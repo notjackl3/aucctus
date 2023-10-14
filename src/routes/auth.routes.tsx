@@ -13,7 +13,7 @@ export const AuthRoutes: FunctionComponent = () => {
     <>
       <Route index element={<Page.Auth.Register />} />
       <Route path={`/`} element={<Page.Auth.Register />} />
-      <Route path={`/signin`} element={<Page.Auth.SignIn />} />
+      <Route path={`/sign-in`} element={<Page.Auth.SignIn />} />
       <Route path='*' element={<Page.NotFound />} />
     </>
   )

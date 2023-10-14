@@ -14,7 +14,7 @@ function App() {
         <Route index element={<AuthGuard component={<Layout />} />} />
         <Route path={AppPath.Home} element={<AuthGuard component={<Layout />} />} />
         {/* TODO: Add unauth guard and try refresh */}
-        <Route path='/signin' element={<Page.Auth.SignIn />} />
+        <Route path='/sign-in' element={<Page.Auth.SignIn />} />
         <Route path='*' element={<NotFound />} />
       </Routes>
     </div>

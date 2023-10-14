@@ -3,11 +3,13 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, AxiosRes
 import "abort-controller/polyfill"
 
 
-interface IApiSuccessResult<T = unknown> {
+export interface IApiSuccessResult<T = unknown> {
+  resultType: 'success'
   data: T
 }
 
-interface IApiErrorResult<E = AxiosError | Error | string | {}> {
+export interface IApiErrorResult<E = AxiosError | Error | string | {}> {
+  resultType: 'fail'
   error: E
 }
 
@@ -87,10 +89,12 @@ export class ApiService {
     try {
       const response: AxiosResponse<T> = await this.api.get(url, config);
       return {
+        resultType: 'success',
         data: response.data
       }
     } catch (error) {
       return {
+        resultType: 'fail',
         // @ts-ignore
         error
       }
@@ -122,11 +126,15 @@ export class ApiService {
   async post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<ApiResult<T>> {
     try {
       const response: AxiosResponse<T> = await this.api.post(url, data, config);
+      console.log('BEEP BOOP')
       return {
+        resultType: 'success',
         data: response.data
       }
     } catch (error) {
+      console.log("Hello", error)
       return {
+        resultType: 'fail',
         // @ts-ignore
         error
       }
@@ -138,10 +146,12 @@ export class ApiService {
     try {
       const response: AxiosResponse<T> = await this.api.delete(url, config);
       return {
+        resultType: 'success',
         data: response.data
       }
     } catch (error) {
       return {
+        resultType: 'fail',
         // @ts-ignore
         error
       }
@@ -152,10 +162,12 @@ export class ApiService {
     try {
       const response: AxiosResponse<T> = await this.api.put(url, config);
       return {
+        resultType: 'success',
         data: response.data
       }
     } catch (error) {
       return {
+        resultType: 'fail',
         // @ts-ignore
         error
       }

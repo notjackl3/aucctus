@@ -6,6 +6,7 @@ import { RootState } from "../../app/store";
 export interface AuthState {
   status: "idle" | "loading" | "failed"
   user?: User;
+  error?: string;
 
   // TODO: Access Token - Store token in http only secure cookie
   accessToken?: string
@@ -14,7 +15,8 @@ export interface AuthState {
 const initialState: AuthState = {
   status: "idle",
   user: undefined,
-  accessToken: undefined
+  accessToken: undefined,
+  error: ""
 }
 
 /** Sign In
@@ -22,10 +24,18 @@ const initialState: AuthState = {
  */
 export const signIn = createAsyncThunk(
   "auth/login",
-  async (credentials: Credentials) => {
-    const { usernameOrEmail, password } = credentials
-    const response = await api.auth.signIn(usernameOrEmail, password)
-    return response
+  async (credentials: Credentials, thunkApi) => {
+    try {
+      const { usernameOrEmail, password } = credentials
+      const response = await api.auth.signIn(usernameOrEmail, password)
+      if (response.resultType === 'success') {
+        return response.data
+      } else {
+        throw response.error
+      }
+    } catch (e) {
+      thunkApi.rejectWithValue(e)
+    }
   }
 )
 
@@ -47,10 +57,8 @@ export const authSlice = createSlice({
       })
       .addCase(signIn.fulfilled, (state, action) => {
         state.status = 'idle'
-        if ("data" in action.payload) {
-          state.accessToken = action.payload.data.accessToken
-          state.user = action.payload.data.user
-        } // TODO: handle error 
+        state.user = action.payload?.user
+        state.accessToken = action.payload?.accessToken
       })
   }
 })

@@ -2,7 +2,7 @@
 export const endpoints = {
   // Auth
 
-  SignIn: 'api/auth/sign-in',
+  SignIn: '/api/auth/sign-in',
   Signup: "",
   Refresh: '/api/auth/refresh-access',
   Me: '/api/auth/me',

@@ -4,8 +4,8 @@ export enum AppPath {
   Home = '/',
 
   /* Auth */
-  Login = "/auth/signin",
-  SignUp = "/auth/signup",
+  Login = "/auth/sign-in",
+  SignUp = "/auth/sign-up",
 
 
 }
