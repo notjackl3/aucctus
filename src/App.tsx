@@ -1,6 +1,6 @@
 
 import { Counter } from "./features/counter/Counter"
-import "./App.css"
+import "./app/assets/styles/App.css"
 import { Route, Routes } from "react-router"
 import AuthGuard from "./routes/guards/auth.guard"
 import Layout from "./Layout"

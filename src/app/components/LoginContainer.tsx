@@ -1,5 +1,5 @@
 import { FunctionComponent } from "react";
-import HeaderNavigation from "./HeaderNavigation";
+import HeaderNavigation from "./Auth/HeaderNavigation";
 import Footer from "./Footer";
 import styles from "./LoginContainer.module.css";
 

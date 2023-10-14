@@ -1,43 +1,26 @@
 import { FunctionComponent } from "react";
-import styles from "./IntoSection.module.css";
 
-type IntoSectionType = {
+import screenImage from '../../assets/img/screen-mockup-replace-fill.png';
+import styles from "../../assets/styles/pages/auth-screens.module.scss";
+import StarIcon from "../../assets/icons/Star";
+
+interface IntoSectionProps {
   shadow?: boolean;
 };
 
-const IntoSection: FunctionComponent<IntoSectionType> = ({ shadow }) => {
+const IntoSection: FunctionComponent<IntoSectionProps> = ({ shadow }) => {
   return (
     <div className={styles.intoSection}>
       <div className={styles.quoteAndAttribution}>
         <div className={styles.stars}>
-          <img
-            className={styles.starIcon}
-            alt=""
-            src="/assets/icons/fill100-colorgray.svg"
-          />
-          <img
-            className={styles.starIcon}
-            alt=""
-            src="/assets/icons/fill100-colorgray.svg"
-          />
-          <img
-            className={styles.starIcon}
-            alt=""
-            src="/assets/icons/fill100-colorgray.svg"
-          />
-          <img
-            className={styles.starIcon}
-            alt=""
-            src="/assets/icons/fill100-colorgray.svg"
-          />
-          <img
-            className={styles.starIcon}
-            alt=""
-            src="/assets/icons/fill100-colorgray.svg"
-          />
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
+          <StarIcon />
         </div>
         <div className={styles.quote}>
-          Few things make me feel more powerful than setting up automations in
+          Few things make me feel more powerful than setting up automation in
           Auctus to make my life easier and more efficient.
         </div>
         <div className={styles.textAndStars}>
@@ -58,7 +41,7 @@ const IntoSection: FunctionComponent<IntoSectionType> = ({ shadow }) => {
           <img
             className={styles.screenMockupReplaceFill}
             alt=""
-            src="/assets/icons/screen-mockup-replace-fill1@2x.png"
+            src={new URL(screenImage, import.meta.url).href}
           />
         </div>
       </div>

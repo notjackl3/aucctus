@@ -1,0 +1,146 @@
+@import "../variables.scss";
+
+.authContainer {
+  display: inline-flex;
+  justify-content: start;
+  max-height: 100vh;
+  width: 100vw;
+  height: 100vw;
+  overflow: auto;
+
+  .formContainer {
+    flex: 1;
+    display: flex;
+    width: 50%;
+  }
+
+  .intoSection,
+  .screenMockupWrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .intoSection {
+    background-color: var(--gray-200-row-header);
+    overflow: hidden;
+    gap: var(--gap-base);
+    text-align: left;
+    font-size: var(--display-sm-medium-size);
+    color: var(--gray-900-text-primary);
+    font-family: var(--text-sm-regular);
+    flex: 1;
+    width: 100vw;
+    height: 100vw;
+
+    .quoteAndAttribution {
+      width: 100%;
+      flex-direction: column;
+      padding: var(--padding-61xl) var(--padding-41xl) var(--padding-44xl);
+      box-sizing: border-box;
+      gap: var(--gap-5xl);
+    }
+
+    .screenMockupWrapper {
+      align-self: stretch;
+      padding: 0 0 0 var(--padding-41xl);
+      width: 100vw;
+      height: 100vh;
+    }
+    .screenMockup {
+      position: relative;
+      border-radius: var(--br-xs);
+      border: 6px solid var(--gray-900-text-primary);
+      box-sizing: border-box;
+      width: 100vw;
+      height: 100vh;
+    }
+    .screenMockupReplaceFill {
+      width: calc(100% - 12px);
+      right: 12px;
+      left: 0;
+      max-width: 100%;
+      overflow: hidden;
+      max-height: 100%;
+      object-fit: cover;
+    }
+    .starIcon {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+    .stars {
+      display: flex;
+      flex-direction: row;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: var(--gap-11xs);
+
+      svg {
+        position: relative;
+        width: 20px;
+        height: 20px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+    }
+    .quote,
+    .supportingText,
+    .text {
+      align-self: stretch;
+      position: relative;
+      line-height: 38px;
+      font-weight: 500;
+    }
+    .supportingText,
+    .text {
+      line-height: 28px;
+    }
+    .supportingText {
+      font-size: var(--h3-size);
+      line-height: 24px;
+      color: var(--gray-600-text-secondary);
+    }
+    .textAndSupportingText {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    .fictionalCompanyLogo {
+      position: relative;
+    }
+    .quoteAndAttribution,
+    .textAndStars {
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
+    .textAndStars {
+      align-self: stretch;
+      flex-direction: row;
+      gap: var(--gap-xs);
+      font-size: var(--text-lg-semibold-size);
+    }
+
+    .mockupShadow,
+    .screenMockupReplaceFill {
+      position: absolute;
+      height: calc(100% - 12px);
+      top: 0;
+      bottom: 12px;
+      border-radius: var(--br-xs);
+    }
+    .mockupShadow {
+      width: calc(100% - 28px);
+      right: 20px;
+      left: 8px;
+      background-color: var(--gray-900-text-primary);
+      box-shadow: var(--shadow-3xl);
+    }
+  }
+}

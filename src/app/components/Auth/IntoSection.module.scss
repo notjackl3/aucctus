@@ -11,6 +11,14 @@
   align-items: flex-start;
   justify-content: flex-start;
   gap: var(--gap-11xs);
+
+  svg {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    overflow: hidden;
+    flex-shrink: 0;
+  }
 }
 .quote,
 .supportingText,
