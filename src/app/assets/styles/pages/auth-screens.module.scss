@@ -8,18 +8,127 @@
   height: 100vw;
   overflow: auto;
 
-  .formContainer {
+  .formSection {
     flex: 1;
     display: flex;
-    width: 50%;
-  }
-
-  .intoSection,
-  .screenMockupWrapper {
-    display: flex;
     flex-direction: column;
-    align-items: flex-start;
-    justify-content: flex-start;
+    justify-content: space-between;
+    text-align: left;
+    font-size: var(--display-md-semibold-size);
+    color: var(--gray-900-text-primary);
+    font-family: var(--text-sm-regular);
+
+    .headerNavigation {
+      flex: 1;
+      height: 96px;
+      align-items: center;
+      padding: var(--padding-13xl);
+      box-sizing: border-box;
+
+      &,
+      .logo {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-start;
+        align-self: stretch;
+      }
+
+      .logoIcon {
+        position: relative;
+        width: 130px;
+        height: 26.9px;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      .logo {
+        flex: 1;
+        align-items: flex-start;
+      }
+    }
+
+    &,
+    .form,
+    .basicForm {
+      align-self: stretch;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .form {
+      justify-content: center;
+      padding: 0 var(--padding-81xl);
+      gap: var(--gap-13xl);
+
+      .header {
+        align-self: stretch;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: var(--gap-base);
+
+        .supportingText,
+        .title {
+          align-self: stretch;
+          position: relative;
+        }
+
+        .title {
+          letter-spacing: -0.02em;
+          line-height: 2.75rem;
+          font-weight: 500;
+        }
+
+        .supportingText {
+          font-size: var(--h3-size);
+          line-height: 1.5rem;
+          color: var(--gray-600-text-secondary);
+        }
+      }
+
+      .basicForm {
+        justify-content: center;
+        border-radius: var(--br-xs);
+        height: 30rem;
+        gap: var(--gap-13xl);
+        font-size: var(--text-sm-regular-size);
+        color: var(--type-tertiary);
+
+        .row {
+          align-self: stretch;
+        }
+
+        .row,
+        .signUp {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0 var(--padding-5xs);
+        }
+      }
+    }
+
+    .link {
+      font-family: "DM Sans";
+      font-size: 0.875rem;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.25rem;
+    }
+
+    button {
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      padding: var(--padding-3xs) var(--padding-base);
+      align-self: stretch;
+      align-items: center;
+      justify-content: center;
+      gap: var(--gap-xs);
+    }
   }
 
   .intoSection {
@@ -33,6 +142,15 @@
     flex: 1;
     width: 100vw;
     height: 100vw;
+    max-height: 100vh;
+
+    &,
+    .screenMockupWrapper {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+    }
 
     .quoteAndAttribution {
       width: 100%;
@@ -42,23 +160,23 @@
       gap: var(--gap-5xl);
     }
 
+    .screenMockupWrapper,
+    .screenMockup {
+      width: 70vw;
+      height: 65vh;
+    }
+
     .screenMockupWrapper {
       align-self: stretch;
       padding: 0 0 0 var(--padding-41xl);
-      width: 100vw;
-      height: 100vh;
     }
     .screenMockup {
       position: relative;
       border-radius: var(--br-xs);
       border: 6px solid var(--gray-900-text-primary);
       box-sizing: border-box;
-      width: 100vw;
-      height: 100vh;
     }
     .screenMockupReplaceFill {
-      width: calc(100% - 12px);
-      right: 12px;
       left: 0;
       max-width: 100%;
       overflow: hidden;
@@ -110,10 +228,14 @@
       flex-direction: column;
       align-items: flex-start;
       justify-content: flex-start;
+
+      svg {
+        position: relative;
+        width: 140px;
+        height: 33px;
+      }
     }
-    .fictionalCompanyLogo {
-      position: relative;
-    }
+
     .quoteAndAttribution,
     .textAndStars {
       display: flex;

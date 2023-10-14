@@ -4,6 +4,10 @@
 @import "~bootstrap/scss/bootstrap";
 @import "./variables.scss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   line-height: normal;
@@ -19,6 +23,71 @@ body {
 body {
   height: 100vh;
   width: 100vw;
+}
+
+a {
+  transition: all 0.3s ease-in-out;
+  transition: all 0.3s ease-in-out;
+  text-decoration: none !important;
+  color: var(--primary-600-primary, #4318ff) !important;
+}
+
+a:hover,
+a:active {
+  outline: 0;
+}
+
+button.btn {
+  border-radius: 0.5rem;
+
+  /* Shadow/xs */
+  box-shadow: var(--shadow-xs) !important;
+
+  .btn-primary {
+    border: 1px solid var(--primary-600-primary, #4318ff) !important;
+    background: var(--primary-600-primary, #4318ff) !important;
+  }
+
+  .btn-white {
+    border: 1px solid var(--gray-300-outline, #e0e5f2) !important;
+    background: var(--base-white, #fff) !important;
+  }
+}
+
+input {
+  &[type="checkbox"],
+  &[type="radio"] {
+    width: 16px;
+    height: 16px;
+
+    // border: 1px solid $content-color-text;
+    transition: 0.2s all linear;
+    margin-right: 5px;
+
+    position: relative;
+
+    &:disabled {
+      border-color: var(--);
+    }
+
+    &:checked {
+      // border: 6px solid $primary-color;
+      outline: unset !important;
+      /* I added this one for Edge (chromium) support */
+
+      &:disabled {
+        // border-color: rgba($content-border-color, 0.75);
+      }
+    }
+  }
+
+  &[type="checkbox"] {
+    border-radius: 2px;
+  }
+
+  &[type="radio"] {
+    border-radius: 50% !important;
+  }
 }
 
 :root {

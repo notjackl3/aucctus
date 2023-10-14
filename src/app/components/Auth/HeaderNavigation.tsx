@@ -1,11 +1,12 @@
 import { FunctionComponent } from "react";
 import styles from "./HeaderNavigation.module.css";
+import Logo from "../../assets/icons/Logo";
 
 const HeaderNavigation: FunctionComponent = () => {
   return (
     <div className={styles.headerNavigation}>
       <div className={styles.logo}>
-        <img className={styles.logoIcon} alt="" src="/assets/icons/logo1.svg" />
+        <Logo />
       </div>
     </div>
   );

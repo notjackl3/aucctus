@@ -2,17 +2,19 @@
   position: relative;
   line-height: 20px;
 }
-.mail01Icon {
+
+.footer,
+.row {
+  display: flex;
+  flex-direction: row;
+
+  svg {
   position: relative;
   width: 16px;
   height: 16px;
   overflow: hidden;
   flex-shrink: 0;
-}
-.footer,
-.row {
-  display: flex;
-  flex-direction: row;
+  }
 }
 .row {
   align-items: center;

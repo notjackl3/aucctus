@@ -1,30 +1,40 @@
-import { FunctionComponent } from "react";
+import { ForwardRefRenderFunction, InputHTMLAttributes } from "react";
 
-import styles from '../assets/styles/input-field.module.css'
+import styles from '../assets/styles/components/input-field.module.scss'
+import React from "react";
 
+interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+  name: string;
+  isPassword?: boolean
+  required?: boolean
+  hintText?: string
+}
 
-const InputField: FunctionComponent = () => {
+const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = ({ label, name, hintText, isPassword = false, ...props }, ref) => {
 
   return (
     <div className={styles.inputField}>
-      <div className={styles.inputField}>
-        <div className={styles.label}>Password</div>
-        <div className={styles.input}>
-          <div className={styles.content}>
-            <div className={styles.text1} />
+      <div className={styles.label}>
+        {label}
+      </div>
+      <input
+        {...props}
+        type={isPassword ? 'password' : props.type}
+        ref={ref}
+        name={name}
+      />
+      {
+        hintText ?
+          <div className={styles.hintText}>
+            This is a hint text to help user.
           </div>
-          <img
-            className={styles.helpIcon}
-            alt=""
-            src="/assets/icons/help-icon3.svg"
-          />
-        </div>
-      </div>
-      <div className={styles.hintText}>
-        This is a hint text to help user.
-      </div>
+          : null
+      }
     </div>
   )
 }
+
+const InputField = React.forwardRef(Input);
 
 export default InputField

@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react";
-import HeaderNavigation from "./Auth/HeaderNavigation";
-import Footer from "./Footer";
+import HeaderNavigation from "../Auth/HeaderNavigation";
+import Footer from "../Footer";
 import styles from "./LoginContainer.module.css";
 
 const LoginContainer: FunctionComponent = () => {
@@ -103,30 +103,7 @@ const LoginContainer: FunctionComponent = () => {
               />
               <div className={styles.text6}>Sign in with Google</div>
             </div>
-            <div className={styles.socialButton1}>
-              <img
-                className={styles.socialIcon}
-                alt=""
-                src="/assets/icons/social-icon1.svg"
-              />
-              <div className={styles.text6}>Sign in with Facebook</div>
-            </div>
-            <div className={styles.socialButton1}>
-              <img
-                className={styles.socialIcon}
-                alt=""
-                src="/assets/icons/social-icon9.svg"
-              />
-              <div className={styles.text6}>Sign in with Apple</div>
-            </div>
-            <div className={styles.socialButton1}>
-              <img
-                className={styles.socialIcon}
-                alt=""
-                src="/assets/icons/social-icon10.svg"
-              />
-              <div className={styles.text6}>Sign in with Twitter</div>
-            </div>
+
           </div>
           <div className={styles.row1}>
             <div className={styles.text10}>Don’t have an account?</div>
