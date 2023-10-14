@@ -126,13 +126,11 @@ export class ApiService {
   async post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<ApiResult<T>> {
     try {
       const response: AxiosResponse<T> = await this.api.post(url, data, config);
-      console.log('BEEP BOOP')
       return {
         resultType: 'success',
         data: response.data
       }
     } catch (error) {
-      console.log("Hello", error)
       return {
         resultType: 'fail',
         // @ts-ignore
