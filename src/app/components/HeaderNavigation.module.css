@@ -1,0 +1,24 @@
+.logoIcon {
+  position: relative;
+  width: 130px;
+  height: 26.9px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.headerNavigation,
+.logo {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-self: stretch;
+}
+.logo {
+  flex: 1;
+  align-items: flex-start;
+}
+.headerNavigation {
+  height: 96px;
+  align-items: center;
+  padding: var(--padding-13xl);
+  box-sizing: border-box;
+}

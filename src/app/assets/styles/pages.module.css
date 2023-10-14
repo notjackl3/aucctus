@@ -1,0 +1,11 @@
+.login {
+  position: relative;
+  background-color: var(--base-white);
+  width: 100%;
+  height: 60rem;
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}

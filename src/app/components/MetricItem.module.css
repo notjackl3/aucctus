@@ -1,0 +1,51 @@
+.heading,
+.number {
+  position: relative;
+  font-weight: 500;
+}
+.heading {
+  align-self: stretch;
+  line-height: 20px;
+}
+.number {
+  flex: 1;
+  line-height: 32px;
+}
+.numberParent {
+  align-self: stretch;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--gap-5xs);
+  font-size: var(--display-xs-semibold-size);
+  color: var(--gray-900-text-primary);
+}
+.headingParent,
+.metricItem {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--gap-5xs);
+}
+.metricItem {
+  border-radius: var(--br-xs);
+  background-color: var(--base-white);
+  border: 1px solid var(--gray-300-outline);
+  box-sizing: border-box;
+  height: 108px;
+  flex-direction: row;
+  align-items: center;
+  padding: var(--padding-5xl);
+  gap: var(--gap-base);
+  min-width: 305px;
+  max-width: 305px;
+  min-height: 108px;
+  max-height: 108px;
+  text-align: left;
+  font-size: var(--text-sm-regular-size);
+  color: var(--gray-600-text-secondary);
+  font-family: var(--text-sm-regular);
+}

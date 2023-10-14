@@ -1,0 +1,33 @@
+.text {
+  position: relative;
+  line-height: 20px;
+}
+.mail01Icon {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.footer,
+.row {
+  display: flex;
+  flex-direction: row;
+}
+.row {
+  align-items: center;
+  justify-content: flex-start;
+  gap: var(--gap-5xs);
+}
+.footer {
+  height: 96px;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: var(--padding-13xl);
+  box-sizing: border-box;
+  text-align: left;
+  font-size: var(--text-sm-regular-size);
+  color: var(--gray-600-text-secondary);
+  font-family: var(--text-sm-regular);
+  align-self: stretch;
+}

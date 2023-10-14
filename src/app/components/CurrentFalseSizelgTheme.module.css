@@ -1,0 +1,17 @@
+.bell01Icon {
+  position: relative;
+  width: 24px;
+  height: 24px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+.currentfalseSizelgTheme {
+  border-radius: var(--br-7xs);
+  background-color: var(--base-white);
+  overflow: hidden;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: var(--padding-xs);
+}
