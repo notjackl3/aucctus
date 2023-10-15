@@ -1,13 +1,12 @@
 
-
-export interface User {
-  id: string;
-  name: string;
+export interface Credentials {
   email: string;
-
+  password: string;
 }
 
-export interface Credentials {
-  usernameOrEmail: string;
+export interface SignupDetails {
+  name: string;
+  email: string;
   password: string;
+  confirmPassword: string;
 }

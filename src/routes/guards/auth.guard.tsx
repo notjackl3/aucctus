@@ -1,24 +1,22 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { selectUser } from '../../features/auth/auth.slice';
-interface AuthGuardProps {
-  component: React.ReactNode
-}
+import { AppPath } from '../routes';
 
-const AuthGuard: FunctionComponent<AuthGuardProps> = ({ component }) => {
+
+const AuthGuard: FunctionComponent = () => {
   const user = useSelector(selectUser);
-  const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!user) {
-      navigate('/sign-in');
+  if (user) {
+    if (!user.organizationId) {
+      return <Navigate to={AppPath.OnBoarding} />
     }
-  }, [user, component, navigate]);
 
-  return (
-    <>{!!user ? component : null} </>
-  )
+    return <Outlet />
+  }
+
+  return <Navigate to={AppPath.SignIn} />
 
 }
 

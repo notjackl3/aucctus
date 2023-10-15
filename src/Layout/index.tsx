@@ -1,5 +1,5 @@
+import { Outlet } from "react-router-dom";
 import NavDrawer from "../app/components/NavDrawer"
-import { AppRoutes } from "../routes/app.routes";
 import styles from "./layout.module.scss"
 
 const Layout = () => {
@@ -12,7 +12,7 @@ const Layout = () => {
         <main role="main" id="main" className={`${styles.main}`}>
           <div className={styles.header}>{/* <Breadcrumbs /> */}</div>
           <section className={styles.content}>
-            <AppRoutes />
+            <Outlet />
           </section>
         </main>
       </div>

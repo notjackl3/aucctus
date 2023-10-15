@@ -1,0 +1,46 @@
+import { FunctionComponent, useEffect } from "react";
+import styles from "../../assets/styles/pages/auth-screens.module.scss"
+import { AppPath } from "../../../routes/routes";
+import { useAppDispatch, useQuery } from "../../hooks";
+import { confirmEmail } from "../../../features/auth/auth.slice";
+import { Link } from "react-router-dom";
+import LeftArrowIcon from "../../assets/icons/LeftArrow";
+
+
+const SignUpSuccess: FunctionComponent = () => {
+  const dispatch = useAppDispatch()
+  const query = useQuery()
+
+
+  useEffect(() => {
+    const token = query.get('token')
+    if (token) {
+      dispatch(confirmEmail(token))
+    }
+  }, [dispatch, query])
+
+
+
+  return (
+    <>
+      <div className={styles.header}>
+        <span className={styles.title}>Check Your Email</span>
+        <span className={styles.supportingText}>
+          Please confirm your email
+        </span>
+      </div>
+
+      <Link className={styles.backArrow} to={AppPath.SignIn}>
+        <LeftArrowIcon
+          width={20}
+          height={20}
+        />
+
+        Back to Sign In
+
+      </Link>
+    </>
+  )
+}
+
+export default SignUpSuccess;

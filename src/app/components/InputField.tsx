@@ -15,6 +15,10 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
 
 const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = ({ label, name, hintText, errorMessage, error = false, isPassword = false, ...props }, ref) => {
 
+  const showHint = !!hintText || !!errorMessage
+  const hint = errorMessage || hintText;
+
+
   return (
     <div className={`${styles.inputField} ${error ? styles.inputFieldError : ""}`}>
       <div className={styles.label}>
@@ -27,9 +31,9 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = ({ la
         name={name}
       />
       {
-        hintText ?
+        showHint ?
           <div className={styles.hintText}>
-            {hintText}
+            {hint}
           </div>
           : null
       }

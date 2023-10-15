@@ -111,6 +111,19 @@
       }
     }
 
+    .backArrow {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--gray-600-text-secondary, #667085) !important;
+      font-family: "DM Sans";
+      font-size: 0.875rem;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.25rem;
+    }
+
     .link {
       font-family: "DM Sans";
       font-size: 0.875rem;

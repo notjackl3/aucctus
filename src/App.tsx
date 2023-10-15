@@ -5,16 +5,30 @@ import Layout from "./Layout"
 import { AppPath } from "./routes/routes"
 import NotFound from "./app/pages/NotFound"
 import Page from "./app/pages"
+import UnauthGuard from "./routes/guards/unauth.guard"
 
 function App() {
 
   return (
     <div className="App">
       <Routes>
-        <Route index element={<AuthGuard component={<Layout />} />} />
-        <Route path={AppPath.Home} element={<AuthGuard component={<Layout />} />} />
-        {/* TODO: Add unauth guard and try refresh */}
-        <Route path='/sign-in' element={<Page.Auth.SignIn />} />
+
+        {/* Protected Routes */}
+        <Route element={<AuthGuard />}>
+          <Route element={<Layout />}>
+            <Route index path={AppPath.Home} element={<Page.Dashboard />} />
+            <Route path={AppPath.OnBoarding} element={<Page.Onboarding />} />
+          </Route>
+        </Route>
+
+        {/* Auth Routes  */}
+        <Route element={<UnauthGuard />} >
+          <Route index path={AppPath.SignIn} element={<Page.Auth.SignIn />} />
+          <Route path={AppPath.SignUp} element={<Page.Auth.SignUp />} />
+          <Route path={AppPath.ForgotPassword} element={<Page.Auth.ForgotPassword />} />
+          <Route path={AppPath.SignUpSuccess} element={<Page.Auth.SignUpSuccess />} />
+          <Route path={AppPath.ConfirmEmail} element={<Page.Auth.ConfirmEmail />} />
+        </Route>
         <Route path='*' element={<NotFound />} />
       </Routes>
     </div>

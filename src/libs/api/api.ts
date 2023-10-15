@@ -1,4 +1,4 @@
-import { AxiosRequestHeaders } from "axios";
+import { AxiosRequestHeaders, HeadersDefaults } from "axios";
 import { IApiServiceConfig } from "./apiService";
 import { AuthApi } from "./auth";
 
@@ -9,7 +9,7 @@ export interface IApiConfig {
   authBaseUrl: string;
 
   /* Settings */
-  defaultHeaders?: AxiosRequestHeaders;
+  defaultHeaders?: HeadersDefaults;
   timeoutSeconds: number;
   debug: boolean;
   appId: string;

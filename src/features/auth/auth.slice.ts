@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { Credentials, User } from "./interfaces/user.interface";
+import { Credentials, SignupDetails } from "./interfaces/user.interface";
 import api from '../../libs/api'
 import { RootState } from "../../app/store";
+import analytics from "../../libs/analytics";
+import { IUser } from "../../libs/api/typings";
 
 export interface AuthState {
   status: "idle" | "loading" | "failed"
-  user?: User;
+  user?: IUser;
   error?: string;
 
   // TODO: Access Token - Store token in http only secure cookie
@@ -23,21 +25,76 @@ const initialState: AuthState = {
  * 
  */
 export const signIn = createAsyncThunk(
-  "auth/login",
+  "auth/signIn",
   async (credentials: Credentials, thunkApi) => {
     try {
-      const { usernameOrEmail, password } = credentials
-      const response = await api.auth.signIn(usernameOrEmail, password)
+      const { email, password } = credentials
+      const response = await api.auth.signIn(email, password)
       if (response.resultType === 'success') {
         return response.data
-      } else {
-        throw response.error
+      } else { // TODO: Handle error
+        thunkApi.rejectWithValue(response.error)
       }
     } catch (e) {
-      thunkApi.rejectWithValue(e)
+      analytics.debug(e)
     }
   }
 )
+
+/** Sign Up
+ * 
+ */
+export const signUp = createAsyncThunk(
+  "auth/signUp",
+  async (details: SignupDetails, thunkApi) => {
+    try {
+      const { name, email, password, confirmPassword } = details
+      const response = await api.auth.signup(name, email, password, confirmPassword)
+      if (response.resultType === 'success') {
+        return response.data
+      } else {
+        thunkApi.rejectWithValue(response.error)
+      }
+    } catch (e) {
+      analytics.debug(e)
+    }
+  }
+)
+
+export const refreshAuth = createAsyncThunk(
+  "auth/refresh",
+  async (_, thunkApi) => {
+    analytics.debug('Refreshing Token')
+    try {
+      const response = await api.auth.refreshToken()
+      if (response.resultType === 'success') {
+        return response.data
+      } else {
+        thunkApi.rejectWithValue(response.error)
+      }
+    } catch (e) {
+      analytics.debug(e)
+    }
+  }
+)
+
+export const confirmEmail = createAsyncThunk(
+  "auth/confirmEmail",
+  async (token: string, thunkApi) => {
+    analytics.debug('Confirming Email')
+    try {
+      const response = await api.auth.confirmEmail(token)
+      if (response.resultType === 'success') {
+        return response.data
+      } else {
+        thunkApi.rejectWithValue(response.error)
+      }
+    } catch (e) {
+      analytics.debug(e)
+    }
+  }
+)
+
 
 export const authSlice = createSlice({
   name: 'auth',
@@ -49,17 +106,22 @@ export const authSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
-      .addCase(signIn.pending, (state) => {
-        state.status = 'loading'
-      })
-      .addCase(signIn.rejected, (state) => {
-        state.status = 'failed'
-      })
       .addCase(signIn.fulfilled, (state, action) => {
         state.status = 'idle'
         state.user = action.payload?.user
         state.accessToken = action.payload?.accessToken
       })
+      .addCase(confirmEmail.fulfilled, (state, action) => {
+        state.status = 'idle'
+        state.user = action.payload?.user
+        state.accessToken = action.payload?.accessToken
+      })
+      .addCase(refreshAuth.fulfilled, (state, action) => {
+        state.status = 'idle'
+        state.user = action.payload?.user
+        state.accessToken = action.payload?.accessToken
+      })
+
   }
 })
 

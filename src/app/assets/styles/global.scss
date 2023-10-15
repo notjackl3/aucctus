@@ -55,12 +55,18 @@ button.btn {
 }
 
 input {
+  transition: box-shadow 0.3s ease-in-out;
+
   &[type="text"],
   &[type="password"],
   &[type="search"],
   &[type="search"] {
-    :active {
-      outline: 0.5px solid var(--primary-100);
+    &:active,
+    &:focus,
+    &:focus-visible {
+      box-shadow: var(--shadow-3xl);
+      outline: 2px solid var(--primary-100) !important;
+      border: 1px solid var(--primary-100) !important;
     }
   }
 

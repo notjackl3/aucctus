@@ -10,16 +10,15 @@
     input {
       border: 1px solid var(--red-300-outline) !important;
       outline: var(--red-300-outline) !important;
-      // box-shadow: var(--shadow-error) !important;
     }
 
     .label {
       font-weight: 700;
-      color: var(--red-900-text-error) !important;
     }
 
-    .hintText {
-      color: var(--gray-600-text-secondary); // TODO
+    .hintText,
+    .label {
+      color: var(--red-900-text-error) !important;
     }
   }
 

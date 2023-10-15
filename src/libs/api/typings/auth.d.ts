@@ -4,8 +4,8 @@
 export interface IUser {
   id: string;
   name: string;
-  username: string;
   email: string;
+  organizationId?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -15,3 +15,7 @@ export interface IAuthSuccessResponse {
   accessToken: string;
 }
 
+export interface ISignUpSuccessResponse {
+  id: string;
+  message: string;
+}

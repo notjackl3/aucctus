@@ -3,12 +3,11 @@ export const endpoints = {
   // Auth
 
   SignIn: '/api/auth/sign-in',
-  Signup: "",
+  Signup: "/api/auth/sign-up",
   Refresh: '/api/auth/refresh-access',
   Me: '/api/auth/me',
   Delete: "/api/users",
-  GetUser: (idOrUsername: string) => `/api/users/${idOrUsername}`,
-
-
+  GetUser: (id: string) => `/api/users/${id}`,
+  confirmEmail: (token: string) => `/api/auth/confirm-email?token=${token}`
 
 }

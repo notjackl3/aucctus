@@ -2,10 +2,13 @@
 
 export enum AppPath {
   Home = '/',
+  OnBoarding = '/onboarding',
 
   /* Auth */
-  Login = "/auth/sign-in",
-  SignUp = "/auth/sign-up",
-
+  SignIn = "/sign-in",
+  SignUp = "/sign-up",
+  SignUpSuccess = "/confirm-email",
+  ConfirmEmail = "/confirm-email/:token",
+  ForgotPassword = "/forgot-password",
 
 }

@@ -1,5 +1,14 @@
+import ConfirmEmail from "./ConfirmEmail";
+import ForgotPassword from "./ForgotPassword";
 import SignIn from "./SignIn";
-import Register from "./SignUp";
+import SignUp from "./SignUp";
+import SignUpSuccess from "./SignUpSuccess";
 
-const Auth = { SignIn, Register }
+const Auth = {
+  SignIn,
+  SignUp,
+  ForgotPassword,
+  ConfirmEmail,
+  SignUpSuccess
+}
 export default Auth
