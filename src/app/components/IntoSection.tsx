@@ -1,14 +1,10 @@
 import { FunctionComponent } from "react";
-import styles from "../../assets/styles/pages/auth-screens.module.scss";
-import StarIcon from "../../assets/icons/Star";
-import images from "../../assets/img";
-import FictionalLogo from "../../assets/icons/FictionalCompanyLogo";
+import styles from "../assets/styles/pages/auth-screens.module.scss";
+import StarIcon from "../assets/icons/Star";
+import images from "../assets/img";
+import FictionalLogo from "../assets/icons/FictionalCompanyLogo";
 
-interface IntoSectionProps {
-  shadow?: boolean;
-};
-
-const IntoSection: FunctionComponent<IntoSectionProps> = ({ shadow }) => {
+const IntoSection: FunctionComponent = () => {
   return (
     <div className={styles.intoSection}>
       <div className={styles.quoteAndAttribution}>

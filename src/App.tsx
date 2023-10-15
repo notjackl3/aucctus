@@ -15,9 +15,9 @@ function App() {
 
         {/* Protected Routes */}
         <Route element={<AuthGuard />}>
+          <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
           <Route element={<Layout />}>
             <Route index path={AppPath.Home} element={<Page.Dashboard />} />
-            <Route path={AppPath.OnBoarding} element={<Page.Onboarding />} />
           </Route>
         </Route>
 

@@ -9,10 +9,6 @@ const AuthGuard: FunctionComponent = () => {
   const user = useSelector(selectUser);
 
   if (user) {
-    if (!user.organizationId) {
-      return <Navigate to={AppPath.OnBoarding} />
-    }
-
     return <Outlet />
   }
 

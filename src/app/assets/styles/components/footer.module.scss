@@ -8,7 +8,10 @@
   height: 96px;
   align-items: flex-end;
   justify-content: space-between;
-  padding: var(--padding-13xl);
+  padding-left: var(--padding-13xl);
+  padding-right: var(--padding-13xl);
+  padding-top: var(--padding-xs);
+  padding-bottom: var(--padding-xs);
   box-sizing: border-box;
   text-align: left;
   font-size: var(--text-sm-regular-size);

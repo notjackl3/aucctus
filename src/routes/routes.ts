@@ -2,7 +2,7 @@
 
 export enum AppPath {
   Home = '/',
-  OnBoarding = '/onboarding',
+  Onboarding = '/onboarding',
 
   /* Auth */
   SignIn = "/sign-in",

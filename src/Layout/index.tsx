@@ -1,8 +1,19 @@
-import { Outlet } from "react-router-dom";
+import { Navigate, Outlet } from "react-router-dom";
 import NavDrawer from "../app/components/NavDrawer"
 import styles from "./layout.module.scss"
+import { useSelector } from "react-redux";
+import { selectUser } from "../features/auth/auth.slice";
+import { AppPath } from "../routes/routes";
 
 const Layout = () => {
+  const user = useSelector(selectUser)!;
+
+  if (!user.organizationId) {
+    return <Navigate to={AppPath.Onboarding} />
+  }
+
+
+
   return (
     <>
       {/* <NavBar /> */}
