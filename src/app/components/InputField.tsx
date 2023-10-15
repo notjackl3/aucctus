@@ -6,28 +6,30 @@ import React from "react";
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
   name: string;
+  error?: boolean;
+  errorMessage?: string;
   isPassword?: boolean
   required?: boolean
   hintText?: string
 }
 
-const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = ({ label, name, hintText, isPassword = false, ...props }, ref) => {
+const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = ({ label, name, hintText, errorMessage, error = false, isPassword = false, ...props }, ref) => {
 
   return (
-    <div className={styles.inputField}>
+    <div className={`${styles.inputField} ${error ? styles.inputFieldError : ""}`}>
       <div className={styles.label}>
         {label}
       </div>
       <input
         {...props}
-        type={isPassword ? 'password' : props.type}
+        type={isPassword ? 'password' : 'text'}
         ref={ref}
         name={name}
       />
       {
         hintText ?
           <div className={styles.hintText}>
-            This is a hint text to help user.
+            {hintText}
           </div>
           : null
       }

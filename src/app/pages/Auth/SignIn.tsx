@@ -10,18 +10,31 @@ import { selectUser, signIn } from "../../../features/auth/auth.slice";
 import { useAppDispatch } from "../../hooks";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { validEmail } from "../../../libs/utils";
 
 const SignIn: FunctionComponent = () => {
   const dispatch = useAppDispatch()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState<string | undefined>()
+
+  const [emailInputError, setEmailInputError] = useState<string | undefined>()
+
+
   const user = useSelector(selectUser)
 
 
   const _handleSignIn = useCallback((e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     dispatch(signIn({ usernameOrEmail: email, password }))
   }, [dispatch, email, password])
+
+  const _handleEmailValidation = useCallback((e: React.FocusEvent) => {
+    if (email && !validEmail(email)) {
+      setEmailInputError("Email is Invalid.")
+    } else {
+      setEmailInputError(undefined)
+    }
+  }, [email])
 
 
   if (user) {
@@ -45,7 +58,17 @@ const SignIn: FunctionComponent = () => {
             {error}
           </div>}
           <div className={`${styles.basicForm}`}>
-            <InputField label="Email" name='email' autoComplete="on" value={email} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)} />
+            <InputField
+              label="Email"
+              name='email'
+              autoComplete="on"
+              error={!!emailInputError}
+              value={email}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              onFocus={(e) => setEmailInputError(undefined)}
+              onBlur={_handleEmailValidation}
+            />
+
             <InputField label="Password" name='password' autoComplete="on" isPassword value={password} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)} />
 
             <div className={`${styles.row}`}>
@@ -64,6 +87,7 @@ const SignIn: FunctionComponent = () => {
               type="button"
               className="btn btn-primary"
               onClick={_handleSignIn}
+              disabled={!email || !password || !!emailInputError}
 
             >Sign in</button>
 

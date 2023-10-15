@@ -131,7 +131,9 @@
     }
   }
 
+  // TODO: hide into section on smaller screens
   .intoSection {
+    flex: 1;
     background-color: var(--gray-200-row-header);
     overflow: hidden;
     gap: var(--gap-base);
@@ -139,10 +141,10 @@
     font-size: var(--display-sm-medium-size);
     color: var(--gray-900-text-primary);
     font-family: var(--text-sm-regular);
-    flex: 1;
+
     width: 100vw;
     height: 100vw;
-    max-height: 100vh;
+    max-height: 100%;
 
     &,
     .screenMockupWrapper {

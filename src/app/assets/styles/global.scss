@@ -55,6 +55,15 @@ button.btn {
 }
 
 input {
+  &[type="text"],
+  &[type="password"],
+  &[type="search"],
+  &[type="search"] {
+    :active {
+      outline: 0.5px solid var(--primary-100);
+    }
+  }
+
   &[type="checkbox"],
   &[type="radio"] {
     width: 16px;
@@ -67,7 +76,7 @@ input {
     position: relative;
 
     &:disabled {
-      border-color: var(--);
+      // border-color: var(--);
     }
 
     &:checked {
@@ -120,6 +129,9 @@ input {
   --gray-900-text-primary: #2b3674;
   --primary-600-primary: #4318ff;
 
+  --red-300-outline: #ec5e57;
+  --red-900-text-error: #ec5e57;
+
   /* Gaps */
   --gap-5xl: 1.5rem;
   --gap-5xs: 0.5rem;
@@ -163,4 +175,7 @@ input {
   --shadow-3xl: 0px 32px 64px -12px rgba(16, 24, 40, 0.14);
   --shadow-lg: 0px 12px 16px -4px rgba(16, 24, 40, 0.08),
     0px 4px 6px -2px rgba(16, 24, 40, 0.03);
+
+  --shadow-error: 0px 12px 16px -4px rgba(40, 16, 16, 0.08),
+    0px 4px 6px -2px rgba(187, 45, 10, 0.819);
 }

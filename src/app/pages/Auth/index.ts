@@ -1,5 +1,5 @@
 import SignIn from "./SignIn";
-import Register from "./Register";
+import Register from "./SignUp";
 
 const Auth = { SignIn, Register }
 export default Auth
