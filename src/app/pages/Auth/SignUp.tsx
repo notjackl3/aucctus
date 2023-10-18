@@ -5,22 +5,20 @@ import InputField from "../../components/InputField";
 import { validEmail } from "../../../libs/utils";
 import { AppPath } from "../../../routes/routes";
 import { useAppDispatch } from "../../hooks";
-import { signUp } from "../../../features/auth/auth.slice";
-import analytics from "../../../libs/analytics";
-import { useNavigate } from "react-router-dom";
+import { selectError, signUp } from "../../../features/auth/auth.slice";
+import { useSelector } from "react-redux";
 
 // TODO: Show loading
 const SignUp: FunctionComponent = () => {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [emailInputError, setEmailInputError] = useState<string | undefined>()
   const [confirmPassInputError, setConfirmPassInputError] = useState<string | undefined>()
+  const error = useSelector(selectError)
 
-  const [error, setError] = useState<string | undefined>()
 
   const _handleEmailValidation = useCallback((e: React.FocusEvent) => {
     if (email && !validEmail(email)) {
@@ -56,20 +54,7 @@ const SignUp: FunctionComponent = () => {
       email,
       password,
       confirmPassword
-    })).unwrap()
-      .then(((value) => {
-        navigate(AppPath.SignUpSuccess)
-      }))
-      .catch((e) => {
-        if ('message' in e) {
-          setError(e.message)
-        } else {
-          setError('Oops Something went wrong.')
-
-        }
-        analytics.debug(e)
-      })
-
+    }))
   }
 
   return (

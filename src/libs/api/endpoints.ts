@@ -8,6 +8,9 @@ export const endpoints = {
   Me: '/api/auth/me',
   Delete: "/api/users",
   GetUser: (id: string) => `/api/users/${id}`,
-  confirmEmail: (token: string) => `/api/auth/confirm-email?token=${token}`
+  confirmEmail: (token: string) => `/api/auth/confirm-email?token=${token}`,
+
+  getOrganization: (id: string) => `/api/organization/${id}`,
+  registerOrganization: 'api/organization/register',
 
 }

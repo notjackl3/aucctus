@@ -1,4 +1,3 @@
-import { AxiosRequestConfig } from "axios";
 import { IAuthSuccessResponse } from "./typings";
 import { ApiService } from "./apiService";
 import { endpoints } from "./endpoints";
@@ -50,6 +49,15 @@ export class AuthApi extends ApiService {
   }
 
 
+  /** Register Organization
+   * 
+   * @param org 
+   * @returns 
+   */
+  async registerOrganization(org: IRegisterOrganization) {
+    return this.post<IOrganizationSuccessResponse>(endpoints.registerOrganization, org, this._handleAccessToken(this.apiInstance.accessToken))
+  }
+
   /** RefreshToken
    * 
    * @returns 
@@ -69,13 +77,5 @@ export class AuthApi extends ApiService {
     return this.get<IAuthSuccessResponse>(endpoints.confirmEmail(token))
   }
 
-
-
-
-  private _handleAccessToken(accessToken: string): AxiosRequestConfig {
-    const config = Object.assign({ headers: {} }, this.config)
-    config.headers.Authorization = `Bearer ${accessToken}`
-    return config
-  }
 
 }

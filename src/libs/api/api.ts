@@ -1,12 +1,13 @@
 import { AxiosRequestHeaders, HeadersDefaults } from "axios";
 import { IApiServiceConfig } from "./apiService";
 import { AuthApi } from "./auth";
+import { OrganizationApi } from "./organization";
 
 
 
 export interface IApiConfig {
   /* End Points */
-  authBaseUrl: string;
+  baseUrl: string;
 
   /* Settings */
   defaultHeaders?: HeadersDefaults;
@@ -18,13 +19,21 @@ export interface IApiConfig {
 
 export class Api {
   private _config: IApiConfig
+
+  accessToken?: string;
+
   auth: AuthApi
+  organization: OrganizationApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig
 
     this.auth = new AuthApi(this, this.buildConfig({
-      baseURL: this._config.authBaseUrl
+      baseURL: this._config.baseUrl,
+    }))
+
+    this.organization = new OrganizationApi(this, this.buildConfig({
+      baseURL: this._config.baseUrl,
     }))
 
   }

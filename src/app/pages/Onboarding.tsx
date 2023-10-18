@@ -4,14 +4,13 @@ import HeaderNavigation from "../components/Auth/HeaderNavigation";
 import OnboardingIntoSection from "../components/OnboardingIntroSection";
 
 import styles from "../assets/styles/pages/auth-screens.module.scss"
-import { useNavigate } from "react-router-dom";
 import { useAppDispatch } from "../hooks";
 import InputField from "../components/InputField";
 import { validDomain } from "../../libs/utils";
+import { registerOrganization } from "../../features/auth/auth.slice";
 
 const OnBoarding: FunctionComponent = () => {
   const dispatch = useAppDispatch()
-  const navigate = useNavigate()
   const [name, setName] = useState<string>("")
   const [domain, setDomain] = useState<string>("")
   const [goal, setGoal] = useState<string>("")
@@ -51,7 +50,13 @@ const OnBoarding: FunctionComponent = () => {
   }
 
   const _handleRegistration = () => {
-
+    dispatch(registerOrganization({
+      domain,
+      name,
+      competitors,
+      kpis,
+      goal
+    }))
   }
 
   return (
@@ -65,7 +70,9 @@ const OnBoarding: FunctionComponent = () => {
               Answer the prompts below to start innovating
             </span>
           </div>
-
+          {error && <div>  {/* TODO: Fix API ERROR */}
+            {error}
+          </div>}
           <div className={styles.basicForm}>
             <InputField
               name={"companyName"}
@@ -98,7 +105,7 @@ const OnBoarding: FunctionComponent = () => {
               label={"Who are your main competitors?"}
               placeholder="Treehouse Corp, Pug River Corporation, etc."
               value={competitors}
-              hintText={competitorsList}
+              hint={!competitorsList ? "Separate each with a comma" : competitorsList}
               onChange={_handleCompetitorChange}
               onBlur={(e) => setCompetitorsList(competitors.split(',').join(" \u2022\ "))}
 
@@ -109,7 +116,7 @@ const OnBoarding: FunctionComponent = () => {
               label={"What are key KPI’s driving your innovation team?"}
               placeholder="12-month revenue, products in market, etc"
               value={kpis}
-              hintText={kpisList}
+              hint={!kpisList ? "Separate each with a comma" : kpisList}
               onChange={_handleKPIChange}
               onBlur={(e) => setKPISList(kpis.split(',').join(" \u2022\ "))}
 

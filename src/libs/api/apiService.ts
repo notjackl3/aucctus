@@ -78,6 +78,12 @@ export class ApiService {
     return Promise.reject(error)
   }
 
+  protected _handleAccessToken(accessToken?: string): AxiosRequestConfig {
+    const config = Object.assign({ headers: {} }, this.config)
+    config.headers.Authorization = `Bearer ${accessToken}`
+    return config
+  }
+
 
   /** Get
    * 

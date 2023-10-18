@@ -5,13 +5,14 @@ export interface IUser {
   id: string;
   name: string;
   email: string;
-  organizationId?: string;
   createdAt: string;
   updatedAt: string;
 }
 
+
 export interface IAuthSuccessResponse {
   user: IUser;
+  organization?: IOrganization;
   accessToken: string;
 }
 

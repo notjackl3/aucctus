@@ -3,29 +3,22 @@ import styles from "../../assets/styles/pages/auth-screens.module.scss"
 import InputField from "../../components/InputField";
 import AuthProviderIcon from "../../assets/icons/SocialIcon";
 import Checkbox from "../../components/CheckBox";
-import { signIn } from "../../../features/auth/auth.slice";
+import { selectError, signIn } from "../../../features/auth/auth.slice";
 import { useAppDispatch } from "../../hooks";
 import { validEmail } from "../../../libs/utils";
 import { AppPath } from "../../../routes/routes";
-import analytics from "../../../libs/analytics";
+import { useSelector } from "react-redux";
 
 const SignIn: FunctionComponent = () => {
   const dispatch = useAppDispatch()
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const [emailInputError, setEmailInputError] = useState<string | undefined>()
-  const [error, setError] = useState<string | undefined>()
+  const error = useSelector(selectError)
+
 
   const _handleSignIn = useCallback(() => {
-    dispatch(signIn({ email: email, password })).unwrap().catch((e) => {
-      if ('message' in e) {
-        setError(e.message)
-      } else {
-        setError('Oops Something went wrong.')
-
-      }
-      analytics.debug(e)
-    })
+    dispatch(signIn({ email: email, password }))
   }, [dispatch, email, password])
 
   const _handleEmailValidation = (e: React.FocusEvent) => {
@@ -77,6 +70,7 @@ const SignIn: FunctionComponent = () => {
             supportingText="Remember for 30 Days"
           />
 
+          {/* Takes you to unfinished page */}
           <a className={`${styles.link} btn btn-link`} href="/forgot-password">Forgot password</a>
 
         </div>

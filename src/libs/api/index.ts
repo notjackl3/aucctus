@@ -2,7 +2,7 @@ import { Api } from './api'
 
 const api = new Api({
   appId: "Aucctus",
-  authBaseUrl: import.meta.env.VITE_AVXISI_BASE_URL || "",
+  baseUrl: import.meta.env.VITE_AVXISI_BASE_URL || "",
   debug: import.meta.env.DEV,
   timeoutSeconds: 100000,
 })

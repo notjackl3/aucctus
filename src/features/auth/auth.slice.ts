@@ -1,13 +1,16 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { PayloadAction, createAsyncThunk, createSlice, isAnyOf, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit";
 import { Credentials, SignupDetails } from "./interfaces/user.interface";
 import api from '../../libs/api'
 import { RootState } from "../../app/store";
 import analytics from "../../libs/analytics";
-import { IUser } from "../../libs/api/typings";
+import { IAuthSuccessResponse, IUser } from "../../libs/api/typings";
+import { IApiErrorResult, IApiSuccessResult } from "../../libs/api/apiService";
+import { AxiosError, isAxiosError } from "axios";
 
 export interface AuthState {
   status: "idle" | "loading" | "failed"
   user?: IUser;
+  organization?: IOrganization;
   error?: string;
 
   // TODO: Access Token - Store token in http only secure cookie
@@ -19,6 +22,16 @@ const initialState: AuthState = {
   user: undefined,
   accessToken: undefined,
   error: ""
+}
+
+const isAPIAuthSuccessResponse = (action: PayloadAction<unknown>): action is PayloadAction<IApiSuccessResult<IAuthSuccessResponse>> => {
+  const payload = action.payload as IApiSuccessResult<IAuthSuccessResponse>
+  return payload && "resultType" in payload && payload.resultType === 'success' && payload.data.user !== undefined && payload.data.accessToken !== undefined
+}
+
+const isApiErrorResult = (action: PayloadAction<unknown>): action is PayloadAction<IApiErrorResult<AxiosError>> => {
+  const payload = action.payload as IApiErrorResult<AxiosError>
+  return payload && "resultType" in payload && payload.resultType === 'fail' && isAxiosError(payload.error)
 }
 
 /** Sign In
@@ -95,33 +108,52 @@ export const confirmEmail = createAsyncThunk(
   }
 )
 
+export const registerOrganization = createAsyncThunk(
+  "auth/registerOrganization",
+  async (organization: IRegisterOrganization, thunkApi) => {
+    analytics.debug('Register Organization')
+    try {
+      const response = await api.auth.registerOrganization(organization)
+      if (response.resultType === 'success') {
+        return response.data
+      } else {
+        thunkApi.rejectWithValue(response.error)
+      }
+    } catch (e) {
+      analytics.debug(e)
+    }
+  },
+)
+
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
-
-  reducers: {
-
-  },
-
+  reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(signIn.fulfilled, (state, action) => {
+      .addMatcher(isFulfilled, (state, action) => {
         state.status = 'idle'
-        state.user = action.payload?.user
-        state.accessToken = action.payload?.accessToken
       })
-      .addCase(confirmEmail.fulfilled, (state, action) => {
-        state.status = 'idle'
-        state.user = action.payload?.user
-        state.accessToken = action.payload?.accessToken
+      .addMatcher(isPending, (state, action) => {
+        state.status = 'loading'
       })
-      .addCase(refreshAuth.fulfilled, (state, action) => {
-        state.status = 'idle'
-        state.user = action.payload?.user
-        state.accessToken = action.payload?.accessToken
+      .addMatcher(isRejected, (state, action) => {
+        state.status = 'failed'
       })
-
+      .addMatcher(
+        isAnyOf(isAPIAuthSuccessResponse), (state, action) => {
+          state.user = action.payload.data.user
+          state.organization = action.payload.data.organization
+          // TODO: Add api interceptor to grab this
+          api.accessToken = action.payload.data.accessToken
+        }
+      ).addMatcher(
+        isAnyOf(isApiErrorResult), (state, action) => {
+          const error = action.payload.error
+          state.error = error.message
+        }
+      )
   }
 })
 
@@ -130,6 +162,7 @@ export const { } = authSlice.actions
 
 
 export const selectUser = (state: RootState) => state.auth.user;
-
+export const selectOrganization = (state: RootState) => state.auth.organization
+export const selectError = (state: RootState) => state.auth.error
 
 export default authSlice.reducer
