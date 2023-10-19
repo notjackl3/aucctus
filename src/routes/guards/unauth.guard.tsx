@@ -4,7 +4,7 @@ import { useAppDispatch } from '../../app/hooks';
 import { Navigate, Outlet } from 'react-router-dom';
 import styles from "../../app/assets/styles/pages/auth-screens.module.scss"
 import Footer from '../../app/components/Footer';
-import HeaderNavigation from '../../app/components/HeaderNavigation';
+import AuthHeader from '../../app/components/AuthHeader';
 import IntoSection from '../../app/components/IntoSection';
 import { useSelector } from 'react-redux';
 import { AppPath } from '../routes';
@@ -33,7 +33,7 @@ const UnauthGuard: FunctionComponent = () => {
   return (
     <div className={`${styles.authContainer}`}>
       <div className={`${styles.formSection}`}>
-        <HeaderNavigation />
+        <AuthHeader />
         <div className={styles.form}>
           <Outlet />
         </div>

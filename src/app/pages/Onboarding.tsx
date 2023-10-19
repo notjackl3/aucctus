@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useState } from "react";
 import Footer from "../components/Footer";
-import HeaderNavigation from "../components/HeaderNavigation";
+import AuthHeader from "../components/AuthHeader";
 import OnboardingIntoSection from "../components/OnboardingIntroSection";
 
 import styles from "../assets/styles/pages/auth-screens.module.scss"
@@ -62,7 +62,7 @@ const OnBoarding: FunctionComponent = () => {
   return (
     <div className={styles.authContainer}>
       <div className={styles.formSection}>
-        <HeaderNavigation />
+        <AuthHeader />
         <div className={styles.form}>
           <div className={styles.header}>
             <span className={styles.title}>Welcome aboard!</span>
