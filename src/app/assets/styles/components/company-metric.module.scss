@@ -1,0 +1,26 @@
+.companyMetric {
+  display: flex;
+  padding: var(--padding-5xl);
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap-base);
+  align-self: stretch;
+
+  border-radius: 0.75rem;
+  border: 1px solid var(--Grey---300, #e0e5f2);
+  background: var(--base-white, #fff);
+
+  span {
+    color: var(--gray-900-text-primary, #2b3674);
+    /* Text md/Semibold */
+    font-family: DM Sans;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.5rem; /* 150% */
+  }
+
+  .value {
+    text-align: right;
+  }
+}
