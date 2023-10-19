@@ -14,12 +14,7 @@ const Layout = () => {
   return (
     <div className={styles.container}>
       <NavDrawer />
-      <main role="main" id="main" className={`${styles.main}`}>
-        {/* <div className={styles.header}><Breadcrumbs /></div> */}
-        <section className={styles.content}>
-          <Outlet />
-        </section>
-      </main>
+      <Outlet />
     </div>
   )
 

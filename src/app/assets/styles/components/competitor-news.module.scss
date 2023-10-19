@@ -1,0 +1,50 @@
+.competitorNews {
+  display: flex;
+  padding: var(--padding-base);
+  justify-content: center;
+  align-items: center;
+  gap: var(--gap-base);
+  align-self: stretch;
+
+  border-radius: 0.75rem;
+  border: 1px solid var(--gray-300-outline, #e0e5f2);
+  background: var(--base-white, #fff);
+
+  img {
+    width: 9.8125rem;
+    height: 6.125rem;
+    border-radius: 0.5rem;
+    // TODO: set default image
+    background: url(<path-to-image>), lightgray 50% / cover no-repeat;
+  }
+
+  .content {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--gap-11xs);
+    flex: 1 0 0;
+
+    .headline,
+    .summary {
+      font-family: var(--text-sm-regular);
+      font-style: normal;
+      line-height: 1.5rem; /* 150% */
+    }
+
+    .headline {
+      color: var(--gray-900-text-primary, #2b3674);
+      font-size: var(--text-lg-semibold-size);
+      font-weight: 500;
+    }
+
+    .summary {
+      color: var(--gray-600-text-secondary, #667085);
+      /* Text md/Regular */
+      font-family: DM Sans;
+      font-size: 1rem;
+      font-weight: 400;
+      align-self: stretch;
+    }
+  }
+}

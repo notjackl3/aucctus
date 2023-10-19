@@ -4,6 +4,7 @@ interface IOrganization {
   id: string;
   name: string;
   domain: string;
+  goal: string;
   createdAt: string;
   updatedAt: string;
 }

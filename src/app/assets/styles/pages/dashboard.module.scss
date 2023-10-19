@@ -1,0 +1,104 @@
+.dashboard {
+  display: flex;
+  padding: 2rem 2rem 3rem 2rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2rem;
+  flex: 1 0 0;
+  align-self: stretch;
+
+  .header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    align-self: stretch;
+
+    .avatar {
+      display: flex;
+      width: 3.875rem;
+      height: 3.875rem;
+      justify-content: center;
+      align-items: center;
+
+      border-radius: 4.84375rem;
+      border: 1.55px solid var(--base-white, #fff);
+      background: var(
+        --avatar-company-logo-acme-group,
+        --base-white 50% / cover no-repeat
+      );
+      box-shadow: 0px 1.55px 2.325px -0.775px rgba(16, 24, 40, 0.03),
+        0px 4.65px 6.2px -1.55px rgba(16, 24, 40, 0.08);
+    }
+
+    .text {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      flex: 1 0 0;
+
+      color: var(--Type---Secondary, #80848f);
+      /* B1 */
+      font-family: var(--text-sm-regular);
+      font-size: var(--text-sm-regular-size);
+      font-style: normal;
+      font-weight: 500;
+      line-height: 1.25rem; /* 142.857% */
+
+      h1 {
+        color: var(--gray-900-text-primary, #2b3674);
+        /* H1 */
+        font-family: var(--text-sm-regular);
+        font-size: 1.875rem;
+        font-style: normal;
+        font-weight: 700;
+        line-height: 2.375rem; /* 126.667% */
+      }
+    }
+  }
+
+  section {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    align-self: stretch;
+  }
+
+  .companyInsights {
+    .companyGoal {
+      display: flex;
+      width: 30%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      flex: 1 0 0;
+
+      h3 {
+        color: var(--gray-900-text-primary, #2b3674);
+        /* H2 */
+        font-family: var(--text-sm-regular);
+        font-size: var(--text-lg-semibold-size);
+        font-style: normal;
+        font-weight: 700;
+        line-height: 1.75rem; /* 155.556% */
+      }
+    }
+
+    .companyMetrics {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex: 1 0 0;
+    }
+
+    .ignite {
+      display: flex;
+      height: 16.5rem;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex: 1 0 0;
+    }
+  }
+}
