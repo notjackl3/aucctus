@@ -21,7 +21,7 @@ const OnBoarding: FunctionComponent = () => {
 
 
   const [domainInputError, setDomainInputError] = useState<string | undefined>()
-  const [error, setError] = useState<string | undefined>()
+  const [error, setError] = useState<string | undefined>() //TODO: error handling
 
   const _handleDomainValidation = useCallback((e: React.FocusEvent) => {
     if (domain && !validDomain(domain)) {

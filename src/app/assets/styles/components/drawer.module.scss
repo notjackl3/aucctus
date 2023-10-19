@@ -1,0 +1,125 @@
+// The Main Drawer Component
+.navDrawer {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+
+  height: 100vh;
+  width: 15.5rem;
+  gap: 1rem;
+  flex-shrink: 0;
+
+  border-right: 1px solid var(--gray-300-outline, #e0e5f2);
+  background: var(--base-white, #fff);
+
+  .navLink,
+  .account {
+    cursor: pointer;
+  }
+
+  .content {
+    display: flex;
+    padding: 2.25rem 1rem 0rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    flex-grow: 3;
+    align-self: stretch;
+  }
+
+  .extras {
+    display: flex;
+    padding: 0rem 1rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    align-self: stretch;
+  }
+
+  .account {
+    display: flex;
+    padding: 1.5rem 0.75rem;
+    justify-content: center;
+    align-items: center;
+    gap: 0.75rem;
+    align-self: stretch;
+
+    border-top: 1px solid var(--gray-300-outline, #e0e5f2);
+
+    .avatar,
+    svg {
+      display: flex;
+      width: 2.5rem;
+      height: 2.5rem;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      border-radius: 12.5rem;
+    }
+
+    .userDetails {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      span {
+        color: var(--gray-700-text-tertiary, #626ba3);
+        /* Text sm/Semibold */
+        font-family: "DM Sans";
+        font-size: 0.875rem;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 1.25rem; /* 142.857% */
+        text-overflow: ellipsis;
+      }
+    }
+  }
+
+  .content,
+  .extras {
+    .navLink {
+      display: flex;
+      padding: 0.5rem 0.75rem;
+      align-items: center;
+      gap: var(--gap-5xs);
+      align-self: stretch;
+      border-radius: 0.375rem;
+      background: var(--base-white, #fff);
+      transition: all 0.3s ease-in-out;
+      width: 100%;
+
+      .label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        flex: 1 0 0;
+        span {
+          color: var(--type-tertiary, #626ba3);
+          /* H3 */
+          font-family: "DM Sans";
+          font-size: 1rem;
+          font-style: normal;
+          font-weight: 700;
+          line-height: 1.5rem; /* 150% */
+        }
+      }
+
+      &:hover {
+        box-shadow: var(--shadow-lg);
+        svg {
+          stroke: var(--type-tertiary);
+        }
+      }
+
+      // Hover Effect when Nav Item is locked
+      &.locked {
+        cursor: not-allowed;
+        &:hover {
+          box-shadow: none !important;
+        }
+      }
+    }
+  }
+}

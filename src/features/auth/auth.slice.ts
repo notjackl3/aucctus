@@ -42,12 +42,7 @@ export const signIn = createAsyncThunk(
   async (credentials: Credentials, thunkApi) => {
     try {
       const { email, password } = credentials
-      const response = await api.auth.signIn(email, password)
-      if (response.resultType === 'success') {
-        return response.data
-      } else { // TODO: Handle error
-        thunkApi.rejectWithValue(response.error)
-      }
+      return await api.auth.signIn(email, password)
     } catch (e) {
       analytics.debug(e)
     }
@@ -62,12 +57,7 @@ export const signUp = createAsyncThunk(
   async (details: SignupDetails, thunkApi) => {
     try {
       const { name, email, password, confirmPassword } = details
-      const response = await api.auth.signup(name, email, password, confirmPassword)
-      if (response.resultType === 'success') {
-        return response.data
-      } else {
-        thunkApi.rejectWithValue(response.error)
-      }
+      return await api.auth.signup(name, email, password, confirmPassword)
     } catch (e) {
       analytics.debug(e)
     }
@@ -79,12 +69,7 @@ export const refreshAuth = createAsyncThunk(
   async (_, thunkApi) => {
     analytics.debug('Refreshing Token')
     try {
-      const response = await api.auth.refreshToken()
-      if (response.resultType === 'success') {
-        return response.data
-      } else {
-        thunkApi.rejectWithValue(response.error)
-      }
+      return await api.auth.refreshToken()
     } catch (e) {
       analytics.debug(e)
     }
@@ -96,12 +81,7 @@ export const confirmEmail = createAsyncThunk(
   async (token: string, thunkApi) => {
     analytics.debug('Confirming Email')
     try {
-      const response = await api.auth.confirmEmail(token)
-      if (response.resultType === 'success') {
-        return response.data
-      } else {
-        thunkApi.rejectWithValue(response.error)
-      }
+      return await api.auth.confirmEmail(token)
     } catch (e) {
       analytics.debug(e)
     }
@@ -113,12 +93,7 @@ export const registerOrganization = createAsyncThunk(
   async (organization: IRegisterOrganization, thunkApi) => {
     analytics.debug('Register Organization')
     try {
-      const response = await api.auth.registerOrganization(organization)
-      if (response.resultType === 'success') {
-        return response.data
-      } else {
-        thunkApi.rejectWithValue(response.error)
-      }
+      return await api.auth.registerOrganization(organization)
     } catch (e) {
       analytics.debug(e)
     }

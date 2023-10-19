@@ -1,7 +1,6 @@
 import { FunctionComponent } from "react";
 
 
-//TODO: Get updated Logo
 const FictionalLogo: FunctionComponent = () => {
   return (
     <svg width="140" height="33" viewBox="0 0 140 33" fill="none" xmlns="http://www.w3.org/2000/svg">

@@ -1,7 +1,7 @@
 
 import { Route, Routes } from "react-router"
 import AuthGuard from "./routes/guards/auth.guard"
-import Layout from "./Layout"
+import Layout from "./Layout/Layout"
 import { AppPath } from "./routes/routes"
 import NotFound from "./app/pages/NotFound"
 import Page from "./app/pages"

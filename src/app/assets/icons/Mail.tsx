@@ -7,7 +7,6 @@ interface IconProps {
   stroke?: string;
 }
 
-//TODO: Get updated Logo
 const MailIcon: FunctionComponent<IconProps> = ({ width = 32, height = 28, fill = "none", stroke = "#4318FF" }) => {
   return (
     <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill={fill} xmlns="http://www.w3.org/2000/svg">
