@@ -4,7 +4,7 @@ import { useAppDispatch } from '../../app/hooks';
 import { Navigate, Outlet } from 'react-router-dom';
 import styles from "../../app/assets/styles/pages/auth-screens.module.scss"
 import Footer from '../../app/components/Footer';
-import HeaderNavigation from '../../app/components/Auth/HeaderNavigation';
+import HeaderNavigation from '../../app/components/HeaderNavigation';
 import IntoSection from '../../app/components/IntoSection';
 import { useSelector } from 'react-redux';
 import { AppPath } from '../routes';

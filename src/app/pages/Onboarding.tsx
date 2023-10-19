@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useState } from "react";
 import Footer from "../components/Footer";
-import HeaderNavigation from "../components/Auth/HeaderNavigation";
+import HeaderNavigation from "../components/HeaderNavigation";
 import OnboardingIntoSection from "../components/OnboardingIntroSection";
 
 import styles from "../assets/styles/pages/auth-screens.module.scss"
