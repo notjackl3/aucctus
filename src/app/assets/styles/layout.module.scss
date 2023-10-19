@@ -3,32 +3,8 @@
 .container {
   display: flex;
   flex-direction: row;
-  padding-left: 0;
-  padding-right: 0;
-
-  .main {
-    position: relative;
-
-    min-height: calc(100vh - 160px);
-
-    width: 100%;
-    margin: 0;
-    margin-left: 16px;
-    margin-top: 160px;
-    padding-top: 0 !important;
-
-    padding-left: 36px !important;
-    background-color: #fff;
-
-    transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
-
-    .header {
-      max-height: 4rem;
-    }
-
-    .content {
-      margin-top: 5rem;
-      padding-bottom: 3vh;
-    }
-  }
+  display: flex;
+  width: 90rem;
+  height: 60rem;
+  align-items: flex-start;
 }

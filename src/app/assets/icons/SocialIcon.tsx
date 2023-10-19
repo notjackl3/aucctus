@@ -6,8 +6,6 @@ interface IconProps {
   height?: number;
 }
 
-
-//TODO: Get updated Logo
 const AuthProviderIcon: FunctionComponent<IconProps> = ({ provider, width = 24, height = 24 }) => {
 
 

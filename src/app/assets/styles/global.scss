@@ -43,15 +43,20 @@ button.btn {
   /* Shadow/xs */
   box-shadow: var(--shadow-xs) !important;
 
-  .btn-primary {
+  &.btn-primary {
     border: 1px solid var(--primary-600-primary, #4318ff) !important;
     background: var(--primary-600-primary, #4318ff) !important;
   }
 
-  .btn-white {
-    border: 1px solid var(--gray-300-outline, #e0e5f2) !important;
-    background: var(--base-white, #fff) !important;
+  &.btn-light  {
+    border: 1px solid var(--gray-300-outline, #E0E5F2);
+    background: var(--base-white, #FFF)
   }
+
+  &.btn-secondary {
+
+  }
+
 }
 
 input {
@@ -111,7 +116,7 @@ input {
   --text-xs-medium: Inter;
 
   /* font sizes */
-  --text-sm-regular-size: 0.88rem;
+  --text-sm-regular-size: 1rem;
   --text-xs-medium-size: 0.75rem;
   --h3-size: 1rem;
   --text-lg-semibold-size: 1.13rem;
@@ -134,6 +139,7 @@ input {
   --success-700: #027a48;
   --gray-900-text-primary: #2b3674;
   --primary-600-primary: #4318ff;
+  --gray-50-bg: #FCFCFD
 
   --red-300-outline: #ec5e57;
   --red-900-text-error: #ec5e57;

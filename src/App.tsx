@@ -10,7 +10,7 @@ import UnauthGuard from "./routes/guards/unauth.guard"
 function App() {
 
   return (
-    <div className="App">
+    <div role="main" className="App">
       <Routes>
 
         {/* Protected Routes */}
