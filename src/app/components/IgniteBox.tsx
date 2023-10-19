@@ -31,13 +31,11 @@ const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, i
   const navigate = useNavigate()
 
   return (
-    <div className={styles.igniteBox}
-      onClick={() => navigate(link)}
-    >
+    <div className={styles.igniteBox}>
       <div className={styles.content}>
         {icons[icon]}
-        <span>{title}</span>
-        <p>{subtitle}</p>
+        <span className={styles.title}>{title}</span>
+        {subtitle}
       </div>
 
       <button className={`btn ${styles.button}`}
@@ -46,7 +44,7 @@ const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, i
         Ignite
         <ArrowRightIcon width={24} height={24} color="#fff" />
       </button>
-    </div>
+    </div >
   );
 };
 
