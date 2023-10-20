@@ -1,9 +1,9 @@
 .igniteBox {
   display: flex;
-  padding: 1.5rem;
+  padding: var(--padding-5xl);
   justify-content: center;
   align-items: center;
-  gap: var(--gap-base);
+  gap: var(--gap-5xs);
   flex: 1 0 0;
   align-self: stretch;
 
@@ -48,21 +48,5 @@
     font-size: var(--text-sm-regular-size);
     font-weight: 500;
     line-height: 1.5rem; /* 150% */
-  }
-
-  .button {
-    display: flex;
-    padding: 0.625rem 1.125rem;
-    justify-content: center;
-    align-items: center;
-    gap: 0.5rem;
-
-    border-radius: 0.5rem;
-    border: 1px solid var(--primary-600-primary, #4318ff);
-    background: var(--primary-600-primary, #4318ff);
-    /* Shadow/xs */
-    box-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
-
-    color: var(--base-white, #fff);
   }
 }

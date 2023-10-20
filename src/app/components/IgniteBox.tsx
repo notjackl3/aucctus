@@ -39,7 +39,7 @@ const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, i
       </div>
 
       <button
-        className={`btn ${styles.button}`}
+        className={`btn btn-primary`}
         onClick={() => navigate(link)}
       >
         Ignite

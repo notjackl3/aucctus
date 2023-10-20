@@ -38,6 +38,12 @@ a:active {
 }
 
 button.btn {
+  display: flex;
+  gap: var(--gap-base);
+  padding: 0.625rem 1.125rem;
+  justify-content: center;
+  align-items: center;
+
   border-radius: 0.5rem;
 
   /* Shadow/xs */
@@ -46,15 +52,12 @@ button.btn {
   &.btn-primary {
     border: 1px solid var(--primary-600-primary, #4318ff) !important;
     background: var(--primary-600-primary, #4318ff) !important;
+    color: var(--base-white, #fff);
   }
 
   &.btn-light  {
     border: 1px solid var(--gray-300-outline, #E0E5F2);
     background: var(--base-white, #FFF)
-  }
-
-  &.btn-secondary {
-
   }
 
 }
@@ -80,7 +83,6 @@ input {
     width: 16px;
     height: 16px;
 
-    // border: 1px solid $content-color-text;
     transition: 0.2s all linear;
     margin-right: 5px;
 

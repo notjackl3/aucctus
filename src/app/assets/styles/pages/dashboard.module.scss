@@ -62,16 +62,22 @@
     align-items: flex-start;
     gap: 1.5rem;
     align-self: stretch;
+    height: fit-content;
+
+    .container {
+      display: flex;
+      height: fit-content;
+      gap: 1.5rem;
+    }
   }
 
   .companyInsights {
     .companyGoal {
       display: flex;
-      width: 30%;
+      flex-grow: 2;
       flex-direction: column;
       align-items: flex-start;
       gap: 0.25rem;
-      flex: 1 0 0;
 
       h3 {
         color: var(--gray-900-text-primary, #2b3674);
@@ -85,11 +91,13 @@
     }
 
     .companyMetrics {
+    }
+
+    .metrics {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       gap: 1.5rem;
-      flex: 1 0 0;
     }
 
     .ignite {
@@ -98,7 +106,6 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 1.5rem;
-      flex: 1 0 0;
     }
   }
 }
