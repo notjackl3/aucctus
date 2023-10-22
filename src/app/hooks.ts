@@ -9,7 +9,7 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
 
 
 
-export function useQuery() {
+export function useQueryParams() {
   const { search } = useLocation();
 
   return React.useMemo(() => new URLSearchParams(search), [search]);

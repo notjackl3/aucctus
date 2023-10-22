@@ -1,7 +1,7 @@
 import { FunctionComponent, useEffect } from "react";
 import styles from "../../assets/styles/pages/auth-screens.module.scss"
 import { AppPath } from "../../../routes/routes";
-import { useAppDispatch, useQuery } from "../../hooks";
+import { useAppDispatch, useQueryParams } from "../../hooks";
 import { confirmEmail } from "../../../features/auth/auth.slice";
 import { Link } from "react-router-dom";
 import LeftArrowIcon from "../../assets/icons/arrowleft.svg?react";
@@ -9,7 +9,7 @@ import LeftArrowIcon from "../../assets/icons/arrowleft.svg?react";
 
 const SignUpSuccess: FunctionComponent = () => {
   const dispatch = useAppDispatch()
-  const query = useQuery()
+  const query = useQueryParams()
 
 
   useEffect(() => {

@@ -5,16 +5,11 @@ import Home from '../../app/assets/icons/home.svg?react'
 import FileSearch from "../assets/icons/filesearch.svg?react";
 import Lightbulb from "../assets/icons/lightbulb.svg?react";
 import Rocket from "../assets/icons/rocket.svg?react";
-import Lock from "../assets/icons/lock.svg?react";
 import Help from "../assets/icons/help.svg?react";
 import Gear from "../assets/icons/gear.svg?react";
-import ChevronUp from "../assets/icons/chevronup.svg?react";
 
 
 import styles from '../assets/styles/components/feature-icon.module.scss'
-
-
-
 
 
 const defaultIconProps = {
