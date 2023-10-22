@@ -1,5 +1,15 @@
 // The Main Drawer Component
 
+.container {
+  display: flex;
+}
+
+.container,
+.navDrawer {
+  height: 100vh;
+  width: 15.5rem;
+}
+
 .wrapper {
   position: fixed;
 }
