@@ -44,8 +44,8 @@ export class AuthApi extends ApiService {
    * @param accessToken 
    * @returns 
    */
-  async Me(accessToken: string) {
-    return this.get(endpoints.Me, this._handleAccessToken(accessToken))
+  async Me() {
+    return this.get(endpoints.Me, this._handleAccessToken())
   }
 
 
@@ -55,7 +55,7 @@ export class AuthApi extends ApiService {
    * @returns 
    */
   async registerOrganization(org: IRegisterOrganization) {
-    return this.post<IOrganizationSuccessResponse>(endpoints.registerOrganization, org, this._handleAccessToken(this.apiInstance.accessToken))
+    return this.post<IOrganizationSuccessResponse>(endpoints.registerOrganization, org, this._handleAccessToken())
   }
 
   /** RefreshToken

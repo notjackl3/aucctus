@@ -5,8 +5,7 @@ export class OrganizationApi extends ApiService {
 
 
   async getOrganization(id: string) {
-    this._handleAccessToken(this.apiInstance.accessToken)
-    return this.get<IOrganizationSuccessResponse>(endpoints.getOrganization(id))
+    return this.get<IOrganizationSuccessResponse>(endpoints.getOrganization(id), this._handleAccessToken())
   }
 
 }

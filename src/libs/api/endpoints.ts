@@ -13,4 +13,9 @@ export const endpoints = {
   getOrganization: (id: string) => `/api/organization/${id}`,
   registerOrganization: 'api/organization/register',
 
+
+  igniteDomain: 'chatbot/ignite-domain',
+
+  igniteConcepts: 'chatbot/ignite-domain'
+
 }

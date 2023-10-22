@@ -1,7 +1,7 @@
 import { FunctionComponent, ReactNode } from "react";
 
 
-import styles from '../assets/styles/components/ignite-form.module.scss'
+import styles from '../assets/styles/pages/ignite.module.scss'
 import FeatureIcon from "./FeatureIcon";
 
 

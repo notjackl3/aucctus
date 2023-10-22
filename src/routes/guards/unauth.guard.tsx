@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { refreshAuth, selectUser } from '../../features/auth/auth.slice';
 import { useAppDispatch } from '../../app/hooks';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import styles from "../../app/assets/styles/pages/auth-screens.module.scss"
 import Footer from '../../app/components/Footer';
 import AuthHeader from '../../app/components/AuthHeader';
@@ -16,6 +16,7 @@ import { AppPath } from '../routes';
 const UnauthGuard: FunctionComponent = () => {
   const dispatch = useAppDispatch()
   const user = useSelector(selectUser)
+  const location = useLocation()
 
   // TODO: Change this. This causes refreshAuth to get called twice do to the way components render (use class component?)
   useEffect(() => {
@@ -26,7 +27,7 @@ const UnauthGuard: FunctionComponent = () => {
 
   if (user) {
     return (
-      <Navigate to={AppPath.Home} />
+      <Navigate to={AppPath.Home} state={{ from: location }} replace />
     )
   }
 

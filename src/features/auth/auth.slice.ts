@@ -126,6 +126,7 @@ export const authSlice = createSlice({
       ).addMatcher(
         isAnyOf(isApiErrorResult), (state, action) => {
           const error = action.payload.error
+          // if (error.response?.request)
           state.error = error.message
         }
       )
