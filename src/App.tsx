@@ -17,7 +17,6 @@ function App() {
     <div role="main" className="App">
       <QueryClientProvider client={queryClient}>
         <Routes>
-
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>
             <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />

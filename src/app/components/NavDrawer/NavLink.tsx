@@ -34,7 +34,7 @@ interface NavLinkProps {
 }
 
 
-const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, locked = false, isOpen }) => {
+const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = false, isOpen }) => {
 
 
 
@@ -53,7 +53,7 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, locked = false,
 
 
   return (
-    <div className={`${styles.navLink}  ${locked ? styles.locked : ""}`}>
+    <a className={`${styles.navLink}  ${locked ? styles.locked : ""}`} href={to}>
       <div className={styles.label}>
         {navDrawerIcons[icon]}
         <span>{title}</span>
@@ -61,7 +61,7 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, locked = false,
 
       {locked ? <Lock {...defaultIconProps} /> : null}
       {isOpen ? <ChevronUp {...defaultIconProps} /> : null}
-    </div>
+    </a>
   );
 };
 
