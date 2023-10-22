@@ -1,4 +1,9 @@
 // The Main Drawer Component
+
+.wrapper {
+  position: fixed;
+}
+
 .navDrawer {
   display: inline-flex;
   flex-direction: column;

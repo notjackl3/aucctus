@@ -32,31 +32,33 @@ const NavDrawer = () => {
   // });
 
   return (
-    <div className={styles.navDrawer}>
-      <div className={styles.content}>
-        <Logo width={146} height={30} />
-        <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
-        <NavLink to={AppPath.DomainOpportunities} title="Domains" icon='file' />
-        {/* TODO Fix this */}
-        <NavLink to={AppPath.DomainOpportunities} title="Concepts" icon='lightbulb' />
-        <NavLink to={AppPath.Home} title="Tests" icon='rocket' locked />
-      </div>
-      <div className={styles.extras}>
-        <NavLink to={AppPath.Home} title="Learn" icon="home" />
-        <NavLink to={AppPath.Home} title="Settings" icon='file' />
-
-      </div>
-      <div className={styles.account}>
-        <img
-          className={styles.avatar}
-          alt='avatar'
-          src={avatar}
-        />
-        <div className={styles.userDetails}>
-          <span>{user.name}</span>
-          <span>{user.email}</span>
+    <div className={styles.wrapper}>
+      <div className={styles.navDrawer}>
+        <div className={styles.content}>
+          <Logo width={146} height={30} />
+          <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
+          <NavLink to={AppPath.DomainOpportunities} title="Domains" icon='file' />
+          {/* TODO Fix this */}
+          <NavLink to={AppPath.DomainOpportunities} title="Concepts" icon='lightbulb' />
+          <NavLink to={AppPath.Home} title="Tests" icon='rocket' locked />
         </div>
+        <div className={styles.extras}>
+          <NavLink to={AppPath.Home} title="Learn" icon="home" />
+          <NavLink to={AppPath.Home} title="Settings" icon='file' />
 
+        </div>
+        <div className={styles.account}>
+          <img
+            className={styles.avatar}
+            alt='avatar'
+            src={avatar}
+          />
+          <div className={styles.userDetails}>
+            <span>{user.name}</span>
+            <span>{user.email}</span>
+          </div>
+
+        </div>
       </div>
     </div>
   );

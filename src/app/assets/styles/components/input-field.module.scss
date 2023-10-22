@@ -1,13 +1,14 @@
 .inputField {
   align-self: stretch;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: flex-start;
-  gap: var(--gap-7xs);
+  display: inline-block;
+  // flex-direction: column;
+  // align-items: flex-start;
+  // justify-content: flex-start;
+  // gap: var(--gap-7xs);
 
   &.inputFieldError {
-    input {
+    input,
+    textarea {
       border: 1px solid var(--red-300-outline) !important;
       outline: var(--red-300-outline) !important;
     }
@@ -26,40 +27,36 @@
     position: relative;
     line-height: 1.25rem;
     font-weight: 500;
+    margin-bottom: var(--gap-7xs);
+    color: var(--gray-900-text-primary, #2b3674);
   }
 
-  input {
-    border: 0;
-    flex: 1;
-    line-height: 1.5rem;
+  input,
+  textarea {
+    overflow: hidden;
     width: 100%;
-    height: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: var(--padding-3xs) var(--padding-sm);
+    color: var(--gray-900-text-primary);
+
+    font-family: var(--text-sm-regular);
+    font-style: normal;
+    font-size: var(--h3-size);
+    font-weight: 400;
+    line-height: 1.5rem;
+
     border-radius: var(--br-5xs);
     background-color: var(--base-white);
     box-shadow: var(--shadow-xs);
     border: 1px solid var(--gray-300-outline);
-    overflow: hidden;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: flex-start;
-    padding: var(--padding-3xs) var(--padding-sm);
-    gap: var(--gap-5xs);
-    font-size: var(--h3-size);
-    color: var(--gray-900-text-primary);
 
     ::placeholder {
       color: var(--gray-400-placeholder, #b4bdd0) !important;
-
-      font-family: "DM Sans";
-      font-style: normal;
-      font-weight: 400;
-      line-height: 1.5rem;
     }
   }
 
-  .hintText,
-  input {
+  .hintText {
     align-self: stretch;
   }
 

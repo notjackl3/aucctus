@@ -1,7 +1,3 @@
-import { useSelector } from "react-redux";
-import { selectOrganization } from "../../../features/auth/auth.slice";
-
-
 import styles from '../../assets/styles/pages/dashboard.module.scss'
 import { FunctionComponent, useState } from "react";
 import CompetitorNews from "./CompetitorNews";
@@ -10,8 +6,6 @@ import { generateRandomString } from "../../../libs/utils";
 interface CompanyNewsProps {
 
 }
-
-
 
 const mockData = [
   {
