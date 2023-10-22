@@ -2,7 +2,7 @@ import { HeadersDefaults } from "axios";
 import { IApiServiceConfig } from "./apiService";
 import { AuthApi } from "./auth";
 import { OrganizationApi } from "./organization";
-import { IgniteApi } from "./chatbot";
+import { IgniteConceptApi } from "./igniteConcept";
 
 
 
@@ -25,7 +25,7 @@ export class Api {
 
   auth: AuthApi
   organization: OrganizationApi;
-  ignite: IgniteApi;
+  igniteConcept: IgniteConceptApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig
@@ -38,7 +38,7 @@ export class Api {
       baseURL: this._config.baseUrl,
     }))
 
-    this.ignite = new IgniteApi(this, this.buildConfig({
+    this.igniteConcept = new IgniteConceptApi(this, this.buildConfig({
       baseURL: this._config.baseUrl,
     }))
 

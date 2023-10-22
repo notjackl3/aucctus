@@ -16,6 +16,18 @@ export const endpoints = {
 
   igniteDomain: 'chatbot/ignite-domain',
 
-  igniteConcepts: 'chatbot/ignite-domain'
+
+
+
+
+  /* Ignite Concepts */
+  igniteConcept: 'api/ignite-concept',
+  getIgniteConcept: (id: string) => `api/ignite-concept/${id}`,
+  concept: 'api/ignite-concept/concept',
+  getConcept: (id: string) => `api/ignite-concept/concept/${id}`,
+  getAllConcepts: (igniteId: string) => `api/ignite-concept/concept-all/${igniteId}`
+
+
+
 
 }

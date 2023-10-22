@@ -19,7 +19,18 @@ export interface IIgniteConceptBody {
 }
 
 export interface IIgniteConceptSuccessResponse {
-  concepts: IConcepts[]
+  id: string
+  concept: string;
+  painPoint: string;
+  monetizationStrategy: string;
+  motivation: string;
+  extraDetails: string
+  concepts: IConceptResponse[]
+}
+
+
+export interface IConceptResponse extends IConcepts {
+  id: string
 }
 
 export interface IConcepts {
@@ -27,3 +38,6 @@ export interface IConcepts {
   description: string;
   score: number
 }
+
+
+
