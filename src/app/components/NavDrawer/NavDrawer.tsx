@@ -8,6 +8,7 @@ import { selectUser } from "../../../features/auth/auth.slice";
 
 
 import avatar from '../../assets/icons/avatar.svg'
+import { AppPath } from "../../../routes/routes";
 
 
 
@@ -34,14 +35,15 @@ const NavDrawer = () => {
     <div className={styles.navDrawer}>
       <div className={styles.content}>
         <Logo width={146} height={30} />
-        <NavLink title="Dashboard" icon="home" />
-        <NavLink title="Domains" icon='file' />
-        <NavLink title="Concepts" icon='lightbulb' />
-        <NavLink title="Tests" icon='rocket' locked />
+        <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
+        <NavLink to={AppPath.DomainOpportunities} title="Domains" icon='file' />
+        {/* TODO Fix this */}
+        <NavLink to={AppPath.DomainOpportunities} title="Concepts" icon='lightbulb' />
+        <NavLink to={AppPath.Home} title="Tests" icon='rocket' locked />
       </div>
       <div className={styles.extras}>
-        <NavLink title="Learn" icon="home" />
-        <NavLink title="Settings" icon='file' />
+        <NavLink to={AppPath.Home} title="Learn" icon="home" />
+        <NavLink to={AppPath.Home} title="Settings" icon='file' />
 
       </div>
       <div className={styles.account}>

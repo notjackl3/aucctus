@@ -21,3 +21,21 @@ export const validEmail = (email: string) => {
 export const validDomain = (domain: string) => {
   return domain.toLowerCase().match(/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/)
 }
+
+
+/** Generate Random String
+ * 
+ * @param length 
+ * @returns 
+ */
+export function generateRandomString(length: number) {
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  let counter = 0;
+  while (counter < length) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    counter += 1;
+  }
+  return result;
+}

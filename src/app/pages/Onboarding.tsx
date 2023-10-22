@@ -13,6 +13,7 @@ const OnBoarding: FunctionComponent = () => {
   const dispatch = useAppDispatch()
   const [name, setName] = useState<string>("")
   const [domain, setDomain] = useState<string>("")
+  const [industry, setIndustry] = useState<string>("")
   const [goal, setGoal] = useState<string>("")
   const [competitors, setCompetitors] = useState<string>("")
   const [competitorsList, setCompetitorsList] = useState<string>("")
@@ -59,6 +60,8 @@ const OnBoarding: FunctionComponent = () => {
     }))
   }
 
+  // TODO: Fix design
+
   return (
     <div className={styles.authContainer}>
       <div className={styles.formSection}>
@@ -91,6 +94,13 @@ const OnBoarding: FunctionComponent = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDomain(e.target.value)}
               onFocus={() => setDomainInputError(undefined)}
               onBlur={_handleDomainValidation}
+            />
+            <InputField
+              name={"industry"}
+              label={"Primary Industry"}
+              value={industry}
+              placeholder=""
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIndustry(e.target.value)}
             />
             <InputField
               name={"goal"}
@@ -126,7 +136,7 @@ const OnBoarding: FunctionComponent = () => {
               type="button"
               className="btn btn-primary"
               onClick={_handleRegistration}
-              disabled={!name || !domain || !goal || !competitors || !kpis || !!domainInputError}
+              disabled={!name || !domain || !industry || !goal || !competitors || !kpis || !!domainInputError}
             >Complete</button>
           </div>
         </div>

@@ -1,0 +1,32 @@
+.outerRing {
+  display: flex;
+  width: 3.5rem;
+  height: 3.5rem;
+  padding: 0.875rem;
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 1.75rem;
+  // border: 10px solid var(--primary-50-secondary, #f4f7fe);
+  // background: var(--primary-100, #dee7fc);
+
+  &.purple {
+    border: 10px solid var(--primary-50-secondary, #f4f7fe);
+    background: var(--primary-100, #dee7fc);
+    svg {
+      stroke: var(--primary-600-primary) !important;
+    }
+  }
+
+  &.green {
+    border: 10px solid #ecfdf3;
+    background: #d1fadf;
+
+    svg {
+      stroke: #039855 !important;
+    }
+  }
+  svg {
+    flex-shrink: 0;
+  }
+}

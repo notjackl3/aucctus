@@ -33,8 +33,8 @@ const Dashboard: FunctionComponent = () => {
 
           </div>
           <div className={`${styles.container} ${styles.ignite}`}>
-            <IgniteBox title="Ignite Domain" subtitle="Generate industry reports" link={AppPath.Home} icon="file" />
-            <IgniteBox title="Ignite Concept" subtitle="Generate powerful concepts" link={AppPath.Home} icon="lightbulb" />
+            <IgniteBox title="Ignite Domain" subtitle="Generate industry reports" link={AppPath.IgniteDomain} icon="file" />
+            <IgniteBox title="Ignite Concept" subtitle="Generate powerful concepts" link={AppPath.IgniteConcept} icon="lightbulb" />
           </div>
 
         </div>

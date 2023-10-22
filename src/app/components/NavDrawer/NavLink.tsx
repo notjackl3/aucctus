@@ -8,6 +8,7 @@ import Lock from "../../assets/icons/lock.svg?react";
 import Help from "../../assets/icons/help.svg?react";
 import Gear from "../../assets/icons/gear.svg?react";
 import ChevronUp from "../../assets/icons/chevronup.svg?react";
+import { AppPath } from "../../../routes/routes";
 
 const defaultIconProps = {
   stroke: "#7586A9",
@@ -25,9 +26,11 @@ const navDrawerIcons = {
 }
 interface NavLinkProps {
   title: string
+  to: AppPath
   icon: keyof typeof navDrawerIcons
   locked?: boolean
   isOpen?: boolean
+
 }
 
 

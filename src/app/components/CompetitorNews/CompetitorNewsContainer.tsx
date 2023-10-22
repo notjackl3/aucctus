@@ -5,6 +5,7 @@ import { selectOrganization } from "../../../features/auth/auth.slice";
 import styles from '../../assets/styles/pages/dashboard.module.scss'
 import { FunctionComponent, useState } from "react";
 import CompetitorNews from "./CompetitorNews";
+import { generateRandomString } from "../../../libs/utils";
 
 interface CompanyNewsProps {
 
@@ -30,10 +31,11 @@ const mockData = [
 const CompetitorNewsContainer: FunctionComponent<CompanyNewsProps> = () => {
   const [news, setNews] = useState(mockData)
 
+
   return (
     <div className={styles.companyNews} >
       {
-        news.map((content) => <CompetitorNews headLine={content.headline} summary={content.summary} />)
+        news.map((content, i) => <CompetitorNews key={`${generateRandomString(4)}`} headLine={content.headline} summary={content.summary} />)
       }
 
     </div >
