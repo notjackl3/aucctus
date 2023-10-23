@@ -4,7 +4,7 @@ import NotFound from "./NotFound";
 import Onboarding from './Onboarding';
 import IgniteConcept from "./IgniteConcept";
 import IgniteDomain from "./IgniteDomain";
-import DomainOpportunities from "./DomainOpportunities";
+import DomainList from "./DomainList";
 import ConceptList from "./ConcetList";
 
 const Page = {
@@ -12,10 +12,12 @@ const Page = {
   NotFound,
   Dashboard,
   Onboarding,
-  IgniteDomain,
+
   IgniteConcept,
   ConceptList,
-  DomainOpportunities,
+
+  IgniteDomain,
+  DomainList,
 
 }
 

@@ -27,7 +27,7 @@ function App() {
               <Route path={AppPath.ConceptList} element={<Page.ConceptList />} />
 
               <Route path={AppPath.IgniteDomain} element={<Page.IgniteDomain />} />
-              <Route path={AppPath.DomainOpportunities} element={<Page.DomainOpportunities />} />
+              <Route path={AppPath.DomainList} element={<Page.DomainList />} />
             </Route>
           </Route>
 

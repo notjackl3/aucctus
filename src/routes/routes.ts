@@ -8,7 +8,7 @@ export enum AppPath {
   ConceptList = '/ignite-concept/concepts',
 
 
-  DomainOpportunities = '/domain-opportunities',
+  DomainList = '/domain-list',
 
   /* Auth */
   SignIn = "/sign-in",

@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 import FileSearchIcon from '../assets/icons/filesearch.svg?react'
 import LightbulbIcon from '../assets/icons/lightbulb.svg?react'
-import ArrowRightIcon from '../assets/icons/ArrowRight.svg?react'
+import ArrowRightIcon from '../assets/icons/arrowright.svg?react'
 
 
 

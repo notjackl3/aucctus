@@ -25,6 +25,17 @@ body {
   width: 100vw;
 }
 
+h1,
+h2,
+h3,
+h3,
+p,
+span,
+button,
+a {
+  font-family: var(--text-sm-regular);
+}
+
 a {
   transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
@@ -53,31 +64,32 @@ button.btn {
     border: 1px solid var(--primary-600-primary, #4318ff) !important;
     background: var(--primary-600-primary, #4318ff) !important;
     color: var(--base-white, #fff);
+    svg {
+      stroke: var(--base-white, #fff) !important;
+    }
   }
 
-  &.btn-light  {
-    border: 1px solid var(--gray-300-outline, #E0E5F2);
-    background: var(--base-white, #FFF);
+  &.btn-light {
+    border: 1px solid var(--gray-300-outline, #e0e5f2);
+    background: var(--base-white, #fff);
     color: var(--type-tertiary);
     svg {
       stroke: var(--type-tertiary) !important;
     }
   }
-
 }
 
 textarea {
   transition: all 0.3s smooth;
   transition: box-shadow 0.3s ease-in-out;
 
-    &:active,
-    &:focus,
-    &:focus-visible {
-      box-shadow: var(--shadow-3xl);
-      outline: 1px solid var(--primary-100) !important;
-      // border: 1px solid var(--primary-100) !important;
-    }
-  
+  &:active,
+  &:focus,
+  &:focus-visible {
+    box-shadow: var(--shadow-3xl);
+    outline: 1px solid var(--primary-100) !important;
+    // border: 1px solid var(--primary-100) !important;
+  }
 }
 
 input {
@@ -159,8 +171,7 @@ input {
   --success-700: #027a48;
   --gray-900-text-primary: #2b3674;
   --primary-600-primary: #4318ff;
-  --gray-50-bg: #FCFCFD
-  --
+  --gray-50-bg: #fcfcfd;
 
   --red-300-outline: #ec5e57;
   --red-900-text-error: #ec5e57;

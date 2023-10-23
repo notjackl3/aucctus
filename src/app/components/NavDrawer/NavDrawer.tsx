@@ -38,7 +38,7 @@ const NavDrawer = () => {
           <div className={styles.content}>
             <Logo width={146} height={30} />
             <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
-            <NavLink to={AppPath.DomainOpportunities} title="Domains" icon='file' />
+            <NavLink to={AppPath.DomainList} title="Domains" icon='file' />
             <NavLink to={AppPath.ConceptList} title="Concepts" icon='lightbulb' />
             {/* TODO Fix this */}
             <NavLink to={AppPath.Home} title="Tests" icon='rocket' locked />
