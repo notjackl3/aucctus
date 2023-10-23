@@ -4,7 +4,6 @@ import styles from '../assets/styles/pages/ignite.module.scss'
 import TextArea from "../components/TextArea";
 import { useQuery } from "react-query";
 import api from "../../libs/api";
-import Loading from "../components/Loading";
 import IgniteLoading from "../components/IgniteLoading";
 
 
@@ -20,19 +19,18 @@ const IgniteConcept: FunctionComponent = () => {
   const query = useQuery({
     queryKey: "igniteDomain",
     enabled: false, // disable this query from automatically running
-    queryFn: async () => await api.ignite.concept({ concept, painPoint, monetizationStrategy, motivation, extraDetails })
+    queryFn: async () => await api.igniteConcept.generateConcepts({ concept, painPoint, monetizationStrategy, motivation, extraDetails })
   })
 
 
   return (
     <div className={styles.ignite} >
 
-      {query.isFetching || query.isLoading ?
+      {query.isLoading ?
 
         <IgniteLoading
           title="Igniting Your Concept"
           subtitle="Ideating can take a moment. Please wait a minute."
-
         />
 
         :
