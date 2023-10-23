@@ -72,12 +72,16 @@
   }
 
   .companyInsights {
+    justify-content: space-between;
+
     .companyGoal {
       display: flex;
       flex-grow: 2;
       flex-direction: column;
       align-items: flex-start;
       gap: 0.25rem;
+      max-width: 35%;
+      height: 100%;
 
       h3 {
         color: var(--gray-900-text-primary, #2b3674);
@@ -88,9 +92,14 @@
         font-weight: 700;
         line-height: 1.75rem; /* 155.556% */
       }
+
+      .goalText {
+        height: 100%;
+      }
     }
 
     .companyMetrics {
+      justify-self: flex-end;
     }
 
     .metrics {
