@@ -6,6 +6,12 @@
   height: 100vw;
   overflow: auto;
 
+  .error {
+    font-size: var(--h3-size);
+    line-height: 1.5rem;
+    color: var(--red-900-text-error);
+  }
+
   .formSection {
     flex: 1;
     display: flex;
