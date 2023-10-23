@@ -5,6 +5,8 @@ export enum AppPath {
   Onboarding = '/onboarding',
   IgniteDomain = '/ignite-domain',
   IgniteConcept = '/ignite-concept',
+  ConceptList = '/ignite-concept/concepts',
+
 
   DomainOpportunities = '/domain-opportunities',
 

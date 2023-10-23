@@ -22,7 +22,10 @@ function App() {
             <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
             <Route element={<Layout />}>
               <Route index path={AppPath.Home} element={<Page.Dashboard />} />
+
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
+              <Route path={AppPath.ConceptList} element={<Page.ConceptList />} />
+
               <Route path={AppPath.IgniteDomain} element={<Page.IgniteDomain />} />
               <Route path={AppPath.DomainOpportunities} element={<Page.DomainOpportunities />} />
             </Route>

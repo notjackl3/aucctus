@@ -5,6 +5,7 @@ import Onboarding from './Onboarding';
 import IgniteConcept from "./IgniteConcept";
 import IgniteDomain from "./IgniteDomain";
 import DomainOpportunities from "./DomainOpportunities";
+import ConceptList from "./ConcetList";
 
 const Page = {
   Auth,
@@ -13,7 +14,9 @@ const Page = {
   Onboarding,
   IgniteDomain,
   IgniteConcept,
-  DomainOpportunities
+  ConceptList,
+  DomainOpportunities,
+
 }
 
 export default Page
