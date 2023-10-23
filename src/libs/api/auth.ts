@@ -1,6 +1,7 @@
 import { IAuthSuccessResponse } from "./typings";
 import { ApiService } from "./apiService";
 import { endpoints } from "./endpoints";
+import { IMessageResponse } from "./typings/avxisi";
 
 export interface ISignInRequest {
   email: string;
@@ -37,6 +38,12 @@ export class AuthApi extends ApiService {
    */
   async signIn(email: string, password: string) {
     return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.SignIn, { email, password })
+  }
+
+
+
+  async logout() {
+    return this.post<IMessageResponse>(endpoints.Logout, this._handleAccessToken())
   }
 
   /** Me

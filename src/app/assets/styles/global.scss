@@ -57,7 +57,11 @@ button.btn {
 
   &.btn-light  {
     border: 1px solid var(--gray-300-outline, #E0E5F2);
-    background: var(--base-white, #FFF)
+    background: var(--base-white, #FFF);
+    color: var(--type-tertiary);
+    svg {
+      stroke: var(--type-tertiary) !important;
+    }
   }
 
 }
@@ -156,6 +160,7 @@ input {
   --gray-900-text-primary: #2b3674;
   --primary-600-primary: #4318ff;
   --gray-50-bg: #FCFCFD
+  --
 
   --red-300-outline: #ec5e57;
   --red-900-text-error: #ec5e57;

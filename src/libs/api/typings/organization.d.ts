@@ -10,16 +10,14 @@ interface IOrganization {
 }
 
 interface IOrganizationSuccessResponse {
-  id: string;
-  name: string;
-  domain: string;
-  createdAt: string;
-  updatedAt: string;
+  user: IUser,
+  organization: IOrganization,
 }
 
 interface IRegisterOrganization {
   name: string;
   domain: string;
+  industry: string;
   goal: string;
   competitors: string;
   kpis: string;

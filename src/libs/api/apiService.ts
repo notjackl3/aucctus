@@ -1,19 +1,18 @@
 import { Api } from "./api";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios'
 import "abort-controller/polyfill"
+import { INestJSErrorResponse } from "./typings/avxisi";
+import analytics from "../analytics";
+import { IAuthSuccessResponse } from "./typings";
 
 
-export interface IApiSuccessResult<T = unknown> {
-  resultType: 'success'
-  data: T
+
+
+
+export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {
+  return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).accessToken
 }
 
-export interface IApiErrorResult<E = AxiosError | Error | string | {}> {
-  resultType: 'fail'
-  error: E
-}
-
-type ApiResult<T = unknown, E = AxiosError | Error | string | {}> = IApiSuccessResult<T> | IApiErrorResult<E>
 
 
 export interface IApiServiceConfig {
@@ -85,26 +84,19 @@ export class ApiService {
     return config
   }
 
-
   /** Get
    * 
    * @param url 
    * @param config 
    * @returns 
    */
-  async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResult<T>> {
+  async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.get(url, config);
-      return {
-        resultType: 'success',
-        data: response.data
-      }
+      return response.data
     } catch (error) {
-      return {
-        resultType: 'fail',
-        // @ts-ignore
-        error
-      }
+      analytics.debug(JSON.stringify(error))
+      throw error
     }
   }
 
@@ -129,53 +121,35 @@ export class ApiService {
     }
   }
 
-  post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<ApiResult<T>>
-  async post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<ApiResult<T>> {
+  post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<T>
+  async post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.post(url, data, config);
-      return {
-        resultType: 'success',
-        data: response.data
-      }
+      return response.data
     } catch (error) {
-      return {
-        resultType: 'fail',
-        // @ts-ignore
-        error
-      }
+      analytics.debug(JSON.stringify(error))
+      throw error
     }
   }
 
 
-  async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<ApiResult<T>> {
+  async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.delete(url, config);
-      return {
-        resultType: 'success',
-        data: response.data
-      }
+      return response.data
     } catch (error) {
-      return {
-        resultType: 'fail',
-        // @ts-ignore
-        error
-      }
+      analytics.debug(JSON.stringify(error))
+      throw error
     }
   }
 
-  async put<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<ApiResult<T>> {
+  async put<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await this.api.put(url, config);
-      return {
-        resultType: 'success',
-        data: response.data
-      }
+      const response: AxiosResponse<T> = await this.api.put(url, data, config);
+      return response.data
     } catch (error) {
-      return {
-        resultType: 'fail',
-        // @ts-ignore
-        error
-      }
+      analytics.debug(JSON.stringify(error))
+      throw error
     }
   }
 }

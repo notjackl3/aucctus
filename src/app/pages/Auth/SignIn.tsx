@@ -1,25 +1,53 @@
-import { FunctionComponent, useCallback, useState } from "react";
+import { FunctionComponent, useState } from "react";
 import styles from "../../assets/styles/pages/auth-screens.module.scss"
 import InputField from "../../components/InputField";
 import AuthProviderIcon from "../../assets/icons/SocialIcon";
 import Checkbox from "../../components/CheckBox";
-import { selectError, signIn } from "../../../features/auth/auth.slice";
+import { setAuthenticated } from "../../../features/auth/auth.slice";
 import { useAppDispatch } from "../../hooks";
 import { validEmail } from "../../../libs/utils";
 import { AppPath } from "../../../routes/routes";
-import { useSelector } from "react-redux";
+
+import { isError, useQuery } from "react-query";
+import api from "../../../libs/api";
+import { isAxiosError } from "axios";
+import { INestJSErrorResponse } from "../../../libs/api/typings/avxisi";
+import { IAuthSuccessResponse } from "../../../libs/api/typings";
+import analytics from "../../../libs/analytics";
+
+
+
 
 const SignIn: FunctionComponent = () => {
   const dispatch = useAppDispatch()
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
   const [emailInputError, setEmailInputError] = useState<string | undefined>()
-  const error = useSelector(selectError)
+  const [error, setError] = useState<string | undefined>()
 
+  const query = useQuery<IAuthSuccessResponse, string>({
+    queryKey: "signin",
+    enabled: false, // Prevent from automatically running
+    refetchOnWindowFocus: false,
+    retry: 0,
+    queryFn: async () => await api.auth.signIn(email, password),
+    onSuccess: (response: IAuthSuccessResponse) => {
+      analytics.debug(JSON.stringify(response))
+      dispatch(setAuthenticated(response))
+      return response
 
-  const _handleSignIn = useCallback(() => {
-    dispatch(signIn({ email: email, password }))
-  }, [dispatch, email, password])
+    },
+    onError: (error) => {
+      let message = "Unexpected Error Occurred"
+      if (isAxiosError<INestJSErrorResponse>(error)) {
+        message = error.response ? error.response.data.message : error.message
+      } else if (isError(error)) {
+        message = error.message
+      }
+      setError(message)
+      return message
+    }
+  })
 
   const _handleEmailValidation = (e: React.FocusEvent) => {
     if (email && !validEmail(email)) {
@@ -37,7 +65,8 @@ const SignIn: FunctionComponent = () => {
           Welcome back! Please enter your details.
         </span>
       </div>
-      {error && <div>
+      {/* TODO: Style this */}
+      {error && <div className={styles.error}>
         {error}
       </div>}
       <div className={styles.basicForm}>
@@ -78,8 +107,12 @@ const SignIn: FunctionComponent = () => {
         <button
           type="button"
           className="btn btn-primary"
-          onClick={_handleSignIn}
-          disabled={!email || !password || !!emailInputError}
+          onClick={async (e) => {
+            setError(undefined)
+            await query.refetch()
+            e.preventDefault()
+          }}
+          disabled={!email || !password || !!emailInputError || query.isFetching || query.isLoading}
 
         >Sign in</button>
 

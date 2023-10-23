@@ -4,34 +4,34 @@ import api from '../../libs/api'
 import { RootState } from "../../app/store";
 import analytics from "../../libs/analytics";
 import { IAuthSuccessResponse, IUser } from "../../libs/api/typings";
-import { IApiErrorResult, IApiSuccessResult } from "../../libs/api/apiService";
 import { AxiosError, isAxiosError } from "axios";
+import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
 
 export interface AuthState {
   status: "idle" | "loading" | "failed"
   user?: IUser;
+  accessToken?: string;
   organization?: IOrganization;
   error?: string;
 
-  // TODO: Access Token - Store token in http only secure cookie
-  accessToken?: string
 }
 
 const initialState: AuthState = {
   status: "idle",
   user: undefined,
-  accessToken: undefined,
   error: ""
 }
 
-const isAPIAuthSuccessResponse = (action: PayloadAction<unknown>): action is PayloadAction<IApiSuccessResult<IAuthSuccessResponse>> => {
-  const payload = action.payload as IApiSuccessResult<IAuthSuccessResponse>
-  return payload && "resultType" in payload && payload.resultType === 'success' && payload.data.user !== undefined && payload.data.accessToken !== undefined
+
+
+const isAPIAuthSuccessResponse = (action: PayloadAction<unknown>): action is PayloadAction<IAuthSuccessResponse> => {
+  const payload = action.payload as IAuthSuccessResponse
+  return payload && payload.user !== undefined && payload.accessToken !== undefined
 }
 
-const isApiErrorResult = (action: PayloadAction<unknown>): action is PayloadAction<IApiErrorResult<AxiosError>> => {
-  const payload = action.payload as IApiErrorResult<AxiosError>
-  return payload && "resultType" in payload && payload.resultType === 'fail' && isAxiosError(payload.error)
+const isApiErrorResult = (action: PayloadAction<unknown>): action is PayloadAction<AxiosError<INestJSErrorResponse>> => {
+  const payload = action.payload as AxiosError<INestJSErrorResponse>
+  return payload && isAxiosError<INestJSErrorResponse>(payload)
 }
 
 /** Sign In
@@ -45,6 +45,7 @@ export const signIn = createAsyncThunk(
       return await api.auth.signIn(email, password)
     } catch (e) {
       analytics.debug(e)
+      thunkApi.rejectWithValue(e)
     }
   }
 )
@@ -60,6 +61,7 @@ export const signUp = createAsyncThunk(
       return await api.auth.signup(name, email, password, confirmPassword)
     } catch (e) {
       analytics.debug(e)
+      thunkApi.rejectWithValue(e)
     }
   }
 )
@@ -72,6 +74,7 @@ export const refreshAuth = createAsyncThunk(
       return await api.auth.refreshToken()
     } catch (e) {
       analytics.debug(e)
+      thunkApi.rejectWithValue(e)
     }
   }
 )
@@ -84,18 +87,22 @@ export const confirmEmail = createAsyncThunk(
       return await api.auth.confirmEmail(token)
     } catch (e) {
       analytics.debug(e)
+      thunkApi.rejectWithValue(e)
     }
   }
 )
 
-export const registerOrganization = createAsyncThunk(
-  "auth/registerOrganization",
-  async (organization: IRegisterOrganization, thunkApi) => {
-    analytics.debug('Register Organization')
+
+
+export const logout = createAsyncThunk(
+  "auth/logout",
+  async (_, thunkApi) => {
+    analytics.debug('Logout')
     try {
-      return await api.auth.registerOrganization(organization)
+      return await api.auth.logout()
     } catch (e) {
       analytics.debug(e)
+      thunkApi.rejectWithValue(e)
     }
   },
 )
@@ -104,9 +111,36 @@ export const registerOrganization = createAsyncThunk(
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
-  reducers: {},
+  reducers: {
+    setAuthenticated(state, action: PayloadAction<IAuthSuccessResponse>) {
+      state.user = action.payload.user
+      state.organization = action.payload.organization
+      state.accessToken = action.payload.accessToken
+      api.accessToken = action.payload.accessToken
+    },
+    setUnauthenticated(state) {
+      state.user = undefined
+      state.organization = undefined
+      state.accessToken = undefined
+      api.accessToken = undefined
+    },
+    registerOrganization(state, action: PayloadAction<IOrganizationSuccessResponse>) {
+      state.organization = action.payload.organization
+    }
+
+  },
   extraReducers: (builder) => {
     builder
+      .addCase(logout.fulfilled, (state) => {
+        state.user = undefined;
+        state.organization = undefined
+        state.accessToken = undefined
+        api.accessToken = undefined
+      })
+      .addCase(refreshAuth.fulfilled, () => {
+        analytics.debug('Refresh Success')
+      })
+
       .addMatcher(isFulfilled, (state, action) => {
         state.status = 'idle'
       })
@@ -118,27 +152,36 @@ export const authSlice = createSlice({
       })
       .addMatcher(
         isAnyOf(isAPIAuthSuccessResponse), (state, action) => {
-          state.user = action.payload.data.user
-          state.organization = action.payload.data.organization
+          state.user = action.payload.user
+          state.organization = action.payload.organization
+          state.accessToken = action.payload.accessToken
           // TODO: Add api interceptor to grab this
-          api.accessToken = action.payload.data.accessToken
+          api.accessToken = action.payload.accessToken
         }
       ).addMatcher(
         isAnyOf(isApiErrorResult), (state, action) => {
-          const error = action.payload.error
-          // if (error.response?.request)
-          state.error = error.message
+          const error = action.payload
+          if (error.response && error.response.status === 401) {
+            state.user = undefined
+            state.organization = undefined
+            state.accessToken = undefined
+            api.accessToken = undefined
+          }
+
+          if (action.type !== "auth/refresh") {
+            state.error = error.message
+          }
         }
       )
   }
 })
 
 
-export const { } = authSlice.actions
-
+export const { setAuthenticated, setUnauthenticated, registerOrganization } = authSlice.actions
 
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectOrganization = (state: RootState) => state.auth.organization
 export const selectError = (state: RootState) => state.auth.error
+export const selectAccessToken = (state: RootState) => state.auth.accessToken
 
 export default authSlice.reducer

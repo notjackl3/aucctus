@@ -7,18 +7,45 @@ import { AppPath } from "../../../routes/routes";
 import { useAppDispatch } from "../../hooks";
 import { selectError, signUp } from "../../../features/auth/auth.slice";
 import { useSelector } from "react-redux";
+import { isError, useQuery } from "react-query";
+import api from "../../../libs/api";
+import { isAxiosError } from "axios";
+import { INestJSErrorResponse } from "../../../libs/api/typings/avxisi";
+import { useNavigate } from "react-router-dom";
 
-// TODO: Show loading
+
 const SignUp: FunctionComponent = () => {
   const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [name, setName] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [emailInputError, setEmailInputError] = useState<string | undefined>()
   const [confirmPassInputError, setConfirmPassInputError] = useState<string | undefined>()
-  const error = useSelector(selectError)
+  const [error, setError] = useState<string | undefined>()
 
+
+
+  const query = useQuery({
+    queryKey: "signup",
+    retry: 0,
+    enabled: false, // Prevent from automatically running
+    queryFn: async () => await api.auth.signup(name, email, password, confirmPassword),
+    onSuccess: () => {
+      navigate(AppPath.ConfirmEmail)
+    },
+    onError: (error) => {
+      let message = "Unexpected Error Occurred"
+      if (isAxiosError<INestJSErrorResponse>(error)) {
+        message = error.response ? error.response.data.message : error.message
+      } else if (isError(error)) {
+        message = error.message
+      }
+      setError(message)
+      return message
+    }
+  })
 
   const _handleEmailValidation = useCallback((e: React.FocusEvent) => {
     if (email && !validEmail(email)) {
@@ -48,13 +75,8 @@ const SignUp: FunctionComponent = () => {
     }
   }
 
-  const _handleSignup = () => {
-    dispatch(signUp({
-      name,
-      email,
-      password,
-      confirmPassword
-    }))
+  const _handleSignup = async () => {
+    await query.refetch()
   }
 
   return (
@@ -111,7 +133,7 @@ const SignUp: FunctionComponent = () => {
           type="button"
           className="btn btn-primary"
           onClick={_handleSignup}
-          disabled={!name || !email || !password || !!emailInputError || !!confirmPassInputError}
+          disabled={!name || !email || !password || !!emailInputError || !!confirmPassInputError || query.isFetching || query.isLoading}
         >Sign Up</button>
 
         <div className={styles.signUp}>
