@@ -3,11 +3,11 @@ import { Route, Routes } from "react-router"
 import AuthGuard from "./routes/guards/auth.guard"
 import Layout from "./Layout/Layout"
 import { AppPath } from "./routes/routes"
-import NotFound from "./app/pages/NotFound"
 import Page from "./app/pages"
 import UnauthGuard from "./routes/guards/unauth.guard"
 import { QueryClient, QueryClientProvider } from "react-query"
 import { Navigate } from "react-router-dom"
+import 'react-circular-progressbar/dist/styles.css';
 
 const queryClient = new QueryClient()
 
@@ -24,7 +24,8 @@ function App() {
               <Route index path={AppPath.Home} element={<Page.Dashboard />} />
 
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
-              <Route path={AppPath.ConceptList} element={<Page.ConceptList />} />
+              <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
+              <Route path={AppPath.ConceptOverview} element={<Page.ConceptOverview />} />
 
               <Route path={AppPath.IgniteDomain} element={<Page.IgniteDomain />} />
               <Route path={AppPath.DomainList} element={<Page.DomainList />} />

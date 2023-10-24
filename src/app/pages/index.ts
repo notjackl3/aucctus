@@ -5,7 +5,8 @@ import Onboarding from './Onboarding';
 import IgniteConcept from "./IgniteConcept";
 import IgniteDomain from "./IgniteDomain";
 import DomainList from "./DomainList";
-import ConceptList from "./GeneratedConcepts";
+import GeneratedConcepts from "./GeneratedConcepts";
+import ConceptOverview from "./ConceptOverview";
 
 const Page = {
   Auth,
@@ -14,7 +15,8 @@ const Page = {
   Onboarding,
 
   IgniteConcept,
-  ConceptList,
+  GeneratedConcepts,
+  ConceptOverview,
 
   IgniteDomain,
   DomainList,

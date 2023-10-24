@@ -1,13 +1,14 @@
 // The Main Drawer Component
 
 .container {
-  display: flex;
+  display: block;
 }
 
 .container,
-.navDrawer {
+.navDrawer,
+.wrapper {
   height: 100vh;
-  width: 15.5rem;
+  width: var(--nav-drawer-width);
 }
 
 .wrapper {
@@ -21,7 +22,6 @@
   align-self: stretch;
 
   height: 100vh;
-  width: 15.5rem;
   gap: 1rem;
   flex-shrink: 0;
 
