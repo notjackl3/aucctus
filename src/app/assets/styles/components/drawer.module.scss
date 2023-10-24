@@ -98,17 +98,42 @@
       display: flex;
       padding: 0.5rem 0.75rem;
       align-items: center;
-      gap: var(--gap-5xs);
+      flex-direction: column;
       align-self: stretch;
       border-radius: 0.375rem;
       background: var(--base-white, #fff);
       transition: all 0.3s ease-in-out;
       width: 100%;
 
-      .label {
+      a {
+        transition: all 0.3s ease-in-out;
+        display: flex;
+        width: 100%;
+        gap: var(--gap-5xs);
+
+        border-radius: 0.375rem;
+        background: var(--base-white, #fff);
+      }
+
+      .nestedLink {
+        display: flex;
+        padding: 0.5rem 0.75rem;
+        align-items: center;
+        gap: 0.5rem;
+        align-self: stretch;
+        margin-top: var(--base-gap);
+
+        span {
+          padding-left: 2.25rem;
+        }
+      }
+
+      .label,
+      .nestedLink {
         display: flex;
         align-items: center;
         gap: 0.75rem;
+
         flex: 1 0 0;
         span {
           color: var(--type-tertiary, #626ba3);
