@@ -2,7 +2,6 @@ import { FunctionComponent } from "react";
 import DashboardHeader from "../components/DashbaordHeader";
 import { useSelector } from "react-redux";
 import { selectOrganization } from "../../features/auth/auth.slice";
-import CompanyMetric from "../components/CompanyMetric";
 import IgniteBox from "../components/IgniteBox";
 import { AppPath } from "../../routes/routes";
 
@@ -22,13 +21,11 @@ const Dashboard: FunctionComponent = () => {
         <InnovationGoal />
 
         <div className={`${styles.container}  ${styles.companyMetrics}`}>
-
           <CompanyMetricsContainer />
           <div className={`${styles.container} ${styles.ignite}`}>
             <IgniteBox title="Ignite Domain" subtitle="Generate industry reports" link={AppPath.IgniteDomain} icon="file" />
             <IgniteBox title="Ignite Concept" subtitle="Generate powerful concepts" link={AppPath.IgniteConcept} icon="lightbulb" />
-          </div>
-
+          </div>å
         </div>
       </section >
 

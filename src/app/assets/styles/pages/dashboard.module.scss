@@ -99,7 +99,9 @@
     }
 
     .companyMetrics {
+      width: 70%;
       justify-self: flex-end;
+      justify-content: space-between;
     }
 
     .metrics {
@@ -111,7 +113,6 @@
 
     .ignite {
       display: flex;
-      height: 16.5rem;
       flex-direction: column;
       align-items: flex-start;
       gap: 1.5rem;

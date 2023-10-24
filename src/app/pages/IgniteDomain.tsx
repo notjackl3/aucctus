@@ -20,7 +20,7 @@ const IgniteDomain: FunctionComponent = () => {
   const query = useQuery({
     queryKey: "igniteDomain",
     enabled: false, // disable this query from automatically running
-    queryFn: async () => await api.ignite.domain({ opportunity, perception, qualification, exampleConcepts, extraDetails })
+    // queryFn: async () => await api.igniteConcept.domain({ opportunity, perception, qualification, exampleConcepts, extraDetails })
 
   })
 
@@ -29,7 +29,7 @@ const IgniteDomain: FunctionComponent = () => {
     <div className={styles.ignite} >
 
 
-      {query.isFetching || query.isLoading ?
+      {query.isLoading ?
 
         <IgniteLoading
           title="Igniting Your Domain"
@@ -42,9 +42,6 @@ const IgniteDomain: FunctionComponent = () => {
           title="Ignite Your Domain"
           subtitle="These answers will kick start your domain generation process"
         >
-
-
-
 
           <TextArea
             name="opportunity"
@@ -93,7 +90,6 @@ const IgniteDomain: FunctionComponent = () => {
             onClick={() => query.refetch()}
           >
             Generate Domains
-
           </button>
 
 
