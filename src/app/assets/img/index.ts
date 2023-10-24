@@ -4,6 +4,7 @@ import domainBooklet from './domain-booklet.png'
 import conceptOverview from "./concept-overview.png"
 import financialProjection from "./finacial-projection-blur.png"
 import customerProfile from './customer-profile-blur.png'
+import marketSegment from "./market-segment-blur.png"
 
 const images = {
   sample,
@@ -12,6 +13,7 @@ const images = {
   conceptOverview,
   financialProjection,
   customerProfile,
+  marketSegment
 }
 
 

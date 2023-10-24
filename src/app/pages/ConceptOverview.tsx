@@ -117,7 +117,7 @@ const ConceptOverview: FunctionComponent = () => {
 
         <ConceptCard
           title="Financial Projection"
-          subtitle="This concept is in the top percentile"
+          subtitle="Breakdown of business model canvas and hypotheses to validate."
           width={360}
         >
           <img
@@ -128,7 +128,7 @@ const ConceptOverview: FunctionComponent = () => {
 
         <ConceptCard
           title="Customer Profiles"
-          subtitle="This concept is in the top percentile."
+          subtitle="Breakdown of target user pain points and jobs to be done."
           width={360}
         >
           <img

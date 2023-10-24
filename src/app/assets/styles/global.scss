@@ -142,6 +142,21 @@ input {
   }
 }
 
+.comingSoon {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+
+  .comingSoonWrapper {
+    display: flex;
+    justify-content: center;
+    align-content: center;
+  }
+}
+
 :root {
   --nav-drawer-width: 15.5rem;
 

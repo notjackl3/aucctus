@@ -10,8 +10,11 @@ export enum AppPath {
   ConceptOverview = '/concept/:id',
 
   /* Domain */
-  DomainList = '/domain-list',
   IgniteDomain = '/ignite-domain',
+  DomainList = '/domain-list',
+  DomainMarket = '/domain/market/:id',
+
+
 
   /* Auth */
   SignIn = "/sign-in",

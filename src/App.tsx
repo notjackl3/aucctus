@@ -29,6 +29,8 @@ function App() {
 
               <Route path={AppPath.IgniteDomain} element={<Page.IgniteDomain />} />
               <Route path={AppPath.DomainList} element={<Page.DomainList />} />
+              <Route path={AppPath.DomainMarket} element={<Page.DomainMarket />} />
+
             </Route>
           </Route>
 
