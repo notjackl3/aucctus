@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-table'
 
 
-import styles from "../assets/styles/pages/concept-list.module.scss"
+import styles from "../assets/styles/pages/generated-concept.module.scss"
 import ArrowUp from '../assets/icons/arrowup.svg?react'
 import ArrowDown from '../assets/icons/arrowdown.svg?react'
 import Star from '../assets/icons/star-01.svg?react'

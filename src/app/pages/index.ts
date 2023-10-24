@@ -7,6 +7,7 @@ import IgniteDomain from "./IgniteDomain";
 import DomainList from "./DomainList";
 import GeneratedConcepts from "./GeneratedConcepts";
 import ConceptOverview from "./ConceptOverview";
+import ConceptList from "./ConceptList";
 import DomainMarket from "./DomainMarket";
 
 const Page = {
@@ -18,6 +19,8 @@ const Page = {
   IgniteConcept,
   GeneratedConcepts,
   ConceptOverview,
+  ConceptList,
+
 
   IgniteDomain,
   DomainList,

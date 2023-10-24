@@ -26,6 +26,7 @@ function App() {
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
               <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
               <Route path={AppPath.ConceptOverview} element={<Page.ConceptOverview />} />
+              <Route path={AppPath.ConceptList} element={<Page.ConceptList />} />
 
               <Route path={AppPath.IgniteDomain} element={<Page.IgniteDomain />} />
               <Route path={AppPath.DomainList} element={<Page.DomainList />} />

@@ -14,22 +14,8 @@ import { AppPath } from "../../../routes/routes";
 
 const NavDrawer = () => {
   const user = useSelector(selectUser)!
+  // TODO: Get Concept List & Domain Need to set up global state
 
-  // Grab the Drawer State to determine if the drawer should be open or not
-  // const isOpen = false
-
-  // Controls the Animation 
-  // const { opacity, width, display } = useSpring({
-  //   from: { width: '150', opacity: 1, display: 'flex' },
-  //   to: async (next) => {
-  //     await next(isOpen ? { display: "flex" } : { opacity: 0 })
-  //     await next(isOpen ? { width: '302px' } : { width: '16px' /*'60px' */ });
-  //     await next(isOpen ? { opacity: 1 } : { display: "none" });
-  //   },
-  //   config: {
-  //     duration: isOpen ? 500 : 150
-  //   }
-  // });
 
   return (
     <div className={styles.container}>
@@ -52,7 +38,7 @@ const NavDrawer = () => {
 
 
             />
-            <NavLink to={AppPath.GeneratedConcepts} title="Concepts" icon='lightbulb' />
+            <NavLink to={AppPath.ConceptList} title="Concepts" icon='lightbulb' />
             {/* TODO Fix this */}
             <NavLink to={AppPath.Home} title="Tests" icon='rocket' locked />
           </div>

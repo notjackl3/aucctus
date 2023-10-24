@@ -1,5 +1,5 @@
 import { FunctionComponent } from "react";
-import styles from "../assets/styles/pages/concept-list.module.scss"
+import styles from "../assets/styles/pages/generated-concept.module.scss"
 import ConceptTable from "../components/ConceptTable";
 import { useNavigate } from "react-router-dom";
 

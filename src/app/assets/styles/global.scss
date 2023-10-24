@@ -32,7 +32,10 @@ h3,
 p,
 span,
 button,
-a {
+a,
+tr,
+th,
+td {
   font-family: var(--text-sm-regular);
 }
 
@@ -59,6 +62,11 @@ button.btn {
 
   /* Shadow/xs */
   box-shadow: var(--shadow-xs) !important;
+
+  color: var(--type-tertiary);
+  svg {
+    stroke: var(--type-tertiary) !important;
+  }
 
   &.btn-primary {
     border: 1px solid var(--primary-600-primary, #4318ff) !important;
