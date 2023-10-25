@@ -47,11 +47,6 @@ const NavDrawer = () => {
           <div className={styles.extras}>
             <NavLink to={AppPath.Home} title="Learn" icon="home" />
             <NavLink to={AppPath.Home} title="Settings" icon='file' />
-            <button
-              onClick={() => {
-                dispatch(logout())
-              }}
-            ></button>
 
           </div>
           <div className={styles.account}>
@@ -60,7 +55,12 @@ const NavDrawer = () => {
               alt='avatar'
               src={avatar}
             />
-            <div className={styles.userDetails}>
+            <div className={styles.userDetails}
+
+              onClick={() => {
+                dispatch(logout())
+              }}
+            >
               <span>{user.name}</span>
               <span>{user.email}</span>
             </div>

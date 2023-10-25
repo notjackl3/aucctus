@@ -63,5 +63,5 @@ jobs:
         with:
           app-name: "Aucctus"
           slot-name: "Production"
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE }} # Publish profile should always be stored as secrets in your repository Settings - Secrets and variables - Actions - secrets
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_6CE4064D10474B95AF7106DD950C3958 }}
           package: .
