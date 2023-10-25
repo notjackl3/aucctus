@@ -79,6 +79,21 @@ export const refreshAuth = createAsyncThunk(
   }
 )
 
+
+export const registerOrganization = createAsyncThunk(
+  "auth/registerOrganization",
+  async (organization: IRegisterOrganization, thunkApi) => {
+    analytics.debug('Register Organization')
+    try {
+      const response = await api.auth.registerOrganization(organization)
+      return response
+    } catch (e) {
+      analytics.debug(e)
+      thunkApi.rejectWithValue(e)
+    }
+  },
+)
+
 export const confirmEmail = createAsyncThunk(
   "auth/confirmEmail",
   async (token: string, thunkApi) => {
@@ -91,6 +106,9 @@ export const confirmEmail = createAsyncThunk(
     }
   }
 )
+
+
+
 
 export const logout = createAsyncThunk(
   "auth/logout",
@@ -121,8 +139,8 @@ export const authSlice = createSlice({
       state.accessToken = undefined
       api.accessToken = undefined
     },
-    registerOrganization(state, action: PayloadAction<IOrganizationSuccessResponse>) {
-      state.organization = action.payload.organization
+    setOrganization(state, action: PayloadAction<IOrganization>) {
+      state.organization = action.payload
     }
 
   },
@@ -139,6 +157,10 @@ export const authSlice = createSlice({
         state.organization = undefined
         state.accessToken = undefined
         api.accessToken = undefined
+      })
+      .addCase(registerOrganization.fulfilled, (state, action) => {
+        analytics.debug(action.payload)
+        state.organization = action.payload?.organization
       })
       .addMatcher(isFulfilled, (state, action) => {
         state.status = 'idle'
@@ -177,7 +199,7 @@ export const authSlice = createSlice({
 })
 
 
-export const { setAuthenticated, setUnauthenticated, registerOrganization } = authSlice.actions
+export const { setAuthenticated, setUnauthenticated, setOrganization } = authSlice.actions
 
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectOrganization = (state: RootState) => state.auth.organization

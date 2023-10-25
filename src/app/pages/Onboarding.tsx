@@ -8,11 +8,7 @@ import { useAppDispatch } from "../hooks";
 import InputField from "../components/InputField";
 import { validDomain } from "../../libs/utils";
 import { registerOrganization } from "../../features/auth/auth.slice";
-import { isError, useQuery } from "react-query";
-import api from "../../libs/api";
-import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
-import { isAxiosError } from "axios";
-import analytics from "../../libs/analytics";
+
 
 const OnBoarding: FunctionComponent = () => {
   const dispatch = useAppDispatch()
@@ -29,27 +25,6 @@ const OnBoarding: FunctionComponent = () => {
 
   const [domainInputError, setDomainInputError] = useState<string | undefined>()
   const [error, setError] = useState<string | undefined>() //TODO: error handling
-
-
-  const query = useQuery({
-    queryKey: "onboarding",
-    retry: 0,
-    enabled: false, // Prevent from automatically running
-    queryFn: async () => await api.auth.registerOrganization({ name, domain, industry, goal, competitors, kpis }),
-    onSuccess: (response) => {
-      analytics.debug(response)
-      dispatch(registerOrganization(response))
-    },
-    onError: (error) => {
-      let message = "Unexpected Error Occurred"
-      if (isAxiosError<INestJSErrorResponse>(error)) {
-        message = error.response ? error.response.data.message : error.message
-      } else if (isError(error)) {
-        message = error.message
-      }
-      setError(message)
-    }
-  })
 
 
   const _handleDomainValidation = useCallback((e: React.FocusEvent) => {
@@ -78,8 +53,8 @@ const OnBoarding: FunctionComponent = () => {
     return list.join(" \u2022\ ")
   }
 
-  const _handleRegistration = async () => {
-    await query.refetch()
+  const _handleRegistration = () => {
+    dispatch(registerOrganization({ name, domain, industry, goal, competitors, kpis }))
   }
 
   // TODO: Finish design
