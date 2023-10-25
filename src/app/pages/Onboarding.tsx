@@ -12,6 +12,7 @@ import { isError, useQuery } from "react-query";
 import api from "../../libs/api";
 import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
 import { isAxiosError } from "axios";
+import analytics from "../../libs/analytics";
 
 const OnBoarding: FunctionComponent = () => {
   const dispatch = useAppDispatch()
@@ -34,8 +35,9 @@ const OnBoarding: FunctionComponent = () => {
     queryKey: "onboarding",
     retry: 0,
     enabled: false, // Prevent from automatically running
-    queryFn: async () => api.auth.registerOrganization({ name, domain, industry, goal, competitors, kpis }),
+    queryFn: async () => await api.auth.registerOrganization({ name, domain, industry, goal, competitors, kpis }),
     onSuccess: (response) => {
+      analytics.debug(response)
       dispatch(registerOrganization(response))
     },
     onError: (error) => {
@@ -92,7 +94,7 @@ const OnBoarding: FunctionComponent = () => {
               Answer the prompts below to start innovating
             </span>
           </div>
-          {error && <div>  {/* TODO: Fix API ERROR */}
+          {error && <div className={styles.error}>
             {error}
           </div>}
           <div className={styles.basicForm}>

@@ -41,11 +41,11 @@ function App() {
             <Route path={AppPath.SignUp} element={<Page.Auth.SignUp />} />
             <Route path={AppPath.ForgotPassword} element={<Page.Auth.ForgotPassword />} />
             <Route path={AppPath.SignUpSuccess} element={<Page.Auth.SignUpSuccess />} />
-            {/* <Route path={AppPath.ConfirmEmail} element={<Page.Auth.ConfirmEmail />} /> */}
+            <Route path={AppPath.ConfirmEmail} element={<Page.Auth.SignUpSuccess />} />
           </Route>
           <Route
             path="*"
-            element={<Navigate to="/" replace />}
+            element={<Navigate to={AppPath.SignIn} replace />}
           />
         </Routes>
       </QueryClientProvider>

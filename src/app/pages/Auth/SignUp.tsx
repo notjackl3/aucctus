@@ -85,7 +85,7 @@ const SignUp: FunctionComponent = () => {
           Start your 30-day free trial
         </span>
       </div>
-      {error && <div>
+      {error && <div className={styles.error}>
         {error}
       </div>}
       <div className={styles.basicForm}>

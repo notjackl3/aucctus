@@ -140,11 +140,6 @@ export const authSlice = createSlice({
         state.accessToken = undefined
         api.accessToken = undefined
       })
-
-      .addCase(refreshAuth.fulfilled, () => {
-
-      })
-
       .addMatcher(isFulfilled, (state, action) => {
         state.status = 'idle'
       })
@@ -156,6 +151,7 @@ export const authSlice = createSlice({
       })
       .addMatcher(
         isAnyOf(isAPIAuthSuccessResponse), (state, action) => {
+          analytics.debug(action.type)
           state.user = action.payload.user
           state.organization = action.payload.organization
           state.accessToken = action.payload.accessToken

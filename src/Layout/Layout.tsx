@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import NavDrawer from "../app/components/NavDrawer/NavDrawer"
 import { useSelector } from "react-redux";
-import { refreshAuth, selectAccessToken, selectOrganization } from "../features/auth/auth.slice";
+import { selectAccessToken, selectOrganization } from "../features/auth/auth.slice";
 import { AppPath } from "../routes/routes";
 import styles from "../app/assets/styles/layout.module.scss"
 import { useAppDispatch } from "../app/hooks";
@@ -13,11 +13,7 @@ const Layout = () => {
   const accessToken = useSelector(selectAccessToken)
 
   useEffect(() => {
-    if (!accessToken) {
-      dispatch(refreshAuth())
-    }
   }, [accessToken, dispatch])
-
 
   if (!organization) {
     return <Navigate to={AppPath.Onboarding} />
