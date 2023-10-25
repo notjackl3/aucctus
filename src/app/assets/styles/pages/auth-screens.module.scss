@@ -101,6 +101,21 @@
         color: var(--type-tertiary);
         margin-bottom: var(--gap-13xl);
 
+        .inputGroup {
+          display: flex;
+          // width: 100%;
+          // gap: var(--gap-13xl);
+          align-self: stretch;
+
+          input {
+            align-self: stretch;
+
+            min-width: 45% !important;
+          }
+
+          justify-content: space-between;
+        }
+
         .row {
           align-self: stretch;
         }

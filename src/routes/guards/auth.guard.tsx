@@ -1,27 +1,26 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { refreshAuth, selectUser } from '../../features/auth/auth.slice';
+import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { selectAccessToken } from '../../features/auth/auth.slice';
 import { AppPath } from '../routes';
-import { useAppDispatch } from '../../app/hooks';
 
 
 const AuthGuard: FunctionComponent = () => {
-  const user = useSelector(selectUser);
-  const dispatch = useAppDispatch()
+  const accessToken = useSelector(selectAccessToken);
+  const navigate = useNavigate()
   const location = useLocation()
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     dispatch(refreshAuth())
-  //   }
-  // }, [user])
+  useEffect(() => {
+    if (!accessToken) {
+      navigate(AppPath.SignIn);
+    }
+  }, [accessToken, navigate]);
 
-  if (user) {
+  if (accessToken) {
     return <Outlet />
   }
 
-  return <Navigate to={AppPath.SignIn} state={{ from: location }} replace />
+  return <Navigate to={AppPath.SignIn} />
 
 }
 

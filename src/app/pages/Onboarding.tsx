@@ -7,7 +7,7 @@ import styles from "../assets/styles/pages/auth-screens.module.scss"
 import { useAppDispatch } from "../hooks";
 import InputField from "../components/InputField";
 import { validDomain } from "../../libs/utils";
-import { logout, registerOrganization } from "../../features/auth/auth.slice";
+import { registerOrganization } from "../../features/auth/auth.slice";
 import { isError, useQuery } from "react-query";
 import api from "../../libs/api";
 import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
@@ -39,15 +39,13 @@ const OnBoarding: FunctionComponent = () => {
       dispatch(registerOrganization(response))
     },
     onError: (error) => {
-      dispatch(logout())
-      // let message = "Unexpected Error Occurred"
-      // if (isAxiosError<INestJSErrorResponse>(error)) {
-      //   message = error.response ? error.response.data.message : error.message
-      // } else if (isError(error)) {
-      //   message = error.message
-      // }
-      // setError(message)
-      // return message
+      let message = "Unexpected Error Occurred"
+      if (isAxiosError<INestJSErrorResponse>(error)) {
+        message = error.response ? error.response.data.message : error.message
+      } else if (isError(error)) {
+        message = error.message
+      }
+      setError(message)
     }
   })
 
@@ -98,24 +96,28 @@ const OnBoarding: FunctionComponent = () => {
             {error}
           </div>}
           <div className={styles.basicForm}>
-            <InputField
-              name={"companyName"}
-              label={"Company Name"}
-              value={name}
-              placeholder="Acme Widgets Corp."
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-            />
-            <InputField
-              name={"companyUrl"}
-              label={"Company Url"}
-              error={!!domainInputError}
-              errorMessage={domainInputError}
-              value={domain}
-              placeholder="www.acmewidgetscorp.com"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDomain(e.target.value)}
-              onFocus={() => setDomainInputError(undefined)}
-              onBlur={_handleDomainValidation}
-            />
+
+            <div className={styles.inputGroup}>
+              <InputField
+                name={"companyName"}
+                label={"Company Name"}
+                value={name}
+                placeholder="Acme Widgets Corp."
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+              />
+              <InputField
+                name={"companyUrl"}
+                label={"Company Url"}
+                error={!!domainInputError}
+                errorMessage={domainInputError}
+                value={domain}
+                placeholder="www.acmewidgetscorp.com"
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDomain(e.target.value)}
+                onFocus={() => setDomainInputError(undefined)}
+                onBlur={_handleDomainValidation}
+              />
+
+            </div>
             <InputField
               name={"industry"}
               label={"Primary Industry"}

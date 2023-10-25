@@ -13,8 +13,6 @@ const ConfirmEmail: FunctionComponent = () => {
     if (token) {
       dispatch(confirmEmail(token))
     }
-
-
   }, [dispatch, token])
 
 

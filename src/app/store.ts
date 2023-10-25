@@ -9,8 +9,9 @@ import storageSession from 'redux-persist/lib/storage/session'
 const authPersistConfig = {
   key: 'fhserw',
   storage: storageSession,
-  blacklist: ['user', 'organization', 'error']
+  blacklist: ['accessToken', "status", 'error']
 }
+
 const conceptPersistConfig = {
   key: 'aasdnfsdfw',
   storage,
