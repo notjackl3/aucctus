@@ -5,13 +5,11 @@ import InputField from "../../components/InputField";
 import { validEmail } from "../../../libs/utils";
 import { AppPath } from "../../../routes/routes";
 import { useAppDispatch } from "../../hooks";
-import { selectError, signUp } from "../../../features/auth/auth.slice";
-import { useSelector } from "react-redux";
 import { isError, useQuery } from "react-query";
 import api from "../../../libs/api";
 import { isAxiosError } from "axios";
 import { INestJSErrorResponse } from "../../../libs/api/typings/avxisi";
-import { Link, Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 
 const SignUp: FunctionComponent = () => {
