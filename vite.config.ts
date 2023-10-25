@@ -7,10 +7,10 @@ import path from 'path'
 export default defineConfig({
   plugins: [react(), svgr({
     svgrOptions: {
-      icon: true,
-      svgProps: { "stroke": "stroke" }
+      // icon: true,
+      // svgProps: { "stroke": "stroke" }
     },
-    include: "**/*.svg?react",
+    // include: "**/*.svg?react",
   })],
   resolve: {
     alias: {
