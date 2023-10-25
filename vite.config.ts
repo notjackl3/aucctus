@@ -9,7 +9,8 @@ export default defineConfig({
     svgrOptions: {
       icon: true,
       svgProps: { "stroke": "stroke" }
-    }
+    },
+    include: "**/*.svg?react",
   })],
   resolve: {
     alias: {
