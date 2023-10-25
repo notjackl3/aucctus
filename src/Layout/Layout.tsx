@@ -13,7 +13,7 @@ const Layout = () => {
   const accessToken = useSelector(selectAccessToken)
 
   useEffect(() => {
-  }, [accessToken, dispatch])
+  }, [accessToken, organization, dispatch])
 
   if (!organization) {
     return <Navigate to={AppPath.Onboarding} />

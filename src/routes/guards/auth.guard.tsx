@@ -7,15 +7,7 @@ import { AppPath } from '../routes';
 
 const AuthGuard: FunctionComponent = () => {
   const accessToken = useSelector(selectAccessToken);
-  // const user = useSelector(selectUser)
-  // const navigate = useNavigate()
-  // const location = useLocation()
 
-  // useEffect(() => {
-  //   if (!user) {
-  //     navigate(AppPath.SignIn);
-  //   }
-  // }, [user, navigate]);
 
   if (accessToken) {
     return <Outlet />

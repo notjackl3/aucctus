@@ -7,11 +7,14 @@ import styles from "../assets/styles/pages/auth-screens.module.scss"
 import { useAppDispatch } from "../hooks";
 import InputField from "../components/InputField";
 import { validDomain } from "../../libs/utils";
-import { registerOrganization, selectAuthStatus } from "../../features/auth/auth.slice";
+import { registerOrganization, selectAuthStatus, selectOrganization } from "../../features/auth/auth.slice";
 import { useSelector } from "react-redux";
+import { Navigate } from "react-router-dom";
+import { AppPath } from "../../routes/routes";
 
 
 const OnBoarding: FunctionComponent = () => {
+  const organization = useSelector(selectOrganization)
   const dispatch = useAppDispatch()
   const [name, setName] = useState<string>("")
   const [domain, setDomain] = useState<string>("")
@@ -59,7 +62,11 @@ const OnBoarding: FunctionComponent = () => {
     dispatch(registerOrganization({ name, domain, industry, goal, competitors, kpis }))
   }
 
-  // TODO: Finish design
+
+  if (organization) {
+    return <Navigate to={AppPath.Home} />
+  }
+
   return (
     <div className={styles.authContainer}>
       <div className={styles.formSection}>
