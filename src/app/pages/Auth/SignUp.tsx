@@ -31,7 +31,7 @@ const SignUp: FunctionComponent = () => {
     enabled: false, // Prevent from automatically running
     queryFn: async () => await api.auth.signup(name, email, password, confirmPassword),
     onSuccess: () => {
-      navigate(AppPath.ConfirmEmail)
+      navigate(AppPath.SignUpSuccess)
     },
     onError: (error) => {
       let message = "Unexpected Error Occurred"

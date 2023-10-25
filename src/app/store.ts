@@ -4,10 +4,12 @@ import conceptReducer from "../features/concepts/concept.slice";
 
 import { persistStore, persistReducer } from 'redux-persist'
 import storage from 'redux-persist/lib/storage'
+import storageSession from 'redux-persist/lib/storage/session'
 
 const authPersistConfig = {
-  key: 'ahfhawdkwa',
-  storage,
+  key: 'fhserw',
+  storage: storageSession,
+  blacklist: ['user', 'organization', 'error']
 }
 const conceptPersistConfig = {
   key: 'aasdnfsdfw',

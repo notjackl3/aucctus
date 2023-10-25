@@ -26,7 +26,7 @@ const initialState: AuthState = {
 
 const isAPIAuthSuccessResponse = (action: PayloadAction<unknown>): action is PayloadAction<IAuthSuccessResponse> => {
   const payload = action.payload as IAuthSuccessResponse
-  return payload && payload.user !== undefined && payload.accessToken !== undefined
+  return payload && !!payload.user && !!payload.accessToken
 }
 
 const isApiErrorResult = (action: PayloadAction<unknown>): action is PayloadAction<AxiosError<INestJSErrorResponse>> => {
@@ -134,8 +134,15 @@ export const authSlice = createSlice({
         state.accessToken = undefined
         api.accessToken = undefined
       })
+      .addCase(logout.rejected, (state) => {
+        state.user = undefined;
+        state.organization = undefined
+        state.accessToken = undefined
+        api.accessToken = undefined
+      })
+
       .addCase(refreshAuth.fulfilled, () => {
-        analytics.debug('Refresh Success')
+
       })
 
       .addMatcher(isFulfilled, (state, action) => {
