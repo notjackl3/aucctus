@@ -1,6 +1,6 @@
 import { FunctionComponent } from "react";
 import styles from "../assets/styles/components/footer.module.scss";
-import MailIcon from "../assets/icons/mail.svg?react";
+import MailIcon from "../assets/icons/Mail";
 import { HELP_EMAIL } from "../../libs/constants";
 
 const year = new Date().getFullYear()

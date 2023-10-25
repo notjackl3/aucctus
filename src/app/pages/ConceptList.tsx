@@ -3,10 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { AppPath } from "../../routes/routes";
 import InputField from "../components/InputField";
 
-import Lightbulb from '../assets/icons/lightbulb.svg?react';
-import DownloadIcon from '../assets/icons/download.svg?react';
-import ArrowRight from '../assets/icons/arrowright.svg?react';
-import FilterLines from '../assets/icons/filter-lines.svg?react';
+import Lightbulb from '../assets/icons/Lightbulb';
+import DownloadIcon from '../assets/icons/Download';
+import ArrowRight from '../assets/icons/ArrowRight';
+import FilterLines from '../assets/icons/FilterLines';
 import { IConceptResponse } from "../../libs/api/typings/ignite-concepts";
 import styles from '../assets/styles/pages/concept-list.module.scss';
 
@@ -76,7 +76,7 @@ const ConceptList: FunctionComponent = () => {
           }}
           className={styles.reviewConceptLink}
         >
-          <ArrowRight height={20} width={20} />
+          <ArrowRight height={20} width={20} stroke="" />
         </button>),
       header: () => <span></span>,
     }),
@@ -100,11 +100,11 @@ const ConceptList: FunctionComponent = () => {
           <h1>Concepts</h1>
           <div className={styles.actions}>
             <button className="btn btn-light disabled">
-              <DownloadIcon height={20} width={20} />
+              <DownloadIcon height={20} width={20} stroke="" />
               Export
             </button>
             <button className="btn btn-primary">
-              <Lightbulb height={20} width={20} />
+              <Lightbulb height={20} width={20} stroke="" />
               Ignite Concept
             </button>
           </div>
@@ -137,7 +137,7 @@ const ConceptList: FunctionComponent = () => {
         <div className={styles.tableControls}>
           <InputField label="" placeholder="Search" disabled name="searchbar" />
           <button className="btn btn-light disabled">
-            <FilterLines height={20} width={20} />
+            <FilterLines height={20} width={20} stroke="" />
             Filter
           </button>
         </div>

@@ -1,8 +1,8 @@
 import { FunctionComponent } from "react";
 
 
-import DownloadIcon from '../assets/icons/download.svg?react'
-import FileSearchIcon from '../assets/icons/filesearch.svg?react'
+import DownloadIcon from '../assets/icons/Download'
+import FileSearchIcon from '../assets/icons/FileSearch'
 
 import styles from '../assets/styles/pages/domain-list.module.scss'
 import DomainBox from "../components/DomainBox";
@@ -29,7 +29,7 @@ const DomainList: FunctionComponent = () => {
         <div className={styles.actionable}>
           <button className="btn btn-light">Edit Inputs</button>
           <button className="btn btn-light">
-            <DownloadIcon height={20} width={20} />
+            <DownloadIcon height={20} width={20} stroke="" />
             Export All
           </button>
           <button className="btn btn-primary"
@@ -37,7 +37,7 @@ const DomainList: FunctionComponent = () => {
               navigate(AppPath.IgniteDomain)
             }}
           >
-            <FileSearchIcon height={20} width={20} />
+            <FileSearchIcon height={20} width={20} stroke="" />
             Ignite Domain
           </button>
 

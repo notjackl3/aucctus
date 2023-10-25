@@ -1,12 +1,12 @@
 
 import { FunctionComponent } from "react";
 
-import Home from '../../app/assets/icons/home.svg?react'
-import FileSearch from "../assets/icons/filesearch.svg?react";
-import Lightbulb from "../assets/icons/lightbulb.svg?react";
-import Rocket from "../assets/icons/rocket.svg?react";
-import Help from "../assets/icons/help.svg?react";
-import Gear from "../assets/icons/gear.svg?react";
+import Home from '../../app/assets/icons/Home'
+import FileSearch from "../assets/icons/FileSearch";
+import Lightbulb from "../assets/icons/Lightbulb";
+import Rocket from "../assets/icons/Rocket";
+import Help from "../assets/icons/Help";
+import Gear from "../assets/icons/Gear";
 
 
 import styles from '../assets/styles/components/feature-icon.module.scss'

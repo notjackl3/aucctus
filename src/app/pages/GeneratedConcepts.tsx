@@ -3,9 +3,9 @@ import styles from "../assets/styles/pages/generated-concept.module.scss"
 import ConceptTable from "../components/ConceptTable";
 import { useNavigate } from "react-router-dom";
 
-import DownloadIcon from '../assets/icons/download.svg?react'
-import ArrowRight from '../assets/icons/arrowright.svg?react'
-import RefreshIcon from '../assets/icons/refresh.svg?react'
+import DownloadIcon from '../assets/icons/Download'
+import ArrowRight from '../assets/icons/ArrowRight'
+import RefreshIcon from '../assets/icons/Refresh'
 import { AppPath } from "../../routes/routes";
 
 const GeneratedConcepts: FunctionComponent = () => {
@@ -23,17 +23,17 @@ const GeneratedConcepts: FunctionComponent = () => {
         </div>
         <div className={styles.actionable}>
           <button className="btn btn-light">
-            <DownloadIcon height={20} width={20} />
+            <DownloadIcon height={20} width={20} stroke="" />
             Export
           </button>
-          <button className="btn btn-light"><RefreshIcon height={20} width={20} /> Generate more</button>
+          <button className="btn btn-light"><RefreshIcon height={20} width={20} stroke="" /> Generate more</button>
           <button className="btn btn-primary"
             onClick={() => {
               navigate(AppPath.ConceptList)
             }}
           >
             Continue
-            <ArrowRight height={20} width={20} />
+            <ArrowRight height={20} width={20} stroke="" />
           </button>
         </div>
       </div>

@@ -1,10 +1,10 @@
 import { FunctionComponent } from "react";
 
-import BankIcon from '../assets/icons/bank.svg?react'
-import LineChartIcon from '../assets/icons/line-chart-up.svg?react'
-import GlobeIcon from '../assets/icons/globe.svg?react'
-import ThreeStarIcon from '../assets/icons/threeStars.svg?react'
-import RightArrowIcon from '../assets/icons/arrowright.svg?react'
+import BankIcon from '../assets/icons/Bank'
+import LineChartIcon from '../assets/icons/LineChartUp'
+import GlobeIcon from '../assets/icons/Globe'
+import ThreeStarIcon from '../assets/icons/ThreeStars'
+import RightArrowIcon from '../assets/icons/ArrowRight'
 
 import styles from "../assets/styles/components/domain-box.module.scss"
 import images from "../assets/img";

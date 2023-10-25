@@ -4,7 +4,7 @@ import { AppPath } from "../../../routes/routes";
 import { useAppDispatch, useQueryParams } from "../../hooks";
 import { confirmEmail } from "../../../features/auth/auth.slice";
 import { Link } from "react-router-dom";
-import LeftArrowIcon from "../../assets/icons/arrowleft.svg?react";
+import LeftArrowIcon from "../../assets/icons/ArrowLeft";
 
 
 const SignUpSuccess: FunctionComponent = () => {

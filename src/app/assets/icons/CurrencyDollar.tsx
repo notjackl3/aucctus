@@ -1,0 +1,19 @@
+import { FunctionComponent } from "react";
+
+
+interface IconProps {
+  height: number;
+  width: number;
+  stroke: string;
+}
+
+
+const CurrencyDollar: FunctionComponent<IconProps> = ({ height, width, stroke }) => {
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M7.66663 19.1667C7.66663 21.744 9.75596 23.8334 12.3333 23.8334H17C19.5773 23.8334 21.6666 21.744 21.6666 19.1667C21.6666 16.5894 19.5773 14.5 17 14.5H12.3333C9.75596 14.5 7.66663 12.4107 7.66663 9.83337C7.66663 7.25605 9.75596 5.16671 12.3333 5.16671H17C19.5773 5.16671 21.6666 7.25605 21.6666 9.83337M14.6666 2.83337V26.1667" stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export default CurrencyDollar;

@@ -30,3 +30,6 @@ build
 *.local
 .env
 .env.*
+
+
+**/.DS_Store

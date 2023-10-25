@@ -8,20 +8,20 @@ import {
 } from '@tanstack/react-table'
 
 import styles from "../assets/styles/pages/generated-concept.module.scss"
-import ArrowUp from '../assets/icons/arrowup.svg?react'
-import ArrowDown from '../assets/icons/arrowdown.svg?react'
-import Star from '../assets/icons/star-01.svg?react'
+import ArrowUp from '../assets/icons/ArrowUp'
+import ArrowDown from '../assets/icons/Arrowdown'
+import Star from '../assets/icons/SaveStar'
 import { IConceptResponse } from "../../libs/api/typings/ignite-concepts";
 import { useSelector } from "react-redux";
-import { removedUnsavedConcepts, saveConcept, selectConceptList, selectIgniteConceptId } from "../../features/concepts/concept.slice";
+import { saveConcept, selectConceptList, selectIgniteConceptId } from "../../features/concepts/concept.slice";
 import { useAppDispatch } from "../hooks";
 
 const getSortIndicator = (value?: SortDirection | false): ReactNode => {
   switch (value) {
     case 'asc':
-      return <ArrowUp height={20} width={20} />
+      return <ArrowUp height={20} width={20} stroke={"#7586A9"} />
     case 'desc':
-      return <ArrowDown height={20} width={20} />
+      return <ArrowDown height={20} width={20} stroke={"#7586A9"} />
     default:
       return null
   }

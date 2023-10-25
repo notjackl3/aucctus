@@ -1,12 +1,16 @@
 import { FunctionComponent } from "react";
 import styles from "../assets/styles/components/auth-header.module.scss";
-import Logo from "../assets/Logo.svg?react";
+import Logo from "../assets/Logo.svg";
 
 const AuthHeader: FunctionComponent = () => {
   return (
     <div className={styles.authHeader}>
       <div className={styles.logo}>
-        <Logo width={146} height={30} />
+        <img
+          alt="Logo"
+          style={{ height: 30, width: 146 }}
+          src={Logo}
+        />
       </div>
     </div>
   );

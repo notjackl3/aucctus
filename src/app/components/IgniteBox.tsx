@@ -3,9 +3,9 @@ import styles from "../assets/styles/components/ignite-box.module.scss";
 import { AppPath } from "../../routes/routes";
 import { useNavigate } from "react-router-dom";
 
-import FileSearchIcon from '../assets/icons/filesearch.svg?react'
-import LightbulbIcon from '../assets/icons/lightbulb.svg?react'
-import ArrowRightIcon from '../assets/icons/arrowright.svg?react'
+import FileSearchIcon from '../assets/icons/FileSearch';
+import LightbulbIcon from '../assets/icons/Lightbulb';
+import ArrowRightIcon from '../assets/icons/ArrowRight';
 
 
 
@@ -43,7 +43,7 @@ const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, i
         onClick={() => navigate(link)}
       >
         Ignite
-        <ArrowRightIcon width={24} height={24} color="#fff" />
+        <ArrowRightIcon width={24} height={24} stroke="#fff" />
       </button>
     </div >
   );

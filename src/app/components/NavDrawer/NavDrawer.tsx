@@ -1,6 +1,6 @@
 
 import React from "react";
-import Logo from "../../assets/Logo.svg?react";
+import Logo from "../../assets/Logo.svg";
 import styles from "../../assets/styles/components/drawer.module.scss";
 import NavLink from "./NavLink";
 import { useSelector } from "react-redux";
@@ -24,7 +24,11 @@ const NavDrawer = () => {
       <div className={styles.wrapper}>
         <div className={styles.navDrawer}>
           <div className={styles.content}>
-            <Logo width={146} height={30} />
+            <img
+              alt="Logo"
+              style={{ height: 30, width: 146 }}
+              src={Logo}
+            />
             <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
             <NavLink
               to={AppPath.DomainList}
@@ -67,7 +71,7 @@ const NavDrawer = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 

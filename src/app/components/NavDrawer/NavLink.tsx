@@ -1,16 +1,15 @@
-import { FunctionComponent, ReactNode } from "react";
+import { FunctionComponent } from "react";
 import styles from "../../assets/styles/components/drawer.module.scss";
-import Home from '../../../app/assets/icons/home.svg?react'
-import FileSearch from "../../assets/icons/filesearch.svg?react";
-import Lightbulb from "../../assets/icons/lightbulb.svg?react";
-import Rocket from "../../assets/icons/rocket.svg?react";
-import Lock from "../../assets/icons/lock.svg?react";
-import Help from "../../assets/icons/help.svg?react";
-import Gear from "../../assets/icons/gear.svg?react";
-import ChevronUp from "../../assets/icons/chevronup.svg?react";
+import Home from '../../../app/assets/icons/Home'
+import FileSearch from "../../assets/icons/FileSearch";
+import Lightbulb from "../../assets/icons/Lightbulb";
+import Rocket from "../../assets/icons/Rocket";
+import Lock from "../../assets/icons/Lock";
+import Help from "../../assets/icons/Help";
+import Gear from "../../assets/icons/Gear";
+import ChevronUp from "../../assets/icons/ChevronUp";
 import { AppPath } from "../../../routes/routes";
 import { useMatch, Link } from "react-router-dom";
-import { useSpring, animated, useTransition } from "@react-spring/web";
 import Collapsible from "../Collapsible";
 
 const defaultIconProps = {

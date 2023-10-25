@@ -1,5 +1,5 @@
 import { FunctionComponent } from "react";
-import TargetIcon from '../assets/icons/target.svg?react';
+import TargetIcon from '../assets/icons/Target';
 import styles from "../assets/styles/components/company-metric.module.scss";
 import Loading from "./Loading";
 

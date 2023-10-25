@@ -1,0 +1,19 @@
+import { FunctionComponent } from "react";
+
+interface IconProps {
+  height: number;
+  width: number;
+  stroke: string;
+}
+
+const PaperAirPlane: FunctionComponent<IconProps> = ({ height, width, stroke }) => {
+  return (
+    <svg width={width} height={height} viewBox={`0 0 ${width} ${height}`} fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path
+        d="M4 8.16663L13.5257 14.8346C14.2971 15.3746 14.6828 15.6446 15.1023 15.7492C15.4729 15.8415 15.8605 15.8415 16.231 15.7492C16.6505 15.6446 17.0362 15.3746 17.8076 14.8346L27.3333 8.16663M9.6 23.3333H21.7333C23.6935 23.3333 24.6736 23.3333 25.4223 22.9518C26.0809 22.6163 26.6163 22.0808 26.9519 21.4223C27.3333 20.6736 27.3333 19.6935 27.3333 17.7333V10.2666C27.3333 8.30644 27.3333 7.32635 26.9519 6.57766C26.6163 5.91909 26.0809 5.38366 25.4223 5.0481C24.6736 4.66663 23.6935 4.66663 21.7333 4.66663H9.6C7.63982 4.66663 6.65972 4.66663 5.91103 5.0481C5.25247 5.38366 4.71703 5.91909 4.38148 6.57766C4 7.32635 4 8.30644 4 10.2666V17.7333C4 19.6935 4 20.6736 4.38148 21.4223C4.71703 22.0808 5.25247 22.6163 5.91103 22.9518C6.65972 23.3333 7.63982 23.3333 9.6 23.3333Z"
+        stroke={stroke} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  )
+}
+
+export default PaperAirPlane;
