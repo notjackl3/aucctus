@@ -7,6 +7,8 @@ import Lightbulb from '../assets/icons/Lightbulb';
 import DownloadIcon from '../assets/icons/Download';
 import ArrowRight from '../assets/icons/ArrowRight';
 import FilterLines from '../assets/icons/FilterLines';
+import ignite from "../assets/icons/ignite.svg";
+
 import { IConceptResponse } from "../../libs/api/typings/ignite-concepts";
 import styles from '../assets/styles/pages/concept-list.module.scss';
 
@@ -29,6 +31,7 @@ const ConceptList: FunctionComponent = () => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const [data, setData] = useState<IConceptResponse[]>([])
+  const [fetchComplete, setFetchComplete] = useState<boolean>(false)
 
   const query = useQuery({
     queryKey: 'saved/concepts',
@@ -36,6 +39,10 @@ const ConceptList: FunctionComponent = () => {
     queryFn: async () => await api.igniteConcept.getAllSavedConcepts(),
     onSuccess: (response) => {
       setData(response)
+      setFetchComplete(true)
+    },
+    onError: (error) => {
+      setFetchComplete(true)
     }
   })
 
@@ -170,27 +177,33 @@ const ConceptList: FunctionComponent = () => {
 
             {query.isLoading ?
 
-              <div className={styles.tableLoading}>
-
+              <div className={styles.tableMessageContainer}>
                 <Loading />
-
-
               </div>
-
 
               :
 
-              table.getRowModel().rows.map(row => (
-                <tr key={row.id} onClick={
-                  row.getToggleSelectedHandler()
-                }>
-                  {row.getVisibleCells().map(cell => (
-                    <td key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
-                  ))}
-                </tr>
-              ))}
+              fetchComplete && (!data || data.length <= 0) ?
+                <div className={styles.tableMessageContainer}>
+                  <img
+                    alt="Ignite your Concept"
+                    src={ignite}
+                  />
+
+                </div>
+                :
+
+                table.getRowModel().rows.map(row => (
+                  <tr key={row.id} onClick={
+                    row.getToggleSelectedHandler()
+                  }>
+                    {row.getVisibleCells().map(cell => (
+                      <td key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
           </tbody>
         </table>
       </div>

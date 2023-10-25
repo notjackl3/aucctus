@@ -124,6 +124,16 @@
         }
       }
 
+      .tableMessageContainer {
+        display: flex;
+        align-self: stretch;
+        align-items: center;
+        justify-content: center;
+
+        width: 100%;
+        height: 160px;
+      }
+
       thead,
       tbody,
       tfoot {
