@@ -45,7 +45,7 @@ function App() {
           </Route>
           <Route
             path="*"
-            element={<Navigate to={AppPath.SignIn} replace />}
+            element={<Navigate to={AppPath.Home} replace />}
           />
         </Routes>
       </QueryClientProvider>
