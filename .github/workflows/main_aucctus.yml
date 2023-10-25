@@ -9,7 +9,8 @@ on:
     branches:
       - main
   workflow_dispatch:
-    env:
+
+env:
   VITE_AVXISI_BASE_URL: https://avxisi.azurewebsites.net
 
 jobs:
