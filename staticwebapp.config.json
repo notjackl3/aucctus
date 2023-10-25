@@ -1,0 +1,17 @@
+{
+  "navigationFallback": {
+    "rewrite": "build/index.html",
+    "exclude": ["/images/*.{png,jpg,gif}", "/css/*"]
+  },
+
+  "platform": {
+    "apiRuntime": "node:16"
+  },
+
+  "responseOverrides": {
+    "401": {
+      "statusCode": 302,
+      "redirect": "/login"
+    }
+  }
+}
