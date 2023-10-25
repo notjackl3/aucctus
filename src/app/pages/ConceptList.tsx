@@ -189,7 +189,6 @@ const ConceptList: FunctionComponent = () => {
                     alt="Ignite your Concept"
                     src={ignite}
                   />
-
                 </div>
                 :
 

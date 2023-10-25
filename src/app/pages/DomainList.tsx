@@ -47,6 +47,7 @@ const DomainList: FunctionComponent = () => {
       </div>
       <div className={styles.content}>
         <DomainBox
+          id="12"
           title="Remote Work Revolution"
           overview="As the global workforce undergoes a seismic shift towards remote and flexible work patterns, the traditional paradigms of mail and package delivery are being challenged."
           totalAddressableMarket={22.5}
@@ -54,6 +55,7 @@ const DomainList: FunctionComponent = () => {
           ventureCapitalInvestment={45}
         />
         <DomainBox
+          id="13"
           title="Remote Work Revolution"
           overview="As the global workforce undergoes a seismic shift towards remote and flexible work patterns, the traditional paradigms of mail and package delivery are being challenged."
           totalAddressableMarket={22.5}
@@ -61,6 +63,7 @@ const DomainList: FunctionComponent = () => {
           ventureCapitalInvestment={45}
         />
         <DomainBox
+          id="14"
           title="Remote Work Revolution"
           overview="As the global workforce undergoes a seismic shift towards remote and flexible work patterns, the traditional paradigms of mail and package delivery are being challenged."
           totalAddressableMarket={22.5}
@@ -68,6 +71,7 @@ const DomainList: FunctionComponent = () => {
           ventureCapitalInvestment={45}
         />
         <DomainBox
+          id="15"
           title="Remote Work Revolution"
           overview="As the global workforce undergoes a seismic shift towards remote and flexible work patterns, the traditional paradigms of mail and package delivery are being challenged."
           totalAddressableMarket={22.5}
@@ -75,6 +79,7 @@ const DomainList: FunctionComponent = () => {
           ventureCapitalInvestment={45}
         />
         <DomainBox
+          id="16"
           title="Remote Work Revolution"
           overview="As the global workforce undergoes a seismic shift towards remote and flexible work patterns, the traditional paradigms of mail and package delivery are being challenged."
           totalAddressableMarket={22.5}

@@ -3,11 +3,12 @@ import { FunctionComponent } from "react";
 import BankIcon from '../assets/icons/Bank'
 import LineChartIcon from '../assets/icons/LineChartUp'
 import GlobeIcon from '../assets/icons/Globe'
-import ThreeStarIcon from '../assets/icons/ThreeStars'
 import RightArrowIcon from '../assets/icons/ArrowRight'
 
 import styles from "../assets/styles/components/domain-box.module.scss"
 import images from "../assets/img";
+import { useNavigate } from "react-router-dom";
+import { AppPath } from "../../routes/routes";
 
 
 
@@ -19,15 +20,17 @@ const iconDefaultProps = {
 }
 
 interface DomainBoxProps {
+  id: string;
   title: string;
   overview: string
-
   totalAddressableMarket: number;
   compoundAnnualGrowth: number;
   ventureCapitalInvestment: number;
 }
 
-const DomainBox: FunctionComponent<DomainBoxProps> = ({ title, overview, totalAddressableMarket, compoundAnnualGrowth, ventureCapitalInvestment }) => {
+const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, totalAddressableMarket, compoundAnnualGrowth, ventureCapitalInvestment }) => {
+  const navigate = useNavigate()
+
 
   return (
     <div className={styles.container}>
@@ -75,13 +78,20 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ title, overview, totalAd
 
       </div>
       <div className={styles.actionable}>
-        <div className={styles.newDomain}>
-          <ThreeStarIcon {...iconDefaultProps} stroke="#039855" />
-          New Domain
+        <div>
+          {/* // TEMP Disable
+          <div className={styles.newDomain}> */}
+          {/* <ThreeStarIcon {...iconDefaultProps} stroke="#039855" />
+          New Domain */}
         </div>
 
         <button
           className={`btn btn-light`}
+          onClick={() => {
+            navigate(AppPath.DomainMarket.replace(":id", id), {
+
+            })
+          }}
 
         >
           Explore Domain
