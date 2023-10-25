@@ -136,7 +136,7 @@ const SignUp: FunctionComponent = () => {
 
         <div className={styles.signUp}>
           <span>Already have an account?</span>
-          <Link className={`${styles.link} btn btn-link`} href={AppPath.SignIn}>Sign In</Link>
+          <Link className={`${styles.link} btn btn-link`} to={AppPath.SignIn}>Sign In</Link>
         </div>
 
       </div>
