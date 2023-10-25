@@ -41,7 +41,7 @@ function App() {
             <Route path={AppPath.SignUp} element={<Page.Auth.SignUp />} />
             <Route path={AppPath.ForgotPassword} element={<Page.Auth.ForgotPassword />} />
             <Route path={AppPath.SignUpSuccess} element={<Page.Auth.SignUpSuccess />} />
-            <Route path={AppPath.ConfirmEmail} element={<Page.Auth.SignUpSuccess />} />
+            <Route path={AppPath.SignUpSuccess} element={<Page.Auth.SignUpSuccess />} />
           </Route>
           <Route
             path="*"
