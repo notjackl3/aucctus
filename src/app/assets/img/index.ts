@@ -14,6 +14,7 @@ const images = {
   financialProjection,
   customerProfile,
   marketSegment
+
 }
 
 
