@@ -69,10 +69,12 @@ export const conceptSlice = createSlice({
     // TODO: Handle errors
     builder
       .addCase(saveConcept.fulfilled, (state, action) => {
-        if (action.payload !== undefined) {
-          state.concepts = state.concepts.map(c => c.id === action.payload.id ? action.payload : c)
-          state.igniteId = action.payload.igniteConceptId
+        const payload = action.payload
+        if (payload) {
+          state.concepts = state.concepts.map(c => c.id === payload.id ? action.payload! : c)
+          state.igniteId = payload.igniteConceptId
         }
+
       })
       .addCase(saveConcept.pending, (state) => {
 
