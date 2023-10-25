@@ -53,7 +53,7 @@ export const conceptSlice = createSlice({
   initialState,
   reducers: {
     setConcepts(state, action: PayloadAction<IConceptResponse[]>) {
-      analytics.debug(action.payload)
+      analytics.debug(`Setting Concepts ${action.payload}`)
       state.concepts = action.payload
       const firstConcept = action.payload[0]
       if (firstConcept) {

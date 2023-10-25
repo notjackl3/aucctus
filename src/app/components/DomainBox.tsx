@@ -39,7 +39,6 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, tot
           <img
             alt="domain-booklet"
             src={images.domainBooklet}
-
           />
           <div className={styles.supportingText}>
             <span className={styles.title}>{title}</span>
