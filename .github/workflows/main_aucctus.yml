@@ -9,16 +9,10 @@ on:
     branches:
       - main
   workflow_dispatch:
-
-# Optional: environment variables can be injected here
-# You can add these variables in your repository Settings - Secrets and variables - Actions - variables
-env:
+    env:
   VITE_AVXISI_BASE_URL: https://avxisi.azurewebsites.net
 
-# There are two jobs in this workflow - build and deploy
 jobs:
-  # Builds the application for production.
-  # You should configure this environment as close as possible to the production environment, e.g. using Ubuntu for Linux apps, using the same Node version
   build:
     runs-on: ubuntu-latest
 
@@ -35,13 +29,12 @@ jobs:
           npm install
           npm run build --if-present
           npm run test --if-present
-        # Other scripts if configured should be added here, such as linting, formating
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3
         with:
           name: node-app
-          path: dist # This should be your distribution path, not the root path
+          path: build
 
   # Deploy the application to Azure
   deploy:
