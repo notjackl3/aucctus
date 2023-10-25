@@ -7,7 +7,7 @@ import styles from "../assets/styles/pages/auth-screens.module.scss"
 import { useAppDispatch } from "../hooks";
 import InputField from "../components/InputField";
 import { validDomain } from "../../libs/utils";
-import { registerOrganization } from "../../features/auth/auth.slice";
+import { logout, registerOrganization } from "../../features/auth/auth.slice";
 import { isError, useQuery } from "react-query";
 import api from "../../libs/api";
 import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
@@ -39,14 +39,15 @@ const OnBoarding: FunctionComponent = () => {
       dispatch(registerOrganization(response))
     },
     onError: (error) => {
-      let message = "Unexpected Error Occurred"
-      if (isAxiosError<INestJSErrorResponse>(error)) {
-        message = error.response ? error.response.data.message : error.message
-      } else if (isError(error)) {
-        message = error.message
-      }
-      setError(message)
-      return message
+      dispatch(logout())
+      // let message = "Unexpected Error Occurred"
+      // if (isAxiosError<INestJSErrorResponse>(error)) {
+      //   message = error.response ? error.response.data.message : error.message
+      // } else if (isError(error)) {
+      //   message = error.message
+      // }
+      // setError(message)
+      // return message
     }
   })
 
@@ -156,7 +157,7 @@ const OnBoarding: FunctionComponent = () => {
               type="button"
               className="btn btn-primary"
               onClick={_handleRegistration}
-              disabled={!name || !domain || !industry || !goal || !competitors || !kpis || !!domainInputError}
+              disabled={!name || !domain || !industry || !goal || !competitors || !kpis || !!domainInputError || query.isLoading || query.isFetching}
             >Complete</button>
           </div>
         </div>

@@ -29,13 +29,19 @@ export interface IIgniteConceptSuccessResponse {
 }
 
 
+
+
 export interface IConceptResponse extends IConcepts {
-  id: string
+  id: string;
+  igniteConceptId: string;
+  isSaved: boolean;
+  updatedAt: string;
+  createdAt: string;
 }
 
 export interface IConcepts {
   title: string;
-  description: string;
+  summary: string;
   score: number
 }
 

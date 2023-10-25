@@ -21,7 +21,7 @@ const DashboardHeader: FunctionComponent<DashboardHeaderProps> = ({ title, suppo
         <span>{supportingText}</span>
       </div>
 
-      <button className="btn btn-light">Edit Inputs</button>
+      <button className="btn btn-light disabled">Edit Inputs</button>
     </div>
   )
 }

@@ -14,16 +14,15 @@ import { AppPath } from '../routes';
 
 
 const UnauthGuard: FunctionComponent = () => {
-  const dispatch = useAppDispatch()
+
   const user = useSelector(selectUser)
   const location = useLocation()
 
   // TODO: Change this. This causes refreshAuth to get called twice do to the way components render (use class component?)
-  useEffect(() => {
-    dispatch(refreshAuth())
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
+  // useEffect(() => {
+  //   dispatch(refreshAuth())
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [])
 
   if (user) {
     return (

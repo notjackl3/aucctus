@@ -92,8 +92,6 @@ export const confirmEmail = createAsyncThunk(
   }
 )
 
-
-
 export const logout = createAsyncThunk(
   "auth/logout",
   async (_, thunkApi) => {
@@ -106,7 +104,6 @@ export const logout = createAsyncThunk(
     }
   },
 )
-
 
 export const authSlice = createSlice({
   name: 'auth',

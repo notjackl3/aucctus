@@ -1,6 +1,6 @@
 import { FunctionComponent, useState } from "react";
 import styles from '../assets/styles/pages/dashboard.module.scss'
-import { refreshAuth } from "../../features/auth/auth.slice";
+import { logout, refreshAuth } from "../../features/auth/auth.slice";
 import { useQuery } from "react-query";
 import api from "../../libs/api";
 import Loading from "./Loading";
@@ -19,19 +19,16 @@ const InnovationGoal: FunctionComponent = () => {
 
   const query = useQuery({
     queryKey: 'innovationGoal',
-    retry: (count, err) => {
-      if (isAxiosError<INestJSErrorResponse>(err)) {
-        if (err.response && err.response.data.statusCode === 401) {
-          void dispatch(refreshAuth())
-        }
-      }
-      return count >= 5
-    },
+    retry: 3,
 
     queryFn: async () => await api.organization.getInnovationGoal(),
 
     onError: (err) => {
-      setError("Oops something went wrong.")
+      if (isAxiosError<INestJSErrorResponse>(err)) {
+        if (err.response && err.response.data.statusCode >= 401) {
+          dispatch(logout())
+        }
+      }
     },
     onSuccess: (data) => {
       analytics.debug(data)

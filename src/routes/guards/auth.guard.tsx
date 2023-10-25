@@ -11,11 +11,11 @@ const AuthGuard: FunctionComponent = () => {
   const dispatch = useAppDispatch()
   const location = useLocation()
 
-  useEffect(() => {
-    if (!user) {
-      dispatch(refreshAuth())
-    }
-  }, [user])
+  // useEffect(() => {
+  //   if (!user) {
+  //     dispatch(refreshAuth())
+  //   }
+  // }, [user])
 
   if (user) {
     return <Outlet />

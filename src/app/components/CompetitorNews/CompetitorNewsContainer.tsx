@@ -1,9 +1,10 @@
-import styles from '../../assets/styles/pages/dashboard.module.scss'
+import styles from '../../assets/styles/components/dashboard-insights.module.scss'
 import { FunctionComponent, useState } from "react";
 import CompetitorNews from "./CompetitorNews";
 import { generateRandomString } from "../../../libs/utils";
 
 interface CompanyNewsProps {
+
 
 }
 
@@ -27,12 +28,17 @@ const CompetitorNewsContainer: FunctionComponent<CompanyNewsProps> = () => {
 
 
   return (
-    <div className={styles.companyNews} >
-      {
-        news.map((content, i) => <CompetitorNews key={`${generateRandomString(4)}`} headLine={content.headline} summary={content.summary} />)
-      }
+    <div className={styles.dashboardInsights}>
+      <div className={styles.header}>
+        <h2>Competitor News</h2>
+      </div>
+      <div className={styles.content} >
+        {
+          news.slice(0, 2).map((content, i) => <CompetitorNews key={`${generateRandomString(4)}`} headLine={content.headline} summary={content.summary} />)
+        }
 
-    </div >
+      </div >
+    </div>
   )
 }
 

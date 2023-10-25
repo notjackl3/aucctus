@@ -4,16 +4,18 @@ import Logo from "../../assets/Logo.svg?react";
 import styles from "../../assets/styles/components/drawer.module.scss";
 import NavLink from "./NavLink";
 import { useSelector } from "react-redux";
-import { selectUser } from "../../../features/auth/auth.slice";
+import { logout, selectUser } from "../../../features/auth/auth.slice";
 
 
 import avatar from '../../assets/icons/avatar.svg'
 import { AppPath } from "../../../routes/routes";
+import { useAppDispatch } from "../../hooks";
 
 
 
 const NavDrawer = () => {
   const user = useSelector(selectUser)!
+  const dispatch = useAppDispatch()
   // TODO: Get Concept List & Domain Need to set up global state
 
 
@@ -45,6 +47,11 @@ const NavDrawer = () => {
           <div className={styles.extras}>
             <NavLink to={AppPath.Home} title="Learn" icon="home" />
             <NavLink to={AppPath.Home} title="Settings" icon='file' />
+            <button
+              onClick={() => {
+                dispatch(logout())
+              }}
+            ></button>
 
           </div>
           <div className={styles.account}>

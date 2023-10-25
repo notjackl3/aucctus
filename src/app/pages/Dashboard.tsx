@@ -32,7 +32,6 @@ const Dashboard: FunctionComponent = () => {
       <section className={`${styles.newsAndOpportunities}`} >
         <CompetitorNewsContainer />
         <CompetitorNewsContainer />
-
       </section>
       <section>
 

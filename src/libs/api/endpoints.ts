@@ -10,22 +10,19 @@ export const endpoints = {
   GetUser: (id: string) => `/api/users/${id}`,
   confirmEmail: (token: string) => `/api/auth/confirm-email?token=${token}`,
 
-
   /* Organization */
   organization: `/api/organization`,
   registerOrganization: 'api/organization/register',
   organizationKpi: '/api/organization/kpi',
   organizationInnovationGoal: '/api/organization/innovation-goal',
 
-
-
-
   /* Ignite Concepts */
   igniteConcept: 'api/ignite-concept',
-  getIgniteConcept: (id: string) => `api/ignite-concept/${id}`,
+  specificIgniteConcept: (id: string) => `api/ignite-concept/${id}`,
   concept: 'api/ignite-concept/concept',
-  getConcept: (id: string) => `api/ignite-concept/concept/${id}`,
-  getAllConcepts: (igniteId: string) => `api/ignite-concept/concept-all/${igniteId}`,
+  specificConcept: (id: string) => `api/ignite-concept/concept/${id}`,
+  saveSpecificConcept: (id: string) => `api/ignite-concept/concept/save/${id}`,
+  deleteUnsavedConcepts: (igniteId: string) => `api/ignite-concept/unsaved/${igniteId}`,
 
 
   /* Ignite Domain */

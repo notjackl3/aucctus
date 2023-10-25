@@ -4,7 +4,9 @@ import ConceptTable from "../components/ConceptTable";
 import { useNavigate } from "react-router-dom";
 
 import DownloadIcon from '../assets/icons/download.svg?react'
+import ArrowRight from '../assets/icons/arrowright.svg?react'
 import RefreshIcon from '../assets/icons/refresh.svg?react'
+import { AppPath } from "../../routes/routes";
 
 const GeneratedConcepts: FunctionComponent = () => {
   const navigate = useNavigate()
@@ -27,10 +29,11 @@ const GeneratedConcepts: FunctionComponent = () => {
           <button className="btn btn-light"><RefreshIcon height={20} width={20} /> Generate more</button>
           <button className="btn btn-primary"
             onClick={() => {
-              // navigate(AppPath.IgniteConcept)
+              navigate(AppPath.ConceptList)
             }}
           >
-            Save
+            Continue
+            <ArrowRight height={20} width={20} />
           </button>
         </div>
       </div>

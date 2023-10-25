@@ -5,10 +5,16 @@ import TextArea from "../components/TextArea";
 import { useQuery } from "react-query";
 import api from "../../libs/api";
 import IgniteLoading from "../components/IgniteLoading";
+import { useAppDispatch } from "../hooks";
+import { setConcepts } from "../../features/concepts/concept.slice"
+import { useNavigate } from "react-router-dom";
+import { AppPath } from "../../routes/routes";
 
 
 
 const IgniteConcept: FunctionComponent = () => {
+  const dispatch = useAppDispatch()
+  const navigate = useNavigate()
   const [concept, setConcept] = useState<string>("")
   const [painPoint, setPainPoint] = useState<string>("")
   const [monetizationStrategy, setMonetizationStrategy] = useState<string>("")
@@ -19,14 +25,18 @@ const IgniteConcept: FunctionComponent = () => {
   const query = useQuery({
     queryKey: "igniteDomain",
     enabled: false, // disable this query from automatically running
-    queryFn: async () => await api.igniteConcept.generateConcepts({ concept, painPoint, monetizationStrategy, motivation, extraDetails })
+    queryFn: async () => await api.igniteConcept.generateConcepts({ concept, painPoint, monetizationStrategy, motivation, extraDetails }),
+    onSuccess: (response) => {
+      dispatch(setConcepts(response))
+      navigate(AppPath.GeneratedConcepts)
+    }
   })
 
 
   return (
     <div className={styles.ignite} >
 
-      {query.isLoading ?
+      {query.isLoading || query.isFetching ?
 
         <IgniteLoading
           title="Igniting Your Concept"
@@ -36,7 +46,7 @@ const IgniteConcept: FunctionComponent = () => {
         :
 
         <IgniteForm
-          title="Ignite Your Domain"
+          title="Ignite Your Concept"
           subtitle="These answers will kick start your domain generation process"
         >
 

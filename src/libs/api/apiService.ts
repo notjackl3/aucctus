@@ -152,4 +152,14 @@ export class ApiService {
       throw error
     }
   }
+
+  async patch<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+    try {
+      const response: AxiosResponse<T> = await this.api.patch(url, data, config);
+      return response.data
+    } catch (error) {
+      analytics.debug(JSON.stringify(error))
+      throw error
+    }
+  }
 }

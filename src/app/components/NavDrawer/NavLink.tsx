@@ -36,7 +36,6 @@ interface NavLinkProps {
   nestedRoutes?: NestedRoute[]
 
 }
-
 interface NestedRoute {
   title: string;
   path: AppPath;

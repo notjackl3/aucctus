@@ -80,7 +80,6 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 0.25rem;
-      max-width: 35%;
       height: 100%;
 
       h3 {
@@ -95,11 +94,17 @@
 
       .goalText {
         height: 100%;
+
+        color: var(--gray-600-text-secondary, #667085);
+        /* Text md/Regular */
+        font-size: 1rem;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.5rem; /* 150% */
       }
     }
 
     .companyMetrics {
-      width: 70%;
       justify-self: flex-end;
       justify-content: space-between;
     }
@@ -109,6 +114,8 @@
       flex-direction: column;
       align-items: flex-start;
       gap: 1.5rem;
+
+      min-width: 300px;
     }
 
     .ignite {

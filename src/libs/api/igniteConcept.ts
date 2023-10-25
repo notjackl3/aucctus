@@ -1,5 +1,6 @@
 import { ApiService } from "./apiService";
 import { endpoints } from "./endpoints";
+import { IMessageResponse } from "./typings/avxisi";
 import { IConceptResponse, IIgniteConceptBody, IIgniteConceptSuccessResponse } from "./typings/ignite-concepts";
 
 export class IgniteConceptApi extends ApiService {
@@ -11,11 +12,11 @@ export class IgniteConceptApi extends ApiService {
    * @returns 
    */
   async generateConcepts(form: IIgniteConceptBody) {
-    return this.post<IIgniteConceptSuccessResponse, IIgniteConceptBody>(endpoints.igniteConcept, form, this._handleAccessToken())
+    return this.post<IConceptResponse[], IIgniteConceptBody>(endpoints.igniteConcept, form, this._handleAccessToken())
   }
 
   async getIgniteConcept(igniteId: string) {
-    return this.get<IIgniteConceptSuccessResponse>(endpoints.getIgniteConcept(igniteId), this._handleAccessToken())
+    return this.get<IIgniteConceptSuccessResponse>(endpoints.specificIgniteConcept(igniteId), this._handleAccessToken())
   }
 
   async deleteIgniteConcept(igniteId: string) {
@@ -26,16 +27,28 @@ export class IgniteConceptApi extends ApiService {
    * 
    */
   async getAllGeneratedConcepts(igniteId: string) {
-    return this.get<IConceptResponse[]>(endpoints.getAllConcepts(igniteId), this._handleAccessToken())
+    return this.get<IConceptResponse[]>(endpoints.specificConcept(igniteId), this._handleAccessToken())
   }
 
-  async deleteGeneratedConcept(id: string) {
-    return this.delete<IConceptResponse>(endpoints.getConcept(id), this._handleAccessToken())
+
+
+  async getAllSavedConcepts() {
+    return this.get<IConceptResponse[]>(endpoints.concept, this._handleAccessToken())
   }
 
   async getGeneratedConcept(id: string) {
-    return this.get<IConceptResponse>(endpoints.getConcept(id), this._handleAccessToken())
+    return this.get<IConceptResponse>(endpoints.specificConcept(id), this._handleAccessToken())
   }
 
+  async saveGeneratedConcept(id: string) {
+    return this.get<IConceptResponse>(endpoints.saveSpecificConcept(id), this._handleAccessToken())
+  }
+  async deleteGeneratedConcept(id: string) {
+    return this.delete<IConceptResponse>(endpoints.specificConcept(id), this._handleAccessToken())
+  }
+
+  async deleteAllUnsavedGeneratedConcept(igniteId: string) {
+    return this.delete<IMessageResponse>(endpoints.deleteUnsavedConcepts(igniteId), this._handleAccessToken())
+  }
 
 }
