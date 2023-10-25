@@ -7,7 +7,8 @@ import styles from "../assets/styles/pages/auth-screens.module.scss"
 import { useAppDispatch } from "../hooks";
 import InputField from "../components/InputField";
 import { validDomain } from "../../libs/utils";
-import { registerOrganization } from "../../features/auth/auth.slice";
+import { registerOrganization, selectAuthStatus } from "../../features/auth/auth.slice";
+import { useSelector } from "react-redux";
 
 
 const OnBoarding: FunctionComponent = () => {
@@ -18,6 +19,7 @@ const OnBoarding: FunctionComponent = () => {
   const [goal, setGoal] = useState<string>("")
   const [competitors, setCompetitors] = useState<string>("")
   const [kpis, setKPIs] = useState<string>("")
+  const status = useSelector(selectAuthStatus)
 
   // For displaying listed items 
   const [kpisList, setKPISList] = useState<string>("")
@@ -136,7 +138,7 @@ const OnBoarding: FunctionComponent = () => {
               type="button"
               className="btn btn-primary"
               onClick={_handleRegistration}
-              disabled={!name || !domain || !industry || !goal || !competitors || !kpis || !!domainInputError || query.isLoading || query.isFetching}
+              disabled={!name || !domain || !industry || !goal || !competitors || !kpis || !!domainInputError || status === 'loading'}
             >Complete</button>
           </div>
         </div>
