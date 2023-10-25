@@ -1,6 +1,6 @@
 
 import React from "react";
-import Logo from "../../assets/Logo.svg";
+import Logo from "../../assets/Logo.png";
 import styles from "../../assets/styles/components/drawer.module.scss";
 import NavLink from "./NavLink";
 import { useSelector } from "react-redux";
