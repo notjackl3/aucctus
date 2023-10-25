@@ -11,7 +11,7 @@ import { isError, useQuery } from "react-query";
 import api from "../../../libs/api";
 import { isAxiosError } from "axios";
 import { INestJSErrorResponse } from "../../../libs/api/typings/avxisi";
-import { useNavigate } from "react-router-dom";
+import { Link, Link, useNavigate } from "react-router-dom";
 
 
 const SignUp: FunctionComponent = () => {
@@ -138,7 +138,7 @@ const SignUp: FunctionComponent = () => {
 
         <div className={styles.signUp}>
           <span>Already have an account?</span>
-          <a className={`${styles.link} btn btn-link`} href={AppPath.SignIn}>Sign In</a>
+          <Link className={`${styles.link} btn btn-link`} href={AppPath.SignIn}>Sign In</Link>
         </div>
 
       </div>

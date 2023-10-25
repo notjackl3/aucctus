@@ -14,6 +14,7 @@ import { isAxiosError } from "axios";
 import { INestJSErrorResponse } from "../../../libs/api/typings/avxisi";
 import { IAuthSuccessResponse } from "../../../libs/api/typings";
 import analytics from "../../../libs/analytics";
+import { Link } from "react-router-dom";
 
 
 
@@ -100,7 +101,7 @@ const SignIn: FunctionComponent = () => {
           />
 
           {/* Takes you to unfinished page */}
-          <a className={`${styles.link} btn btn-link`} href="/forgot-password">Forgot password</a>
+          <Link className={`${styles.link} btn btn-link`} to="/forgot-password">Forgot password</Link>
 
         </div>
 
@@ -124,7 +125,7 @@ const SignIn: FunctionComponent = () => {
 
         <div className={styles.signUp}>
           <span>Don't have an account? </span>
-          <a className={`${styles.link} btn btn-link`} href={AppPath.SignUp}>Sign up</a>
+          <Link className={`${styles.link} btn btn-link`} href={AppPath.SignUp}>Sign up</Link>
         </div>
 
       </div>
