@@ -17,9 +17,9 @@ export default defineConfig({
       '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
     }
   },
-  server: {
-    open: true,
-  },
+  // server: {
+  //   open: true,
+  // },
   build: {
     outDir: "build",
     sourcemap: true,

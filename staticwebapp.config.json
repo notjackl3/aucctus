@@ -1,9 +1,6 @@
 {
   "navigationFallback": {
-    "rewrite": "index.html",
-    "exclude": ["/assets/*.{png,jpg,gif}", "/assets/*.css"]
-  },
-  "mimeTypes": {
-    ".json": "text/json"
+    "rewrite": "/index.html",
+    "exclude": ["*.{png,jpg,gif,css,scss,svg,js,ico}"]
   }
 }
