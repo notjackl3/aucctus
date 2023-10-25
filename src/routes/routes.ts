@@ -5,16 +5,16 @@ export enum AppPath {
   Onboarding = '/onboarding',
 
   /* Concepts */
-  IgniteConcept = '/ignite-concept',
-  GeneratedConcepts = '/ignite-concept/generated-concepts',
-  ConceptList = '/concept-list',
-  ConceptOverview = '/concept/:id',
+  IgniteConcept = '/concept/ignite',
+  GeneratedConcepts = '/concept/ignite/results',
+  ConceptList = '/concept/list',
+  ConceptOverview = '/concept/overview/:id',
 
 
   /* Domain */
-  IgniteDomain = '/ignite-domain',
-  DomainList = '/domain-list',
-  DomainMarket = '/domain/:id',
+  IgniteDomain = '/domain/ignite',
+  DomainList = '/domain/list',
+  DomainMarket = '/domain/overview/:id',
 
 
 

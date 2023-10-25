@@ -1,6 +1,5 @@
-import React, { FunctionComponent, useEffect } from 'react';
-import { refreshAuth, selectAccessToken } from '../../features/auth/auth.slice';
-import { useAppDispatch } from '../../app/hooks';
+import React, { FunctionComponent } from 'react';
+import { selectAccessToken } from '../../features/auth/auth.slice';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import styles from "../../app/assets/styles/pages/auth-screens.module.scss"
 import Footer from '../../app/components/Footer';

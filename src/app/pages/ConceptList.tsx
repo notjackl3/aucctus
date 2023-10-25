@@ -103,7 +103,11 @@ const ConceptList: FunctionComponent = () => {
               <DownloadIcon height={20} width={20} stroke="" />
               Export
             </button>
-            <button className="btn btn-primary">
+            <button className="btn btn-primary"
+              onClick={() => {
+                navigate(AppPath.IgniteConcept)
+              }}
+            >
               <Lightbulb height={20} width={20} stroke="" />
               Ignite Concept
             </button>
