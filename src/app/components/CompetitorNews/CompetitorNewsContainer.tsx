@@ -6,13 +6,8 @@ import { useQuery } from 'react-query';
 import api from '../../../libs/api';
 import Loading from '../Loading';
 import { IArticle } from '../../../libs/api/typings/organization';
-import { useSelector } from 'react-redux';
-import { selectOrganization } from '../../../features/auth/auth.slice';
-
-
 
 const CompetitorNewsContainer: FunctionComponent = () => {
-  const organization = useSelector(selectOrganization)
   const [error, setError] = useState<string | undefined>(undefined)
   const [data, setData] = useState<IArticle[]>([])
 
