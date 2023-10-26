@@ -39,12 +39,54 @@ const NavDrawer = () => {
                 {
                   title: "Market",
                   path: AppPath.DomainMarket
-                }
+                },
+                {
+                  title: "Start Ups",
+                  path: AppPath.Home
+                },
+                {
+                  title: "Incumbents",
+                  path: AppPath.Home
+                },
+                {
+                  title: "VC Activity",
+                  path: AppPath.Home
+                },
+                {
+                  title: "Potential Concepts",
+                  path: AppPath.Home
+                },
               ]}
 
 
             />
-            <NavLink to={AppPath.ConceptList} title="Concepts" icon='lightbulb' />
+            <NavLink to={AppPath.ConceptList}
+              title="Concepts"
+              icon='lightbulb'
+
+              nestedRoutes={[
+                {
+                  title: "Overview",
+                  path: AppPath.ConceptOverview
+                },
+                {
+                  title: "Business Model",
+                  path: AppPath.Home
+                },
+                {
+                  title: "Financial Projection",
+                  path: AppPath.Home
+                },
+                {
+                  title: "Customer Profile",
+                  path: AppPath.Home
+                },
+                {
+                  title: "Related Market",
+                  path: AppPath.Home
+                },
+              ]}
+            />
             {/* TODO Fix this */}
             <NavLink to={AppPath.Home} title="Tests" icon='rocket' locked />
           </div>

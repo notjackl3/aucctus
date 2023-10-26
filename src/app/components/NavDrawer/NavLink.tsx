@@ -11,6 +11,7 @@ import ChevronUp from "../../assets/icons/ChevronUp";
 import { AppPath } from "../../../routes/routes";
 import { useMatch, Link } from "react-router-dom";
 import Collapsible from "../Collapsible";
+import NestedLink from "./NestedLink";
 
 const defaultIconProps = {
   stroke: "#7586A9",
@@ -49,8 +50,8 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
 
 
   return (
-    <div className={`${styles.navLink}  ${locked ? styles.locked : ""}`}>
-      <Link to={to}>
+    <div className={`${styles.navLinkWrapper}  ${locked ? styles.locked : ""}`}>
+      <Link to={to} className={styles.navLink}>
         <div className={styles.label}>
           {navDrawerIcons[icon]}
           <span>{title}</span>
@@ -63,9 +64,10 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
 
       <Collapsible width={"100%"} toggle={isOpen}>
         {nestedRoutes && nestedRoutes.map((route, i) => (
-          <Link className={styles.nestedLink} to={route.path} key={`di-${route.title}-${i}`} >
-            <span>{route.title}</span>
-          </Link>
+          <NestedLink
+            to={route.path}
+            title={route.title}
+            key={`di-${route.title}-${i}`} />
         ))}
       </Collapsible>
 

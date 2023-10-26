@@ -54,7 +54,7 @@ const DomainList: FunctionComponent = () => {
           compoundAnnualGrowth={32.7}
           ventureCapitalInvestment={45}
         />
-        <DomainBox
+        {/* <DomainBox
           id="13"
           title="Remote Work Revolution"
           overview="As the global workforce undergoes a seismic shift towards remote and flexible work patterns, the traditional paradigms of mail and package delivery are being challenged."
@@ -85,7 +85,7 @@ const DomainList: FunctionComponent = () => {
           totalAddressableMarket={22.5}
           compoundAnnualGrowth={32.7}
           ventureCapitalInvestment={45}
-        />
+        /> */}
       </div>
     </div >
   )

@@ -28,7 +28,7 @@
   border-right: 1px solid var(--gray-300-outline, #e0e5f2);
   background: var(--base-white, #fff);
 
-  .navLink,
+  .navLinkWrapper,
   .account {
     cursor: pointer;
   }
@@ -94,7 +94,7 @@
 
   .content,
   .extras {
-    .navLink {
+    .navLinkWrapper {
       display: flex;
       padding: 0.5rem 0.75rem;
       align-items: center;
@@ -104,6 +104,10 @@
       background: var(--base-white, #fff);
       transition: all 0.3s ease-in-out;
       width: 100%;
+
+      .navLink {
+        margin-bottom: var(--gap-5xs);
+      }
 
       a {
         transition: all 0.3s ease-in-out;
@@ -115,21 +119,7 @@
         background: var(--base-white, #fff);
       }
 
-      .nestedLink {
-        display: flex;
-        padding: 0.5rem 0.75rem;
-        align-items: center;
-        gap: 0.5rem;
-        align-self: stretch;
-        margin-top: var(--base-gap);
-
-        span {
-          padding-left: 2.25rem;
-        }
-      }
-
-      .label,
-      .nestedLink {
+      .label {
         display: flex;
         align-items: center;
         gap: 0.75rem;
