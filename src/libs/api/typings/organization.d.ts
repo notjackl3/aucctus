@@ -5,6 +5,8 @@ interface IOrganization {
   name: string;
   domain: string;
   goal: string;
+  kpis: string[];
+  competitors: string[];
   createdAt: string;
   updatedAt: string;
 }
@@ -21,4 +23,19 @@ interface IRegisterOrganization {
   goal: string;
   competitors: string;
   kpis: string;
+}
+
+
+export interface IArticle {
+  source: {
+    id: string | null;
+    name: string;
+  },
+  author: string;
+  title: string;
+  description: string;
+  url: string;
+  urlToImage: string;
+  publishedAt: string
+  content: string;
 }

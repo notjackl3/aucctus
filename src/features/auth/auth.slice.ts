@@ -6,6 +6,7 @@ import analytics from "../../libs/analytics";
 import { IAuthSuccessResponse, IUser } from "../../libs/api/typings";
 import { AxiosError, isAxiosError } from "axios";
 import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
+import { IOrganization, IRegisterOrganization } from "../../libs/api/typings/organization";
 
 export interface AuthState {
   status: "idle" | "loading" | "failed"

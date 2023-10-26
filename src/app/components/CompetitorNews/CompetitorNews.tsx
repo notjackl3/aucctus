@@ -6,12 +6,12 @@ import images from "../../assets/img";
 interface CompetitorNewsProps {
   headLine: string;
   summary: string;
-  image?: string;
-  source?: string
+  image: string;
+  source: string
 }
 const CompetitorNews: FunctionComponent<CompetitorNewsProps> = ({ headLine, summary, source, image = images.sample }) => {
   return (
-    <div className={styles.competitorNews}>
+    <a className={styles.competitorNews} href={source} target="_blank">
       <img
         alt='Competitor News'
         src={image}
@@ -24,7 +24,7 @@ const CompetitorNews: FunctionComponent<CompetitorNewsProps> = ({ headLine, summ
           {summary}
         </span>
       </div>
-    </div>
+    </a>
   );
 };
 

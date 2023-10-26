@@ -15,6 +15,10 @@ export const endpoints = {
   registerOrganization: 'api/organization/register',
   organizationKpi: '/api/organization/kpi',
   organizationInnovationGoal: '/api/organization/innovation-goal',
+  organizationCompetitors: '/api/organization/competitors',
+
+  competitorNews: '/api/competitor-news',
+
 
   /* Ignite Concepts */
   igniteConcept: 'api/ignite-concept',
