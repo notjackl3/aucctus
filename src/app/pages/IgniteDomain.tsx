@@ -4,12 +4,14 @@ import styles from '../assets/styles/pages/ignite.module.scss'
 import TextArea from "../components/TextArea";
 import { useQuery } from "react-query";
 import api from "../../libs/api";
-import Loading from "../components/Loading";
 import IgniteLoading from "../components/IgniteLoading";
+import { useNavigate } from "react-router-dom";
+import { AppPath } from "../../routes/routes";
 
 
 
 const IgniteDomain: FunctionComponent = () => {
+  const navigate = useNavigate()
   const [opportunity, setOpportunity] = useState<string>("")
   const [perception, setPerception] = useState<string>("")
   const [qualification, setQualification] = useState<string>("")
@@ -20,8 +22,10 @@ const IgniteDomain: FunctionComponent = () => {
   const query = useQuery({
     queryKey: "igniteDomain",
     enabled: false, // disable this query from automatically running
-    // queryFn: async () => await api.igniteConcept.domain({ opportunity, perception, qualification, exampleConcepts, extraDetails })
-
+    queryFn: async () => await api.igniteDomain.generateDomain({ opportunity, perception, qualification, exampleConcepts, extraDetails }),
+    onSuccess: (response) => {
+      navigate(AppPath.DomainList)
+    }
   })
 
 

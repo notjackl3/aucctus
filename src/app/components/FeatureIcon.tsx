@@ -2,7 +2,7 @@
 import { FunctionComponent } from "react";
 
 import Home from '../../app/assets/icons/Home'
-import FileSearch from "../assets/icons/FileSearch";
+import FileSearch from "../assets/icons/filesearch.svg?react";
 import Lightbulb from "../assets/icons/lightbulb.svg?react";
 import Target from '../assets/icons/target.svg?react';
 import Rocket from "../assets/icons/rocket.svg?react";

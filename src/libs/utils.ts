@@ -46,3 +46,10 @@ export function differenceInHours(firstDate: Date, secondDate: Date) {
   return Math.abs(Math.round(difference));
 
 }
+
+
+export const formatter = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+  notation: 'compact'
+});

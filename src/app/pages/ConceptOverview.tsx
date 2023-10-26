@@ -9,12 +9,8 @@ import { useQuery } from "react-query";
 import api from "../../libs/api";
 import { IConceptOverview, IConceptResponse } from "../../libs/api/typings/ignite-concepts";
 import Loading from "../components/Loading";
+import { formatter } from "../../libs/utils";
 
-const formatter = new Intl.NumberFormat('en-US', {
-  style: 'currency',
-  currency: 'USD',
-  notation: 'compact'
-});
 
 const ConceptOverview: FunctionComponent = () => {
   let { id } = useParams();

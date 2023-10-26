@@ -19,7 +19,6 @@ export const endpoints = {
 
   competitorNews: '/api/competitor-news',
 
-
   /* Ignite Concepts */
   igniteConcept: 'api/ignite-concept',
   specificIgniteConcept: (id: string) => `api/ignite-concept/${id}`,
@@ -31,6 +30,9 @@ export const endpoints = {
 
 
   /* Ignite Domain */
-  igniteDomain: 'chatbot/ignite-domain',
+  igniteDomain: 'api/ignite-domain',
+  domainAll: `api/ignite-domain/domain`,
+  domain: (id: string) => `api/ignite-domain/domain/${id}`,
+  domainMarket: (id: string) => `api/ignite-domain/domain/market/${id}`,
 
 }

@@ -6,21 +6,11 @@ export interface IIgniteDomainSuccessResponse {
   title: string;
   overview: string;
   whyThisIsAGoodIdea: string;
-  totalAddressableMarket: IRate,
-  compoundAnnualGrowth: IRate
-  marketSegments: IMarketSegments[]
+  totalAddressableMarket: string,
+  compoundAnnualGrowth: string
+
 }
 
-interface IRate {
-  rate: number;
-  overview: string;
-}
-
-interface IMarketSegments {
-  title: string;
-  rate: number;
-  overview: string;
-}
 
 export interface IIgniteDomainBody {
 
@@ -38,4 +28,26 @@ export interface IIgniteDomainBody {
 
   // Could you share any other details about your strategy and competitive advantages in this area?
   extraDetails: string
+}
+
+export interface IGeneratedDomain {
+  id: string;
+  createdAt: string;
+  updatedAt: string;
+  title: string;
+  overview: string;
+  whyThisIsAGoodIdea: string;
+  totalAddressableMarketRate: string,
+  compoundAnnualGrowthRate: number
+}
+
+export interface IDomainMarket {
+  overallReasoning: string;
+  competitiveAdvantages: CompetitiveEdge[];
+}
+
+export interface ICompetitiveEdge {
+  title: string;
+  reasoning: string
+  description: string
 }

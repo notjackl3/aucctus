@@ -23,9 +23,9 @@ interface DomainBoxProps {
   id: string;
   title: string;
   overview: string
-  totalAddressableMarket: number;
-  compoundAnnualGrowth: number;
-  ventureCapitalInvestment: number;
+  totalAddressableMarket: number | string;
+  compoundAnnualGrowth: number | string;
+  ventureCapitalInvestment?: number | string;
 }
 
 const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, totalAddressableMarket, compoundAnnualGrowth, ventureCapitalInvestment }) => {
@@ -54,7 +54,7 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, tot
               <GlobeIcon {...iconDefaultProps} />
               <span>Total Addressable Market (TAM)</span>
             </div>
-            <span>{totalAddressableMarket}% /year</span>
+            <span>{totalAddressableMarket} /year</span>
           </div>
 
           <div className={styles.metric}>
@@ -62,16 +62,16 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, tot
               <LineChartIcon {...iconDefaultProps} />
               <span>Compound Annual Growth Rate (CAGR)</span>
             </div>
-            <span>{compoundAnnualGrowth} /year</span>
+            <span>{compoundAnnualGrowth}% /year</span>
           </div>
 
-          <div className={styles.metric}>
+          {/* <div className={styles.metric}>
             <div>
               <BankIcon {...iconDefaultProps} />
               <span>Venture Capital Investment</span>
             </div>
             <span>${ventureCapitalInvestment}</span>
-          </div>
+          </div> */}
 
         </div>
 

@@ -21,11 +21,11 @@
       gap: 0.25rem;
       flex: 1 0 0;
 
-      color: var(--gray-900-text-primary, #2b3674);
+      color: var(--type-tertiary, #2b3674);
       /* Display sm/Semibold */
       font-size: 1.875rem;
       font-style: normal;
-      font-weight: 500;
+      font-weight: 700;
       line-height: 2.375rem; /* 126.667% */
       align-self: stretch;
     }
@@ -52,7 +52,7 @@
       flex: 1 0 0;
 
       h4 {
-        color: var(--gray-900-text-primary, #2b3674);
+        color: var(--type-tertiary, #2b3674);
         /* H2 */
         font-family: DM Sans;
         font-size: 1.125rem;
@@ -92,6 +92,7 @@
       display: flex;
       padding-top: 1rem;
       flex-direction: row;
+      justify-content: space-between;
       align-items: flex-start;
       gap: 1.5rem;
       align-self: stretch;
@@ -101,6 +102,8 @@
         flex-direction: column;
         align-items: flex-start;
         gap: 1.25rem;
+
+        min-width: 50%;
       }
 
       .overviewBoxContainer {
@@ -113,7 +116,7 @@
 
       .marketSegment {
         display: flex;
-        width: 27.75rem;
+        max-width: 27.75rem;
         max-height: 40rem;
 
         flex-direction: column;

@@ -3,6 +3,7 @@ import { IApiServiceConfig } from "./apiService";
 import { AuthApi } from "./auth";
 import { OrganizationApi } from "./organization";
 import { IgniteConceptApi } from "./igniteConcept";
+import { IgniteDomainApi } from "./igniteDomain";
 
 
 
@@ -26,6 +27,7 @@ export class Api {
   auth: AuthApi
   organization: OrganizationApi;
   igniteConcept: IgniteConceptApi;
+  igniteDomain: IgniteDomainApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig
@@ -42,6 +44,9 @@ export class Api {
       baseURL: this._config.baseUrl,
     }))
 
+    this.igniteDomain = new IgniteDomainApi(this, this.buildConfig({
+      baseURL: this._config.baseUrl
+    }))
   }
 
   buildConfig(config: IApiServiceConfig): IApiServiceConfig {

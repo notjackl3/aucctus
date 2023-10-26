@@ -3,7 +3,7 @@ import styles from "../assets/styles/components/ignite-box.module.scss";
 import { AppPath } from "../../routes/routes";
 import { useNavigate } from "react-router-dom";
 
-import FileSearchIcon from '../assets/icons/FileSearch';
+import FileSearchIcon from '../assets/icons/filesearch.svg?react';
 import LightbulbIcon from '../assets/icons/lightbulb.svg?react';
 import ArrowRightIcon from '../assets/icons/ArrowRight';
 
