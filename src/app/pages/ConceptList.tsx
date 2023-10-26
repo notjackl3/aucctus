@@ -76,7 +76,8 @@ const ConceptList: FunctionComponent = () => {
     columnHelper.accessor(row => row.id, {
       id: 'id',
       cell: info => (
-        <button
+        <div
+
           onClick={() => {
             dispatch(setSelectedConcept(info.getValue()))
             navigate(`/concept/${info.getValue()}`)
@@ -84,7 +85,7 @@ const ConceptList: FunctionComponent = () => {
           className={styles.reviewConceptLink}
         >
           <ArrowRight height={20} width={20} stroke="" />
-        </button>),
+        </div>),
       header: () => <span></span>,
     }),
   ]), [dispatch, navigate])
