@@ -56,9 +56,7 @@ export const conceptSlice = createSlice({
       analytics.debug(`Setting Concepts ${action.payload}`)
       state.concepts = action.payload
       const firstConcept = action.payload[0]
-      if (firstConcept) {
-        state.igniteId = firstConcept.igniteConceptId
-      }
+      state.igniteId = firstConcept ? firstConcept.igniteConceptId : undefined
 
     },
     setSelectedConcept(state, action: PayloadAction<string>) {

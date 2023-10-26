@@ -12,16 +12,30 @@ import { RootState } from "../store";
 import { connect } from "react-redux";
 import { Dispatch } from "@reduxjs/toolkit";
 import { setConcepts } from "../../features/concepts/concept.slice";
+import api from "../../libs/api";
+import analytics from "../../libs/analytics";
 
 
 
 interface Props {
   dispatch: Dispatch
+  igniteId?: string
 }
 class GeneratedConcepts extends Component<Props> {
 
-  componentWillUnmount() {
+  async componentWillUnmount() {
+    try {
+      const igniteId = this.props.igniteId;
+      if (igniteId) {
+        await api.igniteConcept.deleteAllUnsavedGeneratedConcept(igniteId)
+      }
+    } catch (e) {
+      analytics.debug(e)
+    }
+
+    // Clear the concepts anyway for the user
     this.props.dispatch(setConcepts([]))
+
   }
 
   render() {
@@ -56,7 +70,7 @@ class GeneratedConcepts extends Component<Props> {
 }
 
 const mapStateToProps = (state: RootState) => ({
-  concepts: state.concepts.concepts
+  igniteId: state.concepts.igniteId,
 });
 
 
