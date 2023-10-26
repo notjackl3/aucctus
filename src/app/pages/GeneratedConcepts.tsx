@@ -49,11 +49,11 @@ class GeneratedConcepts extends Component<Props> {
             </span>
           </div>
           <div className={styles.actionable}>
-            <button className="btn btn-light">
+            <button className="btn btn-light disabled">
               <DownloadIcon height={20} width={20} stroke="" />
               Export
             </button>
-            <button className="btn btn-light"><RefreshIcon height={20} width={20} stroke="" /> Generate more</button>
+            <button className="btn btn-light disabled"><RefreshIcon height={20} width={20} stroke="" /> Generate more</button>
 
             <NavigateButton variant="primary" route={AppPath.ConceptList} >
               Continue

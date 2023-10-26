@@ -5,7 +5,9 @@ import Home from '../../app/assets/icons/Home'
 import FileSearch from "../assets/icons/FileSearch";
 import Lightbulb from "../assets/icons/lightbulb.svg?react";
 import Target from '../assets/icons/target.svg?react';
-import Rocket from "../assets/icons/Rocket";
+import Rocket from "../assets/icons/rocket.svg?react";
+import SearchRefraction from "../assets/icons/search-refraction.svg?react"
+import UserGroup from "../assets/icons/users-01.svg?react"
 import Help from "../assets/icons/Help";
 import Gear from "../assets/icons/Gear";
 
@@ -26,9 +28,11 @@ const featureIcon = {
   "rocket": <Rocket {...defaultIconProps} />,
   "help": <Help {...defaultIconProps} />,
   "gear": <Gear {...defaultIconProps} />,
-  "target": <Target  {...defaultIconProps} />
+  "target": <Target  {...defaultIconProps} />,
+  "searchRefraction": <SearchRefraction {...defaultIconProps} />,
+  "userGroup": <UserGroup {...defaultIconProps} />
 }
-interface FeatureIconProps {
+export interface FeatureIconProps {
   icon: keyof typeof featureIcon
   color: 'purple' | 'green'
 }
