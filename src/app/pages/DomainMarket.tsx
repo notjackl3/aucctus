@@ -85,7 +85,7 @@ const DomainMarket: FunctionComponent = () => {
               />
               <div className="comingSoon">
                 <div className="comingSoonWrapper">
-                  <button className="btn btn-light">Coming Soon</button>
+                  <div className="comingSoonText">Coming Soon</div>
                 </div>
               </div>
             </div>

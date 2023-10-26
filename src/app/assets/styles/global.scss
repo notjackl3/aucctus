@@ -162,6 +162,20 @@ input {
     display: flex;
     justify-content: center;
     align-content: center;
+    cursor: default;
+
+    .comingSoonText {
+      display: flex;
+      gap: var(--gap-base);
+      padding: 0.625rem 1.125rem;
+      justify-content: center;
+      align-items: center;
+      border-radius: 0.5rem;
+      box-shadow: var(--shadow-xs) !important;
+      border: 1px solid var(--gray-300-outline, #e0e5f2);
+      background: var(--base-white, #fff);
+      color: var(--type-tertiary);
+    }
   }
 }
 
