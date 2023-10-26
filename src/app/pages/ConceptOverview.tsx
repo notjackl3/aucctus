@@ -10,7 +10,8 @@ const mockData = {
   title: "Virtual Address & Package Forwarding Service",
   overview: "For Canadians traveling or living abroad, provide them a 'virtual address' in Canada. They can have packages delivered to this address, where Canada Post will hold, consolidate, and forward them internationally.",
   valueProposition: "Serve the needs of the growing number of digital nomads, travellers, and expatriates who want to shop from Canadian businesses.",
-  annualRevenue: "50M",
+  annualRevenue: "$50M",
+  totalAddressableMarket: "$945M",
   signals: ["Remote Work", "Digital Nomads", "Snow Birds"],
   industries: ["Travel", "Telecommunication", "Logistics"],
   targetUserGroup: ["Students living abroad", "Snow Birds", "Extended vacationers"],
@@ -52,11 +53,7 @@ const ConceptOverview: FunctionComponent = () => {
                   <span>{data.annualRevenue}</span>
                 </div>
                 <div className={styles.supportingText}>
-                  <span className={styles.title}>Annual Revenue</span>
-                  <span>{data.annualRevenue}</span>
-                </div>
-                <div className={styles.supportingText}>
-                  <span className={styles.title}>Annual Revenue</span>
+                  <span className={styles.title}>Total Addressable Market</span>
                   <span>{data.annualRevenue}</span>
                 </div>
 

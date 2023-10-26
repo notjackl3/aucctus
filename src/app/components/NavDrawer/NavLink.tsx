@@ -47,8 +47,6 @@ interface NestedRoute {
 const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = false, openBasePath, nestedRoutes }) => {
   const isOpen = !!useMatch(openBasePath || "path-does-not-exists")
 
-
-
   return (
     <div className={`${styles.navLinkWrapper}  ${locked ? styles.locked : ""}`}>
       <Link to={to} className={styles.navLink}>
