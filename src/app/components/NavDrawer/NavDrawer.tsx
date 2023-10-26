@@ -63,7 +63,7 @@ const NavDrawer = () => {
             <NavLink to={AppPath.ConceptList}
               title="Concepts"
               icon='lightbulb'
-
+              openBasePath={AppPath.ConceptOverview}
               nestedRoutes={[
                 {
                   title: "Overview",

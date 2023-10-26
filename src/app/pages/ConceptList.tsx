@@ -80,7 +80,7 @@ const ConceptList: FunctionComponent = () => {
 
           onClick={() => {
             dispatch(setSelectedConcept(info.getValue()))
-            navigate(`/concept/${info.getValue()}`)
+            navigate(AppPath.ConceptOverview.replace(":id", info.getValue()))
           }}
           className={styles.reviewConceptLink}
         >
