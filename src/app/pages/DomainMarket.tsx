@@ -5,6 +5,7 @@ import CompanyMetric from "../components/CompanyMetric";
 import { useSelector } from "react-redux";
 import { selectOrganization } from "../../features/auth/auth.slice";
 import images from "../assets/img";
+import DomainMarketBox from "../components/DomainMarketBox";
 
 
 
@@ -52,6 +53,25 @@ const DomainMarket: FunctionComponent = () => {
               <h4>Why {organization.name}</h4>
               <span className={styles.text}>{data.whyUs}</span>
             </div>
+
+            <div className={styles.overviewBoxContainer}>
+
+              <DomainMarketBox
+                title="Nationwide Infrastructure"
+                description="Canada Post's widespread physical presence across the country, from urban centers to the most remote regions, gives it a unique edge in serving digital nomads no matter where they choose to work."
+              />
+              <DomainMarketBox
+                title="Trusted Brand"
+                description="Having built credibility over the years, customers are more likely to entrust Canada Post with their essential communication needs, a crucial factor for remote workers who may rely heavily on timely and secure mail and package delivery."
+              />
+              <DomainMarketBox
+                title="Technological Capabilities"
+                description="With investments in digital transformation, Canada Post is primed to develop or integrate tech-driven solutions, like virtual mailboxes and AI-powered mail sorting, catering precisely to the needs of a mobile workforce."
+              />
+
+            </div>
+
+
           </div>
 
           <div className={styles.marketSegment}>

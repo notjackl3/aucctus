@@ -4,6 +4,7 @@ import { FunctionComponent } from "react";
 import Home from '../../app/assets/icons/Home'
 import FileSearch from "../assets/icons/FileSearch";
 import Lightbulb from "../assets/icons/lightbulb.svg?react";
+import Target from '../assets/icons/target.svg?react';
 import Rocket from "../assets/icons/Rocket";
 import Help from "../assets/icons/Help";
 import Gear from "../assets/icons/Gear";
@@ -25,6 +26,7 @@ const featureIcon = {
   "rocket": <Rocket {...defaultIconProps} />,
   "help": <Help {...defaultIconProps} />,
   "gear": <Gear {...defaultIconProps} />,
+  "target": <Target  {...defaultIconProps} />
 }
 interface FeatureIconProps {
   icon: keyof typeof featureIcon

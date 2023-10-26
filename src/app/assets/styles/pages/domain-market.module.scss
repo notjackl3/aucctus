@@ -103,6 +103,14 @@
         gap: 1.25rem;
       }
 
+      .overviewBoxContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        align-self: stretch;
+      }
+
       .marketSegment {
         display: flex;
         width: 27.75rem;
