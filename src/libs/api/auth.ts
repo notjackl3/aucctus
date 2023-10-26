@@ -2,6 +2,7 @@ import { IAuthSuccessResponse } from "./typings";
 import { ApiService } from "./apiService";
 import { endpoints } from "./endpoints";
 import { IMessageResponse } from "./typings/avxisi";
+import { IOrganizationSuccessResponse, IRegisterOrganization } from "./typings/organization";
 
 export interface ISignInRequest {
   email: string;
