@@ -24,6 +24,7 @@ const IgniteConcept: FunctionComponent = () => {
 
   const query = useQuery({
     queryKey: "igniteDomain",
+    cacheTime: 10,
     enabled: false, // disable this query from automatically running
     queryFn: async () => await api.igniteConcept.generateConcepts({ concept, painPoint, monetizationStrategy, motivation, extraDetails }),
     onSuccess: (response) => {
