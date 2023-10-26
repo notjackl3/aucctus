@@ -2,7 +2,7 @@ import { FunctionComponent } from "react";
 import styles from "../../assets/styles/components/drawer.module.scss";
 import Home from '../../../app/assets/icons/Home'
 import FileSearch from "../../assets/icons/FileSearch";
-import Lightbulb from "../../assets/icons/Lightbulb";
+import Lightbulb from "../../assets/icons/lightbulb.svg?react";
 import Rocket from "../../assets/icons/Rocket";
 import Lock from "../../assets/icons/Lock";
 import Help from "../../assets/icons/Help";

@@ -4,7 +4,7 @@ import { AppPath } from "../../routes/routes";
 import { useNavigate } from "react-router-dom";
 
 import FileSearchIcon from '../assets/icons/FileSearch';
-import LightbulbIcon from '../assets/icons/Lightbulb';
+import LightbulbIcon from '../assets/icons/lightbulb.svg?react';
 import ArrowRightIcon from '../assets/icons/ArrowRight';
 
 

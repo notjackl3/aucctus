@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { AppPath } from "../../routes/routes";
 import InputField from "../components/InputField";
 
-import Lightbulb from '../assets/icons/Lightbulb';
+import Lightbulb from '../assets/icons/lightbulb.svg?react';
 import DownloadIcon from '../assets/icons/Download';
 import ArrowRight from '../assets/icons/ArrowRight';
 import FilterLines from '../assets/icons/FilterLines';
