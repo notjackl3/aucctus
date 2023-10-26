@@ -38,11 +38,11 @@ const DomainMarket: FunctionComponent = () => {
           <div className={styles.metrics}>
             <CompanyMetric
               title="Total Addressable Market"
-              value={data.totalAddressableMarket}
+              value={"22.5%"}
             />
             <CompanyMetric
-              title="Total Addressable Market"
-              value={data.totalAddressableMarket}
+              title="Compound Annual Growth Rate"
+              value={"$35B"}
             />
           </div>
         </div>
