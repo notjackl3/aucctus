@@ -20,7 +20,6 @@ const InnovationGoal: FunctionComponent = () => {
   const query = useQuery({
     queryKey: 'innovationGoal',
     retry: 2,
-
     queryFn: async () => await api.organization.getInnovationGoal(),
 
     onError: (err) => {

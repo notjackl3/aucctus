@@ -45,5 +45,14 @@ export interface IConcepts {
   score: number
 }
 
+export interface IConceptOverview {
+  valueProposition: string
+  totalAddressableMarket: number
+  annualRevenue: number
+  targetGroups: string[]
+  industries: string[]
+  signals: string[]
+}
+
 
 

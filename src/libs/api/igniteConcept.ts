@@ -1,7 +1,7 @@
 import { ApiService } from "./apiService";
 import { endpoints } from "./endpoints";
 import { IMessageResponse } from "./typings/avxisi";
-import { IConceptResponse, IIgniteConceptBody, IIgniteConceptSuccessResponse } from "./typings/ignite-concepts";
+import { IConceptOverview, IConceptResponse, IIgniteConceptBody, IIgniteConceptSuccessResponse } from "./typings/ignite-concepts";
 
 export class IgniteConceptApi extends ApiService {
 
@@ -31,6 +31,10 @@ export class IgniteConceptApi extends ApiService {
   }
 
 
+  async getConceptOverview(id: string) {
+    return this.get<IConceptOverview>(endpoints.conceptOverview(id), this._handleAccessToken())
+  }
+
 
   async getAllSavedConcepts() {
     return this.get<IConceptResponse[]>(endpoints.concept, this._handleAccessToken())
@@ -50,5 +54,6 @@ export class IgniteConceptApi extends ApiService {
   async deleteAllUnsavedGeneratedConcept(igniteId: string) {
     return this.delete<IMessageResponse>(endpoints.deleteUnsavedConcepts(igniteId), this._handleAccessToken())
   }
+
 
 }

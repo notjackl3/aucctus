@@ -23,6 +23,7 @@ export const endpoints = {
   specificConcept: (id: string) => `api/ignite-concept/concept/${id}`,
   saveSpecificConcept: (id: string) => `api/ignite-concept/concept/save/${id}`,
   deleteUnsavedConcepts: (igniteId: string) => `api/ignite-concept/unsaved/${igniteId}`,
+  conceptOverview: (id: string) => `/api/ignite-concept/concept/overview/${id}`,
 
 
   /* Ignite Domain */

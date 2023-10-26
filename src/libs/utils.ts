@@ -39,3 +39,10 @@ export function generateRandomString(length: number) {
   }
   return result;
 }
+
+export function differenceInHours(firstDate: Date, secondDate: Date) {
+  let difference = (firstDate.getTime() - secondDate.getTime()) / 1000;
+  difference /= (60 * 60);
+  return Math.abs(Math.round(difference));
+
+}
