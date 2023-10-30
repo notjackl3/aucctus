@@ -93,7 +93,7 @@ const IgniteConcept: FunctionComponent = () => {
 
           <button
             className="btn btn-primary"
-            disabled={!concept || !painPoint || !monetizationStrategy || !motivation || !extraDetails}
+            disabled={!concept}
             onClick={() => query.refetch()}
           >
             Generate Concepts
