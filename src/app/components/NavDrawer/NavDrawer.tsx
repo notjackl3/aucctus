@@ -95,11 +95,10 @@ const NavDrawer = () => {
                 },
               ]}
             />
-            {/* TODO Fix this */}
             <NavLink to={AppPath.Home} title="Tests" icon='rocket' locked />
           </div>
           <div className={styles.extras}>
-            <NavLink to={AppPath.Home} title="Learn" icon="home" />
+            <NavLink to={AppPath.Home} title="Learn" icon="home" locked />
             <NavLink to={AppPath.Home} title="Settings" icon='file' />
 
           </div>
