@@ -10,25 +10,33 @@ import { logout, selectUser } from "../../../features/auth/auth.slice";
 import avatar from '../../assets/icons/avatar.svg'
 import { AppPath } from "../../../routes/routes";
 import { useAppDispatch } from "../../hooks";
+import { useNavigate } from "react-router-dom";
 
 
 
 const NavDrawer = () => {
   const user = useSelector(selectUser)!
   const dispatch = useAppDispatch()
-  // TODO: Get Concept List & Domain Need to set up global state
+
+  const navigate = useNavigate()
 
 
   return (
     <div className={styles.container}>
       <div className={styles.wrapper}>
         <div className={styles.navDrawer}>
-          <div className={styles.content}>
+          <div className={styles.header}
+            onClick={() => {
+              navigate(AppPath.Home)
+            }}
+          >
             <img
               alt="Logo"
               style={{ height: 30, width: 146 }}
               src={Logo}
             />
+          </div>
+          <div className={styles.content}>
             <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
             <NavLink
               to={AppPath.DomainList}

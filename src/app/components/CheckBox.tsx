@@ -1,4 +1,4 @@
-import { ForwardRefRenderFunction, InputHTMLAttributes } from "react";
+import { ForwardRefRenderFunction, ForwardRefExoticComponent, InputHTMLAttributes } from "react";
 
 import styles from '../assets/styles/components/checkbox.module.scss'
 import React from "react";
