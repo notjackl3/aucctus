@@ -4,14 +4,14 @@ import Home from '../../../app/assets/icons/Home'
 import FileSearch from "../../assets/icons/filesearch.svg?react";
 import Lightbulb from "../../assets/icons/lightbulb.svg?react";
 import Rocket from "../../assets/icons/Rocket";
-import Lock from "../../assets/icons/Lock";
-import Help from "../../assets/icons/Help";
+import Lock from "../../assets/icons/lock.svg?react";
+import Help from "../../assets/icons/help.svg?react";
 import Gear from "../../assets/icons/Gear";
 import ChevronUp from "../../assets/icons/ChevronUp";
 import { AppPath } from "../../../routes/routes";
 import { useMatch, Link } from "react-router-dom";
 import Collapsible from "../Collapsible";
-import NestedLink from "./NestedLink";
+import NestedLink, { NestedLinkProps } from "./NestedLink";
 
 const defaultIconProps = {
   stroke: "#7586A9",
@@ -33,13 +33,10 @@ interface NavLinkProps {
   icon: keyof typeof navDrawerIcons
   locked?: boolean
   openBasePath?: AppPath
-  nestedRoutes?: NestedRoute[]
+  nestedRoutes?: NestedLinkProps[]
 
 }
-interface NestedRoute {
-  title: string;
-  path: AppPath;
-}
+
 
 
 
@@ -60,14 +57,14 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
       </Link>
 
 
-      <Collapsible width={"100%"} toggle={isOpen}>
+      {nestedRoutes ? <Collapsible width={"100%"} toggle={isOpen}>
         {nestedRoutes && nestedRoutes.map((route, i) => (
           <NestedLink
-            to={route.path}
-            title={route.title}
-            key={`di-${route.title}-${i}`} />
+            key={`di-${route.title}-${i}`}
+            {...route}
+          />
         ))}
-      </Collapsible>
+      </Collapsible> : null}
 
     </div >
   );

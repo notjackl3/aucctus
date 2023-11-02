@@ -156,11 +156,16 @@
       }
 
       // Hover Effect when Nav Item is locked
-      &.locked {
+
+      &.locked,
+      &.locked a {
         cursor: not-allowed;
         &:hover {
           box-shadow: none !important;
         }
+      }
+      &.locked:hover {
+        box-shadow: none !important;
       }
     }
   }

@@ -1,11 +1,14 @@
 .nestedLink {
   display: flex;
   padding: 0.5rem 0;
+  flex-direction: row;
   align-items: center;
-  gap: 0.5rem;
+  // gap: 0.5rem;
+  justify-content: space-between;
   align-self: stretch;
   margin-top: var(--base-gap);
   width: 100%;
+  max-width: 215px;
 
   display: flex;
   align-items: center;
@@ -17,13 +20,26 @@
   span {
     padding-left: 2.25rem;
 
+    text-wrap: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+
+    -webkit-line-clamp: 1; /* number of lines to show */
+    line-clamp: 1;
+    -webkit-box-orient: vertical;
+
     color: var(--type-tertiary, #626ba3);
     /* H3 */
-    font-family: "DM Sans";
     font-size: 1rem;
     font-style: normal;
-    font-weight: 700;
+    font-weight: 600;
     line-height: 1.5rem; /* 150% */
+  }
+
+  &.locked {
+    span {
+      max-width: 156px;
+    }
   }
 
   &.active {

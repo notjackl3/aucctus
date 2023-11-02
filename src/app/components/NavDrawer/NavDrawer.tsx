@@ -46,23 +46,27 @@ const NavDrawer = () => {
               nestedRoutes={[
                 {
                   title: "Market",
-                  path: AppPath.DomainMarket
+                  to: AppPath.DomainMarket
                 },
                 {
                   title: "Start Ups",
-                  path: AppPath.Home
+                  to: AppPath.Home,
+                  locked: true
                 },
                 {
                   title: "Incumbents",
-                  path: AppPath.Home
+                  to: AppPath.Home,
+                  locked: true
                 },
                 {
                   title: "VC Activity",
-                  path: AppPath.Home
+                  to: AppPath.Home,
+                  locked: true
                 },
                 {
                   title: "Potential Concepts",
-                  path: AppPath.Home
+                  to: AppPath.Home,
+                  locked: true
                 },
               ]}
 
@@ -75,23 +79,27 @@ const NavDrawer = () => {
               nestedRoutes={[
                 {
                   title: "Overview",
-                  path: AppPath.ConceptOverview
+                  to: AppPath.ConceptOverview
                 },
                 {
                   title: "Business Model",
-                  path: AppPath.Home
+                  to: AppPath.Home,
+                  locked: true
                 },
                 {
                   title: "Financial Projection",
-                  path: AppPath.Home
+                  to: AppPath.Home,
+                  locked: true
                 },
                 {
                   title: "Customer Profile",
-                  path: AppPath.Home
+                  to: AppPath.Home,
+                  locked: true
                 },
                 {
                   title: "Related Market",
-                  path: AppPath.Home
+                  to: AppPath.Home,
+                  locked: true
                 },
               ]}
             />

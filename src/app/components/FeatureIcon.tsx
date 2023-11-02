@@ -8,7 +8,7 @@ import Target from '../assets/icons/target.svg?react';
 import Rocket from "../assets/icons/rocket.svg?react";
 import SearchRefraction from "../assets/icons/search-refraction.svg?react"
 import UserGroup from "../assets/icons/users-01.svg?react"
-import Help from "../assets/icons/Help";
+import Help from "../assets/icons/help.svg?react";
 import Gear from "../assets/icons/Gear";
 
 
