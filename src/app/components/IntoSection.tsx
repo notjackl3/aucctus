@@ -17,13 +17,12 @@ const IntoSection: FunctionComponent = () => {
             )}
         </div>
         <div className={styles.quote}>
-          Few things make me feel more powerful than setting up automation in
-          Aucctus to make my life easier and more efficient.
+          We've been on the lookout for a cutting-edge solution to elevate our digital strategies, and Aucctus promises to be exactly what we've been searching for. Leveraging AI for business innovation is the future, and we're excited to embark on this journey. Can't wait to integrate it into our processes
         </div>
         <div className={styles.textAndStars}>
           <div className={styles.textAndSupportingText}>
-            <div className={styles.text}>— Aliah Lane</div>
-            <div className={styles.supportingText}>Founder, Acme Corp</div>
+            <div className={styles.text}>— Brandon Milner, Ellis Don</div>
+            {/* <div className={styles.supportingText}>Founder, Acme Corp</div> */}
           </div>
 
           <img
