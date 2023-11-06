@@ -19,7 +19,7 @@ export const validEmail = (email: string) => {
  * @returns 
  */
 export const validDomain = (domain: string) => {
-  return domain.toLowerCase().match(/^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/)
+  return domain.toLowerCase().match(/^([A-Za-z0-9-]+\.([A-Za-z]{3,}|[A-Za-z]{2}\.[A-Za-z]{2}|[A-za-z]{2}))/)
 }
 
 

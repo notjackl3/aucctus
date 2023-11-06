@@ -33,11 +33,23 @@ const OnBoarding: FunctionComponent = () => {
 
 
   const _handleDomainValidation = useCallback((e: React.FocusEvent) => {
-    if (domain && !validDomain(domain)) {
+    const unwantedPrefix = ['https://', 'http://']
+
+    let d = domain
+
+    for (const prefix of unwantedPrefix) {
+      if (d.substring(0, prefix.length) === prefix) {
+        d = d.slice(prefix.length)
+      }
+    }
+
+    if (d && !validDomain(d)) {
       setDomainInputError('Enter a valid domain name.')
     } else {
       setDomainInputError(undefined)
     }
+
+    setDomain(d)
 
   }, [domain])
 
