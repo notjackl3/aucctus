@@ -9,6 +9,8 @@ import styles from '../assets/styles/pages/dashboard.module.scss'
 import CompetitorNewsContainer from "../components/CompetitorNews/CompetitorNewsContainer";
 import InnovationGoal from "../components/InnovationGoal";
 import CompanyMetricsContainer from "../components/CompanyMetricsContainer";
+import InnovationActivity from "../components/InnovationActivity";
+import InnovationLifecycle from "../components/InnovationLifecycle";
 
 const Dashboard: FunctionComponent = () => {
   const organization = useSelector(selectOrganization)!
@@ -32,8 +34,9 @@ const Dashboard: FunctionComponent = () => {
       <section className={`${styles.newsAndOpportunities}`} >
         <CompetitorNewsContainer />
       </section>
-      <section>
-
+      <section className="">
+        <InnovationActivity />
+        <InnovationLifecycle />
       </section>
     </div >
   )

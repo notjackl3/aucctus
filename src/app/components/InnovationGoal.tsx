@@ -1,13 +1,13 @@
 import { FunctionComponent, useState } from "react";
 import styles from '../assets/styles/pages/dashboard.module.scss'
-import { logout, refreshAuth } from "../../features/auth/auth.slice";
+import { logout } from "../../features/auth/auth.slice";
 import { useQuery } from "react-query";
 import api from "../../libs/api";
 import Loading from "./Loading";
 import { isAxiosError } from "axios";
 import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
 import { useAppDispatch } from "../hooks";
-import analytics from "../../libs/analytics";
+
 
 
 

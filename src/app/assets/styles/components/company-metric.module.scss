@@ -10,6 +10,8 @@
   border: 1px solid var(--Grey---300, #e0e5f2);
   background: var(--base-white, #fff);
 
+  box-shadow: var(--shadow-xs);
+
   .heading {
     display: flex;
     gap: var(--gap-base);

@@ -10,7 +10,6 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import api from "../../libs/api";
 import { IDomainMarket, IGeneratedDomain } from "../../libs/api/typings/ignite-domain";
-import { formatter } from "../../libs/utils";
 import Loading from "../components/Loading";
 
 

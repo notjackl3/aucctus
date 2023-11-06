@@ -46,7 +46,15 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
 
   return (
     <div className={`${styles.navLinkWrapper}  ${locked ? styles.locked : ""}`}>
-      <Link to={!locked ? to : "javascript:void(0)"} className={styles.navLink}>
+      <Link
+
+        to={!locked
+          ? to :
+          // eslint-disable-next-line no-script-url
+          "javascript:void(0)"}
+        className={styles.navLink}
+
+      >
         <div className={styles.label}>
           {navDrawerIcons[icon]}
           <span>{title}</span>

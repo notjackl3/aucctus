@@ -7,7 +7,6 @@ interface ConceptCardProps {
   subtitle: string
 
   width?: number
-
   children: ReactNode
 
 }

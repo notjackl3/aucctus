@@ -51,6 +51,14 @@ a:active {
   outline: 0;
 }
 
+// .dropdown {
+//   button {
+//     background: var(--primary-50-secondary, #f4f7fe);
+//     color: var(--primary-600-primary, #4318FF);
+
+//   }
+// }
+
 button.btn {
   display: flex;
   gap: var(--gap-base);
@@ -71,6 +79,7 @@ button.btn {
   &.btn-primary {
     border: 1px solid var(--primary-600-primary, #4318ff) !important;
     background: var(--primary-600-primary, #4318ff) !important;
+
     color: var(--base-white, #fff);
     svg {
       stroke: var(--base-white, #fff) !important;
@@ -80,9 +89,22 @@ button.btn {
   &.btn-light {
     border: 1px solid var(--gray-300-outline, #e0e5f2);
     background: var(--base-white, #fff);
-    color: var(--type-tertiary);
+    &,
+    &.disabled,
     svg {
-      stroke: var(--type-tertiary) !important;
+      color: var(--type-tertiary) !important;
+    }
+  }
+
+  &.btn-secondary {
+    border-radius: 0.5rem;
+    border: 1px solid var(--primary-50-secondary, #f4f7fe);
+    background: var(--primary-50-secondary, #f4f7fe);
+
+    &,
+    &.disabled,
+    svg {
+      color: var(--primary-600-primary, #4318ff) !important;
     }
   }
 }

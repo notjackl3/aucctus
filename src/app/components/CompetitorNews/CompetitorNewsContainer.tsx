@@ -1,4 +1,3 @@
-import styles from '../../assets/styles/components/dashboard-insights.module.scss'
 import { FunctionComponent, useState } from "react";
 import CompetitorNews from "./CompetitorNews";
 import { generateRandomString } from "../../../libs/utils";
@@ -6,6 +5,9 @@ import { useQuery } from 'react-query';
 import api from '../../../libs/api';
 import Loading from '../Loading';
 import { IArticle } from '../../../libs/api/typings/organization';
+
+
+import styles from '../../assets/styles/components/dashboard-insights.module.scss'
 
 const CompetitorNewsContainer: FunctionComponent = () => {
   const [error, setError] = useState<string | undefined>(undefined)
@@ -29,9 +31,9 @@ const CompetitorNewsContainer: FunctionComponent = () => {
 
   return (
     <div className={styles.dashboardInsights}>
-      <span className={styles.header}>
+      <h2 className={styles.header}>
         Competitor News
-      </span>
+      </h2>
       <div className={styles.content} >
         {query.isLoading ?
 

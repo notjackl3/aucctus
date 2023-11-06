@@ -13,6 +13,8 @@
   border: 1px solid var(--gray-300-outline, #e0e5f2);
   background: var(--base-white, #fff);
 
+  box-shadow: var(--shadow-xs);
+
   .content {
     display: flex;
     flex-direction: column;
