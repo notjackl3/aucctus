@@ -10,7 +10,7 @@ const Footer: FunctionComponent = () => {
   return (
     <div className={styles.footer}>
       <div className={styles.text}>
-        © {year} Disruptive Edge. All Rights Reserved.
+        © {year} Aucctus Inc. All Rights Reserved.
       </div>
       {/* TODO: Add Mail Link */}
       <div className={styles.row}>
