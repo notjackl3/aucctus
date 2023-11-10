@@ -17,7 +17,7 @@ const IntoSection: FunctionComponent = () => {
             )}
         </div>
         <div className={styles.quote}>
-          We've been on the lookout for a cutting-edge solution to elevate our digital strategies, and Aucctus promises to be exactly what we've been searching for. Leveraging AI for business innovation is the future, and we're excited to embark on this journey. Can't wait to integrate it into our processes
+          Aucctus provides organizations with the tools to innovative at speed and scale.
         </div>
         <div className={styles.textAndStars}>
           <div className={styles.textAndSupportingText}>
