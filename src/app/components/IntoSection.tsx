@@ -17,19 +17,19 @@ const IntoSection: FunctionComponent = () => {
             )}
         </div>
         <div className={styles.quote}>
-          Aucctus provides organizations with the tools to innovative at speed and scale.
+          Aucctus provides enormous potential for organizations to innovate at speed and scale.
         </div>
         <div className={styles.textAndStars}>
           <div className={styles.textAndSupportingText}>
-            <div className={styles.text}>— Brandon Milner, Ellis Don</div>
-            {/* <div className={styles.supportingText}>Founder, Acme Corp</div> */}
+            <div className={styles.text}>— Brandon Milner</div>
+            <div className={styles.supportingText}>Head of Innovation at EllisDon</div>
           </div>
 
-          <img
+          {/* <img
             alt="Logo"
             style={{ fill: "#2B3674", width: 140, height: 33 }}
             src={fictionalLogo}
-          />
+          /> */}
         </div>
       </div>
       <div className={styles.screenMockupWrapper}>

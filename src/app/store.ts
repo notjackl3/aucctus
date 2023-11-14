@@ -17,8 +17,6 @@ const conceptPersistConfig = {
   storage,
 }
 
-
-
 const authPersistedReducer = persistReducer(authPersistConfig, authReducer)
 const conceptPersistedReducer = persistReducer(conceptPersistConfig, conceptReducer)
 
