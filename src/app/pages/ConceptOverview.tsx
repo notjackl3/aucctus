@@ -1,5 +1,4 @@
 import { FunctionComponent, useState } from "react";
-
 import styles from "../assets/styles/pages/concept-overview.module.scss"
 import images from "../assets/img";
 import ConceptCard from "../components/ConceptCard";
@@ -9,8 +8,6 @@ import { useQuery } from "react-query";
 import api from "../../libs/api";
 import { IConceptOverview, IConceptResponse } from "../../libs/api/typings/ignite-concepts";
 import Loading from "../components/Loading";
-import { formatter } from "../../libs/utils";
-
 
 const ConceptOverview: FunctionComponent = () => {
   let { id } = useParams();
@@ -66,11 +63,11 @@ const ConceptOverview: FunctionComponent = () => {
               <div className={styles.detailContent}>
                 <div className={styles.supportingText}>
                   <span className={styles.title}>Annual Revenue</span>
-                  {overviewQuery.isLoading ? <Loading /> : <span>{formatter.format(data?.annualRevenue || 0)}</span>}
+                  {overviewQuery.isLoading ? <Loading /> : <span>{data?.annualRevenue || 0}</span>}
                 </div>
                 <div className={styles.supportingText}>
                   <span className={styles.title}>Total Addressable Market</span>
-                  {overviewQuery.isLoading ? <Loading /> : <span>{formatter.format(data?.totalAddressableMarket || 0)}</span>}
+                  {overviewQuery.isLoading ? <Loading /> : <span>{data?.totalAddressableMarket || 0}</span>}
                 </div>
 
               </div>
@@ -119,7 +116,7 @@ const ConceptOverview: FunctionComponent = () => {
               />
             </div>
             <div className={styles.cardContent}>
-              <span className={styles.title}>Let’s make it even stronger</span>
+              <span className={styles.title}>Let's make it even stronger</span>
               <span className={styles.text}>We have identified 5 different areas that you can explore to make this concept even stronger</span>
 
             </div>

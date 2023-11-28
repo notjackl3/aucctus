@@ -46,9 +46,10 @@ export interface IConcepts {
 }
 
 export interface IConceptOverview {
-  valueProposition: string
-  totalAddressableMarket: number
-  annualRevenue: number
+  id: string;
+  valueProposition: string;
+  totalAddressableMarket: string;
+  annualRevenue: string
   targetGroups: string[]
   industries: string[]
   signals: string[]
