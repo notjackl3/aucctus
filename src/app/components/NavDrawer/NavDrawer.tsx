@@ -11,11 +11,13 @@ import avatar from '../../assets/icons/avatar.svg'
 import { AppPath } from "../../../routes/routes";
 import { useAppDispatch } from "../../hooks";
 import { useNavigate } from "react-router-dom";
+import { selectedConcept } from "../../../features/concepts/concept.slice";
 
 
 
 const NavDrawer = () => {
   const user = useSelector(selectUser)!
+  const conceptId = useSelector(selectedConcept)
   const dispatch = useAppDispatch()
 
   const navigate = useNavigate()
@@ -42,6 +44,7 @@ const NavDrawer = () => {
               to={AppPath.DomainList}
               title="Domains"
               icon='file'
+              // TODO: fix base path logic.
               openBasePath={AppPath.DomainMarket}
               nestedRoutes={[
                 {
@@ -75,11 +78,11 @@ const NavDrawer = () => {
             <NavLink to={AppPath.ConceptList}
               title="Concepts"
               icon='lightbulb'
-              openBasePath={AppPath.ConceptOverview}
+              openBasePath={`/concept/${conceptId || ':id'}`}
               nestedRoutes={[
                 {
                   title: "Overview",
-                  to: AppPath.ConceptOverview
+                  to: AppPath.ConceptOverview.replace(':id', conceptId || ':id')
                 },
                 {
                   title: "Business Model",
@@ -93,8 +96,7 @@ const NavDrawer = () => {
                 },
                 {
                   title: "Customer Profile",
-                  to: AppPath.Home,
-                  locked: true
+                  to: AppPath.ConceptCustomerPersona.replace(':id', conceptId || ':id'),
                 },
                 {
                   title: "Related Market",

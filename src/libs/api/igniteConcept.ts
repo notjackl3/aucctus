@@ -1,7 +1,7 @@
 import { ApiService } from "./apiService";
 import { endpoints } from "./endpoints";
 import { IMessageResponse } from "./typings/avxisi";
-import { IConceptOverview, IConceptResponse, IIgniteConceptBody, IIgniteConceptSuccessResponse } from "./typings/ignite-concepts";
+import { IConceptCustomerProfile, IConceptOverview, IConceptResponse, IIgniteConceptBody, IIgniteConceptSuccessResponse } from "./typings/ignite-concepts";
 
 export class IgniteConceptApi extends ApiService {
 
@@ -23,18 +23,14 @@ export class IgniteConceptApi extends ApiService {
     return this.delete<IIgniteConceptSuccessResponse>(endpoints.igniteConcept, this._handleAccessToken())
   }
 
-  /**
-   * 
-   */
+
   async getAllGeneratedConcepts(igniteId: string) {
     return this.get<IConceptResponse[]>(endpoints.specificConcept(igniteId), this._handleAccessToken())
   }
 
-
   async getConceptOverview(id: string) {
     return this.get<IConceptOverview>(endpoints.conceptOverview(id), this._handleAccessToken())
   }
-
 
   async getAllSavedConcepts() {
     return this.get<IConceptResponse[]>(endpoints.concept, this._handleAccessToken())
@@ -55,5 +51,12 @@ export class IgniteConceptApi extends ApiService {
     return this.delete<IMessageResponse>(endpoints.deleteUnsavedConcepts(igniteId), this._handleAccessToken())
   }
 
+  async getTargetGroups(id: string) {
+    return this.get<string[]>(endpoints.conceptTargetGroups(id), this._handleAccessToken())
+  }
 
+
+  async getCustomerProfile(id: string, group: string) {
+    return this.get<IConceptCustomerProfile>(endpoints.conceptCustomerProfile(id, group), this._handleAccessToken())
+  }
 }

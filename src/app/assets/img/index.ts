@@ -1,5 +1,5 @@
 import screenMockup from "./screen-mockup-replace-fill.png";
-import sample from "./sample-img.png"
+
 import domainBooklet from './domain-booklet.png'
 import conceptOverview from "./concept-overview.png"
 import financialProjection from "./finacial-projection-blur.png"
@@ -9,7 +9,7 @@ import innovationLifeCycle from './innovation-lifecycle.png'
 import innovationActivity from './inovation-activity.png'
 
 const images = {
-  sample,
+
   screenMockup,
   domainBooklet,
   conceptOverview,

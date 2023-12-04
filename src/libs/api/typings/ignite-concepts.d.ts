@@ -55,5 +55,19 @@ export interface IConceptOverview {
   signals: string[]
 }
 
+export interface IConceptCustomerProfile {
+  description: string;
+  nickname: string;
+  demographics: {
+    ageRange: string;
+    familySize: string;
+    averageIncome: string;
+    geographicLocation: string;
+  };
+  jobs: string[];
+  quotes: string[];
+  pains: string[];
+}
+
 
 

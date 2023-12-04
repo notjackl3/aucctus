@@ -24,7 +24,7 @@ const NestedLink: FunctionComponent<NestedLinkProps> = ({ to, title, locked = fa
 
   return (
     <Link
-      to={!locked ? to : "javascript:void(0)"}
+      to={!locked ? to : "#!"}
       className={`${styles.nestedLink} ${match ? styles.active : ""} ${locked ? styles.locked : ""}`}
       aria-disabled={locked}
     >

@@ -15,7 +15,7 @@ import Loading from "../components/Loading";
 import ignite from "../assets/icons/ignite.svg";
 
 
-// TODO: Grab data from api if there are no domains re direct user to ignite Domain
+// TODO: Grab data from api if there are no domains redirect user to ignite Domain
 
 const DomainList: FunctionComponent = () => {
   const navigate = useNavigate()
@@ -71,9 +71,7 @@ const DomainList: FunctionComponent = () => {
         {query.isLoading ?
 
           <div className={styles.loadingContainer}>
-
             <Loading />
-
 
           </div>
 

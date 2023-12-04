@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 import styles from "../../assets/styles/components/drawer.module.scss";
 import Home from '../../../app/assets/icons/Home'
 import FileSearch from "../../assets/icons/filesearch.svg?react";
@@ -9,7 +9,7 @@ import Help from "../../assets/icons/help.svg?react";
 import Gear from "../../assets/icons/Gear";
 import ChevronUp from "../../assets/icons/ChevronUp";
 import { AppPath } from "../../../routes/routes";
-import { useMatch, Link } from "react-router-dom";
+import { useMatch, Link, useLocation } from "react-router-dom";
 import Collapsible from "../Collapsible";
 import NestedLink, { NestedLinkProps } from "./NestedLink";
 
@@ -32,7 +32,7 @@ interface NavLinkProps {
   to: AppPath
   icon: keyof typeof navDrawerIcons
   locked?: boolean
-  openBasePath?: AppPath
+  openBasePath?: string
   nestedRoutes?: NestedLinkProps[]
 
 }
@@ -42,7 +42,13 @@ interface NavLinkProps {
 
 
 const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = false, openBasePath, nestedRoutes }) => {
-  const isOpen = !!useMatch(openBasePath || "path-does-not-exists")
+  const location = useLocation();
+  const isOpen = useMemo(() => {
+    if (!openBasePath) return false
+    return location.pathname.substring(0, openBasePath.length) === openBasePath
+  },
+    [location, openBasePath])
+
 
   return (
     <div className={`${styles.navLinkWrapper}  ${locked ? styles.locked : ""}`}>
@@ -50,8 +56,8 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
 
         to={!locked
           ? to :
-          // eslint-disable-next-line no-script-url
-          "javascript:void(0)"}
+
+          "#!"}
         className={styles.navLink}
 
       >

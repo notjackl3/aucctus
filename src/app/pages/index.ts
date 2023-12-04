@@ -9,6 +9,7 @@ import GeneratedConcepts from "./GeneratedConcepts";
 import ConceptOverview from "./ConceptOverview";
 import ConceptList from "./ConceptList";
 import DomainMarket from "./DomainMarket";
+import CustomerPersonas from "./CustomerPersonas/CustomerPersonas";
 
 const Page = {
   Auth,
@@ -18,8 +19,9 @@ const Page = {
 
   IgniteConcept,
   GeneratedConcepts,
-  ConceptOverview,
   ConceptList,
+  ConceptOverview,
+  CustomerPersonas,
 
 
   IgniteDomain,

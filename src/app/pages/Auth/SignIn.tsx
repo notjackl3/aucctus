@@ -35,7 +35,7 @@ const SignIn: FunctionComponent = () => {
     onSuccess: (response: IAuthSuccessResponse) => {
       analytics.debug(JSON.stringify(response))
       dispatch(setAuthenticated(response))
-      return response
+
 
     },
     onError: (error) => {
@@ -46,7 +46,7 @@ const SignIn: FunctionComponent = () => {
         message = error.message
       }
       setError(message)
-      return message
+
     }
   })
 

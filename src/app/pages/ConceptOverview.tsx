@@ -16,8 +16,7 @@ const ConceptOverview: FunctionComponent = () => {
 
 
   const conceptQuery = useQuery({
-    queryKey: 'concept',
-    cacheTime: 1000,
+    queryKey: `concept/${id}`,
     retry: 2,
     queryFn: async () => await api.igniteConcept.getGeneratedConcept(id || ""),
     onSuccess: (response) => {
@@ -26,8 +25,7 @@ const ConceptOverview: FunctionComponent = () => {
   })
 
   const overviewQuery = useQuery({
-    queryKey: 'concept/overview',
-    cacheTime: 1000,
+    queryKey: `concept/overview/${id}`,
     retry: 2,
     queryFn: async () => await api.igniteConcept.getConceptOverview(id || ""),
     onSuccess: (response) => {
