@@ -9,7 +9,7 @@ interface CompetitorNewsProps {
   image: string;
   source: string
 }
-const CompetitorNews: FunctionComponent<CompetitorNewsProps> = ({ headLine, summary, source, image = images.sample }) => {
+const CompetitorNews: FunctionComponent<CompetitorNewsProps> = ({ headLine, summary, source, image }) => {
   return (
     <a className={styles.competitorNews} href={source} target="_blank">
       <img
