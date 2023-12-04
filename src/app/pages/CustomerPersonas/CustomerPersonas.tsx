@@ -15,7 +15,7 @@ const CustomerPersona: FunctionComponent = () => {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const targetGroupsQuery = useQuery({
-    queryKey: `concept/${id}/target-group`,
+    queryKey: [`concept/:id/target-group`, id],
     retry: 2,
     queryFn: async () => await api.igniteConcept.getTargetGroups(id || ""),
     onSuccess: (data) => {
