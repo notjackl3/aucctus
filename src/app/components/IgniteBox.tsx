@@ -2,10 +2,9 @@ import { FunctionComponent } from "react";
 import styles from "../assets/styles/components/ignite-box.module.scss";
 import { AppPath } from "../../routes/routes";
 import { useNavigate } from "react-router-dom";
+import Icon, { IconVariant } from "./Icon";
 
-import FileSearchIcon from '../assets/icons/filesearch.svg?react';
-import LightbulbIcon from '../assets/icons/lightbulb.svg?react';
-import ArrowRightIcon from '../assets/icons/ArrowRight';
+
 
 
 
@@ -15,16 +14,11 @@ const defaultIconProps = {
   stroke: "#2B3674"
 }
 
-const icons = {
-  "file": <FileSearchIcon {...defaultIconProps} />,
-  "lightbulb": <LightbulbIcon {...defaultIconProps} />
-}
-
 interface IgniteBoxProps {
   title: string;
   subtitle: string;
   link: AppPath
-  icon: keyof typeof icons
+  icon: keyof typeof IconVariant
 }
 
 const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, icon }) => {
@@ -33,7 +27,7 @@ const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, i
   return (
     <div className={styles.igniteBox}>
       <div className={styles.content}>
-        {icons[icon]}
+        <Icon variant={icon} {...defaultIconProps} />
         <span className={styles.title}>{title}</span>
         {subtitle}
       </div>
@@ -43,7 +37,7 @@ const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, i
         onClick={() => navigate(link)}
       >
         Ignite
-        <ArrowRightIcon width={24} height={24} stroke="#fff" />
+        <Icon variant='arrowRight' width={24} height={24} stroke="#fff" />
       </button>
     </div >
   );

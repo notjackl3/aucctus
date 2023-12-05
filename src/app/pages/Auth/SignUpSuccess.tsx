@@ -4,7 +4,7 @@ import { AppPath } from "../../../routes/routes";
 import { useAppDispatch, useQueryParams } from "../../hooks";
 import { confirmEmail } from "../../../features/auth/auth.slice";
 import { Link } from "react-router-dom";
-import LeftArrowIcon from "../../assets/icons/ArrowLeft";
+import Icon from "../../components/Icon";
 
 
 const SignUpSuccess: FunctionComponent = () => {
@@ -31,7 +31,8 @@ const SignUpSuccess: FunctionComponent = () => {
       </div>
 
       <Link className={styles.backArrow} to={AppPath.SignIn}>
-        <LeftArrowIcon
+        <Icon
+          variant="arrowLeft"
           width={20}
           height={20}
           stroke="#667085"

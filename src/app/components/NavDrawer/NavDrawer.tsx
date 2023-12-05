@@ -12,6 +12,7 @@ import { AppPath } from "../../../routes/routes";
 import { useAppDispatch } from "../../hooks";
 import { useNavigate } from "react-router-dom";
 import { selectedConcept } from "../../../features/concepts/concept.slice";
+import App from "../../../App";
 
 
 
@@ -72,8 +73,6 @@ const NavDrawer = () => {
                   locked: true
                 },
               ]}
-
-
             />
             <NavLink to={AppPath.ConceptList}
               title="Concepts"
@@ -105,7 +104,9 @@ const NavDrawer = () => {
                 },
               ]}
             />
-            <NavLink to={AppPath.Home} title="Tests" icon='rocket' locked />
+            <NavLink to={AppPath.ChallengeCenter} title="Challenges" icon="rocket" locked />
+
+            <NavLink to={AppPath.Home} title="Tests" icon='beaker' locked />
           </div>
           <div className={styles.extras}>
             <NavLink to={AppPath.Home} title="Learn" icon="home" locked />

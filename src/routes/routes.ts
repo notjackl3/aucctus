@@ -19,6 +19,10 @@ export enum AppPath {
   DomainMarket = '/domain/:id/overview',
 
 
+  /* Challenges */
+  ChallengeCenter = '/challenge',
+  ChallengeWizard = '/challenge/wizards',
+  ChallengeDetails = '/challenge/:id',
 
   /* Auth */
   SignIn = "/sign-in",

@@ -1,8 +1,8 @@
 import { FunctionComponent } from "react";
 import styles from "../assets/styles/pages/auth-screens.module.scss";
-import StarIcon from "../assets/icons/Star";
 import images from "../assets/img";
 import fictionalLogo from "../assets/icons/fictional-company-logo.svg";
+import Icon from "./Icon";
 
 const NUMBER_OF_STARS = 5;
 
@@ -13,7 +13,7 @@ const IntoSection: FunctionComponent = () => {
         <div className={styles.stars}>
           { // Create the Stars icon N times
             [...Array(NUMBER_OF_STARS)].map((e, i) =>
-              <StarIcon key={`star-icon-${i}`} height={20} width={30} stroke="#2B3674" fill="#2B3674" />
+              <Icon variant="star" key={`star-icon-${i}`} height={20} width={30} stroke="#2B3674" fill="#2B3674" />
             )}
         </div>
         <div className={styles.quote}>

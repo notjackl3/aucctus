@@ -1,17 +1,12 @@
 import { FunctionComponent, useMemo } from "react";
 import styles from "../../assets/styles/components/drawer.module.scss";
-import Home from '../../../app/assets/icons/Home'
-import FileSearch from "../../assets/icons/filesearch.svg?react";
-import Lightbulb from "../../assets/icons/lightbulb.svg?react";
-import Rocket from "../../assets/icons/Rocket";
-import Lock from "../../assets/icons/lock.svg?react";
-import Help from "../../assets/icons/help.svg?react";
-import Gear from "../../assets/icons/Gear";
-import ChevronUp from "../../assets/icons/ChevronUp";
 import { AppPath } from "../../../routes/routes";
-import { useMatch, Link, useLocation } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Collapsible from "../Collapsible";
 import NestedLink, { NestedLinkProps } from "./NestedLink";
+import Icon, { IconVariant } from "../Icon";
+
+
 
 const defaultIconProps = {
   stroke: "#7586A9",
@@ -19,18 +14,11 @@ const defaultIconProps = {
   height: 24
 
 }
-const navDrawerIcons = {
-  "home": <Home {...defaultIconProps} />,
-  "file": <FileSearch {...defaultIconProps} />,
-  "lightbulb": <Lightbulb {...defaultIconProps} />,
-  "rocket": <Rocket {...defaultIconProps} />,
-  "help": <Help {...defaultIconProps} />,
-  "gear": <Gear {...defaultIconProps} />,
-}
+
 interface NavLinkProps {
   title: string
   to: AppPath
-  icon: keyof typeof navDrawerIcons
+  icon: keyof typeof IconVariant
   locked?: boolean
   openBasePath?: string
   nestedRoutes?: NestedLinkProps[]
@@ -62,12 +50,12 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
 
       >
         <div className={styles.label}>
-          {navDrawerIcons[icon]}
+          <Icon variant={icon} {...defaultIconProps} />
           <span>{title}</span>
         </div>
 
-        {locked ? <Lock {...defaultIconProps} /> : null}
-        {isOpen ? <ChevronUp {...defaultIconProps} /> : null}
+        {locked ? <Icon variant='lock' {...defaultIconProps} /> : null}
+        {isOpen ? <Icon variant='chevronUp' {...defaultIconProps} /> : null}
       </Link>
 
 

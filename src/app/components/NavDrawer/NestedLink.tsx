@@ -1,8 +1,7 @@
 import { FunctionComponent } from "react";
 import { Link, useMatch } from "react-router-dom"
-
-import Lock from "../../assets/icons/lock.svg?react";
 import styles from '../../assets/styles/components/nested-link.module.scss'
+import Icon from "../Icon";
 
 
 const defaultIconProps = {
@@ -30,7 +29,7 @@ const NestedLink: FunctionComponent<NestedLinkProps> = ({ to, title, locked = fa
     >
 
       <span>{title}</span>
-      {locked ? <Lock {...defaultIconProps} /> : null}
+      {locked ? <Icon variant='lock' {...defaultIconProps} /> : null}
     </Link>
   )
 }

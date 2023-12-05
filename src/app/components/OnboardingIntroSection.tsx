@@ -16,7 +16,7 @@ const OnboardingIntoSection: FunctionComponent = () => {
       <OnboardingMessage title={"Seamless Strategy Roadmaps"} description={"From spark to success, we guide every step"}
         icon="rocket" color={"purple"} />
       <OnboardingMessage title={"Make Moves with Confidence"} description={"Backed by the freshest, most precise data-driven insights. Join the future of business expansion today!"}
-        icon="searchRefraction" color={"purple"} />
+        icon="search" color={"purple"} />
 
     </div>
   );

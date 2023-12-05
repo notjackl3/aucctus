@@ -1,7 +1,5 @@
 import { FunctionComponent } from "react";
 import styles from "../../assets/styles/components/competitor-news.module.scss";
-import images from "../../assets/img";
-
 
 interface CompetitorNewsProps {
   headLine: string;

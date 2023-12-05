@@ -3,10 +3,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { AppPath } from "../../routes/routes";
 import InputField from "../components/InputField";
 
-import Lightbulb from '../assets/icons/lightbulb.svg?react';
-import DownloadIcon from '../assets/icons/Download';
-import ArrowRight from '../assets/icons/ArrowRight';
-import FilterLines from '../assets/icons/FilterLines';
 import ignite from "../assets/icons/ignite.svg";
 
 import { IConceptResponse } from "../../libs/api/typings/ignite-concepts";
@@ -23,6 +19,7 @@ import { useDispatch } from "react-redux";
 import api from "../../libs/api";
 import Loading from "../components/Loading";
 import { setSelectedConcept } from "../../features/concepts/concept.slice";
+import Icon from "../components/Icon";
 
 
 const columnHelper = createColumnHelper<IConceptResponse>()
@@ -84,7 +81,7 @@ const ConceptList: FunctionComponent = () => {
           }}
           className={styles.reviewConceptLink}
         >
-          <ArrowRight height={20} width={20} stroke="" />
+          <Icon variant='arrowRight' height={20} width={20} stroke="" />
         </div>),
       header: () => <span></span>,
     }),
@@ -108,7 +105,7 @@ const ConceptList: FunctionComponent = () => {
           <h1>Concepts</h1>
           <div className={styles.actions}>
             <button className="btn btn-light disabled">
-              <DownloadIcon height={20} width={20} stroke="" />
+              <Icon variant="download" height={20} width={20} stroke="" />
               Export
             </button>
             <button className="btn btn-primary"
@@ -116,7 +113,7 @@ const ConceptList: FunctionComponent = () => {
                 navigate(AppPath.IgniteConcept)
               }}
             >
-              <Lightbulb height={20} width={20} stroke="" />
+              <Icon variant="lightbulb" height={20} width={20} stroke="" />
               Ignite Concept
             </button>
           </div>
@@ -149,7 +146,7 @@ const ConceptList: FunctionComponent = () => {
         <div className={styles.tableControls}>
           <InputField label="" placeholder="Search" disabled name="searchbar" />
           <button className="btn btn-light disabled">
-            <FilterLines height={20} width={20} stroke="" />
+            <Icon variant="filterLines" height={20} width={20} stroke="" />
             Filter
           </button>
         </div>

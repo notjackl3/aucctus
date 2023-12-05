@@ -5,11 +5,9 @@ import api from "../../../libs/api";
 import { IConceptCustomerProfile } from "../../../libs/api/typings/ignite-concepts";
 import Loading from "../../components/Loading";
 
-import Lightbulb from "../../assets/icons/lightbulb.svg?react";
-import Target from '../../assets/icons/target.svg?react';
-import Rocket from "../../assets/icons/rocket.svg?react";
 import styles from '../../assets/styles/pages/customer-personas.module.scss';
 import SimpleList from "../../components/SimpleList";
+import Icon from "../../components/Icon";
 
 
 
@@ -79,25 +77,25 @@ const Persona: FunctionComponent = () => {
           <h2>Demographics</h2>
           <div className={styles.content}>
             <div className={styles.info}>
-              <Lightbulb {...defaultIconProps} />
+              <Icon variant="globe" {...defaultIconProps} />
               <span>
                 <strong>Geographic Location:</strong> {isLoading ? <Loading /> : customerProfile?.demographics.geographicLocation || 'N/A'}
               </span>
             </div>
             <div className={styles.info}>
-              <Lightbulb {...defaultIconProps} />
+              <Icon variant='lightbulb' {...defaultIconProps} />
               <span>
                 <strong>Age Range:</strong> {isLoading ? <Loading /> : customerProfile?.demographics.ageRange || 'N/A'}
               </span>
             </div>
             <div className={styles.info}>
-              <Lightbulb {...defaultIconProps} />
+              <Icon variant="userGroup" {...defaultIconProps} />
               <span>
                 <strong>Family Size:</strong> {isLoading ? <Loading /> : customerProfile?.demographics.familySize || 'N/A'}
               </span>
             </div>
             <div className={styles.info}>
-              <Lightbulb {...defaultIconProps} />
+              <Icon variant="currency" {...defaultIconProps} />
               <span>
                 <strong>Average Income:</strong> {isLoading ? <Loading /> : customerProfile?.demographics.averageIncome || 'N/A'}
               </span>
@@ -129,7 +127,7 @@ const Persona: FunctionComponent = () => {
           <SimpleList
             isLoading={isLoading}
             title={'Quotes'}
-            icon="messageCircle"
+            icon="message"
             minLength={5}
             maxLength={5}
             items={customerProfile?.quotes || []}

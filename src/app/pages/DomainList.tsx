@@ -1,9 +1,4 @@
 import { FunctionComponent, useState } from "react";
-
-
-import DownloadIcon from '../assets/icons/download.svg?react'
-import FileSearchIcon from '../assets/icons/filesearch.svg?react'
-
 import styles from '../assets/styles/pages/domain-list.module.scss'
 import DomainBox from "../components/DomainBox";
 import { useNavigate } from "react-router-dom";
@@ -13,6 +8,7 @@ import { IGeneratedDomain } from "../../libs/api/typings/ignite-domain";
 import { useQuery } from "react-query";
 import Loading from "../components/Loading";
 import ignite from "../assets/icons/ignite.svg";
+import Icon from "../components/Icon";
 
 
 // TODO: Grab data from api if there are no domains redirect user to ignite Domain
@@ -50,7 +46,7 @@ const DomainList: FunctionComponent = () => {
         <div className={styles.actionable}>
           <button className="btn btn-light disabled">Edit Inputs</button>
           <button className="btn btn-light disabled">
-            <DownloadIcon height={20} width={20} />
+            <Icon variant='download' height={20} width={20} />
             Export All
           </button>
           <button className="btn btn-primary"
@@ -58,7 +54,7 @@ const DomainList: FunctionComponent = () => {
               navigate(AppPath.IgniteDomain)
             }}
           >
-            <FileSearchIcon height={20} width={20} />
+            <Icon variant="file" height={20} width={20} />
             Ignite Domain
           </button>
 

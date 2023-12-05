@@ -1,14 +1,11 @@
 import { FunctionComponent } from "react";
 
-import BankIcon from '../assets/icons/Bank'
-import LineChartIcon from '../assets/icons/LineChartUp'
-import GlobeIcon from '../assets/icons/Globe'
-import RightArrowIcon from '../assets/icons/ArrowRight'
 
 import styles from "../assets/styles/components/domain-box.module.scss"
 import images from "../assets/img";
 import { useNavigate } from "react-router-dom";
 import { AppPath } from "../../routes/routes";
+import Icon from "./Icon";
 
 
 
@@ -51,7 +48,7 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, tot
 
           <div className={styles.metric}>
             <div>
-              <GlobeIcon {...iconDefaultProps} />
+              <Icon variant="globe" {...iconDefaultProps} />
               <span>Total Addressable Market (TAM)</span>
             </div>
             <span>{totalAddressableMarket} /year</span>
@@ -59,7 +56,7 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, tot
 
           <div className={styles.metric}>
             <div>
-              <LineChartIcon {...iconDefaultProps} />
+              <Icon variant="lineChartUp" {...iconDefaultProps} />
               <span>Compound Annual Growth Rate (CAGR)</span>
             </div>
             <span>{compoundAnnualGrowth}% /year</span>
@@ -94,7 +91,7 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, tot
 
         >
           Explore Domain
-          <RightArrowIcon {...iconDefaultProps} stroke="#626ba3" />
+          <Icon variant="arrowRight"{...iconDefaultProps} stroke="#626ba3" />
         </button>
 
 

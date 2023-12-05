@@ -1,20 +1,10 @@
 import { FunctionComponent, useEffect, useMemo, useState } from "react"
 
-// import Home from '../../app/assets/icons/Home'
-import FileSearch from "../assets/icons/filesearch.svg?react";
-import Lightbulb from "../assets/icons/lightbulb.svg?react";
-import Target from '../assets/icons/target.svg?react';
-import Rocket from "../assets/icons/rocket.svg?react";
-import SearchRefraction from "../assets/icons/search-refraction.svg?react"
-import UserGroup from "../assets/icons/users-01.svg?react"
-import Help from "../assets/icons/help.svg?react";
-// import Gear from "../assets/icons/Gear";
-import Clipboard from '../assets/icons/clipboard.svg?react';
-import Umbrella from '../assets/icons/umbrella.svg?react';
-import MessageCircle from '../assets/icons/message-circle.svg?react'
+
 
 import styles from '../assets/styles/components/simple-list.module.scss'
 import Loading from "./Loading";
+import Icon, { IconVariant } from "./Icon";
 
 
 
@@ -24,26 +14,13 @@ const defaultIconProps = {
   height: 24
 
 }
-const listIcon = {
-  // "home": <Home {...defaultIconProps} />,
-  "file": <FileSearch {...defaultIconProps} />,
-  "lightbulb": <Lightbulb {...defaultIconProps} />,
-  "rocket": <Rocket {...defaultIconProps} />,
-  "help": <Help {...defaultIconProps} />,
-  // "gear": <Gear {...defaultIconProps} />,
-  "target": <Target  {...defaultIconProps} />,
-  "searchRefraction": <SearchRefraction {...defaultIconProps} />,
-  "userGroup": <UserGroup {...defaultIconProps} />,
-  "clipboard": <Clipboard {...defaultIconProps} />,
-  "umbrella": <Umbrella {...defaultIconProps} />,
-  "messageCircle": <MessageCircle {...defaultIconProps} />
-}
+
 
 interface SimpleListProps {
   title: string;
   subtitle?: string;
   items: string[]
-  icon: keyof typeof listIcon
+  icon: keyof typeof IconVariant
   maxLength?: number
   minLength?: number;
   isLoading?: boolean
@@ -80,7 +57,7 @@ const SimpleList: FunctionComponent<SimpleListProps> = ({ title, subtitle, icon,
   return (
     <div className={styles.simpleList}>
       <div className={styles.header}>
-        {listIcon[icon]}
+        <Icon variant={icon} {...defaultIconProps} />
         <span>{title}</span>
 
         {subtitle ?

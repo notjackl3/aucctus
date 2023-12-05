@@ -10,6 +10,9 @@ import ConceptOverview from "./ConceptOverview";
 import ConceptList from "./ConceptList";
 import DomainMarket from "./DomainMarket";
 import CustomerPersonas from "./CustomerPersonas/CustomerPersonas";
+import ChallengeCenter from "./ChallengeCenter";
+import ChallengeWizard from "./ChallengeWizard";
+import ChallengeDetails from "./ChallengeDetails";
 
 const Page = {
   Auth,
@@ -23,10 +26,14 @@ const Page = {
   ConceptOverview,
   CustomerPersonas,
 
-
   IgniteDomain,
   DomainList,
   DomainMarket,
+
+  ChallengeCenter,
+  ChallengeWizard,
+  ChallengeDetails
+
 
 }
 

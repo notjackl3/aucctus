@@ -1,11 +1,6 @@
-import { Component, FunctionComponent } from "react";
+import { Component } from "react";
 import styles from "../assets/styles/pages/generated-concept.module.scss"
 import ConceptTable from "../components/ConceptTable";
-
-
-import DownloadIcon from '../assets/icons/Download'
-import ArrowRight from '../assets/icons/ArrowRight'
-import RefreshIcon from '../assets/icons/refresh.svg?react'
 import { AppPath } from "../../routes/routes";
 import NavigateButton from "../components/NavigateButton";
 import { RootState } from "../store";
@@ -14,6 +9,7 @@ import { Dispatch } from "@reduxjs/toolkit";
 import { setConcepts } from "../../features/concepts/concept.slice";
 import api from "../../libs/api";
 import analytics from "../../libs/analytics";
+import Icon from "../components/Icon";
 
 
 
@@ -50,14 +46,16 @@ class GeneratedConcepts extends Component<Props> {
           </div>
           <div className={styles.actionable}>
             <button className="btn btn-light disabled">
-              <DownloadIcon height={20} width={20} stroke="" />
+              <Icon variant="download" height={20} width={20} />
               Export
             </button>
-            <button className="btn btn-light disabled"><RefreshIcon height={20} width={20} stroke="" /> Generate more</button>
+            <button className="btn btn-light disabled">
+
+              <Icon variant="refresh" height={20} width={20} stroke="" /> Generate more</button>
 
             <NavigateButton variant="primary" route={AppPath.ConceptList} >
               Continue
-              <ArrowRight height={20} width={20} stroke="" />
+              <Icon variant="arrowRight" height={20} width={20} stroke="" />
             </NavigateButton>
           </div>
         </div>

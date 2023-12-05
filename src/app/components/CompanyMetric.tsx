@@ -1,8 +1,15 @@
 import { FunctionComponent } from "react";
-import TargetIcon from '../assets/icons/Target';
 import styles from "../assets/styles/components/company-metric.module.scss";
 import Loading from "./Loading";
+import Icon from "./Icon";
 
+
+const defaultIconProps = {
+  stroke: "#2B3674",
+  width: 24,
+  height: 24
+
+}
 
 interface CompanyMetricProps {
   title: string;
@@ -14,7 +21,7 @@ const CompanyMetric: FunctionComponent<CompanyMetricProps> = ({ title, value, is
   return (
     <div className={styles.companyMetric}>
       <div className={styles.heading}>
-        <TargetIcon width={25} height={24} stroke="#2B3674" />
+        <Icon variant='target' {...defaultIconProps} />
         <span className={styles.title} >{isLoading ? <Loading /> : title}</span>
       </div>
       <div>
