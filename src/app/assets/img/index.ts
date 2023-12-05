@@ -7,6 +7,7 @@ import customerProfile from './customer-profile-blur.png'
 import marketSegment from "./market-segment-blur.png"
 import innovationLifeCycle from './innovation-lifecycle.png'
 import innovationActivity from './inovation-activity.png'
+import challengeCircle from './challenge-circle.png'
 
 const images = {
 
@@ -17,7 +18,8 @@ const images = {
   customerProfile,
   marketSegment,
   innovationLifeCycle,
-  innovationActivity
+  innovationActivity,
+  challengeCircle
 
 }
 

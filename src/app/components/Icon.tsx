@@ -37,6 +37,8 @@ import Currency from "../assets/icons/currencydollar.svg?react";
 import Download from "../assets/icons/download.svg?react";
 import Refresh from '../assets/icons/refresh.svg?react';
 import Calendar from '../assets/icons/calendar.svg?react';
+import Columns from '../assets/icons/columns.svg?react';
+import Announcement from '../assets/icons/announcement.svg?react';
 
 
 export enum IconVariant {
@@ -76,7 +78,9 @@ export enum IconVariant {
   currency,
   download,
   refresh,
-  calendar
+  calendar,
+  columns,
+  announcement
 }
 
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
@@ -162,6 +166,11 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <Refresh {...props} />
     case 'calendar':
       return <Calendar {...props} />
+    case 'columns':
+      return <Columns {...props} />
+    case 'announcement':
+      return <Announcement {...props} />
+
 
   }
 }
