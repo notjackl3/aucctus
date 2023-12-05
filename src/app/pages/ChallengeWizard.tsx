@@ -73,6 +73,7 @@ const ChallengeWizard: FunctionComponent = () => {
           />
 
           <button className="btn btn-primary"
+            disabled={query.isLoading || !title || !description || !pains || !q4 || !endDate}
             onClick={(e) => {
               // query.refetch()
               e.preventDefault()
