@@ -16,6 +16,9 @@ const ChallengeWizard: FunctionComponent = () => {
 
   const query = useQuery({
     queryKey: 'challenge',
+    enabled: false,
+    refetchOnWindowFocus: false,
+    retry: 0,
     queryFn: async () => api.challenge.createChallenge({ title, description, pains, q4, endDate })
 
   })
