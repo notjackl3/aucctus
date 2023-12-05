@@ -1,0 +1,35 @@
+.challengeCenter {
+  display: flex;
+  padding: 2rem 0rem 3rem 0rem;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  flex: 1 0 0;
+  align-self: stretch;
+
+  .header {
+    display: flex;
+    padding: 0rem 2rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    align-self: stretch;
+
+    h1 {
+      color: var(--gray-900-text-primary, #2b3674);
+      font-size: 1.875rem;
+      font-style: normal;
+      font-weight: 700;
+      line-height: 2.375rem; /* 126.667% */
+    }
+  }
+
+  .content {
+    display: flex;
+    padding: 0rem 2rem;
+    flex-direction: column;
+    align-items: center;
+    flex: 1 0 0;
+    align-self: stretch;
+  }
+}

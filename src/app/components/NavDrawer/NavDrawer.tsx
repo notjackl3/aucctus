@@ -104,7 +104,7 @@ const NavDrawer = () => {
                 },
               ]}
             />
-            <NavLink to={AppPath.ChallengeCenter} title="Challenges" icon="rocket" locked />
+            <NavLink to={AppPath.ChallengeCenter} title="Challenges" icon="rocket" />
 
             <NavLink to={AppPath.Home} title="Tests" icon='beaker' locked />
           </div>

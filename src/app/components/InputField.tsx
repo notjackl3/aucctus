@@ -26,7 +26,7 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = ({ la
       </div>
       <input
         {...props}
-        type={isPassword ? 'password' : 'text'}
+        type={isPassword ? 'password' : props.type ? props.type : 'text'}
         ref={ref}
         name={name}
       />

@@ -31,10 +31,16 @@ export const endpoints = {
   conceptCustomerProfile: (id: string, group: string) => `/api/ignite-concept/concept/${id}/customer-profile/${group}`,
 
 
+
   /* Ignite Domain */
   igniteDomain: 'api/ignite-domain',
   domainAll: `api/ignite-domain/domain`,
   domain: (id: string) => `api/ignite-domain/domain/${id}`,
   domainMarket: (id: string) => `api/ignite-domain/domain/market/${id}`,
+
+
+  /* Challenges */
+  challenge: 'api/challenge',
+  challengeSpecific: (id: string) => `api/challenge/${id}`,
 
 }

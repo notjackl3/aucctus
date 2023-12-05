@@ -1,14 +1,25 @@
 import { FunctionComponent } from "react";
 
 
+import ChallengeStarter from "../components/ChallengeStarter";
 
-const Challenges: FunctionComponent = () => {
+import styles from '../assets/styles/pages/challenge-center.module.scss'
+
+const ChallengeCenter: FunctionComponent = () => {
+
+
 
   return (
-    <div>
+    <div className={styles.challengeCenter}>
+      <div className={styles.header}>
+        <h1>Challenge Center</h1>
+      </div>
+      <div className={styles.content}>
+        <ChallengeStarter />
 
+      </div>
     </div>
   )
 }
 
-export default Challenges;
+export default ChallengeCenter;

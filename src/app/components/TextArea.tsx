@@ -1,9 +1,9 @@
-import { ForwardRefRenderFunction, InputHTMLAttributes } from "react";
+import { ForwardRefRenderFunction, TextareaHTMLAttributes } from "react";
 
 import styles from '../assets/styles/components/input-field.module.scss'
 import React from "react";
 
-interface TextAreaProps extends InputHTMLAttributes<HTMLTextAreaElement> {
+interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   name: string;
   error?: boolean;
@@ -25,6 +25,7 @@ const Input: ForwardRefRenderFunction<HTMLTextAreaElement, TextAreaProps> = ({ l
       </div>
       <textarea
         cols={50}
+        rows={4}
         {...props}
         ref={ref}
         name={name}

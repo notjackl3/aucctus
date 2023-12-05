@@ -4,6 +4,8 @@ import { AuthApi } from "./auth";
 import { OrganizationApi } from "./organization";
 import { IgniteConceptApi } from "./igniteConcept";
 import { IgniteDomainApi } from "./igniteDomain";
+import { IChallenge } from "./typings/challenges";
+import { ChallengeApi } from "./challenge";
 
 
 
@@ -28,6 +30,7 @@ export class Api {
   organization: OrganizationApi;
   igniteConcept: IgniteConceptApi;
   igniteDomain: IgniteDomainApi;
+  challenge: ChallengeApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig
@@ -45,6 +48,10 @@ export class Api {
     }))
 
     this.igniteDomain = new IgniteDomainApi(this, this.buildConfig({
+      baseURL: this._config.baseUrl
+    }))
+
+    this.challenge = new ChallengeApi(this, this.buildConfig({
       baseURL: this._config.baseUrl
     }))
   }
