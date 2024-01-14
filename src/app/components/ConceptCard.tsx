@@ -1,6 +1,7 @@
 import { FunctionComponent, ReactNode } from "react";
 
 import styles from '../assets/styles/components/concept-card.module.scss'
+import Icon, { IconVariant } from "./Icon";
 
 interface ConceptCardProps {
   title: string;
@@ -8,12 +9,16 @@ interface ConceptCardProps {
 
   width?: number
   children: ReactNode
+  icon?: keyof typeof IconVariant
+  buttonTitle: string;
+  actionButtonProps?: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>
+
 
 }
 
 
 
-const ConceptCard: FunctionComponent<ConceptCardProps> = ({ title, subtitle, width, children }) => {
+const ConceptCard: FunctionComponent<ConceptCardProps> = ({ title, subtitle, width, children, buttonTitle, icon, actionButtonProps }) => {
 
   return (
     <div className={styles.cardContainer} style={width ? { width } : {}}>
@@ -27,8 +32,10 @@ const ConceptCard: FunctionComponent<ConceptCardProps> = ({ title, subtitle, wid
       <div className={styles.footer}>
         <button
           className="btn btn-light"
+          {...actionButtonProps}
         >
-          Coming Soon
+          {icon ? <Icon variant={icon} /> : null}
+          {buttonTitle}
         </button>
 
       </div>

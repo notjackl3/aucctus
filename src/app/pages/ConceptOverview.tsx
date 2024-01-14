@@ -3,14 +3,16 @@ import styles from "../assets/styles/pages/concept-overview.module.scss"
 import images from "../assets/img";
 import ConceptCard from "../components/ConceptCard";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import api from "../../libs/api";
 import { IConceptOverview, IConceptResponse } from "../../libs/api/typings/ignite-concepts";
 import Loading from "../components/Loading";
+import { AppPath } from "../../routes/routes";
 
 const ConceptOverview: FunctionComponent = () => {
   let { id } = useParams();
+  const navigate = useNavigate()
   const [data, setData] = useState<IConceptOverview | undefined>(undefined)
   const [concept, setConcept] = useState<IConceptResponse | undefined>(undefined)
 
@@ -53,7 +55,7 @@ const ConceptOverview: FunctionComponent = () => {
 
               <div className={styles.supportingText}>
                 <span className={styles.title}>Value Proposition</span>
-                {overviewQuery.isLoading ? <Loading /> : <span>{data?.valueProposition}</span>}
+                {overviewQuery.isLoading ? <Loading /> : <span className={styles.text}>{data?.valueProposition}</span>}
               </div>
 
             </div>
@@ -61,11 +63,11 @@ const ConceptOverview: FunctionComponent = () => {
               <div className={styles.detailContent}>
                 <div className={styles.supportingText}>
                   <span className={styles.title}>Annual Revenue</span>
-                  {overviewQuery.isLoading ? <Loading /> : <span>{data?.annualRevenue || 0}</span>}
+                  {overviewQuery.isLoading ? <Loading /> : <span className={styles.text} data-text={data?.annualRevenue}>{data?.annualRevenue || 0}</span>}
                 </div>
                 <div className={styles.supportingText}>
                   <span className={styles.title}>Total Addressable Market</span>
-                  {overviewQuery.isLoading ? <Loading /> : <span>{data?.totalAddressableMarket || 0}</span>}
+                  {overviewQuery.isLoading ? <Loading /> : <span className={styles.text} data-text={data?.totalAddressableMarket} >{data?.totalAddressableMarket || 0}</span>}
                 </div>
 
               </div>
@@ -73,15 +75,15 @@ const ConceptOverview: FunctionComponent = () => {
               <div className={styles.detailContent}>
                 <div className={styles.supportingText}>
                   <span className={styles.title}>Signals</span>
-                  {overviewQuery.isLoading ? <Loading /> : data?.signals?.slice(0, 3).map((s, i) => <span key={`signal-${i}`}>{s}</span>)}
+                  {overviewQuery.isLoading ? <Loading /> : data?.signals?.slice(0, 3).map((s, i) => <span className={styles.text} data-text={s} key={`signal-${i}`}>{s}</span>)}
                 </div>
                 <div className={styles.supportingText}>
                   <span className={styles.title}>Industries</span>
-                  {overviewQuery.isLoading ? <Loading /> : data?.industries?.slice(0, 3).map((s, i) => <span key={`industries-${i}`}>{s}</span>)}
+                  {overviewQuery.isLoading ? <Loading /> : data?.industries?.slice(0, 3).map((s, i) => <span className={styles.text} data-text={s} key={`industries-${i}`}>{s}</span>)}
                 </div>
                 <div className={styles.supportingText}>
                   <span className={styles.title}>Target User Groups</span>
-                  {overviewQuery.isLoading ? <Loading /> : data?.targetGroups?.slice(0, 3).map((s, i) => <span key={`target-user-group-${i}`}>{s}</span>)}
+                  {overviewQuery.isLoading ? <Loading /> : data?.targetGroups?.slice(0, 3).map((s, i) => <span className={styles.text} data-text={s} key={`target-user-group-${i}`}>{s}</span>)}
                 </div>
               </div>
             </div>
@@ -94,6 +96,11 @@ const ConceptOverview: FunctionComponent = () => {
           title="Concept Score"
           subtitle="This concept is in the top percentile."
           width={360}
+          buttonTitle="Coming Soon"
+          actionButtonProps={{
+            disabled: true,
+            "aria-disabled": true
+          }}
         >
           <div className={styles.cardContentWrapper}>
             <div style={{ height: 232 }}>
@@ -127,6 +134,11 @@ const ConceptOverview: FunctionComponent = () => {
           title="Financial Projection"
           subtitle="Breakdown of business model canvas and hypotheses to validate."
           width={360}
+          buttonTitle="Coming Soon"
+          actionButtonProps={{
+            disabled: true,
+            "aria-disabled": true
+          }}
         >
           <img
             alt="Financial Projection"
@@ -138,12 +150,32 @@ const ConceptOverview: FunctionComponent = () => {
           title="Customer Profiles"
           subtitle="Breakdown of target user pain points and jobs to be done."
           width={360}
+          buttonTitle="View Details"
+          icon="userGroup"
+          actionButtonProps={{
+            disabled: !id,
+            onClick: () => {
+              if (!id) return
+              navigate(AppPath.ConceptCustomerPersona.replace(':id', id))
+            }
+          }}
         >
-          <img
-            alt="Customer Profile"
-            src={images.customerProfile}
-          />
+          <div className={styles.cardContentWrapper}>
 
+            <img
+              alt="Customer Profile"
+              src={images.customerProfile}
+            />
+
+            <div className={styles.cardContent}>
+              <span className={styles.title}>Mostly Millennial and Hip profiles</span>
+              <span className={styles.text}>
+                The MVP has been targeted towards the millennials that spends the most time abroad
+              </span>
+
+            </div>
+
+          </div>
 
         </ConceptCard>
 

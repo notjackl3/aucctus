@@ -1,9 +1,7 @@
 import { FunctionComponent } from "react";
 import Card from "./Card";
 import images from "../assets/img";
-import styles from '../assets/styles/components/innovation-activity-lifecycle.module.scss'
-import Icon from "./Icon";
-
+import styles from '../assets/styles/components/innovation-activity-lifecycle.module.scss';
 
 interface InnovationLifecycleProps { }
 
@@ -26,7 +24,7 @@ const InnovationLifecycle: FunctionComponent<InnovationLifecycleProps> = () => {
 
         <div className="comingSoon">
           <div className="comingSoonWrapper">
-            <div className="comingSoonText"><Icon variant="threeStars" stroke="#626BA3" />Premium Feature</div>
+            <div className="comingSoonText">Coming Soon</div>
           </div>
         </div>
       </div>

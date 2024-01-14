@@ -17,7 +17,9 @@
   }
 
   .content {
+    position: relative;
     display: flex;
+    justify-content: center;
     flex-direction: row;
     flex-wrap: wrap;
     align-items: flex-start;

@@ -32,7 +32,7 @@ const InnovationActivity: FunctionComponent<InnovationActivityProps> = () => {
 
         <div className="comingSoon">
           <div className="comingSoonWrapper">
-            <div className="comingSoonText"><Icon variant='threeStars' stroke="#626BA3" />Premium Feature</div>
+            <div className="comingSoonText">Coming Soon</div>
           </div>
         </div>
       </div>

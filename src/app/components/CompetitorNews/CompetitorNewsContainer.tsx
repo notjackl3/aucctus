@@ -8,25 +8,27 @@ import { IArticle } from '../../../libs/api/typings/organization';
 
 
 import styles from '../../assets/styles/components/dashboard-insights.module.scss'
+import images from "../../assets/img";
 
 const CompetitorNewsContainer: FunctionComponent = () => {
   const [error, setError] = useState<string | undefined>(undefined)
   const [data, setData] = useState<IArticle[]>([])
 
-  const query = useQuery({
-    queryKey: 'competitorNew',
-    retry: 0,
-    queryFn: async () => await api.organization.getCompetitorNews(),
-    onError: (error) => {
-      setError("Oops something when wrong")
-    },
-    onSuccess: (data) => {
-      if (error) {
-        setError(undefined)
-      }
-      setData(data)
-    }
-  })
+  // Temp Disable
+  // const query = useQuery({
+  //   queryKey: 'competitorNew',
+  //   retry: 0,
+  //   queryFn: async () => await api.organization.getCompetitorNews(),
+  //   onError: (error) => {
+  //     setError("Oops something when wrong")
+  //   },
+  //   onSuccess: (data) => {
+  //     if (error) {
+  //       setError(undefined)
+  //     }
+  //     setData(data)
+  //   }
+  // })
 
 
   return (
@@ -35,7 +37,15 @@ const CompetitorNewsContainer: FunctionComponent = () => {
         Competitor News
       </h2>
       <div className={styles.content} >
-        {query.isLoading ?
+        <img src={images.competitorNewsBlur} alt={""} />
+
+        <div className="comingSoon">
+          <div className="comingSoonWrapper">
+            <div className="comingSoonText">Coming Soon</div>
+          </div>
+        </div>
+
+        {/* {query.isLoading ?
 
           <Loading />
           :
@@ -46,7 +56,7 @@ const CompetitorNewsContainer: FunctionComponent = () => {
             source={content.url}
             image={content.urlToImage}
           />)
-        }
+        } */}
 
       </div >
     </div>
