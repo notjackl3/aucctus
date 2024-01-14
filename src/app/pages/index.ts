@@ -13,6 +13,8 @@ import CustomerPersonas from "./CustomerPersonas/CustomerPersonas";
 import ChallengeCenter from "./ChallengeCenter";
 import ChallengeWizard from "./ChallengeWizard";
 import ChallengeDetails from "./ChallengeDetails";
+import IdeaOverview from "./IdeaOverview";
+import IdeaSubmission from "./IdeaSubmission";
 
 const Page = {
   Auth,
@@ -32,8 +34,10 @@ const Page = {
 
   ChallengeCenter,
   ChallengeWizard,
-  ChallengeDetails
+  ChallengeDetails,
 
+  IdeaOverview,
+  IdeaSubmission,
 
 }
 

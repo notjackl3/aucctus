@@ -14,3 +14,20 @@ export interface IChallengeResponse extends IChallenge {
   createdAt: Date;
   updatedAt: Date;
 }
+
+export interface IChallengeMetrics {
+  totalIdeas: number;
+  uniqueUsers: number;
+}
+
+export interface IChallengeIdea {
+  title: string;
+  description: string;
+}
+
+export interface IChallengeIdeaResponse extends IChallengeIdea {
+  id: string;
+  userId: string
+  createdAt: Date;
+  updatedAt: Date;
+}

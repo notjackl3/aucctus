@@ -42,5 +42,10 @@ export const endpoints = {
   /* Challenges */
   challenge: 'api/challenge',
   challengeSpecific: (id: string) => `api/challenge/${id}`,
+  challengeMetrics: (id: string) => `api/challenge/${id}/metrics`,
+
+  /* Ideas */
+  idea: (challengeId: string) => `api/challenge/${challengeId}/idea`,
+  ideaSpecific: (id: string) => `api/challenge/idea/${id}`,
 
 }
