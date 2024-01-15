@@ -64,6 +64,8 @@
     align-self: stretch;
     height: fit-content;
 
+    max-width: calc(100vw - 3rem - var(--nav-drawer-width));
+
     flex-wrap: wrap;
 
     .container {
