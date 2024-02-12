@@ -44,7 +44,6 @@ const IdeaSubmission: FunctionComponent = () => {
       </div>
       <div className={styles.content}>
 
-
       </div>
 
     </div>

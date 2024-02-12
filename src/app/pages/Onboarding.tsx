@@ -7,26 +7,19 @@ import styles from "../assets/styles/pages/auth-screens.module.scss"
 import { useAppDispatch } from "../hooks";
 import InputField from "../components/InputField";
 import { validDomain } from "../../libs/utils";
-import { registerOrganization, selectAuthStatus, selectOrganization } from "../../features/auth/auth.slice";
+import { registerAccount, selectAuthStatus, selectAccount, selectUser } from "../../features/auth/auth.slice";
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 import { AppPath } from "../../routes/routes";
 
 
 const OnBoarding: FunctionComponent = () => {
-  const organization = useSelector(selectOrganization)
+  const user = useSelector(selectUser)!
   const dispatch = useAppDispatch()
   const [name, setName] = useState<string>("")
   const [domain, setDomain] = useState<string>("")
-  const [industry, setIndustry] = useState<string>("")
-  const [goal, setGoal] = useState<string>("")
-  const [competitors, setCompetitors] = useState<string>("")
-  const [kpis, setKPIs] = useState<string>("")
   const status = useSelector(selectAuthStatus)
 
-  // For displaying listed items 
-  const [kpisList, setKPISList] = useState<string>("")
-  const [competitorsList, setCompetitorsList] = useState<string>("")
 
   const [domainInputError, setDomainInputError] = useState<string | undefined>()
   const [error, setError] = useState<string | undefined>() //TODO: error handling
@@ -53,29 +46,12 @@ const OnBoarding: FunctionComponent = () => {
 
   }, [domain])
 
-  const _handleCompetitorChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setCompetitors(value)
-    setCompetitorsList(splitListedItems(value))
-  }
-
-  const _handleKPIChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setKPIs(value)
-    setKPISList(splitListedItems(value))
-  }
-
-  const splitListedItems = (items: string) => {
-    const list = items.split(',').slice(0, -1)
-    return list.join(" \u2022\ ")
-  }
-
   const _handleRegistration = () => {
-    dispatch(registerOrganization({ name, domain, industry, goal, competitors, kpis }))
+    dispatch(registerAccount({ name, domain }))
   }
 
 
-  if (organization) {
+  if (user.account) {
     return <Navigate to={AppPath.Home} />
   }
 
@@ -94,70 +70,29 @@ const OnBoarding: FunctionComponent = () => {
             {error}
           </div>}
           <div className={styles.basicForm}>
-
-            <div className={styles.inputGroup}>
-              <InputField
-                name={"companyName"}
-                label={"Company Name"}
-                value={name}
-                placeholder="Acme Widgets Corp."
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-              />
-              <InputField
-                name={"companyUrl"}
-                label={"Company Url"}
-                error={!!domainInputError}
-                errorMessage={domainInputError}
-                value={domain}
-                placeholder="www.acmewidgetscorp.com"
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDomain(e.target.value)}
-                onFocus={() => setDomainInputError(undefined)}
-                onBlur={_handleDomainValidation}
-              />
-
-            </div>
             <InputField
-              name={"industry"}
-              label={"Primary Industry"}
-              value={industry}
-              placeholder=""
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setIndustry(e.target.value)}
+              name={"companyName"}
+              label={"Company Name"}
+              value={name}
+              placeholder="Acme Widgets Corp."
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
             />
             <InputField
-              name={"goal"}
-              label={"What is your organization looking to achieve through innovation?"}
-              value={goal}
-              placeholder="Expand into new industries."
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGoal(e.target.value)}
+              name={"companyUrl"}
+              label={"Company Url"}
+              error={!!domainInputError}
+              errorMessage={domainInputError}
+              value={domain}
+              placeholder="www.acmewidgetscorp.com"
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDomain(e.target.value)}
+              onFocus={() => setDomainInputError(undefined)}
+              onBlur={_handleDomainValidation}
             />
-
-            <InputField
-              name={"competitors"}
-              label={"Who are your main competitors?"}
-              placeholder="Treehouse Corp, Pug River Corporation, etc."
-              value={competitors}
-              hint={!competitorsList ? "Separate each with a comma" : competitorsList}
-              onChange={_handleCompetitorChange}
-              onBlur={(e) => setCompetitorsList(competitors.split(',').join(" \u2022\ "))}
-
-            />
-
-            <InputField
-              name={"kvps"}
-              label={"What are key KPI’s driving your innovation team?"}
-              placeholder="12-month revenue, products in market, etc"
-              value={kpis}
-              hint={!kpisList ? "Separate each with a comma" : kpisList}
-              onChange={_handleKPIChange}
-              onBlur={(e) => setKPISList(kpis.split(',').join(" \u2022\ "))}
-
-            />
-
             <button
               type="button"
               className="btn btn-primary"
               onClick={_handleRegistration}
-              disabled={!name || !domain || !industry || !goal || !competitors || !kpis || !!domainInputError || status === 'loading'}
+              disabled={!name || !domain || !!domainInputError || status === 'loading'}
             >Complete</button>
           </div>
         </div>

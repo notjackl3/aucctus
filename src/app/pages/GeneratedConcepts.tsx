@@ -23,7 +23,7 @@ class GeneratedConcepts extends Component<Props> {
     try {
       const igniteId = this.props.igniteId;
       if (igniteId) {
-        await api.igniteConcept.deleteAllUnsavedGeneratedConcept(igniteId)
+        // await api.igniteConcept.deleteAllUnsavedGeneratedConcept(igniteId)
       }
     } catch (e) {
       analytics.debug(e)

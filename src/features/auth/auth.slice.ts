@@ -3,16 +3,15 @@ import { Credentials, SignupDetails } from "./interfaces/user.interface";
 import api from '../../libs/api'
 import { RootState } from "../../app/store";
 import analytics from "../../libs/analytics";
-import { IAuthSuccessResponse, IUser } from "../../libs/api/typings";
+import { IAccount, IAuthSuccessResponse, IRegisterAccount, IUser } from "../../libs/api/typings";
 import { AxiosError, isAxiosError } from "axios";
-import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
-import { IOrganization, IRegisterOrganization } from "../../libs/api/typings/organization";
+import { IFormDetailsError } from "../../libs/api/typings/avxisi";
 
 export interface AuthState {
   status: "idle" | "loading" | "failed"
   user?: IUser;
+  account?: IAccount;
   accessToken?: string;
-  organization?: IOrganization;
   error?: string;
 
 }
@@ -23,27 +22,26 @@ const initialState: AuthState = {
   error: ""
 }
 
-
-
 const isAPIAuthSuccessResponse = (action: PayloadAction<unknown>): action is PayloadAction<IAuthSuccessResponse> => {
   const payload = action.payload as IAuthSuccessResponse
-  return payload && !!payload.user && !!payload.accessToken
+  return payload && !!payload.user && !!payload.token
 }
 
-const isApiErrorResult = (action: PayloadAction<unknown>): action is PayloadAction<AxiosError<INestJSErrorResponse>> => {
-  const payload = action.payload as AxiosError<INestJSErrorResponse>
-  return payload && isAxiosError<INestJSErrorResponse>(payload)
+// TODO: Fix this error type
+const isApiErrorResult = (action: PayloadAction<unknown>): action is PayloadAction<AxiosError<IFormDetailsError>> => {
+  const payload = action.payload as AxiosError<IFormDetailsError>
+  return payload && isAxiosError<IFormDetailsError>(payload)
 }
 
-/** Sign In
+/** Login
  * 
  */
-export const signIn = createAsyncThunk(
-  "auth/signIn",
+export const login = createAsyncThunk(
+  "auth/login",
   async (credentials: Credentials, thunkApi) => {
     try {
       const { email, password } = credentials
-      return await api.auth.signIn(email, password)
+      return await api.auth.login(email, password)
     } catch (e) {
       analytics.debug(e)
       thunkApi.rejectWithValue(e)
@@ -58,8 +56,8 @@ export const signUp = createAsyncThunk(
   "auth/signUp",
   async (details: SignupDetails, thunkApi) => {
     try {
-      const { name, email, password, confirmPassword } = details
-      return await api.auth.signup(name, email, password, confirmPassword)
+      const { firstName, lastName, email, password, confirmPassword } = details
+      return await api.auth.signup(firstName, lastName, email, password, confirmPassword)
     } catch (e) {
       analytics.debug(e)
       thunkApi.rejectWithValue(e)
@@ -81,12 +79,12 @@ export const refreshAuth = createAsyncThunk(
 )
 
 
-export const registerOrganization = createAsyncThunk(
-  "auth/registerOrganization",
-  async (organization: IRegisterOrganization, thunkApi) => {
+export const registerAccount = createAsyncThunk(
+  "auth/registerAccount",
+  async (account: IRegisterAccount, thunkApi) => {
     analytics.debug('Register Organization')
     try {
-      const response = await api.auth.registerOrganization(organization)
+      const response = await api.account.createAccount(account)
       return response
     } catch (e) {
       analytics.debug(e)
@@ -129,39 +127,35 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     setAuthenticated(state, action: PayloadAction<IAuthSuccessResponse>) {
-      state.user = action.payload.user
-      state.organization = action.payload.organization
-      state.accessToken = action.payload.accessToken
-      api.accessToken = action.payload.accessToken
+      const { user, token } = action.payload
+      state.user = user
+      state.accessToken = token
+      api.accessToken = token
     },
     setUnauthenticated(state) {
       state.user = undefined
-      state.organization = undefined
+      state.account = undefined
       state.accessToken = undefined
       api.accessToken = undefined
     },
-    setOrganization(state, action: PayloadAction<IOrganization>) {
-      state.organization = action.payload
+    setAccount(state, action: PayloadAction<IAccount>) {
+      state.account = action.payload
+      if (state.user && !state.user.account) {
+        state.user = { ...state.user, account: action.payload.uuid }
+      }
+
     }
 
   },
   extraReducers: (builder) => {
     builder
-      .addCase(logout.fulfilled, (state) => {
-        state.user = undefined;
-        state.organization = undefined
-        state.accessToken = undefined
-        api.accessToken = undefined
-      })
-      .addCase(logout.rejected, (state) => {
-        state.user = undefined;
-        state.organization = undefined
-        state.accessToken = undefined
-        api.accessToken = undefined
-      })
-      .addCase(registerOrganization.fulfilled, (state, action) => {
+      .addCase(registerAccount.fulfilled, (state, action) => {
         analytics.debug(action.payload)
-        state.organization = action.payload?.organization
+        state.account = action.payload
+        if (state.user && !state.user.account && action.payload) {
+          state.user = { ...state.user, account: action.payload.uuid }
+        }
+
       })
       .addMatcher(isFulfilled, (state, action) => {
         state.status = 'idle'
@@ -174,19 +168,18 @@ export const authSlice = createSlice({
       })
       .addMatcher(
         isAnyOf(isAPIAuthSuccessResponse), (state, action) => {
+          const { user, token } = action.payload
           analytics.debug(action.type)
-          state.user = action.payload.user
-          state.organization = action.payload.organization
-          state.accessToken = action.payload.accessToken
-          // TODO: Add api interceptor to grab this
-          api.accessToken = action.payload.accessToken
+          state.user = user
+          state.accessToken = token
+          api.accessToken = token
         }
       ).addMatcher(
         isAnyOf(isApiErrorResult), (state, action) => {
           const error = action.payload
           if (error.response && error.response.status === 401) {
             state.user = undefined
-            state.organization = undefined
+            state.account = undefined
             state.accessToken = undefined
             api.accessToken = undefined
           }
@@ -195,18 +188,22 @@ export const authSlice = createSlice({
             state.error = error.message
           }
         }
-      )
+      ).addMatcher(isAnyOf(logout.rejected, logout.fulfilled), (state, action) => {
+        state.user = undefined;
+        state.account = undefined
+        state.accessToken = undefined
+        api.accessToken = undefined
+      })
   }
 })
 
 
-export const { setAuthenticated, setUnauthenticated, setOrganization } = authSlice.actions
+export const { setAuthenticated, setUnauthenticated, setAccount } = authSlice.actions
 
 export const selectUser = (state: RootState) => state.auth.user;
-export const selectOrganization = (state: RootState) => state.auth.organization
+export const selectAccount = (state: RootState) => state.auth.account;
 export const selectError = (state: RootState) => state.auth.error
 export const selectAccessToken = (state: RootState) => state.auth.accessToken
 export const selectAuthStatus = (state: RootState) => state.auth.status
-
 
 export default authSlice.reducer

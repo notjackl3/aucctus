@@ -1,11 +1,9 @@
 import { HeadersDefaults } from "axios";
 import { IApiServiceConfig } from "./apiService";
 import { AuthApi } from "./auth";
-import { OrganizationApi } from "./organization";
-import { IgniteConceptApi } from "./igniteConcept";
-import { IgniteDomainApi } from "./igniteDomain";
-import { IChallenge } from "./typings/challenges";
-import { ChallengeApi } from "./challenge";
+import { AccountApi } from "./account";
+import analytics from "../analytics";
+
 
 
 
@@ -24,13 +22,10 @@ export interface IApiConfig {
 export class Api {
   private _config: IApiConfig
 
-  accessToken?: string;
+  _accessToken?: string;
 
   auth: AuthApi
-  organization: OrganizationApi;
-  igniteConcept: IgniteConceptApi;
-  igniteDomain: IgniteDomainApi;
-  challenge: ChallengeApi;
+  account: AccountApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig
@@ -39,21 +34,28 @@ export class Api {
       baseURL: this._config.baseUrl,
     }))
 
-    this.organization = new OrganizationApi(this, this.buildConfig({
+    this.account = new AccountApi(this, this.buildConfig({
       baseURL: this._config.baseUrl,
     }))
+  }
 
-    this.igniteConcept = new IgniteConceptApi(this, this.buildConfig({
-      baseURL: this._config.baseUrl,
-    }))
 
-    this.igniteDomain = new IgniteDomainApi(this, this.buildConfig({
-      baseURL: this._config.baseUrl
-    }))
+  get accessToken() {
+    return this._accessToken
+  }
 
-    this.challenge = new ChallengeApi(this, this.buildConfig({
-      baseURL: this._config.baseUrl
-    }))
+  set accessToken(token: string | undefined) {
+    // Update all pointing to the resource server with the new tokens
+    // By default however,  the access token and refresh token are set to the httpOnly cookies
+    // This is simply just an extra layer.
+
+    [this.account].forEach(api => {
+      api.updateConfigHeaders({ Authorization: `Bearer ${token}` })
+      api.config.headers = Object.assign({}, api.config.headers, { Authorization: `Bearer ${token}` })
+      console.log(api.config.headers, 'api.config.headers')
+    })
+    analytics.debug('Setting Access Token')
+    this._accessToken = token
   }
 
   buildConfig(config: IApiServiceConfig): IApiServiceConfig {
@@ -65,6 +67,10 @@ export class Api {
       debug: this._config.debug
     })
   }
+
+
+
+
 }
 
 export default Api

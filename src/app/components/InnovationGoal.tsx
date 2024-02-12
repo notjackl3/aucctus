@@ -5,7 +5,6 @@ import { useQuery } from "react-query";
 import api from "../../libs/api";
 import Loading from "./Loading";
 import { isAxiosError } from "axios";
-import { INestJSErrorResponse } from "../../libs/api/typings/avxisi";
 import { useAppDispatch } from "../hooks";
 
 
@@ -17,30 +16,34 @@ const InnovationGoal: FunctionComponent = () => {
   const [goal, setGoal] = useState<string>("")
   const [error, setError] = useState<string | undefined>()
 
-  const query = useQuery({
-    queryKey: 'innovationGoal',
-    retry: 2,
-    queryFn: async () => await api.organization.getInnovationGoal(),
+  // TEMP 
+  const isLoading = true;
 
-    onError: (err) => {
-      if (isAxiosError<INestJSErrorResponse>(err)) {
-        if (err.response && err.response.data.statusCode >= 401) {
-          dispatch(logout())
-        }
-      }
-    },
-    onSuccess: (data) => {
-      if (error !== undefined) setError(undefined)
-      setGoal(data)
-    }
-  })
+  // const query = useQuery({
+  //   queryKey: 'innovationGoal',
+  //   retry: 2,
+  //   queryFn: async () => await api.organization.getInnovationGoal(),
+
+  //   onError: (err) => {
+  //     if (isAxiosError<INestJSErrorResponse>(err)) {
+  //       if (err.response && err.response.data.statusCode >= 401) {
+  //         dispatch(logout())
+  //       }
+  //     }
+  //   },
+  //   onSuccess: (data) => {
+  //     if (error !== undefined) setError(undefined)
+  //     setGoal(data)
+  //   }
+  // })
 
   return (
     <div className={styles.companyGoal}>
       <h3>Innovation Goal</h3>
 
       {
-        query.isLoading ?
+        // query.isLoading ?
+        isLoading ?
           // TODO Style Loading
           <Loading />
 

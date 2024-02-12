@@ -1,11 +1,11 @@
 import ConfirmEmail from "./ConfirmEmail";
 import ForgotPassword from "./ForgotPassword";
-import SignIn from "./SignIn";
+import Login from "./Login";
 import SignUp from "./SignUp";
 import SignUpSuccess from "./SignUpSuccess";
 
 const Auth = {
-  SignIn,
+  Login,
   SignUp,
   ForgotPassword,
   ConfirmEmail,

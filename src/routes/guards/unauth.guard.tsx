@@ -7,8 +7,6 @@ import AuthHeader from '../../app/components/AuthHeader';
 import IntoSection from '../../app/components/IntoSection';
 import { useSelector } from 'react-redux';
 import { AppPath } from '../routes';
-import OnboardingIntoSection from '../../app/components/OnboardingIntroSection';
-
 
 const UnauthGuard: FunctionComponent = () => {
   const location = useLocation()

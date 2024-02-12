@@ -1,51 +1,21 @@
 
 export const endpoints = {
   /* Auth */
-  SignIn: '/api/auth/sign-in',
-  Signup: "/api/auth/sign-up",
-  Logout: "/api/auth/logout",
-  Refresh: '/api/auth/refresh-access',
-  Me: '/api/auth/me',
-  Delete: "/api/users",
-  GetUser: (id: string) => `/api/users/${id}`,
-  confirmEmail: (token: string) => `/api/auth/confirm-email?token=${token}`,
+  login: '/api/v1/login',
+  signup: "/api/v1/sign-up",
+  logout: "/api/v1/logout",
+  refresh: '/api/v1/token/refresh',
 
-  /* Organization */
-  organization: `/api/organization`,
-  registerOrganization: 'api/organization/register',
-  organizationKpi: '/api/organization/kpi',
-  organizationInnovationGoal: '/api/organization/innovation-goal',
-  organizationCompetitors: '/api/organization/competitors',
+  user: '/api/v1/user',
+  confirmEmail: `/api/v1/confirm-email`,
+  forgotPassword: (email?: string) => email ? `/api/v1/forgot-password` : `/api/v1/forgot-password?email=${email}`,
 
-  competitorNews: '/api/competitor-news',
+
+  /* Account */
+  account: `/api/v1/account`,
 
   /* Ignite Concepts */
-  igniteConcept: 'api/ignite-concept',
-  specificIgniteConcept: (id: string) => `api/ignite-concept/${id}`,
-  concept: 'api/ignite-concept/concept',
-  specificConcept: (id: string) => `api/ignite-concept/concept/${id}`,
-  saveSpecificConcept: (id: string) => `api/ignite-concept/concept/save/${id}`,
-  deleteUnsavedConcepts: (igniteId: string) => `api/ignite-concept/unsaved/${igniteId}`,
-  conceptOverview: (id: string) => `/api/ignite-concept/concept/overview/${id}`,
-  conceptTargetGroups: (id: string) => `/api/ignite-concept/concept/${id}/target-group`,
-  conceptCustomerProfile: (id: string, group: string) => `/api/ignite-concept/concept/${id}/customer-profile/${group}`,
-
-
-
-  /* Ignite Domain */
-  igniteDomain: 'api/ignite-domain',
-  domainAll: `api/ignite-domain/domain`,
-  domain: (id: string) => `api/ignite-domain/domain/${id}`,
-  domainMarket: (id: string) => `api/ignite-domain/domain/market/${id}`,
-
-
-  /* Challenges */
-  challenge: 'api/challenge',
-  challengeSpecific: (id: string) => `api/challenge/${id}`,
-  challengeMetrics: (id: string) => `api/challenge/${id}/metrics`,
-
-  /* Ideas */
-  idea: (challengeId: string) => `api/challenge/${challengeId}/idea`,
-  ideaSpecific: (id: string) => `api/challenge/idea/${id}`,
+  igniteConcept: 'api/v1/concept/generate',
+  concept: 'api/v1/concept',
 
 }

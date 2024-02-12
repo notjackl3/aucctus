@@ -1,7 +1,7 @@
 import { FunctionComponent } from "react";
 import DashboardHeader from "../components/DashbaordHeader";
 import { useSelector } from "react-redux";
-import { selectOrganization } from "../../features/auth/auth.slice";
+import { selectAccount } from "../../features/auth/auth.slice";
 import IgniteBox from "../components/IgniteBox";
 import { AppPath } from "../../routes/routes";
 
@@ -13,13 +13,13 @@ import InnovationActivity from "../components/InnovationActivity";
 import InnovationLifecycle from "../components/InnovationLifecycle";
 
 const Dashboard: FunctionComponent = () => {
-  const organization = useSelector(selectOrganization)!
+  const { name: accountName } = useSelector(selectAccount) || { name: "" }
 
 
   return (
     <div className={styles.dashboard} >
-      <DashboardHeader title={organization.name} supportingText="The latest domain reports as they relate to your business." />
-      <section className={`${styles.companyInsights}`}>
+      <DashboardHeader title={accountName || ''} supportingText="The latest domain reports as they relate to your business." />
+      {/* <section className={`${styles.companyInsights}`}>
         <InnovationGoal />
 
         <div className={`${styles.container}  ${styles.companyMetrics}`}>
@@ -37,7 +37,7 @@ const Dashboard: FunctionComponent = () => {
       <section className="">
         <InnovationActivity />
         <InnovationLifecycle />
-      </section>
+      </section> */}
     </div >
   )
 }

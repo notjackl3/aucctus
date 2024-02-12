@@ -1,18 +1,14 @@
 import { Api } from "./api";
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders, AxiosResponse, AxiosError, InternalAxiosRequestConfig } from 'axios'
 import "abort-controller/polyfill"
-import { INestJSErrorResponse } from "./typings/avxisi";
 import analytics from "../analytics";
 import { IAuthSuccessResponse } from "./typings";
 
 
 
-
-
 export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {
-  return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).accessToken
+  return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).token
 }
-
 
 
 export interface IApiServiceConfig {
@@ -50,6 +46,7 @@ export class ApiService {
 
   private _requestMiddleware(config: InternalAxiosRequestConfig) {
     Object.assign(config.headers || {}, this.config.headers)
+    console.log(config, 'config')
     return config
   }
 
@@ -57,7 +54,7 @@ export class ApiService {
   private _responseMiddleware(response: AxiosResponse) {
     if (this.config.debug) {
       const method = response.config.method ? `[${response.config.method.toUpperCase()}]` : ''
-      console.log(`Api Call: ${method} ${response.config.baseURL + this.api.getUri(response.config)}`, response)
+      analytics.debug(`Api Call: ${method} ${response.config.baseURL + this.api.getUri(response.config)}`, response)
     }
     return response
   }
@@ -71,7 +68,7 @@ export class ApiService {
 
       if (axios.isAxiosError(error)) {
         const method = error.config && error.config.method ? `[${error.config.method.toUpperCase()}]` : ''
-        console.error(`Api Error: ${method} ${error.name}`, error)
+        analytics.error(`Api Error: ${method} ${error.name}`, error)
       }
     }
     return Promise.reject(error)
@@ -82,6 +79,10 @@ export class ApiService {
     const config = Object.assign({ headers: {} }, this.config)
     config.headers.Authorization = `Bearer ${accessToken}`
     return config
+  }
+
+  updateConfigHeaders(headers: Partial<AxiosRequestHeaders>) {
+    this.config.headers = Object.assign(this.config.headers || {}, headers) as AxiosRequestHeaders
   }
 
   /** Get
@@ -95,7 +96,6 @@ export class ApiService {
       const response: AxiosResponse<T> = await this.api.get(url, config);
       return response.data
     } catch (error) {
-      analytics.debug(JSON.stringify(error))
       throw error
     }
   }
@@ -127,7 +127,6 @@ export class ApiService {
       const response: AxiosResponse<T> = await this.api.post(url, data, config);
       return response.data
     } catch (error) {
-      analytics.debug(JSON.stringify(error))
       throw error
     }
   }
@@ -138,7 +137,6 @@ export class ApiService {
       const response: AxiosResponse<T> = await this.api.delete(url, config);
       return response.data
     } catch (error) {
-      analytics.debug(JSON.stringify(error))
       throw error
     }
   }
@@ -148,7 +146,6 @@ export class ApiService {
       const response: AxiosResponse<T> = await this.api.put(url, data, config);
       return response.data
     } catch (error) {
-      analytics.debug(JSON.stringify(error))
       throw error
     }
   }
@@ -158,7 +155,6 @@ export class ApiService {
       const response: AxiosResponse<T> = await this.api.patch(url, data, config);
       return response.data
     } catch (error) {
-      analytics.debug(JSON.stringify(error))
       throw error
     }
   }

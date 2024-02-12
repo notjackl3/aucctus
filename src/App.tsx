@@ -27,25 +27,25 @@ function App() {
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
               <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
               <Route path={AppPath.ConceptList} element={<Page.ConceptList />} />
-              <Route path={AppPath.ConceptOverview} element={<Page.ConceptOverview />} />
-              <Route path={AppPath.ConceptCustomerPersona} element={<Page.CustomerPersonas />} />
+              {/* <Route path={AppPath.ConceptOverview} element={<Page.ConceptOverview />} /> */}
+              {/* <Route path={AppPath.ConceptCustomerPersona} element={<Page.CustomerPersonas />} /> */}
 
               {/* Domains */}
-              <Route path={AppPath.IgniteDomain} element={<Page.IgniteDomain />} />
+              {/* <Route path={AppPath.IgniteDomain} element={<Page.IgniteDomain />} />
               <Route path={AppPath.DomainList} element={<Page.DomainList />} />
-              <Route path={AppPath.DomainMarket} element={<Page.DomainMarket />} />
+              <Route path={AppPath.DomainMarket} element={<Page.DomainMarket />} /> */}
 
               {/* Challenges */}
-              <Route path={AppPath.ChallengeCenter} element={<Page.ChallengeCenter />} />
+              {/* <Route path={AppPath.ChallengeCenter} element={<Page.ChallengeCenter />} />
               <Route path={AppPath.ChallengeWizard} element={<Page.ChallengeWizard />} />
-              <Route path={AppPath.ChallengeDetails} element={<Page.ChallengeDetails />} />
+              <Route path={AppPath.ChallengeDetails} element={<Page.ChallengeDetails />} /> */}
 
             </Route>
           </Route>
 
           {/* Auth Routes  */}
           <Route element={<UnauthGuard />} >
-            <Route index path={AppPath.SignIn} element={<Page.Auth.SignIn />} />
+            <Route index path={AppPath.SignIn} element={<Page.Auth.Login />} />
             <Route path={AppPath.SignUp} element={<Page.Auth.SignUp />} />
             <Route path={AppPath.ForgotPassword} element={<Page.Auth.ForgotPassword />} />
             <Route path={AppPath.SignUpSuccess} element={<Page.Auth.SignUpSuccess />} />

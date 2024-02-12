@@ -33,14 +33,14 @@ const IntoSection: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.screenMockupWrapper}>
-        <div className={styles.screenMockup}>
-          <div className={styles.mockupShadow} />
-          <img
-            className={styles.screenMockupReplaceFill}
-            alt="Aucctus"
-            src={images.screenMockup}
-          />
-        </div>
+        {/* <div className={styles.screenMockup}> */}
+
+        <img
+          className={styles.screenMockup}
+          alt="Aucctus"
+          src={images.screenMockup}
+        />
+        {/* </div> */}
       </div>
     </div>
   );

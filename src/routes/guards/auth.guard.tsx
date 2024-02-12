@@ -1,7 +1,7 @@
-import React, { FunctionComponent, useEffect } from 'react';
+import React, { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
-import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { selectAccessToken, selectUser } from '../../features/auth/auth.slice';
+import { Navigate, Outlet } from 'react-router-dom';
+import { selectAccessToken } from '../../features/auth/auth.slice';
 import { AppPath } from '../routes';
 
 

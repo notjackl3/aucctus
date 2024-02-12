@@ -8,7 +8,6 @@ export interface IChallenge {
 
 }
 
-
 export interface IChallengeResponse extends IChallenge {
   id: string;
   createdAt: Date;

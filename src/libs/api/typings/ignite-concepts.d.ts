@@ -33,7 +33,6 @@ export interface IIgniteConceptSuccessResponse {
 
 export interface IConceptResponse extends IConcepts {
   id: string;
-  igniteConceptId: string;
   isSaved: boolean;
   updatedAt: string;
   createdAt: string;

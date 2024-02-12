@@ -13,7 +13,7 @@ const AuthHeader: FunctionComponent = () => {
     <div className={styles.authHeader}>
       <div className={styles.logo}
         onClick={() => {
-          // Used in the case of onboarding where the user is actually logged in but just doesn't have an organization.
+          // Used in the case of onboarding where the user is actually logged in but are not tied to their multi-tenancy "Account".
           dispatch(logout())
           navigate(AppPath.SignIn)
         }}

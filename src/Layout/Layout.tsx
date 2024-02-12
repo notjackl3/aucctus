@@ -1,21 +1,36 @@
 import { Navigate, Outlet } from "react-router-dom";
 import NavDrawer from "../app/components/NavDrawer/NavDrawer"
 import { useSelector } from "react-redux";
-import { selectAccessToken, selectOrganization } from "../features/auth/auth.slice";
+import { selectAccount, selectUser, setAccount } from "../features/auth/auth.slice";
 import { AppPath } from "../routes/routes";
 import styles from "../app/assets/styles/layout.module.scss"
 import { useAppDispatch } from "../app/hooks";
-import { useEffect } from "react";
+import { useState } from "react";
+import { useQuery } from "react-query";
+import api from "../libs/api";
+
 
 const Layout = () => {
   const dispatch = useAppDispatch()
-  const organization = useSelector(selectOrganization)!;
-  const accessToken = useSelector(selectAccessToken)
+  const user = useSelector(selectUser)!;
+  const account = useSelector(selectAccount);
+  const [checked, setChecked] = useState(false);
 
-  useEffect(() => {
-  }, [accessToken, organization, dispatch])
 
-  if (!organization) {
+  useQuery({
+    queryKey: ['account'],
+    queryFn: async () => api.account.getAccount(),
+    enabled: !!user.account && !account && !checked,
+    onSuccess: (data) => {
+      dispatch(setAccount(data))
+    },
+    cacheTime: 1000 * 60,
+    onSettled: () => {
+      setChecked(true)
+    }
+  })
+
+  if (!user.account) {
     return <Navigate to={AppPath.Onboarding} />
   }
 

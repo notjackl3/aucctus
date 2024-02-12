@@ -1,8 +1,7 @@
-import { IAuthSuccessResponse } from "./typings";
+import { IAccount, IAuthSuccessResponse, IRegisterAccount, IToken } from "./typings";
 import { ApiService } from "./apiService";
 import { endpoints } from "./endpoints";
 import { IMessageResponse } from "./typings/avxisi";
-import { IOrganizationSuccessResponse, IRegisterOrganization } from "./typings/organization";
 
 export interface ISignInRequest {
   email: string;
@@ -10,14 +9,14 @@ export interface ISignInRequest {
 }
 
 export interface ISignUpRequest {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
-  password2: string;
+  confirmPassword: string;
 }
 
 export class AuthApi extends ApiService {
-
 
   /** Sign Up
    * 
@@ -27,8 +26,8 @@ export class AuthApi extends ApiService {
    * @param password2 
    * @returns 
    */
-  async signup(name: string, email: string, password: string, confirmPassword: string) {
-    return this.post<ISignUpRequest, ISignUpRequest>(endpoints.Signup, { name, email, password, password2: confirmPassword })
+  async signup(firstName: string, lastName: string, email: string, password: string, confirmPassword: string) {
+    return this.post<IMessageResponse, ISignUpRequest>(endpoints.signup, { firstName, lastName, email, password, confirmPassword })
   }
 
   /** Sign In
@@ -37,33 +36,14 @@ export class AuthApi extends ApiService {
    * @param password 
    * @returns 
    */
-  async signIn(email: string, password: string) {
-    return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.SignIn, { email, password })
+  async login(email: string, password: string) {
+    return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.login, { email, password })
   }
 
 
 
   async logout() {
-    return this.post<IMessageResponse>(endpoints.Logout, this._handleAccessToken())
-  }
-
-  /** Me
-   * 
-   * @param accessToken 
-   * @returns 
-   */
-  async Me() {
-    return this.get(endpoints.Me, this._handleAccessToken())
-  }
-
-
-  /** Register Organization
-   * 
-   * @param org 
-   * @returns 
-   */
-  async registerOrganization(org: IRegisterOrganization) {
-    return this.post<IOrganizationSuccessResponse>(endpoints.registerOrganization, org, this._handleAccessToken())
+    return this.post<IMessageResponse>(endpoints.logout, null, this._handleAccessToken())
   }
 
   /** RefreshToken
@@ -71,8 +51,7 @@ export class AuthApi extends ApiService {
    * @returns 
    */
   async refreshToken() {
-    this.api.defaults.withCredentials = true;
-    return this.post<IAuthSuccessResponse>(endpoints.Refresh, { withCredentials: true })
+    return this.post<IAuthSuccessResponse>(endpoints.refresh)
   }
 
 
@@ -82,7 +61,7 @@ export class AuthApi extends ApiService {
    * @returns 
    */
   async confirmEmail(token: string) {
-    return this.get<IAuthSuccessResponse>(endpoints.confirmEmail(token))
+    return this.post<IAuthSuccessResponse, IToken>(endpoints.confirmEmail, { token })
   }
 
 

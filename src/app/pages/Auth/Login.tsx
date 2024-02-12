@@ -2,24 +2,20 @@ import { FunctionComponent, useState } from "react";
 import styles from "../../assets/styles/pages/auth-screens.module.scss"
 import InputField from "../../components/InputField";
 import AuthProviderIcon from "../../assets/icons/SocialIcon";
-import Checkbox from "../../components/CheckBox";
 import { setAuthenticated } from "../../../features/auth/auth.slice";
 import { useAppDispatch } from "../../hooks";
 import { validEmail } from "../../../libs/utils";
 import { AppPath } from "../../../routes/routes";
-
 import { isError, useQuery } from "react-query";
 import api from "../../../libs/api";
 import { isAxiosError } from "axios";
-import { INestJSErrorResponse } from "../../../libs/api/typings/avxisi";
-import { IAuthSuccessResponse } from "../../../libs/api/typings";
+import { IFormError } from "../../../libs/api/typings/avxisi";
+import { IAuthSuccessResponse, IRegisterUser } from "../../../libs/api/typings";
 import analytics from "../../../libs/analytics";
 import { Link } from "react-router-dom";
 
 
-
-
-const SignIn: FunctionComponent = () => {
+const Login: FunctionComponent = () => {
   const dispatch = useAppDispatch()
   const [email, setEmail] = useState<string>("")
   const [password, setPassword] = useState<string>("")
@@ -27,26 +23,38 @@ const SignIn: FunctionComponent = () => {
   const [error, setError] = useState<string | undefined>()
 
   const query = useQuery<IAuthSuccessResponse, string>({
-    queryKey: "signin",
+    queryKey: "login",
     enabled: false, // Prevent from automatically running
     refetchOnWindowFocus: false,
     retry: 0,
-    queryFn: async () => await api.auth.signIn(email, password),
+    queryFn: async () => await api.auth.login(email, password),
     onSuccess: (response: IAuthSuccessResponse) => {
       analytics.debug(JSON.stringify(response))
       dispatch(setAuthenticated(response))
-
-
     },
     onError: (error) => {
       let message = "Unexpected Error Occurred"
-      if (isAxiosError<INestJSErrorResponse>(error)) {
-        message = error.response ? error.response.data.message : error.message
+      if (isAxiosError<IFormError<IRegisterUser>>(error)) {
+        // Check if there is an error response from the server otherwise we will use the default message
+        if (error.response) {
+          const errorResponse = error.response.data
+          console.log(errorResponse.error, typeof errorResponse.error)
+          if (typeof errorResponse.error === "string") {
+            message = errorResponse.error
+          } else {
+            // For now we are only going to show the first error message
+            // Most errors ar caught before they reach the server
+            const firstKey = Object.keys(errorResponse.error)[0] as keyof IRegisterUser;
+            const firstValue = errorResponse.error[firstKey][0];
+            message = `${firstKey}: ${firstValue.message}`;
+          }
+        } else {
+          message = error.message
+        }
       } else if (isError(error)) {
         message = error.message
       }
       setError(message)
-
     }
   })
 
@@ -61,7 +69,7 @@ const SignIn: FunctionComponent = () => {
   return (
     <>
       <div className={styles.header}>
-        <span className={styles.title}>Log in</span>
+        <span className={styles.title}>Login</span>
         <span className={styles.supportingText}>
           Welcome back! Please enter your details.
         </span>
@@ -70,7 +78,7 @@ const SignIn: FunctionComponent = () => {
       {error && <div className={styles.error}>
         {error}
       </div>}
-      <div className={styles.basicForm}>
+      <form className={styles.basicForm}>
         <InputField
           label="Email"
           name='email'
@@ -95,10 +103,10 @@ const SignIn: FunctionComponent = () => {
         <div className={`${styles.row}`}>
 
           {/* Currently Does nothing */}
-          <Checkbox
+          {/* <Checkbox
             name="rememberMe"
             supportingText="Remember for 30 Days"
-          />
+          /> */}
 
           {/* Takes you to unfinished page */}
           <Link className={`${styles.link} btn btn-link`} to="/forgot-password">Forgot password</Link>
@@ -115,7 +123,7 @@ const SignIn: FunctionComponent = () => {
           }}
           disabled={!email || !password || !!emailInputError || query.isFetching || query.isLoading}
 
-        >Sign in</button>
+        >Login</button>
 
         <button type="button" className="btn btn-white">
           <AuthProviderIcon provider="google" />
@@ -128,9 +136,9 @@ const SignIn: FunctionComponent = () => {
           <Link className={`${styles.link} btn btn-link`} to={AppPath.SignUp}>Sign up</Link>
         </div>
 
-      </div>
+      </form>
     </>
   )
 }
 
-export default SignIn;
+export default Login;

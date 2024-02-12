@@ -1,5 +1,5 @@
 .authContainer {
-  display: inline-flex;
+  display: flex;
   justify-content: start;
   max-width: 100vw;
   height: 100vh;
@@ -168,6 +168,7 @@
     flex: 1;
     background-color: var(--gray-200-row-header);
     overflow: hidden;
+    // overflow-y: visible;
     gap: var(--gap-base);
     text-align: left;
     font-size: var(--display-sm-medium-size);
@@ -194,28 +195,23 @@
 
     .screenMockupWrapper,
     .screenMockup {
-      width: 70vw;
-      height: 65vh;
-
-      min-width: 700px;
+      border-radius: var(--br-xs);
     }
 
     .screenMockupWrapper {
-      align-self: stretch;
-      padding: 0 0 0 var(--padding-41xl);
-    }
-    .screenMockup {
+      margin-left: var(--padding-44xl);
+      height: calc(900px);
+      width: calc(1350px);
       position: relative;
-      border-radius: var(--br-xs);
       border: 6px solid var(--gray-900-text-primary);
       box-sizing: border-box;
     }
-    .screenMockupReplaceFill {
-      left: 0;
-      width: 100%;
+
+    .screenMockup {
+      width: 1350px;
+      height: 900px;
       overflow: hidden;
-      height: 100%;
-      object-fit: fill;
+      object-fit: contain;
     }
     .starIcon {
       position: relative;
@@ -281,22 +277,6 @@
       flex-direction: row;
       gap: var(--gap-xs);
       font-size: var(--text-lg-semibold-size);
-    }
-
-    .mockupShadow,
-    .screenMockupReplaceFill {
-      position: absolute;
-      height: calc(100% - 12px);
-      top: 0;
-      bottom: 12px;
-      border-radius: var(--br-xs);
-    }
-    .mockupShadow {
-      width: calc(100% - 28px);
-      right: 20px;
-      left: 8px;
-      background-color: var(--gray-900-text-primary);
-      box-shadow: var(--shadow-3xl);
     }
   }
 

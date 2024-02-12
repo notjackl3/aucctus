@@ -1,14 +1,23 @@
 import { HttpStatusCode } from "axios";
+import { IUser } from ".";
 
 
-export interface INestJSErrorResponse {
-  statusCode: HttpStatusCode;
-  timestamp: string;
-  path: string;
-  // TODO: Get all error response types
-  error: "UnauthorizedException" | string;
-  message: string;
+export type IFormError<T> = IServerErrorMessage | IFormErrorResponse<T>;
+export interface IServerErrorMessage {
+  id: string;
+  error: string;
 }
+
+export interface IFormDetailsError {
+  message: string;
+  code: string;
+}
+export interface IFormErrorResponse<T = unknown> {
+  error: Record<keyof T, IFormDetailsError[]>;
+  // [key as keyof T]: IFormDetailsError[]
+
+}
+
 
 export interface IMessageResponse {
   id: string;
