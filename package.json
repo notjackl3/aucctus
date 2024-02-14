@@ -11,6 +11,8 @@
     "preview": "vite preview",
     "format": "prettier --write .",
     "lint": "eslint .",
+    "formate": "prettier --write .",
+    "prettier-check": "prettier --check .",
     "type-check": "tsc",
     "lint-staged": "lint-staged --config lint-staged.js",
     "test": "vitest --run",
