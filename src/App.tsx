@@ -1,18 +1,16 @@
-
-import { Route, Routes } from "react-router"
-import AuthGuard from "./routes/guards/auth.guard"
-import Layout from "./Layout/Layout"
-import { AppPath } from "./routes/routes"
-import Page from "./app/pages"
-import UnauthGuard from "./routes/guards/unauth.guard"
-import { QueryClient, QueryClientProvider } from "react-query"
-import { Navigate } from "react-router-dom"
+import { Route, Routes } from 'react-router';
+import AuthGuard from './routes/guards/auth.guard';
+import Layout from './Layout/Layout';
+import { AppPath } from './routes/routes';
+import Page from './app/pages';
+import UnauthGuard from './routes/guards/unauth.guard';
+import { QueryClient, QueryClientProvider } from 'react-query';
+import { Navigate } from 'react-router-dom';
 import 'react-circular-progressbar/dist/styles.css';
 
-const queryClient = new QueryClient()
+const queryClient = new QueryClient();
 
 function App() {
-
   return (
     <div role="main" className="App">
       <QueryClientProvider client={queryClient}>
@@ -39,26 +37,22 @@ function App() {
               {/* <Route path={AppPath.ChallengeCenter} element={<Page.ChallengeCenter />} />
               <Route path={AppPath.ChallengeWizard} element={<Page.ChallengeWizard />} />
               <Route path={AppPath.ChallengeDetails} element={<Page.ChallengeDetails />} /> */}
-
             </Route>
           </Route>
 
           {/* Auth Routes  */}
-          <Route element={<UnauthGuard />} >
+          <Route element={<UnauthGuard />}>
             <Route index path={AppPath.SignIn} element={<Page.Auth.Login />} />
             <Route path={AppPath.SignUp} element={<Page.Auth.SignUp />} />
             <Route path={AppPath.ForgotPassword} element={<Page.Auth.ForgotPassword />} />
             <Route path={AppPath.SignUpSuccess} element={<Page.Auth.SignUpSuccess />} />
             <Route path={AppPath.SignUpSuccess} element={<Page.Auth.SignUpSuccess />} />
           </Route>
-          <Route
-            path="*"
-            element={<Navigate to={AppPath.Home} replace />}
-          />
+          <Route path="*" element={<Navigate to={AppPath.Home} replace />} />
         </Routes>
       </QueryClientProvider>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

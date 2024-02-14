@@ -1,0 +1,19 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "extensions": {
+    "recommendations": [
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "ms-vscode.vscode-typescript-tslint-plugin",
+      "dbaeumer.vscode-eslint"
+    ]
+  },
+  "settings": {
+    "editor.formatOnSave": true
+  }
+}
