@@ -1,7 +1,7 @@
-import { IAccount, IAuthSuccessResponse, IRegisterAccount, IToken } from "./typings";
-import { ApiService } from "./apiService";
-import { endpoints } from "./endpoints";
-import { IMessageResponse } from "./typings/avxisi";
+import { IAuthSuccessResponse, IToken } from './typings';
+import { ApiService } from './apiService';
+import { endpoints } from './endpoints';
+import { IMessageResponse } from './typings/avxisi';
 
 export interface ISignInRequest {
   email: string;
@@ -17,52 +17,53 @@ export interface ISignUpRequest {
 }
 
 export class AuthApi extends ApiService {
-
   /** Sign Up
-   * 
-   * @param name 
-   * @param email 
-   * @param password 
-   * @param password2 
-   * @returns 
+   *
+   * @param name
+   * @param email
+   * @param password
+   * @param password2
+   * @returns
    */
   async signup(firstName: string, lastName: string, email: string, password: string, confirmPassword: string) {
-    return this.post<IMessageResponse, ISignUpRequest>(endpoints.signup, { firstName, lastName, email, password, confirmPassword })
+    return this.post<IMessageResponse, ISignUpRequest>(endpoints.signup, {
+      firstName,
+      lastName,
+      email,
+      password,
+      confirmPassword,
+    });
   }
 
   /** Sign In
-   * 
-   * @param email 
-   * @param password 
-   * @returns 
+   *
+   * @param email
+   * @param password
+   * @returns
    */
   async login(email: string, password: string) {
-    return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.login, { email, password })
+    return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.login, { email, password });
   }
 
-
-
   async logout() {
-    return this.post<IMessageResponse>(endpoints.logout, null, this._handleAccessToken())
+    return this.post<IMessageResponse>(endpoints.logout, null, this._handleAccessToken());
   }
 
   /** RefreshToken
-   * 
-   * @returns 
+   * Note that the Refresh token is stored in the HTTPOnly headers. In most cases unless we run into any issues
+   * It will stay like that for the forseeable future.
+   * @returns
    */
-  async refreshToken() {
-    return this.post<IAuthSuccessResponse>(endpoints.refresh)
+  async refreshToken(token: string) {
+    return this.post<IAuthSuccessResponse>(endpoints.refresh, token ? { token } : undefined);
   }
-
 
   /** Confirm Email
-   * 
-   * @param accessToken 
-   * @returns 
+   *
+   * @param accessToken
+   * @returns
    */
   async confirmEmail(token: string) {
-    return this.post<IAuthSuccessResponse, IToken>(endpoints.confirmEmail, { token })
+    return this.post<IAuthSuccessResponse, IToken>(endpoints.confirmEmail, { token });
   }
-
-
 }
