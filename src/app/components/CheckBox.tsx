@@ -1,7 +1,7 @@
-import { ForwardRefRenderFunction, InputHTMLAttributes } from "react";
+import { ForwardRefRenderFunction, InputHTMLAttributes } from 'react';
 
-import styles from '../assets/styles/components/checkbox.module.scss'
-import React from "react";
+import styles from '../assets/styles/components/checkbox.module.scss';
+import React from 'react';
 
 interface CheckBoxProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -9,23 +9,15 @@ interface CheckBoxProps extends InputHTMLAttributes<HTMLInputElement> {
 }
 
 const Box: ForwardRefRenderFunction<HTMLInputElement, CheckBoxProps> = ({ name, supportingText, ...props }, ref) => {
-
   return (
     <div className={styles.checkbox}>
-      <input
-        {...props}
-        type="checkbox"
-        ref={ref}
-        name={name}
-      />
+      <input {...props} type="checkbox" ref={ref} name={name} />
 
-      <span>
-        {supportingText}
-      </span>
+      <span>{supportingText}</span>
     </div>
-  )
-}
+  );
+};
 
 const Checkbox = React.forwardRef(Box);
 
-export default Checkbox
+export default Checkbox;

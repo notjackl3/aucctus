@@ -1,10 +1,10 @@
-import { FunctionComponent, useState } from "react";
+import { FunctionComponent, useState } from 'react';
 
-import styles from '../../assets/styles/components/dashboard-insights.module.scss'
-import images from "../../assets/img";
+import styles from '../../assets/styles/components/dashboard-insights.module.scss';
+import images from '../../assets/img';
 
 const CompetitorNewsContainer: FunctionComponent = () => {
-  const [error, setError] = useState<string | undefined>(undefined)
+  const [error, setError] = useState<string | undefined>(undefined);
   // const [data, setData] = useState<IArticle[]>([])
 
   // Temp Disable
@@ -23,14 +23,11 @@ const CompetitorNewsContainer: FunctionComponent = () => {
   //   }
   // })
 
-
   return (
     <div className={styles.dashboardInsights}>
-      <h2 className={styles.header}>
-        Competitor News
-      </h2>
-      <div className={styles.content} >
-        <img src={images.competitorNewsBlur} alt={""} />
+      <h2 className={styles.header}>Competitor News</h2>
+      <div className={styles.content}>
+        <img src={images.competitorNewsBlur} alt={''} />
 
         <div className="comingSoon">
           <div className="comingSoonWrapper">
@@ -50,10 +47,9 @@ const CompetitorNewsContainer: FunctionComponent = () => {
             image={content.urlToImage}
           />)
         } */}
-
-      </div >
+      </div>
     </div>
-  )
-}
+  );
+};
 
 export default CompetitorNewsContainer;

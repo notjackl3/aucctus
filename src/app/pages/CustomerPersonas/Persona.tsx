@@ -1,61 +1,54 @@
-import { FunctionComponent, useEffect, useMemo, useState } from "react";
-import { useQuery } from "react-query";
-import { useParams, useSearchParams } from "react-router-dom";
-import api from "../../../libs/api";
-import { IConceptCustomerProfile } from "../../../libs/api/typings/ignite-concepts";
-import Loading from "../../components/Loading";
+import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { useQuery } from 'react-query';
+import { useParams, useSearchParams } from 'react-router-dom';
+import api from '../../../libs/api';
+import { IConceptCustomerProfile } from '../../../libs/api/typings/ignite-concepts';
+import Loading from '../../components/Loading';
 
 import styles from '../../assets/styles/pages/customer-personas.module.scss';
-import SimpleList from "../../components/SimpleList";
-import Icon from "../../components/Icon";
-
-
-
+import SimpleList from '../../components/SimpleList';
+import Icon from '../../components/Icon';
 
 const defaultIconProps = {
-  stroke: "#2B3674",
+  stroke: '#2B3674',
   width: 24,
-  height: 24
-}
+  height: 24,
+};
 
 const Persona: FunctionComponent = () => {
   let { id } = useParams();
-  const [searchParams, setSearchParams] = useSearchParams()
-  const persona = searchParams.get('persona')
-  const [currentPersona, setCurrentPersona] = useState<string | undefined>()
-  const [customerProfile, setCustomerProfile] = useState<IConceptCustomerProfile | undefined>()
-
-
+  const [searchParams, setSearchParams] = useSearchParams();
+  const persona = searchParams.get('persona');
+  const [currentPersona, setCurrentPersona] = useState<string | undefined>();
+  const [customerProfile, setCustomerProfile] = useState<IConceptCustomerProfile | undefined>();
 
   const query = useQuery({
     queryKey: [`concept/:id/customer-profile/:group`, id, persona],
     enabled: false, // Prevent from automatically running
     cacheTime: 1000,
     queryFn: async () => {
-      if (id && persona) return await api.igniteConcept.getCustomerProfile(id, persona)
+      if (id && persona) return await api.igniteConcept.getCustomerProfile(id, persona);
     },
     onSuccess: (response) => {
-      setCustomerProfile(response)
-      setCurrentPersona(persona || undefined)
-    }
-  })
+      setCustomerProfile(response);
+      setCurrentPersona(persona || undefined);
+    },
+  });
 
-  const isLoading = useMemo(() => query.isLoading || query.isFetching || query.isRefetching, [query.isFetching, query.isLoading, query.isRefetching])
+  const isLoading = useMemo(
+    () => query.isLoading || query.isFetching || query.isRefetching,
+    [query.isFetching, query.isLoading, query.isRefetching]
+  );
 
   useEffect(() => {
     if (persona !== currentPersona) {
-      query.refetch()
+      query.refetch();
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [persona, currentPersona, query.refetch])
-
-
+  }, [persona, currentPersona, query.refetch]);
 
   return (
     <div className={styles.profile}>
       <section className={styles.header}>
-
         <div className={styles.content}>
           <div className={styles.image} />
           <div className={styles.supportingText}>
@@ -63,15 +56,14 @@ const Persona: FunctionComponent = () => {
             <h1>Sarah Lim</h1>
           </div>
         </div>
-        <button className="btn btn-primary disabled" disabled>Edit Persona</button>
+        <button className="btn btn-primary disabled" disabled>
+          Edit Persona
+        </button>
       </section>
       <section className={styles.details}>
         <div className={styles.description}>
           <h2>Persona Description</h2>
-          <span>
-            {isLoading ? <Loading /> :
-              customerProfile?.description}
-          </span>
+          <span>{isLoading ? <Loading /> : customerProfile?.description}</span>
         </div>
         <div className={styles.demographics}>
           <h2>Demographics</h2>
@@ -79,11 +71,12 @@ const Persona: FunctionComponent = () => {
             <div className={styles.info}>
               <Icon variant="globe" {...defaultIconProps} />
               <span>
-                <strong>Geographic Location:</strong> {isLoading ? <Loading /> : customerProfile?.demographics.geographicLocation || 'N/A'}
+                <strong>Geographic Location:</strong>{' '}
+                {isLoading ? <Loading /> : customerProfile?.demographics.geographicLocation || 'N/A'}
               </span>
             </div>
             <div className={styles.info}>
-              <Icon variant='lightbulb' {...defaultIconProps} />
+              <Icon variant="lightbulb" {...defaultIconProps} />
               <span>
                 <strong>Age Range:</strong> {isLoading ? <Loading /> : customerProfile?.demographics.ageRange || 'N/A'}
               </span>
@@ -91,13 +84,15 @@ const Persona: FunctionComponent = () => {
             <div className={styles.info}>
               <Icon variant="userGroup" {...defaultIconProps} />
               <span>
-                <strong>Family Size:</strong> {isLoading ? <Loading /> : customerProfile?.demographics.familySize || 'N/A'}
+                <strong>Family Size:</strong>{' '}
+                {isLoading ? <Loading /> : customerProfile?.demographics.familySize || 'N/A'}
               </span>
             </div>
             <div className={styles.info}>
               <Icon variant="currency" {...defaultIconProps} />
               <span>
-                <strong>Average Income:</strong> {isLoading ? <Loading /> : customerProfile?.demographics.averageIncome || 'N/A'}
+                <strong>Average Income:</strong>{' '}
+                {isLoading ? <Loading /> : customerProfile?.demographics.averageIncome || 'N/A'}
               </span>
             </div>
           </div>
@@ -132,11 +127,10 @@ const Persona: FunctionComponent = () => {
             maxLength={5}
             items={customerProfile?.quotes || []}
           />
-
         </div>
       </section>
     </div>
-  )
-}
+  );
+};
 
 export default Persona;

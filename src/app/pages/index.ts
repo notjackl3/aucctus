@@ -1,13 +1,13 @@
-import Dashboard from "./Dashboard";
-import Auth from './Auth'
-import NotFound from "./NotFound";
+import Dashboard from './Dashboard';
+import Auth from './Auth';
+import NotFound from './NotFound';
 import Onboarding from './Onboarding';
-import IgniteConcept from "./IgniteConcept";
+import IgniteConcept from './IgniteConcept';
 // import IgniteDomain from "./IgniteDomain";
 // import DomainList from "./DomainList";
-import GeneratedConcepts from "./GeneratedConcepts";
-import ConceptOverview from "./ConceptOverview";
-import ConceptList from "./ConceptList";
+import GeneratedConcepts from './GeneratedConcepts';
+import ConceptOverview from './ConceptOverview';
+import ConceptList from './ConceptList';
 // import DomainMarket from "./DomainMarket";
 // import CustomerPersonas from "./CustomerPersonas/CustomerPersonas";
 // import ChallengeCenter from "./ChallengeCenter";
@@ -37,7 +37,6 @@ const Page = {
 
   // IdeaOverview,
   // IdeaSubmission,
+};
 
-}
-
-export default Page
+export default Page;

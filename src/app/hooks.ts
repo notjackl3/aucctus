@@ -1,15 +1,13 @@
-import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux"
-import type { RootState, AppDispatch } from "./store"
-import { useLocation } from "react-router-dom";
-import React from "react";
+import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import type { RootState, AppDispatch } from './store';
+import { useLocation } from 'react-router-dom';
+import React from 'react';
 import { useRef, useState, useEffect } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 
 // Use throughout your app instead of plain `useDispatch` and `useSelector`
-export const useAppDispatch: () => AppDispatch = useDispatch
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector
-
-
+export const useAppDispatch: () => AppDispatch = useDispatch;
+export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 export function useQueryParams() {
   const { search } = useLocation();
@@ -19,8 +17,8 @@ export function useQueryParams() {
 
 /**
  * Returns the Previous state
- * @param state 
- * @returns 
+ * @param state
+ * @returns
  */
 export function usePrevious<T>(state: T): T | undefined {
   const ref = useRef<T>();
@@ -45,5 +43,3 @@ export const useMeasure = <T extends Element>() => {
   }, [ro]);
   return [{ ref }, bounds];
 };
-
-

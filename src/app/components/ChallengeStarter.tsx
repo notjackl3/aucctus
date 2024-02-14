@@ -1,19 +1,15 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent } from 'react';
 
-import styles from '../assets/styles/components/challenge-starter.module.scss'
-import IgniteIcon from "../assets/icons/ignite.svg?react";
-import Icon from "./Icon";
-import { useNavigate } from "react-router-dom";
-import { AppPath } from "../../routes/routes";
+import styles from '../assets/styles/components/challenge-starter.module.scss';
+import IgniteIcon from '../assets/icons/ignite.svg?react';
+import Icon from './Icon';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '../../routes/routes';
 
-interface IChallengeStarterProps {
-
-}
-
+interface IChallengeStarterProps {}
 
 const ChallengeStarter: FunctionComponent<IChallengeStarterProps> = () => {
-  const navigate = useNavigate()
-
+  const navigate = useNavigate();
 
   return (
     <div className={styles.challengeStarter}>
@@ -26,19 +22,18 @@ const ChallengeStarter: FunctionComponent<IChallengeStarterProps> = () => {
       </div>
 
       <div className={styles.actions}>
-
-        <button className="btn btn-primary"
+        <button
+          className="btn btn-primary"
           onClick={() => {
-            navigate(AppPath.ChallengeWizard)
+            navigate(AppPath.ChallengeWizard);
           }}
         >
-          <Icon variant="rocket" />Start A Challenge
+          <Icon variant="rocket" />
+          Start A Challenge
         </button>
-
       </div>
-
     </div>
-  )
-}
+  );
+};
 
 export default ChallengeStarter;

@@ -17,14 +17,13 @@ npm run start:prod
 
 ```
 
-
 ## Troubleshooting
 
 **Bootstrap**
 
 If you're running into issues with bootstrap and scss. Simply re-install the scss node module followed by reinstalling bootstrap.
 
-``` bash
+```bash
 npm install scss
 # then
 npm install bootstrap

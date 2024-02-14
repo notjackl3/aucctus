@@ -1,22 +1,22 @@
-import { FunctionComponent, useState } from "react";
-import FeatureIcon from "../components/FeatureIcon";
-import InputField from "../components/InputField";
+import { FunctionComponent, useState } from 'react';
+import FeatureIcon from '../components/FeatureIcon';
+import InputField from '../components/InputField';
 
-import styles from '../assets/styles/pages/challenge-wizard.module.scss'
-import TextArea from "../components/TextArea";
-import { useQuery } from "react-query";
-import api from "../../libs/api";
-import { IChallengeResponse } from "../../libs/api/typings/challenges";
-import ChallengeSuccess from "../components/ChallengeSuccess";
+import styles from '../assets/styles/pages/challenge-wizard.module.scss';
+import TextArea from '../components/TextArea';
+import { useQuery } from 'react-query';
+import api from '../../libs/api';
+import { IChallengeResponse } from '../../libs/api/typings/challenges';
+import ChallengeSuccess from '../components/ChallengeSuccess';
 
 const ChallengeWizard: FunctionComponent = () => {
-  const [title, setTitle] = useState<string>('')
-  const [description, setDescription] = useState<string>('')
-  const [pains, setPains] = useState<string>('')
-  const [q4, setQ4] = useState<string>('')
-  const [endDate, setEndDate] = useState<string>('')
+  const [title, setTitle] = useState<string>('');
+  const [description, setDescription] = useState<string>('');
+  const [pains, setPains] = useState<string>('');
+  const [q4, setQ4] = useState<string>('');
+  const [endDate, setEndDate] = useState<string>('');
 
-  const [challenge, setChallenge] = useState<IChallengeResponse>()
+  const [challenge, setChallenge] = useState<IChallengeResponse>();
 
   const query = useQuery({
     queryKey: 'challenge',
@@ -25,19 +25,19 @@ const ChallengeWizard: FunctionComponent = () => {
     retry: 0,
     queryFn: async () => api.challenge.createChallenge({ title, description, pains, q4, endDate }),
     onSuccess: (data) => {
-      setChallenge(data)
+      setChallenge(data);
     },
     onError: (error) => {
       // TODO: Handle error
-      alert(error)
-    }
-  })
+      alert(error);
+    },
+  });
 
   return (
     <div className={styles.challengeWizard}>
-      {challenge ?
+      {challenge ? (
         <ChallengeSuccess challengeId={challenge.id} />
-        :
+      ) : (
         <>
           <div className={styles.header}>
             <FeatureIcon icon="beaker" color="purple" />
@@ -71,13 +71,7 @@ const ChallengeWizard: FunctionComponent = () => {
                 onChange={(e) => setPains(e.target.value)}
               />
 
-              <InputField
-                label="Q4*"
-                name="q4"
-                placeholder="xxxxx"
-                onChange={(e) => setQ4(e.target.value)}
-              />
-
+              <InputField label="Q4*" name="q4" placeholder="xxxxx" onChange={(e) => setQ4(e.target.value)} />
 
               <InputField
                 type="date"
@@ -86,24 +80,22 @@ const ChallengeWizard: FunctionComponent = () => {
                 onChange={(e) => setEndDate(e.target.value)}
               />
 
-              <button className="btn btn-primary"
+              <button
+                className="btn btn-primary"
                 disabled={query.isLoading || !title || !description || !pains || !q4 || !endDate}
                 onClick={(e) => {
-                  query.refetch()
-                  e.preventDefault()
+                  query.refetch();
+                  e.preventDefault();
                 }}
               >
                 Publish Challenge
               </button>
-
-
             </div>
           </div>
         </>
-      }
-
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default ChallengeWizard;

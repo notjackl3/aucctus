@@ -1,7 +1,4 @@
-
-
 export interface IIgniteConceptBody {
-
   // Describe your idea in one sentence*
   concept: string;
 
@@ -15,21 +12,18 @@ export interface IIgniteConceptBody {
   motivation: string;
 
   // Any other details you think are worth sharing?
-  extraDetails: string
+  extraDetails: string;
 }
 
 export interface IIgniteConceptSuccessResponse {
-  id: string
+  id: string;
   concept: string;
   painPoint: string;
   monetizationStrategy: string;
   motivation: string;
-  extraDetails: string
-  concepts: IConceptResponse[]
+  extraDetails: string;
+  concepts: IConceptResponse[];
 }
-
-
-
 
 export interface IConceptResponse extends IConcepts {
   id: string;
@@ -41,17 +35,17 @@ export interface IConceptResponse extends IConcepts {
 export interface IConcepts {
   title: string;
   summary: string;
-  score: number
+  score: number;
 }
 
 export interface IConceptOverview {
   id: string;
   valueProposition: string;
   totalAddressableMarket: string;
-  annualRevenue: string
-  targetGroups: string[]
-  industries: string[]
-  signals: string[]
+  annualRevenue: string;
+  targetGroups: string[];
+  industries: string[];
+  signals: string[];
 }
 
 export interface IConceptCustomerProfile {
@@ -67,6 +61,3 @@ export interface IConceptCustomerProfile {
   quotes: string[];
   pains: string[];
 }
-
-
-

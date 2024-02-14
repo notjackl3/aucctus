@@ -1,4 +1,3 @@
-
 //TODO: Can be used for storing traits and debugging information for things like sentry
 
 export interface IAnalyticsStore {
@@ -7,52 +6,44 @@ export interface IAnalyticsStore {
    */
 
   userAgent?: string;
-
 }
 
-
 class Analytics {
-
   private _store: IAnalyticsStore = {
-    userAgent: navigator.userAgent
-  }
-
+    userAgent: navigator.userAgent,
+  };
 
   update(data: Partial<IAnalyticsStore>) {
     this._store = {
       ...this._store,
-      ...data
-    }
+      ...data,
+    };
   }
 
   debug(...data: any[]) {
     if (import.meta.env.DEV) {
-      console.debug('[AucctusApp]', data)
+      console.debug('[AucctusApp]', data);
     }
   }
 
   log(...data: any[]) {
-    console.log(data)
+    console.log(data);
   }
 
   error(...data: any[]) {
-    console.error(data)
+    console.error(data);
   }
-
 
   /** TODO: Implement tracking
-   * 
-   * @param eventName 
-   * @param data 
+   *
+   * @param eventName
+   * @param data
    */
   trackEvent(eventName: string, data: any) {
-    console.log(`[AucctusApp] Event: ${eventName}`, data)
+    console.log(`[AucctusApp] Event: ${eventName}`, data);
   }
-
 }
 
-
-const analytics = new Analytics()
-
+const analytics = new Analytics();
 
 export default analytics;

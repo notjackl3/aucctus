@@ -1,16 +1,12 @@
-
-
-
 export interface IToken {
   token: string;
 }
 
-
 export interface IAccount {
   /**
    * Accounts are the organizations or Companies that use the Aucctus platform
-   * 
-   * 
+   *
+   *
    */
 
   uuid: string;
@@ -19,13 +15,10 @@ export interface IAccount {
   createdAt: string;
 }
 
-
-
 export interface IRegisterAccount {
   name: string;
   domain: string;
 }
-
 
 export interface IUser {
   uuid: string;
@@ -33,7 +26,7 @@ export interface IUser {
   lastName: string;
   email: string;
   account?: string;
-  role: "Admin" | "Employee"
+  role: 'Admin' | 'Employee';
 }
 
 export interface IRegisterUser {

@@ -1,56 +1,42 @@
-import { FunctionComponent, useState } from "react";
-import IgniteForm from "../components/IgniteForm";
-import styles from '../assets/styles/pages/ignite.module.scss'
-import TextArea from "../components/TextArea";
-import { useQuery } from "react-query";
-import api from "../../libs/api";
-import IgniteLoading from "../components/IgniteLoading";
-import { useAppDispatch } from "../hooks";
-import { setConcepts } from "../../features/concepts/concept.slice"
-import { useNavigate } from "react-router-dom";
-import { AppPath } from "../../routes/routes";
-
-
+import { FunctionComponent, useState } from 'react';
+import IgniteForm from '../components/IgniteForm';
+import styles from '../assets/styles/pages/ignite.module.scss';
+import TextArea from '../components/TextArea';
+import { useQuery } from 'react-query';
+import api from '../../libs/api';
+import IgniteLoading from '../components/IgniteLoading';
+import { useAppDispatch } from '../hooks';
+import { setConcepts } from '../../features/concepts/concept.slice';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '../../routes/routes';
 
 const IgniteConcept: FunctionComponent = () => {
-  const dispatch = useAppDispatch()
-  const navigate = useNavigate()
-  const [concept, setConcept] = useState<string>("")
-  const [painPoint, setPainPoint] = useState<string>("")
-  const [monetizationStrategy, setMonetizationStrategy] = useState<string>("")
-  const [motivation, setMotivation] = useState<string>("")
-  const [extraDetails, setExtraDetails] = useState<string>("")
-
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const [concept, setConcept] = useState<string>('');
+  const [painPoint, setPainPoint] = useState<string>('');
+  const [monetizationStrategy, setMonetizationStrategy] = useState<string>('');
+  const [motivation, setMotivation] = useState<string>('');
+  const [extraDetails, setExtraDetails] = useState<string>('');
 
   const query = useQuery({
-    queryKey: "igniteDomain",
+    queryKey: 'igniteDomain',
     cacheTime: 1000,
     enabled: false, // disable this query from automatically running
-    queryFn: async () => await api.igniteConcept.generateConcepts({ concept, painPoint, monetizationStrategy, motivation, extraDetails }),
+    queryFn: async () =>
+      await api.igniteConcept.generateConcepts({ concept, painPoint, monetizationStrategy, motivation, extraDetails }),
     onSuccess: (response) => {
-      dispatch(setConcepts(response))
-      navigate(AppPath.GeneratedConcepts)
-    }
-  })
-
+      dispatch(setConcepts(response));
+      navigate(AppPath.GeneratedConcepts);
+    },
+  });
 
   return (
-    <div className={styles.ignite} >
-
-      {query.isLoading || query.isFetching ?
-
-        <IgniteLoading
-          title="Igniting Your Concept"
-          subtitle="Ideating can take a moment. Please wait a minute."
-        />
-
-        :
-
-        <IgniteForm
-          title="Ignite Your Concept"
-          subtitle="These answers will kick start your domain generation process"
-        >
-
+    <div className={styles.ignite}>
+      {query.isLoading || query.isFetching ? (
+        <IgniteLoading title="Igniting Your Concept" subtitle="Ideating can take a moment. Please wait a minute." />
+      ) : (
+        <IgniteForm title="Ignite Your Concept" subtitle="These answers will kick start your domain generation process">
           <TextArea
             name="concept"
             label="Describe your idea in one sentence."
@@ -91,19 +77,13 @@ const IgniteConcept: FunctionComponent = () => {
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setExtraDetails(e.target.value)}
           />
 
-          <button
-            className="btn btn-primary"
-            disabled={!concept}
-            onClick={() => query.refetch()}
-          >
+          <button className="btn btn-primary" disabled={!concept} onClick={() => query.refetch()}>
             Generate Concepts
           </button>
-
         </IgniteForm>
-      }
-
-    </div >
-  )
-}
+      )}
+    </div>
+  );
+};
 
 export default IgniteConcept;

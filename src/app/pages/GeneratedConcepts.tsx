@@ -1,24 +1,21 @@
-import { Component } from "react";
-import styles from "../assets/styles/pages/generated-concept.module.scss"
-import ConceptTable from "../components/ConceptTable";
-import { AppPath } from "../../routes/routes";
-import NavigateButton from "../components/NavigateButton";
-import { RootState } from "../store";
-import { connect } from "react-redux";
-import { Dispatch } from "@reduxjs/toolkit";
-import { setConcepts } from "../../features/concepts/concept.slice";
-import api from "../../libs/api";
-import analytics from "../../libs/analytics";
-import Icon from "../components/Icon";
-
-
+import { Component } from 'react';
+import styles from '../assets/styles/pages/generated-concept.module.scss';
+import ConceptTable from '../components/ConceptTable';
+import { AppPath } from '../../routes/routes';
+import NavigateButton from '../components/NavigateButton';
+import { RootState } from '../store';
+import { connect } from 'react-redux';
+import { Dispatch } from '@reduxjs/toolkit';
+import { setConcepts } from '../../features/concepts/concept.slice';
+import api from '../../libs/api';
+import analytics from '../../libs/analytics';
+import Icon from '../components/Icon';
 
 interface Props {
-  dispatch: Dispatch
-  igniteId?: string
+  dispatch: Dispatch;
+  igniteId?: string;
 }
 class GeneratedConcepts extends Component<Props> {
-
   async componentWillUnmount() {
     try {
       const igniteId = this.props.igniteId;
@@ -26,12 +23,11 @@ class GeneratedConcepts extends Component<Props> {
         // await api.igniteConcept.deleteAllUnsavedGeneratedConcept(igniteId)
       }
     } catch (e) {
-      analytics.debug(e)
+      analytics.debug(e);
     }
 
     // Clear the concepts anyway for the user
-    this.props.dispatch(setConcepts([]))
-
+    this.props.dispatch(setConcepts([]));
   }
 
   render() {
@@ -50,10 +46,10 @@ class GeneratedConcepts extends Component<Props> {
               Export
             </button>
             <button className="btn btn-light disabled">
+              <Icon variant="refresh" height={20} width={20} stroke="" /> Generate more
+            </button>
 
-              <Icon variant="refresh" height={20} width={20} stroke="" /> Generate more</button>
-
-            <NavigateButton variant="primary" route={AppPath.ConceptList} >
+            <NavigateButton variant="primary" route={AppPath.ConceptList}>
               Continue
               <Icon variant="arrowRight" height={20} width={20} stroke="" />
             </NavigateButton>
@@ -61,9 +57,8 @@ class GeneratedConcepts extends Component<Props> {
         </div>
 
         <ConceptTable />
-
       </div>
-    )
+    );
   }
 }
 
@@ -71,5 +66,4 @@ const mapStateToProps = (state: RootState) => ({
   igniteId: state.concepts.igniteId,
 });
 
-
-export default connect(mapStateToProps)(GeneratedConcepts)
+export default connect(mapStateToProps)(GeneratedConcepts);

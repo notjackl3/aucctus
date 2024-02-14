@@ -1,52 +1,37 @@
-import { FunctionComponent, useState } from "react";
-import IgniteForm from "../components/IgniteForm";
-import styles from '../assets/styles/pages/ignite.module.scss'
-import TextArea from "../components/TextArea";
-import { useQuery } from "react-query";
-import api from "../../libs/api";
-import IgniteLoading from "../components/IgniteLoading";
-import { useNavigate } from "react-router-dom";
-import { AppPath } from "../../routes/routes";
-
-
+import { FunctionComponent, useState } from 'react';
+import IgniteForm from '../components/IgniteForm';
+import styles from '../assets/styles/pages/ignite.module.scss';
+import TextArea from '../components/TextArea';
+import { useQuery } from 'react-query';
+import api from '../../libs/api';
+import IgniteLoading from '../components/IgniteLoading';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '../../routes/routes';
 
 const IgniteDomain: FunctionComponent = () => {
-  const navigate = useNavigate()
-  const [opportunity, setOpportunity] = useState<string>("")
-  const [perception, setPerception] = useState<string>("")
-  const [qualification, setQualification] = useState<string>("")
-  const [exampleConcepts, setExampleConcepts] = useState<string>("")
-  const [extraDetails, setExtraDetails] = useState<string>("")
-
+  const navigate = useNavigate();
+  const [opportunity, setOpportunity] = useState<string>('');
+  const [perception, setPerception] = useState<string>('');
+  const [qualification, setQualification] = useState<string>('');
+  const [exampleConcepts, setExampleConcepts] = useState<string>('');
+  const [extraDetails, setExtraDetails] = useState<string>('');
 
   const query = useQuery({
-    queryKey: "igniteDomain",
+    queryKey: 'igniteDomain',
     enabled: false, // disable this query from automatically running
-    queryFn: async () => await api.igniteDomain.generateDomain({ opportunity, perception, qualification, exampleConcepts, extraDetails }),
+    queryFn: async () =>
+      await api.igniteDomain.generateDomain({ opportunity, perception, qualification, exampleConcepts, extraDetails }),
     onSuccess: (response) => {
-      navigate(AppPath.DomainList)
-    }
-  })
-
+      navigate(AppPath.DomainList);
+    },
+  });
 
   return (
-    <div className={styles.ignite} >
-
-
-      {query.isLoading ?
-
-        <IgniteLoading
-          title="Igniting Your Domain"
-          subtitle="Ideating can take a moment. Please wait a minute."
-
-        />
-
-        :
-        <IgniteForm
-          title="Ignite Your Domain"
-          subtitle="These answers will kick start your domain generation process"
-        >
-
+    <div className={styles.ignite}>
+      {query.isLoading ? (
+        <IgniteLoading title="Igniting Your Domain" subtitle="Ideating can take a moment. Please wait a minute." />
+      ) : (
+        <IgniteForm title="Ignite Your Domain" subtitle="These answers will kick start your domain generation process">
           <TextArea
             name="opportunity"
             label="What opportunity area are you looking to explore?"
@@ -87,7 +72,6 @@ const IgniteDomain: FunctionComponent = () => {
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setExtraDetails(e.target.value)}
           />
 
-
           <button
             className="btn btn-primary"
             disabled={!opportunity || !perception || !qualification || !exampleConcepts || !extraDetails}
@@ -95,14 +79,10 @@ const IgniteDomain: FunctionComponent = () => {
           >
             Generate Domains
           </button>
-
-
-
         </IgniteForm>
-      }
-
-    </div >
-  )
-}
+      )}
+    </div>
+  );
+};
 
 export default IgniteDomain;

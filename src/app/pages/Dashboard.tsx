@@ -1,24 +1,26 @@
-import { FunctionComponent } from "react";
-import DashboardHeader from "../components/DashbaordHeader";
-import { useSelector } from "react-redux";
-import { selectAccount } from "../../features/auth/auth.slice";
-import IgniteBox from "../components/IgniteBox";
-import { AppPath } from "../../routes/routes";
+import { FunctionComponent } from 'react';
+import DashboardHeader from '../components/DashbaordHeader';
+import { useSelector } from 'react-redux';
+import { selectAccount } from '../../features/auth/auth.slice';
+import IgniteBox from '../components/IgniteBox';
+import { AppPath } from '../../routes/routes';
 
-import styles from '../assets/styles/pages/dashboard.module.scss'
-import CompetitorNewsContainer from "../components/CompetitorNews/CompetitorNewsContainer";
-import InnovationGoal from "../components/InnovationGoal";
-import CompanyMetricsContainer from "../components/CompanyMetricsContainer";
-import InnovationActivity from "../components/InnovationActivity";
-import InnovationLifecycle from "../components/InnovationLifecycle";
+import styles from '../assets/styles/pages/dashboard.module.scss';
+import CompetitorNewsContainer from '../components/CompetitorNews/CompetitorNewsContainer';
+import InnovationGoal from '../components/InnovationGoal';
+import CompanyMetricsContainer from '../components/CompanyMetricsContainer';
+import InnovationActivity from '../components/InnovationActivity';
+import InnovationLifecycle from '../components/InnovationLifecycle';
 
 const Dashboard: FunctionComponent = () => {
-  const { name: accountName } = useSelector(selectAccount) || { name: "" }
-
+  const { name: accountName } = useSelector(selectAccount) || { name: '' };
 
   return (
-    <div className={styles.dashboard} >
-      <DashboardHeader title={accountName || ''} supportingText="The latest domain reports as they relate to your business." />
+    <div className={styles.dashboard}>
+      <DashboardHeader
+        title={accountName || ''}
+        supportingText="The latest domain reports as they relate to your business."
+      />
       {/* <section className={`${styles.companyInsights}`}>
         <InnovationGoal />
 
@@ -38,8 +40,8 @@ const Dashboard: FunctionComponent = () => {
         <InnovationActivity />
         <InnovationLifecycle />
       </section> */}
-    </div >
-  )
-}
+    </div>
+  );
+};
 
 export default Dashboard;

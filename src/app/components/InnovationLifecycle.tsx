@@ -1,12 +1,11 @@
-import { FunctionComponent } from "react";
-import Card from "./Card";
-import images from "../assets/img";
+import { FunctionComponent } from 'react';
+import Card from './Card';
+import images from '../assets/img';
 import styles from '../assets/styles/components/innovation-activity-lifecycle.module.scss';
 
-interface InnovationLifecycleProps { }
+interface InnovationLifecycleProps {}
 
 const InnovationLifecycle: FunctionComponent<InnovationLifecycleProps> = () => {
-
   return (
     <Card>
       <div className={styles.header}>
@@ -16,11 +15,7 @@ const InnovationLifecycle: FunctionComponent<InnovationLifecycleProps> = () => {
         </div>
       </div>
       <div className={styles.content}>
-        <img
-          alt="Innovation Lifecycle"
-          src={images.innovationLifeCycle}
-          width={690}
-        />
+        <img alt="Innovation Lifecycle" src={images.innovationLifeCycle} width={690} />
 
         <div className="comingSoon">
           <div className="comingSoonWrapper">
@@ -29,7 +24,7 @@ const InnovationLifecycle: FunctionComponent<InnovationLifecycleProps> = () => {
         </div>
       </div>
     </Card>
-  )
-}
+  );
+};
 
 export default InnovationLifecycle;

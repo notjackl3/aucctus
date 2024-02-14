@@ -1,8 +1,7 @@
-
 /** Validate Email
- * 
- * @param email 
- * @returns 
+ *
+ * @param email
+ * @returns
  */
 export const validEmail = (email: string) => {
   return email
@@ -12,21 +11,19 @@ export const validEmail = (email: string) => {
     );
 };
 
-
 /** Validate Domain
- * 
- * @param domain 
- * @returns 
+ *
+ * @param domain
+ * @returns
  */
 export const validDomain = (domain: string) => {
-  return domain.toLowerCase().match(/^([A-Za-z0-9-]+\.([A-Za-z]{3,}|[A-Za-z]{2}\.[A-Za-z]{2}|[A-za-z]{2}))/)
-}
-
+  return domain.toLowerCase().match(/^([A-Za-z0-9-]+\.([A-Za-z]{3,}|[A-Za-z]{2}\.[A-Za-z]{2}|[A-za-z]{2}))/);
+};
 
 /** Generate Random String
- * 
- * @param length 
- * @returns 
+ *
+ * @param length
+ * @returns
  */
 export function generateRandomString(length: number) {
   let result = '';
@@ -42,14 +39,12 @@ export function generateRandomString(length: number) {
 
 export function differenceInHours(firstDate: Date, secondDate: Date) {
   let difference = (firstDate.getTime() - secondDate.getTime()) / 1000;
-  difference /= (60 * 60);
+  difference /= 60 * 60;
   return Math.abs(Math.round(difference));
-
 }
-
 
 export const formatter = new Intl.NumberFormat('en-US', {
   style: 'currency',
   currency: 'USD',
-  notation: 'compact'
+  notation: 'compact',
 });

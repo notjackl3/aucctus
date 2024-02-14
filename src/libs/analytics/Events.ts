@@ -1,9 +1,6 @@
-
-
 export enum AnalyticsEvents {
   pageView,
 }
-
 
 export interface PageViewEvent {
   eventName: AnalyticsEvents.pageView;

@@ -1,11 +1,9 @@
-
 export interface IChallenge {
   title: string;
   description: string;
   pains: string;
   q4: string;
   endDate: string;
-
 }
 
 export interface IChallengeResponse extends IChallenge {
@@ -26,7 +24,7 @@ export interface IChallengeIdea {
 
 export interface IChallengeIdeaResponse extends IChallengeIdea {
   id: string;
-  userId: string
+  userId: string;
   createdAt: Date;
   updatedAt: Date;
 }

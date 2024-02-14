@@ -1,22 +1,18 @@
-import { FunctionComponent, useState } from "react";
-import styles from '../assets/styles/pages/dashboard.module.scss'
-import { logout } from "../../features/auth/auth.slice";
-import { useQuery } from "react-query";
-import api from "../../libs/api";
-import Loading from "./Loading";
-import { isAxiosError } from "axios";
-import { useAppDispatch } from "../hooks";
-
-
-
-
+import { FunctionComponent, useState } from 'react';
+import styles from '../assets/styles/pages/dashboard.module.scss';
+import { logout } from '../../features/auth/auth.slice';
+import { useQuery } from 'react-query';
+import api from '../../libs/api';
+import Loading from './Loading';
+import { isAxiosError } from 'axios';
+import { useAppDispatch } from '../hooks';
 
 const InnovationGoal: FunctionComponent = () => {
-  const dispatch = useAppDispatch()
-  const [goal, setGoal] = useState<string>("")
-  const [error, setError] = useState<string | undefined>()
+  const dispatch = useAppDispatch();
+  const [goal, setGoal] = useState<string>('');
+  const [error, setError] = useState<string | undefined>();
 
-  // TEMP 
+  // TEMP
   const isLoading = true;
 
   // const query = useQuery({
@@ -43,20 +39,15 @@ const InnovationGoal: FunctionComponent = () => {
 
       {
         // query.isLoading ?
-        isLoading ?
+        isLoading ? (
           // TODO Style Loading
           <Loading />
-
-          :
-          <span className={styles.goalText}>
-            {
-              goal
-            }
-          </span>
+        ) : (
+          <span className={styles.goalText}>{goal}</span>
+        )
       }
-
     </div>
-  )
-}
+  );
+};
 
 export default InnovationGoal;

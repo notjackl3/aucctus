@@ -1,49 +1,48 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent } from 'react';
 
-
-import styles from "../assets/styles/components/domain-box.module.scss"
-import images from "../assets/img";
-import { useNavigate } from "react-router-dom";
-import { AppPath } from "../../routes/routes";
-import Icon from "./Icon";
-
-
+import styles from '../assets/styles/components/domain-box.module.scss';
+import images from '../assets/img';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '../../routes/routes';
+import Icon from './Icon';
 
 const iconDefaultProps = {
   height: 20,
   width: 20,
-  stroke: "#7586a9"
-
-}
+  stroke: '#7586a9',
+};
 
 interface DomainBoxProps {
   id: string;
   title: string;
-  overview: string
+  overview: string;
   totalAddressableMarket: number | string;
   compoundAnnualGrowth: number | string;
   ventureCapitalInvestment?: number | string;
 }
 
-const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, totalAddressableMarket, compoundAnnualGrowth, ventureCapitalInvestment }) => {
-  const navigate = useNavigate()
-
+const DomainBox: FunctionComponent<DomainBoxProps> = ({
+  id,
+  title,
+  overview,
+  totalAddressableMarket,
+  compoundAnnualGrowth,
+  ventureCapitalInvestment,
+}) => {
+  const navigate = useNavigate();
 
   return (
     <div className={styles.container}>
       <div className={styles.content}>
-        <div className={styles.header} >
-          <img
-            alt="domain-booklet"
-            src={images.domainBooklet}
-          />
+        <div className={styles.header}>
+          <img alt="domain-booklet" src={images.domainBooklet} />
           <div className={styles.supportingText}>
             <span className={styles.title}>{title}</span>
             <span className={styles.overview}>{overview}</span>
           </div>
         </div>
 
-        <div className={styles.importantMetrics} >
+        <div className={styles.importantMetrics}>
           <span className={styles.metricHeader}>Important Metrics</span>
 
           <div className={styles.metric}>
@@ -69,9 +68,7 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, tot
             </div>
             <span>${ventureCapitalInvestment}</span>
           </div> */}
-
         </div>
-
       </div>
       <div className={styles.actionable}>
         <div>
@@ -84,20 +81,15 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({ id, title, overview, tot
         <button
           className={`btn btn-light`}
           onClick={() => {
-            navigate(AppPath.DomainMarket.replace(":id", id), {
-
-            })
+            navigate(AppPath.DomainMarket.replace(':id', id), {});
           }}
-
         >
           Explore Domain
-          <Icon variant="arrowRight"{...iconDefaultProps} stroke="#626ba3" />
+          <Icon variant="arrowRight" {...iconDefaultProps} stroke="#626ba3" />
         </button>
-
-
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default DomainBox
+export default DomainBox;

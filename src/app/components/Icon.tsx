@@ -1,45 +1,44 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent } from 'react';
 
-import Lock from "../assets/icons/lock.svg?react";
-import Help from "../assets/icons/help.svg?react";
-import Beaker from "../assets/icons/beaker.svg?react";
-import FileSearch from "../assets/icons/filesearch.svg?react";
-import Lightbulb from "../assets/icons/lightbulb.svg?react";
+import Lock from '../assets/icons/lock.svg?react';
+import Help from '../assets/icons/help.svg?react';
+import Beaker from '../assets/icons/beaker.svg?react';
+import FileSearch from '../assets/icons/filesearch.svg?react';
+import Lightbulb from '../assets/icons/lightbulb.svg?react';
 import Target from '../assets/icons/target.svg?react';
-import Rocket from "../assets/icons/rocket.svg?react";
-import SearchRefraction from "../assets/icons/search-refraction.svg?react"
-import UserGroup from "../assets/icons/users-01.svg?react"
+import Rocket from '../assets/icons/rocket.svg?react';
+import SearchRefraction from '../assets/icons/search-refraction.svg?react';
+import UserGroup from '../assets/icons/users-01.svg?react';
 import Clipboard from '../assets/icons/clipboard.svg?react';
 import Umbrella from '../assets/icons/umbrella.svg?react';
-import MessageCircle from '../assets/icons/message-circle.svg?react'
+import MessageCircle from '../assets/icons/message-circle.svg?react';
 import Home from '../assets/icons/home.svg?react';
-import Gear from "../assets/icons/gear.svg?react";
-import ChevronUp from "../assets/icons/chevronup.svg?react";
-import Globe from "../assets/icons/globe.svg?react";
-import Key from "../assets/icons/key.svg?react";
-import LifeBuoy from "../assets/icons/lifebuoy.svg?react";
-import LineChartUp from "../assets/icons/line-chart-up.svg?react";
-import Mail from "../assets/icons/mail.svg?react";
-import ShieldDollar from "../assets/icons/shield-dollar.svg?react";
-import ThreeStars from "../assets/icons/threeStars.svg?react";
-import PaperAirPlane from "../assets/icons/paper-airplane.svg?react";
-import PieChart from "../assets/icons/pie-chart.svg?react";
+import Gear from '../assets/icons/gear.svg?react';
+import ChevronUp from '../assets/icons/chevronup.svg?react';
+import Globe from '../assets/icons/globe.svg?react';
+import Key from '../assets/icons/key.svg?react';
+import LifeBuoy from '../assets/icons/lifebuoy.svg?react';
+import LineChartUp from '../assets/icons/line-chart-up.svg?react';
+import Mail from '../assets/icons/mail.svg?react';
+import ShieldDollar from '../assets/icons/shield-dollar.svg?react';
+import ThreeStars from '../assets/icons/threeStars.svg?react';
+import PaperAirPlane from '../assets/icons/paper-airplane.svg?react';
+import PieChart from '../assets/icons/pie-chart.svg?react';
 import PresentationChart from '../assets/icons/presentation-chart.svg?react';
-import SaveStar from "../assets/icons/save-star.svg?react";
-import ArrowDown from "../assets/icons/arrowdown.svg?react";
-import ArrowUp from "../assets/icons/arrowup.svg?react";
-import ArrowRight from "../assets/icons/arrowright.svg?react";
-import ArrowLeft from "../assets/icons/arrowleft.svg?react";
-import Star from "../assets/icons/star.svg?react";
-import TrendUp from "../assets/icons/trendup.svg?react";
-import FilterLines from "../assets/icons/filter-lines.svg?react";
-import Currency from "../assets/icons/currencydollar.svg?react";
-import Download from "../assets/icons/download.svg?react";
+import SaveStar from '../assets/icons/save-star.svg?react';
+import ArrowDown from '../assets/icons/arrowdown.svg?react';
+import ArrowUp from '../assets/icons/arrowup.svg?react';
+import ArrowRight from '../assets/icons/arrowright.svg?react';
+import ArrowLeft from '../assets/icons/arrowleft.svg?react';
+import Star from '../assets/icons/star.svg?react';
+import TrendUp from '../assets/icons/trendup.svg?react';
+import FilterLines from '../assets/icons/filter-lines.svg?react';
+import Currency from '../assets/icons/currencydollar.svg?react';
+import Download from '../assets/icons/download.svg?react';
 import Refresh from '../assets/icons/refresh.svg?react';
 import Calendar from '../assets/icons/calendar.svg?react';
 import Columns from '../assets/icons/columns.svg?react';
 import Announcement from '../assets/icons/announcement.svg?react';
-
 
 export enum IconVariant {
   lock,
@@ -80,7 +79,7 @@ export enum IconVariant {
   refresh,
   calendar,
   columns,
-  announcement
+  announcement,
 }
 
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
@@ -88,91 +87,87 @@ interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
   title?: string;
 }
 
-
 const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
-
   switch (variant) {
     case 'file':
-      return <FileSearch {...props} />
+      return <FileSearch {...props} />;
     case 'lightbulb':
-      return <Lightbulb {...props} />
+      return <Lightbulb {...props} />;
     case 'rocket':
-      return <Rocket {...props} />
+      return <Rocket {...props} />;
     case 'home':
-      return <Home {...props} />
+      return <Home {...props} />;
     case 'gear':
-      return <Gear {...props} />
+      return <Gear {...props} />;
     case 'lock':
-      return <Lock {...props} />
+      return <Lock {...props} />;
     case 'help':
-      return <Help {...props} />
+      return <Help {...props} />;
     case 'beaker':
-      return <Beaker {...props} />
+      return <Beaker {...props} />;
     case 'target':
-      return <Target {...props} />
+      return <Target {...props} />;
     case 'search':
-      return <SearchRefraction {...props} />
+      return <SearchRefraction {...props} />;
     case 'userGroup':
-      return <UserGroup {...props} />
+      return <UserGroup {...props} />;
     case 'clipboard':
-      return <Clipboard {...props} />
+      return <Clipboard {...props} />;
     case 'umbrella':
-      return <Umbrella {...props} />
+      return <Umbrella {...props} />;
     case 'message':
-      return <MessageCircle {...props} />
+      return <MessageCircle {...props} />;
     case 'chevronUp':
-      return <ChevronUp {...props} />
+      return <ChevronUp {...props} />;
     case 'globe':
-      return <Globe {...props} />
+      return <Globe {...props} />;
     case 'key':
-      return <Key {...props} />
+      return <Key {...props} />;
     case 'lifeBuoy':
-      return <LifeBuoy {...props} />
+      return <LifeBuoy {...props} />;
     case 'lineChartUp':
-      return <LineChartUp {...props} />
+      return <LineChartUp {...props} />;
     case 'mail':
-      return <Mail {...props} />
+      return <Mail {...props} />;
     case 'shieldDollar':
-      return <ShieldDollar {...props} />
+      return <ShieldDollar {...props} />;
     case 'threeStars':
-      return <ThreeStars {...props} />
+      return <ThreeStars {...props} />;
     case 'paperAirPlane':
-      return <PaperAirPlane {...props} />
+      return <PaperAirPlane {...props} />;
     case 'pieChart':
-      return <PieChart {...props} />
+      return <PieChart {...props} />;
     case 'presentationChart':
-      return <PresentationChart {...props} />
+      return <PresentationChart {...props} />;
     case 'saveStar':
-      return <SaveStar {...props} />
+      return <SaveStar {...props} />;
     case 'arrowDown':
-      return <ArrowDown {...props} />
+      return <ArrowDown {...props} />;
     case 'arrowUp':
-      return <ArrowUp {...props} />
+      return <ArrowUp {...props} />;
     case 'arrowRight':
-      return <ArrowRight {...props} />
+      return <ArrowRight {...props} />;
     case 'arrowLeft':
-      return <ArrowLeft {...props} />
+      return <ArrowLeft {...props} />;
     case 'star':
-      return <Star {...props} />
+      return <Star {...props} />;
     case 'trendUp':
-      return <TrendUp {...props} />
+      return <TrendUp {...props} />;
     case 'filterLines':
-      return <FilterLines {...props} />
+      return <FilterLines {...props} />;
     case 'currency':
-      return <Currency {...props} />
+      return <Currency {...props} />;
     case 'download':
-      return <Download {...props} />
+      return <Download {...props} />;
     case 'refresh':
-      return <Refresh {...props} />
+      return <Refresh {...props} />;
     case 'calendar':
-      return <Calendar {...props} />
+      return <Calendar {...props} />;
     case 'columns':
-      return <Columns {...props} />
+      return <Columns {...props} />;
     case 'announcement':
-      return <Announcement {...props} />
-
-
+      return <Announcement {...props} />;
   }
-}
+};
 
-export default Icon
+export default Icon;

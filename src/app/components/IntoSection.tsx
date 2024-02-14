@@ -1,8 +1,8 @@
-import { FunctionComponent } from "react";
-import styles from "../assets/styles/pages/auth-screens.module.scss";
-import images from "../assets/img";
-import fictionalLogo from "../assets/icons/fictional-company-logo.svg";
-import Icon from "./Icon";
+import { FunctionComponent } from 'react';
+import styles from '../assets/styles/pages/auth-screens.module.scss';
+import images from '../assets/img';
+import fictionalLogo from '../assets/icons/fictional-company-logo.svg';
+import Icon from './Icon';
 
 const NUMBER_OF_STARS = 5;
 
@@ -11,10 +11,12 @@ const IntoSection: FunctionComponent = () => {
     <div className={styles.intoSection}>
       <div className={styles.quoteAndAttribution}>
         <div className={styles.stars}>
-          { // Create the Stars icon N times
-            [...Array(NUMBER_OF_STARS)].map((e, i) =>
+          {
+            // Create the Stars icon N times
+            [...Array(NUMBER_OF_STARS)].map((e, i) => (
               <Icon variant="star" key={`star-icon-${i}`} height={20} width={30} stroke="#2B3674" fill="#2B3674" />
-            )}
+            ))
+          }
         </div>
         <div className={styles.quote}>
           Aucctus provides enormous potential for organizations to innovate at speed and scale.
@@ -35,11 +37,7 @@ const IntoSection: FunctionComponent = () => {
       <div className={styles.screenMockupWrapper}>
         {/* <div className={styles.screenMockup}> */}
 
-        <img
-          className={styles.screenMockup}
-          alt="Aucctus"
-          src={images.screenMockup}
-        />
+        <img className={styles.screenMockup} alt="Aucctus" src={images.screenMockup} />
         {/* </div> */}
       </div>
     </div>

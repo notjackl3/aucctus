@@ -1,4 +1,1 @@
-
-
-
-export const HELP_EMAIL = "help@aucctus.com"
+export const HELP_EMAIL = 'help@aucctus.com';

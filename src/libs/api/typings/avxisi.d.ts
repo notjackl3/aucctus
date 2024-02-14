@@ -1,6 +1,5 @@
-import { HttpStatusCode } from "axios";
-import { IUser } from ".";
-
+import { HttpStatusCode } from 'axios';
+import { IUser } from '.';
 
 export type IFormError<T> = IServerErrorMessage | IFormErrorResponse<T>;
 export interface IServerErrorMessage {
@@ -15,9 +14,7 @@ export interface IFormDetailsError {
 export interface IFormErrorResponse<T = unknown> {
   error: Record<keyof T, IFormDetailsError[]>;
   // [key as keyof T]: IFormDetailsError[]
-
 }
-
 
 export interface IMessageResponse {
   id: string;

@@ -1,11 +1,11 @@
-import React, { FunctionComponent } from "react";
-import { useSpring, animated } from "@react-spring/web";
-import { usePrevious, useMeasure } from "../hooks";
+import React, { FunctionComponent } from 'react';
+import { useSpring, animated } from '@react-spring/web';
+import { usePrevious, useMeasure } from '../hooks';
 
 interface CollapsibleProps {
   toggle: boolean;
   children: React.ReactNode;
-  width?: number | string
+  width?: number | string;
 }
 
 const Collapsible: FunctionComponent<CollapsibleProps> = ({ toggle = false, children, width }) => {
@@ -23,16 +23,14 @@ const Collapsible: FunctionComponent<CollapsibleProps> = ({ toggle = false, chil
       aria-expanded={toggle}
       style={{
         width: width,
-        position: "relative",
+        position: 'relative',
         opacity: spring.opacity,
-        height: toggle && previous === toggle ? "auto" : spring.height,
+        height: toggle && previous === toggle ? 'auto' : spring.height,
         zIndex: toggle ? 0 : -100,
       }}
     >
       {/* @ts-ignore */}
-      <animated.div {...bind}>
-        {children}
-      </animated.div>
+      <animated.div {...bind}>{children}</animated.div>
     </animated.div>
   );
 };

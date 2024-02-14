@@ -54,7 +54,7 @@ export class AuthApi extends ApiService {
    * It will stay like that for the forseeable future.
    * @returns
    */
-  async refreshToken(token: string) {
+  async refreshToken(token?: string) {
     return this.post<IAuthSuccessResponse>(endpoints.refresh, token ? { token } : undefined);
   }
 
