@@ -73,6 +73,14 @@
         justify-content: center;
         gap: var(--gap-base);
 
+        &.h2 {
+          .supportingText,
+          .title {
+            align-self: center !important;
+            position: relative;
+          }
+        }
+
         .supportingText,
         .title {
           align-self: stretch;

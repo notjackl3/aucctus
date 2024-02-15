@@ -4,7 +4,6 @@ import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
 import { validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import { useAppDispatch } from '../../hooks';
 import { isError, useQuery } from 'react-query';
 import api from '../../../libs/api';
 import { isAxiosError } from 'axios';
@@ -64,7 +63,9 @@ const SignUp: FunctionComponent = () => {
       } else {
         setEmailInputError(undefined);
       }
+      e.preventDefault();
     },
+
     [email]
   );
 

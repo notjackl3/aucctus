@@ -4,7 +4,7 @@ import styles from '../assets/styles/components/feature-icon.module.scss';
 import Icon, { IconVariant } from './Icon';
 
 const defaultIconProps = {
-  stroke: '#FFF',
+  stroke: '#FFFFF',
   width: 24,
   height: 24,
 };

@@ -41,3 +41,9 @@ export interface IAuthSuccessResponse {
   user: IUser;
   token: string;
 }
+
+export interface IUpdateForgottenPasswordRequest {
+  password: string;
+  confirmPassword: string;
+  token: string;
+}

@@ -13,7 +13,8 @@
   &.purple {
     border: 10px solid var(--primary-50-secondary, #f4f7fe);
     background: var(--primary-100, #dee7fc);
-    svg {
+    svg,
+    path {
       stroke: var(--primary-600-primary) !important;
     }
   }

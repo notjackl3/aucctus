@@ -1,4 +1,4 @@
-import { IAuthSuccessResponse, IToken } from './typings';
+import { IAuthSuccessResponse, IToken, IUpdateForgottenPasswordRequest } from './typings';
 import { ApiService } from './apiService';
 import { endpoints } from './endpoints';
 import { IMessageResponse } from './typings/avxisi';
@@ -47,6 +47,23 @@ export class AuthApi extends ApiService {
 
   async logout() {
     return this.post<IMessageResponse>(endpoints.logout, null, this._handleAccessToken());
+  }
+
+  /**
+   *
+   * @param email
+   * @returns
+   */
+  async forgotPassword(email: string) {
+    return this.get<IMessageResponse>(endpoints.forgotPassword(email));
+  }
+
+  async updateForgottenPassword(password: string, confirmPassword: string, token: string) {
+    return this.post<IMessageResponse, IUpdateForgottenPasswordRequest>(endpoints.forgotPassword(), {
+      password,
+      confirmPassword,
+      token,
+    });
   }
 
   /** RefreshToken

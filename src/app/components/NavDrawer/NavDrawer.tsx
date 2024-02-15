@@ -10,7 +10,6 @@ import { AppPath } from '../../../routes/routes';
 import { useAppDispatch } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
 import { selectedConcept } from '../../../features/concepts/concept.slice';
-import App from '../../../App';
 
 const NavDrawer = () => {
   const user = useSelector(selectUser)!;
@@ -113,7 +112,7 @@ const NavDrawer = () => {
                 dispatch(logout());
               }}
             >
-              <span>{user.name}</span>
+              <span>{user.firstName}</span>
               <span>{user.email}</span>
             </div>
           </div>
