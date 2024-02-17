@@ -3,22 +3,22 @@
   "name": "Aucctus",
   "icons": [
     {
-      "src": "/icon-32x32.png",
+      "src": "images/icon-32x32.png",
       "sizes": "32x32",
       "type": "image/png"
     },
     {
-      "src": "/apple-touch-icon-180x180.png",
+      "src": "images/apple-touch-icon-180x180.png",
       "sizes": "180x180",
       "type": "image/png"
     },
     {
-      "src": "/apple-touch-icon-152x152.png",
+      "src": "images/apple-touch-icon-152x152.png",
       "sizes": "152x152",
       "type": "image/png"
     },
     {
-      "src": "/favicon.svg",
+      "src": "images/favicon.svg",
       "sizes": "any",
       "type": "image/svg+xml"
     }

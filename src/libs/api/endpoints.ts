@@ -7,7 +7,7 @@ export const endpoints = {
 
   user: '/api/v1/user',
   confirmEmail: `/api/v1/confirm-email`,
-  forgotPassword: (email?: string) => (email ? `/api/v1/forgot-password` : `/api/v1/forgot-password?email=${email}`),
+  forgotPassword: `/api/v1/forgot-password`,
 
   /* Account */
   account: `/api/v1/account`,

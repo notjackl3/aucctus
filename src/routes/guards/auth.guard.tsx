@@ -11,7 +11,7 @@ const AuthGuard: FunctionComponent = () => {
     return <Outlet />;
   }
 
-  return <Navigate to={AppPath.SignIn} />;
+  return <Navigate to={AppPath.Login} />;
 };
 
 export default AuthGuard;

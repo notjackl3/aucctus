@@ -2,7 +2,7 @@ import { FunctionComponent, useCallback, useState } from 'react';
 
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
-import { validEmail } from '../../../libs/utils';
+import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
 import { isError, useQuery } from 'react-query';
 import api from '../../../libs/api';
@@ -28,31 +28,11 @@ const SignUp: FunctionComponent = () => {
     enabled: false, // Prevent from automatically running
     queryFn: async () => await api.auth.signup(firstName, lastName, email, password, confirmPassword),
     onSuccess: () => {
-      navigate(AppPath.SignUpSuccess);
+      navigate(AppPath.ConfirmEmail);
     },
     onError: (error) => {
-      let message = 'Unexpected Error Occurred';
-      if (isAxiosError<IFormError<IRegisterUser>>(error)) {
-        // Check if there is an error response from the server otherwise we will use the default message
-        if (error.response) {
-          const errorResponse = error.response.data;
-          if (typeof errorResponse.error === 'string') {
-            message = errorResponse.error;
-          } else {
-            // For now we are only going to show the first error message
-            // Most errors ar caught before they reach the server
-            const firstKey = Object.keys(errorResponse.error)[0] as keyof IRegisterUser;
-            const firstValue = errorResponse.error[firstKey][0];
-            message = `${firstKey}: ${firstValue.message}`;
-          }
-        } else {
-          message = error.message;
-        }
-      } else if (isError(error)) {
-        message = error.message;
-      }
+      let message = parseFormError<IRegisterUser>(error);
       setError(message);
-      return message;
     },
   });
 
@@ -168,7 +148,7 @@ const SignUp: FunctionComponent = () => {
 
         <div className={styles.signUp}>
           <span>Already have an account?</span>
-          <Link className={`${styles.link} btn btn-link`} to={AppPath.SignIn}>
+          <Link className={`${styles.link} btn btn-link`} to={AppPath.Login}>
             Sign In
           </Link>
         </div>

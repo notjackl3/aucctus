@@ -16,7 +16,7 @@ const AuthHeader: FunctionComponent = () => {
         onClick={() => {
           // Used in the case of onboarding where the user is actually logged in but are not tied to their multi-tenancy "Account".
           dispatch(logout());
-          navigate(AppPath.SignIn);
+          navigate(AppPath.Login);
         }}
       >
         <img alt="Logo" style={{ height: 30, width: 146 }} src={Logo} />
