@@ -2,7 +2,7 @@ name: Pull Request Build and Test
 
 on:
   pull_request:
-    branches: [main]
+    branches: [main, develop]
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -16,7 +16,7 @@ jobs:
       - name: Set up Node.js (Example)
         uses: actions/setup-node@v3
         with:
-          node-version: '14' # Specify your node version here
+          node-version: '20' # Specify your node version here
 
       - name: Install Dependencies
         run: npm install # or yarn install, depending on your project
