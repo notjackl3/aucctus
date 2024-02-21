@@ -2,8 +2,7 @@ name: S3/CloudFront CI/CD
 
 on:
   push:
-    # TODO: update to develop once done testing
-    branches: [feature/ci-cd]
+    branches: [develop]
 
 env:
   # TODO: Update the VITE_AVXISI_BASE_URL to the staging environment
