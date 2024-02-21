@@ -35,8 +35,9 @@ jobs:
         run: npm install
       - name: Build
         run: npm run build
-      - name: Deploy to S3
-        # upload all static assets w/ cache control (dist/** is an artifact from the previous step)
+      # upload all static assets w/ cache control (dist/** is an artifact from the previous step)
+      - name: Deploy assets to S3
         run: aws s3 sync ./build/ s3://aucctus-staging-bucket --cache-control 'public,max-age=31536000,immutable'
-        # overwrite index file with correct TTLs so latest changes are reflected immediately
-        - aws s3 cp ./build/index.html s3://aucctus-staging-bucket --cache-control 'public,max-age=60'
+      # overwrite index file with correct TTLs so latest changes are reflected immediately
+      - name: Deploy index to S3
+        run: aws s3 cp ./build/index.html s3://aucctus-staging-bucket --cache-control 'public,max-age=60'
