@@ -10,13 +10,13 @@ const CompanyMetricsContainer: FunctionComponent = () => {
   const query = useQuery({
     queryKey: 'CompanyMetrics',
     retry: 2,
-    queryFn: async () => await api.organization.getKips(),
+    // queryFn: async () => await api.organization.getKips(),
     onError: (error) => {
       // TODO: Handle Error
     },
-    onSuccess: (data) => {
-      setMetrics(data);
-    },
+    // onSuccess: (data) => {
+    //   setMetrics(data);
+    // },
   });
 
   return (

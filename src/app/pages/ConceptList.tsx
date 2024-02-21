@@ -27,11 +27,11 @@ const ConceptList: FunctionComponent = () => {
   const query = useQuery({
     queryKey: 'saved/concepts',
     retry: 3,
-    queryFn: async () => await api.igniteConcept.getAllSavedConcepts(),
-    onSuccess: (response) => {
-      setData(response);
-      setFetchComplete(true);
-    },
+    // queryFn: async () => await api.igniteConcept.getAllSavedConcepts(),
+    // onSuccess: (response) => {
+    //   setData(response);
+    //   setFetchComplete(true);
+    // },
     onError: (error) => {
       setFetchComplete(true);
     },

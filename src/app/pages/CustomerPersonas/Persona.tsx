@@ -27,12 +27,12 @@ const Persona: FunctionComponent = () => {
     enabled: false, // Prevent from automatically running
     cacheTime: 1000,
     queryFn: async () => {
-      if (id && persona) return await api.igniteConcept.getCustomerProfile(id, persona);
+      // if (id && persona) return await api.igniteConcept.getCustomerProfile(id, persona);
     },
-    onSuccess: (response) => {
-      setCustomerProfile(response);
-      setCurrentPersona(persona || undefined);
-    },
+    // onSuccess: (response) => {
+    //   setCustomerProfile(response);
+    //   setCurrentPersona(persona || undefined);
+    // },
   });
 
   const isLoading = useMemo(

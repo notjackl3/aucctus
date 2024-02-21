@@ -15,11 +15,11 @@ const CustomerPersona: FunctionComponent = () => {
   const targetGroupsQuery = useQuery({
     queryKey: [`concept/:id/target-group`, id],
     retry: 2,
-    queryFn: async () => await api.igniteConcept.getTargetGroups(id || ''),
-    onSuccess: (data) => {
-      setTargetGroupList(data);
-      setTargetGroup(data[0]);
-    },
+    // queryFn: async () => await api.igniteConcept.getTargetGroups(id || ''),
+    // onSuccess: (data) => {
+    //   setTargetGroupList(data);
+    //   setTargetGroup(data[0]);
+    // },
   });
 
   const setTargetGroup = (group: string) => {

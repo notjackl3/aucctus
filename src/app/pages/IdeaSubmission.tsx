@@ -20,11 +20,11 @@ const IdeaSubmission: FunctionComponent = () => {
     retry: 0,
     queryFn: async () => {
       if (!id) return;
-      return api.challenge.createIdea(id, { title, description });
+      // return api.challenge.createIdea(id, { title, description });
     },
-    onSuccess: (data) => {
-      setIdea(data);
-    },
+    // onSuccess: (data) => {
+    //   setIdea(data);
+    // },
     onError: (error) => {
       // TODO: Handle error
       alert(error);

@@ -19,19 +19,19 @@ const ConceptOverview: FunctionComponent = () => {
   const conceptQuery = useQuery({
     queryKey: [`concept/:id`, id],
     retry: 2,
-    queryFn: async () => await api.igniteConcept.getGeneratedConcept(id || ''),
-    onSuccess: (response) => {
-      setConcept(response);
-    },
+    // queryFn: async () => await api.igniteConcept.getGeneratedConcept(id || ''),
+    // onSuccess: (response) => {
+    //   setConcept(response);
+    // },
   });
 
   const overviewQuery = useQuery({
     queryKey: `concept/overview/${id}`,
     retry: 2,
-    queryFn: async () => await api.igniteConcept.getConceptOverview(id || ''),
-    onSuccess: (response) => {
-      setData(response);
-    },
+    // queryFn: async () => await api.igniteConcept.getConceptOverview(id || ''),
+    // onSuccess: (response) => {
+    //   setData(response);
+    // },
   });
 
   return (

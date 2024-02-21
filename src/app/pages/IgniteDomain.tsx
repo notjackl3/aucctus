@@ -19,11 +19,11 @@ const IgniteDomain: FunctionComponent = () => {
   const query = useQuery({
     queryKey: 'igniteDomain',
     enabled: false, // disable this query from automatically running
-    queryFn: async () =>
-      await api.igniteDomain.generateDomain({ opportunity, perception, qualification, exampleConcepts, extraDetails }),
-    onSuccess: (response) => {
-      navigate(AppPath.DomainList);
-    },
+    // queryFn: async () =>
+    //   await api.igniteDomain.generateDomain({ opportunity, perception, qualification, exampleConcepts, extraDetails }),
+    // onSuccess: (response) => {
+    //   navigate(AppPath.DomainList);
+    // },
   });
 
   return (

@@ -3,7 +3,7 @@ import { FunctionComponent, useState } from 'react';
 import styles from '../assets/styles/pages/domain-market.module.scss';
 import CompanyMetric from '../components/CompanyMetric';
 import { useSelector } from 'react-redux';
-import { selectOrganization } from '../../features/auth/auth.slice';
+// import { selectOrganization } from '../../features/auth/auth.slice';
 import images from '../assets/img';
 import DomainMarketBox from '../components/DomainMarketBox';
 import { useParams } from 'react-router-dom';
@@ -14,7 +14,7 @@ import Loading from '../components/Loading';
 
 const DomainMarket: FunctionComponent = () => {
   let { id } = useParams();
-  const organization = useSelector(selectOrganization)!;
+  // const organization = useSelector(selectOrganization)!;
   const [data, setData] = useState<IDomainMarket | undefined>();
   const [domain, setDomain] = useState<IGeneratedDomain | undefined>();
 
@@ -22,20 +22,20 @@ const DomainMarket: FunctionComponent = () => {
     queryKey: 'domain',
     cacheTime: 1000,
     retry: 2,
-    queryFn: async () => await api.igniteDomain.getDomain(id || ''),
-    onSuccess: (response) => {
-      setDomain(response);
-    },
+    // queryFn: async () => await api.igniteDomain.getDomain(id || ''),
+    // onSuccess: (response) => {
+    //   setDomain(response);
+    // },
   });
 
   const overviewQuery = useQuery({
     queryKey: 'domain/market',
     cacheTime: 1000,
     retry: 2,
-    queryFn: async () => await api.igniteDomain.getDomainMarket(id || ''),
-    onSuccess: (response) => {
-      setData(response);
-    },
+    // queryFn: async () => await api.igniteDomain.getDomainMarket(id || ''),
+    // onSuccess: (response) => {
+    //   setData(response);
+    // },
   });
 
   return (
@@ -62,7 +62,7 @@ const DomainMarket: FunctionComponent = () => {
         <div className={styles.content}>
           <div className={styles.about}>
             <div className={styles.overview}>
-              <h4>Why {organization.name}</h4>
+              {/* <h4>Why {organization.name}</h4> */}
               <span className={styles.text}>{overviewQuery.isLoading ? <Loading /> : data?.overallReasoning}</span>
             </div>
 

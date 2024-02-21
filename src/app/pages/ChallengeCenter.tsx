@@ -14,10 +14,10 @@ const ChallengeCenter: FunctionComponent = () => {
   const query = useQuery({
     queryKey: 'challenges',
     retry: 2,
-    queryFn: async () => await api.challenge.getChallenges(),
-    onSuccess: (response) => {
-      setChallenges(response);
-    },
+    // queryFn: async () => await api.challenge.getChallenges(),
+    // onSuccess: (response) => {
+    //   setChallenges(response);
+    // },
     onError: (error) => {
       alert(error);
     },

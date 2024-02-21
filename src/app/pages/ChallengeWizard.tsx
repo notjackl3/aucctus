@@ -23,10 +23,10 @@ const ChallengeWizard: FunctionComponent = () => {
     enabled: false,
     refetchOnWindowFocus: false,
     retry: 0,
-    queryFn: async () => api.challenge.createChallenge({ title, description, pains, q4, endDate }),
-    onSuccess: (data) => {
-      setChallenge(data);
-    },
+    // queryFn: async () => api.challenge.createChallenge({ title, description, pains, q4, endDate }),
+    // onSuccess: (data) => {
+    //   setChallenge(data);
+    // },
     onError: (error) => {
       // TODO: Handle error
       alert(error);

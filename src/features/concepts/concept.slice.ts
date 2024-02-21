@@ -21,8 +21,8 @@ const initialState: ConceptState = {
 export const saveConcept = createAsyncThunk('concept/save', async (id: string, thunkApi) => {
   analytics.debug('Save');
   try {
-    const response = await api.igniteConcept.saveGeneratedConcept(id);
-    return response;
+    // const response = await api.igniteConcept.saveGeneratedConcept(id);
+    // return response;
   } catch (e) {
     analytics.debug(e);
     thunkApi.rejectWithValue(e);
@@ -32,7 +32,7 @@ export const saveConcept = createAsyncThunk('concept/save', async (id: string, t
 export const removedUnsavedConcepts = createAsyncThunk('concept/remove-unsaved', async (id: string, thunkApi) => {
   analytics.debug('Remove Unsaved');
   try {
-    return await api.igniteConcept.deleteAllUnsavedGeneratedConcept(id);
+    // return await api.igniteConcept.deleteAllUnsavedGeneratedConcept(id);
   } catch (e) {
     analytics.debug(e);
     thunkApi.rejectWithValue(e);
@@ -46,8 +46,9 @@ export const conceptSlice = createSlice({
     setConcepts(state: ConceptState, action: PayloadAction<IConceptResponse[]>) {
       analytics.debug(`Setting Concepts ${action.payload}`);
       state.concepts = action.payload;
-      const firstConcept = action.payload[0];
-      state.igniteId = firstConcept ? firstConcept.igniteConceptId : undefined;
+      state.igniteId = undefined;
+      // const firstConcept = action.payload[0];
+      // state.igniteId = firstConcept ? firstConcept.igniteConceptId : undefined;
     },
     setSelectedConcept(state: ConceptState, action: PayloadAction<string>) {
       state.selectedConcept = action.payload;
@@ -58,10 +59,10 @@ export const conceptSlice = createSlice({
     builder
       .addCase(saveConcept.fulfilled, (state, action) => {
         const payload = action.payload;
-        if (payload) {
-          state.concepts = state.concepts.map((c) => (c.id === payload.id ? action.payload! : c));
-          state.igniteId = payload.igniteConceptId;
-        }
+        // if (payload) {
+        //   state.concepts = state.concepts.map((c) => (c.id === payload.id ? action.payload! : c));
+        //   state.igniteId = payload.igniteConceptId;
+        // }
       })
       // .addCase(saveConcept.pending, (state) => {})
       // .addCase(saveConcept.rejected, (state) => {})

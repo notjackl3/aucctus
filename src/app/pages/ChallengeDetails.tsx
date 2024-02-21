@@ -17,11 +17,11 @@ const ChallengeDetails: FunctionComponent = () => {
   const query = useQuery({
     queryKey: [`concept/:id`, id],
     retry: 2,
-    queryFn: async () => await api.challenge.getChallenge(id || ''),
-    onSuccess: (response) => {
-      setChallenge(response);
-      if (response.endDate) setEndDate(new Date(response.endDate).toLocaleDateString('en-US'));
-    },
+    // queryFn: async () => await api.challenge.getChallenge(id || ''),
+    // onSuccess: (response) => {
+    //   setChallenge(response);
+    //   if (response.endDate) setEndDate(new Date(response.endDate).toLocaleDateString('en-US'));
+    // },
     onError: (error) => {
       alert(error);
     },

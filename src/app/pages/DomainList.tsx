@@ -20,11 +20,11 @@ const DomainList: FunctionComponent = () => {
   const query = useQuery({
     queryKey: 'domain-list',
     cacheTime: 100,
-    queryFn: async () => await api.igniteDomain.getAllDomains(),
-    onSuccess: (response) => {
-      setData(response);
-      setFetchComplete(true);
-    },
+    // queryFn: async () => await api.igniteDomain.getAllDomains(),
+    // onSuccess: (response) => {
+    //   setData(response);
+    //   setFetchComplete(true);
+    // },
     onError: () => {
       setFetchComplete(true);
     },

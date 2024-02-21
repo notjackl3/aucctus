@@ -23,12 +23,12 @@ const IgniteConcept: FunctionComponent = () => {
     queryKey: 'igniteDomain',
     cacheTime: 1000,
     enabled: false, // disable this query from automatically running
-    queryFn: async () =>
-      await api.igniteConcept.generateConcepts({ concept, painPoint, monetizationStrategy, motivation, extraDetails }),
-    onSuccess: (response) => {
-      dispatch(setConcepts(response));
-      navigate(AppPath.GeneratedConcepts);
-    },
+    // queryFn: async () =>
+    //   await api.igniteConcept.generateConcepts({ concept, painPoint, monetizationStrategy, motivation, extraDetails }),
+    // onSuccess: (response) => {
+    //   dispatch(setConcepts(response));
+    //   navigate(AppPath.GeneratedConcepts);
+    // },
   });
 
   return (
