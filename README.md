@@ -1,3 +1,11 @@
+# Aucctus Frontend
+
+## Requirements
+
+- Node.js 20.x
+
+## Commands
+
 - `dev`/`start` - start dev server and open browser
 - `build` - build for production
 - `preview` - locally preview production build
