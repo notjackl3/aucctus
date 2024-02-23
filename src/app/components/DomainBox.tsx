@@ -27,7 +27,6 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({
   overview,
   totalAddressableMarket,
   compoundAnnualGrowth,
-  ventureCapitalInvestment,
 }) => {
   const navigate = useNavigate();
 
@@ -60,14 +59,6 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({
             </div>
             <span>{compoundAnnualGrowth}% /year</span>
           </div>
-
-          {/* <div className={styles.metric}>
-            <div>
-              <BankIcon {...iconDefaultProps} />
-              <span>Venture Capital Investment</span>
-            </div>
-            <span>${ventureCapitalInvestment}</span>
-          </div> */}
         </div>
       </div>
       <div className={styles.actionable}>
