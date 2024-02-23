@@ -9,11 +9,9 @@ import avatar from '../../assets/icons/avatar.svg';
 import { AppPath } from '../../../routes/routes';
 import { useAppDispatch } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
-import { selectedConcept } from '../../../features/concepts/concept.slice';
 
 const NavDrawer = () => {
   const user = useSelector(selectUser)!;
-  const conceptId = useSelector(selectedConcept);
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
@@ -60,37 +58,6 @@ const NavDrawer = () => {
                 },
                 {
                   title: 'Potential Concepts',
-                  to: AppPath.Home,
-                  locked: true,
-                },
-              ]}
-            />
-            <NavLink
-              to={AppPath.ConceptList}
-              title="Concepts"
-              icon="lightbulb"
-              openBasePath={`/concept/${conceptId || ':id'}`}
-              nestedRoutes={[
-                {
-                  title: 'Overview',
-                  to: AppPath.ConceptOverview.replace(':id', conceptId || ':id'),
-                },
-                {
-                  title: 'Business Model',
-                  to: AppPath.Home,
-                  locked: true,
-                },
-                {
-                  title: 'Financial Projection',
-                  to: AppPath.Home,
-                  locked: true,
-                },
-                {
-                  title: 'Customer Profile',
-                  to: AppPath.ConceptCustomerPersona.replace(':id', conceptId || ':id'),
-                },
-                {
-                  title: 'Related Market',
                   to: AppPath.Home,
                   locked: true,
                 },

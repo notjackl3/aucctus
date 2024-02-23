@@ -10,17 +10,10 @@ const authPersistConfig = {
   blacklist: ['status', 'error'],
 };
 
-// const conceptPersistConfig = {
-//   key: 'aasdnfsdfw',
-//   storage,
-// };
-
 const authPersistedReducer = persistReducer(authPersistConfig, authReducer);
-// const conceptPersistedReducer = persistReducer(conceptPersistConfig, conceptReducer);
 
 const rootReducer = combineReducers({
   auth: authPersistedReducer,
-  // concepts: conceptPersistedReducer,
 });
 
 export const store = configureStore({

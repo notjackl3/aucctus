@@ -1,6 +1,3 @@
-import { HttpStatusCode } from 'axios';
-import { IUser } from '.';
-
 export type IFormError<T> = IServerErrorMessage | IFormErrorResponse<T>;
 export interface IServerErrorMessage {
   id: string;
