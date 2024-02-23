@@ -4,10 +4,8 @@ import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
 import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import { isError, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import api from '../../../libs/api';
-import { isAxiosError } from 'axios';
-import { IFormError } from '../../../libs/api/typings/avxisi';
 import { Link, useNavigate } from 'react-router-dom';
 import { IRegisterUser } from '../../../libs/api/typings';
 

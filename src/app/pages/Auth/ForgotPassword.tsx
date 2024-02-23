@@ -8,12 +8,10 @@ import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
-// import { isAxiosError } from 'axios';
 
 const ForgotPassword: FunctionComponent = () => {
   const [email, setEmail] = useState('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
-  const [error, setError] = useState<string | undefined>();
 
   const query = useQuery({
     queryKey: 'forgot-password',
@@ -47,7 +45,6 @@ const ForgotPassword: FunctionComponent = () => {
         <span className={styles.title}>Forgot Password</span>
         <span className={styles.supportingText}>No worries, we'll send you reset instructions.</span>
       </div>
-      {error && <div className={styles.error}>{error}</div>}
       <form className={styles.basicForm}>
         <InputField
           name="email"
