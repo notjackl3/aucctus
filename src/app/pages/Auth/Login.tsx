@@ -1,7 +1,6 @@
 import { FunctionComponent, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
-import AuthProviderIcon from '../../assets/icons/SocialIcon';
 import { setAuthenticated } from '../../../features/auth/auth.slice';
 import { useAppDispatch } from '../../hooks';
 import { parseFormError, validEmail } from '../../../libs/utils';

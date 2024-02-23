@@ -8,7 +8,7 @@ import { Link } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
-import { isAxiosError } from 'axios';
+// import { isAxiosError } from 'axios';
 
 const ForgotPassword: FunctionComponent = () => {
   const [email, setEmail] = useState('');
@@ -21,13 +21,10 @@ const ForgotPassword: FunctionComponent = () => {
     enabled: false, // Prevent from automatically running
     queryFn: async () => await api.auth.forgotPassword(email),
     onSuccess: () => {
-      // TODO: Create new screen to display success message
-      // navigate(AppPath.SignUpSuccess);
+      // TODO: handle success
     },
-    onError: (error) => {
-      if (isAxiosError(error)) {
-        setError(error.message);
-      }
+    onError: () => {
+      // TODO: handle error
     },
   });
 
@@ -50,6 +47,7 @@ const ForgotPassword: FunctionComponent = () => {
         <span className={styles.title}>Forgot Password</span>
         <span className={styles.supportingText}>No worries, we'll send you reset instructions.</span>
       </div>
+      {error && <div className={styles.error}>{error}</div>}
       <form className={styles.basicForm}>
         <InputField
           name="email"
@@ -68,8 +66,8 @@ const ForgotPassword: FunctionComponent = () => {
           Reset Password
         </button>
         <div className={styles.signUp}>
-          <Link className={`${styles.link}`} to={AppPath.SignIn}>
-            <Icon variant="arrowLeft" /> Back to Sign In
+          <Link className={`${styles.backArrow}`} to={AppPath.Login}>
+            <Icon variant="arrowLeft" /> Back to login
           </Link>
         </div>
       </form>
