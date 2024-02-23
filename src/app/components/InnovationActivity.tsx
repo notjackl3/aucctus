@@ -3,7 +3,6 @@ import Card from './Card';
 
 import styles from '../assets/styles/components/innovation-activity-lifecycle.module.scss';
 import images from '../assets/img';
-import Icon from './Icon';
 
 interface InnovationActivityProps {}
 

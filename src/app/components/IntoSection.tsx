@@ -1,7 +1,6 @@
 import { FunctionComponent } from 'react';
 import styles from '../assets/styles/pages/auth-screens.module.scss';
 import images from '../assets/img';
-import fictionalLogo from '../assets/icons/fictional-company-logo.svg';
 import Icon from './Icon';
 
 const NUMBER_OF_STARS = 5;
@@ -26,12 +25,6 @@ const IntoSection: FunctionComponent = () => {
             <div className={styles.text}>— Brandon Milner</div>
             <div className={styles.supportingText}>Head of Innovation at EllisDon</div>
           </div>
-
-          {/* <img
-            alt="Logo"
-            style={{ fill: "#2B3674", width: 140, height: 33 }}
-            src={fictionalLogo}
-          /> */}
         </div>
       </div>
       <div className={styles.screenMockupWrapper}>
