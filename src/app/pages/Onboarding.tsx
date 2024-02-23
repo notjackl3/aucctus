@@ -20,7 +20,6 @@ const OnBoarding: FunctionComponent = () => {
   const status = useSelector(selectAuthStatus);
 
   const [domainInputError, setDomainInputError] = useState<string | undefined>();
-  const [error, setError] = useState<string | undefined>(); //TODO: error handling
 
   const _handleDomainValidation = useCallback(
     (e: React.FocusEvent) => {
@@ -63,7 +62,6 @@ const OnBoarding: FunctionComponent = () => {
             <span className={styles.title}>Welcome aboard!</span>
             <span className={styles.supportingText}>Answer the prompts below to start innovating</span>
           </div>
-          {error && <div className={styles.error}>{error}</div>}
           <div className={styles.basicForm}>
             <InputField
               name={'companyName'}

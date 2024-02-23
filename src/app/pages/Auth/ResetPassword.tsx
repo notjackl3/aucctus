@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
 import FeatureIcon from '../../components/FeatureIcon';
@@ -7,7 +7,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import Icon, { IconVariant } from '../../components/Icon';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
-import { isAxiosError } from 'axios';
 import { useQueryParams } from '../../hooks';
 import { parseFormError } from '../../../libs/utils';
 import { IPasswordResetForm } from '../../../libs/api/typings';
