@@ -14,7 +14,8 @@
     border: 10px solid var(--primary-50-secondary, #f4f7fe);
     background: var(--primary-100, #dee7fc);
     svg,
-    path {
+    path,
+    circle {
       stroke: var(--primary-600-primary) !important;
     }
   }
@@ -23,7 +24,9 @@
     border: 10px solid #ecfdf3;
     background: #d1fadf;
 
-    svg {
+    svg,
+    path,
+    circle {
       stroke: #039855 !important;
     }
   }

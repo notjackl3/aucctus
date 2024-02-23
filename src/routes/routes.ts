@@ -21,9 +21,10 @@ export enum AppPath {
   ChallengeDetails = '/challenge/:id',
 
   /* Auth */
-  SignIn = '/sign-in',
+  Login = '/login',
   SignUp = '/sign-up',
-  SignUpSuccess = '/confirm-email',
-  ConfirmEmail = '/confirm-email/:token',
+  ConfirmEmail = '/confirm-email',
   ForgotPassword = '/forgot-password',
+  ResetPassword = '/reset-password',
+  ResetPasswordSuccess = '/reset-password/success',
 }

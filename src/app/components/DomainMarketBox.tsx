@@ -11,10 +11,7 @@ interface DomainMarketBoxProps {
 const DomainMarketBox: FunctionComponent<DomainMarketBoxProps> = ({ title, description }) => {
   return (
     <div className={styles.domainMarketBox}>
-      {/* <div className={styles.iconContainer}> */}
       <FeatureIcon icon={'target'} color={'purple'} />
-      {/* </div> */}
-
       <div className={styles.supportingText}>
         <h3>{title}</h3>
         <span>{description}</span>

@@ -36,14 +36,29 @@ export interface IRegisterUser {
   password: string;
   confirmPassword: string;
 }
+export interface ISignInRequest {
+  email: string;
+  password: string;
+}
+
+export interface ISignUpRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
 
 export interface IAuthSuccessResponse {
   user: IUser;
   token: string;
 }
 
-export interface IUpdateForgottenPasswordRequest {
+export interface IPasswordResetForm {
   password: string;
   confirmPassword: string;
+}
+
+export interface IUpdateForgottenPasswordRequest extends IPasswordResetForm {
   token: string;
 }

@@ -1,16 +1,13 @@
 import { FunctionComponent, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
-import AuthProviderIcon from '../../assets/icons/SocialIcon';
 import { setAuthenticated } from '../../../features/auth/auth.slice';
 import { useAppDispatch } from '../../hooks';
-import { validEmail } from '../../../libs/utils';
+import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import { isError, useQuery } from 'react-query';
+import { useQuery } from 'react-query';
 import api from '../../../libs/api';
-import { isAxiosError } from 'axios';
-import { IFormError } from '../../../libs/api/typings/avxisi';
-import { IAuthSuccessResponse, IRegisterUser } from '../../../libs/api/typings';
+import { IAuthSuccessResponse, ISignInRequest } from '../../../libs/api/typings';
 import analytics from '../../../libs/analytics';
 import { Link } from 'react-router-dom';
 
@@ -32,27 +29,7 @@ const Login: FunctionComponent = () => {
       dispatch(setAuthenticated(response));
     },
     onError: (error) => {
-      let message = 'Unexpected Error Occurred';
-      if (isAxiosError<IFormError<IRegisterUser>>(error)) {
-        // Check if there is an error response from the server otherwise we will use the default message
-        if (error.response) {
-          const errorResponse = error.response.data;
-          console.log(errorResponse.error, typeof errorResponse.error);
-          if (typeof errorResponse.error === 'string') {
-            message = errorResponse.error;
-          } else {
-            // For now we are only going to show the first error message
-            // Most errors ar caught before they reach the server
-            const firstKey = Object.keys(errorResponse.error)[0] as keyof IRegisterUser;
-            const firstValue = errorResponse.error[firstKey][0];
-            message = `${firstKey}: ${firstValue.message}`;
-          }
-        } else {
-          message = error.message;
-        }
-      } else if (isError(error)) {
-        message = error.message;
-      }
+      let message = parseFormError<ISignInRequest>(error);
       setError(message);
     },
   });
@@ -63,6 +40,7 @@ const Login: FunctionComponent = () => {
     } else {
       setEmailInputError(undefined);
     }
+    e.preventDefault();
   };
 
   return (
@@ -82,7 +60,7 @@ const Login: FunctionComponent = () => {
           errorMessage={emailInputError}
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
-          onFocus={(e) => setEmailInputError(undefined)}
+          onFocus={() => setEmailInputError(undefined)}
           onBlur={_handleEmailValidation}
         />
 
@@ -121,10 +99,12 @@ const Login: FunctionComponent = () => {
           Login
         </button>
 
+        {/* 
+        // TEMP: Disable
         <button type="button" className="btn btn-white">
           <AuthProviderIcon provider="google" />
           Sign in with Google
-        </button>
+        </button> */}
 
         <div className={styles.signUp}>
           <span>Don't have an account? </span>

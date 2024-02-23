@@ -41,6 +41,7 @@ const OnBoarding: FunctionComponent = () => {
       }
 
       setDomain(d);
+      e.preventDefault();
     },
     [domain]
   );

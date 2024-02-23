@@ -1,20 +1,13 @@
-import { IAuthSuccessResponse, IToken, IUpdateForgottenPasswordRequest } from './typings';
+import {
+  IAuthSuccessResponse,
+  ISignInRequest,
+  ISignUpRequest,
+  IToken,
+  IUpdateForgottenPasswordRequest,
+} from './typings';
 import { ApiService } from './apiService';
 import { endpoints } from './endpoints';
 import { IMessageResponse } from './typings/avxisi';
-
-export interface ISignInRequest {
-  email: string;
-  password: string;
-}
-
-export interface ISignUpRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
 
 export class AuthApi extends ApiService {
   /** Sign Up
@@ -25,7 +18,7 @@ export class AuthApi extends ApiService {
    * @param password2
    * @returns
    */
-  async signup(firstName: string, lastName: string, email: string, password: string, confirmPassword: string) {
+  signup(firstName: string, lastName: string, email: string, password: string, confirmPassword: string) {
     return this.post<IMessageResponse, ISignUpRequest>(endpoints.signup, {
       firstName,
       lastName,
@@ -41,11 +34,11 @@ export class AuthApi extends ApiService {
    * @param password
    * @returns
    */
-  async login(email: string, password: string) {
+  login(email: string, password: string) {
     return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.login, { email, password });
   }
 
-  async logout() {
+  logout() {
     return this.post<IMessageResponse>(endpoints.logout, null, this._handleAccessToken());
   }
 
@@ -54,12 +47,16 @@ export class AuthApi extends ApiService {
    * @param email
    * @returns
    */
-  async forgotPassword(email: string) {
-    return this.get<IMessageResponse>(endpoints.forgotPassword(email));
+  forgotPassword(email: string) {
+    return this.get<IMessageResponse>(endpoints.forgotPassword, {
+      params: {
+        email,
+      },
+    });
   }
 
-  async updateForgottenPassword(password: string, confirmPassword: string, token: string) {
-    return this.post<IMessageResponse, IUpdateForgottenPasswordRequest>(endpoints.forgotPassword(), {
+  resetPassword(password: string, confirmPassword: string, token: string) {
+    return this.post<IMessageResponse, IUpdateForgottenPasswordRequest>(endpoints.forgotPassword, {
       password,
       confirmPassword,
       token,
@@ -71,7 +68,7 @@ export class AuthApi extends ApiService {
    * It will stay like that for the forseeable future.
    * @returns
    */
-  async refreshToken(token?: string) {
+  refreshToken(token?: string) {
     return this.post<IAuthSuccessResponse>(endpoints.refresh, token ? { token } : undefined);
   }
 
@@ -80,7 +77,7 @@ export class AuthApi extends ApiService {
    * @param accessToken
    * @returns
    */
-  async confirmEmail(token: string) {
+  confirmEmail(token: string) {
     return this.post<IAuthSuccessResponse, IToken>(endpoints.confirmEmail, { token });
   }
 }
