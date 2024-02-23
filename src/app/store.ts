@@ -1,9 +1,7 @@
 import { configureStore, ThunkAction, Action, combineReducers } from '@reduxjs/toolkit';
 import authReducer from '../features/auth/auth.slice';
-import conceptReducer from '../features/concepts/concept.slice';
-
 import { persistStore, persistReducer } from 'redux-persist';
-import storage from 'redux-persist/lib/storage';
+// import storage from 'redux-persist/lib/storage';
 import storageSession from 'redux-persist/lib/storage/session';
 
 const authPersistConfig = {
@@ -12,17 +10,17 @@ const authPersistConfig = {
   blacklist: ['status', 'error'],
 };
 
-const conceptPersistConfig = {
-  key: 'aasdnfsdfw',
-  storage,
-};
+// const conceptPersistConfig = {
+//   key: 'aasdnfsdfw',
+//   storage,
+// };
 
 const authPersistedReducer = persistReducer(authPersistConfig, authReducer);
-const conceptPersistedReducer = persistReducer(conceptPersistConfig, conceptReducer);
+// const conceptPersistedReducer = persistReducer(conceptPersistConfig, conceptReducer);
 
 const rootReducer = combineReducers({
   auth: authPersistedReducer,
-  concepts: conceptPersistedReducer,
+  // concepts: conceptPersistedReducer,
 });
 
 export const store = configureStore({
