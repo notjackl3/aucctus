@@ -19,6 +19,12 @@ function App() {
             <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
             <Route element={<Layout />}>
               <Route index path={AppPath.Home} element={<Page.Dashboard />} />
+
+              {/* Concepts */}
+              <Route path={AppPath.Concept} element={<Page.Dashboard />} />
+              <Route path={AppPath.ConceptActive} element={<Page.NotFound />} />
+              <Route path={AppPath.ConceptDraft} element={<Page.NotFound />} />
+              <Route path={AppPath.ConceptArchive} element={<Page.NotFound />} />
             </Route>
           </Route>
 
