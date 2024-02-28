@@ -63,6 +63,26 @@ const NavDrawer = () => {
                 },
               ]}
             />
+            <NavLink
+              to={AppPath.ConceptActive}
+              title="Concepts"
+              icon="lightbulb"
+              openBasePath={AppPath.Concept}
+              nestedRoutes={[
+                {
+                  title: 'Active Concepts',
+                  to: AppPath.ConceptActive,
+                },
+                {
+                  title: 'Drafts',
+                  to: AppPath.ConceptDraft,
+                },
+                {
+                  title: 'Archive',
+                  to: AppPath.ConceptArchive,
+                },
+              ]}
+            />
             <NavLink to={AppPath.ChallengeCenter} title="Challenges" icon="rocket" />
 
             <NavLink to={AppPath.Home} title="Tests" icon="beaker" locked />
