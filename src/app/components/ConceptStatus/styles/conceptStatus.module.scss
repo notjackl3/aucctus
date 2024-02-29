@@ -1,0 +1,70 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.conceptStatus {
+  display: flex;
+  padding: 2px 8px 2px 6px;
+  align-items: center;
+  border-radius: 1rem;
+  background: $purple-50;
+  gap: 0.5rem;
+
+  .bulletBlue {
+    color: $gray-blue-500;
+  }
+  .bulletRed {
+    color: $red-500;
+  }
+  .bulletPink {
+    color: $pink-500;
+  }
+  .bulletGreen {
+    color: $green-500;
+  }
+  .bulletPurple {
+    color: $purple-500;
+  }
+
+  .status {
+    text-align: center;
+    white-space: nowrap;
+    font-family: $dm-sans;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.5rem;
+  }
+  .statusBlue {
+    color: $gray-blue-700;
+  }
+  .statusGreen {
+    color: $green-700;
+  }
+
+  .statusPink {
+    color: $pink-700;
+  }
+
+  .statusRed {
+    color: $red-700;
+  }
+  .statusPurple {
+    color: $purple-700;
+  }
+}
+
+.backgroundBlue {
+  background: $gray-blue-50;
+}
+.backgroundRed {
+  background: $red-50;
+}
+.backgroundPink {
+  background: $pink-50;
+}
+.backgroundGreen {
+  background: $green-50;
+}
+.backgroundPurple {
+  background: $purple-50;
+}
