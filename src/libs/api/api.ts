@@ -2,6 +2,7 @@ import { HeadersDefaults } from 'axios';
 import { IApiServiceConfig } from './apiService';
 import { AuthApi } from './auth';
 import { AccountApi } from './account';
+import { ConceptApi } from './concept';
 import analytics from '../analytics';
 
 export interface IApiConfig {
@@ -22,6 +23,7 @@ export class Api {
 
   auth: AuthApi;
   account: AccountApi;
+  concept: ConceptApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -39,6 +41,13 @@ export class Api {
         baseURL: this._config.baseUrl,
       })
     );
+
+    this.concept = new ConceptApi(
+      this,
+      this.buildConfig({
+        baseURL: this._config.baseUrl,
+      })
+    );
   }
 
   get accessToken() {
@@ -50,7 +59,7 @@ export class Api {
     // By default however,  the access token and refresh token are set to the httpOnly cookies
     // This is simply just an extra layer.
 
-    [this.account].forEach((api) => {
+    [this.account, this.concept].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
       api.config.headers = Object.assign({}, api.config.headers, { Authorization: `Bearer ${token}` });
       console.log(api.config.headers, 'api.config.headers');
