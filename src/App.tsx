@@ -10,6 +10,7 @@ import { Navigate } from 'react-router-dom';
 const queryClient = new QueryClient();
 
 function App() {
+
   return (
     <div role="main" className="App">
       <QueryClientProvider client={queryClient}>
@@ -21,9 +22,7 @@ function App() {
               <Route index path={AppPath.Home} element={<Page.Dashboard />} />
 
               {/* Concepts */}
-              <Route path={AppPath.ConceptActive} element={<Page.NotFound />} />
-              <Route path={AppPath.ConceptDraft} element={<Page.NotFound />} />
-              <Route path={AppPath.ConceptArchive} element={<Page.NotFound />} />
+              <Route path={AppPath.ConceptCategory} element={<Page.Concepts />} />
             </Route>
           </Route>
 
