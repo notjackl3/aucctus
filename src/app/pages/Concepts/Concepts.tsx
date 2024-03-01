@@ -37,7 +37,7 @@ const Concepts: FunctionComponent = () => {
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  const fuzzyFilter: FilterFn<ConceptType> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
     addMeta({
       itemRank,
@@ -112,7 +112,7 @@ const Concepts: FunctionComponent = () => {
     <div className={styles.contentList}>
       <div className={styles.headerSection}>
         <div className={styles.header}>
-          <h1>{`${category} Concepts`}</h1>
+          <h1>{`${category} ${category === 'active' ? 'Concepts' : ''}`}</h1>
         </div>
       </div>
       <div className={styles.content}>
