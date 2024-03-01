@@ -79,7 +79,7 @@ const NavDrawer = () => {
                 },
                 {
                   title: 'Archive',
-                  to: `${AppPath.Concept}/archived`,
+                  to: `${AppPath.Concept}/archive`,
                 },
               ]}
             />
