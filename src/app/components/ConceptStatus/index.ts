@@ -1,2 +1,2 @@
-import ConceptStatus from "./ConceptStatus";
+import ConceptStatus from './ConceptStatus';
 export default ConceptStatus;

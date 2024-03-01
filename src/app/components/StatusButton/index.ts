@@ -1,2 +1,2 @@
-import StatusButton from "./StatusButton";
+import StatusButton from './StatusButton';
 export default StatusButton;

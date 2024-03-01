@@ -10,7 +10,6 @@ import { Navigate } from 'react-router-dom';
 const queryClient = new QueryClient();
 
 function App() {
-
   return (
     <div role="main" className="App">
       <QueryClientProvider client={queryClient}>

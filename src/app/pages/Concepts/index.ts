@@ -1,2 +1,2 @@
-import Concepts from "./Concepts";
+import Concepts from './Concepts';
 export default Concepts;

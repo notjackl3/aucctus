@@ -1,6 +1,6 @@
 import { ApiService } from './apiService';
 import { endpoints } from './endpoints';
-import { GetConceptResponse } from './typings';
+import { GetConceptResponse } from './typings/concepts';
 
 /**
  * Concept API
@@ -9,12 +9,11 @@ import { GetConceptResponse } from './typings';
  */
 export class ConceptApi extends ApiService {
   getConcepts(status: string, category: string | undefined) {
-    this.updateConfigHeaders({
-    });
+    this.updateConfigHeaders({});
     return this.get<GetConceptResponse>(endpoints.concept, {
       params: {
         ...(status && { status }),
-        ...(category && { category })
+        ...(category && { category }),
       },
     });
   }
