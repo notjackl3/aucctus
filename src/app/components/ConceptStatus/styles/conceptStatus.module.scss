@@ -9,19 +9,19 @@
   background: $purple-50;
   gap: 0.5rem;
 
-  .bulletBlue {
+  .blueBullet {
     color: $gray-blue-500;
   }
-  .bulletRed {
+  .redBullet {
     color: $red-500;
   }
-  .bulletPink {
+  .pinkBullet {
     color: $pink-500;
   }
-  .bulletGreen {
+  .greeBulletn {
     color: $green-500;
   }
-  .bulletPurple {
+  .purpBulletle {
     color: $purple-500;
   }
 
@@ -34,37 +34,37 @@
     font-weight: 500;
     line-height: 1.5rem;
   }
-  .statusBlue {
+  .blueStatus {
     color: $gray-blue-700;
   }
-  .statusGreen {
+  .greenStatus {
     color: $green-700;
   }
 
-  .statusPink {
+  .pinkStatus {
     color: $pink-700;
   }
 
-  .statusRed {
+  .redStatus {
     color: $red-700;
   }
-  .statusPurple {
+  .purpleStatus {
     color: $purple-700;
   }
 }
 
-.backgroundBlue {
+.blueBackground {
   background: $gray-blue-50;
 }
-.backgroundRed {
+.redBackground {
   background: $red-50;
 }
-.backgroundPink {
+.pinkBackground {
   background: $pink-50;
 }
-.backgroundGreen {
+.greenBackground {
   background: $green-50;
 }
-.backgroundPurple {
+.purpleBackground {
   background: $purple-50;
 }

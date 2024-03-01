@@ -1,37 +1,19 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/conceptStatus.module.scss';
-import { BulletColorTypes, ConceptStatusProps, StatusColorTypes, BackgroundColorTypes } from './ConceptStatus.types';
+import { ConceptStatus as ConceptStatusType } from '../../../libs/api/typings';
+import { snakeCaseToTitleCase } from '../../../libs/utils';
 
-const ConceptStatus: FunctionComponent<ConceptStatusProps> = ({ status, color }) => {
-  const statusColorStyleObj: StatusColorTypes = {
-    red: 'statusRed',
-    green: 'statusGreen',
-    blue: 'statusBlue',
-    pink: 'statusPink',
-    purple: 'statusPurple',
-  };
+export interface IConceptStatusProps {
+  status: ConceptStatusType;
+  color: 'red' | 'green' | 'blue' | 'pink' | 'purple';
+}
 
-  const bulletColorStyleObj: BulletColorTypes = {
-    red: 'bulletRed',
-    green: 'bulletGreen',
-    blue: 'bulletBlue',
-    pink: 'bulletPink',
-    purple: 'bulletPurple',
-  };
-
-  const backgroundColorStylesObj: BackgroundColorTypes = {
-    red: 'backgroundRed',
-    green: 'backgroundGreen',
-    blue: 'backgroundBlue',
-    pink: 'backgroundPink',
-    purple: 'backgroundPurple',
-  };
-
+const ConceptStatus: FunctionComponent<IConceptStatusProps> = ({ status, color }) => {
   return (
-    <div className={`${styles.conceptStatus} ${styles[backgroundColorStylesObj[color]]}`}>
-      <span className={styles[bulletColorStyleObj[color]]}>●</span>
-      <span className={`${styles.status} ${styles[statusColorStyleObj[color]]}`}>{status}</span>
+    <div className={`${styles.conceptStatus} ${styles[`${color}Background`]}`}>
+      <span className={styles[`${color}Bullet`]}>●</span>
+      <span className={`${styles.status} ${styles[`${color}Status`]}`}>{snakeCaseToTitleCase(status)}</span>
     </div>
   );
 };
