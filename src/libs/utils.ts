@@ -1,6 +1,7 @@
 import { AxiosError, isAxiosError } from 'axios';
 import { IFormError } from './api/typings/avxisi';
 import { isError } from 'react-query';
+import { ConceptStatus } from './api/typings';
 
 /** Validate Email
  *
@@ -75,4 +76,16 @@ export function parseFormError<T = object>(error: unknown | AxiosError) {
     message = error.message;
   }
   return message;
+}
+
+/**
+ * Convert snake_case to Title Case
+ * @param snakeCase - snake_case string
+ * @returns
+ */
+export function snakeCaseToTitleCase(snakeCase: string) {
+  return snakeCase
+    .split('_')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
