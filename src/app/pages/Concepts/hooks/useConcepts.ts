@@ -1,25 +1,33 @@
 import { useState } from 'react';
-import { Concept, Concepts } from '../../../../libs/api/typings';
-import { StatusColor, StatusLabel } from '../Concepts.types';
+import { IConcept, ConceptStatus, ConceptCategory } from '../../../../libs/api/typings';
 import { useQuery } from 'react-query';
 import api from '../../../../libs/api';
 import { useParams } from 'react-router-dom';
+import { IConceptQueryOptions } from '../../../../libs/api/endpoints';
+import { IConceptStatusProps } from '../../../components/ConceptStatus/ConceptStatus';
 
-type StatusList = string[];
+type ConceptStatusFilter = ConceptStatus | '';
+type StatusLabel = {
+  [key in ConceptStatus]: string;
+};
+type StatusColor = {
+  [key in ConceptStatus]: IConceptStatusProps['color'];
+};
 
 const useConcepts = () => {
-  const { category } = useParams();
+  const { category } = useParams<{ category: ConceptCategory }>();
   const allConceptsQuery = useQuery({
     queryKey: ['concepts/active', category],
     retry: 1,
     refetchOnWindowFocus: false,
     queryFn: async () => {
       activateFilter('');
-      return api.concept.getConcepts('', category);
+      const queryOptionsObj: IConceptQueryOptions = { ...(category && { category }) };
+      return api.concept.getConcepts(queryOptionsObj);
     },
   });
 
-  const [activeFilter, setActiveFilter] = useState<string>('');
+  const [activeFilter, setActiveFilter] = useState<ConceptStatusFilter>('');
 
   const statusLabelsObj: StatusLabel = {
     ideating: 'Ideating',
@@ -32,7 +40,6 @@ const useConcepts = () => {
   };
 
   const statusColorObj: StatusColor = {
-    new: 'blue',
     ideating: 'blue',
     in_review: 'blue',
     commercialized: 'green',
@@ -42,13 +49,13 @@ const useConcepts = () => {
     archived: 'red',
   };
 
-  const activateFilter = (filter: string) => {
+  const activateFilter = (filter: ConceptStatusFilter) => {
     setActiveFilter(filter);
   };
 
-  const getStatusList = (conceptList: Concepts): StatusList => {
-    const statusSet = new Set<string>();
-    conceptList.forEach((concept: Concept) => {
+  const getStatusList = (conceptList: IConcept[]): ConceptStatus[] => {
+    const statusSet = new Set<ConceptStatus>();
+    conceptList.forEach((concept: IConcept) => {
       const statusType = concept?.status || '';
       if (statusType) {
         statusSet.add(statusType);

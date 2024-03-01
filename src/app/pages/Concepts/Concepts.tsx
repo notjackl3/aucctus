@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/concepts.module.scss';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
@@ -17,10 +17,11 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import ConceptStatus from '../../components/ConceptStatus';
 import StatusButton from '../../components/StatusButton';
 import useConcepts from './hooks/useConcepts';
-import { StatusList } from './Concepts.types';
-import { Concept as ConceptType } from '../../../libs/api/typings';
+import { ConceptStatus as ConceptStatusType, IConcept } from '../../../libs/api/typings';
+import { IConceptQueryOptions } from '../../../libs/api/endpoints';
+import { dateCellFormatter } from '../../../libs/utils';
 
-const columnHelper = createColumnHelper<ConceptType>();
+const columnHelper = createColumnHelper<IConcept>();
 
 const Concepts: FunctionComponent = () => {
   const { activeFilter, statusLabelsObj, categoryCount, statusColorObj, category, conceptStatusList, activateFilter } =
@@ -31,13 +32,14 @@ const Concepts: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     retry: 1,
     queryFn: async () => {
-      return api.concept.getConcepts(activeFilter, category);
+      const queryOptionsObj: IConceptQueryOptions = { ...(activeFilter && { status: activeFilter }), category };
+      return api.concept.getConcepts(queryOptionsObj);
     },
   });
 
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
 
-  const fuzzyFilter: FilterFn<ConceptType> = (row, columnId, value, addMeta) => {
+  const fuzzyFilter: FilterFn<IConcept> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
     addMeta({
       itemRank,
@@ -45,40 +47,44 @@ const Concepts: FunctionComponent = () => {
     return itemRank.passed;
   };
 
-  const columns = [
-    columnHelper.accessor('title', {
-      id: 'title',
-      header: () => <span className={styles.details}>Company</span>,
-      size: 400,
-      cell: (info) => <span className={styles.company}>{info?.getValue()}</span>,
-    }),
-    columnHelper.accessor((row) => row?.description, {
-      id: 'description',
-      cell: (info) => <span className={styles.cellDescription}>{info?.getValue()}</span>,
-      size: 300,
-      header: () => <span>Description</span>,
-    }),
-    columnHelper.accessor((row) => row?.updatedAt, {
-      id: 'updatedAt',
-      size: 300,
-      cell: (info) =>
-        new Date(info.getValue()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
-      header: () => <span>Last Modified</span>,
-    }),
-    columnHelper.accessor((row) => row?.status, {
-      id: 'status',
-      size: 300,
-      header: () => <span>Status</span>,
-      cell: (info) => (
-        <div className={styles.reviewConceptLink}>
-          <ConceptStatus status={statusLabelsObj[info?.getValue()]} color={statusColorObj[info?.getValue()]} />
-        </div>
-      ),
-    }),
-  ];
+  const columns = useMemo(
+    () => [
+      columnHelper.accessor('title', {
+        id: 'title',
+        header: () => <span className={styles.details}>Company</span>,
+        size: 400,
+        cell: (info) => <span className={styles.company}>{info?.getValue()}</span>,
+      }),
+      columnHelper.accessor((row) => row?.description, {
+        id: 'description',
+        cell: (info) => <span className={styles.cellDescription}>{info?.getValue()}</span>,
+        size: 300,
+        header: () => <span>Description</span>,
+      }),
+      columnHelper.accessor((row) => row?.updatedAt, {
+        id: 'updatedAt',
+        size: 300,
+        cell: (info) => dateCellFormatter(info.getValue()),
+        header: () => <span>Last Modified</span>,
+      }),
+      columnHelper.accessor((row) => row?.status, {
+        id: 'status',
+        size: 300,
+        header: () => <span>Status</span>,
+        cell: (info) => (
+          <div className={styles.reviewConceptLink}>
+            <ConceptStatus status={info?.getValue()} color={statusColorObj[info?.getValue()]} />
+          </div>
+        ),
+      }),
+    ],
+    []
+  );
+
+  const tableData = useMemo(() => data?.results ?? [], [data]);
 
   const table = useReactTable({
-    data: data?.results || [],
+    data: tableData,
     columns,
     enableRowSelection: true,
     state: {
@@ -96,7 +102,7 @@ const Concepts: FunctionComponent = () => {
     },
   });
 
-  const renderStatusButtons = (statusList: StatusList) => {
+  const renderStatusButtons = (statusList: ConceptStatusType[]) => {
     return statusList.map((status, index) => (
       <StatusButton
         key={`status-button-${index}`}
