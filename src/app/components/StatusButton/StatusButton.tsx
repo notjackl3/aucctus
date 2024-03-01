@@ -1,8 +1,13 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/statusButton.module.scss';
-import { StatusButtonProps } from './StatusButton.types';
 import useStatusButton from './hooks/useStatusButton';
+interface StatusButtonProps {
+  statusName: string;
+  quantity: number;
+  isActive?: boolean;
+  activateFilter: () => void;
+}
 
 const StatusButton: FunctionComponent<StatusButtonProps> = ({ statusName, isActive, quantity, activateFilter }) => {
   const { activeClassName, activeBadgeClassName, activeStatusClassName } = useStatusButton({ isActive });
