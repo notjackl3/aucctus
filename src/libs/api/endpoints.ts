@@ -1,3 +1,16 @@
+import { ConceptCategory, ConceptStatus } from './typings';
+
+export interface IPageQueryOptions {
+  page?: number;
+}
+
+export interface IConceptQueryOptions extends IPageQueryOptions {
+  status?: ConceptStatus;
+  category?: ConceptCategory;
+  createdBy?: string;
+  isGenerated?: boolean;
+}
+
 export const endpoints = {
   /* Auth */
   login: '/api/v1/login',
@@ -12,7 +25,19 @@ export const endpoints = {
   /* Account */
   account: `/api/v1/account`,
 
-  /* Ignite Concepts */
-  igniteConcept: 'api/v1/concept/generate',
-  concept: 'api/v1/concept',
+  /* Concepts */
+  concept: 'api/v1/concept/',
+  conceptQueries: (options?: IConceptQueryOptions) => {
+    if (!options) return 'api/v1/concept/';
+
+    let query = '';
+    if (options.page) query += `page=${options.page}&`;
+    if (options.status) query += `status=${options.status}&`;
+    if (options.category) query += `category=${options.category}&`;
+    if (options.createdBy) query += `created_by=${options.createdBy}&`;
+    if (options.isGenerated) query += `is_generated=${options.isGenerated}&`;
+
+    return `api/v1/concept/?${query}`;
+  },
+  conceptUuid: (uuid: string) => `api/v1/concept/${uuid}/`,
 };

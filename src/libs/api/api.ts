@@ -4,6 +4,7 @@ import { AuthApi } from './auth';
 import { AccountApi } from './account';
 import { ConceptApi } from './concept';
 import analytics from '../analytics';
+import { ConceptApi } from './concepts';
 
 export interface IApiConfig {
   /* End Points */
@@ -42,12 +43,7 @@ export class Api {
       })
     );
 
-    this.concept = new ConceptApi(
-      this,
-      this.buildConfig({
-        baseURL: this._config.baseUrl,
-      })
-    );
+    this.concept = new ConceptApi(this, this.buildConfig({ baseURL: this._config.baseUrl }));
   }
 
   get accessToken() {
@@ -58,7 +54,6 @@ export class Api {
     // Update all pointing to the resource server with the new tokens
     // By default however,  the access token and refresh token are set to the httpOnly cookies
     // This is simply just an extra layer.
-
     [this.account, this.concept].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
       api.config.headers = Object.assign({}, api.config.headers, { Authorization: `Bearer ${token}` });
