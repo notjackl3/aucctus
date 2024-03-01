@@ -2,7 +2,6 @@ import { HeadersDefaults } from 'axios';
 import { IApiServiceConfig } from './apiService';
 import { AuthApi } from './auth';
 import { AccountApi } from './account';
-import { ConceptApi } from './concept';
 import analytics from '../analytics';
 import { ConceptApi } from './concepts';
 
