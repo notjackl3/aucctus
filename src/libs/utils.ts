@@ -89,3 +89,12 @@ export function snakeCaseToTitleCase(snakeCase: string) {
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
 }
+
+export function dateCellFormatter(info: string, formattingOptions: Intl.DateTimeFormatOptions = {}) {
+  return new Date(info).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    ...formattingOptions,
+  });
+}
