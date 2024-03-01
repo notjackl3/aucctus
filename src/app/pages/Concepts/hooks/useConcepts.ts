@@ -7,9 +7,7 @@ import { IConceptQueryOptions } from '../../../../libs/api/endpoints';
 import { IConceptStatusProps } from '../../../components/ConceptStatus/ConceptStatus';
 
 type ConceptStatusFilter = ConceptStatus | '';
-type StatusLabel = {
-  [key in ConceptStatus]: string;
-};
+
 type StatusColor = {
   [key in ConceptStatus]: IConceptStatusProps['color'];
 };
@@ -28,16 +26,6 @@ const useConcepts = () => {
   });
 
   const [activeFilter, setActiveFilter] = useState<ConceptStatusFilter>('');
-
-  const statusLabelsObj: StatusLabel = {
-    ideating: 'Ideating',
-    in_review: 'In Review',
-    commercialized: 'Commercialized',
-    prototyping: 'Prototyping',
-    proof_of_concept: 'Proof Of Concept',
-    minimum_viable_product: 'Minimum Viable Product',
-    archived: 'Archived',
-  };
 
   const statusColorObj: StatusColor = {
     ideating: 'blue',
@@ -69,7 +57,6 @@ const useConcepts = () => {
 
   return {
     activeFilter,
-    statusLabelsObj,
     statusColorObj,
     category,
     categoryCount,
