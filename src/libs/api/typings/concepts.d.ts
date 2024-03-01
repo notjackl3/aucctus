@@ -30,8 +30,3 @@ export interface IConceptCreate {
   status?: ConceptStatus;
   createdBy?: string;
 }
-
-export type IConceptsGetRequest = {
-  status: string;
-  category: string;
-};
