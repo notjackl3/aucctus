@@ -1,7 +1,6 @@
 import { AxiosError, isAxiosError } from 'axios';
 import { IFormError } from './api/typings/avxisi';
 import { isError } from 'react-query';
-import { ConceptStatus } from './api/typings';
 
 /** Validate Email
  *
@@ -88,4 +87,13 @@ export function snakeCaseToTitleCase(snakeCase: string) {
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(' ');
+}
+
+export function dateCellFormatter(info: string, formattingOptions: Intl.DateTimeFormatOptions = {}) {
+  return new Date(info).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    ...formattingOptions,
+  });
 }
