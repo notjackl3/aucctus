@@ -24,7 +24,7 @@ import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
 const columnHelper = createColumnHelper<IConcept>();
 
 const Concepts: FunctionComponent = () => {
-  const { activeFilter, categoryCount, statusColorObj, category, conceptStatusList, activateFilter } = useConcepts();
+  const { activeFilter, categoryCount, category, conceptStatusList, activateFilter } = useConcepts();
 
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
     queryKey: ['concepts', activeFilter, category],
@@ -72,7 +72,7 @@ const Concepts: FunctionComponent = () => {
         header: () => <span>Status</span>,
         cell: (info) => (
           <div className={styles.reviewConceptLink}>
-            <ConceptStatus status={info?.getValue()} color={statusColorObj[info?.getValue()]} />
+            <ConceptStatus status={info?.getValue()} />
           </div>
         ),
       }),

@@ -6,10 +6,21 @@ import { snakeCaseToTitleCase } from '../../../libs/utils';
 
 export interface IConceptStatusProps {
   status: ConceptStatusType;
-  color: 'red' | 'green' | 'blue' | 'pink' | 'purple';
 }
 
-const ConceptStatus: FunctionComponent<IConceptStatusProps> = ({ status, color }) => {
+const ConceptStatus: FunctionComponent<IConceptStatusProps> = ({ status }) => {
+  const statusColorObj = {
+    ideating: 'blue',
+    in_review: 'blue',
+    commercialized: 'green',
+    prototyping: 'purple',
+    proof_of_concept: 'purple',
+    minimum_viable_product: 'pink',
+    archived: 'red',
+  };
+
+  const color = statusColorObj[status];
+
   return (
     <div className={`${styles.conceptStatus} ${styles[`${color}Background`]}`}>
       <span className={styles[`${color}Bullet`]}>●</span>
