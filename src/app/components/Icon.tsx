@@ -39,6 +39,7 @@ import Refresh from '../assets/icons/refresh.svg?react';
 import Calendar from '../assets/icons/calendar.svg?react';
 import Columns from '../assets/icons/columns.svg?react';
 import Announcement from '../assets/icons/announcement.svg?react';
+import DotsVertical from '../assets/icons/dots-vertical.svg?react';
 
 export enum IconVariant {
   lock,
@@ -80,6 +81,7 @@ export enum IconVariant {
   calendar,
   columns,
   announcement,
+  dotstVertical,
 }
 
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
@@ -167,6 +169,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <Columns {...props} />;
     case 'announcement':
       return <Announcement {...props} />;
+    case 'dotstVertical':
+      return <DotsVertical {...props} />;
   }
 };
 
