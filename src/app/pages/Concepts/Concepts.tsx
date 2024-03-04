@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo, useState } from 'react';
+import React, { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/concepts.module.scss';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
@@ -20,11 +20,28 @@ import useConcepts from './hooks/useConcepts';
 import { ConceptStatus as ConceptStatusType, IConcept } from '../../../libs/api/typings';
 import { IConceptQueryOptions } from '../../../libs/api/endpoints';
 import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
+import PopupMenu from '../../components/PopupMenu';
+import Icon from '../../components/Icon';
 
 const columnHelper = createColumnHelper<IConcept>();
 
+const defaultIconProps = {
+  stroke: '#B4BDD0',
+  width: 24,
+  height: 24,
+};
+
 const Concepts: FunctionComponent = () => {
-  const { activeFilter, categoryCount, category, conceptStatusList, activateFilter } = useConcepts();
+  const {
+    activeFilter,
+    openPopupMenuId,
+    categoryCount,
+    category,
+    conceptStatusList,
+    activateFilter,
+    selectPopupMenuId,
+    clearPopupMenuId,
+  } = useConcepts();
 
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
     queryKey: ['concepts', activeFilter, category],
@@ -76,8 +93,25 @@ const Concepts: FunctionComponent = () => {
           </div>
         ),
       }),
+      columnHelper.accessor((row) => row?.uuid, {
+        id: 'uuid',
+        size: 300,
+        header: () => {},
+        cell: (info) => (
+          <div className={styles.conceptMenu}>
+            <button className={styles.button} onClick={() => selectPopupMenuId(info?.getValue())}>
+              <Icon variant="dotstVertical" {...defaultIconProps} />
+            </button>
+            {info?.getValue() === openPopupMenuId && (
+              <div className={styles.popupMenu}>
+                <PopupMenu conceptId={openPopupMenuId} clearPopupMenuId={clearPopupMenuId} />
+              </div>
+            )}
+          </div>
+        ),
+      }),
     ],
-    []
+    [openPopupMenuId]
   );
 
   const tableData = useMemo(() => data?.results ?? [], [data]);

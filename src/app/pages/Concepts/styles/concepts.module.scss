@@ -139,6 +139,25 @@
               overflow: hidden;
               text-overflow: ellipsis;
             }
+
+            .conceptMenu {
+              display: flex;
+              position: absolute;
+
+              .button {
+                background: none;
+                border: none;
+              }
+
+              .popupMenu {
+                display: flex;
+                position: absolute;
+                right: -1rem;
+                top: 2rem;
+                width: 15rem;
+                height: 2rem;
+              }
+            }
           }
         }
       }

@@ -8,6 +8,9 @@ import { IConceptQueryOptions } from '../../../../libs/api/endpoints';
 type ConceptStatusFilter = ConceptStatus | '';
 
 const useConcepts = () => {
+  const [activeFilter, setActiveFilter] = useState<ConceptStatusFilter>('');
+  const [openPopupMenuId, setOpenPopupMenuId] = useState('');
+
   const { category } = useParams<{ category: ConceptCategory }>();
   const allConceptsQuery = useQuery({
     queryKey: ['concepts/active', category],
@@ -20,10 +23,20 @@ const useConcepts = () => {
     },
   });
 
-  const [activeFilter, setActiveFilter] = useState<ConceptStatusFilter>('');
-
   const activateFilter = (filter: ConceptStatusFilter) => {
     setActiveFilter(filter);
+  };
+
+  const clearPopupMenuId = () => {
+    selectPopupMenuId('');
+  };
+
+  const selectPopupMenuId = (conceptId: string) => {
+    if (conceptId === openPopupMenuId) {
+      selectPopupMenuId('');
+    } else {
+      setOpenPopupMenuId(conceptId);
+    }
   };
 
   const getStatusList = (conceptList: IConcept[]): ConceptStatus[] => {
@@ -44,8 +57,11 @@ const useConcepts = () => {
     activeFilter,
     category,
     categoryCount,
+    openPopupMenuId,
     getStatusList,
     activateFilter,
+    selectPopupMenuId,
+    clearPopupMenuId,
     conceptStatusList,
   };
 };
