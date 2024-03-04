@@ -19,13 +19,12 @@ import StatusButton from '../../components/StatusButton';
 import useConcepts from './hooks/useConcepts';
 import { ConceptStatus as ConceptStatusType, IConcept } from '../../../libs/api/typings';
 import { IConceptQueryOptions } from '../../../libs/api/endpoints';
-import { dateCellFormatter } from '../../../libs/utils';
+import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
 
 const columnHelper = createColumnHelper<IConcept>();
 
 const Concepts: FunctionComponent = () => {
-  const { activeFilter, statusLabelsObj, categoryCount, statusColorObj, category, conceptStatusList, activateFilter } =
-    useConcepts();
+  const { activeFilter, categoryCount, category, conceptStatusList, activateFilter } = useConcepts();
 
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
     queryKey: ['concepts', activeFilter, category],
@@ -73,7 +72,7 @@ const Concepts: FunctionComponent = () => {
         header: () => <span>Status</span>,
         cell: (info) => (
           <div className={styles.reviewConceptLink}>
-            <ConceptStatus status={info?.getValue()} color={statusColorObj[info?.getValue()]} />
+            <ConceptStatus status={info?.getValue()} />
           </div>
         ),
       }),
@@ -107,7 +106,7 @@ const Concepts: FunctionComponent = () => {
       <StatusButton
         key={`status-button-${index}`}
         isActive={activeFilter === status}
-        statusName={statusLabelsObj[status]}
+        statusName={snakeCaseToTitleCase(status)}
         quantity={1}
         activateFilter={() => activateFilter(status)}
       />

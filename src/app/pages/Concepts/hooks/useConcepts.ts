@@ -4,15 +4,8 @@ import { useQuery } from 'react-query';
 import api from '../../../../libs/api';
 import { useParams } from 'react-router-dom';
 import { IConceptQueryOptions } from '../../../../libs/api/endpoints';
-import { IConceptStatusProps } from '../../../components/ConceptStatus/ConceptStatus';
 
 type ConceptStatusFilter = ConceptStatus | '';
-type StatusLabel = {
-  [key in ConceptStatus]: string;
-};
-type StatusColor = {
-  [key in ConceptStatus]: IConceptStatusProps['color'];
-};
 
 const useConcepts = () => {
   const { category } = useParams<{ category: ConceptCategory }>();
@@ -28,26 +21,6 @@ const useConcepts = () => {
   });
 
   const [activeFilter, setActiveFilter] = useState<ConceptStatusFilter>('');
-
-  const statusLabelsObj: StatusLabel = {
-    ideating: 'Ideating',
-    in_review: 'In Review',
-    commercialized: 'Commercialized',
-    prototyping: 'Prototyping',
-    proof_of_concept: 'Proof Of Concept',
-    minimum_viable_product: 'Minimum Viable Product',
-    archived: 'Archived',
-  };
-
-  const statusColorObj: StatusColor = {
-    ideating: 'blue',
-    in_review: 'blue',
-    commercialized: 'green',
-    prototyping: 'purple',
-    proof_of_concept: 'purple',
-    minimum_viable_product: 'pink',
-    archived: 'red',
-  };
 
   const activateFilter = (filter: ConceptStatusFilter) => {
     setActiveFilter(filter);
@@ -69,8 +42,6 @@ const useConcepts = () => {
 
   return {
     activeFilter,
-    statusLabelsObj,
-    statusColorObj,
     category,
     categoryCount,
     getStatusList,
