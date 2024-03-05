@@ -17,8 +17,9 @@
 
   .headerSection {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: flex-start;
+    justify-content: space-between;
     align-self: stretch;
     margin-bottom: 2rem;
 
@@ -36,6 +37,21 @@
         font-weight: 700;
         font-family: $dm-sans;
         height: 100%;
+      }
+    }
+
+    .actions {
+      .button {
+        color: $white;
+        font-family: $dm-sans;
+        font-style: normal;
+        font-weight: 700;
+
+        svg {
+          path {
+            stroke: $white;
+          }
+        }
       }
     }
   }
