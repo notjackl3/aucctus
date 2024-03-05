@@ -20,6 +20,7 @@ import useConcepts from './hooks/useConcepts';
 import { ConceptStatus as ConceptStatusType, IConcept } from '../../../libs/api/typings';
 import { IConceptQueryOptions } from '../../../libs/api/endpoints';
 import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
+import TableCheckBox from '../../components/TableCheckBox';
 import Icon from '../../components/Icon';
 import { AppPath } from '../../../routes/routes';
 import { useNavigate } from 'react-router-dom';
@@ -27,7 +28,20 @@ import { useNavigate } from 'react-router-dom';
 const columnHelper = createColumnHelper<IConcept>();
 
 const Concepts: FunctionComponent = () => {
-  const { activeFilter, categoryCount, category, conceptStatusList, activateFilter } = useConcepts();
+  const {
+    activeFilter,
+    categoryCount,
+    rowSelection,
+    category,
+    conceptStatusList,
+    excludeIdSet,
+    isEntireCategorySelected,
+    modifyExclusionSet,
+    setRowSelection,
+    setExcludeIdSet,
+    toggleIsEntireCategorySelectedFlag,
+    activateFilter,
+  } = useConcepts();
   const navigate = useNavigate();
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
     queryKey: ['concepts', activeFilter, category],
@@ -51,6 +65,37 @@ const Concepts: FunctionComponent = () => {
 
   const columns = useMemo(
     () => [
+      columnHelper.accessor((row) => row?.status, {
+        id: 'select',
+        header: ({ table }) => (
+          <TableCheckBox
+            {...{
+              checked: table.getIsAllRowsSelected(),
+              indeterminate: table.getIsSomeRowsSelected(),
+              onChange: (event) => {
+                setExcludeIdSet(new Set());
+                toggleIsEntireCategorySelectedFlag(table.getIsAllRowsSelected());
+                table.getToggleAllPageRowsSelectedHandler()(event);
+              },
+            }}
+          />
+        ),
+        cell: ({ row }) => {
+          return (
+            <TableCheckBox
+              {...{
+                checked: row.getIsSelected(),
+                disabled: !row.getCanSelect(),
+                indeterminate: row.getIsSomeSelected(),
+                onChange: () => {
+                  modifyExclusionSet(row.getIsSelected(), row?.id);
+                  row.getToggleSelectedHandler();
+                },
+              }}
+            />
+          );
+        },
+      }),
       columnHelper.accessor('title', {
         id: 'title',
         header: () => <span className={styles.details}>Company</span>,
@@ -80,21 +125,24 @@ const Concepts: FunctionComponent = () => {
         ),
       }),
     ],
-    []
+    [activeFilter, excludeIdSet, isEntireCategorySelected]
   );
 
   const tableData = useMemo(() => data?.results ?? [], [data]);
 
   const table = useReactTable({
+    getRowId: (row) => row.uuid,
     data: tableData,
     columns,
     enableRowSelection: true,
     state: {
       columnFilters,
+      rowSelection,
     },
     filterFns: {
       fuzzy: fuzzyFilter,
     },
+    onRowSelectionChange: setRowSelection,
     onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
