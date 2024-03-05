@@ -1,4 +1,4 @@
-import { FunctionComponent, useEffect, useMemo, useState } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/concepts.module.scss';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
