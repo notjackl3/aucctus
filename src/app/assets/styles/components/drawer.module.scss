@@ -118,7 +118,19 @@
       width: 100%;
 
       .navLink {
-        margin-bottom: var(--gap-5xs);
+        display: flex;
+        padding-left: 0.5rem;
+        box-sizing: border-box;
+        align-items: center;
+        height: 2.5rem;
+
+        &.active {
+          background: var(--secondary, #f4f7fe);
+
+          span {
+            color: var(--gray-900, #101828);
+          }
+        }
       }
 
       a {
