@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import styles from '../assets/styles/pages/ignite.module.scss';
+import styles from '../pages/IgniteConcept/styles/igniteConcept.module.scss';
 import igniteIcon from '../assets/icons/ignite.svg';
 import Loading from './Loading';
 
