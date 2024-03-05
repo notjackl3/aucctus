@@ -10,19 +10,22 @@ interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   errorMessage?: string;
   required?: boolean;
   hint?: string;
+  isDisableResize?: boolean;
 }
 
 const Input: ForwardRefRenderFunction<HTMLTextAreaElement, TextAreaProps> = (
-  { label, name, hint, errorMessage, error = false, ...props },
+  { label, name, hint, errorMessage, isDisableResize, error = false, ...props },
   ref
 ) => {
   const showHint = !!hint || !!errorMessage;
   const hintText = errorMessage || hint;
 
+  const disableResizeClassName = isDisableResize ? styles.disableResize : '';
+
   return (
     <div className={`${styles.inputField} ${error ? styles.inputFieldError : ''}`}>
       <div className={styles.label}>{label}</div>
-      <textarea cols={50} rows={4} {...props} ref={ref} name={name} />
+      <textarea className={disableResizeClassName} cols={50} rows={4} {...props} ref={ref} name={name} />
       {showHint ? <div className={styles.hintText}>{hintText}</div> : null}
     </div>
   );
