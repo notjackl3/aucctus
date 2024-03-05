@@ -64,7 +64,7 @@ const NavDrawer = () => {
               ]}
             />
             <NavLink
-              to={AppPath.ConceptActive}
+              to={AppPath.IgniteConcept}
               title="Concepts"
               icon="lightbulb"
               openBasePath={AppPath.Concept}

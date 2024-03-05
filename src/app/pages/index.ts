@@ -3,6 +3,7 @@ import Auth from './Auth';
 import NotFound from './NotFound';
 import Onboarding from './Onboarding';
 import Concepts from './Concepts';
+import IgniteConcept from './IgniteConcept';
 
 const Page = {
   Auth,
@@ -10,6 +11,7 @@ const Page = {
   Dashboard,
   Onboarding,
   Concepts,
+  IgniteConcept,
 };
 
 export default Page;
