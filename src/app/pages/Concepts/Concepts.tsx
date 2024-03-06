@@ -20,7 +20,7 @@ import useConcepts from './hooks/useConcepts';
 import { ConceptStatus as ConceptStatusType, IConcept } from '../../../libs/api/typings';
 import { IConceptQueryOptions } from '../../../libs/api/endpoints';
 import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
-import PopupMenu from '../../components/PopupMenu';
+import ConceptMenu from '../../components/ConceptMenu';
 import Icon from '../../components/Icon';
 
 const columnHelper = createColumnHelper<IConcept>();
@@ -104,7 +104,7 @@ const Concepts: FunctionComponent = () => {
             </button>
             {info?.getValue() === openPopupMenuId && (
               <div className={styles.popupMenu}>
-                <PopupMenu conceptId={openPopupMenuId} clearPopupMenuId={clearPopupMenuId} />
+                <ConceptMenu conceptId={openPopupMenuId} clearConceptMenuId={clearPopupMenuId} />
               </div>
             )}
           </div>
