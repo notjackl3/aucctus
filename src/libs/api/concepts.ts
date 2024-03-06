@@ -1,3 +1,4 @@
+import { AtLeast } from '../utils';
 import { ApiService } from './apiService';
 import { IConceptQueryOptions, endpoints } from './endpoints';
 import { ConceptStatus, IConcept, IConceptCreate } from './typings'; // Import the missing type
@@ -14,11 +15,15 @@ export class ConceptApi extends ApiService {
   }
 
   updateConcept(concept: Partial<IConcept>, uuid: string) {
-    return this.put<IConcept, Partial<IConcept>>(endpoints.conceptUuid(uuid), concept);
+    return this.patch<IConcept, Partial<IConcept>>(endpoints.conceptUuid(uuid), concept);
+  }
+
+  bulkUpdateConcepts(concepts: AtLeast<IConcept, 'uuid'>[]) {
+    return this.patch<IConcept[], AtLeast<IConcept, 'uuid'>[]>(endpoints.conceptList, concepts);
   }
 
   updateConceptStatus(uuid: string, status: ConceptStatus) {
-    return this.put<IConcept>(endpoints.conceptUuid(uuid), { status });
+    return this.patch<IConcept>(endpoints.conceptUuid(uuid), { status });
   }
 
   createConcept(concept: IConceptCreate) {

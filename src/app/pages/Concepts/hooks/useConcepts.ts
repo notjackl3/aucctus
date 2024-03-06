@@ -1,14 +1,18 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IConcept, ConceptStatus, ConceptCategory } from '../../../../libs/api/typings';
 import { useQuery } from 'react-query';
 import api from '../../../../libs/api';
 import { useParams } from 'react-router-dom';
 import { IConceptQueryOptions } from '../../../../libs/api/endpoints';
+import { RowSelectionState } from '@tanstack/react-table';
 
 type ConceptStatusFilter = ConceptStatus | '';
 
 const useConcepts = () => {
   const [activeFilter, setActiveFilter] = useState<ConceptStatusFilter>('');
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const [excludeIdSet, setExcludeIdSet] = useState(new Set());
+  const [isEntireCategorySelected, setIsEntireCategorySelected] = useState(false);
   const [openPopupMenuId, setOpenPopupMenuId] = useState('');
 
   const { category } = useParams<{ category: ConceptCategory }>();
@@ -23,8 +27,47 @@ const useConcepts = () => {
     },
   });
 
+  const resetSelections = () => {
+    setRowSelection({});
+    setIsEntireCategorySelected(false);
+    setExcludeIdSet(new Set());
+  };
+
+  useEffect(() => {
+    resetSelections();
+  }, [category]);
+
   const activateFilter = (filter: ConceptStatusFilter) => {
+    resetSelections();
     setActiveFilter(filter);
+  };
+
+  const addExcludedId = (id: string) => {
+    const newExcludedIds = new Set(excludeIdSet);
+    newExcludedIds.add(id);
+    setExcludeIdSet(newExcludedIds);
+  };
+
+  const removeExcludedId = (id: string) => {
+    const newExcludedIds = new Set(excludeIdSet);
+    newExcludedIds.delete(id);
+    setExcludeIdSet(newExcludedIds);
+  };
+
+  const modifyExclusionSet = (isRowSelected: boolean, id: string) => {
+    if (isRowSelected) {
+      addExcludedId(id);
+    } else {
+      removeExcludedId(id);
+    }
+  };
+
+  const toggleIsEntireCategorySelectedFlag = (isAllRowsSelected: boolean) => {
+    if (isAllRowsSelected) {
+      setIsEntireCategorySelected(false);
+    } else {
+      setIsEntireCategorySelected(true);
+    }
   };
 
   const clearPopupMenuId = () => {
@@ -57,9 +100,18 @@ const useConcepts = () => {
     activeFilter,
     category,
     categoryCount,
+    rowSelection,
+    excludeIdSet,
+    isEntireCategorySelected,
+    addExcludedId,
+    removeExcludedId,
+    modifyExclusionSet,
     openPopupMenuId,
     getStatusList,
     activateFilter,
+    setExcludeIdSet,
+    setRowSelection,
+    toggleIsEntireCategorySelectedFlag,
     selectPopupMenuId,
     clearPopupMenuId,
     conceptStatusList,
