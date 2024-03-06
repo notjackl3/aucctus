@@ -27,6 +27,7 @@ export const endpoints = {
 
   /* Concepts */
   concept: 'api/v1/concept/',
+  conceptList: 'api/v1/concept/list',
   conceptQueries: (options?: IConceptQueryOptions) => {
     if (!options) return 'api/v1/concept/';
 
