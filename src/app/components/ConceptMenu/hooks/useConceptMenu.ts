@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../../../../libs/api';
 import { ConceptStatus, IConcept } from '../../../../libs/api/typings';
+import { toast } from 'react-toastify';
+import { defaultToastConfig } from '../../../../libs/toast';
 
 export interface usePopupMenuProps {
   conceptId: string;
@@ -16,6 +18,9 @@ const useConceptMenu = ({ conceptId }: usePopupMenuProps) => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['concepts'] });
       queryClient.invalidateQueries({ queryKey: ['concepts/active'] });
+    },
+    onError: () => {
+      toast.error('Concept could not be updated. Please try again later.', defaultToastConfig);
     },
   });
 
