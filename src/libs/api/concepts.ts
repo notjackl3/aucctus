@@ -14,8 +14,8 @@ export class ConceptApi extends ApiService {
     return this.get<IConcept>(endpoints.conceptUuid(uuid));
   }
 
-  updateConcept(concept: AtLeast<IConcept, 'uuid'>[], uuid: string) {
-    return this.patch<IConcept, AtLeast<IConcept, 'uuid'>[]>(endpoints.conceptUuid(uuid), concept);
+  updateConcept(concept: Partial<IConcept>, uuid: string) {
+    return this.patch<IConcept, Partial<IConcept>>(endpoints.conceptUuid(uuid), concept);
   }
 
   bulkUpdateConcepts(concepts: AtLeast<IConcept, 'uuid'>[]) {
