@@ -41,15 +41,15 @@ const useConcepts = () => {
   };
 
   const addExcludedId = (id: string) => {
-    const newExcludeddIds = new Set(excludeIdSet);
-    newExcludeddIds.add(id);
-    setExcludeIdSet(newExcludeddIds);
+    const newExcludedIds = new Set(excludeIdSet);
+    newExcludedIds.add(id);
+    setExcludeIdSet(newExcludedIds);
   };
 
   const removeExcludedId = (id: string) => {
-    const newExcludeddIds = new Set(excludeIdSet);
-    newExcludeddIds.delete(id);
-    setExcludeIdSet(newExcludeddIds);
+    const newExcludedIds = new Set(excludeIdSet);
+    newExcludedIds.delete(id);
+    setExcludeIdSet(newExcludedIds);
   };
 
   const modifyExclusionSet = (isRowSelected: boolean, id: string) => {
