@@ -97,3 +97,5 @@ export function dateCellFormatter(info: string, formattingOptions: Intl.DateTime
     ...formattingOptions,
   });
 }
+
+export type AtLeast<T, K extends keyof T> = Partial<T> & Pick<T, K>;
