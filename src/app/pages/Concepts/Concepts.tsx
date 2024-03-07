@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo, useState } from 'react';
+import React, { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/concepts.module.scss';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
@@ -21,12 +21,21 @@ import { ConceptStatus as ConceptStatusType, IConcept } from '../../../libs/api/
 import { IConceptQueryOptions } from '../../../libs/api/endpoints';
 import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
 import TableCheckBox from '../../components/TableCheckBox';
+import ConceptMenu from '../../components/ConceptMenu';
+import Icon from '../../components/Icon';
 
 const columnHelper = createColumnHelper<IConcept>();
+
+const defaultIconProps = {
+  stroke: '#B4BDD0',
+  width: 24,
+  height: 24,
+};
 
 const Concepts: FunctionComponent = () => {
   const {
     activeFilter,
+    openPopupMenuId,
     categoryCount,
     rowSelection,
     category,
@@ -38,6 +47,8 @@ const Concepts: FunctionComponent = () => {
     setExcludeIdSet,
     toggleIsEntireCategorySelectedFlag,
     activateFilter,
+    selectPopupMenuId,
+    clearPopupMenuId,
   } = useConcepts();
 
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
@@ -121,8 +132,25 @@ const Concepts: FunctionComponent = () => {
           </div>
         ),
       }),
+      columnHelper.accessor((row) => row?.uuid, {
+        id: 'uuid',
+        size: 300,
+        header: () => {},
+        cell: (info) => (
+          <div className={styles.conceptMenu}>
+            <button className={styles.button} onClick={() => selectPopupMenuId(info?.getValue())}>
+              <Icon variant="dotstVertical" {...defaultIconProps} />
+            </button>
+            {info?.getValue() === openPopupMenuId && (
+              <div className={styles.popupMenu}>
+                <ConceptMenu conceptId={openPopupMenuId} clearConceptMenuId={clearPopupMenuId} />
+              </div>
+            )}
+          </div>
+        ),
+      }),
     ],
-    [activeFilter, excludeIdSet, isEntireCategorySelected]
+    [activeFilter, excludeIdSet, isEntireCategorySelected, openPopupMenuId]
   );
 
   const tableData = useMemo(() => data?.results ?? [], [data]);
