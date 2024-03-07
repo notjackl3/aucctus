@@ -28,6 +28,7 @@ const defaultIconProps = {
 const GeneratedConcepts: FunctionComponent = () => {
   const {
     isIgniteLoading,
+    isSaveConceptLoading,
     rowSelection,
     numberSelectedConcepts,
     generatedConceptData,
@@ -77,7 +78,7 @@ const GeneratedConcepts: FunctionComponent = () => {
         cell: (data) => (
           <div className={styles.details}>
             <span className={styles.title}>{data.row.original.title}</span>
-            <span className={`${styles.summary} ${styles.cellDescription}`}>{data.row.original.description}</span>
+            <span className={`${styles.summary} ${styles.cellEllipsis}`}>{data.row.original.description}</span>
           </div>
         ),
       }),
@@ -88,7 +89,6 @@ const GeneratedConcepts: FunctionComponent = () => {
   const tableData = useMemo(() => generatedConceptData ?? [], [generatedConceptData]);
 
   const table = useReactTable({
-    // getRowId: (row) => row.uuid,
     data: tableData,
     columns,
     enableRowSelection: true,
@@ -159,13 +159,13 @@ const GeneratedConcepts: FunctionComponent = () => {
               )}
             </table>
             <div className={styles.footer}>
-              <div className={styles.actions}>
-                <button
-                  className="btn btn-primary"
-                  disabled={!numberSelectedConcepts}
-                  onClick={saveNewConcepts}
-                >{`Save ${numberSelectedConcepts} Concepts`}</button>
-              </div>
+              <button
+                className="btn btn-primary"
+                disabled={!numberSelectedConcepts || isSaveConceptLoading}
+                onClick={saveNewConcepts}
+              >
+                {isSaveConceptLoading ? <Loading isSmall /> : `Save ${numberSelectedConcepts} Concepts`}
+              </button>
             </div>
           </div>
         </div>
