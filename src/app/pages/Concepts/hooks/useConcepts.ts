@@ -13,6 +13,8 @@ const useConcepts = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [excludeIdSet, setExcludeIdSet] = useState(new Set());
   const [isEntireCategorySelected, setIsEntireCategorySelected] = useState(false);
+  const [openPopupMenuId, setOpenPopupMenuId] = useState('');
+
   const { category } = useParams<{ category: ConceptCategory }>();
   const allConceptsQuery = useQuery({
     queryKey: ['concepts/active', category],
@@ -68,6 +70,18 @@ const useConcepts = () => {
     }
   };
 
+  const clearPopupMenuId = () => {
+    selectPopupMenuId('');
+  };
+
+  const selectPopupMenuId = (conceptId: string) => {
+    if (conceptId === openPopupMenuId) {
+      selectPopupMenuId('');
+    } else {
+      setOpenPopupMenuId(conceptId);
+    }
+  };
+
   const getStatusList = (conceptList: IConcept[]): ConceptStatus[] => {
     const statusSet = new Set<ConceptStatus>();
     conceptList.forEach((concept: IConcept) => {
@@ -92,11 +106,14 @@ const useConcepts = () => {
     addExcludedId,
     removeExcludedId,
     modifyExclusionSet,
+    openPopupMenuId,
     getStatusList,
     activateFilter,
     setExcludeIdSet,
     setRowSelection,
     toggleIsEntireCategorySelectedFlag,
+    selectPopupMenuId,
+    clearPopupMenuId,
     conceptStatusList,
   };
 };

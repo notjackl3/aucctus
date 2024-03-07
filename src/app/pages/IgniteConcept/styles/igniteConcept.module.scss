@@ -52,19 +52,11 @@
 
         .title {
           color: var(--gray-900-text-primary, #2b3674);
-
-          /* H1 */
-          font-size: 1.875rem;
-          font-weight: 700;
-          line-height: 2.375rem; /* 126.667% */
+          @include heading-100;
         }
         .subtitle {
           color: var(--gray-600-text-secondary, #667085);
-
-          /* B1 */
-          font-size: 0.875rem;
-          font-weight: 500;
-          line-height: 1.25rem; /* 142.857% */
+          @include body-100;
         }
       }
     }

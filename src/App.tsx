@@ -6,6 +6,8 @@ import Page from './app/pages';
 import UnauthGuard from './routes/guards/unauth.guard';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { Navigate } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const queryClient = new QueryClient();
 
@@ -13,6 +15,7 @@ function App() {
   return (
     <div role="main" className="App">
       <QueryClientProvider client={queryClient}>
+        <ToastContainer />
         <Routes>
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>

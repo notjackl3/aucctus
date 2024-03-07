@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import React, { FunctionComponent, useState } from 'react';
 import styles from './styles/igniteConcept.module.scss';
 import { useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -33,6 +33,11 @@ const IgniteConcept: FunctionComponent = () => {
     conceptStatusMutation.mutate(conceptPutObj);
   };
 
+  const generateConceptList = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    generateConcepts(concept);
+  };
+
   // const {
   //   isIgniteLoading,
   //   goalString,
@@ -48,6 +53,7 @@ const IgniteConcept: FunctionComponent = () => {
         <IgniteForm
           title="Ignite Your Concept"
           subtitle="These answers will kick start your concept innovation process"
+          onSubmit={generateConceptList}
         >
           <TextArea
             name="concept"
@@ -58,7 +64,7 @@ const IgniteConcept: FunctionComponent = () => {
             isDisableResize
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setConcept(e.target.value)}
           />
-          <button className="btn btn-primary" disabled={!concept} onClick={() => generateConcepts(concept)}>
+          <button type="submit" className="btn btn-primary" disabled={!concept}>
             Generate Concepts
           </button>
         </IgniteForm>

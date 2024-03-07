@@ -1,1 +1,13 @@
 $dm-sans: 'DM Sans', sans-serif;
+
+@mixin heading-100 {
+  font-size: 1.875rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+}
+
+@mixin body-100 {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+}
