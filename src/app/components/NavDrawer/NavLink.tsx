@@ -27,10 +27,11 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
     if (!openBasePath) return false;
     return location.pathname.substring(0, openBasePath.length) === openBasePath;
   }, [location, openBasePath]);
+  const isParentPathMatch = location?.pathname?.includes(to) && to !== AppPath.Home;
 
   return (
-    <div className={`${styles.navLinkWrapper}  ${locked ? styles.locked : ''}`}>
-      <Link to={!locked ? to : '#!'} className={styles.navLink}>
+    <div className={`${styles.navLinkWrapper} ${locked ? styles.locked : ''}`}>
+      <Link to={!locked ? to : '#!'} className={`${styles.navLink} ${isParentPathMatch ? styles.active : ''}`}>
         <div className={styles.label}>
           <Icon variant={icon} {...defaultIconProps} />
           <span>{title}</span>

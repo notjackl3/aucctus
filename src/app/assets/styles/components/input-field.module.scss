@@ -54,6 +54,10 @@
     ::placeholder {
       color: var(--gray-400-placeholder, #b4bdd0) !important;
     }
+
+    &.disableResize {
+      resize: none;
+    }
   }
 
   .hintText {

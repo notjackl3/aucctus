@@ -1,26 +1,27 @@
-import { FunctionComponent, ReactNode } from 'react';
+import React, { FunctionComponent, ReactNode } from 'react';
 
-import styles from '../assets/styles/pages/ignite.module.scss';
+import styles from '../pages/IgniteConcept/styles/igniteConcept.module.scss';
 import FeatureIcon from './FeatureIcon';
 
 interface IIgniteForm {
   title: string;
   subtitle: string;
+  onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   children: ReactNode;
 }
 
-const IgniteForm: FunctionComponent<IIgniteForm> = ({ title, subtitle, children }) => {
+const IgniteForm: FunctionComponent<IIgniteForm> = ({ title, subtitle, children, onSubmit }) => {
   return (
-    <div className={styles.container}>
+    <form className={styles.container} onSubmit={onSubmit}>
       <div className={styles.header}>
-        <FeatureIcon icon="file" color="purple" />
+        <FeatureIcon icon="lightbulb" color="purple" />
         <div className={styles.supportingText}>
           <h1 className={styles.title}>{title}</h1>
           <span className={styles.subtitle}>{subtitle}</span>
         </div>
       </div>
       <div className={styles.content}>{children}</div>
-    </div>
+    </form>
   );
 };
 

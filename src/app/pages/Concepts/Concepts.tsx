@@ -23,6 +23,8 @@ import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
 import TableCheckBox from '../../components/TableCheckBox';
 import ConceptMenu from '../../components/ConceptMenu';
 import Icon from '../../components/Icon';
+import { AppPath } from '../../../routes/routes';
+import { useNavigate } from 'react-router-dom';
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -50,7 +52,7 @@ const Concepts: FunctionComponent = () => {
     selectPopupMenuId,
     clearPopupMenuId,
   } = useConcepts();
-
+  const navigate = useNavigate();
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
     queryKey: ['concepts', activeFilter, category],
     refetchOnWindowFocus: false,
@@ -194,6 +196,17 @@ const Concepts: FunctionComponent = () => {
       <div className={styles.headerSection}>
         <div className={styles.header}>
           <h1>{`${category} ${category === 'active' ? 'Concepts' : ''}`}</h1>
+        </div>
+        <div className={styles.actions}>
+          <button
+            className={`btn btn-primary ${styles.button}`}
+            onClick={() => {
+              navigate(AppPath.IgniteConcept);
+            }}
+          >
+            <Icon variant="rocket" height={20} width={20} stroke="#fff" />
+            Add Concept
+          </button>
         </div>
       </div>
       <div className={styles.content}>
