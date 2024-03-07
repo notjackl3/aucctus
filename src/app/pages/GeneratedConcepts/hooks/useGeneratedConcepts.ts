@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { IConcept, ConceptStatus, ConceptCategory } from '../../../../libs/api/typings';
+import { useState } from 'react';
+import { IConceptCreate } from '../../../../libs/api/typings';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../../../../libs/api';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,7 +9,7 @@ import { defaultToastConfig } from '../../../../libs/toast';
 import { AppPath } from '../../../../routes/routes';
 import useIgniteConcept from '../../IgniteConcept/hooks/useIgniteConcept';
 
-const useConcepts = () => {
+const useGeneratedConcepts = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
   const queryClient = useQueryClient();
@@ -18,52 +18,50 @@ const useConcepts = () => {
   const generatedConceptData = location?.state?.concepts;
   const goalString = location?.state?.goal || '';
 
-  const {
-    isIgniteLoading,
-    generateConcepts
-  } = useIgniteConcept(generatedConceptData, goalString)
-
+  const { isIgniteLoading, generateConcepts } = useIgniteConcept(generatedConceptData, goalString);
   const createConceptMutation = useMutation({
-    mutationFn: async (conceptObj: Partial<IConcept>) => {
+    mutationFn: async (conceptObj: IConceptCreate[]) => {
       return api.concept.batchCreateConcepts(conceptObj);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['concepts'] });
-      navigate(AppPath.ConceptDraft)
+      navigate(AppPath.ConceptDraft);
     },
     onError: () => {
-      toast.error('Concept could not be updated. Please try again later.', defaultToastConfig);
+      toast.error('Concepts could not be saved. Please try again later.', defaultToastConfig);
     },
   });
-  
-  const getFormattedConceptRequest = (originalConceptList, rowSelection) => {
+
+  const getFormattedConceptRequest = (
+    originalConceptList: IConceptCreate[],
+    rowSelection: RowSelectionState
+  ): IConceptCreate[] => {
     const selectedConceptList = originalConceptList?.map((concept, index) => {
       if (rowSelection[index]) {
         return {
           ...concept,
-          status: 'ideating'
+        };
+      } else {
+        return {
+          title: '',
+          description: '',
         };
       }
     });
-    return selectedConceptList.filter(Boolean);
+    return selectedConceptList?.filter((concept) => !!concept?.title && !!concept?.description);
   };
-  
-  
-  
+
   const newConceptsToSave = getFormattedConceptRequest(generatedConceptData, rowSelection);
 
   const saveNewConcepts = () => {
     createConceptMutation.mutate(newConceptsToSave);
   };
-  
-  const resetSelections = () => {
-    setRowSelection({});
-  };
 
-  const numberSelectedConcepts = newConceptsToSave?.length ? String(newConceptsToSave?.length) : ''
+  const numberSelectedConcepts = newConceptsToSave?.length ? String(newConceptsToSave?.length) : '';
 
   return {
     isIgniteLoading,
+    isSaveConceptLoading: createConceptMutation?.isLoading,
     rowSelection,
     generatedConceptData,
     numberSelectedConcepts,
@@ -75,4 +73,4 @@ const useConcepts = () => {
   };
 };
 
-export default useConcepts;
+export default useGeneratedConcepts;
