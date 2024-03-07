@@ -1,7 +1,7 @@
 import { AtLeast } from '../utils';
 import { ApiService } from './apiService';
 import { IConceptQueryOptions, endpoints } from './endpoints';
-import { ConceptStatus, IConcept, IConceptCreate, IConceptGenerate } from './typings'; // Import the missing type
+import { ConceptStatus, IConcept, IConceptCreate, IConceptGenerate, IConceptGenerateResponse } from './typings'; // Import the missing type
 import { IPageResponse } from './typings/avxisi';
 
 /**
@@ -39,7 +39,7 @@ export class ConceptApi extends ApiService {
   }
 
   igniteConcepts(concept: IConceptGenerate) {
-    return this.post<Partial<IConcept>[]>(endpoints.conceptIgnite, concept);
+    return this.post<IConceptGenerateResponse>(endpoints.conceptIgnite, concept);
   }
 
   deleteConcept(uuid: string) {

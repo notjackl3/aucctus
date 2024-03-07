@@ -34,3 +34,7 @@ export interface IConceptCreate {
 export interface IConceptGenerate {
   goal: string;
 }
+
+export interface IConceptGenerateResponse {
+  concepts: Partial<IConcept>[];
+}
