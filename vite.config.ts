@@ -22,9 +22,10 @@ export default defineConfig({
       '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
     },
   },
-  // server: {
-  //   open: true,
-  // },
+  server: {
+    open: true,
+    port: 3000,
+  },
   build: {
     outDir: 'build',
     sourcemap: true,

@@ -8,6 +8,7 @@ import IgniteLoading from '../../components/IgniteLoading';
 import IgniteForm from '../../components/IgniteForm';
 import TextArea from '../../components/TextArea';
 import { IConceptCreate } from '../../../libs/api/typings';
+import useIgniteConcept from './hooks/useIgniteConcept';
 
 const IgniteConcept: FunctionComponent = () => {
   const navigate = useNavigate();
@@ -17,22 +18,27 @@ const IgniteConcept: FunctionComponent = () => {
 
   const conceptStatusMutation = useMutation({
     mutationFn: async (conceptObj: IConceptCreate) => {
-      //TODO replace temporary call when concept generation endpoint complete
-      return api?.concept?.createConcept(conceptObj);
+      return api?.concept?.igniteConcepts(conceptObj);
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['concepts'] });
-      navigate(AppPath.GeneratedConcepts);
+      navigate(AppPath.GeneratedConcepts, { state: { data, goal: concept } });
     },
   });
 
   const generateConcepts = (concept: string) => {
     const conceptPutObj: IConceptCreate = {
-      title: '',
-      description: concept,
+      goal: concept,
     };
     conceptStatusMutation.mutate(conceptPutObj);
   };
+
+  // const {
+  //   isIgniteLoading,
+  //   goalString,
+  //   setGoalString,
+  //   generateConcepts
+  // } = useIgniteConcept();
 
   return (
     <div className={styles.ignite}>

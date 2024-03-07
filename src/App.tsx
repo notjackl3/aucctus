@@ -22,7 +22,7 @@ function App() {
 
               {/* Concepts */}
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
-              <Route path={AppPath.GeneratedConcepts} element={<Page.NotFound />} />
+              <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
               <Route path={AppPath.ConceptCategory} element={<Page.Concepts />} />
             </Route>
           </Route>
