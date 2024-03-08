@@ -1,0 +1,192 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
+.generatedConcepts {
+  display: flex;
+  padding: 2rem 2rem 3rem 2rem;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  left: var(--nav-drawer-width);
+  min-width: 50rem;
+  width: calc(100vw - var(--nav-drawer-width));
+  background: var(--gray-50-bg, #fcfcfd);
+  height: 100%;
+
+  .headerSection {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    margin-bottom: 2rem;
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      flex-direction: column;
+      justify-content: flex-start;
+
+      h1 {
+        color: var(--type-tertiary, #2b3674);
+        text-transform: capitalize;
+        font-size: 2rem;
+        font-style: normal;
+        font-weight: 700;
+        font-family: $dm-sans;
+        height: 100%;
+      }
+
+      span {
+        color: var(--gray-600-text-secondary, #667085);
+        @include body-100;
+      }
+    }
+
+    .actions {
+      .button {
+        color: $white;
+        font-family: $dm-sans;
+        font-style: normal;
+        font-weight: 700;
+
+        svg {
+          path {
+            stroke: $white;
+          }
+        }
+      }
+    }
+  }
+
+  .content {
+    display: flex;
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+
+    table {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      align-self: stretch;
+      table-layout: fixed;
+      width: 100%;
+      border-radius: 0.75rem 0.75rem 0 0;
+      border: 1px solid var(--gray-300-outline, #e0e5f2);
+      border-bottom: none;
+      background: $white;
+      box-shadow: $shadow-100;
+
+      th {
+        color: var(--gray-600-text-secondary, #667085);
+        font-size: 0.875rem;
+        font-style: normal;
+        font-weight: 400;
+        overflow: hidden;
+        line-height: 1.25rem;
+      }
+
+      thead {
+        display: flex;
+        width: 100%;
+        padding: 0.75rem 1.5rem;
+        box-sizing: border-box;
+        align-items: center;
+        border-radius: 0.75rem 0.75rem 0 0;
+        border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+        background: var(--gray-50-bg, #fcfcfd);
+
+        color: var(--gray-600-text-secondary, #667085);
+        font-family: var(--text-sm-regular);
+        font-size: 0.75rem;
+        font-style: normal;
+        font-weight: 500;
+
+        tr {
+          display: flex;
+          width: 100%;
+          box-sizing: border-box;
+          align-items: flex-start;
+        }
+      }
+
+      tbody {
+        width: 100%;
+        max-height: 50rem;
+        overflow-y: scroll;
+        tr {
+          display: flex;
+          padding: 0.75rem 1.5rem;
+          box-sizing: border-box;
+          align-items: flex-start;
+          border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+
+          td {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            height: 5rem;
+            overflow: hidden;
+            padding-right: 2rem;
+            box-sizing: border-box;
+            color: var(--gray-600---Text-Secondary, #667085);
+            text-overflow: ellipsis;
+            font-family: $dm-sans;
+            font-size: 0.875rem;
+            font-style: normal;
+            font-weight: 400;
+
+            .cellEllipsis {
+              display: -webkit-box;
+              -webkit-line-clamp: 3;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+
+            .details {
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              flex: 1 0 0;
+
+              .title {
+                color: var(--gray-900-text-primary);
+                font-size: 0.875rem;
+                font-weight: 500;
+                line-height: 1.25rem;
+              }
+
+              .summary {
+                color: var(--type-tertiary);
+                @include body-200;
+              }
+            }
+          }
+        }
+      }
+    }
+    .footer {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-end;
+      height: 5rem;
+      width: 100%;
+      color: var(--gray-600-text-secondary, #667085);
+      padding: 2rem;
+      box-sizing: border-box;
+      border-radius: 0 0 0.75rem 0.75rem;
+      background: $white;
+      box-shadow: $shadow-100;
+      border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+
+      button {
+        min-width: 10rem;
+      }
+    }
+  }
+}

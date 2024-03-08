@@ -30,3 +30,11 @@ export interface IConceptCreate {
   status?: ConceptStatus;
   createdBy?: string;
 }
+
+export interface IConceptGenerate {
+  goal: string;
+}
+
+export interface IConceptGenerateResponse {
+  concepts: Partial<IConcept>[];
+}
