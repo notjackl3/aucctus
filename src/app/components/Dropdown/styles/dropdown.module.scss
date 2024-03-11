@@ -1,0 +1,36 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
+.dropdown {
+  position: relative;
+  display: flex;
+
+  .dropdownToggle {
+    display: flex;
+    width: 15rem;
+    justify-content: flex-start;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .dropdownMenu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1;
+    background-color: $white;
+    border-radius: 0 0 4px 4px;
+    box-shadow: $shadow-100;
+    overflow: hidden;
+
+    .dropdownItem {
+      padding: 10px 20px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #f9f9f9;
+      }
+    }
+  }
+}
