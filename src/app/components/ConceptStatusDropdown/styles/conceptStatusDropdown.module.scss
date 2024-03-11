@@ -1,0 +1,73 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.conceptStatusDropdown {
+  display: inline-flex;
+  padding: 2px 8px 2px 6px;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: none;
+  background: $purple-50;
+  gap: 0.5rem;
+
+  .blueBullet {
+    color: $gray-blue-500;
+  }
+  .redBullet {
+    color: $red-500;
+  }
+  .pinkBullet {
+    color: $pink-500;
+  }
+  .greenBullet {
+    color: $green-500;
+  }
+  .purpleBullet {
+    color: $purple-500;
+  }
+
+  .status {
+    text-align: center;
+    white-space: nowrap;
+    font-family: $dm-sans;
+    font-size: 0.875rem;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1.5rem;
+  }
+  .blueStatus {
+    color: $gray-blue-700;
+  }
+  .greenStatus {
+    color: $green-700;
+  }
+
+  .pinkStatus {
+    color: $pink-700;
+  }
+
+  .redStatus {
+    color: $red-700;
+  }
+  .purpleStatus {
+    color: $purple-700;
+  }
+}
+
+.blueBackground {
+  background: $gray-blue-50;
+}
+.redBackground {
+  background: $red-50;
+}
+.pinkBackground {
+  background: $pink-50;
+}
+.greenBackground {
+  background: $green-50;
+}
+.purpleBackground {
+  background: $purple-50;
+}
