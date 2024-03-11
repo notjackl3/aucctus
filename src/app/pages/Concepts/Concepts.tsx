@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useMemo, useState } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/concepts.module.scss';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
@@ -24,7 +24,8 @@ import TableCheckBox from '../../components/TableCheckBox';
 import ConceptMenu from '../../components/ConceptMenu';
 import Icon from '../../components/Icon';
 import { AppPath } from '../../../routes/routes';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import ConceptOverview from '../ConceptOverview';
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -53,6 +54,8 @@ const Concepts: FunctionComponent = () => {
     clearPopupMenuId,
   } = useConcepts();
   const navigate = useNavigate();
+  const { id } = useParams();
+  const [showConceptDetailPage, setShowConceptDetailPage] = useState(false);
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
     queryKey: ['concepts', activeFilter, category],
     refetchOnWindowFocus: false,
@@ -71,6 +74,20 @@ const Concepts: FunctionComponent = () => {
       itemRank,
     });
     return itemRank.passed;
+  };
+
+  const navigateToConcept = (id: string) => {
+    if (!id) {
+      return;
+    }
+    clearPopupMenuId();
+    setShowConceptDetailPage(true);
+    let newPath = AppPath.ConceptOverview.replace(':category', category || 'active');
+    navigate(newPath.replace(':id', id));
+  };
+
+  const closeConceptDetailPage = () => {
+    setShowConceptDetailPage(false);
   };
 
   const columns = useMemo(
@@ -97,9 +114,13 @@ const Concepts: FunctionComponent = () => {
                 checked: row.getIsSelected(),
                 disabled: !row.getCanSelect(),
                 indeterminate: row.getIsSomeSelected(),
-                onChange: () => {
+                onChange: (e) => {
+                  e.stopPropagation();
                   modifyExclusionSet(row.getIsSelected(), row?.id);
-                  row.getToggleSelectedHandler();
+                  row.getToggleSelectedHandler()(e);
+                },
+                onClick: (e) => {
+                  e.stopPropagation();
                 },
               }}
             />
@@ -140,7 +161,13 @@ const Concepts: FunctionComponent = () => {
         header: () => {},
         cell: (info) => (
           <div className={styles.conceptMenu}>
-            <button className={styles.button} onClick={() => selectPopupMenuId(info?.getValue())}>
+            <button
+              className={styles.button}
+              onClick={(e) => {
+                e.stopPropagation();
+                selectPopupMenuId(info?.getValue());
+              }}
+            >
               <Icon variant="dotstVertical" {...defaultIconProps} />
             </button>
             {info?.getValue() === openPopupMenuId && (
@@ -156,7 +183,6 @@ const Concepts: FunctionComponent = () => {
   );
 
   const tableData = useMemo(() => data?.results ?? [], [data]);
-
   const table = useReactTable({
     getRowId: (row) => row.uuid,
     data: tableData,
@@ -192,69 +218,78 @@ const Concepts: FunctionComponent = () => {
   };
 
   return (
-    <div className={styles.contentList}>
-      <div className={styles.headerSection}>
-        <div className={styles.header}>
-          <h1>{`${category} ${category === 'active' ? 'Concepts' : ''}`}</h1>
-        </div>
-        <div className={styles.actions}>
-          <button
-            className={`btn btn-primary ${styles.button}`}
-            onClick={() => {
-              navigate(AppPath.IgniteConcept);
-            }}
-          >
-            <Icon variant="rocket" height={20} width={20} stroke="#fff" />
-            Add Concept
-          </button>
-        </div>
-      </div>
-      <div className={styles.content}>
-        <table>
-          {/* TODO move buttons outside <table> */}
-          <div className={styles.filters}>
-            <StatusButton
-              statusName={`All ${category}`}
-              quantity={categoryCount}
-              isActive={!activeFilter}
-              activateFilter={() => {
-                setColumnFilters([{ id: 'status', value: '' }]);
-                activateFilter('');
-              }}
-            />
-            {renderStatusButtons(conceptStatusList)}
+    <>
+      <div className={styles.contentList}>
+        <div className={styles.headerSection}>
+          <div className={styles.header}>
+            <h1>{`${category} ${category === 'active' ? 'Concepts' : ''}`}</h1>
           </div>
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} style={{ width: header.getSize() }}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          {isFilteredConceptLoading ? (
-            <div className={styles.tableMessageContainer}>
-              <Loading />
+          <div className={styles.actions}>
+            <button
+              className={`btn btn-primary ${styles.button}`}
+              onClick={() => {
+                navigate(AppPath.IgniteConcept);
+              }}
+            >
+              <Icon variant="rocket" height={20} width={20} stroke="#fff" />
+              Add Concept
+            </button>
+          </div>
+        </div>
+        <div className={styles.content}>
+          <table>
+            {/* TODO move buttons outside <table> */}
+            <div className={styles.filters}>
+              <StatusButton
+                statusName={`All ${category}`}
+                quantity={categoryCount}
+                isActive={!activeFilter}
+                activateFilter={() => {
+                  setColumnFilters([{ id: 'status', value: '' }]);
+                  activateFilter('');
+                }}
+              />
+              {renderStatusButtons(conceptStatusList)}
             </div>
-          ) : (
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr key={row.id} onClick={row.getToggleSelectedHandler()}>
-                  {row.getVisibleCells().map((cell) => (
-                    <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id} style={{ width: header.getSize() }}>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </th>
                   ))}
                 </tr>
               ))}
-            </tbody>
-          )}
-        </table>
+            </thead>
+            {isFilteredConceptLoading ? (
+              <div className={styles.tableMessageContainer}>
+                <Loading />
+              </div>
+            ) : (
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigateToConcept(row.id);
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td style={{ width: cell.column.getSize() }} key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            )}
+          </table>
+        </div>
       </div>
-    </div>
+      {showConceptDetailPage && id && <ConceptOverview closePage={closeConceptDetailPage} conceptId={id} />}
+    </>
   );
 };
 

@@ -25,7 +25,8 @@ const ConceptMenu: FunctionComponent<ConceptMenuProps> = ({ conceptId, clearConc
     <div className={styles.conceptMenu}>
       <button
         className={styles.button}
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           clearConceptMenuId();
           updateConceptStatus(ConceptStatus.archived);
         }}

@@ -76,7 +76,7 @@ const useConcepts = () => {
 
   const selectPopupMenuId = (conceptId: string) => {
     if (conceptId === openPopupMenuId) {
-      selectPopupMenuId('');
+      setOpenPopupMenuId('');
     } else {
       setOpenPopupMenuId(conceptId);
     }
