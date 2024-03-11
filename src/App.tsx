@@ -22,11 +22,11 @@ function App() {
             <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
             <Route element={<Layout />}>
               <Route index path={AppPath.Home} element={<Page.Dashboard />} />
-
               {/* Concepts */}
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
               <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
               <Route path={AppPath.ConceptCategory} element={<Page.Concepts />} />
+              <Route path={AppPath.ConceptOverview} element={<Page.Concepts />} />s{' '}
             </Route>
           </Route>
 
