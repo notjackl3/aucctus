@@ -83,6 +83,9 @@ export function parseFormError<T = object>(error: unknown | AxiosError) {
  * @returns
  */
 export function snakeCaseToTitleCase(snakeCase: string) {
+  if (!snakeCase) {
+    return '';
+  }
   return snakeCase
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
