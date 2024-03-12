@@ -6,6 +6,13 @@ $dm-sans: 'DM Sans', sans-serif;
   line-height: 1.5rem;
 }
 
+@mixin heading-300 {
+  font-size: 1rem;
+  font-family: $dm-sans;
+  font-weight: 500;
+  line-height: 2rem;
+}
+
 @mixin body-100 {
   font-size: 0.875rem;
   font-weight: 500;
@@ -16,4 +23,19 @@ $dm-sans: 'DM Sans', sans-serif;
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.25rem;
+}
+
+@mixin text-medium {
+  font-size: 1rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+
+@mixin display-sm {
+  font-family: $dm-sans;
+  font-size: 1.875rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 2.5rem;
 }

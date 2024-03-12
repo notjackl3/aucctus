@@ -1,0 +1,127 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
+.overviewDetails {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-self: stretch;
+  height: 100%;
+  width: 100%;
+  flex-wrap: wrap;
+
+  h3 {
+    color: $blue-900;
+    @include heading-300;
+  }
+
+  p {
+    color: $grey-600;
+    font-family: $dm-sans;
+    @include text-medium;
+  }
+
+  .summary {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 3rem;
+    justify-content: space-between;
+    width: 100%;
+    gap: 2rem;
+    align-self: stretch;
+
+    .summaryBlock {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+
+      p {
+        color: $grey-600;
+        font-family: $dm-sans;
+        font-size: 1.5rem;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 2rem;
+      }
+
+      .textBlock {
+        display: flex;
+      }
+    }
+
+    .detailBlock {
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0rem;
+    }
+
+    .leftColumn {
+      display: flex;
+      height: 100%;
+      flex: 1;
+      flex-direction: column;
+    }
+
+    .rightColumn {
+      display: flex;
+      flex: 1;
+      height: 100%;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .listSection {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      align-self: stretch;
+      .list {
+        p {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .cardContentContainer {
+    display: flex;
+    padding: 0 2rem 2rem 2rem;
+    box-sizing: border-box;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+    align-self: stretch;
+
+    .cardContent {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.25rem;
+      align-self: stretch;
+
+      .title,
+      .text {
+        align-self: stretch;
+      }
+
+      .title {
+        color: $blue-900;
+        font-family: $dm-sans;
+        @include text-medium;
+      }
+
+      .text {
+        color: $grey-600;
+        font-size: 0.75rem;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 1.25rem;
+      }
+    }
+  }
+}

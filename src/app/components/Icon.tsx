@@ -15,6 +15,7 @@ import MessageCircle from '../assets/icons/message-circle.svg?react';
 import Home from '../assets/icons/home.svg?react';
 import Gear from '../assets/icons/gear.svg?react';
 import ChevronUp from '../assets/icons/chevronup.svg?react';
+import ChevronDown from '../assets/icons/chevrondown.svg?react';
 import Globe from '../assets/icons/globe.svg?react';
 import Key from '../assets/icons/key.svg?react';
 import LifeBuoy from '../assets/icons/lifebuoy.svg?react';
@@ -40,6 +41,7 @@ import Calendar from '../assets/icons/calendar.svg?react';
 import Columns from '../assets/icons/columns.svg?react';
 import Announcement from '../assets/icons/announcement.svg?react';
 import DotsVertical from '../assets/icons/dots-vertical.svg?react';
+import CloseX from '../assets/icons/closeX.svg?react';
 
 export enum IconVariant {
   lock,
@@ -57,6 +59,7 @@ export enum IconVariant {
   lightbulb,
   rocket,
   chevronUp,
+  chevronDown,
   globe,
   key,
   lifeBuoy,
@@ -82,6 +85,7 @@ export enum IconVariant {
   columns,
   announcement,
   dotstVertical,
+  closeX,
 }
 
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
@@ -121,6 +125,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <MessageCircle {...props} />;
     case 'chevronUp':
       return <ChevronUp {...props} />;
+    case 'chevronDown':
+      return <ChevronDown {...props} />;
     case 'globe':
       return <Globe {...props} />;
     case 'key':
@@ -171,6 +177,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <Announcement {...props} />;
     case 'dotstVertical':
       return <DotsVertical {...props} />;
+    case 'closeX':
+      return <CloseX {...props} />;
   }
 };
 
