@@ -1,0 +1,148 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
+.customerDetails {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-self: stretch;
+  height: 100%;
+  width: 100%;
+
+  h2 {
+    color: $blue-900;
+    @include heading-200;
+  }
+
+  p {
+    color: $grey-600;
+    font-family: $dm-sans;
+    margin: 0;
+    @include text-medium;
+  }
+
+  .avatarSection {
+    display: flex;
+    margin-top: 2rem;
+    min-height: 3rem;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    gap: 1rem;
+
+    .avatar {
+      display: flex;
+      width: 5.5rem;
+      height: 5.5rem;
+      justify-content: center;
+      align-items: center;
+      border: 1px solid $white;
+      border-radius: 50%;
+    }
+
+    .avatarDetails {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+
+      .description {
+        color: $blue-900;
+        font-family: $dm-sans;
+        font-size: 1.125rem;
+        font-weight: 400;
+        margin-bottom: 0.5rem;
+      }
+
+      .name {
+        color: $blue-900;
+        @include heading-100;
+      }
+    }
+  }
+
+  .summary {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 1rem;
+    justify-content: space-between;
+    width: 100%;
+    gap: 2rem;
+    flex-wrap: wrap;
+
+    .detailBlock {
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0rem;
+    }
+
+    .leftColumn {
+      display: flex;
+      height: 100%;
+      max-width: 50rem;
+      flex-direction: column;
+    }
+
+    .rightColumn {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .listSection {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      align-self: stretch;
+      .list {
+        svg {
+          margin-right: 1rem;
+          path {
+            stroke: $blue-900;
+          }
+        }
+        p {
+          display: flex;
+          align-items: center;
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+
+  .cardContainer {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    .cardContent {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+
+      .text {
+        display: flex;
+        min-height: 4rem;
+        width: 100%;
+        padding: 1rem 1.5rem;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: flex-start;
+        color: $blue-900;
+        border-bottom: 1px solid $grey-300;
+        color: $blue-900;
+        @include body-100;
+        font-family: $dm-sans;
+
+        &:last-child {
+          border-bottom: none;
+        }
+      }
+    }
+  }
+}
