@@ -1,25 +1,24 @@
 import { FunctionComponent } from 'react';
-import styles from './styles/tab.module.scss';
+import styles from './styles/tabButton.module.scss';
 
-export interface TabProps {
+export interface TabButtonProps {
   selectTab: () => void;
   label: string;
   tabIndex: number;
   activeTab: number;
-  className?: string;
 }
 
-const Tab: FunctionComponent<TabProps> = ({ selectTab, label, activeTab, tabIndex, className }) => {
+const TabButton: FunctionComponent<TabButtonProps> = ({ selectTab, label, activeTab, tabIndex }) => {
   const isTabActive = activeTab === tabIndex;
 
   const activeClassName = isTabActive ? styles.active : '';
 
   return (
-    <li className={`${styles.tab} ${activeClassName} ${className}`}>
+    <li className={`${styles.tabButton} ${activeClassName}`}>
       <button className={styles.button} onClick={selectTab} />
       <span className={`${styles.label} ${activeClassName}`}>{label}</span>
     </li>
   );
 };
 
-export default Tab;
+export default TabButton;
