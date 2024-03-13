@@ -2,8 +2,16 @@ $dm-sans: 'DM Sans', sans-serif;
 
 @mixin heading-100 {
   font-size: 1.875rem;
+  font-family: $dm-sans;
   font-weight: 700;
   line-height: 1.5rem;
+}
+
+@mixin heading-200 {
+  font-size: 1.125rem;
+  font-family: $dm-sans;
+  font-weight: 700;
+  line-height: 1.75;
 }
 
 @mixin heading-300 {
