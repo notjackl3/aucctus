@@ -1,0 +1,21 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.marketChart {
+  display: flex;
+  width: 20rem;
+  height: 20rem;
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    fill: $black;
+    font-family: $dm-sans;
+    font-size: 1.25rem;
+    font-weight: 400;
+
+    &.white {
+      fill: $white;
+    }
+  }
+}
