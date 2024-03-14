@@ -1,0 +1,55 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.marketLegend {
+  display: flex;
+  padding: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 0.75rem;
+  border: 1px solid $grey-300;
+
+  .description {
+    display: inline-flex;
+    text-align: start;
+    gap: 0.5rem;
+    .bullet {
+      svg {
+        circle {
+          fill: $purple-200;
+        }
+      }
+
+      &.purple {
+        svg {
+          circle {
+            fill: $purple-200;
+          }
+        }
+      }
+
+      &.darkPurple {
+        svg {
+          circle {
+            fill: $purple-400;
+          }
+        }
+      }
+      &.blue {
+        svg {
+          circle {
+            fill: $blue-600;
+          }
+        }
+      }
+    }
+  }
+
+  .text {
+    text-align: center;
+    white-space: nowrap;
+    color: $blue-900;
+    font-family: $dm-sans;
+    @include text-medium;
+  }
+}
