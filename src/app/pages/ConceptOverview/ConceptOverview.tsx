@@ -6,6 +6,7 @@ import OverviewDetails from './components/OverviewDetails';
 import Dropdown from '../../components/Dropdown/Dropdown';
 import useConceptOverview from './hooks/useConceptOverview';
 import CustomerProfile from './components/CustomerProfile';
+import FinancialDetails from './components/FinancialDetails';
 
 export interface ConceptOverviewProps {
   closePage: () => void;
@@ -37,7 +38,7 @@ const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, c
           <OverviewDetails conceptData={conceptData} />
           {/* Placeholder tab data */}
           <div>Market Scan </div>
-          <div>Financial Projection</div>
+          <FinancialDetails conceptData={conceptData} />
           <CustomerProfile conceptData={conceptData} />
           <div>Key Assumptions</div>
         </Tabs>
