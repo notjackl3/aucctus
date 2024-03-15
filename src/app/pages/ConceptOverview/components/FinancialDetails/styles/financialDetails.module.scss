@@ -1,0 +1,230 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
+.financialDetails {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-self: stretch;
+  height: 100%;
+  width: 100%;
+
+  h2 {
+    color: $blue-900;
+    @include heading-200;
+  }
+
+  p {
+    color: $grey-600;
+    font-family: $dm-sans;
+    margin: 0;
+    @include text-medium;
+  }
+
+  .summary {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 1rem;
+    justify-content: space-between;
+    width: 100%;
+    gap: 2rem;
+    flex-wrap: wrap;
+
+    .detailBlock {
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0rem;
+    }
+
+    .leftColumn {
+      display: flex;
+      height: 100%;
+      max-width: 60rem;
+      flex-direction: column;
+    }
+
+    .rightColumn {
+      display: flex;
+      height: 100%;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    .listSection {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      align-self: stretch;
+      .list {
+        svg {
+          margin-right: 1rem;
+          path {
+            stroke: $blue-900;
+          }
+        }
+        p {
+          display: flex;
+          align-items: center;
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+
+  .cardContainer {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    width: 100%;
+
+    .cardStyle {
+      width: 100%;
+      max-width: 70rem;
+      h4 {
+        color: $blue-900;
+        @include text-large;
+        font-family: $dm-sans;
+      }
+    }
+
+    .paddedCardStyle {
+      width: 100%;
+      flex-wrap: wrap;
+      max-width: 70rem;
+
+      h4 {
+        color: $blue-900;
+        @include text-large;
+        font-family: $dm-sans;
+      }
+    }
+
+    .cardAction {
+      color: $grey-600;
+      @include body-100;
+      font-family: $dm-sans;
+      border: none;
+      background: none;
+    }
+
+    .cardMarketContent {
+      display: flex;
+      padding: 1rem;
+      flex-wrap: wrap;
+      box-sizing: border-box;
+      justify-content: space-between;
+      align-self: stretch;
+      .cardLeft {
+        display: flex;
+        flex-grow: 1;
+        flex-direction: column;
+        gap: 1rem;
+        align-items: center;
+        justify-content: flex-start;
+        color: $blue-900;
+
+        .cardLeftSytle {
+          box-shadow: none;
+          h4 {
+            color: $blue-900;
+            @include heading-300;
+          }
+        }
+
+        .cardLeftContent {
+          display: flex;
+          min-height: 4rem;
+          flex-direction: column;
+          padding: 1rem;
+          box-sizing: border-box;
+          align-items: flex-start;
+          justify-content: space-between;
+          color: $blue-900;
+
+          .cardBoldText {
+            font-family: $dm-sans;
+            color: $grey-600;
+            font-size: 1rem;
+            font-style: normal;
+            font-weight: 700;
+            line-height: 1.5rem;
+            margin-bottom: 0.5rem;
+          }
+
+          .cardRegularText {
+            @include text-medium;
+            font-family: $dm-sans;
+            color: $grey-600;
+          }
+        }
+      }
+
+      .cardRight {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 0.5rem;
+        box-sizing: border-box;
+        flex-grow: 2;
+
+        .marketChart {
+          width: 27rem;
+          height: 27rem;
+        }
+
+        .legend {
+          margin-top: 2rem;
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+          width: 100%;
+          max-width: 30rem;
+        }
+      }
+    }
+
+    .cardContent {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+
+      .cardRow {
+        display: flex;
+        min-height: 4rem;
+        width: 100%;
+        padding: 1rem 1.5rem;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: space-between;
+        color: $blue-900;
+
+        .rowText {
+          color: $blue-900;
+          @include body-100;
+          font-family: $dm-sans;
+        }
+
+        .rowBadge {
+          display: flex;
+          color: $gray-blue-700;
+
+          .bulletLightPurple {
+            color: $purple-200;
+          }
+          .bulletPurple {
+            color: $purple-400;
+          }
+          .bulletBlue {
+            color: $blue-600;
+          }
+        }
+      }
+    }
+  }
+}

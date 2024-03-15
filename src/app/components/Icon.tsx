@@ -43,6 +43,7 @@ import Announcement from '../assets/icons/announcement.svg?react';
 import DotsVertical from '../assets/icons/dots-vertical.svg?react';
 import CloseX from '../assets/icons/closeX.svg?react';
 import PiggyBank from '../assets/icons/piggy-bank.svg?react';
+import Circle from '../assets/icons/circle.svg?react';
 
 export enum IconVariant {
   lock,
@@ -88,6 +89,7 @@ export enum IconVariant {
   dotstVertical,
   closeX,
   piggyBank,
+  circle,
 }
 
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
@@ -183,6 +185,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <CloseX {...props} />;
     case 'piggyBank':
       return <PiggyBank {...props} />;
+    case 'circle':
+      return <Circle {...props} />;
   }
 };
 
