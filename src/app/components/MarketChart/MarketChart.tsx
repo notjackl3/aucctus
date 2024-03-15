@@ -3,7 +3,7 @@ import { FunctionComponent } from 'react';
 import styles from './styles/marketChart.module.scss';
 
 export interface MarketChartProps {
-  chartClass: string;
+  chartClass?: string;
   largeValue: string;
   mediumValue: string;
   smallValue: string;
