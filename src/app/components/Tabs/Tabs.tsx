@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactElement, useState } from 'react';
+import { FunctionComponent, ReactElement } from 'react';
 import styles from './styles/tabs.module.scss';
 import Tab from '../Tab/Tab';
 import TabButton from '../TabButton/TabButton';
@@ -13,11 +13,19 @@ export interface TabsProps {
   tabClassName?: string;
   children: ReactElement[] | ReactElement;
   isButtonStyle?: boolean;
+  selectActiveTab: (index: number) => void;
+  activeTabIndex: number;
 }
 
-const Tabs: FunctionComponent<TabsProps> = ({ tabs, children, className, isButtonStyle, tabClassName }) => {
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
-
+const Tabs: FunctionComponent<TabsProps> = ({
+  tabs,
+  children,
+  className,
+  isButtonStyle,
+  tabClassName,
+  activeTabIndex,
+  selectActiveTab,
+}) => {
   if (!Array.isArray(children)) {
     children = [children];
   }
@@ -28,7 +36,7 @@ const Tabs: FunctionComponent<TabsProps> = ({ tabs, children, className, isButto
         {tabs?.map((tab, index) =>
           !isButtonStyle ? (
             <Tab
-              selectTab={() => setActiveTabIndex(index)}
+              selectTab={() => selectActiveTab(index)}
               activeTab={activeTabIndex}
               tabIndex={index}
               key={tab.label}
@@ -37,7 +45,7 @@ const Tabs: FunctionComponent<TabsProps> = ({ tabs, children, className, isButto
             />
           ) : (
             <TabButton
-              selectTab={() => setActiveTabIndex(index)}
+              selectTab={() => selectActiveTab(index)}
               activeTab={activeTabIndex}
               tabIndex={index}
               key={tab.label}
