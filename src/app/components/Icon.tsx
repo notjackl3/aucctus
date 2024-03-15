@@ -31,6 +31,7 @@ import ArrowDown from '../assets/icons/arrowdown.svg?react';
 import ArrowUp from '../assets/icons/arrowup.svg?react';
 import ArrowRight from '../assets/icons/arrowright.svg?react';
 import ArrowLeft from '../assets/icons/arrowleft.svg?react';
+import ArrowUpRight from '../assets/icons/arrowupright.svg?react';
 import Star from '../assets/icons/star.svg?react';
 import TrendUp from '../assets/icons/trendup.svg?react';
 import FilterLines from '../assets/icons/filter-lines.svg?react';
@@ -44,6 +45,7 @@ import DotsVertical from '../assets/icons/dots-vertical.svg?react';
 import CloseX from '../assets/icons/closeX.svg?react';
 import PiggyBank from '../assets/icons/piggy-bank.svg?react';
 import Circle from '../assets/icons/circle.svg?react';
+import LinkExternal from '../assets/icons/link-external.svg?react';
 
 export enum IconVariant {
   lock,
@@ -77,6 +79,7 @@ export enum IconVariant {
   arrowUp,
   arrowRight,
   arrowLeft,
+  arrowUpRight,
   star,
   trendUp,
   filterLines,
@@ -90,6 +93,7 @@ export enum IconVariant {
   closeX,
   piggyBank,
   circle,
+  linkExternal,
 }
 
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
@@ -161,6 +165,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <ArrowRight {...props} />;
     case 'arrowLeft':
       return <ArrowLeft {...props} />;
+    case 'arrowUpRight':
+      return <ArrowUpRight {...props} />;
     case 'star':
       return <Star {...props} />;
     case 'trendUp':
@@ -187,6 +193,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <PiggyBank {...props} />;
     case 'circle':
       return <Circle {...props} />;
+    case 'linkExternal':
+      return <LinkExternal {...props} />;
   }
 };
 
