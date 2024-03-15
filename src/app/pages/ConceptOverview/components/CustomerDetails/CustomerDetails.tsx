@@ -63,7 +63,7 @@ const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ conceptData 
       </div>
 
       <div className={styles.cardContainer}>
-        <ConceptDetailCard title="Jobs to be Dones" icon="clipboard">
+        <ConceptDetailCard title="Jobs to be Dones" icon="clipboard" isHideFooter>
           <div className={styles.cardContent}>
             <p className={styles.text}>Looking for sustainable products </p>
             <p className={styles.text}>Finding inspiration through browsing</p>
@@ -71,14 +71,14 @@ const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ conceptData 
             <p className={styles.text}>Purchase higher quality items</p>
           </div>
         </ConceptDetailCard>
-        <ConceptDetailCard title="Pains" icon="userGroup">
+        <ConceptDetailCard title="Pains" icon="userGroup" isHideFooter>
           <div className={styles.cardContent}>
             <p className={styles.text}>Long or complicated process </p>
             <p className={styles.text}>Hard to track budget</p>
             <p className={styles.text}>Forgetting to pay recurring bills </p>
           </div>
         </ConceptDetailCard>
-        <ConceptDetailCard title="Quotes" icon="message">
+        <ConceptDetailCard title="Quotes" icon="message" isHideFooter>
           <div className={styles.cardContent}>
             <p className={styles.text}>
               “I love browsing for inspiration, but my financials I want them straight to the point”{' '}
