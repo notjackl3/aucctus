@@ -5,12 +5,13 @@ import Icon from '../Icon';
 
 const defaultIconProps = {
   stroke: '',
-  width: 20,
-  height: 20,
+  width: 16,
+  height: 16,
 };
 
 export interface MarketLegendProps {
   legendClassName?: string;
+  legendTextClassName?: string;
   legendText: string;
   legendValue: string;
   bulletColor: 'purple' | 'darkPurple' | 'blue';
@@ -18,6 +19,7 @@ export interface MarketLegendProps {
 
 const MarketLegend: FunctionComponent<MarketLegendProps> = ({
   legendClassName,
+  legendTextClassName,
   legendText,
   legendValue,
   bulletColor,
@@ -28,9 +30,9 @@ const MarketLegend: FunctionComponent<MarketLegendProps> = ({
         <span className={`${styles.bullet} ${styles[bulletColor]}`}>
           <Icon variant="circle" {...defaultIconProps} />
         </span>
-        <span className={styles.text}>{legendText}</span>
+        <span className={`${styles.text} ${legendTextClassName ? legendTextClassName : ''}`}>{legendText}</span>
       </span>
-      <span className={styles.text}>{legendValue}</span>
+      <span className={`${styles.text} ${legendTextClassName ? legendTextClassName : ''}`}>{legendValue}</span>
     </div>
   );
 };

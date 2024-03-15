@@ -1,17 +1,18 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/overviewDetails.module.scss';
-import { useParams } from 'react-router-dom';
-import ConceptCard from '../../../../components/ConceptCard';
-import images from '../../../../assets/img';
 import { IConcept } from '../../../../../libs/api/typings';
+import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
+import MarketChart from '../../../../components/MarketChart';
+import MarketLegend from '../../../../components/MarketLegend';
+import Icon from '../../../../components/Icon';
+import NewsArticle from '../../../../components/NewsArticle';
 
 export interface OverviewDetailsProps {
   conceptData?: IConcept;
+  selectActiveTab: (tabIndex: number) => void;
 }
 
-const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({ conceptData }) => {
-  let { id } = useParams();
-
+const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({ conceptData, selectActiveTab }) => {
   return (
     <div className={styles.overviewDetails}>
       <div className={styles.summary}>
@@ -54,44 +55,66 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({ conceptData 
         </div>
       </div>
 
-      {/* TODO remove Temporary card placeholders */}
       <div className={styles.cardContentContainer}>
-        <ConceptCard
-          title="Customer Profiles"
-          subtitle="Breakdown of target user pain points and jobs to be done."
-          width={360}
-          buttonTitle="View Details"
-          icon="userGroup"
-          actionButtonProps={{
-            disabled: !id,
-            onClick: () => {
-              if (!id) return;
-            },
-          }}
+        <ConceptDetailCard
+          title="Financial Projection"
+          subtitle="Market size estimate based on initial hypothesis"
+          cardClassName={styles.cardStyle}
+          footerAction={
+            <button
+              className={styles.cardAction}
+              onClick={() => {
+                selectActiveTab(2);
+              }}
+              aria-label="View Financial Projection"
+            >
+              <span>{<Icon variant="lineChartUp" width={16} height={16} stroke="#626BA3" />}</span>
+              View Projections
+            </button>
+          }
         >
-          <div className={styles.cardContentWrapper}>
-            <img alt="Customer Profile" src={images.customerProfile} />
-
-            <div className={styles.cardContent}>
-              <span className={styles.title}>Mostly Millennial and Hip profiles</span>
-              <span className={styles.text}>
-                The MVP has been targeted towards the millennials that spends the most time abroad
-              </span>
+          <div className={styles.cardContent}>
+            <MarketChart largeValue="2.8M" mediumValue="560K" smallValue="56K" chartClass={styles.marketChart} />
+            <div className={styles.legendGroup}>
+              <MarketLegend
+                legendClassName={styles.financeLegend}
+                legendTextClassName={styles.legendText}
+                legendText="Total Addressable Market"
+                legendValue="2.8M"
+                bulletColor="purple"
+              />
+              <MarketLegend
+                legendClassName={styles.financeLegend}
+                legendTextClassName={styles.legendText}
+                legendText="Serviceable Addressable Market"
+                legendValue="560K"
+                bulletColor="darkPurple"
+              />
+              <MarketLegend
+                legendClassName={styles.financeLegend}
+                legendTextClassName={styles.legendText}
+                legendText="Serviceable Obtainable Market"
+                legendValue="56K"
+                bulletColor="blue"
+              />
             </div>
           </div>
-        </ConceptCard>
-        <ConceptCard
-          title="Financial Projection"
-          subtitle="Breakdown of business model canvas and hypotheses to validate."
-          width={360}
-          buttonTitle="Coming Soon"
-          actionButtonProps={{
-            disabled: true,
-            'aria-disabled': true,
-          }}
-        >
-          <img alt="Financial Projection" src={images.financialProjection} />
-        </ConceptCard>
+        </ConceptDetailCard>
+      </div>
+      <div className={styles.summary}>
+        <h2>Activity and News</h2>
+      </div>
+      <div className={styles.newsContainer}>
+        <NewsArticle
+          newsTitle={`Rapid Delivery & Logistics Retail Business, 'Buggy,' Launches Equity Crowdfunding Round on Frontfund`}
+          newsDescription={`Buggy, Canada's leading rapid retail logistics company, is excited to announce its equity crowdfunding round on Frontfundr."With an experienced team, strong strategic partnerships and focus on path to profitability in this space, we're excited to offer the opportunity for individuals to invest in our growth through our equity crowdfunding round on Frontfundr," said Nicole Verkindt, CEO of Buggy.`}
+          newsLink="https://www.google.com/"
+        />
+        <NewsArticle
+          newsTitle={`Rapid Delivery & Logistics Retail Business, 'Buggy,' Launches Equity Crowdfunding Round on Frontfund`}
+          newsDescription={`Buggy, Canada's leading rapid retail logistics company, is excited to announce its equity crowdfunding round on Frontfundr."With an experienced team, strong strategic partnerships and focus on path to profitability in this space, we're excited to offer the opportunity for individuals to invest in our growth through our equity crowdfunding round on Frontfundr," said Nicole Verkindt, CEO of Buggy.`}
+          newsLink=""
+        />
       </div>
     </div>
   );

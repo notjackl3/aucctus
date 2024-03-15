@@ -36,6 +36,7 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
         <ConceptDetailCard
           title="Key Hypothesis"
           cardClassName={styles.cardStyle}
+          isHideFooter
           headerAction={
             <button className={styles.cardAction} onClick={() => {}} aria-label="Unlock Edit Hypothesis">
               <span>{<Icon variant="lock" {...iconDefaultProps} />}</span>
@@ -71,7 +72,7 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
         </ConceptDetailCard>
       </div>
       <div className={styles.cardContainer}>
-        <ConceptDetailCard title="Market Size Projection" cardClassName={styles.paddedCardStyle}>
+        <ConceptDetailCard title="Market Size Projection" cardClassName={styles.paddedCardStyle} isHideFooter>
           <div className={styles.cardMarketContent}>
             <div className={styles.cardLeft}>
               <ConceptDetailCard
@@ -94,6 +95,7 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
                 title="Serviceable Addressable Market"
                 cardClassName={styles.cardLeftSytle}
                 headerAction={<span>560k</span>}
+                isHideFooter
               >
                 <div className={styles.cardLeftContent}>
                   <p className={styles.cardBoldText}>
@@ -108,6 +110,7 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
                 title="Serviceable Obtainable Market"
                 cardClassName={styles.cardLeftSytle}
                 headerAction={<span>56k</span>}
+                isHideFooter
               >
                 <div className={styles.cardLeftContent}>
                   <p className={styles.cardBoldText}>

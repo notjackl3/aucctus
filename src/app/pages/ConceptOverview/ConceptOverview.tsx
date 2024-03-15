@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useState } from 'react';
 import styles from './styles/conceptOverview.module.scss';
 import Icon from '../../components/Icon';
 import Tabs from '../../components/Tabs';
@@ -7,6 +7,7 @@ import Dropdown from '../../components/Dropdown/Dropdown';
 import useConceptOverview from './hooks/useConceptOverview';
 import CustomerProfile from './components/CustomerProfile';
 import FinancialDetails from './components/FinancialDetails';
+import MarketDetails from './components/MarketDetails/MarketDetails';
 
 export interface ConceptOverviewProps {
   closePage: () => void;
@@ -15,7 +16,7 @@ export interface ConceptOverviewProps {
 
 const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, conceptId }) => {
   const { tabs, options, conceptData, changeConceptStatus, initialOption } = useConceptOverview(conceptId);
-
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   return (
     <div className={`${styles.conceptOverview} ${styles.slideAnimation}`}>
       <div className={styles.headerSection}>
@@ -34,12 +35,12 @@ const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, c
         </div>
       </div>
       <div className={styles.contentContainer}>
-        <Tabs className={styles.tabs} tabs={tabs}>
-          <OverviewDetails conceptData={conceptData} />
-          {/* Placeholder tab data */}
-          <div>Market Scan </div>
+        <Tabs className={styles.tabs} tabs={tabs} activeTabIndex={activeTabIndex} selectActiveTab={setActiveTabIndex}>
+          <OverviewDetails conceptData={conceptData} selectActiveTab={setActiveTabIndex} />
+          <MarketDetails conceptData={conceptData} />
           <FinancialDetails conceptData={conceptData} />
           <CustomerProfile conceptData={conceptData} />
+          {/* Placeholder tab data */}
           <div>Key Assumptions</div>
         </Tabs>
       </div>

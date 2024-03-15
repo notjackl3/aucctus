@@ -1,0 +1,168 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
+.marketDetails {
+  display: flex;
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-self: stretch;
+  height: 100%;
+  width: 100%;
+
+  h2 {
+    color: $blue-900;
+    @include heading-200;
+  }
+
+  p {
+    color: $grey-600;
+    font-family: $dm-sans;
+    margin: 0;
+    @include text-medium;
+  }
+
+  .summary {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 1rem;
+    justify-content: space-between;
+    width: 100%;
+    gap: 2rem;
+    flex-wrap: wrap;
+
+    .detailBlock {
+      display: flex;
+      width: 100%;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0rem;
+    }
+  }
+
+  .cardContainer {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    width: 100%;
+
+    .cardStyle {
+      width: 100%;
+      max-width: 70rem;
+      h4 {
+        color: $blue-900;
+        @include text-large;
+        font-family: $dm-sans;
+      }
+    }
+
+    .cardAction {
+      display: flex;
+      color: $grey-600;
+      @include body-100;
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      align-items: flex-start;
+      justify-content: space-between;
+      flex: 1 1 auto;
+      max-width: 15rem;
+      gap: 1rem;
+      box-sizing: border-box;
+      font-family: $dm-sans;
+      border: 1px solid $grey-300;
+      background: none;
+    }
+
+    .cardTrendContent {
+      display: flex;
+      min-height: 4rem;
+      flex-direction: column;
+      padding: 1.5rem;
+      box-sizing: border-box;
+      align-items: flex-start;
+      justify-content: space-between;
+      color: $blue-900;
+
+      img {
+        width: 100%;
+      }
+
+      .cardBoldText {
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+        color: $blue-900;
+        @include text-medium;
+        font-family: $dm-sans;
+        font-weight: 700;
+      }
+
+      .cardRegularText {
+        @include text-small;
+        font-family: $dm-sans;
+        color: $grey-600;
+      }
+    }
+
+    .cardContent {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      width: 100%;
+
+      .cardRow {
+        display: flex;
+        min-height: 3rem;
+        width: 100%;
+        gap: 1rem;
+        padding: 1rem 1.5rem;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: space-between;
+        color: $blue-900;
+        border-bottom: 1px solid $grey-300;
+
+        &:last-child {
+          border-bottom: none;
+        }
+        .cardLogo {
+          width: 3rem;
+          height: 3rem;
+        }
+        .cardDescription {
+          display: flex;
+          flex: 1;
+          flex-direction: column;
+          .cardDescriptionTitle {
+            color: $blue-900;
+            @include text-medium;
+            font-family: $dm-sans;
+          }
+          .cardDescriptionText {
+            color: $grey-600;
+            overflow: hidden;
+            @include text-x-small;
+            font-family: $dm-sans;
+
+            &.cellEllipsis {
+              display: -webkit-box;
+              -webkit-line-clamp: 4;
+              -webkit-box-orient: vertical;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .newsContainer {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+    width: 100%;
+    gap: 1rem;
+  }
+}

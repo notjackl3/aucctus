@@ -5,8 +5,12 @@ import Icon, { IconVariant } from '../Icon';
 
 interface ConceptDetailCardProps {
   title: string;
+  subtitle?: string;
   children: ReactNode;
+  isHideHeader?: boolean;
+  isHideFooter?: boolean;
   headerAction?: ReactNode;
+  footerAction?: ReactNode;
   cardClassName?: string;
   headerClassName?: string;
   icon?: keyof typeof IconVariant;
@@ -20,21 +24,31 @@ const iconDefaultProps = {
 
 const ConceptDetailCard: FunctionComponent<ConceptDetailCardProps> = ({
   title,
+  subtitle,
   children,
   icon,
   cardClassName,
   headerAction,
+  isHideHeader,
+  isHideFooter,
+  footerAction,
 }) => {
   return (
     <div className={`${styles.conceptDetailCard} ${cardClassName ? cardClassName : ''}`}>
-      <div className={styles.cardHeader}>
-        <span className={styles.headerTitle}>
-          <span>{icon ? <Icon variant={icon} {...iconDefaultProps} /> : null}</span>
-          <h4>{title}</h4>
-        </span>
-        {headerAction}
-      </div>
+      {!isHideHeader && (
+        <div className={styles.cardHeader}>
+          <span className={styles.headerTitle}>
+            <h4>
+              {icon && <span className={styles.cardIcon}>{<Icon variant={icon} {...iconDefaultProps} />}</span>}
+              {title}
+            </h4>
+            {subtitle && <h5>{subtitle}</h5>}
+          </span>
+          {headerAction}
+        </div>
+      )}
       <div className={styles.content}>{children}</div>
+      {!isHideFooter && <div className={styles.cardFooter}>{footerAction}</div>}
     </div>
   );
 };
