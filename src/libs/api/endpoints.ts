@@ -26,11 +26,11 @@ export const endpoints = {
   account: `/api/v1/account`,
 
   /* Concepts */
-  concept: 'api/v1/concept/',
+  concept: 'api/v1/concept',
   conceptList: 'api/v1/concept/list',
   conceptIgnite: 'api/v1/concept/ignite',
   conceptQueries: (options?: IConceptQueryOptions) => {
-    if (!options) return 'api/v1/concept/';
+    if (!options) return 'api/v1/concept';
 
     let query = '';
     if (options.page) query += `page=${options.page}&`;
@@ -39,7 +39,7 @@ export const endpoints = {
     if (options.createdBy) query += `created_by=${options.createdBy}&`;
     if (options.isGenerated) query += `is_generated=${options.isGenerated}&`;
 
-    return `api/v1/concept/?${query}`;
+    return `api/v1/concept?${query}`;
   },
-  conceptUuid: (uuid: string) => `api/v1/concept/${uuid}/`,
+  conceptUuid: (uuid: string) => `api/v1/concept/${uuid}`,
 };
