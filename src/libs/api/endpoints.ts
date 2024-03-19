@@ -26,11 +26,11 @@ export const endpoints = {
   account: `/api/v1/account`,
 
   /* Concepts */
-  concept: 'api/v1/concept/',
+  concept: 'api/v1/concept',
   conceptList: 'api/v1/concept/list',
   conceptIgnite: 'api/v1/concept/ignite',
   conceptQueries: (options?: IConceptQueryOptions) => {
-    if (!options) return 'api/v1/concept/';
+    if (!options) return 'api/v1/concept';
 
     let query = '';
     if (options.page) query += `page=${options.page}&`;
@@ -39,7 +39,15 @@ export const endpoints = {
     if (options.createdBy) query += `created_by=${options.createdBy}&`;
     if (options.isGenerated) query += `is_generated=${options.isGenerated}&`;
 
-    return `api/v1/concept/?${query}`;
+    return `api/v1/concept?${query}`;
   },
-  conceptUuid: (uuid: string) => `api/v1/concept/${uuid}/`,
+  conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
+  conceptOverview: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/overview`,
+  conceptCustomerProfile: (conceptUuid: string, profile: string) =>
+    `api/v1/concept/${conceptUuid}/customer-profile/${profile}`,
+  conceptKeyAssumptions: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/key-assumptions`,
+  conceptKeyAssumptionsUuid: (conceptUuid: string, keyAssumptionsUuid: string) =>
+    `api/v1/concept/${conceptUuid}/key-assumptions/${keyAssumptionsUuid}`,
+  conceptFinancialProjection: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/financial-projection`,
+  conceptMarketScan: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/market-scan`,
 };
