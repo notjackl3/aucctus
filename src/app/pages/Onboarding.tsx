@@ -81,6 +81,8 @@ const OnBoarding: FunctionComponent = () => {
               onFocus={() => setDomainInputError(undefined)}
               onBlur={_handleDomainValidation}
             />
+            {/* TODO: Add input field for innovation goal */}
+
             <button
               type="button"
               className="btn btn-primary"

@@ -1,7 +1,18 @@
 import { AtLeast } from '../utils';
 import { ApiService } from './apiService';
 import { IConceptQueryOptions, endpoints } from './endpoints';
-import { ConceptStatus, IConcept, IConceptCreate, IConceptGenerate, IConceptGenerateResponse } from './typings'; // Import the missing type
+import {
+  ConceptStatus,
+  IAssumption,
+  IConcept,
+  IConceptCreate,
+  IConceptGenerate,
+  IConceptGenerateResponse,
+  IConceptOverview,
+  ICustomerProfile,
+  IFinancialProjection,
+  IMarketScan,
+} from './typings'; // Import the missing type
 import { IPageResponse } from './typings/avxisi';
 
 /**
@@ -44,5 +55,29 @@ export class ConceptApi extends ApiService {
 
   deleteConcept(uuid: string) {
     return this.delete<IConcept>(endpoints.conceptUuid(uuid));
+  }
+
+  getConceptOverview(uuid: string) {
+    return this.get<IConceptOverview>(endpoints.conceptOverview(uuid));
+  }
+
+  getConceptCustomerProfile(uuid: string, profile: string) {
+    return this.get<ICustomerProfile>(endpoints.conceptCustomerProfile(uuid, profile));
+  }
+
+  getConceptKeyAssumptions(uuid: string) {
+    return this.get<IAssumption[]>(endpoints.conceptKeyAssumptions(uuid));
+  }
+
+  getConceptKeyAssumptionsUuid(uuid: string, keyAssumptionsUuid: string) {
+    return this.patch<IAssumption, Partial<IAssumption>>(endpoints.conceptKeyAssumptionsUuid(uuid, keyAssumptionsUuid));
+  }
+
+  getConceptFinancialProjection(uuid: string) {
+    return this.get<IFinancialProjection>(endpoints.conceptFinancialProjection(uuid));
+  }
+
+  getConceptMarketScan(uuid: string) {
+    return this.get<IMarketScan>(endpoints.conceptMarketScan(uuid));
   }
 }
