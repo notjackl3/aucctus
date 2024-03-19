@@ -14,15 +14,20 @@ const useConcepts = () => {
   const [excludeIdSet, setExcludeIdSet] = useState(new Set());
   const [isEntireCategorySelected, setIsEntireCategorySelected] = useState(false);
   const [openPopupMenuId, setOpenPopupMenuId] = useState('');
+  const [activePage, setActivePage] = useState(1);
 
   const { category } = useParams<{ category: ConceptCategory }>();
   const allConceptsQuery = useQuery({
     queryKey: ['concepts/active', category],
     retry: 1,
     refetchOnWindowFocus: false,
+    keepPreviousData: true,
     queryFn: async () => {
       activateFilter('');
-      const queryOptionsObj: IConceptQueryOptions = { ...(category && { category }) };
+      const queryOptionsObj: IConceptQueryOptions = {
+        ...(category && { category }),
+        page: 1,
+      };
       return api.concept.getConcepts(queryOptionsObj);
     },
   });
@@ -31,6 +36,7 @@ const useConcepts = () => {
     setRowSelection({});
     setIsEntireCategorySelected(false);
     setExcludeIdSet(new Set());
+    setActivePage(1);
   };
 
   useEffect(() => {
@@ -103,6 +109,7 @@ const useConcepts = () => {
     rowSelection,
     excludeIdSet,
     isEntireCategorySelected,
+    activePage,
     addExcludedId,
     removeExcludedId,
     modifyExclusionSet,
@@ -114,6 +121,7 @@ const useConcepts = () => {
     toggleIsEntireCategorySelectedFlag,
     selectPopupMenuId,
     clearPopupMenuId,
+    setActivePage,
     conceptStatusList,
   };
 };

@@ -63,14 +63,28 @@
     flex-direction: column;
     align-items: flex-start;
 
-    .filters {
-      gap: 1rem;
+    .header {
       display: flex;
-      padding: 1rem;
-      box-sizing: border-box;
+      flex-direction: row;
+      align-items: center;
+      height: 5rem;
       width: 100%;
-      overflow: hidden;
-      border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+      padding: 2rem;
+      box-sizing: border-box;
+      border-radius: 0.75rem 0.75rem 0 0;
+      background: $white;
+      box-shadow: $shadow-100;
+      border-top: 1px solid $grey-300;
+      border-bottom: 1px solid $grey-300;
+
+      .filters {
+        gap: 1rem;
+        display: flex;
+        padding: 1rem;
+        box-sizing: border-box;
+        width: 100%;
+        overflow: hidden;
+      }
     }
 
     table {
@@ -80,14 +94,14 @@
       align-self: stretch;
       table-layout: fixed;
       width: 100%;
-      border-radius: 0.75rem;
-      border: 1px solid var(--gray-300-outline, #e0e5f2);
+      border: 1px $grey-300;
+      border-bottom: none;
       background: $white;
 
       box-shadow: $shadow-100;
 
       th {
-        color: var(--gray-600-text-secondary, #667085);
+        color: $grey-600;
         font-size: 0.875rem;
         font-style: normal;
         font-weight: 400;
@@ -102,10 +116,10 @@
         box-sizing: border-box;
         align-items: center;
         border-radius: 0.75rem 0.75rem 0 0;
-        border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+        border-bottom: 1px solid $grey-300;
         background: var(--gray-50-bg, #fcfcfd);
 
-        color: var(--gray-600-text-secondary, #667085);
+        color: $grey-600;
         font-family: var(--text-sm-regular);
         font-size: 0.75rem;
         font-style: normal;
@@ -127,7 +141,7 @@
           padding: 0.75rem 1.5rem;
           box-sizing: border-box;
           align-items: flex-start;
-          border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+          border-bottom: 1px solid $grey-300;
 
           td {
             display: flex;
@@ -137,7 +151,7 @@
             overflow: hidden;
             padding-right: 2rem;
             box-sizing: border-box;
-            color: var(--gray-600---Text-Secondary, #667085);
+            color: $grey-600;
             text-overflow: ellipsis;
             font-family: $dm-sans;
             font-size: 0.875rem;
@@ -179,6 +193,20 @@
           }
         }
       }
+    }
+    .footer {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      height: 5rem;
+      width: 100%;
+      color: $grey-600;
+      padding: 2rem;
+      box-sizing: border-box;
+      border-radius: 0 0 0.75rem 0.75rem;
+      background: $white;
+      box-shadow: $shadow-100;
+      border-bottom: 1px solid $grey-300;
     }
   }
 }

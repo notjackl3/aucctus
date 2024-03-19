@@ -26,6 +26,7 @@ import Icon from '../../components/Icon';
 import { AppPath } from '../../../routes/routes';
 import { useNavigate, useParams } from 'react-router-dom';
 import ConceptOverview from '../ConceptOverview';
+import TablePagination from '../../components/TablePagination';
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -45,6 +46,7 @@ const Concepts: FunctionComponent = () => {
     conceptStatusList,
     excludeIdSet,
     isEntireCategorySelected,
+    activePage,
     modifyExclusionSet,
     setRowSelection,
     setExcludeIdSet,
@@ -52,16 +54,21 @@ const Concepts: FunctionComponent = () => {
     activateFilter,
     selectPopupMenuId,
     clearPopupMenuId,
+    setActivePage,
   } = useConcepts();
   const navigate = useNavigate();
   const { id } = useParams();
   const [showConceptDetailPage, setShowConceptDetailPage] = useState(false);
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
-    queryKey: ['concepts', activeFilter, category],
+    queryKey: ['concepts', activeFilter, category, activePage],
     refetchOnWindowFocus: false,
     retry: 1,
     queryFn: async () => {
-      const queryOptionsObj: IConceptQueryOptions = { ...(activeFilter && { status: activeFilter }), category };
+      const queryOptionsObj: IConceptQueryOptions = {
+        ...(activeFilter && { status: activeFilter }),
+        category,
+        ...(activePage && { page: activePage }),
+      };
       return api.concept.getConcepts(queryOptionsObj);
     },
   });
@@ -179,7 +186,7 @@ const Concepts: FunctionComponent = () => {
         ),
       }),
     ],
-    [activeFilter, excludeIdSet, isEntireCategorySelected, openPopupMenuId]
+    [activeFilter, activePage, excludeIdSet, isEntireCategorySelected, openPopupMenuId]
   );
 
   const tableData = useMemo(() => data?.results ?? [], [data]);
@@ -237,8 +244,7 @@ const Concepts: FunctionComponent = () => {
           </div>
         </div>
         <div className={styles.content}>
-          <table>
-            {/* TODO move buttons outside <table> */}
+          <div className={styles.header}>
             <div className={styles.filters}>
               <StatusButton
                 statusName={`All ${category}`}
@@ -251,6 +257,8 @@ const Concepts: FunctionComponent = () => {
               />
               {renderStatusButtons(conceptStatusList)}
             </div>
+          </div>
+          <table>
             <thead>
               {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
@@ -286,6 +294,13 @@ const Concepts: FunctionComponent = () => {
               </tbody>
             )}
           </table>
+          <div className={styles.footer}>
+            <TablePagination
+              totalPages={data?.numberOfPages || 1}
+              activePage={activePage}
+              setActivePage={setActivePage}
+            />
+          </div>
         </div>
       </div>
       {showConceptDetailPage && id && <ConceptOverview closePage={closeConceptDetailPage} conceptId={id} />}
