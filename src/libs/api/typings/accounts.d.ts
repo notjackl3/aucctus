@@ -12,7 +12,7 @@ export interface IAccount {
   uuid: string;
   name: string;
   domain: string;
-  innovationGoal: string;
+  goal: string;
   createdAt: string;
 }
 

@@ -41,5 +41,13 @@ export const endpoints = {
 
     return `api/v1/concept?${query}`;
   },
-  conceptUuid: (uuid: string) => `api/v1/concept/${uuid}`,
+  conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
+  conceptOverview: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/overview`,
+  conceptCustomerProfile: (conceptUuid: string, profile: string) =>
+    `api/v1/concept/${conceptUuid}/customer-profile/${profile}`,
+  conceptKeyAssumptions: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/key-assumptions`,
+  conceptKeyAssumptionsUuid: (conceptUuid: string, keyAssumptionsUuid: string) =>
+    `api/v1/concept/${conceptUuid}/key-assumptions/${keyAssumptionsUuid}`,
+  conceptFinancialProjection: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/financial-projection`,
+  conceptMarketScan: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/market-scan`,
 };
