@@ -34,5 +34,6 @@ export interface IPageResponse<T> {
   next: string | null;
   // The previous page URL
   previous: string | null;
+  numberOfPages?: number;
   results: T[];
 }

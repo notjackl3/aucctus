@@ -46,6 +46,9 @@ import CloseX from '../assets/icons/closeX.svg?react';
 import PiggyBank from '../assets/icons/piggy-bank.svg?react';
 import Circle from '../assets/icons/circle.svg?react';
 import LinkExternal from '../assets/icons/link-external.svg?react';
+import Thermometer from '../assets/icons/thermometer.svg?react';
+import Building from '../assets/icons/building.svg?react';
+import FileCode from '../assets/icons/filecode.svg?react';
 
 export enum IconVariant {
   lock,
@@ -94,6 +97,9 @@ export enum IconVariant {
   piggyBank,
   circle,
   linkExternal,
+  thermometer,
+  building,
+  filecode,
 }
 
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
@@ -195,6 +201,12 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <Circle {...props} />;
     case 'linkExternal':
       return <LinkExternal {...props} />;
+    case 'building':
+      return <Building {...props} />;
+    case 'thermometer':
+      return <Thermometer {...props} />;
+    case 'filecode':
+      return <FileCode {...props} />;
   }
 };
 

@@ -123,7 +123,12 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
               </ConceptDetailCard>
             </div>
             <div className={styles.cardRight}>
-              <MarketChart largeValue="2.8M" mediumValue="560K" smallValue="56K" chartClass={styles.marketChart} />
+              <MarketChart
+                largeValue={1400300}
+                mediumValue={1010300}
+                smallValue={600000}
+                chartClass={styles.marketChart}
+              />
               <div className={styles.legend}>
                 <MarketLegend legendText="Total Addressable Market" legendValue="2.8M" bulletColor="purple" />
                 <MarketLegend legendText="Serviceable Addressable Market" legendValue="560K" bulletColor="darkPurple" />

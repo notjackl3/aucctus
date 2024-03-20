@@ -14,7 +14,7 @@ const useIgniteConcept = (originalConcepts = [], originalGoalString = '') => {
 
   const generateConceptMutation = useMutation({
     mutationFn: async (conceptObj: IConceptGenerate) => {
-      return api?.concept?.igniteConcepts(conceptObj);
+      return api?.conceptIgnite?.igniteConcepts(conceptObj);
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['concepts'] });
