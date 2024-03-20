@@ -17,7 +17,7 @@ const MarketChart: FunctionComponent<MarketChartProps> = ({ largeValue, mediumVa
   const mediumRatio = getMediumRatio(mediumValue, largeValue);
   const smallRatio = getSmallRatio(smallValue, largeValue);
 
-  const largeArea = Math.round(Math.PI * 221 * 221);
+  const largeArea = Math.round(Math.PI * LARGE_RADIUS * LARGE_RADIUS);
   const mediumArea = Math.round(largeArea * mediumRatio);
   const smallArea = Math.round(largeArea * smallRatio);
   const mediumRadius = Math.round(Math.sqrt(mediumArea / Math.PI));
