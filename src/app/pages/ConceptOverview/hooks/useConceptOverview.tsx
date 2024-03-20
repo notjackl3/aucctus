@@ -9,10 +9,16 @@ import useConceptMenu from '../../../components/ConceptMenu/hooks/useConceptMenu
 const useConceptOverview = (conceptId: string) => {
   const { updateConceptStatus } = useConceptMenu({ conceptId: conceptId });
 
-  const overviewQuery = useQuery({
+  const conceptGeneralQuery = useQuery({
     queryKey: ['concepts', 'overview'],
     retry: 1,
     queryFn: async () => await api.concept?.getConcept(conceptId || ''),
+  });
+
+  const overviewQuery = useQuery({
+    queryKey: [`concept/overview/${conceptId}`],
+    retry: 1,
+    queryFn: async () => await api.concept?.getConceptOverview(conceptId || ''),
   });
 
   const tabs = [
@@ -66,7 +72,7 @@ const useConceptOverview = (conceptId: string) => {
   };
 
   const getInitialOption = (status: ConceptStatusType | undefined) => {
-    if (conceptId !== overviewQuery?.data?.uuid) {
+    if (conceptId !== conceptGeneralQuery?.data?.uuid) {
       return;
     }
     for (const option of options) {
@@ -76,14 +82,19 @@ const useConceptOverview = (conceptId: string) => {
     }
   };
 
-  const activeStatus = overviewQuery?.data?.status;
+  const activeStatus = conceptGeneralQuery?.data?.status;
   const initialOption = getInitialOption(activeStatus);
-  const conceptData = overviewQuery?.data;
+  const conceptData = conceptGeneralQuery?.data;
+
+  const conceptOverviewData = overviewQuery?.data;
+  const isConceptOverviewLoading = overviewQuery?.isLoading;
 
   return {
     tabs,
     options,
     conceptData,
+    conceptOverviewData,
+    isConceptOverviewLoading,
     changeConceptStatus,
     initialOption,
   };

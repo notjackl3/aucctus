@@ -1,18 +1,34 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/overviewDetails.module.scss';
-import { IConcept } from '../../../../../libs/api/typings';
+import { IConcept, IConceptOverview } from '../../../../../libs/api/typings';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import MarketChart from '../../../../components/MarketChart';
 import MarketLegend from '../../../../components/MarketLegend';
 import Icon from '../../../../components/Icon';
 import NewsArticle from '../../../../components/NewsArticle';
+import Loading from '../../../../components/Loading';
 
 export interface OverviewDetailsProps {
   conceptData?: IConcept;
+  conceptOverviewData?: IConceptOverview;
+  isConceptOverviewLoading?: boolean;
   selectActiveTab: (tabIndex: number) => void;
 }
 
-const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({ conceptData, selectActiveTab }) => {
+const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({
+  conceptData,
+  conceptOverviewData,
+  isConceptOverviewLoading,
+  selectActiveTab,
+}) => {
+  const renderIndustriesList = () => {
+    return conceptOverviewData?.industries?.map((industry, i) => <p key={`industry-${i}`}>{industry}</p>);
+  };
+
+  const renderTrendAndDriversList = () => {
+    return conceptOverviewData?.trendsAndDrivers?.map((trend, i) => <p key={`trend-${i}`}>{trend}</p>);
+  };
+
   return (
     <div className={styles.overviewDetails}>
       <div className={styles.summary}>
@@ -20,10 +36,7 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({ conceptData,
           <div className={styles.summaryBlock}>
             <h3>Value Proposition</h3>
             <div className={styles.textBlock}>
-              <p>
-                Serve the needs of the growing number of digital nomads, travellers, and expatriates who want to shop
-                from Canadian businesses.
-              </p>
+              <p>{conceptOverviewData?.valueProposition}</p>
             </div>
           </div>
         </div>
@@ -35,21 +48,13 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({ conceptData,
           </div>
           <div className={styles.listSection}>
             <div className={styles.detailBlock}>
-              <h3>Signals</h3>
-              <div className={styles.list}>
-                <p>Remote Work</p>
-                <p>Digital Nomads</p>
-                <p>Snow Birds</p>
-                <p>Snow Birds</p>
-              </div>
+              <h3>Trends & Drivers</h3>
+              {isConceptOverviewLoading && <Loading />}
+              <div className={styles.list}>{renderTrendAndDriversList()}</div>
             </div>
             <div className={styles.detailBlock}>
               <h3>Industries</h3>
-              <div className={styles.list}>
-                <p>Remote Work</p>
-                <p>Digital Nomads</p>
-                <p>Snow Birds</p>
-              </div>
+              <div className={styles.list}>{renderIndustriesList()}</div>
             </div>
           </div>
         </div>
@@ -74,7 +79,12 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({ conceptData,
           }
         >
           <div className={styles.cardContent}>
-            <MarketChart largeValue="2.8M" mediumValue="560K" smallValue="56K" chartClass={styles.marketChart} />
+            <MarketChart
+              largeValue={1400300}
+              mediumValue={1010300}
+              smallValue={30300}
+              chartClass={styles.marketChart}
+            />
             <div className={styles.legendGroup}>
               <MarketLegend
                 legendClassName={styles.financeLegend}
