@@ -17,6 +17,7 @@ const OnBoarding: FunctionComponent = () => {
   const dispatch = useAppDispatch();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');
+  const [innovationGoal, setGoal] = useState<string>('');
   const status = useSelector(selectAuthStatus);
 
   const [domainInputError, setDomainInputError] = useState<string | undefined>();
@@ -46,7 +47,7 @@ const OnBoarding: FunctionComponent = () => {
   );
 
   const _handleRegistration = () => {
-    dispatch(registerAccount({ name, domain }));
+    dispatch(registerAccount({ name, domain, innovationGoal }));
   };
 
   if (user.account) {
@@ -68,26 +69,42 @@ const OnBoarding: FunctionComponent = () => {
               label={'Company Name'}
               value={name}
               placeholder="Acme Widgets Corp."
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setName(e.target.value);
+                e.preventDefault();
+              }}
             />
             <InputField
               name={'companyUrl'}
-              label={'Company Url'}
+              label={'Company URL'}
               error={!!domainInputError}
               errorMessage={domainInputError}
               value={domain}
               placeholder="www.acmewidgetscorp.com"
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDomain(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setDomain(e.target.value);
+                e.preventDefault();
+              }}
               onFocus={() => setDomainInputError(undefined)}
               onBlur={_handleDomainValidation}
             />
-            {/* TODO: Add input field for innovation goal */}
+
+            <InputField
+              name={'innovationGoal'}
+              label={'What is your organization looking to achieve through innovation?'}
+              value={innovationGoal}
+              placeholder="Expand into new industries."
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                setGoal(e.target.value);
+                e.preventDefault();
+              }}
+            />
 
             <button
               type="button"
               className="btn btn-primary"
               onClick={_handleRegistration}
-              disabled={!name || !domain || !!domainInputError || status === 'loading'}
+              disabled={!name || !domain || !innovationGoal || !!domainInputError || status === 'loading'}
             >
               Complete
             </button>

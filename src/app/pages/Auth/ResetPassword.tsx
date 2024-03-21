@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
 import FeatureIcon from '../../components/FeatureIcon';
@@ -25,7 +25,7 @@ const ResetPassword: FunctionComponent = () => {
   const [confirmPassInputError, setConfirmPassInputError] = useState<string | undefined>();
   const queryParams = useQueryParams();
 
-  const token = useMemo(() => queryParams.get('token'), [queryParams]);
+  const token = queryParams.get('token');
 
   const query = useQuery({
     queryKey: 'forgot-password',

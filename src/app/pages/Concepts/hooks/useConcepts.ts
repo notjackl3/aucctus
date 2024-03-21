@@ -8,16 +8,18 @@ import { RowSelectionState } from '@tanstack/react-table';
 
 type ConceptStatusFilter = ConceptStatus | '';
 
+const FIRST_PAGE = 1;
+
 const useConcepts = () => {
   const [activeFilter, setActiveFilter] = useState<ConceptStatusFilter>('');
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [excludeIdSet, setExcludeIdSet] = useState(new Set());
   const [isEntireCategorySelected, setIsEntireCategorySelected] = useState(false);
   const [openPopupMenuId, setOpenPopupMenuId] = useState('');
-  const [activePage, setActivePage] = useState(1);
+  const [activePage, setActivePage] = useState(FIRST_PAGE);
 
   const { category } = useParams<{ category: ConceptCategory }>();
-  const allConceptsQuery = useQuery({
+  const { data } = useQuery({
     queryKey: ['concepts/active', category],
     retry: 1,
     refetchOnWindowFocus: false,
@@ -26,7 +28,7 @@ const useConcepts = () => {
       activateFilter('');
       const queryOptionsObj: IConceptQueryOptions = {
         ...(category && { category }),
-        page: 1,
+        page: FIRST_PAGE,
       };
       return api.concept.getConcepts(queryOptionsObj);
     },
@@ -36,7 +38,7 @@ const useConcepts = () => {
     setRowSelection({});
     setIsEntireCategorySelected(false);
     setExcludeIdSet(new Set());
-    setActivePage(1);
+    setActivePage(FIRST_PAGE);
   };
 
   useEffect(() => {
@@ -69,11 +71,7 @@ const useConcepts = () => {
   };
 
   const toggleIsEntireCategorySelectedFlag = (isAllRowsSelected: boolean) => {
-    if (isAllRowsSelected) {
-      setIsEntireCategorySelected(false);
-    } else {
-      setIsEntireCategorySelected(true);
-    }
+    setIsEntireCategorySelected(!isAllRowsSelected);
   };
 
   const clearPopupMenuId = () => {
@@ -99,8 +97,8 @@ const useConcepts = () => {
     return Array.from(statusSet);
   };
 
-  const conceptStatusList = getStatusList(allConceptsQuery?.data?.results || []);
-  const categoryCount = allConceptsQuery?.data?.count || 0;
+  const conceptStatusList = getStatusList(data ? data.results : []);
+  const categoryCount = data ? data.count : 0;
 
   return {
     activeFilter,

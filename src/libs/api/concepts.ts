@@ -6,8 +6,6 @@ import {
   IAssumption,
   IConcept,
   IConceptCreate,
-  IConceptGenerate,
-  IConceptGenerateResponse,
   IConceptOverview,
   ICustomerProfile,
   IFinancialProjection,
@@ -16,9 +14,9 @@ import {
 import { IPageResponse } from './typings/avxisi';
 
 /**
- * Account API
+ * Concept API
  *
- * Handles all the requests for the accounts and users that require authentication.
+ * Handles all the requests for the Concept.
  */
 export class ConceptApi extends ApiService {
   getConcept(uuid: string) {
@@ -47,10 +45,6 @@ export class ConceptApi extends ApiService {
 
   getConcepts(options?: IConceptQueryOptions) {
     return this.get<IPageResponse<IConcept>>(endpoints.conceptQueries(options));
-  }
-
-  igniteConcepts(concept: IConceptGenerate) {
-    return this.post<IConceptGenerateResponse>(endpoints.conceptIgnite, concept);
   }
 
   deleteConcept(uuid: string) {
