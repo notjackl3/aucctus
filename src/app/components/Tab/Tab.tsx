@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, ReactNode } from 'react';
 import styles from './styles/tab.module.scss';
 
 export interface TabProps {
   selectTab: () => void;
-  label: string;
+  label: string | ReactNode;
   tabIndex: number;
   activeTab: number;
   className?: string;
