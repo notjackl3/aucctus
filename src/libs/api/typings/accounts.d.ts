@@ -19,6 +19,7 @@ export interface IAccount {
 export interface IRegisterAccount {
   name: string;
   domain: string;
+  innovationGoal: string;
 }
 
 export interface IUser {
@@ -53,6 +54,7 @@ export interface ISignUpRequest {
 export interface IAuthSuccessResponse {
   user: IUser;
   token: string;
+  refresh: string;
 }
 
 export interface IPasswordResetForm {

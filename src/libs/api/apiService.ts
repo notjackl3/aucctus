@@ -15,12 +15,20 @@ export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResp
   return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).token;
 };
 
+const LOGOUT_STATUSES = [401, 403, 419];
 export interface IApiServiceConfig {
   baseURL: string;
   apiVersion?: string;
   debug?: boolean;
   headers?: AxiosRequestHeaders;
   timeoutSeconds?: number;
+
+  refreshToken?: () => Promise<string>;
+  logout?: () => void | Promise<void>;
+}
+
+export interface ApiServiceRequestConfig<D = any> extends AxiosRequestConfig<D> {
+  skipAuthRefresh?: boolean;
 }
 
 export class ApiService {
@@ -48,7 +56,6 @@ export class ApiService {
 
   private _requestMiddleware(config: InternalAxiosRequestConfig) {
     Object.assign(config.headers || {}, this.config.headers);
-    console.log(config, 'config');
     return config;
   }
 
@@ -60,7 +67,7 @@ export class ApiService {
     return response;
   }
 
-  private _responseErrorMiddleware(error: AxiosError) {
+  private async _responseErrorMiddleware(error: AxiosError) {
     if (this.config.debug) {
       if (axios.isCancel(error)) {
         console.log('Request Aborted: ', error);
@@ -69,12 +76,44 @@ export class ApiService {
       if (axios.isAxiosError(error)) {
         const method = error.config && error.config.method ? `[${error.config.method.toUpperCase()}]` : '';
         analytics.error(`Api Error: ${method} ${error.name}`, error);
+
+        // Skip the refresh logic if the flag is set
+        if (error.config && (error.config as ApiServiceRequestConfig).skipAuthRefresh) {
+          return Promise.reject(error);
+        }
+
+        // If the error is due to being unauthenticated
+        if (error.response && error.response.status === 401 && this.apiInstance.authRetryCount < 1) {
+          try {
+            if (error.config) {
+              // Attempt to refresh the token
+              await this.apiInstance.refreshToken();
+
+              this.apiInstance.authRetryCount++;
+
+              // Retry the original request
+              return this.api.request(error.config).then(() => {
+                this.apiInstance.authRetryCount = 0;
+              });
+            }
+          } catch (err) {
+            this.apiInstance.authRetryCount = 0;
+          }
+        }
       }
     }
+
+    // If the error is due to being unauthenticated then logout
+    const status = (error.response && error.response.status) || 0;
+    if (LOGOUT_STATUSES.includes(status)) {
+      // TODO: Add message for the user to tell them why they are being logged out
+      this.apiInstance.logout();
+    }
+
     return Promise.reject(error);
   }
 
-  protected _handleAccessToken(): AxiosRequestConfig {
+  protected _handleAccessToken(): ApiServiceRequestConfig {
     const accessToken = this.apiInstance.accessToken;
     const config = Object.assign({ headers: {} }, this.config);
     config.headers.Authorization = `Bearer ${accessToken}`;
@@ -91,7 +130,7 @@ export class ApiService {
    * @param config
    * @returns
    */
-  async get<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async get<T = unknown>(url: string, config?: ApiServiceRequestConfig): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.get(url, config);
       return response.data;
@@ -106,7 +145,7 @@ export class ApiService {
    * @param config
    * @returns
    */
-  abortableGet<T = unknown>(url: string, config?: AxiosRequestConfig) {
+  abortableGet<T = unknown>(url: string, config?: ApiServiceRequestConfig) {
     const abortController = new AbortController();
     const signal = abortController.signal;
     const axiosConfig = config || {};
@@ -121,8 +160,8 @@ export class ApiService {
     };
   }
 
-  post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<T>;
-  async post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+  post<T = unknown, D = any>(url: string, data?: D, config?: ApiServiceRequestConfig<D>): Promise<T>;
+  async post<T = unknown, D = any>(url: string, data?: D, config?: ApiServiceRequestConfig): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.post(url, data, config);
       return response.data;
@@ -131,7 +170,7 @@ export class ApiService {
     }
   }
 
-  async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async delete<T = unknown>(url: string, config?: ApiServiceRequestConfig): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.delete(url, config);
       return response.data;
@@ -140,7 +179,7 @@ export class ApiService {
     }
   }
 
-  async put<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+  async put<T = unknown, D = any>(url: string, data?: D, config?: ApiServiceRequestConfig): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.put(url, data, config);
       return response.data;
@@ -149,7 +188,7 @@ export class ApiService {
     }
   }
 
-  async patch<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+  async patch<T = unknown, D = any>(url: string, data?: D, config?: ApiServiceRequestConfig): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.patch(url, data, config);
       return response.data;

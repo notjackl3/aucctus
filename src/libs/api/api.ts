@@ -4,6 +4,7 @@ import { AuthApi } from './auth';
 import { AccountApi } from './account';
 import analytics from '../analytics';
 import { ConceptApi } from './concepts';
+import { IgniteConceptApi } from './igniteConcepts';
 
 export interface IApiConfig {
   /* End Points */
@@ -20,11 +21,15 @@ export class Api {
   private _config: IApiConfig;
 
   _accessToken?: string;
+  private _refreshTokenAction?: () => void;
+  private _logoutAction?: () => void;
+
+  authRetryCount = 0;
 
   auth: AuthApi;
   account: AccountApi;
   concept: ConceptApi;
-  conceptIgnite: ConceptApi;
+  conceptIgnite: IgniteConceptApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -44,7 +49,7 @@ export class Api {
     );
 
     this.concept = new ConceptApi(this, this.buildConfig({ baseURL: this._config.baseUrl }));
-    this.conceptIgnite = new ConceptApi(this, this.buildConfig({ baseURL: this._config.baseFastUrl }));
+    this.conceptIgnite = new IgniteConceptApi(this, this.buildConfig({ baseURL: this._config.baseFastUrl }));
   }
 
   get accessToken() {
@@ -58,7 +63,6 @@ export class Api {
     [this.account, this.concept, this.conceptIgnite].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
       api.config.headers = Object.assign({}, api.config.headers, { Authorization: `Bearer ${token}` });
-      console.log(api.config.headers, 'api.config.headers');
     });
     analytics.debug('Setting Access Token');
     this._accessToken = token;
@@ -72,6 +76,33 @@ export class Api {
       timeoutSeconds: this._config.timeoutSeconds,
       debug: this._config.debug,
     });
+  }
+
+  // Method to update the refresh token action dynamically
+  setRefreshTokenAction(action: () => void) {
+    this._refreshTokenAction = action;
+  }
+
+  // Method to update the logout action dynamically
+  setLogoutAction(action: () => void) {
+    this._logoutAction = action;
+  }
+
+  // Expose these actions through methods to be used in ApiService
+  refreshToken() {
+    if (this._refreshTokenAction) {
+      this._refreshTokenAction();
+    } else {
+      throw new Error('Refresh token action has not been set.');
+    }
+  }
+
+  logout() {
+    if (this._logoutAction) {
+      this._logoutAction();
+    } else {
+      console.warn('Logout action has not been set.');
+    }
   }
 }
 

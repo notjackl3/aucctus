@@ -1,6 +1,6 @@
 import { FunctionComponent, useEffect } from 'react';
-import { useAppDispatch } from '../../hooks';
-import { Link, useParams } from 'react-router-dom';
+import { useAppDispatch, useQueryParams } from '../../hooks';
+import { Link } from 'react-router-dom';
 import { confirmEmail } from '../../../features/auth/auth.slice';
 
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
@@ -10,7 +10,9 @@ import Icon from '../../components/Icon';
 
 const ConfirmEmail: FunctionComponent = () => {
   const dispatch = useAppDispatch();
-  const { token } = useParams();
+  const queryParams = useQueryParams();
+
+  const token = queryParams.get('token');
 
   useEffect(() => {
     if (token) {

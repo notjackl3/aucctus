@@ -8,10 +8,20 @@ import { QueryClient, QueryClientProvider } from 'react-query';
 import { Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useEffect } from 'react';
+import { store } from './app/store';
+import { logout, refreshAuth } from './features/auth/auth.slice';
+import api from './libs/api';
 
 const queryClient = new QueryClient();
 
 function App() {
+  useEffect(() => {
+    // Set refresh token and logout actions
+    api.setRefreshTokenAction(() => store.dispatch(refreshAuth(true)));
+    api.setLogoutAction(() => store.dispatch(logout()));
+  }, []);
+
   return (
     <div role="main" className="App">
       <QueryClientProvider client={queryClient}>
