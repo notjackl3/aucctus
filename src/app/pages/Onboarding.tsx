@@ -47,7 +47,7 @@ const OnBoarding: FunctionComponent = () => {
   );
 
   const _handleRegistration = () => {
-    dispatch(registerAccount({ name, domain }));
+    dispatch(registerAccount({ name, domain, innovationGoal }));
   };
 
   if (user.account) {
