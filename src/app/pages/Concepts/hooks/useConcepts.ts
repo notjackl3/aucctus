@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
-import { IConcept, ConceptStatus, ConceptCategory } from '../../../../libs/api/typings';
+import { IConcept, ConceptCategory } from '../../../../libs/api/typings';
 import { useQuery } from 'react-query';
 import api from '../../../../libs/api';
 import { useParams } from 'react-router-dom';
 import { IConceptQueryOptions } from '../../../../libs/api/endpoints';
 import { RowSelectionState } from '@tanstack/react-table';
+import { ConceptStatus } from '../../../components/ConceptMenu/ConceptMenu';
+import { ConceptColumns } from '../../../components/Kanban/Kanban';
 
 type ConceptStatusFilter = ConceptStatus | '';
 
@@ -17,6 +19,7 @@ const useConcepts = () => {
   const [isEntireCategorySelected, setIsEntireCategorySelected] = useState(false);
   const [openPopupMenuId, setOpenPopupMenuId] = useState('');
   const [activePage, setActivePage] = useState(FIRST_PAGE);
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const { category } = useParams<{ category: ConceptCategory }>();
   const { data } = useQuery({
@@ -34,6 +37,8 @@ const useConcepts = () => {
     },
   });
 
+  const isActiveView = category === 'active';
+
   const resetSelections = () => {
     setRowSelection({});
     setIsEntireCategorySelected(false);
@@ -43,6 +48,7 @@ const useConcepts = () => {
 
   useEffect(() => {
     resetSelections();
+    setActiveTabIndex(isActiveView ? 1 : 0);
   }, [category]);
 
   const activateFilter = (filter: ConceptStatusFilter) => {
@@ -100,6 +106,24 @@ const useConcepts = () => {
   const conceptStatusList = getStatusList(data ? data.results : []);
   const categoryCount = data ? data.count : 0;
 
+  const generateKanbanColumns = () => {
+    const kanbanColumns = conceptStatusList.reduce<ConceptColumns>((acc: ConceptColumns, item: ConceptStatus) => {
+      acc[item] = {
+        title: item,
+        items: [],
+      };
+      return acc;
+    }, {} as ConceptColumns);
+    data?.results?.forEach((item) => {
+      if (kanbanColumns[item.status]) {
+        kanbanColumns[item.status].items.push(item);
+      }
+    });
+    return kanbanColumns;
+  };
+
+  const kanbanColumns = generateKanbanColumns();
+
   return {
     activeFilter,
     category,
@@ -108,6 +132,7 @@ const useConcepts = () => {
     excludeIdSet,
     isEntireCategorySelected,
     activePage,
+    activeTabIndex,
     addExcludedId,
     removeExcludedId,
     modifyExclusionSet,
@@ -120,7 +145,10 @@ const useConcepts = () => {
     selectPopupMenuId,
     clearPopupMenuId,
     setActivePage,
+    setActiveTabIndex,
     conceptStatusList,
+    kanbanColumns,
+    isActiveView,
   };
 };
 

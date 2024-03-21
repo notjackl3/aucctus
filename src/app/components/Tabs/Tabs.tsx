@@ -1,10 +1,10 @@
-import { FunctionComponent, ReactElement } from 'react';
+import { FunctionComponent, ReactElement, ReactNode } from 'react';
 import styles from './styles/tabs.module.scss';
 import Tab from '../Tab/Tab';
 import TabButton from '../TabButton/TabButton';
 
 export interface TabElement {
-  label: string;
+  label: string | ReactNode;
 }
 
 export interface TabsProps {
@@ -39,16 +39,16 @@ const Tabs: FunctionComponent<TabsProps> = ({
               selectTab={() => selectActiveTab(index)}
               activeTab={activeTabIndex}
               tabIndex={index}
-              key={tab.label}
+              key={`tab-label-${index}`}
               className={tabClassName}
               label={tab.label}
             />
           ) : (
             <TabButton
+              key={`tab-label-${index}`}
               selectTab={() => selectActiveTab(index)}
               activeTab={activeTabIndex}
               tabIndex={index}
-              key={tab.label}
               label={tab.label}
             />
           )
