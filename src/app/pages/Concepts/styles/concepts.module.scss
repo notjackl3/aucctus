@@ -7,7 +7,7 @@
   padding: 2rem 2rem 3rem 2rem;
   box-sizing: border-box;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   position: absolute;
   left: var(--nav-drawer-width);
   min-width: 50rem;
@@ -57,6 +57,19 @@
     }
   }
 
+  .tabs {
+    display: flex;
+    margin-bottom: 0.5rem;
+    max-width: 100rem;
+    width: 100%;
+
+    .tabLabel {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+  }
+
   .content {
     display: flex;
     width: 100%;
@@ -69,13 +82,12 @@
       align-items: center;
       height: 5rem;
       width: 100%;
-      padding: 2rem;
+      padding: 1rem;
       box-sizing: border-box;
       border-radius: 0.75rem 0.75rem 0 0;
       background: $white;
       box-shadow: $shadow-100;
-      border-top: 1px solid $grey-300;
-      border-bottom: 1px solid $grey-300;
+      border: 1px solid $grey-300;
 
       .filters {
         gap: 1rem;
@@ -87,6 +99,13 @@
       }
     }
 
+    .kanbanLoading {
+      display: flex;
+      justify-content: center;
+      background: $white;
+      width: 100%;
+    }
+
     table {
       display: flex;
       flex-direction: column;
@@ -94,7 +113,7 @@
       align-self: stretch;
       table-layout: fixed;
       width: 100%;
-      border: 1px $grey-300;
+      border: 1px solid $grey-300;
       border-bottom: none;
       background: $white;
 

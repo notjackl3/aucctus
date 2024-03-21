@@ -27,6 +27,8 @@ import { AppPath } from '../../../routes/routes';
 import { useNavigate, useParams } from 'react-router-dom';
 import ConceptOverview from '../ConceptOverview';
 import TablePagination from '../../components/TablePagination';
+import Tabs from '../../components/Tabs';
+import Kanban from '../../components/Kanban';
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -47,6 +49,7 @@ const Concepts: FunctionComponent = () => {
     excludeIdSet,
     isEntireCategorySelected,
     activePage,
+    activeTabIndex,
     modifyExclusionSet,
     setRowSelection,
     setExcludeIdSet,
@@ -55,6 +58,9 @@ const Concepts: FunctionComponent = () => {
     selectPopupMenuId,
     clearPopupMenuId,
     setActivePage,
+    setActiveTabIndex,
+    kanbanColumns,
+    isActiveView,
   } = useConcepts();
   const navigate = useNavigate();
   const { id } = useParams();
@@ -96,6 +102,27 @@ const Concepts: FunctionComponent = () => {
   const closeConceptDetailPage = () => {
     setShowConceptDetailPage(false);
   };
+
+  const tabs = isActiveView
+    ? [
+        {
+          label: (
+            <div className={styles.tabLabel}>
+              <Icon variant="list" height={20} width={20} />
+              List
+            </div>
+          ),
+        },
+        {
+          label: (
+            <div className={styles.tabLabel}>
+              <Icon variant="board" height={20} width={20} />
+              Board
+            </div>
+          ),
+        },
+      ]
+    : [];
 
   const columns = useMemo(
     () => [
@@ -243,66 +270,108 @@ const Concepts: FunctionComponent = () => {
             </button>
           </div>
         </div>
-        <div className={styles.content}>
-          <div className={styles.header}>
-            <div className={styles.filters}>
-              <StatusButton
-                statusName={`All ${category}`}
-                quantity={categoryCount}
-                isActive={!activeFilter}
-                activateFilter={() => {
-                  setColumnFilters([{ id: 'status', value: '' }]);
-                  activateFilter('');
-                }}
-              />
-              {renderStatusButtons(conceptStatusList)}
-            </div>
-          </div>
-          <table>
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
-                    <th key={header.id} style={{ width: header.getSize() }}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                    </th>
-                  ))}
-                </tr>
-              ))}
-            </thead>
-            {isFilteredConceptLoading ? (
-              <div className={styles.tableMessageContainer}>
-                <Loading />
+        <Tabs
+          tabs={tabs}
+          className={styles.tabs}
+          activeTabIndex={activeTabIndex}
+          selectActiveTab={setActiveTabIndex}
+          isButtonStyle
+        >
+          <div className={styles.content}>
+            <div className={styles.header}>
+              <div className={styles.filters}>
+                <StatusButton
+                  statusName={`All ${category}`}
+                  quantity={categoryCount}
+                  isActive={!activeFilter}
+                  activateFilter={() => {
+                    setColumnFilters([{ id: 'status', value: '' }]);
+                    activateFilter('');
+                  }}
+                />
+                {renderStatusButtons(conceptStatusList)}
               </div>
-            ) : (
-              <tbody>
-                {table.getRowModel().rows.map((row) => (
-                  <tr
-                    key={row.id}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      navigateToConcept(row.id);
-                    }}
-                  >
-                    {row.getVisibleCells().map((cell) => (
-                      <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                      </td>
+            </div>
+            <table>
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} style={{ width: header.getSize() }}>
+                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
                     ))}
                   </tr>
                 ))}
-              </tbody>
-            )}
-          </table>
-          <div className={styles.footer}>
-            <TablePagination
-              totalPages={data?.numberOfPages || 1}
-              activePage={activePage}
-              setActivePage={setActivePage}
-            />
+              </thead>
+              {isFilteredConceptLoading ? (
+                <div className={styles.tableMessageContainer}>
+                  <Loading />
+                </div>
+              ) : (
+                <tbody>
+                  {table.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        navigateToConcept(row.id);
+                      }}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td style={{ width: cell.column.getSize() }} key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+            <div className={styles.footer}>
+              <TablePagination
+                totalPages={data?.numberOfPages || 1}
+                activePage={activePage}
+                setActivePage={setActivePage}
+              />
+            </div>
           </div>
-        </div>
+          {category === 'active' ? (
+            <div className={styles.content}>
+              <div className={styles.header}>
+                <div className={styles.filters}>
+                  <StatusButton
+                    statusName={`All ${category}`}
+                    quantity={categoryCount}
+                    isActive={!activeFilter}
+                    activateFilter={() => {
+                      setColumnFilters([{ id: 'status', value: '' }]);
+                      activateFilter('');
+                    }}
+                  />
+                </div>
+              </div>
+              {isFilteredConceptLoading ? (
+                <div className={styles.kanbanLoading}>
+                  <Loading />
+                </div>
+              ) : (
+                <Kanban kanbanColumns={kanbanColumns} selectCard={navigateToConcept} />
+              )}
+              <div className={styles.footer}>
+                <TablePagination
+                  totalPages={data?.numberOfPages || 1}
+                  activePage={activePage}
+                  setActivePage={setActivePage}
+                />
+              </div>
+            </div>
+          ) : (
+            <></>
+          )}
+        </Tabs>
       </div>
+
       {showConceptDetailPage && id && <ConceptOverview closePage={closeConceptDetailPage} conceptId={id} />}
     </>
   );
