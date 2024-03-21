@@ -20,6 +20,7 @@ export interface AuthState {
   user?: IUser;
   account?: IAccount;
   accessToken?: string;
+  refreshToken?: string;
   error?: string;
 }
 
@@ -66,13 +67,17 @@ export const signUp = createAsyncThunk('auth/signUp', async (details: SignupDeta
   }
 });
 
-export const refreshAuth = createAsyncThunk('auth/refresh', async (_, thunkApi) => {
+export const refreshAuth = createAsyncThunk('auth/refresh', async (shouldThrowError: boolean = false, thunkApi) => {
   analytics.debug('Refreshing Token');
   try {
-    return await api.auth.refreshToken();
+    const { auth } = thunkApi.getState() as RootState;
+    return await api.auth.refreshToken(auth.refreshToken);
   } catch (e) {
     analytics.debug(e);
     thunkApi.rejectWithValue(e);
+    if (shouldThrowError) {
+      throw e;
+    }
   }
 });
 
@@ -149,11 +154,14 @@ export const authSlice = createSlice({
         state.status = 'failed';
       })
       .addMatcher(isAnyOf(isAPIAuthSuccessResponse), (state, action) => {
-        const { user, token } = action.payload;
+        const { user, token, refresh } = action.payload;
         analytics.debug(action.type);
         state.user = user;
         state.accessToken = token;
+        state.refreshToken = refresh;
         api.accessToken = token;
+
+        console.log('state', refresh);
       })
       .addMatcher(isAnyOf(isApiErrorResult), (state, action) => {
         const error = action.payload;
@@ -161,6 +169,7 @@ export const authSlice = createSlice({
           state.user = undefined;
           state.account = undefined;
           state.accessToken = undefined;
+          state.refreshToken = undefined;
           api.accessToken = undefined;
         }
 

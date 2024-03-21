@@ -19,13 +19,17 @@ export class AuthApi extends ApiService {
    * @returns
    */
   signup(firstName: string, lastName: string, email: string, password: string, confirmPassword: string) {
-    return this.post<IMessageResponse, ISignUpRequest>(endpoints.signup, {
-      firstName,
-      lastName,
-      email,
-      password,
-      confirmPassword,
-    });
+    return this.post<IMessageResponse, ISignUpRequest>(
+      endpoints.signup,
+      {
+        firstName,
+        lastName,
+        email,
+        password,
+        confirmPassword,
+      },
+      { skipAuthRefresh: true }
+    );
   }
 
   /** Sign In
@@ -35,11 +39,15 @@ export class AuthApi extends ApiService {
    * @returns
    */
   login(email: string, password: string) {
-    return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.login, { email, password });
+    return this.post<IAuthSuccessResponse, ISignInRequest>(
+      endpoints.login,
+      { email, password },
+      { skipAuthRefresh: true }
+    );
   }
 
   logout() {
-    return this.post<IMessageResponse>(endpoints.logout, null, this._handleAccessToken());
+    return this.post<IMessageResponse>(endpoints.logout, null, { ...this._handleAccessToken(), skipAuthRefresh: true });
   }
 
   /**
@@ -52,15 +60,20 @@ export class AuthApi extends ApiService {
       params: {
         email,
       },
+      skipAuthRefresh: true,
     });
   }
 
   resetPassword(password: string, confirmPassword: string, token: string) {
-    return this.post<IMessageResponse, IUpdateForgottenPasswordRequest>(endpoints.forgotPassword, {
-      password,
-      confirmPassword,
-      token,
-    });
+    return this.post<IMessageResponse, IUpdateForgottenPasswordRequest>(
+      endpoints.forgotPassword,
+      {
+        password,
+        confirmPassword,
+        token,
+      },
+      { skipAuthRefresh: true }
+    );
   }
 
   /** RefreshToken
@@ -68,8 +81,12 @@ export class AuthApi extends ApiService {
    * It will stay like that for the forseeable future.
    * @returns
    */
-  refreshToken(token?: string) {
-    return this.post<IAuthSuccessResponse>(endpoints.refresh, token ? { token } : undefined);
+  refreshToken(refresh?: string) {
+    console.log('refresh', refresh);
+    return this.post<IAuthSuccessResponse>(endpoints.refresh, refresh ? { refresh } : undefined, {
+      skipAuthRefresh: true,
+      withCredentials: true,
+    });
   }
 
   /** Confirm Email
@@ -78,6 +95,6 @@ export class AuthApi extends ApiService {
    * @returns
    */
   confirmEmail(token: string) {
-    return this.post<IAuthSuccessResponse, IToken>(endpoints.confirmEmail, { token });
+    return this.post<IAuthSuccessResponse, IToken>(endpoints.confirmEmail, { token }, { skipAuthRefresh: true });
   }
 }
