@@ -1,12 +1,12 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/customerDetails.module.scss';
 import defaultAvatar from '../../../../assets/icons/avatar.svg';
-import { IConcept } from '../../../../../libs/api/typings';
+import { ICustomerProfile } from '../../../../../libs/api/typings';
 import Icon from '../../../../components/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 
 export interface CustomerDetailsProps {
-  conceptData?: IConcept;
+  customerData: ICustomerProfile;
 }
 
 const iconDefaultProps = {
@@ -15,15 +15,36 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ conceptData }) => {
-  //TODO remove placeholder data with persona response
+const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ customerData }) => {
+  const renderJobs = (jobList: string[] = []) => {
+    return jobList.map((job, index) => (
+      <p key={`jobs-${index}`} className={styles.text}>
+        {job}
+      </p>
+    ));
+  };
+  const renderPains = (painsList: string[] = []) => {
+    return painsList.map((pain, index) => (
+      <p key={`pains-${index}`} className={styles.text}>
+        {pain}
+      </p>
+    ));
+  };
+  const renderQuotes = (quotesList: string[] = []) => {
+    return quotesList.map((quote, index) => (
+      <p key={`pains-${index}`} className={styles.text}>
+        {quote}
+      </p>
+    ));
+  };
+
   return (
     <div className={styles.customerDetails}>
       <div className={styles.avatarSection}>
         <img className={styles.avatar} alt="avatar" src={defaultAvatar} />
         <div className={styles.avatarDetails} onClick={() => {}}>
-          <span className={styles.description}>{'Global Students'}</span>
-          <span className={styles.name}>{'Sarah Lim'}</span>
+          <span className={styles.description}>{customerData?.nickname}</span>
+          <span className={styles.name}>{customerData?.name}</span>
         </div>
       </div>
       <div className={styles.summary}>
@@ -31,7 +52,7 @@ const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ conceptData 
           <div className={styles.detailBlock}>
             <h2>Overview</h2>
             <div className={styles.textBlock}>
-              <p>{conceptData?.description}</p>
+              <p>{customerData?.description}</p>
             </div>
           </div>
         </div>
@@ -42,19 +63,19 @@ const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ conceptData 
               <div className={styles.list}>
                 <p>
                   <Icon variant="globe" {...iconDefaultProps} />
-                  {`Geographic Location: ${'Ontario'}`}
+                  {`Geographic Location: ${customerData?.geoLocation}`}
                 </p>
                 <p>
                   <Icon variant="umbrella" {...iconDefaultProps} />
-                  {`Age Range: ${'24 - 35'}`}
+                  {`Age Range: ${customerData?.ageRange}`}
                 </p>
                 <p>
                   <Icon variant="userGroup" {...iconDefaultProps} />
-                  {`Family Size(Lives with): ${'2'}`}
+                  {`Family Size(Lives with): ${customerData?.familySize}`}
                 </p>
                 <p>
                   <Icon variant="piggyBank" {...iconDefaultProps} />
-                  {`Average Income: ${'$40K - $75K'}`}
+                  {`Average Income: ${customerData?.incomeRange}`}
                 </p>
               </div>
             </div>
@@ -64,30 +85,13 @@ const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ conceptData 
 
       <div className={styles.cardContainer}>
         <ConceptDetailCard title="Jobs to be Dones" icon="clipboard" isHideFooter>
-          <div className={styles.cardContent}>
-            <p className={styles.text}>Looking for sustainable products </p>
-            <p className={styles.text}>Finding inspiration through browsing</p>
-            <p className={styles.text}>Personalization</p>
-            <p className={styles.text}>Purchase higher quality items</p>
-          </div>
+          <div className={styles.cardContent}>{renderJobs(customerData?.jobsToBeDone)}</div>
         </ConceptDetailCard>
         <ConceptDetailCard title="Pains" icon="userGroup" isHideFooter>
-          <div className={styles.cardContent}>
-            <p className={styles.text}>Long or complicated process </p>
-            <p className={styles.text}>Hard to track budget</p>
-            <p className={styles.text}>Forgetting to pay recurring bills </p>
-          </div>
+          <div className={styles.cardContent}>{renderPains(customerData?.pains)}</div>
         </ConceptDetailCard>
         <ConceptDetailCard title="Quotes" icon="message" isHideFooter>
-          <div className={styles.cardContent}>
-            <p className={styles.text}>
-              “I love browsing for inspiration, but my financials I want them straight to the point”{' '}
-            </p>
-            <p className={styles.text}>“I don't like recurring offers that really don't match my needs” </p>
-            <p className={styles.text}>“It is hard to track my budget” </p>
-            <p className={styles.text}>“I have spending goals of my own, but can't seem to hit them”</p>
-            <p className={styles.text}>“I sometimes forget to pay my bills”</p>
-          </div>
+          <div className={styles.cardContent}>{renderQuotes(customerData?.quotes)}</div>
         </ConceptDetailCard>
       </div>
     </div>
