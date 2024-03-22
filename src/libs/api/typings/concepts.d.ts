@@ -48,9 +48,10 @@ export interface IConceptOverview {
   updatedAt: string;
 }
 
-interface ICustomerProfile {
+export interface ICustomerProfile {
   uuid: string;
   name: string;
+  description: string;
   nickname: string;
   overview: string;
   geoLocation: string;

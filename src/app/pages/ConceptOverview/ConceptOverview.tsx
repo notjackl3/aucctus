@@ -22,6 +22,8 @@ const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, c
     conceptData,
     conceptOverviewData,
     isConceptOverviewLoading,
+    conceptCustomerData,
+    isConceptCustomerLoading,
     changeConceptStatus,
     initialOption,
   } = useConceptOverview(conceptId);
@@ -53,7 +55,10 @@ const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, c
           />
           <MarketDetails conceptData={conceptData} />
           <FinancialDetails conceptData={conceptData} />
-          <CustomerProfile conceptData={conceptData} />
+          <CustomerProfile
+            isConceptCustomerLoading={isConceptCustomerLoading}
+            conceptCustomerData={conceptCustomerData}
+          />
           <HypothesisDetails conceptData={conceptData} />
           <div>Key Assumptions</div>
         </Tabs>
