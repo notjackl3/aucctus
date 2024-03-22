@@ -15,6 +15,7 @@ const CustomerProfile: FunctionComponent<CustomerProfileProps> = ({
   conceptCustomerData,
   isConceptCustomerLoading,
 }) => {
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
   const customerList = conceptCustomerData?.results || [];
   const emptyTabs: TabElement[] = [];
 
@@ -26,8 +27,6 @@ const CustomerProfile: FunctionComponent<CustomerProfileProps> = ({
   };
 
   const customerTabs = getCustomerTabs(customerList);
-
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const renderCustomerProfiles = (customerList: ICustomerProfile[]) => {
     return customerList?.map((customer) => (
