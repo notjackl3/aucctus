@@ -26,7 +26,7 @@ export const endpoints = {
   account: `/api/v1/account`,
 
   /* Concepts */
-  concept: 'api/v1/concept',
+  concept: 'api/v1/concept/',
   conceptList: 'api/v1/concept/list',
   conceptIgnite: 'v1/concept/ignite',
   conceptQueries: (options?: IConceptQueryOptions) => {
@@ -43,6 +43,7 @@ export const endpoints = {
   },
   conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
   conceptOverview: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/overview`,
+  conceptCustomerProfiles: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/customer-profile`,
   conceptCustomerProfile: (conceptUuid: string, profile: string) =>
     `api/v1/concept/${conceptUuid}/customer-profile/${profile}`,
   conceptKeyAssumptions: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/key-assumptions`,

@@ -6,6 +6,14 @@ import { Option } from '../../../components/Dropdown/Dropdown';
 import { ConceptStatus as ConceptStatusType } from '../../../components/ConceptMenu/ConceptMenu';
 import useConceptMenu from '../../../components/ConceptMenu/hooks/useConceptMenu';
 
+export const CONCEPT_TABS = [
+  { label: 'Overview' },
+  { label: 'Market Scan' },
+  { label: 'Financial Projection' },
+  { label: 'Customer Profile' },
+  { label: 'Key Assumptions' },
+];
+
 const useConceptOverview = (conceptId: string) => {
   const { updateConceptStatus } = useConceptMenu({ conceptId: conceptId });
 
@@ -21,13 +29,11 @@ const useConceptOverview = (conceptId: string) => {
     queryFn: async () => await api.concept?.getConceptOverview(conceptId || ''),
   });
 
-  const tabs = [
-    { label: 'Overview' },
-    { label: 'Market Scan' },
-    { label: 'Financial Projection' },
-    { label: 'Customer Profile' },
-    { label: 'Key Assumptions' },
-  ];
+  // const customerQuery = useQuery({
+  //   queryKey: [`concept/overview/${conceptId}/customers`],
+  //   retry: 1,
+  //   queryFn: async () => await api.concept?.getConceptCustomerProfiles(conceptId || ''),
+  // });
 
   const options = [
     {
@@ -90,7 +96,7 @@ const useConceptOverview = (conceptId: string) => {
   const isConceptOverviewLoading = overviewQuery?.isLoading;
 
   return {
-    tabs,
+    tabs: CONCEPT_TABS,
     options,
     conceptData,
     conceptOverviewData,
