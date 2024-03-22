@@ -104,6 +104,9 @@ export function dateCellFormatter(info: string, formattingOptions: Intl.DateTime
 export type AtLeast<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 
 export function formatLargeNumber(number: number) {
+  if (!number) {
+    return '0';
+  }
   if (number >= 1000000) {
     return (number / 1000000).toFixed(1) + 'M';
   } else if (number >= 1000) {
