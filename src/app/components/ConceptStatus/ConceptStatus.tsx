@@ -10,6 +10,7 @@ export interface IConceptStatusProps {
 
 const ConceptStatus: FunctionComponent<IConceptStatusProps> = ({ status }) => {
   const statusColorObj = {
+    new: 'blue',
     ideating: 'blue',
     in_review: 'blue',
     commercialized: 'green',

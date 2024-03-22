@@ -9,6 +9,7 @@ export interface ConceptMenuProps {
 }
 
 export enum ConceptStatus {
+  new = 'new',
   ideating = 'ideating',
   inReview = 'in_review',
   prototyping = 'prototyping',
