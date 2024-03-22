@@ -35,7 +35,24 @@ const useConceptOverview = (conceptId: string) => {
     queryFn: async () => await api.concept?.getConceptCustomerProfiles(conceptId || ''),
   });
 
+  const marketQuery = useQuery({
+    queryKey: [`concept/${conceptId}/market-scan`],
+    retry: 1,
+    queryFn: async () => await api.concept?.getConceptMarketScan(conceptId || ''),
+  });
+
+  const financialQuery = useQuery({
+    queryKey: [`concept/${conceptId}/financial`],
+    retry: 1,
+    queryFn: async () => await api.concept?.getConceptFinancialProjection(conceptId || ''),
+  });
+
   const options = [
+    {
+      label: <ConceptStatusDropdown status={ConceptStatusType.new} />,
+      displayLabel: <ConceptStatusDropdown status={ConceptStatusType.new} isActive />,
+      value: ConceptStatusType.new,
+    },
     {
       label: <ConceptStatusDropdown status={ConceptStatusType.ideating} />,
       displayLabel: <ConceptStatusDropdown status={ConceptStatusType.ideating} isActive />,
@@ -95,8 +112,14 @@ const useConceptOverview = (conceptId: string) => {
   const conceptOverviewData = overviewQuery?.data;
   const isConceptOverviewLoading = overviewQuery?.isLoading;
 
-  const conceptCustomerData = customerQuery?.data;
+  const conceptCustomerData = customerQuery?.data?.results || [];
   const isConceptCustomerLoading = overviewQuery?.isLoading;
+
+  const conceptMarketData = marketQuery?.data;
+  const isConceptMarketLoading = overviewQuery?.isLoading;
+
+  const conceptFinancialData = financialQuery.data;
+  const isConceptFinancialLoading = financialQuery?.isLoading;
 
   return {
     tabs: CONCEPT_TABS,
@@ -106,6 +129,10 @@ const useConceptOverview = (conceptId: string) => {
     isConceptOverviewLoading,
     conceptCustomerData,
     isConceptCustomerLoading,
+    conceptMarketData,
+    isConceptMarketLoading,
+    conceptFinancialData,
+    isConceptFinancialLoading,
     changeConceptStatus,
     initialOption,
   };
