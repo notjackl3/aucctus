@@ -1,0 +1,118 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
+.dashboard {
+  display: flex;
+  position: absolute;
+  padding: 2rem 2rem 3rem 2rem;
+  box-sizing: border-box;
+  flex-direction: column;
+  align-items: center;
+  position: absolute;
+  left: var(--nav-drawer-width);
+  min-width: 50rem;
+  width: calc(100vw - var(--nav-drawer-width));
+  background: $gray-blue-50;
+  min-height: 100vh;
+
+  .headerSection {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    align-self: stretch;
+    margin-bottom: 2rem;
+
+    .header {
+      display: flex;
+      align-items: center;
+      flex-direction: row;
+      justify-content: flex-start;
+
+      h1 {
+        text-transform: capitalize;
+        @include display-sm;
+        color: $blue-900;
+        height: 100%;
+      }
+    }
+
+    .actions {
+      display: flex;
+      gap: 1rem;
+      .button {
+        color: $white;
+        font-family: $dm-sans;
+        font-style: normal;
+        font-weight: 700;
+        white-space: nowrap;
+
+        svg {
+          path {
+            stroke: $white;
+          }
+        }
+      }
+      .closeButton {
+        border: none;
+        background: none;
+      }
+    }
+  }
+
+  .contentContainer {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.5rem;
+    align-self: stretch;
+    height: 100%;
+
+    flex-wrap: wrap;
+
+    .cardContainer {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      width: 24rem;
+
+      .cardStyle {
+        width: 100%;
+        max-width: 70rem;
+        h4 {
+          color: $blue-900;
+          @include text-large;
+          font-family: $dm-sans;
+        }
+      }
+
+      .cardAction {
+        color: $grey-600;
+        @include body-100;
+        font-family: $dm-sans;
+        border: none;
+        background: none;
+      }
+
+      .cardContent {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+
+        .cardRow {
+          display: flex;
+          min-height: 4rem;
+          width: 100%;
+          padding: 1rem 1.5rem;
+          box-sizing: border-box;
+          align-items: center;
+          justify-content: space-between;
+          color: $blue-900;
+          border-bottom: 1px solid $grey-300;
+        }
+      }
+    }
+  }
+}
