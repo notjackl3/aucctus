@@ -1,14 +1,16 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/financialDetails.module.scss';
-import { IConcept } from '../../../../../libs/api/typings';
+import { IConcept, IFinancialProjection } from '../../../../../libs/api/typings';
 import Icon from '../../../../components/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import GeneralBadge from '../../../../components/GeneralBadge';
 import MarketChart from '../../../../components/MarketChart';
 import MarketLegend from '../../../../components/MarketLegend';
+import { formatLargeNumber } from '../../../../../libs/utils';
 
 export interface FinancialDetailsProps {
   conceptData?: IConcept;
+  conceptFinancialData?: IFinancialProjection;
 }
 
 const iconDefaultProps = {
@@ -17,8 +19,11 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptData }) => {
-  //TODO remove financial data with financial data response
+const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptFinancialData }) => {
+  const dataTAM = conceptFinancialData?.marketSizeMetrics?.[0];
+  const dataSAM = conceptFinancialData?.marketSizeMetrics?.[1];
+  const dataSOM = conceptFinancialData?.marketSizeMetrics?.[2];
+
   return (
     <div className={styles.financialDetails}>
       <div className={styles.summary}>
@@ -26,7 +31,7 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
           <div className={styles.detailBlock}>
             <h2>Overview</h2>
             <div className={styles.textBlock}>
-              <p>{conceptData?.description}</p>
+              <p>{conceptFinancialData?.overview}</p>
             </div>
           </div>
         </div>
@@ -46,9 +51,7 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
         >
           <div className={styles.cardContent}>
             <div className={styles.cardRow}>
-              <span className={styles.rowText}>
-                20% of Canadians living abroad would be interested in and could afford the service.
-              </span>
+              <span className={styles.rowText}>{dataTAM?.keyHypothesis}</span>
               <GeneralBadge
                 badgeClassName={styles.rowBadge}
                 bulletClassName={styles.bulletLightPurple}
@@ -56,16 +59,11 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
               />
             </div>
             <div className={styles.cardRow}>
-              <span className={styles.rowText}>
-                Assumed a 10% capture rate of the SAM based on competitive factors and operational capabilities.{' '}
-              </span>
+              <span className={styles.rowText}>{dataSAM?.keyHypothesis}</span>
               <GeneralBadge badgeClassName={styles.rowBadge} bulletClassName={styles.bulletPurple} badgeText="SAM" />
             </div>
             <div className={styles.cardRow}>
-              <span className={styles.rowText}>
-                Used an estimated number of Canadians living abroad, 2.8M, which may fluctuate based on immigration
-                trends and policies.{' '}
-              </span>
+              <span className={styles.rowText}>{dataSOM?.keyHypothesis}</span>
               <GeneralBadge badgeClassName={styles.rowBadge} bulletClassName={styles.bulletBlue} badgeText="SOM" />
             </div>
           </div>
@@ -78,61 +76,59 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptDat
               <ConceptDetailCard
                 title="Total Addressable Market"
                 cardClassName={styles.cardLeftSytle}
-                headerAction={<span>2.8M</span>}
+                headerAction={<span>{formatLargeNumber(dataTAM?.value)}</span>}
               >
                 <div className={styles.cardLeftContent}>
-                  <p className={styles.cardBoldText}>
-                    We're considering all Canadians living abroad as potential users. Data Point: According to
-                    Statistics Canada and various sources, there are approximately 2.8 million Canadians living abroad.{' '}
-                  </p>
-                  <p className={styles.cardRegularText}>
-                    Data Point: According to Statistics Canada and various sources, there are approximately 2.8 million
-                    Canadians living abroad.{' '}
-                  </p>
+                  <p className={styles.cardBoldText}>{dataTAM?.keyHypothesis}</p>
+                  <p className={styles.cardRegularText}>{dataTAM?.dataPoint}</p>
                 </div>
               </ConceptDetailCard>
               <ConceptDetailCard
                 title="Serviceable Addressable Market"
                 cardClassName={styles.cardLeftSytle}
-                headerAction={<span>560k</span>}
+                headerAction={<span>{formatLargeNumber(dataSAM?.value)}</span>}
                 isHideFooter
               >
                 <div className={styles.cardLeftContent}>
-                  <p className={styles.cardBoldText}>
-                    Not all Canadians abroad will be interested or have the need for such a service. Based on market
-                    research or surveys, assume that 20% of the expatriate population would be interested in and able to
-                    afford this service.{' '}
-                  </p>
-                  <p className={styles.cardRegularText}>Data Point: 20% of 2.8 million. </p>
+                  <p className={styles.cardBoldText}>{dataSAM?.keyHypothesis}</p>
+                  <p className={styles.cardRegularText}>{dataSAM?.dataPoint}</p>
                 </div>
               </ConceptDetailCard>
               <ConceptDetailCard
                 title="Serviceable Obtainable Market"
                 cardClassName={styles.cardLeftSytle}
-                headerAction={<span>56k</span>}
+                headerAction={<span>{formatLargeNumber(dataSOM?.value)}</span>}
                 isHideFooter
               >
                 <div className={styles.cardLeftContent}>
-                  <p className={styles.cardBoldText}>
-                    Given the competitive landscape and assuming a phased rollout starting with English-speaking
-                    countries where most expatriates live, we estimate that within the first few years, you can capture
-                    10% of the SAM. Data Point: 10% of the SAM.{' '}
-                  </p>
-                  <p className={styles.cardRegularText}>Data Point: 10% of the SAM. </p>
+                  <p className={styles.cardBoldText}>{dataSOM?.keyHypothesis}</p>
+                  <p className={styles.cardRegularText}>{dataSOM?.dataPoint}</p>
                 </div>
               </ConceptDetailCard>
             </div>
             <div className={styles.cardRight}>
               <MarketChart
-                largeValue={1400300}
-                mediumValue={1010300}
-                smallValue={600000}
+                largeValue={dataTAM?.value}
+                mediumValue={dataSAM?.value}
+                smallValue={dataSOM?.value}
                 chartClass={styles.marketChart}
               />
               <div className={styles.legend}>
-                <MarketLegend legendText="Total Addressable Market" legendValue="2.8M" bulletColor="purple" />
-                <MarketLegend legendText="Serviceable Addressable Market" legendValue="560K" bulletColor="darkPurple" />
-                <MarketLegend legendText="Serviceable Obtainable Market" legendValue="56K" bulletColor="blue" />
+                <MarketLegend
+                  legendText="Total Addressable Market"
+                  legendValue={formatLargeNumber(dataTAM?.value)}
+                  bulletColor="purple"
+                />
+                <MarketLegend
+                  legendText="Serviceable Addressable Market"
+                  legendValue={formatLargeNumber(dataSAM?.value)}
+                  bulletColor="darkPurple"
+                />
+                <MarketLegend
+                  legendText="Serviceable Obtainable Market"
+                  legendValue={formatLargeNumber(dataSOM?.value)}
+                  bulletColor="blue"
+                />
               </div>
             </div>
           </div>
