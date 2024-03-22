@@ -1,0 +1,70 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.conceptStatistic {
+  display: flex;
+  padding: 2px 0.5rem 2px 0.4rem;
+  box-sizing: border-box;
+  align-items: center;
+  border-radius: 1rem;
+  gap: 0.5rem;
+
+  .conceptIcon {
+    border-radius: 50%;
+    background: #e0f2fe;
+    display: flex;
+    width: 3rem;
+    height: 3rem;
+    padding: 0.75rem;
+    box-sizing: border-box;
+    justify-content: center;
+    align-items: center;
+
+    &.lightblueIcon {
+      background: #e0f2fe;
+      svg {
+        path {
+          stroke: #155eef;
+        }
+      }
+    }
+    &.blueIcon {
+      background: #d1e0ff;
+      svg {
+        path {
+          stroke: #155eef;
+        }
+      }
+    }
+    &.purpleIcon {
+      background: #ece9fe;
+      svg {
+        path {
+          stroke: $purple-600;
+        }
+      }
+    }
+  }
+
+  .conceptInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .conceptInfoTitle {
+      color: $grey-600;
+      @include text-medium;
+      font-family: $dm-sans;
+    }
+
+    .conceptData {
+      display: flex;
+      color: $blue-900;
+      font-family: $dm-sans;
+      font-size: 1.5rem;
+      font-style: normal;
+      font-weight: 500;
+      line-height: 2rem;
+    }
+  }
+}
