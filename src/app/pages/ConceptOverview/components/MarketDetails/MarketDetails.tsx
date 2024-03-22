@@ -1,13 +1,14 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/marketDetails.module.scss';
-import { IConcept } from '../../../../../libs/api/typings';
+import { IMarketScan } from '../../../../../libs/api/typings';
 import Icon from '../../../../components/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import images from '../../../../assets/img';
 import NewsArticle from '../../../../components/NewsArticle';
 
 export interface MarketDetailsProps {
-  conceptData?: IConcept;
+  conceptMarketData?: IMarketScan;
+  isConceptMarketLoading?: boolean;
 }
 
 const iconDefaultProps = {
@@ -16,69 +17,44 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-const MarketDetails: FunctionComponent<MarketDetailsProps> = ({ conceptData }) => {
-  //TODO remove placeholder market scan data with market scan data response
+const MarketDetails: FunctionComponent<MarketDetailsProps> = ({ conceptMarketData }) => {
+  const renderTrendCards = (trendDriversList: IMarketScan['trendsAndDrivers']) => {
+    return trendDriversList?.map((trend) => (
+      <ConceptDetailCard
+        title=""
+        isHideHeader
+        footerAction={
+          <button className={styles.cardAction} onClick={() => {}} aria-label="See Source">
+            See Source
+            <span>{<Icon variant="arrowRight" {...iconDefaultProps} />}</span>
+          </button>
+        }
+      >
+        <div className={styles.cardTrendContent}>
+          <img alt="delivery-trend" src={images.deliveryTrend} />
+          <span className={styles.cardBoldText}>{trend?.name}</span>
+          <p className={styles.cardRegularText}>{trend?.description}</p>
+        </div>
+      </ConceptDetailCard>
+    ));
+  };
+
   return (
     <div className={styles.marketDetails}>
       <div className={styles.summary}>
         <div className={styles.detailBlock}>
           <h2>Trends and Drivers</h2>
           <div className={styles.textBlock}>
-            <p>{conceptData?.description}</p>
+            <p>{conceptMarketData?.trendsAndDriversDescription}</p>
           </div>
         </div>
       </div>
-      <div className={styles.cardContainer}>
-        <ConceptDetailCard
-          title="Key Hypothesis"
-          isHideHeader
-          footerAction={
-            <button className={styles.cardAction} onClick={() => {}} aria-label="See Source">
-              See Source
-              <span>{<Icon variant="arrowRight" {...iconDefaultProps} />}</span>
-            </button>
-          }
-        >
-          <div className={styles.cardTrendContent}>
-            <img alt="delivery-trend" src={images.deliveryTrend} />
-            <span className={styles.cardBoldText}>Last-Mile Delivery Innovations</span>
-            <p className={styles.cardRegularText}>
-              With consumer expectations for fast and flexible delivery at an all-time high, companies are exploring
-              innovative last-mile delivery solutions, including drone deliveries, autonomous delivery vehicles, and
-              urban micro-fulfillment centers.
-            </p>
-          </div>
-        </ConceptDetailCard>
-        <ConceptDetailCard
-          title="Key Hypothesis"
-          isHideHeader
-          footerAction={
-            <button className={styles.cardAction} onClick={() => {}} aria-label="See Source">
-              See Source
-              <span>{<Icon variant="arrowRight" {...iconDefaultProps} />}</span>
-            </button>
-          }
-        >
-          <div className={styles.cardTrendContent}>
-            <img alt="delivery-trend" src={images.deliveryTrend} />
-            <span className={styles.cardBoldText}>Last-Mile Delivery Innovations</span>
-            <p className={styles.cardRegularText}>
-              With consumer expectations for fast and flexible delivery at an all-time high, companies are exploring
-              innovative last-mile delivery solutions, including drone deliveries, autonomous delivery vehicles, and
-              urban micro-fulfillment centers.
-            </p>
-          </div>
-        </ConceptDetailCard>
-      </div>
+      <div className={styles.cardContainer}>{renderTrendCards(conceptMarketData?.trendsAndDrivers || [])}</div>
       <div className={styles.summary}>
         <div className={styles.detailBlock}>
-          <h2>Competition and Investments</h2>
+          <h2>Ecosystem</h2>
           <div className={styles.textBlock}>
-            <p>
-              Canada Post, with its expansive infrastructure, unparalleled reach, and a legacy of trust built over the
-              decades, stands at an opportune crossroads in the age of remote work. As the digital nomad demographic
-              swells, the need for flexible, reliable, and technologically-advanced mail services rises concomitantly.
-            </p>
+            <p>{conceptMarketData?.ecosystemDescription}</p>
           </div>
         </div>
       </div>
