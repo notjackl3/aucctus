@@ -29,11 +29,11 @@ const useConceptOverview = (conceptId: string) => {
     queryFn: async () => await api.concept?.getConceptOverview(conceptId || ''),
   });
 
-  // const customerQuery = useQuery({
-  //   queryKey: [`concept/overview/${conceptId}/customers`],
-  //   retry: 1,
-  //   queryFn: async () => await api.concept?.getConceptCustomerProfiles(conceptId || ''),
-  // });
+  const customerQuery = useQuery({
+    queryKey: [`concept/${conceptId}/customer-profile`],
+    retry: 1,
+    queryFn: async () => await api.concept?.getConceptCustomerProfiles(conceptId || ''),
+  });
 
   const options = [
     {
@@ -95,12 +95,17 @@ const useConceptOverview = (conceptId: string) => {
   const conceptOverviewData = overviewQuery?.data;
   const isConceptOverviewLoading = overviewQuery?.isLoading;
 
+  const conceptCustomerData = customerQuery?.data;
+  const isConceptCustomerLoading = overviewQuery?.isLoading;
+
   return {
     tabs: CONCEPT_TABS,
     options,
     conceptData,
     conceptOverviewData,
     isConceptOverviewLoading,
+    conceptCustomerData,
+    isConceptCustomerLoading,
     changeConceptStatus,
     initialOption,
   };
