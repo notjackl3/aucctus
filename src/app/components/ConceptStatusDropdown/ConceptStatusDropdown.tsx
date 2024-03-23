@@ -17,6 +17,7 @@ const defaultIconProps = {
 };
 const ConceptStatusDropdown: FunctionComponent<ConceptStatusDropdownProps> = ({ status, isActive }) => {
   const statusColorObj = {
+    new: 'blue',
     ideating: 'blue',
     in_review: 'blue',
     commercialized: 'green',

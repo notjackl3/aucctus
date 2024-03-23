@@ -1,4 +1,5 @@
 export enum ConceptStatus {
+  new = 'new',
   ideating = 'ideating',
   inReview = 'in_review',
   prototyping = 'prototyping',
@@ -73,7 +74,9 @@ interface IFinancialProjection {
   uuid: string;
   createdAt: string;
   updatedAt: string;
+  overview: string;
   // TODO: Add the rest of the fields
+  marketSizeMetrics: any;
 }
 
 enum AssumptionType {
@@ -147,6 +150,8 @@ interface IMarketScan {
   incumbents: IIncumbentsEcosystem[];
   investors: IInvestorsEcosystem[];
   trendsAndDrivers: ITrendsAndDrivers[];
+  trendsAndDriversDescription: string;
+  ecosystemDescription: string;
   createdAt: string;
   updatedAt: string;
 }

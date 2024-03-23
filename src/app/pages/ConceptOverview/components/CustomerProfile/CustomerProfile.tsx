@@ -7,7 +7,7 @@ import { TabElement } from '../../../../components/Tabs/Tabs';
 import Loading from '../../../../components/Loading';
 
 export interface CustomerProfileProps {
-  conceptCustomerData: any;
+  conceptCustomerData: ICustomerProfile[];
   isConceptCustomerLoading: boolean;
 }
 
@@ -16,7 +16,7 @@ const CustomerProfile: FunctionComponent<CustomerProfileProps> = ({
   isConceptCustomerLoading,
 }) => {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const customerList = conceptCustomerData?.results || [];
+  const customerList = conceptCustomerData || [];
   const emptyTabs: TabElement[] = [];
 
   const getCustomerTabs = (customerList: ICustomerProfile[]) => {

@@ -56,7 +56,7 @@ export class ConceptApi extends ApiService {
   }
 
   getConceptCustomerProfiles(uuid: string) {
-    return this.get<ICustomerProfile[]>(endpoints.conceptCustomerProfiles(uuid));
+    return this.get<IPageResponse<ICustomerProfile>>(endpoints.conceptCustomerProfiles(uuid));
   }
 
   getConceptCustomerProfile(uuid: string, profile: string) {

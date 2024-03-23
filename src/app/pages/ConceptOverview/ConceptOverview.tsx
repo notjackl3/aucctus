@@ -24,6 +24,9 @@ const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, c
     isConceptOverviewLoading,
     conceptCustomerData,
     isConceptCustomerLoading,
+    conceptMarketData,
+    isConceptMarketLoading,
+    conceptFinancialData,
     changeConceptStatus,
     initialOption,
   } = useConceptOverview(conceptId);
@@ -49,12 +52,13 @@ const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, c
         <Tabs className={styles.tabs} tabs={tabs} activeTabIndex={activeTabIndex} selectActiveTab={setActiveTabIndex}>
           <OverviewDetails
             conceptData={conceptData}
+            conceptCustomerData={conceptCustomerData}
             isConceptOverviewLoading={isConceptOverviewLoading}
             conceptOverviewData={conceptOverviewData}
             selectActiveTab={setActiveTabIndex}
           />
-          <MarketDetails conceptData={conceptData} />
-          <FinancialDetails conceptData={conceptData} />
+          <MarketDetails conceptMarketData={conceptMarketData} isConceptMarketLoading={isConceptMarketLoading} />
+          <FinancialDetails conceptData={conceptData} conceptFinancialData={conceptFinancialData} />
           <CustomerProfile
             isConceptCustomerLoading={isConceptCustomerLoading}
             conceptCustomerData={conceptCustomerData}
