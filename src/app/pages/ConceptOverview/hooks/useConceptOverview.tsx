@@ -1,51 +1,50 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useQuery } from 'react-query';
 import api from '../../../../libs/api';
 import ConceptStatusDropdown from '../../../components/ConceptStatusDropdown';
 import { Option } from '../../../components/Dropdown/Dropdown';
 import { ConceptStatus as ConceptStatusType } from '../../../components/ConceptMenu/ConceptMenu';
 import useConceptMenu from '../../../components/ConceptMenu/hooks/useConceptMenu';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export const CONCEPT_TABS = [
-  { label: 'Overview' },
-  { label: 'Market Scan' },
-  { label: 'Financial Projection' },
-  { label: 'Customer Profile' },
-  { label: 'Key Assumptions' },
+  { label: 'Overview', path: 'overview' },
+  { label: 'Market Scan', path: 'market-scan' },
+  { label: 'Financial Projection', path: 'financial-projection' },
+  { label: 'Customer Profile', path: 'customer-profile' },
+  { label: 'Key Assumptions', path: 'key-assumptions' },
 ];
 
 const useConceptOverview = (conceptId: string) => {
   const { updateConceptStatus } = useConceptMenu({ conceptId: conceptId });
 
   const conceptGeneralQuery = useQuery({
-    queryKey: ['concepts', 'overview'],
+    queryKey: [`concepts/overview/${conceptId}`],
     retry: 1,
-    queryFn: async () => await api.concept?.getConcept(conceptId || ''),
+    queryFn: async () => await api.concept.getConcept(conceptId || ''),
   });
 
-  const overviewQuery = useQuery({
-    queryKey: [`concept/overview/${conceptId}`],
-    retry: 1,
-    queryFn: async () => await api.concept?.getConceptOverview(conceptId || ''),
-  });
+  const location = useLocation();
+  const lastSegment = location.pathname.split('/').at(-1);
+  const navigate = useNavigate();
+  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  useEffect(() => {
+    const currentActiveTab = CONCEPT_TABS.findIndex((tab) => tab.path === lastSegment);
+    if (typeof currentActiveTab === 'number') {
+      setActiveTabIndex(currentActiveTab);
+    }
+  }, [lastSegment]);
+  const navigateConceptTab = (tabIndex: number) => {
+    setActiveTabIndex(tabIndex);
+    const basePath = location.pathname.split('/').slice(0, 4).join('/');
+    const newPath = `${basePath}/${CONCEPT_TABS[tabIndex].path}`;
+    navigate(newPath);
+  };
 
-  const customerQuery = useQuery({
-    queryKey: [`concept/${conceptId}/customer-profile`],
-    retry: 1,
-    queryFn: async () => await api.concept?.getConceptCustomerProfiles(conceptId || ''),
-  });
-
-  const marketQuery = useQuery({
-    queryKey: [`concept/${conceptId}/market-scan`],
-    retry: 1,
-    queryFn: async () => await api.concept?.getConceptMarketScan(conceptId || ''),
-  });
-
-  const financialQuery = useQuery({
-    queryKey: [`concept/${conceptId}/financial`],
-    retry: 1,
-    queryFn: async () => await api.concept?.getConceptFinancialProjection(conceptId || ''),
-  });
+  const closePage = () => {
+    const basePath = location.pathname.split('/').slice(0, 3).join('/');
+    navigate(basePath);
+  };
 
   const options = [
     {
@@ -109,32 +108,15 @@ const useConceptOverview = (conceptId: string) => {
   const initialOption = getInitialOption(activeStatus);
   const conceptData = conceptGeneralQuery?.data;
 
-  const conceptOverviewData = overviewQuery?.data;
-  const isConceptOverviewLoading = overviewQuery?.isLoading;
-
-  const conceptCustomerData = customerQuery?.data?.results || [];
-  const isConceptCustomerLoading = overviewQuery?.isLoading;
-
-  const conceptMarketData = marketQuery?.data;
-  const isConceptMarketLoading = overviewQuery?.isLoading;
-
-  const conceptFinancialData = financialQuery.data;
-  const isConceptFinancialLoading = financialQuery?.isLoading;
-
   return {
     tabs: CONCEPT_TABS,
     options,
     conceptData,
-    conceptOverviewData,
-    isConceptOverviewLoading,
-    conceptCustomerData,
-    isConceptCustomerLoading,
-    conceptMarketData,
-    isConceptMarketLoading,
-    conceptFinancialData,
-    isConceptFinancialLoading,
     changeConceptStatus,
     initialOption,
+    activeTabIndex,
+    navigateConceptTab,
+    closePage,
   };
 };
 
