@@ -65,6 +65,7 @@ const Concepts: FunctionComponent = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const [showConceptDetailPage, setShowConceptDetailPage] = useState(false);
+
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
     queryKey: ['concepts', activeFilter, category, activePage],
     refetchOnWindowFocus: false,

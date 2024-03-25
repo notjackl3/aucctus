@@ -30,39 +30,7 @@ const NavDrawer = () => {
           </div>
           <div className={styles.content}>
             <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
-            <NavLink
-              to={AppPath.DomainList}
-              title="Domains"
-              icon="file"
-              // TODO: fix base path logic.
-              openBasePath={AppPath.DomainMarket}
-              nestedRoutes={[
-                {
-                  title: 'Market',
-                  to: AppPath.DomainMarket,
-                },
-                {
-                  title: 'Start Ups',
-                  to: AppPath.Home,
-                  locked: true,
-                },
-                {
-                  title: 'Incumbents',
-                  to: AppPath.Home,
-                  locked: true,
-                },
-                {
-                  title: 'VC Activity',
-                  to: AppPath.Home,
-                  locked: true,
-                },
-                {
-                  title: 'Potential Concepts',
-                  to: AppPath.Home,
-                  locked: true,
-                },
-              ]}
-            />
+
             <NavLink
               to={AppPath.IgniteConcept}
               title="Concepts"
@@ -84,11 +52,8 @@ const NavDrawer = () => {
               ]}
             />
             <NavLink to={AppPath.ChallengeCenter} title="Challenges" icon="rocket" />
-
-            <NavLink to={AppPath.Home} title="Tests" icon="beaker" locked />
           </div>
           <div className={styles.extras}>
-            <NavLink to={AppPath.Home} title="Learn" icon="home" locked />
             <NavLink to={AppPath.Home} title="Settings" icon="file" />
           </div>
           <div className={styles.account}>

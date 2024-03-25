@@ -103,15 +103,36 @@ export function dateCellFormatter(info: string, formattingOptions: Intl.DateTime
 
 export type AtLeast<T, K extends keyof T> = Partial<T> & Pick<T, K>;
 
-export function formatLargeNumber(number: number) {
-  if (!number) {
-    return '0';
+export function formatLargeNumber(num: number) {
+  /**
+   * Formats a number with appropriate unit suffix (K, M, B, T) based on its magnitude.
+   * Only shows the decimal if the number is not whole.
+   *
+   * @param num The number to be formatted.
+   * @returns The formatted number with unit suffix.
+   *
+   * Example:
+   *   formatNumber(1234567) // '1.2M'
+   *   formatNumber(9876543210) // '9.8B'
+   *   formatNumber(1000) // '1K'
+   */
+  const units: string[] = ['', 'K', 'M', 'B', 'T'];
+  for (const unit of units) {
+    if (Math.abs(num) < 1000.0) {
+      if (num % 1 === 0) {
+        // Number is whole
+        return `$${num}${unit}`;
+      } else {
+        // Number is not whole, format to 1 decimal place
+        return `$${parseFloat(num.toFixed(1))}${unit}`;
+      }
+    }
+    num /= 1000.0;
   }
-  if (number >= 1000000) {
-    return (number / 1000000).toFixed(1) + 'M';
-  } else if (number >= 1000) {
-    return (number / 1000).toFixed(1) + 'K';
+  // For numbers larger than a trillion, check again if it's whole or not.
+  if (num % 1 === 0) {
+    return `$${num}T`;
   } else {
-    return number.toString();
+    return `$${parseFloat(num.toFixed(1))}T`;
   }
 }

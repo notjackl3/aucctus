@@ -71,7 +71,7 @@ const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ customerData
                 </p>
                 <p>
                   <Icon variant="userGroup" {...iconDefaultProps} />
-                  {`Family Size(Lives with): ${customerData?.familySize}`}
+                  {`Family Size: ${customerData?.familySize}`}
                 </p>
                 <p>
                   <Icon variant="piggyBank" {...iconDefaultProps} />
