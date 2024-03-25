@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/customerProfile.module.scss';
 import { ICustomerProfile } from '../../../../../libs/api/typings';
 import Tabs from '../../../../components/Tabs';
@@ -19,14 +19,12 @@ const CustomerProfile: FunctionComponent<CustomerProfileProps> = ({
   const customerList = conceptCustomerData || [];
   const emptyTabs: TabElement[] = [];
 
-  const getCustomerTabs = (customerList: ICustomerProfile[]) => {
+  const customerTabs = useMemo(() => {
     return customerList.reduce((acc: TabElement[], item: ICustomerProfile, index) => {
       acc.push({ label: item?.nickname || `Customer ${index + 1}` });
       return acc;
     }, emptyTabs);
-  };
-
-  const customerTabs = getCustomerTabs(customerList);
+  }, [customerList]);
 
   const renderCustomerProfiles = (customerList: ICustomerProfile[]) => {
     return customerList?.map((customer) => (
