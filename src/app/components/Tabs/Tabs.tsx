@@ -11,7 +11,7 @@ export interface TabsProps {
   tabs: TabElement[];
   className?: string;
   tabClassName?: string;
-  children: ReactElement[] | ReactElement;
+  children?: ReactElement[] | ReactElement;
   isButtonStyle?: boolean;
   selectActiveTab: (index: number) => void;
   activeTabIndex: number;
@@ -26,7 +26,7 @@ const Tabs: FunctionComponent<TabsProps> = ({
   activeTabIndex,
   selectActiveTab,
 }) => {
-  if (!Array.isArray(children)) {
+  if (!Array.isArray(children) && children) {
     children = [children];
   }
 
