@@ -1,6 +1,5 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/overviewDetails.module.scss';
-import { IConcept, IConceptOverview, ICustomerProfile } from '../../../../../libs/api/typings';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import MarketChart from '../../../../components/MarketChart';
 import MarketLegend from '../../../../components/MarketLegend';
@@ -8,14 +7,11 @@ import defaultAvatar from '../../../../assets/icons/avatar.svg';
 import Icon from '../../../../components/Icon';
 import NewsArticle from '../../../../components/NewsArticle';
 import Loading from '../../../../components/Loading';
+import { useQuery } from 'react-query';
+import api from '../../../../../libs/api';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
-export interface OverviewDetailsProps {
-  conceptData?: IConcept;
-  conceptOverviewData?: IConceptOverview;
-  conceptCustomerData: ICustomerProfile[];
-  isConceptOverviewLoading?: boolean;
-  selectActiveTab: (tabIndex: number) => void;
-}
+export interface OverviewDetailsProps {}
 
 const iconDefaultProps = {
   height: 20,
@@ -23,13 +19,34 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({
-  conceptData,
-  conceptOverviewData,
-  conceptCustomerData,
-  isConceptOverviewLoading,
-  selectActiveTab,
-}) => {
+const OverviewDetails: FunctionComponent = () => {
+  const { id: conceptId } = useParams();
+  const location = useLocation();
+  const basePath = location.pathname.split('/').slice(0, 4).join('/');
+
+  const navigate = useNavigate();
+
+  //TODO remove these queries when overview endpoint modified to return all data required for overview page
+  const { data: conceptData } = useQuery({
+    queryKey: [`concepts/${conceptId}`],
+    retry: 1,
+    queryFn: async () => await api.concept.getConcept(conceptId || ''),
+  });
+
+  const { data: conceptOverviewData, isLoading: isConceptLoading } = useQuery({
+    queryKey: [`concept/overview/${conceptId}`],
+    retry: 1,
+    queryFn: async () => await api.concept.getConceptOverview(conceptId || ''),
+  });
+
+  const { data: conceptCustomerData } = useQuery({
+    queryKey: [`concept/${conceptId}/customer-profile`],
+    retry: 1,
+    queryFn: async () => await api.concept.getConceptCustomerProfiles(conceptId || ''),
+  });
+
+  const customerDataList = conceptCustomerData ? conceptCustomerData.results : [];
+
   const renderIndustriesList = () => {
     return conceptOverviewData?.industries?.map((industry, i) => <p key={`industry-${i}`}>{industry}</p>);
   };
@@ -38,10 +55,10 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({
     return conceptOverviewData?.trendsAndDrivers?.map((trend, i) => <p key={`trend-${i}`}>{trend}</p>);
   };
 
-  const geographicLocation = conceptCustomerData?.length ? conceptCustomerData[0].geoLocation : '';
-  const ageRange = conceptCustomerData?.length ? conceptCustomerData[0].ageRange : '';
-  const familySize = conceptCustomerData?.length ? conceptCustomerData[0].familySize : '';
-  const incomeRange = conceptCustomerData?.length ? conceptCustomerData[0].incomeRange : '';
+  const geographicLocation = customerDataList?.length ? customerDataList[0].geoLocation : '';
+  const ageRange = customerDataList?.length ? customerDataList[0].ageRange : '';
+  const familySize = customerDataList?.length ? customerDataList[0].familySize : '';
+  const incomeRange = customerDataList?.length ? customerDataList[0].incomeRange : '';
 
   return (
     <div className={styles.overviewDetails}>
@@ -63,7 +80,7 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({
           <div className={styles.listSection}>
             <div className={styles.detailBlock}>
               <h3>Trends & Drivers</h3>
-              {isConceptOverviewLoading && <Loading />}
+              {isConceptLoading && <Loading />}
               <div className={styles.list}>{renderTrendAndDriversList()}</div>
             </div>
             <div className={styles.detailBlock}>
@@ -83,7 +100,7 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({
             <button
               className={styles.cardAction}
               onClick={() => {
-                selectActiveTab(3);
+                navigate(`${basePath}/customer-profile`);
               }}
               aria-label="View Customer Profiles"
             >
@@ -97,8 +114,8 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({
               <div className={styles.avatarSection}>
                 <img className={styles.avatar} alt="avatar" src={defaultAvatar} />
                 <div className={styles.avatarDetails} onClick={() => {}}>
-                  <span className={styles.description}>{conceptCustomerData[0]?.nickname}</span>
-                  <span className={styles.name}>{conceptCustomerData[0]?.name}</span>
+                  <span className={styles.description}>{customerDataList[0]?.nickname}</span>
+                  <span className={styles.name}>{customerDataList[0]?.name}</span>
                 </div>
               </div>
               <div className={styles.listSection}>
@@ -115,7 +132,7 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({
                     </p>
                     <p>
                       <Icon variant="userGroup" {...iconDefaultProps} />
-                      {`Family Size(Lives with): ${familySize}`}
+                      {`Family Size: ${familySize}`}
                     </p>
                     <p>
                       <Icon variant="piggyBank" {...iconDefaultProps} />
@@ -135,7 +152,7 @@ const OverviewDetails: FunctionComponent<OverviewDetailsProps> = ({
             <button
               className={styles.cardAction}
               onClick={() => {
-                selectActiveTab(2);
+                navigate(`${basePath}/financial-projection`);
               }}
               aria-label="View Financial Projection"
             >
