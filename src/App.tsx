@@ -1,7 +1,7 @@
 import { Route, Routes } from 'react-router';
 import AuthGuard from './routes/guards/auth.guard';
 import Layout from './Layout/Layout';
-import { AppPath } from './routes/routes';
+import { AppPath, ConceptPath } from './routes/routes';
 import Page from './app/pages';
 import UnauthGuard from './routes/guards/unauth.guard';
 import { QueryClient, QueryClientProvider } from 'react-query';
@@ -35,8 +35,15 @@ function App() {
               {/* Concepts */}
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
               <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
-              <Route path={AppPath.ConceptCategory} element={<Page.Concepts />} />
-              <Route path={AppPath.ConceptOverview} element={<Page.Concepts />} />s{' '}
+              <Route path={AppPath.ConceptCategory} element={<Page.Concepts />}>
+                <Route path={AppPath.ConceptOverview} element={<Page.ConceptPages.ConceptOverview />}>
+                  <Route path={ConceptPath.Overview} element={<Page.ConceptPages.OverviewDetails />} />
+                  <Route path={ConceptPath.MarketScan} element={<Page.ConceptPages.MarketDetails />} />
+                  <Route path={ConceptPath.FinancialProjection} element={<Page.ConceptPages.FinancialDetails />} />
+                  <Route path={ConceptPath.CustomerProfile} element={<Page.ConceptPages.CustomerProfile />} />
+                  <Route path={ConceptPath.KeyAssumptions} element={<Page.ConceptPages.HypothesisDetails />} />
+                </Route>
+              </Route>
             </Route>
           </Route>
 
