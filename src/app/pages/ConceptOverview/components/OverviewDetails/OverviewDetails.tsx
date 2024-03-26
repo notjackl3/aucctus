@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import styles from './styles/overviewDetails.module.scss';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import MarketChart from '../../../../components/MarketChart';
@@ -45,7 +45,12 @@ const OverviewDetails: FunctionComponent = () => {
     queryFn: async () => await api.concept.getConceptCustomerProfiles(conceptId || ''),
   });
 
-  const customerDataList = conceptCustomerData ? conceptCustomerData.results : [];
+  const firstCustomerPrersona = useMemo(() => {
+    if (!conceptCustomerData || (conceptCustomerData && !conceptCustomerData.results)) {
+      return undefined;
+    }
+    return conceptCustomerData.results[0];
+  }, [conceptCustomerData]);
 
   const renderIndustriesList = () => {
     return conceptOverviewData?.industries?.map((industry, i) => <p key={`industry-${i}`}>{industry}</p>);
@@ -54,11 +59,6 @@ const OverviewDetails: FunctionComponent = () => {
   const renderTrendAndDriversList = () => {
     return conceptOverviewData?.trendsAndDrivers?.map((trend, i) => <p key={`trend-${i}`}>{trend}</p>);
   };
-
-  const geographicLocation = customerDataList?.length ? customerDataList[0].geoLocation : '';
-  const ageRange = customerDataList?.length ? customerDataList[0].ageRange : '';
-  const familySize = customerDataList?.length ? customerDataList[0].familySize : '';
-  const incomeRange = customerDataList?.length ? customerDataList[0].incomeRange : '';
 
   return (
     <div className={styles.overviewDetails}>
@@ -114,8 +114,8 @@ const OverviewDetails: FunctionComponent = () => {
               <div className={styles.avatarSection}>
                 <img className={styles.avatar} alt="avatar" src={defaultAvatar} />
                 <div className={styles.avatarDetails} onClick={() => {}}>
-                  <span className={styles.description}>{customerDataList[0]?.nickname}</span>
-                  <span className={styles.name}>{customerDataList[0]?.name}</span>
+                  <span className={styles.description}>{firstCustomerPrersona?.nickname}</span>
+                  <span className={styles.name}>{firstCustomerPrersona?.name}</span>
                 </div>
               </div>
               <div className={styles.listSection}>
@@ -124,19 +124,19 @@ const OverviewDetails: FunctionComponent = () => {
                   <div className={styles.list}>
                     <p>
                       <Icon variant="globe" {...iconDefaultProps} />
-                      {`Geographic Location: ${geographicLocation}`}
+                      {`Geographic Location: ${firstCustomerPrersona?.geoLocation || ''}`}
                     </p>
                     <p>
                       <Icon variant="umbrella" {...iconDefaultProps} />
-                      {`Age Range: ${ageRange}`}
+                      {`Age Range: ${firstCustomerPrersona?.ageRange || ''}`}
                     </p>
                     <p>
                       <Icon variant="userGroup" {...iconDefaultProps} />
-                      {`Family Size: ${familySize}`}
+                      {`Family Size: ${firstCustomerPrersona?.familySize || ''}`}
                     </p>
                     <p>
                       <Icon variant="piggyBank" {...iconDefaultProps} />
-                      {`Average Income: ${incomeRange}`}
+                      {`Average Income: ${firstCustomerPrersona?.incomeRange || ''}`}
                     </p>
                   </div>
                 </div>
