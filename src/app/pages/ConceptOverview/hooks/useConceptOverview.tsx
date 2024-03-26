@@ -25,19 +25,27 @@ const useConceptOverview = (conceptId: string) => {
   });
 
   const location = useLocation();
+
   const lastSegment = location.pathname.split('/').at(-1);
+
   const navigate = useNavigate();
+
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+
   useEffect(() => {
     const currentActiveTab = CONCEPT_TABS.findIndex((tab) => tab.path === lastSegment);
+
     if (typeof currentActiveTab === 'number') {
       setActiveTabIndex(currentActiveTab);
     }
   }, [lastSegment]);
+
   const navigateConceptTab = (tabIndex: number) => {
     setActiveTabIndex(tabIndex);
+
     const basePath = location.pathname.split('/').slice(0, 4).join('/');
     const newPath = `${basePath}/${CONCEPT_TABS[tabIndex].path}`;
+
     navigate(newPath);
   };
 
