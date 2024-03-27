@@ -7,7 +7,7 @@ on:
 env:
   VITE_AVXISI_BASE_URL: http://osiris-staging-1963960893.us-east-1.elb.amazonaws.com
   # TODO replace with staging fast url service
-  VITE__AUCCTUS_BASE_FAST_URL: http://fast-staging-208683520.us-east-1.elb.amazonaws.com
+  VITE__AUCCTUS_BASE_FAST_URL: http://osiris-fast-staging-2-lb-564824902.us-east-1.elb.amazonaws.com
 
 jobs:
   build_and_deploy_job:
