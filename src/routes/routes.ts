@@ -30,3 +30,12 @@ export enum AppPath {
   ResetPassword = '/reset-password',
   ResetPasswordSuccess = '/reset-password/success',
 }
+
+/* Concept Details */
+export enum ConceptPath {
+  Overview = 'overview',
+  MarketScan = 'market-scan',
+  FinancialProjection = 'financial-projection',
+  CustomerProfile = 'customer-profile',
+  KeyAssumptions = 'key-assumptions',
+}

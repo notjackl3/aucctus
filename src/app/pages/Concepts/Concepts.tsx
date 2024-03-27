@@ -23,9 +23,8 @@ import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
 import TableCheckBox from '../../components/TableCheckBox';
 import ConceptMenu from '../../components/ConceptMenu';
 import Icon from '../../components/Icon';
-import { AppPath } from '../../../routes/routes';
-import { useNavigate, useParams } from 'react-router-dom';
-import ConceptOverview from '../ConceptOverview';
+import { AppPath, ConceptPath } from '../../../routes/routes';
+import { Outlet, useNavigate } from 'react-router-dom';
 import TablePagination from '../../components/TablePagination';
 import Tabs from '../../components/Tabs';
 import Kanban from '../../components/Kanban';
@@ -63,8 +62,6 @@ const Concepts: FunctionComponent = () => {
     isActiveView,
   } = useConcepts();
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [showConceptDetailPage, setShowConceptDetailPage] = useState(false);
 
   const { data, isLoading: isFilteredConceptLoading } = useQuery({
     queryKey: ['concepts', activeFilter, category, activePage],
@@ -95,13 +92,9 @@ const Concepts: FunctionComponent = () => {
       return;
     }
     clearPopupMenuId();
-    setShowConceptDetailPage(true);
-    let newPath = AppPath.ConceptOverview.replace(':category', category || 'active');
-    navigate(newPath.replace(':id', id));
-  };
-
-  const closeConceptDetailPage = () => {
-    setShowConceptDetailPage(false);
+    let newPath = `${AppPath.ConceptOverview}${ConceptPath.Overview}`;
+    newPath = AppPath.ConceptOverview.replace(':category', category || 'active');
+    navigate(`${newPath.replace(':id', id)}overview`);
   };
 
   const tabs = isActiveView
@@ -372,8 +365,7 @@ const Concepts: FunctionComponent = () => {
           )}
         </Tabs>
       </div>
-
-      {showConceptDetailPage && id && <ConceptOverview closePage={closeConceptDetailPage} conceptId={id} />}
+      <Outlet />
     </>
   );
 };

@@ -1,17 +1,14 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/financialDetails.module.scss';
-import { IConcept, IFinancialProjection } from '../../../../../libs/api/typings';
 import Icon from '../../../../components/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import GeneralBadge from '../../../../components/GeneralBadge';
 import MarketChart from '../../../../components/MarketChart';
 import MarketLegend from '../../../../components/MarketLegend';
 import { formatLargeNumber } from '../../../../../libs/utils';
-
-export interface FinancialDetailsProps {
-  conceptData?: IConcept;
-  conceptFinancialData?: IFinancialProjection;
-}
+import { useQuery } from 'react-query';
+import { useParams } from 'react-router-dom';
+import api from '../../../../../libs/api';
 
 const iconDefaultProps = {
   height: 20,
@@ -19,7 +16,15 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({ conceptFinancialData }) => {
+const FinancialDetails: FunctionComponent = () => {
+  const { id: conceptId } = useParams();
+
+  const { data: conceptFinancialData } = useQuery({
+    queryKey: [`concept/${conceptId}/financial-projection`],
+    retry: 1,
+    queryFn: async () => await api.concept.getConceptFinancialProjection(conceptId || ''),
+  });
+
   const dataTAM = conceptFinancialData?.marketSizeMetrics?.[0];
   const dataSAM = conceptFinancialData?.marketSizeMetrics?.[1];
   const dataSOM = conceptFinancialData?.marketSizeMetrics?.[2];

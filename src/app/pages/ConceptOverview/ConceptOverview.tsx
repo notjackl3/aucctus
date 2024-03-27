@@ -1,36 +1,25 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent } from 'react';
 import styles from './styles/conceptOverview.module.scss';
 import Icon from '../../components/Icon';
 import Tabs from '../../components/Tabs';
-import OverviewDetails from './components/OverviewDetails';
 import Dropdown from '../../components/Dropdown/Dropdown';
 import useConceptOverview from './hooks/useConceptOverview';
-import CustomerProfile from './components/CustomerProfile';
-import FinancialDetails from './components/FinancialDetails';
-import MarketDetails from './components/MarketDetails/MarketDetails';
-import HypothesisDetails from './components/HypothesisDetails';
+import { Outlet, useParams } from 'react-router-dom';
 
-export interface ConceptOverviewProps {
-  closePage: () => void;
-  conceptId: string;
-}
+const ConceptOverview: FunctionComponent = () => {
+  const { id: conceptId } = useParams();
 
-const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, conceptId }) => {
   const {
     tabs,
     options,
     conceptData,
-    conceptOverviewData,
-    isConceptOverviewLoading,
-    conceptCustomerData,
-    isConceptCustomerLoading,
-    conceptMarketData,
-    isConceptMarketLoading,
-    conceptFinancialData,
     changeConceptStatus,
     initialOption,
-  } = useConceptOverview(conceptId);
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+    activeTabIndex,
+    navigateConceptTab,
+    closePage,
+  } = useConceptOverview(conceptId ? conceptId : '');
+
   return (
     <div className={`${styles.conceptOverview} ${styles.slideAnimation}`}>
       <div className={styles.headerSection}>
@@ -49,23 +38,13 @@ const ConceptOverview: FunctionComponent<ConceptOverviewProps> = ({ closePage, c
         </div>
       </div>
       <div className={styles.contentContainer}>
-        <Tabs className={styles.tabs} tabs={tabs} activeTabIndex={activeTabIndex} selectActiveTab={setActiveTabIndex}>
-          <OverviewDetails
-            conceptData={conceptData}
-            conceptCustomerData={conceptCustomerData}
-            isConceptOverviewLoading={isConceptOverviewLoading}
-            conceptOverviewData={conceptOverviewData}
-            selectActiveTab={setActiveTabIndex}
-          />
-          <MarketDetails conceptMarketData={conceptMarketData} isConceptMarketLoading={isConceptMarketLoading} />
-          <FinancialDetails conceptData={conceptData} conceptFinancialData={conceptFinancialData} />
-          <CustomerProfile
-            isConceptCustomerLoading={isConceptCustomerLoading}
-            conceptCustomerData={conceptCustomerData}
-          />
-          <HypothesisDetails conceptData={conceptData} />
-          <div>Key Assumptions</div>
-        </Tabs>
+        <Tabs
+          className={styles.tabs}
+          tabs={tabs}
+          activeTabIndex={activeTabIndex}
+          selectActiveTab={navigateConceptTab}
+        />
+        <Outlet />
       </div>
     </div>
   );
