@@ -5,23 +5,28 @@ import Tabs from '../../../../components/Tabs';
 import CustomerDetails from '../CustomerDetails';
 import { TabElement } from '../../../../components/Tabs/Tabs';
 import Loading from '../../../../components/Loading';
+import { useQuery } from 'react-query';
+import api from '../../../../../libs/api';
+import { useParams } from 'react-router-dom';
 
-export interface CustomerProfileProps {
-  conceptCustomerData: ICustomerProfile[];
-  isConceptCustomerLoading: boolean;
-}
+const CustomerProfile: FunctionComponent = () => {
+  const { id: conceptId } = useParams();
 
-const CustomerProfile: FunctionComponent<CustomerProfileProps> = ({
-  conceptCustomerData,
-  isConceptCustomerLoading,
-}) => {
+  const { data, isLoading } = useQuery({
+    queryKey: [`concept/${conceptId}/customer-profile`],
+    retry: 1,
+    queryFn: async () => await api.concept.getConceptCustomerProfiles(conceptId || ''),
+  });
+
+  const conceptCustomerData = data ? data.results : [];
+
   const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const customerList = conceptCustomerData || [];
+  const customerList = conceptCustomerData;
   const emptyTabs: TabElement[] = [];
 
   const customerTabs = useMemo(() => {
     return customerList.reduce((acc: TabElement[], item: ICustomerProfile, index) => {
-      acc.push({ label: item?.nickname || `Customer ${index + 1}` });
+      acc.push({ label: item.nickname || `Customer ${index + 1}` });
       return acc;
     }, emptyTabs);
   }, [customerList]);
@@ -34,7 +39,7 @@ const CustomerProfile: FunctionComponent<CustomerProfileProps> = ({
 
   return (
     <div className={styles.customerProfile}>
-      {isConceptCustomerLoading ? (
+      {isLoading ? (
         <Loading />
       ) : (
         <Tabs
