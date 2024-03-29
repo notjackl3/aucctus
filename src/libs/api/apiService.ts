@@ -10,6 +10,8 @@ import axios, {
 import 'abort-controller/polyfill';
 import analytics from '../analytics';
 import { IAuthSuccessResponse } from './typings';
+import { ExpiryTimeNotFoundError, TokenStructureError } from './customErrors';
+import Buffer from 'buffer';
 
 export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {
   return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).token;
@@ -56,6 +58,20 @@ export class ApiService {
 
   private _requestMiddleware(config: InternalAxiosRequestConfig) {
     Object.assign(config.headers || {}, this.config.headers);
+    const accessToken = this.apiInstance.accessToken;
+
+    // if (accessToken && !(config as ApiServiceRequestConfig).skipAuthRefresh) {
+    //   try {
+    //     if (this.hasTokenExpired(accessToken)) {
+    //       this.apiInstance.refreshToken();
+    //     }
+
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+
+    // }
+
     return config;
   }
 
@@ -76,41 +92,56 @@ export class ApiService {
       if (axios.isAxiosError(error)) {
         const method = error.config && error.config.method ? `[${error.config.method.toUpperCase()}]` : '';
         analytics.error(`Api Error: ${method} ${error.name}`, error);
-
-        // Skip the refresh logic if the flag is set
-        if (error.config && (error.config as ApiServiceRequestConfig).skipAuthRefresh) {
-          return Promise.reject(error);
-        }
-
-        // If the error is due to being unauthenticated
-        if (error.response && error.response.status === 401 && this.apiInstance.authRetryCount < 1) {
-          try {
-            if (error.config) {
-              // Attempt to refresh the token
-              await this.apiInstance.refreshToken();
-
-              this.apiInstance.authRetryCount++;
-
-              // Retry the original request
-              return this.api.request(error.config).then(() => {
-                this.apiInstance.authRetryCount = 0;
-              });
-            }
-          } catch (err) {
-            this.apiInstance.authRetryCount = 0;
-          }
-        }
       }
     }
 
-    // If the error is due to being unauthenticated then logout
-    const status = (error.response && error.response.status) || 0;
-    if (LOGOUT_STATUSES.includes(status)) {
-      // TODO: Add message for the user to tell them why they are being logged out
-      this.apiInstance.logout();
+    // Skip the refresh logic if the flag is set
+    if (error.config && (error.config as ApiServiceRequestConfig).skipAuthRefresh) {
+      return Promise.reject(error);
     }
 
+    const status = (error.response && error.response.status) || 0;
+
+    // If the error is due to being unauthenticated
+    // if (status === 401) {
+    //   try {
+    //     if (error.config) {
+    //       // Attempt to refresh the token
+    //       await this.apiInstance.refreshToken();
+
+    //       // Retry the original request
+    //       return this.api.request({ ...error.config, skipAuthRefresh: true } as ApiServiceRequestConfig);
+    //     }
+    //   } catch (err) { }
+    // }
+
+    // // If the error is due to being unauthenticated then logout
+    // if (LOGOUT_STATUSES.includes(status)) {
+    //   await this.apiInstance.logout();
+    // }
+
     return Promise.reject(error);
+  }
+
+  hasTokenExpired(token: string): boolean {
+    const parts = token.split('.');
+    if (parts.length !== 3) {
+      throw new TokenStructureError('Token structure incorrect');
+    }
+
+    const payload = parts[1];
+    const decodedPayload = Buffer.from(payload, 'base64').toString();
+    const payloadData = JSON.parse(decodedPayload);
+
+    const exp = payloadData.exp;
+    if (!exp) {
+      throw new ExpiryTimeNotFoundError('Expiry time not found in token.');
+    }
+
+    const expiryDate = new Date(exp * 1000);
+    const now = new Date();
+
+    return expiryDate <= now;
   }
 
   protected _handleAccessToken(): ApiServiceRequestConfig {

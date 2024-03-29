@@ -24,8 +24,6 @@ export class Api {
   private _refreshTokenAction?: () => void;
   private _logoutAction?: () => void;
 
-  authRetryCount = 0;
-
   auth: AuthApi;
   account: AccountApi;
   concept: ConceptApi;

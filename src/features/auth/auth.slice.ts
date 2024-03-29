@@ -105,7 +105,8 @@ export const confirmEmail = createAsyncThunk('auth/confirmEmail', async (token: 
 export const logout = createAsyncThunk('auth/logout', async (_, thunkApi) => {
   analytics.debug('Logout');
   try {
-    return await api.auth.logout();
+    const { auth } = thunkApi.getState() as RootState;
+    return await api.auth.logout(auth.refreshToken);
   } catch (e) {
     analytics.debug(e);
     thunkApi.rejectWithValue(e);
@@ -116,6 +117,13 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    simpleLogout(state: AuthState) {
+      state.user = undefined;
+      state.account = undefined;
+      state.accessToken = undefined;
+      state.refreshToken = undefined;
+      api.accessToken = undefined;
+    },
     setAuthenticated(state: AuthState, action: PayloadAction<IAuthSuccessResponse>) {
       const { user, token } = action.payload;
       state.user = user;
@@ -160,8 +168,6 @@ export const authSlice = createSlice({
         state.accessToken = token;
         state.refreshToken = refresh;
         api.accessToken = token;
-
-        console.log('state', refresh);
       })
       .addMatcher(isAnyOf(isApiErrorResult), (state, action) => {
         const error = action.payload;
@@ -186,12 +192,13 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setAuthenticated, setUnauthenticated, setAccount } = authSlice.actions;
+export const { setAuthenticated, setUnauthenticated, setAccount, simpleLogout } = authSlice.actions;
 
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectAccount = (state: RootState) => state.auth.account;
 export const selectError = (state: RootState) => state.auth.error;
 export const selectAccessToken = (state: RootState) => state.auth.accessToken;
+export const hasAccessToken = (state: RootState) => !!state.auth.accessToken;
 export const selectAuthStatus = (state: RootState) => state.auth.status;
 
 export default authSlice.reducer;

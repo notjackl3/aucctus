@@ -46,8 +46,12 @@ export class AuthApi extends ApiService {
     );
   }
 
-  logout() {
-    return this.post<IMessageResponse>(endpoints.logout, null, { ...this._handleAccessToken(), skipAuthRefresh: true });
+  logout(token?: string) {
+    return this.post<IMessageResponse>(
+      endpoints.logout,
+      { token },
+      { ...this._handleAccessToken(), skipAuthRefresh: true }
+    );
   }
 
   /**
