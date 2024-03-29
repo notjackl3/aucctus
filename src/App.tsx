@@ -10,7 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { store } from './app/store';
-import { logout, refreshAuth } from './features/auth/auth.slice';
+import { simpleLogout, refreshAuth } from './features/auth/auth.slice';
 import api from './libs/api';
 
 const queryClient = new QueryClient();
@@ -19,7 +19,7 @@ function App() {
   useEffect(() => {
     // Set refresh token and logout actions
     api.setRefreshTokenAction(() => store.dispatch(refreshAuth(true)));
-    api.setLogoutAction(() => store.dispatch(logout()));
+    api.setLogoutAction(() => store.dispatch(simpleLogout()));
   }, []);
 
   return (
