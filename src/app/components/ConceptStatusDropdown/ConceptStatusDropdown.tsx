@@ -4,6 +4,7 @@ import styles from './styles/conceptStatusDropdown.module.scss';
 import { ConceptStatus as ConceptStatusType } from '../../../libs/api/typings';
 import { snakeCaseToTitleCase } from '../../../libs/utils';
 import Icon from '../Icon';
+import { getConceptStatusColor } from '../../../libs/concepts';
 
 export interface ConceptStatusDropdownProps {
   status: ConceptStatusType;
@@ -16,18 +17,7 @@ const defaultIconProps = {
   height: 24,
 };
 const ConceptStatusDropdown: FunctionComponent<ConceptStatusDropdownProps> = ({ status, isActive }) => {
-  const statusColorObj = {
-    new: 'blue',
-    ideating: 'blue',
-    in_review: 'blue',
-    commercialized: 'green',
-    prototyping: 'purple',
-    proof_of_concept: 'purple',
-    minimum_viable_product: 'pink',
-    archived: 'red',
-  };
-
-  const color = statusColorObj[status];
+  const color = getConceptStatusColor(status);
 
   return (
     <div className={`${styles.conceptStatusDropdown} ${styles[`${color}Background`]}`}>
