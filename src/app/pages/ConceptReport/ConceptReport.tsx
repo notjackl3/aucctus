@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useMemo, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './styles/conceptOverview.module.scss';
 import Icon from '../../components/Icon';
 import TabView from '../../components/TabView';
@@ -12,48 +12,11 @@ import { useQuery } from 'react-query';
 import { AppPath } from '../../../routes/routes';
 import useConceptMenu from '../../components/ConceptMenu/hooks/useConceptMenu';
 
-const OPTIONS = [
-  {
-    label: <ConceptStatusDropdown status={ConceptStatus.new} />,
-    displayLabel: <ConceptStatusDropdown status={ConceptStatus.new} isActive />,
-    value: ConceptStatus.new,
-  },
-  {
-    label: <ConceptStatusDropdown status={ConceptStatus.ideating} />,
-    displayLabel: <ConceptStatusDropdown status={ConceptStatus.ideating} isActive />,
-    value: ConceptStatus.ideating,
-  },
-  {
-    label: <ConceptStatusDropdown status={ConceptStatus.inReview} />,
-    displayLabel: <ConceptStatusDropdown status={ConceptStatus.inReview} isActive />,
-    value: ConceptStatus.inReview,
-  },
-  {
-    label: <ConceptStatusDropdown status={ConceptStatus.prototyping} />,
-    displayLabel: <ConceptStatusDropdown status={ConceptStatus.prototyping} isActive />,
-    value: ConceptStatus.prototyping,
-  },
-  {
-    label: <ConceptStatusDropdown status={ConceptStatus.proofOfConcept} />,
-    displayLabel: <ConceptStatusDropdown status={ConceptStatus.proofOfConcept} isActive />,
-    value: ConceptStatus.proofOfConcept,
-  },
-  {
-    label: <ConceptStatusDropdown status={ConceptStatus.minimumViableProduct} />,
-    displayLabel: <ConceptStatusDropdown status={ConceptStatus.minimumViableProduct} isActive />,
-    value: ConceptStatus.minimumViableProduct,
-  },
-  {
-    label: <ConceptStatusDropdown status={ConceptStatus.commercialized} />,
-    displayLabel: <ConceptStatusDropdown status={ConceptStatus.commercialized} isActive />,
-    value: ConceptStatus.commercialized,
-  },
-  {
-    label: <ConceptStatusDropdown status={ConceptStatus.archived} />,
-    displayLabel: <ConceptStatusDropdown status={ConceptStatus.archived} isActive />,
-    value: ConceptStatus.archived,
-  },
-];
+const DROPDOWN_OPTIONS = Object.values(ConceptStatus).map((value) => ({
+  label: <ConceptStatusDropdown status={value} />,
+  displayLabel: <ConceptStatusDropdown status={value} isActive />,
+  value,
+}));
 
 export const CONCEPT_TABS = [
   { label: 'Overview', value: AppPath.ConceptOverview },
@@ -68,11 +31,6 @@ const ConceptReport: FunctionComponent = () => {
   const navigate = useNavigate();
   const { updateConceptStatus } = useConceptMenu({ conceptId: conceptId });
   const [status, setStatus] = useState<ConceptStatus>(ConceptStatus.new);
-
-  const conceptStatusOptions = useMemo(() => {
-    return OPTIONS.find((option) => option.value === status);
-  }, [status]);
-
   /**
    * Each tab has been set to return the associated route from AppPath
    */
@@ -85,8 +43,12 @@ const ConceptReport: FunctionComponent = () => {
   );
 
   const changeConceptStatus = useCallback(
-    (option: Option) => {
-      updateConceptStatus(option?.value as ConceptStatus);
+    (value: string) => {
+      updateConceptStatus(value as ConceptStatus, {
+        onSuccess: (resp) => {
+          setStatus(resp.status);
+        },
+      });
     },
     [updateConceptStatus]
   );
@@ -94,10 +56,11 @@ const ConceptReport: FunctionComponent = () => {
   const { data: concept, isLoading } = useQuery({
     queryKey: [`concept/${conceptId}`],
     retry: 1,
-    queryFn: async () => await api.concept.getConcept(conceptId || ''),
-    onSuccess: (response) => {
-      setStatus(response.status);
-    },
+    queryFn: async () =>
+      await api.concept.getConcept(conceptId || '').then((res) => {
+        setStatus(res.status as ConceptStatus);
+        return res;
+      }),
   });
 
   return (
@@ -106,7 +69,7 @@ const ConceptReport: FunctionComponent = () => {
         <div className={styles.header}>
           <h1>{concept?.title}</h1>
           <div className={styles.statusSelect}>
-            <Dropdown options={OPTIONS} onSelect={changeConceptStatus} initialOption={conceptStatusOptions} />
+            <Dropdown options={DROPDOWN_OPTIONS} onSelect={changeConceptStatus} selected={status} />
           </div>
         </div>
         <div className={styles.actions}>
