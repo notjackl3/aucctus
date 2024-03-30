@@ -1,9 +1,8 @@
-import { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
+import { FunctionComponent, useCallback, useState } from 'react';
 import styles from './styles/conceptOverview.module.scss';
 import Icon from '../../components/Icon';
 import TabView from '../../components/TabView';
 import Dropdown from '../../components/Dropdown/Dropdown';
-import { Option } from '../../components/Dropdown/Dropdown';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { ConceptStatus } from '../../../libs/api/typings';
 import ConceptStatusDropdown from '../../components/ConceptStatusDropdown';
@@ -53,7 +52,7 @@ const ConceptReport: FunctionComponent = () => {
     [updateConceptStatus]
   );
 
-  const { data: concept, isLoading } = useQuery({
+  const { data: concept } = useQuery({
     queryKey: [`concept/${conceptId}`],
     retry: 1,
     queryFn: async () =>
