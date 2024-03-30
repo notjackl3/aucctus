@@ -73,14 +73,23 @@ const ConceptReport: FunctionComponent = () => {
     return OPTIONS.find((option) => option.value === status);
   }, [status]);
 
-  const onTabSelect = useCallback((value: string) => {
-    const route = value.replace(':id', conceptId);
-    navigate(route);
-  }, []);
+  /**
+   * Each tab has been set to return the associated route from AppPath
+   */
+  const onTabSelect = useCallback(
+    (value: string) => {
+      const route = value.replace(':id', conceptId);
+      navigate(route);
+    },
+    [conceptId, navigate]
+  );
 
-  const changeConceptStatus = useCallback((option: Option) => {
-    updateConceptStatus(option?.value as ConceptStatus);
-  }, []);
+  const changeConceptStatus = useCallback(
+    (option: Option) => {
+      updateConceptStatus(option?.value as ConceptStatus);
+    },
+    [updateConceptStatus]
+  );
 
   const { data: concept, isLoading } = useQuery({
     queryKey: [`concept/${conceptId}`],

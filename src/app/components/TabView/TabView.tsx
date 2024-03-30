@@ -2,19 +2,19 @@ import { FunctionComponent, ReactNode, useState } from 'react';
 import styles from './styles/tabs.module.scss';
 import Tab from './Tab';
 
-export interface TabElement<T = string> {
+export interface TabElement {
   label: string | ReactNode;
-  value: T;
+  value: string;
 }
 
-export interface TabsProps<T = string> {
+export interface TabsProps {
   tabs: TabElement[];
   className?: string;
   tabClassName?: string;
   variant?: 'default' | 'button';
-  onTabSelect: (value: T) => void;
+  onTabSelect: (value: string) => void;
   children?: ReactNode;
-  defaultTab: T;
+  defaultTab: string;
 }
 
 const TabView: FunctionComponent<TabsProps> = ({

@@ -1,16 +1,18 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import styles from './styles/customerProfile.module.scss';
 import { ICustomerProfile } from '../../../../../libs/api/typings';
 import TabView from '../../../../components/TabView';
 import CustomerDetails from '../CustomerDetails';
-import { TabElement } from '../../../../components/TabView/TabView';
 import Loading from '../../../../components/Loading';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
+import { TabElement } from '../../../../components/TabView/TabView';
 
 const CustomerProfile: FunctionComponent = () => {
   const { id: conceptId } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const selectedPersona = searchParams.get('persona');
 
   const { data, isLoading } = useQuery({
     queryKey: [`concept/${conceptId}/customer-profile`],
@@ -18,26 +20,27 @@ const CustomerProfile: FunctionComponent = () => {
     queryFn: async () => await api.concept.getConceptCustomerProfiles(conceptId || ''),
   });
 
-  const conceptCustomerData = data ? data.results : [];
+  const customerPersonas = useMemo(() => (data ? data.results : []), [data]);
+  const firstPersona = customerPersonas.length > 0 ? customerPersonas[0] : undefined;
 
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
-  const customerList = conceptCustomerData;
-  const emptyTabs: TabElement[] = [];
+  const customerTabs = useMemo(() => {
+    return customerPersonas.map<TabElement>((item: ICustomerProfile) => ({
+      label: item.nickname,
+      value: item.nickname,
+    }));
+  }, [customerPersonas]);
 
-  const getCustomerTabs = (customerList: ICustomerProfile[]) => {
-    return customerList.reduce((acc: TabElement[], item: ICustomerProfile, index) => {
-      acc.push({ label: item.nickname || `Customer ${index + 1}` });
-      return acc;
-    }, emptyTabs);
-  };
+  const onTabSelect = useCallback((value: string) => {
+    searchParams.set('persona', value);
+    setSearchParams(searchParams);
+  }, []);
 
-  const customerTabs = getCustomerTabs(customerList);
-
-  const renderCustomerProfiles = (customerList: ICustomerProfile[]) => {
-    return customerList?.map((customer) => (
-      <CustomerDetails key={`customer-profile-${customer.uuid}`} customerData={customer} />
-    ));
-  };
+  useEffect(() => {
+    if (!selectedPersona && firstPersona) {
+      searchParams.set('persona', firstPersona.nickname);
+      setSearchParams(searchParams);
+    }
+  }, [selectedPersona, firstPersona, searchParams, setSearchParams]);
 
   return (
     <div className={styles.customerProfile}>
@@ -47,11 +50,19 @@ const CustomerProfile: FunctionComponent = () => {
         <TabView
           tabs={customerTabs}
           className={styles.tabs}
-          activeTabIndex={activeTabIndex}
-          selectActiveTab={setActiveTabIndex}
-          isButtonStyle
+          variant="button"
+          onTabSelect={onTabSelect}
+          defaultTab={firstPersona?.nickname || ''}
         >
-          <>{renderCustomerProfiles(customerList)}</>
+          <>
+            {customerPersonas.map((customer) => (
+              <>
+                {customer.nickname === selectedPersona ? (
+                  <CustomerDetails key={`customer-profile-${customer.uuid}`} customerData={customer} />
+                ) : null}
+              </>
+            ))}
+          </>
         </TabView>
       )}
     </div>

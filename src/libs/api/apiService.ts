@@ -11,7 +11,6 @@ import 'abort-controller/polyfill';
 import analytics from '../analytics';
 import { IAuthSuccessResponse } from './typings';
 import { ExpiryTimeNotFoundError, TokenStructureError } from './customErrors';
-import Buffer from 'buffer';
 
 export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {
   return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).token;
