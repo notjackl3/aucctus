@@ -139,7 +139,7 @@ const HypothesisDetails: FunctionComponent<HypothesisDetailsProps> = () => {
           )}
         </table>
         <div className={styles.footer}>
-          <TablePagination totalPages={1} activePage={activePage} setActivePage={setActivePage} />
+          <TablePagination totalPages={1} page={activePage} setPage={setActivePage} />
         </div>
       </div>
     </div>
