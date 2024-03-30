@@ -8,63 +8,87 @@
   border-radius: 1rem;
   background: $purple-50;
   gap: 0.5rem;
+}
 
-  .blueBullet {
-    color: $gray-blue-500;
-  }
-  .redBullet {
-    color: $red-500;
-  }
-  .pinkBullet {
-    color: $pink-500;
-  }
-  .greenBullet {
-    color: $green-500;
-  }
-  .purpleBullet {
-    color: $purple-500;
-  }
+.conceptStatusDropdown {
+  display: inline-flex;
+  padding: 2px 8px 2px 6px;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: none;
+  background: $purple-50;
+  gap: 0.5rem;
+}
 
-  .status {
-    text-align: center;
-    white-space: nowrap;
-    font-family: $dm-sans;
-    font-size: 0.875rem;
-    font-style: normal;
-    font-weight: 500;
-    line-height: 1.5rem;
-  }
-  .blueStatus {
-    color: $gray-blue-700;
-  }
-  .greenStatus {
-    color: $green-700;
-  }
-
-  .pinkStatus {
-    color: $pink-700;
-  }
-
-  .redStatus {
-    color: $red-700;
-  }
-  .purpleStatus {
-    color: $purple-700;
-  }
+.status {
+  text-align: center;
+  white-space: nowrap;
+  font-family: $dm-sans;
+  font-size: 0.875rem;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 1.5rem;
 }
 
 .blueBackground {
   background: $gray-blue-50;
+
+  span {
+    color: $gray-blue-500;
+  }
+
+  svg,
+  path {
+    stroke: $gray-blue-500;
+  }
 }
 .redBackground {
   background: $red-50;
+
+  span {
+    color: $red-500;
+  }
+
+  svg,
+  path {
+    stroke: $red-500;
+  }
 }
 .pinkBackground {
   background: $pink-50;
+
+  span {
+    color: $pink-500;
+  }
+
+  svg,
+  path {
+    stroke: $pink-500;
+  }
 }
 .greenBackground {
   background: $green-50;
+
+  span {
+    color: $green-500;
+  }
+
+  svg,
+  path {
+    stroke: $green-500;
+  }
 }
 .purpleBackground {
   background: $purple-50;
+
+  span {
+    color: $purple-500;
+  }
+
+  svg,
+  path {
+    stroke: $purple-500;
+  }
 }

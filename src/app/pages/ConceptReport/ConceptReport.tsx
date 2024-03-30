@@ -5,15 +5,15 @@ import TabView from '../../components/TabView';
 import Dropdown from '../../components/Dropdown/Dropdown';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { ConceptStatus } from '../../../libs/api/typings';
-import ConceptStatusDropdown from '../../components/ConceptStatusDropdown';
 import api from '../../../libs/api';
 import { useQuery } from 'react-query';
 import { AppPath } from '../../../routes/routes';
 import useConceptMenu from '../../components/ConceptMenu/hooks/useConceptMenu';
+import ConceptStatusBubble from '../../components/ConceptStatusBubble/ConceptStatusBubble';
 
 const DROPDOWN_OPTIONS = Object.values(ConceptStatus).map((value) => ({
-  label: <ConceptStatusDropdown status={value} />,
-  displayLabel: <ConceptStatusDropdown status={value} isActive />,
+  label: <ConceptStatusBubble status={value} variant="dropdown" />,
+  displayLabel: <ConceptStatusBubble status={value} variant="dropdown" isActive />,
   value,
 }));
 

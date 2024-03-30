@@ -10,6 +10,7 @@ import Loading from '../../../../components/Loading';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { AppPath } from '../../../../../routes/routes';
 
 export interface OverviewDetailsProps {}
 
@@ -20,7 +21,7 @@ const iconDefaultProps = {
 };
 
 const OverviewDetails: FunctionComponent = () => {
-  const { id: conceptId } = useParams();
+  const { id: conceptId = '' } = useParams();
   const location = useLocation();
   const basePath = location.pathname.split('/').slice(0, 4).join('/');
 
@@ -45,7 +46,7 @@ const OverviewDetails: FunctionComponent = () => {
     queryFn: async () => await api.concept.getConceptCustomerProfiles(conceptId || ''),
   });
 
-  const firstCustomerPrersona = useMemo(() => {
+  const firstCustomerPersona = useMemo(() => {
     if (!conceptCustomerData || (conceptCustomerData && !conceptCustomerData.results)) {
       return undefined;
     }
@@ -100,7 +101,11 @@ const OverviewDetails: FunctionComponent = () => {
             <button
               className={styles.cardAction}
               onClick={() => {
-                navigate(`${basePath}/customer-profile`);
+                navigate(
+                  `${AppPath.ConceptCustomerPersona.replace(':id', conceptId)}?persona=${
+                    firstCustomerPersona?.nickname
+                  }`
+                );
               }}
               aria-label="View Customer Profiles"
             >
@@ -114,8 +119,8 @@ const OverviewDetails: FunctionComponent = () => {
               <div className={styles.avatarSection}>
                 <img className={styles.avatar} alt="avatar" src={defaultAvatar} />
                 <div className={styles.avatarDetails} onClick={() => {}}>
-                  <span className={styles.description}>{firstCustomerPrersona?.nickname}</span>
-                  <span className={styles.name}>{firstCustomerPrersona?.name}</span>
+                  <span className={styles.description}>{firstCustomerPersona?.nickname}</span>
+                  <span className={styles.name}>{firstCustomerPersona?.name}</span>
                 </div>
               </div>
               <div className={styles.listSection}>
@@ -124,19 +129,19 @@ const OverviewDetails: FunctionComponent = () => {
                   <div className={styles.list}>
                     <p>
                       <Icon variant="globe" {...iconDefaultProps} />
-                      {`Geographic Location: ${firstCustomerPrersona?.geoLocation || ''}`}
+                      {`Geographic Location: ${firstCustomerPersona?.geoLocation || ''}`}
                     </p>
                     <p>
                       <Icon variant="umbrella" {...iconDefaultProps} />
-                      {`Age Range: ${firstCustomerPrersona?.ageRange || ''}`}
+                      {`Age Range: ${firstCustomerPersona?.ageRange || ''}`}
                     </p>
                     <p>
                       <Icon variant="userGroup" {...iconDefaultProps} />
-                      {`Family Size: ${firstCustomerPrersona?.familySize || ''}`}
+                      {`Family Size: ${firstCustomerPersona?.familySize || ''}`}
                     </p>
                     <p>
                       <Icon variant="piggyBank" {...iconDefaultProps} />
-                      {`Average Income: ${firstCustomerPrersona?.incomeRange || ''}`}
+                      {`Average Income: ${firstCustomerPersona?.incomeRange || ''}`}
                     </p>
                   </div>
                 </div>
