@@ -5,7 +5,7 @@ import { AccountApi } from './account';
 import analytics from '../analytics';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
-import { IAuthSuccessResponse, IRefreshTokenSuccessResponse } from './typings';
+import { IRefreshTokenSuccessResponse } from './typings';
 
 export interface IApiConfig {
   /* End Points */

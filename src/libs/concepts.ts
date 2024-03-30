@@ -1,9 +1,3 @@
-/**
- * Returns the color associated with a given concept status.
- *
- * @param status - The concept status.
- * @returns The color associated with the concept status.
- */
 import { ConceptStatus } from './api/typings';
 
 type StatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
