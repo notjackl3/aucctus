@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import api from '../../../libs/api';
 import Loading from '../../components/Loading';
 
-import Icon from '../../components/Icon';
+import Icon, { IconVariant } from '../../components/Icon';
 import { AppPath } from '../../../routes/routes';
 import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
@@ -43,60 +43,71 @@ export const KANBAN_COLUMNS_MAP = CONCEPT_STATUS_LIST.reduce<ConceptColumns>(
   {} as ConceptColumns
 );
 
-const ACTIVE_VIEW_TABS = [
-  {
-    label: (
-      <div className={styles.tabLabel}>
-        <Icon variant="list" height={20} width={20} />
-        List
-      </div>
-    ),
-    value: 'list',
-  },
-  {
-    label: (
-      <div className={styles.tabLabel}>
-        <Icon variant="board" height={20} width={20} />
-        Board
-      </div>
-    ),
-    value: 'board',
-  },
-];
+const ACTIVE_VIEW_TABS = (['list', 'board'] as (keyof typeof IconVariant)[]).map((value) => ({
+  label: (
+    <div className={styles.tabLabel}>
+      <Icon variant={value} height={20} width={20} />
+      {value.charAt(0).toUpperCase() + value.slice(1)}
+    </div>
+  ),
+  value,
+}));
 
 const Concepts: FunctionComponent = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const category = searchParams.get('category') as ConceptCategory;
+  const category = (searchParams.get('category') as ConceptCategory) || ConceptCategory.active;
   const status = (searchParams.get('status') as ConceptStatus) || null;
   const page = searchParams.get('page') || '1';
 
   const kanbanView = searchParams.get('kanban') === 'true' && category === 'active';
 
-  const setStatusFilter = useCallback((newStatus?: ConceptStatus) => {
-    if (!newStatus) {
-      searchParams.delete('status');
-    } else {
-      searchParams.set('status', newStatus);
-    }
-    setSearchParams(searchParams);
-  }, []);
+  /**
+   * Sets the status filter for concepts.
+   * @param newStatus - The new status to filter by. If not provided, the status filter will be removed.
+   */
+  const setStatusFilter = useCallback(
+    (newStatus?: ConceptStatus) => {
+      if (!newStatus) {
+        searchParams.delete('status');
+      } else {
+        searchParams.set('status', newStatus);
+      }
+      setSearchParams(searchParams);
+    },
+    [searchParams, setSearchParams]
+  );
 
-  const setPage = useCallback((newPage: number) => {
-    searchParams.set('page', newPage.toString());
-    setSearchParams(searchParams);
-  }, []);
+  /**
+   * Sets the page number in the search parameters.
+   * @param newPage - The new page number to set.
+   */
+  const setPage = useCallback(
+    (newPage: number) => {
+      searchParams.set('page', newPage.toString());
+      setSearchParams(searchParams);
+    },
+    [searchParams, setSearchParams]
+  );
 
-  const onTabSelect = useCallback((tab: string) => {
-    if (tab !== 'board') {
-      searchParams.delete('kanban');
-    } else {
-      searchParams.set('kanban', 'true');
-      searchParams.delete('status');
-    }
-    setSearchParams(searchParams);
-  }, []);
+  /**
+   * Handles the selection of a tab.
+   * @param value - The value of the selected tab.
+   */
+  const onTabSelect = useCallback(
+    (value: string) => {
+      if (value !== 'board') {
+        searchParams.delete('kanban');
+      } else {
+        searchParams.set('kanban', 'true');
+        searchParams.set('category', ConceptCategory.active);
+        searchParams.delete('status');
+      }
+      setSearchParams(searchParams);
+    },
+    [searchParams, setSearchParams]
+  );
 
   useEffect(() => {
     if (!page) {
