@@ -50,7 +50,8 @@ a:active {
   outline: 0;
 }
 
-button.btn {
+button.btn,
+a.btn {
   display: flex;
   gap: var(--gap-base);
   padding: 0.625rem 1.125rem;
