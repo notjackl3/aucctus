@@ -77,7 +77,7 @@ export class Api {
   }
 
   // Method to update the refresh token action dynamically
-  setRefreshTokenAction(action: () => void) {
+  setRefreshTokenAction(action: () => Promise<void>) {
     this._refreshTokenAction = action;
   }
 
@@ -87,15 +87,15 @@ export class Api {
   }
 
   // Expose these actions through methods to be used in ApiService
-  refreshToken() {
+  async refreshToken() {
     if (this._refreshTokenAction) {
-      this._refreshTokenAction();
+      await this._refreshTokenAction();
     } else {
       throw new Error('Refresh token action has not been set.');
     }
   }
 
-  logout() {
+  async logout() {
     if (this._logoutAction) {
       this._logoutAction();
     } else {

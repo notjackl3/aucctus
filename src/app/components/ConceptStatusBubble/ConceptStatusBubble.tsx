@@ -8,7 +8,7 @@ export interface IConceptStatusProps {
   status: ConceptStatusType;
 }
 
-const ConceptStatus: FunctionComponent<IConceptStatusProps> = ({ status }) => {
+const ConceptStatusBubble: FunctionComponent<IConceptStatusProps> = ({ status }) => {
   const statusColorObj = {
     new: 'blue',
     ideating: 'blue',
@@ -30,4 +30,4 @@ const ConceptStatus: FunctionComponent<IConceptStatusProps> = ({ status }) => {
   );
 };
 
-export default ConceptStatus;
+export default ConceptStatusBubble;

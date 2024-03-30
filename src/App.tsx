@@ -10,7 +10,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useEffect } from 'react';
 import { store } from './app/store';
-import { simpleLogout, refreshAuth } from './features/auth/auth.slice';
+import { simpleLogout, refreshAuth, isAPIRefreshSuccessResponse } from './features/auth/auth.slice';
 import api from './libs/api';
 
 const queryClient = new QueryClient();
@@ -18,7 +18,21 @@ const queryClient = new QueryClient();
 function App() {
   useEffect(() => {
     // Set refresh token and logout actions
-    api.setRefreshTokenAction(() => store.dispatch(refreshAuth(true)));
+    api.setRefreshTokenAction(() => {
+      return new Promise((resolve, reject) => {
+        store
+          .dispatch(refreshAuth(true))
+          .then((result) => {
+            if (isAPIRefreshSuccessResponse(result)) {
+              resolve(result.payload);
+            }
+            reject(result.payload);
+          })
+          .catch((error) => {
+            reject(error);
+          });
+      });
+    });
     api.setLogoutAction(() => store.dispatch(simpleLogout()));
   }, []);
 
@@ -35,15 +49,14 @@ function App() {
               {/* Concepts */}
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
               <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
-              <Route path={AppPath.ConceptCategory} element={<Page.Concepts />}>
-                {/* Concept Details */}
-                <Route path={AppPath.ConceptOverview} element={<Page.ConceptPages.ConceptOverview />}>
-                  <Route path={ConceptPath.Overview} element={<Page.ConceptPages.OverviewDetails />} />
-                  <Route path={ConceptPath.MarketScan} element={<Page.ConceptPages.MarketDetails />} />
-                  <Route path={ConceptPath.FinancialProjection} element={<Page.ConceptPages.FinancialDetails />} />
-                  <Route path={ConceptPath.CustomerProfile} element={<Page.ConceptPages.CustomerProfile />} />
-                  <Route path={ConceptPath.KeyAssumptions} element={<Page.ConceptPages.HypothesisDetails />} />
-                </Route>
+              <Route path={AppPath.ConceptCategory} element={<Page.Concepts />} />
+
+              <Route path={AppPath.ConceptOverview} element={<Page.ConceptPages.ConceptOverview />}>
+                <Route index element={<Page.ConceptPages.OverviewDetails />} />
+                <Route path={ConceptPath.MarketScan} element={<Page.ConceptPages.MarketDetails />} />
+                <Route path={ConceptPath.FinancialProjection} element={<Page.ConceptPages.FinancialDetails />} />
+                <Route path={ConceptPath.CustomerProfile} element={<Page.ConceptPages.CustomerProfile />} />
+                <Route path={ConceptPath.KeyAssumptions} element={<Page.ConceptPages.HypothesisDetails />} />
               </Route>
             </Route>
           </Route>
