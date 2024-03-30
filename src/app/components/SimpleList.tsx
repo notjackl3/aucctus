@@ -14,7 +14,7 @@ interface SimpleListProps {
   title: string;
   subtitle?: string;
   items: string[];
-  icon: keyof typeof IconVariant;
+  icon: IconVariant;
   maxLength?: number;
   minLength?: number;
   isLoading?: boolean;

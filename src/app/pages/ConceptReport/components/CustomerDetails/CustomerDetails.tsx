@@ -1,8 +1,8 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import styles from './styles/customerDetails.module.scss';
 import defaultAvatar from '../../../../assets/icons/avatar.svg';
 import { ICustomerProfile } from '../../../../../libs/api/typings';
-import Icon from '../../../../components/Icon';
+import Icon, { IconVariant } from '../../../../components/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 
 export interface CustomerDetailsProps {
@@ -16,27 +16,25 @@ const iconDefaultProps = {
 };
 
 const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ customerData }) => {
-  const renderJobs = (jobList: string[] = []) => {
-    return jobList.map((job, index) => (
-      <p key={`jobs-${index}`} className={styles.text}>
-        {job}
-      </p>
-    ));
-  };
-  const renderPains = (painsList: string[] = []) => {
-    return painsList.map((pain, index) => (
-      <p key={`pains-${index}`} className={styles.text}>
-        {pain}
-      </p>
-    ));
-  };
-  const renderQuotes = (quotesList: string[] = []) => {
-    return quotesList.map((quote, index) => (
-      <p key={`pains-${index}`} className={styles.text}>
-        {quote}
-      </p>
-    ));
-  };
+  const listItems = useMemo(() => {
+    return [
+      {
+        title: 'Jobs to be Dones',
+        icon: 'clipboard' as IconVariant,
+        data: customerData?.jobsToBeDone || [],
+      },
+      {
+        title: 'Pains',
+        icon: 'userGroup' as IconVariant,
+        data: customerData?.pains || [],
+      },
+      {
+        title: 'Quotes',
+        icon: 'message' as IconVariant,
+        data: customerData?.quotes || [],
+      },
+    ];
+  }, [customerData]);
 
   return (
     <div className={styles.customerDetails}>
@@ -84,15 +82,19 @@ const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ customerData
       </div>
 
       <div className={styles.cardContainer}>
-        <ConceptDetailCard title="Jobs to be Dones" icon="clipboard" isHideFooter>
-          <div className={styles.cardContent}>{renderJobs(customerData?.jobsToBeDone)}</div>
-        </ConceptDetailCard>
-        <ConceptDetailCard title="Pains" icon="userGroup" isHideFooter>
-          <div className={styles.cardContent}>{renderPains(customerData?.pains)}</div>
-        </ConceptDetailCard>
-        <ConceptDetailCard title="Quotes" icon="message" isHideFooter>
-          <div className={styles.cardContent}>{renderQuotes(customerData?.quotes)}</div>
-        </ConceptDetailCard>
+        {listItems.map((item, index) => {
+          return (
+            <ConceptDetailCard title={item.title} key={`${item.title}-${index}`} icon={item.icon} isHideFooter>
+              <div className={styles.cardContent}>
+                {item.data.map((value, i) => (
+                  <p key={`${item.title}-${item.icon}-${i}`} className={styles.text}>
+                    {value}
+                  </p>
+                ))}
+              </div>
+            </ConceptDetailCard>
+          );
+        })}
       </div>
     </div>
   );

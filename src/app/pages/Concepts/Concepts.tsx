@@ -43,7 +43,7 @@ export const KANBAN_COLUMNS_MAP = CONCEPT_STATUS_LIST.reduce<ConceptColumns>(
   {} as ConceptColumns
 );
 
-const ACTIVE_VIEW_TABS = (['list', 'board'] as (keyof typeof IconVariant)[]).map((value) => ({
+const ACTIVE_VIEW_TABS = (['list', 'board'] as IconVariant[]).map((value) => ({
   label: (
     <div className={styles.tabLabel}>
       <Icon variant={value} height={20} width={20} />

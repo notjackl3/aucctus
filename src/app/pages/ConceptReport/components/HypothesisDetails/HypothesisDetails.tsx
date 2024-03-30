@@ -26,6 +26,7 @@ export interface HypothesisDetailsProps {
 const HypothesisDetails: FunctionComponent<HypothesisDetailsProps> = () => {
   const [activePage, setActivePage] = useState(1);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
   // TODO remove placeholder data and fetch assumption data
   const placehodlerAssumptionType = AssumptionType.feasibility;
   const { data, isLoading: isAssumptionsLoading } = useQuery({
