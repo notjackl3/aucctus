@@ -2,7 +2,7 @@ import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import styles from './styles/customerProfile.module.scss';
 import { ICustomerProfile } from '../../../../../libs/api/typings';
 import TabView from '../../../../components/TabView';
-import CustomerDetails from '../CustomerDetails';
+import CustomerDetails from './CustomerDetails';
 import Loading from '../../../../components/Loading';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';

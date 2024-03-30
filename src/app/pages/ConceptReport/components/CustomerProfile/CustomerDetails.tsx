@@ -5,7 +5,7 @@ import { ICustomerProfile } from '../../../../../libs/api/typings';
 import Icon, { IconVariant } from '../../../../components/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 
-export interface CustomerDetailsProps {
+export interface ICustomerDetailsProps {
   customerData: ICustomerProfile;
 }
 
@@ -15,22 +15,28 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-const CustomerDetails: FunctionComponent<CustomerDetailsProps> = ({ customerData }) => {
-  const listItems = useMemo(() => {
+interface ICustomerDetailLists {
+  title: string;
+  icon: IconVariant;
+  data: string[];
+}
+
+const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ customerData }) => {
+  const listItems: ICustomerDetailLists[] = useMemo(() => {
     return [
       {
-        title: 'Jobs to be Dones',
-        icon: 'clipboard' as IconVariant,
+        title: 'Jobs to be Done',
+        icon: 'clipboard',
         data: customerData?.jobsToBeDone || [],
       },
       {
         title: 'Pains',
-        icon: 'userGroup' as IconVariant,
+        icon: 'userGroup',
         data: customerData?.pains || [],
       },
       {
         title: 'Quotes',
-        icon: 'message' as IconVariant,
+        icon: 'message',
         data: customerData?.quotes || [],
       },
     ];
