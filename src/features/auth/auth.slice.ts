@@ -11,7 +11,13 @@ import { Credentials, SignupDetails } from './interfaces/user.interface';
 import api from '../../libs/api';
 import { RootState } from '../../app/store';
 import analytics from '../../libs/analytics';
-import { IAccount, IAuthSuccessResponse, IRegisterAccount, IUser } from '../../libs/api/typings';
+import {
+  IAccount,
+  IAuthSuccessResponse,
+  IRefreshTokenSuccessResponse,
+  IRegisterAccount,
+  IUser,
+} from '../../libs/api/typings';
 import { AxiosError, isAxiosError } from 'axios';
 import { IFormDetailsError } from '../../libs/api/typings/avxisi';
 
@@ -30,9 +36,18 @@ const initialState: AuthState = {
   error: '',
 };
 
-const isAPIAuthSuccessResponse = (action: PayloadAction<unknown>): action is PayloadAction<IAuthSuccessResponse> => {
+export const isAPIAuthSuccessResponse = (
+  action: PayloadAction<unknown>
+): action is PayloadAction<IAuthSuccessResponse> => {
   const payload = action.payload as IAuthSuccessResponse;
   return payload && !!payload.user && !!payload.token;
+};
+
+export const isAPIRefreshSuccessResponse = (
+  action: PayloadAction<unknown>
+): action is PayloadAction<IRefreshTokenSuccessResponse> => {
+  const payload = action.payload as IRefreshTokenSuccessResponse;
+  return payload && !!payload.access && !!payload.refresh;
 };
 
 // TODO: Fix this error type
@@ -152,6 +167,13 @@ export const authSlice = createSlice({
           state.user = { ...state.user, account: action.payload.uuid };
         }
       })
+      .addCase(refreshAuth.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.refreshToken = action.payload.refresh;
+          state.accessToken = action.payload.access;
+          api.accessToken = action.payload.access;
+        }
+      })
       .addMatcher(isFulfilled, (state) => {
         state.status = 'idle';
       })
@@ -169,6 +191,7 @@ export const authSlice = createSlice({
         state.refreshToken = refresh;
         api.accessToken = token;
       })
+
       .addMatcher(isAnyOf(isApiErrorResult), (state, action) => {
         const error = action.payload;
         if (error.response && error.response.status === 401) {

@@ -70,7 +70,7 @@ export interface ICustomerProfile {
   updatedAt: string;
 }
 
-interface IFinancialProjection {
+export interface IFinancialProjection {
   uuid: string;
   createdAt: string;
   updatedAt: string;
@@ -79,13 +79,13 @@ interface IFinancialProjection {
   marketSizeMetrics: any;
 }
 
-enum AssumptionType {
+export enum AssumptionType {
   adaptability = 'adaptability',
   desirability = 'desirability',
   feasibility = 'feasibility',
   viability = 'viability',
 }
-interface IAssumption {
+export interface IAssumption {
   uuid: string;
   name: string;
   description: string;
@@ -112,26 +112,26 @@ interface IAssumption {
   impactCategory: 'high' | 'medium' | 'low';
 }
 
-interface IEcosystem {
+export interface IEcosystem {
   uuid: string;
   name: string;
   description: string;
   source: string;
 }
 
-interface IStartupEcosystem extends IEcosystem {
+export interface IStartupEcosystem extends IEcosystem {
   ecosystemType: 'startup';
 }
 
-interface IIncumbentsEcosystem extends IEcosystem {
+export interface IIncumbentsEcosystem extends IEcosystem {
   ecosystemType: 'incumbents';
 }
 
-interface IInvestorsEcosystem extends IEcosystem {
+export interface IInvestorsEcosystem extends IEcosystem {
   ecosystemType: 'investors';
 }
 
-interface ITrendsAndDrivers {
+export interface ITrendsAndDrivers {
   uuid: string;
   name: string;
   description: string;
@@ -143,7 +143,7 @@ interface ITrendsAndDrivers {
   updatedAt: string;
 }
 
-interface IMarketScan {
+export interface IMarketScan {
   uuid: string;
   name: string;
   startups: IStartupEcosystem[];

@@ -1,5 +1,6 @@
 import {
   IAuthSuccessResponse,
+  IRefreshTokenSuccessResponse,
   ISignInRequest,
   ISignUpRequest,
   IToken,
@@ -86,8 +87,7 @@ export class AuthApi extends ApiService {
    * @returns
    */
   refreshToken(refresh?: string) {
-    console.log('refresh', refresh);
-    return this.post<IAuthSuccessResponse>(endpoints.refresh, refresh ? { refresh } : undefined, {
+    return this.post<IRefreshTokenSuccessResponse>(endpoints.refresh, refresh ? { refresh } : undefined, {
       skipAuthRefresh: true,
       withCredentials: true,
     });

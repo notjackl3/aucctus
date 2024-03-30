@@ -57,6 +57,11 @@ export interface IAuthSuccessResponse {
   refresh: string;
 }
 
+export interface IRefreshTokenSuccessResponse {
+  access: string;
+  refresh: string;
+}
+
 export interface IPasswordResetForm {
   password: string;
   confirmPassword: string;

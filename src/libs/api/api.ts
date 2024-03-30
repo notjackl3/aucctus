@@ -5,6 +5,7 @@ import { AccountApi } from './account';
 import analytics from '../analytics';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
+import { IAuthSuccessResponse, IRefreshTokenSuccessResponse } from './typings';
 
 export interface IApiConfig {
   /* End Points */
@@ -21,7 +22,7 @@ export class Api {
   private _config: IApiConfig;
 
   _accessToken?: string;
-  private _refreshTokenAction?: () => void;
+  private _refreshTokenAction?: () => Promise<IRefreshTokenSuccessResponse>;
   private _logoutAction?: () => void;
 
   auth: AuthApi;
@@ -77,7 +78,7 @@ export class Api {
   }
 
   // Method to update the refresh token action dynamically
-  setRefreshTokenAction(action: () => Promise<void>) {
+  setRefreshTokenAction(action: () => Promise<IRefreshTokenSuccessResponse>) {
     this._refreshTokenAction = action;
   }
 
@@ -89,7 +90,7 @@ export class Api {
   // Expose these actions through methods to be used in ApiService
   async refreshToken() {
     if (this._refreshTokenAction) {
-      await this._refreshTokenAction();
+      return await this._refreshTokenAction();
     } else {
       throw new Error('Refresh token action has not been set.');
     }
@@ -97,7 +98,7 @@ export class Api {
 
   async logout() {
     if (this._logoutAction) {
-      this._logoutAction();
+      return this._logoutAction();
     } else {
       console.warn('Logout action has not been set.');
     }

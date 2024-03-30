@@ -56,21 +56,20 @@ export class ApiService {
     this.api.interceptors.response.use(this._responseMiddleware.bind(this), this._responseErrorMiddleware.bind(this));
   }
 
-  private _requestMiddleware(config: InternalAxiosRequestConfig) {
-    Object.assign(config.headers || {}, this.config.headers);
+  private async _requestMiddleware(config: InternalAxiosRequestConfig) {
     const accessToken = this.apiInstance.accessToken;
 
-    // if (accessToken && !(config as ApiServiceRequestConfig).skipAuthRefresh) {
-    //   try {
-    //     if (this.hasTokenExpired(accessToken)) {
-    //       this.apiInstance.refreshToken();
-    //     }
+    if (accessToken && !(config as ApiServiceRequestConfig).skipAuthRefresh) {
+      try {
+        if (this.hasTokenExpired(accessToken)) {
+          this.apiInstance.refreshToken();
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-
-    // }
+    Object.assign(config.headers || {}, this.config.headers);
 
     return config;
   }
@@ -101,24 +100,27 @@ export class ApiService {
     }
 
     const status = (error.response && error.response.status) || 0;
+    if (status === 401) {
+      try {
+        if (error.config) {
+          // Attempt to refresh the token
+          await this.apiInstance.refreshToken();
 
-    // If the error is due to being unauthenticated
-    // if (status === 401) {
-    //   try {
-    //     if (error.config) {
-    //       // Attempt to refresh the token
-    //       await this.apiInstance.refreshToken();
+          // Retry the original request
+          return this.api.request({
+            ...error.config,
+            skipAuthRefresh: true,
+            withCredentials: true,
+          } as ApiServiceRequestConfig);
+        }
+      } catch (err) {}
+    }
 
-    //       // Retry the original request
-    //       return this.api.request({ ...error.config, skipAuthRefresh: true } as ApiServiceRequestConfig);
-    //     }
-    //   } catch (err) { }
-    // }
-
-    // // If the error is due to being unauthenticated then logout
-    // if (LOGOUT_STATUSES.includes(status)) {
-    //   await this.apiInstance.logout();
-    // }
+    // If the error is due to being unauthenticated then logout
+    if (LOGOUT_STATUSES.includes(status)) {
+      analytics.debug('Logging out due to unauthenticated status');
+      await this.apiInstance.logout();
+    }
 
     return Promise.reject(error);
   }
@@ -130,7 +132,8 @@ export class ApiService {
     }
 
     const payload = parts[1];
-    const decodedPayload = Buffer.from(payload, 'base64').toString();
+    // Use atob for base64 decoding in the browser
+    const decodedPayload = atob(payload);
     const payloadData = JSON.parse(decodedPayload);
 
     const exp = payloadData.exp;
