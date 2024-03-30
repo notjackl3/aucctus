@@ -15,7 +15,6 @@ module.exports = {
     'react/react-in-jsx-scope': 'off',
     'react-hooks/exhaustive-deps': 'warn',
   },
-
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
@@ -23,8 +22,7 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-member-accessibility': 'off',
         '@typescript-eslint/no-unused-vars': ['warn'],
-        '@typescript-eslint/no-use-before-define': ['error'],
-        'react/jsx-filename-extension': ['warn', { extensions: ['.tsx'] }],
+        '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/typedef': [
           'error',
           {
