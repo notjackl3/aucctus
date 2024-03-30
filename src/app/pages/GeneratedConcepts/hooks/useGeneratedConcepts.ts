@@ -25,7 +25,7 @@ const useGeneratedConcepts = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['concepts'] });
-      navigate(AppPath.ConceptDraft);
+      navigate(`${AppPath.ConceptCategory}?category=draft`);
     },
     onError: () => {
       toast.error('Concepts could not be saved. Please try again later.', defaultToastConfig);

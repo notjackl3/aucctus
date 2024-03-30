@@ -51,7 +51,7 @@ function App() {
               <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
               <Route path={AppPath.ConceptCategory} element={<Page.Concepts />} />
 
-              <Route path={AppPath.ConceptOverview} element={<Page.ConceptPages.ConceptOverview />}>
+              <Route path={AppPath.ConceptOverview} element={<Page.ConceptPages.ConceptReport />}>
                 <Route index element={<Page.ConceptPages.OverviewDetails />} />
                 <Route path={ConceptPath.MarketScan} element={<Page.ConceptPages.MarketDetails />} />
                 <Route path={ConceptPath.FinancialProjection} element={<Page.ConceptPages.FinancialDetails />} />

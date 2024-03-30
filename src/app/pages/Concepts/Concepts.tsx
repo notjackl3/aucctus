@@ -1,249 +1,148 @@
-import { FunctionComponent, useMemo, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import styles from './styles/concepts.module.scss';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
 import Loading from '../../components/Loading';
 
-import {
-  ColumnFiltersState,
-  FilterFn,
-  createColumnHelper,
-  flexRender,
-  getFilteredRowModel,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
-import { rankItem } from '@tanstack/match-sorter-utils';
-import ConceptStatus from '../../components/ConceptStatus';
-import StatusButton from '../../components/StatusButton';
-import useConcepts from './hooks/useConcepts';
-import { ConceptStatus as ConceptStatusType, IConcept } from '../../../libs/api/typings';
-import { IConceptQueryOptions } from '../../../libs/api/endpoints';
-import { dateCellFormatter, snakeCaseToTitleCase } from '../../../libs/utils';
-import TableCheckBox from '../../components/TableCheckBox';
-import ConceptMenu from '../../components/ConceptMenu';
 import Icon from '../../components/Icon';
-import { AppPath, ConceptPath } from '../../../routes/routes';
-import { Outlet, useNavigate } from 'react-router-dom';
-import TablePagination from '../../components/TablePagination';
-import Tabs from '../../components/Tabs';
+import { AppPath } from '../../../routes/routes';
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+
 import Kanban from '../../components/Kanban';
+import TabView from '../../components/TabView';
+import { ConceptStatus, ConceptCategory } from '../../../libs/api/typings';
+import ConceptTable from './components/ConceptTable';
+import ConceptContainer from './components/ConceptContainer';
+import { ConceptColumns } from '../../components/Kanban/Kanban';
 
-const columnHelper = createColumnHelper<IConcept>();
+export const CONCEPT_STATUS_LIST = Object.values(ConceptStatus).map((value: ConceptStatus) => value);
 
-const defaultIconProps = {
-  stroke: '#B4BDD0',
-  width: 24,
-  height: 24,
+export const DRAFT_STATUS_LIST = [ConceptStatus.new, ConceptStatus.ideating, ConceptStatus.inReview];
+export const ACTIVE_STATUS_LIST = [
+  ConceptStatus.prototyping,
+  ConceptStatus.proofOfConcept,
+  ConceptStatus.minimumViableProduct,
+  ConceptStatus.commercialized,
+];
+export const ARCHIVED_STATUS_LIST = [ConceptStatus.archived];
+
+export const CONCEPT_STATUS_LIST_MAP = {
+  [ConceptCategory.draft]: DRAFT_STATUS_LIST,
+  [ConceptCategory.active]: ACTIVE_STATUS_LIST,
+  [ConceptCategory.archive]: ARCHIVED_STATUS_LIST,
 };
 
+export const KANBAN_COLUMNS_MAP = CONCEPT_STATUS_LIST.reduce<ConceptColumns>(
+  (acc: ConceptColumns, item: ConceptStatus) => {
+    acc[item] = {
+      title: item,
+      items: [],
+    };
+    return acc;
+  },
+  {} as ConceptColumns
+);
+
+const ACTIVE_VIEW_TABS = [
+  {
+    label: (
+      <div className={styles.tabLabel}>
+        <Icon variant="list" height={20} width={20} />
+        List
+      </div>
+    ),
+    value: 'list',
+  },
+  {
+    label: (
+      <div className={styles.tabLabel}>
+        <Icon variant="board" height={20} width={20} />
+        Board
+      </div>
+    ),
+    value: 'board',
+  },
+];
+
 const Concepts: FunctionComponent = () => {
-  const {
-    activeFilter,
-    openPopupMenuId,
-    categoryCount,
-    rowSelection,
-    category,
-    conceptStatusList,
-    excludeIdSet,
-    isEntireCategorySelected,
-    activePage,
-    activeTabIndex,
-    modifyExclusionSet,
-    setRowSelection,
-    setExcludeIdSet,
-    toggleIsEntireCategorySelectedFlag,
-    activateFilter,
-    selectPopupMenuId,
-    clearPopupMenuId,
-    setActivePage,
-    setActiveTabIndex,
-    kanbanColumns,
-    isActiveView,
-  } = useConcepts();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const { data, isLoading: isFilteredConceptLoading } = useQuery({
-    queryKey: ['concepts', activeFilter, category, activePage],
-    refetchOnWindowFocus: false,
-    retry: 1,
-    queryFn: async () => {
-      const queryOptionsObj: IConceptQueryOptions = {
-        ...(activeFilter && { status: activeFilter }),
-        category,
-        ...(activePage && { page: activePage }),
-      };
-      return api.concept.getConcepts(queryOptionsObj);
-    },
-  });
+  const category = searchParams.get('category') as ConceptCategory;
+  const status = (searchParams.get('status') as ConceptStatus) || null;
+  const page = searchParams.get('page') || '1';
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const kanbanView = searchParams.get('kanban') === 'true' && category === 'active';
 
-  const fuzzyFilter: FilterFn<IConcept> = (row, columnId, value, addMeta) => {
-    const itemRank = rankItem(row.getValue(columnId), value);
-    addMeta({
-      itemRank,
-    });
-    return itemRank.passed;
-  };
-
-  const navigateToConcept = (id: string) => {
-    if (!id) {
-      return;
+  const setStatusFilter = useCallback((newStatus?: ConceptStatus) => {
+    if (!newStatus) {
+      searchParams.delete('status');
+    } else {
+      searchParams.set('status', newStatus);
     }
-    clearPopupMenuId();
-    let newPath = `${AppPath.ConceptOverview}${ConceptPath.Overview}`;
-    newPath = AppPath.ConceptOverview.replace(':category', category || 'active');
-    navigate(`${newPath.replace(':id', id)}overview`);
-  };
+    setSearchParams(searchParams);
+  }, []);
 
-  const tabs = isActiveView
-    ? [
-        {
-          label: (
-            <div className={styles.tabLabel}>
-              <Icon variant="list" height={20} width={20} />
-              List
-            </div>
-          ),
-        },
-        {
-          label: (
-            <div className={styles.tabLabel}>
-              <Icon variant="board" height={20} width={20} />
-              Board
-            </div>
-          ),
-        },
-      ]
-    : [];
+  const setPage = useCallback((newPage: number) => {
+    searchParams.set('page', newPage.toString());
+    setSearchParams(searchParams);
+  }, []);
 
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor((row) => row?.status, {
-        id: 'select',
-        header: ({ table }) => (
-          <TableCheckBox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: (event) => {
-                setExcludeIdSet(new Set());
-                toggleIsEntireCategorySelectedFlag(table.getIsAllRowsSelected());
-                table.getToggleAllPageRowsSelectedHandler()(event);
-              },
-            }}
-          />
-        ),
-        cell: ({ row }) => {
-          return (
-            <TableCheckBox
-              {...{
-                checked: row.getIsSelected(),
-                disabled: !row.getCanSelect(),
-                indeterminate: row.getIsSomeSelected(),
-                onChange: (e) => {
-                  e.stopPropagation();
-                  modifyExclusionSet(row.getIsSelected(), row?.id);
-                  row.getToggleSelectedHandler()(e);
-                },
-                onClick: (e) => {
-                  e.stopPropagation();
-                },
-              }}
-            />
-          );
-        },
-      }),
-      columnHelper.accessor('title', {
-        id: 'title',
-        header: () => <span className={styles.details}>Company</span>,
-        size: 400,
-        cell: (info) => <span className={styles.company}>{info?.getValue()}</span>,
-      }),
-      columnHelper.accessor((row) => row?.description, {
-        id: 'description',
-        cell: (info) => <span className={styles.cellDescription}>{info?.getValue()}</span>,
-        size: 300,
-        header: () => <span>Description</span>,
-      }),
-      columnHelper.accessor((row) => row?.updatedAt, {
-        id: 'updatedAt',
-        size: 300,
-        cell: (info) => dateCellFormatter(info.getValue()),
-        header: () => <span>Last Modified</span>,
-      }),
-      columnHelper.accessor((row) => row?.status, {
-        id: 'status',
-        size: 300,
-        header: () => <span>Status</span>,
-        cell: (info) => (
-          <div className={styles.reviewConceptLink}>
-            <ConceptStatus status={info?.getValue()} />
-          </div>
-        ),
-      }),
-      columnHelper.accessor((row) => row?.uuid, {
-        id: 'uuid',
-        size: 300,
-        header: () => {},
-        cell: (info) => (
-          <div className={styles.conceptMenu}>
-            <button
-              className={styles.button}
-              onClick={(e) => {
-                e.stopPropagation();
-                selectPopupMenuId(info?.getValue());
-              }}
-            >
-              <Icon variant="dotstVertical" {...defaultIconProps} />
-            </button>
-            {info?.getValue() === openPopupMenuId && (
-              <div className={styles.popupMenu}>
-                <ConceptMenu conceptId={openPopupMenuId} clearConceptMenuId={clearPopupMenuId} />
-              </div>
-            )}
-          </div>
-        ),
-      }),
-    ],
-    [activeFilter, activePage, excludeIdSet, isEntireCategorySelected, openPopupMenuId]
-  );
+  const onTabSelect = useCallback((tab: string) => {
+    if (tab !== 'board') {
+      searchParams.delete('kanban');
+    } else {
+      searchParams.set('kanban', 'true');
+      searchParams.delete('status');
+    }
+    setSearchParams(searchParams);
+  }, []);
 
-  const tableData = useMemo(() => data?.results ?? [], [data]);
-  const table = useReactTable({
-    getRowId: (row) => row.uuid,
-    data: tableData,
-    columns,
-    enableRowSelection: true,
-    state: {
-      columnFilters,
-      rowSelection,
-    },
-    filterFns: {
-      fuzzy: fuzzyFilter,
-    },
-    onRowSelectionChange: setRowSelection,
-    onColumnFiltersChange: setColumnFilters,
-    getFilteredRowModel: getFilteredRowModel(),
-    getCoreRowModel: getCoreRowModel(),
-    defaultColumn: {
-      minSize: 500, //enforced during column resizing
-      maxSize: 500, //enforced during column resizing
+  useEffect(() => {
+    if (!page) {
+      searchParams.set('page', '1');
+      setSearchParams(searchParams);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    if (!category) {
+      searchParams.set('category', ConceptCategory.active);
+      setSearchParams(searchParams);
+    }
+  }, [category]);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['concepts', status, category, page],
+    refetchOnWindowFocus: false,
+    retry: 0,
+    cacheTime: 12000,
+    queryFn: async () => {
+      return api.concept.getConcepts({
+        status,
+        category,
+        page: parseInt(page),
+      });
     },
   });
 
-  const renderStatusButtons = (statusList: ConceptStatusType[]) => {
-    return statusList.map((status, index) => (
-      <StatusButton
-        key={`status-button-${index}`}
-        isActive={activeFilter === status}
-        statusName={snakeCaseToTitleCase(status)}
-        quantity={1}
-        activateFilter={() => activateFilter(status)}
-      />
-    ));
-  };
+  // TODO: Redesign this flow to use a more efficient way to update the kanban columns
+  // We should be able to update the columns (components) without having to recreate the entire component
+  const kanbanColumns = useMemo(() => {
+    // Create a deep copy of the columns
+    const columns = JSON.parse(JSON.stringify(KANBAN_COLUMNS_MAP));
+
+    if (data && data.results) {
+      data.results.forEach((item) => {
+        if (columns[item.status]) {
+          columns[item.status].items.push(item);
+        }
+      });
+    }
+    return columns;
+  }, [data]);
+
+  const tabs = category === 'active' ? ACTIVE_VIEW_TABS : [];
 
   return (
     <>
@@ -264,106 +163,29 @@ const Concepts: FunctionComponent = () => {
             </button>
           </div>
         </div>
-        <Tabs
-          tabs={tabs}
-          className={styles.tabs}
-          activeTabIndex={activeTabIndex}
-          selectActiveTab={setActiveTabIndex}
-          isButtonStyle
-        >
-          <div className={styles.content}>
-            <div className={styles.header}>
-              <div className={styles.filters}>
-                <StatusButton
-                  statusName={`All ${category}`}
-                  quantity={categoryCount}
-                  isActive={!activeFilter}
-                  activateFilter={() => {
-                    setColumnFilters([{ id: 'status', value: '' }]);
-                    activateFilter('');
-                  }}
+        <TabView tabs={tabs} className={styles.tabs} variant="button" onTabSelect={onTabSelect} defaultTab={'list'}>
+          <ConceptContainer
+            category={category}
+            categoryCount={data?.count || 0}
+            numberOfPages={data?.numberOfPages || 1}
+            page={page}
+            setPage={setPage}
+            status={status}
+            setStatusFilter={setStatusFilter}
+            showStatusFilter={!kanbanView}
+          >
+            <>
+              {kanbanView ? (
+                <Kanban
+                  kanbanColumns={kanbanColumns}
+                  selectCard={(id: string) => navigate(AppPath.ConceptOverview.replace(':id', id))}
                 />
-                {renderStatusButtons(conceptStatusList)}
-              </div>
-            </div>
-            <table>
-              <thead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th key={header.id} style={{ width: header.getSize() }}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              {isFilteredConceptLoading ? (
-                <div className={styles.tableMessageContainer}>
-                  <Loading />
-                </div>
               ) : (
-                <tbody>
-                  {table.getRowModel().rows.map((row) => (
-                    <tr
-                      key={row.id}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        navigateToConcept(row.id);
-                      }}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
+                <ConceptTable data={data?.results || []} isLoading={isLoading} />
               )}
-            </table>
-            <div className={styles.footer}>
-              <TablePagination
-                totalPages={data?.numberOfPages || 1}
-                activePage={activePage}
-                setActivePage={setActivePage}
-              />
-            </div>
-          </div>
-          {category === 'active' ? (
-            <div className={styles.content}>
-              <div className={styles.header}>
-                <div className={styles.filters}>
-                  <StatusButton
-                    statusName={`All ${category}`}
-                    quantity={categoryCount}
-                    isActive={!activeFilter}
-                    activateFilter={() => {
-                      setColumnFilters([{ id: 'status', value: '' }]);
-                      activateFilter('');
-                    }}
-                  />
-                </div>
-              </div>
-              {isFilteredConceptLoading ? (
-                <div className={styles.kanbanLoading}>
-                  <Loading />
-                </div>
-              ) : (
-                <Kanban kanbanColumns={kanbanColumns} selectCard={navigateToConcept} />
-              )}
-              <div className={styles.footer}>
-                <TablePagination
-                  totalPages={data?.numberOfPages || 1}
-                  activePage={activePage}
-                  setActivePage={setActivePage}
-                />
-              </div>
-            </div>
-          ) : (
-            <></>
-          )}
-        </Tabs>
+            </>
+          </ConceptContainer>
+        </TabView>
       </div>
       <Outlet />
     </>

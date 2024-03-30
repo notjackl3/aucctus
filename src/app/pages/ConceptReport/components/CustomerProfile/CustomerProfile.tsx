@@ -1,9 +1,9 @@
 import { FunctionComponent, useState } from 'react';
 import styles from './styles/customerProfile.module.scss';
 import { ICustomerProfile } from '../../../../../libs/api/typings';
-import Tabs from '../../../../components/Tabs';
+import TabView from '../../../../components/TabView';
 import CustomerDetails from '../CustomerDetails';
-import { TabElement } from '../../../../components/Tabs/Tabs';
+import { TabElement } from '../../../../components/TabView/TabView';
 import Loading from '../../../../components/Loading';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';
@@ -44,15 +44,15 @@ const CustomerProfile: FunctionComponent = () => {
       {isLoading ? (
         <Loading />
       ) : (
-        <Tabs
+        <TabView
           tabs={customerTabs}
           className={styles.tabs}
           activeTabIndex={activeTabIndex}
           selectActiveTab={setActiveTabIndex}
           isButtonStyle
         >
-          {renderCustomerProfiles(customerList)}
-        </Tabs>
+          <>{renderCustomerProfiles(customerList)}</>
+        </TabView>
       )}
     </div>
   );
