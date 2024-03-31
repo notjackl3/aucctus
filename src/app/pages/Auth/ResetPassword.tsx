@@ -13,7 +13,7 @@ import { IPasswordResetForm } from '../../../libs/api/typings';
 
 const HEADER_TEXT = 'Reset Password';
 const SUPPORTING_TEXT = 'Your new password must be different to previously used passwords.';
-const ICON_VARIANT: keyof typeof IconVariant = 'key';
+const ICON_VARIANT: IconVariant = 'key';
 const ICON_COLOR = 'purple';
 
 const ResetPassword: FunctionComponent = () => {

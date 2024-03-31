@@ -53,63 +53,61 @@ import FileCode from '../assets/icons/filecode.svg?react';
 import List from '../assets/icons/list.svg?react';
 import Board from '../assets/icons/board.svg?react';
 
-export enum IconVariant {
-  lock,
-  help,
-  beaker,
-  target,
-  search,
-  userGroup,
-  clipboard,
-  umbrella,
-  message,
-  gear,
-  home,
-  file,
-  lightbulb,
-  rocket,
-  chevronUp,
-  chevronDown,
-  chevronRight,
-  globe,
-  key,
-  lifeBuoy,
-  lineChartUp,
-  mail,
-  shieldDollar,
-  threeStars,
-  paperAirPlane,
-  pieChart,
-  presentationChart,
-  saveStar,
-  arrowDown,
-  arrowUp,
-  arrowRight,
-  arrowLeft,
-  arrowUpRight,
-  star,
-  trendUp,
-  filterLines,
-  currency,
-  download,
-  refresh,
-  calendar,
-  columns,
-  announcement,
-  dotstVertical,
-  closeX,
-  piggyBank,
-  circle,
-  linkExternal,
-  thermometer,
-  building,
-  filecode,
-  list,
-  board,
-}
-
+export type IconVariant =
+  | 'lock'
+  | 'help'
+  | 'beaker'
+  | 'target'
+  | 'search'
+  | 'userGroup'
+  | 'clipboard'
+  | 'umbrella'
+  | 'message'
+  | 'gear'
+  | 'home'
+  | 'file'
+  | 'lightbulb'
+  | 'rocket'
+  | 'chevronUp'
+  | 'chevronDown'
+  | 'chevronRight'
+  | 'globe'
+  | 'key'
+  | 'lifeBuoy'
+  | 'lineChartUp'
+  | 'mail'
+  | 'shieldDollar'
+  | 'threeStars'
+  | 'paperAirPlane'
+  | 'pieChart'
+  | 'presentationChart'
+  | 'saveStar'
+  | 'arrowDown'
+  | 'arrowUp'
+  | 'arrowRight'
+  | 'arrowLeft'
+  | 'arrowUpRight'
+  | 'star'
+  | 'trendUp'
+  | 'filterLines'
+  | 'currency'
+  | 'download'
+  | 'refresh'
+  | 'calendar'
+  | 'columns'
+  | 'announcement'
+  | 'dotstVertical'
+  | 'closeX'
+  | 'piggyBank'
+  | 'circle'
+  | 'linkExternal'
+  | 'thermometer'
+  | 'building'
+  | 'filecode'
+  | 'list'
+  | 'board';
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
-  variant: keyof typeof IconVariant;
+  variant: IconVariant;
   title?: string;
 }
 

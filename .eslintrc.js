@@ -5,16 +5,24 @@ module.exports = {
     ecmaVersion: 10,
     sourceType: 'module',
   },
-  plugins: ['@typescript-eslint', 'react', 'prettier'],
+  plugins: ['@typescript-eslint', 'react', 'react-hooks', 'prettier'],
+  // extends: ["plugin:react/recommended", "plugin:react-hooks/recommended"],
+  rules: {
+    'no-use-before-define': 'off',
+    'no-unused-vars': 'off',
+    'no-void': 'off',
+    'react/jsx-filename-extension': ['warn', { extensions: ['.tsx'] }],
+    'react/react-in-jsx-scope': 'off',
+    'react-hooks/exhaustive-deps': 'warn',
+  },
   overrides: [
     {
       files: ['*.ts', '*.tsx'],
       rules: {
         '@typescript-eslint/explicit-function-return-type': 'off',
         '@typescript-eslint/explicit-member-accessibility': 'off',
-        'no-unused-vars': 'off',
         '@typescript-eslint/no-unused-vars': ['warn'],
-        'no-void': 'off',
+        '@typescript-eslint/no-use-before-define': 'off',
         '@typescript-eslint/typedef': [
           'error',
           {

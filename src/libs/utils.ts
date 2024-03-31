@@ -61,7 +61,7 @@ export function parseFormError<T = object>(error: unknown | AxiosError) {
       const errorResponse = error.response.data;
       if (typeof errorResponse.error === 'string') {
         message = errorResponse.error;
-      } else {
+      } else if (!!errorResponse.error) {
         // For now we are only going to show the first error message
         // Most errors ar caught before they reach the server
         const key = Object.keys(errorResponse.error)[0] as keyof T;

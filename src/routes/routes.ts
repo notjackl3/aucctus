@@ -6,11 +6,12 @@ export enum AppPath {
   IgniteConcept = '/concept/ignite',
   GeneratedConcepts = '/concept/ignite/results',
   Concept = '/concept',
-  ConceptCategory = '/concept/:category',
-  ConceptActive = '/concept/active',
-  ConceptDraft = '/concept/draft',
-  ConceptOverview = '/concept/:category/:id/',
+  ConceptCategory = '/concept',
+  ConceptOverview = '/concept/:id/',
   ConceptCustomerPersona = '/concept/:id/customer-profile',
+  ConceptFinancialProjection = '/concept/:id/financial-projection',
+  ConceptKeyAssumptions = '/concept/:id/key-assumptions',
+  ConceptMarketScan = '/concept/:id/market-scan',
 
   /* Domain */
   IgniteDomain = '/domain/ignite',

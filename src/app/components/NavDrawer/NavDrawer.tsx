@@ -39,15 +39,16 @@ const NavDrawer = () => {
               nestedRoutes={[
                 {
                   title: 'Active Concepts',
-                  to: `${AppPath.Concept}/active`,
+                  to: `${AppPath.ConceptCategory}?category=active`,
                 },
                 {
                   title: 'Drafts',
-                  to: `${AppPath.Concept}/draft`,
+                  to: `${AppPath.ConceptCategory}?category=draft`,
                 },
                 {
                   title: 'Archive',
-                  to: `${AppPath.Concept}/archive`,
+
+                  to: `${AppPath.ConceptCategory}?category=archive`,
                 },
               ]}
             />

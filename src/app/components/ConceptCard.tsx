@@ -9,7 +9,7 @@ interface ConceptCardProps {
 
   width?: number;
   children: ReactNode;
-  icon?: keyof typeof IconVariant;
+  icon?: IconVariant;
   buttonTitle: string;
   actionButtonProps?: React.DetailedHTMLProps<React.ButtonHTMLAttributes<HTMLButtonElement>, HTMLButtonElement>;
 }

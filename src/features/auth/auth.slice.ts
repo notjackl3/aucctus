@@ -11,7 +11,13 @@ import { Credentials, SignupDetails } from './interfaces/user.interface';
 import api from '../../libs/api';
 import { RootState } from '../../app/store';
 import analytics from '../../libs/analytics';
-import { IAccount, IAuthSuccessResponse, IRegisterAccount, IUser } from '../../libs/api/typings';
+import {
+  IAccount,
+  IAuthSuccessResponse,
+  IRefreshTokenSuccessResponse,
+  IRegisterAccount,
+  IUser,
+} from '../../libs/api/typings';
 import { AxiosError, isAxiosError } from 'axios';
 import { IFormDetailsError } from '../../libs/api/typings/avxisi';
 
@@ -30,9 +36,18 @@ const initialState: AuthState = {
   error: '',
 };
 
-const isAPIAuthSuccessResponse = (action: PayloadAction<unknown>): action is PayloadAction<IAuthSuccessResponse> => {
+export const isAPIAuthSuccessResponse = (
+  action: PayloadAction<unknown>
+): action is PayloadAction<IAuthSuccessResponse> => {
   const payload = action.payload as IAuthSuccessResponse;
   return payload && !!payload.user && !!payload.token;
+};
+
+export const isAPIRefreshSuccessResponse = (
+  action: PayloadAction<unknown>
+): action is PayloadAction<IRefreshTokenSuccessResponse> => {
+  const payload = action.payload as IRefreshTokenSuccessResponse;
+  return payload && !!payload.access && !!payload.refresh;
 };
 
 // TODO: Fix this error type
@@ -105,7 +120,8 @@ export const confirmEmail = createAsyncThunk('auth/confirmEmail', async (token: 
 export const logout = createAsyncThunk('auth/logout', async (_, thunkApi) => {
   analytics.debug('Logout');
   try {
-    return await api.auth.logout();
+    const { auth } = thunkApi.getState() as RootState;
+    return await api.auth.logout(auth.refreshToken);
   } catch (e) {
     analytics.debug(e);
     thunkApi.rejectWithValue(e);
@@ -116,6 +132,13 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    simpleLogout(state: AuthState) {
+      state.user = undefined;
+      state.account = undefined;
+      state.accessToken = undefined;
+      state.refreshToken = undefined;
+      api.accessToken = undefined;
+    },
     setAuthenticated(state: AuthState, action: PayloadAction<IAuthSuccessResponse>) {
       const { user, token } = action.payload;
       state.user = user;
@@ -144,6 +167,13 @@ export const authSlice = createSlice({
           state.user = { ...state.user, account: action.payload.uuid };
         }
       })
+      .addCase(refreshAuth.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.refreshToken = action.payload.refresh;
+          state.accessToken = action.payload.access;
+          api.accessToken = action.payload.access;
+        }
+      })
       .addMatcher(isFulfilled, (state) => {
         state.status = 'idle';
       })
@@ -160,9 +190,8 @@ export const authSlice = createSlice({
         state.accessToken = token;
         state.refreshToken = refresh;
         api.accessToken = token;
-
-        console.log('state', refresh);
       })
+
       .addMatcher(isAnyOf(isApiErrorResult), (state, action) => {
         const error = action.payload;
         if (error.response && error.response.status === 401) {
@@ -186,12 +215,13 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setAuthenticated, setUnauthenticated, setAccount } = authSlice.actions;
+export const { setAuthenticated, setUnauthenticated, setAccount, simpleLogout } = authSlice.actions;
 
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectAccount = (state: RootState) => state.auth.account;
 export const selectError = (state: RootState) => state.auth.error;
 export const selectAccessToken = (state: RootState) => state.auth.accessToken;
+export const hasAccessToken = (state: RootState) => !!state.auth.accessToken;
 export const selectAuthStatus = (state: RootState) => state.auth.status;
 
 export default authSlice.reducer;

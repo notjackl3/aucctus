@@ -14,7 +14,7 @@ interface IgniteBoxProps {
   title: string;
   subtitle: string;
   link: AppPath;
-  icon: keyof typeof IconVariant;
+  icon: IconVariant;
 }
 
 const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, icon }) => {
