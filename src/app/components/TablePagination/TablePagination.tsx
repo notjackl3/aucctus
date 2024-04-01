@@ -5,36 +5,36 @@ import Icon from '../Icon';
 
 export interface TablePaginationProps {
   totalPages: number;
-  activePage: number;
-  setActivePage: (pageNumber: number) => void;
+  page: number;
+  setPage: (pageNumber: number) => void;
 }
 
-const TablePagination: FunctionComponent<TablePaginationProps> = ({ totalPages, activePage, setActivePage }) => {
+const TablePagination: FunctionComponent<TablePaginationProps> = ({ totalPages, page, setPage }) => {
   const [startPage, setStartPage] = useState(1);
   const MAX_PAGES_PER_PAGE = 10;
 
   const nextPage = () => {
-    if (activePage === totalPages) {
+    if (page === totalPages) {
       return;
     }
-    if (activePage === startPage + MAX_PAGES_PER_PAGE - 1) {
+    if (page === startPage + MAX_PAGES_PER_PAGE - 1) {
       setStartPage(startPage + MAX_PAGES_PER_PAGE);
     }
-    setActivePage(activePage + 1);
+    setPage(page + 1);
   };
 
   const previousPage = () => {
-    if (activePage === 1) {
+    if (page === 1) {
       return;
     }
-    if (activePage - 1 < startPage) {
-      setStartPage(Math.max(activePage - MAX_PAGES_PER_PAGE, 1));
+    if (page - 1 < startPage) {
+      setStartPage(Math.max(page - MAX_PAGES_PER_PAGE, 1));
     }
-    setActivePage(Math.max(activePage - 1, 1));
+    setPage(Math.max(page - 1, 1));
   };
 
   const handlePageClick = (pageNumber: number) => {
-    setActivePage(pageNumber);
+    setPage(pageNumber);
   };
 
   const renderPageNumbers = () => {
@@ -43,7 +43,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({ totalPages, 
       pageNumbers.push(
         <button
           key={`table-page-${i}`}
-          className={`${styles.page} ${activePage === i ? styles.active : ''}`}
+          className={`${styles.page} ${page === i ? styles.active : ''}`}
           onClick={() => handlePageClick(i)}
         >
           {i}

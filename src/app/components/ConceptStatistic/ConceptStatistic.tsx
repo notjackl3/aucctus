@@ -4,7 +4,7 @@ import styles from './styles/conceptStatistic.module.scss';
 import Icon, { IconVariant } from '../Icon';
 
 export interface IConceptStatusProps {
-  icon: keyof typeof IconVariant;
+  icon: IconVariant;
   iconColor: 'lightblue' | 'blue' | 'purple';
   infoTitle: string;
   infoValue: string;

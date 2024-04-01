@@ -1,34 +1,28 @@
-import { FunctionComponent, ReactNode } from 'react';
+import { FunctionComponent, ReactNode, useMemo } from 'react';
 import styles from './styles/dropdown.module.scss';
-
 import { useState } from 'react';
-import { ConceptStatus } from '../ConceptMenu/ConceptMenu';
 
 export interface Option {
   label: ReactNode;
   displayLabel: ReactNode;
-  value: ConceptStatus | string;
+  value: string;
 }
 
 interface DropdownProps {
   options: Option[];
-  initialOption?: Option;
-  onSelect: (option: Option) => void;
+  selected?: string;
+  onSelect: (value: string) => void;
 }
 
-const Dropdown: FunctionComponent<DropdownProps> = ({ options, onSelect, initialOption }) => {
-  const [selectedOption, setSelectedOption] = useState<Option | undefined>(initialOption);
+const Dropdown: FunctionComponent<DropdownProps> = ({ options, onSelect, selected }) => {
   const [isOpen, setIsOpen] = useState(false);
 
+  const selectedOption = useMemo(() => options.find((option) => option.value === selected), [options, selected]);
+
   const handleSelect = (option: Option) => {
-    setSelectedOption(option);
-    onSelect(option);
+    onSelect(option.value);
     setIsOpen(false);
   };
-
-  if (initialOption && !selectedOption) {
-    setSelectedOption(initialOption);
-  }
 
   return (
     <div className={styles.dropdown}>

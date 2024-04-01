@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import { selectAccessToken } from '../../features/auth/auth.slice';
+import { hasAccessToken } from '../../features/auth/auth.slice';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import styles from '../../app/assets/styles/pages/auth-screens.module.scss';
 import Footer from '../../app/components/Footer';
@@ -10,9 +10,9 @@ import { AppPath } from '../routes';
 
 const UnauthGuard: FunctionComponent = () => {
   const location = useLocation();
-  const accessToken = useSelector(selectAccessToken);
+  const isAuthenticated = useSelector(hasAccessToken);
 
-  if (accessToken) {
+  if (isAuthenticated) {
     return <Navigate to={AppPath.Home} state={{ from: location }} replace />;
   }
 

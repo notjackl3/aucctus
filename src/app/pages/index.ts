@@ -1,6 +1,6 @@
 import Dashboard from './Dashboard';
 import Auth from './Auth';
-import ConceptPages from './ConceptOverview';
+import ConceptPages from './ConceptReport';
 import NotFound from './NotFound';
 import Onboarding from './Onboarding';
 import Concepts from './Concepts';

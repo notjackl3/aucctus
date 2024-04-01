@@ -13,7 +13,7 @@ interface CompanyMetricProps {
   title: string;
   isLoading?: boolean;
   value?: string | number;
-  icon?: keyof typeof IconVariant;
+  icon?: IconVariant;
 
   iconStroke?: string;
 }

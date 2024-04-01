@@ -10,7 +10,7 @@ const defaultIconProps = {
 };
 
 export interface FeatureIconProps {
-  icon: keyof typeof IconVariant;
+  icon: IconVariant;
   color: 'purple' | 'green';
 }
 

@@ -13,7 +13,7 @@ interface ConceptDetailCardProps {
   footerAction?: ReactNode;
   cardClassName?: string;
   headerClassName?: string;
-  icon?: keyof typeof IconVariant;
+  icon?: IconVariant;
 }
 
 const iconDefaultProps = {
