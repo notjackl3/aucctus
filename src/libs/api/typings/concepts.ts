@@ -45,8 +45,10 @@ export interface IConceptGenerateResponse {
 export interface IConceptOverview {
   uuid: string;
   valueProposition: string;
-  industries: [string];
-  trendsAndDrivers: [string];
+  industries: string[];
+  trendsAndDrivers?: string[];
+  persona?: ICustomerProfile;
+  financialProjection?: IFinancialProjection;
   createdAt: string;
   updatedAt: string;
 }
