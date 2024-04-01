@@ -88,25 +88,33 @@ export enum AssumptionType {
 export interface IAssumption {
   uuid: string;
   name: string;
-  description: string;
+  hypothesis: string;
   createdAt: string;
   updatedAt: string;
+  /**
+   * Rationale for the risk and impact level
+   *
+   */
+  rationale: string;
+  potentialImpact: string;
+  expectedResult: string;
+  methodOfTesting: string;
+  variables: [string];
   assumptionType: AssumptionType;
+
   /**
    * The risk level of the assumption
    * A number between -10 and 10
    */
   riskLevel: string;
+  riskRational: string;
   /**
    * The risk level of the assumption
    * A number between -10 and 10
    */
   impactLevel: string;
+  impactRational: string;
 
-  /**
-   * Reason for the risk and impact level
-   */
-  reason: string;
   validated: boolean;
   riskCategory: 'high' | 'medium' | 'low';
   impactCategory: 'high' | 'medium' | 'low';
