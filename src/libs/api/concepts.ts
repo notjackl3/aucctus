@@ -7,6 +7,7 @@ import {
   IConcept,
   IConceptCreate,
   IConceptOverview,
+  IConceptPage,
   ICustomerProfile,
   IFinancialProjection,
   IMarketScan,
@@ -44,7 +45,7 @@ export class ConceptApi extends ApiService {
   }
 
   getConcepts(options?: IConceptQueryOptions) {
-    return this.get<IPageResponse<IConcept>>(endpoints.conceptQueries(options));
+    return this.get<IConceptPage>(endpoints.conceptQueries(options));
   }
 
   deleteConcept(uuid: string) {

@@ -1,3 +1,5 @@
+import { IPageResponse } from '.';
+
 export enum ConceptStatus {
   new = 'new',
   ideating = 'ideating',
@@ -162,4 +164,8 @@ export interface IMarketScan {
   ecosystemDescription: string;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface IConceptPage extends IPageResponse<IConcept> {
+  statusCounts: { [key in keyof typeof ConceptStatus]: number };
 }
