@@ -1,0 +1,26 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.quadrantChart {
+  display: flex;
+  width: 30rem;
+  height: 30rem;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .text {
+    display: flex;
+    flex-direction: column;
+    fill: $black;
+    font-family: $dm-sans;
+    font-size: 1.25rem;
+    font-weight: 400;
+
+    &.white {
+      fill: $white;
+    }
+  }
+}
