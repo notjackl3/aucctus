@@ -52,123 +52,148 @@
       }
     }
 
-    table {
+    .tableChartContainer {
       display: flex;
-      flex-direction: column;
-      align-items: flex-start;
       align-self: stretch;
-      table-layout: fixed;
-      width: 100%;
-      border: 1px solid $grey-300;
-      border-bottom: none;
-      background: $white;
-
-      box-shadow: $shadow-100;
-
-      th {
-        color: $grey-600;
-        font-size: 0.875rem;
-        font-style: normal;
-        font-weight: 400;
-        overflow: hidden;
-        line-height: 1.25rem;
-      }
-
-      thead {
+      .tableContainer {
         display: flex;
-        width: 100%;
-        padding: 0.75rem 1.5rem;
-        box-sizing: border-box;
-        align-items: center;
-        border-radius: 0.75rem 0.75rem 0 0;
-        border-bottom: 1px solid $grey-300;
-        background: var(--gray-50-bg, #fcfcfd);
-
-        color: $grey-600;
-        font-family: var(--text-sm-regular);
-        font-size: 0.75rem;
-        font-style: normal;
-        font-weight: 500;
-
-        tr {
+        flex-direction: column;
+        width: 50%;
+        table {
           display: flex;
-          width: 100%;
-          box-sizing: border-box;
+          flex-direction: column;
           align-items: flex-start;
-        }
-      }
+          align-self: stretch;
+          table-layout: fixed;
+          border: 1px solid $grey-300;
+          border-bottom: none;
+          background: $white;
+          box-shadow: $shadow-100;
 
-      tbody {
-        width: 100%;
-        tr {
-          cursor: pointer;
-          display: flex;
-          padding: 0.75rem 1.5rem;
-          box-sizing: border-box;
-          align-items: center;
-          border-bottom: 1px solid $grey-300;
-
-          &.selected {
-            background: $purple-50;
-          }
-
-          td {
-            display: flex;
-            align-items: center;
-            justify-content: flex-start;
-            overflow: hidden;
-            padding-right: 2rem;
-            box-sizing: border-box;
+          th {
             color: $grey-600;
-            text-overflow: ellipsis;
-            font-family: $dm-sans;
             font-size: 0.875rem;
             font-style: normal;
             font-weight: 400;
+            overflow: hidden;
+            line-height: 1.25rem;
+          }
 
-            .assumption {
+          thead {
+            display: flex;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            box-sizing: border-box;
+            align-items: center;
+            border-radius: 0.75rem 0.75rem 0 0;
+            border-bottom: 1px solid $grey-300;
+            background: var(--gray-50-bg, #fcfcfd);
+
+            color: $grey-600;
+            font-family: var(--text-sm-regular);
+            font-size: 0.75rem;
+            font-style: normal;
+            font-weight: 500;
+
+            tr {
               display: flex;
-              flex-direction: column;
-
-              .assumptionTitle {
-                color: $grey-600;
-                font-family: $dm-sans;
-                @include text-medium;
-                font-weight: 700;
-              }
-              .assumptionDescription {
-                color: $grey-600;
-                font-family: $dm-sans;
-                @include text-small;
-                overflow: hidden;
-                text-overflow: ellipsis;
-              }
+              width: 100%;
+              box-sizing: border-box;
+              align-items: flex-start;
             }
+          }
 
-            .cellDescription {
-              display: -webkit-box;
-              -webkit-line-clamp: 10;
-              -webkit-box-orient: vertical;
-              overflow: hidden;
-              text-overflow: ellipsis;
+          tbody {
+            width: 100%;
+            tr {
+              cursor: pointer;
+              display: flex;
+              padding: 0.75rem 1.5rem;
+              box-sizing: border-box;
+              align-items: center;
+              border-bottom: 1px solid $grey-300;
+
+              &.selected {
+                background: $purple-50;
+              }
+
+              td {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+                overflow: hidden;
+                padding-right: 2rem;
+                box-sizing: border-box;
+                color: $grey-600;
+                text-overflow: ellipsis;
+                font-family: $dm-sans;
+                font-size: 0.875rem;
+                font-style: normal;
+                font-weight: 400;
+
+                .assumption {
+                  display: flex;
+                  flex-direction: column;
+
+                  .assumptionTitle {
+                    color: $grey-600;
+                    font-family: $dm-sans;
+                    @include text-medium;
+                    font-weight: 700;
+                  }
+                  .assumptionDescription {
+                    color: $grey-600;
+                    font-family: $dm-sans;
+                    @include text-small;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                  }
+                }
+
+                .cellDescription {
+                  display: -webkit-box;
+                  -webkit-line-clamp: 10;
+                  -webkit-box-orient: vertical;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                }
+
+                .riskCategory {
+                  text-transform: capitalize;
+                }
+              }
             }
           }
         }
+        .footer {
+          display: flex;
+          flex-direction: row;
+          align-items: center;
+          height: 5rem;
+          color: $grey-600;
+          padding: 2rem;
+          box-sizing: border-box;
+          border-radius: 0 0 0 0.75rem;
+          background: $white;
+          box-shadow: $shadow-100;
+          border-bottom: 1px solid $grey-300;
+          border-right: 1px solid $grey-300;
+        }
       }
-    }
-    .footer {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      height: 5rem;
-      width: 100%;
-      color: $grey-600;
-      padding: 2rem;
-      box-sizing: border-box;
-      border-radius: 0 0 0.75rem 0.75rem;
-      background: $white;
-      box-shadow: $shadow-100;
-      border-bottom: 1px solid $grey-300;
+
+      .quadrantChartContainer {
+        display: flex;
+        background: $white;
+        width: 50%;
+        padding-top: 2rem;
+        padding-bottom: 2rem;
+        box-sizing: border-box;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0 0 0.75rem 0;
+        border: 1px solid $grey-300;
+        border-left: none;
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/hypothesisDetails.module.scss';
-import { IConcept } from '../../../../../libs/api/typings';
+import { IAssumption } from '../../../../../libs/api/typings';
 import {
   createColumnHelper,
   flexRender,
@@ -8,72 +8,93 @@ import {
   getCoreRowModel,
   useReactTable,
   RowSelectionState,
+  PaginationState,
+  getPaginationRowModel,
 } from '@tanstack/react-table';
 import Loading from '../../../../components/Loading';
 import TablePagination from '../../../../components/TablePagination';
 import { useQuery } from 'react-query';
-import { IConceptQueryOptions } from '../../../../../libs/api/endpoints';
 import api from '../../../../../libs/api';
 import AssumptionBadge from '../../../../components/AssumptionBadge';
-import { AssumptionType } from '../../../../components/AssumptionBadge/AssumptionBadge';
+import { useParams } from 'react-router-dom';
+import QuadrantChart from '../../../../components/QuadrantChart';
+import { getAssumptionActiveHexColor, getAssumptionHexColor } from '../../../../../libs/concepts';
+import GeneralBadge from '../../../../components/GeneralBadge';
 
-const columnHelper = createColumnHelper<IConcept>();
+const columnHelper = createColumnHelper<IAssumption>();
 
-export interface HypothesisDetailsProps {
-  conceptData?: IConcept;
-}
-
-const HypothesisDetails: FunctionComponent<HypothesisDetailsProps> = () => {
-  const [activePage, setActivePage] = useState(1);
+const HypothesisDetails: FunctionComponent = () => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const { id: conceptId } = useParams();
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 3,
+  });
 
-  // TODO remove placeholder data and fetch assumption data
-  const placehodlerAssumptionType = AssumptionType.feasibility;
+  const selectedRowId = Object.keys(rowSelection)[0];
+
   const { data, isLoading: isAssumptionsLoading } = useQuery({
-    queryKey: ['concepts/key-assumptions', activePage],
+    queryKey: ['concepts/key-assumptions'],
     refetchOnWindowFocus: false,
     retry: 1,
     queryFn: async () => {
-      const queryOptionsObj: IConceptQueryOptions = {
-        ...(activePage && { page: activePage }),
-      };
-      return api.concept.getConcepts(queryOptionsObj);
+      return api.concept.getConceptKeyAssumptions(conceptId || '');
     },
   });
 
+  //TODO - add typings when branch updated
+  const chartCoordinates = useMemo(() => {
+    if (!data || !data.results) {
+      return [];
+    }
+    return data.results.map((assumption) => {
+      return {
+        xCoord: assumption.impactLevel,
+        yCoord: assumption.riskLevel,
+        id: assumption.uuid,
+        color: getAssumptionHexColor(assumption.assumptionsType),
+        activeColor: getAssumptionActiveHexColor(assumption.assumptionsType),
+      };
+    });
+  }, [data]);
+
   const columns = useMemo(
     () => [
-      columnHelper.accessor('title', {
-        id: 'title',
+      columnHelper.accessor((row) => row?.uuid, {
+        id: 'uuid',
         header: () => <span className={styles.details}>Title</span>,
         size: 400,
         cell: (info) => (
           <div className={styles.assumption}>
-            <span className={styles.assumptionTitle}>{info?.row?.original?.title}</span>
+            <span className={styles.assumptionTitle}>{info?.row?.original?.name}</span>
             <span className={`${styles.assumptionDescription} ${styles.cellDescription}`}>
-              {info?.row?.original?.description}
+              {info?.row?.original?.hypothesis}
             </span>
           </div>
         ),
       }),
-      columnHelper.accessor((row) => row?.status, {
-        id: 'risk',
-        cell: () => <span className={styles.cellDescription}>{'Medium'}</span>,
-        size: 300,
+      columnHelper.accessor((row) => row.riskCategory, {
+        id: 'riskCategory',
+        cell: (info) => (
+          <div className={styles.riskCategory}>
+            <GeneralBadge variant={`${info.getValue()}Risk`} badgeText={info.getValue()} />
+          </div>
+        ),
+        size: 200,
         header: () => <span>Risk</span>,
       }),
-      columnHelper.accessor((row) => row?.status, {
+      columnHelper.accessor((row) => row.assumptionsType, {
         id: 'assumptionsType',
         size: 300,
         header: () => <span>Type</span>,
-        cell: () => (
+        cell: (info) => (
           <div className={styles.reviewConceptLink}>
-            <AssumptionBadge assumptionType={placehodlerAssumptionType} />
+            <AssumptionBadge assumptionType={info.getValue()} />
           </div>
         ),
       }),
     ],
-    [activePage]
+    []
   );
 
   const tableData = useMemo(() => data?.results ?? [], [data]);
@@ -85,13 +106,16 @@ const HypothesisDetails: FunctionComponent<HypothesisDetailsProps> = () => {
     enableMultiRowSelection: false,
     state: {
       rowSelection,
+      pagination,
     },
+    getPaginationRowModel: getPaginationRowModel(),
+    onPaginationChange: setPagination,
     onRowSelectionChange: setRowSelection,
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     defaultColumn: {
-      minSize: 200, //enforced during column resizing
-      maxSize: 200, //enforced during column resizing
+      minSize: 100, //enforced during column resizing
+      maxSize: 400, //enforced during column resizing
     },
   });
   return (
@@ -99,47 +123,70 @@ const HypothesisDetails: FunctionComponent<HypothesisDetailsProps> = () => {
       <div className={styles.content}>
         <div className={styles.header}>
           <span className={styles.headerText}>Key Assumptions</span>
-          <div className={styles.badge}>10</div>
+          <div className={styles.badge}>{data?.count}</div>
         </div>
-        <table>
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id} style={{ width: header.getSize() }}>
-                    {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                  </th>
+        <div className={styles.tableChartContainer}>
+          <div className={styles.tableContainer}>
+            <table>
+              <thead>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <tr key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <th key={header.id} style={{ width: header.getSize() }}>
+                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      </th>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </thead>
-          {isAssumptionsLoading ? (
-            <div className={styles.tableMessageContainer}>
-              <Loading />
-            </div>
-          ) : (
-            <tbody>
-              {table.getRowModel().rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className={rowSelection?.hasOwnProperty(row.id) ? styles.selected : ''}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    row.getToggleSelectedHandler()(e);
-                  }}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </td>
+              </thead>
+              {isAssumptionsLoading ? (
+                <div className={styles.tableMessageContainer}>
+                  <Loading />
+                </div>
+              ) : (
+                <tbody>
+                  {table.getRowModel().rows.map((row) => (
+                    <tr
+                      key={row.id}
+                      className={rowSelection?.hasOwnProperty(row.id) ? styles.selected : ''}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        row.getToggleSelectedHandler()(e);
+                      }}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td style={{ width: cell.column.getSize() }} key={cell.id}>
+                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                        </td>
+                      ))}
+                    </tr>
                   ))}
-                </tr>
-              ))}
-            </tbody>
-          )}
-        </table>
-        <div className={styles.footer}>
-          <TablePagination totalPages={1} page={activePage} setPage={setActivePage} />
+                </tbody>
+              )}
+            </table>
+            <div className={styles.footer}>
+              <TablePagination
+                variant="client"
+                totalPages={table.getPageCount()}
+                page={table.getState().pagination.pageIndex + 1}
+                setPage={table.setPageIndex}
+                nextPageClient={() => table.nextPage()}
+                previousPageClient={() => table.previousPage()}
+                isNextPageDisabled={!table.getCanNextPage()}
+                isPreviousPageDisabled={!table.getCanPreviousPage()}
+              />
+            </div>
+          </div>
+          <div className={styles.quadrantChartContainer}>
+            <QuadrantChart
+              yTopLabel="High Importance"
+              yBottomLabel="Low Importance"
+              xRightLabel="High Risk"
+              xLeftLabel="Low Risk"
+              chartCoordinates={chartCoordinates}
+              selectedCoordinate={selectedRowId}
+            />
+          </div>
         </div>
       </div>
     </div>

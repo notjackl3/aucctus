@@ -57,15 +57,30 @@ const FinancialDetails: FunctionComponent = () => {
           <div className={styles.cardContent}>
             <div className={styles.cardRow}>
               <span className={styles.rowText}>{dataTAM?.keyHypothesis}</span>
-              <GeneralBadge badgeClassName={styles.rowBadge} bulletClassName={styles.bulletLightPurple} badgeText="1" />
+              <GeneralBadge
+                showBullet
+                badgeClassName={styles.rowBadge}
+                bulletClassName={styles.bulletLightPurple}
+                badgeText="1"
+              />
             </div>
             <div className={styles.cardRow}>
               <span className={styles.rowText}>{dataSAM?.keyHypothesis}</span>
-              <GeneralBadge badgeClassName={styles.rowBadge} bulletClassName={styles.bulletPurple} badgeText="2" />
+              <GeneralBadge
+                showBullet
+                badgeClassName={styles.rowBadge}
+                bulletClassName={styles.bulletPurple}
+                badgeText="2"
+              />
             </div>
             <div className={styles.cardRow}>
               <span className={styles.rowText}>{dataSOM?.keyHypothesis}</span>
-              <GeneralBadge badgeClassName={styles.rowBadge} bulletClassName={styles.bulletBlue} badgeText="3" />
+              <GeneralBadge
+                showBullet
+                badgeClassName={styles.rowBadge}
+                bulletClassName={styles.bulletBlue}
+                badgeText="3"
+              />
             </div>
           </div>
         </ConceptDetailCard>
