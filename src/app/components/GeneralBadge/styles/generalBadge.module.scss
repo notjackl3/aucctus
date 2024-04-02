@@ -21,4 +21,35 @@
     font-weight: 500;
     line-height: 1.5rem;
   }
+
+  &.highRisk {
+    background: #fef3f2;
+    color: #b42318;
+
+    svg {
+      path {
+        stroke: #f04438;
+      }
+    }
+  }
+  &.mediumRisk {
+    background: #fffaeb;
+    color: #b54708;
+
+    svg {
+      path {
+        stroke: #f79009;
+      }
+    }
+  }
+  &.lowRisk {
+    background: #ecfdf3;
+    color: #027a48;
+
+    svg {
+      path {
+        stroke: #12b76a;
+      }
+    }
+  }
 }
