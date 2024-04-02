@@ -8,8 +8,8 @@ export interface TablePaginationProps {
   page: number;
   variant: 'client' | 'server';
   setPage: (pageNumber: number) => void;
-  nextPageClient: () => void;
-  previousPageClient: () => void;
+  nextPageClient?: () => void;
+  previousPageClient?: () => void;
   isNextPageDisabled?: boolean;
   isPreviousPageDisabled?: boolean;
 }
@@ -50,7 +50,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
   const nextPage = () => {
     switch (variant) {
       case 'client':
-        nextPageClient();
+        nextPageClient && nextPageClient();
         return;
       case 'server':
         manualNextPage();
@@ -60,7 +60,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
   const previousPage = () => {
     switch (variant) {
       case 'client':
-        previousPageClient();
+        previousPageClient && previousPageClient();
         return;
       case 'server':
         manualPreviousPage();
