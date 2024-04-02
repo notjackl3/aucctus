@@ -104,19 +104,19 @@ export interface IAssumption {
   expectedResult: string;
   methodOfTesting: string;
   variables: [string];
-  assumptionType: AssumptionType;
+  assumptionsType: AssumptionType;
 
   /**
    * The risk level of the assumption
    * A number between -10 and 10
    */
-  riskLevel: string;
+  riskLevel: number;
   riskRational: string;
   /**
    * The risk level of the assumption
    * A number between -10 and 10
    */
-  impactLevel: string;
+  impactLevel: number;
   impactRational: string;
 
   validated: boolean;

@@ -20,6 +20,7 @@ import { useParams } from 'react-router-dom';
 import QuadrantChart from '../../../../components/QuadrantChart';
 import { getAssumptionActiveHexColor, getAssumptionHexColor } from '../../../../../libs/concepts';
 import GeneralBadge from '../../../../components/GeneralBadge';
+import { ChartPoint } from '../../../../components/QuadrantChart/QuadrantChart';
 
 const columnHelper = createColumnHelper<IAssumption>();
 
@@ -42,8 +43,7 @@ const HypothesisDetails: FunctionComponent = () => {
     },
   });
 
-  //TODO - add typings when branch updated
-  const chartCoordinates = useMemo(() => {
+  const chartCoordinates: ChartPoint[] = useMemo(() => {
     if (!data || !data.results) {
       return [];
     }
