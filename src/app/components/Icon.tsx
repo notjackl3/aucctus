@@ -52,6 +52,9 @@ import Building from '../assets/icons/building.svg?react';
 import FileCode from '../assets/icons/filecode.svg?react';
 import List from '../assets/icons/list.svg?react';
 import Board from '../assets/icons/board.svg?react';
+import AlertOctagon from '../assets/icons/alert-octagon.svg?react';
+import AlertTriangle from '../assets/icons/alert-triangle.svg?react';
+import Check from '../assets/icons/check.svg?react';
 
 export type IconVariant =
   | 'lock'
@@ -105,7 +108,10 @@ export type IconVariant =
   | 'building'
   | 'filecode'
   | 'list'
-  | 'board';
+  | 'board'
+  | 'alertOctagon'
+  | 'alertTriangle'
+  | 'check';
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
   variant: IconVariant;
   title?: string;
@@ -217,6 +223,12 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <List {...props} />;
     case 'board':
       return <Board {...props} />;
+    case 'alertOctagon':
+      return <AlertOctagon {...props} />;
+    case 'alertTriangle':
+      return <AlertTriangle {...props} />;
+    case 'check':
+      return <Check {...props} />;
   }
 };
 
