@@ -2,8 +2,8 @@
 /// <reference types="vite-plugin-svgr/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_AVXISI_BASE_URL: string;
-  readonly VITE__AUCCTUS_BASE_FAST_URL: string;
+  readonly VITE_AUCCTUS_BASE_RESOURCE_URL: string;
+  readonly VITE_AUCCTUS_BASE_FAST_URL: string;
 }
 
 interface ImportMeta {

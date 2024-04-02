@@ -6,7 +6,7 @@ import Loading from '../../components/Loading';
 
 import Icon, { IconVariant } from '../../components/Icon';
 import { AppPath } from '../../../routes/routes';
-import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 import Kanban from '../../components/Kanban';
 import TabView from '../../components/TabView';
@@ -61,7 +61,7 @@ const Concepts: FunctionComponent = () => {
   const status = (searchParams.get('status') as ConceptStatus) || null;
   const page = searchParams.get('page') || '1';
 
-  const kanbanView = searchParams.get('kanban') === 'true' && category === 'active';
+  const isKanbanView = searchParams.get('kanban') === 'true' && category === 'active';
 
   /**
    * Sets the status filter for concepts.
@@ -114,14 +114,14 @@ const Concepts: FunctionComponent = () => {
       searchParams.set('page', '1');
       setSearchParams(searchParams);
     }
-  }, [page]);
+  }, [page, searchParams, setSearchParams]);
 
   useEffect(() => {
     if (!category) {
       searchParams.set('category', ConceptCategory.active);
       setSearchParams(searchParams);
     }
-  }, [category]);
+  }, [category, searchParams, setSearchParams]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['concepts', status, category, page],
@@ -137,7 +137,6 @@ const Concepts: FunctionComponent = () => {
     },
   });
 
-  // TODO: Redesign this flow to use a more efficient way to update the kanban columns
   // We should be able to update the columns (components) without having to recreate the entire component
   const kanbanColumns = useMemo(() => {
     // Create a deep copy of the columns
@@ -183,10 +182,10 @@ const Concepts: FunctionComponent = () => {
             setPage={setPage}
             status={status}
             setStatusFilter={setStatusFilter}
-            showStatusFilter={!kanbanView}
+            showStatusFilter={!isKanbanView}
           >
             <>
-              {kanbanView ? (
+              {isKanbanView ? (
                 <Kanban
                   kanbanColumns={kanbanColumns}
                   selectCard={(id: string) => navigate(AppPath.ConceptOverview.replace(':id', id))}

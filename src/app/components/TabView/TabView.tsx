@@ -4,6 +4,10 @@ import Tab from './Tab';
 
 export interface TabElement {
   label: string | ReactNode;
+  /**
+   * Value be Unique. This is used to tell us which tab is active
+   *
+   */
   value: string;
 }
 
