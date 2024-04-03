@@ -36,8 +36,6 @@
     "react-toastify": "^10.0.4",
     "redux-persist": "^6.0.0",
     "resize-observer-polyfill": "^1.5.1",
-    "terser": "^5.30.3",
-    "vite-plugin-compression": "^0.5.1",
     "vite-plugin-svgr": "^4.1.0"
   },
   "devDependencies": {
@@ -60,6 +58,8 @@
     "sass": "^1.72.0",
     "tsc-files": "^1.1.4",
     "typescript": "5.1",
+    "terser": "^5.30.3",
+    "vite-plugin-compression": "^0.5.1",
     "vite": "^4.0.0",
     "vite-plugin-eslint": "^1.8.1",
     "vitest": "^0.30.1"
