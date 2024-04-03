@@ -51,17 +51,15 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
       const yCoord = getAdjustedCoord(coordinate.yCoord);
       const xCoord = getAdjustedCoord(coordinate.xCoord);
       return (
-        <>
-          <circle
-            key={`coordinate-${i}`}
-            cx={xCoord}
-            cy={yCoord}
-            r={POINT_RADIUS}
-            fill={coordinate.color}
-            strokeWidth={isCoordSelected ? '16' : undefined}
-            stroke={coordinate.activeColor}
-          />
-        </>
+        <circle
+          key={`coordinate-${i}`}
+          cx={xCoord}
+          cy={yCoord}
+          r={POINT_RADIUS}
+          fill={coordinate.color}
+          strokeWidth={isCoordSelected ? '16' : undefined}
+          stroke={coordinate.activeColor}
+        />
       );
     });
   }, [chartCoordinates, selectedCoordinate]);
@@ -76,7 +74,7 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
           x2={CHART_CENTER_WIDTH}
           y2={CHART_WIDTH}
           stroke="#E0E5F2"
-          stroke-width="10"
+          strokeWidth="10"
         />
         <line
           x1="0"
@@ -84,7 +82,7 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
           x2={CHART_WIDTH}
           y2={CHART_CENTER_WIDTH}
           stroke="#E0E5F2"
-          stroke-width="10"
+          strokeWidth="10"
         />
         {chartPoints}
         <QuadrantChartActiveLines activeChartPoint={activeCoordinate} />
