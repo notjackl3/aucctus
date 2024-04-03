@@ -50,7 +50,7 @@ const HypothesisDetails: FunctionComponent = () => {
     return data.results.map((assumption) => {
       return {
         xCoord: assumption.impactLevel,
-        yCoord: assumption.riskLevel,
+        yCoord: -assumption.riskLevel,
         id: assumption.uuid,
         color: getAssumptionHexColor(assumption.assumptionsType),
         activeColor: getAssumptionActiveHexColor(assumption.assumptionsType),
