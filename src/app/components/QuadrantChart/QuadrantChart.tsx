@@ -32,7 +32,7 @@ const defaultTextProps = {
   fontSize: '48',
 };
 
-const QuardantChart: FunctionComponent<QuadrantChartProps> = ({
+const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
   chartCoordinates,
   selectedCoordinate,
   yTopLabel,
@@ -105,4 +105,4 @@ const QuardantChart: FunctionComponent<QuadrantChartProps> = ({
   );
 };
 
-export default QuardantChart;
+export default QuadrantChart;
