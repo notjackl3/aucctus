@@ -13,7 +13,7 @@
     align-items: center;
     border-radius: 50%;
     background: #dee7fc;
-    &.blueIcon {
+    &.purpleIcon {
       background: #ece9fe;
       svg {
         path {
@@ -21,27 +21,27 @@
         }
       }
     }
-    &.redIcon {
-      background: #fee4e2;
+    &.lighBlueIcon {
+      background: #cff9fe;
       svg {
         path {
-          stroke: #f04438;
+          stroke: #088ab2;
         }
       }
     }
     &.greenIcon {
-      background: #d1fadf;
+      background: #ccfbef;
       svg {
         path {
           stroke: #0e9384;
         }
       }
     }
-    &.yellowIcon {
-      background: #cff9fe;
+    &.blueIcon {
+      background: #d1e0ff;
       svg {
         path {
-          stroke: #088ab2;
+          stroke: #155eef;
         }
       }
     }
