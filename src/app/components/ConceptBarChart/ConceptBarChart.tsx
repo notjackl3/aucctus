@@ -64,7 +64,7 @@ const ConceptBarChart: FunctionComponent<ConceptBarChartProps> = ({
           <text className={styles.subLabel} key={`sub-label-${i}`} x={'50%'} y={70} textAnchor="middle">
             {camelCaseToTitleCase(data.label)}
           </text>
-          <rect key={`bar-${i}`} y={yCoord} x={0} width="170" height={MAX_BAR_HEIGHT} fill={data.color} />
+          <rect key={`bar-${i}`} y={yCoord} x={0} width={BAR_WIDTH} height={MAX_BAR_HEIGHT} fill={data.color} />
           <line key={`bar-line-${i}`} x1={BAR_WIDTH} y1={CHART_HEIGHT} x2={BAR_WIDTH} y2="0" {...defaultLineProps} />
         </svg>
       );
