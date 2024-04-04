@@ -92,6 +92,28 @@ export function snakeCaseToTitleCase(snakeCase: string) {
     .join(' ');
 }
 
+export function camelCaseToTitleCase(camelCase: string) {
+  if (!camelCase) {
+    return '';
+  }
+  const words = camelCase.replace(/([A-Z])/g, ' $1').split(' ');
+  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+}
+
+export function camelCaseToSnakeCase(camelCase: string) {
+  if (!camelCase) {
+    return '';
+  }
+  return camelCase.replace(/([A-Z])/g, '_$1').toLowerCase();
+}
+
+export function snakeCaseToCamelCase(snakeCase: string) {
+  if (!snakeCase) {
+    return '';
+  }
+  return snakeCase.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+}
+
 export function dateCellFormatter(info: string, formattingOptions: Intl.DateTimeFormatOptions = {}) {
   return new Date(info).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -136,3 +158,12 @@ export function formatLargeNumber(num: number) {
     return `$${parseFloat(num.toFixed(1))}T`;
   }
 }
+
+export const calculatePercent = (numerator: number, denominator: number): string => {
+  if (!numerator || !denominator) {
+    return '0%';
+  }
+  const percent = (numerator / denominator) * 100;
+  const roundedPercent = Math.round(percent);
+  return `${roundedPercent}%`;
+};
