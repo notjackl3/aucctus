@@ -64,7 +64,7 @@
   .contentContainer {
     display: flex;
     align-items: flex-start;
-    flex-direction: column;
+    flex-direction: row;
     gap: 1.5rem;
     align-self: stretch;
     height: 100%;
@@ -76,10 +76,32 @@
       gap: 1rem;
       flex-wrap: wrap;
       width: 24rem;
+      align-self: stretch;
+
+      &.barChart {
+        width: 45rem;
+
+        .cardAction {
+          color: $blue-600;
+          @include body-100;
+          font-family: $dm-sans;
+          border: none;
+          background: $purple-50;
+          padding: 0.5rem 1rem;
+          border-radius: 0.5rem;
+
+          svg {
+            path {
+              stroke: $blue-600;
+            }
+          }
+        }
+      }
 
       .cardStyle {
         width: 100%;
         max-width: 70rem;
+        align-self: stretch;
         h4 {
           color: $blue-900;
           @include text-large;
