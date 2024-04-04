@@ -22,9 +22,9 @@ const defaultIconProps = {
 
 const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({ assumptionType }) => {
   const assumptionColorObj = {
-    desirability: 'blue',
+    desirability: 'purple',
     viability: 'green',
-    feasibility: 'yellow',
+    feasibility: 'lightBlue',
     adaptability: 'blue',
   };
 

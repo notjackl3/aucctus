@@ -46,6 +46,10 @@
     color: $grey-700;
     @include text-small;
 
+    &:disabled {
+      visibility: hidden;
+    }
+
     svg {
       path {
         stroke: $grey-700;

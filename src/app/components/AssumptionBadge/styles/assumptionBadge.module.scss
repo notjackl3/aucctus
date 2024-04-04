@@ -13,35 +13,35 @@
     align-items: center;
     border-radius: 50%;
     background: #dee7fc;
-    &.blueIcon {
-      background: #dee7fc;
+    &.purpleIcon {
+      background: #ece9fe;
       svg {
         path {
-          stroke: #155eef;
+          stroke: #7839ee;
         }
       }
     }
-    &.redIcon {
-      background: #fee4e2;
+    &.lighBlueIcon {
+      background: #cff9fe;
       svg {
         path {
-          stroke: #f04438;
+          stroke: #088ab2;
         }
       }
     }
     &.greenIcon {
-      background: #d1fadf;
+      background: #ccfbef;
       svg {
         path {
           stroke: #0e9384;
         }
       }
     }
-    &.yellowIcon {
-      background: #fef0c7;
+    &.blueIcon {
+      background: #d1e0ff;
       svg {
         path {
-          stroke: #f48e09;
+          stroke: #155eef;
         }
       }
     }

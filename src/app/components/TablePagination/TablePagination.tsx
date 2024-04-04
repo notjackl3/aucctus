@@ -6,14 +6,28 @@ import Icon from '../Icon';
 export interface TablePaginationProps {
   totalPages: number;
   page: number;
+  variant: 'client' | 'server';
   setPage: (pageNumber: number) => void;
+  nextPageClient?: () => void;
+  previousPageClient?: () => void;
+  isNextPageDisabled?: boolean;
+  isPreviousPageDisabled?: boolean;
 }
 
-const TablePagination: FunctionComponent<TablePaginationProps> = ({ totalPages, page, setPage }) => {
+const TablePagination: FunctionComponent<TablePaginationProps> = ({
+  variant,
+  totalPages,
+  page,
+  setPage,
+  nextPageClient,
+  previousPageClient,
+  isNextPageDisabled,
+  isPreviousPageDisabled,
+}) => {
   const [startPage, setStartPage] = useState(1);
   const MAX_PAGES_PER_PAGE = 10;
 
-  const nextPage = () => {
+  const manualNextPage = () => {
     if (page === totalPages) {
       return;
     }
@@ -23,7 +37,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({ totalPages, 
     setPage(page + 1);
   };
 
-  const previousPage = () => {
+  const manualPreviousPage = () => {
     if (page === 1) {
       return;
     }
@@ -33,8 +47,34 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({ totalPages, 
     setPage(Math.max(page - 1, 1));
   };
 
+  const nextPage = () => {
+    switch (variant) {
+      case 'client':
+        nextPageClient && nextPageClient();
+        return;
+      case 'server':
+        manualNextPage();
+    }
+  };
+
+  const previousPage = () => {
+    switch (variant) {
+      case 'client':
+        previousPageClient && previousPageClient();
+        return;
+      case 'server':
+        manualPreviousPage();
+    }
+  };
+
   const handlePageClick = (pageNumber: number) => {
-    setPage(pageNumber);
+    switch (variant) {
+      case 'client':
+        setPage(Math.max(pageNumber - 1, 0));
+        return;
+      case 'server':
+        setPage(pageNumber);
+    }
   };
 
   const renderPageNumbers = () => {
@@ -55,12 +95,17 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({ totalPages, 
 
   return (
     <div className={styles.tablePagination}>
-      <button className={styles.button} onClick={previousPage}>
+      <button
+        className={styles.button}
+        onClick={previousPage}
+        disabled={isPreviousPageDisabled}
+        aria-label="Previous Page"
+      >
         <Icon variant="arrowLeft" width={20} height={20} />
         Previous
       </button>
       <div className={styles.pageContainer}>{renderPageNumbers()}</div>
-      <button className={styles.button} onClick={nextPage}>
+      <button className={styles.button} onClick={nextPage} disabled={isNextPageDisabled} aria-label="Next Page">
         Next
         <Icon variant="arrowRight" width={20} height={20} />
       </button>

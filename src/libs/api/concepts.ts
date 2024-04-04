@@ -65,7 +65,7 @@ export class ConceptApi extends ApiService {
   }
 
   getConceptKeyAssumptions(uuid: string) {
-    return this.get<IAssumption[]>(endpoints.conceptKeyAssumptions(uuid));
+    return this.get<IPageResponse<IAssumption>>(endpoints.conceptKeyAssumptions(uuid));
   }
 
   getConceptKeyAssumptionsUuid(uuid: string, keyAssumptionsUuid: string) {
