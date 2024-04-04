@@ -60,3 +60,16 @@ export function getAssumptionHexColor(assumption: AssumptionType): AssumptionBac
 
   return assumptionColorObj[assumption];
 }
+
+type ConceptStatusBarColor = '#B9E6FE' | '#84ADFF' | '#A4BCFD' | '#C3B5FD';
+
+export function getConceptStatusBarColor(status: ConceptStatus) {
+  const conceptStatusBarColorObj: Partial<Record<ConceptStatus, ConceptStatusBarColor>> = {
+    [ConceptStatus.prototyping]: '#B9E6FE',
+    [ConceptStatus.proofOfConcept]: '#84ADFF',
+    [ConceptStatus.minimumViableProduct]: '#A4BCFD',
+    [ConceptStatus.commercialized]: '#C3B5FD',
+  };
+
+  return conceptStatusBarColorObj[status];
+}
