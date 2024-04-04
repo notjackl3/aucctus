@@ -76,6 +76,7 @@
       gap: 1rem;
       flex-wrap: wrap;
       width: 24rem;
+      align-self: stretch;
 
       &.barChart {
         width: 45rem;
@@ -100,6 +101,7 @@
       .cardStyle {
         width: 100%;
         max-width: 70rem;
+        align-self: stretch;
         h4 {
           color: $blue-900;
           @include text-large;
