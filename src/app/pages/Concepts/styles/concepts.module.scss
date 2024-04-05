@@ -10,7 +10,7 @@
   align-items: flex-start;
   position: absolute;
   left: var(--nav-drawer-width);
-  min-width: 50rem;
+  min-width: 63rem;
   width: calc(100vw - var(--nav-drawer-width));
   background: var(--gray-50-bg, #fcfcfd);
   height: 100%;
@@ -122,6 +122,7 @@
       th {
         color: $grey-600;
         font-size: 0.875rem;
+        padding: 0rem 0.5rem;
         font-style: normal;
         font-weight: 400;
         overflow: hidden;
@@ -168,7 +169,7 @@
             justify-content: flex-start;
             height: 4rem;
             overflow: hidden;
-            padding-right: 2rem;
+            padding: 0.5rem;
             box-sizing: border-box;
             color: $grey-600;
             text-overflow: ellipsis;
@@ -177,10 +178,30 @@
             font-style: normal;
             font-weight: 400;
 
+            .openButton {
+              min-width: 3.5rem;
+              color: $grey-700;
+              font-family: $dm-sans;
+              font-size: 0.875rem;
+              font-weight: 400;
+              border: 1px solid $grey-300;
+              padding: 0.5rem;
+              box-sizing: border-box;
+              border-radius: 0.5rem;
+              background: none;
+            }
+
+            .actionButton {
+              padding: 0.3rem 0.5rem;
+              font-family: $dm-sans;
+              font-size: 0.875rem;
+              font-weight: 400;
+              font-style: normal;
+              box-sizing: border-box;
+            }
+
             .company {
-              white-space: nowrap;
-              overflow: hidden;
-              text-overflow: ellipsis;
+              display: flex;
             }
 
             .cellDescription {
@@ -225,7 +246,8 @@
       border-radius: 0 0 0.75rem 0.75rem;
       background: $white;
       box-shadow: $shadow-100;
-      border-bottom: 1px solid $grey-300;
+      border: 1px solid $grey-300;
+      border-top: none;
     }
   }
 }
