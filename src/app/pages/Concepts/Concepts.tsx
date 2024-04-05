@@ -128,7 +128,6 @@ const Concepts: FunctionComponent = () => {
     retry: 0,
     cacheTime: 12000,
     refetchInterval: (data?: IConceptPage) => {
-      console.log(data, 'data');
       if (data && data.results.some((concept) => ACTIVE_STATUS_LIST.includes(concept.status) && concept.isGenerated)) {
         return 5000;
       } else {
