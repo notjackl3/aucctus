@@ -38,7 +38,7 @@ const NavDrawer = () => {
               openBasePath={AppPath.Concept}
               nestedRoutes={[
                 {
-                  title: 'Active Concepts',
+                  title: 'Active',
                   to: `${AppPath.ConceptCategory}?category=active`,
                 },
                 {
