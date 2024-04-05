@@ -11,7 +11,7 @@ import {
 } from '@tanstack/react-table';
 import { dateCellFormatter } from '../../../../libs/utils';
 import TableCheckBox from '../../../components/TableCheckBox';
-import { IConcept } from '../../../../libs/api/typings';
+import { ConceptStatus, IConcept } from '../../../../libs/api/typings';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
 import styles from '../styles/concepts.module.scss';
@@ -21,6 +21,8 @@ import Icon from '../../../components/Icon';
 import Loading from '../../../components/Loading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../../routes/routes';
+import ConceptRowButton from './ConceptRowButton';
+import useConceptMenu from '../../../components/ConceptMenu/hooks/useConceptMenu';
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -37,6 +39,7 @@ interface IConceptTableProps {
 
 const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }) => {
   const navigate = useNavigate();
+  const { updateConceptStatus } = useConceptMenu({ conceptId: '' });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [excludeIdSet, setExcludeIdSet] = useState(new Set());
   const [isEntireCategorySelected, setIsEntireCategorySelected] = useState(false);
@@ -91,6 +94,7 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
     () => [
       columnHelper.accessor((row) => row?.status, {
         id: 'select',
+        size: 50,
         header: ({ table }) => (
           <TableCheckBox
             {...{
@@ -127,7 +131,8 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
       columnHelper.accessor('title', {
         id: 'title',
         header: () => <span className={styles.details}>Company</span>,
-        size: 400,
+        size: 200,
+        minSize: 200,
         cell: (info) => <span className={styles.company}>{info?.getValue()}</span>,
       }),
       columnHelper.accessor((row) => row?.description, {
@@ -138,23 +143,45 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
       }),
       columnHelper.accessor((row) => row?.updatedAt, {
         id: 'updatedAt',
-        size: 300,
+        size: 150,
+        minSize: 150,
         cell: (info) => dateCellFormatter(info.getValue()),
         header: () => <span>Last Modified</span>,
       }),
       columnHelper.accessor((row) => row?.status, {
         id: 'status',
-        size: 300,
+        size: 250,
+        minSize: 250,
         header: () => <span>Status</span>,
         cell: (info) => (
-          <span className={styles.reviewConceptLink}>
+          <span>
             <ConceptStatusBubble status={info?.getValue()} />
           </span>
         ),
       }),
+      columnHelper.accessor((row) => row?.isGenerated, {
+        id: 'isGenerated',
+        cell: ({ row }) => (
+          <ConceptRowButton
+            // TODO change variant to row.original.reportStatus
+            variant="complete"
+            onClick={(e) => {
+              // TODO remove placeholder false condition
+              if (false || row.original.reportStatus === 'notStarted') {
+                e.stopPropagation();
+                updateConceptStatus(ConceptStatus.ideating, row.original.uuid);
+              }
+            }}
+          />
+        ),
+        minSize: 120,
+        size: 120,
+        header: () => {},
+      }),
       columnHelper.accessor((row) => row?.uuid, {
         id: 'uuid',
-        size: 300,
+        minSize: 30,
+        size: 30,
         header: () => {},
         cell: (info) => (
           <span className={styles.conceptMenu}>
@@ -196,7 +223,7 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     defaultColumn: {
-      minSize: 500, //enforced during column resizing
+      minSize: 50, //enforced during column resizing
       maxSize: 500, //enforced during column resizing
     },
   });
@@ -225,7 +252,12 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
               key={row.id}
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(AppPath.ConceptOverview.replace(':id', row.id));
+                // TODO change to reportStatus to prevent opening page
+                // remove temp true condition
+                const reportStatus = row.getValue('reportStatus');
+                if (true || (reportStatus && reportStatus === 'complete')) {
+                  navigate(AppPath.ConceptOverview.replace(':id', row.id));
+                }
               }}
             >
               {row.getVisibleCells().map((cell) => (
