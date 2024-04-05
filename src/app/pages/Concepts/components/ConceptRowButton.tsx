@@ -3,7 +3,6 @@ import styles from '../styles/concepts.module.scss';
 import { ConceptReportStatus } from '../../../../libs/api/typings';
 
 type ConceptRowButtonProps = {
-  //TODO align with concept types
   variant: ConceptReportStatus;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
@@ -11,22 +10,22 @@ type ConceptRowButtonProps = {
 const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, onClick }) => {
   const getButtonLabel = (variant: ConceptRowButtonProps['variant']) => {
     switch (variant) {
-      case 'complete':
+      case ConceptReportStatus.complete:
         return 'OPEN';
-      case 'pending':
+      case ConceptReportStatus.pending:
         return 'LOADING';
-      case 'notStarted':
+      case ConceptReportStatus.notStarted:
         return 'LAUNCH';
     }
   };
 
   const getButtonStyle = (variant: ConceptRowButtonProps['variant']) => {
     switch (variant) {
-      case 'complete':
+      case ConceptReportStatus.complete:
         return styles.openButton;
-      case 'pending':
+      case ConceptReportStatus.pending:
         return `${styles.actionButton} btn btn-primary`;
-      case 'notStarted':
+      case ConceptReportStatus.notStarted:
         return `${styles.actionButton} btn btn-primary`;
       default:
         return '';
