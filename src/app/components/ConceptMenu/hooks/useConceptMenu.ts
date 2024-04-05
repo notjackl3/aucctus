@@ -14,7 +14,8 @@ const useConceptMenu = ({ conceptId }: usePopupMenuProps) => {
 
   const conceptStatusMutation = useMutation<IConcept, AxiosError<IFormError<IConcept>>, Partial<IConcept>>({
     mutationFn: async (conceptObj: Partial<IConcept>) => {
-      return api.concept.updateConcept(conceptObj, conceptId);
+      const conceptStatusObj = { status: conceptObj.status };
+      return api.concept.updateConcept(conceptStatusObj, conceptObj.uuid || conceptId);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['concepts'] });
@@ -28,10 +29,12 @@ const useConceptMenu = ({ conceptId }: usePopupMenuProps) => {
 
   const updateConceptStatus = (
     status: ConceptStatus,
+    conceptId: string,
     options?: MutateOptions<IConcept, AxiosError<IFormError<IConcept>>, Partial<IConcept>>
   ) => {
     const conceptPutObj: Partial<IConcept> = {
       status: status,
+      uuid: conceptId,
     };
     conceptStatusMutation.mutate(conceptPutObj, options);
   };
