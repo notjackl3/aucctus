@@ -11,7 +11,7 @@ import {
 } from '@tanstack/react-table';
 import { dateCellFormatter } from '../../../../libs/utils';
 import TableCheckBox from '../../../components/TableCheckBox';
-import { ConceptStatus, IConcept } from '../../../../libs/api/typings';
+import { ConceptReportStatus, ConceptStatus, IConcept } from '../../../../libs/api/typings';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
 import styles from '../styles/concepts.module.scss';
@@ -159,15 +159,13 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
           </span>
         ),
       }),
-      columnHelper.accessor((row) => row?.isGenerated, {
-        id: 'isGenerated',
+      columnHelper.accessor((row) => row?.reportStatus, {
+        id: 'reportStatus',
         cell: ({ row }) => (
           <ConceptRowButton
-            // TODO change variant to row.original.reportStatus
-            variant="complete"
+            variant={row.original.reportStatus}
             onClick={(e) => {
-              // TODO remove placeholder false condition
-              if (false || row.original.reportStatus === 'notStarted') {
+              if (row.original.reportStatus === ConceptReportStatus.notStarted) {
                 e.stopPropagation();
                 updateConceptStatus(ConceptStatus.ideating, row.original.uuid);
               }
@@ -252,10 +250,9 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
               key={row.id}
               onClick={(e) => {
                 e.stopPropagation();
-                // TODO change to reportStatus to prevent opening page
-                // remove temp true condition
                 const reportStatus = row.getValue('reportStatus');
-                if (true || (reportStatus && reportStatus === 'complete')) {
+                //TODO remove true condition when reportStatus is implemented
+                if (true || (reportStatus && reportStatus === ConceptReportStatus.complete)) {
                   navigate(AppPath.ConceptOverview.replace(':id', row.id));
                 }
               }}

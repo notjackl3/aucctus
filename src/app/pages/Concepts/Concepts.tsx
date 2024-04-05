@@ -9,7 +9,7 @@ import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 import Kanban from '../../components/Kanban';
 import TabView from '../../components/TabView';
-import { ConceptStatus, ConceptCategory, IConceptPage } from '../../../libs/api/typings';
+import { ConceptStatus, ConceptCategory, IConceptPage, ConceptReportStatus } from '../../../libs/api/typings';
 import ConceptTable from './components/ConceptTable';
 import ConceptContainer from './components/ConceptContainer';
 import { ConceptColumns } from '../../components/Kanban/Kanban';
@@ -128,7 +128,7 @@ const Concepts: FunctionComponent = () => {
     retry: 0,
     cacheTime: 12000,
     refetchInterval: (data?: IConceptPage) => {
-      if (data && data.results.some((concept) => ACTIVE_STATUS_LIST.includes(concept.status) && concept.isGenerated)) {
+      if (data && data.results.some((concept) => concept.reportStatus === ConceptReportStatus.pending)) {
         return 5000;
       } else {
         return false;

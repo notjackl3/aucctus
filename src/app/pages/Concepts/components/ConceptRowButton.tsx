@@ -1,9 +1,10 @@
 import { FunctionComponent } from 'react';
 import styles from '../styles/concepts.module.scss';
+import { ConceptReportStatus } from '../../../../libs/api/typings';
 
 type ConceptRowButtonProps = {
   //TODO align with concept types
-  variant: 'complete' | 'pending' | 'notStarted';
+  variant: ConceptReportStatus;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 

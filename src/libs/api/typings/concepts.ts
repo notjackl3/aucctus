@@ -15,10 +15,18 @@ export enum ConceptCategory {
   draft = 'draft',
   archive = 'archive',
 }
+
+export enum ConceptReportStatus {
+  notStarted = 'notStarted',
+  complete = 'complete',
+  pending = 'pending',
+  error = 'error',
+}
 export interface IConcept {
   uuid: string;
   title: string;
   isGenerated: boolean;
+  reportStatus: ConceptReportStatus;
   status: ConceptStatus;
   category: ConceptCategory;
   description: string;
