@@ -3,11 +3,19 @@
 
 .conceptStatistic {
   display: flex;
-  padding: 2px 0.5rem 2px 0.4rem;
+  padding: 2px 0.5rem 2px 0.5rem;
   box-sizing: border-box;
   align-items: center;
   border-radius: 1rem;
-  gap: 0.5rem;
+  gap: 1rem;
+  flex: 1 0 auto;
+
+  &.opportunityStatistic {
+    border: 1px solid $grey-300;
+    gap: 1rem;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
 
   .conceptIcon {
     border-radius: 50%;
@@ -64,7 +72,23 @@
       font-size: 1.5rem;
       font-style: normal;
       font-weight: 500;
-      line-height: 2rem;
+      gap: 0.5rem;
+
+      .conceptDataNumber {
+        display: flex;
+        align-items: flex-start;
+        line-height: 1.5rem;
+      }
+
+      .conceptDataInfo {
+        display: flex;
+        align-items: flex-start;
+        justify-content: flex-start;
+        color: $grey-600;
+        font-family: $dm-sans;
+        @include text-small;
+        line-height: 1rem;
+      }
     }
   }
 }

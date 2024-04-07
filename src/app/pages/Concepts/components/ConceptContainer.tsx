@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 
 import styles from '../styles/concepts.module.scss';
 import StatusButton from '../../../components/StatusButton';
-import { snakeCaseToTitleCase } from '../../../../libs/utils';
+import { camelCaseToTitleCase } from '../../../../libs/utils';
 import { CONCEPT_STATUS_LIST_MAP } from '../Concepts';
 import TablePagination from '../../../components/TablePagination';
 import { ConceptCategory, ConceptStatus } from '../../../../libs/api/typings';
@@ -47,7 +47,7 @@ const ConceptContainer: FunctionComponent<IConceptContainerProps> = ({
                 <StatusButton
                   key={`status-button-${index}`}
                   isActive={label === status}
-                  statusName={snakeCaseToTitleCase(label)}
+                  statusName={camelCaseToTitleCase(label)}
                   quantity={1}
                   activateFilter={() => setStatusFilter(label)}
                 />

@@ -24,6 +24,7 @@ export const endpoints = {
 
   /* Account */
   account: `/api/v1/account`,
+  dashboard: `/api/v1/dashboard`,
 
   /* Concepts */
   concept: 'api/v1/concept/',

@@ -10,8 +10,9 @@ import { useQuery } from 'react-query';
 import { AppPath } from '../../../routes/routes';
 import useConceptMenu from '../../components/ConceptMenu/hooks/useConceptMenu';
 import ConceptStatusBubble from '../../components/ConceptStatusBubble/ConceptStatusBubble';
+import { CONCEPT_STATUS_LIST } from '../../../libs/concepts';
 
-const DROPDOWN_OPTIONS = Object.values(ConceptStatus).map((value) => ({
+const DROPDOWN_OPTIONS = CONCEPT_STATUS_LIST.map((value) => ({
   label: <ConceptStatusBubble status={value} variant="dropdown" />,
   displayLabel: <ConceptStatusBubble status={value} variant="dropdown" isActive />,
   value,
@@ -29,7 +30,7 @@ const ConceptReport: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
   const navigate = useNavigate();
   const { updateConceptStatus } = useConceptMenu({ conceptId: conceptId });
-  const [status, setStatus] = useState<ConceptStatus>(ConceptStatus.new);
+  const [status, setStatus] = useState<ConceptStatus>('new');
   /**
    * Each tab has been set to return the associated route from AppPath
    */

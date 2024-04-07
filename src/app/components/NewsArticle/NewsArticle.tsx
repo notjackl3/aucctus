@@ -35,7 +35,7 @@ const NewsArticle: FunctionComponent<NewsArticleProps> = ({
             </a>
           )}
         </div>
-        <span className={styles.text}>{newsDescription}</span>
+        <span className={`${styles.text} ${styles.textOverflow}`}>{newsDescription}</span>
       </span>
     </div>
   );

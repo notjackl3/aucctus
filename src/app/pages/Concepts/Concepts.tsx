@@ -2,8 +2,6 @@ import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import styles from './styles/concepts.module.scss';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
-import Loading from '../../components/Loading';
-
 import Icon, { IconVariant } from '../../components/Icon';
 import { AppPath } from '../../../routes/routes';
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
@@ -14,22 +12,12 @@ import { ConceptStatus, ConceptCategory } from '../../../libs/api/typings';
 import ConceptTable from './components/ConceptTable';
 import ConceptContainer from './components/ConceptContainer';
 import { ConceptColumns } from '../../components/Kanban/Kanban';
-
-export const CONCEPT_STATUS_LIST = Object.values(ConceptStatus).map((value: ConceptStatus) => value);
-
-export const DRAFT_STATUS_LIST = [ConceptStatus.new, ConceptStatus.ideating, ConceptStatus.inReview];
-export const ACTIVE_STATUS_LIST = [
-  ConceptStatus.prototyping,
-  ConceptStatus.proofOfConcept,
-  ConceptStatus.minimumViableProduct,
-  ConceptStatus.commercialized,
-];
-export const ARCHIVED_STATUS_LIST = [ConceptStatus.archived];
+import { ACTIVE_CONCEPT_STATUS_LIST, CONCEPT_STATUS_LIST, DRAFT_CONCEPT_STATUS_LIST } from '../../../libs/concepts';
 
 export const CONCEPT_STATUS_LIST_MAP = {
-  [ConceptCategory.draft]: DRAFT_STATUS_LIST,
-  [ConceptCategory.active]: ACTIVE_STATUS_LIST,
-  [ConceptCategory.archive]: ARCHIVED_STATUS_LIST,
+  draft: DRAFT_CONCEPT_STATUS_LIST,
+  active: ACTIVE_CONCEPT_STATUS_LIST,
+  archive: ACTIVE_CONCEPT_STATUS_LIST,
 };
 
 export const KANBAN_COLUMNS_MAP = CONCEPT_STATUS_LIST.reduce<ConceptColumns>(
@@ -57,7 +45,7 @@ const Concepts: FunctionComponent = () => {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const category = (searchParams.get('category') as ConceptCategory) || ConceptCategory.active;
+  const category = (searchParams.get('category') as ConceptCategory) || 'active';
   const status = (searchParams.get('status') as ConceptStatus) || null;
   const page = searchParams.get('page') || '1';
 
@@ -101,7 +89,7 @@ const Concepts: FunctionComponent = () => {
         searchParams.delete('kanban');
       } else {
         searchParams.set('kanban', 'true');
-        searchParams.set('category', ConceptCategory.active);
+        searchParams.set('category', 'active');
         searchParams.delete('status');
       }
       setSearchParams(searchParams);
@@ -118,7 +106,7 @@ const Concepts: FunctionComponent = () => {
 
   useEffect(() => {
     if (!category) {
-      searchParams.set('category', ConceptCategory.active);
+      searchParams.set('category', 'active');
       setSearchParams(searchParams);
     }
   }, [category, searchParams, setSearchParams]);

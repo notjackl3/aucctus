@@ -78,6 +78,10 @@
       width: 24rem;
       align-self: stretch;
 
+      .noBorder {
+        border: none;
+      }
+
       &.barChart {
         width: 45rem;
 
@@ -98,10 +102,25 @@
         }
       }
 
+      &.marketCard {
+        width: 45rem;
+      }
+
+      .opportunityFooter {
+        display: flex;
+        flex: 1 1 auto;
+        padding: 1rem 1.5rem;
+        box-sizing: border-box;
+        background: $purple-100;
+        border-radius: 0.75rem;
+        border: 1px solid $grey-300;
+      }
+
       .cardStyle {
         width: 100%;
         max-width: 70rem;
         align-self: stretch;
+        background: $white;
         h4 {
           color: $blue-900;
           @include text-large;
@@ -127,6 +146,7 @@
           display: flex;
           min-height: 4rem;
           width: 100%;
+          gap: 1.5rem;
           padding: 1rem 1.5rem;
           box-sizing: border-box;
           align-items: center;

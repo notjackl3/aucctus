@@ -1,3 +1,5 @@
+import { ConceptStatus } from '.';
+
 export interface IToken {
   token: string;
 }
@@ -29,6 +31,11 @@ export interface IUser {
   email: string;
   account?: string;
   role: 'Admin' | 'Employee';
+}
+
+export interface IUserDetailsResponse {
+  user: IUser;
+  account: IAccount;
 }
 
 export interface IRegisterUser {
@@ -69,4 +76,13 @@ export interface IPasswordResetForm {
 
 export interface IUpdateForgottenPasswordRequest extends IPasswordResetForm {
   token: string;
+}
+
+export interface IDashboard {
+  conceptDetails: IConceptDetails;
+}
+
+export interface IConceptDetails {
+  count: { [key in ConceptStatus | 'total']: number };
+  som: Record<ConceptStatus, number>;
 }
