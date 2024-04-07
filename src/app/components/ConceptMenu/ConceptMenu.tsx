@@ -29,7 +29,7 @@ const ConceptMenu: FunctionComponent<ConceptMenuProps> = ({ conceptId, clearConc
         onClick={(e) => {
           e.stopPropagation();
           clearConceptMenuId();
-          updateConceptStatus(ConceptStatus.archived, conceptId);
+          updateConceptStatus('archived', conceptId);
         }}
       >
         Archive concept

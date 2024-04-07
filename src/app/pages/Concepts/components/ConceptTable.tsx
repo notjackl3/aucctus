@@ -11,7 +11,7 @@ import {
 } from '@tanstack/react-table';
 import { dateCellFormatter } from '../../../../libs/utils';
 import TableCheckBox from '../../../components/TableCheckBox';
-import { ConceptReportStatus, ConceptStatus, IConcept } from '../../../../libs/api/typings';
+import { ConceptReportStatus, IConcept } from '../../../../libs/api/typings';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
 import styles from '../styles/concepts.module.scss';
@@ -167,7 +167,7 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
             onClick={(e) => {
               if (row.original.reportStatus === ConceptReportStatus.notStarted) {
                 e.stopPropagation();
-                updateConceptStatus(ConceptStatus.ideating, row.original.uuid);
+                updateConceptStatus('ideating', row.original.uuid);
               }
             }}
           />
