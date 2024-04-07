@@ -57,6 +57,7 @@
         .subtitle {
           color: var(--gray-600-text-secondary, #667085);
           @include body-100;
+          font-size: 1rem;
         }
       }
     }

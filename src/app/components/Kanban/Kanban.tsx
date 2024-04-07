@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 
 import styles from './styles/kanban.module.scss';
 import ConceptCard from '../ConceptCard/ConceptCard';
-import { snakeCaseToTitleCase } from '../../../libs/utils';
+import { camelCaseToTitleCase } from '../../../libs/utils';
 import { ConceptStatus, IConcept } from '../../../libs/api/typings';
 
 interface ConceptColumn {
@@ -32,7 +32,7 @@ const Kanban: FunctionComponent<KanbanProps> = ({ kanbanColumns, selectCard }) =
         return (
           <div key={`column-${columnId}-${index}`} className={styles.column}>
             <div className={styles.columnHeader}>
-              <div className={styles.columnHeaderTitle}>{snakeCaseToTitleCase(column?.title)}</div>
+              <div className={styles.columnHeaderTitle}>{camelCaseToTitleCase(column?.title)}</div>
               <div className={styles.columnHeaderCount}>{column?.items?.length}</div>
             </div>
             {renderColumnCards(column?.items)}

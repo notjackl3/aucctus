@@ -1,4 +1,30 @@
-import { AssumptionType, ConceptStatus } from './api/typings';
+import { IconVariant } from '../app/components/Icon';
+import {
+  ActiveConceptStatus,
+  ArchivedConceptStatus,
+  AssumptionType,
+  ConceptStatus,
+  DraftConceptStatus,
+} from './api/typings';
+
+export const CONCEPT_STATUS_LIST: ConceptStatus[] = [
+  'new',
+  'ideating',
+  'inReview',
+  'prototyping',
+  'proofOfConcept',
+  'minimumViableProduct',
+  'commercialized',
+  'archived',
+];
+export const DRAFT_CONCEPT_STATUS_LIST: DraftConceptStatus[] = ['new', 'ideating', 'inReview'];
+export const ACTIVE_CONCEPT_STATUS_LIST: ActiveConceptStatus[] = [
+  'prototyping',
+  'proofOfConcept',
+  'minimumViableProduct',
+  'commercialized',
+];
+export const ARCHIVE_CONCEPT_STATUS_LIST: ArchivedConceptStatus[] = ['archived'];
 
 type StatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
 
@@ -10,14 +36,14 @@ type StatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
  */
 export function getConceptStatusColor(status: ConceptStatus): StatusColor {
   const statusColorObj: Record<ConceptStatus, StatusColor> = {
-    [ConceptStatus.new]: 'blue',
-    [ConceptStatus.ideating]: 'blue',
-    [ConceptStatus.inReview]: 'blue',
-    [ConceptStatus.commercialized]: 'green',
-    [ConceptStatus.prototyping]: 'purple',
-    [ConceptStatus.proofOfConcept]: 'purple',
-    [ConceptStatus.minimumViableProduct]: 'pink',
-    [ConceptStatus.archived]: 'red',
+    new: 'blue',
+    ideating: 'blue',
+    inReview: 'blue',
+    commercialized: 'green',
+    prototyping: 'purple',
+    proofOfConcept: 'purple',
+    minimumViableProduct: 'pink',
+    archived: 'red',
   };
 
   return statusColorObj[status];
@@ -61,15 +87,26 @@ export function getAssumptionHexColor(assumption: AssumptionType): AssumptionBac
   return assumptionColorObj[assumption];
 }
 
-type ConceptStatusBarColor = '#B9E6FE' | '#84ADFF' | '#A4BCFD' | '#C3B5FD';
-
-export function getConceptStatusBarColor(status: ConceptStatus) {
-  const conceptStatusBarColorObj: Partial<Record<ConceptStatus, ConceptStatusBarColor>> = {
-    [ConceptStatus.prototyping]: '#B9E6FE',
-    [ConceptStatus.proofOfConcept]: '#84ADFF',
-    [ConceptStatus.minimumViableProduct]: '#A4BCFD',
-    [ConceptStatus.commercialized]: '#C3B5FD',
+export function getDashboardConceptStatusIcon(status: ActiveConceptStatus) {
+  const conceptStatusIconObj: Record<ActiveConceptStatus, IconVariant> = {
+    prototyping: 'lightbulb',
+    proofOfConcept: 'paperAirPlane',
+    minimumViableProduct: 'rocket',
+    commercialized: 'shieldDollar',
   };
 
-  return conceptStatusBarColorObj[status];
+  return conceptStatusIconObj[status];
+}
+
+export type ConceptStatusIconColor = 'lightBlue' | 'blue' | 'purple';
+
+export function getDashboardConceptStatusIconColor(status: ActiveConceptStatus) {
+  const conceptStatusColorObj: Record<ActiveConceptStatus, ConceptStatusIconColor> = {
+    prototyping: 'lightBlue',
+    proofOfConcept: 'blue',
+    minimumViableProduct: 'blue',
+    commercialized: 'purple',
+  };
+
+  return conceptStatusColorObj[status];
 }

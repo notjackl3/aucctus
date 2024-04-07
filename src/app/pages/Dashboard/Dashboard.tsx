@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent } from 'react';
 import { useSelector } from 'react-redux';
 import { selectAccount } from '../../../features/auth/auth.slice';
 
@@ -11,65 +11,28 @@ import ConceptStatistic from '../../components/ConceptStatistic';
 import ConceptBarChart from '../../components/ConceptBarChart';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
-import { ConceptCategory, ConceptStatus } from '../../../libs/api/typings';
-import { BarData } from '../../components/ConceptBarChart/ConceptBarChart';
-import { getConceptStatusBarColor } from '../../../libs/concepts';
-import { camelCaseToSnakeCase } from '../../../libs/utils';
-import { getConceptStagePercent, getConceptTotalPercents } from './utils';
+import DashboardOpportunityCard from './components/DashboardOpportunityCard';
+import MarketActivityCard from './components/MarketActivityCard';
 
 const defaultIconProps = {
   stroke: '#2B3674',
   width: 20,
   height: 20,
 };
+
 const Dashboard: FunctionComponent = () => {
   const navigate = useNavigate();
   const { name: accountName } = useSelector(selectAccount) || { name: '' };
 
   const { data } = useQuery({
     // TEMP API call for concept data
-    queryKey: ['concepts'],
+    queryKey: ['dahsboard'],
     refetchOnWindowFocus: false,
     retry: 0,
     queryFn: async () => {
-      return api.concept.getConcepts({
-        category: ConceptCategory.active,
-      });
+      return api.account.getDashboard();
     },
   });
-
-  const barData = useMemo(() => {
-    // TEMP function until updated with new concept data endpoint
-    if (!data || !data.statusCounts) {
-      return [];
-    }
-    const activeStatuses = ['commercialized', 'minimumViableProduct', 'proofOfConcept', 'prototyping'];
-    return Object.entries(data?.statusCounts)
-      .map(([status, statusCount]) => {
-        if (activeStatuses.includes(status)) {
-          return {
-            label: status,
-            value: statusCount,
-            color: getConceptStatusBarColor(camelCaseToSnakeCase(status) as ConceptStatus),
-          };
-        }
-      })
-      .filter(Boolean) as BarData[];
-  }, [data]);
-
-  const conceptStagePercents = useMemo(() => {
-    if (!data || !data.statusCounts) {
-      return [];
-    }
-    return getConceptStagePercent(data.statusCounts);
-  }, [data]);
-
-  const conceptStageTotalPercents = useMemo(() => {
-    if (!data || !data.statusCounts) {
-      return [];
-    }
-    return getConceptTotalPercents(data.statusCounts, data.count);
-  }, [data]);
 
   return (
     <div className={`${styles.dashboard}`}>
@@ -99,7 +62,7 @@ const Dashboard: FunctionComponent = () => {
                   infoTitle="Concepts Generated"
                   infoValue="30"
                   icon="lightbulb"
-                  iconColor="lightblue"
+                  iconColor="lightBlue"
                 />
               </div>
               <div className={styles.cardRow}>
@@ -136,13 +99,15 @@ const Dashboard: FunctionComponent = () => {
             }
           >
             <div className={styles.cardContent}>
-              <ConceptBarChart
-                barData={barData}
-                shortArrowPercents={conceptStagePercents}
-                longArrowPercents={conceptStageTotalPercents}
-              />
+              <ConceptBarChart data={data?.conceptDetails.count} />
             </div>
           </ConceptDetailCard>
+        </div>
+        <div className={`${styles.cardContainer}`}>
+          <DashboardOpportunityCard />
+        </div>
+        <div className={`${styles.cardContainer} ${styles.marketCard}`}>
+          <MarketActivityCard />
         </div>
       </div>
     </div>

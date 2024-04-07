@@ -1,6 +1,6 @@
 import { ApiService } from './apiService';
 import { endpoints } from './endpoints';
-import { IAccount, IRegisterAccount, IUser } from './typings'; // Import the missing type
+import { IAccount, IDashboard, IRegisterAccount, IUser, IUserDetailsResponse } from './typings'; // Import the missing type
 
 /**
  * Account API
@@ -21,10 +21,14 @@ export class AccountApi extends ApiService {
   }
 
   getUser() {
-    return this.get(endpoints.user);
+    return this.get<IUserDetailsResponse>(endpoints.user);
   }
 
   updateUser(user: Partial<IUser>) {
     return this.put(endpoints.user, user);
+  }
+
+  getDashboard() {
+    return this.get<IDashboard>(endpoints.dashboard);
   }
 }

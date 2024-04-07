@@ -1,20 +1,26 @@
 import { IPageResponse } from '.';
 
-export enum ConceptStatus {
-  new = 'new',
-  ideating = 'ideating',
-  inReview = 'in_review',
-  prototyping = 'prototyping',
-  proofOfConcept = 'proof_of_concept',
-  minimumViableProduct = 'minimum_viable_product',
-  commercialized = 'commercialized',
-  archived = 'archived',
-}
-export enum ConceptCategory {
-  active = 'active',
-  draft = 'draft',
-  archive = 'archive',
-}
+export type ConceptStatus =
+  | 'new'
+  | 'ideating'
+  | 'inReview'
+  | 'prototyping'
+  | 'proofOfConcept'
+  | 'minimumViableProduct'
+  | 'commercialized'
+  | 'archived';
+
+export type ConceptCategory = 'active' | 'draft' | 'archive';
+
+export type DraftConceptStatus = Exclude<
+  ConceptStatus,
+  'prototyping' | 'proofOfConcept' | 'minimumViableProduct' | 'commercialized' | 'archived'
+>;
+export type ArchivedConceptStatus = Exclude<
+  ConceptStatus,
+  'new' | 'ideating' | 'inReview' | 'prototyping' | 'proofOfConcept' | 'minimumViableProduct' | 'commercialized'
+>;
+export type ActiveConceptStatus = Exclude<ConceptStatus, ArchivedConceptStatus | DraftConceptStatus>;
 
 export enum ConceptReportStatus {
   notStarted = 'notStarted',
@@ -22,6 +28,7 @@ export enum ConceptReportStatus {
   pending = 'pending',
   error = 'error',
 }
+
 export interface IConcept {
   uuid: string;
   title: string;
@@ -177,5 +184,5 @@ export interface IMarketScan {
 }
 
 export interface IConceptPage extends IPageResponse<IConcept> {
-  statusCounts: { [key in keyof typeof ConceptStatus]: number };
+  statusCounts: { [key in ConceptStatus]: number };
 }

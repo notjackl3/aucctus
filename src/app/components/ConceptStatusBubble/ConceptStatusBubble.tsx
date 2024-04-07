@@ -1,14 +1,14 @@
 import { FunctionComponent, useMemo } from 'react';
 
 import styles from './styles/conceptStatus.module.scss';
-import { ConceptStatus as ConceptStatusType } from '../../../libs/api/typings';
-import { snakeCaseToTitleCase } from '../../../libs/utils';
+import { ConceptStatus } from '../../../libs/api/typings';
 import { getConceptStatusColor } from '../../../libs/concepts';
 import Icon from '../Icon';
+import { camelCaseToTitleCase } from '../../../libs/utils';
 
 type ConceptStatusVariant = 'bubble' | 'dropdown';
-export interface IConceptStatusProps {
-  status: ConceptStatusType;
+export interface IConceptStatusBubbleProps {
+  status: ConceptStatus;
   isActive?: Boolean;
   variant?: ConceptStatusVariant;
 }
@@ -18,7 +18,7 @@ const defaultIconProps = {
   height: 24,
 };
 
-const ConceptStatusBubble: FunctionComponent<IConceptStatusProps> = ({
+const ConceptStatusBubble: FunctionComponent<IConceptStatusBubbleProps> = ({
   status,
   variant = 'bubble',
   isActive = false,
@@ -32,7 +32,7 @@ const ConceptStatusBubble: FunctionComponent<IConceptStatusProps> = ({
   return (
     <div className={`${statusStyle} ${styles[`${color}Background`]}`}>
       {showBullet ? <span>●</span> : null}
-      <span className={styles.status}>{snakeCaseToTitleCase(status)}</span>
+      <span className={styles.status}>{camelCaseToTitleCase(status)}</span>
       {showChevronDown ? <Icon variant="chevronDown" {...defaultIconProps} /> : null}
     </div>
   );
