@@ -19,14 +19,14 @@ const IgniteConcept: FunctionComponent = () => {
         <IgniteLoading title="Igniting Your Concept" subtitle="This process takes about 10 seconds, please wait." />
       ) : (
         <IgniteForm
-          title="Ignite Your Concept"
-          subtitle="These answers will kick start your concept innovation process"
+          title="Generate A New Concept"
+          subtitle="Enter details below and Aucctus AI will instantly generate up to 10 innovative ideas for your business"
           onSubmit={generateConceptList}
         >
           <TextArea
             name="concept"
-            label="Describe your idea in one sentence."
-            placeholder="I want a new innovative idea for my company to explore"
+            label="Describe your idea in one sentence"
+            placeholder="I want to increase revenue from our high value customers"
             value={goalString}
             maxLength={200}
             isDisableResize
