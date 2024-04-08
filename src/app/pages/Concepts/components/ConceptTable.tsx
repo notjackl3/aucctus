@@ -90,15 +90,20 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
       columnHelper.accessor('title', {
         id: 'title',
         header: () => <span className={styles.details}>Company</span>,
-        size: 200,
-        minSize: 200,
-        cell: (info) => <span className={styles.company}>{info.getValue()}</span>,
+        size: 150,
+        minSize: 150,
+        cell: (info) => <div className={styles.company}>{info.getValue()}</div>,
       }),
       columnHelper.accessor((row) => row?.description, {
         id: 'description',
-        cell: (info) => <span className={styles.cellDescription}>{info.getValue()}</span>,
-        size: 300,
-        header: () => <span>Description</span>,
+        cell: (info) => (
+          <span style={{ flexGrow: 1 }} className={styles.cellDescription}>
+            {info.getValue()}
+          </span>
+        ),
+        size: 200,
+        minSize: 200,
+        header: () => <div style={{ flexGrow: 1 }}>Description</div>,
       }),
       columnHelper.accessor((row) => row.updatedAt, {
         id: 'updatedAt',
@@ -109,8 +114,8 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
       }),
       columnHelper.accessor((row) => row?.status, {
         id: 'status',
-        size: 250,
-        minSize: 250,
+        size: 200,
+        minSize: 200,
         header: () => <span>Status</span>,
         cell: (info) => (
           <span>
@@ -131,8 +136,8 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
             }}
           />
         ),
-        minSize: 120,
-        size: 120,
+        minSize: 100,
+        size: 100,
         header: () => {},
       }),
       columnHelper.accessor((row) => row?.uuid, {
@@ -191,7 +196,10 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
         {table.getHeaderGroups().map((headerGroup) => (
           <tr key={headerGroup.id}>
             {headerGroup.headers.map((header) => (
-              <th key={header.id} style={{ width: header.getSize() }}>
+              <th
+                key={header.id}
+                style={{ width: header.getSize(), flexGrow: header.column.id === 'description' ? 1 : 0 }}
+              >
                 {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
               </th>
             ))}
@@ -216,7 +224,10 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
               }}
             >
               {row.getVisibleCells().map((cell) => (
-                <td style={{ width: cell.column.getSize() }} key={cell.id}>
+                <td
+                  style={{ width: cell.column.getSize(), flexGrow: cell.column.id === 'description' ? 1 : 0 }}
+                  key={cell.id}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
