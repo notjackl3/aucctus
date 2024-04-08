@@ -110,7 +110,10 @@ const GeneratedConcepts: FunctionComponent = () => {
     <React.Fragment>
       {isIgniteLoading ? (
         <div className={igniteStyles.ignite}>
-          <IgniteLoading title="Igniting Your Concept" subtitle="This process takes about 10 seconds, please wait." />
+          <IgniteLoading
+            title="Generating A New Concept"
+            subtitle="This process takes about 10 seconds, please wait."
+          />
         </div>
       ) : (
         <div className={styles.generatedConcepts}>
