@@ -5,6 +5,7 @@ import {
   AssumptionType,
   ConceptStatus,
   DraftConceptStatus,
+  MarketMetricType,
 } from './api/typings';
 
 export const CONCEPT_STATUS_LIST: ConceptStatus[] = [
@@ -109,4 +110,24 @@ export function getDashboardConceptStatusIconColor(status: ActiveConceptStatus) 
   };
 
   return conceptStatusColorObj[status];
+}
+
+export function getMarketMetricTitle(metricType: MarketMetricType) {
+  const marketMetricTitleObj: Record<MarketMetricType, string> = {
+    TAM: 'Total Addressable Market',
+    SAM: 'Serviceable Addressable Market',
+    SOM: 'Serviceable Obtainable Market',
+  };
+  return marketMetricTitleObj[metricType];
+}
+
+export type MarketMetricColorType = 'purple' | 'darkPurple' | 'blue';
+
+export function getMarketMetricColor(metricType: MarketMetricType) {
+  const marketMetricTitleColorObj: Record<MarketMetricType, MarketMetricColorType> = {
+    TAM: 'purple',
+    SAM: 'darkPurple',
+    SOM: 'blue',
+  };
+  return marketMetricTitleColorObj[metricType];
 }
