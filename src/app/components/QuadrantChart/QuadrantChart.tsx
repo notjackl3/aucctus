@@ -86,17 +86,17 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
         />
         {chartPoints}
         <QuadrantChartActiveLines activeChartPoint={activeCoordinate} />
-        <text x="1480" y="1120" {...defaultTextProps}>
-          {yTopLabel}
-        </text>
-        <text x="80" y="1120" {...defaultTextProps}>
-          {yBottomLabel}
-        </text>
-        <text x="1020" y="120" {...defaultTextProps}>
+        <text x="1680" y="1120" {...defaultTextProps}>
           {xRightLabel}
         </text>
-        <text x="1020" y="1920" {...defaultTextProps}>
+        <text x="80" y="1120" {...defaultTextProps}>
           {xLeftLabel}
+        </text>
+        <text x="1020" y="120" {...defaultTextProps}>
+          {yTopLabel}
+        </text>
+        <text x="1020" y="1920" {...defaultTextProps}>
+          {yBottomLabel}
         </text>
       </svg>
     </div>
