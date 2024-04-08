@@ -5,12 +5,14 @@ import MarketChart from '../../../../components/MarketChart';
 import MarketLegend from '../../../../components/MarketLegend';
 import defaultAvatar from '../../../../assets/icons/avatar.svg';
 import Icon from '../../../../components/Icon';
-import NewsArticle from '../../../../components/NewsArticle';
+// import NewsArticle from '../../../../components/NewsArticle';
 import Loading from '../../../../components/Loading';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AppPath } from '../../../../../routes/routes';
+import { getMarketMetricColor, getMarketMetricTitle } from '../../../../../libs/concepts';
+import { formatLargeNumber } from '../../../../../libs/utils';
 
 export interface OverviewDetailsProps {}
 
@@ -23,7 +25,7 @@ const iconDefaultProps = {
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
   const location = useLocation();
-  const basePath = location.pathname.split('/').slice(0, 4).join('/');
+  const basePath = location.pathname.split('/').slice(0, 3).join('/');
 
   const navigate = useNavigate();
 
@@ -40,18 +42,23 @@ const OverviewDetails: FunctionComponent = () => {
     queryFn: async () => await api.concept.getConceptOverview(conceptId || ''),
   });
 
-  const { data: conceptCustomerData } = useQuery({
-    queryKey: [`concept/${conceptId}/customer-profile`],
-    retry: 1,
-    queryFn: async () => await api.concept.getConceptCustomerProfiles(conceptId || ''),
-  });
-
   const firstCustomerPersona = useMemo(() => {
-    if (!conceptCustomerData || (conceptCustomerData && !conceptCustomerData.results)) {
+    if (!conceptOverviewData || (conceptOverviewData && !conceptOverviewData.persona)) {
       return undefined;
     }
-    return conceptCustomerData.results[0];
-  }, [conceptCustomerData]);
+    return conceptOverviewData.persona;
+  }, [conceptOverviewData]);
+
+  const marketSizeMetrics = useMemo(() => {
+    if (
+      !conceptOverviewData ||
+      !conceptOverviewData.financialProjection ||
+      !conceptOverviewData.financialProjection.marketSizeMetrics
+    ) {
+      return [];
+    }
+    return conceptOverviewData.financialProjection.marketSizeMetrics;
+  }, [conceptOverviewData]);
 
   const renderIndustriesList = () => {
     return conceptOverviewData?.industries?.map((industry, i) => <p key={`industry-${i}`}>{industry}</p>);
@@ -71,13 +78,13 @@ const OverviewDetails: FunctionComponent = () => {
               <p>{conceptOverviewData?.valueProposition}</p>
             </div>
           </div>
-        </div>
-        <div className={styles.rightColumn}>
           <div className={styles.detailBlock}>
             <h3>Overview</h3>
             <p>{conceptData?.description}</p>
             <div className={styles.overview}></div>
           </div>
+        </div>
+        <div className={styles.rightColumn}>
           <div className={styles.listSection}>
             <div className={styles.detailBlock}>
               <h3>Trends & Drivers</h3>
@@ -168,38 +175,27 @@ const OverviewDetails: FunctionComponent = () => {
         >
           <div className={styles.cardContent}>
             <MarketChart
-              largeValue={1400300}
-              mediumValue={1010300}
-              smallValue={30300}
+              largeValue={marketSizeMetrics[0]?.value}
+              mediumValue={marketSizeMetrics[1]?.value}
+              smallValue={marketSizeMetrics[2]?.value}
               chartClass={styles.marketChart}
             />
             <div className={styles.legendGroup}>
-              <MarketLegend
-                legendClassName={styles.financeLegend}
-                legendTextClassName={styles.legendText}
-                legendText="Total Addressable Market"
-                legendValue="2.8M"
-                bulletColor="purple"
-              />
-              <MarketLegend
-                legendClassName={styles.financeLegend}
-                legendTextClassName={styles.legendText}
-                legendText="Serviceable Addressable Market"
-                legendValue="560K"
-                bulletColor="darkPurple"
-              />
-              <MarketLegend
-                legendClassName={styles.financeLegend}
-                legendTextClassName={styles.legendText}
-                legendText="Serviceable Obtainable Market"
-                legendValue="56K"
-                bulletColor="blue"
-              />
+              {marketSizeMetrics.map((metric, i) => (
+                <MarketLegend
+                  key={`$market-metrics-legend-${i}`}
+                  legendClassName={styles.financeLegend}
+                  legendTextClassName={styles.legendText}
+                  legendText={getMarketMetricTitle(metric.metricType)}
+                  legendValue={formatLargeNumber(metric.value)}
+                  bulletColor={getMarketMetricColor(metric.metricType)}
+                />
+              ))}
             </div>
           </div>
         </ConceptDetailCard>
       </div>
-      <div className={styles.summary}>
+      {/* <div className={styles.summary}>
         <h2>Activity and News</h2>
       </div>
       <div className={styles.newsContainer}>
@@ -213,7 +209,7 @@ const OverviewDetails: FunctionComponent = () => {
           newsDescription={`Buggy, Canada's leading rapid retail logistics company, is excited to announce its equity crowdfunding round on Frontfundr."With an experienced team, strong strategic partnerships and focus on path to profitability in this space, we're excited to offer the opportunity for individuals to invest in our growth through our equity crowdfunding round on Frontfundr," said Nicole Verkindt, CEO of Buggy.`}
           newsLink=""
         />
-      </div>
+      </div> */}
     </div>
   );
 };
