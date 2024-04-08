@@ -21,7 +21,7 @@
         }
       }
     }
-    &.lighBlueIcon {
+    &.lightBlueIcon {
       background: #cff9fe;
       svg {
         path {
@@ -52,7 +52,7 @@
     white-space: nowrap;
     font-family: $dm-sans;
     color: $blue-900;
-    @include text-medium;
+    @include body-100;
     text-transform: capitalize;
   }
 }

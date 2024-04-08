@@ -15,8 +15,8 @@ export interface IConceptAssumptionBadgeProps {
 }
 
 const defaultIconProps = {
-  height: 24,
-  width: 24,
+  height: 12,
+  width: 12,
   stroke: '#2B3674',
 };
 
