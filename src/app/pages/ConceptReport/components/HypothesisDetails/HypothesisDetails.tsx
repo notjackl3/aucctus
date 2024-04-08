@@ -50,7 +50,7 @@ const HypothesisDetails: FunctionComponent = () => {
     return data.results.map((assumption) => {
       return {
         xCoord: assumption.impactLevel,
-        yCoord: -assumption.riskLevel,
+        yCoord: -assumption.difficultyLevel,
         id: assumption.uuid,
         color: getAssumptionHexColor(assumption.assumptionsType),
         activeColor: getAssumptionActiveHexColor(assumption.assumptionsType),
@@ -63,7 +63,8 @@ const HypothesisDetails: FunctionComponent = () => {
       columnHelper.accessor((row) => row?.uuid, {
         id: 'uuid',
         header: () => <span className={styles.details}>Title</span>,
-        size: 400,
+        minSize: 300,
+        size: 300,
         cell: (info) => (
           <div className={styles.assumption}>
             <span className={styles.assumptionTitle}>{info?.row?.original?.name}</span>
@@ -80,12 +81,14 @@ const HypothesisDetails: FunctionComponent = () => {
             <GeneralBadge variant={`${info.getValue()}Risk`} badgeText={info.getValue()} />
           </div>
         ),
-        size: 200,
+        minSize: 125,
+        size: 125,
         header: () => <span>Risk</span>,
       }),
       columnHelper.accessor((row) => row.assumptionsType, {
         id: 'assumptionsType',
-        size: 300,
+        minSize: 150,
+        size: 150,
         header: () => <span>Type</span>,
         cell: (info) => (
           <div className={styles.reviewConceptLink}>
@@ -179,10 +182,10 @@ const HypothesisDetails: FunctionComponent = () => {
           </div>
           <div className={styles.quadrantChartContainer}>
             <QuadrantChart
-              yTopLabel="High Importance"
-              yBottomLabel="Low Importance"
-              xRightLabel="High Risk"
-              xLeftLabel="Low Risk"
+              yTopLabel="High Difficulty"
+              yBottomLabel="Low Difficulty"
+              xRightLabel="High Impact"
+              xLeftLabel="Low Impact"
               chartCoordinates={chartCoordinates}
               selectedCoordinate={selectedRowId}
             />
