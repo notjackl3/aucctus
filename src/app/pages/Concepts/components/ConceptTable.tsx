@@ -39,7 +39,7 @@ interface IConceptTableProps {
 
 const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }) => {
   const navigate = useNavigate();
-  const { updateConceptStatus } = useConceptMenu({ conceptId: '' });
+  const { updateConceptStatus, retryConceptReport } = useConceptMenu({ conceptId: '' });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
   const [openPopupMenuId, setOpenPopupMenuId] = useState('');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -131,8 +131,10 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
             onClick={(e) => {
               if (row.original.reportStatus === 'notStarted') {
                 updateConceptStatus('ideating', row.original.uuid);
-                e.stopPropagation();
+              } else if (row.original.reportStatus === 'error') {
+                retryConceptReport(row.original.uuid);
               }
+              e.stopPropagation();
             }}
           />
         ),

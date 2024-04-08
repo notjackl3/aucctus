@@ -24,6 +24,10 @@ export class ConceptApi extends ApiService {
     return this.get<IConcept>(endpoints.conceptUuid(uuid));
   }
 
+  retryReport(uuid: string) {
+    return this.post<IConcept>(endpoints.conceptReportRetry(uuid));
+  }
+
   updateConcept(concept: Partial<IConcept>, uuid: string) {
     return this.patch<IConcept, Partial<IConcept>>(endpoints.conceptUuid(uuid), concept);
   }

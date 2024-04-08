@@ -29,6 +29,7 @@ export const endpoints = {
   /* Concepts */
   concept: 'api/v1/concept/',
   conceptList: 'api/v1/concept/list',
+
   conceptIgnite: 'v1/concept/ignite',
   conceptQueries: (options?: IConceptQueryOptions) => {
     if (!options) return 'api/v1/concept';
@@ -43,6 +44,7 @@ export const endpoints = {
     return `api/v1/concept?${query}`;
   },
   conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
+  conceptReportRetry: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/retry`,
   conceptOverview: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/overview`,
   conceptCustomerProfiles: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/customer-profile`,
   conceptCustomerProfile: (conceptUuid: string, profile: string) =>
