@@ -44,13 +44,13 @@ const ConceptReport: FunctionComponent = () => {
 
   const changeConceptStatus = useCallback(
     (value: string) => {
-      updateConceptStatus(value as ConceptStatus, {
+      updateConceptStatus(value as ConceptStatus, conceptId, {
         onSuccess: (resp) => {
           setStatus(resp.status);
         },
       });
     },
-    [updateConceptStatus]
+    [updateConceptStatus, conceptId]
   );
 
   const { data: concept } = useQuery({

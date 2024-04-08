@@ -109,8 +109,8 @@ export type IconVariant =
   | 'filecode'
   | 'list'
   | 'board'
-  | 'alertOctagon'
-  | 'alertTriangle'
+  | 'critical'
+  | 'warning'
   | 'check';
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
   variant: IconVariant;
@@ -223,9 +223,9 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <List {...props} />;
     case 'board':
       return <Board {...props} />;
-    case 'alertOctagon':
+    case 'critical':
       return <AlertOctagon {...props} />;
-    case 'alertTriangle':
+    case 'warning':
       return <AlertTriangle {...props} />;
     case 'check':
       return <Check {...props} />;

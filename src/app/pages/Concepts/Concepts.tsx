@@ -8,11 +8,11 @@ import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 import Kanban from '../../components/Kanban';
 import TabView from '../../components/TabView';
-import { ConceptStatus, ConceptCategory } from '../../../libs/api/typings';
+import { ConceptStatus, ConceptCategory, IConceptPage } from '../../../libs/api/typings';
 import ConceptTable from './components/ConceptTable';
 import ConceptContainer from './components/ConceptContainer';
 import { ConceptColumns } from '../../components/Kanban/Kanban';
-import { ACTIVE_CONCEPT_STATUS_LIST, CONCEPT_STATUS_LIST, DRAFT_CONCEPT_STATUS_LIST } from '../../../libs/concepts';
+import { ACTIVE_CONCEPT_STATUS_LIST, DRAFT_CONCEPT_STATUS_LIST } from '../../../libs/concepts';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -20,7 +20,7 @@ export const CONCEPT_STATUS_LIST_MAP = {
   archive: ACTIVE_CONCEPT_STATUS_LIST,
 };
 
-export const KANBAN_COLUMNS_MAP = CONCEPT_STATUS_LIST.reduce<ConceptColumns>(
+export const KANBAN_COLUMNS_MAP = ACTIVE_CONCEPT_STATUS_LIST.reduce<ConceptColumns>(
   (acc: ConceptColumns, item: ConceptStatus) => {
     acc[item] = {
       title: item,
@@ -116,6 +116,13 @@ const Concepts: FunctionComponent = () => {
     refetchOnWindowFocus: false,
     retry: 0,
     cacheTime: 12000,
+    refetchInterval: (data?: IConceptPage) => {
+      if (data && data.results.some((concept) => concept.reportStatus === 'pending')) {
+        return 5000;
+      } else {
+        return false;
+      }
+    },
     queryFn: async () => {
       return api.concept.getConcepts({
         status,
@@ -147,7 +154,7 @@ const Concepts: FunctionComponent = () => {
       <div className={styles.contentList}>
         <div className={styles.headerSection}>
           <div className={styles.header}>
-            <h1>{`${category} ${category === 'active' ? 'Concepts' : ''}`}</h1>
+            <h1>{`${category} Concepts`}</h1>
           </div>
           <div className={styles.actions}>
             <button

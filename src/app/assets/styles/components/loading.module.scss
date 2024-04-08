@@ -1,8 +1,12 @@
 .bouncingDots {
+  display: flex;
+  flex-direction: row;
   font-size: 3rem;
+  line-height: 3rem;
 
   &.small {
-    font-size: 1rem;
+    font-size: 1.3rem !important;
+    line-height: 1.3rem !important;
   }
 
   .dot {

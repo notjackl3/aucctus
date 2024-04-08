@@ -33,7 +33,7 @@
   .header {
     display: flex;
     height: 2.625rem;
-    padding: 0rem 1rem 0.75rem 1rem;
+    padding: 0rem 1rem 0.75rem 2.25rem;
     align-items: center;
     gap: 2rem;
     flex-shrink: 0;
@@ -68,6 +68,7 @@
   .account {
     display: flex;
     padding: 1.5rem 0.75rem;
+    width: var(--nav-drawer-width);
     justify-content: center;
     align-items: center;
     gap: 0.75rem;
@@ -89,6 +90,7 @@
 
     .userDetails {
       display: flex;
+      max-width: 75%;
       flex-direction: column;
       align-items: flex-start;
 
@@ -96,10 +98,13 @@
         color: var(--gray-700-text-tertiary, #626ba3);
         /* Text sm/Semibold */
         font-family: 'DM Sans';
+        max-width: 100%;
         font-size: 0.875rem;
         font-style: normal;
         font-weight: 500;
         line-height: 1.25rem; /* 142.857% */
+        white-space: nowrap;
+        overflow: hidden;
         text-overflow: ellipsis;
       }
     }

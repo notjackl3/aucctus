@@ -21,6 +21,8 @@ import Icon from '../../../components/Icon';
 import Loading from '../../../components/Loading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../../routes/routes';
+import ConceptRowButton from './ConceptRowButton';
+import useConceptMenu from '../../../components/ConceptMenu/hooks/useConceptMenu';
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -37,47 +39,10 @@ interface IConceptTableProps {
 
 const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }) => {
   const navigate = useNavigate();
+  const { updateConceptStatus } = useConceptMenu({ conceptId: '' });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [excludeIdSet, setExcludeIdSet] = useState(new Set());
-  const [isEntireCategorySelected, setIsEntireCategorySelected] = useState(false);
   const [openPopupMenuId, setOpenPopupMenuId] = useState('');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  const addExcludedId = (id: string) => {
-    const newExcludedIds = new Set(excludeIdSet);
-    newExcludedIds.add(id);
-    setExcludeIdSet(newExcludedIds);
-  };
-
-  const removeExcludedId = (id: string) => {
-    const newExcludedIds = new Set(excludeIdSet);
-    newExcludedIds.delete(id);
-    setExcludeIdSet(newExcludedIds);
-  };
-
-  const modifyExclusionSet = (isRowSelected: boolean, id: string) => {
-    if (isRowSelected) {
-      addExcludedId(id);
-    } else {
-      removeExcludedId(id);
-    }
-  };
-
-  const toggleIsEntireCategorySelectedFlag = (isAllRowsSelected: boolean) => {
-    setIsEntireCategorySelected(!isAllRowsSelected);
-  };
-
-  const clearPopupMenuId = () => {
-    selectPopupMenuId('');
-  };
-
-  const selectPopupMenuId = (conceptId: string) => {
-    if (conceptId === openPopupMenuId) {
-      setOpenPopupMenuId('');
-    } else {
-      setOpenPopupMenuId(conceptId);
-    }
-  };
 
   const fuzzyFilter: FilterFn<IConcept> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
@@ -91,14 +56,13 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
     () => [
       columnHelper.accessor((row) => row?.status, {
         id: 'select',
+        size: 50,
         header: ({ table }) => (
           <TableCheckBox
             {...{
               checked: table.getIsAllRowsSelected(),
               indeterminate: table.getIsSomeRowsSelected(),
               onChange: (event) => {
-                setExcludeIdSet(new Set());
-                toggleIsEntireCategorySelectedFlag(table.getIsAllRowsSelected());
                 table.getToggleAllPageRowsSelectedHandler()(event);
               },
             }}
@@ -113,7 +77,6 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
                 indeterminate: row.getIsSomeSelected(),
                 onChange: (e) => {
                   e.stopPropagation();
-                  modifyExclusionSet(row.getIsSelected(), row?.id);
                   row.getToggleSelectedHandler()(e);
                 },
                 onClick: (e) => {
@@ -127,56 +90,77 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
       columnHelper.accessor('title', {
         id: 'title',
         header: () => <span className={styles.details}>Company</span>,
-        size: 400,
-        cell: (info) => <span className={styles.company}>{info?.getValue()}</span>,
+        size: 200,
+        minSize: 200,
+        cell: (info) => <span className={styles.company}>{info.getValue()}</span>,
       }),
       columnHelper.accessor((row) => row?.description, {
         id: 'description',
-        cell: (info) => <span className={styles.cellDescription}>{info?.getValue()}</span>,
+        cell: (info) => <span className={styles.cellDescription}>{info.getValue()}</span>,
         size: 300,
         header: () => <span>Description</span>,
       }),
-      columnHelper.accessor((row) => row?.updatedAt, {
+      columnHelper.accessor((row) => row.updatedAt, {
         id: 'updatedAt',
-        size: 300,
+        size: 150,
+        minSize: 150,
         cell: (info) => dateCellFormatter(info.getValue()),
         header: () => <span>Last Modified</span>,
       }),
       columnHelper.accessor((row) => row?.status, {
         id: 'status',
-        size: 300,
+        size: 250,
+        minSize: 250,
         header: () => <span>Status</span>,
         cell: (info) => (
-          <span className={styles.reviewConceptLink}>
-            <ConceptStatusBubble status={info?.getValue()} />
+          <span>
+            <ConceptStatusBubble status={info.getValue()} />
           </span>
         ),
       }),
+      columnHelper.accessor((row) => row.reportStatus, {
+        id: 'reportStatus',
+        cell: ({ row }) => (
+          <ConceptRowButton
+            variant={row.original.reportStatus}
+            onClick={(e) => {
+              if (row.original.reportStatus === 'notStarted') {
+                updateConceptStatus('ideating', row.original.uuid);
+                e.stopPropagation();
+              }
+            }}
+          />
+        ),
+        minSize: 120,
+        size: 120,
+        header: () => {},
+      }),
       columnHelper.accessor((row) => row?.uuid, {
         id: 'uuid',
-        size: 300,
+        minSize: 30,
+        size: 30,
         header: () => {},
         cell: (info) => (
           <span className={styles.conceptMenu}>
             <button
               className={styles.button}
               onClick={(e) => {
+                setOpenPopupMenuId(info.getValue() === openPopupMenuId ? '' : info.getValue());
                 e.stopPropagation();
-                selectPopupMenuId(info?.getValue());
               }}
             >
               <Icon variant="dotstVertical" {...defaultIconProps} />
             </button>
             {info?.getValue() === openPopupMenuId && (
               <span className={styles.popupMenu}>
-                <ConceptMenu conceptId={openPopupMenuId} clearConceptMenuId={clearPopupMenuId} />
+                <ConceptMenu conceptId={openPopupMenuId} clearConceptMenuId={() => setOpenPopupMenuId('')} />
               </span>
             )}
           </span>
         ),
       }),
     ],
-    [excludeIdSet, isEntireCategorySelected, openPopupMenuId]
+    [openPopupMenuId, updateConceptStatus]
   );
 
   const table = useReactTable({
@@ -196,7 +180,7 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
     getFilteredRowModel: getFilteredRowModel(),
     getCoreRowModel: getCoreRowModel(),
     defaultColumn: {
-      minSize: 500, //enforced during column resizing
+      minSize: 50, //enforced during column resizing
       maxSize: 500, //enforced during column resizing
     },
   });
@@ -225,7 +209,10 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
               key={row.id}
               onClick={(e) => {
                 e.stopPropagation();
-                navigate(AppPath.ConceptOverview.replace(':id', row.id));
+                const reportStatus = row.getValue('reportStatus');
+                if (reportStatus && reportStatus === 'complete') {
+                  navigate(AppPath.ConceptOverview.replace(':id', row.id));
+                }
               }}
             >
               {row.getVisibleCells().map((cell) => (
