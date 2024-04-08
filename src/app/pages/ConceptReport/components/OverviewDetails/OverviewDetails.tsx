@@ -43,7 +43,7 @@ const OverviewDetails: FunctionComponent = () => {
   });
 
   const firstCustomerPersona = useMemo(() => {
-    if (!conceptOverviewData || (conceptOverviewData && !conceptOverviewData.persona)) {
+    if (!conceptOverviewData || !conceptOverviewData.persona) {
       return undefined;
     }
     return conceptOverviewData.persona;
