@@ -136,8 +136,8 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
             }}
           />
         ),
-        minSize: 100,
-        size: 100,
+        minSize: 120,
+        size: 120,
         header: () => {},
       }),
       columnHelper.accessor((row) => row?.uuid, {

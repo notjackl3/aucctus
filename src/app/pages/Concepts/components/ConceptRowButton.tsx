@@ -13,12 +13,12 @@ const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, o
   const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
     const variantContext: Record<ConceptReportStatus, { style: string; label: string | ReactNode }> = {
       complete: {
-        style: `btn btn-light`,
+        style: `btn btn-light btn-bold`,
         label: 'Open',
       },
 
       pending: {
-        style: `btn btn-light`,
+        style: `btn btn-light btn-bold`,
         label: (
           <span className={styles.loadingButton}>
             Loading<span></span>
@@ -27,12 +27,12 @@ const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, o
         ),
       },
       notStarted: {
-        style: `btn btn-primary`,
+        style: `btn btn-primary btn-bold`,
         label: 'Generate',
       },
 
       error: {
-        style: ` btn btn-warning`,
+        style: ` btn btn-warning btn-bold`,
         label: (
           <span>
             <Icon variant="warning" /> Error
