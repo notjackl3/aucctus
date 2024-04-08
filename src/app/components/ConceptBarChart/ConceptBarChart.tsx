@@ -55,7 +55,7 @@ const ConceptBarChart: FunctionComponent<IConceptBarChartProps> = ({ data = defa
 
               const ratio = value / maxValue;
               const originalOffset = LABEL_HEIGHT + MAX_BAR_HEIGHT;
-              const height = MAX_BAR_HEIGHT * ratio;
+              const height = ratio ? MAX_BAR_HEIGHT * ratio : 0;
               const y = originalOffset - height;
 
               return (
