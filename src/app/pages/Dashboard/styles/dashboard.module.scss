@@ -75,7 +75,7 @@
       display: flex;
       gap: 1rem;
       flex-wrap: wrap;
-      width: 24rem;
+      width: 23rem;
       align-self: stretch;
 
       .noBorder {
@@ -83,7 +83,7 @@
       }
 
       &.barChart {
-        width: 45rem;
+        width: 38rem;
 
         .cardAction {
           color: $blue-600;
@@ -102,6 +102,10 @@
         }
       }
 
+      &.innovationCard {
+        width: 20rem;
+      }
+
       &.marketCard {
         width: 45rem;
       }
@@ -109,7 +113,7 @@
       .opportunityFooter {
         display: flex;
         flex: 1 1 auto;
-        padding: 1rem 1.5rem;
+        padding: 1rem 1rem;
         box-sizing: border-box;
         background: $purple-100;
         border-radius: 0.75rem;
@@ -146,8 +150,8 @@
           display: flex;
           min-height: 4rem;
           width: 100%;
-          gap: 1.5rem;
-          padding: 1rem 1.5rem;
+          gap: 1rem;
+          padding: 1rem 1rem;
           box-sizing: border-box;
           align-items: center;
           justify-content: space-between;

@@ -1,84 +1,66 @@
-import { FunctionComponent, useState } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 
 import styles from '../styles/dashboard.module.scss';
 import ConceptDetailCard from '../../../components/ConceptDetailCard/ConceptDetailCard';
 import ConceptStatistic from '../../../components/ConceptStatistic';
-import { formatLargeNumber } from '../../../../libs/utils';
+import { camelCaseToTitleCase, formatLargeNumber } from '../../../../libs/utils';
 import { IconVariant } from '../../../components/Icon';
-import { ConceptStatusIconColor } from '../../../../libs/concepts';
+import {
+  ACTIVE_CONCEPT_STATUS_LIST,
+  ConceptStatusIconColor,
+  getDashboardConceptStatusIcon,
+  getDashboardConceptStatusIconColor,
+} from '../../../../libs/concepts';
+import { ActiveConceptStatus, IConceptDetails } from '../../../../libs/api/typings';
+import { IConceptStatisticProps } from '../../../components/ConceptStatistic/ConceptStatistic';
 
 export interface OpportunityData {
   infoTitle: string;
   conceptCount: number;
+  status: ActiveConceptStatus;
   somValue: number;
-  infoValue: number;
+  infoValue: string;
   infoSubValue: string;
   icon: IconVariant;
   iconColor: ConceptStatusIconColor;
-  variant: string;
+  variant?: IConceptStatisticProps['variant'];
 }
 
 export interface DashboardOpportunityCardProps {
-  opportunityData?: OpportunityData[];
+  conceptDetails: IConceptDetails;
 }
 
-// TODO Remove this temporary data once the API is available
-const OPP_DATA_TEMP: any = {
-  prototype: {
-    infoTitle: 'Prototypes',
-    conceptCount: 30,
-    somValue: 500000,
-    infoValue: formatLargeNumber(500000),
-    infoSubValue: '30 concepts',
-    icon: 'lightbulb',
-    iconColor: 'lightblue',
-    variant: 'opportunity',
-  },
-  proofOfConcept: {
-    infoTitle: 'Proof of Concepts',
-    status: 'prototyping',
-    somValue: 500000,
-    infoValue: formatLargeNumber(500000),
-    conceptCount: 10,
-    infoSubValue: '10 concepts',
-    icon: 'paperAirPlane',
-    iconColor: 'blue',
-    variant: 'opportunity',
-  },
-  commercialized: {
-    infoTitle: 'Products Commercialized',
-    somValue: 2300000,
-    infoValue: formatLargeNumber(2300000),
-    conceptCount: 30,
-    infoSubValue: '30 concepts',
-    icon: 'rocket',
-    iconColor: 'blue',
-    variant: 'opportunity',
-  },
-  minimumViableProduct: {
-    infoTitle: 'Minimum Viable Products',
-    somValue: 5000030,
-    infoValue: formatLargeNumber(5000030),
-    conceptCount: 30,
-    infoSubValue: '30 concepts',
-    icon: 'shieldDollar',
-    iconColor: 'purple',
-    variant: 'opportunity',
-  },
-};
-
-const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps> = ({
-  opportunityData = OPP_DATA_TEMP,
-}) => {
+const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps> = ({ conceptDetails }) => {
   const [selectedOpportunities, setSelectedOpportunities] = useState<string[]>([]);
 
-  function calculateTotalValues(opportunityData: OpportunityData) {
+  const opportunityData: OpportunityData[] = useMemo(() => {
+    if (!conceptDetails) {
+      return [];
+    }
+    return ACTIVE_CONCEPT_STATUS_LIST.map((status) => {
+      const somValue = conceptDetails.som[status];
+      const conceptCount = conceptDetails.count[status];
+      return {
+        status: status,
+        infoTitle: camelCaseToTitleCase(status),
+        icon: getDashboardConceptStatusIcon(status),
+        somValue: somValue,
+        infoValue: formatLargeNumber(somValue),
+        iconColor: getDashboardConceptStatusIconColor(status),
+        variant: 'opportunity',
+        conceptCount: conceptCount,
+        infoSubValue: `${conceptCount} concepts`,
+      };
+    });
+  }, [conceptDetails]);
+
+  function calculateTotalValues(opportunityData: OpportunityData[]) {
     const baseSumObj = { totalSomValue: 0, totalConceptCount: 0 };
     if (!opportunityData) {
       return baseSumObj;
     }
-    return Object.entries(opportunityData).reduce((acc, [statusKey, opportunity]) => {
-      if (selectedOpportunities.includes(statusKey) && opportunity) {
+    return opportunityData.reduce((acc, opportunity) => {
+      if (opportunity && selectedOpportunities.includes(opportunity.status)) {
         acc.totalSomValue += opportunity.somValue || 0;
         acc.totalConceptCount += opportunity.conceptCount || 0;
         return acc;
@@ -109,8 +91,8 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
     }
   };
 
-  const renderOpportunityRows = Object.entries(opportunityData)?.map(([statusKey, opportunity]: any) => (
-    <div className={styles.cardRow}>
+  const renderOpportunityRows = opportunityData?.map((opportunity, i) => (
+    <div className={styles.cardRow} key={`opportunity-${i}`}>
       <ConceptStatistic
         infoTitle={opportunity.infoTitle}
         infoValue={opportunity.infoValue}
@@ -121,8 +103,8 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
       />
       <input
         type="checkbox"
-        checked={selectedOpportunities.includes(statusKey)}
-        onChange={() => toggleSelectedStatus(statusKey)}
+        checked={selectedOpportunities.includes(opportunity.status)}
+        onChange={() => toggleSelectedStatus(opportunity.status)}
       />
     </div>
   ));

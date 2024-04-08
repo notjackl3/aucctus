@@ -98,6 +98,10 @@ button.btn {
       color: var(--primary-600-primary, #4318ff) !important;
     }
   }
+
+  &.btn-bold {
+    font-weight: 700;
+  }
 }
 
 textarea {
