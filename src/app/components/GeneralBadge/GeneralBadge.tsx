@@ -40,9 +40,9 @@ const GeneralBadge: FunctionComponent<GeneralBadgeProps> = ({
   const getBadgeIcon = (variant: GeneralBadgeVariant): IconVariant => {
     switch (variant) {
       case 'highRisk':
-        return 'alertOctagon';
+        return 'critical';
       case 'mediumRisk':
-        return 'alertTriangle';
+        return 'warning';
       case 'lowRisk':
         return 'check';
     }

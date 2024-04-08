@@ -11,7 +11,7 @@ import {
 } from '@tanstack/react-table';
 import { dateCellFormatter } from '../../../../libs/utils';
 import TableCheckBox from '../../../components/TableCheckBox';
-import { ConceptReportStatus, IConcept } from '../../../../libs/api/typings';
+import { IConcept } from '../../../../libs/api/typings';
 import { rankItem } from '@tanstack/match-sorter-utils';
 
 import styles from '../styles/concepts.module.scss';
@@ -41,46 +41,8 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
   const navigate = useNavigate();
   const { updateConceptStatus } = useConceptMenu({ conceptId: '' });
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [excludeIdSet, setExcludeIdSet] = useState(new Set());
-  const [isEntireCategorySelected, setIsEntireCategorySelected] = useState(false);
   const [openPopupMenuId, setOpenPopupMenuId] = useState('');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  const addExcludedId = (id: string) => {
-    const newExcludedIds = new Set(excludeIdSet);
-    newExcludedIds.add(id);
-    setExcludeIdSet(newExcludedIds);
-  };
-
-  const removeExcludedId = (id: string) => {
-    const newExcludedIds = new Set(excludeIdSet);
-    newExcludedIds.delete(id);
-    setExcludeIdSet(newExcludedIds);
-  };
-
-  const modifyExclusionSet = (isRowSelected: boolean, id: string) => {
-    if (isRowSelected) {
-      addExcludedId(id);
-    } else {
-      removeExcludedId(id);
-    }
-  };
-
-  const toggleIsEntireCategorySelectedFlag = (isAllRowsSelected: boolean) => {
-    setIsEntireCategorySelected(!isAllRowsSelected);
-  };
-
-  const clearPopupMenuId = () => {
-    selectPopupMenuId('');
-  };
-
-  const selectPopupMenuId = (conceptId: string) => {
-    if (conceptId === openPopupMenuId) {
-      setOpenPopupMenuId('');
-    } else {
-      setOpenPopupMenuId(conceptId);
-    }
-  };
 
   const fuzzyFilter: FilterFn<IConcept> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
@@ -101,8 +63,6 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
               checked: table.getIsAllRowsSelected(),
               indeterminate: table.getIsSomeRowsSelected(),
               onChange: (event) => {
-                setExcludeIdSet(new Set());
-                toggleIsEntireCategorySelectedFlag(table.getIsAllRowsSelected());
                 table.getToggleAllPageRowsSelectedHandler()(event);
               },
             }}
@@ -117,7 +77,6 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
                 indeterminate: row.getIsSomeSelected(),
                 onChange: (e) => {
                   e.stopPropagation();
-                  modifyExclusionSet(row.getIsSelected(), row?.id);
                   row.getToggleSelectedHandler()(e);
                 },
                 onClick: (e) => {
@@ -133,15 +92,15 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
         header: () => <span className={styles.details}>Company</span>,
         size: 200,
         minSize: 200,
-        cell: (info) => <span className={styles.company}>{info?.getValue()}</span>,
+        cell: (info) => <span className={styles.company}>{info.getValue()}</span>,
       }),
       columnHelper.accessor((row) => row?.description, {
         id: 'description',
-        cell: (info) => <span className={styles.cellDescription}>{info?.getValue()}</span>,
+        cell: (info) => <span className={styles.cellDescription}>{info.getValue()}</span>,
         size: 300,
         header: () => <span>Description</span>,
       }),
-      columnHelper.accessor((row) => row?.updatedAt, {
+      columnHelper.accessor((row) => row.updatedAt, {
         id: 'updatedAt',
         size: 150,
         minSize: 150,
@@ -155,19 +114,19 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
         header: () => <span>Status</span>,
         cell: (info) => (
           <span>
-            <ConceptStatusBubble status={info?.getValue()} />
+            <ConceptStatusBubble status={info.getValue()} />
           </span>
         ),
       }),
-      columnHelper.accessor((row) => row?.reportStatus, {
+      columnHelper.accessor((row) => row.reportStatus, {
         id: 'reportStatus',
         cell: ({ row }) => (
           <ConceptRowButton
             variant={row.original.reportStatus}
             onClick={(e) => {
-              if (row.original.reportStatus === ConceptReportStatus.notStarted) {
-                e.stopPropagation();
+              if (row.original.reportStatus === 'notStarted') {
                 updateConceptStatus('ideating', row.original.uuid);
+                e.stopPropagation();
               }
             }}
           />
@@ -186,22 +145,22 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
             <button
               className={styles.button}
               onClick={(e) => {
+                setOpenPopupMenuId(info.getValue() === openPopupMenuId ? '' : info.getValue());
                 e.stopPropagation();
-                selectPopupMenuId(info?.getValue());
               }}
             >
               <Icon variant="dotstVertical" {...defaultIconProps} />
             </button>
             {info?.getValue() === openPopupMenuId && (
               <span className={styles.popupMenu}>
-                <ConceptMenu conceptId={openPopupMenuId} clearConceptMenuId={clearPopupMenuId} />
+                <ConceptMenu conceptId={openPopupMenuId} clearConceptMenuId={() => setOpenPopupMenuId('')} />
               </span>
             )}
           </span>
         ),
       }),
     ],
-    [excludeIdSet, isEntireCategorySelected, openPopupMenuId]
+    [openPopupMenuId, updateConceptStatus]
   );
 
   const table = useReactTable({
@@ -251,8 +210,7 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
               onClick={(e) => {
                 e.stopPropagation();
                 const reportStatus = row.getValue('reportStatus');
-                //TODO remove true condition when reportStatus is implemented
-                if (true || (reportStatus && reportStatus === ConceptReportStatus.complete)) {
+                if (reportStatus && reportStatus === 'complete') {
                   navigate(AppPath.ConceptOverview.replace(':id', row.id));
                 }
               }}

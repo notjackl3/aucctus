@@ -1,6 +1,8 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, ReactNode } from 'react';
 import styles from '../styles/concepts.module.scss';
 import { ConceptReportStatus } from '../../../../libs/api/typings';
+import Icon from '../../../components/Icon';
+import Loading from '../../../components/Loading';
 
 type ConceptRowButtonProps = {
   variant: ConceptReportStatus;
@@ -8,36 +10,45 @@ type ConceptRowButtonProps = {
 };
 
 const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, onClick }) => {
-  const getButtonLabel = (variant: ConceptRowButtonProps['variant']) => {
-    switch (variant) {
-      case ConceptReportStatus.complete:
-        return 'OPEN';
-      case ConceptReportStatus.pending:
-        return 'LOADING';
-      case ConceptReportStatus.notStarted:
-        return 'LAUNCH';
-    }
+  const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
+    const variantContext: Record<ConceptReportStatus, { style: string; label: string | ReactNode }> = {
+      complete: {
+        style: `btn btn-light`,
+        label: 'Open',
+      },
+
+      pending: {
+        style: `btn btn-light`,
+        label: (
+          <span className={styles.loadingButton}>
+            Loading<span></span>
+            <Loading isSmall />
+          </span>
+        ),
+      },
+      notStarted: {
+        style: `btn btn-primary`,
+        label: 'Generate',
+      },
+
+      error: {
+        style: ` btn btn-warning`,
+        label: (
+          <span>
+            <Icon variant="warning" /> Error
+          </span>
+        ),
+      },
+    };
+
+    return variantContext[variant];
   };
 
-  const getButtonStyle = (variant: ConceptRowButtonProps['variant']) => {
-    switch (variant) {
-      case ConceptReportStatus.complete:
-        return styles.openButton;
-      case ConceptReportStatus.pending:
-        return `${styles.actionButton} btn btn-primary`;
-      case ConceptReportStatus.notStarted:
-        return `${styles.actionButton} btn btn-primary`;
-      default:
-        return '';
-    }
-  };
-
-  const buttonStyle = getButtonStyle(variant);
-  const buttonLabel = getButtonLabel(variant);
+  const { style, label } = getButtonContext(variant);
 
   return (
-    <button className={buttonStyle} onClick={onClick}>
-      {buttonLabel}
+    <button className={style} onClick={onClick}>
+      {label}
     </button>
   );
 };

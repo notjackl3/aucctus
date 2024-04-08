@@ -22,12 +22,7 @@ export type ArchivedConceptStatus = Exclude<
 >;
 export type ActiveConceptStatus = Exclude<ConceptStatus, ArchivedConceptStatus | DraftConceptStatus>;
 
-export enum ConceptReportStatus {
-  notStarted = 'notStarted',
-  complete = 'complete',
-  pending = 'pending',
-  error = 'error',
-}
+export type ConceptReportStatus = 'notStarted' | 'complete' | 'pending' | 'error';
 
 export interface IConcept {
   uuid: string;
@@ -126,13 +121,20 @@ export interface IAssumption {
    * A number between -10 and 10
    */
   riskLevel: number;
-  riskRational: string;
+  riskRationale: string;
   /**
-   * The risk level of the assumption
+   * The impact level of the assumption
    * A number between -10 and 10
    */
   impactLevel: number;
-  impactRational: string;
+  impactRationale: string;
+
+  /**
+   * The difficulty level of the assumption
+   * A number between -10 and 10
+   */
+  difficultyLevel: number;
+  difficultyRationale: string;
 
   validated: boolean;
   riskCategory: 'high' | 'medium' | 'low';

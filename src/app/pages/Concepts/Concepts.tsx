@@ -8,11 +8,11 @@ import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 import Kanban from '../../components/Kanban';
 import TabView from '../../components/TabView';
-import { ConceptStatus, ConceptCategory, IConceptPage, ConceptReportStatus } from '../../../libs/api/typings';
+import { ConceptStatus, ConceptCategory, IConceptPage } from '../../../libs/api/typings';
 import ConceptTable from './components/ConceptTable';
 import ConceptContainer from './components/ConceptContainer';
 import { ConceptColumns } from '../../components/Kanban/Kanban';
-import { ACTIVE_CONCEPT_STATUS_LIST, CONCEPT_STATUS_LIST, DRAFT_CONCEPT_STATUS_LIST } from '../../../libs/concepts';
+import { ACTIVE_CONCEPT_STATUS_LIST, DRAFT_CONCEPT_STATUS_LIST } from '../../../libs/concepts';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -117,7 +117,7 @@ const Concepts: FunctionComponent = () => {
     retry: 0,
     cacheTime: 12000,
     refetchInterval: (data?: IConceptPage) => {
-      if (data && data.results.some((concept) => concept.reportStatus === ConceptReportStatus.pending)) {
+      if (data && data.results.some((concept) => concept.reportStatus === 'pending')) {
         return 5000;
       } else {
         return false;
