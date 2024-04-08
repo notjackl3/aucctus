@@ -32,10 +32,10 @@ const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, o
       },
 
       error: {
-        style: ` btn btn-warning btn-bold`,
+        style: ` btn btn-light btn-bold`,
         label: (
           <span>
-            <Icon variant="warning" /> Error
+            <Icon variant="refresh" /> Retry
           </span>
         ),
       },
