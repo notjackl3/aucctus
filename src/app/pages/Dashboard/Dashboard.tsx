@@ -7,12 +7,12 @@ import Icon from '../../components/Icon';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import ConceptDetailCard from '../../components/ConceptDetailCard/ConceptDetailCard';
-import ConceptStatistic from '../../components/ConceptStatistic';
 import ConceptBarChart from '../../components/ConceptBarChart';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
-import MarketActivityCard from './components/MarketActivityCard';
+import DashboardInnovationCard from './components/DashboardInnovationCard';
+// import MarketActivityCard from './components/MarketActivityCard';
 
 const defaultIconProps = {
   stroke: '#2B3674',
@@ -25,7 +25,6 @@ const Dashboard: FunctionComponent = () => {
   const { name: accountName } = useSelector(selectAccount) || { name: '' };
 
   const { data } = useQuery({
-    // TEMP API call for concept data
     queryKey: ['dahsboard'],
     refetchOnWindowFocus: false,
     retry: 0,
@@ -53,35 +52,11 @@ const Dashboard: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.contentContainer}>
-        <div className={styles.cardContainer}>
-          <ConceptDetailCard title="Innovation Scorecard" cardClassName={styles.cardStyle} isHideFooter>
-            <div className={styles.cardContent}>
-              <div className={styles.cardRow}>
-                {/* TODO - remove temp data and duplication when API is updated */}
-                <ConceptStatistic
-                  infoTitle="Concepts Generated"
-                  infoValue="30"
-                  icon="lightbulb"
-                  iconColor="lightBlue"
-                />
-              </div>
-              <div className={styles.cardRow}>
-                <ConceptStatistic infoTitle="POCs Launched" infoValue="10" icon="paperAirPlane" iconColor="blue" />
-              </div>
-              <div className={styles.cardRow}>
-                <ConceptStatistic infoTitle="MVPs Launched" infoValue="3" icon="rocket" iconColor="blue" />
-              </div>
-              <div className={styles.cardRow}>
-                <ConceptStatistic
-                  infoTitle="Products Commercialized"
-                  infoValue="1"
-                  icon="shieldDollar"
-                  iconColor="purple"
-                />
-              </div>
-            </div>
-          </ConceptDetailCard>
-        </div>
+        {data?.conceptDetails.count && (
+          <div className={`${styles.cardContainer} ${styles.innovationCard}`}>
+            <DashboardInnovationCard conceptCount={data.conceptDetails.count} />
+          </div>
+        )}
         <div className={`${styles.cardContainer} ${styles.barChart}`}>
           <ConceptDetailCard
             title="Active Concepts"
@@ -103,12 +78,15 @@ const Dashboard: FunctionComponent = () => {
             </div>
           </ConceptDetailCard>
         </div>
-        <div className={`${styles.cardContainer}`}>
-          <DashboardOpportunityCard />
-        </div>
-        <div className={`${styles.cardContainer} ${styles.marketCard}`}>
+        {data?.conceptDetails && (
+          <div className={`${styles.cardContainer}`}>
+            <DashboardOpportunityCard conceptDetails={data.conceptDetails} />
+          </div>
+        )}
+        {/* TODO - Add Market Activity Card */}
+        {/* <div className={`${styles.cardContainer} ${styles.marketCard}`}>
           <MarketActivityCard />
-        </div>
+        </div> */}
       </div>
     </div>
   );
