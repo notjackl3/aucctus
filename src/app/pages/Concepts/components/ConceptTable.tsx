@@ -225,7 +225,11 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
             >
               {row.getVisibleCells().map((cell) => (
                 <td
-                  style={{ width: cell.column.getSize(), flexGrow: cell.column.id === 'description' ? 1 : 0 }}
+                  style={{
+                    width: cell.column.getSize(),
+                    flexGrow: cell.column.id === 'description' ? 1 : 0,
+                    justifyContent: cell.column.id === 'reportStatus' ? 'flex-end' : 'flex-start',
+                  }}
                   key={cell.id}
                 >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
