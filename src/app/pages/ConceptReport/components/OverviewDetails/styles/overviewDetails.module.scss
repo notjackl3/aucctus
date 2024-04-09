@@ -105,8 +105,9 @@
     .cardStyle {
       display: flex;
       align-self: stretch;
+      width: 19rem;
       flex-grow: 1;
-      max-width: 20rem;
+      max-width: 22.5rem;
       span {
         h4 {
           color: $blue-900;
