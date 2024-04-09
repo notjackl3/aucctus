@@ -67,7 +67,7 @@
     flex-direction: row;
     align-items: flex-start;
     margin-top: 1rem;
-    justify-content: space-between;
+    justify-content: flex-start;
     width: 100%;
     gap: 2rem;
     flex-wrap: wrap;
@@ -83,13 +83,15 @@
     .leftColumn {
       display: flex;
       height: 100%;
-      max-width: 50rem;
+      width: 40rem;
+      flex: 1 0 auto;
       flex-direction: column;
     }
 
     .rightColumn {
       display: flex;
       height: 100%;
+      max-width: 30%;
       flex-direction: column;
       justify-content: flex-start;
     }
@@ -100,15 +102,18 @@
       align-self: stretch;
       .list {
         svg {
-          margin-right: 1rem;
+          min-width: 1.5rem;
+          margin-top: 0.25rem;
+          align-self: flex-start;
           path {
             stroke: $blue-900;
           }
         }
         p {
           display: flex;
-          align-items: center;
+          align-items: flex-start;
           margin-bottom: 1rem;
+          gap: 0.5rem;
         }
       }
     }
@@ -118,6 +123,10 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+
+    .customerCards {
+      max-width: 19rem;
+    }
 
     .cardContent {
       display: flex;

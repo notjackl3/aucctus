@@ -18,6 +18,7 @@ const iconDefaultProps = {
 interface ICustomerDetailLists {
   title: string;
   icon: IconVariant;
+  type: string;
   data: string[];
 }
 
@@ -27,15 +28,18 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ customerDat
       {
         title: 'Jobs to be Done',
         icon: 'clipboard',
+        type: 'jobs',
         data: customerData?.jobsToBeDone || [],
       },
       {
         title: 'Pains',
         icon: 'userGroup',
+        type: 'pains',
         data: customerData?.pains || [],
       },
       {
         title: 'Quotes',
+        type: 'quotes',
         icon: 'message',
         data: customerData?.quotes || [],
       },
@@ -90,11 +94,17 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ customerDat
       <div className={styles.cardContainer}>
         {listItems.map((item, index) => {
           return (
-            <ConceptDetailCard title={item.title} key={`${item.title}-${index}`} icon={item.icon} isHideFooter>
+            <ConceptDetailCard
+              cardClassName={styles.customerCards}
+              title={item.title}
+              key={`${item.title}-${index}`}
+              icon={item.icon}
+              isHideFooter
+            >
               <div className={styles.cardContent}>
                 {item.data.map((value, i) => (
                   <p key={`${item.title}-${item.icon}-${i}`} className={styles.text}>
-                    {value}
+                    {item.type === 'quotes' ? `"${value}"` : value}
                   </p>
                 ))}
               </div>
