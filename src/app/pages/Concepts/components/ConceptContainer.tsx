@@ -48,7 +48,8 @@ const ConceptContainer: FunctionComponent<IConceptContainerProps> = ({
                   key={`status-button-${index}`}
                   isActive={label === status}
                   statusName={camelCaseToTitleCase(label)}
-                  quantity={1}
+                  //TODO temporary remove quantity for status
+                  // quantity={1}
                   activateFilter={() => setStatusFilter(label)}
                 />
               ))}

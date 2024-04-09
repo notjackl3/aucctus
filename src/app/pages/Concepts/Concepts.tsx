@@ -12,12 +12,16 @@ import { ConceptStatus, ConceptCategory, IConceptPage } from '../../../libs/api/
 import ConceptTable from './components/ConceptTable';
 import ConceptContainer from './components/ConceptContainer';
 import { ConceptColumns } from '../../components/Kanban/Kanban';
-import { ACTIVE_CONCEPT_STATUS_LIST, DRAFT_CONCEPT_STATUS_LIST } from '../../../libs/concepts';
+import {
+  ACTIVE_CONCEPT_STATUS_LIST,
+  ARCHIVE_CONCEPT_STATUS_LIST,
+  DRAFT_CONCEPT_STATUS_LIST,
+} from '../../../libs/concepts';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
   active: ACTIVE_CONCEPT_STATUS_LIST,
-  archive: ACTIVE_CONCEPT_STATUS_LIST,
+  archive: ARCHIVE_CONCEPT_STATUS_LIST,
 };
 
 export const KANBAN_COLUMNS_MAP = ACTIVE_CONCEPT_STATUS_LIST.reduce<ConceptColumns>(

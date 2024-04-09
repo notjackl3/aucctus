@@ -4,7 +4,7 @@ import styles from './styles/statusButton.module.scss';
 import useStatusButton from './hooks/useStatusButton';
 interface StatusButtonProps {
   statusName: string;
-  quantity: number;
+  quantity?: number;
   isActive?: boolean;
   activateFilter: () => void;
 }
