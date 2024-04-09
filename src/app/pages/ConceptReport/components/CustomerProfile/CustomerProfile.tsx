@@ -56,11 +56,9 @@ const CustomerProfile: FunctionComponent = () => {
         >
           <>
             {customerPersonas.map((customer) => (
-              <>
-                {customer.nickname === selectedPersona ? (
-                  <CustomerDetails key={`customer-profile-${customer.uuid}`} customerData={customer} />
-                ) : null}
-              </>
+              <div key={`customer-profile-${customer.uuid}`}>
+                {customer.nickname === selectedPersona ? <CustomerDetails customerData={customer} /> : null}
+              </div>
             ))}
           </>
         </TabView>

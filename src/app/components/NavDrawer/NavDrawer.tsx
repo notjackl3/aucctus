@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import Logo from '../../assets/Logo.png';
 import styles from '../../assets/styles/components/drawer.module.scss';
 import NavLink from './NavLink';
@@ -9,12 +9,30 @@ import avatar from '../../assets/icons/avatar.svg';
 import { AppPath } from '../../../routes/routes';
 import { useAppDispatch } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
+import { useQuery } from 'react-query';
+import api from '../../../libs/api';
 
 const NavDrawer = () => {
   const user = useSelector(selectUser)!;
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
+
+  //TODO swap this query with more efficient endpoint to determine if any concepts are saved
+  const { data } = useQuery({
+    queryKey: ['concepts'],
+    retry: 1,
+    queryFn: async () => {
+      return api.concept.getConcepts({});
+    },
+  });
+
+  const isExistingConcepts = useMemo(() => {
+    if (!data || !data.results) {
+      return false;
+    }
+    return data.results.length > 0;
+  }, [data]);
 
   return (
     <div className={styles.container}>
@@ -32,7 +50,7 @@ const NavDrawer = () => {
             <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
 
             <NavLink
-              to={AppPath.IgniteConcept}
+              to={isExistingConcepts ? `${AppPath.ConceptCategory}?category=draft` : AppPath.IgniteConcept}
               title="Concepts"
               icon="lightbulb"
               openBasePath={AppPath.Concept}

@@ -31,7 +31,7 @@ const NewsArticle: FunctionComponent<NewsArticleProps> = ({
           <div className={styles.title}>{newsTitle}</div>
           {!!newsLink && (
             <a className={styles.link} target="_blank" rel="noopener noreferrer" href={newsLink}>
-              <Icon variant="arrowUpRight" {...defaultIconProps} />
+              <Icon variant="linkExternal" {...defaultIconProps} />
             </a>
           )}
         </div>

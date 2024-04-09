@@ -9,7 +9,7 @@
   width: 100%;
   padding: 1.5rem;
   box-sizing: border-box;
-  flex-wrap: wrap;
+  overflow-x: scroll;
   gap: 2rem;
   border: 1px solid $grey-300;
   background: $white;
