@@ -63,8 +63,8 @@ const HypothesisDetails: FunctionComponent = () => {
       columnHelper.accessor((row) => row?.uuid, {
         id: 'uuid',
         header: () => <span className={styles.details}>Title</span>,
-        minSize: 300,
-        size: 300,
+        minSize: 280,
+        size: 280,
         cell: (info) => (
           <div className={styles.assumption}>
             <span className={styles.assumptionTitle}>{info?.row?.original?.name}</span>
