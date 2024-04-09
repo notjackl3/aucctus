@@ -40,7 +40,7 @@ const KeyAssumptionCard: FunctionComponent<KeyAssumptionCardProps> = ({ keyAssum
       }
     >
       <div className={`${styles.cardContent} ${styles.noCardPadding}`}>
-        <div className={`${styles.assumptionCard} ${styles.hiddenScroll}`}>
+        <div className={styles.assumptionCard}>
           {keyAssumptions.map((assumption, i) => (
             <div key={`assumption-${assumption.uuid}-${i}`} className={styles.assumptionRow}>
               <div className={styles.badge}>
