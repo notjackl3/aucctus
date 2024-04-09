@@ -15,9 +15,11 @@ const StatusButton: FunctionComponent<StatusButtonProps> = ({ statusName, isActi
   return (
     <button className={`${styles.statusButton} ${activeClassName}`} onClick={activateFilter}>
       <span className={`${styles.statusName} ${activeStatusClassName}`}>{statusName}</span>
-      <div className={`${styles.badge} ${activeBadgeClassName}`}>
-        <span className={styles.quantity}>{quantity}</span>
-      </div>
+      {!!quantity && (
+        <div className={`${styles.badge} ${activeBadgeClassName}`}>
+          <span className={styles.quantity}>{quantity}</span>
+        </div>
+      )}
     </button>
   );
 };
