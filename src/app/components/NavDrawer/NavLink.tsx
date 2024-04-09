@@ -14,7 +14,7 @@ const defaultIconProps = {
 
 interface NavLinkProps {
   title: string;
-  to: AppPath;
+  to: AppPath | string;
   icon: IconVariant;
   locked?: boolean;
   openBasePath?: string;
