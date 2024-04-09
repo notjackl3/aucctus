@@ -13,6 +13,7 @@ import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import { AppPath } from '../../../../../routes/routes';
 import { getMarketMetricColor, getMarketMetricTitle } from '../../../../../libs/concepts';
 import { formatLargeNumber } from '../../../../../libs/utils';
+import KeyAssumptionCard from './components/KeyAssumptionCard';
 
 export interface OverviewDetailsProps {}
 
@@ -41,6 +42,22 @@ const OverviewDetails: FunctionComponent = () => {
     retry: 1,
     queryFn: async () => await api.concept.getConceptOverview(conceptId || ''),
   });
+
+  const { data: conceptAssumptionData } = useQuery({
+    queryKey: ['concepts/key-assumptions'],
+    refetchOnWindowFocus: false,
+    retry: 1,
+    queryFn: async () => {
+      return api.concept.getConceptKeyAssumptions(conceptId || '');
+    },
+  });
+
+  const keyAssumptions = useMemo(() => {
+    if (!conceptAssumptionData || !conceptAssumptionData.results) {
+      return [];
+    }
+    return conceptAssumptionData.results;
+  }, [conceptAssumptionData]);
 
   const firstCustomerPersona = useMemo(() => {
     if (!conceptOverviewData || !conceptOverviewData.persona) {
@@ -194,6 +211,7 @@ const OverviewDetails: FunctionComponent = () => {
             </div>
           </div>
         </ConceptDetailCard>
+        <KeyAssumptionCard keyAssumptions={keyAssumptions} conceptId={conceptId} />
       </div>
       {/* <div className={styles.summary}>
         <h2>Activity and News</h2>

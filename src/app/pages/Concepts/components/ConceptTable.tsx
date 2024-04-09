@@ -129,12 +129,15 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
           <ConceptRowButton
             variant={row.original.reportStatus}
             onClick={(e) => {
-              if (row.original.reportStatus === 'notStarted') {
+              const reportStatus = row.original.reportStatus;
+              if (reportStatus === 'notStarted') {
                 updateConceptStatus('ideating', row.original.uuid);
-              } else if (row.original.reportStatus === 'error') {
+              } else if (reportStatus === 'error') {
                 retryConceptReport(row.original.uuid);
               }
-              e.stopPropagation();
+              if (reportStatus !== 'complete') {
+                e.stopPropagation();
+              }
             }}
           />
         ),
