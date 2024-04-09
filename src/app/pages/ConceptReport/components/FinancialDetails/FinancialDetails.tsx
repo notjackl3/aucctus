@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 import styles from './styles/financialDetails.module.scss';
 import Icon from '../../../../components/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
@@ -9,6 +9,7 @@ import { formatLargeNumber } from '../../../../../libs/utils';
 import { useQuery } from 'react-query';
 import { useParams } from 'react-router-dom';
 import api from '../../../../../libs/api';
+import { getMarketMetricColor, getMarketMetricTitle } from '../../../../../libs/concepts';
 
 const iconDefaultProps = {
   height: 20,
@@ -25,9 +26,16 @@ const FinancialDetails: FunctionComponent = () => {
     queryFn: async () => await api.concept.getConceptFinancialProjection(conceptId || ''),
   });
 
-  const dataTAM = conceptFinancialData?.marketSizeMetrics?.[0];
-  const dataSAM = conceptFinancialData?.marketSizeMetrics?.[1];
-  const dataSOM = conceptFinancialData?.marketSizeMetrics?.[2];
+  const marketMetrics = useMemo(() => {
+    if (!conceptFinancialData || !conceptFinancialData.marketSizeMetrics) {
+      return [];
+    }
+    return conceptFinancialData.marketSizeMetrics;
+  }, [conceptFinancialData]);
+
+  const dataTAM = marketMetrics[0];
+  const dataSAM = marketMetrics[1];
+  const dataSOM = marketMetrics[2];
 
   return (
     <div className={styles.financialDetails}>
@@ -89,38 +97,19 @@ const FinancialDetails: FunctionComponent = () => {
         <ConceptDetailCard title="Market Size Projection" cardClassName={styles.paddedCardStyle} isHideFooter>
           <div className={styles.cardMarketContent}>
             <div className={styles.cardLeft}>
-              <ConceptDetailCard
-                title="Total Addressable Market"
-                cardClassName={styles.cardLeftSytle}
-                headerAction={<span>{formatLargeNumber(dataTAM?.value)}</span>}
-              >
-                <div className={styles.cardLeftContent}>
-                  <p className={styles.cardBoldText}>{dataTAM?.keyHypothesis}</p>
-                  <p className={styles.cardRegularText}>{dataTAM?.dataPoint}</p>
-                </div>
-              </ConceptDetailCard>
-              <ConceptDetailCard
-                title="Serviceable Addressable Market"
-                cardClassName={styles.cardLeftSytle}
-                headerAction={<span>{formatLargeNumber(dataSAM?.value)}</span>}
-                isHideFooter
-              >
-                <div className={styles.cardLeftContent}>
-                  <p className={styles.cardBoldText}>{dataSAM?.keyHypothesis}</p>
-                  <p className={styles.cardRegularText}>{dataSAM?.dataPoint}</p>
-                </div>
-              </ConceptDetailCard>
-              <ConceptDetailCard
-                title="Serviceable Obtainable Market"
-                cardClassName={styles.cardLeftSytle}
-                headerAction={<span>{formatLargeNumber(dataSOM?.value)}</span>}
-                isHideFooter
-              >
-                <div className={styles.cardLeftContent}>
-                  <p className={styles.cardBoldText}>{dataSOM?.keyHypothesis}</p>
-                  <p className={styles.cardRegularText}>{dataSOM?.dataPoint}</p>
-                </div>
-              </ConceptDetailCard>
+              {marketMetrics.map((metric, i) => (
+                <ConceptDetailCard
+                  key={`key-hypothesis-${i}`}
+                  title={getMarketMetricTitle(metric.metricType)}
+                  cardClassName={styles.cardLeftSytle}
+                  headerAction={<span>{formatLargeNumber(metric.value)}</span>}
+                >
+                  <div className={styles.cardLeftContent}>
+                    <p className={styles.cardBoldText}>{metric?.keyHypothesis}</p>
+                    <p className={styles.cardRegularText}>{metric?.dataPoint}</p>
+                  </div>
+                </ConceptDetailCard>
+              ))}
             </div>
             <div className={styles.cardRight}>
               <MarketChart
@@ -130,21 +119,14 @@ const FinancialDetails: FunctionComponent = () => {
                 chartClass={styles.marketChart}
               />
               <div className={styles.legend}>
-                <MarketLegend
-                  legendText="Total Addressable Market"
-                  legendValue={formatLargeNumber(dataTAM?.value)}
-                  bulletColor="purple"
-                />
-                <MarketLegend
-                  legendText="Serviceable Addressable Market"
-                  legendValue={formatLargeNumber(dataSAM?.value)}
-                  bulletColor="darkPurple"
-                />
-                <MarketLegend
-                  legendText="Serviceable Obtainable Market"
-                  legendValue={formatLargeNumber(dataSOM?.value)}
-                  bulletColor="blue"
-                />
+                {marketMetrics.map((metric, i) => (
+                  <MarketLegend
+                    key={`$market-metrics-legend-${i}`}
+                    legendText={getMarketMetricTitle(metric.metricType)}
+                    legendValue={formatLargeNumber(metric.value)}
+                    bulletColor={getMarketMetricColor(metric.metricType)}
+                  />
+                ))}
               </div>
             </div>
           </div>

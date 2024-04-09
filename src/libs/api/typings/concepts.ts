@@ -84,13 +84,22 @@ export interface ICustomerProfile {
   updatedAt: string;
 }
 
+export type MarketMetricType = 'TAM' | 'SAM' | 'SOM';
+
+export interface MarketSizeMetrics {
+  dataPoint: string;
+  keyHypothesis: string;
+  metricType: MarketMetricType;
+  reason: string;
+  value: number;
+}
+
 export interface IFinancialProjection {
   uuid: string;
   createdAt: string;
   updatedAt: string;
   overview: string;
-  // TODO: Add the rest of the fields
-  marketSizeMetrics: any;
+  marketSizeMetrics: MarketSizeMetrics[];
 }
 
 export enum AssumptionType {

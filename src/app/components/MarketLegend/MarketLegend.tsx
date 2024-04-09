@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 
 import styles from './styles/marketLegend.module.scss';
 import Icon from '../Icon';
+import { MarketMetricColorType } from '../../../libs/concepts';
 
 const defaultIconProps = {
   stroke: '',
@@ -14,7 +15,7 @@ export interface MarketLegendProps {
   legendTextClassName?: string;
   legendText: string;
   legendValue: string;
-  bulletColor: 'purple' | 'darkPurple' | 'blue';
+  bulletColor: MarketMetricColorType;
 }
 
 const MarketLegend: FunctionComponent<MarketLegendProps> = ({

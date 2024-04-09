@@ -102,6 +102,8 @@
     align-self: stretch;
 
     .cardStyle {
+      display: flex;
+      align-self: stretch;
       span {
         h4 {
           color: $blue-900;
