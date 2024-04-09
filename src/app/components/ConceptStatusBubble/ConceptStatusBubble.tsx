@@ -31,7 +31,7 @@ const ConceptStatusBubble: FunctionComponent<IConceptStatusBubbleProps> = ({
 
   return (
     <div className={`${statusStyle} ${styles[`${color}Background`]}`}>
-      {showBullet ? <span>●</span> : null}
+      {showBullet ? <span className={styles.bullet}>●</span> : null}
       <span className={styles.status}>{camelCaseToTitleCase(status)}</span>
       {showChevronDown ? <Icon variant="chevronDown" {...defaultIconProps} /> : null}
     </div>

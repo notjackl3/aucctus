@@ -20,6 +20,10 @@
   border: none;
   background: $purple-50;
   gap: 0.5rem;
+
+  .bullet {
+    margin-left: 0.25rem;
+  }
 }
 
 .status {
