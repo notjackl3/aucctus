@@ -57,9 +57,7 @@ const CustomerProfile: FunctionComponent = () => {
           <>
             {customerPersonas.map((customer) => (
               <div key={`customer-profile-${customer.uuid}`}>
-                {customer.nickname === selectedPersona ? (
-                  <CustomerDetails customerData={customer} />
-                ) : null}
+                {customer.nickname === selectedPersona ? <CustomerDetails customerData={customer} /> : null}
               </div>
             ))}
           </>
