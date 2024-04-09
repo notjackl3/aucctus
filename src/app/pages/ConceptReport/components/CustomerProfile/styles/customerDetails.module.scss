@@ -82,15 +82,12 @@
 
     .leftColumn {
       display: flex;
-      height: 100%;
       width: 40rem;
-      flex: 1 0 auto;
       flex-direction: column;
     }
 
     .rightColumn {
       display: flex;
-      height: 100%;
       max-width: 30%;
       flex-direction: column;
       justify-content: flex-start;
