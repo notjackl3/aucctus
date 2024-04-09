@@ -83,7 +83,8 @@
     .leftColumn {
       display: flex;
       height: 100%;
-      max-width: 40rem;
+      width: 40rem;
+      flex: 1 0 auto;
       flex-direction: column;
     }
 
@@ -122,6 +123,10 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
+
+    .customerCards {
+      max-width: 19rem;
+    }
 
     .cardContent {
       display: flex;

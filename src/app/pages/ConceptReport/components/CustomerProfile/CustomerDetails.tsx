@@ -94,7 +94,13 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ customerDat
       <div className={styles.cardContainer}>
         {listItems.map((item, index) => {
           return (
-            <ConceptDetailCard title={item.title} key={`${item.title}-${index}`} icon={item.icon} isHideFooter>
+            <ConceptDetailCard
+              cardClassName={styles.customerCards}
+              title={item.title}
+              key={`${item.title}-${index}`}
+              icon={item.icon}
+              isHideFooter
+            >
               <div className={styles.cardContent}>
                 {item.data.map((value, i) => (
                   <p key={`${item.title}-${item.icon}-${i}`} className={styles.text}>
