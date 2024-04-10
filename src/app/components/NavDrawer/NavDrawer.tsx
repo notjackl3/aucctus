@@ -25,6 +25,7 @@ const NavDrawer = () => {
     queryFn: async () => {
       return api.concept.getConcepts({});
     },
+    staleTime: Infinity,
   });
 
   const isExistingConcepts = useMemo(() => {
