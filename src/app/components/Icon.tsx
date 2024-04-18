@@ -2,6 +2,7 @@ import { FunctionComponent } from 'react';
 
 import Lock from '../assets/icons/lock.svg?react';
 import Help from '../assets/icons/help.svg?react';
+import HelpCircle from '../assets/icons/help-circle.svg?react';
 import Beaker from '../assets/icons/beaker.svg?react';
 import FileSearch from '../assets/icons/filesearch.svg?react';
 import Lightbulb from '../assets/icons/lightbulb.svg?react';
@@ -55,10 +56,13 @@ import Board from '../assets/icons/board.svg?react';
 import AlertOctagon from '../assets/icons/alert-octagon.svg?react';
 import AlertTriangle from '../assets/icons/alert-triangle.svg?react';
 import Check from '../assets/icons/check.svg?react';
+import Edit from '../assets/icons/edit.svg?react';
+import Save from '../assets/icons/save.svg?react';
 
 export type IconVariant =
   | 'lock'
   | 'help'
+  | 'helpCircle'
   | 'beaker'
   | 'target'
   | 'search'
@@ -111,7 +115,9 @@ export type IconVariant =
   | 'board'
   | 'critical'
   | 'warning'
-  | 'check';
+  | 'check'
+  | 'edit'
+  | 'save';
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
   variant: IconVariant;
   title?: string;
@@ -133,6 +139,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <Lock {...props} />;
     case 'help':
       return <Help {...props} />;
+    case 'helpCircle':
+      return <HelpCircle {...props} />;
     case 'beaker':
       return <Beaker {...props} />;
     case 'target':
@@ -229,6 +237,10 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <AlertTriangle {...props} />;
     case 'check':
       return <Check {...props} />;
+    case 'edit':
+      return <Edit {...props} />;
+    case 'save':
+      return <Save {...props} />;
   }
 };
 
