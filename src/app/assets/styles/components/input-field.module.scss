@@ -1,3 +1,5 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+
 .inputField {
   align-self: stretch;
   display: inline-block;
@@ -71,9 +73,37 @@
   }
 }
 
-// .helpIcon {
-//   position: relative;
-//   width: 1rem;
-//   height: 1rem;
-//   display: none;
-// }
+.inputFieldSettings {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1 1 auto;
+  max-width: 25rem;
+  .label {
+    color: var(--Gray-700---Text-Tertiary, #626ba3);
+    @include text-small;
+    font-family: var(--text-sm-regular);
+  }
+
+  input {
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: var(--padding-3xs) var(--padding-sm);
+    color: var(--Gray-500---Resting-Icons, var(--Color-Grey-Grey-500, #7586a9));
+    @include text-medium;
+    font-family: var(--text-sm-regular);
+    border-radius: var(--br-5xs);
+    box-shadow: var(--shadow-xs);
+    border: 1px solid var(--gray-300-outline);
+
+    ::placeholder {
+      color: var(--gray-400-placeholder, #b4bdd0) !important;
+    }
+
+    &:disabled {
+      background: none;
+    }
+  }
+}
