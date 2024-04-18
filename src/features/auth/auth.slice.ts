@@ -17,6 +17,7 @@ import {
   IRefreshTokenSuccessResponse,
   IRegisterAccount,
   IUser,
+  IUserDetailsResponse,
 } from '../../libs/api/typings';
 import { AxiosError, isAxiosError } from 'axios';
 import { IFormDetailsError } from '../../libs/api/typings/avxisi';
@@ -157,6 +158,10 @@ export const authSlice = createSlice({
         state.user = { ...state.user, account: action.payload.uuid };
       }
     },
+    setUser(state: AuthState, action: PayloadAction<IUserDetailsResponse>) {
+      const { user } = action.payload;
+      state.user = { ...user };
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -215,7 +220,7 @@ export const authSlice = createSlice({
   },
 });
 
-export const { setAuthenticated, setUnauthenticated, setAccount, simpleLogout } = authSlice.actions;
+export const { setAuthenticated, setUnauthenticated, setAccount, setUser, simpleLogout } = authSlice.actions;
 
 export const selectUser = (state: RootState) => state.auth.user;
 export const selectAccount = (state: RootState) => state.auth.account;
