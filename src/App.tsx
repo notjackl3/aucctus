@@ -48,6 +48,7 @@ function App() {
               <Route index path={AppPath.Home} element={<Page.Dashboard />} />
               {/* Concepts */}
               <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
+              <Route path={AppPath.ConceptSnapshot} element={<Page.ConceptSnapshot />} />
               <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
               <Route path={AppPath.ConceptCategory} element={<Page.Concepts />} />
 

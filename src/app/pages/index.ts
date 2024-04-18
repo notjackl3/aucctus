@@ -5,6 +5,7 @@ import NotFound from './NotFound';
 import Onboarding from './Onboarding';
 import Concepts from './Concepts';
 import IgniteConcept from './IgniteConcept';
+import ConceptSnapshot from './ConceptSnapshot';
 import GeneratedConcepts from './GeneratedConcepts';
 
 const Page = {
@@ -16,6 +17,7 @@ const Page = {
   IgniteConcept,
   GeneratedConcepts,
   ConceptPages,
+  ConceptSnapshot,
 };
 
 export default Page;
