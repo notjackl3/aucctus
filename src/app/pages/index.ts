@@ -6,6 +6,7 @@ import Onboarding from './Onboarding';
 import Concepts from './Concepts';
 import IgniteConcept from './IgniteConcept';
 import GeneratedConcepts from './GeneratedConcepts';
+import SettingsPages from './Settings';
 
 const Page = {
   Auth,
@@ -16,6 +17,7 @@ const Page = {
   IgniteConcept,
   GeneratedConcepts,
   ConceptPages,
+  SettingsPages,
 };
 
 export default Page;
