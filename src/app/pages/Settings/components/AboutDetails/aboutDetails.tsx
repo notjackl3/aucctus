@@ -140,19 +140,22 @@ const AboutDetails: FunctionComponent = () => {
         label: 'Email',
         value: email ?? data?.user.email,
         name: 'email',
+        isDisabled: isFormDisabled,
       },
       {
         label: 'Job Title',
         value: jobTitle ?? data?.user.jobTitle,
         name: 'jobTitle',
+        isDisabled: isFormDisabled,
       },
       {
         label: 'Aucctus Role',
         value: role ?? data?.user.role,
         name: 'role',
+        isDisabled: true,
       },
     ],
-    [data, email, jobTitle, role]
+    [data, email, jobTitle, role, isFormDisabled]
   );
 
   return data ? (
@@ -240,7 +243,7 @@ const AboutDetails: FunctionComponent = () => {
               <InputField
                 variant="settings"
                 name={info.name}
-                disabled={isFormDisabled}
+                disabled={info.isDisabled}
                 label={''}
                 autoComplete="on"
                 value={info.value}
