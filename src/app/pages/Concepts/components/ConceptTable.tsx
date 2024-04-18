@@ -89,9 +89,9 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
       }),
       columnHelper.accessor('title', {
         id: 'title',
-        header: () => <span className={styles.details}>Company</span>,
-        size: 150,
-        minSize: 150,
+        header: () => <span className={styles.details}>Concept</span>,
+        size: 190,
+        minSize: 190,
         cell: (info) => <div className={styles.company}>{info.getValue()}</div>,
       }),
       columnHelper.accessor((row) => row?.description, {
@@ -107,8 +107,8 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
       }),
       columnHelper.accessor((row) => row.updatedAt, {
         id: 'updatedAt',
-        size: 150,
-        minSize: 150,
+        size: 110,
+        minSize: 110,
         cell: (info) => dateCellFormatter(info.getValue()),
         header: () => <span>Last Modified</span>,
       }),
