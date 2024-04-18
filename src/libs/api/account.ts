@@ -25,7 +25,7 @@ export class AccountApi extends ApiService {
   }
 
   updateUser(user: Partial<IUser>) {
-    return this.put(endpoints.user, user);
+    return this.patch<IUserDetailsResponse>(endpoints.user, user);
   }
 
   getDashboard() {

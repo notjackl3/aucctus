@@ -30,6 +30,7 @@ export interface IUser {
   lastName: string;
   email: string;
   account?: string;
+  jobTitle?: string;
   role: 'Admin' | 'Employee';
 }
 

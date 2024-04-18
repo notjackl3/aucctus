@@ -74,7 +74,7 @@ const NavDrawer = () => {
             <NavLink to={AppPath.ChallengeCenter} title="Challenges" icon="rocket" />
           </div>
           <div className={styles.extras}>
-            <NavLink to={AppPath.Home} title="Settings" icon="file" />
+            <NavLink to={AppPath.SettingsAbout} title="Settings" icon="file" />
           </div>
           <div className={styles.account}>
             <img className={styles.avatar} alt="avatar" src={avatar} />

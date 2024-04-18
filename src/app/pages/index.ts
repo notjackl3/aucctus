@@ -7,6 +7,7 @@ import Concepts from './Concepts';
 import IgniteConcept from './IgniteConcept';
 import ConceptSnapshot from './ConceptSnapshot';
 import GeneratedConcepts from './GeneratedConcepts';
+import SettingsPages from './Settings';
 
 const Page = {
   Auth,
@@ -18,6 +19,7 @@ const Page = {
   GeneratedConcepts,
   ConceptPages,
   ConceptSnapshot,
+  SettingsPages,
 };
 
 export default Page;

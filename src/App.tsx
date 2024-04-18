@@ -59,6 +59,10 @@ function App() {
                 <Route path={ConceptPath.CustomerProfile} element={<Page.ConceptPages.CustomerProfile />} />
                 <Route path={ConceptPath.KeyAssumptions} element={<Page.ConceptPages.HypothesisDetails />} />
               </Route>
+              {/* Settings */}
+              <Route path={AppPath.Settings} element={<Page.SettingsPages.Settings />}>
+                <Route index path={AppPath.SettingsAbout} element={<Page.SettingsPages.AboutDetails />} />
+              </Route>
             </Route>
           </Route>
 
