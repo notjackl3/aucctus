@@ -46,13 +46,14 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
   );
 
   const chartPoints = useMemo(() => {
-    return chartCoordinates.map((coordinate, i) => {
+    const chartDots = chartCoordinates.map((coordinate, i) => {
       const isCoordSelected = coordinate.id === selectedCoordinate;
       const yCoord = getAdjustedCoord(coordinate.yCoord);
       const xCoord = getAdjustedCoord(coordinate.xCoord);
       return (
         <circle
           key={`coordinate-${i}`}
+          id={coordinate.id}
           cx={xCoord}
           cy={yCoord}
           r={POINT_RADIUS}
@@ -62,6 +63,13 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
         />
       );
     });
+    // Move the selected circle to the end of the chartDots array so that it will render on top.
+    const selectedIndex = chartDots.findIndex((circle) => circle.props.id === selectedCoordinate);
+    const removedElement = chartDots.splice(selectedIndex, 1);
+    if (removedElement.length) {
+      chartDots.push(removedElement[0]);
+    }
+    return chartDots;
   }, [chartCoordinates, selectedCoordinate]);
 
   return (

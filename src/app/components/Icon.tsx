@@ -18,6 +18,7 @@ import Gear from '../assets/icons/gear.svg?react';
 import ChevronUp from '../assets/icons/chevronup.svg?react';
 import ChevronDown from '../assets/icons/chevrondown.svg?react';
 import ChevronRight from '../assets/icons/chevronright.svg?react';
+import ChevronLeft from '../assets/icons/chevronleft.svg?react';
 import Globe from '../assets/icons/globe.svg?react';
 import Key from '../assets/icons/key.svg?react';
 import LifeBuoy from '../assets/icons/lifebuoy.svg?react';
@@ -56,6 +57,7 @@ import Board from '../assets/icons/board.svg?react';
 import AlertOctagon from '../assets/icons/alert-octagon.svg?react';
 import AlertTriangle from '../assets/icons/alert-triangle.svg?react';
 import Check from '../assets/icons/check.svg?react';
+import DownloadCloud from '../assets/icons/download-cloud.svg?react';
 import Edit from '../assets/icons/edit.svg?react';
 import Save from '../assets/icons/save.svg?react';
 
@@ -78,6 +80,7 @@ export type IconVariant =
   | 'chevronUp'
   | 'chevronDown'
   | 'chevronRight'
+  | 'chevronLeft'
   | 'globe'
   | 'key'
   | 'lifeBuoy'
@@ -116,6 +119,7 @@ export type IconVariant =
   | 'critical'
   | 'warning'
   | 'check'
+  | 'downloadCloud'
   | 'edit'
   | 'save';
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
@@ -161,6 +165,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <ChevronDown {...props} />;
     case 'chevronRight':
       return <ChevronRight {...props} />;
+    case 'chevronLeft':
+      return <ChevronLeft {...props} />;
     case 'globe':
       return <Globe {...props} />;
     case 'key':
@@ -237,6 +243,8 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <AlertTriangle {...props} />;
     case 'check':
       return <Check {...props} />;
+    case 'downloadCloud':
+      return <DownloadCloud {...props} />;
     case 'edit':
       return <Edit {...props} />;
     case 'save':

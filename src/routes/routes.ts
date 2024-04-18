@@ -12,6 +12,7 @@ export enum AppPath {
   ConceptFinancialProjection = '/concept/:id/financial-projection',
   ConceptKeyAssumptions = '/concept/:id/key-assumptions',
   ConceptMarketScan = '/concept/:id/market-scan',
+  ConceptSnapshot = '/concept/snapshot',
 
   /* Domain */
   IgniteDomain = '/domain/ignite',
