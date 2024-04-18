@@ -23,6 +23,10 @@ export enum AppPath {
   ChallengeWizard = '/challenge/wizards',
   ChallengeDetails = '/challenge/:id',
 
+  /* Settings */
+  Settings = '/settings',
+  SettingsAbout = '/settings/about',
+
   /* Auth */
   Login = '/login',
   SignUp = '/sign-up',
