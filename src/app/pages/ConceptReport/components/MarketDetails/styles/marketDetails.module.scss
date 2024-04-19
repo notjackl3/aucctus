@@ -153,4 +153,12 @@
     width: 100%;
     gap: 1rem;
   }
+
+  .externalLogoLink {
+    display: inline;
+    a {
+      @include text-x-small;
+      color: $grey-600 !important;
+    }
+  }
 }
