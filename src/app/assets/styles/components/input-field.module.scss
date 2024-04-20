@@ -74,6 +74,7 @@
 }
 
 .inputFieldSettings {
+  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
@@ -83,6 +84,23 @@
     color: var(--Gray-700---Text-Tertiary, #626ba3);
     @include text-small;
     font-family: var(--text-sm-regular);
+  }
+
+  &.inputFieldError {
+    .hintText,
+    .label {
+      color: var(--red-900-text-error) !important;
+    }
+  }
+
+  .icon {
+    display: flex;
+    position: absolute;
+    right: 1rem;
+    top: 0.9rem;
+    padding: 0;
+    background: none;
+    border: none;
   }
 
   input {
@@ -105,5 +123,10 @@
     &:disabled {
       background: none;
     }
+  }
+
+  .hintText {
+    color: var(--colors-text-text-tertiary-600, #475467);
+    @include text-small;
   }
 }

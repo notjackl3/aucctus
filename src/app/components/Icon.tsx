@@ -60,6 +60,8 @@ import Check from '../assets/icons/check.svg?react';
 import DownloadCloud from '../assets/icons/download-cloud.svg?react';
 import Edit from '../assets/icons/edit.svg?react';
 import Save from '../assets/icons/save.svg?react';
+import Eye from '../assets/icons/eye.svg?react';
+import EyeOff from '../assets/icons/eye-off.svg?react';
 
 export type IconVariant =
   | 'lock'
@@ -121,7 +123,9 @@ export type IconVariant =
   | 'check'
   | 'downloadCloud'
   | 'edit'
-  | 'save';
+  | 'save'
+  | 'eye'
+  | 'eyeOff';
 interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
   variant: IconVariant;
   title?: string;
@@ -249,6 +253,10 @@ const Icon: FunctionComponent<IconProps> = ({ variant, ...props }) => {
       return <Edit {...props} />;
     case 'save':
       return <Save {...props} />;
+    case 'eye':
+      return <Eye {...props} />;
+    case 'eyeOff':
+      return <EyeOff {...props} />;
   }
 };
 

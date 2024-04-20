@@ -27,6 +27,7 @@ export enum AppPath {
   /* Settings */
   Settings = '/settings',
   SettingsAbout = '/settings/about',
+  SettingsSecurity = '/settings/security',
 
   /* Auth */
   Login = '/login',

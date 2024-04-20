@@ -62,6 +62,7 @@ function App() {
               {/* Settings */}
               <Route path={AppPath.Settings} element={<Page.SettingsPages.Settings />}>
                 <Route index path={AppPath.SettingsAbout} element={<Page.SettingsPages.AboutDetails />} />
+                <Route index path={AppPath.SettingsSecurity} element={<Page.SettingsPages.SecurityDetails />} />
               </Route>
             </Route>
           </Route>

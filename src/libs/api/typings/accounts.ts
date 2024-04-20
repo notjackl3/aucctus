@@ -34,6 +34,12 @@ export interface IUser {
   role: 'Admin' | 'Employee';
 }
 
+export interface IUserPassword {
+  current_password: string;
+  password: string;
+  confirm_password: string;
+}
+
 export interface IUserDetailsResponse {
   user: IUser;
   account: IAccount;
