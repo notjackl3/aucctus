@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo } from 'react';
 import styles from './styles/marketDetails.module.scss';
-import Icon from '../../../../components/Icon';
+import Icon from '../../../../components/Icon/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import images from '../../../../assets/img';
 import NewsArticle from '../../../../components/NewsArticle';
@@ -66,7 +66,7 @@ const MarketDetails: FunctionComponent = () => {
                 aria-label="See Source"
               >
                 See Source
-                <span>{<Icon variant="linkExternal" {...iconDefaultProps} />}</span>
+                <span>{<Icon variant="link-external" {...iconDefaultProps} />}</span>
               </a>
             }
           >
@@ -105,7 +105,7 @@ const MarketDetails: FunctionComponent = () => {
                     <p className={styles.cardDescriptionText}>{item.description}</p>
                   </div>
                   <a target="_blank" rel="noopener noreferrer" href={item.source}>
-                    <Icon variant="linkExternal" width={24} height={24} />
+                    <Icon variant="link-external" width={24} height={24} />
                   </a>
                 </div>
               ))}

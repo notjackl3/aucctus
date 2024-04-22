@@ -191,7 +191,8 @@
           gap: 0rem;
 
           .list {
-            svg {
+            svg,
+            use {
               margin-top: 0.25rem;
               width: 1.5rem;
               path {
@@ -296,7 +297,8 @@
       border: 1px solid $grey-300;
       background: none;
 
-      svg {
+      svg,
+      use {
         path {
           stroke: $grey-600;
           stroke-width: 1px;

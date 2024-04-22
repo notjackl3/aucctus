@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 import styles from '../assets/styles/components/ignite-box.module.scss';
 import { AppPath } from '../../routes/routes';
 import { useNavigate } from 'react-router-dom';
-import Icon, { IconVariant } from './Icon';
+import Icon from './Icon/Icon';
 
 const defaultIconProps = {
   height: 24,
@@ -30,7 +30,7 @@ const IgniteBox: FunctionComponent<IgniteBoxProps> = ({ title, subtitle, link, i
 
       <button className={`btn btn-primary`} onClick={() => navigate(link)}>
         Ignite
-        <Icon variant="arrowRight" width={24} height={24} stroke="#fff" />
+        <Icon variant="arrowright" width={24} height={24} stroke="#fff" />
       </button>
     </div>
   );

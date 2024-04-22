@@ -21,7 +21,7 @@ const OnboardingIntoSection: FunctionComponent = () => {
       <OnboardingMessage
         title={'Persona Magic'}
         description={'Tailor-made strategies that resonate with your ideal audience'}
-        icon="userGroup"
+        icon="user-group"
         color={'purple'}
       />
       <OnboardingMessage
@@ -35,7 +35,7 @@ const OnboardingIntoSection: FunctionComponent = () => {
         description={
           'Backed by the freshest, most precise data-driven insights. Join the future of business expansion today!'
         }
-        icon="search"
+        icon="search-refraction"
         color={'purple'}
       />
     </div>

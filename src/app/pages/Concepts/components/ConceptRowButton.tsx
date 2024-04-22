@@ -1,7 +1,7 @@
 import { FunctionComponent, ReactNode } from 'react';
 import styles from '../styles/concepts.module.scss';
 import { ConceptReportStatus } from '../../../../libs/api/typings';
-import Icon from '../../../components/Icon';
+import Icon from '../../../components/Icon/Icon';
 import Loading from '../../../components/Loading';
 
 type ConceptRowButtonProps = {

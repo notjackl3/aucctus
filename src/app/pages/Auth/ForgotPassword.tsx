@@ -2,29 +2,17 @@ import { FunctionComponent, useCallback, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
 import FeatureIcon from '../../components/FeatureIcon';
-import { validEmail } from '../../../libs/utils';
+import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
 import { Link } from 'react-router-dom';
-import Icon from '../../components/Icon';
-import { useQuery } from 'react-query';
-import api from '../../../libs/api';
+import Icon from '../../components/Icon/Icon';
+import { useRequestPasswordReset } from '../../hooks/query/auth';
 
 const ForgotPassword: FunctionComponent = () => {
   const [email, setEmail] = useState('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
 
-  const query = useQuery({
-    queryKey: 'forgot-password',
-    retry: 3,
-    enabled: false, // Prevent from automatically running
-    queryFn: async () => await api.auth.forgotPassword(email),
-    onSuccess: () => {
-      // TODO: handle success
-    },
-    onError: () => {
-      // TODO: handle error
-    },
-  });
+  const { mutate: requestPasswordReset, isSuccess, error } = useRequestPasswordReset();
 
   const _handleEmailValidation = useCallback(
     (e: React.FocusEvent) => {
@@ -44,6 +32,8 @@ const ForgotPassword: FunctionComponent = () => {
         <FeatureIcon icon={'key'} color={'purple'} />
         <span className={styles.title}>Forgot Password</span>
         <span className={styles.supportingText}>No worries, we'll send you reset instructions.</span>
+        <span className={styles.success}>{isSuccess ? 'Reset instructions sent!' : ''}</span>
+        <span className={styles.error}>{!!error ? parseFormError(error) : ''}</span>
       </div>
       <form className={styles.basicForm}>
         <InputField
@@ -59,12 +49,20 @@ const ForgotPassword: FunctionComponent = () => {
           onFocus={() => setEmailInputError(undefined)}
           onBlur={_handleEmailValidation}
         />
-        <button type="submit" className="btn btn-primary" onClick={() => query.refetch()}>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={!email || !!emailInputError}
+          onClick={(e) => {
+            requestPasswordReset(email);
+            e.preventDefault();
+          }}
+        >
           Reset Password
         </button>
         <div className={styles.signUp}>
           <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant="arrowLeft" /> Back to login
+            <Icon variant="arrowleft" width={20} height={20} /> Back to login
           </Link>
         </div>
       </form>

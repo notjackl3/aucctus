@@ -1,24 +1,17 @@
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import type { RootState, AppDispatch } from './store';
 import { useLocation } from 'react-router-dom';
 import React from 'react';
 import { useRef, useState, useEffect } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 
-// Use throughout your app instead of plain `useDispatch` and `useSelector`
-export const useAppDispatch: () => AppDispatch = useDispatch;
-export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
-
 export function useQueryParams() {
   const { search } = useLocation();
-
   return React.useMemo(() => new URLSearchParams(search), [search]);
 }
 
 /**
- * Returns the Previous state
- * @param state
- * @returns
+ * Returns the previous value of the given state.
+ * @param state The current state value.
+ * @returns The previous value of the state.
  */
 export function usePrevious<T>(state: T): T | undefined {
   const ref = useRef<T>();
@@ -29,8 +22,9 @@ export function usePrevious<T>(state: T): T | undefined {
 }
 
 /**
- *
- *
+ * Custom hook that measures the dimensions of a DOM element.
+ * @template T - The type of the DOM element.
+ * @returns An array containing a ref object and the bounds of the element.
  */
 export const useMeasure = <T extends Element>() => {
   const ref = useRef<T>();

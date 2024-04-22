@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import styles from './styles/conceptOverview.module.scss';
-import Icon from '../../components/Icon';
+import Icon from '../../components/Icon/Icon';
 import TabView from '../../components/TabView';
 import Dropdown from '../../components/Dropdown/Dropdown';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
@@ -84,7 +84,7 @@ const ConceptReport: FunctionComponent = () => {
             className={`btn btn-primary btn-bold`}
             onClick={() => navigate(AppPath.ConceptSnapshot)}
           >
-            <Icon variant="downloadCloud" {...defaultIconProps} />
+            <Icon variant="download-cloud" {...defaultIconProps} />
             Opportunity Snapshot
           </button>
           <button

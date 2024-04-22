@@ -2,18 +2,17 @@ import React, { useMemo } from 'react';
 import Logo from '../../assets/Logo.png';
 import styles from '../../assets/styles/components/drawer.module.scss';
 import NavLink from './NavLink';
-import { useSelector } from 'react-redux';
-import { logout, selectUser } from '../../../features/auth/auth.slice';
-
-import avatar from '../../assets/icons/avatar.svg';
+import { logout } from '../../../features/auth/auth.slice';
+import avatar from '../../assets/avatar.svg';
 import { AppPath } from '../../../routes/routes';
-import { useAppDispatch } from '../../hooks';
 import { useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
+import { useAppDispatch } from '../../store';
+import { useUserDetails } from '../../hooks/query/account';
 
 const NavDrawer = () => {
-  const user = useSelector(selectUser)!;
+  const { data: { user } = { user: undefined } } = useUserDetails();
   const dispatch = useAppDispatch();
 
   const navigate = useNavigate();
@@ -80,12 +79,13 @@ const NavDrawer = () => {
             <img className={styles.avatar} alt="avatar" src={avatar} />
             <div
               className={styles.userDetails}
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 dispatch(logout());
               }}
             >
-              <span>{user.firstName}</span>
-              <span>{user.email}</span>
+              <span>{user?.firstName || ''}</span>
+              <span>{user?.email || ''}</span>
             </div>
           </div>
         </div>

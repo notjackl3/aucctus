@@ -3,7 +3,6 @@ import { Outlet } from 'react-router-dom';
 import styles from './styles/settings.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
-
 import TabView from '../../components/TabView/TabView';
 
 export const SETTING_TABS = [

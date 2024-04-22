@@ -1,0 +1,19 @@
+{
+  "shape": {
+    "dimension": {
+      "maxWidth": 24,
+      "maxHeight": 24
+    },
+    "spacing": {
+      "padding": 0
+    },
+    "transform": ["svgo"]
+  },
+  "mode": {
+    "symbol": {
+      "dest": "src/app/assets",
+      "sprite": "icon-sprite.svg",
+      "example": false
+    }
+  }
+}

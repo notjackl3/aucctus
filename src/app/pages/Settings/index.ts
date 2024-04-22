@@ -1,6 +1,8 @@
-import Settings from './Settings';
-import AboutDetails from './components/AboutDetails/aboutDetails';
-import SecurityDetails from './components/SecurityDetails/securityDetails';
+import React from 'react';
+
+const Settings = React.lazy(() => import('./Settings'));
+const AboutDetails = React.lazy(() => import('./components/AboutDetails'));
+const SecurityDetails = React.lazy(() => import('./components/SecurityDetails'));
 
 const SettingsPages = {
   AboutDetails,

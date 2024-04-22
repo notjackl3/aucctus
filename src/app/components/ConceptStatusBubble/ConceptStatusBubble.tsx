@@ -3,7 +3,7 @@ import { FunctionComponent, useMemo } from 'react';
 import styles from './styles/conceptStatus.module.scss';
 import { ConceptStatus } from '../../../libs/api/typings';
 import { getConceptStatusColor } from '../../../libs/concepts';
-import Icon from '../Icon';
+import Icon from '../Icon/Icon';
 import { camelCaseToTitleCase } from '../../../libs/utils';
 
 type ConceptStatusVariant = 'bubble' | 'dropdown';
@@ -33,7 +33,7 @@ const ConceptStatusBubble: FunctionComponent<IConceptStatusBubbleProps> = ({
     <div className={`${statusStyle} ${styles[`${color}Background`]}`}>
       {showBullet ? <span className={styles.bullet}>●</span> : null}
       <span className={styles.status}>{camelCaseToTitleCase(status)}</span>
-      {showChevronDown ? <Icon variant="chevronDown" {...defaultIconProps} /> : null}
+      {showChevronDown ? <Icon variant="chevrondown" {...defaultIconProps} /> : null}
     </div>
   );
 };

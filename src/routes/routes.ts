@@ -33,6 +33,7 @@ export enum AppPath {
   Login = '/login',
   SignUp = '/sign-up',
   ConfirmEmail = '/confirm-email',
+  EmailConfirmation = '/email-confirmation',
   ForgotPassword = '/forgot-password',
   ResetPassword = '/reset-password',
   ResetPasswordSuccess = '/reset-password/success',

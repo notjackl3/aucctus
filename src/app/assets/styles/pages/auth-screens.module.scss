@@ -4,11 +4,21 @@
   max-width: 100vw;
   height: 100vh;
   overflow-y: auto;
+  transition: all 1s ease-in;
 
   .error {
     font-size: var(--h3-size);
     line-height: 1.5rem;
     color: var(--red-900-text-error);
+    text-align: center;
+    transition: all 1s ease-in;
+  }
+  .success {
+    font-size: var(--h3-size);
+    line-height: 1.5rem;
+    color: var(--success-700);
+    text-align: center;
+    transition: all 1s ease-in;
   }
 
   .formSection {
@@ -235,7 +245,8 @@
       justify-content: flex-start;
       gap: var(--gap-11xs);
 
-      svg {
+      svg,
+      use {
         position: relative;
         width: 20px;
         height: 20px;
@@ -267,7 +278,8 @@
       align-items: flex-start;
       justify-content: flex-start;
 
-      svg {
+      svg,
+      use {
         position: relative;
         width: 140px;
         height: 33px;
@@ -299,7 +311,7 @@
       width: 35.9375rem;
       color: #2b3674;
 
-      font-family: DM Sans;
+      font-family: 'DM Sans';
       font-size: 2.25rem;
       font-style: normal;
       font-weight: 700;

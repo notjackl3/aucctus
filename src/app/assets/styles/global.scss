@@ -63,7 +63,8 @@ button.btn {
   box-shadow: var(--shadow-xs) !important;
 
   color: var(--type-tertiary);
-  svg {
+  svg,
+  use {
     stroke: var(--type-tertiary) !important;
   }
 
@@ -72,7 +73,8 @@ button.btn {
     background: var(--primary-600-primary, #4318ff) !important;
     white-space: nowrap;
     color: var(--base-white, #fff);
-    svg {
+    svg,
+    use {
       stroke: var(--base-white, #fff) !important;
     }
   }
@@ -82,7 +84,8 @@ button.btn {
     background: var(--base-white, #fff);
     &,
     &.disabled,
-    svg {
+    svg,
+    use {
       color: var(--type-tertiary) !important;
     }
   }
@@ -94,7 +97,8 @@ button.btn {
 
     &,
     &.disabled,
-    svg {
+    svg,
+    use {
       color: var(--primary-600-primary, #4318ff) !important;
     }
   }
@@ -105,7 +109,8 @@ button.btn {
     color: var(--primary-600-primary, #4318ff) !important;
     &,
     &.disabled,
-    svg {
+    svg,
+    use {
       path {
         stroke: var(--primary-600-primary, #4318ff) !important;
       }

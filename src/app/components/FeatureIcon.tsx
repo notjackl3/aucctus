@@ -1,7 +1,7 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useMemo } from 'react';
 
 import styles from '../assets/styles/components/feature-icon.module.scss';
-import Icon, { IconVariant } from './Icon';
+import Icon from './Icon/Icon';
 
 const defaultIconProps = {
   stroke: '#FFFFF',
@@ -9,14 +9,23 @@ const defaultIconProps = {
   height: 24,
 };
 
-export interface FeatureIconProps {
+export interface IFeatureIconProps {
   icon: IconVariant;
-  color: 'purple' | 'green';
+  color: 'purple' | 'green' | 'yellow';
 }
 
-const FeatureIcon: FunctionComponent<FeatureIconProps> = ({ icon, color }) => {
+const FeatureIcon: FunctionComponent<IFeatureIconProps> = ({ icon, color }) => {
+  const colorStyle = useMemo(() => {
+    const colorMap = {
+      purple: styles.purple,
+      green: styles.green,
+      yellow: styles.yellow,
+    };
+    return colorMap[color];
+  }, [color]);
+
   return (
-    <div className={`${styles.outerRing} ${color === 'purple' ? styles.purple : styles.green}`}>
+    <div className={`${styles.outerRing} ${colorStyle}`}>
       <Icon variant={icon} {...defaultIconProps} />
     </div>
   );

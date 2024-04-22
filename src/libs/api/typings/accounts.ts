@@ -65,15 +65,13 @@ export interface ISignUpRequest {
   confirmPassword: string;
 }
 
-export interface IAuthSuccessResponse {
-  user: IUser;
-  token: string;
+export interface ITokenResponse {
+  access: string;
   refresh: string;
 }
 
-export interface IRefreshTokenSuccessResponse {
-  access: string;
-  refresh: string;
+export interface IAuthSuccessResponse extends ITokenResponse {
+  user: IUser;
 }
 
 export interface IPasswordResetForm {

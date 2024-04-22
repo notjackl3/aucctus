@@ -4,7 +4,7 @@ import Logo from '../assets/Logo.png';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../routes/routes';
 import { logout } from '../../features/auth/auth.slice';
-import { useAppDispatch } from '../hooks';
+import { useAppDispatch } from '../store';
 
 const AuthHeader: FunctionComponent = () => {
   const dispatch = useAppDispatch();

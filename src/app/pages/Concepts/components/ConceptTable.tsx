@@ -17,7 +17,7 @@ import { rankItem } from '@tanstack/match-sorter-utils';
 import styles from '../styles/concepts.module.scss';
 import ConceptStatusBubble from '../../../components/ConceptStatusBubble';
 import ConceptMenu from '../../../components/ConceptMenu';
-import Icon from '../../../components/Icon';
+import Icon from '../../../components/Icon/Icon';
 import Loading from '../../../components/Loading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../../routes/routes';
@@ -159,7 +159,7 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
                 e.stopPropagation();
               }}
             >
-              <Icon variant="dotstVertical" {...defaultIconProps} />
+              <Icon variant="dots-vertical" {...defaultIconProps} />
             </button>
             {info?.getValue() === openPopupMenuId && (
               <span className={styles.popupMenu}>

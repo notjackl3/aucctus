@@ -60,7 +60,8 @@
         font-weight: 700;
         white-space: nowrap;
 
-        svg {
+        svg,
+        use {
           path {
             stroke: $white;
           }

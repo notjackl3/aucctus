@@ -2,7 +2,7 @@ import { ForwardRefRenderFunction, InputHTMLAttributes, useState } from 'react';
 
 import styles from '../assets/styles/components/input-field.module.scss';
 import React from 'react';
-import Icon from './Icon';
+import Icon from './Icon/Icon';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label: string;
@@ -68,7 +68,7 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
           onClick={togglePasswordVisibility}
           aria-label="Toggle password visibility"
         >
-          <Icon variant={isPasswordVisible ? 'eyeOff' : 'eye'} {...defaultIconProps} />
+          <Icon variant={isPasswordVisible ? 'eye-off' : 'eye'} {...defaultIconProps} />
         </button>
       )}
       {showHint ? <div className={styles.hintText}>{hintText}</div> : null}

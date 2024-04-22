@@ -1,48 +1,19 @@
 import { FunctionComponent, useMemo, useState } from 'react';
-import RowInfo from '../../../../components/RowInfo/RowInfo';
-import InputField from '../../../../components/InputField';
-import styles from './styles/aboutDetails.module.scss';
+import RowInfo from '../../../components/RowInfo/RowInfo';
+import InputField from '../../../components/InputField';
+import styles from '../styles/aboutDetails.module.scss';
 import Select, { StylesConfig } from 'react-select';
-import defaultAvatar from '../../../../assets/icons/avatar.svg';
-import Icon from '../../../../components/Icon';
+import defaultAvatar from '../../../assets/avatar.svg';
+import Icon from '../../../components/Icon/Icon';
 import { toast } from 'react-toastify';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
-import api from '../../../../../libs/api';
-import Loading from '../../../../components/Loading';
-import { IUser } from '../../../../../libs/api/typings';
-import { defaultToastConfig } from '../../../../../libs/toast';
-import { setUser } from '../../../../../features/auth/auth.slice';
-import { useAppDispatch } from '../../../../hooks';
+import Loading from '../../../components/Loading';
+import { IUser } from '../../../../libs/api/typings';
+import { useUpdateUser, useUserDetails } from '../../../hooks/query/account';
 
 const defaultIconProps = {
   width: 20,
   height: 20,
   stroke: '#FFFFFF',
-};
-
-const customSelectStyles: StylesConfig = {
-  container: (provided) => ({
-    ...provided,
-    position: 'relative',
-    display: 'flex',
-    flexGrow: 1,
-    border: 'none',
-    maxWidth: '25rem',
-    fontFamily: 'DM Sans',
-    fontSize: '1rem',
-    fontWeight: 500,
-  }),
-  singleValue: (styles) => ({ ...styles, color: 'black' }),
-  control: (provided) => ({
-    ...provided,
-    borderRadius: 8,
-    flexGrow: 1,
-    background: 'white',
-  }),
-  menu: (provided) => ({
-    ...provided,
-    position: 'absolute',
-  }),
 };
 
 //TODO - placeholder options
@@ -60,10 +31,9 @@ const TIME_ZONE_OPTIONS = [
 ];
 
 const AboutDetails: FunctionComponent = () => {
-  const dispatch = useAppDispatch();
-  const queryClient = useQueryClient();
   const [isFormDisabled, setIsFormDisabled] = useState(true);
-
+  const { mutate: updateUser, isLoading } = useUpdateUser();
+  const { data } = useUserDetails();
   const [aboutForm, setAboutForm] = useState<Partial<IUser>>({
     firstName: undefined,
     lastName: undefined,
@@ -73,31 +43,6 @@ const AboutDetails: FunctionComponent = () => {
   });
 
   const { firstName, lastName, email, jobTitle, role } = aboutForm;
-
-  const { data } = useQuery({
-    queryKey: ['user'],
-    retry: 1,
-    queryFn: async () => await api.account.getUser(),
-    staleTime: Infinity,
-  });
-
-  const updateUserMutation = useMutation({
-    mutationFn: async (userObj: Partial<IUser>) => {
-      return api.account.updateUser(userObj);
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['user'] });
-      dispatch(setUser(data));
-      setIsFormDisabled(true);
-    },
-    onError: () => {
-      toast.error('User could not be updated. Please try again later.', defaultToastConfig);
-    },
-  });
-
-  const updateUser = () => {
-    updateUserMutation.mutate(aboutForm);
-  };
 
   const resetFormState = () => {
     if (!data || !data.user) {
@@ -163,7 +108,14 @@ const AboutDetails: FunctionComponent = () => {
       className={styles.aboutDetails}
       onSubmit={(e) => {
         e.preventDefault();
-        updateUser();
+        updateUser(aboutForm, {
+          onSuccess: () => {
+            setIsFormDisabled(true);
+          },
+          onError: () => {
+            toast.error('User could not be updated. Please try again later.');
+          },
+        });
       }}
     >
       <div className={styles.headerSection}>
@@ -198,7 +150,7 @@ const AboutDetails: FunctionComponent = () => {
               Edit
             </button>
           ) : (
-            <button className={`btn btn-primary btn-bold`} type="submit" disabled={updateUserMutation.isLoading}>
+            <button className={`btn btn-primary btn-bold`} type="submit" disabled={isLoading}>
               <Icon variant="save" {...defaultIconProps} />
               Save
             </button>
@@ -281,6 +233,31 @@ const AboutDetails: FunctionComponent = () => {
   ) : (
     <Loading />
   );
+};
+
+const customSelectStyles: StylesConfig = {
+  container: (provided) => ({
+    ...provided,
+    position: 'relative',
+    display: 'flex',
+    flexGrow: 1,
+    border: 'none',
+    maxWidth: '25rem',
+    fontFamily: 'DM Sans',
+    fontSize: '1rem',
+    fontWeight: 500,
+  }),
+  singleValue: (styles) => ({ ...styles, color: 'black' }),
+  control: (provided) => ({
+    ...provided,
+    borderRadius: 8,
+    flexGrow: 1,
+    background: 'white',
+  }),
+  menu: (provided) => ({
+    ...provided,
+    position: 'absolute',
+  }),
 };
 
 export default AboutDetails;

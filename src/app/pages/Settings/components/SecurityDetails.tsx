@@ -1,14 +1,14 @@
 import { FunctionComponent, useMemo, useState } from 'react';
-import RowInfo from '../../../../components/RowInfo/RowInfo';
-import InputField from '../../../../components/InputField';
-import styles from './styles/securityDetails.module.scss';
-import Icon from '../../../../components/Icon';
+import RowInfo from '../../../components/RowInfo/RowInfo';
+import InputField from '../../../components/InputField';
+import styles from '../styles/securityDetails.module.scss';
 import { toast } from 'react-toastify';
 import { useMutation } from 'react-query';
-import api from '../../../../../libs/api';
-import { defaultToastConfig } from '../../../../../libs/toast';
-import { IUserPassword } from '../../../../../libs/api/typings';
-import { parseFormError } from '../../../../../libs/utils';
+import api from '../../../../libs/api';
+import { defaultToastConfig } from '../../../../libs/toast';
+import { IUserPassword } from '../../../../libs/api/typings';
+import { parseFormError } from '../../../../libs/utils';
+import Icon from '../../../components/Icon/Icon';
 
 const defaultIconProps = {
   width: 20,

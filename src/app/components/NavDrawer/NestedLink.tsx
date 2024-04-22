@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { Link, useMatch, To } from 'react-router-dom';
 import styles from '../../assets/styles/components/nested-link.module.scss';
-import Icon from '../Icon';
+import Icon from '../Icon/Icon';
 
 const defaultIconProps = {
   stroke: '#7586A9',

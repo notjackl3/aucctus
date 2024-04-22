@@ -42,7 +42,8 @@
         font-weight: 500;
         margin: 0;
 
-        svg {
+        svg,
+        use {
           path {
             stroke: $blue-900;
           }

@@ -1,7 +1,7 @@
 import { FunctionComponent, ReactNode } from 'react';
 
 import styles from './styles/conceptDetailCard.module.scss';
-import Icon, { IconVariant } from '../Icon';
+import Icon from '../Icon/Icon';
 
 interface ConceptDetailCardProps {
   title: string;

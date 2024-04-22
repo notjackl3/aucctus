@@ -1,4 +1,3 @@
-import { IconVariant } from '../app/components/Icon';
 import {
   ActiveConceptStatus,
   ArchivedConceptStatus,
@@ -91,9 +90,9 @@ export function getAssumptionHexColor(assumption: AssumptionType): AssumptionBac
 export function getDashboardConceptStatusIcon(status: ActiveConceptStatus) {
   const conceptStatusIconObj: Record<ActiveConceptStatus, IconVariant> = {
     prototyping: 'lightbulb',
-    proofOfConcept: 'paperAirPlane',
+    proofOfConcept: 'paper-airplane',
     minimumViableProduct: 'rocket',
-    commercialized: 'shieldDollar',
+    commercialized: 'shield-dollar',
   };
 
   return conceptStatusIconObj[status];

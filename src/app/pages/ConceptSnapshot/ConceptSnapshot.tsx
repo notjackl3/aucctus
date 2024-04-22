@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/conceptSnapshot.module.scss';
-import igniteIcon from '../../assets/icons/ignite.svg';
-import Icon from '../../components/Icon';
+import igniteIcon from '../../assets/ignite.svg';
+import Icon from '../../components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 
@@ -23,7 +23,7 @@ const ConceptSnapshot: FunctionComponent = () => {
           </div>
         </div>
         <button className={`btn btn-bold btn-no-border`} onClick={() => navigate(AppPath.Concept)}>
-          <Icon variant="chevronLeft" {...defaultIconProps} />
+          <Icon variant="chevronleft" {...defaultIconProps} />
           <span>Back to Concepts</span>
         </button>
       </div>

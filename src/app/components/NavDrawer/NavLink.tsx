@@ -4,7 +4,7 @@ import { AppPath } from '../../../routes/routes';
 import { Link, useLocation } from 'react-router-dom';
 import Collapsible from '../Collapsible';
 import NestedLink, { NestedLinkProps } from './NestedLink';
-import Icon, { IconVariant } from '../Icon';
+import Icon from '../Icon/Icon';
 
 const defaultIconProps = {
   stroke: '#7586A9',
@@ -38,7 +38,7 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
         </div>
 
         {locked ? <Icon variant="lock" {...defaultIconProps} /> : null}
-        {isOpen ? <Icon variant="chevronUp" {...defaultIconProps} /> : null}
+        {isOpen ? <Icon variant="chevronup" {...defaultIconProps} /> : null}
       </Link>
 
       {nestedRoutes ? (

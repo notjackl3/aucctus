@@ -14,7 +14,7 @@ import {
 import useGeneratedConcepts from './hooks/useGeneratedConcepts';
 import { IConcept } from '../../../libs/api/typings';
 import TableCheckBox from '../../components/TableCheckBox';
-import Icon from '../../components/Icon';
+import Icon from '../../components/Icon/Icon';
 import IgniteLoading from '../../components/IgniteLoading';
 
 const columnHelper = createColumnHelper<IConcept>();

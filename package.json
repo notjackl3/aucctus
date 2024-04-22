@@ -5,9 +5,8 @@
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
-    "start": "vite",
     "start:dev": "npm run dev",
-    "build": "tsc && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "format": "prettier --write .",
     "lint": "eslint .",
@@ -16,7 +15,10 @@
     "type-check": "tsc",
     "lint-staged": "lint-staged --config lint-staged.js",
     "test": "vitest --run",
-    "prepare": "husky"
+    "prepare": "husky",
+    "generate-sprite-svg": "svg-sprite --config=svg-sprite.config.json icons/*.svg",
+    "generate-icon-types": "node scripts/generate-icon-types.js",
+    "generate-sprite": "npm run generate-sprite-svg && npm run generate-icon-types"
   },
   "dependencies": {
     "@popperjs/core": "^2.11.8",
@@ -44,6 +46,7 @@
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^4.0.0",
     "autoprefixer": "^10.4.19",
+    "cheerio": "^1.0.0-rc.12",
     "cssnano": "^6.1.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -57,11 +60,12 @@
     "prettier": "^2.8.8",
     "prettier-config-nick": "^1.0.2",
     "sass": "^1.72.0",
+    "svg-sprite": "^2.0.4",
+    "terser": "^5.30.3",
     "tsc-files": "^1.1.4",
     "typescript": "5.1",
-    "terser": "^5.30.3",
-    "vite-plugin-compression": "^0.5.1",
     "vite": "^4.0.0",
+    "vite-plugin-compression": "^0.5.1",
     "vite-plugin-eslint": "^1.8.1",
     "vitest": "^0.30.1"
   },

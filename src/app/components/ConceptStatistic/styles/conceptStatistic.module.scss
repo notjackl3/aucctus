@@ -30,7 +30,8 @@
 
     &.lightblueIcon {
       background: #e0f2fe;
-      svg {
+      svg,
+      use {
         path {
           stroke: #155eef;
         }
@@ -38,7 +39,8 @@
     }
     &.blueIcon {
       background: #d1e0ff;
-      svg {
+      svg,
+      use {
         path {
           stroke: #155eef;
         }
@@ -46,7 +48,8 @@
     }
     &.purpleIcon {
       background: #ece9fe;
-      svg {
+      svg,
+      use {
         path {
           stroke: $purple-600;
         }
