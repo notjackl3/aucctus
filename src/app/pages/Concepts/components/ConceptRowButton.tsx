@@ -35,7 +35,7 @@ const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, o
         style: ` btn btn-light btn-bold`,
         label: (
           <span>
-            <Icon variant="refresh" /> Retry
+            <Icon variant="refresh" height={20} width={20} /> Retry
           </span>
         ),
       },
