@@ -3,7 +3,7 @@ const cheerio = require('cheerio');
 const path = require('path');
 
 // Specify the path to your SVG sprite file
-const spritePath = path.resolve(__dirname, '../src/app/assets/icon-sprite.svg');
+const spritePath = path.resolve(__dirname, '../public/assets/icon-sprite.svg');
 const outputPath = path.resolve(__dirname, '../src/app/components/Icon/icons.d.ts');
 
 // Read the SVG file

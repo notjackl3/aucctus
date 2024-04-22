@@ -9,6 +9,7 @@ import { watchIcons } from './vite/plugins.js';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  publicDir: 'public',
   plugins: [
     watchIcons(),
     splitVendorChunkPlugin(),
@@ -36,7 +37,7 @@ export default defineConfig({
     sourcemap: false, // Consider disabling in production
     minify: 'terser',
     rollupOptions: {
-      external: ['icons/*', 'vite'],
+      external: ['icons/*', 'vite', 'scripts'],
     },
     terserOptions: {
       compress: {

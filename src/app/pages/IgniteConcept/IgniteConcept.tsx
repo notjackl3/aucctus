@@ -28,7 +28,7 @@ const IgniteConcept: FunctionComponent = () => {
             label="Describe your idea in one sentence"
             placeholder="I want to increase revenue from our high value customers"
             value={goalString}
-            maxLength={200}
+            maxLength={2000}
             isDisableResize
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setGoalString(e.target.value)}
           />

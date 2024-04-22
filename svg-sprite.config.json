@@ -7,11 +7,37 @@
     "spacing": {
       "padding": 0
     },
-    "transform": ["svgo"]
+    "transform": [
+      {
+        "svgo": {
+          "plugins": [
+            {
+              "name": "removeAttrs",
+              "params": {
+                "attrs": "(stroke|stroke.*)"
+              }
+            },
+            {
+              "name": "addAttributesToSVGElement",
+              "params": {
+                "attributes": [
+                  {
+                    "stroke": "stroke",
+                    "stroke-width": "1.66667",
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
   },
   "mode": {
     "symbol": {
-      "dest": "src/app/assets",
+      "dest": "public/assets",
       "sprite": "icon-sprite.svg",
       "example": false
     }
