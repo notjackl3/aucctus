@@ -1,38 +1,17 @@
 import { FunctionComponent, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
-import { setAuthenticated } from '../../../features/auth/auth.slice';
-import { useAppDispatch } from '../../hooks';
 import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import { useQuery } from 'react-query';
-import api from '../../../libs/api';
-import { IAuthSuccessResponse, ISignInRequest } from '../../../libs/api/typings';
-import analytics from '../../../libs/analytics';
 import { Link } from 'react-router-dom';
+import { useLogin } from '../../hooks/query/auth';
 
 const Login: FunctionComponent = () => {
-  const dispatch = useAppDispatch();
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
-  const [error, setError] = useState<string | undefined>();
 
-  const query = useQuery<IAuthSuccessResponse, string>({
-    queryKey: 'login',
-    enabled: false, // Prevent from automatically running
-    refetchOnWindowFocus: false,
-    retry: 0,
-    queryFn: async () => await api.auth.login(email, password),
-    onSuccess: (response: IAuthSuccessResponse) => {
-      analytics.debug(JSON.stringify(response));
-      dispatch(setAuthenticated(response));
-    },
-    onError: (error) => {
-      let message = parseFormError<ISignInRequest>(error);
-      setError(message);
-    },
-  });
+  const { mutate: login, isLoading, error } = useLogin();
 
   const _handleEmailValidation = (e: React.FocusEvent) => {
     if (email && !validEmail(email)) {
@@ -48,9 +27,10 @@ const Login: FunctionComponent = () => {
       <div className={styles.header}>
         <span className={styles.title}>Login</span>
         <span className={styles.supportingText}>Welcome back! Please enter your details.</span>
+        {error && <div className={styles.error}>{parseFormError(error)}</div>}
       </div>
       {/* TODO: Style this */}
-      {error && <div className={styles.error}>{error}</div>}
+
       <form className={styles.basicForm}>
         <InputField
           label="Email"
@@ -90,11 +70,10 @@ const Login: FunctionComponent = () => {
           type="button"
           className="btn btn-primary"
           onClick={async (e) => {
-            setError(undefined);
-            await query.refetch();
+            login({ email, password });
             e.preventDefault();
           }}
-          disabled={!email || !password || !!emailInputError || query.isFetching || query.isLoading}
+          disabled={!email || !password || !!emailInputError || isLoading}
         >
           Login
         </button>

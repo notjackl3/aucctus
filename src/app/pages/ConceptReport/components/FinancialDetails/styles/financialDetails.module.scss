@@ -60,7 +60,8 @@
       gap: 1rem;
       align-self: stretch;
       .list {
-        svg {
+        svg,
+        use {
           margin-right: 1rem;
           path {
             stroke: $blue-900;

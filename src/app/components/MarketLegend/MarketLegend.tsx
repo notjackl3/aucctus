@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/marketLegend.module.scss';
-import Icon from '../Icon';
+import Icon from '../Icon/Icon';
 import { MarketMetricColorType } from '../../../libs/concepts';
 
 const defaultIconProps = {

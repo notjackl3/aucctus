@@ -3,7 +3,7 @@ import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import FeatureIcon from '../../components/FeatureIcon';
 import { AppPath } from '../../../routes/routes';
 import { Link, useNavigate } from 'react-router-dom';
-import Icon from '../../components/Icon';
+import Icon from '../../components/Icon/Icon';
 
 const ResetPasswordSuccess: FunctionComponent = () => {
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ const ResetPasswordSuccess: FunctionComponent = () => {
         </button>
         <div className={styles.signUp}>
           <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant="arrowLeft" /> Back to log in
+            <Icon variant="arrowleft" /> Back to log in
           </Link>
         </div>
       </div>

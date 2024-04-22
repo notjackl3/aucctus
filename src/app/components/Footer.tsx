@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import styles from '../assets/styles/components/footer.module.scss';
 import { HELP_EMAIL } from '../../libs/constants';
-import Icon from './Icon';
+import Icon from './Icon/Icon';
 
 const year = new Date().getFullYear();
 

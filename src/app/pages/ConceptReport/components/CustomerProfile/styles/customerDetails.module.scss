@@ -98,7 +98,8 @@
       gap: 1rem;
       align-self: stretch;
       .list {
-        svg {
+        svg,
+        use {
           min-width: 1.5rem;
           margin-top: 0.25rem;
           align-self: flex-start;

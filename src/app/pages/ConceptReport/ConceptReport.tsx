@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import styles from './styles/conceptOverview.module.scss';
-import Icon from '../../components/Icon';
+import Icon from '../../components/Icon/Icon';
 import TabView from '../../components/TabView';
 import Dropdown from '../../components/Dropdown/Dropdown';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
@@ -25,6 +25,12 @@ export const CONCEPT_TABS = [
   { label: 'Customer Profile', value: AppPath.ConceptCustomerPersona },
   { label: 'Key Assumptions', value: AppPath.ConceptKeyAssumptions },
 ];
+
+const defaultIconProps = {
+  width: 20,
+  height: 20,
+  stroke: 'white',
+};
 
 const ConceptReport: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
@@ -74,11 +80,19 @@ const ConceptReport: FunctionComponent = () => {
         </div>
         <div className={styles.actions}>
           <button
+            aria-label="Download Opportunity Snapshot"
+            className={`btn btn-primary btn-bold`}
+            onClick={() => navigate(AppPath.ConceptSnapshot)}
+          >
+            <Icon variant="download-cloud" {...defaultIconProps} />
+            Opportunity Snapshot
+          </button>
+          <button
             aria-label="Close Detail Page"
             className={`${styles.closeButton}`}
             onClick={() => navigate(AppPath.ConceptCategory)}
           >
-            <Icon variant="closeX" height={20} width={20} stroke="#fff" />
+            <Icon variant="closeX" {...defaultIconProps} />
           </button>
         </div>
       </div>

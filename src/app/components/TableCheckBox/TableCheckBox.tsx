@@ -6,16 +6,16 @@ export interface TableCheckBoxProps extends InputHTMLAttributes<HTMLInputElement
   indeterminate?: boolean;
 }
 
-const TableCheckBox: FunctionComponent<TableCheckBoxProps> = ({ indeterminate, ...rest }) => {
+const TableCheckBox: FunctionComponent<TableCheckBoxProps> = ({ indeterminate, checked, ...rest }) => {
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (typeof indeterminate === 'boolean') {
       if (ref.current) {
-        ref.current.indeterminate = !rest.checked && indeterminate;
+        ref.current.indeterminate = !checked && indeterminate;
       }
     }
-  }, [ref, indeterminate]);
+  }, [ref, indeterminate, checked]);
 
   return (
     <div className={styles.tableCheckBox}>

@@ -3,13 +3,10 @@ import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
 import FeatureIcon from '../../components/FeatureIcon';
 import { AppPath } from '../../../routes/routes';
-import { Link, useNavigate } from 'react-router-dom';
-import Icon, { IconVariant } from '../../components/Icon';
-import { useQuery } from 'react-query';
-import api from '../../../libs/api';
-import { useQueryParams } from '../../hooks';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import Icon from '../../components/Icon/Icon';
 import { parseFormError } from '../../../libs/utils';
-import { IPasswordResetForm } from '../../../libs/api/typings';
+import { usePasswordReset } from '../../hooks/query/auth';
 
 const HEADER_TEXT = 'Reset Password';
 const SUPPORTING_TEXT = 'Your new password must be different to previously used passwords.';
@@ -20,26 +17,12 @@ const ResetPassword: FunctionComponent = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  // TODO: Display Error message
-  const [error, setError] = useState<string | undefined>();
   const [confirmPassInputError, setConfirmPassInputError] = useState<string | undefined>();
-  const queryParams = useQueryParams();
+  const [searchParams] = useSearchParams();
 
-  const token = queryParams.get('token');
+  const token = searchParams.get('token');
 
-  const query = useQuery({
-    queryKey: 'forgot-password',
-    retry: 0,
-    enabled: false, // Prevent from automatically running
-    queryFn: async () => (token ? await api.auth.resetPassword(password, confirmPassword, token) : void 0),
-    onSuccess: () => {
-      navigate(`${AppPath.ResetPasswordSuccess}`);
-    },
-    onError: (error) => {
-      const message = parseFormError<IPasswordResetForm>(error);
-      setError(message);
-    },
-  });
+  const { mutate, error } = usePasswordReset();
 
   const _handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pass = e.target.value;
@@ -69,8 +52,8 @@ const ResetPassword: FunctionComponent = () => {
         <FeatureIcon icon={ICON_VARIANT} color={ICON_COLOR} />
         <span className={styles.title}>{HEADER_TEXT}</span>
         <span className={styles.supportingText}>{SUPPORTING_TEXT}</span>
+        {error && <div className={styles.error}>{parseFormError(error)}</div>}
       </div>
-      {error && <div className={styles.error}>{error}</div>}
       <form className={styles.basicForm}>
         <InputField
           name={'password'}
@@ -92,12 +75,29 @@ const ResetPassword: FunctionComponent = () => {
           onChange={_handleConfirmPasswordChange}
         />
 
-        <button type="submit" className="btn btn-primary" onClick={() => query.refetch()}>
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={!password || !confirmPassword || !!confirmPassInputError || !token}
+          onClick={(e) => {
+            if (token) {
+              mutate(
+                { password, confirmPassword, token },
+                {
+                  onSuccess: () => {
+                    navigate(AppPath.ResetPasswordSuccess);
+                  },
+                }
+              );
+            }
+            e.preventDefault();
+          }}
+        >
           Reset Password
         </button>
         <div className={styles.signUp}>
           <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant="arrowLeft" /> Back to log in
+            <Icon variant="arrowleft" /> Back to log in
           </Link>
         </div>
       </form>

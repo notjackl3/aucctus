@@ -1,18 +1,13 @@
 import { FunctionComponent } from 'react';
-import { useSelector } from 'react-redux';
-import { selectAccount } from '../../../features/auth/auth.slice';
-
 import styles from './styles/dashboard.module.scss';
-import Icon from '../../components/Icon';
+import Icon from '../../components/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import ConceptDetailCard from '../../components/ConceptDetailCard/ConceptDetailCard';
 import ConceptBarChart from '../../components/ConceptBarChart';
-import { useQuery } from 'react-query';
-import api from '../../../libs/api';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import DashboardInnovationCard from './components/DashboardInnovationCard';
-// import MarketActivityCard from './components/MarketActivityCard';
+import { useDashboard, useUserDetails } from '../../hooks/query/account';
 
 const defaultIconProps = {
   stroke: '#2B3674',
@@ -22,22 +17,14 @@ const defaultIconProps = {
 
 const Dashboard: FunctionComponent = () => {
   const navigate = useNavigate();
-  const { name: accountName } = useSelector(selectAccount) || { name: '' };
-
-  const { data } = useQuery({
-    queryKey: ['dahsboard'],
-    refetchOnWindowFocus: false,
-    retry: 0,
-    queryFn: async () => {
-      return api.account.getDashboard();
-    },
-  });
+  const { account } = useUserDetails();
+  const { data } = useDashboard();
 
   return (
     <div className={`${styles.dashboard}`}>
       <div className={styles.headerSection}>
         <div className={styles.header}>
-          <h1>{accountName}</h1>
+          <h1>{account?.name || ''}</h1>
         </div>
         <div className={styles.actions}>
           <button
@@ -69,7 +56,7 @@ const Dashboard: FunctionComponent = () => {
                 }}
                 aria-label="View Concept Bank"
               >
-                <span>Go to Concept Bank {<Icon variant="arrowRight" {...defaultIconProps} />}</span>
+                <span>Go to Concept Bank {<Icon variant="arrowright" {...defaultIconProps} />}</span>
               </button>
             }
           >

@@ -3,8 +3,8 @@ import styles from './styles/overviewDetails.module.scss';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import MarketChart from '../../../../components/MarketChart';
 import MarketLegend from '../../../../components/MarketLegend';
-import defaultAvatar from '../../../../assets/icons/avatar.svg';
-import Icon from '../../../../components/Icon';
+import defaultAvatar from '../../../../assets/avatar.svg';
+import Icon from '../../../../components/Icon/Icon';
 // import NewsArticle from '../../../../components/NewsArticle';
 import Loading from '../../../../components/Loading';
 import { useQuery } from 'react-query';
@@ -133,7 +133,7 @@ const OverviewDetails: FunctionComponent = () => {
               }}
               aria-label="View Customer Profiles"
             >
-              <span>{<Icon variant="userGroup" width={16} height={16} stroke="#626BA3" />}</span>
+              <span>{<Icon variant="user-group" width={16} height={16} stroke="#626BA3" />}</span>
               View Profile
             </button>
           }
@@ -160,11 +160,11 @@ const OverviewDetails: FunctionComponent = () => {
                       {`Age Range: ${firstCustomerPersona?.ageRange || ''}`}
                     </p>
                     <p>
-                      <Icon variant="userGroup" {...iconDefaultProps} />
+                      <Icon variant="user-group" {...iconDefaultProps} />
                       {`Family Size: ${firstCustomerPersona?.familySize || ''}`}
                     </p>
                     <p>
-                      <Icon variant="piggyBank" {...iconDefaultProps} />
+                      <Icon variant="piggy-bank" {...iconDefaultProps} />
                       {`Average Income: ${firstCustomerPersona?.incomeRange || ''}`}
                     </p>
                   </div>
@@ -185,7 +185,7 @@ const OverviewDetails: FunctionComponent = () => {
               }}
               aria-label="View Financial Projection"
             >
-              <span>{<Icon variant="lineChartUp" width={16} height={16} stroke="#626BA3" />}</span>
+              <span>{<Icon variant="line-chart-up" width={16} height={16} stroke="#626BA3" />}</span>
               View Projections
             </button>
           }

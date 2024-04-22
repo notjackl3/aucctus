@@ -12,6 +12,7 @@ export enum AppPath {
   ConceptFinancialProjection = '/concept/:id/financial-projection',
   ConceptKeyAssumptions = '/concept/:id/key-assumptions',
   ConceptMarketScan = '/concept/:id/market-scan',
+  ConceptSnapshot = '/concept/snapshot',
 
   /* Domain */
   IgniteDomain = '/domain/ignite',
@@ -23,10 +24,16 @@ export enum AppPath {
   ChallengeWizard = '/challenge/wizards',
   ChallengeDetails = '/challenge/:id',
 
+  /* Settings */
+  Settings = '/settings',
+  SettingsAbout = '/settings/about',
+  SettingsSecurity = '/settings/security',
+
   /* Auth */
   Login = '/login',
   SignUp = '/sign-up',
   ConfirmEmail = '/confirm-email',
+  EmailConfirmation = '/email-confirmation',
   ForgotPassword = '/forgot-password',
   ResetPassword = '/reset-password',
   ResetPasswordSuccess = '/reset-password/success',

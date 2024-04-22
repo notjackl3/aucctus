@@ -5,7 +5,8 @@ import { AccountApi } from './account';
 import analytics from '../analytics';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
-import { IRefreshTokenSuccessResponse } from './typings';
+import { ITokenResponse } from './typings';
+import { toast } from 'react-toastify';
 
 export interface IApiConfig {
   /* End Points */
@@ -21,9 +22,11 @@ export interface IApiConfig {
 export class Api {
   private _config: IApiConfig;
 
-  _accessToken?: string;
-  private _refreshTokenAction?: () => Promise<IRefreshTokenSuccessResponse>;
+  private _accessToken?: string;
+  private _refreshTokenAction?: () => Promise<ITokenResponse | undefined>;
   private _logoutAction?: () => void;
+
+  pendingRefresh?: Promise<ITokenResponse | undefined> = void 0;
 
   auth: AuthApi;
   account: AccountApi;
@@ -78,7 +81,7 @@ export class Api {
   }
 
   // Method to update the refresh token action dynamically
-  setRefreshTokenAction(action: () => Promise<IRefreshTokenSuccessResponse>) {
+  setRefreshTokenAction(action: () => Promise<ITokenResponse | undefined>) {
     this._refreshTokenAction = action;
   }
 
@@ -89,15 +92,22 @@ export class Api {
 
   // Expose these actions through methods to be used in ApiService
   async refreshToken() {
+    console.log('## refreshing token');
     if (this._refreshTokenAction) {
-      return await this._refreshTokenAction();
+      this.pendingRefresh = this._refreshTokenAction();
+      console.log('## refreshing token');
+      return await this.pendingRefresh.finally(() => {
+        console.log('## refreshing token');
+        this.pendingRefresh = void 0;
+      });
     } else {
       throw new Error('Refresh token action has not been set.');
     }
   }
 
-  async logout() {
+  logout() {
     if (this._logoutAction) {
+      toast.warning('You have been logged out. Please login again.');
       return this._logoutAction();
     } else {
       console.warn('Logout action has not been set.');

@@ -48,7 +48,8 @@
         font-weight: 700;
         white-space: nowrap;
 
-        svg {
+        svg,
+        use {
           path {
             stroke: $white;
           }
@@ -94,7 +95,8 @@
           padding: 0.5rem 1rem;
           border-radius: 0.5rem;
 
-          svg {
+          svg,
+          use {
             path {
               stroke: $blue-600;
             }

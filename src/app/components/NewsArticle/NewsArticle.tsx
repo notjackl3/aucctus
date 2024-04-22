@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/newsArticle.module.scss';
-import Icon from '../Icon';
+import Icon from '../Icon/Icon';
 import images from '../../assets/img';
 
 const defaultIconProps = {
@@ -31,7 +31,7 @@ const NewsArticle: FunctionComponent<NewsArticleProps> = ({
           <div className={styles.title}>{newsTitle}</div>
           {!!newsLink && (
             <a className={styles.link} target="_blank" rel="noopener noreferrer" href={newsLink}>
-              <Icon variant="linkExternal" {...defaultIconProps} />
+              <Icon variant="link-external" {...defaultIconProps} />
             </a>
           )}
         </div>

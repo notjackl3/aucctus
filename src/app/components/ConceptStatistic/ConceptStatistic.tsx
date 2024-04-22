@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/conceptStatistic.module.scss';
-import Icon, { IconVariant } from '../Icon';
+import Icon from '../Icon/Icon';
 import { ConceptStatusIconColor } from '../../../libs/concepts';
 
 export interface IConceptStatisticProps {

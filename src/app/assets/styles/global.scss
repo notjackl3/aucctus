@@ -63,16 +63,18 @@ button.btn {
   box-shadow: var(--shadow-xs) !important;
 
   color: var(--type-tertiary);
-  svg {
+  svg,
+  use {
     stroke: var(--type-tertiary) !important;
   }
 
   &.btn-primary {
     border: 1px solid var(--primary-600-primary, #4318ff) !important;
     background: var(--primary-600-primary, #4318ff) !important;
-
+    white-space: nowrap;
     color: var(--base-white, #fff);
-    svg {
+    svg,
+    use {
       stroke: var(--base-white, #fff) !important;
     }
   }
@@ -82,7 +84,8 @@ button.btn {
     background: var(--base-white, #fff);
     &,
     &.disabled,
-    svg {
+    svg,
+    use {
       color: var(--type-tertiary) !important;
     }
   }
@@ -94,8 +97,23 @@ button.btn {
 
     &,
     &.disabled,
-    svg {
+    svg,
+    use {
       color: var(--primary-600-primary, #4318ff) !important;
+    }
+  }
+
+  &.btn-no-border {
+    box-shadow: none !important;
+    border: none !important;
+    color: var(--primary-600-primary, #4318ff) !important;
+    &,
+    &.disabled,
+    svg,
+    use {
+      path {
+        stroke: var(--primary-600-primary, #4318ff) !important;
+      }
     }
   }
 
@@ -219,6 +237,7 @@ input {
   --gray-300-outline: #e0e5f2;
   --secondary: #f4f7fe;
   --gray-600-text-secondary: #667085;
+  --gray-600-text-tertiary: #475467;
   --gray-200-row-header: #f9fafb;
   --gray-100: #f2f4f7;
   --gray-700: #344054;

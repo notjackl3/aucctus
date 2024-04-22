@@ -30,7 +30,14 @@ export interface IUser {
   lastName: string;
   email: string;
   account?: string;
+  jobTitle?: string;
   role: 'Admin' | 'Employee';
+}
+
+export interface IUserPassword {
+  current_password: string;
+  password: string;
+  confirm_password: string;
 }
 
 export interface IUserDetailsResponse {
@@ -58,15 +65,13 @@ export interface ISignUpRequest {
   confirmPassword: string;
 }
 
-export interface IAuthSuccessResponse {
-  user: IUser;
-  token: string;
+export interface ITokenResponse {
+  access: string;
   refresh: string;
 }
 
-export interface IRefreshTokenSuccessResponse {
-  access: string;
-  refresh: string;
+export interface IAuthSuccessResponse extends ITokenResponse {
+  user: IUser;
 }
 
 export interface IPasswordResetForm {

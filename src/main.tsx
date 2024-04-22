@@ -8,6 +8,7 @@ import { HashRouter } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 // Used to Circular Progress Bar on Concept Overview page
 import 'react-circular-progressbar/dist/styles.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

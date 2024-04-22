@@ -5,10 +5,13 @@ import svgr from 'vite-plugin-svgr';
 import eslint from 'vite-plugin-eslint';
 import compression from 'vite-plugin-compression';
 import path from 'path';
+import { watchIcons } from './vite/plugins.js';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  publicDir: 'public',
   plugins: [
+    watchIcons(),
     splitVendorChunkPlugin(),
     require('cssnano')({
       preset: 'default',
@@ -33,6 +36,9 @@ export default defineConfig({
     outDir: 'build',
     sourcemap: false, // Consider disabling in production
     minify: 'terser',
+    rollupOptions: {
+      external: ['icons/*', 'vite', 'scripts'],
+    },
     terserOptions: {
       compress: {
         drop_console: true, // Remove console logs in production

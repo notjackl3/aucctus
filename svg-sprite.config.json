@@ -1,0 +1,45 @@
+{
+  "shape": {
+    "dimension": {
+      "maxWidth": 24,
+      "maxHeight": 24
+    },
+    "spacing": {
+      "padding": 0
+    },
+    "transform": [
+      {
+        "svgo": {
+          "plugins": [
+            {
+              "name": "removeAttrs",
+              "params": {
+                "attrs": "(stroke|stroke.*)"
+              }
+            },
+            {
+              "name": "addAttributesToSVGElement",
+              "params": {
+                "attributes": [
+                  {
+                    "stroke": "stroke",
+                    "stroke-width": "1.66667",
+                    "stroke-linecap": "round",
+                    "stroke-linejoin": "round"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "mode": {
+    "symbol": {
+      "dest": "public/assets",
+      "sprite": "icon-sprite.svg",
+      "example": false
+    }
+  }
+}

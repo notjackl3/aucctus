@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import styles from '../assets/styles/pages/auth-screens.module.scss';
 import images from '../assets/img';
-import Icon from './Icon';
+import Icon from './Icon/Icon';
 
 const NUMBER_OF_STARS = 5;
 

@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import defaultAvatar from '../assets/icons/company-avatar.svg';
+import defaultAvatar from '../assets/company-avatar.svg';
 import styles from '../assets/styles/pages/dashboard.module.scss';
 
 interface DashboardHeaderProps {

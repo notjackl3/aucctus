@@ -4,7 +4,6 @@ import styles from '../styles/dashboard.module.scss';
 import ConceptDetailCard from '../../../components/ConceptDetailCard/ConceptDetailCard';
 import ConceptStatistic from '../../../components/ConceptStatistic';
 import { camelCaseToTitleCase, formatLargeNumber } from '../../../../libs/utils';
-import { IconVariant } from '../../../components/Icon';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
   ConceptStatusIconColor,
@@ -119,7 +118,7 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
             infoTitle="Total Potential Opportunity"
             infoValue={formatLargeNumber(summationObj.totalSomValue)}
             infoSubValue={`${summationObj.totalConceptCount} concepts`}
-            icon="shieldDollar"
+            icon="shield-dollar"
             iconColor="purple"
           />
         </div>

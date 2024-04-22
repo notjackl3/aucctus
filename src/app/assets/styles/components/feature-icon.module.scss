@@ -30,7 +30,19 @@
       stroke: #039855 !important;
     }
   }
-  svg {
+
+  &.yellow {
+    border: 10px solid #fdf7ec;
+    background: #ffe8ac;
+
+    svg,
+    path,
+    circle {
+      stroke: #edb845 !important;
+    }
+  }
+  svg,
+  use {
     flex-shrink: 0;
   }
 }

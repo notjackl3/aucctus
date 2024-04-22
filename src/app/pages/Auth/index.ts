@@ -1,9 +1,12 @@
-import ConfirmEmail from './ConfirmEmail';
-import ForgotPassword from './ForgotPassword';
-import ResetPassword from './ResetPassword';
-import ResetPasswordSuccess from './ResetPasswordSuccess';
-import Login from './Login';
-import SignUp from './SignUp';
+import React from 'react';
+
+const ConfirmEmail = React.lazy(() => import('./ConfirmEmail'));
+const ForgotPassword = React.lazy(() => import('./ForgotPassword'));
+const ResetPassword = React.lazy(() => import('./ResetPassword'));
+const ResetPasswordSuccess = React.lazy(() => import('./ResetPasswordSuccess'));
+const Login = React.lazy(() => import('./Login'));
+const SignUp = React.lazy(() => import('./SignUp'));
+const EmailConfirmation = React.lazy(() => import('./EmailConfirmation'));
 
 const Auth = {
   Login,
@@ -12,5 +15,7 @@ const Auth = {
   ResetPassword,
   ResetPasswordSuccess,
   ConfirmEmail,
+  EmailConfirmation,
 };
+
 export default Auth;

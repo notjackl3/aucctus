@@ -2,19 +2,18 @@ import { FunctionComponent, useCallback, useState } from 'react';
 import Footer from '../components/Footer';
 import AuthHeader from '../components/AuthHeader';
 import OnboardingIntoSection from '../components/OnboardingIntroSection';
-
 import styles from '../assets/styles/pages/auth-screens.module.scss';
-import { useAppDispatch } from '../hooks';
 import InputField from '../components/InputField';
 import { validDomain } from '../../libs/utils';
-import { registerAccount, selectAuthStatus, selectUser } from '../../features/auth/auth.slice';
+import { selectAuthStatus } from '../../features/auth/auth.slice';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { AppPath } from '../../routes/routes';
+import { useRegisterAccount, useUserDetails } from '../hooks/query/account';
 
 const OnBoarding: FunctionComponent = () => {
-  const user = useSelector(selectUser)!;
-  const dispatch = useAppDispatch();
+  const { user } = useUserDetails();
+  const { mutate: registerAccount } = useRegisterAccount();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');
   const [innovationGoal, setGoal] = useState<string>('');
@@ -46,11 +45,7 @@ const OnBoarding: FunctionComponent = () => {
     [domain]
   );
 
-  const _handleRegistration = () => {
-    dispatch(registerAccount({ name, domain, innovationGoal }));
-  };
-
-  if (user.account) {
+  if (user && user.account) {
     return <Navigate to={AppPath.Home} />;
   }
 
@@ -103,7 +98,10 @@ const OnBoarding: FunctionComponent = () => {
             <button
               type="button"
               className="btn btn-primary"
-              onClick={_handleRegistration}
+              onClick={(e) => {
+                e.preventDefault();
+                registerAccount({ name, domain, innovationGoal });
+              }}
               disabled={!name || !domain || !innovationGoal || !!domainInputError || status === 'loading'}
             >
               Complete

@@ -52,7 +52,8 @@
         font-style: normal;
         font-weight: 700;
 
-        svg {
+        svg,
+        use {
           path {
             stroke: $white;
           }

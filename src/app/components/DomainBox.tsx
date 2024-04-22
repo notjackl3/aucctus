@@ -4,7 +4,7 @@ import styles from '../assets/styles/components/domain-box.module.scss';
 import images from '../assets/img';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../routes/routes';
-import Icon from './Icon';
+import Icon from './Icon/Icon';
 
 const iconDefaultProps = {
   height: 20,
@@ -54,7 +54,7 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({
 
           <div className={styles.metric}>
             <div>
-              <Icon variant="lineChartUp" {...iconDefaultProps} />
+              <Icon variant="line-chart-up" {...iconDefaultProps} />
               <span>Compound Annual Growth Rate (CAGR)</span>
             </div>
             <span>{compoundAnnualGrowth}% /year</span>
@@ -76,7 +76,7 @@ const DomainBox: FunctionComponent<DomainBoxProps> = ({
           }}
         >
           Explore Domain
-          <Icon variant="arrowRight" {...iconDefaultProps} stroke="#626ba3" />
+          <Icon variant="arrowright" {...iconDefaultProps} stroke="#626ba3" />
         </button>
       </div>
     </div>

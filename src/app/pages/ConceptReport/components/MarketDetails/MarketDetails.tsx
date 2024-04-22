@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo } from 'react';
 import styles from './styles/marketDetails.module.scss';
-import Icon from '../../../../components/Icon';
+import Icon from '../../../../components/Icon/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import images from '../../../../assets/img';
 import NewsArticle from '../../../../components/NewsArticle';
@@ -66,7 +66,7 @@ const MarketDetails: FunctionComponent = () => {
                 aria-label="See Source"
               >
                 See Source
-                <span>{<Icon variant="linkExternal" {...iconDefaultProps} />}</span>
+                <span>{<Icon variant="link-external" {...iconDefaultProps} />}</span>
               </a>
             }
           >
@@ -92,13 +92,20 @@ const MarketDetails: FunctionComponent = () => {
             <div className={styles.cardContent}>
               {ecosystem.data?.map((item) => (
                 <div className={styles.cardRow}>
-                  <img className={styles.cardLogo} alt="domain-booklet" src={images.companyLogoDefault} />
+                  <img
+                    className={styles.cardLogo}
+                    alt="company-logo"
+                    onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                      e.currentTarget.src = images.companyLogoDefault;
+                    }}
+                    src={`https://logo.clearbit.com/${item.source}`}
+                  />
                   <div className={styles.cardDescription}>
                     <span className={styles.cardDescriptionTitle}>{item.name}</span>
                     <p className={styles.cardDescriptionText}>{item.description}</p>
                   </div>
                   <a target="_blank" rel="noopener noreferrer" href={item.source}>
-                    <Icon variant="linkExternal" width={24} height={24} />
+                    <Icon variant="link-external" width={24} height={24} />
                   </a>
                 </div>
               ))}
@@ -124,6 +131,12 @@ const MarketDetails: FunctionComponent = () => {
           newsLink="https://www.google.com/"
         />
       </div> */}
+      {/* This external link is required to be added to the page when using Clearbit logos */}
+      <div className={styles.externalLogoLink}>
+        <a href="https://clearbit.com" target="_blank" rel="noopener noreferrer">
+          Logos provided by Clearbit
+        </a>
+      </div>
     </div>
   );
 };

@@ -77,7 +77,8 @@
     border-top: 1px solid var(--gray-300-outline, #e0e5f2);
 
     .avatar,
-    svg {
+    svg,
+    use {
       display: flex;
       width: 2.5rem;
       height: 2.5rem;
@@ -168,7 +169,8 @@
 
       &:hover {
         // box-shadow: var(--shadow-lg);
-        svg {
+        svg,
+        use {
           stroke: var(--type-tertiary);
         }
       }

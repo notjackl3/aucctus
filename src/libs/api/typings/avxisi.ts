@@ -1,6 +1,6 @@
 import { ConceptCategory, ConceptStatus } from './concepts';
 
-export type IFormError<T> = IServerErrorMessage | IFormErrorResponse<T>;
+export type IFormError<T = object> = IServerErrorMessage | IFormErrorResponse<T>;
 export interface IServerErrorMessage {
   id: string;
   error: string;

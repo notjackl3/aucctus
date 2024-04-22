@@ -1,7 +1,7 @@
 import { FunctionComponent, ReactNode } from 'react';
 import styles from '../styles/concepts.module.scss';
 import { ConceptReportStatus } from '../../../../libs/api/typings';
-import Icon from '../../../components/Icon';
+import Icon from '../../../components/Icon/Icon';
 import Loading from '../../../components/Loading';
 
 type ConceptRowButtonProps = {
@@ -35,7 +35,7 @@ const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, o
         style: ` btn btn-light btn-bold`,
         label: (
           <span>
-            <Icon variant="refresh" /> Retry
+            <Icon variant="refresh" height={20} width={20} /> Retry
           </span>
         ),
       },

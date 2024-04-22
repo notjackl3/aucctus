@@ -1,8 +1,8 @@
 import { FunctionComponent, useMemo } from 'react';
 import styles from './styles/customerDetails.module.scss';
-import defaultAvatar from '../../../../assets/icons/avatar.svg';
+import defaultAvatar from '../../../../assets/avatar.svg';
 import { ICustomerProfile } from '../../../../../libs/api/typings';
-import Icon, { IconVariant } from '../../../../components/Icon';
+import Icon from '../../../../components/Icon/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 
 export interface ICustomerDetailsProps {
@@ -24,26 +24,27 @@ interface ICustomerDetailLists {
 
 const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ customerData }) => {
   const listItems: ICustomerDetailLists[] = useMemo(() => {
-    return [
-      {
-        title: 'Jobs to be Done',
-        icon: 'clipboard',
-        type: 'jobs',
-        data: customerData?.jobsToBeDone || [],
-      },
-      {
-        title: 'Pains',
-        icon: 'userGroup',
-        type: 'pains',
-        data: customerData?.pains || [],
-      },
-      {
-        title: 'Quotes',
-        type: 'quotes',
-        icon: 'message',
-        data: customerData?.quotes || [],
-      },
-    ];
+    const jobContext: ICustomerDetailLists = {
+      title: 'Jobs to be Done',
+      icon: 'clipboard',
+      type: 'jobs',
+      data: customerData?.jobsToBeDone || [],
+    };
+    const pains: ICustomerDetailLists = {
+      title: 'Pains',
+      icon: 'user-group',
+      type: 'pains',
+      data: customerData?.pains || [],
+    };
+
+    const quotes: ICustomerDetailLists = {
+      title: 'Quotes',
+      icon: 'message-circle',
+      type: 'quotes',
+      data: customerData?.quotes || [],
+    };
+
+    return [jobContext, pains, quotes];
   }, [customerData]);
 
   return (
@@ -78,11 +79,11 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ customerDat
                   {`Age Range: ${customerData?.ageRange}`}
                 </p>
                 <p>
-                  <Icon variant="userGroup" {...iconDefaultProps} />
+                  <Icon variant="user-group" {...iconDefaultProps} />
                   {`Family Size: ${customerData?.familySize}`}
                 </p>
                 <p>
-                  <Icon variant="piggyBank" {...iconDefaultProps} />
+                  <Icon variant="piggy-bank" {...iconDefaultProps} />
                   {`Average Income: ${customerData?.incomeRange}`}
                 </p>
               </div>

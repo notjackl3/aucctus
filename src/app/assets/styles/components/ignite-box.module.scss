@@ -22,7 +22,8 @@
     gap: 0.25rem;
     flex: 1 0 0;
 
-    svg {
+    svg,
+    use {
       width: 1.5rem;
       height: 1.5rem;
     }

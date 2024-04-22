@@ -50,7 +50,8 @@
       visibility: hidden;
     }
 
-    svg {
+    svg,
+    use {
       path {
         stroke: $grey-700;
       }

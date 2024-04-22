@@ -3,7 +3,7 @@ import ConceptDetailCard from '../../../../../components/ConceptDetailCard/Conce
 import styles from '../styles/overviewDetails.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../../../../routes/routes';
-import Icon from '../../../../../components/Icon';
+import Icon from '../../../../../components/Icon/Icon';
 import GeneralBadge from '../../../../../components/GeneralBadge';
 import { IAssumption } from '../../../../../../libs/api/typings';
 

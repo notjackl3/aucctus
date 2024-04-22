@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/assumptionBadge.module.scss';
-import Icon from '../Icon';
+import Icon from '../Icon/Icon';
 
 export enum AssumptionType {
   adaptability = 'adaptability',
@@ -32,7 +32,7 @@ const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({ assu
     desirability: <Icon variant="thermometer" {...defaultIconProps} />,
     viability: <Icon variant="building" {...defaultIconProps} />,
     feasibility: <Icon variant="filecode" {...defaultIconProps} />,
-    adaptability: <Icon variant="lineChartUp" {...defaultIconProps} />,
+    adaptability: <Icon variant="line-chart-up" {...defaultIconProps} />,
   };
 
   const color = assumptionColorObj[assumptionType];

@@ -21,6 +21,8 @@ export const endpoints = {
   user: '/api/v1/user',
   confirmEmail: `/api/v1/confirm-email`,
   forgotPassword: `/api/v1/forgot-password`,
+  requestPasswordReset: `/api/v1/password-reset`,
+  updatePassword: `/api/v1/user/update-password`,
 
   /* Account */
   account: `/api/v1/account`,

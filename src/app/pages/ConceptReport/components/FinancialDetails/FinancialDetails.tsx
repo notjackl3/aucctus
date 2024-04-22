@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo } from 'react';
 import styles from './styles/financialDetails.module.scss';
-import Icon from '../../../../components/Icon';
+import Icon from '../../../../components/Icon/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import GeneralBadge from '../../../../components/GeneralBadge';
 import MarketChart from '../../../../components/MarketChart';

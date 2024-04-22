@@ -1,16 +1,12 @@
 import { FunctionComponent, useCallback, useState } from 'react';
-
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/InputField';
 import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import { useQuery } from 'react-query';
-import api from '../../../libs/api';
-import { Link, useNavigate } from 'react-router-dom';
-import { IRegisterUser } from '../../../libs/api/typings';
+import { Link } from 'react-router-dom';
+import { useSignUp } from '../../hooks/query/auth';
 
 const SignUp: FunctionComponent = () => {
-  const navigate = useNavigate();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -18,21 +14,8 @@ const SignUp: FunctionComponent = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
   const [confirmPassInputError, setConfirmPassInputError] = useState<string | undefined>();
-  const [error, setError] = useState<string | undefined>();
 
-  const query = useQuery({
-    queryKey: 'signup',
-    retry: 0,
-    enabled: false, // Prevent from automatically running
-    queryFn: async () => await api.auth.signup(firstName, lastName, email, password, confirmPassword),
-    onSuccess: () => {
-      navigate(AppPath.ConfirmEmail);
-    },
-    onError: (error) => {
-      let message = parseFormError<IRegisterUser>(error);
-      setError(message);
-    },
-  });
+  const { mutate: signUp, error, isLoading } = useSignUp();
 
   const _handleEmailValidation = useCallback(
     (e: React.FocusEvent) => {
@@ -67,17 +50,13 @@ const SignUp: FunctionComponent = () => {
     }
   };
 
-  const _handleSignup = async () => {
-    await query.refetch();
-  };
-
   return (
     <>
       <div className={styles.header}>
         <span className={styles.title}>Sign Up</span>
         <span className={styles.supportingText}>Start your 30-day free trial</span>
+        {error && <div className={styles.error}>{parseFormError(error)}</div>}
       </div>
-      {error && <div className={styles.error}>{error}</div>}
       <form className={styles.basicForm}>
         <div className={styles.inputGroup}>
           <InputField
@@ -129,16 +108,12 @@ const SignUp: FunctionComponent = () => {
         <button
           type="button"
           className="btn btn-primary"
-          onClick={_handleSignup}
+          onClick={(e) => {
+            e.preventDefault();
+            signUp({ firstName, lastName, email, password, confirmPassword });
+          }}
           disabled={
-            !firstName ||
-            !lastName ||
-            !email ||
-            !password ||
-            !!emailInputError ||
-            !!confirmPassInputError ||
-            query.isFetching ||
-            query.isLoading
+            !firstName || !lastName || !email || !password || !!emailInputError || !!confirmPassInputError || isLoading
           }
         >
           Sign Up

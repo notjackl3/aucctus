@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/generalBadge.module.scss';
-import Icon, { IconVariant } from '../Icon';
+import Icon from '../Icon/Icon';
 
 const defaultIconProps = {
   width: 12,
@@ -40,9 +40,9 @@ const GeneralBadge: FunctionComponent<GeneralBadgeProps> = ({
   const getBadgeIcon = (variant: GeneralBadgeVariant): IconVariant => {
     switch (variant) {
       case 'highRisk':
-        return 'critical';
+        return 'alert-octagon';
       case 'mediumRisk':
-        return 'warning';
+        return 'alert-triangle';
       case 'lowRisk':
         return 'check';
     }

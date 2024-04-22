@@ -2,7 +2,7 @@ import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import styles from './styles/concepts.module.scss';
 import { useQuery } from 'react-query';
 import api from '../../../libs/api';
-import Icon, { IconVariant } from '../../components/Icon';
+import Icon from '../../components/Icon/Icon';
 import { AppPath } from '../../../routes/routes';
 import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 

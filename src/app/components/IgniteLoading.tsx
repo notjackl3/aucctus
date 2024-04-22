@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 import styles from '../pages/IgniteConcept/styles/igniteConcept.module.scss';
-import igniteIcon from '../assets/icons/ignite.svg';
+import igniteIcon from '../assets/ignite.svg';
 import Loading from './Loading';
 
 interface IgniteLoadingProps {

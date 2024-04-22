@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/conceptCard.module.scss';
-import Icon from '../Icon';
+import Icon from '../Icon/Icon';
 import { IConcept } from '../../../libs/api/typings';
 import { dateCellFormatter } from '../../../libs/utils';
 
@@ -35,7 +35,7 @@ const ConceptCard: FunctionComponent<IConceptCardProps> = ({ concept, selectCard
           }}
           aria-label="Open Concept Details"
         >
-          <Icon variant="chevronRight" {...defaultIconProps} />
+          <Icon variant="chevronright" {...defaultIconProps} />
         </button>
       </div>
     </div>
