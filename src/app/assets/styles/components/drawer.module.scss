@@ -1,4 +1,6 @@
-// The Main Drawer Component
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
 
 .container {
   display: block;
@@ -98,7 +100,7 @@
       span {
         color: var(--gray-700-text-tertiary, #626ba3);
         /* Text sm/Semibold */
-        font-family: 'DM Sans';
+        font-family: $font-family;
         max-width: 100%;
         font-size: 0.875rem;
         font-style: normal;
@@ -159,7 +161,7 @@
         span {
           color: var(--type-tertiary, #626ba3);
           /* H3 */
-          font-family: 'DM Sans';
+          font-family: $font-family;
           font-size: 1rem;
           font-style: normal;
           font-weight: 700;

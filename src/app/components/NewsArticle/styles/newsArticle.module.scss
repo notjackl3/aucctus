@@ -34,7 +34,7 @@
       .title {
         color: $blue-900;
         @include text-medium;
-        font-family: $dm-sans;
+        font-family: $font-family;
       }
 
       .link {
@@ -47,7 +47,7 @@
     overflow: hidden;
     color: $grey-600;
     @include text-medium;
-    font-family: $dm-sans;
+    font-family: $font-family;
 
     &.textOverflow {
       display: -webkit-box;

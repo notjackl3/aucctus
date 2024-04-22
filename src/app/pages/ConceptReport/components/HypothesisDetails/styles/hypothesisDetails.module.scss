@@ -39,7 +39,7 @@
 
       .headerText {
         @include text-large;
-        font-family: $dm-sans;
+        font-family: $font-family;
       }
 
       .badge {
@@ -95,7 +95,7 @@
             background: var(--gray-50-bg, #fcfcfd);
 
             color: $grey-600;
-            font-family: var(--text-sm-regular);
+            font-family: $font-family
             font-size: 0.75rem;
             font-style: normal;
             font-weight: 500;
@@ -131,7 +131,7 @@
                 box-sizing: border-box;
                 color: $grey-600;
                 text-overflow: ellipsis;
-                font-family: $dm-sans;
+                font-family: $font-family;
                 font-size: 0.875rem;
                 font-style: normal;
                 font-weight: 400;
@@ -142,13 +142,13 @@
 
                   .assumptionTitle {
                     color: $grey-600;
-                    font-family: $dm-sans;
+                    font-family: $font-family;
                     @include text-medium;
                     font-weight: 700;
                   }
                   .assumptionDescription {
                     color: $grey-600;
-                    font-family: $dm-sans;
+                    font-family: $font-family;
                     @include text-small;
                     overflow: hidden;
                     text-overflow: ellipsis;

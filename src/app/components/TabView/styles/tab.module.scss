@@ -37,12 +37,12 @@
     height: 100%;
     box-sizing: border-box;
     color: $grey-500;
-    font-family: $dm-sans;
+    font-family: $font-family;
     @include body-200;
     font-weight: 700;
     &.active {
       color: $blue-600;
-      font-family: $dm-sans;
+      font-family: $font-family;
       @include body-200;
       font-weight: 700;
       border-bottom: 2px solid $blue-600;
@@ -95,11 +95,11 @@
     font-weight: 900;
     margin-right: 3%;
     color: $grey-800;
-    font-family: $dm-sans;
+    font-family: $font-family;
     @include body-200;
     font-weight: 600;
     &.active {
-      font-family: $dm-sans;
+      font-family: $font-family;
       @include body-200;
       font-weight: 700;
     }

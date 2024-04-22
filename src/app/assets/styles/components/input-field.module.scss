@@ -42,7 +42,7 @@
     padding: var(--padding-3xs) var(--padding-sm);
     color: var(--gray-900-text-primary);
 
-    font-family: var(--text-sm-regular);
+    font-family: $font-family;
     font-style: normal;
     font-size: var(--h3-size);
     font-weight: 400;
@@ -83,7 +83,7 @@
   .label {
     color: var(--Gray-700---Text-Tertiary, #626ba3);
     @include text-small;
-    font-family: var(--text-sm-regular);
+    font-family: $font-family;
   }
 
   &.inputFieldError {
@@ -111,7 +111,7 @@
     padding: var(--padding-3xs) var(--padding-sm);
     color: var(--Gray-500---Resting-Icons, var(--Color-Grey-Grey-500, #7586a9));
     @include text-medium;
-    font-family: var(--text-sm-regular);
+    font-family: $font-family;
     border-radius: var(--br-5xs);
     box-shadow: var(--shadow-xs);
     border: 1px solid var(--gray-300-outline);

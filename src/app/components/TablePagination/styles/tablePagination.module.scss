@@ -21,7 +21,7 @@
       text-align: center;
       border-radius: 0.5rem;
       @include text-medium;
-      font-family: $dm-sans;
+      font-family: $font-family;
       border: none;
       background: none;
 
@@ -37,7 +37,7 @@
     box-sizing: border-box;
     align-items: center;
     background: none;
-    font-family: $dm-sans;
+    font-family: $font-family;
     font-weight: 500;
     border-radius: 8px;
     border: 1px solid $grey-300;

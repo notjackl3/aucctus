@@ -1,3 +1,7 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
 .authContainer {
   display: flex;
   justify-content: start;
@@ -29,7 +33,7 @@
     text-align: left;
     font-size: var(--display-md-semibold-size);
     color: var(--gray-900-text-primary);
-    font-family: var(--text-sm-regular);
+    font-family: $font-family;
     overflow: scroll;
 
     .headerNavigation {
@@ -154,15 +158,19 @@
       align-items: center;
       gap: 0.5rem;
       color: var(--gray-600-text-secondary, #667085) !important;
-      font-family: 'DM Sans';
+      font-family: $font-family;
       font-size: 0.875rem;
       font-style: normal;
       font-weight: 500;
       line-height: 1.25rem;
+
+      svg {
+        stroke: var(--gray-600-text-secondary, #667085);
+      }
     }
 
     .link {
-      font-family: 'DM Sans';
+      font-family: $font-family;
       font-size: 0.875rem;
       font-style: normal;
       font-weight: 500;
@@ -191,7 +199,7 @@
     text-align: left;
     font-size: var(--display-sm-medium-size);
     color: var(--gray-900-text-primary);
-    font-family: var(--text-sm-regular);
+    font-family: $font-family;
 
     height: 100vh;
 
@@ -311,7 +319,7 @@
       width: 35.9375rem;
       color: #2b3674;
 
-      font-family: 'DM Sans';
+      font-family: $font-family;
       font-size: 2.25rem;
       font-style: normal;
       font-weight: 700;

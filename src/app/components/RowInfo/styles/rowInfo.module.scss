@@ -27,7 +27,7 @@
       color: var(--gray-700, #344054);
       gap: 0.5rem;
       @include text-small;
-      font-family: $dm-sans;
+      font-family: $font-family;
       font-weight: 600;
     }
     .rowInfoSublabel {

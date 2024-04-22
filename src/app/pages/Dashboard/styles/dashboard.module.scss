@@ -43,7 +43,7 @@
       gap: 1rem;
       .button {
         color: $white;
-        font-family: $dm-sans;
+        font-family: $font-family;
         font-style: normal;
         font-weight: 700;
         white-space: nowrap;
@@ -89,7 +89,7 @@
         .cardAction {
           color: $blue-600;
           @include body-100;
-          font-family: $dm-sans;
+          font-family: $font-family;
           border: none;
           background: $purple-50;
           padding: 0.5rem 1rem;
@@ -130,14 +130,14 @@
         h4 {
           color: $blue-900;
           @include text-large;
-          font-family: $dm-sans;
+          font-family: $font-family;
         }
       }
 
       .cardAction {
         color: $grey-600;
         @include body-100;
-        font-family: $dm-sans;
+        font-family: $font-family;
         border: none;
         background: none;
       }
