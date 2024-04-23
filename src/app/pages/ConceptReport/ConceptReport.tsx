@@ -12,6 +12,10 @@ import useConceptMenu from '../../components/ConceptMenu/hooks/useConceptMenu';
 import ConceptStatusBubble from '../../components/ConceptStatusBubble/ConceptStatusBubble';
 import { CONCEPT_STATUS_LIST } from '../../../libs/concepts';
 
+export interface IConceptReportContext {
+  navigateToTab: (tab: string) => void;
+}
+
 const DROPDOWN_OPTIONS = CONCEPT_STATUS_LIST.map((value) => ({
   label: <ConceptStatusBubble status={value} variant="dropdown" />,
   displayLabel: <ConceptStatusBubble status={value} variant="dropdown" isActive />,
@@ -37,11 +41,13 @@ const ConceptReport: FunctionComponent = () => {
   const navigate = useNavigate();
   const { updateConceptStatus } = useConceptMenu({ conceptId: conceptId });
   const [status, setStatus] = useState<ConceptStatus>('new');
+  const [activeTab, setActiveTab] = useState<string>(AppPath.ConceptOverview);
   /**
    * Each tab has been set to return the associated route from AppPath
    */
   const onTabSelect = useCallback(
     (value: string) => {
+      setActiveTab(value);
       const route = value.replace(':id', conceptId);
       navigate(route);
     },
@@ -83,6 +89,7 @@ const ConceptReport: FunctionComponent = () => {
             aria-label="Download Opportunity Snapshot"
             className={`btn btn-primary btn-bold`}
             onClick={() => navigate(AppPath.ConceptSnapshot)}
+            disabled
           >
             <Icon variant="download-cloud" {...defaultIconProps} />
             Opportunity Snapshot
@@ -97,13 +104,12 @@ const ConceptReport: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.contentContainer}>
-        <TabView
-          className={styles.tabs}
-          tabs={CONCEPT_TABS}
-          onTabSelect={onTabSelect}
-          defaultTab={AppPath.ConceptOverview}
-        >
-          <Outlet />
+        <TabView className={styles.tabs} tabs={CONCEPT_TABS} onTabSelect={onTabSelect} activeTab={activeTab}>
+          <Outlet
+            context={{
+              navigateToTab: onTabSelect,
+            }}
+          />
         </TabView>
       </div>
     </div>

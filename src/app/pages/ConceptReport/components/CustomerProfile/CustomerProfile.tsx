@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
+import { FunctionComponent, useCallback, useEffect, useMemo, useState } from 'react';
 import styles from './styles/customerProfile.module.scss';
 import { ICustomerProfile } from '../../../../../libs/api/typings';
 import TabView from '../../../../components/TabView';
@@ -6,11 +6,13 @@ import CustomerDetails from './CustomerDetails';
 import Loading from '../../../../components/Loading';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { TabElement } from '../../../../components/TabView/TabView';
+import { AppPath } from '../../../../../routes/routes';
 
 const CustomerProfile: FunctionComponent = () => {
   const { id: conceptId } = useParams();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedPersona = searchParams.get('persona');
 
@@ -30,17 +32,23 @@ const CustomerProfile: FunctionComponent = () => {
     }));
   }, [customerPersonas]);
 
-  const onTabSelect = useCallback((value: string) => {
-    searchParams.set('persona', value);
-    setSearchParams(searchParams);
-  }, []);
+  const onTabSelect = useCallback(
+    (value: string) => {
+      setSearchParams((prev) => {
+        prev.set('persona', value);
+        return prev;
+      });
+    },
+    [setSearchParams]
+  );
 
   useEffect(() => {
-    if (!selectedPersona && firstPersona) {
-      searchParams.set('persona', firstPersona.nickname);
-      setSearchParams(searchParams);
+    if (!selectedPersona && conceptId && firstPersona) {
+      navigate(`${AppPath.ConceptCustomerPersona.replace(':id', conceptId)}?persona=${firstPersona.nickname}`, {
+        replace: true,
+      });
     }
-  }, [selectedPersona, firstPersona, searchParams, setSearchParams]);
+  }, [selectedPersona, firstPersona, onTabSelect, conceptId, navigate]);
 
   return (
     <div className={styles.customerProfile}>
@@ -52,7 +60,7 @@ const CustomerProfile: FunctionComponent = () => {
           className={styles.tabs}
           variant="button"
           onTabSelect={onTabSelect}
-          defaultTab={firstPersona?.nickname || ''}
+          activeTab={selectedPersona || ''}
         >
           <>
             {customerPersonas.map((customer) => (

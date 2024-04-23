@@ -5,15 +5,15 @@ import MarketChart from '../../../../components/MarketChart';
 import MarketLegend from '../../../../components/MarketLegend';
 import defaultAvatar from '../../../../assets/avatar.svg';
 import Icon from '../../../../components/Icon/Icon';
-// import NewsArticle from '../../../../components/NewsArticle';
 import Loading from '../../../../components/Loading';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useParams, useOutletContext } from 'react-router-dom';
 import { AppPath } from '../../../../../routes/routes';
 import { getMarketMetricColor, getMarketMetricTitle } from '../../../../../libs/concepts';
 import { formatLargeNumber } from '../../../../../libs/utils';
 import KeyAssumptionCard from './components/KeyAssumptionCard';
+import { IConceptReportContext } from '../../ConceptReport';
 
 export interface OverviewDetailsProps {}
 
@@ -25,12 +25,8 @@ const iconDefaultProps = {
 
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
-  const location = useLocation();
-  const basePath = location.pathname.split('/').slice(0, 3).join('/');
+  const context = useOutletContext<IConceptReportContext>();
 
-  const navigate = useNavigate();
-
-  //TODO remove these queries when overview endpoint modified to return all data required for overview page
   const { data: conceptData } = useQuery({
     queryKey: [`concepts/${conceptId}`],
     retry: 1,
@@ -125,11 +121,7 @@ const OverviewDetails: FunctionComponent = () => {
             <button
               className={styles.cardAction}
               onClick={() => {
-                navigate(
-                  `${AppPath.ConceptCustomerPersona.replace(':id', conceptId)}?persona=${
-                    firstCustomerPersona?.nickname
-                  }`
-                );
+                context.navigateToTab(AppPath.ConceptCustomerPersona);
               }}
               aria-label="View Customer Profiles"
             >
@@ -181,7 +173,7 @@ const OverviewDetails: FunctionComponent = () => {
             <button
               className={styles.cardAction}
               onClick={() => {
-                navigate(`${basePath}/financial-projection`);
+                context.navigateToTab(AppPath.ConceptFinancialProjection);
               }}
               aria-label="View Financial Projection"
             >

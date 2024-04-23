@@ -170,7 +170,7 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
         ),
       }),
     ],
-    [openPopupMenuId, updateConceptStatus]
+    [openPopupMenuId, retryConceptReport, updateConceptStatus]
   );
 
   const table = useReactTable({

@@ -4,7 +4,7 @@ import { useQuery } from 'react-query';
 import api from '../../../libs/api';
 import Icon from '../../components/Icon/Icon';
 import { AppPath } from '../../../routes/routes';
-import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
 import Kanban from '../../components/Kanban';
 import TabView from '../../components/TabView';
@@ -35,7 +35,7 @@ export const KANBAN_COLUMNS_MAP = ACTIVE_CONCEPT_STATUS_LIST.reduce<ConceptColum
   {} as ConceptColumns
 );
 
-const ACTIVE_VIEW_TABS = (['list', 'board'] as IconVariant[]).map((value) => ({
+const ACTIVE_VIEW_TABS = (['list', 'kanban'] as IconVariant[]).map((value) => ({
   label: (
     <div className={styles.tabLabel}>
       <Icon variant={value} height={20} width={20} />
@@ -52,8 +52,9 @@ const Concepts: FunctionComponent = () => {
   const category = (searchParams.get('category') as ConceptCategory) || 'active';
   const status = (searchParams.get('status') as ConceptStatus) || null;
   const page = searchParams.get('page') || '1';
+  const view = searchParams.get('view') || ('list' as 'list' | 'kanban');
 
-  const isKanbanView = searchParams.get('kanban') === 'true' && category === 'active';
+  const isKanbanView = view === 'kanban' && category === 'active';
 
   /**
    * Sets the status filter for concepts.
@@ -89,31 +90,16 @@ const Concepts: FunctionComponent = () => {
    */
   const onTabSelect = useCallback(
     (value: string) => {
-      if (value !== 'board') {
-        searchParams.delete('kanban');
-      } else {
-        searchParams.set('kanban', 'true');
-        searchParams.set('category', 'active');
-        searchParams.delete('status');
-      }
-      setSearchParams(searchParams);
+      setSearchParams((prev) => {
+        if (value !== 'kanban') {
+          prev.delete('status');
+        }
+        prev.set('view', value);
+        return prev;
+      });
     },
-    [searchParams, setSearchParams]
+    [setSearchParams]
   );
-
-  useEffect(() => {
-    if (!page) {
-      searchParams.set('page', '1');
-      setSearchParams(searchParams);
-    }
-  }, [page, searchParams, setSearchParams]);
-
-  useEffect(() => {
-    if (!category) {
-      searchParams.set('category', 'active');
-      setSearchParams(searchParams);
-    }
-  }, [category, searchParams, setSearchParams]);
 
   const { data, isLoading } = useQuery({
     queryKey: ['concepts', status, category, page],
@@ -131,7 +117,7 @@ const Concepts: FunctionComponent = () => {
       return api.concept.getConcepts({
         status,
         category,
-        page: parseInt(page),
+        page: parseInt(page || '1'),
       });
     },
   });
@@ -172,12 +158,12 @@ const Concepts: FunctionComponent = () => {
             </button>
           </div>
         </div>
-        <TabView tabs={tabs} className={styles.tabs} variant="button" onTabSelect={onTabSelect} defaultTab={'list'}>
+        <TabView tabs={tabs} className={styles.tabs} variant="button" onTabSelect={onTabSelect} activeTab={view}>
           <ConceptContainer
             category={category}
             categoryCount={data?.count || 0}
             numberOfPages={data?.numberOfPages || 1}
-            page={page}
+            page={page || '1'}
             setPage={setPage}
             status={status}
             setStatusFilter={setStatusFilter}

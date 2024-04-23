@@ -1,4 +1,4 @@
-import { FunctionComponent, ReactNode, useState } from 'react';
+import { FunctionComponent, ReactNode } from 'react';
 import styles from './styles/tabs.module.scss';
 import Tab from './Tab';
 
@@ -18,7 +18,7 @@ export interface TabsProps {
   variant?: 'default' | 'button';
   onTabSelect: (value: string) => void;
   children?: ReactNode;
-  defaultTab: string;
+  activeTab: string;
 }
 
 const TabView: FunctionComponent<TabsProps> = ({
@@ -27,16 +27,9 @@ const TabView: FunctionComponent<TabsProps> = ({
   className,
   variant = 'default',
   tabClassName,
-  defaultTab,
+  activeTab,
   onTabSelect,
 }) => {
-  const [activeValue, setActiveValue] = useState(defaultTab);
-
-  const handleTabSelect = (value: string) => {
-    setActiveValue(value);
-    onTabSelect(value);
-  };
-
   return (
     <div className={`${styles.tabs} ${className}`}>
       <div className={`${styles.list}`}>
@@ -47,8 +40,8 @@ const TabView: FunctionComponent<TabsProps> = ({
             label={tab.label}
             value={tab.value}
             variant={variant}
-            isActive={activeValue === tab.value}
-            onSelect={handleTabSelect}
+            isActive={activeTab === tab.value}
+            onSelect={onTabSelect}
           />
         ))}
       </div>

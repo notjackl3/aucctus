@@ -96,7 +96,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
   return (
     <div className={styles.tablePagination}>
       <button
-        className={styles.button}
+        className="btn btn-light"
         onClick={previousPage}
         disabled={isPreviousPageDisabled}
         aria-label="Previous Page"
@@ -105,7 +105,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
         Previous
       </button>
       <div className={styles.pageContainer}>{renderPageNumbers()}</div>
-      <button className={styles.button} onClick={nextPage} disabled={isNextPageDisabled} aria-label="Next Page">
+      <button className="btn btn-light" onClick={nextPage} disabled={isNextPageDisabled} aria-label="Next Page">
         Next
         <Icon variant="arrowright" width={20} height={20} />
       </button>

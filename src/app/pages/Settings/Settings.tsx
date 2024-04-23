@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback } from 'react';
+import { FunctionComponent, useCallback, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import styles from './styles/settings.module.scss';
 import { useNavigate } from 'react-router-dom';
@@ -11,10 +11,12 @@ export const SETTING_TABS = [
 ];
 
 const Settings: FunctionComponent = () => {
+  const [activeTab, setActiveTab] = useState<string>(AppPath.SettingsAbout);
   const navigate = useNavigate();
 
   const onTabSelect = useCallback(
     (value: string) => {
+      setActiveTab(value);
       const route = value;
       navigate(route);
     },
@@ -34,7 +36,7 @@ const Settings: FunctionComponent = () => {
           className={styles.tabs}
           variant="default"
           onTabSelect={onTabSelect}
-          defaultTab={AppPath.SettingsAbout}
+          activeTab={activeTab}
         >
           <Outlet />
         </TabView>
