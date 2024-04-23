@@ -46,7 +46,7 @@
         color: var(--colors-text-text-tertiary-600, #475467);
         text-overflow: ellipsis;
         @include text-small;
-        font-family: $dm-sans;
+        font-family: $font-family;
       }
     }
   }

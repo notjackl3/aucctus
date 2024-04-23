@@ -1,3 +1,7 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
 .igniteBox {
   display: flex;
   padding: var(--padding-5xl);
@@ -42,14 +46,14 @@
   .title,
   button,
   .content {
-    font-family: var(--text-sm-regular);
+    font-family: $font-family;
     font-style: normal;
   }
 
   .title,
   button {
     /* Text md/Semibold */
-    font-family: var(--text-sm-regular);
+    font-family: $font-family;
     font-size: var(--text-sm-regular-size);
     font-weight: 500;
     line-height: 1.5rem; /* 150% */

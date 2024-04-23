@@ -21,7 +21,7 @@
     box-sizing: border-box;
     .cardTitle {
       color: $blue-900;
-      font-family: $dm-sans;
+      font-family: $font-family;
       font-size: 0.6rem;
       font-style: normal;
       font-weight: 700;
@@ -30,13 +30,13 @@
 
     .cardDescription {
       color: $grey-600;
-      font-family: $dm-sans;
+      font-family: $font-family;
       margin: 0;
       @include text-medium;
       overflow: hidden;
       color: $grey-600;
       text-overflow: ellipsis;
-      font-family: $dm-sans;
+      font-family: $font-family;
       font-size: 0.6rem;
       font-style: normal;
       font-weight: 400;
@@ -55,7 +55,7 @@
       overflow: hidden;
       color: $grey-600;
       text-overflow: ellipsis;
-      font-family: $dm-sans;
+      font-family: $font-family;
       font-size: 0.6rem;
       font-style: normal;
       font-weight: 700;
@@ -84,7 +84,7 @@
       align-self: stretch;
 
       .ownerText {
-        font-family: 'DM Sans';
+        font-family: $font-family;
         font-size: 0.6rem;
         font-style: normal;
         font-weight: 400;

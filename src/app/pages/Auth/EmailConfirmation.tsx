@@ -62,7 +62,7 @@ const ConfirmEmail: FunctionComponent = () => {
       <form className={styles.basicForm}>
         <div className={styles.signUp}>
           <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant="arrowleft" /> Back to log in
+            <Icon variant="arrowleft" height={20} width={20} /> Back to log in
           </Link>
         </div>
       </form>

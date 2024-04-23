@@ -3,7 +3,6 @@ import styles from './styles/marketDetails.module.scss';
 import Icon from '../../../../components/Icon/Icon';
 import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
 import images from '../../../../assets/img';
-import NewsArticle from '../../../../components/NewsArticle';
 import api from '../../../../../libs/api';
 import { useParams } from 'react-router-dom';
 import { useQuery } from 'react-query';
@@ -58,16 +57,18 @@ const MarketDetails: FunctionComponent = () => {
             key={trend.uuid}
             isHideHeader
             footerAction={
-              <a
+              <button
                 className={`${styles.cardAction} btn btn-light`}
-                target="_blank"
                 rel="noopener noreferrer"
-                href={trend.source}
                 aria-label="See Source"
+                onClick={(e) => {
+                  e.preventDefault();
+                  window.open(trend.source, '_blank');
+                }}
               >
                 See Source
-                <span>{<Icon variant="link-external" {...iconDefaultProps} />}</span>
-              </a>
+                <Icon variant="link-external" {...iconDefaultProps} />
+              </button>
             }
           >
             <div className={styles.cardTrendContent}>
@@ -91,7 +92,13 @@ const MarketDetails: FunctionComponent = () => {
           <ConceptDetailCard key={`${ecosystem.title}-${index}`} title={ecosystem.title} isHideFooter>
             <div className={styles.cardContent}>
               {ecosystem.data?.map((item) => (
-                <div className={styles.cardRow}>
+                <div
+                  className={styles.cardRow}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    window.open(item.source, '_blank');
+                  }}
+                >
                   <img
                     className={styles.cardLogo}
                     alt="company-logo"
@@ -104,9 +111,7 @@ const MarketDetails: FunctionComponent = () => {
                     <span className={styles.cardDescriptionTitle}>{item.name}</span>
                     <p className={styles.cardDescriptionText}>{item.description}</p>
                   </div>
-                  <a target="_blank" rel="noopener noreferrer" href={item.source}>
-                    <Icon variant="link-external" width={24} height={24} />
-                  </a>
+                  <Icon variant="link-external" {...iconDefaultProps} />
                 </div>
               ))}
             </div>

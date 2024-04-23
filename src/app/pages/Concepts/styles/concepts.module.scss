@@ -36,7 +36,7 @@
         font-size: 2rem;
         font-style: normal;
         font-weight: 700;
-        font-family: $dm-sans;
+        font-family: $font-family;
         height: 100%;
       }
     }
@@ -44,7 +44,7 @@
     .actions {
       .button {
         color: $white;
-        font-family: $dm-sans;
+        font-family: $font-family;
         font-style: normal;
         font-weight: 700;
 
@@ -141,7 +141,7 @@
         background: var(--gray-50-bg, #fcfcfd);
 
         color: $grey-600;
-        font-family: var(--text-sm-regular);
+        font-family: $font-family;
         font-size: 0.75rem;
         font-style: normal;
         font-weight: 500;
@@ -175,7 +175,7 @@
             box-sizing: border-box;
             color: $grey-600;
             text-overflow: ellipsis;
-            font-family: $dm-sans;
+            font-family: $font-family;
             font-size: 0.875rem;
             font-style: normal;
             font-weight: 400;
@@ -183,7 +183,7 @@
             .openButton {
               min-width: 3.5rem;
               color: $grey-700;
-              font-family: $dm-sans;
+              font-family: $font-family;
               font-size: 0.875rem;
               font-weight: 400;
               border: 1px solid $grey-300;

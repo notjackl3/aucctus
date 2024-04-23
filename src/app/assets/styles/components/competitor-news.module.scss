@@ -1,3 +1,7 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
 .competitorNews {
   display: flex;
   padding: var(--padding-base);
@@ -30,7 +34,7 @@
 
     .headline,
     .summary {
-      font-family: var(--text-sm-regular);
+      font-family: $font-family;
       font-style: normal;
       line-height: 1.5rem; /* 150% */
       overflow: hidden;

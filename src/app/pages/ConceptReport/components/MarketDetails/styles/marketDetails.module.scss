@@ -18,7 +18,7 @@
 
   p {
     color: $grey-600;
-    font-family: $dm-sans;
+    font-family: $font-family;
     margin: 0;
     @include text-medium;
   }
@@ -54,7 +54,7 @@
       h4 {
         color: $blue-900;
         @include text-large;
-        font-family: $dm-sans;
+        font-family: $font-family;
       }
     }
 
@@ -82,13 +82,13 @@
         margin-bottom: 0.5rem;
         color: $blue-900;
         @include text-medium;
-        font-family: $dm-sans;
+        font-family: $font-family;
         font-weight: 700;
       }
 
       .cardRegularText {
         @include text-small;
-        font-family: $dm-sans;
+        font-family: $font-family;
         color: $grey-600;
       }
     }
@@ -111,6 +111,8 @@
         color: $blue-900;
         border-bottom: 1px solid $grey-300;
 
+        cursor: pointer;
+
         &:last-child {
           border-bottom: none;
         }
@@ -125,13 +127,13 @@
           .cardDescriptionTitle {
             color: $blue-900;
             @include text-medium;
-            font-family: $dm-sans;
+            font-family: $font-family;
           }
           .cardDescriptionText {
             color: $grey-600;
             overflow: hidden;
             @include text-x-small;
-            font-family: $dm-sans;
+            font-family: $font-family;
 
             &.cellEllipsis {
               display: -webkit-box;

@@ -1,3 +1,7 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/shadows.scss' as *;
+
 .introSection {
   display: flex;
   flex-direction: column;
@@ -10,7 +14,7 @@
   text-align: left;
   font-size: var(--display-sm-medium-size);
   color: var(--gray-900-text-primary);
-  font-family: var(--text-sm-regular);
+  font-family: $font-family;
 
   width: 100vw;
   height: 100vw;
