@@ -111,6 +111,8 @@
         color: $blue-900;
         border-bottom: 1px solid $grey-300;
 
+        cursor: pointer;
+
         &:last-child {
           border-bottom: none;
         }
