@@ -23,7 +23,7 @@ const EditCustomerProfileList: FunctionComponent<IEditCustomerProfileListProps> 
       </div>
       <div className={styles.content}>
         {profiles.map((profile) => (
-          <ProfileListItem key={profile.uuid} profile={profile} />
+          <ProfileListItem key={profile.uuid} profile={profile} profileCount={profiles.length} />
         ))}
 
         <button className={styles.generate} disabled onClick={() => {}}>
@@ -42,7 +42,8 @@ const EditCustomerProfileList: FunctionComponent<IEditCustomerProfileListProps> 
 
 const ProfileListItem: FunctionComponent<{
   profile: ICustomerProfile;
-}> = ({ profile }) => {
+  profileCount: number;
+}> = ({ profile, profileCount }) => {
   const { mutate } = useDeleteCustomerProfile();
 
   return (
@@ -55,6 +56,7 @@ const ProfileListItem: FunctionComponent<{
         </div>
       </div>
       <button
+        disabled={profileCount === 1}
         className={styles.remove}
         onClick={() => {
           mutate(profile.uuid);

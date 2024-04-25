@@ -5,6 +5,7 @@
 .container {
   display: flex;
   max-width: 400px;
+  width: 400px;
   flex-direction: column;
   align-items: center;
   // align-self: stretch;
@@ -67,6 +68,7 @@
   justify-content: space-between;
   align-items: center;
   align-self: stretch;
+  width: 350px;
   padding: $padding-5xs $padding-base;
 
   border-radius: $br-5xs;
@@ -119,8 +121,12 @@
 
     color: $red-700;
 
-    :hover {
-      font-weight: 700 !important;
+    &:disabled {
+      text-decoration: line-through;
+    }
+
+    &:hover:not(:disabled) {
+      font-weight: 500 !important;
     }
   }
 }
