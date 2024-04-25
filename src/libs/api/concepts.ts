@@ -12,6 +12,7 @@ import {
   IFinancialProjection,
   IMarketScan,
   IMarketSizeMetric,
+  ITrendsAndDrivers,
 } from './types'; // Import the missing type
 import { IPageResponse } from './types';
 
@@ -108,7 +109,6 @@ export class ConceptApi extends ApiService {
   }
 
   updateMarketMetricSize(uuid: string, data: Partial<IMarketSizeMetric>) {
-    console.log('## updateMarketMetricSize', uuid, data);
     return this.patch<IMarketSizeMetric, Partial<IMarketSizeMetric>>(endpoints.conceptMarketSizeMetric(uuid), data);
   }
 
@@ -118,5 +118,9 @@ export class ConceptApi extends ApiService {
 
   updateConceptMarketScan(uuid: string, data: Partial<IMarketScan>) {
     return this.patch<IMarketScan, Partial<IMarketScan>>(endpoints.conceptMarketScanUuid(uuid), data);
+  }
+
+  updateTrendAndDriver(uuid: string, data: Partial<ITrendsAndDrivers>) {
+    return this.patch<ITrendsAndDrivers, Partial<ITrendsAndDrivers>>(endpoints.conceptTrendAndDriver(uuid), data);
   }
 }

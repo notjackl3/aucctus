@@ -56,25 +56,31 @@ const MarketSizeMetricEditModal: React.FC<IMarketSizeMetricEditModalProps> = ({ 
     [setValue, setValueError]
   );
 
-  const handleReasonChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const handleReasonChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const input = e.target.value;
-    if (input.length < REASON_MAX_LENGTH) {
-      setReason(input);
-      setReasonError(undefined);
-    } else {
+
+    setReasonError(undefined);
+
+    if (input.length === 0) {
+      setReasonError('Reason is required.');
+    } else if (input.length > REASON_MAX_LENGTH) {
       setReasonError('Reason exceeds the maximum allowed length.');
     }
-  };
 
-  const handleDataPointChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setReason(input);
+  }, []);
+
+  const handleDataPointChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const input = e.target.value;
-    if (input.length < DATA_POINT_MAX_LENGTH) {
-      setDataPoint(input);
-      setDataPointError(undefined);
-    } else {
+    setDataPointError(undefined);
+
+    if (input.length === 0) {
+      setDataPointError('Data point is required.');
+    } else if (input.length > DATA_POINT_MAX_LENGTH) {
       setDataPointError('Data point description exceeds the maximum allowed length.');
     }
-  };
+    setDataPoint(input);
+  }, []);
 
   return (
     <div className={styles.container}>

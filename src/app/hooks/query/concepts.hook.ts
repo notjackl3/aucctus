@@ -13,6 +13,7 @@ import {
   IFormError,
   IMarketScan,
   IMarketSizeMetric,
+  ITrendsAndDrivers,
 } from '../../../libs/api/types';
 import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
@@ -297,5 +298,15 @@ export const useMarketMetricSizeUpdate = (uuid: string) => {
       [AucctusQueryKeys.conceptFinancialProjection, uuid],
       [AucctusQueryKeys.conceptOverview, uuid],
     ]
+  );
+};
+
+/**
+ *
+ */
+export const useTrendAndDriverUpdate = () => {
+  return useGenericConceptUpdate<ITrendsAndDrivers>(
+    (data) => api.concept.updateTrendAndDriver(data.uuid, data),
+    [[AucctusQueryKeys.conceptMarketScan]]
   );
 };

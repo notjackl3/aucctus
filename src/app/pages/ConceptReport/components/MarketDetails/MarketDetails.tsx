@@ -3,9 +3,9 @@ import styles from './styles/marketDetails.module.scss';
 import { useParams } from 'react-router-dom';
 import { useConceptMarketScan } from '../../../../hooks/query/concepts.hook';
 import EcosystemList from './EcosystemList';
-import TrendsAndDrivers from './TrendsAndDrivers';
 import { useEditMarketScan } from '../../../../hooks/concepts/editable.hook';
 import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
+import TrendAndDriverCard from './TrendAndDriverCard';
 
 const MarketDetails: FunctionComponent = () => {
   const { id: conceptId } = useParams();
@@ -30,7 +30,9 @@ const MarketDetails: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.cardContainer}>
-        <TrendsAndDrivers trendsAndDrivers={marketScan?.trendsAndDrivers || []} />
+        {marketScan?.trendsAndDrivers.map((trend) => (
+          <TrendAndDriverCard trendAndDriver={trend} key={trend.uuid} />
+        ))}
       </div>
       <div className={styles.summary}>
         <div className={styles.detailBlock}>

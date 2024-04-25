@@ -61,4 +61,5 @@ export const endpoints = {
     `api/v1/concept/market-size-metric/${marketSizeMetricUuid}`,
   conceptMarketScan: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/market-scan`,
   conceptMarketScanUuid: (marketScanUuid: string) => `api/v1/concept/market-scan/${marketScanUuid}`,
+  conceptTrendAndDriver: (trendAndDriverUuid: string) => `api/v1/concept/trends-and-drivers/${trendAndDriverUuid}`,
 };
