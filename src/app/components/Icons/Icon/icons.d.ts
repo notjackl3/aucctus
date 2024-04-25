@@ -45,6 +45,7 @@ type IconVariant =
   | 'link-external'
   | 'list'
   | 'lock'
+  | 'logout'
   | 'mail'
   | 'message-circle'
   | 'paper-airplane'

@@ -11,11 +11,12 @@ const defaultIconProps = {
 export interface NestedLinkProps {
   to: To;
   onClick?: () => void;
+  icon?: IconVariant;
   title: string;
   locked?: boolean;
 }
 
-const NestedLink: FunctionComponent<NestedLinkProps> = ({ to, title, onClick, locked = false }) => {
+const NestedLink: FunctionComponent<NestedLinkProps> = ({ to, title, icon, onClick, locked = false }) => {
   const searchParams = typeof to === 'string' ? '' : `${to.search}`;
   const path = typeof to === 'string' ? to : `${to.pathname}${searchParams}`;
   const match = useMatch(path);
@@ -29,6 +30,7 @@ const NestedLink: FunctionComponent<NestedLinkProps> = ({ to, title, onClick, lo
       className={`${styles.nestedLink} ${isActive ? styles.active : ''} ${locked ? styles.locked : ''}`}
       aria-disabled={locked}
     >
+      {icon ? <Icon variant="chevronright" {...defaultIconProps} /> : null}
       <span>{title}</span>
       {locked ? <Icon variant="lock" {...defaultIconProps} /> : null}
     </Link>

@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAppDispatch } from '../../../store';
 import { useUserDetails } from '../../../hooks/query/account.hook';
 import { useConcepts } from '../../../hooks/query/concepts.hook';
+import NavButton from './NavButton';
 
 const NavDrawer = () => {
   const { data: { user } = { user: undefined } } = useUserDetails();
@@ -77,16 +78,18 @@ const NavDrawer = () => {
           </div>
           <div className={styles.extras}>
             <NavLink to={AppPath.SettingsAbout} title="Settings" icon="file" />
-          </div>
-          <div className={styles.account}>
-            <img className={styles.avatar} alt="avatar" src={avatar} />
-            <div
-              className={styles.userDetails}
+            <NavButton
+              title="Logout"
+              icon="logout"
               onClick={(e) => {
                 e.preventDefault();
                 dispatch(logout());
               }}
-            >
+            />
+          </div>
+          <div className={styles.account}>
+            <img className={styles.avatar} alt="avatar" src={avatar} />
+            <div className={styles.userDetails}>
               <span>{user?.firstName || ''}</span>
               <span>{user?.email || ''}</span>
             </div>
