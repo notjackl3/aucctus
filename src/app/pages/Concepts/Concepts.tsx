@@ -34,10 +34,10 @@ export const KANBAN_COLUMNS_MAP = ACTIVE_CONCEPT_STATUS_LIST.reduce<ConceptColum
   {} as ConceptColumns
 );
 
-const ACTIVE_VIEW_TABS = (['list', 'kanban'] as IconVariant[]).map((value) => ({
+const ACTIVE_VIEW_TABS = (['list', 'board'] as IconVariant[]).map((value) => ({
   label: (
     <div className={styles.tabLabel}>
-      <Icon variant={value} />
+      <Icon variant={value} height={24} width={24} />
       {value.charAt(0).toUpperCase() + value.slice(1)}
     </div>
   ),
@@ -51,9 +51,9 @@ const Concepts: FunctionComponent = () => {
   const category = (searchParams.get('category') as ConceptCategory) || 'active';
   const status = (searchParams.get('status') as ConceptStatus) || null;
   const page = searchParams.get('page') || '1';
-  const view = searchParams.get('view') || ('list' as 'list' | 'kanban');
+  const view = searchParams.get('view') || ('list' as 'list' | 'board');
 
-  const isKanbanView = view === 'kanban' && category === 'active';
+  const isKanbanView = view === 'board' && category === 'active';
 
   // Fetch concepts based on the search parameters
   const { data, isLoading } = useConcepts(category, status, page);
@@ -93,7 +93,7 @@ const Concepts: FunctionComponent = () => {
   const onTabSelect = useCallback(
     (value: string) => {
       setSearchParams((prev) => {
-        if (value !== 'kanban') {
+        if (value !== 'board') {
           prev.delete('status');
         }
         prev.set('view', value);

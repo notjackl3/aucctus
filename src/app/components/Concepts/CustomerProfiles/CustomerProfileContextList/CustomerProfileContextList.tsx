@@ -31,6 +31,10 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    setList(data);
+  }, [data]);
+
+  useEffect(() => {
     if (!isEditing || !ref.current) return;
 
     const handleClickOutside = (event: MouseEvent) => {
@@ -135,7 +139,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
                   e.stopPropagation();
                 }}
               >
-                <Icon variant="alert" height={20} width={20} />
+                <Icon variant="plus" height={20} width={20} />
               </button>
             </span>
           ) : null}

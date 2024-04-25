@@ -43,10 +43,9 @@
         font-weight: 700;
 
         svg,
-        use {
-          path {
-            stroke: $white;
-          }
+        use,
+        path {
+          stroke: $white;
         }
       }
     }
