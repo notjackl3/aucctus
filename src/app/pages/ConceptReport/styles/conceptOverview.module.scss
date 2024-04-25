@@ -1,20 +1,12 @@
 @use 'src/app/assets/styles/colors.scss' as *;
 @use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .conceptOverview {
   display: flex;
-  position: absolute;
   padding: 2rem 2rem 3rem 2rem;
-  box-sizing: border-box;
   flex-direction: column;
-  align-items: center;
-  position: absolute;
-  left: var(--nav-drawer-width);
-  min-width: 50rem;
-  width: calc(100vw - var(--nav-drawer-width));
-  background: var(--gray-50-bg, #fcfcfd);
-  min-height: 100vh;
+  width: 100%;
 
   &.slideAnimation {
     background-size: cover;
@@ -85,7 +77,6 @@
     flex-wrap: wrap;
 
     .tabs {
-      max-width: 70rem;
       height: 100%;
       width: 100%;
     }

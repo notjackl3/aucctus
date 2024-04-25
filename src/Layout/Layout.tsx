@@ -1,8 +1,8 @@
 import { Navigate, Outlet } from 'react-router-dom';
-import NavDrawer from '../app/components/NavDrawer/NavDrawer';
+import NavDrawer from '../app/components/Navigation/NavDrawer/NavDrawer';
 import { AppPath } from '../routes/routes';
-import styles from '../app/assets/styles/layout.module.scss';
-import { useUserDetails } from '../app/hooks/query/account';
+import styles from './layout.module.scss';
+import { useUserDetails } from '../app/hooks/query/account.hook';
 
 const Layout = () => {
   const { data: userDetails } = useUserDetails();

@@ -1,4 +1,4 @@
-import { ConceptCategory, ConceptStatus } from './typings';
+import { ConceptCategory, ConceptStatus } from './types';
 
 export interface IPageQueryOptions {
   page?: number;
@@ -48,12 +48,17 @@ export const endpoints = {
   conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
   conceptReportRetry: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/retry`,
   conceptOverview: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/overview`,
+  conceptOverviewUuid: (overviewUuid: string) => `api/v1/concept/overview/${overviewUuid}`,
   conceptCustomerProfiles: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/customer-profile`,
-  conceptCustomerProfile: (conceptUuid: string, profile: string) =>
-    `api/v1/concept/${conceptUuid}/customer-profile/${profile}`,
+  conceptCustomerProfileUuid: (customerProfileUuid: string) => `api/v1/concept/customer-profile/${customerProfileUuid}`,
   conceptKeyAssumptions: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/key-assumptions`,
   conceptKeyAssumptionsUuid: (conceptUuid: string, keyAssumptionsUuid: string) =>
     `api/v1/concept/${conceptUuid}/key-assumptions/${keyAssumptionsUuid}`,
+  conceptKeyAssumptionSpecific: (assumptionUuid: string) => `api/v1/concept/key-assumptions/${assumptionUuid}`,
   conceptFinancialProjection: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/financial-projection`,
+  conceptFinancialProjectionUuid: (projectionUuid: string) => `api/v1/concept/financial-projection/${projectionUuid}`,
+  conceptMarketSizeMetric: (marketSizeMetricUuid: string) =>
+    `api/v1/concept/market-size-metric/${marketSizeMetricUuid}`,
   conceptMarketScan: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/market-scan`,
+  conceptMarketScanUuid: (marketScanUuid: string) => `api/v1/concept/market-scan/${marketScanUuid}`,
 };

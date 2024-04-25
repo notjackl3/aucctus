@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { IConceptCreate } from '../../../../libs/api/typings';
+import { IConceptCreate } from '../../../../libs/api/types';
 import { useMutation, useQueryClient } from 'react-query';
 import api from '../../../../libs/api';
 import { useLocation, useNavigate } from 'react-router-dom';

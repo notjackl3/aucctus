@@ -1,15 +1,15 @@
 import { FunctionComponent, useCallback, useState } from 'react';
-import Footer from '../components/Footer';
-import AuthHeader from '../components/AuthHeader';
-import OnboardingIntoSection from '../components/OnboardingIntroSection';
+import Footer from '../components/Auth/Footer/Footer';
+import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
+import OnboardingIntoSection from '../components/Auth/OnboardingIntroSection';
 import styles from '../assets/styles/pages/auth-screens.module.scss';
-import InputField from '../components/InputField';
+import InputField from '../components/Text/InputField/InputField';
 import { validDomain } from '../../libs/utils';
 import { selectAuthStatus } from '../../features/auth/auth.slice';
 import { useSelector } from 'react-redux';
 import { Navigate } from 'react-router-dom';
 import { AppPath } from '../../routes/routes';
-import { useRegisterAccount, useUserDetails } from '../hooks/query/account';
+import { useRegisterAccount, useUserDetails } from '../hooks/query/account.hook';
 
 const OnBoarding: FunctionComponent = () => {
   const { user } = useUserDetails();

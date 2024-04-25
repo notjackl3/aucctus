@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import FeatureIcon from '../../components/FeatureIcon';
+import FeatureIcon from '../../components/Icons/FeatureIcon/FeatureIcon';
 import { AppPath } from '../../../routes/routes';
 import { Link, useNavigate } from 'react-router-dom';
-import Icon from '../../components/Icon/Icon';
+import Icon from '../../components/Icons/Icon/Icon';
 
 const ResetPasswordSuccess: FunctionComponent = () => {
   const navigate = useNavigate();

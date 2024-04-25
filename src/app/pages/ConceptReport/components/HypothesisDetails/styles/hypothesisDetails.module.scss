@@ -1,6 +1,6 @@
 @use 'src/app/assets/styles/colors.scss' as *;
 @use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .hypothesisDetails {
   display: flex;
@@ -34,7 +34,7 @@
       border-radius: 0.75rem 0.75rem 0 0;
       background: $white;
       box-shadow: $shadow-100;
-      border: 1px solid $grey-300;
+      border: 1px solid $grey-200;
       color: $blue-900;
 
       .headerText {
@@ -52,7 +52,7 @@
         align-items: center;
         border-radius: 50%;
         color: $blue-600;
-        background: $blue-50;
+        background: $primary-50;
       }
     }
 
@@ -70,7 +70,7 @@
           align-items: flex-start;
           align-self: stretch;
           table-layout: fixed;
-          border: 1px solid $grey-300;
+          border: 1px solid $grey-200;
           border-bottom: none;
           background: $white;
           box-shadow: $shadow-100;
@@ -91,7 +91,7 @@
             box-sizing: border-box;
             align-items: center;
             border-radius: 0.75rem 0.75rem 0 0;
-            border-bottom: 1px solid $grey-300;
+            border-bottom: 1px solid $grey-200;
             background: var(--gray-50-bg, #fcfcfd);
 
             color: $grey-600;
@@ -116,10 +116,10 @@
               padding: 0.75rem 1.5rem;
               box-sizing: border-box;
               align-items: center;
-              border-bottom: 1px solid $grey-300;
+              border-bottom: 1px solid $grey-200;
 
               &.selected {
-                background: $purple-50;
+                background: $primary-50;
               }
 
               td {
@@ -181,7 +181,7 @@
           border-radius: 0 0 0 0.75rem;
           background: $white;
           box-shadow: $shadow-100;
-          border: 1px solid $grey-300;
+          border: 1px solid $grey-200;
         }
       }
 
@@ -192,7 +192,7 @@
         align-items: flex-start;
         justify-content: flex-start;
         border-radius: 0 0 0.75rem 0;
-        border: 1px solid $grey-300;
+        border: 1px solid $grey-200;
         border-left: none;
       }
     }

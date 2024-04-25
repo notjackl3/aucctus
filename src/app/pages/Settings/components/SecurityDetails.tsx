@@ -1,14 +1,14 @@
 import { FunctionComponent, useMemo, useState } from 'react';
-import RowInfo from '../../../components/RowInfo/RowInfo';
-import InputField from '../../../components/InputField';
+import RowInfo from '../../../components/Container/RowInfo/RowInfo';
+import InputField from '../../../components/Text/InputField/InputField';
 import styles from '../styles/securityDetails.module.scss';
 import { toast } from 'react-toastify';
 import { useMutation } from 'react-query';
 import api from '../../../../libs/api';
 import { defaultToastConfig } from '../../../../libs/toast';
-import { IUserPassword } from '../../../../libs/api/typings';
+import { IUserPassword } from '../../../../libs/api/types';
 import { parseFormError } from '../../../../libs/utils';
-import Icon from '../../../components/Icon/Icon';
+import Icon from '../../../components/Icons/Icon/Icon';
 
 const defaultIconProps = {
   width: 20,

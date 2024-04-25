@@ -1,0 +1,60 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.tablePagination {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  padding: 2px 0.5rem 2px 0.4rem;
+  flex: 1 1 auto;
+
+  .pageContainer {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: center;
+    .page {
+      display: flex;
+      padding: 0.75rem;
+      justify-content: center;
+      align-items: center;
+      color: $grey-600;
+      text-align: center;
+      border-radius: 0.5rem;
+      @include text-medium;
+      font-family: $font-family;
+      border: none;
+      background: none;
+
+      &.active {
+        color: $blue-900;
+      }
+    }
+  }
+
+  .button {
+    display: flex;
+    padding: 0.8rem 0.5rem;
+    box-sizing: border-box;
+    align-items: center;
+    background: none;
+    font-family: $font-family;
+    font-weight: 500;
+    border-radius: 8px;
+    border: 1px solid $grey-200;
+    background: $white;
+    gap: 0.5rem;
+    color: $grey-800;
+    @include text-small;
+
+    &:disabled {
+      visibility: hidden;
+    }
+
+    svg,
+    use {
+      path {
+        stroke: $grey-800;
+      }
+    }
+  }
+}

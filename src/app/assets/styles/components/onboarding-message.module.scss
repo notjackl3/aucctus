@@ -1,3 +1,7 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
+
 .onboardingMessage {
   display: flex;
   width: 35.9375rem;
@@ -31,7 +35,7 @@
     }
 
     .description {
-      color: var(--gray-600-text-secondary, #667085);
+      color: $grey-600;
       /* Text md/Regular */
       font-family: DM Sans;
       font-size: 1rem;

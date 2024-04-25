@@ -8,7 +8,7 @@ export enum AppPath {
   Concept = '/concept',
   ConceptCategory = '/concept',
   ConceptOverview = '/concept/:id/',
-  ConceptCustomerPersona = '/concept/:id/customer-profile',
+  ConceptCustomerProfile = '/concept/:id/customer-profile',
   ConceptFinancialProjection = '/concept/:id/financial-projection',
   ConceptKeyAssumptions = '/concept/:id/key-assumptions',
   ConceptMarketScan = '/concept/:id/market-scan',

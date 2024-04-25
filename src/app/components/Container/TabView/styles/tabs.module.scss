@@ -1,0 +1,42 @@
+.tabView {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  align-self: stretch;
+  align-items: center;
+
+  .tabContainer {
+    align-items: flex-start;
+    align-self: stretch;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    .tabs,
+    .actionButtons {
+      display: flex;
+      align-items: center;
+    }
+
+    .tabs {
+      justify-content: flex-start;
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .actionButtons {
+      display: flex;
+      flex-direction: row;
+      gap: 1rem;
+    }
+  }
+
+  .content {
+    display: flex;
+    height: 100%;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
+}

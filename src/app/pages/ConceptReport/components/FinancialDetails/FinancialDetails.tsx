@@ -1,15 +1,21 @@
 import { FunctionComponent, useMemo } from 'react';
-import styles from './styles/financialDetails.module.scss';
-import Icon from '../../../../components/Icon/Icon';
-import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
-import GeneralBadge from '../../../../components/GeneralBadge';
-import MarketChart from '../../../../components/MarketChart';
-import MarketLegend from '../../../../components/MarketLegend';
-import { formatLargeNumber } from '../../../../../libs/utils';
-import { useQuery } from 'react-query';
+import styles from './financialDetails.module.scss';
+import Icon from '../../../../components/Icons/Icon/Icon';
+import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import GeneralBadge from '../../../../components/Badges/GeneralBadge/GeneralBadge';
+import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
+import MarketLegend from '../../../../components/Legends/MarketLegend';
+import { formatter } from '../../../../../libs/utils';
 import { useParams } from 'react-router-dom';
-import api from '../../../../../libs/api';
 import { getMarketMetricColor, getMarketMetricTitle } from '../../../../../libs/concepts';
+import { useFinancialProjection } from '../../../../hooks/query/concepts.hook';
+import { IMarketSizeMetric } from '../../../../../libs/api/types';
+import { useEditFinancialProjections } from '../../../../hooks/concepts/editable.hook';
+import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
+import MarketSizeProjectionsCard from '../../../../components/Concepts/FinacialProjections/MarketSizeProjectionsCard/MarketSizeProjectionsCard';
+import Loading from '../../../../components/Loading';
+import { useModal } from '../../../../context/modal/ModalContextProvider';
+import ConfirmationModal from '../../../../components/Modal/ConfirmationModal/ConfirmationModal';
 
 const iconDefaultProps = {
   height: 20,
@@ -17,36 +23,41 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
+type MarketMetrics = { [key in IMarketSizeMetric['metricType']]: IMarketSizeMetric };
+
 const FinancialDetails: FunctionComponent = () => {
   const { id: conceptId } = useParams();
+  const { financialProjection } = useFinancialProjection(conceptId || '');
+  const { overview, tamKeyHypothesis, samKeyHypothesis, somKeyHypothesis } = useEditFinancialProjections();
+  const { openModal } = useModal();
 
-  const { data: conceptFinancialData } = useQuery({
-    queryKey: [`concept/${conceptId}/financial-projection`],
-    retry: 1,
-    queryFn: async () => await api.concept.getConceptFinancialProjection(conceptId || ''),
-  });
-
-  const marketMetrics = useMemo(() => {
-    if (!conceptFinancialData || !conceptFinancialData.marketSizeMetrics) {
-      return [];
+  const marketSizeMetric = useMemo(() => {
+    if (!financialProjection) {
+      return undefined;
     }
-    return conceptFinancialData.marketSizeMetrics;
-  }, [conceptFinancialData]);
 
-  const dataTAM = marketMetrics[0];
-  const dataSAM = marketMetrics[1];
-  const dataSOM = marketMetrics[2];
+    const marketSizes = financialProjection.marketSizeMetrics.reduce((acc: Partial<MarketMetrics>, metric) => {
+      acc[metric.metricType] = metric;
+      return acc;
+    }, {});
+
+    return marketSizes as MarketMetrics;
+  }, [financialProjection]);
 
   return (
     <div className={styles.financialDetails}>
       <div className={styles.summary}>
-        <div className={styles.leftColumn}>
-          <div className={styles.detailBlock}>
-            <h2>Overview</h2>
-            <div className={styles.textBlock}>
-              <p>{conceptFinancialData?.overview}</p>
-            </div>
-          </div>
+        <div className={styles.detailBlock}>
+          <h2>Overview</h2>
+          <EditModeSwitcher
+            containerClassName={styles.textBlock}
+            value={overview.value}
+            name="overview"
+            maxLength={overview.validation.maxLength}
+            onChange={overview.handleChange}
+            handleSave={overview.handleSave}
+            handleCancel={overview.handleCancel}
+          />
         </div>
       </div>
       <h2>Potential Market Size</h2>
@@ -56,7 +67,32 @@ const FinancialDetails: FunctionComponent = () => {
           cardClassName={styles.cardStyle}
           isHideFooter
           headerAction={
-            <button className={styles.cardAction} onClick={() => {}} aria-label="Unlock Edit Hypothesis">
+            <button
+              className={styles.cardAction}
+              onClick={() => {
+                openModal(ConfirmationModal, {
+                  title: 'Are you sure?',
+                  subtitle: 'This will unlock the AI generated hypothesis',
+                  actions: [
+                    {
+                      title: 'Unlock',
+                      onClick: () => {
+                        // Unlock the AI generated hypothesis
+                      },
+                      variant: 'primary',
+                    },
+                    {
+                      title: 'Cancel',
+                      onClick: () => {
+                        // Close the modal
+                      },
+                      variant: 'danger',
+                    },
+                  ],
+                });
+              }}
+              aria-label="Unlock Edit Hypothesis"
+            >
               <span>{<Icon variant="lock" {...iconDefaultProps} />}</span>
               AI Generated
             </button>
@@ -64,7 +100,15 @@ const FinancialDetails: FunctionComponent = () => {
         >
           <div className={styles.cardContent}>
             <div className={styles.cardRow}>
-              <span className={styles.rowText}>{dataTAM?.keyHypothesis}</span>
+              <EditModeSwitcher
+                pClassName={styles.rowText}
+                value={tamKeyHypothesis.value}
+                name="keyHypothesis"
+                maxLength={tamKeyHypothesis.validation.maxLength}
+                onChange={tamKeyHypothesis.handleChange}
+                handleSave={tamKeyHypothesis.handleSave}
+                handleCancel={tamKeyHypothesis.handleCancel}
+              />
               <GeneralBadge
                 showBullet
                 badgeClassName={styles.rowBadge}
@@ -73,7 +117,15 @@ const FinancialDetails: FunctionComponent = () => {
               />
             </div>
             <div className={styles.cardRow}>
-              <span className={styles.rowText}>{dataSAM?.keyHypothesis}</span>
+              <EditModeSwitcher
+                pClassName={styles.rowText}
+                value={samKeyHypothesis.value}
+                name="keyHypothesis"
+                maxLength={samKeyHypothesis.validation.maxLength}
+                onChange={samKeyHypothesis.handleChange}
+                handleSave={samKeyHypothesis.handleSave}
+                handleCancel={samKeyHypothesis.handleCancel}
+              />
               <GeneralBadge
                 showBullet
                 badgeClassName={styles.rowBadge}
@@ -82,7 +134,15 @@ const FinancialDetails: FunctionComponent = () => {
               />
             </div>
             <div className={styles.cardRow}>
-              <span className={styles.rowText}>{dataSOM?.keyHypothesis}</span>
+              <EditModeSwitcher
+                pClassName={styles.rowText}
+                value={somKeyHypothesis.value}
+                name="keyHypothesis"
+                maxLength={somKeyHypothesis.validation.maxLength}
+                onChange={somKeyHypothesis.handleChange}
+                handleSave={somKeyHypothesis.handleSave}
+                handleCancel={somKeyHypothesis.handleCancel}
+              />
               <GeneralBadge
                 showBullet
                 badgeClassName={styles.rowBadge}
@@ -97,33 +157,29 @@ const FinancialDetails: FunctionComponent = () => {
         <ConceptDetailCard title="Market Size Projection" cardClassName={styles.paddedCardStyle} isHideFooter>
           <div className={styles.cardMarketContent}>
             <div className={styles.cardLeft}>
-              {marketMetrics.map((metric, i) => (
-                <ConceptDetailCard
-                  key={`key-hypothesis-${i}`}
-                  title={getMarketMetricTitle(metric.metricType)}
-                  cardClassName={styles.cardLeftSytle}
-                  headerAction={<span>{formatLargeNumber(metric.value)}</span>}
-                >
-                  <div className={styles.cardLeftContent}>
-                    <p className={styles.cardBoldText}>{metric?.keyHypothesis}</p>
-                    <p className={styles.cardRegularText}>{metric?.dataPoint}</p>
-                  </div>
-                </ConceptDetailCard>
-              ))}
+              {marketSizeMetric ? (
+                <>
+                  <MarketSizeProjectionsCard metric={marketSizeMetric.TAM} conceptUuid={conceptId || ''} />
+                  <MarketSizeProjectionsCard metric={marketSizeMetric.SAM} conceptUuid={conceptId || ''} />
+                  <MarketSizeProjectionsCard metric={marketSizeMetric.SOM} conceptUuid={conceptId || ''} />
+                </>
+              ) : (
+                <Loading />
+              )}
             </div>
             <div className={styles.cardRight}>
               <MarketChart
-                largeValue={dataTAM?.value}
-                mediumValue={dataSAM?.value}
-                smallValue={dataSOM?.value}
-                chartClass={styles.marketChart}
+                className={styles.marketChart}
+                tam={marketSizeMetric?.TAM?.value || 0}
+                sam={marketSizeMetric?.SAM?.value || 0}
+                som={marketSizeMetric?.SOM?.value || 0}
               />
               <div className={styles.legend}>
-                {marketMetrics.map((metric, i) => (
+                {Object.values(marketSizeMetric || {}).map((metric, i) => (
                   <MarketLegend
                     key={`$market-metrics-legend-${i}`}
                     legendText={getMarketMetricTitle(metric.metricType)}
-                    legendValue={formatLargeNumber(metric.value)}
+                    legendValue={formatter.format(metric.value)}
                     bulletColor={getMarketMetricColor(metric.metricType)}
                   />
                 ))}

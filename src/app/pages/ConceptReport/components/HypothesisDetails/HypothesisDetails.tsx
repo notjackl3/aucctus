@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/hypothesisDetails.module.scss';
-import { IAssumption } from '../../../../../libs/api/typings';
+import { IAssumption } from '../../../../../libs/api/types';
 import {
   createColumnHelper,
   flexRender,
@@ -12,15 +12,14 @@ import {
   getPaginationRowModel,
 } from '@tanstack/react-table';
 import Loading from '../../../../components/Loading';
-import TablePagination from '../../../../components/TablePagination';
+import TablePagination from '../../../../components/Tables/TablePagination';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';
-import AssumptionBadge from '../../../../components/AssumptionBadge';
+import AssumptionBadge from '../../../../components/Badges/AssumptionBadge/AssumptionBadge';
 import { useParams } from 'react-router-dom';
-import QuadrantChart from '../../../../components/QuadrantChart';
 import { getAssumptionActiveHexColor, getAssumptionHexColor } from '../../../../../libs/concepts';
-import GeneralBadge from '../../../../components/GeneralBadge';
-import { ChartPoint } from '../../../../components/QuadrantChart/QuadrantChart';
+import GeneralBadge from '../../../../components/Badges/GeneralBadge/GeneralBadge';
+import QuadrantChart, { ChartPoint } from '../../../../components/Charts/QuadrantChart/QuadrantChart';
 
 const columnHelper = createColumnHelper<IAssumption>();
 

@@ -1,0 +1,45 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
+
+.tooltip {
+  display: flex;
+  position: relative;
+  cursor: pointer;
+  align-items: center;
+
+  .tooltipTip {
+    position: relative;
+    display: flex;
+    border-radius: 4px;
+    left: -0.5rem;
+    padding: 0.5rem;
+    color: $white;
+    background: $black;
+    font-size: 14px;
+    font-family: sans-serif;
+    line-height: 1;
+    width: max-content;
+    max-width: 15rem;
+
+    &::before {
+      content: ' ';
+      left: 0.5rem;
+      border: solid transparent;
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+      border-width: 0.5rem;
+    }
+
+    &.top {
+      position: absolute;
+      bottom: 2rem;
+
+      &::before {
+        top: 100%;
+        border-top-color: $black;
+      }
+    }
+  }
+}

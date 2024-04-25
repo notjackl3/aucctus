@@ -1,6 +1,6 @@
 import { AxiosError, isAxiosError } from 'axios';
-import { IFormError } from './api/typings/avxisi';
 import { isError } from 'react-query';
+import { IFormError } from './api/types';
 
 /** Validate Email
  *
@@ -52,6 +52,13 @@ export const formatter = new Intl.NumberFormat('en-US', {
   currency: 'USD',
   notation: 'compact',
 });
+
+export const formatNumber = (num: number) => {
+  // Ensure num is a number and format it, otherwise return empty string
+  return num.toLocaleString('en-US', {
+    maximumFractionDigits: 0, // Ensure no fractional digits in the formatted output
+  });
+};
 
 export function parseFormError<T = object>(error: unknown | AxiosError) {
   let message = 'Unexpected Error Occurred';

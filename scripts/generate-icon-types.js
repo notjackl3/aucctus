@@ -4,7 +4,7 @@ const path = require('path');
 
 // Specify the path to your SVG sprite file
 const spritePath = path.resolve(__dirname, '../public/assets/icon-sprite.svg');
-const outputPath = path.resolve(__dirname, '../src/app/components/Icon/icons.d.ts');
+const outputPath = path.resolve(__dirname, '../src/app/components/Icons/Icon/icons.d.ts');
 
 // Read the SVG file
 fs.readFile(spritePath, 'utf8', (err, data) => {

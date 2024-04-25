@@ -1,36 +1,20 @@
-import { FunctionComponent, useMemo, useState } from 'react';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
 import {
   ColumnFiltersState,
   FilterFn,
-  createColumnHelper,
   flexRender,
   RowSelectionState,
   getFilteredRowModel,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { dateCellFormatter } from '../../../../libs/utils';
-import TableCheckBox from '../../../components/TableCheckBox';
-import { IConcept } from '../../../../libs/api/typings';
+import { IConcept } from '../../../../libs/api/types';
 import { rankItem } from '@tanstack/match-sorter-utils';
-
 import styles from '../styles/concepts.module.scss';
-import ConceptStatusBubble from '../../../components/ConceptStatusBubble';
-import ConceptMenu from '../../../components/ConceptMenu';
-import Icon from '../../../components/Icon/Icon';
 import Loading from '../../../components/Loading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../../routes/routes';
-import ConceptRowButton from './ConceptRowButton';
-import useConceptMenu from '../../../components/ConceptMenu/hooks/useConceptMenu';
-
-const columnHelper = createColumnHelper<IConcept>();
-
-const defaultIconProps = {
-  stroke: '#B4BDD0',
-  width: 24,
-  height: 24,
-};
+import { useConceptTableColumns } from '../columns.hook';
 
 interface IConceptTableProps {
   data: IConcept[];
@@ -39,10 +23,33 @@ interface IConceptTableProps {
 
 const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }) => {
   const navigate = useNavigate();
-  const { updateConceptStatus, retryConceptReport } = useConceptMenu({ conceptId: '' });
+  const [openPopupMenuId, setOpenPopupMenuId] = useState<string | undefined>();
+  const menuRef = useRef<HTMLDivElement>(null);
+  const columns = useConceptTableColumns(menuRef, setOpenPopupMenuId, openPopupMenuId);
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
-  const [openPopupMenuId, setOpenPopupMenuId] = useState('');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+
+  useEffect(() => {
+    if (!openPopupMenuId) {
+      return;
+    }
+
+    const handleKeyDown = () => {
+      setOpenPopupMenuId(undefined);
+    };
+
+    const handleMouseDown = (event: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setOpenPopupMenuId(undefined);
+      }
+    };
+
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [openPopupMenuId]);
 
   const fuzzyFilter: FilterFn<IConcept> = (row, columnId, value, addMeta) => {
     const itemRank = rankItem(row.getValue(columnId), value);
@@ -51,127 +58,6 @@ const ConceptTable: FunctionComponent<IConceptTableProps> = ({ data, isLoading }
     });
     return itemRank.passed;
   };
-
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor((row) => row?.status, {
-        id: 'select',
-        size: 50,
-        header: ({ table }) => (
-          <TableCheckBox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: (event) => {
-                table.getToggleAllPageRowsSelectedHandler()(event);
-              },
-            }}
-          />
-        ),
-        cell: ({ row }) => {
-          return (
-            <TableCheckBox
-              {...{
-                checked: row.getIsSelected(),
-                disabled: !row.getCanSelect(),
-                indeterminate: row.getIsSomeSelected(),
-                onChange: (e) => {
-                  e.stopPropagation();
-                  row.getToggleSelectedHandler()(e);
-                },
-                onClick: (e) => {
-                  e.stopPropagation();
-                },
-              }}
-            />
-          );
-        },
-      }),
-      columnHelper.accessor('title', {
-        id: 'title',
-        header: () => <span className={styles.details}>Concept</span>,
-        size: 190,
-        minSize: 190,
-        cell: (info) => <div className={styles.company}>{info.getValue()}</div>,
-      }),
-      columnHelper.accessor((row) => row?.description, {
-        id: 'description',
-        cell: (info) => (
-          <span style={{ flexGrow: 1 }} className={styles.cellDescription}>
-            {info.getValue()}
-          </span>
-        ),
-        size: 200,
-        minSize: 200,
-        header: () => <div style={{ flexGrow: 1 }}>Description</div>,
-      }),
-      columnHelper.accessor((row) => row.updatedAt, {
-        id: 'updatedAt',
-        size: 110,
-        minSize: 110,
-        cell: (info) => dateCellFormatter(info.getValue()),
-        header: () => <span>Last Modified</span>,
-      }),
-      columnHelper.accessor((row) => row?.status, {
-        id: 'status',
-        size: 200,
-        minSize: 200,
-        header: () => <span>Status</span>,
-        cell: (info) => (
-          <span>
-            <ConceptStatusBubble status={info.getValue()} />
-          </span>
-        ),
-      }),
-      columnHelper.accessor((row) => row.reportStatus, {
-        id: 'reportStatus',
-        cell: ({ row }) => (
-          <ConceptRowButton
-            variant={row.original.reportStatus}
-            onClick={(e) => {
-              const reportStatus = row.original.reportStatus;
-              if (reportStatus === 'notStarted') {
-                updateConceptStatus('ideating', row.original.uuid);
-              } else if (reportStatus === 'error') {
-                retryConceptReport(row.original.uuid);
-              }
-              if (reportStatus !== 'complete') {
-                e.stopPropagation();
-              }
-            }}
-          />
-        ),
-        minSize: 120,
-        size: 120,
-        header: () => {},
-      }),
-      columnHelper.accessor((row) => row?.uuid, {
-        id: 'uuid',
-        minSize: 30,
-        size: 30,
-        header: () => {},
-        cell: (info) => (
-          <span className={styles.conceptMenu}>
-            <button
-              className={styles.button}
-              onClick={(e) => {
-                setOpenPopupMenuId(info.getValue() === openPopupMenuId ? '' : info.getValue());
-                e.stopPropagation();
-              }}
-            >
-              <Icon variant="dots-vertical" {...defaultIconProps} />
-            </button>
-            {info?.getValue() === openPopupMenuId && (
-              <span className={styles.popupMenu}>
-                <ConceptMenu conceptId={openPopupMenuId} clearConceptMenuId={() => setOpenPopupMenuId('')} />
-              </span>
-            )}
-          </span>
-        ),
-      }),
-    ],
-    [openPopupMenuId, retryConceptReport, updateConceptStatus]
-  );
 
   const table = useReactTable({
     getRowId: (row) => row.uuid,

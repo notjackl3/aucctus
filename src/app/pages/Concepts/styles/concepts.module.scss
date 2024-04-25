@@ -1,20 +1,14 @@
 @use 'src/app/assets/styles/colors.scss' as *;
 @use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .contentList {
   display: flex;
+  flex-direction: column;
   padding: 2rem 2rem 3rem 2rem;
   box-sizing: border-box;
-  flex-direction: column;
-  align-items: flex-start;
-  position: absolute;
-  left: var(--nav-drawer-width);
-  min-width: 63rem;
-  width: calc(100vw - var(--nav-drawer-width));
-  background: var(--gray-50-bg, #fcfcfd);
-  height: 100%;
-  overflow-y: scroll;
+
+  width: 100%;
 
   .headerSection {
     display: flex;
@@ -61,7 +55,7 @@
   .tabs {
     display: flex;
     margin-bottom: 0.5rem;
-    max-width: 100rem;
+    // max-width: 100rem;
     width: 100%;
 
     .tabLabel {
@@ -88,7 +82,7 @@
       border-radius: 0.75rem 0.75rem 0 0;
       background: $white;
       box-shadow: $shadow-100;
-      border: 1px solid $grey-300;
+      border: 1px solid $grey-200;
 
       .filters {
         gap: 1rem;
@@ -114,7 +108,7 @@
       align-self: stretch;
       table-layout: fixed;
       width: 100%;
-      border: 1px solid $grey-300;
+      border: 1px solid $grey-200;
       border-bottom: none;
       background: $white;
 
@@ -137,7 +131,7 @@
         box-sizing: border-box;
         align-items: center;
         border-radius: 0.75rem 0.75rem 0 0;
-        border-bottom: 1px solid $grey-300;
+        border-bottom: 1px solid $grey-200;
         background: var(--gray-50-bg, #fcfcfd);
 
         color: $grey-600;
@@ -162,7 +156,7 @@
           padding: 0.75rem 1.5rem;
           box-sizing: border-box;
           align-items: flex-start;
-          border-bottom: 1px solid $grey-300;
+          border-bottom: 1px solid $grey-200;
 
           td {
             display: flex;
@@ -182,11 +176,11 @@
 
             .openButton {
               min-width: 3.5rem;
-              color: $grey-700;
+              color: $grey-800;
               font-family: $font-family;
               font-size: 0.875rem;
               font-weight: 400;
-              border: 1px solid $grey-300;
+              border: 1px solid $grey-200;
               padding: 0.5rem;
               box-sizing: border-box;
               border-radius: 0.5rem;
@@ -244,7 +238,7 @@
       border-radius: 0 0 0.75rem 0.75rem;
       background: $white;
       box-shadow: $shadow-100;
-      border: 1px solid $grey-300;
+      border: 1px solid $grey-200;
       border-top: none;
     }
   }

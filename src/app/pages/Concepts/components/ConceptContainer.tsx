@@ -1,11 +1,11 @@
 import { FunctionComponent } from 'react';
 
 import styles from '../styles/concepts.module.scss';
-import StatusButton from '../../../components/StatusButton';
+import StatusButton from '../../../components/Buttons/StatusButton/StatusButton';
 import { camelCaseToTitleCase } from '../../../../libs/utils';
 import { CONCEPT_STATUS_LIST_MAP } from '../Concepts';
-import TablePagination from '../../../components/TablePagination';
-import { ConceptCategory, ConceptStatus } from '../../../../libs/api/typings';
+import TablePagination from '../../../components/Tables/TablePagination';
+import { ConceptCategory, ConceptStatus } from '../../../../libs/api/types';
 
 interface IConceptContainerProps {
   children?: React.ReactNode;

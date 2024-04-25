@@ -5,7 +5,7 @@ import {
   ConceptStatus,
   DraftConceptStatus,
   MarketMetricType,
-} from './api/typings';
+} from './api/types';
 
 export const CONCEPT_STATUS_LIST: ConceptStatus[] = [
   'new',
@@ -59,10 +59,10 @@ type AssumptionHexColor = '#7839EE' | '#0E9384' | '#088AB2' | '#155EEF';
  */
 export function getAssumptionActiveHexColor(assumption: AssumptionType): AssumptionHexColor {
   const assumptionColorObj: Record<AssumptionType, AssumptionHexColor> = {
-    [AssumptionType.desirability]: '#7839EE',
-    [AssumptionType.viability]: '#0E9384',
-    [AssumptionType.feasibility]: '#088AB2',
-    [AssumptionType.adaptability]: '#155EEF',
+    desirability: '#7839EE',
+    viability: '#0E9384',
+    feasibility: '#088AB2',
+    adaptability: '#155EEF',
   };
 
   return assumptionColorObj[assumption];
@@ -78,10 +78,10 @@ type AssumptionBackgroundHexColor = '#ECE9FE' | '#CCFBEF' | '#CFF9FE' | '#D1E0FF
  */
 export function getAssumptionHexColor(assumption: AssumptionType): AssumptionBackgroundHexColor {
   const assumptionColorObj: Record<AssumptionType, AssumptionBackgroundHexColor> = {
-    [AssumptionType.desirability]: '#ECE9FE',
-    [AssumptionType.viability]: '#CCFBEF',
-    [AssumptionType.feasibility]: '#CFF9FE',
-    [AssumptionType.adaptability]: '#D1E0FF',
+    desirability: '#ECE9FE',
+    viability: '#CCFBEF',
+    feasibility: '#CFF9FE',
+    adaptability: '#D1E0FF',
   };
 
   return assumptionColorObj[assumption];

@@ -1,12 +1,12 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import InputField from '../../components/InputField';
-import FeatureIcon from '../../components/FeatureIcon';
+import InputField from '../../components/Text/InputField/InputField';
+import FeatureIcon from '../../components/Icons/FeatureIcon/FeatureIcon';
 import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
 import { Link } from 'react-router-dom';
-import Icon from '../../components/Icon/Icon';
-import { useRequestPasswordReset } from '../../hooks/query/auth';
+import Icon from '../../components/Icons/Icon/Icon';
+import { useRequestPasswordReset } from '../../hooks/query/auth.hook';
 
 const ForgotPassword: FunctionComponent = () => {
   const [email, setEmail] = useState('');

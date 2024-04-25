@@ -1,14 +1,14 @@
 import { FunctionComponent, useMemo, useState } from 'react';
-import RowInfo from '../../../components/RowInfo/RowInfo';
-import InputField from '../../../components/InputField';
+import RowInfo from '../../../components/Container/RowInfo/RowInfo';
+import InputField from '../../../components/Text/InputField/InputField';
 import styles from '../styles/aboutDetails.module.scss';
 import Select, { StylesConfig } from 'react-select';
 import defaultAvatar from '../../../assets/avatar.svg';
-import Icon from '../../../components/Icon/Icon';
+import Icon from '../../../components/Icons/Icon/Icon';
 import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading';
-import { IUser } from '../../../../libs/api/typings';
-import { useUpdateUser, useUserDetails } from '../../../hooks/query/account';
+import { IUser } from '../../../../libs/api/types';
+import { useUpdateUser, useUserDetails } from '../../../hooks/query/account.hook';
 
 const defaultIconProps = {
   width: 20,

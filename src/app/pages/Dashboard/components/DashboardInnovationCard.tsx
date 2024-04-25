@@ -1,14 +1,14 @@
 import { FunctionComponent, useMemo } from 'react';
 
 import styles from '../styles/dashboard.module.scss';
-import ConceptDetailCard from '../../../components/ConceptDetailCard/ConceptDetailCard';
-import ConceptStatistic from '../../../components/ConceptStatistic';
+import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptStatistic from '../../../components/Badges/ConceptStatistic';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
   getDashboardConceptStatusIcon,
   getDashboardConceptStatusIconColor,
 } from '../../../../libs/concepts';
-import { ActiveConceptStatus, IConceptDetails } from '../../../../libs/api/typings';
+import { ActiveConceptStatus, IConceptDetails } from '../../../../libs/api/types';
 
 const ConceptTitle: Record<ActiveConceptStatus, string> = {
   prototyping: 'Concepts Generated',

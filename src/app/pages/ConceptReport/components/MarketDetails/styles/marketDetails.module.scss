@@ -1,6 +1,6 @@
 @use 'src/app/assets/styles/colors.scss' as *;
 @use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .marketDetails {
   display: flex;
@@ -50,7 +50,7 @@
 
     .cardStyle {
       width: 100%;
-      max-width: 70rem;
+      // max-width: 70rem;
       h4 {
         color: $blue-900;
         @include text-large;
@@ -109,7 +109,7 @@
         align-items: center;
         justify-content: space-between;
         color: $blue-900;
-        border-bottom: 1px solid $grey-300;
+        border-bottom: 1px solid $grey-200;
 
         cursor: pointer;
 

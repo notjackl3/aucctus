@@ -1,0 +1,61 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
+
+.footer,
+.row {
+  display: flex;
+  flex-direction: row;
+}
+
+.footer {
+  height: 96px;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding-left: var(--padding-13xl);
+  padding-right: var(--padding-13xl);
+  padding-top: var(--padding-xs);
+  padding-bottom: var(--padding-xs);
+  box-sizing: border-box;
+  text-align: left;
+  font-size: var(--text-sm-regular-size);
+  color: var(--gray-600-text-secondary);
+  font-family: $font-family;
+  align-self: stretch;
+
+  a,
+  .text {
+    position: relative;
+    line-height: 20px;
+    font-size: var(--text-sm-regular-size) !important;
+    color: var(--gray-600-text-secondary) !important;
+    font-family: var(--text-sm-regular) !important;
+  }
+
+  a {
+    text-decoration: none !important;
+  }
+
+  .row {
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--gap-5xs);
+
+    svg,
+    use {
+      position: relative;
+      width: 16px;
+      height: 16px;
+      overflow: hidden;
+      flex-shrink: 0;
+    }
+  }
+}
+
+@media screen and (max-width: 641px) {
+  .footer {
+    flex-wrap: wrap-reverse;
+    justify-content: center;
+    gap: var(--padding-base);
+  }
+}

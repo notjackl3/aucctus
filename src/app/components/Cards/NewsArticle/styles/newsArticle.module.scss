@@ -1,0 +1,60 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.newsArticle {
+  display: flex;
+  padding: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-radius: 0.75rem;
+  border: 1px solid $grey-200;
+  background: $white;
+  gap: 0.5rem;
+
+  .image {
+    display: flex;
+    width: 10rem;
+    height: 6rem;
+    border-radius: 0.5rem;
+    align-self: flex-start;
+  }
+
+  .description {
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    flex: 1;
+    text-align: start;
+    gap: 0.5rem;
+
+    .header {
+      display: flex;
+      align-self: stretch;
+      justify-content: space-between;
+      .title {
+        color: $blue-900;
+        @include text-medium;
+        font-family: $font-family;
+      }
+
+      .link {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .text {
+    overflow: hidden;
+    color: $grey-600;
+    @include text-medium;
+    font-family: $font-family;
+
+    &.textOverflow {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+}

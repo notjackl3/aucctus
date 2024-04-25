@@ -1,6 +1,6 @@
 @use 'src/app/assets/styles/colors.scss' as *;
 @use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .customerDetails {
   display: flex;
@@ -97,23 +97,6 @@
       align-items: flex-start;
       gap: 1rem;
       align-self: stretch;
-      .list {
-        svg,
-        use {
-          min-width: 1.5rem;
-          margin-top: 0.25rem;
-          align-self: flex-start;
-          path {
-            stroke: $blue-900;
-          }
-        }
-        p {
-          display: flex;
-          align-items: flex-start;
-          margin-bottom: 1rem;
-          gap: 0.5rem;
-        }
-      }
     }
   }
 
@@ -121,35 +104,5 @@
     display: flex;
     gap: 1rem;
     flex-wrap: wrap;
-
-    .customerCards {
-      max-width: 19rem;
-    }
-
-    .cardContent {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      width: 100%;
-
-      .text {
-        display: flex;
-        min-height: 4rem;
-        width: 100%;
-        padding: 1rem 1.5rem;
-        box-sizing: border-box;
-        align-items: center;
-        justify-content: flex-start;
-        color: $blue-900;
-        border-bottom: 1px solid $grey-300;
-        color: $blue-900;
-        @include body-100;
-        font-family: $font-family;
-
-        &:last-child {
-          border-bottom: none;
-        }
-      }
-    }
   }
 }

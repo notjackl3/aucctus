@@ -1,13 +1,13 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/dashboard.module.scss';
-import Icon from '../../components/Icon/Icon';
+import Icon from '../../components/Icons/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
-import ConceptDetailCard from '../../components/ConceptDetailCard/ConceptDetailCard';
-import ConceptBarChart from '../../components/ConceptBarChart';
+import ConceptDetailCard from '../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptBarChart from '../../components/Charts/ConceptBarChart';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import DashboardInnovationCard from './components/DashboardInnovationCard';
-import { useDashboard, useUserDetails } from '../../hooks/query/account';
+import { useDashboard, useUserDetails } from '../../hooks/query/account.hook';
 
 const defaultIconProps = {
   stroke: '#2B3674',

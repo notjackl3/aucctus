@@ -1,6 +1,6 @@
 @use 'src/app/assets/styles/typography.scss' as *;
 @use 'src/app/assets/styles/colors.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .dashboard {
   display: flex;
@@ -99,7 +99,7 @@
       .goalText {
         height: 100%;
 
-        color: var(--gray-600-text-secondary, #667085);
+        color: $grey-600;
         /* Text md/Regular */
         font-size: 1rem;
         font-style: normal;

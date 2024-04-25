@@ -5,10 +5,10 @@ import {
   ISignUpRequest,
   IToken,
   IUpdateForgottenPasswordRequest,
-} from './typings';
+} from './types';
 import { ApiService } from './apiService';
 import { endpoints } from './endpoints';
-import { IMessageResponse } from './typings/avxisi';
+import { IMessageResponse } from './types';
 
 export class AuthApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = true;

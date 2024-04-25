@@ -11,8 +11,9 @@ import {
   ICustomerProfile,
   IFinancialProjection,
   IMarketScan,
-} from './typings'; // Import the missing type
-import { IPageResponse } from './typings/avxisi';
+  IMarketSizeMetric,
+} from './types'; // Import the missing type
+import { IPageResponse } from './types';
 
 /**
  * Concept API
@@ -60,12 +61,27 @@ export class ConceptApi extends ApiService {
     return this.get<IConceptOverview>(endpoints.conceptOverview(uuid));
   }
 
+  updateConceptOverview(uuid: string, overview: Partial<IConceptOverview>) {
+    return this.patch<IConceptOverview, Partial<IConceptOverview>>(endpoints.conceptOverviewUuid(uuid), overview);
+  }
+
   getConceptCustomerProfiles(uuid: string) {
     return this.get<IPageResponse<ICustomerProfile>>(endpoints.conceptCustomerProfiles(uuid));
   }
 
-  getConceptCustomerProfile(uuid: string, profile: string) {
-    return this.get<ICustomerProfile>(endpoints.conceptCustomerProfile(uuid, profile));
+  getConceptCustomerProfile(customerProfileUuid: string) {
+    return this.get<ICustomerProfile>(endpoints.conceptCustomerProfileUuid(customerProfileUuid));
+  }
+
+  updateConceptCustomerProfile(customerProfileUuid: string, data: Partial<ICustomerProfile>) {
+    return this.patch<ICustomerProfile, Partial<ICustomerProfile>>(
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+      data
+    );
+  }
+
+  deleteConceptCustomerProfile(customerProfileUuid: string) {
+    return this.delete<ICustomerProfile>(endpoints.conceptCustomerProfileUuid(customerProfileUuid));
   }
 
   getConceptKeyAssumptions(uuid: string) {
@@ -76,11 +92,31 @@ export class ConceptApi extends ApiService {
     return this.patch<IAssumption, Partial<IAssumption>>(endpoints.conceptKeyAssumptionsUuid(uuid, keyAssumptionsUuid));
   }
 
+  updateConceptKeyAssumptions(uuid: string, data: Partial<IAssumption>) {
+    return this.patch<IAssumption, Partial<IAssumption>>(endpoints.conceptKeyAssumptionSpecific(uuid), data);
+  }
+
   getConceptFinancialProjection(uuid: string) {
     return this.get<IFinancialProjection>(endpoints.conceptFinancialProjection(uuid));
   }
 
+  updateConceptFinancialProjection(uuid: string, data: Partial<IFinancialProjection>) {
+    return this.patch<IFinancialProjection, Partial<IFinancialProjection>>(
+      endpoints.conceptFinancialProjectionUuid(uuid),
+      data
+    );
+  }
+
+  updateMarketMetricSize(uuid: string, data: Partial<IMarketSizeMetric>) {
+    console.log('## updateMarketMetricSize', uuid, data);
+    return this.patch<IMarketSizeMetric, Partial<IMarketSizeMetric>>(endpoints.conceptMarketSizeMetric(uuid), data);
+  }
+
   getConceptMarketScan(uuid: string) {
     return this.get<IMarketScan>(endpoints.conceptMarketScan(uuid));
+  }
+
+  updateConceptMarketScan(uuid: string, data: Partial<IMarketScan>) {
+    return this.patch<IMarketScan, Partial<IMarketScan>>(endpoints.conceptMarketScanUuid(uuid), data);
   }
 }

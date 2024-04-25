@@ -1,6 +1,6 @@
 import { ApiService } from './apiService';
 import { endpoints } from './endpoints';
-import { IConceptGenerate, IConceptGenerateResponse } from './typings'; // Import the missing type
+import { IConceptGenerate, IConceptGenerateResponse } from './types'; // Import the missing type
 
 /**
  * Concept Ignite API

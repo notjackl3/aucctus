@@ -1,8 +1,8 @@
 import React, { FunctionComponent } from 'react';
 import styles from './styles/igniteConcept.module.scss';
 import IgniteLoading from '../../components/IgniteLoading';
-import IgniteForm from '../../components/IgniteForm';
-import TextArea from '../../components/TextArea';
+import IgniteForm from '../../components/Forms/IgniteForm/IgniteForm';
+import TextArea from '../../components/Text/TextArea/TextArea';
 import useIgniteConcept from './hooks/useIgniteConcept';
 
 const IgniteConcept: FunctionComponent = () => {

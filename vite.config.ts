@@ -27,6 +27,15 @@ export default defineConfig({
     }),
     compression({ algorithm: 'brotliCompress' }), // Or 'gzip'
   ],
+  css: {
+    preprocessorOptions: {
+      scss: {
+        additionalData: `$injectedColor: red;`,
+        includePaths: [path.resolve(__dirname, './src')],
+      },
+    },
+  },
+
   resolve: {
     alias: {
       '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
@@ -36,9 +45,6 @@ export default defineConfig({
     outDir: 'build',
     sourcemap: false, // Consider disabling in production
     minify: 'terser',
-    rollupOptions: {
-      external: ['icons/*', 'vite', 'scripts'],
-    },
     terserOptions: {
       compress: {
         drop_console: true, // Remove console logs in production

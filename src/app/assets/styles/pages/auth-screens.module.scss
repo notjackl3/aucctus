@@ -1,6 +1,6 @@
 @use 'src/app/assets/styles/colors.scss' as *;
 @use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .authContainer {
   display: flex;
@@ -13,7 +13,7 @@
   .error {
     font-size: var(--h3-size);
     line-height: 1.5rem;
-    color: var(--red-900-text-error);
+    color: $red-300;
     text-align: center;
     transition: all 1s ease-in;
   }
@@ -119,7 +119,7 @@
         border-radius: var(--br-xs);
         gap: var(--gap-13xl);
         font-size: var(--text-sm-regular-size);
-        color: var(--type-tertiary);
+        color: $grey-600;
         margin-bottom: var(--gap-13xl);
 
         .inputGroup {
@@ -165,7 +165,7 @@
       line-height: 1.25rem;
 
       svg {
-        stroke: var(--gray-600-text-secondary, #667085);
+        stroke: $grey-600;
       }
     }
 
@@ -192,7 +192,7 @@
   // TODO: hide into section on smaller screens
   .intoSection {
     flex: 1;
-    background-color: var(--gray-200-row-header);
+    background-color: $grey-200;
     overflow: hidden;
     // overflow-y: visible;
     gap: var(--gap-base);
@@ -317,7 +317,7 @@
 
     h1 {
       width: 35.9375rem;
-      color: #2b3674;
+      color: $blue-900;
 
       font-family: $font-family;
       font-size: 2.25rem;

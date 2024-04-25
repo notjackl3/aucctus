@@ -8,7 +8,7 @@ import {
   IUser,
   IUserDetailsResponse,
   IUserPassword,
-} from './typings'; // Import the missing type
+} from './types'; // Import the missing type
 
 /**
  * Account API

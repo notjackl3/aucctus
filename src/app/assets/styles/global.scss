@@ -4,6 +4,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap');
 @import '~bootstrap/scss/bootstrap';
 @import './typography.scss';
+@import './colors.scss';
 
 html {
   scroll-behavior: smooth;
@@ -22,6 +23,9 @@ body {
 body {
   height: 100vh;
   width: 100vw;
+}
+.App {
+  position: relative;
 }
 
 h1,
@@ -62,10 +66,11 @@ button.btn {
   /* Shadow/xs */
   box-shadow: var(--shadow-xs) !important;
 
-  color: var(--type-tertiary);
+  color: $grey-600;
   svg,
-  use {
-    stroke: var(--type-tertiary) !important;
+  use,
+  path {
+    stroke: $grey-600 !important;
   }
 
   &.btn-primary {
@@ -74,7 +79,8 @@ button.btn {
     white-space: nowrap;
     color: var(--base-white, #fff);
     svg,
-    use {
+    use,
+    path {
       stroke: var(--base-white, #fff) !important;
     }
   }
@@ -85,8 +91,9 @@ button.btn {
     &,
     &.disabled,
     svg,
-    use {
-      color: var(--type-tertiary) !important;
+    use,
+    path {
+      color: $grey-600 !important;
     }
   }
 
@@ -98,7 +105,8 @@ button.btn {
     &,
     &.disabled,
     svg,
-    use {
+    use,
+    path {
       color: var(--primary-600-primary, #4318ff) !important;
     }
   }
@@ -110,7 +118,8 @@ button.btn {
     &,
     &.disabled,
     svg,
-    use {
+    use,
+    path {
       path {
         stroke: var(--primary-600-primary, #4318ff) !important;
       }
@@ -209,7 +218,7 @@ input {
       box-shadow: var(--shadow-xs) !important;
       border: 1px solid var(--gray-300-outline, #e0e5f2);
       background: var(--base-white, #fff);
-      color: var(--type-tertiary);
+      color: $grey-600;
     }
   }
 }

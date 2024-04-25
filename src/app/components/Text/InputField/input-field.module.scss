@@ -1,0 +1,145 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+
+.inputField {
+  align-self: stretch;
+  display: inline-block;
+  position: relative;
+  transition: all 0.3s ease;
+
+  &.inputFieldError {
+    input,
+    textarea {
+      border: 1px solid $red-300 !important;
+      outline: $red-300 !important;
+    }
+
+    .label {
+      font-weight: 700;
+    }
+
+    .hintText,
+    .label {
+      color: $red-300 !important;
+    }
+  }
+
+  .label {
+    position: relative;
+    line-height: 1.25rem;
+    font-weight: 500;
+    margin-bottom: var(--gap-7xs);
+    color: var(--gray-900-text-primary, #2b3674);
+  }
+
+  input,
+  textarea {
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+
+    padding: var(--padding-3xs) var(--padding-sm);
+    color: var(--gray-900-text-primary);
+
+    font-family: $font-family;
+    font-style: normal;
+    font-size: var(--h3-size);
+    font-weight: 400;
+    line-height: 1.5rem;
+
+    border-radius: var(--br-5xs);
+    background-color: $white;
+    box-shadow: var(--shadow-xs);
+    border: 1px solid var(--gray-300-outline);
+
+    ::placeholder {
+      color: var(--gray-400-placeholder, #b4bdd0) !important;
+    }
+
+    &.disableResize {
+      resize: none;
+    }
+  }
+
+  .characterCount {
+    position: absolute;
+    right: 1rem;
+    bottom: 0.5rem;
+    color: var(--gray-600-text-secondary);
+    font-size: var(--text-small-size);
+
+    &.error {
+      color: $red-300;
+    }
+  }
+
+  .hintText {
+    align-self: stretch;
+  }
+
+  .hintText {
+    position: relative;
+    line-height: 1.25rem;
+    color: var(--gray-600-text-secondary);
+  }
+}
+
+.inputFieldSettings {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1 1 auto;
+  max-width: 25rem;
+  .label {
+    color: var(--Gray-700---Text-Tertiary, #626ba3);
+    @include text-small;
+    font-family: $font-family;
+  }
+
+  &.inputFieldError {
+    .hintText,
+    .label {
+      color: $red-300 !important;
+    }
+  }
+
+  .icon {
+    display: flex;
+    position: absolute;
+    right: 1rem;
+    top: 0.9rem;
+    padding: 0;
+    background: none;
+    border: none;
+  }
+
+  input {
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    padding: var(--padding-3xs) var(--padding-sm);
+    color: var(--Gray-500---Resting-Icons, var(--Color-Grey-Grey-500, #7586a9));
+    @include text-medium;
+    font-family: $font-family;
+    border-radius: var(--br-5xs);
+    box-shadow: var(--shadow-xs);
+    border: 1px solid var(--gray-300-outline);
+
+    ::placeholder {
+      color: var(--gray-400-placeholder, #b4bdd0) !important;
+    }
+
+    &:disabled {
+      background: none;
+    }
+  }
+
+  .hintText {
+    color: var(--colors-text-text-tertiary-600, #475467);
+    @include text-small;
+  }
+}

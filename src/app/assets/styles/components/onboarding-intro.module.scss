@@ -1,6 +1,6 @@
 @use 'src/app/assets/styles/typography.scss' as *;
 @use 'src/app/assets/styles/colors.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .introSection {
   display: flex;
@@ -8,7 +8,7 @@
   align-items: flex-start;
   justify-content: flex-start;
   flex: 1;
-  background-color: var(--gray-200-row-header);
+  background-color: $grey-200;
   overflow: hidden;
   gap: var(--gap-base);
   text-align: left;

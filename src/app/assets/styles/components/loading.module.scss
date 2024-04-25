@@ -1,3 +1,7 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
+
 .bouncingDots {
   display: flex;
   flex-direction: row;
@@ -36,7 +40,7 @@
 
     66% {
       transform: none;
-      color: var(--type-tertiary);
+      color: $grey-600;
     }
   }
 }

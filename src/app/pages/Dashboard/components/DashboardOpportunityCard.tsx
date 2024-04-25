@@ -1,17 +1,17 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 
 import styles from '../styles/dashboard.module.scss';
-import ConceptDetailCard from '../../../components/ConceptDetailCard/ConceptDetailCard';
-import ConceptStatistic from '../../../components/ConceptStatistic';
-import { camelCaseToTitleCase, formatLargeNumber } from '../../../../libs/utils';
+import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptStatistic from '../../../components/Badges/ConceptStatistic';
+import { camelCaseToTitleCase, formatter } from '../../../../libs/utils';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
   ConceptStatusIconColor,
   getDashboardConceptStatusIcon,
   getDashboardConceptStatusIconColor,
 } from '../../../../libs/concepts';
-import { ActiveConceptStatus, IConceptDetails } from '../../../../libs/api/typings';
-import { IConceptStatisticProps } from '../../../components/ConceptStatistic/ConceptStatistic';
+import { ActiveConceptStatus, IConceptDetails } from '../../../../libs/api/types';
+import { IConceptStatisticProps } from '../../../components/Badges/ConceptStatistic/ConceptStatistic';
 
 export interface OpportunityData {
   infoTitle: string;
@@ -44,7 +44,7 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
         infoTitle: camelCaseToTitleCase(status),
         icon: getDashboardConceptStatusIcon(status),
         somValue: somValue,
-        infoValue: formatLargeNumber(somValue),
+        infoValue: formatter.format(somValue),
         iconColor: getDashboardConceptStatusIconColor(status),
         variant: 'opportunity',
         conceptCount: conceptCount,
@@ -116,7 +116,7 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
         <div className={styles.opportunityFooter}>
           <ConceptStatistic
             infoTitle="Total Potential Opportunity"
-            infoValue={formatLargeNumber(summationObj.totalSomValue)}
+            infoValue={formatter.format(summationObj.totalSomValue)}
             infoSubValue={`${summationObj.totalConceptCount} concepts`}
             icon="shield-dollar"
             iconColor="purple"

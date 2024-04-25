@@ -5,7 +5,7 @@ import { AccountApi } from './account';
 import analytics from '../analytics';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
-import { ITokenResponse } from './typings';
+import { ITokenResponse } from './types';
 import { toast } from 'react-toastify';
 
 export interface IApiConfig {
@@ -92,12 +92,9 @@ export class Api {
 
   // Expose these actions through methods to be used in ApiService
   async refreshToken() {
-    console.log('## refreshing token');
     if (this._refreshTokenAction) {
       this.pendingRefresh = this._refreshTokenAction();
-      console.log('## refreshing token');
       return await this.pendingRefresh.finally(() => {
-        console.log('## refreshing token');
         this.pendingRefresh = void 0;
       });
     } else {

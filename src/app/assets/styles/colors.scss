@@ -1,47 +1,69 @@
+// White & Black
 $white: #ffffff !default;
 $black: #000000 !default;
 
+$grey-blue-50: #f8f9fc !default;
+$grey-blue-500: #4e5ba6 !default;
+$grey-blue-700: #363f72 !default;
+
+// Greys
+$grey-50: #fcfcfd;
+$grey-200-outline: #e0e5f2 !default;
+$grey-100: #f2f4f7 !default;
 $grey-200: #f9fafb !default;
-$grey-300: #e0e5f2 !default;
-$grey-500: #7586a9 !default;
+$grey-500: #7586a9;
 $grey-600: #667085 !default;
-$grey-700: #626ba3 !default;
+$grey-800: #626ba3 !default;
 $grey-800: #344054 !default;
 $grey-900: #101828 !default;
+$grey-900-text-primary: #2b3674 !default;
 
+// Reds
 $red-50: #fef3f2 !default;
+$red-300: #ec5e57 !default;
 $red-500: #f04438 !default;
 $red-700: #b42318 !default;
 
-$blue-50: #f4f7fe !default;
-$blue-600: #4318ff !default;
-$blue-900: #2b3674 !default;
-
-$gray-blue-50: #f8f9fc !default;
-$gray-blue-500: #4e5ba6 !default;
-$gray-blue-700: #363f72 !default;
-
-$green-50: #ecfdf3 !default;
-$green-500: #12b76a !default;
-$green-700: #027a48 !default;
-
-$orange-50: #fef3f2 !default;
-$orange-500: #ffbf70 !default;
-
-$blue-0: #f5f8fb !default;
-$blue-100: #a0f7fd !default;
-$blue-300: #91c6e5 !default;
-$blue-500: #00b5f7 !default;
-$blue-900: #05367f !default;
-
+// Pink
 $pink-50: #fdf2fa !default;
 $pink-500: #ee46bc !default;
 $pink-700: #c11574 !default;
 
-$purple-50: #f4f3ff !default;
-$purple-100: #dee7fc !default;
-$purple-200: #c9bdff !default;
-$purple-400: #937bff !default;
-$purple-500: #7a5af8 !default;
-$purple-600: #7839ee !default;
-$purple-700: #5925dc !default;
+// Greens
+$green-50: #ecfdf3 !default; // similar to $success-green-50
+$success-green-50: #ecfdf3 !default; // duplicate with $green-50
+$green-500: #12b76a !default;
+$success-green-500: #17b26a !default; // similar to $green-500
+$green-700: #027a48 !default; // similar to $success-green-700
+$success-green-700: #027a48 !default; // duplicate with $green-700
+
+// Blues
+$blue-600: #4318ff !default; // similar to $primary-600-primary
+$primary-600: #4318ff !default; // duplicate with $blue-600
+$blue-900: #2b3674 !default; // similar to $grey-900-text-primary
+
+// Teals
+$teal-50: #f0fdf9 !default;
+$teal-100: #ccfbef !default;
+$teal-200: #99f6e0 !default;
+$teal-300: #5fe9d0 !default;
+$teal-400: #2ed3b7 !default;
+$teal-500: #15b79e !default;
+$teal-600: #0e9384 !default;
+
+// Oranges
+$warning-orange-50: #fffdeb !default;
+$warning-orange-500: #f79009 !default;
+$warning-orange-700: #b54708 !default;
+
+// Purples
+$primary-50: #f4f3ff !default;
+$primary-100: #dee7fc !default; // duplicate with $primary-100
+$primary-200: #c7d6fa !default;
+$primary-300: #9eb5fa !default;
+$primary-400: #868ff9 !default;
+$primary-500: #615eed !default;
+$primary-600: #4318ff !default; // duplicate with $blue-600
+
+// Color Honeydew
+$color-honeydew-100: #d1fadf !default;

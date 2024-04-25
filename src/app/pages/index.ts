@@ -3,12 +3,12 @@ import Auth from './Auth';
 import ConceptPages from './ConceptReport';
 import SettingsPages from './Settings';
 
-const Dashboard = React.lazy(() => import('./Dashboard'));
+const Dashboard = React.lazy(() => import('./Dashboard/Dashboard'));
 const NotFound = React.lazy(() => import('./NotFound'));
 const Onboarding = React.lazy(() => import('./Onboarding'));
 const Concepts = React.lazy(() => import('./Concepts'));
-const IgniteConcept = React.lazy(() => import('./IgniteConcept'));
-const ConceptSnapshot = React.lazy(() => import('./ConceptSnapshot'));
+const IgniteConcept = React.lazy(() => import('./IgniteConcept/IgniteConcept'));
+const ConceptSnapshot = React.lazy(() => import('./ConceptSnapshot/ConceptSnapshot'));
 const GeneratedConcepts = React.lazy(() => import('./GeneratedConcepts'));
 
 const Page = {

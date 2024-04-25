@@ -1,0 +1,11 @@
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
+
+.container {
+  display: flex;
+  flex-direction: row;
+  display: flex;
+  align-items: flex-start;
+  background: $grey-blue-50;
+}

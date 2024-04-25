@@ -1,0 +1,64 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
+
+.assumptionBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .icon {
+    display: flex;
+    height: 2rem;
+    width: 2rem;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background: #dee7fc;
+    &.purpleIcon {
+      background: #ece9fe;
+      svg,
+      use {
+        path {
+          stroke: #7839ee;
+        }
+      }
+    }
+    &.lightBlueIcon {
+      background: #cff9fe;
+      svg,
+      use {
+        path {
+          stroke: #088ab2;
+        }
+      }
+    }
+    &.greenIcon {
+      background: #ccfbef;
+      svg,
+      use {
+        path {
+          stroke: #0e9384;
+        }
+      }
+    }
+    &.blueIcon {
+      background: #d1e0ff;
+      svg,
+      use {
+        path {
+          stroke: #155eef;
+        }
+      }
+    }
+  }
+
+  .status {
+    text-align: center;
+    white-space: nowrap;
+    font-family: $font-family;
+    color: $blue-900;
+    @include body-100;
+    text-transform: capitalize;
+  }
+}

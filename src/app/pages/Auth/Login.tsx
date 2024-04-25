@@ -1,10 +1,10 @@
 import { FunctionComponent, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import InputField from '../../components/InputField';
+import InputField from '../../components/Text/InputField/InputField';
 import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
 import { Link } from 'react-router-dom';
-import { useLogin } from '../../hooks/query/auth';
+import { useLogin } from '../../hooks/query/auth.hook';
 
 const Login: FunctionComponent = () => {
   const [email, setEmail] = useState<string>('');

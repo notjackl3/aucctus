@@ -3,7 +3,7 @@ import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
 import { hasAccessToken, selectRefreshToken, simpleLogout } from '../../features/auth/auth.slice';
 import { AppPath } from '../routes';
-import { useRefreshToken } from '../../app/hooks/query/auth';
+import { useRefreshToken } from '../../app/hooks/query/auth.hook';
 import { store } from '../../app/store';
 import api from '../../libs/api';
 
@@ -21,14 +21,11 @@ const AuthGuard: FunctionComponent = () => {
           return;
         }
 
-        console.log('refreshing token');
         mutate(refresh, {
           onSuccess: (data) => {
             resolve(data);
-            console.log('refreshing token success');
           },
           onError: (error) => {
-            console.log('refreshing token success');
             reject(error);
           },
         });

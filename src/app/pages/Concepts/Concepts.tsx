@@ -1,17 +1,16 @@
-import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
+import { FunctionComponent, useCallback, useMemo } from 'react';
 import styles from './styles/concepts.module.scss';
-import { useQuery } from 'react-query';
-import api from '../../../libs/api';
-import Icon from '../../components/Icon/Icon';
-import { AppPath } from '../../../routes/routes';
-import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 
-import Kanban from '../../components/Kanban';
-import TabView from '../../components/TabView';
-import { ConceptStatus, ConceptCategory, IConceptPage } from '../../../libs/api/typings';
+import Icon from '../../components/Icons/Icon/Icon';
+import { AppPath } from '../../../routes/routes';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useConcepts } from '../../hooks/query/concepts.hook';
+import Kanban from '../../components/Tables/Kanban';
+import TabView from '../../components/Container/TabView';
+import { ConceptStatus, ConceptCategory } from '../../../libs/api/types';
 import ConceptTable from './components/ConceptTable';
 import ConceptContainer from './components/ConceptContainer';
-import { ConceptColumns } from '../../components/Kanban/Kanban';
+import { ConceptColumns } from '../../components/Tables/Kanban/Kanban';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
   ARCHIVE_CONCEPT_STATUS_LIST,
@@ -38,7 +37,7 @@ export const KANBAN_COLUMNS_MAP = ACTIVE_CONCEPT_STATUS_LIST.reduce<ConceptColum
 const ACTIVE_VIEW_TABS = (['list', 'kanban'] as IconVariant[]).map((value) => ({
   label: (
     <div className={styles.tabLabel}>
-      <Icon variant={value} height={20} width={20} />
+      <Icon variant={value} />
       {value.charAt(0).toUpperCase() + value.slice(1)}
     </div>
   ),
@@ -55,6 +54,9 @@ const Concepts: FunctionComponent = () => {
   const view = searchParams.get('view') || ('list' as 'list' | 'kanban');
 
   const isKanbanView = view === 'kanban' && category === 'active';
+
+  // Fetch concepts based on the search parameters
+  const { data, isLoading } = useConcepts(category, status, page);
 
   /**
    * Sets the status filter for concepts.
@@ -101,30 +103,9 @@ const Concepts: FunctionComponent = () => {
     [setSearchParams]
   );
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['concepts', status, category, page],
-    refetchOnWindowFocus: false,
-    retry: 0,
-    cacheTime: 12000,
-    refetchInterval: (data?: IConceptPage) => {
-      if (data && data.results.some((concept) => concept.reportStatus === 'pending')) {
-        return 5000;
-      } else {
-        return false;
-      }
-    },
-    queryFn: async () => {
-      return api.concept.getConcepts({
-        status,
-        category,
-        page: parseInt(page || '1'),
-      });
-    },
-  });
-
   // We should be able to update the columns (components) without having to recreate the entire component
   const kanbanColumns = useMemo(() => {
-    // Create a deep copy of the columns
+    // Create a deep copy
     const columns = JSON.parse(JSON.stringify(KANBAN_COLUMNS_MAP));
 
     if (data && data.results) {
@@ -140,50 +121,47 @@ const Concepts: FunctionComponent = () => {
   const tabs = category === 'active' ? ACTIVE_VIEW_TABS : [];
 
   return (
-    <>
-      <div className={styles.contentList}>
-        <div className={styles.headerSection}>
-          <div className={styles.header}>
-            <h1>{`${category} Concepts`}</h1>
-          </div>
-          <div className={styles.actions}>
-            <button
-              className={`btn btn-primary ${styles.button}`}
-              onClick={() => {
-                navigate(AppPath.IgniteConcept);
-              }}
-            >
-              <Icon variant="rocket" height={20} width={20} stroke="#fff" />
-              Add Concept
-            </button>
-          </div>
+    <div className={styles.contentList}>
+      <div className={styles.headerSection}>
+        <div className={styles.header}>
+          <h1>{`${category} Concepts`}</h1>
         </div>
-        <TabView tabs={tabs} className={styles.tabs} variant="button" onTabSelect={onTabSelect} activeTab={view}>
-          <ConceptContainer
-            category={category}
-            categoryCount={data?.count || 0}
-            numberOfPages={data?.numberOfPages || 1}
-            page={page || '1'}
-            setPage={setPage}
-            status={status}
-            setStatusFilter={setStatusFilter}
-            showStatusFilter={!isKanbanView}
+        <div className={styles.actions}>
+          <button
+            className={`btn btn-primary ${styles.button}`}
+            onClick={() => {
+              navigate(AppPath.IgniteConcept);
+            }}
           >
-            <>
-              {isKanbanView ? (
-                <Kanban
-                  kanbanColumns={kanbanColumns}
-                  selectCard={(id: string) => navigate(AppPath.ConceptOverview.replace(':id', id))}
-                />
-              ) : (
-                <ConceptTable data={data?.results || []} isLoading={isLoading} />
-              )}
-            </>
-          </ConceptContainer>
-        </TabView>
+            <Icon variant="rocket" height={20} width={20} />
+            Add Concept
+          </button>
+        </div>
       </div>
-      <Outlet />
-    </>
+      <TabView tabs={tabs} className={styles.tabs} variant="button" onTabSelect={onTabSelect} activeTab={view}>
+        <ConceptContainer
+          category={category}
+          categoryCount={data?.count || 0}
+          numberOfPages={data?.numberOfPages || 1}
+          page={page || '1'}
+          setPage={setPage}
+          status={status}
+          setStatusFilter={setStatusFilter}
+          showStatusFilter={!isKanbanView}
+        >
+          <>
+            {isKanbanView ? (
+              <Kanban
+                kanbanColumns={kanbanColumns}
+                selectCard={(id: string) => navigate(AppPath.ConceptOverview.replace(':id', id))}
+              />
+            ) : (
+              <ConceptTable data={data?.results || []} isLoading={isLoading} />
+            )}
+          </>
+        </ConceptContainer>
+      </TabView>
+    </div>
   );
 };
 

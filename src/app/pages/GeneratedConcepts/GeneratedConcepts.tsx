@@ -12,9 +12,9 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import useGeneratedConcepts from './hooks/useGeneratedConcepts';
-import { IConcept } from '../../../libs/api/typings';
-import TableCheckBox from '../../components/TableCheckBox';
-import Icon from '../../components/Icon/Icon';
+import { IConcept } from '../../../libs/api/types';
+import TableCheckBox from '../../components/Tables/TableCheckBox';
+import Icon from '../../components/Icons/Icon/Icon';
 import IgniteLoading from '../../components/IgniteLoading';
 
 const columnHelper = createColumnHelper<IConcept>();

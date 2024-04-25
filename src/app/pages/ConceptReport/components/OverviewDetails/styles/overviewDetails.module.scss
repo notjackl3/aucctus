@@ -1,6 +1,6 @@
 @use 'src/app/assets/styles/colors.scss' as *;
 @use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/shadows.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
 
 .overviewDetails {
   display: flex;
@@ -257,7 +257,7 @@
           align-items: center;
           justify-content: flex-start;
           color: $blue-900;
-          border-bottom: 1px solid $grey-300;
+          border-bottom: 1px solid $grey-200;
           color: $blue-900;
 
           .badge {
@@ -285,7 +285,7 @@
     .cardAction {
       display: flex;
       @include body-100;
-      color: $gray-blue-700;
+      color: $grey-blue-700;
       padding: 0.5rem 1rem;
       border-radius: 0.5rem;
       align-items: flex-start;
@@ -294,7 +294,7 @@
       gap: 0.5rem;
       box-sizing: border-box;
       font-family: $font-family;
-      border: 1px solid $grey-300;
+      border: 1px solid $grey-200;
       background: none;
 
       svg,
@@ -312,7 +312,6 @@
     flex-direction: column;
     align-self: stretch;
     width: 100%;
-    max-width: 70rem;
     gap: 1rem;
   }
 }

@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
-import styles from './styles/conceptSnapshot.module.scss';
+import styles from './conceptSnapshot.module.scss';
 import igniteIcon from '../../assets/ignite.svg';
-import Icon from '../../components/Icon/Icon';
+import Icon from '../../components/Icons/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 

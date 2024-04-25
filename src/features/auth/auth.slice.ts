@@ -11,9 +11,9 @@ import { Credentials } from './interfaces/user.interface';
 import api from '../../libs/api';
 import { RootState } from '../../app/store';
 import analytics from '../../libs/analytics';
-import { IAuthSuccessResponse, ITokenResponse } from '../../libs/api/typings';
+import { IAuthSuccessResponse, ITokenResponse } from '../../libs/api/types';
 import { AxiosError, isAxiosError } from 'axios';
-import { IFormDetailsError } from '../../libs/api/typings/avxisi';
+import { IFormDetailsError } from '../../libs/api/types';
 
 export interface AuthState {
   status: 'idle' | 'loading' | 'failed';
@@ -41,7 +41,6 @@ export const isAPIRefreshSuccessResponse = (
   return payload && !!payload.access && !!payload.refresh;
 };
 
-// TODO: Fix this error type
 const isApiErrorResult = (action: PayloadAction<unknown>): action is PayloadAction<AxiosError<IFormDetailsError>> => {
   const payload = action.payload as AxiosError<IFormDetailsError>;
   return payload && isAxiosError<IFormDetailsError>(payload);

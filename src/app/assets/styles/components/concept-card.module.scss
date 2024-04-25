@@ -1,3 +1,7 @@
+@use 'src/app/assets/styles/typography.scss' as *;
+@use 'src/app/assets/styles/colors.scss' as *;
+@use 'src/app/assets/styles/variables.scss' as *;
+
 .cardContainer {
   display: flex;
   flex-direction: column;
@@ -37,7 +41,7 @@
     }
 
     span {
-      color: var(--gray-600-text-secondary, #667085);
+      color: $grey-600;
       /* Text sm/Regular */
       font-size: 0.875rem;
       font-weight: 400;

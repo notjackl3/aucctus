@@ -1,122 +1,56 @@
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent } from 'react';
 import styles from './styles/marketDetails.module.scss';
-import Icon from '../../../../components/Icon/Icon';
-import ConceptDetailCard from '../../../../components/ConceptDetailCard/ConceptDetailCard';
-import images from '../../../../assets/img';
-import api from '../../../../../libs/api';
 import { useParams } from 'react-router-dom';
-import { useQuery } from 'react-query';
-
-const iconDefaultProps = {
-  height: 24,
-  width: 24,
-  stroke: '#2B3674',
-};
+import { useConceptMarketScan } from '../../../../hooks/query/concepts.hook';
+import EcosystemList from './EcosystemList';
+import TrendsAndDrivers from './TrendsAndDrivers';
+import { useEditMarketScan } from '../../../../hooks/concepts/editable.hook';
+import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
 
 const MarketDetails: FunctionComponent = () => {
   const { id: conceptId } = useParams();
-
-  const { data } = useQuery({
-    queryKey: [`concept/${conceptId}/market-scan`],
-    retry: 1,
-    queryFn: async () => await api.concept.getConceptMarketScan(conceptId || ''),
-  });
-
-  const ecosystems = useMemo(
-    () => [
-      {
-        title: 'Top Startups',
-        data: data?.startups,
-      },
-      {
-        title: 'Top Incumbents',
-        data: data?.incumbents,
-      },
-      {
-        title: 'Top Investors',
-        data: data?.investors,
-      },
-    ],
-    [data]
-  );
+  const { data: marketScan } = useConceptMarketScan(conceptId || '');
+  const { trendsAndDriversDescription, ecosystemDescription } = useEditMarketScan();
 
   return (
     <div className={styles.marketDetails}>
       <div className={styles.summary}>
         <div className={styles.detailBlock}>
           <h2>Trends and Drivers</h2>
-          <div className={styles.textBlock}>
-            <p>{data?.trendsAndDriversDescription}</p>
-          </div>
+          <EditModeSwitcher
+            containerClassName={styles.textBlock}
+            value={trendsAndDriversDescription.value}
+            label=""
+            name="trendsAndDriversDescription"
+            maxLength={trendsAndDriversDescription.validation.maxLength}
+            onChange={trendsAndDriversDescription.handleChange}
+            handleSave={trendsAndDriversDescription.handleSave}
+            handleCancel={trendsAndDriversDescription.handleCancel}
+          />
         </div>
       </div>
       <div className={styles.cardContainer}>
-        {data?.trendsAndDrivers.map((trend) => (
-          <ConceptDetailCard
-            title=""
-            key={trend.uuid}
-            isHideHeader
-            footerAction={
-              <button
-                className={`${styles.cardAction} btn btn-light`}
-                rel="noopener noreferrer"
-                aria-label="See Source"
-                onClick={(e) => {
-                  e.preventDefault();
-                  window.open(trend.source, '_blank');
-                }}
-              >
-                See Source
-                <Icon variant="link-external" {...iconDefaultProps} />
-              </button>
-            }
-          >
-            <div className={styles.cardTrendContent}>
-              <img alt="delivery-trend" src={images.deliveryTrend} />
-              <span className={styles.cardBoldText}>{trend?.name}</span>
-              <p className={styles.cardRegularText}>{trend?.description}</p>
-            </div>
-          </ConceptDetailCard>
-        ))}
+        <TrendsAndDrivers trendsAndDrivers={marketScan?.trendsAndDrivers || []} />
       </div>
       <div className={styles.summary}>
         <div className={styles.detailBlock}>
           <h2>Ecosystem</h2>
-          <div className={styles.textBlock}>
-            <p>{data?.ecosystemDescription}</p>
-          </div>
+          <EditModeSwitcher
+            containerClassName={styles.textBlock}
+            value={ecosystemDescription.value}
+            label=""
+            name="ecosystemDescription"
+            maxLength={ecosystemDescription.validation.maxLength}
+            onChange={ecosystemDescription.handleChange}
+            handleSave={ecosystemDescription.handleSave}
+            handleCancel={ecosystemDescription.handleCancel}
+          />
         </div>
       </div>
       <div className={styles.cardContainer}>
-        {ecosystems.map((ecosystem, index) => (
-          <ConceptDetailCard key={`${ecosystem.title}-${index}`} title={ecosystem.title} isHideFooter>
-            <div className={styles.cardContent}>
-              {ecosystem.data?.map((item) => (
-                <div
-                  className={styles.cardRow}
-                  onClick={(e) => {
-                    e.preventDefault();
-                    window.open(item.source, '_blank');
-                  }}
-                >
-                  <img
-                    className={styles.cardLogo}
-                    alt="company-logo"
-                    onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                      e.currentTarget.src = images.companyLogoDefault;
-                    }}
-                    src={`https://logo.clearbit.com/${item.source}`}
-                  />
-                  <div className={styles.cardDescription}>
-                    <span className={styles.cardDescriptionTitle}>{item.name}</span>
-                    <p className={styles.cardDescriptionText}>{item.description}</p>
-                  </div>
-                  <Icon variant="link-external" {...iconDefaultProps} />
-                </div>
-              ))}
-            </div>
-          </ConceptDetailCard>
-        ))}
+        <EcosystemList title="Top Startups" data={marketScan?.startups || []} />
+        <EcosystemList title="Top Incumbents" data={marketScan?.incumbents || []} />
+        <EcosystemList title="Top Investors" data={marketScan?.investors || []} />
       </div>
       {/* TODO add back news when ready */}
       {/* <div className={styles.summary}>

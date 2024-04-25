@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
 import { Link } from 'react-router-dom';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import FeatureIcon from '../../components/FeatureIcon';
+import FeatureIcon from '../../components/Icons/FeatureIcon/FeatureIcon';
 import { AppPath } from '../../../routes/routes';
-import Icon from '../../components/Icon/Icon';
+import Icon from '../../components/Icons/Icon/Icon';
 
 const ConfirmEmail: FunctionComponent = () => {
   return (
