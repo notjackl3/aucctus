@@ -124,6 +124,7 @@ export const authSlice = createSlice({
       .addMatcher(isAnyOf(logout.rejected, logout.fulfilled), (state) => {
         state.accessToken = undefined;
         api.accessToken = undefined;
+        state.refreshToken = undefined;
       });
   },
 });
@@ -133,7 +134,7 @@ export const { setAuthenticated, setUnauthenticated, simpleLogout } = authSlice.
 export const selectError = (state: RootState) => state.auth.error;
 export const selectAccessToken = (state: RootState) => state.auth.accessToken;
 export const selectRefreshToken = (state: RootState) => state.auth.refreshToken;
-export const hasAccessToken = (state: RootState) => !!state.auth.accessToken;
+export const hasAccessToken = (state: RootState) => !!state.auth.accessToken && !!state.auth.refreshToken;
 export const selectAuthStatus = (state: RootState) => state.auth.status;
 
 export default authSlice.reducer;

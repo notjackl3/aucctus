@@ -2,13 +2,13 @@ import { configureStore, ThunkAction, Action, combineReducers } from '@reduxjs/t
 import authReducer from '../features/auth/auth.slice';
 import { persistStore, persistReducer } from 'redux-persist';
 import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-// import storage from 'redux-persist/lib/storage';
-import storageSession from 'redux-persist/lib/storage/session';
+import storage from 'redux-persist/lib/storage';
+// import storageSession from 'redux-persist/lib/storage/session';
 
 const authPersistConfig = {
   key: 'fhserw',
-  storage: storageSession,
-  blacklist: ['status', 'error'],
+  storage: storage,
+  blacklist: ['status', 'error', 'accessToken'],
 };
 
 const authPersistedReducer = persistReducer(authPersistConfig, authReducer);

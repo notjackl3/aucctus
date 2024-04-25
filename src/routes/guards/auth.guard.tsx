@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { Navigate, Outlet } from 'react-router-dom';
-import { hasAccessToken, selectRefreshToken, simpleLogout } from '../../features/auth/auth.slice';
+import { hasAccessToken, selectAccessToken, selectRefreshToken, simpleLogout } from '../../features/auth/auth.slice';
 import { AppPath } from '../routes';
 import { useRefreshToken } from '../../app/hooks/query/auth.hook';
 import { store } from '../../app/store';
@@ -10,6 +10,7 @@ import api from '../../libs/api';
 const AuthGuard: FunctionComponent = () => {
   const isAuthenticated = useSelector(hasAccessToken);
   const refresh = useSelector(selectRefreshToken);
+  const accessToken = useSelector(selectAccessToken);
   const { mutate } = useRefreshToken();
 
   useEffect(() => {
@@ -34,6 +35,12 @@ const AuthGuard: FunctionComponent = () => {
     });
     api.setLogoutAction(() => store.dispatch(simpleLogout()));
   }, [mutate, refresh]);
+
+  useEffect(() => {
+    if (!accessToken && refresh) {
+      mutate(refresh);
+    }
+  }, [accessToken, refresh, mutate]);
 
   if (isAuthenticated) {
     return <Outlet />;
