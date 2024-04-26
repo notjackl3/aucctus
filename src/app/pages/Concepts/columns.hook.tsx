@@ -155,7 +155,7 @@ export const useConceptTableColumns = (
         },
       }),
     ],
-    [openPopupMenuId, retryConceptReport, setOpenPopupMenuId, updateConcept, ref]
+    [updateConcept, navigate, retryConceptReport, openPopupMenuId, ref, setOpenPopupMenuId]
   );
 
   return columns;

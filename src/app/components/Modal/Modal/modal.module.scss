@@ -1,3 +1,7 @@
+@use '~typography.scss' as *;
+@use '~colors.scss' as *;
+@use '~variables.scss' as *;
+
 .overlay {
   position: fixed;
   top: 0;
@@ -16,7 +20,7 @@
   .content {
     background: white;
     padding: 20px;
-    border-radius: 4px;
+    border-radius: $br-5xs;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     transform: translateY(-50px);
     animation: slideIn 0.3s ease both;

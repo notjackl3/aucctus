@@ -81,6 +81,7 @@ input {
     &:focus-visible {
       box-shadow: var(--shadow-3xl);
       outline: 1px solid var(--primary-100) !important;
+      // border: 1px solid var(--primary-100) !important;
     }
   }
 

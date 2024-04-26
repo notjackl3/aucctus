@@ -41,7 +41,9 @@ $btn-colors: (
   justify-content: center;
   align-items: center;
 
-  border-radius: 0.5rem;
+  box-shadow: $shadow-100;
+
+  border-radius: 6px;
 
   transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
     box-shadow 0.15s ease-in-out;

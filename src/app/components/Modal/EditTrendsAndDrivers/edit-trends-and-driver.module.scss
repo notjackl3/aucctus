@@ -3,6 +3,7 @@
 @use '~variables.scss' as *;
 
 .container {
+  position: relative;
   display: flex;
   max-width: 400px;
   width: 400px;
@@ -49,7 +50,7 @@
       }
     }
   }
-  .actions {
+  .footer {
     display: flex;
     flex-direction: row;
     align-self: stretch;
@@ -60,4 +61,15 @@
       width: 50%;
     }
   }
+}
+
+.confirm {
+  position: absolute;
+  background-color: white;
+  border-radius: $br-5xs;
+  width: 125%;
+
+  top: 15%;
+
+  box-shadow: $shadow-3xl;
 }

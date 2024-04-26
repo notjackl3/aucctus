@@ -5,22 +5,7 @@ import styles from './confirmation-modal.module.scss';
 interface IActionButton {
   title: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  variant:
-    | 'primary'
-    | 'secondary'
-    | 'danger'
-    | 'warning'
-    | 'success'
-    | 'info'
-    | 'light'
-    | 'dark'
-    | 'link'
-    | 'outline-primary'
-    | 'outline-secondary'
-    | 'outline-danger'
-    | 'outline-warning'
-    | 'outline-success'
-    | 'outline-info';
+  variant: 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'info' | 'light' | 'dark';
 }
 
 interface IConfirmationModalProps {

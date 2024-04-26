@@ -52,9 +52,7 @@ export const endpoints = {
   conceptCustomerProfiles: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/customer-profile`,
   conceptCustomerProfileUuid: (customerProfileUuid: string) => `api/v1/concept/customer-profile/${customerProfileUuid}`,
   conceptKeyAssumptions: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/key-assumptions`,
-  conceptKeyAssumptionsUuid: (conceptUuid: string, keyAssumptionsUuid: string) =>
-    `api/v1/concept/${conceptUuid}/key-assumptions/${keyAssumptionsUuid}`,
-  conceptKeyAssumptionSpecific: (assumptionUuid: string) => `api/v1/concept/key-assumptions/${assumptionUuid}`,
+  conceptKeyAssumption: (assumptionUuid: string) => `api/v1/concept/key-assumptions/${assumptionUuid}`,
   conceptFinancialProjection: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/financial-projection`,
   conceptFinancialProjectionUuid: (projectionUuid: string) => `api/v1/concept/financial-projection/${projectionUuid}`,
   conceptMarketSizeMetric: (marketSizeMetricUuid: string) =>
@@ -62,4 +60,5 @@ export const endpoints = {
   conceptMarketScan: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/market-scan`,
   conceptMarketScanUuid: (marketScanUuid: string) => `api/v1/concept/market-scan/${marketScanUuid}`,
   conceptTrendAndDriver: (trendAndDriverUuid: string) => `api/v1/concept/trends-and-drivers/${trendAndDriverUuid}`,
+  conceptEcosystem: (ecosystemUuid: string) => `api/v1/concept/ecosystem/${ecosystemUuid}`,
 };

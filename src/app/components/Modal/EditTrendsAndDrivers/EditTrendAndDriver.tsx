@@ -5,7 +5,9 @@ import { useModal } from '../../../context/modal/ModalContextProvider';
 import { ITrendsAndDrivers } from '../../../../libs/api/types';
 import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';
-import { useTrendAndDriverUpdate } from '../../../hooks/query/concepts.hook';
+import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../hooks/query/concepts.hook';
+import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
+import Icon from '../../Icons/Icon/Icon';
 
 interface EditTrendsAndDriverProps {
   trendAndDriver: ITrendsAndDrivers;
@@ -27,6 +29,8 @@ const removeProtocol = (source: string) => {
 
 const EditTrendAndDriver: FunctionComponent<EditTrendsAndDriverProps> = ({ trendAndDriver }) => {
   const { closeModal } = useModal();
+  const { mutate: deleteTrendAndDriver } = useTrendAndDriverDelete();
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const { mutate } = useTrendAndDriverUpdate();
   const [name, setName] = useState(trendAndDriver.name);
   const [nameError, setNameError] = useState<string | undefined>();
@@ -109,8 +113,15 @@ const EditTrendAndDriver: FunctionComponent<EditTrendsAndDriverProps> = ({ trend
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <div />
-        <button className={'btn-close'} onClick={() => closeModal()} />
+        <button
+          aria-label="Delete"
+          className="btn btn-light btn-no-border"
+          disabled={showConfirmation}
+          onClick={() => setShowConfirmation(true)}
+        >
+          <Icon variant="trash" />
+        </button>
+        <button aria-label="Close" className={'btn-close'} disabled={showConfirmation} onClick={() => closeModal()} />
       </div>
       <div className={styles.content}>
         <InputField
@@ -141,14 +152,47 @@ const EditTrendAndDriver: FunctionComponent<EditTrendsAndDriverProps> = ({ trend
         />
       </div>
       <div className={styles.footer}>
+        <button className="btn btn-light" disabled={showConfirmation} onClick={() => closeModal()}>
+          Cancel
+        </button>
         <button
-          className={'btn btn-primary'}
-          disabled={!name || !description || !source || !!nameError || !!descriptionError || !!sourceError}
+          className="btn btn-primary"
+          disabled={
+            !name || !description || !source || !!nameError || !!descriptionError || !!sourceError || showConfirmation
+          }
           onClick={handleSave}
         >
           Save
         </button>
       </div>
+      {showConfirmation ? (
+        <div className={styles.confirm}>
+          <ConfirmationModal
+            title="Are you sure you'd like to delete?"
+            subtitle="This action can not be reversed."
+            actions={[
+              {
+                title: 'Cancel',
+                variant: 'light',
+                onClick: () => {
+                  setShowConfirmation(false);
+                },
+              },
+              {
+                title: 'Delete',
+                variant: 'danger',
+                onClick: () => {
+                  deleteTrendAndDriver(trendAndDriver.uuid, {
+                    onSuccess: () => {
+                      closeModal();
+                    },
+                  });
+                },
+              },
+            ]}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };

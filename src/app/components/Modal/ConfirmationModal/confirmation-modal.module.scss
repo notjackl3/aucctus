@@ -32,5 +32,9 @@
     align-self: stretch;
     justify-content: space-between;
     gap: 1rem;
+
+    button {
+      width: 50%;
+    }
   }
 }

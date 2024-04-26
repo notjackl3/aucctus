@@ -9,6 +9,7 @@ import {
   IConceptOverview,
   IConceptPage,
   ICustomerProfile,
+  IEcosystem,
   IFinancialProjection,
   IMarketScan,
   IMarketSizeMetric,
@@ -89,12 +90,16 @@ export class ConceptApi extends ApiService {
     return this.get<IPageResponse<IAssumption>>(endpoints.conceptKeyAssumptions(uuid));
   }
 
-  getConceptKeyAssumptionsUuid(uuid: string, keyAssumptionsUuid: string) {
-    return this.patch<IAssumption, Partial<IAssumption>>(endpoints.conceptKeyAssumptionsUuid(uuid, keyAssumptionsUuid));
+  getConceptAssumption(keyAssumptionsUuid: string) {
+    return this.patch<IAssumption, Partial<IAssumption>>(endpoints.conceptKeyAssumption(keyAssumptionsUuid));
   }
 
-  updateConceptKeyAssumptions(uuid: string, data: Partial<IAssumption>) {
-    return this.patch<IAssumption, Partial<IAssumption>>(endpoints.conceptKeyAssumptionSpecific(uuid), data);
+  updateConceptAssumption(uuid: string, data: Partial<IAssumption>) {
+    return this.patch<IAssumption, Partial<IAssumption>>(endpoints.conceptKeyAssumption(uuid), data);
+  }
+
+  deleteConceptAssumption(uuid: string) {
+    return this.delete<IAssumption>(endpoints.conceptKeyAssumption(uuid));
   }
 
   getConceptFinancialProjection(uuid: string) {
@@ -122,5 +127,17 @@ export class ConceptApi extends ApiService {
 
   updateTrendAndDriver(uuid: string, data: Partial<ITrendsAndDrivers>) {
     return this.patch<ITrendsAndDrivers, Partial<ITrendsAndDrivers>>(endpoints.conceptTrendAndDriver(uuid), data);
+  }
+
+  deleteTrendAndDriver(uuid: string) {
+    return this.delete<ITrendsAndDrivers>(endpoints.conceptTrendAndDriver(uuid));
+  }
+
+  updateEcosystem(uuid: string, data: Partial<IEcosystem>) {
+    return this.patch<IEcosystem, Partial<IEcosystem>>(endpoints.conceptEcosystem(uuid), data);
+  }
+
+  deleteEcosystem(uuid: string) {
+    return this.delete<ITrendsAndDrivers>(endpoints.conceptEcosystem(uuid));
   }
 }

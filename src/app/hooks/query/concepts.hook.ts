@@ -9,6 +9,7 @@ import {
   IConceptOverview,
   IConceptPage,
   ICustomerProfile,
+  IEcosystem,
   IFinancialProjection,
   IFormError,
   IMarketScan,
@@ -198,7 +199,7 @@ export const useRetryConceptReport = () => {
 };
 
 // Common useMutation hook
-function useGenericConceptUpdate<T, K = Partial<T> & { uuid: string }>(
+function useGenericConceptMutate<T, K = Partial<T> & { uuid: string }>(
   mutationFunction: (data: K) => Promise<T>,
   queryKeys: string[][]
 ) {
@@ -230,10 +231,10 @@ function useGenericConceptUpdate<T, K = Partial<T> & { uuid: string }>(
  * @param uuid - The UUID of the concept.
  * @returns The result of the generic concept update.
  */
-export const useConceptOverviewUpdate = (uuid: string) => {
-  return useGenericConceptUpdate<IConceptOverview>(
+export const useConceptOverviewUpdate = (conceptUuid: string) => {
+  return useGenericConceptMutate<IConceptOverview>(
     (data) => api.concept.updateConceptOverview(data.uuid, data),
-    [[AucctusQueryKeys.conceptOverview, uuid]]
+    [[AucctusQueryKeys.conceptOverview, conceptUuid]]
   );
 };
 
@@ -243,40 +244,47 @@ export const useConceptOverviewUpdate = (uuid: string) => {
  * @param uuid - The UUID of the concept.
  * @returns The result of the generic concept update.
  */
-export const useMarketScanUpdate = (uuid: string) => {
-  return useGenericConceptUpdate<IMarketScan>(
+export const useMarketScanUpdate = (conceptUuid: string) => {
+  return useGenericConceptMutate<IMarketScan>(
     (data) => api.concept.updateConceptMarketScan(data.uuid, data),
-    [[AucctusQueryKeys.conceptMarketScan, uuid]]
+    [[AucctusQueryKeys.conceptMarketScan, conceptUuid]]
   );
 };
 
-export const useCustomerProfileUpdate = (profileUuid: string, uuid?: string) => {
-  const conceptProfileListQueryKey = uuid
-    ? [AucctusQueryKeys.conceptCustomerProfiles, uuid]
+export const useCustomerProfileUpdate = (profileUuid: string, conceptUuid?: string) => {
+  const conceptProfileListQueryKey = conceptUuid
+    ? [AucctusQueryKeys.conceptCustomerProfiles, conceptUuid]
     : [AucctusQueryKeys.conceptCustomerProfiles];
   const queryKeys = [conceptProfileListQueryKey, [AucctusQueryKeys.conceptCustomerProfile, profileUuid]];
-  return useGenericConceptUpdate<ICustomerProfile>(
+  return useGenericConceptMutate<ICustomerProfile>(
     (data) => api.concept.updateConceptCustomerProfile(data.uuid, data),
     queryKeys
   );
 };
 
 export function useDeleteCustomerProfile() {
-  return useGenericConceptUpdate<ICustomerProfile, string>(
+  return useGenericConceptMutate<ICustomerProfile, string>(
     (uuid) => api.concept.deleteConceptCustomerProfile(uuid),
     [[AucctusQueryKeys.conceptCustomerProfiles]]
   );
 }
 
-export const useAssumptionUpdate = (uuid: string) => {
-  return useGenericConceptUpdate<IAssumption>(
-    (data) => api.concept.updateConceptKeyAssumptions(data.uuid, data),
-    [[AucctusQueryKeys.conceptKeyAssumptions, uuid]]
+export const useAssumptionUpdate = () => {
+  return useGenericConceptMutate<IAssumption>(
+    (data) => api.concept.updateConceptAssumption(data.uuid, data),
+    [[AucctusQueryKeys.conceptKeyAssumptions]]
+  );
+};
+
+export const useAssumptionDelete = () => {
+  return useGenericConceptMutate<IAssumption, string>(
+    (uuid) => api.concept.deleteConceptAssumption(uuid),
+    [[AucctusQueryKeys.conceptKeyAssumptions]]
   );
 };
 
 export const useFinancialProjectionUpdate = (uuid: string) => {
-  return useGenericConceptUpdate<IFinancialProjection>(
+  return useGenericConceptMutate<IFinancialProjection>(
     (data) => api.concept.updateConceptFinancialProjection(data.uuid, data),
     [
       [AucctusQueryKeys.conceptFinancialProjection, uuid],
@@ -292,7 +300,7 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
  * @returns The result of the generic concept update.
  */
 export const useMarketMetricSizeUpdate = (uuid: string) => {
-  return useGenericConceptUpdate<IMarketSizeMetric>(
+  return useGenericConceptMutate<IMarketSizeMetric>(
     (data) => api.concept.updateMarketMetricSize(data.uuid, data),
     [
       [AucctusQueryKeys.conceptFinancialProjection, uuid],
@@ -301,12 +309,30 @@ export const useMarketMetricSizeUpdate = (uuid: string) => {
   );
 };
 
-/**
- *
- */
 export const useTrendAndDriverUpdate = () => {
-  return useGenericConceptUpdate<ITrendsAndDrivers>(
+  return useGenericConceptMutate<ITrendsAndDrivers>(
     (data) => api.concept.updateTrendAndDriver(data.uuid, data),
+    [[AucctusQueryKeys.conceptMarketScan]]
+  );
+};
+
+export const useTrendAndDriverDelete = () => {
+  return useGenericConceptMutate<ITrendsAndDrivers, string>(
+    (uuid) => api.concept.deleteTrendAndDriver(uuid),
+    [[AucctusQueryKeys.conceptMarketScan]]
+  );
+};
+
+export const useEcosystemUpdate = () => {
+  return useGenericConceptMutate<IEcosystem>(
+    (data) => api.concept.updateEcosystem(data.uuid, data),
+    [[AucctusQueryKeys.conceptMarketScan]]
+  );
+};
+
+export const useEcosystemDelete = () => {
+  return useGenericConceptMutate<IEcosystem, string>(
+    (uuid) => api.concept.deleteEcosystem(uuid),
     [[AucctusQueryKeys.conceptMarketScan]]
   );
 };
