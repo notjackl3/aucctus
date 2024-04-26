@@ -38,6 +38,8 @@ export default defineConfig({
 
   resolve: {
     alias: {
+      '~global.scss': path.resolve(__dirname, 'src/app/assets/styles/global.scss'),
+      '~button.scss': path.resolve(__dirname, 'src/app/assets/styles/button.scss'),
       '~typography.scss': path.resolve(__dirname, 'src/app/assets/styles/typography.scss'),
       '~colors.scss': path.resolve(__dirname, 'src/app/assets/styles/colors.scss'),
       '~variables.scss': path.resolve(__dirname, 'src/app/assets/styles/variables.scss'),

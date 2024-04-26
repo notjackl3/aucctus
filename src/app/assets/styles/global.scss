@@ -1,10 +1,12 @@
+@use '~colors.scss' as *;
+@use '~typography.scss' as *;
+@use '~variables.scss' as *;
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@500&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;0,9..40,1000;1,9..40,100;1,9..40,300;1,9..40,400;1,9..40,500;1,9..40,600;1,9..40,700;1,9..40,800;1,9..40,900;1,9..40,1000&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600&display=swap');
 @import '~bootstrap/scss/bootstrap';
-@import './typography.scss';
-@import './colors.scss';
+@import '~button.scss';
 
 html {
   scroll-behavior: smooth;
@@ -54,83 +56,6 @@ a:active {
   outline: 0;
 }
 
-button.btn {
-  display: flex;
-  gap: var(--gap-base);
-  padding: 0.625rem 1.125rem;
-  justify-content: center;
-  align-items: center;
-
-  border-radius: 0.5rem;
-
-  /* Shadow/xs */
-  box-shadow: var(--shadow-xs) !important;
-
-  color: $grey-600;
-  svg,
-  use,
-  path {
-    stroke: $grey-600 !important;
-  }
-
-  &.btn-primary {
-    border: 1px solid var(--primary-600-primary, #4318ff) !important;
-    background: var(--primary-600-primary, #4318ff) !important;
-    white-space: nowrap;
-    color: var(--base-white, #fff);
-    svg,
-    use,
-    path {
-      stroke: var(--base-white, #fff) !important;
-    }
-  }
-
-  &.btn-light {
-    border: 1px solid var(--gray-300-outline, #e0e5f2);
-    background: var(--base-white, #fff);
-    &,
-    &.disabled,
-    svg,
-    use,
-    path {
-      color: $grey-600 !important;
-    }
-  }
-
-  &.btn-secondary {
-    border-radius: 0.5rem;
-    border: 1px solid var(--primary-50-secondary, #f4f7fe);
-    background: var(--primary-50-secondary, #f4f7fe);
-
-    &,
-    &.disabled,
-    svg,
-    use,
-    path {
-      color: var(--primary-600-primary, #4318ff) !important;
-    }
-  }
-
-  &.btn-no-border {
-    box-shadow: none !important;
-    border: none !important;
-    color: var(--primary-600-primary, #4318ff) !important;
-    &,
-    &.disabled,
-    svg,
-    use,
-    path {
-      path {
-        stroke: var(--primary-600-primary, #4318ff) !important;
-      }
-    }
-  }
-
-  &.btn-bold {
-    font-weight: 700;
-  }
-}
-
 textarea {
   transition: all 0.3s smooth;
   transition: box-shadow 0.3s ease-in-out;
@@ -156,7 +81,6 @@ input {
     &:focus-visible {
       box-shadow: var(--shadow-3xl);
       outline: 1px solid var(--primary-100) !important;
-      // border: 1px solid var(--primary-100) !important;
     }
   }
 
@@ -170,18 +94,8 @@ input {
 
     position: relative;
 
-    &:disabled {
-      // border-color: var(--);
-    }
-
     &:checked {
-      // border: 6px solid $primary-color;
       outline: unset !important;
-      /* I added this one for Edge (chromium) support */
-
-      &:disabled {
-        // border-color: rgba($content-border-color, 0.75);
-      }
     }
   }
 

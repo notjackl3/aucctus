@@ -11,6 +11,8 @@ import ConceptRowButton from './components/ConceptRowButton';
 import { useConceptUpdate, useRetryConceptReport } from '../../hooks/query/concepts.hook';
 
 import styles from './styles/concepts.module.scss';
+import { AppPath } from '../../../routes/routes';
+import { useNavigate } from 'react-router-dom';
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -19,6 +21,7 @@ export const useConceptTableColumns = (
   setOpenPopupMenuId: React.Dispatch<React.SetStateAction<string | undefined>>,
   openPopupMenuId: string | undefined
 ) => {
+  const navigate = useNavigate();
   const { mutate: updateConcept } = useConceptUpdate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
 
@@ -107,6 +110,8 @@ export const useConceptTableColumns = (
                     status: 'ideating',
                   });
                   break;
+                case 'complete':
+                  navigate(AppPath.ConceptOverview.replace(':id', row.original.uuid));
                 case 'error':
                   retryConceptReport(row.original.uuid);
                   break;

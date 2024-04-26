@@ -50,7 +50,7 @@ const Dashboard: FunctionComponent = () => {
             cardClassName={styles.cardStyle}
             footerAction={
               <button
-                className={styles.cardAction}
+                className="btn btn-secondary"
                 onClick={() => {
                   navigate(AppPath.ConceptCategory);
                 }}
