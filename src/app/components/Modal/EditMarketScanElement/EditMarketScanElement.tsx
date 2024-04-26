@@ -1,16 +1,19 @@
-import { FunctionComponent, useCallback, useState } from 'react';
+import { FunctionComponent, useCallback, useEffect, useState } from 'react';
 
 import styles from './edit-trends-and-driver.module.scss';
 import { useModal } from '../../../context/modal/ModalContextProvider';
-import { ITrendsAndDrivers } from '../../../../libs/api/types';
+import { Ecosystem, IFormError, ITrendsAndDrivers } from '../../../../libs/api/types';
 import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';
-import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../hooks/query/concepts.hook';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import Icon from '../../Icons/Icon/Icon';
+import { UseMutateFunction } from 'react-query';
+import { AxiosError } from 'axios';
 
-interface EditTrendsAndDriverProps {
-  trendAndDriver: ITrendsAndDrivers;
+interface EditTrendsAndDriverProps<T = Ecosystem | ITrendsAndDrivers> {
+  updateItem: UseMutateFunction<T, AxiosError<IFormError<T>, any>, Partial<T> & { uuid: string }, unknown>;
+  deleteItem: UseMutateFunction<T, AxiosError<IFormError<T>, any>, string, unknown>;
+  item: T;
 }
 
 const NAME_MAX_LENGTH = 36;
@@ -27,16 +30,14 @@ const removeProtocol = (source: string) => {
   return d;
 };
 
-const EditTrendAndDriver: FunctionComponent<EditTrendsAndDriverProps> = ({ trendAndDriver }) => {
+const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item, updateItem, deleteItem }) => {
   const { closeModal } = useModal();
-  const { mutate: deleteTrendAndDriver } = useTrendAndDriverDelete();
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const { mutate } = useTrendAndDriverUpdate();
-  const [name, setName] = useState(trendAndDriver.name);
+  const [name, setName] = useState(item.name);
   const [nameError, setNameError] = useState<string | undefined>();
-  const [source, setSource] = useState(removeProtocol(trendAndDriver.source));
+  const [source, setSource] = useState(removeProtocol(item.source));
   const [sourceError, setSourceError] = useState<string | undefined>();
-  const [description, setDescription] = useState(trendAndDriver.description);
+  const [description, setDescription] = useState(item.description);
   const [descriptionError, setDescriptionError] = useState<string | undefined>();
 
   const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,11 +74,13 @@ const EditTrendAndDriver: FunctionComponent<EditTrendsAndDriverProps> = ({ trend
     setSource(d);
   }, []);
 
+  useEffect(() => {}, []);
+
   const handleSave = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.preventDefault();
-      mutate(
-        { ...trendAndDriver, name, description, source },
+      updateItem(
+        { ...item, name, description, source },
         {
           onSuccess: () => {
             closeModal();
@@ -107,7 +110,7 @@ const EditTrendAndDriver: FunctionComponent<EditTrendsAndDriverProps> = ({ trend
       e.preventDefault();
       e.stopPropagation();
     },
-    [mutate, name, description, source, trendAndDriver, closeModal]
+    [updateItem, name, description, source, item, closeModal]
   );
 
   return (
@@ -182,7 +185,7 @@ const EditTrendAndDriver: FunctionComponent<EditTrendsAndDriverProps> = ({ trend
                 title: 'Delete',
                 variant: 'danger',
                 onClick: () => {
-                  deleteTrendAndDriver(trendAndDriver.uuid, {
+                  deleteItem(item.uuid, {
                     onSuccess: () => {
                       closeModal();
                     },
@@ -197,4 +200,4 @@ const EditTrendAndDriver: FunctionComponent<EditTrendsAndDriverProps> = ({ trend
   );
 };
 
-export default EditTrendAndDriver;
+export default EditMarketScanitem;

@@ -4,6 +4,7 @@ import { AucctusQueryKeys } from './query-keys';
 import {
   ConceptCategory,
   ConceptStatus,
+  Ecosystem,
   IAssumption,
   IConcept,
   IConceptOverview,
@@ -324,14 +325,14 @@ export const useTrendAndDriverDelete = () => {
 };
 
 export const useEcosystemUpdate = () => {
-  return useGenericConceptMutate<IEcosystem>(
+  return useGenericConceptMutate<Ecosystem>(
     (data) => api.concept.updateEcosystem(data.uuid, data),
     [[AucctusQueryKeys.conceptMarketScan]]
   );
 };
 
 export const useEcosystemDelete = () => {
-  return useGenericConceptMutate<IEcosystem, string>(
+  return useGenericConceptMutate<Ecosystem, string>(
     (uuid) => api.concept.deleteEcosystem(uuid),
     [[AucctusQueryKeys.conceptMarketScan]]
   );

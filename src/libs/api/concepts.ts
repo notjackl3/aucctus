@@ -3,6 +3,7 @@ import { ApiService } from './apiService';
 import { IConceptQueryOptions, endpoints } from './endpoints';
 import {
   ConceptStatus,
+  Ecosystem,
   IAssumption,
   IConcept,
   IConceptCreate,
@@ -133,11 +134,11 @@ export class ConceptApi extends ApiService {
     return this.delete<ITrendsAndDrivers>(endpoints.conceptTrendAndDriver(uuid));
   }
 
-  updateEcosystem(uuid: string, data: Partial<IEcosystem>) {
-    return this.patch<IEcosystem, Partial<IEcosystem>>(endpoints.conceptEcosystem(uuid), data);
+  updateEcosystem(uuid: string, data: Partial<Ecosystem>) {
+    return this.patch<Ecosystem, Partial<Ecosystem>>(endpoints.conceptEcosystem(uuid), data);
   }
 
   deleteEcosystem(uuid: string) {
-    return this.delete<ITrendsAndDrivers>(endpoints.conceptEcosystem(uuid));
+    return this.delete<Ecosystem>(endpoints.conceptEcosystem(uuid));
   }
 }

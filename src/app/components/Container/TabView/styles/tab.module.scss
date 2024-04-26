@@ -15,11 +15,7 @@
   border-bottom: none;
   flex-shrink: 0;
   white-space: nowrap;
-  border-bottom: 1px solid $grey-200;
-
-  &.active {
-    border-bottom: 1px solid $grey-200;
-  }
+  border-bottom: 1px solid $grey-300;
 
   .label {
     font-size: 1rem;

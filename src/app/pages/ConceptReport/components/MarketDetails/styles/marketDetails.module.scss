@@ -111,9 +111,13 @@
         align-items: center;
         justify-content: space-between;
         color: $blue-900;
-        border-bottom: 1px solid $grey-200;
+        border-bottom: 1px solid $grey-300;
 
         cursor: pointer;
+
+        &.editCard {
+          @include edit-cursor;
+        }
 
         &:last-child {
           border-bottom: none;

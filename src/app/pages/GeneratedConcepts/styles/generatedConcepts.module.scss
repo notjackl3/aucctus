@@ -92,7 +92,7 @@
         box-sizing: border-box;
         align-items: center;
         border-radius: 0.75rem 0.75rem 0 0;
-        border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+        border-bottom: 1px solid $grey-200-outline;
         background: var(--gray-50-bg, #fcfcfd);
 
         color: $grey-600;
@@ -118,7 +118,11 @@
           padding: 0.75rem 1.5rem;
           box-sizing: border-box;
           align-items: flex-start;
-          border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+          border-bottom: 1px solid $grey-200-outline;
+
+          &:nth-child(even) {
+            background-color: $grey-50 !important;
+          }
 
           td {
             display: flex;
@@ -150,7 +154,7 @@
               flex: 1 0 0;
 
               .title {
-                color: var(--gray-900-text-primary);
+                color: $grey-900-text-primary;
                 font-size: 0.875rem;
                 font-weight: 500;
                 line-height: 1.25rem;
@@ -178,7 +182,7 @@
       border-radius: 0 0 0.75rem 0.75rem;
       background: $white;
       box-shadow: $shadow-100;
-      border-bottom: 1px solid var(--gray-300-outline, #e0e5f2);
+      border-bottom: 1px solid $grey-200-outline;
 
       button {
         min-width: 10rem;

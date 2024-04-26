@@ -92,7 +92,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
         title={title}
         icon={icon}
         headerAction={
-          <button className="btn btn-light" onClick={() => setIsEditing(!isEditing)}>
+          <button className="btn btn-light btn-no-border" onClick={() => setIsEditing(!isEditing)}>
             <Icon variant="edit" height={20} width={20} />
           </button>
         }

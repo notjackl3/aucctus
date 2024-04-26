@@ -15,16 +15,15 @@ import Loading from '../../../../components/Loading';
 import TablePagination from '../../../../components/Tables/TablePagination';
 import { useQuery } from 'react-query';
 import api from '../../../../../libs/api';
-import AssumptionBadge from '../../../../components/Badges/AssumptionBadge/AssumptionBadge';
 import { useParams } from 'react-router-dom';
 import { getAssumptionActiveHexColor, getAssumptionHexColor } from '../../../../../libs/concepts';
-import GeneralBadge from '../../../../components/Badges/GeneralBadge/GeneralBadge';
 import QuadrantChart, { ChartPoint } from '../../../../components/Charts/QuadrantChart/QuadrantChart';
-
-const columnHelper = createColumnHelper<IAssumption>();
+import { useAssumptionsColumns } from './columns.hook';
 
 const HypothesisDetails: FunctionComponent = () => {
+  const { columns } = useAssumptionsColumns();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+
   const { id: conceptId } = useParams();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
@@ -56,48 +55,6 @@ const HypothesisDetails: FunctionComponent = () => {
       };
     });
   }, [data]);
-
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor((row) => row?.uuid, {
-        id: 'uuid',
-        header: () => <span className={styles.details}>Title</span>,
-        minSize: 280,
-        size: 280,
-        cell: (info) => (
-          <div className={styles.assumption}>
-            <span className={styles.assumptionTitle}>{info?.row?.original?.name}</span>
-            <span className={`${styles.assumptionDescription} ${styles.cellDescription}`}>
-              {info?.row?.original?.hypothesis}
-            </span>
-          </div>
-        ),
-      }),
-      columnHelper.accessor((row) => row.riskCategory, {
-        id: 'riskCategory',
-        cell: (info) => (
-          <div className={styles.riskCategory}>
-            <GeneralBadge variant={`${info.getValue()}Risk`} badgeText={info.getValue()} />
-          </div>
-        ),
-        minSize: 125,
-        size: 125,
-        header: () => <span>Risk</span>,
-      }),
-      columnHelper.accessor((row) => row.assumptionsType, {
-        id: 'assumptionsType',
-        minSize: 150,
-        size: 150,
-        header: () => <span>Type</span>,
-        cell: (info) => (
-          <div className={styles.reviewConceptLink}>
-            <AssumptionBadge assumptionType={info.getValue()} />
-          </div>
-        ),
-      }),
-    ],
-    []
-  );
 
   const tableData = useMemo(() => data?.results ?? [], [data]);
   const table = useReactTable({

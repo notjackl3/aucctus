@@ -5,7 +5,8 @@ import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/Co
 import Icon from '../../../../components/Icons/Icon/Icon';
 import images from '../../../../assets/img';
 import { useModal } from '../../../../context/modal/ModalContextProvider';
-import EditTrendAndDriver from '../../../../components/Modal/EditTrendsAndDrivers/EditTrendAndDriver';
+import EditMarketScanElement from '../../../../components/Modal/EditMarketScanElement/EditMarketScanElement';
+import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../../hooks/query/concepts.hook';
 
 const iconDefaultProps = {
   height: 24,
@@ -19,6 +20,8 @@ interface ITrendsAndDriversProps {
 
 const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAndDriver }) => {
   const { openModal } = useModal();
+  const { mutate: deleteItem } = useTrendAndDriverDelete();
+  const { mutate: updateItem } = useTrendAndDriverUpdate();
 
   return (
     <ConceptDetailCard
@@ -40,7 +43,10 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAn
         </button>
       }
     >
-      <div className={styles.cardTrendContent} onClick={() => openModal(EditTrendAndDriver, { trendAndDriver })}>
+      <div
+        className={styles.cardTrendContent}
+        onClick={() => openModal(EditMarketScanElement, { item: trendAndDriver, deleteItem, updateItem })}
+      >
         <img alt="delivery-trend" src={images.deliveryTrend} />
         <span className={styles.cardBoldText}>{trendAndDriver?.name}</span>
         <p className={styles.cardRegularText}>{trendAndDriver?.description}</p>

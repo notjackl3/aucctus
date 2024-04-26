@@ -62,3 +62,14 @@
     }
   }
 }
+
+.confirm {
+  position: absolute;
+  background-color: white;
+  border-radius: $br-5xs;
+  width: 125%;
+
+  top: 15%;
+
+  box-shadow: $shadow-3xl;
+}

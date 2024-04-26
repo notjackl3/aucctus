@@ -156,6 +156,8 @@ export interface IInvestorsEcosystem extends IEcosystem {
   ecosystemType: 'investors';
 }
 
+type Ecosystem = IStartupEcosystem | IIncumbentsEcosystem | IInvestorsEcosystem;
+
 export interface ITrendsAndDrivers extends IBaseConceptEntity {
   name: string;
   description: string;
