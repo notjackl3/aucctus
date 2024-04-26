@@ -10,7 +10,6 @@ import {
   IConceptOverview,
   IConceptPage,
   ICustomerProfile,
-  IEcosystem,
   IFinancialProjection,
   IMarketScan,
   IMarketSizeMetric,

@@ -5,10 +5,15 @@ import { useMemo } from 'react';
 import styles from './styles/hypothesisDetails.module.scss';
 import GeneralBadge from '../../../../components/Badges/GeneralBadge/GeneralBadge';
 import AssumptionBadge from '../../../../components/Badges/AssumptionBadge/AssumptionBadge';
+import Icon from '../../../../components/Icons/Icon/Icon';
+import { useModal } from '../../../../context/modal/ModalContextProvider';
+import EditKeyAssumptionModal from '../../../../components/Modal/EditKeyAssumtionModal/EditKeyAssumtionModal';
 
 const columnHelper = createColumnHelper<IAssumption>();
 
 export function useAssumptionsColumns() {
+  const { openModal } = useModal();
+
   const columns = useMemo(
     () => [
       columnHelper.accessor((row) => row?.uuid, {
@@ -17,20 +22,20 @@ export function useAssumptionsColumns() {
         minSize: 280,
         size: 280,
         cell: (info) => (
-          <div className={styles.assumption}>
-            <span className={styles.assumptionTitle}> {info?.row?.original?.name} </span>
+          <span className={styles.assumption}>
+            <span className={styles.assumptionTitle}> {info.row.original.name} </span>
             <span className={`${styles.assumptionDescription} ${styles.cellDescription}`}>
-              {info?.row?.original?.hypothesis}
+              {info.row.original.hypothesis}
             </span>
-          </div>
+          </span>
         ),
       }),
       columnHelper.accessor((row) => row.riskCategory, {
         id: 'riskCategory',
         cell: (info) => (
-          <div className={styles.riskCategory}>
-            <GeneralBadge variant={`${info.getValue()}Risk`} badgeText={info.getValue()} />
-          </div>
+          <span className={styles.riskCategory}>
+            <GeneralBadge variant={info.getValue()} badgeText={info.getValue()} />
+          </span>
         ),
         minSize: 125,
         size: 125,
@@ -42,9 +47,26 @@ export function useAssumptionsColumns() {
         size: 150,
         header: () => <span>Type </span>,
         cell: (info) => (
-          <div className={styles.reviewConceptLink}>
+          <span className={styles.reviewConceptLink}>
             <AssumptionBadge assumptionType={info.getValue()} />
-          </div>
+          </span>
+        ),
+      }),
+      columnHelper.accessor((row) => row.assumptionsType, {
+        id: 'uuid',
+        minSize: 80,
+        size: 80,
+        header: () => <span> </span>,
+        cell: (info) => (
+          <button
+            className="btn btn-light btn-no-border"
+            onClick={(e) => {
+              openModal(EditKeyAssumptionModal, { assumption: info.row.original });
+              e.preventDefault();
+            }}
+          >
+            <Icon variant="edit" />
+          </button>
         ),
       }),
     ],

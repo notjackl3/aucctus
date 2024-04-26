@@ -1,8 +1,6 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 import styles from './styles/hypothesisDetails.module.scss';
-import { IAssumption } from '../../../../../libs/api/types';
 import {
-  createColumnHelper,
   flexRender,
   getFilteredRowModel,
   getCoreRowModel,
@@ -13,12 +11,11 @@ import {
 } from '@tanstack/react-table';
 import Loading from '../../../../components/Loading';
 import TablePagination from '../../../../components/Tables/TablePagination';
-import { useQuery } from 'react-query';
-import api from '../../../../../libs/api';
 import { useParams } from 'react-router-dom';
 import { getAssumptionActiveHexColor, getAssumptionHexColor } from '../../../../../libs/concepts';
 import QuadrantChart, { ChartPoint } from '../../../../components/Charts/QuadrantChart/QuadrantChart';
 import { useAssumptionsColumns } from './columns.hook';
+import { useKeyAssumptions } from '../../../../hooks/query/concepts.hook';
 
 const HypothesisDetails: FunctionComponent = () => {
   const { columns } = useAssumptionsColumns();
@@ -32,20 +29,13 @@ const HypothesisDetails: FunctionComponent = () => {
 
   const selectedRowId = Object.keys(rowSelection)[0];
 
-  const { data, isLoading: isAssumptionsLoading } = useQuery({
-    queryKey: ['concepts/key-assumptions'],
-    refetchOnWindowFocus: false,
-    retry: 1,
-    queryFn: async () => {
-      return api.concept.getConceptKeyAssumptions(conceptId || '');
-    },
-  });
+  const { data, assumptions, isLoading } = useKeyAssumptions(conceptId || '');
 
   const chartCoordinates: ChartPoint[] = useMemo(() => {
-    if (!data || !data.results) {
+    if (!assumptions) {
       return [];
     }
-    return data.results.map((assumption) => {
+    return assumptions.map((assumption) => {
       return {
         xCoord: assumption.impactLevel,
         yCoord: -assumption.difficultyLevel,
@@ -54,12 +44,11 @@ const HypothesisDetails: FunctionComponent = () => {
         activeColor: getAssumptionActiveHexColor(assumption.assumptionsType),
       };
     });
-  }, [data]);
+  }, [assumptions]);
 
-  const tableData = useMemo(() => data?.results ?? [], [data]);
   const table = useReactTable({
     getRowId: (row) => row.uuid,
-    data: tableData,
+    data: assumptions,
     columns,
     enableRowSelection: true,
     enableMultiRowSelection: false,
@@ -98,7 +87,7 @@ const HypothesisDetails: FunctionComponent = () => {
                   </tr>
                 ))}
               </thead>
-              {isAssumptionsLoading ? (
+              {isLoading ? (
                 <div className={styles.tableMessageContainer}>
                   <Loading />
                 </div>

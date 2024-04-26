@@ -7,11 +7,18 @@
 
   .dropdownToggle {
     display: flex;
-    width: 15rem;
-    justify-content: flex-start;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
     border-radius: 4px;
+    padding: $padding-xs;
+
     cursor: pointer;
     user-select: none;
+
+    gap: $gap-base;
+
+    box-shadow: $shadow-100;
   }
 
   .dropdownMenu {

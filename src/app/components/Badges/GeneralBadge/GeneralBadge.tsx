@@ -8,7 +8,7 @@ const defaultIconProps = {
   height: 16,
 };
 
-type GeneralBadgeVariant = 'highRisk' | 'mediumRisk' | 'lowRisk';
+type GeneralBadgeVariant = 'high' | 'medium' | 'low';
 export interface GeneralBadgeProps {
   badgeClassName?: string;
   bulletClassName?: string;
@@ -28,22 +28,22 @@ const GeneralBadge: FunctionComponent<GeneralBadgeProps> = ({
 }) => {
   const getBadgeStyle = (variant: GeneralBadgeVariant) => {
     switch (variant) {
-      case 'highRisk':
+      case 'high':
         return styles.highRisk;
-      case 'mediumRisk':
+      case 'medium':
         return styles.mediumRisk;
-      case 'lowRisk':
+      case 'low':
         return styles.lowRisk;
     }
   };
 
   const getBadgeIcon = (variant: GeneralBadgeVariant): IconVariant => {
     switch (variant) {
-      case 'highRisk':
+      case 'high':
         return 'alert-octagon';
-      case 'mediumRisk':
+      case 'medium':
         return 'alert-triangle';
-      case 'lowRisk':
+      case 'low':
         return 'check';
     }
   };

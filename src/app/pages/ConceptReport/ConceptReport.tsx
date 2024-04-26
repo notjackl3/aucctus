@@ -81,7 +81,7 @@ const ConceptReport: FunctionComponent = () => {
         <div className={styles.header}>
           <h1>{concept?.title}</h1>
           <div className={styles.statusSelect}>
-            <Dropdown options={DROPDOWN_OPTIONS} onSelect={changeConceptStatus} selected={status} />
+            <Dropdown options={DROPDOWN_OPTIONS} hideChevron onSelect={changeConceptStatus} selected={status} />
           </div>
         </div>
         <div className={styles.actions}>

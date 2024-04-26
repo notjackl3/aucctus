@@ -127,12 +127,12 @@ export const useFinancialProjection = (uuid: string) => {
 
 export const useKeyAssumptions = (uuid: string) => {
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptKeyAssumptions, uuid],
+    queryKey: [AucctusQueryKeys.conceptKeyAssumptions],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptKeyAssumptions(uuid),
   });
 
-  return { ...query, assumptions: query.data };
+  return { ...query, assumptions: query.data?.results || [] };
 };
 
 /**

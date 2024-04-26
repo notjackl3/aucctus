@@ -44,7 +44,7 @@ const KeyAssumptionCard: FunctionComponent<KeyAssumptionCardProps> = ({ keyAssum
           {keyAssumptions.map((assumption, i) => (
             <div key={`assumption-${assumption.uuid}-${i}`} className={styles.assumptionRow}>
               <div className={styles.badge}>
-                <GeneralBadge variant={`${assumption.riskCategory}Risk`} badgeText={assumption.riskCategory} />
+                <GeneralBadge variant={assumption.riskCategory} badgeText={assumption.riskCategory} />
               </div>
               {<div className={`${styles.descriptionText} ${styles.ellipsis}`}>{assumption.name}</div>}
             </div>
