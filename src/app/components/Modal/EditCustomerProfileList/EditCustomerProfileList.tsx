@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useCallback, useState } from 'react';
 
 import styles from './edit-customer-profile-list.module.scss';
 import { useConceptCustomerProfiles, useDeleteCustomerProfile } from '../../../hooks/query/concepts.hook';
@@ -6,6 +6,7 @@ import Icon from '../../Icons/Icon/Icon';
 import { ICustomerProfile } from '../../../../libs/api/types';
 import images from '../../../assets/img';
 import { useModal } from '../../../context/modal/ModalContextProvider';
+import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 
 interface IEditCustomerProfileListProps {
   conceptUuid: string;
@@ -13,17 +14,34 @@ interface IEditCustomerProfileListProps {
 
 const EditCustomerProfileList: FunctionComponent<IEditCustomerProfileListProps> = ({ conceptUuid }) => {
   const { closeModal } = useModal();
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [selectedProfile, setSelectedProfile] = useState<string | undefined>(undefined);
   const { profiles } = useConceptCustomerProfiles(conceptUuid);
+  const { mutate } = useDeleteCustomerProfile();
+  const handleProfileDelete = useCallback((profileUuid: string) => {
+    setShowConfirmation(true);
+    setSelectedProfile(profileUuid);
+  }, []);
+
+  const closeConfirmation = useCallback(() => {
+    setShowConfirmation(false);
+    setSelectedProfile(undefined);
+  }, []);
 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
         <div />
-        <button className={'btn-close'} onClick={() => closeModal()} />
+        <button aria-label="Close" className="btn-close" disabled={showConfirmation} onClick={() => closeModal()} />
       </div>
       <div className={styles.content}>
         {profiles.map((profile) => (
-          <ProfileListItem key={profile.uuid} profile={profile} profileCount={profiles.length} />
+          <ProfileListItem
+            key={profile.uuid}
+            profile={profile}
+            profileCount={profiles.length}
+            onDelete={handleProfileDelete}
+          />
         ))}
 
         <button className={styles.generate} disabled onClick={() => {}}>
@@ -32,10 +50,39 @@ const EditCustomerProfileList: FunctionComponent<IEditCustomerProfileListProps> 
         </button>
       </div>
       <div className={styles.actions}>
-        <button className="btn btn-primary" onClick={() => closeModal()}>
+        <button className="btn btn-primary" disabled={showConfirmation} onClick={() => closeModal()}>
           Done
         </button>
       </div>
+      {showConfirmation ? (
+        <div className={styles.confirm}>
+          <ConfirmationModal
+            title="Are you sure you'd like to delete?"
+            subtitle="This action can not be reversed."
+            actions={[
+              {
+                title: 'Cancel',
+                variant: 'light',
+                onClick: () => {
+                  closeConfirmation();
+                },
+              },
+              {
+                title: 'Delete',
+                variant: 'danger',
+                onClick: () => {
+                  if (!selectedProfile) return;
+                  mutate(selectedProfile, {
+                    onSuccess: () => {
+                      closeConfirmation();
+                    },
+                  });
+                },
+              },
+            ]}
+          />
+        </div>
+      ) : null}
     </div>
   );
 };
@@ -43,9 +90,8 @@ const EditCustomerProfileList: FunctionComponent<IEditCustomerProfileListProps> 
 const ProfileListItem: FunctionComponent<{
   profile: ICustomerProfile;
   profileCount: number;
-}> = ({ profile, profileCount }) => {
-  const { mutate } = useDeleteCustomerProfile();
-
+  onDelete: (uuid: string) => void;
+}> = ({ profile, profileCount, onDelete }) => {
   return (
     <div className={styles.profile}>
       <div className={styles.details}>
@@ -58,8 +104,9 @@ const ProfileListItem: FunctionComponent<{
       <button
         disabled={profileCount === 1}
         className={styles.remove}
-        onClick={() => {
-          mutate(profile.uuid);
+        onClick={(e) => {
+          onDelete(profile.uuid);
+          e.preventDefault();
         }}
       >
         Remove

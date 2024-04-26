@@ -24,8 +24,6 @@ const CustomerProfile: FunctionComponent = () => {
     [profiles, selectedProfileName]
   );
 
-  const firstPersona = profiles.length > 0 ? profiles[0] : undefined;
-
   const customerTabs = useMemo(() => {
     return profiles.map<TabElement>((item: ICustomerProfile) => ({
       label: item.nickname,
@@ -44,7 +42,8 @@ const CustomerProfile: FunctionComponent = () => {
   );
 
   useEffect(() => {
-    if (!selectedProfileName && conceptId && firstPersona) {
+    const firstPersona = profiles.length > 0 ? profiles[0] : undefined;
+    if ((!selectedProfileName || !selectedProfile) && conceptId && firstPersona) {
       navigate(
         {
           pathname: AppPath.ConceptCustomerProfile.replace(':id', conceptId),
@@ -55,7 +54,7 @@ const CustomerProfile: FunctionComponent = () => {
         }
       );
     }
-  }, [selectedProfileName, firstPersona, onTabSelect, conceptId, navigate]);
+  }, [selectedProfileName, onTabSelect, conceptId, navigate, profiles, selectedProfile]);
 
   return (
     <div className={styles.customerProfile}>
