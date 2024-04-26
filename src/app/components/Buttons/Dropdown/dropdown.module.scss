@@ -1,5 +1,5 @@
-@use 'src/app/assets/styles/colors.scss' as *;
-@use 'src/app/assets/styles/variables.scss' as *;
+@use '~colors.scss' as *;
+@use '~variables.scss' as *;
 
 .dropdown {
   position: relative;

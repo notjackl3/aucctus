@@ -9,7 +9,7 @@
   position: relative;
 
   &.editOff {
-    cursor: url('assets/images/pencil.png'), pointer;
+    cursor: url('~pencil.png'), pointer;
 
     &:hover {
       background-color: $white;

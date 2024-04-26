@@ -38,6 +38,10 @@ export default defineConfig({
 
   resolve: {
     alias: {
+      '~typography.scss': path.resolve(__dirname, 'src/app/assets/styles/typography.scss'),
+      '~colors.scss': path.resolve(__dirname, 'src/app/assets/styles/colors.scss'),
+      '~variables.scss': path.resolve(__dirname, 'src/app/assets/styles/variables.scss'),
+      '~pencil.png': path.resolve(__dirname, 'src/app/assets/img/pencil.png'),
       '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
     },
   },

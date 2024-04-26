@@ -1,5 +1,5 @@
-@use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/colors.scss' as *;
+@use '~typography.scss' as *;
+@use '~colors.scss' as *;
 
 .generalBadge {
   display: flex;

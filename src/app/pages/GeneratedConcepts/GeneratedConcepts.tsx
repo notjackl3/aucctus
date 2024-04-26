@@ -83,7 +83,7 @@ const GeneratedConcepts: FunctionComponent = () => {
         ),
       }),
     ],
-    [generatedConceptData]
+    []
   );
 
   const tableData = useMemo(() => generatedConceptData ?? [], [generatedConceptData]);

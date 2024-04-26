@@ -1,6 +1,6 @@
-@use 'src/app/assets/styles/colors.scss' as *;
-@use 'src/app/assets/styles/typography.scss' as *;
-@use 'src/app/assets/styles/variables.scss' as *;
+@use '~colors.scss' as *;
+@use '~typography.scss' as *;
+@use '~variables.scss' as *;
 
 .marketDetails {
   display: flex;
@@ -73,7 +73,7 @@
       justify-content: space-between;
       color: $blue-900;
 
-      cursor: url('assets/images/pencil.png'), pointer;
+      cursor: url('~pencil.png'), pointer;
 
       img {
         width: 100%;
