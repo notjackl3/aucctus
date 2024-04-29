@@ -52,7 +52,8 @@ $btn-colors: (
     font-weight: 700;
   }
 
-  &.btn-no-border {
+  &.btn-no-border,
+  &.btn-link {
     box-shadow: none !important;
     border: none !important;
   }

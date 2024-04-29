@@ -110,10 +110,11 @@ export const useConceptTableColumns = (
                     status: 'ideating',
                   });
                   break;
-                case 'complete':
-                  navigate(AppPath.ConceptOverview.replace(':id', row.original.uuid));
                 case 'error':
                   retryConceptReport(row.original.uuid);
+                  break;
+                case 'complete':
+                  navigate(AppPath.ConceptOverview.replace(':id', row.original.uuid));
                   break;
                 default:
                   e.stopPropagation();
