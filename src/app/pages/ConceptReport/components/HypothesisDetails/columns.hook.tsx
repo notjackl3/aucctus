@@ -19,7 +19,7 @@ export function useAssumptionsColumns() {
       columnHelper.accessor((row) => row?.uuid, {
         id: 'uuid',
         header: () => <span className={styles.details}> Title </span>,
-        minSize: 280,
+        minSize: 125,
         size: 280,
         cell: (info) => (
           <span className={styles.assumption}>
@@ -54,19 +54,21 @@ export function useAssumptionsColumns() {
       }),
       columnHelper.accessor((row) => row.assumptionsType, {
         id: 'uuid',
-        minSize: 80,
-        size: 80,
+        minSize: 10,
+        size: 10,
         header: () => <span> </span>,
         cell: (info) => (
-          <button
-            className="btn btn-light btn-no-border"
-            onClick={(e) => {
-              openModal(EditKeyAssumptionModal, { assumption: info.row.original });
-              e.preventDefault();
-            }}
-          >
-            <Icon variant="edit" />
-          </button>
+          <span className={styles.buttonContainer}>
+            <button
+              className="btn btn-light btn-no-border"
+              onClick={(e) => {
+                openModal(EditKeyAssumptionModal, { assumption: info.row.original });
+                e.preventDefault();
+              }}
+            >
+              <Icon variant="edit" />
+            </button>
+          </span>
         ),
       }),
     ],

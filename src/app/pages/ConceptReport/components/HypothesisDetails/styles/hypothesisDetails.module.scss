@@ -113,6 +113,7 @@
           tbody {
             width: 100%;
             tr {
+              position: relative;
               cursor: pointer;
               display: flex;
               padding: 0.75rem 1.5rem;
@@ -208,8 +209,19 @@
         border-radius: 0 0 0.75rem 0;
         border: 1px solid $grey-200;
         border-left: none;
-        padding: 1.5rem;
+        padding: $padding-base;
       }
     }
+  }
+}
+
+.buttonContainer {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+
+  button {
+    padding: 0.75rem !important;
+    background: transparent !important;
   }
 }
