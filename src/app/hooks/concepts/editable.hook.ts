@@ -107,8 +107,11 @@ function useEditableField<
    * @returns {Promise<void>}
    */
   const handleSave = async (options?: MutateOptions<TData, TError, TVariables>): Promise<void> => {
+    if (!identifier) {
+      toast.error('Oops! Something went wrong. Please try again.');
+    }
+
     if (!isEdited || !identifier) {
-      toast.error(`Missing required fields`);
       return;
     }
 
@@ -162,14 +165,12 @@ export function useEditConcept() {
   const { id: conceptUuid = '' } = useParams();
   const { concept } = useConcept(conceptUuid);
   const { mutate: updateConcept } = useConceptUpdate();
-  const validationOptions: IValidationOptions = { maxLength: 200 };
 
   const descriptionField = useEditableField<string, IConcept>({
     initialValue: concept?.description || '',
     fieldName: 'description',
     updateMutation: updateConcept,
     identifier: conceptUuid,
-    validation: validationOptions,
   });
 
   return {
@@ -181,7 +182,7 @@ export function useEditOverview() {
   const { id: conceptUuid = '' } = useParams();
   const { overview } = useConceptOverview(conceptUuid);
   const { mutate: updateConceptOverview } = useConceptOverviewUpdate(conceptUuid);
-  const validationOptions: IValidationOptions = { maxLength: 200 };
+  const validationOptions: IValidationOptions = { maxLength: 250 };
 
   const valuePropositionField = useEditableField<string, IConceptOverview>({
     initialValue: overview?.valueProposition || '',

@@ -3,9 +3,10 @@ import styles from './styles/conceptOverview.module.scss';
 import Icon from '../../components/Icons/Icon/Icon';
 import TabView from '../../components/Container/TabView';
 import Dropdown from '../../components/Buttons/Dropdown/Dropdown';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { ConceptStatus, IConcept } from '../../../libs/api/types';
 import { AppPath } from '../../../routes/routes';
+import { useConceptUuid } from './concept-uuid.hook';
 
 import ConceptStatusBubble from '../../components/Badges/ConceptStatusBubble/ConceptStatusBubble';
 import { CONCEPT_STATUS_LIST } from '../../../libs/concepts';
@@ -38,7 +39,7 @@ const defaultIconProps = {
 };
 
 const ConceptReport: FunctionComponent = () => {
-  const { id: conceptUuid } = useParams();
+  const conceptUuid = useConceptUuid();
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
 
@@ -68,12 +69,12 @@ const ConceptReport: FunctionComponent = () => {
     [updateConcept, conceptUuid]
   );
 
-  useEffect(() => {
-    if (!conceptUuid || (conceptUuid && !concept && isError)) {
-      // Go back to the previous page if the conceptUuid is not available
-      navigate(-1);
-    }
-  }, [conceptUuid, navigate, concept, isError]);
+  // useEffect(() => {
+  //   if (conceptUuid && !concept && isError) {
+  //     // Go back to the previous page if the conceptUuid is not available
+  //     navigate(-1);
+  //   }
+  // }, [conceptUuid, navigate, concept, isError]);
 
   return (
     <div className={`${styles.conceptOverview} ${styles.slideAnimation}`}>

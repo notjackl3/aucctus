@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useCallback, useRef } from 'react';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
 import { Ecosystem } from '../../../../../libs/api/types';
 import images from '../../../../assets/img';
@@ -21,64 +21,34 @@ interface IEcosystemListProps {
 }
 
 const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data }) => {
-  const [isEditing, setEditing] = useState(false);
-  const { openModal, isOpen } = useModal();
+  const { openModal } = useModal();
   const { mutate: deleteItem } = useEcosystemDelete();
   const { mutate: updateItem } = useEcosystemUpdate();
   const ref = useRef<HTMLDivElement>(null);
 
-  const onEditClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    setEditing((prev) => !prev);
-    e.preventDefault();
-    e.stopPropagation();
-  };
-
   const onContainerClick = useCallback(
     (item: Ecosystem) => (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      if (isEditing) {
-        openModal(EditMarketScanElement, { item, deleteItem, updateItem });
-      } else {
-        window.open(item.source, '_blank');
-      }
+      openModal(EditMarketScanElement, { item, deleteItem, updateItem });
+      e.preventDefault();
+    },
+    [deleteItem, openModal, updateItem]
+  );
+
+  const onClick = useCallback(
+    (item: Ecosystem) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      window.open(item.source, '_blank');
       e.preventDefault();
       e.stopPropagation();
     },
-    [deleteItem, isEditing, openModal, updateItem]
+    []
   );
-
-  useEffect(() => {
-    if (!isEditing || !ref.current) return;
-    const handleClickOutside = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node) && !isOpen) {
-        setEditing(false);
-      }
-    };
-
-    window.addEventListener('mousedown', handleClickOutside);
-
-    return () => {
-      window.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isEditing, isOpen]);
 
   return (
     <div ref={ref}>
-      <ConceptDetailCard
-        title={title}
-        headerAction={
-          <button className={!isEditing ? 'btn btn-light btn-no-border' : 'btn-close'} onClick={onEditClick}>
-            {!isEditing ? <Icon variant="edit" /> : null}
-          </button>
-        }
-        isHideFooter
-      >
+      <ConceptDetailCard title={title} isHideFooter>
         <div className={styles.cardContent}>
           {data?.map((item) => (
-            <div
-              key={item.uuid}
-              className={`${styles.cardRow} ${isEditing ? styles.editCard : ''}`}
-              onClick={onContainerClick(item)}
-            >
+            <div key={item.uuid} className={`${styles.cardRow} ${styles.editCard}`} onClick={onContainerClick(item)}>
               <img
                 className={styles.cardLogo}
                 alt="company-logo"
@@ -91,7 +61,9 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data }) 
                 <span className={styles.cardDescriptionTitle}>{item.name}</span>
                 <p className={styles.cardDescriptionText}>{item.description}</p>
               </div>
-              <Icon variant={isEditing ? 'edit' : 'link-external'} {...iconDefaultProps} />
+              <button className="btn btn-light" onClick={onClick(item)}>
+                <Icon variant={'link-external'} {...iconDefaultProps} />
+              </button>
             </div>
           ))}
         </div>

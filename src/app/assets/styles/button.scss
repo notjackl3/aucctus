@@ -2,6 +2,7 @@
 @use '~typography.scss' as *;
 @use '~variables.scss' as *;
 
+// Array of Tuple for button colors: (background-color, text-color)
 $btn-colors: (
   primary: (
     $primary-600,

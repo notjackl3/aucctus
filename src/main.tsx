@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { persistor, store } from './app/store';
 import App from './App';
-import { HashRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import { PersistGate } from 'redux-persist/integration/react';
 import { ModalProvider } from './app/context/modal/ModalContextProvider';
 import { QueryCache, QueryClient, QueryClientProvider } from 'react-query';
@@ -30,13 +30,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <HashRouter>
+        <BrowserRouter>
           <QueryClientProvider client={queryClient}>
             <ModalProvider>
               <App />
             </ModalProvider>
           </QueryClientProvider>
-        </HashRouter>
+        </BrowserRouter>
       </PersistGate>
     </Provider>
   </React.StrictMode>

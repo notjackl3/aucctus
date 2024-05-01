@@ -91,6 +91,15 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
         setIsEditing(false);
         handleCancel && handleCancel();
       }
+
+      if (e.key === 'Enter' && e.shiftKey) {
+        // Add a new line to the text
+        onChange && onChange({ target: { value: `${value}\n` } } as React.ChangeEvent<HTMLTextAreaElement>);
+        e.preventDefault(); // Prevent the default action
+      } else if (e.key === 'Enter' || ((e.metaKey || e.ctrlKey) && e.key === 's')) {
+        handleSave && handleSave();
+        setIsEditing(false);
+      }
     };
 
     // Close the edit mode when clicking outside the component
