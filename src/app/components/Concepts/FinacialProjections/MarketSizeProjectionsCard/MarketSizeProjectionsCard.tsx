@@ -3,7 +3,7 @@ import { getMarketMetricTitle } from '../../../../../libs/concepts';
 import { formatter } from '../../../../../libs/utils';
 import { useModal } from '../../../../context/modal/ModalContextProvider';
 import ConceptDetailCard from '../../../Cards/ConceptDetailCard/ConceptDetailCard';
-import MarketSizeMetricEditModal from '../../../Modal/MarketSizeMetricEditModal/MarketSizeMetricEditModal';
+import EditMarketSizeMetricModal from '../../../Modal/EditMarketSizeMetricModal/EditMarketSizeMetricModal';
 
 import styles from './market-size-projections.module.scss';
 
@@ -23,7 +23,7 @@ const MarketSizeProjectionsCard: React.FC<IMarketSizeProjectionsCardProps> = ({ 
         e.preventDefault();
         setShouldCloseOnOverlayClickClick(false);
 
-        openModal(MarketSizeMetricEditModal, {
+        openModal(EditMarketSizeMetricModal, {
           conceptUuid,
           metric,
         });

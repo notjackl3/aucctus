@@ -24,6 +24,8 @@
     box-sizing: border-box;
     border-bottom: 1px solid $grey-300;
 
+    @include edit-cursor;
+
     &:last-child {
       border-bottom: none;
     }

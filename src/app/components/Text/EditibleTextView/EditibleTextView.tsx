@@ -117,7 +117,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
       window.removeEventListener('mousedown', handleClick);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleCancel, handleSave, isEditing]);
+  }, [handleCancel, handleSave, isEditing, onChange, value]);
 
   return (
     <div

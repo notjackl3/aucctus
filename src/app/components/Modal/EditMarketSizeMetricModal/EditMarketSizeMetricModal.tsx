@@ -23,7 +23,7 @@ const formatNumber = (num: number) => {
   });
 };
 
-const MarketSizeMetricEditModal: React.FC<IMarketSizeMetricEditModalProps> = ({ metric, conceptUuid }) => {
+const EditMarketSizeMetricModal: React.FC<IMarketSizeMetricEditModalProps> = ({ metric, conceptUuid }) => {
   const { closeModal } = useModal();
   const { mutate } = useMarketMetricSizeUpdate(conceptUuid);
   const [value, setValue] = useState(() => formatNumber(metric.value));
@@ -164,4 +164,4 @@ const MarketSizeMetricEditModal: React.FC<IMarketSizeMetricEditModalProps> = ({ 
   );
 };
 
-export default MarketSizeMetricEditModal;
+export default EditMarketSizeMetricModal;

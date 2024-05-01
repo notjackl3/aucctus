@@ -4,12 +4,18 @@
 
 .container {
   display: flex;
-  padding: 0 32px;
+  padding: $padding-base;
 
   flex-direction: column;
   align-items: flex-start;
   gap: 28px;
   flex: 1 0 0;
+
+  border-radius: $br-base;
+
+  &:hover {
+    background-color: $white;
+  }
 
   .wrapper {
     display: flex;
@@ -45,4 +51,8 @@
       }
     }
   }
+}
+
+.edit {
+  @include edit-cursor;
 }

@@ -39,12 +39,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ profile }) 
         </div>
         <div className={styles.rightColumn}>
           <div className={styles.listSection}>
-            <DemographicsContainer
-              geoLocation={profile?.geoLocation}
-              ageRange={profile?.ageRange}
-              familySize={profile?.familySize}
-              incomeRange={profile?.incomeRange}
-            />
+            <DemographicsContainer profile={profile} canEdit={true} />
           </div>
         </div>
       </div>

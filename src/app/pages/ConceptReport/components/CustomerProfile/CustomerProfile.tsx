@@ -10,7 +10,7 @@ import { AppPath } from '../../../../../routes/routes';
 import { useConceptCustomerProfiles, useDeleteCustomerProfile } from '../../../../hooks/query/concepts.hook';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useModal } from '../../../../context/modal/ModalContextProvider';
-import EditCustomerProfileList from '../../../../components/Modal/AddCustomerProfile/AddCustomerProfile';
+import AddCustomerProfile from '../../../../components/Modal/CustomerProfile/AddCustomerProfile';
 import ConfirmationModal from '../../../../components/Modal/ConfirmationModal/ConfirmationModal';
 
 const CustomerProfile: FunctionComponent = () => {
@@ -74,7 +74,7 @@ const CustomerProfile: FunctionComponent = () => {
               className="btn btn-light"
               disabled={!conceptId || !selectedProfile}
               onClick={() => {
-                openModal(EditCustomerProfileList, { conceptUuid: conceptId || '' });
+                openModal(AddCustomerProfile, { conceptUuid: conceptId || '' });
               }}
             >
               <Icon variant="plus" height={20} width={20} />
