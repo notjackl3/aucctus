@@ -7,16 +7,18 @@ import Loading from '../../../../components/Loading';
 import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
 import { TabElement } from '../../../../components/Container/TabView/TabView';
 import { AppPath } from '../../../../../routes/routes';
-import { useConceptCustomerProfiles } from '../../../../hooks/query/concepts.hook';
+import { useConceptCustomerProfiles, useDeleteCustomerProfile } from '../../../../hooks/query/concepts.hook';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useModal } from '../../../../context/modal/ModalContextProvider';
-import EditCustomerProfileList from '../../../../components/Modal/EditCustomerProfileList/EditCustomerProfileList';
+import EditCustomerProfileList from '../../../../components/Modal/AddCustomerProfile/AddCustomerProfile';
+import ConfirmationModal from '../../../../components/Modal/ConfirmationModal/ConfirmationModal';
 
 const CustomerProfile: FunctionComponent = () => {
   const { id: conceptId } = useParams();
   const navigate = useNavigate();
-  const { openModal } = useModal();
+  const { openModal, closeModal } = useModal();
   const { profiles, isLoading } = useConceptCustomerProfiles(conceptId || '');
+  const { mutate } = useDeleteCustomerProfile();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedProfileName = searchParams.get('persona');
   const selectedProfile = useMemo(
@@ -67,16 +69,49 @@ const CustomerProfile: FunctionComponent = () => {
           variant="button"
           onTabSelect={onTabSelect}
           activeTab={selectedProfileName || ''}
-          actionButtons={
+          actionButtons={[
             <button
               className="btn btn-light"
+              disabled={!conceptId || !selectedProfile}
               onClick={() => {
                 openModal(EditCustomerProfileList, { conceptUuid: conceptId || '' });
               }}
             >
-              <Icon variant="users-edit" height={20} width={20} />
-            </button>
-          }
+              <Icon variant="plus" height={20} width={20} />
+            </button>,
+
+            <button
+              className="btn btn-light"
+              disabled={!conceptId || !selectedProfile}
+              onClick={() => {
+                openModal(ConfirmationModal, {
+                  title: 'Are you sure?',
+                  subtitle: `This will delete the \"${selectedProfileName}\" customer profile`,
+                  actions: [
+                    {
+                      title: 'Delete',
+                      variant: 'danger',
+                      onClick: () => {
+                        if (selectedProfile) {
+                          mutate(selectedProfile.uuid);
+                        }
+                        closeModal();
+                      },
+                    },
+                    {
+                      title: 'Cancel',
+                      onClick: () => {
+                        closeModal();
+                      },
+                      variant: 'primary',
+                    },
+                  ],
+                });
+              }}
+            >
+              <Icon variant="trash" height={20} width={20} />
+            </button>,
+          ]}
         >
           {selectedProfile ? <CustomerDetails profile={selectedProfile} /> : <Loading />}
         </TabView>

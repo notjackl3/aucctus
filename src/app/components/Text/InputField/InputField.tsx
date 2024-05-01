@@ -26,6 +26,7 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
   { label, name, hint, errorMessage, error = false, isPassword = false, variant, width, ...props },
   ref
 ) => {
+  const hasError = !!errorMessage;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const togglePasswordVisibility = () => {
@@ -58,7 +59,7 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
   };
 
   return (
-    <div style={width ? { width } : {}} className={`${inputFieldStyle} ${error ? styles.inputFieldError : ''}`}>
+    <div style={width ? { width } : {}} className={`${inputFieldStyle} ${hasError ? styles.inputFieldError : ''}`}>
       {label && <div className={styles.label}>{label}</div>}
       <input {...props} type={getInputType()} ref={ref} name={name} />
       {showVisibilityIcon && (

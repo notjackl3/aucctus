@@ -126,7 +126,6 @@ const SecurityDetails: FunctionComponent = () => {
                 name={info.name}
                 disabled={info.isDisabled}
                 label={''}
-                error={info.error}
                 errorMessage={info.errorMessage}
                 hint={info.hint}
                 autoComplete="on"

@@ -10,6 +10,7 @@ import {
   IConceptOverview,
   IConceptPage,
   ICustomerProfile,
+  ICustomerProfileCreate,
   IEcosystem,
   IFinancialProjection,
   IFormError,
@@ -260,6 +261,13 @@ export const useCustomerProfileUpdate = (profileUuid: string, conceptUuid?: stri
   return useGenericConceptMutate<ICustomerProfile>(
     (data) => api.concept.updateConceptCustomerProfile(data.uuid, data),
     queryKeys
+  );
+};
+
+export const useCustomerProfileCreate = (conceptUuid: string) => {
+  return useGenericConceptMutate<ICustomerProfile, ICustomerProfileCreate>(
+    (data) => api.concept.createConceptCustomerProfile(conceptUuid, data),
+    [[AucctusQueryKeys.conceptCustomerProfiles, conceptUuid]]
   );
 };
 

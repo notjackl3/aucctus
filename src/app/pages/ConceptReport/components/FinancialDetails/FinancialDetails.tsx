@@ -4,10 +4,8 @@ import Icon from '../../../../components/Icons/Icon/Icon';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
 import GeneralBadge from '../../../../components/Badges/GeneralBadge/GeneralBadge';
 import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
-import MarketLegend from '../../../../components/Legends/MarketLegend';
-import { formatter } from '../../../../../libs/utils';
+import MarketLegend from '../../../../components/Legends/MarketLegend/MarketLegend';
 import { useParams } from 'react-router-dom';
-import { getMarketMetricColor, getMarketMetricTitle } from '../../../../../libs/concepts';
 import { useFinancialProjection } from '../../../../hooks/query/concepts.hook';
 import { IMarketSizeMetric } from '../../../../../libs/api/types';
 import { useEditFinancialProjections } from '../../../../hooks/concepts/editable.hook';
@@ -23,26 +21,11 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-type MarketMetrics = { [key in IMarketSizeMetric['metricType']]: IMarketSizeMetric };
-
 const FinancialDetails: FunctionComponent = () => {
   const { id: conceptId } = useParams();
-  const { financialProjection } = useFinancialProjection(conceptId || '');
-  const { overview, tamKeyHypothesis, samKeyHypothesis, somKeyHypothesis } = useEditFinancialProjections();
+  const { overview, tamKeyHypothesis, samKeyHypothesis, somKeyHypothesis, marketSizeMetric } =
+    useEditFinancialProjections();
   const { openModal } = useModal();
-
-  const marketSizeMetric = useMemo(() => {
-    if (!financialProjection) {
-      return undefined;
-    }
-
-    const marketSizes = financialProjection.marketSizeMetrics.reduce((acc: Partial<MarketMetrics>, metric) => {
-      acc[metric.metricType] = metric;
-      return acc;
-    }, {});
-
-    return marketSizes as MarketMetrics;
-  }, [financialProjection]);
 
   return (
     <div className={styles.financialDetails}>
@@ -174,7 +157,13 @@ const FinancialDetails: FunctionComponent = () => {
                 sam={marketSizeMetric?.SAM?.value || 0}
                 som={marketSizeMetric?.SOM?.value || 0}
               />
-              <div className={styles.legend}>
+              <MarketLegend
+                tam={marketSizeMetric?.TAM?.value || 0}
+                sam={marketSizeMetric?.SAM?.value || 0}
+                som={marketSizeMetric?.SOM?.value || 0}
+              />
+
+              {/* <div className={styles.legend}>
                 {Object.values(marketSizeMetric || {}).map((metric, i) => (
                   <MarketLegend
                     key={`$market-metrics-legend-${i}`}
@@ -183,7 +172,7 @@ const FinancialDetails: FunctionComponent = () => {
                     bulletColor={getMarketMetricColor(metric.metricType)}
                   />
                 ))}
-              </div>
+              </div> */}
             </div>
           </div>
         </ConceptDetailCard>

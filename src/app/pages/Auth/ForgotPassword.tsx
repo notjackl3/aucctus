@@ -43,7 +43,6 @@ const ForgotPassword: FunctionComponent = () => {
           placeholder="Enter your email"
           value={email}
           autoComplete="on"
-          error={!!emailInputError}
           errorMessage={emailInputError}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           onFocus={() => setEmailInputError(undefined)}

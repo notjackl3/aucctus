@@ -68,7 +68,6 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   name: string;
   description: string;
   nickname: string;
-  overview: string;
   geoLocation: string;
   familySize: number;
   ageUpper: number;
@@ -77,9 +76,24 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   incomeUpper: number;
   incomeLower: number;
   incomeRange: string;
-  jobs: [string];
-  pains: [string];
-  quotes: [string];
+  jobs: string[];
+  pains: string[];
+  quotes: string[];
+}
+
+export interface ICustomerProfileCreate {
+  name: string;
+  description: string;
+  nickname: string;
+  geoLocation: string;
+  familySize: number;
+  ageUpper: number;
+  ageLower: number;
+  incomeUpper: number;
+  incomeLower: number;
+  jobs: string[];
+  pains: string[];
+  quotes: string[];
 }
 
 export type MarketMetricType = 'TAM' | 'SAM' | 'SOM';

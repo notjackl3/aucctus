@@ -28,9 +28,9 @@ const MarketChart: FunctionComponent<MarketChartProps> = ({ tam, sam, som, class
 
   return (
     <svg viewBox="0 0 442 442" className={`${styles.marketChart} ${className}`} fill="black">
-      <circle cx={LARGE_RADIUS} cy={LARGE_RADIUS} r={LARGE_RADIUS} fill="#C9BDFF"></circle>
-      <circle cx={LARGE_RADIUS} cy={mediumCenter} r={mediumRadius} fill="#937BFF"></circle>
-      <circle cx={LARGE_RADIUS} cy={smallCenter} r={smallRadius} fill="#4318FF"></circle>
+      <circle className={styles.largeCircle} cx={LARGE_RADIUS} cy={LARGE_RADIUS} r={LARGE_RADIUS}></circle>
+      <circle className={styles.mediumCircle} cx={LARGE_RADIUS} cy={mediumCenter} r={mediumRadius}></circle>
+      <circle className={styles.smallCircle} cx={LARGE_RADIUS} cy={smallCenter} r={smallRadius}></circle>
       <text x={LARGE_RADIUS} y={LARGE_RADIUS} textAnchor="middle" dy="-151" className={styles.text}>
         TAM
       </text>

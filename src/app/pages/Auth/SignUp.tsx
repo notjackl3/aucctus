@@ -78,7 +78,6 @@ const SignUp: FunctionComponent = () => {
           name={'email'}
           label={'Email*'}
           autoComplete="on"
-          error={!!emailInputError}
           errorMessage={emailInputError}
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
@@ -99,7 +98,6 @@ const SignUp: FunctionComponent = () => {
           label={'Confirm Password*'}
           autoComplete="on"
           isPassword
-          error={!!confirmPassInputError}
           errorMessage={confirmPassInputError}
           value={confirmPassword}
           onChange={_handleConfirmPasswordChange}

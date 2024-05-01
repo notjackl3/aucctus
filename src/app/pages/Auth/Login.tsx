@@ -36,7 +36,6 @@ const Login: FunctionComponent = () => {
           label="Email"
           name="email"
           autoComplete="on"
-          error={!!emailInputError}
           errorMessage={emailInputError}
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}

@@ -24,6 +24,10 @@
     }
 
     .content {
+      display: flex;
+      flex-direction: column;
+      gap: $gap-3xs;
+
       span {
         display: inline-flex;
         align-items: flex-start;

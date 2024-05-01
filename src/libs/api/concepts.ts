@@ -10,6 +10,7 @@ import {
   IConceptOverview,
   IConceptPage,
   ICustomerProfile,
+  ICustomerProfileCreate,
   IFinancialProjection,
   IMarketScan,
   IMarketSizeMetric,
@@ -78,6 +79,12 @@ export class ConceptApi extends ApiService {
   updateConceptCustomerProfile(customerProfileUuid: string, data: Partial<ICustomerProfile>) {
     return this.patch<ICustomerProfile, Partial<ICustomerProfile>>(
       endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+      data
+    );
+  }
+  createConceptCustomerProfile(customerProfileUuid: string, data: ICustomerProfileCreate) {
+    return this.post<ICustomerProfile, ICustomerProfileCreate>(
+      endpoints.conceptCustomerProfiles(customerProfileUuid),
       data
     );
   }

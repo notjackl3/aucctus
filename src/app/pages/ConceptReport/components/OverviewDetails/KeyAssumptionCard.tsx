@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
-import styles from './styles/overviewDetails.module.scss';
+import styles from './overviewDetails.module.scss';
 import { useOutletContext } from 'react-router-dom';
 import { AppPath } from '../../../../../routes/routes';
 import Icon from '../../../../components/Icons/Icon/Icon';

@@ -127,7 +127,6 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
                 name={'new'}
                 value={newItem}
                 onChange={handleChange}
-                error={!!inputError}
                 errorMessage={inputError}
                 maxLength={MAX_INPUT_LENGTH}
               />

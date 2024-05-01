@@ -6,9 +6,16 @@ interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
   title?: string;
 }
 
-const Icon: FunctionComponent<IconProps> = ({ variant, height = 24, width = 24, stroke = '#7586A9', ...props }) => {
+const Icon: FunctionComponent<IconProps> = ({
+  variant,
+  height = 24,
+  width = 24,
+  stroke = '#7586A9',
+  fill = 'none',
+  ...props
+}) => {
   return (
-    <svg height={height} width={width} stroke={stroke} {...props}>
+    <svg height={height} width={width} stroke={stroke} fill={fill} {...props}>
       <use href={`${svg}#${variant}`} />
     </svg>
   );

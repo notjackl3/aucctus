@@ -282,6 +282,7 @@ export function useEditFinancialProjections() {
 
   return {
     overview,
+    marketSizeMetric,
     somKeyHypothesis,
     tamKeyHypothesis,
     samKeyHypothesis,

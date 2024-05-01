@@ -119,14 +119,3 @@ export function getMarketMetricTitle(metricType: MarketMetricType) {
   };
   return marketMetricTitleObj[metricType];
 }
-
-export type MarketMetricColorType = 'purple' | 'darkPurple' | 'blue';
-
-export function getMarketMetricColor(metricType: MarketMetricType) {
-  const marketMetricTitleColorObj: Record<MarketMetricType, MarketMetricColorType> = {
-    TAM: 'purple',
-    SAM: 'darkPurple',
-    SOM: 'blue',
-  };
-  return marketMetricTitleColorObj[metricType];
-}

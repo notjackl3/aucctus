@@ -1,14 +1,13 @@
 import { FunctionComponent, useMemo } from 'react';
-import styles from './styles/overviewDetails.module.scss';
+import styles from './overviewDetails.module.scss';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
 import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
-import MarketLegend from '../../../../components/Legends/MarketLegend';
+import MarketLegend from '../../../../components/Legends/MarketLegend/MarketLegend';
 import defaultAvatar from '../../../../assets/avatar.svg';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useParams, useOutletContext } from 'react-router-dom';
 import { AppPath } from '../../../../../routes/routes';
-import { getMarketMetricColor, getMarketMetricTitle } from '../../../../../libs/concepts';
-import { formatter } from '../../../../../libs/utils';
+
 import KeyAssumptionCard from './KeyAssumptionCard';
 import { IConceptReportContext } from '../../ConceptReport';
 import { useConceptAssumptions, useConceptOverview } from '../../../../hooks/query/concepts.hook';
@@ -17,9 +16,9 @@ import EditModeSwitcher from '../../../../components/Text/EditibleTextView/Editi
 import { useEditConcept, useEditOverview } from '../../../../hooks/concepts/editable.hook';
 
 interface IMetricSizes {
-  tam: IMarketSizeMetric;
-  sam: IMarketSizeMetric;
-  som: IMarketSizeMetric;
+  TAM: IMarketSizeMetric;
+  SAM: IMarketSizeMetric;
+  SOM: IMarketSizeMetric;
 }
 
 const iconDefaultProps = {
@@ -54,11 +53,11 @@ const OverviewDetails: FunctionComponent = () => {
     }
 
     const marketSizes = overview.financialProjection.marketSizeMetrics.reduce((acc: Partial<IMetricSizes>, metric) => {
-      acc[metric.metricType.toLocaleLowerCase() as keyof IMetricSizes] = metric;
+      acc[metric.metricType] = metric;
       return acc;
     }, {});
 
-    if (!marketSizes.tam || !marketSizes.sam || !marketSizes.som) {
+    if (!marketSizes.TAM || !marketSizes.SAM || !marketSizes.SOM) {
       return undefined;
     }
 
@@ -192,22 +191,16 @@ const OverviewDetails: FunctionComponent = () => {
               <>
                 <MarketChart
                   className={styles.marketChart}
-                  tam={marketSizeMetrics.tam.value}
-                  sam={marketSizeMetrics.sam.value}
-                  som={marketSizeMetrics.som.value}
+                  tam={marketSizeMetrics.TAM.value}
+                  sam={marketSizeMetrics.SAM.value}
+                  som={marketSizeMetrics.SOM.value}
                 />
-                <div className={styles.legendGroup}>
-                  {Object.values(marketSizeMetrics).map((metric, i) => (
-                    <MarketLegend
-                      key={`$market-metrics-legend-${i}`}
-                      legendClassName={styles.financeLegend}
-                      legendTextClassName={styles.legendText}
-                      legendText={getMarketMetricTitle(metric.metricType)}
-                      legendValue={formatter.format(metric.value)}
-                      bulletColor={getMarketMetricColor(metric.metricType)}
-                    />
-                  ))}
-                </div>{' '}
+
+                <MarketLegend
+                  tam={marketSizeMetrics.TAM.value}
+                  sam={marketSizeMetrics.SAM.value}
+                  som={marketSizeMetrics.SOM.value}
+                />
               </>
             ) : (
               'No financial projection data available'

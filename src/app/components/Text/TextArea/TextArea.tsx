@@ -32,6 +32,7 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
   { label, name, hint, errorMessage, isDisableResize = false, error = false, maxLength, value, ...props },
   ref
 ) => {
+  const hasError = !!errorMessage || error;
   const internalRef = useRef<HTMLTextAreaElement>(null);
   const [characterCount, setCharacterCount] = useState(0);
 
@@ -82,7 +83,7 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
   }));
 
   return (
-    <div className={`${styles.inputField} ${error ? styles.inputFieldError : ''}`}>
+    <div className={`${styles.inputField} ${hasError ? styles.inputFieldError : ''}`}>
       <div className={styles.label}>{label}</div>
       <textarea
         className={disableResizeClassName}

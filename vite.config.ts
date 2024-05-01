@@ -21,7 +21,7 @@ export default defineConfig({
     svgr({
       svgrOptions: {
         icon: true,
-        svgProps: { stroke: 'stroke' },
+        svgProps: { stroke: 'stroke', fill: 'fill' },
       },
       include: '**/*.svg?react',
     }),

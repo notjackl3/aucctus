@@ -162,14 +162,7 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
             onChange={(e) => setImpactLevel(parseInt(e.target.value))}
           />
         </div>
-        <InputField
-          name="title"
-          label="Title"
-          value={title}
-          error={!!titleError}
-          errorMessage={titleError}
-          onChange={handleTitleChange}
-        />
+        <InputField name="title" label="Title" value={title} errorMessage={titleError} onChange={handleTitleChange} />
         <TextArea
           name="hypothesis"
           label="Hypothesis"

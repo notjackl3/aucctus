@@ -1,31 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
-    <link rel="mask-icon" href="images/icon-32x32.png" color="#ffffff" />
-    <link rel="apple-touch-icon" sizes="180x180" href="images/apple-touch-icon-180x180.png" />
-    <link rel="apple-touch-icon" sizes="152x152" href="images/apple-touch-icon-152x152.png" />
-    <link rel="apple-touch-icon" sizes="60x60" href="images/apple-touch-icon-60x60.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="manifest" href="manifest.json" />
-    <title>Aucctus</title>
-    <script>
-      document.querySelectorAll('.btn').forEach((button) => {
-        button.addEventListener('mousemove', function (e) {
-          const rect = this.getBoundingClientRect();
-          const mouseX = e.clientX - rect.left; // x position within the element.
-          const mouseY = e.clientY - rect.top; // y position within the element.
-          this.style.setProperty('--mouse-x', `${mouseX}px`);
-          this.style.setProperty('--mouse-y', `${mouseY}px`);
-        });
-      });
-    </script>
-  </head>
 
-  <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="mask-icon" href="images/icon-32x32.png" color="#ffffff" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-180x180.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/images/apple-touch-icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="60x60" href="/images/apple-touch-icon-60x60.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="/manifest.json" />
+  <title>Aucctus</title>
+</head>
+
+<body>
+  <noscript>You need to enable JavaScript to run this app.</noscript>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>
