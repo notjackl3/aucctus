@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
+import { FunctionComponent, useCallback, useMemo } from 'react';
 import styles from './styles/conceptOverview.module.scss';
 import Icon from '../../components/Icons/Icon/Icon';
 import TabView from '../../components/Container/TabView';
@@ -55,7 +55,7 @@ const ConceptReport: FunctionComponent = () => {
       const route = value.replace(':id', conceptUuid);
       navigate(route);
     },
-    [conceptUuid, navigate]
+    [conceptUuid, navigate],
   );
 
   const changeConceptStatus = useCallback(
@@ -66,7 +66,7 @@ const ConceptReport: FunctionComponent = () => {
         status: value as ConceptStatus,
       });
     },
-    [updateConcept, conceptUuid]
+    [updateConcept, conceptUuid],
   );
 
   // useEffect(() => {

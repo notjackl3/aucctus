@@ -72,7 +72,7 @@ export function useAssumptionsColumns() {
         ),
       }),
     ],
-    []
+    [openModal],
   );
 
   return {

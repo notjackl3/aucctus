@@ -11,7 +11,6 @@ import {
   IConceptPage,
   ICustomerProfile,
   ICustomerProfileCreate,
-  IEcosystem,
   IFinancialProjection,
   IFormError,
   IMarketScan,
@@ -161,7 +160,7 @@ const createConceptMutation = () => {
 
   // Helper function to create mutations with common onSuccess and onError callbacks
   return <TData extends IConcept = IConcept, TError extends IFormError = IFormError<IConcept>, TVariables = unknown>(
-    mutationFn: (variables: TVariables) => Promise<TData>
+    mutationFn: (variables: TVariables) => Promise<TData>,
   ) => {
     return useMutation<TData, AxiosError<TError>, TVariables>({
       mutationFn,
@@ -186,7 +185,7 @@ const createConceptMutation = () => {
  */
 export const useConceptUpdate = () => {
   return createConceptMutation()<IConcept, IFormError<IConcept>, PartialConceptWithRequiredUuid>(
-    async (concept) => await api.concept.updateConcept(concept, concept.uuid)
+    async (concept) => await api.concept.updateConcept(concept, concept.uuid),
   );
 };
 
@@ -196,14 +195,14 @@ export const useConceptUpdate = () => {
  */
 export const useRetryConceptReport = () => {
   return createConceptMutation()<IConcept, IFormError<IConcept>, string>(
-    async (conceptUuid: string) => await api.concept.retryReport(conceptUuid)
+    async (conceptUuid: string) => await api.concept.retryReport(conceptUuid),
   );
 };
 
 // Common useMutation hook
 function useGenericConceptMutate<T, K = Partial<T> & { uuid: string }>(
   mutationFunction: (data: K) => Promise<T>,
-  queryKeys: string[][]
+  queryKeys: string[][],
 ) {
   const queryClient = useQueryClient();
 
@@ -215,7 +214,7 @@ function useGenericConceptMutate<T, K = Partial<T> & { uuid: string }>(
           queryClient.invalidateQueries({
             queryKey: queryKey,
           }),
-        ])
+        ]),
       );
     },
     onError: (e) => {
@@ -236,7 +235,7 @@ function useGenericConceptMutate<T, K = Partial<T> & { uuid: string }>(
 export const useConceptOverviewUpdate = (conceptUuid: string) => {
   return useGenericConceptMutate<IConceptOverview>(
     (data) => api.concept.updateConceptOverview(data.uuid, data),
-    [[AucctusQueryKeys.conceptOverview, conceptUuid]]
+    [[AucctusQueryKeys.conceptOverview, conceptUuid]],
   );
 };
 
@@ -249,7 +248,7 @@ export const useConceptOverviewUpdate = (conceptUuid: string) => {
 export const useMarketScanUpdate = (conceptUuid: string) => {
   return useGenericConceptMutate<IMarketScan>(
     (data) => api.concept.updateConceptMarketScan(data.uuid, data),
-    [[AucctusQueryKeys.conceptMarketScan, conceptUuid]]
+    [[AucctusQueryKeys.conceptMarketScan, conceptUuid]],
   );
 };
 
@@ -260,35 +259,35 @@ export const useCustomerProfileUpdate = (profileUuid: string, conceptUuid?: stri
   const queryKeys = [conceptProfileListQueryKey, [AucctusQueryKeys.conceptCustomerProfile, profileUuid]];
   return useGenericConceptMutate<ICustomerProfile>(
     (data) => api.concept.updateConceptCustomerProfile(data.uuid, data),
-    queryKeys
+    queryKeys,
   );
 };
 
 export const useCustomerProfileCreate = (conceptUuid: string) => {
   return useGenericConceptMutate<ICustomerProfile, ICustomerProfileCreate>(
     (data) => api.concept.createConceptCustomerProfile(conceptUuid, data),
-    [[AucctusQueryKeys.conceptCustomerProfiles, conceptUuid]]
+    [[AucctusQueryKeys.conceptCustomerProfiles, conceptUuid]],
   );
 };
 
 export function useDeleteCustomerProfile() {
   return useGenericConceptMutate<ICustomerProfile, string>(
     (uuid) => api.concept.deleteConceptCustomerProfile(uuid),
-    [[AucctusQueryKeys.conceptCustomerProfiles]]
+    [[AucctusQueryKeys.conceptCustomerProfiles]],
   );
 }
 
 export const useAssumptionUpdate = () => {
   return useGenericConceptMutate<IAssumption>(
     (data) => api.concept.updateConceptAssumption(data.uuid, data),
-    [[AucctusQueryKeys.conceptKeyAssumptions]]
+    [[AucctusQueryKeys.conceptKeyAssumptions]],
   );
 };
 
 export const useAssumptionDelete = () => {
   return useGenericConceptMutate<IAssumption, string>(
     (uuid) => api.concept.deleteConceptAssumption(uuid),
-    [[AucctusQueryKeys.conceptKeyAssumptions]]
+    [[AucctusQueryKeys.conceptKeyAssumptions]],
   );
 };
 
@@ -298,7 +297,7 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
     [
       [AucctusQueryKeys.conceptFinancialProjection, uuid],
       [AucctusQueryKeys.conceptOverview, uuid],
-    ]
+    ],
   );
 };
 
@@ -314,34 +313,34 @@ export const useMarketMetricSizeUpdate = (uuid: string) => {
     [
       [AucctusQueryKeys.conceptFinancialProjection, uuid],
       [AucctusQueryKeys.conceptOverview, uuid],
-    ]
+    ],
   );
 };
 
 export const useTrendAndDriverUpdate = () => {
   return useGenericConceptMutate<ITrendsAndDrivers>(
     (data) => api.concept.updateTrendAndDriver(data.uuid, data),
-    [[AucctusQueryKeys.conceptMarketScan]]
+    [[AucctusQueryKeys.conceptMarketScan]],
   );
 };
 
 export const useTrendAndDriverDelete = () => {
   return useGenericConceptMutate<ITrendsAndDrivers, string>(
     (uuid) => api.concept.deleteTrendAndDriver(uuid),
-    [[AucctusQueryKeys.conceptMarketScan]]
+    [[AucctusQueryKeys.conceptMarketScan]],
   );
 };
 
 export const useEcosystemUpdate = () => {
   return useGenericConceptMutate<Ecosystem>(
     (data) => api.concept.updateEcosystem(data.uuid, data),
-    [[AucctusQueryKeys.conceptMarketScan]]
+    [[AucctusQueryKeys.conceptMarketScan]],
   );
 };
 
 export const useEcosystemDelete = () => {
   return useGenericConceptMutate<Ecosystem, string>(
     (uuid) => api.concept.deleteEcosystem(uuid),
-    [[AucctusQueryKeys.conceptMarketScan]]
+    [[AucctusQueryKeys.conceptMarketScan]],
   );
 };

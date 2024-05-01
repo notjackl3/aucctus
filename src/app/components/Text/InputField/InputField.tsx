@@ -24,9 +24,9 @@ const defaultIconProps = {
 
 const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
   { label, name, hint, errorMessage, error = false, isPassword = false, variant, width, ...props },
-  ref
+  ref,
 ) => {
-  const hasError = !!errorMessage;
+  const hasError = !!errorMessage || error;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
   const togglePasswordVisibility = () => {

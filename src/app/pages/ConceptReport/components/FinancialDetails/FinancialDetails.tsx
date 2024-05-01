@@ -1,4 +1,4 @@
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent } from 'react';
 import styles from './financialDetails.module.scss';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
@@ -6,8 +6,6 @@ import GeneralBadge from '../../../../components/Badges/GeneralBadge/GeneralBadg
 import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
 import MarketLegend from '../../../../components/Legends/MarketLegend/MarketLegend';
 import { useParams } from 'react-router-dom';
-import { useFinancialProjection } from '../../../../hooks/query/concepts.hook';
-import { IMarketSizeMetric } from '../../../../../libs/api/types';
 import { useEditFinancialProjections } from '../../../../hooks/concepts/editable.hook';
 import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
 import MarketSizeProjectionsCard from '../../../../components/Concepts/FinacialProjections/MarketSizeProjectionsCard/MarketSizeProjectionsCard';
