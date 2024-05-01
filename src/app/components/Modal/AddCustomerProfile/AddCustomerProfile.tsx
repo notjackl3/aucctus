@@ -68,21 +68,22 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
         setRange: React.Dispatch<React.SetStateAction<number>>,
         setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
         setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        inverseValue
+        inverseValue: number
       ) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
+        const num = parseInt(input);
 
         setRangeError(undefined);
         setInverseRangeError(undefined);
 
-        if (type === 'lower' && input > inverseValue) {
+        if (type === 'lower' && num > inverseValue) {
           setRangeError('Lower range cannot be greater than upper range');
-        } else if (type === 'upper' && input < inverseValue) {
+        } else if (type === 'upper' && num < inverseValue) {
           setRangeError('Upper range cannot be less than lower range');
         }
 
-        setRange(parseInt(input));
+        setRange(input);
       },
     []
   );
