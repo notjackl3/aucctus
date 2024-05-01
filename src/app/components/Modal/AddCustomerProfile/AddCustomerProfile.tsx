@@ -83,7 +83,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
           setRangeError('Upper range cannot be less than lower range');
         }
 
-        setRange(input);
+        setRange(num);
       },
     []
   );
