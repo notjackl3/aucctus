@@ -31,8 +31,8 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     height: 5rem;
-    gap: 0.5rem;
     padding: 2rem;
     box-sizing: border-box;
     border-radius: 0.75rem 0.75rem 0 0;
@@ -43,22 +43,29 @@
 
     width: 1122px;
 
-    .headerText {
-      @include text-large;
-      font-family: $font-family;
-    }
-
-    .badge {
+    .supportingText {
       display: flex;
-      padding: 0.4rem 0.5rem;
-      font-size: 0.875rem;
-      font-weight: 500;
-      box-sizing: border-box;
-      justify-content: center;
+      flex-direction: row;
       align-items: center;
-      border-radius: 50%;
-      color: $blue-600;
-      background: $primary-50;
+      gap: 0.5rem;
+
+      .headerText {
+        @include text-large;
+        font-family: $font-family;
+      }
+
+      .badge {
+        display: flex;
+        padding: 0.4rem 0.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        box-sizing: border-box;
+        justify-content: center;
+        align-items: center;
+        border-radius: 50%;
+        color: $blue-600;
+        background: $primary-50;
+      }
     }
   }
 
@@ -139,7 +146,7 @@
             td {
               display: flex;
               align-items: center;
-              justify-content: center;
+              justify-content: flex-start;
               align-content: center;
               align-self: stretch;
               overflow: hidden;

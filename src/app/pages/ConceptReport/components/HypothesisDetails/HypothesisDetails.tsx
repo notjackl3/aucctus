@@ -16,12 +16,16 @@ import { getAssumptionActiveHexColor, getAssumptionHexColor } from '../../../../
 import QuadrantChart, { ChartPoint } from '../../../../components/Charts/QuadrantChart/QuadrantChart';
 import { useAssumptionsColumns } from './columns.hook';
 import { useKeyAssumptions } from '../../../../hooks/query/concepts.hook';
+import Icon from '../../../../components/Icons/Icon/Icon';
+import { useModal } from '../../../../context/modal/ModalContextProvider';
+import AddKeyAssumptionModal from '../../../../components/Modal/EditKeyAssumtionModal/AddKeyAssumptionModal';
 
 const HypothesisDetails: FunctionComponent = () => {
   const { columns } = useAssumptionsColumns();
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+  const { openModal } = useModal();
 
-  const { id: conceptId } = useParams();
+  const { id: conceptId = '' } = useParams();
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 3,
@@ -68,10 +72,19 @@ const HypothesisDetails: FunctionComponent = () => {
   });
   return (
     <div className={styles.hypothesisDetails}>
-      {/* <div className={styles.content}> */}
       <div className={styles.header}>
-        <span className={styles.headerText}>Key Assumptions</span>
-        <div className={styles.badge}>{data?.count}</div>
+        <div className={styles.supportingText}>
+          <span className={styles.headerText}>Key Assumptions</span>
+          <div className={styles.badge}>{data?.count}</div>
+        </div>
+        <button
+          className="btn btn-light"
+          onClick={() => {
+            openModal(AddKeyAssumptionModal, { conceptUuid: conceptId });
+          }}
+        >
+          <Icon variant="plus" />
+        </button>
       </div>
       <div className={styles.tableChartContainer}>
         <div className={styles.tableContainer}>
@@ -88,9 +101,9 @@ const HypothesisDetails: FunctionComponent = () => {
               ))}
             </thead>
             {isLoading ? (
-              <div className={styles.tableMessageContainer}>
+              <span className={styles.tableMessageContainer}>
                 <Loading />
-              </div>
+              </span>
             ) : (
               <tbody>
                 {table.getRowModel().rows.map((row) => (
@@ -136,7 +149,6 @@ const HypothesisDetails: FunctionComponent = () => {
           />
         </div>
       </div>
-      {/* </div> */}
     </div>
   );
 };

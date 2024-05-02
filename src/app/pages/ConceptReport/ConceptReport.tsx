@@ -83,7 +83,7 @@ const ConceptReport: FunctionComponent = () => {
           <Tooltip tip="Coming Soon">
             <button
               aria-label="Download Opportunity Snapshot"
-              className={`btn btn-primary btn-bold`}
+              className={`btn btn-disabled btn-bold`}
               onClick={() => navigate(AppPath.ConceptSnapshot)}
               disabled
             >

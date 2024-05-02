@@ -6,6 +6,7 @@ import {
   ConceptStatus,
   Ecosystem,
   IAssumption,
+  IAssumptionCreate,
   IConcept,
   IConceptOverview,
   IConceptPage,
@@ -129,7 +130,7 @@ export const useFinancialProjection = (uuid: string) => {
 
 export const useKeyAssumptions = (uuid: string) => {
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptKeyAssumptions],
+    queryKey: [AucctusQueryKeys.conceptKeyAssumptions, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptKeyAssumptions(uuid),
   });
@@ -297,6 +298,13 @@ export const useAssumptionUpdate = () => {
   return useGenericConceptMutate<IAssumption>(
     (data) => api.concept.updateConceptAssumption(data.uuid, data),
     [[AucctusQueryKeys.conceptKeyAssumptions]],
+  );
+};
+
+export const useAssumptionCreate = (conceptUuid: string) => {
+  return useGenericConceptMutate<IAssumption, IAssumptionCreate>(
+    (data) => api.concept.createConceptAssumption(conceptUuid, data),
+    [[AucctusQueryKeys.conceptKeyAssumptions, conceptUuid]],
   );
 };
 

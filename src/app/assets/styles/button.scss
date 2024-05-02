@@ -32,10 +32,11 @@ $btn-colors: (
     $grey-800,
     $white,
   ),
+  disabled: (
+    $grey-500,
+    $white,
+  ),
 );
-
-$disabled-bg-color: $grey-500;
-$disabled-text-color: $white;
 
 // Button base styles
 .btn {
@@ -63,18 +64,6 @@ $disabled-text-color: $white;
   &.btn-link {
     box-shadow: none !important;
     border: none !important;
-  }
-
-  &:disabled {
-    background-color: $disabled-bg-color !important;
-    border-color: $disabled-bg-color !important;
-    color: $disabled-text-color !important;
-
-    svg,
-    use,
-    path {
-      stroke: $disabled-text-color !important;
-    }
   }
 }
 

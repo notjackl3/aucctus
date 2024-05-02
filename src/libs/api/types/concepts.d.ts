@@ -124,7 +124,7 @@ export interface IAssumption extends IBaseConceptEntity {
   potentialImpact: string;
   expectedResult: string;
   methodOfTesting: string;
-  variables: [string];
+  variables: string[];
   assumptionsType: AssumptionType;
 
   /**
@@ -150,6 +150,15 @@ export interface IAssumption extends IBaseConceptEntity {
   validated: boolean;
   riskCategory: 'high' | 'medium' | 'low';
   impactCategory: 'high' | 'medium' | 'low';
+}
+
+export interface IAssumptionCreate {
+  name: string;
+  hypothesis: string;
+  riskLevel: number;
+  difficultyLevel: number;
+  impactLevel: number;
+  assumptionsType: AssumptionType;
 }
 
 export interface IEcosystem extends IBaseConceptEntity {
