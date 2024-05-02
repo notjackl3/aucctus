@@ -9,15 +9,15 @@ import {
   IServerErrorMessage,
   IRegisterUser,
   ITokenResponse,
+  IToken,
 } from '../../../libs/api/types';
-import { useAppDispatch } from '../../store';
-import { setAuthenticated } from '../../../features/auth/auth.slice';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AucctusLocalStorage } from '../../../libs/localStorage';
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
-  const dispatch = useAppDispatch();
   return useMutation<
     IAuthSuccessResponse,
     AxiosError<IServerErrorMessage>,
@@ -27,7 +27,6 @@ export const useLogin = () => {
     mutationFn: async (credentials) => await api.auth.login(credentials.email, credentials.password),
     onSuccess: (response) => {
       queryClient.invalidateQueries({ queryKey: AucctusQueryKeys.userDetails });
-      dispatch(setAuthenticated(response));
     },
   });
 };
@@ -42,7 +41,7 @@ export const useSignUp = () => {
         details.lastName,
         details.email,
         details.password,
-        details.confirmPassword
+        details.confirmPassword,
       ),
     onSuccess: () => {
       navigate(AppPath.ConfirmEmail);
@@ -74,12 +73,95 @@ export const useConfirmEmail = () => {
 };
 
 export const useRefreshToken = () => {
-  const dispatch = useAppDispatch();
-
   return useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, string, unknown>({
     mutationFn: async (token: string) => await api.auth.refreshToken(token),
+  });
+};
+
+export const useLogout = () => {
+  return useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, unknown, unknown>({
+    mutationFn: async () => await api.auth.logout(),
+  });
+};
+
+export const useAuth = () => {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const [tokens, setTokens] = useState<Partial<ITokenResponse>>({
+    refresh: AucctusLocalStorage.get('refreshToken'),
+    access: undefined,
+  });
+  const isAuthenticated = useMemo(() => !!tokens.refresh || !!tokens.access, [tokens]);
+
+  const updateTokens = useCallback((tokens: Partial<ITokenResponse>) => {
+    api.accessToken = tokens.access;
+    setTokens(tokens);
+
+    if (tokens.refresh) {
+      AucctusLocalStorage.set('refreshToken', tokens.refresh);
+    } else {
+      AucctusLocalStorage.remove('refreshToken');
+    }
+  }, []);
+
+  const refreshToken = useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, void, unknown>({
+    mutationFn: async () => (tokens.refresh ? await api.auth.refreshToken(tokens.refresh) : Promise.reject()),
     onSuccess: (response) => {
-      dispatch(setAuthenticated(response));
+      updateTokens(response);
     },
   });
+
+  const logout = useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, void, unknown>({
+    mutationFn: async () => await api.auth.logout(tokens.refresh),
+    onSettled: () => {
+      updateTokens({ refresh: undefined, access: undefined });
+      queryClient.clear();
+      navigate(AppPath.Login);
+    },
+  });
+
+  const login = useMutation<
+    IAuthSuccessResponse,
+    AxiosError<IServerErrorMessage>,
+    { email: string; password: string },
+    unknown
+  >({
+    mutationFn: async (credentials) => await api.auth.login(credentials.email, credentials.password),
+    onSuccess: (response) => {
+      updateTokens(response);
+      queryClient.invalidateQueries({ queryKey: AucctusQueryKeys.userDetails });
+      navigate(AppPath.Home);
+    },
+  });
+
+  useEffect(() => {
+    // Set refresh token and logout actions
+    api.setRefreshTokenAction(() => {
+      return new Promise((resolve, reject) => {
+        if (!tokens.refresh) {
+          reject();
+          return;
+        }
+
+        refreshToken.mutate(undefined, {
+          onSuccess: (data) => {
+            resolve(data);
+          },
+          onError: (error) => {
+            reject(error);
+          },
+        });
+        return;
+      });
+    });
+    api.setLogoutAction(() => logout.mutate(undefined));
+  }, []);
+
+  return {
+    isAuthenticated,
+    refreshToken,
+    logout,
+    login,
+    tokens,
+  };
 };

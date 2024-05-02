@@ -34,7 +34,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
 
   const handleUpdate = useCallback(
     (newList: string[]) => mutate({ uuid: profileUuid, [field]: newList }),
-    [field, mutate, profileUuid]
+    [field, mutate, profileUuid],
   );
   const handleSave = useCallback(
     (item: string) => {
@@ -45,7 +45,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
       });
       setNewItem('');
     },
-    [handleUpdate]
+    [handleUpdate],
   );
 
   const handleUpdateElement = useCallback(
@@ -57,7 +57,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
         return newList;
       });
     },
-    [handleUpdate]
+    [handleUpdate],
   );
 
   const handleDelete = useCallback(
@@ -69,7 +69,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
         return newList;
       });
     },
-    [handleUpdate]
+    [handleUpdate],
   );
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
@@ -93,7 +93,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
             />
           ))}
 
-          <span>
+          <span className={styles.footer}>
             <InputField
               label={''}
               name={'new'}

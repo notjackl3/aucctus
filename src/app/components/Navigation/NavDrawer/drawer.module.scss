@@ -3,6 +3,7 @@
 @use '~variables.scss' as *;
 
 .container {
+  position: fixed;
   display: block;
   z-index: 1;
 }

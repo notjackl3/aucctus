@@ -1,21 +1,11 @@
 import React, { FunctionComponent } from 'react';
-import { hasAccessToken } from '../../features/auth/auth.slice';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
+import { Outlet } from 'react-router-dom';
 import styles from '../../app/assets/styles/pages/auth-screens.module.scss';
 import Footer from '../../app/components/Auth/Footer/Footer';
 import AuthHeader from '../../app/components/Header/AuthHeader/AuthHeader';
 import IntoSection from '../../app/components/Auth/IntoSection';
-import { useSelector } from 'react-redux';
-import { AppPath } from '../routes';
 
 const UnauthGuard: FunctionComponent = () => {
-  const location = useLocation();
-  const isAuthenticated = useSelector(hasAccessToken);
-
-  if (isAuthenticated) {
-    return <Navigate to={AppPath.Home} state={{ from: location }} replace />;
-  }
-
   return (
     <div className={`${styles.authContainer}`}>
       <div className={`${styles.formSection}`}>

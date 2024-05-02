@@ -4,213 +4,219 @@
 
 .hypothesisDetails {
   display: flex;
-  align-items: flex-start;
   flex-direction: column;
-  gap: 1.5rem;
+  flex-grow: 1;
+  align-items: flex-start;
+  justify-content: center;
+  align-content: center;
   align-self: stretch;
+
   height: 100%;
-  width: 100%;
-  min-height: 49rem;
 
-  .content {
+  width: 1122px;
+
+  overflow-x: auto;
+  scroll-behavior: smooth;
+
+  border-radius: 0.75rem;
+
+  &,
+  .header,
+  .tableContainer,
+  .quadrantChartContainer {
+    box-shadow: $shadow-100;
+  }
+
+  .header {
     display: flex;
-    margin-top: 1rem;
-    // width: 100%;
-    // height: 100%;
-    // min-width: 60rem
-    flex-direction: column;
-    align-items: flex-start;
-    flex-grow: 1;
+    flex-direction: row;
+    align-items: center;
+    height: 5rem;
+    gap: 0.5rem;
+    padding: 2rem;
+    box-sizing: border-box;
+    border-radius: 0.75rem 0.75rem 0 0;
+    background: $white;
 
-    .header {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      height: 5rem;
-      gap: 0.5rem;
-      width: 100%;
-      padding: 2rem;
-      box-sizing: border-box;
-      border-radius: 0.75rem 0.75rem 0 0;
-      background: $white;
-      box-shadow: $shadow-100;
-      border: 1px solid $grey-200;
-      color: $blue-900;
+    border: 1px solid $grey-200;
+    color: $blue-900;
 
-      .headerText {
-        @include text-large;
-        font-family: $font-family;
-      }
+    width: 1122px;
 
-      .badge {
-        display: flex;
-        padding: 0.4rem 0.5rem;
-        font-size: 0.875rem;
-        font-weight: 500;
-        box-sizing: border-box;
-        justify-content: center;
-        align-items: center;
-        border-radius: 50%;
-        color: $blue-600;
-        background: $primary-50;
-      }
+    .headerText {
+      @include text-large;
+      font-family: $font-family;
     }
 
-    .tableChartContainer {
+    .badge {
       display: flex;
-      align-self: stretch;
-      // flex-grow: 1;
-      width: 100%;
-      .tableContainer {
+      padding: 0.4rem 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      box-sizing: border-box;
+      justify-content: center;
+      align-items: center;
+      border-radius: 50%;
+      color: $blue-600;
+      background: $primary-50;
+    }
+  }
+
+  .tableChartContainer {
+    display: flex;
+    align-self: stretch;
+    flex-grow: 1;
+
+    width: 1122px;
+
+    .tableContainer {
+      display: flex;
+      flex-direction: column;
+      // width: 50%;
+
+      table {
         display: flex;
         flex-direction: column;
-        // width: 50%;
+        align-items: flex-start;
+        align-self: stretch;
+        table-layout: fixed;
+        border: 1px solid $grey-200;
+        border-bottom: none;
+        background: $white;
+        flex-grow: 1;
 
-        table {
+        th {
+          color: $grey-600;
+          font-size: 0.875rem;
+          font-style: normal;
+          font-weight: 400;
+          line-height: 1.25rem;
+        }
+
+        thead {
           display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          align-self: stretch;
-          table-layout: fixed;
-          border: 1px solid $grey-200;
-          border-bottom: none;
-          background: $white;
-          box-shadow: $shadow-100;
-          flex-grow: 1;
+          width: 100%;
+          padding: 0.75rem 1.5rem;
+          box-sizing: border-box;
+          align-items: center;
+          border-radius: 0.75rem 0.75rem 0 0;
+          border-bottom: 1px solid $grey-300;
+          background: var(--gray-50-bg, #fcfcfd);
 
-          th {
-            color: $grey-600;
-            font-size: 0.875rem;
-            font-style: normal;
-            font-weight: 400;
-            line-height: 1.25rem;
-          }
+          color: $grey-600;
+          font-family: $font-family;
+          font-size: 0.75rem;
+          font-style: normal;
+          font-weight: 500;
 
-          thead {
+          tr {
             display: flex;
             width: 100%;
+            box-sizing: border-box;
+            align-items: flex-start;
+          }
+        }
+
+        tbody {
+          width: 100%;
+          tr {
+            position: relative;
+            cursor: pointer;
+            display: flex;
             padding: 0.75rem 1.5rem;
             box-sizing: border-box;
             align-items: center;
-            border-radius: 0.75rem 0.75rem 0 0;
             border-bottom: 1px solid $grey-300;
-            background: var(--gray-50-bg, #fcfcfd);
 
-            color: $grey-600;
-            font-family: $font-family;
-            font-size: 0.75rem;
-            font-style: normal;
-            font-weight: 500;
-
-            tr {
-              display: flex;
-              width: 100%;
-              box-sizing: border-box;
-              align-items: flex-start;
+            &:nth-child(even) {
+              background-color: $grey-50 !important;
             }
-          }
 
-          tbody {
-            width: 100%;
-            tr {
-              position: relative;
-              cursor: pointer;
+            &.selected {
+              background: $primary-50;
+            }
+
+            td {
               display: flex;
-              padding: 0.75rem 1.5rem;
-              box-sizing: border-box;
               align-items: center;
-              border-bottom: 1px solid $grey-300;
+              justify-content: center;
+              align-content: center;
+              align-self: stretch;
+              overflow: hidden;
+              padding-right: 1rem;
+              box-sizing: border-box;
+              color: $grey-600;
+              text-overflow: ellipsis;
+              font-family: $font-family;
+              font-size: 0.875rem;
+              font-style: normal;
+              font-weight: 400;
 
-              &:nth-child(even) {
-                background-color: $grey-50 !important;
+              &:last-child {
+                justify-content: flex-end;
               }
 
-              &.selected {
-                background: $primary-50;
-              }
-
-              td {
+              .assumption {
                 display: flex;
-                align-items: center;
-                justify-content: center;
-                align-content: center;
-                align-self: stretch;
-                overflow: hidden;
-                padding-right: 1rem;
-                box-sizing: border-box;
-                color: $grey-600;
-                text-overflow: ellipsis;
-                font-family: $font-family;
-                font-size: 0.875rem;
-                font-style: normal;
-                font-weight: 400;
+                flex-direction: column;
 
-                &:last-child {
-                  justify-content: flex-end;
+                .assumptionTitle {
+                  color: $grey-600;
+                  font-family: $font-family;
+                  @include text-medium;
+                  font-weight: 700;
                 }
-
-                .assumption {
-                  display: flex;
-                  flex-direction: column;
-
-                  .assumptionTitle {
-                    color: $grey-600;
-                    font-family: $font-family;
-                    @include text-medium;
-                    font-weight: 700;
-                  }
-                  .assumptionDescription {
-                    color: $grey-600;
-                    font-family: $font-family;
-                    @include text-small;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                  }
-                }
-
-                .cellDescription {
-                  display: -webkit-box;
-                  -webkit-line-clamp: 10;
-                  -webkit-box-orient: vertical;
+                .assumptionDescription {
+                  color: $grey-600;
+                  font-family: $font-family;
+                  @include text-small;
                   overflow: hidden;
                   text-overflow: ellipsis;
                 }
+              }
 
-                .riskCategory {
-                  text-transform: capitalize;
-                }
+              .cellDescription {
+                display: -webkit-box;
+                -webkit-line-clamp: 10;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+              }
+
+              .riskCategory {
+                text-transform: capitalize;
               }
             }
           }
         }
-        .footer {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          height: 5rem;
-          color: $grey-600;
-          padding: 2rem;
-          box-sizing: border-box;
-          border-radius: 0 0 0 0.75rem;
-          background: $white;
-          box-shadow: $shadow-100;
-          border: 1px solid $grey-200;
-        }
       }
-
-      .quadrantChartContainer {
+      .footer {
         display: flex;
-        background: $white;
-
-        min-width: 500px;
+        flex-direction: row;
         align-items: center;
-        justify-content: center;
-        align-content: center;
-        border-radius: 0 0 0.75rem 0;
+        height: 5rem;
+        color: $grey-600;
+        padding: 2rem;
+        box-sizing: border-box;
+        border-radius: 0 0 0 0.75rem;
+        background: $white;
+        box-shadow: $shadow-100;
         border: 1px solid $grey-200;
-        border-left: none;
-        padding: $padding-base;
       }
+    }
+
+    .quadrantChartContainer {
+      display: flex;
+      background: $white;
+
+      min-width: 500px;
+      align-items: center;
+      justify-content: center;
+      align-content: center;
+      border-radius: 0 0 0.75rem 0;
+      border: 1px solid $grey-200;
+      border-left: none;
+      padding: $padding-base;
     }
   }
 }

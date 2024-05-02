@@ -48,32 +48,7 @@ const FinancialDetails: FunctionComponent = () => {
           cardClassName={styles.cardStyle}
           isHideFooter
           headerAction={
-            <button
-              className={styles.cardAction}
-              onClick={() => {
-                openModal(ConfirmationModal, {
-                  title: 'Are you sure?',
-                  subtitle: 'This will unlock the AI generated hypothesis',
-                  actions: [
-                    {
-                      title: 'Unlock',
-                      onClick: () => {
-                        // Unlock the AI generated hypothesis
-                      },
-                      variant: 'primary',
-                    },
-                    {
-                      title: 'Cancel',
-                      onClick: () => {
-                        // Close the modal
-                      },
-                      variant: 'danger',
-                    },
-                  ],
-                });
-              }}
-              aria-label="Unlock Edit Hypothesis"
-            >
+            <button className={styles.cardAction} aria-label="Unlock Edit Hypothesis" disabled>
               <span>{<Icon variant="lock" {...iconDefaultProps} />}</span>
               AI Generated
             </button>

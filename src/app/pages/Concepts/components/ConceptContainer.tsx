@@ -31,8 +31,8 @@ const ConceptContainer: FunctionComponent<IConceptContainerProps> = ({
   showStatusFilter = true,
 }) => {
   return (
-    <div className={styles.content}>
-      <div className={styles.header}>
+    <div className={styles.tableContainer}>
+      <div className={styles.titleHeader}>
         <div className={styles.filters}>
           <StatusButton
             statusName={`All ${category}`}

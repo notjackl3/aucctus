@@ -1,52 +1,21 @@
-import React, { FunctionComponent, useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import { Navigate, Outlet } from 'react-router-dom';
-import { hasAccessToken, selectAccessToken, selectRefreshToken, simpleLogout } from '../../features/auth/auth.slice';
-import { AppPath } from '../routes';
-import { useRefreshToken } from '../../app/hooks/query/auth.hook';
-import { store } from '../../app/store';
-import api from '../../libs/api';
+import { FunctionComponent, useEffect } from 'react';
+
+import { Outlet } from 'react-router-dom';
+
+import { useAuth } from '../../app/hooks/query/auth.hook';
+import analytics from '../../libs/analytics';
 
 const AuthGuard: FunctionComponent = () => {
-  const isAuthenticated = useSelector(hasAccessToken);
-  const refresh = useSelector(selectRefreshToken);
-  const accessToken = useSelector(selectAccessToken);
-  const { mutate } = useRefreshToken();
+  // This is a guard that will be used to protect routes that require authentication.
+  // This is required here to ensure the user is authenticated before
+  // they can access the protected routes.
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    // Set refresh token and logout actions
-    api.setRefreshTokenAction(() => {
-      return new Promise((resolve, reject) => {
-        if (!refresh) {
-          reject();
-          return;
-        }
+    analytics.debug('Authenticated: ', isAuthenticated);
+  }, [isAuthenticated]);
 
-        mutate(refresh, {
-          onSuccess: (data) => {
-            resolve(data);
-          },
-          onError: (error) => {
-            reject(error);
-          },
-        });
-        return;
-      });
-    });
-    api.setLogoutAction(() => store.dispatch(simpleLogout()));
-  }, [mutate, refresh]);
-
-  useEffect(() => {
-    if (!accessToken && refresh) {
-      mutate(refresh);
-    }
-  }, [accessToken, refresh, mutate]);
-
-  if (isAuthenticated) {
-    return <Outlet />;
-  }
-
-  return <Navigate to={AppPath.Login} />;
+  return <Outlet />;
 };
 
 export default AuthGuard;

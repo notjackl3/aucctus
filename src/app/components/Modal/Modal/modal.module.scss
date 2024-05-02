@@ -15,9 +15,16 @@
   z-index: 1000;
   animation: fadeIn 0.3s ease both;
 
+  overflow-y: auto;
+
+  margin: auto;
+
+  padding: 3rem;
+
   cursor: pointer;
 
   .content {
+    margin: auto;
     background: white;
     padding: 20px;
     border-radius: $br-5xs;

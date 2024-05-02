@@ -14,7 +14,9 @@ const Layout = () => {
   return (
     <div className={styles.container}>
       <NavDrawer />
-      <Outlet />
+      <div className={styles.content}>
+        <Outlet />
+      </div>
     </div>
   );
 };

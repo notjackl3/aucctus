@@ -28,5 +28,21 @@ export const useMeasure = <T extends Element>() => {
     if (ref.current) ro.observe(ref.current);
     return () => ro.disconnect();
   }, [ro]);
+
   return [{ ref }, bounds];
+};
+
+export const useMousePosition = () => {
+  const [mousePosition, setMousePosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const updateMousePosition = (ev: MouseEvent) => {
+      setMousePosition({ x: ev.clientX, y: ev.clientY });
+    };
+    window.addEventListener('mousemove', updateMousePosition);
+    return () => {
+      window.removeEventListener('mousemove', updateMousePosition);
+    };
+  }, []);
+  return mousePosition;
 };

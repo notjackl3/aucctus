@@ -1,17 +1,15 @@
-export enum LocalStorageKeys {
-  ConceptReportUuid = 'conceptReportUuid',
-}
+type StorageKeys = 'refreshToken' | 'conceptUuid';
 
 export class AucctusLocalStorage {
-  static set(key: LocalStorageKeys, value: string) {
+  static set(key: StorageKeys, value: string) {
     localStorage.setItem(key, value);
   }
 
-  static get(key: LocalStorageKeys) {
-    return localStorage.getItem(key);
+  static get(key: StorageKeys) {
+    return localStorage.getItem(key) || undefined;
   }
 
-  static remove(key: LocalStorageKeys) {
+  static remove(key: StorageKeys) {
     localStorage.removeItem(key);
   }
 

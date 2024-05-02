@@ -1,7 +1,13 @@
+@use '~colors.scss' as *;
+@use '~typography.scss' as *;
+@use '~variables.scss' as *;
+
 .tabView {
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 100%;
+
   align-self: stretch;
   align-items: center;
 
@@ -11,7 +17,8 @@
     display: flex;
     flex-direction: row;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    padding: $padding-base $padding-5xs;
+    overflow-x: scroll;
 
     .tabs,
     .actionButtons {
@@ -29,6 +36,8 @@
       display: flex;
       flex-direction: row;
       gap: 1rem;
+      margin-left: 1rem;
+      margin-right: 0.5rem;
     }
   }
 

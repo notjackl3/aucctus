@@ -2,19 +2,18 @@ import React, { useMemo } from 'react';
 import Logo from '../../../assets/Logo.png';
 import styles from './drawer.module.scss';
 import NavLink from './NavLink';
-import { logout } from '../../../../features/auth/auth.slice';
 import avatar from '../../../assets/avatar.svg';
 import { AppPath } from '../../../../routes/routes';
 import { useNavigate } from 'react-router-dom';
-import { useAppDispatch } from '../../../store';
 import { useUserDetails } from '../../../hooks/query/account.hook';
 import { useConcepts } from '../../../hooks/query/concepts.hook';
 import NavButton from './NavButton';
+import { useAuth } from '../../../hooks/query/auth.hook';
 
 const NavDrawer = () => {
   const { data: { user } = { user: undefined } } = useUserDetails();
   const { data } = useConcepts();
-  const dispatch = useAppDispatch();
+  const { logout } = useAuth();
 
   const navigate = useNavigate();
 
@@ -83,7 +82,7 @@ const NavDrawer = () => {
               icon="logout"
               onClick={(e) => {
                 e.preventDefault();
-                dispatch(logout());
+                logout.mutate();
               }}
             />
           </div>

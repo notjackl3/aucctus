@@ -39,6 +39,16 @@ export enum AppPath {
   ResetPasswordSuccess = '/reset-password/success',
 }
 
+export const UNAUTH_ROUTES = [
+  AppPath.Login,
+  AppPath.SignUp,
+  AppPath.ConfirmEmail,
+  AppPath.EmailConfirmation,
+  AppPath.ForgotPassword,
+  AppPath.ResetPassword,
+  AppPath.ResetPasswordSuccess,
+];
+
 /* Concept Details */
 export enum ConceptPath {
   Overview = 'overview',

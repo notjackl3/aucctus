@@ -1,20 +1,20 @@
 import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { AucctusLocalStorage, LocalStorageKeys } from '../../../libs/localStorage';
+import { AucctusLocalStorage } from '../../../libs/localStorage';
 
 export const useConceptUuid = () => {
   const { id } = useParams();
-  const conceptUuidFromLocalStorage = AucctusLocalStorage.get(LocalStorageKeys.ConceptReportUuid) || undefined;
+  const conceptUuidFromLocalStorage = AucctusLocalStorage.get('conceptUuid') || undefined;
 
   const conceptUuid = id || conceptUuidFromLocalStorage;
 
   useEffect(() => {
     if (!conceptUuid) return;
 
-    AucctusLocalStorage.set(LocalStorageKeys.ConceptReportUuid, conceptUuid);
+    AucctusLocalStorage.set('conceptUuid', conceptUuid);
 
     return () => {
-      AucctusLocalStorage.remove(LocalStorageKeys.ConceptReportUuid);
+      AucctusLocalStorage.remove('conceptUuid');
     };
   }, [conceptUuid]);
 

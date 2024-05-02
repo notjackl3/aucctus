@@ -68,75 +68,75 @@ const HypothesisDetails: FunctionComponent = () => {
   });
   return (
     <div className={styles.hypothesisDetails}>
-      <div className={styles.content}>
-        <div className={styles.header}>
-          <span className={styles.headerText}>Key Assumptions</span>
-          <div className={styles.badge}>{data?.count}</div>
-        </div>
-        <div className={styles.tableChartContainer}>
-          <div className={styles.tableContainer}>
-            <table>
-              <thead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th key={header.id} style={{ width: header.getSize() }}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
+      {/* <div className={styles.content}> */}
+      <div className={styles.header}>
+        <span className={styles.headerText}>Key Assumptions</span>
+        <div className={styles.badge}>{data?.count}</div>
+      </div>
+      <div className={styles.tableChartContainer}>
+        <div className={styles.tableContainer}>
+          <table>
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id} style={{ width: header.getSize() }}>
+                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            {isLoading ? (
+              <div className={styles.tableMessageContainer}>
+                <Loading />
+              </div>
+            ) : (
+              <tbody>
+                {table.getRowModel().rows.map((row) => (
+                  <tr
+                    key={row.id}
+                    className={rowSelection?.hasOwnProperty(row.id) ? styles.selected : ''}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      row.getToggleSelectedHandler()(e);
+                    }}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <td style={{ width: cell.column.getSize() }} key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </td>
                     ))}
                   </tr>
                 ))}
-              </thead>
-              {isLoading ? (
-                <div className={styles.tableMessageContainer}>
-                  <Loading />
-                </div>
-              ) : (
-                <tbody>
-                  {table.getRowModel().rows.map((row) => (
-                    <tr
-                      key={row.id}
-                      className={rowSelection?.hasOwnProperty(row.id) ? styles.selected : ''}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        row.getToggleSelectedHandler()(e);
-                      }}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              )}
-            </table>
-            <div className={styles.footer}>
-              <TablePagination
-                variant="client"
-                totalPages={table.getPageCount()}
-                page={table.getState().pagination.pageIndex + 1}
-                setPage={table.setPageIndex}
-                nextPageClient={() => table.nextPage()}
-                previousPageClient={() => table.previousPage()}
-                isNextPageDisabled={!table.getCanNextPage()}
-                isPreviousPageDisabled={!table.getCanPreviousPage()}
-              />
-            </div>
-          </div>
-          <div className={styles.quadrantChartContainer}>
-            <QuadrantChart
-              yTopLabel="High Difficulty"
-              yBottomLabel="Low Difficulty"
-              xRightLabel="High Impact"
-              xLeftLabel="Low Impact"
-              chartCoordinates={chartCoordinates}
-              selectedCoordinate={selectedRowId}
+              </tbody>
+            )}
+          </table>
+          <div className={styles.footer}>
+            <TablePagination
+              variant="client"
+              totalPages={table.getPageCount()}
+              page={table.getState().pagination.pageIndex + 1}
+              setPage={table.setPageIndex}
+              nextPageClient={() => table.nextPage()}
+              previousPageClient={() => table.previousPage()}
+              isNextPageDisabled={!table.getCanNextPage()}
+              isPreviousPageDisabled={!table.getCanPreviousPage()}
             />
           </div>
         </div>
+        <div className={styles.quadrantChartContainer}>
+          <QuadrantChart
+            yTopLabel="High Difficulty"
+            yBottomLabel="Low Difficulty"
+            xRightLabel="High Impact"
+            xLeftLabel="Low Impact"
+            chartCoordinates={chartCoordinates}
+            selectedCoordinate={selectedRowId}
+          />
+        </div>
       </div>
+      {/* </div> */}
     </div>
   );
 };

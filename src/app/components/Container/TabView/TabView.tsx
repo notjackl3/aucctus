@@ -50,7 +50,7 @@ const TabView: FunctionComponent<TabsProps> = ({
         </div>
         {actionButtons ? <div className={styles.actionButtons}>{actionButtons}</div> : null}
       </div>
-      <div className={styles.content}>{children}</div>
+      {children}
     </div>
   );
 };

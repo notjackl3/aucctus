@@ -34,6 +34,9 @@ $btn-colors: (
   ),
 );
 
+$disabled-bg-color: $grey-500;
+$disabled-text-color: $white;
+
 // Button base styles
 .btn {
   display: flex;
@@ -46,7 +49,10 @@ $btn-colors: (
 
   border-radius: 6px;
 
-  transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out,
+  transition:
+    color 0.15s ease-in-out,
+    background-color 0.15s ease-in-out,
+    border-color 0.15s ease-in-out,
     box-shadow 0.15s ease-in-out;
 
   &.btn-bold {
@@ -57,6 +63,18 @@ $btn-colors: (
   &.btn-link {
     box-shadow: none !important;
     border: none !important;
+  }
+
+  &:disabled {
+    background-color: $disabled-bg-color !important;
+    border-color: $disabled-bg-color !important;
+    color: $disabled-text-color !important;
+
+    svg,
+    use,
+    path {
+      stroke: $disabled-text-color !important;
+    }
   }
 }
 

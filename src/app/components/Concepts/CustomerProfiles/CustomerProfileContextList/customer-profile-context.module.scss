@@ -12,6 +12,10 @@
   align-items: flex-start;
   width: 100%;
 
+  .footer {
+    gap: 0.5rem;
+  }
+
   span {
     display: flex;
     align-self: stretch;

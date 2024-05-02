@@ -8,4 +8,14 @@
   display: flex;
   align-items: flex-start;
   background: $grey-blue-50;
+  width: 100vw;
+  min-height: 100vh;
+
+  overflow: hidden;
+
+  .content {
+    margin-left: $nav-drawer-width;
+    min-height: 100vh;
+    overflow: auto;
+  }
 }

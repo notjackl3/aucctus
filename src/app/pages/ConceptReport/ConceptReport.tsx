@@ -12,6 +12,7 @@ import ConceptStatusBubble from '../../components/Badges/ConceptStatusBubble/Con
 import { CONCEPT_STATUS_LIST } from '../../../libs/concepts';
 import { useConcept, useConceptUpdate } from '../../hooks/query/concepts.hook';
 import { useRoutePattern } from '../../hooks/router.hook';
+import Tooltip from '../../components/ToolTip/Tooltip';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
@@ -43,7 +44,7 @@ const ConceptReport: FunctionComponent = () => {
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
 
-  const { concept, isError } = useConcept(conceptUuid);
+  const { concept } = useConcept(conceptUuid);
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
   /**
@@ -69,13 +70,6 @@ const ConceptReport: FunctionComponent = () => {
     [updateConcept, conceptUuid],
   );
 
-  // useEffect(() => {
-  //   if (conceptUuid && !concept && isError) {
-  //     // Go back to the previous page if the conceptUuid is not available
-  //     navigate(-1);
-  //   }
-  // }, [conceptUuid, navigate, concept, isError]);
-
   return (
     <div className={`${styles.conceptOverview} ${styles.slideAnimation}`}>
       <div className={styles.headerSection}>
@@ -86,18 +80,20 @@ const ConceptReport: FunctionComponent = () => {
           </div>
         </div>
         <div className={styles.actions}>
-          <button
-            aria-label="Download Opportunity Snapshot"
-            className={`btn btn-primary btn-bold`}
-            onClick={() => navigate(AppPath.ConceptSnapshot)}
-            disabled
-          >
-            <Icon variant="download-cloud" {...defaultIconProps} />
-            Opportunity Snapshot
-          </button>
+          <Tooltip tip="Coming Soon">
+            <button
+              aria-label="Download Opportunity Snapshot"
+              className={`btn btn-primary btn-bold`}
+              onClick={() => navigate(AppPath.ConceptSnapshot)}
+              disabled
+            >
+              <Icon variant="download-cloud" {...defaultIconProps} />
+              Opportunity Snapshot
+            </button>
+          </Tooltip>
           <button
             aria-label="Close Detail Page"
-            className={`${styles.closeButton}`}
+            className="btn btn-close"
             onClick={() => navigate(AppPath.ConceptCategory)}
           >
             <Icon variant="closeX" {...defaultIconProps} />

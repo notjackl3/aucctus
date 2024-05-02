@@ -1,0 +1,40 @@
+@use '~colors.scss' as *;
+@use '~variables.scss' as *;
+@use '~typography.scss' as *;
+
+.container {
+  position: relative;
+  .tooltip {
+    position: absolute;
+    display: flex;
+    border-radius: 4px;
+    padding: 0.5rem;
+    color: $white;
+    background: $black;
+    font-size: 14px;
+    font-family: sans-serif;
+    text-align: center;
+    line-height: 1;
+    width: max-content;
+    max-width: 15rem;
+    z-index: 1000;
+    height: 2rem;
+    max-height: 2rem;
+
+    &::before {
+      content: '';
+      border: solid transparent;
+      height: 0;
+      width: 0;
+      position: absolute;
+      pointer-events: none;
+      border-width: 0.5rem;
+      top: 100%;
+      border-top-color: $black;
+    }
+
+    &.inActive {
+      display: none !important;
+    }
+  }
+}
