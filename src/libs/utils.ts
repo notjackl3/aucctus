@@ -11,7 +11,7 @@ export const validEmail = (email: string) => {
   return email
     .toLowerCase()
     .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
     );
 };
 
@@ -144,4 +144,15 @@ export const calculatePercent = (numerator: number, denominator: number) => {
   const percent = (numerator / denominator) * 100;
   const roundedPercent = Math.round(percent);
   return roundedPercent;
+};
+
+export const removeProtocol = (source: string) => {
+  const unwantedPrefix = ['https://', 'http://'];
+  let d = source;
+  for (const prefix of unwantedPrefix) {
+    if (d.substring(0, prefix.length) === prefix) {
+      d = d.slice(prefix.length);
+    }
+  }
+  return d;
 };

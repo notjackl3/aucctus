@@ -74,11 +74,8 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
     setSource(d);
   }, []);
 
-  useEffect(() => {}, []);
-
   const handleSave = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      e.preventDefault();
       updateItem(
         { ...item, name, description, source },
         {
@@ -105,12 +102,12 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
               }
             }
           },
-        }
+        },
       );
       e.preventDefault();
       e.stopPropagation();
     },
-    [updateItem, name, description, source, item, closeModal]
+    [updateItem, name, description, source, item, closeModal],
   );
 
   return (

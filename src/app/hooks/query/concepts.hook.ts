@@ -11,9 +11,11 @@ import {
   IConceptPage,
   ICustomerProfile,
   ICustomerProfileCreate,
+  IEcosystemCreate,
   IFinancialProjection,
   IFormError,
   IMarketScan,
+  IMarketScanElementCreate,
   IMarketSizeMetric,
   ITrendsAndDrivers,
 } from '../../../libs/api/types';
@@ -248,6 +250,20 @@ export const useConceptOverviewUpdate = (conceptUuid: string) => {
 export const useMarketScanUpdate = (conceptUuid: string) => {
   return useGenericConceptMutate<IMarketScan>(
     (data) => api.concept.updateConceptMarketScan(data.uuid, data),
+    [[AucctusQueryKeys.conceptMarketScan, conceptUuid]],
+  );
+};
+
+export const useTrendAndDriverCreate = (conceptUuid: string) => {
+  return useGenericConceptMutate<ITrendsAndDrivers, IMarketScanElementCreate>(
+    (data) => api.concept.createTrendAndDriver(conceptUuid, data),
+    [[AucctusQueryKeys.conceptMarketScan, conceptUuid]],
+  );
+};
+
+export const useEcosystemCreate = (conceptUuid: string) => {
+  return useGenericConceptMutate<Ecosystem, IEcosystemCreate>(
+    (data) => api.concept.createEcosystem(conceptUuid, data),
     [[AucctusQueryKeys.conceptMarketScan, conceptUuid]],
   );
 };

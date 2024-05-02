@@ -11,8 +11,10 @@ import {
   IConceptPage,
   ICustomerProfile,
   ICustomerProfileCreate,
+  IEcosystemCreate,
   IFinancialProjection,
   IMarketScan,
+  IMarketScanElementCreate,
   IMarketSizeMetric,
   ITrendsAndDrivers,
 } from './types'; // Import the missing type
@@ -79,13 +81,13 @@ export class ConceptApi extends ApiService {
   updateConceptCustomerProfile(customerProfileUuid: string, data: Partial<ICustomerProfile>) {
     return this.patch<ICustomerProfile, Partial<ICustomerProfile>>(
       endpoints.conceptCustomerProfileUuid(customerProfileUuid),
-      data
+      data,
     );
   }
   createConceptCustomerProfile(customerProfileUuid: string, data: ICustomerProfileCreate) {
     return this.post<ICustomerProfile, ICustomerProfileCreate>(
       endpoints.conceptCustomerProfiles(customerProfileUuid),
-      data
+      data,
     );
   }
 
@@ -116,7 +118,7 @@ export class ConceptApi extends ApiService {
   updateConceptFinancialProjection(uuid: string, data: Partial<IFinancialProjection>) {
     return this.patch<IFinancialProjection, Partial<IFinancialProjection>>(
       endpoints.conceptFinancialProjectionUuid(uuid),
-      data
+      data,
     );
   }
 
@@ -136,12 +138,23 @@ export class ConceptApi extends ApiService {
     return this.patch<ITrendsAndDrivers, Partial<ITrendsAndDrivers>>(endpoints.conceptTrendAndDriver(uuid), data);
   }
 
+  createTrendAndDriver(uuid: string, data: IMarketScanElementCreate) {
+    return this.post<ITrendsAndDrivers, IMarketScanElementCreate>(
+      endpoints.conceptMarketScanElement(uuid, 'trends-and-drivers'),
+      data,
+    );
+  }
+
   deleteTrendAndDriver(uuid: string) {
     return this.delete<ITrendsAndDrivers>(endpoints.conceptTrendAndDriver(uuid));
   }
 
   updateEcosystem(uuid: string, data: Partial<Ecosystem>) {
     return this.patch<Ecosystem, Partial<Ecosystem>>(endpoints.conceptEcosystem(uuid), data);
+  }
+
+  createEcosystem(uuid: string, data: IEcosystemCreate) {
+    return this.post<Ecosystem, IEcosystemCreate>(endpoints.conceptMarketScanElement(uuid, 'ecosystem'), data);
   }
 
   deleteEcosystem(uuid: string) {

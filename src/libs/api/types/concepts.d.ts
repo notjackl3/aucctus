@@ -171,13 +171,23 @@ export interface IInvestorsEcosystem extends IEcosystem {
 }
 
 type Ecosystem = IStartupEcosystem | IIncumbentsEcosystem | IInvestorsEcosystem;
-
+type EcosystemType = Ecosystem['ecosystemType'];
 export interface ITrendsAndDrivers extends IBaseConceptEntity {
   name: string;
   description: string;
   source: string;
   // Currently not implemented but will be used in the future
   image: undefined;
+}
+
+export interface IMarketScanElementCreate {
+  name: string;
+  description: string;
+  source: string;
+}
+
+export interface IEcosystemCreate extends IMarketScanElementCreate {
+  ecosystemType: EcosystemType;
 }
 
 export interface IMarketScan extends IBaseConceptEntity {
