@@ -15,7 +15,7 @@ const Tooltip: FunctionComponent<TooltipProps> = ({ tip, children }) => {
     if (ref.current) {
       const rect = e.currentTarget.getBoundingClientRect();
       const x = e.clientX - rect.left - ref.current.clientWidth / 2;
-      const y = e.clientY - rect.top - ref.current.clientHeight * 2.5;
+      const y = e.clientY - rect.top - ref.current.clientHeight * 2.8;
       ref.current.style.transform = `translate(${x}px, ${y}px)`;
     }
   }, []);
