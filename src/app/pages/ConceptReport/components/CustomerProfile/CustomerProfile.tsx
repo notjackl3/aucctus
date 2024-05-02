@@ -23,7 +23,7 @@ const CustomerProfile: FunctionComponent = () => {
   const selectedProfileName = searchParams.get('persona');
   const selectedProfile = useMemo(
     () => profiles.find((item) => item.nickname === selectedProfileName),
-    [profiles, selectedProfileName]
+    [profiles, selectedProfileName],
   );
 
   const customerTabs = useMemo(() => {
@@ -40,7 +40,7 @@ const CustomerProfile: FunctionComponent = () => {
         return prev;
       });
     },
-    [setSearchParams]
+    [setSearchParams],
   );
 
   useEffect(() => {
@@ -53,7 +53,7 @@ const CustomerProfile: FunctionComponent = () => {
         },
         {
           replace: true,
-        }
+        },
       );
     }
   }, [selectedProfileName, onTabSelect, conceptId, navigate, profiles, selectedProfile]);

@@ -42,7 +42,7 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
 }) => {
   const activeCoordinate = useMemo(
     () => chartCoordinates.find((coordinate) => coordinate.id && coordinate.id === selectedCoordinate),
-    [chartCoordinates, selectedCoordinate]
+    [chartCoordinates, selectedCoordinate],
   );
 
   const chartPoints = useMemo(() => {

@@ -67,7 +67,7 @@ function useEditableField<
   T,
   TData = unknown,
   TError = AxiosError<IFormError<TData>>,
-  TVariables = PartialWithUUid<TData>
+  TVariables = PartialWithUUid<TData>,
 >({
   initialValue,
   fieldName,

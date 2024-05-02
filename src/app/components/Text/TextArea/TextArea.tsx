@@ -30,7 +30,7 @@ interface ITextAreaHandle {
 
 const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
   { label, name, hint, errorMessage, isDisableResize = false, error = false, maxLength, value, ...props },
-  ref
+  ref,
 ) => {
   const hasError = !!errorMessage || error;
   const internalRef = useRef<HTMLTextAreaElement>(null);

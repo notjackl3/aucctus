@@ -20,7 +20,7 @@ const Settings: FunctionComponent = () => {
       const route = value;
       navigate(route);
     },
-    [navigate]
+    [navigate],
   );
 
   return (

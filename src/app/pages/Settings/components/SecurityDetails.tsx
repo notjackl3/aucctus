@@ -96,7 +96,7 @@ const SecurityDetails: FunctionComponent = () => {
         isDisabled: isFormDisabled,
       },
     ],
-    [isFormDisabled, currentPassword, newPassword, confirmPassword, currentPasswordError]
+    [isFormDisabled, currentPassword, newPassword, confirmPassword, currentPasswordError],
   );
 
   return (

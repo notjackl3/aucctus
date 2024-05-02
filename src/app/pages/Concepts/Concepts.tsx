@@ -31,7 +31,7 @@ export const KANBAN_COLUMNS_MAP = ACTIVE_CONCEPT_STATUS_LIST.reduce<ConceptColum
     };
     return acc;
   },
-  {} as ConceptColumns
+  {} as ConceptColumns,
 );
 
 const ACTIVE_VIEW_TABS = (['list', 'board'] as IconVariant[]).map((value) => ({
@@ -71,7 +71,7 @@ const Concepts: FunctionComponent = () => {
       }
       setSearchParams(searchParams);
     },
-    [searchParams, setSearchParams]
+    [searchParams, setSearchParams],
   );
 
   /**
@@ -83,7 +83,7 @@ const Concepts: FunctionComponent = () => {
       searchParams.set('page', newPage.toString());
       setSearchParams(searchParams);
     },
-    [searchParams, setSearchParams]
+    [searchParams, setSearchParams],
   );
 
   /**
@@ -100,7 +100,7 @@ const Concepts: FunctionComponent = () => {
         return prev;
       });
     },
-    [setSearchParams]
+    [setSearchParams],
   );
 
   // We should be able to update the columns (components) without having to recreate the entire component

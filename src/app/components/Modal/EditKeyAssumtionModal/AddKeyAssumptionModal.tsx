@@ -1,8 +1,7 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import Icon from '../../Icons/Icon/Icon';
 import { useModal } from '../../../context/modal/ModalContextProvider';
-import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
-import { AssumptionType, IAssumption } from '../../../../libs/api/types';
+import { AssumptionType } from '../../../../libs/api/types';
 import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';
 import { useAssumptionCreate } from '../../../hooks/query/concepts.hook';

@@ -76,7 +76,7 @@ const AboutDetails: FunctionComponent = () => {
         name: 'lastName',
       },
     ],
-    [data, firstName, lastName]
+    [data, firstName, lastName],
   );
 
   const userInfo = useMemo(
@@ -100,7 +100,7 @@ const AboutDetails: FunctionComponent = () => {
         isDisabled: true,
       },
     ],
-    [data, email, jobTitle, role, isFormDisabled]
+    [data, email, jobTitle, role, isFormDisabled],
   );
 
   return data ? (

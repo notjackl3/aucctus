@@ -73,7 +73,7 @@ export class AuthApi extends ApiService {
       { refresh },
       {
         withCredentials: true,
-      }
+      },
     );
   }
 

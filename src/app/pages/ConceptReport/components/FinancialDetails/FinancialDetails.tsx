@@ -10,8 +10,6 @@ import { useEditFinancialProjections } from '../../../../hooks/concepts/editable
 import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
 import MarketSizeProjectionsCard from '../../../../components/Concepts/FinacialProjections/MarketSizeProjectionsCard/MarketSizeProjectionsCard';
 import Loading from '../../../../components/Loading';
-import { useModal } from '../../../../context/modal/ModalContextProvider';
-import ConfirmationModal from '../../../../components/Modal/ConfirmationModal/ConfirmationModal';
 
 const iconDefaultProps = {
   height: 20,
@@ -23,7 +21,6 @@ const FinancialDetails: FunctionComponent = () => {
   const { id: conceptId } = useParams();
   const { overview, tamKeyHypothesis, samKeyHypothesis, somKeyHypothesis, marketSizeMetric } =
     useEditFinancialProjections();
-  const { openModal } = useModal();
 
   return (
     <div className={styles.financialDetails}>

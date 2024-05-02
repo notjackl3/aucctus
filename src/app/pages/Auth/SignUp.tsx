@@ -27,7 +27,7 @@ const SignUp: FunctionComponent = () => {
       e.preventDefault();
     },
 
-    [email]
+    [email],
   );
 
   const _handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {

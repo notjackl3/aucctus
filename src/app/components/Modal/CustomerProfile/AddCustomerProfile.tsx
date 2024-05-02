@@ -41,11 +41,11 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
 
   const handleTextFieldChange = useCallback(
     (
-        fieldName: string,
-        setText: React.Dispatch<React.SetStateAction<string>>,
-        setError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        maxLength?: number
-      ) =>
+      fieldName: string,
+      setText: React.Dispatch<React.SetStateAction<string>>,
+      setError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      maxLength?: number,
+    ) =>
       (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const input = e.target.value;
 
@@ -59,17 +59,17 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
 
         setText(input);
       },
-    []
+    [],
   );
 
   const handleRangeValueChange = useCallback(
     (
-        type: 'lower' | 'upper',
-        setRange: React.Dispatch<React.SetStateAction<number>>,
-        setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        inverseValue: number
-      ) =>
+      type: 'lower' | 'upper',
+      setRange: React.Dispatch<React.SetStateAction<number>>,
+      setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      inverseValue: number,
+    ) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
         const num = parseInt(input);
@@ -85,7 +85,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
 
         setRange(num);
       },
-    []
+    [],
   );
 
   return (
@@ -145,7 +145,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
               setLowerAgeRange,
               setLowerAgeRangeError,
               setUpperAgeRangeError,
-              ageUpper
+              ageUpper,
             )}
           />
           <InputField
@@ -160,7 +160,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
               setUpperAgeRange,
               setUpperAgeRangeError,
               setLowerAgeRangeError,
-              ageLower
+              ageLower,
             )}
           />
         </div>
@@ -186,7 +186,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
               setLowerIncomeRange,
               setLowerIncomeRangeError,
               setUpperIncomeRangeError,
-              incomeUpper
+              incomeUpper,
             )}
           />
           <InputField
@@ -201,7 +201,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
               setUpperIncomeRange,
               setUpperIncomeRangeError,
               setLowerIncomeRangeError,
-              incomeLower
+              incomeLower,
             )}
           />
         </div>
@@ -304,7 +304,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
                   }
                   toast.error(message);
                 },
-              }
+              },
             );
             closeModal();
           }}

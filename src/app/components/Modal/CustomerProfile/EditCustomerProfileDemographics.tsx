@@ -35,11 +35,11 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
 
   const handleTextFieldChange = useCallback(
     (
-        fieldName: string,
-        setText: React.Dispatch<React.SetStateAction<string>>,
-        setError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        maxLength?: number
-      ) =>
+      fieldName: string,
+      setText: React.Dispatch<React.SetStateAction<string>>,
+      setError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      maxLength?: number,
+    ) =>
       (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const input = e.target.value;
 
@@ -53,17 +53,17 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
 
         setText(input);
       },
-    []
+    [],
   );
 
   const handleRangeValueChange = useCallback(
     (
-        type: 'lower' | 'upper',
-        setRange: React.Dispatch<React.SetStateAction<number>>,
-        setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        inverseValue: number
-      ) =>
+      type: 'lower' | 'upper',
+      setRange: React.Dispatch<React.SetStateAction<number>>,
+      setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      inverseValue: number,
+    ) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
         const num = parseInt(input);
@@ -79,7 +79,7 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
 
         setRange(num);
       },
-    []
+    [],
   );
 
   return (
@@ -109,7 +109,7 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
               setLowerAgeRange,
               setLowerAgeRangeError,
               setUpperAgeRangeError,
-              ageUpper
+              ageUpper,
             )}
           />
           <InputField
@@ -124,7 +124,7 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
               setUpperAgeRange,
               setUpperAgeRangeError,
               setLowerAgeRangeError,
-              ageLower
+              ageLower,
             )}
           />
         </div>
@@ -150,7 +150,7 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
               setLowerIncomeRange,
               setLowerIncomeRangeError,
               setUpperIncomeRangeError,
-              incomeUpper
+              incomeUpper,
             )}
           />
           <InputField
@@ -165,7 +165,7 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
               setUpperIncomeRange,
               setUpperIncomeRangeError,
               setLowerIncomeRangeError,
-              incomeLower
+              incomeLower,
             )}
           />
         </div>
@@ -244,7 +244,7 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
                   }
                   toast.error(message);
                 },
-              }
+              },
             );
             closeModal();
           }}

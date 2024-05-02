@@ -34,7 +34,7 @@ const useGeneratedConcepts = () => {
 
   const getFormattedConceptRequest = (
     originalConceptList: IConceptCreate[],
-    rowSelection: RowSelectionState
+    rowSelection: RowSelectionState,
   ): IConceptCreate[] => {
     const selectedConceptList = originalConceptList?.map((concept, index) => {
       if (rowSelection[index]) {

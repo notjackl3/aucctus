@@ -27,7 +27,9 @@
       border-radius: 4.84375rem;
       border: 1.55px solid var(--base-white, #fff);
       background: var(--avatar-company-logo-acme-group, --base-white 50% / cover no-repeat);
-      box-shadow: 0px 1.55px 2.325px -0.775px rgba(16, 24, 40, 0.03), 0px 4.65px 6.2px -1.55px rgba(16, 24, 40, 0.08);
+      box-shadow:
+        0px 1.55px 2.325px -0.775px rgba(16, 24, 40, 0.03),
+        0px 4.65px 6.2px -1.55px rgba(16, 24, 40, 0.08);
     }
 
     .text {

@@ -87,7 +87,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
           onClick={() => handlePageClick(i)}
         >
           {i}
-        </button>
+        </button>,
       );
     }
     return pageNumbers;

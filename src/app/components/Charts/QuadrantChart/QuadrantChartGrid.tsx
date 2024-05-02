@@ -21,11 +21,11 @@ const QuadrantChartGrid: FunctionComponent<QuadrantChartGridProps> = ({ numberGr
       const dist = i * spacing;
       if (variant === 'horizontal') {
         lineList.push(
-          <line key={`horizontal-line-${i}`} x1="0" y1={dist} x2={CHART_WIDTH} y2={dist} {...defaultLineProps} />
+          <line key={`horizontal-line-${i}`} x1="0" y1={dist} x2={CHART_WIDTH} y2={dist} {...defaultLineProps} />,
         );
       } else if (variant === 'vertical') {
         lineList.push(
-          <line key={`vertical-line-${i}`} x1={dist} y1={0} x2={dist} y2={CHART_WIDTH} {...defaultLineProps} />
+          <line key={`vertical-line-${i}`} x1={dist} y1={0} x2={dist} y2={CHART_WIDTH} {...defaultLineProps} />,
         );
       }
     }

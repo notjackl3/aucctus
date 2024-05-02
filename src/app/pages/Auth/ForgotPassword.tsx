@@ -23,7 +23,7 @@ const ForgotPassword: FunctionComponent = () => {
       }
       e.preventDefault();
     },
-    [email]
+    [email],
   );
 
   return (

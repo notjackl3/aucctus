@@ -53,7 +53,7 @@ const EditMarketSizeMetricModal: React.FC<IMarketSizeMetricEditModalProps> = ({ 
         }
       }
     },
-    [setValue, setValueError]
+    [setValue, setValueError],
   );
 
   const handleReasonChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -151,7 +151,7 @@ const EditMarketSizeMetricModal: React.FC<IMarketSizeMetricEditModalProps> = ({ 
                 onSuccess: () => {
                   closeModal();
                 },
-              }
+              },
             );
             e.preventDefault();
             e.stopPropagation();

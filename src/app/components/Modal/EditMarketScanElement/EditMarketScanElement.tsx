@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useEffect, useState } from 'react';
+import { FunctionComponent, useCallback, useState } from 'react';
 
 import styles from './edit-trends-and-driver.module.scss';
 import { useModal } from '../../../context/modal/ModalContextProvider';

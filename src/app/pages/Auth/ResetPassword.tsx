@@ -87,7 +87,7 @@ const ResetPassword: FunctionComponent = () => {
                   onSuccess: () => {
                     navigate(AppPath.ResetPasswordSuccess);
                   },
-                }
+                },
               );
             }
             e.preventDefault();

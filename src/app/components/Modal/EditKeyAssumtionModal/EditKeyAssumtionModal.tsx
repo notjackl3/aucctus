@@ -94,7 +94,7 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
               }
             }
           },
-        }
+        },
       );
       e.preventDefault();
       e.stopPropagation();
@@ -109,7 +109,7 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
       impactLevel,
       assumptionsType,
       closeModal,
-    ]
+    ],
   );
 
   return (

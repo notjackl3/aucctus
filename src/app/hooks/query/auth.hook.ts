@@ -9,27 +9,11 @@ import {
   IServerErrorMessage,
   IRegisterUser,
   ITokenResponse,
-  IToken,
 } from '../../../libs/api/types';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AucctusLocalStorage } from '../../../libs/localStorage';
-
-export const useLogin = () => {
-  const queryClient = useQueryClient();
-  return useMutation<
-    IAuthSuccessResponse,
-    AxiosError<IServerErrorMessage>,
-    { email: string; password: string },
-    unknown
-  >({
-    mutationFn: async (credentials) => await api.auth.login(credentials.email, credentials.password),
-    onSuccess: (response) => {
-      queryClient.invalidateQueries({ queryKey: AucctusQueryKeys.userDetails });
-    },
-  });
-};
 
 export const useSignUp = () => {
   const navigate = useNavigate();
@@ -69,18 +53,6 @@ export const useConfirmEmail = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: AucctusQueryKeys.userDetails });
     },
-  });
-};
-
-export const useRefreshToken = () => {
-  return useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, string, unknown>({
-    mutationFn: async (token: string) => await api.auth.refreshToken(token),
-  });
-};
-
-export const useLogout = () => {
-  return useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, unknown, unknown>({
-    mutationFn: async () => await api.auth.logout(),
   });
 };
 
@@ -155,7 +127,7 @@ export const useAuth = () => {
       });
     });
     api.setLogoutAction(() => logout.mutate(undefined));
-  }, []);
+  }, [logout, refreshToken, tokens.refresh]);
 
   return {
     isAuthenticated,

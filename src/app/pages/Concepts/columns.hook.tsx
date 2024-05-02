@@ -19,7 +19,7 @@ const columnHelper = createColumnHelper<IConcept>();
 export const useConceptTableColumns = (
   ref: React.RefObject<HTMLDivElement>,
   setOpenPopupMenuId: React.Dispatch<React.SetStateAction<string | undefined>>,
-  openPopupMenuId: string | undefined
+  openPopupMenuId: string | undefined,
 ) => {
   const navigate = useNavigate();
   const { mutate: updateConcept } = useConceptUpdate();
@@ -156,7 +156,7 @@ export const useConceptTableColumns = (
         },
       }),
     ],
-    [updateConcept, navigate, retryConceptReport, openPopupMenuId, ref, setOpenPopupMenuId]
+    [updateConcept, navigate, retryConceptReport, openPopupMenuId, ref, setOpenPopupMenuId],
   );
 
   return columns;

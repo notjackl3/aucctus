@@ -40,14 +40,14 @@ export class Api {
       this,
       this.buildConfig({
         baseURL: this._config.baseUrl,
-      })
+      }),
     );
 
     this.account = new AccountApi(
       this,
       this.buildConfig({
         baseURL: this._config.baseUrl,
-      })
+      }),
     );
 
     this.concept = new ConceptApi(this, this.buildConfig({ baseURL: this._config.baseUrl }));
