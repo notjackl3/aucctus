@@ -93,11 +93,9 @@ const ConceptReport: FunctionComponent = () => {
           </Tooltip>
           <button
             aria-label='Close Detail Page'
-            className='btn btn-close'
+            className='btn-close'
             onClick={() => navigate(AppPath.ConceptCategory)}
-          >
-            <Icon variant='closeX' {...defaultIconProps} />
-          </button>
+          />
         </div>
       </div>
       <div className={styles.contentContainer}>

@@ -8,8 +8,8 @@ interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
 
 const Icon: FunctionComponent<IconProps> = ({
   variant,
-  height = 24,
-  width = 24,
+  height = 18,
+  width = 18,
   stroke = '#7586A9',
   fill = 'none',
   ...props

@@ -50,17 +50,19 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
   return (
     <ConceptDetailCard
       title={title}
-      headerAction={
-        <button
-          className='btn btn-light'
-          onClick={() => {
-            openModal(AddMarketScanElement, { addItem: addEcosystem, ecosystemType });
-          }}
-        >
-          <Icon variant='plus' />
-        </button>
+      footerAction={
+        <>
+          <div />
+          <button
+            className='btn btn-light'
+            onClick={() => {
+              openModal(AddMarketScanElement, { addItem: addEcosystem, ecosystemType });
+            }}
+          >
+            <Icon variant='plus' />
+          </button>
+        </>
       }
-      isHideFooter
     >
       <div className={styles.cardContent}>
         {data?.map((item) => (

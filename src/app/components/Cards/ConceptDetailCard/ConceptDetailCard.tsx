@@ -17,8 +17,8 @@ interface ConceptDetailCardProps extends React.DetailedHTMLProps<React.HTMLAttri
 }
 
 const iconDefaultProps = {
-  height: 20,
-  width: 20,
+  height: 16,
+  width: 16,
   stroke: '#2B3674',
 };
 
