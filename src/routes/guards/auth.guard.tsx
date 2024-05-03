@@ -2,8 +2,8 @@ import { FunctionComponent, useEffect } from 'react';
 
 import { Outlet } from 'react-router-dom';
 
-import { useAuth } from '../../app/hooks/query/auth.hook';
 import analytics from '../../libs/analytics';
+import { useAuth } from '../../app/context/Auth/AuthContextProvider';
 
 const AuthGuard: FunctionComponent = () => {
   // This is a guard that will be used to protect routes that require authentication.

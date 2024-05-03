@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import styles from './auth-header.module.scss';
 import Logo from '../../../assets/Logo.png';
-import { useAuth } from '../../../hooks/query/auth.hook';
+import { useAuth } from '../../../context/Auth/AuthContextProvider';
 
 const AuthHeader: FunctionComponent = () => {
   const { logout } = useAuth();

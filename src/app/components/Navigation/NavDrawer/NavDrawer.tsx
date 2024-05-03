@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import { useUserDetails } from '../../../hooks/query/account.hook';
 import { useConcepts } from '../../../hooks/query/concepts.hook';
 import NavButton from './NavButton';
-import { useAuth } from '../../../hooks/query/auth.hook';
+import { useAuth } from '../../../context/Auth/AuthContextProvider';
 
 const NavDrawer = () => {
   const { data: { user } = { user: undefined } } = useUserDetails();

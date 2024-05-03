@@ -9,6 +9,7 @@ import { toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
+import { AuthProvider } from './app/context/Auth/AuthContextProvider';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
@@ -27,9 +28,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <ModalProvider>
-          <App />
-        </ModalProvider>
+        <AuthProvider>
+          <ModalProvider>
+            <App />
+          </ModalProvider>
+        </AuthProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>,
