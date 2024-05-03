@@ -11,6 +11,7 @@ import 'abort-controller/polyfill';
 import analytics from '../analytics';
 import { IAuthSuccessResponse } from './types';
 import { ExpiryTimeNotFoundError, TokenStructureError } from './customErrors';
+import { sleep } from '../utils';
 
 export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {
   return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).access;
@@ -55,21 +56,23 @@ export abstract class ApiService {
   }
 
   private async _requestMiddleware(config: InternalAxiosRequestConfig) {
-    const accessToken = this.apiInstance.accessToken;
+    // TEMPORARILY REMOVED
+    // const accessToken = this.apiInstance.accessToken;
 
-    if (!this._shouldSkipRefresh(config.url || '')) {
-      if (this.apiInstance.pendingRefresh) {
-        await this.apiInstance.pendingRefresh;
-      }
-      try {
-        if (accessToken && this.hasTokenExpired(accessToken)) {
-          await this.apiInstance.refreshToken();
-          Object.assign(config || {}, this._handleAccessToken());
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    // if (!this._shouldSkipRefresh(config.url || '')) {
+    //   if (this.apiInstance.pendingRefresh) {
+    //     await this.apiInstance.pendingRefresh;
+    //   }
+    //   try {
+    //     if (accessToken && this.hasTokenExpired(accessToken)) {
+    //       await sleep(1000 * Math.random());
+    //       await this.apiInstance.refreshToken();
+    //       Object.assign(config || {}, this._handleAccessToken());
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
     Object.assign(config.headers || {}, this.config.headers);
 
@@ -89,17 +92,20 @@ export abstract class ApiService {
       if (axios.isCancel(error)) {
         analytics.debug('Request Aborted: ', error);
       }
-
       const status = (error.response && error.response.status) || 0;
       if (LOGOUT_STATUSES.includes(status) && !this._shouldSkipRefresh(error?.config?.url || '')) {
         try {
           if (error.config) {
+            // Adds some delay to prevent multiple requests from trying to refresh the token at the same time
+            await sleep(1000 * Math.random());
             // Attempt to refresh the token
-            if (!this.apiInstance.pendingRefresh) {
-              await this.apiInstance.refreshToken();
-            } else {
+            if (this.apiInstance.pendingRefresh) {
               await this.apiInstance.pendingRefresh;
+            } else {
+              await this.apiInstance.refreshToken();
             }
+
+            analytics.debug('Retrying request after token refresh', error.config.url);
             // Retry the original request
             return this.api.request({
               ...error.config,

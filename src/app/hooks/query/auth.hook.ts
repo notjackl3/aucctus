@@ -14,6 +14,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AucctusLocalStorage } from '../../../libs/localStorage';
+import analytics from '../../../libs/analytics';
 
 export const useSignUp = () => {
   const navigate = useNavigate();
@@ -76,9 +77,15 @@ export const useAuth = () => {
     }
   }, []);
 
-  const refreshTokenMutate = useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, void, unknown>({
+  const { mutateAsync: refreshAsync, isLoading: isRefreshLoading } = useMutation<
+    ITokenResponse,
+    AxiosError<IServerErrorMessage>,
+    void,
+    unknown
+  >({
     mutationFn: async () => (tokens.refresh ? await api.auth.refreshToken(tokens.refresh) : Promise.reject()),
     onSuccess: (response) => {
+      analytics.debug('Refreshed Token Updating Access Token');
       updateTokens(response);
     },
   });
@@ -108,40 +115,22 @@ export const useAuth = () => {
 
   useEffect(() => {
     // Set refresh token and logout actions
-    api.setRefreshTokenAction(
-      () => refreshTokenMutate.mutateAsync(),
-
-      // {
-      // return new Promise((resolve, reject) => {
-      //   if (!tokens.refresh) {
-      //     reject();
-      //     return;
-      //   }
-
-      //   refreshTokenMutate.mutate(undefined, {
-      //     onSuccess: (data) => {
-      //       resolve(data);
-      //     },
-      //     onError: (error) => {
-      //       reject(error);
-      //     },
-      //   });
-      //   return;
-      // });
-      // }
-    );
-    api.setLogoutAction(() => logout.mutate(undefined));
-  }, [logout, refreshTokenMutate, tokens.refresh]);
+    if (api.hasSetRefreshTokenAction && api.hasSetLogoutAction) return;
+    api.setRefreshTokenAction(refreshAsync);
+    api.setLogoutAction(logout.mutateAsync);
+  }, [logout, refreshAsync, tokens.refresh]);
 
   useEffect(() => {
-    if (!tokens.refresh) {
+    if (!tokens.refresh && AucctusLocalStorage.get('refreshToken')) {
       setTokens((prev) => ({ ...prev, refresh: AucctusLocalStorage.get('refreshToken') }));
     }
-  }, [tokens]);
+  }, []);
 
   return {
     isAuthenticated,
+    // use the API to refresh the token so it can tell other api request to wait for the refresh to complete
     refreshToken: api.refreshToken,
+    isRefreshLoading,
     logout,
     login,
     tokens,
