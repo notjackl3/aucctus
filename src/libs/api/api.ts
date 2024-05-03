@@ -32,6 +32,8 @@ export class Api {
   account: AccountApi;
   concept: ConceptApi;
   conceptIgnite: IgniteConceptApi;
+  hasSetRefreshTokenAction: boolean = false;
+  hasSetLogoutAction: boolean = false;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -83,16 +85,18 @@ export class Api {
   // Method to update the refresh token action dynamically
   setRefreshTokenAction(action: () => Promise<ITokenResponse | undefined>) {
     this._refreshTokenAction = action;
+    this.hasSetRefreshTokenAction = true;
   }
 
   // Method to update the logout action dynamically
   setLogoutAction(action: () => void) {
     this._logoutAction = action;
+    this.hasSetLogoutAction = true;
   }
 
   // Expose these actions through methods to be used in ApiService
   async refreshToken() {
-    if (this._refreshTokenAction) {
+    if (this._refreshTokenAction !== undefined) {
       this.pendingRefresh = this._refreshTokenAction();
       return await this.pendingRefresh.finally(() => {
         this.pendingRefresh = void 0;
@@ -103,7 +107,7 @@ export class Api {
   }
 
   logout() {
-    if (this._logoutAction) {
+    if (this._logoutAction !== undefined) {
       toast.warning('You have been logged out. Please login again.');
       return this._logoutAction();
     } else {

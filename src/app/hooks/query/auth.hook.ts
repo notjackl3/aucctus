@@ -76,7 +76,7 @@ export const useAuth = () => {
     }
   }, []);
 
-  const refreshToken = useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, void, unknown>({
+  const refreshTokenMutate = useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, void, unknown>({
     mutationFn: async () => (tokens.refresh ? await api.auth.refreshToken(tokens.refresh) : Promise.reject()),
     onSuccess: (response) => {
       updateTokens(response);
@@ -108,26 +108,30 @@ export const useAuth = () => {
 
   useEffect(() => {
     // Set refresh token and logout actions
-    api.setRefreshTokenAction(() => {
-      return new Promise((resolve, reject) => {
-        if (!tokens.refresh) {
-          reject();
-          return;
-        }
+    api.setRefreshTokenAction(
+      () => refreshTokenMutate.mutateAsync(),
 
-        refreshToken.mutate(undefined, {
-          onSuccess: (data) => {
-            resolve(data);
-          },
-          onError: (error) => {
-            reject(error);
-          },
-        });
-        return;
-      });
-    });
+      // {
+      // return new Promise((resolve, reject) => {
+      //   if (!tokens.refresh) {
+      //     reject();
+      //     return;
+      //   }
+
+      //   refreshTokenMutate.mutate(undefined, {
+      //     onSuccess: (data) => {
+      //       resolve(data);
+      //     },
+      //     onError: (error) => {
+      //       reject(error);
+      //     },
+      //   });
+      //   return;
+      // });
+      // }
+    );
     api.setLogoutAction(() => logout.mutate(undefined));
-  }, [logout, refreshToken, tokens.refresh]);
+  }, [logout, refreshTokenMutate, tokens.refresh]);
 
   useEffect(() => {
     if (!tokens.refresh) {
@@ -137,7 +141,7 @@ export const useAuth = () => {
 
   return {
     isAuthenticated,
-    refreshToken,
+    refreshToken: api.refreshToken,
     logout,
     login,
     tokens,
