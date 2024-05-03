@@ -27,7 +27,7 @@ const Tooltip: FunctionComponent<TooltipProps> = ({ content }) => {
   return (
     content && (
       <div className={styles.tooltip} onMouseEnter={showTip} onMouseLeave={hideTip}>
-        <Icon variant="help-circle" {...defaultIconProps} />
+        <Icon variant='help-circle' {...defaultIconProps} />
         {isActive && (
           <div className={`${styles.tooltipTip} ${styles.top}`}>
             <span>{content}</span>

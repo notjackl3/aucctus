@@ -48,7 +48,7 @@ const ConceptBarChart: FunctionComponent<IConceptBarChartProps> = ({ data = defa
 
   return (
     <div className={styles.conceptBarChart}>
-      <svg width={CHART_WIDTH} height={CHART_HEIGHT} viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} fill="none">
+      <svg width={CHART_WIDTH} height={CHART_HEIGHT} viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`} fill='none'>
         {data
           ? ACTIVE_CONCEPT_STATUS_LIST.map((status, i) => {
               const value = data[status];

@@ -17,7 +17,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ profile }) 
   return (
     <div className={styles.customerDetails}>
       <div className={styles.avatarSection}>
-        <img className={styles.avatar} alt="avatar" src={defaultAvatar} />
+        <img className={styles.avatar} alt='avatar' src={defaultAvatar} />
         <div className={styles.avatarDetails}>
           <span className={styles.description}>{profile?.nickname}</span>
           <span className={styles.name}>{profile?.name}</span>
@@ -29,7 +29,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ profile }) 
             <h2>Overview</h2>
             <EditModeSwitcher
               containerClassName={styles.textBlock}
-              name="description"
+              name='description'
               value={description.value}
               onChange={description.handleChange}
               handleSave={description.handleSave}

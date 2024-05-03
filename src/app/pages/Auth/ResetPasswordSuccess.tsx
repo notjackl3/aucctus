@@ -17,12 +17,12 @@ const ResetPasswordSuccess: FunctionComponent = () => {
         <span className={styles.supportingText}>Your password has been successfully reset. Click below to login.</span>
       </div>
       <div className={styles.basicForm}>
-        <button className="btn btn-primary" onClick={() => navigate(AppPath.Login)}>
+        <button className='btn btn-primary' onClick={() => navigate(AppPath.Login)}>
           Continue
         </button>
         <div className={styles.signUp}>
           <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant="arrowleft" /> Back to log in
+            <Icon variant='arrowleft' /> Back to log in
           </Link>
         </div>
       </div>

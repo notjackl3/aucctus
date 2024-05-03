@@ -104,14 +104,14 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
               maxLength={MAX_INPUT_LENGTH}
             />
             <button
-              className="btn btn-light"
+              className='btn btn-light'
               onClick={(e) => {
                 handleSave(newItem);
                 e.preventDefault();
                 e.stopPropagation();
               }}
             >
-              <Icon variant="plus" height={20} width={20} />
+              <Icon variant='plus' height={20} width={20} />
             </button>
           </span>
         </div>
@@ -200,14 +200,14 @@ const CustomerProfileListItem: FunctionComponent<ICustomerProfileListItemProps> 
       )}
 
       <button
-        className="btn btn-light"
+        className='btn btn-light'
         onClick={(e) => {
           handleDelete(value);
           e.preventDefault();
           e.stopPropagation();
         }}
       >
-        <Icon variant="trash" height={20} width={20} />
+        <Icon variant='trash' height={20} width={20} />
       </button>
     </span>
   );

@@ -12,7 +12,7 @@ const IgniteLoading: FunctionComponent<IgniteLoadingProps> = ({ title, subtitle 
   return (
     <div className={styles.container}>
       <div className={styles.header}>
-        <img alt="Ignite!" style={{ width: 172, height: 128 }} src={igniteIcon} />
+        <img alt='Ignite!' style={{ width: 172, height: 128 }} src={igniteIcon} />
         <div className={styles.supportingText}>
           <h1 className={styles.title}>{title}</h1>
           <span className={styles.subtitle}>{subtitle}</span>

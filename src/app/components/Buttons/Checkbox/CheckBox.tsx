@@ -11,7 +11,7 @@ interface CheckBoxProps extends InputHTMLAttributes<HTMLInputElement> {
 const Box: ForwardRefRenderFunction<HTMLInputElement, CheckBoxProps> = ({ name, supportingText, ...props }, ref) => {
   return (
     <div className={styles.checkbox}>
-      <input {...props} type="checkbox" ref={ref} name={name} />
+      <input {...props} type='checkbox' ref={ref} name={name} />
 
       <span>{supportingText}</span>
     </div>

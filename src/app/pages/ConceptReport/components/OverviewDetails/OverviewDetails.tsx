@@ -81,8 +81,8 @@ const OverviewDetails: FunctionComponent = () => {
             <EditModeSwitcher
               containerClassName={styles.textBlock}
               value={valuePropositionEdit.value}
-              label=""
-              name="valueProposition"
+              label=''
+              name='valueProposition'
               maxLength={valuePropositionEdit.validation.maxLength}
               onChange={valuePropositionEdit.handleChange}
               handleSave={valuePropositionEdit.handleSave}
@@ -93,8 +93,8 @@ const OverviewDetails: FunctionComponent = () => {
             <h3>Overview</h3>
             <EditModeSwitcher
               value={descriptionEdit.value}
-              label=""
-              name="description"
+              label=''
+              name='description'
               maxLength={descriptionEdit.validation.maxLength}
               onChange={descriptionEdit.handleChange}
               handleSave={descriptionEdit.handleSave}
@@ -118,8 +118,8 @@ const OverviewDetails: FunctionComponent = () => {
 
       <div className={styles.cardContentContainer}>
         <ConceptDetailCard
-          title="Customer Profiles"
-          subtitle="Breakdown of target user pain points and jobs to be done"
+          title='Customer Profiles'
+          subtitle='Breakdown of target user pain points and jobs to be done'
           cardClassName={styles.cardStyle}
           footerAction={
             <button
@@ -127,9 +127,9 @@ const OverviewDetails: FunctionComponent = () => {
               onClick={() => {
                 navigateToTab(AppPath.ConceptCustomerProfile);
               }}
-              aria-label="View Customer Profiles"
+              aria-label='View Customer Profiles'
             >
-              <span>{<Icon variant="user-group" width={16} height={16} stroke="#626BA3" />}</span>
+              <span>{<Icon variant='user-group' width={16} height={16} stroke='#626BA3' />}</span>
               View Profile
             </button>
           }
@@ -137,7 +137,7 @@ const OverviewDetails: FunctionComponent = () => {
           <div className={styles.cardContent}>
             <div className={styles.customerCard}>
               <div className={styles.avatarSection}>
-                <img className={styles.avatar} alt="avatar" src={defaultAvatar} />
+                <img className={styles.avatar} alt='avatar' src={defaultAvatar} />
                 <div className={styles.avatarDetails} onClick={() => {}}>
                   <span className={styles.description}>{firstCustomerPersona?.nickname}</span>
                   <span className={styles.name}>{firstCustomerPersona?.name}</span>
@@ -148,19 +148,19 @@ const OverviewDetails: FunctionComponent = () => {
                   <h2 className={styles.demographicHeader}>Demographics</h2>
                   <div className={styles.list}>
                     <p>
-                      <Icon variant="globe" {...iconDefaultProps} />
+                      <Icon variant='globe' {...iconDefaultProps} />
                       {`Geographic Location: ${firstCustomerPersona?.geoLocation || ''}`}
                     </p>
                     <p>
-                      <Icon variant="umbrella" {...iconDefaultProps} />
+                      <Icon variant='umbrella' {...iconDefaultProps} />
                       {`Age Range: ${firstCustomerPersona?.ageRange || ''}`}
                     </p>
                     <p>
-                      <Icon variant="user-group" {...iconDefaultProps} />
+                      <Icon variant='user-group' {...iconDefaultProps} />
                       {`Family Size: ${firstCustomerPersona?.familySize || ''}`}
                     </p>
                     <p>
-                      <Icon variant="piggy-bank" {...iconDefaultProps} />
+                      <Icon variant='piggy-bank' {...iconDefaultProps} />
                       {`Average Income: ${firstCustomerPersona?.incomeRange || ''}`}
                     </p>
                   </div>
@@ -170,8 +170,8 @@ const OverviewDetails: FunctionComponent = () => {
           </div>
         </ConceptDetailCard>
         <ConceptDetailCard
-          title="Financial Projection"
-          subtitle="Market size estimate based on initial hypothesis"
+          title='Financial Projection'
+          subtitle='Market size estimate based on initial hypothesis'
           cardClassName={styles.cardStyle}
           footerAction={
             <button
@@ -179,9 +179,9 @@ const OverviewDetails: FunctionComponent = () => {
               onClick={() => {
                 navigateToTab(AppPath.ConceptFinancialProjection);
               }}
-              aria-label="View Financial Projection"
+              aria-label='View Financial Projection'
             >
-              <span>{<Icon variant="line-chart-up" width={16} height={16} stroke="#626BA3" />}</span>
+              <span>{<Icon variant='line-chart-up' width={16} height={16} stroke='#626BA3' />}</span>
               View Projections
             </button>
           }

@@ -41,7 +41,7 @@ const MarketActivityCard: FunctionComponent<DashboardOpportunityCardProps> = ({ 
   ));
 
   return (
-    <ConceptDetailCard title="Market Activity" cardClassName={styles.cardStyle} isHideFooter>
+    <ConceptDetailCard title='Market Activity' cardClassName={styles.cardStyle} isHideFooter>
       <div className={styles.cardContent}>{renderOpportunityRows}</div>
     </ConceptDetailCard>
   );

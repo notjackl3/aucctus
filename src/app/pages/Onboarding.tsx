@@ -60,7 +60,7 @@ const OnBoarding: FunctionComponent = () => {
               name={'companyName'}
               label={'Company Name'}
               value={name}
-              placeholder="Acme Widgets Corp."
+              placeholder='Acme Widgets Corp.'
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setName(e.target.value);
                 e.preventDefault();
@@ -72,7 +72,7 @@ const OnBoarding: FunctionComponent = () => {
               error={!!domainInputError}
               errorMessage={domainInputError}
               value={domain}
-              placeholder="www.acmewidgetscorp.com"
+              placeholder='www.acmewidgetscorp.com'
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setDomain(e.target.value);
                 e.preventDefault();
@@ -85,7 +85,7 @@ const OnBoarding: FunctionComponent = () => {
               name={'innovationGoal'}
               label={'What is your organization looking to achieve through innovation?'}
               value={innovationGoal}
-              placeholder="Expand into new industries."
+              placeholder='Expand into new industries.'
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setGoal(e.target.value);
                 e.preventDefault();
@@ -93,8 +93,8 @@ const OnBoarding: FunctionComponent = () => {
             />
 
             <button
-              type="button"
-              className="btn btn-primary"
+              type='button'
+              className='btn btn-primary'
               onClick={(e) => {
                 e.preventDefault();
                 registerAccount({ name, domain, innovationGoal });

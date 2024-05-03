@@ -14,7 +14,7 @@ const AuthHeader: FunctionComponent = () => {
           logout.mutate();
         }}
       >
-        <img alt="Logo" style={{ height: 30, width: 146 }} src={Logo} />
+        <img alt='Logo' style={{ height: 30, width: 146 }} src={Logo} />
       </div>
     </div>
   );

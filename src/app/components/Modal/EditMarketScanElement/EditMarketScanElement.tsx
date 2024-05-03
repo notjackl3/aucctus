@@ -114,19 +114,19 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
     <div className={styles.container}>
       <div className={styles.header}>
         <button
-          aria-label="Delete"
-          className="btn btn-light btn-no-border"
+          aria-label='Delete'
+          className='btn btn-light btn-no-border'
           disabled={showConfirmation}
           onClick={() => setShowConfirmation(true)}
         >
-          <Icon variant="trash" />
+          <Icon variant='trash' />
         </button>
-        <button aria-label="Close" className={'btn-close'} disabled={showConfirmation} onClick={() => closeModal()} />
+        <button aria-label='Close' className={'btn-close'} disabled={showConfirmation} onClick={() => closeModal()} />
       </div>
       <div className={styles.content}>
         <InputField
           label={'Title'}
-          name="title"
+          name='title'
           value={name}
           error={!!nameError}
           errorMessage={nameError}
@@ -135,7 +135,7 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
         />
         <TextArea
           label={'Description'}
-          name="description"
+          name='description'
           value={description}
           error={!!descriptionError}
           errorMessage={descriptionError}
@@ -144,7 +144,7 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
         />
         <InputField
           label={'Source'}
-          name="source"
+          name='source'
           value={source}
           error={!!sourceError}
           errorMessage={sourceError}
@@ -152,11 +152,11 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
         />
       </div>
       <div className={styles.footer}>
-        <button className="btn btn-light" disabled={showConfirmation} onClick={() => closeModal()}>
+        <button className='btn btn-light' disabled={showConfirmation} onClick={() => closeModal()}>
           Cancel
         </button>
         <button
-          className="btn btn-primary"
+          className='btn btn-primary'
           disabled={
             !name || !description || !source || !!nameError || !!descriptionError || !!sourceError || showConfirmation
           }
@@ -169,7 +169,7 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
         <div className={styles.confirm}>
           <ConfirmationModal
             title="Are you sure you'd like to delete?"
-            subtitle="This action can not be reversed."
+            subtitle='This action can not be reversed.'
             actions={[
               {
                 title: 'Cancel',

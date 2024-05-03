@@ -40,8 +40,8 @@ const NavLink: FunctionComponent<NavLinkProps> = ({ title, icon, to, locked = fa
           <span>{title}</span>
         </div>
 
-        {locked ? <Icon variant="lock" {...defaultIconProps} /> : null}
-        {isOpen ? <Icon variant="chevronup" {...defaultIconProps} /> : null}
+        {locked ? <Icon variant='lock' {...defaultIconProps} /> : null}
+        {isOpen ? <Icon variant='chevronup' {...defaultIconProps} /> : null}
       </Link>
 
       {nestedRoutes ? (

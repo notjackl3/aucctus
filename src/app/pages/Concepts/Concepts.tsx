@@ -133,12 +133,12 @@ const Concepts: FunctionComponent = () => {
               navigate(AppPath.IgniteConcept);
             }}
           >
-            <Icon variant="rocket" height={20} width={20} />
+            <Icon variant='rocket' height={20} width={20} />
             Add Concept
           </button>
         </div>
       </div>
-      <TabView tabs={tabs} className={styles.tabs} variant="button" onTabSelect={onTabSelect} activeTab={view}>
+      <TabView tabs={tabs} className={styles.tabs} variant='button' onTabSelect={onTabSelect} activeTab={view}>
         <ConceptContainer
           category={category}
           categoryCount={data?.count || 0}

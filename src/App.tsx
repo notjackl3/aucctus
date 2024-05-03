@@ -11,7 +11,7 @@ import Loading from './app/components/Loading';
 
 function App() {
   return (
-    <div role="main" className="App">
+    <div role='main' className='App'>
       {/* TODO: Create Loading Screen */}
       <Suspense fallback={<Loading />}>
         <Routes>
@@ -53,15 +53,15 @@ function App() {
               <Route path={AppPath.EmailConfirmation} element={<Page.Auth.EmailConfirmation />} /> d
             </Route>
           </Route>
-          <Route path="*" element={<Navigate to={AppPath.Home} replace />} />
+          <Route path='*' element={<Navigate to={AppPath.Home} replace />} />
         </Routes>
         <ToastContainer
-          position="bottom-center"
+          position='bottom-center'
           autoClose={5000}
           hideProgressBar={false}
           closeOnClick
           pauseOnHover
-          theme="colored"
+          theme='colored'
           transition={Slide}
         />
       </Suspense>

@@ -120,15 +120,15 @@ const SecurityDetails: FunctionComponent = () => {
           render={
             <div className={styles.inputGroup}>
               <InputField
-                variant="settings"
-                type="password"
+                variant='settings'
+                type='password'
                 isPassword
                 name={info.name}
                 disabled={info.isDisabled}
                 label={''}
                 errorMessage={info.errorMessage}
                 hint={info.hint}
-                autoComplete="on"
+                autoComplete='on'
                 value={info.value}
                 onChange={handlePasswordInputChange}
               />
@@ -139,7 +139,7 @@ const SecurityDetails: FunctionComponent = () => {
       <div className={styles.securityActions}>
         {!isFormDisabled && (
           <button
-            type="button"
+            type='button'
             className={`btn btn-light btn-bold`}
             onClick={(e) => {
               e.preventDefault();
@@ -152,19 +152,19 @@ const SecurityDetails: FunctionComponent = () => {
         )}
         {isFormDisabled ? (
           <button
-            type="button"
+            type='button'
             className={`btn btn-primary btn-bold`}
             onClick={(e) => {
               e.preventDefault();
               setIsFormDisabled(false);
             }}
           >
-            <Icon variant="edit" {...defaultIconProps} />
+            <Icon variant='edit' {...defaultIconProps} />
             Update password
           </button>
         ) : (
-          <button className={`btn btn-primary btn-bold`} type="submit" disabled={updatePasswordMutation.isLoading}>
-            <Icon variant="save" {...defaultIconProps} />
+          <button className={`btn btn-primary btn-bold`} type='submit' disabled={updatePasswordMutation.isLoading}>
+            <Icon variant='save' {...defaultIconProps} />
             Save
           </button>
         )}

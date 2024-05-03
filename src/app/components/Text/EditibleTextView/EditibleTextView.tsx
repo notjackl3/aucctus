@@ -140,7 +140,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
                 setIsEditing(false);
               }}
             >
-              <Icon variant="save" height={15} width={15} />
+              <Icon variant='save' height={15} width={15} />
             </button>
           </div>
           <TextArea

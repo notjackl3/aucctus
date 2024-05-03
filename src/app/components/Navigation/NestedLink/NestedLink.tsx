@@ -30,9 +30,9 @@ const NestedLink: FunctionComponent<NestedLinkProps> = ({ to, title, icon, onCli
       className={`${styles.nestedLink} ${isActive ? styles.active : ''} ${locked ? styles.locked : ''}`}
       aria-disabled={locked}
     >
-      {icon ? <Icon variant="chevronright" {...defaultIconProps} /> : null}
+      {icon ? <Icon variant='chevronright' {...defaultIconProps} /> : null}
       <span>{title}</span>
-      {locked ? <Icon variant="lock" {...defaultIconProps} /> : null}
+      {locked ? <Icon variant='lock' {...defaultIconProps} /> : null}
     </Link>
   );
 };

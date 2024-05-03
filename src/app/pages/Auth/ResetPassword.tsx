@@ -58,7 +58,7 @@ const ResetPassword: FunctionComponent = () => {
         <InputField
           name={'password'}
           label={'Password*'}
-          autoComplete="on"
+          autoComplete='on'
           isPassword
           value={password}
           onChange={_handlePasswordChange}
@@ -67,7 +67,7 @@ const ResetPassword: FunctionComponent = () => {
         <InputField
           name={'confirm-password'}
           label={'Confirm Password*'}
-          autoComplete="on"
+          autoComplete='on'
           isPassword
           error={!!confirmPassInputError}
           errorMessage={confirmPassInputError}
@@ -76,8 +76,8 @@ const ResetPassword: FunctionComponent = () => {
         />
 
         <button
-          type="submit"
-          className="btn btn-primary"
+          type='submit'
+          className='btn btn-primary'
           disabled={!password || !confirmPassword || !!confirmPassInputError || !token}
           onClick={(e) => {
             if (token) {
@@ -97,7 +97,7 @@ const ResetPassword: FunctionComponent = () => {
         </button>
         <div className={styles.signUp}>
           <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant="arrowleft" /> Back to log in
+            <Icon variant='arrowleft' /> Back to log in
           </Link>
         </div>
       </form>

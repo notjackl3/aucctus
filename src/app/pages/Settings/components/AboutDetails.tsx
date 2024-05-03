@@ -126,7 +126,7 @@ const AboutDetails: FunctionComponent = () => {
         <div className={styles.headerActions}>
           {!isFormDisabled && (
             <button
-              type="button"
+              type='button'
               className={`btn btn-light btn-bold`}
               onClick={(e) => {
                 e.preventDefault();
@@ -139,19 +139,19 @@ const AboutDetails: FunctionComponent = () => {
           )}
           {isFormDisabled ? (
             <button
-              type="button"
+              type='button'
               className={`btn btn-primary btn-bold`}
               onClick={(e) => {
                 e.preventDefault();
                 setIsFormDisabled(false);
               }}
             >
-              <Icon variant="edit" {...defaultIconProps} />
+              <Icon variant='edit' {...defaultIconProps} />
               Edit
             </button>
           ) : (
-            <button className={`btn btn-primary btn-bold`} type="submit" disabled={isLoading}>
-              <Icon variant="save" {...defaultIconProps} />
+            <button className={`btn btn-primary btn-bold`} type='submit' disabled={isLoading}>
+              <Icon variant='save' {...defaultIconProps} />
               Save
             </button>
           )}
@@ -159,11 +159,11 @@ const AboutDetails: FunctionComponent = () => {
       </div>
       <RowInfo
         label={'Your photo'}
-        tooltipContent="photo"
-        sublabel="This will be displayed on your profile."
+        tooltipContent='photo'
+        sublabel='This will be displayed on your profile.'
         render={
           <div className={styles.inputGroup}>
-            <img className={styles.avatar} alt="avatar" src={defaultAvatar} />
+            <img className={styles.avatar} alt='avatar' src={defaultAvatar} />
           </div>
         }
       />
@@ -174,11 +174,11 @@ const AboutDetails: FunctionComponent = () => {
             {userNames.map((info, i) => (
               <InputField
                 key={`${info.name}-${i}`}
-                variant="settings"
+                variant='settings'
                 name={info.name}
                 disabled={isFormDisabled}
                 label={info.label}
-                autoComplete="on"
+                autoComplete='on'
                 value={info.value}
                 onChange={handleInputChange}
               />
@@ -193,11 +193,11 @@ const AboutDetails: FunctionComponent = () => {
           render={
             <div className={styles.inputGroup}>
               <InputField
-                variant="settings"
+                variant='settings'
                 name={info.name}
                 disabled={info.isDisabled}
                 label={''}
-                autoComplete="on"
+                autoComplete='on'
                 value={info.value}
                 onChange={handleInputChange}
               />

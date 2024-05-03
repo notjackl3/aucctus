@@ -12,9 +12,9 @@ interface IMarketLegendProps {
 const MarketLegend: FunctionComponent<IMarketLegendProps> = ({ tam, sam, som }) => {
   return (
     <div className={styles.container}>
-      <MarketLegendItem title="Total Addressable Market" metricType="TAM" value={formatter.format(tam)} />
-      <MarketLegendItem title="Serviceable Addressable Market" metricType="SAM" value={formatter.format(sam)} />
-      <MarketLegendItem title="Serviceable Obtainable Market" metricType="SOM" value={formatter.format(som)} />
+      <MarketLegendItem title='Total Addressable Market' metricType='TAM' value={formatter.format(tam)} />
+      <MarketLegendItem title='Serviceable Addressable Market' metricType='SAM' value={formatter.format(sam)} />
+      <MarketLegendItem title='Serviceable Obtainable Market' metricType='SOM' value={formatter.format(som)} />
     </div>
   );
 };

@@ -33,7 +33,7 @@ const Dashboard: FunctionComponent = () => {
               navigate(AppPath.IgniteConcept);
             }}
           >
-            <Icon variant="rocket" height={20} width={20} stroke="#fff" />
+            <Icon variant='rocket' height={20} width={20} stroke='#fff' />
             Add Concept
           </button>
         </div>
@@ -46,17 +46,17 @@ const Dashboard: FunctionComponent = () => {
         )}
         <div className={`${styles.cardContainer} ${styles.barChart}`}>
           <ConceptDetailCard
-            title="Active Concepts"
+            title='Active Concepts'
             cardClassName={styles.cardStyle}
             footerAction={
               <button
-                className="btn btn-secondary"
+                className='btn btn-secondary'
                 onClick={() => {
                   navigate(AppPath.ConceptCategory);
                 }}
-                aria-label="View Concept Bank"
+                aria-label='View Concept Bank'
               >
-                <span>Go to Concept Bank {<Icon variant="arrowright" {...defaultIconProps} />}</span>
+                <span>Go to Concept Bank {<Icon variant='arrowright' {...defaultIconProps} />}</span>
               </button>
             }
           >

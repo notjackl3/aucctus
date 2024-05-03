@@ -35,19 +35,19 @@ const DemographicsContainer: FunctionComponent<IDemographicsContainerProps> = ({
         <h2>Demographics</h2>
         <div className={styles.content}>
           <span>
-            <Icon variant="globe" {...iconDefaultProps} />
+            <Icon variant='globe' {...iconDefaultProps} />
             <p>{`Geographic Location: ${profile.geoLocation}`}</p>
           </span>
           <span>
-            <Icon variant="umbrella" {...iconDefaultProps} />
+            <Icon variant='umbrella' {...iconDefaultProps} />
             <p>{`Age Range: ${profile.ageRange}`}</p>
           </span>
           <span>
-            <Icon variant="user-group" {...iconDefaultProps} />
+            <Icon variant='user-group' {...iconDefaultProps} />
             <p>{`Family Size: ${profile.familySize}`}</p>
           </span>
           <span>
-            <Icon variant="piggy-bank" {...iconDefaultProps} />
+            <Icon variant='piggy-bank' {...iconDefaultProps} />
             <p>{`Average Income: ${profile.incomeRange}`}</p>
           </span>
         </div>

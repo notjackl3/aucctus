@@ -34,7 +34,7 @@ const Settings: FunctionComponent = () => {
         <TabView
           tabs={SETTING_TABS}
           className={styles.tabs}
-          variant="default"
+          variant='default'
           onTabSelect={onTabSelect}
           activeTab={activeTab}
         >

@@ -19,7 +19,7 @@ const TableCheckBox: FunctionComponent<TableCheckBoxProps> = ({ indeterminate, c
 
   return (
     <div className={styles.tableCheckBox}>
-      <input type="checkbox" ref={ref} checked={checked} {...rest} />
+      <input type='checkbox' ref={ref} checked={checked} {...rest} />
     </div>
   );
 };

@@ -25,13 +25,13 @@ const NewsArticle: FunctionComponent<NewsArticleProps> = ({
 }) => {
   return (
     <div className={`${styles.newsArticle} ${newsAricleClassName ? newsAricleClassName : ''}`}>
-      <img className={styles.image} alt="news-image" src={images.deliveryNews} />
+      <img className={styles.image} alt='news-image' src={images.deliveryNews} />
       <span className={styles.description}>
         <div className={styles.header}>
           <div className={styles.title}>{newsTitle}</div>
           {!!newsLink && (
-            <a className={styles.link} target="_blank" rel="noopener noreferrer" href={newsLink}>
-              <Icon variant="link-external" {...defaultIconProps} />
+            <a className={styles.link} target='_blank' rel='noopener noreferrer' href={newsLink}>
+              <Icon variant='link-external' {...defaultIconProps} />
             </a>
           )}
         </div>

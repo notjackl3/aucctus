@@ -11,7 +11,7 @@ const Footer: FunctionComponent = () => {
       <div className={styles.text}>© {year} Aucctus Inc. All Rights Reserved.</div>
       {/* TODO: Add Mail Link */}
       <div className={styles.row}>
-        <Icon variant="mail" stroke="#4318FF" width={24} height={24} />
+        <Icon variant='mail' stroke='#4318FF' width={24} height={24} />
         <a href={`mailto:${HELP_EMAIL}`}>{HELP_EMAIL}</a>
       </div>
     </div>

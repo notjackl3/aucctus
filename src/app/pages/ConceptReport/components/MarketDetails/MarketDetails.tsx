@@ -24,19 +24,19 @@ const MarketDetails: FunctionComponent = () => {
           <div className={styles.detailTitle}>
             <h2>Trends and Drivers</h2>
             <button
-              className="btn btn-light"
+              className='btn btn-light'
               onClick={() => {
                 openModal(AddMarketScanElement, { addItem: addTrendAndDriver });
               }}
             >
-              <Icon variant="plus" />
+              <Icon variant='plus' />
             </button>
           </div>
           <EditModeSwitcher
             containerClassName={styles.textBlock}
             value={trendsAndDriversDescription.value}
-            label=""
-            name="trendsAndDriversDescription"
+            label=''
+            name='trendsAndDriversDescription'
             maxLength={trendsAndDriversDescription.validation.maxLength}
             onChange={trendsAndDriversDescription.handleChange}
             handleSave={trendsAndDriversDescription.handleSave}
@@ -45,7 +45,9 @@ const MarketDetails: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.cardContainer}>
-        {marketScan?.trendsAndDrivers.map((trend) => <TrendAndDriverCard trendAndDriver={trend} key={trend.uuid} />)}
+        {marketScan?.trendsAndDrivers.map((trend) => (
+          <TrendAndDriverCard trendAndDriver={trend} key={trend.uuid} />
+        ))}
       </div>
       <div className={styles.summary}>
         <div className={styles.detailBlock}>
@@ -53,8 +55,8 @@ const MarketDetails: FunctionComponent = () => {
           <EditModeSwitcher
             containerClassName={styles.textBlock}
             value={ecosystemDescription.value}
-            label=""
-            name="ecosystemDescription"
+            label=''
+            name='ecosystemDescription'
             maxLength={ecosystemDescription.validation.maxLength}
             onChange={ecosystemDescription.handleChange}
             handleSave={ecosystemDescription.handleSave}
@@ -63,9 +65,9 @@ const MarketDetails: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.cardContainer}>
-        <EcosystemList title="Top Startups" data={marketScan?.startups || []} ecosystemType="startup" />
-        <EcosystemList title="Top Incumbents" data={marketScan?.incumbents || []} ecosystemType="incumbents" />
-        <EcosystemList title="Top Investors" data={marketScan?.investors || []} ecosystemType="investors" />
+        <EcosystemList title='Top Startups' data={marketScan?.startups || []} ecosystemType='startup' />
+        <EcosystemList title='Top Incumbents' data={marketScan?.incumbents || []} ecosystemType='incumbents' />
+        <EcosystemList title='Top Investors' data={marketScan?.investors || []} ecosystemType='investors' />
       </div>
       {/* TODO add back news when ready */}
       {/* <div className={styles.summary}>
@@ -87,7 +89,7 @@ const MarketDetails: FunctionComponent = () => {
       </div> */}
       {/* This external link is required to be added to the page when using Clearbit logos */}
       <div className={styles.externalLogoLink}>
-        <a href="https://clearbit.com" target="_blank" rel="noopener noreferrer">
+        <a href='https://clearbit.com' target='_blank' rel='noopener noreferrer'>
           Logos provided by Clearbit
         </a>
       </div>

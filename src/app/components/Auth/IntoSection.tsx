@@ -13,7 +13,7 @@ const IntoSection: FunctionComponent = () => {
           {
             // Create the Stars icon N times
             [...Array(NUMBER_OF_STARS)].map((e, i) => (
-              <Icon variant="star" key={`star-icon-${i}`} height={20} width={30} stroke="#2B3674" fill="#2B3674" />
+              <Icon variant='star' key={`star-icon-${i}`} height={20} width={30} stroke='#2B3674' fill='#2B3674' />
             ))
           }
         </div>
@@ -30,7 +30,7 @@ const IntoSection: FunctionComponent = () => {
       <div className={styles.screenMockupWrapper}>
         {/* <div className={styles.screenMockup}> */}
 
-        <img className={styles.screenMockup} alt="Aucctus" src={images.screenMockup} />
+        <img className={styles.screenMockup} alt='Aucctus' src={images.screenMockup} />
         {/* </div> */}
       </div>
     </div>

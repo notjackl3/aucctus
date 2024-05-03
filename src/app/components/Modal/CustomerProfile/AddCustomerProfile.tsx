@@ -41,11 +41,11 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
 
   const handleTextFieldChange = useCallback(
     (
-      fieldName: string,
-      setText: React.Dispatch<React.SetStateAction<string>>,
-      setError: React.Dispatch<React.SetStateAction<string | undefined>>,
-      maxLength?: number,
-    ) =>
+        fieldName: string,
+        setText: React.Dispatch<React.SetStateAction<string>>,
+        setError: React.Dispatch<React.SetStateAction<string | undefined>>,
+        maxLength?: number,
+      ) =>
       (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const input = e.target.value;
 
@@ -64,12 +64,12 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
 
   const handleRangeValueChange = useCallback(
     (
-      type: 'lower' | 'upper',
-      setRange: React.Dispatch<React.SetStateAction<number>>,
-      setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-      setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-      inverseValue: number,
-    ) =>
+        type: 'lower' | 'upper',
+        setRange: React.Dispatch<React.SetStateAction<number>>,
+        setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+        setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+        inverseValue: number,
+      ) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
         const num = parseInt(input);
@@ -92,54 +92,54 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
     <div className={styles.container}>
       <div className={styles.header}>
         <div />
-        <button aria-label="Close" className="btn-close" onClick={() => closeModal()} />
+        <button aria-label='Close' className='btn-close' onClick={() => closeModal()} />
       </div>
       <div className={styles.content}>
         <InputField
-          label="Nickname"
-          name="nickname"
+          label='Nickname'
+          name='nickname'
           value={nickname}
           errorMessage={nicknameError}
           onChange={handleTextFieldChange('Nickname', setNickname, setNicknameError, NICKNAME_MAX_LENGTH)}
         />
         <div className={styles.inputRow}>
           <InputField
-            label="First Name"
-            name="firstName"
+            label='First Name'
+            name='firstName'
             value={firstName}
             errorMessage={firstNameError}
             onChange={handleTextFieldChange('First Name', setFirstName, setFirstNameError, NAME_MAX_LENGTH)}
           />
           <InputField
-            label="Last Name"
-            name="lastName"
+            label='Last Name'
+            name='lastName'
             value={lastName}
             errorMessage={lastNameError}
             onChange={handleTextFieldChange('Last Name', setLastName, setLastNameError, NAME_MAX_LENGTH)}
           />
         </div>
         <TextArea
-          label="Overview"
-          name="overview"
+          label='Overview'
+          name='overview'
           value={description}
           errorMessage={descriptionError}
           onChange={handleTextFieldChange('Description', setDescription, setDescriptionError)}
         />
         <h4>Demographics</h4>
         <InputField
-          label="Geo Location"
-          name="geoLocation"
+          label='Geo Location'
+          name='geoLocation'
           value={geoLocation}
           errorMessage={geoLocationError}
           onChange={handleTextFieldChange('Geolocation', setGeoLocation, setGeoLocationError)}
         />
         <div className={styles.inputRow}>
           <InputField
-            label="Lower Age Ranger"
-            name="lowerAgeRange"
+            label='Lower Age Ranger'
+            name='lowerAgeRange'
             value={ageLower}
             errorMessage={ageLowerError}
-            type="number"
+            type='number'
             onChange={handleRangeValueChange(
               'lower',
               setLowerAgeRange,
@@ -149,12 +149,12 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
             )}
           />
           <InputField
-            label="Upper Age Ranger"
-            name="upperAgeRange"
+            label='Upper Age Ranger'
+            name='upperAgeRange'
             value={ageUpper}
             errorMessage={ageUpperError}
             min={ageLower}
-            type="number"
+            type='number'
             onChange={handleRangeValueChange(
               'upper',
               setUpperAgeRange,
@@ -165,10 +165,10 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
           />
         </div>
         <InputField
-          label="Family Size"
-          name="familySize"
+          label='Family Size'
+          name='familySize'
           value={familySize}
-          type="number"
+          type='number'
           errorMessage={familySizeError}
           onChange={(e) => {
             setFamilySize(parseInt(e.target.value));
@@ -176,11 +176,11 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
         />
         <div className={styles.inputRow}>
           <InputField
-            label="Lower Income Ranger"
-            name="lowerIncomeRange"
+            label='Lower Income Ranger'
+            name='lowerIncomeRange'
             value={incomeLower}
             errorMessage={incomeLowerError}
-            type="number"
+            type='number'
             onChange={handleRangeValueChange(
               'lower',
               setLowerIncomeRange,
@@ -190,12 +190,12 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
             )}
           />
           <InputField
-            label="Upper Income Ranger"
-            name="upperIncomeRange"
+            label='Upper Income Ranger'
+            name='upperIncomeRange'
             value={incomeUpper}
             errorMessage={incomeUpperError}
             min={incomeUpper}
-            type="number"
+            type='number'
             onChange={handleRangeValueChange(
               'upper',
               setUpperIncomeRange,
@@ -207,11 +207,11 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
         </div>
       </div>
       <div className={styles.footer}>
-        <button className="btn btn-light" onClick={() => closeModal()}>
+        <button className='btn btn-light' onClick={() => closeModal()}>
           Cancel
         </button>
         <button
-          className="btn btn-primary"
+          className='btn btn-primary'
           disabled={
             !!incomeLowerError ||
             !!incomeUpperError ||

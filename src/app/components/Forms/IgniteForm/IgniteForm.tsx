@@ -14,7 +14,7 @@ const IgniteForm: FunctionComponent<IIgniteForm> = ({ title, subtitle, children,
   return (
     <form className={styles.container} onSubmit={onSubmit}>
       <div className={styles.header}>
-        <FeatureIcon icon="lightbulb" color="purple" />
+        <FeatureIcon icon='lightbulb' color='purple' />
         <div className={styles.supportingText}>
           <h1 className={styles.title}>{title}</h1>
           <span className={styles.subtitle}>{subtitle}</span>

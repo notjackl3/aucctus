@@ -33,9 +33,9 @@ const Login: FunctionComponent = () => {
 
       <form className={styles.basicForm}>
         <InputField
-          label="Email"
-          name="email"
-          autoComplete="on"
+          label='Email'
+          name='email'
+          autoComplete='on'
           errorMessage={emailInputError}
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
@@ -44,9 +44,9 @@ const Login: FunctionComponent = () => {
         />
 
         <InputField
-          label="Password"
-          name="password"
-          autoComplete="on"
+          label='Password'
+          name='password'
+          autoComplete='on'
           isPassword
           value={password}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
@@ -60,14 +60,14 @@ const Login: FunctionComponent = () => {
           /> */}
 
           {/* Takes you to unfinished page */}
-          <Link className={`${styles.link} btn btn-link`} to="/forgot-password">
+          <Link className={`${styles.link} btn btn-link`} to='/forgot-password'>
             Forgot password
           </Link>
         </div>
 
         <button
-          type="button"
-          className="btn btn-primary"
+          type='button'
+          className='btn btn-primary'
           onClick={async (e) => {
             login.mutate({ email, password });
             e.preventDefault();

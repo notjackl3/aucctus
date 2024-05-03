@@ -78,12 +78,12 @@ const HypothesisDetails: FunctionComponent = () => {
           <div className={styles.badge}>{data?.count}</div>
         </div>
         <button
-          className="btn btn-light"
+          className='btn btn-light'
           onClick={() => {
             openModal(AddKeyAssumptionModal, { conceptUuid: conceptId });
           }}
         >
-          <Icon variant="plus" />
+          <Icon variant='plus' />
         </button>
       </div>
       <div className={styles.tableChartContainer}>
@@ -127,7 +127,7 @@ const HypothesisDetails: FunctionComponent = () => {
           </table>
           <div className={styles.footer}>
             <TablePagination
-              variant="client"
+              variant='client'
               totalPages={table.getPageCount()}
               page={table.getState().pagination.pageIndex + 1}
               setPage={table.setPageIndex}
@@ -140,10 +140,10 @@ const HypothesisDetails: FunctionComponent = () => {
         </div>
         <div className={styles.quadrantChartContainer}>
           <QuadrantChart
-            yTopLabel="High Difficulty"
-            yBottomLabel="Low Difficulty"
-            xRightLabel="High Impact"
-            xLeftLabel="Low Impact"
+            yTopLabel='High Difficulty'
+            yBottomLabel='Low Difficulty'
+            xRightLabel='High Impact'
+            xLeftLabel='Low Impact'
             chartCoordinates={chartCoordinates}
             selectedCoordinate={selectedRowId}
           />

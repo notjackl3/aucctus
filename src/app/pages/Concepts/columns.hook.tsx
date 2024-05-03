@@ -144,7 +144,7 @@ export const useConceptTableColumns = (
                   e.stopPropagation();
                 }}
               >
-                <Icon variant="dots-vertical" height={24} width={24} stroke="#B4BDD0" />
+                <Icon variant='dots-vertical' height={24} width={24} stroke='#B4BDD0' />
               </button>
               {uuid === openPopupMenuId ? (
                 <span className={styles.popupMenu} ref={ref}>

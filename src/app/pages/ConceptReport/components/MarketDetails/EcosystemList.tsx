@@ -52,12 +52,12 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
       title={title}
       headerAction={
         <button
-          className="btn btn-light"
+          className='btn btn-light'
           onClick={() => {
             openModal(AddMarketScanElement, { addItem: addEcosystem, ecosystemType });
           }}
         >
-          <Icon variant="plus" />
+          <Icon variant='plus' />
         </button>
       }
       isHideFooter
@@ -67,7 +67,7 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
           <div key={item.uuid} className={`${styles.cardRow} ${styles.editCard}`} onClick={onContainerClick(item)}>
             <img
               className={styles.cardLogo}
-              alt="company-logo"
+              alt='company-logo'
               onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                 e.currentTarget.src = images.companyLogoDefault;
               }}
@@ -77,7 +77,7 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
               <span className={styles.cardDescriptionTitle}>{item.name}</span>
               <p className={styles.cardDescriptionText}>{item.description}</p>
             </div>
-            <button className="btn btn-light" onClick={onClick(item)}>
+            <button className='btn btn-light' onClick={onClick(item)}>
               <Icon variant={'link-external'} {...iconDefaultProps} />
             </button>
           </div>

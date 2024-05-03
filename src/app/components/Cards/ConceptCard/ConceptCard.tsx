@@ -33,9 +33,9 @@ const ConceptCard: FunctionComponent<IConceptCardProps> = ({ concept, selectCard
           onClick={() => {
             selectCard(concept.uuid);
           }}
-          aria-label="Open Concept Details"
+          aria-label='Open Concept Details'
         >
-          <Icon variant="chevronright" {...defaultIconProps} />
+          <Icon variant='chevronright' {...defaultIconProps} />
         </button>
       </div>
     </div>

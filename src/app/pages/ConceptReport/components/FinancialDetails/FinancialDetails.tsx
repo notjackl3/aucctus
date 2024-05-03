@@ -30,7 +30,7 @@ const FinancialDetails: FunctionComponent = () => {
           <EditModeSwitcher
             containerClassName={styles.textBlock}
             value={overview.value}
-            name="overview"
+            name='overview'
             maxLength={overview.validation.maxLength}
             onChange={overview.handleChange}
             handleSave={overview.handleSave}
@@ -41,12 +41,12 @@ const FinancialDetails: FunctionComponent = () => {
       <h2>Potential Market Size</h2>
       <div className={styles.cardContainer}>
         <ConceptDetailCard
-          title="Key Hypothesis"
+          title='Key Hypothesis'
           cardClassName={styles.cardStyle}
           isHideFooter
           headerAction={
-            <button className={styles.cardAction} aria-label="Unlock Edit Hypothesis" disabled>
-              <span>{<Icon variant="lock" {...iconDefaultProps} />}</span>
+            <button className={styles.cardAction} aria-label='Unlock Edit Hypothesis' disabled>
+              <span>{<Icon variant='lock' {...iconDefaultProps} />}</span>
               AI Generated
             </button>
           }
@@ -56,7 +56,7 @@ const FinancialDetails: FunctionComponent = () => {
               <EditModeSwitcher
                 pClassName={styles.rowText}
                 value={tamKeyHypothesis.value}
-                name="keyHypothesis"
+                name='keyHypothesis'
                 maxLength={tamKeyHypothesis.validation.maxLength}
                 onChange={tamKeyHypothesis.handleChange}
                 handleSave={tamKeyHypothesis.handleSave}
@@ -66,14 +66,14 @@ const FinancialDetails: FunctionComponent = () => {
                 showBullet
                 badgeClassName={styles.rowBadge}
                 bulletClassName={styles.bulletLightPurple}
-                badgeText="1"
+                badgeText='1'
               />
             </div>
             <div className={styles.cardRow}>
               <EditModeSwitcher
                 pClassName={styles.rowText}
                 value={samKeyHypothesis.value}
-                name="keyHypothesis"
+                name='keyHypothesis'
                 maxLength={samKeyHypothesis.validation.maxLength}
                 onChange={samKeyHypothesis.handleChange}
                 handleSave={samKeyHypothesis.handleSave}
@@ -83,14 +83,14 @@ const FinancialDetails: FunctionComponent = () => {
                 showBullet
                 badgeClassName={styles.rowBadge}
                 bulletClassName={styles.bulletPurple}
-                badgeText="2"
+                badgeText='2'
               />
             </div>
             <div className={styles.cardRow}>
               <EditModeSwitcher
                 pClassName={styles.rowText}
                 value={somKeyHypothesis.value}
-                name="keyHypothesis"
+                name='keyHypothesis'
                 maxLength={somKeyHypothesis.validation.maxLength}
                 onChange={somKeyHypothesis.handleChange}
                 handleSave={somKeyHypothesis.handleSave}
@@ -100,14 +100,14 @@ const FinancialDetails: FunctionComponent = () => {
                 showBullet
                 badgeClassName={styles.rowBadge}
                 bulletClassName={styles.bulletBlue}
-                badgeText="3"
+                badgeText='3'
               />
             </div>
           </div>
         </ConceptDetailCard>
       </div>
       <div className={styles.cardContainer}>
-        <ConceptDetailCard title="Market Size Projection" cardClassName={styles.paddedCardStyle} isHideFooter>
+        <ConceptDetailCard title='Market Size Projection' cardClassName={styles.paddedCardStyle} isHideFooter>
           <div className={styles.cardMarketContent}>
             <div className={styles.cardLeft}>
               {marketSizeMetric ? (

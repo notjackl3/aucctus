@@ -25,21 +25,21 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAn
 
   return (
     <ConceptDetailCard
-      title=""
+      title=''
       key={trendAndDriver.uuid}
       isHideHeader
       footerAction={
         <button
           className={`${styles.cardAction} btn btn-light`}
-          rel="noopener noreferrer"
-          aria-label="See Source"
+          rel='noopener noreferrer'
+          aria-label='See Source'
           onClick={(e) => {
             e.preventDefault();
             window.open(trendAndDriver.source, '_blank');
           }}
         >
           See Source
-          <Icon variant="link-external" {...iconDefaultProps} />
+          <Icon variant='link-external' {...iconDefaultProps} />
         </button>
       }
     >
@@ -47,7 +47,7 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAn
         className={styles.cardTrendContent}
         onClick={() => openModal(EditMarketScanElement, { item: trendAndDriver, deleteItem, updateItem })}
       >
-        <img alt="delivery-trend" src={images.deliveryTrend} />
+        <img alt='delivery-trend' src={images.deliveryTrend} />
         <span className={styles.cardBoldText}>{trendAndDriver?.name}</span>
         <p className={styles.cardRegularText}>{trendAndDriver?.description}</p>
       </div>

@@ -20,8 +20,8 @@ export interface IConceptReportContext {
 }
 
 const DROPDOWN_OPTIONS = CONCEPT_STATUS_LIST.map((value) => ({
-  label: <ConceptStatusBubble status={value} variant="dropdown" />,
-  displayLabel: <ConceptStatusBubble status={value} variant="dropdown" isActive />,
+  label: <ConceptStatusBubble status={value} variant='dropdown' />,
+  displayLabel: <ConceptStatusBubble status={value} variant='dropdown' isActive />,
   value,
 }));
 
@@ -80,23 +80,23 @@ const ConceptReport: FunctionComponent = () => {
           </div>
         </div>
         <div className={styles.actions}>
-          <Tooltip tip="Coming Soon">
+          <Tooltip tip='Coming Soon'>
             <button
-              aria-label="Download Opportunity Snapshot"
+              aria-label='Download Opportunity Snapshot'
               className={`btn btn-disabled btn-bold`}
               onClick={() => navigate(AppPath.ConceptSnapshot)}
               disabled
             >
-              <Icon variant="download-cloud" {...defaultIconProps} />
+              <Icon variant='download-cloud' {...defaultIconProps} />
               Opportunity Snapshot
             </button>
           </Tooltip>
           <button
-            aria-label="Close Detail Page"
-            className="btn btn-close"
+            aria-label='Close Detail Page'
+            className='btn btn-close'
             onClick={() => navigate(AppPath.ConceptCategory)}
           >
-            <Icon variant="closeX" {...defaultIconProps} />
+            <Icon variant='closeX' {...defaultIconProps} />
           </button>
         </div>
       </div>

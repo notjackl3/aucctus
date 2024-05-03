@@ -136,7 +136,7 @@ const EditMarketSizeMetricModal: React.FC<IMarketSizeMetricEditModalProps> = ({ 
           Cancel
         </button>
         <button
-          aria-label="Save "
+          aria-label='Save '
           className={`btn btn-primary`}
           disabled={!!valueError || !!reasonError || !!dataPointError}
           onClick={(e) => {

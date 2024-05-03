@@ -20,14 +20,14 @@ const defaultLineProps = {
 const ChartBar: FunctionComponent<IChartBarProps> = ({ width, height, chartHeight, x, y, value, label, color }) => {
   return (
     <svg x={x} width={width} height={chartHeight} viewBox={`0 0 ${width} ${chartHeight}`}>
-      <text className={styles.headerText} x={'50%'} y={50} textAnchor="middle">
+      <text className={styles.headerText} x={'50%'} y={50} textAnchor='middle'>
         {value}
       </text>
-      <text className={styles.subLabel} x={'50%'} y={70} textAnchor="middle">
+      <text className={styles.subLabel} x={'50%'} y={70} textAnchor='middle'>
         {label}
       </text>
       <rect y={y} x={0} width={width} height={height} fill={color} />
-      <line x1={width} y1={chartHeight} x2={width} y2="0" {...defaultLineProps} />
+      <line x1={width} y1={chartHeight} x2={width} y2='0' {...defaultLineProps} />
     </svg>
   );
 };

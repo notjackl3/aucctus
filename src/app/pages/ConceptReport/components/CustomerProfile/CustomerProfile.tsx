@@ -66,22 +66,22 @@ const CustomerProfile: FunctionComponent = () => {
         <TabView
           tabs={customerTabs}
           className={styles.tabs}
-          variant="button"
+          variant='button'
           onTabSelect={onTabSelect}
           activeTab={selectedProfileName || ''}
           actionButtons={[
             <button
-              className="btn btn-light"
+              className='btn btn-light'
               disabled={!conceptId || !selectedProfile}
               onClick={() => {
                 openModal(AddCustomerProfile, { conceptUuid: conceptId || '' });
               }}
             >
-              <Icon variant="plus" height={20} width={20} />
+              <Icon variant='plus' height={20} width={20} />
             </button>,
 
             <button
-              className="btn btn-light"
+              className='btn btn-light'
               disabled={!conceptId || !selectedProfile}
               onClick={() => {
                 openModal(ConfirmationModal, {
@@ -109,7 +109,7 @@ const CustomerProfile: FunctionComponent = () => {
                 });
               }}
             >
-              <Icon variant="trash" height={20} width={20} />
+              <Icon variant='trash' height={20} width={20} />
             </button>,
           ]}
         >

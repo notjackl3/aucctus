@@ -60,13 +60,13 @@ export function useAssumptionsColumns() {
         cell: (info) => (
           <span className={styles.buttonContainer}>
             <button
-              className="btn btn-light btn-no-border"
+              className='btn btn-light btn-no-border'
               onClick={(e) => {
                 openModal(EditKeyAssumptionModal, { assumption: info.row.original });
                 e.preventDefault();
               }}
             >
-              <Icon variant="edit" />
+              <Icon variant='edit' />
             </button>
           </span>
         ),

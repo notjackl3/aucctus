@@ -108,12 +108,12 @@ const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ add
     <div className={styles.container}>
       <div className={styles.header}>
         <div />
-        <button aria-label="Close" className={'btn-close'} onClick={() => closeModal()} />
+        <button aria-label='Close' className={'btn-close'} onClick={() => closeModal()} />
       </div>
       <div className={styles.content}>
         <InputField
           label={'Title'}
-          name="title"
+          name='title'
           value={name}
           error={!!nameError}
           errorMessage={nameError}
@@ -122,7 +122,7 @@ const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ add
         />
         <TextArea
           label={'Description'}
-          name="description"
+          name='description'
           value={description}
           error={!!descriptionError}
           errorMessage={descriptionError}
@@ -131,7 +131,7 @@ const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ add
         />
         <InputField
           label={'Source'}
-          name="source"
+          name='source'
           value={source}
           error={!!sourceError}
           errorMessage={sourceError}
@@ -139,11 +139,11 @@ const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ add
         />
       </div>
       <div className={styles.footer}>
-        <button className="btn btn-light" onClick={() => closeModal()}>
+        <button className='btn btn-light' onClick={() => closeModal()}>
           Cancel
         </button>
         <button
-          className="btn btn-primary"
+          className='btn btn-primary'
           disabled={!name || !description || !source || !!nameError || !!descriptionError || !!sourceError}
           onClick={handleSave}
         >

@@ -31,7 +31,7 @@ const ConceptCard: FunctionComponent<ConceptCardProps> = ({
       </div>
       <div className={styles.content}>{children}</div>
       <div className={styles.footer}>
-        <button className="btn btn-light" {...actionButtonProps}>
+        <button className='btn btn-light' {...actionButtonProps}>
           {icon ? <Icon variant={icon} /> : null}
           {buttonTitle}
         </button>

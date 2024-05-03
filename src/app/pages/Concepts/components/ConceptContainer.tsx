@@ -59,7 +59,7 @@ const ConceptContainer: FunctionComponent<IConceptContainerProps> = ({
       {children}
       <div className={styles.footer}>
         <TablePagination
-          variant="server"
+          variant='server'
           totalPages={numberOfPages || 1}
           page={typeof page === 'string' ? parseInt(page) : page}
           setPage={setPage}

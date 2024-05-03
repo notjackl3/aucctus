@@ -62,14 +62,14 @@ const SignUp: FunctionComponent = () => {
           <InputField
             name={'first name'}
             label={'First Name*'}
-            autoComplete="on"
+            autoComplete='on'
             value={firstName}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
           />
           <InputField
             name={'last name'}
             label={'Last Name*'}
-            autoComplete="on"
+            autoComplete='on'
             value={lastName}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
           />
@@ -77,7 +77,7 @@ const SignUp: FunctionComponent = () => {
         <InputField
           name={'email'}
           label={'Email*'}
-          autoComplete="on"
+          autoComplete='on'
           errorMessage={emailInputError}
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
@@ -87,7 +87,7 @@ const SignUp: FunctionComponent = () => {
         <InputField
           name={'password'}
           label={'Password*'}
-          autoComplete="on"
+          autoComplete='on'
           isPassword
           value={password}
           onChange={_handlePasswordChange}
@@ -96,7 +96,7 @@ const SignUp: FunctionComponent = () => {
         <InputField
           name={'confirm-password'}
           label={'Confirm Password*'}
-          autoComplete="on"
+          autoComplete='on'
           isPassword
           errorMessage={confirmPassInputError}
           value={confirmPassword}
@@ -104,8 +104,8 @@ const SignUp: FunctionComponent = () => {
         />
 
         <button
-          type="button"
-          className="btn btn-primary"
+          type='button'
+          className='btn btn-primary'
           onClick={(e) => {
             e.preventDefault();
             signUp({ firstName, lastName, email, password, confirmPassword });

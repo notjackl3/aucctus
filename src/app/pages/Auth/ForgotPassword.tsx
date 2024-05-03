@@ -37,20 +37,20 @@ const ForgotPassword: FunctionComponent = () => {
       </div>
       <form className={styles.basicForm}>
         <InputField
-          name="email"
+          name='email'
           label={'Email'}
-          type="email"
-          placeholder="Enter your email"
+          type='email'
+          placeholder='Enter your email'
           value={email}
-          autoComplete="on"
+          autoComplete='on'
           errorMessage={emailInputError}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
           onFocus={() => setEmailInputError(undefined)}
           onBlur={_handleEmailValidation}
         />
         <button
-          type="submit"
-          className="btn btn-primary"
+          type='submit'
+          className='btn btn-primary'
           disabled={!email || !!emailInputError}
           onClick={(e) => {
             requestPasswordReset(email);
@@ -61,7 +61,7 @@ const ForgotPassword: FunctionComponent = () => {
         </button>
         <div className={styles.signUp}>
           <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant="arrowleft" width={20} height={20} /> Back to login
+            <Icon variant='arrowleft' width={20} height={20} /> Back to login
           </Link>
         </div>
       </form>

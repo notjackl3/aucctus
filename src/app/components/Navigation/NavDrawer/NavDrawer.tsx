@@ -31,10 +31,10 @@ const NavDrawer = () => {
               navigate(AppPath.Home);
             }}
           >
-            <img alt="Logo" style={{ height: 30, width: 146 }} src={Logo} />
+            <img alt='Logo' style={{ height: 30, width: 146 }} src={Logo} />
           </div>
           <div className={styles.content}>
-            <NavLink to={AppPath.Home} title="Dashboard" icon="home" />
+            <NavLink to={AppPath.Home} title='Dashboard' icon='home' />
 
             <NavLink
               to={
@@ -45,8 +45,8 @@ const NavDrawer = () => {
                     }
                   : AppPath.IgniteConcept
               }
-              title="Concepts"
-              icon="lightbulb"
+              title='Concepts'
+              icon='lightbulb'
               openBasePath={AppPath.Concept}
               nestedRoutes={[
                 {
@@ -73,13 +73,13 @@ const NavDrawer = () => {
                 },
               ]}
             />
-            <NavLink to={AppPath.ChallengeCenter} title="Challenges" icon="rocket" locked />
+            <NavLink to={AppPath.ChallengeCenter} title='Challenges' icon='rocket' locked />
           </div>
           <div className={styles.extras}>
-            <NavLink to={AppPath.SettingsAbout} title="Settings" icon="file" />
+            <NavLink to={AppPath.SettingsAbout} title='Settings' icon='file' />
             <NavButton
-              title="Logout"
-              icon="logout"
+              title='Logout'
+              icon='logout'
               onClick={(e) => {
                 e.preventDefault();
                 logout.mutate();
@@ -87,7 +87,7 @@ const NavDrawer = () => {
             />
           </div>
           <div className={styles.account}>
-            <img className={styles.avatar} alt="avatar" src={avatar} />
+            <img className={styles.avatar} alt='avatar' src={avatar} />
             <div className={styles.userDetails}>
               <span>{user?.firstName || ''}</span>
               <span>{user?.email || ''}</span>

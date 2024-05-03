@@ -48,7 +48,7 @@ const DashboardInnovationCard: FunctionComponent<DashboardInnovationCardProps> =
   ));
 
   return (
-    <ConceptDetailCard title="Innovation Scorecard" cardClassName={styles.cardStyle} isHideFooter>
+    <ConceptDetailCard title='Innovation Scorecard' cardClassName={styles.cardStyle} isHideFooter>
       <div className={styles.cardContent}>{renderInnovationRows}</div>
     </ConceptDetailCard>
   );

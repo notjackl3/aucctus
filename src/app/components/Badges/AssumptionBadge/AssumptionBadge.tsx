@@ -21,10 +21,10 @@ const assumptionColorObj = {
 };
 
 const assumptionIconObj = {
-  desirability: <Icon variant="thermometer" {...defaultIconProps} />,
-  viability: <Icon variant="building" {...defaultIconProps} />,
-  feasibility: <Icon variant="filecode" {...defaultIconProps} />,
-  adaptability: <Icon variant="line-chart-up" {...defaultIconProps} />,
+  desirability: <Icon variant='thermometer' {...defaultIconProps} />,
+  viability: <Icon variant='building' {...defaultIconProps} />,
+  feasibility: <Icon variant='filecode' {...defaultIconProps} />,
+  adaptability: <Icon variant='line-chart-up' {...defaultIconProps} />,
 };
 const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({ assumptionType }) => {
   const color = assumptionColorObj[assumptionType];

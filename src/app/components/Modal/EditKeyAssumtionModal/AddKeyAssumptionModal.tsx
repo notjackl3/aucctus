@@ -104,14 +104,14 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
     <div className={styles.container}>
       <div className={styles.header}>
         <button
-          aria-label="Delete"
-          className="btn btn-light btn-no-border"
+          aria-label='Delete'
+          className='btn btn-light btn-no-border'
           disabled={showConfirmation}
           onClick={() => setShowConfirmation(true)}
         >
-          <Icon variant="trash" />
+          <Icon variant='trash' />
         </button>
-        <button aria-label="Close" className={'btn-close'} disabled={showConfirmation} onClick={() => closeModal()} />
+        <button aria-label='Close' className={'btn-close'} disabled={showConfirmation} onClick={() => closeModal()} />
       </div>
       <div className={styles.content}>
         <Dropdown
@@ -126,7 +126,7 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
             label={'Risk Level'}
             name={'risk-level'}
             value={riskLevel}
-            type="number"
+            type='number'
             min={-10}
             max={10}
             onChange={(e) => setRiskLevel(parseInt(e.target.value))}
@@ -135,7 +135,7 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
             label={'Difficulty Level'}
             name={'difficulty-level'}
             value={difficultyLevel}
-            type="number"
+            type='number'
             min={-10}
             max={10}
             onChange={(e) => setDifficultyLevel(parseInt(e.target.value))}
@@ -144,16 +144,16 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
             label={'Impact Level'}
             name={'impact-level'}
             value={impactLevel}
-            type="number"
+            type='number'
             min={-10}
             max={10}
             onChange={(e) => setImpactLevel(parseInt(e.target.value))}
           />
         </div>
-        <InputField name="title" label="Title" value={title} errorMessage={titleError} onChange={handleTitleChange} />
+        <InputField name='title' label='Title' value={title} errorMessage={titleError} onChange={handleTitleChange} />
         <TextArea
-          name="hypothesis"
-          label="Hypothesis"
+          name='hypothesis'
+          label='Hypothesis'
           value={hypothesis}
           error={!!hypothesisError}
           errorMessage={hypothesisError}
@@ -161,11 +161,11 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
         />
       </div>
       <div className={styles.footer}>
-        <button className="btn btn-light" disabled={showConfirmation} onClick={() => closeModal()}>
+        <button className='btn btn-light' disabled={showConfirmation} onClick={() => closeModal()}>
           Cancel
         </button>
         <button
-          className="btn btn-primary"
+          className='btn btn-primary'
           disabled={!title || !hypothesis || !!titleError || !!hypothesisError || showConfirmation}
           onClick={handleSave}
         >

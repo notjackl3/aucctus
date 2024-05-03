@@ -64,10 +64,10 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
       <input {...props} type={getInputType()} ref={ref} name={name} />
       {showVisibilityIcon && (
         <button
-          type="button"
+          type='button'
           className={`${styles.icon}`}
           onClick={togglePasswordVisibility}
-          aria-label="Toggle password visibility"
+          aria-label='Toggle password visibility'
         >
           <Icon variant={isPasswordVisible ? 'eye-off' : 'eye'} {...defaultIconProps} />
         </button>

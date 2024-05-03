@@ -101,7 +101,7 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
         variant={opportunity.variant}
       />
       <input
-        type="checkbox"
+        type='checkbox'
         checked={selectedOpportunities.includes(opportunity.status)}
         onChange={() => toggleSelectedStatus(opportunity.status)}
       />
@@ -110,16 +110,16 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
 
   return (
     <ConceptDetailCard
-      title="Potential Opportunity Size"
+      title='Potential Opportunity Size'
       cardClassName={styles.cardStyle}
       footerAction={
         <div className={styles.opportunityFooter}>
           <ConceptStatistic
-            infoTitle="Total Potential Opportunity"
+            infoTitle='Total Potential Opportunity'
             infoValue={formatter.format(summationObj.totalSomValue)}
             infoSubValue={`${summationObj.totalConceptCount} concepts`}
-            icon="shield-dollar"
-            iconColor="purple"
+            icon='shield-dollar'
+            iconColor='purple'
           />
         </div>
       }

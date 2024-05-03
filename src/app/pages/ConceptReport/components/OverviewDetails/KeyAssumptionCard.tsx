@@ -23,8 +23,8 @@ const KeyAssumptionCard: FunctionComponent<KeyAssumptionCardProps> = ({ keyAssum
 
   return (
     <ConceptDetailCard
-      title="Key Assumptions"
-      subtitle="List of assumptions that require validation"
+      title='Key Assumptions'
+      subtitle='List of assumptions that require validation'
       cardClassName={styles.cardStyle}
       footerAction={
         <button
@@ -32,9 +32,9 @@ const KeyAssumptionCard: FunctionComponent<KeyAssumptionCardProps> = ({ keyAssum
           onClick={() => {
             context.navigateToTab(AppPath.ConceptKeyAssumptions);
           }}
-          aria-label="View Assumptions"
+          aria-label='View Assumptions'
         >
-          <span>{<Icon variant="warning" {...iconDefaultProps} />}</span>
+          <span>{<Icon variant='warning' {...iconDefaultProps} />}</span>
           View Key Assumptions
         </button>
       }

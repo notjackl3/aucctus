@@ -74,36 +74,36 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
 
   return (
     <div className={styles.quadrantChart}>
-      <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_WIDTH}`} xmlns="http://www.w3.org/2000/svg">
+      <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_WIDTH}`} xmlns='http://www.w3.org/2000/svg'>
         <QuadrantChartGrid numberGridLines={10} spacing={200} />
         <line
           x1={CHART_CENTER_WIDTH}
-          y1="0"
+          y1='0'
           x2={CHART_CENTER_WIDTH}
           y2={CHART_WIDTH}
-          stroke="#E0E5F2"
-          strokeWidth="10"
+          stroke='#E0E5F2'
+          strokeWidth='10'
         />
         <line
-          x1="0"
+          x1='0'
           y1={CHART_CENTER_WIDTH}
           x2={CHART_WIDTH}
           y2={CHART_CENTER_WIDTH}
-          stroke="#E0E5F2"
-          strokeWidth="10"
+          stroke='#E0E5F2'
+          strokeWidth='10'
         />
         {chartPoints}
         <QuadrantChartActiveLines activeChartPoint={activeCoordinate} />
-        <text x="1680" y="1120" {...defaultTextProps}>
+        <text x='1680' y='1120' {...defaultTextProps}>
           {xRightLabel}
         </text>
-        <text x="80" y="1120" {...defaultTextProps}>
+        <text x='80' y='1120' {...defaultTextProps}>
           {xLeftLabel}
         </text>
-        <text x="1020" y="120" {...defaultTextProps}>
+        <text x='1020' y='120' {...defaultTextProps}>
           {yTopLabel}
         </text>
-        <text x="1020" y="1920" {...defaultTextProps}>
+        <text x='1020' y='1920' {...defaultTextProps}>
           {yBottomLabel}
         </text>
       </svg>

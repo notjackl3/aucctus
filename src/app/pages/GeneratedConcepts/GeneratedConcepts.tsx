@@ -111,8 +111,8 @@ const GeneratedConcepts: FunctionComponent = () => {
       {isIgniteLoading ? (
         <div className={igniteStyles.ignite}>
           <IgniteLoading
-            title="Generating A New Concept"
-            subtitle="This process takes about 10 seconds, please wait."
+            title='Generating A New Concept'
+            subtitle='This process takes about 10 seconds, please wait.'
           />
         </div>
       ) : (
@@ -125,8 +125,8 @@ const GeneratedConcepts: FunctionComponent = () => {
               </span>
             </div>
             <div className={styles.actions}>
-              <button className="btn btn-light" onClick={() => generateConcepts(goalString)}>
-                <Icon variant="refresh" {...defaultIconProps} /> Generate more
+              <button className='btn btn-light' onClick={() => generateConcepts(goalString)}>
+                <Icon variant='refresh' {...defaultIconProps} /> Generate more
               </button>
             </div>
           </div>
@@ -163,7 +163,7 @@ const GeneratedConcepts: FunctionComponent = () => {
             </table>
             <div className={styles.footer}>
               <button
-                className="btn btn-primary"
+                className='btn btn-primary'
                 disabled={!numberSelectedConcepts || isSaveConceptLoading}
                 onClick={saveNewConcepts}
               >
