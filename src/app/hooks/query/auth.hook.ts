@@ -3,18 +3,13 @@ import api from '../../../libs/api';
 import { AucctusQueryKeys } from './query-keys';
 import { AxiosError } from 'axios';
 import {
-  IAuthSuccessResponse,
   IMessageResponse,
   IUpdateForgottenPasswordRequest,
   IServerErrorMessage,
   IRegisterUser,
-  ITokenResponse,
 } from '../../../libs/api/types';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AucctusLocalStorage } from '../../../libs/localStorage';
-import analytics from '../../../libs/analytics';
 
 export const useSignUp = () => {
   const navigate = useNavigate();
