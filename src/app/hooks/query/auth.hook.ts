@@ -129,6 +129,12 @@ export const useAuth = () => {
     api.setLogoutAction(() => logout.mutate(undefined));
   }, [logout, refreshToken, tokens.refresh]);
 
+  useEffect(() => {
+    if (!tokens.refresh) {
+      setTokens((prev) => ({ ...prev, refresh: AucctusLocalStorage.get('refreshToken') }));
+    }
+  }, [tokens]);
+
   return {
     isAuthenticated,
     refreshToken,
