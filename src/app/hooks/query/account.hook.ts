@@ -43,6 +43,5 @@ export const useDashboard = () => {
     queryFn: async () => await api.account.getDashboard(),
     cacheTime: 1000 * 60 * 60,
     staleTime: 1000 * 60 * 15,
-    retry: 0,
   });
 };
