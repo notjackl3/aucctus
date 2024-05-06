@@ -92,37 +92,39 @@ export abstract class ApiService {
       if (axios.isCancel(error)) {
         analytics.debug('Request Aborted: ', error);
       }
-      const status = (error.response && error.response.status) || 0;
-      if (LOGOUT_STATUSES.includes(status) && !this._shouldSkipRefresh(error?.config?.url || '')) {
-        try {
-          if (error.config) {
-            // Adds some delay to prevent multiple requests from trying to refresh the token at the same time
-            await sleep(1000 * Math.random());
-            // Attempt to refresh the token
-            if (this.apiInstance.pendingRefresh) {
-              await this.apiInstance.pendingRefresh;
-            } else {
-              await this.apiInstance.refreshToken();
-            }
+    }
 
-            analytics.debug('Retrying request after token refresh', error.config.url);
-            // Retry the original request
-            return this.api.request({
-              ...error.config,
-              ...this._handleAccessToken(),
-              withCredentials: true,
-            } as AxiosRequestConfig);
+    const status = (error.response && error.response.status) || 0;
+    if (LOGOUT_STATUSES.includes(status) && !this._shouldSkipRefresh(error?.config?.url || '')) {
+      try {
+        if (error.config) {
+          // Adds some delay to prevent multiple requests from trying to refresh the token at the same time
+          await sleep(1000 * Math.random());
+          // Attempt to refresh the token
+          if (this.apiInstance.pendingRefresh) {
+            await this.apiInstance.pendingRefresh;
+          } else {
+            await this.apiInstance.refreshToken();
           }
-        } catch (err) {}
-        // If the error is due to being unauthenticated then logout
-        analytics.debug('Logging out due to unauthenticated status');
-        this.apiInstance.logout();
-      }
 
-      if (axios.isAxiosError(error)) {
-        const method = error.config && error.config.method ? `[${error.config.method.toUpperCase()}]` : '';
-        analytics.error(`Api Error: ${method} ${error.name}`, error);
-      }
+          analytics.debug('Retrying request after token refresh', error.config.url);
+          // Retry the original request
+          return this.api.request({
+            ...error.config,
+            ...this._handleAccessToken(),
+            withCredentials: true,
+          } as AxiosRequestConfig);
+        }
+      } catch (err) {}
+
+      // If the error is due to being unauthenticated then logout
+      analytics.debug('Logging out due to unauthenticated status');
+      this.apiInstance.logout();
+    }
+
+    if (axios.isAxiosError(error)) {
+      const method = error.config && error.config.method ? `[${error.config.method.toUpperCase()}]` : '';
+      analytics.error(`Api Error: ${method} ${error.name}`, error);
     }
 
     return Promise.reject(error);

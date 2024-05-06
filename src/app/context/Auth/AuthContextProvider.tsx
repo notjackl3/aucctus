@@ -1,8 +1,10 @@
 import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect, useCallback } from 'react';
 import { UseMutationResult, useMutation, useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import { IAuthSuccessResponse, IMessageResponse, IServerErrorMessage, ITokenResponse } from '../../../libs/api/types';
 import { AucctusLocalStorage } from '../../../libs/localStorage';
 import { AxiosError } from 'axios';
+import { AppPath } from '../../../routes/routes';
 import { AucctusQueryKeys } from '../../hooks/query/query-keys';
 import api from '../../../libs/api';
 import analytics from '../../../libs/analytics';
@@ -40,6 +42,7 @@ interface IAuthProviderProps {
 
 export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [tokens, setTokens] = useState<Partial<ITokenResponse>>({
     refresh: AucctusLocalStorage.get('refreshToken'),
     access: undefined,
@@ -57,6 +60,12 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     }
   }, []);
 
+  const clearTokens = useCallback(() => {
+    queryClient.clear();
+    updateTokens({ refresh: undefined, access: undefined });
+    navigate(AppPath.Login, { replace: true });
+  }, [navigate, queryClient, updateTokens]);
+
   const { mutateAsync: refreshAsync, isLoading: isRefreshLoading } = useMutation<
     ITokenResponse,
     AxiosError<IServerErrorMessage>,
@@ -68,13 +77,16 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
       analytics.debug('Refreshed Token Updating Access Token');
       updateTokens(response);
     },
+    onError: (error) => {
+      analytics.error('Error refreshing token', error);
+      clearTokens();
+    },
   });
 
   const logout = useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, void, unknown>({
     mutationFn: async () => await api.auth.logout(tokens.refresh),
     onSettled: () => {
-      updateTokens({ refresh: undefined, access: undefined });
-      queryClient.clear();
+      clearTokens();
     },
   });
 
@@ -88,17 +100,18 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     onSuccess: (response) => {
       updateTokens(response);
       queryClient.invalidateQueries({ queryKey: AucctusQueryKeys.userDetails });
+      navigate(AppPath.Home, { replace: true });
     },
   });
 
   useEffect(() => {
     // Set refresh token and logout actions
-    if ((api.hasSetRefreshTokenAction && api.hasSetLogoutAction) || !logout || !tokens.refresh) {
+    if ((api.hasSetRefreshTokenAction && api.hasSetLogoutAction) || !tokens.refresh) {
       return;
     }
     api.setRefreshTokenAction(refreshAsync);
-    api.setLogoutAction(logout.mutateAsync);
-  }, [logout, refreshAsync, tokens.refresh]);
+    api.setLogoutAction(clearTokens);
+  }, [clearTokens, refreshAsync, tokens.refresh]);
 
   useEffect(() => {
     const refreshToken = AucctusLocalStorage.get('refreshToken');
