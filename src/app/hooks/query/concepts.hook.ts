@@ -169,6 +169,7 @@ const createConceptMutation = () => {
       mutationFn,
       onSuccess: (data) => {
         Promise.all([
+          queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.userDetails] }),
           queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] }),
           queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.dashboard] }),
           queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concept, data.uuid] }),
