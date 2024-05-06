@@ -1,19 +1,18 @@
 import { FunctionComponent, useEffect } from 'react';
 
-import { Outlet } from 'react-router-dom';
-
-import analytics from '../../libs/analytics';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../app/context/Auth/AuthContextProvider';
+import { AppPath } from '../routes';
 
 const AuthGuard: FunctionComponent = () => {
-  // This is a guard that will be used to protect routes that require authentication.
-  // This is required here to ensure the user is authenticated before
-  // they can access the protected routes.
+  const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
   useEffect(() => {
-    analytics.debug('Authenticated: ', isAuthenticated);
-  }, [isAuthenticated]);
+    if (!isAuthenticated) {
+      navigate(AppPath.Login, { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   return <Outlet />;
 };

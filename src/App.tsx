@@ -15,9 +15,9 @@ function App() {
       {/* TODO: Create Loading Screen */}
       <Suspense fallback={<Loading />}>
         <Routes>
-          <Route element={<AuthGuard />}>
+          <Route>
             {/* Protected Routes */}
-            <Route>
+            <Route element={<AuthGuard />}>
               <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
               <Route element={<Layout />}>
                 <Route index path={AppPath.Home} element={<Page.Dashboard />} />

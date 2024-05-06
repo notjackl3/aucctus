@@ -1,10 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect, useCallback } from 'react';
 import { UseMutationResult, useMutation, useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import { IAuthSuccessResponse, IMessageResponse, IServerErrorMessage, ITokenResponse } from '../../../libs/api/types';
 import { AucctusLocalStorage } from '../../../libs/localStorage';
 import { AxiosError } from 'axios';
-import { AppPath } from '../../../routes/routes';
 import { AucctusQueryKeys } from '../../hooks/query/query-keys';
 import api from '../../../libs/api';
 import analytics from '../../../libs/analytics';
@@ -42,7 +40,6 @@ interface IAuthProviderProps {
 
 export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [tokens, setTokens] = useState<Partial<ITokenResponse>>({
     refresh: AucctusLocalStorage.get('refreshToken'),
     access: undefined,
@@ -78,7 +75,6 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     onSettled: () => {
       updateTokens({ refresh: undefined, access: undefined });
       queryClient.clear();
-      navigate(AppPath.Login);
     },
   });
 
@@ -92,7 +88,6 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     onSuccess: (response) => {
       updateTokens(response);
       queryClient.invalidateQueries({ queryKey: AucctusQueryKeys.userDetails });
-      navigate(AppPath.Home);
     },
   });
 
