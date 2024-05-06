@@ -1,5 +1,6 @@
 import { AtLeast } from '../utils';
-import { ApiService } from './apiService';
+import Api from './api';
+import { ApiService, IApiServiceConfig } from './apiService';
 import { IConceptQueryOptions, endpoints } from './endpoints';
 import {
   ConceptStatus,
@@ -27,6 +28,15 @@ import { IPageResponse } from './types';
  * Handles all the requests for the Concept.
  */
 export class ConceptApi extends ApiService {
+  protected _excludeAllFromRefresh: boolean = false;
+  protected _excludePathFromRefresh: string[] = [];
+
+  constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
+    super(apiInstance, apiConfig);
+    this._setupMiddleware(); // Rebind interceptor functions
+    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
+  }
+
   getConcept(uuid: string) {
     return this.get<IConcept>(endpoints.conceptUuid(uuid));
   }

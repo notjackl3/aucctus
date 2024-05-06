@@ -1,4 +1,5 @@
-import { ApiService } from './apiService';
+import Api from './api';
+import { ApiService, IApiServiceConfig } from './apiService';
 import { endpoints } from './endpoints';
 import {
   IAccount,
@@ -16,6 +17,16 @@ import {
  * Handles all the requests for the accounts and users that require authentication.
  */
 export class AccountApi extends ApiService {
+  protected _excludeAllFromRefresh: boolean = false;
+  protected _excludePathFromRefresh: string[] = [];
+
+  constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
+    super(apiInstance, apiConfig);
+    this._setupMiddleware(); // Rebind interceptor functions
+
+    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
+  }
+
   getAccount() {
     return this.get<IAccount>(endpoints.account);
   }

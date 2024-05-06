@@ -6,12 +6,29 @@ import {
   IToken,
   IUpdateForgottenPasswordRequest,
 } from './types';
-import { ApiService } from './apiService';
+import { ApiService, IApiServiceConfig } from './apiService';
 import { endpoints } from './endpoints';
 import { IMessageResponse } from './types';
+import Api from './api';
 
 export class AuthApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = true;
+  protected _excludePathFromRefresh: string[] = [
+    endpoints.refresh,
+    endpoints.logout,
+    endpoints.signup,
+    endpoints.login,
+    endpoints.confirmEmail,
+    endpoints.requestPasswordReset,
+    endpoints.forgotPassword,
+    endpoints.logout,
+  ];
+
+  constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
+    super(apiInstance, apiConfig);
+    this._setupMiddleware(); // Rebind interceptor functions
+    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
+  }
 
   /** Sign Up
    *

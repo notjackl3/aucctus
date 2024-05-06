@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import Logo from '../../../assets/Logo.png';
 import styles from './drawer.module.scss';
 import NavLink from './NavLink';
@@ -6,20 +6,14 @@ import avatar from '../../../assets/avatar.svg';
 import { AppPath } from '../../../../routes/routes';
 import { useNavigate } from 'react-router-dom';
 import { useUserDetails } from '../../../hooks/query/account.hook';
-import { useConcepts } from '../../../hooks/query/concepts.hook';
 import NavButton from './NavButton';
 import { useAuth } from '../../../context/Auth/AuthContextProvider';
 
 const NavDrawer = () => {
-  const { data: { user } = { user: undefined } } = useUserDetails();
-  const { data } = useConcepts();
+  const { user, account } = useUserDetails();
   const { logout } = useAuth();
 
   const navigate = useNavigate();
-
-  const isExistingConcepts = useMemo(() => {
-    return !!data && data?.count > 0;
-  }, [data]);
 
   return (
     <div className={styles.container}>
@@ -38,7 +32,7 @@ const NavDrawer = () => {
 
             <NavLink
               to={
-                isExistingConcepts
+                account?.hasConcepts
                   ? {
                       pathname: AppPath.ConceptCategory,
                       search: '?category=active',

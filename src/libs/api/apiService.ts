@@ -34,8 +34,8 @@ export abstract class ApiService {
   api: AxiosInstance;
   config: IApiServiceConfig;
 
-  protected _excludeAllFromRefresh: boolean = false;
-  protected _excludePathFromRefresh: string[] = [];
+  protected abstract _excludeAllFromRefresh: boolean;
+  protected abstract _excludePathFromRefresh: string[];
 
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     this.apiInstance = apiInstance;
@@ -50,29 +50,28 @@ export abstract class ApiService {
     this._setupMiddleware();
   }
 
-  private _setupMiddleware() {
+  protected _setupMiddleware(this: ApiService) {
     this.api.interceptors.request.use(this._requestMiddleware.bind(this));
     this.api.interceptors.response.use(this._responseMiddleware.bind(this), this._responseErrorMiddleware.bind(this));
   }
 
   private async _requestMiddleware(config: InternalAxiosRequestConfig) {
-    // TEMPORARILY REMOVED
-    // const accessToken = this.apiInstance.accessToken;
+    const accessToken = this.apiInstance.accessToken;
 
-    // if (!this._shouldSkipRefresh(config.url || '')) {
-    //   if (this.apiInstance.pendingRefresh) {
-    //     await this.apiInstance.pendingRefresh;
-    //   }
-    //   try {
-    //     if (accessToken && this.hasTokenExpired(accessToken)) {
-    //       await sleep(1000 * Math.random());
-    //       await this.apiInstance.refreshToken();
-    //       Object.assign(config || {}, this._handleAccessToken());
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
+    if (!this._shouldSkipRefresh(config.url || '')) {
+      if (this.apiInstance.pendingRefresh) {
+        await this.apiInstance.pendingRefresh;
+      }
+      try {
+        if (accessToken && this.hasTokenExpired(accessToken)) {
+          await sleep(1000 * Math.random());
+          await this.apiInstance.refreshToken();
+          Object.assign(config || {}, this._handleAccessToken());
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
     Object.assign(config.headers || {}, this.config.headers);
 
@@ -95,7 +94,8 @@ export abstract class ApiService {
     }
 
     const status = (error.response && error.response.status) || 0;
-    if (LOGOUT_STATUSES.includes(status) && !this._shouldSkipRefresh(error?.config?.url || '')) {
+    const url = error && error.config && error.config.url;
+    if (url && LOGOUT_STATUSES.includes(status) && !this._shouldSkipRefresh(url)) {
       try {
         if (error.config) {
           // Adds some delay to prevent multiple requests from trying to refresh the token at the same time
@@ -115,11 +115,11 @@ export abstract class ApiService {
             withCredentials: true,
           } as AxiosRequestConfig);
         }
-      } catch (err) {}
-
-      // If the error is due to being unauthenticated then logout
-      analytics.debug('Logging out due to unauthenticated status');
-      this.apiInstance.logout();
+      } catch (err) {
+        analytics.debug('Logging out due to unauthenticated status');
+        this.apiInstance.logout();
+        return Promise.reject(err);
+      }
     }
 
     if (axios.isAxiosError(error)) {
@@ -162,12 +162,13 @@ export abstract class ApiService {
     return config;
   }
 
-  private _shouldSkipRefresh(url: string): boolean {
+  protected _shouldSkipRefresh(url: string): boolean {
     if (this._excludeAllFromRefresh) {
       return true;
     }
 
     const path = url.split('?')[0];
+    analytics.debug('Checking if path should be excluded from refresh:', path, url);
     return this._excludePathFromRefresh.includes(path);
   }
 

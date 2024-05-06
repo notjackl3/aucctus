@@ -15,6 +15,7 @@ export interface IAccount {
   name: string;
   domain: string;
   goal: string;
+  hasConcepts: boolean;
   createdAt: string;
 }
 
