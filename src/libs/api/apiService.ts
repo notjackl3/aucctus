@@ -10,7 +10,6 @@ import axios, {
 import 'abort-controller/polyfill';
 import analytics from '../analytics';
 import { IAuthSuccessResponse } from './types';
-import { ExpiryTimeNotFoundError, TokenStructureError } from './customErrors';
 import { hasTokenExpired, sleep } from '../utils';
 
 export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {

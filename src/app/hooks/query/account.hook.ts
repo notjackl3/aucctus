@@ -54,8 +54,8 @@ export const useUpdateUser = () => {
 };
 
 export const useDashboard = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { isAuthenticated } = useAuth();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [userDetails, _] = useLocalStorage<Partial<IUserDetailsResponse>>('user');
   const { account } = userDetails || INITIAL_USER_DETAILS;
 
