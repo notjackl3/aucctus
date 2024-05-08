@@ -4,7 +4,7 @@ import InputField from '../../components/Text/InputField/InputField';
 import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/Auth/AuthContextProvider';
+import { useAuth } from '../../context/AuthContextProvider';
 
 const Login: FunctionComponent = () => {
   const [email, setEmail] = useState<string>('');

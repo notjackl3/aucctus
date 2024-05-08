@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useRef } from 'react';
-import { useModal } from '../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../context/ModalContextProvider';
 
 import styles from './modal.module.scss';
 

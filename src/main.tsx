@@ -2,14 +2,14 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App';
 import { BrowserRouter } from 'react-router-dom';
-import { ModalProvider } from './app/context/modal/ModalContextProvider';
+import { ModalProvider } from './app/context/ModalContextProvider';
 import { QueryCache, QueryClient, QueryClientProvider } from 'react-query';
 import { parseFormError } from './libs/utils';
 import { toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
-import { AuthProvider } from './app/context/Auth/AuthContextProvider';
+import { AuthProvider } from './app/context/AuthContextProvider';
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({

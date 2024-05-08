@@ -9,7 +9,7 @@ import { TabElement } from '../../../../components/Container/TabView/TabView';
 import { AppPath } from '../../../../../routes/routes';
 import { useConceptCustomerProfiles, useDeleteCustomerProfile } from '../../../../hooks/query/concepts.hook';
 import Icon from '../../../../components/Icons/Icon/Icon';
-import { useModal } from '../../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../../context/ModalContextProvider';
 import AddCustomerProfile from '../../../../components/Modal/CustomerProfile/AddCustomerProfile';
 import ConfirmationModal from '../../../../components/Modal/ConfirmationModal/ConfirmationModal';
 

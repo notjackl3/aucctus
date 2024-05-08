@@ -1,7 +1,7 @@
 import { FunctionComponent, useEffect } from 'react';
 
 import { Outlet, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../app/context/Auth/AuthContextProvider';
+import { useAuth } from '../../app/context/AuthContextProvider';
 import { AppPath } from '../routes';
 
 const AuthGuard: FunctionComponent = () => {

@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import Icon from '../../Icons/Icon/Icon';
-import { useModal } from '../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../context/ModalContextProvider';
 import { AssumptionType } from '../../../../libs/api/types';
 import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';

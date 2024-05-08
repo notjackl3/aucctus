@@ -1,19 +1,15 @@
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import NavDrawer from '../app/components/Navigation/NavDrawer/NavDrawer';
 import { AppPath } from '../routes/routes';
 import styles from './layout.module.scss';
 import { useUserDetails } from '../app/hooks/query/account.hook';
-import { useEffect } from 'react';
 
 const Layout = () => {
-  const { account } = useUserDetails();
-  const navigate = useNavigate();
+  const { account, isLoading: isUserDetailsLoading } = useUserDetails();
 
-  useEffect(() => {
-    if (!account) {
-      navigate(AppPath.Onboarding);
-    }
-  }, [account, navigate]);
+  if (!account && !isUserDetailsLoading) {
+    return <Navigate to={AppPath.Onboarding} />;
+  }
 
   return (
     <div className={styles.container}>

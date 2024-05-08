@@ -1,6 +1,6 @@
 import { useCallback, useState } from 'react';
 import { IMarketSizeMetric } from '../../../../libs/api/types';
-import { useModal } from '../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../context/ModalContextProvider';
 import Icon from '../../Icons/Icon/Icon';
 import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';

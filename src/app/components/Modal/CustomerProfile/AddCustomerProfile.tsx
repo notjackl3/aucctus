@@ -1,7 +1,7 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import styles from './add-customer-profile.module.scss';
 import { useCustomerProfileCreate } from '../../../hooks/query/concepts.hook';
-import { useModal } from '../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../context/ModalContextProvider';
 import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';
 import { parseFormError } from '../../../../libs/utils';

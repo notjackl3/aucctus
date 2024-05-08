@@ -1,7 +1,7 @@
 import { IMarketSizeMetric } from '../../../../../libs/api/types';
 import { getMarketMetricTitle } from '../../../../../libs/concepts';
 import { formatter } from '../../../../../libs/utils';
-import { useModal } from '../../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../../context/ModalContextProvider';
 import ConceptDetailCard from '../../../Cards/ConceptDetailCard/ConceptDetailCard';
 import EditMarketSizeMetricModal from '../../../Modal/EditMarketSizeMetricModal/EditMarketSizeMetricModal';
 

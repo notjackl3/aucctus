@@ -1,6 +1,6 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import styles from './edit-trends-and-driver.module.scss';
-import { useModal } from '../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../context/ModalContextProvider';
 import {
   Ecosystem,
   EcosystemType,

@@ -4,7 +4,7 @@ import { Ecosystem, EcosystemType } from '../../../../../libs/api/types';
 import images from '../../../../assets/img';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useEcosystemCreate, useEcosystemDelete, useEcosystemUpdate } from '../../../../hooks/query/concepts.hook';
-import { useModal } from '../../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../../context/ModalContextProvider';
 import EditMarketScanElement from '../../../../components/Modal/EditMarketScanElement/EditMarketScanElement';
 
 import styles from './styles/marketDetails.module.scss';

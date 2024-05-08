@@ -43,7 +43,7 @@ export interface IUserPassword {
 
 export interface IUserDetailsResponse {
   user: IUser;
-  account: IAccount;
+  account?: IAccount;
 }
 
 export interface IRegisterUser {

@@ -7,7 +7,7 @@ import { useEditMarketScan } from '../../../../hooks/concepts/editable.hook';
 import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
 import TrendAndDriverCard from './TrendAndDriverCard';
 import Icon from '../../../../components/Icons/Icon/Icon';
-import { useModal } from '../../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../../context/ModalContextProvider';
 import AddMarketScanElement from '../../../../components/Modal/EditMarketScanElement/AddMarketScanElement';
 
 const MarketDetails: FunctionComponent = () => {

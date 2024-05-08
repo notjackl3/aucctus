@@ -1,13 +1,16 @@
 import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect, useCallback } from 'react';
 import { UseMutationResult, useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { IAuthSuccessResponse, IMessageResponse, IServerErrorMessage, ITokenResponse } from '../../../libs/api/types';
-import { AucctusLocalStorage } from '../../../libs/localStorage';
+import { IAuthSuccessResponse, IMessageResponse, IServerErrorMessage, ITokenResponse } from '../../libs/api/types';
 import { AxiosError } from 'axios';
-import { AppPath } from '../../../routes/routes';
-import { AucctusQueryKeys } from '../../hooks/query/query-keys';
-import api from '../../../libs/api';
-import analytics from '../../../libs/analytics';
+import { AppPath } from '../../routes/routes';
+import { AucctusQueryKeys } from '../hooks/query/query-keys';
+import api from '../../libs/api';
+import analytics from '../../libs/analytics';
+import { useLocalStorage, useSessionStorage } from '../hooks/utility.hook';
+import { hasTokenExpired } from '../../libs/utils';
+import TokenRefreshWrapper from './TokenRefresh';
+import LoadingScreen from '../pages/LoadingScreen';
 
 interface IAuthContext {
   tokens: Partial<ITokenResponse>;
@@ -43,21 +46,19 @@ interface IAuthProviderProps {
 export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [tokens, setTokens] = useState<Partial<ITokenResponse>>({
-    refresh: AucctusLocalStorage.get('refreshToken'),
-    access: undefined,
-  });
-  const isAuthenticated = useMemo(() => !!tokens.refresh || !!tokens.access, [tokens]);
+  const [hasSetRefreshTokenAction, setRefreshTokenAction] = useState<boolean>(false);
+  const [initialized, setInitialized] = useSessionStorage<boolean>('initialized');
+
+  const [refresh, setRefresh] = useLocalStorage<string | undefined>('refreshToken');
+  const [access, setAccess] = useState<string | undefined>(undefined);
+
+  const isAuthenticated = useMemo(() => !!refresh || !!access, [access, refresh]);
 
   const updateTokens = useCallback((tokens: Partial<ITokenResponse>) => {
+    setAccess(tokens.access);
+    setRefresh(tokens.refresh);
     api.accessToken = tokens.access;
-    setTokens(tokens);
-
-    if (tokens.refresh) {
-      AucctusLocalStorage.set('refreshToken', tokens.refresh);
-    } else {
-      AucctusLocalStorage.remove('refreshToken');
-    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const clearTokens = useCallback(() => {
@@ -72,7 +73,18 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     void,
     unknown
   >({
-    mutationFn: async () => (tokens.refresh ? await api.auth.refreshToken(tokens.refresh) : Promise.reject()),
+    mutationFn: async () => {
+      if (!refresh) {
+        return Promise.reject();
+      }
+
+      if ((access && hasTokenExpired(access)) || !access) {
+        analytics.debug('Making Refresh Token Request');
+        return await api.auth.refreshToken(refresh);
+      }
+
+      return Promise.resolve({ refresh, access });
+    },
     onSuccess: (response) => {
       analytics.debug('Refreshed Token Updating Access Token');
       updateTokens(response);
@@ -84,7 +96,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   });
 
   const logout = useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, void, unknown>({
-    mutationFn: async () => await api.auth.logout(tokens.refresh),
+    mutationFn: async () => await api.auth.logout(access),
     onSettled: () => {
       clearTokens();
     },
@@ -105,32 +117,34 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   });
 
   useEffect(() => {
-    // Set refresh token and logout actions
-    if ((api.hasSetRefreshTokenAction && api.hasSetLogoutAction) || !tokens.refresh) {
-      return;
-    }
-    api.setRefreshTokenAction(refreshAsync);
-    api.setLogoutAction(clearTokens);
-  }, [clearTokens, refreshAsync, tokens.refresh]);
-
-  useEffect(() => {
-    const refreshToken = AucctusLocalStorage.get('refreshToken');
-    if (refreshToken) {
-      setTokens((prev) => ({ ...prev, refresh: refreshToken }));
-    }
-  }, []);
-
-  useEffect(() => {
-    if (api.hasSetRefreshTokenAction) {
-      api.refreshToken();
+    if (!hasSetRefreshTokenAction) {
+      api.setRefreshTokenAction(refreshAsync, () => {
+        setRefreshTokenAction(true);
+      });
+      api.setLogoutAction(clearTokens);
     }
   }, []);
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, tokens, refreshToken: api.refreshToken, isRefreshLoading, logout, login }}
+      value={{
+        isAuthenticated,
+        tokens: { access, refresh },
+        refreshToken: api.refreshToken,
+        isRefreshLoading,
+        logout,
+        login,
+      }}
     >
-      {children}
+      <TokenRefreshWrapper
+        refreshToken={api.refreshToken}
+        refreshActionReady={hasSetRefreshTokenAction}
+        initialized={!!initialized}
+        setInitialized={setInitialized}
+      >
+        {children}
+        {!initialized && <LoadingScreen />}
+      </TokenRefreshWrapper>
     </AuthContext.Provider>
   );
 };

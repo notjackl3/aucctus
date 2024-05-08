@@ -63,6 +63,7 @@ export const useConcept = (uuid?: string) => {
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 60, // 1 hour
     queryFn: async () => (uuid ? await api.concept.getConcept(uuid) : void 0),
+    enabled: !!uuid,
   });
 
   return { ...query, concept: query.data };
@@ -78,6 +79,7 @@ export const useConceptOverview = (uuid: string) => {
     queryKey: [AucctusQueryKeys.conceptOverview, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptOverview(uuid),
+    enabled: !!uuid,
   });
 
   return { ...query, overview: query.data };
@@ -93,6 +95,7 @@ export const useConceptMarketScan = (uuid: string) => {
     queryKey: [AucctusQueryKeys.conceptMarketScan, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptMarketScan(uuid),
+    enabled: !!uuid,
   });
 
   return { ...query, marketScan: query.data };
@@ -103,6 +106,7 @@ export const useConceptCustomerProfiles = (uuid: string) => {
     queryKey: [AucctusQueryKeys.conceptCustomerProfiles, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptCustomerProfiles(uuid),
+    enabled: !!uuid,
   });
 
   return { ...query, profiles: query.data?.results || [] };
@@ -113,6 +117,7 @@ export const useConceptCustomerProfile = (profileUuid: string) => {
     queryKey: [AucctusQueryKeys.conceptCustomerProfile, profileUuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptCustomerProfile(profileUuid),
+    enabled: !!profileUuid,
   });
 
   return { ...query, profile: query.data };
@@ -123,6 +128,7 @@ export const useFinancialProjection = (uuid: string) => {
     queryKey: [AucctusQueryKeys.conceptFinancialProjection, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptFinancialProjection(uuid),
+    enabled: !!uuid,
   });
 
   return { ...query, financialProjection: query.data };
@@ -133,6 +139,7 @@ export const useKeyAssumptions = (uuid: string) => {
     queryKey: [AucctusQueryKeys.conceptKeyAssumptions, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptKeyAssumptions(uuid),
+    enabled: !!uuid,
   });
 
   return { ...query, assumptions: query.data?.results || [] };
@@ -148,6 +155,7 @@ export const useConceptAssumptions = (uuid: string) => {
     queryKey: [AucctusQueryKeys.conceptKeyAssumptions, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptKeyAssumptions(uuid),
+    enabled: !!uuid,
   });
   return { ...query, assumptions: query.data };
 };

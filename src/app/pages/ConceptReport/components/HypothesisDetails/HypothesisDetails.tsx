@@ -17,7 +17,7 @@ import QuadrantChart, { ChartPoint } from '../../../../components/Charts/Quadran
 import { useAssumptionsColumns } from './columns.hook';
 import { useKeyAssumptions } from '../../../../hooks/query/concepts.hook';
 import Icon from '../../../../components/Icons/Icon/Icon';
-import { useModal } from '../../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../../context/ModalContextProvider';
 import AddKeyAssumptionModal from '../../../../components/Modal/EditKeyAssumtionModal/AddKeyAssumptionModal';
 
 const HypothesisDetails: FunctionComponent = () => {

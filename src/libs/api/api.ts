@@ -32,8 +32,6 @@ export class Api {
   account: AccountApi;
   concept: ConceptApi;
   conceptIgnite: IgniteConceptApi;
-  hasSetRefreshTokenAction: boolean = false;
-  hasSetLogoutAction: boolean = false;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -83,15 +81,16 @@ export class Api {
   }
 
   // Method to update the refresh token action dynamically
-  setRefreshTokenAction(action: () => Promise<ITokenResponse | undefined>) {
+  setRefreshTokenAction(action: () => Promise<ITokenResponse | undefined>, callback?: () => void) {
     this._refreshTokenAction = action;
-    this.hasSetRefreshTokenAction = true;
+    if (callback) {
+      callback();
+    }
   }
 
   // Method to update the logout action dynamically
   setLogoutAction(action: () => void) {
     this._logoutAction = action;
-    this.hasSetLogoutAction = true;
   }
 
   // Expose these actions through methods to be used in ApiService

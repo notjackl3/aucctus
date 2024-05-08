@@ -11,7 +11,7 @@ import 'abort-controller/polyfill';
 import analytics from '../analytics';
 import { IAuthSuccessResponse } from './types';
 import { ExpiryTimeNotFoundError, TokenStructureError } from './customErrors';
-import { sleep } from '../utils';
+import { hasTokenExpired, sleep } from '../utils';
 
 export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {
   return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).access;
@@ -59,13 +59,14 @@ export abstract class ApiService {
     const accessToken = this.apiInstance.accessToken;
 
     if (!this._shouldSkipRefresh(config.url || '')) {
-      if (this.apiInstance.pendingRefresh) {
-        await this.apiInstance.pendingRefresh;
-      }
       try {
-        if (accessToken && this.hasTokenExpired(accessToken)) {
+        if (accessToken && hasTokenExpired(accessToken)) {
           await sleep(1000 * Math.random());
-          await this.apiInstance.refreshToken();
+          if (this.apiInstance.pendingRefresh) {
+            await this.apiInstance.pendingRefresh;
+          } else {
+            await this.apiInstance.refreshToken();
+          }
           Object.assign(config || {}, this._handleAccessToken());
         }
       } catch (error) {
@@ -98,8 +99,6 @@ export abstract class ApiService {
     if (url && LOGOUT_STATUSES.includes(status) && !this._shouldSkipRefresh(url)) {
       try {
         if (error.config) {
-          // Adds some delay to prevent multiple requests from trying to refresh the token at the same time
-          await sleep(1000 * Math.random());
           // Attempt to refresh the token
           if (this.apiInstance.pendingRefresh) {
             await this.apiInstance.pendingRefresh;
@@ -130,31 +129,6 @@ export abstract class ApiService {
     return Promise.reject(error);
   }
 
-  hasTokenExpired(token: string): boolean {
-    analytics.debug('Checking token expiry...');
-    const parts = token.split('.');
-    if (parts.length !== 3) {
-      throw new TokenStructureError('Token structure incorrect');
-    }
-
-    const payload = parts[1];
-    // Use atob for base64 decoding in the browser
-    const decodedPayload = atob(payload);
-    const payloadData = JSON.parse(decodedPayload);
-
-    const exp = payloadData.exp;
-
-    if (!exp) {
-      throw new ExpiryTimeNotFoundError('Expiry time not found in token.');
-    }
-
-    analytics.debug('Token expiry:', new Date(exp * 1000));
-    const expiryDate = new Date(exp * 1000);
-    const now = new Date();
-
-    return expiryDate <= now;
-  }
-
   protected _handleAccessToken(): AxiosRequestConfig {
     const accessToken = this.apiInstance.accessToken;
     const config = Object.assign({ headers: {} }, this.config);
@@ -168,7 +142,7 @@ export abstract class ApiService {
     }
 
     const path = url.split('?')[0];
-    analytics.debug('Checking if path should be excluded from refresh:', path, url);
+    // analytics.debug('Checking if path should be excluded from refresh:', path, url);
     return this._excludePathFromRefresh.includes(path);
   }
 

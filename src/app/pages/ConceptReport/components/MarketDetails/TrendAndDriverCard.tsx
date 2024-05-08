@@ -4,7 +4,7 @@ import styles from './styles/marketDetails.module.scss';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import images from '../../../../assets/img';
-import { useModal } from '../../../../context/modal/ModalContextProvider';
+import { useModal } from '../../../../context/ModalContextProvider';
 import EditMarketScanElement from '../../../../components/Modal/EditMarketScanElement/EditMarketScanElement';
 import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../../hooks/query/concepts.hook';
 

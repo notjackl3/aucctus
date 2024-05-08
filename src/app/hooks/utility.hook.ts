@@ -1,5 +1,7 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
+import { AucctusStorage, AucctusStorageEvent, StorageKeys } from '../../libs/localStorage';
+import analytics from '../../libs/analytics';
 
 /**
  * Returns the previous value of the given state.
@@ -46,3 +48,51 @@ export const useMousePosition = () => {
   }, []);
   return mousePosition;
 };
+
+declare global {
+  interface WindowEventMap {
+    aucctusStorage: AucctusStorageEvent;
+  }
+}
+
+const createStorageHook =
+  (type: 'local' | 'session') =>
+  <T = unknown>(key: StorageKeys) => {
+    // Using state to manage the storage value
+    const [value, setValue] = useState(() => AucctusStorage.get<T>(key, { type }));
+
+    // Handler to update both state and storage
+    const handleSetValue = useCallback(
+      (newValue: T | undefined) => {
+        AucctusStorage.set(key, newValue, type);
+        setValue(newValue);
+      },
+      [key],
+    );
+
+    // Effect for syncing state with storage changes
+    useEffect(() => {
+      const storageEventListener = (e: AucctusStorageEvent) => {
+        const detail = e.detail;
+        if (detail.key === key && detail.type === type) {
+          const newValue = AucctusStorage.get<T>(key, { type });
+          if (newValue !== value) {
+            setValue(newValue);
+          }
+        }
+      };
+
+      window.addEventListener('aucctusStorage', storageEventListener);
+      return () => window.removeEventListener('aucctusStorage', storageEventListener);
+    }, [key, value]);
+
+    return [value, handleSetValue] as [typeof value, typeof handleSetValue];
+  };
+
+export function useLocalStorage<T>(key: StorageKeys) {
+  return createStorageHook('local')<T>(key);
+}
+
+export function useSessionStorage<T>(key: StorageKeys) {
+  return createStorageHook('session')<T>(key);
+}

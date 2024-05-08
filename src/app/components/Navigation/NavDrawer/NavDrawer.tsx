@@ -7,7 +7,7 @@ import { AppPath } from '../../../../routes/routes';
 import { useNavigate } from 'react-router-dom';
 import { useUserDetails } from '../../../hooks/query/account.hook';
 import NavButton from './NavButton';
-import { useAuth } from '../../../context/Auth/AuthContextProvider';
+import { useAuth } from '../../../context/AuthContextProvider';
 
 const NavDrawer = () => {
   const { user, account } = useUserDetails();
