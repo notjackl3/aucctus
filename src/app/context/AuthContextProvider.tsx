@@ -48,7 +48,9 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const [hasSetRefreshTokenAction, setRefreshTokenAction] = useState<boolean>(false);
   const [initialized, setInitialized] = useSessionStorage<boolean>('initialized');
-  const [user, setUser] = useLocalStorage('user');
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [_, setUser] = useLocalStorage('user');
 
   const [refresh, setRefresh] = useLocalStorage<string | undefined>('refreshToken');
   const [access, setAccess] = useState<string | undefined>(undefined);
