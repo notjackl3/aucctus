@@ -48,6 +48,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   const navigate = useNavigate();
   const [hasSetRefreshTokenAction, setRefreshTokenAction] = useState<boolean>(false);
   const [initialized, setInitialized] = useSessionStorage<boolean>('initialized');
+  const [user, setUser] = useLocalStorage('user');
 
   const [refresh, setRefresh] = useLocalStorage<string | undefined>('refreshToken');
   const [access, setAccess] = useState<string | undefined>(undefined);
@@ -65,7 +66,8 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     queryClient.clear();
     updateTokens({ refresh: undefined, access: undefined });
     navigate(AppPath.Login, { replace: true });
-  }, [navigate, queryClient, updateTokens]);
+    setUser(undefined);
+  }, [navigate, queryClient, updateTokens, setUser]);
 
   const { mutateAsync: refreshAsync, isLoading: isRefreshLoading } = useMutation<
     ITokenResponse,
