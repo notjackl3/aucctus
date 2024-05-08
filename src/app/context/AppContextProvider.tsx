@@ -24,14 +24,6 @@ interface IAppProviderProps {
 
 export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const [initialized, _] = useLocalStorage('initialized');
-
-  useEffect(() => {
-    console.log('initialized', initialized);
-    if (initialized) {
-      setIsLoading(false);
-    }
-  }, [initialized]);
 
   const showLoading = useCallback((value: boolean) => {
     if (value) {
