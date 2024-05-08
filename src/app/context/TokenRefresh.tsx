@@ -11,7 +11,7 @@ interface ITokenRefreshProps {
 }
 
 class TokenRefreshWrapper extends React.Component<ITokenRefreshProps> {
-  componentDidUpdate(prevProps: Readonly<ITokenRefreshProps>, prevState: Readonly<{}>, snapshot?: any): void {
+  componentDidUpdate(): void {
     const initialized = AucctusStorage.get('initialized', { defaultValue: false, type: 'session' });
     if (this.props.refreshActionReady && !initialized && this.props.setInitialized) {
       this.props.refreshToken().finally(() => {

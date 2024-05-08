@@ -65,7 +65,6 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     queryClient.clear();
     updateTokens({ refresh: undefined, access: undefined });
     navigate(AppPath.Login, { replace: true });
-    setInitialized(undefined);
   }, [navigate, queryClient, updateTokens]);
 
   const { mutateAsync: refreshAsync, isLoading: isRefreshLoading } = useMutation<
