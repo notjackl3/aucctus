@@ -28,7 +28,7 @@ export const useUserDetails = () => {
   });
 
   const { data } = query;
-  const { user, account } = data || { user: undefined, account: undefined };
+  const { user, account } = data || INITIAL_USER_DETAILS;
 
   return { ...query, user, account };
 };

@@ -10,10 +10,10 @@ import analytics from '../../libs/analytics';
 import { useLocalStorage, useSessionStorage } from '../hooks/utility.hook';
 import { hasTokenExpired } from '../../libs/utils';
 import TokenRefreshWrapper from './TokenRefresh';
-import LoadingScreen from '../pages/LoadingScreen';
 
 interface IAuthContext {
   tokens: Partial<ITokenResponse>;
+  initialized: boolean;
   isAuthenticated: boolean;
   refreshToken: () => Promise<ITokenResponse | undefined>;
   isRefreshLoading: boolean;
@@ -133,6 +133,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     <AuthContext.Provider
       value={{
         isAuthenticated,
+        initialized: !!initialized,
         tokens: { access, refresh },
         refreshToken: api.refreshToken,
         isRefreshLoading,
@@ -147,7 +148,6 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
         setInitialized={setInitialized}
       >
         {children}
-        {!initialized && <LoadingScreen />}
       </TokenRefreshWrapper>
     </AuthContext.Provider>
   );
