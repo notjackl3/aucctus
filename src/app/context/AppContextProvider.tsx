@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect } from 'react';
 import LoadingScreen from '../pages/LoadingScreen';
-
-import { useLocalStorage } from '../hooks/utility.hook';
+import { useAuth } from './AuthContextProvider';
+import { useUserDetails } from '../hooks/query/account.hook';
 
 interface IAppContext {
   isLoading: boolean;
@@ -24,6 +24,8 @@ interface IAppProviderProps {
 
 export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const { initialized } = useAuth();
+  const { isLoading: isUserDetailsLoading } = useUserDetails();
 
   const showLoading = useCallback((value: boolean) => {
     if (value) {
@@ -34,6 +36,11 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
       }, 1000);
     }
   }, []);
+
+  useEffect(() => {
+    console.log('Layout: useEffect: showLoading');
+    showLoading(isUserDetailsLoading && !initialized);
+  }, [isUserDetailsLoading, showLoading, initialized]);
 
   return (
     <AppContext.Provider value={{ isLoading, showLoading }}>

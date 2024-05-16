@@ -127,6 +127,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
       });
       api.setLogoutAction(clearTokens);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
