@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect, useCallback, useRef } from 'react';
 import { UseMutationResult, useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { IAuthSuccessResponse, IMessageResponse, IServerErrorMessage, ITokenResponse } from '../../libs/api/types';
@@ -46,7 +46,7 @@ interface IAuthProviderProps {
 export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const [hasSetRefreshTokenAction, setRefreshTokenAction] = useState<boolean>(false);
+  const hasSetRefreshTokenAction = useRef<boolean>(false);
   const [initialized, setInitialized] = useSessionStorage<boolean>('initialized');
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -120,15 +120,10 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     },
   });
 
-  useEffect(() => {
-    if (!hasSetRefreshTokenAction) {
-      api.setRefreshTokenAction(refreshAsync, () => {
-        setRefreshTokenAction(true);
-      });
-      api.setLogoutAction(clearTokens);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  api.setRefreshTokenAction(refreshAsync, () => {
+    hasSetRefreshTokenAction.current = true;
+  });
+  api.setLogoutAction(clearTokens);
 
   return (
     <AuthContext.Provider
@@ -144,7 +139,7 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     >
       <TokenRefreshWrapper
         refreshToken={api.refreshToken}
-        refreshActionReady={hasSetRefreshTokenAction}
+        refreshActionReady={hasSetRefreshTokenAction.current}
         initialized={!!initialized}
         setInitialized={setInitialized}
       >

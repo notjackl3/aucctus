@@ -38,7 +38,6 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log('Layout: useEffect: showLoading');
     showLoading(isUserDetailsLoading && !initialized);
   }, [isUserDetailsLoading, showLoading, initialized]);
 
