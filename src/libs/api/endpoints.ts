@@ -18,7 +18,7 @@ export const endpoints = {
   logout: '/api/v1/logout',
   refresh: '/api/v1/token/refresh',
 
-  user: '/api/v1/user',
+  user: '/api/v1/user/',
   confirmEmail: `/api/v1/confirm-email`,
   forgotPassword: `/api/v1/forgot-password`,
   requestPasswordReset: `/api/v1/password-reset`,
@@ -43,7 +43,9 @@ export const endpoints = {
     if (options.createdBy) query += `created_by=${options.createdBy}&`;
     if (options.isGenerated) query += `is_generated=${options.isGenerated}&`;
 
-    return `api/v1/concept?${query}`;
+    if (query !== '') return `api/v1/concept?${query}`;
+
+    return 'api/v1/concept';
   },
   conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
   conceptReportRetry: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/retry`,
@@ -62,7 +64,7 @@ export const endpoints = {
   conceptMarketSizeMetric: (marketSizeMetricUuid: string) =>
     `api/v1/concept/market-size-metric/${marketSizeMetricUuid}`,
 
-  conceptMarketScan: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/market-scan`,
+  conceptMarketScan: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/market-scan/`,
   conceptMarketScanUuid: (marketScanUuid: string) => `api/v1/concept/market-scan/${marketScanUuid}`,
   conceptMarketScanElement: (conceptUuid: string, element: 'trends-and-drivers' | 'ecosystem') =>
     `api/v1/concept/${conceptUuid}/market-scan/${element}`,

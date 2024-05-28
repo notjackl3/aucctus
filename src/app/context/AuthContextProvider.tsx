@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useMemo, useEffect, useCallback, useRef } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useMemo, useCallback, useRef } from 'react';
 import { UseMutationResult, useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { IAuthSuccessResponse, IMessageResponse, IServerErrorMessage, ITokenResponse } from '../../libs/api/types';
@@ -120,10 +120,12 @@ export const AuthProvider: React.FC<IAuthProviderProps> = ({ children }) => {
     },
   });
 
-  api.setRefreshTokenAction(refreshAsync, () => {
-    hasSetRefreshTokenAction.current = true;
-  });
-  api.setLogoutAction(clearTokens);
+  if (!hasSetRefreshTokenAction.current && refreshAsync) {
+    api.setRefreshTokenAction(refreshAsync, () => {
+      hasSetRefreshTokenAction.current = true;
+    });
+    api.setLogoutAction(clearTokens);
+  }
 
   return (
     <AuthContext.Provider

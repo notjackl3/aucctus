@@ -22,7 +22,7 @@ export interface IAccount {
 export interface IRegisterAccount {
   name: string;
   domain: string;
-  innovationGoal: string;
+  goal: string;
 }
 
 export interface IUser {

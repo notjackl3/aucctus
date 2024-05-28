@@ -97,7 +97,7 @@ const OnBoarding: FunctionComponent = () => {
               className='btn btn-primary'
               onClick={(e) => {
                 e.preventDefault();
-                registerAccount({ name, domain, innovationGoal });
+                registerAccount({ name, domain, goal: innovationGoal });
               }}
               disabled={!name || !domain || !innovationGoal || !!domainInputError || status === 'loading'}
             >
