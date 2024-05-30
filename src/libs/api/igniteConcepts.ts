@@ -19,6 +19,6 @@ export class IgniteConceptApi extends ApiService {
   }
 
   igniteConcepts(concept: IConceptGenerate) {
-    return this.post<IConceptGenerateResponse>(endpoints.conceptIgnite, concept);
+    return this.post<IConceptGenerateResponse>(endpoints.conceptIgnite, concept, { timeout: 1200000 });
   }
 }
