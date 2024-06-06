@@ -14,6 +14,14 @@ import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import { useTokenStore } from '../../stores/token.store';
 
+// Define a custom error class
+class NoRefreshTokenError extends Error {
+  constructor() {
+    super('No refresh token available');
+    this.name = 'NoRefreshTokenError';
+  }
+}
+
 export const useSignUp = () => {
   const navigate = useNavigate();
 
@@ -61,7 +69,7 @@ export const useRefresh = () => {
   return useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, void, unknown>({
     mutationFn: async () => {
       if (!refresh) {
-        return Promise.reject();
+        throw new NoRefreshTokenError();
       }
       return await api.auth.refreshToken(refresh);
     },
@@ -69,10 +77,12 @@ export const useRefresh = () => {
       storeTokens(response.access, response.refresh);
     },
     onError: (error) => {
-      console.error('Error refreshing token (App)', error);
+      if (!(error instanceof NoRefreshTokenError)) {
+        console.error('Error refreshing token (App)', error);
 
-      // Remove tokens if refresh fails
-      clear();
+        // Remove tokens if refresh fails
+        clear();
+      }
     },
   });
 };

@@ -7,8 +7,8 @@ interface AppStoreState {
   account: IAccount | undefined;
   initialized: boolean;
   serverError: boolean;
-  setUser: (user: IUser) => void;
-  setAccount: (account: IAccount) => void;
+  setUser: (user: IUser | undefined) => void;
+  setAccount: (account: IAccount | undefined) => void;
 
   initializeApp: () => void;
 }
@@ -26,7 +26,7 @@ export const useAppStore = create<AppStoreState>()(
       },
       setAccount: (account) => set({ account }),
 
-      initializeApp: async () => {
+      initializeApp: () => {
         set({ initialized: true });
       },
     }),

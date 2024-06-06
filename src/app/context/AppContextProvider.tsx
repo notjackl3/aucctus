@@ -50,7 +50,7 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
     }
   }, []);
 
-  useUserDetails(!!user && isAuthenticated); // Fetch user details if we don't have them and we are authenticated
+  useUserDetails(isAuthenticated); // Fetch user details if we don't have them and we are authenticated
 
   // First try to retrieve tokens from storage
   useEffect(() => {
@@ -73,10 +73,10 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
   // This will only happen once
   useEffect(() => {
     (async () => {
+      console.log('refreshing token');
       if (!initialized && hasSetRefreshTokenAction && hasRetrievedTokens) {
-        console.log('App Loaded attempting to refresh token');
-        await api.refreshToken().finally(async () => {
-          await initializeApp();
+        await api.refreshToken().finally(() => {
+          initializeApp();
         });
       }
     })();
