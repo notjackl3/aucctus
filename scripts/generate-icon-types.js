@@ -25,7 +25,7 @@ fs.readFile(spritePath, 'utf8', (err, data) => {
     .get();
 
   // Generate TypeScript type
-  const typeDeclaration = `type IconVariant = '${ids.join("' | '")}';\n`;
+  const typeDeclaration = `type IconVariant = '${ids.join("' \n | '")}';\n`;
 
   // Write the type to a TypeScript definition file
   fs.writeFile(outputPath, typeDeclaration, (err) => {

@@ -18,4 +18,9 @@ coverage
 *.min.css
 *.min.css.map
 *.min.scss
+
+icons.d.ts
+
+.vscode
+.github
  

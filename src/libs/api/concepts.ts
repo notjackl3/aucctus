@@ -11,10 +11,13 @@ import {
   IConceptCreate,
   IConceptOverview,
   IConceptPage,
+  IConceptSeed,
+  IConceptSeedBase,
   ICustomerProfile,
   ICustomerProfileCreate,
   IEcosystemCreate,
   IFinancialProjection,
+  IGeneratedConcept,
   IMarketScan,
   IMarketScanElementCreate,
   IMarketSizeMetric,
@@ -27,6 +30,17 @@ import { IPageResponse } from './types';
  *
  * Handles all the requests for the Concept.
  */
+
+export interface IGeneratedConceptsSaveBody {
+  concepts: IGeneratedConcept[];
+  seed: Omit<IConceptSeedBase, 'createdBy'>;
+}
+
+export interface IGeneratedConceptSaveResponse {
+  concepts: IConcept[];
+  seed: IConceptSeed;
+}
+
 export class ConceptApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = false;
   protected _excludePathFromRefresh: string[] = [];
@@ -63,6 +77,10 @@ export class ConceptApi extends ApiService {
 
   batchCreateConcepts(concepts: IConceptCreate[]) {
     return this.post<IConcept[], IConceptCreate[]>(endpoints.concept, concepts);
+  }
+
+  saveGeneratedConcepts(body: IGeneratedConceptsSaveBody) {
+    return this.post<IConcept[], IGeneratedConceptsSaveBody>(endpoints.saveGeneratedConcepts, body);
   }
 
   getConcepts(options?: IConceptQueryOptions) {

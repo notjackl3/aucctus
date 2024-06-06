@@ -24,6 +24,8 @@ import { AxiosError } from 'axios';
 import { toast } from 'react-toastify';
 import { parseFormError } from '../../../libs/utils';
 import analytics from '../../../libs/analytics';
+import { IGeneratedConceptsSaveBody } from '../../../libs/api/concepts';
+import { IIgniteConceptBody } from '../../../libs/api/igniteConcepts';
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & { uuid: string };
 export type PartialConceptOverviewWithRequiredUuid = Partial<IConceptOverview> & { uuid: string };
@@ -67,6 +69,45 @@ export const useConcept = (uuid?: string) => {
   });
 
   return { ...query, concept: query.data };
+};
+
+/**
+ * Custom hook for saving generated concepts.
+ *
+ * @returns {MutationFunction} The mutation function for saving generated concepts.
+ */
+export const useSaveGeneratedConcepts = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (body: IGeneratedConceptsSaveBody) => {
+      return api.concept.saveGeneratedConcepts(body);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
+    },
+    onError: () => {
+      toast.error('Concepts could not be saved. Please try again later.');
+    },
+  });
+};
+
+/**
+ * Custom hook for igniting a concept.
+ * @returns A mutation function for igniting a concept.
+ */
+export const useConceptIgnition = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (body: IIgniteConceptBody) => await api.conceptIgnite.ignite(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
+    },
+    onError: (e) => {
+      const message = parseFormError(e);
+      toast.error(message);
+    },
+  });
 };
 
 /**

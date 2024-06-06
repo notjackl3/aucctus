@@ -14,8 +14,10 @@
   overflow: hidden;
 
   .content {
+    padding: $padding-base;
     margin-left: $nav-drawer-width;
     min-height: 100vh;
+    width: calc(100vw - $nav-drawer-width);
     overflow: auto;
   }
 }

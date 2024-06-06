@@ -16,10 +16,12 @@ export type DraftConceptStatus = Exclude<
   ConceptStatus,
   'prototyping' | 'proofOfConcept' | 'minimumViableProduct' | 'commercialized' | 'archived'
 >;
+
 export type ArchivedConceptStatus = Exclude<
   ConceptStatus,
   'new' | 'ideating' | 'inReview' | 'prototyping' | 'proofOfConcept' | 'minimumViableProduct' | 'commercialized'
 >;
+
 export type ActiveConceptStatus = Exclude<ConceptStatus, ArchivedConceptStatus | DraftConceptStatus>;
 
 export type ConceptReportStatus = 'notStarted' | 'complete' | 'pending' | 'error';
@@ -31,30 +33,42 @@ export interface IBaseConceptEntity {
   updatedAt: string;
 }
 
-export interface IConcept extends IBaseConceptEntity {
+export interface IGeneratedConcept {
   title: string;
-  isGenerated: boolean;
-  reportStatus: ConceptReportStatus;
-  status: ConceptStatus;
-  category: ConceptCategory;
   description: string;
-  createdBy: string;
 }
 
-export interface IConceptCreate {
-  title: string;
-  description: string;
+// Used When creating a new concept
+export interface IConceptCreate extends IGeneratedConcept {
   status?: ConceptStatus;
   createdBy?: string;
 }
 
-export interface IConceptGenerate {
-  goal: string;
+export interface IConcept extends IBaseConceptEntity, IGeneratedConcept {
+  isGenerated: boolean; // Currently not used will likely drop
+  seed?: Unknown;
+  reportStatus: ConceptReportStatus;
+  status: ConceptStatus;
+  category: ConceptCategory;
+  createdBy: string;
+}
+type ConceptSeedType = 'EXPAND_AN_EXISTING_IDEA' | 'IDENTIFY_NEW_OPPORTUNITIES' | 'UNKNOWN';
+type ExpandAnExistingIdeaQuestionKeys = 'DESCRIBE' | 'PROBLEM' | 'CUSTOMER' | 'SUCCESS';
+type IdentifyNewOpportunitiesQuestionKeys = 'TARGET' | 'PROBLEM' | 'INTEREST' | 'SUCCESS';
+type IgniteConceptQuestionKeys = ExpandAnExistingIdeaQuestionKeys | IdentifyNewOpportunitiesQuestionKeys;
+
+export interface IConceptSeedAttribute<T = IgniteConceptQuestionKeys> {
+  question: T;
+  answer: string;
 }
 
-export interface IConceptGenerateResponse {
-  concepts: Partial<IConcept>[];
+interface IConceptSeedBase {
+  attributes: IConceptSeedAttribute[];
+  type: ConceptSeedType;
+  createdBy: string;
 }
+
+export interface IConceptSeed extends IConceptSeedBase, Omit<IBaseConceptEntity, 'version'> {}
 
 export interface IConceptOverview extends IBaseConceptEntity {
   valueProposition: string;

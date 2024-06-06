@@ -41,11 +41,11 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
 
   const handleTextFieldChange = useCallback(
     (
-        fieldName: string,
-        setText: React.Dispatch<React.SetStateAction<string>>,
-        setError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        maxLength?: number,
-      ) =>
+      fieldName: string,
+      setText: React.Dispatch<React.SetStateAction<string>>,
+      setError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      maxLength?: number,
+    ) =>
       (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const input = e.target.value;
 
@@ -64,12 +64,12 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
 
   const handleRangeValueChange = useCallback(
     (
-        type: 'lower' | 'upper',
-        setRange: React.Dispatch<React.SetStateAction<number>>,
-        setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-        inverseValue: number,
-      ) =>
+      type: 'lower' | 'upper',
+      setRange: React.Dispatch<React.SetStateAction<number>>,
+      setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      inverseValue: number,
+    ) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
         const input = e.target.value;
         const num = parseInt(input);

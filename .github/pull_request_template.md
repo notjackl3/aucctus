@@ -1,4 +1,4 @@
-# Pull Request Template
+#### Ticket:  https://aucctus.atlassian.net/browse/AUC-
 
 ## Description
 
@@ -19,5 +19,3 @@ Please include a summary of the change or the feature you are adding. Provide an
 - Any other form of proof that shows the effectiveness of the change
 * **Evidence provided:**
 -->
-
-_Note: Remember to tag relevant people or teams for review._

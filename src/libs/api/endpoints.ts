@@ -31,8 +31,9 @@ export const endpoints = {
   /* Concepts */
   concept: 'api/v1/concept/',
   conceptList: 'api/v1/concept/list',
+  saveGeneratedConcepts: 'api/v1/concept/generated',
 
-  conceptIgnite: 'v1/concept/ignite',
+  conceptIgnite: 'v1/concept/ignite', // Fast
   conceptQueries: (options?: IConceptQueryOptions) => {
     if (!options) return 'api/v1/concept';
 

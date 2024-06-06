@@ -1,13 +1,22 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
 import { endpoints } from './endpoints';
-import { IConceptGenerate, IConceptGenerateResponse } from './types'; // Import the missing type
+import { IConceptSeedAttribute, IConceptSeedBase, IGeneratedConcept } from './types'; // Import the missing type
 
 /**
  * Concept Ignite API
  *
  * Handles all the requests to the fast service for concept generation.
  */
+export interface IConceptGenerateResponse {
+  concepts: IGeneratedConcept[];
+  seed: IConceptSeedAttribute[];
+}
+
+export interface IIgniteConceptBody extends Omit<IConceptSeedBase, 'createdBy'> {
+  numberOfConcepts?: number;
+}
+
 export class IgniteConceptApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = false;
   protected _excludePathFromRefresh: string[] = [];
@@ -18,7 +27,7 @@ export class IgniteConceptApi extends ApiService {
     this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
-  igniteConcepts(concept: IConceptGenerate) {
-    return this.post<IConceptGenerateResponse>(endpoints.conceptIgnite, concept, { timeout: 1200000 });
+  ignite(body: IIgniteConceptBody) {
+    return this.post<IConceptGenerateResponse>(endpoints.conceptIgnite, body);
   }
 }

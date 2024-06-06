@@ -4,29 +4,33 @@ import conceptOverview from './concept-overview.png';
 import customerProfile from './customer-profile.png';
 import deliveryTrend from './delivery-trend.png';
 import deliveryNews from './delivery-news.png';
-import marketSegment from './market-segment-blur.png';
-import innovationLifeCycle from './innovation-lifecycle.png';
-import innovationActivity from './inovation-activity.png';
-import challengeCircle from './challenge-circle.png';
-import competitorNewsBlur from './competitor-news-blur.png';
 import companyLogoDefault from './company-logo-default.png';
+import expandOnExistingIdeas from './expand-an-existing-idea.png';
+import exploreNewSpace from './explore-a-new-space.png';
+import whiteSpaceSuggestions from './white-space-suggestions.png';
 
 import avatar from './avatar.png';
 
 const images = {
+  // Auth
   screenMockup,
+
+  // Concept Components
   conceptOverview,
   customerProfile,
-  marketSegment,
-  innovationLifeCycle,
-  innovationActivity,
-  challengeCircle,
-  competitorNewsBlur,
   deliveryTrend,
-  deliveryNews,
-  companyLogoDefault,
 
+  // Miscellaneous
+  deliveryNews,
+
+  // Concept Ignition
+  expandOnExistingIdeas,
+  exploreNewSpace,
+  whiteSpaceSuggestions,
+
+  // User
   avatar,
+  companyLogoDefault,
 };
 
 export default images;

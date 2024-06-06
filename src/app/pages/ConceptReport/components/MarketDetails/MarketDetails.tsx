@@ -45,9 +45,7 @@ const MarketDetails: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.cardContainer}>
-        {marketScan?.trendsAndDrivers.map((trend) => (
-          <TrendAndDriverCard trendAndDriver={trend} key={trend.uuid} />
-        ))}
+        {marketScan?.trendsAndDrivers.map((trend) => <TrendAndDriverCard trendAndDriver={trend} key={trend.uuid} />)}
       </div>
       <div className={styles.summary}>
         <div className={styles.detailBlock}>

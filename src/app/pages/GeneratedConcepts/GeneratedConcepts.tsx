@@ -1,92 +1,79 @@
-import React, { FunctionComponent, useMemo, useState } from 'react';
+import React, { FunctionComponent, useCallback, useMemo } from 'react';
 import styles from './styles/generatedConcepts.module.scss';
-import igniteStyles from '../IgniteConcept/styles/igniteConcept.module.scss';
 import Loading from '../../components/Loading';
 
-import {
-  ColumnFiltersState,
-  createColumnHelper,
-  flexRender,
-  getFilteredRowModel,
-  getCoreRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
-import useGeneratedConcepts from './hooks/useGeneratedConcepts';
-import { IConcept } from '../../../libs/api/types';
-import TableCheckBox from '../../components/Tables/TableCheckBox';
-import Icon from '../../components/Icons/Icon/Icon';
+import { flexRender, getFilteredRowModel, getCoreRowModel, useReactTable } from '@tanstack/react-table';
+import useGeneratedConcepts from './generated-concepts.hook';
+
 import IgniteLoading from '../../components/IgniteLoading';
-
-const columnHelper = createColumnHelper<IConcept>();
-
-const defaultIconProps = {
-  stroke: '',
-  width: 20,
-  height: 20,
-};
+import { useGeneratedConceptsColumns } from './table.hook';
+import { useConceptIgnition, useSaveGeneratedConcepts } from '../../hooks/query/concepts.hook';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '../../../routes/routes';
+import Icon from '../../components/Icons/Icon/Icon';
 
 const GeneratedConcepts: FunctionComponent = () => {
+  const navigate = useNavigate();
+
+  const { mutate: igniteConcept, isLoading: isGenerateLoading } = useConceptIgnition();
+  const { mutate: saveConcepts, isLoading: isSaveLoading } = useSaveGeneratedConcepts();
+
   const {
-    isIgniteLoading,
-    isSaveConceptLoading,
     rowSelection,
-    numberSelectedConcepts,
-    generatedConceptData,
-    goalString,
-    generateConcepts,
-    saveNewConcepts,
+    numberOfSelectedConcepts,
+    seed,
+    hasSelectedConcepts,
+    concepts,
+    selectedConcepts,
     setRowSelection,
   } = useGeneratedConcepts();
+  const { columns, columnFilters, setColumnFilters } = useGeneratedConceptsColumns();
 
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-
-  const columns = useMemo(
-    () => [
-      columnHelper.accessor((row) => row?.uuid, {
-        id: 'select',
-        size: 100,
-        header: ({ table }) => (
-          <TableCheckBox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: (event) => {
-                table.getToggleAllPageRowsSelectedHandler()(event);
-              },
-            }}
-          />
-        ),
-        cell: ({ row }) => {
-          return (
-            <TableCheckBox
-              {...{
-                checked: row.getIsSelected(),
-                disabled: !row.getCanSelect(),
-                indeterminate: row.getIsSomeSelected(),
-                onChange: (e) => {
-                  row.getToggleSelectedHandler()(e);
-                },
-              }}
-            />
-          );
+  const handleSaveConcepts = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.preventDefault();
+      saveConcepts(
+        {
+          concepts: selectedConcepts,
+          seed: {
+            attributes: seed.attributes || [],
+            type: seed.type || 'UNKNOWN',
+          },
         },
-      }),
-      columnHelper.accessor('title', {
-        id: 'title',
-        header: () => <span className={styles.details}>Concept Name</span>,
-        size: 1000,
-        cell: (data) => (
-          <div className={styles.details}>
-            <span className={styles.title}>{data.row.original.title}</span>
-            <span className={`${styles.summary} ${styles.cellEllipsis}`}>{data.row.original.description}</span>
-          </div>
-        ),
-      }),
-    ],
-    [],
+        {
+          onSuccess: () => {
+            navigate(`${AppPath.ConceptCategory}?category=draft`);
+          },
+        },
+      );
+    },
+    [navigate, saveConcepts, seed.attributes, seed.type, selectedConcepts],
   );
 
-  const tableData = useMemo(() => generatedConceptData ?? [], [generatedConceptData]);
+  const handleGenerateConcepts = useCallback(
+    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      e.preventDefault();
+      igniteConcept(
+        { attributes: seed.attributes || [], numberOfConcepts: 10, type: seed.type || 'UNKNOWN' },
+        {
+          onSuccess: (response) => {
+            navigate(AppPath.GeneratedConcepts, {
+              state: {
+                concepts: [...concepts, ...response.concepts],
+                seed: {
+                  ...seed,
+                  attributes: response.seed || seed.attributes,
+                },
+              },
+            });
+          },
+        },
+      );
+    },
+    [concepts, igniteConcept, navigate, seed],
+  );
+
+  const tableData = useMemo(() => concepts ?? [], [concepts]);
 
   const table = useReactTable({
     data: tableData,
@@ -108,13 +95,8 @@ const GeneratedConcepts: FunctionComponent = () => {
 
   return (
     <React.Fragment>
-      {isIgniteLoading ? (
-        <div className={igniteStyles.ignite}>
-          <IgniteLoading
-            title='Generating A New Concept'
-            subtitle='This process takes about 10 seconds, please wait.'
-          />
-        </div>
+      {isGenerateLoading ? (
+        <IgniteLoading title='Generating A New Concept' subtitle='This process takes about 10 seconds, please wait.' />
       ) : (
         <div className={styles.generatedConcepts}>
           <div className={styles.headerSection}>
@@ -125,8 +107,8 @@ const GeneratedConcepts: FunctionComponent = () => {
               </span>
             </div>
             <div className={styles.actions}>
-              <button className='btn btn-light' onClick={() => generateConcepts(goalString)}>
-                <Icon variant='refresh' {...defaultIconProps} /> Generate more
+              <button className='btn btn-light' onClick={handleGenerateConcepts}>
+                <Icon variant='refresh' /> Generate more
               </button>
             </div>
           </div>
@@ -144,9 +126,9 @@ const GeneratedConcepts: FunctionComponent = () => {
                 ))}
               </thead>
               {false ? (
-                <div className={styles.tableMessageContainer}>
+                <span className={styles.tableMessageContainer}>
                   <Loading />
-                </div>
+                </span>
               ) : (
                 <tbody>
                   {table.getRowModel().rows.map((row) => (
@@ -163,11 +145,11 @@ const GeneratedConcepts: FunctionComponent = () => {
             </table>
             <div className={styles.footer}>
               <button
-                className='btn btn-primary'
-                disabled={!numberSelectedConcepts || isSaveConceptLoading}
-                onClick={saveNewConcepts}
+                className='btn btn-primary disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600'
+                disabled={!hasSelectedConcepts || isSaveLoading}
+                onClick={handleSaveConcepts}
               >
-                {isSaveConceptLoading ? <Loading isSmall /> : `Save ${numberSelectedConcepts} Concepts`}
+                {isSaveLoading ? <Loading isSmall /> : `Save ${numberOfSelectedConcepts} Concepts`}
               </button>
             </div>
           </div>

@@ -4,5 +4,6 @@
   "endOfLine": "auto",
   "trailingComma": "all",
   "tabWidth": 2,
-  "jsxSingleQuote": true
+  "jsxSingleQuote": true,
+  "plugins": ["prettier-plugin-tailwindcss"]
 }
