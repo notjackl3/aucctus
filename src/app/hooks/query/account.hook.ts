@@ -30,13 +30,6 @@ export const useUserDetails = (enabled: boolean) => {
         setAccount(data.account);
       }
     },
-    onError: (error) => {
-      if (isAxiosError(error)) {
-        if (error.response?.status === 500) {
-          toast.error('Something went wrong. Please try again later.');
-        }
-      }
-    },
   });
 
   const { data } = query;
