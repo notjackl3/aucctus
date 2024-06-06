@@ -7,6 +7,7 @@ on:
 env:
   VITE_AUCCTUS_BASE_RESOURCE_URL: https://resource.app.aucctus.com
   VITE_AUCCTUS_BASE_FAST_URL: https://fast.app.aucctus.com
+  VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
 
 jobs:
   build_and_deploy_job:
