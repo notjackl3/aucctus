@@ -7,7 +7,8 @@ import ConceptDetailCard from '../../components/Cards/ConceptDetailCard/ConceptD
 import ConceptBarChart from '../../components/Charts/ConceptBarChart';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import DashboardInnovationCard from './components/DashboardInnovationCard';
-import { useDashboard, useUserDetails } from '../../hooks/query/account.hook';
+import { useDashboard } from '../../hooks/query/account.hook';
+import { useAppStore } from '../../stores/app.store';
 
 const defaultIconProps = {
   stroke: '#2B3674',
@@ -17,7 +18,7 @@ const defaultIconProps = {
 
 const Dashboard: FunctionComponent = () => {
   const navigate = useNavigate();
-  const { account } = useUserDetails();
+  const { account } = useAppStore();
   const { data } = useDashboard();
 
   return (

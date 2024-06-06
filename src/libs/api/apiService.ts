@@ -10,7 +10,6 @@ import axios, {
 import 'abort-controller/polyfill';
 import analytics from '../analytics';
 import { IAuthSuccessResponse } from './types';
-import { hasTokenExpired, sleep } from '../utils';
 
 export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {
   return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).access;
@@ -60,24 +59,6 @@ export abstract class ApiService {
   }
 
   private async _requestMiddleware(config: InternalAxiosRequestConfig) {
-    const accessToken = this.apiInstance.accessToken;
-
-    // if (!this._shouldSkipRefresh(config.url || '')) {
-    //   try {
-    //     if (accessToken && hasTokenExpired(accessToken)) {
-    //       await sleep(1000 * Math.random());
-    //       if (this.apiInstance.pendingRefresh) {
-    //         await this.apiInstance.pendingRefresh;
-    //       } else {
-    //         await this.apiInstance.refreshToken();
-    //       }
-    //       Object.assign(config || {}, this._handleAccessToken());
-    //     }
-    //   } catch (error) {
-    //     console.error(error);
-    //   }
-    // }
-
     Object.assign(config.headers || {}, this.config.headers);
 
     return config;
@@ -114,7 +95,6 @@ export abstract class ApiService {
           }
 
           analytics.debug('Retrying request after token refresh', config.url);
-
           // Retry the original request
           return this.api.request({
             ...config,

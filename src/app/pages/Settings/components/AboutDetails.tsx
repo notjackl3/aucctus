@@ -8,7 +8,8 @@ import Icon from '../../../components/Icons/Icon/Icon';
 import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading';
 import { IUser } from '../../../../libs/api/types';
-import { useUpdateUser, useUserDetails } from '../../../hooks/query/account.hook';
+import { useUpdateUser } from '../../../hooks/query/account.hook';
+import { useAppStore } from '../../../stores/app.store';
 
 const defaultIconProps = {
   width: 20,
@@ -33,7 +34,7 @@ const TIME_ZONE_OPTIONS = [
 const AboutDetails: FunctionComponent = () => {
   const [isFormDisabled, setIsFormDisabled] = useState(true);
   const { mutate: updateUser, isLoading } = useUpdateUser();
-  const { data } = useUserDetails();
+  const { user } = useAppStore();
   const [aboutForm, setAboutForm] = useState<Partial<IUser>>({
     firstName: undefined,
     lastName: undefined,
@@ -45,10 +46,10 @@ const AboutDetails: FunctionComponent = () => {
   const { firstName, lastName, email, jobTitle, role } = aboutForm;
 
   const resetFormState = () => {
-    if (!data || !data.user) {
+    if (!user) {
       return;
     }
-    const { firstName, lastName, email, jobTitle, role } = data.user;
+    const { firstName, lastName, email, jobTitle, role } = user;
     setAboutForm({
       firstName,
       lastName,
@@ -67,43 +68,43 @@ const AboutDetails: FunctionComponent = () => {
     () => [
       {
         label: 'First Name',
-        value: firstName ?? data?.user.firstName,
+        value: firstName ?? user?.firstName,
         name: 'firstName',
       },
       {
         label: 'Last Name',
-        value: lastName ?? data?.user.lastName,
+        value: lastName ?? user?.lastName,
         name: 'lastName',
       },
     ],
-    [data, firstName, lastName],
+    [user, firstName, lastName],
   );
 
   const userInfo = useMemo(
     () => [
       {
         label: 'Email',
-        value: email ?? data?.user.email,
+        value: email ?? user?.email,
         name: 'email',
         isDisabled: isFormDisabled,
       },
       {
         label: 'Job Title',
-        value: jobTitle ?? data?.user.jobTitle,
+        value: jobTitle ?? user?.jobTitle,
         name: 'jobTitle',
         isDisabled: isFormDisabled,
       },
       {
         label: 'Aucctus Role',
-        value: role ?? data?.user.role,
+        value: role ?? user?.role,
         name: 'role',
         isDisabled: true,
       },
     ],
-    [data, email, jobTitle, role, isFormDisabled],
+    [user, email, jobTitle, role, isFormDisabled],
   );
 
-  return data ? (
+  return user ? (
     <form
       className={styles.aboutDetails}
       onSubmit={(e) => {

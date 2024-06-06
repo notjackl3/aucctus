@@ -12,6 +12,11 @@ import '~global.scss';
 import { AppProvider } from './app/context/AppContextProvider';
 
 const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retry: 0,
+    },
+  },
   queryCache: new QueryCache({
     onError: (error, query) => {
       // 🎉 only show error toasts if we already have data in the cache

@@ -1,4 +1,4 @@
-import create from 'zustand';
+import { create } from 'zustand';
 import CryptoJS from 'crypto-js';
 import api from '../../libs/api';
 
