@@ -2,13 +2,13 @@ import { Outlet, Navigate } from 'react-router-dom';
 import NavDrawer from '../app/components/Navigation/NavDrawer/NavDrawer';
 import { AppPath } from '../routes/routes';
 import styles from './layout.module.scss';
-import { useUserDetails } from '../app/hooks/query/account.hook';
+import { useAppStore } from '../app/stores/app.store';
 
 const Layout = () => {
-  const { account, isLoading: isUserDetailsLoading } = useUserDetails();
+  const { user } = useAppStore();
 
-  if (!account && !isUserDetailsLoading) {
-    return <Navigate to={AppPath.Onboarding} />;
+  if (user && !user.account) {
+    return <Navigate to={AppPath.Onboarding} replace />;
   }
 
   return (

@@ -5,12 +5,12 @@ import NavLink from './NavLink';
 import avatar from '../../../assets/avatar.svg';
 import { AppPath } from '../../../../routes/routes';
 import { useNavigate } from 'react-router-dom';
-import { useUserDetails } from '../../../hooks/query/account.hook';
 import NavButton from './NavButton';
 import { useLogout } from '../../../hooks/query/auth.hook';
+import { useAppStore } from '../../../stores/app.store';
 
 const NavDrawer = () => {
-  const { user, account } = useUserDetails();
+  const { user, account } = useAppStore();
   const { mutate: logout } = useLogout();
 
   const navigate = useNavigate();

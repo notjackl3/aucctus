@@ -1,7 +1,6 @@
 import { AxiosError, isAxiosError } from 'axios';
 import { isError } from 'react-query';
 import { IFormError } from './api/types';
-import analytics from './analytics';
 import { ExpiryTimeNotFoundError, TokenStructureError } from './api/customErrors';
 
 /** Validate Email

@@ -4,39 +4,52 @@ import { AucctusQueryKeys } from './query-keys';
 import { IAccount, IFormError, IRegisterAccount, IUser, IUserDetailsResponse } from '../../../libs/api/types';
 import { AxiosError } from 'axios';
 import { useApp } from '../../context/AppContextProvider';
-import { useLocalStorage, useSessionStorage } from '../utility.hook';
+import { useAppStore } from '../../stores/app.store';
 
 const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
   user: undefined,
   account: undefined,
 };
 
-// TODO: review this hooks enabled logic
-export const useUserDetails = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [initialized, _] = useSessionStorage<boolean>('initialized');
-  const [userDetails, setUserDetails] = useLocalStorage<Partial<IUserDetailsResponse>>('user');
-  const { isAuthenticated } = useApp();
+export const useUserDetails = (enabled: boolean) => {
+  const { setUser, setAccount } = useAppStore();
 
   const query = useQuery({
     queryKey: [AucctusQueryKeys.userDetails],
     queryFn: async () => await api.account.getUser(),
-    cacheTime: 1000 * 60 * 60,
-    staleTime: 1000 * 60 * 60,
+    cacheTime: Infinity,
     refetchOnWindowFocus: false,
-
     retry: false,
-    enabled: !!initialized && isAuthenticated,
-    placeholderData: userDetails || INITIAL_USER_DETAILS,
+    refetchOnMount: false,
+    enabled: enabled,
     onSuccess: (data) => {
-      setUserDetails(data);
+      setUser(data.user);
+
+      if (data.account) {
+        setAccount(data.account);
+      }
     },
   });
 
   const { data } = query;
   const { user, account } = data || INITIAL_USER_DETAILS;
+  const getUserDetails = query.refetch;
 
-  return { ...query, user, account };
+  return { ...query, getUserDetails, user, account };
+};
+
+export const useDashboard = () => {
+  const { isAuthenticated } = useApp();
+  const { account } = useAppStore();
+
+  return useQuery({
+    queryKey: [AucctusQueryKeys.dashboard],
+    queryFn: async () => await api.account.getDashboard(),
+    cacheTime: Infinity,
+    refetchOnMount: false,
+    retry: false,
+    enabled: !!account && isAuthenticated,
+  });
 };
 
 export const useRegisterAccount = () => {
@@ -56,21 +69,5 @@ export const useUpdateUser = () => {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.userDetails] });
     },
-  });
-};
-
-export const useDashboard = () => {
-  const { isAuthenticated } = useApp();
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [userDetails, _] = useLocalStorage<Partial<IUserDetailsResponse>>('user');
-  const { account } = userDetails || INITIAL_USER_DETAILS;
-
-  return useQuery({
-    queryKey: [AucctusQueryKeys.dashboard],
-    queryFn: async () => await api.account.getDashboard(),
-    cacheTime: 1000 * 60 * 60,
-    staleTime: 1000 * 60 * 15,
-    retry: false,
-    enabled: !!account && isAuthenticated,
   });
 };

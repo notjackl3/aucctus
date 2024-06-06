@@ -1,17 +1,14 @@
-import { FunctionComponent, useEffect } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { FunctionComponent } from 'react';
+import { Outlet, Navigate } from 'react-router-dom';
 import { AppPath } from '../routes';
 import { useApp } from '../../app/context/AppContextProvider';
 
 const AuthGuard: FunctionComponent = () => {
-  const navigate = useNavigate();
   const { isAuthenticated } = useApp();
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate(AppPath.Login, { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
+  if (!isAuthenticated) {
+    return <Navigate to={AppPath.Login} replace />;
+  }
 
   return <Outlet />;
 };

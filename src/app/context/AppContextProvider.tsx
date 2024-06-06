@@ -1,11 +1,11 @@
 import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect, useMemo } from 'react';
 import LoadingScreen from '../pages/LoadingScreen';
-import { useSessionStorage } from '../hooks/utility.hook';
-
 import api from '../../libs/api';
 import { useRefresh } from '../hooks/query/auth.hook';
 import { ITokenResponse } from '../../libs/api/types';
 import { useTokenStore } from '../stores/token.store';
+import { useAppStore } from '../stores/app.store';
+import { useUserDetails } from '../hooks/query/account.hook';
 
 interface IAppContext {
   isLoading: boolean;
@@ -33,9 +33,9 @@ interface IAppProviderProps {
 }
 
 export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
+  const { initialized, initializeApp, user } = useAppStore();
   const { clearTokens, access, refresh, retrieveTokens, hasRetrievedTokens } = useTokenStore();
   const [hasSetRefreshTokenAction, setHasSetRefreshTokenAction] = useState<boolean>(false);
-  const [initialized, setInitialized] = useSessionStorage<boolean>('initialized');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const { mutateAsync: refreshAsync, isLoading: isRefreshLoading } = useRefresh();
   const isAuthenticated = useMemo(() => !!refresh && !!access && !!initialized, [refresh, access, initialized]);
@@ -50,6 +50,8 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
     }
   }, []);
 
+  useUserDetails(!!user && isAuthenticated); // Fetch user details if we don't have them and we are authenticated
+
   // First try to retrieve tokens from storage
   useEffect(() => {
     if (!hasRetrievedTokens) {
@@ -60,8 +62,6 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
   // Set the refresh token action for the API
   useEffect(() => {
     if (!hasSetRefreshTokenAction && refreshAsync) {
-      console.log('Setting Refresh Token Action');
-      setHasSetRefreshTokenAction(true);
       api.setRefreshTokenAction(refreshAsync, () => {
         setHasSetRefreshTokenAction(true);
       });
@@ -75,12 +75,12 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
     (async () => {
       if (!initialized && hasSetRefreshTokenAction && hasRetrievedTokens) {
         console.log('App Loaded attempting to refresh token');
-        await api.refreshToken().finally(() => {
-          setInitialized(true);
+        await api.refreshToken().finally(async () => {
+          await initializeApp();
         });
       }
     })();
-  }, [hasSetRefreshTokenAction, initialized, hasRetrievedTokens, setInitialized]);
+  }, [hasSetRefreshTokenAction, initialized, hasRetrievedTokens, initializeApp]);
 
   useEffect(() => {
     showLoading(!initialized || isRefreshLoading);

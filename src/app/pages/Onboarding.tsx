@@ -7,10 +7,11 @@ import InputField from '../components/Text/InputField/InputField';
 import { validDomain } from '../../libs/utils';
 import { Navigate } from 'react-router-dom';
 import { AppPath } from '../../routes/routes';
-import { useRegisterAccount, useUserDetails } from '../hooks/query/account.hook';
+import { useRegisterAccount } from '../hooks/query/account.hook';
+import { useAppStore } from '../stores/app.store';
 
 const OnBoarding: FunctionComponent = () => {
-  const { user } = useUserDetails();
+  const { user } = useAppStore();
   const { mutate: registerAccount } = useRegisterAccount();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');
@@ -43,7 +44,7 @@ const OnBoarding: FunctionComponent = () => {
   );
 
   if (user && user.account) {
-    return <Navigate to={AppPath.Home} />;
+    return <Navigate to={AppPath.Home} replace />;
   }
 
   return (
