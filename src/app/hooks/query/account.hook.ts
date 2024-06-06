@@ -2,10 +2,9 @@ import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../libs/api';
 import { AucctusQueryKeys } from './query-keys';
 import { IAccount, IFormError, IRegisterAccount, IUser, IUserDetailsResponse } from '../../../libs/api/types';
-import { AxiosError, isAxiosError } from 'axios';
+import { AxiosError } from 'axios';
 import { useApp } from '../../context/AppContextProvider';
 import { useAppStore } from '../../stores/app.store';
-import { toast } from 'react-toastify';
 
 const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
   user: undefined,
