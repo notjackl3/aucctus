@@ -9,7 +9,6 @@ import { toast } from 'react-toastify';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
-import { AuthProvider } from './app/context/AuthContextProvider';
 import { AppProvider } from './app/context/AppContextProvider';
 
 const queryClient = new QueryClient({
@@ -29,13 +28,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <AppProvider>
-            <ModalProvider>
-              <App />
-            </ModalProvider>
-          </AppProvider>
-        </AuthProvider>
+        <AppProvider>
+          <ModalProvider>
+            <App />
+          </ModalProvider>
+        </AppProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>,

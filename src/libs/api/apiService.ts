@@ -28,6 +28,11 @@ export interface IApiServiceConfig {
   logout?: () => void | Promise<void>;
 }
 
+// Extend AxiosRequestConfig to include the _retry property
+interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
+  _retry?: boolean;
+}
+
 export abstract class ApiService {
   apiInstance: Api;
   api: AxiosInstance;
@@ -57,21 +62,21 @@ export abstract class ApiService {
   private async _requestMiddleware(config: InternalAxiosRequestConfig) {
     const accessToken = this.apiInstance.accessToken;
 
-    if (!this._shouldSkipRefresh(config.url || '')) {
-      try {
-        if (accessToken && hasTokenExpired(accessToken)) {
-          await sleep(1000 * Math.random());
-          if (this.apiInstance.pendingRefresh) {
-            await this.apiInstance.pendingRefresh;
-          } else {
-            await this.apiInstance.refreshToken();
-          }
-          Object.assign(config || {}, this._handleAccessToken());
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
+    // if (!this._shouldSkipRefresh(config.url || '')) {
+    //   try {
+    //     if (accessToken && hasTokenExpired(accessToken)) {
+    //       await sleep(1000 * Math.random());
+    //       if (this.apiInstance.pendingRefresh) {
+    //         await this.apiInstance.pendingRefresh;
+    //       } else {
+    //         await this.apiInstance.refreshToken();
+    //       }
+    //       Object.assign(config || {}, this._handleAccessToken());
+    //     }
+    //   } catch (error) {
+    //     console.error(error);
+    //   }
+    // }
 
     Object.assign(config.headers || {}, this.config.headers);
 
@@ -97,7 +102,10 @@ export abstract class ApiService {
     const url = error && error.config && error.config.url;
     if (url && LOGOUT_STATUSES.includes(status) && !this._shouldSkipRefresh(url)) {
       try {
-        if (error.config) {
+        const config = error.config as ExtendedAxiosRequestConfig;
+        if (config && !config._retry) {
+          config._retry = true; // This is required to prevent infinite loops
+
           // Attempt to refresh the token
           if (this.apiInstance.pendingRefresh) {
             await this.apiInstance.pendingRefresh;
@@ -105,10 +113,11 @@ export abstract class ApiService {
             await this.apiInstance.refreshToken();
           }
 
-          analytics.debug('Retrying request after token refresh', error.config.url);
+          analytics.debug('Retrying request after token refresh', config.url);
+
           // Retry the original request
           return this.api.request({
-            ...error.config,
+            ...config,
             ...this._handleAccessToken(),
             withCredentials: true,
           } as AxiosRequestConfig);
@@ -118,11 +127,6 @@ export abstract class ApiService {
         this.apiInstance.logout();
         return Promise.reject(err);
       }
-    }
-
-    if (axios.isAxiosError(error)) {
-      const method = error.config && error.config.method ? `[${error.config.method.toUpperCase()}]` : '';
-      analytics.error(`Api Error: ${method} ${error.name}`, error);
     }
 
     return Promise.reject(error);

@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import { AucctusStorage, AucctusStorageEvent, StorageKeys } from '../../libs/localStorage';
-import analytics from '../../libs/analytics';
 
 /**
  * Returns the previous value of the given state.

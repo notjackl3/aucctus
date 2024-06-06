@@ -84,6 +84,7 @@ export class Api {
   setRefreshTokenAction(action: () => Promise<ITokenResponse | undefined>, callback?: () => void) {
     this._refreshTokenAction = action;
     if (callback) {
+      console.log('Setting callback');
       callback();
     }
   }

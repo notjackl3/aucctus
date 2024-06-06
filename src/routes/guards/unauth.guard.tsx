@@ -4,11 +4,11 @@ import styles from '../../app/assets/styles/pages/auth-screens.module.scss';
 import Footer from '../../app/components/Auth/Footer/Footer';
 import AuthHeader from '../../app/components/Header/AuthHeader/AuthHeader';
 import IntoSection from '../../app/components/Auth/IntoSection';
-import { useAuth } from '../../app/context/AuthContextProvider';
 import { AppPath } from '../routes';
+import { useApp } from '../../app/context/AppContextProvider';
 
 const UnauthGuard: FunctionComponent = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated } = useApp();
   const navigate = useNavigate();
 
   useEffect(() => {

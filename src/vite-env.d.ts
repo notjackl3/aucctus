@@ -4,6 +4,7 @@
 interface ImportMetaEnv {
   readonly VITE_AUCCTUS_BASE_RESOURCE_URL: string;
   readonly VITE_AUCCTUS_BASE_FAST_URL: string;
+  readonly VITE_SECRET_KEY: string;
 }
 
 interface ImportMeta {

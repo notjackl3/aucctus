@@ -7,9 +7,12 @@ import {
   IUpdateForgottenPasswordRequest,
   IServerErrorMessage,
   IRegisterUser,
+  ITokenResponse,
+  IAuthSuccessResponse,
 } from '../../../libs/api/types';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
+import { useTokenStore } from '../../stores/token.store';
 
 export const useSignUp = () => {
   const navigate = useNavigate();
@@ -48,6 +51,59 @@ export const useConfirmEmail = () => {
     mutationFn: async (token: string) => await api.auth.confirmEmail(token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: AucctusQueryKeys.userDetails });
+    },
+  });
+};
+
+export const useRefresh = () => {
+  const { clearTokens: clear, refresh, storeTokens } = useTokenStore();
+
+  return useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, void, unknown>({
+    mutationFn: async () => {
+      if (!refresh) {
+        return Promise.reject();
+      }
+      return await api.auth.refreshToken(refresh);
+    },
+    onSuccess: (response) => {
+      storeTokens(response.access, response.refresh);
+    },
+    onError: (error) => {
+      console.error('Error refreshing token (App)', error);
+
+      // Remove tokens if refresh fails
+      clear();
+    },
+  });
+};
+
+export const useLogout = () => {
+  const { clearTokens: clear, access } = useTokenStore();
+
+  return useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, void, unknown>({
+    mutationFn: async () => await api.auth.logout(access),
+    onSettled: () => {
+      // Clear tokens on logout
+      clear();
+    },
+  });
+};
+
+export const useLogin = () => {
+  const navigate = useNavigate();
+  const { storeTokens } = useTokenStore();
+
+  return useMutation<
+    IAuthSuccessResponse,
+    AxiosError<IServerErrorMessage>,
+    { email: string; password: string },
+    unknown
+  >({
+    mutationFn: async (credentials) => await api.auth.login(credentials.email, credentials.password),
+    onSuccess: (response) => {
+      storeTokens(response.access, response.refresh);
+      console.log('Login success');
+      navigate(AppPath.Home, { replace: true });
     },
   });
 };

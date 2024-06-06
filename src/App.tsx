@@ -21,7 +21,7 @@ function App() {
               <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
               <Route element={<Layout />}>
                 <Route index path={AppPath.Home} element={<Page.Dashboard />} />
-                {/* Concepts */}
+
                 <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
                 <Route path={AppPath.ConceptSnapshot} element={<Page.ConceptSnapshot />} />
                 <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
@@ -34,7 +34,7 @@ function App() {
                   <Route path={ConceptPath.CustomerProfile} element={<Page.ConceptPages.CustomerProfile />} />
                   <Route path={ConceptPath.KeyAssumptions} element={<Page.ConceptPages.KeyAssumptions />} />
                 </Route>
-                {/* Settings */}
+
                 <Route path={AppPath.Settings} element={<Page.SettingsPages.Settings />}>
                   <Route index path={AppPath.SettingsAbout} element={<Page.SettingsPages.AboutDetails />} />
                   <Route index path={AppPath.SettingsSecurity} element={<Page.SettingsPages.SecurityDetails />} />

@@ -7,11 +7,11 @@ import { AppPath } from '../../../../routes/routes';
 import { useNavigate } from 'react-router-dom';
 import { useUserDetails } from '../../../hooks/query/account.hook';
 import NavButton from './NavButton';
-import { useAuth } from '../../../context/AuthContextProvider';
+import { useLogout } from '../../../hooks/query/auth.hook';
 
 const NavDrawer = () => {
   const { user, account } = useUserDetails();
-  const { logout } = useAuth();
+  const { mutate: logout } = useLogout();
 
   const navigate = useNavigate();
 
@@ -76,7 +76,7 @@ const NavDrawer = () => {
               icon='logout'
               onClick={(e) => {
                 e.preventDefault();
-                logout.mutate();
+                logout();
               }}
             />
           </div>
