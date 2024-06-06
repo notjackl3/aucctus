@@ -76,6 +76,7 @@ export const useTokenStore = create<TokenStore>((set, get) => ({
    * Clears the tokens from local storage and resets the state.
    */
   clearTokens: () => {
+    console.log('Clearing tokens');
     localStorage.removeItem(StorageKeys.acc);
     localStorage.removeItem(StorageKeys.ref);
     set({ access: undefined, refresh: undefined });
@@ -98,7 +99,7 @@ export const useTokenStore = create<TokenStore>((set, get) => ({
       const accessParts = splitIntoThree(encryptedAccess);
       const refreshParts = splitIntoThree(encryptedRefresh);
 
-      localStorage.setItem(StorageKeys.acc, JSON.stringify(accessParts));
+      sessionStorage.setItem(StorageKeys.acc, JSON.stringify(accessParts));
       localStorage.setItem(StorageKeys.ref, JSON.stringify(refreshParts));
 
       get().setTokens(access, refresh);
@@ -113,7 +114,7 @@ export const useTokenStore = create<TokenStore>((set, get) => ({
    */
   retrieveTokens: () => {
     try {
-      const accessPartsString = localStorage.getItem(StorageKeys.acc);
+      const accessPartsString = sessionStorage.getItem(StorageKeys.acc);
       const refreshPartsString = localStorage.getItem(StorageKeys.ref);
 
       if (accessPartsString && refreshPartsString) {

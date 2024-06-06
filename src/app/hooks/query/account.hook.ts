@@ -24,10 +24,7 @@ export const useUserDetails = (enabled: boolean) => {
     enabled: enabled,
     onSuccess: (data) => {
       setUser(data.user);
-
-      if (data.account) {
-        setAccount(data.account);
-      }
+      setAccount(data.account);
     },
   });
 
@@ -39,7 +36,6 @@ export const useUserDetails = (enabled: boolean) => {
 };
 
 export const useDashboard = () => {
-  const { isAuthenticated } = useApp();
   const { account } = useAppStore();
 
   return useQuery({
@@ -48,7 +44,7 @@ export const useDashboard = () => {
     cacheTime: Infinity,
     refetchOnMount: false,
     retry: false,
-    enabled: !!account && isAuthenticated,
+    enabled: true,
   });
 };
 
