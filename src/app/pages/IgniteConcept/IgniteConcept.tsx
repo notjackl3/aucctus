@@ -22,9 +22,18 @@ const IgniteConcept: FunctionComponent = () => {
   const [newOpportunities, setNewOpportunities] = useState<ConceptIgnitionInput[]>(INITIAL_NEW_OPPORTUNITY);
 
   const handleIgnition = useCallback(
-    (attributes: IConceptSeedAttribute[], type: ConceptSeedType, numberOfConcepts: number = 10) => {
+    (attributes: ConceptIgnitionInput[], type: ConceptSeedType, numberOfConcepts: number = 10) => {
+      // Remove extra properties from the attributes
+      const cleanAttributes = attributes.map(
+        (attribute) =>
+          ({
+            question: attribute.question,
+            answer: attribute.answer,
+          }) as IConceptSeedAttribute,
+      );
+
       igniteConcept(
-        { attributes, numberOfConcepts, type },
+        { attributes: cleanAttributes, numberOfConcepts, type },
         {
           onSuccess: (data) => {
             // Navigate to the generated concepts page with the generated concepts and seed

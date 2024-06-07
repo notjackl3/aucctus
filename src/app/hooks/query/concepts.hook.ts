@@ -54,6 +54,16 @@ export const useConcepts = (category?: ConceptCategory, status?: ConceptStatus, 
   });
 };
 
+export const useConceptSeed = (uuid: string) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.conceptSeed, AucctusQueryKeys.concept, uuid],
+    cacheTime: Infinity,
+    staleTime: 100 * 60, // 1 minute
+    enabled: !!uuid,
+    queryFn: async () => await api.concept.seed(uuid),
+  });
+};
+
 /**
  * Custom hook for fetching a concept by UUID.
  * @param uuid - The UUID of the concept to fetch.
@@ -99,7 +109,10 @@ export const useSaveGeneratedConcepts = () => {
 export const useConceptIgnition = () => {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (body: IIgniteConceptBody) => await api.conceptIgnite.ignite(body),
+    mutationFn: async (body: IIgniteConceptBody) => {
+      console.log('##', body);
+      return await api.conceptIgnite.ignite(body);
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
     },

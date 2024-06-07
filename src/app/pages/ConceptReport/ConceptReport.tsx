@@ -30,6 +30,7 @@ export const CONCEPT_TABS = [
   { label: 'Financial Projection', value: AppPath.ConceptFinancialProjection },
   { label: 'Customer Profile', value: AppPath.ConceptCustomerProfile },
   { label: 'Key Assumptions', value: AppPath.ConceptKeyAssumptions },
+  // { label: 'Settings', value: AppPath.ConceptSettings },
 ];
 
 const defaultIconProps = {

@@ -32,7 +32,7 @@ const OverviewDetails: FunctionComponent = () => {
   const { navigateToTab } = useOutletContext<IConceptReportContext>();
   const { overview } = useConceptOverview(conceptId);
   const { assumptions } = useConceptAssumptions(conceptId);
-  const valuePropositionEdit = useEditOverview();
+  const { valueProposition, problemStatement } = useEditOverview();
   const descriptionEdit = useEditConcept();
 
   const firstCustomerPersona = useMemo(() => {
@@ -80,13 +80,13 @@ const OverviewDetails: FunctionComponent = () => {
             <h3>Value Proposition</h3>
             <EditModeSwitcher
               containerClassName={styles.textBlock}
-              value={valuePropositionEdit.value}
+              value={valueProposition.value}
               label=''
               name='valueProposition'
-              maxLength={valuePropositionEdit.validation.maxLength}
-              onChange={valuePropositionEdit.handleChange}
-              handleSave={valuePropositionEdit.handleSave}
-              handleCancel={valuePropositionEdit.handleCancel}
+              maxLength={valueProposition.validation.maxLength}
+              onChange={valueProposition.handleChange}
+              handleSave={valueProposition.handleSave}
+              handleCancel={valueProposition.handleCancel}
             />
           </div>
           <div className={styles.detailBlock}>
@@ -101,6 +101,21 @@ const OverviewDetails: FunctionComponent = () => {
               handleCancel={descriptionEdit.handleCancel}
             />
           </div>
+
+          {overview?.problemStatement ? (
+            <div className={styles.detailBlock}>
+              <h3>Problem Statement</h3>
+              <EditModeSwitcher
+                value={problemStatement.value}
+                label=''
+                name='description'
+                maxLength={problemStatement.validation.maxLength}
+                onChange={problemStatement.handleChange}
+                handleSave={problemStatement.handleSave}
+                handleCancel={problemStatement.handleCancel}
+              />
+            </div>
+          ) : null}
         </div>
         <div className={styles.rightColumn}>
           <div className={styles.listSection}>

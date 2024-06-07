@@ -6,16 +6,18 @@ import AuthHeader from '../../app/components/Header/AuthHeader/AuthHeader';
 import IntoSection from '../../app/components/Auth/IntoSection';
 import { AppPath } from '../routes';
 import { useApp } from '../../app/context/AppContextProvider';
+import { useIsUnauthRoute } from '../../app/hooks/router.hook';
 
 const UnauthGuard: FunctionComponent = () => {
   const { isAuthenticated } = useApp();
+  const isUnAuthRoute = useIsUnauthRoute();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (isAuthenticated && isUnAuthRoute) {
       navigate(AppPath.Home, { replace: true });
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, isUnAuthRoute]);
 
   return (
     <div className={`${styles.authContainer}`}>

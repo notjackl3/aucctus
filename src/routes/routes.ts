@@ -1,3 +1,13 @@
+/* Concept Details */
+export enum ConceptPath {
+  Overview = 'overview',
+  MarketScan = 'market-scan',
+  FinancialProjection = 'financial-projection',
+  CustomerProfile = 'customer-profile',
+  KeyAssumptions = 'key-assumptions',
+  ConceptSettings = 'settings',
+}
+
 export enum AppPath {
   Home = '/',
   Onboarding = '/onboarding',
@@ -8,11 +18,12 @@ export enum AppPath {
   Concept = '/concept',
   ConceptCategory = '/concept',
   ConceptOverview = '/concept/:id/',
-  ConceptCustomerProfile = '/concept/:id/customer-profile',
-  ConceptFinancialProjection = '/concept/:id/financial-projection',
-  ConceptKeyAssumptions = '/concept/:id/key-assumptions',
-  ConceptMarketScan = '/concept/:id/market-scan',
-  ConceptSnapshot = '/concept/snapshot',
+  ConceptCustomerProfile = `/concept/:id/${ConceptPath.CustomerProfile}`,
+  ConceptFinancialProjection = `/concept/:id/${ConceptPath.FinancialProjection}`,
+  ConceptKeyAssumptions = `/concept/:id/${ConceptPath.KeyAssumptions}`,
+  ConceptMarketScan = `/concept/:id/${ConceptPath.MarketScan}`,
+  ConceptSettings = `/concept/:id/${ConceptPath.ConceptSettings}`,
+  ConceptSnapshot = `/concept/snapshot`,
 
   /* Domain */
   IgniteDomain = '/domain/ignite',
@@ -48,12 +59,3 @@ export const UNAUTH_ROUTES = [
   AppPath.ResetPassword,
   AppPath.ResetPasswordSuccess,
 ];
-
-/* Concept Details */
-export enum ConceptPath {
-  Overview = 'overview',
-  MarketScan = 'market-scan',
-  FinancialProjection = 'financial-projection',
-  CustomerProfile = 'customer-profile',
-  KeyAssumptions = 'key-assumptions',
-}

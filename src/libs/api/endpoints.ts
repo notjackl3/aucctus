@@ -50,6 +50,7 @@ export const endpoints = {
   },
   conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
   conceptReportRetry: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/retry`,
+  conceptSeed: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/seed`,
 
   conceptOverview: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/overview`,
   conceptOverviewUuid: (overviewUuid: string) => `api/v1/concept/overview/${overviewUuid}`,

@@ -72,6 +72,7 @@ export interface IConceptSeed extends IConceptSeedBase, Omit<IBaseConceptEntity,
 
 export interface IConceptOverview extends IBaseConceptEntity {
   valueProposition: string;
+  problemStatement?: string;
   industries: string[];
   trendsAndDrivers?: string[];
   persona?: ICustomerProfile;

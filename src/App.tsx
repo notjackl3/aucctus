@@ -33,6 +33,7 @@ function App() {
                   <Route path={ConceptPath.FinancialProjection} element={<Page.ConceptPages.FinancialProjection />} />
                   <Route path={ConceptPath.CustomerProfile} element={<Page.ConceptPages.CustomerProfile />} />
                   <Route path={ConceptPath.KeyAssumptions} element={<Page.ConceptPages.KeyAssumptions />} />
+                  <Route path={ConceptPath.ConceptSettings} element={<Page.ConceptPages.ConceptSettings />} />
                 </Route>
 
                 <Route path={AppPath.Settings} element={<Page.SettingsPages.Settings />}>
