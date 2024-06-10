@@ -73,6 +73,9 @@ module.exports = {
         '2xl': '2rem',
         full: '9999px',
       },
+      blur: {
+        xs: '2px',
+      },
     },
   },
   plugins: [],

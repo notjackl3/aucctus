@@ -112,7 +112,6 @@ export const useLogin = () => {
     mutationFn: async (credentials) => await api.auth.login(credentials.email, credentials.password),
     onSuccess: (response) => {
       storeTokens(response.access, response.refresh);
-      console.log('Login success');
       navigate(AppPath.Home, { replace: true });
     },
   });

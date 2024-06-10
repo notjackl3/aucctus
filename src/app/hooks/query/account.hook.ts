@@ -3,7 +3,6 @@ import api from '../../../libs/api';
 import { AucctusQueryKeys } from './query-keys';
 import { IAccount, IFormError, IRegisterAccount, IUser, IUserDetailsResponse } from '../../../libs/api/types';
 import { AxiosError } from 'axios';
-import { useApp } from '../../context/AppContextProvider';
 import { useAppStore } from '../../stores/app.store';
 
 const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
@@ -36,8 +35,6 @@ export const useUserDetails = (enabled: boolean) => {
 };
 
 export const useDashboard = () => {
-  const { account } = useAppStore();
-
   return useQuery({
     queryKey: [AucctusQueryKeys.dashboard],
     queryFn: async () => await api.account.getDashboard(),

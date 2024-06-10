@@ -2,7 +2,12 @@ import { ConceptSeedType } from './api/types';
 
 export const HELP_EMAIL = 'help@aucctus.com';
 
-// TODO: Add typings to records
+/**
+ * Make sure that if any changes are made to the questions here that changes are also made in the backend.
+ * You can find the backend questions in the `libs/base/aucctus/base/concepts/ignitions.py` file.
+ *
+ */
+
 export const EXPAND_AN_EXISTING_IDEA_QUESTIONS: Record<string, string> = {
   DESCRIBE: 'Describe your idea in one sentence',
   PROBLEM: 'What problem does your idea solve?',
@@ -12,7 +17,7 @@ export const EXPAND_AN_EXISTING_IDEA_QUESTIONS: Record<string, string> = {
 
 export const IDENTIFY_NEW_OPPORTUNITIES_QUESTIONS: Record<string, string> = {
   TARGET: 'What industry are you targeting?',
-  PROBLEM: 'What customer problems do you wish to solve?',
+  PROBLEM: 'Who are you targeting and what problems need to be solved?',
   INTEREST: 'Why is your company interested in this?',
   SUCCESS: 'What will success look like?',
 };

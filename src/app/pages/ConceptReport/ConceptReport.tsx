@@ -30,7 +30,7 @@ export const CONCEPT_TABS = [
   { label: 'Financial Projection', value: AppPath.ConceptFinancialProjection },
   { label: 'Customer Profile', value: AppPath.ConceptCustomerProfile },
   { label: 'Key Assumptions', value: AppPath.ConceptKeyAssumptions },
-  // { label: 'Settings', value: AppPath.ConceptSettings },
+  { label: 'Context', value: AppPath.ConceptSettings },
 ];
 
 const defaultIconProps = {
@@ -71,7 +71,7 @@ const ConceptReport: FunctionComponent = () => {
   );
 
   return (
-    <div className={`${styles.conceptOverview} ${styles.slideAnimation}`}>
+    <div className={`h-full ${styles.conceptOverview} ${styles.slideAnimation}`}>
       <div className={styles.headerSection}>
         <div className={styles.header}>
           <h1>{concept?.title}</h1>
@@ -99,7 +99,12 @@ const ConceptReport: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.contentContainer}>
-        <TabView className={styles.tabs} tabs={CONCEPT_TABS} onTabSelect={onTabSelect} activeTab={activeTab || ''}>
+        <TabView
+          className={styles.tabs}
+          tabs={CONCEPT_TABS.filter((v) => !(v.label === 'Context' && !concept?.seed))}
+          onTabSelect={onTabSelect}
+          activeTab={activeTab || ''}
+        >
           <Outlet
             context={{
               navigateToTab: onTabSelect,

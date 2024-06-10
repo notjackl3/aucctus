@@ -55,13 +55,18 @@ export const useConcepts = (category?: ConceptCategory, status?: ConceptStatus, 
 };
 
 export const useConceptSeed = (uuid: string) => {
-  return useQuery({
+  const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeed, AucctusQueryKeys.concept, uuid],
     cacheTime: Infinity,
     staleTime: 100 * 60, // 1 minute
     enabled: !!uuid,
     queryFn: async () => await api.concept.seed(uuid),
   });
+
+  return {
+    ...query,
+    seed: query.data || { attributes: [], type: 'UNKNOWN', createdBy: '', uuid: '', createdAt: '', updatedAt: '' },
+  };
 };
 
 /**
