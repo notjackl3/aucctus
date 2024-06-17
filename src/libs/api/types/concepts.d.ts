@@ -34,6 +34,7 @@ export interface IBaseConceptEntity {
 }
 
 export interface IGeneratedConcept {
+  uuid: string;
   title: string;
   description: string;
 }
@@ -53,9 +54,11 @@ export interface IConcept extends IBaseConceptEntity, IGeneratedConcept {
   createdBy: string;
 }
 type ConceptSeedType = 'EXPAND_AN_EXISTING_IDEA' | 'IDENTIFY_NEW_OPPORTUNITIES' | 'UNKNOWN';
-type ExpandAnExistingIdeaQuestionKeys = 'DESCRIBE' | 'PROBLEM' | 'CUSTOMER' | 'SUCCESS';
-type IdentifyNewOpportunitiesQuestionKeys = 'TARGET' | 'PROBLEM' | 'INTEREST' | 'SUCCESS';
-type IgniteConceptQuestionKeys = ExpandAnExistingIdeaQuestionKeys | IdentifyNewOpportunitiesQuestionKeys;
+// Expand an existing idea
+type EEIQuestionKeys = 'DESCRIBE' | 'PROBLEM' | 'CUSTOMER' | 'SUCCESS';
+// Identify new opportunities
+type INOQuestionKeys = 'TARGET' | 'PROBLEM' | 'INTEREST' | 'SUCCESS';
+type IgniteConceptQuestionKeys = EEIQuestionKeys | INOQuestionKeys;
 
 export interface IConceptSeedAttribute<T = IgniteConceptQuestionKeys> {
   question: T;

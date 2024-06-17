@@ -84,7 +84,11 @@ export class ConceptApi extends ApiService {
   }
 
   saveGeneratedConcepts(body: IGeneratedConceptsSaveBody) {
-    return this.post<IConcept[], IGeneratedConceptsSaveBody>(endpoints.saveGeneratedConcepts, body);
+    return this.post<IConcept[], IGeneratedConceptsSaveBody>(endpoints.saveGeneratedConcepts, body, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
   }
 
   getConcepts(options?: IConceptQueryOptions) {

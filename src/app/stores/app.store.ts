@@ -15,13 +15,12 @@ interface AppStoreState {
 
 export const useAppStore = create<AppStoreState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: undefined,
       account: undefined,
       initialized: false,
       serverError: true,
       setUser: (user) => {
-        console.log('setUser', user);
         set({ user });
       },
       setAccount: (account) => set({ account }),

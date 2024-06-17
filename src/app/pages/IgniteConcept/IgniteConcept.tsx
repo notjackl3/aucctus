@@ -4,48 +4,135 @@ import ConceptIgnitionCard from '../../components/Cards/FormCard/ConceptIgnition
 import images from '../../assets/img';
 import TextArea from '../../components/Text/TextArea/TextArea';
 import Icon from '../../components/Icons/Icon/Icon';
-import { ConceptIgnitionInput, INITIAL_EXPANDING_IDEA, INITIAL_NEW_OPPORTUNITY } from './constants';
 import InputField from '../../components/Text/InputField/InputField';
-import { ConceptSeedType, IConceptSeedAttribute } from '../../../libs/api/types';
+import { ConceptSeedType, EEIQuestionKeys, IConceptSeedAttribute, INOQuestionKeys } from '../../../libs/api/types';
 import { toast } from 'react-toastify';
 import IgniteLoading from '../../components/IgniteLoading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import WhiteSpaceSuggestion from '../../components/WhiteSpaceSuggestions';
-import { IGeneratedConceptsState } from '../GeneratedConcepts/generated-concepts.hook';
-import { CONCEPT_SEED_TYPE_QUESTIONS } from '../../../libs/constants';
+import { useConceptGenerationStore } from '../../stores/concept-generation.store';
+
+const INITIAL_EXPANDING_IDEA: IConceptSeedAttribute<EEIQuestionKeys>[] = [
+  { question: 'DESCRIBE', answer: '' },
+  { question: 'PROBLEM', answer: '' },
+  { question: 'CUSTOMER', answer: '' },
+  { question: 'SUCCESS', answer: '' },
+];
+const INITIAL_NEW_OPPORTUNITY: IConceptSeedAttribute<INOQuestionKeys>[] = [
+  { question: 'TARGET', answer: '' },
+  { question: 'PROBLEM', answer: '' },
+  { question: 'INTEREST', answer: '' },
+  { question: 'SUCCESS', answer: '' },
+];
+
+export interface ConceptIgnitionInput {
+  question: string;
+  placeholder: string;
+  rows?: number;
+  fieldType: 'input' | 'textarea';
+}
+
+export const EXPANDING_IDEA_INPUT_MAP: Record<EEIQuestionKeys, ConceptIgnitionInput> = {
+  DESCRIBE: {
+    question: 'Describe your idea in one sentence',
+    placeholder: 'I want to leverage our network of retail stores to deliver healthcare services',
+    rows: 2,
+    fieldType: 'textarea',
+  },
+  PROBLEM: {
+    question: 'What problem does your idea solve?',
+    placeholder: 'Busy customers lack healthcare access and the time to juggle their to-do list.',
+    rows: 2,
+    fieldType: 'textarea',
+  },
+  CUSTOMER: {
+    question: 'Who might your customers be?',
+    placeholder: 'Time-strapped consumers in suburban areas who need to maximize time.',
+    rows: 2,
+    fieldType: 'textarea',
+  },
+  SUCCESS: {
+    question: 'What will success look like?',
+    placeholder: '$15M in new revenue in 24 months.',
+    rows: 1,
+    fieldType: 'textarea',
+  },
+};
+
+export const NEW_OPPORTUNITY_INPUT_MAP: Record<INOQuestionKeys, ConceptIgnitionInput> = {
+  TARGET: {
+    question: 'What industry are you targeting?',
+    placeholder: 'Healthcare services',
+    fieldType: 'input',
+  },
+  PROBLEM: {
+    question: 'Who are you targeting and what problems need to be solved?',
+    placeholder: 'Customers struggle to be assigned a family doctor and access care quickly',
+    rows: 2,
+    fieldType: 'textarea',
+  },
+  INTEREST: {
+    question: 'Why is your company interested in this?',
+    placeholder: 'We have broad reach across the country and have experience training workforces',
+    rows: 3,
+    fieldType: 'textarea',
+  },
+  SUCCESS: {
+    question: 'What will success look like?',
+    placeholder: 'Create a new revenue stream and increase customer satisfaction by 10%',
+    rows: 2,
+    fieldType: 'textarea',
+  },
+};
+
+type ConceptSeedTypeMap = {
+  EXPAND_AN_EXISTING_IDEA: typeof EXPANDING_IDEA_INPUT_MAP;
+  IDENTIFY_NEW_OPPORTUNITIES: typeof NEW_OPPORTUNITY_INPUT_MAP;
+  UNKNOWN: never;
+};
+
+const CONCEPT_SEED_TYPE_QUESTIONS: ConceptSeedTypeMap = {
+  EXPAND_AN_EXISTING_IDEA: EXPANDING_IDEA_INPUT_MAP,
+  IDENTIFY_NEW_OPPORTUNITIES: NEW_OPPORTUNITY_INPUT_MAP,
+  UNKNOWN: undefined as never,
+};
+
+// Define the type for the renderIgnitionInput function
+type RenderIgnitionInput = <T extends ConceptSeedType = ConceptSeedType>(
+  type: T,
+  item: IConceptSeedAttribute<keyof ConceptSeedTypeMap[T]>,
+  index: number,
+  setter: React.Dispatch<React.SetStateAction<IConceptSeedAttribute<keyof ConceptSeedTypeMap[T]>[]>>,
+) => JSX.Element | null;
 
 const IgniteConcept: FunctionComponent = () => {
   const navigate = useNavigate();
   const { mutate: igniteConcept, isLoading } = useConceptIgnition();
-  const [expandingIdea, setExpandingIdea] = useState<ConceptIgnitionInput[]>(INITIAL_EXPANDING_IDEA);
-  const [newOpportunities, setNewOpportunities] = useState<ConceptIgnitionInput[]>(INITIAL_NEW_OPPORTUNITY);
+  const [expandingIdea, setExpandingIdea] = useState<IConceptSeedAttribute<EEIQuestionKeys>[]>(
+    JSON.parse(JSON.stringify(INITIAL_EXPANDING_IDEA)),
+  );
+  const [newOpportunities, setNewOpportunities] = useState<IConceptSeedAttribute<INOQuestionKeys>[]>(
+    JSON.parse(JSON.stringify(INITIAL_NEW_OPPORTUNITY)),
+  );
+  const { setSeed, setGeneratedConcepts } = useConceptGenerationStore();
 
   const handleIgnition = useCallback(
-    (attributes: ConceptIgnitionInput[], type: ConceptSeedType, numberOfConcepts: number = 10) => {
-      // Remove extra properties from the attributes
-      const cleanAttributes = attributes.map(
-        (attribute) =>
-          ({
-            question: attribute.question,
-            answer: attribute.answer,
-          }) as IConceptSeedAttribute,
-      );
-
+    (
+      attributes: IConceptSeedAttribute<EEIQuestionKeys | INOQuestionKeys>[],
+      type: ConceptSeedType,
+      numberOfConcepts: number = 10,
+    ) => {
       igniteConcept(
-        { attributes: cleanAttributes, numberOfConcepts, type },
+        { attributes: attributes, numberOfConcepts, type },
         {
           onSuccess: (data) => {
-            // Navigate to the generated concepts page with the generated concepts and seed
-            const locationState: IGeneratedConceptsState = {
-              concepts: data.concepts,
-              seed: {
-                attributes: data.seed || attributes,
-                type: type,
-              },
-            };
-
-            navigate(AppPath.GeneratedConcepts, { state: locationState });
+            setSeed({
+              attributes: data.seed || attributes,
+              type: type,
+            });
+            setGeneratedConcepts(data.concepts);
+            navigate(AppPath.GeneratedConcepts);
           },
           onError: () => {
             toast.error('Failed to ignite concept');
@@ -53,44 +140,36 @@ const IgniteConcept: FunctionComponent = () => {
         },
       );
     },
-    [igniteConcept, navigate],
+    [igniteConcept, navigate, setGeneratedConcepts, setSeed],
   );
 
-  const renderIgnitionInput = useCallback(
-    (
-      type: ConceptSeedType,
-      item: ConceptIgnitionInput,
-      index: number,
-      setter: React.Dispatch<React.SetStateAction<ConceptIgnitionInput[]>>,
-    ) => {
-      if (type === 'UNKNOWN') return null; // Add this line to prevent rendering of unknown seed type
+  const renderIgnitionInput: RenderIgnitionInput = useCallback((type, item, index, setter) => {
+    if (type === 'UNKNOWN') return null; // Add this line to prevent rendering of unknown seed type
+    const inputProps: ConceptIgnitionInput = CONCEPT_SEED_TYPE_QUESTIONS[type][item.question] as ConceptIgnitionInput;
+    const sharedProps = {
+      label: inputProps.question,
+      name: inputProps.question.toLowerCase().replace(' ', '-'),
+      placeholder: inputProps.placeholder,
+      value: item.answer,
+      onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setter((prev) =>
+          prev.map((prevItem, prevIndex) =>
+            prevIndex === index ? { ...prevItem, answer: event.target.value } : prevItem,
+          ),
+        );
+      },
+    };
 
-      const sharedProps = {
-        label: CONCEPT_SEED_TYPE_QUESTIONS[type][item.question],
-        name: item.question.toLowerCase().replace(' ', '-'),
-        placeholder: item.placeholder,
-        value: item.answer,
-        onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-          setter((prev) =>
-            prev.map((prevItem, prevIndex) =>
-              prevIndex === index ? { ...prevItem, answer: event.target.value } : prevItem,
-            ),
-          );
-        },
-      };
-
-      return (
-        <div className='flex gap-3.5 self-stretch' key={sharedProps.name + index}>
-          {item.fieldType === 'input' ? (
-            <InputField {...sharedProps} width='100%' />
-          ) : (
-            <TextArea {...sharedProps} rows={item.rows || 2} />
-          )}
-        </div>
-      );
-    },
-    [],
-  );
+    return (
+      <div className='flex gap-3.5 self-stretch' key={sharedProps.name + index}>
+        {inputProps.fieldType === 'input' ? (
+          <InputField {...sharedProps} width='100%' />
+        ) : (
+          <TextArea {...sharedProps} rows={inputProps.rows || 2} />
+        )}
+      </div>
+    );
+  }, []);
 
   return (
     <div className='flex flex-col items-center gap-10 self-stretch bg-gray-50 pb-11 pt-8'>

@@ -13,7 +13,7 @@ export const useGeneratedConceptsColumns = () => {
 
   const columns = useMemo(
     () => [
-      columnHelper.accessor('title', {
+      columnHelper.accessor('uuid', {
         id: 'select',
         size: 100,
         header: ({ table }) => (

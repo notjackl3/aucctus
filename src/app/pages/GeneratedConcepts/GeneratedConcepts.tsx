@@ -1,32 +1,40 @@
-import React, { FunctionComponent, useCallback, useMemo } from 'react';
+import React, { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import styles from './styles/generatedConcepts.module.scss';
 import Loading from '../../components/Loading';
-
-import { flexRender, getFilteredRowModel, getCoreRowModel, useReactTable } from '@tanstack/react-table';
-import useGeneratedConcepts from './generated-concepts.hook';
-
+import {
+  flexRender,
+  getFilteredRowModel,
+  getCoreRowModel,
+  useReactTable,
+  RowSelectionState,
+} from '@tanstack/react-table';
 import IgniteLoading from '../../components/IgniteLoading';
 import { useGeneratedConceptsColumns } from './table.hook';
 import { useConceptIgnition, useSaveGeneratedConcepts } from '../../hooks/query/concepts.hook';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import Icon from '../../components/Icons/Icon/Icon';
+import { useConceptGenerationStore } from '../../stores/concept-generation.store';
+import { IGeneratedConcept } from '../../../libs/api/types';
 
 const GeneratedConcepts: FunctionComponent = () => {
   const navigate = useNavigate();
-
   const { mutate: igniteConcept, isLoading: isGenerateLoading } = useConceptIgnition();
   const { mutate: saveConcepts, isLoading: isSaveLoading } = useSaveGeneratedConcepts();
+  const { generatedConcepts: concepts, seed, clear, setGeneratedConcepts } = useConceptGenerationStore();
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
 
-  const {
-    rowSelection,
-    numberOfSelectedConcepts,
-    seed,
-    hasSelectedConcepts,
-    concepts,
-    selectedConcepts,
-    setRowSelection,
-  } = useGeneratedConcepts();
+  const selectedConcepts = useMemo((): IGeneratedConcept[] => {
+    return concepts.reduce((acc: IGeneratedConcept[], concept) => {
+      if (rowSelection[concept.uuid]) {
+        acc.push(concept);
+      }
+      return acc;
+    }, []);
+  }, [concepts, rowSelection]);
+
+  const hasSelectedConcepts = selectedConcepts.length > 0;
+
   const { columns, columnFilters, setColumnFilters } = useGeneratedConceptsColumns();
 
   const handleSaveConcepts = useCallback(
@@ -35,19 +43,17 @@ const GeneratedConcepts: FunctionComponent = () => {
       saveConcepts(
         {
           concepts: selectedConcepts,
-          seed: {
-            attributes: seed.attributes || [],
-            type: seed.type || 'UNKNOWN',
-          },
+          seed: seed,
         },
         {
           onSuccess: () => {
             navigate(`${AppPath.ConceptCategory}?category=draft`);
+            clear();
           },
         },
       );
     },
-    [navigate, saveConcepts, seed.attributes, seed.type, selectedConcepts],
+    [clear, selectedConcepts, navigate, saveConcepts, seed],
   );
 
   const handleGenerateConcepts = useCallback(
@@ -57,25 +63,18 @@ const GeneratedConcepts: FunctionComponent = () => {
         { attributes: seed.attributes || [], numberOfConcepts: 10, type: seed.type || 'UNKNOWN' },
         {
           onSuccess: (response) => {
-            navigate(AppPath.GeneratedConcepts, {
-              state: {
-                concepts: [...concepts, ...response.concepts],
-                seed: {
-                  ...seed,
-                  attributes: response.seed || seed.attributes,
-                },
-              },
-            });
+            setGeneratedConcepts([...response.concepts, ...concepts]);
           },
         },
       );
     },
-    [concepts, igniteConcept, navigate, seed],
+    [concepts, igniteConcept, seed.attributes, seed.type, setGeneratedConcepts],
   );
 
   const tableData = useMemo(() => concepts ?? [], [concepts]);
 
   const table = useReactTable({
+    getRowId: (row) => row.uuid,
     data: tableData,
     columns,
     enableRowSelection: true,
@@ -95,66 +94,73 @@ const GeneratedConcepts: FunctionComponent = () => {
 
   return (
     <React.Fragment>
-      {isGenerateLoading ? (
-        <IgniteLoading title='Generating A New Concept' subtitle='This process takes about 10 seconds, please wait.' />
-      ) : (
-        <div className={styles.generatedConcepts}>
-          <div className={styles.headerSection}>
-            <div className={styles.header}>
-              <h1>Generated Concepts</h1>
-              <span className={styles.supportingText}>
-                From the list below, choose the top concepts that you want to keep and continue building on
-              </span>
-            </div>
-            <div className={styles.actions}>
-              <button className='btn btn-light' onClick={handleGenerateConcepts}>
-                <Icon variant='refresh' /> Generate more
-              </button>
-            </div>
-          </div>
-          <div className={styles.content}>
-            <table>
-              <thead>
-                {table.getHeaderGroups().map((headerGroup) => (
-                  <tr key={headerGroup.id}>
-                    {headerGroup.headers.map((header) => (
-                      <th key={header.id} style={{ width: header.getSize() }}>
-                        {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
-                      </th>
-                    ))}
-                  </tr>
-                ))}
-              </thead>
-              {false ? (
-                <span className={styles.tableMessageContainer}>
-                  <Loading />
+      <div className={`${styles.generatedConcepts} flex min-h-screen flex-col`}>
+        {isGenerateLoading ? (
+          <IgniteLoading
+            title='Generating A New Concept'
+            subtitle='This process takes about 10 seconds, please wait.'
+          />
+        ) : (
+          <>
+            <div className={styles.headerSection}>
+              <div className={styles.header}>
+                <h1>Generated Concepts</h1>
+                <span className={styles.supportingText}>
+                  From the list below, choose the top concepts that you want to keep and continue building on
                 </span>
-              ) : (
-                <tbody>
-                  {table.getRowModel().rows.map((row) => (
-                    <tr key={row.id}>
-                      {row.getVisibleCells().map((cell) => (
-                        <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                        </td>
+              </div>
+              <div className={styles.actions}>
+                <button className='btn btn-light' onClick={handleGenerateConcepts}>
+                  <Icon variant='refresh' /> Generate more
+                </button>
+              </div>
+            </div>
+            <div className={styles.content}>
+              <table>
+                <thead>
+                  {table.getHeaderGroups().map((headerGroup) => (
+                    <tr key={headerGroup.id}>
+                      {headerGroup.headers.map((header) => (
+                        <th key={header.id} style={{ width: header.getSize() }}>
+                          {header.isPlaceholder
+                            ? null
+                            : flexRender(header.column.columnDef.header, header.getContext())}
+                        </th>
                       ))}
                     </tr>
                   ))}
-                </tbody>
-              )}
-            </table>
-            <div className={styles.footer}>
-              <button
-                className='btn btn-primary disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600'
-                disabled={!hasSelectedConcepts || isSaveLoading}
-                onClick={handleSaveConcepts}
-              >
-                {isSaveLoading ? <Loading isSmall /> : `Save ${numberOfSelectedConcepts} Concepts`}
-              </button>
+                </thead>
+                {false ? (
+                  <span className={styles.tableMessageContainer}>
+                    <Loading />
+                  </span>
+                ) : (
+                  <tbody>
+                    {table.getRowModel().rows.map((row) => (
+                      <tr key={row.id}>
+                        {row.getVisibleCells().map((cell) => (
+                          <td style={{ width: cell.column.getSize() }} key={cell.id}>
+                            {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                )}
+              </table>
+              <div className={styles.footer}>
+                <button
+                  className='btn btn-primary disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600'
+                  disabled={!hasSelectedConcepts || isSaveLoading}
+                  onClick={handleSaveConcepts}
+                >
+                  {isSaveLoading ? <Loading isSmall /> : `Save ${selectedConcepts.length} Concepts`}
+                </button>
+              </div>
             </div>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </div>
     </React.Fragment>
   );
 };

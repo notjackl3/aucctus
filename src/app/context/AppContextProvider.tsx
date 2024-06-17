@@ -33,7 +33,7 @@ interface IAppProviderProps {
 }
 
 export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
-  const { initialized, initializeApp, user } = useAppStore();
+  const { initialized, initializeApp } = useAppStore();
   const { clearTokens, access, refresh, retrieveTokens, hasRetrievedTokens } = useTokenStore();
   const [hasSetRefreshTokenAction, setHasSetRefreshTokenAction] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
