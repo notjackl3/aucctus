@@ -73,7 +73,6 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
   // This will only happen once
   useEffect(() => {
     (async () => {
-      console.log('refreshing token');
       if (!initialized && hasSetRefreshTokenAction && hasRetrievedTokens) {
         await api.refreshToken().finally(() => {
           initializeApp();

@@ -31,6 +31,7 @@ export interface ConceptIgnitionInput {
   placeholder: string;
   rows?: number;
   fieldType: 'input' | 'textarea';
+  required?: boolean;
 }
 
 export const EXPANDING_IDEA_INPUT_MAP: Record<EEIQuestionKeys, ConceptIgnitionInput> = {
@@ -39,6 +40,7 @@ export const EXPANDING_IDEA_INPUT_MAP: Record<EEIQuestionKeys, ConceptIgnitionIn
     placeholder: 'I want to leverage our network of retail stores to deliver healthcare services',
     rows: 2,
     fieldType: 'textarea',
+    required: true,
   },
   PROBLEM: {
     question: 'What problem does your idea solve?',
@@ -65,6 +67,7 @@ export const NEW_OPPORTUNITY_INPUT_MAP: Record<INOQuestionKeys, ConceptIgnitionI
     question: 'What industry are you targeting?',
     placeholder: 'Healthcare services',
     fieldType: 'input',
+    required: true,
   },
   PROBLEM: {
     question: 'Who are you targeting and what problems need to be solved?',
@@ -110,9 +113,11 @@ const IgniteConcept: FunctionComponent = () => {
   const navigate = useNavigate();
   const { mutate: igniteConcept, isLoading } = useConceptIgnition();
   const [expandingIdea, setExpandingIdea] = useState<IConceptSeedAttribute<EEIQuestionKeys>[]>(
+    // Create deep copy.
     JSON.parse(JSON.stringify(INITIAL_EXPANDING_IDEA)),
   );
   const [newOpportunities, setNewOpportunities] = useState<IConceptSeedAttribute<INOQuestionKeys>[]>(
+    // Create deep copy.
     JSON.parse(JSON.stringify(INITIAL_NEW_OPPORTUNITY)),
   );
   const { setSeed, setGeneratedConcepts } = useConceptGenerationStore();
@@ -151,6 +156,7 @@ const IgniteConcept: FunctionComponent = () => {
       name: inputProps.question.toLowerCase().replace(' ', '-'),
       placeholder: inputProps.placeholder,
       value: item.answer,
+      required: inputProps.required,
       onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setter((prev) =>
           prev.map((prevItem, prevIndex) =>
@@ -208,14 +214,19 @@ const IgniteConcept: FunctionComponent = () => {
                 <>
                   <button
                     className='btn btn-light border border-solid px-2.5 py-2'
-                    disabled={expandingIdea.some((item) => !item.answer)}
+                    disabled={expandingIdea.some(
+                      (item) => !item.answer && !!EXPANDING_IDEA_INPUT_MAP[item.question].required,
+                    )}
                     onClick={() => handleIgnition(expandingIdea, 'EXPAND_AN_EXISTING_IDEA', 10)}
                   >
                     See Similar Ideas
                   </button>
+
                   <button
                     className='btn btn-secondary border border-violet-50 px-2.5 py-2'
-                    disabled={expandingIdea.some((item) => !item.answer)}
+                    disabled={expandingIdea.some(
+                      (item) => !item.answer && !!EXPANDING_IDEA_INPUT_MAP[item.question].required,
+                    )}
                     onClick={() => handleIgnition(expandingIdea, 'EXPAND_AN_EXISTING_IDEA', 1)}
                   >
                     Expand This Idea
@@ -246,7 +257,9 @@ const IgniteConcept: FunctionComponent = () => {
                 <>
                   <button
                     className='btn btn-secondary w-80 justify-between border border-violet-50 px-2.5 py-2'
-                    disabled={newOpportunities.some((item) => !item.answer)}
+                    disabled={newOpportunities.some(
+                      (item) => !item.answer && !!NEW_OPPORTUNITY_INPUT_MAP[item.question].required,
+                    )}
                     onClick={() => handleIgnition(newOpportunities, 'IDENTIFY_NEW_OPPORTUNITIES', 10)}
                   >
                     Generate Ideas <Icon variant='arrowright' />
