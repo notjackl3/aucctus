@@ -45,7 +45,7 @@ const FinancialDetails: FunctionComponent = () => {
           cardClassName={styles.cardStyle}
           isHideFooter
           headerAction={
-            <button className={styles.cardAction} aria-label='Unlock Edit Hypothesis' disabled>
+            <button className='btn btn-light btn-no-border' aria-label='Unlock Edit Hypothesis' disabled>
               <span>{<Icon variant='lock' {...iconDefaultProps} />}</span>
               AI Generated
             </button>

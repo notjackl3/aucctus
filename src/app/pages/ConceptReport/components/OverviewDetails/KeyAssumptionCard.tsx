@@ -28,7 +28,7 @@ const KeyAssumptionCard: FunctionComponent<KeyAssumptionCardProps> = ({ keyAssum
       cardClassName={styles.cardStyle}
       footerAction={
         <button
-          className={styles.cardAction}
+          className='btn btn-light'
           onClick={() => {
             context.navigateToTab(AppPath.ConceptKeyAssumptions);
           }}

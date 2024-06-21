@@ -138,7 +138,7 @@ const OverviewDetails: FunctionComponent = () => {
           cardClassName={styles.cardStyle}
           footerAction={
             <button
-              className={styles.cardAction}
+              className='btn btn-light'
               onClick={() => {
                 navigateToTab(AppPath.ConceptCustomerProfile);
               }}
@@ -190,7 +190,7 @@ const OverviewDetails: FunctionComponent = () => {
           cardClassName={styles.cardStyle}
           footerAction={
             <button
-              className={styles.cardAction}
+              className='btn btn-light'
               onClick={() => {
                 navigateToTab(AppPath.ConceptFinancialProjection);
               }}
