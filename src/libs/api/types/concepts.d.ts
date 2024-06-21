@@ -203,6 +203,9 @@ export interface ITrendsAndDrivers extends IBaseConceptEntity {
   name: string;
   description: string;
   source: string;
+  source: string;
+  // TODO: Fix Source editing
+  sources: [string];
   // Currently not implemented but will be used in the future
   image: undefined;
 }

@@ -30,6 +30,10 @@ const removeProtocol = (source: string) => {
   return d;
 };
 
+const isEcosystemItem = (item: unknown) => {
+  return (item as Ecosystem).ecosystemType !== undefined;
+};
+
 const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item, updateItem, deleteItem }) => {
   const { closeModal } = useModal();
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -142,14 +146,16 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
           maxLength={DESCRIPTION_MAX_LENGTH}
           onChange={handleDescriptionChange}
         />
-        <InputField
-          label={'Source'}
-          name='source'
-          value={source}
-          error={!!sourceError}
-          errorMessage={sourceError}
-          onChange={handleSourceChange}
-        />
+        {isEcosystemItem(item) ? (
+          <InputField
+            label={'Source'}
+            name='source'
+            value={source}
+            error={!!sourceError}
+            errorMessage={sourceError}
+            onChange={handleSourceChange}
+          />
+        ) : null}
       </div>
       <div className={styles.footer}>
         <button className='btn btn-light' disabled={showConfirmation} onClick={() => closeModal()}>
