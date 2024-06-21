@@ -17,6 +17,7 @@ export function useRoutePattern() {
 
 export function useIsUnauthRoute() {
   const location = useLocation();
+  console.log(location.pathname);
 
   for (const path of UNAUTH_ROUTES) {
     // The matchPath function tries to match the current location against the route pattern

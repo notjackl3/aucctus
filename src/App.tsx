@@ -4,7 +4,6 @@ import AuthGuard from './routes/guards/auth.guard';
 import Layout from './Layout/Layout';
 import { AppPath, ConceptPath } from './routes/routes';
 import Page from './app/pages';
-import UnauthGuard from './routes/guards/unauth.guard';
 import { Navigate } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
 import Loading from './app/components/Loading';
@@ -41,10 +40,7 @@ function App() {
                   <Route index path={AppPath.SettingsSecurity} element={<Page.SettingsPages.SecurityDetails />} />
                 </Route>
               </Route>
-            </Route>
-
-            {/* Auth Routes  */}
-            <Route element={<UnauthGuard />}>
+              {/* Auth Routes  */}
               <Route index path={AppPath.Login} element={<Page.Auth.Login />} />
               <Route path={AppPath.SignUp} element={<Page.Auth.SignUp />} />
               <Route path={AppPath.ForgotPassword} element={<Page.Auth.ForgotPassword />} />

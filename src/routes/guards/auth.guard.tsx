@@ -5,11 +5,16 @@ import { useApp } from '../../app/context/AppContextProvider';
 import { useIsUnauthRoute } from '../../app/hooks/router.hook';
 
 const AuthGuard: FunctionComponent = () => {
-  const { isAuthenticated } = useApp();
+  const { isAuthenticated, isLoading } = useApp();
   const isUnAuthRoute = useIsUnauthRoute();
 
-  if (!isAuthenticated && !isUnAuthRoute) {
-    return <Navigate to={AppPath.Login} replace />;
+  if (!isLoading) {
+    if (isAuthenticated && isUnAuthRoute) {
+      return <Navigate to={AppPath.Home} replace />;
+    }
+    if (!isAuthenticated && !isUnAuthRoute) {
+      return <Navigate to={AppPath.Login} replace />;
+    }
   }
 
   return <Outlet />;
