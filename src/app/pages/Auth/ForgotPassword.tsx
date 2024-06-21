@@ -1,7 +1,7 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/Text/InputField/InputField';
-import FeatureIcon from '../../components/Icons/FeatureIcon/FeatureIcon';
+import FeatureIcon from '../../components/Icons/FeatureIcon';
 import { parseFormError, validEmail } from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
 import { Link } from 'react-router-dom';

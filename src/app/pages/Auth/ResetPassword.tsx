@@ -1,7 +1,7 @@
 import { FunctionComponent, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/Text/InputField/InputField';
-import FeatureIcon from '../../components/Icons/FeatureIcon/FeatureIcon';
+import FeatureIcon from '../../components/Icons/FeatureIcon';
 import { AppPath } from '../../../routes/routes';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import Icon from '../../components/Icons/Icon/Icon';

@@ -13,7 +13,7 @@ interface ConceptGenerationStoreState {
 
 export const useConceptGenerationStore = create<ConceptGenerationStoreState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       generatedConcepts: [],
       seed: {
         attributes: [],

@@ -1,7 +1,7 @@
 import React, { FunctionComponent, ReactNode } from 'react';
 
 import styles from './ignite-form.module.scss';
-import FeatureIcon from '../../Icons/FeatureIcon/FeatureIcon';
+import FeatureIcon from '../../Icons/FeatureIcon';
 
 interface IIgniteForm {
   title: string;

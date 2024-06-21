@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import styles from '../../assets/styles/components/onboarding-message.module.scss';
-import FeatureIcon, { IFeatureIconProps } from '../Icons/FeatureIcon/FeatureIcon';
+import FeatureIcon, { IFeatureIconProps } from '../Icons/FeatureIcon';
 
 interface OnboardingMessageProps extends IFeatureIconProps {
   title: string;
