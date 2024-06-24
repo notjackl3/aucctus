@@ -20,6 +20,7 @@ export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElemen
   hint?: string;
   maxLength?: number;
   isDisableResize?: boolean;
+  showAsterisk?: boolean;
   calculateInitialHeight?: boolean; // New prop to control height calculation
 }
 
@@ -29,7 +30,18 @@ interface ITextAreaHandle {
 }
 
 const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
-  { label, name, hint, errorMessage, isDisableResize = false, error = false, maxLength, value, ...props },
+  {
+    label,
+    name,
+    hint,
+    errorMessage,
+    isDisableResize = false,
+    error = false,
+    maxLength,
+    showAsterisk = false,
+    value,
+    ...props
+  },
   ref,
 ) => {
   const hasError = !!errorMessage || error;
@@ -84,7 +96,10 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
 
   return (
     <div className={`${styles.inputField} ${hasError ? styles.inputFieldError : ''}`}>
-      <div className={styles.label}>{label}</div>
+      <div className={styles.label}>
+        {label}
+        {showAsterisk ? <span className='font-semibold text-red-400'>*</span> : null}
+      </div>
       <textarea
         className={disableResizeClassName}
         cols={50}

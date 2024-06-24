@@ -157,6 +157,7 @@ const IgniteConcept: FunctionComponent = () => {
       placeholder: inputProps.placeholder,
       value: item.answer,
       required: inputProps.required,
+      showAsterisk: inputProps.required,
       onChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setter((prev) =>
           prev.map((prevItem, prevIndex) =>

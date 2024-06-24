@@ -14,6 +14,7 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   hint?: string;
   width?: number | string;
   variant?: 'settings';
+  showAsterisk?: boolean;
 }
 
 const defaultIconProps = {
@@ -23,7 +24,18 @@ const defaultIconProps = {
 };
 
 const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
-  { label, name, hint, errorMessage, error = false, isPassword = false, variant, width, ...props },
+  {
+    label,
+    name,
+    hint,
+    errorMessage,
+    error = false,
+    isPassword = false,
+    variant,
+    showAsterisk = false,
+    width,
+    ...props
+  },
   ref,
 ) => {
   const hasError = !!errorMessage || error;
@@ -60,7 +72,12 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
 
   return (
     <div style={width ? { width } : {}} className={`${inputFieldStyle} ${hasError ? styles.inputFieldError : ''}`}>
-      {label && <div className={styles.label}>{label}</div>}
+      {label && (
+        <div className={styles.label}>
+          {label}
+          {showAsterisk ? <span className='font-semibold text-red-400'>*</span> : null}
+        </div>
+      )}
       <input {...props} type={getInputType()} ref={ref} name={name} />
       {showVisibilityIcon && (
         <button
