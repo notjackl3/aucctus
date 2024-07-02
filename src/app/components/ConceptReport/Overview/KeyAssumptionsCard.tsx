@@ -34,7 +34,7 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = 
             className='inline-flex w-full snap-center items-center justify-start border-b border-slate-200 odd:bg-neutral-50'
             key={`assumption-${i + 1}`}
           >
-            <div className='flex h-16 w-36 items-center px-6 py-4'>
+            <div className='flex h-16 items-center px-6 py-4'>
               <GeneralBadge variant={item.riskCategory} badgeText={item.riskCategory} />
             </div>
             <p className="font-['DM Sans'] text-base font-normal leading-normal text-indigo-900">{item.name}</p>

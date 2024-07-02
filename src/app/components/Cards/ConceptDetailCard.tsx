@@ -45,7 +45,9 @@ const ConceptDetailCard: FunctionComponent<ConceptDetailCardProps> = ({
               {icon && <Icon variant={icon} {...iconDefaultProps} />}
               <Header text={title} />
             </span>
-            {subtitle && <h5 className='max-w-full text-wrap'>{subtitle}</h5>}
+            {subtitle && (
+              <h5 className='max-w-full text-wrap text-sm font-normal leading-tight text-gray-500'>{subtitle}</h5>
+            )}
           </span>
           {headerAction}
         </div>

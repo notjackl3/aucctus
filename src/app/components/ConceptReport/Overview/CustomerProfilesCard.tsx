@@ -50,7 +50,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({ profile, o
     >
       <div className='inline-flex flex-col items-center justify-start gap-6 p-6'>
         {/* Header  */}
-        <div className='inline-flex items-center justify-start gap-4'>
+        <div className='flex w-full items-center justify-start gap-4'>
           <img className='relative h-16 w-16 rounded-3xl border border-white' alt='avatar' src={defaultAvatar} />
           <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-1'>
             <h6 className="font-['DM Sans'] h-6 self-stretch text-base font-normal text-indigo-900">
