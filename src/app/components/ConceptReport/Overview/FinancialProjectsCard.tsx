@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import ConceptDetailCard from '../../Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../Cards/ConceptDetailCard';
 import Icon from '../../Icons/Icon/Icon';
 import { IFinancialProjection, IMarketSizeMetric } from '../../../../libs/api/types';
 import MarketChart from '../../Charts/MarketChart/MarketChart';

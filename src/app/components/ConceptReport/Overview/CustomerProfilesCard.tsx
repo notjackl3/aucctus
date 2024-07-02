@@ -1,5 +1,5 @@
 import React from 'react';
-import ConceptDetailCard from '../../Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../Cards/ConceptDetailCard';
 import Icon from '../../Icons/Icon/Icon';
 import { ICustomerProfile } from '../../../../libs/api/types';
 // TODO: This should be a PNG

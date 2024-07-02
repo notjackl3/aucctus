@@ -14,6 +14,7 @@ interface DropdownProps {
   selected?: string;
   onSelect: (value: string) => void;
 
+  hidePadding?: boolean;
   chevronColor?: string;
   hideChevron?: boolean;
 }
@@ -23,6 +24,8 @@ const Dropdown: FunctionComponent<DropdownProps> = ({
   onSelect,
   selected,
   chevronColor,
+  hidePadding = false,
+
   hideChevron = false,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -36,7 +39,10 @@ const Dropdown: FunctionComponent<DropdownProps> = ({
 
   return (
     <div className={styles.dropdown}>
-      <div className={styles.dropdownToggle} onClick={() => setIsOpen(!isOpen)}>
+      <div
+        className={`${styles.dropdownToggle} ${hidePadding ? styles.noPadding : ''}`}
+        onClick={() => setIsOpen(!isOpen)}
+      >
         <span>{selectedOption ? selectedOption.displayLabel : 'Select an option'}</span>
         {!hideChevron ? <Icon variant={!isOpen ? 'chevrondown' : 'chevronup'} stroke={chevronColor} /> : null}
       </div>

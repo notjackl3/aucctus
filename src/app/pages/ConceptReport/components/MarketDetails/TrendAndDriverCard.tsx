@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { ITrendsAndDrivers } from '../../../../../libs/api/types';
 import styles from './styles/marketDetails.module.scss';
-import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import images from '../../../../assets/img';
 import { useModal } from '../../../../context/ModalContextProvider';

@@ -1,5 +1,5 @@
 import { FunctionComponent, useCallback } from 'react';
-import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard';
 import { Ecosystem, EcosystemType } from '../../../../../libs/api/types';
 import images from '../../../../assets/img';
 import Icon from '../../../../components/Icons/Icon/Icon';

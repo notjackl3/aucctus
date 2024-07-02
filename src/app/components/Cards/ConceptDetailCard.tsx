@@ -1,0 +1,63 @@
+import { FunctionComponent, ReactNode } from 'react';
+import Icon from '../Icons/Icon/Icon';
+import { Header } from '../ConceptReport';
+
+interface ConceptDetailCardProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+  title: string;
+  subtitle?: string;
+  children: ReactNode;
+  isHideHeader?: boolean;
+  isHideFooter?: boolean;
+  headerAction?: ReactNode;
+  footerAction?: ReactNode;
+  cardClassName?: string;
+  headerClassName?: string;
+  icon?: IconVariant;
+}
+
+const iconDefaultProps = {
+  height: 16,
+  width: 16,
+  stroke: '#2B3674',
+};
+
+const ConceptDetailCard: FunctionComponent<ConceptDetailCardProps> = ({
+  title,
+  subtitle,
+  children,
+  icon,
+  cardClassName,
+  headerAction,
+  isHideHeader,
+  isHideFooter,
+  footerAction,
+  ...rest
+}) => {
+  return (
+    <div
+      {...rest}
+      className={`flex w-[22.5rem] flex-col items-center self-stretch rounded-xl border border-gray-200 bg-white shadow-sm  ${cardClassName ? cardClassName : ''}`}
+    >
+      {!isHideHeader && (
+        <div className='max-full border-solid; box-border flex flex-row items-center justify-between gap-2 self-stretch border-b border-b-gray-300 px-6 py-3'>
+          <span className='flex max-w-full flex-col items-start justify-start gap-2'>
+            <span className='flex flex-row items-center justify-center gap-2'>
+              {icon && <Icon variant={icon} {...iconDefaultProps} />}
+              <Header text={title} />
+            </span>
+            {subtitle && <h5 className='max-w-full text-wrap'>{subtitle}</h5>}
+          </span>
+          {headerAction}
+        </div>
+      )}
+      <div className='flex w-full flex-[1_0_auto] flex-col items-center justify-start'>{children}</div>
+      {!isHideFooter && (
+        <div className='border-solid; flex justify-between self-stretch border-t border-t-gray-200 px-6 py-3'>
+          {footerAction}
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ConceptDetailCard;

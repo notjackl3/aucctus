@@ -3,7 +3,7 @@ import styles from './styles/dashboard.module.scss';
 import Icon from '../../components/Icons/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
-import ConceptDetailCard from '../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../components/Cards/ConceptDetailCard';
 import ConceptBarChart from '../../components/Charts/ConceptBarChart';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import DashboardInnovationCard from './components/DashboardInnovationCard';

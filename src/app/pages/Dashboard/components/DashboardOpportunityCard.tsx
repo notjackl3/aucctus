@@ -1,7 +1,7 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 
 import styles from '../styles/dashboard.module.scss';
-import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard';
 import ConceptStatistic from '../../../components/Badges/ConceptStatistic';
 import { camelCaseToTitleCase, formatter } from '../../../../libs/utils';
 import {

@@ -2,7 +2,7 @@ import { IMarketSizeMetric } from '../../../../../libs/api/types';
 import { getMarketMetricTitle } from '../../../../../libs/concepts';
 import { formatter } from '../../../../../libs/utils';
 import { useModal } from '../../../../context/ModalContextProvider';
-import ConceptDetailCard from '../../../Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../../Cards/ConceptDetailCard';
 import EditMarketSizeMetricModal from '../../../Modal/EditMarketSizeMetricModal/EditMarketSizeMetricModal';
 
 import styles from './market-size-projections.module.scss';

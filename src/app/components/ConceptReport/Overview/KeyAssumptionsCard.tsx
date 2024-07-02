@@ -1,5 +1,5 @@
 import React from 'react';
-import ConceptDetailCard from '../../Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../Cards/ConceptDetailCard';
 import Icon from '../../Icons/Icon/Icon';
 import { IAssumption } from '../../../../libs/api/types';
 import GeneralBadge from '../../Badges/GeneralBadge/GeneralBadge';

@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import styles from '../styles/dashboard.module.scss';
-import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard';
 import NewsArticle from '../../../components/Cards/NewsArticle';
 
 export interface NewsData {

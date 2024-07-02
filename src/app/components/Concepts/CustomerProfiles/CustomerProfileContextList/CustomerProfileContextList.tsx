@@ -1,5 +1,5 @@
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
-import ConceptDetailCard from '../../../Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../../Cards/ConceptDetailCard';
 
 import styles from './customer-profile-context.module.scss';
 import { useCustomerProfileUpdate } from '../../../../hooks/query/concepts.hook';

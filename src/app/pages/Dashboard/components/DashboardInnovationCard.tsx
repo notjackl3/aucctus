@@ -1,7 +1,7 @@
 import { FunctionComponent, useMemo } from 'react';
 
 import styles from '../styles/dashboard.module.scss';
-import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard/ConceptDetailCard';
+import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard';
 import ConceptStatistic from '../../../components/Badges/ConceptStatistic';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
