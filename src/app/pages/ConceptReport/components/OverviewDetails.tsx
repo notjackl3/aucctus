@@ -1,0 +1,105 @@
+import { FunctionComponent, useMemo } from 'react';
+import { useParams, useOutletContext } from 'react-router-dom';
+import { AppPath } from '../../../../routes/routes';
+import { IConceptReportContext } from '../ConceptReport';
+import { useConceptAssumptions, useConceptOverview } from '../../../hooks/query/concepts.hook';
+import EditModeSwitcher from '../../../components/Text/EditibleTextView/EditibleTextView';
+import { useEditConcept, useEditOverview } from '../../../hooks/concepts/editable.hook';
+import { Header, ListContainer, Overview } from '../../../components/ConceptReport';
+
+const OverviewDetails: FunctionComponent = () => {
+  const { id: conceptId = '' } = useParams();
+  const { navigateToTab } = useOutletContext<IConceptReportContext>();
+  const { overview } = useConceptOverview(conceptId);
+  const { assumptions } = useConceptAssumptions(conceptId);
+  const { valueProposition, problemStatement } = useEditOverview();
+  const descriptionEdit = useEditConcept();
+
+  const firstCustomerPersona = useMemo(() => {
+    if (!overview || !overview.persona) {
+      return undefined;
+    }
+    return overview.persona;
+  }, [overview]);
+
+  return (
+    <div className='flex flex-col items-start'>
+      <section className='inline-flex items-start justify-start gap-12'>
+        {/* Left Section */}
+        <div className='inline-flex shrink grow basis-0 flex-col items-start justify-center gap-8 self-stretch'>
+          <div className='inline-flex flex-col items-start justify-start gap-5'>
+            <Header text='Value Proposition' />
+            <EditModeSwitcher
+              pClassName="text-gray-500 text-2xl font-medium font-['DM Sans']"
+              value={valueProposition.value}
+              label=''
+              name='valueProposition'
+              maxLength={valueProposition.validation.maxLength}
+              onChange={valueProposition.handleChange}
+              handleSave={valueProposition.handleSave}
+              handleCancel={valueProposition.handleCancel}
+            />
+          </div>
+
+          {overview?.problemStatement ? (
+            <div className='inline-flex flex-col items-start justify-start gap-5'>
+              <Header text='Problem Statement' />
+              <EditModeSwitcher
+                pClassName="text-gray-500 text-2xl font-medium font-['DM Sans']"
+                value={problemStatement.value}
+                label=''
+                name='description'
+                maxLength={problemStatement.validation.maxLength}
+                onChange={problemStatement.handleChange}
+                handleSave={problemStatement.handleSave}
+                handleCancel={problemStatement.handleCancel}
+              />
+            </div>
+          ) : null}
+        </div>
+        {/* Right Section */}
+        <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-8 self-stretch'>
+          {/* Overview  */}
+          <div className='inline-flex flex-col items-start justify-start gap-5'>
+            <Header text='Overview' />
+            <EditModeSwitcher
+              pClassName="self-stretch text-gray-500 text-base font-normal font-['DM Sans'] leading-normal"
+              value={descriptionEdit.value}
+              label=''
+              name='description'
+              maxLength={descriptionEdit.validation.maxLength}
+              onChange={descriptionEdit.handleChange}
+              handleSave={descriptionEdit.handleSave}
+              handleCancel={descriptionEdit.handleCancel}
+            />
+          </div>
+
+          {/* Lists of Trends & Drives and Industries */}
+          <div className='inline-flex items-start justify-between gap-3'>
+            <ListContainer title='Trends & Drivers' items={overview?.trendsAndDrivers || []} />
+            <ListContainer title='Industries' items={overview?.industries || []} />
+          </div>
+        </div>
+      </section>
+
+      <section className={`inline-flex flex-wrap items-center justify-start gap-6 p-8`}>
+        <Overview.CustomerProfilesCard
+          profile={firstCustomerPersona}
+          onViewProfilesClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
+        />
+
+        <Overview.FinancialProjectsCard
+          projection={overview?.financialProjection}
+          onViewClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
+        />
+
+        <Overview.KeyAssumptionsCard
+          assumptions={assumptions?.results || []}
+          onViewClick={() => navigateToTab(AppPath.ConceptKeyAssumptions)}
+        />
+      </section>
+    </div>
+  );
+};
+
+export default OverviewDetails;
