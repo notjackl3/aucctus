@@ -1,6 +1,4 @@
 import { FunctionComponent } from 'react';
-
-import styles from './assumptionBadge.module.scss';
 import Icon from '../Icons/Icon/Icon';
 import { AssumptionType } from '@libs/api/types';
 

@@ -4,9 +4,9 @@ import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
 import OnboardingIntoSection from '../components/Auth/OnboardingIntroSection';
 import styles from '../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../components/Text/InputField/InputField';
-import { validDomain } from '../../libs/utils';
+import { validDomain } from '@libs/utils';
 import { Navigate } from 'react-router-dom';
-import { AppPath } from '../../routes/routes';
+import { AppPath } from '@routes/routes';
 import { useRegisterAccount } from '../hooks/query/account.hook';
 import { useAppStore } from '../stores/app.store';
 

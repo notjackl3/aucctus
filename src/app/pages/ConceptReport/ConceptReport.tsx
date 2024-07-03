@@ -71,7 +71,7 @@ const ConceptReport: FunctionComponent = () => {
   );
 
   return (
-    <div className={`min-h-full ${styles.conceptOverview} ${styles.slideAnimation}`}>
+    <div className={`min-h-full ${styles.conceptOverview}`}>
       <div className={styles.headerSection}>
         <div className={styles.header}>
           <h1>{concept?.title}</h1>
