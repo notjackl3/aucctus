@@ -11,7 +11,7 @@ const ConceptSettings: FunctionComponent = () => {
   const { seed, isLoading } = useConceptSeed(conceptUuid || '');
 
   return (
-    <div className='inline-flex h-96 w-full flex-col items-start justify-start gap-3 px-8 pb-8'>
+    <div className='inline-flex h-96 w-full flex-col items-start justify-start gap-3 pb-8'>
       <div className='inline-flex items-start justify-start rounded-lg border border-gray-300 shadow'>
         {/* TODO: Convert these to buttons */}
         <div className='flex items-center justify-center gap-2 rounded-l-lg border-r border-gray-300 bg-gray-50 px-4 py-2'>

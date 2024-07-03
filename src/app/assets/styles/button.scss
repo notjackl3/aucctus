@@ -50,7 +50,7 @@ $btn-colors: (
 // Button base styles
 .btn {
   display: flex;
-  gap: $gap-base;
+  gap: 0.5rem;
   padding: 0.625rem 1.125rem;
   justify-content: center;
   align-items: center;

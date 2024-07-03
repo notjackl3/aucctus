@@ -20,6 +20,8 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = 
     <ConceptDetailCard
       title='Key Assumptions'
       subtitle='List of assumptions that require validation'
+      headerClassName='min-h-[92px]'
+      contentClassName='h-[360px]'
       footerAction={
         <button className='btn btn-light' onClick={onViewClick} aria-label='View Assumptions'>
           <span>{<Icon variant='warning' {...iconDefaultProps} />}</span>
@@ -28,16 +30,16 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = 
       }
     >
       {/* Body */}
-      <ul className='inline-flex h-full w-full snap-y flex-col items-center justify-start'>
+      <ul className='inline-flex w-full snap-y snap-mandatory flex-col items-center justify-start overflow-y-auto'>
         {assumptions.map((item, i) => (
           <li
-            className='inline-flex w-full snap-center items-center justify-start border-b border-slate-200 odd:bg-neutral-50'
+            className='inline-flex w-full snap-center items-center justify-start gap-2 border-b border-slate-200 px-6 py-4 odd:bg-neutral-50'
             key={`assumption-${i + 1}`}
           >
-            <div className='flex h-16 items-center px-6 py-4'>
+            <div className='flex h-16 items-center'>
               <Badge.RiskLevel variant={item.riskCategory} text={item.riskCategory} />
             </div>
-            <p className='text-base font-normal leading-normal text-indigo-900'>{item.name}</p>
+            <p className='text-base font-normal text-indigo-900'>{item.name}</p>
           </li>
         ))}
       </ul>

@@ -6,12 +6,14 @@ import eslint from 'vite-plugin-eslint';
 import compression from 'vite-plugin-compression';
 import path from 'path';
 import { watchIcons } from './vite/plugins.js';
+import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   publicDir: 'public',
   plugins: [
     watchIcons(),
+    // tsconfigPaths(),
     splitVendorChunkPlugin(),
     require('cssnano')({
       preset: 'default',
@@ -38,13 +40,22 @@ export default defineConfig({
 
   resolve: {
     alias: {
+      // React Components
+      '@components': path.resolve(__dirname, 'src/app/components'),
+      '@pages': path.resolve(__dirname, 'src/app/pages'),
+      '@routes': path.resolve(__dirname, 'src/routes'),
+      '@libs': path.resolve(__dirname, 'src/libs'),
+
+      // Style Sheets
       '~global.scss': path.resolve(__dirname, 'src/app/assets/styles/global.scss'),
       '~button.scss': path.resolve(__dirname, 'src/app/assets/styles/button.scss'),
       '~typography.scss': path.resolve(__dirname, 'src/app/assets/styles/typography.scss'),
       '~colors.scss': path.resolve(__dirname, 'src/app/assets/styles/colors.scss'),
       '~variables.scss': path.resolve(__dirname, 'src/app/assets/styles/variables.scss'),
-      '~pencil.png': path.resolve(__dirname, 'src/app/assets/img/pencil.png'),
       '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
+
+      // Images
+      '~pencil.png': path.resolve(__dirname, 'src/app/assets/img/pencil.png'),
     },
   },
   build: {

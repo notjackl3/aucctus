@@ -34,7 +34,7 @@ const BADGE_VARIANT_MAP: Record<RiskLevelVariant, { style: string; icon: IconVar
 const RiskLevel: FunctionComponent<RiskLevelProps> = ({ badgeClassName, text, variant }) => {
   return (
     <div
-      className={`flex items-center gap-2 rounded-2xl py-[0.2rem] pl-[0.4rem] pr-2 ${BADGE_VARIANT_MAP[variant].style} ${
+      className={`flex items-center gap-2 rounded-2xl py-[0.2rem] pl-[0.4rem] pr-2 shadow-sm ${BADGE_VARIANT_MAP[variant].style} ${
         badgeClassName ? badgeClassName : ''
       }`}
     >

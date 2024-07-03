@@ -18,7 +18,7 @@ type DemographicProfile = keyof Pick<ICustomerProfile, (typeof DEMOGRAPHIC_KEYS)
 const DEMOGRAPHIC_VALUE_MAP: Record<DemographicProfile, { prefix: string; icon: IconVariant }> = {
   geoLocation: {
     icon: 'globe',
-    prefix: 'Geographic Location:',
+    prefix: 'Location:',
   },
   ageRange: {
     icon: 'umbrella',
@@ -40,7 +40,8 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({ profile, o
     <ConceptDetailCard
       title='Customer Profiles'
       subtitle='Breakdown of target user pain points and jobs to be done'
-      cardClassName={''}
+      headerClassName='min-h-[92px]'
+      contentClassName='h-[360px]'
       footerAction={
         <button className='btn btn-light' onClick={onViewProfilesClick} aria-label='View Customer Profiles'>
           <span>{<Icon variant='user-group' width={16} height={16} stroke='#626BA3' />}</span>
@@ -60,15 +61,15 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({ profile, o
 
         {/* Body */}
         <div className='inline-flex h-full w-full flex-col items-start justify-start gap-3.5'>
-          <div className='self-stretch text-xs font-bold leading-7 text-indigo-900'>Demographics</div>
+          <div className='self-stretch text-base font-bold leading-7 text-indigo-900'>Demographics</div>
           {/* Demographics */}
           <div className='inline-flex flex-col items-start justify-start gap-5'>
             {DEMOGRAPHIC_KEYS.map((item) => (
               <div className='inline-flex h-4 items-center justify-start gap-3 self-stretch'>
                 <Icon variant={DEMOGRAPHIC_VALUE_MAP[item].icon} />
-                <div className='shrink grow basis-0 text-base font-normal leading-none text-gray-500'>
+                <span className='shrink grow basis-0 text-sm font-medium leading-none text-gray-500'>
                   {DEMOGRAPHIC_VALUE_MAP[item].prefix} {profile ? profile[item] : ''}
-                </div>
+                </span>
               </div>
             ))}
           </div>

@@ -3,7 +3,7 @@ import ConceptDetailCard from '../../Cards/ConceptDetailCard';
 import Icon from '../../Icons/Icon/Icon';
 import { IFinancialProjection, IMarketSizeMetric } from '../../../../libs/api/types';
 import MarketChart from '../../Charts/MarketChart/MarketChart';
-import MarketLegend from '../../Legends/MarketLegend/MarketLegend';
+import { Legend } from '@components';
 
 export interface IMetricSizes {
   TAM: IMarketSizeMetric;
@@ -43,6 +43,8 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projecti
     <ConceptDetailCard
       title='Financial Projection'
       subtitle='Market size estimate based on initial hypothesis'
+      headerClassName='min-h-[92px]'
+      contentClassName='h-[360px]'
       cardClassName=''
       footerAction={
         <button className='btn btn-light' onClick={onViewClick} aria-label='View Financial Projection'>
@@ -51,17 +53,17 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projecti
         </button>
       }
     >
-      <div className='inline-flex flex-col items-center justify-start gap-6 p-6'>
+      <div className='inline-flex h-full w-full flex-col items-center justify-between p-6'>
         {marketSizeMetrics ? (
           <>
             <MarketChart
-              className={'h-60 w-60'}
+              className={'h-44 w-44'}
               tam={marketSizeMetrics.TAM.value}
               sam={marketSizeMetrics.SAM.value}
               som={marketSizeMetrics.SOM.value}
             />
 
-            <MarketLegend
+            <Legend.MarketLegend
               tam={marketSizeMetrics.TAM.value}
               sam={marketSizeMetrics.SAM.value}
               som={marketSizeMetrics.SOM.value}

@@ -15,8 +15,17 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite-plugin-svgr/client", "./src/types/index.d.ts", "./src/libs/api/types/index.d.ts"]
+    "types": ["vite-plugin-svgr/client", "./src/types/index.d.ts", "./src/libs/api/types/index.d.ts"],
+    "baseUrl": ".",
+    "paths": {
+      "@components": ["src/app/components/index.ts"],
+      "@components/*": ["src/app/components/*"],
+      "@pages": ["src/app/pages/index.ts"],
+      "@pages/*": ["src/app/pages/*"],
+      "@routes/*": ["src/app/routes/*"],
+      "@libs/*": ["src/app/routes/*"]
+    }
   },
-  "include": ["src", "src/**/*"],
+  "include": ["src", "src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -2,9 +2,8 @@ import { FunctionComponent } from 'react';
 import styles from './financialDetails.module.scss';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard';
-import Badge from '../../../../components/Badges';
+import { Badge, Legend } from '@components';
 import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
-import MarketLegend from '../../../../components/Legends/MarketLegend/MarketLegend';
 import { useParams } from 'react-router-dom';
 import { useEditFinancialProjections } from '../../../../hooks/concepts/editable.hook';
 import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
@@ -112,7 +111,7 @@ const FinancialDetails: FunctionComponent = () => {
                 sam={marketSizeMetric?.SAM?.value || 0}
                 som={marketSizeMetric?.SOM?.value || 0}
               />
-              <MarketLegend
+              <Legend.MarketLegend
                 tam={marketSizeMetric?.TAM?.value || 0}
                 sam={marketSizeMetric?.SAM?.value || 0}
                 som={marketSizeMetric?.SOM?.value || 0}
