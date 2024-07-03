@@ -38,7 +38,7 @@ export default defineConfig({
 
   resolve: {
     alias: {
-      // React Components
+      // React Components and JavaScript
       '@components': path.resolve(__dirname, 'src/app/components'),
       '@pages': path.resolve(__dirname, 'src/app/pages'),
       '@routes': path.resolve(__dirname, 'src/routes'),

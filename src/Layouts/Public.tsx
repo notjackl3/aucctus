@@ -5,7 +5,7 @@ import Footer from '../../app/components/Auth/Footer/Footer';
 import AuthHeader from '../../app/components/Header/AuthHeader/AuthHeader';
 import IntoSection from '../../app/components/Auth/IntoSection';
 
-const UnauthGuard: FunctionComponent = () => {
+const PublicLayout: FunctionComponent = () => {
   return (
     <div className={`${styles.authContainer}`}>
       <div className={`${styles.formSection}`}>
@@ -20,4 +20,4 @@ const UnauthGuard: FunctionComponent = () => {
   );
 };
 
-export default UnauthGuard;
+export default PublicLayout;

@@ -1,9 +1,9 @@
 import { Outlet, Navigate } from 'react-router-dom';
-import NavDrawer from './app/components/Navigation/NavDrawer/NavDrawer';
-import { AppPath } from './routes/routes';
-import { useAppStore } from './app/stores/app.store';
+import NavDrawer from '@components/Navigation/NavDrawer/NavDrawer';
+import { AppPath } from '@routes/routes';
+import { useAppStore } from '../../app/stores/app.store';
 
-const Layout = () => {
+const PrivateLayout = () => {
   const { user } = useAppStore();
 
   if (user && !user.account) {
@@ -20,4 +20,4 @@ const Layout = () => {
   );
 };
 
-export default Layout;
+export default PrivateLayout;

@@ -22,8 +22,8 @@
       "@components/*": ["src/app/components/*"],
       "@pages": ["src/app/pages/index.ts"],
       "@pages/*": ["src/app/pages/*"],
-      "@routes/*": ["src/app/routes/*"],
-      "@libs/*": ["src/app/routes/*"]
+      "@routes/*": ["src/routes/*"],
+      "@libs/*": ["src/libs/*"]
     }
   },
   "include": ["src", "src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],

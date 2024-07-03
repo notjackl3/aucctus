@@ -1,60 +1,38 @@
 import { Suspense } from 'react';
-import { Route, Routes } from 'react-router-dom';
-import AuthGuard from './routes/guards/auth.guard';
-import Layout from './Layout';
-import { AppPath, ConceptPath } from './routes/routes';
-import Page from './app/pages';
-import { Navigate } from 'react-router-dom';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
-import Loading from './app/components/Loading';
-import UnauthGuard from './routes/guards/unauth.gaurd';
+import { usePublicRoutes, usePrivateRoutes } from '@routes/hooks';
+import AuthGuard from '@routes/guards/auth.guard';
+import { AppPath } from '@routes/routes';
+import Page from '@pages';
+import Loading from '@components/Loading';
 
 function App() {
+  // Public Routes (Unauthenticated)
+  const PublicRoutes = usePublicRoutes();
+
+  // Private Routes
+  const PrivateRoutes = usePrivateRoutes();
+
   return (
     <div role='main' className='App'>
-      {/* TODO: Create Loading Screen */}
       <Suspense fallback={<Loading />}>
         <Routes>
-          <Route>
-            {/* Protected Routes */}
-            <Route element={<AuthGuard />}>
-              <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
-              <Route element={<Layout />}>
-                <Route index path={AppPath.Home} element={<Page.Dashboard />} />
+          {/* Protected Routes */}
+          <Route element={<AuthGuard />}>
+            <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
 
-                <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
-                <Route path={AppPath.ConceptSnapshot} element={<Page.ConceptSnapshot />} />
-                <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
-                <Route path={AppPath.ConceptCategory} element={<Page.Concepts />} />
+            {/* Private Routes */}
+            {/* These are nested inside the Layout Component */}
+            {PrivateRoutes}
 
-                <Route path={AppPath.ConceptOverview} element={<Page.ConceptPages.ConceptReport />}>
-                  <Route index element={<Page.ConceptPages.Overview />} />
-                  <Route path={ConceptPath.MarketScan} element={<Page.ConceptPages.MarketScan />} />
-                  <Route path={ConceptPath.FinancialProjection} element={<Page.ConceptPages.FinancialProjection />} />
-                  <Route path={ConceptPath.CustomerProfile} element={<Page.ConceptPages.CustomerProfile />} />
-                  <Route path={ConceptPath.KeyAssumptions} element={<Page.ConceptPages.KeyAssumptions />} />
-                  <Route path={ConceptPath.ConceptSettings} element={<Page.ConceptPages.ConceptSettings />} />
-                </Route>
-
-                <Route path={AppPath.Settings} element={<Page.SettingsPages.Settings />}>
-                  <Route index path={AppPath.SettingsAbout} element={<Page.SettingsPages.AboutDetails />} />
-                  <Route index path={AppPath.SettingsSecurity} element={<Page.SettingsPages.SecurityDetails />} />
-                </Route>
-              </Route>
-              {/* Auth Routes  */}
-              <Route element={<UnauthGuard />}>
-                <Route index path={AppPath.Login} element={<Page.Auth.Login />} />
-                <Route path={AppPath.SignUp} element={<Page.Auth.SignUp />} />
-                <Route path={AppPath.ForgotPassword} element={<Page.Auth.ForgotPassword />} />
-                <Route path={AppPath.ResetPassword} element={<Page.Auth.ResetPassword />} />
-                <Route path={AppPath.ResetPasswordSuccess} element={<Page.Auth.ResetPasswordSuccess />} />
-                <Route path={AppPath.ConfirmEmail} element={<Page.Auth.ConfirmEmail />} />
-                <Route path={AppPath.EmailConfirmation} element={<Page.Auth.EmailConfirmation />} />
-              </Route>
-            </Route>
+            {/* Public Routes  */}
+            {PublicRoutes}
           </Route>
+
           <Route path='*' element={<Navigate to={AppPath.Home} replace />} />
         </Routes>
+
         <ToastContainer
           position='bottom-center'
           autoClose={5000}
