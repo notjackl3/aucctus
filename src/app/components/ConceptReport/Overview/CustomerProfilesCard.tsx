@@ -48,7 +48,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({ profile, o
         </button>
       }
     >
-      <div className='inline-flex flex-col items-center justify-start gap-6 p-6'>
+      <div className='inline-flex h-full w-full flex-col items-center justify-start gap-6 p-6'>
         {/* Header  */}
         <div className='flex w-full items-center justify-start gap-4'>
           <img className='relative h-16 w-16 rounded-3xl border border-white' alt='avatar' src={defaultAvatar} />
@@ -59,14 +59,14 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({ profile, o
         </div>
 
         {/* Body */}
-        <div className='inline-flex h-48 w-80 flex-col items-start justify-start gap-3.5'>
+        <div className='inline-flex h-full w-full flex-col items-start justify-start gap-3.5'>
           <div className='self-stretch text-xs font-bold leading-7 text-indigo-900'>Demographics</div>
           {/* Demographics */}
-          <div className='inline-flex h-32 w-80 flex-col items-start justify-start gap-5'>
+          <div className='inline-flex flex-col items-start justify-start gap-5'>
             {DEMOGRAPHIC_KEYS.map((item) => (
               <div className='inline-flex h-4 items-center justify-start gap-3 self-stretch'>
                 <Icon variant={DEMOGRAPHIC_VALUE_MAP[item].icon} />
-                <div className='shrink grow basis-0 text-xs font-normal leading-none text-gray-500'>
+                <div className='shrink grow basis-0 text-base font-normal leading-none text-gray-500'>
                   {DEMOGRAPHIC_VALUE_MAP[item].prefix} {profile ? profile[item] : ''}
                 </div>
               </div>

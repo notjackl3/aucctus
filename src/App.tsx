@@ -1,7 +1,7 @@
 import { Suspense } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import AuthGuard from './routes/guards/auth.guard';
-import Layout from './Layout/Layout';
+import Layout from './Layout';
 import { AppPath, ConceptPath } from './routes/routes';
 import Page from './app/pages';
 import { Navigate } from 'react-router-dom';

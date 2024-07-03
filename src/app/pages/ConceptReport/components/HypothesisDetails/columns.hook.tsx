@@ -3,7 +3,7 @@ import { IAssumption } from '../../../../../libs/api/types';
 import { useMemo } from 'react';
 
 import styles from './styles/hypothesisDetails.module.scss';
-import GeneralBadge from '../../../../components/Badges/GeneralBadge/GeneralBadge';
+import GeneralBadge from '../../../../components/Badges/GeneralBadge';
 import AssumptionBadge from '../../../../components/Badges/AssumptionBadge/AssumptionBadge';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useModal } from '../../../../context/ModalContextProvider';

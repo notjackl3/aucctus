@@ -1,6 +1,5 @@
 module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
-  purge: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
       colors: {
@@ -30,6 +29,7 @@ module.exports = {
           500: '#615eed',
           600: '#4318ff',
         },
+
         warning: {
           50: '#fffaeb',
           500: '#f79009',
@@ -44,6 +44,9 @@ module.exports = {
           50: '#ecfdf3',
           500: '#17b26a',
           700: '#027a48',
+        },
+        width: {
+          'nav-drawer': '15.5rem',
         },
       },
 

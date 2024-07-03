@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 import styles from './financialDetails.module.scss';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard';
-import GeneralBadge from '../../../../components/Badges/GeneralBadge/GeneralBadge';
+import GeneralBadge from '../../../../components/Badges/GeneralBadge';
 import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
 import MarketLegend from '../../../../components/Legends/MarketLegend/MarketLegend';
 import { useParams } from 'react-router-dom';

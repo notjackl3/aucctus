@@ -26,7 +26,7 @@ const OverviewDetails: FunctionComponent = () => {
     <div className='flex flex-col items-start'>
       <section className='inline-flex items-start justify-start gap-12'>
         {/* Left Section */}
-        <div className='inline-flex shrink grow basis-0 flex-col items-start justify-center gap-8 self-stretch'>
+        <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-8 self-stretch'>
           <div className='inline-flex flex-col items-start justify-start gap-5'>
             <Header text='Value Proposition' />
             <EditModeSwitcher
@@ -82,7 +82,7 @@ const OverviewDetails: FunctionComponent = () => {
         </div>
       </section>
 
-      <section className={`inline-flex flex-wrap items-center justify-start gap-6 p-8`}>
+      <section className={`inline-flex flex-wrap items-center justify-start gap-6 pt-8`}>
         <Overview.CustomerProfilesCard
           profile={firstCustomerPersona}
           onViewProfilesClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
