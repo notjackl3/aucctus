@@ -34,7 +34,7 @@ const isEcosystemItem = (item: unknown) => {
   return (item as Ecosystem).ecosystemType !== undefined;
 };
 
-const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item, updateItem, deleteItem }) => {
+const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ item, updateItem, deleteItem }) => {
   const { closeModal } = useModal();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [name, setName] = useState(item.name);
@@ -203,4 +203,4 @@ const EditMarketScanitem: FunctionComponent<EditTrendsAndDriverProps> = ({ item,
   );
 };
 
-export default EditMarketScanitem;
+export default EditMarketScanElement;

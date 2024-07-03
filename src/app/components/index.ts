@@ -1,7 +1,18 @@
+// Component Groups
 import Badge from './Badges';
-import Legend from './Legends';
 import Button from './Buttons';
-import Icon from './Icons';
 import Card from './Cards';
+import Chart from './Charts';
+import Container from './Container';
+import Header from './Header';
+import Icon from './Icons';
+import Legend from './Legends';
+import Modal from './Modal';
+import Text from './Text';
 
-export { Legend, Badge, Button, Icon, Card };
+// Components
+import IgniteLoading from './IgniteLoading';
+import Loading from './Loading';
+import Tooltip from './ToolTip/Tooltip';
+
+export { Badge, Button, Card, Chart, Container, Header, Icon, Legend, Modal, Text, IgniteLoading, Loading, Tooltip };

@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react';
 import { useSpring, animated } from '@react-spring/web';
-import { usePrevious, useMeasure } from '../hooks/utility.hook';
+import { usePrevious, useMeasure } from '../../hooks/utility.hook';
 
 interface CollapsibleProps {
   toggle: boolean;

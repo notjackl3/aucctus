@@ -4,10 +4,10 @@ import { Ecosystem, EcosystemType } from '../../../../../libs/api/types';
 import images from '../../../../assets/img';
 import { useEcosystemCreate, useEcosystemDelete, useEcosystemUpdate } from '../../../../hooks/query/concepts.hook';
 import { useModal } from '../../../../context/ModalContextProvider';
-import EditMarketScanElement from '../../../../components/Modal/EditMarketScanElement/EditMarketScanElement';
+import EditMarketScanElement from '../../../../components/Modal/MarketScanElement/EditMarketScanElement';
 
 import styles from './styles/marketDetails.module.scss';
-import AddMarketScanElement from '../../../../components/Modal/EditMarketScanElement/AddMarketScanElement';
+import AddMarketScanElement from '../../../../components/Modal/MarketScanElement/AddMarketScanElement';
 import { useParams } from 'react-router-dom';
 import { Card, Icon } from '@components';
 

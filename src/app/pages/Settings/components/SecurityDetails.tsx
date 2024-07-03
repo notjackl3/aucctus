@@ -1,5 +1,5 @@
 import { FunctionComponent, useMemo, useState } from 'react';
-import RowInfo from '../../../components/Container/RowInfo/RowInfo';
+import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import InputField from '../../../components/Text/InputField/InputField';
 import styles from '../styles/securityDetails.module.scss';
 import { toast } from 'react-toastify';

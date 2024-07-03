@@ -25,7 +25,7 @@ const ASSUMPTION_TYPE_OPTIONS: Option[] = (
   value,
 }));
 
-const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = ({ conceptUuid }) => {
+const AddKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = ({ conceptUuid }) => {
   const { closeModal } = useModal();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { mutate: createAssumption } = useAssumptionCreate(conceptUuid);
@@ -176,4 +176,4 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
   );
 };
 
-export default EditKeyAssumptionModal;
+export default AddKeyAssumptionModal;

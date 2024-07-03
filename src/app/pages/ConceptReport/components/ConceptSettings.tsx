@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import SeedField from '../../../components/SeedField';
+import SeedField from '../../../components/Text/SeedField';
 import { useConceptSeed } from '../../../hooks/query/concepts.hook';
 import { useParams } from 'react-router-dom';
 import Loading from '../../../components/Loading';

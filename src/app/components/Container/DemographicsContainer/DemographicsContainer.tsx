@@ -1,10 +1,10 @@
 import { FunctionComponent } from 'react';
 
 import styles from './demographics-container.module.scss';
-import Icon from '../../../Icons/Icon/Icon';
-import { useModal } from '../../../../context/ModalContextProvider';
-import EditCustomerProfileDemographics from '../../../Modal/CustomerProfile/EditCustomerProfileDemographics';
-import { ICustomerProfile } from '../../../../../libs/api/types';
+import Icon from '../../Icons/Icon/Icon';
+import { useModal } from '../../../context/ModalContextProvider';
+import EditCustomerProfileDemographics from '../../Modal/CustomerProfile/EditCustomerProfileDemographics';
+import { ICustomerProfile } from '../../../../libs/api/types';
 
 const iconDefaultProps = {
   height: 20,

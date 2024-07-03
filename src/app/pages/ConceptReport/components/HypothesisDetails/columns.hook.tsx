@@ -7,7 +7,7 @@ import styles from './styles/hypothesisDetails.module.scss';
 import { Badge } from '@components';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useModal } from '../../../../context/ModalContextProvider';
-import EditKeyAssumptionModal from '../../../../components/Modal/EditKeyAssumtionModal/EditKeyAssumtionModal';
+import EditKeyAssumptionModal from '../../../../components/Modal/KeyAssumtionModal/EditKeyAssumtionModal';
 
 const columnHelper = createColumnHelper<IAssumption>();
 

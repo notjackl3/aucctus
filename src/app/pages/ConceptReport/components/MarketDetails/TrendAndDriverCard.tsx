@@ -3,7 +3,7 @@ import { ITrendsAndDrivers } from '@libs/api/types';
 import styles from './styles/marketDetails.module.scss';
 import images from '../../../../assets/img';
 import { useModal } from '../../../../context/ModalContextProvider';
-import EditMarketScanElement from '../../../../components/Modal/EditMarketScanElement/EditMarketScanElement';
+import EditMarketScanElement from '../../../../components/Modal/MarketScanElement/EditMarketScanElement';
 import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../../hooks/query/concepts.hook';
 import { Card, Icon } from '@components';
 

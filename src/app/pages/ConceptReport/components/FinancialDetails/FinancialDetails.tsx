@@ -4,7 +4,7 @@ import { Badge, Legend, Card, Icon } from '@components';
 import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
 import { useParams } from 'react-router-dom';
 import { useEditFinancialProjections } from '../../../../hooks/concepts/editable.hook';
-import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
+import EditModeSwitcher from '../../../../components/Text/EditModeSwitcher/EditModeSwitcher';
 import Loading from '../../../../components/Loading';
 
 const iconDefaultProps = {

@@ -1,8 +1,8 @@
 import { FunctionComponent } from 'react';
 import styles from './drawer.module.scss';
-import Collapsible from '../../Collapsible';
 import NestedLink, { NestedLinkProps } from '../NestedLink/NestedLink';
 import Icon from '../../Icons/Icon/Icon';
+import { Button } from '@components';
 
 const defaultIconProps = {
   stroke: '#7586A9',
@@ -39,9 +39,9 @@ const NavLink: FunctionComponent<NavLinkButtonProps> = ({
       </a>
 
       {nestedRoutes ? (
-        <Collapsible width={'100%'} toggle={!!isOpen}>
+        <Button.Collapsible width={'100%'} toggle={!!isOpen}>
           {nestedRoutes && nestedRoutes.map((route, i) => <NestedLink key={`di-${route.title}-${i}`} {...route} />)}
-        </Collapsible>
+        </Button.Collapsible>
       ) : null}
     </div>
   );

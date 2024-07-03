@@ -1,7 +1,7 @@
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
 import styles from './customer-profile-context.module.scss';
-import { useCustomerProfileUpdate } from '../../../../hooks/query/concepts.hook';
-import InputField from '../../../Text/InputField/InputField';
+import { useCustomerProfileUpdate } from '../../../hooks/query/concepts.hook';
+import InputField from '../../Text/InputField/InputField';
 import { Card, Icon } from '@components';
 
 interface ICustomerProfileDetailsLists {

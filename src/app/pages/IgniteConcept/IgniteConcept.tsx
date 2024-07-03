@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 import IgniteLoading from '../../components/IgniteLoading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
-import WhiteSpaceSuggestion from '../../components/WhiteSpaceSuggestions';
+import WhiteSpaceSuggestion from '../../components/Text/WhiteSpaceSuggestions';
 import { useConceptGenerationStore } from '../../stores/concept-generation.store';
 import { Card } from '@components';
 

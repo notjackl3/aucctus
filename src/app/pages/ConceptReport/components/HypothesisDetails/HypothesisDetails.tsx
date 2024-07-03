@@ -18,7 +18,7 @@ import { useAssumptionsColumns } from './columns.hook';
 import { useKeyAssumptions } from '../../../../hooks/query/concepts.hook';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useModal } from '../../../../context/ModalContextProvider';
-import AddKeyAssumptionModal from '../../../../components/Modal/EditKeyAssumtionModal/AddKeyAssumptionModal';
+import AddKeyAssumptionModal from '../../../../components/Modal/KeyAssumtionModal/AddKeyAssumptionModal';
 
 const HypothesisDetails: FunctionComponent = () => {
   const { columns } = useAssumptionsColumns();

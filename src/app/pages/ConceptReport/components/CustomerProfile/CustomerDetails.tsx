@@ -2,9 +2,9 @@ import { FunctionComponent } from 'react';
 import styles from './styles/customerDetails.module.scss';
 import defaultAvatar from '../../../../assets/avatar.svg';
 import { ICustomerProfile } from '../../../../../libs/api/types';
-import CustomerProfileContextList from '../../../../components/Concepts/CustomerProfiles/CustomerProfileContextList/CustomerProfileContextList';
-import DemographicsContainer from '../../../../components/Concepts/CustomerProfiles/DemographicsContainer/DemographicsContainer';
-import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
+import CustomerProfileContextList from '../../../../components/Cards/CustomerProfileContextList/CustomerProfileContextList';
+import DemographicsContainer from '../../../../components/Container/DemographicsContainer/DemographicsContainer';
+import EditModeSwitcher from '../../../../components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditCustomerProfile } from '../../../../hooks/concepts/editable.hook';
 
 export interface ICustomerDetailsProps {

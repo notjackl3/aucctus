@@ -8,6 +8,7 @@ const KeyAssumptions = React.lazy(() => import('./KeyAssumptionsCard'));
 const FinancialProjects = React.lazy(() => import('./FinancialProjectsCard'));
 const CustomerProfiles = React.lazy(() => import('./CustomerProfilesCard'));
 const Ignition = React.lazy(() => import('./IgnitionCard'));
+const CustomerProfileContextList = React.lazy(() => import('./CustomerProfileContextList/CustomerProfileContextList'));
 
 const Card = {
   Detail,
@@ -17,6 +18,7 @@ const Card = {
   FinancialProjects,
   CustomerProfiles,
   Ignition,
+  CustomerProfileContextList,
 };
 
 export default Card;

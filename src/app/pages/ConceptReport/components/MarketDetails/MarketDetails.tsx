@@ -4,11 +4,11 @@ import { useParams } from 'react-router-dom';
 import { useConceptMarketScan, useTrendAndDriverCreate } from '../../../../hooks/query/concepts.hook';
 import EcosystemList from './EcosystemList';
 import { useEditMarketScan } from '../../../../hooks/concepts/editable.hook';
-import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
+import EditModeSwitcher from '../../../../components/Text/EditModeSwitcher/EditModeSwitcher';
 import TrendAndDriverCard from './TrendAndDriverCard';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useModal } from '../../../../context/ModalContextProvider';
-import AddMarketScanElement from '../../../../components/Modal/EditMarketScanElement/AddMarketScanElement';
+import AddMarketScanElement from '../../../../components/Modal/MarketScanElement/AddMarketScanElement';
 
 const MarketDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();

@@ -1,12 +1,10 @@
 import { FunctionComponent, useMemo } from 'react';
 import { useParams, useOutletContext } from 'react-router-dom';
-import { AppPath } from '../../../../routes/routes';
+import { AppPath } from '@routes/routes';
 import { IConceptReportContext } from '../ConceptReport';
 import { useConceptAssumptions, useConceptOverview } from '../../../hooks/query/concepts.hook';
-import EditModeSwitcher from '../../../components/Text/EditibleTextView/EditibleTextView';
 import { useEditConcept, useEditOverview } from '../../../hooks/concepts/editable.hook';
-import { Header, ListContainer } from '../../../components/ConceptReport';
-import { Card } from '@components';
+import { Card, Header, Container, Text } from '@components';
 
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
@@ -29,8 +27,8 @@ const OverviewDetails: FunctionComponent = () => {
         {/* Left Section */}
         <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-8 self-stretch'>
           <div className='inline-flex flex-col items-start justify-start gap-5'>
-            <Header text='Value Proposition' />
-            <EditModeSwitcher
+            <Header.Three text='Value Proposition' />
+            <Text.EditModeSwitcher
               pClassName='text-gray-500 text-2xl font-medium'
               value={valueProposition.value}
               label=''
@@ -44,8 +42,8 @@ const OverviewDetails: FunctionComponent = () => {
 
           {overview?.problemStatement ? (
             <div className='inline-flex flex-col items-start justify-start gap-5'>
-              <Header text='Problem Statement' />
-              <EditModeSwitcher
+              <Header.Three text='Problem Statement' />
+              <Text.EditModeSwitcher
                 pClassName='text-gray-500 text-2xl font-medium'
                 value={problemStatement.value}
                 label=''
@@ -62,8 +60,8 @@ const OverviewDetails: FunctionComponent = () => {
         <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-8 self-stretch'>
           {/* Overview  */}
           <div className='inline-flex flex-col items-start justify-start gap-5'>
-            <Header text='Overview' />
-            <EditModeSwitcher
+            <Header.Three text='Overview' />
+            <Text.EditModeSwitcher
               pClassName='self-stretch text-gray-500 text-base font-normal leading-normal'
               value={descriptionEdit.value}
               label=''
@@ -77,8 +75,8 @@ const OverviewDetails: FunctionComponent = () => {
 
           {/* Lists of Trends & Drives and Industries */}
           <div className='inline-flex items-start justify-between gap-3'>
-            <ListContainer title='Trends & Drivers' items={overview?.trendsAndDrivers || []} />
-            <ListContainer title='Industries' items={overview?.industries || []} />
+            <Container.List title='Trends & Drivers' items={overview?.trendsAndDrivers || []} />
+            <Container.List title='Industries' items={overview?.industries || []} />
           </div>
         </div>
       </section>
