@@ -1,9 +1,11 @@
 import { FunctionComponent } from 'react';
 
 import styles from './styles/kanban.module.scss';
-import ConceptCard from '../../Cards/ConceptCard/ConceptCard';
-import { camelCaseToTitleCase } from '../../../../libs/utils';
-import { ConceptStatus, IConcept } from '../../../../libs/api/types';
+
+import { Card } from '@components';
+
+import { camelCaseToTitleCase } from '@libs/utils';
+import { ConceptStatus, IConcept } from '@libs/api/types';
 
 interface ConceptColumn {
   title: ConceptStatus;
@@ -22,7 +24,7 @@ export interface KanbanProps {
 const Kanban: FunctionComponent<KanbanProps> = ({ kanbanColumns, selectCard }) => {
   const renderColumnCards = (columnCardList: IConcept[]) => {
     return columnCardList.map((columnCard, index) => {
-      return <ConceptCard key={`concept-card-${index}`} concept={columnCard} selectCard={selectCard} />;
+      return <Card.Kanban key={`concept-card-${index}`} concept={columnCard} selectCard={selectCard} />;
     });
   };
 

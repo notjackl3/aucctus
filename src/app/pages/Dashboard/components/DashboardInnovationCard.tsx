@@ -1,14 +1,14 @@
 import { FunctionComponent, useMemo } from 'react';
 
 import styles from '../styles/dashboard.module.scss';
-import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard';
-import ConceptStatistic from '../../../components/Badges/ConceptStatistic';
+
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
   getDashboardConceptStatusIcon,
   getDashboardConceptStatusIconColor,
-} from '../../../../libs/concepts';
-import { ActiveConceptStatus, IConceptDetails } from '../../../../libs/api/types';
+} from '@libs/concepts';
+import { ActiveConceptStatus, IConceptDetails } from '@libs/api/types';
+import { Badge, Card } from '@components';
 
 const ConceptTitle: Record<ActiveConceptStatus, string> = {
   prototyping: 'Concepts Generated',
@@ -38,7 +38,7 @@ const DashboardInnovationCard: FunctionComponent<DashboardInnovationCardProps> =
 
   const renderInnovationRows = innovationScores?.map((innovationRow, i) => (
     <div className={styles.cardRow} key={`innovation-score-${i}`}>
-      <ConceptStatistic
+      <Badge.ConceptStatistic
         infoTitle={innovationRow.infoTitle}
         infoValue={`${innovationRow.infoValue}`}
         icon={innovationRow.icon}
@@ -48,9 +48,9 @@ const DashboardInnovationCard: FunctionComponent<DashboardInnovationCardProps> =
   ));
 
   return (
-    <ConceptDetailCard title='Innovation Scorecard' cardClassName={styles.cardStyle} isHideFooter>
+    <Card.Detail title='Innovation Scorecard' cardClassName={styles.cardStyle} isHideFooter>
       <div className={styles.cardContent}>{renderInnovationRows}</div>
-    </ConceptDetailCard>
+    </Card.Detail>
   );
 };
 

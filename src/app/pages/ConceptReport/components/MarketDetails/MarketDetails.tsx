@@ -67,24 +67,7 @@ const MarketDetails: FunctionComponent = () => {
         <EcosystemList title='Top Incumbents' data={marketScan?.incumbents || []} ecosystemType='incumbents' />
         <EcosystemList title='Top Investors' data={marketScan?.investors || []} ecosystemType='investors' />
       </div>
-      {/* TODO add back news when ready */}
-      {/* <div className={styles.summary}>
-        <div className={styles.detailBlock}>
-          <h2>Activity and News</h2>
-        </div>
-      </div>
-      <div className={styles.newsContainer}>
-        <NewsArticle
-          newsTitle={`Rapid Delivery & Logistics Retail Business, 'Buggy,' Launches Equity Crowdfunding Round on Frontfund`}
-          newsDescription={`Buggy, Canada's leading rapid retail logistics company, is excited to announce its equity crowdfunding round on Frontfundr."With an experienced team, strong strategic partnerships and focus on path to profitability in this space, we're excited to offer the opportunity for individuals to invest in our growth through our equity crowdfunding round on Frontfundr," said Nicole Verkindt, CEO of Buggy.`}
-          newsLink="https://www.google.com/"
-        />
-        <NewsArticle
-          newsTitle={`Rapid Delivery & Logistics Retail Business, 'Buggy,' Launches Equity Crowdfunding Round on Frontfund`}
-          newsDescription={`Buggy, Canada's leading rapid retail logistics company, is excited to announce its equity crowdfunding round on Frontfundr."With an experienced team, strong strategic partnerships and focus on path to profitability in this space, we're excited to offer the opportunity for individuals to invest in our growth through our equity crowdfunding round on Frontfundr," said Nicole Verkindt, CEO of Buggy.`}
-          newsLink="https://www.google.com/"
-        />
-      </div> */}
+
       {/* This external link is required to be added to the page when using Clearbit logos */}
       <div className={styles.externalLogoLink}>
         <a href='https://clearbit.com' target='_blank' rel='noopener noreferrer'>

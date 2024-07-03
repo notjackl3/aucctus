@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-interface IConceptIgnitionCardProps {
+interface IIgnitionCardProps {
   header: {
     title: string;
     description: string;
@@ -15,7 +15,7 @@ interface IConceptIgnitionCardProps {
   footer?: React.ReactNode;
 }
 
-const ConceptIgnitionCard: React.FunctionComponent<IConceptIgnitionCardProps> = ({ header, children, footer }) => {
+const IgnitionCard: React.FunctionComponent<IIgnitionCardProps> = ({ header, children, footer }) => {
   return (
     <section className='flex max-w-[360px] flex-col self-stretch overflow-clip rounded-xl border border-solid border-slate-200 bg-white shadow-sm'>
       <div className={`flex w-full flex-col justify-center px-4 py-6 text-center ${header.color}`}>
@@ -38,4 +38,4 @@ const ConceptIgnitionCard: React.FunctionComponent<IConceptIgnitionCardProps> = 
   );
 };
 
-export default ConceptIgnitionCard;
+export default IgnitionCard;

@@ -1,13 +1,10 @@
 import { FunctionComponent } from 'react';
 import styles from './financialDetails.module.scss';
-import Icon from '../../../../components/Icons/Icon/Icon';
-import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard';
-import { Badge, Legend } from '@components';
+import { Badge, Legend, Card, Icon } from '@components';
 import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
 import { useParams } from 'react-router-dom';
 import { useEditFinancialProjections } from '../../../../hooks/concepts/editable.hook';
 import EditModeSwitcher from '../../../../components/Text/EditibleTextView/EditibleTextView';
-import MarketSizeProjectionsCard from '../../../../components/Concepts/FinacialProjections/MarketSizeProjectionsCard/MarketSizeProjectionsCard';
 import Loading from '../../../../components/Loading';
 
 const iconDefaultProps = {
@@ -39,13 +36,13 @@ const FinancialDetails: FunctionComponent = () => {
       </div>
       <h2>Potential Market Size</h2>
       <div className={styles.cardContainer}>
-        <ConceptDetailCard
+        <Card.Detail
           title='Key Hypothesis'
           cardClassName={styles.cardStyle}
           isHideFooter
           headerAction={
             <button className='btn btn-light btn-no-border' aria-label='Unlock Edit Hypothesis' disabled>
-              <span>{<Icon variant='lock' {...iconDefaultProps} />}</span>
+              <span>{<Icon.Variant variant='lock' {...iconDefaultProps} />}</span>
               AI Generated
             </button>
           }
@@ -88,17 +85,17 @@ const FinancialDetails: FunctionComponent = () => {
               <Badge.Simple showBullet bulletClass='text-blue-600' text='3' />
             </div>
           </div>
-        </ConceptDetailCard>
+        </Card.Detail>
       </div>
       <div className={styles.cardContainer}>
-        <ConceptDetailCard title='Market Size Projection' cardClassName={styles.paddedCardStyle} isHideFooter>
+        <Card.Detail title='Market Size Projection' cardClassName={styles.paddedCardStyle} isHideFooter>
           <div className={styles.cardMarketContent}>
             <div className={styles.cardLeft}>
               {marketSizeMetric ? (
                 <>
-                  <MarketSizeProjectionsCard metric={marketSizeMetric.TAM} conceptUuid={conceptId || ''} />
-                  <MarketSizeProjectionsCard metric={marketSizeMetric.SAM} conceptUuid={conceptId || ''} />
-                  <MarketSizeProjectionsCard metric={marketSizeMetric.SOM} conceptUuid={conceptId || ''} />
+                  <Card.MarketSizeProjections metric={marketSizeMetric.TAM} conceptUuid={conceptId || ''} />
+                  <Card.MarketSizeProjections metric={marketSizeMetric.SAM} conceptUuid={conceptId || ''} />
+                  <Card.MarketSizeProjections metric={marketSizeMetric.SOM} conceptUuid={conceptId || ''} />
                 </>
               ) : (
                 <Loading />
@@ -116,20 +113,9 @@ const FinancialDetails: FunctionComponent = () => {
                 sam={marketSizeMetric?.SAM?.value || 0}
                 som={marketSizeMetric?.SOM?.value || 0}
               />
-
-              {/* <div className={styles.legend}>
-                {Object.values(marketSizeMetric || {}).map((metric, i) => (
-                  <MarketLegend
-                    key={`$market-metrics-legend-${i}`}
-                    legendText={getMarketMetricTitle(metric.metricType)}
-                    legendValue={formatter.format(metric.value)}
-                    bulletColor={getMarketMetricColor(metric.metricType)}
-                  />
-                ))}
-              </div> */}
             </div>
           </div>
-        </ConceptDetailCard>
+        </Card.Detail>
       </div>
     </div>
   );

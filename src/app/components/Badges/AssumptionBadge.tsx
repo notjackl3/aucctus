@@ -1,8 +1,8 @@
 import { FunctionComponent } from 'react';
 
 import styles from './assumptionBadge.module.scss';
-import Icon from '../../Icons/Icon/Icon';
-import { AssumptionType } from '../../../../libs/api/types';
+import Icon from '../Icons/Icon/Icon';
+import { AssumptionType } from '@libs/api/types';
 
 export interface IConceptAssumptionBadgeProps {
   type: AssumptionType;
@@ -22,7 +22,9 @@ const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({ type
       >
         <Icon variant={ASSUMPTION_TYPE_MAP[type].icon} {...defaultIconProps} />
       </span>
-      <span className={styles.status}>{type}</span>
+      <span className='whitespace-nowrap text-center text-sm  font-medium capitalize leading-6 text-blue-900'>
+        {type}
+      </span>
     </div>
   );
 };

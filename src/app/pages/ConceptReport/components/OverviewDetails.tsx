@@ -5,7 +5,8 @@ import { IConceptReportContext } from '../ConceptReport';
 import { useConceptAssumptions, useConceptOverview } from '../../../hooks/query/concepts.hook';
 import EditModeSwitcher from '../../../components/Text/EditibleTextView/EditibleTextView';
 import { useEditConcept, useEditOverview } from '../../../hooks/concepts/editable.hook';
-import { Header, ListContainer, Overview } from '../../../components/ConceptReport';
+import { Header, ListContainer } from '../../../components/ConceptReport';
+import { Card } from '@components';
 
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
@@ -83,17 +84,17 @@ const OverviewDetails: FunctionComponent = () => {
       </section>
 
       <section className={`inline-flex flex-wrap items-center justify-start gap-6 pt-8`}>
-        <Overview.CustomerProfilesCard
+        <Card.CustomerProfiles
           profile={firstCustomerPersona}
           onViewProfilesClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
         />
 
-        <Overview.FinancialProjectsCard
+        <Card.FinancialProjects
           projection={overview?.financialProjection}
           onViewClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
         />
 
-        <Overview.KeyAssumptionsCard
+        <Card.KeyAssumptions
           assumptions={assumptions?.results || []}
           onViewClick={() => navigateToTab(AppPath.ConceptKeyAssumptions)}
         />

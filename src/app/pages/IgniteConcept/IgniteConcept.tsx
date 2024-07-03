@@ -1,17 +1,17 @@
 import React, { FunctionComponent, useCallback, useState } from 'react';
 import { useConceptIgnition } from '../../hooks/query/concepts.hook';
-import ConceptIgnitionCard from '../../components/Cards/FormCard/ConceptIgnitionCard';
 import images from '../../assets/img';
 import TextArea from '../../components/Text/TextArea/TextArea';
 import Icon from '../../components/Icons/Icon/Icon';
 import InputField from '../../components/Text/InputField/InputField';
-import { ConceptSeedType, EEIQuestionKeys, IConceptSeedAttribute, INOQuestionKeys } from '../../../libs/api/types';
+import { ConceptSeedType, EEIQuestionKeys, IConceptSeedAttribute, INOQuestionKeys } from '@libs/api/types';
 import { toast } from 'react-toastify';
 import IgniteLoading from '../../components/IgniteLoading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import WhiteSpaceSuggestion from '../../components/WhiteSpaceSuggestions';
 import { useConceptGenerationStore } from '../../stores/concept-generation.store';
+import { Card } from '@components';
 
 const INITIAL_EXPANDING_IDEA: IConceptSeedAttribute<EEIQuestionKeys>[] = [
   { question: 'DESCRIBE', answer: '' },
@@ -192,7 +192,7 @@ const IgniteConcept: FunctionComponent = () => {
           </section>
 
           <section className='w-100 flex flex-row flex-wrap gap-6'>
-            <ConceptIgnitionCard
+            <Card.Ignition
               header={{
                 title: 'Expanding An Existing Idea',
                 description: "Describe an idea you already have and we'll help you to validate it.",
@@ -235,7 +235,7 @@ const IgniteConcept: FunctionComponent = () => {
               }
             />
 
-            <ConceptIgnitionCard
+            <Card.Ignition
               header={{
                 title: 'Identify New Opportunities',
                 description: "Describe an industry you want to enter and we'll suggest ideas that fit your goals.",
@@ -267,7 +267,7 @@ const IgniteConcept: FunctionComponent = () => {
               }
             />
 
-            <ConceptIgnitionCard
+            <Card.Ignition
               header={{
                 title: 'White Space Suggestions',
                 description: "Based on what we know about your company, we've suggested some ideas.",

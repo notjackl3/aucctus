@@ -1,14 +1,13 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/dashboard.module.scss';
-import Icon from '../../components/Icons/Icon/Icon';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
-import ConceptDetailCard from '../../components/Cards/ConceptDetailCard';
 import ConceptBarChart from '../../components/Charts/ConceptBarChart';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import DashboardInnovationCard from './components/DashboardInnovationCard';
 import { useDashboard } from '../../hooks/query/account.hook';
 import { useAppStore } from '../../stores/app.store';
+import { Card, Icon } from '@components';
 
 const defaultIconProps = {
   stroke: '#2B3674',
@@ -34,7 +33,7 @@ const Dashboard: FunctionComponent = () => {
               navigate(AppPath.IgniteConcept);
             }}
           >
-            <Icon variant='rocket' height={20} width={20} stroke='#fff' />
+            <Icon.Variant variant='rocket' height={20} width={20} stroke='#fff' />
             Add Concept
           </button>
         </div>
@@ -46,7 +45,7 @@ const Dashboard: FunctionComponent = () => {
           </div>
         )}
         <div className={`${styles.cardContainer} ${styles.barChart}`}>
-          <ConceptDetailCard
+          <Card.Detail
             title='Active Concepts'
             cardClassName={styles.cardStyle}
             footerAction={
@@ -57,14 +56,14 @@ const Dashboard: FunctionComponent = () => {
                 }}
                 aria-label='View Concept Bank'
               >
-                Go to Concept Bank <Icon variant='arrowright' {...defaultIconProps} />
+                Go to Concept Bank <Icon.Variant variant='arrowright' {...defaultIconProps} />
               </button>
             }
           >
             <div className={styles.cardContent}>
               <ConceptBarChart data={data?.conceptDetails.count} />
             </div>
-          </ConceptDetailCard>
+          </Card.Detail>
         </div>
         {data?.conceptDetails && (
           <div className={`${styles.cardContainer}`}>

@@ -1,9 +1,10 @@
 import React from 'react';
-import ConceptDetailCard from '../../Cards/ConceptDetailCard';
-import Icon from '../../Icons/Icon/Icon';
-import { ICustomerProfile } from '../../../../libs/api/types';
+
+import Icon from '../Icons/Icon/Icon';
+import { ICustomerProfile } from '../../../libs/api/types';
 // TODO: This should be a PNG
-import defaultAvatar from '../../../assets/avatar.svg';
+import defaultAvatar from '../../assets/avatar.svg';
+import { Card } from '@components';
 
 interface ICustomerProfilesCardProps {
   profile: ICustomerProfile | undefined;
@@ -37,7 +38,7 @@ const DEMOGRAPHIC_VALUE_MAP: Record<DemographicProfile, { prefix: string; icon: 
 
 const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({ profile, onViewProfilesClick }) => {
   return (
-    <ConceptDetailCard
+    <Card.Detail
       title='Customer Profiles'
       subtitle='Breakdown of target user pain points and jobs to be done'
       headerClassName='min-h-[92px]'
@@ -75,7 +76,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({ profile, o
           </div>
         </div>
       </div>
-    </ConceptDetailCard>
+    </Card.Detail>
   );
 };
 

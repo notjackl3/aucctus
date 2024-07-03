@@ -1,9 +1,9 @@
 import React, { useMemo } from 'react';
-import ConceptDetailCard from '../../Cards/ConceptDetailCard';
-import Icon from '../../Icons/Icon/Icon';
-import { IFinancialProjection, IMarketSizeMetric } from '../../../../libs/api/types';
-import MarketChart from '../../Charts/MarketChart/MarketChart';
-import { Legend } from '@components';
+
+import Icon from '../Icons/Icon/Icon';
+import { IFinancialProjection, IMarketSizeMetric } from '../../../libs/api/types';
+import MarketChart from '../Charts/MarketChart/MarketChart';
+import { Card, Legend } from '@components';
 
 export interface IMetricSizes {
   TAM: IMarketSizeMetric;
@@ -40,7 +40,7 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projecti
   }, [projection]);
 
   return (
-    <ConceptDetailCard
+    <Card.Detail
       title='Financial Projection'
       subtitle='Market size estimate based on initial hypothesis'
       headerClassName='min-h-[92px]'
@@ -73,7 +73,7 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projecti
           'No financial projection data available'
         )}
       </div>
-    </ConceptDetailCard>
+    </Card.Detail>
   );
 };
 

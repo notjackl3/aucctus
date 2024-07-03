@@ -1,10 +1,8 @@
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
-import ConceptDetailCard from '../../../Cards/ConceptDetailCard';
-
 import styles from './customer-profile-context.module.scss';
 import { useCustomerProfileUpdate } from '../../../../hooks/query/concepts.hook';
-import Icon from '../../../Icons/Icon/Icon';
 import InputField from '../../../Text/InputField/InputField';
+import { Card, Icon } from '@components';
 
 interface ICustomerProfileDetailsLists {
   title: string;
@@ -81,7 +79,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
 
   return (
     <div>
-      <ConceptDetailCard cardClassName={styles.customerCards} title={title} icon={icon} isHideFooter>
+      <Card.Detail cardClassName={styles.customerCards} title={title} icon={icon} isHideFooter>
         <div className={styles.cardContent}>
           {list.map((value, index) => (
             <CustomerProfileListItem
@@ -111,11 +109,11 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
                 e.stopPropagation();
               }}
             >
-              <Icon variant='plus' height={20} width={20} />
+              <Icon.Variant variant='plus' height={20} width={20} />
             </button>
           </span>
         </div>
-      </ConceptDetailCard>
+      </Card.Detail>
     </div>
   );
 };
@@ -207,7 +205,7 @@ const CustomerProfileListItem: FunctionComponent<ICustomerProfileListItemProps> 
           e.stopPropagation();
         }}
       >
-        <Icon variant='trash' height={20} width={20} />
+        <Icon.Variant variant='trash' height={20} width={20} />
       </button>
     </span>
   );

@@ -1,12 +1,11 @@
 import { FunctionComponent } from 'react';
-import { ITrendsAndDrivers } from '../../../../../libs/api/types';
+import { ITrendsAndDrivers } from '@libs/api/types';
 import styles from './styles/marketDetails.module.scss';
-import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard';
-import Icon from '../../../../components/Icons/Icon/Icon';
 import images from '../../../../assets/img';
 import { useModal } from '../../../../context/ModalContextProvider';
 import EditMarketScanElement from '../../../../components/Modal/EditMarketScanElement/EditMarketScanElement';
 import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../../hooks/query/concepts.hook';
+import { Card, Icon } from '@components';
 
 const iconDefaultProps = {
   height: 24,
@@ -24,7 +23,7 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAn
   const { mutate: updateItem } = useTrendAndDriverUpdate();
 
   return (
-    <ConceptDetailCard
+    <Card.Detail
       title=''
       key={trendAndDriver.uuid}
       isHideHeader
@@ -39,7 +38,7 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAn
           }}
         >
           See Source
-          <Icon variant='link-external' {...iconDefaultProps} />
+          <Icon.Variant variant='link-external' {...iconDefaultProps} />
         </button>
       }
     >
@@ -51,7 +50,7 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAn
         <span className={styles.cardBoldText}>{trendAndDriver?.name}</span>
         <p className={styles.cardRegularText}>{trendAndDriver?.description}</p>
       </div>
-    </ConceptDetailCard>
+    </Card.Detail>
   );
 };
 

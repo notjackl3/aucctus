@@ -1,8 +1,7 @@
 import { FunctionComponent, useCallback } from 'react';
-import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard';
+
 import { Ecosystem, EcosystemType } from '../../../../../libs/api/types';
 import images from '../../../../assets/img';
-import Icon from '../../../../components/Icons/Icon/Icon';
 import { useEcosystemCreate, useEcosystemDelete, useEcosystemUpdate } from '../../../../hooks/query/concepts.hook';
 import { useModal } from '../../../../context/ModalContextProvider';
 import EditMarketScanElement from '../../../../components/Modal/EditMarketScanElement/EditMarketScanElement';
@@ -10,6 +9,7 @@ import EditMarketScanElement from '../../../../components/Modal/EditMarketScanEl
 import styles from './styles/marketDetails.module.scss';
 import AddMarketScanElement from '../../../../components/Modal/EditMarketScanElement/AddMarketScanElement';
 import { useParams } from 'react-router-dom';
+import { Card, Icon } from '@components';
 
 const iconDefaultProps = {
   height: 24,
@@ -48,7 +48,7 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
   );
 
   return (
-    <ConceptDetailCard
+    <Card.Detail
       title={title}
       footerAction={
         <>
@@ -59,7 +59,7 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
               openModal(AddMarketScanElement, { addItem: addEcosystem, ecosystemType });
             }}
           >
-            <Icon variant='plus' />
+            <Icon.Variant variant='plus' />
           </button>
         </>
       }
@@ -80,12 +80,12 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
               <p className={styles.cardDescriptionText}>{item.description}</p>
             </div>
             <button className='btn btn-light' onClick={onClick(item)}>
-              <Icon variant={'link-external'} {...iconDefaultProps} />
+              <Icon.Variant variant={'link-external'} {...iconDefaultProps} />
             </button>
           </div>
         ))}
       </div>
-    </ConceptDetailCard>
+    </Card.Detail>
   );
 };
 

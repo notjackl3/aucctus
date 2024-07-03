@@ -1,17 +1,16 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 
 import styles from '../styles/dashboard.module.scss';
-import ConceptDetailCard from '../../../components/Cards/ConceptDetailCard';
-import ConceptStatistic from '../../../components/Badges/ConceptStatistic';
-import { camelCaseToTitleCase, formatter } from '../../../../libs/utils';
+import { camelCaseToTitleCase, formatter } from '@libs/utils';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
   ConceptStatusIconColor,
   getDashboardConceptStatusIcon,
   getDashboardConceptStatusIconColor,
-} from '../../../../libs/concepts';
-import { ActiveConceptStatus, IConceptDetails } from '../../../../libs/api/types';
-import { IConceptStatisticProps } from '../../../components/Badges/ConceptStatistic/ConceptStatistic';
+} from '@libs/concepts';
+import { ActiveConceptStatus, IConceptDetails } from '@libs/api/types';
+import { IConceptStatisticProps } from '@components/Badges/ConceptStatistic/ConceptStatistic';
+import { Badge, Card } from '@components';
 
 export interface OpportunityData {
   infoTitle: string;
@@ -92,7 +91,7 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
 
   const renderOpportunityRows = opportunityData?.map((opportunity, i) => (
     <div className={styles.cardRow} key={`opportunity-${i}`}>
-      <ConceptStatistic
+      <Badge.ConceptStatistic
         infoTitle={opportunity.infoTitle}
         infoValue={opportunity.infoValue}
         infoSubValue={opportunity.infoSubValue}
@@ -109,12 +108,12 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
   ));
 
   return (
-    <ConceptDetailCard
+    <Card.Detail
       title='Potential Opportunity Size'
       cardClassName={styles.cardStyle}
       footerAction={
         <div className={styles.opportunityFooter}>
-          <ConceptStatistic
+          <Badge.ConceptStatistic
             infoTitle='Total Potential Opportunity'
             infoValue={formatter.format(summationObj.totalSomValue)}
             infoSubValue={`${summationObj.totalConceptCount} concepts`}
@@ -125,7 +124,7 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
       }
     >
       <div className={styles.cardContent}>{renderOpportunityRows}</div>
-    </ConceptDetailCard>
+    </Card.Detail>
   );
 };
 

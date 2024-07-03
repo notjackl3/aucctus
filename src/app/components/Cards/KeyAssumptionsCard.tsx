@@ -1,8 +1,6 @@
 import React from 'react';
-import ConceptDetailCard from '../../Cards/ConceptDetailCard';
-import Icon from '../../Icons/Icon/Icon';
-import { IAssumption } from '../../../../libs/api/types';
-import Badge from '../../Badges';
+import { Card, Badge, Icon } from '@components';
+import { IAssumption } from '@libs/api/types';
 
 interface IKeyAssumptionsCardProps {
   assumptions: IAssumption[] | undefined;
@@ -17,14 +15,14 @@ const iconDefaultProps = {
 
 const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = [], onViewClick }) => {
   return (
-    <ConceptDetailCard
+    <Card.Detail
       title='Key Assumptions'
       subtitle='List of assumptions that require validation'
       headerClassName='min-h-[92px]'
       contentClassName='h-[360px]'
       footerAction={
         <button className='btn btn-light' onClick={onViewClick} aria-label='View Assumptions'>
-          <span>{<Icon variant='warning' {...iconDefaultProps} />}</span>
+          <span>{<Icon.Variant variant='warning' {...iconDefaultProps} />}</span>
           View Key Assumptions
         </button>
       }
@@ -43,7 +41,7 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = 
           </li>
         ))}
       </ul>
-    </ConceptDetailCard>
+    </Card.Detail>
   );
 };
 

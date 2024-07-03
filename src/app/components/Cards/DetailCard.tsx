@@ -2,7 +2,7 @@ import { FunctionComponent, ReactNode } from 'react';
 import Icon from '../Icons/Icon/Icon';
 import { Header } from '../ConceptReport';
 
-interface ConceptDetailCardProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+interface DetailCardProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   title: string;
   subtitle?: string;
   children: ReactNode;
@@ -23,7 +23,7 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-const ConceptDetailCard: FunctionComponent<ConceptDetailCardProps> = ({
+const DetailCard: FunctionComponent<DetailCardProps> = ({
   title,
   subtitle,
   children,
@@ -73,4 +73,4 @@ const ConceptDetailCard: FunctionComponent<ConceptDetailCardProps> = ({
   );
 };
 
-export default ConceptDetailCard;
+export default DetailCard;
