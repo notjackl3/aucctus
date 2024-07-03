@@ -7,7 +7,7 @@ import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';
 import { useAssumptionDelete, useAssumptionUpdate } from '../../../hooks/query/concepts.hook';
 import Dropdown, { Option } from '../../Buttons/Dropdown/Dropdown';
-import AssumptionBadge from '../../Badges/AssumptionBadge/AssumptionBadge';
+import { Badge } from '@components';
 
 import styles from './edit-key-assumption.module.scss';
 
@@ -21,8 +21,8 @@ const TITLE_MAX_LENGTH = 64;
 const ASSUMPTION_TYPE_OPTIONS: Option[] = (
   ['adaptability', 'desirability', 'feasibility', 'viability'] as AssumptionType[]
 ).map((value) => ({
-  label: <AssumptionBadge assumptionType={value} />,
-  displayLabel: <AssumptionBadge assumptionType={value} />,
+  label: <Badge.Assumption type={value} />,
+  displayLabel: <Badge.Assumption type={value} />,
   value,
 }));
 

@@ -15,15 +15,7 @@
     align-items: center;
     border-radius: 50%;
     background: #dee7fc;
-    &.purpleIcon {
-      background: #ece9fe;
-      svg,
-      use {
-        path {
-          stroke: #7839ee;
-        }
-      }
-    }
+
     &.lightBlueIcon {
       background: #cff9fe;
       svg,
@@ -33,15 +25,7 @@
         }
       }
     }
-    &.greenIcon {
-      background: #ccfbef;
-      svg,
-      use {
-        path {
-          stroke: #0e9384;
-        }
-      }
-    }
+
     &.blueIcon {
       background: #d1e0ff;
       svg,

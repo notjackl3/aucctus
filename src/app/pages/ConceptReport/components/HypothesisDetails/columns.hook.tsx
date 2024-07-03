@@ -3,8 +3,8 @@ import { IAssumption } from '../../../../../libs/api/types';
 import { useMemo } from 'react';
 
 import styles from './styles/hypothesisDetails.module.scss';
-import Badge from '../../../../components/Badges';
-import AssumptionBadge from '../../../../components/Badges/AssumptionBadge/AssumptionBadge';
+
+import { Badge } from '@components';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useModal } from '../../../../context/ModalContextProvider';
 import EditKeyAssumptionModal from '../../../../components/Modal/EditKeyAssumtionModal/EditKeyAssumtionModal';
@@ -48,7 +48,7 @@ export function useAssumptionsColumns() {
         header: () => <span>Type </span>,
         cell: (info) => (
           <span className={styles.reviewConceptLink}>
-            <AssumptionBadge assumptionType={info.getValue()} />
+            <Badge.Assumption type={info.getValue()} />
           </span>
         ),
       }),

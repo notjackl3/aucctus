@@ -32,6 +32,12 @@ module.exports = {
           600: '#4318ff',
         },
 
+        // Assumptions Colors
+        desirability: '#7839ee',
+        viability: '#0e9384',
+        adaptability: '#155eef',
+        feasibility: '#088ab2',
+
         warning: {
           50: '#fffaeb',
           500: '#f79009',

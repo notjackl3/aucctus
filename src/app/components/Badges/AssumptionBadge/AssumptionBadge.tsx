@@ -5,7 +5,7 @@ import Icon from '../../Icons/Icon/Icon';
 import { AssumptionType } from '../../../../libs/api/types';
 
 export interface IConceptAssumptionBadgeProps {
-  assumptionType: AssumptionType;
+  type: AssumptionType;
 }
 
 const defaultIconProps = {
@@ -13,29 +13,38 @@ const defaultIconProps = {
   width: 16,
   stroke: '#2B3674',
 };
-const assumptionColorObj = {
-  desirability: 'purple',
-  viability: 'green',
-  feasibility: 'lightBlue',
-  adaptability: 'blue',
-};
 
-const assumptionIconObj = {
-  desirability: <Icon variant='thermometer' {...defaultIconProps} />,
-  viability: <Icon variant='building' {...defaultIconProps} />,
-  feasibility: <Icon variant='filecode' {...defaultIconProps} />,
-  adaptability: <Icon variant='line-chart-up' {...defaultIconProps} />,
-};
-const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({ assumptionType }) => {
-  const color = assumptionColorObj[assumptionType];
-  const assumptionIcon = assumptionIconObj[assumptionType];
-
+const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({ type }) => {
   return (
-    <div className={`${styles.assumptionBadge} ${styles[`${color}Background`]}`}>
-      <span className={`${styles.icon} ${styles[`${color}Icon`]}`}>{assumptionIcon}</span>
-      <span className={styles.status}>{assumptionType}</span>
+    <div className={`flex items-center gap-2`}>
+      <span
+        className={`flex h-8 w-8 items-center justify-center rounded-[50%] bg-primary-100 ${ASSUMPTION_TYPE_MAP[type].style}`}
+      >
+        <Icon variant={ASSUMPTION_TYPE_MAP[type].icon} {...defaultIconProps} />
+      </span>
+      <span className={styles.status}>{type}</span>
     </div>
   );
+};
+
+const ASSUMPTION_TYPE_MAP: Record<AssumptionType, { style: string; icon: IconVariant }> = {
+  desirability: {
+    style: 'bg-[#ece9fe] [&>svg>use]:stroke-desirability', //'purple',
+    icon: 'thermometer',
+  },
+  viability: {
+    style: 'bg-[#ccfbef] [&>svg>use]:stroke-viability', //'green',
+    icon: 'building',
+  },
+
+  feasibility: {
+    style: 'bg-[#cff9fe] [&>svg>use]:stroke-feasibility', // 'lightBlue',
+    icon: 'filecode',
+  },
+  adaptability: {
+    style: 'bg-[#d1e0ff] [&>svg>use]:stroke-adaptability', //'blue',
+    icon: 'line-chart-up',
+  },
 };
 
 export default AssumptionBadge;
