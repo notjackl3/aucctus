@@ -6,14 +6,12 @@ import eslint from 'vite-plugin-eslint';
 import compression from 'vite-plugin-compression';
 import path from 'path';
 import { watchIcons } from './vite/plugins.js';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 // https://vitejs.dev/config/
 export default defineConfig({
   publicDir: 'public',
   plugins: [
     watchIcons(),
-    // tsconfigPaths(),
     splitVendorChunkPlugin(),
     require('cssnano')({
       preset: 'default',
