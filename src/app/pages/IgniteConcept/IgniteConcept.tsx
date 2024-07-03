@@ -185,9 +185,7 @@ const IgniteConcept: FunctionComponent = () => {
       ) : (
         <>
           <section className='flex w-full flex-col content-center items-center self-stretch text-center'>
-            <h1 className="font-['DM Sans'] w-96 text-center text-3xl font-bold leading-9 text-indigo-900">
-              Generate New Ideas
-            </h1>
+            <h1 className='w-96 text-center text-3xl font-bold leading-9 text-indigo-900'>Generate New Ideas</h1>
             <p className='mt-3 w-full text-sm font-medium leading-5 text-gray-500 max-md:max-w-full'>
               Let Aucctus AI Ignite your imagination and suggest new ideas to transform your business.
             </p>
@@ -286,9 +284,7 @@ const IgniteConcept: FunctionComponent = () => {
                     disabled
                   >
                     <Icon variant='clock-stopwatch' />
-                    <div className="Text font-['DM Sans'] text-sm font-medium leading-tight text-gray-500">
-                      Coming Soon
-                    </div>
+                    <div className='text-sm font-medium leading-tight text-gray-500'>Coming Soon</div>
                   </button>
 
                   <WhiteSpaceSuggestion

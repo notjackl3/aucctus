@@ -244,7 +244,7 @@ const customSelectStyles: StylesConfig = {
     flexGrow: 1,
     border: 'none',
     maxWidth: '25rem',
-    fontFamily: 'DM Sans',
+    fontFamily: 'Inter',
     fontSize: '1rem',
     fontWeight: 500,
   }),

@@ -30,7 +30,7 @@ const OverviewDetails: FunctionComponent = () => {
           <div className='inline-flex flex-col items-start justify-start gap-5'>
             <Header text='Value Proposition' />
             <EditModeSwitcher
-              pClassName="text-gray-500 text-2xl font-medium font-['DM Sans']"
+              pClassName='text-gray-500 text-2xl font-medium'
               value={valueProposition.value}
               label=''
               name='valueProposition'
@@ -45,7 +45,7 @@ const OverviewDetails: FunctionComponent = () => {
             <div className='inline-flex flex-col items-start justify-start gap-5'>
               <Header text='Problem Statement' />
               <EditModeSwitcher
-                pClassName="text-gray-500 text-2xl font-medium font-['DM Sans']"
+                pClassName='text-gray-500 text-2xl font-medium'
                 value={problemStatement.value}
                 label=''
                 name='description'
@@ -63,7 +63,7 @@ const OverviewDetails: FunctionComponent = () => {
           <div className='inline-flex flex-col items-start justify-start gap-5'>
             <Header text='Overview' />
             <EditModeSwitcher
-              pClassName="self-stretch text-gray-500 text-base font-normal font-['DM Sans'] leading-normal"
+              pClassName='self-stretch text-gray-500 text-base font-normal leading-normal'
               value={descriptionEdit.value}
               label=''
               name='description'
