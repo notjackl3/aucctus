@@ -3,7 +3,7 @@ import { IAssumption } from '../../../../../libs/api/types';
 import { useMemo } from 'react';
 
 import styles from './styles/hypothesisDetails.module.scss';
-import GeneralBadge from '../../../../components/Badges/GeneralBadge';
+import Badge from '../../../../components/Badges';
 import AssumptionBadge from '../../../../components/Badges/AssumptionBadge/AssumptionBadge';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import { useModal } from '../../../../context/ModalContextProvider';
@@ -34,7 +34,7 @@ export function useAssumptionsColumns() {
         id: 'riskCategory',
         cell: (info) => (
           <span className={styles.riskCategory}>
-            <GeneralBadge variant={info.getValue()} badgeText={info.getValue()} />
+            <Badge.RiskLevel variant={info.getValue()} text={info.getValue()} />
           </span>
         ),
         minSize: 125,

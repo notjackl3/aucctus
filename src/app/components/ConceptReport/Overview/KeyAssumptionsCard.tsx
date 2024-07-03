@@ -2,7 +2,7 @@ import React from 'react';
 import ConceptDetailCard from '../../Cards/ConceptDetailCard';
 import Icon from '../../Icons/Icon/Icon';
 import { IAssumption } from '../../../../libs/api/types';
-import GeneralBadge from '../../Badges/GeneralBadge';
+import Badge from '../../Badges';
 
 interface IKeyAssumptionsCardProps {
   assumptions: IAssumption[] | undefined;
@@ -35,7 +35,7 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = 
             key={`assumption-${i + 1}`}
           >
             <div className='flex h-16 items-center px-6 py-4'>
-              <GeneralBadge variant={item.riskCategory} badgeText={item.riskCategory} />
+              <Badge.RiskLevel variant={item.riskCategory} text={item.riskCategory} />
             </div>
             <p className='text-base font-normal leading-normal text-indigo-900'>{item.name}</p>
           </li>

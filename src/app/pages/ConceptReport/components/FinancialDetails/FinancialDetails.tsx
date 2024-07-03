@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 import styles from './financialDetails.module.scss';
 import Icon from '../../../../components/Icons/Icon/Icon';
 import ConceptDetailCard from '../../../../components/Cards/ConceptDetailCard';
-import GeneralBadge from '../../../../components/Badges/GeneralBadge';
+import Badge from '../../../../components/Badges';
 import MarketChart from '../../../../components/Charts/MarketChart/MarketChart';
 import MarketLegend from '../../../../components/Legends/MarketLegend/MarketLegend';
 import { useParams } from 'react-router-dom';
@@ -62,12 +62,7 @@ const FinancialDetails: FunctionComponent = () => {
                 handleSave={tamKeyHypothesis.handleSave}
                 handleCancel={tamKeyHypothesis.handleCancel}
               />
-              <GeneralBadge
-                showBullet
-                badgeClassName={styles.rowBadge}
-                bulletClassName={styles.bulletLightPurple}
-                badgeText='1'
-              />
+              <Badge.Simple showBullet bulletClass='text-primary-200' text='1' />
             </div>
             <div className={styles.cardRow}>
               <EditModeSwitcher
@@ -79,12 +74,7 @@ const FinancialDetails: FunctionComponent = () => {
                 handleSave={samKeyHypothesis.handleSave}
                 handleCancel={samKeyHypothesis.handleCancel}
               />
-              <GeneralBadge
-                showBullet
-                badgeClassName={styles.rowBadge}
-                bulletClassName={styles.bulletPurple}
-                badgeText='2'
-              />
+              <Badge.Simple showBullet bulletClass='text-primary-400' text='2' />
             </div>
             <div className={styles.cardRow}>
               <EditModeSwitcher
@@ -96,12 +86,7 @@ const FinancialDetails: FunctionComponent = () => {
                 handleSave={somKeyHypothesis.handleSave}
                 handleCancel={somKeyHypothesis.handleCancel}
               />
-              <GeneralBadge
-                showBullet
-                badgeClassName={styles.rowBadge}
-                bulletClassName={styles.bulletBlue}
-                badgeText='3'
-              />
+              <Badge.Simple showBullet bulletClass='text-blue-600' text='3' />
             </div>
           </div>
         </ConceptDetailCard>

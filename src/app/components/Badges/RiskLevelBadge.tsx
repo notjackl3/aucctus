@@ -7,17 +7,16 @@ const defaultIconProps = {
   height: 16,
 };
 
-type GeneralBadgeVariant = 'high' | 'medium' | 'low';
-export interface GeneralBadgeProps {
+type RiskLevelVariant = 'high' | 'medium' | 'low';
+export interface RiskLevelProps {
   badgeClassName?: string;
   bulletClassName?: string;
-  badgeText: string;
+  text: string;
   showBullet?: boolean;
-  iconType?: IconVariant;
-  variant?: GeneralBadgeVariant;
+  variant: RiskLevelVariant;
 }
 
-const BADGE_VARIANT_MAP: Record<GeneralBadgeVariant, { style: string; icon: IconVariant }> = {
+const BADGE_VARIANT_MAP: Record<RiskLevelVariant, { style: string; icon: IconVariant }> = {
   high: {
     icon: 'alert-octagon',
     style: 'text-error-700 bg-error-50 [&>svg>use]:stroke-error-700',
@@ -32,28 +31,19 @@ const BADGE_VARIANT_MAP: Record<GeneralBadgeVariant, { style: string; icon: Icon
   },
 };
 
-const GeneralBadge: FunctionComponent<GeneralBadgeProps> = ({
-  badgeClassName,
-  bulletClassName,
-  badgeText,
-  iconType,
-  showBullet,
-  variant,
-}) => {
+const RiskLevel: FunctionComponent<RiskLevelProps> = ({ badgeClassName, text, variant }) => {
   return (
     <div
-      className={`flex items-center gap-2 rounded-2xl bg-neutral-50 py-[0.2rem] pl-[0.4rem] pr-2 ${variant ? BADGE_VARIANT_MAP[variant].style : ''} ${
+      className={`flex items-center gap-2 rounded-2xl py-[0.2rem] pl-[0.4rem] pr-2 ${BADGE_VARIANT_MAP[variant].style} ${
         badgeClassName ? badgeClassName : ''
       }`}
     >
-      {showBullet ? <span className={`bg-primary-400 ${bulletClassName ? bulletClassName : ''}`}>●</span> : null}
-      {iconType ? <Icon variant={iconType} {...defaultIconProps} /> : null}
       {variant ? <Icon variant={BADGE_VARIANT_MAP[variant].icon} {...defaultIconProps} /> : null}
       <span className={'whitespace-nowrap text-center text-sm font-medium capitalize not-italic leading-6'}>
-        {badgeText}
+        {text}
       </span>
     </div>
   );
 };
 
-export default GeneralBadge;
+export default RiskLevel;
