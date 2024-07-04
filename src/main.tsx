@@ -6,6 +6,7 @@ import { ModalProvider } from './app/context/ModalContextProvider';
 import { QueryCache, QueryClient, QueryClientProvider } from 'react-query';
 import { parseFormError } from './libs/utils';
 import { toast } from 'react-toastify';
+import { DirectionProvider } from '@radix-ui/react-direction';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
@@ -33,11 +34,13 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <AppProvider>
-          <ModalProvider>
-            <App />
-          </ModalProvider>
-        </AppProvider>
+        <DirectionProvider dir='rtl'>
+          <AppProvider>
+            <ModalProvider>
+              <App />
+            </ModalProvider>
+          </AppProvider>
+        </DirectionProvider>
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>,

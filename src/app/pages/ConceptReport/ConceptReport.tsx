@@ -1,28 +1,16 @@
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import styles from './styles/conceptOverview.module.scss';
-import Icon from '../../components/Icons/Icon/Icon';
-import TabView from '../../components/Container/TabView';
-import Dropdown from '../../components/Buttons/Dropdown/Dropdown';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { ConceptStatus, IConcept } from '../../../libs/api/types';
-import { AppPath } from '../../../routes/routes';
-
-import ConceptStatusBubble from '../../components/Badges/ConceptStatusBubble/ConceptStatusBubble';
-import { CONCEPT_STATUS_LIST } from '../../../libs/concepts';
+import { ConceptStatus, IConcept } from '@libs/api/types';
+import { AppPath } from '@routes/routes';
 import { useConcept, useConceptUpdate } from '../../hooks/query/concepts.hook';
 import { useRoutePattern } from '../../hooks/router.hook';
-import Tooltip from '../../components/ToolTip/Tooltip';
+import { Button, Container, Icon, Tooltip } from '@components';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
   concept?: IConcept;
 }
-
-const DROPDOWN_OPTIONS = CONCEPT_STATUS_LIST.map((value) => ({
-  label: <ConceptStatusBubble status={value} variant='dropdown' />,
-  displayLabel: <ConceptStatusBubble status={value} variant='dropdown' isActive />,
-  value,
-}));
 
 export const CONCEPT_TABS = [
   { label: 'Overview', value: AppPath.ConceptOverview },
@@ -76,13 +64,7 @@ const ConceptReport: FunctionComponent = () => {
         <div className={styles.header}>
           <h1>{concept?.title}</h1>
           <div className={styles.statusSelect}>
-            <Dropdown
-              options={DROPDOWN_OPTIONS}
-              hideChevron
-              onSelect={changeConceptStatus}
-              selected={status}
-              hidePadding
-            />
+            <Button.ConceptDropdown value={status} onChange={changeConceptStatus} />
           </div>
         </div>
         <div className={styles.actions}>
@@ -93,7 +75,7 @@ const ConceptReport: FunctionComponent = () => {
               onClick={() => navigate(AppPath.ConceptSnapshot)}
               disabled
             >
-              <Icon variant='download-cloud' {...defaultIconProps} />
+              <Icon.Variant variant='download-cloud' {...defaultIconProps} />
               Opportunity Snapshot
             </button>
           </Tooltip>
@@ -105,7 +87,7 @@ const ConceptReport: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.contentContainer}>
-        <TabView
+        <Container.TabView
           className={styles.tabs}
           tabs={CONCEPT_TABS.filter((v) => !(v.label === 'Context' && !concept?.seed))}
           onTabSelect={onTabSelect}
@@ -117,7 +99,7 @@ const ConceptReport: FunctionComponent = () => {
               concept: concept,
             }}
           />
-        </TabView>
+        </Container.TabView>
       </div>
     </div>
   );
