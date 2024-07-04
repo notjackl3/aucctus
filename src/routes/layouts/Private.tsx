@@ -13,7 +13,7 @@ const PrivateLayout = () => {
   return (
     <div className='flex min-h-screen w-screen flex-row items-start overflow-hidden bg-neutral-50'>
       <NavDrawer />
-      <div className='ml-[15.5rem] min-h-screen w-[calc(100vw-theme(w.nav-drawer))] overflow-auto'>
+      <div className='ml-[15.5rem] min-h-screen w-[calc(100vw-15.5rem)] overflow-auto'>
         <Outlet />
       </div>
     </div>

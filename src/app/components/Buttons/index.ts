@@ -2,7 +2,7 @@ import Status from './StatusButton/StatusButton';
 import Checkbox from './Checkbox/CheckBox';
 import Dropdown from './Dropdown/Dropdown';
 import Collapsible from './Collapsible';
-import ConceptDropdown from './ConceptStatusSelect';
+import ConceptDropdown from '../Select/ConceptStatusSelect';
 
 const Button = {
   Status,

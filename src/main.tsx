@@ -34,7 +34,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <DirectionProvider dir='rtl'>
+        <DirectionProvider dir='ltr'>
           <AppProvider>
             <ModalProvider>
               <App />

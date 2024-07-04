@@ -26,7 +26,7 @@ export const ACTIVE_CONCEPT_STATUS_LIST: ActiveConceptStatus[] = [
 ];
 export const ARCHIVE_CONCEPT_STATUS_LIST: ArchivedConceptStatus[] = ['archived'];
 
-type StatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
+export type ConceptStatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
 
 /**
  * Returns the color associated with a given concept status.
@@ -34,8 +34,8 @@ type StatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
  * @param status - The concept status.
  * @returns The color associated with the concept status.
  */
-export function getConceptStatusColor(status: ConceptStatus): StatusColor {
-  const statusColorObj: Record<ConceptStatus, StatusColor> = {
+export function getConceptStatusColor(status: ConceptStatus): ConceptStatusColor {
+  const statusColorObj: Record<ConceptStatus, ConceptStatusColor> = {
     new: 'blue',
     ideating: 'blue',
     inReview: 'blue',
