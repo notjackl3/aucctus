@@ -3,7 +3,7 @@ import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import InputField from '../../../components/Text/InputField/InputField';
 import styles from '../styles/aboutDetails.module.scss';
 import Select, { StylesConfig } from 'react-select';
-import defaultAvatar from '../../../assets/avatar.svg';
+import defaultAvatar from '../../../assets/img/avatar.png';
 import Icon from '../../../components/Icons/Icon/Icon';
 import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading';

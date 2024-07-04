@@ -99,19 +99,19 @@
       flex-direction: column;
       align-items: flex-start;
 
-      span {
-        color: var(--gray-700-text-tertiary, #626ba3);
-        /* Text sm/Semibold */
-        font-family: $font-family;
-        max-width: 100%;
-        font-size: 0.875rem;
-        font-style: normal;
-        font-weight: 500;
-        line-height: 1.25rem; /* 142.857% */
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
+      // span {
+      //   color: var(--gray-700-text-tertiary, #626ba3);
+      //   /* Text sm/Semibold */
+      //   font-family: $font-family;
+      //   max-width: 100%;
+      //   font-size: 0.875rem;
+      //   font-style: normal;
+      //   font-weight: 500;
+      //   line-height: 1.25rem; /* 142.857% */
+      //   white-space: nowrap;
+      //   overflow: hidden;
+      //   text-overflow: ellipsis;
+      // }
     }
   }
 

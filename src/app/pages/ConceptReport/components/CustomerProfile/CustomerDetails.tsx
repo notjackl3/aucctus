@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 import styles from './styles/customerDetails.module.scss';
-import defaultAvatar from '../../../../assets/avatar.svg';
+import defaultAvatar from '../../../../assets/img/avatar.png';
 import { ICustomerProfile } from '../../../../../libs/api/types';
 import CustomerProfileContextList from '../../../../components/Cards/CustomerProfileContextList/CustomerProfileContextList';
 import DemographicsContainer from '../../../../components/Container/DemographicsContainer/DemographicsContainer';

@@ -23,7 +23,8 @@
       "@pages": ["src/app/pages/index.ts"],
       "@pages/*": ["src/app/pages/*"],
       "@routes/*": ["src/routes/*"],
-      "@libs/*": ["src/libs/*"]
+      "@libs/*": ["src/libs/*"],
+      "@assets/*": ["src/app/assets/*"]
     }
   },
   "include": ["src", "src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],

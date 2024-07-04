@@ -3,7 +3,7 @@ import React from 'react';
 import Icon from '../Icons/Icon/Icon';
 import { ICustomerProfile } from '../../../libs/api/types';
 // TODO: This should be a PNG
-import defaultAvatar from '../../assets/avatar.svg';
+import defaultAvatar from '../../assets/img/avatar.png';
 import { Card } from '@components';
 
 interface ICustomerProfilesCardProps {

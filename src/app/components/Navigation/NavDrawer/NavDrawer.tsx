@@ -1,13 +1,13 @@
 import React from 'react';
-import Logo from '../../../assets/Logo.png';
 import styles from './drawer.module.scss';
 import NavLink from './NavLink';
-import avatar from '../../../assets/avatar.svg';
-import { AppPath } from '../../../../routes/routes';
+import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
 import NavButton from './NavButton';
 import { useLogout } from '../../../hooks/query/auth.hook';
 import { useAppStore } from '../../../stores/app.store';
+import { Avatar } from '@components';
+import Logo from '@assets/Logo-black.png';
 
 const NavDrawer = () => {
   const { user, account } = useAppStore();
@@ -25,7 +25,7 @@ const NavDrawer = () => {
               navigate(AppPath.Home);
             }}
           >
-            <img alt='Logo' style={{ height: 30, width: 146 }} src={Logo} />
+            <img alt='Aucctus' style={{ width: 165 }} src={Logo} />
           </div>
           <div className={styles.content}>
             <NavLink to={AppPath.Home} title='Dashboard' icon='home' />
@@ -81,10 +81,10 @@ const NavDrawer = () => {
             />
           </div>
           <div className={styles.account}>
-            <img className={styles.avatar} alt='avatar' src={avatar} />
+            <Avatar firstName={user?.firstName || ''} lastName={user?.lastName || ''} hideImage />
             <div className={styles.userDetails}>
-              <span>{user?.firstName || ''}</span>
-              <span>{user?.email || ''}</span>
+              <span className='text-base font-medium leading-tight text-slate-500'>{user?.firstName || ''}</span>
+              <span className='text-sm font-normal leading-tight text-gray-500'>{user?.email || ''}</span>
             </div>
           </div>
         </div>

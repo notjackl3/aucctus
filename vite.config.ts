@@ -43,6 +43,7 @@ export default defineConfig({
       '@pages': path.resolve(__dirname, 'src/app/pages'),
       '@routes': path.resolve(__dirname, 'src/routes'),
       '@libs': path.resolve(__dirname, 'src/libs'),
+      '@assets': path.resolve(__dirname, 'src/app/assets'),
 
       // Style Sheets
       '~global.scss': path.resolve(__dirname, 'src/app/assets/styles/global.scss'),
