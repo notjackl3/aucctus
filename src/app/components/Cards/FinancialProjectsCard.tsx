@@ -1,15 +1,9 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
-import Icon from '../Icons/Icon/Icon';
-import { IFinancialProjection, IMarketSizeMetric } from '../../../libs/api/types';
-import MarketChart from '../Charts/MarketChart/MarketChart';
 import { Card, Legend } from '@components';
-
-export interface IMetricSizes {
-  TAM: IMarketSizeMetric;
-  SAM: IMarketSizeMetric;
-  SOM: IMarketSizeMetric;
-}
+import { IFinancialProjection } from '../../../libs/api/types';
+import MarketChart from '../Charts/MarketChart';
+import Icon from '../Icons/Icon/Icon';
 
 interface IFinancialProjectsCardProps {
   projection: IFinancialProjection | undefined;
@@ -22,22 +16,6 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projecti
    *
    * @returns The market size metrics object containing TAM, SAM, and SOM.
    */
-  const marketSizeMetrics = useMemo(() => {
-    if (!projection) {
-      return undefined;
-    }
-
-    const marketSizes = projection.marketSizeMetrics.reduce((acc: Partial<IMetricSizes>, metric) => {
-      acc[metric.metricType] = metric;
-      return acc;
-    }, {});
-
-    if (!marketSizes.TAM || !marketSizes.SAM || !marketSizes.SOM) {
-      return undefined;
-    }
-
-    return marketSizes as IMetricSizes;
-  }, [projection]);
 
   return (
     <Card.Detail
@@ -54,20 +32,11 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projecti
       }
     >
       <div className='inline-flex h-full w-full flex-col items-center justify-between p-6'>
-        {marketSizeMetrics ? (
+        {projection ? (
           <>
-            <MarketChart
-              className={'h-44 w-44'}
-              tam={marketSizeMetrics.TAM.value}
-              sam={marketSizeMetrics.SAM.value}
-              som={marketSizeMetrics.SOM.value}
-            />
+            <MarketChart className={'h-44 w-44'} tam={projection.tam} sam={projection.sam} som={projection.som} />
 
-            <Legend.MarketLegend
-              tam={marketSizeMetrics.TAM.value}
-              sam={marketSizeMetrics.SAM.value}
-              som={marketSizeMetrics.SOM.value}
-            />
+            <Legend.MarketLegend tam={projection.tam} sam={projection.sam} som={projection.som} />
           </>
         ) : (
           'No financial projection data available'

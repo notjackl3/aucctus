@@ -116,17 +116,59 @@ export interface ICustomerProfileCreate {
 
 export type MarketMetricType = 'TAM' | 'SAM' | 'SOM';
 
-export interface IMarketSizeMetric extends IBaseConceptEntity {
-  dataPoint: string;
-  keyHypothesis: string;
-  metricType: MarketMetricType;
-  reason: string;
-  value: number;
+export interface ISource {
+  uuid: string;
+  title: string;
+  description?: string;
+  url: string;
+}
+
+export interface IBusinessModel {
+  uuid: string;
+  version: number;
+  modelName: string;
+  description: string;
+  rationale: string;
+}
+
+export interface IFinancialProjectionPricing {
+  uuid: string;
+  version: number;
+  price: number;
+  unit: string;
+  averageRevenuePerCustomer: number;
+  purchasingFrequency: number;
+  rationale: string;
+
+  sources: ISource[];
+}
+
+export interface IMarketSizing {
+  uuid: string;
+  version: number;
+  totalMarketSize: number;
+  totalMarketSizeRationale: string;
+
+  serviceableMarketPercentMarket: number;
+  serviceableMarketPercentRationale: string;
+  serviceableMarketPercentAssumptions: [string];
+
+  marketShare: number;
+  marketShareRationale: string;
+  marketShareAssumptions: [string];
+
+  sources: [ISource];
 }
 
 export interface IFinancialProjection extends IBaseConceptEntity {
   overview: string;
-  marketSizeMetrics: IMarketSizeMetric[];
+  businessModel: IBusinessModel;
+  pricing: IFinancialProjectionPricing;
+  marketSizing: IMarketSizing;
+
+  tam: number;
+  sam: number;
+  som: number;
 }
 
 type AssumptionType = 'adaptability' | 'desirability' | 'feasibility' | 'viability';

@@ -87,10 +87,10 @@ const OverviewDetails: FunctionComponent = () => {
           onViewProfilesClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
         />
 
-        <Card.FinancialProjects
+        {/* <Card.FinancialProjects
           projection={overview?.financialProjection}
           onViewClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
-        />
+        /> */}
 
         <Card.KeyAssumptions
           assumptions={assumptions?.results || []}

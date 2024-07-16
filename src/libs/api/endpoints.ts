@@ -63,8 +63,8 @@ export const endpoints = {
 
   conceptFinancialProjection: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/financial-projection`,
   conceptFinancialProjectionUuid: (projectionUuid: string) => `api/v1/concept/financial-projection/${projectionUuid}`,
-  conceptMarketSizeMetric: (marketSizeMetricUuid: string) =>
-    `api/v1/concept/market-size-metric/${marketSizeMetricUuid}`,
+  // conceptMarketSizeMetric: (marketSizeMetricUuid: string) =>
+  //   `api/v1/concept/market-size-metric/${marketSizeMetricUuid}`,
 
   conceptMarketScan: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/market-scan/`,
   conceptMarketScanUuid: (marketScanUuid: string) => `api/v1/concept/market-scan/${marketScanUuid}`,

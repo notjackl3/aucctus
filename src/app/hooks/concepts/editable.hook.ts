@@ -9,7 +9,7 @@ import {
   useCustomerProfileUpdate,
   useFinancialProjection,
   useFinancialProjectionUpdate,
-  useMarketMetricSizeUpdate,
+  // useMarketMetricSizeUpdate,
   useMarketScanUpdate,
 } from '../query/concepts.hook';
 import { MutateOptions, UseMutateFunction } from 'react-query';
@@ -20,7 +20,7 @@ import {
   IFinancialProjection,
   IFormError,
   IMarketScan,
-  IMarketSizeMetric,
+  // IMarketSizeMetric,
 } from '../../../libs/api/types';
 import { AxiosError } from 'axios';
 import { useParams } from 'react-router-dom';
@@ -234,28 +234,28 @@ export function useEditMarketScan() {
   };
 }
 
-type MarketMetrics = { [key in IMarketSizeMetric['metricType']]: IMarketSizeMetric };
+// type MarketMetrics = { [key in IMarketSizeMetric['metricType']]: IMarketSizeMetric };
 
 export function useEditFinancialProjections() {
   const { id: conceptUuid = '' } = useParams();
   const { financialProjection } = useFinancialProjection(conceptUuid);
   const { mutate } = useFinancialProjectionUpdate(conceptUuid);
-  const { mutate: updateMarketMetricSize } = useMarketMetricSizeUpdate(conceptUuid);
+  // const { mutate: updateMarketMetricSize } = useMarketMetricSizeUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 500 };
   const keyHypothesisValidationOptions: IValidationOptions = { maxLength: 300 };
 
-  const marketSizeMetric = useMemo(() => {
-    if (!financialProjection) {
-      return undefined;
-    }
+  // const marketSizeMetric = useMemo(() => {
+  //   if (!financialProjection) {
+  //     return undefined;
+  //   }
 
-    const marketSizes = financialProjection.marketSizeMetrics.reduce((acc: Partial<MarketMetrics>, metric) => {
-      acc[metric.metricType] = metric;
-      return acc;
-    }, {});
+  //   const marketSizes = financialProjection.marketSizeMetrics.reduce((acc: Partial<MarketMetrics>, metric) => {
+  //     acc[metric.metricType] = metric;
+  //     return acc;
+  //   }, {});
 
-    return marketSizes as MarketMetrics;
-  }, [financialProjection]);
+  //   return marketSizes as MarketMetrics;
+  // }, [financialProjection]);
 
   const overview = useEditableField<string, IFinancialProjection>({
     initialValue: financialProjection?.overview || '',
@@ -265,36 +265,67 @@ export function useEditFinancialProjections() {
     validation: validationOptions,
   });
 
-  const somKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
-    initialValue: marketSizeMetric?.SOM?.keyHypothesis || '',
-    fieldName: 'keyHypothesis',
-    updateMutation: updateMarketMetricSize,
-    identifier: marketSizeMetric?.SOM?.uuid || '',
-    validation: keyHypothesisValidationOptions,
+  const tam = useEditableField<number, IFinancialProjection>({
+    initialValue: financialProjection?.tam || 0,
+    fieldName: 'tam',
+    updateMutation: mutate,
+    identifier: financialProjection?.uuid || '',
+    validation: validationOptions,
   });
 
-  const tamKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
-    initialValue: marketSizeMetric?.TAM?.keyHypothesis || '',
-    fieldName: 'keyHypothesis',
-    updateMutation: updateMarketMetricSize,
-    identifier: marketSizeMetric?.TAM?.uuid || '',
-    validation: keyHypothesisValidationOptions,
+  const sam = useEditableField<number, IFinancialProjection>({
+    initialValue: financialProjection?.sam || 0,
+    fieldName: 'sam',
+    updateMutation: mutate,
+    identifier: financialProjection?.uuid || '',
+    validation: validationOptions,
   });
 
-  const samKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
-    initialValue: marketSizeMetric?.SAM?.keyHypothesis || '',
-    fieldName: 'keyHypothesis',
-    updateMutation: updateMarketMetricSize,
-    identifier: marketSizeMetric?.SAM?.uuid || '',
-    validation: keyHypothesisValidationOptions,
+  const som = useEditableField<number, IFinancialProjection>({
+    initialValue: financialProjection?.som || 0,
+    fieldName: 'som',
+    updateMutation: mutate,
+    identifier: financialProjection?.uuid || '',
+    validation: validationOptions,
   });
+
+  // const somKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
+  //   initialValue: marketSizeMetric?.SOM?.keyHypothesis || '',
+  //   fieldName: 'keyHypothesis',
+  //   updateMutation: updateMarketMetricSize,
+  //   identifier: marketSizeMetric?.SOM?.uuid || '',
+  //   validation: keyHypothesisValidationOptions,
+  // });
+
+  // const tamKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
+  //   initialValue: marketSizeMetric?.TAM?.keyHypothesis || '',
+  //   fieldName: 'keyHypothesis',
+  //   updateMutation: updateMarketMetricSize,
+  //   identifier: marketSizeMetric?.TAM?.uuid || '',
+  //   validation: keyHypothesisValidationOptions,
+  // });
+
+  // const samKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
+  //   initialValue: marketSizeMetric?.SAM?.keyHypothesis || '',
+  //   fieldName: 'keyHypothesis',
+  //   updateMutation: updateMarketMetricSize,
+  //   identifier: marketSizeMetric?.SAM?.uuid || '',
+  //   validation: keyHypothesisValidationOptions,
+  // });
 
   return {
     overview,
-    marketSizeMetric,
-    somKeyHypothesis,
-    tamKeyHypothesis,
-    samKeyHypothesis,
+    tam,
+    sam,
+    som,
+    businessModel: financialProjection?.businessModel,
+    marketSize: financialProjection?.marketSizing,
+    pricing: financialProjection?.pricing,
+
+    // marketSizeMetric,
+    // somKeyHypothesis,
+    // tamKeyHypothesis,
+    // samKeyHypothesis,
   };
 }
 

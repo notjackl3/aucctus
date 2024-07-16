@@ -159,9 +159,9 @@ export class ConceptApi extends ApiService {
     );
   }
 
-  updateMarketMetricSize(uuid: string, data: Partial<IMarketSizeMetric>) {
-    return this.patch<IMarketSizeMetric, Partial<IMarketSizeMetric>>(endpoints.conceptMarketSizeMetric(uuid), data);
-  }
+  // updateMarketMetricSize(uuid: string, data: Partial<IMarketSizeMetric>) {
+  //   return this.patch<IMarketSizeMetric, Partial<IMarketSizeMetric>>(endpoints.conceptMarketSizeMetric(uuid), data);
+  // }
 
   getConceptMarketScan(uuid: string) {
     return this.get<IMarketScan>(endpoints.conceptMarketScan(uuid));

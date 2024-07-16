@@ -122,19 +122,19 @@ export function formatLargeNumber(num: number) {
     if (Math.abs(num) < 1000.0) {
       if (num % 1 === 0) {
         // Number is whole
-        return `$${num}${unit}`;
+        return `${num}${unit}`;
       } else {
         // Number is not whole, format to 1 decimal place
-        return `$${parseFloat(num.toFixed(1))}${unit}`;
+        return `${parseFloat(num.toFixed(1))}${unit}`;
       }
     }
     num /= 1000.0;
   }
   // For numbers larger than a trillion, check again if it's whole or not.
   if (num % 1 === 0) {
-    return `$${num}T`;
+    return `${num}T`;
   } else {
-    return `$${parseFloat(num.toFixed(1))}T`;
+    return `${parseFloat(num.toFixed(1))}T`;
   }
 }
 
@@ -184,3 +184,13 @@ export const hasTokenExpired = (token: string): boolean => {
 
   return expiryDate <= now;
 };
+
+/**
+ * Clamps a value between a specified minimum and maximum range.
+ *
+ * @param value - The value to be clamped.
+ * @param min - The minimum limit.
+ * @param max - The maximum limit.
+ * @returns The clamped value.
+ */
+export const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));

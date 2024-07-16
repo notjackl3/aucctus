@@ -1,5 +1,5 @@
 import ConceptBarChart from './ConceptBarChart';
-import MarketChart from './MarketChart/MarketChart';
+import MarketChart from './MarketChart';
 import QuadrantChart from './QuadrantChart/QuadrantChart';
 
 const Chart = {

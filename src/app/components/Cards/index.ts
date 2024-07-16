@@ -1,24 +1,24 @@
-import React from 'react';
-
 import Detail from './DetailCard';
+import Kanban from './Kanban/ConceptCard';
 
-const Kanban = React.lazy(() => import('./Kanban/ConceptCard'));
-const MarketSizeProjections = React.lazy(() => import('./MarketSizeProjectionsCard/MarketSizeProjectionsCard'));
-const KeyAssumptions = React.lazy(() => import('./KeyAssumptionsCard'));
-const FinancialProjects = React.lazy(() => import('./FinancialProjectsCard'));
-const CustomerProfiles = React.lazy(() => import('./CustomerProfilesCard'));
-const Ignition = React.lazy(() => import('./IgnitionCard'));
-const CustomerProfileContextList = React.lazy(() => import('./CustomerProfileContextList/CustomerProfileContextList'));
+import CustomerProfileContextList from './CustomerProfileContextList/CustomerProfileContextList';
+import CustomerProfiles from './CustomerProfilesCard';
+import FinancialModel from './FinancialModelCard';
+import FinancialProjects from './FinancialProjectsCard';
+import Ignition from './IgnitionCard';
+import KeyAssumptions from './KeyAssumptionsCard';
+import MarketSize from './MarketSizeCard';
 
 const Card = {
   Detail,
   Kanban,
-  MarketSizeProjections,
   KeyAssumptions,
   FinancialProjects,
   CustomerProfiles,
   Ignition,
   CustomerProfileContextList,
+  FinancialModel,
+  MarketSize,
 };
 
 export default Card;

@@ -17,7 +17,7 @@ import {
   IFormError,
   IMarketScan,
   IMarketScanElementCreate,
-  IMarketSizeMetric,
+  // IMarketSizeMetric,
   ITrendsAndDrivers,
 } from '../../../libs/api/types';
 import { AxiosError } from 'axios';
@@ -115,7 +115,6 @@ export const useConceptIgnition = () => {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (body: IIgniteConceptBody) => {
-      console.log('##', body);
       return await api.conceptIgnite.ignite(body);
     },
     onSuccess: () => {
@@ -393,21 +392,21 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
   );
 };
 
-/**
- * Custom hook for updating a market metric size.
- *
- * @param uuid - The UUID of the Concept.
- * @returns The result of the generic concept update.
- */
-export const useMarketMetricSizeUpdate = (uuid: string) => {
-  return useGenericConceptMutate<IMarketSizeMetric>(
-    (data) => api.concept.updateMarketMetricSize(data.uuid, data),
-    [
-      [AucctusQueryKeys.conceptFinancialProjection, uuid],
-      [AucctusQueryKeys.conceptOverview, uuid],
-    ],
-  );
-};
+// /**
+//  * Custom hook for updating a market metric size.
+//  *
+//  * @param uuid - The UUID of the Concept.
+//  * @returns The result of the generic concept update.
+//  */
+// export const useMarketMetricSizeUpdate = (uuid: string) => {
+//   return useGenericConceptMutate<IMarketSizeMetric>(
+//     (data) => api.concept.updateMarketMetricSize(data.uuid, data),
+//     [
+//       [AucctusQueryKeys.conceptFinancialProjection, uuid],
+//       [AucctusQueryKeys.conceptOverview, uuid],
+//     ],
+//   );
+// };
 
 export const useTrendAndDriverUpdate = () => {
   return useGenericConceptMutate<ITrendsAndDrivers>(
