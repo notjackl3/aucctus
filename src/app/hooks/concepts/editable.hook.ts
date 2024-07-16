@@ -1,4 +1,17 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { AxiosError } from 'axios';
+import React, { useCallback, useEffect, useState } from 'react';
+import { MutateOptions, UseMutateFunction } from 'react-query';
+import { useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import {
+  IConcept,
+  IConceptOverview,
+  ICustomerProfile,
+  IFinancialProjection,
+  IFormError,
+  IMarketScan,
+} from '../../../libs/api/types';
+import { parseFormError } from '../../../libs/utils';
 import {
   useConcept,
   useConceptCustomerProfile,
@@ -12,20 +25,6 @@ import {
   // useMarketMetricSizeUpdate,
   useMarketScanUpdate,
 } from '../query/concepts.hook';
-import { MutateOptions, UseMutateFunction } from 'react-query';
-import {
-  IConcept,
-  IConceptOverview,
-  ICustomerProfile,
-  IFinancialProjection,
-  IFormError,
-  IMarketScan,
-  // IMarketSizeMetric,
-} from '../../../libs/api/types';
-import { AxiosError } from 'axios';
-import { useParams } from 'react-router-dom';
-import { parseFormError } from '../../../libs/utils';
-import { toast } from 'react-toastify';
 
 interface EditableField<T, TData = unknown, TError = unknown, TVariables = unknown> {
   value: T;
@@ -319,7 +318,7 @@ export function useEditFinancialProjections() {
     sam,
     som,
     businessModel: financialProjection?.businessModel,
-    marketSize: financialProjection?.marketSizing,
+    marketSize: financialProjection?.marketSize,
     pricing: financialProjection?.pricing,
 
     // marketSizeMetric,

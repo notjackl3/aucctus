@@ -143,7 +143,7 @@ export interface IFinancialProjectionPricing {
   sources: ISource[];
 }
 
-export interface IMarketSizing {
+export interface IMarketSize {
   uuid: string;
   version: number;
   totalMarketSize: number;
@@ -151,20 +151,20 @@ export interface IMarketSizing {
 
   serviceableMarketPercentMarket: number;
   serviceableMarketPercentRationale: string;
-  serviceableMarketPercentAssumptions: [string];
+  serviceableMarketPercentAssumptions: string[];
 
   marketShare: number;
   marketShareRationale: string;
-  marketShareAssumptions: [string];
+  marketShareAssumptions: string[];
 
-  sources: [ISource];
+  sources: ISource[];
 }
 
 export interface IFinancialProjection extends IBaseConceptEntity {
   overview: string;
   businessModel: IBusinessModel;
   pricing: IFinancialProjectionPricing;
-  marketSizing: IMarketSizing;
+  marketSize: IMarketSize;
 
   tam: number;
   sam: number;
