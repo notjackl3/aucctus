@@ -1,13 +1,12 @@
-import React from 'react';
-import styles from './drawer.module.scss';
-import NavLink from './NavLink';
+import Logo from '@assets/Logo-black.png';
+import { Avatar } from '@components';
 import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
-import NavButton from './NavButton';
 import { useLogout } from '../../../hooks/query/auth.hook';
 import { useAppStore } from '../../../stores/app.store';
-import { Avatar } from '@components';
-import Logo from '@assets/Logo-black.png';
+import styles from './drawer.module.scss';
+import NavButton from './NavButton';
+import NavLink from './NavLink';
 
 const NavDrawer = () => {
   const { user, account } = useAppStore();
@@ -83,8 +82,10 @@ const NavDrawer = () => {
           <div className={styles.account}>
             <Avatar firstName={user?.firstName || ''} lastName={user?.lastName || ''} hideImage />
             <div className={styles.userDetails}>
-              <span className='text-base font-medium leading-tight text-slate-500'>{user?.firstName || ''}</span>
-              <span className='text-sm font-normal leading-tight text-gray-500'>{user?.email || ''}</span>
+              <span className='w-40 truncate text-base font-medium leading-tight text-slate-500'>
+                {user?.firstName || ''}
+              </span>
+              <span className='w-40 truncate text-sm font-normal leading-tight text-gray-500'>{user?.email || ''}</span>
             </div>
           </div>
         </div>
