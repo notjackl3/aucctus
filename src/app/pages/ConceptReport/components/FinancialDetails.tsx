@@ -1,13 +1,90 @@
-import { Card, Chart, Header } from '@components';
+import { Card, Chart, Header, Modal } from '@components';
+import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
+import { useModal } from '@context/ModalContextProvider';
+import { useEditFinancialProjections } from '@hooks/concepts/editable.hook';
+import { IBusinessModel, IFinancialProjectionPricing, IMarketSize, ISource } from '@libs/api/types';
 import { formatLargeNumber, formatter } from '@libs/utils';
-import { FunctionComponent } from 'react';
-import { useParams } from 'react-router-dom';
-import EditModeSwitcher from '../../../components/Text/EditModeSwitcher/EditModeSwitcher';
-import { useEditFinancialProjections } from '../../../hooks/concepts/editable.hook';
+import React, { FunctionComponent } from 'react';
+
+const DEFAULT_BUISENSS_MODEL: IBusinessModel = {
+  uuid: '',
+  version: 0,
+  modelName: '',
+  description: '',
+  rationale: '',
+};
+
+const DEFAULT_PRICING: IFinancialProjectionPricing = {
+  uuid: '',
+  version: 0,
+  price: 0,
+  billing: '',
+  averageRevenuePerCustomer: 0,
+  purchasingFrequency: 0,
+  rationale: '',
+  sources: [],
+};
+
+const DEFAULT_MARKET_SIZE: IMarketSize = {
+  uuid: '',
+  version: 0,
+  totalMarketSize: 0,
+  totalMarketSizeRationale: '',
+  totalMarketSizeAssumptions: [],
+  serviceableMarketPercentMarket: 0,
+  serviceableMarketPercentRationale: '',
+  serviceableMarketPercentAssumptions: [],
+  marketShare: 0,
+  marketShareRationale: '',
+  marketShareAssumptions: [],
+  sources: [],
+};
+
+const BUSINESS_MODEL_SOURCE: ISource = {
+  uuid: '12345',
+  title: '50 Types of Business Models (2022) – The Best Examples of Companies Using It',
+  url: 'https://bstrategyhub.com/50-types-of-business-models-the-best-examples-of-companies-using-it/',
+};
 
 const FinancialDetails: FunctionComponent = () => {
-  const { id: conceptId } = useParams();
+  // const { id: conceptId } = useParams();
   const { overview, tam, sam, som, businessModel, marketSize, pricing } = useEditFinancialProjections();
+  // Extract values from Business Model, Market Size and Pricing
+  const { modelName, rationale: businessModelRationale } = businessModel || DEFAULT_BUISENSS_MODEL;
+  const { price, billing, rationale: pricingRationale, sources: pricingSources } = pricing || DEFAULT_PRICING;
+  const {
+    totalMarketSize,
+    totalMarketSizeRationale,
+    totalMarketSizeAssumptions,
+    serviceableMarketPercentRationale,
+    serviceableMarketPercentAssumptions,
+    marketShareRationale,
+    marketShareAssumptions,
+    sources: marketSizeSources,
+  } = marketSize || DEFAULT_MARKET_SIZE;
+
+  // Formate Large numbers
+  const formattedPrice = React.useMemo(() => formatter.format(price), [price]);
+  const formattedTotalMarketSize = React.useMemo(() => formatLargeNumber(totalMarketSize), [totalMarketSize]);
+  const formattedTam = React.useMemo(() => formatter.format(tam.value), [tam]);
+  const formattedSam = React.useMemo(() => formatter.format(sam.value), [sam]);
+  const formattedSom = React.useMemo(() => formatter.format(som.value), [som]);
+
+  const { openModal } = useModal();
+
+  const handleReasoningModelClick = React.useCallback(
+    (conclusion: string, reasoning: string, sources: ISource[]) =>
+      (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        openModal(Modal.EvidenceAndReasoning, {
+          conclusion,
+          reasoning,
+          sources,
+        });
+        e.preventDefault();
+        e.stopPropagation();
+      },
+    [openModal],
+  );
 
   return (
     <div className='align-self-lg-stretch flex h-full w-full flex-col items-start gap-6'>
@@ -30,18 +107,21 @@ const FinancialDetails: FunctionComponent = () => {
         <div className='inline-flex w-full items-start justify-between gap-5'>
           <Card.FinancialModel
             heading='Business Model'
-            value={businessModel?.modelName || ''}
-            content={businessModel?.rationale || ''}
+            value={modelName}
+            content={businessModelRationale}
+            onClick={handleReasoningModelClick(modelName, businessModelRationale, [BUSINESS_MODEL_SOURCE])}
           />
           <Card.FinancialModel
             heading='Price'
-            value={formatter.format(pricing?.price || 0) || ''}
-            content={pricing?.rationale || ''}
+            value={`${formattedPrice} / ${billing}`}
+            content={pricingRationale}
+            onClick={handleReasoningModelClick(`${formattedPrice} / ${billing}`, pricingRationale, pricingSources)}
           />
           <Card.FinancialModel
             heading='Total Users'
-            value={formatLargeNumber(marketSize?.totalMarketSize || 0) || ''}
-            content={marketSize?.totalMarketSizeRationale || ''}
+            value={formattedTotalMarketSize}
+            content={totalMarketSizeRationale}
+            onClick={handleReasoningModelClick(formattedTotalMarketSize, totalMarketSizeRationale, marketSizeSources)}
           />
         </div>
       </section>
@@ -59,23 +139,26 @@ const FinancialDetails: FunctionComponent = () => {
             <Card.MarketSize
               bulletColor='bg-violet-300'
               title={'Total Addressable Market (TAM)'}
-              value={formatter.format(tam.value || 0)}
+              value={formattedTam}
               descriptor='ARR'
-              assumptions={marketSize?.marketShareAssumptions || []}
+              assumptions={totalMarketSizeAssumptions}
+              onClick={handleReasoningModelClick(formattedTam, totalMarketSizeRationale, marketSizeSources)}
             />
             <Card.MarketSize
               bulletColor='bg-violet-500'
               title={'Serviceable Addressable Market (SAM)'}
-              value={formatter.format(sam.value || 0)}
+              value={formattedSam}
               descriptor='ARR'
-              assumptions={marketSize?.serviceableMarketPercentAssumptions || []}
+              assumptions={serviceableMarketPercentAssumptions}
+              onClick={handleReasoningModelClick(formattedSam, serviceableMarketPercentRationale, marketSizeSources)}
             />
             <Card.MarketSize
               bulletColor='bg-indigo-600'
               title={'Serviceable Obtainable Market (SOM)'}
-              value={formatter.format(som.value || 0)}
+              value={formattedSom}
               descriptor='ARR'
-              assumptions={marketSize?.marketShareAssumptions || []}
+              assumptions={marketShareAssumptions}
+              onClick={handleReasoningModelClick(formattedSom, marketShareRationale, marketSizeSources)}
             />
           </div>
 

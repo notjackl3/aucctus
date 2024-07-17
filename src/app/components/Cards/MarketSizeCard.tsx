@@ -1,3 +1,4 @@
+import Icon from '@components/Icons';
 import { generateRandomString } from '@libs/utils';
 import React from 'react';
 
@@ -8,6 +9,8 @@ interface IMarketSizeCard {
   assumptions: string[];
   // TODO: Add tail wind class typings
   bulletColor: string;
+
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }
 
 const MarketSizeCard: React.FC<IMarketSizeCard> = ({
@@ -16,6 +19,7 @@ const MarketSizeCard: React.FC<IMarketSizeCard> = ({
   descriptor,
   assumptions,
   bulletColor = 'bg-violet-300',
+  onClick,
 }) => {
   return (
     <div className='inline-flex w-96 flex-col items-start justify-start rounded-xl border border-slate-200 bg-white shadow'>
@@ -40,9 +44,12 @@ const MarketSizeCard: React.FC<IMarketSizeCard> = ({
             <p className='w-64 self-stretch text-wrap text-sm font-medium leading-tight text-indigo-900'>
               {assumption}
             </p>
-            {/* <div className="Button w-6 h-6 p-2 bg-violet-50 rounded border border-violet-50 justify-center items-center gap-2 flex">
-          <div className="w-3 h-3 relative" />
-        </div> */}
+            <button
+              className='btn btn-primary-light btn-no-border h-8 w-8 border-violet-50 p-0 [&>svg>use]:stroke-primary-600'
+              onClick={onClick}
+            >
+              <Icon.Variant variant='book-open' strokeWidth={6} />
+            </button>
           </div>
         ))}
       </div>

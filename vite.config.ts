@@ -1,10 +1,10 @@
-import { splitVendorChunkPlugin } from 'vite';
-import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
-import svgr from 'vite-plugin-svgr';
-import eslint from 'vite-plugin-eslint';
-import compression from 'vite-plugin-compression';
 import path from 'path';
+import { splitVendorChunkPlugin } from 'vite';
+import compression from 'vite-plugin-compression';
+import eslint from 'vite-plugin-eslint';
+import svgr from 'vite-plugin-svgr';
+import { defineConfig } from 'vitest/config';
 import { watchIcons } from './vite/plugins.js';
 
 // https://vitejs.dev/config/
@@ -44,6 +44,9 @@ export default defineConfig({
       '@routes': path.resolve(__dirname, 'src/routes'),
       '@libs': path.resolve(__dirname, 'src/libs'),
       '@assets': path.resolve(__dirname, 'src/app/assets'),
+      '@context': path.resolve(__dirname, 'src/app/context'),
+      '@hooks': path.resolve(__dirname, 'src/app/hooks'),
+      '@stores': path.resolve(__dirname, 'src/app/stores'),
 
       // Style Sheets
       '~global.scss': path.resolve(__dirname, 'src/app/assets/styles/global.scss'),

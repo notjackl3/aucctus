@@ -1,11 +1,12 @@
-import Confirmation from './ConfirmationModal/ConfirmationModal';
-import Base from './Modal/Modal';
-import EditCustomerProfileDemographics from './CustomerProfile/EditCustomerProfileDemographics';
 import CustomerProfile from '@pages/ConceptReport/components/CustomerProfile';
-import EditKeyAssumptionModal from './KeyAssumtionModal/EditKeyAssumtionModal';
+import Confirmation from './ConfirmationModal/ConfirmationModal';
+import EditCustomerProfileDemographics from './CustomerProfile/EditCustomerProfileDemographics';
+import EvidenceAndReasoning from './EvedanceAndReasoningModal';
 import AddKeyAssumptionModal from './KeyAssumtionModal/AddKeyAssumptionModal';
+import EditKeyAssumptionModal from './KeyAssumtionModal/EditKeyAssumtionModal';
 import AddMarketScanElement from './MarketScanElement/AddMarketScanElement';
 import EditMarketScanElement from './MarketScanElement/EditMarketScanElement';
+import Base from './Modal/Modal';
 
 const Modal = {
   Base,
@@ -16,6 +17,7 @@ const Modal = {
   AddKeyAssumptionModal,
   AddMarketScanElement,
   EditMarketScanElement,
+  EvidenceAndReasoning,
 };
 
 export default Modal;

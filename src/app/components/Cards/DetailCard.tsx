@@ -1,6 +1,6 @@
+import { Header } from '@components';
 import { FunctionComponent, ReactNode } from 'react';
 import Icon from '../Icons/Icon/Icon';
-import { Header } from '@components';
 
 interface DetailCardProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
   title: string;

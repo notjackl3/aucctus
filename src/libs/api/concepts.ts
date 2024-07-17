@@ -20,7 +20,6 @@ import {
   IGeneratedConcept,
   IMarketScan,
   IMarketScanElementCreate,
-  IMarketSizeMetric,
   ITrendsAndDrivers,
 } from './types'; // Import the missing type
 import { IPageResponse } from './types';

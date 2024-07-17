@@ -233,28 +233,12 @@ export function useEditMarketScan() {
   };
 }
 
-// type MarketMetrics = { [key in IMarketSizeMetric['metricType']]: IMarketSizeMetric };
-
+// TODO: Handle Editing
 export function useEditFinancialProjections() {
   const { id: conceptUuid = '' } = useParams();
-  const { financialProjection } = useFinancialProjection(conceptUuid);
+  const { financialProjection, isLoading } = useFinancialProjection(conceptUuid);
   const { mutate } = useFinancialProjectionUpdate(conceptUuid);
-  // const { mutate: updateMarketMetricSize } = useMarketMetricSizeUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 500 };
-  const keyHypothesisValidationOptions: IValidationOptions = { maxLength: 300 };
-
-  // const marketSizeMetric = useMemo(() => {
-  //   if (!financialProjection) {
-  //     return undefined;
-  //   }
-
-  //   const marketSizes = financialProjection.marketSizeMetrics.reduce((acc: Partial<MarketMetrics>, metric) => {
-  //     acc[metric.metricType] = metric;
-  //     return acc;
-  //   }, {});
-
-  //   return marketSizes as MarketMetrics;
-  // }, [financialProjection]);
 
   const overview = useEditableField<string, IFinancialProjection>({
     initialValue: financialProjection?.overview || '',
@@ -288,31 +272,8 @@ export function useEditFinancialProjections() {
     validation: validationOptions,
   });
 
-  // const somKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
-  //   initialValue: marketSizeMetric?.SOM?.keyHypothesis || '',
-  //   fieldName: 'keyHypothesis',
-  //   updateMutation: updateMarketMetricSize,
-  //   identifier: marketSizeMetric?.SOM?.uuid || '',
-  //   validation: keyHypothesisValidationOptions,
-  // });
-
-  // const tamKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
-  //   initialValue: marketSizeMetric?.TAM?.keyHypothesis || '',
-  //   fieldName: 'keyHypothesis',
-  //   updateMutation: updateMarketMetricSize,
-  //   identifier: marketSizeMetric?.TAM?.uuid || '',
-  //   validation: keyHypothesisValidationOptions,
-  // });
-
-  // const samKeyHypothesis = useEditableField<string, IMarketSizeMetric>({
-  //   initialValue: marketSizeMetric?.SAM?.keyHypothesis || '',
-  //   fieldName: 'keyHypothesis',
-  //   updateMutation: updateMarketMetricSize,
-  //   identifier: marketSizeMetric?.SAM?.uuid || '',
-  //   validation: keyHypothesisValidationOptions,
-  // });
-
   return {
+    isLoading: isLoading,
     overview,
     tam,
     sam,
@@ -320,11 +281,6 @@ export function useEditFinancialProjections() {
     businessModel: financialProjection?.businessModel,
     marketSize: financialProjection?.marketSize,
     pricing: financialProjection?.pricing,
-
-    // marketSizeMetric,
-    // somKeyHypothesis,
-    // tamKeyHypothesis,
-    // samKeyHypothesis,
   };
 }
 

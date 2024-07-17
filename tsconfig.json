@@ -24,7 +24,10 @@
       "@pages/*": ["src/app/pages/*"],
       "@routes/*": ["src/routes/*"],
       "@libs/*": ["src/libs/*"],
-      "@assets/*": ["src/app/assets/*"]
+      "@assets/*": ["src/app/assets/*"],
+      "@context/*": ["src/app/context/*"],
+      "@hooks/*": ["src/app/hooks/*"],
+      "@stores/*": ["src/app/stores/*"]
     }
   },
   "include": ["src", "src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],

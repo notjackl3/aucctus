@@ -135,7 +135,7 @@ export interface IFinancialProjectionPricing {
   uuid: string;
   version: number;
   price: number;
-  unit: string;
+  billing: string;
   averageRevenuePerCustomer: number;
   purchasingFrequency: number;
   rationale: string;
@@ -148,6 +148,7 @@ export interface IMarketSize {
   version: number;
   totalMarketSize: number;
   totalMarketSizeRationale: string;
+  totalMarketSizeAssumptions: string[];
 
   serviceableMarketPercentMarket: number;
   serviceableMarketPercentRationale: string;
