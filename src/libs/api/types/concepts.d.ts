@@ -150,13 +150,13 @@ export interface IMarketSize {
   totalMarketSizeRationale: string;
   totalMarketSizeAssumptions: string[];
 
-  serviceableMarketPercentMarket: number;
+  serviceableMarketPercent: number;
   serviceableMarketPercentRationale: string;
   serviceableMarketPercentAssumptions: string[];
 
-  marketShare: number;
-  marketShareRationale: string;
-  marketShareAssumptions: string[];
+  marketCaptureRate: number;
+  marketCaptureRateRationale: string;
+  marketCaptureRateAssumptions: string[];
 
   sources: ISource[];
 }

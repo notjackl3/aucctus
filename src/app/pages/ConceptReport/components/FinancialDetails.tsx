@@ -31,12 +31,12 @@ const DEFAULT_MARKET_SIZE: IMarketSize = {
   totalMarketSize: 0,
   totalMarketSizeRationale: '',
   totalMarketSizeAssumptions: [],
-  serviceableMarketPercentMarket: 0,
+  serviceableMarketPercent: 0,
   serviceableMarketPercentRationale: '',
   serviceableMarketPercentAssumptions: [],
-  marketShare: 0,
-  marketShareRationale: '',
-  marketShareAssumptions: [],
+  marketCaptureRate: 0,
+  marketCaptureRateRationale: '',
+  marketCaptureRateAssumptions: [],
   sources: [],
 };
 
@@ -58,8 +58,8 @@ const FinancialDetails: FunctionComponent = () => {
     totalMarketSizeAssumptions,
     serviceableMarketPercentRationale,
     serviceableMarketPercentAssumptions,
-    marketShareRationale,
-    marketShareAssumptions,
+    marketCaptureRateRationale,
+    marketCaptureRateAssumptions,
     sources: marketSizeSources,
   } = marketSize || DEFAULT_MARKET_SIZE;
 
@@ -157,8 +157,8 @@ const FinancialDetails: FunctionComponent = () => {
               title={'Serviceable Obtainable Market (SOM)'}
               value={formattedSom}
               descriptor='ARR'
-              assumptions={marketShareAssumptions}
-              onClick={handleReasoningModelClick(formattedSom, marketShareRationale, marketSizeSources)}
+              assumptions={marketCaptureRateAssumptions}
+              onClick={handleReasoningModelClick(formattedSom, marketCaptureRateRationale, marketSizeSources)}
             />
           </div>
 
