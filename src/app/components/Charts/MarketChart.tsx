@@ -31,7 +31,7 @@ const MarketChart: FunctionComponent<MarketChartProps> = ({ tam, sam, som, class
     });
 
   return (
-    <svg viewBox='0 0 442 442' fill='black' className={classname('flex min-h-80 min-w-80', className)}>
+    <svg viewBox='0 0 442 442' fill='black' className={classname('flex', className)}>
       <circle className='fill-primary-250' fill='#c9bdff' cx={LARGE_RADIUS} cy={LARGE_RADIUS} r={LARGE_RADIUS}></circle>
       <circle className='fill-primary-450' fill='#937bff' cx={LARGE_RADIUS} cy={mediumCenter} r={mediumRadius}></circle>
       <circle className='fill-primary-600' fill='' cx={LARGE_RADIUS} cy={smallCenter} r={smallRadius}></circle>

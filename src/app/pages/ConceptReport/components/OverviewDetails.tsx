@@ -1,10 +1,10 @@
-import { FunctionComponent, useMemo } from 'react';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { Card, Container, Header, Text } from '@components';
 import { AppPath } from '@routes/routes';
-import { IConceptReportContext } from '../ConceptReport';
-import { useConceptAssumptions, useConceptOverview } from '../../../hooks/query/concepts.hook';
+import { FunctionComponent, useMemo } from 'react';
+import { useOutletContext, useParams } from 'react-router-dom';
 import { useEditConcept, useEditOverview } from '../../../hooks/concepts/editable.hook';
-import { Card, Header, Container, Text } from '@components';
+import { useConceptAssumptions, useConceptOverview } from '../../../hooks/query/concepts.hook';
+import { IConceptReportContext } from '../ConceptReport';
 
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
@@ -87,10 +87,10 @@ const OverviewDetails: FunctionComponent = () => {
           onViewProfilesClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
         />
 
-        {/* <Card.FinancialProjects
+        <Card.FinancialProjects
           projection={overview?.financialProjection}
           onViewClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
-        /> */}
+        />
 
         <Card.KeyAssumptions
           assumptions={assumptions?.results || []}
