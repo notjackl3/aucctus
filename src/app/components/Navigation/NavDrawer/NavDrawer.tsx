@@ -1,4 +1,4 @@
-import Logo from '@assets/Logo-black.png';
+import Logo from '@assets/Logo.png';
 import { Avatar } from '@components';
 import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
