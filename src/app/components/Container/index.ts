@@ -1,8 +1,6 @@
-import React from 'react';
-
-const DemographicsContainer = React.lazy(() => import('./DemographicsContainer/DemographicsContainer'));
-const TabView = React.lazy(() => import('./TabView/TabView'));
-const List = React.lazy(() => import('./ListContainer'));
+import DemographicsContainer from './DemographicsContainer/DemographicsContainer';
+import List from './ListContainer';
+import TabView from './TabView/TabView';
 
 const Container = {
   DemographicsContainer,
