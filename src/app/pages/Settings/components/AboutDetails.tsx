@@ -1,15 +1,15 @@
 import { FunctionComponent, useMemo, useState } from 'react';
-import RowInfo from '../../../components/Text/RowInfo/RowInfo';
-import InputField from '../../../components/Text/InputField/InputField';
-import styles from '../styles/aboutDetails.module.scss';
 import Select, { StylesConfig } from 'react-select';
+import { toast } from 'react-toastify';
+import { IUser } from '../../../../libs/api/types';
 import defaultAvatar from '../../../assets/img/avatar.png';
 import Icon from '../../../components/Icons/Icon/Icon';
-import { toast } from 'react-toastify';
 import Loading from '../../../components/Loading';
-import { IUser } from '../../../../libs/api/types';
+import InputField from '../../../components/Text/InputField/InputField';
+import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import { useUpdateUser } from '../../../hooks/query/account.hook';
 import { useAppStore } from '../../../stores/app.store';
+import styles from '../styles/aboutDetails.module.scss';
 
 const defaultIconProps = {
   width: 20,
@@ -86,7 +86,7 @@ const AboutDetails: FunctionComponent = () => {
         label: 'Email',
         value: email ?? user?.email,
         name: 'email',
-        isDisabled: isFormDisabled,
+        isDisabled: true,
       },
       {
         label: 'Job Title',
