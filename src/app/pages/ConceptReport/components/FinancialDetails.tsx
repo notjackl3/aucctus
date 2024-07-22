@@ -104,7 +104,7 @@ const FinancialDetails: FunctionComponent = () => {
       <section className='inline-flex w-full flex-col items-start justify-start gap-5'>
         <Header.Three text='Financial Model' />
 
-        <div className='inline-flex w-full items-start justify-center gap-5'>
+        <div className='inline-flex w-full items-start justify-start gap-5'>
           <Card.FinancialModel
             heading='Business Model'
             value={modelName}
