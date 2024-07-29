@@ -1,5 +1,4 @@
-import { useLocation } from 'react-router-dom';
-import { matchPath } from 'react-router-dom';
+import { matchPath, useLocation } from 'react-router-dom';
 import { AppPath, UNAUTH_ROUTES } from '../../routes/routes'; // import your route definitions
 
 export function useRoutePattern() {
@@ -17,7 +16,6 @@ export function useRoutePattern() {
 
 export function useIsUnauthRoute() {
   const location = useLocation();
-  console.log(location.pathname);
 
   for (const path of UNAUTH_ROUTES) {
     // The matchPath function tries to match the current location against the route pattern

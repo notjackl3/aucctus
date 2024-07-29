@@ -123,49 +123,41 @@ export interface ISource {
   url: string;
 }
 
-export interface IBusinessModel {
-  uuid: string;
-  version: number;
+export interface IBusinessModel extends IBaseConceptEntity {
   modelName: string;
   description: string;
   rationale: string;
+  sources: ISource[];
 }
 
-export interface IFinancialProjectionPricing {
-  uuid: string;
-  version: number;
+interface BaseFinancialProjectionItem extends IBaseConceptEntity {
+  rationale: string;
+  sources: ISource[];
+}
+
+export interface IBusinessModel extends BaseFinancialProjectionItem {
+  modelName: string;
+  description: string;
+}
+export interface IFinancialProjectionPricing extends BaseFinancialProjectionItem {
   price: number;
   billing: string;
   averageRevenuePerCustomer: number;
   purchasingFrequency: number;
-  rationale: string;
-
-  sources: ISource[];
 }
 
-export interface IMarketSize {
-  uuid: string;
-  version: number;
-  totalMarketSize: number;
-  totalMarketSizeRationale: string;
-  totalMarketSizeAssumptions: string[];
-
-  serviceableMarketPercent: number;
-  serviceableMarketPercentRationale: string;
-  serviceableMarketPercentAssumptions: string[];
-
-  marketCaptureRate: number;
-  marketCaptureRateRationale: string;
-  marketCaptureRateAssumptions: string[];
-
-  sources: ISource[];
+export interface IFinancialMarketSizeItem extends BaseFinancialProjectionItem {
+  value: number;
+  assumptions: string[];
 }
 
 export interface IFinancialProjection extends IBaseConceptEntity {
   overview: string;
   businessModel: IBusinessModel;
   pricing: IFinancialProjectionPricing;
-  marketSize: IMarketSize;
+  totalUsers: IFinancialMarketSizeItem;
+  serviceableAddressablePercent: IFinancialMarketSizeItem;
+  serviceableObtainablePercent: IFinancialMarketSizeItem;
 
   tam: number;
   sam: number;

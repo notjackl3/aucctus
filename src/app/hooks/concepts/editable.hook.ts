@@ -1,3 +1,4 @@
+import { IBusinessModel, IFinancialMarketSizeItem, IFinancialProjectionPricing } from '@libs/api/types';
 import { AxiosError } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { MutateOptions, UseMutateFunction } from 'react-query';
@@ -234,6 +235,41 @@ export function useEditMarketScan() {
 }
 
 // TODO: Handle Editing
+
+const DEFAULT_BUSINESS_MODEL: IBusinessModel = {
+  modelName: '',
+  description: '',
+  rationale: '',
+  uuid: '',
+  version: 0,
+  createdAt: '',
+  updatedAt: '',
+  sources: [],
+};
+
+const DEFAULT_PRICING: IFinancialProjectionPricing = {
+  price: 0,
+  billing: '',
+  averageRevenuePerCustomer: 0,
+  purchasingFrequency: 0,
+  rationale: '',
+  sources: [],
+  uuid: '',
+  version: 0,
+  createdAt: '',
+  updatedAt: '',
+};
+
+const DEFAULT_MARKET_SIZE: IFinancialMarketSizeItem = {
+  value: 0,
+  assumptions: [],
+  rationale: '',
+  sources: [],
+  uuid: '',
+  version: 0,
+  createdAt: '',
+  updatedAt: '',
+};
 export function useEditFinancialProjections() {
   const { id: conceptUuid = '' } = useParams();
   const { financialProjection, isLoading } = useFinancialProjection(conceptUuid);
@@ -278,9 +314,13 @@ export function useEditFinancialProjections() {
     tam,
     sam,
     som,
-    businessModel: financialProjection?.businessModel,
-    marketSize: financialProjection?.marketSize,
-    pricing: financialProjection?.pricing,
+
+    // TODO: Clean this all up and enable editing
+    businessModel: financialProjection?.businessModel || DEFAULT_BUSINESS_MODEL,
+    pricing: financialProjection?.pricing || DEFAULT_PRICING,
+    totalUsers: financialProjection?.totalUsers || DEFAULT_MARKET_SIZE,
+    serviceableAddressablePercent: financialProjection?.serviceableAddressablePercent || DEFAULT_MARKET_SIZE,
+    serviceableObtainablePercent: financialProjection?.serviceableObtainablePercent || DEFAULT_MARKET_SIZE,
   };
 }
 

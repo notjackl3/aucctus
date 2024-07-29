@@ -2,70 +2,27 @@ import { Card, Chart, Header, Modal } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useModal } from '@context/ModalContextProvider';
 import { useEditFinancialProjections } from '@hooks/concepts/editable.hook';
-import { IBusinessModel, IFinancialProjectionPricing, IMarketSize, ISource } from '@libs/api/types';
+import { ISource } from '@libs/api/types';
 import { formatLargeNumber, formatter } from '@libs/utils';
 import React, { FunctionComponent } from 'react';
 
-const DEFAULT_BUISENSS_MODEL: IBusinessModel = {
-  uuid: '',
-  version: 0,
-  modelName: '',
-  description: '',
-  rationale: '',
-};
-
-const DEFAULT_PRICING: IFinancialProjectionPricing = {
-  uuid: '',
-  version: 0,
-  price: 0,
-  billing: '',
-  averageRevenuePerCustomer: 0,
-  purchasingFrequency: 0,
-  rationale: '',
-  sources: [],
-};
-
-const DEFAULT_MARKET_SIZE: IMarketSize = {
-  uuid: '',
-  version: 0,
-  totalMarketSize: 0,
-  totalMarketSizeRationale: '',
-  totalMarketSizeAssumptions: [],
-  serviceableMarketPercent: 0,
-  serviceableMarketPercentRationale: '',
-  serviceableMarketPercentAssumptions: [],
-  marketCaptureRate: 0,
-  marketCaptureRateRationale: '',
-  marketCaptureRateAssumptions: [],
-  sources: [],
-};
-
-const BUSINESS_MODEL_SOURCE: ISource = {
-  uuid: '12345',
-  title: '50 Types of Business Models (2022) – The Best Examples of Companies Using It',
-  url: 'https://bstrategyhub.com/50-types-of-business-models-the-best-examples-of-companies-using-it/',
-};
-
 const FinancialDetails: FunctionComponent = () => {
   // const { id: conceptId } = useParams();
-  const { overview, tam, sam, som, businessModel, marketSize, pricing } = useEditFinancialProjections();
-  // Extract values from Business Model, Market Size and Pricing
-  const { modelName, rationale: businessModelRationale } = businessModel || DEFAULT_BUISENSS_MODEL;
-  const { price, billing, rationale: pricingRationale, sources: pricingSources } = pricing || DEFAULT_PRICING;
   const {
-    totalMarketSize,
-    totalMarketSizeRationale,
-    totalMarketSizeAssumptions,
-    serviceableMarketPercentRationale,
-    serviceableMarketPercentAssumptions,
-    marketCaptureRateRationale,
-    marketCaptureRateAssumptions,
-    sources: marketSizeSources,
-  } = marketSize || DEFAULT_MARKET_SIZE;
+    overview,
+    tam,
+    sam,
+    som,
+    businessModel,
+    pricing,
+    totalUsers,
+    serviceableAddressablePercent,
+    serviceableObtainablePercent,
+  } = useEditFinancialProjections();
 
   // Formate Large numbers
-  const formattedPrice = React.useMemo(() => formatter.format(price), [price]);
-  const formattedTotalMarketSize = React.useMemo(() => formatLargeNumber(totalMarketSize), [totalMarketSize]);
+  const formattedPrice = React.useMemo(() => formatter.format(pricing.price), [pricing]);
+  const formattedTotalUsers = React.useMemo(() => formatLargeNumber(totalUsers.value), [totalUsers]);
   const formattedTam = React.useMemo(() => formatter.format(tam.value), [tam]);
   const formattedSam = React.useMemo(() => formatter.format(sam.value), [sam]);
   const formattedSom = React.useMemo(() => formatter.format(som.value), [som]);
@@ -107,21 +64,25 @@ const FinancialDetails: FunctionComponent = () => {
         <div className='inline-flex w-full items-start justify-start gap-5'>
           <Card.FinancialModel
             heading='Business Model'
-            value={modelName}
-            content={businessModelRationale}
-            onClick={handleReasoningModelClick(modelName, businessModelRationale, [BUSINESS_MODEL_SOURCE])}
+            value={businessModel.modelName}
+            content={businessModel.rationale}
+            onClick={handleReasoningModelClick(businessModel.modelName, businessModel.rationale, businessModel.sources)}
           />
           <Card.FinancialModel
             heading='Price'
-            value={`${formattedPrice} / ${billing}`}
-            content={pricingRationale}
-            onClick={handleReasoningModelClick(`${formattedPrice} / ${billing}`, pricingRationale, pricingSources)}
+            value={`${formattedPrice} / ${pricing.billing}`}
+            content={pricing.rationale}
+            onClick={handleReasoningModelClick(
+              `${formattedPrice} / ${pricing.billing}`,
+              pricing.rationale,
+              pricing.sources,
+            )}
           />
           <Card.FinancialModel
             heading='Total Users'
-            value={formattedTotalMarketSize}
-            content={totalMarketSizeRationale}
-            onClick={handleReasoningModelClick(formattedTotalMarketSize, totalMarketSizeRationale, marketSizeSources)}
+            value={formattedTotalUsers}
+            content={totalUsers.rationale}
+            onClick={handleReasoningModelClick(formattedTotalUsers, totalUsers.rationale, totalUsers.sources)}
           />
         </div>
       </section>
@@ -141,24 +102,32 @@ const FinancialDetails: FunctionComponent = () => {
               title={'Total Addressable Market (TAM)'}
               value={formattedTam}
               descriptor='ARR'
-              assumptions={totalMarketSizeAssumptions}
-              onClick={handleReasoningModelClick(formattedTam, totalMarketSizeRationale, marketSizeSources)}
+              assumptions={totalUsers.assumptions}
+              onClick={handleReasoningModelClick(formattedTam, totalUsers.rationale, totalUsers.sources)}
             />
             <Card.MarketSize
               bulletColor='bg-violet-500'
               title={'Serviceable Addressable Market (SAM)'}
               value={formattedSam}
               descriptor='ARR'
-              assumptions={serviceableMarketPercentAssumptions}
-              onClick={handleReasoningModelClick(formattedSam, serviceableMarketPercentRationale, marketSizeSources)}
+              assumptions={serviceableAddressablePercent.assumptions}
+              onClick={handleReasoningModelClick(
+                formattedSam,
+                serviceableAddressablePercent.rationale,
+                serviceableAddressablePercent.sources,
+              )}
             />
             <Card.MarketSize
               bulletColor='bg-indigo-600'
               title={'Serviceable Obtainable Market (SOM)'}
               value={formattedSom}
               descriptor='ARR'
-              assumptions={marketCaptureRateAssumptions}
-              onClick={handleReasoningModelClick(formattedSom, marketCaptureRateRationale, marketSizeSources)}
+              assumptions={serviceableObtainablePercent.assumptions}
+              onClick={handleReasoningModelClick(
+                formattedSom,
+                serviceableObtainablePercent.rationale,
+                serviceableObtainablePercent.sources,
+              )}
             />
           </div>
 
