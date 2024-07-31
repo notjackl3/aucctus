@@ -1,6 +1,10 @@
+import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { toast } from 'react-toastify';
+import analytics from '../../../libs/analytics';
 import api from '../../../libs/api';
-import { AucctusQueryKeys } from './query-keys';
+import { IGeneratedConceptsSaveBody } from '../../../libs/api/concepts';
+import { IIgniteConceptBody } from '../../../libs/api/igniteConcepts';
 import {
   ConceptCategory,
   ConceptStatus,
@@ -20,12 +24,8 @@ import {
   // IMarketSizeMetric,
   ITrendsAndDrivers,
 } from '../../../libs/api/types';
-import { AxiosError } from 'axios';
-import { toast } from 'react-toastify';
 import { parseFormError } from '../../../libs/utils';
-import analytics from '../../../libs/analytics';
-import { IGeneratedConceptsSaveBody } from '../../../libs/api/concepts';
-import { IIgniteConceptBody } from '../../../libs/api/igniteConcepts';
+import { AucctusQueryKeys } from './query-keys';
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & { uuid: string };
 export type PartialConceptOverviewWithRequiredUuid = Partial<IConceptOverview> & { uuid: string };
@@ -41,7 +41,7 @@ export const useConcepts = (category?: ConceptCategory, status?: ConceptStatus, 
   return useQuery({
     queryKey: [AucctusQueryKeys.concepts, status, category, page],
     cacheTime: Infinity,
-    staleTime: 100 * 60, // 1 minute
+    staleTime: 1000 * 60, // 1 minute
     refetchInterval: (data?: IConceptPage) => {
       return data && data.results.some((concept) => concept.reportStatus === 'pending') ? 5000 : false;
     },
@@ -58,7 +58,7 @@ export const useConceptSeed = (uuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeed, AucctusQueryKeys.concept, uuid],
     cacheTime: Infinity,
-    staleTime: 100 * 60, // 1 minute
+    staleTime: 1000 * 60, // 1 minute
     enabled: !!uuid,
     queryFn: async () => await api.concept.seed(uuid),
   });
@@ -78,7 +78,7 @@ export const useConcept = (uuid?: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.concept, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 60, // 1 hour
+    cacheTime: 1000 * 60 * 2, // 2 minutes
     queryFn: async () => (uuid ? await api.concept.getConcept(uuid) : void 0),
     enabled: !!uuid,
   });

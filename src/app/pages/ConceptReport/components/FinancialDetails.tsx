@@ -21,11 +21,11 @@ const FinancialDetails: FunctionComponent = () => {
   } = useEditFinancialProjections();
 
   // Formate Large numbers
-  const formattedPrice = React.useMemo(() => formatter.format(pricing.price), [pricing]);
-  const formattedTotalUsers = React.useMemo(() => formatLargeNumber(totalUsers.value), [totalUsers]);
-  const formattedTam = React.useMemo(() => formatter.format(tam.value), [tam]);
-  const formattedSam = React.useMemo(() => formatter.format(sam.value), [sam]);
-  const formattedSom = React.useMemo(() => formatter.format(som.value), [som]);
+  const formattedPrice = React.useMemo(() => formatter.format(pricing.price), [pricing.price]);
+  const formattedTotalUsers = React.useMemo(() => formatLargeNumber(totalUsers.value), [totalUsers.value]);
+  const formattedTam = React.useMemo(() => formatter.format(tam.value), [tam.value]);
+  const formattedSam = React.useMemo(() => formatter.format(sam.value), [sam.value]);
+  const formattedSom = React.useMemo(() => formatter.format(som.value), [som.value]);
 
   const { openModal } = useModal();
 

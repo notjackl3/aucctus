@@ -1,9 +1,9 @@
+import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../libs/api';
-import { AucctusQueryKeys } from './query-keys';
 import { IAccount, IFormError, IRegisterAccount, IUser, IUserDetailsResponse } from '../../../libs/api/types';
-import { AxiosError } from 'axios';
 import { useAppStore } from '../../stores/app.store';
+import { AucctusQueryKeys } from './query-keys';
 
 const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
   user: undefined,
@@ -39,6 +39,7 @@ export const useDashboard = () => {
     queryKey: [AucctusQueryKeys.dashboard],
     queryFn: async () => await api.account.getDashboard(),
     cacheTime: Infinity,
+    staleTime: 1000 * 60, // 1 minute
     refetchOnMount: false,
     retry: false,
     enabled: true,

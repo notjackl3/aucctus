@@ -1,18 +1,24 @@
-import { FunctionComponent, useCallback, useMemo } from 'react';
-import styles from './styles/conceptOverview.module.scss';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Button, Container, Icon, Tooltip } from '@components';
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
+import { FunctionComponent, useCallback, useMemo } from 'react';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { useConcept, useConceptUpdate } from '../../hooks/query/concepts.hook';
 import { useRoutePattern } from '../../hooks/router.hook';
-import { Button, Container, Icon, Tooltip } from '@components';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
   concept?: IConcept;
 }
 
-export const CONCEPT_TABS = [
+type TabTitles =
+  | 'Overview'
+  | 'Market Scan'
+  | 'Financial Projection'
+  | 'Customer Profile'
+  | 'Key Assumptions'
+  | 'Context';
+export const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
   { label: 'Overview', value: AppPath.ConceptOverview },
   { label: 'Market Scan', value: AppPath.ConceptMarketScan },
   { label: 'Financial Projection', value: AppPath.ConceptFinancialProjection },
@@ -59,15 +65,17 @@ const ConceptReport: FunctionComponent = () => {
   );
 
   return (
-    <div className={`min-h-full ${styles.conceptOverview}`}>
-      <div className={styles.headerSection}>
-        <div className={styles.header}>
-          <h1>{concept?.title}</h1>
-          <div className={styles.statusSelect}>
+    <div className={`mx-auto my-0 flex min-h-full w-full flex-col p-8`}>
+      <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
+        <div className='flex flex-row items-center justify-start'>
+          <h1 className='h-full text-3xl font-medium capitalize not-italic leading-10 text-blue-900'>
+            {concept?.title}
+          </h1>
+          <div className='ml-4 flex'>
             <Button.ConceptDropdown value={status} onChange={changeConceptStatus} />
           </div>
         </div>
-        <div className={styles.actions}>
+        <div className='flex gap-4'>
           <Tooltip tip='Coming Soon'>
             <button
               aria-label='Download Opportunity Snapshot'
@@ -86,9 +94,9 @@ const ConceptReport: FunctionComponent = () => {
           />
         </div>
       </div>
-      <div className={styles.contentContainer}>
+      <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
         <Container.TabView
-          className={styles.tabs}
+          className=''
           tabs={CONCEPT_TABS.filter((v) => !(v.label === 'Context' && !concept?.seed))}
           onTabSelect={onTabSelect}
           activeTab={activeTab || ''}
