@@ -34,8 +34,11 @@ export const endpoints = {
   saveGeneratedConcepts: 'api/v1/concept/generated',
 
   conceptIgnite: 'v1/concept/ignite', // Fast
-  conceptQueries: (options?: IConceptQueryOptions) => {
-    if (!options) return 'api/v1/concept';
+  // eslint-disable-next-line @typescript-eslint/typedef
+  conceptQueries: function (this, options?: IConceptQueryOptions) {
+    const root = this.concept;
+
+    if (!options) return root;
 
     let query = '';
     if (options.page) query += `page=${options.page}&`;
@@ -44,9 +47,9 @@ export const endpoints = {
     if (options.createdBy) query += `created_by=${options.createdBy}&`;
     if (options.isGenerated) query += `is_generated=${options.isGenerated}&`;
 
-    if (query !== '') return `api/v1/concept?${query}`;
+    if (query !== '') return `${root}?${query}`;
 
-    return 'api/v1/concept';
+    return root;
   },
   conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
   conceptReportRetry: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/retry`,
