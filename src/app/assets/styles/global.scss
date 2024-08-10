@@ -75,69 +75,57 @@ textarea {
 input {
   transition: all 0.3s ease-in-out;
 
-  &[type='text'],
-  &[type='password'],
-  &[type='search'],
-  &[type='search'] {
-    &:active,
-    &:focus,
-    &:focus-visible {
-      box-shadow: var(--shadow-3xl);
-      outline: 1px solid var(--primary-100) !important;
-      // border: 1px solid var(--primary-100) !important;
-    }
-  }
-
   &[type='checkbox'],
   &[type='radio'] {
-    width: 16px;
-    height: 16px;
-
     transition: 0.2s all linear;
     margin-right: 5px;
-
     position: relative;
+    appearance: none; // Hide default checkbox and radio appearance
+    display: inline-block;
+    // width: 16px;
+    // height: 16px;
+    // border: 2px solid #d1d5db; // Tailwind's gray-300 equivalent
+    // border-radius: 4px; // Rounded corners for checkboxes
+    // background-color: #f3f4f6; // Tailwind's gray-100 equivalent
 
-    &:checked {
-      outline: unset !important;
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 2px 6366f1; // Focus ring (Tailwind's indigo-400 equivalent)
     }
-  }
 
-  &[type='checkbox'] {
-    border-radius: 2px;
+    // Checkmark (✓) when checked
+    &:checked::after {
+      content: '✓';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: white;
+      font-size: 10px;
+      font-weight: bold;
+    }
+
+    // Indeterminate state styling
+    &:indeterminate::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 10px;
+      height: 2px;
+      background-color: white;
+      transform: translate(-50%, -50%);
+    }
+
+    &:checked,
+    &:indeterminate {
+      background-color: #6366f1; // Tailwind's indigo-500 equivalent
+      border-color: #6366f1; // Border color when checked or indeterminate
+    }
   }
 
   &[type='radio'] {
     border-radius: 50% !important;
-  }
-}
-
-.comingSoon {
-  position: absolute;
-  top: 50%;
-  left: 0;
-  right: 0;
-  align-items: center;
-  justify-content: center;
-
-  .comingSoonWrapper {
-    display: flex;
-    justify-content: center;
-    align-content: center;
-    cursor: default;
-
-    .comingSoonText {
-      display: flex;
-      gap: var(--gap-base);
-      padding: 0.625rem 1.125rem;
-      justify-content: center;
-      align-items: center;
-      border-radius: 0.5rem;
-      box-shadow: var(--shadow-xs) !important;
-      border: 1px solid var(--gray-300-outline, #e0e5f2);
-      background: var(--base-white, #fff);
-      color: $grey-600;
-    }
   }
 }
 

@@ -1,7 +1,5 @@
 import { FunctionComponent, InputHTMLAttributes, useEffect, useRef } from 'react';
 
-import styles from './styles/tableCheckBox.module.scss';
-
 export interface TableCheckBoxProps extends InputHTMLAttributes<HTMLInputElement> {
   indeterminate?: boolean;
 }
@@ -18,9 +16,13 @@ const TableCheckBox: FunctionComponent<TableCheckBoxProps> = ({ indeterminate, c
   }, [ref, indeterminate, checked]);
 
   return (
-    <div className={styles.tableCheckBox}>
-      <input type='checkbox' ref={ref} checked={checked} {...rest} />
-    </div>
+    <input
+      type='checkbox'
+      ref={ref}
+      checked={checked}
+      className='h-4 w-4 appearance-none rounded-md border border-gray-300 bg-gray-100 checked:border-indigo-600 checked:bg-indigo-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+      {...rest}
+    />
   );
 };
 

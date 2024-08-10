@@ -8,6 +8,7 @@ import Header from './Header';
 import Icon from './Icons';
 import Legend from './Legends';
 import Modal from './Modal';
+import Table from './Tables';
 import Text from './Text';
 
 // Components
@@ -25,10 +26,11 @@ export {
   Container,
   Header,
   Icon,
-  Legend,
-  Modal,
-  Text,
   IgniteLoading,
+  Legend,
   Loading,
+  Modal,
+  Table,
+  Text,
   Tooltip,
 };

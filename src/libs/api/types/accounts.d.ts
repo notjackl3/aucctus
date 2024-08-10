@@ -32,6 +32,7 @@ export interface IUser {
   email: string;
   account?: string;
   jobTitle?: string;
+  profileImage?: string;
   role: 'Admin' | 'Employee';
 }
 

@@ -1,15 +1,14 @@
+import { ConceptReportStatus } from '@libs/api/types';
 import { FunctionComponent, ReactNode } from 'react';
-import styles from '../styles/concepts.module.scss';
-import { ConceptReportStatus } from '../../../../libs/api/types';
-import Icon from '../../../components/Icons/Icon/Icon';
-import Loading from '../../../components/Loading';
+
+import { Icon, Loading } from '@components';
 
 type ConceptRowButtonProps = {
   variant: ConceptReportStatus;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
-const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, onClick }) => {
+const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, onClick }) => {
   const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
     const variantContext: Record<ConceptReportStatus, { style: string; label: string | ReactNode }> = {
       complete: {
@@ -20,8 +19,8 @@ const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, o
       pending: {
         style: `btn btn-light btn-bold`,
         label: (
-          <span className={styles.loadingButton}>
-            Loading<span></span>
+          <span className='flex flex-row gap-2'>
+            Loading
             <Loading isSmall />
           </span>
         ),
@@ -34,9 +33,9 @@ const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, o
       error: {
         style: ` btn btn-light btn-bold`,
         label: (
-          <span>
-            <Icon variant='refresh' height={20} width={20} /> Retry
-          </span>
+          <>
+            <Icon.Variant variant='refresh' height={20} width={20} /> Retry
+          </>
         ),
       },
     };
@@ -53,4 +52,4 @@ const ConceptRowButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, o
   );
 };
 
-export default ConceptRowButton;
+export default ConceptGenerateButton;

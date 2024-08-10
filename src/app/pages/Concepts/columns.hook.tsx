@@ -1,18 +1,18 @@
-import { useMemo } from 'react';
 import { createColumnHelper } from '@tanstack/react-table';
-import { dateCellFormatter } from '../../../libs/utils';
-import TableCheckBox from '../../components/Tables/TableCheckBox';
+import { useMemo } from 'react';
 import { IConcept } from '../../../libs/api/types';
+import { dateFormatter } from '../../../libs/utils';
+import TableCheckBox from '../../components/Tables/TableCheckBox';
 
-import ConceptStatusBubble from '../../components/Badges/ConceptStatusBubble';
+import ConceptStatusBubble from '../../components/Badges/ConceptStatus';
+import ConceptRowButton from '../../components/Buttons/ConceptGenerateButton';
 import ConceptMenu from '../../components/Buttons/ConceptMenu/ConceptMenu';
 import Icon from '../../components/Icons/Icon/Icon';
-import ConceptRowButton from './components/ConceptRowButton';
 import { useConceptUpdate, useRetryConceptReport } from '../../hooks/query/concepts.hook';
 
-import styles from './styles/concepts.module.scss';
-import { AppPath } from '../../../routes/routes';
 import { useNavigate } from 'react-router-dom';
+import { AppPath } from '../../../routes/routes';
+import styles from './styles/concepts.module.scss';
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -82,7 +82,7 @@ export const useConceptTableColumns = (
         id: 'updatedAt',
         size: 110,
         minSize: 110,
-        cell: (info) => dateCellFormatter(info.getValue()),
+        cell: (info) => dateFormatter(info.getValue()),
         header: () => <span>Last Modified</span>,
       }),
       columnHelper.accessor((row) => row?.status, {

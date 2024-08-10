@@ -1,15 +1,15 @@
-import Simple from './SimpleBadge';
-import RiskLevel from './RiskLevelBadge';
 import Assumption from './AssumptionBadge';
 import ConceptStatistic from './ConceptStatistic';
-import ConceptStatusBadge from './ConceptStatusBubble/ConceptStatusBubble';
+import ConceptStatus from './ConceptStatus';
+import RiskLevel from './RiskLevelBadge';
+import Simple from './SimpleBadge';
 
 const Badges = {
   Simple,
   RiskLevel,
   Assumption,
   ConceptStatistic,
-  ConceptStatusBadge,
+  ConceptStatus,
 };
 
 export default Badges;

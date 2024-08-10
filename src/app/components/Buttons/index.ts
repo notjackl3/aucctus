@@ -1,8 +1,9 @@
-import Status from './StatusButton/StatusButton';
-import Checkbox from './Checkbox/CheckBox';
-import Dropdown from './Dropdown/Dropdown';
-import Collapsible from './Collapsible';
 import ConceptDropdown from '../Select/ConceptStatusSelect';
+import Checkbox from './Checkbox/CheckBox';
+import Collapsible from './Collapsible';
+import ConceptGenerate from './ConceptGenerateButton';
+import Dropdown from './Dropdown/Dropdown';
+import Status from './StatusButton/StatusButton';
 
 const Button = {
   Status,
@@ -10,6 +11,7 @@ const Button = {
   Dropdown,
   Collapsible,
   ConceptDropdown,
+  ConceptGenerate,
 };
 
 export default Button;

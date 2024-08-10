@@ -80,7 +80,12 @@ const NavDrawer = () => {
             />
           </div>
           <div className={styles.account}>
-            <Avatar firstName={user?.firstName || ''} lastName={user?.lastName || ''} hideImage />
+            <Avatar
+              firstName={user?.firstName || ''}
+              lastName={user?.lastName || ''}
+              src={user?.profileImage}
+              hideImage={!!user?.profileImage}
+            />
             <div className={styles.userDetails}>
               <span className='w-40 truncate text-base font-medium leading-tight text-slate-500'>
                 {user?.firstName || ''}

@@ -24,6 +24,7 @@ export interface IPageQueryOptions {
 }
 
 export interface IConceptQueryOptions extends IPageQueryOptions {
+  search?: string;
   status?: ConceptStatus;
   category?: ConceptCategory;
   createdBy?: string;

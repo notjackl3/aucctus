@@ -28,6 +28,42 @@ export const ARCHIVE_CONCEPT_STATUS_LIST: ArchivedConceptStatus[] = ['archived']
 
 export type ConceptStatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
 
+export const CONCEPT_STATUS_STYLE_MAP: Record<
+  ConceptStatusColor,
+  { bg: string; bullet: string; text: string; stroke: string }
+> = {
+  blue: {
+    bg: 'bg-[#f8f9fc]',
+    bullet: 'bg-[#4e5ba6]',
+    text: 'text-[#4e5ba6]',
+    stroke: 'stroke-[#4e5ba6]',
+  },
+  green: {
+    bg: 'bg-success-50',
+    bullet: 'bg-success-500',
+    text: 'text-success-500',
+    stroke: 'stroke-success-500',
+  },
+  purple: {
+    bg: 'bg-primary-50',
+    bullet: 'bg-primary-500',
+    text: 'text-primary-500',
+    stroke: 'stroke-primary-500',
+  },
+  pink: {
+    bg: 'bg-[#fdf2fa]',
+    bullet: 'bg-[#ee46bc]',
+    text: 'text-[#ee46bc]',
+    stroke: 'stroke-[#ee46bc]',
+  },
+  red: {
+    bg: 'bg-error-50',
+    bullet: 'bg-error-500',
+    text: 'text-error-500',
+    stroke: 'stroke-error-500',
+  },
+};
+
 /**
  * Returns the color associated with a given concept status.
  *
@@ -47,6 +83,11 @@ export function getConceptStatusColor(status: ConceptStatus): ConceptStatusColor
   };
 
   return statusColorObj[status];
+}
+
+export function getConceptStatusStyles(status: ConceptStatus) {
+  const color = getConceptStatusColor(status);
+  return CONCEPT_STATUS_STYLE_MAP[color];
 }
 
 type AssumptionHexColor = '#7839EE' | '#0E9384' | '#088AB2' | '#155EEF';

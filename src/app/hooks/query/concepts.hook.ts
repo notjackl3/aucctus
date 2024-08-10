@@ -1,19 +1,11 @@
-import { AxiosError } from 'axios';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { toast } from 'react-toastify';
-import analytics from '../../../libs/analytics';
-import api from '../../../libs/api';
-import { IGeneratedConceptsSaveBody } from '../../../libs/api/concepts';
-import { IIgniteConceptBody } from '../../../libs/api/igniteConcepts';
 import {
-  ConceptCategory,
-  ConceptStatus,
   Ecosystem,
   IAssumption,
   IAssumptionCreate,
   IConcept,
   IConceptOverview,
   IConceptPage,
+  IConceptQueryOptions,
   ICustomerProfile,
   ICustomerProfileCreate,
   IEcosystemCreate,
@@ -23,8 +15,15 @@ import {
   IMarketScanElementCreate,
   // IMarketSizeMetric,
   ITrendsAndDrivers,
-} from '../../../libs/api/types';
-import { parseFormError } from '../../../libs/utils';
+} from '@libs/api/types';
+import { parseFormError } from '@libs/utils';
+import { AxiosError } from 'axios';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { toast } from 'react-toastify';
+import analytics from '../../../libs/analytics';
+import api from '../../../libs/api';
+import { IGeneratedConceptsSaveBody } from '../../../libs/api/concepts';
+import { IIgniteConceptBody } from '../../../libs/api/igniteConcepts';
 import { AucctusQueryKeys } from './query-keys';
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & { uuid: string };
@@ -37,20 +36,21 @@ export type PartialConceptOverviewWithRequiredUuid = Partial<IConceptOverview> &
  * @param page - Optional page number for pagination
  * @returns The result of the useQuery hook.
  */
-export const useConcepts = (category?: ConceptCategory, status?: ConceptStatus, page?: string) => {
+export const useConcepts = (queryOptions: IConceptQueryOptions) => {
   return useQuery({
-    queryKey: [AucctusQueryKeys.concepts, status, category, page],
+    queryKey: [
+      AucctusQueryKeys.concepts,
+      queryOptions.status,
+      queryOptions.category,
+      queryOptions.page,
+      queryOptions.search,
+    ],
     cacheTime: Infinity,
-    staleTime: 1000 * 60, // 1 minute
+    staleTime: 1000 * 60 * 2, // 2 minute
     refetchInterval: (data?: IConceptPage) => {
       return data && data.results.some((concept) => concept.reportStatus === 'pending') ? 5000 : false;
     },
-    queryFn: async () =>
-      await api.concept.getConcepts({
-        status,
-        category,
-        page: page ? parseInt(page) : undefined,
-      }),
+    queryFn: async () => await api.concept.getConcepts(queryOptions),
   });
 };
 
@@ -58,7 +58,7 @@ export const useConceptSeed = (uuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeed, AucctusQueryKeys.concept, uuid],
     cacheTime: Infinity,
-    staleTime: 1000 * 60, // 1 minute
+    staleTime: 1000 * 60 * 2, // 2 minute
     enabled: !!uuid,
     queryFn: async () => await api.concept.seed(uuid),
   });

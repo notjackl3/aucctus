@@ -51,7 +51,7 @@ export interface IConcept extends IBaseConceptEntity, IGeneratedConcept {
   reportStatus: ConceptReportStatus;
   status: ConceptStatus;
   category: ConceptCategory;
-  createdBy: string;
+  createdBy: IUser;
 }
 type ConceptSeedType = 'EXPAND_AN_EXISTING_IDEA' | 'IDENTIFY_NEW_OPPORTUNITIES' | 'UNKNOWN';
 // Expand an existing idea

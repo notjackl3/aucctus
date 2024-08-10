@@ -1,7 +1,7 @@
 import { AxiosError, isAxiosError } from 'axios';
 import { isError } from 'react-query';
-import { IFormError } from './api/types';
 import { ExpiryTimeNotFoundError, TokenStructureError } from './api/customErrors';
+import { IFormError } from './api/types';
 
 /** Validate Email
  *
@@ -93,7 +93,7 @@ export function camelCaseToTitleCase(camelCase: string) {
   return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
 }
 
-export function dateCellFormatter(info: string, formattingOptions: Intl.DateTimeFormatOptions = {}) {
+export function dateFormatter(info: string, formattingOptions: Intl.DateTimeFormatOptions = {}) {
   return new Date(info).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -194,3 +194,11 @@ export const hasTokenExpired = (token: string): boolean => {
  * @returns The clamped value.
  */
 export const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
+
+export function toSnakeCase(str: string): string {
+  return str
+    .replace(/([a-z])([A-Z])/g, '$1_$2') // Add an underscore between camelCase words
+    .replace(/\s+/g, '_') // Replace spaces with underscores
+    .replace(/-/g, '_') // Replace hyphens with underscores
+    .toLowerCase(); // Convert the entire string to lowercase
+}

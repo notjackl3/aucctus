@@ -3,13 +3,6 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        grey: {
-          icon: '#2b3674',
-          50: '#fcfcfd',
-          300: '#f9fafb',
-          400: '#b4bdd0',
-          500: '#7586a9',
-        },
         teal: {
           50: '#f0fdf9',
           100: '#ccfbef',

@@ -1,14 +1,8 @@
-import { ConceptCategory, ConceptStatus } from './types';
+import { toSnakeCase } from '@libs/utils';
+import { IConceptQueryOptions } from './types';
 
 export interface IPageQueryOptions {
   page?: number;
-}
-
-export interface IConceptQueryOptions extends IPageQueryOptions {
-  status?: ConceptStatus;
-  category?: ConceptCategory;
-  createdBy?: string;
-  isGenerated?: boolean;
 }
 
 export const endpoints = {
@@ -39,14 +33,9 @@ export const endpoints = {
     const root = this.concept;
 
     if (!options) return root;
-
-    let query = '';
-    if (options.page) query += `page=${options.page}&`;
-    if (options.status) query += `status=${options.status}&`;
-    if (options.category) query += `category=${options.category}&`;
-    if (options.createdBy) query += `created_by=${options.createdBy}&`;
-    if (options.isGenerated) query += `is_generated=${options.isGenerated}&`;
-
+    const query = Object.entries(options)
+      .map(([key, value]) => value && `${toSnakeCase(key)}=${value}`)
+      .join('&');
     if (query !== '') return `${root}?${query}`;
 
     return root;

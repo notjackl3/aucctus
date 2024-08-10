@@ -1,21 +1,21 @@
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import styles from './styles/concepts.module.scss';
 
-import Icon from '../../components/Icons/Icon/Icon';
-import { AppPath } from '../../../routes/routes';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useConcepts } from '../../hooks/query/concepts.hook';
-import Kanban from '../../components/Tables/Kanban';
-import TabView from '../../components/Container/TabView';
-import { ConceptStatus, ConceptCategory } from '../../../libs/api/types';
-import ConceptTable from './components/ConceptTable';
-import ConceptContainer from './components/ConceptContainer';
-import { ConceptColumns } from '../../components/Tables/Kanban/Kanban';
+import { ConceptCategory, ConceptStatus } from '../../../libs/api/types';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
   ARCHIVE_CONCEPT_STATUS_LIST,
   DRAFT_CONCEPT_STATUS_LIST,
 } from '../../../libs/concepts';
+import { AppPath } from '../../../routes/routes';
+import TabView from '../../components/Container/TabView';
+import Icon from '../../components/Icons/Icon/Icon';
+import Kanban from '../../components/Tables/Kanban';
+import { ConceptColumns } from '../../components/Tables/Kanban/Kanban';
+import { useConcepts } from '../../hooks/query/concepts.hook';
+import ConceptContainer from './components/ConceptContainer';
+import ConceptTable from './components/ConceptTable';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -56,7 +56,7 @@ const Concepts: FunctionComponent = () => {
   const isKanbanView = view === 'board' && category === 'active';
 
   // Fetch concepts based on the search parameters
-  const { data, isLoading } = useConcepts(category, status, page);
+  const { data, isLoading } = useConcepts({ category, status, page: parseInt(page) });
 
   /**
    * Sets the status filter for concepts.
