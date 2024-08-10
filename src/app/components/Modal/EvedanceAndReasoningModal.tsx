@@ -21,7 +21,7 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({ conclusion
           <h5 className='self-stretch text-lg font-bold leading-7 text-gray-900'>Evidence & Reasoning</h5>
         </div>
         <button className='btn btn-close btn-no-border px-6 pt-6' onClick={closeModal}>
-          <Icon.Variant variant='closeX' />
+          <Icon variant='closeX' />
         </button>
       </div>
       <div className='inline-flex h-full w-full items-start justify-start'>
@@ -56,7 +56,7 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({ conclusion
                     <div className='flex items-start justify-start gap-2'>
                       {/* Bullet */}
                       <div className='flex h-10 w-10 items-center justify-center rounded-2xl bg-indigo-100 [&>svg>use]:stroke-primary-500'>
-                        <Icon.Variant variant='link-03' />
+                        <Icon variant='link-03' />
                       </div>
                     </div>
                     <div className='group relative inline-flex h-10 flex-col items-start justify-start'>
@@ -69,7 +69,7 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({ conclusion
 
                   <div className='inline-flex flex-col items-end justify-center'>
                     <div className='inline-flex items-center justify-end rounded-lg py-2.5'>
-                      <Icon.Variant variant='link-external' />
+                      <Icon variant='link-external' />
                     </div>
                   </div>
                 </a>

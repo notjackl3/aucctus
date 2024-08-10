@@ -1,4 +1,4 @@
-import { FunctionComponent } from 'react';
+import React from 'react';
 import Icon from './Icon/Icon';
 
 const defaultIconProps = {
@@ -24,7 +24,7 @@ const stroke = {
   yellow: '#edb845',
 };
 
-const FeatureIcon: FunctionComponent<IFeatureIconProps> = ({ icon, color }) => {
+const FeatureIcon: React.FC<IFeatureIconProps> = ({ icon, color }) => {
   return (
     <div
       className={`inline-flex h-14 w-14 items-center justify-center gap-2.5 rounded-full border-8 p-3.5 ${colorStyle[color]}`}

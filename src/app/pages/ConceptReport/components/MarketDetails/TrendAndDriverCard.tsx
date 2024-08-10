@@ -1,11 +1,11 @@
-import { FunctionComponent } from 'react';
-import { ITrendsAndDrivers } from '@libs/api/types';
-import styles from './styles/marketDetails.module.scss';
-import images from '../../../../assets/img';
-import { useModal } from '../../../../context/ModalContextProvider';
-import EditMarketScanElement from '../../../../components/Modal/MarketScanElement/EditMarketScanElement';
-import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../../hooks/query/concepts.hook';
 import { Card, Icon } from '@components';
+import { ITrendsAndDrivers } from '@libs/api/types';
+import { FunctionComponent } from 'react';
+import images from '../../../../assets/img';
+import EditMarketScanElement from '../../../../components/Modal/MarketScanElement/EditMarketScanElement';
+import { useModal } from '../../../../context/ModalContextProvider';
+import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../../hooks/query/concepts.hook';
+import styles from './styles/marketDetails.module.scss';
 
 const iconDefaultProps = {
   height: 24,
@@ -38,7 +38,7 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAn
           }}
         >
           See Source
-          <Icon.Variant variant='link-external' {...iconDefaultProps} />
+          <Icon variant='link-external' {...iconDefaultProps} />
         </button>
       }
     >

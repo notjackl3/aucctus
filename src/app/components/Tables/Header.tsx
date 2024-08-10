@@ -29,8 +29,8 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({ header }: ITableHea
           >
             {flexRender(header.column.columnDef.header, header.getContext())}
             {{
-              asc: <Icon.Variant variant='arrowup' className='ml-1' />,
-              desc: <Icon.Variant variant='arrowdown' className='ml-1' />,
+              asc: <Icon variant='arrowup' className='ml-1' />,
+              desc: <Icon variant='arrowdown' className='ml-1' />,
             }[header.column.getIsSorted() as string] ?? null}
           </div>
           {header.column.getCanFilter() ? (

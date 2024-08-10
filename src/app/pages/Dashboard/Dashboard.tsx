@@ -1,13 +1,13 @@
+import { Card, Icon } from '@components';
 import { FunctionComponent } from 'react';
-import styles from './styles/dashboard.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import ConceptBarChart from '../../components/Charts/ConceptBarChart';
-import DashboardOpportunityCard from './components/DashboardOpportunityCard';
-import DashboardInnovationCard from './components/DashboardInnovationCard';
 import { useDashboard } from '../../hooks/query/account.hook';
 import { useAppStore } from '../../stores/app.store';
-import { Card, Icon } from '@components';
+import DashboardInnovationCard from './components/DashboardInnovationCard';
+import DashboardOpportunityCard from './components/DashboardOpportunityCard';
+import styles from './styles/dashboard.module.scss';
 
 const defaultIconProps = {
   stroke: '#2B3674',
@@ -33,7 +33,7 @@ const Dashboard: FunctionComponent = () => {
               navigate(AppPath.IgniteConcept);
             }}
           >
-            <Icon.Variant variant='rocket' height={20} width={20} stroke='#fff' />
+            <Icon variant='rocket' height={20} width={20} stroke='#fff' />
             Add Concept
           </button>
         </div>
@@ -56,7 +56,7 @@ const Dashboard: FunctionComponent = () => {
                 }}
                 aria-label='View Concept Bank'
               >
-                Go to Concept Bank <Icon.Variant variant='arrowright' {...defaultIconProps} />
+                Go to Concept Bank <Icon variant='arrowright' {...defaultIconProps} />
               </button>
             }
           >

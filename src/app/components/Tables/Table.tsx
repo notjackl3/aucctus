@@ -104,7 +104,7 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
             aria-label='Previous Page'
             disabled={pagination.page <= 1}
           >
-            <Icon.Variant variant='arrowleft' width={20} height={20} />
+            <Icon variant='arrowleft' width={20} height={20} />
             Previous
           </button>
           <div className=''>...</div>
@@ -115,7 +115,7 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
             aria-label='Next Page'
           >
             Next
-            <Icon.Variant variant='arrowright' width={20} height={20} />
+            <Icon variant='arrowright' width={20} height={20} />
           </button>
         </div>
       ) : null}

@@ -1,21 +1,21 @@
-import React, { FunctionComponent, useCallback, useMemo, useState } from 'react';
-import styles from './styles/generatedConcepts.module.scss';
-import Loading from '../../components/Loading';
 import {
   flexRender,
-  getFilteredRowModel,
   getCoreRowModel,
-  useReactTable,
+  getFilteredRowModel,
   RowSelectionState,
+  useReactTable,
 } from '@tanstack/react-table';
-import IgniteLoading from '../../components/IgniteLoading';
-import { useGeneratedConceptsColumns } from './table.hook';
-import { useConceptIgnition, useSaveGeneratedConcepts } from '../../hooks/query/concepts.hook';
+import React, { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { IGeneratedConcept } from '../../../libs/api/types';
 import { AppPath } from '../../../routes/routes';
 import Icon from '../../components/Icons/Icon/Icon';
+import IgniteLoading from '../../components/IgniteLoading';
+import Loading from '../../components/Loading';
+import { useConceptIgnition, useSaveGeneratedConcepts } from '../../hooks/query/concepts.hook';
 import { useConceptGenerationStore } from '../../stores/concept-generation.store';
-import { IGeneratedConcept } from '../../../libs/api/types';
+import styles from './styles/generatedConcepts.module.scss';
+import { useGeneratedConceptsColumns } from './table.hook';
 
 const GeneratedConcepts: FunctionComponent = () => {
   const navigate = useNavigate();
@@ -47,7 +47,8 @@ const GeneratedConcepts: FunctionComponent = () => {
         },
         {
           onSuccess: () => {
-            navigate(`${AppPath.ConceptCategory}?category=draft`);
+            // TODO: Add navigation state to navigate to list of new concepts
+            navigate(AppPath.ConceptCategory);
             clear();
           },
         },

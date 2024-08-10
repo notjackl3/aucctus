@@ -22,7 +22,7 @@ export const useConceptTable = () => {
   const navigate = useNavigate();
   const { mutate: updateConcept } = useConceptUpdate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
-  const [status, setStatus] = React.useState<ConceptStatus | undefined>(undefined);
+  const [visibleStatuses, setVisibleStatuses] = React.useState<Set<ConceptStatus>>(new Set());
   const [category, setCategory] = React.useState<ConceptCategory | undefined>(undefined);
   const [searchParam, setSearchParam] = React.useState<string | undefined>(undefined);
 
@@ -32,7 +32,12 @@ export const useConceptTable = () => {
   });
 
   // Fetch concepts based on the search parameters
-  const { data, isLoading } = useConcepts({ category, status, page: pagination.pageIndex, search: searchParam });
+  const { data, isLoading } = useConcepts({
+    category,
+    status: Array.from(visibleStatuses).join(',') || undefined,
+    page: pagination.pageIndex + 1,
+    search: searchParam,
+  });
 
   const setPage = React.useCallback(
     (page: number) => {
@@ -108,13 +113,13 @@ export const useConceptTable = () => {
         sortingFn: 'text',
         enableColumnFilter: false,
         header: () => 'Concept',
-        cell: (info) => <Table.Concept.Title title={info.getValue()} />,
+        cell: (info) => <Table.ConceptBank.Title title={info.getValue()} />,
       }),
       columnHelper.accessor('description', {
         enableColumnFilter: false,
         enableSorting: false,
         id: 'description',
-        cell: (info) => <Table.Concept.Text value={info.getValue()} />,
+        cell: (info) => <Table.ConceptBank.Text value={info.getValue()} />,
         header: () => 'Description',
         filterFn: 'includesString',
       }),
@@ -124,13 +129,13 @@ export const useConceptTable = () => {
         enableColumnFilter: false,
         sortingFn: userSort,
         header: () => 'Created By',
-        cell: ({ row }) => <Table.Concept.CreatedBy user={row.original.createdBy} />,
+        cell: ({ row }) => <Table.ConceptBank.CreatedBy user={row.original.createdBy} />,
       }),
       columnHelper.accessor('status', {
         id: 'status',
         sortingFn: 'text',
         header: () => 'Status',
-        cell: (info) => <Table.Concept.Status value={info.getValue()} />,
+        cell: (info) => <Table.ConceptBank.Status value={info.getValue()} />,
         enableColumnFilter: false,
       }),
 
@@ -138,7 +143,7 @@ export const useConceptTable = () => {
         id: 'updatedAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
-        cell: (info) => <Table.Concept.Text className='text-nowrap' value={info.getValue()} />,
+        cell: (info) => <Table.ConceptBank.Text className='text-nowrap' value={info.getValue()} />,
         header: () => 'Last Modified',
       }),
       columnHelper.accessor('reportStatus', {
@@ -161,7 +166,7 @@ export const useConceptTable = () => {
           const uuid = info.getValue();
           const { reportStatus, status } = info.row.original;
 
-          return <Table.Concept.MenuButton />;
+          return <Table.ConceptBank.MenuButton />;
         },
       }),
     ];
@@ -187,10 +192,8 @@ export const useConceptTable = () => {
     numberOfPages: data?.numberOfPages || 0,
     page: pagination.pageIndex,
     setPage,
-    status,
-    setStatus,
-    category,
-    setCategory,
+    visibleStatuses,
+    setVisibleStatuses,
     table,
     columns,
     searchParam,

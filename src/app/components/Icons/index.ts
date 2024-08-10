@@ -1,11 +1,13 @@
 import Feature from './FeatureIcon';
-import Variant from './Icon/Icon';
+import Default from './Icon/Icon';
 import Tooltip from './Tooltip';
 
-const Icon = {
-  Feature,
-  Variant,
-  Tooltip,
+(Default as any).Feature = Feature;
+(Default as any).Tooltip = Tooltip;
+
+const Icon = Default as typeof Default & {
+  Feature: typeof Feature;
+  Tooltip: typeof Tooltip;
 };
 
 export default Icon;

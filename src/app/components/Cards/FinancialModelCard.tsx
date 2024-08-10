@@ -20,7 +20,7 @@ const FinancialModelCard: React.FC<IFinancialModelCard> = ({ heading, value, con
           className='btn btn-primary-light btn-no-border h-8 w-8 border-violet-50 p-0 [&>svg>use]:stroke-primary-600'
           onClick={onClick}
         >
-          <Icon.Variant variant='book-open' strokeWidth={6} />
+          <Icon variant='book-open' strokeWidth={6} />
         </button>
       </div>
 

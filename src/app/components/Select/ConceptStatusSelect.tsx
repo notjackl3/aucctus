@@ -34,7 +34,7 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({ value, onChange }) =
           <span className={`${style.text}`}>{camelCaseToTitleCase(value)}</span>
         </Select.Value>
         <Select.Icon>
-          <Icon.Variant variant={open ? 'chevronup' : 'chevrondown'} className={`${style.stroke}`} />
+          <Icon variant={open ? 'chevronup' : 'chevrondown'} className={`${style.stroke}`} />
         </Select.Icon>
       </Select.Trigger>
 

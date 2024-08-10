@@ -1,5 +1,3 @@
-import { ConceptCategory, ConceptStatus } from './concepts';
-
 export type IFormError<T = object> = IServerErrorMessage | IFormErrorResponse<T>;
 export interface IServerErrorMessage {
   id: string;
@@ -25,8 +23,8 @@ export interface IPageQueryOptions {
 
 export interface IConceptQueryOptions extends IPageQueryOptions {
   search?: string;
-  status?: ConceptStatus;
-  category?: ConceptCategory;
+  status?: string;
+  category?: string;
   createdBy?: string;
   isGenerated?: boolean;
 }

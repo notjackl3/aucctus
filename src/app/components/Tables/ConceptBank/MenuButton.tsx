@@ -7,7 +7,7 @@ const ConceptTableMenuButtonCol: React.FC = () => {
     <Popover.Root>
       <Popover.Trigger asChild>
         <button className='btn btn-no-border p-0' aria-label='Update Concept'>
-          <Icon.Variant variant='dots-vertical' />
+          <Icon variant='dots-vertical' />
         </button>
       </Popover.Trigger>
       <Popover.Portal>
@@ -17,7 +17,7 @@ const ConceptTableMenuButtonCol: React.FC = () => {
         >
           <div className='flex flex-col gap-4' style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
             <button className='btn btn-no-border btn-light'>
-              <Icon.Variant variant='trash' />
+              <Icon variant='trash' />
               Archive
             </button>
           </div>

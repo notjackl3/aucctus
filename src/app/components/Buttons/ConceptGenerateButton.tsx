@@ -34,7 +34,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({ varia
         style: ` btn btn-light btn-bold`,
         label: (
           <>
-            <Icon.Variant variant='refresh' height={20} width={20} /> Retry
+            <Icon variant='refresh' height={20} width={20} /> Retry
           </>
         ),
       },

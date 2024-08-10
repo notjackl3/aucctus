@@ -1,6 +1,6 @@
-import React from 'react';
-import { Card, Badge, Icon } from '@components';
+import { Badge, Card, Icon } from '@components';
 import { IAssumption } from '@libs/api/types';
+import React from 'react';
 
 interface IKeyAssumptionsCardProps {
   assumptions: IAssumption[] | undefined;
@@ -22,7 +22,7 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = 
       contentClassName='h-[360px]'
       footerAction={
         <button className='btn btn-light' onClick={onViewClick} aria-label='View Assumptions'>
-          <span>{<Icon.Variant variant='warning' {...iconDefaultProps} />}</span>
+          <span>{<Icon variant='warning' {...iconDefaultProps} />}</span>
           View Key Assumptions
         </button>
       }

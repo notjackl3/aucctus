@@ -1,8 +1,8 @@
+import { Card, Icon } from '@components';
 import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
-import styles from './customer-profile-context.module.scss';
 import { useCustomerProfileUpdate } from '../../../hooks/query/concepts.hook';
 import InputField from '../../Text/InputField/InputField';
-import { Card, Icon } from '@components';
+import styles from './customer-profile-context.module.scss';
 
 interface ICustomerProfileDetailsLists {
   title: string;
@@ -109,7 +109,7 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
                 e.stopPropagation();
               }}
             >
-              <Icon.Variant variant='plus' height={20} width={20} />
+              <Icon variant='plus' height={20} width={20} />
             </button>
           </span>
         </div>
@@ -205,7 +205,7 @@ const CustomerProfileListItem: FunctionComponent<ICustomerProfileListItemProps> 
           e.stopPropagation();
         }}
       >
-        <Icon.Variant variant='trash' height={20} width={20} />
+        <Icon variant='trash' height={20} width={20} />
       </button>
     </span>
   );

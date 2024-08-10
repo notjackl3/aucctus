@@ -30,41 +30,9 @@ const NavDrawer = () => {
             <NavLink to={AppPath.Home} title='Dashboard' icon='home' />
 
             <NavLink
-              to={
-                account?.hasConcepts
-                  ? {
-                      pathname: AppPath.ConceptCategory,
-                      search: '?category=active',
-                    }
-                  : AppPath.IgniteConcept
-              }
+              to={account?.hasConcepts ? AppPath.ConceptCategory : AppPath.IgniteConcept}
               title='Concepts'
               icon='lightbulb'
-              openBasePath={AppPath.Concept}
-              nestedRoutes={[
-                {
-                  title: 'Active',
-                  to: {
-                    pathname: AppPath.ConceptCategory,
-                    search: '?category=active',
-                  },
-                },
-                {
-                  title: 'Drafts',
-                  to: {
-                    pathname: AppPath.ConceptCategory,
-                    search: '?category=draft',
-                  },
-                },
-                {
-                  title: 'Archive',
-
-                  to: {
-                    pathname: AppPath.ConceptCategory,
-                    search: '?category=archive',
-                  },
-                },
-              ]}
             />
             <NavLink to={AppPath.ChallengeCenter} title='Challenges' icon='rocket' locked />
           </div>

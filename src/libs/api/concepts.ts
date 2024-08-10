@@ -1,7 +1,7 @@
 import { AtLeast } from '../utils';
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
-import { IConceptQueryOptions, endpoints } from './endpoints';
+import { endpoints } from './endpoints';
 import {
   ConceptStatus,
   Ecosystem,
@@ -11,6 +11,7 @@ import {
   IConceptCreate,
   IConceptOverview,
   IConceptPage,
+  IConceptQueryOptions,
   IConceptSeed,
   IConceptSeedBase,
   ICustomerProfile,
@@ -20,9 +21,9 @@ import {
   IGeneratedConcept,
   IMarketScan,
   IMarketScanElementCreate,
+  IPageResponse,
   ITrendsAndDrivers,
 } from './types'; // Import the missing type
-import { IPageResponse } from './types';
 
 /**
  * Concept API

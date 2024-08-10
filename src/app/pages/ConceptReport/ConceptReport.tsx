@@ -83,7 +83,7 @@ const ConceptReport: FunctionComponent = () => {
               onClick={() => navigate(AppPath.ConceptSnapshot)}
               disabled
             >
-              <Icon.Variant variant='download-cloud' {...defaultIconProps} />
+              <Icon variant='download-cloud' {...defaultIconProps} />
               Opportunity Snapshot
             </button>
           </Tooltip>

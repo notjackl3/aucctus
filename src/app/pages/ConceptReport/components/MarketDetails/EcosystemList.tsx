@@ -2,14 +2,14 @@ import { FunctionComponent, useCallback } from 'react';
 
 import { Ecosystem, EcosystemType } from '../../../../../libs/api/types';
 import images from '../../../../assets/img';
-import { useEcosystemCreate, useEcosystemDelete, useEcosystemUpdate } from '../../../../hooks/query/concepts.hook';
-import { useModal } from '../../../../context/ModalContextProvider';
 import EditMarketScanElement from '../../../../components/Modal/MarketScanElement/EditMarketScanElement';
+import { useModal } from '../../../../context/ModalContextProvider';
+import { useEcosystemCreate, useEcosystemDelete, useEcosystemUpdate } from '../../../../hooks/query/concepts.hook';
 
-import styles from './styles/marketDetails.module.scss';
-import AddMarketScanElement from '../../../../components/Modal/MarketScanElement/AddMarketScanElement';
-import { useParams } from 'react-router-dom';
 import { Card, Icon } from '@components';
+import { useParams } from 'react-router-dom';
+import AddMarketScanElement from '../../../../components/Modal/MarketScanElement/AddMarketScanElement';
+import styles from './styles/marketDetails.module.scss';
 
 const iconDefaultProps = {
   height: 24,
@@ -59,7 +59,7 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
               openModal(AddMarketScanElement, { addItem: addEcosystem, ecosystemType });
             }}
           >
-            <Icon.Variant variant='plus' />
+            <Icon variant='plus' />
           </button>
         </>
       }
@@ -80,7 +80,7 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
               <p className={styles.cardDescriptionText}>{item.description}</p>
             </div>
             <button className='btn btn-light' onClick={onClick(item)}>
-              <Icon.Variant variant={'link-external'} {...iconDefaultProps} />
+              <Icon variant={'link-external'} {...iconDefaultProps} />
             </button>
           </div>
         ))}

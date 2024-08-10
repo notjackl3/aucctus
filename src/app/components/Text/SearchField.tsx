@@ -28,14 +28,14 @@ const SearchInput: React.FC<SearchInputProps> = ({ debounce = 500, onChange, ...
   return (
     <div className='relative w-full max-w-md'>
       <div className='absolute inset-y-0 left-0 flex items-center pl-3 [&>svg]:stroke-primary-500'>
-        <Icon.Variant variant='search-refraction' />
+        <Icon variant='search-refraction' />
       </div>
       <input
         {...props}
         type='text'
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        className='block w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 shadow-sm focus:border-primary-500 focus:ring-primary-500 focus-visible:outline-primary-500 sm:text-sm'
+        className='block w-full rounded-lg border border-gray-200 py-2 pl-10 pr-4 shadow-sm outline-transparent ring-0 focus:border-primary-500  focus-visible:outline-primary-500 sm:text-sm'
         placeholder='Search...'
       />
     </div>
