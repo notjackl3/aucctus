@@ -1,5 +1,5 @@
 import CreatedBy from './CreatedBy';
-import FilterOptions from './FilterOptionsPopover';
+import FilterMenubar from './FilterMenu';
 import MenuButton from './MenuButton';
 import Status from './Status';
 import Text from './Text';
@@ -11,7 +11,7 @@ const Concept = {
   Text,
   Status,
   CreatedBy,
-  FilterOptions,
+  FilterMenubar,
 };
 
 export default Concept;

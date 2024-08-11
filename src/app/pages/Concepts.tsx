@@ -2,7 +2,6 @@ import React from 'react';
 
 import { Header, Icon, Table, Text } from '@components';
 import { useConceptTable } from '@hooks/tables/concepts.hook';
-import { ConceptStatus } from '@libs/api/types';
 import { ACTIVE_CONCEPT_STATUS_LIST, ARCHIVE_CONCEPT_STATUS_LIST, DRAFT_CONCEPT_STATUS_LIST } from '@libs/concepts';
 import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
@@ -54,22 +53,20 @@ const Concepts: React.FC = () => {
               value={searchParam || ''}
               onChange={(e) => setSearchParam(e.target.value)}
             />
-
-            <Table.ConceptBank.FilterOptions
-              onStatusSelect={(value: ConceptStatus) => (checked: boolean) => {
+            <Table.ConceptBank.FilterMenubar
+              onStatusSelect={(v, checked) => {
                 setVisibleStatuses((current) => {
                   const updatedStatuses = new Set(current); // Create a new Set to avoid direct mutation
 
                   if (!checked) {
-                    updatedStatuses.delete(value);
+                    updatedStatuses.delete(v);
                   } else {
-                    updatedStatuses.add(value);
+                    updatedStatuses.add(v);
                   }
 
                   return updatedStatuses; // Return the new Set
                 });
               }}
-              selectedStatus={Array.from(visibleStatuses)}
             />
           </div>
         }

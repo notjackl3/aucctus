@@ -1,6 +1,6 @@
+import Checkbox from '../Input/CheckBox';
 import ConceptDropdown from '../Select/ConceptStatusSelect';
 import Default from './Button';
-import Checkbox from './CheckBox';
 import Collapsible from './Collapsible';
 import ConceptGenerate from './ConceptGenerateButton';
 import Dropdown from './Dropdown/Dropdown';

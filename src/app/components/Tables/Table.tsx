@@ -37,7 +37,7 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
   );
 
   return (
-    <div className='inline-flex h-auto min-h-96 w-full flex-col items-start justify-between rounded-xl border border-gray-300 bg-white shadow'>
+    <div className='inline-flex h-auto min-h-96 w-full flex-col items-start justify-between overflow-scroll rounded-xl border border-gray-300 bg-white shadow'>
       <div className='inline-flex w-full flex-col items-start justify-start'>
         {/* Header */}
         <div className='inline-flex h-[60px] w-full items-center justify-between rounded-t-xl border-b border-gray-300 px-6 py-3'>

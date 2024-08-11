@@ -17,14 +17,14 @@ const Avatar: React.FC<AvatarProps> = ({ firstName = '', lastName = '', src = im
   );
 
   return (
-    <Av.Root className='h-12 min-h-12 w-12 min-w-12 rounded-full border border-gray-200 bg-blue-50 shadow-md'>
+    <Av.Root className='h-12 min-h-12 w-12 min-w-12 rounded-full border border-gray-100 bg-gray-50 shadow-md'>
       <Av.Image
         className='h-full w-full border-r-inherit object-cover'
         src={hideImage ? '' : src}
         alt={`${firstName} ${lastName}`}
       />
       <Av.Fallback
-        className='flex h-full w-full items-center justify-center bg-transparent text-center font-bold text-primary-600'
+        className='flex h-full w-full items-center justify-center bg-transparent text-center font-semibold text-primary-500'
         delayMs={600}
       >
         {initials}

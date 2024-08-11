@@ -1,4 +1,4 @@
-import { Button, Table } from '@components';
+import { Button, Input, Table } from '@components';
 import { useConcepts } from '@hooks/query/concepts.hook';
 import { ConceptCategory, ConceptStatus, IConcept, IUser } from '@libs/api/types';
 import {
@@ -79,7 +79,7 @@ export const useConceptTable = () => {
         enableColumnFilter: false,
         enableSorting: false,
         header: ({ table }) => (
-          <Table.CheckBox
+          <Input.CheckBox
             {...{
               checked: table.getIsAllRowsSelected(),
               indeterminate: table.getIsSomeRowsSelected(),
@@ -91,7 +91,7 @@ export const useConceptTable = () => {
         ),
         cell: ({ row }) => {
           return (
-            <Table.CheckBox
+            <Input.CheckBox
               {...{
                 checked: row.getIsSelected(),
                 disabled: !row.getCanSelect(),
@@ -113,24 +113,14 @@ export const useConceptTable = () => {
         sortingFn: 'text',
         enableColumnFilter: false,
         header: () => 'Concept',
-        cell: (info) => <Table.ConceptBank.Title title={info.getValue()} />,
-      }),
-      columnHelper.accessor('description', {
-        enableColumnFilter: false,
-        enableSorting: false,
-        id: 'description',
-        cell: (info) => <Table.ConceptBank.Text value={info.getValue()} />,
-        header: () => 'Description',
-        filterFn: 'includesString',
+        cell: (info) => (
+          <span className='flex flex-col justify-start gap-2'>
+            <Table.ConceptBank.Title title={info.getValue()} />
+            <Table.ConceptBank.Text value={info.row.original.description} />
+          </span>
+        ),
       }),
 
-      columnHelper.accessor('createdBy', {
-        id: 'createdBy',
-        enableColumnFilter: false,
-        sortingFn: userSort,
-        header: () => 'Created By',
-        cell: ({ row }) => <Table.ConceptBank.CreatedBy user={row.original.createdBy} />,
-      }),
       columnHelper.accessor('status', {
         id: 'status',
         sortingFn: 'text',
@@ -139,19 +129,24 @@ export const useConceptTable = () => {
         enableColumnFilter: false,
       }),
 
-      columnHelper.accessor((row) => dateFormatter(row.updatedAt), {
-        id: 'updatedAt',
+      columnHelper.accessor((row) => dateFormatter(row.createdAt), {
+        id: 'createdAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
-        cell: (info) => <Table.ConceptBank.Text className='text-nowrap' value={info.getValue()} />,
-        header: () => 'Last Modified',
+        cell: (info) => (
+          <span className='flex flex-row items-center justify-center gap-2'>
+            <Table.ConceptBank.CreatedBy user={info.row.original.createdBy} />
+            <Table.ConceptBank.Text className='text-nowrap' value={info.getValue()} />
+          </span>
+        ),
+        header: () => 'Created',
       }),
       columnHelper.accessor('reportStatus', {
         id: 'reportStatus',
         enableColumnFilter: false,
         enableSorting: false,
         cell: ({ row }) => (
-          <span className='m-auto flex h-full w-full items-center justify-center self-stretch align-middle'>
+          <span className='m-auto flex h-full w-full items-center justify-end self-stretch align-middle'>
             <Button.ConceptGenerate variant={row.original.reportStatus} onClick={handleGenerateConceptButton(row)} />
           </span>
         ),

@@ -6,6 +6,7 @@ import Chart from './Charts';
 import Container from './Container';
 import Header from './Header';
 import Icon from './Icons';
+import Input from './Input';
 import Legend from './Legends';
 import Modal from './Modal';
 import Table from './Tables';
@@ -27,6 +28,7 @@ export {
   Header,
   Icon,
   IgniteLoading,
+  Input,
   Legend,
   Loading,
   Modal,

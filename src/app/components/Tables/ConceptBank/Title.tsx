@@ -5,7 +5,7 @@ interface IColHeaderProps {
 }
 
 const ColHeader: React.FC<IColHeaderProps> = ({ title }) => {
-  return <span className=''>{title}</span>;
+  return <span className='text-base font-medium text-indigo-900'>{title}</span>;
 };
 
 export default ColHeader;

@@ -9,8 +9,10 @@
     display: flex;
     border-radius: 4px;
     padding: 0.5rem;
-    color: $white;
-    background: $black;
+    font-family: 'Inter';
+    font-weight: 600;
+    color: #312e81;
+    background: #f4f7fe;
     font-size: 14px;
     font-family: sans-serif;
     text-align: center;
@@ -20,6 +22,7 @@
     z-index: 1000;
     height: 2rem;
     max-height: 2rem;
+    box-shadow: $shadow-100;
 
     &::before {
       content: '';
@@ -31,7 +34,7 @@
       border-width: 0.5rem;
       top: 100%;
       left: 45%;
-      border-top-color: $black;
+      border-top-color: #f4f7fe;
     }
 
     &.inActive {

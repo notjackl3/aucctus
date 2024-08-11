@@ -12,7 +12,7 @@ interface ITableHeaderProps<T> {
 const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({ header }: ITableHeaderProps<T>) => {
   return (
     <th
-      className='text-nowrap px-3 py-3 align-top text-base font-medium leading-normal text-indigo-900 first:pl-6 last:pr-8'
+      className='text-nowrap px-3 py-3 align-top text-base font-medium leading-normal text-indigo-900 first:pl-3 last:pr-4'
       key={header.id}
     >
       {header.isPlaceholder ? null : (

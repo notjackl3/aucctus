@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import styles from './styles/generatedConcepts.module.scss';
 
 import { ColumnFiltersState, createColumnHelper } from '@tanstack/react-table';
 
 import { IGeneratedConcept } from '../../../libs/api/types';
-import TableCheckBox from '../../components/Tables/TableCheckBox';
+import TableCheckBox from '../../components/Input/CheckBox';
 
 const columnHelper = createColumnHelper<IGeneratedConcept>();
 
