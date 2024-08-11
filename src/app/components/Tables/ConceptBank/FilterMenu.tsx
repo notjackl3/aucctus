@@ -7,14 +7,16 @@ import React from 'react';
 
 interface IFilterMenubarProps {
   onStatusSelect: (status: ConceptStatus, checked: boolean) => void;
+  selectedStatuses: ConceptStatus[];
 }
 
-const FilterMenubar: React.FC<IFilterMenubarProps> = ({ onStatusSelect }) => {
+const FilterMenubar: React.FC<IFilterMenubarProps> = ({ onStatusSelect, selectedStatuses }) => {
   const createStatusCheckItem = React.useCallback(
     (value: ConceptStatus) => (
       <Menubar.Item className='hover:outline-none' disabled>
         <Input.CheckBox
           id={`filter-status-${value}`}
+          checked={selectedStatuses.includes(value)}
           onChange={(e) => {
             onStatusSelect(value, e.target.checked);
           }}
@@ -24,7 +26,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({ onStatusSelect }) => {
         </label>
       </Menubar.Item>
     ),
-    [onStatusSelect],
+    [onStatusSelect, selectedStatuses],
   );
 
   return (

@@ -54,6 +54,7 @@ const Concepts: React.FC = () => {
               onChange={(e) => setSearchParam(e.target.value)}
             />
             <Table.ConceptBank.FilterMenubar
+              selectedStatuses={Array.from(visibleStatuses)}
               onStatusSelect={(v, checked) => {
                 setVisibleStatuses((current) => {
                   const updatedStatuses = new Set(current); // Create a new Set to avoid direct mutation
