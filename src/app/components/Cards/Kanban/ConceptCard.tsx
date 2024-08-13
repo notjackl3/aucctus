@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
-import { IConcept } from '../../../../libs/api/types';
-import { dateFormatter } from '../../../../libs/utils';
+import { IConcept } from '@libs/api/types';
+import utils from '@libs/utils';
 import Icon from '../../Icons/Icon/Icon';
 import styles from './conceptCard.module.scss';
 
@@ -22,7 +22,7 @@ const ConceptCard: FunctionComponent<IConceptCardProps> = ({ concept, selectCard
       <div className={styles.conceptCardContent}>
         <div className={styles.cardTitle}>{concept?.title}</div>
         <p className={`${styles.cardDescription} ${styles.descriptionOverflow}`}>{concept?.description}</p>
-        <p className={styles.cardModified}>Last modified: {dateFormatter(concept?.updatedAt)}</p>
+        <p className={styles.cardModified}>Last modified: {utils.time.dateFormatter(concept?.updatedAt)}</p>
       </div>
       <div className={styles.footer}>
         <div className={styles.owner}>

@@ -1,3 +1,4 @@
+import { IUserQueryOptions } from '@libs/api/endpoints';
 import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../libs/api';
@@ -32,6 +33,22 @@ export const useUserDetails = (enabled: boolean) => {
   const getUserDetails = query.refetch;
 
   return { ...query, getUserDetails, user, account };
+};
+
+export const useAllUsers = (options?: IUserQueryOptions) => {
+  const query = useQuery({
+    queryKey: options
+      ? [AucctusQueryKeys.allUsers, options.email, options.firstName, options.lastName, options.search]
+      : [AucctusQueryKeys.allUsers],
+    queryFn: async () => await api.account.getAllUser(options),
+    cacheTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: false,
+    refetchOnMount: false,
+  });
+
+  const { data } = query;
+  return { ...query, users: data || [] };
 };
 
 export const useDashboard = () => {

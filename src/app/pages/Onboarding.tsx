@@ -1,12 +1,12 @@
-import { FunctionComponent, useCallback, useState } from 'react';
-import Footer from '../components/Auth/Footer/Footer';
-import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
-import OnboardingIntoSection from '../components/Auth/OnboardingIntroSection';
-import styles from '../assets/styles/pages/auth-screens.module.scss';
-import InputField from '../components/Text/InputField/InputField';
-import { validDomain } from '@libs/utils';
-import { Navigate } from 'react-router-dom';
+import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
+import { FunctionComponent, useCallback, useState } from 'react';
+import { Navigate } from 'react-router-dom';
+import styles from '../assets/styles/pages/auth-screens.module.scss';
+import Footer from '../components/Auth/Footer/Footer';
+import OnboardingIntoSection from '../components/Auth/OnboardingIntroSection';
+import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
+import InputField from '../components/Text/InputField/InputField';
 import { useRegisterAccount } from '../hooks/query/account.hook';
 import { useAppStore } from '../stores/app.store';
 
@@ -31,7 +31,7 @@ const OnBoarding: FunctionComponent = () => {
         }
       }
 
-      if (d && !validDomain(d)) {
+      if (d && !utils.string.validDomain(d)) {
         setDomainInputError('Enter a valid domain name.');
       } else {
         setDomainInputError(undefined);

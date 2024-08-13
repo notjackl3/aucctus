@@ -1,4 +1,5 @@
 import { IBusinessModel, IFinancialMarketSizeItem, IFinancialProjectionPricing } from '@libs/api/types';
+import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { MutateOptions, UseMutateFunction } from 'react-query';
@@ -12,7 +13,6 @@ import {
   IFormError,
   IMarketScan,
 } from '../../../libs/api/types';
-import { parseFormError } from '../../../libs/utils';
 import {
   useConcept,
   useConceptCustomerProfile,
@@ -125,7 +125,7 @@ function useEditableField<
     updateMutation(input, {
       ...options,
       onError: (error, variables, context) => {
-        const message = parseFormError(error);
+        const message = utils.osiris.parseFormError(error);
         toast.error(message);
         if (options?.onError) {
           options.onError(error, variables, context);

@@ -20,13 +20,17 @@ export interface IMessageResponse {
 export interface IPageQueryOptions {
   page?: number;
 }
+export type SortableConceptProperties = 'createdAt' | 'updatedAt' | 'status' | 'title';
+export type ConceptSort = SortableConceptProperties | `-${SortableConceptProperties}`;
 
 export interface IConceptQueryOptions extends IPageQueryOptions {
   search?: string;
+  user?: string;
   status?: string;
   category?: string;
   createdBy?: string;
   isGenerated?: boolean;
+  sort?: ConceptSort;
 }
 
 export interface IPageResponse<T> {

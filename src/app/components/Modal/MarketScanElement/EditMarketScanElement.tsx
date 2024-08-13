@@ -1,14 +1,15 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 
-import styles from './edit-trends-and-driver.module.scss';
-import { useModal } from '../../../context/ModalContextProvider';
+import utils from '@libs/utils';
+import { AxiosError } from 'axios';
+import { UseMutateFunction } from 'react-query';
 import { Ecosystem, IFormError, ITrendsAndDrivers } from '../../../../libs/api/types';
+import { useModal } from '../../../context/ModalContextProvider';
+import Icon from '../../Icons/Icon/Icon';
 import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
-import Icon from '../../Icons/Icon/Icon';
-import { UseMutateFunction } from 'react-query';
-import { AxiosError } from 'axios';
+import styles from './edit-trends-and-driver.module.scss';
 
 interface EditTrendsAndDriverProps<T = Ecosystem | ITrendsAndDrivers> {
   updateItem: UseMutateFunction<T, AxiosError<IFormError<T>, any>, Partial<T> & { uuid: string }, unknown>;
@@ -19,17 +20,6 @@ interface EditTrendsAndDriverProps<T = Ecosystem | ITrendsAndDrivers> {
 const NAME_MAX_LENGTH = 36;
 const DESCRIPTION_MAX_LENGTH = 500;
 
-const removeProtocol = (source: string) => {
-  const unwantedPrefix = ['https://', 'http://'];
-  let d = source;
-  for (const prefix of unwantedPrefix) {
-    if (d.substring(0, prefix.length) === prefix) {
-      d = d.slice(prefix.length);
-    }
-  }
-  return d;
-};
-
 const isEcosystemItem = (item: unknown) => {
   return (item as Ecosystem).ecosystemType !== undefined;
 };
@@ -39,7 +29,7 @@ const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ it
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [name, setName] = useState(item.name);
   const [nameError, setNameError] = useState<string | undefined>();
-  const [source, setSource] = useState(removeProtocol(item.source));
+  const [source, setSource] = useState(utils.string.removeProtocol(item.source));
   const [sourceError, setSourceError] = useState<string | undefined>();
   const [description, setDescription] = useState(item.description);
   const [descriptionError, setDescriptionError] = useState<string | undefined>();
@@ -74,7 +64,7 @@ const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ it
 
   const handleSourceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     setSourceError(undefined);
-    let d = removeProtocol(e.target.value);
+    let d = utils.string.removeProtocol(e.target.value);
     setSource(d);
   }, []);
 

@@ -1,5 +1,7 @@
 export * from './api';
 
+export type AtLeast<T, K extends keyof T> = Partial<T> & Pick<T, K>;
+
 declare module '@components/*' {
   const value: any;
   export default value;

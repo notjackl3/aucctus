@@ -1,14 +1,14 @@
+import utils from '@libs/utils';
 import { FunctionComponent, useMemo, useState } from 'react';
-import RowInfo from '../../../components/Text/RowInfo/RowInfo';
-import InputField from '../../../components/Text/InputField/InputField';
-import styles from '../styles/securityDetails.module.scss';
-import { toast } from 'react-toastify';
 import { useMutation } from 'react-query';
+import { toast } from 'react-toastify';
 import api from '../../../../libs/api';
-import { defaultToastConfig } from '../../../../libs/toast';
 import { IUserPassword } from '../../../../libs/api/types';
-import { parseFormError } from '../../../../libs/utils';
+import { defaultToastConfig } from '../../../../libs/toast';
 import Icon from '../../../components/Icons/Icon/Icon';
+import InputField from '../../../components/Text/InputField/InputField';
+import RowInfo from '../../../components/Text/RowInfo/RowInfo';
+import styles from '../styles/securityDetails.module.scss';
 
 const defaultIconProps = {
   width: 20,
@@ -43,7 +43,7 @@ const SecurityDetails: FunctionComponent = () => {
       setIsFormDisabled(true);
     },
     onError: (error) => {
-      const message = parseFormError<IUserPassword>(error);
+      const message = utils.osiris.parseFormError<IUserPassword>(error);
       setCurrentPasswordError(message);
       toast.error('Password could not be updated. Please try again later.', defaultToastConfig);
     },

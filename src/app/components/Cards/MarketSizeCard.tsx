@@ -1,5 +1,5 @@
 import Icon from '@components/Icons';
-import { generateRandomString } from '@libs/utils';
+import utils from '@libs/utils';
 import React from 'react';
 
 interface IMarketSizeCard {
@@ -46,7 +46,7 @@ const MarketSizeCard: React.FC<IMarketSizeCard> = ({
       <div className='flex shrink grow basis-0 flex-col items-start justify-start self-stretch'>
         {assumptions.map((assumption) => (
           <div
-            key={generateRandomString(5)}
+            key={utils.string.generateRandomString(5)}
             className='inline-flex items-center justify-start gap-5 self-stretch border-b border-slate-200 bg-neutral-50 px-6 py-3 last:rounded-b-xl'
           >
             <p className='w-full self-stretch text-wrap text-sm font-medium leading-tight text-indigo-900'>

@@ -1,24 +1,24 @@
-import { FunctionComponent, useMemo, useState } from 'react';
-import styles from './styles/hypothesisDetails.module.scss';
 import {
-  flexRender,
-  getFilteredRowModel,
-  getCoreRowModel,
-  useReactTable,
-  RowSelectionState,
   PaginationState,
+  RowSelectionState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
+  useReactTable,
 } from '@tanstack/react-table';
-import Loading from '../../../../components/Loading';
-import TablePagination from '../../../../components/Tables/TablePagination';
+import { FunctionComponent, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { getAssumptionActiveHexColor, getAssumptionHexColor } from '../../../../../libs/concepts';
+import { getAssumptionActiveHexColor, getAssumptionHexColor } from '../../../../../libs/utils/concepts';
 import QuadrantChart, { ChartPoint } from '../../../../components/Charts/QuadrantChart/QuadrantChart';
-import { useAssumptionsColumns } from './columns.hook';
-import { useKeyAssumptions } from '../../../../hooks/query/concepts.hook';
 import Icon from '../../../../components/Icons/Icon/Icon';
-import { useModal } from '../../../../context/ModalContextProvider';
+import Loading from '../../../../components/Loading';
 import AddKeyAssumptionModal from '../../../../components/Modal/KeyAssumtionModal/AddKeyAssumptionModal';
+import TablePagination from '../../../../components/Tables/TablePagination';
+import { useModal } from '../../../../context/ModalContextProvider';
+import { useKeyAssumptions } from '../../../../hooks/query/concepts.hook';
+import { useAssumptionsColumns } from './columns.hook';
+import styles from './styles/hypothesisDetails.module.scss';
 
 const HypothesisDetails: FunctionComponent = () => {
   const { columns } = useAssumptionsColumns();

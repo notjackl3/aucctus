@@ -87,11 +87,7 @@ const ConceptReport: FunctionComponent = () => {
               Opportunity Snapshot
             </button>
           </Tooltip>
-          <button
-            aria-label='Close Detail Page'
-            className='btn-close'
-            onClick={() => navigate(AppPath.ConceptCategory)}
-          />
+          <button aria-label='Close Detail Page' className='btn-close' onClick={() => navigate(AppPath.ConceptBank)} />
         </div>
       </div>
       <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>

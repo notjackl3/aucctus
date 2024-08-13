@@ -12,6 +12,9 @@ module.exports = {
           500: '#15b79e',
           600: '#0e9384',
         },
+        tertiary: {
+          700: '#626ba3',
+        },
         primary: {
           25: '#fcfaff',
           50: '#f4f7fe',

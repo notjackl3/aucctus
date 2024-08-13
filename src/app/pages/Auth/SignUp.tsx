@@ -1,7 +1,7 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/Text/InputField/InputField';
-import { parseFormError, validEmail } from '../../../libs/utils';
+import utils from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
 import { Link } from 'react-router-dom';
 import { useSignUp } from '../../hooks/query/auth.hook';
@@ -19,7 +19,7 @@ const SignUp: FunctionComponent = () => {
 
   const _handleEmailValidation = useCallback(
     (e: React.FocusEvent) => {
-      if (email && !validEmail(email)) {
+      if (email && !utils.string.validEmail(email)) {
         setEmailInputError('Email is Invalid.');
       } else {
         setEmailInputError(undefined);
@@ -55,7 +55,7 @@ const SignUp: FunctionComponent = () => {
       <div className={styles.header}>
         <span className={styles.title}>Sign Up</span>
         <span className={styles.supportingText}>Start your 30-day free trial</span>
-        {error && <div className={styles.error}>{parseFormError(error)}</div>}
+        {error && <div className={styles.error}>{utils.osiris.parseFormError(error)}</div>}
       </div>
       <form className={styles.basicForm}>
         <div className={styles.inputGroup}>

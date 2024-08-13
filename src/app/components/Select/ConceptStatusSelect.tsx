@@ -1,7 +1,7 @@
 import { Icon } from '@components';
 import { ConceptStatus } from '@libs/api/types';
-import { CONCEPT_STATUS_LIST, getConceptStatusStyles } from '@libs/concepts';
-import { camelCaseToTitleCase } from '@libs/utils';
+import utils from '@libs/utils';
+import { CONCEPT_STATUS_LIST, getConceptStatusStyles } from '@libs/utils/concepts';
 import * as Select from '@radix-ui/react-select';
 import React from 'react';
 
@@ -31,7 +31,7 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({ value, onChange }) =
           <div className={`0 h-1.5 w-1.5 rounded-full ${style.bullet}`} />
         </Select.Icon>
         <Select.Value className={`flex flex-row gap-4`}>
-          <span className={`${style.text}`}>{camelCaseToTitleCase(value)}</span>
+          <span className={`${style.text}`}>{utils.string.camelCaseToTitleCase(value)}</span>
         </Select.Value>
         <Select.Icon>
           <Icon variant={open ? 'chevronup' : 'chevrondown'} className={`${style.stroke}`} />
@@ -53,7 +53,7 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({ value, onChange }) =
                   value={item}
                   className={`flex h-8 select-none flex-row items-center justify-between gap-2 self-stretch rounded-sm px-4 py-2 text-base leading-none ${itemStyles.text} ${itemStyles.bg}`}
                 >
-                  <Select.ItemText>{camelCaseToTitleCase(item)}</Select.ItemText>
+                  <Select.ItemText>{utils.string.camelCaseToTitleCase(item)}</Select.ItemText>
                   <Select.ItemIndicator>
                     <div className={`h-1.5 w-1.5 ${itemStyles.bullet} rounded-full`} />
                   </Select.ItemIndicator>

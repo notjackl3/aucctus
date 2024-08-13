@@ -52,7 +52,7 @@ const Dashboard: FunctionComponent = () => {
               <button
                 className='btn btn-secondary'
                 onClick={() => {
-                  navigate(AppPath.ConceptCategory);
+                  navigate(AppPath.ConceptBank);
                 }}
                 aria-label='View Concept Bank'
               >

@@ -30,7 +30,7 @@ const NavDrawer = () => {
             <NavLink to={AppPath.Home} title='Dashboard' icon='home' />
 
             <NavLink
-              to={account?.hasConcepts ? AppPath.ConceptCategory : AppPath.IgniteConcept}
+              to={account?.hasConcepts ? AppPath.ConceptBank : AppPath.IgniteConcept}
               title='Concepts'
               icon='lightbulb'
             />

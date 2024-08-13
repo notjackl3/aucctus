@@ -1,6 +1,6 @@
+import utils from '@libs/utils';
 import { FunctionComponent } from 'react';
 import { MarketMetricType } from '../../../libs/api/types';
-import { formatter } from '../../../libs/utils';
 
 interface IMarketLegendProps {
   tam: number;
@@ -11,9 +11,17 @@ interface IMarketLegendProps {
 const MarketLegend: FunctionComponent<IMarketLegendProps> = ({ tam, sam, som }) => {
   return (
     <div className='flex w-full flex-col gap-4'>
-      <MarketLegendItem title='Total Addressable Market' metricType='TAM' value={formatter.format(tam)} />
-      <MarketLegendItem title='Serviceable Addressable Market' metricType='SAM' value={formatter.format(sam)} />
-      <MarketLegendItem title='Serviceable Obtainable Market' metricType='SOM' value={formatter.format(som)} />
+      <MarketLegendItem title='Total Addressable Market' metricType='TAM' value={utils.number.formatter.format(tam)} />
+      <MarketLegendItem
+        title='Serviceable Addressable Market'
+        metricType='SAM'
+        value={utils.number.formatter.format(sam)}
+      />
+      <MarketLegendItem
+        title='Serviceable Obtainable Market'
+        metricType='SOM'
+        value={utils.number.formatter.format(som)}
+      />
     </div>
   );
 };

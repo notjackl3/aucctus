@@ -1,9 +1,10 @@
 import { FunctionComponent } from 'react';
 
 import { ConceptStatus } from '@libs/api/types';
-import { getConceptStatusStyles } from '@libs/concepts';
-import { camelCaseToTitleCase } from '@libs/utils';
 
+import utils from '@libs/utils';
+
+import { getConceptStatusStyles } from '@libs/utils/concepts';
 import classNames from 'classnames';
 
 export interface IConceptStatusBubbleProps {
@@ -14,12 +15,12 @@ const ConceptStatusBubble: FunctionComponent<IConceptStatusBubbleProps> = ({ sta
   const style = getConceptStatusStyles(status);
 
   return (
-    <span className={classNames('flex w-fit gap-2 rounded-2xl px-3 py-1 shadow-md', style.bg)}>
+    <span className={classNames('flex w-fit gap-2 rounded-2xl px-3 py-1', style.bg)}>
       {<span className={classNames(style.text)}>●</span>}
       <span
         className={classNames('whitespace-nowrap text-center text-sm font-medium not-italic leading-6', style.text)}
       >
-        {camelCaseToTitleCase(status)}
+        {utils.string.camelCaseToTitleCase(status)}
       </span>
     </span>
   );

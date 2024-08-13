@@ -1,8 +1,15 @@
-import { toSnakeCase } from '@libs/utils';
+import utils from '@libs/utils';
 import { IConceptQueryOptions } from './types';
 
 export interface IPageQueryOptions {
   page?: number;
+}
+
+export interface IUserQueryOptions {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  search?: string;
 }
 
 export const endpoints = {
@@ -13,6 +20,12 @@ export const endpoints = {
   refresh: '/api/v1/token/refresh',
 
   user: '/api/v1/user/',
+  allUsers: '/api/v1/user/list',
+  // eslint-disable-next-line @typescript-eslint/typedef
+  allUsersQuery: function (this, options?: IUserQueryOptions) {
+    return utils.string.queryStringGenerator(this.allUsers, options);
+  },
+
   confirmEmail: `/api/v1/confirm-email`,
   forgotPassword: `/api/v1/forgot-password`,
   requestPasswordReset: `/api/v1/password-reset`,
@@ -30,24 +43,12 @@ export const endpoints = {
   conceptIgnite: 'v1/concept/ignite', // Fast
   // eslint-disable-next-line @typescript-eslint/typedef
   conceptQueries: function (this, options?: IConceptQueryOptions) {
-    const root = this.concept;
-
-    if (!options) return root;
-
-    const query = Object.entries(options)
-      .filter(([, value]) => value !== undefined && value !== null && value !== '') // Filter out undefined and null values
-      .map(([key, value]) => `${toSnakeCase(key)}=${encodeURIComponent(value as string)}`) // Convert to query params
-      .join('&');
-
-    if (query) {
-      return `${root}?${query}`;
-    }
-
-    return root;
+    return utils.string.queryStringGenerator(this.concept, options);
   },
   conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
   conceptReportRetry: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/retry`,
   conceptSeed: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/seed`,
+  unarchiveConcept: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/unarchive`,
 
   conceptOverview: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/overview`,
   conceptOverviewUuid: (overviewUuid: string) => `api/v1/concept/overview/${overviewUuid}`,

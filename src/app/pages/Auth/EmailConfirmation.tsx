@@ -6,7 +6,7 @@ import { AppPath } from '../../../routes/routes';
 import Icon from '../../components/Icons/Icon/Icon';
 import { useSearchParams } from 'react-router-dom';
 import { useConfirmEmail } from '../../hooks/query/auth.hook';
-import { parseFormError } from '../../../libs/utils';
+import utils from '@libs/utils';
 import { toast } from 'react-toastify';
 
 interface IConfirmEmailContext {
@@ -28,7 +28,7 @@ const ConfirmEmail: FunctionComponent = () => {
     if (token) {
       mutate(token, {
         onError: (error) => {
-          const message = parseFormError(error);
+          const message = utils.osiris.parseFormError(error);
           toast.error(message);
         },
       });

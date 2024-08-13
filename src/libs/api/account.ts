@@ -1,6 +1,6 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
-import { endpoints } from './endpoints';
+import { endpoints, IUserQueryOptions } from './endpoints';
 import {
   IAccount,
   IDashboard,
@@ -41,6 +41,10 @@ export class AccountApi extends ApiService {
 
   getUser() {
     return this.get<IUserDetailsResponse>(endpoints.user);
+  }
+
+  getAllUser(options?: IUserQueryOptions) {
+    return this.get<IUser[]>(endpoints.allUsersQuery(options));
   }
 
   updateUser(user: Partial<IUser>) {

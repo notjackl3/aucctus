@@ -1,16 +1,12 @@
 import { FunctionComponent, useMemo, useState } from 'react';
 
+import utils from '@libs/utils';
 import styles from '../styles/dashboard.module.scss';
-import { camelCaseToTitleCase, formatter } from '@libs/utils';
-import {
-  ACTIVE_CONCEPT_STATUS_LIST,
-  ConceptStatusIconColor,
-  getDashboardConceptStatusIcon,
-  getDashboardConceptStatusIconColor,
-} from '@libs/concepts';
-import { ActiveConceptStatus, IConceptDetails } from '@libs/api/types';
-import { IConceptStatisticProps } from '@components/Badges/ConceptStatistic/ConceptStatistic';
+
 import { Badge, Card } from '@components';
+import { IConceptStatisticProps } from '@components/Badges/ConceptStatistic/ConceptStatistic';
+import { ActiveConceptStatus, IConceptDetails } from '@libs/api/types';
+import { ConceptStatusIconColor } from '@libs/utils/concepts';
 
 export interface OpportunityData {
   infoTitle: string;
@@ -35,16 +31,16 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
     if (!conceptDetails) {
       return [];
     }
-    return ACTIVE_CONCEPT_STATUS_LIST.map((status) => {
+    return utils.concepts.ACTIVE_CONCEPT_STATUS_LIST.map((status) => {
       const somValue = conceptDetails.som[status];
       const conceptCount = conceptDetails.count[status];
       return {
         status: status,
-        infoTitle: camelCaseToTitleCase(status),
-        icon: getDashboardConceptStatusIcon(status),
+        infoTitle: utils.string.camelCaseToTitleCase(status),
+        icon: utils.concepts.getDashboardConceptStatusIcon(status),
         somValue: somValue,
-        infoValue: formatter.format(somValue),
-        iconColor: getDashboardConceptStatusIconColor(status),
+        infoValue: utils.number.formatter.format(somValue),
+        iconColor: utils.concepts.getDashboardConceptStatusIconColor(status),
         variant: 'opportunity',
         conceptCount: conceptCount,
         infoSubValue: `${conceptCount} concepts`,
@@ -115,7 +111,7 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
         <div className={styles.opportunityFooter}>
           <Badge.ConceptStatistic
             infoTitle='Total Potential Opportunity'
-            infoValue={formatter.format(summationObj.totalSomValue)}
+            infoValue={utils.number.formatter.format(summationObj.totalSomValue)}
             infoSubValue={`${summationObj.totalConceptCount} concepts`}
             icon='shield-dollar'
             iconColor='purple'

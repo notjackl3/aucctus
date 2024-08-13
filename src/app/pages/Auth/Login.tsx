@@ -1,9 +1,9 @@
+import utils from '@libs/utils';
 import { FunctionComponent, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { AppPath } from '../../../routes/routes';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/Text/InputField/InputField';
-import { parseFormError, validEmail } from '../../../libs/utils';
-import { AppPath } from '../../../routes/routes';
-import { Link } from 'react-router-dom';
 import { useLogin } from '../../hooks/query/auth.hook';
 
 const Login: FunctionComponent = () => {
@@ -13,7 +13,7 @@ const Login: FunctionComponent = () => {
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
 
   const _handleEmailValidation = (e: React.FocusEvent) => {
-    if (email && !validEmail(email)) {
+    if (email && !utils.string.validEmail(email)) {
       setEmailInputError('Email is Invalid.');
     } else {
       setEmailInputError(undefined);
@@ -26,7 +26,7 @@ const Login: FunctionComponent = () => {
       <div className={styles.header}>
         <span className={styles.title}>Login</span>
         <span className={styles.supportingText}>Welcome back! Please enter your details.</span>
-        {error && <div className={styles.error}>{parseFormError(error)}</div>}
+        {error && <div className={styles.error}>{utils.osiris.parseFormError(error)}</div>}
       </div>
       {/* TODO: Style this */}
 

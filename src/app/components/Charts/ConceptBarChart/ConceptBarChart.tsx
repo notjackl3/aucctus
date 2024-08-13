@@ -1,11 +1,11 @@
+import utils from '@libs/utils';
+import { ACTIVE_CONCEPT_STATUS_LIST } from '@libs/utils/concepts';
 import { FunctionComponent, useMemo } from 'react';
-import styles from './styles/conceptBarChart.module.scss';
+import { ActiveConceptStatus, ConceptStatus } from '../../../../libs/api/types';
+import ChartBar from './components/Bar';
 import ChartLongArrow from './components/ChartLongArrow';
 import ChartShortArrows from './components/ChartShortArrows';
-import ChartBar from './components/Bar';
-import { ActiveConceptStatus, ConceptStatus } from '../../../../libs/api/types';
-import { ACTIVE_CONCEPT_STATUS_LIST } from '../../../../libs/concepts';
-import { camelCaseToTitleCase } from '../../../../libs/utils';
+import styles from './styles/conceptBarChart.module.scss';
 
 const BAR_COLOR: Record<ActiveConceptStatus, string> = {
   prototyping: '#B9E6FE',
@@ -67,7 +67,7 @@ const ConceptBarChart: FunctionComponent<IConceptBarChartProps> = ({ data = defa
                   x={i * BAR_WIDTH}
                   y={y}
                   value={data[status]}
-                  label={camelCaseToTitleCase(status)}
+                  label={utils.string.camelCaseToTitleCase(status)}
                   color={BAR_COLOR[status]}
                 />
               );

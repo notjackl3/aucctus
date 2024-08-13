@@ -1,7 +1,7 @@
+import { ConceptStatus } from '@libs/api/types';
+import utils from '@libs/utils';
 import { FunctionComponent, useMemo } from 'react';
 import { BAR_WIDTH } from '../ConceptBarChart';
-import { ConceptStatus } from '../../../../../libs/api/types';
-import { calculatePercent } from '../../../../../libs/utils';
 
 export interface ChartLongArrow {
   data: { [key in ConceptStatus | 'total']: number };
@@ -18,9 +18,9 @@ const defaultProps = {
 };
 const ChartShortArrows: FunctionComponent<ChartLongArrow> = ({ data }) => {
   const percentList = useMemo(() => {
-    const proofOfConceptPercent = calculatePercent(data.proofOfConcept, data.prototyping);
-    const minimumViableProductPercent = calculatePercent(data.minimumViableProduct, data.proofOfConcept);
-    const commercializedPercent = calculatePercent(data.commercialized, data.minimumViableProduct);
+    const proofOfConceptPercent = utils.number.calculatePercent(data.proofOfConcept, data.prototyping);
+    const minimumViableProductPercent = utils.number.calculatePercent(data.minimumViableProduct, data.proofOfConcept);
+    const commercializedPercent = utils.number.calculatePercent(data.commercialized, data.minimumViableProduct);
 
     return [proofOfConceptPercent, minimumViableProductPercent, commercializedPercent];
   }, [data]);

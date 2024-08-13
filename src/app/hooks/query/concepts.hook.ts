@@ -16,7 +16,7 @@ import {
   // IMarketSizeMetric,
   ITrendsAndDrivers,
 } from '@libs/api/types';
-import { parseFormError } from '@libs/utils';
+import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
@@ -44,6 +44,7 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
       queryOptions.category,
       queryOptions.page,
       queryOptions.search,
+      queryOptions.sort,
     ],
     cacheTime: Infinity,
     staleTime: 1000 * 60 * 2, // 2 minute
@@ -121,7 +122,7 @@ export const useConceptIgnition = () => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
     },
     onError: (e) => {
-      const message = parseFormError(e);
+      const message = utils.osiris.parseFormError(e);
       toast.error(message);
     },
   });
@@ -242,7 +243,7 @@ const createConceptMutation = () => {
         ]);
       },
       onError: (e) => {
-        const message = parseFormError(e);
+        const message = utils.osiris.parseFormError(e);
         toast.error(message);
       },
     });
@@ -256,6 +257,16 @@ const createConceptMutation = () => {
 export const useConceptUpdate = () => {
   return createConceptMutation()<IConcept, IFormError<IConcept>, PartialConceptWithRequiredUuid>(
     async (concept) => await api.concept.updateConcept(concept, concept.uuid),
+  );
+};
+
+/**
+ * Custom hook for updating a concept.
+ * @returns The result of the useMutation hook.
+ */
+export const useUnarchiveConcept = () => {
+  return createConceptMutation()<IConcept, IFormError<IConcept>, string>(
+    async (conceptUuid) => await api.concept.unarchive(conceptUuid),
   );
 };
 
@@ -289,7 +300,7 @@ function useGenericConceptMutate<T, K = Partial<T> & { uuid: string }>(
     },
     onError: (e) => {
       analytics.debug(`Error:`, e);
-      const message = parseFormError(e);
+      const message = utils.osiris.parseFormError(e);
       toast.error(message);
     },
   });

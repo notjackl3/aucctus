@@ -5,7 +5,7 @@ import {
   ConceptStatus,
   DraftConceptStatus,
   MarketMetricType,
-} from './api/types';
+} from '../api/types';
 
 export const CONCEPT_STATUS_LIST: ConceptStatus[] = [
   'new',

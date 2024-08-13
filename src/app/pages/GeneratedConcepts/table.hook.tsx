@@ -1,23 +1,44 @@
-import { useMemo, useState } from 'react';
-import styles from './styles/generatedConcepts.module.scss';
+import {
+  ColumnFiltersState,
+  createColumnHelper,
+  getCoreRowModel,
+  getFilteredRowModel,
+  RowSelectionState,
+  useReactTable,
+} from '@tanstack/react-table';
+import React from 'react';
 
-import { ColumnFiltersState, createColumnHelper } from '@tanstack/react-table';
-
+import { Input, Table } from '@components';
+import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { IGeneratedConcept } from '../../../libs/api/types';
-import TableCheckBox from '../../components/Input/CheckBox';
 
 const columnHelper = createColumnHelper<IGeneratedConcept>();
 
 export const useGeneratedConceptsColumns = () => {
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
+  const { generatedConcepts: concepts } = useConceptGenerationStore();
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
-  const columns = useMemo(
+  const selectedConcepts = React.useMemo((): IGeneratedConcept[] => {
+    return concepts.reduce((acc: IGeneratedConcept[], concept) => {
+      if (rowSelection[concept.uuid]) {
+        acc.push(concept);
+      }
+      return acc;
+    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [concepts, rowSelection]);
+
+  const hasSelectedConcepts = selectedConcepts.length > 0;
+
+  const columns = React.useMemo(
     () => [
       columnHelper.accessor('uuid', {
         id: 'select',
-        size: 100,
+        enableColumnFilter: false,
+        enableSorting: false,
         header: ({ table }) => (
-          <TableCheckBox
+          <Input.CheckBox
             {...{
               checked: table.getIsAllRowsSelected(),
               indeterminate: table.getIsSomeRowsSelected(),
@@ -29,7 +50,7 @@ export const useGeneratedConceptsColumns = () => {
         ),
         cell: ({ row }) => {
           return (
-            <TableCheckBox
+            <Input.CheckBox
               {...{
                 checked: row.getIsSelected(),
                 disabled: !row.getCanSelect(),
@@ -44,12 +65,13 @@ export const useGeneratedConceptsColumns = () => {
       }),
       columnHelper.accessor('title', {
         id: 'title',
-        header: () => <span className={styles.details}>Concept Name</span>,
-        size: 1000,
-        cell: (data) => (
-          <span className={styles.details}>
-            <span className={styles.title}>{data.row.original.title}</span>
-            <span className={`${styles.summary} ${styles.cellEllipsis}`}>{data.row.original.description}</span>
+        enableColumnFilter: false,
+        enableSorting: false,
+        header: () => 'Concept',
+        cell: (info) => (
+          <span className='flex flex-col justify-start gap-2'>
+            <Table.ConceptBank.Title title={info.getValue()} />
+            <Table.ConceptBank.Text value={info.row.original.description} />
           </span>
         ),
       }),
@@ -57,7 +79,24 @@ export const useGeneratedConceptsColumns = () => {
     [],
   );
 
+  const table = useReactTable({
+    getRowId: (row) => row.uuid,
+    data: concepts,
+    columns,
+    enableRowSelection: true,
+    state: {
+      rowSelection,
+    },
+    onRowSelectionChange: setRowSelection,
+    onColumnFiltersChange: setColumnFilters,
+    getFilteredRowModel: getFilteredRowModel(),
+    getCoreRowModel: getCoreRowModel(),
+  });
+
   return {
+    selectedConcepts,
+    hasSelectedConcepts,
+    table,
     columns,
     columnFilters,
     setColumnFilters,

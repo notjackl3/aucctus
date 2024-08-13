@@ -1,53 +1,86 @@
-import { Button, Input, Table } from '@components';
+import { Button, Table } from '@components';
 import { useConcepts } from '@hooks/query/concepts.hook';
-import { ConceptCategory, ConceptStatus, IConcept, IUser } from '@libs/api/types';
+import { ConceptSort, ConceptStatus, IConcept, IUser, SortableConceptProperties } from '@libs/api/types';
 import {
   ColumnDef,
   createColumnHelper,
   getCoreRowModel,
-  PaginationState,
+  OnChangeFn,
   Row,
+  SortingState,
   useReactTable,
 } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
 
 import { useConceptUpdate, useRetryConceptReport } from '@hooks/query/concepts.hook';
-import { dateFormatter } from '@libs/utils';
+import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
 
 const columnHelper = createColumnHelper<IConcept>();
 
+export interface IConceptFilterOptions {
+  // id?: string;
+  status: Set<ConceptStatus>;
+  createdBy?: IUser;
+  search?: string;
+  sort?: ConceptSort;
+}
+
+const INITIAL_FILTER: IConceptFilterOptions = {
+  status: new Set<ConceptStatus>(),
+};
+
+const PAGE_SIZE = 20;
+
+export const areFilterOptionsSet = (filterOptions: IConceptFilterOptions): boolean => {
+  const { status, createdBy, search, sort } = filterOptions;
+
+  return (
+    (status && status.size > 0) || // Check if 'status' set is not empty
+    !!createdBy || // Check if 'createdBy' is set
+    !!search || // Check if 'search' is set
+    !!sort
+  );
+};
+
+function isSortableConceptProperty(value: string): value is SortableConceptProperties {
+  const arr: SortableConceptProperties[] = ['createdAt', 'updatedAt', 'status', 'title'];
+  return (arr as string[]).includes(value);
+}
+
 export const useConceptTable = () => {
   const navigate = useNavigate();
   const { mutate: updateConcept } = useConceptUpdate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
-  const [visibleStatuses, setVisibleStatuses] = React.useState<Set<ConceptStatus>>(new Set());
-  const [category, setCategory] = React.useState<ConceptCategory | undefined>(undefined);
-  const [searchParam, setSearchParam] = React.useState<string | undefined>(undefined);
-
-  const [pagination, setPagination] = React.useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: 20,
-  });
+  const [filterOptions, setFilterOptions] = React.useState<IConceptFilterOptions>(INITIAL_FILTER);
+  const [page, setPage] = React.useState<number>(1);
+  const [sorting, setSorting] = React.useState<SortingState>([]);
 
   // Fetch concepts based on the search parameters
   const { data, isLoading } = useConcepts({
-    category,
-    status: Array.from(visibleStatuses).join(',') || undefined,
-    page: pagination.pageIndex + 1,
-    search: searchParam,
+    // category,
+    // Convert the array of visible statuses to a query string (ie ideating,new)
+    status: Array.from(filterOptions.status).join(', ') || undefined,
+    createdBy: filterOptions.createdBy
+      ? `${filterOptions.createdBy.firstName} ${filterOptions.createdBy.lastName}`
+      : undefined,
+    search: filterOptions.search,
+    page,
+    sort: filterOptions.sort,
   });
 
-  const setPage = React.useCallback(
-    (page: number) => {
-      setPagination({
-        ...pagination,
-        pageIndex: page,
-      });
+  const updateTableFiltering = React.useCallback(
+    (value: Partial<IConceptFilterOptions>) => {
+      setFilterOptions({ ...filterOptions, ...value });
     },
-    [pagination],
+    [filterOptions],
   );
+
+  const resetFilter = React.useCallback(() => {
+    setFilterOptions(INITIAL_FILTER);
+    setSorting([]);
+  }, []);
 
   const handleGenerateConceptButton = React.useCallback(
     (row: Row<IConcept>) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -72,64 +105,75 @@ export const useConceptTable = () => {
     [navigate, retryConceptReport, updateConcept],
   );
 
+  const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(
+    (updater) => {
+      const newSorting = typeof updater === 'function' ? updater(sorting) : updater;
+
+      if (newSorting.length === 0) {
+        updateTableFiltering({ sort: undefined });
+      }
+      const value = newSorting[0];
+      if (value) {
+        if (isSortableConceptProperty(value.id)) {
+          const sortValue = (value.desc ? `-${value.id}` : value.id) as ConceptSort;
+          updateTableFiltering({ sort: sortValue });
+        }
+      }
+
+      setSorting(newSorting);
+    },
+    [sorting, updateTableFiltering],
+  );
+
   const columns = useMemo<ColumnDef<IConcept, any>[]>(() => {
     return [
-      columnHelper.accessor('uuid', {
-        id: 'select',
-        enableColumnFilter: false,
-        enableSorting: false,
-        header: ({ table }) => (
-          <Input.CheckBox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: (event) => {
-                table.getToggleAllPageRowsSelectedHandler()(event);
-              },
-            }}
-          />
-        ),
-        cell: ({ row }) => {
-          return (
-            <Input.CheckBox
-              {...{
-                checked: row.getIsSelected(),
-                disabled: !row.getCanSelect(),
-                indeterminate: row.getIsSomeSelected(),
-                onChange: (e) => {
-                  e.stopPropagation();
-                  row.getToggleSelectedHandler()(e);
-                },
-                onClick: (e) => {
-                  e.stopPropagation();
-                },
-              }}
-            />
-          );
-        },
-      }),
+      // columnHelper.accessor('uuid', {
+      //   id: 'select',
+      //   enableColumnFilter: false,
+      //   enableSorting: false,
+      //   header: ({ table }) => (
+      //     <Input.CheckBox
+      //       {...{
+      //         checked: table.getIsAllRowsSelected(),
+      //         indeterminate: table.getIsSomeRowsSelected(),
+      //         onChange: (event) => {
+      //           table.getToggleAllPageRowsSelectedHandler()(event);
+      //         },
+      //       }}
+      //     />
+      //   ),
+      //   cell: ({ row }) => {
+      //     return (
+      //       <Input.CheckBox
+      //         {...{
+      //           checked: row.getIsSelected(),
+      //           disabled: !row.getCanSelect(),
+      //           indeterminate: row.getIsSomeSelected(),
+      //           onChange: (e) => {
+      //             e.stopPropagation();
+      //             row.getToggleSelectedHandler()(e);
+      //           },
+      //           onClick: (e) => {
+      //             e.stopPropagation();
+      //           },
+      //         }}
+      //       />
+      //     );
+      //   },
+      // }),
       columnHelper.accessor('title', {
         id: 'title',
         sortingFn: 'text',
         enableColumnFilter: false,
         header: () => 'Concept',
         cell: (info) => (
-          <span className='flex flex-col justify-start gap-2'>
+          <span className='flex flex-col justify-start gap-2 px-2'>
             <Table.ConceptBank.Title title={info.getValue()} />
             <Table.ConceptBank.Text value={info.row.original.description} />
           </span>
         ),
       }),
-
-      columnHelper.accessor('status', {
-        id: 'status',
-        sortingFn: 'text',
-        header: () => 'Status',
-        cell: (info) => <Table.ConceptBank.Status value={info.getValue()} />,
-        enableColumnFilter: false,
-      }),
-
-      columnHelper.accessor((row) => dateFormatter(row.createdAt), {
+      columnHelper.accessor((row) => utils.time.dateFormatter(row.createdAt), {
         id: 'createdAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
@@ -141,6 +185,14 @@ export const useConceptTable = () => {
         ),
         header: () => 'Created',
       }),
+      columnHelper.accessor('status', {
+        id: 'status',
+        sortingFn: 'text',
+        header: () => 'Status',
+        cell: (info) => <Table.ConceptBank.Status value={info.getValue()} />,
+        enableColumnFilter: false,
+      }),
+
       columnHelper.accessor('reportStatus', {
         id: 'reportStatus',
         enableColumnFilter: false,
@@ -157,12 +209,7 @@ export const useConceptTable = () => {
         enableColumnFilter: false,
         enableSorting: false,
         header: () => {},
-        cell: (info) => {
-          const uuid = info.getValue();
-          const { reportStatus, status } = info.row.original;
-
-          return <Table.ConceptBank.MenuButton />;
-        },
+        cell: (info) => <Table.ConceptBank.MenuButton status={info.row.original.status} uuid={info.getValue()} />,
       }),
     ];
   }, [handleGenerateConceptButton]);
@@ -172,36 +219,28 @@ export const useConceptTable = () => {
     data: data?.results || [],
     columns,
     enableRowSelection: true,
+    manualSorting: true,
     pageCount: data?.numberOfPages || 0,
     state: {
-      pagination,
+      pagination: {
+        pageSize: PAGE_SIZE,
+        pageIndex: page - 1,
+      },
+      sorting,
     },
     getCoreRowModel: getCoreRowModel(),
-    debugTable: true,
-    debugHeaders: true,
-    debugColumns: true,
+    onSortingChange: handleSortingChange,
   });
 
   return {
     isLoading,
     numberOfPages: data?.numberOfPages || 0,
-    page: pagination.pageIndex,
+    page,
     setPage,
-    visibleStatuses,
-    setVisibleStatuses,
     table,
     columns,
-    searchParam,
-    setSearchParam,
+    updateTableFiltering,
+    resetFilter,
+    filterOptions,
   };
-};
-
-const userSort = (rowA: Row<IConcept>, rowB: Row<IConcept>, columnId: string): number => {
-  const userA: IUser = rowA.original[columnId as keyof IConcept];
-  const userB: IUser = rowB.original[columnId as keyof IConcept];
-
-  const fullNameA = `${userA.firstName} ${userA.lastName}`;
-  const fullNameB = `${userB.firstName} ${userB.lastName}`;
-
-  return fullNameA.localeCompare(fullNameB);
 };

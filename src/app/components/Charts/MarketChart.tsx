@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 
-import { clamp, formatter } from '@libs/utils';
+import utils from '@libs/utils';
 import classname from 'classnames';
 export interface MarketChartProps {
   className?: string;
@@ -39,19 +39,19 @@ const MarketChart: FunctionComponent<MarketChartProps> = ({ tam, sam, som, class
         TAM
       </text>
       <text x={LARGE_RADIUS} y={LARGE_RADIUS} textAnchor='middle' dy='-131' className={textClass()}>
-        {formatter.format(tam) || '0M'}
+        {utils.number.formatter.format(tam) || '0M'}
       </text>
       <text x={LARGE_RADIUS} y={mediumCenter - mediumRadius} textAnchor='middle' dy='30' className={textClass()}>
         SAM
       </text>
       <text x={LARGE_RADIUS} y={mediumCenter - mediumRadius} textAnchor='middle' dy='50' className={textClass()}>
-        {formatter.format(sam) || '0K'}
+        {utils.number.formatter.format(sam) || '0K'}
       </text>
       <text x={LARGE_RADIUS} y={smallCenter - smallRadius} textAnchor='middle' dy='30' className={textClass(true)}>
         SOM
       </text>
       <text x={LARGE_RADIUS} y={smallCenter - smallRadius} textAnchor='middle' dy='50' className={textClass(true)}>
-        {formatter.format(som) || '0K'}
+        {utils.number.formatter.format(som) || '0K'}
       </text>
     </svg>
   );
@@ -65,7 +65,8 @@ const MarketChart: FunctionComponent<MarketChartProps> = ({ tam, sam, som, class
  * @param largeValue - The large value.
  * @returns The clamped medium ratio, ensuring it is between 0.4 and 0.6.
  */
-const getMediumRatio = (mediumValue: number, largeValue: number) => clamp(mediumValue / largeValue, 0.4, 0.6);
+const getMediumRatio = (mediumValue: number, largeValue: number) =>
+  utils.number.clamp(mediumValue / largeValue, 0.4, 0.6);
 
 /**
  * Calculates the small ratio by dividing the small value by the large value.
@@ -75,6 +76,7 @@ const getMediumRatio = (mediumValue: number, largeValue: number) => clamp(medium
  * @param largeValue - The large value.
  * @returns The clamped small ratio, ensuring it is between 0.05 and 0.25.
  */
-const getSmallRatio = (smallValue: number, largeValue: number) => clamp(smallValue / largeValue, 0.05, 0.25);
+const getSmallRatio = (smallValue: number, largeValue: number) =>
+  utils.number.clamp(smallValue / largeValue, 0.05, 0.25);
 
 export default MarketChart;

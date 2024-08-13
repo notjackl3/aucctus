@@ -1,8 +1,8 @@
+import { ConceptStatus } from '@libs/api/types';
+import utils from '@libs/utils';
+import { ACTIVE_CONCEPT_STATUS_LIST } from '@libs/utils/concepts';
 import { FunctionComponent, useMemo } from 'react';
 import { BAR_WIDTH } from '../ConceptBarChart';
-import { ConceptStatus } from '../../../../../libs/api/types';
-import { calculatePercent } from '../../../../../libs/utils';
-import { ACTIVE_CONCEPT_STATUS_LIST } from '../../../../../libs/concepts';
 
 export interface ChartLongArrow {
   data: { [key in ConceptStatus | 'total']: number };
@@ -19,9 +19,9 @@ const ChartLongArrow: FunctionComponent<ChartLongArrow> = ({ data }) => {
       return data[status] + result;
     }, 0);
 
-    const proofOfConceptPercent = calculatePercent(data.proofOfConcept, totalActiveConcepts);
-    const minimumViableProductPercent = calculatePercent(data.minimumViableProduct, totalActiveConcepts);
-    const commercializedPercent = calculatePercent(data.commercialized, totalActiveConcepts);
+    const proofOfConceptPercent = utils.number.calculatePercent(data.proofOfConcept, totalActiveConcepts);
+    const minimumViableProductPercent = utils.number.calculatePercent(data.minimumViableProduct, totalActiveConcepts);
+    const commercializedPercent = utils.number.calculatePercent(data.commercialized, totalActiveConcepts);
     return [proofOfConceptPercent, minimumViableProductPercent, commercializedPercent];
   }, [data]);
 

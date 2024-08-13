@@ -1,12 +1,12 @@
+import utils from '@libs/utils';
+import { DirectionProvider } from '@radix-ui/react-direction';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import App from './App';
-import { BrowserRouter } from 'react-router-dom';
-import { ModalProvider } from './app/context/ModalContextProvider';
 import { QueryCache, QueryClient, QueryClientProvider } from 'react-query';
-import { parseFormError } from './libs/utils';
+import { BrowserRouter } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { DirectionProvider } from '@radix-ui/react-direction';
+import App from './App';
+import { ModalProvider } from './app/context/ModalContextProvider';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
@@ -23,7 +23,7 @@ const queryClient = new QueryClient({
       // 🎉 only show error toasts if we already have data in the cache
       // which indicates a failed background update
       if (query.state.data !== undefined) {
-        const message = parseFormError(error);
+        const message = utils.osiris.parseFormError(error);
         toast.error(`Something went wrong: ${message}`);
       }
     },

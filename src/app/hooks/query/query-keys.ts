@@ -1,6 +1,7 @@
 export enum AucctusQueryKeys {
   /* --- Auth --- */
   userDetails = 'userDetails',
+  allUsers = 'allusers',
   dashboard = 'dashboard',
 
   /* Concepts */

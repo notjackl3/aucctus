@@ -3,7 +3,7 @@ import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher
 import { useModal } from '@context/ModalContextProvider';
 import { useEditFinancialProjections } from '@hooks/concepts/editable.hook';
 import { ISource } from '@libs/api/types';
-import { formatLargeNumber, formatter } from '@libs/utils';
+import utils from '@libs/utils';
 import React, { FunctionComponent } from 'react';
 
 const FinancialDetails: FunctionComponent = () => {
@@ -21,11 +21,11 @@ const FinancialDetails: FunctionComponent = () => {
   } = useEditFinancialProjections();
 
   // Formate Large numbers
-  const formattedPrice = React.useMemo(() => formatter.format(pricing.price), [pricing.price]);
-  const formattedTotalUsers = React.useMemo(() => formatLargeNumber(totalUsers.value), [totalUsers.value]);
-  const formattedTam = React.useMemo(() => formatter.format(tam.value), [tam.value]);
-  const formattedSam = React.useMemo(() => formatter.format(sam.value), [sam.value]);
-  const formattedSom = React.useMemo(() => formatter.format(som.value), [som.value]);
+  const formattedPrice = React.useMemo(() => utils.number.formatter.format(pricing.price), [pricing.price]);
+  const formattedTotalUsers = React.useMemo(() => utils.number.formatLargeNumber(totalUsers.value), [totalUsers.value]);
+  const formattedTam = React.useMemo(() => utils.number.formatter.format(tam.value), [tam.value]);
+  const formattedSam = React.useMemo(() => utils.number.formatter.format(sam.value), [sam.value]);
+  const formattedSom = React.useMemo(() => utils.number.formatter.format(som.value), [som.value]);
 
   const { openModal } = useModal();
 

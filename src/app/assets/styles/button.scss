@@ -99,6 +99,13 @@ $btn-colors: (
 
     &:disabled {
       cursor: not-allowed;
+      background-color: darken($btn-background, 5%) !important;
+      // border-color: darken($btn-background, 5%) !important;
+    }
+
+    &.btn-no-hover {
+      background-color: $btn-background !important;
+      border-color: darken($btn-background, 5%) !important;
     }
   }
 }

@@ -4,7 +4,7 @@ import { useCustomerProfileCreate } from '../../../hooks/query/concepts.hook';
 import { useModal } from '../../../context/ModalContextProvider';
 import InputField from '../../Text/InputField/InputField';
 import TextArea from '../../Text/TextArea/TextArea';
-import { parseFormError } from '../../../../libs/utils';
+import utils from '@libs/utils';
 import { toast } from 'react-toastify';
 
 interface IAddCustomerProfileProps {
@@ -255,7 +255,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
                   closeModal();
                 },
                 onError: (error) => {
-                  const message = parseFormError(error);
+                  const message = utils.osiris.parseFormError(error);
 
                   if (
                     error.response &&

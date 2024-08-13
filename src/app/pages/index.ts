@@ -3,16 +3,16 @@ import ConceptPages from './ConceptReport';
 import SettingsPages from './Settings';
 import Dashboard from './Dashboard';
 import Onboarding from './Onboarding';
-import Concepts from './Concepts';
 import IgniteConcept from './IgniteConcept/IgniteConcept';
 import ConceptSnapshot from './ConceptSnapshot/ConceptSnapshot';
 import GeneratedConcepts from './GeneratedConcepts';
+import Concept from './Concept';
 
 const Page = {
   Auth,
   Dashboard,
   Onboarding,
-  Concepts,
+  Concept,
   IgniteConcept,
   GeneratedConcepts,
   ConceptPages,

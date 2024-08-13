@@ -1,4 +1,4 @@
-import { Icon } from '@components';
+import { Icon, Input } from '@components';
 import { Column, Header, flexRender } from '@tanstack/react-table';
 import classNames from 'classnames';
 import React from 'react';
@@ -16,10 +16,10 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({ header }: ITableHea
       key={header.id}
     >
       {header.isPlaceholder ? null : (
-        <div className='flex flex-col items-center justify-start text-center'>
+        <div className='flex flex-row items-center justify-start [&>svg]:stroke-indigo-900'>
           <div
             className={classNames([
-              'flex items-center justify-center',
+              'flex items-center justify-start',
               {
                 'cursor-pointer': header.column.getCanSort(),
                 'select-none': header.column.getCanSort(),
@@ -29,8 +29,8 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({ header }: ITableHea
           >
             {flexRender(header.column.columnDef.header, header.getContext())}
             {{
-              asc: <Icon variant='arrowup' className='ml-1' />,
-              desc: <Icon variant='arrowdown' className='ml-1' />,
+              asc: <Icon variant='arrowup' className='ml-1 stroke-indigo-900' />,
+              desc: <Icon variant='arrowdown' className='ml-1 stroke-indigo-900' />,
             }[header.column.getIsSorted() as string] ?? null}
           </div>
           {header.column.getCanFilter() ? (
@@ -49,7 +49,7 @@ function Filter({ column }: { column: Column<any, unknown> }) {
   const columnFilterValue = column.getFilterValue();
 
   return (
-    <DebouncedInput
+    <Input
       type='text'
       value={(columnFilterValue ?? '') as string}
       onChange={(value) => column.setFilterValue(value)}
@@ -57,34 +57,6 @@ function Filter({ column }: { column: Column<any, unknown> }) {
       className='w-36 rounded border shadow'
     />
   );
-}
-
-// DebouncedInput Component (unchanged)
-function DebouncedInput({
-  value: initialValue,
-  onChange,
-  debounce = 500,
-  ...props
-}: {
-  value: string | number;
-  onChange: (value: string | number) => void;
-  debounce?: number;
-} & Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange'>) {
-  const [value, setValue] = React.useState(initialValue);
-
-  React.useEffect(() => {
-    setValue(initialValue);
-  }, [initialValue]);
-
-  React.useEffect(() => {
-    const timeout = setTimeout(() => {
-      onChange(value);
-    }, debounce);
-
-    return () => clearTimeout(timeout);
-  }, [value]);
-
-  return <input {...props} value={value} onChange={(e) => setValue(e.target.value)} />;
 }
 
 export default TableHeader;

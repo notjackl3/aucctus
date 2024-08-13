@@ -1,11 +1,11 @@
+import utils from '@libs/utils';
 import { FunctionComponent, useCallback, useState } from 'react';
-import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import InputField from '../../components/Text/InputField/InputField';
-import FeatureIcon from '../../components/Icons/FeatureIcon';
-import { parseFormError, validEmail } from '../../../libs/utils';
-import { AppPath } from '../../../routes/routes';
 import { Link } from 'react-router-dom';
+import { AppPath } from '../../../routes/routes';
+import styles from '../../assets/styles/pages/auth-screens.module.scss';
+import FeatureIcon from '../../components/Icons/FeatureIcon';
 import Icon from '../../components/Icons/Icon/Icon';
+import InputField from '../../components/Text/InputField/InputField';
 import { useRequestPasswordReset } from '../../hooks/query/auth.hook';
 
 const ForgotPassword: FunctionComponent = () => {
@@ -16,7 +16,7 @@ const ForgotPassword: FunctionComponent = () => {
 
   const _handleEmailValidation = useCallback(
     (e: React.FocusEvent) => {
-      if (email && !validEmail(email)) {
+      if (email && !utils.string.validEmail(email)) {
         setEmailInputError('Email is Invalid.');
       } else {
         setEmailInputError(undefined);
@@ -33,7 +33,7 @@ const ForgotPassword: FunctionComponent = () => {
         <span className={styles.title}>Forgot Password</span>
         <span className={styles.supportingText}>No worries, we'll send you reset instructions.</span>
         <span className={styles.success}>{isSuccess ? 'Reset instructions sent!' : ''}</span>
-        <span className={styles.error}>{!!error ? parseFormError(error) : ''}</span>
+        <span className={styles.error}>{!!error ? utils.osiris.parseFormError(error) : ''}</span>
       </div>
       <form className={styles.basicForm}>
         <InputField

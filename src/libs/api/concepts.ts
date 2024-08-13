@@ -1,4 +1,4 @@
-import { AtLeast } from '../utils';
+import { AtLeast } from 'src/types';
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
 import { endpoints } from './endpoints';
@@ -61,6 +61,10 @@ export class ConceptApi extends ApiService {
 
   seed(uuid: string) {
     return this.get<IConceptSeed>(endpoints.conceptSeed(uuid));
+  }
+
+  unarchive(uuid: string) {
+    return this.post<IConcept>(endpoints.unarchiveConcept(uuid));
   }
 
   updateConcept(concept: Partial<IConcept>, uuid: string) {

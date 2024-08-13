@@ -1,12 +1,12 @@
+import { useModal } from '@context/ModalContextProvider';
+import { useCustomerProfileUpdate } from '@hooks/query/concepts.hook';
 import { FunctionComponent, useCallback, useState } from 'react';
-import styles from './add-customer-profile.module.scss';
-import { useCustomerProfileUpdate } from '../../../hooks/query/concepts.hook';
-import { useModal } from '../../../context/ModalContextProvider';
 import InputField from '../../Text/InputField/InputField';
+import styles from './add-customer-profile.module.scss';
 
-import { parseFormError } from '../../../../libs/utils';
+import { ICustomerProfile } from '@libs/api/types';
+import utils from '@libs/utils';
 import { toast } from 'react-toastify';
-import { ICustomerProfile } from '../../../../libs/api/types';
 
 interface IEditCustomerProfileDemographicsProps {
   conceptUuid?: string;
@@ -206,7 +206,7 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
                   closeModal();
                 },
                 onError: (error) => {
-                  const message = parseFormError(error);
+                  const message = utils.osiris.parseFormError(error);
 
                   if (
                     error.response &&

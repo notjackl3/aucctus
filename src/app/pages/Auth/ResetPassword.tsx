@@ -1,11 +1,11 @@
+import utils from '@libs/utils';
 import { FunctionComponent, useState } from 'react';
-import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import InputField from '../../components/Text/InputField/InputField';
-import FeatureIcon from '../../components/Icons/FeatureIcon';
-import { AppPath } from '../../../routes/routes';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { AppPath } from '../../../routes/routes';
+import styles from '../../assets/styles/pages/auth-screens.module.scss';
+import FeatureIcon from '../../components/Icons/FeatureIcon';
 import Icon from '../../components/Icons/Icon/Icon';
-import { parseFormError } from '../../../libs/utils';
+import InputField from '../../components/Text/InputField/InputField';
 import { usePasswordReset } from '../../hooks/query/auth.hook';
 
 const HEADER_TEXT = 'Reset Password';
@@ -52,7 +52,7 @@ const ResetPassword: FunctionComponent = () => {
         <FeatureIcon icon={ICON_VARIANT} color={ICON_COLOR} />
         <span className={styles.title}>{HEADER_TEXT}</span>
         <span className={styles.supportingText}>{SUPPORTING_TEXT}</span>
-        {error && <div className={styles.error}>{parseFormError(error)}</div>}
+        {error && <div className={styles.error}>{utils.osiris.parseFormError(error)}</div>}
       </div>
       <form className={styles.basicForm}>
         <InputField

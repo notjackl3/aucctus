@@ -1,4 +1,4 @@
-import { camelCaseToTitleCase } from '@libs/utils';
+import utils from '@libs/utils';
 import * as Radio from '@radix-ui/react-radio-group';
 import React from 'react';
 
@@ -28,7 +28,7 @@ const RadioGroup: React.FC<IRadioGroup> = ({ value, defaultValue, labels, onSele
           <Radio.Indicator className="relative flex h-full w-full items-center justify-center after:block after:h-[11px] after:w-[11px] after:rounded-[50%] after:bg-primary-400 after:content-['']" />
         </Radio.Item>
         <label className='pl-2 text-base font-medium capitalize leading-tight text-slate-500' htmlFor={`r${index + 1}`}>
-          {camelCaseToTitleCase(value)}
+          {utils.string.camelCaseToTitleCase(value)}
         </label>
       </div>
     ))}
