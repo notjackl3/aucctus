@@ -61,7 +61,7 @@ export const useConceptTable = () => {
   const { data, isLoading } = useConcepts({
     // category,
     // Convert the array of visible statuses to a query string (ie ideating,new)
-    status: Array.from(filterOptions.status).join(', ') || undefined,
+    status: Array.from(filterOptions.status).join(',') || undefined,
     createdBy: filterOptions.createdBy
       ? `${filterOptions.createdBy.firstName} ${filterOptions.createdBy.lastName}`
       : undefined,
@@ -167,18 +167,18 @@ export const useConceptTable = () => {
         enableColumnFilter: false,
         header: () => 'Concept',
         cell: (info) => (
-          <span className='flex flex-col justify-start gap-2 px-2'>
-            <Table.ConceptBank.Title title={info.getValue()} />
-            <Table.ConceptBank.Text value={info.row.original.description} />
-          </span>
+          <Table.ConceptBank.TitleDescription title={info.getValue()} description={info.row.original.description} />
         ),
       }),
       columnHelper.accessor((row) => utils.time.dateFormatter(row.createdAt), {
         id: 'createdAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
+        size: 167,
+        maxSize: 167,
+        enableResizing: false,
         cell: (info) => (
-          <span className='flex flex-row items-center justify-center gap-2'>
+          <span className='flex w-[167px] flex-row items-center justify-center gap-2'>
             <Table.ConceptBank.CreatedBy user={info.row.original.createdBy} />
             <Table.ConceptBank.Text className='text-nowrap' value={info.getValue()} />
           </span>
@@ -188,6 +188,8 @@ export const useConceptTable = () => {
       columnHelper.accessor('status', {
         id: 'status',
         sortingFn: 'text',
+        size: 175,
+        maxSize: 175,
         header: () => 'Status',
         cell: (info) => <Table.ConceptBank.Status value={info.getValue()} />,
         enableColumnFilter: false,
@@ -197,8 +199,11 @@ export const useConceptTable = () => {
         id: 'reportStatus',
         enableColumnFilter: false,
         enableSorting: false,
+        size: 124,
+        maxSize: 124,
+        enableResizing: false,
         cell: ({ row }) => (
-          <span className='m-auto flex h-full w-full items-center justify-end self-stretch align-middle'>
+          <span className='m-auto flex h-full w-[124px] items-center justify-end self-stretch align-middle'>
             <Button.ConceptGenerate variant={row.original.reportStatus} onClick={handleGenerateConceptButton(row)} />
           </span>
         ),
@@ -208,6 +213,8 @@ export const useConceptTable = () => {
         id: 'uuid',
         enableColumnFilter: false,
         enableSorting: false,
+        size: 42,
+        maxSize: 42,
         header: () => {},
         cell: (info) => <Table.ConceptBank.MenuButton status={info.row.original.status} uuid={info.getValue()} />,
       }),

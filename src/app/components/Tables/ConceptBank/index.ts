@@ -1,14 +1,14 @@
+import MenuButton from './ActionsMenuButton';
 import CreatedBy from './CreatedBy';
 import FilterMenubar from './FilterMenu/FilterMenu';
 import FilterOptionsHeaderItem from './FilterOptionsHeaderItem';
-import MenuButton from './ActionsMenuButton';
 import Status from './Status';
 import Text from './Text';
-import Title from './Title';
+import TitleDescription from './TitleDescription';
 
 const Concept = {
   MenuButton,
-  Title,
+  TitleDescription,
   Text,
   Status,
   CreatedBy,

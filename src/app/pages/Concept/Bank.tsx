@@ -30,7 +30,7 @@ const ConceptBank: React.FC = () => {
       let itemValue = '';
 
       if (value instanceof Set) {
-        itemValue = Array.from(value).map(camelCaseToTitleCase).join(',');
+        itemValue = Array.from(value).map(camelCaseToTitleCase).join(', ');
       } else if (typeof value === 'string') {
         itemValue = value;
       } else if (isUser(value)) {

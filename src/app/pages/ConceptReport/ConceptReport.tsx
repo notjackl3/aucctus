@@ -1,4 +1,4 @@
-import { Button, Container, Icon, Tooltip } from '@components';
+import { Container, Icon, Select, Tooltip } from '@components';
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useMemo } from 'react';
@@ -72,7 +72,7 @@ const ConceptReport: FunctionComponent = () => {
             {concept?.title}
           </h1>
           <div className='ml-4 flex'>
-            <Button.ConceptDropdown value={status} onChange={changeConceptStatus} />
+            <Select.ConceptStatus value={status} onChange={changeConceptStatus} />
           </div>
         </div>
         <div className='flex gap-4'>

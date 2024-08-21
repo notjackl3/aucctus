@@ -12,12 +12,12 @@ interface ITableHeaderProps<T> {
 const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({ header }: ITableHeaderProps<T>) => {
   return (
     <th
-      className='text-nowrap p-2 align-top text-base font-medium leading-normal text-indigo-900 first:pl-3 last:pr-4'
+      className='text-nowrap p-3 align-top text-base font-medium leading-normal text-indigo-900 first:pl-6 last:pr-6'
       key={header.id}
     >
       {header.isPlaceholder ? null : (
-        <div className='flex flex-row items-center justify-start [&>svg]:stroke-indigo-900'>
-          <div
+        <span className='flex flex-row items-center justify-start [&>svg]:stroke-indigo-900'>
+          <span
             className={classNames([
               'flex items-center justify-start',
               {
@@ -32,13 +32,13 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({ header }: ITableHea
               asc: <Icon variant='arrowup' className='ml-1 stroke-indigo-900' />,
               desc: <Icon variant='arrowdown' className='ml-1 stroke-indigo-900' />,
             }[header.column.getIsSorted() as string] ?? null}
-          </div>
+          </span>
           {header.column.getCanFilter() ? (
-            <div className='mt-2'>
+            <span className='mt-2'>
               <Filter column={header.column} />
-            </div>
+            </span>
           ) : null}
-        </div>
+        </span>
       )}
     </th>
   );

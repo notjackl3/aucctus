@@ -31,7 +31,7 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
           </div>
         ) : (
           // Table
-          <div className='max-h-[calc(100vh-360px)] w-full overflow-y-auto'>
+          <div className='w-full'>
             <table className='w-full table-auto text-gray-600'>
               <thead className='border-b border-gray-300'>
                 {table &&

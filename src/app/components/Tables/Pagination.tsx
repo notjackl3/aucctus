@@ -21,9 +21,14 @@ const Pagination: React.FC<IPaginationProps> = ({ page, numberOfPages, onPageCha
     const pageNumbers = utils.array.createPaginationNumbers(page, numberOfPages, MAX_PAGINATION_BUTTON);
     return pageNumbers.map((value) =>
       value == '...' ? (
-        <Ellipsis />
+        <Ellipsis key={utils.string.generateRandomString(5)} />
       ) : (
-        <PageNumber page={value} disabled={value == page} onClick={() => onPageChange(value)} />
+        <PageNumber
+          key={utils.string.generateRandomString(5)}
+          page={value}
+          disabled={value == page}
+          onClick={() => onPageChange(value)}
+        />
       ),
     );
   }, [numberOfPages, onPageChange, page]);

@@ -69,7 +69,7 @@ export const queryStringGenerator = (root: string, options?: object) => {
 
   const query = Object.entries(options)
     .filter(([, value]) => value !== undefined && value !== null && value !== '') // Filter out undefined and null values
-    .map(([key, value]) => `${toSnakeCase(key)}=${encodeURIComponent(value as string)}`) // Convert to query params
+    .map(([key, value]) => `${toSnakeCase(key)}=${value as string}`) // Convert to query params
     .join('&');
 
   if (query) {

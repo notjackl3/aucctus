@@ -8,7 +8,7 @@ interface IStatusProps {
 
 const Status: React.FC<IStatusProps> = ({ value }) => {
   return (
-    <span className='m-auto flex h-full w-full items-center justify-start self-stretch align-middle'>
+    <span className='m-auto flex h-full w-full min-w-[175px] items-center justify-start self-stretch align-middle'>
       <Badge.ConceptStatus status={value} />
     </span>
   );

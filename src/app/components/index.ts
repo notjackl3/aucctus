@@ -9,6 +9,7 @@ import Icon from './Icons';
 import Input from './Input';
 import Legend from './Legends';
 import Modal from './Modal';
+import Select from './Select';
 import Table from './Tables';
 import Text from './Text';
 
@@ -32,6 +33,7 @@ export {
   Legend,
   Loading,
   Modal,
+  Select,
   Table,
   Text,
   Tooltip,
