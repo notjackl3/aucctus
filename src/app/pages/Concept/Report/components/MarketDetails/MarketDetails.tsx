@@ -1,14 +1,14 @@
+import Icon from '@components/Icons/Icon/Icon';
+import AddMarketScanElement from '@components/Modal/MarketScanElement/AddMarketScanElement';
+import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
+import { useModal } from '@context/ModalContextProvider';
+import { useEditMarketScan } from '@hooks/concepts/editable.hook';
+import { useConceptMarketScan, useTrendAndDriverCreate } from '@hooks/query/concepts.hook';
 import { FunctionComponent } from 'react';
-import styles from './styles/marketDetails.module.scss';
 import { useParams } from 'react-router-dom';
-import { useConceptMarketScan, useTrendAndDriverCreate } from '../../../../hooks/query/concepts.hook';
 import EcosystemList from './EcosystemList';
-import { useEditMarketScan } from '../../../../hooks/concepts/editable.hook';
-import EditModeSwitcher from '../../../../components/Text/EditModeSwitcher/EditModeSwitcher';
+import styles from './styles/marketDetails.module.scss';
 import TrendAndDriverCard from './TrendAndDriverCard';
-import Icon from '../../../../components/Icons/Icon/Icon';
-import { useModal } from '../../../../context/ModalContextProvider';
-import AddMarketScanElement from '../../../../components/Modal/MarketScanElement/AddMarketScanElement';
 
 const MarketDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();

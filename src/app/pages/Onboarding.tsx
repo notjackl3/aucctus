@@ -6,7 +6,7 @@ import styles from '../assets/styles/pages/auth-screens.module.scss';
 import Footer from '../components/Auth/Footer/Footer';
 import OnboardingIntoSection from '../components/Auth/OnboardingIntroSection';
 import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
-import InputField from '../components/Text/InputField/InputField';
+import InputField from '../components/Input/InputField/InputField';
 import { useRegisterAccount } from '../hooks/query/account.hook';
 import { useAppStore } from '../stores/app.store';
 

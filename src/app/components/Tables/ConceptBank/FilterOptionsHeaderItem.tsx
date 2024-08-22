@@ -1,5 +1,5 @@
 import Icon from '@components/Icons';
-import { IConceptFilterOptions } from '@hooks/tables/concepts.hook';
+import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import utils from '@libs/utils';
 
 import React from 'react';

@@ -1,5 +1,5 @@
-import CustomerProfile from '@pages/ConceptReport/components/CustomerProfile';
 import Confirmation from './ConfirmationModal/ConfirmationModal';
+import AddCustomerProfile from './CustomerProfile/AddCustomerProfile';
 import EditCustomerProfileDemographics from './CustomerProfile/EditCustomerProfileDemographics';
 import EvidenceAndReasoning from './EvedanceAndReasoningModal';
 import AddKeyAssumptionModal from './KeyAssumtionModal/AddKeyAssumptionModal';
@@ -12,7 +12,7 @@ const Modal = {
   Base,
   Confirmation,
   EditCustomerProfileDemographics,
-  CustomerProfile,
+  AddCustomerProfile,
   EditKeyAssumptionModal,
   AddKeyAssumptionModal,
   AddMarketScanElement,

@@ -11,9 +11,9 @@ const usePrivateRoutes = () => {
   return (
     <Route element={<Layout.Private />}>
       <Route index path={AppPath.Home} element={<Page.Dashboard />} />
-      <Route path={AppPath.IgniteConcept} element={<Page.IgniteConcept />} />
-      <Route path={AppPath.ConceptSnapshot} element={<Page.ConceptSnapshot />} />
-      <Route path={AppPath.GeneratedConcepts} element={<Page.GeneratedConcepts />} />
+      <Route path={AppPath.IgniteConcept} element={<Page.Concept.Ignite />} />
+      <Route path={AppPath.ConceptSnapshot} element={<Page.Concept.Snapshot />} />
+      <Route path={AppPath.GeneratedConcepts} element={<Page.Concept.Generated />} />
       <Route path={AppPath.ConceptBank} element={<Page.Concept.Bank />} />
 
       {/* Concept Report */}

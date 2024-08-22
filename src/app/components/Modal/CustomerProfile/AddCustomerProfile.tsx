@@ -1,11 +1,11 @@
-import { FunctionComponent, useCallback, useState } from 'react';
-import styles from './add-customer-profile.module.scss';
-import { useCustomerProfileCreate } from '../../../hooks/query/concepts.hook';
-import { useModal } from '../../../context/ModalContextProvider';
-import InputField from '../../Text/InputField/InputField';
-import TextArea from '../../Text/TextArea/TextArea';
 import utils from '@libs/utils';
+import { FunctionComponent, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
+import { useModal } from '../../../context/ModalContextProvider';
+import { useCustomerProfileCreate } from '../../../hooks/query/concepts.hook';
+import InputField from '../../Input/InputField/InputField';
+import TextArea from '../../Input/TextArea/TextArea';
+import styles from './add-customer-profile.module.scss';
 
 interface IAddCustomerProfileProps {
   conceptUuid: string;

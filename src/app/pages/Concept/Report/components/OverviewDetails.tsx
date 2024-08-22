@@ -1,9 +1,9 @@
 import { Card, Container, Header, Text } from '@components';
+import { useEditConcept, useEditOverview } from '@hooks/concepts/editable.hook';
+import { useConceptAssumptions, useConceptOverview } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
-import { useEditConcept, useEditOverview } from '../../../hooks/concepts/editable.hook';
-import { useConceptAssumptions, useConceptOverview } from '../../../hooks/query/concepts.hook';
 import { IConceptReportContext } from '../ConceptReport';
 
 const OverviewDetails: FunctionComponent = () => {

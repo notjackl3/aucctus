@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
-import SeedField from '../../../components/Text/SeedField';
-import { useConceptSeed } from '../../../hooks/query/concepts.hook';
+
+import { Icon, Loading } from '@components';
+import SeedField from '@components/Text/SeedField';
+import { useConceptSeed } from '@hooks/query/concepts.hook';
 import { useParams } from 'react-router-dom';
-import Loading from '../../../components/Loading';
-import Icon from '../../../components/Icons/Icon/Icon';
 
 const ConceptSettings: FunctionComponent = () => {
   const { id: conceptUuid } = useParams();

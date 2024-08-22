@@ -9,12 +9,12 @@ import {
 import React from 'react';
 
 import { Input, Table } from '@components';
+import { IGeneratedConcept } from '@libs/api/types';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
-import { IGeneratedConcept } from '../../../libs/api/types';
 
 const columnHelper = createColumnHelper<IGeneratedConcept>();
 
-export const useGeneratedConceptsColumns = () => {
+export const useGeneratedConcepts = () => {
   const { generatedConcepts: concepts } = useConceptGenerationStore();
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
@@ -69,10 +69,7 @@ export const useGeneratedConceptsColumns = () => {
         enableSorting: false,
         header: () => 'Concept',
         cell: (info) => (
-          <span className='flex flex-col justify-start gap-2'>
-            <Table.ConceptBank.Title title={info.getValue()} />
-            <Table.ConceptBank.Text value={info.row.original.description} />
-          </span>
+          <Table.ConceptBank.TitleDescription title={info.getValue()} description={info.row.original.description} />
         ),
       }),
     ],

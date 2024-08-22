@@ -1,17 +1,16 @@
+import TabView from '@components/Container/TabView';
+import { TabElement } from '@components/Container/TabView/TabView';
+import Loading from '@components/Loading';
+import { useConceptCustomerProfiles, useDeleteCustomerProfile } from '@hooks/query/concepts.hook';
+import { ICustomerProfile } from '@libs/api/types';
+import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
-import styles from './styles/customerProfile.module.scss';
-import { ICustomerProfile } from '../../../../../libs/api/types';
-import TabView from '../../../../components/Container/TabView';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import CustomerDetails from './CustomerDetails';
-import Loading from '../../../../components/Loading';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
-import { TabElement } from '../../../../components/Container/TabView/TabView';
-import { AppPath } from '../../../../../routes/routes';
-import { useConceptCustomerProfiles, useDeleteCustomerProfile } from '../../../../hooks/query/concepts.hook';
-import Icon from '../../../../components/Icons/Icon/Icon';
-import { useModal } from '../../../../context/ModalContextProvider';
-import AddCustomerProfile from '../../../../components/Modal/CustomerProfile/AddCustomerProfile';
-import ConfirmationModal from '../../../../components/Modal/ConfirmationModal/ConfirmationModal';
+import styles from './styles/customerProfile.module.scss';
+
+import { Icon, Modal } from '@components';
+import { useModal } from '@context/ModalContextProvider';
 
 const CustomerProfile: FunctionComponent = () => {
   const { id: conceptId } = useParams();
@@ -74,7 +73,7 @@ const CustomerProfile: FunctionComponent = () => {
               className='btn btn-light'
               disabled={!conceptId || !selectedProfile}
               onClick={() => {
-                openModal(AddCustomerProfile, { conceptUuid: conceptId || '' });
+                openModal(Modal.AddCustomerProfile, { conceptUuid: conceptId || '' });
               }}
             >
               <Icon variant='plus' height={20} width={20} />
@@ -84,7 +83,7 @@ const CustomerProfile: FunctionComponent = () => {
               className='btn btn-light'
               disabled={!conceptId || !selectedProfile}
               onClick={() => {
-                openModal(ConfirmationModal, {
+                openModal(Modal.Confirmation, {
                   title: 'Are you sure?',
                   subtitle: `This will delete the \"${selectedProfileName}\" customer profile`,
                   actions: [

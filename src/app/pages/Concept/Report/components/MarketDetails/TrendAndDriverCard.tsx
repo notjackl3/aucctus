@@ -1,10 +1,10 @@
+import images from '@assets/img';
 import { Card, Icon } from '@components';
+import EditMarketScanElement from '@components/Modal/MarketScanElement/EditMarketScanElement';
+import { useModal } from '@context/ModalContextProvider';
+import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '@hooks/query/concepts.hook';
 import { ITrendsAndDrivers } from '@libs/api/types';
 import { FunctionComponent } from 'react';
-import images from '../../../../assets/img';
-import EditMarketScanElement from '../../../../components/Modal/MarketScanElement/EditMarketScanElement';
-import { useModal } from '../../../../context/ModalContextProvider';
-import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '../../../../hooks/query/concepts.hook';
 import styles from './styles/marketDetails.module.scss';
 
 const iconDefaultProps = {

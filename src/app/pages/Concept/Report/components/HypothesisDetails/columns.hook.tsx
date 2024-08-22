@@ -1,13 +1,13 @@
+import { IAssumption } from '@libs/api/types';
 import { createColumnHelper } from '@tanstack/react-table';
-import { IAssumption } from '../../../../../libs/api/types';
 import { useMemo } from 'react';
 
 import styles from './styles/hypothesisDetails.module.scss';
 
-import { Badge } from '@components';
-import Icon from '../../../../components/Icons/Icon/Icon';
-import { useModal } from '../../../../context/ModalContextProvider';
-import EditKeyAssumptionModal from '../../../../components/Modal/KeyAssumtionModal/EditKeyAssumtionModal';
+import { Badge, Icon } from '@components';
+
+import EditKeyAssumptionModal from '@components/Modal/KeyAssumtionModal/EditKeyAssumtionModal';
+import { useModal } from '@context/ModalContextProvider';
 
 const columnHelper = createColumnHelper<IAssumption>();
 

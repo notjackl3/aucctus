@@ -6,8 +6,8 @@ import { UseMutateFunction } from 'react-query';
 import { Ecosystem, IFormError, ITrendsAndDrivers } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
 import Icon from '../../Icons/Icon/Icon';
-import InputField from '../../Text/InputField/InputField';
-import TextArea from '../../Text/TextArea/TextArea';
+import InputField from '../../Input/InputField/InputField';
+import TextArea from '../../Input/TextArea/TextArea';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import styles from './edit-trends-and-driver.module.scss';
 

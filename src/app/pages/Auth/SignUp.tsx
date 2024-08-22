@@ -1,9 +1,9 @@
 import { FunctionComponent, useCallback, useState } from 'react';
-import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import InputField from '../../components/Text/InputField/InputField';
+import { Link } from 'react-router-dom';
 import utils from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import { Link } from 'react-router-dom';
+import styles from '../../assets/styles/pages/auth-screens.module.scss';
+import InputField from '../../components/Input/InputField/InputField';
 import { useSignUp } from '../../hooks/query/auth.hook';
 
 const SignUp: FunctionComponent = () => {

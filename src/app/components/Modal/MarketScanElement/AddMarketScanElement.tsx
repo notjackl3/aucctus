@@ -1,6 +1,6 @@
+import { AxiosError } from 'axios';
 import { FunctionComponent, useCallback, useState } from 'react';
-import styles from './edit-trends-and-driver.module.scss';
-import { useModal } from '../../../context/ModalContextProvider';
+import { UseMutateFunction } from 'react-query';
 import {
   Ecosystem,
   EcosystemType,
@@ -9,10 +9,10 @@ import {
   IMarketScanElementCreate,
   ITrendsAndDrivers,
 } from '../../../../libs/api/types';
-import InputField from '../../Text/InputField/InputField';
-import TextArea from '../../Text/TextArea/TextArea';
-import { UseMutateFunction } from 'react-query';
-import { AxiosError } from 'axios';
+import { useModal } from '../../../context/ModalContextProvider';
+import InputField from '../../Input/InputField/InputField';
+import TextArea from '../../Input/TextArea/TextArea';
+import styles from './edit-trends-and-driver.module.scss';
 
 interface EditTrendsAndDriverProps {
   addItem:

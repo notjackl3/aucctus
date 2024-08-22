@@ -49,7 +49,7 @@ function isSortableConceptProperty(value: string): value is SortableConceptPrope
   return (arr as string[]).includes(value);
 }
 
-export const useConceptTable = () => {
+export const useConceptBank = () => {
   const navigate = useNavigate();
   const { mutate: updateConcept } = useConceptUpdate();
   const { mutate: retryConceptReport } = useRetryConceptReport();

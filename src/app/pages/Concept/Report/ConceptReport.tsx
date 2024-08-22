@@ -1,10 +1,10 @@
 import { Container, Icon, Select, Tooltip } from '@components';
+import { useConcept, useConceptUpdate } from '@hooks/query/concepts.hook';
+import { useRoutePattern } from '@hooks/router.hook';
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { useConcept, useConceptUpdate } from '../../hooks/query/concepts.hook';
-import { useRoutePattern } from '../../hooks/router.hook';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;

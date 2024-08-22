@@ -1,7 +1,7 @@
-import React, { useState, useEffect, FunctionComponent, useRef } from 'react';
-import styles from './edit-mode-switcher.module.scss'; // Import the SCSS module
-import TextArea from '../TextArea/TextArea';
+import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import Icon from '../../Icons/Icon/Icon';
+import TextArea from '../../Input/TextArea/TextArea';
+import styles from './edit-mode-switcher.module.scss'; // Import the SCSS module
 
 interface IEditModeSwitcherProps {
   value?: string;

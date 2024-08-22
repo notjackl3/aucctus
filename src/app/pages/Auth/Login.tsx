@@ -3,7 +3,7 @@ import { FunctionComponent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import InputField from '../../components/Text/InputField/InputField';
+import InputField from '../../components/Input/InputField/InputField';
 import { useLogin } from '../../hooks/query/auth.hook';
 
 const Login: FunctionComponent = () => {

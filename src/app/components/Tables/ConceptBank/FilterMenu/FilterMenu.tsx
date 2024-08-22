@@ -1,6 +1,6 @@
 import { Avatar, Icon, Input } from '@components';
 import { useAllUsers } from '@hooks/query/account.hook';
-import { IConceptFilterOptions } from '@hooks/tables/concepts.hook';
+import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import { ConceptStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import { CONCEPT_STATUS_LIST } from '@libs/utils/concepts';

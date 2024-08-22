@@ -1,7 +1,7 @@
 import { useModal } from '@context/ModalContextProvider';
 import { useCustomerProfileUpdate } from '@hooks/query/concepts.hook';
 import { FunctionComponent, useCallback, useState } from 'react';
-import InputField from '../../Text/InputField/InputField';
+import InputField from '../../Input/InputField/InputField';
 import styles from './add-customer-profile.module.scss';
 
 import { ICustomerProfile } from '@libs/api/types';

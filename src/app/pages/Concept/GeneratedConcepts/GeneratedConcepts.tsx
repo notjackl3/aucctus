@@ -1,13 +1,13 @@
 import { Loading, Table } from '@components';
+import Icon from '@components/Icons/Icon/Icon';
+import IgniteLoading from '@components/IgniteLoading';
+import { useConceptIgnition, useSaveGeneratedConcepts } from '@hooks/query/concepts.hook';
+import { AppPath } from '@routes/routes';
+import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import React, { FunctionComponent, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { AppPath } from '../../../routes/routes';
-import Icon from '../../components/Icons/Icon/Icon';
-import IgniteLoading from '../../components/IgniteLoading';
-import { useConceptIgnition, useSaveGeneratedConcepts } from '../../hooks/query/concepts.hook';
-import { useConceptGenerationStore } from '../../stores/concept-generation.store';
+import { useGeneratedConcepts } from '../../../hooks/tables/generated-concepts.hook';
 import styles from './styles/generatedConcepts.module.scss';
-import { useGeneratedConceptsColumns } from './table.hook';
 
 const GeneratedConcepts: FunctionComponent = () => {
   const navigate = useNavigate();
@@ -15,7 +15,7 @@ const GeneratedConcepts: FunctionComponent = () => {
   const { mutate: saveConcepts, isLoading: isSaveLoading } = useSaveGeneratedConcepts();
   const { generatedConcepts: concepts, seed, clear, setGeneratedConcepts } = useConceptGenerationStore();
 
-  const { table, hasSelectedConcepts, selectedConcepts } = useGeneratedConceptsColumns();
+  const { table, hasSelectedConcepts, selectedConcepts } = useGeneratedConcepts();
 
   const handleSaveConcepts = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

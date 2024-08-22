@@ -1,17 +1,17 @@
-import React, { FunctionComponent, useCallback, useState } from 'react';
-import { useConceptIgnition } from '../../hooks/query/concepts.hook';
-import images from '../../assets/img';
-import TextArea from '../../components/Text/TextArea/TextArea';
-import Icon from '../../components/Icons/Icon/Icon';
-import InputField from '../../components/Text/InputField/InputField';
-import { ConceptSeedType, EEIQuestionKeys, IConceptSeedAttribute, INOQuestionKeys } from '@libs/api/types';
-import { toast } from 'react-toastify';
-import IgniteLoading from '../../components/IgniteLoading';
-import { useNavigate } from 'react-router-dom';
-import { AppPath } from '../../../routes/routes';
-import WhiteSpaceSuggestion from '../../components/Text/WhiteSpaceSuggestions';
-import { useConceptGenerationStore } from '../../stores/concept-generation.store';
+import images from '@assets/img';
 import { Card } from '@components';
+import Icon from '@components/Icons/Icon/Icon';
+import IgniteLoading from '@components/IgniteLoading';
+import InputField from '@components/Input/InputField/InputField';
+import TextArea from '@components/Input/TextArea/TextArea';
+import WhiteSpaceSuggestion from '@components/Text/WhiteSpaceSuggestions';
+import { useConceptIgnition } from '@hooks/query/concepts.hook';
+import { ConceptSeedType, EEIQuestionKeys, IConceptSeedAttribute, INOQuestionKeys } from '@libs/api/types';
+import { AppPath } from '@routes/routes';
+import { useConceptGenerationStore } from '@stores/concept-generation.store';
+import React, { FunctionComponent, useCallback, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 const INITIAL_EXPANDING_IDEA: IConceptSeedAttribute<EEIQuestionKeys>[] = [
   { question: 'DESCRIBE', answer: '' },

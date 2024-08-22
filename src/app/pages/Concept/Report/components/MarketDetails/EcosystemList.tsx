@@ -1,14 +1,14 @@
 import { FunctionComponent, useCallback } from 'react';
 
-import { Ecosystem, EcosystemType } from '../../../../../libs/api/types';
-import images from '../../../../assets/img';
-import EditMarketScanElement from '../../../../components/Modal/MarketScanElement/EditMarketScanElement';
-import { useModal } from '../../../../context/ModalContextProvider';
-import { useEcosystemCreate, useEcosystemDelete, useEcosystemUpdate } from '../../../../hooks/query/concepts.hook';
+import images from '@assets/img';
+import EditMarketScanElement from '@components/Modal/MarketScanElement/EditMarketScanElement';
+import { useModal } from '@context/ModalContextProvider';
+import { useEcosystemCreate, useEcosystemDelete, useEcosystemUpdate } from '@hooks/query/concepts.hook';
+import { Ecosystem, EcosystemType } from '@libs/api/types';
 
 import { Card, Icon } from '@components';
+import AddMarketScanElement from '@components/Modal/MarketScanElement/AddMarketScanElement';
 import { useParams } from 'react-router-dom';
-import AddMarketScanElement from '../../../../components/Modal/MarketScanElement/AddMarketScanElement';
 import styles from './styles/marketDetails.module.scss';
 
 const iconDefaultProps = {

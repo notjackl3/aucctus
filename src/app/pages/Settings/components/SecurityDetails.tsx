@@ -6,7 +6,7 @@ import api from '../../../../libs/api';
 import { IUserPassword } from '../../../../libs/api/types';
 import { defaultToastConfig } from '../../../../libs/toast';
 import Icon from '../../../components/Icons/Icon/Icon';
-import InputField from '../../../components/Text/InputField/InputField';
+import InputField from '../../../components/Input/InputField/InputField';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import styles from '../styles/securityDetails.module.scss';
 

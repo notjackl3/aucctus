@@ -1,13 +1,13 @@
+import { Badge } from '@components';
 import { FunctionComponent, useCallback, useState } from 'react';
-import Icon from '../../Icons/Icon/Icon';
-import { useModal } from '../../../context/ModalContextProvider';
-import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import { AssumptionType, IAssumption } from '../../../../libs/api/types';
-import InputField from '../../Text/InputField/InputField';
-import TextArea from '../../Text/TextArea/TextArea';
+import { useModal } from '../../../context/ModalContextProvider';
 import { useAssumptionDelete, useAssumptionUpdate } from '../../../hooks/query/concepts.hook';
 import Dropdown, { Option } from '../../Buttons/Dropdown/Dropdown';
-import { Badge } from '@components';
+import Icon from '../../Icons/Icon/Icon';
+import InputField from '../../Input/InputField/InputField';
+import TextArea from '../../Input/TextArea/TextArea';
+import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 
 import styles from './edit-key-assumption.module.scss';
 

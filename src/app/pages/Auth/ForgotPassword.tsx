@@ -5,7 +5,7 @@ import { AppPath } from '../../../routes/routes';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import FeatureIcon from '../../components/Icons/FeatureIcon';
 import Icon from '../../components/Icons/Icon/Icon';
-import InputField from '../../components/Text/InputField/InputField';
+import InputField from '../../components/Input/InputField/InputField';
 import { useRequestPasswordReset } from '../../hooks/query/auth.hook';
 
 const ForgotPassword: FunctionComponent = () => {

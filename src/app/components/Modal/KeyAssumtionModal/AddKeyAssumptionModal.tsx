@@ -1,12 +1,12 @@
+import { Badge } from '@components';
 import { FunctionComponent, useCallback, useState } from 'react';
-import Icon from '../../Icons/Icon/Icon';
-import { useModal } from '../../../context/ModalContextProvider';
 import { AssumptionType } from '../../../../libs/api/types';
-import InputField from '../../Text/InputField/InputField';
-import TextArea from '../../Text/TextArea/TextArea';
+import { useModal } from '../../../context/ModalContextProvider';
 import { useAssumptionCreate } from '../../../hooks/query/concepts.hook';
 import Dropdown, { Option } from '../../Buttons/Dropdown/Dropdown';
-import { Badge } from '@components';
+import Icon from '../../Icons/Icon/Icon';
+import InputField from '../../Input/InputField/InputField';
+import TextArea from '../../Input/TextArea/TextArea';
 
 import styles from './edit-key-assumption.module.scss';
 
