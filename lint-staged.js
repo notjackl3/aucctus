@@ -5,6 +5,6 @@ module.exports = {
     () => 'tsc-files --noEmit',
   ],
   '*.js,*.jsx,*.ts,*.tsx,*.json,*.css': [
-    'prettier --config .prettierrc --write .',
+    'prettier --config .prettierrc --write',
   ],
-}
+};
