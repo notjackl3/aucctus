@@ -17,10 +17,10 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
   isLoading,
 }: IConceptTableProps<T>) => {
   return (
-    <div className='inline-flex h-auto  min-h-96 w-full flex-col items-start justify-between rounded-xl border border-gray-300 bg-white shadow'>
+    <div className='inline-flex h-auto  min-h-96 w-full flex-col items-start justify-between rounded-xl border border-gray-200 bg-white shadow-sm'>
       <div className='inline-flex w-full flex-col items-start justify-start'>
         {/* Header */}
-        <div className='inline-flex h-[60px] w-full items-center justify-between rounded-t-xl border-b border-gray-300 px-6 py-3'>
+        <div className='inline-flex h-[60px] w-full items-center justify-between rounded-t-xl border-b border-gray-200 px-6 py-3'>
           {header}
         </div>
         {/* Content */}
@@ -31,9 +31,9 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
           </div>
         ) : (
           // Table
-          <div className='w-full'>
+          <div className='max-h-[calc(100vh-360px)] w-full overflow-y-scroll'>
             <table className='w-full table-auto text-gray-600'>
-              <thead className='border-b border-gray-300'>
+              <thead className='border-b border-gray-200'>
                 {table &&
                   table.getHeaderGroups().map((headerGroup) => (
                     <tr key={headerGroup.id}>
@@ -86,7 +86,7 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
         )}
       </div>
       {/* Footer */}
-      <div className='inline-flex h-[68px] w-full items-center justify-between self-end border-t border-gray-300 px-6 pb-4 pt-3'>
+      <div className='inline-flex h-[68px] w-full items-center justify-between self-end border-t border-gray-200 px-6 pb-4 pt-3'>
         {footer}
       </div>
     </div>

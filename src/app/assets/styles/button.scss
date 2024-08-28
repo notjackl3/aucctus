@@ -54,6 +54,7 @@ $btn-colors: (
   padding: 0.625rem 1.125rem;
   justify-content: center;
   align-items: center;
+  text-align: center;
 
   box-shadow: $shadow-100;
 
@@ -73,6 +74,38 @@ $btn-colors: (
   &.btn-link {
     box-shadow: none !important;
     border: none !important;
+  }
+
+  // Extra Small button size
+  &.btn-xs {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+
+    svg {
+      width: 0.75rem;
+      height: 0.75rem;
+    }
+  }
+
+  // Small button size
+  &.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+
+    svg {
+      width: 0.875rem;
+      height: 0.875rem;
+    }
+  }
+
+  // Large button size
+  &.btn-lg {
+    padding: 0.875rem 1.5rem;
+    font-size: 1.25rem;
+    svg {
+      width: 1.25rem;
+      height: 1.25rem;
+    }
   }
 }
 
