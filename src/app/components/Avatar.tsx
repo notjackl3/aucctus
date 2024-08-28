@@ -19,7 +19,7 @@ const Avatar: React.FC<AvatarProps> = ({ firstName = '', lastName = '', src }) =
       <Av.Image className='h-full w-full border-r-inherit object-cover' src={src} alt={`${firstName} ${lastName}`} />
       <Av.Fallback
         className='flex h-full w-full items-center justify-center bg-transparent text-center font-semibold text-primary-500'
-        delayMs={600}
+        delayMs={!src ? undefined : 600}
       >
         {initials}
       </Av.Fallback>

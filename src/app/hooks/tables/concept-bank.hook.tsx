@@ -178,7 +178,7 @@ export const useConceptBank = () => {
         maxSize: 167,
         enableResizing: false,
         cell: (info) => (
-          <span className='flex w-[167px] flex-row items-center justify-center gap-2'>
+          <span className='flex w-[167px] flex-row items-center justify-start gap-2'>
             <Table.ConceptBank.CreatedBy user={info.row.original.createdBy} />
             <Table.ConceptBank.Text className='text-nowrap' value={info.getValue()} />
           </span>
