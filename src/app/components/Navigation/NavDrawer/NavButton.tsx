@@ -1,8 +1,8 @@
-import { FunctionComponent } from 'react';
-import styles from './drawer.module.scss';
-import NestedLink, { NestedLinkProps } from '../NestedLink/NestedLink';
-import Icon from '../../Icons/Icon/Icon';
 import { Button } from '@components';
+import { FunctionComponent } from 'react';
+import Icon from '../../Icon/Icon/Icon';
+import NestedLink, { NestedLinkProps } from '../NestedLink/NestedLink';
+import styles from './drawer.module.scss';
 
 const defaultIconProps = {
   stroke: '#7586A9',
@@ -29,7 +29,10 @@ const NavLink: FunctionComponent<NavLinkButtonProps> = ({
 }) => {
   return (
     <div className={`${styles.navLinkWrapper} ${locked ? styles.locked : ''}`}>
-      <a onClick={onClick} className={`${styles.navLink} ${isOpen ? styles.active : ''}`}>
+      <a
+        onClick={onClick}
+        className={`${styles.navLink} ${isOpen ? styles.active : ''}`}
+      >
         <div className={styles.label}>
           <Icon variant={icon} {...defaultIconProps} />
           <span>{title}</span>
@@ -40,7 +43,10 @@ const NavLink: FunctionComponent<NavLinkButtonProps> = ({
 
       {nestedRoutes ? (
         <Button.Collapsible width={'100%'} toggle={!!isOpen}>
-          {nestedRoutes && nestedRoutes.map((route, i) => <NestedLink key={`di-${route.title}-${i}`} {...route} />)}
+          {nestedRoutes &&
+            nestedRoutes.map((route, i) => (
+              <NestedLink key={`di-${route.title}-${i}`} {...route} />
+            ))}
         </Button.Collapsible>
       ) : null}
     </div>

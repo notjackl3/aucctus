@@ -72,7 +72,10 @@ const ConceptReport: FunctionComponent = () => {
             {concept?.title}
           </h1>
           <div className='ml-4 flex'>
-            <Select.ConceptStatus value={status} onChange={changeConceptStatus} />
+            <Select.ConceptStatus
+              value={status}
+              onChange={changeConceptStatus}
+            />
           </div>
         </div>
         <div className='flex gap-4'>
@@ -87,13 +90,19 @@ const ConceptReport: FunctionComponent = () => {
               Opportunity Snapshot
             </button>
           </Tooltip>
-          <button aria-label='Close Detail Page' className='btn-close' onClick={() => navigate(AppPath.ConceptBank)} />
+          <button
+            aria-label='Close Detail Page'
+            className='btn-close'
+            onClick={() => navigate(AppPath.ConceptBank)}
+          />
         </div>
       </div>
       <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
         <Container.TabView
           className=''
-          tabs={CONCEPT_TABS.filter((v) => !(v.label === 'Context' && !concept?.seed))}
+          tabs={CONCEPT_TABS.filter(
+            (v) => !(v.label === 'Context' && !concept?.seed),
+          )}
           onTabSelect={onTabSelect}
           activeTab={activeTab || ''}
         >

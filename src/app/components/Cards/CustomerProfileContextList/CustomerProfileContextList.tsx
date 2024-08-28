@@ -1,5 +1,11 @@
 import { Card, Icon } from '@components';
-import { FunctionComponent, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { useCustomerProfileUpdate } from '../../../hooks/query/concepts.hook';
 import InputField from '../../Input/InputField/InputField';
 import styles from './customer-profile-context.module.scss';
@@ -14,13 +20,9 @@ interface ICustomerProfileDetailsLists {
 
 const MAX_INPUT_LENGTH = 30;
 
-const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists> = ({
-  profileUuid,
-  title,
-  icon,
-  data,
-  field,
-}) => {
+const CustomerProfileContextList: FunctionComponent<
+  ICustomerProfileDetailsLists
+> = ({ profileUuid, title, icon, data, field }) => {
   const { mutate } = useCustomerProfileUpdate(profileUuid);
   const [list, setList] = useState(data);
   const [newItem, setNewItem] = useState('');
@@ -79,7 +81,12 @@ const CustomerProfileContextList: FunctionComponent<ICustomerProfileDetailsLists
 
   return (
     <div>
-      <Card.Detail cardClassName={styles.customerCards} title={title} icon={icon} isHideFooter>
+      <Card.Detail
+        cardClassName={styles.customerCards}
+        title={title}
+        icon={icon}
+        isHideFooter
+      >
         <div className={styles.cardContent}>
           {list.map((value, index) => (
             <CustomerProfileListItem
@@ -126,25 +133,25 @@ interface ICustomerProfileListItemProps {
   handleSave: (value: string) => void;
 }
 
-const CustomerProfileListItem: FunctionComponent<ICustomerProfileListItemProps> = ({
-  value,
-  handleDelete,
-  field,
-  handleSave,
-}) => {
+const CustomerProfileListItem: FunctionComponent<
+  ICustomerProfileListItemProps
+> = ({ value, handleDelete, field, handleSave }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [inputError, setInputError] = useState<string | undefined>();
   const [newValue, setNewValue] = useState(value);
 
   const ref = useRef<HTMLInputElement>(null);
 
-  const onInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputError(undefined);
-    if (e.target.value.length > MAX_INPUT_LENGTH) {
-      setInputError(`Max length is ${MAX_INPUT_LENGTH} characters`);
-    }
-    setNewValue(e.target.value);
-  }, []);
+  const onInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setInputError(undefined);
+      if (e.target.value.length > MAX_INPUT_LENGTH) {
+        setInputError(`Max length is ${MAX_INPUT_LENGTH} characters`);
+      }
+      setNewValue(e.target.value);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (!isEditing || !ref.current) return;
@@ -184,7 +191,9 @@ const CustomerProfileListItem: FunctionComponent<ICustomerProfileListItemProps> 
       }}
     >
       {!isEditing ? (
-        <p className={styles.text}>{field === 'quotes' ? `"${value}"` : value}</p>
+        <p className={styles.text}>
+          {field === 'quotes' ? `"${value}"` : value}
+        </p>
       ) : (
         <InputField
           ref={ref}

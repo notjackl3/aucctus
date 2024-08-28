@@ -1,7 +1,7 @@
 import { FunctionComponent, useState } from 'react';
 
+import Icon from '../../Icon/Icon/Icon';
 import styles from './styles/tablePagination.module.scss';
-import Icon from '../../Icons/Icon/Icon';
 
 export interface TablePaginationProps {
   totalPages: number;
@@ -79,7 +79,11 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
 
   const renderPageNumbers = () => {
     const pageNumbers = [];
-    for (let i = startPage; i <= Math.min(startPage + MAX_PAGES_PER_PAGE - 1, totalPages); i++) {
+    for (
+      let i = startPage;
+      i <= Math.min(startPage + MAX_PAGES_PER_PAGE - 1, totalPages);
+      i++
+    ) {
       pageNumbers.push(
         <button
           key={`table-page-${i}`}
@@ -105,7 +109,12 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
         Previous
       </button>
       <div className={styles.pageContainer}>{renderPageNumbers()}</div>
-      <button className='btn btn-light' onClick={nextPage} disabled={isNextPageDisabled} aria-label='Next Page'>
+      <button
+        className='btn btn-light'
+        onClick={nextPage}
+        disabled={isNextPageDisabled}
+        aria-label='Next Page'
+      >
         Next
         <Icon variant='arrowright' width={20} height={20} />
       </button>

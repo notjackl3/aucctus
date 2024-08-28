@@ -11,14 +11,23 @@ interface IPaginationProps {
 
 const MAX_PAGINATION_BUTTON = 7;
 
-const Pagination: React.FC<IPaginationProps> = ({ page, numberOfPages, onPageChange }) => {
+const Pagination: React.FC<IPaginationProps> = ({
+  page,
+  numberOfPages,
+  onPageChange,
+}) => {
   const handlePageChange = React.useCallback(
-    (value: number) => onPageChange(utils.number.clamp(value, 1, numberOfPages)),
+    (value: number) =>
+      onPageChange(utils.number.clamp(value, 1, numberOfPages)),
     [numberOfPages, onPageChange],
   );
 
   const renderPageNumbers = React.useCallback(() => {
-    const pageNumbers = utils.array.createPaginationNumbers(page, numberOfPages, MAX_PAGINATION_BUTTON);
+    const pageNumbers = utils.array.createPaginationNumbers(
+      page,
+      numberOfPages,
+      MAX_PAGINATION_BUTTON,
+    );
     return pageNumbers.map((value) =>
       value == '...' ? (
         <Ellipsis key={utils.string.generateRandomString(5)} />
@@ -62,16 +71,24 @@ const Ellipsis: React.FC = () => {
   return <span className='btn btn-light btn-no-border btn-no-hover'>...</span>;
 };
 
-interface PageNumberProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+interface PageNumberProps
+  extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   page: number;
 }
 
-const PageNumber = React.forwardRef<HTMLButtonElement, PageNumberProps>(({ page, className, ...props }, ref) => {
-  return (
-    <button ref={ref} className={classNames('btn btn-light btn-no-border', className)} {...props}>
-      {page}
-    </button>
-  );
-});
+// eslint-disable-next-line react/display-name
+const PageNumber = React.forwardRef<HTMLButtonElement, PageNumberProps>(
+  ({ page, className, ...props }, ref) => {
+    return (
+      <button
+        ref={ref}
+        className={classNames('btn btn-light btn-no-border', className)}
+        {...props}
+      >
+        {page}
+      </button>
+    );
+  },
+);
 
 export default Pagination;

@@ -30,11 +30,20 @@ const NavDrawer = () => {
             <NavLink to={AppPath.Home} title='Dashboard' icon='home' />
 
             <NavLink
-              to={account?.hasConcepts ? AppPath.ConceptBank : AppPath.IgniteConcept}
+              to={
+                account?.hasConcepts
+                  ? AppPath.ConceptBank
+                  : AppPath.IgniteConcept
+              }
               title='Concepts'
               icon='lightbulb'
             />
-            <NavLink to={AppPath.ChallengeCenter} title='Challenges' icon='rocket' locked />
+            <NavLink
+              to={AppPath.ChallengeCenter}
+              title='Challenges'
+              icon='rocket'
+              locked
+            />
           </div>
           <div className={styles.extras}>
             <NavLink to={AppPath.SettingsAbout} title='Settings' icon='file' />
@@ -58,7 +67,9 @@ const NavDrawer = () => {
               <span className='w-40 truncate text-base font-medium leading-tight text-slate-500'>
                 {user?.firstName || ''}
               </span>
-              <span className='w-40 truncate text-sm font-normal leading-tight text-gray-500'>{user?.email || ''}</span>
+              <span className='w-40 truncate text-sm font-normal leading-tight text-gray-500'>
+                {user?.email || ''}
+              </span>
             </div>
           </div>
         </div>

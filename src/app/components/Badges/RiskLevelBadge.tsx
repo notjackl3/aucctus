@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 
-import Icon from '../Icons/Icon/Icon';
+import Icon from '../Icon/Icon/Icon';
 
 const defaultIconProps = {
   width: 16,
@@ -16,7 +16,10 @@ export interface RiskLevelProps {
   variant: RiskLevelVariant;
 }
 
-const BADGE_VARIANT_MAP: Record<RiskLevelVariant, { style: string; icon: IconVariant }> = {
+const BADGE_VARIANT_MAP: Record<
+  RiskLevelVariant,
+  { style: string; icon: IconVariant }
+> = {
   high: {
     icon: 'alert-octagon',
     style: 'text-error-700 bg-error-50 [&>svg>use]:stroke-error-700',
@@ -31,15 +34,25 @@ const BADGE_VARIANT_MAP: Record<RiskLevelVariant, { style: string; icon: IconVar
   },
 };
 
-const RiskLevel: FunctionComponent<RiskLevelProps> = ({ badgeClassName, text, variant }) => {
+const RiskLevel: FunctionComponent<RiskLevelProps> = ({
+  badgeClassName,
+  text,
+  variant,
+}) => {
   return (
     <div
       className={`flex items-center gap-2 rounded-2xl py-[0.2rem] pl-[0.4rem] pr-2 shadow-sm ${BADGE_VARIANT_MAP[variant].style} ${
         badgeClassName ? badgeClassName : ''
       }`}
     >
-      {variant ? <Icon variant={BADGE_VARIANT_MAP[variant].icon} {...defaultIconProps} /> : null}
-      <span className={'whitespace-nowrap text-center text-sm font-medium capitalize not-italic leading-6'}>
+      {variant ? (
+        <Icon variant={BADGE_VARIANT_MAP[variant].icon} {...defaultIconProps} />
+      ) : null}
+      <span
+        className={
+          'whitespace-nowrap text-center text-sm font-medium capitalize not-italic leading-6'
+        }
+      >
         {text}
       </span>
     </div>

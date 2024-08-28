@@ -11,14 +11,21 @@ export interface IConceptStatusBubbleProps {
   status: ConceptStatus;
 }
 
-const ConceptStatusBubble: FunctionComponent<IConceptStatusBubbleProps> = ({ status }) => {
+const ConceptStatusBubble: FunctionComponent<IConceptStatusBubbleProps> = ({
+  status,
+}) => {
   const style = getConceptStatusStyles(status);
 
   return (
-    <span className={classNames('flex w-fit gap-2 rounded-2xl px-3 py-2', style.bg)}>
+    <span
+      className={classNames('flex w-fit gap-2 rounded-2xl px-3 py-2', style.bg)}
+    >
       {<span className={classNames(style.text)}>●</span>}
       <span
-        className={classNames('whitespace-nowrap text-center text-base font-medium not-italic leading-6', style.text)}
+        className={classNames(
+          'whitespace-nowrap text-center text-base font-medium not-italic leading-6',
+          style.text,
+        )}
       >
         {utils.string.camelCaseToTitleCase(status)}
       </span>

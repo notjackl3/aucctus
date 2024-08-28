@@ -1,6 +1,9 @@
 import { Card, Container, Header, Text } from '@components';
 import { useEditConcept, useEditOverview } from '@hooks/concepts/editable.hook';
-import { useConceptAssumptions, useConceptOverview } from '@hooks/query/concepts.hook';
+import {
+  useConceptAssumptions,
+  useConceptOverview,
+} from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
@@ -75,16 +78,26 @@ const OverviewDetails: FunctionComponent = () => {
 
           {/* Lists of Trends & Drives and Industries */}
           <div className='inline-flex items-start justify-between gap-3'>
-            <Container.List title='Trends & Drivers' items={overview?.trendsAndDrivers || []} />
-            <Container.List title='Industries' items={overview?.industries || []} />
+            <Container.List
+              title='Trends & Drivers'
+              items={overview?.trendsAndDrivers || []}
+            />
+            <Container.List
+              title='Industries'
+              items={overview?.industries || []}
+            />
           </div>
         </div>
       </section>
 
-      <section className={`inline-flex flex-wrap items-center justify-start gap-6 pt-8`}>
+      <section
+        className={`inline-flex flex-wrap items-center justify-start gap-6 pt-8`}
+      >
         <Card.CustomerProfiles
           profile={firstCustomerPersona}
-          onViewProfilesClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
+          onViewProfilesClick={() =>
+            navigateToTab(AppPath.ConceptFinancialProjection)
+          }
         />
 
         <Card.FinancialProjects

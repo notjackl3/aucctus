@@ -9,9 +9,8 @@
     "build": "vite build",
     "build:debug": "vite build --debug",
     "preview": "vite preview",
-    "format": "prettier --write .",
+    "format": "prettier --config ./.prettierrc --write .",
     "lint": "eslint .",
-    "formate": "prettier --write .",
     "prettier-check": "prettier --check .",
     "type-check": "tsc",
     "lint-staged": "lint-staged --config lint-staged.js",
@@ -19,7 +18,8 @@
     "prepare": "husky",
     "generate-sprite-svg": "svg-sprite --config=svg-sprite.config.json icons/*.svg",
     "generate-icon-types": "node scripts/generate-icon-types.js",
-    "generate-sprite": "npm run generate-sprite-svg && npm run generate-icon-types"
+    "icon-hash-buster": "node scripts/modify-icon-hash.js",
+    "generate-sprite": "npm run generate-sprite-svg && npm run generate-icon-types && npm run icon-hash-buster"
   },
   "dependencies": {
     "@floating-ui/react-dom": "^2.1.1",
@@ -76,7 +76,6 @@
     "lint-staged": "^15.2.2",
     "postcss": "^8.4.38",
     "prettier": "^3.2.5",
-    "prettier-config-nick": "^1.0.2",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "sass": "^1.72.0",
     "svg-sprite": "^2.0.4",

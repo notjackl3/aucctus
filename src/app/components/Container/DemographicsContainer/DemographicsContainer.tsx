@@ -1,10 +1,10 @@
 import { FunctionComponent } from 'react';
 
-import styles from './demographics-container.module.scss';
-import Icon from '../../Icons/Icon/Icon';
-import { useModal } from '../../../context/ModalContextProvider';
-import EditCustomerProfileDemographics from '../../Modal/CustomerProfile/EditCustomerProfileDemographics';
 import { ICustomerProfile } from '../../../../libs/api/types';
+import { useModal } from '../../../context/ModalContextProvider';
+import Icon from '../../Icon/Icon/Icon';
+import EditCustomerProfileDemographics from '../../Modal/CustomerProfile/EditCustomerProfileDemographics';
+import styles from './demographics-container.module.scss';
 
 const iconDefaultProps = {
   height: 20,
@@ -17,7 +17,10 @@ interface IDemographicsContainerProps {
   canEdit?: boolean;
 }
 
-const DemographicsContainer: FunctionComponent<IDemographicsContainerProps> = ({ profile, canEdit = false }) => {
+const DemographicsContainer: FunctionComponent<IDemographicsContainerProps> = ({
+  profile,
+  canEdit = false,
+}) => {
   const { openModal } = useModal();
 
   return (

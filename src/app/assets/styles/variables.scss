@@ -1,4 +1,7 @@
-$shadow-100: (0px 1px 2px 0px rgba(16, 24, 40, 0.06), 0px 1px 3px 0px rgba(16, 24, 40, 0.1)) !default;
+$shadow-100: (
+  0px 1px 2px 0px rgba(16, 24, 40, 0.06),
+  0px 1px 3px 0px rgba(16, 24, 40, 0.1)
+) !default;
 
 // Dimensions
 $nav-drawer-width: 15.5rem;
@@ -56,7 +59,10 @@ $br-9xs: 4px;
 $br-9xl: 28px;
 
 // Effects
-$shadow-100: (0px 1px 2px 0px rgba(16, 24, 40, 0.06), 0px 1px 3px 0px rgba(16, 24, 40, 0.1)) !default;
+$shadow-100: (
+  0px 1px 2px 0px rgba(16, 24, 40, 0.06),
+  0px 1px 3px 0px rgba(16, 24, 40, 0.1)
+) !default;
 $shadow-xs: 0px 1px 2px rgba(16, 24, 40, 0.05);
 $shadow-3xl: 0px 32px 64px -12px rgba(16, 24, 40, 0.14);
 $shadow-lg:

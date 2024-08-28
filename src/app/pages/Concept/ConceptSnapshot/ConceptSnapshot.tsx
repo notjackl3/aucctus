@@ -1,4 +1,4 @@
-import Icon from '@components/Icons/Icon/Icon';
+import Icon from '@components/Icon/Icon/Icon';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -17,12 +17,19 @@ const ConceptSnapshot: FunctionComponent = () => {
     <div className={styles.conceptSnapshot}>
       <div className={styles.container}>
         <div className={styles.header}>
-          <img alt='Ignite!' style={{ width: 172, height: 128 }} src={igniteIcon} />
+          <img
+            alt='Ignite!'
+            style={{ width: 172, height: 128 }}
+            src={igniteIcon}
+          />
           <div className={styles.supportingText}>
             <h1 className={styles.title}>Opportunity Snapshot downloaded</h1>
           </div>
         </div>
-        <button className={`btn btn-bold btn-no-border`} onClick={() => navigate(AppPath.Concept)}>
+        <button
+          className={`btn btn-bold btn-no-border`}
+          onClick={() => navigate(AppPath.Concept)}
+        >
           <Icon variant='chevronleft' {...defaultIconProps} />
           <span>Back to Concepts</span>
         </button>

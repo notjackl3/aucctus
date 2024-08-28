@@ -5,7 +5,15 @@ import styles from './confirmation-modal.module.scss';
 interface IActionButton {
   title: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  variant: 'primary' | 'secondary' | 'danger' | 'warning' | 'success' | 'info' | 'light' | 'dark';
+  variant:
+    | 'primary'
+    | 'secondary'
+    | 'danger'
+    | 'warning'
+    | 'success'
+    | 'info'
+    | 'light'
+    | 'dark';
 }
 
 interface IConfirmationModalProps {
@@ -15,7 +23,11 @@ interface IConfirmationModalProps {
   actions: IActionButton[];
 }
 
-const ConfirmationModal: FunctionComponent<IConfirmationModalProps> = ({ title, subtitle, actions }) => {
+const ConfirmationModal: FunctionComponent<IConfirmationModalProps> = ({
+  title,
+  subtitle,
+  actions,
+}) => {
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -24,7 +36,11 @@ const ConfirmationModal: FunctionComponent<IConfirmationModalProps> = ({ title, 
       </div>
       <div className={styles.actions}>
         {actions.map((action, index) => (
-          <button key={index} className={`btn btn-${action.variant}`} onClick={action.onClick}>
+          <button
+            key={index}
+            className={`btn btn-${action.variant}`}
+            onClick={action.onClick}
+          >
             {action.title}
           </button>
         ))}

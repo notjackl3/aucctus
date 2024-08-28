@@ -41,7 +41,10 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
   xLeftLabel,
 }) => {
   const activeCoordinate = useMemo(
-    () => chartCoordinates.find((coordinate) => coordinate.id && coordinate.id === selectedCoordinate),
+    () =>
+      chartCoordinates.find(
+        (coordinate) => coordinate.id && coordinate.id === selectedCoordinate,
+      ),
     [chartCoordinates, selectedCoordinate],
   );
 
@@ -64,7 +67,9 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
       );
     });
     // Move the selected circle to the end of the chartDots array so that it will render on top.
-    const selectedIndex = chartDots.findIndex((circle) => circle.props.id === selectedCoordinate);
+    const selectedIndex = chartDots.findIndex(
+      (circle) => circle.props.id === selectedCoordinate,
+    );
     const removedElement = chartDots.splice(selectedIndex, 1);
     if (removedElement.length) {
       chartDots.push(removedElement[0]);
@@ -74,7 +79,10 @@ const QuadrantChart: FunctionComponent<QuadrantChartProps> = ({
 
   return (
     <div className={styles.quadrantChart}>
-      <svg viewBox={`0 0 ${CHART_WIDTH} ${CHART_WIDTH}`} xmlns='http://www.w3.org/2000/svg'>
+      <svg
+        viewBox={`0 0 ${CHART_WIDTH} ${CHART_WIDTH}`}
+        xmlns='http://www.w3.org/2000/svg'
+      >
         <QuadrantChartGrid numberGridLines={10} spacing={200} />
         <line
           x1={CHART_CENTER_WIDTH}

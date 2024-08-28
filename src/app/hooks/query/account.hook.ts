@@ -2,7 +2,13 @@ import { IUserQueryOptions } from '@libs/api/endpoints';
 import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../libs/api';
-import { IAccount, IFormError, IRegisterAccount, IUser, IUserDetailsResponse } from '../../../libs/api/types';
+import {
+  IAccount,
+  IFormError,
+  IRegisterAccount,
+  IUser,
+  IUserDetailsResponse,
+} from '../../../libs/api/types';
 import { useAppStore } from '../../stores/app.store';
 import { AucctusQueryKeys } from './query-keys';
 
@@ -38,7 +44,13 @@ export const useUserDetails = (enabled: boolean) => {
 export const useAllUsers = (options?: IUserQueryOptions) => {
   const query = useQuery({
     queryKey: options
-      ? [AucctusQueryKeys.allUsers, options.email, options.firstName, options.lastName, options.search]
+      ? [
+          AucctusQueryKeys.allUsers,
+          options.email,
+          options.firstName,
+          options.lastName,
+          options.search,
+        ]
       : [AucctusQueryKeys.allUsers],
     queryFn: async () => await api.account.getAllUser(options),
     cacheTime: Infinity,
@@ -65,20 +77,34 @@ export const useDashboard = () => {
 
 export const useRegisterAccount = () => {
   const queryClient = useQueryClient();
-  return useMutation<IAccount, AxiosError<IFormError>, IRegisterAccount, unknown>({
+  return useMutation<
+    IAccount,
+    AxiosError<IFormError>,
+    IRegisterAccount,
+    unknown
+  >({
     mutationFn: async (details) => await api.account.createAccount(details),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.userDetails] });
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.userDetails],
+      });
     },
   });
 };
 
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
-  return useMutation<IUserDetailsResponse, AxiosError<IFormError>, Partial<IUser>, unknown>({
+  return useMutation<
+    IUserDetailsResponse,
+    AxiosError<IFormError>,
+    Partial<IUser>,
+    unknown
+  >({
     mutationFn: async (userObj) => await api.account.updateUser(userObj),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.userDetails] });
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.userDetails],
+      });
     },
   });
 };

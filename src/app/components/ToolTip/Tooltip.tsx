@@ -11,14 +11,17 @@ const Tooltip: FunctionComponent<TooltipProps> = ({ tip, children }) => {
   const [isActive, setActive] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (ref.current) {
-      const rect = e.currentTarget.getBoundingClientRect();
-      const x = e.clientX - rect.left - ref.current.clientWidth / 2;
-      const y = e.clientY - rect.top - ref.current.clientHeight * 2.8;
-      ref.current.style.transform = `translate(${x}px, ${y}px)`;
-    }
-  }, []);
+  const handleMouseMove = useCallback(
+    (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      if (ref.current) {
+        const rect = e.currentTarget.getBoundingClientRect();
+        const x = e.clientX - rect.left - ref.current.clientWidth / 2;
+        const y = e.clientY - rect.top - ref.current.clientHeight * 2.8;
+        ref.current.style.transform = `translate(${x}px, ${y}px)`;
+      }
+    },
+    [],
+  );
 
   return (
     <div
@@ -28,7 +31,10 @@ const Tooltip: FunctionComponent<TooltipProps> = ({ tip, children }) => {
       onMouseMove={handleMouseMove}
     >
       {children}
-      <div ref={ref} className={`${styles.tooltip} ${styles.top} ${!isActive ? styles.inActive : ''}`}>
+      <div
+        ref={ref}
+        className={`${styles.tooltip} ${styles.top} ${!isActive ? styles.inActive : ''}`}
+      >
         <span>{tip}</span>
       </div>
     </div>

@@ -14,14 +14,18 @@ interface IFilterMenubarProps {
   updateFilterOptions: (value: Partial<IConceptFilterOptions>) => void;
 }
 
-const FilterMenubar: React.FC<IFilterMenubarProps> = ({ filterOptions, updateFilterOptions }) => {
+const FilterMenubar: React.FC<IFilterMenubarProps> = ({
+  filterOptions,
+  updateFilterOptions,
+}) => {
   const [search, setSearch] = React.useState<string>('');
   const { users } = useAllUsers({ search });
 
   const menuItemClass =
     'group hover:outline-none hover:bg-primary-400 p-1.5 rounded-md hover:text-white hover:[&>svg]:stroke-white focus-visible:outline-none focus:outline-none';
   const userMenuItemClassName = `flex flex-row h-16 items-center py-2 px-3 gap-2 bg-white`;
-  const spanClassName = 'truncate text-base font-medium leading-tight text-slate-500 group-hover:text-white';
+  const spanClassName =
+    'truncate text-base font-medium leading-tight text-slate-500 group-hover:text-white';
 
   const createStatusCheckItem = React.useCallback(
     (value: ConceptStatus) => (
@@ -46,7 +50,9 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({ filterOptions, updateFil
           }}
         />
         <label
-          className={'text-base font-medium leading-tight text-slate-500 group-hover:text-white'}
+          className={
+            'text-base font-medium leading-tight text-slate-500 group-hover:text-white'
+          }
           htmlFor={`filter-status-${value}`}
         >
           {utils.string.camelCaseToTitleCase(value)}
@@ -75,7 +81,9 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({ filterOptions, updateFil
                   className='flex w-auto flex-col gap-1 rounded-md bg-white p-3 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
                   alignOffset={-5}
                 >
-                  {CONCEPT_STATUS_LIST.map((value) => createStatusCheckItem(value))}
+                  {CONCEPT_STATUS_LIST.map((value) =>
+                    createStatusCheckItem(value),
+                  )}
                 </Menubar.SubContent>
               </Menubar.Portal>
             </Menubar.Sub>
@@ -100,7 +108,8 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({ filterOptions, updateFil
                   <div className='max-h-80 min-h-[240px] overflow-y-scroll rounded-lg bg-gray-50 p-2'>
                     {users.length > 0 ? (
                       users.map((user) => {
-                        const filterCreatedByIsUser = user.uuid === filterOptions.createdBy?.uuid;
+                        const filterCreatedByIsUser =
+                          user.uuid === filterOptions.createdBy?.uuid;
 
                         return (
                           <Menubar.Item
@@ -116,22 +125,39 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({ filterOptions, updateFil
                             key={`uf-${user.uuid}`}
                             disabled
                             onClick={() => {
-                              let value: Partial<IConceptFilterOptions> = { createdBy: undefined };
+                              let value: Partial<IConceptFilterOptions> = {
+                                createdBy: undefined,
+                              };
                               if (!filterCreatedByIsUser) {
                                 value.createdBy = user;
                               }
                               updateFilterOptions(value);
                             }}
                           >
-                            <Avatar firstName={user.firstName} lastName={user.lastName} src={user.profileImage} />
-                            <span className={classNames([spanClassName, { 'text-white': filterCreatedByIsUser }])}>
+                            <Avatar
+                              firstName={user.firstName}
+                              lastName={user.lastName}
+                              src={user.profileImage}
+                            />
+                            <span
+                              className={classNames([
+                                spanClassName,
+                                { 'text-white': filterCreatedByIsUser },
+                              ])}
+                            >
                               {utils.account.getUsersFullName(user)}
                             </span>
                           </Menubar.Item>
                         );
                       })
                     ) : (
-                      <Menubar.Item className={classNames([menuItemClass, userMenuItemClassName])} disabled>
+                      <Menubar.Item
+                        className={classNames([
+                          menuItemClass,
+                          userMenuItemClassName,
+                        ])}
+                        disabled
+                      >
                         <span className={spanClassName}>No Users Found</span>
                       </Menubar.Item>
                     )}

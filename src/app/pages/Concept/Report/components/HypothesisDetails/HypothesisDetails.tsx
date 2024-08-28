@@ -1,11 +1,16 @@
-import QuadrantChart, { ChartPoint } from '@components/Charts/QuadrantChart/QuadrantChart';
-import Icon from '@components/Icons/Icon/Icon';
+import QuadrantChart, {
+  ChartPoint,
+} from '@components/Charts/QuadrantChart/QuadrantChart';
+import Icon from '@components/Icon/Icon/Icon';
 import Loading from '@components/Loading';
 import AddKeyAssumptionModal from '@components/Modal/KeyAssumtionModal/AddKeyAssumptionModal';
 import TablePagination from '@components/Tables/TablePagination';
 import { useModal } from '@context/ModalContextProvider';
 import { useKeyAssumptions } from '@hooks/query/concepts.hook';
-import { getAssumptionActiveHexColor, getAssumptionHexColor } from '@libs/utils/concepts';
+import {
+  getAssumptionActiveHexColor,
+  getAssumptionHexColor,
+} from '@libs/utils/concepts';
 import {
   PaginationState,
   RowSelectionState,
@@ -94,7 +99,12 @@ const HypothesisDetails: FunctionComponent = () => {
                 <tr key={headerGroup.id}>
                   {headerGroup.headers.map((header) => (
                     <th key={header.id} style={{ width: header.getSize() }}>
-                      {header.isPlaceholder ? null : flexRender(header.column.columnDef.header, header.getContext())}
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                     </th>
                   ))}
                 </tr>
@@ -109,15 +119,25 @@ const HypothesisDetails: FunctionComponent = () => {
                 {table.getRowModel().rows.map((row) => (
                   <tr
                     key={row.id}
-                    className={rowSelection?.hasOwnProperty(row.id) ? styles.selected : ''}
+                    className={
+                      rowSelection?.hasOwnProperty(row.id)
+                        ? styles.selected
+                        : ''
+                    }
                     onClick={(e) => {
                       e.stopPropagation();
                       row.getToggleSelectedHandler()(e);
                     }}
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <td style={{ width: cell.column.getSize() }} key={cell.id}>
-                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      <td
+                        style={{ width: cell.column.getSize() }}
+                        key={cell.id}
+                      >
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
                       </td>
                     ))}
                   </tr>

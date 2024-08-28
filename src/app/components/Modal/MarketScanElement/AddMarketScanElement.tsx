@@ -16,7 +16,12 @@ import styles from './edit-trends-and-driver.module.scss';
 
 interface EditTrendsAndDriverProps {
   addItem:
-    | UseMutateFunction<Ecosystem, AxiosError<IFormError<Ecosystem>, any>, IEcosystemCreate, unknown>
+    | UseMutateFunction<
+        Ecosystem,
+        AxiosError<IFormError<Ecosystem>, any>,
+        IEcosystemCreate,
+        unknown
+      >
     | UseMutateFunction<
         ITrendsAndDrivers,
         AxiosError<IFormError<ITrendsAndDrivers>, any>,
@@ -29,48 +34,62 @@ interface EditTrendsAndDriverProps {
 const NAME_MAX_LENGTH = 36;
 const DESCRIPTION_MAX_LENGTH = 500;
 
-const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ addItem, ecosystemType }) => {
+const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({
+  addItem,
+  ecosystemType,
+}) => {
   const { closeModal } = useModal();
   const [name, setName] = useState('');
   const [nameError, setNameError] = useState<string | undefined>();
   const [source, setSource] = useState('');
   const [sourceError, setSourceError] = useState<string | undefined>();
   const [description, setDescription] = useState('');
-  const [descriptionError, setDescriptionError] = useState<string | undefined>();
+  const [descriptionError, setDescriptionError] = useState<
+    string | undefined
+  >();
 
-  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target.value;
 
-    setNameError(undefined);
+      setNameError(undefined);
 
-    if (input.length === 0) {
-      setNameError('Title is required.');
-    } else if (input.length > NAME_MAX_LENGTH) {
-      setNameError('Title exceeds the maximum allowed length.');
-    }
+      if (input.length === 0) {
+        setNameError('Title is required.');
+      } else if (input.length > NAME_MAX_LENGTH) {
+        setNameError('Title exceeds the maximum allowed length.');
+      }
 
-    setName(input);
-  }, []);
+      setName(input);
+    },
+    [],
+  );
 
-  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const input = e.target.value;
+  const handleDescriptionChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const input = e.target.value;
 
-    setDescriptionError(undefined);
+      setDescriptionError(undefined);
 
-    if (input.length === 0) {
-      setDescriptionError('Description is required.');
-    } else if (input.length > DESCRIPTION_MAX_LENGTH) {
-      setDescriptionError('Description exceeds the maximum allowed length.');
-    }
+      if (input.length === 0) {
+        setDescriptionError('Description is required.');
+      } else if (input.length > DESCRIPTION_MAX_LENGTH) {
+        setDescriptionError('Description exceeds the maximum allowed length.');
+      }
 
-    setDescription(input);
-  }, []);
+      setDescription(input);
+    },
+    [],
+  );
 
-  const handleSourceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSourceError(undefined);
-    let d = e.target.value;
-    setSource(d);
-  }, []);
+  const handleSourceChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSourceError(undefined);
+      let d = e.target.value;
+      setSource(d);
+    },
+    [],
+  );
 
   const handleSave = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -83,10 +102,14 @@ const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ add
 
       // If ecosystemType is defined, it means we are adding an ecosystem cast the addItem function to the correct type
       if (ecosystemType) {
-        (addItem as UseMutateFunction<Ecosystem, AxiosError<IFormError<Ecosystem>, any>, IEcosystemCreate, unknown>)(
-          { name, description, source, ecosystemType },
-          options,
-        );
+        (
+          addItem as UseMutateFunction<
+            Ecosystem,
+            AxiosError<IFormError<Ecosystem>, any>,
+            IEcosystemCreate,
+            unknown
+          >
+        )({ name, description, source, ecosystemType }, options);
       } else {
         (
           addItem as UseMutateFunction<
@@ -108,7 +131,11 @@ const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ add
     <div className={styles.container}>
       <div className={styles.header}>
         <div />
-        <button aria-label='Close' className={'btn-close'} onClick={() => closeModal()} />
+        <button
+          aria-label='Close'
+          className={'btn-close'}
+          onClick={() => closeModal()}
+        />
       </div>
       <div className={styles.content}>
         <InputField
@@ -144,7 +171,14 @@ const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ add
         </button>
         <button
           className='btn btn-primary'
-          disabled={!name || !description || !source || !!nameError || !!descriptionError || !!sourceError}
+          disabled={
+            !name ||
+            !description ||
+            !source ||
+            !!nameError ||
+            !!descriptionError ||
+            !!sourceError
+          }
           onClick={handleSave}
         >
           Save

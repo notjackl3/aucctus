@@ -6,7 +6,11 @@ module.exports = {
     sourceType: 'module',
   },
   plugins: ['@typescript-eslint', 'react', 'react-hooks', 'prettier'],
-  // extends: ["plugin:react/recommended", "plugin:react-hooks/recommended"],
+  extends: [
+    'plugin:react/recommended',
+    'plugin:react-hooks/recommended',
+    'prettier',
+  ],
   rules: {
     'no-use-before-define': 'off',
     'no-unused-vars': 'off',
@@ -39,4 +43,4 @@ module.exports = {
       },
     },
   ],
-};
+}

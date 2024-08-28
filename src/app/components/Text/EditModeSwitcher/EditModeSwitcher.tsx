@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
-import Icon from '../../Icons/Icon/Icon';
+import Icon from '../../Icon/Icon/Icon';
 import TextArea from '../../Input/TextArea/TextArea';
 import styles from './edit-mode-switcher.module.scss'; // Import the SCSS module
 
@@ -94,9 +94,15 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
 
       if (e.key === 'Enter' && e.shiftKey) {
         // Add a new line to the text
-        onChange && onChange({ target: { value: `${value}\n` } } as React.ChangeEvent<HTMLTextAreaElement>);
+        onChange &&
+          onChange({
+            target: { value: `${value}\n` },
+          } as React.ChangeEvent<HTMLTextAreaElement>);
         e.preventDefault(); // Prevent the default action
-      } else if (e.key === 'Enter' || ((e.metaKey || e.ctrlKey) && e.key === 's')) {
+      } else if (
+        e.key === 'Enter' ||
+        ((e.metaKey || e.ctrlKey) && e.key === 's')
+      ) {
         handleSave && handleSave();
         setIsEditing(false);
       }

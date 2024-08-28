@@ -32,7 +32,10 @@ export const useAppStore = create<AppStoreState>()(
     {
       name: 'app-store',
       storage: createJSONStorage(() => sessionStorage),
-      partialize: (state) => ({ user: state.user, initialized: state.initialized }),
+      partialize: (state) => ({
+        user: state.user,
+        initialized: state.initialized,
+      }),
     },
   ),
 );

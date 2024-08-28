@@ -6,8 +6,14 @@ export function removeMiddleItems<T>(array: T[], n: number): T[] {
   return array;
 }
 
-function createArrayFromRange(startNumber: number, endNumber: number): number[] {
-  return Array.from({ length: endNumber - startNumber + 1 }, (_, index) => startNumber + index);
+function createArrayFromRange(
+  startNumber: number,
+  endNumber: number,
+): number[] {
+  return Array.from(
+    { length: endNumber - startNumber + 1 },
+    (_, index) => startNumber + index,
+  );
 }
 
 export function createPaginationNumbers(

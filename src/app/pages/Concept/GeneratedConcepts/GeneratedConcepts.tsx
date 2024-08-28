@@ -1,7 +1,10 @@
 import { Loading, Table } from '@components';
-import Icon from '@components/Icons/Icon/Icon';
+import Icon from '@components/Icon/Icon/Icon';
 import IgniteLoading from '@components/IgniteLoading';
-import { useConceptIgnition, useSaveGeneratedConcepts } from '@hooks/query/concepts.hook';
+import {
+  useConceptIgnition,
+  useSaveGeneratedConcepts,
+} from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import React, { FunctionComponent, useCallback } from 'react';
@@ -11,11 +14,19 @@ import styles from './styles/generatedConcepts.module.scss';
 
 const GeneratedConcepts: FunctionComponent = () => {
   const navigate = useNavigate();
-  const { mutate: igniteConcept, isLoading: isGenerateLoading } = useConceptIgnition();
-  const { mutate: saveConcepts, isLoading: isSaveLoading } = useSaveGeneratedConcepts();
-  const { generatedConcepts: concepts, seed, clear, setGeneratedConcepts } = useConceptGenerationStore();
+  const { mutate: igniteConcept, isLoading: isGenerateLoading } =
+    useConceptIgnition();
+  const { mutate: saveConcepts, isLoading: isSaveLoading } =
+    useSaveGeneratedConcepts();
+  const {
+    generatedConcepts: concepts,
+    seed,
+    clear,
+    setGeneratedConcepts,
+  } = useConceptGenerationStore();
 
-  const { table, hasSelectedConcepts, selectedConcepts } = useGeneratedConcepts();
+  const { table, hasSelectedConcepts, selectedConcepts } =
+    useGeneratedConcepts();
 
   const handleSaveConcepts = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -41,7 +52,11 @@ const GeneratedConcepts: FunctionComponent = () => {
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.preventDefault();
       igniteConcept(
-        { attributes: seed.attributes || [], numberOfConcepts: 10, type: seed.type || 'UNKNOWN' },
+        {
+          attributes: seed.attributes || [],
+          numberOfConcepts: 10,
+          type: seed.type || 'UNKNOWN',
+        },
         {
           onSuccess: (response) => {
             setGeneratedConcepts([...response.concepts, ...concepts]);
@@ -56,18 +71,25 @@ const GeneratedConcepts: FunctionComponent = () => {
     <React.Fragment>
       <div className={`${styles.generatedConcepts} flex min-h-screen flex-col`}>
         {isGenerateLoading ? (
-          <IgniteLoading title='Generating Concepts' subtitle='This process takes about 10 seconds, please wait.' />
+          <IgniteLoading
+            title='Generating Concepts'
+            subtitle='This process takes about 10 seconds, please wait.'
+          />
         ) : (
           <>
             <div className={styles.headerSection}>
               <div className={styles.header}>
                 <h1>Generated Concepts</h1>
                 <span className={styles.supportingText}>
-                  From the list below, choose the top concepts that you want to keep and continue building on
+                  From the list below, choose the top concepts that you want to
+                  keep and continue building on
                 </span>
               </div>
               <div className={styles.actions}>
-                <button className='btn btn-light' onClick={handleGenerateConcepts}>
+                <button
+                  className='btn btn-light'
+                  onClick={handleGenerateConcepts}
+                >
                   <Icon variant='refresh' /> Generate more
                 </button>
               </div>
@@ -82,7 +104,11 @@ const GeneratedConcepts: FunctionComponent = () => {
                     disabled={!hasSelectedConcepts || isSaveLoading}
                     onClick={handleSaveConcepts}
                   >
-                    {isSaveLoading ? <Loading isSmall /> : `Save ${selectedConcepts.length} Concepts`}
+                    {isSaveLoading ? (
+                      <Loading isSmall />
+                    ) : (
+                      `Save ${selectedConcepts.length} Concepts`
+                    )}
                   </button>
                 </div>
               }

@@ -26,8 +26,11 @@ import { IGeneratedConceptsSaveBody } from '../../../libs/api/concepts';
 import { IIgniteConceptBody } from '../../../libs/api/igniteConcepts';
 import { AucctusQueryKeys } from './query-keys';
 
-export type PartialConceptWithRequiredUuid = Partial<IConcept> & { uuid: string };
-export type PartialConceptOverviewWithRequiredUuid = Partial<IConceptOverview> & { uuid: string };
+export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
+  uuid: string;
+};
+export type PartialConceptOverviewWithRequiredUuid =
+  Partial<IConceptOverview> & { uuid: string };
 
 /**
  * Custom hook for fetching list concepts.
@@ -49,7 +52,10 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
     cacheTime: Infinity,
     staleTime: 1000 * 60 * 2, // 2 minute
     refetchInterval: (data?: IConceptPage) => {
-      return data && data.results.some((concept) => concept.reportStatus === 'pending') ? 5000 : false;
+      return data &&
+        data.results.some((concept) => concept.reportStatus === 'pending')
+        ? 5000
+        : false;
     },
     queryFn: async () => await api.concept.getConcepts(queryOptions),
   });
@@ -66,7 +72,14 @@ export const useConceptSeed = (uuid: string) => {
 
   return {
     ...query,
-    seed: query.data || { attributes: [], type: 'UNKNOWN', createdBy: '', uuid: '', createdAt: '', updatedAt: '' },
+    seed: query.data || {
+      attributes: [],
+      type: 'UNKNOWN',
+      createdBy: '',
+      uuid: '',
+      createdAt: '',
+      updatedAt: '',
+    },
   };
 };
 
@@ -175,7 +188,8 @@ export const useConceptCustomerProfile = (profileUuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptCustomerProfile, profileUuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
-    queryFn: async () => await api.concept.getConceptCustomerProfile(profileUuid),
+    queryFn: async () =>
+      await api.concept.getConceptCustomerProfile(profileUuid),
     enabled: !!profileUuid,
   });
 
@@ -226,20 +240,33 @@ export const useConceptAssumptions = (uuid: string) => {
  * @returns A mutation function that can be used to update the concept.
  */
 const createConceptMutation = () => {
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   const queryClient = useQueryClient();
 
   // Helper function to create mutations with common onSuccess and onError callbacks
-  return <TData extends IConcept = IConcept, TError extends IFormError = IFormError<IConcept>, TVariables = unknown>(
+  return <
+    TData extends IConcept = IConcept,
+    TError extends IFormError = IFormError<IConcept>,
+    TVariables = unknown,
+  >(
     mutationFn: (variables: TVariables) => Promise<TData>,
   ) => {
     return useMutation<TData, AxiosError<TError>, TVariables>({
       mutationFn,
       onSuccess: (data) => {
         Promise.all([
-          queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.userDetails] }),
-          queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] }),
-          queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.dashboard] }),
-          queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concept, data.uuid] }),
+          queryClient.invalidateQueries({
+            queryKey: [AucctusQueryKeys.userDetails],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [AucctusQueryKeys.concepts],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [AucctusQueryKeys.dashboard],
+          }),
+          queryClient.invalidateQueries({
+            queryKey: [AucctusQueryKeys.concept, data.uuid],
+          }),
         ]);
       },
       onError: (e) => {
@@ -255,9 +282,11 @@ const createConceptMutation = () => {
  * @returns The result of the useMutation hook.
  */
 export const useConceptUpdate = () => {
-  return createConceptMutation()<IConcept, IFormError<IConcept>, PartialConceptWithRequiredUuid>(
-    async (concept) => await api.concept.updateConcept(concept, concept.uuid),
-  );
+  return createConceptMutation()<
+    IConcept,
+    IFormError<IConcept>,
+    PartialConceptWithRequiredUuid
+  >(async (concept) => await api.concept.updateConcept(concept, concept.uuid));
 };
 
 /**
@@ -347,11 +376,17 @@ export const useEcosystemCreate = (conceptUuid: string) => {
   );
 };
 
-export const useCustomerProfileUpdate = (profileUuid: string, conceptUuid?: string) => {
+export const useCustomerProfileUpdate = (
+  profileUuid: string,
+  conceptUuid?: string,
+) => {
   const conceptProfileListQueryKey = conceptUuid
     ? [AucctusQueryKeys.conceptCustomerProfiles, conceptUuid]
     : [AucctusQueryKeys.conceptCustomerProfiles];
-  const queryKeys = [conceptProfileListQueryKey, [AucctusQueryKeys.conceptCustomerProfile, profileUuid]];
+  const queryKeys = [
+    conceptProfileListQueryKey,
+    [AucctusQueryKeys.conceptCustomerProfile, profileUuid],
+  ];
   return useGenericConceptMutate<ICustomerProfile>(
     (data) => api.concept.updateConceptCustomerProfile(data.uuid, data),
     queryKeys,

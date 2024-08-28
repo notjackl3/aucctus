@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
+import Tooltip from '../../Icon/Tooltip/Tooltip';
 import styles from './styles/rowInfo.module.scss';
-import Tooltip from '../../Icons/Tooltip/Tooltip';
 
 export interface RowInfoProps {
   label: string;
@@ -10,7 +10,12 @@ export interface RowInfoProps {
   tooltipContent?: string;
 }
 
-const RowInfo: FunctionComponent<RowInfoProps> = ({ label, sublabel, render, tooltipContent }) => {
+const RowInfo: FunctionComponent<RowInfoProps> = ({
+  label,
+  sublabel,
+  render,
+  tooltipContent,
+}) => {
   return (
     <div className={styles.rowInfo}>
       <div className={styles.rowInfoDescription}>

@@ -1,7 +1,11 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
 import { endpoints } from './endpoints';
-import { IConceptSeedAttribute, IConceptSeedBase, IGeneratedConcept } from './types'; // Import the missing type
+import {
+  IConceptSeedAttribute,
+  IConceptSeedBase,
+  IGeneratedConcept,
+} from './types'; // Import the missing type
 
 /**
  * Concept Ignite API
@@ -13,7 +17,8 @@ export interface IConceptGenerateResponse {
   seed: IConceptSeedAttribute[];
 }
 
-export interface IIgniteConceptBody extends Omit<IConceptSeedBase, 'createdBy'> {
+export interface IIgniteConceptBody
+  extends Omit<IConceptSeedBase, 'createdBy'> {
   numberOfConcepts?: number;
 }
 

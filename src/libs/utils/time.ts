@@ -1,4 +1,7 @@
-export function dateFormatter(info: string, formattingOptions: Intl.DateTimeFormatOptions = {}) {
+export function dateFormatter(
+  info: string,
+  formattingOptions: Intl.DateTimeFormatOptions = {},
+) {
   const date = new Date(info);
   const now = new Date();
   const differenceInSeconds = (now.getTime() - date.getTime()) / 1000;

@@ -3,7 +3,7 @@ import Select, { StylesConfig } from 'react-select';
 import { toast } from 'react-toastify';
 import { IUser } from '../../../../libs/api/types';
 import defaultAvatar from '../../../assets/img/avatar.png';
-import Icon from '../../../components/Icons/Icon/Icon';
+import Icon from '../../../components/Icon/Icon/Icon';
 import InputField from '../../../components/Input/InputField/InputField';
 import Loading from '../../../components/Loading';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
@@ -122,7 +122,9 @@ const AboutDetails: FunctionComponent = () => {
       <div className={styles.headerSection}>
         <div className={styles.headerDescription}>
           <h3 className={styles.headerTitle}>Personal Info</h3>
-          <div className={styles.headerSubtitle}>Update your photo and personal details here.</div>
+          <div className={styles.headerSubtitle}>
+            Update your photo and personal details here.
+          </div>
         </div>
         <div className={styles.headerActions}>
           {!isFormDisabled && (
@@ -151,7 +153,11 @@ const AboutDetails: FunctionComponent = () => {
               Edit
             </button>
           ) : (
-            <button className={`btn btn-primary btn-bold`} type='submit' disabled={isLoading}>
+            <button
+              className={`btn btn-primary btn-bold`}
+              type='submit'
+              disabled={isLoading}
+            >
               <Icon variant='save' {...defaultIconProps} />
               Save
             </button>

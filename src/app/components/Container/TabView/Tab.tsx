@@ -26,7 +26,14 @@ function getTabStyle(variant: TabVariant) {
   }
 }
 
-const Tab: FunctionComponent<ITabProps> = ({ label, value, isActive, className, onSelect, variant = 'default' }) => {
+const Tab: FunctionComponent<ITabProps> = ({
+  label,
+  value,
+  isActive,
+  className,
+  onSelect,
+  variant = 'default',
+}) => {
   const activeClassName = isActive ? styles.active : '';
   const tabStyle = getTabStyle(variant);
 

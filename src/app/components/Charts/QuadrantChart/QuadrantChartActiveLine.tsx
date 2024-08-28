@@ -9,7 +9,9 @@ const defaultLineProps = {
   strokeWidth: '8',
   strokeDasharray: '10,10',
 };
-const QuadrantChartActiveLines: FunctionComponent<QuadrantChartActiveLinesProps> = ({ activeChartPoint }) => {
+const QuadrantChartActiveLines: FunctionComponent<
+  QuadrantChartActiveLinesProps
+> = ({ activeChartPoint }) => {
   const renderActiveLines = (activeCoordinate?: ChartPoint) => {
     if (!activeCoordinate) {
       return;

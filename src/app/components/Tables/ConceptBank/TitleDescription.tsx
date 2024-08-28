@@ -9,7 +9,10 @@ interface TitleDescriptionProps {
 
 const MAX_DESCRIPTION_WIDTH = 60;
 
-const TitleDescription: React.FC<TitleDescriptionProps> = ({ title, description }) => {
+const TitleDescription: React.FC<TitleDescriptionProps> = ({
+  title,
+  description,
+}) => {
   const [isHovered, setIsHovered] = React.useState(false);
   const [memoizedHeight, setMemoizedHeight] = React.useState(0);
   const [isTruncated, setIsTruncated] = React.useState(false);
@@ -41,9 +44,18 @@ const TitleDescription: React.FC<TitleDescriptionProps> = ({ title, description 
     >
       <span className='text-base font-medium text-indigo-900'>{title}</span>
       <span className='relative max-h-[60px]'>
-        <span className={`line-clamp-3 text-base font-medium leading-tight text-slate-500`}>{description}</span>
+        <span
+          className={`line-clamp-3 text-base font-medium leading-tight text-slate-500`}
+        >
+          {description}
+        </span>
         <animated.span
-          style={{ position: 'absolute', top: 0, maxHeight: animatedStyles.maxHeight, opacity: animatedStyles.opacity }}
+          style={{
+            position: 'absolute',
+            top: 0,
+            maxHeight: animatedStyles.maxHeight,
+            opacity: animatedStyles.opacity,
+          }}
           ref={fullTextRef}
           className={classNames(
             `z-10 rounded-md bg-white text-base font-medium leading-tight text-slate-500 shadow-lg`,

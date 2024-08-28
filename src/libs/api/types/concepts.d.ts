@@ -14,17 +14,34 @@ export type ConceptCategory = 'active' | 'draft' | 'archive';
 
 export type DraftConceptStatus = Exclude<
   ConceptStatus,
-  'prototyping' | 'proofOfConcept' | 'minimumViableProduct' | 'commercialized' | 'archived'
+  | 'prototyping'
+  | 'proofOfConcept'
+  | 'minimumViableProduct'
+  | 'commercialized'
+  | 'archived'
 >;
 
 export type ArchivedConceptStatus = Exclude<
   ConceptStatus,
-  'new' | 'ideating' | 'inReview' | 'prototyping' | 'proofOfConcept' | 'minimumViableProduct' | 'commercialized'
+  | 'new'
+  | 'ideating'
+  | 'inReview'
+  | 'prototyping'
+  | 'proofOfConcept'
+  | 'minimumViableProduct'
+  | 'commercialized'
 >;
 
-export type ActiveConceptStatus = Exclude<ConceptStatus, ArchivedConceptStatus | DraftConceptStatus>;
+export type ActiveConceptStatus = Exclude<
+  ConceptStatus,
+  ArchivedConceptStatus | DraftConceptStatus
+>;
 
-export type ConceptReportStatus = 'notStarted' | 'complete' | 'pending' | 'error';
+export type ConceptReportStatus =
+  | 'notStarted'
+  | 'complete'
+  | 'pending'
+  | 'error';
 
 export interface IBaseConceptEntity {
   uuid: string;
@@ -53,7 +70,10 @@ export interface IConcept extends IBaseConceptEntity, IGeneratedConcept {
   category: ConceptCategory;
   createdBy: IUser;
 }
-type ConceptSeedType = 'EXPAND_AN_EXISTING_IDEA' | 'IDENTIFY_NEW_OPPORTUNITIES' | 'UNKNOWN';
+type ConceptSeedType =
+  | 'EXPAND_AN_EXISTING_IDEA'
+  | 'IDENTIFY_NEW_OPPORTUNITIES'
+  | 'UNKNOWN';
 // Expand an existing idea
 type EEIQuestionKeys = 'DESCRIBE' | 'PROBLEM' | 'CUSTOMER' | 'SUCCESS';
 // Identify new opportunities
@@ -71,7 +91,9 @@ interface IConceptSeedBase {
   createdBy: string;
 }
 
-export interface IConceptSeed extends IConceptSeedBase, Omit<IBaseConceptEntity, 'version'> {}
+export interface IConceptSeed
+  extends IConceptSeedBase,
+    Omit<IBaseConceptEntity, 'version'> {}
 
 export interface IConceptOverview extends IBaseConceptEntity {
   valueProposition: string;
@@ -139,7 +161,8 @@ export interface IBusinessModel extends BaseFinancialProjectionItem {
   modelName: string;
   description: string;
 }
-export interface IFinancialProjectionPricing extends BaseFinancialProjectionItem {
+export interface IFinancialProjectionPricing
+  extends BaseFinancialProjectionItem {
   price: number;
   billing: string;
   averageRevenuePerCustomer: number;
@@ -164,7 +187,11 @@ export interface IFinancialProjection extends IBaseConceptEntity {
   som: number;
 }
 
-type AssumptionType = 'adaptability' | 'desirability' | 'feasibility' | 'viability';
+type AssumptionType =
+  | 'adaptability'
+  | 'desirability'
+  | 'feasibility'
+  | 'viability';
 export interface IAssumption extends IBaseConceptEntity {
   name: string;
   hypothesis: string;

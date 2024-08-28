@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'react';
-import Icon from '../Icons/Icon/Icon';
 import { AssumptionType } from '@libs/api/types';
+import { FunctionComponent } from 'react';
+import Icon from '../Icon/Icon/Icon';
 
 export interface IConceptAssumptionBadgeProps {
   type: AssumptionType;
@@ -12,7 +12,9 @@ const defaultIconProps = {
   stroke: '#2B3674',
 };
 
-const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({ type }) => {
+const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({
+  type,
+}) => {
   return (
     <div className={`flex items-center gap-2`}>
       <span
@@ -27,7 +29,10 @@ const AssumptionBadge: FunctionComponent<IConceptAssumptionBadgeProps> = ({ type
   );
 };
 
-const ASSUMPTION_TYPE_MAP: Record<AssumptionType, { style: string; icon: IconVariant }> = {
+const ASSUMPTION_TYPE_MAP: Record<
+  AssumptionType,
+  { style: string; icon: IconVariant }
+> = {
   desirability: {
     style: 'bg-[#ece9fe] [&>svg>use]:stroke-desirability', //'purple',
     icon: 'thermometer',

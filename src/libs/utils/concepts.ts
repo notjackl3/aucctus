@@ -17,14 +17,20 @@ export const CONCEPT_STATUS_LIST: ConceptStatus[] = [
   'commercialized',
   'archived',
 ];
-export const DRAFT_CONCEPT_STATUS_LIST: DraftConceptStatus[] = ['new', 'ideating', 'inReview'];
+export const DRAFT_CONCEPT_STATUS_LIST: DraftConceptStatus[] = [
+  'new',
+  'ideating',
+  'inReview',
+];
 export const ACTIVE_CONCEPT_STATUS_LIST: ActiveConceptStatus[] = [
   'prototyping',
   'proofOfConcept',
   'minimumViableProduct',
   'commercialized',
 ];
-export const ARCHIVE_CONCEPT_STATUS_LIST: ArchivedConceptStatus[] = ['archived'];
+export const ARCHIVE_CONCEPT_STATUS_LIST: ArchivedConceptStatus[] = [
+  'archived',
+];
 
 export type ConceptStatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
 
@@ -70,7 +76,9 @@ export const CONCEPT_STATUS_STYLE_MAP: Record<
  * @param status - The concept status.
  * @returns The color associated with the concept status.
  */
-export function getConceptStatusColor(status: ConceptStatus): ConceptStatusColor {
+export function getConceptStatusColor(
+  status: ConceptStatus,
+): ConceptStatusColor {
   const statusColorObj: Record<ConceptStatus, ConceptStatusColor> = {
     new: 'blue',
     ideating: 'blue',
@@ -98,7 +106,9 @@ type AssumptionHexColor = '#7839EE' | '#0E9384' | '#088AB2' | '#155EEF';
  * @param assumption - The assumption type.
  * @returns The color associated with the active assumption type.
  */
-export function getAssumptionActiveHexColor(assumption: AssumptionType): AssumptionHexColor {
+export function getAssumptionActiveHexColor(
+  assumption: AssumptionType,
+): AssumptionHexColor {
   const assumptionColorObj: Record<AssumptionType, AssumptionHexColor> = {
     desirability: '#7839EE',
     viability: '#0E9384',
@@ -109,7 +119,11 @@ export function getAssumptionActiveHexColor(assumption: AssumptionType): Assumpt
   return assumptionColorObj[assumption];
 }
 
-type AssumptionBackgroundHexColor = '#ECE9FE' | '#CCFBEF' | '#CFF9FE' | '#D1E0FF';
+type AssumptionBackgroundHexColor =
+  | '#ECE9FE'
+  | '#CCFBEF'
+  | '#CFF9FE'
+  | '#D1E0FF';
 
 /**
  * Returns the color associated with a given assumption type.
@@ -117,8 +131,13 @@ type AssumptionBackgroundHexColor = '#ECE9FE' | '#CCFBEF' | '#CFF9FE' | '#D1E0FF
  * @param assumption - The assumption type.
  * @returns The color associated with the assumption type.
  */
-export function getAssumptionHexColor(assumption: AssumptionType): AssumptionBackgroundHexColor {
-  const assumptionColorObj: Record<AssumptionType, AssumptionBackgroundHexColor> = {
+export function getAssumptionHexColor(
+  assumption: AssumptionType,
+): AssumptionBackgroundHexColor {
+  const assumptionColorObj: Record<
+    AssumptionType,
+    AssumptionBackgroundHexColor
+  > = {
     desirability: '#ECE9FE',
     viability: '#CCFBEF',
     feasibility: '#CFF9FE',
@@ -141,8 +160,13 @@ export function getDashboardConceptStatusIcon(status: ActiveConceptStatus) {
 
 export type ConceptStatusIconColor = 'lightBlue' | 'blue' | 'purple';
 
-export function getDashboardConceptStatusIconColor(status: ActiveConceptStatus) {
-  const conceptStatusColorObj: Record<ActiveConceptStatus, ConceptStatusIconColor> = {
+export function getDashboardConceptStatusIconColor(
+  status: ActiveConceptStatus,
+) {
+  const conceptStatusColorObj: Record<
+    ActiveConceptStatus,
+    ConceptStatusIconColor
+  > = {
     prototyping: 'lightBlue',
     proofOfConcept: 'blue',
     minimumViableProduct: 'blue',

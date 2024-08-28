@@ -38,7 +38,13 @@ export class AuthApi extends ApiService {
    * @param password2
    * @returns
    */
-  signup(firstName: string, lastName: string, email: string, password: string, confirmPassword: string) {
+  signup(
+    firstName: string,
+    lastName: string,
+    email: string,
+    password: string,
+    confirmPassword: string,
+  ) {
     return this.post<IMessageResponse, ISignUpRequest>(endpoints.signup, {
       firstName,
       lastName,
@@ -55,7 +61,10 @@ export class AuthApi extends ApiService {
    * @returns
    */
   login(email: string, password: string) {
-    return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.login, { email, password });
+    return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.login, {
+      email,
+      password,
+    });
   }
 
   logout(token?: string) {
@@ -68,15 +77,20 @@ export class AuthApi extends ApiService {
    * @returns
    */
   requestPasswordReset(email: string) {
-    return this.post<IMessageResponse>(endpoints.requestPasswordReset, { email });
+    return this.post<IMessageResponse>(endpoints.requestPasswordReset, {
+      email,
+    });
   }
 
   resetPassword(password: string, confirmPassword: string, token: string) {
-    return this.post<IMessageResponse, IUpdateForgottenPasswordRequest>(endpoints.forgotPassword, {
-      password,
-      confirmPassword,
-      token,
-    });
+    return this.post<IMessageResponse, IUpdateForgottenPasswordRequest>(
+      endpoints.forgotPassword,
+      {
+        password,
+        confirmPassword,
+        token,
+      },
+    );
   }
 
   /** RefreshToken
@@ -100,6 +114,8 @@ export class AuthApi extends ApiService {
    * @returns
    */
   confirmEmail(token: string) {
-    return this.post<IMessageResponse, IToken>(endpoints.confirmEmail, { token });
+    return this.post<IMessageResponse, IToken>(endpoints.confirmEmail, {
+      token,
+    });
   }
 }

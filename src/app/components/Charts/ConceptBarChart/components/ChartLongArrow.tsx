@@ -15,18 +15,42 @@ const defaultProps = {
 };
 const ChartLongArrow: FunctionComponent<ChartLongArrow> = ({ data }) => {
   const percentList = useMemo(() => {
-    const totalActiveConcepts = ACTIVE_CONCEPT_STATUS_LIST.reduce((result, status) => {
-      return data[status] + result;
-    }, 0);
+    const totalActiveConcepts = ACTIVE_CONCEPT_STATUS_LIST.reduce(
+      (result, status) => {
+        return data[status] + result;
+      },
+      0,
+    );
 
-    const proofOfConceptPercent = utils.number.calculatePercent(data.proofOfConcept, totalActiveConcepts);
-    const minimumViableProductPercent = utils.number.calculatePercent(data.minimumViableProduct, totalActiveConcepts);
-    const commercializedPercent = utils.number.calculatePercent(data.commercialized, totalActiveConcepts);
-    return [proofOfConceptPercent, minimumViableProductPercent, commercializedPercent];
+    const proofOfConceptPercent = utils.number.calculatePercent(
+      data.proofOfConcept,
+      totalActiveConcepts,
+    );
+    const minimumViableProductPercent = utils.number.calculatePercent(
+      data.minimumViableProduct,
+      totalActiveConcepts,
+    );
+    const commercializedPercent = utils.number.calculatePercent(
+      data.commercialized,
+      totalActiveConcepts,
+    );
+    return [
+      proofOfConceptPercent,
+      minimumViableProductPercent,
+      commercializedPercent,
+    ];
   }, [data]);
 
   return (
-    <svg x='160' y='275' width='381' height='19' viewBox='0 0 381 19' fill='none' xmlns='http://www.w3.org/2000/svg'>
+    <svg
+      x='160'
+      y='275'
+      width='381'
+      height='19'
+      viewBox='0 0 381 19'
+      fill='none'
+      xmlns='http://www.w3.org/2000/svg'
+    >
       <path
         fillRule='evenodd'
         clipRule='evenodd'
@@ -37,7 +61,12 @@ const ChartLongArrow: FunctionComponent<ChartLongArrow> = ({ data }) => {
         ? percentList.map((percent, i) => {
             const xCoord = 5 + i * BAR_WIDTH;
             return (
-              <text key={`long-arrow-percent-${i}`} x={xCoord} y='55%' {...defaultProps}>
+              <text
+                key={`long-arrow-percent-${i}`}
+                x={xCoord}
+                y='55%'
+                {...defaultProps}
+              >
                 {percent}%
               </text>
             );

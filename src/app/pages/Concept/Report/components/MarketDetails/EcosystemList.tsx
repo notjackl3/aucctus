@@ -3,7 +3,11 @@ import { FunctionComponent, useCallback } from 'react';
 import images from '@assets/img';
 import EditMarketScanElement from '@components/Modal/MarketScanElement/EditMarketScanElement';
 import { useModal } from '@context/ModalContextProvider';
-import { useEcosystemCreate, useEcosystemDelete, useEcosystemUpdate } from '@hooks/query/concepts.hook';
+import {
+  useEcosystemCreate,
+  useEcosystemDelete,
+  useEcosystemUpdate,
+} from '@hooks/query/concepts.hook';
 import { Ecosystem, EcosystemType } from '@libs/api/types';
 
 import { Card, Icon } from '@components';
@@ -23,7 +27,11 @@ interface IEcosystemListProps {
   ecosystemType: EcosystemType;
 }
 
-const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ecosystemType }) => {
+const EcosystemList: FunctionComponent<IEcosystemListProps> = ({
+  title,
+  data,
+  ecosystemType,
+}) => {
   const { id: conceptId = '' } = useParams();
   const { openModal } = useModal();
   const { mutate: addEcosystem } = useEcosystemCreate(conceptId || '');
@@ -39,11 +47,12 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
   );
 
   const onClick = useCallback(
-    (item: Ecosystem) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      window.open(item.source, '_blank');
-      e.preventDefault();
-      e.stopPropagation();
-    },
+    (item: Ecosystem) =>
+      (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        window.open(item.source, '_blank');
+        e.preventDefault();
+        e.stopPropagation();
+      },
     [],
   );
 
@@ -56,7 +65,10 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
           <button
             className='btn btn-light'
             onClick={() => {
-              openModal(AddMarketScanElement, { addItem: addEcosystem, ecosystemType });
+              openModal(AddMarketScanElement, {
+                addItem: addEcosystem,
+                ecosystemType,
+              });
             }}
           >
             <Icon variant='plus' />
@@ -66,7 +78,11 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({ title, data, ec
     >
       <div className={styles.cardContent}>
         {data?.map((item) => (
-          <div key={item.uuid} className={`${styles.cardRow} ${styles.editCard}`} onClick={onContainerClick(item)}>
+          <div
+            key={item.uuid}
+            className={`${styles.cardRow} ${styles.editCard}`}
+            onClick={onContainerClick(item)}
+          >
             <img
               className={styles.cardLogo}
               alt='company-logo'

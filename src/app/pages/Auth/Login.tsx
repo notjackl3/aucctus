@@ -25,8 +25,14 @@ const Login: FunctionComponent = () => {
     <>
       <div className={styles.header}>
         <span className={styles.title}>Login</span>
-        <span className={styles.supportingText}>Welcome back! Please enter your details.</span>
-        {error && <div className={styles.error}>{utils.osiris.parseFormError(error)}</div>}
+        <span className={styles.supportingText}>
+          Welcome back! Please enter your details.
+        </span>
+        {error && (
+          <div className={styles.error}>
+            {utils.osiris.parseFormError(error)}
+          </div>
+        )}
       </div>
       {/* TODO: Style this */}
 
@@ -37,7 +43,9 @@ const Login: FunctionComponent = () => {
           autoComplete='on'
           errorMessage={emailInputError}
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
           onFocus={() => setEmailInputError(undefined)}
           onBlur={_handleEmailValidation}
         />
@@ -48,7 +56,9 @@ const Login: FunctionComponent = () => {
           autoComplete='on'
           isPassword
           value={password}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
         />
 
         <div className={`${styles.row}`}>
@@ -84,7 +94,7 @@ const Login: FunctionComponent = () => {
         </button> */}
 
         <div className={styles.signUp}>
-          <span>Don't have an account? </span>
+          <span>{"Don't have an account?"}</span>
           <Link className={`${styles.link} btn btn-link`} to={AppPath.SignUp}>
             Sign up
           </Link>

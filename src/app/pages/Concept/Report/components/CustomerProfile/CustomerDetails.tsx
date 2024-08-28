@@ -11,7 +11,9 @@ export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
 }
 
-const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({ profile }) => {
+const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
+  profile,
+}) => {
   const { description } = useEditCustomerProfile(profile.uuid);
 
   return (

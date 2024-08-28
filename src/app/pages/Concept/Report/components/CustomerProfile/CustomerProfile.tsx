@@ -1,7 +1,10 @@
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import Loading from '@components/Loading';
-import { useConceptCustomerProfiles, useDeleteCustomerProfile } from '@hooks/query/concepts.hook';
+import {
+  useConceptCustomerProfiles,
+  useDeleteCustomerProfile,
+} from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
@@ -11,6 +14,7 @@ import styles from './styles/customerProfile.module.scss';
 
 import { Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
+import utils from '@libs/utils';
 
 const CustomerProfile: FunctionComponent = () => {
   const { id: conceptId } = useParams();
@@ -44,7 +48,11 @@ const CustomerProfile: FunctionComponent = () => {
 
   useEffect(() => {
     const firstPersona = profiles.length > 0 ? profiles[0] : undefined;
-    if ((!selectedProfileName || !selectedProfile) && conceptId && firstPersona) {
+    if (
+      (!selectedProfileName || !selectedProfile) &&
+      conceptId &&
+      firstPersona
+    ) {
       navigate(
         {
           pathname: AppPath.ConceptCustomerProfile.replace(':id', conceptId),
@@ -55,7 +63,14 @@ const CustomerProfile: FunctionComponent = () => {
         },
       );
     }
-  }, [selectedProfileName, onTabSelect, conceptId, navigate, profiles, selectedProfile]);
+  }, [
+    selectedProfileName,
+    onTabSelect,
+    conceptId,
+    navigate,
+    profiles,
+    selectedProfile,
+  ]);
 
   return (
     <div className={styles.customerProfile}>
@@ -70,16 +85,20 @@ const CustomerProfile: FunctionComponent = () => {
           activeTab={selectedProfileName || ''}
           actionButtons={[
             <button
+              key={utils.string.generateRandomString(5)}
               className='btn btn-light'
               disabled={!conceptId || !selectedProfile}
               onClick={() => {
-                openModal(Modal.AddCustomerProfile, { conceptUuid: conceptId || '' });
+                openModal(Modal.AddCustomerProfile, {
+                  conceptUuid: conceptId || '',
+                });
               }}
             >
               <Icon variant='plus' height={20} width={20} />
             </button>,
 
             <button
+              key={utils.string.generateRandomString(5)}
               className='btn btn-light'
               disabled={!conceptId || !selectedProfile}
               onClick={() => {
@@ -112,7 +131,11 @@ const CustomerProfile: FunctionComponent = () => {
             </button>,
           ]}
         >
-          {selectedProfile ? <CustomerDetails profile={selectedProfile} /> : <Loading />}
+          {selectedProfile ? (
+            <CustomerDetails profile={selectedProfile} />
+          ) : (
+            <Loading />
+          )}
         </TabView>
       )}
     </div>

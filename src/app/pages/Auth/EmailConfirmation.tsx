@@ -1,13 +1,14 @@
-import { FunctionComponent, useEffect, useMemo } from 'react';
-import { Link } from 'react-router-dom';
-import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import FeatureIcon, { IFeatureIconProps } from '../../components/Icons/FeatureIcon';
-import { AppPath } from '../../../routes/routes';
-import Icon from '../../components/Icons/Icon/Icon';
-import { useSearchParams } from 'react-router-dom';
-import { useConfirmEmail } from '../../hooks/query/auth.hook';
 import utils from '@libs/utils';
+import { FunctionComponent, useEffect, useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { AppPath } from '../../../routes/routes';
+import styles from '../../assets/styles/pages/auth-screens.module.scss';
+import FeatureIcon, {
+  IFeatureIconProps,
+} from '../../components/Icon/FeatureIcon';
+import Icon from '../../components/Icon/Icon/Icon';
+import { useConfirmEmail } from '../../hooks/query/auth.hook';
 
 interface IConfirmEmailContext {
   icon: IconVariant;

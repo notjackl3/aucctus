@@ -62,4 +62,5 @@ export const calculatePercent = (numerator: number, denominator: number) => {
  * @param max - The maximum limit.
  * @returns The clamped value.
  */
-export const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(value, max));
+export const clamp = (value: number, min: number, max: number) =>
+  Math.max(min, Math.min(value, max));

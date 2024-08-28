@@ -1,4 +1,8 @@
-import { CHART_CENTER_WIDTH, POINT_RADIUS, valueConversionRate } from './QuadrantChart';
+import {
+  CHART_CENTER_WIDTH,
+  POINT_RADIUS,
+  valueConversionRate,
+} from './QuadrantChart';
 
 export const getAdjustedCoord = (coordValue: number) => {
   return CHART_CENTER_WIDTH + coordValue * valueConversionRate;

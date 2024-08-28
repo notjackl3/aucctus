@@ -13,7 +13,10 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = [], onViewClick }) => {
+const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({
+  assumptions = [],
+  onViewClick,
+}) => {
   return (
     <Card.Detail
       title='Key Assumptions'
@@ -21,7 +24,11 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = 
       headerClassName='min-h-[92px]'
       contentClassName='h-[360px]'
       footerAction={
-        <button className='btn btn-light' onClick={onViewClick} aria-label='View Assumptions'>
+        <button
+          className='btn btn-light'
+          onClick={onViewClick}
+          aria-label='View Assumptions'
+        >
           <span>{<Icon variant='warning' {...iconDefaultProps} />}</span>
           View Key Assumptions
         </button>
@@ -35,7 +42,10 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({ assumptions = 
             key={`assumption-${i + 1}`}
           >
             <div className='flex h-16 items-center'>
-              <Badge.RiskLevel variant={item.riskCategory} text={item.riskCategory} />
+              <Badge.RiskLevel
+                variant={item.riskCategory}
+                text={item.riskCategory}
+              />
             </div>
             <p className='text-base font-normal text-indigo-900'>{item.name}</p>
           </li>

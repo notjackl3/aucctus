@@ -16,7 +16,9 @@ const columnHelper = createColumnHelper<IGeneratedConcept>();
 
 export const useGeneratedConcepts = () => {
   const { generatedConcepts: concepts } = useConceptGenerationStore();
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    [],
+  );
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   const selectedConcepts = React.useMemo((): IGeneratedConcept[] => {
@@ -69,7 +71,10 @@ export const useGeneratedConcepts = () => {
         enableSorting: false,
         header: () => 'Concept',
         cell: (info) => (
-          <Table.ConceptBank.TitleDescription title={info.getValue()} description={info.row.original.description} />
+          <Table.ConceptBank.TitleDescription
+            title={info.getValue()}
+            description={info.row.original.description}
+          />
         ),
       }),
     ],

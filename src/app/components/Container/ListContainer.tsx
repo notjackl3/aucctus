@@ -8,10 +8,15 @@ interface IListContainerProps {
 const ListContainer: React.FC<IListContainerProps> = ({ title, items }) => {
   return (
     <div className='inline-flex w-64 flex-col items-start justify-start gap-2'>
-      <span className='self-stretch text-sm font-medium leading-tight text-indigo-900'>{title}</span>
+      <span className='self-stretch text-sm font-medium leading-tight text-indigo-900'>
+        {title}
+      </span>
       <ul className='flex flex-col items-start justify-start self-stretch'>
         {items.map((item) => (
-          <li key={item.replace(' ', '-')} className='self-stretch text-base font-normal leading-normal text-gray-500'>
+          <li
+            key={item.replace(' ', '-')}
+            className='self-stretch text-base font-normal leading-normal text-gray-500'
+          >
             {item}
           </li>
         ))}

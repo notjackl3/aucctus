@@ -2,9 +2,12 @@ import { Badge } from '@components';
 import { FunctionComponent, useCallback, useState } from 'react';
 import { AssumptionType, IAssumption } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
-import { useAssumptionDelete, useAssumptionUpdate } from '../../../hooks/query/concepts.hook';
+import {
+  useAssumptionDelete,
+  useAssumptionUpdate,
+} from '../../../hooks/query/concepts.hook';
 import Dropdown, { Option } from '../../Buttons/Dropdown/Dropdown';
-import Icon from '../../Icons/Icon/Icon';
+import Icon from '../../Icon/Icon/Icon';
 import InputField from '../../Input/InputField/InputField';
 import TextArea from '../../Input/TextArea/TextArea';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
@@ -19,61 +22,90 @@ const HYPOTHESES_MAX_LENGTH = 1500;
 const TITLE_MAX_LENGTH = 64;
 
 const ASSUMPTION_TYPE_OPTIONS: Option[] = (
-  ['adaptability', 'desirability', 'feasibility', 'viability'] as AssumptionType[]
+  [
+    'adaptability',
+    'desirability',
+    'feasibility',
+    'viability',
+  ] as AssumptionType[]
 ).map((value) => ({
   label: <Badge.Assumption type={value} />,
   displayLabel: <Badge.Assumption type={value} />,
   value,
 }));
 
-const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = ({ assumption }) => {
+const EditKeyAssumptionModal: FunctionComponent<
+  IEditKeyAssumptionModalProps
+> = ({ assumption }) => {
   const { closeModal } = useModal();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { mutate: updateAssumption } = useAssumptionUpdate();
   const { mutate: deleteAssumption } = useAssumptionDelete();
   const [riskLevel, setRiskLevel] = useState<number>(assumption.riskLevel);
-  const [impactLevel, setImpactLevel] = useState<number>(assumption.impactLevel);
-  const [difficultyLevel, setDifficultyLevel] = useState<number>(assumption.difficultyLevel);
+  const [impactLevel, setImpactLevel] = useState<number>(
+    assumption.impactLevel,
+  );
+  const [difficultyLevel, setDifficultyLevel] = useState<number>(
+    assumption.difficultyLevel,
+  );
 
-  const [assumptionsType, setAssumptionType] = useState<AssumptionType>(assumption.assumptionsType);
+  const [assumptionsType, setAssumptionType] = useState<AssumptionType>(
+    assumption.assumptionsType,
+  );
   const [title, setTitle] = useState<string>(assumption.name);
   const [titleError, setTitleError] = useState<string | undefined>(undefined);
   const [hypothesis, setHypothesis] = useState<string>(assumption.hypothesis);
-  const [hypothesisError, setHypothesisError] = useState<string | undefined>(undefined);
+  const [hypothesisError, setHypothesisError] = useState<string | undefined>(
+    undefined,
+  );
 
-  const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target.value;
 
-    setTitleError(undefined);
+      setTitleError(undefined);
 
-    if (input.length === 0) {
-      setTitleError('Title is required.');
-    } else if (input.length > TITLE_MAX_LENGTH) {
-      setTitleError('Title exceeds the maximum allowed length.');
-    }
+      if (input.length === 0) {
+        setTitleError('Title is required.');
+      } else if (input.length > TITLE_MAX_LENGTH) {
+        setTitleError('Title exceeds the maximum allowed length.');
+      }
 
-    setTitle(input);
-  }, []);
+      setTitle(input);
+    },
+    [],
+  );
 
-  const handleHypothesesChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const input = e.target.value;
+  const handleHypothesesChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const input = e.target.value;
 
-    setHypothesisError(undefined);
+      setHypothesisError(undefined);
 
-    if (input.length === 0) {
-      setHypothesis('Hypothesis is required.');
-    } else if (input.length > HYPOTHESES_MAX_LENGTH) {
-      setHypothesisError('Hypothesis exceeds the maximum allowed length.');
-    }
+      if (input.length === 0) {
+        setHypothesis('Hypothesis is required.');
+      } else if (input.length > HYPOTHESES_MAX_LENGTH) {
+        setHypothesisError('Hypothesis exceeds the maximum allowed length.');
+      }
 
-    setHypothesis(input);
-  }, []);
+      setHypothesis(input);
+    },
+    [],
+  );
 
   const handleSave = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.preventDefault();
       updateAssumption(
-        { ...assumption, name: title, hypothesis, riskLevel, difficultyLevel, impactLevel, assumptionsType },
+        {
+          ...assumption,
+          name: title,
+          hypothesis,
+          riskLevel,
+          difficultyLevel,
+          impactLevel,
+          assumptionsType,
+        },
         {
           onSuccess: () => {
             closeModal();
@@ -123,7 +155,12 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
         >
           <Icon variant='trash' />
         </button>
-        <button aria-label='Close' className={'btn-close'} disabled={showConfirmation} onClick={() => closeModal()} />
+        <button
+          aria-label='Close'
+          className={'btn-close'}
+          disabled={showConfirmation}
+          onClick={() => closeModal()}
+        />
       </div>
       <div className={styles.content}>
         <Dropdown
@@ -162,7 +199,13 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
             onChange={(e) => setImpactLevel(parseInt(e.target.value))}
           />
         </div>
-        <InputField name='title' label='Title' value={title} errorMessage={titleError} onChange={handleTitleChange} />
+        <InputField
+          name='title'
+          label='Title'
+          value={title}
+          errorMessage={titleError}
+          onChange={handleTitleChange}
+        />
         <TextArea
           name='hypothesis'
           label='Hypothesis'
@@ -173,12 +216,22 @@ const EditKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = 
         />
       </div>
       <div className={styles.footer}>
-        <button className='btn btn-light' disabled={showConfirmation} onClick={() => closeModal()}>
+        <button
+          className='btn btn-light'
+          disabled={showConfirmation}
+          onClick={() => closeModal()}
+        >
           Cancel
         </button>
         <button
           className='btn btn-primary'
-          disabled={!title || !hypothesis || !!titleError || !!hypothesisError || showConfirmation}
+          disabled={
+            !title ||
+            !hypothesis ||
+            !!titleError ||
+            !!hypothesisError ||
+            showConfirmation
+          }
           onClick={handleSave}
         >
           Save

@@ -11,8 +11,14 @@ import 'abort-controller/polyfill';
 import analytics from '../analytics';
 import { IAuthSuccessResponse } from './types';
 
-export const isAuthSuccessResponse = (value: unknown): value is IAuthSuccessResponse => {
-  return !!value && !!(value as IAuthSuccessResponse).user && !!(value as IAuthSuccessResponse).access;
+export const isAuthSuccessResponse = (
+  value: unknown,
+): value is IAuthSuccessResponse => {
+  return (
+    !!value &&
+    !!(value as IAuthSuccessResponse).user &&
+    !!(value as IAuthSuccessResponse).access
+  );
 };
 
 const LOGOUT_STATUSES = [401, 403, 419];
@@ -55,7 +61,10 @@ export abstract class ApiService {
 
   protected _setupMiddleware(this: ApiService) {
     this.api.interceptors.request.use(this._requestMiddleware.bind(this));
-    this.api.interceptors.response.use(this._responseMiddleware.bind(this), this._responseErrorMiddleware.bind(this));
+    this.api.interceptors.response.use(
+      this._responseMiddleware.bind(this),
+      this._responseErrorMiddleware.bind(this),
+    );
   }
 
   private async _requestMiddleware(config: InternalAxiosRequestConfig) {
@@ -66,8 +75,13 @@ export abstract class ApiService {
 
   private _responseMiddleware(response: AxiosResponse) {
     if (this.config.debug) {
-      const method = response.config.method ? `[${response.config.method.toUpperCase()}]` : '';
-      analytics.debug(`Api Call: ${method} ${response.config.baseURL + this.api.getUri(response.config)}`, response);
+      const method = response.config.method
+        ? `[${response.config.method.toUpperCase()}]`
+        : '';
+      analytics.debug(
+        `Api Call: ${method} ${response.config.baseURL + this.api.getUri(response.config)}`,
+        response,
+      );
     }
     return response;
   }
@@ -81,7 +95,11 @@ export abstract class ApiService {
 
     const status = (error.response && error.response.status) || 0;
     const url = error && error.config && error.config.url;
-    if (url && LOGOUT_STATUSES.includes(status) && !this._shouldSkipRefresh(url)) {
+    if (
+      url &&
+      LOGOUT_STATUSES.includes(status) &&
+      !this._shouldSkipRefresh(url)
+    ) {
       try {
         const config = error.config as ExtendedAxiosRequestConfig;
         if (config && !config._retry) {
@@ -130,7 +148,10 @@ export abstract class ApiService {
   }
 
   updateConfigHeaders(headers: Partial<AxiosRequestHeaders>) {
-    this.config.headers = Object.assign(this.config.headers || {}, headers) as AxiosRequestHeaders;
+    this.config.headers = Object.assign(
+      this.config.headers || {},
+      headers,
+    ) as AxiosRequestHeaders;
   }
 
   /** Get
@@ -169,8 +190,16 @@ export abstract class ApiService {
     };
   }
 
-  post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig<D>): Promise<T>;
-  async post<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+  post<T = unknown, D = any>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig<D>,
+  ): Promise<T>;
+  async post<T = unknown, D = any>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.post(url, data, config);
       return response.data;
@@ -179,7 +208,10 @@ export abstract class ApiService {
     }
   }
 
-  async delete<T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> {
+  async delete<T = unknown>(
+    url: string,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.delete(url, config);
       return response.data;
@@ -188,7 +220,11 @@ export abstract class ApiService {
     }
   }
 
-  async put<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+  async put<T = unknown, D = any>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
     try {
       const response: AxiosResponse<T> = await this.api.put(url, data, config);
       return response.data;
@@ -197,9 +233,17 @@ export abstract class ApiService {
     }
   }
 
-  async patch<T = unknown, D = any>(url: string, data?: D, config?: AxiosRequestConfig): Promise<T> {
+  async patch<T = unknown, D = any>(
+    url: string,
+    data?: D,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
     try {
-      const response: AxiosResponse<T> = await this.api.patch(url, data, config);
+      const response: AxiosResponse<T> = await this.api.patch(
+        url,
+        data,
+        config,
+      );
       return response.data;
     } catch (error) {
       throw error;

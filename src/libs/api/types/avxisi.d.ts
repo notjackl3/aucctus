@@ -1,4 +1,6 @@
-export type IFormError<T = object> = IServerErrorMessage | IFormErrorResponse<T>;
+export type IFormError<T = object> =
+  | IServerErrorMessage
+  | IFormErrorResponse<T>;
 export interface IServerErrorMessage {
   id: string;
   error: string;
@@ -20,8 +22,14 @@ export interface IMessageResponse {
 export interface IPageQueryOptions {
   page?: number;
 }
-export type SortableConceptProperties = 'createdAt' | 'updatedAt' | 'status' | 'title';
-export type ConceptSort = SortableConceptProperties | `-${SortableConceptProperties}`;
+export type SortableConceptProperties =
+  | 'createdAt'
+  | 'updatedAt'
+  | 'status'
+  | 'title';
+export type ConceptSort =
+  | SortableConceptProperties
+  | `-${SortableConceptProperties}`;
 
 export interface IConceptQueryOptions extends IPageQueryOptions {
   search?: string;

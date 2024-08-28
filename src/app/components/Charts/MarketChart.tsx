@@ -9,7 +9,12 @@ export interface MarketChartProps {
   som: number;
 }
 
-const MarketChart: FunctionComponent<MarketChartProps> = ({ tam, sam, som, className = '' }) => {
+const MarketChart: FunctionComponent<MarketChartProps> = ({
+  tam,
+  sam,
+  som,
+  className = '',
+}) => {
   const LARGE_RADIUS = 221;
 
   const mediumRatio = getMediumRatio(sam, tam);
@@ -31,26 +36,84 @@ const MarketChart: FunctionComponent<MarketChartProps> = ({ tam, sam, som, class
     });
 
   return (
-    <svg viewBox='0 0 442 442' fill='black' className={classname('flex', className)}>
-      <circle className='fill-primary-250' fill='#c9bdff' cx={LARGE_RADIUS} cy={LARGE_RADIUS} r={LARGE_RADIUS}></circle>
-      <circle className='fill-primary-450' fill='#937bff' cx={LARGE_RADIUS} cy={mediumCenter} r={mediumRadius}></circle>
-      <circle className='fill-primary-600' fill='' cx={LARGE_RADIUS} cy={smallCenter} r={smallRadius}></circle>
-      <text x={LARGE_RADIUS} y={LARGE_RADIUS} textAnchor='middle' dy='-151' className={textClass()}>
+    <svg
+      viewBox='0 0 442 442'
+      fill='black'
+      className={classname('flex', className)}
+    >
+      <circle
+        className='fill-primary-250'
+        fill='#c9bdff'
+        cx={LARGE_RADIUS}
+        cy={LARGE_RADIUS}
+        r={LARGE_RADIUS}
+      ></circle>
+      <circle
+        className='fill-primary-450'
+        fill='#937bff'
+        cx={LARGE_RADIUS}
+        cy={mediumCenter}
+        r={mediumRadius}
+      ></circle>
+      <circle
+        className='fill-primary-600'
+        fill=''
+        cx={LARGE_RADIUS}
+        cy={smallCenter}
+        r={smallRadius}
+      ></circle>
+      <text
+        x={LARGE_RADIUS}
+        y={LARGE_RADIUS}
+        textAnchor='middle'
+        dy='-151'
+        className={textClass()}
+      >
         TAM
       </text>
-      <text x={LARGE_RADIUS} y={LARGE_RADIUS} textAnchor='middle' dy='-131' className={textClass()}>
+      <text
+        x={LARGE_RADIUS}
+        y={LARGE_RADIUS}
+        textAnchor='middle'
+        dy='-131'
+        className={textClass()}
+      >
         {utils.number.formatter.format(tam) || '0M'}
       </text>
-      <text x={LARGE_RADIUS} y={mediumCenter - mediumRadius} textAnchor='middle' dy='30' className={textClass()}>
+      <text
+        x={LARGE_RADIUS}
+        y={mediumCenter - mediumRadius}
+        textAnchor='middle'
+        dy='30'
+        className={textClass()}
+      >
         SAM
       </text>
-      <text x={LARGE_RADIUS} y={mediumCenter - mediumRadius} textAnchor='middle' dy='50' className={textClass()}>
+      <text
+        x={LARGE_RADIUS}
+        y={mediumCenter - mediumRadius}
+        textAnchor='middle'
+        dy='50'
+        className={textClass()}
+      >
         {utils.number.formatter.format(sam) || '0K'}
       </text>
-      <text x={LARGE_RADIUS} y={smallCenter - smallRadius} textAnchor='middle' dy='30' className={textClass(true)}>
+      <text
+        x={LARGE_RADIUS}
+        y={smallCenter - smallRadius}
+        textAnchor='middle'
+        dy='30'
+        className={textClass(true)}
+      >
         SOM
       </text>
-      <text x={LARGE_RADIUS} y={smallCenter - smallRadius} textAnchor='middle' dy='50' className={textClass(true)}>
+      <text
+        x={LARGE_RADIUS}
+        y={smallCenter - smallRadius}
+        textAnchor='middle'
+        dy='50'
+        className={textClass(true)}
+      >
         {utils.number.formatter.format(som) || '0K'}
       </text>
     </svg>

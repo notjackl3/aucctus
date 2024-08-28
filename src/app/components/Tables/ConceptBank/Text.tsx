@@ -7,7 +7,16 @@ interface ITextProps {
 }
 
 const Description: React.FC<ITextProps> = ({ value, className }) => {
-  return <span className={classNames('text-base font-medium leading-tight text-slate-500', className)}>{value}</span>;
+  return (
+    <span
+      className={classNames(
+        'text-base font-medium leading-tight text-slate-500',
+        className,
+      )}
+    >
+      {value}
+    </span>
+  );
 };
 
 export default Description;

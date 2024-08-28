@@ -1,8 +1,12 @@
 import { Header } from '@components';
 import { FunctionComponent, ReactNode } from 'react';
-import Icon from '../Icons/Icon/Icon';
+import Icon from '../Icon/Icon/Icon';
 
-interface DetailCardProps extends React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> {
+interface DetailCardProps
+  extends React.DetailedHTMLProps<
+    React.HTMLAttributes<HTMLDivElement>,
+    HTMLDivElement
+  > {
   title: string;
   subtitle?: string;
   children: ReactNode;
@@ -57,11 +61,15 @@ const DetailCard: FunctionComponent<DetailCardProps> = ({
 
           {/* Subtitle */}
           {subtitle && (
-            <h5 className='max-w-full text-wrap text-sm font-normal leading-tight text-gray-500'>{subtitle}</h5>
+            <h5 className='max-w-full text-wrap text-sm font-normal leading-tight text-gray-500'>
+              {subtitle}
+            </h5>
           )}
         </div>
       )}
-      <div className={`flex w-full flex-[1_0_auto] flex-col items-center justify-start ${contentClassName}`}>
+      <div
+        className={`flex w-full flex-[1_0_auto] flex-col items-center justify-start ${contentClassName}`}
+      >
         {children}
       </div>
       {!isHideFooter && (

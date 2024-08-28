@@ -21,10 +21,19 @@ export interface KanbanProps {
   selectCard: (id: string) => void;
 }
 
-const Kanban: FunctionComponent<KanbanProps> = ({ kanbanColumns, selectCard }) => {
+const Kanban: FunctionComponent<KanbanProps> = ({
+  kanbanColumns,
+  selectCard,
+}) => {
   const renderColumnCards = (columnCardList: IConcept[]) => {
     return columnCardList.map((columnCard, index) => {
-      return <Card.Kanban key={`concept-card-${index}`} concept={columnCard} selectCard={selectCard} />;
+      return (
+        <Card.Kanban
+          key={`concept-card-${index}`}
+          concept={columnCard}
+          selectCard={selectCard}
+        />
+      );
     });
   };
 
@@ -34,8 +43,12 @@ const Kanban: FunctionComponent<KanbanProps> = ({ kanbanColumns, selectCard }) =
         return (
           <div key={`column-${columnId}-${index}`} className={styles.column}>
             <div className={styles.columnHeader}>
-              <div className={styles.columnHeaderTitle}>{utils.string.camelCaseToTitleCase(column?.title)}</div>
-              <div className={styles.columnHeaderCount}>{column?.items?.length}</div>
+              <div className={styles.columnHeaderTitle}>
+                {utils.string.camelCaseToTitleCase(column?.title)}
+              </div>
+              <div className={styles.columnHeaderCount}>
+                {column?.items?.length}
+              </div>
             </div>
             {renderColumnCards(column?.items)}
           </div>

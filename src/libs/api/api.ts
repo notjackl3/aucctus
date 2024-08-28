@@ -50,8 +50,14 @@ export class Api {
       }),
     );
 
-    this.concept = new ConceptApi(this, this.buildConfig({ baseURL: this._config.baseUrl }));
-    this.conceptIgnite = new IgniteConceptApi(this, this.buildConfig({ baseURL: this._config.baseFastUrl }));
+    this.concept = new ConceptApi(
+      this,
+      this.buildConfig({ baseURL: this._config.baseUrl }),
+    );
+    this.conceptIgnite = new IgniteConceptApi(
+      this,
+      this.buildConfig({ baseURL: this._config.baseFastUrl }),
+    );
   }
 
   get accessToken() {
@@ -64,7 +70,9 @@ export class Api {
     // This is simply just an extra layer.
     [this.account, this.concept, this.conceptIgnite].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
-      api.config.headers = Object.assign({}, api.config.headers, { Authorization: `Bearer ${token}` });
+      api.config.headers = Object.assign({}, api.config.headers, {
+        Authorization: `Bearer ${token}`,
+      });
     });
     analytics.debug('Setting Access Token');
     this._accessToken = token;
@@ -81,7 +89,10 @@ export class Api {
   }
 
   // Method to update the refresh token action dynamically
-  setRefreshTokenAction(action: () => Promise<ITokenResponse | undefined>, callback?: () => void) {
+  setRefreshTokenAction(
+    action: () => Promise<ITokenResponse | undefined>,
+    callback?: () => void,
+  ) {
     this._refreshTokenAction = action;
     if (callback) {
       callback();

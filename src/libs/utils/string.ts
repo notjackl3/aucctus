@@ -11,7 +11,9 @@ export function camelCaseToTitleCase(camelCase: string) {
     return '';
   }
   const words = camelCase.replace(/([A-Z])/g, ' $1').split(' ');
-  return words.map((word) => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+  return words
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
 
 export const removeProtocol = (source: string) => {
@@ -32,7 +34,8 @@ export const removeProtocol = (source: string) => {
  */
 export function generateRandomString(length: number) {
   let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
   let counter = 0;
   while (counter < length) {
@@ -61,14 +64,20 @@ export const validEmail = (email: string) => {
  * @returns
  */
 export const validDomain = (domain: string) => {
-  return domain.toLowerCase().match(/^([A-Za-z0-9-]+\.([A-Za-z]{3,}|[A-Za-z]{2}\.[A-Za-z]{2}|[A-za-z]{2}))/);
+  return domain
+    .toLowerCase()
+    .match(
+      /^([A-Za-z0-9-]+\.([A-Za-z]{3,}|[A-Za-z]{2}\.[A-Za-z]{2}|[A-za-z]{2}))/,
+    );
 };
 
 export const queryStringGenerator = (root: string, options?: object) => {
   if (!options) return root;
 
   const query = Object.entries(options)
-    .filter(([, value]) => value !== undefined && value !== null && value !== '') // Filter out undefined and null values
+    .filter(
+      ([, value]) => value !== undefined && value !== null && value !== '',
+    ) // Filter out undefined and null values
     .map(([key, value]) => `${toSnakeCase(key)}=${value as string}`) // Convert to query params
     .join('&');
 

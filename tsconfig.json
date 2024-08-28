@@ -15,7 +15,11 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vite-plugin-svgr/client", "./src/types/index.d.ts", "./src/libs/api/types/index.d.ts"],
+    "types": [
+      "vite-plugin-svgr/client",
+      "./src/types/index.d.ts",
+      "./src/libs/api/types/index.d.ts"
+    ],
     "baseUrl": ".",
     "paths": {
       "@components": ["src/app/components/index.ts"],

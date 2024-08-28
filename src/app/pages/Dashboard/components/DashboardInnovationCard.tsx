@@ -21,7 +21,9 @@ export interface DashboardInnovationCardProps {
   conceptCount: IConceptDetails['count'];
 }
 
-const DashboardInnovationCard: FunctionComponent<DashboardInnovationCardProps> = ({ conceptCount }) => {
+const DashboardInnovationCard: FunctionComponent<
+  DashboardInnovationCardProps
+> = ({ conceptCount }) => {
   const innovationScores = useMemo(() => {
     if (!conceptCount) {
       return [];
@@ -48,7 +50,11 @@ const DashboardInnovationCard: FunctionComponent<DashboardInnovationCardProps> =
   ));
 
   return (
-    <Card.Detail title='Innovation Scorecard' cardClassName={styles.cardStyle} isHideFooter>
+    <Card.Detail
+      title='Innovation Scorecard'
+      cardClassName={styles.cardStyle}
+      isHideFooter
+    >
       <div className={styles.cardContent}>{renderInnovationRows}</div>
     </Card.Detail>
   );

@@ -14,28 +14,50 @@ interface IAddCustomerProfileProps {
 const NICKNAME_MAX_LENGTH = 250;
 const NAME_MAX_LENGTH = 250 / 2;
 
-const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conceptUuid }) => {
+const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({
+  conceptUuid,
+}) => {
   const { closeModal } = useModal();
   const [nickname, setNickname] = useState('');
-  const [nicknameError, setNicknameError] = useState<string | undefined>(undefined);
+  const [nicknameError, setNicknameError] = useState<string | undefined>(
+    undefined,
+  );
   const [firstName, setFirstName] = useState('');
-  const [firstNameError, setFirstNameError] = useState<string | undefined>(undefined);
+  const [firstNameError, setFirstNameError] = useState<string | undefined>(
+    undefined,
+  );
   const [lastName, setLastName] = useState('');
-  const [lastNameError, setLastNameError] = useState<string | undefined>(undefined);
+  const [lastNameError, setLastNameError] = useState<string | undefined>(
+    undefined,
+  );
   const [description, setDescription] = useState('');
-  const [descriptionError, setDescriptionError] = useState<string | undefined>(undefined);
+  const [descriptionError, setDescriptionError] = useState<string | undefined>(
+    undefined,
+  );
   const [ageUpper, setUpperAgeRange] = useState(0);
-  const [ageUpperError, setUpperAgeRangeError] = useState<string | undefined>(undefined);
+  const [ageUpperError, setUpperAgeRangeError] = useState<string | undefined>(
+    undefined,
+  );
   const [ageLower, setLowerAgeRange] = useState(0);
-  const [ageLowerError, setLowerAgeRangeError] = useState<string | undefined>(undefined);
+  const [ageLowerError, setLowerAgeRangeError] = useState<string | undefined>(
+    undefined,
+  );
   const [incomeUpper, setUpperIncomeRange] = useState(0);
-  const [incomeUpperError, setUpperIncomeRangeError] = useState<string | undefined>(undefined);
+  const [incomeUpperError, setUpperIncomeRangeError] = useState<
+    string | undefined
+  >(undefined);
   const [incomeLower, setLowerIncomeRange] = useState(0);
-  const [incomeLowerError, setLowerIncomeRangeError] = useState<string | undefined>(undefined);
+  const [incomeLowerError, setLowerIncomeRangeError] = useState<
+    string | undefined
+  >(undefined);
   const [familySize, setFamilySize] = useState(0);
-  const [familySizeError, setFamilySizeError] = useState<string | undefined>(undefined);
+  const [familySizeError, setFamilySizeError] = useState<string | undefined>(
+    undefined,
+  );
   const [geoLocation, setGeoLocation] = useState('');
-  const [geoLocationError, setGeoLocationError] = useState<string | undefined>(undefined);
+  const [geoLocationError, setGeoLocationError] = useState<string | undefined>(
+    undefined,
+  );
 
   const { mutate } = useCustomerProfileCreate(conceptUuid);
 
@@ -67,7 +89,9 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
       type: 'lower' | 'upper',
       setRange: React.Dispatch<React.SetStateAction<number>>,
       setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-      setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      setInverseRangeError: React.Dispatch<
+        React.SetStateAction<string | undefined>
+      >,
       inverseValue: number,
     ) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,7 +116,11 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
     <div className={styles.container}>
       <div className={styles.header}>
         <div />
-        <button aria-label='Close' className='btn-close' onClick={() => closeModal()} />
+        <button
+          aria-label='Close'
+          className='btn-close'
+          onClick={() => closeModal()}
+        />
       </div>
       <div className={styles.content}>
         <InputField
@@ -100,7 +128,12 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
           name='nickname'
           value={nickname}
           errorMessage={nicknameError}
-          onChange={handleTextFieldChange('Nickname', setNickname, setNicknameError, NICKNAME_MAX_LENGTH)}
+          onChange={handleTextFieldChange(
+            'Nickname',
+            setNickname,
+            setNicknameError,
+            NICKNAME_MAX_LENGTH,
+          )}
         />
         <div className={styles.inputRow}>
           <InputField
@@ -108,14 +141,24 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
             name='firstName'
             value={firstName}
             errorMessage={firstNameError}
-            onChange={handleTextFieldChange('First Name', setFirstName, setFirstNameError, NAME_MAX_LENGTH)}
+            onChange={handleTextFieldChange(
+              'First Name',
+              setFirstName,
+              setFirstNameError,
+              NAME_MAX_LENGTH,
+            )}
           />
           <InputField
             label='Last Name'
             name='lastName'
             value={lastName}
             errorMessage={lastNameError}
-            onChange={handleTextFieldChange('Last Name', setLastName, setLastNameError, NAME_MAX_LENGTH)}
+            onChange={handleTextFieldChange(
+              'Last Name',
+              setLastName,
+              setLastNameError,
+              NAME_MAX_LENGTH,
+            )}
           />
         </div>
         <TextArea
@@ -123,7 +166,11 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
           name='overview'
           value={description}
           errorMessage={descriptionError}
-          onChange={handleTextFieldChange('Description', setDescription, setDescriptionError)}
+          onChange={handleTextFieldChange(
+            'Description',
+            setDescription,
+            setDescriptionError,
+          )}
         />
         <h4>Demographics</h4>
         <InputField
@@ -131,7 +178,11 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({ conce
           name='geoLocation'
           value={geoLocation}
           errorMessage={geoLocationError}
-          onChange={handleTextFieldChange('Geolocation', setGeoLocation, setGeoLocationError)}
+          onChange={handleTextFieldChange(
+            'Geolocation',
+            setGeoLocation,
+            setGeoLocationError,
+          )}
         />
         <div className={styles.inputRow}>
           <InputField

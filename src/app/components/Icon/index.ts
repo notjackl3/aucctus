@@ -1,5 +1,6 @@
 import Feature from './FeatureIcon';
 import Default from './Icon/Icon';
+
 import Tooltip from './Tooltip';
 
 (Default as any).Feature = Feature;

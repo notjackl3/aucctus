@@ -3,14 +3,17 @@ import React from 'react';
 import { Card, Legend } from '@components';
 import { IFinancialProjection } from '../../../libs/api/types';
 import MarketChart from '../Charts/MarketChart';
-import Icon from '../Icons/Icon/Icon';
+import Icon from '../Icon/Icon/Icon';
 
 interface IFinancialProjectsCardProps {
   projection: IFinancialProjection | undefined;
   onViewClick: React.MouseEventHandler<HTMLButtonElement> | undefined;
 }
 
-const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projection, onViewClick }) => {
+const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({
+  projection,
+  onViewClick,
+}) => {
   /**
    * Calculates and returns the market size metrics based on the overview and financial projection data.
    *
@@ -25,8 +28,21 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projecti
       contentClassName='h-[360px]'
       cardClassName=''
       footerAction={
-        <button className='btn btn-light' onClick={onViewClick} aria-label='View Financial Projection'>
-          <span>{<Icon variant='line-chart-up' width={16} height={16} stroke='#626BA3' />}</span>
+        <button
+          className='btn btn-light'
+          onClick={onViewClick}
+          aria-label='View Financial Projection'
+        >
+          <span>
+            {
+              <Icon
+                variant='line-chart-up'
+                width={16}
+                height={16}
+                stroke='#626BA3'
+              />
+            }
+          </span>
           View Projections
         </button>
       }
@@ -34,9 +50,18 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({ projecti
       <div className='inline-flex h-full w-full flex-col items-center justify-between p-6'>
         {projection ? (
           <>
-            <MarketChart className={'h-44 w-44'} tam={projection.tam} sam={projection.sam} som={projection.som} />
+            <MarketChart
+              className={'h-44 w-44'}
+              tam={projection.tam}
+              sam={projection.sam}
+              som={projection.som}
+            />
 
-            <Legend.MarketLegend tam={projection.tam} sam={projection.sam} som={projection.som} />
+            <Legend.MarketLegend
+              tam={projection.tam}
+              sam={projection.sam}
+              som={projection.som}
+            />
           </>
         ) : (
           'No financial projection data available'

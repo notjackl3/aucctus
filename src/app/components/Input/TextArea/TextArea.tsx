@@ -11,7 +11,8 @@ import {
 import styles from './text-area.module.scss';
 import React from 'react';
 
-export interface TextAreaProps extends TextareaHTMLAttributes<HTMLTextAreaElement> {
+export interface TextAreaProps
+  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label: string;
   name: string;
   error?: boolean;
@@ -52,7 +53,8 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
   const hintText = errorMessage || hint;
 
   const disableResizeClassName = isDisableResize ? styles.disableResize : '';
-  const characterCountErrorStyle = !!maxLength && characterCount > maxLength ? styles.error : '';
+  const characterCountErrorStyle =
+    !!maxLength && characterCount > maxLength ? styles.error : '';
 
   const scrollToTextAreaWithPadding = useCallback(() => {
     const padding = 35; // Adjust padding value as needed, e.g., 35 pixels from the bottom
@@ -60,7 +62,8 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
     if (element) {
       const elementRect = element.getBoundingClientRect();
       const absoluteElementTop = elementRect.top + window.scrollY;
-      const middle = absoluteElementTop - (window.innerHeight - elementRect.height) / 2;
+      const middle =
+        absoluteElementTop - (window.innerHeight - elementRect.height) / 2;
       window.scrollTo({
         top: middle - padding, // Scrolls to the position of the element minus the padding
         behavior: 'smooth',
@@ -95,10 +98,14 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
   }));
 
   return (
-    <div className={`${styles.inputField} ${hasError ? styles.inputFieldError : ''}`}>
+    <div
+      className={`${styles.inputField} ${hasError ? styles.inputFieldError : ''}`}
+    >
       <div className={styles.label}>
         {label}
-        {showAsterisk ? <span className='font-semibold text-red-400'>*</span> : null}
+        {showAsterisk ? (
+          <span className='font-semibold text-red-400'>*</span>
+        ) : null}
       </div>
       <textarea
         className={disableResizeClassName}
@@ -110,7 +117,9 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
         name={name}
       />
       {maxLength ? (
-        <span className={`${styles.characterCount} ${characterCountErrorStyle}`}>
+        <span
+          className={`${styles.characterCount} ${characterCountErrorStyle}`}
+        >
           {characterCount}/{maxLength}
         </span>
       ) : null}

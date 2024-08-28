@@ -2,7 +2,10 @@ import images from '@assets/img';
 import { Card, Icon } from '@components';
 import EditMarketScanElement from '@components/Modal/MarketScanElement/EditMarketScanElement';
 import { useModal } from '@context/ModalContextProvider';
-import { useTrendAndDriverDelete, useTrendAndDriverUpdate } from '@hooks/query/concepts.hook';
+import {
+  useTrendAndDriverDelete,
+  useTrendAndDriverUpdate,
+} from '@hooks/query/concepts.hook';
 import { ITrendsAndDrivers } from '@libs/api/types';
 import { FunctionComponent } from 'react';
 import styles from './styles/marketDetails.module.scss';
@@ -17,7 +20,9 @@ interface ITrendsAndDriversProps {
   trendAndDriver: ITrendsAndDrivers;
 }
 
-const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAndDriver }) => {
+const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
+  trendAndDriver,
+}) => {
   const { openModal } = useModal();
   const { mutate: deleteItem } = useTrendAndDriverDelete();
   const { mutate: updateItem } = useTrendAndDriverUpdate();
@@ -44,7 +49,13 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({ trendAn
     >
       <div
         className={styles.cardTrendContent}
-        onClick={() => openModal(EditMarketScanElement, { item: trendAndDriver, deleteItem, updateItem })}
+        onClick={() =>
+          openModal(EditMarketScanElement, {
+            item: trendAndDriver,
+            deleteItem,
+            updateItem,
+          })
+        }
       >
         <img alt='delivery-trend' src={images.deliveryTrend} />
         <span className={styles.cardBoldText}>{trendAndDriver?.name}</span>

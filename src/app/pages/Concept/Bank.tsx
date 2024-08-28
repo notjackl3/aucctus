@@ -1,7 +1,11 @@
 import React, { ReactNode } from 'react';
 
 import { Header, Icon, Input, Table } from '@components';
-import { areFilterOptionsSet, IConceptFilterOptions, useConceptBank } from '@hooks/tables/concept-bank.hook';
+import {
+  areFilterOptionsSet,
+  IConceptFilterOptions,
+  useConceptBank,
+} from '@hooks/tables/concept-bank.hook';
 import utils from '@libs/utils';
 import { isUser } from '@libs/utils/account';
 import {
@@ -22,33 +26,44 @@ export const CONCEPT_STATUS_LIST_MAP = {
 const ConceptBank: React.FC = () => {
   const navigate = useNavigate();
 
-  const { table, page, setPage, numberOfPages, isLoading, filterOptions, updateTableFiltering, resetFilter } =
-    useConceptBank();
+  const {
+    table,
+    page,
+    setPage,
+    numberOfPages,
+    isLoading,
+    filterOptions,
+    updateTableFiltering,
+    resetFilter,
+  } = useConceptBank();
 
   const createFilterHeader = React.useCallback(() => {
-    return Object.entries(filterOptions).reduce<ReactNode[]>((headerItems, [key, value]) => {
-      let itemValue = '';
+    return Object.entries(filterOptions).reduce<ReactNode[]>(
+      (headerItems, [key, value]) => {
+        let itemValue = '';
 
-      if (value instanceof Set) {
-        itemValue = Array.from(value).map(camelCaseToTitleCase).join(', ');
-      } else if (typeof value === 'string') {
-        itemValue = value;
-      } else if (isUser(value)) {
-        itemValue = utils.account.getUsersFullName(value);
-      }
+        if (value instanceof Set) {
+          itemValue = Array.from(value).map(camelCaseToTitleCase).join(', ');
+        } else if (typeof value === 'string') {
+          itemValue = value;
+        } else if (isUser(value)) {
+          itemValue = utils.account.getUsersFullName(value);
+        }
 
-      if (itemValue) {
-        headerItems.push(
-          <Table.ConceptBank.FilterOptionsHeaderItem
-            key={`${utils.string.generateRandomString(5)}${key}`}
-            propertyName={key as keyof IConceptFilterOptions}
-            value={itemValue}
-          />,
-        );
-      }
+        if (itemValue) {
+          headerItems.push(
+            <Table.ConceptBank.FilterOptionsHeaderItem
+              key={`${utils.string.generateRandomString(5)}${key}`}
+              propertyName={key as keyof IConceptFilterOptions}
+              value={itemValue}
+            />,
+          );
+        }
 
-      return headerItems;
-    }, []);
+        return headerItems;
+      },
+      [],
+    );
   }, [filterOptions]);
 
   return (
@@ -81,17 +96,25 @@ const ConceptBank: React.FC = () => {
             }}
           />
 
-          <Table.ConceptBank.FilterMenubar updateFilterOptions={updateTableFiltering} filterOptions={filterOptions} />
+          <Table.ConceptBank.FilterMenubar
+            updateFilterOptions={updateTableFiltering}
+            filterOptions={filterOptions}
+          />
         </div>
 
         <Table
           isLoading={isLoading}
           header={
             <>
-              <div className='flex h-full w-full flex-row gap-2 overflow-x-scroll'>{createFilterHeader()}</div>
+              <div className='flex h-full w-full flex-row gap-2 overflow-x-scroll'>
+                {createFilterHeader()}
+              </div>
 
               {areFilterOptionsSet(filterOptions) ? (
-                <button className='btn btn-no-border btn-light text-nowrap' onClick={resetFilter}>
+                <button
+                  className='btn btn-no-border btn-light text-nowrap'
+                  onClick={resetFilter}
+                >
                   <Icon variant='closeX' />
                   Reset Filter
                 </button>

@@ -3,8 +3,8 @@ import { FunctionComponent, useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import FeatureIcon from '../../components/Icons/FeatureIcon';
-import Icon from '../../components/Icons/Icon/Icon';
+import FeatureIcon from '../../components/Icon/FeatureIcon';
+import Icon from '../../components/Icon/Icon/Icon';
 import InputField from '../../components/Input/InputField/InputField';
 import { useRequestPasswordReset } from '../../hooks/query/auth.hook';
 
@@ -12,7 +12,11 @@ const ForgotPassword: FunctionComponent = () => {
   const [email, setEmail] = useState('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
 
-  const { mutate: requestPasswordReset, isSuccess, error } = useRequestPasswordReset();
+  const {
+    mutate: requestPasswordReset,
+    isSuccess,
+    error,
+  } = useRequestPasswordReset();
 
   const _handleEmailValidation = useCallback(
     (e: React.FocusEvent) => {
@@ -31,9 +35,15 @@ const ForgotPassword: FunctionComponent = () => {
       <div className={`${styles.header} ${styles.h2}`}>
         <FeatureIcon icon={'key'} color={'purple'} />
         <span className={styles.title}>Forgot Password</span>
-        <span className={styles.supportingText}>No worries, we'll send you reset instructions.</span>
-        <span className={styles.success}>{isSuccess ? 'Reset instructions sent!' : ''}</span>
-        <span className={styles.error}>{!!error ? utils.osiris.parseFormError(error) : ''}</span>
+        <span className={styles.supportingText}>
+          {"No worries, we'll send you reset instructions."}
+        </span>
+        <span className={styles.success}>
+          {isSuccess ? 'Reset instructions sent!' : ''}
+        </span>
+        <span className={styles.error}>
+          {!!error ? utils.osiris.parseFormError(error) : ''}
+        </span>
       </div>
       <form className={styles.basicForm}>
         <InputField
@@ -44,7 +54,9 @@ const ForgotPassword: FunctionComponent = () => {
           value={email}
           autoComplete='on'
           errorMessage={emailInputError}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
           onFocus={() => setEmailInputError(undefined)}
           onBlur={_handleEmailValidation}
         />

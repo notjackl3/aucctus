@@ -56,7 +56,8 @@ const Dashboard: FunctionComponent = () => {
                 }}
                 aria-label='View Concept Bank'
               >
-                Go to Concept Bank <Icon variant='arrowright' {...defaultIconProps} />
+                Go to Concept Bank{' '}
+                <Icon variant='arrowright' {...defaultIconProps} />
               </button>
             }
           >

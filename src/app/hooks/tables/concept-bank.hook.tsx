@@ -1,6 +1,12 @@
 import { Button, Table } from '@components';
 import { useConcepts } from '@hooks/query/concepts.hook';
-import { ConceptSort, ConceptStatus, IConcept, IUser, SortableConceptProperties } from '@libs/api/types';
+import {
+  ConceptSort,
+  ConceptStatus,
+  IConcept,
+  IUser,
+  SortableConceptProperties,
+} from '@libs/api/types';
 import {
   ColumnDef,
   createColumnHelper,
@@ -12,7 +18,10 @@ import {
 } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
 
-import { useConceptUpdate, useRetryConceptReport } from '@hooks/query/concepts.hook';
+import {
+  useConceptUpdate,
+  useRetryConceptReport,
+} from '@hooks/query/concepts.hook';
 import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
@@ -33,7 +42,9 @@ const INITIAL_FILTER: IConceptFilterOptions = {
 
 const PAGE_SIZE = 20;
 
-export const areFilterOptionsSet = (filterOptions: IConceptFilterOptions): boolean => {
+export const areFilterOptionsSet = (
+  filterOptions: IConceptFilterOptions,
+): boolean => {
   const { status, createdBy, search, sort } = filterOptions;
 
   return (
@@ -44,8 +55,15 @@ export const areFilterOptionsSet = (filterOptions: IConceptFilterOptions): boole
   );
 };
 
-function isSortableConceptProperty(value: string): value is SortableConceptProperties {
-  const arr: SortableConceptProperties[] = ['createdAt', 'updatedAt', 'status', 'title'];
+function isSortableConceptProperty(
+  value: string,
+): value is SortableConceptProperties {
+  const arr: SortableConceptProperties[] = [
+    'createdAt',
+    'updatedAt',
+    'status',
+    'title',
+  ];
   return (arr as string[]).includes(value);
 }
 
@@ -53,7 +71,8 @@ export const useConceptBank = () => {
   const navigate = useNavigate();
   const { mutate: updateConcept } = useConceptUpdate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
-  const [filterOptions, setFilterOptions] = React.useState<IConceptFilterOptions>(INITIAL_FILTER);
+  const [filterOptions, setFilterOptions] =
+    React.useState<IConceptFilterOptions>(INITIAL_FILTER);
   const [page, setPage] = React.useState<number>(1);
   const [sorting, setSorting] = React.useState<SortingState>([]);
 
@@ -83,31 +102,33 @@ export const useConceptBank = () => {
   }, []);
 
   const handleGenerateConceptButton = React.useCallback(
-    (row: Row<IConcept>) => (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      const reportStatus = row.original.reportStatus;
-      switch (reportStatus) {
-        case 'notStarted':
-          updateConcept({
-            uuid: row.original.uuid,
-            status: 'ideating',
-          });
-          break;
-        case 'error':
-          retryConceptReport(row.original.uuid);
-          break;
-        case 'complete':
-          navigate(AppPath.ConceptOverview.replace(':id', row.original.uuid));
-          break;
-        default:
-          e.stopPropagation();
-      }
-    },
+    (row: Row<IConcept>) =>
+      (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        const reportStatus = row.original.reportStatus;
+        switch (reportStatus) {
+          case 'notStarted':
+            updateConcept({
+              uuid: row.original.uuid,
+              status: 'ideating',
+            });
+            break;
+          case 'error':
+            retryConceptReport(row.original.uuid);
+            break;
+          case 'complete':
+            navigate(AppPath.ConceptOverview.replace(':id', row.original.uuid));
+            break;
+          default:
+            e.stopPropagation();
+        }
+      },
     [navigate, retryConceptReport, updateConcept],
   );
 
   const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(
     (updater) => {
-      const newSorting = typeof updater === 'function' ? updater(sorting) : updater;
+      const newSorting =
+        typeof updater === 'function' ? updater(sorting) : updater;
 
       if (newSorting.length === 0) {
         updateTableFiltering({ sort: undefined });
@@ -115,7 +136,9 @@ export const useConceptBank = () => {
       const value = newSorting[0];
       if (value) {
         if (isSortableConceptProperty(value.id)) {
-          const sortValue = (value.desc ? `-${value.id}` : value.id) as ConceptSort;
+          const sortValue = (
+            value.desc ? `-${value.id}` : value.id
+          ) as ConceptSort;
           updateTableFiltering({ sort: sortValue });
         }
       }
@@ -167,7 +190,10 @@ export const useConceptBank = () => {
         enableColumnFilter: false,
         header: () => 'Concept',
         cell: (info) => (
-          <Table.ConceptBank.TitleDescription title={info.getValue()} description={info.row.original.description} />
+          <Table.ConceptBank.TitleDescription
+            title={info.getValue()}
+            description={info.row.original.description}
+          />
         ),
       }),
       columnHelper.accessor((row) => utils.time.dateFormatter(row.createdAt), {
@@ -180,7 +206,10 @@ export const useConceptBank = () => {
         cell: (info) => (
           <span className='flex w-[167px] flex-row items-center justify-start gap-2'>
             <Table.ConceptBank.CreatedBy user={info.row.original.createdBy} />
-            <Table.ConceptBank.Text className='text-nowrap' value={info.getValue()} />
+            <Table.ConceptBank.Text
+              className='text-nowrap'
+              value={info.getValue()}
+            />
           </span>
         ),
         header: () => 'Created',
@@ -204,7 +233,10 @@ export const useConceptBank = () => {
         enableResizing: false,
         cell: ({ row }) => (
           <span className='m-auto flex h-full w-[124px] items-center justify-end self-stretch align-middle'>
-            <Button.ConceptGenerate variant={row.original.reportStatus} onClick={handleGenerateConceptButton(row)} />
+            <Button.ConceptGenerate
+              variant={row.original.reportStatus}
+              onClick={handleGenerateConceptButton(row)}
+            />
           </span>
         ),
         header: () => {},
@@ -216,7 +248,12 @@ export const useConceptBank = () => {
         size: 42,
         maxSize: 42,
         header: () => {},
-        cell: (info) => <Table.ConceptBank.MenuButton status={info.row.original.status} uuid={info.getValue()} />,
+        cell: (info) => (
+          <Table.ConceptBank.MenuButton
+            status={info.row.original.status}
+            uuid={info.getValue()}
+          />
+        ),
       }),
     ];
   }, [handleGenerateConceptButton]);

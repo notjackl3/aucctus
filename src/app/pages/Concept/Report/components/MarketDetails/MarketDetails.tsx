@@ -1,9 +1,12 @@
-import Icon from '@components/Icons/Icon/Icon';
+import Icon from '@components/Icon/Icon/Icon';
 import AddMarketScanElement from '@components/Modal/MarketScanElement/AddMarketScanElement';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useModal } from '@context/ModalContextProvider';
 import { useEditMarketScan } from '@hooks/concepts/editable.hook';
-import { useConceptMarketScan, useTrendAndDriverCreate } from '@hooks/query/concepts.hook';
+import {
+  useConceptMarketScan,
+  useTrendAndDriverCreate,
+} from '@hooks/query/concepts.hook';
 import { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import EcosystemList from './EcosystemList';
@@ -13,8 +16,11 @@ import TrendAndDriverCard from './TrendAndDriverCard';
 const MarketDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
   const { data: marketScan } = useConceptMarketScan(conceptId || '');
-  const { trendsAndDriversDescription, ecosystemDescription } = useEditMarketScan();
-  const { mutate: addTrendAndDriver } = useTrendAndDriverCreate(conceptId || '');
+  const { trendsAndDriversDescription, ecosystemDescription } =
+    useEditMarketScan();
+  const { mutate: addTrendAndDriver } = useTrendAndDriverCreate(
+    conceptId || '',
+  );
   const { openModal } = useModal();
 
   return (
@@ -45,7 +51,9 @@ const MarketDetails: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.cardContainer}>
-        {marketScan?.trendsAndDrivers.map((trend) => <TrendAndDriverCard trendAndDriver={trend} key={trend.uuid} />)}
+        {marketScan?.trendsAndDrivers.map((trend) => (
+          <TrendAndDriverCard trendAndDriver={trend} key={trend.uuid} />
+        ))}
       </div>
       <div className={styles.summary}>
         <div className={styles.detailBlock}>
@@ -63,14 +71,30 @@ const MarketDetails: FunctionComponent = () => {
         </div>
       </div>
       <div className={styles.cardContainer}>
-        <EcosystemList title='Top Startups' data={marketScan?.startups || []} ecosystemType='startup' />
-        <EcosystemList title='Top Incumbents' data={marketScan?.incumbents || []} ecosystemType='incumbents' />
-        <EcosystemList title='Top Investors' data={marketScan?.investors || []} ecosystemType='investors' />
+        <EcosystemList
+          title='Top Startups'
+          data={marketScan?.startups || []}
+          ecosystemType='startup'
+        />
+        <EcosystemList
+          title='Top Incumbents'
+          data={marketScan?.incumbents || []}
+          ecosystemType='incumbents'
+        />
+        <EcosystemList
+          title='Top Investors'
+          data={marketScan?.investors || []}
+          ecosystemType='investors'
+        />
       </div>
 
       {/* This external link is required to be added to the page when using Clearbit logos */}
       <div className={styles.externalLogoLink}>
-        <a href='https://clearbit.com' target='_blank' rel='noopener noreferrer'>
+        <a
+          href='https://clearbit.com'
+          target='_blank'
+          rel='noopener noreferrer'
+        >
           Logos provided by Clearbit
         </a>
       </div>

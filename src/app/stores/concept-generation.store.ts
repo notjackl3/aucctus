@@ -27,13 +27,19 @@ export const useConceptGenerationStore = create<ConceptGenerationStoreState>()(
       },
 
       clear() {
-        set({ generatedConcepts: [], seed: { attributes: [], type: 'UNKNOWN' } });
+        set({
+          generatedConcepts: [],
+          seed: { attributes: [], type: 'UNKNOWN' },
+        });
       },
     }),
     {
       name: 'app-store',
       storage: createJSONStorage(() => sessionStorage),
-      partialize: (state) => ({ generatedConcepts: state.generatedConcepts, seed: state.seed }),
+      partialize: (state) => ({
+        generatedConcepts: state.generatedConcepts,
+        seed: state.seed,
+      }),
     },
   ),
 );

@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import { ConceptStatusIconColor } from '../../../../libs/utils/concepts';
-import Icon from '../../Icons/Icon/Icon';
+import Icon from '../../Icon/Icon/Icon';
 import styles from './styles/conceptStatistic.module.scss';
 
 export interface IConceptStatisticProps {
@@ -27,7 +27,9 @@ const ConceptStatistic: FunctionComponent<IConceptStatisticProps> = ({
   icon,
   variant,
 }) => {
-  const getAdditionalStatisticStyle = (variant: IConceptStatisticProps['variant']) => {
+  const getAdditionalStatisticStyle = (
+    variant: IConceptStatisticProps['variant'],
+  ) => {
     switch (variant) {
       case 'opportunity':
         return styles.opportunityStatistic;
@@ -47,7 +49,9 @@ const ConceptStatistic: FunctionComponent<IConceptStatisticProps> = ({
         <div className={styles.conceptInfoTitle}>{infoTitle}</div>
         <div className={styles.conceptData}>
           <div className={styles.conceptDataNumber}>{infoValue}</div>
-          {infoSubValue && <div className={styles.conceptDataInfo}>{infoSubValue}</div>}
+          {infoSubValue && (
+            <div className={styles.conceptDataInfo}>{infoSubValue}</div>
+          )}
         </div>
       </div>
     </div>

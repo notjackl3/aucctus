@@ -1,5 +1,10 @@
-import React, { ForwardRefRenderFunction, InputHTMLAttributes, useEffect, useState } from 'react';
-import Icon from '../../Icons/Icon/Icon';
+import React, {
+  ForwardRefRenderFunction,
+  InputHTMLAttributes,
+  useEffect,
+  useState,
+} from 'react';
+import Icon from '../../Icon/Icon/Icon';
 import styles from './input-field.module.scss';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -89,11 +94,16 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
   }, [value, debounce, props, name]);
 
   return (
-    <div style={width ? { width } : {}} className={`${inputFieldStyle} ${hasError ? styles.inputFieldError : ''}`}>
+    <div
+      style={width ? { width } : {}}
+      className={`${inputFieldStyle} ${hasError ? styles.inputFieldError : ''}`}
+    >
       {label && (
         <div className={styles.label}>
           {label}
-          {showAsterisk ? <span className='font-semibold text-red-400'>*</span> : null}
+          {showAsterisk ? (
+            <span className='font-semibold text-red-400'>*</span>
+          ) : null}
         </div>
       )}
       <input
@@ -111,7 +121,10 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
           onClick={togglePasswordVisibility}
           aria-label='Toggle password visibility'
         >
-          <Icon variant={isPasswordVisible ? 'eye-off' : 'eye'} {...defaultIconProps} />
+          <Icon
+            variant={isPasswordVisible ? 'eye-off' : 'eye'}
+            {...defaultIconProps}
+          />
         </button>
       )}
       {showHint ? <div className={styles.hintText}>{hintText}</div> : null}

@@ -1,14 +1,19 @@
 import { FunctionComponent } from 'react';
 
 import styles from '../../assets/styles/components/onboarding-message.module.scss';
-import FeatureIcon, { IFeatureIconProps } from '../Icons/FeatureIcon';
+import FeatureIcon, { IFeatureIconProps } from '../Icon/FeatureIcon';
 
 interface OnboardingMessageProps extends IFeatureIconProps {
   title: string;
   description: string;
 }
 
-const OnboardingMessage: FunctionComponent<OnboardingMessageProps> = ({ title, description, icon, color }) => {
+const OnboardingMessage: FunctionComponent<OnboardingMessageProps> = ({
+  title,
+  description,
+  icon,
+  color,
+}) => {
   return (
     <div className={styles.onboardingMessage}>
       <FeatureIcon icon={icon} color={color} />

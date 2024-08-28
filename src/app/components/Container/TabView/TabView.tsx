@@ -48,7 +48,9 @@ const TabView: FunctionComponent<TabsProps> = ({
             />
           ))}
         </div>
-        {actionButtons ? <div className={styles.actionButtons}>{actionButtons}</div> : null}
+        {actionButtons ? (
+          <div className={styles.actionButtons}>{actionButtons}</div>
+        ) : null}
       </div>
       {children}
     </div>

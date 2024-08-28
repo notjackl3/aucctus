@@ -15,11 +15,15 @@ const ConceptSettings: FunctionComponent = () => {
       <div className='inline-flex items-start justify-start rounded-lg border border-gray-300 shadow'>
         {/* TODO: Convert these to buttons */}
         <div className='flex items-center justify-center gap-2 rounded-l-lg border-r border-gray-300 bg-gray-50 px-4 py-2'>
-          <div className='text-base font-semibold leading-tight text-slate-700'>Original Prompt</div>
+          <div className='text-base font-semibold leading-tight text-slate-700'>
+            Original Prompt
+          </div>
         </div>
         <div className='flex items-center justify-center gap-2 rounded-r-lg border-r border-gray-300 bg-white py-2 pl-3.5 pr-4'>
           <Icon variant='lock' />
-          <div className='text-base font-semibold leading-tight text-slate-700'>Uploads</div>
+          <div className='text-base font-semibold leading-tight text-slate-700'>
+            Uploads
+          </div>
         </div>
       </div>
 

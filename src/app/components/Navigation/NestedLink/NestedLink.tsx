@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
-import { Link, useMatch, To } from 'react-router-dom';
+import { Link, To, useMatch } from 'react-router-dom';
+import Icon from '../../Icon/Icon/Icon';
 import styles from './nested-link.module.scss';
-import Icon from '../../Icons/Icon/Icon';
 
 const defaultIconProps = {
   stroke: '#7586A9',
@@ -16,7 +16,13 @@ export interface NestedLinkProps {
   locked?: boolean;
 }
 
-const NestedLink: FunctionComponent<NestedLinkProps> = ({ to, title, icon, onClick, locked = false }) => {
+const NestedLink: FunctionComponent<NestedLinkProps> = ({
+  to,
+  title,
+  icon,
+  onClick,
+  locked = false,
+}) => {
   const searchParams = typeof to === 'string' ? '' : `${to.search}`;
   const path = typeof to === 'string' ? to : `${to.pathname}${searchParams}`;
   const match = useMatch(path);

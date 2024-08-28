@@ -3,17 +3,31 @@ import { FunctionComponent, useCallback, useState } from 'react';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import { UseMutateFunction } from 'react-query';
-import { Ecosystem, IFormError, ITrendsAndDrivers } from '../../../../libs/api/types';
+import {
+  Ecosystem,
+  IFormError,
+  ITrendsAndDrivers,
+} from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
-import Icon from '../../Icons/Icon/Icon';
+import Icon from '../../Icon/Icon/Icon';
 import InputField from '../../Input/InputField/InputField';
 import TextArea from '../../Input/TextArea/TextArea';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import styles from './edit-trends-and-driver.module.scss';
 
 interface EditTrendsAndDriverProps<T = Ecosystem | ITrendsAndDrivers> {
-  updateItem: UseMutateFunction<T, AxiosError<IFormError<T>, any>, Partial<T> & { uuid: string }, unknown>;
-  deleteItem: UseMutateFunction<T, AxiosError<IFormError<T>, any>, string, unknown>;
+  updateItem: UseMutateFunction<
+    T,
+    AxiosError<IFormError<T>, any>,
+    Partial<T> & { uuid: string },
+    unknown
+  >;
+  deleteItem: UseMutateFunction<
+    T,
+    AxiosError<IFormError<T>, any>,
+    string,
+    unknown
+  >;
   item: T;
 }
 
@@ -24,49 +38,66 @@ const isEcosystemItem = (item: unknown) => {
   return (item as Ecosystem).ecosystemType !== undefined;
 };
 
-const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ item, updateItem, deleteItem }) => {
+const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({
+  item,
+  updateItem,
+  deleteItem,
+}) => {
   const { closeModal } = useModal();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [name, setName] = useState(item.name);
   const [nameError, setNameError] = useState<string | undefined>();
-  const [source, setSource] = useState(utils.string.removeProtocol(item.source));
+  const [source, setSource] = useState(
+    utils.string.removeProtocol(item.source),
+  );
   const [sourceError, setSourceError] = useState<string | undefined>();
   const [description, setDescription] = useState(item.description);
-  const [descriptionError, setDescriptionError] = useState<string | undefined>();
+  const [descriptionError, setDescriptionError] = useState<
+    string | undefined
+  >();
 
-  const handleNameChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
+  const handleNameChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target.value;
 
-    setNameError(undefined);
+      setNameError(undefined);
 
-    if (input.length === 0) {
-      setNameError('Title is required.');
-    } else if (input.length > NAME_MAX_LENGTH) {
-      setNameError('Title exceeds the maximum allowed length.');
-    }
+      if (input.length === 0) {
+        setNameError('Title is required.');
+      } else if (input.length > NAME_MAX_LENGTH) {
+        setNameError('Title exceeds the maximum allowed length.');
+      }
 
-    setName(input);
-  }, []);
+      setName(input);
+    },
+    [],
+  );
 
-  const handleDescriptionChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const input = e.target.value;
+  const handleDescriptionChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const input = e.target.value;
 
-    setDescriptionError(undefined);
+      setDescriptionError(undefined);
 
-    if (input.length === 0) {
-      setDescriptionError('Description is required.');
-    } else if (input.length > DESCRIPTION_MAX_LENGTH) {
-      setDescriptionError('Description exceeds the maximum allowed length.');
-    }
+      if (input.length === 0) {
+        setDescriptionError('Description is required.');
+      } else if (input.length > DESCRIPTION_MAX_LENGTH) {
+        setDescriptionError('Description exceeds the maximum allowed length.');
+      }
 
-    setDescription(input);
-  }, []);
+      setDescription(input);
+    },
+    [],
+  );
 
-  const handleSourceChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSourceError(undefined);
-    let d = utils.string.removeProtocol(e.target.value);
-    setSource(d);
-  }, []);
+  const handleSourceChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSourceError(undefined);
+      let d = utils.string.removeProtocol(e.target.value);
+      setSource(d);
+    },
+    [],
+  );
 
   const handleSave = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
@@ -115,7 +146,12 @@ const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ it
         >
           <Icon variant='trash' />
         </button>
-        <button aria-label='Close' className={'btn-close'} disabled={showConfirmation} onClick={() => closeModal()} />
+        <button
+          aria-label='Close'
+          className={'btn-close'}
+          disabled={showConfirmation}
+          onClick={() => closeModal()}
+        />
       </div>
       <div className={styles.content}>
         <InputField
@@ -148,13 +184,23 @@ const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({ it
         ) : null}
       </div>
       <div className={styles.footer}>
-        <button className='btn btn-light' disabled={showConfirmation} onClick={() => closeModal()}>
+        <button
+          className='btn btn-light'
+          disabled={showConfirmation}
+          onClick={() => closeModal()}
+        >
           Cancel
         </button>
         <button
           className='btn btn-primary'
           disabled={
-            !name || !description || !source || !!nameError || !!descriptionError || !!sourceError || showConfirmation
+            !name ||
+            !description ||
+            !source ||
+            !!nameError ||
+            !!descriptionError ||
+            !!sourceError ||
+            showConfirmation
           }
           onClick={handleSave}
         >

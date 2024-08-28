@@ -4,7 +4,7 @@ import { AssumptionType } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
 import { useAssumptionCreate } from '../../../hooks/query/concepts.hook';
 import Dropdown, { Option } from '../../Buttons/Dropdown/Dropdown';
-import Icon from '../../Icons/Icon/Icon';
+import Icon from '../../Icon/Icon/Icon';
 import InputField from '../../Input/InputField/InputField';
 import TextArea from '../../Input/TextArea/TextArea';
 
@@ -18,14 +18,21 @@ const HYPOTHESES_MAX_LENGTH = 1500;
 const TITLE_MAX_LENGTH = 64;
 
 const ASSUMPTION_TYPE_OPTIONS: Option[] = (
-  ['adaptability', 'desirability', 'feasibility', 'viability'] as AssumptionType[]
+  [
+    'adaptability',
+    'desirability',
+    'feasibility',
+    'viability',
+  ] as AssumptionType[]
 ).map((value) => ({
   label: <Badge.Assumption type={value} />,
   displayLabel: <Badge.Assumption type={value} />,
   value,
 }));
 
-const AddKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = ({ conceptUuid }) => {
+const AddKeyAssumptionModal: FunctionComponent<
+  IEditKeyAssumptionModalProps
+> = ({ conceptUuid }) => {
   const { closeModal } = useModal();
   const [showConfirmation, setShowConfirmation] = useState(false);
   const { mutate: createAssumption } = useAssumptionCreate(conceptUuid);
@@ -33,45 +40,61 @@ const AddKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = (
   const [impactLevel, setImpactLevel] = useState<number>(0);
   const [difficultyLevel, setDifficultyLevel] = useState<number>(0);
 
-  const [assumptionsType, setAssumptionType] = useState<AssumptionType>('adaptability');
+  const [assumptionsType, setAssumptionType] =
+    useState<AssumptionType>('adaptability');
   const [title, setTitle] = useState<string>('');
   const [titleError, setTitleError] = useState<string | undefined>(undefined);
   const [hypothesis, setHypothesis] = useState<string>('');
-  const [hypothesisError, setHypothesisError] = useState<string | undefined>(undefined);
+  const [hypothesisError, setHypothesisError] = useState<string | undefined>(
+    undefined,
+  );
 
-  const handleTitleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
+  const handleTitleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const input = e.target.value;
 
-    setTitleError(undefined);
+      setTitleError(undefined);
 
-    if (input.length === 0) {
-      setTitleError('Title is required.');
-    } else if (input.length > TITLE_MAX_LENGTH) {
-      setTitleError('Title exceeds the maximum allowed length.');
-    }
+      if (input.length === 0) {
+        setTitleError('Title is required.');
+      } else if (input.length > TITLE_MAX_LENGTH) {
+        setTitleError('Title exceeds the maximum allowed length.');
+      }
 
-    setTitle(input);
-  }, []);
+      setTitle(input);
+    },
+    [],
+  );
 
-  const handleHypothesesChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const input = e.target.value;
+  const handleHypothesesChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      const input = e.target.value;
 
-    setHypothesisError(undefined);
+      setHypothesisError(undefined);
 
-    if (input.length === 0) {
-      setHypothesis('Hypothesis is required.');
-    } else if (input.length > HYPOTHESES_MAX_LENGTH) {
-      setHypothesisError('Hypothesis exceeds the maximum allowed length.');
-    }
+      if (input.length === 0) {
+        setHypothesis('Hypothesis is required.');
+      } else if (input.length > HYPOTHESES_MAX_LENGTH) {
+        setHypothesisError('Hypothesis exceeds the maximum allowed length.');
+      }
 
-    setHypothesis(input);
-  }, []);
+      setHypothesis(input);
+    },
+    [],
+  );
 
   const handleSave = useCallback(
     (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
       e.preventDefault();
       createAssumption(
-        { name: title, hypothesis, riskLevel, difficultyLevel, impactLevel, assumptionsType },
+        {
+          name: title,
+          hypothesis,
+          riskLevel,
+          difficultyLevel,
+          impactLevel,
+          assumptionsType,
+        },
         {
           onSuccess: () => {
             closeModal();
@@ -97,7 +120,16 @@ const AddKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = (
       e.preventDefault();
       e.stopPropagation();
     },
-    [createAssumption, title, hypothesis, riskLevel, difficultyLevel, impactLevel, assumptionsType, closeModal],
+    [
+      createAssumption,
+      title,
+      hypothesis,
+      riskLevel,
+      difficultyLevel,
+      impactLevel,
+      assumptionsType,
+      closeModal,
+    ],
   );
 
   return (
@@ -111,7 +143,12 @@ const AddKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = (
         >
           <Icon variant='trash' />
         </button>
-        <button aria-label='Close' className={'btn-close'} disabled={showConfirmation} onClick={() => closeModal()} />
+        <button
+          aria-label='Close'
+          className={'btn-close'}
+          disabled={showConfirmation}
+          onClick={() => closeModal()}
+        />
       </div>
       <div className={styles.content}>
         <Dropdown
@@ -150,7 +187,13 @@ const AddKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = (
             onChange={(e) => setImpactLevel(parseInt(e.target.value))}
           />
         </div>
-        <InputField name='title' label='Title' value={title} errorMessage={titleError} onChange={handleTitleChange} />
+        <InputField
+          name='title'
+          label='Title'
+          value={title}
+          errorMessage={titleError}
+          onChange={handleTitleChange}
+        />
         <TextArea
           name='hypothesis'
           label='Hypothesis'
@@ -161,12 +204,22 @@ const AddKeyAssumptionModal: FunctionComponent<IEditKeyAssumptionModalProps> = (
         />
       </div>
       <div className={styles.footer}>
-        <button className='btn btn-light' disabled={showConfirmation} onClick={() => closeModal()}>
+        <button
+          className='btn btn-light'
+          disabled={showConfirmation}
+          onClick={() => closeModal()}
+        >
           Cancel
         </button>
         <button
           className='btn btn-primary'
-          disabled={!title || !hypothesis || !!titleError || !!hypothesisError || showConfirmation}
+          disabled={
+            !title ||
+            !hypothesis ||
+            !!titleError ||
+            !!hypothesisError ||
+            showConfirmation
+          }
           onClick={handleSave}
         >
           Save

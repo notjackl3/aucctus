@@ -1,4 +1,8 @@
-import { IBusinessModel, IFinancialMarketSizeItem, IFinancialProjectionPricing } from '@libs/api/types';
+import {
+  IBusinessModel,
+  IFinancialMarketSizeItem,
+  IFinancialProjectionPricing,
+} from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -27,19 +31,33 @@ import {
   useMarketScanUpdate,
 } from '../query/concepts.hook';
 
-interface EditableField<T, TData = unknown, TError = unknown, TVariables = unknown> {
+interface EditableField<
+  T,
+  TData = unknown,
+  TError = unknown,
+  TVariables = unknown,
+> {
   value: T;
   isEdited: boolean;
   validation: IValidationOptions;
-  handleChange: (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement> | T) => void;
-  handleSave: (options?: MutateOptions<TData, TError, TVariables>) => Promise<void>;
+  handleChange: (
+    e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement> | T,
+  ) => void;
+  handleSave: (
+    options?: MutateOptions<TData, TError, TVariables>,
+  ) => Promise<void>;
   handleCancel: () => void;
 }
 
 interface IValidationOptions {
   maxLength?: number;
 }
-interface EditableFieldOptions<T, TData = unknown, TError = unknown, TVariables = unknown> {
+interface EditableFieldOptions<
+  T,
+  TData = unknown,
+  TError = unknown,
+  TVariables = unknown,
+> {
   initialValue: T;
   fieldName: keyof Exclude<Partial<TData>, 'uuid'>;
   updateMutation: UseMutateFunction<TData, TError, TVariables, unknown>;
@@ -74,11 +92,19 @@ function useEditableField<
   updateMutation,
   identifier,
   validation,
-}: EditableFieldOptions<T, TData, TError, TVariables>): EditableField<T, TData, TError, TVariables> {
+}: EditableFieldOptions<T, TData, TError, TVariables>): EditableField<
+  T,
+  TData,
+  TError,
+  TVariables
+> {
   const [value, setValue] = useState<T>(initialValue);
   const [isEdited, setIsEdited] = useState(false);
 
-  const validationOptions = Object.assign({ maxLength: undefined }, validation || {}) as IValidationOptions;
+  const validationOptions = Object.assign(
+    { maxLength: undefined },
+    validation || {},
+  ) as IValidationOptions;
   const { maxLength } = validationOptions;
 
   /**
@@ -87,18 +113,22 @@ function useEditableField<
    * @param {T} newValue - The new value to set.
    * @returns {void}
    */
-  const handleChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement> | T) => {
-    let newValue: T;
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement> | T) => {
+      let newValue: T;
 
-    if ((e as React.ChangeEvent<HTMLTextAreaElement>).target) {
-      newValue = (e as React.ChangeEvent<HTMLTextAreaElement>).target.value as unknown as T;
-    } else {
-      newValue = e as T;
-    }
+      if ((e as React.ChangeEvent<HTMLTextAreaElement>).target) {
+        newValue = (e as React.ChangeEvent<HTMLTextAreaElement>).target
+          .value as unknown as T;
+      } else {
+        newValue = e as T;
+      }
 
-    setValue(newValue);
-    setIsEdited(true);
-  }, []);
+      setValue(newValue);
+      setIsEdited(true);
+    },
+    [],
+  );
 
   /**
    * Saves the changes made to the editable field.
@@ -106,7 +136,9 @@ function useEditableField<
    * @param {MutateOptions<TData, TError, TVariables>} options - Optional options for the mutation.
    * @returns {Promise<void>}
    */
-  const handleSave = async (options?: MutateOptions<TData, TError, TVariables>): Promise<void> => {
+  const handleSave = async (
+    options?: MutateOptions<TData, TError, TVariables>,
+  ): Promise<void> => {
     if (!identifier) {
       toast.error('Oops! Something went wrong. Please try again.');
     }
@@ -158,7 +190,14 @@ function useEditableField<
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialValue]);
 
-  return { value, handleChange, handleSave, isEdited, handleCancel, validation: validationOptions };
+  return {
+    value,
+    handleChange,
+    handleSave,
+    isEdited,
+    handleCancel,
+    validation: validationOptions,
+  };
 }
 
 export function useEditConcept() {
@@ -181,7 +220,8 @@ export function useEditConcept() {
 export function useEditOverview() {
   const { id: conceptUuid = '' } = useParams();
   const { overview } = useConceptOverview(conceptUuid);
-  const { mutate: updateConceptOverview } = useConceptOverviewUpdate(conceptUuid);
+  const { mutate: updateConceptOverview } =
+    useConceptOverviewUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 250 };
 
   const valueProposition = useEditableField<string, IConceptOverview>({
@@ -272,7 +312,8 @@ const DEFAULT_MARKET_SIZE: IFinancialMarketSizeItem = {
 };
 export function useEditFinancialProjections() {
   const { id: conceptUuid = '' } = useParams();
-  const { financialProjection, isLoading } = useFinancialProjection(conceptUuid);
+  const { financialProjection, isLoading } =
+    useFinancialProjection(conceptUuid);
   const { mutate } = useFinancialProjectionUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 500 };
 
@@ -319,8 +360,10 @@ export function useEditFinancialProjections() {
     businessModel: financialProjection?.businessModel || DEFAULT_BUSINESS_MODEL,
     pricing: financialProjection?.pricing || DEFAULT_PRICING,
     totalUsers: financialProjection?.totalUsers || DEFAULT_MARKET_SIZE,
-    serviceableAddressablePercent: financialProjection?.serviceableAddressablePercent || DEFAULT_MARKET_SIZE,
-    serviceableObtainablePercent: financialProjection?.serviceableObtainablePercent || DEFAULT_MARKET_SIZE,
+    serviceableAddressablePercent:
+      financialProjection?.serviceableAddressablePercent || DEFAULT_MARKET_SIZE,
+    serviceableObtainablePercent:
+      financialProjection?.serviceableObtainablePercent || DEFAULT_MARKET_SIZE,
   };
 }
 

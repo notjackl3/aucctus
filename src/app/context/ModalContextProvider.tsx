@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, ReactNode, FunctionComponent } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  FunctionComponent,
+} from 'react';
 import Modal from '../components/Modal/Modal/Modal';
 
 interface ModalContextType {
@@ -8,8 +14,13 @@ interface ModalContextType {
    * Resets to True when the modal is closed.
    */
   shouldCloseOnOverlayClick: boolean;
-  setShouldCloseOnOverlayClickClick: React.Dispatch<React.SetStateAction<boolean>>;
-  openModal: <T extends object>(Component: FunctionComponent<T>, props?: T) => void;
+  setShouldCloseOnOverlayClickClick: React.Dispatch<
+    React.SetStateAction<boolean>
+  >;
+  openModal: <T extends object>(
+    Component: FunctionComponent<T>,
+    props?: T,
+  ) => void;
   closeModal: () => void;
 }
 
@@ -30,9 +41,13 @@ interface ModalProviderProps {
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [content, setContent] = useState<ReactNode>(null);
-  const [shouldCloseOnOverlayClick, setShouldCloseOnOverlayClickClick] = useState<boolean>(true);
+  const [shouldCloseOnOverlayClick, setShouldCloseOnOverlayClickClick] =
+    useState<boolean>(true);
 
-  const openModal = <T extends object>(Component: FunctionComponent<T>, props: T = {} as T) => {
+  const openModal = <T extends object>(
+    Component: FunctionComponent<T>,
+    props: T = {} as T,
+  ) => {
     setContent(<Component {...props} />);
     setIsOpen(true);
   };
@@ -46,7 +61,13 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
   return (
     <ModalContext.Provider
-      value={{ isOpen, openModal, closeModal, shouldCloseOnOverlayClick, setShouldCloseOnOverlayClickClick }}
+      value={{
+        isOpen,
+        openModal,
+        closeModal,
+        shouldCloseOnOverlayClick,
+        setShouldCloseOnOverlayClickClick,
+      }}
     >
       {children}
       {isOpen && <Modal>{content}</Modal>}

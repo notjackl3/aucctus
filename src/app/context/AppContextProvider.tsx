@@ -1,4 +1,12 @@
-import React, { createContext, useContext, useState, ReactNode, useCallback, useEffect, useMemo } from 'react';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+} from 'react';
 import LoadingScreen from '../pages/LoadingScreen';
 import api from '../../libs/api';
 import { useRefresh } from '../hooks/query/auth.hook';
@@ -34,11 +42,17 @@ interface IAppProviderProps {
 
 export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
   const { initialized, initializeApp } = useAppStore();
-  const { clearTokens, access, refresh, retrieveTokens, hasRetrievedTokens } = useTokenStore();
-  const [hasSetRefreshTokenAction, setHasSetRefreshTokenAction] = useState<boolean>(false);
+  const { clearTokens, access, refresh, retrieveTokens, hasRetrievedTokens } =
+    useTokenStore();
+  const [hasSetRefreshTokenAction, setHasSetRefreshTokenAction] =
+    useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(true);
-  const { mutateAsync: refreshAsync, isLoading: isRefreshLoading } = useRefresh();
-  const isAuthenticated = useMemo(() => !!refresh && !!access && !!initialized, [refresh, access, initialized]);
+  const { mutateAsync: refreshAsync, isLoading: isRefreshLoading } =
+    useRefresh();
+  const isAuthenticated = useMemo(
+    () => !!refresh && !!access && !!initialized,
+    [refresh, access, initialized],
+  );
 
   const showLoading = useCallback((value: boolean) => {
     if (value) {
@@ -79,7 +93,12 @@ export const AppProvider: React.FC<IAppProviderProps> = ({ children }) => {
         });
       }
     })();
-  }, [hasSetRefreshTokenAction, initialized, hasRetrievedTokens, initializeApp]);
+  }, [
+    hasSetRefreshTokenAction,
+    initialized,
+    hasRetrievedTokens,
+    initializeApp,
+  ]);
 
   useEffect(() => {
     showLoading(!initialized || isRefreshLoading);

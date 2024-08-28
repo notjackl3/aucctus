@@ -48,7 +48,10 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
                   'min-h-96': !table?.getRowModel().rows.length, // Apply min height when empty
                 })}
               >
-                {table && table.getRowModel().rows.map((row) => <TB.Row key={row.id} row={row} />)}
+                {table &&
+                  table
+                    .getRowModel()
+                    .rows.map((row) => <TB.Row key={row.id} row={row} />)}
                 {/* Display a message if the table is empty */}
                 {!table?.getRowModel().rows.length && (
                   <tr>
@@ -69,7 +72,10 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
                         <th key={header.id}>
                           {header.isPlaceholder
                             ? null
-                            : flexRender(header.column.columnDef.footer, header.getContext())}
+                            : flexRender(
+                                header.column.columnDef.footer,
+                                header.getContext(),
+                              )}
                         </th>
                       ))}
                     </tr>

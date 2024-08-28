@@ -5,7 +5,7 @@ import Card from './Cards';
 import Chart from './Charts';
 import Container from './Container';
 import Header from './Header';
-import Icon from './Icons';
+import Icon from './Icon';
 import Input from './Input';
 import Legend from './Legends';
 import Modal from './Modal';

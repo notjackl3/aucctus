@@ -9,7 +9,9 @@ interface ITableHeaderProps<T> {
 }
 
 // TableHeader Component
-const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({ header }: ITableHeaderProps<T>) => {
+const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
+  header,
+}: ITableHeaderProps<T>) => {
   return (
     <th
       className='text-nowrap p-3 align-top text-base font-medium leading-normal text-indigo-900 first:pl-6 last:pr-6'
@@ -29,8 +31,12 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({ header }: ITableHea
           >
             {flexRender(header.column.columnDef.header, header.getContext())}
             {{
-              asc: <Icon variant='arrowup' className='ml-1 stroke-indigo-900' />,
-              desc: <Icon variant='arrowdown' className='ml-1 stroke-indigo-900' />,
+              asc: (
+                <Icon variant='arrowup' className='ml-1 stroke-indigo-900' />
+              ),
+              desc: (
+                <Icon variant='arrowdown' className='ml-1 stroke-indigo-900' />
+              ),
             }[header.column.getIsSorted() as string] ?? null}
           </span>
           {header.column.getCanFilter() ? (

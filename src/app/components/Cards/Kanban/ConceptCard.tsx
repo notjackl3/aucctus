@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 
 import { IConcept } from '@libs/api/types';
 import utils from '@libs/utils';
-import Icon from '../../Icons/Icon/Icon';
+import Icon from '../../Icon/Icon/Icon';
 import styles from './conceptCard.module.scss';
 
 export interface IConceptCardProps {
@@ -16,13 +16,22 @@ const defaultIconProps = {
   stroke: '#FFFFFF',
 };
 
-const ConceptCard: FunctionComponent<IConceptCardProps> = ({ concept, selectCard }) => {
+const ConceptCard: FunctionComponent<IConceptCardProps> = ({
+  concept,
+  selectCard,
+}) => {
   return (
     <div className={`${styles.conceptCard}`}>
       <div className={styles.conceptCardContent}>
         <div className={styles.cardTitle}>{concept?.title}</div>
-        <p className={`${styles.cardDescription} ${styles.descriptionOverflow}`}>{concept?.description}</p>
-        <p className={styles.cardModified}>Last modified: {utils.time.dateFormatter(concept?.updatedAt)}</p>
+        <p
+          className={`${styles.cardDescription} ${styles.descriptionOverflow}`}
+        >
+          {concept?.description}
+        </p>
+        <p className={styles.cardModified}>
+          Last modified: {utils.time.dateFormatter(concept?.updatedAt)}
+        </p>
       </div>
       <div className={styles.footer}>
         <div className={styles.owner}>

@@ -13,7 +13,9 @@ const SignUp: FunctionComponent = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
-  const [confirmPassInputError, setConfirmPassInputError] = useState<string | undefined>();
+  const [confirmPassInputError, setConfirmPassInputError] = useState<
+    string | undefined
+  >();
 
   const { mutate: signUp, error, isLoading } = useSignUp();
 
@@ -33,10 +35,14 @@ const SignUp: FunctionComponent = () => {
   const _handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pass = e.target.value;
     setPassword(pass);
-    setConfirmPassErrorOnCondition(!!confirmPassword && confirmPassword !== pass);
+    setConfirmPassErrorOnCondition(
+      !!confirmPassword && confirmPassword !== pass,
+    );
   };
 
-  const _handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const _handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const cPassword = e.target.value;
     setConfirmPassword(cPassword);
     setConfirmPassErrorOnCondition(cPassword !== password);
@@ -54,8 +60,14 @@ const SignUp: FunctionComponent = () => {
     <>
       <div className={styles.header}>
         <span className={styles.title}>Sign Up</span>
-        <span className={styles.supportingText}>Start your 30-day free trial</span>
-        {error && <div className={styles.error}>{utils.osiris.parseFormError(error)}</div>}
+        <span className={styles.supportingText}>
+          Start your 30-day free trial
+        </span>
+        {error && (
+          <div className={styles.error}>
+            {utils.osiris.parseFormError(error)}
+          </div>
+        )}
       </div>
       <form className={styles.basicForm}>
         <div className={styles.inputGroup}>
@@ -64,14 +76,18 @@ const SignUp: FunctionComponent = () => {
             label={'First Name*'}
             autoComplete='on'
             value={firstName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFirstName(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setFirstName(e.target.value)
+            }
           />
           <InputField
             name={'last name'}
             label={'Last Name*'}
             autoComplete='on'
             value={lastName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLastName(e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setLastName(e.target.value)
+            }
           />
         </div>
         <InputField
@@ -80,7 +96,9 @@ const SignUp: FunctionComponent = () => {
           autoComplete='on'
           errorMessage={emailInputError}
           value={email}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
           onFocus={() => setEmailInputError(undefined)}
           onBlur={_handleEmailValidation}
         />
@@ -111,7 +129,13 @@ const SignUp: FunctionComponent = () => {
             signUp({ firstName, lastName, email, password, confirmPassword });
           }}
           disabled={
-            !firstName || !lastName || !email || !password || !!emailInputError || !!confirmPassInputError || isLoading
+            !firstName ||
+            !lastName ||
+            !email ||
+            !password ||
+            !!emailInputError ||
+            !!confirmPassInputError ||
+            isLoading
           }
         >
           Sign Up

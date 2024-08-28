@@ -14,7 +14,11 @@ const Modal: FunctionComponent<IModalProps> = ({ children }) => {
   // Effect to add and clean up the event listener based on shouldCloseOnOverlayClick
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (shouldCloseOnOverlayClick && contentRef.current && !contentRef.current.contains(event.target as Node)) {
+      if (
+        shouldCloseOnOverlayClick &&
+        contentRef.current &&
+        !contentRef.current.contains(event.target as Node)
+      ) {
         closeModal();
       }
     };

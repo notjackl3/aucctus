@@ -8,7 +8,11 @@ interface AvatarProps {
   hideImage?: boolean;
 }
 
-const Avatar: React.FC<AvatarProps> = ({ firstName = '', lastName = '', src }) => {
+const Avatar: React.FC<AvatarProps> = ({
+  firstName = '',
+  lastName = '',
+  src,
+}) => {
   const initials = React.useMemo(
     () => [firstName, lastName].map((name) => name.charAt(0)).join(''),
     [firstName, lastName],
@@ -16,7 +20,11 @@ const Avatar: React.FC<AvatarProps> = ({ firstName = '', lastName = '', src }) =
 
   return (
     <Av.Root className='h-12 min-h-12 w-12 min-w-12 rounded-full border border-indigo-50 bg-indigo-50'>
-      <Av.Image className='h-full w-full border-r-inherit object-cover' src={src} alt={`${firstName} ${lastName}`} />
+      <Av.Image
+        className='h-full w-full border-r-inherit object-cover'
+        src={src}
+        alt={`${firstName} ${lastName}`}
+      />
       <Av.Fallback
         className='flex h-full w-full items-center justify-center bg-transparent text-center font-semibold text-primary-500'
         delayMs={!src ? undefined : 600}

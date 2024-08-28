@@ -1,4 +1,4 @@
-import Icon from '@components/Icons';
+import Icon from '@components/Icon';
 import utils from '@libs/utils';
 import React from 'react';
 
@@ -28,11 +28,17 @@ const MarketSizeCard: React.FC<IMarketSizeCard> = ({
           <div className='flex items-center justify-start gap-2.5 pr-2.5'>
             <div className={`h-5 w-5 rounded-full ${bulletColor}`} />
           </div>
-          <div className='w-56 text-base font-medium leading-normal text-indigo-900'>{title}</div>
+          <div className='w-56 text-base font-medium leading-normal text-indigo-900'>
+            {title}
+          </div>
           <div className='flex flex-col items-end justify-center gap-2.5'>
             <div className='inline-flex flex-col items-end justify-center'>
-              <p className='text-base font-medium leading-normal text-indigo-900'>{value}</p>
-              <p className='text-xs font-normal leading-none text-gray-500'>{descriptor}</p>
+              <p className='text-base font-medium leading-normal text-indigo-900'>
+                {value}
+              </p>
+              <p className='text-xs font-normal leading-none text-gray-500'>
+                {descriptor}
+              </p>
             </div>
             <button
               className='btn btn-primary-light btn-no-border h-8 w-8 border-violet-50 p-0 [&>svg>use]:stroke-primary-600'

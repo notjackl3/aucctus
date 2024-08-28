@@ -23,8 +23,13 @@ export function useAssumptionsColumns() {
         size: 280,
         cell: (info) => (
           <span className={styles.assumption}>
-            <span className={styles.assumptionTitle}> {info.row.original.name} </span>
-            <span className={`${styles.assumptionDescription} ${styles.cellDescription}`}>
+            <span className={styles.assumptionTitle}>
+              {' '}
+              {info.row.original.name}{' '}
+            </span>
+            <span
+              className={`${styles.assumptionDescription} ${styles.cellDescription}`}
+            >
               {info.row.original.hypothesis}
             </span>
           </span>
@@ -62,7 +67,9 @@ export function useAssumptionsColumns() {
             <button
               className='btn btn-light btn-no-border'
               onClick={(e) => {
-                openModal(EditKeyAssumptionModal, { assumption: info.row.original });
+                openModal(EditKeyAssumptionModal, {
+                  assumption: info.row.original,
+                });
                 e.preventDefault();
               }}
             >

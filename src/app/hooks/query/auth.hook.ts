@@ -25,7 +25,12 @@ class NoRefreshTokenError extends Error {
 export const useSignUp = () => {
   const navigate = useNavigate();
 
-  return useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, IRegisterUser, unknown>({
+  return useMutation<
+    IMessageResponse,
+    AxiosError<IServerErrorMessage>,
+    IRegisterUser,
+    unknown
+  >({
     mutationFn: async (details) =>
       await api.auth.signup(
         details.firstName,
@@ -41,21 +46,41 @@ export const useSignUp = () => {
 };
 
 export const useRequestPasswordReset = () => {
-  return useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, string, unknown>({
-    mutationFn: async (email: string) => await api.auth.requestPasswordReset(email),
+  return useMutation<
+    IMessageResponse,
+    AxiosError<IServerErrorMessage>,
+    string,
+    unknown
+  >({
+    mutationFn: async (email: string) =>
+      await api.auth.requestPasswordReset(email),
   });
 };
 
 export const usePasswordReset = () => {
-  return useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, IUpdateForgottenPasswordRequest, unknown>({
+  return useMutation<
+    IMessageResponse,
+    AxiosError<IServerErrorMessage>,
+    IUpdateForgottenPasswordRequest,
+    unknown
+  >({
     mutationFn: async (credentials) =>
-      await api.auth.resetPassword(credentials.password, credentials.confirmPassword, credentials.token),
+      await api.auth.resetPassword(
+        credentials.password,
+        credentials.confirmPassword,
+        credentials.token,
+      ),
   });
 };
 
 export const useConfirmEmail = () => {
   const queryClient = useQueryClient();
-  return useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, string, unknown>({
+  return useMutation<
+    IMessageResponse,
+    AxiosError<IServerErrorMessage>,
+    string,
+    unknown
+  >({
     mutationFn: async (token: string) => await api.auth.confirmEmail(token),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: AucctusQueryKeys.userDetails });
@@ -66,7 +91,12 @@ export const useConfirmEmail = () => {
 export const useRefresh = () => {
   const { clearTokens: clear, refresh, storeTokens } = useTokenStore();
 
-  return useMutation<ITokenResponse, AxiosError<IServerErrorMessage>, void, unknown>({
+  return useMutation<
+    ITokenResponse,
+    AxiosError<IServerErrorMessage>,
+    void,
+    unknown
+  >({
     mutationFn: async () => {
       if (!refresh) {
         throw new NoRefreshTokenError();
@@ -90,7 +120,12 @@ export const useRefresh = () => {
 export const useLogout = () => {
   const { clearTokens: clear, access } = useTokenStore();
 
-  return useMutation<IMessageResponse, AxiosError<IServerErrorMessage>, void, unknown>({
+  return useMutation<
+    IMessageResponse,
+    AxiosError<IServerErrorMessage>,
+    void,
+    unknown
+  >({
     mutationFn: async () => await api.auth.logout(access),
     onSettled: () => {
       // Clear tokens on logout
@@ -109,7 +144,8 @@ export const useLogin = () => {
     { email: string; password: string },
     unknown
   >({
-    mutationFn: async (credentials) => await api.auth.login(credentials.email, credentials.password),
+    mutationFn: async (credentials) =>
+      await api.auth.login(credentials.email, credentials.password),
     onSuccess: (response) => {
       storeTokens(response.access, response.refresh);
       navigate(AppPath.Home, { replace: true });

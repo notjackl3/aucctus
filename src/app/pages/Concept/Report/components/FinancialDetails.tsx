@@ -21,11 +21,26 @@ const FinancialDetails: FunctionComponent = () => {
   } = useEditFinancialProjections();
 
   // Formate Large numbers
-  const formattedPrice = React.useMemo(() => utils.number.formatter.format(pricing.price), [pricing.price]);
-  const formattedTotalUsers = React.useMemo(() => utils.number.formatLargeNumber(totalUsers.value), [totalUsers.value]);
-  const formattedTam = React.useMemo(() => utils.number.formatter.format(tam.value), [tam.value]);
-  const formattedSam = React.useMemo(() => utils.number.formatter.format(sam.value), [sam.value]);
-  const formattedSom = React.useMemo(() => utils.number.formatter.format(som.value), [som.value]);
+  const formattedPrice = React.useMemo(
+    () => utils.number.formatter.format(pricing.price),
+    [pricing.price],
+  );
+  const formattedTotalUsers = React.useMemo(
+    () => utils.number.formatLargeNumber(totalUsers.value),
+    [totalUsers.value],
+  );
+  const formattedTam = React.useMemo(
+    () => utils.number.formatter.format(tam.value),
+    [tam.value],
+  );
+  const formattedSam = React.useMemo(
+    () => utils.number.formatter.format(sam.value),
+    [sam.value],
+  );
+  const formattedSom = React.useMemo(
+    () => utils.number.formatter.format(som.value),
+    [som.value],
+  );
 
   const { openModal } = useModal();
 
@@ -66,7 +81,11 @@ const FinancialDetails: FunctionComponent = () => {
             heading='Business Model'
             value={businessModel.modelName}
             content={businessModel.rationale}
-            onClick={handleReasoningModelClick(businessModel.modelName, businessModel.rationale, businessModel.sources)}
+            onClick={handleReasoningModelClick(
+              businessModel.modelName,
+              businessModel.rationale,
+              businessModel.sources,
+            )}
           />
           <Card.FinancialModel
             heading='Price'
@@ -82,7 +101,11 @@ const FinancialDetails: FunctionComponent = () => {
             heading='Total Users'
             value={formattedTotalUsers}
             content={totalUsers.rationale}
-            onClick={handleReasoningModelClick(formattedTotalUsers, totalUsers.rationale, totalUsers.sources)}
+            onClick={handleReasoningModelClick(
+              formattedTotalUsers,
+              totalUsers.rationale,
+              totalUsers.sources,
+            )}
           />
         </div>
       </section>
@@ -90,7 +113,9 @@ const FinancialDetails: FunctionComponent = () => {
         <div className='flex h-16 flex-col items-start justify-start gap-5 self-stretch rounded-t-xl border-b border-gray-300 bg-white'>
           <div className=' inline-flex items-start justify-start gap-4 self-stretch px-6 pt-5'>
             <div className='inline-flex shrink grow basis-0 flex-col items-start justify-center gap-1 self-stretch'>
-              <h3 className='self-stretch text-lg font-medium leading-7 text-indigo-900'>Market Size</h3>
+              <h3 className='self-stretch text-lg font-medium leading-7 text-indigo-900'>
+                Market Size
+              </h3>
             </div>
           </div>
         </div>
@@ -103,7 +128,11 @@ const FinancialDetails: FunctionComponent = () => {
               value={formattedTam}
               descriptor='ARR'
               assumptions={totalUsers.assumptions}
-              onClick={handleReasoningModelClick(formattedTam, totalUsers.rationale, totalUsers.sources)}
+              onClick={handleReasoningModelClick(
+                formattedTam,
+                totalUsers.rationale,
+                totalUsers.sources,
+              )}
             />
             <Card.MarketSize
               bulletColor='bg-violet-500'
@@ -132,7 +161,12 @@ const FinancialDetails: FunctionComponent = () => {
           </div>
 
           <div className='m-auto inline-flex h-full w-96 flex-col items-center justify-center gap-12'>
-            <Chart.MarketChart className={''} tam={tam.value} sam={sam.value} som={som.value} />
+            <Chart.MarketChart
+              className={''}
+              tam={tam.value}
+              sam={sam.value}
+              som={som.value}
+            />
           </div>
         </div>
       </section>

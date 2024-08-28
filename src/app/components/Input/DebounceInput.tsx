@@ -1,10 +1,16 @@
 import React from 'react';
 
-interface DebouncedInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface DebouncedInputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
   debounce?: number;
 }
 
-const DebouncedInput: React.FC<DebouncedInputProps> = ({ value: initialValue, onChange, debounce = 500, ...props }) => {
+const DebouncedInput: React.FC<DebouncedInputProps> = ({
+  value: initialValue,
+  onChange,
+  debounce = 500,
+  ...props
+}) => {
   const [value, setValue] = React.useState(initialValue);
 
   React.useEffect(() => {
@@ -28,7 +34,13 @@ const DebouncedInput: React.FC<DebouncedInputProps> = ({ value: initialValue, on
     };
   }, [value, debounce, onChange]);
 
-  return <input {...props} value={value} onChange={(e) => setValue(e.target.value)} />;
+  return (
+    <input
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
 };
 
 export default DebouncedInput;

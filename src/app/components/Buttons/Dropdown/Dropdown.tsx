@@ -1,7 +1,6 @@
-import { FunctionComponent, ReactNode, useMemo } from 'react';
+import { FunctionComponent, ReactNode, useMemo, useState } from 'react';
+import Icon from '../../Icon/Icon/Icon';
 import styles from './dropdown.module.scss';
-import { useState } from 'react';
-import Icon from '../../Icons/Icon/Icon';
 
 export interface Option {
   label: ReactNode;
@@ -30,7 +29,10 @@ const Dropdown: FunctionComponent<DropdownProps> = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const selectedOption = useMemo(() => options.find((option) => option.value === selected), [options, selected]);
+  const selectedOption = useMemo(
+    () => options.find((option) => option.value === selected),
+    [options, selected],
+  );
 
   const handleSelect = (option: Option) => {
     onSelect(option.value);
@@ -43,13 +45,24 @@ const Dropdown: FunctionComponent<DropdownProps> = ({
         className={`${styles.dropdownToggle} ${hidePadding ? styles.noPadding : ''}`}
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span>{selectedOption ? selectedOption.displayLabel : 'Select an option'}</span>
-        {!hideChevron ? <Icon variant={!isOpen ? 'chevrondown' : 'chevronup'} stroke={chevronColor} /> : null}
+        <span>
+          {selectedOption ? selectedOption.displayLabel : 'Select an option'}
+        </span>
+        {!hideChevron ? (
+          <Icon
+            variant={!isOpen ? 'chevrondown' : 'chevronup'}
+            stroke={chevronColor}
+          />
+        ) : null}
       </div>
       {isOpen && (
         <div className={styles.dropdownMenu}>
           {options.map((option, index) => (
-            <div key={index} className={styles.dropdownItem} onClick={() => handleSelect(option)}>
+            <div
+              key={index}
+              className={styles.dropdownItem}
+              onClick={() => handleSelect(option)}
+            >
               {option.label}
             </div>
           ))}

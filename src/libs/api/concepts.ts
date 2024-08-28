@@ -68,11 +68,17 @@ export class ConceptApi extends ApiService {
   }
 
   updateConcept(concept: Partial<IConcept>, uuid: string) {
-    return this.patch<IConcept, Partial<IConcept>>(endpoints.conceptUuid(uuid), concept);
+    return this.patch<IConcept, Partial<IConcept>>(
+      endpoints.conceptUuid(uuid),
+      concept,
+    );
   }
 
   bulkUpdateConcepts(concepts: AtLeast<IConcept, 'uuid'>[]) {
-    return this.patch<IConcept[], AtLeast<IConcept, 'uuid'>[]>(endpoints.conceptList, concepts);
+    return this.patch<IConcept[], AtLeast<IConcept, 'uuid'>[]>(
+      endpoints.conceptList,
+      concepts,
+    );
   }
 
   updateConceptStatus(uuid: string, status: ConceptStatus) {
@@ -88,11 +94,15 @@ export class ConceptApi extends ApiService {
   }
 
   saveGeneratedConcepts(body: IGeneratedConceptsSaveBody) {
-    return this.post<IConcept[], IGeneratedConceptsSaveBody>(endpoints.saveGeneratedConcepts, body, {
-      headers: {
-        'Content-Type': 'application/json',
+    return this.post<IConcept[], IGeneratedConceptsSaveBody>(
+      endpoints.saveGeneratedConcepts,
+      body,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
       },
-    });
+    );
   }
 
   getConcepts(options?: IConceptQueryOptions) {
@@ -108,24 +118,37 @@ export class ConceptApi extends ApiService {
   }
 
   updateConceptOverview(uuid: string, overview: Partial<IConceptOverview>) {
-    return this.patch<IConceptOverview, Partial<IConceptOverview>>(endpoints.conceptOverviewUuid(uuid), overview);
+    return this.patch<IConceptOverview, Partial<IConceptOverview>>(
+      endpoints.conceptOverviewUuid(uuid),
+      overview,
+    );
   }
 
   getConceptCustomerProfiles(uuid: string) {
-    return this.get<IPageResponse<ICustomerProfile>>(endpoints.conceptCustomerProfiles(uuid));
+    return this.get<IPageResponse<ICustomerProfile>>(
+      endpoints.conceptCustomerProfiles(uuid),
+    );
   }
 
   getConceptCustomerProfile(customerProfileUuid: string) {
-    return this.get<ICustomerProfile>(endpoints.conceptCustomerProfileUuid(customerProfileUuid));
+    return this.get<ICustomerProfile>(
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+    );
   }
 
-  updateConceptCustomerProfile(customerProfileUuid: string, data: Partial<ICustomerProfile>) {
+  updateConceptCustomerProfile(
+    customerProfileUuid: string,
+    data: Partial<ICustomerProfile>,
+  ) {
     return this.patch<ICustomerProfile, Partial<ICustomerProfile>>(
       endpoints.conceptCustomerProfileUuid(customerProfileUuid),
       data,
     );
   }
-  createConceptCustomerProfile(customerProfileUuid: string, data: ICustomerProfileCreate) {
+  createConceptCustomerProfile(
+    customerProfileUuid: string,
+    data: ICustomerProfileCreate,
+  ) {
     return this.post<ICustomerProfile, ICustomerProfileCreate>(
       endpoints.conceptCustomerProfiles(customerProfileUuid),
       data,
@@ -133,19 +156,29 @@ export class ConceptApi extends ApiService {
   }
 
   deleteConceptCustomerProfile(customerProfileUuid: string) {
-    return this.delete<ICustomerProfile>(endpoints.conceptCustomerProfileUuid(customerProfileUuid));
+    return this.delete<ICustomerProfile>(
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+    );
   }
 
   getConceptKeyAssumptions(conceptUuid: string) {
-    return this.get<IPageResponse<IAssumption>>(endpoints.conceptKeyAssumptions(conceptUuid));
+    return this.get<IPageResponse<IAssumption>>(
+      endpoints.conceptKeyAssumptions(conceptUuid),
+    );
   }
 
   updateConceptAssumption(uuid: string, data: Partial<IAssumption>) {
-    return this.patch<IAssumption, Partial<IAssumption>>(endpoints.conceptKeyAssumption(uuid), data);
+    return this.patch<IAssumption, Partial<IAssumption>>(
+      endpoints.conceptKeyAssumption(uuid),
+      data,
+    );
   }
 
   createConceptAssumption(conceptUuid: string, data: IAssumptionCreate) {
-    return this.post<IAssumption, IAssumptionCreate>(endpoints.conceptKeyAssumptions(conceptUuid), data);
+    return this.post<IAssumption, IAssumptionCreate>(
+      endpoints.conceptKeyAssumptions(conceptUuid),
+      data,
+    );
   }
 
   deleteConceptAssumption(uuid: string) {
@@ -153,10 +186,15 @@ export class ConceptApi extends ApiService {
   }
 
   getConceptFinancialProjection(uuid: string) {
-    return this.get<IFinancialProjection>(endpoints.conceptFinancialProjection(uuid));
+    return this.get<IFinancialProjection>(
+      endpoints.conceptFinancialProjection(uuid),
+    );
   }
 
-  updateConceptFinancialProjection(uuid: string, data: Partial<IFinancialProjection>) {
+  updateConceptFinancialProjection(
+    uuid: string,
+    data: Partial<IFinancialProjection>,
+  ) {
     return this.patch<IFinancialProjection, Partial<IFinancialProjection>>(
       endpoints.conceptFinancialProjectionUuid(uuid),
       data,
@@ -172,11 +210,17 @@ export class ConceptApi extends ApiService {
   }
 
   updateConceptMarketScan(uuid: string, data: Partial<IMarketScan>) {
-    return this.patch<IMarketScan, Partial<IMarketScan>>(endpoints.conceptMarketScanUuid(uuid), data);
+    return this.patch<IMarketScan, Partial<IMarketScan>>(
+      endpoints.conceptMarketScanUuid(uuid),
+      data,
+    );
   }
 
   updateTrendAndDriver(uuid: string, data: Partial<ITrendsAndDrivers>) {
-    return this.patch<ITrendsAndDrivers, Partial<ITrendsAndDrivers>>(endpoints.conceptTrendAndDriver(uuid), data);
+    return this.patch<ITrendsAndDrivers, Partial<ITrendsAndDrivers>>(
+      endpoints.conceptTrendAndDriver(uuid),
+      data,
+    );
   }
 
   createTrendAndDriver(uuid: string, data: IMarketScanElementCreate) {
@@ -187,15 +231,23 @@ export class ConceptApi extends ApiService {
   }
 
   deleteTrendAndDriver(uuid: string) {
-    return this.delete<ITrendsAndDrivers>(endpoints.conceptTrendAndDriver(uuid));
+    return this.delete<ITrendsAndDrivers>(
+      endpoints.conceptTrendAndDriver(uuid),
+    );
   }
 
   updateEcosystem(uuid: string, data: Partial<Ecosystem>) {
-    return this.patch<Ecosystem, Partial<Ecosystem>>(endpoints.conceptEcosystem(uuid), data);
+    return this.patch<Ecosystem, Partial<Ecosystem>>(
+      endpoints.conceptEcosystem(uuid),
+      data,
+    );
   }
 
   createEcosystem(uuid: string, data: IEcosystemCreate) {
-    return this.post<Ecosystem, IEcosystemCreate>(endpoints.conceptMarketScanElement(uuid, 'ecosystem'), data);
+    return this.post<Ecosystem, IEcosystemCreate>(
+      endpoints.conceptMarketScanElement(uuid, 'ecosystem'),
+      data,
+    );
   }
 
   deleteEcosystem(uuid: string) {

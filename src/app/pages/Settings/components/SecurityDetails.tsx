@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import api from '../../../../libs/api';
 import { IUserPassword } from '../../../../libs/api/types';
 import { defaultToastConfig } from '../../../../libs/toast';
-import Icon from '../../../components/Icons/Icon/Icon';
+import Icon from '../../../components/Icon/Icon/Icon';
 import InputField from '../../../components/Input/InputField/InputField';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import styles from '../styles/securityDetails.module.scss';
@@ -45,7 +45,10 @@ const SecurityDetails: FunctionComponent = () => {
     onError: (error) => {
       const message = utils.osiris.parseFormError<IUserPassword>(error);
       setCurrentPasswordError(message);
-      toast.error('Password could not be updated. Please try again later.', defaultToastConfig);
+      toast.error(
+        'Password could not be updated. Please try again later.',
+        defaultToastConfig,
+      );
     },
   });
 
@@ -66,7 +69,9 @@ const SecurityDetails: FunctionComponent = () => {
     });
   };
 
-  const handlePasswordInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handlePasswordInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     setCurrentPasswordError('');
     const { name, value } = e.target;
     setPasswordForm((prevForm) => ({ ...prevForm, [name]: value }));
@@ -96,7 +101,13 @@ const SecurityDetails: FunctionComponent = () => {
         isDisabled: isFormDisabled,
       },
     ],
-    [isFormDisabled, currentPassword, newPassword, confirmPassword, currentPasswordError],
+    [
+      isFormDisabled,
+      currentPassword,
+      newPassword,
+      confirmPassword,
+      currentPasswordError,
+    ],
   );
 
   return (
@@ -110,7 +121,9 @@ const SecurityDetails: FunctionComponent = () => {
       <div className={styles.headerSection}>
         <div className={styles.headerDescription}>
           <h3 className={styles.headerTitle}>Change Your Password</h3>
-          <div className={styles.headerSubtitle}>Please enter your current password to change your password.</div>
+          <div className={styles.headerSubtitle}>
+            Please enter your current password to change your password.
+          </div>
         </div>
       </div>
       {userSecurity.map((info, i) => (
@@ -163,7 +176,11 @@ const SecurityDetails: FunctionComponent = () => {
             Update password
           </button>
         ) : (
-          <button className={`btn btn-primary btn-bold`} type='submit' disabled={updatePasswordMutation.isLoading}>
+          <button
+            className={`btn btn-primary btn-bold`}
+            type='submit'
+            disabled={updatePasswordMutation.isLoading}
+          >
             <Icon variant='save' {...defaultIconProps} />
             Save
           </button>

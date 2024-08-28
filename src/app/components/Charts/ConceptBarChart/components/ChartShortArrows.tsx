@@ -18,11 +18,24 @@ const defaultProps = {
 };
 const ChartShortArrows: FunctionComponent<ChartLongArrow> = ({ data }) => {
   const percentList = useMemo(() => {
-    const proofOfConceptPercent = utils.number.calculatePercent(data.proofOfConcept, data.prototyping);
-    const minimumViableProductPercent = utils.number.calculatePercent(data.minimumViableProduct, data.proofOfConcept);
-    const commercializedPercent = utils.number.calculatePercent(data.commercialized, data.minimumViableProduct);
+    const proofOfConceptPercent = utils.number.calculatePercent(
+      data.proofOfConcept,
+      data.prototyping,
+    );
+    const minimumViableProductPercent = utils.number.calculatePercent(
+      data.minimumViableProduct,
+      data.proofOfConcept,
+    );
+    const commercializedPercent = utils.number.calculatePercent(
+      data.commercialized,
+      data.minimumViableProduct,
+    );
 
-    return [proofOfConceptPercent, minimumViableProductPercent, commercializedPercent];
+    return [
+      proofOfConceptPercent,
+      minimumViableProductPercent,
+      commercializedPercent,
+    ];
   }, [data]);
 
   return (

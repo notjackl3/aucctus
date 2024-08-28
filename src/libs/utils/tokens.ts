@@ -1,4 +1,7 @@
-import { ExpiryTimeNotFoundError, TokenStructureError } from '../api/customErrors';
+import {
+  ExpiryTimeNotFoundError,
+  TokenStructureError,
+} from '../api/customErrors';
 
 export const hasTokenExpired = (token: string): boolean => {
   // analytics.debug('Checking token expiry...');

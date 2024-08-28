@@ -8,7 +8,10 @@ interface ISubMenuTriggerProps {
   icon: IconVariant;
 }
 
-const SubMenuTrigger: React.FC<ISubMenuTriggerProps> = ({ label, icon = 'arrowleft' }) => {
+const SubMenuTrigger: React.FC<ISubMenuTriggerProps> = ({
+  label,
+  icon = 'arrowleft',
+}) => {
   const ref = React.useRef<HTMLDivElement>(null);
   // const [isOpen, setIsOpen] = useState(false);
 

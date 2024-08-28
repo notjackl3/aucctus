@@ -8,7 +8,11 @@ interface CollapsibleProps {
   width?: number | string;
 }
 
-const Collapsible: FunctionComponent<CollapsibleProps> = ({ toggle = false, children, width }) => {
+const Collapsible: FunctionComponent<CollapsibleProps> = ({
+  toggle = false,
+  children,
+  width,
+}) => {
   // @ts-ignore
   const [bind, { height: viewHeight }] = useMeasure<HTMLDivElement>();
   const previous = usePrevious(toggle);

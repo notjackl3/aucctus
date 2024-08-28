@@ -27,7 +27,10 @@ interface IParts {
  */
 const splitIntoThree = (token: string): IParts => {
   const part1 = token.substring(0, Math.ceil(token.length / 3));
-  const part2 = token.substring(Math.ceil(token.length / 3), Math.ceil((2 * token.length) / 3));
+  const part2 = token.substring(
+    Math.ceil(token.length / 3),
+    Math.ceil((2 * token.length) / 3),
+  );
   const part3 = token.substring(Math.ceil((2 * token.length) / 3));
   const decoy = part1.split('').reverse().join(''); // A simple decoy, you can change this to something else
   return { a: part1, b: part2, c: part3, e: decoy };
@@ -51,7 +54,10 @@ interface TokenStore {
   hasRetrievedTokens: boolean;
   setTokens: (access: string | undefined, refresh: string | undefined) => void;
   clearTokens: () => void;
-  storeTokens: (access: string | undefined, refresh: string | undefined) => void;
+  storeTokens: (
+    access: string | undefined,
+    refresh: string | undefined,
+  ) => void;
   retrieveTokens: () => void;
 }
 
@@ -93,8 +99,14 @@ export const useTokenStore = create<TokenStore>((set, get) => ({
       return;
     }
     try {
-      const encryptedAccess = CryptoJS.AES.encrypt(access, secretKey).toString();
-      const encryptedRefresh = CryptoJS.AES.encrypt(refresh, secretKey).toString();
+      const encryptedAccess = CryptoJS.AES.encrypt(
+        access,
+        secretKey,
+      ).toString();
+      const encryptedRefresh = CryptoJS.AES.encrypt(
+        refresh,
+        secretKey,
+      ).toString();
 
       const accessParts = splitIntoThree(encryptedAccess);
       const refreshParts = splitIntoThree(encryptedRefresh);
@@ -124,8 +136,14 @@ export const useTokenStore = create<TokenStore>((set, get) => ({
         const encryptedAccess = mergeFromThree(accessParts);
         const encryptedRefresh = mergeFromThree(refreshParts);
 
-        const decryptedAccess = CryptoJS.AES.decrypt(encryptedAccess, secretKey).toString(CryptoJS.enc.Utf8);
-        const decryptedRefresh = CryptoJS.AES.decrypt(encryptedRefresh, secretKey).toString(CryptoJS.enc.Utf8);
+        const decryptedAccess = CryptoJS.AES.decrypt(
+          encryptedAccess,
+          secretKey,
+        ).toString(CryptoJS.enc.Utf8);
+        const decryptedRefresh = CryptoJS.AES.decrypt(
+          encryptedRefresh,
+          secretKey,
+        ).toString(CryptoJS.enc.Utf8);
 
         get().setTokens(decryptedAccess, decryptedRefresh);
       }

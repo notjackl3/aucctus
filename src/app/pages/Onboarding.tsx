@@ -17,7 +17,9 @@ const OnBoarding: FunctionComponent = () => {
   const [domain, setDomain] = useState<string>('');
   const [innovationGoal, setGoal] = useState<string>('');
 
-  const [domainInputError, setDomainInputError] = useState<string | undefined>();
+  const [domainInputError, setDomainInputError] = useState<
+    string | undefined
+  >();
 
   const _handleDomainValidation = useCallback(
     (e: React.FocusEvent) => {
@@ -54,7 +56,9 @@ const OnBoarding: FunctionComponent = () => {
         <div className={styles.form}>
           <div className={styles.header}>
             <span className={styles.title}>Welcome aboard!</span>
-            <span className={styles.supportingText}>Answer the prompts below to start innovating</span>
+            <span className={styles.supportingText}>
+              Answer the prompts below to start innovating
+            </span>
           </div>
           <div className={styles.basicForm}>
             <InputField
@@ -84,7 +88,9 @@ const OnBoarding: FunctionComponent = () => {
 
             <InputField
               name={'innovationGoal'}
-              label={'What is your organization looking to achieve through innovation?'}
+              label={
+                'What is your organization looking to achieve through innovation?'
+              }
               value={innovationGoal}
               placeholder='Expand into new industries.'
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,7 +106,13 @@ const OnBoarding: FunctionComponent = () => {
                 e.preventDefault();
                 registerAccount({ name, domain, goal: innovationGoal });
               }}
-              disabled={!name || !domain || !innovationGoal || !!domainInputError || status === 'loading'}
+              disabled={
+                !name ||
+                !domain ||
+                !innovationGoal ||
+                !!domainInputError ||
+                status === 'loading'
+              }
             >
               Complete
             </button>

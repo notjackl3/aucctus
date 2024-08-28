@@ -24,8 +24,12 @@ export interface DashboardOpportunityCardProps {
   conceptDetails: IConceptDetails;
 }
 
-const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps> = ({ conceptDetails }) => {
-  const [selectedOpportunities, setSelectedOpportunities] = useState<string[]>([]);
+const DashboardOpportunityCard: FunctionComponent<
+  DashboardOpportunityCardProps
+> = ({ conceptDetails }) => {
+  const [selectedOpportunities, setSelectedOpportunities] = useState<string[]>(
+    [],
+  );
 
   const opportunityData: OpportunityData[] = useMemo(() => {
     if (!conceptDetails) {
@@ -111,7 +115,9 @@ const DashboardOpportunityCard: FunctionComponent<DashboardOpportunityCardProps>
         <div className={styles.opportunityFooter}>
           <Badge.ConceptStatistic
             infoTitle='Total Potential Opportunity'
-            infoValue={utils.number.formatter.format(summationObj.totalSomValue)}
+            infoValue={utils.number.formatter.format(
+              summationObj.totalSomValue,
+            )}
             infoSubValue={`${summationObj.totalConceptCount} concepts`}
             icon='shield-dollar'
             iconColor='purple'

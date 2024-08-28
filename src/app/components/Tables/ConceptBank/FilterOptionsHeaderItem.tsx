@@ -1,4 +1,4 @@
-import Icon from '@components/Icons';
+import Icon from '@components/Icon';
 import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import utils from '@libs/utils';
 
@@ -9,8 +9,12 @@ interface IFilterOptionsHeaderItemProps {
   value: string;
 }
 
-const FilterOptionsHeaderItem: React.FC<IFilterOptionsHeaderItemProps> = ({ propertyName, value }) => {
-  const prefix = propertyName === 'sort' ? removeFirstCharIfDash(value) : propertyName;
+const FilterOptionsHeaderItem: React.FC<IFilterOptionsHeaderItemProps> = ({
+  propertyName,
+  value,
+}) => {
+  const prefix =
+    propertyName === 'sort' ? removeFirstCharIfDash(value) : propertyName;
   const suffix = propertyName === 'sort' ? checkStringOrder(value) : value;
 
   return (
@@ -37,7 +41,9 @@ function checkStringOrder(str: string) {
   return 'Ascending';
 }
 
-const getPropertyIcon = (propertyName: keyof IConceptFilterOptions): IconVariant => {
+const getPropertyIcon = (
+  propertyName: keyof IConceptFilterOptions,
+): IconVariant => {
   switch (propertyName) {
     case 'status':
       return 'loading-02';

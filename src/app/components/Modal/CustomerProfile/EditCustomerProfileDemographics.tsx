@@ -13,23 +13,34 @@ interface IEditCustomerProfileDemographicsProps {
   profile: ICustomerProfile;
 }
 
-const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDemographicsProps> = ({
-  conceptUuid,
-  profile,
-}) => {
+const EditCustomerProfileDemographics: FunctionComponent<
+  IEditCustomerProfileDemographicsProps
+> = ({ conceptUuid, profile }) => {
   const { closeModal } = useModal();
   const [ageUpper, setUpperAgeRange] = useState(profile.ageUpper);
-  const [ageUpperError, setUpperAgeRangeError] = useState<string | undefined>(undefined);
+  const [ageUpperError, setUpperAgeRangeError] = useState<string | undefined>(
+    undefined,
+  );
   const [ageLower, setLowerAgeRange] = useState(profile.ageLower);
-  const [ageLowerError, setLowerAgeRangeError] = useState<string | undefined>(undefined);
+  const [ageLowerError, setLowerAgeRangeError] = useState<string | undefined>(
+    undefined,
+  );
   const [incomeUpper, setUpperIncomeRange] = useState(profile.incomeUpper);
-  const [incomeUpperError, setUpperIncomeRangeError] = useState<string | undefined>(undefined);
+  const [incomeUpperError, setUpperIncomeRangeError] = useState<
+    string | undefined
+  >(undefined);
   const [incomeLower, setLowerIncomeRange] = useState(profile.incomeLower);
-  const [incomeLowerError, setLowerIncomeRangeError] = useState<string | undefined>(undefined);
+  const [incomeLowerError, setLowerIncomeRangeError] = useState<
+    string | undefined
+  >(undefined);
   const [familySize, setFamilySize] = useState(profile.familySize);
-  const [familySizeError, setFamilySizeError] = useState<string | undefined>(undefined);
+  const [familySizeError, setFamilySizeError] = useState<string | undefined>(
+    undefined,
+  );
   const [geoLocation, setGeoLocation] = useState(profile.geoLocation);
-  const [geoLocationError, setGeoLocationError] = useState<string | undefined>(undefined);
+  const [geoLocationError, setGeoLocationError] = useState<string | undefined>(
+    undefined,
+  );
 
   const { mutate } = useCustomerProfileUpdate(profile.uuid, conceptUuid);
 
@@ -61,7 +72,9 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
       type: 'lower' | 'upper',
       setRange: React.Dispatch<React.SetStateAction<number>>,
       setRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
-      setInverseRangeError: React.Dispatch<React.SetStateAction<string | undefined>>,
+      setInverseRangeError: React.Dispatch<
+        React.SetStateAction<string | undefined>
+      >,
       inverseValue: number,
     ) =>
       (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +99,11 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
     <div className={styles.container}>
       <div className={styles.header}>
         <div />
-        <button aria-label='Close' className='btn-close' onClick={() => closeModal()} />
+        <button
+          aria-label='Close'
+          className='btn-close'
+          onClick={() => closeModal()}
+        />
       </div>
       <div className={styles.content}>
         <h4>Demographics</h4>
@@ -95,7 +112,11 @@ const EditCustomerProfileDemographics: FunctionComponent<IEditCustomerProfileDem
           name='geoLocation'
           value={geoLocation}
           errorMessage={geoLocationError}
-          onChange={handleTextFieldChange('Geolocation', setGeoLocation, setGeoLocationError)}
+          onChange={handleTextFieldChange(
+            'Geolocation',
+            setGeoLocation,
+            setGeoLocationError,
+          )}
         />
         <div className={styles.inputRow}>
           <InputField

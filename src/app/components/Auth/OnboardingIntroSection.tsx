@@ -14,13 +14,17 @@ const OnboardingIntoSection: FunctionComponent = () => {
       />
       <OnboardingMessage
         title={'Idea Factory'}
-        description={'Let innovation flow! We generate and rank your next big moves'}
+        description={
+          'Let innovation flow! We generate and rank your next big moves'
+        }
         icon='lightbulb'
         color={'purple'}
       />
       <OnboardingMessage
         title={'Persona Magic'}
-        description={'Tailor-made strategies that resonate with your ideal audience'}
+        description={
+          'Tailor-made strategies that resonate with your ideal audience'
+        }
         icon='user-group'
         color={'purple'}
       />

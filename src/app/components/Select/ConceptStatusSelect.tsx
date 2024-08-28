@@ -1,7 +1,10 @@
 import { Icon } from '@components';
 import { ConceptStatus } from '@libs/api/types';
 import utils from '@libs/utils';
-import { CONCEPT_STATUS_LIST, getConceptStatusStyles } from '@libs/utils/concepts';
+import {
+  CONCEPT_STATUS_LIST,
+  getConceptStatusStyles,
+} from '@libs/utils/concepts';
 import * as Select from '@radix-ui/react-select';
 import React from 'react';
 
@@ -10,7 +13,10 @@ interface DropdownMenuProps {
   onChange: (value: string) => void;
 }
 
-const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({ value, onChange }) => {
+const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({
+  value,
+  onChange,
+}) => {
   const [open, setOpen] = React.useState(false);
 
   const onChangeEvent = React.useCallback(
@@ -23,7 +29,12 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({ value, onChange }) =
   const style = React.useMemo(() => getConceptStatusStyles(value), [value]);
 
   return (
-    <Select.Root value={value} onValueChange={onChangeEvent} open={open} onOpenChange={setOpen}>
+    <Select.Root
+      value={value}
+      onValueChange={onChangeEvent}
+      open={open}
+      onOpenChange={setOpen}
+    >
       <Select.Trigger
         className={`inline-flex min-h-8 min-w-32 items-center justify-center gap-2 rounded-md px-2.5 py-1.5 mix-blend-multiply shadow ${style.bg}`}
       >
@@ -31,10 +42,15 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({ value, onChange }) =
           <div className={`0 h-1.5 w-1.5 rounded-full ${style.bullet}`} />
         </Select.Icon>
         <Select.Value className={`flex flex-row gap-4`}>
-          <span className={`${style.text}`}>{utils.string.camelCaseToTitleCase(value)}</span>
+          <span className={`${style.text}`}>
+            {utils.string.camelCaseToTitleCase(value)}
+          </span>
         </Select.Value>
         <Select.Icon>
-          <Icon variant={open ? 'chevronup' : 'chevrondown'} className={`${style.stroke}`} />
+          <Icon
+            variant={open ? 'chevronup' : 'chevrondown'}
+            className={`${style.stroke}`}
+          />
         </Select.Icon>
       </Select.Trigger>
 
@@ -50,12 +66,17 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({ value, onChange }) =
               return (
                 // Change highlight color example: data-[highlighted]:outline-gray-300
                 <Select.Item
+                  key={item}
                   value={item}
                   className={`flex h-8 select-none flex-row items-center justify-between gap-2 self-stretch rounded-sm px-4 py-2 text-base leading-none ${itemStyles.text} ${itemStyles.bg}`}
                 >
-                  <Select.ItemText>{utils.string.camelCaseToTitleCase(item)}</Select.ItemText>
+                  <Select.ItemText>
+                    {utils.string.camelCaseToTitleCase(item)}
+                  </Select.ItemText>
                   <Select.ItemIndicator>
-                    <div className={`h-1.5 w-1.5 ${itemStyles.bullet} rounded-full`} />
+                    <div
+                      className={`h-1.5 w-1.5 ${itemStyles.bullet} rounded-full`}
+                    />
                   </Select.ItemIndicator>
                 </Select.Item>
               );

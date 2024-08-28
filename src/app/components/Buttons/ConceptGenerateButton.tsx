@@ -8,9 +8,15 @@ type ConceptRowButtonProps = {
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
 };
 
-const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({ variant, onClick }) => {
+const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
+  variant,
+  onClick,
+}) => {
   const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
-    const variantContext: Record<ConceptReportStatus, { style: string; label: string | ReactNode }> = {
+    const variantContext: Record<
+      ConceptReportStatus,
+      { style: string; label: string | ReactNode }
+    > = {
       complete: {
         style: `btn btn-light btn-bold`,
         label: 'Open',

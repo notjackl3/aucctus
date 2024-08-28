@@ -1,10 +1,20 @@
-import { FunctionComponent, InputHTMLAttributes, useEffect, useRef } from 'react';
+import {
+  FunctionComponent,
+  InputHTMLAttributes,
+  useEffect,
+  useRef,
+} from 'react';
 
-export interface TableCheckBoxProps extends InputHTMLAttributes<HTMLInputElement> {
+export interface TableCheckBoxProps
+  extends InputHTMLAttributes<HTMLInputElement> {
   indeterminate?: boolean;
 }
 
-const TableCheckBox: FunctionComponent<TableCheckBoxProps> = ({ indeterminate, checked, ...rest }) => {
+const TableCheckBox: FunctionComponent<TableCheckBoxProps> = ({
+  indeterminate,
+  checked,
+  ...rest
+}) => {
   const ref = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
