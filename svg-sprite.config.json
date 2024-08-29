@@ -38,7 +38,7 @@
   },
   "mode": {
     "symbol": {
-      "dest": "src/app/components/Icons/Icon",
+      "dest": "src/app/components/Icon/Icon",
       "sprite": "icon-sprite.svg",
       "example": false
     }
