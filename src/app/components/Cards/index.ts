@@ -3,6 +3,7 @@ import Kanban from './Kanban/ConceptCard';
 
 import CustomerProfileContextList from './CustomerProfileContextList/CustomerProfileContextList';
 import CustomerProfiles from './CustomerProfilesCard';
+import Demographics from './DemographicsCard/DemographicsCard';
 import FinancialModel from './FinancialModelCard';
 import FinancialProjects from './FinancialProjectsCard';
 import Ignition from './IgnitionCard';
@@ -12,6 +13,7 @@ import MarketSize from './MarketSizeCard';
 const Card = {
   Detail,
   Kanban,
+  Demographics,
   KeyAssumptions,
   FinancialProjects,
   CustomerProfiles,

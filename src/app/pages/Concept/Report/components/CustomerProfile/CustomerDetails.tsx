@@ -1,6 +1,5 @@
 import defaultAvatar from '@assets/img/avatar.png';
-import CustomerProfileContextList from '@components/Cards/CustomerProfileContextList/CustomerProfileContextList';
-import DemographicsContainer from '@components/Container/DemographicsContainer/DemographicsContainer';
+import { Card } from "@components";
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { ICustomerProfile } from '@libs/api/types';
@@ -41,27 +40,27 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         </div>
         <div className={styles.rightColumn}>
           <div className={styles.listSection}>
-            <DemographicsContainer profile={profile} canEdit={true} />
+            <Card.Demographics profile={profile} canEdit={true} />
           </div>
         </div>
       </div>
 
       <div className={styles.cardContainer}>
-        <CustomerProfileContextList
+        <Card.CustomerProfileContextList
           profileUuid={profile.uuid}
           title={'Jobs to be Done'}
           icon={'clipboard'}
           field={'jobs'}
           data={profile.jobs}
         />
-        <CustomerProfileContextList
+        <Card.CustomerProfileContextList
           profileUuid={profile.uuid}
           title={'Pains'}
           icon={'user-group'}
           field={'pains'}
           data={profile.pains}
         />
-        <CustomerProfileContextList
+        <Card.CustomerProfileContextList
           profileUuid={profile.uuid}
           title={'Quotes'}
           icon={'message-circle'}

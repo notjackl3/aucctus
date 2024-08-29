@@ -1,10 +1,10 @@
 import { FunctionComponent } from 'react';
 
-import { ICustomerProfile } from '../../../../libs/api/types';
-import { useModal } from '../../../context/ModalContextProvider';
-import Icon from '../../Icon/Icon/Icon';
-import EditCustomerProfileDemographics from '../../Modal/CustomerProfile/EditCustomerProfileDemographics';
-import styles from './demographics-container.module.scss';
+import { Icon } from '@components';
+import EditCustomerProfileDemographics from '@components/Modal/CustomerProfile/EditCustomerProfileDemographics';
+import { useModal } from '@context/ModalContextProvider';
+import { ICustomerProfile } from '@libs/api/types';
+import styles from './demographics-card.module.scss';
 
 const iconDefaultProps = {
   height: 20,
@@ -12,12 +12,12 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-interface IDemographicsContainerProps {
+interface IDemographicsProps {
   profile: ICustomerProfile;
   canEdit?: boolean;
 }
 
-const DemographicsContainer: FunctionComponent<IDemographicsContainerProps> = ({
+const Demographics: FunctionComponent<IDemographicsProps> = ({
   profile,
   canEdit = false,
 }) => {
@@ -59,4 +59,4 @@ const DemographicsContainer: FunctionComponent<IDemographicsContainerProps> = ({
   );
 };
 
-export default DemographicsContainer;
+export default Demographics;
