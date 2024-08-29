@@ -1,5 +1,5 @@
 import defaultAvatar from '@assets/img/avatar.png';
-import { Card } from "@components";
+import { Card } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { ICustomerProfile } from '@libs/api/types';

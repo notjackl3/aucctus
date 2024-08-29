@@ -1,15 +1,15 @@
-import { Loading, Table } from '@components';
+import { Container, Loading, Table } from '@components';
 import Icon from '@components/Icon/Icon/Icon';
 import IgniteLoading from '@components/IgniteLoading';
 import {
   useConceptIgnition,
   useSaveGeneratedConcepts,
 } from '@hooks/query/concepts.hook';
+import { useGeneratedConcepts } from '@hooks/tables/generated-concepts.hook';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import React, { FunctionComponent, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useGeneratedConcepts } from '../../../hooks/tables/generated-concepts.hook';
 import styles from './styles/generatedConcepts.module.scss';
 
 const GeneratedConcepts: FunctionComponent = () => {
@@ -94,8 +94,7 @@ const GeneratedConcepts: FunctionComponent = () => {
                 </button>
               </div>
             </div>
-            <Table
-              table={table}
+            <Container.ConceptTableWrapper
               isLoading={isGenerateLoading}
               footer={
                 <div className='flex h-full w-full justify-end'>
@@ -112,7 +111,9 @@ const GeneratedConcepts: FunctionComponent = () => {
                   </button>
                 </div>
               }
-            />
+            >
+              <Table table={table} />
+            </Container.ConceptTableWrapper>
           </>
         )}
       </div>

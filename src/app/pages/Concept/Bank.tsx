@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react';
 
-import { Header, Icon, Input, Table } from '@components';
+import { Container, Header, Icon, Input, Table } from '@components';
 import {
   areFilterOptionsSet,
   IConceptFilterOptions,
@@ -101,8 +101,7 @@ const ConceptBank: React.FC = () => {
             filterOptions={filterOptions}
           />
         </div>
-
-        <Table
+        <Container.ConceptTableWrapper
           isLoading={isLoading}
           header={
             <>
@@ -121,7 +120,6 @@ const ConceptBank: React.FC = () => {
               ) : null}
             </>
           }
-          table={table}
           footer={
             <Table.Pagination
               page={page}
@@ -129,7 +127,9 @@ const ConceptBank: React.FC = () => {
               onPageChange={(page: number) => setPage(page)}
             />
           }
-        />
+        >
+          <Table table={table} />
+        </Container.ConceptTableWrapper>
       </div>
     </div>
   );
