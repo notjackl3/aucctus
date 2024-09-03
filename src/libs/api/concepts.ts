@@ -1,9 +1,7 @@
-import { AtLeast } from 'src/types';
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
 import { endpoints } from './endpoints';
 import {
-  ConceptStatus,
   Ecosystem,
   IAssumption,
   IAssumptionCreate,
@@ -22,7 +20,7 @@ import {
   IMarketScan,
   IMarketScanElementCreate,
   IPageResponse,
-  ITrendsAndDrivers,
+  ITrendsAndDrivers
 } from './types'; // Import the missing type
 
 /**
@@ -89,10 +87,6 @@ export class ConceptApi extends ApiService {
     return this.post<IConcept, IConceptCreate>(endpoints.concept, concept);
   }
 
-  batchCreateConcepts(concepts: IConceptCreate[]) {
-    return this.post<IConcept[], IConceptCreate[]>(endpoints.concept, concepts);
-  }
-
   saveGeneratedConcepts(body: IGeneratedConceptsSaveBody) {
     return this.post<IConcept[], IGeneratedConceptsSaveBody>(
       endpoints.saveGeneratedConcepts,
@@ -146,11 +140,11 @@ export class ConceptApi extends ApiService {
     );
   }
   createConceptCustomerProfile(
-    customerProfileUuid: string,
+    conceptUuid: string,
     data: ICustomerProfileCreate,
   ) {
     return this.post<ICustomerProfile, ICustomerProfileCreate>(
-      endpoints.conceptCustomerProfiles(customerProfileUuid),
+      endpoints.conceptCustomerProfiles(conceptUuid),
       data,
     );
   }
