@@ -277,7 +277,7 @@ export function useEditMarketScan() {
 // TODO: Handle Editing
 
 const DEFAULT_BUSINESS_MODEL: IBusinessModel = {
-  modelName: '',
+  name: '',
   description: '',
   rationale: '',
   uuid: '',

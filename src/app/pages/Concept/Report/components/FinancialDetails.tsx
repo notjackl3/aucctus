@@ -79,10 +79,10 @@ const FinancialDetails: FunctionComponent = () => {
         <div className='inline-flex w-full items-start justify-start gap-5'>
           <Card.FinancialModel
             heading='Business Model'
-            value={businessModel.modelName}
+            value={businessModel.name}
             content={businessModel.rationale}
             onClick={handleReasoningModelClick(
-              businessModel.modelName,
+              businessModel.name,
               businessModel.rationale,
               businessModel.sources,
             )}

@@ -93,7 +93,7 @@ interface IConceptSeedBase {
 
 export interface IConceptSeed
   extends IConceptSeedBase,
-    Omit<IBaseConceptEntity, 'version'> {}
+  Omit<IBaseConceptEntity, 'version'> { }
 
 export interface IConceptOverview extends IBaseConceptEntity {
   valueProposition: string;
@@ -145,12 +145,6 @@ export interface ISource {
   url: string;
 }
 
-export interface IBusinessModel extends IBaseConceptEntity {
-  modelName: string;
-  description: string;
-  rationale: string;
-  sources: ISource[];
-}
 
 interface BaseFinancialProjectionItem extends IBaseConceptEntity {
   rationale: string;
@@ -158,7 +152,7 @@ interface BaseFinancialProjectionItem extends IBaseConceptEntity {
 }
 
 export interface IBusinessModel extends BaseFinancialProjectionItem {
-  modelName: string;
+  name: string;
   description: string;
 }
 export interface IFinancialProjectionPricing
