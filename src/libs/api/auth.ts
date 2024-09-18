@@ -1,15 +1,15 @@
+import Api from './api';
+import { ApiService, IApiServiceConfig } from './apiService';
+import { endpoints } from './endpoints';
 import {
   IAuthSuccessResponse,
-  ITokenResponse,
+  IMessageResponse,
   ISignInRequest,
   ISignUpRequest,
   IToken,
+  ITokenResponse,
   IUpdateForgottenPasswordRequest,
 } from './types';
-import { ApiService, IApiServiceConfig } from './apiService';
-import { endpoints } from './endpoints';
-import { IMessageResponse } from './types';
-import Api from './api';
 
 export class AuthApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = true;
@@ -68,7 +68,7 @@ export class AuthApi extends ApiService {
   }
 
   logout(token?: string) {
-    return this.post<IMessageResponse>(endpoints.logout, { token });
+    return this.post<IMessageResponse>(endpoints.logout, { refresh: token });
   }
 
   /**

@@ -1,6 +1,6 @@
-import { Outlet, Navigate } from 'react-router-dom';
 import NavDrawer from '@components/Navigation/NavDrawer/NavDrawer';
 import { AppPath } from '@routes/routes';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAppStore } from '../../app/stores/app.store';
 
 const PrivateLayout = () => {

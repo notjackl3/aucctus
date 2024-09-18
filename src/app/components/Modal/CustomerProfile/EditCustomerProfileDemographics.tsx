@@ -227,42 +227,43 @@ const EditCustomerProfileDemographics: FunctionComponent<
                   closeModal();
                 },
                 onError: (error) => {
+                  // TODO: Comeback to this and fix it.
                   const message = utils.osiris.parseFormError(error);
 
-                  if (
-                    error.response &&
-                    error.response.data &&
-                    error.response.data.error &&
-                    typeof error.response.data.error !== 'string'
-                  ) {
-                    const {
-                      geoLocation: gLocation,
-                      familySize: fSize,
-                      ageLower: aLower,
-                      ageUpper: aUpper,
-                      incomeLower: iLower,
-                      incomeUpper: iUpper,
-                    } = error.response.data.error;
+                  // if (
+                  //   error.response &&
+                  //   error.response.data &&
+                  //   error.response.data.error &&
+                  //   typeof error.response.data.error !== 'string'
+                  // ) {
+                  //   const {
+                  //     geoLocation: gLocation,
+                  //     familySize: fSize,
+                  //     ageLower: aLower,
+                  //     ageUpper: aUpper,
+                  //     incomeLower: iLower,
+                  //     incomeUpper: iUpper,
+                  //   } = error.response.data.error;
 
-                    if (gLocation) {
-                      setGeoLocationError(gLocation[0].message);
-                    }
-                    if (fSize) {
-                      setFamilySizeError(fSize[0].message);
-                    }
-                    if (aLower) {
-                      setLowerAgeRangeError(aLower[0].message);
-                    }
-                    if (aUpper) {
-                      setUpperAgeRangeError(aUpper[0].message);
-                    }
-                    if (iLower) {
-                      setLowerIncomeRangeError(iLower[0].message);
-                    }
-                    if (iUpper) {
-                      setUpperIncomeRangeError(iUpper[0].message);
-                    }
-                  }
+                  //   if (gLocation) {
+                  //     setGeoLocationError(gLocation[0].message);
+                  //   }
+                  //   if (fSize) {
+                  //     setFamilySizeError(fSize[0].message);
+                  //   }
+                  //   if (aLower) {
+                  //     setLowerAgeRangeError(aLower[0].message);
+                  //   }
+                  //   if (aUpper) {
+                  //     setUpperAgeRangeError(aUpper[0].message);
+                  //   }
+                  //   if (iLower) {
+                  //     setLowerIncomeRangeError(iLower[0].message);
+                  //   }
+                  //   if (iUpper) {
+                  //     setUpperIncomeRangeError(iUpper[0].message);
+                  // }
+                  // }
                   toast.error(message);
                 },
               },

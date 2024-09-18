@@ -1,10 +1,11 @@
 import {
   ActiveConceptStatus,
   ArchivedConceptStatus,
-  AssumptionType,
+  AssumptionCategory,
   ConceptStatus,
   DraftConceptStatus,
   MarketMetricType,
+  TestingValidationStatus,
 } from '../api/types';
 
 export const CONCEPT_STATUS_LIST: ConceptStatus[] = [
@@ -30,6 +31,12 @@ export const ACTIVE_CONCEPT_STATUS_LIST: ActiveConceptStatus[] = [
 ];
 export const ARCHIVE_CONCEPT_STATUS_LIST: ArchivedConceptStatus[] = [
   'archived',
+];
+export const ASSUMPTIONS_CATEGORIES: AssumptionCategory[] = [
+  'desirability',
+  'feasibility',
+  'viability',
+  'adaptability',
 ];
 
 export type ConceptStatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
@@ -70,6 +77,47 @@ export const CONCEPT_STATUS_STYLE_MAP: Record<
   },
 };
 
+export const VALIDATION_STATUS: TestingValidationStatus[] = [
+  'inProgress',
+  'notStarted',
+  'partiallyValidated',
+  'validated',
+];
+
+export const TESTING_STATUS_STYLE_MAP: Record<
+  TestingValidationStatus,
+  { icon: IconVariant; bg: string; stroke: string; svg: string; text: string }
+> = {
+  notStarted: {
+    icon: 'play-square',
+    bg: 'bg-[#f8f9fc]',
+    svg: '[&>svg]:stroke-[#667085]',
+    stroke: 'stroke-[#667085]',
+    text: 'text-[#667085]',
+  },
+  inProgress: {
+    icon: 'clock-fast-forward',
+    bg: 'bg-[#f8f9fc]',
+    svg: '[&>svg]:stroke-[#667085]',
+    stroke: 'stroke-[#667085]',
+    text: 'text-[#667085]',
+  },
+  partiallyValidated: {
+    icon: 'loading-02',
+    bg: 'bg-[#fcf7e9]',
+    svg: '[&>svg]:stroke-[#b55121]',
+    stroke: 'stroke-[#b55121]',
+    text: 'text-[#b55121]',
+  },
+  validated: {
+    icon: 'check',
+    bg: 'bg-[#e9fbf2]',
+    svg: '[&>svg]:stroke-[#117246]',
+    stroke: 'stroke-[#117246]',
+    text: 'text-[#117246]',
+  },
+};
+
 /**
  * Returns the color associated with a given concept status.
  *
@@ -107,9 +155,9 @@ type AssumptionHexColor = '#7839EE' | '#0E9384' | '#088AB2' | '#155EEF';
  * @returns The color associated with the active assumption type.
  */
 export function getAssumptionActiveHexColor(
-  assumption: AssumptionType,
+  assumption: AssumptionCategory,
 ): AssumptionHexColor {
-  const assumptionColorObj: Record<AssumptionType, AssumptionHexColor> = {
+  const assumptionColorObj: Record<AssumptionCategory, AssumptionHexColor> = {
     desirability: '#7839EE',
     viability: '#0E9384',
     feasibility: '#088AB2',
@@ -132,10 +180,10 @@ type AssumptionBackgroundHexColor =
  * @returns The color associated with the assumption type.
  */
 export function getAssumptionHexColor(
-  assumption: AssumptionType,
+  assumption: AssumptionCategory,
 ): AssumptionBackgroundHexColor {
   const assumptionColorObj: Record<
-    AssumptionType,
+    AssumptionCategory,
     AssumptionBackgroundHexColor
   > = {
     desirability: '#ECE9FE',

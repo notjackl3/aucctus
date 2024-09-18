@@ -37,10 +37,9 @@ export const endpoints = {
 
   /* Concepts */
   concept: 'api/v1/concept/',
-  conceptList: 'api/v1/concept/list',
   saveGeneratedConcepts: 'api/v1/concept/generated',
 
-  conceptIgnite: 'v1/concept/ignite', // Fast
+  conceptIgnite: 'api/v1/concept/ignite', // Fast
   // eslint-disable-next-line @typescript-eslint/typedef
   conceptQueries: function (this, options?: IConceptQueryOptions) {
     return utils.string.queryStringGenerator(this.concept, options);

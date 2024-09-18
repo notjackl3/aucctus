@@ -1,17 +1,38 @@
-export type IFormError<T = object> =
+export type IFormError<T = object | str | number> =
   | IServerErrorMessage
-  | IFormErrorResponse<T>;
+  | IPydanticValidationErrorResponse<T>;
 export interface IServerErrorMessage {
   id: string;
-  error: string;
+  detail: string;
 }
 
-export interface IFormDetailsError {
-  message: string;
-  code: string;
+type NestedKeyOf<T> = T extends object
+  ? {
+      [K in keyof T]: K extends string
+        ? K | `${K}.${NestedKeyOf<T[K]>}`
+        : never;
+    }[keyof T]
+  : never;
+
+export interface IPydanticValidationError<T = unknown> {
+  loc: T extends object ? (NestedKeyOf<T> | number)[] : (string | number)[];
+  msg: string;
+  type: string;
+  ctx?: Record<string, unknown>;
+  input: T;
+  url?: string;
 }
-export interface IFormErrorResponse<T = unknown> {
-  error: Record<keyof T, IFormDetailsError[]>;
+
+type NestedKeyOf<T> = T extends object
+  ? {
+      [K in keyof T]: K extends string
+        ? K | `${K}.${NestedKeyOf<T[K]>}`
+        : never;
+    }[keyof T]
+  : never;
+
+export interface IPydanticValidationErrorResponse<T = unknown> {
+  detail: IPydanticValidationError<T>[];
 }
 
 export interface IMessageResponse {

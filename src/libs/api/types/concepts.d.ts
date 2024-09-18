@@ -93,7 +93,7 @@ interface IConceptSeedBase {
 
 export interface IConceptSeed
   extends IConceptSeedBase,
-  Omit<IBaseConceptEntity, 'version'> { }
+    Omit<IBaseConceptEntity, 'version'> {}
 
 export interface IConceptOverview extends IBaseConceptEntity {
   valueProposition: string;
@@ -145,7 +145,6 @@ export interface ISource {
   url: string;
 }
 
-
 interface BaseFinancialProjectionItem extends IBaseConceptEntity {
   rationale: string;
   sources: ISource[];
@@ -181,49 +180,37 @@ export interface IFinancialProjection extends IBaseConceptEntity {
   som: number;
 }
 
+type AssumptionCategory =
+  | 'adaptability'
+  | 'desirability'
+  | 'feasibility'
+  | 'viability';
 type AssumptionType =
   | 'adaptability'
   | 'desirability'
   | 'feasibility'
   | 'viability';
+
+type RiskLevel = 'high' | 'medium' | 'low';
+
 export interface IAssumption extends IBaseConceptEntity {
   name: string;
-  hypothesis: string;
+  text: string;
 
-  /**
-   * Rationale for the risk and impact level
-   *
-   */
-  rationale: string;
-  potentialImpact: string;
-  expectedResult: string;
-  methodOfTesting: string;
-  variables: string[];
-  assumptionsType: AssumptionType;
+  category: AssumptionCategory;
 
-  /**
-   * The risk level of the assumption
-   * A number between -10 and 10
-   */
-  riskLevel: number;
-  riskRationale: string;
-  /**
-   * The impact level of the assumption
-   * A number between -10 and 10
-   */
-  impactLevel: number;
-  impactRationale: string;
+  importanceLevel: number;
+  importanceRationale: string;
+  importanceCategory: RiskLevel;
 
-  /**
-   * The difficulty level of the assumption
-   * A number between -10 and 10
-   */
-  difficultyLevel: number;
-  difficultyRationale: string;
+  certaintyLevel: number;
+  certaintyRationale: string;
+  certaintyCategory: RiskLevel;
+
+  status: TestingValidationStatus;
 
   validated: boolean;
-  riskCategory: 'high' | 'medium' | 'low';
-  impactCategory: 'high' | 'medium' | 'low';
+  riskCategory: RiskLevel;
 }
 
 export interface IAssumptionCreate {
@@ -232,7 +219,7 @@ export interface IAssumptionCreate {
   riskLevel: number;
   difficultyLevel: number;
   impactLevel: number;
-  assumptionsType: AssumptionType;
+  assumptionsType: AssumptionCategory;
 }
 
 export interface IEcosystem extends IBaseConceptEntity {
@@ -289,3 +276,44 @@ export interface IMarketScan extends IBaseConceptEntity {
 export interface IConceptPage extends IPageResponse<IConcept> {
   statusCounts: { [key in ConceptStatus]: number };
 }
+
+type TestingValidationStatus =
+  | 'notStarted'
+  | 'inProgress'
+  | 'partiallyValidated'
+  | 'validated';
+
+/**
+ * Assumption Tests:
+ *
+ * Discovery:
+ * - Scanning Surveys
+ * - Immersive Dialogues
+ * - Market Pulse-checks
+ * - Community Scans
+ *
+ * Validate:
+ * - Wizard Of Oz
+ * - Market Resonance
+ * - Action Signals
+ * - Product Blueprint
+ *
+ * Scale:
+ * - Feedback Loops
+ * - Performance Tracking
+ * - Test Drives
+ * - Product Roadmap Testing
+ */
+type AssumptionTest =
+  | 'scanningSurveys'
+  | 'immersiveDialogues'
+  | 'marketPulse-checks'
+  | 'communityScans'
+  | 'wizardOfOz'
+  | 'marketResonance'
+  | 'actionSignals'
+  | 'productBlueprint'
+  | 'feedbackLoops'
+  | 'performanceTracking'
+  | 'testDrives'
+  | 'productRoadmapTesting';

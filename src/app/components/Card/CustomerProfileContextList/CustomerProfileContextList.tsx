@@ -1,4 +1,5 @@
 import { Card, Icon } from '@components';
+import utils from '@libs/utils';
 import {
   FunctionComponent,
   useCallback,
@@ -90,7 +91,7 @@ const CustomerProfileContextList: FunctionComponent<
         <div className={styles.cardContent}>
           {list.map((value, index) => (
             <CustomerProfileListItem
-              key={value}
+              key={`${value}-${utils.string.generateRandomString(5)}`}
               value={value}
               field={field}
               handleDelete={handleDelete}

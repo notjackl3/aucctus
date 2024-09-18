@@ -92,3 +92,25 @@ describe('formatter', () => {
     expect(result).toBe('$1M');
   });
 });
+
+describe('toTitleCase', () => {
+  it('should convert a single word to title case', () => {
+    expect(utils.string.toTitleCase('hello')).toBe('Hello');
+  });
+
+  it('should convert multiple words to title case', () => {
+    expect(utils.string.toTitleCase('hello world')).toBe('Hello World');
+  });
+
+  it('should handle empty strings', () => {
+    expect(utils.string.toTitleCase('')).toBe('');
+  });
+
+  it('should handle strings with mixed case', () => {
+    expect(utils.string.toTitleCase('hElLo WoRLd')).toBe('Hello World');
+  });
+
+  it('should handle strings with leading and trailing spaces', () => {
+    expect(utils.string.toTitleCase('  hello world  ')).toBe('  Hello World  ');
+  });
+});

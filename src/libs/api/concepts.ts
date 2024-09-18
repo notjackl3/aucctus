@@ -2,6 +2,7 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
 import { endpoints } from './endpoints';
 import {
+  ConceptStatus,
   Ecosystem,
   IAssumption,
   IAssumptionCreate,
@@ -20,7 +21,7 @@ import {
   IMarketScan,
   IMarketScanElementCreate,
   IPageResponse,
-  ITrendsAndDrivers
+  ITrendsAndDrivers,
 } from './types'; // Import the missing type
 
 /**
@@ -69,13 +70,6 @@ export class ConceptApi extends ApiService {
     return this.patch<IConcept, Partial<IConcept>>(
       endpoints.conceptUuid(uuid),
       concept,
-    );
-  }
-
-  bulkUpdateConcepts(concepts: AtLeast<IConcept, 'uuid'>[]) {
-    return this.patch<IConcept[], AtLeast<IConcept, 'uuid'>[]>(
-      endpoints.conceptList,
-      concepts,
     );
   }
 
@@ -194,10 +188,6 @@ export class ConceptApi extends ApiService {
       data,
     );
   }
-
-  // updateMarketMetricSize(uuid: string, data: Partial<IMarketSizeMetric>) {
-  //   return this.patch<IMarketSizeMetric, Partial<IMarketSizeMetric>>(endpoints.conceptMarketSizeMetric(uuid), data);
-  // }
 
   getConceptMarketScan(uuid: string) {
     return this.get<IMarketScan>(endpoints.conceptMarketScan(uuid));

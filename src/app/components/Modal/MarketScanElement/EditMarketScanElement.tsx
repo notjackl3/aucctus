@@ -108,24 +108,24 @@ const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({
             closeModal();
           },
           onError: (error) => {
-            if (
-              error.response &&
-              error.response.data &&
-              error.response.data.error &&
-              typeof error.response.data.error !== 'string'
-            ) {
-              const { name, description, source } = error.response.data.error;
-              if (name) {
-                setNameError(name[0].message);
-              }
-              if (description) {
-                setDescriptionError(description[0].message);
-              }
-
-              if (source) {
-                setSourceError(source[0].message);
-              }
-            }
+            // TODO: bring back error message extraction
+            // if (
+            //   error.response &&
+            //   error.response.data &&
+            //   error.response.data.error &&
+            //   typeof error.response.data.error !== 'string'
+            // ) {
+            //   const { name, description, source } = error.response.data.error;
+            //   if (name) {
+            //     setNameError(name[0].message);
+            //   }
+            //   if (description) {
+            //     setDescriptionError(description[0].message);
+            //   }
+            //   if (source) {
+            //     setSourceError(source[0].message);
+            //   }
+            // }
           },
         },
       );

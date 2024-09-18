@@ -27,6 +27,22 @@ export const removeProtocol = (source: string) => {
   return d;
 };
 
+/** Convert any string to Title Case
+ *
+ * @param str
+ * @returns
+ */
+export function toTitleCase(str: string): string {
+  if (!str) {
+    return '';
+  }
+  return str
+    .toLowerCase()
+    .split(' ')
+    .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+}
+
 /** Generate Random String
  *
  * @param length

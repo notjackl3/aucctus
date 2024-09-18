@@ -97,7 +97,7 @@ const GeneratedConcepts: FunctionComponent = () => {
             <Container.ConceptTableWrapper
               isLoading={isGenerateLoading}
               footer={
-                <div className='flex h-full w-full justify-end'>
+                <div className='flex h-full w-full justify-end p-3'>
                   <button
                     className='btn btn-primary disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600'
                     disabled={!hasSelectedConcepts || isSaveLoading}

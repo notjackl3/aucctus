@@ -1,9 +1,9 @@
 import { Badge } from '@components';
 import { FunctionComponent, useCallback, useState } from 'react';
-import { AssumptionType } from '../../../../libs/api/types';
+import { AssumptionCategory } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
 import { useAssumptionCreate } from '../../../hooks/query/concepts.hook';
-import Dropdown, { Option } from '../../Buttons/Dropdown/Dropdown';
+import Dropdown, { Option } from '../../Button/Dropdown/Dropdown';
 import Icon from '../../Icon/Icon/Icon';
 import InputField from '../../Input/InputField/InputField';
 import TextArea from '../../Input/TextArea/TextArea';
@@ -23,10 +23,10 @@ const ASSUMPTION_TYPE_OPTIONS: Option[] = (
     'desirability',
     'feasibility',
     'viability',
-  ] as AssumptionType[]
+  ] as AssumptionCategory[]
 ).map((value) => ({
-  label: <Badge.Assumption type={value} />,
-  displayLabel: <Badge.Assumption type={value} />,
+  label: <Badge.AssumptionCategory category={value} />,
+  displayLabel: <Badge.AssumptionCategory category={value} />,
   value,
 }));
 
@@ -41,7 +41,7 @@ const AddKeyAssumptionModal: FunctionComponent<
   const [difficultyLevel, setDifficultyLevel] = useState<number>(0);
 
   const [assumptionsType, setAssumptionType] =
-    useState<AssumptionType>('adaptability');
+    useState<AssumptionCategory>('adaptability');
   const [title, setTitle] = useState<string>('');
   const [titleError, setTitleError] = useState<string | undefined>(undefined);
   const [hypothesis, setHypothesis] = useState<string>('');
@@ -100,20 +100,7 @@ const AddKeyAssumptionModal: FunctionComponent<
             closeModal();
           },
           onError: (error) => {
-            if (
-              error.response &&
-              error.response.data &&
-              error.response.data.error &&
-              typeof error.response.data.error !== 'string'
-            ) {
-              const { name, hypothesis } = error.response.data.error;
-              if (name) {
-                setTitleError(name[0].message);
-              }
-              if (hypothesis) {
-                setHypothesisError(hypothesis[0].message);
-              }
-            }
+            //  TODO: Bring back Error Message Extraction.
           },
         },
       );
@@ -155,7 +142,7 @@ const AddKeyAssumptionModal: FunctionComponent<
           options={ASSUMPTION_TYPE_OPTIONS}
           selected={assumptionsType}
           onSelect={(value) => {
-            setAssumptionType(value as AssumptionType);
+            setAssumptionType(value as AssumptionCategory);
           }}
         />
         <div className={styles.levels}>

@@ -7,6 +7,7 @@ interface IPaginationProps {
   page: number;
   numberOfPages: number;
   onPageChange: (page: number) => void;
+  hideNavText?: boolean;
 }
 
 const MAX_PAGINATION_BUTTON = 7;
@@ -15,6 +16,7 @@ const Pagination: React.FC<IPaginationProps> = ({
   page,
   numberOfPages,
   onPageChange,
+  hideNavText = false,
 }) => {
   const handlePageChange = React.useCallback(
     (value: number) =>
@@ -43,7 +45,7 @@ const Pagination: React.FC<IPaginationProps> = ({
   }, [numberOfPages, onPageChange, page]);
 
   return (
-    <>
+    <div className='inline-flex h-[68px] w-full items-center justify-between self-end px-6 pb-4 pt-3'>
       <button
         className='btn btn-light'
         onClick={() => handlePageChange(page - 1)}
@@ -51,7 +53,7 @@ const Pagination: React.FC<IPaginationProps> = ({
         disabled={page <= 1}
       >
         <Icon variant='arrowleft' width={20} height={20} />
-        Previous
+        {!hideNavText ? 'Previous' : ''}
       </button>
       <div className='inline-flex items-end gap-2'>{renderPageNumbers()}</div>
       <button
@@ -60,10 +62,10 @@ const Pagination: React.FC<IPaginationProps> = ({
         disabled={page >= numberOfPages}
         aria-label='Next Page'
       >
-        Next
+        {!hideNavText ? 'Next' : ''}
         <Icon variant='arrowright' width={20} height={20} />
       </button>
-    </>
+    </div>
   );
 };
 

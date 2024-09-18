@@ -14,7 +14,7 @@ const IntoSection: FunctionComponent = () => {
             // Create the Stars icon N times
             [...Array(NUMBER_OF_STARS)].map((e, i) => (
               <Icon
-                variant='star'
+                variant='star-01'
                 key={`star-icon-${i}`}
                 height={20}
                 width={30}

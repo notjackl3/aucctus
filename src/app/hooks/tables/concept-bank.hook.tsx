@@ -190,7 +190,7 @@ export const useConceptBank = () => {
         enableColumnFilter: false,
         header: () => 'Concept',
         cell: (info) => (
-          <Table.ConceptBank.TitleDescription
+          <Table.Column.TitleDescription
             title={info.getValue()}
             description={info.row.original.description}
           />

@@ -59,7 +59,7 @@ const Dropdown: FunctionComponent<DropdownProps> = ({
         <div className={styles.dropdownMenu}>
           {options.map((option, index) => (
             <div
-              key={index}
+              key={`${option.label}${index}`}
               className={styles.dropdownItem}
               onClick={() => handleSelect(option)}
             >

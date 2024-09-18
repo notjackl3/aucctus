@@ -1,7 +1,7 @@
 // Component Groups
 import Badge from './Badges';
-import Button from './Buttons';
-import Card from './Cards';
+import Button from './Button';
+import Card from './Card';
 import Chart from './Charts';
 import Container from './Container';
 import Header from './Header';

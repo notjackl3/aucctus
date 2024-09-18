@@ -1,5 +1,6 @@
 import { FunctionComponent } from 'react';
 
+import { RiskLevel } from '@libs/api/types';
 import Icon from '../Icon/Icon/Icon';
 
 const defaultIconProps = {
@@ -7,46 +8,43 @@ const defaultIconProps = {
   height: 16,
 };
 
-type RiskLevelVariant = 'high' | 'medium' | 'low';
-export interface RiskLevelProps {
+export interface RiskLevelBadgeProps {
   badgeClassName?: string;
   bulletClassName?: string;
   text: string;
   showBullet?: boolean;
-  variant: RiskLevelVariant;
+  level: RiskLevel;
 }
 
-const BADGE_VARIANT_MAP: Record<
-  RiskLevelVariant,
-  { style: string; icon: IconVariant }
-> = {
-  high: {
-    icon: 'alert-octagon',
-    style: 'text-error-700 bg-error-50 [&>svg>use]:stroke-error-700',
-  },
-  medium: {
-    icon: 'alert-triangle',
-    style: 'text-warning-500 bg-warning-50 [&>svg>use]:stroke-warning-500',
-  },
-  low: {
-    icon: 'alert',
-    style: 'text-success-700 bg-success-50 [&>svg>use]:stroke-success-700',
-  },
-};
+const BADGE_LEVEL_MAP: Record<RiskLevel, { style: string; icon: IconVariant }> =
+  {
+    high: {
+      icon: 'alert-octagon',
+      style: 'text-error-700 bg-error-50 [&>svg>use]:stroke-error-700',
+    },
+    medium: {
+      icon: 'alert-triangle',
+      style: 'text-warning-500 bg-warning-50 [&>svg>use]:stroke-warning-500',
+    },
+    low: {
+      icon: 'alert',
+      style: 'text-success-700 bg-success-50 [&>svg>use]:stroke-success-700',
+    },
+  };
 
-const RiskLevel: FunctionComponent<RiskLevelProps> = ({
+const RiskLevelBadge: FunctionComponent<RiskLevelBadgeProps> = ({
   badgeClassName,
   text,
-  variant,
+  level,
 }) => {
   return (
     <div
-      className={`flex items-center gap-2 rounded-2xl py-[0.2rem] pl-[0.4rem] pr-2 shadow-sm ${BADGE_VARIANT_MAP[variant].style} ${
+      className={`flex items-center gap-2 rounded-2xl py-[0.2rem] pl-[0.4rem] pr-2 shadow-sm ${BADGE_LEVEL_MAP[level].style} ${
         badgeClassName ? badgeClassName : ''
       }`}
     >
-      {variant ? (
-        <Icon variant={BADGE_VARIANT_MAP[variant].icon} {...defaultIconProps} />
+      {level ? (
+        <Icon variant={BADGE_LEVEL_MAP[level].icon} {...defaultIconProps} />
       ) : null}
       <span
         className={
@@ -59,4 +57,4 @@ const RiskLevel: FunctionComponent<RiskLevelProps> = ({
   );
 };
 
-export default RiskLevel;
+export default RiskLevelBadge;

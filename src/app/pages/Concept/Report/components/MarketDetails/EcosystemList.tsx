@@ -40,6 +40,7 @@ const EcosystemList: FunctionComponent<IEcosystemListProps> = ({
 
   const onContainerClick = useCallback(
     (item: Ecosystem) => (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      // @ts-ignore TODO: Fix type definition for EditMarketScanElement props
       openModal(EditMarketScanElement, { item, deleteItem, updateItem });
       e.preventDefault();
     },

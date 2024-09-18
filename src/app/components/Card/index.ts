@@ -1,6 +1,9 @@
+import AssumptionOverview from './AssumptionOverview';
 import Detail from './DetailCard';
 import Kanban from './Kanban/ConceptCard';
+import Testing from './Testing';
 
+import AssumptionsTestingStatus from './AssumptionsTestingStatus/AssumptionsTestingStatus';
 import CustomerProfileContextList from './CustomerProfileContextList/CustomerProfileContextList';
 import CustomerProfiles from './CustomerProfilesCard';
 import Demographics from './DemographicsCard/DemographicsCard';
@@ -21,6 +24,9 @@ const Card = {
   CustomerProfileContextList,
   FinancialModel,
   MarketSize,
+  AssumptionsTestingStatus,
+  AssumptionOverview,
+  Testing,
 };
 
 export default Card;

@@ -315,7 +315,7 @@ export function useEditFinancialProjections() {
   const { financialProjection, isLoading } =
     useFinancialProjection(conceptUuid);
   const { mutate } = useFinancialProjectionUpdate(conceptUuid);
-  const validationOptions: IValidationOptions = { maxLength: 500 };
+  const validationOptions: IValidationOptions = { maxLength: 2500 };
 
   const overview = useEditableField<string, IFinancialProjection>({
     initialValue: financialProjection?.overview || '',

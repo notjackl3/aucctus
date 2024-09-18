@@ -52,7 +52,9 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
         onClick={() =>
           openModal(EditMarketScanElement, {
             item: trendAndDriver,
+            // @ts-ignore TODO: Fix type definition for EditMarketScanElement props
             deleteItem,
+            // @ts-ignore
             updateItem,
           })
         }

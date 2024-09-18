@@ -1,16 +1,7 @@
 import { Badge } from '@components';
-import { FunctionComponent, useCallback, useState } from 'react';
-import { AssumptionType, IAssumption } from '../../../../libs/api/types';
-import { useModal } from '../../../context/ModalContextProvider';
-import {
-  useAssumptionDelete,
-  useAssumptionUpdate,
-} from '../../../hooks/query/concepts.hook';
-import Dropdown, { Option } from '../../Buttons/Dropdown/Dropdown';
-import Icon from '../../Icon/Icon/Icon';
-import InputField from '../../Input/InputField/InputField';
-import TextArea from '../../Input/TextArea/TextArea';
-import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
+import { FunctionComponent } from 'react';
+import { AssumptionCategory, IAssumption } from '../../../../libs/api/types';
+import { Option } from '../../Button/Dropdown/Dropdown';
 
 import styles from './edit-key-assumption.module.scss';
 
@@ -27,126 +18,127 @@ const ASSUMPTION_TYPE_OPTIONS: Option[] = (
     'desirability',
     'feasibility',
     'viability',
-  ] as AssumptionType[]
+  ] as AssumptionCategory[]
 ).map((value) => ({
-  label: <Badge.Assumption type={value} />,
-  displayLabel: <Badge.Assumption type={value} />,
+  label: <Badge.AssumptionCategory category={value} />,
+  displayLabel: <Badge.AssumptionCategory category={value} />,
   value,
 }));
 
 const EditKeyAssumptionModal: FunctionComponent<
   IEditKeyAssumptionModalProps
 > = ({ assumption }) => {
-  const { closeModal } = useModal();
-  const [showConfirmation, setShowConfirmation] = useState(false);
-  const { mutate: updateAssumption } = useAssumptionUpdate();
-  const { mutate: deleteAssumption } = useAssumptionDelete();
-  const [riskLevel, setRiskLevel] = useState<number>(assumption.riskLevel);
-  const [impactLevel, setImpactLevel] = useState<number>(
-    assumption.impactLevel,
-  );
-  const [difficultyLevel, setDifficultyLevel] = useState<number>(
-    assumption.difficultyLevel,
-  );
+  // const { closeModal } = useModal();
+  // const [showConfirmation, setShowConfirmation] = useState(false);
+  // const { mutate: updateAssumption } = useAssumptionUpdate();
+  // const { mutate: deleteAssumption } = useAssumptionDelete();
+  // const [riskLevel, setRiskLevel] = useState<number>(assumption.riskLevel);
+  // const [impactLevel, setImpactLevel] = useState<number>(
+  //   assumption.impactLevel,
+  // );
+  // const [difficultyLevel, setDifficultyLevel] = useState<number>(
+  //   assumption.difficultyLevel,
+  // );
 
-  const [assumptionsType, setAssumptionType] = useState<AssumptionType>(
-    assumption.assumptionsType,
-  );
-  const [title, setTitle] = useState<string>(assumption.name);
-  const [titleError, setTitleError] = useState<string | undefined>(undefined);
-  const [hypothesis, setHypothesis] = useState<string>(assumption.hypothesis);
-  const [hypothesisError, setHypothesisError] = useState<string | undefined>(
-    undefined,
-  );
+  // const [assumptionsType, setAssumptionType] = useState<AssumptionCategory>(
+  //   assumption.assumptionsType,
+  // );
+  // const [title, setTitle] = useState<string>(assumption.name);
+  // const [titleError, setTitleError] = useState<string | undefined>(undefined);
+  // const [hypothesis, setHypothesis] = useState<string>(assumption.hypothesis);
+  // const [hypothesisError, setHypothesisError] = useState<string | undefined>(
+  //   undefined,
+  // );
 
-  const handleTitleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const input = e.target.value;
+  // const handleTitleChange = useCallback(
+  //   (e: React.ChangeEvent<HTMLInputElement>) => {
+  //     const input = e.target.value;
 
-      setTitleError(undefined);
+  //     setTitleError(undefined);
 
-      if (input.length === 0) {
-        setTitleError('Title is required.');
-      } else if (input.length > TITLE_MAX_LENGTH) {
-        setTitleError('Title exceeds the maximum allowed length.');
-      }
+  //     if (input.length === 0) {
+  //       setTitleError('Title is required.');
+  //     } else if (input.length > TITLE_MAX_LENGTH) {
+  //       setTitleError('Title exceeds the maximum allowed length.');
+  //     }
 
-      setTitle(input);
-    },
-    [],
-  );
+  //     setTitle(input);
+  //   },
+  //   [],
+  // );
 
-  const handleHypothesesChange = useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-      const input = e.target.value;
+  // const handleHypothesesChange = useCallback(
+  //   (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  //     const input = e.target.value;
 
-      setHypothesisError(undefined);
+  //     setHypothesisError(undefined);
 
-      if (input.length === 0) {
-        setHypothesis('Hypothesis is required.');
-      } else if (input.length > HYPOTHESES_MAX_LENGTH) {
-        setHypothesisError('Hypothesis exceeds the maximum allowed length.');
-      }
+  //     if (input.length === 0) {
+  //       setHypothesis('Hypothesis is required.');
+  //     } else if (input.length > HYPOTHESES_MAX_LENGTH) {
+  //       setHypothesisError('Hypothesis exceeds the maximum allowed length.');
+  //     }
 
-      setHypothesis(input);
-    },
-    [],
-  );
+  //     setHypothesis(input);
+  //   },
+  //   [],
+  // );
 
-  const handleSave = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      e.preventDefault();
-      updateAssumption(
-        {
-          ...assumption,
-          name: title,
-          hypothesis,
-          riskLevel,
-          difficultyLevel,
-          impactLevel,
-          assumptionsType,
-        },
-        {
-          onSuccess: () => {
-            closeModal();
-          },
-          onError: (error) => {
-            if (
-              error.response &&
-              error.response.data &&
-              error.response.data.error &&
-              typeof error.response.data.error !== 'string'
-            ) {
-              const { name, hypothesis } = error.response.data.error;
-              if (name) {
-                setTitleError(name[0].message);
-              }
-              if (hypothesis) {
-                setHypothesisError(hypothesis[0].message);
-              }
-            }
-          },
-        },
-      );
-      e.preventDefault();
-      e.stopPropagation();
-    },
-    [
-      updateAssumption,
-      assumption,
-      title,
-      hypothesis,
-      riskLevel,
-      difficultyLevel,
-      impactLevel,
-      assumptionsType,
-      closeModal,
-    ],
-  );
+  // const handleSave = useCallback(
+  //   (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  //     e.preventDefault();
+  //     updateAssumption(
+  //       {
+  //         ...assumption,
+  //         name: title,
+  //         hypothesis,
+  //         riskLevel,
+  //         difficultyLevel,
+  //         impactLevel,
+  //         assumptionsType,
+  //       },
+  //       {
+  //         onSuccess: () => {
+  //           closeModal();
+  //         },
+  //         onError: (error) => {
+  //           // TODO: bring back error message extraction
+  //           //   if (
+  //           //     error.response &&
+  //           //     error.response.data &&
+  //           //     error.response.data.error &&
+  //           //     typeof error.response.data.error !== 'string'
+  //           //   ) {
+  //           //     const { name, hypothesis } = error.response.data.error;
+  //           //     if (name) {
+  //           //       setTitleError(name[0].message);
+  //           //     }
+  //           //     if (hypothesis) {
+  //           //       setHypothesisError(hypothesis[0].message);
+  //           //     }
+  //           //   }
+  //         },
+  //       },
+  //     );
+  //     e.preventDefault();
+  //     e.stopPropagation();
+  //   },
+  //   [
+  //     updateAssumption,
+  //     assumption,
+  //     title,
+  //     hypothesis,
+  //     riskLevel,
+  //     difficultyLevel,
+  //     impactLevel,
+  //     assumptionsType,
+  //     closeModal,
+  //   ],
+  // );
 
   return (
     <div className={styles.container}>
-      <div className={styles.header}>
+      {/* <div className={styles.header}>
         <button
           aria-label='Delete'
           className='btn btn-light btn-no-border'
@@ -167,7 +159,7 @@ const EditKeyAssumptionModal: FunctionComponent<
           options={ASSUMPTION_TYPE_OPTIONS}
           selected={assumptionsType}
           onSelect={(value) => {
-            setAssumptionType(value as AssumptionType);
+            setAssumptionType(value as AssumptionCategory);
           }}
         />
         <div className={styles.levels}>
@@ -264,7 +256,7 @@ const EditKeyAssumptionModal: FunctionComponent<
             ]}
           />
         </div>
-      ) : null}
+      ) : null} */}
     </div>
   );
 };

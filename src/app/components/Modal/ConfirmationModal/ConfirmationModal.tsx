@@ -37,7 +37,7 @@ const ConfirmationModal: FunctionComponent<IConfirmationModalProps> = ({
       <div className={styles.actions}>
         {actions.map((action, index) => (
           <button
-            key={index}
+            key={`confirmation-button-${index}`}
             className={`btn btn-${action.variant}`}
             onClick={action.onClick}
           >

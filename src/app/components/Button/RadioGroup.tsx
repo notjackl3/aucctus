@@ -25,7 +25,10 @@ const RadioGroup: React.FC<IRadioGroup> = ({
     onValueChange={onSelect}
   >
     {labels.map((value, index) => (
-      <div key={value} style={{ display: 'flex', alignItems: 'center' }}>
+      <div
+        key={utils.string.generateRandomString(5) + value}
+        style={{ display: 'flex', alignItems: 'center' }}
+      >
         <Radio.Item
           className='h-[25px] w-[25px] cursor-default rounded-full border border-gray-200 bg-gray-100 shadow-md outline-none hover:outline-primary-400 focus:shadow-lg'
           value={value}

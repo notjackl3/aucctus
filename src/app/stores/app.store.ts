@@ -1,14 +1,14 @@
 import { create } from 'zustand';
-import { persist, createJSONStorage } from 'zustand/middleware';
+import { createJSONStorage, persist } from 'zustand/middleware';
 import { IAccount, IUser } from '../../libs/api/types';
 
 interface AppStoreState {
-  user: IUser | undefined;
-  account: IAccount | undefined;
+  user: IUser | undefined | null;
+  account: IAccount | undefined | null;
   initialized: boolean;
   serverError: boolean;
-  setUser: (user: IUser | undefined) => void;
-  setAccount: (account: IAccount | undefined) => void;
+  setUser: (user: IUser | undefined | null) => void;
+  setAccount: (account: IAccount | undefined | null) => void;
 
   initializeApp: () => void;
 }

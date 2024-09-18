@@ -3,12 +3,10 @@ import CreatedBy from './CreatedBy';
 import FilterMenubar from './FilterMenu/FilterMenu';
 import FilterOptionsHeaderItem from './FilterOptionsHeaderItem';
 import Status from './Status';
-import Text from './Text';
-import TitleDescription from './TitleDescription';
+import Text from '../Columns/Text';
 
 const Concept = {
   MenuButton,
-  TitleDescription,
   Text,
   Status,
   CreatedBy,

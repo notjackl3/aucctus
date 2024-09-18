@@ -30,7 +30,7 @@ export interface IUser {
   firstName: string;
   lastName: string;
   email: string;
-  account?: string;
+  account?: string | null;
   jobTitle?: string;
   profileImage?: string;
   role: 'Admin' | 'Employee';
@@ -44,7 +44,7 @@ export interface IUserPassword {
 
 export interface IUserDetailsResponse {
   user: IUser;
-  account?: IAccount;
+  account?: IAccount | null;
 }
 
 export interface IRegisterUser {

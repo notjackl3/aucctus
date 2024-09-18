@@ -4,6 +4,7 @@ import { ICustomerProfile } from '../../../libs/api/types';
 import Icon from '../Icon/Icon/Icon';
 // TODO: This should be a PNG
 import { Card } from '@components';
+import utils from '@libs/utils';
 import defaultAvatar from '../../assets/img/avatar.png';
 
 interface ICustomerProfilesCardProps {
@@ -104,7 +105,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
           <div className='inline-flex flex-col items-start justify-start gap-5'>
             {DEMOGRAPHIC_KEYS.map((item) => (
               <div
-                key={item}
+                key={`${item}${utils.string.generateRandomString(6)}`}
                 className='inline-flex h-4 items-center justify-start gap-3 self-stretch'
               >
                 <Icon variant={DEMOGRAPHIC_VALUE_MAP[item].icon} />

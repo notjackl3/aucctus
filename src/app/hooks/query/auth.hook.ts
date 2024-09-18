@@ -1,18 +1,19 @@
-import { useMutation, useQueryClient } from 'react-query';
-import api from '../../../libs/api';
-import { AucctusQueryKeys } from './query-keys';
+import { useAppStore } from '@stores/app.store';
 import { AxiosError } from 'axios';
-import {
-  IMessageResponse,
-  IUpdateForgottenPasswordRequest,
-  IServerErrorMessage,
-  IRegisterUser,
-  ITokenResponse,
-  IAuthSuccessResponse,
-} from '../../../libs/api/types';
+import { useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import api from '../../../libs/api';
+import {
+  IAuthSuccessResponse,
+  IMessageResponse,
+  IRegisterUser,
+  IServerErrorMessage,
+  ITokenResponse,
+  IUpdateForgottenPasswordRequest,
+} from '../../../libs/api/types';
 import { AppPath } from '../../../routes/routes';
 import { useTokenStore } from '../../stores/token.store';
+import { AucctusQueryKeys } from './query-keys';
 
 // Define a custom error class
 class NoRefreshTokenError extends Error {
@@ -137,6 +138,7 @@ export const useLogout = () => {
 export const useLogin = () => {
   const navigate = useNavigate();
   const { storeTokens } = useTokenStore();
+  const { setUser } = useAppStore();
 
   return useMutation<
     IAuthSuccessResponse,
@@ -148,6 +150,7 @@ export const useLogin = () => {
       await api.auth.login(credentials.email, credentials.password),
     onSuccess: (response) => {
       storeTokens(response.access, response.refresh);
+      setUser(response.user);
       navigate(AppPath.Home, { replace: true });
     },
   });

@@ -35,9 +35,7 @@ const ConceptTableCard: React.FC<ConceptTableCardProps> = ({
         )}
       </div>
       {/* Footer */}
-      <div className='inline-flex h-[68px] w-full items-center justify-between self-end border-t border-gray-200 px-6 pb-4 pt-3'>
-        {footer}
-      </div>
+      <div className='w-full border-t border-gray-200'>{footer}</div>
     </div>
   );
 };

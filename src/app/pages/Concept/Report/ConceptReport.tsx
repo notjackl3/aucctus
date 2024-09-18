@@ -1,14 +1,15 @@
-import { Container, Icon, Select, Tooltip } from '@components';
+import { Container, Icon, Loading, Select, Tooltip } from '@components';
 import { useConcept, useConceptUpdate } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useMemo } from 'react';
-import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
-  concept?: IConcept;
+  concept: IConcept;
 }
 
 type TabTitles =
@@ -38,7 +39,7 @@ const ConceptReport: FunctionComponent = () => {
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
 
-  const { concept } = useConcept(conceptUuid);
+  const { concept, isFetched } = useConcept(conceptUuid);
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
   /**
@@ -63,6 +64,11 @@ const ConceptReport: FunctionComponent = () => {
     },
     [updateConcept, conceptUuid],
   );
+
+  if (!concept && isFetched) {
+    toast.error('Concept Not Found.');
+    return <Navigate to={AppPath.ConceptBank} />;
+  }
 
   return (
     <div className={`mx-auto my-0 flex min-h-full w-full flex-col p-8`}>
@@ -106,12 +112,18 @@ const ConceptReport: FunctionComponent = () => {
           onTabSelect={onTabSelect}
           activeTab={activeTab || ''}
         >
-          <Outlet
-            context={{
-              navigateToTab: onTabSelect,
-              concept: concept,
-            }}
-          />
+          {!concept ? (
+            <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
+              <Loading />
+            </div>
+          ) : (
+            <Outlet
+              context={{
+                navigateToTab: onTabSelect,
+                concept: concept,
+              }}
+            />
+          )}
         </Container.TabView>
       </div>
     </div>

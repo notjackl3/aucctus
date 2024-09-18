@@ -1,12 +1,12 @@
 import { HeadersDefaults } from 'axios';
+import { toast } from 'react-toastify';
+import analytics from '../analytics';
+import { AccountApi } from './account';
 import { IApiServiceConfig } from './apiService';
 import { AuthApi } from './auth';
-import { AccountApi } from './account';
-import analytics from '../analytics';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
 import { ITokenResponse } from './types';
-import { toast } from 'react-toastify';
 
 export interface IApiConfig {
   /* End Points */
@@ -56,7 +56,7 @@ export class Api {
     );
     this.conceptIgnite = new IgniteConceptApi(
       this,
-      this.buildConfig({ baseURL: this._config.baseFastUrl }),
+      this.buildConfig({ baseURL: this._config.baseUrl }),
     );
   }
 
