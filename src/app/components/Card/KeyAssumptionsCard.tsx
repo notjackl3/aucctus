@@ -43,7 +43,7 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({
           >
             <div className='flex h-16 items-center'>
               <Badge.RiskLevel
-                level={item.riskCategory}
+                category={item.riskCategory}
                 text={item.riskCategory}
               />
             </div>

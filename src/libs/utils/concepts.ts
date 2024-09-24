@@ -2,10 +2,10 @@ import {
   ActiveConceptStatus,
   ArchivedConceptStatus,
   AssumptionCategory,
+  AssumptionTestStatus,
   ConceptStatus,
   DraftConceptStatus,
   MarketMetricType,
-  TestingValidationStatus,
 } from '../api/types';
 
 export const CONCEPT_STATUS_LIST: ConceptStatus[] = [
@@ -77,7 +77,7 @@ export const CONCEPT_STATUS_STYLE_MAP: Record<
   },
 };
 
-export const VALIDATION_STATUS: TestingValidationStatus[] = [
+export const VALIDATION_STATUS: AssumptionTestStatus[] = [
   'inProgress',
   'notStarted',
   'partiallyValidated',
@@ -85,7 +85,7 @@ export const VALIDATION_STATUS: TestingValidationStatus[] = [
 ];
 
 export const TESTING_STATUS_STYLE_MAP: Record<
-  TestingValidationStatus,
+  AssumptionTestStatus,
   { icon: IconVariant; bg: string; stroke: string; svg: string; text: string }
 > = {
   notStarted: {
@@ -115,6 +115,13 @@ export const TESTING_STATUS_STYLE_MAP: Record<
     svg: '[&>svg]:stroke-[#117246]',
     stroke: 'stroke-[#117246]',
     text: 'text-[#117246]',
+  },
+  invalidated: {
+    icon: 'closeX',
+    bg: 'bg-[#fcf7e9]',
+    svg: '[&>svg]:stroke-[#b55121]',
+    stroke: 'stroke-[#b55121]',
+    text: 'text-[#b55121]',
   },
 };
 

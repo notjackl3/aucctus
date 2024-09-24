@@ -1,5 +1,11 @@
 import { Card, Chart, Header, Icon, Table } from '@components';
-import { useKeyAssumptionsTable } from '@hooks/tables/key-assumptions.hook';
+import { Point } from '@components/Charts/ScatterChart/ScatterChart';
+import { useAssumptionTestDetails } from '@hooks/query/assumptions.hook';
+import { useAssumptionsTable } from '@hooks/tables/assumptions.hook';
+import {
+  getAssumptionActiveHexColor,
+  getAssumptionHexColor,
+} from '@libs/utils/concepts';
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { IConceptReportContext } from './ConceptReport';
@@ -7,7 +13,24 @@ import { IConceptReportContext } from './ConceptReport';
 const KeyAssumptions: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
 
-  const { table } = useKeyAssumptionsTable(concept.uuid);
+  const { table, selectedAssumptionUuid, handleRowClick, data, assumptions } =
+    useAssumptionsTable(concept.uuid);
+  const { testDetails = [] } = useAssumptionTestDetails(
+    selectedAssumptionUuid || '',
+  );
+
+  const scatterPoints: Point[] = React.useMemo(() => {
+    return assumptions.map((item) => {
+      const point: Point = {
+        x: item.certainty,
+        y: item.importance,
+        color: getAssumptionHexColor(item.category),
+        activeColor: getAssumptionActiveHexColor(item.category),
+        id: item.uuid,
+      };
+      return point;
+    });
+  }, [assumptions]);
 
   return (
     <div className='flex h-auto w-full flex-col gap-6'>
@@ -38,13 +61,17 @@ const KeyAssumptions: React.FC = () => {
         {/* Assumptions Testing Priority */}
         <div className='inline-flex min-h-[440px] min-w-[470px] flex-col items-start justify-start gap-3 rounded-lg border border-gray-200 bg-white p-6'>
           <Header.Two text='Assumption Testing Priority' />
-          <Chart.QuadrantChart
-            yTopLabel='High Difficulty'
-            yBottomLabel='Low Difficulty'
-            xRightLabel='High Impact'
-            xLeftLabel='Low Impact'
-            chartCoordinates={[]}
-            selectedCoordinate={''}
+          <Chart.Scatter
+            xAxis={{
+              upperLabel: 'Certainty',
+              lowerLabel: 'Uncertainty',
+            }}
+            yAxis={{
+              upperLabel: 'High Importance',
+              lowerLabel: 'Low Importance',
+            }}
+            data={scatterPoints}
+            selectedItem={selectedAssumptionUuid}
           />
         </div>
       </div>
@@ -56,7 +83,7 @@ const KeyAssumptions: React.FC = () => {
           {/* Header */}
           <Header.AssumptionsTable
             text='Assumptions'
-            count={0}
+            count={data ? data.count : 0}
             handleAdd={() => null}
           />
           <div className='inline-flex w-full items-center justify-between self-stretch border-b border-gray-200 px-3 py-2'>
@@ -72,13 +99,17 @@ const KeyAssumptions: React.FC = () => {
           </div>
 
           <div className='min-h-[675px] w-full'>
-            <Table table={table} />
+            <Table
+              selectedRowId={selectedAssumptionUuid}
+              table={table}
+              handleRowClick={handleRowClick}
+            />
           </div>
           {/* Footer */}
           <div className='w-full border-t border-gray-200'>
             <Table.Pagination
               page={1}
-              numberOfPages={3}
+              numberOfPages={data?.numberOfPages || 0}
               onPageChange={() => null}
               hideNavText
             />
@@ -90,21 +121,24 @@ const KeyAssumptions: React.FC = () => {
           {/* Fixed Header */}
           <Header.AssumptionsTable
             text='Tests'
-            count={0}
+            count={testDetails.length}
             handleAdd={() => null}
           />
 
           {/* Scrollable Content */}
-          <div className='flex min-h-[675px] flex-row items-start justify-center overflow-y-auto px-7 py-8'>
+          <div className='flex min-h-[675px] w-full flex-col items-center gap-3  overflow-y-auto px-7 py-8'>
             {/* This will be a list of cards... */}
-            <Card.Testing
-              test='scanningSurveys'
-              identifier='RB07'
-              duration='8 days'
-              description='Create a landing page to drive Formula 1 fans to that would measure conversion of interest.'
-              status='partiallyValidated'
-              state=''
-            />
+            {testDetails.map((test) => (
+              <Card.Testing
+                key={`test-card-${test.uuid}`}
+                type={test.type}
+                identifier={test.identifier}
+                duration='8 days'
+                description={test.goal}
+                status={test.status}
+                state=''
+              />
+            ))}
           </div>
         </div>
       </div>

@@ -1,12 +1,12 @@
 import { Badge } from '@components';
-import { AssumptionCategory, TestingValidationStatus } from '@libs/api/types';
+import { AssumptionCategory, AssumptionTestStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import classNames from 'classnames';
 import React from 'react';
 
 interface CategoryRowProps {
   category: AssumptionCategory;
-  validationStatus: TestingValidationStatus;
+  validationStatus: AssumptionTestStatus;
   colWidth?: string;
 }
 

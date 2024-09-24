@@ -3,6 +3,7 @@ import { toast } from 'react-toastify';
 import analytics from '../analytics';
 import { AccountApi } from './account';
 import { IApiServiceConfig } from './apiService';
+import { AssumptionsApi } from './assumptions';
 import { AuthApi } from './auth';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
@@ -11,7 +12,6 @@ import { ITokenResponse } from './types';
 export interface IApiConfig {
   /* End Points */
   baseUrl: string;
-  baseFastUrl: string;
   /* Settings */
   defaultHeaders?: HeadersDefaults;
   timeoutSeconds: number;
@@ -31,6 +31,7 @@ export class Api {
   auth: AuthApi;
   account: AccountApi;
   concept: ConceptApi;
+  assumption: AssumptionsApi;
   conceptIgnite: IgniteConceptApi;
 
   constructor(apiConfig: IApiConfig) {
@@ -54,6 +55,12 @@ export class Api {
       this,
       this.buildConfig({ baseURL: this._config.baseUrl }),
     );
+
+    this.assumption = new AssumptionsApi(
+      this,
+      this.buildConfig({ baseURL: this._config.baseUrl }),
+    );
+
     this.conceptIgnite = new IgniteConceptApi(
       this,
       this.buildConfig({ baseURL: this._config.baseUrl }),
@@ -68,12 +75,14 @@ export class Api {
     // Update all pointing to the resource server with the new tokens
     // By default however,  the access token and refresh token are set to the httpOnly cookies
     // This is simply just an extra layer.
-    [this.account, this.concept, this.conceptIgnite].forEach((api) => {
-      api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
-      api.config.headers = Object.assign({}, api.config.headers, {
-        Authorization: `Bearer ${token}`,
-      });
-    });
+    [this.account, this.concept, this.conceptIgnite, this.assumption].forEach(
+      (api) => {
+        api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
+        api.config.headers = Object.assign({}, api.config.headers, {
+          Authorization: `Bearer ${token}`,
+        });
+      },
+    );
     analytics.debug('Setting Access Token');
     this._accessToken = token;
   }

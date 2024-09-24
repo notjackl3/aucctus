@@ -1,5 +1,5 @@
 import { Badge, Icon } from '@components';
-import { AssumptionTest, TestingValidationStatus } from '@libs/api/types';
+import { AssumptionTestStatus, TestType } from '@libs/api/types';
 import utils from '@libs/utils';
 import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/concepts';
 import classNames from 'classnames';
@@ -7,19 +7,19 @@ import React from 'react';
 
 interface TestingProps {
   identifier: string;
-  test: AssumptionTest;
+  type: TestType;
   description: string;
   duration: string;
-  status: TestingValidationStatus;
+  status: AssumptionTestStatus;
   state: string;
 }
 
 const Testing: React.FC<TestingProps> = ({
   identifier,
-  test,
+  type,
   description,
   status,
-  state,
+
   duration,
 }) => {
   const validationStatusVisuals = TESTING_STATUS_STYLE_MAP[status];
@@ -44,7 +44,7 @@ const Testing: React.FC<TestingProps> = ({
       <div className='inline-flex items-center justify-start gap-3.5 self-stretch'>
         {/* Right Side */}
         <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-5'>
-          <Badge.AssumptionTest test={test} />
+          <Badge.AssumptionTest test={type} />
 
           {/* Description */}
           <div className='flex w-52 flex-col items-start justify-start gap-1.5'>

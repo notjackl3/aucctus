@@ -1,7 +1,8 @@
+import api from '@libs/api';
+import { IGeneratedConceptsSaveBody } from '@libs/api/concepts';
+import { IIgniteConceptBody } from '@libs/api/igniteConcepts';
 import {
   Ecosystem,
-  IAssumption,
-  IAssumptionCreate,
   IConcept,
   IConceptOverview,
   IConceptPage,
@@ -20,10 +21,7 @@ import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
-import analytics from '../../../libs/analytics';
-import api from '../../../libs/api';
-import { IGeneratedConceptsSaveBody } from '../../../libs/api/concepts';
-import { IIgniteConceptBody } from '../../../libs/api/igniteConcepts';
+import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
@@ -164,7 +162,7 @@ export const useConceptOverview = (uuid: string) => {
  */
 export const useConceptMarketScan = (uuid: string) => {
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptMarketScan, uuid],
+    queryKey: [AucctusQueryKeys.marketScan, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptMarketScan(uuid),
     enabled: !!uuid,
@@ -175,7 +173,7 @@ export const useConceptMarketScan = (uuid: string) => {
 
 export const useConceptCustomerProfiles = (uuid: string) => {
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptCustomerProfiles, uuid],
+    queryKey: [AucctusQueryKeys.customerProfiles, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptCustomerProfiles(uuid),
     enabled: !!uuid,
@@ -186,7 +184,7 @@ export const useConceptCustomerProfiles = (uuid: string) => {
 
 export const useConceptCustomerProfile = (profileUuid: string) => {
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptCustomerProfile, profileUuid],
+    queryKey: [AucctusQueryKeys.customerProfile, profileUuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () =>
       await api.concept.getConceptCustomerProfile(profileUuid),
@@ -198,40 +196,13 @@ export const useConceptCustomerProfile = (profileUuid: string) => {
 
 export const useFinancialProjection = (uuid: string) => {
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptFinancialProjection, uuid],
+    queryKey: [AucctusQueryKeys.financialProjection, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: async () => await api.concept.getConceptFinancialProjection(uuid),
     enabled: !!uuid,
   });
 
   return { ...query, financialProjection: query.data };
-};
-
-export const useKeyAssumptions = (conceptUuid: string) => {
-  const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptKeyAssumptions, conceptUuid],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    queryFn: async () =>
-      await api.concept.getConceptKeyAssumptions(conceptUuid),
-    enabled: !!conceptUuid,
-  });
-
-  return { ...query, assumptions: query.data?.results || [] };
-};
-
-/**
- * Custom hook for fetching a concept key assumptions by UUID.
- * @param uuid - The UUID of the concept to fetch.
- * @returns An object containing the query result and the concept key assumptions data.
- */
-export const useConceptAssumptions = (uuid: string) => {
-  const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptKeyAssumptions, uuid],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    queryFn: async () => await api.concept.getConceptKeyAssumptions(uuid),
-    enabled: !!uuid,
-  });
-  return { ...query, assumptions: query.data };
 };
 
 /**
@@ -310,32 +281,6 @@ export const useRetryConceptReport = () => {
   );
 };
 
-// Common useMutation hook
-function useGenericConceptMutate<T, K = Partial<T> & { uuid: string }>(
-  mutationFunction: (data: K) => Promise<T>,
-  queryKeys: string[][],
-) {
-  const queryClient = useQueryClient();
-
-  return useMutation<T, AxiosError<IFormError<T>>, K>({
-    mutationFn: mutationFunction,
-    onSuccess: () => {
-      Promise.all(
-        queryKeys.map((queryKey) => [
-          queryClient.invalidateQueries({
-            queryKey: queryKey,
-          }),
-        ]),
-      );
-    },
-    onError: (e) => {
-      analytics.debug(`Error:`, e);
-      const message = utils.osiris.parseFormError(e);
-      toast.error(message);
-    },
-  });
-}
-
 // Specific hooks using the generic one
 /**
  * Custom hook for updating the concept overview.
@@ -359,21 +304,21 @@ export const useConceptOverviewUpdate = (conceptUuid: string) => {
 export const useMarketScanUpdate = (conceptUuid: string) => {
   return useGenericConceptMutate<IMarketScan>(
     (data) => api.concept.updateConceptMarketScan(data.uuid, data),
-    [[AucctusQueryKeys.conceptMarketScan, conceptUuid]],
+    [[AucctusQueryKeys.marketScan, conceptUuid]],
   );
 };
 
 export const useTrendAndDriverCreate = (conceptUuid: string) => {
   return useGenericConceptMutate<ITrendsAndDrivers, IMarketScanElementCreate>(
     (data) => api.concept.createTrendAndDriver(conceptUuid, data),
-    [[AucctusQueryKeys.conceptMarketScan, conceptUuid]],
+    [[AucctusQueryKeys.marketScan, conceptUuid]],
   );
 };
 
 export const useEcosystemCreate = (conceptUuid: string) => {
   return useGenericConceptMutate<Ecosystem, IEcosystemCreate>(
     (data) => api.concept.createEcosystem(conceptUuid, data),
-    [[AucctusQueryKeys.conceptMarketScan, conceptUuid]],
+    [[AucctusQueryKeys.marketScan, conceptUuid]],
   );
 };
 
@@ -382,11 +327,11 @@ export const useCustomerProfileUpdate = (
   conceptUuid?: string,
 ) => {
   const conceptProfileListQueryKey = conceptUuid
-    ? [AucctusQueryKeys.conceptCustomerProfiles, conceptUuid]
-    : [AucctusQueryKeys.conceptCustomerProfiles];
+    ? [AucctusQueryKeys.customerProfiles, conceptUuid]
+    : [AucctusQueryKeys.customerProfiles];
   const queryKeys = [
     conceptProfileListQueryKey,
-    [AucctusQueryKeys.conceptCustomerProfile, profileUuid],
+    [AucctusQueryKeys.customerProfile, profileUuid],
   ];
   return useGenericConceptMutate<ICustomerProfile>(
     (data) => api.concept.updateConceptCustomerProfile(data.uuid, data),
@@ -397,43 +342,22 @@ export const useCustomerProfileUpdate = (
 export const useCustomerProfileCreate = (conceptUuid: string) => {
   return useGenericConceptMutate<ICustomerProfile, ICustomerProfileCreate>(
     (data) => api.concept.createConceptCustomerProfile(conceptUuid, data),
-    [[AucctusQueryKeys.conceptCustomerProfiles, conceptUuid]],
+    [[AucctusQueryKeys.customerProfiles, conceptUuid]],
   );
 };
 
 export function useDeleteCustomerProfile() {
   return useGenericConceptMutate<ICustomerProfile, string>(
     (uuid) => api.concept.deleteConceptCustomerProfile(uuid),
-    [[AucctusQueryKeys.conceptCustomerProfiles]],
+    [[AucctusQueryKeys.customerProfiles]],
   );
 }
-
-export const useAssumptionUpdate = () => {
-  return useGenericConceptMutate<IAssumption>(
-    (data) => api.concept.updateConceptAssumption(data.uuid, data),
-    [[AucctusQueryKeys.conceptKeyAssumptions]],
-  );
-};
-
-export const useAssumptionCreate = (conceptUuid: string) => {
-  return useGenericConceptMutate<IAssumption, IAssumptionCreate>(
-    (data) => api.concept.createConceptAssumption(conceptUuid, data),
-    [[AucctusQueryKeys.conceptKeyAssumptions, conceptUuid]],
-  );
-};
-
-export const useAssumptionDelete = () => {
-  return useGenericConceptMutate<IAssumption, string>(
-    (uuid) => api.concept.deleteConceptAssumption(uuid),
-    [[AucctusQueryKeys.conceptKeyAssumptions]],
-  );
-};
 
 export const useFinancialProjectionUpdate = (uuid: string) => {
   return useGenericConceptMutate<IFinancialProjection>(
     (data) => api.concept.updateConceptFinancialProjection(data.uuid, data),
     [
-      [AucctusQueryKeys.conceptFinancialProjection, uuid],
+      [AucctusQueryKeys.financialProjection, uuid],
       [AucctusQueryKeys.conceptOverview, uuid],
     ],
   );
@@ -458,27 +382,27 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 export const useTrendAndDriverUpdate = () => {
   return useGenericConceptMutate<ITrendsAndDrivers>(
     (data) => api.concept.updateTrendAndDriver(data.uuid, data),
-    [[AucctusQueryKeys.conceptMarketScan]],
+    [[AucctusQueryKeys.marketScan]],
   );
 };
 
 export const useTrendAndDriverDelete = () => {
   return useGenericConceptMutate<ITrendsAndDrivers, string>(
     (uuid) => api.concept.deleteTrendAndDriver(uuid),
-    [[AucctusQueryKeys.conceptMarketScan]],
+    [[AucctusQueryKeys.marketScan]],
   );
 };
 
 export const useEcosystemUpdate = () => {
   return useGenericConceptMutate<Ecosystem>(
     (data) => api.concept.updateEcosystem(data.uuid, data),
-    [[AucctusQueryKeys.conceptMarketScan]],
+    [[AucctusQueryKeys.marketScan]],
   );
 };
 
 export const useEcosystemDelete = () => {
   return useGenericConceptMutate<Ecosystem, string>(
     (uuid) => api.concept.deleteEcosystem(uuid),
-    [[AucctusQueryKeys.conceptMarketScan]],
+    [[AucctusQueryKeys.marketScan]],
   );
 };

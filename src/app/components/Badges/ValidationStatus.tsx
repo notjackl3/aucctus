@@ -1,5 +1,5 @@
 import Icon from '@components/Icon';
-import { TestingValidationStatus } from '@libs/api/types';
+import { AssumptionTestStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/concepts';
 import classNames from 'classnames';
@@ -7,7 +7,7 @@ import React from 'react';
 
 interface ValidationStatusProps {
   width?: string;
-  status: TestingValidationStatus;
+  status: AssumptionTestStatus;
 }
 
 const ValidationStatus: React.FC<ValidationStatusProps> = ({
@@ -21,8 +21,8 @@ const ValidationStatus: React.FC<ValidationStatusProps> = ({
       className={classNames(
         'flex items-center justify-start gap-2 text-nowrap align-middle text-sm font-semibold',
         width,
-        validationStatusVisuals.text,
-        validationStatusVisuals.svg,
+        validationStatusVisuals.text || '',
+        validationStatusVisuals.svg || '',
       )}
     >
       <span>

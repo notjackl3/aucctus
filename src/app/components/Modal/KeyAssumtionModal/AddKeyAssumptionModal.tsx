@@ -2,7 +2,7 @@ import { Badge } from '@components';
 import { FunctionComponent, useCallback, useState } from 'react';
 import { AssumptionCategory } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
-import { useAssumptionCreate } from '../../../hooks/query/concepts.hook';
+import { useAssumptionCreate } from '../../../hooks/query/assumptions.hook';
 import Dropdown, { Option } from '../../Button/Dropdown/Dropdown';
 import Icon from '../../Icon/Icon/Icon';
 import InputField from '../../Input/InputField/InputField';

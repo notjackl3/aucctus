@@ -1,11 +1,11 @@
 import ConceptBarChart from './ConceptBarChart';
 import MarketChart from './MarketChart';
-import QuadrantChart from './QuadrantChart/QuadrantChart';
+import Scatter from './ScatterChart/ScatterChart';
 
 const Chart = {
   ConceptBarChart,
   MarketChart,
-  QuadrantChart,
+  Scatter,
 };
 
 export default Chart;

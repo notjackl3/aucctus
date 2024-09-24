@@ -4,8 +4,6 @@ import { endpoints } from './endpoints';
 import {
   ConceptStatus,
   Ecosystem,
-  IAssumption,
-  IAssumptionCreate,
   IConcept,
   IConceptCreate,
   IConceptOverview,
@@ -147,30 +145,6 @@ export class ConceptApi extends ApiService {
     return this.delete<ICustomerProfile>(
       endpoints.conceptCustomerProfileUuid(customerProfileUuid),
     );
-  }
-
-  getConceptKeyAssumptions(conceptUuid: string) {
-    return this.get<IPageResponse<IAssumption>>(
-      endpoints.conceptKeyAssumptions(conceptUuid),
-    );
-  }
-
-  updateConceptAssumption(uuid: string, data: Partial<IAssumption>) {
-    return this.patch<IAssumption, Partial<IAssumption>>(
-      endpoints.conceptKeyAssumption(uuid),
-      data,
-    );
-  }
-
-  createConceptAssumption(conceptUuid: string, data: IAssumptionCreate) {
-    return this.post<IAssumption, IAssumptionCreate>(
-      endpoints.conceptKeyAssumptions(conceptUuid),
-      data,
-    );
-  }
-
-  deleteConceptAssumption(uuid: string) {
-    return this.delete<IAssumption>(endpoints.conceptKeyAssumption(uuid));
   }
 
   getConceptFinancialProjection(uuid: string) {

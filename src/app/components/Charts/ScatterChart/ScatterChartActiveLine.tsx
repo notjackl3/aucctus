@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
-import { CHART_CENTER_WIDTH, ChartPoint } from './QuadrantChart';
-import { getActiveAdjustmentDistance, getAdjustedCoord } from './utils';
+import { CHART_CENTER_WIDTH, Point } from './ScatterChart';
+import { getActiveAdjustmentDistance, getNormalizedCoord } from './utils';
 
 export interface QuadrantChartActiveLinesProps {
-  activeChartPoint?: ChartPoint;
+  activeChartPoint?: Point;
 }
 const defaultLineProps = {
   strokeWidth: '8',
@@ -12,31 +12,31 @@ const defaultLineProps = {
 const QuadrantChartActiveLines: FunctionComponent<
   QuadrantChartActiveLinesProps
 > = ({ activeChartPoint }) => {
-  const renderActiveLines = (activeCoordinate?: ChartPoint) => {
+  const renderActiveLines = (activeCoordinate?: Point) => {
     if (!activeCoordinate) {
       return;
     }
-    const yCoord = getAdjustedCoord(activeCoordinate.yCoord);
-    const xCoord = getAdjustedCoord(activeCoordinate.xCoord);
-    const xAdjust = getActiveAdjustmentDistance(xCoord);
-    const yAdjust = getActiveAdjustmentDistance(yCoord);
+    const y = getNormalizedCoord(activeCoordinate.y);
+    const x = getNormalizedCoord(activeCoordinate.x);
+    const xOffset = getActiveAdjustmentDistance(x);
+    const yOffset = getActiveAdjustmentDistance(y);
     return (
       <>
         {/* x-axis-line */}
         <line
           x1={CHART_CENTER_WIDTH}
-          y1={yCoord}
-          x2={xCoord + xAdjust}
-          y2={yCoord}
+          y1={y}
+          x2={x + xOffset}
+          y2={y}
           stroke={activeCoordinate.activeColor}
           {...defaultLineProps}
         />
         {/* y-axis-line */}
         <line
-          x1={xCoord}
+          x1={x}
           y1={CHART_CENTER_WIDTH}
-          x2={xCoord}
-          y2={yCoord + yAdjust}
+          x2={x}
+          y2={y + yOffset}
           stroke={activeCoordinate.activeColor}
           {...defaultLineProps}
         />

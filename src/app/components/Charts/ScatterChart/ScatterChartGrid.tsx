@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { CHART_WIDTH } from './QuadrantChart';
+import { CHART_WIDTH } from './ScatterChart';
 
 type LineDirection = 'horizontal' | 'vertical';
 

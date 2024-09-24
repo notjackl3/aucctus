@@ -1,16 +1,16 @@
 import { Badge } from '@components';
-import { AssumptionCategory, RiskLevel } from '@libs/api/types';
+import { AssumptionCategory, RiskCategory } from '@libs/api/types';
 import utils from '@libs/utils';
 import React from 'react';
 
 interface RiskAndCategoryProps {
   category: AssumptionCategory;
-  riskLevel: RiskLevel;
+  riskCategory: RiskCategory;
 }
 
 const RiskAndCategory: React.FC<RiskAndCategoryProps> = ({
   category,
-  riskLevel,
+  riskCategory,
 }) => {
   return (
     <div className='inline-flex flex-col items-start justify-start gap-[15px]'>
@@ -25,8 +25,8 @@ const RiskAndCategory: React.FC<RiskAndCategoryProps> = ({
           Risk Level
         </div>
         <Badge.RiskLevel
-          level={riskLevel}
-          text={utils.string.toTitleCase(riskLevel)}
+          category={riskCategory}
+          text={utils.string.toTitleCase(riskCategory)}
         />
       </div>
     </div>

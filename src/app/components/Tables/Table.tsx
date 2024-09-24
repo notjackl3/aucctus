@@ -3,13 +3,17 @@ import { flexRender, Table } from '@tanstack/react-table';
 import classNames from 'classnames';
 import React from 'react';
 
-interface IConceptTableProps<T = any> {
+interface IAucctusTableProps<T = any> {
   table: Table<T> | undefined;
+  selectedRowId?: string;
+  handleRowClick?: (rowId: string) => void;
 }
 
-const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
+const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
   table,
-}: IConceptTableProps<T>) => {
+  selectedRowId,
+  handleRowClick,
+}: IAucctusTableProps<T>) => {
   return (
     <table className='w-full table-auto text-gray-600'>
       <thead className='border-b border-gray-200'>
@@ -30,7 +34,14 @@ const AucctusTable: React.FC<IConceptTableProps<any>> = <T,>({
         {table &&
           table
             .getRowModel()
-            .rows.map((row) => <TB.Row key={row.id} row={row} />)}
+            .rows.map((row) => (
+              <TB.Row
+                key={row.id}
+                row={row}
+                handleClick={handleRowClick}
+                isSelected={selectedRowId === row.id}
+              />
+            ))}
         {/* Display a message if the table is empty */}
         {!table?.getRowModel().rows.length && (
           <tr>

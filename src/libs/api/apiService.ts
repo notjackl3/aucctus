@@ -1,14 +1,14 @@
-import { Api } from './api';
+import 'abort-controller/polyfill';
 import axios, {
+  AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   AxiosRequestHeaders,
   AxiosResponse,
-  AxiosError,
   InternalAxiosRequestConfig,
 } from 'axios';
-import 'abort-controller/polyfill';
 import analytics from '../analytics';
+import { Api } from './api';
 import { IAuthSuccessResponse } from './types';
 
 export const isAuthSuccessResponse = (

@@ -64,7 +64,7 @@ const TitleDescription: React.FC<TitleDescriptionProps> = ({
   return (
     <span
       ref={containerRef}
-      className='relative flex flex-col justify-start gap-2'
+      className='relative flex flex-col justify-start gap-2 bg-inherit'
       onClick={() => isTruncated && setOpen((prev) => !prev)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -84,7 +84,7 @@ const TitleDescription: React.FC<TitleDescriptionProps> = ({
         {description}
         {!open && isTruncated && (
           <>
-            <span className='pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-white to-transparent'></span>
+            <span className='pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-inherit to-transparent'></span>
             <span className='absolute top-[50%] flex w-full justify-center'>
               {isHovered && (
                 <button className='btn btn-light btn-xs'>

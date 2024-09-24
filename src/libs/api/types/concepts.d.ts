@@ -65,6 +65,7 @@ export interface IConceptCreate extends IGeneratedConcept {
 export interface IConcept extends IBaseConceptEntity, IGeneratedConcept {
   isGenerated: boolean; // Currently not used will likely drop
   seed?: Unknown;
+  identifier: string;
   reportStatus: ConceptReportStatus;
   status: ConceptStatus;
   category: ConceptCategory;
@@ -180,48 +181,6 @@ export interface IFinancialProjection extends IBaseConceptEntity {
   som: number;
 }
 
-type AssumptionCategory =
-  | 'adaptability'
-  | 'desirability'
-  | 'feasibility'
-  | 'viability';
-type AssumptionType =
-  | 'adaptability'
-  | 'desirability'
-  | 'feasibility'
-  | 'viability';
-
-type RiskLevel = 'high' | 'medium' | 'low';
-
-export interface IAssumption extends IBaseConceptEntity {
-  name: string;
-  text: string;
-
-  category: AssumptionCategory;
-
-  importanceLevel: number;
-  importanceRationale: string;
-  importanceCategory: RiskLevel;
-
-  certaintyLevel: number;
-  certaintyRationale: string;
-  certaintyCategory: RiskLevel;
-
-  status: TestingValidationStatus;
-
-  validated: boolean;
-  riskCategory: RiskLevel;
-}
-
-export interface IAssumptionCreate {
-  name: string;
-  hypothesis: string;
-  riskLevel: number;
-  difficultyLevel: number;
-  impactLevel: number;
-  assumptionsType: AssumptionCategory;
-}
-
 export interface IEcosystem extends IBaseConceptEntity {
   name: string;
   description: string;
@@ -276,44 +235,3 @@ export interface IMarketScan extends IBaseConceptEntity {
 export interface IConceptPage extends IPageResponse<IConcept> {
   statusCounts: { [key in ConceptStatus]: number };
 }
-
-type TestingValidationStatus =
-  | 'notStarted'
-  | 'inProgress'
-  | 'partiallyValidated'
-  | 'validated';
-
-/**
- * Assumption Tests:
- *
- * Discovery:
- * - Scanning Surveys
- * - Immersive Dialogues
- * - Market Pulse-checks
- * - Community Scans
- *
- * Validate:
- * - Wizard Of Oz
- * - Market Resonance
- * - Action Signals
- * - Product Blueprint
- *
- * Scale:
- * - Feedback Loops
- * - Performance Tracking
- * - Test Drives
- * - Product Roadmap Testing
- */
-type AssumptionTest =
-  | 'scanningSurveys'
-  | 'immersiveDialogues'
-  | 'marketPulse-checks'
-  | 'communityScans'
-  | 'wizardOfOz'
-  | 'marketResonance'
-  | 'actionSignals'
-  | 'productBlueprint'
-  | 'feedbackLoops'
-  | 'performanceTracking'
-  | 'testDrives'
-  | 'productRoadmapTesting';

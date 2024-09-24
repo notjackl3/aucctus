@@ -1,5 +1,5 @@
 import { Icon } from '@components';
-import { TestingValidationStatus } from '@libs/api/types';
+import { AssumptionTestStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import {
   TESTING_STATUS_STYLE_MAP,
@@ -11,7 +11,7 @@ import classNames from 'classnames';
 import React from 'react';
 
 interface TestingStatusSelectProps {
-  value: TestingValidationStatus;
+  value: AssumptionTestStatus;
   onChange: (value: string) => void;
 }
 

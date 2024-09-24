@@ -1,9 +1,7 @@
 import { Card, Container, Header, Text } from '@components';
 import { useEditConcept, useEditOverview } from '@hooks/concepts/editable.hook';
-import {
-  useConceptAssumptions,
-  useConceptOverview,
-} from '@hooks/query/concepts.hook';
+import { useAssumptions } from '@hooks/query/assumptions.hook';
+import { useConceptOverview } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
@@ -13,7 +11,7 @@ const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
   const { navigateToTab } = useOutletContext<IConceptReportContext>();
   const { overview } = useConceptOverview(conceptId);
-  const { assumptions } = useConceptAssumptions(conceptId);
+  const { assumptions } = useAssumptions(conceptId);
   const { valueProposition, problemStatement } = useEditOverview();
   const descriptionEdit = useEditConcept();
 
@@ -106,7 +104,7 @@ const OverviewDetails: FunctionComponent = () => {
         />
 
         <Card.KeyAssumptions
-          assumptions={assumptions?.results || []}
+          assumptions={assumptions || []}
           onViewClick={() => navigateToTab(AppPath.ConceptKeyAssumptions)}
         />
       </section>

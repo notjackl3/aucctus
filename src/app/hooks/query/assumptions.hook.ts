@@ -1,0 +1,65 @@
+import api from '@libs/api';
+import {
+  IAssumption,
+  IAssumptionCreate,
+  IAssumptionTestDetails,
+} from '@libs/api/types/assumptions';
+import { useQuery } from 'react-query';
+import { useGenericConceptMutate, useGenericMutate } from './helper.hooks';
+import { AucctusQueryKeys } from './query-keys';
+
+/**
+ * Custom hook for fetching a concept key assumptions by UUID.
+ * @param uuid - The UUID of the concept to fetch.
+ * @returns An object containing the query result and the concept key assumptions data.
+ */
+export const useAssumptions = (conceptUuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.assumptions, conceptUuid],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
+    queryFn: async () => await api.assumption.getAll(conceptUuid),
+    enabled: !!conceptUuid,
+  });
+  return { ...query, assumptions: query.data?.results || [] };
+};
+
+export const useAssumptionUpdate = () => {
+  return useGenericConceptMutate<IAssumption>(
+    (data) => api.assumption.update(data.uuid, data),
+    [[AucctusQueryKeys.assumptions]],
+  );
+};
+
+export const useAssumptionCreate = (conceptUuid: string) => {
+  return useGenericConceptMutate<IAssumption, IAssumptionCreate>(
+    (data) => api.assumption.create(conceptUuid, data),
+    [[AucctusQueryKeys.assumptions, conceptUuid]],
+  );
+};
+
+export const useAssumptionDelete = () => {
+  return useGenericConceptMutate<IAssumption, string>(
+    (uuid) => api.assumption.deleteAssumption(uuid),
+    [[AucctusQueryKeys.assumptions]],
+  );
+};
+
+export const useAssumptionTestDetails = (assumptionUuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.assumptionTestDetails, assumptionUuid],
+    queryFn: async () =>
+      await api.assumption.getAllAssumptionTests(assumptionUuid),
+    enabled: !!assumptionUuid,
+  });
+
+  return { ...query, testDetails: query.data };
+};
+
+export const useStartTest = (assumptionUuid: string) => {
+  return useGenericMutate<IAssumptionTestDetails, string>(
+    (assumptionTestDetailUuid) =>
+      api.assumption.startTest(assumptionUuid, assumptionTestDetailUuid),
+    [[AucctusQueryKeys.assumptionTestDetails]],
+  );
+};

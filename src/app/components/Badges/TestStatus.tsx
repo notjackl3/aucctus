@@ -1,14 +1,10 @@
 import { Icon } from '@components';
+import { AssumptionTestStatus } from '@libs/api/types';
 import classNames from 'classnames';
 import React from 'react';
 
-type TestingValidationStatus =
-  | 'notStarted'
-  | 'inProgress'
-  | 'partiallyValidated'
-  | 'validated';
 interface ValidatedStatusProps {
-  status: TestingValidationStatus;
+  status: AssumptionTestStatus;
 }
 
 const ValidatedStatus: React.FC<ValidatedStatusProps> = ({ status }) => {
@@ -17,7 +13,7 @@ const ValidatedStatus: React.FC<ValidatedStatusProps> = ({ status }) => {
   return (
     <span
       className={classNames(
-        'flex h-[20px] w-[20px] items-center justify-center rounded-full align-middle',
+        'flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white align-middle',
         {
           border: isBlank,
           'border-gray-300': isBlank,
@@ -31,7 +27,7 @@ const ValidatedStatus: React.FC<ValidatedStatusProps> = ({ status }) => {
 };
 
 const VALIDATED_STATUS_MAP: Record<
-  TestingValidationStatus,
+  AssumptionTestStatus,
   { icon?: IconVariant | undefined; style?: string }
 > = {
   notStarted: {},
@@ -41,6 +37,7 @@ const VALIDATED_STATUS_MAP: Record<
     style: 'bg-[#fcf7e9] [&>svg]:stroke-[#b55121]',
   },
   validated: { icon: 'check', style: 'bg-[#e9fbf2] [&>svg]:stroke-[#117246]' },
+  invalidated: {},
 };
 
 export default ValidatedStatus;

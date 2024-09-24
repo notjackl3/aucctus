@@ -1,19 +1,10 @@
-export type IFormError<T = object | str | number> =
+export type IFormError<T = any> =
   | IServerErrorMessage
   | IPydanticValidationErrorResponse<T>;
 export interface IServerErrorMessage {
   id: string;
   detail: string;
 }
-
-type NestedKeyOf<T> = T extends object
-  ? {
-      [K in keyof T]: K extends string
-        ? K | `${K}.${NestedKeyOf<T[K]>}`
-        : never;
-    }[keyof T]
-  : never;
-
 export interface IPydanticValidationError<T = unknown> {
   loc: T extends object ? (NestedKeyOf<T> | number)[] : (string | number)[];
   msg: string;
@@ -69,5 +60,12 @@ export interface IPageResponse<T> {
   // The previous page URL
   previous: string | null;
   numberOfPages?: number;
+  pageSize: number;
+  // The current Page results
   results: T[];
+}
+
+export interface IFullListAndPageResponse<T> extends IPageResponse<T> {
+  // All results given the filter and sorting without being sorted
+  items: T[];
 }

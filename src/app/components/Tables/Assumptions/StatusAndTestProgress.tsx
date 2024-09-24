@@ -1,13 +1,15 @@
 import { Badge } from '@components';
-import { TestingValidationStatus } from '@libs/api/types';
+import { AssumptionTestStatus } from '@libs/api/types';
 import React from 'react';
 
 interface StatusAndTestProgressProps {
-  status: TestingValidationStatus;
+  status: AssumptionTestStatus;
+  testProgress: [AssumptionTestStatus];
 }
 
 const StatusAndTestProgress: React.FC<StatusAndTestProgressProps> = ({
   status,
+  testProgress = [],
 }) => {
   return (
     <div className='inline-flex flex-col items-start justify-start gap-[15px]'>
@@ -21,7 +23,11 @@ const StatusAndTestProgress: React.FC<StatusAndTestProgressProps> = ({
         <div className='self-stretch text-xs font-medium text-slate-500'>
           Testing Progress
         </div>
-        {/* <Badge.RiskLevel level={riskLevel} text={utils.string.toTitleCase(riskLevel)} /> */}
+        <div className='flex flex-row items-start justify-start gap-2 self-stretch'>
+          {testProgress.map((status, i) => (
+            <Badge.TestStatus key={`${status}-${i}`} status={status} />
+          ))}
+        </div>
       </div>
     </div>
   );

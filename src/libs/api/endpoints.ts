@@ -86,4 +86,16 @@ export const endpoints = {
     `api/v1/concept/trends-and-drivers/${trendAndDriverUuid}`,
   conceptEcosystem: (ecosystemUuid: string) =>
     `api/v1/concept/ecosystem/${ecosystemUuid}`,
+
+  assumptionTestsDetails: (assumptionUuid: string) =>
+    `api/v1/concept/assumption/${assumptionUuid}/test-details`,
+
+  assumptionTestDetailsUuid: (
+    assumptionUuid: string,
+    assumptionTestUuid: string,
+  ) =>
+    `api/v1/concept/assumption/${assumptionUuid}/test-details/${assumptionTestUuid}`,
+
+  assumptionStartTest: (assumptionUuid: string, assumptionTestUuid: string) =>
+    `api/v1/concept/assumption/${assumptionUuid}/test-details/${assumptionTestUuid}/start`,
 };
