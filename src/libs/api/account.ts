@@ -1,6 +1,6 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
-import { endpoints, IUserQueryOptions } from './endpoints';
+import { Endpoints as endpoints } from './endpoints';
 import {
   IAccount,
   IDashboard,
@@ -9,6 +9,7 @@ import {
   IUser,
   IUserDetailsResponse,
   IUserPassword,
+  IUserQueryOptions,
 } from './types'; // Import the missing type
 
 /**

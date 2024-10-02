@@ -226,13 +226,13 @@ const IgniteConcept: FunctionComponent = () => {
             <h1 className='w-96 text-center text-3xl font-bold leading-9 text-indigo-900'>
               Generate New Ideas
             </h1>
-            <p className='mt-3 w-full text-sm font-medium leading-5 text-gray-500 max-md:max-w-full'>
+            <p className='mt-3 w-full text-base font-medium leading-5 text-gray-500 max-md:max-w-full'>
               Let Aucctus AI Ignite your imagination and suggest new ideas to
               transform your business.
             </p>
           </section>
 
-          <section className='w-100 flex flex-row flex-wrap gap-6'>
+          <section className='flex w-full flex-row flex-wrap justify-center gap-6'>
             <Card.Ignition
               header={{
                 title: 'Expanding An Existing Idea',

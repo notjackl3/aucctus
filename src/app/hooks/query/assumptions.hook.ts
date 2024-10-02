@@ -60,6 +60,33 @@ export const useStartTest = (assumptionUuid: string) => {
   return useGenericMutate<IAssumptionTestDetails, string>(
     (assumptionTestDetailUuid) =>
       api.assumption.startTest(assumptionUuid, assumptionTestDetailUuid),
-    [[AucctusQueryKeys.assumptionTestDetails]],
+    [[AucctusQueryKeys.assumptionTestDetails, assumptionUuid]],
   );
+};
+
+export const useAllConceptTestDetails = (conceptUuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.conceptTestDetails, conceptUuid],
+    queryFn: async () =>
+      await api.assumption.getAllConceptTestDetails(conceptUuid),
+    enabled: !!conceptUuid,
+  });
+  return { ...query, testDetails: query.data };
+};
+
+export const useConceptTestDetails = (
+  conceptUuid: string,
+  conceptTestUuid: string,
+) => {
+  const query = useQuery({
+    queryKey: [
+      AucctusQueryKeys.conceptTestDetails,
+      conceptUuid,
+      conceptTestUuid,
+    ],
+    queryFn: async () =>
+      await api.assumption.getConceptTestDetails(conceptUuid, conceptTestUuid),
+    enabled: !!conceptUuid && !!conceptTestUuid,
+  });
+  return { ...query, testDetails: query.data };
 };

@@ -1,10 +1,11 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
-import { endpoints } from './endpoints';
+import { Endpoints as endpoints } from './endpoints';
 import {
   IAssumption,
   IAssumptionCreate,
   IAssumptionTestDetails,
+  IConceptTestDetails,
   IPageResponse,
 } from './types'; // Import the missing type
 
@@ -53,6 +54,18 @@ export class AssumptionsApi extends ApiService {
   startTest(assumptionUuid: string, assumptionTestDetailsUuid: string) {
     return this.post<IAssumptionTestDetails>(
       endpoints.assumptionStartTest(assumptionUuid, assumptionTestDetailsUuid),
+    );
+  }
+
+  getAllConceptTestDetails(conceptUuid: string) {
+    return this.get<IPageResponse<IConceptTestDetails>>(
+      endpoints.conceptTestDetails(conceptUuid),
+    );
+  }
+
+  getConceptTestDetails(conceptUuid: string, conceptTestUuid: string) {
+    return this.get<IConceptTestDetails>(
+      endpoints.conceptTestDetailsUuid(conceptUuid, conceptTestUuid),
     );
   }
 }

@@ -30,8 +30,6 @@ export function createPaginationNumbers(
 
   const remainingButtons = maxPages - startPages.length - endPages.length;
 
-  console.log(`RemainingButtons: ${remainingButtons}`);
-
   // TODO: Ensure the current page is in the list
   if (remainingButtons < 0) {
     return [...startPages, '...', ...endPages];

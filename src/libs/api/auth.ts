@@ -1,6 +1,6 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
-import { endpoints } from './endpoints';
+import { Endpoints as endpoints } from './endpoints';
 import {
   IAuthSuccessResponse,
   IMessageResponse,

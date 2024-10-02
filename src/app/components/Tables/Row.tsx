@@ -1,12 +1,13 @@
+import { cn } from '@libs/utils/react';
 import { flexRender, Row } from '@tanstack/react-table';
-import classNames from 'classnames';
 import React from 'react';
 
 // Props for the TableHeader component
-interface ITableRowProps<T> {
+interface ITableRowProps<T> extends React.HTMLAttributes<HTMLTableRowElement> {
   row: Row<T>;
   handleClick?: (rowId: string) => void;
   isSelected: boolean;
+  center?: boolean;
 }
 
 // TableHeader Component
@@ -14,10 +15,12 @@ const TableRow: React.FC<ITableRowProps<any>> = <T,>({
   row,
   handleClick,
   isSelected = false,
+  ...props
 }: ITableRowProps<T>) => {
   return (
     <tr
-      className={classNames(
+      {...props}
+      className={cn(
         'table-row h-auto cursor-pointer border-b border-solid border-b-gray-200 ',
         {
           // The from-** styles are used so that the the expandable text can inherit these colors and they are all in one place
@@ -25,6 +28,7 @@ const TableRow: React.FC<ITableRowProps<any>> = <T,>({
           'odd:bg-white odd:from-white even:bg-gray-50 even:from-gray-50':
             !isSelected,
         },
+        props.className,
       )}
       key={`row-${row.id}`}
       onClick={() => handleClick && handleClick(row.id)}

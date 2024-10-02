@@ -10,7 +10,7 @@ import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import React, { FunctionComponent, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './styles/generatedConcepts.module.scss';
+import styles from './generatedConcepts.module.scss';
 
 const GeneratedConcepts: FunctionComponent = () => {
   const navigate = useNavigate();

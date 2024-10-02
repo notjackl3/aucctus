@@ -1,7 +1,7 @@
 import AssumptionOverview from './AssumptionOverview';
 import Detail from './DetailCard';
 import Kanban from './Kanban/ConceptCard';
-import Testing from './Testing';
+import Testing from './TestingCard';
 
 import AssumptionsTestingStatus from './AssumptionsTestingStatus/AssumptionsTestingStatus';
 import CustomerProfileContextList from './CustomerProfileContextList/CustomerProfileContextList';

@@ -8,19 +8,23 @@ interface RiskAndCategoryProps {
   riskCategory: RiskCategory;
 }
 
+// Add a common class for repeated styles
+const commonClass =
+  'flex flex-col items-start justify-start gap-2 self-stretch';
+
 const RiskAndCategory: React.FC<RiskAndCategoryProps> = ({
   category,
   riskCategory,
 }) => {
   return (
-    <div className='inline-flex flex-col items-start justify-start gap-[15px]'>
-      <div className='flex flex-col items-start justify-start gap-2 self-stretch'>
-        <div className='self-stretch text-xs font-medium text-slate-500 '>
+    <div className='flex h-full flex-col items-start justify-start gap-4'>
+      <div className={commonClass}>
+        <div className='self-stretch text-xs font-medium text-slate-500'>
           Category
         </div>
         <Badge.AssumptionCategory category={category} />
       </div>
-      <div className='flex flex-col items-start justify-start gap-2 self-stretch'>
+      <div className={commonClass}>
         <div className='self-stretch text-xs font-medium text-slate-500'>
           Risk Level
         </div>

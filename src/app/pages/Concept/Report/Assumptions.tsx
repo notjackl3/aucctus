@@ -1,6 +1,10 @@
-import { Card, Chart, Header, Icon, Table } from '@components';
+import { Card, Chart, Header, Icon, Modal, Table } from '@components';
 import { Point } from '@components/Charts/ScatterChart/ScatterChart';
-import { useAssumptionTestDetails } from '@hooks/query/assumptions.hook';
+import { useModal } from '@context/ModalContextProvider';
+import {
+  useAssumptionTestDetails,
+  useStartTest,
+} from '@hooks/query/assumptions.hook';
 import { useAssumptionsTable } from '@hooks/tables/assumptions.hook';
 import {
   getAssumptionActiveHexColor,
@@ -12,12 +16,16 @@ import { IConceptReportContext } from './ConceptReport';
 
 const KeyAssumptions: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
+  const { openModal } = useModal();
 
   const { table, selectedAssumptionUuid, handleRowClick, data, assumptions } =
     useAssumptionsTable(concept.uuid);
+
   const { testDetails = [] } = useAssumptionTestDetails(
     selectedAssumptionUuid || '',
   );
+
+  const { mutate: startTest } = useStartTest(selectedAssumptionUuid || '');
 
   const scatterPoints: Point[] = React.useMemo(() => {
     return assumptions.map((item) => {
@@ -103,6 +111,9 @@ const KeyAssumptions: React.FC = () => {
               selectedRowId={selectedAssumptionUuid}
               table={table}
               handleRowClick={handleRowClick}
+              rowProps={{
+                className: 'align-top text-left',
+              }}
             />
           </div>
           {/* Footer */}
@@ -133,10 +144,18 @@ const KeyAssumptions: React.FC = () => {
                 key={`test-card-${test.uuid}`}
                 type={test.type}
                 identifier={test.identifier}
-                duration='8 days'
+                duration={test.duration}
                 description={test.goal}
                 status={test.status}
-                state=''
+                stage={test.stage}
+                handleStartTest={() => startTest(test.uuid)}
+                handleOpenTest={() =>
+                  openModal(Modal.TestModal, {
+                    conceptUuid: concept.uuid,
+                    testUuid: test.testUuid,
+                    identifier: test.identifier,
+                  })
+                }
               />
             ))}
           </div>

@@ -9,8 +9,8 @@ import { ICustomerProfile } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import CustomerDetails from './CustomerDetails';
-import styles from './styles/customerProfile.module.scss';
+import CustomerDetails from './Details/CustomerDetails';
+import styles from './customerProfile.module.scss';
 
 import { Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';

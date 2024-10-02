@@ -98,6 +98,16 @@ $btn-colors: (
     }
   }
 
+  &.btn-md {
+    padding: 0.5rem 1rem; // Adjust padding for medium size
+    font-size: 1rem; // Adjust font size for medium size
+
+    svg {
+      width: 1rem; // Adjust SVG size for medium size
+      height: 1rem; // Adjust SVG size for medium size
+    }
+  }
+
   // Large button size
   &.btn-lg {
     padding: 0.875rem 1.5rem;

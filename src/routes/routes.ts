@@ -4,7 +4,7 @@ export enum ConceptPath {
   MarketScan = 'market-scan',
   FinancialProjection = 'financial-projection',
   CustomerProfile = 'customer-profile',
-  KeyAssumptions = 'key-assumptions',
+  Assumptions = 'assumptions',
   ConceptSettings = 'settings',
 }
 
@@ -20,15 +20,10 @@ export enum AppPath {
   ConceptOverview = '/concept/:id/',
   ConceptCustomerProfile = `/concept/:id/${ConceptPath.CustomerProfile}`,
   ConceptFinancialProjection = `/concept/:id/${ConceptPath.FinancialProjection}`,
-  ConceptKeyAssumptions = `/concept/:id/${ConceptPath.KeyAssumptions}`,
+  ConceptKeyAssumptions = `/concept/:id/${ConceptPath.Assumptions}`,
   ConceptMarketScan = `/concept/:id/${ConceptPath.MarketScan}`,
   ConceptSettings = `/concept/:id/${ConceptPath.ConceptSettings}`,
   ConceptSnapshot = `/concept/snapshot`,
-
-  /* Domain */
-  IgniteDomain = '/domain/ignite',
-  DomainList = '/domain/list',
-  DomainMarket = '/domain/:id/overview',
 
   /* Challenges */
   ChallengeCenter = '/challenge',

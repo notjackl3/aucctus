@@ -87,6 +87,7 @@ export abstract class ApiService {
   }
 
   private async _responseErrorMiddleware(error: AxiosError) {
+    analytics.log('error', error);
     if (this.config.debug) {
       if (axios.isCancel(error)) {
         analytics.debug('Request Aborted: ', error);

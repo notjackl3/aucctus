@@ -127,14 +127,12 @@
           // width: 100%;
           // gap: var(--gap-13xl);
           align-self: stretch;
-
+          justify-content: space-between;
           input {
             align-self: stretch;
 
             min-width: 45% !important;
           }
-
-          justify-content: space-between;
         }
 
         .row {

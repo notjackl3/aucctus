@@ -1,11 +1,8 @@
 import { Icon } from '@components';
 import { AssumptionTestStatus } from '@libs/api/types';
 import utils from '@libs/utils';
-import {
-  TESTING_STATUS_STYLE_MAP,
-  VALIDATION_STATUS,
-} from '@libs/utils/concepts';
-// import { CONCEPT_STATUS_LIST, getConceptStatusStyles } from '@libs/utils/concepts';
+import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/assumptions';
+import { VALIDATION_STATUS } from '@libs/utils/concepts';
 import * as Select from '@radix-ui/react-select';
 import classNames from 'classnames';
 import React from 'react';
@@ -48,11 +45,8 @@ const TestingStatusSelect: React.FC<TestingStatusSelectProps> = ({
             {utils.string.camelCaseToTitleCase(value)}
           </span>
         </Select.Value>
-        <Select.Icon>
-          <Icon
-            variant={open ? 'chevronup' : 'chevrondown'}
-            className={`${style.stroke}`}
-          />
+        <Select.Icon asChild>
+          <Icon.RotatingIcon isUp={open} className={`${style.stroke}`} />
         </Select.Icon>
       </Select.Trigger>
 

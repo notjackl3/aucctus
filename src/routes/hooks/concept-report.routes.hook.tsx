@@ -19,8 +19,8 @@ const useConceptReportRoutes = () => {
         element={<Page.Concept.Report.CustomerProfile />}
       />
       <Route
-        path={ConceptPath.KeyAssumptions}
-        element={<Page.Concept.Report.KeyAssumptions />}
+        path={ConceptPath.Assumptions}
+        element={<Page.Concept.Report.Assumptions />}
       />
       <Route
         path={ConceptPath.ConceptSettings}

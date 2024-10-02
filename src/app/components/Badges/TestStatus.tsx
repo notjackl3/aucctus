@@ -3,11 +3,11 @@ import { AssumptionTestStatus } from '@libs/api/types';
 import classNames from 'classnames';
 import React from 'react';
 
-interface ValidatedStatusProps {
+interface TestStatusProps {
   status: AssumptionTestStatus;
 }
 
-const ValidatedStatus: React.FC<ValidatedStatusProps> = ({ status }) => {
+const TestStatus: React.FC<TestStatusProps> = ({ status }) => {
   const isBlank = status === 'notStarted' || status === 'inProgress';
   const { icon, style } = VALIDATED_STATUS_MAP[status];
   return (
@@ -37,7 +37,10 @@ const VALIDATED_STATUS_MAP: Record<
     style: 'bg-[#fcf7e9] [&>svg]:stroke-[#b55121]',
   },
   validated: { icon: 'check', style: 'bg-[#e9fbf2] [&>svg]:stroke-[#117246]' },
-  invalidated: {},
+  invalidated: {
+    icon: 'closeX',
+    style: 'bg-[#fde9e9] [&>svg]:stroke-[#b55121]',
+  },
 };
 
-export default ValidatedStatus;
+export default TestStatus;

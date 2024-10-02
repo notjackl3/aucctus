@@ -46,11 +46,8 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({
             {utils.string.camelCaseToTitleCase(value)}
           </span>
         </Select.Value>
-        <Select.Icon>
-          <Icon
-            variant={open ? 'chevronup' : 'chevrondown'}
-            className={`${style.stroke}`}
-          />
+        <Select.Icon asChild>
+          <Icon.RotatingIcon isUp={open} className={`${style.stroke}`} />
         </Select.Icon>
       </Select.Trigger>
 

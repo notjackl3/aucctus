@@ -1,26 +1,32 @@
 import { Icon, Input } from '@components';
+import { cn } from '@libs/utils/react';
 import { Column, Header, flexRender } from '@tanstack/react-table';
-import classNames from 'classnames';
 import React from 'react';
 
 // Props for the TableHeader component
-interface ITableHeaderProps<T> {
+interface ITableHeaderProps<T>
+  extends React.HTMLAttributes<HTMLTableHeaderCellElement> {
   header: Header<T, unknown>;
 }
 
 // TableHeader Component
 const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
   header,
+  ...props
 }: ITableHeaderProps<T>) => {
   return (
     <th
-      className='text-nowrap p-3 align-top text-base font-medium leading-normal text-indigo-900 first:pl-6 last:pr-6'
+      {...props}
+      className={cn(
+        'text-nowrap p-3 align-top text-base font-medium leading-normal text-indigo-900 first:pl-6 last:pr-6',
+        props.className,
+      )}
       key={header.id}
     >
       {header.isPlaceholder ? null : (
         <span className='flex flex-row items-center justify-start [&>svg]:stroke-indigo-900'>
           <span
-            className={classNames([
+            className={cn([
               'flex items-center justify-start',
               {
                 'cursor-pointer': header.column.getCanSort(),

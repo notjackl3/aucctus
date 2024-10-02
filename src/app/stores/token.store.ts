@@ -1,5 +1,5 @@
-import { create } from 'zustand';
 import CryptoJS from 'crypto-js';
+import { create } from 'zustand';
 import api from '../../libs/api';
 
 const secretKey = import.meta.env.VITE_SECRET_KEY;
@@ -82,7 +82,6 @@ export const useTokenStore = create<TokenStore>((set, get) => ({
    * Clears the tokens from local storage and resets the state.
    */
   clearTokens: () => {
-    console.log('Clearing tokens');
     localStorage.removeItem(StorageKeys.acc);
     localStorage.removeItem(StorageKeys.ref);
     set({ access: undefined, refresh: undefined });

@@ -6,13 +6,15 @@ import React from 'react';
 interface TitleDescriptionProps {
   title: string;
   description: string;
+  maxDescriptionHeight?: number;
 }
 
-const MAX_DESCRIPTION_HEIGHT = 60;
+// const MAX_DESCRIPTION_HEIGHT = 60;
 
 const TitleDescription: React.FC<TitleDescriptionProps> = ({
   title,
   description,
+  maxDescriptionHeight = 60,
 }) => {
   const [open, setOpen] = React.useState(false);
   const [isTruncated, setIsTruncated] = React.useState(false);
@@ -57,14 +59,14 @@ const TitleDescription: React.FC<TitleDescriptionProps> = ({
   }, []);
 
   const animatedStyles = useSpring({
-    height: open ? textRef.current?.scrollHeight : MAX_DESCRIPTION_HEIGHT,
+    height: open ? textRef.current?.scrollHeight : maxDescriptionHeight,
     config: { tension: 300, friction: 25 },
   });
 
   return (
     <span
       ref={containerRef}
-      className='relative flex flex-col justify-start gap-2 bg-inherit'
+      className='flex h-full min-h-full flex-col items-start justify-start gap-2 bg-inherit text-start align-top'
       onClick={() => isTruncated && setOpen((prev) => !prev)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}

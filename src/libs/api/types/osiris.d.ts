@@ -53,6 +53,13 @@ export interface IConceptQueryOptions extends IPageQueryOptions {
   sort?: ConceptSort;
 }
 
+export interface IUserQueryOptions extends IPageQueryOptions {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  search?: string;
+}
+
 export interface IPageResponse<T> {
   count: number;
   // The next page URL

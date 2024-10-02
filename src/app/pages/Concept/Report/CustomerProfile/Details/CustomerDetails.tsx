@@ -4,7 +4,7 @@ import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { FunctionComponent } from 'react';
-import styles from './styles/customerDetails.module.scss';
+import styles from './customerDetails.module.scss';
 
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;

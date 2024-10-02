@@ -1,7 +1,7 @@
 import AssumptionCategory from './AssumptionCategoryBadge';
-import AssumptionTest from './AssumptionTest';
 import ConceptStatistic from './ConceptStatistic';
 import ConceptStatus from './ConceptStatus';
+import CostEstimate from './CostEstimateBadge';
 import Count from './Count';
 import RiskLevel from './RiskLevelBadge';
 import TestStatus from './TestStatus';
@@ -14,8 +14,8 @@ const Badges = {
   ConceptStatus,
   TestStatus,
   Count,
-  AssumptionTest,
   ValidationStatus,
+  CostEstimate,
 };
 
 export default Badges;

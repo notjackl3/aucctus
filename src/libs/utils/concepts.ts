@@ -84,47 +84,6 @@ export const VALIDATION_STATUS: AssumptionTestStatus[] = [
   'validated',
 ];
 
-export const TESTING_STATUS_STYLE_MAP: Record<
-  AssumptionTestStatus,
-  { icon: IconVariant; bg: string; stroke: string; svg: string; text: string }
-> = {
-  notStarted: {
-    icon: 'play-square',
-    bg: 'bg-[#f8f9fc]',
-    svg: '[&>svg]:stroke-[#667085]',
-    stroke: 'stroke-[#667085]',
-    text: 'text-[#667085]',
-  },
-  inProgress: {
-    icon: 'clock-fast-forward',
-    bg: 'bg-[#f8f9fc]',
-    svg: '[&>svg]:stroke-[#667085]',
-    stroke: 'stroke-[#667085]',
-    text: 'text-[#667085]',
-  },
-  partiallyValidated: {
-    icon: 'loading-02',
-    bg: 'bg-[#fcf7e9]',
-    svg: '[&>svg]:stroke-[#b55121]',
-    stroke: 'stroke-[#b55121]',
-    text: 'text-[#b55121]',
-  },
-  validated: {
-    icon: 'check',
-    bg: 'bg-[#e9fbf2]',
-    svg: '[&>svg]:stroke-[#117246]',
-    stroke: 'stroke-[#117246]',
-    text: 'text-[#117246]',
-  },
-  invalidated: {
-    icon: 'closeX',
-    bg: 'bg-[#fcf7e9]',
-    svg: '[&>svg]:stroke-[#b55121]',
-    stroke: 'stroke-[#b55121]',
-    text: 'text-[#b55121]',
-  },
-};
-
 /**
  * Returns the color associated with a given concept status.
  *

@@ -1,41 +1,68 @@
 import { Table as TB } from '@components';
+import { cn } from '@libs/utils/react';
 import { flexRender, Table } from '@tanstack/react-table';
-import classNames from 'classnames';
 import React from 'react';
 
-interface IAucctusTableProps<T = any> {
+interface IAucctusTableProps<T = any>
+  extends React.HTMLAttributes<HTMLTableElement> {
   table: Table<T> | undefined;
   selectedRowId?: string;
   handleRowClick?: (rowId: string) => void;
+  emptyTableText?: string;
+  theadProps?: React.HTMLAttributes<HTMLTableSectionElement>;
+  tbodyProps?: React.HTMLAttributes<HTMLTableSectionElement>;
+  tfootProps?: React.HTMLAttributes<HTMLTableSectionElement>;
+  rowProps?: React.HTMLAttributes<HTMLTableRowElement>;
+  headerProps?: React.HTMLAttributes<HTMLTableHeaderCellElement>;
 }
 
 const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
   table,
   selectedRowId,
   handleRowClick,
+  theadProps,
+  tbodyProps,
+  tfootProps,
+  rowProps,
+  headerProps,
+  emptyTableText = 'No data available',
+
+  ...props
 }: IAucctusTableProps<T>) => {
   return (
-    <table className='w-full table-auto text-gray-600'>
-      <thead className='border-b border-gray-200'>
+    <table
+      {...props}
+      className={cn('w-full table-auto text-gray-600', props.className)}
+    >
+      <thead
+        {...theadProps}
+        className={cn('border-b border-gray-200', theadProps?.className)}
+      >
         {table &&
           table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TB.Header key={header.id} header={header} />
+                <TB.Header {...headerProps} key={header.id} header={header} />
               ))}
             </tr>
           ))}
       </thead>
       <tbody
-        className={classNames('w-full bg-gray-50', {
-          'min-h-96': !table?.getRowModel().rows.length, // Apply min height when empty
-        })}
+        {...tbodyProps}
+        className={cn(
+          'w-full bg-gray-50',
+          {
+            'h-64': !table?.getRowModel().rows.length, // Apply min height when empty
+          },
+          tbodyProps?.className,
+        )}
       >
         {table &&
           table
             .getRowModel()
             .rows.map((row) => (
               <TB.Row
+                {...rowProps}
                 key={row.id}
                 row={row}
                 handleClick={handleRowClick}
@@ -49,12 +76,12 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
               colSpan={table?.getHeaderGroups()[0]?.headers.length || 1}
               className='py-6 text-center text-gray-500'
             >
-              No data available
+              {emptyTableText}
             </td>
           </tr>
         )}
       </tbody>
-      <tfoot>
+      <tfoot {...tfootProps}>
         {table &&
           table.getFooterGroups().map((footerGroup) => (
             <tr key={footerGroup.id}>

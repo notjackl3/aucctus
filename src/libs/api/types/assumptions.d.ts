@@ -31,18 +31,21 @@ type TestStatus = 'notStarted' | 'inProgress' | 'completed';
  * - Product Roadmap Testing
  */
 type TestType =
-  | 'scanningSurveys'
-  | 'immersiveDialogues'
-  | 'marketPulse-checks'
-  | 'communityScans'
+  | 'scanningSurvey'
+  | 'immersiveDialogue'
+  | 'marketPulseCheck'
+  | 'communityScan'
   | 'wizardOfOz'
   | 'marketResonance'
-  | 'actionSignals'
+  | 'actionSignal'
   | 'productBlueprint'
-  | 'feedbackLoops'
+  | 'feedbackLoop'
   | 'performanceTracking'
-  | 'testDrives'
+  | 'testDrive'
   | 'productRoadmapTesting';
+
+type ConceptTestStatus = 'notStarted' | 'inProgress' | 'completed';
+type ConceptTestStage = 'discover' | 'validate' | 'scale';
 
 type AssumptionCategory =
   | 'adaptability'
@@ -89,5 +92,92 @@ export interface IAssumptionTestDetails extends IBaseConceptEntity {
   findings?: string;
   assumptionUuid: string;
   testUuid: string;
-  type: AssumptionTest;
+  type: TestType;
+  duration: string;
+  stage: ConceptTestStage;
+}
+
+export interface IConceptTestDetails extends IBaseConceptEntity {
+  uuid: string;
+  identifier: string;
+  stage: ConceptTestStage;
+  type: TestType;
+  status: ConceptTestStatus;
+  goal: string;
+  findingsSummary?: string;
+  startDate: string;
+  endDate: string;
+  runTime: string;
+  assumptions: IAssumptionsToTest[];
+  spec: IConceptTestSpec;
+  steps: ITestStep[];
+  findings: ITestFindings[];
+}
+
+export interface IConceptTestSpec {
+  stage: ConceptTestStage;
+  name: string;
+
+  testedCategories: AssumptionCategory[];
+  details: {
+    description: string;
+    whenToConduct: string;
+    timeFrame: TimeFrame;
+  };
+  assetsAndInputs: string[];
+  highLevelCharacteristics: HighLevelCharacteristics;
+  bestSuitedFor: string[];
+  partners: string[];
+  stepByStepProcess: IConceptTestSpecStep[];
+  expectedOutputs: IConceptTestExpectedOutput[];
+}
+
+export interface IAssumptionsToTest {
+  name: string;
+  findings?: string;
+  status: AssumptionTestStatus;
+  goal: string;
+  category: AssumptionCategory;
+  testDetailsUuid: string;
+  assumptionUuid: string;
+}
+
+interface TimeFrame {
+  h?: number; // hours
+  d?: number; // days
+  w?: number; // weeks
+  m?: number; // months
+}
+
+interface HighLevelCharacteristics {
+  costEstimate: 'low' | 'medium' | 'high';
+  effortNeeded: 'low' | 'medium' | 'high';
+  timeForExecution: 'short' | 'medium' | 'long';
+}
+
+interface IConceptTestSpecStep {
+  stepId: int;
+  title: string;
+  description: string;
+}
+
+interface IConceptTestExpectedOutput {
+  title: string;
+  description: string;
+}
+
+interface ITestFindings extends IBaseConceptEntity {
+  uuid: string;
+  content: string;
+  testUuid: string;
+}
+
+interface ITestStep extends IBaseConceptEntity {
+  testUuid: string;
+  stepId: int;
+  uuid: string;
+  title: string;
+  description: string;
+  isCompleted: boolean;
+  suggestedOutputAndConsiderations: string;
 }

@@ -1,4 +1,4 @@
-import classNames from 'classnames';
+import { cn } from '@libs/utils/react';
 import React from 'react';
 
 interface ITextProps {
@@ -9,7 +9,7 @@ interface ITextProps {
 const Description: React.FC<ITextProps> = ({ value, className }) => {
   return (
     <span
-      className={classNames(
+      className={cn(
         'text-base font-medium leading-tight text-slate-500',
         className,
       )}

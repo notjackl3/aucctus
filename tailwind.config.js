@@ -34,6 +34,12 @@ module.exports = {
         adaptability: '#155eef',
         feasibility: '#088ab2',
 
+        level: {
+          low: '#66CCAA',
+          medium: '#FFC107',
+          high: '#E57373',
+        },
+
         warning: {
           50: '#fffaeb',
           500: '#f79009',
@@ -54,20 +60,6 @@ module.exports = {
         },
       },
 
-      // TODO: Fix font sizing
-      // fontSize: {
-      //   base: '0.75rem',
-      //   lg: '0.875rem',
-      //   xl: '1rem',
-      //   '2xl': '1.125rem',
-      //   '3xl': '1.25rem',
-      //   '4xl': '1.5rem',
-      //   '5xl': '1.875rem',
-      //   '6xl': '2.25rem',
-      //   '7xl': '3rem',
-      //   '8xl': '3.75rem',
-      //   '9xl': '4.5rem',
-      // },
       fontFamily: {
         primary: ['Inter', 'sans-serif'],
       },

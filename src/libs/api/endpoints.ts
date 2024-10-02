@@ -1,101 +1,130 @@
 import utils from '@libs/utils';
-import { IConceptQueryOptions } from './types';
+import { IConceptQueryOptions, IUserQueryOptions } from './types';
 
-export interface IPageQueryOptions {
-  page?: number;
-}
+export class Endpoints {
+  static login = '/api/v1/login';
+  static signup = '/api/v1/sign-up';
+  static logout = '/api/v1/logout';
+  static refresh = '/api/v1/token/refresh';
 
-export interface IUserQueryOptions {
-  firstName?: string;
-  lastName?: string;
-  email?: string;
-  search?: string;
-}
+  static user = '/api/v1/user/';
+  static allUsers = '/api/v1/user/list';
 
-export const endpoints = {
-  /* Auth */
-  login: '/api/v1/login',
-  signup: '/api/v1/sign-up',
-  logout: '/api/v1/logout',
-  refresh: '/api/v1/token/refresh',
+  static confirmEmail = `/api/v1/confirm-email`;
+  static forgotPassword = `/api/v1/forgot-password`;
+  static requestPasswordReset = `/api/v1/password-reset`;
+  static updatePassword = `/api/v1/user/update-password`;
 
-  user: '/api/v1/user/',
-  allUsers: '/api/v1/user/list',
-  // eslint-disable-next-line @typescript-eslint/typedef
-  allUsersQuery: function (this, options?: IUserQueryOptions) {
-    return utils.string.queryStringGenerator(this.allUsers, options);
-  },
+  static account = `/api/v1/account`;
+  static dashboard = `/api/v1/dashboard`;
 
-  confirmEmail: `/api/v1/confirm-email`,
-  forgotPassword: `/api/v1/forgot-password`,
-  requestPasswordReset: `/api/v1/password-reset`,
-  updatePassword: `/api/v1/user/update-password`,
+  static concept = 'api/v1/concept/';
+  static saveGeneratedConcepts = 'api/v1/concept/generated';
 
-  /* Account */
-  account: `/api/v1/account`,
-  dashboard: `/api/v1/dashboard`,
+  static conceptIgnite = 'api/v1/concept/ignite';
 
-  /* Concepts */
-  concept: 'api/v1/concept/',
-  saveGeneratedConcepts: 'api/v1/concept/generated',
+  static conceptUuid(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/`;
+  }
 
-  conceptIgnite: 'api/v1/concept/ignite', // Fast
-  // eslint-disable-next-line @typescript-eslint/typedef
-  conceptQueries: function (this, options?: IConceptQueryOptions) {
-    return utils.string.queryStringGenerator(this.concept, options);
-  },
-  conceptUuid: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/`,
-  conceptReportRetry: (conceptUuid: string) =>
-    `api/v1/concept/${conceptUuid}/retry`,
-  conceptSeed: (conceptUuid: string) => `api/v1/concept/${conceptUuid}/seed`,
-  unarchiveConcept: (conceptUuid: string) =>
-    `api/v1/concept/${conceptUuid}/unarchive`,
+  static conceptReportRetry(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/retry`;
+  }
 
-  conceptOverview: (conceptUuid: string) =>
-    `api/v1/concept/${conceptUuid}/overview`,
-  conceptOverviewUuid: (overviewUuid: string) =>
-    `api/v1/concept/overview/${overviewUuid}`,
+  static conceptSeed(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/seed`;
+  }
 
-  conceptCustomerProfiles: (conceptUuid: string) =>
-    `api/v1/concept/${conceptUuid}/customer-profile`,
-  conceptCustomerProfileUuid: (customerProfileUuid: string) =>
-    `api/v1/concept/customer-profile/${customerProfileUuid}`,
+  static unarchiveConcept(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/unarchive`;
+  }
 
-  conceptKeyAssumptions: (conceptUuid: string) =>
-    `api/v1/concept/${conceptUuid}/key-assumptions`,
-  conceptKeyAssumption: (assumptionUuid: string) =>
-    `api/v1/concept/key-assumption/${assumptionUuid}`,
+  static conceptOverview(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/overview`;
+  }
 
-  conceptFinancialProjection: (conceptUuid: string) =>
-    `api/v1/concept/${conceptUuid}/financial-projection`,
-  conceptFinancialProjectionUuid: (projectionUuid: string) =>
-    `api/v1/concept/financial-projection/${projectionUuid}`,
-  // conceptMarketSizeMetric: (marketSizeMetricUuid: string) =>
-  //   `api/v1/concept/market-size-metric/${marketSizeMetricUuid}`,
+  static conceptOverviewUuid(overviewUuid: string) {
+    return `api/v1/concept/overview/${overviewUuid}`;
+  }
 
-  conceptMarketScan: (conceptUuid: string) =>
-    `api/v1/concept/${conceptUuid}/market-scan/`,
-  conceptMarketScanUuid: (marketScanUuid: string) =>
-    `api/v1/concept/market-scan/${marketScanUuid}`,
-  conceptMarketScanElement: (
+  static conceptCustomerProfiles(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/customer-profile`;
+  }
+
+  static conceptCustomerProfileUuid(customerProfileUuid: string) {
+    return `api/v1/concept/customer-profile/${customerProfileUuid}`;
+  }
+
+  static conceptKeyAssumptions(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/key-assumptions`;
+  }
+
+  static conceptKeyAssumption(assumptionUuid: string) {
+    return `api/v1/concept/key-assumption/${assumptionUuid}`;
+  }
+
+  static conceptFinancialProjection(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/financial-projection`;
+  }
+
+  static conceptFinancialProjectionUuid(projectionUuid: string) {
+    return `api/v1/concept/financial-projection/${projectionUuid}`;
+  }
+
+  static conceptMarketScan(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/market-scan/`;
+  }
+
+  static conceptMarketScanUuid(marketScanUuid: string) {
+    return `api/v1/concept/market-scan/${marketScanUuid}`;
+  }
+
+  static conceptMarketScanElement(
     conceptUuid: string,
     element: 'trends-and-drivers' | 'ecosystem',
-  ) => `api/v1/concept/${conceptUuid}/market-scan/${element}`,
+  ) {
+    return `api/v1/concept/${conceptUuid}/market-scan/${element}`;
+  }
 
-  conceptTrendAndDriver: (trendAndDriverUuid: string) =>
-    `api/v1/concept/trends-and-drivers/${trendAndDriverUuid}`,
-  conceptEcosystem: (ecosystemUuid: string) =>
-    `api/v1/concept/ecosystem/${ecosystemUuid}`,
+  static conceptTrendAndDriver(trendAndDriverUuid: string) {
+    return `api/v1/concept/trends-and-drivers/${trendAndDriverUuid}`;
+  }
 
-  assumptionTestsDetails: (assumptionUuid: string) =>
-    `api/v1/concept/assumption/${assumptionUuid}/test-details`,
+  static conceptEcosystem(ecosystemUuid: string) {
+    return `api/v1/concept/ecosystem/${ecosystemUuid}`;
+  }
 
-  assumptionTestDetailsUuid: (
+  static assumptionTestsDetails(assumptionUuid: string) {
+    return `api/v1/concept/assumption/${assumptionUuid}/test-details`;
+  }
+
+  static assumptionTestDetailsUuid(
     assumptionUuid: string,
     assumptionTestUuid: string,
-  ) =>
-    `api/v1/concept/assumption/${assumptionUuid}/test-details/${assumptionTestUuid}`,
+  ) {
+    return `api/v1/concept/assumption/${assumptionUuid}/test-details/${assumptionTestUuid}`;
+  }
 
-  assumptionStartTest: (assumptionUuid: string, assumptionTestUuid: string) =>
-    `api/v1/concept/assumption/${assumptionUuid}/test-details/${assumptionTestUuid}/start`,
-};
+  static assumptionStartTest(
+    assumptionUuid: string,
+    assumptionTestUuid: string,
+  ) {
+    return `api/v1/concept/assumption/${assumptionUuid}/test-details/${assumptionTestUuid}/start`;
+  }
+
+  static conceptTestDetails(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/test`;
+  }
+
+  static conceptTestDetailsUuid(conceptUuid: string, conceptTestUuid: string) {
+    return `api/v1/concept/${conceptUuid}/test/${conceptTestUuid}`;
+  }
+
+  static allUsersQuery(options?: IUserQueryOptions) {
+    return utils.string.queryStringGenerator(this.allUsers, options);
+  }
+
+  static conceptQueries(options?: IConceptQueryOptions) {
+    return utils.string.queryStringGenerator(this.concept, options);
+  }
+}

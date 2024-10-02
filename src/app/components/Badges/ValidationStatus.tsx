@@ -1,7 +1,7 @@
 import Icon from '@components/Icon';
 import { AssumptionTestStatus } from '@libs/api/types';
 import utils from '@libs/utils';
-import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/concepts';
+import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/assumptions';
 import classNames from 'classnames';
 import React from 'react';
 

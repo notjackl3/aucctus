@@ -5,7 +5,7 @@ import { useConceptOverview } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
-import { IConceptReportContext } from '../ConceptReport';
+import { IConceptReportContext } from './ConceptReport';
 
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();

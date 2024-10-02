@@ -1,4 +1,3 @@
-import { IUserQueryOptions } from '@libs/api/endpoints';
 import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../libs/api';
@@ -8,6 +7,7 @@ import {
   IRegisterAccount,
   IUser,
   IUserDetailsResponse,
+  IUserQueryOptions,
 } from '../../../libs/api/types';
 import { useAppStore } from '../../stores/app.store';
 import { AucctusQueryKeys } from './query-keys';

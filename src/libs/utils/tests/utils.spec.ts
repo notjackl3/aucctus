@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import utils from '../utils';
+import utils from '..';
 
 describe('validEmail', () => {
   test('should return true for a valid email', () => {
@@ -74,9 +74,11 @@ describe('dateFormatter', () => {
 
   it('should return "Aug 14, 2024" with custom formatting options', () => {
     const pastDate = new Date('2023-08-14T12:00:00Z').toISOString();
-    expect(utils.time.dateFormatter(pastDate, { weekday: 'long' })).toBe(
-      'Monday, Aug 14, 2023',
-    );
+    expect(
+      utils.time.dateFormatter(pastDate, {
+        formattingOptions: { weekday: 'long' },
+      }),
+    ).toBe('Monday, Aug 14, 2023');
   });
 
   it('should handle invalid date strings gracefully', () => {

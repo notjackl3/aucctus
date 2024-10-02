@@ -1,16 +1,16 @@
-import Context from './components/ConceptSettings';
-import CustomerProfile from './components/CustomerProfile';
-import FinancialProjection from './components/FinancialDetails';
-import MarketScan from './components/MarketDetails';
-import Overview from './components/OverviewDetails';
+import Assumptions from './Assumptions';
 import Default from './ConceptReport';
-import KeyAssumptions from './KeyAssumptions';
+import Context from './ConceptSettings';
+import CustomerProfile from './CustomerProfile';
+import FinancialProjection from './FinancialDetails';
+import MarketScan from './MarketDetails';
+import Overview from './OverviewDetails';
 
 (Default as any).Overview = Overview;
 (Default as any).MarketScan = MarketScan;
 (Default as any).CustomerProfile = CustomerProfile;
 (Default as any).FinancialProjection = FinancialProjection;
-(Default as any).KeyAssumptions = KeyAssumptions;
+(Default as any).Assumptions = Assumptions;
 (Default as any).Context = Context;
 
 const Report = Default as typeof Default & {
@@ -18,7 +18,7 @@ const Report = Default as typeof Default & {
   MarketScan: typeof MarketScan;
   CustomerProfile: typeof CustomerProfile;
   FinancialProjection: typeof FinancialProjection;
-  KeyAssumptions: typeof KeyAssumptions;
+  Assumptions: typeof Assumptions;
   Context: typeof Context;
 };
 

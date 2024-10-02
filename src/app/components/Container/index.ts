@@ -1,3 +1,4 @@
+import Collapsible from './Collapsible';
 import ConceptTableWrapper from './ConceptTableWrapper';
 
 import List from './ListContainer';
@@ -7,6 +8,7 @@ const Container = {
   TabView,
   List,
   ConceptTableWrapper,
+  Collapsible,
 };
 
 export default Container;

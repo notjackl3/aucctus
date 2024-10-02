@@ -1,66 +1,90 @@
-import { Badge, Icon } from '@components';
-import { AssumptionTestStatus, TestType } from '@libs/api/types';
+import { Button, Header, Icon } from '@components';
+import {
+  AssumptionTestStatus,
+  ConceptTestStage,
+  TestType,
+} from '@libs/api/types';
 import utils from '@libs/utils';
-import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/concepts';
+import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/assumptions';
 import classNames from 'classnames';
 import React from 'react';
 
 interface TestingProps {
+  stage: ConceptTestStage;
   identifier: string;
   type: TestType;
   description: string;
   duration: string;
   status: AssumptionTestStatus;
-  state: string;
+  handleStartTest: () => void;
+  handleOpenTest: () => void;
 }
 
 const Testing: React.FC<TestingProps> = ({
   identifier,
   type,
+  stage,
   description,
   status,
-
   duration,
+  handleStartTest,
+  handleOpenTest,
 }) => {
   const validationStatusVisuals = TESTING_STATUS_STYLE_MAP[status];
+
+  const hasStarted = status !== 'notStarted';
+
   return (
-    <div className='inline-flex min-h-48 min-w-[432px] flex-col items-start justify-center gap-2 rounded-lg border border-gray-200 bg-white p-3 shadow-sm'>
-      <div className='inline-flex items-start justify-between self-stretch'>
+    <div className='flex h-fit min-h-36 min-w-[432px] flex-col items-start justify-start gap-2 rounded-lg border border-gray-200 bg-white p-3 shadow-sm'>
+      <div className='inline-flex items-center justify-between self-stretch'>
         <div className='inline-flex flex-col items-start justify-start gap-2'>
-          <div className='text-xs font-medium text-[#7586a9]'>
+          <div className='text-xs font-medium text-gray-500'>
             ID: {identifier}
           </div>
-          <div className='inline-flex items-center justify-start gap-1 rounded-lg bg-[#f4f7fe] p-2'>
-            <Icon variant='star-01' />
-            <div className='text-xs font-semibold text-[#4318ff]'>
+
+          {!hasStarted && (
+            <span className='inline-flex items-center justify-center gap-1.5 rounded-lg bg-slate-50 p-2 text-center text-xs font-semibold text-primary-600'>
+              <Icon variant='star-01' className='stroke-primary-600' />
               Recommended
-            </div>
-          </div>
+            </span>
+          )}
         </div>
 
         {/* Start / Open Button */}
-        <button className='btn btn-primary'>Start</button>
+        <Button
+          color={hasStarted ? 'light' : 'primary'}
+          noBorder={hasStarted}
+          size={hasStarted ? 'md' : undefined}
+          onClick={() => {
+            if (!hasStarted) {
+              handleStartTest();
+            } else {
+              handleOpenTest();
+            }
+          }}
+        >
+          {hasStarted ? <Icon variant='link-external' /> : 'Start'}
+        </Button>
       </div>
       <div className='inline-flex items-center justify-start gap-3.5 self-stretch'>
         {/* Right Side */}
-        <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-5'>
-          <Badge.AssumptionTest test={type} />
-
+        <div className='flex-flex-grow-1 inline-flex shrink grow  flex-col items-start justify-start gap-5'>
+          <Header.AssumptionTest test={type} stage={stage} />
           {/* Description */}
           <div className='flex w-52 flex-col items-start justify-start gap-1.5'>
-            <span className='self-stretch text-xs font-medium text-[#7586a9]'>
+            <span className='self-stretch text-xs font-medium text-slate-500'>
               Test Description
             </span>
-            <span className='self-stretch text-wrap text-xs font-semibold text-[#667085]'>
+            <span className='self-stretch text-wrap text-xs font-semibold text-gray-500'>
               {description}
             </span>
           </div>
         </div>
 
         {/* Left Side */}
-        <div className='inline-flex h-full min-w-[160px] shrink grow basis-0 flex-col items-start justify-start gap-5'>
+        <div className='inline-flex h-full min-w-[160px] shrink grow flex-col items-start justify-start gap-5'>
           <div className='flex flex-col items-start justify-start gap-2 self-stretch'>
-            <span className='self-stretch text-xs font-medium text-[#7586a9]'>
+            <span className='self-stretch text-xs font-medium text-slate-500'>
               Test Status
             </span>
             <span
@@ -83,10 +107,10 @@ const Testing: React.FC<TestingProps> = ({
           </div>
 
           <div className='flex flex-col items-start justify-start gap-2 self-stretch'>
-            <div className='self-stretch text-xs font-medium text-[#7586a9]'>
+            <div className='self-stretch text-xs font-medium text-slate-500'>
               Run Time
             </div>
-            <div className='text-base font-semibold text-[#667085]'>
+            <div className='text-base font-semibold text-gray-500'>
               {duration}
             </div>
           </div>

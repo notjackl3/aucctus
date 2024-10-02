@@ -16,10 +16,10 @@ const IgniteLoading: FunctionComponent<IgniteLoadingProps> = ({
       <div className='flex h-56 flex-col items-center justify-start gap-8 self-stretch'>
         <img alt='Ignite!' className='relative w-48' src={igniteIcon} />
         <div className='flex flex-col items-center justify-start gap-3 self-stretch'>
-          <div className="self-stretch text-center font-['Inter'] text-3xl font-bold leading-9 text-indigo-900">
+          <div className='self-stretch text-center text-3xl font-bold leading-9 text-indigo-900'>
             {title}
           </div>
-          <div className="self-stretch text-center font-['Inter'] text-sm font-medium text-gray-500">
+          <div className='self-stretch text-center text-sm font-medium text-gray-500'>
             {subtitle}
           </div>
         </div>
