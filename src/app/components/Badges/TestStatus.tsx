@@ -1,13 +1,13 @@
 import { Icon } from '@components';
-import { AssumptionTestStatus } from '@libs/api/types';
+import { type AssumptionTestStatus, type TestStatus } from '@libs/api/types';
 import classNames from 'classnames';
 import React from 'react';
 
 interface TestStatusProps {
-  status: AssumptionTestStatus;
+  status: AssumptionTestStatus | TestStatus;
 }
 
-const TestStatus: React.FC<TestStatusProps> = ({ status }) => {
+const TestStatusBadge: React.FC<TestStatusProps> = ({ status }) => {
   const isBlank = status === 'notStarted' || status === 'inProgress';
   const { icon, style } = VALIDATED_STATUS_MAP[status];
   return (
@@ -27,20 +27,24 @@ const TestStatus: React.FC<TestStatusProps> = ({ status }) => {
 };
 
 const VALIDATED_STATUS_MAP: Record<
-  AssumptionTestStatus,
+  AssumptionTestStatus | TestStatus,
   { icon?: IconVariant | undefined; style?: string }
 > = {
   notStarted: {},
-  inProgress: {},
+  inProgress: {
+    icon: 'clock-fast-forward',
+    style: 'bg-[#f8f9fc] [&>svg]:stroke-gray-500',
+  },
   partiallyValidated: {
     icon: 'loading-02',
     style: 'bg-[#fcf7e9] [&>svg]:stroke-[#b55121]',
   },
   validated: { icon: 'check', style: 'bg-[#e9fbf2] [&>svg]:stroke-[#117246]' },
+  completed: { icon: 'check', style: 'bg-[#e9fbf2] [&>svg]:stroke-[#117246]' },
   invalidated: {
     icon: 'closeX',
     style: 'bg-[#fde9e9] [&>svg]:stroke-[#b55121]',
   },
 };
 
-export default TestStatus;
+export default TestStatusBadge;

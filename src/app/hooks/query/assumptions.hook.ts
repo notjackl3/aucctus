@@ -3,6 +3,8 @@ import {
   IAssumption,
   IAssumptionCreate,
   IAssumptionTestDetails,
+  IAssumptionTestStatus,
+  IAssumptionTestStatusCategory,
 } from '@libs/api/types/assumptions';
 import { useQuery } from 'react-query';
 import { useGenericConceptMutate, useGenericMutate } from './helper.hooks';
@@ -60,7 +62,10 @@ export const useStartTest = (assumptionUuid: string) => {
   return useGenericMutate<IAssumptionTestDetails, string>(
     (assumptionTestDetailUuid) =>
       api.assumption.startTest(assumptionUuid, assumptionTestDetailUuid),
-    [[AucctusQueryKeys.assumptionTestDetails, assumptionUuid]],
+    [
+      [AucctusQueryKeys.assumptionTestDetails, assumptionUuid],
+      [AucctusQueryKeys.assumption],
+    ],
   );
 };
 
@@ -89,4 +94,39 @@ export const useConceptTestDetails = (
     enabled: !!conceptUuid && !!conceptTestUuid,
   });
   return { ...query, testDetails: query.data };
+};
+
+const defaultAssumptionTestStatusCategory: IAssumptionTestStatusCategory = {
+  status: 'notStarted',
+  testProgress: [],
+  estimatedEndDate: undefined,
+};
+
+const defaultAssumptionTestStatusOverview: IAssumptionTestStatus = {
+  desirability: { ...defaultAssumptionTestStatusCategory },
+  feasibility: { ...defaultAssumptionTestStatusCategory },
+
+  viability: { ...defaultAssumptionTestStatusCategory },
+  adaptability: { ...defaultAssumptionTestStatusCategory },
+  overview: {
+    daysRemaining: undefined,
+    daysPast: undefined,
+    riskiestCategory: undefined,
+    riskiestCategoryStatus: undefined,
+    averageDuration: undefined,
+    lastMonthAverageTestDuration: undefined,
+  },
+};
+
+export const useAssumptionTestStatusOverview = (conceptUuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.assumptionTestStatusOverview, conceptUuid],
+    queryFn: async () =>
+      await api.assumption.getAssumptionTestStatusOverview(conceptUuid),
+    enabled: !!conceptUuid,
+  });
+  return {
+    ...query,
+    data: { ...defaultAssumptionTestStatusOverview, ...query.data },
+  };
 };

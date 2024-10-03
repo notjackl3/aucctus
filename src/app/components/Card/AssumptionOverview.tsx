@@ -1,27 +1,45 @@
+import { cn } from '@libs/utils/react';
 import React from 'react';
 
 interface AssumptionOverviewProps {
   header: string;
   body?: React.ReactNode;
+  bodyProps?: React.HTMLAttributes<HTMLDivElement>;
   footer: React.ReactNode;
 }
 
 const AssumptionOverview: React.FC<AssumptionOverviewProps> = ({
   header,
   body,
+  bodyProps,
   footer,
 }) => {
   return (
-    <div className='inline-flex h-[119px] flex-col items-start justify-start gap-1.5 rounded-lg border border-gray-200 bg-white p-6'>
-      <div className='self-stretch text-xs font-medium text-slate-300'>
+    <div
+      className={cn(
+        'inline-flex h-32 flex-col items-start justify-start gap-3 rounded-lg border border-gray-200 bg-white px-4 py-4',
+      )}
+    >
+      <div className={cn('self-stretch text-sm font-medium text-slate-500')}>
         {header}
       </div>
-      <div className='self-stretch text-2xl font-semibold text-indigo-900'>
+
+      <div
+        {...bodyProps}
+        className={cn(
+          'font-base self-stretch text-3xl text-indigo-900',
+          bodyProps?.className,
+        )}
+      >
         {body ? body : '--'}
       </div>
-      <div className='self-stretch text-xs font-semibold text-slate-500'>
-        {footer}
-      </div>
+      {footer && (
+        <div
+          className={cn('self-stretch text-sm font-semibold text-slate-500')}
+        >
+          {footer}
+        </div>
+      )}
     </div>
   );
 };

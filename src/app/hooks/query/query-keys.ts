@@ -17,4 +17,5 @@ export enum AucctusQueryKeys {
   assumptions = 'assumptions',
   assumptionTestDetails = 'assumptionTestDetails',
   conceptTestDetails = 'conceptTestDetails',
+  assumptionTestStatusOverview = 'assumptionTestStatusOverview',
 }

@@ -5,6 +5,7 @@ import {
   IAssumption,
   IAssumptionCreate,
   IAssumptionTestDetails,
+  IAssumptionTestStatus,
   IConceptTestDetails,
   IPageResponse,
 } from './types'; // Import the missing type
@@ -66,6 +67,12 @@ export class AssumptionsApi extends ApiService {
   getConceptTestDetails(conceptUuid: string, conceptTestUuid: string) {
     return this.get<IConceptTestDetails>(
       endpoints.conceptTestDetailsUuid(conceptUuid, conceptTestUuid),
+    );
+  }
+
+  getAssumptionTestStatusOverview(conceptUuid: string) {
+    return this.get<IAssumptionTestStatus>(
+      endpoints.assumptionTestStatusOverview(conceptUuid),
     );
   }
 }

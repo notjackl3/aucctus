@@ -1,20 +1,25 @@
 import { Badge } from '@components';
-import { AssumptionCategory, AssumptionTestStatus } from '@libs/api/types';
+import {
+  AssumptionCategory,
+  IAssumptionTestStatusCategory,
+} from '@libs/api/types';
 import utils from '@libs/utils';
 import classNames from 'classnames';
 import React from 'react';
 
-interface CategoryRowProps {
+interface CategoryRowProps extends IAssumptionTestStatusCategory {
   category: AssumptionCategory;
-  validationStatus: AssumptionTestStatus;
   colWidth?: string;
 }
 
 const CategoryRow: React.FC<CategoryRowProps> = ({
   category,
-  validationStatus,
+  status,
+  testProgress,
+  estimatedEndDate,
   colWidth = 'w-[120px]',
 }) => {
+  console.log(testProgress);
   return (
     <div className='inline-flex items-center justify-start gap-6'>
       <div
@@ -22,17 +27,16 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
       >
         <Badge.AssumptionCategory category={category} />
       </div>
-      <Badge.ValidationStatus status={validationStatus} />
+      <Badge.ValidationStatus status={status} />
       <div
         className={classNames(
           'flex items-center justify-start gap-2',
           colWidth,
         )}
       >
-        <Badge.TestStatus status='notStarted' />
-        <Badge.TestStatus status='inProgress' />
-        <Badge.TestStatus status='partiallyValidated' />
-        <Badge.TestStatus status='validated' />
+        {testProgress.map((item, i) => (
+          <Badge.TestStatus key={`${item}-${i}`} status={item} />
+        ))}
       </div>
       <span
         className={classNames(
@@ -40,7 +44,11 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
           colWidth,
         )}
       >
-        {utils.time.dateFormatter(new Date('26 Jul 2024').toISOString())}
+        {estimatedEndDate
+          ? utils.time.dateFormatter(new Date(estimatedEndDate).toISOString(), {
+              dateOnly: true,
+            })
+          : '--'}
       </span>
     </div>
   );

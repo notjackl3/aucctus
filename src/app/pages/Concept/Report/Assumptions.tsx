@@ -1,8 +1,9 @@
-import { Card, Chart, Header, Icon, Modal, Table } from '@components';
+import { Badge, Card, Chart, Header, Icon, Modal, Table } from '@components';
 import { Point } from '@components/Charts/ScatterChart/ScatterChart';
 import { useModal } from '@context/ModalContextProvider';
 import {
   useAssumptionTestDetails,
+  useAssumptionTestStatusOverview,
   useStartTest,
 } from '@hooks/query/assumptions.hook';
 import { useAssumptionsTable } from '@hooks/tables/assumptions.hook';
@@ -17,6 +18,17 @@ import { IConceptReportContext } from './ConceptReport';
 const KeyAssumptions: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
   const { openModal } = useModal();
+
+  const { data: assumptionTestStatusOverview } =
+    useAssumptionTestStatusOverview(concept.uuid);
+  const {
+    daysRemaining,
+    riskiestCategoryStatus,
+    riskiestCategory,
+    averageDuration,
+    daysPast,
+    lastMonthAverageTestDuration,
+  } = assumptionTestStatusOverview?.overview || {};
 
   const { table, selectedAssumptionUuid, handleRowClick, data, assumptions } =
     useAssumptionsTable(concept.uuid);
@@ -46,22 +58,41 @@ const KeyAssumptions: React.FC = () => {
       <div className='flex w-fit flex-row flex-wrap gap-6'>
         {/* Assumptions Testing Status & Overview Cards */}
         <div className='flex flex-col gap-6'>
-          <Card.AssumptionsTestingStatus />
+          <Card.AssumptionsTestingStatus
+            overview={assumptionTestStatusOverview}
+          />
           <div className={'inline-flex items-center justify-between'}>
             <Card.AssumptionOverview
               header='Average Test Duration'
-              body={undefined}
+              body={averageDuration ? `${averageDuration} Days` : undefined}
+              //  TODO: Set the percentage from last month
               footer={''}
             />
             <Card.AssumptionOverview
               header='Test Days Remaining'
-              body={undefined}
-              footer={''}
+              body={daysRemaining ? `${daysRemaining} Days` : undefined}
+              footer={daysPast ? `${daysPast} Days Consumed` : undefined}
             />
             <Card.AssumptionOverview
               header='Riskiest Category'
-              body={undefined}
-              footer={''}
+              // bodyProps={{ className:' }
+              body={
+                riskiestCategory ? (
+                  <Badge.AssumptionCategory
+                    category={riskiestCategory}
+                    textProps={{ className: 'text-3xl' }}
+                  />
+                ) : (
+                  ''
+                )
+              }
+              footer={
+                riskiestCategoryStatus ? (
+                  <Badge.ValidationStatus status={riskiestCategoryStatus} />
+                ) : (
+                  ''
+                )
+              }
             />
           </div>
         </div>

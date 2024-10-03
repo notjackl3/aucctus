@@ -82,7 +82,7 @@ export interface IAssumption extends IBaseConceptEntity {
 
   status: AssumptionTestStatus;
 
-  testProgress: [AssumptionTestStatus];
+  testProgress: AssumptionTestStatus[];
 }
 
 export interface IAssumptionTestDetails extends IBaseConceptEntity {
@@ -180,4 +180,27 @@ interface ITestStep extends IBaseConceptEntity {
   description: string;
   isCompleted: boolean;
   suggestedOutputAndConsiderations: string;
+}
+
+interface IAssumptionTestStatus {
+  desirability: IAssumptionTestStatusCategory;
+  feasibility: IAssumptionTestStatusCategory;
+  viability: IAssumptionTestStatusCategory;
+  adaptability: IAssumptionTestStatusCategory;
+
+  overview: IAssumptionTestStatusOverview;
+}
+
+interface IAssumptionTestStatusCategory {
+  status: AssumptionTestStatus;
+  testProgress: AssumptionTestStatus[];
+  estimatedEndDate?: string;
+}
+interface IAssumptionTestStatusOverview {
+  daysRemaining?: number;
+  daysPast?: number;
+  riskiestCategory?: AssumptionCategory;
+  riskiestCategoryStatus?: AssumptionTestStatus;
+  averageDuration?: number;
+  lastMonthAverageTestDuration?: number;
 }

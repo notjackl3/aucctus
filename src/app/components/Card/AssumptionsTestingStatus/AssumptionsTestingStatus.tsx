@@ -1,20 +1,19 @@
 import { Select } from '@components';
-import { AssumptionCategory } from '@libs/api/types';
-import {
-  ASSUMPTIONS_CATEGORIES,
-  VALIDATION_STATUS,
-} from '@libs/utils/concepts';
+import { AssumptionCategory, IAssumptionTestStatus } from '@libs/api/types';
+import { ASSUMPTIONS_CATEGORIES } from '@libs/utils/concepts';
 import React from 'react';
 import AssumptionTestingStatusHeader from './AssumptionTestingStatusHeader';
 import CategoryRow from './CategoryRow';
 
 const COL_WIDTH = 'w-[120px]';
 
-interface AssumptionTestingStatusProps {}
+interface AssumptionTestingStatusProps {
+  overview: IAssumptionTestStatus;
+}
 
-const AssumptionTestingStatus: React.FC<
-  AssumptionTestingStatusProps
-> = ({}) => {
+const AssumptionTestingStatus: React.FC<AssumptionTestingStatusProps> = ({
+  overview,
+}) => {
   return (
     <div className='inline-flex h-auto flex-col items-start justify-start gap-7 rounded-lg border border-gray-200 bg-white px-6 py-8'>
       {/* Header */}
@@ -51,7 +50,9 @@ const AssumptionTestingStatus: React.FC<
           <React.Fragment key={`${item}-${i}`}>
             <CategoryRow
               category={item as AssumptionCategory}
-              validationStatus={VALIDATION_STATUS[i]}
+              status={overview[item].status}
+              testProgress={overview[item].testProgress}
+              estimatedEndDate={overview[item].estimatedEndDate}
             />
             {ASSUMPTIONS_CATEGORIES.length - 1 !== i && (
               <span className='h-[1px] w-full bg-slate-100' />

@@ -112,6 +112,10 @@ export class Endpoints {
     return `api/v1/concept/assumption/${assumptionUuid}/test-details/${assumptionTestUuid}/start`;
   }
 
+  static assumptionTestStatusOverview(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/test-status`;
+  }
+
   static conceptTestDetails(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/test`;
   }
