@@ -126,7 +126,10 @@ const KeyAssumptions: React.FC = () => {
             handleAdd={() => null}
           />
           <div className='inline-flex w-full items-center justify-between self-stretch border-b border-gray-200 px-3 py-2'>
-            <div>Coming</div>
+
+            <div>
+              {/* This will display active filters */}
+            </div>
             <div className='inline-flex h-3 items-center justify-end gap-2'>
               <button>
                 <Icon variant='filter-lines' />
