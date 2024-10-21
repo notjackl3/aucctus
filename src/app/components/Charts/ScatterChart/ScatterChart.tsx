@@ -24,10 +24,8 @@ export interface ScatterChartProps {
   xAxis: AxisProps;
 }
 
-export const CHART_WIDTH = 2000;
-export const CHART_CENTER_WIDTH = 1000;
+export const CHART_SIZE = 2000;
 export const POINT_RADIUS = 48;
-export const valueConversionRate = 100;
 
 const defaultTextProps = {
   fill: '#667085',
@@ -86,23 +84,23 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   return (
     <div className={styles.quadrantChart}>
       <svg
-        viewBox={`0 0 ${CHART_WIDTH} ${CHART_WIDTH}`}
+        viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
         xmlns='http://www.w3.org/2000/svg'
       >
         <ScatterChartGrid numberGridLines={10} spacing={200} />
         <line
-          x1={CHART_CENTER_WIDTH}
+          x1={CHART_SIZE / 2}
           y1='0'
-          x2={CHART_CENTER_WIDTH}
-          y2={CHART_WIDTH}
+          x2={CHART_SIZE / 2}
+          y2={CHART_SIZE}
           stroke='#E0E5F2'
           strokeWidth='10'
         />
         <line
           x1='0'
-          y1={CHART_CENTER_WIDTH}
-          x2={CHART_WIDTH}
-          y2={CHART_CENTER_WIDTH}
+          y1={CHART_SIZE / 2}
+          x2={CHART_SIZE}
+          y2={CHART_SIZE / 2}
           stroke='#E0E5F2'
           strokeWidth='10'
         />

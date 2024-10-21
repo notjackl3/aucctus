@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { CHART_WIDTH } from './ScatterChart';
+import { CHART_SIZE } from './ScatterChart';
 
 type LineDirection = 'horizontal' | 'vertical';
 
@@ -32,7 +32,7 @@ const QuadrantChartGrid: FunctionComponent<QuadrantChartGridProps> = ({
             key={`horizontal-line-${i}`}
             x1='0'
             y1={dist}
-            x2={CHART_WIDTH}
+            x2={CHART_SIZE}
             y2={dist}
             {...defaultLineProps}
           />,
@@ -44,7 +44,7 @@ const QuadrantChartGrid: FunctionComponent<QuadrantChartGridProps> = ({
             x1={dist}
             y1={0}
             x2={dist}
-            y2={CHART_WIDTH}
+            y2={CHART_SIZE}
             {...defaultLineProps}
           />,
         );

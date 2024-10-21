@@ -19,7 +19,6 @@ const CategoryRow: React.FC<CategoryRowProps> = ({
   estimatedEndDate,
   colWidth = 'w-[120px]',
 }) => {
-  console.log(testProgress);
   return (
     <div className='inline-flex items-center justify-start gap-6'>
       <div

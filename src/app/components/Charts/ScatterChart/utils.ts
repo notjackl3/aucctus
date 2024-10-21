@@ -1,12 +1,8 @@
 import analytics from '@libs/analytics';
-import {
-  CHART_CENTER_WIDTH,
-  POINT_RADIUS,
-  valueConversionRate,
-} from './ScatterChart';
+import { CHART_SIZE, POINT_RADIUS } from './ScatterChart';
 
 export const getNormalizedCoord = (value: number) => {
-  const normalizedCoord = CHART_CENTER_WIDTH + value * valueConversionRate;
+  const normalizedCoord = CHART_SIZE - (value / 100) * CHART_SIZE;
 
   if (isNaN(normalizedCoord)) {
     analytics.debug('Coordinates value found as NaN!');
@@ -17,9 +13,9 @@ export const getNormalizedCoord = (value: number) => {
 };
 
 export const getActiveAdjustmentDistance = (coord: number) => {
-  if (coord === CHART_CENTER_WIDTH) {
+  if (coord === CHART_SIZE / 2) {
     return 0;
   } else {
-    return coord > CHART_CENTER_WIDTH ? -POINT_RADIUS : POINT_RADIUS;
+    return coord > CHART_SIZE / 2 ? -POINT_RADIUS : POINT_RADIUS;
   }
 };

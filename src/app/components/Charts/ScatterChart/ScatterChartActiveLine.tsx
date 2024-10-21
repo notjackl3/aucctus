@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { CHART_CENTER_WIDTH, Point } from './ScatterChart';
+import { CHART_SIZE, Point } from './ScatterChart';
 import { getActiveAdjustmentDistance, getNormalizedCoord } from './utils';
 
 export interface QuadrantChartActiveLinesProps {
@@ -24,7 +24,7 @@ const QuadrantChartActiveLines: FunctionComponent<
       <>
         {/* x-axis-line */}
         <line
-          x1={CHART_CENTER_WIDTH}
+          x1={CHART_SIZE / 2}
           y1={y}
           x2={x + xOffset}
           y2={y}
@@ -34,7 +34,7 @@ const QuadrantChartActiveLines: FunctionComponent<
         {/* y-axis-line */}
         <line
           x1={x}
-          y1={CHART_CENTER_WIDTH}
+          y1={CHART_SIZE / 2}
           x2={x}
           y2={y + yOffset}
           stroke={activeCoordinate.activeColor}
