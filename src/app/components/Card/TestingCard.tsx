@@ -35,7 +35,7 @@ const Testing: React.FC<TestingProps> = ({
   const hasStarted = status !== 'notStarted';
 
   return (
-    <div className='flex h-fit min-h-36 min-w-[432px] flex-col items-start justify-start gap-2 rounded-lg border border-gray-200 bg-white p-3 shadow-sm'>
+    <div className='flex h-fit min-h-36 min-w-[432px] flex-col items-start justify-start gap-2 rounded-lg border border-gray-200 bg-white p-4 shadow-sm'>
       <div className='inline-flex items-center justify-between self-stretch'>
         <div className='inline-flex flex-col items-start justify-start gap-2'>
           <div className='text-xs font-medium text-gray-500'>
@@ -71,7 +71,7 @@ const Testing: React.FC<TestingProps> = ({
         <div className='flex-flex-grow-1 inline-flex shrink grow  flex-col items-start justify-start gap-5'>
           <Header.AssumptionTest test={type} stage={stage} />
           {/* Description */}
-          <div className='flex w-52 flex-col items-start justify-start gap-1.5'>
+          <div className='flex w-72 flex-col items-start justify-start gap-1.5'>
             <span className='self-stretch text-xs font-medium text-slate-500'>
               Test Description
             </span>
@@ -82,7 +82,7 @@ const Testing: React.FC<TestingProps> = ({
         </div>
 
         {/* Left Side */}
-        <div className='inline-flex h-full min-w-[160px] shrink grow flex-col items-start justify-start gap-5'>
+        <div className='inline-flex h-full shrink grow flex-col items-start justify-start gap-5'>
           <div className='flex flex-col items-start justify-start gap-2 self-stretch'>
             <span className='self-stretch text-xs font-medium text-slate-500'>
               Test Status
