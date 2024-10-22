@@ -1,4 +1,4 @@
-import { Button, Header, Icon } from '@components';
+import { Button, Header, Icon, Tooltip } from '@components';
 import { ConceptTestStatus } from '@libs/api/types';
 import React from 'react';
 
@@ -26,7 +26,7 @@ const Footer: React.FC<FooterProps> = ({ status }) => {
 
   return (
     <div className='flex h-24 flex-row items-center justify-between gap-2  rounded-b-lg bg-primary-100 px-8 py-4'>
-      <span className='flex flex-row gap-2'>
+      <span className='flex flex-row items-center justify-center gap-2.5'>
         {isCompleted ? (
           <Icon
             variant='check'
@@ -40,23 +40,26 @@ const Footer: React.FC<FooterProps> = ({ status }) => {
           />
         )}
         <Header.Three className='text-xl font-semibold' text={text.header} />
+
+        <span className='max-w-96 text-wrap text-sm text-slate-500 text-center'>
+          {text.subHeader}
+        </span>
       </span>
 
-      <span className='max-w-96 text-wrap text-sm text-slate-500'>
-        {text.subHeader}
-      </span>
+
 
       {/* Conclude Test Button */}
       {status === 'inProgress' && (
-        <Button
-          color='primary'
-          // size='sm'
+        <Tooltip tip='Coming Soon'>
+          <Button
+            disabled
+            color="disabled"
 
-          // TODO: Add functionality to conclude test
-          onClick={() => {}}
-        >
-          Conclude Test
-        </Button>
+            onClick={() => { }}
+          >
+            Conclude Test
+          </Button>
+        </Tooltip>
       )}
     </div>
   );
