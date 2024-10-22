@@ -100,6 +100,7 @@ export interface IAssumptionTestDetails extends IBaseConceptEntity {
 export interface IConceptTestDetails extends IBaseConceptEntity {
   uuid: string;
   identifier: string;
+  description: string;
   stage: ConceptTestStage;
   type: TestType;
   status: ConceptTestStatus;

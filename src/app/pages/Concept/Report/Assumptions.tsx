@@ -27,7 +27,6 @@ const KeyAssumptions: React.FC = () => {
     riskiestCategory,
     averageDuration,
     daysPast,
-    lastMonthAverageTestDuration,
   } = assumptionTestStatusOverview?.overview || {};
 
   const { table, selectedAssumptionUuid, handleRowClick, data, assumptions } =
@@ -40,47 +39,42 @@ const KeyAssumptions: React.FC = () => {
   const { mutate: startTest } = useStartTest(selectedAssumptionUuid || '');
 
   const scatterPoints: Point[] = React.useMemo(() => {
-    return assumptions.map((item) => {
-      const point: Point = {
-        x: item.certainty,
-        y: item.importance,
-        color: getAssumptionHexColor(item.category),
-        activeColor: getAssumptionActiveHexColor(item.category),
-        id: item.uuid,
-      };
-      return point;
-    });
+    return assumptions.map((item) => ({
+      x: item.certainty,
+      y: item.importance,
+      color: getAssumptionHexColor(item.category),
+      activeColor: getAssumptionActiveHexColor(item.category),
+      id: item.uuid,
+    }));
   }, [assumptions]);
 
   return (
     <div className='flex h-auto w-full flex-col gap-6'>
       {/* Upper most cards */}
-      <div className='flex w-fit flex-row flex-wrap gap-6'>
+      <div className='flex w-fit h-full flex-row flex-wrap gap-6'>
         {/* Assumptions Testing Status & Overview Cards */}
-        <div className='flex flex-col gap-6'>
+        <div className='flex flex-col gap-6 justify-between'>
           <Card.AssumptionsTestingStatus
             overview={assumptionTestStatusOverview}
           />
           <div className={'inline-flex items-center justify-between'}>
             <Card.AssumptionOverview
-              header='Average Test Duration'
+              header="Average Test Duration"
               body={averageDuration ? `${averageDuration} Days` : undefined}
-              //  TODO: Set the percentage from last month
               footer={''}
             />
             <Card.AssumptionOverview
-              header='Test Days Remaining'
+              header="Test Days Remaining"
               body={daysRemaining ? `${daysRemaining} Days` : undefined}
               footer={daysPast ? `${daysPast} Days Consumed` : undefined}
             />
             <Card.AssumptionOverview
-              header='Riskiest Category'
-              // bodyProps={{ className:' }
+              header="Riskiest Category"
               body={
                 riskiestCategory ? (
                   <Badge.AssumptionCategory
                     category={riskiestCategory}
-                    textProps={{ className: 'text-3xl' }}
+                    textProps={{ className: 'text-xl' }}
                   />
                 ) : (
                   ''
@@ -99,7 +93,7 @@ const KeyAssumptions: React.FC = () => {
 
         {/* Assumptions Testing Priority */}
         <div className='inline-flex min-h-[440px] min-w-[470px] flex-col items-start justify-start gap-3 rounded-lg border border-gray-200 bg-white p-6'>
-          <Header.Two text='Assumption Testing Priority' />
+          <Header.Two text="Assumption Testing Priority" className="text-xl" />
           <Chart.Scatter
             xAxis={{
               upperLabel: 'Certainty',
@@ -114,11 +108,10 @@ const KeyAssumptions: React.FC = () => {
           />
         </div>
       </div>
-
       {/* Assumptions & Testing Table */}
-      <div className='flex min-w-fit rounded-lg border border-gray-200 bg-white'>
+      <div className='flex w-fit rounded-lg border border-gray-200 bg-white'>
         {/* Assumptions */}
-        <div className='flex w-full min-w-[400px] max-w-[600px] flex-1 flex-col items-start justify-start overflow-y-auto border-r border-gray-200'>
+        <div className='flex w-full min-w-[400px] max-w-[600px] flex-col items-start justify-start overflow-y-auto border-r border-gray-200'>
           {/* Header */}
           <Header.AssumptionsTable
             text='Assumptions'
@@ -162,7 +155,7 @@ const KeyAssumptions: React.FC = () => {
         </div>
 
         {/* Testing */}
-        <div className='flex min-w-fit max-w-[600px] flex-1 flex-col items-start justify-start'>
+        <div className='flex flex-col items-start justify-start'>
           {/* Fixed Header */}
           <Header.AssumptionsTable
             text='Tests'
@@ -171,7 +164,7 @@ const KeyAssumptions: React.FC = () => {
           />
 
           {/* Scrollable Content */}
-          <div className='flex min-h-[675px] w-full flex-col items-center gap-3  overflow-y-auto px-7 py-8'>
+          <div className='flex min-h-[675px] w-full flex-col items-center gap-3  overflow-y-auto px-4 py-8'>
             {/* This will be a list of cards... */}
             {testDetails.map((test) => (
               <Card.Testing
