@@ -63,9 +63,9 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({
           </div>
           <ScrollArea.Viewport className='h-full w-full min-w-[50%]'>
             {sources &&
-              sources.map((source) => (
+              sources.map((source, i) => (
                 <a
-                  key={source.url}
+                  key={`${source.url}-${i}`}
                   href={source.url}
                   target='_blank'
                   rel='noopener noreferrer'
