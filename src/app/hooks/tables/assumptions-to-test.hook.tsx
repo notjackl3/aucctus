@@ -21,10 +21,10 @@ export const useAssumptionsToTestTable = (
         enableColumnFilter: false,
         header: () => 'Assumptions',
         cell: (info) => (
-          <span className='max-w-30 flex items-center gap-1.5 text-wrap'>
+          <span className='flex items-center gap-1.5 text-wrap'>
             <Icon.AssumptionCategory category={info.row.original.category} />
             <Table.Column.Text
-              className='flex max-w-40 text-wrap'
+              className='flex text-wrap'
               value={info.row.original.name}
             />
           </span>
@@ -36,7 +36,7 @@ export const useAssumptionsToTestTable = (
         header: () => 'Testing Goal',
         cell: (info) => (
           <Table.Column.Text
-            className='flex max-w-44'
+            className='flex'
             value={info.getValue() || '--'}
           />
         ),
@@ -47,7 +47,7 @@ export const useAssumptionsToTestTable = (
         header: () => 'Findings',
         cell: (info) => (
           <Table.Column.Text
-            className='flex max-w-44'
+            className='flex'
             value={info.getValue() || '--'}
           />
         ),
