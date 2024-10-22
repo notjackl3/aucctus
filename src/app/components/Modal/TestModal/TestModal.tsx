@@ -21,7 +21,7 @@ const TestModal: React.FC<TestModalProps> = ({
   identifier,
 }) => {
   const { closeModal } = useModal();
-  const [isAssumptionsOpen, setIsAssumptionsOpen] = React.useState(false);
+  const [isAssumptionsOpen, setIsAssumptionsOpen] = React.useState(true);
   const [isTestingPlanOpen, setIsTestingPlanOpen] = React.useState(false);
   const [isFindingsAndResultsOpen, setIsFindingsAndResultsOpen] =
     React.useState(false);
@@ -49,7 +49,7 @@ const TestModal: React.FC<TestModalProps> = ({
     : '--';
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col gap-4 max-w-[1100px]'>
       <div className='flex flex-row justify-between px-8 pt-8'>
         <div className='text-xs font-medium text-gray-500'>
           ID: {identifier}
@@ -73,6 +73,8 @@ const TestModal: React.FC<TestModalProps> = ({
             startDate={formattedStartDate}
             endDate={formattedEndDate}
             runTime={testDetails.runTime}
+            testDescription={testDetails.description}
+            findingsSummary={testDetails.findingsSummary}
             costEstimate={
               testDetails.spec.highLevelCharacteristics.costEstimate
             }
@@ -123,7 +125,7 @@ const TestModal: React.FC<TestModalProps> = ({
             <Container.Collapsible open={isFindingsAndResultsOpen}>
               <Table
                 table={findingsAndResultsTable}
-                emptyTableText='No Findings Logged'
+                emptyTableText='Coming Soon'
                 headerProps={{
                   className: 'text-sm text-slate-500',
                 }}
@@ -148,7 +150,7 @@ const SectionButton: React.FC<{
       className='flex flex-row items-center gap-2 border-b border-gray-200 px-8 pb-4'
       onClick={() => setIsOpen(!isOpen)}
     >
-      <Header.Three text={text} />
+      <Header.Two text={text} className='text-xl' />
       <Icon.RotatingIcon isUp={isOpen} height={24} width={24} />
     </button>
   );
