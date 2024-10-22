@@ -17,6 +17,8 @@ interface HeaderProps {
   startDate: string;
   endDate: string;
   runTime: string;
+  testDescription: string;
+  findingsSummary?: string;
   costEstimate: HighLevelCharacteristics['costEstimate'];
 }
 
@@ -27,6 +29,8 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
   startDate,
   endDate,
   runTime,
+  testDescription,
+  findingsSummary,
   costEstimate,
 }) => {
   return (
@@ -93,8 +97,7 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
           </div>
           <div className='inline-flex items-center justify-center gap-2.5 self-stretch'>
             <div className='h-[45px] shrink grow basis-0 text-xs font-semibold text-gray-500'>
-              Digital survey sent to past in-person attendees of Formula 1
-              races, distributed globally.
+              {testDescription}
             </div>
           </div>
         </div>
@@ -114,10 +117,7 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
           </div>
           <div className='inline-flex items-center justify-center gap-2.5 self-stretch'>
             <div className='shrink grow basis-0 text-xs font-semibold text-gray-500'>
-              86% of fans surveyed indicated a willingness to pay extra for a
-              chance to meet their favourite driver, and most drivers are
-              popular enough to warrant this, but sensitivity to the cost of
-              participation was noted.
+              {findingsSummary || '--'}
             </div>
           </div>
         </div>
