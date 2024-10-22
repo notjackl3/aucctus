@@ -39,10 +39,10 @@ const CostEstimateBadge: React.FC<CostEstimateBadgeProps> = ({
   return (
     <div
       className={
-        'inline-flex items-center justify-center gap-1.5 px-2 py-1 text-sm font-semibold text-gray-600'
+        'inline-flex items-center justify-center gap-1.5 py-1 text-sm font-semibold text-gray-600'
       }
     >
-      <div className='inline-flex items-center justify-center gap-1'>
+      <div className='inline-flex items-center justify-start gap-1'>
         {[...Array(3)].map((_, index) => (
           <div
             key={index}
