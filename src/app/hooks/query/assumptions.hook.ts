@@ -5,6 +5,7 @@ import {
   IAssumptionTestDetails,
   IAssumptionTestStatus,
   IAssumptionTestStatusCategory,
+  ITestStep,
 } from '@libs/api/types/assumptions';
 import { useQuery } from 'react-query';
 import { useGenericConceptMutate, useGenericMutate } from './helper.hooks';
@@ -111,6 +112,14 @@ export const useUpdateAssumptionTestDetails = (assumptionUuid: string) => {
       [AucctusQueryKeys.assumptionTestDetails, assumptionUuid],
       [AucctusQueryKeys.assumption],
     ],
+  );
+};
+
+export const useUpdateConceptTestStep = (conceptTestUuid: string) => {
+  return useGenericMutate<ITestStep, Partial<ITestStep> & { uuid: string }>(
+    (data) =>
+      api.assumption.updateConceptTestStep(conceptTestUuid, data.uuid, data),
+    [[AucctusQueryKeys.conceptTestDetails], [AucctusQueryKeys.assumption]],
   );
 };
 

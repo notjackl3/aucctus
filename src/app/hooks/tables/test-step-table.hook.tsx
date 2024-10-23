@@ -7,13 +7,14 @@ import {
 import React from 'react';
 
 import { Icon, Table } from '@components';
+import { useUpdateConceptTestStep } from '@hooks/query/assumptions.hook';
 import { ITestStep } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 
 const columnHelper = createColumnHelper<ITestStep>();
 
-export const useTestStepTable = (steps: ITestStep[] = []) => {
-  // const { mutate: updateAssumptionTestDetails } = useUpdateAssumptionTestDetails(assumptionUuid);
+export const useTestStepTable = (testUuid: string, steps: ITestStep[] = []) => {
+  const { mutate: updateConceptTestStep } = useUpdateConceptTestStep(testUuid);
 
   const columns = React.useMemo(
     () => [
@@ -27,7 +28,12 @@ export const useTestStepTable = (steps: ITestStep[] = []) => {
               'flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 p-1',
               info.getValue() ? 'bg-green-100' : 'bg-white',
             )}
-            // onClick={() => updateAssumptionTestDetails({ uuid: info.row.original.uuid, isCompleted: !info.getValue() })}
+            onClick={() =>
+              updateConceptTestStep({
+                uuid: info.row.original.uuid,
+                isCompleted: !info.getValue(),
+              })
+            }
           >
             {info.getValue() ? (
               <Icon variant='check' className='text-green-500' />

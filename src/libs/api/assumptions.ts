@@ -8,6 +8,7 @@ import {
   IAssumptionTestStatus,
   IConceptTestDetails,
   IPageResponse,
+  ITestStep,
 } from './types'; // Import the missing type
 
 export class AssumptionsApi extends ApiService {
@@ -86,6 +87,17 @@ export class AssumptionsApi extends ApiService {
         assumptionUuid,
         assumptionTestDetailsUuid,
       ),
+      data,
+    );
+  }
+
+  updateConceptTestStep(
+    conceptTestUuid: string,
+    stepUuid: string,
+    data: Partial<ITestStep> & { uuid: string },
+  ) {
+    return this.patch<ITestStep, Partial<ITestStep> & { uuid: string }>(
+      endpoints.conceptTestStepUuid(conceptTestUuid, stepUuid),
       data,
     );
   }

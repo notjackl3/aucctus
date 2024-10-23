@@ -39,7 +39,7 @@ const TestModal: React.FC<TestModalProps> = ({
     useAssumptionsToTestTable(assumptionsToTest);
   const { table: findingsAndResultsTable } =
     useFindingsAndResultsTable(findings);
-  const { table: testStepsTable } = useTestStepTable(testSteps);
+  const { table: testStepsTable } = useTestStepTable(testUuid, testSteps);
 
   const formattedStartDate = testDetails
     ? utils.time.dateFormatter(testDetails.startDate, { dateOnly: true })
