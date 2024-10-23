@@ -96,6 +96,17 @@ export const useConceptTestDetails = (
   return { ...query, testDetails: query.data };
 };
 
+export const useUpdateAssumptionTestDetails = (assumptionUuid: string) => {
+  return useGenericMutate<IAssumptionTestDetails, Partial<IAssumptionTestDetails> & { uuid: string }>(
+    (data) =>
+      api.assumption.updateAssumptionTestDetails(assumptionUuid, data.uuid, data),
+    [
+      [AucctusQueryKeys.assumptionTestDetails, assumptionUuid],
+      [AucctusQueryKeys.assumption],
+    ],
+  );
+};
+
 const defaultAssumptionTestStatusCategory: IAssumptionTestStatusCategory = {
   status: 'notStarted',
   testProgress: [],
