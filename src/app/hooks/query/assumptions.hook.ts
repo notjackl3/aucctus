@@ -97,9 +97,16 @@ export const useConceptTestDetails = (
 };
 
 export const useUpdateAssumptionTestDetails = (assumptionUuid: string) => {
-  return useGenericMutate<IAssumptionTestDetails, Partial<IAssumptionTestDetails> & { uuid: string }>(
+  return useGenericMutate<
+    IAssumptionTestDetails,
+    Partial<IAssumptionTestDetails> & { uuid: string }
+  >(
     (data) =>
-      api.assumption.updateAssumptionTestDetails(assumptionUuid, data.uuid, data),
+      api.assumption.updateAssumptionTestDetails(
+        assumptionUuid,
+        data.uuid,
+        data,
+      ),
     [
       [AucctusQueryKeys.assumptionTestDetails, assumptionUuid],
       [AucctusQueryKeys.assumption],

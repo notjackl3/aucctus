@@ -13,22 +13,25 @@ import { cn } from '@libs/utils/react';
 const columnHelper = createColumnHelper<ITestStep>();
 
 export const useTestStepTable = (steps: ITestStep[] = []) => {
-
   // const { mutate: updateAssumptionTestDetails } = useUpdateAssumptionTestDetails(assumptionUuid);
 
   const columns = React.useMemo(
     () => [
-
       columnHelper.accessor('isCompleted', {
         id: 'isCompleted',
         enableColumnFilter: false,
         header: () => null,
         cell: (info) => (
           <button
-            className={cn('flex h-9 w-9 rounded-full justify-center items-center border border-gray-200 p-1', info.getValue() ? 'bg-green-100' : 'bg-white')}
-          // onClick={() => updateAssumptionTestDetails({ uuid: info.row.original.uuid, isCompleted: !info.getValue() })}
+            className={cn(
+              'flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 p-1',
+              info.getValue() ? 'bg-green-100' : 'bg-white',
+            )}
+            // onClick={() => updateAssumptionTestDetails({ uuid: info.row.original.uuid, isCompleted: !info.getValue() })}
           >
-            {info.getValue() ? <Icon variant='check' className='text-green-500' /> : null}
+            {info.getValue() ? (
+              <Icon variant='check' className='text-green-500' />
+            ) : null}
           </button>
         ),
       }),

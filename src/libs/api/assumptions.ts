@@ -76,9 +76,16 @@ export class AssumptionsApi extends ApiService {
     );
   }
 
-  updateAssumptionTestDetails(assumptionUuid: string, assumptionTestDetailsUuid: string, data: Partial<IAssumptionTestDetails>) {
+  updateAssumptionTestDetails(
+    assumptionUuid: string,
+    assumptionTestDetailsUuid: string,
+    data: Partial<IAssumptionTestDetails>,
+  ) {
     return this.patch<IAssumptionTestDetails, Partial<IAssumptionTestDetails>>(
-      endpoints.assumptionTestDetailsUuid(assumptionUuid, assumptionTestDetailsUuid),
+      endpoints.assumptionTestDetailsUuid(
+        assumptionUuid,
+        assumptionTestDetailsUuid,
+      ),
       data,
     );
   }
