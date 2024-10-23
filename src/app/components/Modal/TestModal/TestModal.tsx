@@ -49,7 +49,7 @@ const TestModal: React.FC<TestModalProps> = ({
     : '--';
 
   return (
-    <div className='flex flex-col gap-4 max-w-[1100px]'>
+    <div className='flex max-w-[1100px] flex-col gap-4'>
       <div className='flex flex-row justify-between px-8 pt-8'>
         <div className='text-xs font-medium text-gray-500'>
           ID: {identifier}

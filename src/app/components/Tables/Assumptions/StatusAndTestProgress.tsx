@@ -4,7 +4,7 @@ import React from 'react';
 
 interface StatusAndTestProgressProps {
   status: AssumptionTestStatus;
-  testProgress: [AssumptionTestStatus];
+  testProgress: AssumptionTestStatus[];
 }
 
 const commonClass =
@@ -17,14 +17,14 @@ const StatusAndTestProgress: React.FC<StatusAndTestProgressProps> = ({
   return (
     <div className='flex h-full grow flex-col justify-start gap-4'>
       <div className={commonClass}>
-        <div className='self-stretch text-xs font-medium text-slate-500'>
+        <div className='self-stretch text-sm font-medium text-slate-500'>
           Validation Status
         </div>
         <Badge.ValidationStatus status={status} />
       </div>
 
       <div className={commonClass}>
-        <div className='self-stretch text-xs font-medium text-slate-500'>
+        <div className='self-stretch text-sm font-medium text-slate-500'>
           Testing Progress
         </div>
         <div className='flex max-w-[160px] flex-row items-start justify-start gap-2 self-stretch overflow-x-scroll'>

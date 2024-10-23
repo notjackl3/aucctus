@@ -51,25 +51,25 @@ const KeyAssumptions: React.FC = () => {
   return (
     <div className='flex h-auto w-full flex-col gap-6'>
       {/* Upper most cards */}
-      <div className='flex w-fit h-full flex-row flex-wrap gap-6'>
+      <div className='flex h-full w-fit flex-row flex-wrap gap-6'>
         {/* Assumptions Testing Status & Overview Cards */}
-        <div className='flex flex-col gap-6 justify-between'>
+        <div className='flex flex-col justify-between gap-6'>
           <Card.AssumptionsTestingStatus
             overview={assumptionTestStatusOverview}
           />
           <div className={'inline-flex items-center justify-between'}>
             <Card.AssumptionOverview
-              header="Average Test Duration"
+              header='Average Test Duration'
               body={averageDuration ? `${averageDuration} Days` : undefined}
               footer={''}
             />
             <Card.AssumptionOverview
-              header="Test Days Remaining"
+              header='Test Days Remaining'
               body={daysRemaining ? `${daysRemaining} Days` : undefined}
               footer={daysPast ? `${daysPast} Days Consumed` : undefined}
             />
             <Card.AssumptionOverview
-              header="Riskiest Category"
+              header='Riskiest Category'
               body={
                 riskiestCategory ? (
                   <Badge.AssumptionCategory
@@ -93,7 +93,7 @@ const KeyAssumptions: React.FC = () => {
 
         {/* Assumptions Testing Priority */}
         <div className='inline-flex min-h-[440px] min-w-[470px] flex-col items-start justify-start gap-3 rounded-lg border border-gray-200 bg-white p-6'>
-          <Header.Two text="Assumption Testing Priority" className="text-xl" />
+          <Header.Two text='Assumption Testing Priority' className='text-xl' />
           <Chart.Scatter
             xAxis={{
               upperLabel: 'Certainty',
@@ -119,10 +119,7 @@ const KeyAssumptions: React.FC = () => {
             handleAdd={() => null}
           />
           <div className='inline-flex w-full items-center justify-between self-stretch border-b border-gray-200 px-3 py-2'>
-
-            <div>
-              {/* This will display active filters */}
-            </div>
+            <div>{/* This will display active filters */}</div>
             <div className='inline-flex h-3 items-center justify-end gap-2'>
               <button>
                 <Icon variant='filter-lines' />

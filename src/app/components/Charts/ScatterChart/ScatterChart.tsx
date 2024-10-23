@@ -81,52 +81,44 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   }, [data, getPoints, selectedItem]);
 
   return (
-    <div className="flex self-start bg-white w-full">
+    <div className='flex w-full self-start bg-white'>
       <svg
-        className="w-full h-auto max-w-full max-h-[500px]" // Max height is 500px but you can adjust
+        className='h-auto max-h-[500px] w-full max-w-full' // Max height is 500px but you can adjust
         viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
-        xmlns="http://www.w3.org/2000/svg"
+        xmlns='http://www.w3.org/2000/svg'
       >
         <ScatterChartGrid numberGridLines={10} spacing={CHART_SIZE / 10} />
         <line
           x1={CHART_SIZE / 2}
-          y1="0"
+          y1='0'
           x2={CHART_SIZE / 2}
           y2={CHART_SIZE}
-          stroke="#E0E5F2"
-          strokeWidth="10"
+          stroke='#E0E5F2'
+          strokeWidth='10'
         />
         <line
-          x1="0"
+          x1='0'
           y1={CHART_SIZE / 2}
           x2={CHART_SIZE}
           y2={CHART_SIZE / 2}
-          stroke="#E0E5F2"
-          strokeWidth="10"
+          stroke='#E0E5F2'
+          strokeWidth='10'
         />
         {points}
         <ScatterChartActiveLines activeChartPoint={activePoint} />
         <text
           x={`${CHART_SIZE - 320}`}
           y={`${CHART_SIZE / 2 + 80}`}
-          fill="#667085"
-          fontFamily="Inter"
-          fontSize="48"
+          fill='#667085'
+          fontFamily='Inter'
+          fontSize='48'
         >
           {xAxis.lowerLabel}
         </text>
-        <text
-          x="80"
-          y={`${CHART_SIZE / 2 + 80}`}
-          {...defaultTextProps}
-        >
+        <text x='80' y={`${CHART_SIZE / 2 + 80}`} {...defaultTextProps}>
           {xAxis.upperLabel}
         </text>
-        <text
-          x={`${CHART_SIZE / 2 - 40}`}
-          y="80"
-          {...defaultTextProps}
-        >
+        <text x={`${CHART_SIZE / 2 - 40}`} y='80' {...defaultTextProps}>
           {yAxis.upperLabel}
         </text>
         <text

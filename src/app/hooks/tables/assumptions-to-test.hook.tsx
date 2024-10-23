@@ -35,10 +35,7 @@ export const useAssumptionsToTestTable = (
         enableColumnFilter: false,
         header: () => 'Testing Goal',
         cell: (info) => (
-          <Table.Column.Text
-            className='flex'
-            value={info.getValue() || '--'}
-          />
+          <Table.Column.Text className='flex' value={info.getValue() || '--'} />
         ),
       }),
       columnHelper.accessor('findings', {
@@ -46,10 +43,7 @@ export const useAssumptionsToTestTable = (
         enableColumnFilter: false,
         header: () => 'Findings',
         cell: (info) => (
-          <Table.Column.Text
-            className='flex'
-            value={info.getValue() || '--'}
-          />
+          <Table.Column.Text className='flex' value={info.getValue() || '--'} />
         ),
       }),
       columnHelper.accessor('status', {

@@ -17,7 +17,7 @@ const AssumptionOverview: React.FC<AssumptionOverviewProps> = ({
   return (
     <div
       className={cn(
-        'inline-flex h-32 flex-col min-w-fit items-start justify-start gap-3 rounded-lg border border-gray-200 bg-white px-4 py-4',
+        'inline-flex h-32 min-w-fit flex-col items-start justify-start gap-3 rounded-lg border border-gray-200 bg-white px-4 py-4',
       )}
     >
       <div className={cn('self-stretch text-sm font-medium text-slate-500')}>

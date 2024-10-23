@@ -22,6 +22,12 @@ interface HeaderProps {
   costEstimate: HighLevelCharacteristics['costEstimate'];
 }
 
+const TEST_DATES_CLASSES = {
+  CONTAINER: 'inline-flex flex-col items-start justify-start gap-1',
+  LABEL: 'self-stretch text-sm font-medium text-slate-500',
+  VALUE: 'text-base font-semibold text-gray-500',
+};
+
 const AssumptionTestHeader: React.FC<HeaderProps> = ({
   stage,
   type,
@@ -43,9 +49,7 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
 
         {/* Test Status */}
         <div className='inline-flex w-40 flex-col items-start justify-start gap-1'>
-          <div className='self-stretch text-xs font-normal text-slate-500'>
-            Test Status
-          </div>
+          <div className={TEST_DATES_CLASSES.LABEL}>Test Status</div>
           <span
             className={classNames(
               ' inline-flex items-center justify-start gap-1.5 self-stretch',
@@ -62,30 +66,18 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
 
         {/* Test Dates */}
         <div className='flex items-center justify-start gap-6'>
-          <div className='inline-flex flex-col items-start justify-start gap-1'>
-            <div className='self-stretch text-xs font-medium text-slate-500'>
-              Start Date
-            </div>
-            <div className='self-stretch text-base font-semibold text-gray-500'>
-              {startDate}
-            </div>
+          <div className={TEST_DATES_CLASSES.CONTAINER}>
+            <div className={TEST_DATES_CLASSES.LABEL}>Start Date</div>
+            <div className={TEST_DATES_CLASSES.VALUE}>{startDate}</div>
           </div>
-          <div className='inline-flex flex-col items-start justify-start gap-1'>
-            <div className='self-stretch text-xs font-medium text-slate-500'>
-              End Date
-            </div>
-            <div className='text-base font-semibold text-gray-500'>
-              {endDate}
-            </div>
+          <div className={TEST_DATES_CLASSES.CONTAINER}>
+            <div className={TEST_DATES_CLASSES.LABEL}>End Date</div>
+            <div className={TEST_DATES_CLASSES.VALUE}>{endDate}</div>
           </div>
-          <div className='inline-flex flex-col items-start justify-start gap-1'>
-            <div className='self-stretch text-xs font-medium text-slate-500'>
-              Run Time
-            </div>
-            <div className='text-base font-semibold text-gray-500'>
-              {runTime}
-            </div>
-          </div>
+        </div>
+        <div className={TEST_DATES_CLASSES.CONTAINER}>
+          <div className={TEST_DATES_CLASSES.LABEL}>Run Time</div>
+          <div className={TEST_DATES_CLASSES.VALUE}>{runTime}</div>
         </div>
       </div>
 

@@ -41,22 +41,15 @@ const Footer: React.FC<FooterProps> = ({ status }) => {
         )}
         <Header.Three className='text-xl font-semibold' text={text.header} />
 
-        <span className='max-w-96 text-wrap text-sm text-slate-500 text-center'>
+        <span className='max-w-96 text-wrap text-center text-sm text-slate-500'>
           {text.subHeader}
         </span>
       </span>
 
-
-
       {/* Conclude Test Button */}
       {status === 'inProgress' && (
         <Tooltip tip='Coming Soon'>
-          <Button
-            disabled
-            color="disabled"
-
-            onClick={() => { }}
-          >
+          <Button disabled color='disabled' onClick={() => {}}>
             Conclude Test
           </Button>
         </Tooltip>

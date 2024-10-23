@@ -28,6 +28,7 @@ export const useAssumptionsTable = (conceptUuid: string) => {
           <Table.Column.TitleDescription
             title={info.getValue()}
             description={info.row.original.text}
+            maxDescriptionHeight={72}
           />
         ),
       }),

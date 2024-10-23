@@ -14,7 +14,7 @@ const AssumptionTestingStatus: React.FC<AssumptionTestingStatusProps> = ({
   overview,
 }) => {
   return (
-    <div className='inline-flex h-auto flex-col min-w-fit items-start justify-start gap-7 rounded-lg border border-gray-200 bg-white px-6 py-8'>
+    <div className='inline-flex h-auto min-w-fit flex-col items-start justify-start gap-7 rounded-lg border border-gray-200 bg-white px-6 py-8'>
       {/* Header */}
       <div className='inline-flex items-center justify-between self-stretch bg-white'>
         <div className='text-xl font-semibold text-[#2b3674]'>

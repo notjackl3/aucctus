@@ -6,7 +6,7 @@ import {
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/assumptions';
-import classNames from 'classnames';
+import { cn } from '@libs/utils/react';
 import React from 'react';
 
 interface TestingProps {
@@ -19,6 +19,14 @@ interface TestingProps {
   handleStartTest: () => void;
   handleOpenTest: () => void;
 }
+
+const defaultProps = {
+  headerFontSize: 'text-sm',
+  headerFontColor: 'text-slate-500',
+  headerFontWeight: 'font-semibold',
+  valueFontSize: 'text-sm',
+  valueFontColor: 'text-gray-500',
+};
 
 const Testing: React.FC<TestingProps> = ({
   identifier,
@@ -35,7 +43,7 @@ const Testing: React.FC<TestingProps> = ({
   const hasStarted = status !== 'notStarted';
 
   return (
-    <div className='flex h-fit min-h-36 min-w-[432px] flex-col items-start justify-start gap-2 rounded-lg border border-gray-200 bg-white p-4 shadow-sm'>
+    <div className='flex h-fit min-h-36 min-w-[492px] flex-col items-start justify-start gap-2 rounded-lg border border-gray-200 bg-white p-4 shadow-sm'>
       <div className='inline-flex items-center justify-between self-stretch'>
         <div className='inline-flex flex-col items-start justify-start gap-2'>
           <div className='text-xs font-medium text-gray-500'>
@@ -72,10 +80,21 @@ const Testing: React.FC<TestingProps> = ({
           <Header.AssumptionTest test={type} stage={stage} />
           {/* Description */}
           <div className='flex w-72 flex-col items-start justify-start gap-1.5'>
-            <span className='self-stretch text-xs font-medium text-slate-500'>
+            <span
+              className={cn(
+                defaultProps.headerFontSize,
+                defaultProps.headerFontColor,
+                defaultProps.headerFontWeight,
+              )}
+            >
               Test Description
             </span>
-            <span className='self-stretch text-wrap text-xs font-semibold text-gray-500'>
+            <span
+              className={cn(
+                defaultProps.valueFontSize,
+                defaultProps.valueFontColor,
+              )}
+            >
               {description}
             </span>
           </div>
@@ -84,12 +103,19 @@ const Testing: React.FC<TestingProps> = ({
         {/* Left Side */}
         <div className='inline-flex h-full shrink grow flex-col items-start justify-start gap-5'>
           <div className='flex flex-col items-start justify-start gap-2 self-stretch'>
-            <span className='self-stretch text-xs font-medium text-slate-500'>
+            <span
+              className={cn(
+                defaultProps.headerFontSize,
+                defaultProps.headerFontColor,
+                defaultProps.headerFontWeight,
+              )}
+            >
               Test Status
             </span>
             <span
-              className={classNames(
-                'flex  items-center justify-start gap-2 text-ellipsis text-nowrap align-middle text-sm font-semibold',
+              className={cn(
+                'flex  items-center justify-start gap-2 text-ellipsis text-nowrap align-middle',
+                defaultProps.valueFontSize,
                 validationStatusVisuals.text,
                 validationStatusVisuals.svg,
               )}
@@ -107,10 +133,22 @@ const Testing: React.FC<TestingProps> = ({
           </div>
 
           <div className='flex flex-col items-start justify-start gap-2 self-stretch'>
-            <div className='self-stretch text-xs font-medium text-slate-500'>
+            <div
+              className={cn(
+                'self-stretch',
+                defaultProps.headerFontSize,
+                defaultProps.headerFontColor,
+                defaultProps.headerFontWeight,
+              )}
+            >
               Run Time
             </div>
-            <div className='text-base font-semibold text-gray-500'>
+            <div
+              className={cn(
+                defaultProps.valueFontSize,
+                defaultProps.valueFontColor,
+              )}
+            >
               {duration}
             </div>
           </div>

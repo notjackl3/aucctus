@@ -1,11 +1,14 @@
 import { Icon } from '@components';
+import { cn } from '@libs/utils/react';
 import { animated, useSpring } from '@react-spring/web';
-import classNames from 'classnames';
 import React from 'react';
 
 interface TitleDescriptionProps {
   title: string;
+  titleClassName?: string;
   description: string;
+  // Note: trying to set the position of the description will not work as this is being enforced to a relative position to ensure the animation works properly
+  descriptionClassName?: string;
   maxDescriptionHeight?: number;
 }
 
@@ -13,7 +16,9 @@ interface TitleDescriptionProps {
 
 const TitleDescription: React.FC<TitleDescriptionProps> = ({
   title,
+  titleClassName,
   description,
+  descriptionClassName,
   maxDescriptionHeight = 60,
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -71,15 +76,22 @@ const TitleDescription: React.FC<TitleDescriptionProps> = ({
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <span className='text-base font-medium text-indigo-900'>{title}</span>
+      <span
+        className={cn('text-base font-medium text-indigo-900', titleClassName)}
+      >
+        {title}
+      </span>
       <animated.span
         ref={textRef}
-        className={classNames(
-          'relative text-base font-medium leading-tight text-slate-500',
+        className={cn(
+          'text-sm font-medium leading-tight text-slate-500',
           {
             'line-clamp-3': !open,
             'cursor-pointer': isTruncated,
           },
+          descriptionClassName,
+          // This is to ensure relative is set and takes priority
+          'relative',
         )}
         style={animatedStyles}
       >
