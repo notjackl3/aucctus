@@ -76,7 +76,7 @@ export const useTestStepTable = (testUuid: string, steps: ITestStep[] = []) => {
         ),
       }),
     ],
-    [],
+    [updateConceptTestStep],
   );
 
   const table = useReactTable({
