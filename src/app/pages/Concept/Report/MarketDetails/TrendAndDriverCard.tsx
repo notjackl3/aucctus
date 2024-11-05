@@ -39,7 +39,14 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
           aria-label='See Source'
           onClick={(e) => {
             e.preventDefault();
-            window.open(trendAndDriver.source, '_blank');
+            let source = trendAndDriver.source;
+
+            // TODO: TEMP
+            if (!source || source.trim() === '') {
+              source = trendAndDriver.sources[0];
+            }
+
+            window.open(source, '_blank');
           }}
         >
           See Source
