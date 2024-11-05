@@ -14,7 +14,7 @@ interface TitleDescriptionProps {
 
 // const MAX_DESCRIPTION_HEIGHT = 60;
 
-const TitleDescription: React.FC<TitleDescriptionProps> = ({
+const CollapsibleText: React.FC<TitleDescriptionProps> = ({
   title,
   titleClassName,
   description,
@@ -113,4 +113,4 @@ const TitleDescription: React.FC<TitleDescriptionProps> = ({
   );
 };
 
-export default TitleDescription;
+export default CollapsibleText;

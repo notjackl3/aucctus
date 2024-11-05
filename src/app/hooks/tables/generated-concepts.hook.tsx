@@ -8,7 +8,7 @@ import {
 } from '@tanstack/react-table';
 import React from 'react';
 
-import { Input, Table } from '@components';
+import { Input, Text } from '@components';
 import { IGeneratedConcept } from '@libs/api/types';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 
@@ -71,7 +71,7 @@ export const useGeneratedConcepts = () => {
         enableSorting: false,
         header: () => 'Concept',
         cell: (info) => (
-          <Table.Column.TitleDescription
+          <Text.Collapsible
             title={info.getValue()}
             description={info.row.original.description}
           />

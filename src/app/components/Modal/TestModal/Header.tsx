@@ -1,4 +1,4 @@
-import { Badge, Header, Icon } from '@components';
+import { Badge, Header, Icon, Text } from '@components';
 import {
   ConceptTestStage,
   ConceptTestStatus,
@@ -22,10 +22,12 @@ interface HeaderProps {
   costEstimate: HighLevelCharacteristics['costEstimate'];
 }
 
-const TEST_DATES_CLASSES = {
-  CONTAINER: 'inline-flex flex-col items-start justify-start gap-1',
-  LABEL: 'self-stretch text-sm font-medium text-slate-500',
-  VALUE: 'text-base font-semibold text-gray-500',
+const defaultProps = {
+  testDate: {
+    container: 'inline-flex flex-col items-start justify-start gap-1',
+    label: 'self-stretch text-sm font-medium text-slate-500',
+    value: 'text-base font-semibold text-gray-500',
+  },
 };
 
 const AssumptionTestHeader: React.FC<HeaderProps> = ({
@@ -40,16 +42,27 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
   costEstimate,
 }) => {
   return (
-    <div className=' inline-flex flex-col items-start justify-start gap-2 border-b border-gray-200 px-8 pb-4'>
-      <div className='inline-flex items-start justify-start gap-6'>
+    <div className='flex flex-row items-start justify-start gap-8 border-b border-gray-200 px-8 pb-4'>
+      <div className='flex max-w-lg flex-col items-start justify-start gap-2 from-white'>
         {/* Test Type */}
         <div className='w-64'>
           <Header.AssumptionTest test={type} stage={stage} lg />
         </div>
 
+        {/* Test Description */}
+        <Text.Collapsible
+          title='Test Description'
+          titleClassName='self-stretch text-base font-medium text-slate-500'
+          description={testDescription}
+          descriptionClassName='text-xs font-semibold text-gray-500'
+          maxDescriptionHeight={45}
+        />
+      </div>
+
+      <div className='flex flex-col gap-2'>
         {/* Test Status */}
-        <div className='inline-flex w-40 flex-col items-start justify-start gap-1'>
-          <div className={TEST_DATES_CLASSES.LABEL}>Test Status</div>
+        <div className='inline-flex flex-col items-start justify-start gap-1'>
+          <div className={defaultProps.testDate.label}>Test Status</div>
           <span
             className={classNames(
               ' inline-flex items-center justify-start gap-1.5 self-stretch',
@@ -63,43 +76,30 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
             {utils.string.camelCaseToTitleCase(status)}
           </span>
         </div>
-
-        {/* Test Dates */}
-        <div className='flex items-center justify-start gap-6'>
-          <div className={TEST_DATES_CLASSES.CONTAINER}>
-            <div className={TEST_DATES_CLASSES.LABEL}>Start Date</div>
-            <div className={TEST_DATES_CLASSES.VALUE}>{startDate}</div>
-          </div>
-          <div className={TEST_DATES_CLASSES.CONTAINER}>
-            <div className={TEST_DATES_CLASSES.LABEL}>End Date</div>
-            <div className={TEST_DATES_CLASSES.VALUE}>{endDate}</div>
-          </div>
-        </div>
-        <div className={TEST_DATES_CLASSES.CONTAINER}>
-          <div className={TEST_DATES_CLASSES.LABEL}>Run Time</div>
-          <div className={TEST_DATES_CLASSES.VALUE}>{runTime}</div>
-        </div>
-      </div>
-
-      {/* Test Description */}
-      <div className='inline-flex items-start justify-start gap-6'>
-        <div className='inline-flex w-64 flex-col items-start justify-start gap-1 self-stretch'>
-          <div className='self-stretch text-base font-medium text-slate-500'>
-            Test Description
-          </div>
-          <div className='inline-flex items-center justify-center gap-2.5 self-stretch'>
-            <div className='h-[45px] shrink grow basis-0 text-xs font-semibold text-gray-500'>
-              {testDescription}
-            </div>
-          </div>
-        </div>
-
         {/* Cost Estimate */}
-        <div className='inline-flex w-40 flex-col items-start justify-center gap-1 self-stretch'>
+        <div className='inline-flex flex-col items-start justify-center gap-1 self-stretch'>
           <div className='self-stretch text-base font-medium text-slate-500'>
             Cost Estimate
           </div>
           <Badge.CostEstimate costEstimate={costEstimate} />
+        </div>
+      </div>
+
+      <div className='flex flex-col gap-2'>
+        {/* Test Dates */}
+        <div className='flex min-w-fit flex-row items-center justify-start gap-8'>
+          <div className={defaultProps.testDate.container}>
+            <div className={defaultProps.testDate.label}>Start Date</div>
+            <div className={defaultProps.testDate.value}>{startDate}</div>
+          </div>
+          <div className={defaultProps.testDate.container}>
+            <div className={defaultProps.testDate.label}>End Date</div>
+            <div className={defaultProps.testDate.value}>{endDate}</div>
+          </div>
+          <div className={defaultProps.testDate.container}>
+            <div className={defaultProps.testDate.label}>Run Time</div>
+            <div className={defaultProps.testDate.value}>{runTime}</div>
+          </div>
         </div>
 
         {/* Summary of Findings */}

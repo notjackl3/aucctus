@@ -6,7 +6,7 @@ import {
 } from '@tanstack/react-table';
 import React from 'react';
 
-import { Table } from '@components';
+import { Table, Text } from '@components';
 import { useAssumptions } from '@hooks/query/assumptions.hook';
 import { IAssumption } from '@libs/api/types';
 
@@ -25,7 +25,7 @@ export const useAssumptionsTable = (conceptUuid: string) => {
         enableColumnFilter: false,
         header: () => null,
         cell: (info) => (
-          <Table.Column.TitleDescription
+          <Text.Collapsible
             title={info.getValue()}
             description={info.row.original.text}
             maxDescriptionHeight={72}

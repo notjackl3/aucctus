@@ -1,4 +1,4 @@
-import { Button, Table } from '@components';
+import { Button, Table, Text } from '@components';
 import { useConcepts } from '@hooks/query/concepts.hook';
 import {
   ConceptSort,
@@ -190,7 +190,7 @@ export const useConceptBank = () => {
         enableColumnFilter: false,
         header: () => 'Concept',
         cell: (info) => (
-          <Table.Column.TitleDescription
+          <Text.Collapsible
             title={info.getValue()}
             description={info.row.original.description}
           />

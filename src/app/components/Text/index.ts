@@ -1,6 +1,8 @@
 import EditModeSwitcher from './EditModeSwitcher/EditModeSwitcher';
 import RowInfo from './RowInfo';
 import SeedField from './SeedField';
+import Collapsible from './CollapsibleText';
+
 import WhiteSpaceSuggestion from './WhiteSpaceSuggestions';
 
 const Text = {
@@ -8,6 +10,7 @@ const Text = {
   RowInfo,
   SeedField,
   WhiteSpaceSuggestion,
+  Collapsible,
 };
 
 export default Text;
