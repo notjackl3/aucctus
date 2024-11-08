@@ -2,7 +2,7 @@ name: S3/CloudFront CI/CD
 
 on:
   push:
-    branches: [develop]
+    branches: [developppp] # remove or undo
 
 env:
   VITE_AUCCTUS_BASE_RESOURCE_URL: https://resource.staging.aucctus.com
