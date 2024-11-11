@@ -30,6 +30,7 @@ build
 *.local
 .env
 .env.*
+!.env.sample
 
 src/app/assets/.DS_Store
 .DS_Store

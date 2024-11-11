@@ -1,3 +1,4 @@
+import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
 import path from 'path';
 import { splitVendorChunkPlugin } from 'vite';
@@ -30,11 +31,23 @@ export default defineConfig((config) => {
 
   const devPlugins = [watchIcons(), viteBoilerplatePlugin(), eslint()];
 
-  const plugins = [...defaultPlugins, ...(isDevelopment ? devPlugins : [])];
+  const plugins = [
+    ...defaultPlugins,
+    ...(isDevelopment ? devPlugins : []),
+    // Sentry must be the last plugin
+    sentryVitePlugin({
+      org: 'aucctus',
+      project: 'front-end-react',
+      authToken: process.env.SENTRY_AUTH_TOKEN,
+    }),
+  ];
 
   return {
     publicDir: 'public',
     plugins: plugins,
+    define: {
+      __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+    },
     css: {
       preprocessorOptions: {
         scss: {

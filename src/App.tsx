@@ -1,11 +1,14 @@
-import { Suspense } from 'react';
-import { Route, Routes, Navigate } from 'react-router-dom';
-import { Slide, ToastContainer } from 'react-toastify';
-import { usePublicRoutes, usePrivateRoutes } from '@routes/hooks';
-import AuthGuard from '@routes/guards/auth.guard';
-import { AppPath } from '@routes/routes';
-import Page from '@pages';
 import Loading from '@components/Loading';
+import Page from '@pages';
+import AuthGuard from '@routes/guards/auth.guard';
+import { usePrivateRoutes, usePublicRoutes } from '@routes/hooks';
+import { AppPath } from '@routes/routes';
+import * as Sentry from '@sentry/react';
+import { Suspense } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { Slide, ToastContainer } from 'react-toastify';
+
+const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
 function App() {
   // Public Routes (Unauthenticated)
@@ -17,7 +20,7 @@ function App() {
   return (
     <div role='main' className='App'>
       <Suspense fallback={<Loading />}>
-        <Routes>
+        <SentryRoutes>
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>
             <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
@@ -31,7 +34,7 @@ function App() {
           </Route>
 
           <Route path='*' element={<Navigate to={AppPath.Home} replace />} />
-        </Routes>
+        </SentryRoutes>
 
         <ToastContainer
           position='bottom-center'

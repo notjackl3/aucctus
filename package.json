@@ -1,7 +1,7 @@
 {
   "name": "aucctus",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.0.1",
   "type": "commonjs",
   "scripts": {
     "dev": "vite",
@@ -35,6 +35,7 @@
     "@radix-ui/react-select": "^2.1.1",
     "@react-spring/web": "^9.7.3",
     "@reduxjs/toolkit": "^1.8.1",
+    "@sentry/react": "^8.37.1",
     "@tanstack/match-sorter-utils": "^8.11.8",
     "@tanstack/react-table": "^8.10.7",
     "@tanstack/react-virtual": "^3.8.4",
@@ -62,6 +63,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
+    "@sentry/vite-plugin": "^2.22.6",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^4.0.0",

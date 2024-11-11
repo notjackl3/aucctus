@@ -3,6 +3,7 @@
 
 interface ImportMetaEnv {
   readonly VITE_AUCCTUS_BASE_RESOURCE_URL: string;
+  readonly VITE_SENTRY_DNS: string;
   readonly VITE_SECRET_KEY: string;
 }
 
@@ -20,3 +21,5 @@ declare module '*.svg' {
   const src: string;
   export default src;
 }
+
+declare const __APP_VERSION__: string;
