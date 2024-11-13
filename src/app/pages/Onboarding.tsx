@@ -12,7 +12,7 @@ import { useAppStore } from '../stores/app.store';
 
 const OnBoarding: FunctionComponent = () => {
   const { user } = useAppStore();
-  const { mutate: registerAccount } = useRegisterAccount();
+  const { mutate: registerAccount, isLoading } = useRegisterAccount();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');
   const [innovationGoal, setGoal] = useState<string>('');
@@ -40,7 +40,6 @@ const OnBoarding: FunctionComponent = () => {
       }
 
       setDomain(d);
-      e.preventDefault();
     },
     [domain],
   );
@@ -68,7 +67,6 @@ const OnBoarding: FunctionComponent = () => {
               placeholder='Acme Widgets Corp.'
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setName(e.target.value);
-                e.preventDefault();
               }}
             />
             <InputField
@@ -80,7 +78,6 @@ const OnBoarding: FunctionComponent = () => {
               placeholder='www.acmewidgetscorp.com'
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setDomain(e.target.value);
-                e.preventDefault();
               }}
               onFocus={() => setDomainInputError(undefined)}
               onBlur={_handleDomainValidation}
@@ -95,7 +92,6 @@ const OnBoarding: FunctionComponent = () => {
               placeholder='Expand into new industries.'
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 setGoal(e.target.value);
-                e.preventDefault();
               }}
             />
 
@@ -103,7 +99,6 @@ const OnBoarding: FunctionComponent = () => {
               type='button'
               className='btn btn-primary'
               onClick={(e) => {
-                e.preventDefault();
                 registerAccount({ name, domain, goal: innovationGoal });
               }}
               disabled={
@@ -111,7 +106,7 @@ const OnBoarding: FunctionComponent = () => {
                 !domain ||
                 !innovationGoal ||
                 !!domainInputError ||
-                status === 'loading'
+                isLoading
               }
             >
               Complete

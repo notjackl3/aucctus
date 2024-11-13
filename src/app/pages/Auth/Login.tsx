@@ -12,13 +12,12 @@ const Login: FunctionComponent = () => {
   const [password, setPassword] = useState<string>('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
 
-  const _handleEmailValidation = (e: React.FocusEvent) => {
+  const _handleEmailValidation = () => {
     if (email && !utils.string.validEmail(email)) {
       setEmailInputError('Email is Invalid.');
     } else {
       setEmailInputError(undefined);
     }
-    e.preventDefault();
   };
 
   return (
@@ -77,9 +76,8 @@ const Login: FunctionComponent = () => {
         <button
           type='button'
           className='btn btn-primary'
-          onClick={async (e) => {
+          onClick={async () => {
             login({ email, password });
-            e.preventDefault();
           }}
           disabled={!email || !password || !!emailInputError || isLoading}
         >
