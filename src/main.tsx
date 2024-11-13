@@ -19,11 +19,9 @@ import { ModalProvider } from './app/context/ModalContextProvider';
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
 
-const VERSION = __APP_VERSION__;
-
 Sentry.init({
-  environment: process.env.NODE_ENV,
-  release: VERSION,
+  environment: __APP_ENVIRONMENT__,
+  release: __APP_VERSION__,
   dsn: import.meta.env.VITE_SENTRY_DNS,
   integrations: [
     Sentry.browserTracingIntegration(),

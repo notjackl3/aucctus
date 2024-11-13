@@ -47,6 +47,7 @@ export default defineConfig((config) => {
     plugins: plugins,
     define: {
       __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+      __APP_ENVIRONMENT__: JSON.stringify(process.env.NODE_ENV),
     },
     css: {
       preprocessorOptions: {
