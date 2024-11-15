@@ -27,7 +27,6 @@ module.exports = {
           500: '#615eed',
           600: '#4318ff',
         },
-
         // Assumptions Colors
         desirability: '#7839ee',
         viability: '#0e9384',

@@ -98,6 +98,17 @@ export const useConcept = (uuid?: string) => {
   return { ...query, concept: query.data };
 };
 
+export const useDownloadConcept = (uuid?: string) => {
+  const query = useQuery({
+    queryFn: async () =>
+      uuid ? await api.concept.downloadConcept(uuid) : void 0,
+    enabled: !!uuid,
+    cacheTime: 0, // disable caching
+  });
+
+  return { ...query, concept: query.data };
+};
+
 /**
  * Custom hook for saving generated concepts.
  *

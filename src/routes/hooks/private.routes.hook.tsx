@@ -13,10 +13,6 @@ const usePrivateRoutes = () => {
       <Route index path={AppPath.Home} element={<Page.Dashboard />} />
       <Route path={AppPath.IgniteConcept} element={<Page.Concept.Ignite />} />
       <Route
-        path={AppPath.ConceptSnapshot}
-        element={<Page.Concept.Snapshot />}
-      />
-      <Route
         path={AppPath.GeneratedConcepts}
         element={<Page.Concept.Generated />}
       />

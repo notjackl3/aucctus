@@ -27,6 +27,10 @@ export class Endpoints {
     return `api/v1/concept/${conceptUuid}/`;
   }
 
+  static conceptSnapshotUuid(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/snapshot/download`;
+  }
+
   static conceptReportRetry(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/retry`;
   }

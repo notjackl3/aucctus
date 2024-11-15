@@ -52,6 +52,15 @@ export class ConceptApi extends ApiService {
     return this.get<IConcept>(endpoints.conceptUuid(uuid));
   }
 
+  downloadConcept(uuid: string) {
+    return this.get<BlobPart>(endpoints.conceptSnapshotUuid(uuid), {
+      headers: {
+        Accept: 'application/pdf',
+      },
+      responseType: 'blob', // Ensure response is treated as binary data
+    });
+  }
+
   retryReport(uuid: string) {
     return this.post<IConcept>(endpoints.conceptReportRetry(uuid));
   }

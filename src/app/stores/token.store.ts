@@ -102,6 +102,7 @@ export const useTokenStore = create<TokenStore>((set, get) => ({
         access,
         secretKey,
       ).toString();
+
       const encryptedRefresh = CryptoJS.AES.encrypt(
         refresh,
         secretKey,

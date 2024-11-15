@@ -23,7 +23,6 @@ export enum AppPath {
   ConceptKeyAssumptions = `/concept/:id/${ConceptPath.Assumptions}`,
   ConceptMarketScan = `/concept/:id/${ConceptPath.MarketScan}`,
   ConceptSettings = `/concept/:id/${ConceptPath.ConceptSettings}`,
-  ConceptSnapshot = `/concept/snapshot`,
 
   /* Challenges */
   ChallengeCenter = '/challenge',

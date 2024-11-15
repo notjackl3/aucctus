@@ -3,9 +3,10 @@ import { useConcept, useConceptUpdate } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
-import { FunctionComponent, useCallback, useMemo } from 'react';
+import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import api from '@libs/api';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
@@ -39,12 +40,11 @@ const ConceptReport: FunctionComponent = () => {
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
 
-  const { concept, isFetched } = useConcept(conceptUuid);
+  const { concept, isFetched: isConceptFetched } = useConcept(conceptUuid);
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
-  /**
-   * Each tab has been set to return the associated route from AppPath
-   */
+  const [isLoading, setIsLoading] = useState(false);
+
   const onTabSelect = useCallback(
     (value: string) => {
       if (conceptUuid === undefined) return;
@@ -53,6 +53,25 @@ const ConceptReport: FunctionComponent = () => {
     },
     [conceptUuid, navigate],
   );
+
+  const onSnapshotClick = useCallback(async () => {
+    if (conceptUuid === undefined) return;
+    setIsLoading(true);
+    try {
+      const pdf = await api.concept.downloadConcept(conceptUuid);
+      const blob = new Blob([pdf], { type: 'application/pdf' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `concept-${conceptUuid}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      toast.error('Failed to download snapshot.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [conceptUuid]);
 
   const changeConceptStatus = useCallback(
     (value: string) => {
@@ -65,7 +84,7 @@ const ConceptReport: FunctionComponent = () => {
     [updateConcept, conceptUuid],
   );
 
-  if (!concept && isFetched) {
+  if (!concept && isConceptFetched) {
     toast.error('Concept Not Found.');
     return <Navigate to={AppPath.ConceptBank} />;
   }
@@ -85,14 +104,18 @@ const ConceptReport: FunctionComponent = () => {
           </div>
         </div>
         <div className='flex gap-4'>
-          <Tooltip tip='Coming Soon'>
+          <Tooltip tip='Download to PDF'>
             <button
               aria-label='Download Opportunity Snapshot'
-              className={`btn btn-disabled btn-bold`}
-              onClick={() => navigate(AppPath.ConceptSnapshot)}
-              disabled
+              className={`btn btn-bold`}
+              onClick={onSnapshotClick}
+              disabled={isLoading}
             >
-              <Icon variant='download-cloud' {...defaultIconProps} />
+              {isLoading ? (
+                <Loading isSmall />
+              ) : (
+                <Icon variant='download-cloud' {...defaultIconProps} />
+              )}
               Opportunity Snapshot
             </button>
           </Tooltip>
