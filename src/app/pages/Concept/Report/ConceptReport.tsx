@@ -7,6 +7,7 @@ import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import api from '@libs/api';
+import { useAppStore } from '@stores/app.store';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
@@ -39,6 +40,7 @@ const ConceptReport: FunctionComponent = () => {
   const { id: conceptUuid } = useParams();
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
+  const { account } = useAppStore();
 
   const { concept, isFetched: isConceptFetched } = useConcept(conceptUuid);
   const status = useMemo(() => concept?.status || 'new', [concept]);
@@ -57,13 +59,21 @@ const ConceptReport: FunctionComponent = () => {
   const onSnapshotClick = useCallback(async () => {
     if (conceptUuid === undefined) return;
     setIsLoading(true);
+
     try {
       const pdf = await api.concept.downloadConcept(conceptUuid);
       const blob = new Blob([pdf], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `concept-${conceptUuid}.pdf`;
+      // Get today's date in YYYYMMDD format
+      const today = new Date();
+      const readableDate = today.toISOString().split('T')[0].replace(/-/g, '');
+      console.log(concept);
+      // company-concept-20241117
+      const fileName = `${account?.name.toLowerCase()}-${concept?.title.replace(/\s+/g, '-').toLowerCase()}-${readableDate}.pdf`;
+      // Set the download filename
+      a.download = fileName;
       a.click();
       URL.revokeObjectURL(url);
     } catch (error) {
@@ -71,7 +81,7 @@ const ConceptReport: FunctionComponent = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [conceptUuid]);
+  }, [conceptUuid, concept]);
 
   const changeConceptStatus = useCallback(
     (value: string) => {
@@ -107,7 +117,7 @@ const ConceptReport: FunctionComponent = () => {
           <Tooltip tip='Download to PDF'>
             <button
               aria-label='Download Opportunity Snapshot'
-              className={`btn btn-bold`}
+              className={`btn btn-bold hover:bg-primary-600 hover:text-white`}
               onClick={onSnapshotClick}
               disabled={isLoading}
             >
