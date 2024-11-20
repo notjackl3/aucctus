@@ -12,12 +12,15 @@ const Login: FunctionComponent = () => {
   const [password, setPassword] = useState<string>('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
 
-  const _handleEmailValidation = () => {
-    if (email && !utils.string.validEmail(email)) {
+  const handleSubmit = () => {
+    if (!email || !password || emailInputError) return;
+
+    if (!utils.string.validEmail(email)) {
       setEmailInputError('Email is Invalid.');
-    } else {
-      setEmailInputError(undefined);
+      return;
     }
+    setEmailInputError(undefined);
+    login({ email, password });
   };
 
   return (
@@ -33,9 +36,16 @@ const Login: FunctionComponent = () => {
           </div>
         )}
       </div>
-      {/* TODO: Style this */}
 
-      <form className={styles.basicForm}>
+      <form
+        className={styles.basicForm}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault(); // Prevent default form submission
+            handleSubmit(); // Call the submit handler
+          }
+        }}
+      >
         <InputField
           label='Email'
           name='email'
@@ -46,7 +56,6 @@ const Login: FunctionComponent = () => {
             setEmail(e.target.value)
           }
           onFocus={() => setEmailInputError(undefined)}
-          onBlur={_handleEmailValidation}
         />
 
         <InputField
@@ -61,13 +70,6 @@ const Login: FunctionComponent = () => {
         />
 
         <div className={`${styles.row}`}>
-          {/* Currently Does nothing */}
-          {/* <Checkbox
-            name="rememberMe"
-            supportingText="Remember for 30 Days"
-          /> */}
-
-          {/* Takes you to unfinished page */}
           <Link className={`${styles.link} btn btn-link`} to='/forgot-password'>
             Forgot password
           </Link>
@@ -76,20 +78,11 @@ const Login: FunctionComponent = () => {
         <button
           type='button'
           className='btn btn-primary'
-          onClick={async () => {
-            login({ email, password });
-          }}
+          onClick={handleSubmit}
           disabled={!email || !password || !!emailInputError || isLoading}
         >
           Login
         </button>
-
-        {/* 
-        // TEMP: Disable
-        <button type="button" className="btn btn-white">
-          <AuthProviderIcon provider="google" />
-          Sign in with Google
-        </button> */}
 
         <div className={styles.signUp}>
           <span>{"Don't have an account?"}</span>

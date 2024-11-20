@@ -12,7 +12,7 @@ export class Endpoints {
 
   static confirmEmail = `/api/v1/confirm-email`;
   static forgotPassword = `/api/v1/forgot-password`;
-  static requestPasswordReset = `/api/v1/password-reset`;
+  static requestPasswordReset = `/api/v1/request-reset-email`;
   static updatePassword = `/api/v1/user/update-password`;
 
   static account = `/api/v1/account`;

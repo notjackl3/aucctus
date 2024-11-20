@@ -33,7 +33,6 @@ const ResetPassword: FunctionComponent = () => {
     setConfirmPassErrorOnCondition(
       !!confirmPassword && confirmPassword !== pass,
     );
-    e.preventDefault();
   };
 
   const _handleConfirmPasswordChange = (
@@ -42,7 +41,6 @@ const ResetPassword: FunctionComponent = () => {
     const cPassword = e.target.value;
     setConfirmPassword(cPassword);
     setConfirmPassErrorOnCondition(cPassword !== password);
-    e.preventDefault();
   };
 
   const setConfirmPassErrorOnCondition = (condition: boolean) => {

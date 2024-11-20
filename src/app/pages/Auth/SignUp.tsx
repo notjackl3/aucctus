@@ -19,18 +19,21 @@ const SignUp: FunctionComponent = () => {
 
   const { mutate: signUp, error, isLoading } = useSignUp();
 
-  const _handleEmailValidation = useCallback(
-    (e: React.FocusEvent) => {
-      if (email && !utils.string.validEmail(email)) {
-        setEmailInputError('Email is Invalid.');
-      } else {
-        setEmailInputError(undefined);
-      }
-      e.preventDefault();
-    },
+  const handleSignUp = () => {
+    if (!utils.string.validEmail(email)) {
+      setEmailInputError('Email is invalid.');
+      return;
+    }
 
-    [email],
-  );
+    setEmailInputError(undefined);
+
+    signUp({ firstName, lastName, email, password, confirmPassword });
+  };
+
+  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    handleSignUp();
+  };
 
   const _handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const pass = e.target.value;
@@ -69,7 +72,7 @@ const SignUp: FunctionComponent = () => {
           </div>
         )}
       </div>
-      <form className={styles.basicForm}>
+      <form className={styles.basicForm} onSubmit={handleFormSubmit}>
         <div className={styles.inputGroup}>
           <InputField
             name={'first name'}
@@ -100,7 +103,6 @@ const SignUp: FunctionComponent = () => {
             setEmail(e.target.value)
           }
           onFocus={() => setEmailInputError(undefined)}
-          onBlur={_handleEmailValidation}
         />
         <InputField
           name={'password'}
@@ -122,12 +124,8 @@ const SignUp: FunctionComponent = () => {
         />
 
         <button
-          type='button'
+          type='submit'
           className='btn btn-primary'
-          onClick={(e) => {
-            e.preventDefault();
-            signUp({ firstName, lastName, email, password, confirmPassword });
-          }}
           disabled={
             !firstName ||
             !lastName ||

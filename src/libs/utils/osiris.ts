@@ -3,7 +3,7 @@ import { isError } from 'react-query';
 import { IFormError } from '../api/types';
 
 export function parseFormError<T = unknown>(error: unknown | AxiosError) {
-  let message = 'Unexpected Error Occurred';
+  let message = 'Unexpected error occurred.';
   if (isAxiosError<IFormError<T>>(error)) {
     // Check if there is an error response from the server otherwise we will use the default message
     if (error.response) {

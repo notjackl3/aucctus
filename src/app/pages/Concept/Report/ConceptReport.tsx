@@ -69,7 +69,6 @@ const ConceptReport: FunctionComponent = () => {
       // Get today's date in YYYYMMDD format
       const today = new Date();
       const readableDate = today.toISOString().split('T')[0].replace(/-/g, '');
-      console.log(concept);
       // company-concept-20241117
       const fileName = `${account?.name.toLowerCase()}-${concept?.title.replace(/\s+/g, '-').toLowerCase()}-${readableDate}.pdf`;
       // Set the download filename

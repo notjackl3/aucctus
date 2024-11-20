@@ -1,9 +1,8 @@
 import { FunctionComponent } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import FeatureIcon from '../../components/Icon/FeatureIcon';
-import Icon from '../../components/Icon/Icon/Icon';
 
 const ResetPasswordSuccess: FunctionComponent = () => {
   const navigate = useNavigate();
@@ -23,13 +22,8 @@ const ResetPasswordSuccess: FunctionComponent = () => {
           className='btn btn-primary'
           onClick={() => navigate(AppPath.Login)}
         >
-          Continue
+          Continue to log in
         </button>
-        <div className={styles.signUp}>
-          <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant='arrowleft' /> Back to log in
-          </Link>
-        </div>
       </div>
     </>
   );
