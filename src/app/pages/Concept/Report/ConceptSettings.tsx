@@ -27,7 +27,7 @@ const ConceptSettings: FunctionComponent = () => {
         </div>
       </div>
 
-      <div className='grid grid-flow-col grid-rows-2 gap-4'>
+      <div className='grid grid-flow-col grid-rows-2 items-start gap-4'>
         {isLoading ? (
           <Loading />
         ) : (

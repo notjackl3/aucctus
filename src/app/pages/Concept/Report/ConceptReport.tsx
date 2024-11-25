@@ -113,21 +113,19 @@ const ConceptReport: FunctionComponent = () => {
           </div>
         </div>
         <div className='flex gap-4'>
-          <Tooltip tip='Download to PDF'>
-            <button
-              aria-label='Download Opportunity Snapshot'
-              className={`btn btn-bold hover:bg-primary-600 hover:text-white`}
-              onClick={onSnapshotClick}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <Loading isSmall />
-              ) : (
-                <Icon variant='download-cloud' {...defaultIconProps} />
-              )}
-              Opportunity Snapshot
-            </button>
-          </Tooltip>
+          <button
+            aria-label='Download Opportunity Snapshot'
+            className={`btn btn-bold hover:bg-primary-600 hover:text-white`}
+            onClick={onSnapshotClick}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loading isSmall />
+            ) : (
+              <Icon variant='download-cloud' {...defaultIconProps} />
+            )}
+            Opportunity Snapshot
+          </button>
           <button
             aria-label='Close Detail Page'
             className='btn-close'
