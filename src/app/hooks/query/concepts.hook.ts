@@ -81,6 +81,32 @@ export const useConceptSeed = (uuid: string) => {
   };
 };
 
+export const useConceptIgnitionQuestionnaire = () => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.conceptIgnitionQuestionnaire],
+    cacheTime: Infinity,
+    staleTime: Infinity,
+    queryFn: async () => await api.conceptIgnite.questionnaire(),
+  });
+
+  return {
+    ...query,
+
+    questionnaires: query.data || {
+      expandAnExistingIdea: {
+        name: '',
+        description: '',
+        questions: undefined,
+      },
+      identifyNewOpportunities: {
+        name: '',
+        description: '',
+        questions: undefined,
+      },
+    },
+  };
+};
+
 /**
  * Custom hook for fetching a concept by UUID.
  * @param uuid - The UUID of the concept to fetch.

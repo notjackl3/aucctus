@@ -1,13 +1,13 @@
 import { Container, Icon, Loading, Select, Tooltip } from '@components';
 import { useConcept, useConceptUpdate } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
+import api from '@libs/api';
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
+import { useAppStore } from '@stores/app.store';
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import api from '@libs/api';
-import { useAppStore } from '@stores/app.store';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
@@ -80,7 +80,7 @@ const ConceptReport: FunctionComponent = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [conceptUuid, concept]);
+  }, [conceptUuid, account?.name, concept?.title]);
 
   const changeConceptStatus = useCallback(
     (value: string) => {

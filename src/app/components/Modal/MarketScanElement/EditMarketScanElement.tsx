@@ -107,7 +107,7 @@ const EditMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({
           onSuccess: () => {
             closeModal();
           },
-          onError: (error) => {
+          onError: () => {
             // TODO: bring back error message extraction
             // if (
             //   error.response &&

@@ -6,6 +6,7 @@ import {
   useSaveGeneratedConcepts,
 } from '@hooks/query/concepts.hook';
 import { useGeneratedConcepts } from '@hooks/tables/generated-concepts.hook';
+import { IConceptIgnitionQuestionnaire } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import React, { FunctionComponent, useCallback } from 'react';
@@ -53,9 +54,9 @@ const GeneratedConcepts: FunctionComponent = () => {
       e.preventDefault();
       igniteConcept(
         {
-          attributes: seed.attributes || [],
+          answers: seed.answers,
           numberOfConcepts: 10,
-          type: seed.type || 'UNKNOWN',
+          type: seed.type as keyof IConceptIgnitionQuestionnaire,
         },
         {
           onSuccess: (response) => {
@@ -64,7 +65,7 @@ const GeneratedConcepts: FunctionComponent = () => {
         },
       );
     },
-    [concepts, igniteConcept, seed.attributes, seed.type, setGeneratedConcepts],
+    [concepts, igniteConcept, seed.answers, seed.type, setGeneratedConcepts],
   );
 
   return (

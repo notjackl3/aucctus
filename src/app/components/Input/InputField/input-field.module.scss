@@ -30,7 +30,7 @@
     line-height: 1.25rem;
     font-weight: 500;
     margin-bottom: var(--gap-7xs);
-    color: var(--gray-900-text-primary, #2b3674);
+    color: #374151;
   }
 
   input,
@@ -94,7 +94,7 @@
   flex: 1 1 auto;
   max-width: 25rem;
   .label {
-    color: var(--Gray-700---Text-Tertiary, #626ba3);
+    color: #374151;
     @include text-small;
     font-family: $font-family;
   }

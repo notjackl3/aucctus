@@ -71,30 +71,6 @@ export interface IConcept extends IBaseConceptEntity, IGeneratedConcept {
   category: ConceptCategory;
   createdBy: IUser;
 }
-type ConceptSeedType =
-  | 'EXPAND_AN_EXISTING_IDEA'
-  | 'IDENTIFY_NEW_OPPORTUNITIES'
-  | 'UNKNOWN';
-// Expand an existing idea
-type EEIQuestionKeys = 'DESCRIBE' | 'PROBLEM' | 'CUSTOMER' | 'SUCCESS';
-// Identify new opportunities
-type INOQuestionKeys = 'TARGET' | 'PROBLEM' | 'INTEREST' | 'SUCCESS';
-type IgniteConceptQuestionKeys = EEIQuestionKeys | INOQuestionKeys;
-
-export interface IConceptSeedAttribute<T = IgniteConceptQuestionKeys> {
-  question: T;
-  answer: string;
-}
-
-interface IConceptSeedBase {
-  attributes: IConceptSeedAttribute[];
-  type: ConceptSeedType;
-  createdBy: string;
-}
-
-export interface IConceptSeed
-  extends IConceptSeedBase,
-    Omit<IBaseConceptEntity, 'version'> {}
 
 export interface IConceptOverview extends IBaseConceptEntity {
   valueProposition: string;

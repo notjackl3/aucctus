@@ -22,6 +22,7 @@ export class Endpoints {
   static saveGeneratedConcepts = 'api/v1/concept/generated';
 
   static conceptIgnite = 'api/v1/concept/ignite';
+  static conceptQuestionnaire = '/api/v1/concept/ignition/questionnaires';
 
   static conceptUuid(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/`;

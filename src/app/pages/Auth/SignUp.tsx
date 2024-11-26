@@ -1,4 +1,4 @@
-import { FunctionComponent, useCallback, useState } from 'react';
+import { FunctionComponent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import utils from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';

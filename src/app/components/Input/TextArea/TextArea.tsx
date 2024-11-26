@@ -8,12 +8,12 @@ import {
   useState,
 } from 'react';
 
-import styles from './text-area.module.scss';
 import React from 'react';
+import styles from './text-area.module.scss';
 
 export interface TextAreaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label: string;
+  label?: string;
   name: string;
   error?: boolean;
   errorMessage?: string;

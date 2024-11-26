@@ -1,6 +1,6 @@
 import Bank from './Bank';
 import Generated from './GeneratedConcepts';
-import Ignite from './IgniteConcept';
+import Ignite from './Ignition/IgniteConcept';
 import Report from './Report';
 
 const Concept = {

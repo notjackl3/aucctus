@@ -4,6 +4,7 @@ export enum AucctusQueryKeys {
   allUsers = 'allusers',
   dashboard = 'dashboard',
 
+  conceptIgnitionQuestionnaire = 'conceptIgnitionQuestionnaire',
   /* Concepts */
   concepts = 'concepts',
   concept = 'concept',

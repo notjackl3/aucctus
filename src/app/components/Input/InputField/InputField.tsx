@@ -1,14 +1,13 @@
 import React, {
   ForwardRefRenderFunction,
   InputHTMLAttributes,
-  useEffect,
   useState,
 } from 'react';
 import Icon from '../../Icon/Icon/Icon';
 import styles from './input-field.module.scss';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-  label: string;
+  label?: string;
   name: string;
   error?: boolean;
   errorMessage?: string;
@@ -18,7 +17,6 @@ interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   width?: number | string;
   variant?: 'settings';
   showAsterisk?: boolean;
-  debounce?: number; // New prop for debounce duration
 }
 
 const defaultIconProps = {
@@ -38,14 +36,14 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
     variant,
     showAsterisk = false,
     width,
-    debounce = 500, // Default debounce time set to 500ms
+    value, // Add value to props for controlled input
+    onChange,
     ...props
   },
   ref,
 ) => {
   const hasError = !!errorMessage || error;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
-  const [value, setValue] = useState(props.value || ''); // Local state for input value
 
   const togglePasswordVisibility = () => {
     setIsPasswordVisible(!isPasswordVisible);
@@ -76,23 +74,6 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
     }
   };
 
-  // Debounce effect
-  useEffect(() => {
-    const handler = setTimeout(() => {
-      if (props.onChange) {
-        const event = {
-          ...props,
-          target: { value, name },
-        };
-        props.onChange(event as any); // Trigger the onChange event with the debounced value
-      }
-    }, debounce);
-
-    return () => {
-      clearTimeout(handler);
-    };
-  }, [value, debounce, props, name]);
-
   return (
     <div
       style={width ? { width } : {}}
@@ -111,8 +92,8 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
         type={getInputType()}
         ref={ref}
         name={name}
-        value={value}
-        onChange={(e) => setValue(e.target.value)} // Update local state
+        value={value ?? ''} // Ensure value is always defined (fallback to empty string)
+        onChange={onChange} // Pass the onChange handler directly
       />
       {showVisibilityIcon && (
         <button

@@ -128,7 +128,7 @@ const ConceptBank: React.FC = () => {
             />
           }
         >
-          <Table table={table} centerCols />
+          <Table table={table} />
         </Container.ConceptTableWrapper>
       </div>
     </div>

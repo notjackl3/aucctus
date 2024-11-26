@@ -2,9 +2,11 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
-  IConceptSeedAttribute,
-  IConceptSeedBase,
+  ConceptIgnitionQuestion,
+  IConceptIgnitionQuestionnaire,
+  IConceptIgnitionQuestionnaireType,
   IGeneratedConcept,
+  QuestionIdentifier,
 } from './types'; // Import the missing type
 
 /**
@@ -14,12 +16,19 @@ import {
  */
 export interface IConceptGenerateResponse {
   concepts: IGeneratedConcept[];
-  seed: IConceptSeedAttribute[];
 }
 
-export interface IIgniteConceptBody
-  extends Omit<IConceptSeedBase, 'createdBy'> {
+export interface IIgnitionAnswer {
+  answer: string;
+  fieldType: ConceptIgnitionQuestion['fieldType'];
+  details?: string;
+  questionId: number;
+}
+
+export interface IIgniteConceptBody {
   numberOfConcepts?: number;
+  type: IConceptIgnitionQuestionnaireType;
+  answers: { [key in QuestionIdentifier]?: IIgnitionAnswer };
 }
 
 export class IgniteConceptApi extends ApiService {
@@ -34,5 +43,11 @@ export class IgniteConceptApi extends ApiService {
 
   ignite(body: IIgniteConceptBody) {
     return this.post<IConceptGenerateResponse>(endpoints.conceptIgnite, body);
+  }
+
+  questionnaire() {
+    return this.get<IConceptIgnitionQuestionnaire>(
+      endpoints.conceptQuestionnaire,
+    );
   }
 }

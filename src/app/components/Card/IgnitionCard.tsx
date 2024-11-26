@@ -38,11 +38,11 @@ const IgnitionCard: React.FunctionComponent<IIgnitionCardProps> = ({
           {header.description}
         </p>
       </div>
-      <div className='mt-5 flex w-full grow flex-col justify-between gap-3.5 px-4 pb-6'>
+      <div className='flex w-full grow flex-col justify-between gap-1 px-4 py-6'>
         {children}
       </div>
       {footer ? (
-        <div className='flex w-full flex-row items-center justify-center gap-2.5 border-t border-solid border-slate-200 py-3 '>
+        <div className='flex w-full flex-row items-center justify-center gap-2.5 border-t border-solid border-slate-200 px-2 py-3'>
           {footer}
         </div>
       ) : null}
