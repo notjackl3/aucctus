@@ -3,8 +3,8 @@ import { ApiService, IApiServiceConfig } from './apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
   ConceptIgnitionQuestion,
+  ConceptIgnitionQuestionnaireType,
   IConceptIgnitionQuestionnaire,
-  IConceptIgnitionQuestionnaireType,
   IGeneratedConcept,
   QuestionIdentifier,
 } from './types'; // Import the missing type
@@ -27,7 +27,7 @@ export interface IIgnitionAnswer {
 
 export interface IIgniteConceptBody {
   numberOfConcepts?: number;
-  type: IConceptIgnitionQuestionnaireType;
+  type: ConceptIgnitionQuestionnaireType;
   answers: { [key in QuestionIdentifier]?: IIgnitionAnswer };
 }
 

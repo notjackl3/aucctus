@@ -2,13 +2,13 @@ import { IIgnitionAnswer } from '@libs/api/igniteConcepts';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import {
-  IConceptIgnitionQuestionnaireType,
+  ConceptIgnitionQuestionnaireType,
   IGeneratedConcept,
   QuestionIdentifier,
 } from '../../libs/api/types';
 
 interface IIgnitionSeed {
-  type?: IConceptIgnitionQuestionnaireType;
+  type?: ConceptIgnitionQuestionnaireType;
   answers: { [key in QuestionIdentifier]?: IIgnitionAnswer };
 }
 interface ConceptGenerationStoreState {

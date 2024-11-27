@@ -8,8 +8,8 @@ import {
   useConceptIgnitionQuestionnaire,
 } from '@hooks/query/concepts.hook';
 import {
+  ConceptIgnitionQuestionnaireType,
   IConceptIgnitionQuestionnaire,
-  IConceptIgnitionQuestionnaireType,
   QuestionIdentifier,
 } from '@libs/api/types';
 // import { useNavigate } from 'react-router-dom';
@@ -45,10 +45,20 @@ const QUESTIONNAIRE_HEADERS = {
   },
 };
 
+type ConceptQuestionnaireName = keyof IConceptIgnitionQuestionnaire;
+
 type AnswerStore = {
-  [key in IConceptIgnitionQuestionnaireType]: {
+  [key in ConceptQuestionnaireName]: {
     [key in QuestionIdentifier]?: IIgnitionAnswer;
   };
+};
+
+const questionnaireTypeMap: Record<
+  ConceptQuestionnaireName,
+  ConceptIgnitionQuestionnaireType
+> = {
+  expandAnExistingIdea: 'EXPAND_AN_EXISTING_IDEA',
+  identifyNewOpportunities: 'IDENTIFY_NEW_OPPORTUNITIES',
 };
 
 // Component
@@ -63,7 +73,7 @@ const IgniteConcept: React.FC = () => {
   });
 
   const handleAnswerChange = (
-    questionnaireName: IConceptIgnitionQuestionnaireType,
+    questionnaireName: ConceptQuestionnaireName,
     identifier: QuestionIdentifier,
     answer: Partial<IIgnitionAnswer>,
   ) => {
@@ -80,7 +90,7 @@ const IgniteConcept: React.FC = () => {
   };
 
   const areAllRequiredQuestionsAnswered = (
-    questionnaireName: IConceptIgnitionQuestionnaireType,
+    questionnaireName: ConceptQuestionnaireName,
   ) => {
     const questionnaire = questionnaires[questionnaireName];
     const answerBook = answers[questionnaireName];
@@ -100,8 +110,8 @@ const IgniteConcept: React.FC = () => {
   };
 
   const renderQuestions = (
-    questionnaireName: IConceptIgnitionQuestionnaireType,
-    questions?: IConceptIgnitionQuestionnaire[IConceptIgnitionQuestionnaireType]['questions'],
+    questionnaireName: ConceptQuestionnaireName,
+    questions?: IConceptIgnitionQuestionnaire[ConceptQuestionnaireName]['questions'],
   ) => {
     if (!questions) {
       return (
@@ -164,7 +174,7 @@ const IgniteConcept: React.FC = () => {
   };
 
   const handleSubmission = (
-    questionnaireName: IConceptIgnitionQuestionnaireType,
+    questionnaireName: ConceptQuestionnaireName,
     numberOfConcepts: number = 10,
   ) => {
     const questionnaireAnswers = answers[questionnaireName];
@@ -172,14 +182,14 @@ const IgniteConcept: React.FC = () => {
     igniteConcept(
       {
         numberOfConcepts,
-        type: questionnaireName,
+        type: questionnaireTypeMap[questionnaireName],
         answers: questionnaireAnswers,
       },
       {
         onSuccess: (data) => {
           setSeed({
             answers: questionnaireAnswers,
-            type: questionnaireName,
+            type: questionnaireTypeMap[questionnaireName],
           });
           setGeneratedConcepts(data.concepts);
           navigate(AppPath.GeneratedConcepts);

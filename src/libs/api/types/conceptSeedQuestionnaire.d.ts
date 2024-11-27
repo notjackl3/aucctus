@@ -54,8 +54,11 @@ export type QuestionIdentifier =
   | ExpandAnExistingIdeaQuestions
   | IdentifyNewOpportunitiesQuestions;
 
+export type ConceptIgnitionQuestionnaireType =
+  | 'EXPAND_AN_EXISTING_IDEA'
+  | 'IDENTIFY_NEW_OPPORTUNITIES';
 export interface IConceptIgnitionQuestionnaireSection<T extends string> {
-  name: string;
+  type: ConceptIgnitionQuestionnaireType;
   description: string;
   questions: { [key in T]: ConceptIgnitionQuestion };
 }
@@ -64,6 +67,3 @@ export interface IConceptIgnitionQuestionnaire {
   expandAnExistingIdea: IConceptIgnitionQuestionnaireSection<ExpandAnExistingIdeaQuestions>;
   identifyNewOpportunities: IConceptIgnitionQuestionnaireSection<IdentifyNewOpportunitiesQuestions>;
 }
-
-export type IConceptIgnitionQuestionnaireType =
-  keyof IConceptIgnitionQuestionnaire;
