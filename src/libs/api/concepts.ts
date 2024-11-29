@@ -2,6 +2,8 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
+  ConceptIgnitionQuestion,
+  ConceptIgnitionQuestionnaireType,
   ConceptStatus,
   Ecosystem,
   IConcept,
@@ -9,8 +11,6 @@ import {
   IConceptOverview,
   IConceptPage,
   IConceptQueryOptions,
-  IConceptSeed,
-  IConceptSeedBase,
   ICustomerProfile,
   ICustomerProfileCreate,
   IEcosystemCreate,
@@ -22,6 +22,19 @@ import {
   ITrendsAndDrivers,
 } from './types'; // Import the missing type
 
+export interface IConceptSeedAnswer {
+  answer: string;
+  details?: string;
+  question: ConceptIgnitionQuestion;
+}
+
+export interface IConceptSeed {
+  answers: IConceptSeedAnswer[];
+  type: ConceptIgnitionQuestionnaireType;
+  createdAt: string;
+  updatedAt: string;
+}
+
 /**
  * Concept API
  *
@@ -30,7 +43,7 @@ import {
 
 export interface IGeneratedConceptsSaveBody {
   concepts: IGeneratedConcept[];
-  seed: Omit<IConceptSeedBase, 'createdBy'>;
+  seed: IConceptSeed;
 }
 
 export interface IGeneratedConceptSaveResponse {

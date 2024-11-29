@@ -71,12 +71,7 @@ export const useConceptSeed = (uuid: string) => {
   return {
     ...query,
     seed: query.data || {
-      attributes: [],
-      type: 'UNKNOWN',
-      createdBy: '',
-      uuid: '',
-      createdAt: '',
-      updatedAt: '',
+      answers: [],
     },
   };
 };

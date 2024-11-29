@@ -1,5 +1,4 @@
 import React from 'react';
-// import Icon from './Icons/Icon/Icon';
 
 interface ISeedFieldProps {
   question: string;
@@ -17,9 +16,6 @@ const SeedField: React.FC<ISeedFieldProps> = ({ question, answer }) => {
           </p>
         </div>
       </div>
-      {/* <button className='btn btn-primary-light btn-no-border h-8 w-8 items-center justify-center p-2'>
-        <Icon variant='file-attachment' />
-      </button> */}
     </div>
   );
 };

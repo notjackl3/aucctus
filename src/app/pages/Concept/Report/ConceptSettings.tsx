@@ -31,11 +31,11 @@ const ConceptSettings: FunctionComponent = () => {
         {isLoading ? (
           <Loading />
         ) : (
-          seed.attributes.map((attribute) => (
+          seed.answers.map((answer) => (
             <SeedField
-              key={attribute.question.replace(' ', '-')}
-              question={attribute.question}
-              answer={attribute.answer}
+              key={answer.question.label.replace(' ', '-')}
+              question={answer.question.label}
+              answer={answer.answer}
             />
           ))
         )}

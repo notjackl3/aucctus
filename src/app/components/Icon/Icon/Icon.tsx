@@ -2,7 +2,7 @@ import { FunctionComponent } from 'react';
 import spritePath from './icon-sprite.svg';
 
 // Hardcoded hash value
-const ICON_HASH = 'c8dd0a38f452a898fbce714a95e657a4';
+const ICON_HASH = '05c13cef2c820c7e20edbebe25474671';
 
 export interface IconProps extends Partial<React.SVGProps<SVGSVGElement>> {
   variant: IconVariant;

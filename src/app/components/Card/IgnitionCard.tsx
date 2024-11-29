@@ -38,7 +38,7 @@ const IgnitionCard: React.FunctionComponent<IIgnitionCardProps> = ({
           {header.description}
         </p>
       </div>
-      <div className='flex w-full grow flex-col justify-between gap-1 px-4 py-6'>
+      <div className='flex w-full grow flex-col justify-between gap-4 px-4 py-6'>
         {children}
       </div>
       {footer ? (
