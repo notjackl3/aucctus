@@ -214,10 +214,6 @@ const IgniteConcept: React.FC = () => {
    * If no seed is found the form is cleared.
    */
   useEffect(() => {
-    toast('Some fields from your original prompt could not be used', {
-      position: 'top-right',
-      className: 'bg-white text-black font-semibold border shadow-lg', // Adds small border, shadow, and semibold black text
-    });
     // Break out if initialized or dependencies are not resolved
     if (
       hasInitialized.current ||
