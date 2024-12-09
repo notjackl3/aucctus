@@ -1,15 +1,18 @@
 import images from '@assets/img';
 import { Button, Card, Icon, Input, Loading } from '@components';
 import IgniteLoading from '@components/IgniteLoading';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import {
   useConceptIgnition,
   useConceptIgnitionQuestionnaire,
 } from '@hooks/query/concepts.hook';
 import {
+  ConceptIgnitionQuestion,
   ConceptIgnitionQuestionnaireType,
+  ExpandAnExistingIdeaQuestions,
   IConceptIgnitionQuestionnaire,
+  IConceptIgnitionQuestionnaireSection,
   QuestionIdentifier,
 } from '@libs/api/types';
 // import { useNavigate } from 'react-router-dom';
@@ -20,6 +23,8 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ExpandAnExistingIdeaFooter from './ExpandAnExistingIdeaFooter';
 import WhiteSpaceSuggestions from './WhiteSpaceSuggestions';
+import { useReseedStore } from '@stores/reseed.store';
+import { toCamelCase } from '@libs/utils/string';
 
 // Constants
 const QUESTIONNAIRE_HEADERS = {
@@ -71,6 +76,9 @@ const IgniteConcept: React.FC = () => {
     expandAnExistingIdea: {},
     identifyNewOpportunities: {},
   });
+  const hasInitialized = useRef(false); // Ref to track initialization
+
+  const { seed, clear } = useReseedStore();
 
   const handleAnswerChange = (
     questionnaireName: ConceptQuestionnaireName,
@@ -200,6 +208,74 @@ const IgniteConcept: React.FC = () => {
       },
     );
   };
+
+  /**
+   * On load it checks for a saved seed to initialize inputs with.
+   * If no seed is found the form is cleared.
+   */
+  useEffect(() => {
+    toast('Some fields from your original prompt could not be used', {
+      position: 'top-right',
+      className: 'bg-white text-black font-semibold border shadow-lg', // Adds small border, shadow, and semibold black text
+    });
+    // Break out if initialized or dependencies are not resolved
+    if (
+      hasInitialized.current ||
+      !seed ||
+      !questionnaires?.expandAnExistingIdea?.type
+    )
+      return;
+    hasInitialized.current = true; // Mark as executed
+    const updatedAnswers = {
+      expandAnExistingIdea: {},
+      identifyNewOpportunities: {},
+    };
+    let issueCount = 0;
+    if (seed?.answers?.length) {
+      const type = toCamelCase(seed.type);
+      seed.answers.forEach(({ question, answer }) => {
+        try {
+          const questionnaireKey = Object.keys(
+            (questionnaires as unknown as any)[type].questions,
+          ).find(
+            (key) =>
+              (questionnaires as unknown as any)[type].questions[key].id ===
+              question.id,
+          );
+
+          if (questionnaireKey) {
+            const currentQuestion = (questionnaires as unknown as any)[type]
+              .questions[questionnaireKey];
+            (updatedAnswers as unknown as any)[type][questionnaireKey] = {
+              answer:
+                currentQuestion.fieldType === 'multiSelect'
+                  ? toCamelCase(answer)
+                  : answer,
+              questionId: question.id,
+              fieldType: currentQuestion.fieldType,
+            };
+          } else {
+            issueCount++;
+          }
+        } catch {
+          console.error(
+            'Unable to find seed question. Likely due to old seed contract.',
+          );
+          issueCount++;
+        }
+      });
+      setAnswers(updatedAnswers);
+      if (issueCount > 0) {
+        toast('Some fields from your original prompt could not be used', {
+          position: 'top-right',
+          className: 'bg-white text-black font-semibold border shadow-lg', // Adds small border, shadow, and semibold black text
+        });
+      }
+      clear(); // Clear reseed storage after setting answers
+    } else {
+      setAnswers(updatedAnswers); // Reset form when no seed answers exist
+    }
+  }, [seed, questionnaires]);
 
   if (isLoading) {
     return (

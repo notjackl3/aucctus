@@ -90,11 +90,13 @@ export const useConceptIgnitionQuestionnaire = () => {
     questionnaires: query.data || {
       expandAnExistingIdea: {
         name: '',
+        type: '',
         description: '',
         questions: undefined,
       },
       identifyNewOpportunities: {
         name: '',
+        type: '',
         description: '',
         questions: undefined,
       },

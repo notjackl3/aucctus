@@ -5,14 +5,13 @@ import {
 } from '@hooks/query/concepts.hook';
 import { ConceptStatus } from '@libs/api/types';
 import * as Popover from '@radix-ui/react-popover';
+import ClickAwayListener from 'react-click-away-listener';
 import React from 'react';
 
 interface IConceptActionMenuButton {
   uuid: string;
   status: ConceptStatus;
 }
-
-// TODO: Store Status of pre-archive
 
 const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
   uuid,
@@ -36,33 +35,35 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
         </button>
       </Popover.Trigger>
       <Popover.Portal>
-        <Popover.Content
-          className='rounded bg-white p-2 shadow-lg will-change-[transform,opacity] focus:shadow-lg'
-          side='left'
-        >
-          <div
-            className='flex flex-col gap-4'
-            style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+        <ClickAwayListener onClickAway={() => setOpen(false)}>
+          <Popover.Content
+            className='rounded bg-white p-2 shadow-lg will-change-[transform,opacity] focus:shadow-lg'
+            side='left'
           >
-            <button
-              className='btn btn-no-border btn-light'
-              onClick={() => {
-                if (status === 'archived') {
-                  unarchiveConcept(uuid);
-                } else {
-                  updateConcept({
-                    uuid,
-                    status: 'archived',
-                  });
-                }
-                setOpen(false);
-              }}
+            <div
+              className='flex flex-col gap-4'
+              style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
             >
-              {label}
-            </button>
-          </div>
-          <Popover.Arrow className=' fill-white' />
-        </Popover.Content>
+              <button
+                className='btn btn-no-border btn-light'
+                onClick={() => {
+                  if (status === 'archived') {
+                    unarchiveConcept(uuid);
+                  } else {
+                    updateConcept({
+                      uuid,
+                      status: 'archived',
+                    });
+                  }
+                  setOpen(false);
+                }}
+              >
+                {label}
+              </button>
+            </div>
+            <Popover.Arrow className='fill-white' />
+          </Popover.Content>
+        </ClickAwayListener>
       </Popover.Portal>
     </Popover.Root>
   );

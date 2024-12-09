@@ -120,7 +120,7 @@ export const useRefresh = () => {
 
 export const useLogout = () => {
   const { clearTokens: clear, access } = useTokenStore();
-
+  const queryClient = useQueryClient();
   return useMutation<
     IMessageResponse,
     AxiosError<IServerErrorMessage>,
@@ -131,6 +131,12 @@ export const useLogout = () => {
     onSettled: () => {
       // Clear tokens on logout
       clear();
+    },
+    onSuccess: () => {
+      // TODO this isnt working but when we logout and do not full refresh
+      // old concepts are still cached in memory. We need to clear the concept
+      // queryKey
+      queryClient.invalidateQueries([AucctusQueryKeys.concepts]);
     },
   });
 };
