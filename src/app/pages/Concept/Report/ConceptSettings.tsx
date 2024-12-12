@@ -25,8 +25,8 @@ const ConceptSettings: FunctionComponent = () => {
   }, [seed]);
 
   return (
-    <div className='inline-flex h-96 w-full flex-col gap-3 pb-8'>
-      <div className='flex w-full items-center justify-between'>
+    <div className='inline-flex h-96 w-full flex-col gap-3 pt-2'>
+      <div className='flex w-full items-center justify-start'>
         {/* Left Buttons */}
         <div className='inline-flex items-start justify-start rounded-lg border border-gray-300 shadow'>
           <div className='flex items-center justify-center gap-2 rounded-l-lg border-r border-gray-300 bg-gray-50 px-4 py-2'>
@@ -45,7 +45,7 @@ const ConceptSettings: FunctionComponent = () => {
         {/* Right Button */}
         <button
           aria-label='Re-seed Concept'
-          className='btn btn-normal hover:bg-secondary-600'
+          className='btn btn-normal hover:bg-secondary-600 ml-2 px-[16px] py-[10px]'
           onClick={onReseedClick}
         >
           <Icon variant='refresh' {...defaultIconProps} />
@@ -53,7 +53,7 @@ const ConceptSettings: FunctionComponent = () => {
         </button>
       </div>
 
-      <div className='grid grid-flow-col grid-rows-2 items-start gap-4'>
+      <div className='grid max-w-[80%] grid-cols-2 gap-4 pt-4'>
         {isLoading ? (
           <Loading />
         ) : (
