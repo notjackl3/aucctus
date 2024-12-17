@@ -49,7 +49,7 @@ const ConceptSettings: FunctionComponent = () => {
           onClick={onReseedClick}
         >
           <Icon variant='refresh' {...defaultIconProps} />
-          Re-Use Concept
+          Re-Use Prompt
         </button>
       </div>
 
