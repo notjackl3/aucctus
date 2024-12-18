@@ -1,3 +1,4 @@
+import { Input } from '@components';
 import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useState } from 'react';
@@ -10,12 +11,17 @@ import InputField from '../components/Input/InputField/InputField';
 import { useRegisterAccount } from '../hooks/query/account.hook';
 import { useAppStore } from '../stores/app.store';
 
+const GOAL_MAX_LENGTH = 500;
+
 const OnBoarding: FunctionComponent = () => {
   const { user } = useAppStore();
   const { mutate: registerAccount, isLoading } = useRegisterAccount();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');
   const [innovationGoal, setGoal] = useState<string>('');
+  const [goalInputError, setGoalInputError] = useState<string | undefined>(
+    undefined,
+  );
 
   const [domainInputError, setDomainInputError] = useState<
     string | undefined
@@ -83,16 +89,27 @@ const OnBoarding: FunctionComponent = () => {
               onBlur={_handleDomainValidation}
             />
 
-            <InputField
+            <Input.TextArea
               name={'innovationGoal'}
               label={
                 'What is your organization looking to achieve through innovation?'
               }
+              errorMessage={goalInputError}
+              rows={2}
               value={innovationGoal}
               placeholder='Expand into new industries.'
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
                 setGoal(e.target.value);
+                if (e.target.value.length >= GOAL_MAX_LENGTH) {
+                  setGoalInputError(
+                    `Maximum character limit of ${GOAL_MAX_LENGTH} reached.`,
+                  );
+                } else {
+                  setGoalInputError(undefined);
+                }
               }}
+              maxLength={1000}
+              onFocus={() => setGoalInputError(undefined)}
             />
 
             <button
@@ -106,6 +123,7 @@ const OnBoarding: FunctionComponent = () => {
                 !domain ||
                 !innovationGoal ||
                 !!domainInputError ||
+                !!goalInputError ||
                 isLoading
               }
             >
