@@ -1,0 +1,27 @@
+
+name: PR Check
+
+on:
+  pull_request:
+    types: [opened, edited, reopened]
+
+jobs:
+  pr-title-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: PR Title
+        run: |
+          echo "PR Title: ${{ github.event.pull_request.title }}"
+          # Regex checks for conventional commit format:
+          # <type>(optional scope): <description>
+          # e.g. feat: add user authentication
+          # You can modify this if you have a stricter or different requirement
+          if [[ ! "${{ github.event.pull_request.title }}" =~ ^(feat|fix|chore|docs|style|refactor|perf|test)(\(.+\))?:\  ]]; then
+            echo "❌ The PR title does not follow the required naming convention!"
+            exit 1
+          fi
+          echo "✅ PR title follows conventional commit format."
