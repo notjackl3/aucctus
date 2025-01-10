@@ -27,12 +27,11 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
             <Card.InfoSection
               title='Company Overview'
               content={startup.overview}
-              // If you have the "overviewEvidence" data:
-              // onReasoningClick={onReasoningClick(
-              //   startup.overview,
-              //   startup.overviewEvidence.insight,
-              //   startup.overviewEvidence.sources
-              // )}
+              onReasoningClick={onReasoningClick(
+                startup.overview,
+                startup.overviewEvidence.insight,
+                startup.overviewEvidence.sources,
+              )}
             />
             <Card.InfoSection
               title='Headquarters'
@@ -46,11 +45,11 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
             <Card.InfoSection
               title='Founded'
               content={startup.founded}
-              // onReasoningClick={onReasoningClick(
-              //   startup.founded,
-              //   startup.foundedEvidence.insight,
-              //   startup.foundedEvidence.sources
-              // )}
+              onReasoningClick={onReasoningClick(
+                startup.founded,
+                startup.foundedEvidence.insight,
+                startup.foundedEvidence.sources,
+              )}
             />
           </div>
           <div className='flex flex-1 flex-col gap-4'>
@@ -58,24 +57,22 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
               <Card.InfoSection
                 title='Value Proposition'
                 content={startup.valueProposition}
-                // onReasoningClick={startup.valuePropositionEvidence &&
-                //   onReasoningClick(
-                //     startup.valueProposition,
-                //     startup.valuePropositionEvidence.insight,
-                //     startup.valuePropositionEvidence.sources
-                //   )
-                // }
+                onReasoningClick={onReasoningClick(
+                  startup.valueProposition,
+                  startup.valuePropositionEvidence.insight,
+                  startup.valuePropositionEvidence.sources,
+                )}
               />
             </div>
             <div className='flex-1 rounded-lg border border-gray-200 bg-white p-4'>
               <Card.InfoSection
                 title='Competitive Advantage'
                 content={startup.competitiveAdvantage}
-                // onReasoningClick={onReasoningClick(
-                //   startup.competitiveAdvantage,
-                //   startup.competitiveAdvantageEvidence.insight,
-                //   startup.competitiveAdvantageEvidence.sources
-                // )}
+                onReasoningClick={onReasoningClick(
+                  startup.competitiveAdvantage,
+                  startup.competitiveAdvantageEvidence.insight,
+                  startup.competitiveAdvantageEvidence.sources,
+                )}
               />
             </div>
           </div>
