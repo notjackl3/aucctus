@@ -2,14 +2,23 @@ import React from 'react';
 
 interface CountProps {
   value: number | string;
+  classNameBadge?: string; // Custom classes for the badge container
+  classNameLabel?: string; // Custom classes for the label inside the badge
 }
 
-const Count: React.FC<CountProps> = ({ value }) => {
+const Count: React.FC<CountProps> = ({
+  value,
+  classNameBadge = '',
+  classNameLabel = '',
+}) => {
+  const defaultBadgeStyles =
+    'inline-flex h-6 items-center justify-center gap-0.5 rounded-full p-2 bg-violet-50';
+  const defaultLabelStyles =
+    "font-['DM Sans'] text-center text-xs font-medium leading-[18px] text-indigo-600";
+
   return (
-    <div className=' inline-flex h-6 items-center justify-start gap-0.5 rounded-lg bg-violet-50 p-2'>
-      <span className="font-['DM Sans'] text-center text-xs font-medium leading-[18px] text-indigo-600">
-        {value}
-      </span>
+    <div className={`${defaultBadgeStyles} ${classNameBadge}`}>
+      <span className={`${defaultLabelStyles} ${classNameLabel}`}>{value}</span>
     </div>
   );
 };

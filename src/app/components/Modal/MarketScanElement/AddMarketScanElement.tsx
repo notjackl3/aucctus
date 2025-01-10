@@ -7,7 +7,7 @@ import {
   IEcosystemCreate,
   IFormError,
   IMarketScanElementCreate,
-  ITrendsAndDrivers,
+  ITrendsAndDriversV1,
 } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
 import InputField from '../../Input/InputField/InputField';
@@ -23,8 +23,8 @@ interface EditTrendsAndDriverProps {
         unknown
       >
     | UseMutateFunction<
-        ITrendsAndDrivers,
-        AxiosError<IFormError<ITrendsAndDrivers>, any>,
+        ITrendsAndDriversV1,
+        AxiosError<IFormError<ITrendsAndDriversV1>, any>,
         IMarketScanElementCreate,
         unknown
       >;
@@ -113,8 +113,8 @@ const AddMarketScanElement: FunctionComponent<EditTrendsAndDriverProps> = ({
       } else {
         (
           addItem as UseMutateFunction<
-            ITrendsAndDrivers,
-            AxiosError<IFormError<ITrendsAndDrivers>, any>,
+            ITrendsAndDriversV1,
+            AxiosError<IFormError<ITrendsAndDriversV1>, any>,
             IMarketScanElementCreate,
             unknown
           >

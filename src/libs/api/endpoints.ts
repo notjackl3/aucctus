@@ -76,8 +76,8 @@ export class Endpoints {
     return `api/v1/concept/financial-projection/${projectionUuid}`;
   }
 
-  static conceptMarketScan(conceptUuid: string) {
-    return `api/v1/concept/${conceptUuid}/market-scan/`;
+  static conceptMarketScan(conceptUuid: string, version: string = 'v1') {
+    return `api/${version}/concept/${conceptUuid}/market-scan/`;
   }
 
   static conceptMarketScanUuid(marketScanUuid: string) {
@@ -140,4 +140,14 @@ export class Endpoints {
   static conceptQueries(options?: IConceptQueryOptions) {
     return utils.string.queryStringGenerator(this.concept, options);
   }
+
+  static conceptMarketScanV2(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/market-scan/`;
+  }
+
+  static conceptMarketScanUuidV2(marketScanUuid: string) {
+    return `api/v2/concept/market-scan/${marketScanUuid}`;
+  }
+
+  // TODO: Add trends and drivers and ecosystem endpoints for v2
 }

@@ -12,10 +12,10 @@ import {
   IEcosystemCreate,
   IFinancialProjection,
   IFormError,
-  IMarketScan,
+  IMarketScanV1,
   IMarketScanElementCreate,
   // IMarketSizeMetric,
-  ITrendsAndDrivers,
+  ITrendsAndDriversV1,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
@@ -194,11 +194,11 @@ export const useConceptOverview = (uuid: string) => {
  * @param uuid - The UUID of the concept.
  * @returns An object containing the query result and the concept market scan data.
  */
-export const useConceptMarketScan = (uuid: string) => {
+export const useConceptMarketScan = (uuid: string, version: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.marketScan, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
-    queryFn: async () => await api.concept.getConceptMarketScan(uuid),
+    queryFn: async () => await api.concept.getConceptMarketScan(uuid, version),
     enabled: !!uuid,
   });
 
@@ -336,14 +336,14 @@ export const useConceptOverviewUpdate = (conceptUuid: string) => {
  * @returns The result of the generic concept update.
  */
 export const useMarketScanUpdate = (conceptUuid: string) => {
-  return useGenericConceptMutate<IMarketScan>(
+  return useGenericConceptMutate<IMarketScanV1>(
     (data) => api.concept.updateConceptMarketScan(data.uuid, data),
     [[AucctusQueryKeys.marketScan, conceptUuid]],
   );
 };
 
 export const useTrendAndDriverCreate = (conceptUuid: string) => {
-  return useGenericConceptMutate<ITrendsAndDrivers, IMarketScanElementCreate>(
+  return useGenericConceptMutate<ITrendsAndDriversV1, IMarketScanElementCreate>(
     (data) => api.concept.createTrendAndDriver(conceptUuid, data),
     [[AucctusQueryKeys.marketScan, conceptUuid]],
   );
@@ -414,14 +414,14 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 // };
 
 export const useTrendAndDriverUpdate = () => {
-  return useGenericConceptMutate<ITrendsAndDrivers>(
+  return useGenericConceptMutate<ITrendsAndDriversV1>(
     (data) => api.concept.updateTrendAndDriver(data.uuid, data),
     [[AucctusQueryKeys.marketScan]],
   );
 };
 
 export const useTrendAndDriverDelete = () => {
-  return useGenericConceptMutate<ITrendsAndDrivers, string>(
+  return useGenericConceptMutate<ITrendsAndDriversV1, string>(
     (uuid) => api.concept.deleteTrendAndDriver(uuid),
     [[AucctusQueryKeys.marketScan]],
   );

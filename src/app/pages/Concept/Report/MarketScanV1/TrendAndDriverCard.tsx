@@ -6,7 +6,7 @@ import {
   useTrendAndDriverDelete,
   useTrendAndDriverUpdate,
 } from '@hooks/query/concepts.hook';
-import { ITrendsAndDrivers } from '@libs/api/types';
+import { ITrendsAndDriversV1 } from '@libs/api/types';
 import { FunctionComponent } from 'react';
 import styles from './styles/marketDetails.module.scss';
 
@@ -17,7 +17,7 @@ const iconDefaultProps = {
 };
 
 interface ITrendsAndDriversProps {
-  trendAndDriver: ITrendsAndDrivers;
+  trendAndDriver: ITrendsAndDriversV1;
 }
 
 const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({

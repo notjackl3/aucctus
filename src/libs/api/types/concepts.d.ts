@@ -64,12 +64,13 @@ export interface IConceptCreate extends IGeneratedConcept {
 
 export interface IConcept extends IBaseConceptEntity, IGeneratedConcept {
   isGenerated: boolean; // Currently not used will likely drop
-  seed?: Unknown;
   identifier: string;
   reportStatus: ConceptReportStatus;
   status: ConceptStatus;
   category: ConceptCategory;
   createdBy: IUser;
+
+  marketScanVersion: 'v1' | 'v2';
 }
 
 export interface IConceptOverview extends IBaseConceptEntity {
@@ -157,55 +158,30 @@ export interface IFinancialProjection extends IBaseConceptEntity {
   som: number;
 }
 
-export interface IEcosystem extends IBaseConceptEntity {
+export interface IGeneralInfo {
+  overview: string;
+  headquarters: string;
+  yearEstablished: number;
+}
+
+export interface IRecentActivity {
+  activity: string;
+  source: string;
+}
+export interface IIncumbent {
+  source: string;
+  ecosystemType: string;
+  version: number;
+  uuid: string;
   name: string;
   description: string;
-  source: string;
-}
-
-export interface IStartupEcosystem extends IEcosystem {
-  ecosystemType: 'startup';
-}
-
-export interface IIncumbentsEcosystem extends IEcosystem {
-  ecosystemType: 'incumbents';
-}
-
-export interface IInvestorsEcosystem extends IEcosystem {
-  ecosystemType: 'investors';
-}
-
-type Ecosystem = IStartupEcosystem | IIncumbentsEcosystem | IInvestorsEcosystem;
-type EcosystemType = Ecosystem['ecosystemType'];
-export interface ITrendsAndDrivers extends IBaseConceptEntity {
-  name: string;
-  description: string;
-  source: string;
-  source: string;
-  // TODO: Fix Source editing
-  sources: [string];
-  // Currently not implemented but will be used in the future
-  image: undefined;
-}
-
-export interface IMarketScanElementCreate {
-  name: string;
-  description: string;
-  source: string;
-}
-
-export interface IEcosystemCreate extends IMarketScanElementCreate {
-  ecosystemType: EcosystemType;
-}
-
-export interface IMarketScan extends IBaseConceptEntity {
-  name: string;
-  startups: IStartupEcosystem[];
-  incumbents: IIncumbentsEcosystem[];
-  investors: IInvestorsEcosystem[];
-  trendsAndDrivers: ITrendsAndDrivers[];
-  trendsAndDriversDescription: string;
-  ecosystemDescription: string;
+  general: IGeneralInfo;
+  recentActivity: IRecentActivity[];
+  recommendedAction: string;
+  hasCompetitiveProduct: boolean;
+  support: ISupport[];
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IConceptPage extends IPageResponse<IConcept> {

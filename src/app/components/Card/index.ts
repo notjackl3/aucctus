@@ -1,5 +1,8 @@
+import StartupSideBarItem from './StartupSideBarItem';
+import AiConclusionBox from './AiConclusionBox';
 import AssumptionOverview from './AssumptionOverview';
 import Detail from './DetailCard';
+import InfoSection from './InfoSection';
 import Kanban from './Kanban/ConceptCard';
 import Testing from './TestingCard';
 
@@ -16,6 +19,7 @@ import MarketSize from './MarketSizeCard';
 const Card = {
   Detail,
   Kanban,
+  InfoSection,
   Demographics,
   KeyAssumptions,
   FinancialProjects,
@@ -27,6 +31,8 @@ const Card = {
   AssumptionsTestingStatus,
   AssumptionOverview,
   Testing,
+  AiConclusionBox,
+  StartupSideBarItem,
 };
 
 export default Card;

@@ -1,4 +1,4 @@
-import { Container, Icon, Loading, Select, Tooltip } from '@components';
+import { Container, Icon, Loading, Select } from '@components';
 import { useConcept, useConceptUpdate } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import api from '@libs/api';
@@ -17,6 +17,7 @@ export interface IConceptReportContext {
 type TabTitles =
   | 'Overview'
   | 'Market Scan'
+  | 'Market Scan V2'
   | 'Financial Projection'
   | 'Customer Profile'
   | 'Key Assumptions'

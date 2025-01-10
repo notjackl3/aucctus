@@ -6,7 +6,7 @@ import { UseMutateFunction } from 'react-query';
 import {
   Ecosystem,
   IFormError,
-  ITrendsAndDrivers,
+  ITrendsAndDriversV1,
 } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
 import Icon from '../../Icon/Icon/Icon';
@@ -15,7 +15,7 @@ import TextArea from '../../Input/TextArea/TextArea';
 import ConfirmationModal from '../ConfirmationModal/ConfirmationModal';
 import styles from './edit-trends-and-driver.module.scss';
 
-interface EditTrendsAndDriverProps<T = Ecosystem | ITrendsAndDrivers> {
+interface EditTrendsAndDriverProps<T = Ecosystem | ITrendsAndDriversV1> {
   updateItem: UseMutateFunction<
     T,
     AxiosError<IFormError<T>, any>,

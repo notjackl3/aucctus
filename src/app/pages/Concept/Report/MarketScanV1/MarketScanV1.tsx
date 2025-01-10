@@ -13,9 +13,9 @@ import EcosystemList from './EcosystemList';
 import styles from './styles/marketDetails.module.scss';
 import TrendAndDriverCard from './TrendAndDriverCard';
 
-const MarketDetails: FunctionComponent = () => {
+const MarketScanV1: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
-  const { data: marketScan } = useConceptMarketScan(conceptId || '');
+  const { data: marketScan } = useConceptMarketScan(conceptId || '', 'v1');
   const { trendsAndDriversDescription, ecosystemDescription } =
     useEditMarketScan();
   const { mutate: addTrendAndDriver } = useTrendAndDriverCreate(
@@ -102,4 +102,4 @@ const MarketDetails: FunctionComponent = () => {
   );
 };
 
-export default MarketDetails;
+export default MarketScanV1;

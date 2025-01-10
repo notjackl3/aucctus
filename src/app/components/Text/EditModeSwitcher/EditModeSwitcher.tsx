@@ -1,7 +1,6 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
 import Icon from '../../Icon/Icon/Icon';
 import TextArea from '../../Input/TextArea/TextArea';
-import styles from './edit-mode-switcher.module.scss'; // Import the SCSS module
 
 interface IEditModeSwitcherProps {
   value?: string;
@@ -24,43 +23,6 @@ interface IEditModeSwitcherProps {
 
 /**
  * EditModeSwitcher component allows the user to switch between edit mode and display mode.
- *
- * @component
- * @example
- * ```tsx
- * <EditModeSwitcher
- *   value="Hello World"
- *   containerClassName="container"
- *   textFieldClassName="textField"
- *   pClassName="paragraph"
- *   name="editModeSwitcher"
- *   label="Edit Mode Switcher"
- *   error={false}
- *   errorMessage=""
- *   required={true}
- *   hint="Click to edit"
- *   isDisableResize={false}
- *   onChange={handleChange}
- *   handleSave={handleSave}
- * />
- * ```
- *
- * @param {Object} props - The component props.
- * @param {string} props.value - The current value of the text.
- * @param {string} [props.containerClassName] - The class name for the container element.
- * @param {string} [props.textFieldClassName] - The class name for the text field element.
- * @param {string} [props.pClassName] - The class name for the paragraph element.
- * @param {string} [props.name] - The name attribute for the text field.
- * @param {string} [props.label] - The label for the text field.
- * @param {boolean} [props.error] - Indicates if there is an error with the text field.
- * @param {string} [props.errorMessage] - The error message to display.
- * @param {boolean} [props.required] - Indicates if the text field is required.
- * @param {string} [props.hint] - The hint text to display.
- * @param {boolean} [props.isDisableResize] - Indicates if the text field should be resizable.
- * @param {Function} [props.onChange] - The callback function to handle text changes.
- * @param {Function} [props.handleSave] - The callback function to handle saving the text.
- *
- * @returns {JSX.Element} The rendered EditModeSwitcher component.
  */
 const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
   value = '',
@@ -85,7 +47,6 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
   useEffect(() => {
     if (!isEditing || !ref.current) return;
 
-    // Handle the keydown event
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setIsEditing(false);
@@ -93,12 +54,11 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
       }
 
       if (e.key === 'Enter' && e.shiftKey) {
-        // Add a new line to the text
         onChange &&
           onChange({
             target: { value: `${value}\n` },
           } as React.ChangeEvent<HTMLTextAreaElement>);
-        e.preventDefault(); // Prevent the default action
+        e.preventDefault();
       } else if (
         e.key === 'Enter' ||
         ((e.metaKey || e.ctrlKey) && e.key === 's')
@@ -108,7 +68,6 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
       }
     };
 
-    // Close the edit mode when clicking outside the component
     const handleClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setIsEditing(false);
@@ -127,7 +86,11 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
 
   return (
     <div
-      className={`${styles.container}  ${!isEditing ? styles.editOff : ''} ${containerClassName}`}
+      className={`relative w-full rounded-md transition-all duration-300 ${
+        !isEditing
+          ? 'cursor-pointer hover:bg-white hover:p-2 hover:shadow-md'
+          : ''
+      } ${containerClassName}`}
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -135,10 +98,10 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
       }}
     >
       {isEditing ? (
-        <div className={styles.editContainer} ref={ref}>
-          <div className={styles.editActions}>
+        <div className='flex w-full flex-col' ref={ref}>
+          <div className='absolute right-2 top-3 flex flex-row justify-end gap-4'>
             <button
-              className={`btn btn-light ${styles.editButton}`}
+              className='bg-light z-10 max-h-8 rounded-md p-3'
               onClick={(e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -152,7 +115,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
           <TextArea
             value={value}
             onChange={onChange}
-            className={`${styles.inputField} ${textFieldClassName}`} // Use SCSS module style
+            className={`box-border w-full p-2 pb-5 pr-12 text-base opacity-100 transition-opacity duration-300 ${textFieldClassName}`}
             name={name}
             label={label}
             error={error}
@@ -164,7 +127,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
           />
         </div>
       ) : (
-        <p className={`${pClassName}`}>{value}</p> // Use SCSS module style
+        <p className={pClassName}>{value}</p>
       )}
     </div>
   );

@@ -3,11 +3,11 @@ import Default from './ConceptReport';
 import Context from './ConceptSettings';
 import CustomerProfile from './CustomerProfile';
 import FinancialProjection from './FinancialDetails';
-import MarketScan from './MarketDetails';
+import MarketScanBase from './MarketScanBase';
 import Overview from './OverviewDetails';
 
 (Default as any).Overview = Overview;
-(Default as any).MarketScan = MarketScan;
+(Default as any).MarketScan = MarketScanBase;
 (Default as any).CustomerProfile = CustomerProfile;
 (Default as any).FinancialProjection = FinancialProjection;
 (Default as any).Assumptions = Assumptions;
@@ -15,7 +15,7 @@ import Overview from './OverviewDetails';
 
 const Report = Default as typeof Default & {
   Overview: typeof Overview;
-  MarketScan: typeof MarketScan;
+  MarketScan: typeof MarketScanBase;
   CustomerProfile: typeof CustomerProfile;
   FinancialProjection: typeof FinancialProjection;
   Assumptions: typeof Assumptions;

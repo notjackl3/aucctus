@@ -7,6 +7,7 @@ import { AssumptionsApi } from './assumptions';
 import { AuthApi } from './auth';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
+import { MarketScanApi } from './marketScan';
 import { ITokenResponse } from './types';
 
 export interface IApiConfig {
@@ -29,10 +30,11 @@ export class Api {
   pendingRefresh?: Promise<ITokenResponse | undefined> = void 0;
 
   auth: AuthApi;
-  account: AccountApi;
-  concept: ConceptApi;
-  assumption: AssumptionsApi;
-  conceptIgnite: IgniteConceptApi;
+  account!: AccountApi;
+  concept!: ConceptApi;
+  assumption!: AssumptionsApi;
+  marketScan!: MarketScanApi;
+  conceptIgnite!: IgniteConceptApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -44,27 +46,20 @@ export class Api {
       }),
     );
 
-    this.account = new AccountApi(
-      this,
-      this.buildConfig({
-        baseURL: this._config.baseUrl,
-      }),
-    );
+    const apiClasses: { key: keyof Api; class: any }[] = [
+      { key: 'account', class: AccountApi },
+      { key: 'concept', class: ConceptApi },
+      { key: 'assumption', class: AssumptionsApi },
+      { key: 'marketScan', class: MarketScanApi },
+      { key: 'conceptIgnite', class: IgniteConceptApi },
+    ];
 
-    this.concept = new ConceptApi(
-      this,
-      this.buildConfig({ baseURL: this._config.baseUrl }),
-    );
-
-    this.assumption = new AssumptionsApi(
-      this,
-      this.buildConfig({ baseURL: this._config.baseUrl }),
-    );
-
-    this.conceptIgnite = new IgniteConceptApi(
-      this,
-      this.buildConfig({ baseURL: this._config.baseUrl }),
-    );
+    apiClasses.forEach(({ key, class: ApiClass }) => {
+      this[key] = new ApiClass(
+        this,
+        this.buildConfig({ baseURL: this._config.baseUrl }),
+      );
+    });
   }
 
   get accessToken() {
@@ -75,14 +70,18 @@ export class Api {
     // Update all pointing to the resource server with the new tokens
     // By default however,  the access token and refresh token are set to the httpOnly cookies
     // This is simply just an extra layer.
-    [this.account, this.concept, this.conceptIgnite, this.assumption].forEach(
-      (api) => {
-        api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
-        api.config.headers = Object.assign({}, api.config.headers, {
-          Authorization: `Bearer ${token}`,
-        });
-      },
-    );
+    [
+      this.account,
+      this.concept,
+      this.conceptIgnite,
+      this.assumption,
+      this.marketScan,
+    ].forEach((api) => {
+      api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
+      api.config.headers = Object.assign({}, api.config.headers, {
+        Authorization: `Bearer ${token}`,
+      });
+    });
     analytics.debug('Setting Access Token');
     this._accessToken = token;
   }

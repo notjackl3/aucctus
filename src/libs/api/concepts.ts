@@ -16,10 +16,10 @@ import {
   IEcosystemCreate,
   IFinancialProjection,
   IGeneratedConcept,
-  IMarketScan,
+  IMarketScanV1,
   IMarketScanElementCreate,
   IPageResponse,
-  ITrendsAndDrivers,
+  ITrendsAndDriversV1,
 } from './types'; // Import the missing type
 
 export interface IConceptSeedAnswer {
@@ -185,33 +185,33 @@ export class ConceptApi extends ApiService {
     );
   }
 
-  getConceptMarketScan(uuid: string) {
-    return this.get<IMarketScan>(endpoints.conceptMarketScan(uuid));
+  getConceptMarketScan(uuid: string, version: string = 'v1') {
+    return this.get<IMarketScanV1>(endpoints.conceptMarketScan(uuid, version));
   }
 
-  updateConceptMarketScan(uuid: string, data: Partial<IMarketScan>) {
-    return this.patch<IMarketScan, Partial<IMarketScan>>(
+  updateConceptMarketScan(uuid: string, data: Partial<IMarketScanV1>) {
+    return this.patch<IMarketScanV1, Partial<IMarketScanV1>>(
       endpoints.conceptMarketScanUuid(uuid),
       data,
     );
   }
 
-  updateTrendAndDriver(uuid: string, data: Partial<ITrendsAndDrivers>) {
-    return this.patch<ITrendsAndDrivers, Partial<ITrendsAndDrivers>>(
+  updateTrendAndDriver(uuid: string, data: Partial<ITrendsAndDriversV1>) {
+    return this.patch<ITrendsAndDriversV1, Partial<ITrendsAndDriversV1>>(
       endpoints.conceptTrendAndDriver(uuid),
       data,
     );
   }
 
   createTrendAndDriver(uuid: string, data: IMarketScanElementCreate) {
-    return this.post<ITrendsAndDrivers, IMarketScanElementCreate>(
+    return this.post<ITrendsAndDriversV1, IMarketScanElementCreate>(
       endpoints.conceptMarketScanElement(uuid, 'trends-and-drivers'),
       data,
     );
   }
 
   deleteTrendAndDriver(uuid: string) {
-    return this.delete<ITrendsAndDrivers>(
+    return this.delete<ITrendsAndDriversV1>(
       endpoints.conceptTrendAndDriver(uuid),
     );
   }

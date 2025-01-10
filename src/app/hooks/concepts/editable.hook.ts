@@ -15,7 +15,7 @@ import {
   ICustomerProfile,
   IFinancialProjection,
   IFormError,
-  IMarketScan,
+  IMarketScanV1,
 } from '../../../libs/api/types';
 import {
   useConcept,
@@ -252,7 +252,7 @@ export function useEditMarketScan() {
   const { mutate } = useMarketScanUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 500 };
 
-  const trendsAndDriversDescription = useEditableField<string, IMarketScan>({
+  const trendsAndDriversDescription = useEditableField<string, IMarketScanV1>({
     initialValue: marketScan?.trendsAndDriversDescription || '',
     fieldName: 'trendsAndDriversDescription',
     updateMutation: mutate,
@@ -260,7 +260,7 @@ export function useEditMarketScan() {
     validation: validationOptions,
   });
 
-  const ecosystemDescription = useEditableField<string, IMarketScan>({
+  const ecosystemDescription = useEditableField<string, IMarketScanV1>({
     initialValue: marketScan?.ecosystemDescription || '',
     fieldName: 'ecosystemDescription',
     updateMutation: mutate,

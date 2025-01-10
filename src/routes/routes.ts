@@ -2,6 +2,7 @@
 export enum ConceptPath {
   Overview = 'overview',
   MarketScan = 'market-scan',
+  MarketScanV2 = 'market-scan-v2',
   FinancialProjection = 'financial-projection',
   CustomerProfile = 'customer-profile',
   Assumptions = 'assumptions',
