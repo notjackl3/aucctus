@@ -5,7 +5,7 @@ import React, {
   ReactNode,
   FunctionComponent,
 } from 'react';
-import Modal from '../components/Modal/Modal/Modal';
+import Modal, { ModalPosition } from '../components/Modal/Modal/Modal';
 
 interface ModalContextType {
   isOpen: boolean;
@@ -20,6 +20,7 @@ interface ModalContextType {
   openModal: <T extends object>(
     Component: FunctionComponent<T>,
     props?: T,
+    options?: ModalOptions,
   ) => void;
   closeModal: () => void;
 }
@@ -38,8 +39,13 @@ interface ModalProviderProps {
   children: ReactNode;
 }
 
+interface ModalOptions {
+  position?: ModalPosition;
+}
+
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const [options, setOptions] = useState<ModalOptions>();
   const [content, setContent] = useState<ReactNode>(null);
   const [shouldCloseOnOverlayClick, setShouldCloseOnOverlayClickClick] =
     useState<boolean>(true);
@@ -47,8 +53,10 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const openModal = <T extends object>(
     Component: FunctionComponent<T>,
     props: T = {} as T,
+    options: ModalOptions = { position: 'center' },
   ) => {
     setContent(<Component {...props} />);
+    setOptions(options);
     setIsOpen(true);
   };
 
@@ -56,6 +64,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     setShouldCloseOnOverlayClickClick;
     setIsOpen(false);
     setShouldCloseOnOverlayClickClick(true);
+    setContent(null);
     setContent(null);
   };
 
@@ -70,7 +79,9 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       }}
     >
       {children}
-      {isOpen && <Modal>{content}</Modal>}
+      {isOpen && (
+        <Modal position={options?.position ?? 'center'}>{content}</Modal>
+      )}
     </ModalContext.Provider>
   );
 };

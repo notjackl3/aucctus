@@ -75,6 +75,35 @@ module.exports = {
       blur: {
         xs: '2px',
       },
+      animation: {
+        'slide-in-center': 'slideInCenter 0.3s ease both',
+        'slide-in-top': 'slideInTop 0.3s ease both',
+        'slide-in-bottom': 'slideInBottom 0.3s ease both',
+        'slide-in-left': 'slideInLeft 0.3s ease both',
+        'slide-in-right': 'slideInRight 0.3s ease both',
+      },
+      keyframes: {
+        slideInCenter: {
+          from: { transform: 'translateY(-50px)', opacity: '0' },
+          to: { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideInTop: {
+          from: { transform: 'translateY(-100%)', opacity: '0' },
+          to: { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideInBottom: {
+          from: { transform: 'translateY(100%)', opacity: '0' },
+          to: { transform: 'translateY(0)', opacity: '1' },
+        },
+        slideInLeft: {
+          from: { transform: 'translateX(-100%)', opacity: '0' },
+          to: { transform: 'translateX(0)', opacity: '1' },
+        },
+        slideInRight: {
+          from: { transform: 'translateX(100%)', opacity: '0' },
+          to: { transform: 'translateX(0)', opacity: '1' },
+        },
+      },
     },
   },
   plugins: [],

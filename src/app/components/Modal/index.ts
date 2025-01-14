@@ -1,7 +1,8 @@
 import Confirmation from './ConfirmationModal/ConfirmationModal';
 import AddCustomerProfile from './CustomerProfile/AddCustomerProfile';
 import EditCustomerProfileDemographics from './CustomerProfile/EditCustomerProfileDemographics';
-import EvidenceAndReasoning from './EvedanceAndReasoningModal';
+import EvidenceAndReasoning from './EvidenceAndReasoningModal';
+import SupportInsights from './SupportInsights';
 import AddKeyAssumptionModal from './KeyAssumtionModal/AddKeyAssumptionModal';
 import EditKeyAssumptionModal from './KeyAssumtionModal/EditKeyAssumtionModal';
 import AddMarketScanElement from './MarketScanElement/AddMarketScanElement';
@@ -19,6 +20,7 @@ const Modal = {
   AddMarketScanElement,
   EditMarketScanElement,
   EvidenceAndReasoning,
+  SupportInsights,
   TestModal,
 };
 

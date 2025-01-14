@@ -1,17 +1,21 @@
 import React, { FunctionComponent, useEffect, useRef } from 'react';
 import { useModal } from '../../../context/ModalContextProvider';
+import { cn } from '@libs/utils/react';
 
-import styles from './modal.module.scss';
+export type ModalPosition = 'center' | 'left' | 'right';
 
 interface IModalProps {
   children: React.ReactNode;
+  position?: ModalPosition;
 }
 
-const Modal: FunctionComponent<IModalProps> = ({ children }) => {
+const Modal: FunctionComponent<IModalProps> = ({
+  children,
+  position = 'center',
+}) => {
   const { closeModal, shouldCloseOnOverlayClick } = useModal();
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // Effect to add and clean up the event listener based on shouldCloseOnOverlayClick
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -23,23 +27,39 @@ const Modal: FunctionComponent<IModalProps> = ({ children }) => {
       }
     };
 
-    // Conditionally add click event listener to the document
     if (shouldCloseOnOverlayClick) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
-    // Clean up function that removes the event listener
     return () => {
       if (shouldCloseOnOverlayClick) {
         document.removeEventListener('mousedown', handleClickOutside);
       }
     };
-  }, [closeModal, shouldCloseOnOverlayClick]); // include shouldCloseOnOverlayClick in the dependency array
+  }, [closeModal, shouldCloseOnOverlayClick]);
+
+  // Determine classes based on position prop
+  const positionClasses = {
+    center: 'm-auto animate-slide-in-center',
+    right: 'flex items-center justify-end animate-slide-in-right',
+    left: 'flex items-center justify-start animate-slide-in-left',
+  };
 
   return (
-    <div className={styles.overlay}>
-      <div ref={contentRef} className={styles.content}>
-        {children}
+    <div className='fixed inset-0 z-50 flex w-full overflow-y-auto bg-black bg-opacity-50'>
+      {/* If position is center set m-auto and rounded/shadow.
+      If not center than make w-full so flex can position correctly */}
+      <div
+        className={cn(
+          'transform cursor-default',
+          position === 'center'
+            ? 'm-auto rounded-lg shadow-lg'
+            : `${positionClasses[position]} w-full`,
+        )}
+      >
+        <div ref={contentRef} className='h-full bg-white'>
+          {children}
+        </div>
       </div>
     </div>
   );

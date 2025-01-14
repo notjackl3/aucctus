@@ -15,7 +15,6 @@ interface IConceptReportContext {
 
 const MarketScanBase: FunctionComponent = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  console.log(concept);
   return (
     <div>
       {concept.marketScanVersion === 'v2' ? <MarketScan /> : <MarketScanV1 />}

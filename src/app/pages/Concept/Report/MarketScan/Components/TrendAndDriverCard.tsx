@@ -1,13 +1,8 @@
 import images from '@assets/img';
-import { Card, Icon } from '@components';
-import EditMarketScanElement from '@components/Modal/MarketScanElement/EditMarketScanElement';
+import { Card, Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
-import {
-  useTrendAndDriverDelete,
-  useTrendAndDriverUpdate,
-} from '@hooks/query/concepts.hook';
-import { ITrendsAndDrivers } from '@libs/api/types';
-import { FunctionComponent } from 'react';
+import { IInsight, ISupport, ITrendsAndDrivers } from '@libs/api/types';
+import { FunctionComponent, useCallback } from 'react';
 
 const iconDefaultProps = {
   height: 19,
@@ -29,8 +24,25 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
   trendAndDriver,
 }) => {
   const { openModal } = useModal();
-  const { mutate: deleteItem } = useTrendAndDriverDelete();
-  const { mutate: updateItem } = useTrendAndDriverUpdate();
+
+  const handleSupportModalClick = useCallback(
+    (conclusion: string, support: ISupport) => {
+      openModal(Modal.EvidenceAndReasoning, {
+        conclusion: conclusion,
+        reasoning: support.insights
+          .map((i: IInsight) => i.description)
+          .join('\n\n'),
+        sources: Array.from(
+          new Map(
+            support.insights
+              .flatMap((i: IInsight) => i.sources) // Flatten all sources arrays
+              .map((source) => [source.url, source]), // Use source.url as the key
+          ).values(), // Get only the unique values
+        ),
+      });
+    },
+    [openModal],
+  );
 
   const renderTrendIcon = (trend: string) => {
     switch (trend) {
@@ -73,29 +85,34 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
               </div>
             </div>
           </div>
-          <div className='cursor-pointer rounded-md bg-[#EAECF0] p-[4px]'>
+          <div
+            onClick={() =>
+              handleSupportModalClick(
+                trendAndDriver.name,
+                trendAndDriver.support,
+              )
+            }
+            className='cursor-pointer rounded-md bg-[#EAECF0] p-[4px]'
+          >
             <Icon variant='link-source' {...iconDefaultProps} />
           </div>
         </div>
       }
     >
-      <div
-        className='flex cursor-pointer flex-col gap-4 p-6 hover:bg-gray-50'
-        // onClick={() =>
-        //   openModal(EditMarketScanElement, {
-        //     item: trendAndDriver,
-        //     deleteItem,
-        //     updateItem,
-        //   })
-        // }
-      >
+      <div className='flex cursor-pointer flex-col gap-4 p-6 hover:bg-gray-50'>
         <img
           alt='delivery-trend'
           src={trendAndDriver.imagePath ?? 'url'}
           className='h-[120px] w-full object-cover object-center'
           onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-            const randomNumber = Math.floor(Math.random() * 3) + 1; // Random number between 1 and 3
-            e.currentTarget.src = images.trendOne;
+            const imageArray = [
+              images.trendOne,
+              images.trendTwo,
+              images.trendThree,
+            ];
+            const randomImage =
+              imageArray[Math.floor(Math.random() * imageArray.length)];
+            e.currentTarget.src = randomImage;
           }}
         />
         <span className='text-base font-bold leading-6 text-gray-950'>

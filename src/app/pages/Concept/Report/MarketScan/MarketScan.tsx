@@ -14,11 +14,12 @@ import { useParams } from 'react-router-dom';
 import TrendAndDriverCard from './Components/TrendAndDriverCard';
 
 import { Container } from '@components';
+import InvestorList from './Components/InvestorList';
+import IncumbentsList from './Components/IncumbentList';
 
 const MarketScan: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
   const { data: marketScan } = useConceptMarketScan(conceptId || '', 'v2');
-  console.log(marketScan);
   const { trendsAndDriversDescription, ecosystemDescription } =
     useEditMarketScan();
   const { mutate: addTrendAndDriver } = useTrendAndDriverCreate(
@@ -77,21 +78,11 @@ const MarketScan: FunctionComponent = () => {
           startups={(marketScan as unknown as IMarketScan)?.startups || []}
         />
       </div>
-      {/* <div className='flex w-full flex-col gap-4'>
-        <IncumbentList
+      <div className='flex w-full flex-col gap-4'>
+        <IncumbentsList
           incumbents={(marketScan as unknown as IMarketScan)?.incumbents || []}
         />
-      </div> */}
-      {/* <IncumbentList
-          title='Top Incumbents'
-          data={marketScan?.incumbents || []}
-          ecosystemType='incumbents'
-        />
-        <InvestorList
-          title='Top Investors'
-          data={marketScan?.investors || []}
-          ecosystemType='investors'
-        /> */}
+      </div>
     </div>
   );
 };

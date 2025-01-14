@@ -49,7 +49,6 @@ export interface IStartup extends IBaseConceptEntity {
 
 export interface FieldEvidence {
   insight: string;
-
   // The source of the evidence
   sources: ISource[];
 }
@@ -79,7 +78,7 @@ export interface ITrendsAndDrivers extends IBaseConceptEntity {
   description: string;
   trendChange: TrendChangeType; // Use the literal type
   imagePath: string;
-  support: ISupport[];
+  support: ISupport;
   createdAt: string;
   updatedAt: string;
 }
@@ -87,8 +86,6 @@ export interface ITrendsAndDrivers extends IBaseConceptEntity {
 export interface IInvestor extends IBaseConceptEntity {}
 
 export interface IMarketScan extends IBaseConceptEntity {
-  version_flag: 'v2';
-
   name: string;
 
   ecosystemDescription: string;
@@ -98,6 +95,4 @@ export interface IMarketScan extends IBaseConceptEntity {
 
   trendsAndDriversDescription: string;
   trendsAndDrivers: ITrendsAndDrivers[];
-
-  support: ISupport[];
 }

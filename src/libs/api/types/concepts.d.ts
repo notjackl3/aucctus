@@ -116,13 +116,6 @@ export interface ICustomerProfileCreate {
 
 export type MarketMetricType = 'TAM' | 'SAM' | 'SOM';
 
-export interface ISource {
-  uuid: string;
-  title: string;
-  description?: string;
-  url: string;
-}
-
 interface BaseFinancialProjectionItem extends IBaseConceptEntity {
   rationale: string;
   sources: ISource[];
@@ -167,21 +160,6 @@ export interface IGeneralInfo {
 export interface IRecentActivity {
   activity: string;
   source: string;
-}
-export interface IIncumbent {
-  source: string;
-  ecosystemType: string;
-  version: number;
-  uuid: string;
-  name: string;
-  description: string;
-  general: IGeneralInfo;
-  recentActivity: IRecentActivity[];
-  recommendedAction: string;
-  hasCompetitiveProduct: boolean;
-  support: ISupport[];
-  createdAt: string;
-  updatedAt: string;
 }
 
 export interface IConceptPage extends IPageResponse<IConcept> {
