@@ -16,8 +16,8 @@ import {
   IEcosystemCreate,
   IFinancialProjection,
   IGeneratedConcept,
-  IMarketScanV1,
   IMarketScanElementCreate,
+  IMarketScanV1,
   IPageResponse,
   ITrendsAndDriversV1,
 } from './types'; // Import the missing type
@@ -185,8 +185,8 @@ export class ConceptApi extends ApiService {
     );
   }
 
-  getConceptMarketScan(uuid: string, version: string = 'v1') {
-    return this.get<IMarketScanV1>(endpoints.conceptMarketScan(uuid, version));
+  getConceptMarketScan(uuid: string) {
+    return this.get<IMarketScanV1>(endpoints.conceptMarketScan(uuid, 'v1'));
   }
 
   updateConceptMarketScan(uuid: string, data: Partial<IMarketScanV1>) {

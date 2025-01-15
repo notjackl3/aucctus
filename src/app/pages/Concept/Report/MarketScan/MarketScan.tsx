@@ -1,4 +1,3 @@
-// Tailwind CSS equivalent of the components
 import Icon from '@components/Icon/Icon/Icon';
 import AddMarketScanElement from '@components/Modal/MarketScanElement/AddMarketScanElement';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
@@ -8,18 +7,15 @@ import {
   useConceptMarketScan,
   useTrendAndDriverCreate,
 } from '@hooks/query/concepts.hook';
-import { IMarketScan } from '@libs/api/types';
 import { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
+import IncumbentsList from './Components/IncumbentList/IncumbentList';
+import StartupList from './Components/StartupList/StartupList';
 import TrendAndDriverCard from './Components/TrendAndDriverCard';
-
-import { Container } from '@components';
-import InvestorList from './Components/InvestorList';
-import IncumbentsList from './Components/IncumbentList';
 
 const MarketScan: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
-  const { data: marketScan } = useConceptMarketScan(conceptId || '', 'v2');
+  const { data: marketScan } = useConceptMarketScan(conceptId || '');
   const { trendsAndDriversDescription, ecosystemDescription } =
     useEditMarketScan();
   const { mutate: addTrendAndDriver } = useTrendAndDriverCreate(
@@ -74,15 +70,21 @@ const MarketScan: FunctionComponent = () => {
         />
       </div>
       <div className='flex w-full flex-col gap-4'>
-        <Container.StartupList
-          startups={(marketScan as unknown as IMarketScan)?.startups || []}
-        />
+        <StartupList startups={marketScan?.startups || []} />
       </div>
       <div className='flex w-full flex-col gap-4'>
-        <IncumbentsList
-          incumbents={(marketScan as unknown as IMarketScan)?.incumbents || []}
-        />
+        <IncumbentsList incumbents={marketScan?.incumbents || []} />
       </div>
+      {/* <IncumbentList
+          title='Top Incumbents'
+          data={marketScan?.incumbents || []}
+          ecosystemType='incumbents'
+        />
+        <InvestorList
+          title='Top Investors'
+          data={marketScan?.investors || []}
+          ecosystemType='investors'
+        /> */}
     </div>
   );
 };

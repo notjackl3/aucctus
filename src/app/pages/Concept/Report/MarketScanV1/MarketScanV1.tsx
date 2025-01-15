@@ -4,7 +4,7 @@ import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher
 import { useModal } from '@context/ModalContextProvider';
 import { useEditMarketScan } from '@hooks/concepts/editable.hook';
 import {
-  useConceptMarketScan,
+  useConceptMarketScanV1,
   useTrendAndDriverCreate,
 } from '@hooks/query/concepts.hook';
 import { FunctionComponent } from 'react';
@@ -15,7 +15,7 @@ import TrendAndDriverCard from './TrendAndDriverCard';
 
 const MarketScanV1: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
-  const { data: marketScan } = useConceptMarketScan(conceptId || '', 'v1');
+  const { data: marketScan } = useConceptMarketScanV1(conceptId || '');
   const { trendsAndDriversDescription, ecosystemDescription } =
     useEditMarketScan();
   const { mutate: addTrendAndDriver } = useTrendAndDriverCreate(

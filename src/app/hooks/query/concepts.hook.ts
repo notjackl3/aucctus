@@ -12,8 +12,8 @@ import {
   IEcosystemCreate,
   IFinancialProjection,
   IFormError,
-  IMarketScanV1,
   IMarketScanElementCreate,
+  IMarketScanV1,
   // IMarketSizeMetric,
   ITrendsAndDriversV1,
 } from '@libs/api/types';
@@ -190,15 +190,32 @@ export const useConceptOverview = (uuid: string) => {
 };
 
 /**
+ * @deprecated Use useConceptMarketScan instead.
  * Custom hook for fetching a concept market scan by their Concept UUID.
  * @param uuid - The UUID of the concept.
  * @returns An object containing the query result and the concept market scan data.
  */
-export const useConceptMarketScan = (uuid: string, version: string) => {
+export const useConceptMarketScanV1 = (uuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.marketScan, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
-    queryFn: async () => await api.concept.getConceptMarketScan(uuid, version),
+    queryFn: async () => await api.concept.getConceptMarketScan(uuid),
+    enabled: !!uuid,
+  });
+
+  return { ...query, marketScan: query.data };
+};
+
+/**
+ * Custom hook for fetching a concept market scan by their Concept UUID.
+ * @param uuid - The UUID of the concept.
+ * @returns An object containing the query result and the concept market scan data.
+ */
+export const useConceptMarketScan = (uuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.marketScan, uuid],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    queryFn: async () => await api.marketScan.getMarketScan(uuid),
     enabled: !!uuid,
   });
 

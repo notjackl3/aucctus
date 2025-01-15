@@ -1,14 +1,4 @@
-export interface IGeneralInfo {
-  overview: string;
-  headquarters: string;
-  yearEstablished: number;
-}
-
-export interface IRecentActivity {
-  activity: string;
-  source: string;
-}
-
+import { IBaseConceptEntity } from '.';
 interface IEngagementTactic {
   name: string;
   description: string;
@@ -17,8 +7,9 @@ interface IEngagementTactic {
 
 interface IContact {
   name: string;
-  position: string;
-  source: 'general' | 'linkedin';
+  title: string;
+  email?: string;
+  linkedin?: string;
 }
 
 interface IKeyFact {
@@ -26,25 +17,27 @@ interface IKeyFact {
   source: string;
 }
 
-export interface IStartup extends IBaseConceptEntity {
-  uuid: string;
+export interface IBaseMarketScanCompany extends IBaseConceptEntity {
   name: string;
-  overview: string;
   domain: string;
-
+  overview: string;
   overviewEvidence: FieldEvidence;
-
-  headquarters: string;
-  headquartersEvidence: FieldEvidence;
-
   founded: string;
   foundedEvidence: FieldEvidence;
+  headquarters: string;
+  headquartersEvidence: FieldEvidence;
+}
+
+export interface IStartup extends IBaseMarketScanCompany {
+  uuid: string;
 
   valueProposition: string;
   valuePropositionEvidence: FieldEvidence;
 
   competitiveAdvantage: string;
   competitiveAdvantageEvidence: FieldEvidence;
+
+  keyContacts: IContact[];
 }
 
 export interface FieldEvidence {
@@ -53,21 +46,10 @@ export interface FieldEvidence {
   sources: ISource[];
 }
 
-export interface IIncumbent extends IBaseConceptEntity {
-  uuid: string;
-  source: string;
-  ecosystemType: string;
-  version: number;
-  uuid: string;
-  name: string;
-  description: string;
-  general: IGeneralInfo;
-  recentActivity: IRecentActivity[];
-  recommendedAction: string;
+export interface IIncumbent extends IBaseMarketScanCompany {
   hasCompetitiveProduct: boolean;
-  support: ISupport[];
-  createdAt: string;
-  updatedAt: string;
+  recentActivity?: list[Any];
+  recommendedAction?: string;
 }
 
 type TrendChangeType = 'increasing' | 'decreasing' | 'stagnating';

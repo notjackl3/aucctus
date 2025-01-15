@@ -151,17 +151,6 @@ export interface IFinancialProjection extends IBaseConceptEntity {
   som: number;
 }
 
-export interface IGeneralInfo {
-  overview: string;
-  headquarters: string;
-  yearEstablished: number;
-}
-
-export interface IRecentActivity {
-  activity: string;
-  source: string;
-}
-
 export interface IConceptPage extends IPageResponse<IConcept> {
   statusCounts: { [key in ConceptStatus]: number };
 }

@@ -1,8 +1,8 @@
-import React from 'react';
-import { Button, Icon } from '@components';
 import images from '@assets/img';
+import { Button, Icon } from '@components';
 import { IStartup } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import React from 'react';
 
 interface SidebarItemProps {
   startup: IStartup;
@@ -45,13 +45,14 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
 
         <Button
           color='light'
-          size='xs'
+          size='sm'
+          noBorder
           onClick={(e) => {
             e.stopPropagation();
             window.open(startup.domain, '_blank');
           }}
         >
-          <Icon variant='link' height='12' width='12' stroke='#2B3674' />
+          <Icon variant='link' />
         </Button>
       </div>
       <p className='line-clamp-3 text-[12px] font-normal leading-[18px] text-[#0C111D]'>

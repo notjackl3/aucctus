@@ -14,12 +14,12 @@ export class MarketScanApi extends ApiService {
   }
 
   getMarketScan(uuid: string) {
-    return this.get<IMarketScan>(endpoints.conceptMarketScanV2(uuid));
+    return this.get<IMarketScan>(endpoints.conceptMarketScan(uuid, 'v2'));
   }
 
   updateMarketScan(uuid: string, data: Partial<IMarketScan>) {
     return this.patch<IMarketScan, Partial<IMarketScan>>(
-      endpoints.conceptMarketScanUuid(uuid),
+      endpoints.conceptMarketScanUuid(uuid, 'v2'),
       data,
     );
   }

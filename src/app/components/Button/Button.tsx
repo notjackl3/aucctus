@@ -12,7 +12,8 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
     | 'danger'
     | 'warning'
     | 'info'
-    | 'disabled';
+    | 'disabled'
+    | 'grey';
   size?: 'xs' | 'sm' | 'md' | 'lg';
   bold?: boolean;
   noBorder?: boolean;
