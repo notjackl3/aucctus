@@ -13,23 +13,28 @@ interface IContact {
 }
 
 interface IKeyFact {
-  fact: string;
-  source: string;
+  text: string;
+  evidence: FieldEvidence;
 }
 
 export interface IBaseMarketScanCompany extends IBaseConceptEntity {
   name: string;
-  domain: string;
-  overview: string;
-  overviewEvidence: FieldEvidence;
-  founded: string;
-  foundedEvidence: FieldEvidence;
-  headquarters: string;
-  headquartersEvidence: FieldEvidence;
+  domain?: string;
+  overview?: string;
+  overviewEvidence?: FieldEvidence;
+  founded?: string;
+  foundedEvidence?: FieldEvidence;
+  headquarters?: string;
+  headquartersEvidence?: FieldEvidence;
+
+  status: 'isPending' | 'completed';
 }
 
 export interface IStartup extends IBaseMarketScanCompany {
   uuid: string;
+
+  relevance?: string;
+  predictions?: string;
 
   valueProposition: string;
   valuePropositionEvidence: FieldEvidence;
@@ -38,6 +43,9 @@ export interface IStartup extends IBaseMarketScanCompany {
   competitiveAdvantageEvidence: FieldEvidence;
 
   keyContacts: IContact[];
+  keyFacts: IKeyFact[];
+
+  engagementTactics: IEngagementTactic[];
 }
 
 export interface FieldEvidence {

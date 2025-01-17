@@ -31,7 +31,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           <div className='h-8 w-8 overflow-hidden rounded-full'>
             <img
               alt='company-logo'
-              src={`https://logo.clearbit.com/${startup.domain}`}
+              src={`https://logo.clearbit.com/${startup.domain || ''}`}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src =
                   images.companyLogoDefault;
@@ -43,17 +43,19 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           </h3>
         </div>
 
-        <Button
-          color='light'
-          size='sm'
-          noBorder
-          onClick={(e) => {
-            e.stopPropagation();
-            window.open(startup.domain, '_blank');
-          }}
-        >
-          <Icon variant='link' />
-        </Button>
+        {startup.domain && (
+          <Button
+            color='light'
+            size='sm'
+            noBorder
+            onClick={(e) => {
+              e.stopPropagation();
+              window.open(startup.domain, '_blank');
+            }}
+          >
+            <Icon variant='link' />
+          </Button>
+        )}
       </div>
       <p className='line-clamp-3 text-[12px] font-normal leading-[18px] text-[#0C111D]'>
         {startup.overview}

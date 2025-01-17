@@ -37,9 +37,9 @@ const IncumbentsList: React.FC<IncumbentDashboardProps> = ({ incumbents }) => {
   );
 
   return (
-    <div className='flex flex-col rounded-xl border border-gray-200 bg-white p-4 pt-8 shadow-sm'>
+    <div className='relative rounded-xl border border-gray-200 bg-white p-4 pt-8 shadow-sm'>
       {/* Header */}
-      <div className='flex flex-row items-center justify-start'>
+      <div className='mb-4 flex flex-row items-center justify-start'>
         <h2 className='pr-2 font-bold leading-[30px] text-[#0C111D]'>
           Incumbents
         </h2>
@@ -50,37 +50,47 @@ const IncumbentsList: React.FC<IncumbentDashboardProps> = ({ incumbents }) => {
         />
       </div>
 
-      <div className='mt-8 flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
-        {/* Left Sidebar */}
-        <div className='h-full w-80'>
-          <nav>
-            {incumbents.map((incumbent) => (
-              <SidebarItem
-                key={incumbent.uuid}
-                incumbent={incumbent}
-                isSelected={incumbent.uuid === selectedIncumbent?.uuid}
-                onClick={() => setSelectedIncumbent(incumbent)}
-              />
-            ))}
-          </nav>
-        </div>
-
-        {/* Main Content */}
-        <main className='flex-1 border-l border-gray-200 bg-[#F9FAFB] p-6'>
-          {selectedIncumbent ? (
-            <IncumbentDetails
-              incumbent={selectedIncumbent}
-              onReasoningClick={handleReasoningModelClick}
+      {/*
+        SIDEBAR: Absolutely positioned on the left.
+        - `top-0 bottom-0` pins it to the container’s top & bottom.
+        - `w-80` gives it a fixed width.
+        - `overflow-y-auto` so it scrolls if there is extra content.
+        - We add a bit of padding so items aren't flush against the sides.
+      */}
+      <div className='absolute bottom-4 left-4 top-[4rem] w-80 overflow-y-auto rounded-lg border border-gray-200 bg-white p-4'>
+        <nav>
+          {incumbents.map((incumbent) => (
+            <SidebarItem
+              key={incumbent.uuid}
+              incumbent={incumbent}
+              isSelected={incumbent.uuid === selectedIncumbent?.uuid}
+              onClick={() => setSelectedIncumbent(incumbent)}
             />
-          ) : (
-            <div className='flex h-full items-center justify-center'>
-              <p className='text-lg text-gray-500'>
-                Select an incumbent to view details
-              </p>
-            </div>
-          )}
-        </main>
+          ))}
+        </nav>
       </div>
+
+      {/*
+        MAIN CONTENT: This remains in normal flow, so it determines
+        the container's overall height.
+        
+        We add a left margin to keep it from going under the absolute sidebar.
+        The container now grows/shrinks based on how tall <main> is.
+      */}
+      <main className='ml-[22rem] border-l border-gray-200 bg-[#F9FAFB] p-6'>
+        {selectedIncumbent ? (
+          <IncumbentDetails
+            incumbent={selectedIncumbent}
+            onReasoningClick={handleReasoningModelClick}
+          />
+        ) : (
+          <div className='flex h-full items-center justify-center'>
+            <p className='text-lg text-gray-500'>
+              Select an incumbent to view details
+            </p>
+          </div>
+        )}
+      </main>
     </div>
   );
 };
