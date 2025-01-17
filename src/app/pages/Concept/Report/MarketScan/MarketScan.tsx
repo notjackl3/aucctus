@@ -12,6 +12,7 @@ import { useParams } from 'react-router-dom';
 import IncumbentsList from './Components/IncumbentList/IncumbentList';
 import StartupList from './Components/StartupList/StartupList';
 import TrendAndDriverCard from './Components/TrendAndDriverCard';
+import Investors from './Components/Investors';
 
 const MarketScan: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
@@ -75,16 +76,9 @@ const MarketScan: FunctionComponent = () => {
       <div className='flex w-full flex-col gap-4'>
         <IncumbentsList incumbents={marketScan?.incumbents || []} />
       </div>
-      {/* <IncumbentList
-          title='Top Incumbents'
-          data={marketScan?.incumbents || []}
-          ecosystemType='incumbents'
-        />
-        <InvestorList
-          title='Top Investors'
-          data={marketScan?.investors || []}
-          ecosystemType='investors'
-        /> */}
+      <div className='flex w-full flex-col gap-4'>
+        <Investors investors={marketScan?.investors ?? []} />
+      </div>
     </div>
   );
 };

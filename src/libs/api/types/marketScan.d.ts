@@ -1,4 +1,6 @@
 import { IBaseConceptEntity } from '.';
+import { ISupport } from './support';
+
 interface IEngagementTactic {
   name: string;
   description: string;
@@ -56,8 +58,17 @@ export interface FieldEvidence {
 
 export interface IIncumbent extends IBaseMarketScanCompany {
   hasCompetitiveProduct: boolean;
-  recentActivity?: list[Any];
-  recommendedAction?: string;
+}
+
+export interface IInvestor extends IBaseConceptEntity {
+  uuid: string;
+  name: string;
+  domain: string;
+  investedAmount: number;
+  investmentDate: string;
+  createdAt: string;
+  updatedAt: string;
+  support: ISupport;
 }
 
 type TrendChangeType = 'increasing' | 'decreasing' | 'stagnating';

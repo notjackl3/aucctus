@@ -67,7 +67,7 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({
       <div className='inline-flex h-full w-full items-start justify-start'>
         <div className='inline-flex min-w-[260px] max-w-96 flex-col items-start justify-start gap-5 self-stretch border-r border-gray-300 p-6'>
           {/* Conclusion */}
-          <div className='flex flex-col items-center justify-center gap-2.5 self-stretch'>
+          <div className='flex flex-col justify-center gap-2.5 self-stretch'>
             <h6 className='self-stretch text-base font-bold leading-7 text-gray-500'>
               Conclusion
             </h6>
