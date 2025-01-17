@@ -18,7 +18,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
   return (
     <div
       className={cn(
-        'group flex cursor-pointer flex-col items-start gap-3 p-4',
+        'group flex cursor-pointer flex-col items-start gap-3 rounded-lg p-4',
         {
           'bg-gray-100': isSelected,
           'hover:bg-gray-50': !isSelected,

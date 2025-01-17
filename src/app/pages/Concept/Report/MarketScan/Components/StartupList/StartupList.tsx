@@ -77,7 +77,7 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
         We add a left margin to keep it from going under the absolute sidebar.
         The container now grows/shrinks based on how tall <main> is.
       */}
-      <main className='ml-[22rem] border-l border-gray-200 bg-[#F9FAFB] p-6'>
+      <main className='ml-[22rem] rounded-lg border-l border-gray-200 bg-[#F9FAFB] p-6'>
         {selectedStartup ? (
           <StartupDetails
             startup={selectedStartup}
