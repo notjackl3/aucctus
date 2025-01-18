@@ -1,4 +1,4 @@
-import { Icon } from '@components';
+import { Loading } from '@components';
 import { IIncumbent, ISource } from '@libs/api/types';
 import React from 'react';
 import InfoSection from '../InfoSection';
@@ -16,6 +16,24 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
   incumbent,
   onReasoningClick,
 }) => {
+  if (incumbent.status !== 'completed') {
+    return (
+      <div className='mx-auto max-w-5xl space-y-8'>
+        <div className='flex min-h-96 items-center justify-center gap-6 self-stretch text-center align-middle'>
+          <section>
+            <div className='self-stretch text-center text-sm font-medium text-gray-500'>
+              An Agent is currently analyzing {incumbent.name}. This may take a
+              moment.
+            </div>
+            <div className='flex flex-col items-center justify-start gap-3 self-stretch'>
+              <Loading />
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='mx-auto max-w-5xl space-y-4'>
       {/* General Information Section */}
@@ -26,55 +44,61 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
         <div className='flex justify-between gap-6'>
           <div className='flex-1 rounded-lg border border-gray-200 bg-white p-6'>
             {/* TODO: Change overview to Relevant Product */}
-            <InfoSection
-              title='Company Overview'
-              content={incumbent.overview}
-              contentClassName='text-[14px] font-semibold'
-              iconVariant='link-source'
-              onClick={
-                incumbent.overviewEvidence
-                  ? onReasoningClick(
-                      incumbent.overview,
-                      incumbent.overviewEvidence.insight,
-                      incumbent.overviewEvidence.sources,
-                    )
-                  : undefined
-              }
-            />
-            <InfoSection
-              title='Headquarters'
-              content={incumbent.headquarters}
-              iconVariant='link-source'
-              onClick={() =>
-                incumbent.headquartersEvidence
-                  ? onReasoningClick(
-                      incumbent.headquarters,
-                      incumbent.headquartersEvidence.insight,
-                      incumbent.headquartersEvidence.sources,
-                    )
-                  : undefined
-              }
-            />
-            <InfoSection
-              title='Established'
-              content={incumbent.founded}
-              iconVariant='link-source'
-              onClick={() =>
-                incumbent.foundedEvidence
-                  ? onReasoningClick(
-                      incumbent.founded,
-                      incumbent.foundedEvidence.insight,
-                      incumbent.foundedEvidence.sources,
-                    )
-                  : undefined
-              }
-            />
+            {incumbent.overview && (
+              <InfoSection
+                title='Company Overview'
+                content={incumbent.overview}
+                contentClassName='text-[14px] font-semibold'
+                iconVariant='link-source'
+                onClick={
+                  incumbent.overviewEvidence
+                    ? onReasoningClick(
+                        incumbent.overview,
+                        incumbent.overviewEvidence.insight,
+                        incumbent.overviewEvidence.sources,
+                      )
+                    : undefined
+                }
+              />
+            )}
+            {incumbent.headquarters ? (
+              <InfoSection
+                title='Headquarters'
+                content={incumbent.headquarters}
+                iconVariant='link-source'
+                onClick={() =>
+                  incumbent.headquartersEvidence && incumbent.headquarters
+                    ? onReasoningClick(
+                        incumbent.headquarters,
+                        incumbent.headquartersEvidence.insight,
+                        incumbent.headquartersEvidence.sources,
+                      )
+                    : undefined
+                }
+              />
+            ) : null}
+            {incumbent.founded && (
+              <InfoSection
+                title='Established'
+                content={incumbent.founded}
+                iconVariant='link-source'
+                onClick={() =>
+                  incumbent.foundedEvidence && incumbent.founded
+                    ? onReasoningClick(
+                        incumbent.founded,
+                        incumbent.foundedEvidence.insight,
+                        incumbent.foundedEvidence.sources,
+                      )
+                    : undefined
+                }
+              />
+            )}
           </div>
         </div>
       </section>
 
       {/* Recommended Action Section */}
-      <section>
+      {/* {incumbent.recommendedAction && <section>
         <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
           Recommended Action
         </h2>
@@ -89,7 +113,7 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
             {incumbent.recommendedAction}
           </p>
         </div>
-      </section>
+      </section>} */}
 
       {/* Additional Sections (e.g., Recent Activity, Support) */}
       {/* Uncomment and implement as needed */}

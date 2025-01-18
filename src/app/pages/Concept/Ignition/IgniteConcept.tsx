@@ -8,23 +8,20 @@ import {
   useConceptIgnitionQuestionnaire,
 } from '@hooks/query/concepts.hook';
 import {
-  ConceptIgnitionQuestion,
   ConceptIgnitionQuestionnaireType,
-  ExpandAnExistingIdeaQuestions,
   IConceptIgnitionQuestionnaire,
-  IConceptIgnitionQuestionnaireSection,
   QuestionIdentifier,
 } from '@libs/api/types';
 // import { useNavigate } from 'react-router-dom';
 import { IIgnitionAnswer } from '@libs/api/igniteConcepts';
+import { toCamelCase } from '@libs/utils/string';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
+import { useReseedStore } from '@stores/reseed.store';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import ExpandAnExistingIdeaFooter from './ExpandAnExistingIdeaFooter';
 import WhiteSpaceSuggestions from './WhiteSpaceSuggestions';
-import { useReseedStore } from '@stores/reseed.store';
-import { toCamelCase } from '@libs/utils/string';
 
 // Constants
 const QUESTIONNAIRE_HEADERS = {

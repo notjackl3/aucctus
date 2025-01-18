@@ -1,4 +1,4 @@
-import { Button, Card, Icon } from '@components';
+import { Button, Card, Icon, Loading } from '@components';
 import { ISource, IStartup } from '@libs/api/types';
 import React from 'react';
 import InfoSection from '../InfoSection';
@@ -18,6 +18,24 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
   startup,
   onReasoningClick,
 }) => {
+  if (startup.status !== 'completed') {
+    return (
+      <div className='mx-auto max-w-5xl space-y-8'>
+        <div className='flex min-h-96 items-center justify-center gap-6 self-stretch text-center align-middle'>
+          <section>
+            <div className='self-stretch text-center text-sm font-medium text-gray-500'>
+              An Agent is currently analyzing {startup.name}. This may take a
+              moment.
+            </div>
+            <div className='flex flex-col items-center justify-start gap-3 self-stretch'>
+              <Loading />
+            </div>
+          </section>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className='mx-auto max-w-5xl space-y-8'>
       {/* General Information Section */}
