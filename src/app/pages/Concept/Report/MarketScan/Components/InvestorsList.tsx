@@ -1,12 +1,10 @@
-'use client';
-
-import { Badge, Button, Icon, Modal } from '@components';
-import { IInsight, IInvestor, ISupport } from '@libs/api/types';
-import { useCallback, useEffect, useState } from 'react';
 import images from '@assets/img';
-import InvestorsLineChart from './InvestorsLineChart';
-import { formatLargeNumber } from '@libs/utils/number';
+import { Badge, Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
+import { IInsight, IInvestor, ISupport } from '@libs/api/types';
+import { formatLargeNumber } from '@libs/utils/number';
+import { useCallback, useEffect, useState } from 'react';
+import InvestorsLineChart from './InvestorsLineChart';
 
 const iconDefaultProps = {
   height: 16,
@@ -14,9 +12,9 @@ const iconDefaultProps = {
   stroke: '#2B3674',
 };
 
-type InvestorListProps = {
+interface IInvestorListProps {
   investors: IInvestor[];
-};
+}
 
 function getTotalInvestment(investors: IInvestor[]): number {
   return investors.reduce((acc, val) => acc + val.investedAmount, 0);
@@ -26,7 +24,9 @@ function getTotalInvestments(investors: IInvestor[]): number {
   return investors.length;
 }
 
-const Investors = ({ investors }: InvestorListProps) => {
+const InvestorsList: React.FC<IInvestorListProps> = ({
+  investors,
+}: IInvestorListProps) => {
   const [selectedInvestment, setSelectedInvestment] =
     useState<IInvestor | null>(null);
 
@@ -178,7 +178,7 @@ const Investors = ({ investors }: InvestorListProps) => {
             </div>
             {sortedInvestors?.length > 0 && (
               <InvestorsLineChart
-                data={sortedInvestors ?? []}
+                data={sortedInvestors || []}
                 selected={selectedInvestment}
               />
             )}
@@ -189,4 +189,4 @@ const Investors = ({ investors }: InvestorListProps) => {
   );
 };
 
-export default Investors;
+export default InvestorsList;
