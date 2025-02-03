@@ -1,10 +1,14 @@
 import { Container, Icon, Loading, Select } from '@components';
+import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
+import { useEditConcept } from '@hooks/concepts/editable.hook';
 import { useConcept, useConceptUpdate } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import api from '@libs/api';
+
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { useAppStore } from '@stores/app.store';
+
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -42,6 +46,7 @@ const ConceptReport: FunctionComponent = () => {
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
   const { account } = useAppStore();
+  const { title: titleEdit } = useEditConcept();
 
   const { concept, isFetched: isConceptFetched } = useConcept(conceptUuid);
   const status = useMemo(() => concept?.status || 'new', [concept]);
@@ -103,9 +108,18 @@ const ConceptReport: FunctionComponent = () => {
     <div className={`mx-auto my-0 flex min-h-full w-full flex-col p-8`}>
       <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
         <div className='flex flex-row items-center justify-start'>
-          <h1 className='h-full text-3xl font-medium capitalize not-italic leading-10 text-blue-900'>
-            {concept?.title}
-          </h1>
+          <EditModeSwitcher
+            pClassName='text-3xl font-medium capitalize not-italic leading-10 text-blue-900'
+            textFieldClassName='!text-3xl max-w-[600px]'
+            value={titleEdit.value}
+            label=''
+            name='title'
+            maxLength={titleEdit.validation.maxLength}
+            rows={1}
+            onChange={titleEdit.handleChange}
+            handleSave={titleEdit.handleSave}
+            handleCancel={titleEdit.handleCancel}
+          />
           <div className='ml-4 flex'>
             <Select.ConceptStatus
               value={status}

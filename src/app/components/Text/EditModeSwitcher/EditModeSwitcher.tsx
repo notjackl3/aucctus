@@ -15,6 +15,7 @@ interface IEditModeSwitcherProps {
   hint?: string;
   isDisableResize?: boolean;
   maxLength?: number;
+  rows?: number;
 
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement> | undefined;
   handleSave?: () => void;
@@ -35,6 +36,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
   errorMessage,
   required,
   maxLength,
+  rows,
   hint,
   isDisableResize = false,
   onChange,
@@ -124,6 +126,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
             hint={hint}
             isDisableResize={isDisableResize}
             maxLength={maxLength}
+            rows={rows}
           />
         </div>
       ) : (

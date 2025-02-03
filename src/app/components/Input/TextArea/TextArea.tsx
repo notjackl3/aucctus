@@ -20,6 +20,7 @@ export interface TextAreaProps
   required?: boolean;
   hint?: string;
   maxLength?: number;
+  rows?: number;
   isDisableResize?: boolean;
   showAsterisk?: boolean;
   calculateInitialHeight?: boolean; // New prop to control height calculation
@@ -39,6 +40,7 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
     isDisableResize = false,
     error = false,
     maxLength,
+    rows,
     showAsterisk = false,
     value,
     ...props
@@ -110,7 +112,7 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
       <textarea
         className={disableResizeClassName}
         cols={50}
-        rows={4}
+        rows={rows ?? 4}
         value={value}
         {...props}
         ref={internalRef}

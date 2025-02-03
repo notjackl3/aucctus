@@ -13,7 +13,7 @@ const OverviewDetails: FunctionComponent = () => {
   const { overview } = useConceptOverview(conceptId);
   const { assumptions } = useAssumptions(conceptId);
   const { valueProposition, problemStatement } = useEditOverview();
-  const descriptionEdit = useEditConcept();
+  const { description: descriptionEdit } = useEditConcept();
 
   const firstCustomerPersona = useMemo(() => {
     if (!overview || !overview.persona) {

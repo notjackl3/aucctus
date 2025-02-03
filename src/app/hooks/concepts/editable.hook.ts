@@ -205,6 +205,13 @@ export function useEditConcept() {
   const { concept } = useConcept(conceptUuid);
   const { mutate: updateConcept } = useConceptUpdate();
 
+  const titleField = useEditableField<string, IConcept>({
+    initialValue: concept?.title || '',
+    fieldName: 'title',
+    updateMutation: updateConcept,
+    identifier: conceptUuid,
+  });
+
   const descriptionField = useEditableField<string, IConcept>({
     initialValue: concept?.description || '',
     fieldName: 'description',
@@ -213,7 +220,8 @@ export function useEditConcept() {
   });
 
   return {
-    ...descriptionField,
+    title: titleField,
+    description: descriptionField,
   };
 }
 
