@@ -48,7 +48,7 @@ export class AuthApi extends ApiService {
     return this.post<IMessageResponse, ISignUpRequest>(endpoints.signup, {
       firstName,
       lastName,
-      email,
+      email: email.toLowerCase(),
       password,
       confirmPassword,
     });
@@ -62,7 +62,7 @@ export class AuthApi extends ApiService {
    */
   login(email: string, password: string) {
     return this.post<IAuthSuccessResponse, ISignInRequest>(endpoints.login, {
-      email,
+      email: email.toLowerCase(),
       password,
     });
   }
@@ -78,7 +78,7 @@ export class AuthApi extends ApiService {
    */
   requestPasswordReset(email: string) {
     return this.post<IMessageResponse>(endpoints.requestPasswordReset, {
-      email,
+      email: email.toLowerCase(),
     });
   }
 
