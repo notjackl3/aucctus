@@ -1,5 +1,5 @@
 import Api from './api';
-import { ApiService, IApiServiceConfig } from './apiService';
+import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
   ConceptIgnitionQuestion,

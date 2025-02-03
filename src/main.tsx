@@ -15,6 +15,7 @@ import { toast } from 'react-toastify';
 import App from './App';
 import { AppProvider } from './app/context/AppContextProvider';
 import { ModalProvider } from './app/context/ModalContextProvider';
+import { SocketProvider } from './app/context/SocketContext';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
@@ -72,9 +73,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <QueryClientProvider client={queryClient}>
         <DirectionProvider dir='ltr'>
           <AppProvider>
-            <ModalProvider>
-              <App />
-            </ModalProvider>
+            <SocketProvider>
+              <ModalProvider>
+                <App />
+              </ModalProvider>
+            </SocketProvider>
           </AppProvider>
         </DirectionProvider>
       </QueryClientProvider>

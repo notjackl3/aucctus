@@ -2,9 +2,11 @@ import { HeadersDefaults } from 'axios';
 import { toast } from 'react-toastify';
 import analytics from '../analytics';
 import { AccountApi } from './account';
-import { IApiServiceConfig } from './apiService';
 import { AssumptionsApi } from './assumptions';
+import { AucctusSocket } from './aucctusSocket';
 import { AuthApi } from './auth';
+import { IApiServiceConfig } from './base/apiService';
+import { ISocketConfig } from './base/socketService';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
 import { MarketScanApi } from './marketScan';
@@ -13,6 +15,7 @@ import { ITokenResponse } from './types';
 export interface IApiConfig {
   /* End Points */
   baseUrl: string;
+  baseSocketUrl: string;
   /* Settings */
   defaultHeaders?: HeadersDefaults;
   timeoutSeconds: number;
@@ -35,6 +38,7 @@ export class Api {
   assumption!: AssumptionsApi;
   marketScan!: MarketScanApi;
   conceptIgnite!: IgniteConceptApi;
+  aucctusSocket!: AucctusSocket;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -45,6 +49,13 @@ export class Api {
         baseURL: this._config.baseUrl,
       }),
     );
+
+    // Configure socket settings.
+    const socketConfig: ISocketConfig = {
+      baseUrl: `${this._config.baseSocketUrl}/ws/v1/aucctus`,
+      debug: this._config.debug,
+    };
+    this.aucctusSocket = new AucctusSocket(this, socketConfig);
 
     const apiClasses: { key: keyof Api; class: any }[] = [
       { key: 'account', class: AccountApi },
@@ -67,6 +78,12 @@ export class Api {
   }
 
   set accessToken(token: string | undefined) {
+    if (token === this._accessToken) {
+      return;
+    }
+
+    this.aucctusSocket.accessToken = token;
+
     // Update all pointing to the resource server with the new tokens
     // By default however,  the access token and refresh token are set to the httpOnly cookies
     // This is simply just an extra layer.
@@ -82,6 +99,7 @@ export class Api {
         Authorization: `Bearer ${token}`,
       });
     });
+
     analytics.debug('Setting Access Token');
     this._accessToken = token;
   }

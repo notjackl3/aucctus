@@ -7,9 +7,9 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import analytics from '../analytics';
-import { Api } from './api';
-import { IAuthSuccessResponse } from './types';
+import analytics from '../../analytics';
+import { Api } from '../api';
+import { IAuthSuccessResponse } from '../types';
 
 export const isAuthSuccessResponse = (
   value: unknown,
