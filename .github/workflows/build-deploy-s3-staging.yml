@@ -7,6 +7,7 @@ on:
 env:
   NODE_ENV: staging
   VITE_AUCCTUS_BASE_RESOURCE_URL: https://resource.staging.aucctus.com
+  VITE_AUCCTUS_BASE_WS_URL: wss://ws.staging.aucctus.com
   VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }} 
 
