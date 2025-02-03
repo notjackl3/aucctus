@@ -105,7 +105,7 @@ const ConceptBank: React.FC = () => {
           isLoading={isLoading}
           header={
             <>
-              <div className='flex h-full w-full flex-row gap-2 overflow-x-scroll'>
+              <div className='flex h-full w-full flex-row gap-2'>
                 {createFilterHeader()}
               </div>
 
