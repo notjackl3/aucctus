@@ -15,7 +15,7 @@ export interface TabsProps {
   tabs: TabElement[];
   className?: string;
   tabClassName?: string;
-  variant?: 'default' | 'button';
+  variant?: 'default' | 'button' | 'button-separated';
   onTabSelect: (value: string) => void;
   children?: ReactNode;
   actionButtons?: ReactNode | ReactNode[];

@@ -2,26 +2,14 @@ import Icon from '@components/Icon';
 import { useModal } from '@context/ModalContextProvider';
 import { ISource } from '@libs/api/types';
 import * as ScrollArea from '@radix-ui/react-scroll-area';
-import React from 'react';
+import React, { useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { mightContainMarkdown } from '@libs/utils/string';
 
 interface IEvidenceAndReasoningProps {
   conclusion: string;
   reasoning: string;
   sources: ISource[];
-}
-
-function mightContainMarkdown(str: string): boolean {
-  const markdownPatterns = [
-    /^#{1,6}\s/m,
-    /\*\*[^*]+\*\*/,
-    /_[^_]+_/,
-    /\[[^\]]*\]\([^)]+\)/,
-    /!\[[^\]]*\]\([^)]+\)/,
-    /```[^`]*```/,
-    /`[^`]+`/,
-  ];
-  return markdownPatterns.some((regex) => regex.test(str));
 }
 
 const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({
@@ -31,11 +19,18 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({
 }) => {
   const { closeModal } = useModal();
 
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, []);
+
   // Condition: If `reasoning` probably has Markdown, render via `react-markdown`,
   // otherwise render plain text.
   const renderReasoning = (text: string) => {
     if (mightContainMarkdown(text)) {
-      // Render as Markdown
       return <ReactMarkdown>{text}</ReactMarkdown>;
     } else {
       // Render as plain text

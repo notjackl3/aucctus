@@ -161,6 +161,7 @@ input {
   --color-honeydew-100: #d1fadf;
   --success-700: #027a48;
   --gray-900-text-primary: #2b3674;
+  --gray-600-text-primary: #4f5b8c;
   --primary-600-primary: #4318ff;
   --gray-50-bg: #fcfcfd;
 
@@ -213,4 +214,29 @@ input {
 
   --shadow-error: 0px 12px 16px -4px rgba(40, 16, 16, 0.08),
     0px 4px 6px -2px rgba(187, 45, 10, 0.819);
+}
+
+/* Custom Scrollbar Styling */
+* {
+  /* For Webkit browsers (Chrome, Safari) */
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    border-radius: 20px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+
+    &:hover {
+      background: var(--primary-100);
+    }
+  }
+
+  /* For Firefox */
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-600-text-primary) var(--gray-300-outline);
 }

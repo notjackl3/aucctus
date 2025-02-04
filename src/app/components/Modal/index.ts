@@ -8,6 +8,7 @@ import EditKeyAssumptionModal from './KeyAssumtionModal/EditKeyAssumtionModal';
 import AddMarketScanElement from './MarketScanElement/AddMarketScanElement';
 import EditMarketScanElement from './MarketScanElement/EditMarketScanElement';
 import Base from './Modal/Modal';
+import ConclusionVisualization from './ConclusionVisualizationModal/ConclusionVisualizationModal';
 import TestModal from './TestModal/TestModal';
 
 const Modal = {
@@ -20,6 +21,7 @@ const Modal = {
   AddMarketScanElement,
   EditMarketScanElement,
   EvidenceAndReasoning,
+  ConclusionVisualization,
   SupportInsights,
   TestModal,
 };

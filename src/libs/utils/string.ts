@@ -27,6 +27,24 @@ export const removeProtocol = (source: string) => {
   return d;
 };
 
+/**
+ * Check if a string might contain markdown
+ * @param str
+ * @returns boolean
+ */
+export const mightContainMarkdown = (str: string): boolean => {
+  const markdownPatterns = [
+    /^#{1,6}\s/m,
+    /\*\*[^*]+\*\*/,
+    /_[^_]+_/,
+    /\[[^\]]*\]\([^)]+\)/,
+    /!\[[^\]]*\]\([^)]+\)/,
+    /```[^`]*```/,
+    /`[^`]+`/,
+  ];
+  return markdownPatterns.some((regex) => regex.test(str));
+};
+
 /** Convert any string to Title Case
  *
  * @param str

@@ -81,6 +81,7 @@ module.exports = {
         'slide-in-bottom': 'slideInBottom 0.3s ease both',
         'slide-in-left': 'slideInLeft 0.3s ease both',
         'slide-in-right': 'slideInRight 0.3s ease both',
+        'slide-out-right': 'slideOutRight 0.3s ease both',
       },
       keyframes: {
         slideInCenter: {
@@ -102,6 +103,10 @@ module.exports = {
         slideInRight: {
           from: { transform: 'translateX(100%)', opacity: '0' },
           to: { transform: 'translateX(0)', opacity: '1' },
+        },
+        slideOutRight: {
+          from: { transform: 'translateX(0)', opacity: '1' },
+          to: { transform: 'translateX(100%)', opacity: '0' },
         },
       },
     },

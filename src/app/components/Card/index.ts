@@ -1,3 +1,4 @@
+import InsightCard from './InsightCard';
 import AiConclusionBox from './AiConclusionBox';
 import AssumptionOverview from './AssumptionOverview';
 import Detail from './DetailCard';
@@ -13,6 +14,7 @@ import FinancialProjects from './FinancialProjectsCard';
 import Ignition from './IgnitionCard';
 import KeyAssumptions from './KeyAssumptionsCard';
 import MarketSize from './MarketSizeCard';
+import Insight from './InsightCard';
 
 const Card = {
   Detail,
@@ -22,6 +24,7 @@ const Card = {
   FinancialProjects,
   CustomerProfiles,
   Ignition,
+  Insight,
   CustomerProfileContextList,
   FinancialModel,
   MarketSize,
@@ -29,6 +32,7 @@ const Card = {
   AssumptionOverview,
   Testing,
   AiConclusionBox,
+  InsightCard,
 };
 
 export default Card;

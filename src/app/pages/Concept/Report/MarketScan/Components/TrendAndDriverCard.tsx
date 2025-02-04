@@ -26,22 +26,27 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
   const { openModal } = useModal();
 
   const handleSupportModalClick = useCallback(
-    (conclusion: string, support: ISupport) => {
-      openModal(Modal.EvidenceAndReasoning, {
-        conclusion: conclusion,
-        reasoning: support.insights
-          .map((i: IInsight) => i.description)
-          .join('\n\n'),
-        sources: Array.from(
-          new Map(
-            support.insights
-              .flatMap((i: IInsight) => i.sources) // Flatten all sources arrays
-              .map((source) => [source.url, source]), // Use source.url as the key
-          ).values(), // Get only the unique values
-        ),
-      });
+    (title: string, conclusion: string, support: ISupport) => {
+      openModal(
+        Modal.ConclusionVisualization,
+        {
+          conclusion: title,
+          reasoning: support.insights
+            .map((i: IInsight) => i.description)
+            .join('\n\n'),
+          insights: support.insights,
+          sources: Array.from(
+            new Map(
+              support.insights
+                .flatMap((i: IInsight) => i.sources) // Flatten all sources arrays
+                .map((source) => [source.url, source]), // Use source.url as the key
+            ).values(), // Get only the unique values
+          ),
+        },
+        { position: 'right' },
+      );
     },
-    [openModal],
+    [openModal, trendAndDriver],
   );
 
   const renderTrendIcon = (trend: string) => {
@@ -89,6 +94,7 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
             onClick={() =>
               handleSupportModalClick(
                 trendAndDriver.name,
+                trendAndDriver.description,
                 trendAndDriver.support,
               )
             }

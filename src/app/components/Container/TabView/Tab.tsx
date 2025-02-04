@@ -1,10 +1,12 @@
 import { FunctionComponent, ReactNode } from 'react';
 import styles from './styles/tab.module.scss';
 
-export type TabVariant = 'default' | 'button';
+export type TabVariant = 'default' | 'button' | 'button-separated';
 export interface ITabProps<T = string> {
   /**
    * The value the will be used when the tab is selected
+
+
    */
   value: T;
   onSelect: (value: T) => void;
@@ -14,13 +16,15 @@ export interface ITabProps<T = string> {
   /**
    * The variant of the tab for different styles
    */
-  variant?: 'default' | 'button';
+  variant?: 'default' | 'button' | 'button-separated';
 }
 
 function getTabStyle(variant: TabVariant) {
   switch (variant) {
     case 'button':
       return styles.tabButton;
+    case 'button-separated':
+      return styles.tabButtonSeparated;
     default:
       return styles.tab;
   }
