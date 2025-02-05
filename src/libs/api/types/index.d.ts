@@ -1,3 +1,4 @@
+export * from './support';
 export * from './accounts';
 export * from './assumptions';
 export * from './concepts';
@@ -6,5 +7,3 @@ export * from './fastService';
 export * from './marketScan';
 export * from './marketScanV1';
 export * from './osiris';
-export * from './socketsEvents';
-export * from './support';

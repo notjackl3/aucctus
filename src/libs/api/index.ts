@@ -3,7 +3,6 @@ import { Api } from './api';
 const api = new Api({
   appId: 'Aucctus',
   baseUrl: import.meta.env.VITE_AUCCTUS_BASE_RESOURCE_URL || '',
-  baseSocketUrl: import.meta.env.VITE_AUCCTUS_BASE_WS_URL || '',
   debug: import.meta.env.DEV,
   timeoutSeconds: 100000,
 });

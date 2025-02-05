@@ -3,7 +3,6 @@
 
 interface ImportMetaEnv {
   readonly VITE_AUCCTUS_BASE_RESOURCE_URL: string;
-  readonly VITE_AUCCTUS_BASE_WS_URL: string;
   readonly VITE_SENTRY_DNS: string;
   readonly VITE_SECRET_KEY: string;
 }

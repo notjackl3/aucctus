@@ -34,10 +34,6 @@ class Analytics {
     console.error(data);
   }
 
-  warn(...data: any[]) {
-    console.warn(data);
-  }
-
   /** TODO: Implement tracking
    *
    * @param eventName
