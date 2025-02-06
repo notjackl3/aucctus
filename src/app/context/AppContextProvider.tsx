@@ -1,19 +1,19 @@
 import React, {
   createContext,
-  useContext,
-  useState,
   ReactNode,
   useCallback,
+  useContext,
   useEffect,
   useMemo,
+  useState,
 } from 'react';
-import LoadingScreen from '../pages/LoadingScreen';
 import api from '../../libs/api';
-import { useRefresh } from '../hooks/query/auth.hook';
 import { ITokenResponse } from '../../libs/api/types';
-import { useTokenStore } from '../stores/token.store';
-import { useAppStore } from '../stores/app.store';
 import { useUserDetails } from '../hooks/query/account.hook';
+import { useRefresh } from '../hooks/query/auth.hook';
+import LoadingScreen from '../pages/LoadingScreen';
+import { useAppStore } from '../stores/app.store';
+import { useTokenStore } from '../stores/token.store';
 
 interface IAppContext {
   isLoading: boolean;

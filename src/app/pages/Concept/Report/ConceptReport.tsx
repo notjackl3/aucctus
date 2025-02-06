@@ -152,7 +152,7 @@ const ConceptReport: FunctionComponent = () => {
         <Container.TabView
           className=''
           tabs={CONCEPT_TABS.filter(
-            (v) => !(v.label === 'Context' && !concept?.seed),
+            (v) => !(v.label === 'Context' && !concept?.hasSeed),
           )}
           onTabSelect={onTabSelect}
           activeTab={activeTab || ''}

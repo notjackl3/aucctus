@@ -60,7 +60,21 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
         {incumbent.overview}
       </p>
       {/* TODO: Replace */}
-      <Badge.Count value='Competitive Product' />
+      <Badge.Default
+        classNameBadge={
+          incumbent.hasCompetitiveProduct ? 'bg-primary-50' : 'bg-[#fdf2fa]'
+        }
+        classNameLabel={
+          incumbent.hasCompetitiveProduct
+            ? 'text-primary-500'
+            : 'text-[#ee46bc]'
+        }
+        value={
+          incumbent.hasCompetitiveProduct
+            ? 'Competitive Product'
+            : 'No Competitive Product'
+        }
+      />
     </div>
   );
 };

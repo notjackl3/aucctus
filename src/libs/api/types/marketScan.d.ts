@@ -28,6 +28,7 @@ export interface IBaseMarketScanCompany extends IBaseConceptEntity {
   foundedEvidence?: FieldEvidence;
   headquarters?: string;
   headquartersEvidence?: FieldEvidence;
+  relevance?: string;
 
   status: 'isPending' | 'completed';
 }

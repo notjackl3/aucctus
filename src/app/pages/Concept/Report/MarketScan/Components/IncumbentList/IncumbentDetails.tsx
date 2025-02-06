@@ -1,4 +1,4 @@
-import { Loading } from '@components';
+import { Card, Loading } from '@components';
 import { IIncumbent, ISource } from '@libs/api/types';
 import React from 'react';
 import InfoSection from '../InfoSection';
@@ -140,6 +140,17 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
         </div>
       </section>
       */}
+
+      {incumbent.relevance && (
+        <section className='space-y-4'>
+          {incumbent.relevance && (
+            <Card.AiConclusionBox
+              title='Relevance to Concept'
+              content={incumbent.relevance}
+            />
+          )}
+        </section>
+      )}
     </div>
   );
 };
