@@ -10,6 +10,8 @@ export class Endpoints {
   static user = '/api/v1/user/';
   static allUsers = '/api/v1/user/list';
 
+  static articlePublishedDate = '/article-published-date';
+
   static confirmEmail = `/api/v1/confirm-email`;
   static forgotPassword = `/api/v1/forgot-password`;
   static requestPasswordReset = `/api/v1/request-reset-email`;

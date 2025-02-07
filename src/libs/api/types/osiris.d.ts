@@ -53,6 +53,10 @@ export interface IConceptQueryOptions extends IPageQueryOptions {
   sort?: ConceptSort;
 }
 
+export interface IArticlePublishedQueryOptions extends IPageQueryOptions {
+  url?: string;
+}
+
 export interface IUserQueryOptions extends IPageQueryOptions {
   firstName?: string;
   lastName?: string;

@@ -18,6 +18,7 @@ import Avatar from './Avatar';
 import IgniteLoading from './IgniteLoading';
 import Loading from './Loading';
 import Tooltip from './ToolTip/Tooltip';
+import ComponentTooltip from './ToolTip/ComponentTooltip';
 
 export {
   Avatar,
@@ -37,4 +38,5 @@ export {
   Table,
   Text,
   Tooltip,
+  ComponentTooltip,
 };

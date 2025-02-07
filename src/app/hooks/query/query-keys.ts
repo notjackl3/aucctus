@@ -22,5 +22,5 @@ export enum AucctusQueryKeys {
 
   /* External APIs */
   clearbitCompany = 'clearbitCompany',
-  articlePublished = 'articlePublished',
+  articlePublishedDate = 'articlePublishedDate',
 }

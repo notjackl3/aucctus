@@ -56,4 +56,16 @@ export function differenceInHours(firstDate: Date, secondDate: Date) {
   return Math.abs(Math.round(difference));
 }
 
+export function differenceInDays(firstDate: Date, secondDate: Date) {
+  let difference = (firstDate.getTime() - secondDate.getTime()) / 1000;
+  difference /= 60 * 60 * 24;
+  return Math.abs(Math.round(difference));
+}
+
+export function differenceInMonths(firstDate: Date, secondDate: Date) {
+  let difference = (firstDate.getTime() - secondDate.getTime()) / 1000;
+  difference /= 60 * 60 * 24 * 30;
+  return Math.abs(Math.round(difference));
+}
+
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));

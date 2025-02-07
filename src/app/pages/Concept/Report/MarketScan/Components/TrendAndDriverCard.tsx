@@ -2,7 +2,8 @@ import images from '@assets/img';
 import { Card, Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { IInsight, ISupport, ITrendsAndDrivers } from '@libs/api/types';
-import { FunctionComponent, useCallback } from 'react';
+import { FunctionComponent, useCallback, useMemo, useRef } from 'react';
+import SourceBadgeFooter from './Sources/SourceBadgeFooter';
 
 const iconDefaultProps = {
   height: 19,
@@ -12,18 +13,26 @@ const iconDefaultProps = {
 
 interface ITrendsAndDriversProps {
   trendAndDriver: ITrendsAndDrivers;
+  cardClassName?: string;
 }
-
-const trends = {
-  increasing: 'Increasing Popularity',
-  decreasing: 'Decreasing Popularity',
-  stagnating: 'Stagnant Popularity',
-};
 
 const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
   trendAndDriver,
+  cardClassName = '',
 }) => {
   const { openModal } = useModal();
+
+  const sources = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          trendAndDriver.support.insights
+            .flatMap((i: IInsight) => i.sources)
+            .map((source) => [source.url, source]),
+        ).values(),
+      ),
+    [trendAndDriver.support.insights],
+  );
 
   const handleSupportModalClick = useCallback(
     (title: string, conclusion: string, support: ISupport) => {
@@ -31,77 +40,61 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
         Modal.ConclusionVisualization,
         {
           conclusion: title,
-          reasoning: support.insights
-            .map((i: IInsight) => i.description)
-            .join('\n\n'),
+          reasoning: conclusion,
           insights: support.insights,
-          sources: Array.from(
-            new Map(
-              support.insights
-                .flatMap((i: IInsight) => i.sources) // Flatten all sources arrays
-                .map((source) => [source.url, source]), // Use source.url as the key
-            ).values(), // Get only the unique values
-          ),
+          sources: sources,
         },
         { position: 'right' },
       );
     },
-    [openModal, trendAndDriver],
+    [openModal, sources],
   );
 
-  const renderTrendIcon = (trend: string) => {
-    switch (trend) {
-      case 'increasing':
-        return (
-          <Icon variant='increasing' {...iconDefaultProps} stroke='#17B26A' />
-        );
-      case 'decreasing':
-        return (
-          <div className='rounded-md bg-[#EAECF0] p-[4px]'>
-            <Icon variant='decreasing' {...iconDefaultProps} stroke='#F04438' />
-          </div>
-        );
-      case 'stagnating':
-        return (
-          <div className='rounded-md bg-[#EAECF0] p-[4px]'>
-            <Icon variant='stagnating' {...iconDefaultProps} stroke='#F79009' />
-          </div>
-        );
-    }
-  };
+  const footerActionRef = useRef<HTMLDivElement>(null);
+
+  const conclusionVisualizationButton = useMemo(() => {
+    return (
+      <div
+        onClick={() =>
+          handleSupportModalClick(
+            trendAndDriver.name,
+            trendAndDriver.description,
+            trendAndDriver.support,
+          )
+        }
+        className='flex aspect-square cursor-pointer 
+        items-center justify-center rounded-md
+        bg-[#EAECF0] p-[4px] transition-colors hover:bg-gray-300 active:bg-gray-400 '
+      >
+        <Icon variant='link-source' {...iconDefaultProps} />
+      </div>
+    );
+  }, [
+    handleSupportModalClick,
+    trendAndDriver.description,
+    trendAndDriver.name,
+    trendAndDriver.support,
+  ]);
+
   return (
     <Card.Detail
+      cardClassName={cardClassName}
       title=''
       key={trendAndDriver.uuid}
       isHideHeader
       footerAction={
-        <div className='flex w-full items-center justify-between p-2'>
-          <div className='flex items-center gap-2'>
-            <div className='mr-2'>
-              {renderTrendIcon(trendAndDriver.trendChange)}
-            </div>
-            <div>
-              <div className='text-[8px] font-normal text-[#0C111D]'>
-                12 Month-Trend
-              </div>
-
-              <div className='text-[10px] font-bold leading-[20px] text-[#0C111D]'>
-                {trends[trendAndDriver.trendChange]}
-              </div>
-            </div>
-          </div>
-          <div
-            onClick={() =>
-              handleSupportModalClick(
-                trendAndDriver.name,
-                trendAndDriver.description,
-                trendAndDriver.support,
-              )
-            }
-            className='cursor-pointer rounded-md bg-[#EAECF0] p-[4px]'
-          >
-            <Icon variant='link-source' {...iconDefaultProps} />
-          </div>
+        <div
+          ref={footerActionRef}
+          className='flex w-full justify-between gap-2'
+        >
+          {sources.length > 0 && (
+            <SourceBadgeFooter
+              className='flex gap-2 overflow-hidden'
+              parentContainerRef={footerActionRef}
+              sources={sources}
+            />
+          )}
+          {conclusionVisualizationButton}
         </div>
       }
     >

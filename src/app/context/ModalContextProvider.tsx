@@ -4,25 +4,24 @@ import React, {
   useState,
   ReactNode,
   FunctionComponent,
+  useMemo,
+  useCallback,
 } from 'react';
 import Modal, { ModalPosition } from '../components/Modal/Modal/Modal';
 
+interface ModalOptions {
+  position?: ModalPosition;
+  shouldCloseOnOverlayClick?: boolean;
+}
+
 interface ModalContextType {
-  isOpen: boolean;
-  /**
-   * Boolean to determine if the modal should close when the overlay is clicked.
-   * Resets to True when the modal is closed.
-   */
-  shouldCloseOnOverlayClick: boolean;
-  setShouldCloseOnOverlayClickClick: React.Dispatch<
-    React.SetStateAction<boolean>
-  >;
   openModal: <T extends object>(
     Component: FunctionComponent<T>,
     props?: T,
     options?: ModalOptions,
   ) => void;
   closeModal: () => void;
+  shouldCloseOnOverlayClick: boolean;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -39,48 +38,61 @@ interface ModalProviderProps {
   children: ReactNode;
 }
 
-interface ModalOptions {
-  position?: ModalPosition;
+interface ModalState {
+  isOpen: boolean;
+  content: ReactNode;
+  options: ModalOptions;
 }
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
-  const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [options, setOptions] = useState<ModalOptions>();
-  const [content, setContent] = useState<ReactNode>(null);
-  const [shouldCloseOnOverlayClick, setShouldCloseOnOverlayClickClick] =
-    useState<boolean>(true);
+  const [modalState, setModalState] = useState<ModalState>({
+    isOpen: false,
+    content: null,
+    options: { position: 'center', shouldCloseOnOverlayClick: true },
+  });
 
-  const openModal = <T extends object>(
-    Component: FunctionComponent<T>,
-    props: T = {} as T,
-    options: ModalOptions = { position: 'center' },
-  ) => {
-    setContent(<Component {...props} />);
-    setOptions(options);
-    setIsOpen(true);
-  };
+  const openModal = useCallback(
+    <T extends object>(
+      Component: FunctionComponent<T>,
+      props: T = {} as T,
+      options: ModalOptions = { position: 'center' },
+    ) => {
+      setModalState({
+        isOpen: true,
+        content: <Component {...props} />,
+        options,
+      });
+    },
+    [],
+  );
 
-  const closeModal = () => {
-    setShouldCloseOnOverlayClickClick;
-    setIsOpen(false);
-    setShouldCloseOnOverlayClickClick(true);
-    setContent(null);
-    setContent(null);
-  };
+  const closeModal = useCallback(() => {
+    setModalState((prev) => ({
+      ...prev,
+      isOpen: false,
+      content: null,
+    }));
+  }, []);
+
+  // Only these functions are provided via context—children that use useModal()
+  // won't re-render when modalState changes.
+  const contextValue = useMemo(
+    () => ({
+      openModal,
+      closeModal,
+      shouldCloseOnOverlayClick:
+        modalState.options.shouldCloseOnOverlayClick ?? true,
+    }),
+    [openModal, closeModal, modalState.options.shouldCloseOnOverlayClick],
+  );
 
   return (
-    <ModalContext.Provider
-      value={{
-        isOpen,
-        openModal,
-        closeModal,
-        shouldCloseOnOverlayClick,
-        setShouldCloseOnOverlayClickClick,
-      }}
-    >
+    <ModalContext.Provider value={contextValue}>
       {children}
-      {isOpen && (
-        <Modal position={options?.position ?? 'center'}>{content}</Modal>
+      {modalState.isOpen && (
+        <Modal position={modalState.options.position ?? 'center'}>
+          {modalState.content}
+        </Modal>
       )}
     </ModalContext.Provider>
   );

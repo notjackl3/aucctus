@@ -3,7 +3,7 @@ import styles from './tool-tip.module.scss';
 import { useState } from 'react';
 
 interface TooltipProps {
-  tip: string;
+  tip: string | React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -26,7 +26,7 @@ const Tooltip: FunctionComponent<TooltipProps> = ({ tip, children }) => {
   return (
     <div
       className={styles.container}
-      onMouseEnter={() => setActive(!!tip)}
+      onMouseEnter={() => setActive(true)}
       onMouseLeave={() => setActive(false)}
       onMouseMove={handleMouseMove}
     >
@@ -35,7 +35,7 @@ const Tooltip: FunctionComponent<TooltipProps> = ({ tip, children }) => {
         ref={ref}
         className={`${styles.tooltip} ${styles.top} ${!isActive ? styles.inActive : ''}`}
       >
-        <span>{tip}</span>
+        {typeof tip === 'string' ? <span>{tip}</span> : tip}
       </div>
     </div>
   );

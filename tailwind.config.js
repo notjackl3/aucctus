@@ -76,6 +76,7 @@ module.exports = {
         xs: '2px',
       },
       animation: {
+        'fade-in': 'fadeIn 0.2s ease-in forwards',
         'slide-in-center': 'slideInCenter 0.3s ease both',
         'slide-in-top': 'slideInTop 0.3s ease both',
         'slide-in-bottom': 'slideInBottom 0.3s ease both',
@@ -84,6 +85,10 @@ module.exports = {
         'slide-out-right': 'slideOutRight 0.3s ease both',
       },
       keyframes: {
+        fadeIn: {
+          from: { opacity: '0' },
+          to: { opacity: '1' },
+        },
         slideInCenter: {
           from: { transform: 'translateY(-50px)', opacity: '0' },
           to: { transform: 'translateY(0)', opacity: '1' },

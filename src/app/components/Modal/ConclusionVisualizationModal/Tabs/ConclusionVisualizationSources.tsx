@@ -31,6 +31,7 @@ const ConclusionVisualizationSources: React.FC<
         <Badge.SourceInfo
           source={source}
           onClick={() => window.open(source.url, '_blank')}
+          showPublishedDate={true}
         />
         {renderSpacer()}
         {renderLinkButton(source)}
@@ -51,7 +52,7 @@ const ConclusionVisualizationSources: React.FC<
     return sources.map((source) => {
       return (
         <Card.Detail
-          key={source.url}
+          key={source.url + Math.random()}
           cardClassName='w-full my-4'
           headerClassName='border-none !px-2'
           title={''}

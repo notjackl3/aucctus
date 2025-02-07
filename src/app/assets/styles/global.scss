@@ -240,3 +240,12 @@ input {
   scrollbar-width: thin;
   scrollbar-color: var(--gray-600-text-primary) var(--gray-300-outline);
 }
+
+.no-scrollbar {
+  overflow: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Edge */
+}

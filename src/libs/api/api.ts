@@ -9,6 +9,7 @@ import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
 import { MarketScanApi } from './marketScan';
 import { ITokenResponse } from './types';
+import { ArticleApi } from './article';
 
 export interface IApiConfig {
   /* End Points */
@@ -35,6 +36,7 @@ export class Api {
   assumption!: AssumptionsApi;
   marketScan!: MarketScanApi;
   conceptIgnite!: IgniteConceptApi;
+  article!: ArticleApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -52,6 +54,7 @@ export class Api {
       { key: 'assumption', class: AssumptionsApi },
       { key: 'marketScan', class: MarketScanApi },
       { key: 'conceptIgnite', class: IgniteConceptApi },
+      { key: 'article', class: ArticleApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {
@@ -76,6 +79,7 @@ export class Api {
       this.conceptIgnite,
       this.assumption,
       this.marketScan,
+      this.article,
     ].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
       api.config.headers = Object.assign({}, api.config.headers, {

@@ -62,11 +62,17 @@ const MarketScan: FunctionComponent = () => {
           />
         </div>
       </div>
-      <div className='flex flex-wrap gap-4'>
+      <div className='grid grid-cols-2 gap-4'>
         {marketScan?.trendsAndDrivers.map(
           (
             trend: any, // todo fix typing here
-          ) => <TrendAndDriverCard trendAndDriver={trend} key={trend.uuid} />,
+          ) => (
+            <TrendAndDriverCard
+              cardClassName='w-full'
+              trendAndDriver={trend}
+              key={trend.uuid}
+            />
+          ),
         )}
       </div>
       <div className='flex w-full flex-col gap-4'>
