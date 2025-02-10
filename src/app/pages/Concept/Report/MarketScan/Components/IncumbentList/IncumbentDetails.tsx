@@ -1,7 +1,14 @@
-import { Card, Loading } from '@components';
+import { Card, Loading, Text } from '@components';
 import { IIncumbent, ISource } from '@libs/api/types';
-import React from 'react';
+import React, { useCallback } from 'react';
 import InfoSection from '../InfoSection';
+import IconBox from './IconBox';
+
+const iconDefaultProps = {
+  height: 16,
+  width: 16,
+  stroke: '#2B3674',
+};
 
 interface IncumbentDetailsProps {
   incumbent: IIncumbent;
@@ -9,13 +16,27 @@ interface IncumbentDetailsProps {
     conclusion: string,
     reasoning: string,
     sources: ISource[],
-  ) => React.MouseEventHandler<HTMLButtonElement>;
+  ) => void;
 }
 
 const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
   incumbent,
   onReasoningClick,
 }) => {
+  const handleEvidenceClick = useCallback(
+    (
+      content: string | undefined,
+      evidence?: { insight: string; sources: ISource[] },
+    ) =>
+      (e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (evidence) {
+          onReasoningClick(content || '', evidence.insight, evidence.sources);
+        }
+      },
+    [onReasoningClick],
+  );
+
   if (incumbent.status !== 'completed') {
     return (
       <div className='mx-auto max-w-5xl space-y-8'>
@@ -50,47 +71,32 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
                 content={incumbent.overview}
                 contentClassName='text-[14px] font-semibold'
                 iconVariant='link-source'
-                onClick={
-                  incumbent.overviewEvidence
-                    ? onReasoningClick(
-                        incumbent.overview,
-                        incumbent.overviewEvidence.insight,
-                        incumbent.overviewEvidence.sources,
-                      )
-                    : undefined
-                }
+                onClick={handleEvidenceClick(
+                  incumbent.overview,
+                  incumbent.overviewEvidence,
+                )}
               />
             )}
-            {incumbent.headquarters ? (
+            {incumbent.headquarters && (
               <InfoSection
                 title='Headquarters'
                 content={incumbent.headquarters}
                 iconVariant='link-source'
-                onClick={() =>
-                  incumbent.headquartersEvidence && incumbent.headquarters
-                    ? onReasoningClick(
-                        incumbent.headquarters,
-                        incumbent.headquartersEvidence.insight,
-                        incumbent.headquartersEvidence.sources,
-                      )
-                    : undefined
-                }
+                onClick={handleEvidenceClick(
+                  incumbent.headquarters,
+                  incumbent.headquartersEvidence,
+                )}
               />
-            ) : null}
+            )}
             {incumbent.founded && (
               <InfoSection
                 title='Established'
                 content={incumbent.founded}
                 iconVariant='link-source'
-                onClick={() =>
-                  incumbent.foundedEvidence && incumbent.founded
-                    ? onReasoningClick(
-                        incumbent.founded,
-                        incumbent.foundedEvidence.insight,
-                        incumbent.foundedEvidence.sources,
-                      )
-                    : undefined
-                }
+                onClick={handleEvidenceClick(
+                  incumbent.founded,
+                  incumbent.foundedEvidence,
+                )}
               />
             )}
           </div>
@@ -116,30 +122,40 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
       </section>} */}
 
       {/* Additional Sections (e.g., Recent Activity, Support) */}
-      {/* Uncomment and implement as needed */}
-      {/*
       <section>
         <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
           Recent Activity
         </h2>
-        <div className='space-y-4'>
-          {incumbent.recentActivity?.map((activity, index) => (
-            <div key={index} className='rounded-lg border border-gray-200 bg-white p-4'>
-              <div className='flex items-center justify-between'>
-                <h3 className="font-['Inter'] text-[12px] font-normal leading-[18px] text-gray-950">
-                  {activity.activity}
-                </h3>
-                <IconBox
-                  variant='link-source'
-                  onClick={() => window.open(activity.source, '_blank')}
-                  {...iconDefaultProps}
-                />
+        <div className='space-y-2'>
+          {incumbent.newsAndActivities &&
+            incumbent.newsAndActivities.length > 0 &&
+            incumbent.newsAndActivities.map((activity, idx) => (
+              <div
+                key={idx}
+                className='rounded-lg border border-gray-200 bg-white p-4'
+              >
+                <div className='flex items-center justify-between'>
+                  <Text.Collapsible
+                    title=''
+                    titleClassName='hidden'
+                    description={activity.text.trim()}
+                    descriptionClassName="font-['Inter'] text-[12px] font-normal leading-[18px] text-gray-950"
+                    maxDescriptionHeight={40}
+                    truncationClassName='line-clamp-2'
+                  />
+                  <IconBox
+                    variant='link-source'
+                    onClick={handleEvidenceClick(
+                      activity.text,
+                      activity.evidence,
+                    )}
+                    {...iconDefaultProps}
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
         </div>
       </section>
-      */}
 
       {incumbent.relevance && (
         <section className='space-y-4'>

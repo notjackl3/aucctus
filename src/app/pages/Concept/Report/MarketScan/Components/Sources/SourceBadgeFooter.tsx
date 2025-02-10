@@ -159,7 +159,7 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
 
   const renderMultiSourceList = useCallback(
     (sources: ISource[]) => (
-      <ComponentList className='overflow-behavior-contain overflow-behavior-contain max-h-[50vh] max-w-[500px] overflow-y-auto py-4 shadow-lg'>
+      <ComponentList className='max-h-[50vh] max-w-[500px] overflow-y-auto overscroll-contain py-4 shadow-lg'>
         <div className='flex flex-col'>
           {sources.map((source) =>
             renderSourceCard(

@@ -3,6 +3,7 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
 } from 'react';
 import { useModal } from '../../../context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
@@ -21,6 +22,30 @@ const Modal: FunctionComponent<IModalProps> = ({
   const { closeModal, shouldCloseOnOverlayClick } = useModal();
   const contentRef = useRef<HTMLDivElement>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+
+  const slideOutAnimations: Record<ModalPosition, string> = useMemo(
+    () => ({
+      center: 'animate-slide-out-center',
+      right: 'animate-slide-out-right',
+      left: 'animate-slide-out-left',
+    }),
+    [],
+  );
+
+  const handleCloseModal = useCallback(() => {
+    if (!wrapperRef.current) return;
+
+    const animationClass = slideOutAnimations[position];
+    if (!animationClass) {
+      closeModal();
+      return;
+    }
+
+    wrapperRef.current.classList.add(animationClass);
+    wrapperRef.current.addEventListener('animationend', closeModal, {
+      once: true,
+    });
+  }, [closeModal, position, slideOutAnimations]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -42,34 +67,12 @@ const Modal: FunctionComponent<IModalProps> = ({
         document.removeEventListener('mousedown', handleClickOutside);
       }
     };
-  }, [closeModal, shouldCloseOnOverlayClick]);
-
-  const handleCloseModal = useCallback(() => {
-    if (!wrapperRef.current) return;
-
-    switch (position) {
-      case 'right':
-        wrapperRef.current.classList.add('animate-slide-out-right');
-        wrapperRef.current.addEventListener('animationend', closeModal, {
-          once: true,
-        });
-        break;
-      case 'left':
-        wrapperRef.current.classList.add('animate-slide-out-left');
-        wrapperRef.current.addEventListener('animationend', closeModal, {
-          once: true,
-        });
-        break;
-      default:
-        closeModal();
-        break;
-    }
-  }, [closeModal, position]);
+  }, [closeModal, shouldCloseOnOverlayClick, handleCloseModal]);
 
   // Determine classes based on position prop
 
   const positionClasses = {
-    center: 'animate-slide-in-center',
+    center: 'animate-fade-in',
     right: 'flex items-center justify-end animate-slide-in-right',
     left: 'flex items-center justify-start animate-slide-in-left',
   };
@@ -89,13 +92,16 @@ const Modal: FunctionComponent<IModalProps> = ({
         className={cn(
           'transform cursor-default overflow-hidden',
           position === 'center'
-            ? 'm-auto shadow-lg'
+            ? 'm-auto animate-slide-in-center shadow-lg'
             : `${positionClasses[position]} w-full`,
         )}
       >
         <div
           ref={contentRef}
-          className={`h-full bg-white ${contentClasses[position]}`}
+          className={cn(
+            'h-full max-h-[100vh] bg-white',
+            contentClasses[position],
+          )}
         >
           {children}
         </div>

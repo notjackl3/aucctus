@@ -11,6 +11,7 @@ import whiteSpaceSuggestions from './white-space-suggestions.png';
 import trendOne from './trends/trend1.png';
 import trendTwo from './trends/trend2.png';
 import trendThree from './trends/trend3.png';
+import link from './link.png';
 
 import avatar from './avatar.png';
 
@@ -30,6 +31,7 @@ const images = {
 
   // Miscellaneous
   deliveryNews,
+  link,
 
   // Concept Ignition
   expandOnExistingIdeas,

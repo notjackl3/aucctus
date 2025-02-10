@@ -1,12 +1,23 @@
-import { Button, Card, Icon, Loading } from '@components';
-import { ISource, IStartup } from '@libs/api/types';
-import React from 'react';
+import { Button, Card, Icon, Loading, Text } from '@components';
+import { EngagementAction, ISource, IStartup } from '@libs/api/types';
+import React, { useCallback } from 'react';
 import InfoSection from '../InfoSection';
+import { cn } from '@libs/utils/react';
+import { toTitleCase } from '@libs/utils/string';
 
 // TODO: Handling Loading
 
+const ACTION_ICON_MAPPING: Record<EngagementAction, IconVariant> = {
+  acquisition: 'target',
+  investment: 'shield-dollar',
+  partnership: 'link-03',
+  customer: 'user-group',
+  supplier: 'building',
+};
+
 interface StartupDetailsProps {
   startup: IStartup;
+  className?: string;
   onReasoningClick: (
     conclusion: string,
     reasoning: string,
@@ -17,10 +28,38 @@ interface StartupDetailsProps {
 const StartupDetails: React.FC<StartupDetailsProps> = ({
   startup,
   onReasoningClick,
+  className = '',
 }) => {
+  const getEngagementIcon = useCallback((action: EngagementAction) => {
+    const engagementIcon = ACTION_ICON_MAPPING[action];
+    if (!engagementIcon) {
+      return null;
+    }
+
+    return <Icon variant={engagementIcon} />;
+  }, []);
+
+  const handleEvidenceClick = useCallback(
+    (
+      content: string | undefined,
+      evidence?: { insight: string; sources: ISource[] },
+    ) =>
+      (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (evidence) {
+          onReasoningClick(
+            content || '',
+            evidence.insight,
+            evidence.sources,
+          )(e as React.MouseEvent<HTMLButtonElement>);
+        }
+      },
+    [onReasoningClick],
+  );
+
   if (startup.status !== 'completed') {
     return (
-      <div className='mx-auto max-w-5xl space-y-8'>
+      <div className={cn('mx-auto max-w-5xl space-y-8', className)}>
         <div className='flex min-h-96 items-center justify-center gap-6 self-stretch text-center align-middle'>
           <section>
             <div className='self-stretch text-center text-sm font-medium text-gray-500'>
@@ -37,7 +76,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
   }
 
   return (
-    <div className='mx-auto max-w-5xl space-y-8'>
+    <div className={cn('mx-auto max-w-5xl space-y-8', className)}>
       {/* General Information Section */}
       <section>
         <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
@@ -48,79 +87,55 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
             {startup.overview && (
               <InfoSection
                 title='Company Overview'
+                onClick={handleEvidenceClick(
+                  startup.overview,
+                  startup.overviewEvidence,
+                )}
                 content={startup.overview}
                 contentClassName='text-[14px] font-semibold'
-                onClick={
-                  startup.overviewEvidence
-                    ? onReasoningClick(
-                        startup.overview,
-                        startup.overviewEvidence.insight,
-                        startup.overviewEvidence.sources,
-                      )
-                    : undefined
-                }
               />
             )}
             {startup.headquarters && (
               <InfoSection
                 title='Headquarters'
+                onClick={handleEvidenceClick(
+                  startup.headquarters,
+                  startup.headquartersEvidence,
+                )}
                 content={startup.headquarters}
-                onClick={
-                  startup.headquartersEvidence
-                    ? onReasoningClick(
-                        startup.headquarters,
-                        startup.headquartersEvidence.insight,
-                        startup.headquartersEvidence.sources,
-                      )
-                    : undefined
-                }
               />
             )}
             {startup.founded && (
               <InfoSection
+                onClick={handleEvidenceClick(
+                  startup.founded,
+                  startup.foundedEvidence,
+                )}
                 title='Founded'
                 content={startup.founded}
-                onClick={
-                  startup.foundedEvidence
-                    ? onReasoningClick(
-                        startup.founded,
-                        startup.foundedEvidence.insight,
-                        startup.foundedEvidence.sources,
-                      )
-                    : undefined
-                }
               />
             )}
           </div>
+
           <div className='flex flex-1 flex-col gap-4'>
             <div className='flex-1 rounded-lg border border-gray-200 bg-white p-4'>
               <InfoSection
                 title='Value Proposition'
                 content={startup.valueProposition}
-                onClick={
-                  startup.valuePropositionEvidence
-                    ? onReasoningClick(
-                        startup.valueProposition,
-                        startup.valuePropositionEvidence.insight,
-                        startup.valuePropositionEvidence.sources,
-                      )
-                    : undefined
-                }
+                onClick={handleEvidenceClick(
+                  startup.valueProposition,
+                  startup.valuePropositionEvidence,
+                )}
               />
             </div>
             <div className='flex-1 rounded-lg border border-gray-200 bg-white p-4'>
               <InfoSection
                 title='Competitive Advantage'
                 content={startup.competitiveAdvantage}
-                onClick={
-                  startup.competitiveAdvantageEvidence
-                    ? onReasoningClick(
-                        startup.competitiveAdvantage,
-                        startup.competitiveAdvantageEvidence.insight,
-                        startup.competitiveAdvantageEvidence.sources,
-                      )
-                    : undefined
-                }
+                onClick={handleEvidenceClick(
+                  startup.competitiveAdvantage,
+                  startup.competitiveAdvantageEvidence,
+                )}
               />
             </div>
           </div>
@@ -146,16 +161,38 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
       )}
 
       {/* Potential Engagement Tactics */}
-      {/* <section>
-        <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
-          Potential Engagement Tactics
-        </h2>
-        <div className='grid grid-cols-3 gap-4'> */}
-      {/* {startup.engagementTactics.map((tactic, index) => (...))} */}
-      {/* </div>
-      </section> */}
+      {startup.potentialEngagements &&
+        startup.potentialEngagements.length > 0 && (
+          <section>
+            <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
+              Potential Engagement Tactics
+            </h2>
+
+            <div className='grid grid-cols-3 gap-4'>
+              {startup.potentialEngagements.map((engagement, index) => (
+                <div
+                  key={index}
+                  className='rounded-lg border border-gray-200 bg-white p-4'
+                >
+                  <div className='flex flex-row gap-2'>
+                    <h3 className='text-sm font-medium text-gray-900'>
+                      {toTitleCase(engagement.action)}
+                    </h3>
+                    <span className='!text-gray-900'>
+                      {getEngagementIcon(engagement.action)}
+                    </span>
+                  </div>
+                  <p className='mt-4 break-words text-sm text-gray-600'>
+                    {engagement.description}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
 
       {/* Key Facts & Contacts */}
+
       <section>
         <div className='flex flex-row gap-6'>
           {(startup.keyFacts || []).length > 0 && (
@@ -170,20 +207,19 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
                     className='flex-1 rounded-lg border border-gray-200 bg-white p-2'
                   >
                     <div className='flex items-center justify-between'>
-                      <h3 className="font-['Inter'] text-[12px] font-normal leading-[18px] text-gray-950">
-                        {fact.text}
-                      </h3>
+                      <Text.Collapsible
+                        title=''
+                        titleClassName='hidden'
+                        description={fact.text.trim()}
+                        descriptionClassName="font-['Inter'] text-[12px] font-normal leading-[18px] text-gray-950"
+                        maxDescriptionHeight={75}
+                        truncationClassName='line-clamp-4'
+                      />
                       <Button
                         color='grey'
                         noBorder
                         size='xs'
-                        onClick={() =>
-                          onReasoningClick(
-                            fact.text,
-                            fact.evidence.insight,
-                            fact.evidence.sources,
-                          )
-                        }
+                        onClick={handleEvidenceClick(fact.text, fact.evidence)}
                       >
                         <Icon variant='link-source' />
                       </Button>
@@ -203,7 +239,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
                 {startup.keyContacts.map((contact, index) => (
                   <li
                     className='flex items-center justify-between gap-6 rounded-lg border border-gray-200 bg-white p-4'
-                    key={`${contact.name}-${index}`}
+                    key={index}
                   >
                     <div className='flex flex-col pr-6'>
                       <span className='font-semibold text-gray-900'>

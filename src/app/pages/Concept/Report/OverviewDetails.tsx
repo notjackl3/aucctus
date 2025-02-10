@@ -94,7 +94,7 @@ const OverviewDetails: FunctionComponent = () => {
         <Card.CustomerProfiles
           profile={firstCustomerPersona}
           onViewProfilesClick={() =>
-            navigateToTab(AppPath.ConceptFinancialProjection)
+            navigateToTab(AppPath.ConceptCustomerProfile)
           }
         />
 

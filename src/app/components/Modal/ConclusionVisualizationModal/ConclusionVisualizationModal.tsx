@@ -50,7 +50,7 @@ const ConclusionVisualization: React.FC<IConclusionVisualizationProps> = ({
   };
 
   return (
-    <div className='flex h-full min-w-[500px] max-w-[500px] flex-col'>
+    <div className='flex h-full min-w-[500px] max-w-[500px] flex-col overflow-auto'>
       <Container.TabView
         variant='button-separated'
         className='flex flex-1 flex-col px-4'
@@ -59,7 +59,9 @@ const ConclusionVisualization: React.FC<IConclusionVisualizationProps> = ({
         onTabSelect={(tab) => setActiveTab(tab as TabTitles)}
         activeTab={activeTab}
       >
-        <div className='w-full flex-1 overflow-auto'>{renderActiveTab()}</div>
+        <div className='max-h-[90vh] w-full flex-1 overflow-auto py-4'>
+          {renderActiveTab()}
+        </div>
       </Container.TabView>
     </div>
   );

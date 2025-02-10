@@ -1,5 +1,6 @@
 // _shared/IconBox.tsx
 import { Icon } from '@components';
+import { cn } from '@libs/utils/react';
 import React from 'react';
 
 interface IconBoxProps {
@@ -19,7 +20,10 @@ const IconBox: React.FC<IconBoxProps> = ({
 }) => {
   return (
     <div
-      className='cursor-pointer rounded-md bg-[#EAECF0] p-[4px]'
+      className={cn(
+        'cursor-pointer rounded-md bg-[#EAECF0] p-[4px] transition-colors',
+        { 'hover:bg-gray-300': !!onClick },
+      )}
       onClick={onClick}
     >
       <Icon variant={variant} height={height} width={width} stroke={stroke} />

@@ -1,10 +1,15 @@
 import { IBaseConceptEntity } from '.';
 import { ISupport } from './support';
 
-interface IEngagementTactic {
-  name: string;
+type EngagementAction =
+  | 'partnership'
+  | 'investment'
+  | 'acquisition'
+  | 'customer'
+  | 'supplier';
+interface IPotentialEngagement {
   description: string;
-  when: string;
+  action: EngagementAction;
 }
 
 interface IContact {
@@ -19,6 +24,11 @@ interface IKeyFact {
   evidence: FieldEvidence;
 }
 
+export interface INewsAndActivities {
+  text: string;
+  evidence: FieldEvidence;
+}
+
 export interface IBaseMarketScanCompany extends IBaseConceptEntity {
   name: string;
   domain?: string;
@@ -29,6 +39,7 @@ export interface IBaseMarketScanCompany extends IBaseConceptEntity {
   headquarters?: string;
   headquartersEvidence?: FieldEvidence;
   relevance?: string;
+  newsAndActivities?: INewsAndActivities[];
 
   status: 'isPending' | 'completed';
 }
@@ -48,7 +59,7 @@ export interface IStartup extends IBaseMarketScanCompany {
   keyContacts: IContact[];
   keyFacts: IKeyFact[];
 
-  engagementTactics: IEngagementTactic[];
+  potentialEngagements?: IPotentialEngagement[];
 }
 
 export interface FieldEvidence {

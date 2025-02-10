@@ -43,8 +43,7 @@ const MultiSourceBadge: FunctionComponent<MultiSourceBadgeProps> = ({
               alt='source-logo'
               src={`https://logo.clearbit.com/${getBaseUrl(source.url) || ''}`}
               onError={(e) => {
-                (e.currentTarget as HTMLImageElement).src =
-                  images.companyLogoDefault;
+                (e.currentTarget as HTMLImageElement).src = images.link;
               }}
             />
           </div>

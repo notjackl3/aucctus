@@ -78,9 +78,11 @@ module.exports = {
       animation: {
         'fade-in': 'fadeIn 0.2s ease-in forwards',
         'slide-in-center': 'slideInCenter 0.3s ease both',
+        'slide-out-center': 'slideOutCenter 0.3s ease both',
         'slide-in-top': 'slideInTop 0.3s ease both',
         'slide-in-bottom': 'slideInBottom 0.3s ease both',
         'slide-in-left': 'slideInLeft 0.3s ease both',
+        'slide-out-left': 'slideOutLeft 0.3s ease both',
         'slide-in-right': 'slideInRight 0.3s ease both',
         'slide-out-right': 'slideOutRight 0.3s ease both',
       },
@@ -93,6 +95,10 @@ module.exports = {
           from: { transform: 'translateY(-50px)', opacity: '0' },
           to: { transform: 'translateY(0)', opacity: '1' },
         },
+        slideOutCenter: {
+          from: { transform: 'translateY(0)', opacity: '1' },
+          to: { transform: 'translateY(-50px)', opacity: '0' },
+        },
         slideInTop: {
           from: { transform: 'translateY(-100%)', opacity: '0' },
           to: { transform: 'translateY(0)', opacity: '1' },
@@ -104,6 +110,10 @@ module.exports = {
         slideInLeft: {
           from: { transform: 'translateX(-100%)', opacity: '0' },
           to: { transform: 'translateX(0)', opacity: '1' },
+        },
+        slideOutLeft: {
+          from: { transform: 'translateX(0)', opacity: '1' },
+          to: { transform: 'translateX(-100%)', opacity: '0' },
         },
         slideInRight: {
           from: { transform: 'translateX(100%)', opacity: '0' },

@@ -91,8 +91,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
           alt='source-logo'
           src={`https://logo.clearbit.com/${sourceBaseUrl || ''}`}
           onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src =
-              images.companyLogoDefault;
+            (e.currentTarget as HTMLImageElement).src = images.link;
           }}
         />
       </div>

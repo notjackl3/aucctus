@@ -21,18 +21,13 @@ const IncumbentsList: React.FC<IncumbentDashboardProps> = ({ incumbents }) => {
     }
   }, [incumbents]);
 
-  // Example callback for opening the "evidence & reasoning" modal
   const handleReasoningModelClick = React.useCallback(
     (conclusion: string, reasoning: string, sources: ISource[]) =>
-      (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        openModal(Modal.EvidenceAndReasoning, {
-          conclusion,
-          reasoning,
-          sources,
-        });
-        e.preventDefault();
-        e.stopPropagation();
-      },
+      openModal(Modal.EvidenceAndReasoning, {
+        conclusion,
+        reasoning,
+        sources,
+      }),
     [openModal],
   );
 

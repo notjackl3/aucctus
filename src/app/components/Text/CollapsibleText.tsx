@@ -7,9 +7,10 @@ interface TitleDescriptionProps {
   title: string;
   titleClassName?: string;
   description: string;
-  // Note: trying to set the position of the description will not work as this is being enforced to a relative position to ensure the animation works properly
+  // Note: trying to set the position of the description will not work as this is being enforced to ensure the animation works properly
   descriptionClassName?: string;
   maxDescriptionHeight?: number;
+  truncationClassName?: string;
 }
 
 // const MAX_DESCRIPTION_HEIGHT = 60;
@@ -20,9 +21,11 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
   description,
   descriptionClassName,
   maxDescriptionHeight = 60,
+  truncationClassName = 'line-clamp-3',
 }) => {
   const [open, setOpen] = React.useState(false);
   const [isTruncated, setIsTruncated] = React.useState(false);
+
   const [isHovered, setIsHovered] = React.useState(false);
 
   const textRef = React.useRef<HTMLSpanElement>(null);
@@ -86,7 +89,7 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
         className={cn(
           'text-sm font-medium leading-tight text-slate-500',
           {
-            'line-clamp-3': !open,
+            [truncationClassName]: !open,
             'cursor-pointer': isTruncated,
           },
           descriptionClassName,
