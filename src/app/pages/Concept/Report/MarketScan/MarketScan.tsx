@@ -8,7 +8,7 @@ import {
   useConceptMarketScan,
   useTrendAndDriverCreate,
 } from '@hooks/query/concepts.hook';
-import { FunctionComponent } from 'react';
+import React, { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import IncumbentsList from './Components/IncumbentList/IncumbentList';
 import Investors from './Components/InvestorsList';
@@ -93,9 +93,11 @@ const MarketScan: FunctionComponent = () => {
       <div className='flex w-full flex-col gap-4'>
         <IncumbentsList incumbents={marketScan?.incumbents || []} />
       </div>
-      <div className='flex w-full flex-col gap-4'>
-        <Investors investors={marketScan?.investors || []} />
-      </div>
+      {marketScan?.investors && marketScan?.investors.length > 0 && (
+        <div className='flex w-full flex-col gap-4'>
+          <Investors investors={marketScan?.investors} />
+        </div>
+      )}
     </div>
   );
 };
