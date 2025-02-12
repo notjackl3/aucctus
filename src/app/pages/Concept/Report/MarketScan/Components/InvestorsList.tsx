@@ -13,15 +13,32 @@ const iconDefaultProps = {
 };
 
 interface IInvestorListProps {
-  investors: IInvestor[];
+  investors: IInvestor[] | undefined;
 }
 
-function getTotalInvestment(investors: IInvestor[]): number {
+function getTotalInvestment(investors: IInvestor[] | undefined): number {
+  if (!investors) {
+    return 0;
+  }
   return investors.reduce((acc, val) => acc + val.investedAmount, 0);
 }
 
-function getTotalInvestments(investors: IInvestor[]): number {
+function getTotalInvestments(investors: IInvestor[] | undefined): number {
+  if (!investors) {
+    return 0;
+  }
   return investors.length;
+}
+
+function getSortedInvestors(investors: IInvestor[] | undefined): IInvestor[] {
+  if (!investors) {
+    return [];
+  }
+  return [...investors].sort(
+    (a, b) =>
+      new Date(b.investmentDate).getTime() -
+      new Date(a.investmentDate).getTime(),
+  );
 }
 
 const InvestorsList: React.FC<IInvestorListProps> = ({
@@ -33,7 +50,7 @@ const InvestorsList: React.FC<IInvestorListProps> = ({
   const { openModal } = useModal();
 
   useEffect(() => {
-    if (investors.length > 0) {
+    if (investors && investors.length > 0) {
       setSelectedInvestment(investors[0]);
     }
   }, [investors]);
@@ -42,27 +59,23 @@ const InvestorsList: React.FC<IInvestorListProps> = ({
   const totalInvestments = getTotalInvestments(investors);
 
   // Ensure the list is sorted from earliest to latest
-  const sortedInvestors = [...investors].sort(
-    (a, b) =>
-      new Date(b.investmentDate).getTime() -
-      new Date(a.investmentDate).getTime(),
-  );
+  const sortedInvestors = getSortedInvestors(investors);
 
   const handleSupportModalClick = useCallback(
-    (conclusion: string, support: ISupport) => {
-      openModal(Modal.EvidenceAndReasoning, {
-        conclusion: conclusion,
-        reasoning: support.insights
-          .map((i: IInsight) => i.summary)
-          .join('\n\n'),
-        sources: Array.from(
-          new Map(
-            support.insights
-              .flatMap((i: IInsight) => i.sources) // Flatten all sources arrays
-              .map((source) => [source.url, source]), // Use source.url as the key
-          ).values(), // Get only the unique values
-        ),
-      });
+    (title: string, conclusion: string, support: ISupport) => {
+      openModal(
+        Modal.ConclusionVisualization,
+        {
+          conclusion: title,
+          reasoning: conclusion,
+          insights: support.insights,
+          sources: support.insights.reduce(
+            (acc: any[], insight: IInsight) => acc.concat(insight.sources),
+            [],
+          ),
+        },
+        { position: 'right' },
+      );
     },
     [openModal],
   );
@@ -79,112 +92,122 @@ const InvestorsList: React.FC<IInvestorListProps> = ({
           classNameLabel='text-[#0C111D] text-sm font-bold'
         />
       </div>
-
-      <div className='mt-8 flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
-        <div className='h-full w-80'>
-          <nav>
-            {sortedInvestors.map((investment) => (
-              <div
-                key={investment.uuid}
-                className={`group flex cursor-pointer flex-col items-start gap-3 p-4 hover:bg-gray-50 ${
-                  selectedInvestment?.uuid === investment.uuid
-                    ? 'bg-gray-100'
-                    : ''
-                }`}
-                onClick={() => setSelectedInvestment(investment)}
-              >
-                <div className='flex w-full flex-row items-center justify-between'>
-                  <div className='flex items-center'>
-                    <div className='h-8 w-8 overflow-hidden rounded-full'>
-                      <img
-                        alt='company-logo'
-                        onError={(
-                          e: React.SyntheticEvent<HTMLImageElement, Event>,
-                        ) => {
-                          e.currentTarget.src = images.companyLogoDefault;
-                        }}
-                        src={`https://logo.clearbit.com/${investment.domain}`}
-                      />
+      {sortedInvestors.length > 0 ? (
+        <div className='mt-8 flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
+          <div className='h-full w-80'>
+            <nav>
+              {sortedInvestors.map((investment) => (
+                <div
+                  key={investment.uuid}
+                  className={`group flex cursor-pointer flex-col items-start gap-3 p-4 hover:bg-gray-50 ${
+                    selectedInvestment?.uuid === investment.uuid
+                      ? 'bg-gray-100'
+                      : ''
+                  }`}
+                  onClick={() => setSelectedInvestment(investment)}
+                >
+                  <div className='flex w-full flex-row items-center justify-between'>
+                    <div className='flex items-center'>
+                      <div className='h-8 w-8 overflow-hidden rounded-full'>
+                        <img
+                          alt='company-logo'
+                          onError={(
+                            e: React.SyntheticEvent<HTMLImageElement, Event>,
+                          ) => {
+                            e.currentTarget.src = images.companyLogoDefault;
+                          }}
+                          src={`https://logo.clearbit.com/${investment.domain}`}
+                        />
+                      </div>
+                      <h3 className='ml-2 text-sm font-medium text-gray-900'>
+                        {investment.name}
+                      </h3>
                     </div>
-                    <h3 className='ml-2 text-sm font-medium text-gray-900'>
-                      {investment.name}
-                    </h3>
+                    <div
+                      onClick={() =>
+                        handleSupportModalClick(
+                          investment.name,
+                          `Invested ${formatLargeNumber(investment.investedAmount)} in companies: ${investment.companies.join(', ')}`,
+                          investment.support,
+                        )
+                      }
+                      className='cursor-pointer rounded-md bg-[#EAECF0] p-[4px]'
+                    >
+                      <Icon variant='link-source' {...iconDefaultProps} />
+                    </div>
                   </div>
-                  <div
-                    onClick={() =>
-                      handleSupportModalClick(
-                        investment.name,
-                        investment.support,
-                      )
-                    }
-                    className='cursor-pointer rounded-md bg-[#EAECF0] p-[4px]'
-                  >
-                    <Icon variant='link-source' {...iconDefaultProps} />
+                  <div className='flex-start flex gap-6'>
+                    {investment.companies?.length > 0 && (
+                      <div>
+                        <p className='font-inter text-[12px] font-bold text-[#0C111D]'>
+                          Invested in
+                        </p>
+                        <p className='font-inter pt-3 text-[12px] font-normal text-[#0C111D]'>
+                          {investment.companies.join(', ')}
+                        </p>
+                      </div>
+                    )}
+                    <div>
+                      <p className='font-inter text-[12px] font-bold text-[#0C111D]'>
+                        Amount invested
+                      </p>
+                      <p className='font-inter pt-3 text-[12px] font-normal text-[#0C111D]'>
+                        ${formatLargeNumber(investment.investedAmount)}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <div className='flex-start flex gap-6'>
-                  <div>
-                    <p className='font-inter text-[12px] font-bold text-[#0C111D]'>
-                      Amount invested
-                    </p>
-                    <p className='font-inter pt-3 text-[12px] font-normal text-[#0C111D]'>
-                      ${formatLargeNumber(investment.investedAmount)}
-                    </p>
-                  </div>
-                  <div>
-                    <p className='font-inter text-[12px] font-bold text-[#0C111D]'>
-                      Date invested
-                    </p>
-                    <p className='font-inter pt-3 text-[12px] font-normal text-[#0C111D]'>
-                      {investment.investmentDate}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </nav>
-        </div>
-        <main className='flex-1 border-l border-gray-200 bg-[#F9FAFB] p-6'>
-          <div className='rounded bg-white p-5 shadow-md'>
-            <div className='direction-row flex gap-6'>
-              <div>
-                <p className='font-inter text-[10px] font-medium text-[#667085]'>
-                  Total Investment
-                </p>
-                <p className='font-inter flex items-center gap-2 pt-2 text-[20px] font-bold text-[#0C111D]'>
-                  <Icon
-                    variant='trendup'
-                    height='25'
-                    width='25'
-                    stroke='#17B26A'
-                  />
-                  <p>{formatLargeNumber(totalInvestment)}</p>
-                </p>
-              </div>
-              <div>
-                <p className='font-inter text-[10px] font-medium text-[#667085]'>
-                  Total Investments
-                </p>
-                <p className='font-inter flex items-center gap-2 pt-2 text-[20px] font-bold text-[#0C111D]'>
-                  <Icon
-                    variant='trendup'
-                    height='25'
-                    width='25'
-                    stroke='#17B26A'
-                  />
-                  <p>{totalInvestments}</p>
-                </p>
-              </div>
-            </div>
-            {sortedInvestors?.length > 0 && (
-              <InvestorsLineChart
-                data={sortedInvestors || []}
-                selected={selectedInvestment}
-              />
-            )}
+              ))}
+            </nav>
           </div>
-        </main>
-      </div>
+          <main className='flex-1 border-l border-gray-200 bg-[#F9FAFB] p-6'>
+            <div className='rounded bg-white p-5 shadow-md'>
+              <div className='direction-row flex gap-6'>
+                <div>
+                  <p className='font-inter text-[10px] font-medium text-[#667085]'>
+                    Total Investment
+                  </p>
+                  <p className='font-inter flex items-center gap-2 pt-2 text-[20px] font-bold text-[#0C111D]'>
+                    <Icon
+                      variant='trendup'
+                      height='25'
+                      width='25'
+                      stroke='#17B26A'
+                    />
+                    <p>{formatLargeNumber(totalInvestment)}</p>
+                  </p>
+                </div>
+                <div>
+                  <p className='font-inter text-[10px] font-medium text-[#667085]'>
+                    Total Investments
+                  </p>
+                  <p className='font-inter flex items-center gap-2 pt-2 text-[20px] font-bold text-[#0C111D]'>
+                    <Icon
+                      variant='trendup'
+                      height='25'
+                      width='25'
+                      stroke='#17B26A'
+                    />
+                    <p>{totalInvestments}</p>
+                  </p>
+                </div>
+              </div>
+              {sortedInvestors?.length > 0 && (
+                <InvestorsLineChart
+                  data={sortedInvestors || []}
+                  selected={selectedInvestment}
+                />
+              )}
+            </div>
+          </main>
+        </div>
+      ) : (
+        <div className='mt-4 flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-4 shadow-sm'>
+          <div className='text-center text-gray-500'>
+            Hmm, our agent’s struggled to find investor details
+          </div>
+        </div>
+      )}
     </div>
   );
 };

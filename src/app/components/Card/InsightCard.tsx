@@ -1,6 +1,7 @@
 import React from 'react';
 import { IInsight, ISource } from '@libs/api/types';
 import { Badge, Icon } from '@components';
+import ReactMarkdown from 'react-markdown';
 
 interface SourceCardProps {
   source: ISource;
@@ -44,7 +45,9 @@ const InsightCard: React.FC<InsightCardProps> = ({
     <div
       className={`flex w-full flex-col gap-2 self-stretch rounded-lg border border-gray-200 bg-white p-4 shadow-sm ${cardClassName}`}
     >
-      <div className='text-md mb-4 text-gray-900'>{insight.summary}</div>
+      <div className='text-md mb-4 text-gray-900'>
+        <ReactMarkdown>{insight.summary}</ReactMarkdown>
+      </div>
       {insight.sources.map((source) => (
         <SourceCard key={source.uuid} source={source} />
       ))}

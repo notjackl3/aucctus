@@ -77,6 +77,7 @@ export interface IInvestor extends IBaseConceptEntity {
   name: string;
   domain: string;
   investedAmount: number;
+  companies: string[];
   investmentDate: string;
   createdAt: string;
   updatedAt: string;
@@ -96,15 +97,13 @@ export interface ITrendsAndDrivers extends IBaseConceptEntity {
   updatedAt: string;
 }
 
-export interface IInvestor extends IBaseConceptEntity {}
-
 export interface IMarketScan extends IBaseConceptEntity {
   name: string;
 
   ecosystemDescription: string;
   startups: IStartup[];
   incumbents: IIncumbents[];
-  investors: IInvestors[];
+  investors: IInvestor[];
 
   trendsAndDriversDescription: string;
   trendsAndDrivers: ITrendsAndDrivers[];
