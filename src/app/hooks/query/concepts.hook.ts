@@ -46,9 +46,10 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
       queryOptions.page,
       queryOptions.search,
       queryOptions.sort,
+      queryOptions.createdBy,
     ],
     cacheTime: Infinity,
-    staleTime: 1000 * 60 * 2, // 2 minute
+    staleTime: 0,
     refetchInterval: (data?: IConceptPage) => {
       return data &&
         data.results.some((concept) => concept.reportStatus === 'pending')

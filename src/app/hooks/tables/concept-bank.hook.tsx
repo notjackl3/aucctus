@@ -74,12 +74,12 @@ export const useConceptBank = () => {
   const [filterOptions, setFilterOptions] =
     React.useState<IConceptFilterOptions>(INITIAL_FILTER);
   const [page, setPage] = React.useState<number>(1);
-  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [sorting, setSorting] = React.useState<SortingState>([
+    { id: 'createdAt', desc: true },
+  ]);
 
   // Fetch concepts based on the search parameters
   const { data, isLoading } = useConcepts({
-    // category,
-    // Convert the array of visible statuses to a query string (ie ideating,new)
     status: Array.from(filterOptions.status).join(',') || undefined,
     createdBy: filterOptions.createdBy
       ? `${filterOptions.createdBy.firstName} ${filterOptions.createdBy.lastName}`
@@ -91,6 +91,7 @@ export const useConceptBank = () => {
 
   const updateTableFiltering = React.useCallback(
     (value: Partial<IConceptFilterOptions>) => {
+      setPage(1); // avoid pagination issues
       setFilterOptions({ ...filterOptions, ...value });
     },
     [filterOptions],
