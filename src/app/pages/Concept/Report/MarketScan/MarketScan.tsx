@@ -93,9 +93,9 @@ const MarketScan: FunctionComponent = () => {
       <div className='flex w-full flex-col gap-4'>
         <IncumbentsList incumbents={marketScan?.incumbents || []} />
       </div>
-      <div className='flex w-full flex-col gap-4'>
+      {/* <div className='flex w-full flex-col gap-4'>
         <Investors investors={marketScan?.investors} />
-      </div>
+      </div> */}
     </div>
   );
 };
