@@ -1,6 +1,7 @@
 import { Input } from '@components';
 import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
+import { useAuthStore } from '@stores/auth.store';
 import { FunctionComponent, useCallback, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import styles from '../assets/styles/pages/auth-screens.module.scss';
@@ -9,12 +10,11 @@ import OnboardingIntoSection from '../components/Auth/OnboardingIntroSection';
 import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
 import InputField from '../components/Input/InputField/InputField';
 import { useRegisterAccount } from '../hooks/query/account.hook';
-import { useAppStore } from '../stores/app.store';
 
 const GOAL_MAX_LENGTH = 500;
 
 const OnBoarding: FunctionComponent = () => {
-  const { user } = useAppStore();
+  const { user } = useAuthStore();
   const { mutate: registerAccount, isLoading } = useRegisterAccount();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');

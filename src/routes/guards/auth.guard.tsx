@@ -1,18 +1,18 @@
+import { useAuthStore } from '@stores/auth.store';
 import { FunctionComponent } from 'react';
-import { Outlet, Navigate } from 'react-router-dom';
-import { AppPath } from '../routes';
-import { useApp } from '../../app/context/AppContextProvider';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useIsUnauthRoute } from '../../app/hooks/router.hook';
+import { AppPath } from '../routes';
 
 const AuthGuard: FunctionComponent = () => {
-  const { isAuthenticated, isLoading } = useApp();
+  const { isAuthenticated, initialized } = useAuthStore();
   const isUnAuthRoute = useIsUnauthRoute();
 
-  if (!isLoading) {
-    if (isAuthenticated && isUnAuthRoute) {
+  if (initialized) {
+    if (isAuthenticated() && isUnAuthRoute) {
       return <Navigate to={AppPath.Home} replace />;
     }
-    if (!isAuthenticated && !isUnAuthRoute) {
+    if (!isAuthenticated() && !isUnAuthRoute) {
       return <Navigate to={AppPath.Login} replace />;
     }
   }

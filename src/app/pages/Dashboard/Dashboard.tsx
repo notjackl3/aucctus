@@ -1,10 +1,10 @@
 import { Card, Icon } from '@components';
+import { useAuthStore } from '@stores/auth.store';
 import { FunctionComponent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import ConceptBarChart from '../../components/Charts/ConceptBarChart';
 import { useDashboard } from '../../hooks/query/account.hook';
-import { useAppStore } from '../../stores/app.store';
 import DashboardInnovationCard from './components/DashboardInnovationCard';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import styles from './styles/dashboard.module.scss';
@@ -17,8 +17,8 @@ const defaultIconProps = {
 
 const Dashboard: FunctionComponent = () => {
   const navigate = useNavigate();
-  const { account } = useAppStore();
-  const { data } = useDashboard();
+  const { account, isAuthenticated } = useAuthStore();
+  const { data } = useDashboard(isAuthenticated());
 
   return (
     <div className={`${styles.dashboard}`}>

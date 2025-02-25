@@ -71,7 +71,10 @@ export class AuthApi extends ApiService {
     return this.post<IMessageResponse>(
       endpoints.logout,
       { refresh: refreshToken },
-      { headers: { Authorization: `Bearer ${accessToken}` } },
+      {
+        headers: { Authorization: `Bearer ${accessToken}` },
+        withCredentials: true,
+      },
     );
   }
 

@@ -1,15 +1,15 @@
-import { HeadersDefaults } from 'axios';
+import { AxiosRequestHeaders, HeadersDefaults } from 'axios';
 import { toast } from 'react-toastify';
 import analytics from '../analytics';
 import { AccountApi } from './account';
 import { IApiServiceConfig } from './apiService';
+import { ArticleApi } from './article';
 import { AssumptionsApi } from './assumptions';
 import { AuthApi } from './auth';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
 import { MarketScanApi } from './marketScan';
 import { ITokenResponse } from './types';
-import { ArticleApi } from './article';
 
 export interface IApiConfig {
   /* End Points */
@@ -60,7 +60,10 @@ export class Api {
     apiClasses.forEach(({ key, class: ApiClass }) => {
       this[key] = new ApiClass(
         this,
-        this.buildConfig({ baseURL: this._config.baseUrl }),
+        this.buildConfig({
+          baseURL: this._config.baseUrl,
+          withCredentials: true,
+        }),
       );
     });
   }
@@ -70,29 +73,15 @@ export class Api {
   }
 
   set accessToken(token: string | undefined) {
-    // Update all pointing to the resource server with the new tokens
-    // By default however,  the access token and refresh token are set to the httpOnly cookies
-    // This is simply just an extra layer.
-    [
-      this.account,
-      this.concept,
-      this.conceptIgnite,
-      this.assumption,
-      this.marketScan,
-      this.article,
-    ].forEach((api) => {
-      api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
-      api.config.headers = Object.assign({}, api.config.headers, {
-        Authorization: `Bearer ${token}`,
-      });
-    });
-    analytics.debug('Setting Access Token');
     this._accessToken = token;
   }
 
   buildConfig(config: IApiServiceConfig): IApiServiceConfig {
     if (config.headers) {
-      Object.assign(config.headers, this._config.defaultHeaders || {});
+      config.headers = {
+        ...(this._config.defaultHeaders || {}),
+        ...config.headers,
+      } as Partial<AxiosRequestHeaders>;
     }
     return Object.assign(config, {
       timeoutSeconds: this._config.timeoutSeconds,
@@ -118,6 +107,7 @@ export class Api {
 
   // Expose these actions through methods to be used in ApiService
   async refreshToken() {
+    console.log('Refreshing token from api service');
     try {
       if (this._refreshTokenAction !== undefined) {
         this.pendingRefresh = this._refreshTokenAction();

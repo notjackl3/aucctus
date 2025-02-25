@@ -1,4 +1,4 @@
-import { useAppStore } from '@stores/app.store';
+import { useAuthStore } from '@stores/auth.store';
 import { AxiosError } from 'axios';
 import { useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -12,7 +12,6 @@ import {
   IUpdateForgottenPasswordRequest,
 } from '../../../libs/api/types';
 import { AppPath } from '../../../routes/routes';
-import { useTokenStore } from '../../stores/token.store';
 import { AucctusQueryKeys } from './query-keys';
 
 // Define a custom error class
@@ -90,7 +89,7 @@ export const useConfirmEmail = () => {
 };
 
 export const useRefresh = () => {
-  const { clearTokens: clear, refresh, storeTokens } = useTokenStore();
+  const { clearTokens: clear, refresh, storeTokens } = useAuthStore();
 
   return useMutation<
     ITokenResponse,
@@ -119,7 +118,7 @@ export const useRefresh = () => {
 };
 
 export const useLogout = () => {
-  const { clearTokens: clear, access, refresh } = useTokenStore();
+  const { clearTokens: clear, access, refresh } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation<
     IMessageResponse,
@@ -142,8 +141,7 @@ export const useLogout = () => {
 
 export const useLogin = () => {
   const navigate = useNavigate();
-  const { storeTokens } = useTokenStore();
-  const { setUser } = useAppStore();
+  const { storeTokens, setUser } = useAuthStore();
 
   return useMutation<
     IAuthSuccessResponse,

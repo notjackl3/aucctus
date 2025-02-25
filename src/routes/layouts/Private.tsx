@@ -1,10 +1,10 @@
 import NavDrawer from '@components/Navigation/NavDrawer/NavDrawer';
 import { AppPath } from '@routes/routes';
+import { useAuthStore } from '@stores/auth.store';
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAppStore } from '../../app/stores/app.store';
 
 const PrivateLayout = () => {
-  const { user } = useAppStore();
+  const { user } = useAuthStore();
 
   if (user && !user.account) {
     return <Navigate to={AppPath.Onboarding} replace />;

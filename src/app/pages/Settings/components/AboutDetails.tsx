@@ -8,8 +8,8 @@ import InputField from '../../../components/Input/InputField/InputField';
 import Loading from '../../../components/Loading';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import { useUpdateUser } from '../../../hooks/query/account.hook';
-import { useAppStore } from '../../../stores/app.store';
 import styles from '../styles/aboutDetails.module.scss';
+import { useAuthStore } from '@stores/auth.store';
 
 const defaultIconProps = {
   width: 20,
@@ -34,7 +34,7 @@ const TIME_ZONE_OPTIONS = [
 const AboutDetails: FunctionComponent = () => {
   const [isFormDisabled, setIsFormDisabled] = useState(true);
   const { mutate: updateUser, isLoading } = useUpdateUser();
-  const { user } = useAppStore();
+  const { user } = useAuthStore();
   const [aboutForm, setAboutForm] = useState<Partial<IUser>>({
     firstName: undefined,
     lastName: undefined,

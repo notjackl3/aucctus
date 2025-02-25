@@ -26,8 +26,9 @@ export interface IApiServiceConfig {
   baseURL: string;
   apiVersion?: string;
   debug?: boolean;
-  headers?: AxiosRequestHeaders;
+  headers?: Partial<AxiosRequestHeaders>;
   timeoutSeconds?: number;
+  withCredentials?: boolean;
 
   refreshToken?: () => Promise<string>;
   logout?: () => void | Promise<void>;
@@ -49,11 +50,11 @@ export abstract class ApiService {
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     this.apiInstance = apiInstance;
     this.config = apiConfig;
-
     this.api = axios.create({
       baseURL: apiConfig.baseURL,
-      headers: apiConfig.headers,
+      headers: apiConfig.headers || {},
       timeout: (apiConfig.timeoutSeconds || 10) * 1000,
+      withCredentials: apiConfig.withCredentials,
     });
 
     this._setupMiddleware();
@@ -96,6 +97,7 @@ export abstract class ApiService {
 
     const status = (error.response && error.response.status) || 0;
     const url = error && error.config && error.config.url;
+
     if (
       url &&
       LOGOUT_STATUSES.includes(status) &&
@@ -110,6 +112,7 @@ export abstract class ApiService {
           if (this.apiInstance.pendingRefresh) {
             await this.apiInstance.pendingRefresh;
           } else {
+            console.log('Refreshing token from error middleware');
             await this.apiInstance.refreshToken();
           }
 
@@ -117,7 +120,6 @@ export abstract class ApiService {
           // Retry the original request
           return this.api.request({
             ...config,
-            ...this._handleAccessToken(),
             withCredentials: true,
           } as AxiosRequestConfig);
         }
@@ -129,13 +131,6 @@ export abstract class ApiService {
     }
 
     return Promise.reject(error);
-  }
-
-  protected _handleAccessToken(): AxiosRequestConfig {
-    const accessToken = this.apiInstance.accessToken;
-    const config = Object.assign({ headers: {} }, this.config);
-    config.headers.Authorization = `Bearer ${accessToken}`;
-    return config;
   }
 
   protected _shouldSkipRefresh(url: string): boolean {

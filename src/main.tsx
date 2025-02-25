@@ -1,5 +1,4 @@
 import utils from '@libs/utils';
-import { DirectionProvider } from '@radix-ui/react-direction';
 import * as Sentry from '@sentry/react';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
@@ -13,11 +12,11 @@ import {
 } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import App from './App';
-import { AppProvider } from './app/context/AppContextProvider';
 import { ModalProvider } from './app/context/ModalContextProvider';
 
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
+import RefreshBootstrap from './app/bootstraps/auth.bootstrap';
 
 if (__APP_ENVIRONMENT__ !== 'development') {
   Sentry.init({
@@ -70,13 +69,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <DirectionProvider dir='ltr'>
-          <AppProvider>
-            <ModalProvider>
-              <App />
-            </ModalProvider>
-          </AppProvider>
-        </DirectionProvider>
+        <RefreshBootstrap>
+          <ModalProvider>
+            <App />
+          </ModalProvider>
+        </RefreshBootstrap>
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>,

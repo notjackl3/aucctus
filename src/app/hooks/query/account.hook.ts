@@ -1,4 +1,5 @@
-import { AxiosError } from 'axios';
+import { useAuthStore } from '@stores/auth.store';
+import { AxiosError, isAxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../libs/api';
 import {
@@ -9,7 +10,7 @@ import {
   IUserDetailsResponse,
   IUserQueryOptions,
 } from '../../../libs/api/types';
-import { useAppStore } from '../../stores/app.store';
+import { useLogout } from './auth.hook';
 import { AucctusQueryKeys } from './query-keys';
 
 const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
@@ -18,7 +19,7 @@ const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
 };
 
 export const useUserDetails = (enabled: boolean) => {
-  const { setUser, setAccount } = useAppStore();
+  const { setUser, setAccount } = useAuthStore();
 
   const query = useQuery({
     queryKey: [AucctusQueryKeys.userDetails],
@@ -39,6 +40,31 @@ export const useUserDetails = (enabled: boolean) => {
   const getUserDetails = query.refetch;
 
   return { ...query, getUserDetails, user, account };
+};
+
+export const useUser = () => {
+  const { mutate: logout } = useLogout();
+
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.userDetails],
+    queryFn: async () => await api.account.getUser(),
+    onError: (error: unknown) => {
+      // Check if the error is an AxiosError with an HTTP response
+      if (isAxiosError(error)) {
+        const status = error.response?.status;
+        if ([401, 403, 419].includes(status || 0)) {
+          // Log the user out if we have an unauthenticated error
+          logout();
+        }
+      }
+    },
+    cacheTime: Infinity,
+    refetchOnWindowFocus: false,
+    retry: false,
+    refetchOnMount: false,
+  });
+
+  return { ...query, user: query.data?.user, account: query.data?.account };
 };
 
 export const useAllUsers = (options?: IUserQueryOptions) => {
@@ -63,15 +89,16 @@ export const useAllUsers = (options?: IUserQueryOptions) => {
   return { ...query, users: data || [] };
 };
 
-export const useDashboard = () => {
+export const useDashboard = (enabled: boolean) => {
   return useQuery({
     queryKey: [AucctusQueryKeys.dashboard],
     queryFn: async () => await api.account.getDashboard(),
     cacheTime: Infinity,
     staleTime: 1000 * 60, // 1 minute
     refetchOnMount: false,
+    refetchOnWindowFocus: false,
     retry: false,
-    enabled: true,
+    enabled: enabled,
   });
 };
 

@@ -1,15 +1,15 @@
 import Logo from '@assets/Logo.png';
 import { Avatar } from '@components';
 import { AppPath } from '@routes/routes';
+import { useAuthStore } from '@stores/auth.store';
 import { useNavigate } from 'react-router-dom';
 import { useLogout } from '../../../hooks/query/auth.hook';
-import { useAppStore } from '../../../stores/app.store';
 import styles from './drawer.module.scss';
 import NavButton from './NavButton';
 import NavLink from './NavLink';
 
 const NavDrawer = () => {
-  const { user, account } = useAppStore();
+  const { user, account } = useAuthStore();
   const { mutate: logout } = useLogout();
 
   const navigate = useNavigate();
