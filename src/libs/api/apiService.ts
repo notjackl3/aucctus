@@ -120,6 +120,7 @@ export abstract class ApiService {
           // Retry the original request
           return this.api.request({
             ...config,
+            ...this._handleAccessToken(),
             withCredentials: true,
           } as AxiosRequestConfig);
         }
@@ -131,6 +132,13 @@ export abstract class ApiService {
     }
 
     return Promise.reject(error);
+  }
+
+  protected _handleAccessToken(): AxiosRequestConfig {
+    const accessToken = this.apiInstance.accessToken;
+    const config = Object.assign({ headers: {} }, this.config);
+    config.headers.Authorization = `Bearer ${accessToken}`;
+    return config;
   }
 
   protected _shouldSkipRefresh(url: string): boolean {

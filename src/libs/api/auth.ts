@@ -106,13 +106,7 @@ export class AuthApi extends ApiService {
    * @returns
    */
   refreshToken(refresh: string) {
-    return this.post<ITokenResponse>(
-      endpoints.refresh,
-      { refresh },
-      {
-        withCredentials: true,
-      },
-    );
+    return this.post<ITokenResponse>(endpoints.refresh, { refresh });
   }
 
   /** Confirm Email

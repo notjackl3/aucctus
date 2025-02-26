@@ -14,6 +14,7 @@ const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
     initialized,
     user: authUser,
     account: authAccount,
+    access,
     setUser,
     setAccount,
   } = useAuthStore();
@@ -36,9 +37,6 @@ const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
           setRefreshActionSet(true);
         });
         api.setLogoutAction(clearTokens);
-
-        await checkAuthentication();
-
         setInitialized(true);
       }
     })();
@@ -51,15 +49,17 @@ const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
   ]);
 
   React.useEffect(() => {
-    if (!initialized) {
-      return;
+    if (initialized && !!access) {
+      checkAuthentication();
     }
+  }, [initialized, access, checkAuthentication]);
 
-    if (user && !authUser) {
+  React.useEffect(() => {
+    if (user !== authUser) {
       setUser(user);
     }
 
-    if (account && !authAccount) {
+    if (account !== authAccount) {
       setAccount(account);
     }
   }, [user, account, initialized, authUser, authAccount, setUser, setAccount]);

@@ -103,8 +103,8 @@ export const useRefresh = () => {
       }
       return await api.auth.refreshToken(refresh);
     },
-    onSuccess: (response) => {
-      storeTokens(response.access, response.refresh);
+    onSuccess: async (response) => {
+      await storeTokens(response.access, response.refresh);
     },
     onError: (error) => {
       if (!(error instanceof NoRefreshTokenError)) {
@@ -118,7 +118,7 @@ export const useRefresh = () => {
 };
 
 export const useLogout = () => {
-  const { clearTokens: clear, access, refresh } = useAuthStore();
+  const { logout, access, refresh } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation<
     IMessageResponse,
@@ -129,19 +129,19 @@ export const useLogout = () => {
     mutationFn: async () => await api.auth.logout(access, refresh),
     onSettled: () => {
       // Clear tokens on logout
-      clear();
+      logout();
     },
     onSuccess: () => {
       // Clear cache on logout
       queryClient.removeQueries();
-      queryClient.invalidateQueries({ refetchActive: false });
+      queryClient.invalidateQueries();
     },
   });
 };
 
 export const useLogin = () => {
   const navigate = useNavigate();
-  const { storeTokens, setUser } = useAuthStore();
+  const { storeTokens, setUser, setInitialized } = useAuthStore();
 
   return useMutation<
     IAuthSuccessResponse,
@@ -151,9 +151,10 @@ export const useLogin = () => {
   >({
     mutationFn: async (credentials) =>
       await api.auth.login(credentials.email, credentials.password),
-    onSuccess: (response) => {
-      storeTokens(response.access, response.refresh);
+    onSuccess: async (response) => {
+      await storeTokens(response.access, response.refresh);
       setUser(response.user);
+      setInitialized(true);
       navigate(AppPath.Home, { replace: true });
     },
   });

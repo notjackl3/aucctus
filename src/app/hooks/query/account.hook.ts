@@ -62,6 +62,7 @@ export const useUser = () => {
     refetchOnWindowFocus: false,
     retry: false,
     refetchOnMount: false,
+    enabled: false,
   });
 
   return { ...query, user: query.data?.user, account: query.data?.account };

@@ -20,12 +20,12 @@ const secureStorage = {
       const decryptedRefresh = refresh
         ? CryptoJS.AES.decrypt(refresh, secretKey).toString(CryptoJS.enc.Utf8)
         : undefined;
-      const decryptedUser = user
+      const decryptedUser = !!user
         ? JSON.parse(
             CryptoJS.AES.decrypt(user, secretKey).toString(CryptoJS.enc.Utf8),
           )
         : undefined;
-      const decryptedAccount = account
+      const decryptedAccount = !!account
         ? JSON.parse(
             CryptoJS.AES.decrypt(account, secretKey).toString(
               CryptoJS.enc.Utf8,
@@ -92,18 +92,18 @@ interface AuthStore {
   account: IAccount | undefined | null;
 
   // Methods for tokens
-  setTokens: (access: string | undefined, refresh: string | undefined) => void;
   clearTokens: () => void;
   storeTokens: (
     access: string | undefined,
     refresh: string | undefined,
-  ) => void;
+  ) => Promise<void>;
   setInitialized: (value: boolean) => void;
   isAuthenticated: () => boolean;
 
   // Methods for user and account
   setUser: (user: IUser | undefined | null) => void;
   setAccount: (account: IAccount | undefined | null) => void;
+  logout: () => void;
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -117,29 +117,34 @@ export const useAuthStore = create<AuthStore>()(
       initialized: false,
 
       // Token methods
-      setTokens: (access, refresh) => {
-        set({ access, refresh });
-        if (access !== api.accessToken) {
-          api.accessToken = access;
-        }
-      },
       clearTokens: () => {
         set({ access: undefined, refresh: undefined });
       },
-      storeTokens: (access, refresh) => {
+      logout: () => {
+        set({
+          user: undefined,
+          account: undefined,
+          access: undefined,
+          refresh: undefined,
+          initialized: false,
+        });
+      },
+      storeTokens: async (access, refresh) => {
         if (!access || !refresh) {
           get().clearTokens();
           return;
         }
         set({ access, refresh });
+        if (access !== api.accessToken) {
+          await api.setAccessToken(access);
+        }
       },
 
       // User and account methods
       setUser: (user) => set({ user }),
       setAccount: (account) => set({ account }),
       setInitialized: (value: boolean) => set({ initialized: value }),
-      isAuthenticated: () =>
-        !!get().refresh && !!get().access && !!get().initialized,
+      isAuthenticated: () => !!get().access && !!get().initialized,
     }),
     {
       name: 'abc-store',
