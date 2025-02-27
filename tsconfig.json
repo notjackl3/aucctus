@@ -31,7 +31,8 @@
       "@assets/*": ["src/app/assets/*"],
       "@context/*": ["src/app/context/*"],
       "@hooks/*": ["src/app/hooks/*"],
-      "@stores/*": ["src/app/stores/*"]
+      "@stores/*": ["src/app/stores/*"],
+      "@bootstraps/*": ["src/app/bootstraps/*"]
     }
   },
   "include": ["src", "src/**/*.ts", "src/**/*.tsx", "src/**/*.d.ts"],

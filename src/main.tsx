@@ -1,3 +1,4 @@
+import AuthBootstrap from '@bootstraps/auth.bootstrap';
 import utils from '@libs/utils';
 import * as Sentry from '@sentry/react';
 import React from 'react';
@@ -11,12 +12,10 @@ import {
   useNavigationType,
 } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import App from './App';
-import { ModalProvider } from './app/context/ModalContextProvider';
-
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
-import RefreshBootstrap from './app/bootstraps/auth.bootstrap';
+import App from './App';
+import { ModalProvider } from './app/context/ModalContextProvider';
 
 if (__APP_ENVIRONMENT__ !== 'development') {
   Sentry.init({
@@ -69,11 +68,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <BrowserRouter>
       <QueryClientProvider client={queryClient}>
-        <RefreshBootstrap>
+        <AuthBootstrap>
           <ModalProvider>
             <App />
           </ModalProvider>
-        </RefreshBootstrap>
+        </AuthBootstrap>
       </QueryClientProvider>
     </BrowserRouter>
   </React.StrictMode>,

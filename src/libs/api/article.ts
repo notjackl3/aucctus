@@ -1,6 +1,6 @@
-import { ApiService, IApiServiceConfig } from './apiService';
-import { Endpoints as endpoints } from './endpoints';
 import Api from './api';
+import { ApiService, IApiServiceConfig } from './base/apiService';
+import { Endpoints as endpoints } from './endpoints';
 
 export interface IArticlePublishedDateResponse {
   publishedDate: string;

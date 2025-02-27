@@ -1,5 +1,5 @@
 import { FunctionComponent } from 'react';
-import { useParams, useOutletContext } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import MarketScan from './MarketScan/MarketScan';
 import MarketScanV1 from './MarketScanV1/MarketScanV1';
 

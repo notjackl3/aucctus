@@ -7,9 +7,9 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import analytics from '../analytics';
-import { Api } from './api';
-import { IAuthSuccessResponse } from './types';
+import analytics from '../../analytics';
+import { Api } from '../api';
+import { IAuthSuccessResponse } from '../types';
 
 export const isAuthSuccessResponse = (
   value: unknown,
@@ -134,7 +134,7 @@ export abstract class ApiService {
     return Promise.reject(error);
   }
 
-  protected _handleAccessToken(): AxiosRequestConfig {
+  protected _handleAccessToken() {
     const accessToken = this.apiInstance.accessToken;
     const config = Object.assign({ headers: {} }, this.config);
     config.headers.Authorization = `Bearer ${accessToken}`;

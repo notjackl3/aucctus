@@ -1,3 +1,4 @@
+import AucctusSocketBootstrap from '@bootstraps/aucctusSocket.bootstrap';
 import NavDrawer from '@components/Navigation/NavDrawer/NavDrawer';
 import { AppPath } from '@routes/routes';
 import { useAuthStore } from '@stores/auth.store';
@@ -11,12 +12,14 @@ const PrivateLayout = () => {
   }
 
   return (
-    <div className='flex min-h-screen flex-row items-start overflow-hidden bg-neutral-50'>
-      <NavDrawer />
-      <div className='ml-[15.5rem] min-h-screen w-[calc(100vw-15.5rem)] overflow-auto'>
-        <Outlet />
+    <AucctusSocketBootstrap>
+      <div className='flex min-h-screen flex-row items-start overflow-hidden bg-neutral-50'>
+        <NavDrawer />
+        <div className='ml-[15.5rem] min-h-screen w-[calc(100vw-15.5rem)] overflow-auto'>
+          <Outlet />
+        </div>
       </div>
-    </div>
+    </AucctusSocketBootstrap>
   );
 };
 

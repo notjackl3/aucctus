@@ -2,10 +2,12 @@ import { HeadersDefaults } from 'axios';
 import { toast } from 'react-toastify';
 import analytics from '../analytics';
 import { AccountApi } from './account';
-import { IApiServiceConfig } from './apiService';
 import { ArticleApi } from './article';
 import { AssumptionsApi } from './assumptions';
+import { AucctusSocket } from './aucctusSocket';
 import { AuthApi } from './auth';
+import { IApiServiceConfig } from './base/apiService';
+import { ISocketConfig } from './base/socketService';
 import { ConceptApi } from './concepts';
 import { IgniteConceptApi } from './igniteConcepts';
 import { MarketScanApi } from './marketScan';
@@ -14,6 +16,7 @@ import { ITokenResponse } from './types';
 export interface IApiConfig {
   /* End Points */
   baseUrl: string;
+  baseSocketUrl: string;
   /* Settings */
   defaultHeaders?: HeadersDefaults;
   timeoutSeconds: number;
@@ -36,6 +39,7 @@ export class Api {
   assumption!: AssumptionsApi;
   marketScan!: MarketScanApi;
   conceptIgnite!: IgniteConceptApi;
+  aucctusSocket!: AucctusSocket;
   article!: ArticleApi;
 
   constructor(apiConfig: IApiConfig) {
@@ -47,6 +51,13 @@ export class Api {
         baseURL: this._config.baseUrl,
       }),
     );
+
+    // Configure socket settings.
+    const socketConfig: ISocketConfig = {
+      baseUrl: `${this._config.baseSocketUrl}/ws/v1/aucctus`,
+      debug: this._config.debug,
+    };
+    this.aucctusSocket = new AucctusSocket(this, socketConfig);
 
     const apiClasses: { key: keyof Api; class: any }[] = [
       { key: 'account', class: AccountApi },
@@ -92,6 +103,8 @@ export class Api {
         Authorization: `Bearer ${token}`,
       });
     });
+
+    this.aucctusSocket.accessToken = token;
 
     analytics.debug('Setting Access Token');
     this._accessToken = token;

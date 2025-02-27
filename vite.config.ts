@@ -69,6 +69,7 @@ export default defineConfig((config) => {
         '@context': path.resolve(__dirname, 'src/app/context'),
         '@hooks': path.resolve(__dirname, 'src/app/hooks'),
         '@stores': path.resolve(__dirname, 'src/app/stores'),
+        '@bootstraps': path.resolve(__dirname, 'src/app/bootstraps'),
 
         // Style Sheets
         '~global.scss': path.resolve(
