@@ -144,7 +144,7 @@ export const useAuthStore = create<AuthStore>()(
       setUser: (user) => set({ user }),
       setAccount: (account) => set({ account }),
       setInitialized: (value: boolean) => set({ initialized: value }),
-      isAuthenticated: () => !!get().access && !!get().initialized,
+      isAuthenticated: () => !!get().access,
     }),
     {
       name: 'abc-store',
