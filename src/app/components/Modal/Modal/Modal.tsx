@@ -99,7 +99,7 @@ const Modal: FunctionComponent<IModalProps> = ({
         <div
           ref={contentRef}
           className={cn(
-            'h-full max-h-[100vh] bg-white',
+            'aucctus-bg-primary h-full max-h-[100vh]',
             contentClasses[position],
           )}
         >

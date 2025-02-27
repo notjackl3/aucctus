@@ -28,12 +28,17 @@ const Dashboard: FunctionComponent = () => {
         </div>
         <div className={styles.actions}>
           <button
-            className={`btn btn-primary ${styles.button}`}
+            className='btn btn-bold btn-primary'
             onClick={() => {
               navigate(AppPath.IgniteConcept);
             }}
           >
-            <Icon variant='rocket' height={20} width={20} stroke='#fff' />
+            <Icon
+              variant='rocket'
+              height={20}
+              width={20}
+              className='stroke-primary-100'
+            />
             Add Concept
           </button>
         </div>

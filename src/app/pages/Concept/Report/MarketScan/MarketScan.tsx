@@ -8,10 +8,9 @@ import {
   useConceptMarketScan,
   useTrendAndDriverCreate,
 } from '@hooks/query/concepts.hook';
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import IncumbentsList from './Components/IncumbentList/IncumbentList';
-import Investors from './Components/InvestorsList';
 import StartupList from './Components/StartupList/StartupList';
 import TrendAndDriverCard from './Components/TrendAndDriverCard';
 
@@ -40,11 +39,11 @@ const MarketScan: FunctionComponent = () => {
       <div className='flex flex-wrap justify-between gap-8'>
         <div className='flex w-full flex-col gap-4'>
           <div className='flex items-end justify-between'>
-            <h2 className='font-bold leading-[30px] text-[#0C111D]'>
+            <h2 className='aucctus-text-brand-primary aucctus-text-md-bold'>
               Trends and Drivers
             </h2>
             <button
-              className='bg-light rounded-md p-2 shadow hover:shadow-lg'
+              className='aucctus-bg-primary-hover rounded-md p-2 shadow hover:shadow-lg'
               onClick={() => {
                 openModal(AddMarketScanElement, { addItem: addTrendAndDriver });
               }}
@@ -54,6 +53,7 @@ const MarketScan: FunctionComponent = () => {
           </div>
           <EditModeSwitcher
             value={trendsAndDriversDescription.value}
+            pClassName='aucctus-text-secondary aucctus-text-md-medium'
             name='trendsAndDriversDescription'
             maxLength={trendsAndDriversDescription.validation.maxLength}
             onChange={trendsAndDriversDescription.handleChange}

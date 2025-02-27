@@ -78,7 +78,7 @@ const ConceptIgnition: React.FC<ConceptIgnitionInputProps> = ({
       case 'multiSelect':
         return (
           <div className='inline-flex w-full flex-col items-start justify-center gap-2.5'>
-            <span className='font-base relative font-medium leading-5 text-gray-700'>
+            <span className='font-base aucctus-text-secondary relative font-medium leading-5'>
               {question.label}
             </span>
             <Button.RadioButtonGroup

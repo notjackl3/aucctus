@@ -14,7 +14,7 @@ const defaultTextProps = {
 };
 
 const defaultProps = {
-  fill: '#4318FF',
+  className: 'fill-indigo-600',
 };
 const ChartShortArrows: FunctionComponent<ChartLongArrow> = ({ data }) => {
   const percentList = useMemo(() => {

@@ -27,7 +27,7 @@ const ASSUMPTION_TYPE_OPTIONS: Option[] = (
 
 const EditKeyAssumptionModal: FunctionComponent<
   IEditKeyAssumptionModalProps
-> = ({ assumption }) => {
+> = () => {
   // const { closeModal } = useModal();
   // const [showConfirmation, setShowConfirmation] = useState(false);
   // const { mutate: updateAssumption } = useAssumptionUpdate();

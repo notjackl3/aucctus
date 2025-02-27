@@ -1,0 +1,244 @@
+/* Base background styles */
+.aucctus-bg-primary {
+  @apply bg-base-white dark:bg-gray-light-950;
+
+  &-alt {
+    @apply bg-base-white dark:bg-gray-light-900;
+  }
+
+  &-hover {
+    @extend .aucctus-bg-primary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-gray-light-50 dark:bg-gray-light-900;
+    }
+  }
+}
+
+.aucctus-bg-primary-solid {
+  @apply bg-gray-light-950 dark:bg-gray-light-900;
+
+  &-hover {
+    @extend .aucctus-bg-primary-solid;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-gray-light-700 dark:bg-gray-light-950;
+    }
+  }
+
+  &-alt {
+    @apply bg-gray-light-700 dark:bg-gray-light-800;
+
+    &-hover {
+      @extend .aucctus-bg-primary-solid-alt;
+      @apply transition-colors duration-300;
+
+      &:hover {
+        @apply bg-gray-light-500 dark:bg-gray-light-950;
+      }
+    }
+  }
+}
+
+.aucctus-bg-secondary {
+  @apply bg-gray-light-50 dark:bg-gray-light-900;
+
+  &-alt {
+    @apply bg-gray-light-50 dark:bg-gray-light-950;
+  }
+
+  &-hover {
+    @extend .aucctus-bg-secondary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-gray-light-100 dark:bg-gray-light-800;
+    }
+  }
+
+  &-subtle {
+    @apply bg-gray-light-25 dark:bg-gray-light-900;
+  }
+
+  &-extra-subtle {
+    @apply bg-gray-light-10 dark:bg-gray-light-900;
+  }
+}
+
+.aucctus-bg-secondary-solid {
+  @apply bg-gray-light-600 dark:bg-gray-light-700;
+
+  &-hover {
+    @extend .aucctus-bg-secondary-solid;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-gray-light-400 dark:bg-gray-light-800;
+    }
+  }
+}
+
+.aucctus-bg-tertiary {
+  @apply bg-gray-light-100 dark:bg-gray-light-800;
+
+  &-hover {
+    @extend .aucctus-bg-tertiary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-gray-light-200 dark:bg-gray-light-800;
+    }
+  }
+}
+
+.aucctus-bg-quaternary {
+  @apply bg-gray-light-200 dark:bg-gray-light-700;
+
+  &-hover {
+    @extend .aucctus-bg-quaternary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-gray-light-300 dark:bg-gray-light-800;
+    }
+  }
+}
+
+/* State-based backgrounds */
+.aucctus-bg-active {
+  @apply bg-gray-light-50 dark:bg-gray-light-800;
+}
+
+.aucctus-bg-disabled {
+  @apply bg-gray-light-100 dark:bg-gray-light-800;
+
+  &-subtle {
+    @apply bg-gray-light-50 dark:bg-gray-light-900;
+  }
+
+  // required for button usage
+  &-hover {
+    @extend .aucctus-bg-disabled;
+  }
+}
+
+.aucctus-bg-overlay {
+  @apply bg-gray-light-950/60 dark:bg-gray-light-950/80;
+}
+
+/* Brand backgrounds */
+.aucctus-bg-brand-primary {
+  @apply bg-primary-50 dark:bg-primary-500;
+
+  &-alt {
+    @apply bg-primary-50 dark:bg-gray-light-800;
+  }
+
+  &-hover {
+    @extend .aucctus-bg-brand-primary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-primary-200 dark:bg-primary-600;
+    }
+  }
+}
+
+.aucctus-bg-brand-secondary {
+  @apply bg-primary-100 dark:bg-primary-600;
+
+  &-hover {
+    @extend .aucctus-bg-brand-secondary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-primary-200 dark:bg-primary-600;
+    }
+  }
+}
+.aucctus-bg-brand-solid {
+  @apply bg-primary-600 dark:bg-primary-500;
+
+  &-hover {
+    @extend .aucctus-bg-brand-solid;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-primary-700 dark:bg-primary-600;
+    }
+  }
+}
+
+.aucctus-bg-brand-section {
+  @apply bg-primary-800 dark:bg-gray-light-800;
+
+  &-subtle {
+    @apply bg-primary-700 dark:bg-gray-light-950;
+  }
+}
+
+/* Semantic backgrounds */
+.aucctus-bg-error-primary {
+  @apply bg-error-50 dark:bg-error-500;
+}
+
+.aucctus-bg-error-secondary {
+  @apply bg-error-100 dark:bg-error-600;
+}
+
+.aucctus-bg-error-solid {
+  @apply bg-error-600;
+
+  &-hover {
+    @extend .aucctus-bg-error-solid;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-error-700;
+    }
+  }
+}
+
+.aucctus-bg-warning-primary {
+  @apply bg-warning-50 dark:bg-warning-500;
+}
+
+.aucctus-bg-warning-secondary {
+  @apply bg-warning-100 dark:bg-warning-600;
+}
+
+.aucctus-bg-warning-solid {
+  @apply bg-warning-600;
+
+  &-hover {
+    @extend .aucctus-bg-warning-solid;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-warning-700;
+    }
+  }
+}
+
+.aucctus-bg-success-primary {
+  @apply bg-success-50 dark:bg-success-500;
+}
+
+.aucctus-bg-success-secondary {
+  @apply bg-success-100 dark:bg-success-600;
+}
+
+.aucctus-bg-success-solid {
+  @apply bg-success-600;
+
+  &-hover {
+    @extend .aucctus-bg-success-solid;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-success-700;
+    }
+  }
+}

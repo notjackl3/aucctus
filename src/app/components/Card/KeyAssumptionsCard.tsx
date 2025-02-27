@@ -38,7 +38,7 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({
       <ul className='inline-flex w-full snap-y snap-mandatory flex-col items-center justify-start overflow-y-auto'>
         {assumptions.map((item, i) => (
           <li
-            className='inline-flex w-full snap-center items-center justify-start gap-2 border-b border-slate-200 px-6 py-4 odd:bg-neutral-50'
+            className='aucctus-border-secondary inline-flex w-full snap-center items-center justify-start gap-2 border-b px-6 py-4 odd:bg-primary-10'
             key={`assumption-${i + 1}`}
           >
             <div className='flex h-16 items-center'>
@@ -47,7 +47,9 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({
                 text={item.riskCategory}
               />
             </div>
-            <p className='text-base font-normal text-indigo-900'>{item.name}</p>
+            <p className='aucctus-text-md aucctus-text-brand-primary'>
+              {item.name}
+            </p>
           </li>
         ))}
       </ul>

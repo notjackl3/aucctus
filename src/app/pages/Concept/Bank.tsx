@@ -72,12 +72,17 @@ const ConceptBank: React.FC = () => {
       <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
         <Header.One text='Concepts' />
         <button
-          className={`btn btn-primary [&>svg]:stroke-white`}
+          className={`btn btn-bold btn-primary`}
           onClick={() => {
             navigate(AppPath.IgniteConcept);
           }}
         >
-          <Icon variant='rocket' height={20} width={20} />
+          <Icon
+            variant='rocket'
+            height={20}
+            width={20}
+            className='stroke-primary-100'
+          />
           Add Concept
         </button>
       </div>

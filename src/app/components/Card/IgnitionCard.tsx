@@ -21,7 +21,7 @@ const IgnitionCard: React.FunctionComponent<IIgnitionCardProps> = ({
   footer,
 }) => {
   return (
-    <section className='flex max-w-[360px] flex-col self-stretch overflow-clip rounded-xl border border-solid border-slate-200 bg-white shadow-sm'>
+    <section className='aucctus-border-secondary aucctus-bg-primary flex max-w-[360px] flex-col self-stretch overflow-clip rounded-xl border border-solid shadow-sm'>
       <div
         className={`flex w-full flex-col justify-center px-4 py-6 text-center ${header.color}`}
       >
@@ -31,10 +31,10 @@ const IgnitionCard: React.FunctionComponent<IIgnitionCardProps> = ({
           alt={header.image.alt}
           className='aspect-[0.99] w-[75px] self-center'
         />
-        <h1 className='mt-2.5 text-2xl font-medium leading-8 text-indigo-900'>
+        <h1 className='aucctus-text-brand-primary mt-2.5 text-2xl font-medium leading-8'>
           {header.title}
         </h1>
-        <p className='mt-2.5 text-base leading-6 text-gray-500'>
+        <p className='aucctus-text-tertiary mt-2.5 text-base leading-6'>
           {header.description}
         </p>
       </div>
@@ -42,7 +42,7 @@ const IgnitionCard: React.FunctionComponent<IIgnitionCardProps> = ({
         {children}
       </div>
       {footer ? (
-        <div className='flex w-full flex-row items-center justify-center gap-2.5 border-t border-solid border-slate-200 px-2 py-3'>
+        <div className='aucctus-border-secondary flex w-full flex-row items-center justify-center gap-2.5 border-t border-solid px-2 py-3'>
           {footer}
         </div>
       ) : null}

@@ -5,14 +5,13 @@
 .container {
   position: relative;
   .tooltip {
+    @apply aucctus-bg-secondary aucctus-text-secondary;
     position: absolute;
     display: flex;
     border-radius: 4px;
     padding: 0.5rem;
     font-family: 'Inter';
     font-weight: 600;
-    color: #312e81;
-    background: #f4f7fe;
     font-size: 14px;
     font-family: sans-serif;
     text-align: center;
@@ -34,7 +33,7 @@
       border-width: 0.5rem;
       top: 100%;
       left: 45%;
-      border-top-color: #f4f7fe;
+      border-top-color: #fafafa;
     }
 
     &.inActive {

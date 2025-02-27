@@ -7,12 +7,6 @@ import { useReseedStore } from '@stores/reseed.store';
 import { IConceptSeed } from '@libs/api/concepts';
 import { AppPath } from '@routes/routes';
 
-const defaultIconProps = {
-  width: 20,
-  height: 20,
-  stroke: '#98A2B3',
-};
-
 const ConceptSettings: FunctionComponent = () => {
   const { id: conceptUuid } = useParams();
   const navigate = useNavigate();
@@ -28,15 +22,15 @@ const ConceptSettings: FunctionComponent = () => {
     <div className='inline-flex h-96 w-full flex-col gap-3 pt-2'>
       <div className='flex w-full items-center justify-start'>
         {/* Left Buttons */}
-        <div className='inline-flex items-start justify-start rounded-lg border border-gray-300 shadow'>
-          <div className='flex items-center justify-center gap-2 rounded-l-lg border-r border-gray-300 bg-gray-50 px-4 py-2'>
-            <div className='text-base font-semibold leading-tight text-slate-700'>
+        <div className='aucctus-border-secondary inline-flex items-start justify-start rounded-lg border shadow'>
+          <div className='aucctus-bg-secondary aucctus-border-secondary flex items-center justify-center gap-2 rounded-l-lg border-r px-4 py-2'>
+            <div className='aucctus-text-primary aucctus-text-md-medium'>
               Original Prompt
             </div>
           </div>
-          <div className='flex items-center justify-center gap-2 rounded-r-lg border-r border-gray-300 bg-white py-2 pl-3.5 pr-4'>
+          <div className='aucctus-border-secondary aucctus-bg-primary flex items-center justify-center gap-2 rounded-r-lg border-r py-2 pl-3.5 pr-4'>
             <Icon variant='lock' />
-            <div className='text-base font-semibold leading-tight text-slate-700'>
+            <div className='aucctus-text-primary aucctus-text-md-medium'>
               Uploads
             </div>
           </div>
@@ -45,10 +39,15 @@ const ConceptSettings: FunctionComponent = () => {
         {/* Right Button */}
         <button
           aria-label='Re-seed Concept'
-          className='btn btn-normal hover:bg-secondary-600 ml-2 px-[16px] py-[10px]'
+          className='btn btn-normal ml-2 px-[16px] py-[10px]'
           onClick={onReseedClick}
         >
-          <Icon variant='refresh' {...defaultIconProps} />
+          <Icon
+            variant='refresh'
+            height={20}
+            width={20}
+            className='stroke-gray-light-900'
+          />
           Re-Use Prompt
         </button>
       </div>

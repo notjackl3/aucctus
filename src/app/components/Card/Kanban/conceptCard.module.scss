@@ -8,10 +8,10 @@
   align-items: flex-start;
   gap: 0.5rem;
   box-sizing: border-box;
-  border: 2px solid $grey-200;
+  @apply aucctus-border-secondary border-2;
   border-radius: 0.75rem;
   width: 16rem;
-  background: $white;
+  @apply aucctus-bg-primary;
 
   .conceptCardContent {
     display: flex;
@@ -20,7 +20,7 @@
     gap: 1rem;
     box-sizing: border-box;
     .cardTitle {
-      color: $blue-900;
+      @apply aucctus-text-primary #{!important};
       font-family: $font-family;
       font-size: 0.6rem;
       font-style: normal;
@@ -29,12 +29,12 @@
     }
 
     .cardDescription {
-      color: $grey-600;
+      @apply aucctus-text-secondary #{!important};
       font-family: $font-family;
       margin: 0;
       @include text-medium;
       overflow: hidden;
-      color: $grey-600;
+      @apply aucctus-text-secondary #{!important};
       text-overflow: ellipsis;
       font-family: $font-family;
       font-size: 0.6rem;
@@ -53,7 +53,7 @@
 
     .cardModified {
       overflow: hidden;
-      color: $grey-600;
+      @apply aucctus-text-secondary #{!important};
       text-overflow: ellipsis;
       font-family: $font-family;
       font-size: 0.6rem;
@@ -69,14 +69,14 @@
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    color: $grey-600;
+    @apply aucctus-text-secondary #{!important};
     padding: 1rem;
     gap: 0.5rem;
     box-sizing: border-box;
     border-radius: 0 0 0.75rem 0.75rem;
-    background: $white;
+    @apply aucctus-bg-primary;
     box-shadow: $shadow-100;
-    border-top: 1px solid $grey-200;
+    @apply aucctus-border-secondary border-t;
 
     .owner {
       display: flex;

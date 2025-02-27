@@ -9,7 +9,6 @@ export interface QuadrantChartGridProps {
 }
 
 const defaultLineProps = {
-  stroke: '#7586a9',
   strokeWidth: '2',
   strokeDasharray: '5,5',
 };
@@ -34,6 +33,7 @@ const QuadrantChartGrid: FunctionComponent<QuadrantChartGridProps> = ({
             y1={dist}
             x2={CHART_SIZE}
             y2={dist}
+            className='stroke-gray-light-400'
             {...defaultLineProps}
           />,
         );
@@ -45,6 +45,7 @@ const QuadrantChartGrid: FunctionComponent<QuadrantChartGridProps> = ({
             y1={0}
             x2={dist}
             y2={CHART_SIZE}
+            className='stroke-gray-light-400'
             {...defaultLineProps}
           />,
         );

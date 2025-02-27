@@ -10,7 +10,7 @@ const Description: React.FC<ITextProps> = ({ value, className }) => {
   return (
     <span
       className={cn(
-        'text-base font-medium leading-tight text-slate-500',
+        'aucctus-text-secondary text-base font-medium leading-tight',
         className,
       )}
     >

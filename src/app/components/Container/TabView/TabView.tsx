@@ -1,6 +1,6 @@
 import { FunctionComponent, ReactNode } from 'react';
-import styles from './styles/tabs.module.scss';
 import Tab from './Tab';
+import { cn } from '@libs/utils/react';
 
 export interface TabElement {
   label: string | ReactNode;
@@ -33,9 +33,14 @@ const TabView: FunctionComponent<TabsProps> = ({
   onTabSelect,
 }) => {
   return (
-    <div className={`${styles.tabView} ${className}`}>
-      <div className={styles.tabContainer}>
-        <div className={`${styles.tabs}`}>
+    <div
+      className={cn(
+        'flex h-full w-full flex-col items-center self-stretch',
+        className,
+      )}
+    >
+      <div className='flex flex-row items-start justify-between self-stretch overflow-x-auto overflow-y-hidden py-4'>
+        <div className='flex list-none items-center justify-start pl-0'>
           {tabs.map((tab, index) => (
             <Tab
               key={`tab-label-${index}`}
@@ -49,10 +54,14 @@ const TabView: FunctionComponent<TabsProps> = ({
           ))}
         </div>
         {actionButtons ? (
-          <div className={styles.actionButtons}>{actionButtons}</div>
+          <div className='ml-4 mr-2 flex flex-row items-center gap-4'>
+            {actionButtons}
+          </div>
         ) : null}
       </div>
-      {children}
+      <div className='flex h-full w-full items-center justify-center'>
+        {children}
+      </div>
     </div>
   );
 };

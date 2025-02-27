@@ -32,7 +32,7 @@ const WhiteSpaceSuggestions: React.FC = () => {
           disabled
         >
           <Icon variant='clock-stopwatch' />
-          <div className='text-sm font-medium leading-tight text-gray-500'>
+          <div className='aucctus-text-tertiary text-sm font-medium leading-tight'>
             Coming Soon
           </div>
         </button>

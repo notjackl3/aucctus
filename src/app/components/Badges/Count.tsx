@@ -12,9 +12,9 @@ const Count: React.FC<CountProps> = ({
   classNameLabel = '',
 }) => {
   const defaultBadgeStyles =
-    'inline-flex h-6 items-center justify-center gap-0.5 rounded-full p-2 bg-violet-50';
+    'inline-flex h-6 items-center justify-center gap-0.5 rounded-full p-2 aucctus-bg-tertiary';
   const defaultLabelStyles =
-    "font-['DM Sans'] text-center text-xs font-medium leading-[18px] text-indigo-600";
+    'aucctus-text-xs-semibold aucctus-text-primary text-center';
 
   return (
     <div className={`${defaultBadgeStyles} ${classNameBadge}`}>

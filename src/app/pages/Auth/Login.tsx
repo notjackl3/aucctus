@@ -2,7 +2,6 @@ import utils from '@libs/utils';
 import { FunctionComponent, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
-import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/Input/InputField/InputField';
 import { useLogin } from '../../hooks/query/auth.hook';
 
@@ -25,20 +24,22 @@ const Login: FunctionComponent = () => {
 
   return (
     <>
-      <div className={styles.header}>
-        <span className={styles.title}>Login</span>
-        <span className={styles.supportingText}>
+      <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
+        <span className='aucctus-text-brand-secondary aucctus-header-md-medium relative self-stretch'>
+          Login
+        </span>
+        <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
           Welcome back! Please enter your details.
         </span>
         {error && (
-          <div className={styles.error}>
+          <div className='aucctus-text-error-primary aucctus-text-lg'>
             {utils.osiris.parseFormError(error)}
           </div>
         )}
       </div>
 
       <form
-        className={styles.basicForm}
+        className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
         onKeyDown={(e) => {
           if (e.key === 'Enter') {
             e.preventDefault(); // Prevent default form submission
@@ -69,8 +70,11 @@ const Login: FunctionComponent = () => {
           }
         />
 
-        <div className={`${styles.row}`}>
-          <Link className={`${styles.link} btn btn-link`} to='/forgot-password'>
+        <div className='aucctus-text-sm-medium aucctus-text-secondary px- flex w-full flex-row items-center justify-between'>
+          <Link
+            className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
+            to='/forgot-password'
+          >
             Forgot password
           </Link>
         </div>
@@ -84,9 +88,14 @@ const Login: FunctionComponent = () => {
           Login
         </button>
 
-        <div className={styles.signUp}>
-          <span>{"Don't have an account?"}</span>
-          <Link className={`${styles.link} btn btn-link`} to={AppPath.SignUp}>
+        <div className='flex flex-row items-center justify-between px-1'>
+          <span className='aucctus-text-tertiary aucctus-text-md'>
+            {"Don't have an account?"}
+          </span>
+          <Link
+            className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
+            to={AppPath.SignUp}
+          >
             Sign up
           </Link>
         </div>

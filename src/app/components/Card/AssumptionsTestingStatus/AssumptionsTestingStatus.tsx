@@ -14,10 +14,10 @@ const AssumptionTestingStatus: React.FC<AssumptionTestingStatusProps> = ({
   overview,
 }) => {
   return (
-    <div className='inline-flex h-auto min-w-fit flex-col items-start justify-start gap-7 rounded-lg border border-gray-200 bg-white px-6 py-8'>
+    <div className='aucctus-border-secondary aucctus-bg-primary inline-flex h-auto min-w-fit flex-col items-start justify-start gap-7 rounded-lg border px-6 py-8'>
       {/* Header */}
-      <div className='inline-flex items-center justify-between self-stretch bg-white'>
-        <div className='text-xl font-semibold text-[#2b3674]'>
+      <div className='aucctus-bg-primary inline-flex items-center justify-between self-stretch'>
+        <div className='aucctus-text-primary aucctus-text-xl-semibold'>
           Assumption Testing Status
         </div>
         {/* <Select.TestingStatus
@@ -28,9 +28,9 @@ const AssumptionTestingStatus: React.FC<AssumptionTestingStatusProps> = ({
       </div>
 
       {/* Content */}
-      <div className='inline-flex h-auto flex-col items-start justify-start gap-3 bg-white'>
+      <div className='aucctus-bg-primary inline-flex h-auto flex-col items-start justify-start gap-3'>
         {/* 'Table' Header */}
-        <div className=' inline-flex min-w-fit items-center justify-start gap-6 bg-white'>
+        <div className=' aucctus-bg-primary inline-flex min-w-fit items-center justify-start gap-6'>
           <AssumptionTestingStatusHeader
             text='Category'
             className={'w-[134px]'}
@@ -58,7 +58,7 @@ const AssumptionTestingStatus: React.FC<AssumptionTestingStatusProps> = ({
               estimatedEndDate={overview[item].estimatedEndDate}
             />
             {ASSUMPTIONS_CATEGORIES.length - 1 !== i && (
-              <span className='h-[1px] w-full bg-slate-100' />
+              <span className='aucctus-bg-quaternary h-[1px] w-full' />
             )}
           </React.Fragment>
         ))}

@@ -82,15 +82,15 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
         {/* Header  */}
         <div className='flex w-full items-center justify-start gap-4'>
           <img
-            className='relative h-16 w-16 rounded-3xl border border-white'
+            className='aucctus-border-secondary relative h-16 w-16 rounded-full border'
             alt='avatar'
             src={defaultAvatar}
           />
           <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-1'>
-            <h6 className='h-6 self-stretch text-base font-normal text-indigo-900'>
+            <h6 className='aucctus-text-primary aucctus-text-md h-6 self-stretch text-base'>
               {profile?.nickname}
             </h6>
-            <span className='h-7 self-stretch text-xl font-bold text-indigo-900'>
+            <span className='aucctus-text-primary aucctus-text-md-bold h-7 self-stretch text-xl'>
               {profile?.name}
             </span>
           </div>
@@ -98,7 +98,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
 
         {/* Body */}
         <div className='inline-flex h-full w-full flex-col items-start justify-start gap-3.5'>
-          <div className='self-stretch text-base font-bold leading-7 text-indigo-900'>
+          <div className='aucctus-text-lg-bold aucctus-text-primary self-stretch'>
             Demographics
           </div>
           {/* Demographics */}
@@ -109,7 +109,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
                 className='inline-flex h-4 items-center justify-start gap-3 self-stretch'
               >
                 <Icon variant={DEMOGRAPHIC_VALUE_MAP[item].icon} />
-                <span className='shrink grow basis-0 text-sm font-medium leading-none text-gray-500'>
+                <span className='aucctus-text-tertiary aucctus-text-sm shrink grow basis-0 text-sm'>
                   {DEMOGRAPHIC_VALUE_MAP[item].prefix}{' '}
                   {profile ? profile[item] : ''}
                 </span>

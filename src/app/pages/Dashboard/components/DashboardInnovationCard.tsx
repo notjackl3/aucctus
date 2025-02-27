@@ -1,7 +1,5 @@
 import { FunctionComponent, useMemo } from 'react';
 
-import styles from '../styles/dashboard.module.scss';
-
 import { Badge, Card } from '@components';
 import { ActiveConceptStatus, IConceptDetails } from '@libs/api/types';
 import {
@@ -39,7 +37,10 @@ const DashboardInnovationCard: FunctionComponent<
   }, [conceptCount]);
 
   const renderInnovationRows = innovationScores?.map((innovationRow, i) => (
-    <div className={styles.cardRow} key={`innovation-score-${i}`}>
+    <div
+      className='aucctus-text-tertiary aucctus-border-secondary box-border flex min-h-16 w-full items-center justify-between gap-4 border-b p-4'
+      key={`innovation-score-${i}`}
+    >
       <Badge.ConceptStatistic
         infoTitle={innovationRow.infoTitle}
         infoValue={`${innovationRow.infoValue}`}
@@ -52,10 +53,12 @@ const DashboardInnovationCard: FunctionComponent<
   return (
     <Card.Detail
       title='Innovation Scorecard'
-      cardClassName={styles.cardStyle}
+      cardClassName='w-full self-stretch bg-white'
       isHideFooter
     >
-      <div className={styles.cardContent}>{renderInnovationRows}</div>
+      <div className='flex w-full flex-col items-start'>
+        {renderInnovationRows}
+      </div>
     </Card.Detail>
   );
 };

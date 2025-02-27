@@ -35,14 +35,14 @@
       }
 
       span {
-        color: $grey-600;
+        @apply aucctus-text-secondary #{!important};
         @include body-100;
       }
     }
 
     .actions {
       .button {
-        color: $white;
+        @apply aucctus-text-white #{!important};
         font-family: $font-family;
         font-style: normal;
         font-weight: 700;
@@ -50,7 +50,7 @@
         svg,
         use {
           path {
-            stroke: $white;
+            @apply stroke-white #{!important};
           }
         }
       }
@@ -73,11 +73,11 @@
       border-radius: 0.75rem 0.75rem 0 0;
       border: 1px solid var(--gray-300-outline, #e0e5f2);
       border-bottom: none;
-      background: $white;
+      @apply aucctus-bg-primary;
       box-shadow: $shadow-100;
 
       th {
-        color: $grey-600;
+        @apply aucctus-text-secondary #{!important};
         font-size: 0.875rem;
         font-style: normal;
         font-weight: 400;
@@ -92,10 +92,10 @@
         box-sizing: border-box;
         align-items: center;
         border-radius: 0.75rem 0.75rem 0 0;
-        border-bottom: 1px solid $grey-200-outline;
+        @apply aucctus-border-secondary border-b;
         background: var(--gray-50-bg, #fcfcfd);
 
-        color: $grey-600;
+        @apply aucctus-text-secondary #{!important};
         font-family: $font-family;
         font-size: 0.75rem;
         font-style: normal;
@@ -118,10 +118,10 @@
           padding: 0.75rem 1.5rem;
           box-sizing: border-box;
           align-items: flex-start;
-          border-bottom: 1px solid $grey-200-outline;
+          @apply aucctus-border-secondary border-b;
 
           &:nth-child(even) {
-            background-color: $grey-50 !important;
+            @apply aucctus-bg-secondary #{!important};
           }
 
           td {
@@ -154,14 +154,14 @@
               flex: 1 0 0;
 
               .title {
-                color: $grey-900-text-primary;
+                @apply aucctus-text-secondary #{!important};
                 font-size: 0.875rem;
                 font-weight: 500;
                 line-height: 1.25rem;
               }
 
               .summary {
-                color: $grey-600;
+                @apply aucctus-text-secondary #{!important};
                 @include body-200;
               }
             }
@@ -176,13 +176,13 @@
       justify-content: flex-end;
       height: 5rem;
       width: 100%;
-      color: $grey-600;
+      @apply aucctus-text-secondary #{!important};
       padding: 2rem;
       box-sizing: border-box;
       border-radius: 0 0 0.75rem 0.75rem;
-      background: $white;
+      @apply aucctus-bg-primary;
       box-shadow: $shadow-100;
-      border-bottom: 1px solid $grey-200-outline;
+      @apply aucctus-border-secondary border-b;
 
       button {
         min-width: 10rem;

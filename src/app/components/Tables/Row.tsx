@@ -21,12 +21,11 @@ const TableRow: React.FC<ITableRowProps<any>> = <T,>({
     <tr
       {...props}
       className={cn(
-        'table-row h-auto cursor-pointer border-b border-solid border-b-gray-200 ',
+        'aucctus-border-secondary table-row h-auto cursor-pointer border-b border-solid transition-colors duration-200 ',
         {
           // The from-** styles are used so that the the expandable text can inherit these colors and they are all in one place
           'bg-primary-100 from-primary-100': isSelected,
-          'odd:bg-white odd:from-white even:bg-gray-50 even:from-gray-50':
-            !isSelected,
+          'bg-white odd:bg-white even:bg-primary-10': !isSelected,
         },
         props.className,
       )}

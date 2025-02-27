@@ -208,7 +208,7 @@ export const useConceptBank = () => {
           <span className='flex w-[167px] flex-row items-center justify-start gap-2'>
             <Table.ConceptBank.CreatedBy user={info.row.original.createdBy} />
             <Table.ConceptBank.Text
-              className='text-nowrap'
+              className='aucctus-text-tertiary text-nowrap'
               value={info.getValue()}
             />
           </span>

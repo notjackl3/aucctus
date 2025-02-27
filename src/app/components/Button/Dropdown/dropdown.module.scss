@@ -30,7 +30,7 @@
     top: 100%;
     left: 0;
     z-index: 1;
-    background-color: $white;
+    @apply aucctus-bg-primary #{!important};
     border-radius: 0 0 4px 4px;
     box-shadow: $shadow-100;
     overflow: hidden;

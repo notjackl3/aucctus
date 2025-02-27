@@ -34,7 +34,7 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
   );
 
   return (
-    <div className='relative rounded-xl border border-gray-200 bg-white p-4 pt-8 shadow-sm'>
+    <div className='aucctus-border-secondary aucctus-bg-primary relative rounded-xl border p-4 pt-8 shadow-sm'>
       {/* Header */}
       <div className='mb-4 flex flex-row items-center justify-start'>
         <h2 className='pr-2 font-bold leading-[30px] text-[#0C111D]'>
@@ -42,8 +42,8 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
         </h2>
         <Badge.Count
           value={startups.length}
-          classNameBadge='bg-[#D0D5DD] h-4'
-          classNameLabel='text-[#0C111D] text-sm font-bold'
+          classNameBadge='aucctus-bg-secondary h-4'
+          classNameLabel='aucctus-text-sm-bold aucctus-text-primary'
         />
       </div>
 
@@ -54,7 +54,7 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
         - `overflow-y-auto` so it scrolls if there is extra content.
         - We add a bit of padding so items aren't flush against the sides.
       */}
-      <div className='absolute bottom-4 left-4 top-[4rem] max-h-[80vh] w-80 overflow-y-auto rounded-lg border border-gray-200 bg-white p-4'>
+      <div className='aucctus-border-secondary aucctus-bg-primary absolute bottom-4 left-4 top-[4rem] max-h-[80vh] w-80 overflow-y-auto rounded-lg border p-4'>
         <nav>
           {startups.map((startup) => (
             <StartupSideBarItem
@@ -74,9 +74,9 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
         We add a left margin to keep it from going under the absolute sidebar.
         The container now grows/shrinks based on how tall <main> is.
       */}
-      <main className='ml-[22rem] rounded-lg border-l border-gray-200 bg-[#F9FAFB]'>
+      <main className='aucctus-border-secondary aucctus-bg-secondary-extra-subtle ml-[22rem] rounded-lg border'>
         {selectedStartup ? (
-          <div className='flex max-h-[80vh] gap-4 overflow-y-auto pb-6 pl-6 pt-6'>
+          <div className='mb-6 flex max-h-[80vh] gap-4 overflow-y-auto p-6'>
             <StartupDetails
               className='pr-6' // for scrollbar positioning
               startup={selectedStartup}
@@ -87,7 +87,7 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
           </div>
         ) : (
           <div className='flex h-full items-center justify-center'>
-            <p className='text-lg text-gray-500'>
+            <p className='aucctus-text-tertiary text-lg'>
               Select a startup to view details
             </p>
           </div>

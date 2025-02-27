@@ -107,6 +107,13 @@ const CustomerProfile: FunctionComponent = () => {
                   subtitle: `This will delete the \"${selectedProfileName}\" customer profile`,
                   actions: [
                     {
+                      title: 'Cancel',
+                      onClick: () => {
+                        closeModal();
+                      },
+                      variant: 'light',
+                    },
+                    {
                       title: 'Delete',
                       variant: 'danger',
                       onClick: () => {
@@ -115,13 +122,6 @@ const CustomerProfile: FunctionComponent = () => {
                         }
                         closeModal();
                       },
-                    },
-                    {
-                      title: 'Cancel',
-                      onClick: () => {
-                        closeModal();
-                      },
-                      variant: 'primary',
                     },
                   ],
                 });

@@ -35,7 +35,7 @@ const TestingStatusSelect: React.FC<TestingStatusSelectProps> = ({
       onOpenChange={setOpen}
     >
       <Select.Trigger
-        className={`inline-flex min-h-8 min-w-32 items-center justify-center gap-2 rounded-md px-2.5 py-1.5 mix-blend-multiply shadow ${style.bg}`}
+        className={`inline-flex min-h-8 min-w-32 items-center justify-center gap-2 text-nowrap rounded-md px-2.5 py-1.5 mix-blend-multiply shadow ${style.bg}`}
       >
         <Select.Icon>
           <Icon variant={style.icon} />
@@ -52,7 +52,7 @@ const TestingStatusSelect: React.FC<TestingStatusSelectProps> = ({
 
       <Select.Portal>
         <Select.Content
-          className='min-w-32 rounded-md bg-white p-1 shadow will-change-[transform,opacity] '
+          className='aucctus-bg-primary min-w-32 rounded-md p-1 shadow will-change-[transform,opacity] '
           position='popper'
         >
           <Select.Viewport className='flex h-full w-full flex-col justify-start gap-2 px-4 py-2'>

@@ -8,12 +8,11 @@ import { defaultToastConfig } from '../../../../libs/toast';
 import Icon from '../../../components/Icon/Icon/Icon';
 import InputField from '../../../components/Input/InputField/InputField';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
-import styles from '../styles/securityDetails.module.scss';
 
 const defaultIconProps = {
   width: 20,
   height: 20,
-  stroke: '#FFFFFF',
+  className: 'stroke-primary-25',
 };
 
 interface PasswordForm {
@@ -112,16 +111,18 @@ const SecurityDetails: FunctionComponent = () => {
 
   return (
     <form
-      className={styles.securityDetails}
+      className='flex w-full flex-col'
       onSubmit={(e) => {
         e.preventDefault();
         updatePassword();
       }}
     >
-      <div className={styles.headerSection}>
-        <div className={styles.headerDescription}>
-          <h3 className={styles.headerTitle}>Change Your Password</h3>
-          <div className={styles.headerSubtitle}>
+      <div className='mb-8 flex flex-row items-start justify-between'>
+        <div className='flex flex-col'>
+          <h3 className='aucctus-text-lg aucctus-text-brand-primary'>
+            Change Your Password
+          </h3>
+          <div className='aucctus-text-sm aucctus-text-tertiary'>
             Please enter your current password to change your password.
           </div>
         </div>
@@ -131,7 +132,7 @@ const SecurityDetails: FunctionComponent = () => {
           key={`${info.name}-${i}`}
           label={info.label}
           render={
-            <div className={styles.inputGroup}>
+            <div className='w-full max-w-md'>
               <InputField
                 variant='settings'
                 type='password'
@@ -149,11 +150,11 @@ const SecurityDetails: FunctionComponent = () => {
           }
         />
       ))}
-      <div className={styles.securityActions}>
+      <div className='mt-6 flex justify-end gap-4'>
         {!isFormDisabled && (
           <button
             type='button'
-            className={`btn btn-light btn-bold`}
+            className='btn btn-light btn-bold'
             onClick={(e) => {
               e.preventDefault();
               setIsFormDisabled(true);
@@ -166,18 +167,18 @@ const SecurityDetails: FunctionComponent = () => {
         {isFormDisabled ? (
           <button
             type='button'
-            className={`btn btn-primary btn-bold`}
+            className='btn btn-primary btn-bold'
             onClick={(e) => {
               e.preventDefault();
               setIsFormDisabled(false);
             }}
           >
             <Icon variant='edit' {...defaultIconProps} />
-            Update password
+            Update Password
           </button>
         ) : (
           <button
-            className={`btn btn-primary btn-bold`}
+            className='btn btn-primary btn-bold'
             type='submit'
             disabled={updatePasswordMutation.isLoading}
           >

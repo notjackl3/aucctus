@@ -8,13 +8,12 @@ import InputField from '../../../components/Input/InputField/InputField';
 import Loading from '../../../components/Loading';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import { useUpdateUser } from '../../../hooks/query/account.hook';
-import styles from '../styles/aboutDetails.module.scss';
 import { useAuthStore } from '@stores/auth.store';
 
 const defaultIconProps = {
   width: 20,
   height: 20,
-  stroke: '#FFFFFF',
+  className: 'stroke-white',
 };
 
 //TODO - placeholder options
@@ -106,7 +105,7 @@ const AboutDetails: FunctionComponent = () => {
 
   return user ? (
     <form
-      className={styles.aboutDetails}
+      className='flex h-full w-full flex-col items-start'
       onSubmit={(e) => {
         e.preventDefault();
         updateUser(aboutForm, {
@@ -119,18 +118,20 @@ const AboutDetails: FunctionComponent = () => {
         });
       }}
     >
-      <div className={styles.headerSection}>
-        <div className={styles.headerDescription}>
-          <h3 className={styles.headerTitle}>Personal Info</h3>
-          <div className={styles.headerSubtitle}>
+      <div className='mb-8 flex w-full items-start justify-between'>
+        <div className='flex flex-col'>
+          <h3 className='aucctus-text-xl-semibold aucctus-text-brand-secondary'>
+            Personal Info
+          </h3>
+          <div className='aucctus-text-sm aucctus-text-secondary'>
             Update your photo and personal details here.
           </div>
         </div>
-        <div className={styles.headerActions}>
+        <div className='flex gap-2'>
           {!isFormDisabled && (
             <button
               type='button'
-              className={`btn btn-light btn-bold`}
+              className='btn btn-light btn-bold'
               onClick={(e) => {
                 e.preventDefault();
                 setIsFormDisabled(true);
@@ -143,7 +144,7 @@ const AboutDetails: FunctionComponent = () => {
           {isFormDisabled ? (
             <button
               type='button'
-              className={`btn btn-primary btn-bold`}
+              className='btn btn-primary btn-bold'
               onClick={(e) => {
                 e.preventDefault();
                 setIsFormDisabled(false);
@@ -154,7 +155,7 @@ const AboutDetails: FunctionComponent = () => {
             </button>
           ) : (
             <button
-              className={`btn btn-primary btn-bold`}
+              className='btn btn-primary btn-bold'
               type='submit'
               disabled={isLoading}
             >
@@ -169,15 +170,15 @@ const AboutDetails: FunctionComponent = () => {
         tooltipContent='photo'
         sublabel='This will be displayed on your profile.'
         render={
-          <div className={styles.inputGroup}>
-            <img className={styles.avatar} alt='avatar' src={defaultAvatar} />
+          <div className='flex flex-1 gap-4'>
+            <img className='h-16 w-16' alt='avatar' src={defaultAvatar} />
           </div>
         }
       />
       <RowInfo
         label={'Name'}
         render={
-          <div className={styles.inputGroup}>
+          <div className='flex flex-1 gap-4'>
             {userNames.map((info, i) => (
               <InputField
                 key={`${info.name}-${i}`}
@@ -198,7 +199,7 @@ const AboutDetails: FunctionComponent = () => {
           key={`${info.name}-${i}`}
           label={info.label}
           render={
-            <div className={styles.inputGroup}>
+            <div className='flex flex-1 gap-4'>
               <InputField
                 variant='settings'
                 name={info.name}

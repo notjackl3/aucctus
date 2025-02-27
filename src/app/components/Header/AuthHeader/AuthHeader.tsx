@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import styles from './auth-header.module.scss';
-import Logo from '../../../assets/Logo.png';
-
+import NavWord from '../../../assets/aucctus_nav_word.png';
+import NavLogo from '../../../assets/aucctus_nav_logo.png';
 import { useLogout } from '../../../hooks/query/auth.hook';
 
 const AuthHeader: FunctionComponent = () => {
@@ -15,7 +15,8 @@ const AuthHeader: FunctionComponent = () => {
           logout();
         }}
       >
-        <img alt='Logo' style={{ height: 30, width: 146 }} src={Logo} />
+        <img alt='Logo' className='w-[45px]' src={NavLogo} />
+        <img alt='Logo' className='mb-1 ml-[1px] w-[145px]' src={NavWord} />
       </div>
     </div>
   );

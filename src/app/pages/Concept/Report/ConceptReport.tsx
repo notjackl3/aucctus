@@ -35,12 +35,6 @@ export const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
   { label: 'Context', value: AppPath.ConceptSettings },
 ];
 
-const defaultIconProps = {
-  width: 20,
-  height: 20,
-  stroke: '#98A2B3',
-};
-
 const ConceptReport: FunctionComponent = () => {
   const { id: conceptUuid } = useParams();
   const navigate = useNavigate();
@@ -105,11 +99,13 @@ const ConceptReport: FunctionComponent = () => {
   }
 
   return (
-    <div className={`mx-auto my-0 flex min-h-full w-full flex-col p-8`}>
+    <div
+      className={`aucctus-bg-secondary-extra-subtle mx-auto my-0 flex min-h-full w-full flex-col p-8`}
+    >
       <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
         <div className='flex flex-row items-center justify-start'>
           <EditModeSwitcher
-            pClassName='text-3xl font-medium capitalize not-italic leading-10 text-blue-900'
+            pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
             textFieldClassName='!text-3xl max-w-[600px]'
             value={titleEdit.value}
             label=''
@@ -130,14 +126,19 @@ const ConceptReport: FunctionComponent = () => {
         <div className='flex gap-4'>
           <button
             aria-label='Download Opportunity Snapshot'
-            className={`btn btn-bold hover:bg-primary-600 hover:text-white`}
+            className={`btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white`}
             onClick={onSnapshotClick}
             disabled={isLoading}
           >
             {isLoading ? (
               <Loading isSmall />
             ) : (
-              <Icon variant='download-cloud' {...defaultIconProps} />
+              <Icon
+                variant='download-cloud'
+                height={20}
+                width={20}
+                className='stroke-primary-900 transition-colors duration-300 group-hover:stroke-primary-100'
+              />
             )}
             Opportunity Snapshot
           </button>

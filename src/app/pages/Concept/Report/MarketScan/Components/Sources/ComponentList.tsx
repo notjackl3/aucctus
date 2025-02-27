@@ -10,7 +10,7 @@ const ComponentList: React.FC<MultiSourceListProps> = ({
   className,
 }) => {
   return (
-    <div className={`flex flex-col rounded-lg bg-white ${className}`}>
+    <div className={`aucctus-bg-primary flex flex-col rounded-lg ${className}`}>
       {children}
     </div>
   );

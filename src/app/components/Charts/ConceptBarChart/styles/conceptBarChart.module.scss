@@ -4,7 +4,7 @@
 .conceptBarChart {
   display: flex;
   align-self: stretch;
-  background: $white;
+  @apply aucctus-bg-primary;
 
   svg,
   use {
@@ -13,7 +13,7 @@
   }
 
   .headerText {
-    fill: $blue-900;
+    @apply aucctus-text-primary aucctus-fill-primary #{!important};
     font-family: $font-family;
     text-align: center;
     font-family: $font-family;
@@ -24,10 +24,9 @@
   }
 
   .subLabel {
-    color: $grey-600;
+    @apply aucctus-text-tertiary aucctus-fill-tertiary #{!important};
     text-align: center;
     font-family: $font-family;
-    fill: $grey-600;
     font-size: 0.75rem;
     font-style: normal;
     font-weight: 500;

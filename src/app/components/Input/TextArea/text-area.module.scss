@@ -11,8 +11,7 @@
   &.inputFieldError {
     input,
     textarea {
-      border: 1px solid $red-300 !important;
-      outline: 1px solid $red-300 !important;
+      @apply aucctus-border-error border #{!important};
     }
 
     .label {
@@ -21,7 +20,7 @@
 
     .hintText,
     .label {
-      color: $red-300 !important;
+      @apply aucctus-text-error-primary #{!important};
     }
   }
 
@@ -50,9 +49,8 @@
     line-height: 1.5rem;
 
     border-radius: var(--br-5xs);
-    background-color: $white;
-    box-shadow: var(--shadow-xs);
-    border: 1px solid var(--gray-300-outline);
+    @apply aucctus-bg-primary #{!important};
+    @apply aucctus-border-primary border #{!important};
 
     ::placeholder {
       color: var(--gray-400-placeholder, #b4bdd0) !important;
@@ -71,7 +69,7 @@
     font-size: var(--text-small-size);
 
     &.error {
-      color: $red-300;
+      @apply aucctus-text-error-primary #{!important};
     }
   }
 
@@ -102,7 +100,7 @@
   &.inputFieldError {
     .hintText,
     .label {
-      color: $red-300 !important;
+      @apply aucctus-text-error-primary #{!important};
     }
   }
 
@@ -126,8 +124,7 @@
     @include text-medium;
     font-family: $font-family;
     border-radius: var(--br-5xs);
-    box-shadow: var(--shadow-xs);
-    border: 1px solid var(--gray-300-outline);
+    @apply aucctus-border-primary border #{!important};
 
     ::placeholder {
       color: var(--gray-400-placeholder, #b4bdd0) !important;

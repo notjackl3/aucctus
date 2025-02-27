@@ -44,11 +44,11 @@ const DetailCard: FunctionComponent<DetailCardProps> = ({
   return (
     <div
       {...rest}
-      className={`flex w-[22.5rem] flex-col items-center self-stretch rounded-xl border border-gray-200 bg-white shadow-sm  ${cardClassName ? cardClassName : ''}`}
+      className={`aucctus-border-secondary aucctus-bg-primary flex w-[22.5rem] flex-col items-center self-stretch rounded-xl border shadow-sm  ${cardClassName ? cardClassName : ''}`}
     >
       {!isHideHeader && (
         <div
-          className={`box-border flex max-w-full flex-col items-start justify-start gap-2 self-stretch border-b border-solid border-b-gray-300 px-6 py-3 ${headerClassName}`}
+          className={`aucctus-border-primary aucctus-text-primary box-border flex max-w-full flex-col items-start justify-start gap-2 self-stretch border-b border-solid px-6 py-3 ${headerClassName}`}
         >
           {/* Title */}
           <div className='flex-column flex max-w-full items-center justify-between self-stretch'>
@@ -61,7 +61,7 @@ const DetailCard: FunctionComponent<DetailCardProps> = ({
 
           {/* Subtitle */}
           {subtitle && (
-            <h5 className='max-w-full text-wrap text-sm font-normal leading-tight text-gray-500'>
+            <h5 className='aucctus-text-secondary aucctus-text-sm max-w-full text-wrap'>
               {subtitle}
             </h5>
           )}

@@ -8,7 +8,7 @@ import {
 } from '@hooks/query/assumptions.hook';
 import { useAssumptionsTable } from '@hooks/tables/assumptions.hook';
 import {
-  getAssumptionActiveHexColor,
+  getAssumptionActiveColorClass,
   getAssumptionHexColor,
 } from '@libs/utils/concepts';
 import React from 'react';
@@ -43,7 +43,7 @@ const KeyAssumptions: React.FC = () => {
       x: item.certainty,
       y: item.importance,
       color: getAssumptionHexColor(item.category),
-      activeColor: getAssumptionActiveHexColor(item.category),
+      activeColor: getAssumptionActiveColorClass(item.category),
       id: item.uuid,
     }));
   }, [assumptions]);
@@ -92,7 +92,7 @@ const KeyAssumptions: React.FC = () => {
         </div>
 
         {/* Assumptions Testing Priority */}
-        <div className='inline-flex min-h-[440px] min-w-[470px] flex-col items-start justify-start gap-3 rounded-lg border border-gray-200 bg-white p-6'>
+        <div className='aucctus-border-secondary aucctus-bg-primary inline-flex min-h-[440px] min-w-[470px] flex-col items-start justify-start gap-3 rounded-lg border p-6'>
           <Header.Two text='Assumption Testing Priority' className='text-xl' />
           <Chart.Scatter
             xAxis={{
@@ -109,16 +109,16 @@ const KeyAssumptions: React.FC = () => {
         </div>
       </div>
       {/* Assumptions & Testing Table */}
-      <div className='flex w-fit rounded-lg border border-gray-200 bg-white'>
+      <div className='aucctus-border-secondary aucctus-bg-primary flex w-fit rounded-lg border'>
         {/* Assumptions */}
-        <div className='flex w-full min-w-[400px] max-w-[600px] flex-col items-start justify-start overflow-y-auto border-r border-gray-200'>
+        <div className='aucctus-border-secondary flex w-full min-w-[400px] max-w-[600px] flex-col items-start justify-start overflow-y-auto border-r'>
           {/* Header */}
           <Header.AssumptionsTable
             text='Assumptions'
             count={data ? data.count : 0}
             handleAdd={() => null}
           />
-          <div className='inline-flex w-full items-center justify-between self-stretch border-b border-gray-200 px-3 py-2'>
+          <div className='aucctus-border-secondary inline-flex w-full items-center justify-between self-stretch border-b px-3 py-2'>
             <div>{/* This will display active filters */}</div>
             <div className='inline-flex h-3 items-center justify-end gap-2'>
               <button>
@@ -141,7 +141,7 @@ const KeyAssumptions: React.FC = () => {
             />
           </div>
           {/* Footer */}
-          <div className='w-full border-t border-gray-200'>
+          <div className='aucctus-border-secondary w-full border-t'>
             <Table.Pagination
               page={1}
               numberOfPages={data?.numberOfPages || 0}

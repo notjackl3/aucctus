@@ -30,7 +30,7 @@ const TableCheckBox: FunctionComponent<TableCheckBoxProps> = ({
       type='checkbox'
       ref={ref}
       checked={checked}
-      className='h-4 w-4 appearance-none rounded-md border border-gray-300 bg-gray-100 checked:border-indigo-600 checked:bg-indigo-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2'
+      className='aucctus-border-primary h-4 w-4 appearance-none rounded-md border bg-gray-100 checked:border-indigo-600 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2'
       {...rest}
     />
   );

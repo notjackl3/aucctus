@@ -18,16 +18,16 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
     <th
       {...props}
       className={cn(
-        'text-nowrap p-3 align-top text-base font-medium leading-normal text-indigo-900 first:pl-6 last:pr-6',
+        'aucctus-text-primary text-nowrap p-3 align-top text-base font-medium leading-normal first:pl-6 last:pr-6',
         props.className,
       )}
       key={header.id}
     >
       {header.isPlaceholder ? null : (
-        <span className='flex flex-row items-center justify-start [&>svg]:stroke-indigo-900'>
+        <span className='flex flex-row items-center justify-start [&>svg]:stroke-primary-500'>
           <span
             className={cn([
-              'flex items-center justify-start',
+              '!aucctus-text-primary flex items-center justify-start',
               {
                 'cursor-pointer': header.column.getCanSort(),
                 'select-none': header.column.getCanSort(),
@@ -38,10 +38,10 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
             {flexRender(header.column.columnDef.header, header.getContext())}
             {{
               asc: (
-                <Icon variant='arrowup' className='ml-1 stroke-indigo-900' />
+                <Icon variant='arrowup' className='ml-1 stroke-primary-800' />
               ),
               desc: (
-                <Icon variant='arrowdown' className='ml-1 stroke-indigo-900' />
+                <Icon variant='arrowdown' className='ml-1 stroke-primary-800' />
               ),
             }[header.column.getIsSorted() as string] ?? null}
           </span>

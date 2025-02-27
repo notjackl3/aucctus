@@ -68,6 +68,7 @@
   },
   "devDependencies": {
     "@sentry/vite-plugin": "^2.22.6",
+    "@types/postcss-import": "^14.0.3",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",
     "@vitejs/plugin-react": "^4.0.0",

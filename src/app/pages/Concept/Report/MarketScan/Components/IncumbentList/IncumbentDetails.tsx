@@ -42,7 +42,7 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
       <div className='mx-auto max-w-5xl space-y-8'>
         <div className='flex min-h-96 items-center justify-center gap-6 self-stretch text-center align-middle'>
           <section>
-            <div className='self-stretch text-center text-sm font-medium text-gray-500'>
+            <div className='aucctus-text-tertiary self-stretch text-center text-sm font-medium'>
               An Agent is currently analyzing {incumbent.name}. This may take a
               moment.
             </div>
@@ -59,17 +59,16 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
     <div className='mx-auto max-w-5xl space-y-4'>
       {/* General Information Section */}
       <section>
-        <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
+        <h2 className='aucctus-text-brand-primary aucctus-text-xs-bold mb-4 h-[15px] w-[176px]'>
           General Information
         </h2>
         <div className='flex justify-between gap-6'>
-          <div className='flex-1 rounded-lg border border-gray-200 bg-white p-6'>
+          <div className='aucctus-border-secondary aucctus-bg-primary flex-1 rounded-lg border p-6'>
             {/* TODO: Change overview to Relevant Product */}
             {incumbent.overview && (
               <InfoSection
                 title='Company Overview'
                 content={incumbent.overview}
-                contentClassName='text-[14px] font-semibold'
                 iconVariant='link-source'
                 onClick={handleEvidenceClick(
                   incumbent.overview,
@@ -103,6 +102,17 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
         </div>
       </section>
 
+      {incumbent.relevance && (
+        <section className='space-y-4'>
+          {incumbent.relevance && (
+            <Card.AiConclusionBox
+              title='Relevance to Concept'
+              content={incumbent.relevance}
+            />
+          )}
+        </section>
+      )}
+
       {/* Recommended Action Section */}
       {/* {incumbent.recommendedAction && <section>
         <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
@@ -122,51 +132,41 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
       </section>} */}
 
       {/* Additional Sections (e.g., Recent Activity, Support) */}
-      <section>
-        <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
-          Recent Activity
-        </h2>
-        <div className='space-y-2'>
-          {incumbent.newsAndActivities &&
-            incumbent.newsAndActivities.length > 0 &&
-            incumbent.newsAndActivities.map((activity, idx) => (
-              <div
-                key={idx}
-                className='rounded-lg border border-gray-200 bg-white p-4'
-              >
-                <div className='flex items-center justify-between'>
-                  <Text.Collapsible
-                    title=''
-                    titleClassName='hidden'
-                    description={activity.text.trim()}
-                    descriptionClassName="font-['Inter'] text-[12px] font-normal leading-[18px] text-gray-950"
-                    maxDescriptionHeight={40}
-                    truncationClassName='line-clamp-2'
-                  />
-                  <IconBox
-                    variant='link-source'
-                    onClick={handleEvidenceClick(
-                      activity.text,
-                      activity.evidence,
-                    )}
-                    {...iconDefaultProps}
-                  />
+      {incumbent.newsAndActivities &&
+        incumbent.newsAndActivities.length > 0 && (
+          <section>
+            <h2 className='aucctus-text-brand-primary aucctus-text-xs-bold mb-4 h-[15px] w-[176px]'>
+              Recent Activity
+            </h2>
+            <div className='space-y-2'>
+              {incumbent.newsAndActivities.map((activity, idx) => (
+                <div
+                  key={idx}
+                  className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4'
+                >
+                  <div className='flex items-center justify-between'>
+                    <Text.Collapsible
+                      title=''
+                      titleClassName='hidden'
+                      description={activity.text.trim()}
+                      descriptionClassName='aucctus-text-primary aucctus-text-sm !text-[12px]'
+                      maxDescriptionHeight={45}
+                      truncationClassName='line-clamp-3'
+                    />
+                    <IconBox
+                      variant='link-source'
+                      onClick={handleEvidenceClick(
+                        activity.text,
+                        activity.evidence,
+                      )}
+                      {...iconDefaultProps}
+                    />
+                  </div>
                 </div>
-              </div>
-            ))}
-        </div>
-      </section>
-
-      {incumbent.relevance && (
-        <section className='space-y-4'>
-          {incumbent.relevance && (
-            <Card.AiConclusionBox
-              title='Relevance to Concept'
-              content={incumbent.relevance}
-            />
-          )}
-        </section>
-      )}
+              ))}
+            </div>
+          </section>
+        )}
     </div>
   );
 };

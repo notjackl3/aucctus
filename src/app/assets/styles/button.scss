@@ -5,49 +5,49 @@
 // Array of Tuple for button colors: (background-color, text-color)
 $btn-colors: (
   primary: (
-    $primary-600,
-    $white,
+    aucctus-bg-primary-solid-alt,
+    aucctus-text-white,
   ),
 
   primary-light: (
-    $primary-50,
-    $primary-600,
+    aucctus-bg-brand-primary,
+    aucctus-text-brand-tertiary,
   ),
   light: (
-    $white,
-    $grey-600,
+    aucctus-bg-primary,
+    aucctus-text-secondary,
   ),
   light-primary: (
-    $white,
-    $primary-600,
+    aucctus-bg-primary,
+    aucctus-text-brand-tertiary,
   ),
   grey: (
-    $grey-300,
-    $black,
+    aucctus-bg-secondary,
+    aucctus-text-primary,
   ),
   secondary: (
-    $primary-50,
-    $primary-600,
+    aucctus-bg-brand-primary,
+    aucctus-text-brand-tertiary,
   ),
   success: (
-    $success-green-500,
-    $green-50,
+    aucctus-bg-success-solid,
+    aucctus-text-white,
   ),
   danger: (
-    $red-700,
-    $red-50,
+    aucctus-bg-error-solid,
+    aucctus-text-white,
   ),
   warning: (
-    $warning-orange-500,
-    $white,
+    aucctus-bg-warning-solid,
+    aucctus-text-white,
   ),
   info: (
-    $grey-800,
-    $white,
+    aucctus-bg-secondary-solid,
+    aucctus-text-white,
   ),
   disabled: (
-    $grey-500,
-    $white,
+    aucctus-bg-disabled,
+    aucctus-text-disabled,
   ),
 );
 
@@ -60,7 +60,14 @@ $btn-colors: (
   align-items: center;
   text-align: center;
 
-  box-shadow: $shadow-100;
+  border: 1px solid rgba(20, 20, 20, 0.1);
+
+  box-shadow:
+    0px 2px 6px rgba(0, 0, 0, 0.05),
+    // soft box-shadow bottom
+    0px 1px 0px 0px rgba(255, 255, 255, 0.2) inset,
+    // top
+    0px -1.5px 0px 0px rgba(20, 20, 20, 0.07) inset; // bottom
 
   border-radius: 6px;
 
@@ -121,38 +128,32 @@ $btn-colors: (
       height: 1.25rem;
     }
   }
+
+  &:disabled {
+    @apply aucctus-bg-disabled aucctus-text-disabled;
+    cursor: not-allowed;
+    box-shadow: none !important;
+  }
 }
 
 // Generating button styles for each color
 @each $color, $value in $btn-colors {
-  $btn-background: nth($value, 1);
-  $btn-text: nth($value, 2);
+  $bg-class: nth($value, 1);
+  $text-class: nth($value, 2);
 
   .btn-#{$color} {
-    background-color: $btn-background !important;
-    border-color: darken($btn-background, 5%) !important;
-    color: $btn-text !important;
-
-    svg,
-    use,
-    path {
-      stroke: $btn-text !important;
-    }
-
-    &:hover {
-      background-color: darken($btn-background, 10%) !important;
-      border-color: darken($btn-background, 15%) !important;
-    }
+    @apply #{$bg-class} #{$text-class};
 
     &:disabled {
-      cursor: not-allowed;
-      background-color: darken($btn-background, 5%) !important;
-      // border-color: darken($btn-background, 5%) !important;
+      @apply aucctus-bg-disabled aucctus-text-disabled aucctus-border-disabled;
+    }
+
+    &:hover:not(:disabled) {
+      @apply #{$bg-class}-hover;
     }
 
     &.btn-no-hover {
-      background-color: $btn-background !important;
-      border-color: darken($btn-background, 5%) !important;
+      @apply #{$bg-class};
     }
   }
 }

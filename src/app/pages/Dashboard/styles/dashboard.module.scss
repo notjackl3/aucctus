@@ -27,7 +27,7 @@
       h1 {
         text-transform: capitalize;
         @include display-sm;
-        color: $blue-900;
+        @apply aucctus-text-primary #{!important};
         height: 100%;
       }
     }
@@ -36,7 +36,7 @@
       display: flex;
       gap: 1rem;
       .button {
-        color: $white;
+        @apply aucctus-text-white #{!important};
         font-family: $font-family;
         font-style: normal;
         font-weight: 700;
@@ -45,7 +45,7 @@
         svg,
         use {
           path {
-            stroke: $white;
+            @apply stroke-white #{!important};
           }
         }
       }
@@ -81,18 +81,19 @@
         width: 38rem;
 
         .cardAction {
-          color: $blue-600;
+          @apply aucctus-text-primary #{!important};
+          @apply aucctus-bg-secondary #{!important};
+
           @include body-100;
           font-family: $font-family;
           border: none;
-          background: $primary-50;
           padding: 0.5rem 1rem;
           border-radius: 0.5rem;
 
           svg,
           use {
             path {
-              stroke: $blue-600;
+              @apply stroke-primary-900 #{!important};
             }
           }
         }
@@ -111,24 +112,24 @@
         flex: 1 1 auto;
         padding: 1rem 1rem;
         box-sizing: border-box;
-        background: $primary-100;
+        @apply aucctus-bg-secondary-subtle;
         border-radius: 0.75rem;
-        border: 1px solid $grey-200;
+        @apply aucctus-border-primary border #{!important};
       }
 
       .cardStyle {
         width: 100%;
         align-self: stretch;
-        background: $white;
+        @apply aucctus-bg-primary;
         h4 {
-          color: $blue-900;
+          @apply aucctus-text-primary #{!important};
           @include text-large;
           font-family: $font-family;
         }
       }
 
       .cardAction {
-        color: $grey-600;
+        @apply aucctus-text-secondary #{!important};
         @include body-100;
         font-family: $font-family;
         border: none;
@@ -150,8 +151,8 @@
           box-sizing: border-box;
           align-items: center;
           justify-content: space-between;
-          color: $blue-900;
-          border-bottom: 1px solid $grey-200;
+          @apply aucctus-text-primary #{!important};
+          @apply aucctus-border-secondary border-b;
         }
       }
     }

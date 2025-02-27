@@ -21,15 +21,15 @@ const SupportInsights: React.FC<ISupportInsightsProps> = ({ support }) => {
 
   return (
     <div className='flex h-screen w-full flex-col items-center justify-start'>
-      <ScrollArea.Root className='h-full w-[600px] overflow-hidden rounded-br-xl border border-slate-200 bg-neutral-50'>
+      <ScrollArea.Root className='aucctus-border-secondary h-full w-[600px] overflow-hidden rounded-br-xl border'>
         {/* Header */}
-        <div className='flex items-center justify-between border-b border-slate-200 px-6 py-4'>
-          <h2 className='text-base font-bold text-gray-500'>
+        <div className='aucctus-border-secondary flex items-center justify-between border-b px-6 py-4'>
+          <h2 className='aucctus-text-secondary aucctus-text-sm-bold'>
             Support Insights
           </h2>
           <button
             onClick={closeModal}
-            className='text-sm text-gray-500 hover:text-gray-700 focus:outline-none'
+            className='aucctus-text-tertiary-hover aucctus-text-sm-medium focus:outline-none'
           >
             Close
           </button>
@@ -41,22 +41,24 @@ const SupportInsights: React.FC<ISupportInsightsProps> = ({ support }) => {
             {support.insights.map((insight) => (
               <div
                 key={insight.uuid}
-                className='space-y-4 rounded-lg border border-gray-200 bg-white p-4'
+                className='aucctus-border-secondary aucctus-bg-primary space-y-4 rounded-lg border p-4'
               >
                 <div>
-                  <h3 className='text-sm font-bold text-gray-700'>
+                  <h3 className='aucctus-text-secondary text-sm font-bold'>
                     Insight Summary:
                   </h3>
                   <p className='text-sm text-gray-600'>{insight.summary}</p>
                 </div>
                 <div>
-                  <h3 className='text-sm font-bold text-gray-700'>
+                  <h3 className='aucctus-text-secondary text-sm font-bold'>
                     Description:
                   </h3>
                   <p className='text-sm text-gray-600'>{insight.description}</p>
                 </div>
                 <div className='space-y-4'>
-                  <h3 className='text-sm font-bold text-gray-700'>Sources:</h3>
+                  <h3 className='aucctus-text-secondary text-sm font-bold'>
+                    Sources:
+                  </h3>
                   {insight.sources.map((source) => (
                     <div
                       key={source.uuid}
@@ -72,11 +74,11 @@ const SupportInsights: React.FC<ISupportInsightsProps> = ({ support }) => {
                           href={source.url}
                           target='_blank'
                           rel='noopener noreferrer'
-                          className='text-sm text-blue-500 hover:underline'
+                          className='aucctus-text-brand-secondary aucctus-text-sm-medium hover:underline'
                         >
                           {source.title}
                         </a>
-                        <p className='text-xs text-gray-500'>
+                        <p className='aucctus-text-tertiary aucctus-text-xs-medium'>
                           {source.description}
                         </p>
                       </div>

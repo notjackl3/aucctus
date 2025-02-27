@@ -15,10 +15,10 @@ const ConceptTableCard: React.FC<ConceptTableCardProps> = ({
   isLoading,
 }) => {
   return (
-    <div className='inline-flex h-auto  min-h-96 w-full flex-col items-start justify-between rounded-xl border border-gray-200 bg-white shadow-sm'>
+    <div className='aucctus-border-secondary aucctus-bg-primary  inline-flex h-auto min-h-96 w-full flex-col items-start justify-between rounded-xl border shadow-sm'>
       <div className='inline-flex w-full flex-col items-start justify-start'>
         {/* Header */}
-        <div className='inline-flex h-[60px] w-full items-center justify-between rounded-t-xl border-b border-gray-200 px-6 py-3'>
+        <div className='aucctus-border-secondary inline-flex h-[60px] w-full items-center justify-between rounded-t-xl border-b px-6 py-3'>
           {header}
         </div>
         {/* Content */}
@@ -35,7 +35,7 @@ const ConceptTableCard: React.FC<ConceptTableCardProps> = ({
         )}
       </div>
       {/* Footer */}
-      <div className='w-full border-t border-gray-200'>{footer}</div>
+      <div className='aucctus-border-secondary w-full border-t'>{footer}</div>
     </div>
   );
 };

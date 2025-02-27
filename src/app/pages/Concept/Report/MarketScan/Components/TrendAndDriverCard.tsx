@@ -62,9 +62,9 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
             trendAndDriver.support,
           )
         }
-        className='flex aspect-square cursor-pointer 
-        items-center justify-center rounded-md
-        bg-[#EAECF0] p-[4px] transition-colors hover:bg-gray-300 active:bg-gray-400 '
+        className='aucctus-bg-tertiary-hover flex aspect-square 
+        cursor-pointer items-center justify-center
+        rounded-md p-[4px] transition-colors'
       >
         <Icon variant='link-source' {...iconDefaultProps} />
       </div>
@@ -98,7 +98,7 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
         </div>
       }
     >
-      <div className='flex cursor-pointer flex-col gap-4 p-6 hover:bg-gray-50'>
+      <div className='aucctus-bg-primary-hover flex cursor-pointer flex-col gap-4 p-6'>
         <img
           alt='delivery-trend'
           src={trendAndDriver.imagePath ?? 'url'}
@@ -114,11 +114,11 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
             e.currentTarget.src = randomImage;
           }}
         />
-        <span className='text-base font-bold leading-6 text-gray-950'>
+        <span className='aucctus-text-primary aucctus-text-md-bold'>
           {trendAndDriver.name}
         </span>
 
-        <p className='font-400 text-sm text-[#0C111D]'>
+        <p className='aucctus-text-secondary aucctus-text-sm'>
           {trendAndDriver.description}
         </p>
       </div>

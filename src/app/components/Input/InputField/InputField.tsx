@@ -4,7 +4,7 @@ import React, {
   useState,
 } from 'react';
 import Icon from '../../Icon/Icon/Icon';
-import styles from './input-field.module.scss';
+import { cn } from '@libs/utils/react';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -36,7 +36,7 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
     variant,
     showAsterisk = false,
     width,
-    value, // Add value to props for controlled input
+    value,
     onChange,
     ...props
   },
@@ -53,17 +53,6 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
   const hintText = errorMessage || hint;
   const showVisibilityIcon = isPassword && variant === 'settings';
 
-  function getInputFieldStyle(variant: InputFieldProps['variant']) {
-    switch (variant) {
-      case 'settings':
-        return styles.inputFieldSettings;
-      default:
-        return styles.inputField;
-    }
-  }
-
-  const inputFieldStyle = getInputFieldStyle(variant);
-
   const getInputType = () => {
     if (isPassword && isPasswordVisible) {
       return 'text';
@@ -74,41 +63,74 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
     }
   };
 
+  const baseInputClasses = cn(
+    'w-full flex flex-row',
+    'px-3 py-2',
+    'text-gray-900',
+    'font-normal text-base leading-6',
+    'rounded-md',
+    'aucctus-bg-primary',
+    'shadow-sm',
+    'border aucctus-border-primary',
+    'placeholder:aucctus-text-placeholder',
+    'transition-all duration-300 ease-in-out',
+    'focus:outline-none focus:ring-2 focus:ring-primary-600 focus:border-primary-500',
+    props.disabled && 'bg-transparent',
+  );
+
+  const containerClasses = cn(
+    'relative inline-block self-stretch transition-all duration-300',
+    variant === 'settings' && 'flex flex-col gap-1 flex-1 max-w-[25rem]',
+    width && `w-[${width}${typeof width === 'number' ? 'px' : ''}]`,
+  );
+
+  const labelClasses = cn(
+    'relative leading-5 font-medium mb-1 aucctus-text-secondary',
+    variant === 'settings' && 'text-sm',
+    hasError && 'font-bold text-error-500',
+  );
+
+  const hintClasses = cn(
+    'relative leading-5',
+    hasError ? 'text-error-500' : 'text-gray-600',
+    variant === 'settings' && 'text-sm',
+  );
+
   return (
-    <div
-      style={width ? { width } : {}}
-      className={`${inputFieldStyle} ${hasError ? styles.inputFieldError : ''}`}
-    >
+    <div className={containerClasses}>
       {label && (
-        <div className={styles.label}>
+        <div className={labelClasses}>
           {label}
           {showAsterisk ? (
             <span className='font-semibold text-red-400'>*</span>
           ) : null}
         </div>
       )}
-      <input
-        {...props}
-        type={getInputType()}
-        ref={ref}
-        name={name}
-        value={value ?? ''} // Ensure value is always defined (fallback to empty string)
-        onChange={onChange} // Pass the onChange handler directly
-      />
-      {showVisibilityIcon && (
-        <button
-          type='button'
-          className={`${styles.icon}`}
-          onClick={togglePasswordVisibility}
-          aria-label='Toggle password visibility'
-        >
-          <Icon
-            variant={isPasswordVisible ? 'eye-off' : 'eye'}
-            {...defaultIconProps}
-          />
-        </button>
-      )}
-      {showHint ? <div className={styles.hintText}>{hintText}</div> : null}
+      <div className='relative'>
+        <input
+          {...props}
+          type={getInputType()}
+          ref={ref}
+          name={name}
+          value={value ?? ''}
+          onChange={onChange}
+          className={baseInputClasses}
+        />
+        {showVisibilityIcon && (
+          <button
+            type='button'
+            className='absolute right-4 top-[0.9rem] border-none bg-transparent p-0'
+            onClick={togglePasswordVisibility}
+            aria-label='Toggle password visibility'
+          >
+            <Icon
+              variant={isPasswordVisible ? 'eye-off' : 'eye'}
+              {...defaultIconProps}
+            />
+          </button>
+        )}
+      </div>
+      {showHint ? <div className={hintClasses}>{hintText}</div> : null}
     </div>
   );
 };

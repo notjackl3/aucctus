@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react';
+import { FunctionComponent } from 'react';
 import { Outlet } from 'react-router-dom';
 import styles from '../../app/assets/styles/pages/auth-screens.module.scss';
 import Footer from '../../app/components/Auth/Footer/Footer';

@@ -13,8 +13,8 @@
     border-radius: 4px;
     left: -0.5rem;
     padding: 0.5rem;
-    color: $white;
-    background: $black;
+    @apply aucctus-text-white #{!important};
+    @apply aucctus-bg-primary-solid #{!important};
     font-size: 14px;
     font-family: sans-serif;
     line-height: 1;
@@ -38,7 +38,7 @@
 
       &::before {
         top: 100%;
-        border-top-color: $black;
+        @apply aucctus-border-primary;
       }
     }
   }

@@ -37,7 +37,7 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
       <Popover.Portal>
         <ClickAwayListener onClickAway={() => setOpen(false)}>
           <Popover.Content
-            className='rounded bg-white p-2 shadow-lg will-change-[transform,opacity] focus:shadow-lg'
+            className='aucctus-bg-primary rounded p-2 shadow-lg will-change-[transform,opacity] focus:shadow-lg'
             side='left'
           >
             <div

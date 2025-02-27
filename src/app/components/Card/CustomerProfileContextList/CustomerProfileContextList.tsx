@@ -84,6 +84,7 @@ const CustomerProfileContextList: FunctionComponent<
     <div>
       <Card.Detail
         cardClassName={styles.customerCards}
+        headerClassName={styles.header}
         title={title}
         icon={icon}
         isHideFooter
@@ -202,6 +203,7 @@ const CustomerProfileListItem: FunctionComponent<
           name={'new'}
           value={newValue}
           maxLength={MAX_INPUT_LENGTH}
+          className='aucctus-text-primary'
           onChange={onInputChange}
           errorMessage={inputError}
         />

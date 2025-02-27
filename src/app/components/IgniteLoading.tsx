@@ -12,14 +12,14 @@ const IgniteLoading: FunctionComponent<IgniteLoadingProps> = ({
   subtitle,
 }) => {
   return (
-    <div className='inline-flex w-96 flex-col items-center justify-center gap-10 rounded-xl border border-slate-200 bg-white px-8 py-10 shadow'>
+    <div className='aucctus-border-secondary aucctus-bg-primary inline-flex w-96 flex-col items-center justify-center gap-10 rounded-xl border px-8 py-10 shadow'>
       <div className='flex h-56 flex-col items-center justify-start gap-8 self-stretch'>
         <img alt='Ignite!' className='relative w-48' src={igniteIcon} />
         <div className='flex flex-col items-center justify-start gap-3 self-stretch'>
-          <div className='self-stretch text-center text-3xl font-bold leading-9 text-indigo-900'>
+          <div className='aucctus-text-brand-primary self-stretch text-center text-3xl font-bold leading-9'>
             {title}
           </div>
-          <div className='self-stretch text-center text-sm font-medium text-gray-500'>
+          <div className='aucctus-text-tertiary self-stretch text-center text-sm font-medium'>
             {subtitle}
           </div>
         </div>

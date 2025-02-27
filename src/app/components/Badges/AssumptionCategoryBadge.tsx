@@ -17,7 +17,7 @@ const AssumptionCategoryBadge: FunctionComponent<
       <span
         {...textProps}
         className={cn(
-          'whitespace-nowrap text-center text-base capitalize text-slate-600',
+          'aucctus-text-tertiary whitespace-nowrap text-center text-base capitalize',
           textProps?.className,
         )}
       >

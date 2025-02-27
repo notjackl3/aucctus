@@ -41,7 +41,7 @@ const Footer: React.FC<FooterProps> = ({ status }) => {
         )}
         <Header.Three className='text-xl font-semibold' text={text.header} />
 
-        <span className='max-w-96 text-wrap text-center text-sm text-slate-500'>
+        <span className='aucctus-text-tertiary max-w-96 text-wrap text-center text-sm'>
           {text.subHeader}
         </span>
       </span>

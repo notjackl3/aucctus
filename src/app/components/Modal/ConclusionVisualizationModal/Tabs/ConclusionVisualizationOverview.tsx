@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactMarkdown from 'react-markdown';
+import ReactMarkdown, { Components } from 'react-markdown';
 import { IInsight } from '@libs/api/types';
 import { Card } from '@components';
 import { mightContainMarkdown } from '@libs/utils/string';
@@ -14,12 +14,25 @@ const renderConclusion = (conclusion: string) => {
   return <div className='text-lg font-medium text-gray-900'>{conclusion}</div>;
 };
 
+const markdownComponents: Components = {
+  strong: ({ children }) => (
+    <strong className='aucctus-text-secondary'>{children}</strong>
+  ),
+};
+
 const renderReasoning = (reasoning: string) => {
   if (mightContainMarkdown(reasoning)) {
-    return <ReactMarkdown>{reasoning}</ReactMarkdown>;
+    return (
+      <ReactMarkdown
+        className='aucctus-text-tertiary'
+        components={markdownComponents}
+      >
+        {reasoning}
+      </ReactMarkdown>
+    );
   }
 
-  return <div className='text-sm text-gray-500'>{reasoning}</div>;
+  return <div className='aucctus-text-tertiary text-sm'>{reasoning}</div>;
 };
 
 const renderInsights = (insights: IInsight[]) => {

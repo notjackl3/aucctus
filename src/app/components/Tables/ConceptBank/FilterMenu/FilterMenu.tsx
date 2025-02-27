@@ -5,7 +5,7 @@ import { ConceptStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import { CONCEPT_STATUS_LIST } from '@libs/utils/concepts';
 import * as Menubar from '@radix-ui/react-menubar';
-import classNames from 'classnames';
+import { cn } from '@libs/utils/react';
 import React from 'react';
 import SubMenuTrigger from './FilterMenuTrigger';
 
@@ -22,16 +22,16 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
   const { users } = useAllUsers({ search });
 
   const menuItemClass =
-    'group hover:outline-none hover:bg-primary-400 p-1.5 rounded-md hover:text-white hover:[&>svg]:stroke-white focus-visible:outline-none focus:outline-none';
-  const userMenuItemClassName = `flex flex-row h-16 items-center py-2 px-3 gap-2 bg-white`;
+    'group hover:outline-none transition-colors duration-300 aucctus-bg-primary-hover rounded-md focus-visible:outline-none focus:outline-none';
+  const userMenuItemClassName = `flex flex-row h-16 items-center py-2 px-3 gap-2 aucctus-bg-primary`;
   const spanClassName =
-    'truncate text-base font-medium leading-tight text-slate-500 group-hover:text-white';
+    'truncate aucctus-text-md-medium aucctus-text-tertiary group-hover:text-primary-700';
 
   const createStatusCheckItem = React.useCallback(
     (value: ConceptStatus) => (
       <Menubar.Item
         key={utils.string.generateRandomString(5)}
-        className={classNames([menuItemClass, 'inline-flex items-center'])}
+        className={cn(menuItemClass, 'inline-flex items-center')}
         disabled
       >
         <Input.CheckBox
@@ -51,7 +51,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
         />
         <label
           className={
-            'text-base font-medium leading-tight text-slate-500 group-hover:text-white'
+            'aucctus-text-md-medium aucctus-text-tertiary group-hover:text-primary-700'
           }
           htmlFor={`filter-status-${value}`}
         >
@@ -65,12 +65,12 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
   return (
     <Menubar.Root className='flex flex-row'>
       <Menubar.Menu>
-        <Menubar.Trigger className='px-3 py-2 [&>svg]:stroke-primary-500'>
+        <Menubar.Trigger className='aspect-square rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-primary-50 active:bg-primary-100 [&>svg]:stroke-primary-500'>
           <Icon variant='filter-lines' height={24} width={24} />
         </Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content
-            className='flex w-auto flex-col gap-1 rounded-md bg-white p-2 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
+            className='aucctus-bg-primary flex w-auto flex-col gap-1 rounded-md p-2 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
             align='end'
             side='bottom'
           >
@@ -78,7 +78,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
               <SubMenuTrigger label='Status' icon='loading-02' />
               <Menubar.Portal>
                 <Menubar.SubContent
-                  className='flex w-auto flex-col gap-1 rounded-md bg-white p-3 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
+                  className='aucctus-bg-primary flex w-auto flex-col gap-1 rounded-md p-3 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
                   alignOffset={-5}
                 >
                   {CONCEPT_STATUS_LIST.map((value) =>
@@ -93,7 +93,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
               <Menubar.Portal>
                 <Menubar.SubContent
                   sticky='always'
-                  className='flex w-auto flex-col gap-1 rounded-md bg-white p-3 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
+                  className='aucctus-bg-primary flex w-auto flex-col gap-1 rounded-md p-3 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
                   alignOffset={-5}
                 >
                   <div className='className="max-w-[100px]'>
@@ -105,7 +105,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                       }}
                     />
                   </div>
-                  <div className='max-h-80 min-h-[240px] overflow-y-scroll rounded-lg bg-gray-50 p-2'>
+                  <div className='max-h-80 min-h-[240px] overflow-y-auto rounded-lg'>
                     {users.length > 0 ? (
                       users.map((user) => {
                         const filterCreatedByIsUser =
@@ -113,15 +113,15 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
 
                         return (
                           <Menubar.Item
-                            className={classNames([
+                            className={cn(
                               menuItemClass,
                               userMenuItemClassName,
                               'hover:shadow-md',
-                              'border border-gray-50',
+                              'aucctus-border-tertiary border',
                               {
-                                'bg-primary-400': filterCreatedByIsUser,
+                                'bg-primary-100': filterCreatedByIsUser,
                               },
-                            ])}
+                            )}
                             key={`uf-${user.uuid}`}
                             disabled
                             onClick={() => {
@@ -140,10 +140,9 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                               src={user.profileImage}
                             />
                             <span
-                              className={classNames([
-                                spanClassName,
-                                { 'text-white': filterCreatedByIsUser },
-                              ])}
+                              className={cn(spanClassName, {
+                                'text-primary-700': filterCreatedByIsUser,
+                              })}
                             >
                               {utils.account.getUsersFullName(user)}
                             </span>
@@ -152,10 +151,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                       })
                     ) : (
                       <Menubar.Item
-                        className={classNames([
-                          menuItemClass,
-                          userMenuItemClassName,
-                        ])}
+                        className={cn(menuItemClass, userMenuItemClassName)}
                         disabled
                       >
                         <span className={spanClassName}>No Users Found</span>

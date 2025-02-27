@@ -29,7 +29,7 @@
     .generate {
       display: flex;
       @include text-medium;
-      color: $blue-900;
+      @apply aucctus-text-primary #{!important};
       background: none;
       border: none;
       cursor: pointer;
@@ -40,7 +40,7 @@
       svg,
       use,
       path {
-        stroke: $blue-900 !important;
+        @apply stroke-primary-900 #{!important};
       }
 
       &:hover {

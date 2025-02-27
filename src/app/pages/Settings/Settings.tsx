@@ -1,6 +1,5 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import { Outlet } from 'react-router-dom';
-import styles from './styles/settings.module.scss';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import TabView from '../../components/Container/TabView/TabView';
@@ -24,16 +23,18 @@ const Settings: FunctionComponent = () => {
   );
 
   return (
-    <div className={`${styles.settings}`}>
-      <div className={styles.headerSection}>
-        <div className={styles.header}>
-          <h1>{'Settings'}</h1>
+    <div className='box-border flex h-auto w-full flex-col items-center p-8 pb-12'>
+      <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
+        <div className='flex flex-row items-center justify-start'>
+          <h1 className='aucctus-header-sm-medium aucctus-text-brand-primary'>
+            Settings
+          </h1>
         </div>
       </div>
-      <div className={styles.contentContainer}>
+      <div className='flex h-full flex-row flex-wrap items-start gap-6 self-stretch'>
         <TabView
           tabs={SETTING_TABS}
-          className={styles.tabs}
+          className='h-full w-full'
           variant='default'
           onTabSelect={onTabSelect}
           activeTab={activeTab}

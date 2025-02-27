@@ -10,12 +10,12 @@ const WhiteSpaceSuggestion: FunctionComponent<WhiteSpaceSuggestionsProps> = ({
   subtitle,
 }) => {
   return (
-    <div className='inline-flex w-80 items-center justify-between rounded-lg border border-slate-200 bg-white px-3 py-4 shadow'>
+    <div className='aucctus-border-secondary aucctus-bg-primary inline-flex w-80 items-center justify-between rounded-lg border px-3 py-4 shadow'>
       <div className='inline-flex flex-col items-start justify-center gap-1.5 blur-xs'>
-        <div className="w-44 font-['Inter'] text-sm font-medium text-slate-500">
+        <div className="aucctus-text-tertiary w-44 font-['Inter'] text-sm font-medium">
           {title}
         </div>
-        <div className="w-44 font-['Inter'] text-xs font-normal text-slate-500">
+        <div className="aucctus-text-tertiary w-44 font-['Inter'] text-xs font-normal">
           {subtitle}
         </div>
       </div>

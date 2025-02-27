@@ -1,0 +1,43 @@
+/* Base border styles */
+.aucctus-border-primary {
+  @apply border-gray-light-300 dark:border-gray-light-700;
+}
+
+.aucctus-border-secondary {
+  @apply border-gray-light-200 dark:border-gray-light-800;
+}
+
+.aucctus-border-tertiary {
+  @apply border-gray-light-100 dark:border-gray-light-800;
+}
+
+/* State-based borders */
+.aucctus-border-disabled {
+  @apply border-gray-light-300 dark:border-gray-light-700;
+
+  &-subtle {
+    @apply border-gray-light-200 dark:border-gray-light-800;
+  }
+}
+
+/* Brand borders */
+.aucctus-border-brand {
+  @apply border-primary-500 dark:border-primary-400;
+
+  &-alt {
+    @apply border-primary-600 dark:border-gray-light-700;
+  }
+
+  &-subtle {
+    @apply border-primary-300 dark:border-primary-400;
+  }
+}
+
+/* Semantic borders */
+.aucctus-border-error {
+  @apply border-error-500 dark:border-error-400;
+
+  &-subtle {
+    @apply border-error-300 dark:border-error-400;
+  }
+}

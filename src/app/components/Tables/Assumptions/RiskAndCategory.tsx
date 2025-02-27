@@ -11,7 +11,8 @@ interface RiskAndCategoryProps {
 // Add a common class for repeated styles
 const commonClassContainer =
   'flex flex-col items-start justify-start gap-2 self-stretch';
-const commonClassSpan = 'self-stretch text-sm font-medium text-slate-500';
+const commonClassSpan =
+  'self-stretch text-sm font-medium aucctus-text-tertiary';
 
 const RiskAndCategory: React.FC<RiskAndCategoryProps> = ({
   category,

@@ -19,8 +19,8 @@ const AssumptionTestBadge: React.FC<AssumptionTestProps> = ({
   return (
     <span
       className={cn(
-        'inline-flex items-center justify-center gap-1.5 text-center font-semibold leading-none text-indigo-900',
-        lg ? 'text-2xl' : 'text-base',
+        'aucctus-text-primary inline-flex items-center justify-center gap-1.5 text-center font-semibold leading-none',
+        lg ? 'aucctus-text-lg' : 'aucctus-text-sm',
       )}
     >
       <Icon

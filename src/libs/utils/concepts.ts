@@ -43,37 +43,42 @@ export type ConceptStatusColor = 'blue' | 'green' | 'purple' | 'pink' | 'red';
 
 export const CONCEPT_STATUS_STYLE_MAP: Record<
   ConceptStatusColor,
-  { bg: string; bullet: string; text: string; stroke: string }
+  { bg: string; bullet: string; text: string; stroke: string; border: string }
 > = {
   blue: {
-    bg: 'bg-[#f8f9fc]',
-    bullet: 'bg-[#4e5ba6]',
-    text: 'text-[#4e5ba6]',
-    stroke: 'stroke-[#4e5ba6]',
+    bg: 'bg-blue-25',
+    bullet: 'bg-blue-800',
+    text: 'text-blue-800',
+    stroke: 'stroke-blue-800',
+    border: 'border-2 border-blue-50',
   },
   green: {
-    bg: 'bg-success-50',
-    bullet: 'bg-success-500',
-    text: 'text-success-500',
-    stroke: 'stroke-success-500',
+    bg: 'bg-success-25',
+    bullet: 'bg-success-700',
+    text: 'text-success-700',
+    stroke: 'stroke-success-700',
+    border: 'border-2 border-success-50',
   },
   purple: {
-    bg: 'bg-primary-50',
-    bullet: 'bg-primary-500',
-    text: 'text-primary-500',
-    stroke: 'stroke-primary-500',
+    bg: 'bg-indigo-25',
+    bullet: 'bg-indigo-800',
+    text: 'text-indigo-800',
+    stroke: 'stroke-indigo-800',
+    border: 'border-2 border-indigo-50',
   },
   pink: {
-    bg: 'bg-[#fdf2fa]',
-    bullet: 'bg-[#ee46bc]',
-    text: 'text-[#ee46bc]',
-    stroke: 'stroke-[#ee46bc]',
+    bg: 'bg-purple-25',
+    bullet: 'bg-purple-800',
+    text: 'text-purple-800',
+    stroke: 'stroke-purple-800',
+    border: 'border-2 border-purple-50',
   },
   red: {
-    bg: 'bg-error-50',
-    bullet: 'bg-error-500',
-    text: 'text-error-500',
-    stroke: 'stroke-error-500',
+    bg: 'bg-error-25',
+    bullet: 'bg-error-800',
+    text: 'text-error-800',
+    stroke: 'stroke-error-800',
+    border: 'border-2 border-error-50',
   },
 };
 
@@ -112,22 +117,20 @@ export function getConceptStatusStyles(status: ConceptStatus) {
   return CONCEPT_STATUS_STYLE_MAP[color];
 }
 
-type AssumptionHexColor = '#7839EE' | '#0E9384' | '#088AB2' | '#155EEF';
-
 /**
  * Returns the active color associated with a given assumption type.
  *
  * @param assumption - The assumption type.
  * @returns The color associated with the active assumption type.
  */
-export function getAssumptionActiveHexColor(
+export function getAssumptionActiveColorClass(
   assumption: AssumptionCategory,
-): AssumptionHexColor {
-  const assumptionColorObj: Record<AssumptionCategory, AssumptionHexColor> = {
-    desirability: '#7839EE',
-    viability: '#0E9384',
-    feasibility: '#088AB2',
-    adaptability: '#155EEF',
+): string {
+  const assumptionColorObj: Record<AssumptionCategory, string> = {
+    desirability: 'bg-purple-100',
+    viability: 'bg-success-100',
+    feasibility: 'bg-indigo-100',
+    adaptability: 'bg-blue-100',
   };
 
   return assumptionColorObj[assumption];

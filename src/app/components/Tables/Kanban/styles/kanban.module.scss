@@ -11,8 +11,8 @@
   box-sizing: border-box;
   overflow-x: scroll;
   gap: 2rem;
-  border: 1px solid $grey-200;
-  background: $white;
+  @apply aucctus-border-primary border #{!important};
+  @apply aucctus-bg-primary;
   box-shadow: $shadow-100;
 
   .column {
@@ -28,15 +28,15 @@
       justify-content: flex-start;
       gap: 0.5rem;
       align-self: stretch;
-      border-bottom: 3px solid $grey-300;
+      @apply aucctus-border-secondary border-b-2;
       .columnHeaderTitle {
-        color: $black;
+        @apply aucctus-text-brand-primary #{!important};
         @include text-large;
         font-family: $font-family;
       }
 
       .columnHeaderCount {
-        color: $blue-600;
+        @apply aucctus-text-primary #{!important};
         font-family: $font-family;
         font-size: 0.8rem;
         font-style: normal;
@@ -47,7 +47,7 @@
   }
 
   p {
-    color: $grey-600;
+    @apply aucctus-text-secondary #{!important};
     font-family: $font-family;
     margin: 0;
     @include text-medium;
@@ -59,12 +59,12 @@
     align-items: center;
     height: 5rem;
     width: 100%;
-    color: $grey-600;
+    @apply aucctus-text-secondary #{!important};
     padding: 2rem;
     box-sizing: border-box;
     border-radius: 0 0 0.75rem 0.75rem;
-    background: $white;
+    @apply aucctus-bg-primary;
     box-shadow: $shadow-100;
-    border-bottom: 1px solid $grey-300;
+    @apply aucctus-border-secondary border-b #{!important};
   }
 }

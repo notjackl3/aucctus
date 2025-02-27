@@ -99,7 +99,7 @@ const AddKeyAssumptionModal: FunctionComponent<
           onSuccess: () => {
             closeModal();
           },
-          onError: (error) => {
+          onError: () => {
             //  TODO: Bring back Error Message Extraction.
           },
         },

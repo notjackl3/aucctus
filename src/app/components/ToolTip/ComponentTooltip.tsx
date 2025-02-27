@@ -27,9 +27,15 @@ const ComponentTooltip: FunctionComponent<ComponentTooltipProps> = ({
     if (childRef.current && tooltipRef.current && isHovered) {
       const childRect = childRef.current.getBoundingClientRect();
       const tooltipRect = tooltipRef.current.getBoundingClientRect();
+      const windowWidth = window.innerWidth;
 
-      const centerX =
-        childRect.left + (childRect.width - tooltipRect.width) / 2;
+      // Calculate the centered position
+      let centerX = childRect.left + (childRect.width - tooltipRect.width) / 2;
+
+      // Ensure tooltip doesn't go off the left side
+      centerX = Math.max(10, centerX);
+      // Ensure tooltip doesn't go off the right side
+      centerX = Math.min(windowWidth - tooltipRect.width - 10, centerX);
 
       const topPositionAbove = childRect.top - tooltipRect.height - 5; // 5px gap
       const topPositionBelow = childRect.bottom + 5; // 5px gap

@@ -21,13 +21,15 @@ const SourceCard: React.FC<SourceCardProps> = ({ source }) => {
   };
 
   return (
-    <div className='flex w-full flex-col gap-2 self-stretch rounded-lg bg-indigo-100 bg-opacity-25 p-2'>
+    <div className='flex w-full flex-col gap-2 self-stretch rounded-lg p-2'>
       <div className='flex'>
         <Badge.SourceInfo source={source} badgeClassName='!border-none' />
         <span className='flex-1'></span>
         {renderLinkButton(source)}
       </div>
-      <div className='text-sm text-gray-500'>{source.description}</div>
+      <div className='aucctus-text-tertiary aucctus-text-sm'>
+        {source.description}
+      </div>
     </div>
   );
 };
@@ -43,9 +45,9 @@ const InsightCard: React.FC<InsightCardProps> = ({
 }) => {
   return (
     <div
-      className={`flex w-full flex-col gap-2 self-stretch rounded-lg border border-gray-200 bg-white p-4 shadow-sm ${cardClassName}`}
+      className={`aucctus-border-secondary aucctus-bg-primary flex w-full flex-col gap-2 self-stretch rounded-lg border p-4 shadow-sm ${cardClassName}`}
     >
-      <div className='text-md mb-4 text-gray-900'>
+      <div className='aucctus-text-primary aucctus-text-md mb-4'>
         <ReactMarkdown>{insight.summary}</ReactMarkdown>
       </div>
       {insight.sources.map((source) => (

@@ -40,6 +40,7 @@ const MarketScanV1: FunctionComponent = () => {
           </div>
           <EditModeSwitcher
             containerClassName={styles.textBlock}
+            pClassName='aucctus-text-tertiary aucctus-text-xl-medium'
             value={trendsAndDriversDescription.value}
             label=''
             name='trendsAndDriversDescription'

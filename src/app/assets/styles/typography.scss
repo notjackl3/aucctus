@@ -1,3 +1,5 @@
+@use './aucctus-theme/typography/text.scss' as *;
+
 $font-family: 'Inter', 'DM Sans', sans-serif;
 
 @mixin heading-100 {
@@ -12,13 +14,6 @@ $font-family: 'Inter', 'DM Sans', sans-serif;
   font-family: $font-family;
   font-weight: 700;
   line-height: 1.75rem;
-}
-
-@mixin heading-300 {
-  font-size: 1rem;
-  font-family: $font-family;
-  font-weight: 500;
-  line-height: 2rem;
 }
 
 @mixin body-100 {

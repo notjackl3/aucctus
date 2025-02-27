@@ -3,6 +3,7 @@ import { FunctionComponent } from 'react';
 import Icon from '../../Icon/Icon/Icon';
 import NestedLink, { NestedLinkProps } from '../NestedLink/NestedLink';
 import styles from './drawer.module.scss';
+import { cn } from '@libs/utils/react';
 
 const defaultIconProps = {
   stroke: '#7586A9',
@@ -17,6 +18,7 @@ interface NavLinkButtonProps {
   locked?: boolean;
   isOpen?: boolean;
   nestedRoutes?: NestedLinkProps[];
+  collapsed?: boolean;
 }
 
 const NavLink: FunctionComponent<NavLinkButtonProps> = ({
@@ -26,6 +28,7 @@ const NavLink: FunctionComponent<NavLinkButtonProps> = ({
   isOpen,
   locked = false,
   nestedRoutes,
+  collapsed = false,
 }) => {
   return (
     <div className={`${styles.navLinkWrapper} ${locked ? styles.locked : ''}`}>
@@ -35,7 +38,17 @@ const NavLink: FunctionComponent<NavLinkButtonProps> = ({
       >
         <div className={styles.label}>
           <Icon variant={icon} {...defaultIconProps} />
-          <span>{title}</span>
+          <span
+            className={cn(
+              'flex items-center justify-center overflow-hidden rounded-full border border-transparent transition-all duration-300',
+              {
+                'w-[0px]': collapsed,
+                'w-[100px]': !collapsed,
+              },
+            )}
+          >
+            {title}
+          </span>
         </div>
 
         {locked ? <Icon variant='lock' {...defaultIconProps} /> : null}

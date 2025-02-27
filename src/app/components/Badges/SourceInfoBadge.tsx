@@ -103,10 +103,10 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
       <div
         onClick={onClick}
         className={cn(
-          'flex items-center gap-2 rounded-full border border-gray-200 p-1',
+          'aucctus-border-primary flex items-center gap-2 rounded-full border p-1',
           badgeClassName,
           onClick &&
-            'cursor-pointer transition-all !duration-200 hover:bg-gray-100',
+            'aucctus-bg-primary-hover cursor-pointer transition-all !duration-200',
         )}
       >
         {renderSourceLogo(source)}
@@ -117,7 +117,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
         </span>
       </div>
       {showPublishedDate && (
-        <span className='items-center whitespace-nowrap text-xs text-gray-500'>
+        <span className='aucctus-text-secondary aucctus-text-xs items-center whitespace-nowrap'>
           {publishedDate}
         </span>
       )}

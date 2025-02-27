@@ -64,7 +64,7 @@ const FinancialDetails: FunctionComponent = () => {
         <Header.Three text='Overview' />
 
         <EditModeSwitcher
-          pClassName='self-stretch text-gray-500 text-base font-normal leading-normal'
+          pClassName='self-stretch aucctus-text-md aucctus-text-tertiary'
           value={overview.value}
           name='overview'
           maxLength={overview.validation.maxLength}
@@ -109,11 +109,11 @@ const FinancialDetails: FunctionComponent = () => {
           />
         </div>
       </section>
-      <section className='inline-flex w-full flex-col items-start justify-start rounded-xl border border-slate-200 bg-white px-8 shadow'>
-        <div className='flex h-16 flex-col items-start justify-start gap-5 self-stretch rounded-t-xl border-b border-gray-300 bg-white'>
+      <section className='aucctus-border-secondary aucctus-bg-primary inline-flex w-full flex-col items-start justify-start rounded-xl border px-8 shadow'>
+        <div className='aucctus-border-primary aucctus-bg-primary flex h-16 flex-col items-start justify-start gap-5 self-stretch rounded-t-xl border-b'>
           <div className=' inline-flex items-start justify-start gap-4 self-stretch px-6 pt-5'>
             <div className='inline-flex shrink grow basis-0 flex-col items-start justify-center gap-1 self-stretch'>
-              <h3 className='self-stretch text-lg font-medium leading-7 text-indigo-900'>
+              <h3 className='aucctus-text-lg aucctus-text-brand-primary self-stretch'>
                 Market Size
               </h3>
             </div>
@@ -123,7 +123,7 @@ const FinancialDetails: FunctionComponent = () => {
         <div className='inline-flex items-start justify-start gap-12 self-stretch py-6'>
           <div className='inline-flex w-96 flex-col items-start justify-start gap-3.5 p-1'>
             <Card.MarketSize
-              bulletColor='bg-violet-300'
+              bulletColor='bg-purple-100'
               title={'Total Addressable Market (TAM)'}
               value={formattedTam}
               descriptor='ARR'
@@ -135,7 +135,7 @@ const FinancialDetails: FunctionComponent = () => {
               )}
             />
             <Card.MarketSize
-              bulletColor='bg-violet-500'
+              bulletColor='bg-indigo-200'
               title={'Serviceable Addressable Market (SAM)'}
               value={formattedSam}
               descriptor='ARR'
@@ -147,7 +147,7 @@ const FinancialDetails: FunctionComponent = () => {
               )}
             />
             <Card.MarketSize
-              bulletColor='bg-indigo-600'
+              bulletColor='bg-indigo-500'
               title={'Serviceable Obtainable Market (SOM)'}
               value={formattedSom}
               descriptor='ARR'

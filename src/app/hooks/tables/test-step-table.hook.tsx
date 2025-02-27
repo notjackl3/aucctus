@@ -25,8 +25,8 @@ export const useTestStepTable = (testUuid: string, steps: ITestStep[] = []) => {
         cell: (info) => (
           <button
             className={cn(
-              'flex h-9 w-9 items-center justify-center rounded-full border border-gray-200 p-1',
-              info.getValue() ? 'bg-green-100' : 'bg-white',
+              'aucctus-border-secondarysecondarysecondarysecondary flex h-9 w-9 items-center justify-center rounded-full border p-1',
+              info.getValue() ? 'bg-green-100' : 'aucctus-bg-primary',
             )}
             onClick={() =>
               updateConceptTestStep({

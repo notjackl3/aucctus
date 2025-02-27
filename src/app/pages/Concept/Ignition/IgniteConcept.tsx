@@ -261,7 +261,8 @@ const IgniteConcept: React.FC = () => {
       if (issueCount > 0) {
         toast('Some fields from your original prompt could not be used', {
           position: 'top-right',
-          className: 'bg-white text-black font-semibold border shadow-lg', // Adds small border, shadow, and semibold black text
+          className:
+            'aucctus-bg-primary text-black font-semibold border shadow-lg', // Adds small border, shadow, and semibold black text
         });
       }
       clear(); // Clear reseed storage after setting answers
@@ -284,10 +285,10 @@ const IgniteConcept: React.FC = () => {
   return (
     <div className='flex flex-col items-center gap-10 self-stretch bg-gray-50 pb-11 pt-8'>
       <section className='flex w-full flex-col content-center items-center self-stretch text-center'>
-        <h1 className='w-96 text-center text-3xl font-bold leading-9 text-indigo-900'>
+        <h1 className='aucctus-text-brand-primary w-96 text-center text-3xl font-bold leading-9'>
           Generate New Ideas
         </h1>
-        <p className='mt-3 w-full text-base font-medium leading-5 text-gray-500 max-md:max-w-full'>
+        <p className='aucctus-text-tertiary mt-3 w-full text-base font-medium leading-5 max-md:max-w-full'>
           Let Aucctus AI ignite your imagination and suggest new ideas to
           transform your business.
         </p>

@@ -81,19 +81,19 @@ const InvestorsList: React.FC<IInvestorListProps> = ({
   );
 
   return (
-    <div className='flex flex-col rounded-xl border border-gray-200 bg-white p-4 pt-8 shadow-sm'>
+    <div className='aucctus-border-secondary aucctus-bg-primary flex flex-col rounded-xl border p-4 pt-8 shadow-sm'>
       <div className='flex flex-row items-center justify-start'>
         <h2 className='pr-2 font-bold leading-[30px] text-[#0C111D]'>
           Investors
         </h2>
         <Badge.Count
           value={sortedInvestors.length}
-          classNameBadge='bg-[#D0D5DD] h-4'
-          classNameLabel='text-[#0C111D] text-sm font-bold'
+          classNameBadge='aucctus-bg-secondary h-4'
+          classNameLabel='aucctus-text-sm-bold aucctus-text-primary'
         />
       </div>
       {sortedInvestors.length > 0 ? (
-        <div className='mt-8 flex overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm'>
+        <div className='aucctus-border-secondary aucctus-bg-primary mt-8 flex overflow-hidden rounded-lg border shadow-sm'>
           <div className='h-full w-80'>
             <nav>
               {sortedInvestors.map((investment) => (
@@ -160,8 +160,8 @@ const InvestorsList: React.FC<IInvestorListProps> = ({
               ))}
             </nav>
           </div>
-          <main className='flex-1 border-l border-gray-200 bg-[#F9FAFB] p-6'>
-            <div className='rounded bg-white p-5 shadow-md'>
+          <main className='aucctus-border-secondary flex-1 border-l bg-[#F9FAFB] p-6'>
+            <div className='aucctus-bg-primary rounded p-5 shadow-md'>
               <div className='direction-row flex gap-6'>
                 <div>
                   <p className='font-inter text-[10px] font-medium text-[#667085]'>
@@ -202,8 +202,8 @@ const InvestorsList: React.FC<IInvestorListProps> = ({
           </main>
         </div>
       ) : (
-        <div className='mt-4 flex flex-col items-center justify-center rounded-xl border border-gray-200 bg-white p-4 shadow-sm'>
-          <div className='text-center text-gray-500'>
+        <div className='aucctus-border-secondary aucctus-bg-primary mt-4 flex flex-col items-center justify-center rounded-xl border p-4 shadow-sm'>
+          <div className='aucctus-text-tertiary text-center'>
             Hmm, our agent’s struggled to find investor details
           </div>
         </div>

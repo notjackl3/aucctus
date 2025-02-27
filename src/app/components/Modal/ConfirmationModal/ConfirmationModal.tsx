@@ -1,7 +1,5 @@
 import { FunctionComponent } from 'react';
 
-import styles from './confirmation-modal.module.scss';
-
 interface IActionButton {
   title: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
@@ -19,7 +17,6 @@ interface IActionButton {
 interface IConfirmationModalProps {
   title: string;
   subtitle?: string;
-
   actions: IActionButton[];
 }
 
@@ -29,16 +26,18 @@ const ConfirmationModal: FunctionComponent<IConfirmationModalProps> = ({
   actions,
 }) => {
   return (
-    <div className={styles.container}>
-      <div className={styles.header}>
-        <h1>{title}</h1>
-        <p>{subtitle}</p>
+    <div className='aucctus-bg-primary flex flex-col gap-4 rounded-lg p-6'>
+      <div className='flex flex-grow flex-col gap-4'>
+        <h1 className='aucctus-text-xl-semibold aucctus-text-primary'>
+          {title}
+        </h1>
+        <p className='aucctus-text-md aucctus-text-secondary'>{subtitle}</p>
       </div>
-      <div className={styles.actions}>
+      <div className='flex flex-row justify-between gap-4 self-stretch'>
         {actions.map((action, index) => (
           <button
             key={`confirmation-button-${index}`}
-            className={`btn btn-${action.variant}`}
+            className={`btn btn-${action.variant} w-1/2`}
             onClick={action.onClick}
           >
             {action.title}

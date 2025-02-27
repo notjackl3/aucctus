@@ -12,7 +12,7 @@ const AssumptionTestingStatusHeader: React.FC<
   return (
     <div
       className={classNames(
-        'text-nowrap text-xs font-medium text-slate-300',
+        'aucctus-text-tertiary aucctus-text-xs text-nowrap',
         className,
       )}
     >

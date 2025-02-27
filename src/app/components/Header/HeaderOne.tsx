@@ -9,7 +9,7 @@ const HeaderOne: React.FC<HeaderProps> = ({ text, className, ...props }) => {
   return (
     <h1
       className={cn(
-        'text-[2rem] font-bold capitalize not-italic text-indigo-900',
+        'aucctus-text-brand-primary text-[2rem] font-bold capitalize not-italic',
         className,
       )}
       {...props}

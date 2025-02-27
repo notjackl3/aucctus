@@ -30,17 +30,17 @@
   @keyframes bouncing {
     0% {
       transform: none;
-      color: var(--primary-600-primary);
+      @apply text-primary-600;
     }
 
     33% {
       transform: translateY(-0.5em);
-      color: var(--gray-600-text-secondary);
+      @apply text-gray-light-400;
     }
 
     66% {
       transform: none;
-      color: $grey-600;
+      @apply text-primary-600;
     }
   }
 }

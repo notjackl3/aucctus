@@ -62,7 +62,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
       <div className={cn('mx-auto max-w-5xl space-y-8', className)}>
         <div className='flex min-h-96 items-center justify-center gap-6 self-stretch text-center align-middle'>
           <section>
-            <div className='self-stretch text-center text-sm font-medium text-gray-500'>
+            <div className='aucctus-text-tertiary self-stretch text-center text-sm font-medium'>
               An Agent is currently analyzing {startup.name}. This may take a
               moment.
             </div>
@@ -79,11 +79,11 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
     <div className={cn('mx-auto max-w-5xl space-y-8', className)}>
       {/* General Information Section */}
       <section>
-        <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
+        <h2 className='aucctus-text-brand-primary aucctus-text-xs-bold mb-4 h-[15px]  w-[176px]'>
           General Information
         </h2>
         <div className='flex justify-between gap-6'>
-          <div className='flex-1 rounded-lg border border-gray-200 bg-white p-6'>
+          <div className='aucctus-border-primary aucctus-bg-primary flex-1 rounded-lg border p-6'>
             {startup.overview && (
               <InfoSection
                 title='Company Overview'
@@ -92,7 +92,6 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
                   startup.overviewEvidence,
                 )}
                 content={startup.overview}
-                contentClassName='text-[14px] font-semibold'
               />
             )}
             {startup.headquarters && (
@@ -118,7 +117,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
           </div>
 
           <div className='flex flex-1 flex-col gap-4'>
-            <div className='flex-1 rounded-lg border border-gray-200 bg-white p-4'>
+            <div className='aucctus-border-primary aucctus-bg-primary flex-1 rounded-lg border p-4'>
               <InfoSection
                 title='Value Proposition'
                 content={startup.valueProposition}
@@ -128,7 +127,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
                 )}
               />
             </div>
-            <div className='flex-1 rounded-lg border border-gray-200 bg-white p-4'>
+            <div className='aucctus-border-primary aucctus-bg-primary flex-1 rounded-lg border p-4'>
               <InfoSection
                 title='Competitive Advantage'
                 content={startup.competitiveAdvantage}
@@ -164,7 +163,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
       {startup.potentialEngagements &&
         startup.potentialEngagements.length > 0 && (
           <section>
-            <h2 className="mb-4 h-[15px] w-[176px] font-['Inter'] text-[12px] font-bold leading-[15px] text-gray-950">
+            <h2 className='aucctus-text-brand-primary aucctus-text-xs-bold mb-4 h-[15px] w-[176px]'>
               Potential Engagement Tactics
             </h2>
 
@@ -172,17 +171,17 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
               {startup.potentialEngagements.map((engagement, index) => (
                 <div
                   key={index}
-                  className='rounded-lg border border-gray-200 bg-white p-4'
+                  className='aucctus-border-primary aucctus-bg-primary rounded-lg border p-4'
                 >
-                  <div className='flex flex-row gap-2'>
-                    <h3 className='text-sm font-medium text-gray-900'>
+                  <div className='flex flex-row items-center gap-2'>
+                    <h3 className='aucctus-text-sm-medium aucctus-text-primary'>
                       {toTitleCase(engagement.action)}
                     </h3>
-                    <span className='!text-gray-900'>
+                    <span className='aucctus-text-brand-primary'>
                       {getEngagementIcon(engagement.action)}
                     </span>
                   </div>
-                  <p className='mt-4 break-words text-sm text-gray-600'>
+                  <p className='aucctus-text-tertiary aucctus-text-sm mt-4 break-words'>
                     {engagement.description}
                   </p>
                 </div>
@@ -197,22 +196,22 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
         <div className='flex flex-row gap-6'>
           {(startup.keyFacts || []).length > 0 && (
             <div className='flex max-w-[400px] flex-col gap-4'>
-              <h3 className='mb-1 text-[12px] font-bold leading-[15px] text-gray-950'>
+              <h3 className='aucctus-text-brand-primary aucctus-text-xs-bold mb-1'>
                 Key Facts
               </h3>
               <ul className='space-y-4'>
                 {(startup.keyFacts || []).map((fact, index) => (
                   <li
                     key={index}
-                    className='flex-1 rounded-lg border border-gray-200 bg-white p-2'
+                    className='aucctus-border-secondary aucctus-bg-primary flex-1 rounded-lg border p-2'
                   >
                     <div className='flex items-center justify-between'>
                       <Text.Collapsible
                         title=''
                         titleClassName='hidden'
                         description={fact.text.trim()}
-                        descriptionClassName="font-['Inter'] text-[12px] font-normal leading-[18px] text-gray-950"
-                        maxDescriptionHeight={75}
+                        descriptionClassName='aucctus-text-primary aucctus-text-sm !text-[12px]'
+                        maxDescriptionHeight={60}
                         truncationClassName='line-clamp-4'
                       />
                       <Button
@@ -232,20 +231,20 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
 
           {startup.keyContacts.length > 0 ? (
             <div className='flex flex-col gap-4'>
-              <h3 className='mb-1 text-[12px] font-bold leading-[15px] text-gray-950'>
+              <h3 className='aucctus-text-brand-primary aucctus-text-xs-bold mb-1'>
                 Key Contacts
               </h3>
               <ul className='space-y-4'>
                 {startup.keyContacts.map((contact, index) => (
                   <li
-                    className='flex items-center justify-between gap-6 rounded-lg border border-gray-200 bg-white p-4'
+                    className='aucctus-border-secondary aucctus-bg-primary flex items-center justify-between gap-6 rounded-lg border p-4'
                     key={index}
                   >
                     <div className='flex flex-col pr-6'>
-                      <span className='font-semibold text-gray-900'>
+                      <span className='aucctus-text-brand-secondary aucctus-text-sm-bold'>
                         {contact.name}
                       </span>
-                      <span className='text-sm text-gray-600'>
+                      <span className='aucctus-text-brand-tertiary aucctus-text-sm'>
                         {contact.title}
                       </span>
                     </div>
@@ -266,8 +265,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
                       >
                         <Icon
                           variant={contact.linkedin ? 'linkedin' : 'mail'}
-                          stroke='#fff'
-                          fill='#fff'
+                          className='fill-primary-100 stroke-primary-100'
                           height={20}
                           width={20}
                         />

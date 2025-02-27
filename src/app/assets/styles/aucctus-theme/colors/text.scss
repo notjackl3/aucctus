@@ -1,0 +1,91 @@
+/* Base text styles */
+.aucctus-text-primary {
+  @apply text-gray-light-900 dark:text-gray-light-50;
+}
+
+.aucctus-text-secondary {
+  @apply text-gray-light-700 dark:text-gray-light-300;
+
+  &-hover {
+    @extend .aucctus-text-secondary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply text-gray-light-800 dark:text-gray-light-200;
+    }
+  }
+}
+
+.aucctus-text-tertiary {
+  @apply text-gray-light-500 dark:text-gray-light-400;
+
+  &-hover {
+    @extend .aucctus-text-tertiary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply text-gray-light-700 dark:text-gray-light-300;
+    }
+  }
+}
+
+.aucctus-text-quaternary {
+  @apply text-gray-light-400 dark:text-gray-light-500;
+
+  &-hover {
+    @extend .aucctus-text-quaternary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply text-gray-light-500 dark:text-gray-light-400;
+    }
+  }
+}
+
+/* Static colors */
+.aucctus-text-white {
+  @apply text-base-white;
+}
+
+/* State-based text */
+.aucctus-text-disabled {
+  @apply text-gray-light-500 dark:text-gray-light-500;
+}
+
+.aucctus-text-placeholder {
+  @apply text-gray-light-500 dark:text-gray-light-400;
+
+  &-subtle {
+    @apply text-gray-light-300 dark:text-gray-light-700;
+  }
+}
+
+/* Brand text */
+.aucctus-text-brand-primary {
+  @apply text-primary-900 dark:text-primary-50;
+}
+
+.aucctus-text-brand-secondary {
+  @apply text-primary-700 dark:text-primary-300;
+}
+
+.aucctus-text-brand-tertiary {
+  @apply text-primary-600 dark:text-primary-400;
+
+  &-alt {
+    @apply text-primary-600 dark:text-primary-50;
+  }
+}
+
+/* Semantic colors */
+.aucctus-text-error-primary {
+  @apply text-error-600 dark:text-error-400;
+}
+
+.aucctus-text-warning-primary {
+  @apply text-warning-600 dark:text-warning-400;
+}
+
+.aucctus-text-success-primary {
+  @apply text-success-600 dark:text-success-400;
+}

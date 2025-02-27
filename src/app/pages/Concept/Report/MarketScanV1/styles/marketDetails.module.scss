@@ -12,12 +12,12 @@
   width: 100%;
 
   h2 {
-    color: $blue-900;
+    @apply aucctus-text-primary #{!important};
     @include heading-200;
   }
 
   p {
-    color: $grey-600;
+    @apply aucctus-text-secondary #{!important};
     font-family: $font-family;
     margin: 0;
     @include text-medium;
@@ -66,7 +66,7 @@
       width: 100%;
       // max-width: 70rem;
       h4 {
-        color: $blue-900;
+        @apply aucctus-text-primary #{!important};
         @include text-large;
         font-family: $font-family;
       }
@@ -85,7 +85,7 @@
       box-sizing: border-box;
       align-items: flex-start;
       justify-content: space-between;
-      color: $blue-900;
+      @apply aucctus-text-primary #{!important};
 
       cursor: url('~pencil.png'), pointer;
 
@@ -96,7 +96,7 @@
       .cardBoldText {
         margin-top: 1rem;
         margin-bottom: 0.5rem;
-        color: $blue-900;
+        @apply aucctus-text-primary #{!important};
         @include text-medium;
         font-family: $font-family;
         font-weight: 700;
@@ -105,7 +105,7 @@
       .cardRegularText {
         @include text-small;
         font-family: $font-family;
-        color: $grey-600;
+        @apply aucctus-text-secondary #{!important};
       }
     }
 
@@ -124,8 +124,8 @@
         box-sizing: border-box;
         align-items: center;
         justify-content: space-between;
-        color: $blue-900;
-        border-bottom: 1px solid $grey-300;
+        @apply aucctus-text-primary #{!important};
+        @apply aucctus-border-secondary border-b;
 
         cursor: pointer;
 
@@ -145,12 +145,12 @@
           flex: 1;
           flex-direction: column;
           .cardDescriptionTitle {
-            color: $blue-900;
+            @apply aucctus-text-primary #{!important};
             @include text-medium;
             font-family: $font-family;
           }
           .cardDescriptionText {
-            color: $grey-600;
+            @apply aucctus-text-secondary #{!important};
             overflow: hidden;
             @include text-x-small;
             font-family: $font-family;
@@ -180,7 +180,7 @@
     display: inline;
     a {
       @include text-x-small;
-      color: $grey-600 !important;
+      @apply aucctus-text-secondary #{!important};
     }
   }
 }

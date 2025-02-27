@@ -61,9 +61,11 @@ const SignUp: FunctionComponent = () => {
 
   return (
     <>
-      <div className={styles.header}>
-        <span className={styles.title}>Sign Up</span>
-        <span className={styles.supportingText}>
+      <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
+        <span className='aucctus-header-md-medium aucctus-text-brand-primary relative self-stretch'>
+          Sign Up
+        </span>
+        <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
           Start your 30-day free trial
         </span>
         {error && (
@@ -140,8 +142,13 @@ const SignUp: FunctionComponent = () => {
         </button>
 
         <div className={styles.signUp}>
-          <span>Already have an account?</span>
-          <Link className={`${styles.link} btn btn-link`} to={AppPath.Login}>
+          <span className='aucctus-text-tertiary aucctus-text-md'>
+            Already have an account?
+          </span>
+          <Link
+            className='aucctus-text-sm-medium btn btn-link !text-gray-light-700 hover:!text-primary-900'
+            to={AppPath.Login}
+          >
             Sign In
           </Link>
         </div>

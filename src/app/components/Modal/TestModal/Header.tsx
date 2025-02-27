@@ -25,8 +25,8 @@ interface HeaderProps {
 const defaultProps = {
   testDate: {
     container: 'inline-flex flex-col items-start justify-start gap-1',
-    label: 'self-stretch text-sm font-medium text-slate-500',
-    value: 'text-base font-semibold text-gray-500',
+    label: 'self-stretch text-sm font-medium aucctus-text-tertiary',
+    value: 'text-base font-semibold aucctus-text-tertiary',
   },
 };
 
@@ -42,7 +42,7 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
   costEstimate,
 }) => {
   return (
-    <div className='flex flex-row items-start justify-start gap-8 border-b border-gray-200 px-8 pb-4'>
+    <div className='aucctus-border-secondary flex flex-row items-start justify-start gap-8 border-b px-8 pb-4'>
       <div className='flex max-w-lg flex-col items-start justify-start gap-2 from-white'>
         {/* Test Type */}
         <div className='w-64'>
@@ -52,9 +52,9 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
         {/* Test Description */}
         <Text.Collapsible
           title='Test Description'
-          titleClassName='self-stretch text-base font-medium text-slate-500'
+          titleClassName='self-stretch text-base font-medium aucctus-text-tertiary'
           description={testDescription}
-          descriptionClassName='text-xs font-semibold text-gray-500'
+          descriptionClassName='text-xs font-semibold aucctus-text-tertiary'
           maxDescriptionHeight={45}
         />
       </div>
@@ -78,7 +78,7 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
         </div>
         {/* Cost Estimate */}
         <div className='inline-flex flex-col items-start justify-center gap-1 self-stretch'>
-          <div className='self-stretch text-base font-medium text-slate-500'>
+          <div className='aucctus-text-tertiary self-stretch text-base font-medium'>
             Cost Estimate
           </div>
           <Badge.CostEstimate costEstimate={costEstimate} />
@@ -104,11 +104,11 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
 
         {/* Summary of Findings */}
         <div className='inline-flex w-[292px] flex-col items-start justify-start gap-1'>
-          <div className='self-stretch text-base font-medium text-slate-500'>
+          <div className='aucctus-text-tertiary self-stretch text-base font-medium'>
             Summary of Findings
           </div>
           <div className='inline-flex items-center justify-center gap-2.5 self-stretch'>
-            <div className='shrink grow basis-0 text-xs font-semibold text-gray-500'>
+            <div className='aucctus-text-tertiary shrink grow basis-0 text-xs font-semibold'>
               {findingsSummary || '--'}
             </div>
           </div>

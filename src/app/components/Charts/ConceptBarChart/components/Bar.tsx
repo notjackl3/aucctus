@@ -10,7 +10,7 @@ export interface IChartBarProps {
   y: number;
   value: number;
   label: string;
-  color: string;
+  barColorClass: string;
 }
 
 const defaultLineProps = {
@@ -25,7 +25,7 @@ const ChartBar: FunctionComponent<IChartBarProps> = ({
   y,
   value,
   label,
-  color,
+  barColorClass,
 }) => {
   return (
     <svg
@@ -40,7 +40,13 @@ const ChartBar: FunctionComponent<IChartBarProps> = ({
       <text className={styles.subLabel} x={'50%'} y={70} textAnchor='middle'>
         {label}
       </text>
-      <rect y={y} x={0} width={width} height={height} fill={color} />
+      <rect
+        y={y}
+        x={0}
+        width={width}
+        height={height}
+        className={barColorClass}
+      />
       <line
         x1={width}
         y1={chartHeight}

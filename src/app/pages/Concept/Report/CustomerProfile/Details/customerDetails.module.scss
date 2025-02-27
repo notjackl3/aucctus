@@ -12,12 +12,12 @@
   width: 100%;
 
   h2 {
-    color: $blue-900;
+    @apply aucctus-text-primary #{!important};
     @include heading-200;
   }
 
   p {
-    color: $grey-600;
+    @apply aucctus-text-secondary #{!important};
     font-family: $font-family;
     margin: 0;
     @include text-medium;
@@ -48,7 +48,7 @@
       align-items: flex-start;
 
       .description {
-        color: $blue-900;
+        @apply aucctus-text-secondary;
         font-family: $font-family;
         font-size: 1.125rem;
         font-weight: 400;
@@ -56,7 +56,7 @@
       }
 
       .name {
-        color: $blue-900;
+        @apply aucctus-text-primary;
         @include heading-100;
       }
     }

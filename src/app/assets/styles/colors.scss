@@ -1,72 +1,120 @@
-// White & Black
-$white: #ffffff !default;
-$black: #000000 !default;
+@use './aucctus-theme/colors/text.scss' as *;
+@use './aucctus-theme/colors/background.scss' as *;
+@use './aucctus-theme/colors/border.scss' as *;
 
-$grey-blue-50: #f8f9fc !default;
-$grey-blue-500: #4e5ba6 !default;
-$grey-blue-700: #363f72 !default;
+/* Primary foreground styles */
+.aucctus-fill-primary {
+  @apply fill-gray-light-900 dark:fill-white;
+}
 
-// Greys
-$grey-50: #fcfcfd;
-$grey-200-outline: #e0e5f2 !default;
-$grey-100: #f2f4f7 !default;
-$grey-200: #f9fafb !default;
-$grey-300: #dfe3e8 !default;
-$grey-400: #b0b8c1 !default;
-$grey-500: #7586a9 !default;
-$grey-600: #667085 !default;
-$grey-800: #626ba3 !default;
-$grey-800: #344054 !default;
-$grey-900: #101828 !default;
-$grey-900-text-primary: #2b3674 !default;
+.aucctus-fill-secondary {
+  @apply fill-gray-light-700 dark:fill-gray-light-300;
 
-// Reds
-$red-50: #fef3f2 !default;
-$red-300: #ec5e57 !default;
-$red-500: #f04438 !default;
-$red-700: #b42318 !default;
+  &-hover {
+    @extend .aucctus-fill-secondary;
+    @apply transition-colors duration-300;
 
-// Pink
-$pink-50: #fdf2fa !default;
-$pink-500: #ee46bc !default;
-$pink-700: #c11574 !default;
+    &:hover {
+      @apply fill-gray-light-800 dark:fill-gray-light-200;
+    }
+  }
+}
 
-// Greens
-$green-50: #ecfdf3 !default; // similar to $success-green-50
-$success-green-50: #ecfdf3 !default; // duplicate with $green-50
-$green-500: #12b76a !default;
-$success-green-500: #17b26a !default; // similar to $green-500
-$green-700: #027a48 !default; // similar to $success-green-700
-$success-green-700: #027a48 !default; // duplicate with $green-700
+.aucctus-fill-tertiary {
+  @apply fill-gray-light-600 dark:fill-gray-light-400;
 
-// Blues
-$blue-600: #4318ff !default; // similar to $primary-600-primary
-$blue-900: #2b3674 !default; // similar to $grey-900-text-primary
+  &-hover {
+    @extend .aucctus-fill-tertiary;
+    @apply transition-colors duration-300;
 
-// Teals
-$teal-50: #f0fdf9 !default;
-$teal-100: #ccfbef !default;
-$teal-200: #99f6e0 !default;
-$teal-300: #5fe9d0 !default;
-$teal-400: #2ed3b7 !default;
-$teal-500: #15b79e !default;
-$teal-600: #0e9384 !default;
+    &:hover {
+      @apply fill-gray-light-700 dark:fill-gray-light-300;
+    }
+  }
+}
 
-// Oranges
-$warning-orange-50: #fffdeb !default;
-$warning-orange-500: #f79009 !default;
-$warning-orange-700: #b54708 !default;
+.aucctus-fill-quaternary {
+  @apply fill-gray-light-500 dark:fill-gray-light-400;
 
-// Purples
-$primary-50: #f4f3ff !default;
-$primary-100: #dee7fc !default; // duplicate with $primary-100
-$primary-200: #c7d6fa !default;
-$primary-250: #c9bdff !default;
-$primary-300: #9eb5fa !default;
-$primary-400: #868ff9 !default;
-$primary-450: #937bff !default;
-$primary-500: #615eed !default;
-$primary-600: #4318ff !default; // duplicate with $blue-600
+  &-hover {
+    @extend .aucctus-fill-quaternary;
+    @apply transition-colors duration-300;
 
-// Color Honeydew
-$color-honeydew-100: #d1fadf !default;
+    &:hover {
+      @apply fill-gray-light-600 dark:fill-gray-light-300;
+    }
+  }
+}
+
+.aucctus-fill-quinary {
+  @apply fill-gray-light-400 dark:fill-gray-light-500;
+
+  &-hover {
+    @extend .aucctus-fill-quinary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply fill-gray-light-500 dark:fill-gray-light-400;
+    }
+  }
+}
+
+.aucctus-fill-senary {
+  @apply fill-gray-light-300 dark:fill-gray-light-600;
+}
+
+/* Static foreground */
+.aucctus-fill-white {
+  @apply fill-base-white;
+}
+
+/* Disabled states */
+.aucctus-fill-disabled {
+  @apply fill-gray-light-400 dark:fill-gray-light-500;
+
+  &-subtle {
+    @apply fill-gray-light-300 dark:fill-gray-light-600;
+  }
+}
+
+/* Brand foregrounds */
+.aucctus-fill-brand-primary {
+  @apply fill-primary-600 dark:fill-primary-500;
+
+  &-alt {
+    @apply fill-primary-600 dark:fill-gray-light-300;
+  }
+}
+
+.aucctus-fill-brand-secondary {
+  @apply fill-primary-500;
+}
+
+.aucctus-fill-brand-tertiary {
+  @apply fill-primary-200;
+}
+
+/* Semantic foregrounds */
+.aucctus-fill-error-primary {
+  @apply fill-error-600 dark:fill-error-500;
+}
+
+.aucctus-fill-error-secondary {
+  @apply fill-error-500 dark:fill-error-400;
+}
+
+.aucctus-fill-warning-primary {
+  @apply fill-warning-600 dark:fill-warning-500;
+}
+
+.aucctus-fill-warning-secondary {
+  @apply fill-warning-500 dark:fill-warning-400;
+}
+
+.aucctus-fill-success-primary {
+  @apply fill-success-600 dark:fill-success-500;
+}
+
+.aucctus-fill-success-secondary {
+  @apply fill-success-500 dark:fill-success-400;
+}

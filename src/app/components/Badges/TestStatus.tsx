@@ -13,10 +13,10 @@ const TestStatusBadge: React.FC<TestStatusProps> = ({ status }) => {
   return (
     <span
       className={classNames(
-        'flex h-[20px] w-[20px] items-center justify-center rounded-full bg-white align-middle',
+        'aucctus-bg-primary flex h-[20px] w-[20px] items-center justify-center rounded-full align-middle',
         {
           border: isBlank,
-          'border-gray-300': isBlank,
+          'aucctus-border-primary': isBlank,
         },
         style,
       )}

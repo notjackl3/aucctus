@@ -58,10 +58,10 @@ const MarketLegendItem: FunctionComponent<MarketLegendItemProps> = ({
           className={`h-4 w-4 ${METRIC_TYPE_COLOR_MAP[metricType]} rounded-full`}
         ></div>
       </div>
-      <div className='shrink grow basis-0 text-xs font-medium leading-none text-indigo-900'>
+      <div className='aucctus-text-brand-primary shrink grow basis-0 text-xs font-medium leading-none'>
         {title}
       </div>
-      <div className='text-xs font-medium leading-none text-indigo-900'>
+      <div className='aucctus-text-brand-primary text-xs font-medium leading-none'>
         {value}
       </div>
     </div>

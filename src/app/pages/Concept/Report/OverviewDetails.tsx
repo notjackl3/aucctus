@@ -30,7 +30,7 @@ const OverviewDetails: FunctionComponent = () => {
           <div className='inline-flex flex-col items-start justify-start gap-5'>
             <Header.Three text='Value Proposition' />
             <Text.EditModeSwitcher
-              pClassName='text-gray-500 text-2xl font-medium'
+              pClassName='aucctus-text-tertiary aucctus-text-xl-medium'
               value={valueProposition.value}
               label=''
               name='valueProposition'
@@ -45,7 +45,7 @@ const OverviewDetails: FunctionComponent = () => {
             <div className='inline-flex flex-col items-start justify-start gap-5'>
               <Header.Three text='Problem Statement' />
               <Text.EditModeSwitcher
-                pClassName='text-gray-500 text-2xl font-medium'
+                pClassName='aucctus-text-tertiary aucctus-text-xl-medium'
                 value={problemStatement.value}
                 label=''
                 name='description'
@@ -63,7 +63,7 @@ const OverviewDetails: FunctionComponent = () => {
           <div className='inline-flex flex-col items-start justify-start gap-5'>
             <Header.Three text='Overview' />
             <Text.EditModeSwitcher
-              pClassName='self-stretch text-gray-500 text-base font-normal leading-normal'
+              pClassName='self-stretch aucctus-text-tertiary aucctus-text-md'
               value={descriptionEdit.value}
               label=''
               name='description'

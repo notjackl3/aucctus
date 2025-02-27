@@ -51,7 +51,7 @@ const TestModal: React.FC<TestModalProps> = ({
   return (
     <div className='flex max-w-[1100px] flex-col gap-4'>
       <div className='flex flex-row justify-between px-8 pt-8'>
-        <div className='text-xs font-medium text-gray-500'>
+        <div className='aucctus-text-tertiary text-xs font-medium'>
           ID: {identifier}
         </div>
         <Button color='light' noBorder size='sm' onClick={closeModal}>
@@ -92,7 +92,7 @@ const TestModal: React.FC<TestModalProps> = ({
               <Table
                 table={assumptionsToTestTable}
                 headerProps={{
-                  className: 'text-sm text-slate-500',
+                  className: 'text-sm aucctus-text-tertiary',
                 }}
               />
             </Container.Collapsible>
@@ -109,7 +109,7 @@ const TestModal: React.FC<TestModalProps> = ({
               <Table
                 table={testStepsTable}
                 headerProps={{
-                  className: 'text-sm text-slate-500',
+                  className: 'text-sm aucctus-text-tertiary',
                 }}
               />
             </Container.Collapsible>
@@ -127,7 +127,7 @@ const TestModal: React.FC<TestModalProps> = ({
                 table={findingsAndResultsTable}
                 emptyTableText='Coming Soon'
                 headerProps={{
-                  className: 'text-sm text-slate-500',
+                  className: 'text-sm aucctus-text-tertiary',
                 }}
               />
             </Container.Collapsible>
@@ -147,7 +147,7 @@ const SectionButton: React.FC<{
 }> = ({ text, isOpen, setIsOpen }) => {
   return (
     <button
-      className='flex flex-row items-center gap-2 border-b border-gray-200 px-8 pb-4'
+      className='aucctus-border-secondarysecondary flex flex-row items-center gap-2 border-b px-8 pb-4'
       onClick={() => setIsOpen(!isOpen)}
     >
       <Header.Two text={text} className='text-xl' />

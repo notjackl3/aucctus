@@ -8,7 +8,7 @@ const HeaderThree: React.FC<HeaderProps> = ({ text, className, ...props }) => {
   return (
     <h3
       className={cn(
-        'text-base font-medium leading-normal text-indigo-900',
+        'aucctus-text-primary text-base font-medium leading-normal',
         className,
       )}
       {...props}

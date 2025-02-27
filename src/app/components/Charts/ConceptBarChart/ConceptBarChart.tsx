@@ -7,11 +7,11 @@ import ChartLongArrow from './components/ChartLongArrow';
 import ChartShortArrows from './components/ChartShortArrows';
 import styles from './styles/conceptBarChart.module.scss';
 
-const BAR_COLOR: Record<ActiveConceptStatus, string> = {
-  prototyping: '#B9E6FE',
-  proofOfConcept: '#84ADFF',
-  minimumViableProduct: '#A4BCFD',
-  commercialized: '#C3B5FD',
+const BAR_COLOR_CLASS: Record<ActiveConceptStatus, string> = {
+  prototyping: 'fill-blue-100',
+  proofOfConcept: 'fill-blue-500 opacity-50',
+  minimumViableProduct: 'fill-indigo-300',
+  commercialized: 'fill-purple-300',
 };
 
 export interface IConceptBarChartProps {
@@ -75,7 +75,7 @@ const ConceptBarChart: FunctionComponent<IConceptBarChartProps> = ({
                   y={y}
                   value={data[status]}
                   label={utils.string.camelCaseToTitleCase(status)}
-                  color={BAR_COLOR[status]}
+                  barColorClass={BAR_COLOR_CLASS[status]}
                 />
               );
             })

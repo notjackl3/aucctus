@@ -42,22 +42,19 @@ const MarketChart: FunctionComponent<MarketChartProps> = ({
       className={classname('flex', className)}
     >
       <circle
-        className='fill-primary-250'
-        fill='#c9bdff'
+        className='fill-purple-100'
         cx={LARGE_RADIUS}
         cy={LARGE_RADIUS}
         r={LARGE_RADIUS}
       ></circle>
       <circle
-        className='fill-primary-450'
-        fill='#937bff'
+        className='fill-indigo-200'
         cx={LARGE_RADIUS}
         cy={mediumCenter}
         r={mediumRadius}
       ></circle>
       <circle
-        className='fill-primary-600'
-        fill=''
+        className='fill-indigo-500'
         cx={LARGE_RADIUS}
         cy={smallCenter}
         r={smallRadius}

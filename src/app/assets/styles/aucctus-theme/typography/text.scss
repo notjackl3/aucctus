@@ -1,0 +1,188 @@
+/* Header Text Styles */
+.aucctus-header-2xl {
+  @apply text-[4.5rem] font-normal leading-[5.625rem] tracking-[-0.02em];
+
+  &-medium {
+    @extend .aucctus-header-2xl;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-header-2xl;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-header-2xl;
+    @apply font-bold;
+  }
+}
+
+.aucctus-header-xl {
+  @apply text-[3.75rem] font-normal leading-[4.5rem] tracking-[-0.02em];
+
+  &-medium {
+    @extend .aucctus-header-xl;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-header-xl;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-header-xl;
+    @apply font-bold;
+  }
+}
+
+.aucctus-header-lg {
+  @apply text-[3rem] font-normal leading-[3.75rem] tracking-[-0.02em];
+
+  &-medium {
+    @extend .aucctus-header-lg;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-header-lg;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-header-lg;
+    @apply font-bold;
+  }
+}
+
+.aucctus-header-md {
+  @apply text-[2.25rem] font-normal leading-[2.75rem] tracking-[-0.02em];
+
+  &-medium {
+    @extend .aucctus-header-md;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-header-md;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-header-md;
+    @apply font-bold;
+  }
+}
+
+.aucctus-header-sm {
+  @apply text-[1.875rem] font-normal leading-[2.375rem];
+
+  &-medium {
+    @extend .aucctus-header-sm;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-header-sm;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-header-sm;
+    @apply font-bold;
+  }
+}
+
+.aucctus-header-xs {
+  @apply text-[1.5rem] font-normal leading-[2rem];
+
+  &-medium {
+    @extend .aucctus-header-xs;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-header-xs;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-header-xs;
+    @apply font-bold;
+  }
+}
+
+/* Text Styles */
+.aucctus-text-xl {
+  @apply text-[1.25rem] font-normal leading-[1.875rem];
+
+  &-medium {
+    @extend .aucctus-text-xl;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-text-xl;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-text-xl;
+    @apply font-bold;
+  }
+}
+
+.aucctus-text-lg {
+  @apply text-[1.125rem] font-normal leading-[1.75rem];
+
+  &-medium {
+    @extend .aucctus-text-lg;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-text-lg;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-text-lg;
+    @apply font-bold;
+  }
+}
+
+.aucctus-text-md {
+  @apply text-[1rem] font-normal leading-[1.5rem];
+
+  &-medium {
+    @extend .aucctus-text-md;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-text-md;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-text-md;
+    @apply font-bold;
+  }
+}
+
+.aucctus-text-sm {
+  @apply text-[0.875rem] font-normal leading-[1.25rem];
+
+  &-medium {
+    @extend .aucctus-text-sm;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-text-sm;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-text-sm;
+    @apply font-bold;
+  }
+}
+
+.aucctus-text-xs {
+  @apply text-[0.75rem] font-normal leading-[1.125rem];
+
+  &-medium {
+    @extend .aucctus-text-xs;
+    @apply font-medium;
+  }
+  &-semibold {
+    @extend .aucctus-text-xs;
+    @apply font-semibold;
+  }
+  &-bold {
+    @extend .aucctus-text-xs;
+    @apply font-bold;
+  }
+}

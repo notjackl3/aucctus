@@ -5,9 +5,9 @@ import styles from './drawer.module.scss';
 import { Button } from '@components';
 import Icon from '../../Icon/Icon/Icon';
 import NestedLink, { NestedLinkProps } from '../NestedLink/NestedLink';
+import { cn } from '@libs/utils/react';
 
 const defaultIconProps = {
-  stroke: '#7586A9',
   width: 24,
   height: 24,
 };
@@ -19,6 +19,7 @@ interface NavLinkProps {
   locked?: boolean;
   openBasePath?: string;
   nestedRoutes?: NestedLinkProps[];
+  collapsed?: boolean;
 }
 
 const NavLink: FunctionComponent<NavLinkProps> = ({
@@ -28,6 +29,7 @@ const NavLink: FunctionComponent<NavLinkProps> = ({
   locked = false,
   openBasePath,
   nestedRoutes,
+  collapsed = false,
 }) => {
   const location = useLocation();
   const toPath = useMemo(
@@ -44,14 +46,30 @@ const NavLink: FunctionComponent<NavLinkProps> = ({
   const isActive = match?.pathname === location.pathname || isOpen;
 
   return (
-    <div className={`${styles.navLinkWrapper} ${locked ? styles.locked : ''}`}>
+    <div
+      className={cn(styles.navLinkWrapper, {
+        [styles.locked]: locked,
+      })}
+    >
       <Link
         to={!locked ? to : '#!'}
-        className={`${styles.navLink} ${isActive ? styles.active : ''}`}
+        className={cn(styles.navLink, {
+          [styles.active]: isActive,
+        })}
       >
         <div className={styles.label}>
           <Icon variant={icon} {...defaultIconProps} />
-          <span>{title}</span>
+          <span
+            className={cn(
+              'flex items-center justify-center overflow-hidden rounded-full border border-transparent transition-all duration-300',
+              {
+                'w-[0px]': collapsed,
+                'w-[100px]': !collapsed,
+              },
+            )}
+          >
+            {title}
+          </span>
         </div>
 
         {locked ? <Icon variant='lock' {...defaultIconProps} /> : null}

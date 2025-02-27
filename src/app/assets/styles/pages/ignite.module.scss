@@ -57,7 +57,7 @@
           line-height: 2.375rem; /* 126.667% */
         }
         .subtitle {
-          color: $grey-600;
+          @apply aucctus-text-secondary #{!important};
 
           /* B1 */
           font-size: 0.875rem;

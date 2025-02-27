@@ -24,8 +24,12 @@ const renderSourceHeader = (source: ISource) => (
 
 const renderSourceContent = (source: ISource) => (
   <div className='mx-2 mb-2 flex flex-col gap-4 px-2 pb-2'>
-    <div className='text-md text-gray-900'>{source.title}</div>
-    <div className='text-sm text-gray-500'>{source.description}</div>
+    <div className='aucctus-text-brand-primary aucctus-text-md-medium'>
+      {source.title}
+    </div>
+    <div className='aucctus-text-secondary aucctus-text-sm'>
+      {source.description}
+    </div>
   </div>
 );
 
@@ -37,7 +41,7 @@ const renderSourceCard = (
   return (
     <div className='flex max-w-[500px] flex-col' onClick={onClick}>
       <Card.Detail
-        key={`${source.url}-${Math.random()}`}
+        key={`${source.uuid}`}
         cardClassName={cn('w-full', cardClassName)}
         headerClassName='border-none !px-2'
         title={''}
@@ -70,7 +74,7 @@ const SourceBadges: FunctionComponent<SourceBadgesProps> = ({ sources }) => {
         >
           <Badge.SourceInfo
             badgeSize='small'
-            badgeClassName='!text-gray-800 whitespace-nowrap'
+            badgeClassName='aucctus-text-primary whitespace-nowrap'
             source={source}
             key={source.url + Math.random()}
             onClick={() => window.open(source.url, '_blank')}
@@ -164,7 +168,7 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
           {sources.map((source) =>
             renderSourceCard(
               source,
-              'cursor-pointer hover:bg-gray-100 active:bg-gray-200 !border-none !shadow-none !rounded-none',
+              'cursor-pointer aucctus-bg-primary-hover !border-none !shadow-none !rounded-none',
               () => window.open(source.url, '_blank'),
             ),
           )}

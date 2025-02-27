@@ -20,8 +20,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
       className={cn(
         'group flex cursor-pointer flex-col items-start gap-3 rounded-lg p-4',
         {
-          'bg-gray-100': isSelected,
-          'hover:bg-gray-50': !isSelected,
+          'aucctus-bg-tertiary': isSelected,
+          'aucctus-bg-primary-hover': !isSelected,
         },
       )}
       onClick={onClick}
@@ -44,7 +44,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
         </div>
         {incumbent.domain && (
           <Button
-            color='light'
+            color='secondary'
             noBorder
             size='sm'
             onClick={(e) => {
@@ -52,23 +52,24 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
               window.open(incumbent.domain, '_blank');
             }}
           >
-            <Icon variant='link' height='12' width='12' stroke='#2B3674' />
+            <Icon variant='link' height='12' width='12' />
           </Button>
         )}
       </div>
-      <p className='line-clamp-3 text-[12px] font-normal leading-[18px] text-[#0C111D]'>
+      <p className='aucctus-text-xs aucctus-text-secondary line-clamp-3'>
         {incumbent.overview}
       </p>
       {/* TODO: Replace */}
       <Badge.Default
-        classNameBadge={
-          incumbent.hasCompetitiveProduct ? 'bg-primary-50' : 'bg-[#fdf2fa]'
-        }
-        classNameLabel={
-          incumbent.hasCompetitiveProduct
-            ? 'text-primary-500'
-            : 'text-[#ee46bc]'
-        }
+        classNameBadge={cn('aucctus-bg-secondary', {
+          'aucctus-bg-warning-primary': incumbent.hasCompetitiveProduct,
+          'aucctus-bg-opacity-75': incumbent.hasCompetitiveProduct,
+          'aucctus-bg-secondary': !incumbent.hasCompetitiveProduct,
+        })}
+        classNameLabel={cn({
+          'aucctus-text-primary': !incumbent.hasCompetitiveProduct,
+          'aucctus-text-warning-primary': incumbent.hasCompetitiveProduct,
+        })}
         value={
           incumbent.hasCompetitiveProduct
             ? 'Competitive Product'

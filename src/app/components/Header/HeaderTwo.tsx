@@ -8,7 +8,7 @@ const Two: React.FC<TwoProps> = ({ text, className, ...props }) => {
   return (
     <h2
       className={cn(
-        'text-2xl font-semibold capitalize not-italic text-indigo-900',
+        'aucctus-text-brand-primary text-2xl font-semibold capitalize not-italic',
         className,
       )}
       {...props}

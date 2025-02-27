@@ -17,17 +17,21 @@ const AssumptionOverview: React.FC<AssumptionOverviewProps> = ({
   return (
     <div
       className={cn(
-        'inline-flex h-32 min-w-fit flex-col items-start justify-start gap-3 rounded-lg border border-gray-200 bg-white px-4 py-4',
+        'aucctus-border-secondary aucctus-bg-primary inline-flex h-32 min-w-fit flex-col items-start justify-start gap-3 rounded-lg border px-4 py-4',
       )}
     >
-      <div className={cn('self-stretch text-sm font-medium text-slate-500')}>
+      <div
+        className={cn(
+          'aucctus-text-tertiary aucctus-text-sm self-stretch text-sm',
+        )}
+      >
         {header}
       </div>
 
       <div
         {...bodyProps}
         className={cn(
-          'font-base self-stretch text-xl text-indigo-900',
+          'font-base aucctus-text-primary aucctus-text-lg self-stretch',
           bodyProps?.className,
         )}
       >
@@ -35,7 +39,9 @@ const AssumptionOverview: React.FC<AssumptionOverviewProps> = ({
       </div>
       {footer && (
         <div
-          className={cn('self-stretch text-sm font-semibold text-slate-500')}
+          className={cn(
+            'aucctus-text-primary aucctus-text-sm-semibold self-stretch',
+          )}
         >
           {footer}
         </div>

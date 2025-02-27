@@ -54,7 +54,7 @@ const ConclusionVisualization: React.FC<IConclusionVisualizationProps> = ({
       <Container.TabView
         variant='button-separated'
         className='flex flex-1 flex-col px-4'
-        tabClassName='flex-1 px-4 py-2 rounded-lg text-center hover:bg-gray-50 border-b-2 border-transparent hover:border-gray-200 transition-colors flex items-center justify-center'
+        tabClassName='flex-1 px-4 py-2 rounded-lg text-center aucctus-bg-primary-hover hover:border-b-2 hover:aucctus-border-primary transition-colors flex items-center justify-center'
         tabs={VISUALIZATION_TABS}
         onTabSelect={(tab) => setActiveTab(tab as TabTitles)}
         activeTab={activeTab}

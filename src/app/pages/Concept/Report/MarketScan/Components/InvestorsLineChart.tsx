@@ -261,7 +261,12 @@ const InvestorsLineChart: React.FC<InvestorsLineChartProps> = ({
         })}
 
         {/* Line Path */}
-        <path d={pathD} fill='none' stroke='#4318FF' strokeWidth={2} />
+        <path
+          d={pathD}
+          fill='none'
+          className='stroke-indigo-600'
+          strokeWidth={2}
+        />
 
         {/* Points */}
         {points.map((pt, i) => {
@@ -283,7 +288,7 @@ const InvestorsLineChart: React.FC<InvestorsLineChartProps> = ({
                 cx={pt.x}
                 cy={pt.y}
                 r={9}
-                fill={isSelected ? '#4318FF' : '#9EB5FA'}
+                className={isSelected ? 'fill-indigo-600' : 'fill-blue-200'}
               />
             </g>
           );

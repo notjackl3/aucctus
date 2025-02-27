@@ -36,7 +36,10 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
     >
       <thead
         {...theadProps}
-        className={cn('border-b border-gray-200', theadProps?.className)}
+        className={cn(
+          'aucctus-border-secondarysecondarysecondarysecondarysecondarysecondarysecondarysecondary border-b',
+          theadProps?.className,
+        )}
       >
         {table &&
           table.getHeaderGroups().map((headerGroup) => (
@@ -74,7 +77,7 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
           <tr>
             <td
               colSpan={table?.getHeaderGroups()[0]?.headers.length || 1}
-              className='py-6 text-center text-gray-500'
+              className='aucctus-text-tertiary py-6 text-center'
             >
               {emptyTableText}
             </td>

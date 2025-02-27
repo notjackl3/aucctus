@@ -20,8 +20,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
       className={cn(
         'group flex cursor-pointer flex-col items-start gap-3 rounded-lg p-4',
         {
-          'bg-gray-100': isSelected,
-          'hover:bg-gray-50': !isSelected,
+          'aucctus-bg-tertiary': isSelected,
+          'aucctus-bg-primary-hover': !isSelected,
         },
       )}
       onClick={onClick}
@@ -38,14 +38,14 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
               }}
             />
           </div>
-          <h3 className='ml-2 text-sm font-medium text-gray-900'>
+          <h3 className='aucctus-text-sm-medium aucctus-text-primary ml-2'>
             {startup.name}
           </h3>
         </div>
 
         {startup.domain && (
           <Button
-            color='light'
+            color='secondary'
             size='sm'
             noBorder
             onClick={(e) => {
@@ -57,7 +57,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           </Button>
         )}
       </div>
-      <p className='line-clamp-3 text-[12px] font-normal leading-[18px] text-[#0C111D]'>
+      <p className='aucctus-text-xs aucctus-text-secondary line-clamp-3'>
         {startup.overview}
       </p>
     </div>

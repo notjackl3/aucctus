@@ -11,30 +11,23 @@ export const ASSUMPTION_CATEGORY_MAP: Record<
   { style: string; icon: IconVariant }
 > = {
   desirability: {
-    style: 'bg-[#ece9fe] [&>svg>use]:stroke-desirability', //'purple',
+    style: 'bg-purple-50 [&>svg>use]:stroke-purple-900',
     icon: 'heart',
   },
   viability: {
-    style: 'bg-[#ccfbef] [&>svg>use]:stroke-viability', //'green',
+    style: 'bg-success-50 [&>svg>use]:stroke-success-800',
     icon: 'line-chart-up',
   },
 
   feasibility: {
-    style: 'bg-[#cff9fe] [&>svg>use]:stroke-feasibility', // 'lightBlue',
+    style: 'bg-indigo-50 [&>svg>use]:stroke-indigo-800',
     icon: 'filecode',
   },
   adaptability: {
-    style: 'bg-[#d1e0ff] [&>svg>use]:stroke-adaptability', //'blue',
+    style: 'bg-blue-50 [&>svg>use]:stroke-blue-800',
     icon: 'expand-06',
   },
 };
-
-export const VALIDATION_STATUS: AssumptionTestStatus[] = [
-  'inProgress',
-  'notStarted',
-  'partiallyValidated',
-  'validated',
-];
 
 export const TESTING_STATUS_STYLE_MAP: Record<
   AssumptionTestStatus | ConceptTestStatus,
@@ -42,17 +35,17 @@ export const TESTING_STATUS_STYLE_MAP: Record<
 > = {
   notStarted: {
     icon: 'play-square',
-    bg: 'bg-[#f8f9fc]',
-    svg: '[&>svg]:stroke-gray-500',
-    stroke: 'stroke-gray-500',
-    text: 'text-gray-500',
+    bg: 'aucctus-bg-secondary',
+    svg: '[&>svg]:stroke-gray-light-00',
+    stroke: 'stroke-gray-light-700',
+    text: 'aucctus-text-tertiary',
   },
   inProgress: {
     icon: 'clock-fast-forward',
-    bg: 'bg-[#f8f9fc]',
-    svg: '[&>svg]:stroke-gray-500',
-    stroke: 'stroke-gray-500',
-    text: 'text-gray-500',
+    bg: 'aucctus-bg-secondary',
+    svg: '[&>svg]:stroke-primary-900',
+    stroke: 'stroke-primary-900',
+    text: 'aucctus-text-tertiary',
   },
   partiallyValidated: {
     icon: 'loading-02',

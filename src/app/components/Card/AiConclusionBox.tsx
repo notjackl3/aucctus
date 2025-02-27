@@ -11,26 +11,24 @@ const AiConclusionBox: React.FC<AiConclusionBoxProps> = ({
   content = '',
 }) => {
   return (
-    <div className='rounded-lg border border-[#868FF9] bg-[#F4F7FE] p-4'>
+    <div className='aucctus-border-brand aucctus-bg-primary rounded-lg border bg-opacity-50 p-4'>
       <div className='mb-2 flex items-start justify-between'>
-        <h3 className="font-['Inter'] text-[10px] font-medium leading-[20px] text-[#667085]">
+        <h3 className='aucctus-text-primary aucctus-text-xs-medium items-center'>
           {title}
         </h3>
         <div className='mb-1 flex items-center justify-between'>
           <Icon
             variant='ai-conclusion'
-            stroke='#4318FF'
+            className='stroke-primary-900'
             height='14'
             width='14'
           />
-          <span className="px-2 py-1 font-['Inter'] text-[10px] font-semibold leading-[18px] text-[#4318FF]">
+          <span className='aucctus-text-brand-primary aucctus-text-xs-bold px-2 py-1'>
             AI Conclusion
           </span>
         </div>
       </div>
-      <p className="font-['Inter'] text-[12px] font-normal leading-[18px] text-[#0C111D]">
-        {content}
-      </p>
+      <p className='aucctus-text-brand-secondary aucctus-text-xs'>{content}</p>
     </div>
   );
 };

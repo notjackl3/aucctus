@@ -27,7 +27,7 @@ export const CHART_SIZE = 2000;
 export const POINT_RADIUS = 48;
 
 const defaultTextProps = {
-  fill: '#667085',
+  className: 'aucctus-text-primary',
   fontFamily: 'Inter',
   fontSize: '48',
 };
@@ -81,7 +81,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
   }, [data, getPoints, selectedItem]);
 
   return (
-    <div className='flex w-full self-start bg-white'>
+    <div className='aucctus-bg-primary flex w-full self-start'>
       <svg
         className='h-auto max-h-[500px] w-full max-w-full' // Max height is 500px but you can adjust
         viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`}
@@ -93,7 +93,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           y1='0'
           x2={CHART_SIZE / 2}
           y2={CHART_SIZE}
-          stroke='#E0E5F2'
+          className='stroke-gray-light-300'
           strokeWidth='10'
         />
         <line
@@ -101,7 +101,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
           y1={CHART_SIZE / 2}
           x2={CHART_SIZE}
           y2={CHART_SIZE / 2}
-          stroke='#E0E5F2'
+          className='stroke-gray-light-300'
           strokeWidth='10'
         />
         {points}
@@ -109,7 +109,7 @@ const ScatterChart: React.FC<ScatterChartProps> = ({
         <text
           x={`${CHART_SIZE - 320}`}
           y={`${CHART_SIZE / 2 + 80}`}
-          fill='#667085'
+          className='aucctus-text-primary'
           fontFamily='Inter'
           fontSize='48'
         >

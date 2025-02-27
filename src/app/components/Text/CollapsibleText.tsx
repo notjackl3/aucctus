@@ -80,14 +80,14 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
       onMouseLeave={() => setIsHovered(false)}
     >
       <span
-        className={cn('text-base font-medium text-indigo-900', titleClassName)}
+        className={cn('aucctus-text-primary aucctus-text-md', titleClassName)}
       >
         {title}
       </span>
       <animated.span
         ref={textRef}
         className={cn(
-          'text-sm font-medium leading-tight text-slate-500',
+          'aucctus-text-tertiary text-sm font-medium leading-tight',
           {
             [truncationClassName]: !open,
             'cursor-pointer': isTruncated,

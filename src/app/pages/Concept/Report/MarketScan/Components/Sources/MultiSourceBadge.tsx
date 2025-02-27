@@ -31,7 +31,7 @@ const MultiSourceBadge: FunctionComponent<MultiSourceBadgeProps> = ({
         {sourcesToShow.map((source, index) => (
           <div
             className={cn(
-              'flex h-4 w-4 items-center justify-center overflow-hidden rounded-full bg-white',
+              'aucctus-bg-primary flex h-4 w-4 items-center justify-center overflow-hidden rounded-full',
               index !== sourcesToShow.length - 1 || sources.length <= 4
                 ? '-mr-1'
                 : '',
@@ -50,7 +50,7 @@ const MultiSourceBadge: FunctionComponent<MultiSourceBadgeProps> = ({
         ))}
         <div className='-ml-1 flex items-center justify-center'>
           <span
-            className={`flex h-4 w-4 items-center justify-center rounded-full bg-gray-800 pr-[0.1rem] text-[0.6rem] font-medium text-white ${
+            className={`aucctus-bg-primary-solid flex h-4 w-4 items-center justify-center rounded-full pr-[0.1rem] text-[0.6rem] font-medium text-white ${
               sourcesToShow.length < 1 ? 'ml-[0.3rem]' : ''
             }`}
           >
@@ -64,7 +64,7 @@ const MultiSourceBadge: FunctionComponent<MultiSourceBadgeProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center rounded-2xl border border-gray-300 p-1',
+        'aucctus-border-primary flex items-center rounded-2xl border p-1',
         `w-[${width}px]`,
       )}
     >

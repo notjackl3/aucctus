@@ -5,7 +5,7 @@ import { ConceptStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 
 import { getConceptStatusStyles } from '@libs/utils/concepts';
-import classNames from 'classnames';
+import { cn } from '@libs/utils/react';
 
 export interface IConceptStatusBubbleProps {
   status: ConceptStatus;
@@ -18,11 +18,15 @@ const ConceptStatusBubble: FunctionComponent<IConceptStatusBubbleProps> = ({
 
   return (
     <span
-      className={classNames('flex w-fit gap-2 rounded-2xl px-3 py-2', style.bg)}
+      className={cn(
+        'flex w-fit gap-2 rounded-2xl border px-3 py-2',
+        style.bg,
+        style.border,
+      )}
     >
-      {<span className={classNames(style.text)}>●</span>}
+      {<span className={cn(style.text)}>●</span>}
       <span
-        className={classNames(
+        className={cn(
           'whitespace-nowrap text-center text-base font-medium not-italic leading-6',
           style.text,
         )}

@@ -22,10 +22,10 @@ const CreatedBy: React.FC<ICreatedByProps> = ({ user }) => {
       {/* 
       // Temp Disable
       <span className='flex flex-col lg:hidden '>
-        <span className='truncate text-base font-medium leading-tight text-slate-500'>
+        <span className='truncate text-base font-medium leading-tight aucctus-text-tertiary'>
           {user.firstName} {user.lastName}
         </span>
-        <span className='truncate text-sm font-normal leading-tight text-slate-500'>{user.email}</span>
+        <span className='truncate text-sm font-normal leading-tight aucctus-text-tertiary'>{user.email}</span>
       </span> */}
     </span>
   );
