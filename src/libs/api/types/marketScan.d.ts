@@ -72,18 +72,6 @@ export interface IIncumbent extends IBaseMarketScanCompany {
   hasCompetitiveProduct: boolean;
 }
 
-export interface IInvestor extends IBaseConceptEntity {
-  uuid: string;
-  name: string;
-  domain: string;
-  investedAmount: number;
-  companies: string[];
-  investmentDate: string;
-  createdAt: string;
-  updatedAt: string;
-  support: ISupport;
-}
-
 type TrendChangeType = 'increasing' | 'decreasing' | 'stagnating';
 
 export interface ITrendsAndDrivers extends IBaseConceptEntity {
@@ -103,7 +91,6 @@ export interface IMarketScan extends IBaseConceptEntity {
   ecosystemDescription: string;
   startups: IStartup[];
   incumbents: IIncumbents[];
-  investors: IInvestor[];
 
   trendsAndDriversDescription: string;
   trendsAndDrivers: ITrendsAndDrivers[];
