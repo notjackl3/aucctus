@@ -51,9 +51,9 @@ const KeyAssumptions: React.FC = () => {
   return (
     <div className='flex h-auto w-full flex-col gap-6'>
       {/* Upper most cards */}
-      <div className='flex h-full w-fit flex-row flex-wrap gap-6'>
+      <div className='flex h-full w-full flex-row flex-wrap gap-6'>
         {/* Assumptions Testing Status & Overview Cards */}
-        <div className='flex flex-col justify-between gap-6'>
+        <div className='flex flex-1 flex-col justify-between gap-6'>
           <Card.AssumptionsTestingStatus
             overview={assumptionTestStatusOverview}
           />
@@ -108,10 +108,11 @@ const KeyAssumptions: React.FC = () => {
           />
         </div>
       </div>
+
       {/* Assumptions & Testing Table */}
-      <div className='flex w-fit rounded-lg border border-gray-200 bg-white'>
+      <div className='flex w-full rounded-lg border border-gray-200 bg-white'>
         {/* Assumptions */}
-        <div className='flex w-full min-w-[400px] max-w-[600px] flex-col items-start justify-start overflow-y-auto border-r border-gray-200'>
+        <div className='flex w-full flex-col items-start justify-start overflow-y-auto border-r border-gray-200'>
           {/* Header */}
           <Header.AssumptionsTable
             text='Assumptions'
@@ -162,26 +163,28 @@ const KeyAssumptions: React.FC = () => {
 
           {/* Scrollable Content */}
           <div className='flex min-h-[675px] w-full flex-col items-center gap-3  overflow-y-auto px-4 py-8'>
-            {/* This will be a list of cards... */}
-            {testDetails.map((test) => (
-              <Card.Testing
-                key={`test-card-${test.uuid}`}
-                type={test.type}
-                identifier={test.identifier}
-                duration={test.duration}
-                description={test.goal}
-                status={test.status}
-                stage={test.stage}
-                handleStartTest={() => startTest(test.uuid)}
-                handleOpenTest={() =>
-                  openModal(Modal.TestModal, {
-                    conceptUuid: concept.uuid,
-                    testUuid: test.testUuid,
-                    identifier: test.identifier,
-                  })
-                }
-              />
-            ))}
+            <div className='min-w-[492px]'>
+              {/* This will be a list of cards... */}
+              {testDetails.map((test) => (
+                <Card.Testing
+                  key={`test-card-${test.uuid}`}
+                  type={test.type}
+                  identifier={test.identifier}
+                  duration={test.duration}
+                  description={test.description}
+                  status={test.status}
+                  stage={test.stage}
+                  handleStartTest={() => startTest(test.uuid)}
+                  handleOpenTest={() =>
+                    openModal(Modal.TestModal, {
+                      conceptUuid: concept.uuid,
+                      testUuid: test.testUuid,
+                      identifier: test.identifier,
+                    })
+                  }
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>

@@ -27,7 +27,7 @@ const StatusAndTestProgress: React.FC<StatusAndTestProgressProps> = ({
         <div className='self-stretch text-sm font-medium text-slate-500'>
           Testing Progress
         </div>
-        <div className='flex max-w-[160px] flex-row items-start justify-start gap-2 self-stretch overflow-x-scroll'>
+        <div className='flex max-w-[160px] flex-row items-start justify-start gap-2 self-stretch overflow-x-auto'>
           {testProgress.map((status, i) => (
             <Badge.TestStatus key={`${status}-${i}`} status={status} />
           ))}
