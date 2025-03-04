@@ -108,6 +108,14 @@ export class Endpoints {
     return `api/v1/concept/assumption/${assumptionUuid}/test-details`;
   }
 
+  static incumbentUuid(incumbentUuid: string) {
+    return `api/v2/concept/incumbent/${incumbentUuid}`;
+  }
+
+  static startupUuid(startupUuid: string) {
+    return `api/v2/concept/startup/${startupUuid}`;
+  }
+
   static assumptionTestDetailsUuid(
     assumptionUuid: string,
     assumptionTestUuid: string,

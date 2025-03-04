@@ -1,8 +1,10 @@
 import { Card, Loading, Text } from '@components';
-import { IIncumbent, ISource } from '@libs/api/types';
+import { ISource } from '@libs/api/types';
 import React, { useCallback } from 'react';
 import InfoSection from '../InfoSection';
 import IconBox from './IconBox';
+import { useIncumbent } from '@hooks/query/company.hook';
+import { cn } from '@libs/utils/react';
 
 const iconDefaultProps = {
   height: 16,
@@ -11,7 +13,7 @@ const iconDefaultProps = {
 };
 
 interface IncumbentDetailsProps {
-  incumbent: IIncumbent;
+  incumbentUuid: string;
   onReasoningClick: (
     conclusion: string,
     reasoning: string,
@@ -20,9 +22,11 @@ interface IncumbentDetailsProps {
 }
 
 const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
-  incumbent,
+  incumbentUuid,
   onReasoningClick,
 }) => {
+  const { incumbent, isLoading } = useIncumbent(incumbentUuid);
+
   const handleEvidenceClick = useCallback(
     (
       content: string | undefined,
@@ -37,13 +41,21 @@ const IncumbentDetails: React.FC<IncumbentDetailsProps> = ({
     [onReasoningClick],
   );
 
-  if (incumbent.status !== 'completed') {
+  if (incumbent?.status !== 'completed' || isLoading) {
     return (
       <div className='mx-auto max-w-5xl space-y-8'>
         <div className='flex min-h-96 items-center justify-center gap-6 self-stretch text-center align-middle'>
           <section>
-            <div className='aucctus-text-tertiary self-stretch text-center text-sm font-medium'>
-              An Agent is currently analyzing {incumbent.name}. This may take a
+            <div
+              className={cn(
+                'ease self-stretch text-center text-sm font-medium text-gray-500 opacity-0',
+                {
+                  'opacity-100 transition-all duration-300': !isLoading,
+                  'opacity-0': isLoading,
+                },
+              )}
+            >
+              An Agent is currently analyzing {incumbent?.name}. This may take a
               moment.
             </div>
             <div className='flex flex-col items-center justify-start gap-3 self-stretch'>

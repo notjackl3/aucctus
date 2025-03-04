@@ -1,9 +1,10 @@
 import { Button, Card, Icon, Loading, Text } from '@components';
-import { EngagementAction, ISource, IStartup } from '@libs/api/types';
+import { EngagementAction, ISource } from '@libs/api/types';
 import React, { useCallback } from 'react';
 import InfoSection from '../InfoSection';
 import { cn } from '@libs/utils/react';
 import { toTitleCase } from '@libs/utils/string';
+import { useStartup } from '@hooks/query/company.hook';
 
 // TODO: Handling Loading
 
@@ -16,7 +17,7 @@ const ACTION_ICON_MAPPING: Record<EngagementAction, IconVariant> = {
 };
 
 interface StartupDetailsProps {
-  startup: IStartup;
+  startupUuid: string;
   className?: string;
   onReasoningClick: (
     conclusion: string,
@@ -26,10 +27,12 @@ interface StartupDetailsProps {
 }
 
 const StartupDetails: React.FC<StartupDetailsProps> = ({
-  startup,
+  startupUuid,
   onReasoningClick,
   className = '',
 }) => {
+  const { startup, isLoading } = useStartup(startupUuid);
+
   const getEngagementIcon = useCallback((action: EngagementAction) => {
     const engagementIcon = ACTION_ICON_MAPPING[action];
     if (!engagementIcon) {
@@ -57,13 +60,21 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
     [onReasoningClick],
   );
 
-  if (startup.status !== 'completed') {
+  if (startup?.status !== 'completed' || isLoading) {
     return (
       <div className={cn('mx-auto max-w-5xl space-y-8', className)}>
         <div className='flex min-h-96 items-center justify-center gap-6 self-stretch text-center align-middle'>
           <section>
-            <div className='aucctus-text-tertiary self-stretch text-center text-sm font-medium'>
-              An Agent is currently analyzing {startup.name}. This may take a
+            <div
+              className={cn(
+                'ease aucctus-text-tertiary self-stretch text-center text-sm font-medium opacity-0',
+                {
+                  'opacity-100 transition-all duration-300': !isLoading,
+                  'opacity-0': isLoading,
+                },
+              )}
+            >
+              An Agent is currently analyzing {startup?.name}. This may take a
               moment.
             </div>
             <div className='flex flex-col items-center justify-start gap-3 self-stretch'>

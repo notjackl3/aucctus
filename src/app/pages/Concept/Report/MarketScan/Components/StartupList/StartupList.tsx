@@ -49,7 +49,7 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
 
       {/*
         SIDEBAR: Absolutely positioned on the left.
-        - `top-0 bottom-0` pins it to the container’s top & bottom.
+        - `top-0 bottom-0` pins it to the container's top & bottom.
         - `w-80` gives it a fixed width.
         - `overflow-y-auto` so it scrolls if there is extra content.
         - We add a bit of padding so items aren't flush against the sides.
@@ -79,8 +79,8 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
           <div className='mb-6 flex max-h-[80vh] gap-4 overflow-y-auto p-6'>
             <StartupDetails
               className='pr-6' // for scrollbar positioning
-              startup={selectedStartup}
-              onReasoningClick={(conclusion, reasoning, sources) =>
+              startupUuid={selectedStartup.uuid}
+              onReasoningClick={(conclusion, reasoning, sources) => (e) =>
                 handleReasoningModelClick(conclusion, reasoning, sources)
               }
             />

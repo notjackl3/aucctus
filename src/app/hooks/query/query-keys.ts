@@ -19,6 +19,8 @@ export enum AucctusQueryKeys {
   assumptionTestDetails = 'assumptionTestDetails',
   conceptTestDetails = 'conceptTestDetails',
   assumptionTestStatusOverview = 'assumptionTestStatusOverview',
+  incumbent = 'incumbent',
+  startup = 'startup',
 
   /* External APIs */
   clearbitCompany = 'clearbitCompany',

@@ -52,6 +52,7 @@ const IncumbentsList: React.FC<IncumbentDashboardProps> = ({ incumbents }) => {
         - `overflow-y-auto` so it scrolls if there is extra content.
         - We add a bit of padding so items aren't flush against the sides.
       */}
+
       <div className='aucctus-border-secondary aucctus-bg-primary absolute bottom-4 left-4 top-[4rem] max-h-[80vh] w-80 overflow-y-auto rounded-lg border p-4'>
         <nav>
           {incumbents.map((incumbent) => (
@@ -76,7 +77,7 @@ const IncumbentsList: React.FC<IncumbentDashboardProps> = ({ incumbents }) => {
         {selectedIncumbent ? (
           <div className='mb-6 flex max-h-[80vh] gap-4 overflow-y-auto p-6'>
             <IncumbentDetails
-              incumbent={selectedIncumbent}
+              incumbentUuid={selectedIncumbent.uuid}
               onReasoningClick={handleReasoningModelClick}
             />
           </div>
