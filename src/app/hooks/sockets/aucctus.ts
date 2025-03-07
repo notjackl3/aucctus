@@ -2,18 +2,30 @@ import api from '@libs/api';
 import { SocketService } from '@libs/api/base';
 import React from 'react';
 
+function isSocketEventOfType<T extends SocketEventType, C extends object>(
+  data: SocketEvent<C>,
+  type: T,
+): data is Extract<SocketEvent<C>, { type: T }> {
+  return data.type === type;
+}
+
 /**
  * Custom hook to listen for a specific event type from the WebSocket.
  * @param eventName The event "type" to filter for.
  * @param callback Function to call when an event with the matching type is received.
+ *
+ * ... Its annoying and redundant, but if you need to specify the type of K (So in cases like the stream.structured)
+ * you have to specify T/SocketEventType which is a little redundant
  */
-export function useSocketEvent<T extends SocketEventType>(
+export function useSocketEvent<
+  T extends SocketEventType,
+  C extends object = {},
+>(
   eventName: T,
-  callback: (data: Extract<SocketEvent, { type: T }>) => void,
+  callback: (data: Extract<SocketEvent<C>, { type: T }>) => void,
 ) {
   const aucctusSocket = React.useMemo(() => api.aucctusSocket, []);
 
-  // Create a stable callback reference.
   const savedCallback = React.useCallback(callback, [callback]);
 
   React.useEffect(() => {
@@ -21,9 +33,9 @@ export function useSocketEvent<T extends SocketEventType>(
 
     const handleIncoming = (e: MessageEvent) => {
       try {
-        const data: SocketEvent = JSON.parse(e.data);
-        if (data.type === eventName) {
-          savedCallback(data as Extract<SocketEvent, { type: T }>);
+        const data: SocketEvent<C> = JSON.parse(JSON.parse(e.data));
+        if (isSocketEventOfType<T, C>(data, eventName)) {
+          savedCallback(data as Extract<SocketEvent<C>, { type: T }>);
         }
       } catch (error) {
         console.error('Error parsing WebSocket message:', error);
@@ -54,7 +66,7 @@ export function useSocketMaxRetriesExceeded(
     return () => {
       socketService.removeMaxRetriesExceededListener(listener);
     };
-  }, []);
+  }, [socketService]);
 
   return error;
 }
