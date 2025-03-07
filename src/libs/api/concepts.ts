@@ -29,10 +29,32 @@ export interface IConceptSeedAnswer {
 }
 
 export interface IConceptSeed {
+  uuid: string;
   answers: IConceptSeedAnswer[];
   type: ConceptIgnitionQuestionnaireType;
   createdAt: string;
   updatedAt: string;
+}
+
+// Incubation
+export type FieldType = 'text' | 'textarea' | 'multiSelect' | 'radioButton';
+
+export interface IncubationAnswerPayload {
+  questionId: number;
+  fieldType: FieldType;
+  answer: string[];
+  details?: string;
+}
+
+export interface IncubationAnswerUpdatePayload extends IncubationAnswerPayload {
+  answerId: number;
+}
+
+export interface IncubationAnswer {
+  answer: string[];
+  details?: string;
+  question: ConceptIgnitionQuestion;
+  id: number;
 }
 
 /**
@@ -80,6 +102,41 @@ export class ConceptApi extends ApiService {
 
   seed(uuid: string) {
     return this.get<IConceptSeed>(endpoints.conceptSeed(uuid));
+  }
+
+  seedDraft(uuid: string) {
+    return this.get<IConceptSeed>(endpoints.conceptIncubationSeedUuid(uuid));
+  }
+
+  saveSeedDraft(seed: IConceptSeed) {
+    return this.post<IConceptSeed, IConceptSeed>(
+      endpoints.conceptIncubationSeed(),
+      seed,
+    );
+  }
+
+  deleteSeedDraft(uuid: string) {
+    return this.delete<IConceptSeed>(endpoints.conceptIncubationSeedUuid(uuid));
+  }
+
+  getSeedDraftAnswers(uuid: string) {
+    return this.get<IncubationAnswer[]>(
+      endpoints.conceptIncubationSeedUuidAnswers(uuid),
+    );
+  }
+
+  saveSeedDraftAnswer(uuid: string, answer: IncubationAnswerPayload) {
+    return this.post<IncubationAnswerPayload>(
+      endpoints.conceptIncubationSeedUuidAnswer(uuid),
+      answer,
+    );
+  }
+
+  updateSeedDraftAnswer(answerId: number, answer: IncubationAnswerPayload) {
+    return this.patch<IncubationAnswerPayload>(
+      endpoints.conceptIncubationSeedAnswerId(answerId),
+      answer,
+    );
   }
 
   unarchive(uuid: string) {

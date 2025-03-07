@@ -42,6 +42,26 @@ export class Endpoints {
     return `api/v1/concept/${conceptUuid}/seed`;
   }
 
+  static conceptIncubationSeed() {
+    return `api/v2/concept/incubation/seed`;
+  }
+
+  static conceptIncubationSeedUuid(draftUuid: string) {
+    return `api/v2/concept/incubation/seed/${draftUuid}`;
+  }
+
+  static conceptIncubationSeedUuidAnswer(draftUuid: string) {
+    return `api/v2/concept/incubation/seed/${draftUuid}/answer`;
+  }
+
+  static conceptIncubationSeedUuidAnswers(draftUuid: string) {
+    return `api/v2/concept/incubation/seed/${draftUuid}/answers`;
+  }
+
+  static conceptIncubationSeedAnswerId(answerId: number) {
+    return `api/v2/concept/incubation/seed/answer/${answerId}`;
+  }
+
   static unarchiveConcept(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/unarchive`;
   }

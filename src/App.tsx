@@ -7,6 +7,8 @@ import * as Sentry from '@sentry/react';
 import { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
+import images from '@assets/img';
+import React from 'react';
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
@@ -16,6 +18,18 @@ function App() {
 
   // Private Routes
   const PrivateRoutes = usePrivateRoutes();
+
+  // Preload Concept Generation Background Images
+  React.useEffect(() => {
+    const aiExplorationsBackground = new Image();
+    aiExplorationsBackground.src = images.aiExplorationsBackground;
+
+    const incubationCard = new Image();
+    incubationCard.src = images.incubationCard;
+
+    const incubationCard2 = new Image();
+    incubationCard2.src = images.incubationCard2;
+  }, []);
 
   return (
     <div role='main' className='App'>

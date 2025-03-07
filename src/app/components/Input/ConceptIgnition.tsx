@@ -99,7 +99,7 @@ const ConceptIgnition: React.FC<ConceptIgnitionInputProps> = ({
                 >
                   <Icon
                     variant='plus'
-                    className='stroke-primary-600'
+                    className='stroke-primary-800'
                     height={20}
                     width={20}
                   />

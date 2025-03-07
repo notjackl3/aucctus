@@ -22,10 +22,20 @@ export interface IDetailQuestion {
   placeholder?: string;
   rows?: number;
 }
+
+export interface IConceptIgnitionMultiSelectOption {
+  label: string;
+  value: string;
+  description?: string;
+  icon?: string;
+}
+
+export type multiSelectFieldType = 'multiSelect' | 'radioButton';
+
 export interface IConceptIgnitionMultiSelectQuestion
   extends BaseConceptIgnitionQuestion {
-  fieldType: 'multiSelect';
-  options: string[];
+  fieldType: multiSelectFieldType;
+  options: IConceptIgnitionMultiSelectOption[];
   defaultOption?: string;
   allowCustomInput: boolean;
   details?: IDetailQuestion;

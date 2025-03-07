@@ -1,4 +1,5 @@
 import Page from '@pages';
+import ConceptIncubationProvider from '@stores/concept-incubation.store';
 import { useConceptReportRoutes, useSettingsRoutes } from '@routes/hooks';
 import Layout from '@routes/layouts';
 import { AppPath } from '@routes/routes';
@@ -11,7 +12,7 @@ const usePrivateRoutes = () => {
   return (
     <Route element={<Layout.Private />}>
       <Route index path={AppPath.Home} element={<Page.Dashboard />} />
-      <Route path={AppPath.IgniteConcept} element={<Page.Concept.Ignite />} />
+      <Route path={AppPath.IgniteConcept} element={<Page.Concept.Incubate />} />
       <Route
         path={AppPath.GeneratedConcepts}
         element={<Page.Concept.Generated />}

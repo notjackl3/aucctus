@@ -101,4 +101,12 @@ type IconVariant = 'activity'
  | 'users-03' 
  | 'users-edit' 
  | 'warning' 
- | 'wizard-of-oz';
+ | 'wizard-of-oz' 
+ | 'telescope' 
+ | 'building-02' 
+ | 'building-03' 
+ | 'route' 
+ | 'dataflow-04' 
+ | 'alert-circle' 
+ | 'user-square' 
+ | 'currency-dollar';

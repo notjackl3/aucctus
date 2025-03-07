@@ -28,7 +28,7 @@ export const useAssumptionsTable = (conceptUuid: string) => {
           <Text.Collapsible
             title={info.getValue()}
             description={info.row.original.text}
-            maxDescriptionHeight={40}
+            maxDescriptionHeight={72}
           />
         ),
       }),

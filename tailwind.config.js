@@ -165,6 +165,8 @@ module.exports = {
         xs: '2px',
       },
       animation: {
+        'incubation-answer-expand': 'incubationAnswerExpand 0.3s ease both',
+        'incubation-answer-collapse': 'incubationAnswerCollapse 0.3s ease both',
         'fade-in': 'fadeIn 0.2s ease-in forwards',
         'slide-in-center': 'slideInCenter 0.3s ease both',
         'slide-out-center': 'slideOutCenter 0.3s ease both',
@@ -176,6 +178,38 @@ module.exports = {
         'slide-out-right': 'slideOutRight 0.3s ease both',
       },
       keyframes: {
+        incubationAnswerExpand: {
+          from: {
+            maxHeight: '0px',
+            minHeight: '0px',
+            opacity: '0',
+            borderWidth: '0px',
+            padding: '0px',
+          },
+          to: {
+            maxHeight: '500px',
+            minHeight: '55px',
+            opacity: '1',
+            borderWidth: '2px',
+            padding: '0.5rem',
+          },
+        },
+        incubationAnswerCollapse: {
+          from: {
+            maxHeight: '500px',
+            minHeight: '55px',
+            opacity: '1',
+            borderWidth: '2px',
+            padding: '0.5rem',
+          },
+          to: {
+            maxHeight: '0px',
+            minHeight: '0px',
+            opacity: '0',
+            borderWidth: '0px',
+            padding: '0px',
+          },
+        },
         fadeIn: {
           from: { opacity: '0' },
           to: { opacity: '1' },

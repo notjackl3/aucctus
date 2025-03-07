@@ -1,0 +1,29 @@
+---
+description: Guidelines for styling jsx and html components
+globs: *.ts
+---
+# Aucctus JSX and HTML component style guide
+
+The Aucctus styling system is a comprehensive design system built on top of Tailwind CSS, providing consistent styling across the application with support for both light and dark modes. This document outlines how to use the Aucctus theme classes in JSX and HTML components.
+
+## Design System Files
+Consider the following scss files when deciding how to style a particular component.
+[text.scss](mdc:src/app/assets/styles/aucctus-theme/colors/text.scss)
+[border.scss](mdc:src/app/assets/styles/aucctus-theme/colors/border.scss)
+[button.scss](mdc:src/app/assets/styles/button.scss)
+[background.scss](mdc:src/app/assets/styles/aucctus-theme/colors/background.scss)
+[colors.scss](mdc:src/app/assets/styles/colors.scss)
+[text.scss](mdc:src/app/assets/styles/aucctus-theme/typography/text.scss)
+
+2. **Tailwind CSS RULES**
+- Use Tailwind utility classes combined with aucctus classes for styling components
+- Use the responsive utilities for different screen sizes
+- Use the animation utilities for transitions and animations
+- ALWAYS Use the `cn` utility with object notation for conditional classes
+
+## Best Practices
+1. **Always use theme classes**: Use Aucctus theme classes instead of direct Tailwind classes for colors and typography.
+2. **Responsive design**: Use Tailwind's responsive prefixes with Aucctus theme classes for responsive designs.
+3. **Accessibility**: Ensure sufficient color contrast and proper semantic HTML.
+4. **Component consistency**: Use the established components and patterns for a consistent user experience.
+

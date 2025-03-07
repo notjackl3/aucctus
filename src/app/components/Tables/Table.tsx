@@ -53,7 +53,7 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
       <tbody
         {...tbodyProps}
         className={cn(
-          'w-full bg-gray-50',
+          'aucctus-bg-secondary-extra-subtle w-full',
           {
             'h-64': !table?.getRowModel().rows.length, // Apply min height when empty
           },

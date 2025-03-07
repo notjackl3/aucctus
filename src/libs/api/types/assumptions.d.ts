@@ -89,7 +89,6 @@ export interface IAssumptionTestDetails extends IBaseConceptEntity {
   status: AssumptionTestStatus;
   identifier: str;
   goal: string;
-  description: string;
   findings?: string;
   assumptionUuid: string;
   testUuid: string;

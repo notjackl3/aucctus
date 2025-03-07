@@ -134,6 +134,14 @@ textarea:focus {
   --tw-ring-shadow: none !important;
 }
 
+input:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px #514141 !important;
+  ring-color: #514141 !important;
+  --tw-ring-color: #514141 !important; // #514141 - primary-600 - tailwind.config.js
+  --tw-ring-offset-shadow: none !important;
+  --tw-ring-shadow: none !important;
+}
 :root {
   --nav-drawer-expanded-width: 15.5rem;
   --nav-drawer-collapsed-width: 6rem;

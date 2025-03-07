@@ -51,7 +51,12 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           })}
         >
           <div
-            className='ml-6 flex cursor-pointer gap-2 pb-4 transition-all duration-300'
+            className={cn(
+              'ml-6 flex cursor-pointer gap-2 pb-4 transition-all duration-300',
+              {
+                'pointer-events-none': collapsed,
+              },
+            )}
             onClick={() => {
               navigate(AppPath.Home);
             }}

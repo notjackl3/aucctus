@@ -1,5 +1,10 @@
 import api from '@libs/api';
-import { IGeneratedConceptsSaveBody } from '@libs/api/concepts';
+import {
+  IConceptSeed,
+  IGeneratedConceptsSaveBody,
+  IncubationAnswerPayload,
+  IncubationAnswerUpdatePayload,
+} from '@libs/api/concepts';
 import { IIgniteConceptBody } from '@libs/api/igniteConcepts';
 import {
   Ecosystem,
@@ -75,6 +80,62 @@ export const useConceptSeed = (uuid: string) => {
       answers: [],
     },
   };
+};
+
+export const useConceptSeedDraft = (uuid?: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.conceptSeedDraft, uuid],
+    queryFn: async () => {
+      return uuid ? await api.concept.seedDraft(uuid) : {};
+    },
+  });
+
+  return {
+    ...query,
+    seedDraft: query.data || {
+      answers: [],
+    },
+  };
+};
+
+export const useSaveConceptSeedDraft = () => {
+  return useMutation({
+    mutationFn: async (body: IConceptSeed) =>
+      await api.concept.saveSeedDraft(body),
+  });
+};
+
+export const useDeleteConceptSeedDraft = () => {
+  return useMutation({
+    mutationFn: async (uuid: string) => await api.concept.deleteSeedDraft(uuid),
+  });
+};
+
+export const useGetConceptSeedDraftAnswers = (seedDraftUuid: string) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.conceptSeedDraftAnswers, seedDraftUuid],
+    queryFn: async () => await api.concept.getSeedDraftAnswers(seedDraftUuid),
+    cacheTime: Infinity,
+    staleTime: Infinity,
+  });
+};
+
+export const useSaveConceptSeedDraftAnswer = () => {
+  return useMutation({
+    mutationFn: async (params: {
+      uuid: string;
+      body: IncubationAnswerPayload;
+    }) => await api.concept.saveSeedDraftAnswer(params.uuid, params.body),
+  });
+};
+
+export const useUpdateConceptSeedDraftAnswer = () => {
+  return useMutation({
+    mutationFn: async (params: {
+      answerId: number;
+      body: IncubationAnswerUpdatePayload;
+    }) => await api.concept.updateSeedDraftAnswer(params.answerId, params.body),
+  });
 };
 
 export const useConceptIgnitionQuestionnaire = () => {

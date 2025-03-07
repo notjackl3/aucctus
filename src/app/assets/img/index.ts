@@ -5,13 +5,14 @@ import customerProfile from './customer-profile.png';
 import deliveryTrend from './delivery-trend.png';
 import deliveryNews from './delivery-news.png';
 import companyLogoDefault from './company-logo-default.png';
-import expandOnExistingIdeas from './expand-an-existing-idea.png';
-import exploreNewSpace from './explore-a-new-space.png';
-import whiteSpaceSuggestions from './white-space-suggestions.png';
 import trendOne from './trends/trend1.png';
 import trendTwo from './trends/trend2.png';
 import trendThree from './trends/trend3.png';
 import link from './link.png';
+import aiExplorationsBackground from './ai-explorations-background.png';
+import incubationCard from './aucctus-incubation-card-1.png';
+import incubationCard2 from './aucctus-incubation-card-2.png';
+import incubationLineChart from './aucctus-incubation-line-chart.png';
 
 import avatar from './avatar.png';
 
@@ -34,9 +35,10 @@ const images = {
   link,
 
   // Concept Ignition
-  expandOnExistingIdeas,
-  exploreNewSpace,
-  whiteSpaceSuggestions,
+  aiExplorationsBackground,
+  incubationCard,
+  incubationCard2,
+  incubationLineChart,
 
   // User
   avatar,

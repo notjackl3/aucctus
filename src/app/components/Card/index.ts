@@ -1,3 +1,6 @@
+import AiExplorationsCard from './ConceptGeneration/AiExplorationsCard';
+import IntroducingAucctusCard from './ConceptGeneration/AiExploration/IntroducingAucctusCard';
+import UserExplorationCard from './ConceptGeneration/UserExplorationCard';
 import InsightCard from './InsightCard';
 import AiConclusionBox from './AiConclusionBox';
 import AssumptionOverview from './AssumptionOverview';
@@ -11,7 +14,6 @@ import CustomerProfiles from './CustomerProfilesCard';
 import Demographics from './DemographicsCard/DemographicsCard';
 import FinancialModel from './FinancialModelCard';
 import FinancialProjects from './FinancialProjectsCard';
-import Ignition from './IgnitionCard';
 import KeyAssumptions from './KeyAssumptionsCard';
 import MarketSize from './MarketSizeCard';
 import Insight from './InsightCard';
@@ -23,7 +25,6 @@ const Card = {
   KeyAssumptions,
   FinancialProjects,
   CustomerProfiles,
-  Ignition,
   Insight,
   CustomerProfileContextList,
   FinancialModel,
@@ -33,6 +34,9 @@ const Card = {
   Testing,
   AiConclusionBox,
   InsightCard,
+  AiExplorationsCard,
+  UserExplorationCard,
+  IntroducingAucctusCard,
 };
 
 export default Card;
