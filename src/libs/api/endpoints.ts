@@ -62,6 +62,12 @@ export class Endpoints {
     return `api/v2/concept/incubation/seed/answer/${answerId}`;
   }
 
+  static conceptIncubationSeedAnswerIdAndDeleteHigherOrderAnswers(
+    answerId: number,
+  ) {
+    return `api/v2/concept/incubation/seed/answer/update_and_delete_higher_order/${answerId}`;
+  }
+
   static unarchiveConcept(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/unarchive`;
   }

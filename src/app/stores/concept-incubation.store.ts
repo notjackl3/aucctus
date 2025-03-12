@@ -1,20 +1,13 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { QuestionnaireSection } from '@pages/Concept/Ignition/IncubateConcept';
-import { FieldType } from '@libs/api/concepts';
 import { useCallback, useMemo } from 'react';
 import { ConceptIgnitionQuestion } from '@libs/api/types';
+import { IncubationAnswer } from '@libs/api/concepts';
 
 export type AnswerItem = {
   answer: string;
   uuid: string;
-};
-
-export type SubmittedAnswer = {
-  answer: string[];
-  details?: string;
-  id: number;
-  question: ConceptIgnitionQuestion;
 };
 
 interface IAISuggestion {
@@ -32,7 +25,7 @@ interface ConceptIncubationStoreState {
   draftSeedUuid: string;
   currentTextAnswerList: AnswerItem[];
   currentMultiSelectAnswerList: AnswerItem[];
-  submittedAnswers: SubmittedAnswer[];
+  submittedAnswers: IncubationAnswer[];
 
   suggestions: IncubationAISuggestions;
 
@@ -41,7 +34,7 @@ interface ConceptIncubationStoreState {
   setDraftSeedUuid: (uuid: string) => void;
   setCurrentTextAnswerList: (answerList: AnswerItem[]) => void;
   setCurrentMultiSelectAnswerList: (answerList: AnswerItem[]) => void;
-  setSubmittedAnswers: (answers: SubmittedAnswer[]) => void;
+  setSubmittedAnswers: (answers: IncubationAnswer[]) => void;
   resetQuestionnaire: () => void;
 
   setSuggestions: (identifier: string, suggestions: IAISuggestion[]) => void;
@@ -74,7 +67,7 @@ const conceptIncubationStore = create<ConceptIncubationStoreState>()(
       setCurrentMultiSelectAnswerList: (answerList: AnswerItem[]) => {
         set({ currentMultiSelectAnswerList: answerList });
       },
-      setSubmittedAnswers: (answers: SubmittedAnswer[]) => {
+      setSubmittedAnswers: (answers: IncubationAnswer[]) => {
         set({ submittedAnswers: answers });
       },
       resetQuestionnaire: () => {
@@ -127,9 +120,9 @@ export const useConceptIncubationStore = () => {
   }, [activeQuestionnaire]);
 
   const shouldShowQuestion = useCallback(
-    (question: ConceptIgnitionQuestion) => {
+    (question: ConceptIgnitionQuestion, answers: IncubationAnswer[]) => {
       if (question.dependsOn) {
-        const dependentAnswer = submittedAnswers.find(
+        const dependentAnswer = answers.find(
           (answer) => answer.question.identifier === question.dependsOn,
         );
 
@@ -142,27 +135,31 @@ export const useConceptIncubationStore = () => {
 
       return true;
     },
-    [submittedAnswers],
+    [],
   );
 
-  const getNextQuestion = useCallback(() => {
-    if (currentQuestionOrder === undefined) return;
+  const getNextQuestion = useCallback(
+    (answers: IncubationAnswer[]) => {
+      if (currentQuestionOrder === undefined) return;
 
-    const eligibleQuestions = questions
-      .map((question) => {
-        return {
-          ...question,
-        };
-      })
-      .filter(
-        (question) =>
-          question.order > currentQuestionOrder && shouldShowQuestion(question),
-      )
-      .sort((a, b) => a.order - b.order);
+      const eligibleQuestions = questions
+        .map((question) => {
+          return {
+            ...question,
+          };
+        })
+        .filter(
+          (question) =>
+            question.order > currentQuestionOrder &&
+            shouldShowQuestion(question, answers),
+        )
+        .sort((a, b) => a.order - b.order);
 
-    // Return the first eligible question (the one with the lowest order above currentQuestionOrder)
-    return eligibleQuestions[0];
-  }, [currentQuestionOrder, questions, shouldShowQuestion]);
+      // Return the first eligible question (the one with the lowest order above currentQuestionOrder)
+      return eligibleQuestions[0];
+    },
+    [currentQuestionOrder, questions, shouldShowQuestion],
+  );
 
   const getPreviousQuestion = useCallback(() => {
     if (!currentQuestionOrder) return;

@@ -134,7 +134,11 @@ export const useUpdateConceptSeedDraftAnswer = () => {
     mutationFn: async (params: {
       answerId: number;
       body: IncubationAnswerUpdatePayload;
-    }) => await api.concept.updateSeedDraftAnswer(params.answerId, params.body),
+    }) =>
+      await api.concept.updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
+        params.answerId,
+        params.body,
+      ),
   });
 };
 

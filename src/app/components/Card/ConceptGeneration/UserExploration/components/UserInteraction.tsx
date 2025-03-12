@@ -9,7 +9,6 @@ import React, {
 import { toast } from 'react-toastify';
 import {
   useDeleteConceptSeedDraft,
-  useDeleteConceptSeedDraftAnswer,
   useGetConceptSeedDraftAnswers,
   useSaveConceptSeedDraftAnswer,
   useUpdateConceptSeedDraftAnswer,
@@ -23,7 +22,7 @@ import LoadingMask from './util/LoadingMask';
 import QuestionnaireHeader from './question/QuestionnaireHeader';
 import AnswerInput from './answer/AnswerInput';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-
+import { IncubationAnswer } from '@libs/api/concepts';
 // Types
 interface UserInteractionProps {}
 
@@ -57,10 +56,8 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     useDeleteConceptSeedDraft();
   const { mutate: saveAnswer, isLoading: isSaveAnswerLoading } =
     useSaveConceptSeedDraftAnswer();
-  const { mutate: updateAnswer, isLoading: isUpdateAnswerLoading } =
+  const { mutateAsync: updateAnswer, isLoading: isUpdateAnswerLoading } =
     useUpdateConceptSeedDraftAnswer();
-  const { mutateAsync: deleteAnswer, isLoading: isDeleteAnswerLoading } =
-    useDeleteConceptSeedDraftAnswer();
   const { data: seedDraftAnswers, isLoading: isSeedDraftAnswersLoading } =
     useGetConceptSeedDraftAnswers(draftSeedUuid || '');
 
@@ -72,7 +69,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     setSubmittedAnswers(answers);
 
     if (shouldAdvance.current) {
-      goToNextQuestion();
+      goToNextQuestion(answers);
       shouldAdvance.current = false;
     }
   }, [seedDraftAnswers]);
@@ -82,14 +79,12 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       isSeedDraftAnswersLoading ||
       isDeleteDraftLoading ||
       isSaveAnswerLoading ||
-      isUpdateAnswerLoading ||
-      isDeleteAnswerLoading,
+      isUpdateAnswerLoading,
     [
       isSeedDraftAnswersLoading,
       isDeleteDraftLoading,
       isSaveAnswerLoading,
       isUpdateAnswerLoading,
-      isDeleteAnswerLoading,
     ],
   );
 
@@ -152,15 +147,18 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     currentMultiSelectAnswerList,
   ]);
 
-  const goToNextQuestion = useCallback(() => {
-    const nextQuestion = getNextQuestion();
-    if (nextQuestion) {
-      dispatchAnimationEvent('forward', () => {
-        setCurrentQuestionOrder(nextQuestion.order);
-        setAnswerValue('');
-      });
-    }
-  }, [dispatchAnimationEvent, getNextQuestion, setCurrentQuestionOrder]);
+  const goToNextQuestion = useCallback(
+    (answers: IncubationAnswer[]) => {
+      const nextQuestion = getNextQuestion(answers);
+      if (nextQuestion) {
+        dispatchAnimationEvent('forward', () => {
+          setCurrentQuestionOrder(nextQuestion.order);
+          setAnswerValue('');
+        });
+      }
+    },
+    [dispatchAnimationEvent, getNextQuestion, setCurrentQuestionOrder],
+  );
 
   useEffect(() => {
     if (!activeAnswer) {
@@ -319,19 +317,11 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     return isAnswerSame && isDetailsSame;
   }, [submittedAnswers, activeQuestion, formattedAnswerPayload]);
 
-  const getDeleteCandidates = useCallback(() => {
-    if (currentQuestionOrder === undefined) return [];
-
-    return submittedAnswers.filter(
-      (answer) => answer.question.order > currentQuestionOrder,
-    );
-  }, [submittedAnswers, currentQuestionOrder]);
-
   const handleSubmitAnswer = useCallback(() => {
     if (currentQuestionOrder === undefined) return;
 
     if (isDuplicateAnswer()) {
-      goToNextQuestion();
+      goToNextQuestion(submittedAnswers);
       return;
     }
 
@@ -366,15 +356,11 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
         },
         {
           onSuccess: async () => {
-            await Promise.all(
-              getDeleteCandidates().map((answer) => deleteAnswer(answer.id)),
-            ).then(() => {
-              shouldAdvance.current = true;
-              queryClient.refetchQueries([
-                AucctusQueryKeys.conceptSeedDraftAnswers,
-                draftSeedUuid,
-              ]);
-            });
+            shouldAdvance.current = true;
+            await queryClient.refetchQueries([
+              AucctusQueryKeys.conceptSeedDraftAnswers,
+              draftSeedUuid,
+            ]);
           },
           onError: () => {
             toast.error('Failed to submit answer', {

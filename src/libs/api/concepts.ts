@@ -1,4 +1,3 @@
-import { SubmittedAnswer } from '@stores/concept-incubation.store';
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
@@ -127,15 +126,20 @@ export class ConceptApi extends ApiService {
   }
 
   saveSeedDraftAnswer(uuid: string, answer: IncubationAnswerPayload) {
-    return this.post<SubmittedAnswer>(
+    return this.post<IncubationAnswer>(
       endpoints.conceptIncubationSeedUuidAnswer(uuid),
       answer,
     );
   }
 
-  updateSeedDraftAnswer(answerId: number, answer: IncubationAnswerPayload) {
-    return this.patch<SubmittedAnswer>(
-      endpoints.conceptIncubationSeedAnswerId(answerId),
+  updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
+    answerId: number,
+    answer: IncubationAnswerPayload,
+  ) {
+    return this.patch<IncubationAnswer>(
+      endpoints.conceptIncubationSeedAnswerIdAndDeleteHigherOrderAnswers(
+        answerId,
+      ),
       answer,
     );
   }
