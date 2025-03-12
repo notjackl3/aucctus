@@ -77,7 +77,9 @@
       min-width: var(--nav-drawer-collapsed-width) !important;
     }
 
-    border-top: 1px solid var(--gray-300-outline, #e0e5f2);
+    & {
+      border-top: 1px solid var(--gray-300-outline, #e0e5f2);
+    }
 
     .userDetails {
       display: flex;

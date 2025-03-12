@@ -1,13 +1,12 @@
-import { Icon, Loading } from '@components';
+import React from 'react';
+import { Icon } from '@components';
 import {
   useConceptIgnitionQuestionnaire,
   useSaveConceptSeedDraft,
 } from '@hooks/query/concepts.hook';
 import { QuestionnaireSection } from '@pages/Concept/Ignition/IncubateConcept';
 import { IConceptSeed } from '@libs/api/concepts';
-import React from 'react';
 import { toast } from 'react-toastify';
-import { createPortal } from 'react-dom';
 import LoadingMask from './util/LoadingMask';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 

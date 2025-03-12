@@ -51,9 +51,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({
     string | undefined
   >(undefined);
   const [familySize, setFamilySize] = useState(0);
-  const [familySizeError, setFamilySizeError] = useState<string | undefined>(
-    undefined,
-  );
+  const [familySizeError] = useState<string | undefined>(undefined);
   const [geoLocation, setGeoLocation] = useState('');
   const [geoLocationError, setGeoLocationError] = useState<string | undefined>(
     undefined,

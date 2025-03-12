@@ -1,7 +1,6 @@
 import { Icon } from '@components';
 import { Input } from '@components';
 import React from 'react';
-import { QuestionEntry } from '../../types/question';
 import { boxShadowStyle } from '../question/QuestionIcons';
 import { v4 as uuidv4 } from 'uuid';
 import {

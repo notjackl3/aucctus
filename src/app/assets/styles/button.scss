@@ -141,7 +141,7 @@ $btn-colors: (
   $bg-class: nth($value, 1);
   $text-class: nth($value, 2);
 
-  .btn-#{$color} {
+  .btn-#{'' + $color} {
     @apply #{$bg-class} #{$text-class};
 
     &:disabled {

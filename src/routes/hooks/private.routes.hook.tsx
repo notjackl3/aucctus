@@ -1,5 +1,4 @@
 import Page from '@pages';
-import ConceptIncubationProvider from '@stores/concept-incubation.store';
 import { useConceptReportRoutes, useSettingsRoutes } from '@routes/hooks';
 import Layout from '@routes/layouts';
 import { AppPath } from '@routes/routes';

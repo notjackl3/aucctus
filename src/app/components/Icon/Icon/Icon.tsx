@@ -1,6 +1,6 @@
+import React from 'react';
 import { FunctionComponent } from 'react';
 import spritePath from './icon-sprite.svg';
-import { cn } from '@libs/utils/react';
 
 // Hardcoded hash value
 const ICON_HASH = '20b2c4dd3da6f2738bc72b3fae38fb57';

@@ -1,29 +1,11 @@
-import { Badge } from '@components';
 import { FunctionComponent } from 'react';
-import { AssumptionCategory, IAssumption } from '../../../../libs/api/types';
-import { Option } from '../../Button/Dropdown/Dropdown';
+import { IAssumption } from '../../../../libs/api/types';
 
 import styles from './edit-key-assumption.module.scss';
 
 interface IEditKeyAssumptionModalProps {
   assumption: IAssumption;
 }
-
-const HYPOTHESES_MAX_LENGTH = 1500;
-const TITLE_MAX_LENGTH = 64;
-
-const ASSUMPTION_TYPE_OPTIONS: Option[] = (
-  [
-    'adaptability',
-    'desirability',
-    'feasibility',
-    'viability',
-  ] as AssumptionCategory[]
-).map((value) => ({
-  label: <Badge.AssumptionCategory category={value} />,
-  displayLabel: <Badge.AssumptionCategory category={value} />,
-  value,
-}));
 
 const EditKeyAssumptionModal: FunctionComponent<
   IEditKeyAssumptionModalProps

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { cn } from '@libs/utils/react';
 import images from '@assets/img';
 import { Card } from '@components';

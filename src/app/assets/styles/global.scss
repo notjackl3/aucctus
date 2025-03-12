@@ -230,8 +230,10 @@ input:focus {
   }
 
   /* For Firefox */
-  scrollbar-width: thin;
-  scrollbar-color: #271818 #ebe9e9;
+  & {
+    scrollbar-width: thin;
+    scrollbar-color: #271818 #ebe9e9;
+  }
 }
 
 .no-scrollbar {

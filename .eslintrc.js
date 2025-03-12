@@ -11,6 +11,12 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'prettier',
   ],
+  ignorePatterns: ['build/**', 'dist/**', 'node_modules/**'],
+  settings: {
+    react: {
+      version: 'detect',
+    },
+  },
   rules: {
     'no-use-before-define': 'off',
     'no-unused-vars': 'off',

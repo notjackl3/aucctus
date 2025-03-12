@@ -42,7 +42,7 @@ interface ConceptIncubationStoreState {
 
 const conceptIncubationStore = create<ConceptIncubationStoreState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       currentQuestionOrder: undefined,
       activeQuestionnaire: undefined,
       draftSeedUuid: '',

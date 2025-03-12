@@ -16,7 +16,7 @@ const ConceptSettings: FunctionComponent = () => {
   const onReseedClick = useCallback(() => {
     setSeed(seed as IConceptSeed);
     navigate(AppPath.IgniteConcept);
-  }, [seed]);
+  }, [seed, navigate, setSeed]);
 
   return (
     <div className='inline-flex h-96 w-full flex-col gap-3 pt-2'>

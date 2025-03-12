@@ -1,4 +1,4 @@
-import { Card, Container, Header, Text } from '@components';
+import { Card, Header, Text } from '@components';
 import { useEditConcept, useEditOverview } from '@hooks/concepts/editable.hook';
 import { useAssumptions } from '@hooks/query/assumptions.hook';
 import { useConceptOverview } from '@hooks/query/concepts.hook';
@@ -6,6 +6,7 @@ import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
 import { IConceptReportContext } from './ConceptReport';
+import React from 'react';
 
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();

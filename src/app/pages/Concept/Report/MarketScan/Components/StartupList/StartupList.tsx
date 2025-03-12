@@ -80,7 +80,7 @@ const StartupList: React.FC<IStartupDashboardProps> = ({ startups }) => {
             <StartupDetails
               className='pr-6' // for scrollbar positioning
               startupUuid={selectedStartup.uuid}
-              onReasoningClick={(conclusion, reasoning, sources) => (e) =>
+              onReasoningClick={(conclusion, reasoning, sources) => () =>
                 handleReasoningModelClick(conclusion, reasoning, sources)
               }
             />

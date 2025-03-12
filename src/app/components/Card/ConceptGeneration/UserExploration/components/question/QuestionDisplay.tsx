@@ -1,14 +1,13 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useRef } from 'react';
 import { CompletionIcon } from './QuestionIcons';
 import { useQuestionTransition } from '../../hooks/question-transition.hook';
-import { PointerEventMask } from '../util/PointerEventMask';
 import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
-import { QuestionEntry } from '../../types/question';
 import CompletedQuestions from './CompletedQuestions';
 import MultiSelectAnswers from '../answer/MultiSelectAnswers';
 import TextAnswers from '../answer/TextAnswers';
 import CurrentQuestion from './CurrentQuestion';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { PointerEventMask } from '../util/PointerEventMask';
+
 interface QuestionDisplayProps {}
 
 /**

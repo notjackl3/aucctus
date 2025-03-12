@@ -27,28 +27,25 @@ const OnBoarding: FunctionComponent = () => {
     string | undefined
   >();
 
-  const _handleDomainValidation = useCallback(
-    (e: React.FocusEvent) => {
-      const unwantedPrefix = ['https://', 'http://'];
+  const _handleDomainValidation = useCallback(() => {
+    const unwantedPrefix = ['https://', 'http://'];
 
-      let d = domain;
+    let d = domain;
 
-      for (const prefix of unwantedPrefix) {
-        if (d.substring(0, prefix.length) === prefix) {
-          d = d.slice(prefix.length);
-        }
+    for (const prefix of unwantedPrefix) {
+      if (d.substring(0, prefix.length) === prefix) {
+        d = d.slice(prefix.length);
       }
+    }
 
-      if (d && !utils.string.validDomain(d)) {
-        setDomainInputError('Enter a valid domain name.');
-      } else {
-        setDomainInputError(undefined);
-      }
+    if (d && !utils.string.validDomain(d)) {
+      setDomainInputError('Enter a valid domain name.');
+    } else {
+      setDomainInputError(undefined);
+    }
 
-      setDomain(d);
-    },
-    [domain],
-  );
+    setDomain(d);
+  }, [domain]);
 
   if (user && user.account) {
     return <Navigate to={AppPath.Home} replace />;
@@ -115,7 +112,7 @@ const OnBoarding: FunctionComponent = () => {
             <button
               type='button'
               className='btn btn-primary'
-              onClick={(e) => {
+              onClick={() => {
                 registerAccount({ name, domain, goal: innovationGoal });
               }}
               disabled={

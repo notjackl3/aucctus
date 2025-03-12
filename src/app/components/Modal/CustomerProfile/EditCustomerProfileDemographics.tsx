@@ -34,9 +34,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
     string | undefined
   >(undefined);
   const [familySize, setFamilySize] = useState(profile.familySize);
-  const [familySizeError, setFamilySizeError] = useState<string | undefined>(
-    undefined,
-  );
+  const [familySizeError] = useState<string | undefined>(undefined);
   const [geoLocation, setGeoLocation] = useState(profile.geoLocation);
   const [geoLocationError, setGeoLocationError] = useState<string | undefined>(
     undefined,

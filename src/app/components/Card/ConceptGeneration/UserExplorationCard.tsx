@@ -10,8 +10,7 @@ interface UserExplorationCardProps {
 const UserExplorationCard: React.FC<UserExplorationCardProps> = ({
   className = '',
 }) => {
-  const { currentQuestionOrder, activeQuestionnaire, draftSeedUuid } =
-    useConceptIncubationStore();
+  const { currentQuestionOrder } = useConceptIncubationStore();
 
   const renderActiveCard = React.useCallback(() => {
     if (currentQuestionOrder === undefined) {
