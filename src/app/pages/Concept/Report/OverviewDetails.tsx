@@ -73,18 +73,6 @@ const OverviewDetails: FunctionComponent = () => {
               handleCancel={descriptionEdit.handleCancel}
             />
           </div>
-
-          {/* Lists of Trends & Drives and Industries */}
-          <div className='inline-flex items-start justify-between gap-3'>
-            <Container.List
-              title='Trends & Drivers'
-              items={overview?.trendsAndDrivers || []}
-            />
-            <Container.List
-              title='Industries'
-              items={overview?.industries || []}
-            />
-          </div>
         </div>
       </section>
 
