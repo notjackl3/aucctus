@@ -80,8 +80,12 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 
 const GenerateNewIdeas: React.FC = () => {
   const { questionnaires } = useConceptIgnitionQuestionnaire();
-  const { setActiveQuestionnaire, setDraftSeedUuid, setCurrentQuestionIndex } =
-    useConceptIncubationStore();
+  const {
+    setActiveQuestionnaire,
+    setDraftSeedUuid,
+    setCurrentQuestionOrder,
+    resetQuestionnaire,
+  } = useConceptIncubationStore();
   const contentRef = React.useRef<HTMLDivElement>(null);
 
   const {
@@ -135,11 +139,12 @@ const GenerateNewIdeas: React.FC = () => {
           {
             onSuccess: (response) => {
               handleTransition(contentElement, () => {
+                resetQuestionnaire();
                 setActiveQuestionnaire(
                   questionnaires.identifyNewOpportunities as QuestionnaireSection,
                 );
                 setDraftSeedUuid(response.uuid);
-                setCurrentQuestionIndex(0);
+                setCurrentQuestionOrder(1);
               });
             },
             onError: (error) => {
@@ -156,7 +161,8 @@ const GenerateNewIdeas: React.FC = () => {
       handleTransition,
       saveConceptSeedDraft,
       setActiveQuestionnaire,
-      setCurrentQuestionIndex,
+      setCurrentQuestionOrder,
+      resetQuestionnaire,
     ],
   );
 

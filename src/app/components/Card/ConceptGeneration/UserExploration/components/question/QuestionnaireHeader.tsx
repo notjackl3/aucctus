@@ -3,11 +3,10 @@ import { Badge, Icon } from '@components';
 import IncubationIcon from '../util/IncubationIcon';
 import ProgressCircle from '../util/ProgressCircle';
 import { QuestionnaireSection } from '@pages/Concept/Ignition/IncubateConcept';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 interface QuestionnaireHeaderProps {
   questionnaire?: QuestionnaireSection;
-  currentStep: number;
-  totalSteps: number;
   onGoBack: () => void;
   onContinue: () => void;
   isQuestionAnswered: boolean;
@@ -22,14 +21,14 @@ const formatHeaderName = (questionnaire?: QuestionnaireSection) =>
 
 const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
   questionnaire,
-  currentStep,
-  totalSteps,
   onGoBack,
   onContinue,
   isQuestionAnswered,
   isRequired,
 }) => {
   const renderSpacer = () => <div className='flex-1' />;
+
+  const { currentStep, totalSteps } = useConceptIncubationStore();
 
   return (
     <div className='relative z-[10] flex flex-row items-center gap-3'>

@@ -13,22 +13,24 @@ import {
  * MultiSelectAnswers component handles rendering and interaction for multiple choice questions
  */
 const MultiSelectAnswers: React.FC<{
-  questionEntry: QuestionEntry | undefined;
   answersRef?: React.RefObject<HTMLDivElement>;
-}> = ({ questionEntry, answersRef }) => {
-  const { currentMultiSelectAnswerList, setCurrentMultiSelectAnswerList } =
-    useConceptIncubationStore();
+}> = ({ answersRef }) => {
+  const {
+    currentMultiSelectAnswerList,
+    setCurrentMultiSelectAnswerList,
+    activeQuestion,
+  } = useConceptIncubationStore();
 
   if (
-    !questionEntry ||
-    (questionEntry[1].fieldType !== 'multiSelect' &&
-      questionEntry[1].fieldType !== 'radioButton')
+    !activeQuestion ||
+    (activeQuestion.fieldType !== 'multiSelect' &&
+      activeQuestion.fieldType !== 'radioButton')
   ) {
     return null;
   }
 
   const handleOptionSelect = (optionValue: string) => {
-    if (questionEntry[1].fieldType === 'radioButton') {
+    if (activeQuestion.fieldType === 'radioButton') {
       // For radio buttons, replace the entire selection with just the clicked option
       setCurrentMultiSelectAnswerList([
         { uuid: uuidv4(), answer: optionValue },
@@ -61,7 +63,7 @@ const MultiSelectAnswers: React.FC<{
       ref={answersRef}
       className='flex max-h-[50vh] flex-1 flex-col gap-2 overflow-y-auto'
     >
-      {questionEntry[1].options.map((option) => {
+      {activeQuestion.options.map((option) => {
         const isSelected = currentMultiSelectAnswerList.some(
           (item: AnswerItem) => item.answer === option.value,
         );

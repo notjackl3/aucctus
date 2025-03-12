@@ -1,6 +1,5 @@
 import { useCallback } from 'react';
 import { AnswerItem } from '@stores/concept-incubation.store'; // Adjust import based on your actual type
-import { toast } from 'react-toastify';
 
 export const useAnswerList = (
   currentTextAnswerList: AnswerItem[],
@@ -35,6 +34,16 @@ export const useAnswerList = (
     [currentTextAnswerList, setCurrentTextAnswerList],
   );
 
+  const allowUpdateAnswer = useCallback(
+    (newAnswer: string) => {
+      if (newAnswer.trim().length === 0) return false;
+      return !currentTextAnswerList
+        .map((answer) => answer.answer.trim())
+        .includes(newAnswer.trim());
+    },
+    [currentTextAnswerList],
+  );
+
   const handleUpdateAnswer = useCallback(
     (answerUuid: string, newAnswer: string) => {
       if (
@@ -53,5 +62,5 @@ export const useAnswerList = (
     [currentTextAnswerList, setCurrentTextAnswerList],
   );
 
-  return { handleRemoveAnswer, handleUpdateAnswer };
+  return { handleRemoveAnswer, handleUpdateAnswer, allowUpdateAnswer };
 };

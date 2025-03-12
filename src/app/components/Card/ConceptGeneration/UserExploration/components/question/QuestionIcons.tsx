@@ -15,7 +15,11 @@ export const questionIconVariantMap: Record<string, IconVariant> = {
   valueCreation: 'currency-dollar',
 };
 
-export const CompletionIcon = ({ className }: { className?: string }) => (
+interface CompletionIconProps {
+  className?: string;
+}
+
+export const CompletionIcon = ({ className }: CompletionIconProps) => (
   <span
     style={boxShadowStyle}
     className={cn(

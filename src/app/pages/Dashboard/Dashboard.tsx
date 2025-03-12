@@ -8,6 +8,7 @@ import { useDashboard } from '../../hooks/query/account.hook';
 import DashboardInnovationCard from './components/DashboardInnovationCard';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import styles from './styles/dashboard.module.scss';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 const defaultIconProps = {
   stroke: '#2B3674',
@@ -17,6 +18,7 @@ const defaultIconProps = {
 
 const Dashboard: FunctionComponent = () => {
   const navigate = useNavigate();
+  const { resetQuestionnaire } = useConceptIncubationStore();
   const { account, isAuthenticated } = useAuthStore();
   const { data } = useDashboard(isAuthenticated());
 
@@ -30,6 +32,7 @@ const Dashboard: FunctionComponent = () => {
           <button
             className='btn btn-bold btn-primary'
             onClick={() => {
+              resetQuestionnaire();
               navigate(AppPath.IgniteConcept);
             }}
           >

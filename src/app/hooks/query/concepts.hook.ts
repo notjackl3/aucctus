@@ -138,6 +138,13 @@ export const useUpdateConceptSeedDraftAnswer = () => {
   });
 };
 
+export const useDeleteConceptSeedDraftAnswer = () => {
+  return useMutation({
+    mutationFn: async (answerId: number) =>
+      await api.concept.deleteSeedDraftAnswer(answerId),
+  });
+};
+
 export const useConceptIgnitionQuestionnaire = () => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptIgnitionQuestionnaire],

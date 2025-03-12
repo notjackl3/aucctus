@@ -33,7 +33,7 @@ export function useSocketEvent<
 
     const handleIncoming = (e: MessageEvent) => {
       try {
-        const data: SocketEvent<C> = JSON.parse(JSON.parse(e.data));
+        const data: SocketEvent<C> = JSON.parse(e.data);
         if (isSocketEventOfType<T, C>(data, eventName)) {
           savedCallback(data as Extract<SocketEvent<C>, { type: T }>);
         }

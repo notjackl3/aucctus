@@ -34,10 +34,10 @@ interface AiExplorationsCardProps {
 const AiExplorationsCard: React.FC<AiExplorationsCardProps> = ({
   className = '',
 }) => {
-  const { currentQuestionIndex } = useConceptIncubationStore();
+  const { currentQuestionOrder } = useConceptIncubationStore();
   const isValidQuestionIndex = useMemo(
-    () => currentQuestionIndex !== undefined,
-    [currentQuestionIndex],
+    () => currentQuestionOrder !== undefined,
+    [currentQuestionOrder],
   );
 
   const { contentRef, stateValue: startedAiExploration } = useFadeTransition({

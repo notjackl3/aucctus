@@ -16,6 +16,7 @@ import {
 import { camelCaseToTitleCase } from '@libs/utils/string';
 import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -25,6 +26,7 @@ export const CONCEPT_STATUS_LIST_MAP = {
 
 const ConceptBank: React.FC = () => {
   const navigate = useNavigate();
+  const { resetQuestionnaire } = useConceptIncubationStore();
 
   const {
     table,
@@ -74,6 +76,7 @@ const ConceptBank: React.FC = () => {
         <button
           className={`btn btn-bold btn-primary`}
           onClick={() => {
+            resetQuestionnaire();
             navigate(AppPath.IgniteConcept);
           }}
         >

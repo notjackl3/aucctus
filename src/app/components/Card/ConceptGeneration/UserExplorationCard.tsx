@@ -10,16 +10,16 @@ interface UserExplorationCardProps {
 const UserExplorationCard: React.FC<UserExplorationCardProps> = ({
   className = '',
 }) => {
-  const { currentQuestionIndex, activeQuestionnaire, draftSeedUuid } =
+  const { currentQuestionOrder, activeQuestionnaire, draftSeedUuid } =
     useConceptIncubationStore();
 
   const renderActiveCard = React.useCallback(() => {
-    if (currentQuestionIndex === undefined) {
+    if (currentQuestionOrder === undefined) {
       return <GenerateNewIdeas />;
     }
 
     return <UserInteraction />;
-  }, [currentQuestionIndex]);
+  }, [currentQuestionOrder]);
 
   return (
     <div className={cn('flex flex-col rounded-xl', className)}>

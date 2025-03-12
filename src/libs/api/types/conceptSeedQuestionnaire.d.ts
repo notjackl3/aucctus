@@ -1,7 +1,11 @@
 export interface BaseConceptIgnitionQuestion {
   id: number;
+  identifier: string;
   label: string;
   required: boolean;
+  dependsOn?: string;
+  dependsOnValue?: string[];
+  order: number; // x for main questions, x.2, x.4, etc for sub questions
 }
 
 export interface IConceptIgnitionTextQuestion

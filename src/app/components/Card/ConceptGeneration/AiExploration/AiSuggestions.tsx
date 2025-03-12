@@ -1,56 +1,102 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import { QuestionEntry } from '../UserExploration/types/question';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
-import { ConceptIgnitionQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
 
 interface AiSuggestionsProps {
   title?: string;
-  children?: React.ReactNode;
 }
 
 const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   title = 'AI Suggestions',
-  children,
 }) => {
   const {
     suggestions,
+    activeQuestion,
     setSuggestions,
-    currentQuestionIndex,
-    activeQuestionnaire,
     draftSeedUuid,
+    currentMultiSelectAnswerList,
+    currentTextAnswerList,
   } = useConceptIncubationStore();
 
+  const activeSuggestions = useMemo<IAISuggestion[]>(() => {
+    return suggestions[activeQuestion?.identifier ?? ''] ?? [];
+  }, [suggestions, activeQuestion]);
+
+  const sendAiSuggestionsRequest = useCallback(
+    (identifier: string, answer: string[]) => {
+      if (activeQuestion?.identifier === identifier && draftSeedUuid) {
+        setSuggestions(activeQuestion.identifier, []);
+
+        api.aucctusSocket.send({
+          type: 'incubation.ai.suggestions.request',
+          seed_uuid: draftSeedUuid,
+          identifier: activeQuestion.identifier,
+          answer: answer.length ? answer : undefined,
+        });
+      }
+    },
+    [draftSeedUuid, activeQuestion, setSuggestions],
+  );
+
+  useEffect(() => {
+    const handleGenerateAiSuggestions = (event: CustomEvent) =>
+      sendAiSuggestionsRequest(event.detail.identifier, event.detail.answer);
+
+    window.addEventListener(
+      'aucctus-generate-ai-suggestions',
+      handleGenerateAiSuggestions as EventListener,
+    );
+
+    return () =>
+      window.removeEventListener(
+        'aucctus-generate-ai-suggestions',
+        handleGenerateAiSuggestions as EventListener,
+      );
+  }, [activeQuestion, draftSeedUuid, setSuggestions, sendAiSuggestionsRequest]);
+
+  useEffect(() => {
+    if (activeQuestion) {
+      sendAiSuggestionsRequest(activeQuestion.identifier, [
+        ...currentMultiSelectAnswerList.map((answer) => answer.answer.trim()),
+        ...currentTextAnswerList.map((answer) => answer.answer.trim()),
+      ]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeQuestion]);
+
   useSocketEvent('stream.structured.ai.suggestions', (data) => {
-    if (data.stage === 'delta') {
-      setSuggestions(data.id, data.content.suggestions ?? []);
+    if (['done', 'delta'].includes(data.stage)) {
+      setSuggestions(data.context.identifier, data.content.suggestions ?? []);
     }
   });
 
-  const activeQuestion = useMemo<ConceptIgnitionQuestion | undefined>(() => {
-    return Object.values(activeQuestionnaire?.questions ?? {})[
-      currentQuestionIndex ?? 0
-    ];
-  }, [activeQuestionnaire, currentQuestionIndex]);
-
-  useEffect(() => {
-    if (!activeQuestion || !activeQuestion.id) return;
-
-    setSuggestions(activeQuestion.id.toString(), []);
-
-    api.aucctusSocket.send({
-      type: 'incubation.ai.suggestions.request',
-      seed_uuid: draftSeedUuid,
-      identifier: activeQuestion.id.toString(),
-      answer: [],
+  const dispatchAnswerUpdateEvent = useCallback((suggestion: IAISuggestion) => {
+    const event = new CustomEvent('aucctus-incubation-answer-update', {
+      detail: { answer: suggestion.description },
     });
-  }, [activeQuestion, setSuggestions, draftSeedUuid]);
+    window.dispatchEvent(event);
+  }, []);
 
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex h-full flex-col gap-4'>
       <div className='aucctus-text-xl text-white'>{title}</div>
-      <div className='flex flex-col gap-4'>{children}</div>
+      <div className='no-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto'>
+        {activeSuggestions.map((suggestion, index) => (
+          <div
+            onClick={() => dispatchAnswerUpdateEvent(suggestion)}
+            className='aucctus-border-primary flex animate-fade-in cursor-pointer flex-col gap-2 rounded-lg border border-opacity-50 bg-white bg-opacity-25 p-4 backdrop-blur-lg transition-all duration-200 hover:brightness-125'
+            key={`${activeQuestion?.id}-${index}`}
+          >
+            <div className='aucctus-text-md-medium text-gray-light-100'>
+              {suggestion.title}
+            </div>
+            <div className='aucctus-text-sm text-gray-light-200'>
+              {suggestion.description}
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };

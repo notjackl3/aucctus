@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { useAnswerList } from '../../hooks/answer-list.hook';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 interface Answer {
   uuid: string;
@@ -25,6 +27,8 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
   const [editedAnswer, setEditedAnswer] = useState(answer.answer);
   const inputRef = useRef<HTMLInputElement>(null);
   const isBlurFromSaveButton = useRef(false);
+  const { currentTextAnswerList } = useConceptIncubationStore();
+  const { allowUpdateAnswer } = useAnswerList(currentTextAnswerList, () => {});
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -34,7 +38,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
 
   const handleSave = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
-    if (editedAnswer.trim()) {
+    if (editedAnswer.trim() && allowUpdateAnswer(editedAnswer)) {
       handleUpdateAnswer(answer.uuid, editedAnswer);
       setIsEditing(false);
     }
@@ -65,8 +69,8 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
         className={cn(
           'aucctus-text-sm aucctus-text-primary flex-1 break-words rounded-md px-2 py-1',
           {
-            '!focus:ring-2 !focus:ring-error-500': !editedAnswer.trim(),
-            'aucctus-bg-error-primary': !editedAnswer.trim(),
+            'aucctus-text-disabled': !allowUpdateAnswer(editedAnswer),
+            'aucctus-bg-error-primary': !allowUpdateAnswer(editedAnswer),
             'aucctus-bg-tertiary': editedAnswer.trim(),
           },
         )}
@@ -80,7 +84,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
         className={cn(
           'aucctus-bg-tertiary-hover cursor-pointer rounded-lg p-2',
           {
-            'cursor-not-allowed opacity-50': !editedAnswer.trim(),
+            'cursor-not-allowed opacity-50': !allowUpdateAnswer(editedAnswer),
           },
         )}
         onMouseDown={(e) => {

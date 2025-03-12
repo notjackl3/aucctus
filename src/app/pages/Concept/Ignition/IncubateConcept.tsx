@@ -31,7 +31,7 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
   const { mutate: deleteDraft } = useDeleteConceptSeedDraft();
 
   const {
-    currentQuestionIndex,
+    currentQuestionOrder,
     draftSeedUuid,
     submittedAnswers,
     resetQuestionnaire,
@@ -86,7 +86,7 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
       <Card.UserExplorationCard className='ease h-full flex-1 p-4 transition-all duration-300' />
       <Card.AiExplorationsCard
         className={cn('ease h-full w-[50%] p-4 transition-all duration-300', {
-          'w-[35%]': currentQuestionIndex !== undefined,
+          'w-[35%]': currentQuestionOrder !== undefined,
         })}
       />
     </div>

@@ -1,5 +1,5 @@
 import { cn } from '@libs/utils/react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import EditableAnswerRow from './EditableAnswerRow';
 import { useAnswerList } from '../../hooks/answer-list.hook';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
@@ -9,13 +9,20 @@ import { useConceptIncubationStore } from '@stores/concept-incubation.store';
  */
 const TextAnswers: React.FC<{
   answerRowRef: React.RefObject<HTMLDivElement>;
-  isMultiSelectOrRadio: boolean;
-}> = ({ answerRowRef, isMultiSelectOrRadio }) => {
+}> = ({ answerRowRef }) => {
   const {
-    currentQuestionIndex,
+    currentQuestionOrder,
     currentTextAnswerList,
     setCurrentTextAnswerList,
+    activeQuestion,
   } = useConceptIncubationStore();
+
+  const isMultiSelectOrRadio = useMemo(
+    () =>
+      activeQuestion?.fieldType === 'multiSelect' ||
+      activeQuestion?.fieldType === 'radioButton',
+    [activeQuestion],
+  );
 
   const { handleRemoveAnswer, handleUpdateAnswer } = useAnswerList(
     currentTextAnswerList,
@@ -40,7 +47,7 @@ const TextAnswers: React.FC<{
     >
       {currentTextAnswerList.map((answer) => (
         <EditableAnswerRow
-          key={`answer-${answer.answer}-${currentQuestionIndex}`}
+          key={`answer-${answer.answer}-${currentQuestionOrder}`}
           answer={answer}
           handleUpdateAnswer={handleUpdateAnswer}
           handleRemoveAnswer={handleRemoveAnswer}
