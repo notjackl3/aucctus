@@ -1,7 +1,7 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { splitVendorChunkPlugin } from 'vite';
+import { splitVendorChunkPlugin, loadEnv } from 'vite';
 import compression from 'vite-plugin-compression';
 import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
@@ -12,6 +12,7 @@ import { viteBoilerplatePlugin, watchIcons } from './vite/plugins.js';
 export default defineConfig((config) => {
   const { mode } = config;
   const isDevelopment = mode === 'development';
+  const env = loadEnv(mode, process.cwd(), '');
 
   const defaultPlugins = [
     splitVendorChunkPlugin(),
@@ -38,16 +39,18 @@ export default defineConfig((config) => {
     sentryVitePlugin({
       org: 'aucctus',
       project: 'front-end-react',
-      authToken: process.env.SENTRY_AUTH_TOKEN,
+      authToken: env.SENTRY_AUTH_TOKEN,
     }),
   ];
+
+  const allowedHosts = env.ALLOWED_HOSTS ? env.ALLOWED_HOSTS.split(',') : [];
 
   return {
     publicDir: 'public',
     plugins: plugins,
     define: {
-      __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
-      __APP_ENVIRONMENT__: JSON.stringify(process.env.NODE_ENV),
+      __APP_VERSION__: JSON.stringify(env.npm_package_version),
+      __APP_ENVIRONMENT__: JSON.stringify(env.NODE_ENV),
     },
     css: {
       preprocessorOptions: {
@@ -113,5 +116,10 @@ export default defineConfig((config) => {
       environment: 'jsdom',
       mockReset: true,
     },
+    server: isDevelopment
+      ? {
+          allowedHosts,
+        }
+      : {},
   };
 });
