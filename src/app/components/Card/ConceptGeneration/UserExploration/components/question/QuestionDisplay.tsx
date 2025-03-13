@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { CompletionIcon } from './QuestionIcons';
+import { CompletionIcon } from './CompletionIcon';
 import { useQuestionTransition } from '../../hooks/question-transition.hook';
 import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
 import CompletedQuestions from './CompletedQuestions';
@@ -7,6 +7,7 @@ import MultiSelectAnswers from '../answer/MultiSelectAnswers';
 import TextAnswers from '../answer/TextAnswers';
 import CurrentQuestion from './CurrentQuestion';
 import { PointerEventMask } from '../util/PointerEventMask';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 interface QuestionDisplayProps {}
 
@@ -25,10 +26,11 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     multiSelectAnswersRef,
   } = useQuestionTransition();
 
+  const { currentQuestionOrder } = useConceptIncubationStore();
+
   const questionIconLineRef = useRef<HTMLDivElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
 
-  // Use the custom hook to manage the question icon line
   useQuestionIconLine(
     questionIconRef as React.RefObject<HTMLDivElement>,
     questionIconLineRef,
@@ -43,7 +45,15 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
       <CompletedQuestions />
 
       <div className='relative'>
-        <span className='absolute opacity-0' ref={nextCompletionIconRef}>
+        <span
+          style={
+            !Number.isInteger(currentQuestionOrder)
+              ? { marginTop: '-10px' }
+              : {}
+          }
+          className='absolute opacity-0'
+          ref={nextCompletionIconRef}
+        >
           <CompletionIcon />
         </span>
       </div>
@@ -63,7 +73,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
 
       <div
         ref={questionIconLineRef}
-        className='aucctus-border-primary absolute left-[1.4rem] top-[-18px] z-[1] h-10 w-10 border-l-[2px]'
+        className='aucctus-border-primary absolute left-[1.4rem] top-[-25px] z-[1] h-10 w-10 border-l-[2px]'
       />
 
       <PointerEventMask showMask={showMask} />

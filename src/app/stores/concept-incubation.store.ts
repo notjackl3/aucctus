@@ -139,7 +139,7 @@ export const useConceptIncubationStore = () => {
   );
 
   const getNextQuestion = useCallback(
-    (answers: IncubationAnswer[]) => {
+    (answers: IncubationAnswer[]): ConceptIgnitionQuestion | undefined => {
       if (currentQuestionOrder === undefined) return;
 
       const eligibleQuestions = questions

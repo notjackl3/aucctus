@@ -1,7 +1,7 @@
 import { Icon } from '@components';
 import { Input } from '@components';
 import React from 'react';
-import { boxShadowStyle } from '../question/QuestionIcons';
+import { boxShadowStyle } from '../question/QuestionIcon';
 import { v4 as uuidv4 } from 'uuid';
 import {
   useConceptIncubationStore,

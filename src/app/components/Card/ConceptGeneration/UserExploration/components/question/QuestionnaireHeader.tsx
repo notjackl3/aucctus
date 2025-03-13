@@ -31,7 +31,7 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
   const { currentStep, totalSteps } = useConceptIncubationStore();
 
   return (
-    <div className='relative z-[10] flex flex-row items-center gap-3'>
+    <div className='relative z-[100] flex flex-row items-center gap-3'>
       <IncubationIcon variant='telescope' className='stroke-primary-800' />
       <span className='aucctus-text-xl-medium aucctus-text-primary'>
         {formatHeaderName(questionnaire)}

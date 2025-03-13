@@ -10,25 +10,14 @@ export const boxShadowStyle = {
 // Icon mapping for question types
 export const questionIconVariantMap: Record<string, IconVariant> = {
   problemStatement: 'alert-circle',
-  reachUsers: 'route',
+  businessModel: 'route',
   targetProfiles: 'user-group',
   valueCreation: 'currency-dollar',
+  internalProfiles: 'dataflow-04',
+  businessTypes: 'building-02',
+  businessPersonas: 'user-square',
+  consumerProfiles: 'user-group',
 };
-
-interface CompletionIconProps {
-  className?: string;
-}
-
-export const CompletionIcon = ({ className }: CompletionIconProps) => (
-  <span
-    style={boxShadowStyle}
-    className={cn(
-      'aucctus-bg-secondary aucctus-border-primary z-[10] ml-2 flex h-8 w-8 items-center justify-center rounded-md border stroke-primary-600 p-2',
-    )}
-  >
-    <Icon className={className} variant='check' />
-  </span>
-);
 
 export const QuestionIcon = ({
   questionType,

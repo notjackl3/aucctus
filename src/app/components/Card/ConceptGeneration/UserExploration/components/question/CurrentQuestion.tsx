@@ -1,4 +1,4 @@
-import { QuestionIcon } from './QuestionIcons';
+import { QuestionIcon } from './QuestionIcon';
 import React from 'react';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 

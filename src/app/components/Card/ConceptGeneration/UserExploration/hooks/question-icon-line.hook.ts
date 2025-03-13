@@ -22,7 +22,7 @@ export const useQuestionIconLine = (
 
       if (parentRect) {
         // Calculate the distance from the parent's top to the icon's top
-        const distanceToIcon = iconRect.top - parentRect.top + 18;
+        const distanceToIcon = iconRect.top - parentRect.top + 25;
         // Set the height to reach exactly the top of the icon
         iconLine.style.height = `${distanceToIcon}px`;
       }
