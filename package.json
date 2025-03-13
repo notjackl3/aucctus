@@ -8,7 +8,7 @@
     "start:dev": "npm run dev",
     "build": "vite build",
     "build:debug": "vite build --debug",
-    "preview": "vite preview",
+    "preview": "NODE_ENV=production vite build && vite preview",
     "format": "prettier --config ./.prettierrc --write .",
     "lint": "eslint .",
     "prettier-check": "prettier --config ./.prettierrc --check .",
@@ -25,6 +25,7 @@
     "check-deps": "npx depcheck"
   },
   "dependencies": {
+    "@floating-ui/react-dom": "^2.1.1",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-menubar": "^1.1.1",
     "@radix-ui/react-popover": "^1.1.1",
@@ -89,7 +90,7 @@
     "vite": "^6.2.0",
     "vite-plugin-compression": "^0.5.1",
     "vite-plugin-eslint": "^1.8.1",
-    "vite-plugin-imagemin": "^0.6.1",
+    "vite-plugin-imagemin": "^0.1.0",
     "vitest": "^3.0.7"
   },
   "eslintConfig": {

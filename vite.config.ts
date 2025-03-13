@@ -47,27 +47,6 @@ export default defineConfig((config) => {
 
   const allowedHosts = env.ALLOWED_HOSTS ? env.ALLOWED_HOSTS.split(',') : [];
 
-  const packageGroups = {
-    'vendor-react': [
-      'react',
-      'react-dom',
-      'react-router',
-      'react-query',
-      'react-use',
-    ],
-    'vendor-ui': ['@radix-ui', 'react-select', 'react-toastify'],
-    'vendor-utils': [
-      'axios',
-      'classnames',
-      'clsx',
-      'uuid',
-      'crypto-js',
-      'tailwind-merge',
-    ],
-    'vendor-sentry': ['@sentry'],
-    'vendor-tanstack': ['@tanstack'],
-  };
-
   return {
     publicDir: 'public',
     plugins: plugins,
@@ -155,28 +134,6 @@ export default defineConfig((config) => {
             if (id.includes('node_modules')) {
               // Check if the module belongs to a predefined group
               const packageName = id.split('node_modules/')[1].split('/')[0];
-
-              // Handle scoped packages (e.g., @radix-ui/react-dropdown-menu)
-              const scopedPackageName = id
-                .split('node_modules/')[1]
-                .split('/')
-                .slice(0, 2)
-                .join('/');
-
-              // Check if this module matches any of our package groups
-              for (const [groupName, packagesPatterns] of Object.entries(
-                packageGroups,
-              )) {
-                const matchesGroup = packagesPatterns.some(
-                  (pattern) =>
-                    packageName.startsWith(pattern) ||
-                    scopedPackageName.startsWith(pattern),
-                );
-
-                if (matchesGroup) {
-                  return groupName;
-                }
-              }
 
               // Size-based approach - large packages get their own chunk
               // This list can be dynamically generated based on bundle analysis
