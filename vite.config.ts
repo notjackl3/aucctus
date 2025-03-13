@@ -1,7 +1,7 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { splitVendorChunkPlugin, loadEnv } from 'vite';
+import { loadEnv } from 'vite';
 import compression from 'vite-plugin-compression';
 import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
@@ -15,7 +15,6 @@ export default defineConfig((config) => {
   const env = loadEnv(mode, process.cwd(), '');
 
   const defaultPlugins = [
-    splitVendorChunkPlugin(),
     require('cssnano')({
       preset: 'default',
     }),
@@ -40,10 +39,34 @@ export default defineConfig((config) => {
       org: 'aucctus',
       project: 'front-end-react',
       authToken: env.SENTRY_AUTH_TOKEN,
+      sourcemaps: {
+        filesToDeleteAfterUpload: '**/*.map', // Clean up after upload
+      },
     }),
   ];
 
   const allowedHosts = env.ALLOWED_HOSTS ? env.ALLOWED_HOSTS.split(',') : [];
+
+  const packageGroups = {
+    'vendor-react': [
+      'react',
+      'react-dom',
+      'react-router',
+      'react-query',
+      'react-use',
+    ],
+    'vendor-ui': ['@radix-ui', 'react-select', 'react-toastify'],
+    'vendor-utils': [
+      'axios',
+      'classnames',
+      'clsx',
+      'uuid',
+      'crypto-js',
+      'tailwind-merge',
+    ],
+    'vendor-sentry': ['@sentry'],
+    'vendor-tanstack': ['@tanstack'],
+  };
 
   return {
     publicDir: 'public',
@@ -103,11 +126,78 @@ export default defineConfig((config) => {
     },
     build: {
       outDir: 'build',
-      sourcemap: false, // Consider disabling in production
+      sourcemap: !isDevelopment ? 'hidden' : true, // 'hidden' doesn't add references in the bundle
       minify: 'terser',
+      assetsInlineLimit: 4096, // Inline small assets to reduce HTTP requests
+      chunkSizeWarningLimit: 1000, // Increase warning limit if needed
+      cssCodeSplit: true, // Split CSS for better caching
+      target: 'es2018', // Modern browsers support
+      commonjsOptions: {
+        transformMixedEsModules: true, // Handle mixed CJS and ESM modules
+      },
       terserOptions: {
         compress: {
-          drop_console: true, // Remove console logs in production
+          drop_console: true,
+          drop_debugger: true,
+          pure_funcs: ['console.info', 'console.debug', 'console.warn'],
+          passes: 2, // Multiple passes can achieve better minimization
+        },
+        mangle: {
+          safari10: true, // Better Safari compatibility
+        },
+        format: {
+          comments: false, // Remove all comments
+        },
+      },
+      rollupOptions: {
+        output: {
+          manualChunks: (id) => {
+            if (id.includes('node_modules')) {
+              // Check if the module belongs to a predefined group
+              const packageName = id.split('node_modules/')[1].split('/')[0];
+
+              // Handle scoped packages (e.g., @radix-ui/react-dropdown-menu)
+              const scopedPackageName = id
+                .split('node_modules/')[1]
+                .split('/')
+                .slice(0, 2)
+                .join('/');
+
+              // Check if this module matches any of our package groups
+              for (const [groupName, packagesPatterns] of Object.entries(
+                packageGroups,
+              )) {
+                const matchesGroup = packagesPatterns.some(
+                  (pattern) =>
+                    packageName.startsWith(pattern) ||
+                    scopedPackageName.startsWith(pattern),
+                );
+
+                if (matchesGroup) {
+                  return groupName;
+                }
+              }
+
+              // Size-based approach - large packages get their own chunk
+              // This list can be dynamically generated based on bundle analysis
+              const largePackages = ['bootstrap'];
+              if (largePackages.some((pkg) => packageName.startsWith(pkg))) {
+                return `vendor-${packageName.replace('@', '')}`;
+              }
+
+              // Default vendor chunk
+              return 'vendor';
+            }
+
+            // Application code chunking - based on module path LEAVE HERE AS EXAMPLE FOR FUTURE
+            // if (id.includes('src/app/')) {
+            //   if (id.includes('components')) return 'app-components';
+            //   if (id.includes('pages')) return 'app-pages';
+            // }
+          },
+          entryFileNames: 'assets/[name].[hash].js',
+          chunkFileNames: 'assets/[name].[hash].js',
+          assetFileNames: 'assets/[name].[hash].[ext]',
         },
       },
     },
