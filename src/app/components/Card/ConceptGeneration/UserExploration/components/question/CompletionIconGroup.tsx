@@ -24,14 +24,14 @@ const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
     return highestOrder < Math.floor(currentQuestionOrder);
   }, [questionGroup, currentQuestionOrder]);
 
-  const fadeAnimation = useSpring({
-    marginTop: isGroupCompleted ? '-30px' : '5px',
+  const collapseAnimation = useSpring({
+    marginTop: isGroupCompleted ? '-29px' : '5px', // magic number
     config: isGroupCompleted
       ? { tension: 100, friction: 12, mass: 0.5 }
       : { duration: 0 },
   });
 
-  const labelAnimation = useSpring({
+  const fadeOutAnimation = useSpring({
     opacity: isGroupCompleted ? 0 : 1,
     config: { duration: 200 },
   });
@@ -61,14 +61,14 @@ const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
         <animated.span
           style={{
             ...getQuestionStyle(question, index),
-            ...(index > 0 ? fadeAnimation : {}),
+            ...(index > 0 ? collapseAnimation : {}),
           }}
           className='relative flex flex-row items-center gap-2 ease-in-out'
           key={question.identifier}
         >
-          <CompletionIcon className='z-[10] animate-fade-in opacity-0' />
+          <CompletionIcon iconClassName='z-[10] animate-fade-in opacity-0' />
           <animated.span
-            style={index > 0 ? labelAnimation : {}}
+            style={index > 0 ? fadeOutAnimation : {}}
             className='aucctus-completed-question-label aucctus-text-sm aucctus-text-primary'
           >
             {question.label}

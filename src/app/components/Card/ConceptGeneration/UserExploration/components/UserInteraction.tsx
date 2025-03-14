@@ -23,6 +23,7 @@ import QuestionnaireHeader from './question/QuestionnaireHeader';
 import AnswerInput from './answer/AnswerInput';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { IncubationAnswer } from '@libs/api/concepts';
+import { useTransition, animated } from 'react-spring';
 // Types
 interface UserInteractionProps {}
 
@@ -150,12 +151,10 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
   const goToNextQuestion = useCallback(
     (answers: IncubationAnswer[]) => {
       const nextQuestion = getNextQuestion(answers);
-      if (nextQuestion) {
-        dispatchAnimationEvent('forward', () => {
-          setCurrentQuestionOrder(nextQuestion.order);
-          setAnswerValue('');
-        });
-      }
+      dispatchAnimationEvent('forward', () => {
+        setCurrentQuestionOrder(nextQuestion?.order ?? Infinity);
+        setAnswerValue('');
+      });
     },
     [dispatchAnimationEvent, getNextQuestion, setCurrentQuestionOrder],
   );
@@ -216,7 +215,6 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     return !hasAnswer;
   }, [activeQuestion, currentTextAnswerList, answerValue]);
 
-  // ===== EVENT HANDLERS =====
   const onInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setAnswerValue(e.target.value);
@@ -244,7 +242,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
   const handleGoBack = useCallback(() => {
     if (currentQuestionOrder === undefined) return;
 
-    const previousQuestion = getPreviousQuestion();
+    const previousQuestion = getPreviousQuestion(submittedAnswers);
 
     if (!previousQuestion) {
       if ((seedDraftAnswers ?? []).length === 0) {
@@ -410,10 +408,20 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     activeAnswer,
   ]);
 
-  // ===== MAIN RENDER =====
+  // Add transition for answer input
+  const answerInputTransition = useTransition(
+    currentQuestionOrder !== Infinity,
+    {
+      from: { opacity: 0, transform: 'translateX(0px)', maxHeight: '0px' },
+      enter: { opacity: 1, transform: 'translateX(0px)', maxHeight: '100px' },
+      leave: { opacity: 0, transform: 'translateX(0px)', maxHeight: '0px' },
+      config: { tension: 200, friction: 20, mass: 0.5 },
+    },
+  );
+
   return (
     <>
-      <div className='relative flex flex-1 animate-slide-in-center flex-col gap-4'>
+      <div className='relative flex flex-1 animate-slide-in-center flex-col'>
         <QuestionnaireHeader
           questionnaire={activeQuestionnaire}
           onGoBack={handleGoBack}
@@ -421,16 +429,23 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
           isQuestionAnswered={isQuestionAnswered}
           isRequired={activeQuestion?.required ?? false}
         />
-        <div className='z-[10] flex flex-1'>
+        <div className='z-[10] my-4 flex flex-1 transition-all duration-300'>
           <QuestionDisplay />
         </div>
-        <AnswerInput
-          value={answerValue}
-          onChange={onInputChange}
-          onAddAnswer={handleAddAnswer}
-          allowAddAnswer={allowAddAnswer}
-          onGenerateAiSuggestions={dispatchAiSuggestionsEvent}
-        />
+        {answerInputTransition(
+          (style, item) =>
+            item && (
+              <animated.div style={style}>
+                <AnswerInput
+                  value={answerValue}
+                  onChange={onInputChange}
+                  onAddAnswer={handleAddAnswer}
+                  allowAddAnswer={allowAddAnswer}
+                  onGenerateAiSuggestions={dispatchAiSuggestionsEvent}
+                />
+              </animated.div>
+            ),
+        )}
       </div>
       <LoadingMask isLoading={isLoading} />
     </>

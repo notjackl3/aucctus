@@ -14,7 +14,7 @@
             {
               "name": "removeAttrs",
               "params": {
-                "attrs": "(stroke|stroke.*)"
+                "attrs": "(stroke|stroke-linecap|stroke-linejoin|stroke-dasharray)"
               }
             },
             {
@@ -23,7 +23,6 @@
                 "attributes": [
                   {
                     "stroke": "stroke",
-                    "stroke-width": "2",
                     "stroke-linecap": "round",
                     "stroke-linejoin": "round",
                     "fill": "fill"

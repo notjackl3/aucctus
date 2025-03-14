@@ -112,8 +112,7 @@ export const useQuestionTransition = () => {
   // Handle animation when moving to previous question
   const handleBackwardAnimation = useCallback((callback: () => void) => {
     const parentComponent = componentRef.current;
-    const answerRow = answerRowRef.current;
-    if (parentComponent && answerRow) {
+    if (parentComponent) {
       const handleTransitionEnd = () => {
         parentComponent.classList.remove('opacity-0');
         parentComponent.removeEventListener(

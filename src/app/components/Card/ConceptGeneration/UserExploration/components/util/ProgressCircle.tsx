@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useCallback } from 'react';
 
 interface ProgressCircleProps {
   currentStep: number;
@@ -14,34 +14,6 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   size = '1.5rem',
 }) => {
   const progress = (currentStep / totalSteps) * 100;
-
-  useEffect(() => {
-    if (CSS && 'registerProperty' in CSS) {
-      try {
-        // @ts-ignore - TypeScript might not recognize this API
-        CSS.registerProperty({
-          name: '--incubationProgress',
-          syntax: '<percentage>',
-          initialValue: '0%',
-          inherits: false,
-        });
-      } catch (e) {
-        // Property might already be registered or browser doesn't support it
-        console.log('CSS Property registration error:', e);
-      }
-    }
-
-    // Add the keyframes animation to the document
-    const styleSheet = document.createElement('style');
-    styleSheet.textContent = `
-      @keyframes progressAnimation { to { --incubationProgress: 100% } }
-    `;
-    document.head.appendChild(styleSheet);
-
-    return () => {
-      document.head.removeChild(styleSheet);
-    };
-  }, []);
 
   const getCircularProgressStyle = useCallback(() => {
     return {

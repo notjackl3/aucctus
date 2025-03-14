@@ -6,7 +6,7 @@ import { useConceptIncubationStore } from '@stores/concept-incubation.store';
  * CurrentQuestion component displays the current active question
  */
 const CurrentQuestion: React.FC<{
-  questionIconRef: React.RefObject<HTMLDivElement>;
+  questionIconRef: React.RefObject<HTMLSpanElement>;
   questionLabelRef: React.RefObject<HTMLSpanElement>;
 }> = ({ questionIconRef, questionLabelRef }) => {
   const { activeQuestion } = useConceptIncubationStore();

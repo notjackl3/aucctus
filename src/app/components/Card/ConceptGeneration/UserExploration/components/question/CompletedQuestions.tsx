@@ -7,26 +7,16 @@ import CompletionIconGroup from './CompletionIconGroup';
  * CompletedQuestions component displays a list of questions that have been answered
  */
 const CompletedQuestions: React.FC = () => {
-  const { activeQuestionnaire, submittedAnswers, currentQuestionOrder } =
+  const { submittedAnswers, currentQuestionOrder } =
     useConceptIncubationStore();
 
-  // Get all completed questions
-  const numCompletedQuestions = useMemo(() => {
-    if (!currentQuestionOrder) return 0;
-
-    return submittedAnswers.filter(
-      (answer) => answer.question.order < currentQuestionOrder,
-    ).length;
+  const completedQuestions = useMemo(() => {
+    return submittedAnswers
+      .filter((answer) => answer.question.order < (currentQuestionOrder ?? 0))
+      .map((answer) => answer.question);
   }, [submittedAnswers, currentQuestionOrder]);
 
-  const completedQuestions = useMemo(() => {
-    if (!activeQuestionnaire?.questions) return [];
-
-    const allQuestions = Object.values(activeQuestionnaire.questions);
-    return allQuestions.slice(0, numCompletedQuestions);
-  }, [activeQuestionnaire, numCompletedQuestions]);
-
-  const groupedCompletedQuestions = useMemo(() => {
+  const groupedCompletedQuestions: ConceptIgnitionQuestion[][] = useMemo(() => {
     if (!completedQuestions.length) return [];
 
     // Create a map to group questions by their floor order value
@@ -40,7 +30,6 @@ const CompletedQuestions: React.FC = () => {
       groupMap[floorOrder].push(question);
     });
 
-    // Convert the map to an array of arrays
     return Object.values(groupMap);
   }, [completedQuestions]);
 

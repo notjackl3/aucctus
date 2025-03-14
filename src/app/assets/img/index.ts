@@ -13,6 +13,7 @@ import aiExplorationsBackground from './ai-explorations-background.png';
 import incubationCard from './aucctus-incubation-card-1.png';
 import incubationCard2 from './aucctus-incubation-card-2.png';
 import incubationLineChart from './aucctus-incubation-line-chart.png';
+import readyToGenerateGradient from './ready-to-generate-gradient.png';
 
 import avatar from './avatar.png';
 
@@ -39,6 +40,7 @@ const images = {
   incubationCard,
   incubationCard2,
   incubationLineChart,
+  readyToGenerateGradient,
 
   // User
   avatar,

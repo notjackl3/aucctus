@@ -19,16 +19,48 @@ function App() {
   // Private Routes
   const PrivateRoutes = usePrivateRoutes();
 
+  React.useEffect(() => {
+    if (CSS && 'registerProperty' in CSS) {
+      try {
+        // @ts-ignore - TypeScript might not recognize this API
+        CSS.registerProperty({
+          name: '--incubationProgress',
+          syntax: '<percentage>',
+          initialValue: '0%',
+          inherits: false,
+        });
+      } catch (e) {}
+    }
+
+    // Add the keyframes animation to the document
+    const styleSheet = document.createElement('style');
+    styleSheet.textContent = `
+      @keyframes progressAnimation { to { --incubationProgress: 100% } }
+    `;
+    document.head.appendChild(styleSheet);
+
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
+  }, []);
+
   // Preload Concept Generation Background Images
   React.useEffect(() => {
-    const aiExplorationsBackground = new Image();
-    aiExplorationsBackground.src = images.aiExplorationsBackground;
+    const preloadImage = (src: string) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = reject;
+        img.src = src;
+      });
+    };
 
-    const incubationCard = new Image();
-    incubationCard.src = images.incubationCard;
-
-    const incubationCard2 = new Image();
-    incubationCard2.src = images.incubationCard2;
+    Promise.all([
+      preloadImage(images.aiExplorationsBackground),
+      preloadImage(images.incubationCard),
+      preloadImage(images.incubationCard2),
+      preloadImage(images.readyToGenerateGradient),
+    ]);
   }, []);
 
   return (

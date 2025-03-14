@@ -109,7 +109,7 @@ const conceptIncubationStore = create<ConceptIncubationStoreState>()(
 
 export const useConceptIncubationStore = () => {
   const store = conceptIncubationStore();
-  const { submittedAnswers, activeQuestionnaire, currentQuestionOrder } = store;
+  const { activeQuestionnaire, currentQuestionOrder } = store;
 
   const questions = useMemo(() => {
     if (!activeQuestionnaire) return [];
@@ -161,16 +161,19 @@ export const useConceptIncubationStore = () => {
     [currentQuestionOrder, questions, shouldShowQuestion],
   );
 
-  const getPreviousQuestion = useCallback(() => {
-    if (!currentQuestionOrder) return;
+  const getPreviousQuestion = useCallback(
+    (answers: IncubationAnswer[]) => {
+      if (!currentQuestionOrder) return;
 
-    const previousQuestion = [...submittedAnswers]
-      .map((answer) => answer.question)
-      .sort((a, b) => b.order - a.order)
-      .find((question) => question.order < currentQuestionOrder);
+      const previousQuestion = [...answers]
+        .map((answer) => answer.question)
+        .sort((a, b) => b.order - a.order)
+        .find((question) => question.order < currentQuestionOrder);
 
-    return previousQuestion;
-  }, [currentQuestionOrder, submittedAnswers]);
+      return previousQuestion;
+    },
+    [currentQuestionOrder],
+  );
 
   const totalSteps = useMemo(() => {
     if (!questions) return 0;

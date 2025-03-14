@@ -4,9 +4,10 @@ import { useEffect } from 'react';
  * Custom hook to manage the question icon line height
  */
 export const useQuestionIconLine = (
-  questionIconRef: React.RefObject<HTMLDivElement>,
+  questionIconRef: React.RefObject<HTMLSpanElement>,
   questionIconLineRef: React.RefObject<HTMLDivElement>,
   spacerRef: React.RefObject<HTMLDivElement>,
+  currentQuestionOrder: number,
 ) => {
   useEffect(() => {
     const questionIcon = questionIconRef.current;
@@ -17,7 +18,7 @@ export const useQuestionIconLine = (
 
     // Function to update the line height
     const updateLineHeight = () => {
-      const iconRect = questionIcon.getBoundingClientRect();
+      const iconRect = questionIcon?.getBoundingClientRect();
       const parentRect = iconLine.parentElement?.getBoundingClientRect();
 
       if (parentRect) {
@@ -59,5 +60,5 @@ export const useQuestionIconLine = (
       resizeObserver.disconnect();
       window.removeEventListener('resize', updateLineHeight);
     };
-  }, [questionIconRef, questionIconLineRef, spacerRef]);
+  }, [questionIconRef, questionIconLineRef, spacerRef, currentQuestionOrder]);
 };

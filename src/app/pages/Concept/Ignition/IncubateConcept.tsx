@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Card, Loading } from '@components';
 import {
   useConceptIgnitionQuestionnaire,
@@ -55,27 +55,31 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
     };
   }, [draftSeedUuid, submittedAnswers, deleteDraft, resetQuestionnaire]);
 
-  // useRefs with latest values, only on unmount
-  useEffect(() => {
-    return () => {
-      const {
-        draftSeedUuid,
-        submittedAnswers,
-        deleteDraft,
-        resetQuestionnaire,
-      } = latestValuesRef.current;
+  const deleteAnswerlessDraft = useCallback(() => {
+    const { draftSeedUuid, submittedAnswers, deleteDraft, resetQuestionnaire } =
+      latestValuesRef.current;
 
-      if (submittedAnswers.length === 0 && draftSeedUuid) {
-        deleteDraft(draftSeedUuid, {
-          onSuccess: () => resetQuestionnaire(),
-          onError: (error) => {
-            console.error('Failed to delete draft: ', error);
-            resetQuestionnaire();
-          },
-        });
-      }
-    };
-  }, []); // Empty dependency array means this only runs on mount/unmount
+    if (submittedAnswers.length === 0 && draftSeedUuid) {
+      deleteDraft(draftSeedUuid, {
+        onSuccess: () => resetQuestionnaire(),
+        onError: (error) => {
+          console.error('Failed to delete draft: ', error);
+          resetQuestionnaire();
+        },
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener('beforeunload', deleteAnswerlessDraft);
+
+    return () =>
+      window.removeEventListener('beforeunload', deleteAnswerlessDraft);
+  }, [deleteAnswerlessDraft]);
+
+  useEffect(() => {
+    return () => deleteAnswerlessDraft();
+  }, [deleteAnswerlessDraft]);
 
   if (isSeedLoading || isQuestionnaireLoading) {
     return <Loading />;

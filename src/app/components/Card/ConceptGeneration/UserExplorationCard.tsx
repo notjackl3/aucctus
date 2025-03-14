@@ -13,7 +13,7 @@ const UserExplorationCard: React.FC<UserExplorationCardProps> = ({
   const { currentQuestionOrder } = useConceptIncubationStore();
 
   const renderActiveCard = React.useCallback(() => {
-    if (currentQuestionOrder === undefined) {
+    if (!currentQuestionOrder) {
       return <GenerateNewIdeas />;
     }
 

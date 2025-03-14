@@ -1,18 +1,28 @@
 import { Icon } from '@components';
 import { boxShadowStyle } from './QuestionIcon';
 import React from 'react';
+import { cn } from '@libs/utils/react';
 
 interface CompletionIconProps {
   className?: string;
+  iconClassName?: string;
+  variant?: IconVariant;
 }
 
-export const CompletionIcon = ({ className }: CompletionIconProps) => {
+export const CompletionIcon = ({
+  className = 'aucctus-bg-secondary ml-2 h-8 w-8',
+  iconClassName,
+  variant = 'check',
+}: CompletionIconProps) => {
   return (
     <span
       style={{ ...boxShadowStyle }}
-      className='aucctus-bg-secondary aucctus-border-primary z-[10] ml-2 flex h-8 w-8 items-center justify-center rounded-md border stroke-primary-600 p-2'
+      className={cn(
+        'aucctus-border-primary z-[10] flex items-center justify-center rounded-md border stroke-primary-600 p-2',
+        className,
+      )}
     >
-      <Icon className={className} variant='check' />
+      <Icon className={iconClassName} variant={variant} />
     </span>
   );
 };

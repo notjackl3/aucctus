@@ -17,7 +17,7 @@ const AnswerInput: React.FC<AnswerInputProps> = ({
   allowAddAnswer,
 }) => {
   return (
-    <div className='relative h-12 w-full'>
+    <>
       <input
         type='text'
         value={value}
@@ -60,7 +60,7 @@ const AnswerInput: React.FC<AnswerInputProps> = ({
           </span>
         </button>
       </span>
-    </div>
+    </>
   );
 };
 
