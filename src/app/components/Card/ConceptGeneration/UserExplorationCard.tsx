@@ -3,13 +3,15 @@ import React from 'react';
 import GenerateNewIdeas from './UserExploration/components/GenerateNewIdeas';
 import UserInteraction from './UserExploration/components/UserInteraction';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+
 interface UserExplorationCardProps {
   className?: string;
 }
 
-const UserExplorationCard: React.FC<UserExplorationCardProps> = ({
-  className = '',
-}) => {
+const UserExplorationCard = React.forwardRef<
+  HTMLDivElement,
+  UserExplorationCardProps
+>(({ className = '' }, ref) => {
   const { currentQuestionOrder } = useConceptIncubationStore();
 
   const renderActiveCard = React.useCallback(() => {
@@ -21,10 +23,12 @@ const UserExplorationCard: React.FC<UserExplorationCardProps> = ({
   }, [currentQuestionOrder]);
 
   return (
-    <div className={cn('flex flex-col rounded-xl', className)}>
+    <div ref={ref} className={cn('flex flex-col rounded-xl', className)}>
       {renderActiveCard()}
     </div>
   );
-};
+});
+
+UserExplorationCard.displayName = 'UserExplorationCard';
 
 export default UserExplorationCard;

@@ -1,4 +1,8 @@
 ---
+description: 
+globs: *.tsx, *.ts
+---
+---
 description: Best practices for building Aucctus with React TS
 globs: *.ts, *.tsx
 ---

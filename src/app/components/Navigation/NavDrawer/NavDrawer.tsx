@@ -1,4 +1,4 @@
-import NavLogo from '@assets/aucctus_nav_logo.png';
+import NavLogo from '@assets/aucctus_logo.png';
 import NavWord from '@assets/aucctus_nav_word.png';
 import { Avatar } from '@components';
 import { AppPath } from '@routes/routes';

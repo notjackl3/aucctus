@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
+import { cn } from '@libs/utils/react';
 
 interface AiSuggestionsProps {
   title?: string;
@@ -17,6 +18,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     draftSeedUuid,
     currentMultiSelectAnswerList,
     currentTextAnswerList,
+    currentQuestionOrder,
   } = useConceptIncubationStore();
 
   const activeSuggestions = useMemo<IAISuggestion[]>(() => {
@@ -79,7 +81,12 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   }, []);
 
   return (
-    <div className='flex h-full flex-col gap-4'>
+    <div
+      className={cn('flex h-full flex-col gap-4 transition-all duration-300', {
+        'opacity-1': (currentQuestionOrder ?? 0) < Infinity,
+        'opacity-0': currentQuestionOrder === Infinity,
+      })}
+    >
       <div className='aucctus-text-xl text-white'>{title}</div>
       <div className='no-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto'>
         {activeSuggestions.map((suggestion, index) => (

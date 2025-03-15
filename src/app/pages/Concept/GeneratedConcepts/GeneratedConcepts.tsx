@@ -2,7 +2,7 @@ import { Container, Loading, Table } from '@components';
 import Icon from '@components/Icon/Icon/Icon';
 import IgniteLoading from '@components/IgniteLoading';
 import {
-  useConceptIgnition,
+  useConceptGeneration,
   useSaveGeneratedConcepts,
 } from '@hooks/query/concepts.hook';
 import { useGeneratedConcepts } from '@hooks/tables/generated-concepts.hook';
@@ -15,8 +15,8 @@ import styles from './generatedConcepts.module.scss';
 
 const GeneratedConcepts: FunctionComponent = () => {
   const navigate = useNavigate();
-  const { mutate: igniteConcept, isLoading: isGenerateLoading } =
-    useConceptIgnition();
+  const { mutate: generateConcepts, isLoading: isGenerateLoading } =
+    useConceptGeneration();
   const { mutate: saveConcepts, isLoading: isSaveLoading } =
     useSaveGeneratedConcepts();
   const {

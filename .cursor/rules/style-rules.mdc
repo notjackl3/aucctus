@@ -1,4 +1,8 @@
 ---
+description: 
+globs: *.tsx
+---
+---
 description: Guidelines for styling jsx and html components
 globs: *.ts
 ---

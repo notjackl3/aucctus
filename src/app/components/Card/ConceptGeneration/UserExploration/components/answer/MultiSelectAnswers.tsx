@@ -78,7 +78,7 @@ const MultiSelectAnswers: React.FC<{
               className='aucctus-bg-primary aucctus-border-secondary mr-2 flex h-8 w-8 items-center justify-center rounded-lg border-2'
             >
               <Icon
-                variant={option.icon as IconVariant}
+                variant={(option.icon || 'help') as IconVariant}
                 height={16}
                 width={16}
               />
@@ -87,9 +87,11 @@ const MultiSelectAnswers: React.FC<{
               <span className='aucctus-text-sm aucctus-text-primary'>
                 {option.label}
               </span>
-              <span className='aucctus-text-xs aucctus-text-secondary'>
-                {option.description}
-              </span>
+              {option.description && (
+                <span className='aucctus-text-xs aucctus-text-secondary'>
+                  {option.description}
+                </span>
+              )}
             </div>
             <Input.CheckBox
               checked={isSelected}

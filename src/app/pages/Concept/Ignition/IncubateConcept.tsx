@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Card, Loading } from '@components';
 import {
   useConceptIgnitionQuestionnaire,
@@ -12,6 +12,17 @@ import {
 } from '@libs/api/types/conceptSeedQuestionnaire';
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { useState } from 'react';
+import { animated, easings, useTransition } from '@react-spring/web';
+import ConceptGeneration from '@components/Card/ConceptGeneration/Generation/ConceptGeneration';
+import { toast } from 'react-toastify';
+import ConceptSelection from '@components/Card/ConceptGeneration/Generation/ConceptSelection';
+
+type ConceptGenerationState =
+  | 'pre-generation'
+  | 'generating'
+  | 'selecting'
+  | 'post-generation';
 
 interface IncubateConceptProps {
   initialDraftSeedUuid?: string;
@@ -24,12 +35,20 @@ export type QuestionnaireSection =
 const IncubateConcept: React.FC<IncubateConceptProps> = ({
   initialDraftSeedUuid,
 }) => {
+  const conceptGenerationRef = useRef<HTMLDivElement>(null);
+
+  const [conceptGenerationState, setConceptGenerationState] =
+    useState<ConceptGenerationState>('pre-generation');
+  const [pregenToGenAnimationComplete, setPregenToGenAnimationComplete] =
+    useState(false);
+  const userExplorationRef = useRef<HTMLDivElement>(null);
+
+  // Data Fetching & Store Access
   const { isLoading: isSeedLoading } =
     useConceptSeedDraft(initialDraftSeedUuid);
   const { isLoading: isQuestionnaireLoading } =
     useConceptIgnitionQuestionnaire();
   const { mutate: deleteDraft } = useDeleteConceptSeedDraft();
-
   const {
     currentQuestionOrder,
     draftSeedUuid,
@@ -37,7 +56,12 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
     resetQuestionnaire,
   } = useConceptIncubationStore();
 
-  // Refs to store latest values
+  const hasSubmittedAnswers = useMemo(
+    () => submittedAnswers.length > 0,
+    [submittedAnswers],
+  );
+
+  // Draft Management
   const latestValuesRef = useRef({
     draftSeedUuid,
     submittedAnswers,
@@ -45,7 +69,6 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
     resetQuestionnaire,
   });
 
-  // Update refs whenever values change
   useEffect(() => {
     latestValuesRef.current = {
       draftSeedUuid,
@@ -71,28 +94,179 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
   }, []);
 
   useEffect(() => {
-    window.addEventListener('beforeunload', deleteAnswerlessDraft);
-
-    return () =>
-      window.removeEventListener('beforeunload', deleteAnswerlessDraft);
-  }, [deleteAnswerlessDraft]);
-
-  useEffect(() => {
     return () => deleteAnswerlessDraft();
   }, [deleteAnswerlessDraft]);
+
+  // Concept Generation Event Handling
+  useEffect(() => {
+    const handleGenerateConcept = (event?: Event) => {
+      const customEvent = event as
+        | CustomEvent<{ revert?: boolean }>
+        | undefined;
+
+      if (customEvent?.detail?.revert) {
+        setConceptGenerationState('pre-generation');
+        setPregenToGenAnimationComplete(false);
+        toast.error(
+          'An error occurred while generating the concept. Please try again.',
+        );
+        return;
+      }
+
+      if (hasSubmittedAnswers) {
+        const userExplorationElement = userExplorationRef.current;
+
+        if (userExplorationElement) {
+          userExplorationElement.addEventListener(
+            'transitionend',
+            () => {
+              setConceptGenerationState('generating');
+            },
+            { once: true },
+          );
+
+          userExplorationElement.classList.replace('opacity-1', 'opacity-0');
+        } else {
+          setConceptGenerationState('generating');
+        }
+      }
+    };
+
+    window.addEventListener('aucctus-generate-concept', handleGenerateConcept);
+    return () =>
+      window.removeEventListener(
+        'aucctus-generate-concept',
+        handleGenerateConcept,
+      );
+  }, [hasSubmittedAnswers]);
+
+  // Animation Transitions
+  const userExplorationTransition = useTransition(
+    conceptGenerationState === 'pre-generation',
+    {
+      from: { opacity: 0, maxWidth: '0px' },
+      enter: { opacity: 1, maxWidth: '3000px' },
+      leave: { opacity: 0, maxWidth: '0px', overflow: 'hidden' },
+      config: { duration: 300, easing: easings.easeInOutSine },
+    },
+  );
+
+  const aiExplorationTransition = useTransition(
+    conceptGenerationState === 'pre-generation',
+    {
+      enter: { width: '35%' },
+      leave: { width: '100%' },
+      config: { duration: 300, easing: easings.easeInOutSine },
+      onRest: () => {
+        if (conceptGenerationState === 'generating') {
+          setPregenToGenAnimationComplete(true);
+        }
+      },
+    },
+  );
+
+  const handleBeginConceptSelection = useCallback(() => {
+    const conceptGenerationElement = conceptGenerationRef.current;
+
+    if (conceptGenerationElement) {
+      conceptGenerationElement.addEventListener(
+        'transitionend',
+        () => {
+          setConceptGenerationState('selecting');
+        },
+        { once: true },
+      );
+
+      conceptGenerationElement.classList.remove('rounded-xl', 'p-4', 'mr-4');
+    } else {
+      setConceptGenerationState('selecting');
+    }
+  }, []);
+
+  // Render Functions
+  const renderPreGeneration = useCallback(() => {
+    return (
+      <>
+        {userExplorationTransition(
+          (style, show) =>
+            show && (
+              <animated.span style={style} className={cn('flex-1')}>
+                <Card.UserExplorationCard
+                  ref={userExplorationRef}
+                  className='ease opacity-1 ml-4 h-full flex-1 p-4 transition-all duration-300'
+                />
+              </animated.span>
+            ),
+        )}
+
+        {aiExplorationTransition(
+          (style, show) =>
+            show && (
+              <animated.span
+                style={style}
+                className={cn('transition-all duration-300', {
+                  '!w-[35%]':
+                    currentQuestionOrder !== undefined &&
+                    conceptGenerationState === 'pre-generation',
+                  '!w-[50%]':
+                    currentQuestionOrder === undefined &&
+                    conceptGenerationState === 'pre-generation',
+                  '!w-[100%]': conceptGenerationState === 'generating',
+                })}
+              >
+                <Card.AiExplorationsCard className='ease mr-4 h-full flex-1 p-4 transition-all duration-300' />
+              </animated.span>
+            ),
+        )}
+      </>
+    );
+  }, [
+    userExplorationTransition,
+    aiExplorationTransition,
+    conceptGenerationState,
+    currentQuestionOrder,
+  ]);
+
+  const renderConceptGeneration = useCallback(
+    (className: string) => {
+      return (
+        <ConceptGeneration
+          ref={conceptGenerationRef}
+          className={className}
+          onGenerateComplete={handleBeginConceptSelection}
+        />
+      );
+    },
+    [handleBeginConceptSelection],
+  );
+
+  const renderConceptSelection = useCallback((className: string) => {
+    return <ConceptSelection className={className} />;
+  }, []);
 
   if (isSeedLoading || isQuestionnaireLoading) {
     return <Loading />;
   }
 
   return (
-    <div className='flex h-[100vh] flex-row gap-4 p-8'>
-      <Card.UserExplorationCard className='ease h-full flex-1 p-4 transition-all duration-300' />
-      <Card.AiExplorationsCard
-        className={cn('ease h-full w-[50%] p-4 transition-all duration-300', {
-          'w-[35%]': currentQuestionOrder !== undefined,
-        })}
-      />
+    <div
+      className={cn(
+        'no-scrollbar ease flex h-[100vh] flex-row transition-all duration-300',
+        {
+          'p-8': conceptGenerationState !== 'selecting',
+        },
+      )}
+    >
+      {renderPreGeneration()}
+      {conceptGenerationState === 'generating' &&
+        pregenToGenAnimationComplete &&
+        renderConceptGeneration(
+          'flex flex-col rounded-xl flex-1 ease h-full p-4 transition-all duration-300 mr-4',
+        )}
+      {conceptGenerationState === 'selecting' &&
+        renderConceptSelection(
+          'flex flex-col flex-1 ease h-full transition-all duration-300',
+        )}
     </div>
   );
 };

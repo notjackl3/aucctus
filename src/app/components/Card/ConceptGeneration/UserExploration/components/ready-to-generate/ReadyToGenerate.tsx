@@ -3,6 +3,7 @@ import { CompletionIcon } from '../question/CompletionIcon';
 import { animated } from '@react-spring/web';
 import { useReadyToGenerateAnimations } from './ready-to-generate-animation.hook';
 import images from '@assets/img';
+import AucctusImg from '@components/Image/AucctusImg';
 
 const ReadyToGenerateIcon: React.FC = () => {
   return (
@@ -47,18 +48,19 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({}) => {
             <span className='flex flex-1'></span>
             <button
               className='btn btn-primary self-start'
-              onClick={() => {
-                console.log('TODO: Implement generate concepts');
-              }}
+              onClick={() =>
+                window.dispatchEvent(
+                  new CustomEvent('aucctus-generate-concept'),
+                )
+              }
             >
               Generate
             </button>
           </div>
-          <div className='flex w-[40%] flex-col gap-2'>
-            <img
+          <div className='flex w-[40%] flex-col items-center justify-center gap-2'>
+            <AucctusImg
               src={images.readyToGenerateGradient}
-              alt='arrow-right'
-              className='h-full w-full'
+              className='w-full'
             />
           </div>
         </div>

@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import styles from './auth-header.module.scss';
 import NavWord from '../../../assets/aucctus_nav_word.png';
-import NavLogo from '../../../assets/aucctus_nav_logo.png';
+import NavLogo from '../../../assets/aucctus_logo.png';
 import { useLogout } from '../../../hooks/query/auth.hook';
 
 const AuthHeader: FunctionComponent = () => {
