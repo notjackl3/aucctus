@@ -419,6 +419,20 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     },
   );
 
+  const deleteAnswerlessDraft = useCallback(() => {
+    const { draftSeedUuid, submittedAnswers, deleteDraft, resetQuestionnaire } =
+      latestValuesRef.current;
+
+    if (submittedAnswers.length === 0 && draftSeedUuid) {
+      deleteDraft(draftSeedUuid, {
+        onSuccess: () => resetQuestionnaire(),
+        onError: (error) => {
+          resetQuestionnaire();
+        },
+      });
+    }
+  }, []);
+
   return (
     <>
       <div className='relative flex flex-1 animate-slide-in-center flex-col'>

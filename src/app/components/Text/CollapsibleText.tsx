@@ -74,20 +74,23 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
   return (
     <span
       ref={containerRef}
-      className='flex h-full min-h-full flex-col items-start justify-start gap-2 bg-inherit text-start align-top'
+      className='flex h-full min-h-full flex-col items-start justify-center gap-2 bg-inherit text-start align-middle'
       onClick={() => isTruncated && setOpen((prev) => !prev)}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <span
-        className={cn('aucctus-text-primary aucctus-text-md', titleClassName)}
+        className={cn(
+          'aucctus-text-primary aucctus-text-md self-start',
+          titleClassName,
+        )}
       >
         {title}
       </span>
       <animated.span
         ref={textRef}
         className={cn(
-          'aucctus-text-tertiary text-sm font-medium leading-tight',
+          'aucctus-text-tertiary self-start text-sm font-medium leading-tight',
           {
             [truncationClassName]: !open,
             'cursor-pointer': isTruncated,

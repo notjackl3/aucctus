@@ -46,6 +46,20 @@ export class Endpoints {
     return `api/v2/concept/incubation/seed`;
   }
 
+  static conceptIncubationSeeds(options?: IConceptQueryOptions) {
+    const url = `api/v2/concept/incubation/seeds`;
+    if (!options) return url;
+
+    const params = new URLSearchParams();
+    if (options.status) params.append('status', options.status);
+    if (options.createdBy) params.append('createdBy', options.createdBy);
+    if (options.search) params.append('search', options.search);
+    if (options.page) params.append('page', options.page.toString());
+    if (options.sort) params.append('sort', options.sort);
+
+    return params.toString() ? `${url}?${params.toString()}` : url;
+  }
+
   static conceptIncubationSeedUuid(draftUuid: string) {
     return `api/v2/concept/incubation/seed/${draftUuid}`;
   }

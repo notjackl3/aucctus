@@ -44,6 +44,10 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
           </>
         ),
       },
+      draft: {
+        style: `btn btn-light btn-bold`,
+        label: 'Continue',
+      },
     };
 
     return variantContext[variant];

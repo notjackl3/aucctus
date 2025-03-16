@@ -57,9 +57,7 @@ export type PartialConceptOverviewWithRequiredUuid =
 
 /**
  * Custom hook for fetching list concepts.
- * @param category - Optional concept category filter
- * @param status - Optional concept status filter
- * @param page - Optional page number for pagination
+ * @param queryOptions - Options for filtering, sorting, and pagination
  * @returns The result of the useQuery hook.
  */
 export const useConcepts = (queryOptions: IConceptQueryOptions) => {
@@ -68,20 +66,33 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
       AucctusQueryKeys.concepts,
       queryOptions.status,
       queryOptions.category,
-      queryOptions.page,
       queryOptions.search,
+      queryOptions.page,
       queryOptions.sort,
-      queryOptions.createdBy,
     ],
-    cacheTime: Infinity,
-    staleTime: 0,
-    refetchInterval: (data?: IConceptPage) => {
-      return data &&
-        data.results.some((concept) => concept.reportStatus === 'pending')
-        ? 5000
-        : false;
-    },
-    queryFn: async () => await api.concept.getConcepts(queryOptions),
+    queryFn: () => api.concept.getConcepts(queryOptions),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    keepPreviousData: true, // Keep previous data while loading new data
+  });
+};
+
+/**
+ * Custom hook for fetching concept seeds.
+ * @param queryOptions - Options for filtering, sorting, and pagination
+ * @returns The result of the useQuery hook.
+ */
+export const useSeeds = (queryOptions: IConceptQueryOptions) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.seeds,
+      queryOptions.status,
+      queryOptions.search,
+      queryOptions.page,
+      queryOptions.sort,
+    ],
+    queryFn: () => api.concept.getSeeds(queryOptions),
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    keepPreviousData: true, // Keep previous data while loading new data
   });
 };
 
@@ -137,15 +148,25 @@ export const useConceptSeedDraft = (uuid?: string) => {
 };
 
 export const useSaveConceptSeedDraft = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (body: IConceptSeed) =>
       await api.concept.saveSeedDraft(body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
+    },
   });
 };
 
 export const useDeleteConceptSeedDraft = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (uuid: string) => await api.concept.deleteSeedDraft(uuid),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
+    },
   });
 };
 
@@ -159,15 +180,22 @@ export const useGetConceptSeedDraftAnswers = (seedDraftUuid: string) => {
 };
 
 export const useSaveConceptSeedDraftAnswer = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (params: {
       uuid: string;
       body: IncubationAnswerPayload;
     }) => await api.concept.saveSeedDraftAnswer(params.uuid, params.body),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
+    },
   });
 };
 
 export const useUpdateConceptSeedDraftAnswer = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (params: {
       answerId: number;
@@ -177,13 +205,21 @@ export const useUpdateConceptSeedDraftAnswer = () => {
         params.answerId,
         params.body,
       ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
+    },
   });
 };
 
 export const useDeleteConceptSeedDraftAnswer = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (answerId: number) =>
       await api.concept.deleteSeedDraftAnswer(answerId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
+    },
   });
 };
 
@@ -360,7 +396,7 @@ const createConceptMutation = () => {
   // Helper function to create mutations with common onSuccess and onError callbacks
   return <
     TData extends IConcept = IConcept,
-    TError extends IFormError = IFormError<IConcept>,
+    TError = IFormError<IConcept>,
     TVariables = unknown,
   >(
     mutationFn: (variables: TVariables) => Promise<TData>,
@@ -547,4 +583,37 @@ export const useEcosystemDelete = () => {
     (uuid) => api.concept.deleteEcosystem(uuid),
     [[AucctusQueryKeys.marketScan]],
   );
+};
+
+/**
+ * Custom hook for updating a concept seed.
+ * @returns The result of the useMutation hook.
+ */
+export const useSeedUpdate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    IConceptSeed,
+    AxiosError<IFormError<IConceptSeed>>,
+    Partial<IConceptSeed> & { uuid: string }
+  >({
+    mutationFn: async (seed) => await api.concept.updateSeed(seed, seed.uuid),
+    onSuccess: () => {
+      Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.seeds],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.dashboard],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.conceptSeed],
+        }),
+      ]);
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message);
+    },
+  });
 };

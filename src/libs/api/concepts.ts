@@ -4,6 +4,7 @@ import { Endpoints as endpoints } from './endpoints';
 import {
   ConceptIgnitionQuestion,
   ConceptIgnitionQuestionnaireType,
+  ConceptSeedStatus,
   ConceptStatus,
   Ecosystem,
   IConcept,
@@ -23,9 +24,11 @@ import {
 } from './types'; // Import the missing type
 
 export interface IConceptSeedAnswer {
-  answer: string;
+  answer: string[];
   details?: string;
   question: ConceptIgnitionQuestion;
+  identifier?: string;
+  id?: number;
 }
 
 export interface IConceptSeed {
@@ -34,6 +37,12 @@ export interface IConceptSeed {
   type: ConceptIgnitionQuestionnaireType;
   createdAt: string;
   updatedAt: string;
+  status?: ConceptSeedStatus;
+  createdBy?: {
+    firstName: string;
+    lastName: string;
+    uuid: string;
+  };
 }
 
 // Incubation
@@ -115,6 +124,13 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  updateSeed(seed: Partial<IConceptSeed>, uuid: string) {
+    return this.patch<IConceptSeed, Partial<IConceptSeed>>(
+      endpoints.conceptIncubationSeedUuid(uuid),
+      seed,
+    );
+  }
+
   deleteSeedDraft(uuid: string) {
     return this.delete<IConceptSeed>(endpoints.conceptIncubationSeedUuid(uuid));
   }
@@ -181,6 +197,12 @@ export class ConceptApi extends ApiService {
 
   getConcepts(options?: IConceptQueryOptions) {
     return this.get<IConceptPage>(endpoints.conceptQueries(options));
+  }
+
+  getSeeds(options?: IConceptQueryOptions) {
+    return this.get<IPageResponse<IConceptSeed>>(
+      endpoints.conceptIncubationSeeds(options),
+    );
   }
 
   deleteConcept(uuid: string) {

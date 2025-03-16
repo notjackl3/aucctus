@@ -7,22 +7,32 @@ import React from 'react';
 interface IFilterOptionsHeaderItemProps {
   propertyName: keyof IConceptFilterOptions;
   value: string;
+  onRemove?: () => void;
 }
 
 const FilterOptionsHeaderItem: React.FC<IFilterOptionsHeaderItemProps> = ({
   propertyName,
   value,
+  onRemove,
 }) => {
   const prefix =
     propertyName === 'sort' ? removeFirstCharIfDash(value) : propertyName;
   const suffix = propertyName === 'sort' ? checkStringOrder(value) : value;
 
   return (
-    <span className='flex h-full w-fit  max-w-96 items-center gap-2 rounded-lg bg-primary-50 px-3 py-2 align-middle text-primary-600 [&>svg]:stroke-primary-600'>
+    <span className='flex h-full w-fit max-w-96 items-center gap-2 rounded-lg bg-primary-50 px-3 py-2 align-middle text-primary-600 [&>svg]:stroke-primary-600'>
       <span className='[&>svg]:stroke-primary-600'>
         <Icon variant={getPropertyIcon(propertyName)} width={16} height={16} />
       </span>
       <span className='truncate'>{`${utils.string.camelCaseToTitleCase(prefix)}: ${suffix}`}</span>
+      {onRemove && (
+        <button
+          onClick={onRemove}
+          className='ml-1 rounded-full p-1 hover:bg-primary-100'
+        >
+          <Icon variant='closeX' width={12} height={12} />
+        </button>
+      )}
     </span>
   );
 };

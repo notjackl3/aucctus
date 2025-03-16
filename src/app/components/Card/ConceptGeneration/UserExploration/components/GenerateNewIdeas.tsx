@@ -147,7 +147,6 @@ const GenerateNewIdeas: React.FC = () => {
               });
             },
             onError: (error) => {
-              console.error('Error saving concept seed draft:', error);
               toast.error('Error saving concept seed draft');
             },
           },

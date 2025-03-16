@@ -4,7 +4,6 @@ import {
   ConceptSort,
   ConceptStatus,
   IConcept,
-  IUser,
   SortableConceptProperties,
 } from '@libs/api/types';
 import {
@@ -25,35 +24,16 @@ import {
 import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
+import { ConceptActionMenuButton } from '@components/Tables/ConceptBank/ActionsMenuButton';
+import { IConceptFilterOptions } from './concept-seed.hook';
 
 const columnHelper = createColumnHelper<IConcept>();
-
-export interface IConceptFilterOptions {
-  // id?: string;
-  status: Set<ConceptStatus>;
-  createdBy?: IUser;
-  search?: string;
-  sort?: ConceptSort;
-}
 
 const INITIAL_FILTER: IConceptFilterOptions = {
   status: new Set<ConceptStatus>(),
 };
 
 const PAGE_SIZE = 20;
-
-export const areFilterOptionsSet = (
-  filterOptions: IConceptFilterOptions,
-): boolean => {
-  const { status, createdBy, search, sort } = filterOptions;
-
-  return (
-    (status && status.size > 0) || // Check if 'status' set is not empty
-    !!createdBy || // Check if 'createdBy' is set
-    !!search || // Check if 'search' is set
-    !!sort
-  );
-};
 
 function isSortableConceptProperty(
   value: string,
@@ -67,40 +47,92 @@ function isSortableConceptProperty(
   return (arr as string[]).includes(value);
 }
 
-export const useConceptBank = () => {
+// Helper function to standardize header styling
+const headerStyle = () => (
+  <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
+    {/* The content will be injected */}
+  </div>
+);
+
+export const useConceptBank = (
+  externalFilterOptions?: IConceptFilterOptions,
+  externalUpdateTableFiltering?: (
+    value: Partial<IConceptFilterOptions>,
+  ) => void,
+) => {
   const navigate = useNavigate();
   const { mutate: updateConcept } = useConceptUpdate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
+
+  // Use refs for values that don't need to trigger re-renders when updated internally
+  const filterOptionsRef = React.useRef<IConceptFilterOptions>(INITIAL_FILTER);
   const [filterOptions, setFilterOptions] =
-    React.useState<IConceptFilterOptions>(INITIAL_FILTER);
+    React.useState<IConceptFilterOptions>(
+      externalFilterOptions || filterOptionsRef.current,
+    );
+
   const [page, setPage] = React.useState<number>(1);
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: 'createdAt', desc: true },
   ]);
 
-  // Fetch concepts based on the search parameters
-  const { data, isLoading } = useConcepts({
-    status: Array.from(filterOptions.status).join(',') || undefined,
-    createdBy: filterOptions.createdBy
-      ? `${filterOptions.createdBy.firstName} ${filterOptions.createdBy.lastName}`
-      : undefined,
-    search: filterOptions.search,
-    page,
-    sort: filterOptions.sort,
-  });
+  // If we receive external filter options, use those instead
+  React.useEffect(() => {
+    if (externalFilterOptions) {
+      setFilterOptions(externalFilterOptions);
+    }
+  }, [externalFilterOptions]);
 
+  // Memoize the query options to prevent unnecessary API calls
+  const queryOptions = useMemo(
+    () => ({
+      status: Array.from(filterOptions.status).join(',') || undefined,
+      createdBy: filterOptions.createdBy
+        ? `${filterOptions.createdBy.firstName} ${filterOptions.createdBy.lastName}`
+        : undefined,
+      search: filterOptions.search,
+      page,
+      sort: filterOptions.sort,
+    }),
+    [
+      filterOptions.status,
+      filterOptions.createdBy,
+      filterOptions.search,
+      filterOptions.sort,
+      page,
+    ],
+  );
+
+  // Fetch concepts with memoized query options
+  const { data, isLoading } = useConcepts(queryOptions);
+
+  // Optimize the updateTableFiltering function
   const updateTableFiltering = React.useCallback(
     (value: Partial<IConceptFilterOptions>) => {
       setPage(1); // avoid pagination issues
-      setFilterOptions({ ...filterOptions, ...value });
+
+      // Use external update function if provided, otherwise update local state
+      if (externalUpdateTableFiltering) {
+        externalUpdateTableFiltering(value);
+      } else {
+        // Update the ref first to ensure consistency
+        filterOptionsRef.current = { ...filterOptionsRef.current, ...value };
+        setFilterOptions(filterOptionsRef.current);
+      }
     },
-    [filterOptions],
+    [externalUpdateTableFiltering],
   );
 
+  // Reset the filter function
   const resetFilter = React.useCallback(() => {
-    setFilterOptions(INITIAL_FILTER);
-    setSorting([]);
-  }, []);
+    if (externalUpdateTableFiltering) {
+      externalUpdateTableFiltering(INITIAL_FILTER);
+    } else {
+      filterOptionsRef.current = INITIAL_FILTER;
+      setFilterOptions(INITIAL_FILTER);
+    }
+    setPage(1);
+  }, [externalUpdateTableFiltering]);
 
   const handleGenerateConceptButton = React.useCallback(
     (row: Row<IConcept>) =>
@@ -133,10 +165,9 @@ export const useConceptBank = () => {
 
       if (newSorting.length === 0) {
         updateTableFiltering({ sort: undefined });
-      }
-      const value = newSorting[0];
-      if (value) {
-        if (isSortableConceptProperty(value.id)) {
+      } else {
+        const value = newSorting[0];
+        if (value && isSortableConceptProperty(value.id)) {
           const sortValue = (
             value.desc ? `-${value.id}` : value.id
           ) as ConceptSort;
@@ -151,45 +182,17 @@ export const useConceptBank = () => {
 
   const columns = useMemo<ColumnDef<IConcept, any>[]>(() => {
     return [
-      // columnHelper.accessor('uuid', {
-      //   id: 'select',
-      //   enableColumnFilter: false,
-      //   enableSorting: false,
-      //   header: ({ table }) => (
-      //     <Input.CheckBox
-      //       {...{
-      //         checked: table.getIsAllRowsSelected(),
-      //         indeterminate: table.getIsSomeRowsSelected(),
-      //         onChange: (event) => {
-      //           table.getToggleAllPageRowsSelectedHandler()(event);
-      //         },
-      //       }}
-      //     />
-      //   ),
-      //   cell: ({ row }) => {
-      //     return (
-      //       <Input.CheckBox
-      //         {...{
-      //           checked: row.getIsSelected(),
-      //           disabled: !row.getCanSelect(),
-      //           indeterminate: row.getIsSomeSelected(),
-      //           onChange: (e) => {
-      //             e.stopPropagation();
-      //             row.getToggleSelectedHandler()(e);
-      //           },
-      //           onClick: (e) => {
-      //             e.stopPropagation();
-      //           },
-      //         }}
-      //       />
-      //     );
-      //   },
-      // }),
       columnHelper.accessor('title', {
         id: 'title',
         sortingFn: 'text',
         enableColumnFilter: false,
-        header: () => 'Concept',
+        header: () => (
+          <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
+            Concept
+          </div>
+        ),
+        size: 600,
+        minSize: 400,
         cell: (info) => (
           <Text.Collapsible
             title={info.getValue()}
@@ -201,26 +204,56 @@ export const useConceptBank = () => {
         id: 'createdAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
-        size: 167,
-        maxSize: 167,
+        size: 150,
+        maxSize: 150,
         enableResizing: false,
-        cell: (info) => (
-          <span className='flex w-[167px] flex-row items-center justify-start gap-2'>
-            <Table.ConceptBank.CreatedBy user={info.row.original.createdBy} />
-            <Table.ConceptBank.Text
-              className='aucctus-text-tertiary text-nowrap'
-              value={info.getValue()}
-            />
-          </span>
+        cell: (info) => {
+          const createdBy = info.row.original.createdBy;
+          const initials = createdBy
+            ? `${createdBy.firstName?.charAt(0) || ''}${createdBy.lastName?.charAt(0) || ''}`
+            : '';
+          const fullName = createdBy
+            ? `${createdBy.firstName || ''} ${createdBy.lastName || ''}`
+            : '';
+
+          return (
+            <span className='flex w-full flex-row items-center justify-start gap-2'>
+              {createdBy && (
+                <div className='mr-2 flex items-center'>
+                  <div className='aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full bg-[#F5F3F3] text-xs font-medium'>
+                    {initials}
+                  </div>
+                </div>
+              )}
+              <div className='flex flex-row items-center'>
+                {createdBy && (
+                  <span className='mr-1 text-sm font-medium'>{fullName}</span>
+                )}
+                <Table.ConceptBank.Text
+                  className='aucctus-text-tertiary text-nowrap'
+                  value={info.getValue()}
+                />
+              </div>
+            </span>
+          );
+        },
+        header: () => (
+          <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
+            Created
+          </div>
         ),
-        header: () => 'Created',
       }),
       columnHelper.accessor('status', {
         id: 'status',
         sortingFn: 'text',
-        size: 175,
-        maxSize: 175,
-        header: () => 'Status',
+        size: 150,
+        maxSize: 150,
+        enableResizing: false,
+        header: () => (
+          <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
+            Status
+          </div>
+        ),
         cell: (info) => <Table.ConceptBank.Status value={info.getValue()} />,
         enableColumnFilter: false,
       }),
@@ -250,7 +283,7 @@ export const useConceptBank = () => {
         maxSize: 42,
         header: () => {},
         cell: (info) => (
-          <Table.ConceptBank.MenuButton
+          <ConceptActionMenuButton
             status={info.row.original.status}
             uuid={info.getValue()}
           />
@@ -259,11 +292,11 @@ export const useConceptBank = () => {
     ];
   }, [handleGenerateConceptButton]);
 
-  const table = useReactTable({
-    getRowId: (row) => row.uuid,
+  // Create table configuration outside of useMemo
+  const tableOptions = {
+    getRowId: (row: IConcept) => row.uuid,
     data: data?.results || [],
     columns,
-    enableRowSelection: true,
     manualSorting: true,
     pageCount: data?.numberOfPages || 0,
     state: {
@@ -275,17 +308,41 @@ export const useConceptBank = () => {
     },
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSortingChange,
-  });
-
-  return {
-    isLoading,
-    numberOfPages: data?.numberOfPages || 0,
-    page,
-    setPage,
-    table,
-    columns,
-    updateTableFiltering,
-    resetFilter,
-    filterOptions,
   };
+
+  // Use useReactTable directly at the top level, not inside a callback
+  const table = useReactTable(tableOptions);
+
+  // Return memoized values to prevent unnecessary re-renders
+  return useMemo(
+    () => ({
+      isLoading,
+      numberOfPages: data?.numberOfPages || 0,
+      page,
+      setPage,
+      table,
+      updateTableFiltering,
+      resetFilter,
+      filterOptions,
+    }),
+    [
+      isLoading,
+      data?.numberOfPages,
+      page,
+      setPage,
+      table,
+      updateTableFiltering,
+      resetFilter,
+      filterOptions,
+    ],
+  );
 };
+
+// Export areFilterOptionsSet as a function
+export { areFilterOptionsSet } from './concept-seed.hook';
+
+// Export the interface for use in other files using 'export type'
+export type { IConceptFilterOptions } from './concept-seed.hook';
+
+// Re-export the useSeedsBank hook to fix the import error in Bank.tsx
+export { useSeedsBank } from './concept-seed.hook';

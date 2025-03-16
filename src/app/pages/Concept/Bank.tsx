@@ -1,11 +1,13 @@
-import React, { ReactNode } from 'react';
+import React, {
+  ReactNode,
+  useEffect,
+  useMemo,
+  useCallback,
+  useState,
+} from 'react';
 
 import { Container, Header, Icon, Input, Table } from '@components';
-import {
-  areFilterOptionsSet,
-  IConceptFilterOptions,
-  useConceptBank,
-} from '@hooks/tables/concept-bank.hook';
+import { useConceptBank, useSeedsBank } from '@hooks/tables/concept-bank.hook';
 import utils from '@libs/utils';
 import { isUser } from '@libs/utils/account';
 import {
@@ -15,8 +17,16 @@ import {
 } from '@libs/utils/concepts';
 import { camelCaseToTitleCase } from '@libs/utils/string';
 import { AppPath } from '@routes/routes';
-import { useNavigate } from 'react-router-dom';
+import {
+  useNavigate,
+  useLocation,
+  Outlet,
+  useOutletContext,
+} from 'react-router-dom';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { ConceptStatus } from '@libs/api/types';
+import { IConceptFilterOptions } from '@hooks/tables/concept-seed.hook';
+import { cn } from '@libs/utils/react';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -24,22 +34,77 @@ export const CONCEPT_STATUS_LIST_MAP = {
   archive: ARCHIVE_CONCEPT_STATUS_LIST,
 };
 
+// Define seed status options
+export const SEED_STATUS_OPTIONS = [
+  { value: 'draft', label: 'Draft' },
+  { value: 'published', label: 'Published' },
+  { value: 'archived', label: 'Archived' },
+];
+
+// Helper function moved outside component to avoid recreation on each render
+const areFilterOptionsSet = (filterOptions: IConceptFilterOptions) => {
+  const { status, createdBy, search, sort } = filterOptions;
+
+  return (status && status.size > 0) || !!createdBy || !!search || !!sort;
+};
+
+// Define the type for context being passed to children
+type ConceptBankContextType = {
+  filterOptions: IConceptFilterOptions;
+  updateTableFiltering: (value: Partial<IConceptFilterOptions>) => void;
+};
+
 const ConceptBank: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const { resetQuestionnaire } = useConceptIncubationStore();
 
+  // Determine if we're on the drafts route
+  const isDraftsRoute = location.pathname.includes('/drafts');
+
+  // Initialize both hooks to manage both concept and seed data
   const {
-    table,
-    page,
-    setPage,
-    numberOfPages,
-    isLoading,
-    filterOptions,
-    updateTableFiltering,
-    resetFilter,
+    filterOptions: conceptFilterOptions,
+    updateTableFiltering: updateConceptFiltering,
   } = useConceptBank();
 
-  const createFilterHeader = React.useCallback(() => {
+  const {
+    filterOptions: seedFilterOptions,
+    updateTableFiltering: updateSeedFiltering,
+  } = useSeedsBank();
+
+  // Use the appropriate filter options and update function based on current route
+  const filterOptions = isDraftsRoute
+    ? seedFilterOptions
+    : conceptFilterOptions;
+  const updateTableFiltering = isDraftsRoute
+    ? updateSeedFiltering
+    : updateConceptFiltering;
+
+  const handleAddConcept = useCallback(() => {
+    resetQuestionnaire();
+    navigate(AppPath.IgniteConcept);
+  }, [resetQuestionnaire, navigate]);
+
+  const handleTabChange = useCallback(
+    (tabPath: string) => {
+      navigate(tabPath);
+    },
+    [navigate],
+  );
+
+  // Memoize search handling to prevent unnecessary function recreation
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (e.target.value !== filterOptions.search) {
+        updateTableFiltering({ search: e.target.value });
+      }
+    },
+    [filterOptions.search, updateTableFiltering],
+  );
+
+  // Create filter header chips
+  const createFilterHeader = useCallback(() => {
     return Object.entries(filterOptions).reduce<ReactNode[]>(
       (headerItems, [key, value]) => {
         let itemValue = '';
@@ -55,9 +120,21 @@ const ConceptBank: React.FC = () => {
         if (itemValue) {
           headerItems.push(
             <Table.ConceptBank.FilterOptionsHeaderItem
-              key={`${utils.string.generateRandomString(5)}${key}`}
-              propertyName={key as keyof IConceptFilterOptions}
+              key={`${key}-${itemValue}`}
+              propertyName={key as 'status' | 'createdBy' | 'search' | 'sort'}
               value={itemValue}
+              onRemove={() => {
+                // Handle removal of individual filter
+                if (key === 'status') {
+                  updateTableFiltering({ status: new Set() });
+                } else if (key === 'createdBy') {
+                  updateTableFiltering({ createdBy: undefined });
+                } else if (key === 'search') {
+                  updateTableFiltering({ search: '' });
+                } else if (key === 'sort') {
+                  updateTableFiltering({ sort: undefined });
+                }
+              }}
             />,
           );
         }
@@ -66,19 +143,32 @@ const ConceptBank: React.FC = () => {
       },
       [],
     );
-  }, [filterOptions]);
+  }, [filterOptions, updateTableFiltering]);
+
+  // Memoize UI parts to prevent unnecessary recalculations
+  const filterHeaderSection = useMemo(() => {
+    return areFilterOptionsSet(filterOptions) ? (
+      <div className='mr-2 flex items-center gap-1'>{createFilterHeader()}</div>
+    ) : null;
+  }, [filterOptions, createFilterHeader]);
+
+  // Create context value for child components
+  const outletContext = useMemo(
+    () => ({
+      filterOptions,
+      updateTableFiltering,
+    }),
+    [filterOptions, updateTableFiltering],
+  );
 
   return (
     <div className='box-border flex flex-col p-8'>
       {/* Header */}
-      <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
+      <div className='mb-4 flex flex-row items-start justify-between self-stretch'>
         <Header.One text='Concepts' />
         <button
-          className={`btn btn-bold btn-primary`}
-          onClick={() => {
-            resetQuestionnaire();
-            navigate(AppPath.IgniteConcept);
-          }}
+          className={cn('btn btn-bold btn-primary')}
+          onClick={handleAddConcept}
         >
           <Icon
             variant='rocket'
@@ -91,56 +181,58 @@ const ConceptBank: React.FC = () => {
       </div>
 
       <div className='flex h-full w-full flex-col gap-3'>
-        {/* Search and Filter  */}
-        <div className='flex w-full flex-row items-center justify-between'>
-          <Input.Search
-            name=''
-            type='text'
-            value={filterOptions.search}
-            onChange={(e) => {
-              if (e.target.value !== filterOptions.search) {
-                updateTableFiltering({ search: e.target.value });
-              }
-            }}
-          />
+        {/* Top navigation bar with tabs on left and search/filter on right */}
+        <div className='mb-4 flex w-full flex-row items-center justify-between'>
+          {/* Tabs grouped on the left */}
+          <div className='flex items-center'>
+            <button
+              className={cn('btn mr-2', {
+                'btn-outlined': !isDraftsRoute,
+                'btn-no-border aucctus-text-tertiary': isDraftsRoute,
+              })}
+              onClick={() => handleTabChange(AppPath.ConceptBank)}
+            >
+              Complete
+            </button>
+            <button
+              className={cn('btn', {
+                'btn-outlined': isDraftsRoute,
+                'btn-no-border aucctus-text-tertiary': !isDraftsRoute,
+              })}
+              onClick={() => handleTabChange(AppPath.ConceptBankDrafts)}
+            >
+              Drafts
+            </button>
+          </div>
 
-          <Table.ConceptBank.FilterMenubar
-            updateFilterOptions={updateTableFiltering}
-            filterOptions={filterOptions}
-          />
-        </div>
-        <Container.ConceptTableWrapper
-          isLoading={isLoading}
-          header={
-            <>
-              <div className='flex h-full w-full flex-row gap-2'>
-                {createFilterHeader()}
-              </div>
+          {/* Search and filter controls moved from child components */}
+          <div className='flex items-center gap-3'>
+            {/* Filter chips appear here when active */}
+            {filterHeaderSection}
 
-              {areFilterOptionsSet(filterOptions) ? (
-                <button
-                  className='btn btn-no-border btn-light text-nowrap'
-                  onClick={resetFilter}
-                >
-                  <Icon variant='closeX' />
-                  Reset Filter
-                </button>
-              ) : null}
-            </>
-          }
-          footer={
-            <Table.Pagination
-              page={page}
-              numberOfPages={numberOfPages}
-              onPageChange={(page: number) => setPage(page)}
+            <div className='w-64'>
+              <Input.Search
+                name=''
+                type='text'
+                placeholder='Search'
+                value={filterOptions.search || ''}
+                onChange={handleSearchChange}
+              />
+            </div>
+
+            <Table.ConceptBank.FilterMenubar
+              updateFilterOptions={updateTableFiltering}
+              filterOptions={filterOptions}
+              statusOptions={isDraftsRoute ? SEED_STATUS_OPTIONS : undefined}
             />
-          }
-        >
-          <Table table={table} />
-        </Container.ConceptTableWrapper>
+          </div>
+        </div>
+
+        {/* Outlet component will render the child routes with context */}
+        <Outlet context={outletContext} />
       </div>
     </div>
   );
 };
 
-export default ConceptBank;
+export default React.memo(ConceptBank);

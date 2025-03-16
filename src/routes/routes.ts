@@ -14,9 +14,11 @@ export enum AppPath {
 
   /* Concepts */
   IgniteConcept = '/concept/ignite',
+  IgniteConceptWithUuid = '/concept/ignite/:uuid',
   GeneratedConcepts = '/concept/ignite/results',
   Concept = '/concept',
   ConceptBank = '/concept',
+  ConceptBankDrafts = '/concept/drafts',
   ConceptOverview = '/concept/:id/',
   ConceptCustomerProfile = `/concept/:id/${ConceptPath.CustomerProfile}`,
   ConceptFinancialProjection = `/concept/:id/${ConceptPath.FinancialProjection}`,

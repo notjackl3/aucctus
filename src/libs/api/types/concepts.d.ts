@@ -1,5 +1,7 @@
 import { IPageResponse } from '.';
 
+export type ConceptSeedStatus = 'draft' | 'published' | 'archived';
+
 export type ConceptStatus =
   | 'new'
   | 'ideating'
@@ -41,7 +43,8 @@ export type ConceptReportStatus =
   | 'notStarted'
   | 'complete'
   | 'pending'
-  | 'error';
+  | 'error'
+  | 'draft';
 
 export interface IBaseConceptEntity {
   uuid: string;

@@ -15,7 +15,12 @@ const ConceptSettings: FunctionComponent = () => {
 
   const onReseedClick = useCallback(() => {
     setSeed(seed as IConceptSeed);
-    navigate(AppPath.IgniteConcept);
+    const seedId = (seed as IConceptSeed)?.uuid;
+    if (seedId) {
+      navigate(`/concept/ignite/${String(seedId)}`);
+    } else {
+      navigate(AppPath.IgniteConcept);
+    }
   }, [seed, navigate, setSeed]);
 
   return (

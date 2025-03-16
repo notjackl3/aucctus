@@ -12,11 +12,13 @@ import SubMenuTrigger from './FilterMenuTrigger';
 interface IFilterMenubarProps {
   filterOptions: IConceptFilterOptions;
   updateFilterOptions: (value: Partial<IConceptFilterOptions>) => void;
+  statusOptions?: Array<{ value: string; label: string }>;
 }
 
 const FilterMenubar: React.FC<IFilterMenubarProps> = ({
   filterOptions,
   updateFilterOptions,
+  statusOptions,
 }) => {
   const [search, setSearch] = React.useState<string>('');
   const { users } = useAllUsers({ search });
@@ -50,12 +52,43 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
           }}
         />
         <label
-          className={
-            'aucctus-text-md-medium aucctus-text-tertiary group-hover:text-primary-700'
-          }
           htmlFor={`filter-status-${value}`}
+          className='aucctus-text-secondary ml-2 block cursor-pointer text-sm font-medium'
         >
           {utils.string.camelCaseToTitleCase(value)}
+        </label>
+      </Menubar.Item>
+    ),
+    [filterOptions.status, updateFilterOptions],
+  );
+
+  const createCustomStatusCheckItem = React.useCallback(
+    (option: { value: string; label: string }) => (
+      <Menubar.Item
+        key={utils.string.generateRandomString(5)}
+        className={cn(menuItemClass, 'inline-flex items-center')}
+        disabled
+      >
+        <Input.CheckBox
+          id={`filter-status-${option.value}`}
+          checked={filterOptions.status.has(option.value as ConceptStatus)}
+          onChange={(e) => {
+            const checked = e.target.checked;
+            const statusSet = new Set(filterOptions.status);
+
+            if (checked) {
+              statusSet.add(option.value as ConceptStatus);
+            } else {
+              statusSet.delete(option.value as ConceptStatus);
+            }
+            updateFilterOptions({ status: statusSet });
+          }}
+        />
+        <label
+          htmlFor={`filter-status-${option.value}`}
+          className='aucctus-text-secondary ml-2 block cursor-pointer text-sm font-medium'
+        >
+          {option.label}
         </label>
       </Menubar.Item>
     ),
@@ -65,8 +98,16 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
   return (
     <Menubar.Root className='flex flex-row'>
       <Menubar.Menu>
-        <Menubar.Trigger className='aspect-square rounded-lg px-3 py-2 transition-colors duration-200 hover:bg-primary-50 active:bg-primary-100 [&>svg]:stroke-primary-500'>
-          <Icon variant='filter-lines' height={24} width={24} />
+        <Menubar.Trigger className='flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 transition-colors duration-200 hover:bg-primary-50 active:bg-primary-100'>
+          <Icon
+            variant='filter-lines'
+            height={18}
+            width={18}
+            className='stroke-primary-500'
+          />
+          <span className='font-inter text-sm font-semibold leading-[143%] text-[#514141]'>
+            Filters
+          </span>
         </Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content
@@ -81,9 +122,15 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                   className='aucctus-bg-primary flex w-auto flex-col gap-1 rounded-md p-3 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
                   alignOffset={-5}
                 >
-                  {CONCEPT_STATUS_LIST.map((value) =>
-                    createStatusCheckItem(value),
-                  )}
+                  <div className='box-border flex w-full flex-col px-2'>
+                    {statusOptions
+                      ? statusOptions.map((option) =>
+                          createCustomStatusCheckItem(option),
+                        )
+                      : CONCEPT_STATUS_LIST.map((status) =>
+                          createStatusCheckItem(status),
+                        )}
+                  </div>
                 </Menubar.SubContent>
               </Menubar.Portal>
             </Menubar.Sub>

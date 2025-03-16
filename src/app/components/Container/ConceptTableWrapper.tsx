@@ -17,10 +17,6 @@ const ConceptTableCard: React.FC<ConceptTableCardProps> = ({
   return (
     <div className='aucctus-border-secondary aucctus-bg-primary  inline-flex h-auto min-h-96 w-full flex-col items-start justify-between rounded-xl border shadow-sm'>
       <div className='inline-flex w-full flex-col items-start justify-start'>
-        {/* Header */}
-        <div className='aucctus-border-secondary inline-flex h-[60px] w-full items-center justify-between rounded-t-xl border-b px-6 py-3'>
-          {header}
-        </div>
         {/* Content */}
         {isLoading ? (
           // Loading Indicator

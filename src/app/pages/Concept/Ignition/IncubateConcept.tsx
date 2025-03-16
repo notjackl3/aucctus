@@ -4,14 +4,17 @@ import {
   useConceptIgnitionQuestionnaire,
   useConceptSeedDraft,
   useDeleteConceptSeedDraft,
+  useGetConceptSeedDraftAnswers,
 } from '@hooks/query/concepts.hook';
 import {
+  ConceptIgnitionQuestionnaireType,
   ExpandAnExistingIdeaQuestions,
   IConceptIgnitionQuestionnaireSection,
   IdentifyNewOpportunitiesQuestions,
 } from '@libs/api/types/conceptSeedQuestionnaire';
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { IConceptSeed } from '@libs/api/concepts';
 import { useState } from 'react';
 import { animated, easings, useTransition } from '@react-spring/web';
 import ConceptGeneration from '@components/Card/ConceptGeneration/Generation/ConceptGeneration';
@@ -44,17 +47,130 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
   const userExplorationRef = useRef<HTMLDivElement>(null);
 
   // Data Fetching & Store Access
-  const { isLoading: isSeedLoading } =
+  const { data: seedDraftData, isLoading: isSeedLoading } =
     useConceptSeedDraft(initialDraftSeedUuid);
-  const { isLoading: isQuestionnaireLoading } =
+  const { questionnaires, isLoading: isQuestionnaireLoading } =
     useConceptIgnitionQuestionnaire();
   const { mutate: deleteDraft } = useDeleteConceptSeedDraft();
   const {
     currentQuestionOrder,
+    activeQuestionnaire,
     draftSeedUuid,
     submittedAnswers,
     resetQuestionnaire,
+    setDraftSeedUuid,
+    setSubmittedAnswers,
+    setActiveQuestionnaire,
+    setCurrentQuestionOrder,
   } = useConceptIncubationStore();
+
+  // Fetch answers if we have a seed UUID
+  const { data: seedDraftAnswers, isLoading: isAnswersLoading } =
+    useGetConceptSeedDraftAnswers(draftSeedUuid || '');
+
+  // Update store with UUID from props if available and not already set
+  useEffect(() => {
+    // Check if seedDraftData exists and has a uuid
+    if (
+      seedDraftData &&
+      'uuid' in seedDraftData &&
+      typeof seedDraftData.uuid === 'string' &&
+      seedDraftData.uuid !== draftSeedUuid
+    ) {
+      setDraftSeedUuid(seedDraftData.uuid);
+    } else if (initialDraftSeedUuid && initialDraftSeedUuid !== draftSeedUuid) {
+      setDraftSeedUuid(initialDraftSeedUuid);
+    }
+  }, [initialDraftSeedUuid, seedDraftData, draftSeedUuid, setDraftSeedUuid]);
+
+  // Set the active questionnaire if we have seed data with a type
+  useEffect(() => {
+    if (
+      seedDraftData &&
+      'type' in seedDraftData &&
+      seedDraftData.type &&
+      questionnaires
+    ) {
+      // Check for valid questionnaire data with correct type
+      if (
+        seedDraftData.type === 'EXPAND_AN_EXISTING_IDEA' &&
+        questionnaires.expandAnExistingIdea.questions &&
+        questionnaires.expandAnExistingIdea.type === 'EXPAND_AN_EXISTING_IDEA'
+      ) {
+        setActiveQuestionnaire(
+          questionnaires.expandAnExistingIdea as QuestionnaireSection,
+        );
+      } else if (
+        seedDraftData.type === 'IDENTIFY_NEW_OPPORTUNITIES' &&
+        questionnaires.identifyNewOpportunities.questions &&
+        questionnaires.identifyNewOpportunities.type ===
+          'IDENTIFY_NEW_OPPORTUNITIES'
+      ) {
+        setActiveQuestionnaire(
+          questionnaires.identifyNewOpportunities as QuestionnaireSection,
+        );
+      }
+    }
+  }, [
+    seedDraftData,
+    questionnaires,
+    activeQuestionnaire,
+    setActiveQuestionnaire,
+  ]);
+
+  // Update store with answers when they are loaded
+  useEffect(() => {
+    if (seedDraftAnswers && seedDraftAnswers.length > 0) {
+      setSubmittedAnswers(seedDraftAnswers);
+    }
+  }, [seedDraftAnswers, setSubmittedAnswers]);
+
+  // Determine the current question based on answers
+  useEffect(() => {
+    if (
+      activeQuestionnaire &&
+      activeQuestionnaire.questions &&
+      (!currentQuestionOrder || currentQuestionOrder === Infinity)
+    ) {
+      if (submittedAnswers.length > 0) {
+        // Sort answers by question order to find the latest answered question
+        const sortedAnswers = [...submittedAnswers].sort(
+          (a, b) => b.question.order - a.question.order,
+        );
+
+        // Get the order of the last answered question
+        const lastAnsweredQuestionOrder = sortedAnswers[0].question.order;
+
+        // We need to find the next unanswered question
+        const questionOrders = Object.values(activeQuestionnaire.questions)
+          .map((q) => q.order)
+          .filter((order) => order > lastAnsweredQuestionOrder)
+          .sort((a, b) => a - b);
+
+        if (questionOrders.length > 0) {
+          // Set current question to the next question after the last answered one
+          const nextQuestionOrder = questionOrders[0];
+          setCurrentQuestionOrder(nextQuestionOrder);
+        } else {
+          // If all questions are answered, set to Infinity (questionnaire complete)
+          setCurrentQuestionOrder(Infinity);
+        }
+      } else if (Object.values(activeQuestionnaire.questions).length > 0) {
+        // If no questions answered yet, set to the first question (lowest order)
+        const firstQuestionOrder = Math.min(
+          ...Object.values(activeQuestionnaire.questions)
+            .map((q) => q.order)
+            .filter((order) => order > 0),
+        );
+        setCurrentQuestionOrder(firstQuestionOrder);
+      }
+    }
+  }, [
+    activeQuestionnaire,
+    submittedAnswers,
+    currentQuestionOrder,
+    setCurrentQuestionOrder,
+  ]);
 
   const hasSubmittedAnswers = useMemo(
     () => submittedAnswers.length > 0,
@@ -86,7 +202,6 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
       deleteDraft(draftSeedUuid, {
         onSuccess: () => resetQuestionnaire(),
         onError: (error) => {
-          console.error('Failed to delete draft: ', error);
           resetQuestionnaire();
         },
       });
@@ -244,7 +359,7 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
     return <ConceptSelection className={className} />;
   }, []);
 
-  if (isSeedLoading || isQuestionnaireLoading) {
+  if (isSeedLoading || isQuestionnaireLoading || isAnswersLoading) {
     return <Loading />;
   }
 
