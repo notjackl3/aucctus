@@ -226,11 +226,9 @@ export const useSeedsBank = (
               </div>
               <div className='ml-2 flex flex-col items-center justify-center'>
                 <Text.Collapsible
-                  title={info.getValue()}
-                  description={`${answeredCount} question${answeredCount !== 1 ? 's' : ''} answered`}
-                  maxDescriptionHeight={35}
-                  titleClassName='leading-tight'
-                  descriptionClassName='leading-tight'
+                  description={info.getValue()}
+                  title={`${answeredCount} question${answeredCount !== 1 ? 's' : ''} answered`}
+                  truncationClassName='line-clamp-1'
                 />
               </div>
             </div>
