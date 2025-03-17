@@ -1,4 +1,10 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { CompletionIcon } from './CompletionIcon';
 import { useQuestionTransition } from '../../hooks/question-transition.hook';
 import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
@@ -12,6 +18,11 @@ import ReadyToGenerate from '../ready-to-generate/ReadyToGenerate';
 import ContinueRefining from '../continue-refining/ContinueRefining';
 import { animated, useTransition } from 'react-spring';
 import { cn } from '@libs/utils/react';
+import {
+  ConceptIncubationClarifyingQuestion,
+  ConceptIncubationQuestion,
+} from '@libs/api/types/conceptSeedQuestionnaire';
+import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
 
 interface QuestionDisplayProps {}
 
@@ -22,6 +33,8 @@ interface QuestionDisplayProps {}
 const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
   const questionIconLineRef = useRef<HTMLDivElement>(null);
   const spacerRef = useRef<HTMLDivElement>(null);
+
+  const { dispatchAnimationEvent } = useDispatchIncubationAnimation();
 
   const {
     showMask,
@@ -37,6 +50,9 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     currentQuestionOrder,
     submittedAnswers,
     activeQuestion,
+    activeClarifyingQuestion,
+    clarifyingQuestions,
+    setActiveClarifyingQuestion,
     getPreviousQuestion,
   } = useConceptIncubationStore();
 
@@ -45,7 +61,14 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     questionIconLineRef,
     spacerRef,
     currentQuestionOrder ?? 0,
+    activeClarifyingQuestion,
   );
+
+  const [isClarifyingExpanded, setIsClarifyingExpanded] = useState(false);
+
+  useEffect(() => {
+    setIsClarifyingExpanded(false);
+  }, [clarifyingQuestions]);
 
   const previousQuestion = useMemo(
     () => getPreviousQuestion(submittedAnswers),
@@ -62,21 +85,26 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     return {};
   }, [previousQuestion, currentQuestionOrder]);
 
-  const renderQuestion = useCallback(() => {
-    return (
-      <span className='flex flex-col gap-4'>
-        <CurrentQuestion
-          questionIconRef={questionIconRef}
-          questionLabelRef={questionLabelRef}
-        />
+  const renderQuestion = useCallback(
+    (question: ConceptIncubationQuestion, icon?: string) => {
+      return (
+        <span className='flex flex-col gap-4'>
+          <CurrentQuestion
+            questionIconRef={questionIconRef}
+            questionLabelRef={questionLabelRef}
+            question={question}
+            iconVariant={icon as IconVariant}
+          />
 
-        <div className='relative transition-all duration-300 ease-in-out'>
-          <MultiSelectAnswers answersRef={multiSelectAnswersRef} />
-          <TextAnswers answerRowRef={answerRowRef} />
-        </div>
-      </span>
-    );
-  }, [questionIconRef, questionLabelRef, multiSelectAnswersRef, answerRowRef]);
+          <div className='relative transition-all duration-300 ease-in-out'>
+            <MultiSelectAnswers answersRef={multiSelectAnswersRef} />
+            <TextAnswers answerRowRef={answerRowRef} />
+          </div>
+        </span>
+      );
+    },
+    [questionIconRef, questionLabelRef, multiSelectAnswersRef, answerRowRef],
+  );
 
   const renderNextCompletionIcon = useCallback(
     () => (
@@ -107,7 +135,30 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     [questionIconLineRef],
   );
 
-  // Add transition for CompletedQuestions
+  const renderSpacer = useCallback(() => {
+    return (
+      <div
+        ref={spacerRef}
+        className={cn('flex-1 transition-all duration-1000 ease-in-out', {
+          'max-h-[100px] min-h-[100px]':
+            !activeQuestion &&
+            !activeClarifyingQuestion &&
+            !isClarifyingExpanded,
+          'max-h-[20px] min-h-[20px]':
+            !activeQuestion &&
+            !activeClarifyingQuestion &&
+            isClarifyingExpanded,
+          'max-h-[2000px]': activeQuestion || activeClarifyingQuestion,
+        })}
+      />
+    );
+  }, [
+    activeQuestion,
+    activeClarifyingQuestion,
+    isClarifyingExpanded,
+    spacerRef,
+  ]);
+
   const completedQuestionsTransition = useTransition(
     previousQuestion && currentQuestionOrder !== Infinity,
     {
@@ -118,31 +169,67 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     },
   );
 
+  const renderCompletedQuestions = useCallback(() => {
+    return completedQuestionsTransition(
+      (style, item) =>
+        item && (
+          <animated.span style={style} className='z-[99] flex flex-col gap-4'>
+            <CompletedQuestions />
+          </animated.span>
+        ),
+    );
+  }, [completedQuestionsTransition]);
+
+  const renderReadyToGenerate = useCallback(() => {
+    return <ReadyToGenerate compact={isClarifyingExpanded} />;
+  }, [isClarifyingExpanded]);
+
+  const handleSelectClarifyingQuestion = useCallback(
+    (question: ConceptIncubationClarifyingQuestion) => {
+      dispatchAnimationEvent('fade', () => {
+        setActiveClarifyingQuestion(question);
+      });
+    },
+    [dispatchAnimationEvent, setActiveClarifyingQuestion],
+  );
+
+  const renderContinueRefining = useCallback(() => {
+    return (
+      <ContinueRefining
+        iconRef={questionIconRef}
+        clarifyingQuestions={clarifyingQuestions}
+        submittedAnswers={submittedAnswers}
+        onMouseEnter={() => setIsClarifyingExpanded(true)}
+        selectClarifyingQuestion={handleSelectClarifyingQuestion}
+      />
+    );
+  }, [
+    questionIconRef,
+    clarifyingQuestions,
+    submittedAnswers,
+    setIsClarifyingExpanded,
+    handleSelectClarifyingQuestion,
+  ]);
+
   return (
     <div
       ref={componentRef}
       className='relative z-[999] flex flex-1 flex-col transition-all duration-300 ease-in-out'
     >
-      {completedQuestionsTransition(
-        (style, item) =>
-          item && (
-            <animated.span
-              style={style}
-              className='z-[99] flex flex-col gap-4 overflow-hidden'
-            >
-              <CompletedQuestions />
-            </animated.span>
-          ),
-      )}
+      {renderCompletedQuestions()}
 
       {activeQuestion && renderNextCompletionIcon()}
-      {!activeQuestion && <ReadyToGenerate />}
+      {!activeQuestion && !activeClarifyingQuestion && renderReadyToGenerate()}
 
-      <div ref={spacerRef} className='flex-1' />
+      {renderSpacer()}
 
-      {!activeQuestion && <ContinueRefining iconRef={questionIconRef} />}
-
-      {activeQuestion && renderQuestion()}
+      {activeQuestion && renderQuestion(activeQuestion)}
+      {activeClarifyingQuestion &&
+        renderQuestion(
+          activeClarifyingQuestion.question,
+          activeClarifyingQuestion.icon,
+        )}
+      {!activeQuestion && !activeClarifyingQuestion && renderContinueRefining()}
 
       {renderQuestionIconLine()}
 

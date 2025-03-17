@@ -12,6 +12,7 @@ const CompletedQuestions: React.FC = () => {
 
   const completedQuestions = useMemo(() => {
     return submittedAnswers
+      .filter((answer) => !!answer.question.identifier) // Filter out clarifying questions
       .filter((answer) => answer.question.order < (currentQuestionOrder ?? 0))
       .map((answer) => answer.question);
   }, [submittedAnswers, currentQuestionOrder]);

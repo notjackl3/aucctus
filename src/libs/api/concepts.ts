@@ -148,6 +148,13 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  updateSeedDraftAnswer(answerId: number, answer: IncubationAnswerPayload) {
+    return this.patch<IncubationAnswer>(
+      endpoints.conceptIncubationSeedAnswerId(answerId),
+      answer,
+    );
+  }
+
   updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
     answerId: number,
     answer: IncubationAnswerPayload,

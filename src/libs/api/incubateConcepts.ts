@@ -3,7 +3,7 @@ import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
   ConceptIncubationQuestion,
-  IConceptIncubationClarifyingQuestion,
+  ConceptIncubationClarifyingQuestion,
   IConceptIncubationQuestionnaire,
 } from './types'; // Import the missing type
 
@@ -31,7 +31,7 @@ export class IncubateConceptApi extends ApiService {
   }
 
   generateClarifyingQuestions(uuid: string) {
-    return this.post<IConceptIncubationClarifyingQuestion[]>(
+    return this.post<ConceptIncubationClarifyingQuestion[]>(
       endpoints.conceptIncubationSeedUuidClarifyingQuestions(uuid),
     );
   }

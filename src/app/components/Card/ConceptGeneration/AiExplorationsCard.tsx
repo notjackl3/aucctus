@@ -36,7 +36,7 @@ const AiExplorationsCard: React.FC<AiExplorationsCardProps> = ({
 }) => {
   const { currentQuestionOrder } = useConceptIncubationStore();
   const isValidQuestionIndex = useMemo(
-    () => currentQuestionOrder !== undefined,
+    () => !!currentQuestionOrder,
     [currentQuestionOrder],
   );
 

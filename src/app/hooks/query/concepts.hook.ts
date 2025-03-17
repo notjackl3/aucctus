@@ -194,22 +194,27 @@ export const useSaveConceptSeedDraftAnswer = () => {
 };
 
 export const useUpdateConceptSeedDraftAnswer = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (params: {
       answerId: number;
       body: IncubationAnswerUpdatePayload;
-    }) =>
-      await api.concept.updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
-        params.answerId,
-        params.body,
-      ),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
-    },
+    }) => await api.concept.updateSeedDraftAnswer(params.answerId, params.body),
   });
 };
+
+export const useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers =
+  () => {
+    return useMutation({
+      mutationFn: async (params: {
+        answerId: number;
+        body: IncubationAnswerUpdatePayload;
+      }) =>
+        await api.concept.updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
+          params.answerId,
+          params.body,
+        ),
+    });
+  };
 
 export const useDeleteConceptSeedDraftAnswer = () => {
   const queryClient = useQueryClient();

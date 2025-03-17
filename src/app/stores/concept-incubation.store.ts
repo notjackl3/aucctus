@@ -4,7 +4,7 @@ import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept'
 import { useCallback, useMemo } from 'react';
 import {
   ConceptIncubationQuestion,
-  IConceptIncubationClarifyingQuestion,
+  ConceptIncubationClarifyingQuestion,
 } from '@libs/api/types';
 import { IncubationAnswer } from '@libs/api/concepts';
 
@@ -29,8 +29,8 @@ interface ConceptIncubationStoreState {
   currentTextAnswerList: AnswerItem[];
   currentMultiSelectAnswerList: AnswerItem[];
   submittedAnswers: IncubationAnswer[];
-  clarifyingQuestions: IConceptIncubationClarifyingQuestion[];
-
+  clarifyingQuestions: ConceptIncubationClarifyingQuestion[];
+  activeClarifyingQuestion: ConceptIncubationClarifyingQuestion | undefined;
   suggestions: IncubationAISuggestions;
 
   setCurrentQuestionOrder: (order?: number) => void;
@@ -39,12 +39,15 @@ interface ConceptIncubationStoreState {
   setCurrentTextAnswerList: (answerList: AnswerItem[]) => void;
   setCurrentMultiSelectAnswerList: (answerList: AnswerItem[]) => void;
   setClarifyingQuestions: (
-    questions: IConceptIncubationClarifyingQuestion[],
+    questions: ConceptIncubationClarifyingQuestion[],
   ) => void;
   setSubmittedAnswers: (answers: IncubationAnswer[]) => void;
   resetQuestionnaire: () => void;
 
   setSuggestions: (identifier: string, suggestions: IAISuggestion[]) => void;
+  setActiveClarifyingQuestion: (
+    question: ConceptIncubationClarifyingQuestion | undefined,
+  ) => void;
 }
 
 const conceptIncubationStore = create<ConceptIncubationStoreState>()(
@@ -52,6 +55,7 @@ const conceptIncubationStore = create<ConceptIncubationStoreState>()(
     (set) => ({
       currentQuestionOrder: undefined,
       activeQuestionnaire: undefined,
+      activeClarifyingQuestion: undefined,
       draftSeedUuid: '',
       currentTextAnswerList: [],
       currentMultiSelectAnswerList: [],
@@ -78,9 +82,14 @@ const conceptIncubationStore = create<ConceptIncubationStoreState>()(
         set({ submittedAnswers: answers });
       },
       setClarifyingQuestions: (
-        questions: IConceptIncubationClarifyingQuestion[],
+        questions: ConceptIncubationClarifyingQuestion[],
       ) => {
         set({ clarifyingQuestions: questions });
+      },
+      setActiveClarifyingQuestion: (
+        question: ConceptIncubationClarifyingQuestion | undefined,
+      ) => {
+        set({ activeClarifyingQuestion: question });
       },
       resetQuestionnaire: () => {
         set({

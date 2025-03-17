@@ -23,10 +23,12 @@ export const QuestionIcon = ({
   questionType,
   className,
   innerRef,
+  variant,
 }: {
   questionType: string;
   className?: string;
   innerRef?: React.RefObject<HTMLSpanElement>;
+  variant?: IconVariant;
 }) => (
   <span
     ref={innerRef}
@@ -36,6 +38,8 @@ export const QuestionIcon = ({
       className,
     )}
   >
-    <Icon variant={questionIconVariantMap[questionType] || 'help-circle'} />
+    <Icon
+      variant={variant || questionIconVariantMap[questionType] || 'help-circle'}
+    />
   </span>
 );

@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
+import { useListenForIncubationAnimation } from './incubation-animation-event.hook';
 
 export const useQuestionTransition = () => {
   const [showMask, setShowMask] = useState(false);
@@ -12,107 +13,113 @@ export const useQuestionTransition = () => {
   const multiSelectAnswersRef = useRef<HTMLDivElement>(null);
 
   // Handle animation when moving to next question
-  const handleForwardAnimation = useCallback((callback: () => void) => {
-    const questionIcon = questionIconRef.current;
-    const nextCompletionIcon = nextCompletionIconRef.current;
-    const questionLabel = questionLabelRef.current;
-    const answerRow = answerRowRef.current;
-    const multiSelectAnswers = multiSelectAnswersRef.current;
+  const handleQuestionTransitionAnimation = useCallback(
+    (callback: () => void) => {
+      const questionIcon = questionIconRef.current;
+      const nextCompletionIcon = nextCompletionIconRef.current;
+      const questionLabel = questionLabelRef.current;
+      const answerRow = answerRowRef.current;
+      const multiSelectAnswers = multiSelectAnswersRef.current;
 
-    if (!questionIcon || !nextCompletionIcon || !questionLabel || !answerRow)
-      return;
+      if (!questionIcon || !nextCompletionIcon || !questionLabel || !answerRow)
+        return;
 
-    questionIcon.classList.remove('animate-fade-in');
+      setShowMask(true);
 
-    // Clone the question icon for animation
-    const questionIconClone = questionIcon.cloneNode(true) as HTMLSpanElement;
-    const questionIconRect = questionIcon.getBoundingClientRect();
-    const nextCompletionIconRect = nextCompletionIcon.getBoundingClientRect();
+      questionIcon.classList.remove('animate-fade-in');
 
-    // Collapse answer rows
-    Array.from(answerRow.children).forEach((child) => {
-      if (child instanceof HTMLDivElement) {
-        child.classList.remove('animate-incubation-answer-expand');
-        child.classList.add('animate-incubation-answer-collapse');
-      }
-    });
+      // Clone the question icon for animation
+      const questionIconClone = questionIcon.cloneNode(true) as HTMLSpanElement;
+      const questionIconRect = questionIcon.getBoundingClientRect();
+      const nextCompletionIconRect = nextCompletionIcon.getBoundingClientRect();
 
-    Array.from(multiSelectAnswers?.children ?? []).forEach((child) => {
-      if (child instanceof HTMLDivElement) {
-        child.classList.remove('animate-incubation-answer-expand');
-        child.classList.add('animate-incubation-answer-collapse');
-      }
-    });
+      // Collapse answer rows
+      Array.from(answerRow.children).forEach((child) => {
+        if (child instanceof HTMLDivElement) {
+          child.classList.remove('animate-incubation-answer-expand');
+          child.classList.add('animate-incubation-answer-collapse');
+        }
+      });
 
-    // Set up the cloned element for animation
-    questionIconClone.classList.add(
-      'aucctus-cloned-element',
-      'absolute',
-      'z-[999]',
-      'transition-all',
-      'duration-300',
-      'ease-in-out',
-    );
-    questionIconClone.style.left = `${questionIconRect.left - 4}px`;
-    questionIconClone.style.top = `${questionIconRect.top}px`;
+      Array.from(multiSelectAnswers?.children ?? []).forEach((child) => {
+        if (child instanceof HTMLDivElement) {
+          child.classList.remove('animate-incubation-answer-expand');
+          child.classList.add('animate-incubation-answer-collapse');
+        }
+      });
 
-    const handleTransitionEnd = () => {
-      questionIconClone.removeEventListener(
-        'transitionend',
-        handleTransitionEnd,
+      // Set up the cloned element for animation
+      questionIconClone.classList.add(
+        'aucctus-cloned-element',
+        'absolute',
+        'z-[999]',
+        'transition-all',
+        'duration-300',
+        'ease-in-out',
       );
-      questionLabel.classList.remove('opacity-0');
-      questionIcon.classList.add('animate-fade-in');
-      questionIcon.classList.remove('opacity-0');
-      callback();
+      questionIconClone.style.left = `${questionIconRect.left - 4}px`;
+      questionIconClone.style.top = `${questionIconRect.top}px`;
 
-      setTimeout(() => {
-        if (document.body.contains(questionIconClone)) {
-          document.body.removeChild(questionIconClone); // Guarantees that the question completed icon is present before removal
+      const handleTransitionEnd = () => {
+        questionIconClone.removeEventListener(
+          'transitionend',
+          handleTransitionEnd,
+        );
+        questionLabel.classList.remove('opacity-0');
+        questionIcon.classList.add('animate-fade-in');
+        questionIcon.classList.remove('opacity-0');
+        callback();
+
+        setTimeout(() => {
+          if (document.body.contains(questionIconClone)) {
+            document.body.removeChild(questionIconClone); // Guarantees that the question completed icon is present before removal
+          }
+
+          setShowMask(false);
+        }, 0);
+      };
+
+      questionIconClone.addEventListener('transitionend', handleTransitionEnd);
+      document.body.appendChild(questionIconClone);
+
+      // Animate the cloned element
+      requestAnimationFrame(() => {
+        void questionIconClone.offsetWidth; // Force reflow
+
+        questionIcon.classList.add('opacity-0');
+        questionIconClone.style.top = `${nextCompletionIconRect.top}px`;
+        questionIconClone.style.left = `${nextCompletionIconRect.left + 4}px`;
+
+        const firstChild = questionIconClone.firstElementChild;
+        if (firstChild) {
+          firstChild.classList.add(
+            'transition-all',
+            'duration-[280ms]',
+            'ease-in-out',
+            'opacity-0',
+          );
         }
 
-        setShowMask(false);
-      }, 0);
-    };
-
-    questionIconClone.addEventListener('transitionend', handleTransitionEnd);
-    document.body.appendChild(questionIconClone);
-
-    // Animate the cloned element
-    requestAnimationFrame(() => {
-      void questionIconClone.offsetWidth; // Force reflow
-
-      questionIcon.classList.add('opacity-0');
-      questionIconClone.style.top = `${nextCompletionIconRect.top}px`;
-      questionIconClone.style.left = `${nextCompletionIconRect.left + 4}px`;
-
-      const firstChild = questionIconClone.firstElementChild;
-      if (firstChild) {
-        firstChild.classList.add(
-          'transition-all',
-          'duration-[280ms]',
-          'ease-in-out',
-          'opacity-0',
+        // Transform the cloned element
+        questionIconClone.classList.replace('w-10', 'w-8');
+        questionIconClone.classList.replace('h-10', 'h-8');
+        questionIconClone.classList.replace('p-2', 'p-1');
+        questionIconClone.classList.replace('rounded-lg', 'rounded-md');
+        questionIconClone.classList.replace(
+          'aucctus-bg-primary',
+          'aucctus-bg-secondary',
         );
-      }
-
-      // Transform the cloned element
-      questionIconClone.classList.replace('w-10', 'w-8');
-      questionIconClone.classList.replace('h-10', 'h-8');
-      questionIconClone.classList.replace('p-2', 'p-1');
-      questionIconClone.classList.replace('rounded-lg', 'rounded-md');
-      questionIconClone.classList.replace(
-        'aucctus-bg-primary',
-        'aucctus-bg-secondary',
-      );
-      questionLabel.classList.add('opacity-0');
-    });
-  }, []);
+        questionLabel.classList.add('opacity-0');
+      });
+    },
+    [],
+  );
 
   // Handle animation when moving to previous question
-  const handleBackwardAnimation = useCallback((callback: () => void) => {
+  const handleFadeAnimation = useCallback((callback: () => void) => {
     const parentComponent = componentRef.current;
     if (parentComponent) {
+      setShowMask(true);
       const handleTransitionEnd = () => {
         parentComponent.classList.remove('opacity-0');
         parentComponent.removeEventListener(
@@ -128,37 +135,10 @@ export const useQuestionTransition = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const handleQuestionTransition = (
-      event: CustomEvent<{
-        type: 'forward' | 'backward';
-        callback: () => void;
-      }>,
-    ) => {
-      setShowMask(true);
-      const { type, callback } = event.detail;
-
-      if (type === 'forward') {
-        handleForwardAnimation(callback);
-      } else {
-        handleBackwardAnimation(callback);
-      }
-    };
-
-    // Add event listener with type assertion
-    window.addEventListener(
-      'aucctus-question-transition',
-      handleQuestionTransition as EventListener,
-    );
-
-    // Clean up event listener on unmount
-    return () => {
-      window.removeEventListener(
-        'aucctus-question-transition',
-        handleQuestionTransition as EventListener,
-      );
-    };
-  }, [handleForwardAnimation, handleBackwardAnimation]);
+  useListenForIncubationAnimation(
+    handleQuestionTransitionAnimation,
+    handleFadeAnimation,
+  );
 
   return {
     showMask,

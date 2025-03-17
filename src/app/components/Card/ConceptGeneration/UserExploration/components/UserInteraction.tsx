@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, {
   useCallback,
   useEffect,
@@ -9,9 +8,11 @@ import React, {
 import { toast } from 'react-toastify';
 import {
   useDeleteConceptSeedDraft,
+  useGenerateConceptIncubationClarifyingQuestions,
   useGetConceptSeedDraftAnswers,
   useSaveConceptSeedDraftAnswer,
   useUpdateConceptSeedDraftAnswer,
+  useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers,
 } from '@hooks/query/concepts.hook';
 import { useQueryClient } from 'react-query';
 import QuestionDisplay from './question/QuestionDisplay';
@@ -25,8 +26,10 @@ import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { IncubationAnswer } from '@libs/api/concepts';
 import { useTransition, animated } from 'react-spring';
 import ConfirmAnswerUpdate from './answer/ConfirmAnswerUpdate';
+import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
+import { useDispatchIncubationAnimation } from '../hooks/incubation-animation-event.hook';
 
-type advanceActionType = 'to-next-question' | 'to-clarifying-question' | false;
+type advanceActionType = 'to-next-question' | 'to-clarifying-questions' | false;
 
 // Types
 interface UserInteractionProps {}
@@ -42,6 +45,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     currentTextAnswerList,
     currentMultiSelectAnswerList,
     submittedAnswers,
+    activeClarifyingQuestion,
     setCurrentQuestionOrder,
     getNextQuestion,
     getPreviousQuestion,
@@ -49,6 +53,8 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     setCurrentMultiSelectAnswerList,
     resetQuestionnaire,
     setSubmittedAnswers,
+    setClarifyingQuestions,
+    setActiveClarifyingQuestion,
   } = useConceptIncubationStore();
   const queryClient = useQueryClient();
 
@@ -64,8 +70,16 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     useSaveConceptSeedDraftAnswer();
   const { mutateAsync: updateAnswer, isLoading: isUpdateAnswerLoading } =
     useUpdateConceptSeedDraftAnswer();
+  const {
+    mutateAsync: updateAnswerAndDeleteHigherOrder,
+    isLoading: isUpdateAnswerAndDeleteHigherOrderLoading,
+  } = useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers();
   const { data: seedDraftAnswers, isLoading: isSeedDraftAnswersLoading } =
     useGetConceptSeedDraftAnswers(draftSeedUuid || '');
+  const {
+    mutate: generateClarifyingQuestions,
+    isLoading: isGenerateClarifyingQuestionsLoading,
+  } = useGenerateConceptIncubationClarifyingQuestions();
 
   useEffect(() => {
     const answers = (seedDraftAnswers ?? []).sort(
@@ -77,7 +91,14 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     if (advanceAction.current === 'to-next-question') {
       goToNextQuestion(answers);
       advanceAction.current = false;
+    } else if (advanceAction.current === 'to-clarifying-questions') {
+      dispatchAnimationEvent('fade', () => {
+        setActiveClarifyingQuestion(undefined);
+        setAnswerValue('');
+      });
+      advanceAction.current = false;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seedDraftAnswers]);
 
   const isLoading = useMemo(
@@ -85,20 +106,26 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       isSeedDraftAnswersLoading ||
       isDeleteDraftLoading ||
       isSaveAnswerLoading ||
-      isUpdateAnswerLoading,
+      isUpdateAnswerLoading ||
+      isUpdateAnswerAndDeleteHigherOrderLoading ||
+      isGenerateClarifyingQuestionsLoading,
     [
       isSeedDraftAnswersLoading,
       isDeleteDraftLoading,
       isSaveAnswerLoading,
       isUpdateAnswerLoading,
+      isUpdateAnswerAndDeleteHigherOrderLoading,
+      isGenerateClarifyingQuestionsLoading,
     ],
   );
 
   const activeAnswer = useMemo(() => {
     return seedDraftAnswers?.find(
-      (answer) => answer.question.id === activeQuestion?.id,
+      (answer) =>
+        answer.question.id === activeQuestion?.id ||
+        answer.question.id === activeClarifyingQuestion?.question.id,
     );
-  }, [seedDraftAnswers, activeQuestion]);
+  }, [seedDraftAnswers, activeQuestion, activeClarifyingQuestion]);
 
   useEffect(() => {
     const handleAnswerUpdate = (event: CustomEvent) =>
@@ -116,18 +143,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       );
   }, []);
 
-  const dispatchAnimationEvent = useCallback(
-    (type: 'forward' | 'backward', callback: () => void) => {
-      const event = new CustomEvent('aucctus-question-transition', {
-        detail: {
-          type,
-          callback,
-        },
-      });
-      window.dispatchEvent(event);
-    },
-    [],
-  );
+  const { dispatchAnimationEvent } = useDispatchIncubationAnimation();
 
   const dispatchAiSuggestionsEvent = useCallback(() => {
     if (!activeQuestion) return;
@@ -154,14 +170,35 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
   ]);
 
   const goToNextQuestion = useCallback(
-    (answers: IncubationAnswer[]) => {
+    (answers: IncubationAnswer[], fetchClarifyingQuestions: boolean = true) => {
       const nextQuestion = getNextQuestion(answers);
-      dispatchAnimationEvent('forward', () => {
-        setCurrentQuestionOrder(nextQuestion?.order ?? Infinity);
-        setAnswerValue('');
-      });
+      const nextOrder = nextQuestion?.order ?? Infinity;
+
+      if (nextOrder === Infinity && fetchClarifyingQuestions) {
+        generateClarifyingQuestions(draftSeedUuid || '', {
+          onSuccess: (data: ConceptIncubationClarifyingQuestion[]) => {
+            setClarifyingQuestions(data);
+            dispatchAnimationEvent('question-transition', () => {
+              setCurrentQuestionOrder(nextOrder);
+              setAnswerValue('');
+            });
+          },
+        });
+      } else {
+        dispatchAnimationEvent('question-transition', () => {
+          setCurrentQuestionOrder(nextOrder);
+          setAnswerValue('');
+        });
+      }
     },
-    [dispatchAnimationEvent, getNextQuestion, setCurrentQuestionOrder],
+    [
+      dispatchAnimationEvent,
+      getNextQuestion,
+      setCurrentQuestionOrder,
+      setClarifyingQuestions,
+      draftSeedUuid,
+      generateClarifyingQuestions,
+    ],
   );
 
   useEffect(() => {
@@ -199,7 +236,12 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
         })),
       );
     }
-  }, [activeAnswer, activeQuestion]);
+  }, [
+    activeAnswer,
+    activeQuestion,
+    setCurrentTextAnswerList,
+    setCurrentMultiSelectAnswerList,
+  ]);
 
   const isQuestionAnswered = useMemo(() => {
     if (
@@ -218,7 +260,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     );
 
     return !hasAnswer;
-  }, [activeQuestion, currentTextAnswerList, answerValue]);
+  }, [currentTextAnswerList, answerValue]);
 
   const onInputChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -247,6 +289,16 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
   const handleGoBack = useCallback(() => {
     if (currentQuestionOrder === undefined) return;
 
+    if (activeClarifyingQuestion) {
+      dispatchAnimationEvent('fade', () => {
+        setActiveClarifyingQuestion(undefined);
+        setCurrentMultiSelectAnswerList([]);
+        setCurrentTextAnswerList([]);
+        setAnswerValue('');
+      });
+      return;
+    }
+
     const previousQuestion = getPreviousQuestion(submittedAnswers);
 
     if (!previousQuestion) {
@@ -266,7 +318,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
         resetQuestionnaire();
       }
     } else {
-      dispatchAnimationEvent('backward', () => {
+      dispatchAnimationEvent('fade', () => {
         setCurrentQuestionOrder(previousQuestion.order);
         setAnswerValue('');
       });
@@ -279,6 +331,12 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     resetQuestionnaire,
     seedDraftAnswers,
     dispatchAnimationEvent,
+    activeClarifyingQuestion,
+    submittedAnswers,
+    getPreviousQuestion,
+    setActiveClarifyingQuestion,
+    setCurrentMultiSelectAnswerList,
+    setCurrentTextAnswerList,
   ]);
 
   const formattedAnswerPayload = useMemo(() => {
@@ -286,9 +344,11 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       activeQuestion?.fieldType === 'multiSelect' ||
       activeQuestion?.fieldType === 'radioButton';
 
+    const question = activeClarifyingQuestion?.question ?? activeQuestion;
+
     return {
-      questionId: activeQuestion?.id,
-      fieldType: activeQuestion?.fieldType,
+      questionId: question?.id,
+      fieldType: question?.fieldType,
       answer: isMultiSelectType
         ? currentMultiSelectAnswerList.map((answer) => answer.answer)
         : currentTextAnswerList.map((answer) => answer.answer),
@@ -296,11 +356,18 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
         ? currentTextAnswerList.map((answer) => answer.answer).join('\n')
         : '',
     } as IncubationAnswerPayload;
-  }, [activeQuestion, currentMultiSelectAnswerList, currentTextAnswerList]);
+  }, [
+    activeQuestion,
+    currentMultiSelectAnswerList,
+    currentTextAnswerList,
+    activeClarifyingQuestion,
+  ]);
 
   const isDuplicateAnswer = useCallback(() => {
     const answeredQuestion = submittedAnswers.find(
-      (answer) => answer.question.id === activeQuestion?.id,
+      (answer) =>
+        answer.question.id === activeQuestion?.id ||
+        answer.question.id === activeClarifyingQuestion?.question.id,
     );
 
     if (!answeredQuestion) return false;
@@ -318,12 +385,21 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       (answeredQuestion.details ?? '');
 
     return isAnswerSame && isDetailsSame;
-  }, [submittedAnswers, activeQuestion, formattedAnswerPayload]);
+  }, [
+    submittedAnswers,
+    activeQuestion,
+    activeClarifyingQuestion,
+    formattedAnswerPayload,
+  ]);
 
   const doUpdateAnswer = useCallback(() => {
     if (!activeAnswer) return;
 
-    updateAnswer(
+    const updateMethod = activeClarifyingQuestion
+      ? updateAnswer
+      : updateAnswerAndDeleteHigherOrder;
+
+    updateMethod(
       {
         answerId: activeAnswer.id,
         body: {
@@ -333,7 +409,9 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       },
       {
         onSuccess: async () => {
-          advanceAction.current = 'to-next-question';
+          advanceAction.current = activeClarifyingQuestion
+            ? 'to-clarifying-questions'
+            : 'to-next-question';
           await queryClient.refetchQueries([
             AucctusQueryKeys.conceptSeedDraftAnswers,
             draftSeedUuid,
@@ -354,15 +432,24 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     formattedAnswerPayload,
     draftSeedUuid,
     queryClient,
-    updateAnswer,
+    updateAnswerAndDeleteHigherOrder,
     advanceAction,
+    activeClarifyingQuestion,
+    updateAnswer,
   ]);
 
   const handleSubmitAnswer = useCallback(() => {
     if (currentQuestionOrder === undefined) return;
 
     if (isDuplicateAnswer()) {
-      goToNextQuestion(submittedAnswers);
+      if (activeClarifyingQuestion) {
+        dispatchAnimationEvent('fade', () => {
+          setAnswerValue('');
+          setActiveClarifyingQuestion(undefined);
+        });
+      } else {
+        goToNextQuestion(submittedAnswers, false);
+      }
       return;
     }
 
@@ -388,8 +475,9 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
 
     if (activeAnswer) {
       if (
+        !!activeAnswer.question.identifier &&
         activeAnswer.question.order <
-        submittedAnswers[submittedAnswers.length - 1].question.order
+          submittedAnswers[submittedAnswers.length - 1].question.order
       ) {
         setShowConfirmation(true);
       } else {
@@ -403,7 +491,9 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
         },
         {
           onSuccess: async () => {
-            advanceAction.current = 'to-next-question';
+            advanceAction.current = activeClarifyingQuestion
+              ? 'to-clarifying-questions'
+              : 'to-next-question';
             await queryClient.refetchQueries([
               AucctusQueryKeys.conceptSeedDraftAnswers,
               draftSeedUuid,
@@ -421,42 +511,33 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       );
     }
   }, [
-    currentQuestionOrder,
-    setCurrentQuestionOrder,
-    isQuestionAnswered,
+    activeAnswer,
+    activeClarifyingQuestion,
     activeQuestion,
+    currentQuestionOrder,
+    dispatchAnimationEvent,
+    doUpdateAnswer,
     draftSeedUuid,
     formattedAnswerPayload,
-    saveAnswer,
-    updateAnswer,
+    goToNextQuestion,
+    isDuplicateAnswer,
+    isQuestionAnswered,
     queryClient,
-    activeAnswer,
+    saveAnswer,
+    setActiveClarifyingQuestion,
+    submittedAnswers,
   ]);
 
   // Add transition for answer input
   const answerInputTransition = useTransition(
-    currentQuestionOrder !== Infinity,
+    currentQuestionOrder !== Infinity || activeClarifyingQuestion,
     {
-      from: { opacity: 0, transform: 'translateX(0px)', maxHeight: '0px' },
-      enter: { opacity: 1, transform: 'translateX(0px)', maxHeight: '100px' },
-      leave: { opacity: 0, transform: 'translateX(0px)', maxHeight: '0px' },
+      from: { opacity: 0, transform: 'translateY(100px)', maxHeight: '0px' },
+      enter: { opacity: 1, transform: 'translateY(0px)', maxHeight: '100px' },
+      leave: { opacity: 0, transform: 'translateY(100px)', maxHeight: '0px' },
       config: { tension: 200, friction: 20, mass: 0.5 },
     },
   );
-
-  const deleteAnswerlessDraft = useCallback(() => {
-    const { draftSeedUuid, submittedAnswers, deleteDraft, resetQuestionnaire } =
-      latestValuesRef.current;
-
-    if (submittedAnswers.length === 0 && draftSeedUuid) {
-      deleteDraft(draftSeedUuid, {
-        onSuccess: () => resetQuestionnaire(),
-        onError: (error) => {
-          resetQuestionnaire();
-        },
-      });
-    }
-  }, []);
 
   return (
     <>

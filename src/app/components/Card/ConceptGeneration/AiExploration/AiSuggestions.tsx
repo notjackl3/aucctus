@@ -80,6 +80,8 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   });
 
   const dispatchAnswerUpdateEvent = useCallback((suggestion: IAISuggestion) => {
+    if (suggestion.description.length === 0) return;
+
     const event = new CustomEvent('aucctus-incubation-answer-update', {
       detail: { answer: suggestion.description },
     });

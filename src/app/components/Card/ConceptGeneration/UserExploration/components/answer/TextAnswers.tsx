@@ -37,7 +37,7 @@ const TextAnswers: React.FC<{
         'flex-1',
         'flex-col',
         'gap-3',
-        'overflow-y-auto',
+        'no-scrollbar',
         'mt-4',
         {
           'max-h-[10vh]': isMultiSelectOrRadio,

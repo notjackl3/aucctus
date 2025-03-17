@@ -1,3 +1,4 @@
+import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
 import { useEffect } from 'react';
 
 /**
@@ -8,6 +9,7 @@ export const useQuestionIconLine = (
   questionIconLineRef: React.RefObject<HTMLDivElement>,
   spacerRef: React.RefObject<HTMLDivElement>,
   currentQuestionOrder: number,
+  activeClarifyingQuestion: ConceptIncubationClarifyingQuestion | undefined,
 ) => {
   useEffect(() => {
     const questionIcon = questionIconRef.current;
@@ -60,5 +62,11 @@ export const useQuestionIconLine = (
       resizeObserver.disconnect();
       window.removeEventListener('resize', updateLineHeight);
     };
-  }, [questionIconRef, questionIconLineRef, spacerRef, currentQuestionOrder]);
+  }, [
+    questionIconRef,
+    questionIconLineRef,
+    spacerRef,
+    currentQuestionOrder,
+    activeClarifyingQuestion,
+  ]);
 };

@@ -29,8 +29,12 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
 }) => {
   const renderSpacer = () => <div className='flex-1' />;
 
-  const { currentStep, totalSteps, currentQuestionOrder } =
-    useConceptIncubationStore();
+  const {
+    currentStep,
+    totalSteps,
+    currentQuestionOrder,
+    activeClarifyingQuestion,
+  } = useConceptIncubationStore();
 
   const getProgressText = useCallback(() => {
     if (currentStep === Infinity) {
@@ -39,12 +43,15 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
     return `${currentStep} / ${totalSteps} steps`;
   }, [currentStep, totalSteps]);
 
-  const buttonTransition = useTransition(currentQuestionOrder !== Infinity, {
-    from: { opacity: 0, maxWidth: '0px' },
-    enter: { opacity: 1, maxWidth: '200px' },
-    leave: { opacity: 0, maxWidth: '0px' },
-    config: { tension: 100, friction: 12, mass: 0.5 },
-  });
+  const buttonTransition = useTransition(
+    currentQuestionOrder !== Infinity || activeClarifyingQuestion,
+    {
+      from: { opacity: 0, maxWidth: '0px' },
+      enter: { opacity: 1, maxWidth: '200px' },
+      leave: { opacity: 0, maxWidth: '0px' },
+      config: { tension: 100, friction: 12, mass: 0.5 },
+    },
+  );
 
   return (
     <div className='relative z-[100] flex flex-row items-center'>
@@ -79,7 +86,10 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
               <button
                 className='btn btn-primary flex items-center gap-2'
                 onClick={onContinue}
-                disabled={!isQuestionAnswered && isRequired}
+                disabled={
+                  !isQuestionAnswered &&
+                  (isRequired || !!activeClarifyingQuestion)
+                }
               >
                 {isQuestionAnswered ||
                 isRequired ||

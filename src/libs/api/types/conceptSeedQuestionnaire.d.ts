@@ -45,8 +45,9 @@ export interface IConceptIncubationMultiSelectQuestion
   details?: IDetailQuestion;
 }
 
-export interface IConceptIncubationClarifyingQuestion {
+export interface ConceptIncubationClarifyingQuestion {
   title: string;
+  uuid: string;
   icon: string;
   question: ConceptIncubationQuestion;
 }

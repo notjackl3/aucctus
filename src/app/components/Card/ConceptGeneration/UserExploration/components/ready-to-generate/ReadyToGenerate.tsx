@@ -16,14 +16,22 @@ const ReadyToGenerateIcon: React.FC = () => {
   );
 };
 
-interface ReadyToGenerateProps {}
+interface ReadyToGenerateProps {
+  compact?: boolean;
+}
 
 const READY_TO_GENERATE_TEXT =
   'Aucctus is ready to generate some concepts on the right, based on your answers or you can refine some of your answers, note that the more questions and accurate your answers, the better Aucctus can help generate the concepts for you.';
 
-const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({}) => {
-  const { iconAnimation, labelAnimation, cardAnimation } =
-    useReadyToGenerateAnimations();
+const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
+  compact = false,
+}) => {
+  const {
+    iconAnimation,
+    labelAnimation,
+    cardAnimation,
+    headerButtonAnimation,
+  } = useReadyToGenerateAnimations(compact);
 
   return (
     <span className='z-[999] mt-4 flex flex-col gap-4'>
@@ -34,6 +42,20 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({}) => {
         <ReadyToGenerateIcon />
         <animated.span style={labelAnimation} className='aucctus-text-primary'>
           {'Your concepts are ready to be generated'}
+        </animated.span>
+        <span className='flex flex-1'></span>
+        <animated.span
+          style={headerButtonAnimation}
+          className='aucctus-text-primary mr-2'
+        >
+          <button
+            className='btn btn-primary'
+            onClick={() =>
+              window.dispatchEvent(new CustomEvent('aucctus-generate-concept'))
+            }
+          >
+            Generate
+          </button>
         </animated.span>
       </animated.span>
       <animated.span style={cardAnimation} className='flex flex-row gap-2'>

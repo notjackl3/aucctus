@@ -60,7 +60,7 @@ const MultiSelectAnswers: React.FC<{
   return (
     <div
       ref={answersRef}
-      className='flex max-h-[50vh] flex-1 flex-col gap-2 overflow-y-auto'
+      className='no-scrollbar flex max-h-[50vh] flex-1 flex-col gap-2'
     >
       {activeQuestion.options.map((option) => {
         const isSelected = currentMultiSelectAnswerList.some(
