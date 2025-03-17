@@ -30,7 +30,7 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
   iconSize = 24,
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
-  const label = status !== 'archived' ? 'Archive' : 'Unarchive';
+  const label = status !== 'ARCHIVED' ? 'Archive' : 'Unarchive';
 
   return (
     <Popover.Root open={open}>
@@ -55,7 +55,7 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
               <button
                 className='btn btn-no-border btn-light'
                 onClick={() => {
-                  if (status === 'archived') {
+                  if (status === 'ARCHIVED') {
                     onUnarchive(uuid);
                   } else {
                     onArchive(uuid);
@@ -125,14 +125,14 @@ const SeedActionMenuButton: React.FC<ISeedActionMenuButton> = ({
   const handleArchive = (id: string) => {
     updateSeed({
       uuid: id,
-      status: 'archived',
+      status: 'ARCHIVED',
     });
   };
 
   const handleUnarchive = (id: string) => {
     updateSeed({
       uuid: id,
-      status: 'draft',
+      status: 'DRAFT',
     });
   };
 

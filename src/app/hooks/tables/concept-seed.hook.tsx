@@ -310,7 +310,7 @@ export const useSeedsBank = (
         header: () => {},
         cell: (info) => {
           // Check if current seed is archived
-          const isArchived = info.row.original.status === 'archived';
+          const isArchived = info.row.original.status === 'ARCHIVED';
 
           // By default, show continue button for non-archived seeds
           let showButton = !isArchived;

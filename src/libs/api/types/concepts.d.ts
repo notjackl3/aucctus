@@ -1,6 +1,6 @@
 import { IPageResponse } from '.';
 
-export type ConceptSeedStatus = 'draft' | 'published' | 'archived';
+export type ConceptSeedStatus = 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
 
 export type ConceptStatus =
   | 'new'
