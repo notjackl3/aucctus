@@ -1,65 +1,9 @@
-import React, { useCallback } from 'react';
+import React from 'react';
 import images from '@assets/img';
-import { useConceptGeneration } from '@hooks/query/concepts.hook';
-import { animated, easings, useSpring, useTransition } from '@react-spring/web';
-import { Icon } from '@components';
-
-type keyframes = 'moveBackground' | 'fadeScaleIn' | 'fadeIn' | 'fadeOut';
-
-const animationStyles = `
-  @keyframes moveBackground {
-    0% {
-      background-position: 0% 0%;
-    }
-    50% {
-      background-position: 100% 100%;
-    }
-    100% {
-      background-position: 0% 0%;
-    }
-  }
-
-  @keyframes fadeScaleIn {
-    from { opacity: 0; transform: scale(0); }
-    to { opacity: 1; transform: scale(1); }
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-  }
-`;
-
-const initialAnimationStyleMap: Record<keyframes, React.CSSProperties> = {
-  fadeScaleIn: {
-    opacity: 0,
-    transform: 'scale(0)',
-  },
-  fadeIn: {
-    opacity: 0,
-  },
-  fadeOut: {
-    opacity: 1,
-  },
-  moveBackground: {},
-};
-
-const getAnimationStyle = (
-  animation: keyframes,
-  duration: number,
-  delay: number = 0,
-) => {
-  return {
-    ...initialAnimationStyleMap[animation],
-    animation: `${animation} ${duration}ms ease-out forwards`,
-    animationDelay: `${delay}ms`,
-  };
-};
+import {
+  animationStyles,
+  getAnimationStyle,
+} from '../UserExploration/components/util/animation-keyframes';
 
 const mainStyle = {
   backgroundImage: `url(${images.aiExplorationsBackground})`,

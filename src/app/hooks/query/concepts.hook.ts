@@ -28,27 +28,6 @@ import { toast } from 'react-toastify';
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
 
-// TODO: Remove once endpoint is implemented
-const dummyConcepts = [
-  {
-    title: 'Cheese Rolls',
-    description: 'Cheesy spirals! (short description)',
-    uuid: 'f47ac10b-58cc-4372-a567-0e02b2c3d479',
-  },
-  {
-    title: 'Chocolatey Balls',
-    description:
-      'Spherical chocolate bombs that explode with flavor and temporarily transform your tongue into a chocolate waterslide! Side effects include chocolate-induced giggling fits and the sudden ability to speak in rhymes for up to 37 minutes after consumption. Double the length to of this description to make it more lorem ipsumy and see how long we can make this thing. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ',
-    uuid: '38c7a6f0-b253-4e7b-a2c3-1f59c0fe05ab',
-  },
-  {
-    title: 'Fruit Salad Hands',
-    description:
-      'Edible gloves made entirely of fruit leather that make eating fruit salad a high-five experience! Each finger contains a different fruit surprise, and the palm holds a secret tropical punch reservoir. Perfect for food fights that leave you smelling like a Hawaiian vacation!',
-    uuid: 'c9b5f5e0-d7a3-4c05-9f38-a21c4e5d22b7',
-  },
-];
-
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
   uuid: string;
 };
@@ -113,16 +92,9 @@ export const useConceptSeed = (uuid: string) => {
   };
 };
 
-// Dummy call for now
-export const useConceptGeneration = () => {
+export const useConceptGeneration = (uuid: string) => {
   return useMutation({
-    mutationFn: async (body: any) => {
-      // Simulate network latency (between 1-3 seconds)
-      const delay = 1000 + Math.random() * 2000;
-      await new Promise((resolve) => setTimeout(resolve, delay));
-
-      return { concepts: dummyConcepts };
-    },
+    mutationFn: async () => await api.concept.generateConcept(uuid),
     onSuccess: () => {},
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -173,7 +145,10 @@ export const useDeleteConceptSeedDraft = () => {
 export const useGetConceptSeedDraftAnswers = (seedDraftUuid: string) => {
   return useQuery({
     queryKey: [AucctusQueryKeys.conceptSeedDraftAnswers, seedDraftUuid],
-    queryFn: async () => await api.concept.getSeedDraftAnswers(seedDraftUuid),
+    queryFn: async () => {
+      if (!seedDraftUuid) return [];
+      return await api.concept.getSeedDraftAnswers(seedDraftUuid);
+    },
     cacheTime: Infinity,
     staleTime: Infinity,
   });

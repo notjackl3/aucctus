@@ -5,25 +5,12 @@ import { Card } from '@components';
 import { useFadeTransition } from './hooks/fade-transition.hook';
 import AiSuggestions from './AiExploration/AiSuggestions';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-
-const animationStyles = `
-  @keyframes moveBackground {
-    0% {
-      background-position: 0% 0%;
-    }
-    50% {
-      background-position: 50% 0%;
-    }
-    100% {
-      background-position: 0% 0%;
-    }
-  }
-`;
+import { animationStyles } from './UserExploration/components/util/animation-keyframes';
 
 const mainStyle = {
   backgroundImage: `url(${images.aiExplorationsBackground})`,
   backgroundSize: 'cover',
-  animation: 'fadeIn 1s ease-in-out forwards, moveBackground 40s ease infinite',
+  animation: 'fadeIn 1s ease-in-out forwards, moveBackground 60s ease infinite',
   opacity: 0,
 };
 

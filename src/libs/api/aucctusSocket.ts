@@ -5,7 +5,7 @@ export class AucctusSocket extends SocketService {
     console.log('AucctusSocket encountered an error:', error);
   }
   protected handleMessage(event: SocketEvent): void {
-    console.log('Received event:', event);
+    //console.log('Received event:', event);
   }
   protected onConnect(): void {
     console.log('AucctusSocket connected.');

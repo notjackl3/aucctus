@@ -95,6 +95,7 @@ const conceptIncubationStore = create<ConceptIncubationStoreState>()(
         set({
           currentQuestionOrder: undefined,
           activeQuestionnaire: undefined,
+          activeClarifyingQuestion: undefined,
           draftSeedUuid: '',
           currentTextAnswerList: [],
           currentMultiSelectAnswerList: [],
@@ -166,11 +167,7 @@ export const useConceptIncubationStore = () => {
       if (currentQuestionOrder === undefined) return;
 
       const eligibleQuestions = questions
-        .map((question) => {
-          return {
-            ...question,
-          };
-        })
+        .filter((question) => !!question.identifier)
         .filter(
           (question) =>
             question.order > currentQuestionOrder &&
@@ -189,6 +186,7 @@ export const useConceptIncubationStore = () => {
       if (!currentQuestionOrder) return;
 
       const previousQuestion = [...answers]
+        .filter((answer) => !!answer.question.identifier) // filter out clarifying questions
         .map((answer) => answer.question)
         .sort((a, b) => b.order - a.order)
         .find((question) => question.order < currentQuestionOrder);

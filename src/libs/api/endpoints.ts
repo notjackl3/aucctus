@@ -75,6 +75,10 @@ export class Endpoints {
     return `api/v2/concept/incubation/seed/answer/${answerId}`;
   }
 
+  static conceptGenerate(seedUuid: string) {
+    return `api/v2/concept/incubation/seed/${seedUuid}/generate-concepts`;
+  }
+
   static conceptIncubationSeedAnswerIdAndDeleteHigherOrderAnswers(
     answerId: number,
   ) {

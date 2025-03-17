@@ -116,6 +116,13 @@ interface AISuggestionsStreamEvent
   type: 'stream.structured.ai.suggestions';
 }
 
+interface ConceptGenerationStreamEvent
+  extends IStreamDeltaEvent<IConceptList, IConceptGenerationContext>,
+    IStreamDoneEvent<IConceptList, IConceptGenerationContext>,
+    IStreamErrorEvent<IConceptGenerationContext> {
+  type: 'stream.structured.concept.generation';
+}
+
 interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
   type: 'incubation.ai.suggestions.request';
   seed_uuid: string;
@@ -129,6 +136,7 @@ type SocketEvent<C = {}> =
   | ChatMessageEvent
   | ChatStreamEvent<C>
   | IncubationAiSuggestionsRequestEvent
-  | AISuggestionsStreamEvent;
+  | AISuggestionsStreamEvent
+  | ConceptGenerationStreamEvent;
 
 type SocketEventType = SocketEvent['type'];

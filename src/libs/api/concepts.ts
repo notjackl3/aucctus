@@ -171,6 +171,10 @@ export class ConceptApi extends ApiService {
     return this.delete<void>(endpoints.conceptIncubationSeedAnswerId(answerId));
   }
 
+  generateConcept(uuid: string) {
+    return this.post<IConcept>(endpoints.conceptGenerate(uuid));
+  }
+
   unarchive(uuid: string) {
     return this.post<IConcept>(endpoints.unarchiveConcept(uuid));
   }

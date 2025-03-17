@@ -1,48 +1,21 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import images from '@assets/img';
 import { useConceptGeneration } from '@hooks/query/concepts.hook';
 import { animated, easings, useSpring, useTransition } from '@react-spring/web';
 import { Icon } from '@components';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
+import { IConcept } from '@libs/api/types/conceptIncubation';
+import {
+  animationStyles,
+  getAnimationStyle,
+} from '../UserExploration/components/util/animation-keyframes';
 
-const animationStyles = `
-  @keyframes moveBackground {
-    0% {
-      background-position: 0% 0%;
-    }
-    50% {
-      background-position: 100% 100%;
-    }
-    100% {
-      background-position: 0% 0%;
-    }
-  }
+const getFadeInStyle = (duration: number, delay: number = 0) =>
+  getAnimationStyle('fadeIn', duration, delay);
 
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  @keyframes fadeOut {
-    from { opacity: 1; }
-    to { opacity: 0; }
-  }
-`;
-
-const getFadeInStyle = (duration: number, delay: number = 0) => {
-  return {
-    opacity: 0,
-    animation: `fadeIn ${duration}ms ease-in-out forwards`,
-    animationDelay: `${delay}ms`,
-  };
-};
-
-const getFadeOutStyle = (duration: number, delay: number = 0) => {
-  return {
-    opacity: 1,
-    animation: `fadeOut ${duration}ms ease-in-out forwards`,
-    animationDelay: `${delay}ms`,
-  };
-};
+const getFadeOutStyle = (duration: number, delay: number = 0) =>
+  getAnimationStyle('fadeOut', duration, delay);
 
 const mainStyle = {
   backgroundImage: `url(${images.aiExplorationsBackground})`,
@@ -60,9 +33,28 @@ const ConceptGeneration = React.forwardRef<
   ConceptGenerationProps
 >(({ className = '', onGenerateComplete }, ref) => {
   // State and refs
-  const [concepts, setConcepts] = React.useState<any>([]);
+  const { draftSeedUuid } = useConceptIncubationStore();
+  const [concepts, setConcepts] = React.useState<IConcept[]>([]);
   const contentRef = React.useRef<HTMLDivElement>(null);
-  const { mutate: generateConcept } = useConceptGeneration();
+  const { mutate: generateConcept } = useConceptGeneration(draftSeedUuid);
+  const animatedTitles = useRef<Set<string>>(new Set());
+  const conceptsContainerRef = React.useRef<HTMLDivElement>(null);
+
+  // Handle socket events for concept generation
+  useSocketEvent('stream.structured.concept.generation', (data) => {
+    const { concepts: eventConcepts } = data?.content;
+
+    if (['done'].includes(data.stage) && eventConcepts) {
+      setConcepts(eventConcepts);
+      setTimeout(() => {
+        handleGenerateComplete();
+      }, 3000);
+    } else if (['delta'].includes(data.stage) && eventConcepts) {
+      if (eventConcepts.length - 1 > concepts.length) {
+        setConcepts(eventConcepts.slice(0, -1));
+      }
+    }
+  });
 
   // Animation configurations
   const floatingAnimation = useSpring({
@@ -86,115 +78,120 @@ const ConceptGeneration = React.forwardRef<
     delay: 1000,
   });
 
+  const conceptAnimated = useCallback((concept: IConcept) => {
+    return !!concept.title && animatedTitles.current.has(concept.title);
+  }, []);
+
   const transitions = useTransition(concepts, {
-    from: {
-      opacity: 0,
-      transform: 'translateY(60px) scale(1.1)',
-      maxHeight: '0px',
-      padding: '0px',
+    from: (concept) => {
+      const isAnimated = conceptAnimated(concept);
+      const animatedIndex = concepts.findIndex(
+        (c) => c.title === concept.title,
+      );
+
+      return {
+        opacity: isAnimated ? 1 : 0,
+        transform: isAnimated
+          ? `translateY(${animatedIndex * 20}px) scale(${0.9 + animatedIndex * 0.05})`
+          : 'translateY(0px) scale(1)',
+        maxHeight: isAnimated ? '200px' : '0px',
+        padding: isAnimated ? '20px' : '0px',
+      };
     },
-    enter: (_, index) => async (next) => {
+    enter: (concept, index) => async (next) => {
       await next({
         opacity: 1,
-        dummy: index,
-        transform: `${`translateY(${index * 20}px) scale(${0.9 + index * 0.05})`}`,
+        transform: `translateY(${index * 20}px) scale(${0.9 + index * 0.05})`,
         maxHeight: '200px',
         padding: '20px',
-        delay: index * 2000,
       });
-
-      if (index === concepts.length - 1) {
-        setTimeout(() => {
-          handleGenerateComplete();
-        }, 2000);
+      if (concept.title) {
+        animatedTitles.current.add(concept.title);
       }
     },
-    config: { duration: 300 },
+    config: {
+      duration: 300,
+      tension: 280,
+      friction: 20,
+    },
   });
 
-  // Handlers
   const handleGenerateComplete = useCallback(() => {
     const content = contentRef.current;
-    if (!content) return;
+    const conceptsContainer = conceptsContainerRef.current;
 
-    Object.assign(content.style, getFadeOutStyle(300));
-    content.addEventListener(
-      'animationend',
-      () => {
-        onGenerateComplete();
-      },
-      { once: true },
+    if (!content || !conceptsContainer) return;
+
+    conceptsContainer.childNodes.forEach((child, index) =>
+      Object.assign(
+        (child as HTMLElement).style,
+        getFadeOutStyle(200, 100 * index),
+      ),
     );
+
+    setTimeout(() => Object.assign(content.style, getFadeOutStyle(300)), 1000);
+    setTimeout(() => onGenerateComplete(), 1500);
   }, [onGenerateComplete]);
 
-  // Effects
+  // Start concept generation on component mount
   React.useEffect(() => {
-    generateConcept(
-      {},
-      {
-        onSuccess: (data) => {
-          setConcepts(data.concepts);
-        },
-        onError: () => {
-          const event = new CustomEvent('aucctus-generate-concept', {
-            detail: { revert: true },
-          });
-          window.dispatchEvent(event);
-        },
+    generateConcept(undefined, {
+      onError: () => {
+        const event = new CustomEvent('aucctus-generate-concept', {
+          detail: { revert: true },
+        });
+        window.dispatchEvent(event);
       },
-    );
+    });
   }, [generateConcept]);
 
-  const renderLoadingIcon = () => {
-    return (
-      <>
-        <animated.div
-          className='aucctus-bg-primary-solid absolute rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
-          style={echoAnimation}
-        >
-          <Icon
-            variant='ai-conclusion'
-            className='stroke-primary-100 opacity-30'
-            width={24}
-            height={24}
-          />
-        </animated.div>
-        <animated.div
-          className='aucctus-bg-primary-solid rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
-          style={floatingAnimation}
-        >
-          <Icon
-            variant='ai-conclusion'
-            className='stroke-primary-100'
-            width={24}
-            height={24}
-          />
-        </animated.div>
-      </>
-    );
-  };
+  // UI Component renderers
+  const renderLoadingIcon = () => (
+    <>
+      <animated.div
+        className='aucctus-bg-primary-solid absolute rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
+        style={echoAnimation}
+      >
+        <Icon
+          variant='ai-conclusion'
+          className='stroke-primary-100 opacity-30'
+          width={24}
+          height={24}
+        />
+      </animated.div>
+      <animated.div
+        className='aucctus-bg-primary-solid rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
+        style={floatingAnimation}
+      >
+        <Icon
+          variant='ai-conclusion'
+          className='stroke-primary-100'
+          width={24}
+          height={24}
+        />
+      </animated.div>
+    </>
+  );
 
-  const renderLoadingText = () => {
-    return (
-      <div className='my-4 flex flex-col items-center justify-center gap-2'>
-        <div
-          style={getFadeInStyle(500, 500)}
-          className='aucctus-text-white aucctus-text-lg'
-        >
-          Generating concepts
-        </div>
-        <div
-          style={getFadeInStyle(500, 1000)}
-          className='aucctus-text-white aucctus-text-xs'
-        >
-          This will take just a few seconds to complete
-        </div>
+  const renderLoadingText = () => (
+    <div className='my-4 flex flex-col items-center justify-center gap-2'>
+      <div
+        style={getFadeInStyle(500, 500)}
+        className='aucctus-text-white aucctus-text-lg'
+      >
+        Generating concepts
       </div>
-    );
-  };
+      <div
+        style={getFadeInStyle(500, 1000)}
+        className='aucctus-text-white aucctus-text-xs'
+      >
+        This will take just a few seconds to complete
+      </div>
+    </div>
+  );
 
-  const renderConcepts = () => {
-    return transitions((style, concept) => (
+  const renderConcepts = () =>
+    transitions((style, concept) => (
       <animated.div
         style={{ ...style, transformOrigin: 'top' }}
         className='aucctus-border-primary aucctus-bg-primary absolute flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-opacity-25 bg-opacity-[0.1] p-4 backdrop-blur-md'
@@ -207,7 +204,6 @@ const ConceptGeneration = React.forwardRef<
         </span>
       </animated.div>
     ));
-  };
 
   return (
     <>
@@ -223,7 +219,10 @@ const ConceptGeneration = React.forwardRef<
             {renderLoadingIcon()}
           </div>
           {renderLoadingText()}
-          <span className='relative flex w-[50%] flex-1 flex-col'>
+          <span
+            ref={conceptsContainerRef}
+            className='relative flex w-[50%] flex-1 flex-col'
+          >
             {renderConcepts()}
           </span>
         </div>

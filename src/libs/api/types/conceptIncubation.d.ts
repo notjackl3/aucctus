@@ -12,3 +12,19 @@ interface IAISuggestion {
   title: string;
   description: string;
 }
+
+interface IConceptGenerationContext {
+  seed_uuid: string;
+  account_uuid: string;
+  user_uuid: string;
+}
+
+interface IConceptList {
+  concepts: IConcept[];
+}
+
+export interface IConcept {
+  title?: string;
+  description?: string;
+  uuid: string;
+}

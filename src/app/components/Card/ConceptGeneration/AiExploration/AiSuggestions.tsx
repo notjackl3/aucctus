@@ -3,6 +3,7 @@ import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
 import { cn } from '@libs/utils/react';
+import { IAISuggestion } from '@libs/api/types/conceptIncubation';
 
 interface AiSuggestionsProps {
   title?: string;
