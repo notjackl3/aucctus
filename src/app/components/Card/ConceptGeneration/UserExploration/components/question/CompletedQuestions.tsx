@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import { ConceptIgnitionQuestion } from '@libs/api/types';
+import { ConceptIncubationQuestion } from '@libs/api/types';
 import CompletionIconGroup from './CompletionIconGroup';
 
 /**
@@ -16,22 +16,23 @@ const CompletedQuestions: React.FC = () => {
       .map((answer) => answer.question);
   }, [submittedAnswers, currentQuestionOrder]);
 
-  const groupedCompletedQuestions: ConceptIgnitionQuestion[][] = useMemo(() => {
-    if (!completedQuestions.length) return [];
+  const groupedCompletedQuestions: ConceptIncubationQuestion[][] =
+    useMemo(() => {
+      if (!completedQuestions.length) return [];
 
-    // Create a map to group questions by their floor order value
-    const groupMap: Record<number, ConceptIgnitionQuestion[]> = {};
+      // Create a map to group questions by their floor order value
+      const groupMap: Record<number, ConceptIncubationQuestion[]> = {};
 
-    completedQuestions.forEach((question) => {
-      const floorOrder = Math.floor(question.order);
-      if (!groupMap[floorOrder]) {
-        groupMap[floorOrder] = [];
-      }
-      groupMap[floorOrder].push(question);
-    });
+      completedQuestions.forEach((question) => {
+        const floorOrder = Math.floor(question.order);
+        if (!groupMap[floorOrder]) {
+          groupMap[floorOrder] = [];
+        }
+        groupMap[floorOrder].push(question);
+      });
 
-    return Object.values(groupMap);
-  }, [completedQuestions]);
+      return Object.values(groupMap);
+    }, [completedQuestions]);
 
   if (completedQuestions.length === 0) return null;
 

@@ -223,12 +223,19 @@ export const useDeleteConceptSeedDraftAnswer = () => {
   });
 };
 
-export const useConceptIgnitionQuestionnaire = () => {
+export const useGenerateConceptIncubationClarifyingQuestions = () => {
+  return useMutation({
+    mutationFn: async (uuid: string) =>
+      await api.conceptIncubate.generateClarifyingQuestions(uuid),
+  });
+};
+
+export const useConceptIncubationQuestionnaire = () => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptIgnitionQuestionnaire],
     cacheTime: Infinity,
     staleTime: Infinity,
-    queryFn: async () => await api.conceptIgnite.questionnaire(),
+    queryFn: async () => await api.conceptIncubate.questionnaire(),
   });
 
   return {

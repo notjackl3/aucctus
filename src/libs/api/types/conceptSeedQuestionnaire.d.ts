@@ -1,4 +1,4 @@
-export interface BaseConceptIgnitionQuestion {
+export interface BaseConceptIncubationQuestion {
   id: number;
   identifier: string;
   label: string;
@@ -8,14 +8,14 @@ export interface BaseConceptIgnitionQuestion {
   order: number; // x for main questions, x.2, x.4, etc for sub questions
 }
 
-export interface IConceptIgnitionTextQuestion
-  extends BaseConceptIgnitionQuestion {
+export interface IConceptIncubationTextQuestion
+  extends BaseConceptIncubationQuestion {
   fieldType: 'text';
   placeholder?: string;
 }
 
-export interface IConceptIgnitionTextareaQuestion
-  extends BaseConceptIgnitionQuestion {
+export interface IConceptIncubationTextareaQuestion
+  extends BaseConceptIncubationQuestion {
   fieldType: 'textarea';
   placeholder?: string;
   rows?: number;
@@ -27,7 +27,7 @@ export interface IDetailQuestion {
   rows?: number;
 }
 
-export interface IConceptIgnitionMultiSelectOption {
+export interface IConceptIncubationMultiSelectOption {
   label: string;
   value: string;
   description?: string;
@@ -36,21 +36,27 @@ export interface IConceptIgnitionMultiSelectOption {
 
 export type multiSelectFieldType = 'multiSelect' | 'radioButton';
 
-export interface IConceptIgnitionMultiSelectQuestion
-  extends BaseConceptIgnitionQuestion {
+export interface IConceptIncubationMultiSelectQuestion
+  extends BaseConceptIncubationQuestion {
   fieldType: multiSelectFieldType;
-  options: IConceptIgnitionMultiSelectOption[];
+  options: IConceptIncubationMultiSelectOption[];
   defaultOption?: string;
   allowCustomInput: boolean;
   details?: IDetailQuestion;
 }
 
-export type ConceptIgnitionQuestion =
-  | IConceptIgnitionTextQuestion
-  | IConceptIgnitionTextareaQuestion
-  | IConceptIgnitionMultiSelectQuestion;
+export interface IConceptIncubationClarifyingQuestion {
+  title: string;
+  icon: string;
+  question: ConceptIncubationQuestion;
+}
 
-export type QuestionFieldType = ConceptIgnitionQuestion['fieldType'];
+export type ConceptIncubationQuestion =
+  | IConceptIncubationTextQuestion
+  | IConceptIncubationTextareaQuestion
+  | IConceptIncubationMultiSelectQuestion;
+
+export type QuestionFieldType = ConceptIncubationQuestion['fieldType'];
 
 export type ExpandAnExistingIdeaQuestions =
   | 'describe'
@@ -68,16 +74,16 @@ export type QuestionIdentifier =
   | ExpandAnExistingIdeaQuestions
   | IdentifyNewOpportunitiesQuestions;
 
-export type ConceptIgnitionQuestionnaireType =
+export type ConceptIncubationQuestionnaireType =
   | 'EXPAND_AN_EXISTING_IDEA'
   | 'IDENTIFY_NEW_OPPORTUNITIES';
-export interface IConceptIgnitionQuestionnaireSection<T extends string> {
-  type: ConceptIgnitionQuestionnaireType;
+export interface IConceptIncubationQuestionnaireSection<T extends string> {
+  type: ConceptIncubationQuestionnaireType;
   description: string;
-  questions: { [key in T]: ConceptIgnitionQuestion };
+  questions: { [key in T]: ConceptIncubationQuestion };
 }
 
-export interface IConceptIgnitionQuestionnaire {
-  expandAnExistingIdea: IConceptIgnitionQuestionnaireSection<ExpandAnExistingIdeaQuestions>;
-  identifyNewOpportunities: IConceptIgnitionQuestionnaireSection<IdentifyNewOpportunitiesQuestions>;
+export interface IConceptIncubationQuestionnaire {
+  expandAnExistingIdea: IConceptIncubationQuestionnaireSection<ExpandAnExistingIdeaQuestions>;
+  identifyNewOpportunities: IConceptIncubationQuestionnaireSection<IdentifyNewOpportunitiesQuestions>;
 }

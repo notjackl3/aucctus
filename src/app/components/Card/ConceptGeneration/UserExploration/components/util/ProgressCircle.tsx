@@ -13,7 +13,8 @@ const ProgressCircle: React.FC<ProgressCircleProps> = ({
   totalSteps,
   size = '1.5rem',
 }) => {
-  const progress = (currentStep / totalSteps) * 100;
+  const progress =
+    currentStep === Infinity ? 100 : (currentStep / totalSteps) * 100;
 
   const getCircularProgressStyle = useCallback(() => {
     return {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
@@ -20,6 +20,8 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     currentTextAnswerList,
     currentQuestionOrder,
   } = useConceptIncubationStore();
+
+  const activeQuestionIdentifierRef = useRef<string | null>(null);
 
   const activeSuggestions = useMemo<IAISuggestion[]>(() => {
     return suggestions[activeQuestion?.identifier ?? ''] ?? [];
@@ -58,14 +60,18 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   }, [activeQuestion, draftSeedUuid, setSuggestions, sendAiSuggestionsRequest]);
 
   useEffect(() => {
-    if (activeQuestion) {
+    if (
+      activeQuestion &&
+      activeQuestionIdentifierRef.current !== activeQuestion.identifier
+    ) {
+      activeQuestionIdentifierRef.current = activeQuestion.identifier;
       sendAiSuggestionsRequest(activeQuestion.identifier, [
         ...currentMultiSelectAnswerList.map((answer) => answer.answer.trim()),
         ...currentTextAnswerList.map((answer) => answer.answer.trim()),
       ]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuestion]);
+  }, [activeQuestion, activeQuestionIdentifierRef]);
 
   useSocketEvent('stream.structured.ai.suggestions', (data) => {
     if (['done', 'delta'].includes(data.stage)) {

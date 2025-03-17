@@ -1,10 +1,10 @@
 import React from 'react';
 import { Icon } from '@components';
 import {
-  useConceptIgnitionQuestionnaire,
+  useConceptIncubationQuestionnaire,
   useSaveConceptSeedDraft,
 } from '@hooks/query/concepts.hook';
-import { QuestionnaireSection } from '@pages/Concept/Ignition/IncubateConcept';
+import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
 import { IConceptSeed } from '@libs/api/concepts';
 import { toast } from 'react-toastify';
 import LoadingMask from './util/LoadingMask';
@@ -78,7 +78,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 );
 
 const GenerateNewIdeas: React.FC = () => {
-  const { questionnaires } = useConceptIgnitionQuestionnaire();
+  const { questionnaires } = useConceptIncubationQuestionnaire();
   const {
     setActiveQuestionnaire,
     setDraftSeedUuid,

@@ -35,7 +35,7 @@ const images = {
   deliveryNews,
   link,
 
-  // Concept Ignition
+  // Concept Incubation
   aiExplorationsBackground,
   incubationCard,
   incubationCard2,

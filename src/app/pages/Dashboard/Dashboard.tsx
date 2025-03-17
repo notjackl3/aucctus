@@ -33,7 +33,7 @@ const Dashboard: FunctionComponent = () => {
             className='btn btn-bold btn-primary'
             onClick={() => {
               resetQuestionnaire();
-              navigate(AppPath.IgniteConcept);
+              navigate(AppPath.IncubateConcept);
             }}
           >
             <Icon

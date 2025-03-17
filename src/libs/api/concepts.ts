@@ -2,8 +2,8 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
-  ConceptIgnitionQuestion,
-  ConceptIgnitionQuestionnaireType,
+  ConceptIncubationQuestion,
+  ConceptIncubationQuestionnaireType,
   ConceptSeedStatus,
   ConceptStatus,
   Ecosystem,
@@ -26,7 +26,7 @@ import {
 export interface IConceptSeedAnswer {
   answer: string[];
   details?: string;
-  question: ConceptIgnitionQuestion;
+  question: ConceptIncubationQuestion;
   identifier?: string;
   id?: number;
 }
@@ -34,7 +34,7 @@ export interface IConceptSeedAnswer {
 export interface IConceptSeed {
   uuid: string;
   answers: IConceptSeedAnswer[];
-  type: ConceptIgnitionQuestionnaireType;
+  type: ConceptIncubationQuestionnaireType;
   createdAt: string;
   updatedAt: string;
   status?: ConceptSeedStatus;
@@ -62,7 +62,7 @@ export interface IncubationAnswerUpdatePayload extends IncubationAnswerPayload {
 export interface IncubationAnswer {
   answer: string[];
   details?: string;
-  question: ConceptIgnitionQuestion;
+  question: ConceptIncubationQuestion;
   id: number;
 }
 

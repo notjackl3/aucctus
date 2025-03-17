@@ -1,15 +1,15 @@
-import { IIgnitionAnswer } from '@libs/api/igniteConcepts';
+import { IIncubationAnswer } from '@libs/api/incubateConcepts';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import {
-  ConceptIgnitionQuestionnaireType,
+  ConceptIncubationQuestionnaireType,
   IGeneratedConcept,
   QuestionIdentifier,
 } from '../../libs/api/types';
 
 interface IIgnitionSeed {
-  type?: ConceptIgnitionQuestionnaireType;
-  answers: { [key in QuestionIdentifier]?: IIgnitionAnswer };
+  type?: ConceptIncubationQuestionnaireType;
+  answers: { [key in QuestionIdentifier]?: IIncubationAnswer };
 }
 interface ConceptGenerationStoreState {
   generatedConcepts: IGeneratedConcept[];

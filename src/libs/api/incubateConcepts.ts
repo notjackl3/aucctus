@@ -2,36 +2,25 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
-  ConceptIgnitionQuestion,
-  ConceptIgnitionQuestionnaireType,
-  IConceptIgnitionQuestionnaire,
-  IGeneratedConcept,
-  QuestionIdentifier,
+  ConceptIncubationQuestion,
+  IConceptIncubationClarifyingQuestion,
+  IConceptIncubationQuestionnaire,
 } from './types'; // Import the missing type
 
 /**
- * Concept Ignite API
+ * Concept Incubation API
  *
  * Handles all the requests to the fast service for concept generation.
  */
-export interface IConceptGenerateResponse {
-  concepts: IGeneratedConcept[];
-}
 
-export interface IIgnitionAnswer {
+export interface IIncubationAnswer {
   answer: string;
-  fieldType: ConceptIgnitionQuestion['fieldType'];
+  fieldType: ConceptIncubationQuestion['fieldType'];
   details?: string;
   questionId: number;
 }
 
-export interface IIgniteConceptBody {
-  numberOfConcepts?: number;
-  type: ConceptIgnitionQuestionnaireType;
-  answers: { [key in QuestionIdentifier]?: IIgnitionAnswer };
-}
-
-export class IgniteConceptApi extends ApiService {
+export class IncubateConceptApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = false;
   protected _excludePathFromRefresh: string[] = [];
 
@@ -41,12 +30,14 @@ export class IgniteConceptApi extends ApiService {
     this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
-  ignite(body: IIgniteConceptBody) {
-    return this.post<IConceptGenerateResponse>(endpoints.conceptIgnite, body);
+  generateClarifyingQuestions(uuid: string) {
+    return this.post<IConceptIncubationClarifyingQuestion[]>(
+      endpoints.conceptIncubationSeedUuidClarifyingQuestions(uuid),
+    );
   }
 
   questionnaire() {
-    return this.get<IConceptIgnitionQuestionnaire>(
+    return this.get<IConceptIncubationQuestionnaire>(
       endpoints.conceptQuestionnaire,
     );
   }

@@ -15,7 +15,6 @@ import Text from './Text';
 
 // Components
 import Avatar from './Avatar';
-import IgniteLoading from './IgniteLoading';
 import Loading from './Loading';
 import Tooltip from './ToolTip/Tooltip';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
@@ -29,7 +28,6 @@ export {
   Container,
   Header,
   Icon,
-  IgniteLoading,
   Input,
   Legend,
   Loading,

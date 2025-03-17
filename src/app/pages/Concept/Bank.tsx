@@ -78,7 +78,7 @@ const ConceptBank: React.FC = () => {
 
   const handleAddConcept = useCallback(() => {
     resetQuestionnaire();
-    navigate(AppPath.IgniteConcept);
+    navigate(AppPath.IncubateConcept);
   }, [resetQuestionnaire, navigate]);
 
   const handleTabChange = useCallback(

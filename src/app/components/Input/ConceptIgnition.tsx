@@ -1,20 +1,20 @@
 import Button from '@components/Button';
 import Icon from '@components/Icon';
-import { ConceptIgnitionQuestion, IDetailQuestion } from '@libs/api/types';
+import { ConceptIncubationQuestion, IDetailQuestion } from '@libs/api/types';
 import React from 'react';
 import InputField from './InputField/InputField';
 import TextArea from './TextArea/TextArea';
 
-interface ConceptIgnitionInputProps {
+interface ConceptIncubationInputProps {
   value?: string;
   details?: string;
-  question: ConceptIgnitionQuestion;
+  question: ConceptIncubationQuestion;
   onChange?: (value: string) => void; // Callback for single input changes
   onDetailChange?: (value: string) => void;
   onMultiSelectChange?: (value: string) => void; // Callback for multi-select inputs
 }
 
-const ConceptIgnition: React.FC<ConceptIgnitionInputProps> = ({
+const ConceptIncubation: React.FC<ConceptIncubationInputProps> = ({
   value,
   details,
   question,
@@ -117,4 +117,4 @@ const ConceptIgnition: React.FC<ConceptIgnitionInputProps> = ({
   return <div className='flex gap-3.5 self-stretch'>{renderQuestion()}</div>;
 };
 
-export default ConceptIgnition;
+export default ConceptIncubation;

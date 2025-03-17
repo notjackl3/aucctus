@@ -3,7 +3,7 @@ import { Badge, Icon } from '@components';
 import { useTransition, animated } from 'react-spring';
 import IncubationIcon from '../util/IncubationIcon';
 import ProgressCircle from '../util/ProgressCircle';
-import { QuestionnaireSection } from '@pages/Concept/Ignition/IncubateConcept';
+import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 interface QuestionnaireHeaderProps {

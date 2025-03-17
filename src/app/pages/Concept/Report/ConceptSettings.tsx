@@ -15,11 +15,12 @@ const ConceptSettings: FunctionComponent = () => {
 
   const onReseedClick = useCallback(() => {
     setSeed(seed as IConceptSeed);
+
     const seedId = (seed as IConceptSeed)?.uuid;
     if (seedId) {
-      navigate(`/concept/ignite/${String(seedId)}`);
+      navigate(`/concept/incubate/${String(seedId)}`);
     } else {
-      navigate(AppPath.IgniteConcept);
+      navigate(AppPath.IncubateConcept);
     }
   }, [seed, navigate, setSeed]);
 
@@ -65,7 +66,7 @@ const ConceptSettings: FunctionComponent = () => {
             <SeedField
               key={answer.question.label.replace(' ', '-')}
               question={answer.question.label}
-              answer={answer.answer}
+              answer={answer.answer.join(', ')}
             />
           ))
         )}

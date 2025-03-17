@@ -24,6 +24,10 @@ import AnswerInput from './answer/AnswerInput';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { IncubationAnswer } from '@libs/api/concepts';
 import { useTransition, animated } from 'react-spring';
+import ConfirmAnswerUpdate from './answer/ConfirmAnswerUpdate';
+
+type advanceActionType = 'to-next-question' | 'to-clarifying-question' | false;
+
 // Types
 interface UserInteractionProps {}
 
@@ -50,7 +54,8 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
 
   // ===== LOCAL STATE =====
   const [answerValue, setAnswerValue] = useState<string>('');
-  const shouldAdvance = useRef(false);
+  const advanceAction = useRef<advanceActionType>(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
 
   // ===== API MUTATIONS AND QUERIES =====
   const { mutate: deleteDraft, isLoading: isDeleteDraftLoading } =
@@ -69,9 +74,9 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
 
     setSubmittedAnswers(answers);
 
-    if (shouldAdvance.current) {
+    if (advanceAction.current === 'to-next-question') {
       goToNextQuestion(answers);
-      shouldAdvance.current = false;
+      advanceAction.current = false;
     }
   }, [seedDraftAnswers]);
 
@@ -315,6 +320,44 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     return isAnswerSame && isDetailsSame;
   }, [submittedAnswers, activeQuestion, formattedAnswerPayload]);
 
+  const doUpdateAnswer = useCallback(() => {
+    if (!activeAnswer) return;
+
+    updateAnswer(
+      {
+        answerId: activeAnswer.id,
+        body: {
+          ...formattedAnswerPayload,
+          answerId: activeAnswer.id,
+        },
+      },
+      {
+        onSuccess: async () => {
+          advanceAction.current = 'to-next-question';
+          await queryClient.refetchQueries([
+            AucctusQueryKeys.conceptSeedDraftAnswers,
+            draftSeedUuid,
+          ]);
+        },
+        onError: () => {
+          toast.error('Failed to submit answer', {
+            toastId: 'submit-answer-error',
+            autoClose: 2000,
+            hideProgressBar: true,
+            pauseOnHover: false,
+          });
+        },
+      },
+    );
+  }, [
+    activeAnswer,
+    formattedAnswerPayload,
+    draftSeedUuid,
+    queryClient,
+    updateAnswer,
+    advanceAction,
+  ]);
+
   const handleSubmitAnswer = useCallback(() => {
     if (currentQuestionOrder === undefined) return;
 
@@ -344,32 +387,14 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     }
 
     if (activeAnswer) {
-      updateAnswer(
-        {
-          answerId: activeAnswer.id,
-          body: {
-            ...formattedAnswerPayload,
-            answerId: activeAnswer.id,
-          },
-        },
-        {
-          onSuccess: async () => {
-            shouldAdvance.current = true;
-            await queryClient.refetchQueries([
-              AucctusQueryKeys.conceptSeedDraftAnswers,
-              draftSeedUuid,
-            ]);
-          },
-          onError: () => {
-            toast.error('Failed to submit answer', {
-              toastId: 'submit-answer-error',
-              autoClose: 2000,
-              hideProgressBar: true,
-              pauseOnHover: false,
-            });
-          },
-        },
-      );
+      if (
+        activeAnswer.question.order <
+        submittedAnswers[submittedAnswers.length - 1].question.order
+      ) {
+        setShowConfirmation(true);
+      } else {
+        doUpdateAnswer();
+      }
     } else {
       saveAnswer(
         {
@@ -378,7 +403,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
         },
         {
           onSuccess: async () => {
-            shouldAdvance.current = true;
+            advanceAction.current = 'to-next-question';
             await queryClient.refetchQueries([
               AucctusQueryKeys.conceptSeedDraftAnswers,
               draftSeedUuid,
@@ -462,6 +487,14 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
         )}
       </div>
       <LoadingMask isLoading={isLoading} />
+      <ConfirmAnswerUpdate
+        show={showConfirmation}
+        onCancel={() => setShowConfirmation(false)}
+        onConfirm={() => {
+          doUpdateAnswer();
+          setShowConfirmation(false);
+        }}
+      />
     </>
   );
 };

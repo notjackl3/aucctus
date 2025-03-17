@@ -23,7 +23,6 @@ export class Endpoints {
   static concept = 'api/v1/concept/';
   static saveGeneratedConcepts = 'api/v1/concept/generated';
 
-  static conceptIgnite = 'api/v1/concept/ignite';
   static conceptQuestionnaire = '/api/v1/concept/ignition/questionnaires';
 
   static conceptUuid(conceptUuid: string) {
@@ -80,6 +79,10 @@ export class Endpoints {
     answerId: number,
   ) {
     return `api/v2/concept/incubation/seed/answer/update_and_delete_higher_order/${answerId}`;
+  }
+
+  static conceptIncubationSeedUuidClarifyingQuestions(draftUuid: string) {
+    return `api/v2/concept/incubation/seed/${draftUuid}/clarifying-questions`;
   }
 
   static unarchiveConcept(conceptUuid: string) {

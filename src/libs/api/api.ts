@@ -9,7 +9,7 @@ import { AuthApi } from './auth';
 import { IApiServiceConfig } from './base/apiService';
 import { ISocketConfig } from './base/socketService';
 import { ConceptApi } from './concepts';
-import { IgniteConceptApi } from './igniteConcepts';
+import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { ITokenResponse } from './types';
 
@@ -38,7 +38,7 @@ export class Api {
   concept!: ConceptApi;
   assumption!: AssumptionsApi;
   marketScan!: MarketScanApi;
-  conceptIgnite!: IgniteConceptApi;
+  conceptIncubate!: IncubateConceptApi;
   aucctusSocket!: AucctusSocket;
   article!: ArticleApi;
 
@@ -64,7 +64,7 @@ export class Api {
       { key: 'concept', class: ConceptApi },
       { key: 'assumption', class: AssumptionsApi },
       { key: 'marketScan', class: MarketScanApi },
-      { key: 'conceptIgnite', class: IgniteConceptApi },
+      { key: 'conceptIncubate', class: IncubateConceptApi },
       { key: 'article', class: ArticleApi },
     ];
 
@@ -96,7 +96,7 @@ export class Api {
     [
       this.account,
       this.concept,
-      this.conceptIgnite,
+      this.conceptIncubate,
       this.assumption,
       this.marketScan,
     ].forEach((api) => {

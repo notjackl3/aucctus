@@ -11,14 +11,17 @@ const usePrivateRoutes = () => {
   return (
     <Route element={<Layout.Private />}>
       <Route index path={AppPath.Home} element={<Page.Dashboard />} />
-      <Route path={AppPath.IgniteConcept} element={<Page.Concept.Incubate />} />
       <Route
-        path={AppPath.IgniteConceptWithUuid}
+        path={AppPath.IncubateConceptWithUuid}
+        element={<Page.Concept.Incubate />}
+      />
+      <Route
+        path={AppPath.IncubateConcept}
         element={<Page.Concept.Incubate />}
       />
       <Route
         path={AppPath.GeneratedConcepts}
-        element={<Page.Concept.Generated />}
+        element={<Page.Concept.BankConcepts />}
       />
 
       {/* Concept Bank with Outlet pattern */}

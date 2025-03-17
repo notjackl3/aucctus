@@ -13,9 +13,9 @@ export enum AppPath {
   Onboarding = '/onboarding',
 
   /* Concepts */
-  IgniteConcept = '/concept/ignite',
-  IgniteConceptWithUuid = '/concept/ignite/:uuid',
-  GeneratedConcepts = '/concept/ignite/results',
+  IncubateConcept = '/concept/incubate',
+  IncubateConceptWithUuid = '/concept/incubate/:uuid',
+  GeneratedConcepts = '/concept/incubate/results',
   Concept = '/concept',
   ConceptBank = '/concept',
   ConceptBankDrafts = '/concept/drafts',

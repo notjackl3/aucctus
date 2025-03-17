@@ -83,7 +83,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
               to={
                 account?.hasConcepts
                   ? AppPath.ConceptBank
-                  : AppPath.IgniteConcept
+                  : AppPath.IncubateConcept
               }
               title='Concepts'
               icon='lightbulb'

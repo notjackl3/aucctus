@@ -1,11 +1,11 @@
 import React, { useCallback, useMemo, useRef } from 'react';
 import { CompletionIcon } from './CompletionIcon';
-import { ConceptIgnitionQuestion } from '@libs/api/types';
+import { ConceptIncubationQuestion } from '@libs/api/types';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { useSpring, animated } from 'react-spring';
 
 interface CompletionIconGroupProps {
-  questionGroup: ConceptIgnitionQuestion[];
+  questionGroup: ConceptIncubationQuestion[];
 }
 
 const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
@@ -36,12 +36,12 @@ const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
     config: { duration: 200 },
   });
 
-  const isPartial = useCallback((question: ConceptIgnitionQuestion) => {
+  const isPartial = useCallback((question: ConceptIncubationQuestion) => {
     return !Number.isInteger(question.order);
   }, []);
 
   const getQuestionStyle = useCallback(
-    (question: ConceptIgnitionQuestion, index: number) => {
+    (question: ConceptIncubationQuestion, index: number) => {
       const zIndex = 9 - index;
 
       if (isPartial(question)) {
