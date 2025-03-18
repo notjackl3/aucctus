@@ -8,7 +8,6 @@ import {
   ConceptStatus,
   Ecosystem,
   IConcept,
-  IConceptCreate,
   IConceptOverview,
   IConceptPage,
   IConceptQueryOptions,
@@ -16,7 +15,6 @@ import {
   ICustomerProfileCreate,
   IEcosystemCreate,
   IFinancialProjection,
-  IGeneratedConcept,
   IMarketScanElementCreate,
   IMarketScanV1,
   IPageResponse,
@@ -71,16 +69,6 @@ export interface IncubationAnswer {
  *
  * Handles all the requests for the Concept.
  */
-
-export interface IGeneratedConceptsSaveBody {
-  concepts: IGeneratedConcept[];
-  seed: IConceptSeed;
-}
-
-export interface IGeneratedConceptSaveResponse {
-  concepts: IConcept[];
-  seed: IConceptSeed;
-}
 
 export class ConceptApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = false;
@@ -188,22 +176,6 @@ export class ConceptApi extends ApiService {
 
   updateConceptStatus(uuid: string, status: ConceptStatus) {
     return this.patch<IConcept>(endpoints.conceptUuid(uuid), { status });
-  }
-
-  createConcept(concept: IConceptCreate) {
-    return this.post<IConcept, IConceptCreate>(endpoints.concept, concept);
-  }
-
-  saveGeneratedConcepts(body: IGeneratedConceptsSaveBody) {
-    return this.post<IConcept[], IGeneratedConceptsSaveBody>(
-      endpoints.saveGeneratedConcepts,
-      body,
-      {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      },
-    );
   }
 
   getConcepts(options?: IConceptQueryOptions) {

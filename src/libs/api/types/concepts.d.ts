@@ -56,17 +56,15 @@ export interface IBaseConceptEntity {
 export interface IGeneratedConcept {
   uuid: string;
   title: string;
+  summary: string;
+  overview: string;
+  valueProposition: string;
+}
+
+export interface IConcept extends IBaseConceptEntity {
+  uuid: string;
+  title: string;
   description: string;
-}
-
-// Used When creating a new concept
-export interface IConceptCreate extends IGeneratedConcept {
-  status?: ConceptStatus;
-  createdBy?: string;
-}
-
-export interface IConcept extends IBaseConceptEntity, IGeneratedConcept {
-  isGenerated: boolean; // Currently not used will likely drop
   identifier: string;
   reportStatus: ConceptReportStatus;
   status: ConceptStatus;

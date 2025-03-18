@@ -1,7 +1,6 @@
 import api from '@libs/api';
 import {
   IConceptSeed,
-  IGeneratedConceptsSaveBody,
   IncubationAnswerPayload,
   IncubationAnswerUpdatePayload,
 } from '@libs/api/concepts';
@@ -9,13 +8,13 @@ import {
   Ecosystem,
   IConcept,
   IConceptOverview,
-  IConceptPage,
   IConceptQueryOptions,
   ICustomerProfile,
   ICustomerProfileCreate,
   IEcosystemCreate,
   IFinancialProjection,
   IFormError,
+  IGeneratedConcept,
   IMarketScanElementCreate,
   IMarketScanV1,
   // IMarketSizeMetric,
@@ -271,12 +270,12 @@ export const useDownloadConcept = (uuid?: string) => {
  *
  * @returns {MutationFunction} The mutation function for saving generated concepts.
  */
-export const useSaveGeneratedConcepts = () => {
+export const useSaveGeneratedConcepts = (seedUuid: string) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (body: IGeneratedConceptsSaveBody) => {
-      return api.concept.saveGeneratedConcepts(body);
+    mutationFn: async (body: IGeneratedConcept[]) => {
+      return api.conceptIncubate.saveGeneratedConcept(seedUuid, body);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });

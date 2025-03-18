@@ -21,7 +21,6 @@ export class Endpoints {
   static dashboard = `/api/v1/dashboard`;
 
   static concept = 'api/v1/concept/';
-  static saveGeneratedConcepts = 'api/v1/concept/generated';
 
   static conceptQuestionnaire = '/api/v1/concept/ignition/questionnaires';
 
@@ -85,8 +84,12 @@ export class Endpoints {
     return `api/v2/concept/incubation/seed/answer/update_and_delete_higher_order/${answerId}`;
   }
 
-  static conceptIncubationSeedUuidClarifyingQuestions(draftUuid: string) {
-    return `api/v2/concept/incubation/seed/${draftUuid}/clarifying-questions`;
+  static conceptIncubationSeedUuidClarifyingQuestions(seedUuid: string) {
+    return `api/v2/concept/incubation/seed/${seedUuid}/clarifying-questions`;
+  }
+
+  static saveGeneratedConcept(seedUuid: string) {
+    return `api/v2/concept/incubation/seed/${seedUuid}/generated`;
   }
 
   static unarchiveConcept(conceptUuid: string) {

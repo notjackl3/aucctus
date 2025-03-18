@@ -2,9 +2,11 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
-  ConceptIncubationQuestion,
   ConceptIncubationClarifyingQuestion,
+  ConceptIncubationQuestion,
+  IConcept,
   IConceptIncubationQuestionnaire,
+  IGeneratedConcept,
 } from './types'; // Import the missing type
 
 /**
@@ -39,6 +41,13 @@ export class IncubateConceptApi extends ApiService {
   questionnaire() {
     return this.get<IConceptIncubationQuestionnaire>(
       endpoints.conceptQuestionnaire,
+    );
+  }
+
+  saveGeneratedConcept(seedUuid: string, concepts: IGeneratedConcept[]) {
+    return this.post<IConcept[], IGeneratedConcept[]>(
+      endpoints.saveGeneratedConcept(seedUuid),
+      concepts,
     );
   }
 }

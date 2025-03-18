@@ -23,7 +23,8 @@ interface IConceptList {
   concepts: IConcept[];
 }
 
-export interface IConcept {
+// TODO: replace with IGeneratedConcept
+export interface IConcept extends IGeneratedConcept {
   title?: string;
   summary?: string;
   uuid: string;
