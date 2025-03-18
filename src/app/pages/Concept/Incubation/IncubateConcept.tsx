@@ -18,6 +18,7 @@ import { animated, easings, useTransition } from '@react-spring/web';
 import ConceptGeneration from '@components/Card/ConceptGeneration/Generation/ConceptGeneration';
 import { toast } from 'react-toastify';
 import ConceptSelection from '@components/Card/ConceptGeneration/Generation/ConceptSelection';
+import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 
 type ConceptGenerationState =
   | 'pre-generation'
@@ -357,30 +358,31 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
     return <ConceptSelection className={className} />;
   }, []);
 
-  if (isSeedLoading || isQuestionnaireLoading || isAnswersLoading) {
-    return <Loading />;
-  }
-
   return (
-    <div
-      className={cn(
-        'ease flex h-[100vh] flex-row overflow-hidden transition-all duration-300',
-        {
-          'p-8': conceptGenerationState !== 'selecting',
-        },
-      )}
-    >
-      {renderPreGeneration()}
-      {conceptGenerationState === 'generating' &&
-        pregenToGenAnimationComplete &&
-        renderConceptGeneration(
-          'flex flex-col rounded-xl flex-1 ease h-full p-4 transition-all duration-300 mr-4',
+    <>
+      <div
+        className={cn(
+          'ease flex h-[100vh] flex-row overflow-hidden transition-all duration-300',
+          {
+            'p-8': conceptGenerationState !== 'selecting',
+          },
         )}
-      {conceptGenerationState === 'selecting' &&
-        renderConceptSelection(
-          'flex flex-col flex-1 ease h-full transition-all duration-300',
-        )}
-    </div>
+      >
+        {renderPreGeneration()}
+        {conceptGenerationState === 'generating' &&
+          pregenToGenAnimationComplete &&
+          renderConceptGeneration(
+            'flex flex-col rounded-xl flex-1 ease h-full p-4 transition-all duration-300 mr-4',
+          )}
+        {conceptGenerationState === 'selecting' &&
+          renderConceptSelection(
+            'flex flex-col flex-1 ease h-full transition-all duration-300',
+          )}
+      </div>
+      <LoadingMask
+        isLoading={isSeedLoading || isQuestionnaireLoading || isAnswersLoading}
+      />
+    </>
   );
 };
 

@@ -25,6 +25,6 @@ interface IConceptList {
 
 export interface IConcept {
   title?: string;
-  description?: string;
+  summary?: string;
   uuid: string;
 }

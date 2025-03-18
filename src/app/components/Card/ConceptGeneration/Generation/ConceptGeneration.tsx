@@ -46,9 +46,7 @@ const ConceptGeneration = React.forwardRef<
 
     if (['done'].includes(data.stage) && eventConcepts) {
       setConcepts(eventConcepts);
-      setTimeout(() => {
-        handleGenerateComplete();
-      }, 3000);
+      setTimeout(() => handleGenerateComplete(), 3000);
     } else if (['delta'].includes(data.stage) && eventConcepts) {
       if (eventConcepts.length - 1 > concepts.length) {
         setConcepts(eventConcepts.slice(0, -1));
@@ -83,24 +81,26 @@ const ConceptGeneration = React.forwardRef<
   }, []);
 
   const transitions = useTransition(concepts, {
-    from: (concept) => {
+    from: (concept, index) => {
       const isAnimated = conceptAnimated(concept);
-      const animatedIndex = concepts.findIndex(
-        (c) => c.title === concept.title,
-      );
+      const isFaded = concepts.length > -1 && index < concepts.length - 2;
 
       return {
-        opacity: isAnimated ? 1 : 0,
+        opacity: isFaded ? 0.15 : isAnimated ? 1 : 0,
         transform: isAnimated
-          ? `translateY(${animatedIndex * 20}px) scale(${0.9 + animatedIndex * 0.05})`
+          ? `translateY(${index * 20}px) scale(${0.9 + index * 0.05})`
           : 'translateY(0px) scale(1)',
         maxHeight: isAnimated ? '200px' : '0px',
         padding: isAnimated ? '20px' : '0px',
       };
     },
     enter: (concept, index) => async (next) => {
+      const animatedIndex = concepts.findIndex(
+        (c) => c.title === concept.title,
+      );
+
       await next({
-        opacity: 1,
+        opacity: animatedIndex === concepts.length - 1 ? 1 : 0.15,
         transform: `translateY(${index * 20}px) scale(${0.9 + index * 0.05})`,
         maxHeight: '200px',
         padding: '20px',
@@ -122,12 +122,15 @@ const ConceptGeneration = React.forwardRef<
 
     if (!content || !conceptsContainer) return;
 
-    conceptsContainer.childNodes.forEach((child, index) =>
-      Object.assign(
-        (child as HTMLElement).style,
-        getFadeOutStyle(200, 100 * index),
-      ),
-    );
+    conceptsContainer.childNodes.forEach((child, index) => {
+      const childElement = child as HTMLElement;
+      childElement.classList.add(
+        'transition-all',
+        'duration-300',
+        'ease-in-out',
+      );
+      setTimeout(() => (childElement.style.opacity = '0'), 200 * index);
+    });
 
     setTimeout(() => Object.assign(content.style, getFadeOutStyle(300)), 1000);
     setTimeout(() => onGenerateComplete(), 1500);
@@ -194,13 +197,13 @@ const ConceptGeneration = React.forwardRef<
     transitions((style, concept) => (
       <animated.div
         style={{ ...style, transformOrigin: 'top' }}
-        className='aucctus-border-primary aucctus-bg-primary absolute flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-opacity-25 bg-opacity-[0.1] p-4 backdrop-blur-md'
+        className='aucctus-border-primary aucctus-bg-primary absolute flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-opacity-25 bg-opacity-[0.3] p-4'
       >
         <span className='aucctus-text-white aucctus-text-sm'>
           {concept.title}
         </span>
         <span className='aucctus-text-white aucctus-text-xs line-clamp-3 min-h-[4em]'>
-          {concept.description}
+          {concept.summary}
         </span>
       </animated.div>
     ));

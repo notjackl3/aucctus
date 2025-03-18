@@ -44,7 +44,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     componentRef,
     answerRowRef,
     multiSelectAnswersRef,
-  } = useQuestionTransition();
+  } = useQuestionTransition(questionIconLineRef);
 
   const {
     currentQuestionOrder,
@@ -129,7 +129,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     () => (
       <div
         ref={questionIconLineRef}
-        className='aucctus-border-primary absolute left-[1.4rem] top-[-25px] z-[1] h-10 w-10 border-l-[2px]'
+        className='aucctus-border-primary absolute left-[1.4rem] top-[40px] z-[1] h-10 w-10 border-l-[2px]'
       />
     ),
     [questionIconLineRef],
@@ -211,30 +211,61 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     handleSelectClarifyingQuestion,
   ]);
 
+  useEffect(() => {
+    const component = componentRef.current;
+
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        if (entry.target === component) {
+          const viewportHeight = window.innerHeight;
+          const componentRect = component.getBoundingClientRect();
+          const maxHeight = viewportHeight - componentRect.top;
+          const padding = 20;
+          component.style.maxHeight = `${maxHeight - padding}px`;
+        }
+      }
+    });
+
+    if (component) {
+      resizeObserver.observe(component);
+    }
+
+    return () => {
+      if (component) {
+        resizeObserver.unobserve(component);
+      }
+    };
+  }, [componentRef]);
+
   return (
-    <div
-      ref={componentRef}
-      className='relative z-[999] flex flex-1 flex-col transition-all duration-300 ease-in-out'
-    >
-      {renderCompletedQuestions()}
-
-      {activeQuestion && renderNextCompletionIcon()}
-      {!activeQuestion && !activeClarifyingQuestion && renderReadyToGenerate()}
-
-      {renderSpacer()}
-
-      {activeQuestion && renderQuestion(activeQuestion)}
-      {activeClarifyingQuestion &&
-        renderQuestion(
-          activeClarifyingQuestion.question,
-          activeClarifyingQuestion.icon,
-        )}
-      {!activeQuestion && !activeClarifyingQuestion && renderContinueRefining()}
-
+    <>
       {renderQuestionIconLine()}
+      <div
+        ref={componentRef}
+        className='no-scrollbar relative z-[999] flex flex-1 flex-col transition-all duration-300 ease-in-out'
+      >
+        {renderCompletedQuestions()}
 
-      <PointerEventMask showMask={showMask} />
-    </div>
+        {activeQuestion && renderNextCompletionIcon()}
+        {!activeQuestion &&
+          !activeClarifyingQuestion &&
+          renderReadyToGenerate()}
+
+        {renderSpacer()}
+
+        {activeQuestion && renderQuestion(activeQuestion)}
+        {activeClarifyingQuestion &&
+          renderQuestion(
+            activeClarifyingQuestion.question,
+            activeClarifyingQuestion.icon,
+          )}
+        {!activeQuestion &&
+          !activeClarifyingQuestion &&
+          renderContinueRefining()}
+
+        <PointerEventMask showMask={showMask} />
+      </div>
+    </>
   );
 };
 

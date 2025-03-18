@@ -4,7 +4,7 @@ export const animationStyles = `
       background-position: 0% 0%;
     }
     50% {
-      background-position: 100% 100%;
+      background-position: 50% 100%;
     }
     100% {
       background-position: 0% 0%;

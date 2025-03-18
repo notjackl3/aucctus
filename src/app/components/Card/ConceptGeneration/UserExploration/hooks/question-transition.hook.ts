@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useCallback, RefObject } from 'react';
 import { useListenForIncubationAnimation } from './incubation-animation-event.hook';
 
-export const useQuestionTransition = () => {
+export const useQuestionTransition = (
+  questionIconLineRef: RefObject<HTMLDivElement>,
+) => {
   const [showMask, setShowMask] = useState(false);
 
   // Refs for DOM elements involved in the transition
@@ -116,24 +118,38 @@ export const useQuestionTransition = () => {
   );
 
   // Handle animation when moving to previous question
-  const handleFadeAnimation = useCallback((callback: () => void) => {
-    const parentComponent = componentRef.current;
-    if (parentComponent) {
-      setShowMask(true);
-      const handleTransitionEnd = () => {
-        parentComponent.classList.remove('opacity-0');
-        parentComponent.removeEventListener(
-          'transitionend',
-          handleTransitionEnd,
-        );
-        callback();
-        setShowMask(false);
-      };
+  const handleFadeAnimation = useCallback(
+    (callback: () => void) => {
+      const parentComponent = componentRef.current;
+      const questionIconLine = questionIconLineRef.current;
+      if (parentComponent && questionIconLine) {
+        setShowMask(true);
+        const handleTransitionEnd = () => {
+          parentComponent.classList.remove('opacity-0');
+          setTimeout(() => {
+            questionIconLine.classList.remove(
+              'transition-all',
+              'duration-300',
+              'ease',
+            );
+          }, 1000);
+          callback();
+          setShowMask(false);
+        };
 
-      parentComponent.addEventListener('transitionend', handleTransitionEnd);
-      parentComponent.classList.add('opacity-0');
-    }
-  }, []);
+        questionIconLine.classList.add(
+          'transition-all',
+          'duration-300',
+          'ease',
+        );
+        parentComponent.addEventListener('transitionend', handleTransitionEnd, {
+          once: true,
+        });
+        parentComponent.classList.add('opacity-0');
+      }
+    },
+    [questionIconLineRef],
+  );
 
   useListenForIncubationAnimation(
     handleQuestionTransitionAnimation,
