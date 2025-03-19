@@ -93,10 +93,7 @@ const MultiSelectAnswers: React.FC<{
                 </span>
               )}
             </div>
-            <Input.CheckBox
-              checked={isSelected}
-              onChange={() => handleOptionSelect(option.value)}
-            />
+            <Input.CheckBox checked={isSelected} onChange={() => {}} />
           </div>
         );
       })}

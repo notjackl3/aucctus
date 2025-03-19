@@ -144,7 +144,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
             !activeQuestion &&
             !activeClarifyingQuestion &&
             !isClarifyingExpanded,
-          'max-h-[20px] min-h-[20px]':
+          'max-h-[40px] min-h-[40px]':
             !activeQuestion &&
             !activeClarifyingQuestion &&
             isClarifyingExpanded,
@@ -181,7 +181,12 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
   }, [completedQuestionsTransition]);
 
   const renderReadyToGenerate = useCallback(() => {
-    return <ReadyToGenerate compact={isClarifyingExpanded} />;
+    return (
+      <ReadyToGenerate
+        compact={isClarifyingExpanded}
+        onMouseEnter={() => setIsClarifyingExpanded(false)}
+      />
+    );
   }, [isClarifyingExpanded]);
 
   const handleSelectClarifyingQuestion = useCallback(

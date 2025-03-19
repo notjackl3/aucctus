@@ -15,6 +15,11 @@ export const animationStyles = `
     from { opacity: 0; transform: scale(0); }
     to { opacity: 1; transform: scale(1); }
   }
+  
+  @keyframes fadeScaleOut {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0); }
+  }
 
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -27,12 +32,21 @@ export const animationStyles = `
   }
 `;
 
-type keyframes = 'moveBackground' | 'fadeScaleIn' | 'fadeIn' | 'fadeOut';
+type keyframes =
+  | 'moveBackground'
+  | 'fadeScaleIn'
+  | 'fadeIn'
+  | 'fadeOut'
+  | 'fadeScaleOut';
 
 const initialAnimationStyleMap: Record<keyframes, React.CSSProperties> = {
   fadeScaleIn: {
     opacity: 0,
     transform: 'scale(0)',
+  },
+  fadeScaleOut: {
+    opacity: 1,
+    transform: 'scale(1)',
   },
   fadeIn: {
     opacity: 0,

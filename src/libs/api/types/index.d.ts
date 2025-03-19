@@ -8,3 +8,4 @@ export * from './marketScanV1';
 export * from './osiris';
 export * from './socketsEvents';
 export * from './support';
+export * from './conceptIncubation';

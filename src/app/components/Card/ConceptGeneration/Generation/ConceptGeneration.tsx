@@ -5,12 +5,12 @@ import { animated, easings, useSpring, useTransition } from '@react-spring/web';
 import { Icon } from '@components';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
-import { IConcept } from '@libs/api/types/conceptIncubation';
+import { IGeneratedConcept } from '@libs/api/types';
 import {
   animationStyles,
   getAnimationStyle,
 } from '../UserExploration/components/util/animation-keyframes';
-
+import { useConceptGenerationStore } from '@stores/concept-generation.store';
 const getFadeInStyle = (duration: number, delay: number = 0) =>
   getAnimationStyle('fadeIn', duration, delay);
 
@@ -34,11 +34,12 @@ const ConceptGeneration = React.forwardRef<
 >(({ className = '', onGenerateComplete }, ref) => {
   // State and refs
   const { draftSeedUuid } = useConceptIncubationStore();
-  const [concepts, setConcepts] = React.useState<IConcept[]>([]);
+  const [concepts, setConcepts] = React.useState<IGeneratedConcept[]>([]);
   const contentRef = React.useRef<HTMLDivElement>(null);
   const { mutate: generateConcept } = useConceptGeneration(draftSeedUuid);
   const animatedTitles = useRef<Set<string>>(new Set());
   const conceptsContainerRef = React.useRef<HTMLDivElement>(null);
+  const { setGeneratedConcepts } = useConceptGenerationStore();
 
   // Handle socket events for concept generation
   useSocketEvent('stream.structured.concept.generation', (data) => {
@@ -46,6 +47,7 @@ const ConceptGeneration = React.forwardRef<
 
     if (['done'].includes(data.stage) && eventConcepts) {
       setConcepts(eventConcepts);
+      setGeneratedConcepts(draftSeedUuid, eventConcepts as IGeneratedConcept[]);
       setTimeout(() => handleGenerateComplete(), 3000);
     } else if (['delta'].includes(data.stage) && eventConcepts) {
       if (eventConcepts.length - 1 > concepts.length) {
@@ -76,7 +78,7 @@ const ConceptGeneration = React.forwardRef<
     delay: 1000,
   });
 
-  const conceptAnimated = useCallback((concept: IConcept) => {
+  const conceptAnimated = useCallback((concept: IGeneratedConcept) => {
     return !!concept.title && animatedTitles.current.has(concept.title);
   }, []);
 
@@ -136,12 +138,11 @@ const ConceptGeneration = React.forwardRef<
     setTimeout(() => onGenerateComplete(), 1500);
   }, [onGenerateComplete]);
 
-  // Start concept generation on component mount
   React.useEffect(() => {
     generateConcept(undefined, {
       onError: () => {
         const event = new CustomEvent('aucctus-generate-concept', {
-          detail: { revert: true },
+          detail: { revert: true, error: true },
         });
         window.dispatchEvent(event);
       },

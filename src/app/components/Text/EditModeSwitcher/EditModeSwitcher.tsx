@@ -117,7 +117,11 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
           <TextArea
             value={value}
             onChange={onChange}
-            className={`box-border w-full p-2 pb-5 pr-12 text-base !text-primary-500 opacity-100 transition-opacity duration-300 ${textFieldClassName}`}
+            className={`box-border w-full p-2 text-base !text-primary-500 opacity-100 transition-opacity duration-300 ${textFieldClassName}`}
+            style={{
+              paddingRight: '2rem',
+              paddingBottom: '2rem',
+            }}
             name={name}
             label={label}
             error={error}

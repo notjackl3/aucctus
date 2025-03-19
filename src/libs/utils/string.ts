@@ -130,3 +130,94 @@ export const queryStringGenerator = (root: string, options?: object) => {
   }
   return root;
 };
+
+/**
+ * Converts an integer to its word representation
+ * @param num The integer to convert
+ * @returns The word representation of the number
+ */
+export function numberToWord(num: number, zeroWord?: string): string {
+  const units = [
+    zeroWord || 'zero',
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine',
+    'ten',
+    'eleven',
+    'twelve',
+    'thirteen',
+    'fourteen',
+    'fifteen',
+    'sixteen',
+    'seventeen',
+    'eighteen',
+    'nineteen',
+  ];
+  const tens = [
+    '',
+    '',
+    'twenty',
+    'thirty',
+    'forty',
+    'fifty',
+    'sixty',
+    'seventy',
+    'eighty',
+    'ninety',
+  ];
+
+  // Handle numbers from 0-19
+  if (num < 20) {
+    return units[num];
+  }
+
+  // Handle numbers from 20-99
+  if (num < 100) {
+    const ten = Math.floor(num / 10);
+    const unit = num % 10;
+    return unit === 0 ? tens[ten] : `${tens[ten]}-${units[unit]}`;
+  }
+
+  // Handle numbers from 100-999
+  if (num < 1000) {
+    const hundred = Math.floor(num / 100);
+    const remainder = num % 100;
+    return remainder === 0
+      ? `${units[hundred]} hundred`
+      : `${units[hundred]} hundred and ${numberToWord(remainder)}`;
+  }
+
+  // Handle numbers from 1000-9999
+  if (num < 10000) {
+    const thousand = Math.floor(num / 1000);
+    const remainder = num % 1000;
+    return remainder === 0
+      ? `${units[thousand]} thousand`
+      : `${units[thousand]} thousand ${remainder < 100 ? 'and ' : ''}${numberToWord(remainder)}`;
+  }
+
+  // For larger numbers, return the number itself
+  return num.toString();
+}
+
+/**
+ * Capitalizes the first letter of a string
+ * @param str The string to capitalize
+ * @returns The string with its first letter capitalized
+ */
+export function capitalize(str: string): string {
+  if (!str || str.length === 0) {
+    return '';
+  }
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function pluralize(str: string, count: number): string {
+  return count === 1 ? str : `${str}s`;
+}

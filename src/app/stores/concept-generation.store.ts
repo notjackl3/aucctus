@@ -1,52 +1,72 @@
-import { IIncubationAnswer } from '@libs/api/incubateConcepts';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import {
-  ConceptIncubationQuestionnaireType,
-  IGeneratedConcept,
-  QuestionIdentifier,
-} from '../../libs/api/types';
+import { IGeneratedConcept } from '@libs/api/types';
 
-interface IIgnitionSeed {
-  type?: ConceptIncubationQuestionnaireType;
-  answers: { [key in QuestionIdentifier]?: IIncubationAnswer };
-}
 interface ConceptGenerationStoreState {
-  generatedConcepts: IGeneratedConcept[];
-  seed: IIgnitionSeed;
+  generatedConcepts: Record<string, IGeneratedConcept[]>;
 
-  setGeneratedConcepts: (concepts: IGeneratedConcept[]) => void;
-  setSeed: (seed: IIgnitionSeed) => void;
+  setGeneratedConcepts: (
+    seedUuid: string,
+    concepts: IGeneratedConcept[],
+  ) => void;
+  updateGeneratedConcept: (
+    seedUuid: string,
+    concept: IGeneratedConcept,
+  ) => void;
+  clearGeneratedConceptsBySeedUuid: (seedUuid: string) => void;
   clear: () => void;
 }
 
 export const useConceptGenerationStore = create<ConceptGenerationStoreState>()(
   persist(
     (set) => ({
-      generatedConcepts: [],
-      seed: {
-        answers: {},
+      generatedConcepts: {},
+      setGeneratedConcepts: (
+        seedUuid: string,
+        concepts: IGeneratedConcept[],
+      ) => {
+        set((state) => ({
+          generatedConcepts: {
+            ...state.generatedConcepts,
+            [seedUuid]: concepts,
+          },
+        }));
       },
-      setGeneratedConcepts: (concepts: IGeneratedConcept[]) => {
-        set({ generatedConcepts: concepts });
+
+      updateGeneratedConcept: (
+        seedUuid: string,
+        concept: IGeneratedConcept,
+      ) => {
+        set((state) => ({
+          generatedConcepts: {
+            ...state.generatedConcepts,
+            [seedUuid]: state.generatedConcepts[seedUuid].map((c) =>
+              c.uuid === concept.uuid ? concept : c,
+            ),
+          },
+        }));
       },
-      setSeed: (seed: IIgnitionSeed) => {
-        set({ seed });
+
+      clearGeneratedConceptsBySeedUuid: (seedUuid: string) => {
+        set((state) => ({
+          generatedConcepts: {
+            ...state.generatedConcepts,
+            [seedUuid]: [],
+          },
+        }));
       },
 
       clear() {
         set({
-          generatedConcepts: [],
-          seed: { answers: {}, type: undefined },
+          generatedConcepts: {},
         });
       },
     }),
     {
-      name: 'concept-ignition-store',
+      name: 'concept-generation-store',
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         generatedConcepts: state.generatedConcepts,
-        seed: state.seed,
       }),
     },
   ),

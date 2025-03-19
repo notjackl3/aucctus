@@ -18,6 +18,7 @@ const ReadyToGenerateIcon: React.FC = () => {
 
 interface ReadyToGenerateProps {
   compact?: boolean;
+  onMouseEnter?: () => void;
 }
 
 const READY_TO_GENERATE_TEXT =
@@ -25,6 +26,7 @@ const READY_TO_GENERATE_TEXT =
 
 const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
   compact = false,
+  onMouseEnter = () => {},
 }) => {
   const {
     iconAnimation,
@@ -40,7 +42,11 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
         className='flex flex-row items-center gap-2'
       >
         <ReadyToGenerateIcon />
-        <animated.span style={labelAnimation} className='aucctus-text-primary'>
+        <animated.span
+          onMouseEnter={onMouseEnter}
+          style={labelAnimation}
+          className='aucctus-text-primary cursor-pointer'
+        >
           {'Your concepts are ready to be generated'}
         </animated.span>
         <span className='flex flex-1'></span>

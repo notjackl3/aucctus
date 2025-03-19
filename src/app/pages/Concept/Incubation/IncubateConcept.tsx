@@ -215,15 +215,19 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
   useEffect(() => {
     const handleGenerateConcept = (event?: Event) => {
       const customEvent = event as
-        | CustomEvent<{ revert?: boolean }>
+        | CustomEvent<{ revert?: boolean; error?: boolean }>
         | undefined;
 
       if (customEvent?.detail?.revert) {
         setConceptGenerationState('pre-generation');
         setPregenToGenAnimationComplete(false);
-        toast.error(
-          'An error occurred while generating the concept. Please try again.',
-        );
+
+        if (customEvent?.detail?.error) {
+          toast.error(
+            'An error occurred while generating the concept. Please try again.',
+          );
+        }
+
         return;
       }
 

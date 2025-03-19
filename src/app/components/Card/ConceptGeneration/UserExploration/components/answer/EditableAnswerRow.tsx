@@ -11,6 +11,10 @@ interface Answer {
 
 interface EditableAnswerRowProps {
   answer: Answer;
+  bgClass?: string;
+  className?: string;
+  buttonClass?: string;
+  allowEdit?: boolean;
   handleUpdateAnswer: (uuid: string, newAnswer: string) => void;
   handleRemoveAnswer: (
     e: React.MouseEvent<HTMLButtonElement>,
@@ -20,6 +24,10 @@ interface EditableAnswerRowProps {
 
 const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
   answer,
+  bgClass = 'aucctus-bg-tertiary',
+  className = '',
+  buttonClass = 'aucctus-bg-tertiary-hover cursor-pointer rounded-lg p-2',
+  allowEdit = true,
   handleUpdateAnswer,
   handleRemoveAnswer,
 }) => {
@@ -71,7 +79,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
           {
             'aucctus-text-disabled': !allowUpdateAnswer(editedAnswer),
             'aucctus-bg-error-primary': !allowUpdateAnswer(editedAnswer),
-            'aucctus-bg-tertiary': editedAnswer.trim(),
+            [bgClass]: editedAnswer.trim(),
           },
         )}
         onKeyDown={(e) => {
@@ -111,15 +119,17 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
         {answer.answer}
       </span>
       <span className='flex-1' />
+      {allowEdit && (
+        <button
+          className={buttonClass}
+          onClick={() => setIsEditing(true)}
+          aria-label='Edit answer'
+        >
+          <Icon variant='edit' />
+        </button>
+      )}
       <button
-        className='aucctus-bg-tertiary-hover cursor-pointer rounded-lg p-2'
-        onClick={() => setIsEditing(true)}
-        aria-label='Edit answer'
-      >
-        <Icon variant='edit' />
-      </button>
-      <button
-        className='aucctus-bg-tertiary-hover cursor-pointer rounded-lg p-2'
+        className={buttonClass}
         onClick={(e) => handleRemoveAnswer(e, answer.uuid)}
         aria-label='Remove answer'
       >
@@ -129,8 +139,14 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
   );
 
   return (
-    <div className='aucctus-incubation-answer-row aucctus-border-secondary aucctus-bg-secondary flex flex-1 animate-incubation-answer-expand flex-row items-center gap-3 rounded-lg border-2 p-2'>
-      {isEditing ? renderEditMode() : renderViewMode()}
+    <div
+      className={cn(
+        'aucctus-incubation-answer-row aucctus-border-secondary flex flex-1 animate-incubation-answer-expand flex-row items-center gap-3 rounded-lg border-2 p-2',
+        bgClass,
+        className,
+      )}
+    >
+      {allowEdit && isEditing ? renderEditMode() : renderViewMode()}
     </div>
   );
 };

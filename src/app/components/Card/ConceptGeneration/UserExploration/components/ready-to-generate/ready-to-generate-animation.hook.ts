@@ -23,15 +23,13 @@ export const useReadyToGenerateAnimations = (compact: boolean) => {
   });
 
   const cardAnimation = useSpring({
-    to: {
-      opacity: compact ? 0 : 1,
-      maxHeight: compact ? '0px' : '1000px',
-      transform: compact ? 'scale(0.5)' : 'scale(1)',
-      transformOrigin: 'top',
-    },
+    opacity: compact ? 0 : 1,
+    maxHeight: compact ? '0px' : '500px',
+    transform: compact ? 'scale(0.5)' : 'scale(1)',
+    transformOrigin: 'top',
     config: {
       tension: 100,
-      friction: 12,
+      friction: 15,
       mass: 0.5,
     },
   });
@@ -43,7 +41,7 @@ export const useReadyToGenerateAnimations = (compact: boolean) => {
       friction: 12,
       mass: 0.5,
     },
-    delay: 1000,
+    delay: 500,
   });
 
   return {

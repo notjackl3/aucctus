@@ -1,6 +1,7 @@
 import api from '@libs/api';
 import { SocketService } from '@libs/api/base';
 import React from 'react';
+import { keysToCamelCase } from '@libs/utils/object';
 
 function isSocketEventOfType<T extends SocketEventType, C extends object>(
   data: SocketEvent<C>,
@@ -33,7 +34,7 @@ export function useSocketEvent<
 
     const handleIncoming = (e: MessageEvent) => {
       try {
-        const data: SocketEvent<C> = JSON.parse(e.data);
+        const data: SocketEvent<C> = keysToCamelCase(JSON.parse(e.data));
         if (isSocketEventOfType<T, C>(data, eventName)) {
           savedCallback(data as Extract<SocketEvent<C>, { type: T }>);
         }

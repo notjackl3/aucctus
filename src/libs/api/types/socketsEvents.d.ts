@@ -117,8 +117,8 @@ interface AISuggestionsStreamEvent
 }
 
 interface ConceptGenerationStreamEvent
-  extends IStreamDeltaEvent<IConceptList, IConceptGenerationContext>,
-    IStreamDoneEvent<IConceptList, IConceptGenerationContext>,
+  extends IStreamDeltaEvent<IGeneratedConceptList, IConceptGenerationContext>,
+    IStreamDoneEvent<IGeneratedConceptList, IConceptGenerationContext>,
     IStreamErrorEvent<IConceptGenerationContext> {
   type: 'stream.structured.concept.generation';
 }

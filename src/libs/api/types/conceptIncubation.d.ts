@@ -19,13 +19,6 @@ interface IConceptGenerationContext {
   user_uuid: string;
 }
 
-interface IConceptList {
-  concepts: IConcept[];
-}
-
-// TODO: replace with IGeneratedConcept
-export interface IConcept extends IGeneratedConcept {
-  title?: string;
-  summary?: string;
-  uuid: string;
+interface IGeneratedConceptList {
+  concepts: IGeneratedConcept[];
 }
