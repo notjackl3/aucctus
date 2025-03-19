@@ -7,10 +7,12 @@ import { useState } from 'react';
 import { cn } from '@libs/utils/react';
 
 const PrivateLayout = () => {
-  const { user } = useAuthStore();
+  const account = useAuthStore((state) => state.account);
+  const user = useAuthStore((state) => state.user);
+
   const [navCollapsed, setNavCollapsed] = useState(true);
 
-  if (user && !user.account) {
+  if (user && !account) {
     return <Navigate to={AppPath.Onboarding} replace />;
   }
 

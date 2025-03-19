@@ -10,7 +10,7 @@
     "build:debug": "vite build --debug",
     "preview": "NODE_ENV=production vite build && vite preview",
     "format": "prettier --config ./.prettierrc --write .",
-    "lint": "eslint .",
+    "lint": "eslint . --max-warnings=0",
     "prettier-check": "prettier --config ./.prettierrc --check .",
     "type-check": "tsc",
     "lint-staged": "lint-staged --config lint-staged.js",

@@ -14,7 +14,8 @@ import { useRegisterAccount } from '../hooks/query/account.hook';
 const GOAL_MAX_LENGTH = 500;
 
 const OnBoarding: FunctionComponent = () => {
-  const { user } = useAuthStore();
+  const account = useAuthStore((state) => state.account);
+  const user = useAuthStore((state) => state.user);
   const { mutate: registerAccount, isLoading } = useRegisterAccount();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');
@@ -47,7 +48,7 @@ const OnBoarding: FunctionComponent = () => {
     setDomain(d);
   }, [domain]);
 
-  if (user && user.account) {
+  if (user && account) {
     return <Navigate to={AppPath.Home} replace />;
   }
 

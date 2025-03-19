@@ -104,6 +104,7 @@ export const useDashboard = (enabled: boolean) => {
 };
 
 export const useRegisterAccount = () => {
+  const { setAccount } = useAuthStore();
   const queryClient = useQueryClient();
   return useMutation<
     IAccount,
@@ -112,10 +113,11 @@ export const useRegisterAccount = () => {
     unknown
   >({
     mutationFn: async (details) => await api.account.createAccount(details),
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.userDetails],
       });
+      setAccount(data);
     },
   });
 };

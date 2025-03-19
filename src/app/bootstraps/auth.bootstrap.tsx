@@ -8,18 +8,9 @@ import LoadingScreen from '../pages/LoadingScreen';
 const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const {
-    clearTokens,
-    setInitialized,
-    initialized,
-    user: authUser,
-    account: authAccount,
-    access,
-    setUser,
-    setAccount,
-  } = useAuthStore();
+  const { clearTokens, setInitialized, initialized, access } = useAuthStore();
   const { mutateAsync: refreshAsync } = useRefresh();
-  const { refetch: checkAuthentication, user, account } = useUser();
+  const { refetch: checkAuthentication } = useUser();
 
   // Use state to trigger a re-render.
   const [refreshActionSet, setRefreshActionSet] = React.useState(false);
@@ -53,16 +44,6 @@ const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
       checkAuthentication();
     }
   }, [initialized, access, checkAuthentication]);
-
-  React.useEffect(() => {
-    if (user !== authUser) {
-      setUser(user);
-    }
-
-    if (account !== authAccount) {
-      setAccount(account);
-    }
-  }, [user, account, initialized, authUser, authAccount, setUser, setAccount]);
 
   if (!refreshActionSet) {
     return <LoadingScreen />;
