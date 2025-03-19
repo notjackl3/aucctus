@@ -10,6 +10,7 @@ import {
   IUser,
 } from '@libs/api/types';
 import utils from '@libs/utils';
+import { AppPath } from '@routes/routes';
 import {
   ColumnDef,
   createColumnHelper,
