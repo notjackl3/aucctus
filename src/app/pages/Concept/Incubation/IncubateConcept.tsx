@@ -1,5 +1,7 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { Card, Loading } from '@components';
+import { Card } from '@components';
+import ConceptGeneration from '@components/Card/ConceptGeneration/Generation/ConceptGeneration';
+import ConceptSelection from '@components/Card/ConceptGeneration/Generation/ConceptSelection';
+import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import {
   useConceptIncubationQuestionnaire,
   useConceptSeedDraft,
@@ -12,13 +14,16 @@ import {
   IdentifyNewOpportunitiesQuestions,
 } from '@libs/api/types/conceptSeedQuestionnaire';
 import { cn } from '@libs/utils/react';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import { useState } from 'react';
 import { animated, easings, useTransition } from '@react-spring/web';
-import ConceptGeneration from '@components/Card/ConceptGeneration/Generation/ConceptGeneration';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { toast } from 'react-toastify';
-import ConceptSelection from '@components/Card/ConceptGeneration/Generation/ConceptSelection';
-import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 
 type ConceptGenerationState =
   | 'pre-generation'

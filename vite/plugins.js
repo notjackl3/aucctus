@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { exec } from 'child_process'
 import chokidar from 'chokidar'
 import fs from 'fs'

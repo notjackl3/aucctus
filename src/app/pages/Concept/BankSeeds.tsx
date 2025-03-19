@@ -1,8 +1,8 @@
-import React, { ReactNode, useMemo, useCallback } from 'react';
 import { Container, Table } from '@components';
 import { useSeedsBank } from '@hooks/tables/concept-bank.hook';
-import { useOutletContext } from 'react-router-dom';
 import { IConceptFilterOptions } from '@hooks/tables/concept-seed.hook';
+import React from 'react';
+import { useOutletContext } from 'react-router-dom';
 
 // Define type for context being passed from parent
 type ConceptBankContextType = {
@@ -15,8 +15,10 @@ const BankSeeds: React.FC = () => {
   const { filterOptions, updateTableFiltering } =
     useOutletContext<ConceptBankContextType>();
 
-  const { table, page, setPage, numberOfPages, isLoading, resetFilter } =
-    useSeedsBank(filterOptions, updateTableFiltering);
+  const { table, page, setPage, numberOfPages, isLoading } = useSeedsBank(
+    filterOptions,
+    updateTableFiltering,
+  );
 
   return (
     <>

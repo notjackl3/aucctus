@@ -1,6 +1,6 @@
 import { HeadersDefaults } from 'axios';
 import { toast } from 'react-toastify';
-import analytics from '../analytics';
+import analytics from '../telemetry';
 import { AccountApi } from './account';
 import { ArticleApi } from './article';
 import { AssumptionsApi } from './assumptions';
@@ -163,7 +163,7 @@ export class Api {
       toast.warning('You have been logged out. Please login again.');
       return this._logoutAction();
     } else {
-      console.warn('Logout action has not been set.');
+      analytics.warn('Logout action has not been set.');
     }
   }
 }

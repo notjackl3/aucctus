@@ -7,7 +7,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig,
 } from 'axios';
-import analytics from '../../analytics';
+import analytics from '../../telemetry';
 import { Api } from '../api';
 import { IAuthSuccessResponse } from '../types';
 
@@ -112,7 +112,6 @@ export abstract class ApiService {
           if (this.apiInstance.pendingRefresh) {
             await this.apiInstance.pendingRefresh;
           } else {
-            console.log('Refreshing token from error middleware');
             await this.apiInstance.refreshToken();
           }
 

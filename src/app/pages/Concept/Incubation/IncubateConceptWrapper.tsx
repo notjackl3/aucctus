@@ -13,8 +13,6 @@ const IncubateConceptWrapper: React.FC = () => {
   // Use UUID from path params if available, otherwise fall back to query params
   const initialDraftSeedUuid = uuid || seedUuidFromQuery || undefined;
 
-  console.log('initialDraftSeedUuid', initialDraftSeedUuid);
-
   try {
     return <IncubateConcept initialDraftSeedUuid={initialDraftSeedUuid} />;
   } catch (error) {

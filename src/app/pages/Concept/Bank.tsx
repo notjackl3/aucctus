@@ -1,13 +1,8 @@
-import React, {
-  ReactNode,
-  useEffect,
-  useMemo,
-  useCallback,
-  useState,
-} from 'react';
+import React, { ReactNode, useCallback, useMemo } from 'react';
 
-import { Container, Header, Icon, Input, Table } from '@components';
+import { Header, Icon, Input, Table } from '@components';
 import { useConceptBank, useSeedsBank } from '@hooks/tables/concept-bank.hook';
+import { IConceptFilterOptions } from '@hooks/tables/concept-seed.hook';
 import utils from '@libs/utils';
 import { isUser } from '@libs/utils/account';
 import {
@@ -15,13 +10,11 @@ import {
   ARCHIVE_CONCEPT_STATUS_LIST,
   DRAFT_CONCEPT_STATUS_LIST,
 } from '@libs/utils/concepts';
+import { cn } from '@libs/utils/react';
 import { camelCaseToTitleCase } from '@libs/utils/string';
 import { AppPath } from '@routes/routes';
-import { useNavigate, useLocation, Outlet } from 'react-router-dom';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import { ConceptStatus } from '@libs/api/types';
-import { IConceptFilterOptions } from '@hooks/tables/concept-seed.hook';
-import { cn } from '@libs/utils/react';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -41,12 +34,6 @@ const areFilterOptionsSet = (filterOptions: IConceptFilterOptions) => {
   const { status, createdBy, search, sort } = filterOptions;
 
   return (status && status.size > 0) || !!createdBy || !!search || !!sort;
-};
-
-// Define the type for context being passed to children
-type ConceptBankContextType = {
-  filterOptions: IConceptFilterOptions;
-  updateTableFiltering: (value: Partial<IConceptFilterOptions>) => void;
 };
 
 const ConceptBank: React.FC = () => {

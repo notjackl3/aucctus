@@ -1,38 +1,39 @@
+import analytics from '@libs/telemetry';
 import { SocketService } from './base';
 
 export class AucctusSocket extends SocketService {
   protected onError(error: Event): void {
-    console.log('AucctusSocket encountered an error:', error);
+    analytics.debug('AucctusSocket encountered an error:', error);
   }
   protected handleMessage(event: SocketEvent): void {
-    //console.log('Received event:', event);
+    analytics.debug('Received event:', event);
   }
   protected onConnect(): void {
-    console.log('AucctusSocket connected.');
+    analytics.debug('AucctusSocket connected.');
     // Optionally, send an initial message or request state.
   }
 
   protected onConnectError(err: any): void {
-    console.error('AucctusSocket connection error:', err);
+    analytics.error('AucctusSocket connection error:', err);
   }
 
   protected onDisconnect(reason: string): void {
-    console.log('AucctusSocket disconnected:', reason);
+    analytics.debug('AucctusSocket disconnected:', reason);
   }
 
   protected handleChatMessage(event: SocketEvent): void {
     // Process a chat message event (e.g. update UI).
-    console.log('Received chat message:', event);
+    analytics.debug('Received chat message:', event);
   }
 
   protected handleNotification(event: SocketEvent): void {
     // Process a notification event.
-    console.log('Received notification:', event);
+    analytics.debug('Received notification:', event);
   }
 
   protected handleError(event: SocketEvent): void {
     // Process an error event.
-    console.error('Received error event:', event);
+    analytics.error('Received error event:', event);
   }
 
   // Domain-specific method for sending chat messages.
@@ -43,7 +44,7 @@ export class AucctusSocket extends SocketService {
   }
 
   protected onMaxRetriesExceeded(error: Error): void {
-    console.error('Max reconnect attempts exceeded:', error);
+    analytics.debug('Max reconnect attempts exceeded:', error);
     // You can now hook into this error and respond dynamically,
     // for example, by showing a notification or logging the user out.
     // Optionally, throw the error to trigger higher-level error handling.

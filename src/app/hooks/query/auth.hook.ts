@@ -108,6 +108,7 @@ export const useRefresh = () => {
     },
     onError: (error) => {
       if (!(error instanceof NoRefreshTokenError)) {
+        // eslint-disable-next-line no-console
         console.error('Error refreshing token (App)', error);
 
         // Remove tokens if refresh fails

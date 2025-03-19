@@ -1,9 +1,6 @@
-import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
-import { v4 as uuidv4 } from 'uuid';
 import images from '@assets/img';
 import { Icon } from '@components';
+import { useSaveGeneratedConcepts } from '@hooks/query/concepts.hook';
 import { IGeneratedConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
@@ -11,17 +8,18 @@ import {
   AnswerItem,
   useConceptIncubationStore,
 } from '@stores/concept-incubation.store';
-import { useSaveGeneratedConcepts } from '@hooks/query/concepts.hook';
-import { useAnswerList } from '../UserExploration/hooks/answer-list.hook';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 import {
   animationStyles,
   getAnimationStyle,
 } from '../UserExploration/components/util/animation-keyframes';
 import LoadingMask from '../UserExploration/components/util/LoadingMask';
 import { PointerEventMask } from '../UserExploration/components/util/PointerEventMask';
-import ConceptGenerationInput from './ConceptGenerationInput';
-import SelectableConcept from './SelectableConcept';
+import { useAnswerList } from '../UserExploration/hooks/answer-list.hook';
 import PromptAnswers from './PromptAnswers';
+import SelectableConcept from './SelectableConcept';
 import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
 
@@ -91,21 +89,21 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   );
 
   // Prompt answers state
-  const [inputValue, setValue] = useState<string>('');
+  // const [inputValue, setValue] = useState<string>('');
   const [promptAnswers, setPromptAnswers] = useState<AnswerItem[]>([]);
   const { handleUpdateAnswer, handleRemoveAnswer } = useAnswerList(
     promptAnswers,
     setPromptAnswers,
   );
 
-  // Derived state
-  const allowAddAnswer = useMemo(() => {
-    return !(
-      promptAnswers.find(
-        (promptAnswer) => promptAnswer.answer === inputValue,
-      ) || promptAnswers.length >= 3
-    );
-  }, [promptAnswers, inputValue]);
+  // // Derived state
+  // const allowAddAnswer = useMemo(() => {
+  //   return !(
+  //     promptAnswers.find(
+  //       (promptAnswer) => promptAnswer.answer === inputValue,
+  //     ) || promptAnswers.length >= 3
+  //   );
+  // }, [promptAnswers, inputValue]);
 
   // Animation handlers
   const handleLeaveAnimation = useCallback((callback: () => void) => {
@@ -129,15 +127,15 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     }
   }, []);
 
-  // Prompt answer handlers
-  const handleAddAnswer = useCallback(
-    (answer: string) => {
-      if (!allowAddAnswer) return;
-      setPromptAnswers([...promptAnswers, { answer, uuid: uuidv4() }]);
-      setValue('');
-    },
-    [promptAnswers, allowAddAnswer],
-  );
+  // // Prompt answer handlers
+  // const handleAddAnswer = useCallback(
+  //   (answer: string) => {
+  //     if (!allowAddAnswer) return;
+  //     setPromptAnswers([...promptAnswers, { answer, uuid: uuidv4() }]);
+  //     setValue('');
+  //   },
+  //   [promptAnswers, allowAddAnswer],
+  // );
 
   // Concept selection handlers
   const handleSelectConcept = useCallback(
@@ -235,7 +233,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
         <div
           ref={containerRef}
           style={getAnimationStyle('fadeScaleIn', 1000)}
-          className='aucctus-bg-secondary m-8 flex max-h-[calc(100vh-4rem)] flex-1 flex-col rounded-xl rounded-xl p-4'
+          className='aucctus-bg-secondary m-8 flex max-h-[calc(100vh-4rem)] flex-1 flex-col rounded-xl p-4'
         >
           <ConceptSelectionHeader onClose={handleClose} />
           <div className='mt-4 flex flex-1 flex-row gap-2 overflow-hidden'>

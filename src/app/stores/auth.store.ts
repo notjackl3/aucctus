@@ -42,6 +42,7 @@ const secureStorage = {
         },
       });
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error in secureStorage.getItem', error);
       return null;
     }
@@ -73,6 +74,7 @@ const secureStorage = {
       };
       localStorage.setItem(name, JSON.stringify(persistState));
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Error in secureStorage.setItem', error);
     }
   },

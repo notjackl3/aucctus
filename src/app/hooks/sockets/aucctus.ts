@@ -1,7 +1,7 @@
 import api from '@libs/api';
 import { SocketService } from '@libs/api/base';
-import React from 'react';
 import { keysToCamelCase } from '@libs/utils/object';
+import React from 'react';
 
 function isSocketEventOfType<T extends SocketEventType, C extends object>(
   data: SocketEvent<C>,
@@ -39,6 +39,7 @@ export function useSocketEvent<
           savedCallback(data as Extract<SocketEvent<C>, { type: T }>);
         }
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error parsing WebSocket message:', error);
       }
     };

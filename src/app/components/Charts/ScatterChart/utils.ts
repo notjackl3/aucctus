@@ -1,4 +1,4 @@
-import analytics from '@libs/analytics';
+import analytics from '@libs/telemetry';
 import { CHART_SIZE, POINT_RADIUS } from './ScatterChart';
 
 export const getNormalizedCoord = (value: number) => {

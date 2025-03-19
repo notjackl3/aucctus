@@ -1,14 +1,14 @@
-import React from 'react';
 import { Icon } from '@components';
 import {
   useConceptIncubationQuestionnaire,
   useSaveConceptSeedDraft,
 } from '@hooks/query/concepts.hook';
-import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
 import { IConceptSeed } from '@libs/api/concepts';
+import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import React from 'react';
 import { toast } from 'react-toastify';
 import LoadingMask from './util/LoadingMask';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 type QuestionPath = 'expand-an-existing-idea' | 'identify-new-opportunities';
 
@@ -146,7 +146,7 @@ const GenerateNewIdeas: React.FC = () => {
                 setCurrentQuestionOrder(1);
               });
             },
-            onError: (error) => {
+            onError: () => {
               toast.error('Error saving concept seed draft');
             },
           },

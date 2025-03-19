@@ -17,6 +17,7 @@ import {
 } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
 
+import { ConceptActionMenuButton } from '@components/Tables/ConceptBank/ActionsMenuButton';
 import {
   useConceptUpdate,
   useRetryConceptReport,
@@ -24,7 +25,6 @@ import {
 import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
-import { ConceptActionMenuButton } from '@components/Tables/ConceptBank/ActionsMenuButton';
 import { IConceptFilterOptions } from './concept-seed.hook';
 
 const columnHelper = createColumnHelper<IConcept>();
@@ -46,13 +46,6 @@ function isSortableConceptProperty(
   ];
   return (arr as string[]).includes(value);
 }
-
-// Helper function to standardize header styling
-const headerStyle = () => (
-  <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
-    {/* The content will be injected */}
-  </div>
-);
 
 export const useConceptBank = (
   externalFilterOptions?: IConceptFilterOptions,

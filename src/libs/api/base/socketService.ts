@@ -1,4 +1,4 @@
-import analytics from '../../analytics';
+import analytics from '../../telemetry';
 import { Api } from '../api';
 
 export interface ISocketConfig {
@@ -67,6 +67,7 @@ export abstract class SocketService {
         const data: SocketEvent = JSON.parse(messageEvent.data);
         this.handleMessage(data);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error parsing incoming message', error);
       }
     };

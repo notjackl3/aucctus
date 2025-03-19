@@ -1,12 +1,15 @@
-import { Button, Table, Text } from '@components';
+import { Badge, Button, Icon, Table, Text } from '@components';
+import { ConceptStage } from '@components/Badges/StageBadge';
+import { SeedActionMenuButton } from '@components/Tables/ConceptBank/ActionsMenuButton';
 import { useSeeds } from '@hooks/query/concepts.hook';
+import { IConceptSeed } from '@libs/api/concepts';
 import {
   ConceptSeedStatus,
   ConceptSort,
   ConceptStatus,
   IUser,
 } from '@libs/api/types';
-import { IConceptSeed } from '@libs/api/concepts';
+import utils from '@libs/utils';
 import {
   ColumnDef,
   createColumnHelper,
@@ -14,13 +17,8 @@ import {
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
-import React, { useMemo, useCallback, useEffect } from 'react';
-import utils from '@libs/utils';
-import { AppPath } from '@routes/routes';
+import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Icon, Badge } from '@components';
-import { SeedActionMenuButton } from '@components/Tables/ConceptBank/ActionsMenuButton';
-import { ConceptStage } from '@components/Badges/StageBadge';
 
 // Shared interfaces and constants
 export interface IConceptFilterOptions {
@@ -355,6 +353,7 @@ export const useSeedsBank = (
       }),
     ];
   }, [
+    columnHelper,
     navigate,
     filterOptions,
     extractConceptDescription,

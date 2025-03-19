@@ -2,14 +2,12 @@ import { Loading } from '@components';
 import React from 'react';
 
 interface ConceptTableCardProps {
-  header?: React.ReactNode;
   footer?: React.ReactNode;
   isLoading: boolean;
   children: React.ReactNode;
 }
 
 const ConceptTableCard: React.FC<ConceptTableCardProps> = ({
-  header,
   footer,
   children,
   isLoading,
