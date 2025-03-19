@@ -28,6 +28,8 @@ import { useTransition, animated } from 'react-spring';
 import ConfirmAnswerUpdate from './answer/ConfirmAnswerUpdate';
 import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
 import { useDispatchIncubationAnimation } from '../hooks/incubation-animation-event.hook';
+import { AppPath } from '@routes/routes';
+import { useNavigate } from 'react-router-dom';
 
 type advanceActionType = 'to-next-question' | 'to-clarifying-questions' | false;
 
@@ -80,6 +82,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     mutate: generateClarifyingQuestions,
     isLoading: isGenerateClarifyingQuestionsLoading,
   } = useGenerateConceptIncubationClarifyingQuestions();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const answers = (seedDraftAnswers ?? []).sort(
@@ -316,6 +319,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
         });
       } else {
         resetQuestionnaire();
+        navigate(AppPath.IncubateConcept);
       }
     } else {
       dispatchAnimationEvent('fade', () => {
@@ -337,6 +341,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     setActiveClarifyingQuestion,
     setCurrentMultiSelectAnswerList,
     setCurrentTextAnswerList,
+    navigate,
   ]);
 
   const formattedAnswerPayload = useMemo(() => {

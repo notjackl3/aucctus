@@ -326,7 +326,9 @@ export const useSeedsBank = (
                 <Button.ConceptGenerate
                   variant='draft'
                   onClick={() =>
-                    navigate(`/concept/ignite/${String(info.getValue())}`)
+                    navigate(
+                      `${AppPath.IncubateConceptWithUuid.replace(':uuid', info.getValue())}`,
+                    )
                   }
                 />
               )}

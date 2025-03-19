@@ -13,7 +13,7 @@ const usePrivateRoutes = () => {
       <Route index path={AppPath.Home} element={<Page.Dashboard />} />
       <Route
         path={AppPath.IncubateConceptWithUuid}
-        element={<Page.Concept.Incubate />}
+        element={<Page.Concept.IncubateWrapper />}
       />
       <Route
         path={AppPath.IncubateConcept}

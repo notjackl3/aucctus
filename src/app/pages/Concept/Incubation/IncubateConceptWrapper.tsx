@@ -4,11 +4,13 @@ import IncubateConcept from './IncubateConcept';
 
 const IncubateConceptWrapper: React.FC = () => {
   // Extract UUID from URL parameters
-  const { uuid } = useParams<{ uuid?: string }>();
+  const { uuid } = useParams<{ uuid: string }>();
 
   // Also check for query parameters for backward compatibility
   const [searchParams] = useSearchParams();
   const seedUuidFromQuery = searchParams.get('seed');
+
+  React.useEffect(() => {}, [uuid, seedUuidFromQuery]);
 
   // Use UUID from path params if available, otherwise fall back to query params
   const initialDraftSeedUuid = uuid || seedUuidFromQuery || undefined;
