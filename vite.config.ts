@@ -116,9 +116,9 @@ export default defineConfig((config) => {
       },
       terserOptions: {
         compress: {
-          drop_console: true,
+          drop_console: false,
           drop_debugger: true,
-          pure_funcs: ['console.info', 'console.debug', 'console.warn'],
+          // pure_funcs: ['console.info', 'console.debug', 'console.warn'],
           passes: 2, // Multiple passes can achieve better minimization
         },
         mangle: {
