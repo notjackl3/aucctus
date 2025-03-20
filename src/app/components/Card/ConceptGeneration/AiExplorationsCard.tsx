@@ -1,10 +1,10 @@
-import React, { useMemo } from 'react';
-import { cn } from '@libs/utils/react';
 import images from '@assets/img';
 import { Card } from '@components';
-import { useFadeTransition } from './hooks/fade-transition.hook';
-import AiSuggestions from './AiExploration/AiSuggestions';
+import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import React from 'react';
+import AiSuggestions from './AiExploration/AiSuggestions';
+import { useFadeTransition } from './hooks/fade-transition.hook';
 import { animationStyles } from './UserExploration/components/util/animation-keyframes';
 
 const mainStyle = {
@@ -21,14 +21,14 @@ interface AiExplorationsCardProps {
 const AiExplorationsCard: React.FC<AiExplorationsCardProps> = ({
   className = '',
 }) => {
-  const { currentQuestionOrder } = useConceptIncubationStore();
-  const isValidQuestionIndex = useMemo(
-    () => !!currentQuestionOrder,
-    [currentQuestionOrder],
-  );
+  const { activeQuestion, activeClarifyingQuestion } =
+    useConceptIncubationStore();
+  const question = activeClarifyingQuestion
+    ? activeClarifyingQuestion.question
+    : activeQuestion;
 
   const { contentRef, stateValue: startedAiExploration } = useFadeTransition({
-    currentValue: isValidQuestionIndex,
+    currentValue: !!question,
   });
 
   const renderActiveCard = React.useCallback(() => {

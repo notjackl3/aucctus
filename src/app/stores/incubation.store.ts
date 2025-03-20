@@ -1,18 +1,13 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-interface IAISuggestions {
-  title: string;
-  description: string;
-}
-
 type IncubationAISuggestions = {
-  [key: string]: IAISuggestions[];
+  [key: string]: IAISuggestion[];
 };
 
 interface IncubationStoreState {
   suggestions: IncubationAISuggestions;
-  setSuggestions: (identifier: string, suggestions: IAISuggestions[]) => void;
+  setSuggestions: (identifier: string, suggestions: IAISuggestion[]) => void;
 }
 
 export const useIncubationStore = create<IncubationStoreState>()(
@@ -20,7 +15,7 @@ export const useIncubationStore = create<IncubationStoreState>()(
     (set, get) => ({
       suggestions: {},
 
-      setSuggestions: (identifier: string, aiSuggestions: IAISuggestions[]) => {
+      setSuggestions: (identifier: string, aiSuggestions: IAISuggestion[]) => {
         set({
           suggestions: { ...get().suggestions, [identifier]: aiSuggestions },
         });

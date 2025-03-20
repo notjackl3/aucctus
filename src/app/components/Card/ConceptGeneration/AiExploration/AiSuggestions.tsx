@@ -1,9 +1,7 @@
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
-import {
-  IAISuggestion,
-  IConceptIncubationMultiSelectQuestion,
-} from '@libs/api/types';
+import { IConceptIncubationMultiSelectQuestion } from '@libs/api/types';
+
 import { AiSuggestionEvent } from '@libs/events';
 import { IncubationAnswerEvent } from '@libs/events/IncumbentAnswerEvent';
 import telemetry from '@libs/telemetry';
@@ -24,37 +22,43 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   const {
     suggestions,
     activeQuestion,
+    activeClarifyingQuestion,
     setSuggestions,
     draftSeedUuid,
     currentMultiSelectAnswerList,
     currentTextAnswerList,
-    currentQuestionOrder,
     setCurrentMultiSelectAnswerList,
   } = useConceptIncubationStore();
 
   const activeQuestionIdRef = useRef<number | null>(null);
+  const question = useMemo(
+    () =>
+      activeClarifyingQuestion
+        ? activeClarifyingQuestion.question
+        : activeQuestion,
+    [activeClarifyingQuestion, activeQuestion],
+  );
 
   // --- Derived state ---
   const isMultiSelectQuestion = useMemo(
     () =>
-      !!activeQuestion &&
-      ['multiSelect', 'radioButton'].includes(activeQuestion.fieldType),
-    [activeQuestion],
+      !!question && ['multiSelect', 'radioButton'].includes(question.fieldType),
+    [question],
   );
 
   const activeSuggestions = useMemo<IAISuggestion[]>(() => {
-    if (activeQuestion && activeQuestion.id in suggestions) {
-      return suggestions[activeQuestion.id];
+    if (question && question.id in suggestions) {
+      return suggestions[question.id];
     }
     return [];
-  }, [suggestions, activeQuestion]);
+  }, [suggestions, question]);
 
   // --- Helper functions ---
   const setMultiSelectFromSuggestion = useCallback(
     (suggestion: IAISuggestion) => {
-      if (isMultiSelectQuestion && activeQuestion) {
+      if (isMultiSelectQuestion && question) {
         const answerValueSearchStrings = (
-          activeQuestion as IConceptIncubationMultiSelectQuestion
+          question as IConceptIncubationMultiSelectQuestion
         ).options.map((option) => option.value);
         const regex = new RegExp(
           `\\b(${answerValueSearchStrings.join('|')})\\b`,
@@ -72,7 +76,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
         }
       }
     },
-    [isMultiSelectQuestion, activeQuestion, setCurrentMultiSelectAnswerList],
+    [isMultiSelectQuestion, question, setCurrentMultiSelectAnswerList],
   );
 
   const dispatchAnswerUpdateEvent = useCallback((suggestion: IAISuggestion) => {
@@ -84,18 +88,20 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   // --- API interactions ---
   const sendAiSuggestionsRequest = useCallback(
     (questionId: number, answer: string[]) => {
-      if (activeQuestion && activeQuestion.id === questionId && draftSeedUuid) {
-        setSuggestions(activeQuestion.id, []);
+      telemetry.log('sendAiSuggestionsRequest called', questionId, answer);
+      if (question && question.id === questionId && draftSeedUuid) {
+        telemetry.log('sendAiSuggestionsRequest 2', question.id, answer);
+        setSuggestions(question.id, []);
 
         api.aucctusSocket.send({
           type: 'incubation.ai.suggestions.request',
           seedUuid: draftSeedUuid,
-          questionId: activeQuestion.id,
+          questionId: question.id,
           answer: answer.length ? answer : undefined,
         });
       }
     },
-    [draftSeedUuid, activeQuestion, setSuggestions],
+    [draftSeedUuid, question, setSuggestions],
   );
 
   // --- Event handlers ---
@@ -137,26 +143,28 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
         AiSuggestionEvent.eventName,
         handleGenerateAiSuggestions,
       );
-  }, [activeQuestion, draftSeedUuid, setSuggestions, sendAiSuggestionsRequest]);
+  }, [question, draftSeedUuid, setSuggestions, sendAiSuggestionsRequest]);
 
   // Generate suggestions when active question changes
   useEffect(() => {
-    if (activeQuestion && activeQuestionIdRef.current !== activeQuestion.id) {
-      activeQuestionIdRef.current = activeQuestion.id;
-      sendAiSuggestionsRequest(activeQuestion.id, [
-        ...currentMultiSelectAnswerList.map((answer) => answer.answer.trim()),
-        ...currentTextAnswerList.map((answer) => answer.answer.trim()),
-      ]);
-    }
+    if (!question || question.id === activeQuestionIdRef.current) return;
+
+    activeQuestionIdRef.current = question.id;
+
+    sendAiSuggestionsRequest(question.id, [
+      ...currentMultiSelectAnswerList.map((answer) => answer.answer.trim()),
+      ...currentTextAnswerList.map((answer) => answer.answer.trim()),
+    ]);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuestion, activeQuestionIdRef]);
+  }, [question, activeQuestionIdRef]);
 
   // --- Render component ---
   return (
     <div
       className={cn('flex h-full flex-col gap-4 transition-all duration-300', {
-        'opacity-1': (currentQuestionOrder ?? 0) < Infinity,
-        'opacity-0': currentQuestionOrder === Infinity,
+        'opacity-1': !!question,
+        'opacity-0': !question,
       })}
     >
       <div className='aucctus-text-xl text-white'>{title}</div>
@@ -165,7 +173,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
           <div
             onClick={() => handleSuggestionClick(suggestion)}
             className='aucctus-border-primary flex animate-fade-in cursor-pointer flex-col gap-2 rounded-lg border border-opacity-50 bg-white bg-opacity-25 p-4 backdrop-blur-lg transition-all duration-200 hover:brightness-125'
-            key={`${activeQuestion?.id}-${index}`}
+            key={`${question?.label}-${index}`}
           >
             <div className='aucctus-text-md-medium text-gray-light-100'>
               {suggestion.title}

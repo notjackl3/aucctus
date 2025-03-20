@@ -149,13 +149,17 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
   const { dispatchAnimationEvent } = useDispatchIncubationAnimation();
 
   const dispatchAiSuggestionsEvent = useCallback(() => {
-    if (!activeQuestion) return;
+    const question = activeClarifyingQuestion
+      ? activeClarifyingQuestion.question
+      : activeQuestion;
+
+    if (!question) return;
 
     const inputAnswer =
       answerValue.trim().length > 0 ? [answerValue.trim()] : [];
 
     AiSuggestionEvent.dispatch({
-      questionId: activeQuestion.id,
+      questionId: question.id,
       answer: [
         ...inputAnswer,
         ...currentTextAnswerList.map((answer) => answer.answer.trim()),
@@ -163,6 +167,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       ],
     });
   }, [
+    activeClarifyingQuestion,
     activeQuestion,
     answerValue,
     currentTextAnswerList,

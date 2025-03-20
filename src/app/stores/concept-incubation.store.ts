@@ -3,11 +3,11 @@ import {
   ConceptIncubationClarifyingQuestion,
   ConceptIncubationQuestion,
 } from '@libs/api/types';
-import telemetry from '@libs/telemetry';
 import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
 import { useCallback, useMemo } from 'react';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { NonFunctionProperties } from '../../types';
 
 export type AnswerItem = {
   answer: string;
@@ -51,18 +51,25 @@ interface ConceptIncubationStoreState {
   ) => void;
 }
 
+type ConceptIncubationState =
+  NonFunctionProperties<ConceptIncubationStoreState>;
+
+const INITIAL_STATE: ConceptIncubationState = {
+  currentQuestionOrder: undefined,
+  activeQuestionnaire: undefined,
+  activeClarifyingQuestion: undefined,
+  draftSeedUuid: '',
+  currentTextAnswerList: [],
+  currentMultiSelectAnswerList: [],
+  submittedAnswers: [],
+  clarifyingQuestions: [],
+  suggestions: {},
+};
+
 const conceptIncubationStore = create<ConceptIncubationStoreState>()(
   persist(
     (set) => ({
-      currentQuestionOrder: undefined,
-      activeQuestionnaire: undefined,
-      activeClarifyingQuestion: undefined,
-      draftSeedUuid: '',
-      currentTextAnswerList: [],
-      currentMultiSelectAnswerList: [],
-      submittedAnswers: [],
-      clarifyingQuestions: [],
-      suggestions: {},
+      ...INITIAL_STATE,
 
       setCurrentQuestionOrder: (index?: number) => {
         set({ currentQuestionOrder: index });
@@ -93,21 +100,10 @@ const conceptIncubationStore = create<ConceptIncubationStoreState>()(
         set({ activeClarifyingQuestion: question });
       },
       resetQuestionnaire: () => {
-        set({
-          currentQuestionOrder: undefined,
-          activeQuestionnaire: undefined,
-          activeClarifyingQuestion: undefined,
-          draftSeedUuid: '',
-          currentTextAnswerList: [],
-          currentMultiSelectAnswerList: [],
-          submittedAnswers: [],
-          clarifyingQuestions: [],
-          suggestions: {},
-        });
+        set(INITIAL_STATE);
       },
 
       setSuggestions: (id: number, aiSuggestions: IAISuggestion[]) => {
-        telemetry.log('setSuggestions', id, aiSuggestions);
         set((state) => ({
           suggestions: {
             ...state.suggestions,

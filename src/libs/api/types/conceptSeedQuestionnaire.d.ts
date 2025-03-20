@@ -1,4 +1,4 @@
-export interface BaseConceptIncubationQuestion {
+interface BaseConceptIncubationQuestion {
   id: number;
   identifier: string;
   label: string;
@@ -10,77 +10,73 @@ export interface BaseConceptIncubationQuestion {
   isIgnition: boolean;
 }
 
-export interface IConceptIncubationTextQuestion
-  extends BaseConceptIncubationQuestion {
+interface IConceptIncubationTextQuestion extends BaseConceptIncubationQuestion {
   fieldType: 'text';
   placeholder?: string;
 }
 
-export interface IConceptIncubationTextareaQuestion
+interface IConceptIncubationTextareaQuestion
   extends BaseConceptIncubationQuestion {
   fieldType: 'textarea';
   placeholder?: string;
   rows?: number;
 }
 
-export interface IDetailQuestion {
+interface IDetailQuestion {
   fieldType: 'text' | 'textarea';
   placeholder?: string;
   rows?: number;
 }
 
-export interface IConceptIncubationMultiSelectOption {
+interface IConceptIncubationMultiSelectOption {
   label: string;
   value: string;
   description?: string;
   icon?: string;
 }
-
-export type multiSelectFieldType = 'multiSelect' | 'radioButton';
-
-export interface IConceptIncubationMultiSelectQuestion
+interface IConceptIncubationMultiSelectQuestion
   extends BaseConceptIncubationQuestion {
-  fieldType: multiSelectFieldType;
+  fieldType: 'multiSelect' | 'radioButton';
   options: IConceptIncubationMultiSelectOption[];
   defaultOption?: string;
   allowCustomInput: boolean;
   details?: IDetailQuestion;
 }
 
-export interface ConceptIncubationClarifyingQuestion {
+interface ConceptIncubationClarifyingQuestion {
   title: string;
   uuid: string;
   icon: string;
   question: ConceptIncubationQuestion;
 }
 
-export type ConceptIncubationQuestion =
+type ConceptIncubationQuestion =
   | IConceptIncubationTextQuestion
   | IConceptIncubationTextareaQuestion
   | IConceptIncubationMultiSelectQuestion;
 
-export type QuestionFieldType = ConceptIncubationQuestion['fieldType'];
+type QuestionFieldType = ConceptIncubationQuestion['fieldType'];
 
-export type ExpandAnExistingIdeaQuestions =
+type ExpandAnExistingIdeaQuestions =
   | 'describe'
   | 'problem'
   | 'customer'
   | 'value';
-export type IdentifyNewOpportunitiesQuestions =
+type IdentifyNewOpportunitiesQuestions =
   | 'target'
   | 'describe'
   | 'customer'
   | 'value'
   | 'interest';
 
-export type QuestionIdentifier =
+type QuestionIdentifier =
   | ExpandAnExistingIdeaQuestions
   | IdentifyNewOpportunitiesQuestions;
 
-export type ConceptIncubationQuestionnaireType =
+type ConceptIncubationQuestionnaireType =
   | 'EXPAND_AN_EXISTING_IDEA'
   | 'IDENTIFY_NEW_OPPORTUNITIES';
-export interface IConceptIncubationQuestionnaireSection<T extends string> {
+interface IConceptIncubationQuestionnaireSection<T extends string> {
   type: ConceptIncubationQuestionnaireType;
   description: string;
   questions: { [key in T]: ConceptIncubationQuestion };

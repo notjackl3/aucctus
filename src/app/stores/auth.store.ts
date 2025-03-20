@@ -161,3 +161,16 @@ export const useAuthStore = create<AuthStore>()(
     },
   ),
 );
+
+export const useUser = () => useAuthStore((state) => state.user);
+export const useAccount = () => useAuthStore((state) => state.account);
+export const useInitialized = () => useAuthStore((state) => state.initialized);
+export const useIsAuthenticated = () =>
+  useAuthStore((state) => state.isAuthenticated());
+
+// actions
+export const useClearTokens = () => useAuthStore((state) => state.clearTokens);
+export const useLogout = () => useAuthStore((state) => state.logout);
+export const useStoreTokens = () => useAuthStore((state) => state.storeTokens);
+export const useSetInitialized = () =>
+  useAuthStore((state) => state.setInitialized);
