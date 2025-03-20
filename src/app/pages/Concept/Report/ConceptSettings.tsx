@@ -66,7 +66,11 @@ const ConceptSettings: FunctionComponent = () => {
             <SeedField
               key={answer.question.label.replace(' ', '-')}
               question={answer.question.label}
-              answer={answer.answer.join(', ')}
+              answer={
+                Array.isArray(answer.answer)
+                  ? answer.answer.join(', ')
+                  : answer.answer
+              }
             />
           ))
         )}

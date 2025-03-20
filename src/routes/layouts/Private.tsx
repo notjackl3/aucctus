@@ -11,7 +11,6 @@ const PrivateLayout = () => {
   const user = useAuthStore((state) => state.user);
 
   const [navCollapsed, setNavCollapsed] = useState(true);
-
   if (user && !account) {
     return <Navigate to={AppPath.Onboarding} replace />;
   }

@@ -143,6 +143,7 @@ export const useLogout = () => {
 export const useLogin = () => {
   const navigate = useNavigate();
   const { storeTokens, setUser, setInitialized } = useAuthStore();
+  const { setAccount } = useAuthStore();
 
   return useMutation<
     IAuthSuccessResponse,
@@ -155,6 +156,7 @@ export const useLogin = () => {
     onSuccess: async (response) => {
       await storeTokens(response.access, response.refresh);
       setUser(response.user);
+      setAccount(response.account);
       setInitialized(true);
       navigate(AppPath.Home, { replace: true });
     },

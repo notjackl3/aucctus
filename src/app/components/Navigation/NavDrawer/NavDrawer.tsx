@@ -31,7 +31,6 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
     onExpandCollapse(true);
     setCollapsed(true);
   };
-
   return (
     <div
       className={cn(styles.container, {
@@ -81,7 +80,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
 
             <NavLink
               to={
-                account?.hasConcepts
+                account?.hasConcepts || account?.hasSeeds
                   ? AppPath.ConceptBank
                   : AppPath.IncubateConcept
               }

@@ -16,6 +16,7 @@ export interface IAccount {
   domain: string;
   goal: string;
   hasConcepts: boolean;
+  hasSeeds: boolean;
   owner: {
     uuid: string;
     firstName: string;
@@ -86,6 +87,7 @@ export interface ITokenResponse {
 
 export interface IAuthSuccessResponse extends ITokenResponse {
   user: IUser;
+  account: IAccount;
 }
 
 export interface IPasswordResetForm {
