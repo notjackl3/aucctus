@@ -6,6 +6,8 @@ export interface BaseConceptIncubationQuestion {
   dependsOn?: string;
   dependsOnValue?: string[];
   order: number; // x for main questions, x.2, x.4, etc for sub questions
+  isClarifying: boolean;
+  isIgnition: boolean;
 }
 
 export interface IConceptIncubationTextQuestion

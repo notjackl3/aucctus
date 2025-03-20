@@ -1,12 +1,13 @@
-import { create } from 'zustand';
-import { createJSONStorage, persist } from 'zustand/middleware';
+import { IncubationAnswer } from '@libs/api/concepts';
+import {
+  ConceptIncubationClarifyingQuestion,
+  ConceptIncubationQuestion,
+} from '@libs/api/types';
+import telemetry from '@libs/telemetry';
 import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
 import { useCallback, useMemo } from 'react';
-import {
-  ConceptIncubationQuestion,
-  ConceptIncubationClarifyingQuestion,
-} from '@libs/api/types';
-import { IncubationAnswer } from '@libs/api/concepts';
+import { create } from 'zustand';
+import { createJSONStorage, persist } from 'zustand/middleware';
 
 export type AnswerItem = {
   answer: string;
@@ -19,7 +20,7 @@ interface IAISuggestion {
 }
 
 type IncubationAISuggestions = {
-  [key: string]: IAISuggestion[];
+  [key: number]: IAISuggestion[];
 };
 
 interface ConceptIncubationStoreState {
@@ -44,7 +45,7 @@ interface ConceptIncubationStoreState {
   setSubmittedAnswers: (answers: IncubationAnswer[]) => void;
   resetQuestionnaire: () => void;
 
-  setSuggestions: (identifier: string, suggestions: IAISuggestion[]) => void;
+  setSuggestions: (id: number, suggestions: IAISuggestion[]) => void;
   setActiveClarifyingQuestion: (
     question: ConceptIncubationClarifyingQuestion | undefined,
   ) => void;
@@ -105,11 +106,12 @@ const conceptIncubationStore = create<ConceptIncubationStoreState>()(
         });
       },
 
-      setSuggestions: (identifier: string, aiSuggestions: IAISuggestion[]) => {
+      setSuggestions: (id: number, aiSuggestions: IAISuggestion[]) => {
+        telemetry.log('setSuggestions', id, aiSuggestions);
         set((state) => ({
           suggestions: {
             ...state.suggestions,
-            [identifier]: aiSuggestions,
+            [id]: aiSuggestions,
           },
         }));
       },

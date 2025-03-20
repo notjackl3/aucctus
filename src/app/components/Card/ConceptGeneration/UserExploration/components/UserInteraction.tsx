@@ -1,11 +1,3 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
-import { toast } from 'react-toastify';
 import {
   useDeleteConceptSeedDraft,
   useGenerateConceptIncubationClarifyingQuestions,
@@ -14,22 +6,30 @@ import {
   useUpdateConceptSeedDraftAnswer,
   useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers,
 } from '@hooks/query/concepts.hook';
-import { useQueryClient } from 'react-query';
-import QuestionDisplay from './question/QuestionDisplay';
-import { v4 as uuidv4 } from 'uuid';
-import { IncubationAnswerPayload } from '@libs/api/concepts';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
-import LoadingMask from './util/LoadingMask';
-import QuestionnaireHeader from './question/QuestionnaireHeader';
-import AnswerInput from './answer/AnswerInput';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import { IncubationAnswer } from '@libs/api/concepts';
-import { useTransition, animated } from 'react-spring';
-import ConfirmAnswerUpdate from './answer/ConfirmAnswerUpdate';
+import { IncubationAnswer, IncubationAnswerPayload } from '@libs/api/concepts';
 import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
-import { useDispatchIncubationAnimation } from '../hooks/incubation-animation-event.hook';
+import { AiSuggestionEvent, IncubationAnswerEvent } from '@libs/events';
 import { AppPath } from '@routes/routes';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { animated, useTransition } from 'react-spring';
+import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
+import { useDispatchIncubationAnimation } from '../hooks/incubation-animation-event.hook';
+import AnswerInput from './answer/AnswerInput';
+import ConfirmAnswerUpdate from './answer/ConfirmAnswerUpdate';
+import QuestionDisplay from './question/QuestionDisplay';
+import QuestionnaireHeader from './question/QuestionnaireHeader';
+import LoadingMask from './util/LoadingMask';
 
 type advanceActionType = 'to-next-question' | 'to-clarifying-questions' | false;
 
@@ -131,17 +131,17 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
   }, [seedDraftAnswers, activeQuestion, activeClarifyingQuestion]);
 
   useEffect(() => {
-    const handleAnswerUpdate = (event: CustomEvent) =>
+    const handleAnswerUpdate = (event: IncubationAnswerEvent) =>
       setAnswerValue(event.detail.answer);
 
     window.addEventListener(
-      'aucctus-incubation-answer-update',
+      IncubationAnswerEvent.eventName,
       handleAnswerUpdate as EventListener,
     );
 
     return () =>
       window.removeEventListener(
-        'aucctus-incubation-answer-update',
+        IncubationAnswerEvent.eventName,
         handleAnswerUpdate as EventListener,
       );
   }, []);
@@ -154,17 +154,14 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     const inputAnswer =
       answerValue.trim().length > 0 ? [answerValue.trim()] : [];
 
-    const event = new CustomEvent('aucctus-generate-ai-suggestions', {
-      detail: {
-        identifier: activeQuestion.identifier,
-        answer: [
-          ...inputAnswer,
-          ...currentTextAnswerList.map((answer) => answer.answer.trim()),
-          ...currentMultiSelectAnswerList.map((answer) => answer.answer.trim()),
-        ],
-      },
+    AiSuggestionEvent.dispatch({
+      questionId: activeQuestion.id,
+      answer: [
+        ...inputAnswer,
+        ...currentTextAnswerList.map((answer) => answer.answer.trim()),
+        ...currentMultiSelectAnswerList.map((answer) => answer.answer.trim()),
+      ],
     });
-    window.dispatchEvent(event);
   }, [
     activeQuestion,
     answerValue,
@@ -480,7 +477,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
 
     if (activeAnswer) {
       if (
-        !!activeAnswer.question.identifier &&
+        !!activeAnswer.question.id &&
         activeAnswer.question.order <
           submittedAnswers[submittedAnswers.length - 1].question.order
       ) {

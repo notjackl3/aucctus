@@ -1,7 +1,7 @@
 interface IAISuggestionsContext {
-  seed_uuid: string;
-  identifier: string; // The question Identifier(And Strict Typing to this)
-  user_uuid: string;
+  seedUuid: string;
+  questionId: int; // The question Identifier(And Strict Typing to this)
+  userUuid: string;
 }
 
 interface IAISuggestionList {
@@ -14,9 +14,9 @@ interface IAISuggestion {
 }
 
 interface IConceptGenerationContext {
-  seed_uuid: string;
-  account_uuid: string;
-  user_uuid: string;
+  seedUuid: string;
+  accountUuid: string;
+  userUuid: string;
 }
 
 interface IGeneratedConceptList {

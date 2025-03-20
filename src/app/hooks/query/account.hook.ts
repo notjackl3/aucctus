@@ -43,11 +43,16 @@ export const useUserDetails = (enabled: boolean) => {
 };
 
 export const useUser = () => {
+  const { setUser, setAccount } = useAuthStore();
   const { mutate: logout } = useLogout();
 
   const query = useQuery({
     queryKey: [AucctusQueryKeys.userDetails],
     queryFn: async () => await api.account.getUser(),
+    onSuccess: (data) => {
+      setUser(data.user);
+      setAccount(data.account);
+    },
     onError: (error: unknown) => {
       // Check if the error is an AxiosError with an HTTP response
       if (isAxiosError(error)) {

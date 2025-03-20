@@ -1,10 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
+import {
+  IAISuggestion,
+  IConceptIncubationMultiSelectQuestion,
+} from '@libs/api/types';
+import { AiSuggestionEvent } from '@libs/events';
+import { IncubationAnswerEvent } from '@libs/events/IncumbentAnswerEvent';
+import telemetry from '@libs/telemetry';
 import { cn } from '@libs/utils/react';
-import { IAISuggestion } from '@libs/api/types/conceptIncubation';
-import { IConceptIncubationMultiSelectQuestion } from '@libs/api/types';
+import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 // Component props interface
@@ -27,17 +32,21 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     setCurrentMultiSelectAnswerList,
   } = useConceptIncubationStore();
 
-  const activeQuestionIdentifierRef = useRef<string | null>(null);
+  const activeQuestionIdRef = useRef<number | null>(null);
 
   // --- Derived state ---
   const isMultiSelectQuestion = useMemo(
     () =>
-      ['multiSelect', 'radioButton'].includes(activeQuestion?.fieldType ?? ''),
+      !!activeQuestion &&
+      ['multiSelect', 'radioButton'].includes(activeQuestion.fieldType),
     [activeQuestion],
   );
 
   const activeSuggestions = useMemo<IAISuggestion[]>(() => {
-    return suggestions[activeQuestion?.identifier ?? ''] ?? [];
+    if (activeQuestion && activeQuestion.id in suggestions) {
+      return suggestions[activeQuestion.id];
+    }
+    return [];
   }, [suggestions, activeQuestion]);
 
   // --- Helper functions ---
@@ -67,22 +76,21 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   );
 
   const dispatchAnswerUpdateEvent = useCallback((suggestion: IAISuggestion) => {
-    const event = new CustomEvent('aucctus-incubation-answer-update', {
-      detail: { answer: suggestion.description },
+    IncubationAnswerEvent.dispatch({
+      answer: suggestion.description,
     });
-    window.dispatchEvent(event);
   }, []);
 
   // --- API interactions ---
   const sendAiSuggestionsRequest = useCallback(
-    (identifier: string, answer: string[]) => {
-      if (activeQuestion?.identifier === identifier && draftSeedUuid) {
-        setSuggestions(activeQuestion.identifier, []);
+    (questionId: number, answer: string[]) => {
+      if (activeQuestion && activeQuestion.id === questionId && draftSeedUuid) {
+        setSuggestions(activeQuestion.id, []);
 
         api.aucctusSocket.send({
           type: 'incubation.ai.suggestions.request',
-          seed_uuid: draftSeedUuid,
-          identifier: activeQuestion.identifier,
+          seedUuid: draftSeedUuid,
+          questionId: activeQuestion.id,
           answer: answer.length ? answer : undefined,
         });
       }
@@ -104,42 +112,44 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   // --- Socket event handling ---
   useSocketEvent('stream.structured.ai.suggestions', (data) => {
     if (['done', 'delta'].includes(data.stage)) {
-      setSuggestions(data.context.identifier, data.content.suggestions ?? []);
+      telemetry.log(
+        'aiSuggestions',
+        data.context,
+        data.content.suggestions ?? [],
+      );
+      setSuggestions(data.context.questionId, data.content.suggestions ?? []);
     }
   });
 
   // --- Side effects ---
   // Listen for custom event to generate AI suggestions
   useEffect(() => {
-    const handleGenerateAiSuggestions = (event: CustomEvent) =>
-      sendAiSuggestionsRequest(event.detail.identifier, event.detail.answer);
+    const handleGenerateAiSuggestions = (event: AiSuggestionEvent) =>
+      sendAiSuggestionsRequest(event.detail.questionId, event.detail.answer);
 
     window.addEventListener(
-      'aucctus-generate-ai-suggestions',
-      handleGenerateAiSuggestions as EventListener,
+      AiSuggestionEvent.eventName,
+      handleGenerateAiSuggestions,
     );
 
     return () =>
       window.removeEventListener(
-        'aucctus-generate-ai-suggestions',
-        handleGenerateAiSuggestions as EventListener,
+        AiSuggestionEvent.eventName,
+        handleGenerateAiSuggestions,
       );
   }, [activeQuestion, draftSeedUuid, setSuggestions, sendAiSuggestionsRequest]);
 
   // Generate suggestions when active question changes
   useEffect(() => {
-    if (
-      activeQuestion &&
-      activeQuestionIdentifierRef.current !== activeQuestion.identifier
-    ) {
-      activeQuestionIdentifierRef.current = activeQuestion.identifier;
-      sendAiSuggestionsRequest(activeQuestion.identifier, [
+    if (activeQuestion && activeQuestionIdRef.current !== activeQuestion.id) {
+      activeQuestionIdRef.current = activeQuestion.id;
+      sendAiSuggestionsRequest(activeQuestion.id, [
         ...currentMultiSelectAnswerList.map((answer) => answer.answer.trim()),
         ...currentTextAnswerList.map((answer) => answer.answer.trim()),
       ]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeQuestion, activeQuestionIdentifierRef]);
+  }, [activeQuestion, activeQuestionIdRef]);
 
   // --- Render component ---
   return (

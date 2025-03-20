@@ -2,8 +2,8 @@ interface BaseSocketEvent {}
 
 interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
   type: 'incubation.ai.suggestions.request';
-  seed_uuid: string;
-  identifier: string; // The question Identifier(And Strict Typing to this)
+  seedUuid: string;
+  questionId: int; // The question Identifier(And Strict Typing to this)
   answer?: string[];
 }
 
@@ -125,8 +125,8 @@ interface ConceptGenerationStreamEvent
 
 interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
   type: 'incubation.ai.suggestions.request';
-  seed_uuid: string;
-  identifier: string; // The question Identifier(And Strict Typing to this)
+  seedUuid: string;
+  questionId: int;
   answer?: string[];
 }
 

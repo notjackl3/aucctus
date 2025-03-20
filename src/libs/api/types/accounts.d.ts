@@ -16,6 +16,12 @@ export interface IAccount {
   domain: string;
   goal: string;
   hasConcepts: boolean;
+  owner: {
+    uuid: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
   createdAt: string;
 }
 
@@ -25,12 +31,18 @@ export interface IRegisterAccount {
   goal: string;
 }
 
+export interface IAccountDetails {
+  uuid: string;
+  name: string;
+  domain: string;
+}
+
 export interface IUser {
   uuid: string;
   firstName: string;
   lastName: string;
   email: string;
-  account?: string | null;
+  account?: IAccountDetails | null;
   jobTitle?: string;
   profileImage?: string;
   role: 'Admin' | 'Employee';
