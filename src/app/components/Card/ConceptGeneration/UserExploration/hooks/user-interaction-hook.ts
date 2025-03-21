@@ -1,0 +1,567 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
+import { useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import {
+  useDeleteConceptSeedDraft,
+  useGenerateConceptIncubationClarifyingQuestions,
+  useGetConceptSeedDraftAnswers,
+  useSaveConceptSeedDraftAnswer,
+  useUpdateConceptSeedDraftAnswer,
+  useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers,
+} from '@hooks/query/concepts.hook';
+import { IncubationAnswerPayload, IncubationAnswer } from '@libs/api/concepts';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
+import {
+  AnswerItem,
+  useConceptIncubationStore,
+} from '@stores/concept-incubation.store';
+import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
+import { useDispatchIncubationAnimation } from './incubation-animation-event.hook';
+import { AppPath } from '@routes/routes';
+
+type AdvanceActionType = 'to-next-question' | 'to-clarifying-questions' | false;
+
+export const useUserInteraction = () => {
+  // ===== CONTEXT AND GLOBAL STATE =====
+  const {
+    activeQuestionnaire,
+    activeQuestion,
+    currentQuestionOrder,
+    draftSeedUuid,
+    currentTextAnswerList,
+    currentMultiSelectAnswerList,
+    submittedAnswers,
+    activeClarifyingQuestion,
+    setCurrentQuestionOrder,
+    getNextQuestion,
+    getPreviousQuestion,
+    setCurrentTextAnswerList,
+    setCurrentMultiSelectAnswerList,
+    resetQuestionnaire,
+    setSubmittedAnswers,
+    setClarifyingQuestions,
+    setActiveClarifyingQuestion,
+  } = useConceptIncubationStore();
+
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
+
+  // ===== LOCAL STATE =====
+  const [answerValue, setAnswerValue] = useState<string>('');
+  const advanceAction = useRef<AdvanceActionType>(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+
+  // ===== API MUTATIONS AND QUERIES =====
+  const { mutate: deleteDraft, isLoading: isDeleteDraftLoading } =
+    useDeleteConceptSeedDraft();
+  const { mutate: saveAnswer, isLoading: isSaveAnswerLoading } =
+    useSaveConceptSeedDraftAnswer();
+  const { mutateAsync: updateAnswer, isLoading: isUpdateAnswerLoading } =
+    useUpdateConceptSeedDraftAnswer();
+  const {
+    mutateAsync: updateAnswerAndDeleteHigherOrder,
+    isLoading: isUpdateAnswerAndDeleteHigherOrderLoading,
+  } = useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers();
+  const { data: seedDraftAnswers, isLoading: isSeedDraftAnswersLoading } =
+    useGetConceptSeedDraftAnswers(draftSeedUuid || '');
+  const {
+    mutate: generateClarifyingQuestions,
+    isLoading: isGenerateClarifyingQuestionsLoading,
+  } = useGenerateConceptIncubationClarifyingQuestions();
+
+  const { dispatchAnimationEvent } = useDispatchIncubationAnimation();
+
+  const isLoading = useMemo(
+    () =>
+      isSeedDraftAnswersLoading ||
+      isDeleteDraftLoading ||
+      isSaveAnswerLoading ||
+      isUpdateAnswerLoading ||
+      isUpdateAnswerAndDeleteHigherOrderLoading ||
+      isGenerateClarifyingQuestionsLoading,
+    [
+      isSeedDraftAnswersLoading,
+      isDeleteDraftLoading,
+      isSaveAnswerLoading,
+      isUpdateAnswerLoading,
+      isUpdateAnswerAndDeleteHigherOrderLoading,
+      isGenerateClarifyingQuestionsLoading,
+    ],
+  );
+
+  const activeAnswer = useMemo(() => {
+    return seedDraftAnswers?.find(
+      (answer) =>
+        answer.question.id === activeQuestion?.id ||
+        answer.question.id === activeClarifyingQuestion?.question.id,
+    );
+  }, [seedDraftAnswers, activeQuestion, activeClarifyingQuestion]);
+
+  const goToNextQuestion = useCallback(
+    (answers: IncubationAnswer[], fetchClarifyingQuestions: boolean = true) => {
+      const nextQuestion = getNextQuestion(answers);
+      const nextOrder = nextQuestion?.order ?? Infinity;
+
+      if (nextOrder === Infinity && fetchClarifyingQuestions) {
+        generateClarifyingQuestions(
+          {
+            seedUuid: draftSeedUuid || '',
+          },
+          {
+            onSuccess: (data: ConceptIncubationClarifyingQuestion[]) => {
+              setClarifyingQuestions(data);
+              dispatchAnimationEvent('question-transition', () => {
+                setCurrentQuestionOrder(nextOrder);
+                setAnswerValue('');
+              });
+            },
+          },
+        );
+      } else {
+        dispatchAnimationEvent('question-transition', () => {
+          setCurrentQuestionOrder(nextOrder);
+          setAnswerValue('');
+        });
+      }
+    },
+    [
+      dispatchAnimationEvent,
+      getNextQuestion,
+      setCurrentQuestionOrder,
+      setClarifyingQuestions,
+      draftSeedUuid,
+      generateClarifyingQuestions,
+    ],
+  );
+
+  useEffect(() => {
+    const answers = (seedDraftAnswers ?? []).sort(
+      (a, b) => a.question.order - b.question.order,
+    );
+
+    setSubmittedAnswers(answers);
+
+    if (advanceAction.current === 'to-next-question') {
+      goToNextQuestion(answers);
+      advanceAction.current = false;
+    } else if (advanceAction.current === 'to-clarifying-questions') {
+      dispatchAnimationEvent('fade', () => {
+        setActiveClarifyingQuestion(undefined);
+        setAnswerValue('');
+      });
+      advanceAction.current = false;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [seedDraftAnswers]);
+
+  useEffect(() => {
+    const handleAnswerUpdate = (event: CustomEvent) =>
+      setAnswerValue(event.detail.answer);
+
+    window.addEventListener(
+      'aucctus-incubation-answer-update',
+      handleAnswerUpdate as EventListener,
+    );
+
+    return () =>
+      window.removeEventListener(
+        'aucctus-incubation-answer-update',
+        handleAnswerUpdate as EventListener,
+      );
+  }, []);
+
+  useEffect(() => {
+    if (!activeAnswer) {
+      setCurrentMultiSelectAnswerList([]);
+      setCurrentTextAnswerList([]);
+      return;
+    }
+
+    if (
+      activeQuestion?.fieldType === 'multiSelect' ||
+      activeQuestion?.fieldType === 'radioButton'
+    ) {
+      setCurrentMultiSelectAnswerList(
+        activeAnswer.answer.map((answer) => ({
+          answer: answer,
+          uuid: uuidv4(),
+        })),
+      );
+      if (activeAnswer.details) {
+        setCurrentTextAnswerList([
+          {
+            answer: activeAnswer.details,
+            uuid: uuidv4(),
+          },
+        ]);
+      } else {
+        setCurrentTextAnswerList([]);
+      }
+    } else {
+      setCurrentTextAnswerList(
+        activeAnswer.answer.map((answer) => ({
+          answer: answer,
+          uuid: uuidv4(),
+        })),
+      );
+    }
+  }, [
+    activeAnswer,
+    activeQuestion,
+    setCurrentTextAnswerList,
+    setCurrentMultiSelectAnswerList,
+  ]);
+
+  const dispatchAiSuggestionsEvent = useCallback(() => {
+    const question = activeClarifyingQuestion
+      ? activeClarifyingQuestion.question
+      : activeQuestion;
+
+    if (!question) return;
+
+    const inputAnswer =
+      answerValue.trim().length > 0 ? [answerValue.trim()] : [];
+
+    const event = new CustomEvent('aucctus-generate-ai-suggestions', {
+      detail: {
+        questionId: question.id,
+        answer: [
+          ...inputAnswer,
+          ...currentTextAnswerList.map((answer: AnswerItem) =>
+            answer.answer.trim(),
+          ),
+          ...currentMultiSelectAnswerList.map((answer: AnswerItem) =>
+            answer.answer.trim(),
+          ),
+        ],
+      },
+    });
+    window.dispatchEvent(event);
+  }, [
+    activeQuestion,
+    answerValue,
+    currentTextAnswerList,
+    currentMultiSelectAnswerList,
+    activeClarifyingQuestion,
+  ]);
+
+  const isQuestionAnswered = useMemo(() => {
+    if (
+      activeQuestion?.fieldType === 'multiSelect' ||
+      activeQuestion?.fieldType === 'radioButton'
+    ) {
+      return currentMultiSelectAnswerList.length > 0;
+    } else {
+      return currentTextAnswerList.length > 0;
+    }
+  }, [activeQuestion, currentTextAnswerList, currentMultiSelectAnswerList]);
+
+  const allowAddAnswer = useMemo(() => {
+    const hasAnswer = currentTextAnswerList.some(
+      (answer) => answer.answer.trim() === answerValue.trim(),
+    );
+
+    return !hasAnswer;
+  }, [currentTextAnswerList, answerValue]);
+
+  const formattedAnswerPayload = useMemo(() => {
+    const isMultiSelectType =
+      activeQuestion?.fieldType === 'multiSelect' ||
+      activeQuestion?.fieldType === 'radioButton';
+
+    const question = activeClarifyingQuestion?.question ?? activeQuestion;
+
+    return {
+      questionId: question?.id,
+      fieldType: question?.fieldType,
+      answer: isMultiSelectType
+        ? currentMultiSelectAnswerList.map((answer) => answer.answer)
+        : currentTextAnswerList.map((answer) => answer.answer),
+      details: isMultiSelectType
+        ? currentTextAnswerList.map((answer) => answer.answer).join('\n')
+        : '',
+    } as IncubationAnswerPayload;
+  }, [
+    activeQuestion,
+    currentMultiSelectAnswerList,
+    currentTextAnswerList,
+    activeClarifyingQuestion,
+  ]);
+
+  const isDuplicateAnswer = useCallback(() => {
+    const answeredQuestion = submittedAnswers.find(
+      (answer) =>
+        answer.question.id === activeQuestion?.id ||
+        answer.question.id === activeClarifyingQuestion?.question.id,
+    );
+
+    if (!answeredQuestion) return false;
+
+    // Check if answers are the same
+    const isAnswerSame =
+      formattedAnswerPayload.answer.length === answeredQuestion.answer.length &&
+      formattedAnswerPayload.answer.every((answer) =>
+        answeredQuestion.answer.includes(answer),
+      );
+
+    // Check if details are the same
+    const isDetailsSame =
+      (formattedAnswerPayload.details ?? '') ===
+      (answeredQuestion.details ?? '');
+
+    return isAnswerSame && isDetailsSame;
+  }, [
+    submittedAnswers,
+    activeQuestion,
+    activeClarifyingQuestion,
+    formattedAnswerPayload,
+  ]);
+
+  const doUpdateAnswer = useCallback(() => {
+    if (!activeAnswer) return;
+
+    const updateMethod = activeClarifyingQuestion
+      ? updateAnswer
+      : updateAnswerAndDeleteHigherOrder;
+
+    updateMethod(
+      {
+        answerId: activeAnswer.id,
+        body: {
+          ...formattedAnswerPayload,
+          answerId: activeAnswer.id,
+        },
+      },
+      {
+        onSuccess: async () => {
+          advanceAction.current = activeClarifyingQuestion
+            ? 'to-clarifying-questions'
+            : 'to-next-question';
+          await queryClient.refetchQueries([
+            AucctusQueryKeys.conceptSeedDraftAnswers,
+            draftSeedUuid,
+          ]);
+        },
+        onError: () => {
+          toast.error('Failed to submit answer', {
+            toastId: 'submit-answer-error',
+            autoClose: 2000,
+            hideProgressBar: true,
+            pauseOnHover: false,
+          });
+        },
+      },
+    );
+  }, [
+    activeAnswer,
+    formattedAnswerPayload,
+    draftSeedUuid,
+    queryClient,
+    updateAnswerAndDeleteHigherOrder,
+    activeClarifyingQuestion,
+    updateAnswer,
+  ]);
+
+  const onInputChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setAnswerValue(e.target.value);
+    },
+    [],
+  );
+
+  const handleAddAnswer = useCallback(() => {
+    if (!allowAddAnswer) return;
+
+    setCurrentTextAnswerList([
+      ...currentTextAnswerList,
+      { answer: answerValue.trim(), uuid: uuidv4() },
+    ]);
+    setAnswerValue('');
+    dispatchAiSuggestionsEvent();
+  }, [
+    currentTextAnswerList,
+    answerValue,
+    setCurrentTextAnswerList,
+    allowAddAnswer,
+    dispatchAiSuggestionsEvent,
+  ]);
+
+  const handleGoBack = useCallback(() => {
+    if (currentQuestionOrder === undefined) return;
+
+    if (activeClarifyingQuestion) {
+      dispatchAnimationEvent('fade', () => {
+        setActiveClarifyingQuestion(undefined);
+        setCurrentMultiSelectAnswerList([]);
+        setCurrentTextAnswerList([]);
+        setAnswerValue('');
+      });
+      return;
+    }
+
+    const previousQuestion = getPreviousQuestion(submittedAnswers);
+
+    if (!previousQuestion) {
+      if ((seedDraftAnswers ?? []).length === 0) {
+        deleteDraft(draftSeedUuid || '', {
+          onSuccess: resetQuestionnaire,
+          onError: () => {
+            toast.error('Failed to delete draft', {
+              toastId: 'delete-draft-error',
+              autoClose: 2000,
+              hideProgressBar: true,
+              pauseOnHover: false,
+            });
+          },
+        });
+      } else {
+        resetQuestionnaire();
+        navigate(AppPath.IncubateConcept);
+      }
+    } else {
+      dispatchAnimationEvent('fade', () => {
+        setCurrentQuestionOrder(previousQuestion.order);
+        setAnswerValue('');
+      });
+    }
+  }, [
+    currentQuestionOrder,
+    setCurrentQuestionOrder,
+    draftSeedUuid,
+    deleteDraft,
+    resetQuestionnaire,
+    seedDraftAnswers,
+    dispatchAnimationEvent,
+    activeClarifyingQuestion,
+    submittedAnswers,
+    getPreviousQuestion,
+    setActiveClarifyingQuestion,
+    setCurrentMultiSelectAnswerList,
+    setCurrentTextAnswerList,
+    navigate,
+  ]);
+
+  const handleSubmitAnswer = useCallback(() => {
+    if (currentQuestionOrder === undefined) return;
+
+    if (isDuplicateAnswer()) {
+      if (activeClarifyingQuestion) {
+        dispatchAnimationEvent('fade', () => {
+          setAnswerValue('');
+          setActiveClarifyingQuestion(undefined);
+        });
+      } else {
+        goToNextQuestion(submittedAnswers, false);
+      }
+      return;
+    }
+
+    if (!isQuestionAnswered && activeQuestion?.required) {
+      toast.error('Please provide a valid answer question', {
+        toastId: 'answer-required',
+        autoClose: 2000,
+        hideProgressBar: true,
+        pauseOnHover: false,
+      });
+      return;
+    }
+
+    if (draftSeedUuid.length === 0) {
+      toast.error('Failed to submit answer', {
+        toastId: 'submit-answer-error',
+        autoClose: 2000,
+        hideProgressBar: true,
+        pauseOnHover: false,
+      });
+      return;
+    }
+
+    if (activeAnswer) {
+      if (
+        !!activeAnswer.question.identifier &&
+        activeAnswer.question.order <
+          submittedAnswers[submittedAnswers.length - 1].question.order
+      ) {
+        setShowConfirmation(true);
+      } else {
+        doUpdateAnswer();
+      }
+    } else {
+      saveAnswer(
+        {
+          uuid: draftSeedUuid,
+          body: formattedAnswerPayload,
+        },
+        {
+          onSuccess: async () => {
+            advanceAction.current = activeClarifyingQuestion
+              ? 'to-clarifying-questions'
+              : 'to-next-question';
+            await queryClient.refetchQueries([
+              AucctusQueryKeys.conceptSeedDraftAnswers,
+              draftSeedUuid,
+            ]);
+          },
+          onError: () => {
+            toast.error('Failed to submit answer', {
+              toastId: 'submit-answer-error',
+              autoClose: 2000,
+              hideProgressBar: true,
+              pauseOnHover: false,
+            });
+          },
+        },
+      );
+    }
+  }, [
+    activeAnswer,
+    activeClarifyingQuestion,
+    activeQuestion,
+    currentQuestionOrder,
+    dispatchAnimationEvent,
+    doUpdateAnswer,
+    draftSeedUuid,
+    formattedAnswerPayload,
+    goToNextQuestion,
+    isDuplicateAnswer,
+    isQuestionAnswered,
+    queryClient,
+    saveAnswer,
+    setActiveClarifyingQuestion,
+    submittedAnswers,
+  ]);
+
+  const loadingMessage = useMemo(
+    () =>
+      isGenerateClarifyingQuestionsLoading
+        ? 'Generating clarifying questions...'
+        : undefined,
+    [isGenerateClarifyingQuestionsLoading],
+  );
+
+  return {
+    // State
+    answerValue,
+    showConfirmation,
+    isLoading,
+    loadingMessage,
+    activeQuestionnaire,
+    activeQuestion,
+    currentQuestionOrder,
+    isQuestionAnswered,
+    allowAddAnswer,
+    activeAnswer,
+
+    // Actions
+    setAnswerValue,
+    setShowConfirmation,
+    onInputChange,
+    handleAddAnswer,
+    handleGoBack,
+    handleSubmitAnswer,
+    doUpdateAnswer,
+    dispatchAiSuggestionsEvent,
+  };
+};

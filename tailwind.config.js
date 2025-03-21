@@ -168,6 +168,7 @@ module.exports = {
         'incubation-answer-expand': 'incubationAnswerExpand 0.3s ease both',
         'incubation-answer-collapse': 'incubationAnswerCollapse 0.3s ease both',
         'fade-in': 'fadeIn 0.2s ease-in forwards',
+        'fade-oscillation': 'fadeIn 3s ease-in-out infinite alternate',
         'slide-in-center': 'slideInCenter 0.3s ease both',
         'slide-out-center': 'slideOutCenter 0.3s ease both',
         'slide-in-top': 'slideInTop 0.3s ease both',

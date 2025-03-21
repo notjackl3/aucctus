@@ -9,9 +9,6 @@ import { CompletionIcon } from './CompletionIcon';
 import { useQuestionTransition } from '../../hooks/question-transition.hook';
 import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
 import CompletedQuestions from './CompletedQuestions';
-import MultiSelectAnswers from '../answer/MultiSelectAnswers';
-import TextAnswers from '../answer/TextAnswers';
-import CurrentQuestion from './CurrentQuestion';
 import { PointerEventMask } from '../util/PointerEventMask';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import ReadyToGenerate from '../ready-to-generate/ReadyToGenerate';
@@ -23,6 +20,8 @@ import {
   ConceptIncubationQuestion,
 } from '@libs/api/types/conceptSeedQuestionnaire';
 import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
+import { useObserveResizeQuestion } from '../../hooks/use-observe-resize-question';
+import Question from './Question';
 
 interface QuestionDisplayProps {}
 
@@ -45,6 +44,8 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     answerRowRef,
     multiSelectAnswersRef,
   } = useQuestionTransition(questionIconLineRef);
+
+  useObserveResizeQuestion(componentRef);
 
   const {
     currentQuestionOrder,
@@ -88,19 +89,14 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
   const renderQuestion = useCallback(
     (question: ConceptIncubationQuestion, icon?: string) => {
       return (
-        <span className='flex flex-col gap-4'>
-          <CurrentQuestion
-            questionIconRef={questionIconRef}
-            questionLabelRef={questionLabelRef}
-            question={question}
-            iconVariant={icon as IconVariant}
-          />
-
-          <div className='relative transition-all duration-300 ease-in-out'>
-            <MultiSelectAnswers answersRef={multiSelectAnswersRef} />
-            <TextAnswers answerRowRef={answerRowRef} />
-          </div>
-        </span>
+        <Question
+          question={question}
+          icon={icon}
+          questionIconRef={questionIconRef}
+          questionLabelRef={questionLabelRef}
+          multiSelectAnswersRef={multiSelectAnswersRef}
+          answerRowRef={answerRowRef}
+        />
       );
     },
     [questionIconRef, questionLabelRef, multiSelectAnswersRef, answerRowRef],
@@ -185,6 +181,9 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
       <ReadyToGenerate
         compact={isClarifyingExpanded}
         onMouseEnter={() => setIsClarifyingExpanded(false)}
+        onGenerate={() =>
+          window.dispatchEvent(new CustomEvent('aucctus-generate-concept'))
+        }
       />
     );
   }, [isClarifyingExpanded]);
@@ -215,32 +214,6 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     setIsClarifyingExpanded,
     handleSelectClarifyingQuestion,
   ]);
-
-  useEffect(() => {
-    const component = componentRef.current;
-
-    const resizeObserver = new ResizeObserver((entries) => {
-      for (let entry of entries) {
-        if (entry.target === component) {
-          const viewportHeight = window.innerHeight;
-          const componentRect = component.getBoundingClientRect();
-          const maxHeight = viewportHeight - componentRect.top;
-          const padding = 20;
-          component.style.maxHeight = `${maxHeight - padding}px`;
-        }
-      }
-    });
-
-    if (component) {
-      resizeObserver.observe(component);
-    }
-
-    return () => {
-      if (component) {
-        resizeObserver.unobserve(component);
-      }
-    };
-  }, [componentRef]);
 
   return (
     <>

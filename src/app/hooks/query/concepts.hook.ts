@@ -17,7 +17,6 @@ import {
   IGeneratedConcept,
   IMarketScanElementCreate,
   IMarketScanV1,
-  // IMarketSizeMetric,
   ITrendsAndDriversV1,
 } from '@libs/api/types';
 import utils from '@libs/utils';
@@ -25,7 +24,6 @@ import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from 'react-toastify';
 import { useGenericConceptMutate } from './helper.hooks';
-
 import { AucctusQueryKeys } from './query-keys';
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
@@ -205,8 +203,11 @@ export const useDeleteConceptSeedDraftAnswer = () => {
 
 export const useGenerateConceptIncubationClarifyingQuestions = () => {
   return useMutation({
-    mutationFn: async (uuid: string) =>
-      await api.conceptIncubate.generateClarifyingQuestions(uuid),
+    mutationFn: async (params: { seedUuid: string; conceptUuid?: string }) =>
+      await api.conceptIncubate.generateClarifyingQuestions(
+        params.seedUuid,
+        params.conceptUuid,
+      ),
   });
 };
 

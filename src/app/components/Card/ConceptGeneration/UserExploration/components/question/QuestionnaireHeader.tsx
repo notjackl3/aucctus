@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useMemo } from 'react';
 import { Badge, Icon } from '@components';
 import { useTransition, animated } from 'react-spring';
 import IncubationIcon from '../util/IncubationIcon';
@@ -27,21 +27,31 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
   isQuestionAnswered,
   isRequired,
 }) => {
-  const renderSpacer = () => <div className='flex-1' />;
-
   const {
     currentStep,
     totalSteps,
     currentQuestionOrder,
     activeClarifyingQuestion,
+    activeGeneratedConcept,
+    activeQuestion,
   } = useConceptIncubationStore();
 
-  const getProgressText = useCallback(() => {
+  const progressText = useMemo(() => {
     if (currentStep === Infinity) {
       return 'Complete';
     }
     return `${currentStep} / ${totalSteps} steps`;
   }, [currentStep, totalSteps]);
+
+  const backButtonTransition = useTransition(
+    !activeGeneratedConcept || activeClarifyingQuestion || activeQuestion,
+    {
+      from: { opacity: 0, maxWidth: '0px' },
+      enter: { opacity: 1, maxWidth: '200px' },
+      leave: { opacity: 0, maxWidth: '0px' },
+      config: { tension: 100, friction: 12, mass: 0.5 },
+    },
+  );
 
   const buttonTransition = useTransition(
     currentQuestionOrder !== Infinity || activeClarifyingQuestion,
@@ -52,6 +62,12 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
       config: { tension: 100, friction: 12, mass: 0.5 },
     },
   );
+
+  const buttonText = useMemo(() => {
+    return isQuestionAnswered || isRequired || currentQuestionOrder === Infinity
+      ? 'Continue'
+      : 'Skip';
+  }, [isQuestionAnswered, isRequired, currentQuestionOrder]);
 
   return (
     <div className='relative z-[100] flex flex-row items-center'>
@@ -64,21 +80,28 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
         classNameBadge='aucctus-border-secondary border items-center justify-center ml-3'
         classNameLabel='aucctus-text-secondary'
       />
-      {renderSpacer()}
+      <div className='flex-1' />
       <ProgressCircle
         currentStep={currentStep}
         totalSteps={totalSteps}
         className='aucctus-border-brand border-4'
       />
       <span className='aucctus-text-sm-medium aucctus-text-secondary ml-3 w-20'>
-        {getProgressText()}
+        {progressText}
       </span>
-      <button
-        className='btn btn-light mx-3 flex items-center gap-2'
-        onClick={onGoBack}
-      >
-        <Icon variant='arrowleft' width={20} height={20} />
-      </button>
+      {backButtonTransition(
+        (style, show) =>
+          show && (
+            <animated.span className='overflow-hidden' style={style}>
+              <button
+                className='btn btn-light mx-3 flex items-center gap-2'
+                onClick={onGoBack}
+              >
+                <Icon variant='arrowleft' width={20} height={20} />
+              </button>
+            </animated.span>
+          ),
+      )}
       {buttonTransition(
         (style, show) =>
           show && (
@@ -91,11 +114,7 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
                   (isRequired || !!activeClarifyingQuestion)
                 }
               >
-                {isQuestionAnswered ||
-                isRequired ||
-                currentQuestionOrder === Infinity
-                  ? 'Continue'
-                  : 'Skip'}
+                {buttonText}
               </button>
             </animated.span>
           ),

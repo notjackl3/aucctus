@@ -98,7 +98,7 @@ const ContinueRefining: React.FC<ContinueRefiningProps> = ({
               </div>
               <span className='flex-1' />
               {hasClarifyingAnswer(question.question) && (
-                <CompletionIcon className='aucctus-bg-success-primary self-center justify-self-center stroke-success-800' />
+                <CompletionIcon className='aucctus-bg-secondary self-center justify-self-center stroke-success-800' />
               )}
             </div>
           ),

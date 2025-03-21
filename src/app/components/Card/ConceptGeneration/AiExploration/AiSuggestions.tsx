@@ -1,12 +1,18 @@
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
-import { IConceptIncubationMultiSelectQuestion } from '@libs/api/types';
+import {
+  IAISuggestion,
+  IConceptIncubationMultiSelectQuestion,
+} from '@libs/api/types';
 
 import { AiSuggestionEvent } from '@libs/events';
 import { IncubationAnswerEvent } from '@libs/events/IncumbentAnswerEvent';
 import telemetry from '@libs/telemetry';
 import { cn } from '@libs/utils/react';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import {
+  AnswerItem,
+  useConceptIncubationStore,
+} from '@stores/concept-incubation.store';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -28,6 +34,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     currentMultiSelectAnswerList,
     currentTextAnswerList,
     setCurrentMultiSelectAnswerList,
+    activeGeneratedConcept,
   } = useConceptIncubationStore();
 
   const activeQuestionIdRef = useRef<number | null>(null);
@@ -57,22 +64,48 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   const setMultiSelectFromSuggestion = useCallback(
     (suggestion: IAISuggestion) => {
       if (isMultiSelectQuestion && question) {
-        const answerValueSearchStrings = (
-          question as IConceptIncubationMultiSelectQuestion
-        ).options.map((option) => option.value);
-        const regex = new RegExp(
+        const options = (question as IConceptIncubationMultiSelectQuestion)
+          .options;
+        const answerValueSearchStrings = options.map((option) => option.value);
+        const answerLabelSearchStrings = options.map((option) => option.label);
+        const valueRegex = new RegExp(
           `\\b(${answerValueSearchStrings.join('|')})\\b`,
           'i',
         );
-        const match = suggestion.title.toLowerCase().match(regex);
+        const labelRegex = new RegExp(
+          `\\b(${answerLabelSearchStrings.join('|')})\\b`,
+          'i',
+        );
 
-        if (match) {
+        // Try to match by value first
+        const valueMatch = suggestion.title.toLowerCase().match(valueRegex);
+        if (valueMatch) {
           setCurrentMultiSelectAnswerList([
             {
-              answer: match[0],
+              answer: valueMatch[0],
               uuid: uuidv4(),
             },
           ]);
+          return;
+        }
+
+        // If no value match, try to match by label and map back to value
+        const labelMatch = suggestion.title.toLowerCase().match(labelRegex);
+        if (labelMatch) {
+          // Find the option with the matching label
+          const matchedLabel = labelMatch[0];
+          const matchedOption = options.find(
+            (option) => option.label.toLowerCase() === matchedLabel,
+          );
+
+          if (matchedOption) {
+            setCurrentMultiSelectAnswerList([
+              {
+                answer: matchedOption.value, // Use the value, not the label
+                uuid: uuidv4(),
+              },
+            ]);
+          }
         }
       }
     },
@@ -98,10 +131,11 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
           seedUuid: draftSeedUuid,
           questionId: question.id,
           answer: answer.length ? answer : undefined,
+          conceptUuid: activeGeneratedConcept?.uuid ?? undefined,
         });
       }
     },
-    [draftSeedUuid, question, setSuggestions],
+    [draftSeedUuid, question, setSuggestions, activeGeneratedConcept],
   );
 
   // --- Event handlers ---
@@ -152,8 +186,12 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     activeQuestionIdRef.current = question.id;
 
     sendAiSuggestionsRequest(question.id, [
-      ...currentMultiSelectAnswerList.map((answer) => answer.answer.trim()),
-      ...currentTextAnswerList.map((answer) => answer.answer.trim()),
+      ...currentMultiSelectAnswerList.map((answer: AnswerItem) =>
+        answer.answer.trim(),
+      ),
+      ...currentTextAnswerList.map((answer: AnswerItem) =>
+        answer.answer.trim(),
+      ),
     ]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps

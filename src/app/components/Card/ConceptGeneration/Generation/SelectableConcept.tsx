@@ -8,6 +8,7 @@ interface SelectableConceptProps {
   isSelected: boolean;
   concept: IGeneratedConcept;
   onClick: () => void;
+  onSelect: () => void;
 }
 
 const SelectableConcept: React.FC<SelectableConceptProps> = ({
@@ -15,6 +16,7 @@ const SelectableConcept: React.FC<SelectableConceptProps> = ({
   isSelected,
   concept,
   onClick,
+  onSelect,
 }) => {
   return (
     <div
@@ -31,7 +33,7 @@ const SelectableConcept: React.FC<SelectableConceptProps> = ({
           {concept.title}
         </span>
         <span className='flex flex-1'></span>
-        <Input.CheckBox checked={isSelected} onChange={() => {}} />
+        <Input.CheckBox checked={isSelected} onChange={onSelect} />
       </div>
       <div className='flex flex-row items-center justify-center gap-2'>
         <span className='aucctus-text-secondary aucctus-text-sm'>

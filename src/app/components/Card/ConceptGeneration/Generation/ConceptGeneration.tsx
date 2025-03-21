@@ -1,8 +1,7 @@
 import React, { useCallback, useRef } from 'react';
 import images from '@assets/img';
 import { useConceptGeneration } from '@hooks/query/concepts.hook';
-import { animated, easings, useSpring, useTransition } from '@react-spring/web';
-import { Icon } from '@components';
+import { animated, useTransition } from '@react-spring/web';
 import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { IGeneratedConcept } from '@libs/api/types';
@@ -11,6 +10,8 @@ import {
   getAnimationStyle,
 } from '../UserExploration/components/util/animation-keyframes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
+import LoadingIcon from './LoadingIcon';
+
 const getFadeInStyle = (duration: number, delay: number = 0) =>
   getAnimationStyle('fadeIn', duration, delay);
 
@@ -54,28 +55,6 @@ const ConceptGeneration = React.forwardRef<
         setConcepts(eventConcepts.slice(0, -1));
       }
     }
-  });
-
-  // Animation configurations
-  const floatingAnimation = useSpring({
-    from: { transform: 'translateY(3px)' },
-    to: { transform: 'translateY(-3px)' },
-    config: {
-      duration: 1500,
-      easing: easings.easeInOutSine,
-    },
-    loop: { reverse: true },
-  });
-
-  const echoAnimation = useSpring({
-    from: { transform: 'scale(1)', opacity: 0.3 },
-    to: { transform: 'scale(2)', opacity: 0 },
-    config: {
-      duration: 1000,
-      easing: easings.easeInOutSine,
-    },
-    loop: true,
-    delay: 1000,
   });
 
   const conceptAnimated = useCallback((concept: IGeneratedConcept) => {
@@ -150,33 +129,6 @@ const ConceptGeneration = React.forwardRef<
   }, [generateConcept]);
 
   // UI Component renderers
-  const renderLoadingIcon = () => (
-    <>
-      <animated.div
-        className='aucctus-bg-primary-solid absolute rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
-        style={echoAnimation}
-      >
-        <Icon
-          variant='ai-conclusion'
-          className='stroke-primary-100 opacity-30'
-          width={24}
-          height={24}
-        />
-      </animated.div>
-      <animated.div
-        className='aucctus-bg-primary-solid rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
-        style={floatingAnimation}
-      >
-        <Icon
-          variant='ai-conclusion'
-          className='stroke-primary-100'
-          width={24}
-          height={24}
-        />
-      </animated.div>
-    </>
-  );
-
   const renderLoadingText = () => (
     <div className='my-4 flex flex-col items-center justify-center gap-2'>
       <div
@@ -220,7 +172,7 @@ const ConceptGeneration = React.forwardRef<
         >
           <span className='flex max-h-[25%] flex-1' />
           <div className='relative flex items-center justify-center'>
-            {renderLoadingIcon()}
+            <LoadingIcon />
           </div>
           {renderLoadingText()}
           <span

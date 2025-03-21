@@ -32,9 +32,10 @@ export class IncubateConceptApi extends ApiService {
     this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
-  generateClarifyingQuestions(uuid: string) {
+  generateClarifyingQuestions(uuid: string, conceptUuid?: string) {
     return this.post<ConceptIncubationClarifyingQuestion[]>(
       endpoints.conceptIncubationSeedUuidClarifyingQuestions(uuid),
+      { conceptUuid: conceptUuid },
     );
   }
 

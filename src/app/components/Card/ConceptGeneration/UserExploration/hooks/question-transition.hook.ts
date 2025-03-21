@@ -126,6 +126,7 @@ export const useQuestionTransition = (
         setShowMask(true);
         const handleTransitionEnd = () => {
           parentComponent.classList.remove('opacity-0');
+          questionIconLine.classList.remove('opacity-0');
           setTimeout(() => {
             questionIconLine.classList.remove(
               'transition-all',
@@ -146,6 +147,7 @@ export const useQuestionTransition = (
           once: true,
         });
         parentComponent.classList.add('opacity-0');
+        questionIconLine.classList.add('opacity-0');
       }
     },
     [questionIconLineRef],

@@ -59,6 +59,9 @@ export interface IGeneratedConcept {
   summary: string;
   overview: string;
   valueProposition: string;
+
+  clarifyingQuestions?: IClarifyingQuestion[];
+  isGenerating?: boolean;
 }
 
 export interface IConcept extends IBaseConceptEntity {

@@ -1,15 +1,16 @@
 import images from '@assets/img';
 import { Icon } from '@components';
-import { useSaveGeneratedConcepts } from '@hooks/query/concepts.hook';
+import {
+  useGenerateConceptIncubationClarifyingQuestions,
+  useSaveGeneratedConcepts,
+} from '@hooks/query/concepts.hook';
 import { IGeneratedConcept } from '@libs/api/types';
-import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import {
   AnswerItem,
   useConceptIncubationStore,
 } from '@stores/concept-incubation.store';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import {
   animationStyles,
@@ -63,22 +64,28 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
   // Store connections
   const { draftSeedUuid } = useConceptIncubationStore();
-  const { generatedConcepts, clearGeneratedConceptsBySeedUuid } =
-    useConceptGenerationStore();
+  const {
+    generatedConcepts,
+    clearGeneratedConceptsBySeedUuid,
+    setGeneratedConcepts,
+  } = useConceptGenerationStore();
   const currentGeneratedConcepts = useMemo(
     () => generatedConcepts[draftSeedUuid],
     [generatedConcepts, draftSeedUuid],
   );
 
-  // Navigation
-  const navigate = useNavigate();
-
   // API mutations
   const { mutate: saveGeneratedConcepts, isLoading: isSaving } =
     useSaveGeneratedConcepts(draftSeedUuid);
+  const { mutateAsync: generateClarifyingQuestions } =
+    useGenerateConceptIncubationClarifyingQuestions();
 
   // UI state
   const [showMask, setShowMask] = useState(false);
+  const [
+    isGenerateClarifyingQuestionsLoading,
+    setIsGenerateClarifyingQuestionsLoading,
+  ] = useState(false);
 
   // Concept selection state
   const [activeConcept, setActiveConcept] = useState<IGeneratedConcept>(
@@ -163,22 +170,69 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     });
   }, [handleLeaveAnimation, draftSeedUuid, clearGeneratedConceptsBySeedUuid]);
 
+  // Extracted helper functions
+  const generateClarifyingQuestionsForConcepts = useCallback(
+    async (concepts: IGeneratedConcept[]): Promise<IGeneratedConcept[]> => {
+      const updatedConcepts = [...concepts];
+
+      setIsGenerateClarifyingQuestionsLoading(true);
+
+      await Promise.all(
+        concepts.map(async (concept) => {
+          const clarifyingQuestions = await generateClarifyingQuestions({
+            seedUuid: draftSeedUuid || '',
+            conceptUuid: concept.uuid,
+          });
+
+          const conceptToUpdate = updatedConcepts.find(
+            (c) => c.uuid === concept.uuid,
+          );
+          if (conceptToUpdate) {
+            conceptToUpdate.clarifyingQuestions = clarifyingQuestions;
+          }
+        }),
+      );
+
+      setIsGenerateClarifyingQuestionsLoading(false);
+      return updatedConcepts;
+    },
+    [draftSeedUuid, generateClarifyingQuestions],
+  );
+
+  const showSuccessAndNavigate = useCallback(() => {
+    handleLeaveAnimation(() => {
+      toast.success('Concepts saved successfully', {
+        autoClose: 1000,
+        hideProgressBar: true,
+        pauseOnHover: false,
+      });
+      setTimeout(() => {
+        const event = new CustomEvent('aucctus-generate-concept', {
+          detail: { refine: true },
+        });
+        window.dispatchEvent(event);
+      }, 1000);
+    });
+  }, [handleLeaveAnimation]);
+
+  // Simplified handleContinue function
   const handleContinue = useCallback(() => {
     saveGeneratedConcepts(selectedConcepts, {
-      onSuccess: () => {
-        handleLeaveAnimation(() => {
-          toast.success('Concepts saved successfully', {
-            autoClose: 1000,
-            hideProgressBar: true,
-            pauseOnHover: false,
-          });
-          setTimeout(() => {
-            navigate(AppPath.ConceptBank);
-          }, 1000);
-        });
+      onSuccess: async () => {
+        const updatedConcepts =
+          await generateClarifyingQuestionsForConcepts(selectedConcepts);
+        setGeneratedConcepts(draftSeedUuid, updatedConcepts);
+        showSuccessAndNavigate();
       },
     });
-  }, [selectedConcepts, saveGeneratedConcepts, navigate, handleLeaveAnimation]);
+  }, [
+    selectedConcepts,
+    saveGeneratedConcepts,
+    generateClarifyingQuestionsForConcepts,
+    showSuccessAndNavigate,
+    draftSeedUuid,
+    setGeneratedConcepts,
+  ]);
 
   // UI rendering functions
   const renderConceptSelection = useCallback(
@@ -192,6 +246,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
               isSelected={selectedConcepts.some((c) => c.uuid === concept.uuid)}
               concept={concept}
               onClick={() => setActiveConcept(concept)}
+              onSelect={() => handleSelectConcept(concept)}
             />
           ))}
         </div>
@@ -217,12 +272,26 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
       //inputValue,
       //allowAddAnswer,
       //handleAddAnswer,
+      handleSelectConcept,
       promptAnswers,
       handleUpdateAnswer,
       handleRemoveAnswer,
       selectedConcepts,
       activeConcept.uuid,
     ],
+  );
+
+  const isLoading = useMemo(
+    () => isSaving || isGenerateClarifyingQuestionsLoading,
+    [isSaving, isGenerateClarifyingQuestionsLoading],
+  );
+
+  const loadingMessage = useMemo(
+    () =>
+      isGenerateClarifyingQuestionsLoading
+        ? 'Generating clarifying questions...'
+        : undefined,
+    [isGenerateClarifyingQuestionsLoading],
   );
 
   // Main render
@@ -257,7 +326,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
         </div>
       </div>
       <PointerEventMask showMask={showMask} />
-      <LoadingMask isLoading={isSaving} />
+      <LoadingMask isLoading={isLoading} message={loadingMessage} />
     </>
   );
 };

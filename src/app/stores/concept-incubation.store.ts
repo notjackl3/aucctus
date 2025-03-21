@@ -2,6 +2,7 @@ import { IncubationAnswer } from '@libs/api/concepts';
 import {
   ConceptIncubationClarifyingQuestion,
   ConceptIncubationQuestion,
+  IGeneratedConcept,
 } from '@libs/api/types';
 import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
 import { useCallback, useMemo } from 'react';
@@ -33,6 +34,7 @@ interface ConceptIncubationStoreState {
   clarifyingQuestions: ConceptIncubationClarifyingQuestion[];
   activeClarifyingQuestion: ConceptIncubationClarifyingQuestion | undefined;
   suggestions: IncubationAISuggestions;
+  activeGeneratedConcept: IGeneratedConcept | undefined;
 
   setCurrentQuestionOrder: (order?: number) => void;
   setActiveQuestionnaire: (questionnaire?: QuestionnaireSection) => void;
@@ -49,6 +51,7 @@ interface ConceptIncubationStoreState {
   setActiveClarifyingQuestion: (
     question: ConceptIncubationClarifyingQuestion | undefined,
   ) => void;
+  setActiveGeneratedConcept: (concept: IGeneratedConcept | undefined) => void;
 }
 
 type ConceptIncubationState =
@@ -63,6 +66,7 @@ const INITIAL_STATE: ConceptIncubationState = {
   currentMultiSelectAnswerList: [],
   submittedAnswers: [],
   clarifyingQuestions: [],
+  activeGeneratedConcept: undefined,
   suggestions: {},
 };
 
@@ -98,6 +102,9 @@ const conceptIncubationStore = create<ConceptIncubationStoreState>()(
         question: ConceptIncubationClarifyingQuestion | undefined,
       ) => {
         set({ activeClarifyingQuestion: question });
+      },
+      setActiveGeneratedConcept: (concept: IGeneratedConcept | undefined) => {
+        set({ activeGeneratedConcept: concept });
       },
       resetQuestionnaire: () => {
         set(INITIAL_STATE);

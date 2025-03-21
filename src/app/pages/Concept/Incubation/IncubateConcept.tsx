@@ -29,7 +29,7 @@ type ConceptGenerationState =
   | 'pre-generation'
   | 'generating'
   | 'selecting'
-  | 'post-generation';
+  | 'selection-refinement';
 
 interface IncubateConceptProps {
   initialDraftSeedUuid?: string;
@@ -220,11 +220,16 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
   useEffect(() => {
     const handleGenerateConcept = (event?: Event) => {
       const customEvent = event as
-        | CustomEvent<{ revert?: boolean; error?: boolean }>
+        | CustomEvent<{ revert?: boolean; refine?: boolean; error?: boolean }>
         | undefined;
 
-      if (customEvent?.detail?.revert) {
-        setConceptGenerationState('pre-generation');
+      const revert = customEvent?.detail?.revert;
+      const refine = customEvent?.detail?.refine;
+
+      if (revert || refine) {
+        setConceptGenerationState(
+          revert ? 'pre-generation' : 'selection-refinement',
+        );
         setPregenToGenAnimationComplete(false);
 
         if (customEvent?.detail?.error) {
@@ -265,7 +270,7 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
 
   // Animation Transitions
   const userExplorationTransition = useTransition(
-    conceptGenerationState === 'pre-generation',
+    ['pre-generation', 'selection-refinement'].includes(conceptGenerationState),
     {
       from: { opacity: 0, maxWidth: '0px' },
       enter: { opacity: 1, maxWidth: '3000px' },
@@ -275,7 +280,7 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
   );
 
   const aiExplorationTransition = useTransition(
-    conceptGenerationState === 'pre-generation',
+    ['pre-generation', 'selection-refinement'].includes(conceptGenerationState),
     {
       enter: { width: '35%' },
       leave: { width: '100%' },
@@ -307,7 +312,7 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
   }, []);
 
   // Render Functions
-  const renderPreGeneration = useCallback(() => {
+  const renderExploration = useCallback(() => {
     return (
       <>
         {userExplorationTransition(
@@ -330,10 +335,14 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
                 className={cn('transition-all duration-300', {
                   '!w-[35%]':
                     !!currentQuestionOrder &&
-                    conceptGenerationState === 'pre-generation',
+                    ['pre-generation', 'selection-refinement'].includes(
+                      conceptGenerationState,
+                    ),
                   '!w-[50%]':
                     !currentQuestionOrder &&
-                    conceptGenerationState === 'pre-generation',
+                    ['pre-generation', 'selection-refinement'].includes(
+                      conceptGenerationState,
+                    ),
                   '!w-[100%]': conceptGenerationState === 'generating',
                 })}
               >
@@ -377,7 +386,7 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
           },
         )}
       >
-        {renderPreGeneration()}
+        {renderExploration()}
         {conceptGenerationState === 'generating' &&
           pregenToGenAnimationComplete &&
           renderConceptGeneration(
