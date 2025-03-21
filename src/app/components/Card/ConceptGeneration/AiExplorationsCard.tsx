@@ -1,12 +1,12 @@
 import images from '@assets/img';
 import { Card } from '@components';
 import { cn } from '@libs/utils/react';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
 import AiSuggestions from './AiExploration/AiSuggestions';
+import LoadingIcon from './Generation/LoadingIcon';
 import { useFadeTransition } from './hooks/fade-transition.hook';
 import { animationStyles } from './UserExploration/components/util/animation-keyframes';
-import LoadingIcon from './Generation/LoadingIcon';
 
 const mainStyle = {
   backgroundImage: `url(${images.aiExplorationsBackground})`,

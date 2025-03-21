@@ -39,6 +39,11 @@ interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
   _retry?: boolean;
 }
 
+export interface AbortableRequest<T> {
+  response: Promise<AxiosResponse<T>>;
+  abort: () => void;
+}
+
 export abstract class ApiService {
   apiInstance: Api;
   api: AxiosInstance;

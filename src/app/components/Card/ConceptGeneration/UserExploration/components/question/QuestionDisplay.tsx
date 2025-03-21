@@ -1,3 +1,9 @@
+import {
+  ConceptIncubationClarifyingQuestion,
+  ConceptIncubationQuestion,
+} from '@libs/api/types/conceptSeedQuestionnaire';
+import { cn } from '@libs/utils/react';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, {
   useCallback,
   useEffect,
@@ -5,22 +11,16 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { CompletionIcon } from './CompletionIcon';
-import { useQuestionTransition } from '../../hooks/question-transition.hook';
-import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
-import CompletedQuestions from './CompletedQuestions';
-import { PointerEventMask } from '../util/PointerEventMask';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import ReadyToGenerate from '../ready-to-generate/ReadyToGenerate';
-import ContinueRefining from '../continue-refining/ContinueRefining';
 import { animated, useTransition } from 'react-spring';
-import { cn } from '@libs/utils/react';
-import {
-  ConceptIncubationClarifyingQuestion,
-  ConceptIncubationQuestion,
-} from '@libs/api/types/conceptSeedQuestionnaire';
 import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
+import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
+import { useQuestionTransition } from '../../hooks/question-transition.hook';
 import { useObserveResizeQuestion } from '../../hooks/use-observe-resize-question';
+import ContinueRefining from '../continue-refining/ContinueRefining';
+import ReadyToGenerate from '../ready-to-generate/ReadyToGenerate';
+import { PointerEventMask } from '../util/PointerEventMask';
+import CompletedQuestions from './CompletedQuestions';
+import { CompletionIcon } from './CompletionIcon';
 import Question from './Question';
 
 interface QuestionDisplayProps {}

@@ -1,4 +1,4 @@
-import { useAuthStore } from '@stores/auth.store';
+import useAppStore from '@stores/store';
 import { AxiosError } from 'axios';
 import { useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -89,7 +89,9 @@ export const useConfirmEmail = () => {
 };
 
 export const useRefresh = () => {
-  const { clearTokens: clear, refresh, storeTokens } = useAuthStore();
+  const clear = useAppStore((state) => state.auth.clearTokens);
+  const refresh = useAppStore((state) => state.auth.refresh);
+  const storeTokens = useAppStore((state) => state.auth.storeTokens);
 
   return useMutation<
     ITokenResponse,
@@ -119,7 +121,10 @@ export const useRefresh = () => {
 };
 
 export const useLogout = () => {
-  const { logout, access, refresh } = useAuthStore();
+  const logout = useAppStore((state) => state.auth.logout);
+  const access = useAppStore((state) => state.auth.access);
+  const refresh = useAppStore((state) => state.auth.refresh);
+
   const queryClient = useQueryClient();
   return useMutation<
     IMessageResponse,
@@ -142,8 +147,10 @@ export const useLogout = () => {
 
 export const useLogin = () => {
   const navigate = useNavigate();
-  const { storeTokens, setUser, setInitialized } = useAuthStore();
-  const { setAccount } = useAuthStore();
+  const storeTokens = useAppStore((state) => state.auth.storeTokens);
+  const setUser = useAppStore((state) => state.auth.setUser);
+  const setInitialized = useAppStore((state) => state.auth.setInitialized);
+  const setAccount = useAppStore((state) => state.auth.setAccount);
 
   return useMutation<
     IAuthSuccessResponse,

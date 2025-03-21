@@ -9,10 +9,8 @@ import { AiSuggestionEvent } from '@libs/events';
 import { IncubationAnswerEvent } from '@libs/events/IncumbentAnswerEvent';
 import telemetry from '@libs/telemetry';
 import { cn } from '@libs/utils/react';
-import {
-  AnswerItem,
-  useConceptIncubationStore,
-} from '@stores/concept-incubation.store';
+import { AnswerItem } from '@stores/concept-incubation/actions';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 

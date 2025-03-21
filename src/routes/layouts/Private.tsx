@@ -1,14 +1,14 @@
 import AucctusSocketBootstrap from '@bootstraps/aucctusSocket.bootstrap';
 import NavDrawer from '@components/Navigation/NavDrawer/NavDrawer';
-import { AppPath } from '@routes/routes';
-import { useAuthStore } from '@stores/auth.store';
-import { Navigate, Outlet } from 'react-router-dom';
-import { useState } from 'react';
 import { cn } from '@libs/utils/react';
+import { AppPath } from '@routes/routes';
+import useStore from '@stores/store';
+import { useState } from 'react';
+import { Navigate, Outlet } from 'react-router-dom';
 
 const PrivateLayout = () => {
-  const account = useAuthStore((state) => state.account);
-  const user = useAuthStore((state) => state.user);
+  const account = useStore((state) => state.auth.account);
+  const user = useStore((state) => state.auth.user);
 
   const [navCollapsed, setNavCollapsed] = useState(true);
   if (user && !account) {

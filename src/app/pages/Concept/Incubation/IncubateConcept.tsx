@@ -15,7 +15,7 @@ import {
 } from '@libs/api/types/conceptSeedQuestionnaire';
 import { cn } from '@libs/utils/react';
 import { animated, easings, useTransition } from '@react-spring/web';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, {
   useCallback,
   useEffect,

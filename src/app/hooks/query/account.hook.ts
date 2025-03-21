@@ -1,4 +1,4 @@
-import { useAuthStore } from '@stores/auth.store';
+import useStore from '@stores/store';
 import { AxiosError, isAxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../libs/api';
@@ -19,7 +19,8 @@ const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
 };
 
 export const useUserDetails = (enabled: boolean) => {
-  const { setUser, setAccount } = useAuthStore();
+  const setUser = useStore((state) => state.auth.setUser);
+  const setAccount = useStore((state) => state.auth.setAccount);
 
   const query = useQuery({
     queryKey: [AucctusQueryKeys.userDetails],
@@ -43,7 +44,7 @@ export const useUserDetails = (enabled: boolean) => {
 };
 
 export const useUser = () => {
-  const { setUser, setAccount } = useAuthStore();
+  const { setUser, setAccount } = useStore((state) => state.auth);
   const { mutate: logout } = useLogout();
 
   const query = useQuery({
@@ -109,7 +110,7 @@ export const useDashboard = (enabled: boolean) => {
 };
 
 export const useRegisterAccount = () => {
-  const { setAccount } = useAuthStore();
+  const setAccount = useStore((state) => state.auth.setAccount);
   const queryClient = useQueryClient();
   return useMutation<
     IAccount,

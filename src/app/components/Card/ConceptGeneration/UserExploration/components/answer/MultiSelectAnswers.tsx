@@ -1,12 +1,9 @@
-import { Icon } from '@components';
-import { Input } from '@components';
+import { Icon, Input } from '@components';
+import { AnswerItem } from '@stores/concept-incubation/actions';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
-import { boxShadowStyle } from '../question/QuestionIcon';
 import { v4 as uuidv4 } from 'uuid';
-import {
-  useConceptIncubationStore,
-  AnswerItem,
-} from '@stores/concept-incubation.store';
+import { boxShadowStyle } from '../question/QuestionIcon';
 
 /**
  * MultiSelectAnswers component handles rendering and interaction for multiple choice questions

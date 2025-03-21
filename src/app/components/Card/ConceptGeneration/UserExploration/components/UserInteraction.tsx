@@ -1,14 +1,14 @@
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
-import QuestionDisplay from './question/QuestionDisplay';
-import LoadingMask from './util/LoadingMask';
-import QuestionnaireHeader from './question/QuestionnaireHeader';
+import { animated, useTransition } from 'react-spring';
 import AnswerInput from './answer/AnswerInput';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import { useTransition, animated } from 'react-spring';
 import ConfirmAnswerUpdate from './answer/ConfirmAnswerUpdate';
+import QuestionDisplay from './question/QuestionDisplay';
+import QuestionnaireHeader from './question/QuestionnaireHeader';
+import LoadingMask from './util/LoadingMask';
 
-import { useUserInteraction } from '../hooks/user-interaction-hook';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
+import { useUserInteraction } from '../hooks/user-interaction-hook';
 import PostGenerateQuestionDisplay from './question/PostGenerateQuestionDisplay';
 
 // Types

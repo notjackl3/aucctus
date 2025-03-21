@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAnswerList } from '../../hooks/answer-list.hook';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 interface Answer {
   uuid: string;

@@ -1,5 +1,6 @@
 import { Card, Icon } from '@components';
-import { useAuthStore } from '@stores/auth.store';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import useStore from '@stores/store';
 import { FunctionComponent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
@@ -8,7 +9,6 @@ import { useDashboard } from '../../hooks/query/account.hook';
 import DashboardInnovationCard from './components/DashboardInnovationCard';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import styles from './styles/dashboard.module.scss';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 const defaultIconProps = {
   stroke: '#2B3674',
@@ -19,7 +19,7 @@ const defaultIconProps = {
 const Dashboard: FunctionComponent = () => {
   const navigate = useNavigate();
   const { resetQuestionnaire } = useConceptIncubationStore();
-  const { account, isAuthenticated } = useAuthStore();
+  const { account, isAuthenticated } = useStore((state) => state.auth);
   const { data } = useDashboard(isAuthenticated());
 
   return (

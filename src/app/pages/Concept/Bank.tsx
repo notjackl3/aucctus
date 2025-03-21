@@ -13,7 +13,7 @@ import {
 import { cn } from '@libs/utils/react';
 import { camelCaseToTitleCase } from '@libs/utils/string';
 import { AppPath } from '@routes/routes';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 export const CONCEPT_STATUS_LIST_MAP = {

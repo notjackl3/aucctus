@@ -1,8 +1,8 @@
 import { cn } from '@libs/utils/react';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
 import GenerateNewIdeas from './UserExploration/components/GenerateNewIdeas';
 import UserInteraction from './UserExploration/components/UserInteraction';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 
 interface UserExplorationCardProps {
   className?: string;

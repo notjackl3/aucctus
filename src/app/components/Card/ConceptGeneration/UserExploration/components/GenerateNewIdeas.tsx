@@ -5,7 +5,7 @@ import {
 } from '@hooks/query/concepts.hook';
 import { IConceptSeed } from '@libs/api/concepts';
 import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
 import { toast } from 'react-toastify';
 import LoadingMask from './util/LoadingMask';

@@ -1,8 +1,8 @@
-import React, { useCallback, useMemo, useRef } from 'react';
-import { CompletionIcon } from './CompletionIcon';
 import { ConceptIncubationQuestion } from '@libs/api/types';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import { useSpring, animated } from 'react-spring';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { animated, useSpring } from 'react-spring';
+import { CompletionIcon } from './CompletionIcon';
 
 interface CompletionIconGroupProps {
   questionGroup: ConceptIncubationQuestion[];

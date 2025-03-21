@@ -1,5 +1,5 @@
+import { AnswerItem } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
-import { AnswerItem } from '@stores/concept-incubation.store';
 import EditableAnswerRow from '../UserExploration/components/answer/EditableAnswerRow';
 
 interface PromptAnswersProps {

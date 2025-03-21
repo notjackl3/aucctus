@@ -1,6 +1,6 @@
 import { useUser } from '@hooks/query/account.hook';
 import { useRefresh } from '@hooks/query/auth.hook';
-import { useAuthStore } from '@stores/auth.store';
+import useStore from '@stores/store';
 import React from 'react';
 import api from '../../libs/api';
 import LoadingScreen from '../pages/LoadingScreen';
@@ -8,7 +8,10 @@ import LoadingScreen from '../pages/LoadingScreen';
 const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { clearTokens, setInitialized, initialized, access } = useAuthStore();
+  const { access, initialized, clearTokens, setInitialized } = useStore(
+    (state) => state.auth,
+  );
+
   const { mutateAsync: refreshAsync } = useRefresh();
   const { refetch: checkAuthentication } = useUser();
 

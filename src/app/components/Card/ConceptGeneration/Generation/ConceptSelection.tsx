@@ -9,7 +9,7 @@ import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import {
   AnswerItem,
   useConceptIncubationStore,
-} from '@stores/concept-incubation.store';
+} from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import {

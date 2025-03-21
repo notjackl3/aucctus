@@ -1,22 +1,22 @@
 import NavLogo from '@assets/aucctus_logo.png';
 import NavWord from '@assets/aucctus_nav_word.png';
 import { Avatar } from '@components';
+import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
-import { useAuthStore } from '@stores/auth.store';
+import useStore from '@stores/store';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLogout } from '../../../hooks/query/auth.hook';
 import styles from './drawer.module.scss';
 import NavButton from './NavButton';
 import NavLink from './NavLink';
-import { useState } from 'react';
-import { cn } from '@libs/utils/react';
 
 interface NavDrawerProps {
   onExpandCollapse: (isCollapsed: boolean) => void;
 }
 
 const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
-  const { user, account } = useAuthStore();
+  const { user, account } = useStore((state) => state.auth);
   const { mutate: logout } = useLogout();
   const [collapsed, setCollapsed] = useState(true);
 

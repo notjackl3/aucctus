@@ -7,7 +7,7 @@ import api from '@libs/api';
 
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
-import { useAuthStore } from '@stores/auth.store';
+import useStore from '@stores/store';
 
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
@@ -39,7 +39,7 @@ const ConceptReport: FunctionComponent = () => {
   const { id: conceptUuid } = useParams();
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
-  const { account } = useAuthStore();
+  const account = useStore((state) => state.auth.account);
   const { title: titleEdit } = useEditConcept();
 
   const { concept, isFetched: isConceptFetched } = useConcept(conceptUuid);

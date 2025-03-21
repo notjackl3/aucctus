@@ -1,8 +1,3 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
-import { v4 as uuidv4 } from 'uuid';
-import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import {
   useDeleteConceptSeedDraft,
   useGenerateConceptIncubationClarifyingQuestions,
@@ -11,15 +6,20 @@ import {
   useUpdateConceptSeedDraftAnswer,
   useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers,
 } from '@hooks/query/concepts.hook';
-import { IncubationAnswerPayload, IncubationAnswer } from '@libs/api/concepts';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
+import { IncubationAnswer, IncubationAnswerPayload } from '@libs/api/concepts';
+import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
+import { AppPath } from '@routes/routes';
 import {
   AnswerItem,
   useConceptIncubationStore,
-} from '@stores/concept-incubation.store';
-import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
+} from '@stores/concept-incubation/enhancedStore';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
 import { useDispatchIncubationAnimation } from './incubation-animation-event.hook';
-import { AppPath } from '@routes/routes';
 
 type AdvanceActionType = 'to-next-question' | 'to-clarifying-questions' | false;
 

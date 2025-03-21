@@ -1,3 +1,10 @@
+import { Icon } from '@components';
+import { useConceptUpdate } from '@hooks/query/concepts.hook';
+import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
+import { cn } from '@libs/utils/react';
+import { AppPath } from '@routes/routes';
+import { useConceptGenerationStore } from '@stores/concept-generation.store';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, {
   useCallback,
   useEffect,
@@ -5,24 +12,17 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useQuestionTransition } from '../../hooks/question-transition.hook';
-import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
-import { PointerEventMask } from '../util/PointerEventMask';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
-import ReadyToGenerate from '../ready-to-generate/ReadyToGenerate';
-import ContinueRefining from '../continue-refining/ContinueRefining';
-import { cn } from '@libs/utils/react';
-import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
-import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
-import { useObserveResizeQuestion } from '../../hooks/use-observe-resize-question';
-import Question from './Question';
-import { Icon } from '@components';
-import { useConceptUpdate } from '@hooks/query/concepts.hook';
-import { AppPath } from '@routes/routes';
-import { toast } from 'react-toastify';
-import { useConceptGenerationStore } from '@stores/concept-generation.store';
-import LoadingMask from '../util/LoadingMask';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
+import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
+import { useQuestionTransition } from '../../hooks/question-transition.hook';
+import { useObserveResizeQuestion } from '../../hooks/use-observe-resize-question';
+import ContinueRefining from '../continue-refining/ContinueRefining';
+import ReadyToGenerate from '../ready-to-generate/ReadyToGenerate';
+import LoadingMask from '../util/LoadingMask';
+import { PointerEventMask } from '../util/PointerEventMask';
+import Question from './Question';
 
 interface PostGenerateQuestionDisplayProps {}
 

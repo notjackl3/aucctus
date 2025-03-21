@@ -1,15 +1,15 @@
-import React, { useCallback, useRef } from 'react';
 import images from '@assets/img';
 import { useConceptGeneration } from '@hooks/query/concepts.hook';
-import { animated, useTransition } from '@react-spring/web';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { IGeneratedConcept } from '@libs/api/types';
+import { animated, useTransition } from '@react-spring/web';
+import { useConceptGenerationStore } from '@stores/concept-generation.store';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import React, { useCallback, useRef } from 'react';
 import {
   animationStyles,
   getAnimationStyle,
 } from '../UserExploration/components/util/animation-keyframes';
-import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import LoadingIcon from './LoadingIcon';
 
 const getFadeInStyle = (duration: number, delay: number = 0) =>

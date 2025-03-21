@@ -1,7 +1,7 @@
 import { Input } from '@components';
 import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
-import { useAuthStore } from '@stores/auth.store';
+import useStore from '@stores/store';
 import { FunctionComponent, useCallback, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import styles from '../assets/styles/pages/auth-screens.module.scss';
@@ -14,8 +14,8 @@ import { useRegisterAccount } from '../hooks/query/account.hook';
 const GOAL_MAX_LENGTH = 500;
 
 const OnBoarding: FunctionComponent = () => {
-  const account = useAuthStore((state) => state.account);
-  const user = useAuthStore((state) => state.user);
+  const account = useStore((state) => state.auth.account);
+  const user = useStore((state) => state.auth.user);
   const { mutate: registerAccount, isLoading } = useRegisterAccount();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');

@@ -1,9 +1,9 @@
-import React from 'react';
 import { Icon } from '@components';
-import { IGeneratedConcept } from '@libs/api/types';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
+import { IGeneratedConcept } from '@libs/api/types';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import React from 'react';
 interface ConceptHeaderProps {
   title: string;
   onSelect: () => void;

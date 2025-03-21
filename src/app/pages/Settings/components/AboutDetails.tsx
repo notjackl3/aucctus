@@ -1,3 +1,4 @@
+import useStore from '@stores/store';
 import { FunctionComponent, useMemo, useState } from 'react';
 import Select, { StylesConfig } from 'react-select';
 import { toast } from 'react-toastify';
@@ -8,7 +9,6 @@ import InputField from '../../../components/Input/InputField/InputField';
 import Loading from '../../../components/Loading';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import { useUpdateUser } from '../../../hooks/query/account.hook';
-import { useAuthStore } from '@stores/auth.store';
 
 const defaultIconProps = {
   width: 20,
@@ -33,7 +33,7 @@ const TIME_ZONE_OPTIONS = [
 const AboutDetails: FunctionComponent = () => {
   const [isFormDisabled, setIsFormDisabled] = useState(true);
   const { mutate: updateUser, isLoading } = useUpdateUser();
-  const { user } = useAuthStore();
+  const user = useStore((state) => state.auth.user);
   const [aboutForm, setAboutForm] = useState<Partial<IUser>>({
     firstName: undefined,
     lastName: undefined,

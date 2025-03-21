@@ -1,8 +1,8 @@
 import { cn } from '@libs/utils/react';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
-import EditableAnswerRow from './EditableAnswerRow';
 import { useAnswerList } from '../../hooks/answer-list.hook';
-import { useConceptIncubationStore } from '@stores/concept-incubation.store';
+import EditableAnswerRow from './EditableAnswerRow';
 
 /**
  * TextAnswers component displays and manages text-based answers
