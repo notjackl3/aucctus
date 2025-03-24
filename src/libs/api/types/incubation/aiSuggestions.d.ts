@@ -8,7 +8,7 @@ interface IAISuggestionList {
   suggestions: IAISuggestion[];
 }
 
-export interface IAISuggestion {
+interface IAISuggestion {
   title: string;
   description: string;
 }

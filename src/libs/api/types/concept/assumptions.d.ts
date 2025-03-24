@@ -1,4 +1,4 @@
-import { IBaseConceptEntity } from './concepts';
+import type { IBaseConceptEntity } from './concepts';
 
 type AssumptionTestStatus =
   | 'notStarted'
@@ -55,7 +55,7 @@ type AssumptionCategory =
 
 type RiskCategory = 'high' | 'medium' | 'low';
 
-export interface IAssumptionCreate {
+interface IAssumptionCreate {
   name: string;
   hypothesis: string;
   riskLevel: number;
@@ -64,7 +64,7 @@ export interface IAssumptionCreate {
   assumptionsType: AssumptionCategory;
 }
 
-export interface IAssumption extends IBaseConceptEntity {
+interface IAssumption extends IBaseConceptEntity {
   name: string;
   text: string;
   category: AssumptionCategory;
@@ -85,7 +85,7 @@ export interface IAssumption extends IBaseConceptEntity {
   testProgress: AssumptionTestStatus[];
 }
 
-export interface IAssumptionTestDetails extends IBaseConceptEntity {
+interface IAssumptionTestDetails extends IBaseConceptEntity {
   status: AssumptionTestStatus;
   identifier: str;
   goal: string;
@@ -97,7 +97,7 @@ export interface IAssumptionTestDetails extends IBaseConceptEntity {
   stage: ConceptTestStage;
 }
 
-export interface IConceptTestDetails extends IBaseConceptEntity {
+interface IConceptTestDetails extends IBaseConceptEntity {
   uuid: string;
   identifier: string;
   description: string;
@@ -115,7 +115,7 @@ export interface IConceptTestDetails extends IBaseConceptEntity {
   findings: ITestFindings[];
 }
 
-export interface IConceptTestSpec {
+interface IConceptTestSpec {
   stage: ConceptTestStage;
   name: string;
 
@@ -133,7 +133,7 @@ export interface IConceptTestSpec {
   expectedOutputs: IConceptTestExpectedOutput[];
 }
 
-export interface IAssumptionsToTest {
+interface IAssumptionsToTest {
   name: string;
   findings?: string;
   status: AssumptionTestStatus;

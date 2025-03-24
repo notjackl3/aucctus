@@ -1,8 +1,14 @@
 import React, { ReactNode, useCallback, useMemo } from 'react';
 
 import { Header, Icon, Input, Table } from '@components';
-import { useConceptBank, useSeedsBank } from '@hooks/tables/concept-bank.hook';
-import { IConceptFilterOptions } from '@hooks/tables/concept-seed.hook';
+import {
+  IConceptFilterOptions,
+  useConceptBank,
+} from '@hooks/tables/concept-bank.hook';
+import {
+  ISeedFilterOptions,
+  useSeedsBank,
+} from '@hooks/tables/concept-seed.hook';
 import utils from '@libs/utils';
 import { isUser } from '@libs/utils/account';
 import {
@@ -30,7 +36,9 @@ export const SEED_STATUS_OPTIONS = [
 ];
 
 // Helper function moved outside component to avoid recreation on each render
-const areFilterOptionsSet = (filterOptions: IConceptFilterOptions) => {
+const areFilterOptionsSet = (
+  filterOptions: IConceptFilterOptions | ISeedFilterOptions,
+) => {
   const { status, createdBy, search, sort } = filterOptions;
 
   return (status && status.size > 0) || !!createdBy || !!search || !!sort;
@@ -108,6 +116,7 @@ const ConceptBank: React.FC = () => {
               onRemove={() => {
                 // Handle removal of individual filter
                 if (key === 'status') {
+                  // @ts-ignore
                   updateTableFiltering({ status: new Set() });
                 } else if (key === 'createdBy') {
                   updateTableFiltering({ createdBy: undefined });
@@ -202,11 +211,26 @@ const ConceptBank: React.FC = () => {
               />
             </div>
 
-            <Table.ConceptBank.FilterMenubar
-              updateFilterOptions={updateTableFiltering}
-              filterOptions={filterOptions}
-              statusOptions={isDraftsRoute ? SEED_STATUS_OPTIONS : undefined}
-            />
+            {isDraftsRoute ? (
+              <Table.SeedBank.FilterMenubar
+                updateFilterOptions={
+                  updateTableFiltering as (
+                    value: Partial<ISeedFilterOptions>,
+                  ) => void
+                }
+                filterOptions={filterOptions as ISeedFilterOptions}
+                statusOptions={SEED_STATUS_OPTIONS}
+              />
+            ) : (
+              <Table.ConceptBank.FilterMenubar
+                updateFilterOptions={
+                  updateTableFiltering as (
+                    value: Partial<IConceptFilterOptions>,
+                  ) => void
+                }
+                filterOptions={filterOptions as IConceptFilterOptions}
+              />
+            )}
           </div>
         </div>
 

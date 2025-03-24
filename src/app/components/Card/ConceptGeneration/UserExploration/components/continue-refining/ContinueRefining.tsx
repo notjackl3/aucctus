@@ -1,14 +1,10 @@
-import React, { useCallback } from 'react';
-import { animated } from '@react-spring/web';
-import { useContinueRefiningAnimations } from './continue-refining-animation.hook';
-import {
-  ConceptIncubationClarifyingQuestion,
-  ConceptIncubationQuestion,
-} from '@libs/api/types/conceptSeedQuestionnaire';
-import { IncubationAnswer } from '@libs/api/concepts';
-import { boxShadowStyle } from '../question/QuestionIcon';
-import { CompletionIcon } from '../question/CompletionIcon';
 import { Icon } from '@components';
+import { IncubationAnswer } from '@libs/api/concepts';
+import { animated } from '@react-spring/web';
+import React, { useCallback } from 'react';
+import { CompletionIcon } from '../question/CompletionIcon';
+import { boxShadowStyle } from '../question/QuestionIcon';
+import { useContinueRefiningAnimations } from './continue-refining-animation.hook';
 
 interface ContinueRefiningIconProps {
   iconRef: React.RefObject<HTMLSpanElement>;
@@ -29,12 +25,10 @@ const ContinueRefiningIcon: React.FC<ContinueRefiningIconProps> = ({
 
 interface ContinueRefiningProps {
   iconRef: React.RefObject<HTMLSpanElement>;
-  clarifyingQuestions: ConceptIncubationClarifyingQuestion[];
+  clarifyingQuestions: IClarifyingQuestion[];
   submittedAnswers: IncubationAnswer[];
   onMouseEnter?: () => void;
-  selectClarifyingQuestion: (
-    question: ConceptIncubationClarifyingQuestion,
-  ) => void;
+  selectClarifyingQuestion: (question: IClarifyingQuestion) => void;
 }
 
 const ContinueRefining: React.FC<ContinueRefiningProps> = ({
@@ -71,38 +65,36 @@ const ContinueRefining: React.FC<ContinueRefiningProps> = ({
         style={cardAnimation}
         className='no-scrollbar flex flex-col gap-2'
       >
-        {clarifyingQuestions.map(
-          (question: ConceptIncubationClarifyingQuestion) => (
-            <div
-              key={question.uuid}
-              onClick={() => selectClarifyingQuestion(question)}
-              className='aucctus-bg-primary-hover aucctus-border-primary flex w-full cursor-pointer flex-row gap-2 rounded-xl border-2 p-4'
+        {clarifyingQuestions.map((question: IClarifyingQuestion) => (
+          <div
+            key={question.uuid}
+            onClick={() => selectClarifyingQuestion(question)}
+            className='aucctus-bg-primary-hover aucctus-border-primary flex w-full cursor-pointer flex-row gap-2 rounded-xl border-2 p-4'
+          >
+            <span
+              style={boxShadowStyle}
+              className='aucctus-bg-primary aucctus-border-secondary mr-2 flex h-8 w-8 items-center justify-center self-center justify-self-center rounded-lg border-2'
             >
-              <span
-                style={boxShadowStyle}
-                className='aucctus-bg-primary aucctus-border-secondary mr-2 flex h-8 w-8 items-center justify-center self-center justify-self-center rounded-lg border-2'
-              >
-                <Icon
-                  variant={(question.icon as IconVariant) || 'help'}
-                  height={16}
-                  width={16}
-                />
+              <Icon
+                variant={(question.icon as IconVariant) || 'help'}
+                height={16}
+                width={16}
+              />
+            </span>
+            <div className='flex flex-col'>
+              <span className='aucctus-text-secondary aucctus-text-md-medium'>
+                {question.title}
               </span>
-              <div className='flex flex-col'>
-                <span className='aucctus-text-secondary aucctus-text-md-medium'>
-                  {question.title}
-                </span>
-                <span className='aucctus-text-secondary aucctus-text-xs'>
-                  {question.question.label}
-                </span>
-              </div>
-              <span className='flex-1' />
-              {hasClarifyingAnswer(question.question) && (
-                <CompletionIcon className='aucctus-bg-secondary self-center justify-self-center stroke-success-800' />
-              )}
+              <span className='aucctus-text-secondary aucctus-text-xs'>
+                {question.question.label}
+              </span>
             </div>
-          ),
-        )}
+            <span className='flex-1' />
+            {hasClarifyingAnswer(question.question) && (
+              <CompletionIcon className='aucctus-bg-secondary self-center justify-self-center stroke-success-800' />
+            )}
+          </div>
+        ))}
       </animated.span>
     </span>
   );

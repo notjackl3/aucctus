@@ -8,12 +8,9 @@ import {
 } from '@hooks/query/concepts.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { IncubationAnswer, IncubationAnswerPayload } from '@libs/api/concepts';
-import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
 import { AppPath } from '@routes/routes';
-import {
-  AnswerItem,
-  useConceptIncubationStore,
-} from '@stores/concept-incubation/enhancedStore';
+import { AnswerItem } from '@stores/concept-incubation/actions';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
@@ -110,7 +107,7 @@ export const useUserInteraction = () => {
             seedUuid: draftSeedUuid || '',
           },
           {
-            onSuccess: (data: ConceptIncubationClarifyingQuestion[]) => {
+            onSuccess: (data: IClarifyingQuestion[]) => {
               setClarifyingQuestions(data);
               dispatchAnimationEvent('question-transition', () => {
                 setCurrentQuestionOrder(nextOrder);

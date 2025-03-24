@@ -34,6 +34,7 @@ interface IConceptIncubationMultiSelectOption {
   description?: string;
   icon?: string;
 }
+
 interface IConceptIncubationMultiSelectQuestion
   extends BaseConceptIncubationQuestion {
   fieldType: 'multiSelect' | 'radioButton';
@@ -43,7 +44,7 @@ interface IConceptIncubationMultiSelectQuestion
   details?: IDetailQuestion;
 }
 
-interface ConceptIncubationClarifyingQuestion {
+interface IClarifyingQuestion {
   title: string;
   uuid: string;
   icon: string;
@@ -57,32 +58,17 @@ type ConceptIncubationQuestion =
 
 type QuestionFieldType = ConceptIncubationQuestion['fieldType'];
 
-type ExpandAnExistingIdeaQuestions =
-  | 'describe'
-  | 'problem'
-  | 'customer'
-  | 'value';
-type IdentifyNewOpportunitiesQuestions =
-  | 'target'
-  | 'describe'
-  | 'customer'
-  | 'value'
-  | 'interest';
-
-type QuestionIdentifier =
-  | ExpandAnExistingIdeaQuestions
-  | IdentifyNewOpportunitiesQuestions;
-
 type ConceptIncubationQuestionnaireType =
   | 'EXPAND_AN_EXISTING_IDEA'
   | 'IDENTIFY_NEW_OPPORTUNITIES';
-interface IConceptIncubationQuestionnaireSection<T extends string> {
+
+interface IConceptIncubationQuestionnaireSection<T extends string = string> {
   type: ConceptIncubationQuestionnaireType;
   description: string;
   questions: { [key in T]: ConceptIncubationQuestion };
 }
 
-export interface IConceptIncubationQuestionnaire {
-  expandAnExistingIdea: IConceptIncubationQuestionnaireSection<ExpandAnExistingIdeaQuestions>;
-  identifyNewOpportunities: IConceptIncubationQuestionnaireSection<IdentifyNewOpportunitiesQuestions>;
+interface IConceptIncubationQuestionnaire {
+  expandAnExistingIdea: IConceptIncubationQuestionnaireSection;
+  identifyNewOpportunities: IConceptIncubationQuestionnaireSection;
 }

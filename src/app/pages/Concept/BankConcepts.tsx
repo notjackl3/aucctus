@@ -1,6 +1,8 @@
 import { Container, Table } from '@components';
-import { useConceptBank } from '@hooks/tables/concept-bank.hook';
-import { IConceptFilterOptions } from '@hooks/tables/concept-seed.hook';
+import {
+  IConceptFilterOptions,
+  useConceptBank,
+} from '@hooks/tables/concept-bank.hook';
 import { useOutletContext } from 'react-router-dom';
 
 // Define type for context being passed from parent

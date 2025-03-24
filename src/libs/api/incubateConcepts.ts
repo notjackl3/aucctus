@@ -1,26 +1,7 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
-import {
-  ConceptIncubationClarifyingQuestion,
-  ConceptIncubationQuestion,
-  IConcept,
-  IConceptIncubationQuestionnaire,
-  IGeneratedConcept,
-} from './types'; // Import the missing type
-
-/**
- * Concept Incubation API
- *
- * Handles all the requests to the fast service for concept generation.
- */
-
-export interface IIncubationAnswer {
-  answer: string;
-  fieldType: ConceptIncubationQuestion['fieldType'];
-  details?: string;
-  questionId: number;
-}
+import type { IConcept, IGeneratedConcept } from './types';
 
 export class IncubateConceptApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = false;
@@ -33,7 +14,7 @@ export class IncubateConceptApi extends ApiService {
   }
 
   generateClarifyingQuestions(uuid: string, conceptUuid?: string) {
-    return this.post<ConceptIncubationClarifyingQuestion[]>(
+    return this.post<IClarifyingQuestion[]>(
       endpoints.conceptIncubationSeedUuidClarifyingQuestions(uuid),
       { conceptUuid: conceptUuid },
     );
@@ -41,6 +22,12 @@ export class IncubateConceptApi extends ApiService {
 
   questionnaire() {
     return this.get<IConceptIncubationQuestionnaire>(
+      endpoints.conceptQuestionnaire,
+    );
+  }
+
+  abortableQuestionnaire() {
+    return this.abortableGet<IConceptIncubationQuestionnaire>(
       endpoints.conceptQuestionnaire,
     );
   }

@@ -12,10 +12,6 @@ const usePrivateRoutes = () => {
     <Route element={<Layout.Private />}>
       <Route index path={AppPath.Home} element={<Page.Dashboard />} />
       <Route
-        path={AppPath.IncubateConceptWithUuid}
-        element={<Page.Concept.IncubateWrapper />}
-      />
-      <Route
         path={AppPath.IncubateConcept}
         element={<Page.Concept.Incubate />}
       />

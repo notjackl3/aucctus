@@ -8,11 +8,6 @@ import {
   useDeleteConceptSeedDraft,
   useGetConceptSeedDraftAnswers,
 } from '@hooks/query/concepts.hook';
-import {
-  ExpandAnExistingIdeaQuestions,
-  IConceptIncubationQuestionnaireSection,
-  IdentifyNewOpportunitiesQuestions,
-} from '@libs/api/types/conceptSeedQuestionnaire';
 import { cn } from '@libs/utils/react';
 import { animated, easings, useTransition } from '@react-spring/web';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
@@ -23,6 +18,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 type ConceptGenerationState =
@@ -31,17 +27,10 @@ type ConceptGenerationState =
   | 'selecting'
   | 'selection-refinement';
 
-interface IncubateConceptProps {
-  initialDraftSeedUuid?: string;
-}
+const IncubateConcept: React.FC = () => {
+  const [searchParams] = useSearchParams();
+  const seedUuid = searchParams.get('seed') || undefined;
 
-export type QuestionnaireSection =
-  | IConceptIncubationQuestionnaireSection<ExpandAnExistingIdeaQuestions>
-  | IConceptIncubationQuestionnaireSection<IdentifyNewOpportunitiesQuestions>;
-
-const IncubateConcept: React.FC<IncubateConceptProps> = ({
-  initialDraftSeedUuid,
-}) => {
   const conceptGenerationRef = useRef<HTMLDivElement>(null);
 
   const [conceptGenerationState, setConceptGenerationState] =
@@ -52,7 +41,7 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
 
   // Data Fetching & Store Access
   const { data: seedDraftData, isLoading: isSeedLoading } =
-    useConceptSeedDraft(initialDraftSeedUuid);
+    useConceptSeedDraft(seedUuid);
   const { questionnaires, isLoading: isQuestionnaireLoading } =
     useConceptIncubationQuestionnaire();
   const { mutate: deleteDraft } = useDeleteConceptSeedDraft();
@@ -82,10 +71,10 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
       seedDraftData.uuid !== draftSeedUuid
     ) {
       setDraftSeedUuid(seedDraftData.uuid);
-    } else if (initialDraftSeedUuid && initialDraftSeedUuid !== draftSeedUuid) {
-      setDraftSeedUuid(initialDraftSeedUuid);
+    } else if (seedUuid && seedUuid !== draftSeedUuid) {
+      setDraftSeedUuid(seedUuid);
     }
-  }, [initialDraftSeedUuid, seedDraftData, draftSeedUuid, setDraftSeedUuid]);
+  }, [seedUuid, seedDraftData, draftSeedUuid, setDraftSeedUuid]);
 
   // Set the active questionnaire if we have seed data with a type
   useEffect(() => {
@@ -101,18 +90,14 @@ const IncubateConcept: React.FC<IncubateConceptProps> = ({
         questionnaires.expandAnExistingIdea.questions &&
         questionnaires.expandAnExistingIdea.type === 'EXPAND_AN_EXISTING_IDEA'
       ) {
-        setActiveQuestionnaire(
-          questionnaires.expandAnExistingIdea as QuestionnaireSection,
-        );
+        setActiveQuestionnaire(questionnaires.expandAnExistingIdea);
       } else if (
         seedDraftData.type === 'IDENTIFY_NEW_OPPORTUNITIES' &&
         questionnaires.identifyNewOpportunities.questions &&
         questionnaires.identifyNewOpportunities.type ===
           'IDENTIFY_NEW_OPPORTUNITIES'
       ) {
-        setActiveQuestionnaire(
-          questionnaires.identifyNewOpportunities as QuestionnaireSection,
-        );
+        setActiveQuestionnaire(questionnaires.identifyNewOpportunities);
       }
     }
   }, [

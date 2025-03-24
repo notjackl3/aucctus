@@ -1,4 +1,4 @@
-import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
+import { IClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
 import { useEffect } from 'react';
 
 /**
@@ -9,7 +9,7 @@ export const useQuestionIconLine = (
   questionIconLineRef: React.RefObject<HTMLDivElement>,
   spacerRef: React.RefObject<HTMLDivElement>,
   currentQuestionOrder: number,
-  activeClarifyingQuestion: ConceptIncubationClarifyingQuestion | undefined,
+  activeClarifyingQuestion: IClarifyingQuestion | undefined,
 ) => {
   useEffect(() => {
     const questionIcon = questionIconRef.current;

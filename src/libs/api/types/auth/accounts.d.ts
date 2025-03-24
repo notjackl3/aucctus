@@ -1,4 +1,4 @@
-import { ConceptStatus } from '.';
+import { ConceptStatus } from '..';
 
 export interface IToken {
   token: string;
@@ -101,6 +101,13 @@ export interface IUpdateForgottenPasswordRequest extends IPasswordResetForm {
 
 export interface IDashboard {
   conceptDetails: IConceptDetails;
+}
+
+export interface IUserQueryOptions extends IPageQueryOptions {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  search?: string;
 }
 
 export interface IConceptDetails {

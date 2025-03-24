@@ -17,6 +17,7 @@ import {
   IGeneratedConcept,
   IMarketScanElementCreate,
   IMarketScanV1,
+  ISeedQueryOptions,
   ITrendsAndDriversV1,
 } from '@libs/api/types';
 import utils from '@libs/utils';
@@ -44,6 +45,7 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
       queryOptions.status,
       queryOptions.category,
       queryOptions.search,
+      queryOptions.createdBy,
       queryOptions.page,
       queryOptions.sort,
     ],
@@ -58,21 +60,22 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
  * @param queryOptions - Options for filtering, sorting, and pagination
  * @returns The result of the useQuery hook.
  */
-export const useSeeds = (queryOptions: IConceptQueryOptions) => {
+export const useSeeds = (queryOptions: ISeedQueryOptions) => {
   return useQuery({
     queryKey: [
       AucctusQueryKeys.seeds,
       queryOptions.status,
       queryOptions.search,
+      queryOptions.createdBy,
+      queryOptions.type,
       queryOptions.page,
       queryOptions.sort,
     ],
-    queryFn: () => api.concept.getSeeds(queryOptions),
+    queryFn: () => api.seed.getSeeds(queryOptions),
     staleTime: 1000 * 60 * 2, // 2 minutes
     keepPreviousData: true, // Keep previous data while loading new data
   });
 };
-
 export const useConceptSeed = (uuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeed, AucctusQueryKeys.concept, uuid],

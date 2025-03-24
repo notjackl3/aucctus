@@ -1,26 +1,26 @@
-import { IBaseConceptEntity } from '.';
-export interface IEcosystem extends IBaseConceptEntity {
+import type { IBaseConceptEntity } from './concepts';
+interface IEcosystem extends IBaseConceptEntity {
   name: string;
   description: string;
   source: string;
 }
 
-export interface IStartupEcosystem extends IEcosystem {
+interface IStartupEcosystem extends IEcosystem {
   ecosystemType: 'startup';
 }
 
-export interface IIncumbentsEcosystem extends IEcosystem {
+interface IIncumbentsEcosystem extends IEcosystem {
   ecosystemType: 'incumbents';
 }
 
-export interface IInvestorsEcosystem extends IEcosystem {
+interface IInvestorsEcosystem extends IEcosystem {
   ecosystemType: 'investors';
 }
 
 type Ecosystem = IStartupEcosystem | IIncumbentsEcosystem | IInvestorsEcosystem;
 type EcosystemType = Ecosystem['ecosystemType'];
 
-export interface ITrendsAndDriversV1 extends IBaseConceptEntity {
+interface ITrendsAndDriversV1 extends IBaseConceptEntity {
   uuid: string;
   name: string;
   description: string;
@@ -29,17 +29,17 @@ export interface ITrendsAndDriversV1 extends IBaseConceptEntity {
   image: undefined;
 }
 
-export interface IMarketScanElementCreate {
+interface IMarketScanElementCreate {
   name: string;
   description: string;
   source: string;
 }
 
-export interface IEcosystemCreate extends IMarketScanElementCreate {
+interface IEcosystemCreate extends IMarketScanElementCreate {
   ecosystemType: EcosystemType;
 }
 
-export interface IMarketScanV1 extends IBaseConceptEntity {
+interface IMarketScanV1 extends IBaseConceptEntity {
   name: string;
   startups: IStartupEcosystem[];
   incumbents: IIncumbentsEcosystem[];

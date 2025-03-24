@@ -1,12 +1,21 @@
-import {
-  ActiveConceptStatus,
-  ArchivedConceptStatus,
+import type {
   AssumptionCategory,
   AssumptionTestStatus,
+} from '@libs/api/types/concept/assumptions';
+import type {
+  ActiveConceptStatus,
+  ArchivedConceptStatus,
   ConceptStatus,
   DraftConceptStatus,
   MarketMetricType,
+  SeedStatus,
 } from '../api/types';
+
+export const SEED_STATUS_LIST: SeedStatus[] = [
+  'draft',
+  'published',
+  'archived',
+];
 
 export const CONCEPT_STATUS_LIST: ConceptStatus[] = [
   'new',

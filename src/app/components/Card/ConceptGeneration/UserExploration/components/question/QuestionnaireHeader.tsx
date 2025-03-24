@@ -1,5 +1,5 @@
 import { Badge, Icon } from '@components';
-import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
+import { QuestionnaireSection } from '@pages/Concept/IncubateConcept';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
 import { animated, useTransition } from 'react-spring';

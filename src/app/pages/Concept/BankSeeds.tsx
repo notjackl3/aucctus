@@ -1,13 +1,15 @@
 import { Container, Table } from '@components';
-import { useSeedsBank } from '@hooks/tables/concept-bank.hook';
-import { IConceptFilterOptions } from '@hooks/tables/concept-seed.hook';
+import {
+  ISeedFilterOptions,
+  useSeedsBank,
+} from '@hooks/tables/concept-seed.hook';
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 
 // Define type for context being passed from parent
 type ConceptBankContextType = {
-  filterOptions: IConceptFilterOptions;
-  updateTableFiltering: (value: Partial<IConceptFilterOptions>) => void;
+  filterOptions: ISeedFilterOptions;
+  updateTableFiltering: (value: Partial<ISeedFilterOptions>) => void;
 };
 
 const BankSeeds: React.FC = () => {

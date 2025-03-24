@@ -29,7 +29,9 @@ interface ChatMessageEvent extends BaseSocketEvent {
  * Base interface for all stream events.
  * Stream events represent data that is sent incrementally over time.
  */
-interface IBaseStreamEvent<C extends object> extends BaseSocketEvent {
+interface IBaseStreamEvent<T extends string, C extends object>
+  extends BaseSocketEvent {
+  type: T;
   id: string; // Unique identifier for the stream
   context: C; // Context of the stream that can be defined based on the current context. Will often contain user id.
 }
@@ -52,9 +54,13 @@ interface IBaseStreamEvent<C extends object> extends BaseSocketEvent {
  * Note: For 'stream.chat' type, T will be string
  * For 'stream.structured' type, T will be an object
  */
-interface IStreamDeltaEvent<T, C> extends IBaseStreamEvent<C> {
+interface IStreamDeltaEvent<
+  T extends string,
+  K extends string,
+  C extends object,
+> extends IBaseStreamEvent<T, C> {
   stage: 'delta';
-  content: Partial<T>;
+  content: Partial<K>;
 }
 
 /**
@@ -69,9 +75,10 @@ interface IStreamDeltaEvent<T, C> extends IBaseStreamEvent<C> {
  * Note: For 'stream.chat' type, T will be string
  * For 'stream.structured' type, T will be an object
  */
-interface IStreamDoneEvent<T, C> extends IBaseStreamEvent<C> {
+interface IStreamDoneEvent<T extends string, K extends string, C extends object>
+  extends IBaseStreamEvent<T, C> {
   stage: 'done';
-  content: T;
+  content: K;
 }
 
 /**
@@ -80,10 +87,16 @@ interface IStreamDoneEvent<T, C> extends IBaseStreamEvent<C> {
  * Indicates that an error occurred during streaming.
  * This terminates the stream and signals that no more data will be sent.
  */
-interface IStreamErrorEvent<C> extends IBaseStreamEvent<C> {
+interface IStreamErrorEvent<T extends string, C extends object>
+  extends IBaseStreamEvent<T, C> {
   stage: 'error';
   content: null;
 }
+
+type StreamEvent<T extends string, K extends string, C extends object> =
+  | IStreamDeltaEvent<T, K, C>
+  | IStreamDoneEvent<T, K, C>
+  | IStreamErrorEvent<T, C>;
 
 /**
  * Union type representing all possible stream events.
@@ -102,26 +115,17 @@ interface IStreamErrorEvent<C> extends IBaseStreamEvent<C> {
 
  * Type-safe helpers for stream events based on their type
  */
-interface ChatStreamEvent<C = {}>
-  extends IStreamDeltaEvent<string, C>,
-    IStreamDoneEvent<string, C>,
-    IStreamErrorEvent<C> {
-  type: 'stream.chat';
-}
-
-interface AISuggestionsStreamEvent
-  extends IStreamDeltaEvent<IAISuggestionList, IAISuggestionsContext>,
-    IStreamDoneEvent<IAISuggestionList, IAISuggestionsContext>,
-    IStreamErrorEvent<IAISuggestionsContext> {
-  type: 'stream.structured.ai.suggestions';
-}
-
-interface ConceptGenerationStreamEvent
-  extends IStreamDeltaEvent<IGeneratedConceptList, IConceptGenerationContext>,
-    IStreamDoneEvent<IGeneratedConceptList, IConceptGenerationContext>,
-    IStreamErrorEvent<IConceptGenerationContext> {
-  type: 'stream.structured.concept.generation';
-}
+type ChatStreamEvent<C = {}> = StreamEvent<'stream.chat', string, C>;
+type AISuggestionsStreamEvent = StreamEvent<
+  'stream.structured.ai.suggestions',
+  IAISuggestionList,
+  IAISuggestionsContext
+>;
+type ConceptGenerationStreamEvent = StreamEvent<
+  'stream.structured.concept.generation',
+  IGeneratedConceptList,
+  IConceptGenerationContext
+>;
 
 interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
   type: 'incubation.ai.suggestions.request';

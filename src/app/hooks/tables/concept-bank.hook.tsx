@@ -1,11 +1,18 @@
 import { Button, Table, Text } from '@components';
-import { useConcepts } from '@hooks/query/concepts.hook';
+import {
+  useConcepts,
+  useConceptUpdate,
+  useRetryConceptReport,
+} from '@hooks/query/concepts.hook';
 import {
   ConceptSort,
   ConceptStatus,
   IConcept,
+  IUser,
   SortableConceptProperties,
 } from '@libs/api/types';
+import utils from '@libs/utils';
+import { AppPath } from '@routes/routes';
 import {
   ColumnDef,
   createColumnHelper,
@@ -16,16 +23,14 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
-
-import { ConceptActionMenuButton } from '@components/Tables/ConceptBank/ActionsMenuButton';
-import {
-  useConceptUpdate,
-  useRetryConceptReport,
-} from '@hooks/query/concepts.hook';
-import utils from '@libs/utils';
-import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
-import { IConceptFilterOptions } from './concept-seed.hook';
+
+export interface IConceptFilterOptions {
+  status: Set<ConceptStatus>;
+  createdBy?: IUser;
+  search?: string;
+  sort?: ConceptSort;
+}
 
 const columnHelper = createColumnHelper<IConcept>();
 
@@ -72,8 +77,9 @@ export const useConceptBank = (
   // If we receive external filter options, use those instead
   React.useEffect(() => {
     if (externalFilterOptions) {
-      setFilterOptions(externalFilterOptions);
+      setFilterOptions({ ...filterOptions, ...externalFilterOptions });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalFilterOptions]);
 
   // Memoize the query options to prevent unnecessary API calls
@@ -276,7 +282,7 @@ export const useConceptBank = (
         maxSize: 42,
         header: () => {},
         cell: (info) => (
-          <ConceptActionMenuButton
+          <Table.ConceptBank.ConceptActionMenuButton
             status={info.row.original.status}
             uuid={info.getValue()}
           />
@@ -330,12 +336,3 @@ export const useConceptBank = (
     ],
   );
 };
-
-// Export areFilterOptionsSet as a function
-export { areFilterOptionsSet } from './concept-seed.hook';
-
-// Export the interface for use in other files using 'export type'
-export type { IConceptFilterOptions } from './concept-seed.hook';
-
-// Re-export the useSeedsBank hook to fix the import error in Bank.tsx
-export { useSeedsBank } from './concept-seed.hook';

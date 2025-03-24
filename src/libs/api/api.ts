@@ -11,6 +11,7 @@ import { ISocketConfig } from './base/socketService';
 import { ConceptApi } from './concepts';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
+import { SeedApi } from './seed';
 import { ITokenResponse } from './types';
 
 export interface IApiConfig {
@@ -36,6 +37,7 @@ export class Api {
   auth: AuthApi;
   account!: AccountApi;
   concept!: ConceptApi;
+  seed!: SeedApi;
   assumption!: AssumptionsApi;
   marketScan!: MarketScanApi;
   conceptIncubate!: IncubateConceptApi;
@@ -66,6 +68,7 @@ export class Api {
       { key: 'marketScan', class: MarketScanApi },
       { key: 'conceptIncubate', class: IncubateConceptApi },
       { key: 'article', class: ArticleApi },
+      { key: 'seed', class: SeedApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {
@@ -99,6 +102,7 @@ export class Api {
       this.conceptIncubate,
       this.assumption,
       this.marketScan,
+      this.seed,
     ].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
       api.config.headers = Object.assign({}, api.config.headers, {

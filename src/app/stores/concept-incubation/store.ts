@@ -1,10 +1,6 @@
 import { Lens, lens } from '@dhmk/zustand-lens';
 import { IncubationAnswer } from '@libs/api/concepts';
-import {
-  ConceptIncubationClarifyingQuestion,
-  IGeneratedConcept,
-} from '@libs/api/types';
-import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
+import { IClarifyingQuestion, IGeneratedConcept } from '@libs/api/types';
 import type { IAppStore } from '../store';
 import {
   AnswerItem,
@@ -27,13 +23,13 @@ export interface IConceptIncubationState extends IConceptIncubationActions {
   status: 'pre-generation' | 'generating' | 'selecting' | 'post-generation';
 
   currentQuestionOrder?: number;
-  activeQuestionnaire?: QuestionnaireSection;
+  activeQuestionnaire?: IConceptIncubationQuestionnaireSection;
   draftSeedUuid: string;
   currentTextAnswerList: AnswerItem[];
   currentMultiSelectAnswerList: AnswerItem[];
   submittedAnswers: IncubationAnswer[];
-  clarifyingQuestions: ConceptIncubationClarifyingQuestion[];
-  activeClarifyingQuestion: ConceptIncubationClarifyingQuestion | undefined;
+  clarifyingQuestions: IClarifyingQuestion[];
+  activeClarifyingQuestion: IClarifyingQuestion | undefined;
   suggestions: IncubationAISuggestions;
   activeGeneratedConcept: IGeneratedConcept | undefined;
 }

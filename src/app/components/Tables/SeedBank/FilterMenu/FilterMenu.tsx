@@ -1,9 +1,9 @@
 import { Avatar, Icon, Input } from '@components';
 import { useAllUsers } from '@hooks/query/account.hook';
-import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
-import { ConceptStatus } from '@libs/api/types';
+import { ISeedFilterOptions } from '@hooks/tables/concept-seed.hook';
+import { SeedStatus } from '@libs/api/types';
 import utils from '@libs/utils';
-import { CONCEPT_STATUS_LIST } from '@libs/utils/concepts';
+import { SEED_STATUS_LIST } from '@libs/utils/concepts';
 import { cn } from '@libs/utils/react';
 import * as Menubar from '@radix-ui/react-menubar';
 import React from 'react';
@@ -12,8 +12,8 @@ import SubMenuTrigger from './FilterMenuTrigger';
 // TODO: Revisit typing for status options
 
 interface IFilterMenubarProps {
-  filterOptions: IConceptFilterOptions;
-  updateFilterOptions: (value: Partial<IConceptFilterOptions>) => void;
+  filterOptions: ISeedFilterOptions;
+  updateFilterOptions: (value: Partial<ISeedFilterOptions>) => void;
   statusOptions?: Array<{ value: string; label: string }>;
 }
 
@@ -32,7 +32,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
     'truncate aucctus-text-md-medium aucctus-text-tertiary group-hover:text-primary-700';
 
   const createStatusCheckItem = React.useCallback(
-    (value: ConceptStatus) => (
+    (value: SeedStatus) => (
       <Menubar.Item
         key={utils.string.generateRandomString(5)}
         className={cn(menuItemClass, 'inline-flex items-center')}
@@ -135,7 +135,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                       ? statusOptions.map((option) =>
                           createCustomStatusCheckItem(option),
                         )
-                      : CONCEPT_STATUS_LIST.map((status) =>
+                      : SEED_STATUS_LIST.map((status) =>
                           createStatusCheckItem(status),
                         )}
                   </div>
@@ -180,7 +180,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                             key={`uf-${user.uuid}`}
                             disabled
                             onClick={() => {
-                              let value: Partial<IConceptFilterOptions> = {
+                              let value: Partial<ISeedFilterOptions> = {
                                 createdBy: undefined,
                               };
                               if (!filterCreatedByIsUser) {

@@ -1,20 +1,21 @@
 import { Badge, Button, Icon, Table, Text } from '@components';
 import { ConceptStage } from '@components/Badges/StageBadge';
-import { SeedActionMenuButton } from '@components/Tables/ConceptBank/ActionsMenuButton';
 import { useSeeds } from '@hooks/query/concepts.hook';
 import { IConceptSeed } from '@libs/api/concepts';
 import {
-  ConceptSeedStatus,
-  ConceptSort,
-  ConceptStatus,
   IUser,
+  SeedSort,
+  SeedStatus,
+  SortableSeedProperties,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
+import useStore from '@stores/store';
 import {
   ColumnDef,
   createColumnHelper,
   getCoreRowModel,
+  OnChangeFn,
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
@@ -22,21 +23,21 @@ import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 // Shared interfaces and constants
-export interface IConceptFilterOptions {
-  status: Set<ConceptStatus>;
+export interface ISeedFilterOptions {
+  status: Set<SeedStatus>;
   createdBy?: IUser;
   search?: string;
-  sort?: ConceptSort;
+  sort?: SeedSort;
 }
 
-const INITIAL_FILTER: IConceptFilterOptions = {
-  status: new Set<ConceptStatus>(),
+const INITIAL_FILTER: ISeedFilterOptions = {
+  status: new Set<SeedStatus>(),
 };
 
 const PAGE_SIZE = 20;
 
 export const areFilterOptionsSet = (
-  filterOptions: IConceptFilterOptions,
+  filterOptions: ISeedFilterOptions,
 ): boolean => {
   const { status, createdBy, search, sort } = filterOptions;
 
@@ -48,24 +49,36 @@ export const areFilterOptionsSet = (
   );
 };
 
+function isSortableSeedProperty(
+  value: string,
+): value is SortableSeedProperties {
+  const arr: SortableSeedProperties[] = [
+    'createdAt',
+    'updatedAt',
+    'status',
+    'type',
+  ];
+  return (arr as string[]).includes(value);
+}
+
 export const useSeedsBank = (
-  externalFilterOptions?: IConceptFilterOptions,
-  externalUpdateTableFiltering?: (
-    value: Partial<IConceptFilterOptions>,
-  ) => void,
+  externalFilterOptions?: ISeedFilterOptions,
+  externalUpdateTableFiltering?: (value: Partial<ISeedFilterOptions>) => void,
 ) => {
   const navigate = useNavigate();
+  const resetIncubationState = useStore(
+    (state) => state.incubation.resetQuestionnaire,
+  );
 
   // Use useRef for values that don't need to trigger re-renders when updated internally
-  const filterOptionsRef = React.useRef<IConceptFilterOptions>({
+  const filterOptionsRef = React.useRef<ISeedFilterOptions>({
     ...INITIAL_FILTER,
-    status: new Set(['draft'] as unknown as ConceptStatus[]), // Default to only show 'draft' seeds
+    status: new Set<SeedStatus>(['draft']), // Default to only show 'draft' seeds
   });
 
-  const [filterOptions, setFilterOptions] =
-    React.useState<IConceptFilterOptions>(
-      externalFilterOptions || filterOptionsRef.current,
-    );
+  const [filterOptions, setFilterOptions] = React.useState<ISeedFilterOptions>(
+    externalFilterOptions || filterOptionsRef.current,
+  );
 
   const [page, setPage] = React.useState<number>(1);
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -75,8 +88,9 @@ export const useSeedsBank = (
   // If we receive external filter options, use those instead
   React.useEffect(() => {
     if (externalFilterOptions) {
-      setFilterOptions(externalFilterOptions);
+      setFilterOptions({ ...filterOptions, ...externalFilterOptions });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalFilterOptions]);
 
   // Memoize the query options to prevent unnecessary API calls
@@ -104,7 +118,7 @@ export const useSeedsBank = (
 
   // Optimize the updateTableFiltering function
   const updateTableFiltering = React.useCallback(
-    (value: Partial<IConceptFilterOptions>) => {
+    (value: Partial<ISeedFilterOptions>) => {
       setPage(1); // avoid pagination issues
 
       // Use external update function if provided, otherwise update local state
@@ -122,7 +136,6 @@ export const useSeedsBank = (
   const resetFilter = React.useCallback(() => {
     const defaultFilter = {
       ...INITIAL_FILTER,
-      status: new Set(['draft'] as unknown as ConceptStatus[]), // Reset to default 'draft' filter
     };
 
     filterOptionsRef.current = defaultFilter;
@@ -192,6 +205,28 @@ export const useSeedsBank = (
       return 'questions';
     },
     [getAnsweredQuestionsCount],
+  );
+
+  const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(
+    (updater) => {
+      const newSorting =
+        typeof updater === 'function' ? updater(sorting) : updater;
+
+      if (newSorting.length === 0) {
+        updateTableFiltering({ sort: undefined });
+      } else {
+        const value = newSorting[0];
+        if (value && isSortableSeedProperty(value.id)) {
+          const sortValue = (
+            value.desc ? `-${value.id}` : value.id
+          ) as SeedSort;
+          updateTableFiltering({ sort: sortValue });
+        }
+      }
+
+      setSorting(newSorting);
+    },
+    [sorting, updateTableFiltering],
   );
 
   const columnHelper = createColumnHelper<IConceptSeed>();
@@ -307,7 +342,7 @@ export const useSeedsBank = (
         header: () => {},
         cell: (info) => {
           // Check if current seed is archived
-          const isArchived = info.row.original.status === 'ARCHIVED';
+          const isArchived = info.row.original.status === 'archived';
 
           // By default, show continue button for non-archived seeds
           let showButton = !isArchived;
@@ -316,7 +351,7 @@ export const useSeedsBank = (
           if (filterOptions.status.size > 1 && !isArchived) {
             // Extract values from the row for type checking
             const statusValue = Array.from(filterOptions.status).includes(
-              'draft' as ConceptStatus,
+              'draft',
             );
             showButton = statusValue;
           }
@@ -326,11 +361,12 @@ export const useSeedsBank = (
               {showButton && (
                 <Button.ConceptGenerate
                   variant='draft'
-                  onClick={() =>
+                  onClick={() => {
+                    resetIncubationState();
                     navigate(
-                      `${AppPath.IncubateConceptWithUuid.replace(':uuid', info.getValue())}`,
-                    )
-                  }
+                      `${AppPath.IncubateConcept}?seed=${info.getValue()}`,
+                    );
+                  }}
                 />
               )}
             </span>
@@ -348,20 +384,21 @@ export const useSeedsBank = (
         enableResizing: false,
         header: () => {},
         cell: (info) => (
-          <SeedActionMenuButton
+          <Table.SeedBank.SeedActionMenuButton
             uuid={info.getValue()}
-            status={info.row.original.status as ConceptSeedStatus}
+            status={info.row.original.status}
           />
         ),
       }),
     ];
   }, [
     columnHelper,
-    navigate,
-    filterOptions,
     extractConceptDescription,
     getAnsweredQuestionsCount,
     determineConceptStage,
+    filterOptions.status,
+    resetIncubationState,
+    navigate,
   ]);
 
   // Create table configuration outside of useMemo
@@ -379,13 +416,7 @@ export const useSeedsBank = (
       sorting,
     },
     getCoreRowModel: getCoreRowModel(),
-    onSortingChange: (
-      updater: SortingState | ((old: SortingState) => SortingState),
-    ) => {
-      const newSorting =
-        typeof updater === 'function' ? updater(sorting) : updater;
-      setSorting(newSorting);
-    },
+    onSortingChange: handleSortingChange,
   };
 
   // Use useReactTable directly at the top level, not inside a callback

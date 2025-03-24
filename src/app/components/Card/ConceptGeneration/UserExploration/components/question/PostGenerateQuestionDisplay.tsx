@@ -1,6 +1,6 @@
 import { Icon } from '@components';
 import { useConceptUpdate } from '@hooks/query/concepts.hook';
-import { ConceptIncubationClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
+import { IClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
@@ -163,7 +163,7 @@ const PostGenerateQuestionDisplay: React.FC<
   ]);
 
   const handleSelectClarifyingQuestion = useCallback(
-    (question: ConceptIncubationClarifyingQuestion) => {
+    (question: IClarifyingQuestion) => {
       dispatchAnimationEvent('fade', () => {
         setActiveClarifyingQuestion(question);
       });

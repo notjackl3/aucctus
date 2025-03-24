@@ -1,6 +1,6 @@
 import {
-  ConceptIncubationClarifyingQuestion,
   ConceptIncubationQuestion,
+  IClarifyingQuestion,
 } from '@libs/api/types/conceptSeedQuestionnaire';
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
@@ -189,7 +189,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
   }, [isClarifyingExpanded]);
 
   const handleSelectClarifyingQuestion = useCallback(
-    (question: ConceptIncubationClarifyingQuestion) => {
+    (question: IClarifyingQuestion) => {
       dispatchAnimationEvent('fade', () => {
         setActiveClarifyingQuestion(question);
       });

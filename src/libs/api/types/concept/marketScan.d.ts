@@ -1,5 +1,5 @@
-import { IBaseConceptEntity } from '.';
-import { ISupport } from './support';
+import type { IBaseConceptEntity } from './concepts';
+import type { ISupport } from './support';
 
 type EngagementAction =
   | 'partnership'
@@ -24,12 +24,12 @@ interface IKeyFact {
   evidence: FieldEvidence;
 }
 
-export interface INewsAndActivities {
+interface INewsAndActivities {
   text: string;
   evidence: FieldEvidence;
 }
 
-export interface IBaseMarketScanCompany extends IBaseConceptEntity {
+interface IBaseMarketScanCompany extends IBaseConceptEntity {
   name: string;
   domain?: string;
   overview?: string;
@@ -44,7 +44,7 @@ export interface IBaseMarketScanCompany extends IBaseConceptEntity {
   status: 'isPending' | 'completed';
 }
 
-export interface IStartup extends IBaseMarketScanCompany {
+interface IStartup extends IBaseMarketScanCompany {
   uuid: string;
 
   relevance?: string;
@@ -62,19 +62,19 @@ export interface IStartup extends IBaseMarketScanCompany {
   potentialEngagements?: IPotentialEngagement[];
 }
 
-export interface FieldEvidence {
+interface FieldEvidence {
   insight: string;
   // The source of the evidence
   sources: ISource[];
 }
 
-export interface IIncumbent extends IBaseMarketScanCompany {
+interface IIncumbent extends IBaseMarketScanCompany {
   hasCompetitiveProduct: boolean;
 }
 
 type TrendChangeType = 'increasing' | 'decreasing' | 'stagnating';
 
-export interface ITrendsAndDrivers extends IBaseConceptEntity {
+interface ITrendsAndDrivers extends IBaseConceptEntity {
   uuid: string;
   name: string;
   description: string;
@@ -85,7 +85,7 @@ export interface ITrendsAndDrivers extends IBaseConceptEntity {
   updatedAt: string;
 }
 
-export interface IMarketScan extends IBaseConceptEntity {
+interface IMarketScan extends IBaseConceptEntity {
   name: string;
 
   ecosystemDescription: string;

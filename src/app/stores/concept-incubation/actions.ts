@@ -1,10 +1,5 @@
 import { IncubationAnswer } from '@libs/api/concepts';
-import {
-  ConceptIncubationClarifyingQuestion,
-  IAISuggestion,
-  IGeneratedConcept,
-} from '@libs/api/types';
-import { QuestionnaireSection } from '@pages/Concept/Incubation/IncubateConcept';
+import { IClarifyingQuestion, IGeneratedConcept } from '@libs/api/types';
 import { IStoreApi } from '@stores/store';
 import { IConceptIncubationState } from './store';
 
@@ -19,16 +14,16 @@ export type IncubationAISuggestions = {
 
 export interface IConceptIncubationActions {
   setCurrentQuestionOrder: (index?: number) => void;
-  setActiveQuestionnaire: (questionnaire?: QuestionnaireSection) => void;
+  setActiveQuestionnaire: (
+    questionnaire?: IConceptIncubationQuestionnaireSection,
+  ) => void;
   setDraftSeedUuid: (uuid: string) => void;
   setCurrentTextAnswerList: (answerList: AnswerItem[]) => void;
   setCurrentMultiSelectAnswerList: (answerList: AnswerItem[]) => void;
   setSubmittedAnswers: (answers: IncubationAnswer[]) => void;
-  setClarifyingQuestions: (
-    questions: ConceptIncubationClarifyingQuestion[],
-  ) => void;
+  setClarifyingQuestions: (questions: IClarifyingQuestion[]) => void;
   setActiveClarifyingQuestion: (
-    question: ConceptIncubationClarifyingQuestion | undefined,
+    question: IClarifyingQuestion | undefined,
   ) => void;
   setActiveGeneratedConcept: (concept: IGeneratedConcept | undefined) => void;
   resetQuestionnaire: () => void;
@@ -44,7 +39,7 @@ export function setCurrentQuestionOrder(
 
 export function setActiveQuestionnaire(
   this: IStoreApi<IConceptIncubationState>,
-  questionnaire?: QuestionnaireSection,
+  questionnaire?: IConceptIncubationQuestionnaireSection,
 ) {
   this.set({ activeQuestionnaire: questionnaire });
 }
@@ -79,14 +74,14 @@ export function setSubmittedAnswers(
 
 export function setClarifyingQuestions(
   this: IStoreApi<IConceptIncubationState>,
-  questions: ConceptIncubationClarifyingQuestion[],
+  questions: IClarifyingQuestion[],
 ) {
   this.set({ clarifyingQuestions: questions });
 }
 
 export function setActiveClarifyingQuestion(
   this: IStoreApi<IConceptIncubationState>,
-  question: ConceptIncubationClarifyingQuestion | undefined,
+  question: IClarifyingQuestion | undefined,
 ) {
   this.set({ activeClarifyingQuestion: question });
 }
