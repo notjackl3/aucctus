@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatchIncubationAnimation } from './incubation-animation-event.hook';
+import telemetry from '@libs/telemetry';
 
 type AdvanceActionType = 'to-next-question' | 'to-clarifying-questions' | false;
 
@@ -52,7 +53,7 @@ export const useUserInteraction = () => {
 
   // ===== API MUTATIONS AND QUERIES =====
   const { mutate: deleteDraft, isLoading: isDeleteDraftLoading } =
-    useDeleteSeed();
+    useDeleteSeed({ status: 'draft' });
   const { mutate: saveAnswer, isLoading: isSaveAnswerLoading } =
     useSaveConceptSeedDraftAnswer();
   const { mutateAsync: updateAnswer, isLoading: isUpdateAnswerLoading } =
@@ -415,19 +416,22 @@ export const useUserInteraction = () => {
     if (!previousQuestion) {
       if ((seedDraftAnswers ?? []).length === 0) {
         deleteDraft(draftSeedUuid || '', {
-          onSuccess: resetQuestionnaire,
-          onError: () => {
-            toast.error('Failed to delete draft', {
-              toastId: 'delete-draft-error',
-              autoClose: 2000,
-              hideProgressBar: true,
-              pauseOnHover: false,
+          onSuccess: () => {
+            resetQuestionnaire();
+            navigate(AppPath.IncubateConcept, { replace: true });
+          },
+          onError: (error: unknown) => {
+            telemetry.error('Failed to delete unused draft', {
+              seedUuid: draftSeedUuid,
+              error: error instanceof Error ? error.message : 'Unknown error',
             });
+            resetQuestionnaire();
+            navigate(AppPath.IncubateConcept, { replace: true });
           },
         });
       } else {
         resetQuestionnaire();
-        navigate(AppPath.IncubateConcept);
+        navigate(AppPath.IncubateConcept, { replace: true });
       }
     } else {
       dispatchAnimationEvent('fade', () => {

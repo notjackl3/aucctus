@@ -117,11 +117,12 @@ export const useSaveSeed = () => {
   });
 };
 
-export const useDeleteSeed = () => {
+export const useDeleteSeed = (options?: ISeedQueryOptions) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (uuid: string) => await api.concept.delete(uuid),
+    mutationFn: async (uuid: string) =>
+      await api.seed.deleteSeed(uuid, options),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
     },

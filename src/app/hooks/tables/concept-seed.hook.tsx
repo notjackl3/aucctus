@@ -101,7 +101,7 @@ export const useSeedsBank = (
         ? `${filterOptions.createdBy.firstName} ${filterOptions.createdBy.lastName}`
         : undefined,
       search: filterOptions.search,
-      page,
+      page: page,
       sort: filterOptions.sort,
     }),
     [
@@ -343,9 +343,9 @@ export const useSeedsBank = (
         cell: (info) => {
           // Check if current seed is archived
           const isArchived = info.row.original.status === 'archived';
+          const isDraft = info.row.original.status === 'draft';
 
-          // By default, show continue button for non-archived seeds
-          let showButton = !isArchived;
+          let showButton = isDraft;
 
           // If we're filtering by multiple statuses, only show button for draft seeds that aren't archived
           if (filterOptions.status.size > 1 && !isArchived) {

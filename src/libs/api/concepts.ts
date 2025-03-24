@@ -30,6 +30,7 @@ export interface IConceptSeedAnswer {
 export interface IConceptSeed {
   uuid: string;
   answers: IConceptSeedAnswer[];
+  clarifyingQuestions: IClarifyingQuestion[];
   type: ConceptIncubationQuestionnaireType;
   createdAt: string;
   updatedAt: string;

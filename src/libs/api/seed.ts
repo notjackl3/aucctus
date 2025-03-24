@@ -46,7 +46,7 @@ export class SeedApi extends ApiService {
     );
   }
 
-  deleteSeed(seedUuid: string) {
-    return this.delete<IMessageResponse>(endpoints.seedUuid(seedUuid));
+  deleteSeed(seedUuid: string, options?: ISeedQueryOptions) {
+    return this.delete<IMessageResponse>(endpoints.seedUuid(seedUuid, options));
   }
 }

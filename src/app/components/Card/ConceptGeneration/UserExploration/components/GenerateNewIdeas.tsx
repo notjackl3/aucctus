@@ -8,6 +8,7 @@ import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedSt
 import React from 'react';
 import { toast } from 'react-toastify';
 import LoadingMask from './util/LoadingMask';
+import { AppPath } from '@routes/routes';
 
 type QuestionPath = 'expand-an-existing-idea' | 'identify-new-opportunities';
 
@@ -143,6 +144,12 @@ const GenerateNewIdeas: React.FC = () => {
                 );
                 setDraftSeedUuid(response.uuid);
                 setCurrentQuestionOrder(1);
+                // Update the URL to include the seed UUID without refreshing the page
+                window.history.pushState(
+                  { seedUuid: response.uuid },
+                  '',
+                  `${AppPath.IncubateConcept}?seed=${response.uuid}`,
+                );
               });
             },
             onError: () => {

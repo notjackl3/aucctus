@@ -90,7 +90,7 @@ export const useConceptBank = (
         ? `${filterOptions.createdBy.firstName} ${filterOptions.createdBy.lastName}`
         : undefined,
       search: filterOptions.search,
-      page,
+      page: page,
       sort: filterOptions.sort,
     }),
     [

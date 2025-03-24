@@ -10,6 +10,7 @@ import {
 } from '@hooks/query/concepts.hook';
 import { cn } from '@libs/utils/react';
 import { animated, easings, useTransition } from '@react-spring/web';
+import { AppPath } from '@routes/routes';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, {
   useCallback,
@@ -18,7 +19,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 type ConceptGenerationState =
@@ -40,10 +41,14 @@ const IncubateConcept: React.FC = () => {
   const userExplorationRef = useRef<HTMLDivElement>(null);
 
   // Data Fetching & Store Access
-  const { data: seedDraftData, isLoading: isSeedLoading } = useSeed(seedUuid);
+  const {
+    data: seedDraftData,
+    isLoading: isSeedLoading,
+    error: seedError,
+  } = useSeed(seedUuid, { status: 'draft' });
   const { questionnaires, isLoading: isQuestionnaireLoading } =
     useConceptIncubationQuestionnaire();
-  const { mutate: deleteDraft } = useDeleteSeed();
+  const { mutate: deleteDraft } = useDeleteSeed({ status: 'draft' });
   const {
     currentQuestionOrder,
     activeQuestionnaire,
@@ -54,11 +59,24 @@ const IncubateConcept: React.FC = () => {
     setSubmittedAnswers,
     setActiveQuestionnaire,
     setCurrentQuestionOrder,
+    setClarifyingQuestions,
   } = useConceptIncubationStore();
 
   // Fetch answers if we have a seed UUID
   const { data: seedDraftAnswers, isLoading: isAnswersLoading } =
     useGetConceptSeedDraftAnswers(draftSeedUuid || '');
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (seedError) {
+      const status = (seedError as any).response.status;
+      if (status === 404) {
+        resetQuestionnaire();
+        navigate(AppPath.IncubateConcept);
+      }
+    }
+  }, [seedError, resetQuestionnaire, navigate]);
 
   // Update store with UUID from props if available and not already set
   useEffect(() => {
@@ -97,6 +115,7 @@ const IncubateConcept: React.FC = () => {
           'IDENTIFY_NEW_OPPORTUNITIES'
       ) {
         setActiveQuestionnaire(questionnaires.identifyNewOpportunities);
+        setClarifyingQuestions(seedDraftData.clarifyingQuestions);
       }
     }
   }, [
@@ -104,6 +123,7 @@ const IncubateConcept: React.FC = () => {
     questionnaires,
     activeQuestionnaire,
     setActiveQuestionnaire,
+    setClarifyingQuestions,
   ]);
 
   // Update store with answers when they are loaded

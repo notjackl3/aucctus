@@ -6,11 +6,13 @@ import { Icon, Loading } from '@components';
 type ConceptRowButtonProps = {
   variant: ConceptReportStatus;
   onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
+  disabled?: boolean;
 };
 
 const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   variant,
   onClick,
+  disabled,
 }) => {
   const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
     const variantContext: Record<
@@ -56,7 +58,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   const { style, label } = getButtonContext(variant);
 
   return (
-    <button className={style} onClick={onClick}>
+    <button className={style} onClick={onClick} disabled={disabled}>
       {label}
     </button>
   );
