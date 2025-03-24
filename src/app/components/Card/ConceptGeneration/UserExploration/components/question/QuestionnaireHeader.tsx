@@ -1,5 +1,4 @@
 import { Badge, Icon } from '@components';
-import { QuestionnaireSection } from '@pages/Concept/IncubateConcept';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
 import { animated, useTransition } from 'react-spring';
@@ -7,14 +6,16 @@ import IncubationIcon from '../util/IncubationIcon';
 import ProgressCircle from '../util/ProgressCircle';
 
 interface QuestionnaireHeaderProps {
-  questionnaire?: QuestionnaireSection;
+  questionnaire?: IConceptIncubationQuestionnaireSection;
   onGoBack: () => void;
   onContinue: () => void;
   isQuestionAnswered: boolean;
   isRequired: boolean;
 }
 
-const formatHeaderName = (questionnaire?: QuestionnaireSection) =>
+const formatHeaderName = (
+  questionnaire?: IConceptIncubationQuestionnaireSection,
+) =>
   questionnaire?.type
     .split('_')
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())

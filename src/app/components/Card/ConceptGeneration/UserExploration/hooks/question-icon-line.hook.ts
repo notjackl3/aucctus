@@ -1,4 +1,3 @@
-import { IClarifyingQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
 import { useEffect } from 'react';
 
 /**

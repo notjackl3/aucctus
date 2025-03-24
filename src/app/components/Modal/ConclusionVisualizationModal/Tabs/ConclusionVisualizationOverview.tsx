@@ -1,8 +1,7 @@
-import React from 'react';
-import ReactMarkdown, { Components } from 'react-markdown';
-import { IInsight } from '@libs/api/types';
 import { Card } from '@components';
 import { mightContainMarkdown } from '@libs/utils/string';
+import React from 'react';
+import ReactMarkdown, { Components } from 'react-markdown';
 
 interface IConclusionVisualizationOverviewProps {
   conclusion: string;

@@ -58,6 +58,7 @@ export class Api {
     const socketConfig: ISocketConfig = {
       baseUrl: `${this._config.baseSocketUrl}/ws/v1/aucctus`,
       debug: this._config.debug,
+      autoConnect: true,
     };
     this.aucctusSocket = new AucctusSocket(this, socketConfig);
 

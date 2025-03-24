@@ -1,4 +1,3 @@
-import { ConceptIncubationQuestion } from '@libs/api/types';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
 import CompletionIconGroup from './CompletionIconGroup';

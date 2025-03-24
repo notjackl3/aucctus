@@ -1,12 +1,12 @@
 import api from '@libs/api';
-import {
+import type {
   IAssumption,
   IAssumptionCreate,
   IAssumptionTestDetails,
   IAssumptionTestStatus,
   IAssumptionTestStatusCategory,
   ITestStep,
-} from '@libs/api/types/assumptions';
+} from '@libs/api/types';
 import { useQuery } from 'react-query';
 import { useGenericConceptMutate, useGenericMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';

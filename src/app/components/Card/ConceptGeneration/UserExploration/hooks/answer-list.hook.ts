@@ -1,4 +1,4 @@
-import { AnswerItem } from '@stores/concept-incubation/enhancedStore'; // Adjust import based on your actual type
+import { AnswerItem } from '@stores/concept-incubation/actions';
 import React, { useCallback } from 'react';
 
 export const useAnswerList = (

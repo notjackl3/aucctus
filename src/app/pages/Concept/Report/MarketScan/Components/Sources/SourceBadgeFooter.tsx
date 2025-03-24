@@ -1,16 +1,15 @@
+import { Badge, Card, ComponentTooltip } from '@components';
+import { cn } from '@libs/utils/react';
 import React, {
   FunctionComponent,
-  useEffect,
-  useRef,
-  useMemo,
-  useState,
   useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
 } from 'react';
-import { ISource } from '@libs/api/types';
-import { Badge, Card, ComponentTooltip } from '@components';
-import MultiSourceBadge from './MultiSourceBadge';
 import ComponentList from './ComponentList';
-import { cn } from '@libs/utils/react';
+import MultiSourceBadge from './MultiSourceBadge';
 
 const renderSourceHeader = (source: ISource) => (
   <div className='flex w-full'>

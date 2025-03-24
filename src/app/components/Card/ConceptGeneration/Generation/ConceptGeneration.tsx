@@ -44,13 +44,13 @@ const ConceptGeneration = React.forwardRef<
 
   // Handle socket events for concept generation
   useSocketEvent('stream.structured.concept.generation', (data) => {
-    const { concepts: eventConcepts } = data?.content;
+    const { concepts: eventConcepts } = data?.content ?? {};
 
-    if (['done'].includes(data.stage) && eventConcepts) {
+    if ('done' === data.stage && eventConcepts) {
       setConcepts(eventConcepts);
       setGeneratedConcepts(draftSeedUuid, eventConcepts as IGeneratedConcept[]);
       setTimeout(() => handleGenerateComplete(), 3000);
-    } else if (['delta'].includes(data.stage) && eventConcepts) {
+    } else if ('delta' === data.stage && eventConcepts) {
       if (eventConcepts.length - 1 > concepts.length) {
         setConcepts(eventConcepts.slice(0, -1));
       }

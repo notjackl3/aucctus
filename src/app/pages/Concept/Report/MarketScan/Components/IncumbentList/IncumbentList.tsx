@@ -1,6 +1,6 @@
 import { Badge, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
-import { IIncumbent, ISource } from '@libs/api/types';
+import { IIncumbent } from '@libs/api/types';
 import React from 'react';
 import IncumbentDetails from './IncumbentDetails';
 import SidebarItem from './SidebarItem';

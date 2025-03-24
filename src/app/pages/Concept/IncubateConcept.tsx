@@ -4,9 +4,9 @@ import ConceptSelection from '@components/Card/ConceptGeneration/Generation/Conc
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import {
   useConceptIncubationQuestionnaire,
-  useConceptSeedDraft,
-  useDeleteConceptSeedDraft,
+  useDeleteSeed,
   useGetConceptSeedDraftAnswers,
+  useSeed,
 } from '@hooks/query/concepts.hook';
 import { cn } from '@libs/utils/react';
 import { animated, easings, useTransition } from '@react-spring/web';
@@ -40,11 +40,10 @@ const IncubateConcept: React.FC = () => {
   const userExplorationRef = useRef<HTMLDivElement>(null);
 
   // Data Fetching & Store Access
-  const { data: seedDraftData, isLoading: isSeedLoading } =
-    useConceptSeedDraft(seedUuid);
+  const { data: seedDraftData, isLoading: isSeedLoading } = useSeed(seedUuid);
   const { questionnaires, isLoading: isQuestionnaireLoading } =
     useConceptIncubationQuestionnaire();
-  const { mutate: deleteDraft } = useDeleteConceptSeedDraft();
+  const { mutate: deleteDraft } = useDeleteSeed();
   const {
     currentQuestionOrder,
     activeQuestionnaire,

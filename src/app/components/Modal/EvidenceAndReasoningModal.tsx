@@ -1,6 +1,5 @@
 import Icon from '@components/Icon';
 import { useModal } from '@context/ModalContextProvider';
-import { ISource } from '@libs/api/types';
 import React, { useEffect } from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';
 import { mightContainMarkdown } from '@libs/utils/string';

@@ -1,6 +1,5 @@
-import { QuestionIcon } from './QuestionIcon';
 import React from 'react';
-import { ConceptIncubationQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
+import { QuestionIcon } from './QuestionIcon';
 
 /**
  * CurrentQuestion component displays the current active question

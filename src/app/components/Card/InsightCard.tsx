@@ -1,6 +1,5 @@
-import React from 'react';
-import { IInsight, ISource } from '@libs/api/types';
 import { Badge, Icon } from '@components';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
 interface SourceCardProps {

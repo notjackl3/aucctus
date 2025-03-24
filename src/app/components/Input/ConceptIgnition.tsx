@@ -1,6 +1,5 @@
 import Button from '@components/Button';
 import Icon from '@components/Icon';
-import { ConceptIncubationQuestion, IDetailQuestion } from '@libs/api/types';
 import React from 'react';
 import InputField from './InputField/InputField';
 import TextArea from './TextArea/TextArea';
@@ -84,7 +83,7 @@ const ConceptIncubation: React.FC<ConceptIncubationInputProps> = ({
             <Button.RadioButtonGroup
               label={question.label}
               value={value}
-              options={question.options}
+              options={question.options.map((option) => option.label)}
               defaultSelected={question.defaultOption}
               required={question.required}
               onChange={(value) => onMultiSelectChange?.(value)}

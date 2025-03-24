@@ -1,10 +1,9 @@
 import { Card, Loading, Text } from '@components';
-import { ISource } from '@libs/api/types';
+import { useIncumbent } from '@hooks/query/company.hook';
+import { cn } from '@libs/utils/react';
 import React, { useCallback } from 'react';
 import InfoSection from '../InfoSection';
 import IconBox from './IconBox';
-import { useIncumbent } from '@hooks/query/company.hook';
-import { cn } from '@libs/utils/react';
 
 const iconDefaultProps = {
   height: 16,

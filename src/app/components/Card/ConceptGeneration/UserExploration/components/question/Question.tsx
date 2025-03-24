@@ -1,8 +1,7 @@
 import React, { forwardRef, useMemo } from 'react';
-import { ConceptIncubationQuestion } from '@libs/api/types/conceptSeedQuestionnaire';
-import CurrentQuestion from './CurrentQuestion';
 import MultiSelectAnswers from '../answer/MultiSelectAnswers';
 import TextAnswers from '../answer/TextAnswers';
+import CurrentQuestion from './CurrentQuestion';
 
 interface QuestionProps {
   question: ConceptIncubationQuestion;

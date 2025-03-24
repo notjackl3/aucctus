@@ -1,7 +1,6 @@
-import { ISource } from '@libs/api/types';
 import images from '@assets/img';
-import { FunctionComponent, useCallback } from 'react';
 import { cn } from '@libs/utils/react';
+import { FunctionComponent, useCallback } from 'react';
 
 interface MultiSourceBadgeProps {
   sources: ISource[];

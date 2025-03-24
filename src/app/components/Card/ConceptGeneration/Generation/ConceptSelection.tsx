@@ -6,10 +6,7 @@ import {
 } from '@hooks/query/concepts.hook';
 import { IGeneratedConcept } from '@libs/api/types';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
-import {
-  AnswerItem,
-  useConceptIncubationStore,
-} from '@stores/concept-incubation/enhancedStore';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import {
@@ -23,6 +20,7 @@ import PromptAnswers from './PromptAnswers';
 import SelectableConcept from './SelectableConcept';
 import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
+import { AnswerItem } from '@stores/concept-incubation/actions';
 
 // Constants
 const mainStyle = {

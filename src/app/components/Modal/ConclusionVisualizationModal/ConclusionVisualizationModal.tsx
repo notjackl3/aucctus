@@ -1,6 +1,5 @@
 import { Container } from '@components';
-import { ISource, IInsight } from '@libs/api/types';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ConclusionVisualizationOverview from './Tabs/ConclusionVisualizationOverview';
 import ConclusionVisualizationSources from './Tabs/ConclusionVisualizationSources';
 export interface IConclusionVisualizationProps {

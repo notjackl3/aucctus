@@ -1,4 +1,4 @@
-import { AnswerItem } from '@stores/concept-incubation/enhancedStore';
+import { AnswerItem } from '@stores/concept-incubation/actions';
 import React from 'react';
 import EditableAnswerRow from '../UserExploration/components/answer/EditableAnswerRow';
 

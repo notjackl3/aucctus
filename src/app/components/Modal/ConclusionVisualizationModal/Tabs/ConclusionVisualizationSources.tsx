@@ -1,5 +1,4 @@
-import { Badge, Icon, Card } from '@components';
-import { ISource } from '@libs/api/types';
+import { Badge, Card, Icon } from '@components';
 import React from 'react';
 
 interface ConclusionVisualizationSourcesProps {

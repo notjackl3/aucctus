@@ -41,6 +41,7 @@ export abstract class SocketService {
   }
 
   public connect(): void {
+    this.shouldReconnect = true;
     if (!this._accessToken) {
       return;
     }
@@ -59,29 +60,16 @@ export abstract class SocketService {
       }
       // Reset retry count on successful connection.
       this.currentRetryCount = 0;
-      this.onConnect();
-    };
-
-    this._ws.onmessage = (messageEvent: MessageEvent) => {
-      try {
-        const data: SocketEvent = JSON.parse(messageEvent.data);
-        this.handleMessage(data);
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error parsing incoming message', error);
-      }
     };
 
     this._ws.onerror = (error: Event) => {
       analytics.error('WebSocket encountered an error', error);
-      this.onError(error);
     };
 
     this._ws.onclose = (closeEvent: CloseEvent) => {
       if (this.config.debug) {
         analytics.debug('WebSocket closed:', closeEvent.reason);
       }
-      this.onDisconnect(closeEvent.reason);
       if (this.shouldReconnect) {
         if (
           this.config.maxRetries !== undefined &&
@@ -143,10 +131,4 @@ export abstract class SocketService {
       (l) => l !== listener,
     );
   }
-
-  // Abstract hooks to be implemented by subclasses.
-  protected abstract onConnect(): void;
-  protected abstract onError(error: Event): void;
-  protected abstract onDisconnect(reason: string): void;
-  protected abstract handleMessage(event: SocketEvent): void;
 }

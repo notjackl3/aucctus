@@ -1,10 +1,9 @@
 import { Icon } from '@components';
 import {
   useConceptIncubationQuestionnaire,
-  useSaveConceptSeedDraft,
+  useSaveSeed,
 } from '@hooks/query/concepts.hook';
 import { IConceptSeed } from '@libs/api/concepts';
-import { QuestionnaireSection } from '@pages/Concept/IncubateConcept';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
 import { toast } from 'react-toastify';
@@ -78,7 +77,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
 );
 
 const GenerateNewIdeas: React.FC = () => {
-  const { questionnaires } = useConceptIncubationQuestionnaire();
+  const { data: questionnaires } = useConceptIncubationQuestionnaire();
   const {
     setActiveQuestionnaire,
     setDraftSeedUuid,
@@ -90,7 +89,7 @@ const GenerateNewIdeas: React.FC = () => {
   const {
     mutate: saveConceptSeedDraft,
     isLoading: isSaveConceptSeedDraftLoading,
-  } = useSaveConceptSeedDraft();
+  } = useSaveSeed();
 
   const getAnimationStyle = React.useCallback(
     (duration: number, offset: number) => ({
@@ -140,7 +139,7 @@ const GenerateNewIdeas: React.FC = () => {
               handleTransition(contentElement, () => {
                 resetQuestionnaire();
                 setActiveQuestionnaire(
-                  questionnaires.identifyNewOpportunities as QuestionnaireSection,
+                  questionnaires?.identifyNewOpportunities,
                 );
                 setDraftSeedUuid(response.uuid);
                 setCurrentQuestionOrder(1);

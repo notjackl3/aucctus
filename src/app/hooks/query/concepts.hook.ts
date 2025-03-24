@@ -9,6 +9,8 @@ import {
   IConcept,
   IConceptOverview,
   IConceptQueryOptions,
+  IConceptSeedCreate,
+  IConceptSeedUpdate,
   ICustomerProfile,
   ICustomerProfileCreate,
   IEcosystemCreate,
@@ -76,22 +78,6 @@ export const useSeeds = (queryOptions: ISeedQueryOptions) => {
     keepPreviousData: true, // Keep previous data while loading new data
   });
 };
-export const useConceptSeed = (uuid: string) => {
-  const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptSeed, AucctusQueryKeys.concept, uuid],
-    cacheTime: Infinity,
-    staleTime: 1000 * 60 * 2, // 2 minute
-    enabled: !!uuid,
-    queryFn: async () => await api.concept.seed(uuid),
-  });
-
-  return {
-    ...query,
-    seed: query.data || {
-      answers: [],
-    },
-  };
-};
 
 export const useConceptGeneration = (uuid: string) => {
   return useMutation({
@@ -104,11 +90,11 @@ export const useConceptGeneration = (uuid: string) => {
   });
 };
 
-export const useConceptSeedDraft = (uuid?: string) => {
+export const useSeed = (uuid?: string, options?: ISeedQueryOptions) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeedDraft, uuid],
     queryFn: async () => {
-      return uuid ? await api.concept.seedDraft(uuid) : {};
+      return uuid ? await api.seed.getSeed(uuid, options) : {};
     },
   });
 
@@ -120,23 +106,22 @@ export const useConceptSeedDraft = (uuid?: string) => {
   };
 };
 
-export const useSaveConceptSeedDraft = () => {
+export const useSaveSeed = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (body: IConceptSeed) =>
-      await api.concept.saveSeedDraft(body),
+    mutationFn: async (body: IConceptSeedCreate) => await api.seed.create(body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
     },
   });
 };
 
-export const useDeleteConceptSeedDraft = () => {
+export const useDeleteSeed = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (uuid: string) => await api.concept.deleteSeedDraft(uuid),
+    mutationFn: async (uuid: string) => await api.concept.delete(uuid),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
     },
@@ -584,11 +569,11 @@ export const useSeedUpdate = () => {
   const queryClient = useQueryClient();
 
   return useMutation<
-    IConceptSeed,
+    IConceptSeedUpdate,
     AxiosError<IFormError<IConceptSeed>>,
     Partial<IConceptSeed> & { uuid: string }
   >({
-    mutationFn: async (seed) => await api.concept.updateSeed(seed, seed.uuid),
+    mutationFn: async (seed) => await api.seed.update(seed.uuid, seed),
     onSuccess: () => {
       Promise.all([
         queryClient.invalidateQueries({

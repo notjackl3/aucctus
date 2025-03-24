@@ -2,9 +2,6 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
-  ConceptIncubationQuestion,
-  ConceptIncubationQuestionnaireType,
-  ConceptSeedStatus,
   ConceptStatus,
   Ecosystem,
   IConcept,
@@ -19,6 +16,7 @@ import {
   IMarketScanV1,
   IPageResponse,
   ITrendsAndDriversV1,
+  SeedStatus,
 } from './types'; // Import the missing type
 
 export interface IConceptSeedAnswer {
@@ -35,7 +33,7 @@ export interface IConceptSeed {
   type: ConceptIncubationQuestionnaireType;
   createdAt: string;
   updatedAt: string;
-  status?: ConceptSeedStatus;
+  status?: SeedStatus;
   createdBy?: {
     firstName: string;
     lastName: string;
@@ -97,32 +95,6 @@ export class ConceptApi extends ApiService {
     return this.post<IConcept>(endpoints.conceptReportRetry(uuid));
   }
 
-  seed(uuid: string) {
-    return this.get<IConceptSeed>(endpoints.conceptSeed(uuid));
-  }
-
-  seedDraft(uuid: string) {
-    return this.get<IConceptSeed>(endpoints.conceptIncubationSeedUuid(uuid));
-  }
-
-  saveSeedDraft(seed: IConceptSeed) {
-    return this.post<IConceptSeed, IConceptSeed>(
-      endpoints.conceptIncubationSeed(),
-      seed,
-    );
-  }
-
-  updateSeed(seed: Partial<IConceptSeed>, uuid: string) {
-    return this.patch<IConceptSeed, Partial<IConceptSeed>>(
-      endpoints.conceptIncubationSeedUuid(uuid),
-      seed,
-    );
-  }
-
-  deleteSeedDraft(uuid: string) {
-    return this.delete<IConceptSeed>(endpoints.conceptIncubationSeedUuid(uuid));
-  }
-
   getSeedDraftAnswers(uuid: string) {
     return this.get<IncubationAnswer[]>(
       endpoints.conceptIncubationSeedUuidAnswers(uuid),
@@ -180,12 +152,6 @@ export class ConceptApi extends ApiService {
 
   getConcepts(options?: IConceptQueryOptions) {
     return this.get<IConceptPage>(endpoints.conceptQueries(options));
-  }
-
-  getSeeds(options?: IConceptQueryOptions) {
-    return this.get<IPageResponse<IConceptSeed>>(
-      endpoints.conceptIncubationSeeds(options),
-    );
   }
 
   deleteConcept(uuid: string) {

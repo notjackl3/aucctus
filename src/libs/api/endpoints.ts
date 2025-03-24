@@ -45,16 +45,18 @@ export class Endpoints {
     return `api/v1/concept/${conceptUuid}/seed`;
   }
 
-  static conceptIncubationSeed() {
-    return `api/v2/concept/incubation/seed`;
-  }
-
   static seedQueries(options?: ISeedQueryOptions) {
     return utils.string.queryStringGenerator(this.seed, options);
   }
 
-  static conceptIncubationSeedUuid(draftUuid: string) {
-    return `api/v2/concept/incubation/seed/${draftUuid}`;
+  static seedUuid(seedUuid: string, options?: ISeedQueryOptions) {
+    const url = `${this.seed}/${seedUuid}`;
+
+    if (options) {
+      return utils.string.queryStringGenerator(url, options);
+    }
+
+    return url;
   }
 
   static conceptIncubationSeedUuidAnswer(draftUuid: string) {

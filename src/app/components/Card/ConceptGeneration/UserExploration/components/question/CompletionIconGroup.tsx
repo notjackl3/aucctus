@@ -1,4 +1,3 @@
-import { ConceptIncubationQuestion } from '@libs/api/types';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { animated, useSpring } from 'react-spring';

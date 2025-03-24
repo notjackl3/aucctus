@@ -1,10 +1,5 @@
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
-import {
-  IAISuggestion,
-  IConceptIncubationMultiSelectQuestion,
-} from '@libs/api/types';
-
 import { AiSuggestionEvent } from '@libs/events';
 import { IncubationAnswerEvent } from '@libs/events/IncumbentAnswerEvent';
 import telemetry from '@libs/telemetry';
@@ -64,8 +59,12 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
       if (isMultiSelectQuestion && question) {
         const options = (question as IConceptIncubationMultiSelectQuestion)
           .options;
-        const answerValueSearchStrings = options.map((option) => option.value);
-        const answerLabelSearchStrings = options.map((option) => option.label);
+        const answerValueSearchStrings = options.map(
+          (option: IConceptIncubationMultiSelectOption) => option.value,
+        );
+        const answerLabelSearchStrings = options.map(
+          (option: IConceptIncubationMultiSelectOption) => option.label,
+        );
         const valueRegex = new RegExp(
           `\\b(${answerValueSearchStrings.join('|')})\\b`,
           'i',
@@ -149,7 +148,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
 
   // --- Socket event handling ---
   useSocketEvent('stream.structured.ai.suggestions', (data) => {
-    if (['done', 'delta'].includes(data.stage)) {
+    if ('done' === data.stage || 'delta' === data.stage) {
       telemetry.log(
         'aiSuggestions',
         data.context,

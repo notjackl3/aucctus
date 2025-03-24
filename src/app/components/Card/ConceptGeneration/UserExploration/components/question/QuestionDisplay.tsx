@@ -1,7 +1,3 @@
-import {
-  ConceptIncubationQuestion,
-  IClarifyingQuestion,
-} from '@libs/api/types/conceptSeedQuestionnaire';
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, {

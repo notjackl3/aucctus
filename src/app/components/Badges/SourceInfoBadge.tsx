@@ -1,12 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { ISource } from '@libs/api/types';
 import images from '@assets/img';
-import utils from '@libs/utils';
 import {
-  usePublishedDatesQuery,
   useClearbitCompany,
+  usePublishedDatesQuery,
 } from '@hooks/query/articles.hook';
+import utils from '@libs/utils';
 import { cn } from '@libs/utils/react';
+import React, { useEffect, useState } from 'react';
 
 interface SourceInfoBadgeProps {
   source: ISource;

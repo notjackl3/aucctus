@@ -6,11 +6,11 @@ import {
   subscribeWithSelector,
 } from 'zustand/middleware';
 import authSlice, { IAuthState } from './auth/store';
-import globalSlice, { IGlobalState } from './global/store';
 import conceptIncubationSlice, {
   IConceptIncubationState,
 } from './concept-incubation/store';
-import { AucctusStorage } from './storage';
+import globalSlice, { IGlobalState } from './global/store';
+import { AucctusStorage } from './utils/storage';
 
 export interface IAppStore {
   global: IGlobalState;

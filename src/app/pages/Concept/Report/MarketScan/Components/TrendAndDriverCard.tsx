@@ -1,7 +1,7 @@
 import images from '@assets/img';
 import { Card, Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
-import { IInsight, ISupport, ITrendsAndDrivers } from '@libs/api/types';
+import { ITrendsAndDrivers } from '@libs/api/types';
 import { FunctionComponent, useCallback, useMemo, useRef } from 'react';
 import SourceBadgeFooter from './Sources/SourceBadgeFooter';
 
@@ -22,17 +22,17 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
 }) => {
   const { openModal } = useModal();
 
-  const sources = useMemo(
-    () =>
-      Array.from(
-        new Map(
-          trendAndDriver.support.insights
-            .flatMap((i: IInsight) => i.sources)
-            .map((source) => [source.url, source]),
-        ).values(),
-      ),
-    [trendAndDriver.support.insights],
-  );
+  const sources = useMemo<ISource[]>(() => {
+    // Create a Map where each key is a source's URL and each value is the source object
+    const sourceMap: Map<string, ISource> = new Map(
+      trendAndDriver.support.insights
+        .flatMap((insight: IInsight) => insight.sources)
+        .map((source: ISource) => [source.url, source]),
+    );
+
+    // Convert the Map's values to an array
+    return Array.from(sourceMap.values());
+  }, [trendAndDriver.support.insights]);
 
   const handleSupportModalClick = useCallback(
     (title: string, conclusion: string, support: ISupport) => {

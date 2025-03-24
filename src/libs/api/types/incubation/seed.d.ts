@@ -38,6 +38,10 @@ interface IConceptSeed {
   clarifyingQuestions: IClarifyingQuestion[];
 }
 
+interface IConceptSeedUpdate {
+  status?: SeedStatus;
+}
+
 interface ISeedQueryOptions extends IPageQueryOptions {
   search?: string;
   status?: string;

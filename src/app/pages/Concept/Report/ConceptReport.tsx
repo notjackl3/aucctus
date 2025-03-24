@@ -26,7 +26,7 @@ type TabTitles =
   | 'Customer Profile'
   | 'Key Assumptions'
   | 'Context';
-export const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
+const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
   { label: 'Overview', value: AppPath.ConceptOverview },
   { label: 'Market Scan', value: AppPath.ConceptMarketScan },
   { label: 'Financial Projection', value: AppPath.ConceptFinancialProjection },

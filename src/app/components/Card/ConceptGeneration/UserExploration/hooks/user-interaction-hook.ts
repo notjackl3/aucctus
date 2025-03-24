@@ -1,5 +1,5 @@
 import {
-  useDeleteConceptSeedDraft,
+  useDeleteSeed,
   useGenerateConceptIncubationClarifyingQuestions,
   useGetConceptSeedDraftAnswers,
   useSaveConceptSeedDraftAnswer,
@@ -52,7 +52,7 @@ export const useUserInteraction = () => {
 
   // ===== API MUTATIONS AND QUERIES =====
   const { mutate: deleteDraft, isLoading: isDeleteDraftLoading } =
-    useDeleteConceptSeedDraft();
+    useDeleteSeed();
   const { mutate: saveAnswer, isLoading: isSaveAnswerLoading } =
     useSaveConceptSeedDraftAnswer();
   const { mutateAsync: updateAnswer, isLoading: isUpdateAnswerLoading } =
