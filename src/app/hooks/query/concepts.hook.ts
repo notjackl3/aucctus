@@ -8,6 +8,7 @@ import {
   Ecosystem,
   IConcept,
   IConceptOverview,
+  IConceptPage,
   IConceptQueryOptions,
   IConceptSeedCreate,
   IConceptSeedUpdate,
@@ -54,6 +55,12 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
     queryFn: () => api.concept.getConcepts(queryOptions),
     staleTime: 1000 * 60 * 2, // 2 minutes
     keepPreviousData: true, // Keep previous data while loading new data
+    refetchInterval: (data?: IConceptPage) => {
+      return data &&
+        data.results.some((concept) => concept.reportStatus === 'pending')
+        ? 5000
+        : false;
+    },
   });
 };
 
