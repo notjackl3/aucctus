@@ -169,46 +169,54 @@ export const useUserInteraction = () => {
       );
   }, []);
 
-  useEffect(() => {
-    if (!activeAnswer) {
-      setCurrentMultiSelectAnswerList([]);
-      setCurrentTextAnswerList([]);
-      return;
-    }
-
-    if (
-      activeQuestion?.fieldType === 'multiSelect' ||
-      activeQuestion?.fieldType === 'radioButton'
-    ) {
-      setCurrentMultiSelectAnswerList(
-        activeAnswer.answer.map((answer) => ({
-          answer: answer,
-          uuid: uuidv4(),
-        })),
-      );
-      if (activeAnswer.details) {
-        setCurrentTextAnswerList([
-          {
-            answer: activeAnswer.details,
-            uuid: uuidv4(),
-          },
-        ]);
-      } else {
+  const updateCurrentAnswerLists = useCallback(
+    (answer: IncubationAnswer | undefined) => {
+      if (!answer) {
+        setCurrentMultiSelectAnswerList([]);
         setCurrentTextAnswerList([]);
+        return;
       }
-    } else {
-      setCurrentTextAnswerList(
-        activeAnswer.answer.map((answer) => ({
-          answer: answer,
-          uuid: uuidv4(),
-        })),
-      );
-    }
+
+      if (
+        activeQuestion?.fieldType === 'multiSelect' ||
+        activeQuestion?.fieldType === 'radioButton'
+      ) {
+        setCurrentMultiSelectAnswerList(
+          answer.answer.map((answer) => ({
+            answer: answer,
+            uuid: uuidv4(),
+          })),
+        );
+        if (answer.details) {
+          setCurrentTextAnswerList([
+            {
+              answer: answer.details,
+              uuid: uuidv4(),
+            },
+          ]);
+        } else {
+          setCurrentTextAnswerList([]);
+        }
+      } else {
+        setCurrentTextAnswerList(
+          answer.answer.map((answer) => ({
+            answer: answer,
+            uuid: uuidv4(),
+          })),
+        );
+      }
+    },
+    [activeQuestion, setCurrentMultiSelectAnswerList, setCurrentTextAnswerList],
+  );
+
+  useEffect(() => {
+    updateCurrentAnswerLists(activeAnswer);
   }, [
     activeAnswer,
     activeQuestion,
     setCurrentTextAnswerList,
     setCurrentMultiSelectAnswerList,
+    updateCurrentAnswerLists,
   ]);
 
   const dispatchAiSuggestionsEvent = useCallback(() => {
@@ -315,6 +323,10 @@ export const useUserInteraction = () => {
     activeClarifyingQuestion,
     formattedAnswerPayload,
   ]);
+
+  const doRevertAnswer = useCallback(() => {
+    updateCurrentAnswerLists(activeAnswer);
+  }, [activeAnswer, updateCurrentAnswerLists]);
 
   const doUpdateAnswer = useCallback(() => {
     if (!activeAnswer) return;
@@ -559,6 +571,7 @@ export const useUserInteraction = () => {
     handleGoBack,
     handleSubmitAnswer,
     doUpdateAnswer,
+    doRevertAnswer,
     dispatchAiSuggestionsEvent,
   };
 };

@@ -33,6 +33,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     handleGoBack,
     handleSubmitAnswer,
     doUpdateAnswer,
+    doRevertAnswer,
     dispatchAiSuggestionsEvent,
   } = useUserInteraction();
 
@@ -91,7 +92,10 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
       <LoadingMask isLoading={isLoading} message={loadingMessage} />
       <ConfirmAnswerUpdate
         show={showConfirmation}
-        onCancel={() => setShowConfirmation(false)}
+        onCancel={() => {
+          doRevertAnswer();
+          setShowConfirmation(false);
+        }}
         onConfirm={() => {
           doUpdateAnswer();
           setShowConfirmation(false);
