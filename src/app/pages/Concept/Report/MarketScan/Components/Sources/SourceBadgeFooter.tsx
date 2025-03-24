@@ -22,7 +22,7 @@ const renderSourceHeader = (source: ISource) => (
 );
 
 const renderSourceContent = (source: ISource) => (
-  <div className='mx-2 mb-2 flex flex-col gap-4 px-2 pb-2'>
+  <div className='mx-2 mb-2 flex w-full flex-col gap-4 break-words px-2 pb-2'>
     <div className='aucctus-text-brand-primary aucctus-text-md-medium'>
       {source.title}
     </div>
@@ -70,6 +70,7 @@ const SourceBadges: FunctionComponent<SourceBadgesProps> = ({ sources }) => {
         <ComponentTooltip
           tip={renderSourceCard(source)}
           key={source.uuid + Math.random()}
+          hideDelay={300}
         >
           <Badge.SourceInfo
             badgeSize='small'

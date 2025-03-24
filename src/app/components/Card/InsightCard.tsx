@@ -26,7 +26,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source }) => {
         <span className='flex-1'></span>
         {renderLinkButton(source)}
       </div>
-      <div className='aucctus-text-tertiary aucctus-text-sm'>
+      <div className='aucctus-text-tertiary aucctus-text-sm break-words'>
         {source.description}
       </div>
     </div>
