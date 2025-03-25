@@ -341,20 +341,7 @@ export const useSeedsBank = (
         enableResizing: false,
         header: () => {},
         cell: (info) => {
-          // Check if current seed is archived
-          const isArchived = info.row.original.status === 'archived';
-          const isDraft = info.row.original.status === 'draft';
-
-          let showButton = isDraft;
-
-          // If we're filtering by multiple statuses, only show button for draft seeds that aren't archived
-          if (filterOptions.status.size > 1 && !isArchived) {
-            // Extract values from the row for type checking
-            const statusValue = Array.from(filterOptions.status).includes(
-              'draft',
-            );
-            showButton = statusValue;
-          }
+          const showButton = info.row.original.status === 'draft';
 
           return (
             <span className='m-auto flex h-full w-[124px] items-center justify-end self-stretch align-middle'>
@@ -396,7 +383,6 @@ export const useSeedsBank = (
     extractConceptDescription,
     getAnsweredQuestionsCount,
     determineConceptStage,
-    filterOptions.status,
     resetIncubationState,
     navigate,
   ]);
