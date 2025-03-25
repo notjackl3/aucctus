@@ -248,6 +248,11 @@ export const useSeedsBank = (
         cell: (info) => {
           const answeredCount = getAnsweredQuestionsCount(info.row.original);
 
+          const title =
+            info.row.original.title ||
+            `${answeredCount} question${answeredCount !== 1 ? 's' : ''} answered`;
+          const description = info.row.original.description || info.getValue();
+
           return (
             <div className='flex items-center'>
               <div className='mr-3 flex items-center justify-center rounded-lg border border-gray-100 bg-white p-3 shadow-sm'>
@@ -261,8 +266,8 @@ export const useSeedsBank = (
               </div>
               <div className='ml-2 flex flex-col items-center justify-center'>
                 <Text.Collapsible
-                  description={info.getValue()}
-                  title={`${answeredCount} question${answeredCount !== 1 ? 's' : ''} answered`}
+                  title={title}
+                  description={description}
                   truncationClassName='line-clamp-1'
                 />
               </div>

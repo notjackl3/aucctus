@@ -31,6 +31,8 @@ export type SeedSort = SortableSeedProperties | `-${SortableSeedProperties}`;
 export type SeedStatus = 'draft' | 'published' | 'archived';
 
 export interface IConceptSeed {
+  title?: string;
+  description?: string;
   uuid: string;
   answers: IConceptSeedAnswer[];
   type: ConceptIncubationQuestionnaireType;
