@@ -116,7 +116,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
 
   const dispatchAnswerUpdateEvent = useCallback((suggestion: IAISuggestion) => {
     IncubationAnswerEvent.dispatch({
-      answer: suggestion.description,
+      answer: suggestion.title + ': ' + suggestion.description,
     });
   }, []);
 
