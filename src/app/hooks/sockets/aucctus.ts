@@ -1,5 +1,6 @@
 import api from '@libs/api';
 import { SocketService } from '@libs/api/base';
+import { SocketEvent, SocketEventType } from '@libs/api/types';
 import React from 'react';
 
 function isSocketEventOfType<T extends SocketEventType, C extends object>(

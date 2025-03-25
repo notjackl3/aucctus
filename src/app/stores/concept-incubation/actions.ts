@@ -1,5 +1,10 @@
 import { IncubationAnswer } from '@libs/api/concepts';
-import { IClarifyingQuestion, IGeneratedConcept } from '@libs/api/types';
+import {
+  IAISuggestion,
+  IClarifyingQuestion,
+  IConceptIncubationQuestionnaireSection,
+  IGeneratedConcept,
+} from '@libs/api/types';
 import { IStoreApi } from '@stores/store';
 import { IConceptIncubationState } from './store';
 

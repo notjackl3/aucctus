@@ -1,4 +1,5 @@
 import { useModal } from '@context/ModalContextProvider';
+import { ISupport } from '@libs/api/types';
 import * as ScrollArea from '@radix-ui/react-scroll-area';
 import React from 'react';
 

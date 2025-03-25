@@ -10,6 +10,7 @@ import React, {
 } from 'react';
 import ComponentList from './ComponentList';
 import MultiSourceBadge from './MultiSourceBadge';
+import { ISource } from '@libs/api/types';
 
 const renderSourceHeader = (source: ISource) => (
   <div className='flex w-full'>

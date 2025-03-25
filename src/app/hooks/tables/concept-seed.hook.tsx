@@ -1,8 +1,8 @@
 import { Badge, Button, Icon, Table, Text } from '@components';
 import { ConceptStage } from '@components/Badges/StageBadge';
 import { useSeeds } from '@hooks/query/concepts.hook';
-import { IConceptSeed } from '@libs/api/concepts';
 import {
+  IConceptSeed,
   IUser,
   SeedSort,
   SeedStatus,
@@ -153,7 +153,8 @@ export const useSeedsBank = (
       // First look for answers with specific identifiers
       const describeAnswer = seed.answers.find(
         (a) =>
-          a.identifier === 'describe' || a.identifier === 'problemStatement',
+          a.question.identifier === 'describe' ||
+          a.question.identifier === 'problemStatement',
       );
 
       if (

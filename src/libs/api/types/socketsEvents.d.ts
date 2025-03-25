@@ -1,25 +1,25 @@
-interface BaseSocketEvent {}
+export interface BaseSocketEvent {}
 
-interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
+export interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
   type: 'incubation.ai.suggestions.request';
   seedUuid: string;
   questionId: int; // The question Identifier(And Strict Typing to this)
   answer?: string[];
 }
 
-interface ErrorEvent extends BaseSocketEvent {
+export interface ErrorEvent extends BaseSocketEvent {
   type: 'error';
   error: string;
   details: string | object | number | boolean;
 }
 
-interface NotificationEvent extends BaseSocketEvent {
+export interface NotificationEvent extends BaseSocketEvent {
   type: 'notification.user' | 'notification.account';
   title: string;
   body: string;
 }
 
-interface ChatMessageEvent extends BaseSocketEvent {
+export interface ChatMessageEvent extends BaseSocketEvent {
   type: 'chat.message.user';
   message: string;
   sender: string;
@@ -29,7 +29,7 @@ interface ChatMessageEvent extends BaseSocketEvent {
  * Base interface for all stream events.
  * Stream events represent data that is sent incrementally over time.
  */
-interface IBaseStreamEvent<T extends string, C extends object>
+export interface IBaseStreamEvent<T extends string, C extends object>
   extends BaseSocketEvent {
   type: T;
   id: string; // Unique identifier for the stream
@@ -54,7 +54,7 @@ interface IBaseStreamEvent<T extends string, C extends object>
  * Note: For 'stream.chat' type, T will be string
  * For 'stream.structured' type, T will be an object
  */
-interface IStreamDeltaEvent<
+export interface IStreamDeltaEvent<
   T extends string,
   K extends string,
   C extends object,
@@ -75,8 +75,11 @@ interface IStreamDeltaEvent<
  * Note: For 'stream.chat' type, T will be string
  * For 'stream.structured' type, T will be an object
  */
-interface IStreamDoneEvent<T extends string, K extends string, C extends object>
-  extends IBaseStreamEvent<T, C> {
+export interface IStreamDoneEvent<
+  T extends string,
+  K extends string,
+  C extends object,
+> extends IBaseStreamEvent<T, C> {
   stage: 'done';
   content: K;
 }
@@ -87,13 +90,13 @@ interface IStreamDoneEvent<T extends string, K extends string, C extends object>
  * Indicates that an error occurred during streaming.
  * This terminates the stream and signals that no more data will be sent.
  */
-interface IStreamErrorEvent<T extends string, C extends object>
+export interface IStreamErrorEvent<T extends string, C extends object>
   extends IBaseStreamEvent<T, C> {
   stage: 'error';
   content: null;
 }
 
-type StreamEvent<T extends string, K extends string, C extends object> =
+export type StreamEvent<T extends string, K extends string, C extends object> =
   | IStreamDeltaEvent<T, K, C>
   | IStreamDoneEvent<T, K, C>
   | IStreamErrorEvent<T, C>;
@@ -115,26 +118,26 @@ type StreamEvent<T extends string, K extends string, C extends object> =
 
  * Type-safe helpers for stream events based on their type
  */
-type ChatStreamEvent<C = {}> = StreamEvent<'stream.chat', string, C>;
-type AISuggestionsStreamEvent = StreamEvent<
+export type ChatStreamEvent<C = {}> = StreamEvent<'stream.chat', string, C>;
+export type AISuggestionsStreamEvent = StreamEvent<
   'stream.structured.ai.suggestions',
   IAISuggestionList,
   IAISuggestionsContext
 >;
-type ConceptGenerationStreamEvent = StreamEvent<
+export type ConceptGenerationStreamEvent = StreamEvent<
   'stream.structured.concept.generation',
   IGeneratedConceptList,
   IConceptGenerationContext
 >;
 
-interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
+export interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
   type: 'incubation.ai.suggestions.request';
   seedUuid: string;
   questionId: int;
   answer?: string[];
 }
 
-type SocketEvent<C = {}> =
+export type SocketEvent<C = {}> =
   | ErrorEvent
   | NotificationEvent
   | ChatMessageEvent
@@ -143,4 +146,4 @@ type SocketEvent<C = {}> =
   | AISuggestionsStreamEvent
   | ConceptGenerationStreamEvent;
 
-type SocketEventType = SocketEvent['type'];
+export type SocketEventType = SocketEvent['type'];

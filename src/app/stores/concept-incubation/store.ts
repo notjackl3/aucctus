@@ -1,6 +1,10 @@
 import { Lens, lens } from '@dhmk/zustand-lens';
 import { IncubationAnswer } from '@libs/api/concepts';
-import { IClarifyingQuestion, IGeneratedConcept } from '@libs/api/types';
+import {
+  IClarifyingQuestion,
+  IConceptIncubationQuestionnaireSection,
+  IGeneratedConcept,
+} from '@libs/api/types';
 import type { IAppStore } from '../store';
 import {
   AnswerItem,

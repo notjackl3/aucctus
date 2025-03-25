@@ -3,12 +3,11 @@ import {
   useConceptIncubationQuestionnaire,
   useSaveSeed,
 } from '@hooks/query/concepts.hook';
-import { IConceptSeed } from '@libs/api/concepts';
+import { AppPath } from '@routes/routes';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
 import { toast } from 'react-toastify';
 import LoadingMask from './util/LoadingMask';
-import { AppPath } from '@routes/routes';
 
 type QuestionPath = 'expand-an-existing-idea' | 'identify-new-opportunities';
 
@@ -132,9 +131,7 @@ const GenerateNewIdeas: React.FC = () => {
         saveConceptSeedDraft(
           {
             type: 'IDENTIFY_NEW_OPPORTUNITIES',
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          } as IConceptSeed,
+          },
           {
             onSuccess: (response) => {
               handleTransition(contentElement, () => {

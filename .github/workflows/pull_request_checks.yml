@@ -27,6 +27,9 @@ jobs:
       - name: Run Prettier Check
         run: npx prettier --config ./.prettierrc --check "**/*.{js,jsx,ts,tsx,json,css}"
 
+      - name: Run Type Check
+        run: npm run type-check
+
       - name: Run Build
         run: npm run build
 

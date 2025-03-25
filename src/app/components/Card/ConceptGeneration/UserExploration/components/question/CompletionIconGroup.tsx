@@ -2,6 +2,7 @@ import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedSt
 import React, { useCallback, useMemo, useRef } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { CompletionIcon } from './CompletionIcon';
+import { ConceptIncubationQuestion } from '@libs/api/types';
 
 interface CompletionIconGroupProps {
   questionGroup: ConceptIncubationQuestion[];

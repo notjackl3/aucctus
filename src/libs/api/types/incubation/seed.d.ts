@@ -1,32 +1,36 @@
 import type { IUser } from '../auth/accounts';
 import type { IPageQueryOptions } from '../osiris';
-interface IConceptSeedAnswer {
+export interface IConceptSeedAnswer {
   answer: string[];
   details?: string;
   question: ConceptIncubationQuestion;
   id?: number;
 }
 
-interface IConceptSeedAnswerUpdateCreate extends IConceptSeedAnswer {
+export interface IConceptSeedAnswerUpdateCreate extends IConceptSeedAnswer {
   answerId: number;
 }
 
-interface IClarifyingQuestion {
+export interface IClarifyingQuestion {
   title: string;
   uuid: string;
   icon: string;
   question: ConceptIncubationQuestion;
 }
 
-interface IConceptSeedCreate {
+export interface IConceptSeedCreate {
   type: ConceptIncubationQuestionnaireType;
 }
 
-type SortableSeedProperties = 'createdAt' | 'updatedAt' | 'status' | 'type';
-type SeedSort = SortableSeedProperties | `-${SortableSeedProperties}`;
-type SeedStatus = 'draft' | 'published' | 'archived';
+export type SortableSeedProperties =
+  | 'createdAt'
+  | 'updatedAt'
+  | 'status'
+  | 'type';
+export type SeedSort = SortableSeedProperties | `-${SortableSeedProperties}`;
+export type SeedStatus = 'draft' | 'published' | 'archived';
 
-interface IConceptSeed {
+export interface IConceptSeed {
   uuid: string;
   answers: IConceptSeedAnswer[];
   type: ConceptIncubationQuestionnaireType;
@@ -38,11 +42,11 @@ interface IConceptSeed {
   clarifyingQuestions: IClarifyingQuestion[];
 }
 
-interface IConceptSeedUpdate {
+export interface IConceptSeedUpdate {
   status?: SeedStatus;
 }
 
-interface ISeedQueryOptions extends IPageQueryOptions {
+export interface ISeedQueryOptions extends IPageQueryOptions {
   search?: string;
   status?: string;
   type?: string;

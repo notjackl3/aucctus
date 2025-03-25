@@ -1,4 +1,5 @@
 import { Card } from '@components';
+import { IInsight } from '@libs/api/types';
 import { mightContainMarkdown } from '@libs/utils/string';
 import React from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';

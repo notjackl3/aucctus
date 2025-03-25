@@ -2,6 +2,7 @@ import React, { forwardRef, useMemo } from 'react';
 import MultiSelectAnswers from '../answer/MultiSelectAnswers';
 import TextAnswers from '../answer/TextAnswers';
 import CurrentQuestion from './CurrentQuestion';
+import { ConceptIncubationQuestion } from '@libs/api/types';
 
 interface QuestionProps {
   question: ConceptIncubationQuestion;

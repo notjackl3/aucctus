@@ -1,18 +1,18 @@
-interface ISource {
+export interface ISource {
   uuid: string;
   title: string;
   description?: string;
   url: string;
 }
 
-interface IInsight {
+export interface IInsight {
   uuid: string;
   summary: string;
   description: string;
   sources: ISource[];
 }
 
-interface ISupport {
+export interface ISupport {
   uuid: string;
   insights: IInsight[];
 }

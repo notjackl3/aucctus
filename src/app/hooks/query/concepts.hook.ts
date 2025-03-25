@@ -1,6 +1,5 @@
 import api from '@libs/api';
 import {
-  IConceptSeed,
   IncubationAnswerPayload,
   IncubationAnswerUpdatePayload,
 } from '@libs/api/concepts';
@@ -10,6 +9,7 @@ import {
   IConceptOverview,
   IConceptPage,
   IConceptQueryOptions,
+  IConceptSeed,
   IConceptSeedCreate,
   IConceptSeedUpdate,
   ICustomerProfile,
@@ -100,16 +100,12 @@ export const useConceptGeneration = (uuid: string) => {
 export const useSeed = (uuid?: string, options?: ISeedQueryOptions) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeedDraft, uuid],
-    queryFn: async () => {
-      return uuid ? await api.seed.getSeed(uuid, options) : {};
-    },
+    queryFn: async () => (uuid ? await api.seed.getSeed(uuid, options) : null),
   });
 
   return {
     ...query,
-    seedDraft: query.data || {
-      answers: [],
-    },
+    seedDraft: query.data,
   };
 };
 

@@ -4,6 +4,7 @@ import { cn } from '@libs/utils/react';
 import React, { useCallback } from 'react';
 import InfoSection from '../InfoSection';
 import IconBox from './IconBox';
+import { ISource } from '@libs/api/types';
 
 const iconDefaultProps = {
   height: 16,

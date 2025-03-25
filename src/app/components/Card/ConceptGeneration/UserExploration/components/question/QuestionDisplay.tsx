@@ -18,6 +18,10 @@ import { PointerEventMask } from '../util/PointerEventMask';
 import CompletedQuestions from './CompletedQuestions';
 import { CompletionIcon } from './CompletionIcon';
 import Question from './Question';
+import {
+  ConceptIncubationQuestion,
+  IClarifyingQuestion,
+} from '@libs/api/types';
 
 interface QuestionDisplayProps {}
 

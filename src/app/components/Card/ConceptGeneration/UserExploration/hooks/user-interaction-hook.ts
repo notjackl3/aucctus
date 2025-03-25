@@ -18,6 +18,7 @@ import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatchIncubationAnimation } from './incubation-animation-event.hook';
 import telemetry from '@libs/telemetry';
+import { IClarifyingQuestion } from '@libs/api/types';
 
 type AdvanceActionType = 'to-next-question' | 'to-clarifying-questions' | false;
 

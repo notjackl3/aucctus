@@ -4,6 +4,7 @@ import React, { useMemo } from 'react';
 import { animated, useTransition } from 'react-spring';
 import IncubationIcon from '../util/IncubationIcon';
 import ProgressCircle from '../util/ProgressCircle';
+import { IConceptIncubationQuestionnaireSection } from '@libs/api/types';
 
 interface QuestionnaireHeaderProps {
   questionnaire?: IConceptIncubationQuestionnaireSection;

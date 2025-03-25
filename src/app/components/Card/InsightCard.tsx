@@ -1,4 +1,5 @@
 import { Badge, Icon } from '@components';
+import { IInsight, ISource } from '@libs/api/types';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
 
@@ -33,6 +34,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source }) => {
   );
 };
 
+// TODO: Split these into 2 separate files
 interface InsightCardProps {
   insight: IInsight;
   cardClassName?: string;

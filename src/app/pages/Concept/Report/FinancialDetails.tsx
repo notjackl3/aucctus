@@ -2,6 +2,7 @@ import { Card, Chart, Header, Modal } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useModal } from '@context/ModalContextProvider';
 import { useEditFinancialProjections } from '@hooks/concepts/editable.hook';
+import { ISource } from '@libs/api/types';
 import utils from '@libs/utils';
 import React, { FunctionComponent } from 'react';
 

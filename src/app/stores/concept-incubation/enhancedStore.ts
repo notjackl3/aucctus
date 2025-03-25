@@ -1,4 +1,5 @@
 import { IncubationAnswer } from '@libs/api/concepts';
+import { ConceptIncubationQuestion } from '@libs/api/types';
 import useStore from '@stores/store';
 import React from 'react';
 

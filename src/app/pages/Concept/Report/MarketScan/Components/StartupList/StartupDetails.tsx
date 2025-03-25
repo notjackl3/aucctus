@@ -1,6 +1,6 @@
 import { Button, Card, Icon, Loading, Text } from '@components';
 import { useStartup } from '@hooks/query/company.hook';
-import { EngagementAction } from '@libs/api/types';
+import { EngagementAction, ISource } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { toTitleCase } from '@libs/utils/string';
 import React, { useCallback } from 'react';

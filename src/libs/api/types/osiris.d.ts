@@ -14,7 +14,7 @@ export interface IPydanticValidationError<T = unknown> {
   url?: string;
 }
 
-type NestedKeyOf<T> = T extends object
+export type NestedKeyOf<T> = T extends object
   ? {
       [K in keyof T]: K extends string
         ? K | `${K}.${NestedKeyOf<T[K]>}`

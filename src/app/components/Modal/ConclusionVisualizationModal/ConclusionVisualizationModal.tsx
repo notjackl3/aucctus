@@ -2,6 +2,7 @@ import { Container } from '@components';
 import React, { useEffect, useState } from 'react';
 import ConclusionVisualizationOverview from './Tabs/ConclusionVisualizationOverview';
 import ConclusionVisualizationSources from './Tabs/ConclusionVisualizationSources';
+import { IInsight, ISource } from '@libs/api/types';
 export interface IConclusionVisualizationProps {
   conclusion: string;
   reasoning: string;

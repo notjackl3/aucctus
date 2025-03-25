@@ -3,6 +3,7 @@ import Icon from '@components/Icon';
 import React from 'react';
 import InputField from './InputField/InputField';
 import TextArea from './TextArea/TextArea';
+import { ConceptIncubationQuestion, IDetailQuestion } from '@libs/api/types';
 
 interface ConceptIncubationInputProps {
   value?: string;

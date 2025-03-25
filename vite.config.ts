@@ -1,5 +1,6 @@
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import react from '@vitejs/plugin-react';
+import cssnano from 'cssnano';
 import path from 'path';
 import { loadEnv } from 'vite';
 import compression from 'vite-plugin-compression';
@@ -9,15 +10,16 @@ import { defineConfig } from 'vitest/config';
 import { viteBoilerplatePlugin, watchIcons } from './vite/plugins.js';
 
 // https://vitejs.dev/config/
-export default defineConfig((config) => {
+export default defineConfig(async (config) => {
   const { mode } = config;
   const isDevelopment = mode === 'development';
   const env = loadEnv(mode, process.cwd(), '');
 
+  // Dynamically import vite-plugin-checker so it loads as an ES module.
+  const { default: checker } = await import('vite-plugin-checker');
+
   const defaultPlugins = [
-    require('cssnano')({
-      preset: 'default',
-    }),
+    cssnano({ preset: 'default' }),
     react(),
     svgr({
       svgrOptions: {
@@ -29,7 +31,19 @@ export default defineConfig((config) => {
     compression({ algorithm: 'brotliCompress' }), // Or 'gzip'
   ];
 
-  const devPlugins = [watchIcons(), viteBoilerplatePlugin(), eslint()];
+  const devPlugins = [
+    watchIcons(),
+    viteBoilerplatePlugin(),
+    eslint(),
+    checker({
+      typescript: {
+        tsconfigPath: './tsconfig.json', // use your valid tsconfig file
+      },
+      eslint: {
+        lintCommand: 'eslint "./src/**/*.{ts,tsx}"',
+      },
+    }),
+  ];
 
   const plugins = [
     ...defaultPlugins,
@@ -62,10 +76,8 @@ export default defineConfig((config) => {
         },
       },
     },
-
     resolve: {
       alias: {
-        // React Components and JavaScript
         '@components': path.resolve(__dirname, 'src/app/components'),
         '@pages': path.resolve(__dirname, 'src/app/pages'),
         '@routes': path.resolve(__dirname, 'src/routes'),
@@ -75,8 +87,6 @@ export default defineConfig((config) => {
         '@hooks': path.resolve(__dirname, 'src/app/hooks'),
         '@stores': path.resolve(__dirname, 'src/app/stores'),
         '@bootstraps': path.resolve(__dirname, 'src/app/bootstraps'),
-
-        // Style Sheets
         '~global.scss': path.resolve(
           __dirname,
           'src/app/assets/styles/global.scss',
@@ -98,59 +108,45 @@ export default defineConfig((config) => {
           'src/app/assets/styles/variables.scss',
         ),
         '~bootstrap': path.resolve(__dirname, 'node_modules/bootstrap'),
-
-        // Images
         '~pencil.png': path.resolve(__dirname, 'src/app/assets/img/pencil.png'),
       },
     },
     build: {
       outDir: 'build',
-      sourcemap: !isDevelopment ? 'hidden' : true, // 'hidden' doesn't add references in the bundle
+      sourcemap: !isDevelopment ? 'hidden' : true,
+      manifest: true,
       minify: 'terser',
-      assetsInlineLimit: 4096, // Inline small assets to reduce HTTP requests
-      chunkSizeWarningLimit: 1000, // Increase warning limit if needed
-      cssCodeSplit: true, // Split CSS for better caching
-      target: 'es2018', // Modern browsers support
+      assetsInlineLimit: 4096,
+      chunkSizeWarningLimit: 1000,
+      cssCodeSplit: true,
+      target: 'es2018',
       commonjsOptions: {
-        transformMixedEsModules: true, // Handle mixed CJS and ESM modules
+        transformMixedEsModules: true,
       },
       terserOptions: {
         compress: {
           drop_console: false,
           drop_debugger: true,
-          // pure_funcs: ['console.info', 'console.debug', 'console.warn'],
-          passes: 2, // Multiple passes can achieve better minimization
+          passes: 2,
         },
         mangle: {
-          safari10: true, // Better Safari compatibility
+          safari10: true,
         },
         format: {
-          comments: false, // Remove all comments
+          comments: false,
         },
       },
       rollupOptions: {
         output: {
           manualChunks: (id) => {
             if (id.includes('node_modules')) {
-              // Check if the module belongs to a predefined group
               const packageName = id.split('node_modules/')[1].split('/')[0];
-
-              // Size-based approach - large packages get their own chunk
-              // This list can be dynamically generated based on bundle analysis
               const largePackages = ['bootstrap'];
               if (largePackages.some((pkg) => packageName.startsWith(pkg))) {
                 return `vendor-${packageName.replace('@', '')}`;
               }
-
-              // Default vendor chunk
               return 'vendor';
             }
-
-            // Application code chunking - based on module path LEAVE HERE AS EXAMPLE FOR FUTURE
-            // if (id.includes('src/app/')) {
-            //   if (id.includes('components')) return 'app-components';
-            //   if (id.includes('pages')) return 'app-pages';
-            // }
           },
           entryFileNames: 'assets/[name].[hash].js',
           chunkFileNames: 'assets/[name].[hash].js',

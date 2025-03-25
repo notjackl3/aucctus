@@ -1,6 +1,6 @@
 import type { IPageQueryOptions, IPageResponse } from '../osiris';
 
-type ConceptStatus =
+export type ConceptStatus =
   | 'new'
   | 'ideating'
   | 'inReview'
@@ -10,9 +10,9 @@ type ConceptStatus =
   | 'commercialized'
   | 'archived';
 
-type ConceptCategory = 'active' | 'draft' | 'archive';
+export type ConceptCategory = 'active' | 'draft' | 'archive';
 
-type DraftConceptStatus = Exclude<
+export type DraftConceptStatus = Exclude<
   ConceptStatus,
   | 'prototyping'
   | 'proofOfConcept'
@@ -21,7 +21,7 @@ type DraftConceptStatus = Exclude<
   | 'archived'
 >;
 
-type ArchivedConceptStatus = Exclude<
+export type ArchivedConceptStatus = Exclude<
   ConceptStatus,
   | 'new'
   | 'ideating'
@@ -32,26 +32,26 @@ type ArchivedConceptStatus = Exclude<
   | 'commercialized'
 >;
 
-type ActiveConceptStatus = Exclude<
+export type ActiveConceptStatus = Exclude<
   ConceptStatus,
   ArchivedConceptStatus | DraftConceptStatus
 >;
 
-type ConceptReportStatus =
+export type ConceptReportStatus =
   | 'notStarted'
   | 'complete'
   | 'pending'
   | 'error'
   | 'draft';
 
-interface IBaseConceptEntity {
+export interface IBaseConceptEntity {
   uuid: string;
   version: number;
   createdAt: string;
   updatedAt: string;
 }
 
-interface IGeneratedConcept {
+export interface IGeneratedConcept {
   uuid: string;
   title: string;
   summary: string;
@@ -62,7 +62,7 @@ interface IGeneratedConcept {
   isGenerating?: boolean;
 }
 
-interface IConcept extends IBaseConceptEntity {
+export interface IConcept extends IBaseConceptEntity {
   uuid: string;
   title: string;
   description: string;
@@ -86,7 +86,7 @@ export interface IConceptOverview extends IBaseConceptEntity {
   financialProjection?: IFinancialProjection;
 }
 
-interface ICustomerProfile extends IBaseConceptEntity {
+export interface ICustomerProfile extends IBaseConceptEntity {
   name: string;
   description: string;
   nickname: string;
@@ -103,7 +103,7 @@ interface ICustomerProfile extends IBaseConceptEntity {
   quotes: string[];
 }
 
-interface ICustomerProfileCreate {
+export interface ICustomerProfileCreate {
   name: string;
   description: string;
   nickname: string;
@@ -118,10 +118,16 @@ interface ICustomerProfileCreate {
   quotes: string[];
 }
 
-type SortableConceptProperties = 'createdAt' | 'updatedAt' | 'status' | 'title';
-type ConceptSort = SortableConceptProperties | `-${SortableConceptProperties}`;
+export type SortableConceptProperties =
+  | 'createdAt'
+  | 'updatedAt'
+  | 'status'
+  | 'title';
+export type ConceptSort =
+  | SortableConceptProperties
+  | `-${SortableConceptProperties}`;
 
-interface IConceptQueryOptions extends IPageQueryOptions {
+export interface IConceptQueryOptions extends IPageQueryOptions {
   search?: string;
   user?: string;
   status?: string;
@@ -130,6 +136,6 @@ interface IConceptQueryOptions extends IPageQueryOptions {
   sort?: ConceptSort;
 }
 
-interface IConceptPage extends IPageResponse<IConcept> {
+export interface IConceptPage extends IPageResponse<IConcept> {
   statusCounts: { [key in ConceptStatus]: number };
 }

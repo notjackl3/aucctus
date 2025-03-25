@@ -1,5 +1,10 @@
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import api from '@libs/api';
+import type {
+  IAISuggestion,
+  IConceptIncubationMultiSelectOption,
+  IConceptIncubationMultiSelectQuestion,
+} from '@libs/api/types';
 import { AiSuggestionEvent } from '@libs/events';
 import { IncubationAnswerEvent } from '@libs/events/IncumbentAnswerEvent';
 import telemetry from '@libs/telemetry';

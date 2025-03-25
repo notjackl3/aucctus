@@ -1,7 +1,12 @@
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
-import type { IConcept, IGeneratedConcept } from './types';
+import type {
+  IClarifyingQuestion,
+  IConcept,
+  IConceptIncubationQuestionnaire,
+  IGeneratedConcept,
+} from './types';
 
 export class IncubateConceptApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = false;

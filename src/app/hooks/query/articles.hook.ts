@@ -1,6 +1,7 @@
 import api from '@libs/api';
 import { useQuery } from 'react-query';
 import { AucctusQueryKeys } from './query-keys';
+import { ISource } from '@libs/api/types';
 
 const getBaseUrl = (url: string): string => {
   try {

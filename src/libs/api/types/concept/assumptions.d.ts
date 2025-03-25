@@ -1,13 +1,13 @@
 import type { IBaseConceptEntity } from './concepts';
 
-type AssumptionTestStatus =
+export type AssumptionTestStatus =
   | 'notStarted'
   | 'inProgress'
   | 'partiallyValidated'
   | 'validated'
   | 'invalidated';
 
-type TestStatus = 'notStarted' | 'inProgress' | 'completed';
+export type TestStatus = 'notStarted' | 'inProgress' | 'completed';
 
 /**
  * Assumption Tests:
@@ -30,7 +30,7 @@ type TestStatus = 'notStarted' | 'inProgress' | 'completed';
  * - Test Drives
  * - Product Roadmap Testing
  */
-type TestType =
+export type TestType =
   | 'scanningSurvey'
   | 'immersiveDialogue'
   | 'marketPulseCheck'
@@ -44,18 +44,18 @@ type TestType =
   | 'testDrive'
   | 'productRoadmapTesting';
 
-type ConceptTestStatus = 'notStarted' | 'inProgress' | 'completed';
-type ConceptTestStage = 'discover' | 'validate' | 'scale';
+export type ConceptTestStatus = 'notStarted' | 'inProgress' | 'completed';
+export type ConceptTestStage = 'discover' | 'validate' | 'scale';
 
-type AssumptionCategory =
+export type AssumptionCategory =
   | 'adaptability'
   | 'desirability'
   | 'feasibility'
   | 'viability';
 
-type RiskCategory = 'high' | 'medium' | 'low';
+export type RiskCategory = 'high' | 'medium' | 'low';
 
-interface IAssumptionCreate {
+export interface IAssumptionCreate {
   name: string;
   hypothesis: string;
   riskLevel: number;
@@ -64,7 +64,7 @@ interface IAssumptionCreate {
   assumptionsType: AssumptionCategory;
 }
 
-interface IAssumption extends IBaseConceptEntity {
+export interface IAssumption extends IBaseConceptEntity {
   name: string;
   text: string;
   category: AssumptionCategory;
@@ -85,7 +85,7 @@ interface IAssumption extends IBaseConceptEntity {
   testProgress: AssumptionTestStatus[];
 }
 
-interface IAssumptionTestDetails extends IBaseConceptEntity {
+export interface IAssumptionTestDetails extends IBaseConceptEntity {
   status: AssumptionTestStatus;
   identifier: str;
   goal: string;
@@ -97,7 +97,7 @@ interface IAssumptionTestDetails extends IBaseConceptEntity {
   stage: ConceptTestStage;
 }
 
-interface IConceptTestDetails extends IBaseConceptEntity {
+export interface IConceptTestDetails extends IBaseConceptEntity {
   uuid: string;
   identifier: string;
   description: string;
@@ -115,7 +115,7 @@ interface IConceptTestDetails extends IBaseConceptEntity {
   findings: ITestFindings[];
 }
 
-interface IConceptTestSpec {
+export interface IConceptTestSpec {
   stage: ConceptTestStage;
   name: string;
 
@@ -133,7 +133,7 @@ interface IConceptTestSpec {
   expectedOutputs: IConceptTestExpectedOutput[];
 }
 
-interface IAssumptionsToTest {
+export interface IAssumptionsToTest {
   name: string;
   findings?: string;
   status: AssumptionTestStatus;
@@ -143,37 +143,37 @@ interface IAssumptionsToTest {
   assumptionUuid: string;
 }
 
-interface TimeFrame {
+export interface TimeFrame {
   h?: number; // hours
   d?: number; // days
   w?: number; // weeks
   m?: number; // months
 }
 
-interface HighLevelCharacteristics {
+export interface HighLevelCharacteristics {
   costEstimate: 'low' | 'medium' | 'high';
   effortNeeded: 'low' | 'medium' | 'high';
   timeForExecution: 'short' | 'medium' | 'long';
 }
 
-interface IConceptTestSpecStep {
+export interface IConceptTestSpecStep {
   stepId: int;
   title: string;
   description: string;
 }
 
-interface IConceptTestExpectedOutput {
+export interface IConceptTestExpectedOutput {
   title: string;
   description: string;
 }
 
-interface ITestFindings extends IBaseConceptEntity {
+export interface ITestFindings extends IBaseConceptEntity {
   uuid: string;
   content: string;
   testUuid: string;
 }
 
-interface ITestStep extends IBaseConceptEntity {
+export interface ITestStep extends IBaseConceptEntity {
   testUuid: string;
   stepId: int;
   uuid: string;
@@ -183,7 +183,7 @@ interface ITestStep extends IBaseConceptEntity {
   suggestedOutputAndConsiderations: string;
 }
 
-interface IAssumptionTestStatus {
+export interface IAssumptionTestStatus {
   desirability: IAssumptionTestStatusCategory;
   feasibility: IAssumptionTestStatusCategory;
   viability: IAssumptionTestStatusCategory;
@@ -192,12 +192,12 @@ interface IAssumptionTestStatus {
   overview: IAssumptionTestStatusOverview;
 }
 
-interface IAssumptionTestStatusCategory {
+export interface IAssumptionTestStatusCategory {
   status: AssumptionTestStatus;
   testProgress: AssumptionTestStatus[];
   estimatedEndDate?: string;
 }
-interface IAssumptionTestStatusOverview {
+export interface IAssumptionTestStatusOverview {
   daysRemaining?: number;
   daysPast?: number;
   riskiestCategory?: AssumptionCategory;

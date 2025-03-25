@@ -1,3 +1,4 @@
+import { IAISuggestion } from '@libs/api/types';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 

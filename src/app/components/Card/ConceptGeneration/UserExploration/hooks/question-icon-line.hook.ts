@@ -1,3 +1,4 @@
+import { IClarifyingQuestion } from '@libs/api/types';
 import { useEffect } from 'react';
 
 /**

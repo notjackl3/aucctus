@@ -2,6 +2,7 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
+  ConceptIncubationQuestion,
   ConceptStatus,
   Ecosystem,
   IConcept,
@@ -16,38 +17,13 @@ import {
   IMarketScanV1,
   IPageResponse,
   ITrendsAndDriversV1,
-  SeedStatus,
+  QuestionFieldType,
 } from './types'; // Import the missing type
 
-export interface IConceptSeedAnswer {
-  answer: string[];
-  details?: string;
-  question: ConceptIncubationQuestion;
-  identifier?: string;
-  id?: number;
-}
-
-export interface IConceptSeed {
-  uuid: string;
-  answers: IConceptSeedAnswer[];
-  clarifyingQuestions: IClarifyingQuestion[];
-  type: ConceptIncubationQuestionnaireType;
-  createdAt: string;
-  updatedAt: string;
-  status?: SeedStatus;
-  createdBy?: {
-    firstName: string;
-    lastName: string;
-    uuid: string;
-  };
-}
-
-// Incubation
-export type FieldType = 'text' | 'textarea' | 'multiSelect' | 'radioButton';
-
+// TODO: Move these types to their correct files.
 export interface IncubationAnswerPayload {
   questionId: number;
-  fieldType: FieldType;
+  fieldType: QuestionFieldType;
   answer: string[];
   details?: string;
 }

@@ -1,6 +1,6 @@
 import { Badge, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
-import { IStartup } from '@libs/api/types';
+import { ISource, IStartup } from '@libs/api/types';
 import React from 'react';
 import StartupDetails from './StartupDetails';
 import StartupSideBarItem from './StartupSideBarItem';

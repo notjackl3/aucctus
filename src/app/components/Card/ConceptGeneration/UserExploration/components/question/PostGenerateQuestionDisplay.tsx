@@ -22,6 +22,7 @@ import ReadyToGenerate from '../ready-to-generate/ReadyToGenerate';
 import LoadingMask from '../util/LoadingMask';
 import { PointerEventMask } from '../util/PointerEventMask';
 import Question from './Question';
+import { IClarifyingQuestion } from '@libs/api/types';
 
 interface PostGenerateQuestionDisplayProps {}
 

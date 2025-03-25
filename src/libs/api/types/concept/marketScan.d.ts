@@ -1,35 +1,35 @@
 import type { IBaseConceptEntity } from './concepts';
 import type { ISupport } from './support';
 
-type EngagementAction =
+export type EngagementAction =
   | 'partnership'
   | 'investment'
   | 'acquisition'
   | 'customer'
   | 'supplier';
-interface IPotentialEngagement {
+export interface IPotentialEngagement {
   description: string;
   action: EngagementAction;
 }
 
-interface IContact {
+export interface IContact {
   name: string;
   title: string;
   email?: string;
   linkedin?: string;
 }
 
-interface IKeyFact {
+export interface IKeyFact {
   text: string;
   evidence: FieldEvidence;
 }
 
-interface INewsAndActivities {
+export interface INewsAndActivities {
   text: string;
   evidence: FieldEvidence;
 }
 
-interface IBaseMarketScanCompany extends IBaseConceptEntity {
+export interface IBaseMarketScanCompany extends IBaseConceptEntity {
   name: string;
   domain?: string;
   overview?: string;
@@ -44,7 +44,7 @@ interface IBaseMarketScanCompany extends IBaseConceptEntity {
   status: 'isPending' | 'completed';
 }
 
-interface IStartup extends IBaseMarketScanCompany {
+export interface IStartup extends IBaseMarketScanCompany {
   uuid: string;
 
   relevance?: string;
@@ -62,19 +62,19 @@ interface IStartup extends IBaseMarketScanCompany {
   potentialEngagements?: IPotentialEngagement[];
 }
 
-interface FieldEvidence {
+export interface FieldEvidence {
   insight: string;
   // The source of the evidence
   sources: ISource[];
 }
 
-interface IIncumbent extends IBaseMarketScanCompany {
+export interface IIncumbent extends IBaseMarketScanCompany {
   hasCompetitiveProduct: boolean;
 }
 
-type TrendChangeType = 'increasing' | 'decreasing' | 'stagnating';
+export type TrendChangeType = 'increasing' | 'decreasing' | 'stagnating';
 
-interface ITrendsAndDrivers extends IBaseConceptEntity {
+export interface ITrendsAndDrivers extends IBaseConceptEntity {
   uuid: string;
   name: string;
   description: string;
@@ -85,7 +85,7 @@ interface ITrendsAndDrivers extends IBaseConceptEntity {
   updatedAt: string;
 }
 
-interface IMarketScan extends IBaseConceptEntity {
+export interface IMarketScan extends IBaseConceptEntity {
   name: string;
 
   ecosystemDescription: string;

@@ -1,5 +1,6 @@
 import analytics from '@libs/telemetry';
 import { SocketService } from './base';
+import { SocketEvent } from './types';
 
 export class AucctusSocket extends SocketService {
   protected onError(error: Event): void {

@@ -1,24 +1,24 @@
-interface IAISuggestionsContext {
+export interface IAISuggestionsContext {
   seedUuid: string;
   questionId: int; // The question Identifier(And Strict Typing to this)
   userUuid: string;
 }
 
-interface IAISuggestionList {
+export interface IAISuggestionList {
   suggestions: IAISuggestion[];
 }
 
-interface IAISuggestion {
+export interface IAISuggestion {
   title: string;
   description: string;
 }
 
-interface IConceptGenerationContext {
+export interface IConceptGenerationContext {
   seedUuid: string;
   accountUuid: string;
   userUuid: string;
 }
 
-interface IGeneratedConceptList {
+export interface IGeneratedConceptList {
   concepts: IGeneratedConcept[];
 }

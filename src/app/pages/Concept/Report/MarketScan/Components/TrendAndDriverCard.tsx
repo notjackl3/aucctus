@@ -1,7 +1,12 @@
 import images from '@assets/img';
 import { Card, Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
-import { ITrendsAndDrivers } from '@libs/api/types';
+import {
+  IInsight,
+  ISource,
+  ISupport,
+  ITrendsAndDrivers,
+} from '@libs/api/types';
 import { FunctionComponent, useCallback, useMemo, useRef } from 'react';
 import SourceBadgeFooter from './Sources/SourceBadgeFooter';
 
