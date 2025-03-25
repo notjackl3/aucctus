@@ -76,11 +76,12 @@ interface IConcept extends IBaseConceptEntity {
   marketScanVersion: 'v1' | 'v2';
 }
 
-interface IConceptOverview extends IBaseConceptEntity {
+export interface IConceptOverview extends IBaseConceptEntity {
+  text: string;
   valueProposition: string;
   problemStatement?: string;
-  industries: string[];
-  trendsAndDrivers?: string[];
+
+  // TODO: Remove and use API instead.
   persona?: ICustomerProfile;
   financialProjection?: IFinancialProjection;
 }

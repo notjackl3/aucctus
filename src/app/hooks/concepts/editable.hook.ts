@@ -232,6 +232,14 @@ export function useEditOverview() {
     useConceptOverviewUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 250 };
 
+  const text = useEditableField<string, IConceptOverview>({
+    initialValue: overview?.text || '',
+    fieldName: 'text',
+    updateMutation: updateConceptOverview,
+    identifier: overview?.uuid || '',
+    validation: { maxLength: 1500 },
+  });
+
   const valueProposition = useEditableField<string, IConceptOverview>({
     initialValue: overview?.valueProposition || '',
     fieldName: 'valueProposition',
@@ -249,6 +257,7 @@ export function useEditOverview() {
   });
 
   return {
+    text,
     problemStatement,
     valueProposition,
   };
