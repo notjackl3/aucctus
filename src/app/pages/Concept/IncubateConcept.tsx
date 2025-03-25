@@ -19,7 +19,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 
 type ConceptGenerationState =
@@ -67,16 +67,26 @@ const IncubateConcept: React.FC = () => {
     useGetConceptSeedDraftAnswers(draftSeedUuid || '');
 
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleResetAndNavigate = useCallback(() => {
+    resetQuestionnaire();
+    if (
+      location.pathname.includes('/concept/incubate') &&
+      searchParams.has('seed')
+    ) {
+      navigate(AppPath.IncubateConcept, { replace: true });
+    }
+  }, [navigate, resetQuestionnaire, location, searchParams]);
 
   useEffect(() => {
     if (seedError) {
       const status = (seedError as any).response.status;
       if (status === 404) {
-        resetQuestionnaire();
-        navigate(AppPath.IncubateConcept);
+        handleResetAndNavigate();
       }
     }
-  }, [seedError, resetQuestionnaire, navigate]);
+  }, [seedError, handleResetAndNavigate]);
 
   // Update store with UUID from props if available and not already set
   useEffect(() => {
@@ -203,18 +213,16 @@ const IncubateConcept: React.FC = () => {
   }, [draftSeedUuid, submittedAnswers, deleteDraft, resetQuestionnaire]);
 
   const deleteAnswerlessDraft = useCallback(() => {
-    const { draftSeedUuid, submittedAnswers, deleteDraft, resetQuestionnaire } =
+    const { draftSeedUuid, submittedAnswers, deleteDraft } =
       latestValuesRef.current;
 
     if (submittedAnswers.length === 0 && draftSeedUuid) {
       deleteDraft(draftSeedUuid, {
-        onSuccess: () => resetQuestionnaire(),
-        onError: () => {
-          resetQuestionnaire();
-        },
+        onSuccess: () => handleResetAndNavigate(),
+        onError: () => handleResetAndNavigate(),
       });
     }
-  }, []);
+  }, [handleResetAndNavigate]);
 
   useEffect(() => {
     return () => deleteAnswerlessDraft();
