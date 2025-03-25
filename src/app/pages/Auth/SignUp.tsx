@@ -62,11 +62,12 @@ const SignUp: FunctionComponent = () => {
   return (
     <>
       <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
-        <span className='aucctus-header-md-medium aucctus-text-brand-primary relative self-stretch'>
+        <span className='aucctus-header-sm-medium aucctus-text-brand-primary relative self-stretch'>
           Sign Up
         </span>
         <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
-          Start your 30-day free trial
+          After completing the form below, check your email for a confirmation
+          link.
         </span>
         {error && (
           <div className={styles.error}>

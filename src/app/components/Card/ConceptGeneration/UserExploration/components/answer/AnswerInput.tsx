@@ -43,7 +43,7 @@ const AnswerInput: React.FC<AnswerInputProps> = ({
       </span>
       <span className='absolute right-2 top-1/2 -translate-y-1/2 transform'>
         <button
-          className='btn btn-primary my-2 aspect-square w-6 rounded-lg'
+          className='btn btn-primary aspect-square w-6 rounded-lg'
           disabled={value.length === 0 || !allowAddAnswer}
           aria-label='Add Answer'
           onClick={onAddAnswer}

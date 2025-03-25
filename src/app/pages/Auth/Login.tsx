@@ -25,7 +25,7 @@ const Login: FunctionComponent = () => {
   return (
     <>
       <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
-        <span className='aucctus-text-brand-secondary aucctus-header-md-medium relative self-stretch'>
+        <span className='aucctus-text-brand-primary aucctus-header-sm-medium relative self-stretch'>
           Login
         </span>
         <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>

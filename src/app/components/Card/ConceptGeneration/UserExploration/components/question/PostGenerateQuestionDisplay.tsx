@@ -26,73 +26,51 @@ import { IClarifyingQuestion } from '@libs/api/types';
 
 interface PostGenerateQuestionDisplayProps {}
 
-interface NextConceptButtonProps {
-  onClick: () => void;
-  disabled: boolean;
-}
-
-interface PreviousConceptButtonProps {
-  onClick: () => void;
-  disabled: boolean;
-}
-
 interface ConceptCounterProps {
   currentIndex: number;
   totalConcepts: number;
+  onNextConcept?: () => void;
+  onPreviousConcept?: () => void;
 }
 
 const ConceptCounter: React.FC<ConceptCounterProps> = ({
   currentIndex,
   totalConcepts,
+  onNextConcept,
+  onPreviousConcept,
 }) => {
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary aucctus-text-secondary aucctus-text-sm-semibold fixed right-4 top-20 z-[1000] rounded-lg border-2 p-2'>
-      <span className='aucctus-text-primary'>
+    <div className='aucctus-text-sm-medium absolute right-4 top-4 z-[1000] flex flex-row gap-2 p-2'>
+      {currentIndex > 0 && (
+        <span
+          className='cursor-pointer hover:scale-110'
+          onClick={onPreviousConcept}
+        >
+          <Icon
+            variant='arrowleft'
+            width={20}
+            height={20}
+            className='!stroke-gray-light-600'
+          />
+        </span>
+      )}
+      <span className='aucctus-text-secondary'>
         {currentIndex + 1} of {totalConcepts}
       </span>
+      {currentIndex < totalConcepts - 1 && (
+        <span
+          className='cursor-pointer hover:scale-110'
+          onClick={onNextConcept}
+        >
+          <Icon
+            variant='arrowright'
+            width={20}
+            height={20}
+            className='!stroke-gray-light-600'
+          />
+        </span>
+      )}
     </div>
-  );
-};
-
-const PreviousConceptButton: React.FC<PreviousConceptButtonProps> = ({
-  onClick,
-  disabled,
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-        'btn btn-light fixed left-5 top-1/2 z-[1000] flex h-10 w-10 -translate-y-1/2 cursor-pointer shadow-xl transition-all duration-300 hover:scale-110 active:scale-95',
-        { hidden: disabled },
-      )}
-      aria-label='Previous concept'
-    >
-      <span className='flex items-center justify-center'>
-        <Icon variant='arrowleft' width={20} height={20} />
-      </span>
-    </button>
-  );
-};
-
-const NextConceptButton: React.FC<NextConceptButtonProps> = ({
-  onClick,
-  disabled,
-}) => {
-  return (
-    <button
-      onClick={onClick}
-      disabled={disabled}
-      className={cn(
-        'btn btn-light fixed right-5 top-1/2 z-[1000] flex h-10 w-10 -translate-y-1/2 cursor-pointer shadow-xl transition-all duration-300 hover:scale-110 active:scale-95',
-        { hidden: disabled },
-      )}
-      aria-label='Next concept'
-    >
-      <span className='flex items-center justify-center'>
-        <Icon variant='arrowright' width={20} height={20} />
-      </span>
-    </button>
   );
 };
 
@@ -213,10 +191,19 @@ const PostGenerateQuestionDisplay: React.FC<
         {
           onSuccess: () => {
             dispatchAnimationEvent('fade', () => {
-              const updatedConcept = activeGeneratedConcept;
+              const updatedConcept = { ...activeGeneratedConcept };
               updatedConcept.isGenerating = true;
-              setActiveGeneratedConcept(updatedConcept);
               updateGeneratedConcept(draftSeedUuid, updatedConcept);
+
+              // Find next non-generated concept
+              const nextNonGeneratedConcept = currentGeneratedConcepts.find(
+                (concept) =>
+                  !concept.isGenerating && concept.uuid !== updatedConcept.uuid,
+              );
+
+              setActiveGeneratedConcept(
+                nextNonGeneratedConcept ?? updatedConcept,
+              );
             });
           },
           onError: () => {
@@ -232,6 +219,7 @@ const PostGenerateQuestionDisplay: React.FC<
     updateGeneratedConcept,
     draftSeedUuid,
     dispatchAnimationEvent,
+    currentGeneratedConcepts,
   ]);
 
   useEffect(() => {
@@ -277,26 +265,12 @@ const PostGenerateQuestionDisplay: React.FC<
         ref={componentRef}
         className='no-scrollbar relative z-[999] flex flex-1 flex-col transition-all duration-300 ease-in-out'
       >
-        {currentGeneratedConcepts.length > 1 && (
+        {currentGeneratedConcepts.length > 1 && !activeClarifyingQuestion && (
           <ConceptCounter
             currentIndex={currentConceptIndex}
             totalConcepts={currentGeneratedConcepts.length}
-          />
-        )}
-
-        {currentGeneratedConcepts.length > 1 && !activeClarifyingQuestion && (
-          <PreviousConceptButton
-            onClick={handlePreviousConcept}
-            disabled={currentConceptIndex === 0}
-          />
-        )}
-
-        {currentGeneratedConcepts.length > 1 && !activeClarifyingQuestion && (
-          <NextConceptButton
-            onClick={handleNextConcept}
-            disabled={
-              currentConceptIndex === currentGeneratedConcepts.length - 1
-            }
+            onPreviousConcept={handlePreviousConcept}
+            onNextConcept={handleNextConcept}
           />
         )}
 

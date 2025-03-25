@@ -233,14 +233,14 @@ const IntroducingAucctusCard: React.FC<IntroducingAucctusCardProps> = ({}) => {
         style={getAnimationStyle(300, 300)}
         className='aucctus-text-white aucctus-header-xs-medium relative left-[12.5%] top-[70%] z-[12] w-[75%] text-center'
       >
-        Introducing Aucctus Idea AI 2.0®
+        Introducing Aucctus Ideate AI 2.0®
       </div>
       <div
         style={getAnimationStyle(300, 300)}
         className='aucctus-text-white aucctus-text-sm relative left-[12.5%] top-[72%] z-[12] w-[75%] text-center'
       >
-        Powerful, self-serve product and growth analytics to help you convert,
-        engage, and retain more users.
+        An AI-powered innovation expert at your fingertips– <br />
+        ready to find and validate ideas that transform your business.
       </div>
     </div>
   );
