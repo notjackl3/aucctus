@@ -12,7 +12,7 @@ const HEADER_TEXT = 'Reset Password';
 const SUPPORTING_TEXT =
   'Your new password must be different to previously used passwords.';
 const ICON_VARIANT: IconVariant = 'key';
-const ICON_COLOR = 'purple';
+const ICON_COLOR = 'primary';
 
 const ResetPassword: FunctionComponent = () => {
   const navigate = useNavigate();

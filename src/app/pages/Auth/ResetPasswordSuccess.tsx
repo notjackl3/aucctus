@@ -11,7 +11,7 @@ const ResetPasswordSuccess: FunctionComponent = () => {
     <>
       <div className={`${styles.header} ${styles.h2}`}>
         {/* TODO: Get Check Icon */}
-        <FeatureIcon icon={'threeStars'} color={'green'} />
+        <FeatureIcon icon={'threeStars'} color={'success'} />
         <span className={styles.title}>Password Reset Successful</span>
         <span className={styles.supportingText}>
           Your password has been successfully reset. Click below to login.

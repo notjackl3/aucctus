@@ -40,7 +40,7 @@ const ConfirmEmail: FunctionComponent = () => {
     return error || !token
       ? {
           icon: 'warning',
-          color: 'yellow',
+          color: 'warning',
           title: 'Token Invalid or Expired',
           supportingText:
             'Please try logging in again to receive a new email confirmation link, or if the issue persists contact your admin.',
@@ -48,7 +48,7 @@ const ConfirmEmail: FunctionComponent = () => {
       : {
           icon: 'mail',
           title: 'Your Email is Confirmed!',
-          color: 'green',
+          color: 'success',
           supportingText: 'Please return to the login page to sign in.',
         };
   }, [error, token]);

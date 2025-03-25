@@ -1,6 +1,5 @@
 import { FunctionComponent } from 'react';
 
-import styles from '../../assets/styles/components/onboarding-message.module.scss';
 import FeatureIcon, { IFeatureIconProps } from '../Icon/FeatureIcon';
 
 interface OnboardingMessageProps extends IFeatureIconProps {
@@ -15,12 +14,16 @@ const OnboardingMessage: FunctionComponent<OnboardingMessageProps> = ({
   color,
 }) => {
   return (
-    <div className={styles.onboardingMessage}>
-      <FeatureIcon icon={icon} color={color} />
+    <div className='aucctus-border-primary aucctus-bg-primary flex w-[36rem] items-start gap-4 rounded-xl border p-4'>
+      <span className='flex h-full items-center justify-center'>
+        <FeatureIcon icon={icon} color={color} />
+      </span>
 
-      <div className={styles.message}>
-        <span className={styles.title}>{title}</span>
-        <span className={styles.description}>{description}</span>
+      <div className='flex flex-1 flex-col items-start gap-0.5'>
+        <span className='aucctus-text-primary aucctus-text-md'>{title}</span>
+        <span className='aucctus-text-secondary aucctus-text-sm'>
+          {description}
+        </span>
       </div>
     </div>
   );

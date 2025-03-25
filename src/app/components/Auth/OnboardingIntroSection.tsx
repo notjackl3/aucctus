@@ -7,40 +7,36 @@ const OnboardingIntoSection: FunctionComponent = () => {
     <div className={`${styles.intoSection}  ${styles.onboarding}`}>
       <h1>Get ready to unleash the Power of AI-Driven Innovation:</h1>
       <OnboardingMessage
-        title={'Instant Industry Intel'}
-        description={'Dive in and dominate with on-the-spot market insights'}
+        title={'Identify Innovative Ideas'}
+        description={
+          'Our AI agents will find unique, innovative opportunities for your company to pursue – instantly'
+        }
         icon={'target'}
-        color={'purple'}
+        color={'primary'}
       />
       <OnboardingMessage
-        title={'Idea Factory'}
+        title={'Instantly Validate Idea Potential'}
         description={
-          'Let innovation flow! We generate and rank your next big moves'
+          'In minutes, our agents conduct weeks worth of research and investigation on market trends, startups, customer personas and financial modelling'
         }
         icon='lightbulb'
-        color={'purple'}
+        color={'primary'}
       />
       <OnboardingMessage
-        title={'Persona Magic'}
+        title={'Democratize Innovation Best Practice'}
         description={
-          'Tailor-made strategies that resonate with your ideal audience'
+          'Our standardized innovation process guides employees from any business unit through a stage-gated, risk mitigated process'
         }
         icon='user-group'
-        color={'purple'}
+        color={'primary'}
       />
       <OnboardingMessage
-        title={'Seamless Strategy Roadmaps'}
-        description={'From spark to success, we guide every step'}
-        icon='rocket'
-        color={'purple'}
-      />
-      <OnboardingMessage
-        title={'Make Moves with Confidence'}
+        title={'Tracking, ROI and Accountability'}
         description={
-          'Backed by the freshest, most precise data-driven insights. Join the future of business expansion today!'
+          'Visualize all activity company-wide to track idea stage, impact size, and return on investment of your innovation practice'
         }
-        icon='search-refraction'
-        color={'purple'}
+        icon='rocket'
+        color={'primary'}
       />
     </div>
   );

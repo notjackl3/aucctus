@@ -41,7 +41,7 @@ const ForgotPassword: FunctionComponent = () => {
   return (
     <>
       <div className={`${styles.header} ${styles.h2}`}>
-        <FeatureIcon icon={'key'} color={'purple'} />
+        <FeatureIcon icon={'key'} color={'primary'} />
         <span className={styles.title}>Forgot Password</span>
         <span className={styles.success}>
           {isSuccess && isSubmitted

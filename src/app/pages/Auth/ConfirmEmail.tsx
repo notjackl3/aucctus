@@ -9,7 +9,7 @@ const ConfirmEmail: FunctionComponent = () => {
   return (
     <>
       <div className={`${styles.header} ${styles.h2}`}>
-        <FeatureIcon icon={'mail'} color={'purple'} />
+        <FeatureIcon icon={'mail'} color={'primary'} />
         <span className={styles.title}>Confirm Email</span>
         <span className={styles.supportingText}>
           Please check your email and confirm your email address.
@@ -18,8 +18,13 @@ const ConfirmEmail: FunctionComponent = () => {
       <form className={styles.basicForm}>
         <div className={styles.signUp}>
           <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant='arrowleft' height={20} width={20} stroke='' /> Back
-            to log in
+            <Icon
+              variant='arrowleft'
+              height={20}
+              width={20}
+              stroke='stroke-primary-800'
+            />{' '}
+            Back to log in
           </Link>
         </div>
       </form>

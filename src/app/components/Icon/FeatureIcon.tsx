@@ -1,5 +1,6 @@
 import React from 'react';
 import Icon from './Icon/Icon';
+import { cn } from '@libs/utils/react';
 
 const defaultIconProps = {
   stroke: '#000',
@@ -9,28 +10,37 @@ const defaultIconProps = {
 
 export interface IFeatureIconProps {
   icon: IconVariant;
-  color: 'purple' | 'green' | 'yellow';
+  color: 'primary' | 'success' | 'warning' | 'error';
 }
 
 const colorStyle = {
-  purple: 'bg-indigo-100 border-violet-50',
-  green: 'bg-emerald-100 border-emerald-50',
-  yellow: '',
+  primary: 'aucctus-bg-secondary',
+  success: 'aucctus-bg-success-primary',
+  warning: 'aucctus-bg-warning-primary',
+  error: 'aucctus-bg-error-primary',
 };
 
-const stroke = {
-  purple: '#4318ff',
-  green: '#039855',
-  yellow: '#edb845',
+const strokeStyle = {
+  primary: 'stroke-primary-900',
+  success: 'stroke-success-900',
+  warning: 'stroke-warning-900',
+  error: 'stroke-error-900',
 };
 
 const FeatureIcon: React.FC<IFeatureIconProps> = ({ icon, color }) => {
   return (
     <div
-      className={`inline-flex h-14 w-14 items-center justify-center gap-2.5 rounded-full border-8 p-3.5 ${colorStyle[color]}`}
+      className={cn(
+        'inline-flex h-14 w-14 items-center justify-center gap-2.5 rounded-full p-3.5',
+        colorStyle[color],
+      )}
     >
-      <div className='relative h-7 w-7'>
-        <Icon variant={icon} {...defaultIconProps} stroke={stroke[color]} />
+      <div className='relative flex h-7 w-7 items-center justify-center'>
+        <Icon
+          variant={icon}
+          {...defaultIconProps}
+          className={strokeStyle[color]}
+        />
       </div>
     </div>
   );

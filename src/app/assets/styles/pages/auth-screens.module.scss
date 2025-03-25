@@ -147,7 +147,7 @@
       justify-content: center;
       align-items: center;
       gap: 0.5rem;
-      color: var(--gray-600-text-secondary, #667085) !important;
+      color: #271818 !important;
       font-family: $font-family;
       font-size: 0.875rem;
       font-style: normal;
@@ -155,7 +155,7 @@
       line-height: 1.25rem;
 
       svg {
-        @apply stroke-gray-light-200 #{!important};
+        @apply stroke-gray-light-500 #{!important};
       }
     }
 
