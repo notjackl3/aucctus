@@ -32,7 +32,7 @@ const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
   { label: 'Financial Projection', value: AppPath.ConceptFinancialProjection },
   { label: 'Customer Profile', value: AppPath.ConceptCustomerProfile },
   { label: 'Key Assumptions', value: AppPath.ConceptKeyAssumptions },
-  // { label: 'Context', value: AppPath.ConceptSettings },
+  { label: 'Context', value: AppPath.ConceptSettings },
 ];
 
 const ConceptReport: FunctionComponent = () => {

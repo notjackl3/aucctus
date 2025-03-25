@@ -72,6 +72,7 @@ export interface IConcept extends IBaseConceptEntity {
   category: ConceptCategory;
   createdBy: IUser;
   hasSeed: boolean;
+  seedUuid: string;
 
   marketScanVersion: 'v1' | 'v2';
 }

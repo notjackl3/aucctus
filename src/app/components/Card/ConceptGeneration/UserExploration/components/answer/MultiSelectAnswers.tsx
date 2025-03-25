@@ -3,7 +3,7 @@ import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { boxShadowStyle } from '../question/QuestionIcon';
+import { boxShadowStyle } from '../../../../../Icon/QuestionIcon';
 
 /**
  * MultiSelectAnswers component handles rendering and interaction for multiple choice questions

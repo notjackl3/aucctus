@@ -25,7 +25,10 @@ export class SeedApi extends ApiService {
     this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
-  getSeed(seedUuid: string, options?: ISeedQueryOptions) {
+  getSeed(
+    seedUuid: string,
+    options?: ISeedQueryOptions,
+  ): Promise<IConceptSeed> {
     return this.get<IConceptSeed>(endpoints.seedUuid(seedUuid, options));
   }
 

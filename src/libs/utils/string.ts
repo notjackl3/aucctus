@@ -16,6 +16,18 @@ export function camelCaseToTitleCase(camelCase: string) {
     .join(' ');
 }
 
+export const snakeToTitleCase = (str: string): string => {
+  return (
+    str
+      // Split on underscores
+      .split('_')
+      // Capitalize first letter of each word, lowercase the rest
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      // Join with spaces
+      .join(' ')
+  );
+};
+
 export const removeProtocol = (source: string) => {
   const unwantedPrefix = ['https://', 'http://'];
   let d = source;

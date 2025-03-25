@@ -1,7 +1,6 @@
 import { Icon } from '@components';
-import { boxShadowStyle } from './QuestionIcon';
-import React from 'react';
 import { cn } from '@libs/utils/react';
+import { boxShadowStyle } from '../../../../../Icon/QuestionIcon';
 
 interface CompletionIconProps {
   className?: string;

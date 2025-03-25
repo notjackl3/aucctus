@@ -1,6 +1,6 @@
-import React from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import React from 'react';
 
 // Shadow style shared across components
 export const boxShadowStyle = {
@@ -19,7 +19,12 @@ export const questionIconVariantMap: Record<string, IconVariant> = {
   consumerProfiles: 'user-group',
 };
 
-export const QuestionIcon = ({
+export const QuestionIcon: React.FC<{
+  questionType: string;
+  className?: string;
+  innerRef?: React.RefObject<HTMLSpanElement>;
+  variant?: IconVariant;
+}> = ({
   questionType,
   className,
   innerRef,

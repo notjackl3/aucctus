@@ -22,6 +22,10 @@ const useConceptReportRoutes = () => {
         path={ConceptPath.Assumptions}
         element={<Page.Concept.Report.Assumptions />}
       />
+      <Route
+        path={ConceptPath.Settings}
+        element={<Page.Concept.Report.ConceptSettings />}
+      />
     </Route>
   );
 };

@@ -1,5 +1,10 @@
 import type { IUser } from '../auth/accounts';
 import type { IPageQueryOptions } from '../osiris';
+import type {
+  ConceptIncubationQuestion,
+  IClarifyingQuestion,
+} from './questionnaire';
+
 export interface IConceptSeedAnswer {
   answer: string[];
   details?: string;
@@ -9,13 +14,6 @@ export interface IConceptSeedAnswer {
 
 export interface IConceptSeedAnswerUpdateCreate extends IConceptSeedAnswer {
   answerId: number;
-}
-
-export interface IClarifyingQuestion {
-  title: string;
-  uuid: string;
-  icon: string;
-  question: ConceptIncubationQuestion;
 }
 
 export interface IConceptSeedCreate {

@@ -1,14 +1,14 @@
 import { Icon } from '@components';
 import { IncubationAnswer } from '@libs/api/concepts';
-import { animated } from '@react-spring/web';
-import React, { useCallback } from 'react';
-import { CompletionIcon } from '../question/CompletionIcon';
-import { boxShadowStyle } from '../question/QuestionIcon';
-import { useContinueRefiningAnimations } from './continue-refining-animation.hook';
 import {
   ConceptIncubationQuestion,
   IClarifyingQuestion,
 } from '@libs/api/types';
+import { animated } from '@react-spring/web';
+import React, { useCallback } from 'react';
+import { boxShadowStyle } from '../../../../../Icon/QuestionIcon';
+import { CompletionIcon } from '../question/CompletionIcon';
+import { useContinueRefiningAnimations } from './continue-refining-animation.hook';
 
 interface ContinueRefiningIconProps {
   iconRef: React.RefObject<HTMLSpanElement>;
