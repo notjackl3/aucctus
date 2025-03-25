@@ -1,4 +1,5 @@
 import { useSocketEvent } from '@hooks/sockets/aucctus';
+import { useDebounce } from '@hooks/utility.hook';
 import api from '@libs/api';
 import type {
   IAISuggestion,
@@ -11,7 +12,7 @@ import telemetry from '@libs/telemetry';
 import { cn } from '@libs/utils/react';
 import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
 // Component props interface
@@ -35,7 +36,6 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     activeGeneratedConcept,
   } = useConceptIncubationStore();
 
-  const activeQuestionIdRef = useRef<number | null>(null);
   const question = useMemo(
     () =>
       activeClarifyingQuestion
@@ -121,7 +121,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   }, []);
 
   // --- API interactions ---
-  const sendAiSuggestionsRequest = useCallback(
+  const sendAiSuggestionsRequest = useDebounce(
     (questionId: number, answer: string[]) => {
       telemetry.log('sendAiSuggestionsRequest called', questionId, answer);
       if (question && question.id === questionId && draftSeedUuid) {
@@ -137,7 +137,8 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
         });
       }
     },
-    [draftSeedUuid, question, setSuggestions, activeGeneratedConcept],
+
+    500,
   );
 
   // --- Event handlers ---
@@ -183,9 +184,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
 
   // Generate suggestions when active question changes
   useEffect(() => {
-    if (!question || question.id === activeQuestionIdRef.current) return;
-
-    activeQuestionIdRef.current = question.id;
+    if (!question) return;
 
     sendAiSuggestionsRequest(question.id, [
       ...currentMultiSelectAnswerList.map((answer: AnswerItem) =>
@@ -197,7 +196,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     ]);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [question, activeQuestionIdRef]);
+  }, [question]);
 
   // --- Render component ---
   return (
