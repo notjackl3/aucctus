@@ -80,7 +80,9 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
         <span className='flex flex-1'></span>
         <animated.span
           style={headerButtonAnimation}
-          className='aucctus-text-primary mr-2'
+          className={cn('aucctus-text-primary mr-2', {
+            'pointer-events-none': !compact,
+          })}
         >
           <button
             className='btn btn-primary'

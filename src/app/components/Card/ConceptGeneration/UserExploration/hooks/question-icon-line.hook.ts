@@ -9,14 +9,16 @@ export const useQuestionIconLine = (
   questionIconLineRef: React.RefObject<HTMLDivElement>,
   spacerRef: React.RefObject<HTMLDivElement>,
   currentQuestionOrder: number,
+  componentRef: React.RefObject<HTMLDivElement>,
   activeClarifyingQuestion: IClarifyingQuestion | undefined,
 ) => {
   useEffect(() => {
     const questionIcon = questionIconRef.current;
     const iconLine = questionIconLineRef.current;
     const spacer = spacerRef.current;
+    const component = componentRef.current;
 
-    if (!questionIcon || !iconLine || !spacer) return;
+    if (!questionIcon || !iconLine || !spacer || !component) return;
 
     // Function to update the line height
     const updateLineHeight = () => {
@@ -30,6 +32,11 @@ export const useQuestionIconLine = (
         iconLine.style.height = `${distanceToIcon}px`;
       }
     };
+
+    // Add scroll event listener to parent element
+    if (component) {
+      component.addEventListener('scroll', updateLineHeight);
+    }
 
     // Initial height adjustment
     updateLineHeight();
@@ -61,6 +68,9 @@ export const useQuestionIconLine = (
       mutationObserver.disconnect();
       resizeObserver.disconnect();
       window.removeEventListener('resize', updateLineHeight);
+      if (component) {
+        component.removeEventListener('scroll', updateLineHeight);
+      }
     };
   }, [
     questionIconRef,
@@ -68,5 +78,6 @@ export const useQuestionIconLine = (
     spacerRef,
     currentQuestionOrder,
     activeClarifyingQuestion,
+    componentRef,
   ]);
 };

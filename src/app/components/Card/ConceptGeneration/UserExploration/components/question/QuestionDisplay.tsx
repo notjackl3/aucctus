@@ -1,12 +1,6 @@
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { animated, useTransition } from 'react-spring';
 import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
 import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
@@ -62,14 +56,11 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     questionIconLineRef,
     spacerRef,
     currentQuestionOrder ?? 0,
+    componentRef,
     activeClarifyingQuestion,
   );
 
-  const [isClarifyingExpanded, setIsClarifyingExpanded] = useState(false);
-
-  useEffect(() => {
-    setIsClarifyingExpanded(false);
-  }, [clarifyingQuestions]);
+  const [isGenerateCardExpanded, setIsGenerateCardExpanded] = useState(true);
 
   const previousQuestion = useMemo(
     () => getPreviousQuestion(submittedAnswers),
@@ -139,11 +130,11 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
           'max-h-[100px] min-h-[100px]':
             !activeQuestion &&
             !activeClarifyingQuestion &&
-            !isClarifyingExpanded,
+            !isGenerateCardExpanded,
           'max-h-[40px] min-h-[40px]':
             !activeQuestion &&
             !activeClarifyingQuestion &&
-            isClarifyingExpanded,
+            isGenerateCardExpanded,
           'max-h-[2000px]': activeQuestion || activeClarifyingQuestion,
         })}
       />
@@ -151,7 +142,7 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
   }, [
     activeQuestion,
     activeClarifyingQuestion,
-    isClarifyingExpanded,
+    isGenerateCardExpanded,
     spacerRef,
   ]);
 
@@ -179,14 +170,13 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
   const renderReadyToGenerate = useCallback(() => {
     return (
       <ReadyToGenerate
-        compact={isClarifyingExpanded}
-        onMouseEnter={() => setIsClarifyingExpanded(false)}
+        compact={!isGenerateCardExpanded}
         onGenerate={() =>
           window.dispatchEvent(new CustomEvent('aucctus-generate-concept'))
         }
       />
     );
-  }, [isClarifyingExpanded]);
+  }, [isGenerateCardExpanded]);
 
   const handleSelectClarifyingQuestion = useCallback(
     (question: IClarifyingQuestion) => {
@@ -203,7 +193,6 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
         iconRef={questionIconRef}
         clarifyingQuestions={clarifyingQuestions}
         submittedAnswers={submittedAnswers}
-        onMouseEnter={() => setIsClarifyingExpanded(true)}
         selectClarifyingQuestion={handleSelectClarifyingQuestion}
       />
     );
@@ -211,7 +200,6 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     questionIconRef,
     clarifyingQuestions,
     submittedAnswers,
-    setIsClarifyingExpanded,
     handleSelectClarifyingQuestion,
   ]);
 
@@ -221,6 +209,14 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
       <div
         ref={componentRef}
         className='no-scrollbar relative z-[999] flex flex-1 flex-col transition-all duration-300 ease-in-out'
+        onWheel={(e) => {
+          const element = componentRef.current!;
+          const isScrollingUp = e.deltaY < 0;
+
+          const atTop = element.scrollTop === 0;
+
+          setIsGenerateCardExpanded(isScrollingUp && atTop);
+        }}
       >
         {renderCompletedQuestions()}
 

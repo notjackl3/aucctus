@@ -127,6 +127,7 @@ const PostGenerateQuestionDisplay: React.FC<
     questionIconLineRef,
     spacerRef,
     Infinity,
+    componentRef,
     activeClarifyingQuestion,
   );
 
