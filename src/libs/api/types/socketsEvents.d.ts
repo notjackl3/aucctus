@@ -1,12 +1,5 @@
 export interface BaseSocketEvent {}
 
-export interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
-  type: 'incubation.ai.suggestions.request';
-  seedUuid: string;
-  questionId: int; // The question Identifier(And Strict Typing to this)
-  answer?: string[];
-}
-
 export interface ErrorEvent extends BaseSocketEvent {
   type: 'error';
   error: string;

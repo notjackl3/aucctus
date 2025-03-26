@@ -3,6 +3,7 @@ import React, { useCallback, useMemo, useRef } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { CompletionIcon } from './CompletionIcon';
 import { ConceptIncubationQuestion } from '@libs/api/types';
+import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
 
 interface CompletionIconGroupProps {
   questionGroup: ConceptIncubationQuestion[];
@@ -11,8 +12,10 @@ interface CompletionIconGroupProps {
 const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
   questionGroup,
 }) => {
-  const { currentQuestionOrder } = useConceptIncubationStore();
+  const { currentQuestionOrder, setCurrentQuestionOrder } =
+    useConceptIncubationStore();
   const componentRef = useRef<HTMLSpanElement>(null);
+  const { dispatchAnimationEvent } = useDispatchIncubationAnimation();
 
   const isGroupCompleted = useMemo(() => {
     if (!currentQuestionOrder) return false;
@@ -53,6 +56,15 @@ const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
     [isPartial],
   );
 
+  const handleClickCompletionIcon = useCallback(
+    (question: ConceptIncubationQuestion) => {
+      dispatchAnimationEvent('fade', () => {
+        setCurrentQuestionOrder(question.order);
+      });
+    },
+    [dispatchAnimationEvent, setCurrentQuestionOrder],
+  );
+
   if (!questionGroup || questionGroup.length === 0) return null;
 
   return (
@@ -66,7 +78,11 @@ const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
           className='relative flex flex-row items-center gap-2 ease-in-out'
           key={question.identifier}
         >
-          <CompletionIcon iconClassName='z-[10] animate-fade-in opacity-0' />
+          <CompletionIcon
+            onClick={() => handleClickCompletionIcon(question)}
+            className='aucctus-bg-secondary-hover ml-2 h-8 w-8 cursor-pointer'
+            iconClassName='z-[10] animate-fade-in opacity-0'
+          />
           <animated.span
             style={index > 0 ? fadeOutAnimation : {}}
             className='aucctus-completed-question-label aucctus-text-sm aucctus-text-primary'
