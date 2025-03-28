@@ -390,13 +390,11 @@ export const useUserInteraction = () => {
       { answer: answerValue.trim(), uuid: uuidv4() },
     ]);
     setAnswerValue('');
-    dispatchAiSuggestionsEvent();
   }, [
     currentTextAnswerList,
     answerValue,
     setCurrentTextAnswerList,
     allowAddAnswer,
-    dispatchAiSuggestionsEvent,
   ]);
 
   const handleGoBack = useCallback(() => {

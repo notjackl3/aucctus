@@ -52,8 +52,8 @@ const AnswerInput: React.FC<AnswerInputProps> = ({
             {
               <Icon
                 variant='arrowup'
-                width={20}
-                height={20}
+                width={16}
+                height={16}
                 className='stroke-white !stroke-[0.5]'
               />
             }
