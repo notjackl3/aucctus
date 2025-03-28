@@ -111,10 +111,13 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
   const renderViewMode = () => (
     <>
       <span
-        className={cn('aucctus-text-primary whitespace-pre-wrap break-all', {
-          'aucctus-text-xs': answer.answer.length >= 300,
-          'aucctus-text-sm': answer.answer.length < 300,
-        })}
+        className={cn(
+          'aucctus-text-primary line-clamp-3 whitespace-pre-wrap break-all',
+          {
+            'aucctus-text-xs': answer.answer.length >= 300,
+            'aucctus-text-sm': answer.answer.length < 300,
+          },
+        )}
       >
         {answer.answer}
       </span>
@@ -141,7 +144,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
   return (
     <div
       className={cn(
-        'aucctus-incubation-answer-row aucctus-border-secondary flex flex-1 animate-incubation-answer-expand flex-row items-center gap-3 rounded-lg border-2 p-2',
+        'no-scrollbar aucctus-incubation-answer-row aucctus-border-secondary flex flex-1 animate-incubation-answer-expand flex-row items-center gap-3 rounded-lg border-2 p-2',
         bgClass,
         className,
       )}

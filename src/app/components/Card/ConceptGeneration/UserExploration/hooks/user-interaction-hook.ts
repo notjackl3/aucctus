@@ -376,7 +376,7 @@ export const useUserInteraction = () => {
   ]);
 
   const onInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
+    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setAnswerValue(e.target.value);
     },
     [],

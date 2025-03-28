@@ -74,7 +74,7 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
   return (
     <div className='relative z-[100] flex flex-row items-center'>
       <IncubationIcon variant='telescope' className='stroke-primary-800' />
-      <span className='aucctus-text-xl-medium aucctus-text-primary ml-3'>
+      <span className='aucctus-text-xl-medium aucctus-text-primary ml-3 line-clamp-1'>
         {formatHeaderName(questionnaire)}
       </span>
       <Badge.Default

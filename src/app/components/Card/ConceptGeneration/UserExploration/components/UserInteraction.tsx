@@ -50,9 +50,9 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
   const answerInputTransition = useTransition(
     currentQuestionOrder !== Infinity || activeClarifyingQuestion,
     {
-      from: { opacity: 0, transform: 'translateY(100px)', maxHeight: '0px' },
-      enter: { opacity: 1, transform: 'translateY(0px)', maxHeight: '100px' },
-      leave: { opacity: 0, transform: 'translateY(100px)', maxHeight: '0px' },
+      from: { opacity: 0, transform: 'translateY(100px)' },
+      enter: { opacity: 1, transform: 'translateY(0px)' },
+      leave: { opacity: 0, transform: 'translateY(100px)' },
       config: { tension: 200, friction: 20, mass: 0.5 },
     },
   );
