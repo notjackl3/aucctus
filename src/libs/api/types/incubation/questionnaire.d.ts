@@ -50,6 +50,7 @@ export interface IClarifyingQuestion {
   uuid: string;
   icon: IconVariant;
   question: ConceptIncubationQuestion;
+  isFreeForm: boolean;
 }
 
 export type ConceptIncubationQuestion =

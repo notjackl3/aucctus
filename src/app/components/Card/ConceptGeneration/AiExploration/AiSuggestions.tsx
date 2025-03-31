@@ -44,6 +44,10 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     [activeClarifyingQuestion, activeQuestion],
   );
 
+  const allowAiSuggestions = useMemo(() => {
+    return question && !activeClarifyingQuestion?.isFreeForm;
+  }, [question, activeClarifyingQuestion]);
+
   // --- Derived state ---
   const isMultiSelectQuestion = useMemo(
     () =>
@@ -124,7 +128,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   const sendAiSuggestionsRequest = useDebounce(
     (questionId: number, answer: string[]) => {
       telemetry.log('sendAiSuggestionsRequest called', questionId, answer);
-      if (question && question.id === questionId && draftSeedUuid) {
+      if (allowAiSuggestions && question?.id === questionId && draftSeedUuid) {
         telemetry.log('sendAiSuggestionsRequest 2', question.id, answer);
         setSuggestions(question.id, []);
 
@@ -184,7 +188,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
 
   // Generate suggestions when active question changes
   useEffect(() => {
-    if (!question) return;
+    if (!question || !allowAiSuggestions) return;
 
     sendAiSuggestionsRequest(question.id, [
       ...currentMultiSelectAnswerList.map((answer: AnswerItem) =>
@@ -202,8 +206,8 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   return (
     <div
       className={cn('flex h-full flex-col gap-4 transition-all duration-300', {
-        'opacity-1': !!question,
-        'opacity-0': !question,
+        'opacity-1': allowAiSuggestions,
+        'opacity-0': !allowAiSuggestions,
       })}
     >
       <div className='aucctus-text-xl text-white'>{title}</div>
