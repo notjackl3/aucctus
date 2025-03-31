@@ -1,6 +1,6 @@
 import images from '@assets/img';
-import { Icon } from '@components';
 import {
+  useConceptGeneration,
   useGenerateConceptIncubationClarifyingQuestions,
   useSaveGeneratedConcepts,
 } from '@hooks/query/concepts.hook';
@@ -21,6 +21,10 @@ import SelectableConcept from './SelectableConcept';
 import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
 import { AnswerItem } from '@stores/concept-incubation/actions';
+import ConceptGenerationInput from './ConceptGenerationInput';
+import { v4 as uuidv4 } from 'uuid';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
+import ConceptSelectionHeader from './ConceptSelectionHeader';
 
 // Constants
 const mainStyle = {
@@ -33,25 +37,6 @@ const mainStyle = {
 interface ConceptSelectionProps {
   className?: string;
 }
-
-interface ConceptSelectionHeaderProps {
-  onClose: () => void;
-}
-
-// Header component
-const ConceptSelectionHeader: React.FC<ConceptSelectionHeaderProps> = ({
-  onClose,
-}) => (
-  <div className='flex flex-row items-center justify-center gap-2'>
-    <span className='aucctus-text-brand-primary aucctus-text-xl-semibold'>
-      Concept Selection
-    </span>
-    <span className='flex flex-1' />
-    <button onClick={onClose} className='btn btn-light aspect-square !p-2'>
-      <Icon variant='closeX' height={20} width={20} />
-    </button>
-  </div>
-);
 
 // Main component
 const ConceptSelection: React.FC<ConceptSelectionProps> = ({
@@ -67,48 +52,96 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     clearGeneratedConceptsBySeedUuid,
     setGeneratedConcepts,
   } = useConceptGenerationStore();
+
+  // Derived state from store
   const currentGeneratedConcepts = useMemo(
-    () => generatedConcepts[draftSeedUuid],
+    () => generatedConcepts[draftSeedUuid] || [],
     [generatedConcepts, draftSeedUuid],
   );
 
+  // Local state
+  const [showMask, setShowMask] = useState(false);
+  const [isGeneratingMoreConcepts, setIsGeneratingMoreConcepts] =
+    useState(false);
+  const [
+    isGenerateClarifyingQuestionsLoading,
+    setIsGenerateClarifyingQuestionsLoading,
+  ] = useState(false);
+  const [activeConcept, setActiveConcept] = useState<IGeneratedConcept>(
+    () => currentGeneratedConcepts[0] || null,
+  );
+  const [selectedConcepts, setSelectedConcepts] = useState<IGeneratedConcept[]>(
+    [],
+  );
+  const [inputValue, setValue] = useState<string>('');
+  const [promptAnswers, setPromptAnswers] = useState<AnswerItem[]>([]);
+
   // API mutations
+  const { mutate: generateConcept } = useConceptGeneration(draftSeedUuid);
   const { mutate: saveGeneratedConcepts, isLoading: isSaving } =
     useSaveGeneratedConcepts(draftSeedUuid);
   const { mutateAsync: generateClarifyingQuestions } =
     useGenerateConceptIncubationClarifyingQuestions();
 
-  // UI state
-  const [showMask, setShowMask] = useState(false);
-  const [
-    isGenerateClarifyingQuestionsLoading,
-    setIsGenerateClarifyingQuestionsLoading,
-  ] = useState(false);
-
-  // Concept selection state
-  const [activeConcept, setActiveConcept] = useState<IGeneratedConcept>(
-    currentGeneratedConcepts[0],
-  );
-  const [selectedConcepts, setSelectedConcepts] = useState<IGeneratedConcept[]>(
-    [],
-  );
-
-  // Prompt answers state
-  // const [inputValue, setValue] = useState<string>('');
-  const [promptAnswers, setPromptAnswers] = useState<AnswerItem[]>([]);
+  // Custom hooks
   const { handleUpdateAnswer, handleRemoveAnswer } = useAnswerList(
     promptAnswers,
     setPromptAnswers,
   );
 
-  // // Derived state
-  // const allowAddAnswer = useMemo(() => {
-  //   return !(
-  //     promptAnswers.find(
-  //       (promptAnswer) => promptAnswer.answer === inputValue,
-  //     ) || promptAnswers.length >= 3
-  //   );
-  // }, [promptAnswers, inputValue]);
+  // Derived state
+  const allowAddAnswer = useMemo(() => {
+    return !(
+      promptAnswers.find(
+        (promptAnswer) => promptAnswer.answer === inputValue,
+      ) || promptAnswers.length >= 3
+    );
+  }, [promptAnswers, inputValue]);
+
+  const isLoading = useMemo(
+    () =>
+      isSaving ||
+      isGenerateClarifyingQuestionsLoading ||
+      isGeneratingMoreConcepts,
+    [isSaving, isGenerateClarifyingQuestionsLoading, isGeneratingMoreConcepts],
+  );
+
+  const loadingMessage = useMemo(() => {
+    if (isGeneratingMoreConcepts) {
+      return 'Generating more concepts...';
+    } else if (isGenerateClarifyingQuestionsLoading) {
+      return 'Generating clarifying questions...';
+    } else {
+      return undefined;
+    }
+  }, [isGeneratingMoreConcepts, isGenerateClarifyingQuestionsLoading]);
+
+  // Socket event handlers
+  useSocketEvent('stream.structured.concept.generation', (data) => {
+    const { concepts: eventConcepts } = data?.content ?? {};
+
+    if ('done' === data.stage && eventConcepts) {
+      // Deduplicate concepts by uuid before setting them
+      const newConcepts = eventConcepts as IGeneratedConcept[];
+      const existingConcepts = generatedConcepts[draftSeedUuid] || [];
+
+      // Create a map of existing concepts by uuid for quick lookup
+      const existingConceptMap = new Map(
+        existingConcepts.map((concept) => [concept.uuid, concept]),
+      );
+
+      // Filter out duplicates and combine with existing concepts
+      const deduplicatedConcepts = [
+        ...existingConcepts,
+        ...newConcepts.filter(
+          (concept) => !existingConceptMap.has(concept.uuid),
+        ),
+      ];
+
+      setGeneratedConcepts(draftSeedUuid, deduplicatedConcepts);
+      setIsGeneratingMoreConcepts(false);
+    }
+  });
 
   // Animation handlers
   const handleLeaveAnimation = useCallback((callback: () => void) => {
@@ -132,17 +165,16 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     }
   }, []);
 
-  // // Prompt answer handlers
-  // const handleAddAnswer = useCallback(
-  //   (answer: string) => {
-  //     if (!allowAddAnswer) return;
-  //     setPromptAnswers([...promptAnswers, { answer, uuid: uuidv4() }]);
-  //     setValue('');
-  //   },
-  //   [promptAnswers, allowAddAnswer],
-  // );
+  // Event handlers
+  const handleAddAnswer = useCallback(
+    (answer: string) => {
+      if (!allowAddAnswer) return;
+      setPromptAnswers([...promptAnswers, { answer, uuid: uuidv4() }]);
+      setValue('');
+    },
+    [promptAnswers, allowAddAnswer],
+  );
 
-  // Concept selection handlers
   const handleSelectConcept = useCallback(
     (concept: IGeneratedConcept) => {
       if (selectedConcepts.some((c) => c.uuid === concept.uuid)) {
@@ -156,7 +188,6 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     [selectedConcepts],
   );
 
-  // Navigation handlers
   const handleClose = useCallback(() => {
     handleLeaveAnimation(() => {
       clearGeneratedConceptsBySeedUuid(draftSeedUuid);
@@ -168,7 +199,6 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     });
   }, [handleLeaveAnimation, draftSeedUuid, clearGeneratedConceptsBySeedUuid]);
 
-  // Extracted helper functions
   const generateClarifyingQuestionsForConcepts = useCallback(
     async (concepts: IGeneratedConcept[]): Promise<IGeneratedConcept[]> => {
       const updatedConcepts = [...concepts];
@@ -213,7 +243,6 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     });
   }, [handleLeaveAnimation]);
 
-  // Simplified handleContinue function
   const handleContinue = useCallback(() => {
     saveGeneratedConcepts(selectedConcepts, {
       onSuccess: async () => {
@@ -232,6 +261,16 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     setGeneratedConcepts,
   ]);
 
+  const handleGenerateMoreConcepts = useCallback(() => {
+    generateConcept({
+      concepts: currentGeneratedConcepts,
+      user_generation_instructions: promptAnswers
+        .map((answer) => answer.answer)
+        .join('\n'),
+    });
+    setIsGeneratingMoreConcepts(true);
+  }, [currentGeneratedConcepts, promptAnswers, generateConcept]);
+
   // UI rendering functions
   const renderConceptSelection = useCallback(
     () => (
@@ -240,7 +279,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
           {currentGeneratedConcepts.map((concept) => (
             <SelectableConcept
               key={concept.uuid}
-              isActive={concept.uuid === activeConcept.uuid}
+              isActive={activeConcept?.uuid === concept.uuid}
               isSelected={selectedConcepts.some((c) => c.uuid === concept.uuid)}
               concept={concept}
               onClick={() => setActiveConcept(concept)}
@@ -255,41 +294,31 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
           handleRemoveAnswer={handleRemoveAnswer}
         />
 
-        {/* <div className='sticky bottom-0 m-2'>
-        <ConceptGenerationInput
-          value={value}
-          onChange={(e) => setValue(e.target.value)}
-          onAddAnswer={() => handleAddAnswer(value)}
-          allowAddAnswer={allowAddAnswer}
-        />
-      </div> */}
+        <div className='sticky bottom-0 m-2'>
+          <ConceptGenerationInput
+            value={inputValue}
+            onChange={(e) => setValue(e.target.value)}
+            onAddAnswer={() => handleAddAnswer(inputValue)}
+            allowAddAnswer={allowAddAnswer}
+            allowGenerateMoreConcepts={promptAnswers.length > 0}
+            onGenerateMoreConcepts={handleGenerateMoreConcepts}
+          />
+        </div>
       </div>
     ),
     [
       currentGeneratedConcepts,
-      //inputValue,
-      //allowAddAnswer,
-      //handleAddAnswer,
+      activeConcept,
+      selectedConcepts,
       handleSelectConcept,
       promptAnswers,
       handleUpdateAnswer,
       handleRemoveAnswer,
-      selectedConcepts,
-      activeConcept.uuid,
+      inputValue,
+      allowAddAnswer,
+      handleAddAnswer,
+      handleGenerateMoreConcepts,
     ],
-  );
-
-  const isLoading = useMemo(
-    () => isSaving || isGenerateClarifyingQuestionsLoading,
-    [isSaving, isGenerateClarifyingQuestionsLoading],
-  );
-
-  const loadingMessage = useMemo(
-    () =>
-      isGenerateClarifyingQuestionsLoading
-        ? 'Generating clarifying questions...'
-        : undefined,
-    [isGenerateClarifyingQuestionsLoading],
   );
 
   // Main render
@@ -309,7 +338,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
               <SelectedConcept
                 activeConcept={activeConcept}
                 isSelected={selectedConcepts.some(
-                  (c) => c.uuid === activeConcept.uuid,
+                  (c) => c.uuid === activeConcept?.uuid,
                 )}
                 onSelect={handleSelectConcept}
               />

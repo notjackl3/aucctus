@@ -21,7 +21,7 @@ const PromptAnswers: React.FC<PromptAnswersProps> = ({
       {promptAnswers.map((answer) => (
         <EditableAnswerRow
           bgClass='aucctus-bg-primary'
-          buttonClass='aucctus-bg-secondary-hover cursor-pointer rounded-lg p-2'
+          buttonClass='aucctus-bg-primary-hover cursor-pointer rounded-lg p-2'
           className='aucctus-border-primary'
           key={`answer-${answer.answer}`}
           answer={answer}

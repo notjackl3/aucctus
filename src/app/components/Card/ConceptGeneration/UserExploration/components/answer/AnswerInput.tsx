@@ -63,12 +63,9 @@ const AnswerInput: React.FC<AnswerInputProps> = ({
             }
           }
         }}
-        style={{
-          minHeight: '48px !important',
-        }}
         className={cn(
           'aucctus-border-primary aucctus-text-primary w-full rounded-lg border pl-4 pr-28',
-          'no-scrollbar !max-h-[150px] resize-none py-3',
+          'no-scrollbar !max-h-[150px] !min-h-[48px] resize-none py-3',
         )}
       />
       <span className='absolute right-14 top-6 -translate-y-1/2 transform'>

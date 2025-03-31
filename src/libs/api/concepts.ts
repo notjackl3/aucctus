@@ -13,6 +13,7 @@ import {
   ICustomerProfileCreate,
   IEcosystemCreate,
   IFinancialProjection,
+  IGeneratedConcept,
   IMarketScanElementCreate,
   IMarketScanV1,
   IPageResponse,
@@ -108,8 +109,14 @@ export class ConceptApi extends ApiService {
     return this.delete<void>(endpoints.conceptIncubationSeedAnswerId(answerId));
   }
 
-  generateConcept(uuid: string) {
-    return this.post<IConcept>(endpoints.conceptGenerate(uuid));
+  generateConcept(
+    uuid: string,
+    payload?: {
+      concepts?: IGeneratedConcept[];
+      user_generation_instructions?: string;
+    },
+  ) {
+    return this.post<IConcept>(endpoints.conceptGenerate(uuid), payload);
   }
 
   unarchive(uuid: string) {

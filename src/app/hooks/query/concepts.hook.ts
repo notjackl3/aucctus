@@ -88,7 +88,10 @@ export const useSeeds = (queryOptions: ISeedQueryOptions) => {
 
 export const useConceptGeneration = (uuid: string) => {
   return useMutation({
-    mutationFn: async () => await api.concept.generateConcept(uuid),
+    mutationFn: async (payload?: {
+      concepts?: IGeneratedConcept[];
+      user_generation_instructions?: string;
+    }) => await api.concept.generateConcept(uuid, payload),
     onSuccess: () => {},
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
