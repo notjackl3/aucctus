@@ -37,12 +37,13 @@ const ConceptGenerationInput: React.FC<ConceptGenerationInputProps> = ({
   }, [value]);
 
   const renderActiveButton = () => {
-    if (allowAddAnswer && value.length > 0) {
+    if (allowAddAnswer) {
       return (
         <button
           className='btn btn-primary my-2 aspect-square w-6 rounded-lg'
           aria-label='Add Answer'
           onClick={onAddAnswer}
+          disabled={value.length === 0}
         >
           <span>
             {
@@ -87,7 +88,7 @@ const ConceptGenerationInput: React.FC<ConceptGenerationInputProps> = ({
           onChange(e as unknown as React.ChangeEvent<HTMLInputElement>)
         }
         disabled={!allowAddAnswer}
-        placeholder={allowAddAnswer ? 'Type anything' : 'Max 3 answers'}
+        placeholder={allowAddAnswer ? 'Type anything' : '-'}
         maxLength={500}
         rows={1}
         onKeyDown={(e) => {

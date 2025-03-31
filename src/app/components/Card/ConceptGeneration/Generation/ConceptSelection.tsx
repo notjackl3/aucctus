@@ -94,7 +94,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     return !(
       promptAnswers.find(
         (promptAnswer) => promptAnswer.answer === inputValue,
-      ) || promptAnswers.length >= 3
+      ) || promptAnswers.length > 0
     );
   }, [promptAnswers, inputValue]);
 
@@ -137,6 +137,9 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
           (concept) => !existingConceptMap.has(concept.uuid),
         ),
       ];
+
+      setPromptAnswers([]);
+      setValue('');
 
       setGeneratedConcepts(draftSeedUuid, deduplicatedConcepts);
       setIsGeneratingMoreConcepts(false);
