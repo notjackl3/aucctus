@@ -4,6 +4,10 @@ import { useEditConcept } from '@hooks/concepts/editable.hook';
 import { useConcept, useConceptUpdate } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import api from '@libs/api';
+import {
+  downloadPdf,
+  generateConceptSnapshotFileName,
+} from '@libs/utils/download';
 
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
@@ -62,19 +66,11 @@ const ConceptReport: FunctionComponent = () => {
 
     try {
       const pdf = await api.concept.downloadConcept(conceptUuid);
-      const blob = new Blob([pdf], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      // Get today's date in YYYYMMDD format
-      const today = new Date();
-      const readableDate = today.toISOString().split('T')[0].replace(/-/g, '');
-      // company-concept-20241117
-      const fileName = `${account?.name.toLowerCase()}-${concept?.title.replace(/\s+/g, '-').toLowerCase()}-${readableDate}.pdf`;
-      // Set the download filename
-      a.download = fileName;
-      a.click();
-      URL.revokeObjectURL(url);
+      const fileName = generateConceptSnapshotFileName(
+        account?.name || '',
+        concept?.title || '',
+      );
+      await downloadPdf(pdf, fileName);
     } catch (error) {
       toast.error('Failed to download snapshot.');
     } finally {
