@@ -4,11 +4,11 @@ import analytics from '../telemetry';
 import { AccountApi } from './account';
 import { ArticleApi } from './article';
 import { AssumptionsApi } from './assumptions';
-import { AucctusSocket } from './aucctusSocket';
 import { AuthApi } from './auth';
 import { IApiServiceConfig } from './base/apiService';
-import { ISocketConfig } from './base/socketService';
+import { ISocketConfig, SocketService } from './base/socketService';
 import { ConceptApi } from './concepts';
+import { SocketEndpoints } from './endpoints';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { SeedApi } from './seed';
@@ -41,7 +41,7 @@ export class Api {
   assumption!: AssumptionsApi;
   marketScan!: MarketScanApi;
   conceptIncubate!: IncubateConceptApi;
-  aucctusSocket!: AucctusSocket;
+  aucctusSocket!: SocketService;
   article!: ArticleApi;
 
   constructor(apiConfig: IApiConfig) {
@@ -56,11 +56,12 @@ export class Api {
 
     // Configure socket settings.
     const socketConfig: ISocketConfig = {
-      baseUrl: `${this._config.baseSocketUrl}/ws/v1/aucctus`,
+      baseUrl: `${this._config.baseSocketUrl}${SocketEndpoints.aucctus}`,
       debug: this._config.debug,
       autoConnect: true,
+      maxRetries: 5,
     };
-    this.aucctusSocket = new AucctusSocket(this, socketConfig);
+    this.aucctusSocket = new SocketService(this, socketConfig);
 
     const apiClasses: { key: keyof Api; class: any }[] = [
       { key: 'account', class: AccountApi },

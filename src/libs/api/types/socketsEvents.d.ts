@@ -1,4 +1,6 @@
-export interface BaseSocketEvent {}
+export interface BaseSocketEvent {
+  type: string;
+}
 
 export interface ErrorEvent extends BaseSocketEvent {
   type: 'error';
@@ -128,6 +130,7 @@ export interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
   seedUuid: string;
   questionId: int;
   answer?: string[];
+  conceptUuid?: string;
 }
 
 export type SocketEvent<C = {}> =

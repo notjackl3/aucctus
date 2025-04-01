@@ -1,5 +1,6 @@
 import analytics from '../../telemetry';
 import { Api } from '../api';
+import { SocketEvent } from '../types';
 
 export interface ISocketConfig {
   baseUrl: string; // e.g. "ws://localhost:8000/ws/endpoint/"
@@ -9,17 +10,10 @@ export interface ISocketConfig {
   maxRetries?: number; // maximum number of reconnect attempts before giving up
 }
 
-export interface BaseSocketEvent {
-  type: string;
-  [key: string]: any;
-}
-
-export type SocketEvent = BaseSocketEvent;
-
-export abstract class SocketService {
+export class SocketService {
   protected _ws: WebSocket | null = null;
   protected _accessToken?: string;
-  protected config: ISocketConfig;
+  protected config: ISocketConfig & { maxRetries: number };
   protected reconnectInterval: number;
   protected shouldReconnect: boolean = true;
   protected currentRetryCount: number = 0;
@@ -32,7 +26,8 @@ export abstract class SocketService {
     config: ISocketConfig,
   ) {
     this._accessToken = api.accessToken;
-    this.config = config;
+    // Default max retries to 5 if not provided
+    this.config = Object.assign({ maxRetries: 5 }, config);
     this.reconnectInterval = config.reconnectInterval ?? 3000;
   }
 
@@ -71,10 +66,7 @@ export abstract class SocketService {
         analytics.debug('WebSocket closed:', closeEvent.reason);
       }
       if (this.shouldReconnect) {
-        if (
-          this.config.maxRetries !== undefined &&
-          this.currentRetryCount >= this.config.maxRetries
-        ) {
+        if (this.currentRetryCount >= this.config.maxRetries) {
           // Maximum retry limit reached—notify all listeners.
           const error = new Error(
             `Max reconnect attempts (${this.config.maxRetries}) reached`,

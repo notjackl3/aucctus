@@ -4,11 +4,14 @@ import {
   useGenerateConceptIncubationClarifyingQuestions,
   useSaveGeneratedConcepts,
 } from '@hooks/query/concepts.hook';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { IGeneratedConcept } from '@libs/api/types';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
+import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
+import { v4 as uuidv4 } from 'uuid';
 import {
   animationStyles,
   getAnimationStyle,
@@ -16,15 +19,12 @@ import {
 import LoadingMask from '../UserExploration/components/util/LoadingMask';
 import { PointerEventMask } from '../UserExploration/components/util/PointerEventMask';
 import { useAnswerList } from '../UserExploration/hooks/answer-list.hook';
+import ConceptGenerationInput from './ConceptGenerationInput';
+import ConceptSelectionHeader from './ConceptSelectionHeader';
 import PromptAnswers from './PromptAnswers';
 import SelectableConcept from './SelectableConcept';
 import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
-import { AnswerItem } from '@stores/concept-incubation/actions';
-import ConceptGenerationInput from './ConceptGenerationInput';
-import { v4 as uuidv4 } from 'uuid';
-import { useSocketEvent } from '@hooks/sockets/aucctus';
-import ConceptSelectionHeader from './ConceptSelectionHeader';
 
 // Constants
 const mainStyle = {

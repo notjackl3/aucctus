@@ -25,12 +25,10 @@ export function useSocketEvent<
   eventName: T,
   callback: (data: Extract<SocketEvent<C>, { type: T }>) => void,
 ) {
-  const aucctusSocket = React.useMemo(() => api.aucctusSocket, []);
-
   const savedCallback = React.useCallback(callback, [callback]);
 
   React.useEffect(() => {
-    if (!aucctusSocket || !aucctusSocket.ws) return;
+    if (!api.aucctusSocket || !api.aucctusSocket.ws) return;
 
     const handleIncoming = (e: MessageEvent) => {
       try {
@@ -44,11 +42,11 @@ export function useSocketEvent<
       }
     };
 
-    aucctusSocket.ws.addEventListener('message', handleIncoming);
+    api.aucctusSocket.ws.addEventListener('message', handleIncoming);
     return () => {
-      aucctusSocket.ws?.removeEventListener('message', handleIncoming);
+      api.aucctusSocket.ws?.removeEventListener('message', handleIncoming);
     };
-  }, [aucctusSocket, eventName, savedCallback]);
+  }, [eventName, savedCallback]);
 }
 
 export function useSocketMaxRetriesExceeded(

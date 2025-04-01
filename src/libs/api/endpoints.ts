@@ -203,3 +203,7 @@ export class Endpoints {
 
   // TODO: Add trends and drivers and ecosystem endpoints for v2
 }
+
+export class SocketEndpoints {
+  static aucctus = '/ws/v1/aucctus';
+}

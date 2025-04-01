@@ -127,9 +127,7 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   // --- API interactions ---
   const sendAiSuggestionsRequest = useDebounce(
     (questionId: number, answer: string[]) => {
-      telemetry.log('sendAiSuggestionsRequest called', questionId, answer);
       if (allowAiSuggestions && question?.id === questionId && draftSeedUuid) {
-        telemetry.log('sendAiSuggestionsRequest 2', question.id, answer);
         setSuggestions(question.id, []);
 
         api.aucctusSocket.send({

@@ -1,14 +1,13 @@
+import images from '@assets/img';
 import Loading from '@components/Loading';
 import Page from '@pages';
 import AuthGuard from '@routes/guards/auth.guard';
 import { usePrivateRoutes, usePublicRoutes } from '@routes/hooks';
 import { AppPath } from '@routes/routes';
 import * as Sentry from '@sentry/react';
-import { Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
-import images from '@assets/img';
-import React from 'react';
 
 const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
