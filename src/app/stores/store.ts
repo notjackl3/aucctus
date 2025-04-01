@@ -1,4 +1,5 @@
 import { mergeDeep, withLenses } from '@dhmk/zustand-lens';
+import api from '@libs/api';
 import { create, StoreApi } from 'zustand';
 import { multiPersist } from 'zustand-multi-persist';
 import { createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
@@ -45,8 +46,20 @@ const useStore = create<IAppStore>()(
             account: state.auth.account,
           },
         }),
-        merge: (persistedState: unknown, currentState: IAppStore): IAppStore =>
-          mergeDeep(currentState, persistedState as IAppStore),
+        merge: (
+          persistedState: unknown,
+          currentState: IAppStore,
+        ): IAppStore => {
+          const mergedState = mergeDeep(
+            currentState,
+            persistedState as IAppStore,
+          );
+          // If the access token is set, set it in the api to ensure connections are maintained
+          if (mergedState.auth.access) {
+            api.accessToken = mergedState.auth.access;
+          }
+          return mergedState;
+        },
       },
       session: {
         storage: createJSONStorage(() => sessionStorage),
