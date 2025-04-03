@@ -8,6 +8,7 @@ export interface BaseConceptIncubationQuestion {
   order: number; // x for main questions, x.2, x.4, etc for sub questions
   isClarifying: boolean;
   isIgnition: boolean;
+  isSuggestionsEnabled: boolean;
 }
 
 export interface IConceptIncubationTextQuestion
@@ -50,7 +51,6 @@ export interface IClarifyingQuestion {
   uuid: string;
   icon: IconVariant;
   question: ConceptIncubationQuestion;
-  isFreeForm: boolean;
 }
 
 export type ConceptIncubationQuestion =

@@ -46,8 +46,8 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   );
 
   const allowAiSuggestions = useMemo(() => {
-    return question && !activeClarifyingQuestion?.isFreeForm;
-  }, [question, activeClarifyingQuestion]);
+    return question && question.isSuggestionsEnabled;
+  }, [question]);
 
   // --- Derived state ---
   const isMultiSelectQuestion = useMemo(
@@ -130,7 +130,6 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     (questionId: number, answer: string[]) => {
       if (allowAiSuggestions && question?.id === questionId && draftSeedUuid) {
         setSuggestions(question.id, []);
-
         api.aucctusSocket.send({
           type: 'incubation.ai.suggestions.request',
           seedUuid: draftSeedUuid,
