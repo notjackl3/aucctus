@@ -168,6 +168,7 @@ module.exports = {
         'incubation-answer-expand': 'incubationAnswerExpand 0.3s ease both',
         'incubation-answer-collapse': 'incubationAnswerCollapse 0.3s ease both',
         'fade-in': 'fadeIn 0.2s ease-in forwards',
+        'fade-out': 'fadeOut 0.2s ease-out forwards',
         'fade-oscillation': 'fadeIn 3s ease-in-out infinite alternate',
         'slide-in-center': 'slideInCenter 0.3s ease both',
         'slide-out-center': 'slideOutCenter 0.3s ease both',
@@ -214,6 +215,10 @@ module.exports = {
         fadeIn: {
           from: { opacity: '0' },
           to: { opacity: '1' },
+        },
+        fadeOut: {
+          from: { opacity: '1' },
+          to: { opacity: '0' },
         },
         slideInCenter: {
           from: { transform: 'translateY(-50px)', opacity: '0' },

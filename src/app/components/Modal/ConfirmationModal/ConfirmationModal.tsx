@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 
-interface IActionButton {
+export interface IActionButton {
   title: string;
   onClick: (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
   variant:

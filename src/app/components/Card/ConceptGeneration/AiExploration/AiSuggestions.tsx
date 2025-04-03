@@ -14,6 +14,7 @@ import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
+import AiFrostedCard from './AiFrostedCard';
 
 // Component props interface
 interface AiSuggestionsProps {
@@ -211,18 +212,12 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
       <div className='aucctus-text-xl text-white'>{title}</div>
       <div className='no-scrollbar flex flex-1 flex-col gap-4 overflow-y-auto'>
         {activeSuggestions.map((suggestion, index) => (
-          <div
-            onClick={() => handleSuggestionClick(suggestion)}
-            className='aucctus-border-primary flex animate-fade-in cursor-pointer flex-col gap-2 rounded-lg border border-opacity-50 bg-white bg-opacity-25 p-4 backdrop-blur-lg transition-all duration-200 hover:brightness-125'
+          <AiFrostedCard
             key={`${question?.label}-${index}`}
-          >
-            <div className='aucctus-text-md-medium text-gray-light-100'>
-              {suggestion.title}
-            </div>
-            <div className='aucctus-text-sm text-gray-light-200'>
-              {suggestion.description}
-            </div>
-          </div>
+            title={suggestion.title}
+            message={suggestion.description}
+            onClick={() => handleSuggestionClick(suggestion)}
+          />
         ))}
       </div>
     </div>

@@ -1,12 +1,11 @@
 import utils from '@libs/utils';
 import { FunctionComponent, useCallback, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useModal } from '../../../context/ModalContextProvider';
 import { useCustomerProfileCreate } from '../../../hooks/query/concepts.hook';
 import InputField from '../../Input/InputField/InputField';
 import TextArea from '../../Input/TextArea/TextArea';
 import styles from './add-customer-profile.module.scss';
-
+import { useModal } from '@context/ModalContextProvider';
 interface IAddCustomerProfileProps {
   conceptUuid: string;
 }
@@ -114,11 +113,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({
     <div className={styles.container}>
       <div className={styles.header}>
         <div />
-        <button
-          aria-label='Close'
-          className='btn-close'
-          onClick={() => closeModal()}
-        />
+        <button aria-label='Close' className='btn-close' onClick={closeModal} />
       </div>
       <div className={styles.content}>
         <InputField
@@ -256,7 +251,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({
         </div>
       </div>
       <div className={styles.footer}>
-        <button className='btn btn-light' onClick={() => closeModal()}>
+        <button className='btn btn-light' onClick={closeModal}>
           Cancel
         </button>
         <button

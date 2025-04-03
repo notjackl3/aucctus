@@ -9,10 +9,12 @@ import AddMarketScanElement from './MarketScanElement/AddMarketScanElement';
 import EditMarketScanElement from './MarketScanElement/EditMarketScanElement';
 import Base from './Modal/Modal';
 import ConclusionVisualization from './ConclusionVisualizationModal/ConclusionVisualizationModal';
+import AiEditing from './AiEditingModal/AiEditingModal';
 import TestModal from './TestModal/TestModal';
 
 const Modal = {
   Base,
+  AiEditing,
   Confirmation,
   EditCustomerProfileDemographics,
   AddCustomerProfile,

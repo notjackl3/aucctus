@@ -10,7 +10,7 @@ import {
   animationStyles,
   getAnimationStyle,
 } from '../UserExploration/components/util/animation-keyframes';
-import LoadingIcon from './LoadingIcon';
+import FloatingAiIcon from './FloatingAiIcon';
 
 const getFadeInStyle = (duration: number, delay: number = 0) =>
   getAnimationStyle('fadeIn', duration, delay);
@@ -176,7 +176,7 @@ const ConceptGeneration = React.forwardRef<
         >
           <span className='flex max-h-[25%] flex-1' />
           <div className='relative flex items-center justify-center'>
-            <LoadingIcon />
+            <FloatingAiIcon />
           </div>
           {renderLoadingText()}
           <span

@@ -1,6 +1,7 @@
-import { createPortal } from 'react-dom';
-import ConfirmationModal from '@components/Modal/ConfirmationModal/ConfirmationModal';
-import React from 'react';
+import { useModal } from '@context/ModalContextProvider';
+import React, { useEffect, useMemo } from 'react';
+import Modal from '@components/Modal';
+import { IActionButton } from '@components/Modal/ConfirmationModal/ConfirmationModal';
 
 interface ConfirmAnswerUpdateProps {
   show: boolean;
@@ -13,29 +14,46 @@ const ConfirmAnswerUpdate: React.FC<ConfirmAnswerUpdateProps> = ({
   onCancel,
   onConfirm,
 }) => {
-  if (!show) return null;
+  const { openModal, closeModal } = useModal();
 
-  return createPortal(
-    <div className='fixed inset-0 z-[9999] flex animate-fade-in items-center justify-center bg-black/50'>
-      <ConfirmationModal
-        title='Updating this answer will delete answers to subsequent questions.'
-        subtitle='This action can not be reversed. Continue?'
-        actions={[
-          {
-            title: 'Cancel',
-            variant: 'light',
-            onClick: onCancel,
-          },
-          {
-            title: 'Confirm',
-            variant: 'primary',
-            onClick: onConfirm,
-          },
-        ]}
-      />
-    </div>,
-    document.body,
+  const actions: IActionButton[] = useMemo(
+    () => [
+      {
+        title: 'Cancel',
+        variant: 'light',
+        onClick: () => {
+          closeModal();
+          onCancel();
+        },
+      },
+      {
+        title: 'Confirm',
+        variant: 'primary',
+        onClick: () => {
+          closeModal();
+          onConfirm();
+        },
+      },
+    ],
+    [onCancel, onConfirm, closeModal],
   );
+
+  useEffect(() => {
+    if (show) {
+      openModal(
+        Modal.Confirmation,
+        {
+          title:
+            'Updating this answer will delete answers to subsequent questions.',
+          subtitle: 'This action can not be reversed. Continue?',
+          actions: actions,
+        },
+        { position: 'center', shouldCloseOnOverlayClick: true },
+      );
+    }
+  }, [show, onCancel, onConfirm, openModal, closeModal, actions]);
+
+  return null;
 };
 
 export default ConfirmAnswerUpdate;

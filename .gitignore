@@ -34,3 +34,4 @@ build
 
 src/app/assets/.DS_Store
 .DS_Store
+.vscode/

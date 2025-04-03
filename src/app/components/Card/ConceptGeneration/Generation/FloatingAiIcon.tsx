@@ -2,7 +2,13 @@ import React from 'react';
 import { animated, easings, useSpring } from '@react-spring/web';
 import { Icon } from '@components';
 
-const LoadingIcon: React.FC = () => {
+interface FloatingAiIconProps {
+  showPulse?: boolean;
+}
+
+const FloatingAiIcon: React.FC<FloatingAiIconProps> = ({
+  showPulse = true,
+}) => {
   // Animation configurations
   const floatingAnimation = useSpring({
     from: { transform: 'translateY(3px)' },
@@ -27,17 +33,19 @@ const LoadingIcon: React.FC = () => {
 
   return (
     <>
-      <animated.div
-        className='aucctus-bg-primary-solid absolute rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
-        style={echoAnimation}
-      >
-        <Icon
-          variant='ai-conclusion'
-          className='stroke-primary-100 opacity-30'
-          width={24}
-          height={24}
-        />
-      </animated.div>
+      {showPulse && (
+        <animated.div
+          className='aucctus-bg-primary-solid absolute rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
+          style={echoAnimation}
+        >
+          <Icon
+            variant='ai-conclusion'
+            className='stroke-primary-100 opacity-30'
+            width={24}
+            height={24}
+          />
+        </animated.div>
+      )}
       <animated.div
         className='aucctus-bg-primary-solid rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
         style={floatingAnimation}
@@ -53,4 +61,4 @@ const LoadingIcon: React.FC = () => {
   );
 };
 
-export default LoadingIcon;
+export default FloatingAiIcon;

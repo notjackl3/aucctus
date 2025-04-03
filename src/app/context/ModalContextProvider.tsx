@@ -8,10 +8,14 @@ import React, {
   useCallback,
 } from 'react';
 import Modal, { ModalPosition } from '../components/Modal/Modal/Modal';
+import { createPortal } from 'react-dom';
 
 interface ModalOptions {
   position?: ModalPosition;
   shouldCloseOnOverlayClick?: boolean;
+  modalClassName?: string;
+  backgroundClassName?: string;
+  hideBodyScroll?: boolean;
 }
 
 interface ModalContextType {
@@ -22,6 +26,7 @@ interface ModalContextType {
   ) => void;
   closeModal: () => void;
   shouldCloseOnOverlayClick: boolean;
+  className?: string;
 }
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
@@ -42,6 +47,7 @@ interface ModalState {
   isOpen: boolean;
   content: ReactNode;
   options: ModalOptions;
+  isClosing: boolean;
 }
 
 export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
@@ -49,6 +55,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     isOpen: false,
     content: null,
     options: { position: 'center', shouldCloseOnOverlayClick: true },
+    isClosing: false,
   });
 
   const openModal = useCallback(
@@ -57,10 +64,15 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       props: T = {} as T,
       options: ModalOptions = { position: 'center' },
     ) => {
+      if (options.hideBodyScroll) {
+        document.body.style.overflow = 'hidden';
+      }
+
       setModalState({
         isOpen: true,
         content: <Component {...props} />,
         options,
+        isClosing: false,
       });
     },
     [],
@@ -69,13 +81,22 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const closeModal = useCallback(() => {
     setModalState((prev) => ({
       ...prev,
-      isOpen: false,
-      content: null,
+      isClosing: true,
     }));
+
+    const cleanup = () => {
+      document.body.style.overflow = '';
+      setModalState((prev) => ({
+        ...prev,
+        isOpen: false,
+        content: null,
+        isClosing: false,
+      }));
+    };
+
+    setTimeout(cleanup, 300);
   }, []);
 
-  // Only these functions are provided via context—children that use useModal()
-  // won't re-render when modalState changes.
   const contextValue = useMemo(
     () => ({
       openModal,
@@ -89,11 +110,18 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   return (
     <ModalContext.Provider value={contextValue}>
       {children}
-      {modalState.isOpen && (
-        <Modal position={modalState.options.position ?? 'center'}>
-          {modalState.content}
-        </Modal>
-      )}
+      {modalState.isOpen &&
+        createPortal(
+          <Modal
+            position={modalState.options.position ?? 'center'}
+            modalClassName={modalState.options.modalClassName}
+            backgroundClassName={modalState.options.backgroundClassName}
+            isClosing={modalState.isClosing}
+          >
+            {modalState.content}
+          </Modal>,
+          document.body,
+        )}
     </ModalContext.Provider>
   );
 };

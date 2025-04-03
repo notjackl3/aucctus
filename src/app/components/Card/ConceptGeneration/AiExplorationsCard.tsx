@@ -4,7 +4,7 @@ import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
 import AiSuggestions from './AiExploration/AiSuggestions';
-import LoadingIcon from './Generation/LoadingIcon';
+import FloatingAiIcon from './Generation/FloatingAiIcon';
 import { useFadeTransition } from './hooks/fade-transition.hook';
 import { animationStyles } from './UserExploration/components/util/animation-keyframes';
 
@@ -42,7 +42,7 @@ const AiExplorationsCard: React.FC<AiExplorationsCardProps> = ({
     if (activeGeneratedConcept?.isGenerating) {
       return (
         <div className='relative flex h-full w-full animate-fade-in flex-col items-center justify-center gap-4 pb-4'>
-          <LoadingIcon />
+          <FloatingAiIcon />
           <span className='aucctus-text-white aucctus-text-md-semibold absolute mt-24 animate-fade-oscillation'>
             Generating report...
           </span>

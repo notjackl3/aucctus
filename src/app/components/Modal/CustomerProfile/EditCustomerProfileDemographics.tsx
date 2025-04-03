@@ -1,4 +1,3 @@
-import { useModal } from '@context/ModalContextProvider';
 import { useCustomerProfileUpdate } from '@hooks/query/concepts.hook';
 import { FunctionComponent, useCallback, useState } from 'react';
 import InputField from '../../Input/InputField/InputField';
@@ -7,7 +6,7 @@ import styles from './add-customer-profile.module.scss';
 import { ICustomerProfile } from '@libs/api/types';
 import utils from '@libs/utils';
 import { toast } from 'react-toastify';
-
+import { useModal } from '@context/ModalContextProvider';
 interface IEditCustomerProfileDemographicsProps {
   conceptUuid?: string;
   profile: ICustomerProfile;
@@ -97,11 +96,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
     <div className={styles.container}>
       <div className={styles.header}>
         <div />
-        <button
-          aria-label='Close'
-          className='btn-close'
-          onClick={() => closeModal()}
-        />
+        <button aria-label='Close' className='btn-close' onClick={closeModal} />
       </div>
       <div className={styles.content}>
         <h4>Demographics</h4>
@@ -190,7 +185,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
         </div>
       </div>
       <div className={styles.footer}>
-        <button className='btn btn-light' onClick={() => closeModal()}>
+        <button className='btn btn-light' onClick={closeModal}>
           Cancel
         </button>
         <button
