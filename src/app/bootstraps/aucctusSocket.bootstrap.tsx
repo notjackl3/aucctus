@@ -5,7 +5,9 @@ const AucctusSocketBootstrap: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   React.useEffect(() => {
-    api.aucctusSocket.connect();
+    (async () => {
+      await api.aucctusSocket.connect();
+    })();
     return () => api.aucctusSocket.disconnect();
   }, []);
 

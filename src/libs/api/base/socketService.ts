@@ -17,6 +17,8 @@ export class SocketService {
   protected reconnectInterval: number;
   protected shouldReconnect: boolean = true;
   protected currentRetryCount: number = 0;
+  protected deferredConnect: Promise<void> | undefined;
+  protected isConnected: boolean = false;
 
   // Listeners for when max retries are exceeded
   protected maxRetriesExceededListeners: Array<(error: Error) => void> = [];
@@ -29,15 +31,16 @@ export class SocketService {
     // Default max retries to 5 if not provided
     this.config = Object.assign({ maxRetries: 5 }, config);
     this.reconnectInterval = config.reconnectInterval ?? 3000;
+    this.isConnected = false;
   }
 
   get ws() {
     return this._ws;
   }
 
-  public connect(): void {
+  public async connect(): Promise<void> {
     this.shouldReconnect = true;
-    if (!this._accessToken) {
+    if (!this._accessToken || this.isConnected) {
       return;
     }
 
@@ -53,6 +56,7 @@ export class SocketService {
       if (this.config.debug) {
         analytics.debug('WebSocket connected', event);
       }
+      this.isConnected = true;
       // Reset retry count on successful connection.
       this.currentRetryCount = 0;
     };
@@ -65,6 +69,7 @@ export class SocketService {
       if (this.config.debug) {
         analytics.debug('WebSocket closed:', closeEvent.reason);
       }
+      this.isConnected = false;
       if (this.shouldReconnect) {
         if (this.currentRetryCount >= this.config.maxRetries) {
           // Maximum retry limit reached—notify all listeners.
@@ -76,8 +81,12 @@ export class SocketService {
           );
         } else {
           this.currentRetryCount++;
-          setTimeout(() => {
-            this.connect();
+          setTimeout(async () => {
+            if (this.deferredConnect) {
+              await this.deferredConnect;
+            }
+            this.deferredConnect = this.connect();
+            await this.deferredConnect;
           }, this.reconnectInterval);
         }
       }
@@ -86,6 +95,7 @@ export class SocketService {
 
   public disconnect(): void {
     this.shouldReconnect = false;
+    this.isConnected = false;
     this._ws?.close();
   }
 
@@ -103,7 +113,10 @@ export class SocketService {
     this._accessToken = token;
     this._ws?.close();
     if (token) {
-      this.connect();
+      (async () => {
+        this.deferredConnect = this.connect();
+        await this.deferredConnect;
+      })();
     }
   }
 
