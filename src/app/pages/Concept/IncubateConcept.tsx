@@ -11,6 +11,7 @@ import {
 import { cn } from '@libs/utils/react';
 import { animated, easings, useTransition } from '@react-spring/web';
 import { AppPath } from '@routes/routes';
+import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, {
   useCallback,
@@ -61,6 +62,8 @@ const IncubateConcept: React.FC = () => {
     setCurrentQuestionOrder,
     setClarifyingQuestions,
   } = useConceptIncubationStore();
+
+  const { setGeneratedConcepts } = useConceptGenerationStore();
 
   // Fetch answers if we have a seed UUID
   const { data: seedDraftAnswers, isLoading: isAnswersLoading } =
@@ -224,9 +227,20 @@ const IncubateConcept: React.FC = () => {
     }
   }, [handleResetAndNavigate]);
 
+  const unsetGenerateConcepts = useCallback(() => {
+    if (draftSeedUuid) {
+      setGeneratedConcepts(draftSeedUuid, []);
+    }
+  }, [draftSeedUuid, setGeneratedConcepts]);
+
+  const cleanup = useCallback(() => {
+    deleteAnswerlessDraft();
+    unsetGenerateConcepts();
+  }, [deleteAnswerlessDraft, unsetGenerateConcepts]);
+
   useEffect(() => {
-    return () => deleteAnswerlessDraft();
-  }, [deleteAnswerlessDraft]);
+    return () => cleanup();
+  }, [cleanup]);
 
   // Concept Generation Event Handling
   useEffect(() => {

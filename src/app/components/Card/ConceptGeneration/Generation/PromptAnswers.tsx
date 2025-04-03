@@ -4,18 +4,9 @@ import EditableAnswerRow from '../UserExploration/components/answer/EditableAnsw
 
 interface PromptAnswersProps {
   promptAnswers: AnswerItem[];
-  handleUpdateAnswer: (uuid: string, newAnswer: string) => void;
-  handleRemoveAnswer: (
-    e: React.MouseEvent<HTMLButtonElement>,
-    uuid: string,
-  ) => void;
 }
 
-const PromptAnswers: React.FC<PromptAnswersProps> = ({
-  promptAnswers,
-  handleUpdateAnswer,
-  handleRemoveAnswer,
-}) => {
+const PromptAnswers: React.FC<PromptAnswersProps> = ({ promptAnswers }) => {
   return (
     <div className='mx-2 flex flex-col gap-2'>
       {promptAnswers.map((answer) => (
@@ -26,8 +17,6 @@ const PromptAnswers: React.FC<PromptAnswersProps> = ({
           key={`answer-${answer.answer}`}
           answer={answer}
           allowEdit={false}
-          handleUpdateAnswer={handleUpdateAnswer}
-          handleRemoveAnswer={handleRemoveAnswer}
         />
       ))}
     </div>

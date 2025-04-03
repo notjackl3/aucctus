@@ -18,7 +18,6 @@ import {
 } from '../UserExploration/components/util/animation-keyframes';
 import LoadingMask from '../UserExploration/components/util/LoadingMask';
 import { PointerEventMask } from '../UserExploration/components/util/PointerEventMask';
-import { useAnswerList } from '../UserExploration/hooks/answer-list.hook';
 import ConceptGenerationInput from './ConceptGenerationInput';
 import ConceptSelectionHeader from './ConceptSelectionHeader';
 import PromptAnswers from './PromptAnswers';
@@ -53,11 +52,20 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     setGeneratedConcepts,
   } = useConceptGenerationStore();
 
+  const regenerations = useRef<number>(0);
+
   // Derived state from store
-  const currentGeneratedConcepts = useMemo(
-    () => generatedConcepts[draftSeedUuid] || [],
-    [generatedConcepts, draftSeedUuid],
-  );
+  const currentGeneratedConcepts = useMemo(() => {
+    return [...(generatedConcepts[draftSeedUuid] || [])].sort((a, b) => {
+      // Sort by generation order (newest first)
+      if (a.generationOrder !== b.generationOrder) {
+        return (b.generationOrder ?? 0) - (a.generationOrder ?? 0);
+      }
+
+      // If same generation order, sort alphabetically by title
+      return (a.title ?? '').localeCompare(b.title ?? '');
+    });
+  }, [generatedConcepts, draftSeedUuid]);
 
   // Local state
   const [showMask, setShowMask] = useState(false);
@@ -82,12 +90,6 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     useSaveGeneratedConcepts(draftSeedUuid);
   const { mutateAsync: generateClarifyingQuestions } =
     useGenerateConceptIncubationClarifyingQuestions();
-
-  // Custom hooks
-  const { handleUpdateAnswer, handleRemoveAnswer } = useAnswerList(
-    promptAnswers,
-    setPromptAnswers,
-  );
 
   // Derived state
   const allowAddAnswer = useMemo(() => {
@@ -122,26 +124,16 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
     if ('done' === data.stage && eventConcepts) {
       // Deduplicate concepts by uuid before setting them
-      const newConcepts = eventConcepts as IGeneratedConcept[];
-      const existingConcepts = generatedConcepts[draftSeedUuid] || [];
-
-      // Create a map of existing concepts by uuid for quick lookup
-      const existingConceptMap = new Map(
-        existingConcepts.map((concept) => [concept.uuid, concept]),
+      const newConcepts = (eventConcepts as IGeneratedConcept[]).map(
+        (concept) => ({ ...concept, generationOrder: regenerations.current }),
       );
-
-      // Filter out duplicates and combine with existing concepts
-      const deduplicatedConcepts = [
-        ...existingConcepts,
-        ...newConcepts.filter(
-          (concept) => !existingConceptMap.has(concept.uuid),
-        ),
-      ];
+      const existingConcepts = generatedConcepts[draftSeedUuid] || [];
+      const uniqueConcepts = new Set([...existingConcepts, ...newConcepts]);
 
       setPromptAnswers([]);
       setValue('');
 
-      setGeneratedConcepts(draftSeedUuid, deduplicatedConcepts);
+      setGeneratedConcepts(draftSeedUuid, Array.from(uniqueConcepts));
       setIsGeneratingMoreConcepts(false);
     }
   });
@@ -264,15 +256,22 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     setGeneratedConcepts,
   ]);
 
-  const handleGenerateMoreConcepts = useCallback(() => {
+  const doGenerateMoreConcepts = useCallback(() => {
+    if (!allowAddAnswer) return;
+    handleAddAnswer(inputValue);
+    regenerations.current++;
     generateConcept({
       concepts: currentGeneratedConcepts,
-      user_generation_instructions: promptAnswers
-        .map((answer) => answer.answer)
-        .join('\n'),
+      user_generation_instructions: inputValue,
     });
     setIsGeneratingMoreConcepts(true);
-  }, [currentGeneratedConcepts, promptAnswers, generateConcept]);
+  }, [
+    currentGeneratedConcepts,
+    generateConcept,
+    allowAddAnswer,
+    inputValue,
+    handleAddAnswer,
+  ]);
 
   // UI rendering functions
   const renderConceptSelection = useCallback(
@@ -291,20 +290,14 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
           ))}
         </div>
 
-        <PromptAnswers
-          promptAnswers={promptAnswers}
-          handleUpdateAnswer={handleUpdateAnswer}
-          handleRemoveAnswer={handleRemoveAnswer}
-        />
+        <PromptAnswers promptAnswers={promptAnswers} />
 
         <div className='sticky bottom-0 m-2'>
           <ConceptGenerationInput
             value={inputValue}
             onChange={(e) => setValue(e.target.value)}
-            onAddAnswer={() => handleAddAnswer(inputValue)}
+            onAddAnswer={doGenerateMoreConcepts}
             allowAddAnswer={allowAddAnswer}
-            allowGenerateMoreConcepts={promptAnswers.length > 0}
-            onGenerateMoreConcepts={handleGenerateMoreConcepts}
           />
         </div>
       </div>
@@ -315,12 +308,9 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
       selectedConcepts,
       handleSelectConcept,
       promptAnswers,
-      handleUpdateAnswer,
-      handleRemoveAnswer,
       inputValue,
       allowAddAnswer,
-      handleAddAnswer,
-      handleGenerateMoreConcepts,
+      doGenerateMoreConcepts,
     ],
   );
 

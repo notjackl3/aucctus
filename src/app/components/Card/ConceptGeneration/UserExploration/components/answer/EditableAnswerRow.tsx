@@ -1,7 +1,7 @@
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useAnswerList } from '../../hooks/answer-list.hook';
 
 interface Answer {
@@ -15,8 +15,8 @@ interface EditableAnswerRowProps {
   className?: string;
   buttonClass?: string;
   allowEdit?: boolean;
-  handleUpdateAnswer: (uuid: string, newAnswer: string) => void;
-  handleRemoveAnswer: (
+  handleUpdateAnswer?: (uuid: string, newAnswer: string) => void;
+  handleRemoveAnswer?: (
     e: React.MouseEvent<HTMLButtonElement>,
     uuid: string,
   ) => void;
@@ -37,6 +37,9 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
   const isBlurFromSaveButton = useRef(false);
   const { currentTextAnswerList } = useConceptIncubationStore();
   const { allowUpdateAnswer } = useAnswerList(currentTextAnswerList, () => {});
+  const allowAnswerEdit = useMemo(() => {
+    return allowEdit && handleUpdateAnswer;
+  }, [allowEdit, handleUpdateAnswer]);
 
   useEffect(() => {
     if (isEditing && inputRef.current) {
@@ -47,7 +50,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
   const handleSave = (e: React.MouseEvent | React.KeyboardEvent) => {
     e.stopPropagation();
     if (editedAnswer.trim() && allowUpdateAnswer(editedAnswer)) {
-      handleUpdateAnswer(answer.uuid, editedAnswer);
+      handleUpdateAnswer?.(answer.uuid, editedAnswer);
       setIsEditing(false);
     }
   };
@@ -122,7 +125,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
         {answer.answer}
       </span>
       <span className='flex-1' />
-      {allowEdit && (
+      {allowAnswerEdit && (
         <button
           className={buttonClass}
           onClick={() => setIsEditing(true)}
@@ -131,13 +134,15 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
           <Icon variant='edit' />
         </button>
       )}
-      <button
-        className={buttonClass}
-        onClick={(e) => handleRemoveAnswer(e, answer.uuid)}
-        aria-label='Remove answer'
-      >
-        <Icon variant='closeX' />
-      </button>
+      {handleRemoveAnswer && (
+        <button
+          className={buttonClass}
+          onClick={(e) => handleRemoveAnswer?.(e, answer.uuid)}
+          aria-label='Remove answer'
+        >
+          <Icon variant='closeX' />
+        </button>
+      )}
     </>
   );
 
@@ -149,7 +154,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
         className,
       )}
     >
-      {allowEdit && isEditing ? renderEditMode() : renderViewMode()}
+      {allowAnswerEdit && isEditing ? renderEditMode() : renderViewMode()}
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { IGeneratedConcept } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { Input } from '@components';
@@ -18,6 +18,13 @@ const SelectableConcept: React.FC<SelectableConceptProps> = ({
   onClick,
   onSelect,
 }) => {
+  const conceptTitle = useMemo(() => {
+    if (!concept.generationOrder) {
+      return concept.title;
+    }
+    return `• ${concept.title}`;
+  }, [concept.title, concept.generationOrder]);
+
   return (
     <div
       key={concept.uuid}
@@ -30,7 +37,7 @@ const SelectableConcept: React.FC<SelectableConceptProps> = ({
     >
       <div className='flex flex-row gap-2'>
         <span className='aucctus-text-brand-primary aucctus-text-md-semibold'>
-          {concept.title}
+          {conceptTitle}
         </span>
         <span className='flex flex-1'></span>
         <Input.CheckBox checked={isSelected} onChange={onSelect} />

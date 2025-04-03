@@ -51,15 +51,20 @@ export interface IBaseConceptEntity {
   updatedAt: string;
 }
 
-export interface IGeneratedConcept {
+interface IGeneratedConceptBase {
+  // API provided properties
   uuid: string;
   title: string;
   summary: string;
   overview: string;
   valueProposition: string;
+}
 
+export interface IGeneratedConcept extends IGeneratedConceptBase {
+  // Frontend properties
   clarifyingQuestions?: IClarifyingQuestion[];
   isGenerating?: boolean;
+  generationOrder?: number;
 }
 
 export interface IConcept extends IBaseConceptEntity {

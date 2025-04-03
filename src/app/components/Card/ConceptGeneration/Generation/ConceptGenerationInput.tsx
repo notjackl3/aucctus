@@ -6,18 +6,14 @@ interface ConceptGenerationInputProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onAddAnswer: () => void;
-  onGenerateMoreConcepts: () => void;
   allowAddAnswer: boolean;
-  allowGenerateMoreConcepts: boolean;
 }
 
 const ConceptGenerationInput: React.FC<ConceptGenerationInputProps> = ({
   value,
   onChange,
   onAddAnswer,
-  onGenerateMoreConcepts,
   allowAddAnswer,
-  allowGenerateMoreConcepts,
 }) => {
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -36,49 +32,6 @@ const ConceptGenerationInput: React.FC<ConceptGenerationInputProps> = ({
     }
   }, [value]);
 
-  const renderActiveButton = () => {
-    if (allowAddAnswer) {
-      return (
-        <button
-          className='btn btn-primary my-2 aspect-square w-6 rounded-lg'
-          aria-label='Add Answer'
-          onClick={onAddAnswer}
-          disabled={value.length === 0}
-        >
-          <span>
-            {
-              <Icon
-                variant='arrowup'
-                width={16}
-                height={16}
-                className='stroke-white !stroke-[0.5]'
-              />
-            }
-          </span>
-        </button>
-      );
-    }
-    return (
-      <button
-        className='btn btn-light my-2 aspect-square w-6 rounded-lg'
-        aria-label='Generate More Concepts'
-        onClick={onGenerateMoreConcepts}
-        disabled={!allowGenerateMoreConcepts}
-      >
-        <span>
-          {
-            <Icon
-              variant='ai-conclusion'
-              width={16}
-              height={16}
-              className='stroke-gray-light-900 !stroke-[0.5]'
-            />
-          }
-        </span>
-      </button>
-    );
-  };
-
   return (
     <>
       <textarea
@@ -88,7 +41,7 @@ const ConceptGenerationInput: React.FC<ConceptGenerationInputProps> = ({
           onChange(e as unknown as React.ChangeEvent<HTMLInputElement>)
         }
         disabled={!allowAddAnswer}
-        placeholder={allowAddAnswer ? 'Type anything' : '-'}
+        placeholder={allowAddAnswer ? 'Enter feedback to refine concepts' : '-'}
         maxLength={500}
         rows={1}
         onKeyDown={(e) => {
@@ -107,7 +60,23 @@ const ConceptGenerationInput: React.FC<ConceptGenerationInputProps> = ({
         )}
       />
       <span className='absolute right-2 top-1/2 -translate-y-1/2 transform'>
-        {renderActiveButton()}
+        <button
+          className='btn btn-primary aspect-square w-6 rounded-lg'
+          aria-label='Add Answer'
+          onClick={onAddAnswer}
+          disabled={value.length === 0 && !allowAddAnswer}
+        >
+          <span>
+            {
+              <Icon
+                variant='arrowup'
+                width={16}
+                height={16}
+                className='stroke-white !stroke-[0.5]'
+              />
+            }
+          </span>
+        </button>
       </span>
     </>
   );

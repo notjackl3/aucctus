@@ -5,7 +5,7 @@ import { IGeneratedConcept } from '@libs/api/types';
 import { animated, useTransition } from '@react-spring/web';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import {
   animationStyles,
   getAnimationStyle,
@@ -41,6 +41,7 @@ const ConceptGeneration = React.forwardRef<
   const animatedTitles = useRef<Set<string>>(new Set());
   const conceptsContainerRef = React.useRef<HTMLDivElement>(null);
   const { setGeneratedConcepts } = useConceptGenerationStore();
+  const hasGenerated = useRef(false);
 
   // Handle socket events for concept generation
   useSocketEvent('stream.structured.concept.generation', (data) => {
@@ -117,7 +118,10 @@ const ConceptGeneration = React.forwardRef<
     setTimeout(() => onGenerateComplete(), 1500);
   }, [onGenerateComplete]);
 
-  React.useEffect(() => {
+  useEffect(() => {
+    if (hasGenerated.current) return;
+    hasGenerated.current = true;
+
     generateConcept(undefined, {
       onError: () => {
         const event = new CustomEvent('aucctus-generate-concept', {
