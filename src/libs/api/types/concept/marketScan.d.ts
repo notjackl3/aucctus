@@ -79,7 +79,6 @@ export interface ITrendsAndDrivers extends IBaseConceptEntity {
   name: string;
   description: string;
   trendChange: TrendChangeType; // Use the literal type
-  imagePath: string;
   support: ISupport;
   createdAt: string;
   updatedAt: string;

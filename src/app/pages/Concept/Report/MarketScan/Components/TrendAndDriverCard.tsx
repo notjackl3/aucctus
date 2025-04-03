@@ -1,4 +1,3 @@
-import images from '@assets/img';
 import { Card, Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import {
@@ -104,21 +103,6 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
       }
     >
       <div className='aucctus-bg-primary-hover flex cursor-pointer flex-col gap-4 p-6'>
-        <img
-          alt='delivery-trend'
-          src={trendAndDriver.imagePath ?? 'url'}
-          className='h-[120px] w-full object-cover object-center'
-          onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-            const imageArray = [
-              images.trendOne,
-              images.trendTwo,
-              images.trendThree,
-            ];
-            const randomImage =
-              imageArray[Math.floor(Math.random() * imageArray.length)];
-            e.currentTarget.src = randomImage;
-          }}
-        />
         <span className='aucctus-text-primary aucctus-text-md-bold'>
           {trendAndDriver.name}
         </span>
