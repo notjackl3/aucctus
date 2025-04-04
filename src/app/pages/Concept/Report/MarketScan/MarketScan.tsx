@@ -1,13 +1,7 @@
 import { Loading } from '@components';
-import Icon from '@components/Icon/Icon/Icon';
-import AddMarketScanElement from '@components/Modal/MarketScanElement/AddMarketScanElement';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
-import { useModal } from '@context/ModalContextProvider';
 import { useEditMarketScan } from '@hooks/concepts/editable.hook';
-import {
-  useConceptMarketScan,
-  useTrendAndDriverCreate,
-} from '@hooks/query/concepts.hook';
+import { useConceptMarketScan } from '@hooks/query/concepts.hook';
 import { FunctionComponent } from 'react';
 import { useParams } from 'react-router-dom';
 import IncumbentsList from './Components/IncumbentList/IncumbentList';
@@ -19,10 +13,6 @@ const MarketScan: FunctionComponent = () => {
   const { data: marketScan, isLoading } = useConceptMarketScan(conceptId || '');
   const { trendsAndDriversDescription, ecosystemDescription } =
     useEditMarketScan();
-  const { mutate: addTrendAndDriver } = useTrendAndDriverCreate(
-    conceptId || '',
-  );
-  const { openModal } = useModal();
 
   if (isLoading) {
     return (
@@ -42,14 +32,6 @@ const MarketScan: FunctionComponent = () => {
             <h2 className='aucctus-text-brand-primary aucctus-text-md-bold'>
               Trends and Drivers
             </h2>
-            <button
-              className='aucctus-bg-primary-hover rounded-md p-2 shadow hover:shadow-lg'
-              onClick={() => {
-                openModal(AddMarketScanElement, { addItem: addTrendAndDriver });
-              }}
-            >
-              <Icon variant='plus' />
-            </button>
           </div>
           <EditModeSwitcher
             value={trendsAndDriversDescription.value}

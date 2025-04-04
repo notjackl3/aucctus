@@ -19,7 +19,7 @@ export class MarketScanApi extends ApiService {
 
   updateMarketScan(uuid: string, data: Partial<IMarketScan>) {
     return this.patch<IMarketScan, Partial<IMarketScan>>(
-      endpoints.conceptMarketScanUuid(uuid, 'v2'),
+      endpoints.conceptMarketScanUuid(uuid),
       data,
     );
   }

@@ -2,6 +2,7 @@ import {
   IBusinessModel,
   IFinancialMarketSizeItem,
   IFinancialProjectionPricing,
+  IMarketScan,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
@@ -15,7 +16,6 @@ import {
   ICustomerProfile,
   IFinancialProjection,
   IFormError,
-  IMarketScanV1,
 } from '../../../libs/api/types';
 import {
   useConcept,
@@ -269,7 +269,7 @@ export function useEditMarketScan() {
   const { mutate } = useMarketScanUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 500 };
 
-  const trendsAndDriversDescription = useEditableField<string, IMarketScanV1>({
+  const trendsAndDriversDescription = useEditableField<string, IMarketScan>({
     initialValue: marketScan?.trendsAndDriversDescription || '',
     fieldName: 'trendsAndDriversDescription',
     updateMutation: mutate,
@@ -277,7 +277,7 @@ export function useEditMarketScan() {
     validation: validationOptions,
   });
 
-  const ecosystemDescription = useEditableField<string, IMarketScanV1>({
+  const ecosystemDescription = useEditableField<string, IMarketScan>({
     initialValue: marketScan?.ecosystemDescription || '',
     fieldName: 'ecosystemDescription',
     updateMutation: mutate,

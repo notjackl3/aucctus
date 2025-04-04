@@ -4,7 +4,6 @@ export * from './concept/assumptions';
 export * from './concept/concepts';
 export * from './concept/financialProjection';
 export * from './concept/marketScan';
-export * from './concept/marketScanV1';
 export * from './concept/support';
 export * from './fastService';
 export * from './incubation/aiSuggestions';

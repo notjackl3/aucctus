@@ -4,7 +4,6 @@ import {
   IncubationAnswerUpdatePayload,
 } from '@libs/api/concepts';
 import {
-  Ecosystem,
   IConcept,
   IConceptOverview,
   IConceptPage,
@@ -14,14 +13,12 @@ import {
   IConceptSeedUpdate,
   ICustomerProfile,
   ICustomerProfileCreate,
-  IEcosystemCreate,
   IFinancialProjection,
   IFormError,
   IGeneratedConcept,
-  IMarketScanElementCreate,
-  IMarketScanV1,
+  IMarketScan,
   ISeedQueryOptions,
-  ITrendsAndDriversV1,
+  ITrendsAndDrivers,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
@@ -300,23 +297,6 @@ export const useConceptOverview = (uuid: string) => {
 };
 
 /**
- * @deprecated Use useConceptMarketScan instead.
- * Custom hook for fetching a concept market scan by their Concept UUID.
- * @param uuid - The UUID of the concept.
- * @returns An object containing the query result and the concept market scan data.
- */
-export const useConceptMarketScanV1 = (uuid: string) => {
-  const query = useQuery({
-    queryKey: [AucctusQueryKeys.marketScan, uuid],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    queryFn: async () => await api.concept.getConceptMarketScan(uuid),
-    enabled: !!uuid,
-  });
-
-  return { ...query, marketScan: query.data };
-};
-
-/**
  * Custom hook for fetching a concept market scan by their Concept UUID.
  * @param uuid - The UUID of the concept.
  * @returns An object containing the query result and the concept market scan data.
@@ -463,22 +443,8 @@ export const useConceptOverviewUpdate = (conceptUuid: string) => {
  * @returns The result of the generic concept update.
  */
 export const useMarketScanUpdate = (conceptUuid: string) => {
-  return useGenericConceptMutate<IMarketScanV1>(
+  return useGenericConceptMutate<IMarketScan>(
     (data) => api.concept.updateConceptMarketScan(data.uuid, data),
-    [[AucctusQueryKeys.marketScan, conceptUuid]],
-  );
-};
-
-export const useTrendAndDriverCreate = (conceptUuid: string) => {
-  return useGenericConceptMutate<ITrendsAndDriversV1, IMarketScanElementCreate>(
-    (data) => api.concept.createTrendAndDriver(conceptUuid, data),
-    [[AucctusQueryKeys.marketScan, conceptUuid]],
-  );
-};
-
-export const useEcosystemCreate = (conceptUuid: string) => {
-  return useGenericConceptMutate<Ecosystem, IEcosystemCreate>(
-    (data) => api.concept.createEcosystem(conceptUuid, data),
     [[AucctusQueryKeys.marketScan, conceptUuid]],
   );
 };
@@ -541,29 +507,15 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 // };
 
 export const useTrendAndDriverUpdate = () => {
-  return useGenericConceptMutate<ITrendsAndDriversV1>(
+  return useGenericConceptMutate<ITrendsAndDrivers>(
     (data) => api.concept.updateTrendAndDriver(data.uuid, data),
     [[AucctusQueryKeys.marketScan]],
   );
 };
 
 export const useTrendAndDriverDelete = () => {
-  return useGenericConceptMutate<ITrendsAndDriversV1, string>(
+  return useGenericConceptMutate<ITrendsAndDrivers, string>(
     (uuid) => api.concept.deleteTrendAndDriver(uuid),
-    [[AucctusQueryKeys.marketScan]],
-  );
-};
-
-export const useEcosystemUpdate = () => {
-  return useGenericConceptMutate<Ecosystem>(
-    (data) => api.concept.updateEcosystem(data.uuid, data),
-    [[AucctusQueryKeys.marketScan]],
-  );
-};
-
-export const useEcosystemDelete = () => {
-  return useGenericConceptMutate<Ecosystem, string>(
-    (uuid) => api.concept.deleteEcosystem(uuid),
     [[AucctusQueryKeys.marketScan]],
   );
 };

@@ -4,20 +4,17 @@ import { Endpoints as endpoints } from './endpoints';
 import {
   ConceptIncubationQuestion,
   ConceptStatus,
-  Ecosystem,
   IConcept,
   IConceptOverview,
   IConceptPage,
   IConceptQueryOptions,
   ICustomerProfile,
   ICustomerProfileCreate,
-  IEcosystemCreate,
   IFinancialProjection,
   IGeneratedConcept,
-  IMarketScanElementCreate,
-  IMarketScanV1,
+  IMarketScan,
   IPageResponse,
-  ITrendsAndDriversV1,
+  ITrendsAndDrivers,
   QuestionFieldType,
 } from './types'; // Import the missing type
 
@@ -206,52 +203,23 @@ export class ConceptApi extends ApiService {
     );
   }
 
-  getConceptMarketScan(uuid: string) {
-    return this.get<IMarketScanV1>(endpoints.conceptMarketScan(uuid, 'v1'));
-  }
-
-  updateConceptMarketScan(uuid: string, data: Partial<IMarketScanV1>) {
-    return this.patch<IMarketScanV1, Partial<IMarketScanV1>>(
+  updateConceptMarketScan(uuid: string, data: Partial<IMarketScan>) {
+    return this.patch<IMarketScan, Partial<IMarketScan>>(
       endpoints.conceptMarketScanUuid(uuid),
       data,
     );
   }
 
-  updateTrendAndDriver(uuid: string, data: Partial<ITrendsAndDriversV1>) {
-    return this.patch<ITrendsAndDriversV1, Partial<ITrendsAndDriversV1>>(
+  updateTrendAndDriver(uuid: string, data: Partial<ITrendsAndDrivers>) {
+    return this.patch<ITrendsAndDrivers, Partial<ITrendsAndDrivers>>(
       endpoints.conceptTrendAndDriver(uuid),
-      data,
-    );
-  }
-
-  createTrendAndDriver(uuid: string, data: IMarketScanElementCreate) {
-    return this.post<ITrendsAndDriversV1, IMarketScanElementCreate>(
-      endpoints.conceptMarketScanElement(uuid, 'trends-and-drivers'),
       data,
     );
   }
 
   deleteTrendAndDriver(uuid: string) {
-    return this.delete<ITrendsAndDriversV1>(
+    return this.delete<ITrendsAndDrivers>(
       endpoints.conceptTrendAndDriver(uuid),
     );
-  }
-
-  updateEcosystem(uuid: string, data: Partial<Ecosystem>) {
-    return this.patch<Ecosystem, Partial<Ecosystem>>(
-      endpoints.conceptEcosystem(uuid),
-      data,
-    );
-  }
-
-  createEcosystem(uuid: string, data: IEcosystemCreate) {
-    return this.post<Ecosystem, IEcosystemCreate>(
-      endpoints.conceptMarketScanElement(uuid, 'ecosystem'),
-      data,
-    );
-  }
-
-  deleteEcosystem(uuid: string) {
-    return this.delete<Ecosystem>(endpoints.conceptEcosystem(uuid));
   }
 }

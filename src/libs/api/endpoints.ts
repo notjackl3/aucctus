@@ -129,18 +129,8 @@ export class Endpoints {
     return `api/${version}/concept/${conceptUuid}/market-scan/`;
   }
 
-  static conceptMarketScanUuid(
-    marketScanUuid: string,
-    version: 'v1' | 'v2' = 'v1',
-  ) {
-    return `api/${version}/concept/market-scan/${marketScanUuid}`;
-  }
-
-  static conceptMarketScanElement(
-    conceptUuid: string,
-    element: 'trends-and-drivers' | 'ecosystem',
-  ) {
-    return `api/v1/concept/${conceptUuid}/market-scan/${element}`;
+  static conceptMarketScanUuid(marketScanUuid: string) {
+    return `api/v2/concept/market-scan/${marketScanUuid}`;
   }
 
   static conceptTrendAndDriver(trendAndDriverUuid: string) {
