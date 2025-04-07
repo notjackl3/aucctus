@@ -25,3 +25,6 @@ declare module '*.svg' {
 
 declare const __APP_VERSION__: string;
 declare const __APP_ENVIRONMENT__: string;
+
+// Feature flags
+declare const FEATURE_VERSION_HISTORY: boolean;

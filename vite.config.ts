@@ -67,6 +67,11 @@ export default defineConfig(async (config) => {
     define: {
       __APP_VERSION__: JSON.stringify(env.npm_package_version),
       __APP_ENVIRONMENT__: JSON.stringify(env.NODE_ENV),
+
+      // Feature flags
+      // Make sure when defining feature flags to add them to the vite-env.d.ts file
+      // If the variable is not found in the .env the default value will be false (Boolean(undefined) === false)
+      FEATURE_VERSION_HISTORY: Boolean(env.FEATURE_VERSION_HISTORY),
     },
     css: {
       preprocessorOptions: {
