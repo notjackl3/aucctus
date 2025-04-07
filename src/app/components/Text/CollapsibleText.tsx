@@ -20,7 +20,7 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
   titleClassName,
   description,
   descriptionClassName,
-  maxDescriptionHeight = 60,
+  maxDescriptionHeight = 'auto',
   truncationClassName = 'line-clamp-3',
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -105,9 +105,9 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
         {!open && isTruncated && (
           <>
             <span className='pointer-events-none absolute inset-x-0 bottom-0 h-6 bg-gradient-to-t from-inherit to-transparent'></span>
-            <span className='absolute top-[50%] flex w-full justify-center'>
+            <span className='absolute inset-x-0 bottom-0 flex w-full justify-center'>
               {isHovered && (
-                <button className='btn btn-light btn-xs'>
+                <button className='btn btn-light btn-xs mb-1'>
                   See More <Icon variant='arrowdown' />
                 </button>
               )}

@@ -15,6 +15,7 @@ import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
 import {
   ColumnDef,
+  ColumnResizeMode,
   createColumnHelper,
   getCoreRowModel,
   OnChangeFn,
@@ -185,27 +186,33 @@ export const useConceptBank = (
         id: 'title',
         sortingFn: 'text',
         enableColumnFilter: false,
+        size: 600,
+        minSize: 600,
+        maxSize: 600,
+        enableResizing: true,
         header: () => (
           <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
             Concept
           </div>
         ),
-        size: 600,
-        minSize: 400,
         cell: (info) => (
-          <Text.Collapsible
-            title={info.getValue()}
-            description={info.row.original.description}
-          />
+          <div className='flex max-w-[700px] items-center p-2'>
+            <Text.Collapsible
+              title={info.getValue()}
+              maxDescriptionHeight={35}
+              description={info.row.original.description}
+            />
+          </div>
         ),
       }),
       columnHelper.accessor((row) => utils.time.dateFormatter(row.createdAt), {
         id: 'createdAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
-        size: 150,
-        maxSize: 150,
-        enableResizing: false,
+        size: 130,
+        minSize: 130,
+        maxSize: 130,
+        enableResizing: true,
         cell: (info) => {
           const createdBy = info.row.original.createdBy;
           const initials = createdBy
@@ -218,20 +225,21 @@ export const useConceptBank = (
           return (
             <span className='flex w-full flex-row items-center justify-start gap-2'>
               {createdBy && (
-                <div className='mr-2 flex items-center'>
-                  <div className='aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full bg-[#F5F3F3] text-xs font-medium'>
+                <div className='flex items-center'>
+                  <div className='aucctus-bg-secondary aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium'>
                     {initials}
                   </div>
                 </div>
               )}
-              <div className='flex flex-row items-center'>
+              <div className='ml-2 flex flex-col'>
                 {createdBy && (
-                  <span className='mr-1 text-sm font-medium'>{fullName}</span>
+                  <span className='aucctus-text-primary max-w-[160px] truncate text-sm font-medium'>
+                    {fullName}
+                  </span>
                 )}
-                <Table.ConceptBank.Text
-                  className='aucctus-text-tertiary text-nowrap'
-                  value={info.getValue()}
-                />
+                <span className='aucctus-text-tertiary text-xs'>
+                  {info.getValue()}
+                </span>
               </div>
             </span>
           );
@@ -245,9 +253,10 @@ export const useConceptBank = (
       columnHelper.accessor('status', {
         id: 'status',
         sortingFn: 'text',
-        size: 150,
-        maxSize: 150,
-        enableResizing: false,
+        size: 90,
+        minSize: 90,
+        maxSize: 90,
+        enableResizing: true,
         header: () => (
           <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
             Status
@@ -257,15 +266,16 @@ export const useConceptBank = (
         enableColumnFilter: false,
       }),
 
-      columnHelper.accessor('reportStatus', {
-        id: 'reportStatus',
+      columnHelper.accessor('uuid', {
+        id: 'actions',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 124,
-        maxSize: 124,
-        enableResizing: false,
+        size: 90,
+        minSize: 90,
+        maxSize: 90,
+        enableResizing: true,
         cell: ({ row }) => (
-          <span className='m-auto flex h-full w-[124px] items-center justify-end self-stretch align-middle'>
+          <span className='m-auto flex h-full w-full items-center justify-end self-stretch align-middle'>
             <Button.ConceptGenerate
               variant={row.original.reportStatus}
               onClick={handleGenerateConceptButton(row)}
@@ -275,11 +285,12 @@ export const useConceptBank = (
         header: () => {},
       }),
       columnHelper.accessor('uuid', {
-        id: 'uuid',
+        id: 'settings',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 42,
-        maxSize: 42,
+        size: 60,
+        maxSize: 60,
+        enableResizing: false,
         header: () => {},
         cell: (info) => (
           <Table.ConceptBank.ConceptActionMenuButton
@@ -307,6 +318,8 @@ export const useConceptBank = (
     },
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSortingChange,
+    enableColumnResizing: true,
+    columnResizeMode: 'onChange' as ColumnResizeMode,
   };
 
   // Use useReactTable directly at the top level, not inside a callback

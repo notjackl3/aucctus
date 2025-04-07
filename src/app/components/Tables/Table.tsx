@@ -32,7 +32,10 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
   return (
     <table
       {...props}
-      className={cn('w-full table-auto text-gray-600', props.className)}
+      className={cn(
+        'table-layout-fixed w-full table-auto text-gray-600',
+        props.className,
+      )}
     >
       <thead
         {...theadProps}

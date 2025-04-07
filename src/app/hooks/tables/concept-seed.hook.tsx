@@ -13,6 +13,7 @@ import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import {
   ColumnDef,
+  ColumnResizeMode,
   createColumnHelper,
   getCoreRowModel,
   OnChangeFn,
@@ -243,8 +244,10 @@ export const useSeedsBank = (
             Concept
           </div>
         ),
-        size: 400,
-        minSize: 400,
+        size: 600,
+        minSize: 600,
+        maxSize: 600,
+        enableResizing: false,
         cell: (info) => {
           const answeredCount = getAnsweredQuestionsCount(info.row.original);
 
@@ -254,8 +257,8 @@ export const useSeedsBank = (
           const description = info.row.original.description || info.getValue();
 
           return (
-            <div className='flex items-center'>
-              <div className='mr-3 flex items-center justify-center rounded-lg border border-gray-100 bg-white p-3 shadow-sm'>
+            <div className='flex max-w-[700px] items-center p-3'>
+              <div className='aucctus-border-primary aucctus-bg-primary mr-3 flex items-center justify-center rounded-lg p-3 shadow-sm'>
                 <Icon
                   variant={
                     info.row.original.type === 'EXPAND_AN_EXISTING_IDEA'
@@ -267,8 +270,8 @@ export const useSeedsBank = (
               <div className='ml-2 flex flex-col items-center justify-center'>
                 <Text.Collapsible
                   title={title}
+                  maxDescriptionHeight={35}
                   description={description}
-                  truncationClassName='line-clamp-1'
                 />
               </div>
             </div>
@@ -279,8 +282,9 @@ export const useSeedsBank = (
         id: 'createdAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
-        size: 230, // Increased width for Created By column
-        maxSize: 230, // Increased max width as well
+        size: 130,
+        minSize: 130,
+        maxSize: 130,
         enableResizing: false,
         cell: (info) => {
           const createdBy = info.row.original.createdBy;
@@ -292,24 +296,23 @@ export const useSeedsBank = (
             : '';
 
           return (
-            <span className='flex w-full flex-row items-center justify-start gap-2'>
+            <span className='flex flex-row items-center justify-start gap-2'>
               {createdBy && (
-                <div className='mr-2 flex items-center'>
-                  <div className='aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full bg-[#F5F3F3] text-xs font-medium'>
+                <div className='flex items-center'>
+                  <div className='aucctus-bg-secondary aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium'>
                     {initials}
                   </div>
                 </div>
               )}
-              <div className='flex flex-col'>
+              <div className='ml-2 flex flex-col'>
                 {createdBy && (
-                  <span className='mr-1 max-w-[160px] truncate text-sm font-medium'>
+                  <span className='aucctus-text-primary max-w-[160px] truncate text-sm font-medium'>
                     {fullName}
                   </span>
                 )}
-                <Table.ConceptBank.Text
-                  className='aucctus-text-tertiary text-nowrap'
-                  value={info.getValue()}
-                />
+                <span className='aucctus-text-tertiary text-xs'>
+                  {info.getValue()}
+                </span>
               </div>
             </span>
           );
@@ -324,8 +327,9 @@ export const useSeedsBank = (
         id: 'stage',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 120,
-        maxSize: 120,
+        size: 90,
+        minSize: 90,
+        maxSize: 90,
         enableResizing: false,
         header: () => (
           <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
@@ -342,15 +346,16 @@ export const useSeedsBank = (
         id: 'actions',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 150,
-        maxSize: 150,
+        size: 90,
+        minSize: 90,
+        maxSize: 90,
         enableResizing: false,
         header: () => {},
         cell: (info) => {
           const showButton = info.row.original.status === 'draft';
 
           return (
-            <span className='m-auto flex h-full w-[124px] items-center justify-end self-stretch align-middle'>
+            <span className='m-auto flex h-full w-full items-center justify-end self-stretch'>
               {showButton && (
                 <Button.ConceptGenerate
                   variant='draft'
@@ -372,8 +377,8 @@ export const useSeedsBank = (
         id: 'settings',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 42,
-        maxSize: 42,
+        size: 60,
+        maxSize: 60,
         enableResizing: false,
         header: () => {},
         cell: (info) => (
@@ -409,6 +414,8 @@ export const useSeedsBank = (
     },
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSortingChange,
+    enableColumnResizing: true,
+    columnResizeMode: 'onChange' as ColumnResizeMode,
   };
 
   // Use useReactTable directly at the top level, not inside a callback

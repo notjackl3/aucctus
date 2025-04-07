@@ -45,9 +45,9 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
     if (concept) {
       return concept.isGenerating
         ? 'Report generation is in progress'
-        : `Your concept report is ready to be generated`;
+        : `We have enough information to generate your concept report`;
     } else {
-      return 'Your concepts are ready to be generated';
+      return 'We have enough information to generate concepts for you';
     }
   }, [concept]);
   const buttonText = useMemo(

@@ -62,7 +62,7 @@ const ContinueRefining: React.FC<ContinueRefiningProps> = ({
       >
         <ContinueRefiningIcon iconRef={iconRef} />
         <animated.span style={labelAnimation} className='aucctus-text-primary'>
-          {'Continue refining concept direction'}
+          {'Or, answer these questions to help refine even further'}
         </animated.span>
       </animated.span>
       <animated.span

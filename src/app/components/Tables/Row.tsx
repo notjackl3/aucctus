@@ -35,6 +35,12 @@ const TableRow: React.FC<ITableRowProps<any>> = <T,>({
       {row.getVisibleCells().map((cell) => (
         <td
           className='break-words bg-inherit p-3 text-base font-normal first:pl-6 last:pr-6'
+          style={{
+            width: cell.column.getSize(),
+            maxWidth: cell.column.columnDef.maxSize || cell.column.getSize(),
+            minWidth: cell.column.columnDef.minSize || cell.column.getSize(),
+            position: 'relative',
+          }}
           key={`cell-${cell.id}`}
         >
           {flexRender(cell.column.columnDef.cell, cell.getContext())}

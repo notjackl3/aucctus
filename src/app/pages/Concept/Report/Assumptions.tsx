@@ -109,7 +109,7 @@ const KeyAssumptions: React.FC = () => {
         </div>
       </div>
       {/* Assumptions & Testing Table */}
-      <div className='aucctus-border-secondary aucctus-bg-primary flex w-fit rounded-lg border'>
+      <div className='aucctus-border-secondary aucctus-bg-primary flex w-full rounded-lg border'>
         {/* Assumptions */}
         <div className='aucctus-border-secondary flex w-full min-w-[400px] max-w-[600px] flex-col items-start justify-start overflow-y-auto border-r'>
           {/* Header */}

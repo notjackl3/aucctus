@@ -22,6 +22,12 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
         props.className,
       )}
       key={header.id}
+      style={{
+        width: header.column.getSize(),
+        maxWidth: header.column.columnDef.maxSize || header.column.getSize(),
+        minWidth: header.column.columnDef.minSize || header.column.getSize(),
+        position: 'relative',
+      }}
     >
       {header.isPlaceholder ? null : (
         <span className='flex flex-row items-center justify-start [&>svg]:stroke-primary-500'>
