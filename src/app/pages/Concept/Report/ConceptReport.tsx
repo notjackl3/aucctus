@@ -1,6 +1,6 @@
-import { Container, Icon, Loading, Modal, Select } from '@components';
+import { Container, Icon, Loading, Select } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
-import { useModal } from '@context/ModalContextProvider';
+// import { useModal } from '@context/ModalContextProvider';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import { useConcept, useConceptUpdate } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
@@ -52,7 +52,7 @@ const ConceptReport: FunctionComponent = () => {
   const { mutate: updateConcept } = useConceptUpdate();
   const [isLoading, setIsLoading] = useState(false);
 
-  const { openModal } = useModal();
+  // const { openModal } = useModal();
 
   const onTabSelect = useCallback(
     (value: string) => {
@@ -123,7 +123,7 @@ const ConceptReport: FunctionComponent = () => {
           </div>
         </div>
         <div className='flex gap-4'>
-          <button className='btn btn-bold aucctus-text-brand-primary group aspect-square w-10 hover:bg-primary-900 hover:text-white'>
+          {/* <button className='btn btn-bold aucctus-text-brand-primary group aspect-square w-10 hover:bg-primary-900 hover:text-white'>
             <span>
               <Icon
                 variant='clock-rewind'
@@ -132,7 +132,7 @@ const ConceptReport: FunctionComponent = () => {
                 className='stroke-primary-900 transition-colors duration-300 group-hover:stroke-primary-100'
               />
             </span>
-          </button>
+          </button> */}
           <button
             aria-label='Download Opportunity Snapshot'
             className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
@@ -151,7 +151,7 @@ const ConceptReport: FunctionComponent = () => {
             )}
             Opportunity Snapshot
           </button>
-          <button
+          {/* <button
             onClick={() =>
               openModal(
                 Modal.AiEditing,
@@ -166,7 +166,7 @@ const ConceptReport: FunctionComponent = () => {
             className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
           >
             Refine
-          </button>
+          </button> */}
         </div>
       </div>
       <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
