@@ -200,6 +200,17 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [question]);
 
+  const isSuggestionInUserAnswers = useCallback(
+    (suggestion: IAISuggestion) => {
+      return currentTextAnswerList.some(
+        (answer) =>
+          answer.answer.includes(suggestion.title) ||
+          answer.answer.includes(suggestion.description),
+      );
+    },
+    [currentTextAnswerList],
+  );
+
   // --- Render component ---
   return (
     <div
@@ -216,6 +227,11 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
             title={suggestion.title}
             message={suggestion.description}
             onClick={() => handleSuggestionClick(suggestion)}
+            className={
+              isSuggestionInUserAnswers(suggestion)
+                ? '!pointer-events-none !opacity-50'
+                : ''
+            }
           />
         ))}
       </div>
