@@ -1,7 +1,9 @@
 import images from '@assets/img';
+import { useModal } from '@context/ModalContextProvider';
+import useStore from '@stores/store';
 import React from 'react';
 import AiEditingCard from './AiEditingCard';
-import { useModal } from '@context/ModalContextProvider';
+import AiEditingSocketWrapper from './AiEditingSocketWrapper';
 
 const mainStyle = {
   backgroundImage: `url(${images.aiExplorationsBackground})`,
@@ -11,6 +13,15 @@ const mainStyle = {
 
 const AiEditing: React.FC = () => {
   const { closeModal } = useModal();
+  const clearConversation = useStore(
+    (state) => state.aiEditing.clearConversation,
+  );
+
+  React.useEffect(() => {
+    return () => {
+      clearConversation();
+    };
+  }, [clearConversation]);
 
   return (
     <>
@@ -35,6 +46,8 @@ const AiEditing: React.FC = () => {
           <AiEditingCard onClose={closeModal} />
         </div>
       </div>
+      {/* This is a wrapper for the socket events and handles receiving messages and updating the state */}
+      <AiEditingSocketWrapper />
     </>
   );
 };

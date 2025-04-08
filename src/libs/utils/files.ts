@@ -1,3 +1,5 @@
+import { Mimetype } from '../api/types';
+
 /**
  * Downloads a PDF file from a blob response
  * @param pdfBlob - The PDF blob data
@@ -31,3 +33,24 @@ export const generateConceptSnapshotFileName = (
   const readableDate = today.toISOString().split('T')[0].replace(/-/g, '');
   return `${companyName.toLowerCase()}-${conceptTitle.replace(/\s+/g, '-').toLowerCase()}-${readableDate}.pdf`;
 };
+
+/**
+ * Converts a File object to a base64 string with proper MIME type handling
+ * @param file The File object to convert
+ * @returns A promise that resolves to an object containing the base64 data and file metadata
+ */
+export async function fileToBase64(file: File): Promise<{
+  mediaData: string;
+  mimetype: Mimetype;
+  filename: string;
+}> {
+  return {
+    mediaData: await new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.readAsDataURL(file);
+    }),
+    mimetype: file.type as unknown as Mimetype,
+    filename: file.name,
+  };
+}

@@ -1,6 +1,13 @@
-export interface BaseSocketEvent {
-  type: string;
-}
+import { IConceptReportEdit } from '../ai-editing';
+import {
+  IConceptGenerationContext,
+  IGeneratedConceptList,
+} from '../concept/concepts';
+import {
+  IAISuggestionList,
+  IAISuggestionsContext,
+} from '../incubation/aiSuggestions';
+import { BaseSocketEvent } from './base';
 
 export interface ErrorEvent extends BaseSocketEvent {
   type: 'error';
@@ -8,16 +15,56 @@ export interface ErrorEvent extends BaseSocketEvent {
   details: string | object | number | boolean;
 }
 
-export interface NotificationEvent extends BaseSocketEvent {
-  type: 'notification.user' | 'notification.account';
-  title: string;
-  body: string;
+interface IBaseInboundChatMessage {
+  sessionId: string;
 }
 
-export interface ChatMessageEvent extends BaseSocketEvent {
-  type: 'chat.message.user';
+// The handshake simply responds back with the created session id after the user has sent the first message... Probably could have been a post...
+export interface IHandshakeMessage
+  extends IBaseInboundChatMessage,
+    BaseSocketEvent {
+  type: 'ai.editing.conversation.start';
+  // Add typing for initial message
+}
+
+export interface IInboundChatMessage
+  extends IBaseInboundChatMessage,
+    BaseSocketEvent {
+  type: 'chat.message';
+  uuid: string; // The uuid of the message
+  content: string;
+  timestamp: number; // The timestamp of the message
+  name: string; // The name of the user who sent the message or Aucctus
+  role: 'user' | 'assistant';
+}
+
+export interface IAiEditingHandshakeMessage
+  extends IBaseInboundChatMessage,
+    BaseSocketEvent {
+  type: 'ai.editing.handshake';
+  sessionId: string;
+  conceptUuid: string;
+}
+
+export interface IAiEditingInboundChatMessage
+  extends IBaseInboundChatMessage,
+    BaseSocketEvent {
+  type: 'ai.editing.chat';
+}
+
+// AI Editing Typing Message
+export interface IAiEditingTypingMessage extends BaseSocketEvent {
+  type: 'ai.editing.chat.typing';
+  conceptUuid: string;
+  value: boolean;
+}
+
+// AI Editing Error Message
+export interface IAiEditingErrorMessage extends BaseSocketEvent {
+  type: 'ai.editing.error';
+  conceptUuid: string;
+  code: string; // This should match your ConsumerErrorCodes enum
   message: string;
-  sender: string;
 }
 
 /**
@@ -113,7 +160,8 @@ export type StreamEvent<T extends string, K extends string, C extends object> =
 
  * Type-safe helpers for stream events based on their type
  */
-export type ChatStreamEvent<C = {}> = StreamEvent<'stream.chat', string, C>;
+export type ChatStreamEvent<C = {}> = StreamEvent<'stream.chat', string, C>; // TODO: This needs to be properly updated to conform to the correct typing
+
 export type AISuggestionsStreamEvent = StreamEvent<
   'stream.structured.ai.suggestions',
   IAISuggestionList,
@@ -125,21 +173,23 @@ export type ConceptGenerationStreamEvent = StreamEvent<
   IConceptGenerationContext
 >;
 
-export interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
-  type: 'incubation.ai.suggestions.request';
-  seedUuid: string;
-  questionId: int;
-  answer?: string[];
-  conceptUuid?: string;
-}
+export type IAiEditingSuggestionsStreamEvent = StreamEvent<
+  'stream.ai.editing.edit.suggestion',
+  IConceptReportEdit,
+  { conceptUuid: string; sessionId: string }
+>;
 
-export type SocketEvent<C = {}> =
+export type InboundSocketEvent<C = {}> =
   | ErrorEvent
-  | NotificationEvent
-  | ChatMessageEvent
   | ChatStreamEvent<C>
-  | IncubationAiSuggestionsRequestEvent
   | AISuggestionsStreamEvent
-  | ConceptGenerationStreamEvent;
+  | ConceptGenerationStreamEvent
+  | IHandshakeMessage
+  | IInboundChatMessage
+  | IAiEditingHandshakeMessage
+  | IAiEditingInboundChatMessage
+  | IAiEditingTypingMessage
+  | IAiEditingErrorMessage
+  | IAiEditingSuggestionsStreamEvent;
 
-export type SocketEventType = SocketEvent['type'];
+export type InboundSocketEventType = InboundSocketEvent['type'];

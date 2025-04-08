@@ -8,6 +8,7 @@ import {
   IConceptOverview,
   IConceptPage,
   IConceptQueryOptions,
+  IConceptReportEdit,
   ICustomerProfile,
   ICustomerProfileCreate,
   IFinancialProjection,
@@ -18,15 +19,21 @@ import {
   QuestionFieldType,
 } from './types'; // Import the missing type
 
+export interface EditConceptReportRequest {
+  concept_uuid: string;
+  session_id: string; // UUID as string
+  edit: IConceptReportEdit | Partial<IConceptReportEdit>;
+}
+
 // TODO: Move these types to their correct files.
-export interface IncubationAnswerPayload {
+export interface IncubationAnswerRequest {
   questionId: number;
   fieldType: QuestionFieldType;
   answer: string[];
   details?: string;
 }
 
-export interface IncubationAnswerUpdatePayload extends IncubationAnswerPayload {
+export interface IncubationAnswerUpdateRequest extends IncubationAnswerRequest {
   answerId: number;
 }
 
@@ -76,14 +83,14 @@ export class ConceptApi extends ApiService {
     );
   }
 
-  saveSeedDraftAnswer(uuid: string, answer: IncubationAnswerPayload) {
+  saveSeedDraftAnswer(uuid: string, answer: IncubationAnswerRequest) {
     return this.post<IncubationAnswer>(
       endpoints.conceptIncubationSeedUuidAnswer(uuid),
       answer,
     );
   }
 
-  updateSeedDraftAnswer(answerId: number, answer: IncubationAnswerPayload) {
+  updateSeedDraftAnswer(answerId: number, answer: IncubationAnswerRequest) {
     return this.patch<IncubationAnswer>(
       endpoints.conceptIncubationSeedAnswerId(answerId),
       answer,
@@ -92,7 +99,7 @@ export class ConceptApi extends ApiService {
 
   updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
     answerId: number,
-    answer: IncubationAnswerPayload,
+    answer: IncubationAnswerRequest,
   ) {
     return this.patch<IncubationAnswer>(
       endpoints.conceptIncubationSeedAnswerIdAndDeleteHigherOrderAnswers(
@@ -114,6 +121,10 @@ export class ConceptApi extends ApiService {
     },
   ) {
     return this.post<IConcept>(endpoints.conceptGenerate(uuid), payload);
+  }
+
+  aiEditConcept(payload: EditConceptReportRequest) {
+    return this.post<IConcept>(endpoints.conceptAiEditing, payload);
   }
 
   unarchive(uuid: string) {

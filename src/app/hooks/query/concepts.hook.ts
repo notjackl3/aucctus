@@ -1,7 +1,8 @@
 import api from '@libs/api';
 import {
-  IncubationAnswerPayload,
-  IncubationAnswerUpdatePayload,
+  EditConceptReportRequest,
+  IncubationAnswerRequest,
+  IncubationAnswerUpdateRequest,
 } from '@libs/api/concepts';
 import {
   IConcept,
@@ -97,6 +98,17 @@ export const useConceptGeneration = (uuid: string) => {
   });
 };
 
+export const useConceptAiEditing = () => {
+  return useMutation({
+    mutationFn: async (payload: EditConceptReportRequest) =>
+      await api.concept.aiEditConcept(payload),
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Concept edit request failed. Please try again.');
+    },
+  });
+};
+
 export const useSeed = (uuid?: string, options?: ISeedQueryOptions) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeedDraft, uuid],
@@ -150,7 +162,7 @@ export const useSaveConceptSeedDraftAnswer = () => {
   return useMutation({
     mutationFn: async (params: {
       uuid: string;
-      body: IncubationAnswerPayload;
+      body: IncubationAnswerRequest;
     }) => await api.concept.saveSeedDraftAnswer(params.uuid, params.body),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
@@ -162,7 +174,7 @@ export const useUpdateConceptSeedDraftAnswer = () => {
   return useMutation({
     mutationFn: async (params: {
       answerId: number;
-      body: IncubationAnswerUpdatePayload;
+      body: IncubationAnswerUpdateRequest;
     }) => await api.concept.updateSeedDraftAnswer(params.answerId, params.body),
   });
 };
@@ -172,7 +184,7 @@ export const useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers =
     return useMutation({
       mutationFn: async (params: {
         answerId: number;
-        body: IncubationAnswerUpdatePayload;
+        body: IncubationAnswerUpdateRequest;
       }) =>
         await api.concept.updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
           params.answerId,

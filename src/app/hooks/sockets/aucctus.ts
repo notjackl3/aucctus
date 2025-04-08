@@ -1,12 +1,15 @@
 import api from '@libs/api';
 import { SocketService } from '@libs/api/base';
-import { SocketEvent, SocketEventType } from '@libs/api/types';
+import { InboundSocketEvent, InboundSocketEventType } from '@libs/api/types';
 import React from 'react';
 
-function isSocketEventOfType<T extends SocketEventType, C extends object>(
-  data: SocketEvent<C>,
+function isSocketEventOfType<
+  T extends InboundSocketEventType,
+  C extends object,
+>(
+  data: InboundSocketEvent<C>,
   type: T,
-): data is Extract<SocketEvent<C>, { type: T }> {
+): data is Extract<InboundSocketEvent<C>, { type: T }> {
   return data.type === type;
 }
 
@@ -19,11 +22,11 @@ function isSocketEventOfType<T extends SocketEventType, C extends object>(
  * you have to specify T/SocketEventType which is a little redundant
  */
 export function useSocketEvent<
-  T extends SocketEventType,
+  T extends InboundSocketEventType,
   C extends object = {},
 >(
   eventName: T,
-  callback: (data: Extract<SocketEvent<C>, { type: T }>) => void,
+  callback: (data: Extract<InboundSocketEvent<C>, { type: T }>) => void,
 ) {
   const savedCallback = React.useCallback(callback, [callback]);
 
@@ -32,9 +35,9 @@ export function useSocketEvent<
 
     const handleIncoming = (e: MessageEvent) => {
       try {
-        const data: SocketEvent<C> = JSON.parse(e.data);
+        const data: InboundSocketEvent<C> = JSON.parse(e.data);
         if (isSocketEventOfType<T, C>(data, eventName)) {
-          savedCallback(data as Extract<SocketEvent<C>, { type: T }>);
+          savedCallback(data as Extract<InboundSocketEvent<C>, { type: T }>);
         }
       } catch (error) {
         // eslint-disable-next-line no-console

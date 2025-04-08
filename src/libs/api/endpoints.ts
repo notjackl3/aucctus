@@ -27,6 +27,8 @@ export class Endpoints {
   static concept = 'api/v1/concept/';
   static seed = `api/v2/concept/seed`;
 
+  static conceptAiEditing = 'api/v2/concept/ai/report/edit';
+
   static conceptQuestionnaire = '/api/v1/concept/ignition/questionnaires';
 
   static conceptUuid(conceptUuid: string) {

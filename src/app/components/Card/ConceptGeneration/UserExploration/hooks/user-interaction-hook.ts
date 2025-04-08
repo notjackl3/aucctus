@@ -7,7 +7,7 @@ import {
   useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers,
 } from '@hooks/query/concepts.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
-import { IncubationAnswer, IncubationAnswerPayload } from '@libs/api/concepts';
+import { IncubationAnswer, IncubationAnswerRequest } from '@libs/api/concepts';
 import { AppPath } from '@routes/routes';
 import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
@@ -289,7 +289,7 @@ export const useUserInteraction = () => {
       details: isMultiSelectType
         ? currentTextAnswerList.map((answer) => answer.answer).join('\n')
         : '',
-    } as IncubationAnswerPayload;
+    } as IncubationAnswerRequest;
   }, [
     activeQuestion,
     currentMultiSelectAnswerList,

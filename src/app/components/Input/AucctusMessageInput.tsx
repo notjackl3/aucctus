@@ -9,6 +9,7 @@ interface AucctusMessageInputProps {
   onGenerateAiSuggestions?: () => void;
   allowSubmitMessage: boolean;
   className?: string;
+  disabled?: boolean;
 }
 
 const AucctusMessageInput = React.forwardRef<
@@ -23,6 +24,7 @@ const AucctusMessageInput = React.forwardRef<
       onGenerateAiSuggestions,
       allowSubmitMessage: allowAddAnswer,
       className = '',
+      disabled = false,
     },
     ref,
   ) => {
@@ -40,7 +42,7 @@ const AucctusMessageInput = React.forwardRef<
             if (e.key === 'Enter') {
               e.preventDefault();
               // Only submit if not shift+enter and there's content
-              if (!e.shiftKey && value.length > 0) {
+              if (!e.shiftKey && value.length > 0 && !disabled) {
                 onAddAnswer();
               }
             }
@@ -56,7 +58,7 @@ const AucctusMessageInput = React.forwardRef<
             <button
               className='btn btn-light aspect-square w-6 rounded-lg'
               aria-label='Generate AI Suggestions'
-              disabled={!allowAddAnswer}
+              disabled={!allowAddAnswer || disabled}
               onClick={onGenerateAiSuggestions}
             >
               <span>
@@ -68,7 +70,7 @@ const AucctusMessageInput = React.forwardRef<
         <span className='absolute right-2 top-6 -translate-y-1/2 transform'>
           <button
             className='btn btn-primary aspect-square w-6 rounded-lg'
-            disabled={value.length === 0 || !allowAddAnswer}
+            disabled={value.length === 0 || !allowAddAnswer || disabled}
             aria-label='Add Answer'
             onClick={onAddAnswer}
           >

@@ -167,6 +167,8 @@ module.exports = {
       animation: {
         'incubation-answer-expand': 'incubationAnswerExpand 0.3s ease both',
         'incubation-answer-collapse': 'incubationAnswerCollapse 0.3s ease both',
+        expand: 'expand 1s ease both',
+        collapse: 'collapse 1s ease both',
         'fade-in': 'fadeIn 0.2s ease-in forwards',
         'fade-out': 'fadeOut 0.2s ease-out forwards',
         'fade-oscillation': 'fadeIn 3s ease-in-out infinite alternate',
@@ -210,6 +212,32 @@ module.exports = {
             opacity: '0',
             borderWidth: '0px',
             padding: '0px',
+          },
+        },
+        expand: {
+          from: {
+            maxHeight: '0px',
+            minHeight: '0px',
+            overflow: 'hidden',
+          },
+          to: {
+            maxHeight: '2000px',
+            minHeight: '20px',
+            overflow: 'visible',
+          },
+        },
+        collapse: {
+          from: {
+            maxHeight: '500px',
+            minHeight: 'max-content',
+            opacity: '1',
+            overflow: 'visible',
+          },
+          to: {
+            maxHeight: '0px',
+            minHeight: '0px',
+            opacity: '0',
+            overflow: 'hidden',
           },
         },
         fadeIn: {

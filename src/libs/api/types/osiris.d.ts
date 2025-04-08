@@ -55,3 +55,36 @@ export interface IFullListAndPageResponse<T> extends IPageResponse<T> {
   // All results given the filter and sorting without being sorted
   items: T[];
 }
+
+export type Mimetype = [
+  // Images
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml',
+  // Documents
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  // Text
+  'text/plain',
+  'text/csv',
+  'text/html',
+  // Archives
+  'application/zip',
+  'application/x-rar-compressed',
+  'application/x-7z-compressed',
+  // Audio
+  'audio/mpeg',
+  'audio/wav',
+  'audio/ogg',
+  // Video
+  'video/mp4',
+  'video/webm',
+  'video/ogg',
+];

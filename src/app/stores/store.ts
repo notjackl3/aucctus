@@ -3,15 +3,22 @@ import api from '@libs/api';
 import { create, StoreApi } from 'zustand';
 import { multiPersist } from 'zustand-multi-persist';
 import { createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
+import aiEditingSlice, { IAiEditingState } from './ai-editing/store';
 import authSlice, { IAuthState } from './auth/store';
 import conceptIncubationSlice, {
   IConceptIncubationState,
 } from './concept-incubation/store';
+import conceptReportSlice, {
+  IConceptReportState,
+} from './concept-report/store';
 import { AucctusStorage } from './utils/storage';
+
 export interface IAppStore {
   // global: IGlobalState;
   auth: IAuthState;
   incubation: IConceptIncubationState;
+  aiEditing: IAiEditingState;
+  conceptReport: IConceptReportState;
 }
 
 export interface IStoreApi<S> {
@@ -27,6 +34,8 @@ const useStore = create<IAppStore>()(
         // global: globalSlice,
         auth: authSlice,
         incubation: conceptIncubationSlice,
+        aiEditing: aiEditingSlice,
+        conceptReport: conceptReportSlice,
       }),
     ),
     {
@@ -68,6 +77,8 @@ const useStore = create<IAppStore>()(
             initialized: state.auth.initialized,
           },
           incubation: state.incubation,
+          aiEditing: state.aiEditing,
+          conceptReport: state.conceptReport,
         }),
         merge: (persistedState: unknown, currentState: IAppStore): IAppStore =>
           mergeDeep(currentState, persistedState as IAppStore),

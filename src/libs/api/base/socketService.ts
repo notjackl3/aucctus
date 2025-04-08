@@ -1,6 +1,6 @@
 import analytics from '../../telemetry';
 import { Api } from '../api';
-import { SocketEvent } from '../types';
+import { OutboundSocketEvent } from '../types';
 
 export interface ISocketConfig {
   baseUrl: string; // e.g. "ws://localhost:8000/ws/endpoint/"
@@ -100,7 +100,7 @@ export class SocketService {
   }
 
   // Send data as a JSON string.
-  public send(data: SocketEvent | string): void {
+  public send(data: OutboundSocketEvent | string): void {
     if (this._ws && this._ws.readyState === WebSocket.OPEN) {
       const payload = typeof data === 'string' ? data : JSON.stringify(data);
       this._ws.send(payload);
