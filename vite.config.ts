@@ -6,11 +6,11 @@ import { loadEnv } from 'vite';
 import compression from 'vite-plugin-compression';
 import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
-import { defineConfig } from 'vitest/config';
+import { defineConfig, ViteUserConfig } from 'vitest/config';
 import { viteBoilerplatePlugin, watchIcons } from './vite/plugins.js';
 
 // https://vitejs.dev/config/
-export default defineConfig(async (config) => {
+export default defineConfig(async (config: ViteUserConfig) => {
   const { mode } = config;
   const isDevelopment = mode === 'development';
   const env = loadEnv(mode, process.cwd(), '');
@@ -61,7 +61,7 @@ export default defineConfig(async (config) => {
 
   const allowedHosts = env.ALLOWED_HOSTS ? env.ALLOWED_HOSTS.split(',') : [];
 
-  return {
+  const viteConfig: ViteUserConfig = {
     publicDir: 'public',
     plugins: plugins,
     define: {
@@ -170,4 +170,6 @@ export default defineConfig(async (config) => {
         }
       : {},
   };
+
+  return viteConfig;
 });
