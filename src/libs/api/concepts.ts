@@ -163,13 +163,13 @@ export class ConceptApi extends ApiService {
 
   getConceptCustomerProfiles(uuid: string) {
     return this.get<IPageResponse<ICustomerProfile>>(
-      endpoints.conceptCustomerProfiles(uuid),
+      endpoints.conceptCustomerProfiles(uuid, 'v2'),
     );
   }
 
   getConceptCustomerProfile(customerProfileUuid: string) {
     return this.get<ICustomerProfile>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
     );
   }
 
@@ -178,7 +178,7 @@ export class ConceptApi extends ApiService {
     data: Partial<ICustomerProfile>,
   ) {
     return this.patch<ICustomerProfile, Partial<ICustomerProfile>>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
       data,
     );
   }
@@ -187,14 +187,14 @@ export class ConceptApi extends ApiService {
     data: ICustomerProfileCreate,
   ) {
     return this.post<ICustomerProfile, ICustomerProfileCreate>(
-      endpoints.conceptCustomerProfiles(conceptUuid),
+      endpoints.conceptCustomerProfiles(conceptUuid, 'v2'),
       data,
     );
   }
 
   deleteConceptCustomerProfile(customerProfileUuid: string) {
     return this.delete<ICustomerProfile>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
     );
   }
 

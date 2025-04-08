@@ -103,12 +103,18 @@ export class Endpoints {
     return `api/v1/concept/overview/${overviewUuid}`;
   }
 
-  static conceptCustomerProfiles(conceptUuid: string) {
-    return `api/v1/concept/${conceptUuid}/customer-profile`;
+  static conceptCustomerProfiles(
+    conceptUuid: string,
+    version: 'v1' | 'v2' = 'v1',
+  ) {
+    return `api/${version}/concept/${conceptUuid}/customer-profile`;
   }
 
-  static conceptCustomerProfileUuid(customerProfileUuid: string) {
-    return `api/v1/concept/customer-profile/${customerProfileUuid}`;
+  static conceptCustomerProfileUuid(
+    customerProfileUuid: string,
+    version: 'v1' | 'v2' = 'v1',
+  ) {
+    return `api/${version}/concept/customer-profile/${customerProfileUuid}`;
   }
 
   static conceptKeyAssumptions(conceptUuid: string) {
