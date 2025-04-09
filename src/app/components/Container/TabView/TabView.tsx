@@ -15,6 +15,7 @@ export interface TabsProps {
   tabs: TabElement[];
   className?: string;
   tabClassName?: string;
+  tabViewClassName?: string;
   variant?: 'default' | 'button' | 'button-separated';
   onTabSelect: (value: string) => void;
   children?: ReactNode;
@@ -28,6 +29,7 @@ const TabView: FunctionComponent<TabsProps> = ({
   className = '',
   variant = 'default',
   tabClassName = '',
+  tabViewClassName = '',
   actionButtons,
   activeTab,
   onTabSelect,
@@ -59,7 +61,12 @@ const TabView: FunctionComponent<TabsProps> = ({
           </div>
         ) : null}
       </div>
-      <div className='flex h-full w-full items-center justify-center'>
+      <div
+        className={cn(
+          'flex h-full w-full items-center justify-center',
+          tabViewClassName,
+        )}
+      >
         {children}
       </div>
     </div>

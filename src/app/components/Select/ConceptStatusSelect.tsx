@@ -10,11 +10,13 @@ import React from 'react';
 
 interface DropdownMenuProps {
   value: ConceptStatus;
+  disabled?: boolean;
   onChange: (value: string) => void;
 }
 
 const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({
   value,
+  disabled,
   onChange,
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -30,6 +32,7 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({
 
   return (
     <Select.Root
+      disabled={disabled}
       value={value}
       onValueChange={onChangeEvent}
       open={open}

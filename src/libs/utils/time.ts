@@ -50,6 +50,12 @@ export function formatDate(date: string) {
   });
 }
 
+export function differenceInMinutes(firstDate: Date, secondDate: Date) {
+  let difference = (firstDate.getTime() - secondDate.getTime()) / 1000;
+  difference /= 60;
+  return Math.abs(Math.round(difference));
+}
+
 export function differenceInHours(firstDate: Date, secondDate: Date) {
   let difference = (firstDate.getTime() - secondDate.getTime()) / 1000;
   difference /= 60 * 60;
@@ -69,3 +75,12 @@ export function differenceInMonths(firstDate: Date, secondDate: Date) {
 }
 
 export const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+export function formatDateFromTimestamp(timestamp: number) {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+}

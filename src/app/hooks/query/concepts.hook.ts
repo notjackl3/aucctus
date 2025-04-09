@@ -23,7 +23,12 @@ import {
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
-import { useMutation, useQuery, useQueryClient } from 'react-query';
+import {
+  QueryClient,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from 'react-query';
 import { toast } from 'react-toastify';
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
@@ -518,6 +523,32 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 //   );
 // };
 
+const doRevertInvalidation = (queryClient: QueryClient, uuid: string) => {
+  Promise.all([
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.concept, uuid],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.conceptVersions, uuid],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.conceptOverview, uuid],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.marketScan, uuid],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.customerProfile],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.customerProfiles, uuid],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.financialProjection, uuid],
+    }),
+  ]);
+};
+
 export const useTrendAndDriverUpdate = () => {
   return useGenericConceptMutate<ITrendsAndDrivers>(
     (data) => api.concept.updateTrendAndDriver(data.uuid, data),
@@ -561,6 +592,110 @@ export const useSeedUpdate = () => {
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message);
+    },
+  });
+};
+
+/**
+ * Custom hook for saving a concept version.
+ * @returns The result of the useMutation hook.
+ */
+export const useSaveConceptVersion = () => {
+  return useMutation({
+    mutationFn: async (uuid: string) =>
+      await api.concept.saveConceptVersion(uuid),
+    onSuccess: () => {
+      toast.success('Concept version saved successfully');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to save concept version');
+    },
+  });
+};
+
+/**
+ * Custom hook for fetching concept versions.
+ * @param uuid - The UUID of the concept.
+ * @returns The result of the useQuery hook.
+ */
+export const useConceptVersions = (uuid?: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.conceptVersions, uuid],
+    queryFn: async () =>
+      uuid ? await api.concept.getConceptVersions(uuid) : undefined,
+    enabled: !!uuid,
+    staleTime: 0,
+    cacheTime: 0,
+  });
+
+  return {
+    ...query,
+    versions: query.data || { versions: [], version_count: 0 },
+  };
+};
+
+/**
+ * Custom hook for reverting to a specific concept version.
+ * @returns The result of the useMutation hook.
+ */
+export const useRevertConceptVersion = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      uuid: string;
+      payload: { versionId: number };
+    }) => await api.concept.revertConceptVersion(params.uuid, params.payload),
+    onSuccess: (_, params) => {
+      doRevertInvalidation(queryClient, params.uuid);
+      toast.success('Concept version revert initiated');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to revert concept version');
+    },
+  });
+};
+
+/**
+ * Custom hook for committing a concept version revert.
+ * @returns The result of the useMutation hook.
+ */
+export const useCommitConceptVersionRevert = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (uuid: string) =>
+      await api.concept.commitConceptVersionRevert(uuid),
+    onSuccess: (_, uuid) => {
+      doRevertInvalidation(queryClient, uuid);
+      toast.success('Concept version revert committed successfully');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to commit concept version revert');
+    },
+  });
+};
+
+/**
+ * Custom hook for canceling a concept version revert.
+ * @returns The result of the useMutation hook.
+ */
+export const useCancelConceptVersionRevert = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (uuid: string) =>
+      await api.concept.cancelConceptVersionRevert(uuid),
+    onSuccess: (_, uuid) => {
+      doRevertInvalidation(queryClient, uuid);
+      toast.success('Concept version revert canceled');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to cancel concept version revert');
     },
   });
 };

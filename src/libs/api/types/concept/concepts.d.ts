@@ -78,8 +78,7 @@ export interface IConcept extends IBaseConceptEntity {
   createdBy: IUser;
   hasSeed: boolean;
   seedUuid: string;
-
-  marketScanVersion: 'v1' | 'v2';
+  isHistoricalVersion: boolean;
 }
 
 export interface IConceptOverview extends IBaseConceptEntity {

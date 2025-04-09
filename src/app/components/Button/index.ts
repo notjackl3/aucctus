@@ -1,3 +1,4 @@
+import ConceptVersionsButton from './ConceptVersionsButton';
 import ActionsMenuButton from './ActionsMenuButton';
 import RadioButtonGroup from './RadioButtonGroup';
 import Default from './Button';
@@ -9,6 +10,7 @@ import RadioGroup from './RadioGroup';
 // Attach other components as properties to Default
 
 (Default as any).Dropdown = Dropdown;
+(Default as any).ConceptVersionsButton = ConceptVersionsButton;
 (Default as any).ActionsMenuButton = ActionsMenuButton;
 (Default as any).RadioButtonGroup = RadioButtonGroup;
 (Default as any).Collapsible = Collapsible;
@@ -22,6 +24,7 @@ const Button = Default as typeof Default & {
   RadioGroup: typeof RadioGroup;
   RadioButtonGroup: typeof RadioButtonGroup;
   ActionsMenuButton: typeof ActionsMenuButton;
+  ConceptVersionsButton: typeof ConceptVersionsButton;
 };
 
 export default Button;

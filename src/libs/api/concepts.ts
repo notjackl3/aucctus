@@ -18,6 +18,10 @@ import {
   ITrendsAndDrivers,
   QuestionFieldType,
 } from './types'; // Import the missing type
+import {
+  IConceptVersionList,
+  IConceptVersionRevertRequestPayload,
+} from './types/concept/concept_versions';
 
 export interface EditConceptReportRequest {
   concept_uuid: string;
@@ -121,6 +125,32 @@ export class ConceptApi extends ApiService {
     },
   ) {
     return this.post<IConcept>(endpoints.conceptGenerate(uuid), payload);
+  }
+
+  saveConceptVersion(uuid: string) {
+    return this.post(endpoints.saveConceptVersion(uuid));
+  }
+
+  getConceptVersions(uuid: string) {
+    return this.get<IConceptVersionList>(endpoints.listConceptVersions(uuid));
+  }
+
+  revertConceptVersion(
+    uuid: string,
+    payload: IConceptVersionRevertRequestPayload,
+  ) {
+    return this.post<IConceptVersionRevertRequestPayload>(
+      endpoints.revertConceptVersion(uuid),
+      payload,
+    );
+  }
+
+  commitConceptVersionRevert(uuid: string) {
+    return this.post(endpoints.commitConceptReversion(uuid));
+  }
+
+  cancelConceptVersionRevert(uuid: string) {
+    return this.post(endpoints.cancelConceptReversion(uuid));
   }
 
   aiEditConcept(payload: EditConceptReportRequest) {
