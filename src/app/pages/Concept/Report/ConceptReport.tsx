@@ -205,14 +205,16 @@ const ConceptReport: FunctionComponent = () => {
               </button>
             </>
           )}
-          {concept && !concept.isHistoricalVersion && (
-            <button
-              onClick={() => saveConceptVersion(conceptUuid!)}
-              className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-            >
-              SAVE VERSION (TEMP)
-            </button>
-          )}
+          {concept &&
+            !concept.isHistoricalVersion &&
+            FEATURE_VERSION_HISTORY && (
+              <button
+                onClick={() => saveConceptVersion(conceptUuid!)}
+                className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+              >
+                SAVE VERSION (TEMP)
+              </button>
+            )}
           {concept && !concept.isHistoricalVersion && (
             <ConceptVersionsButton conceptUuid={conceptUuid} />
           )}

@@ -17,9 +17,9 @@ import '~global.scss';
 import App from './App';
 import { ModalProvider } from './app/context/ModalContextProvider';
 
-if (__APP_ENVIRONMENT__ !== 'development') {
+if (__ENVIRONMENT__ !== 'development') {
   Sentry.init({
-    environment: __APP_ENVIRONMENT__,
+    environment: __ENVIRONMENT__,
     release: __APP_VERSION__,
     dsn: import.meta.env.VITE_SENTRY_DNS,
     integrations: [

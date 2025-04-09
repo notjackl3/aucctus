@@ -10,6 +10,7 @@ env:
   VITE_AUCCTUS_BASE_WS_URL: wss://api.aucctus.com
   VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+  ENVIRONMENT: production
 
 jobs:
   build_and_deploy_job:

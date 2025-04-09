@@ -1,15 +1,17 @@
-name: S3/CloudFront CI/CD
+name: Develop Deploy
 
 on:
   push:
-    branches: [developppp] # remove or undo
+    branches: [develop]
 
 env:
-  NODE_ENV: staging
-  VITE_AUCCTUS_BASE_RESOURCE_URL: https://resource.staging.aucctus.com
-  VITE_AUCCTUS_BASE_WS_URL: wss://ws.staging.aucctus.com
+  NODE_ENV: production
+  VITE_AUCCTUS_BASE_RESOURCE_URL: https://api-develop.aucctus.com
+  VITE_AUCCTUS_BASE_WS_URL: wss://api-develop.aucctus.com
   VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }} 
+  ENVIRONMENT: development
+  FEATURE_VERSION_HISTORY: true
 
 jobs:
   build_and_deploy_job:

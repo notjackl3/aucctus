@@ -66,7 +66,7 @@ export default defineConfig(async (config: ViteUserConfig) => {
     plugins: plugins,
     define: {
       __APP_VERSION__: JSON.stringify(env.npm_package_version),
-      __APP_ENVIRONMENT__: JSON.stringify(env.NODE_ENV),
+      __ENVIRONMENT__: JSON.stringify(env.ENVIRONMENT ?? 'production'),
 
       // Feature flags
       // Make sure when defining feature flags to add them to the vite-env.d.ts file

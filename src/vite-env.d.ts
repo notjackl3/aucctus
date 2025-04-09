@@ -24,7 +24,7 @@ declare module '*.svg' {
 }
 
 declare const __APP_VERSION__: string;
-declare const __APP_ENVIRONMENT__: string;
+declare const __ENVIRONMENT__: 'development' | 'staging' | 'production';
 
 // Feature flags
 declare const FEATURE_VERSION_HISTORY: boolean;
