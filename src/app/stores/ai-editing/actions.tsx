@@ -14,7 +14,7 @@ export interface IAiEditingActions {
   handleAiEditingMessage: (handshake: IAiEditingHandshakeMessage) => void;
   performHandshake: () => Promise<void>;
   clearConversation: (resetCurrentMessage?: boolean) => void;
-  addAssistantMessage: (message: IAssistantMessage, isDone: boolean) => void;
+  addAssistantMessage: (message: IAssistantMessage) => void;
   agentIsTyping: (value: boolean) => void;
 }
 
@@ -170,14 +170,13 @@ export function agentIsTyping(
 export function addAssistantMessage(
   this: IStoreApi<IAiEditingState>,
   message: IAssistantMessage,
-  isDone: boolean,
 ) {
   const { set } = this;
 
   set(
     produce((state: IAiEditingState) => {
       const existingMessageIndex = state.messages.findIndex(
-        (msg) => msg.role === 'assistant' && msg.agentId === message.agentId,
+        (msg) => msg.role === 'assistant' && msg.uuid === message.uuid,
       );
 
       if (existingMessageIndex !== -1) {
@@ -189,7 +188,7 @@ export function addAssistantMessage(
       }
 
       // If the message is done, we unlock the user input
-      state.userInputLocked = !isDone;
+      state.userInputLocked = false;
     }),
   );
 }

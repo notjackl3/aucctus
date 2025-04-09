@@ -67,6 +67,16 @@ export interface IAiEditingErrorMessage extends BaseSocketEvent {
   message: string;
 }
 
+export interface IAiEditingSuggestionsEvent extends BaseSocketEvent {
+  type: 'ai.editing.edit.suggestion';
+  uuid: string;
+  conceptUuid: string;
+  sessionId: string;
+  content: IConceptReportEdit;
+  timestamp?: number;
+  agentId: string;
+}
+
 /**
  * Base interface for all stream events.
  * Stream events represent data that is sent incrementally over time.
@@ -173,12 +183,6 @@ export type ConceptGenerationStreamEvent = StreamEvent<
   IConceptGenerationContext
 >;
 
-export type IAiEditingSuggestionsStreamEvent = StreamEvent<
-  'stream.ai.editing.edit.suggestion',
-  IConceptReportEdit,
-  { conceptUuid: string; sessionId: string }
->;
-
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -190,6 +194,6 @@ export type InboundSocketEvent<C = {}> =
   | IAiEditingInboundChatMessage
   | IAiEditingTypingMessage
   | IAiEditingErrorMessage
-  | IAiEditingSuggestionsStreamEvent;
+  | IAiEditingSuggestionsEvent;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

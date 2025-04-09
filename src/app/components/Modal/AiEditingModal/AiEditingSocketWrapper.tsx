@@ -36,23 +36,17 @@ const AiEditingSocketWrapper: React.FC<AiEditingSocketWrapperProps> = ({}) => {
     }
   });
 
-  useSocketEvent('stream.ai.editing.edit.suggestion', (stream) => {
-    console.log('stream.ai.editing.edit.suggestion', stream);
-    // TODO: Once streaming is proplerly implemented, we can listen for the delta event
-    if (stream.stage === 'done') {
-      console.log('stream.ai.editing.edit.suggestion', stream);
-      addAssistantMessage(
-        {
-          // The uuid is not defined until the stream is done
-          // This is the uuid that is used when saving the message to the conversation.
-          uuid: stream.content.uuid || stream.id,
-          content: stream.content,
-          role: 'assistant',
-          // Note these are unique to each call
-          agentId: stream.id,
-        },
-        stream.stage === 'done',
-      );
+  useSocketEvent('ai.editing.edit.suggestion', (message) => {
+    if (message.conceptUuid === conceptUuid) {
+      addAssistantMessage({
+        // The uuid is not defined until the stream is done
+        // This is the uuid that is used when saving the message to the conversation.
+        uuid: message.uuid,
+        content: message.content,
+        role: 'assistant',
+        // Note these are unique to each call
+        agentId: message.sessionId,
+      });
     }
   });
 
