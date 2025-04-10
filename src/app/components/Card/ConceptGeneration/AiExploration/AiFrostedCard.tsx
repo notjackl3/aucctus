@@ -1,7 +1,7 @@
 import { cn } from '@libs/utils/react';
 import React from 'react';
+import ReactMarkdown from 'react-markdown';
 import IconContainer from './IconContainer';
-
 type CardVariant = 'light' | 'dark';
 
 interface AiFrostedCardProps {
@@ -117,7 +117,7 @@ const AiFrostedCard: React.FC<AiFrostedCardProps> = ({
                 messageClassName,
               )}
             >
-              {message}
+              <ReactMarkdown>{message}</ReactMarkdown>
             </div>
           )}
         </div>

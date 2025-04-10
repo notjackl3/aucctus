@@ -1,18 +1,18 @@
 import { Icon, Modal } from '@components';
-import AucctusMessageInput from '@components/Input/AucctusMessageInput';
-import useStore from '@stores/store';
-import React, { useEffect, useMemo, useState } from 'react';
-import { animated, useTransition } from 'react-spring';
-import IntroMessage from './IntroMessage';
-import { IConceptReportEdit } from '@libs/api/types';
-import FrostedLoadingCard from './FrostedLoadingCard';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
-import { useConceptAiEditing } from '@hooks/query/concepts.hook';
+import AucctusMessageInput from '@components/Input/AucctusMessageInput';
 import { useModal } from '@context/ModalContextProvider';
+import { useConceptAiEditing } from '@hooks/query/concepts.hook';
+import { IConceptReportEdit } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
-import { toast } from 'react-toastify';
+import useStore from '@stores/store';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { animated, useTransition } from 'react-spring';
+import { toast } from 'react-toastify';
 import ChatMessages from './ChatMessages';
+import FrostedLoadingCard from './FrostedLoadingCard';
+import IntroMessage from './IntroMessage';
 
 interface AiEditingCardProps {
   onClose: () => void;
@@ -35,6 +35,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
   const clearConversation = useStore(
     (state) => state.aiEditing.clearConversation,
   );
+  const isThinking = useStore((state) => state.aiEditing.isAucctusThinking);
   const [aiEditSubmission, setAiEditSubmission] = useState<
     IConceptReportEdit | Partial<IConceptReportEdit> | undefined
   >(undefined);
@@ -44,11 +45,6 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     useConceptAiEditing();
   const { closeModal } = useModal();
   const navigate = useNavigate();
-
-  // ===== Derived State =====
-  const isThinking = useMemo(() => {
-    return messages.length > 0 && messages[messages.length - 1].role === 'user';
-  }, [messages]);
 
   // ===== Animations =====
   const transition = useTransition(messages.length === 0, {
@@ -66,13 +62,6 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // ===== Handlers =====
-  const handleSendMessage = async () => {
-    clearConversation(false);
-    await sendMessage();
-    setCurrentMessage('');
-  };
 
   // ===== Renderers =====
   // ===== Component =====
@@ -133,7 +122,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
             <FrostedLoadingCard
               variant='dark'
               className='flex-1'
-              message='Got it, processing your feedback...'
+              defaultMessage='Got it, processing your feedback...'
             />
           </div>
         )}
@@ -144,7 +133,9 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
         <AucctusMessageInput
           value={currentMessage || ''}
           onChange={(e) => setCurrentMessage(e.target.value)}
-          onSubmitMessage={handleSendMessage}
+          onSubmitMessage={async () => {
+            await sendMessage();
+          }}
           allowSubmitMessage={true}
           disabled={isThinking}
           className='!max-h-[150px]'

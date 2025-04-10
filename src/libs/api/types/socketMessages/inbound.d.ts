@@ -33,7 +33,7 @@ export interface IInboundChatMessage
   type: 'chat.message';
   uuid: string; // The uuid of the message
   content: string;
-  timestamp: number; // The timestamp of the message
+  timestamp: number | str; // The timestamp of the message
   name: string; // The name of the user who sent the message or Aucctus
   role: 'user' | 'assistant';
 }
@@ -47,9 +47,10 @@ export interface IAiEditingHandshakeMessage
 }
 
 export interface IAiEditingInboundChatMessage
-  extends IBaseInboundChatMessage,
+  extends IInboundChatMessage,
     BaseSocketEvent {
   type: 'ai.editing.chat';
+  conceptUuid: string;
 }
 
 // AI Editing Typing Message
@@ -57,6 +58,7 @@ export interface IAiEditingTypingMessage extends BaseSocketEvent {
   type: 'ai.editing.chat.typing';
   conceptUuid: string;
   value: boolean;
+  content?: string;
 }
 
 // AI Editing Error Message
@@ -70,11 +72,11 @@ export interface IAiEditingErrorMessage extends BaseSocketEvent {
 export interface IAiEditingSuggestionsEvent extends BaseSocketEvent {
   type: 'ai.editing.edit.suggestion';
   uuid: string;
+  name: string;
   conceptUuid: string;
   sessionId: string;
   content: IConceptReportEdit;
   timestamp?: number;
-  agentId: string;
 }
 
 /**

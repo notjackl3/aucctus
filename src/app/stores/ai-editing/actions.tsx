@@ -1,5 +1,5 @@
 import api from '@libs/api';
-import { IAiEditingHandshakeMessage, IMediaMessage } from '@libs/api/types';
+import { IAiEditingHandshakeMessage } from '@libs/api/types';
 import telemetry from '@libs/telemetry';
 import { fileToBase64 } from '@libs/utils/files';
 import { produce } from 'immer';
@@ -8,16 +8,22 @@ import { v4 as uuidv4 } from 'uuid';
 import type { IStoreApi } from '../store';
 import { IAiEditingState, IAssistantMessage, IUserMessage } from './store';
 
+/**
+ * Actions for AI editing conversation management
+ */
 export interface IAiEditingActions {
   setCurrentMessage: (message: string) => void;
   sendMessage: () => Promise<void>;
   handleAiEditingMessage: (handshake: IAiEditingHandshakeMessage) => void;
-  performHandshake: () => Promise<void>;
+  performHandshake: (message: IUserMessage) => Promise<void>;
   clearConversation: (resetCurrentMessage?: boolean) => void;
   addAssistantMessage: (message: IAssistantMessage) => void;
-  agentIsTyping: (value: boolean) => void;
+  agentIsThinking: (value: boolean, thinkingMessage?: string) => void;
 }
 
+/**
+ * Clears the entire conversation and resets state
+ */
 export function clearConversation(
   this: IStoreApi<IAiEditingState>,
   resetCurrentMessage?: boolean,
@@ -28,7 +34,8 @@ export function clearConversation(
     produce((state: IAiEditingState) => {
       state.messages = [];
       state.sessionId = undefined;
-      state.agentIsTyping(false);
+      state.isAucctusThinking = false;
+      state.thinkingMessage = undefined;
       state.currentMessage = resetCurrentMessage
         ? undefined
         : state.currentMessage;
@@ -36,28 +43,9 @@ export function clearConversation(
   );
 }
 
-export async function sendMessage(this: IStoreApi<IAiEditingState>) {
-  const { get } = this;
-  const { sessionId, currentMessage, performHandshake } = get();
-
-  if (!sessionId) {
-    // If the session id is not set, we assume this is the first message and we need to perform a handshake
-    await performHandshake();
-    return;
-  }
-
-  if (!currentMessage) {
-    toast.error('No message to send.');
-
-    telemetry.debug('Ai Editing Send Message No Message', {
-      currentMessage,
-    });
-    return;
-  }
-
-  // TODO: Handle other logic here...
-}
-
+/**
+ * Updates the current draft message
+ */
 export function setCurrentMessage(
   this: IStoreApi<IAiEditingState>,
   message: string,
@@ -71,53 +59,114 @@ export function setCurrentMessage(
   );
 }
 
-export async function performHandshake(this: IStoreApi<IAiEditingState>) {
-  const { get, storeApi, set } = this;
-  const { currentMessage, currentMediaUpload } = get();
+/**
+ * Updates the thinking state of the AI assistant
+ */
+export function agentIsThinking(
+  this: IStoreApi<IAiEditingState>,
+  value: boolean,
+  thinkingMessage?: string,
+) {
+  const { set } = this;
 
+  set(
+    produce((state: IAiEditingState) => {
+      state.isAucctusThinking = value;
+      state.thinkingMessage = thinkingMessage;
+    }),
+  );
+}
+
+/**
+ * Adds or updates an assistant message in the conversation
+ */
+export function addAssistantMessage(
+  this: IStoreApi<IAiEditingState>,
+  message: IAssistantMessage,
+) {
+  const { set, get } = this;
+  const { messages } = get();
+
+  let msgs = [...messages];
+  const existingMessageIndex = msgs.findIndex(
+    (msg) => msg.role === 'assistant' && msg.uuid === message.uuid,
+  );
+
+  if (existingMessageIndex !== -1) {
+    // Update existing message
+    msgs[existingMessageIndex] = message;
+  } else {
+    // Add new message
+    msgs.push(message);
+  }
+
+  set(
+    produce((state: IAiEditingState) => {
+      state.messages = msgs;
+      // If the message is done, we unlock the user input
+      state.isAucctusThinking = false;
+      state.thinkingMessage = undefined;
+    }),
+  );
+}
+
+/**
+ * Processes uploaded media file for sending
+ */
+async function processMediaMessage(media: File | undefined) {
+  if (!media) {
+    return undefined;
+  }
+
+  const file = await fileToBase64(media);
+  return {
+    mediaData: file.mediaData,
+    mimetype: file.mimetype,
+    filename: file.filename,
+  };
+}
+
+/**
+ * Handles the initial handshake response from the server
+ */
+export function handleAiEditingMessage(
+  this: IStoreApi<IAiEditingState>,
+  handshake: IAiEditingHandshakeMessage,
+) {
+  const { set, storeApi } = this;
   const conceptUuid = storeApi.getState().conceptReport.conceptUuid;
 
-  if (!conceptUuid) {
-    // TODO: Refine this error message
+  if (handshake.conceptUuid !== conceptUuid) {
     toast.error('Unable to find Concept to edit.');
-    telemetry.debug('Ai Editing Handshake Concept Not Found', {
+    telemetry.debug('Ai Editing Handshake Concept Mismatch', {
+      handshakeConceptUuid: handshake.conceptUuid,
       conceptUuid,
     });
     return;
   }
 
-  if (!currentMessage) {
-    toast.error('No message to send.');
-    telemetry.debug('Ai Editing Handshake No Message', {
-      currentMessage,
-    });
-    return;
-  }
+  set(
+    produce((state: IAiEditingState) => {
+      state.sessionId = handshake.sessionId;
+    }),
+  );
+}
 
-  // Optionally allow a single file upload ... This should probably be a list of files
-  let media: IMediaMessage | undefined = undefined;
-  if (currentMediaUpload) {
-    const file = await fileToBase64(currentMediaUpload);
-    media = {
-      mediaData: file.mediaData,
-      mimetype: file.mimetype,
-      filename: file.filename,
-    };
-  }
+/**
+ * Initiates a new conversation session with the AI
+ */
+export async function performHandshake(
+  this: IStoreApi<IAiEditingState>,
+  message: IUserMessage,
+) {
+  const { storeApi, set } = this;
+  const conceptUuid = storeApi.getState().conceptReport.conceptUuid;
 
-  const message: IUserMessage = {
-    uuid: uuidv4(),
-    content: currentMessage,
-    role: 'user',
-    media,
-  };
-
-  // Get the concept uuid from the state...
+  // Start a new conversation session
   api.aucctusSocket.send({
     type: 'ai.editing.conversation.start',
     uuid: message.uuid,
-    // role: message.role, TODO: Add this to typings
-    conceptUuid: conceptUuid,
+    conceptUuid: conceptUuid!,
     content: message.content,
     media: message.media,
   });
@@ -126,69 +175,81 @@ export async function performHandshake(this: IStoreApi<IAiEditingState>) {
     produce((state: IAiEditingState) => {
       state.messages = [message];
       state.currentMessage = undefined;
+      state.isAucctusThinking = true;
     }),
   );
 }
 
-export function handleAiEditingMessage(
-  this: IStoreApi<IAiEditingState>,
-  handshake: IAiEditingHandshakeMessage,
-) {
-  const { set, storeApi } = this;
-
+/**
+ * Sends a user message to the AI assistant
+ */
+export async function sendMessage(this: IStoreApi<IAiEditingState>) {
+  const { get, set, storeApi } = this;
+  const { sessionId, currentMessage, performHandshake, currentMediaUpload } =
+    get();
   const conceptUuid = storeApi.getState().conceptReport.conceptUuid;
-  if (handshake.conceptUuid !== conceptUuid) {
-    toast.error('Unable to find Concept to edit.');
 
-    telemetry.debug('Ai Editing Handshake Concept Mismatch', {
-      handshakeConceptUuid: handshake.conceptUuid,
+  // Validate required data
+  let error = false;
+  if (!conceptUuid) {
+    toast.error('Unable to find Concept to edit.');
+    telemetry.debug('Ai Editing Send Message Concept Not Found', {
       conceptUuid,
     });
+    error = true;
+  }
 
+  if (!currentMessage && !currentMediaUpload) {
+    toast.error('No message to send.');
+    telemetry.debug('Ai Editing Send Message No Message', {
+      currentMessage,
+      currentMediaUpload,
+    });
+    error = true;
+  }
+
+  if (error) {
+    set(
+      produce((state: IAiEditingState) => {
+        state.isAucctusThinking = false;
+      }),
+    );
     return;
   }
+
+  // Process any media attachments
+  const media = await processMediaMessage(currentMediaUpload);
+
+  // Create the message object
+  const message: IUserMessage = {
+    uuid: uuidv4(),
+    content: currentMessage || '',
+    role: 'user',
+    media: media,
+  };
+
+  // Update state with the new message
   set(
     produce((state: IAiEditingState) => {
-      state.sessionId = handshake.sessionId;
+      state.isAucctusThinking = true;
+      state.currentMessage = undefined;
+      state.messages = [...state.messages, message];
     }),
   );
-}
 
-export function agentIsTyping(
-  this: IStoreApi<IAiEditingState>,
-  value: boolean,
-) {
-  const { set } = this;
-  set(
-    produce((state: IAiEditingState) => {
-      state.isAucctusTyping = value;
-      state.userInputLocked = value;
-    }),
-  );
-}
+  // If no sessionId exists yet, initiate a handshake
+  if (!sessionId) {
+    await performHandshake(message);
+    return;
+  }
 
-export function addAssistantMessage(
-  this: IStoreApi<IAiEditingState>,
-  message: IAssistantMessage,
-) {
-  const { set } = this;
-
-  set(
-    produce((state: IAiEditingState) => {
-      const existingMessageIndex = state.messages.findIndex(
-        (msg) => msg.role === 'assistant' && msg.uuid === message.uuid,
-      );
-
-      if (existingMessageIndex !== -1) {
-        // Update existing message
-        state.messages[existingMessageIndex] = message;
-      } else {
-        // Add new message
-        state.messages.push(message);
-      }
-
-      // If the message is done, we unlock the user input
-      state.userInputLocked = false;
-    }),
-  );
+  // Send the message to the server
+  api.aucctusSocket.send({
+    type: 'ai.editing.message',
+    uuid: message.uuid,
+    conceptUuid: conceptUuid!,
+    session_id: sessionId,
+    content: message.content,
+    media: message.media,
+  });
 }

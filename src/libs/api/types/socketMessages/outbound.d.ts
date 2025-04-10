@@ -44,6 +44,7 @@ interface OutboundChatMessage extends ITextMessage, BaseSocketEvent {
   // The conversation uuid
   session_id: string;
   content: string;
+  media?: IMediaMessage;
 }
 
 interface OutboundChatMediaMessage extends IMediaMessage, BaseSocketEvent {

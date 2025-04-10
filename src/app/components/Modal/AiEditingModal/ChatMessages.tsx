@@ -1,8 +1,8 @@
-import React from 'react';
 import AiFrostedCard from '@components/Card/ConceptGeneration/AiExploration/AiFrostedCard';
-import AgentMessageCard from './AgentMessageCard';
-import { EditMessage } from '@stores/ai-editing/store';
 import { IConceptReportEdit } from '@libs/api/types';
+import { EditMessage } from '@stores/ai-editing/store';
+import React from 'react';
+import AgentMessageCard from './AgentMessageCard';
 
 interface ChatMessagesProps {
   message: EditMessage;
@@ -27,19 +27,37 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
     return (
       <div className='mb-2 flex flex-1 animate-expand flex-row'>
         <div className='flex flex-1' />
-        <AiFrostedCard message={message.content} className='mx-4' />
+        <AiFrostedCard
+          message={message.content}
+          variant='light'
+          className='mx-4'
+        />
       </div>
     );
   }
 
   return (
     <div className='mb-2 flex flex-1 animate-expand flex-row'>
-      <AgentMessageCard
-        message={message.content}
-        isActiveAiEditMessage={isLastMessage}
-        onConfirmation={() => onConfirmation(message.content)}
-        onRejection={onRejection}
-      />
+      {typeof message.content === 'string' ? (
+        <AiFrostedCard
+          message={message.content}
+          variant='dark'
+          className='mx-4'
+        />
+      ) : (
+        <AgentMessageCard
+          message={message.content}
+          isActiveAiEditMessage={isLastMessage}
+          onConfirmation={() =>
+            onConfirmation(
+              message.content as
+                | IConceptReportEdit
+                | Partial<IConceptReportEdit>,
+            )
+          }
+          onRejection={onRejection}
+        />
+      )}
     </div>
   );
 };

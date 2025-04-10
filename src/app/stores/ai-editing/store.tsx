@@ -1,10 +1,10 @@
 import { Lens, lens } from '@dhmk/zustand-lens';
-import { IMediaMessage } from '@libs/api/types';
+import { IInboundChatMessage, IMediaMessage } from '@libs/api/types';
 import { IConceptReportEdit } from '@libs/api/types/ai-editing';
 import type { IAppStore } from '../store';
 import {
   addAssistantMessage,
-  agentIsTyping,
+  agentIsThinking,
   clearConversation,
   handleAiEditingMessage,
   IAiEditingActions,
@@ -21,11 +21,10 @@ export interface IUserMessage {
   media?: IMediaMessage;
 }
 
-export interface IAssistantMessage {
-  agentId: string;
-  uuid: string;
+export interface IAssistantMessage
+  extends Omit<IInboundChatMessage, 'role' | 'type' | 'content' | 'sessionId'> {
   role: 'assistant';
-  content: Partial<IConceptReportEdit> | IConceptReportEdit;
+  content: Partial<IConceptReportEdit> | IConceptReportEdit | string;
 }
 
 export type EditMessage = IUserMessage | IAssistantMessage;
@@ -37,8 +36,9 @@ export interface IAiEditingState extends IAiEditingActions {
 
   currentMediaUpload?: File;
 
-  isAucctusTyping: boolean;
-  userInputLocked: boolean;
+  isAucctusThinking: boolean;
+
+  thinkingMessage?: string;
 }
 
 const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
@@ -52,17 +52,16 @@ const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
     sessionId: undefined,
     messages: [],
     currentMessage: undefined,
-    isAucctusTyping: false,
-    // User input is locked both when the agent is typing and when the streams are incoming
-    // This is to prevent the user from sending multiple messages at once.
-    userInputLocked: false,
+    isAucctusThinking: false,
+    thinkingMessage: undefined,
+
     sendMessage: sendMessage.bind(actionContext),
     setCurrentMessage: setCurrentMessage.bind(actionContext),
     handleAiEditingMessage: handleAiEditingMessage.bind(actionContext),
     performHandshake: performHandshake.bind(actionContext),
     clearConversation: clearConversation.bind(actionContext),
     addAssistantMessage: addAssistantMessage.bind(actionContext),
-    agentIsTyping: agentIsTyping.bind(actionContext),
+    agentIsThinking: agentIsThinking.bind(actionContext),
   };
 };
 

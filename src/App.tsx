@@ -4,12 +4,11 @@ import Page from '@pages';
 import AuthGuard from '@routes/guards/auth.guard';
 import { usePrivateRoutes, usePublicRoutes } from '@routes/hooks';
 import { AppPath } from '@routes/routes';
-import * as Sentry from '@sentry/react';
 import React, { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
 
-const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
+// const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
 function App() {
   // Public Routes (Unauthenticated)
@@ -65,7 +64,7 @@ function App() {
   return (
     <div role='main' className='App'>
       <Suspense fallback={<Loading />}>
-        <SentryRoutes>
+        <Routes>
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>
             <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
@@ -79,7 +78,7 @@ function App() {
           </Route>
 
           <Route path='*' element={<Navigate to={AppPath.Home} replace />} />
-        </SentryRoutes>
+        </Routes>
 
         <ToastContainer
           position='bottom-center'

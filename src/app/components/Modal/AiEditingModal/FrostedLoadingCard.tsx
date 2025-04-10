@@ -1,12 +1,14 @@
 import { Loading } from '@components';
+
 import { cn } from '@libs/utils/react';
+import useStore from '@stores/store';
 import React from 'react';
 
 type cardVariant = 'light' | 'dark';
 
 interface FrostedLoadingCardProps {
   className?: string;
-  message?: string;
+  defaultMessage?: string;
   variant?: cardVariant;
 }
 
@@ -16,9 +18,13 @@ const cardStyle = {
 
 const FrostedLoadingCard: React.FC<FrostedLoadingCardProps> = ({
   className,
-  message,
+  defaultMessage,
   variant = 'light',
 }) => {
+  const thinkingMessage = useStore((state) => state.aiEditing.thinkingMessage);
+
+  const message = thinkingMessage || defaultMessage;
+
   const cardClassName =
     variant === 'light' ? 'aucctus-bg-tertiary' : 'aucctus-bg-primary-solid';
   const textClassName =
