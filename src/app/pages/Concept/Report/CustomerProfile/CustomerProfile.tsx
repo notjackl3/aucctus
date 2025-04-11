@@ -71,73 +71,87 @@ const CustomerProfile: FunctionComponent = () => {
     profiles,
     selectedProfile,
   ]);
+  if (isLoading) {
+    return (
+      <div className='flex h-full w-full flex-col gap-6'>
+        <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
+          <Loading />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle case where loading is finished but no profiles exist
+  if (!isLoading && profiles.length === 0) {
+    return (
+      <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
+        No customer profiles found for this concept.
+        {/* Optionally add a button to create one? */}
+      </div>
+    );
+  }
 
   return (
     <div className={styles.customerProfile}>
-      {isLoading ? (
-        <Loading />
-      ) : (
-        <TabView
-          tabs={customerTabs}
-          className={styles.tabs}
-          variant='button'
-          onTabSelect={onTabSelect}
-          activeTab={selectedProfileName || ''}
-          actionButtons={[
-            <button
-              key={utils.string.generateRandomString(5)}
-              className='btn btn-light'
-              disabled={!conceptId || !selectedProfile}
-              onClick={() => {
-                openModal(Modal.AddCustomerProfile, {
-                  conceptUuid: conceptId || '',
-                });
-              }}
-            >
-              <Icon variant='plus' height={20} width={20} />
-            </button>,
+      <TabView
+        tabs={customerTabs}
+        className={styles.tabs}
+        variant='button'
+        onTabSelect={onTabSelect}
+        activeTab={selectedProfileName || ''}
+        actionButtons={[
+          <button
+            key={utils.string.generateRandomString(5)}
+            className='btn btn-light'
+            disabled={!conceptId || !selectedProfile}
+            onClick={() => {
+              openModal(Modal.AddCustomerProfile, {
+                conceptUuid: conceptId || '',
+              });
+            }}
+          >
+            <Icon variant='plus' height={20} width={20} />
+          </button>,
 
-            <button
-              key={utils.string.generateRandomString(5)}
-              className='btn btn-light'
-              disabled={!conceptId || !selectedProfile}
-              onClick={() => {
-                openModal(Modal.Confirmation, {
-                  title: 'Are you sure?',
-                  subtitle: `This will delete the \"${selectedProfileName}\" customer profile`,
-                  actions: [
-                    {
-                      title: 'Cancel',
-                      onClick: () => {
-                        closeModal();
-                      },
-                      variant: 'light',
+          <button
+            key={utils.string.generateRandomString(5)}
+            className='btn btn-light'
+            disabled={!conceptId || !selectedProfile}
+            onClick={() => {
+              openModal(Modal.Confirmation, {
+                title: 'Are you sure?',
+                subtitle: `This will delete the \"${selectedProfileName}\" customer profile`,
+                actions: [
+                  {
+                    title: 'Cancel',
+                    onClick: () => {
+                      closeModal();
                     },
-                    {
-                      title: 'Delete',
-                      variant: 'danger',
-                      onClick: () => {
-                        if (selectedProfile) {
-                          mutate(selectedProfile.uuid);
-                        }
-                        closeModal();
-                      },
+                    variant: 'light',
+                  },
+                  {
+                    title: 'Delete',
+                    variant: 'danger',
+                    onClick: () => {
+                      if (selectedProfile) {
+                        mutate(selectedProfile.uuid);
+                      }
+                      closeModal();
                     },
-                  ],
-                });
-              }}
-            >
-              <Icon variant='trash' height={20} width={20} />
-            </button>,
-          ]}
-        >
-          {selectedProfile ? (
-            <CustomerDetails profile={selectedProfile} />
-          ) : (
-            <Loading />
-          )}
-        </TabView>
-      )}
+                  },
+                ],
+              });
+            }}
+          >
+            <Icon variant='trash' height={20} width={20} />
+          </button>,
+        ]}
+      >
+        {selectedProfile ? (
+          <CustomerDetails profile={selectedProfile} />
+        ) : // Render nothing if no profile is selected after loading
+        null}
+      </TabView>
     </div>
   );
 };

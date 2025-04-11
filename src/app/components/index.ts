@@ -18,6 +18,7 @@ import Avatar from './Avatar';
 import Loading from './Loading';
 import Tooltip from './ToolTip/Tooltip';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
+import Toast from './Notification/Toast';
 
 export {
   Avatar,
@@ -37,4 +38,5 @@ export {
   Text,
   Tooltip,
   ComponentTooltip,
+  Toast,
 };

@@ -14,6 +14,7 @@ import { toast } from 'react-toastify';
 import ChatMessages from './ChatMessages';
 import FrostedLoadingCard from './FrostedLoadingCard';
 import IntroMessage from './IntroMessage';
+import Toast from '@components/Notification/Toast';
 
 interface AiEditingCardProps {
   onClose: () => void;
@@ -200,7 +201,14 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                     {
                       onSuccess: () => {
                         setAiEditSubmission(undefined);
-                        toast.success('AI edit request submitted successfully');
+                        toast(Toast, {
+                          data: {
+                            primaryMessage: 'Concept update started',
+                            secondaryMessage:
+                              'This may take up to 10 minutes. You can navigate away.',
+                            status: 'warning', // Use success/info for confirmation
+                          },
+                        });
                         navigate(AppPath.ConceptBank);
                         closeModal();
                       },

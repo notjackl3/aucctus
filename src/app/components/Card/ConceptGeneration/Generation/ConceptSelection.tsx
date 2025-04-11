@@ -24,6 +24,7 @@ import PromptAnswers from './PromptAnswers';
 import SelectableConcept from './SelectableConcept';
 import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
+import Toast from '@components/Notification/Toast';
 
 // Constants
 const mainStyle = {
@@ -224,8 +225,13 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
   const showSuccessAndNavigate = useCallback(() => {
     handleLeaveAnimation(() => {
-      toast.success('Concepts saved successfully', {
-        autoClose: 1000,
+      toast(Toast, {
+        data: {
+          primaryMessage: 'Concepts saved successfully',
+          secondaryMessage: 'Proceeding to the refinement step.',
+          status: 'success',
+        },
+        autoClose: 2000,
         hideProgressBar: true,
         pauseOnHover: false,
       });

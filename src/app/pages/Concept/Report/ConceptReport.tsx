@@ -248,7 +248,7 @@ const ConceptReport: FunctionComponent = () => {
                     position: 'right',
                     modalClassName: 'max-h-[90vh]',
                     hideBodyScroll: true,
-                    shouldCloseOnOverlayClick: false,
+                    shouldCloseOnEscape: true,
                   },
                 )
               }

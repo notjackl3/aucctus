@@ -44,8 +44,8 @@ const Testing: React.FC<TestingProps> = ({
   const hasStarted = status !== 'notStarted';
 
   return (
-    <div className='aucctus-border-secondary aucctus-bg-primary flex h-fit min-h-36 min-w-[492px] flex-col items-start justify-start gap-2 rounded-lg border p-4 shadow-sm'>
-      <div className='inline-flex items-center justify-between self-stretch'>
+    <div className='aucctus-border-secondary aucctus-bg-primary flex h-fit min-h-36 w-full flex-col items-start justify-start gap-2 rounded-lg border p-4 shadow-sm'>
+      <div className='inline-flex w-full items-center justify-between self-stretch'>
         <div className='inline-flex flex-col items-start justify-start gap-2'>
           <div className='aucctus-text-tertiary aucctus-text-xs-medium'>
             ID: {identifier}

@@ -1,4 +1,13 @@
-import { Badge, Card, Chart, Header, Icon, Modal, Table } from '@components';
+import {
+  Badge,
+  Card,
+  Chart,
+  Header,
+  Icon,
+  Modal,
+  Table,
+  Loading,
+} from '@components';
 import { Point } from '@components/Charts/ScatterChart/ScatterChart';
 import { useModal } from '@context/ModalContextProvider';
 import {
@@ -19,8 +28,10 @@ const KeyAssumptions: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
   const { openModal } = useModal();
 
-  const { data: assumptionTestStatusOverview } =
-    useAssumptionTestStatusOverview(concept.uuid);
+  const {
+    data: assumptionTestStatusOverview,
+    isLoading: isStatusOverviewLoading,
+  } = useAssumptionTestStatusOverview(concept.uuid);
   const {
     daysRemaining,
     riskiestCategoryStatus,
@@ -29,14 +40,22 @@ const KeyAssumptions: React.FC = () => {
     daysPast,
   } = assumptionTestStatusOverview?.overview || {};
 
-  const { table, selectedAssumptionUuid, handleRowClick, data, assumptions } =
-    useAssumptionsTable(concept.uuid);
+  const {
+    table,
+    selectedAssumptionUuid,
+    handleRowClick,
+    data,
+    assumptions,
+    isLoading: isAssumptionsLoading,
+  } = useAssumptionsTable(concept.uuid);
 
   const { testDetails = [] } = useAssumptionTestDetails(
     selectedAssumptionUuid || '',
   );
 
   const { mutate: startTest } = useStartTest(selectedAssumptionUuid || '');
+
+  const isLoading = isStatusOverviewLoading || isAssumptionsLoading;
 
   const scatterPoints: Point[] = React.useMemo(() => {
     return assumptions.map((item) => ({
@@ -48,12 +67,31 @@ const KeyAssumptions: React.FC = () => {
     }));
   }, [assumptions]);
 
+  if (isLoading) {
+    return (
+      <div className='flex h-full w-full flex-col gap-6'>
+        <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
+          <Loading />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle case where loading is finished but no assumptions exist
+  if (!isLoading && assumptions.length === 0) {
+    return (
+      <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
+        No key assumptions found for this concept.
+      </div>
+    );
+  }
+
   return (
     <div className='flex h-auto w-full flex-col gap-6'>
       {/* Upper most cards */}
-      <div className='flex h-full w-fit flex-row flex-wrap gap-6'>
+      <div className='flex h-full w-full flex-row flex-wrap gap-6'>
         {/* Assumptions Testing Status & Overview Cards */}
-        <div className='flex flex-col justify-between gap-6'>
+        <div className='flex flex-grow flex-col justify-between gap-6'>
           <Card.AssumptionsTestingStatus
             overview={assumptionTestStatusOverview}
           />
@@ -92,7 +130,7 @@ const KeyAssumptions: React.FC = () => {
         </div>
 
         {/* Assumptions Testing Priority */}
-        <div className='aucctus-border-secondary aucctus-bg-primary inline-flex min-h-[440px] min-w-[470px] flex-col items-start justify-start gap-3 rounded-lg border p-6'>
+        <div className='aucctus-border-secondary aucctus-bg-primary inline-flex min-h-[440px] min-w-[470px] flex-shrink-0 flex-col items-start justify-start gap-3 rounded-lg border p-6'>
           <Header.Two text='Assumption Testing Priority' className='text-xl' />
           <Chart.Scatter
             xAxis={{
@@ -111,7 +149,7 @@ const KeyAssumptions: React.FC = () => {
       {/* Assumptions & Testing Table */}
       <div className='aucctus-border-secondary aucctus-bg-primary flex w-full rounded-lg border'>
         {/* Assumptions */}
-        <div className='aucctus-border-secondary flex w-full min-w-[400px] max-w-[600px] flex-col items-start justify-start overflow-y-auto border-r'>
+        <div className='aucctus-border-secondary flex w-full min-w-[400px] flex-grow flex-col items-start justify-start overflow-y-auto border-r'>
           {/* Header */}
           <Header.AssumptionsTable
             text='Assumptions'
@@ -152,7 +190,7 @@ const KeyAssumptions: React.FC = () => {
         </div>
 
         {/* Testing */}
-        <div className='flex flex-col items-start justify-start'>
+        <div className='flex min-w-[470px] flex-shrink-0 flex-col items-start justify-start'>
           {/* Fixed Header */}
           <Header.AssumptionsTable
             text='Tests'

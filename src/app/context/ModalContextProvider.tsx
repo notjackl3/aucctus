@@ -16,6 +16,7 @@ interface ModalOptions {
   modalClassName?: string;
   backgroundClassName?: string;
   hideBodyScroll?: boolean;
+  shouldCloseOnEscape?: boolean;
 }
 
 interface ModalContextType {
@@ -26,6 +27,7 @@ interface ModalContextType {
   ) => void;
   closeModal: () => void;
   shouldCloseOnOverlayClick: boolean;
+  shouldCloseOnEscape: boolean;
   className?: string;
 }
 
@@ -54,7 +56,11 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
   const [modalState, setModalState] = useState<ModalState>({
     isOpen: false,
     content: null,
-    options: { position: 'center', shouldCloseOnOverlayClick: true },
+    options: {
+      position: 'center',
+      shouldCloseOnOverlayClick: true,
+      shouldCloseOnEscape: true,
+    },
     isClosing: false,
   });
 
@@ -62,7 +68,11 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     <T extends object>(
       Component: FunctionComponent<T>,
       props: T = {} as T,
-      options: ModalOptions = { position: 'center' },
+      options: ModalOptions = {
+        position: 'center',
+        shouldCloseOnOverlayClick: true,
+        shouldCloseOnEscape: true,
+      },
     ) => {
       if (options.hideBodyScroll) {
         document.body.style.overflow = 'hidden';
@@ -71,7 +81,14 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       setModalState({
         isOpen: true,
         content: <Component {...props} />,
-        options,
+        options: {
+          position: options.position ?? 'center',
+          shouldCloseOnOverlayClick: options.shouldCloseOnOverlayClick ?? true,
+          shouldCloseOnEscape: options.shouldCloseOnEscape ?? true,
+          modalClassName: options.modalClassName,
+          backgroundClassName: options.backgroundClassName,
+          hideBodyScroll: options.hideBodyScroll,
+        },
         isClosing: false,
       });
     },
@@ -103,8 +120,14 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
       closeModal,
       shouldCloseOnOverlayClick:
         modalState.options.shouldCloseOnOverlayClick ?? true,
+      shouldCloseOnEscape: modalState.options.shouldCloseOnEscape ?? true,
     }),
-    [openModal, closeModal, modalState.options.shouldCloseOnOverlayClick],
+    [
+      openModal,
+      closeModal,
+      modalState.options.shouldCloseOnOverlayClick,
+      modalState.options.shouldCloseOnEscape,
+    ],
   );
 
   return (

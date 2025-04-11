@@ -87,7 +87,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
             src={defaultAvatar}
           />
           <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-1'>
-            <h6 className='aucctus-text-primary aucctus-text-md h-6 self-stretch text-base'>
+            <h6 className='aucctus-text-primary aucctus-text-md self-stretch text-base'>
               {profile?.nickname}
             </h6>
             <span className='aucctus-text-primary aucctus-text-md-bold h-7 self-stretch text-xl'>

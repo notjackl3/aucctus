@@ -24,6 +24,16 @@ const MarketScan: FunctionComponent = () => {
     );
   }
 
+  // Handle case where loading is finished but no market scan data exists
+  if (!isLoading && !marketScan) {
+    // Can refine this check if needed (e.g., check specific arrays)
+    return (
+      <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
+        Market scan data is not available for this concept.
+      </div>
+    );
+  }
+
   return (
     <div className='flex h-full w-full flex-col gap-6'>
       <div className='flex flex-wrap justify-between gap-8'>

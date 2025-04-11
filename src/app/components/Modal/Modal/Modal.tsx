@@ -19,7 +19,8 @@ const Modal: FunctionComponent<IModalProps> = ({
   backgroundClassName = 'aucctus-bg-secondary-solid bg-opacity-20',
   isClosing,
 }) => {
-  const { closeModal, shouldCloseOnOverlayClick } = useModal();
+  const { closeModal, shouldCloseOnOverlayClick, shouldCloseOnEscape } =
+    useModal();
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -43,6 +44,20 @@ const Modal: FunctionComponent<IModalProps> = ({
       }
     };
   }, [closeModal, shouldCloseOnOverlayClick]);
+
+  useEffect(() => {
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && shouldCloseOnEscape) {
+        closeModal();
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+    };
+  }, [closeModal, shouldCloseOnEscape]);
 
   const slideAnimations: Record<ModalPosition, string> = {
     center: isClosing ? 'animate-slide-out-center' : 'animate-slide-in-center',

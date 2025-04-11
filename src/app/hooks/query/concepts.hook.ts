@@ -104,9 +104,14 @@ export const useConceptGeneration = (uuid: string) => {
 };
 
 export const useConceptAiEditing = () => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     mutationFn: async (payload: EditConceptReportRequest) =>
       await api.concept.aiEditConcept(payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
+    },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Concept edit request failed. Please try again.');

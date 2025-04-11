@@ -80,11 +80,15 @@ function App() {
           <Route path='*' element={<Navigate to={AppPath.Home} replace />} />
         </Routes>
 
+        {/* Global Toast Container Configuration */}
         <ToastContainer
-          position='bottom-center'
+          className='flex flex-col items-center rounded-lg'
+          bodyClassName='p-0'
+          position='top-center'
           autoClose={5000}
-          hideProgressBar={false}
+          hideProgressBar={true}
           closeOnClick
+          closeButton={true}
           pauseOnHover
           theme='colored'
           transition={Slide}

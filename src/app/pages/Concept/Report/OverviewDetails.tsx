@@ -1,4 +1,4 @@
-import { Card, Header, Text } from '@components';
+import { Card, Header, Text, Loading } from '@components';
 import { useEditOverview } from '@hooks/concepts/editable.hook';
 import { useAssumptions } from '@hooks/query/assumptions.hook';
 import { useConceptOverview } from '@hooks/query/concepts.hook';
@@ -10,9 +10,13 @@ import { IConceptReportContext } from './ConceptReport';
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
   const { navigateToTab } = useOutletContext<IConceptReportContext>();
-  const { overview } = useConceptOverview(conceptId);
-  const { assumptions } = useAssumptions(conceptId);
+  const { overview, isLoading: isOverviewLoading } =
+    useConceptOverview(conceptId);
+  const { assumptions, isLoading: isAssumptionsLoading } =
+    useAssumptions(conceptId);
   const { valueProposition, problemStatement, text } = useEditOverview();
+
+  const isLoading = isOverviewLoading || isAssumptionsLoading;
 
   const firstCustomerPersona = useMemo(() => {
     if (!overview || !overview.persona) {
@@ -20,6 +24,25 @@ const OverviewDetails: FunctionComponent = () => {
     }
     return overview.persona;
   }, [overview]);
+
+  if (isLoading) {
+    return (
+      <div className='flex h-full w-full flex-col gap-6'>
+        <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
+          <Loading />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle case where loading is finished but no overview data exists
+  if (!isLoading && !overview) {
+    return (
+      <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
+        Overview data is not available for this concept.
+      </div>
+    );
+  }
 
   return (
     <div className='flex flex-col items-start'>
