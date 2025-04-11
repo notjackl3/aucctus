@@ -17,3 +17,11 @@ export interface IConceptReportEdit {
   edits: IAiEditingSuggestion[];
   uuid: string;
 }
+
+export interface IAiEditingContext {
+  uuid: string;
+  conceptUuid: string;
+  sessionId: string;
+  name: string;
+  timestamp: number;
+}

@@ -30,7 +30,7 @@ const AgentMessageCard: React.FC<AgentMessageCardProps> = ({
     <>
       <AiFrostedCard
         message={message.response || ''}
-        className='mx-4'
+        className='transition-all'
         variant='dark'
       >
         <div className='flex flex-col gap-4'>

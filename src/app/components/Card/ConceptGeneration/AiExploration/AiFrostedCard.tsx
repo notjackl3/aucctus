@@ -58,7 +58,7 @@ const AiFrostedCard: React.FC<AiFrostedCardProps> = ({
 
   // Base card classes
   const baseCardClasses = cn(
-    'aucctus-border-primary flex animate-fade-in flex-col gap-2 rounded-lg border border-opacity-50 bg-opacity-25 p-4 backdrop-blur-lg transition-all duration-200',
+    'aucctus-border-primary animate-fade-in flex flex-col gap-2 rounded-lg border border-opacity-50 bg-opacity-25 p-4 backdrop-blur-lg transition-all duration-200',
     themeClasses.card,
     className,
   );
@@ -112,7 +112,7 @@ const AiFrostedCard: React.FC<AiFrostedCardProps> = ({
             <div
               style={STYLES.text}
               className={cn(
-                'aucctus-text-sm',
+                'aucctus-text-sm transition-all',
                 themeClasses.message,
                 messageClassName,
               )}

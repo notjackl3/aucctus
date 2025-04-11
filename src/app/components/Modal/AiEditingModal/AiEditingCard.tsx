@@ -8,6 +8,7 @@ import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import ScrollToBottom from 'react-scroll-to-bottom';
 import { animated, useTransition } from 'react-spring';
 import { toast } from 'react-toastify';
 import ChatMessages from './ChatMessages';
@@ -23,6 +24,7 @@ interface AiEditingCardProps {
  * for concept reports. It manages a conversation flow between the user and AI.
  */
 const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
+  const [showConversation, setShowConversation] = useState(false);
   // ===== State Management =====
   const messages = useStore((state) => state.aiEditing.messages);
   const currentMessage = useStore((state) => state.aiEditing.currentMessage);
@@ -52,9 +54,36 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     enter: { opacity: 1, transform: 'translateY(0px)' },
     leave: { opacity: 0, transform: 'translateY(20px)' },
     config: { tension: 280, friction: 60 },
+    onRest: () => {
+      setShowConversation(true);
+    },
   });
 
-  // ===== Lifecycle =====
+  // Loading indicator animation
+  const loadingTransition = useTransition(isThinking, {
+    from: {
+      opacity: 0,
+      transform: 'translateY(40px) scale(0.9)',
+      maxHeight: '0px',
+    },
+    enter: {
+      opacity: 1,
+      transform: 'translateY(0px) scale(1)',
+      maxHeight: '100px',
+    },
+    leave: {
+      opacity: 0,
+      transform: 'translateY(40px) scale(0.9)',
+      maxHeight: '0px',
+    },
+    config: {
+      tension: 220,
+      friction: 30,
+      mass: 1,
+    },
+  });
+
+  // Cleanup function
   useEffect(() => {
     return () => {
       setCurrentMessage('');
@@ -63,13 +92,10 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ===== Renderers =====
-  // ===== Component =====
   return (
-    <div className='relative flex h-full w-full flex-col'>
+    <div className='flex h-full w-full flex-col overflow-hidden'>
       {/* Header with close button */}
-      <div className='m-4 flex flex-row gap-4'>
-        <span className='flex-1' />
+      <div className='flex shrink-0 flex-row justify-end gap-4 p-4'>
         <button
           onClick={onClose}
           className='aspect-square w-6 rounded-lg transition-all duration-200 hover:bg-gray-light-100 hover:bg-opacity-20'
@@ -85,51 +111,60 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
         </button>
       </div>
 
-      {/* Intro message (shown when no messages exist) */}
-      {transition(
-        (style, item) =>
-          item && (
-            <animated.div
-              style={style}
-              className='flex flex-1 flex-col items-center justify-center'
-            >
-              <IntroMessage />
-            </animated.div>
-          ),
-      )}
-
-      <span className='flex-1' />
-
-      {/* Conversation history */}
-      <div className='no-scrollbar flex !max-h-[90%] flex-col gap-4'>
-        {messages.map((message, index) => (
-          <div key={message.uuid} className='flex flex-row gap-4'>
-            <ChatMessages
-              message={message}
-              isLastMessage={index === messages.length - 1}
-              onConfirmation={setAiEditSubmission}
-              onRejection={clearConversation}
-            />
-          </div>
-        ))}
-
-        {/* Loading indicator when AI is thinking */}
-        {isThinking && (
-          <div
-            style={{ animationDelay: `1000ms` }}
-            className='mx-4 flex animate-expand flex-row gap-4'
-          >
-            <FrostedLoadingCard
-              variant='dark'
-              className='flex-1'
-              defaultMessage='Got it, processing your feedback...'
-            />
-          </div>
+      {/* Main content area with flex-grow to take available space */}
+      <div className='relative flex h-full flex-1 flex-col overflow-hidden'>
+        {/* Intro message (shown when no messages exist) */}
+        {transition(
+          (style, item) =>
+            item && (
+              <animated.div
+                style={style}
+                className='absolute inset-0 flex items-center justify-center px-4'
+              >
+                <IntroMessage />
+              </animated.div>
+            ),
         )}
+
+        <ScrollToBottom
+          scrollViewClassName='no-scrollbar p-2 overflow-auto flex flex-col justify-end min-h-full'
+          followButtonClassName='hidden'
+          className='flex h-full w-full flex-col'
+          mode='bottom'
+        >
+          {/* Conversation history */}
+          {showConversation
+            ? messages.map((message, index) => (
+                <ChatMessages
+                  key={message.uuid}
+                  message={message}
+                  isLastMessage={index === messages.length - 1}
+                  onConfirmation={setAiEditSubmission}
+                  onRejection={clearConversation}
+                />
+              ))
+            : null}
+        </ScrollToBottom>
       </div>
 
-      {/* Message input */}
-      <div className='relative m-4 w-auto'>
+      {/* Message input - fixed at bottom */}
+      <div className='relative flex h-auto w-full shrink-0 flex-col justify-end gap-4 p-4'>
+        {/* Loading indicator when AI is thinking */}
+        {loadingTransition(
+          (style, item) =>
+            item && (
+              <animated.div
+                style={style}
+                className='flex flex-row gap-4 overflow-hidden'
+              >
+                <FrostedLoadingCard
+                  variant='dark'
+                  className='flex-1'
+                  defaultMessage='Got it, processing your feedback...'
+                />
+              </animated.div>
+            ),
+        )}
         <AucctusMessageInput
           value={currentMessage || ''}
           onChange={(e) => setCurrentMessage(e.target.value)}

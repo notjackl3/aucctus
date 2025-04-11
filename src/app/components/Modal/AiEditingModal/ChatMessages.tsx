@@ -1,9 +1,9 @@
 import AiFrostedCard from '@components/Card/ConceptGeneration/AiExploration/AiFrostedCard';
 import { IConceptReportEdit } from '@libs/api/types';
+import { cn } from '@libs/utils/react';
 import { EditMessage } from '@stores/ai-editing/store';
 import React from 'react';
 import AgentMessageCard from './AgentMessageCard';
-
 interface ChatMessagesProps {
   message: EditMessage;
   isLastMessage: boolean;
@@ -11,6 +11,7 @@ interface ChatMessagesProps {
     content: IConceptReportEdit | Partial<IConceptReportEdit>,
   ) => void;
   onRejection: () => void;
+  className?: string;
 }
 
 /**
@@ -22,11 +23,16 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   isLastMessage,
   onConfirmation,
   onRejection,
+  className,
 }) => {
   if (message.role === 'user') {
     return (
-      <div className='mb-2 flex flex-1 animate-expand flex-row'>
-        <div className='flex flex-1' />
+      <div
+        className={cn(
+          'mb-2 flex w-full animate-expand flex-row justify-end',
+          className,
+        )}
+      >
         <AiFrostedCard
           message={message.content}
           variant='light'
@@ -37,7 +43,7 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
   }
 
   return (
-    <div className='mb-2 flex flex-1 animate-expand flex-row'>
+    <div className='mb-2 flex animate-expand flex-row'>
       {typeof message.content === 'string' ? (
         <AiFrostedCard
           message={message.content}

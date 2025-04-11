@@ -1,4 +1,4 @@
-import { IConceptReportEdit } from '../ai-editing';
+import { IAiEditingContext, IConceptReportEdit } from '../ai-editing';
 import {
   IConceptGenerationContext,
   IGeneratedConceptList,
@@ -185,6 +185,18 @@ export type ConceptGenerationStreamEvent = StreamEvent<
   IConceptGenerationContext
 >;
 
+export type AiEditingChatStreamEvent = StreamEvent<
+  'ai.editing.chat.stream',
+  string,
+  IAiEditingContext
+>;
+
+export type IAiEditingSuggestionsStreamEvent = StreamEvent<
+  'stream.ai.editing.edit.suggestion',
+  IConceptReportEdit,
+  IAiEditingContext
+>;
+
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -196,6 +208,8 @@ export type InboundSocketEvent<C = {}> =
   | IAiEditingInboundChatMessage
   | IAiEditingTypingMessage
   | IAiEditingErrorMessage
-  | IAiEditingSuggestionsEvent;
+  | IAiEditingSuggestionsEvent
+  | IAiEditingSuggestionsStreamEvent
+  | AiEditingChatStreamEvent;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];
