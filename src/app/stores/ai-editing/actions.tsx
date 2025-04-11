@@ -1,7 +1,7 @@
 import api from '@libs/api';
 import { IAiEditingHandshakeMessage } from '@libs/api/types';
 import telemetry from '@libs/telemetry';
-import { fileToBase64 } from '@libs/utils/files';
+import { processMediaMessage } from '@libs/utils/files';
 import { produce } from 'immer';
 import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
@@ -108,22 +108,6 @@ export function addAssistantMessage(
       state.thinkingMessage = undefined;
     }),
   );
-}
-
-/**
- * Processes uploaded media file for sending
- */
-async function processMediaMessage(media: File | undefined) {
-  if (!media) {
-    return undefined;
-  }
-
-  const file = await fileToBase64(media);
-  return {
-    mediaData: file.mediaData,
-    mimetype: file.mimetype,
-    filename: file.filename,
-  };
 }
 
 /**

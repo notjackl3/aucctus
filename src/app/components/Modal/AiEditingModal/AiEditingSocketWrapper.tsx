@@ -6,7 +6,10 @@ import {
   IAiEditingSuggestionsEvent,
   IAiEditingSuggestionsStreamEvent,
 } from '@libs/api/types';
-import { isDirectMessage, isStreamEvent } from '@libs/api/utils/typeGuards';
+import {
+  isAiEditingDirectMessage,
+  isAiEditingStreamEvent,
+} from '@libs/api/utils/typeGuards';
 import telemetry from '@libs/telemetry';
 import useStore from '@stores/store';
 import React from 'react';
@@ -32,7 +35,7 @@ const AiEditingSocketWrapper: React.FC<AiEditingSocketWrapperProps> = ({}) => {
         | AiEditingChatStreamEvent,
     ) => {
       // For direct messages
-      if (isDirectMessage(message)) {
+      if (isAiEditingDirectMessage(message)) {
         if (message.conceptUuid === conceptUuid) {
           addAssistantMessage({
             uuid: message.uuid,
@@ -44,7 +47,7 @@ const AiEditingSocketWrapper: React.FC<AiEditingSocketWrapperProps> = ({}) => {
         }
       }
       // For stream events
-      else if (isStreamEvent(message)) {
+      else if (isAiEditingStreamEvent(message)) {
         if (message.context.conceptUuid === conceptUuid && message.content) {
           addAssistantMessage({
             uuid: message.context.uuid,

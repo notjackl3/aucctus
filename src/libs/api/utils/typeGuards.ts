@@ -7,8 +7,11 @@ import {
   IConceptIncubationMultiSelectQuestion,
   IConceptIncubationTextareaQuestion,
   IConceptIncubationTextQuestion,
+  ICustomerProfileInboundChatMessage,
+  CustomerProfileStreamEvent,
 } from '../types';
 
+// Incubation question type guards
 export const isMultiSelectQuestion = (
   question: ConceptIncubationQuestion,
 ): question is IConceptIncubationMultiSelectQuestion => {
@@ -27,22 +30,42 @@ export const isTextareaQuestion = (
   return question.fieldType === 'textarea';
 };
 
-export const isDirectMessage = (
+// AI Editing message type guards
+export const isAiEditingDirectMessage = (
   message:
     | IAiEditingSuggestionsEvent
     | IAiEditingInboundChatMessage
     | IAiEditingSuggestionsStreamEvent
     | AiEditingChatStreamEvent,
 ): message is IAiEditingSuggestionsEvent | IAiEditingInboundChatMessage => {
-  return 'conceptUuid' in message;
+  return 'conceptUuid' in message && !('context' in message);
 };
 
-export const isStreamEvent = (
+export const isAiEditingStreamEvent = (
   message:
     | IAiEditingSuggestionsEvent
     | IAiEditingInboundChatMessage
     | IAiEditingSuggestionsStreamEvent
     | AiEditingChatStreamEvent,
 ): message is IAiEditingSuggestionsStreamEvent | AiEditingChatStreamEvent => {
-  return 'context' in message && 'stage' in message;
+  return (
+    'context' in message &&
+    'stage' in message &&
+    'conceptUuid' in message.context
+  );
+};
+
+// Customer Profile message type guards
+export const isCustomerProfileDirectMessage = (
+  message: ICustomerProfileInboundChatMessage | CustomerProfileStreamEvent,
+): message is ICustomerProfileInboundChatMessage => {
+  return 'sessionId' in message && !('context' in message);
+};
+
+export const isCustomerProfileStreamEvent = (
+  message: ICustomerProfileInboundChatMessage | CustomerProfileStreamEvent,
+): message is CustomerProfileStreamEvent => {
+  return (
+    'context' in message && 'stage' in message && 'sessionId' in message.context
+  );
 };

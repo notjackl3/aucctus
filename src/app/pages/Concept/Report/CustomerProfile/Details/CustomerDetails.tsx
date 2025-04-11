@@ -1,9 +1,11 @@
 import defaultAvatar from '@assets/img/avatar.png';
 import { Card } from '@components';
+import ConversationHead from '../ConversationHead';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { ICustomerProfile } from '@libs/api/types';
-import { FunctionComponent } from 'react';
+import { FunctionComponent, useEffect } from 'react';
+import useStore from '@stores/store';
 
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
@@ -13,6 +15,18 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   profile,
 }) => {
   const { description } = useEditCustomerProfile(profile.uuid);
+
+  const setCustomerProfileUuid = useStore(
+    (state) => state.customerProfileConversations.setCustomerProfileUuid,
+  );
+
+  useEffect(() => {
+    setCustomerProfileUuid(profile.uuid);
+
+    return () => {
+      setCustomerProfileUuid('');
+    };
+  }, [profile.uuid, setCustomerProfileUuid]);
 
   return (
     <div className='flex h-full w-full flex-col items-start gap-6 self-stretch'>
@@ -78,6 +92,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
           data={profile.quotes}
         />
       </div>
+      <ConversationHead profile={profile} />
     </div>
   );
 };

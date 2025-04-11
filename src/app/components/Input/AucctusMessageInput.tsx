@@ -9,6 +9,7 @@ interface AucctusMessageInputProps {
   onGenerateAiSuggestions?: () => void;
   allowSubmitMessage: boolean;
   className?: string;
+  placeholder?: string;
   disabled?: boolean;
 }
 
@@ -25,6 +26,7 @@ const AucctusMessageInput = React.forwardRef<
       allowSubmitMessage: allowAddAnswer,
       className = '',
       disabled = false,
+      placeholder = 'Type anything',
     },
     ref,
   ) => {
@@ -90,7 +92,7 @@ const AucctusMessageInput = React.forwardRef<
             onChange(e);
             adjustHeight(); // Adjust immediately on change
           }}
-          placeholder='Type anything'
+          placeholder={placeholder}
           maxLength={500}
           onKeyDown={(e) => {
             // Prevent Enter key from creating newlines

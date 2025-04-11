@@ -1,7 +1,7 @@
 import { cn } from '@libs/utils/react';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import IconContainer from './IconContainer';
+import IconContainer from '@components/AiInteraction/IconContainer';
 type CardVariant = 'light' | 'dark';
 
 interface AiFrostedCardProps {
@@ -58,7 +58,7 @@ const AiFrostedCard: React.FC<AiFrostedCardProps> = ({
 
   // Base card classes
   const baseCardClasses = cn(
-    'aucctus-border-primary animate-fade-in flex flex-col gap-2 rounded-lg border border-opacity-50 bg-opacity-25 p-4 backdrop-blur-lg transition-all duration-200',
+    'aucctus-border-primary animate-fade-in flex flex-col gap-2 rounded-lg border border-opacity-50 bg-opacity-25 p-4 backdrop-blur-lg transition-all duration-200 h-fit',
     themeClasses.card,
     className,
   );

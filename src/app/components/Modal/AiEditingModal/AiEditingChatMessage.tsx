@@ -1,12 +1,12 @@
-import AiFrostedCard from '@components/Card/ConceptGeneration/AiExploration/AiFrostedCard';
+import React from 'react';
+import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
+import AiEditingAgentMessageCard from './AiEditingAgentMessageCard';
+import { EditMessage } from '@stores/ai-editing/store';
 import { IConceptReportEdit } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import { EditMessage } from '@stores/ai-editing/store';
-import React from 'react';
-import AgentMessageCard from './AgentMessageCard';
-interface ChatMessagesProps {
+
+interface AiEditingChatMessageProps {
   message: EditMessage;
-  isLastMessage: boolean;
   onConfirmation: (
     content: IConceptReportEdit | Partial<IConceptReportEdit>,
   ) => void;
@@ -18,9 +18,8 @@ interface ChatMessagesProps {
  * MessageRenderer - Renders different message types in the AI editing conversation
  * based on the role (user or assistant).
  */
-const ChatMessages: React.FC<ChatMessagesProps> = ({
+const AiEditingChatMessage: React.FC<AiEditingChatMessageProps> = ({
   message,
-  isLastMessage,
   onConfirmation,
   onRejection,
   className,
@@ -51,9 +50,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           className='mx-4'
         />
       ) : (
-        <AgentMessageCard
+        <AiEditingAgentMessageCard
+          className='mx-4'
           message={message.content}
-          isActiveAiEditMessage={isLastMessage}
           onConfirmation={() =>
             onConfirmation(
               message.content as
@@ -64,8 +63,9 @@ const ChatMessages: React.FC<ChatMessagesProps> = ({
           onRejection={onRejection}
         />
       )}
+      <span className='flex-1' />
     </div>
   );
 };
 
-export default ChatMessages;
+export default AiEditingChatMessage;

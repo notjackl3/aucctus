@@ -6,14 +6,13 @@ import { useConceptAiEditing } from '@hooks/query/concepts.hook';
 import { IConceptReportEdit } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import ScrollToBottom from 'react-scroll-to-bottom';
 import { animated, useTransition } from 'react-spring';
 import { toast } from 'react-toastify';
-import ChatMessages from './ChatMessages';
-import FrostedLoadingCard from './FrostedLoadingCard';
-import IntroMessage from './IntroMessage';
+import AiEditingChatMessage from './AiEditingChatMessage';
+import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
+import AiIntroMessage from '@components/AiInteraction/AiIntroMessage';
 import Toast from '@components/Notification/Toast';
 
 interface AiEditingCardProps {
@@ -25,9 +24,12 @@ interface AiEditingCardProps {
  * for concept reports. It manages a conversation flow between the user and AI.
  */
 const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
+  const messageScrollRef = useRef<HTMLDivElement>(null);
+
   const [showConversation, setShowConversation] = useState(false);
   // ===== State Management =====
   const messages = useStore((state) => state.aiEditing.messages);
+  const thinkingMessage = useStore((state) => state.aiEditing.thinkingMessage);
   const currentMessage = useStore((state) => state.aiEditing.currentMessage);
   const setCurrentMessage = useStore(
     (state) => state.aiEditing.setCurrentMessage,
@@ -48,6 +50,15 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     useConceptAiEditing();
   const { closeModal } = useModal();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (messageScrollRef.current) {
+        messageScrollRef.current.scrollTop =
+          messageScrollRef.current.scrollHeight;
+      }
+    }, 0);
+  }, [messages, thinkingMessage]);
 
   // ===== Animations =====
   const transition = useTransition(messages.length === 0, {
@@ -122,41 +133,41 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                 style={style}
                 className='absolute inset-0 flex items-center justify-center px-4'
               >
-                <IntroMessage />
+                <AiIntroMessage
+                  title='AI Editing'
+                  subtitle='Describe how you want this report to change'
+                />
               </animated.div>
             ),
         )}
 
-        <ScrollToBottom
-          scrollViewClassName='no-scrollbar p-2 overflow-auto flex flex-col justify-end min-h-full'
-          followButtonClassName='hidden'
-          className='flex h-full w-full flex-col'
-          mode='bottom'
+        <div
+          ref={messageScrollRef}
+          className='no-scrollbar mt-auto scroll-smooth pb-8'
         >
           {/* Conversation history */}
           {showConversation
-            ? messages.map((message, index) => (
-                <ChatMessages
+            ? messages.map((message) => (
+                <AiEditingChatMessage
                   key={message.uuid}
                   message={message}
-                  isLastMessage={index === messages.length - 1}
                   onConfirmation={setAiEditSubmission}
                   onRejection={clearConversation}
                 />
               ))
             : null}
-        </ScrollToBottom>
+        </div>
+        {/* Loading indicator when AI is thinking */}
       </div>
 
       {/* Message input - fixed at bottom */}
       <div className='relative flex h-auto w-full shrink-0 flex-col justify-end gap-4 p-4'>
-        {/* Loading indicator when AI is thinking */}
         {loadingTransition(
           (style, item) =>
             item && (
               <animated.div
                 style={style}
-                className='flex flex-row gap-4 overflow-hidden'
+                className='mx-4 flex flex-row gap-4 overflow-hidden'
               >
                 <FrostedLoadingCard
                   variant='dark'
@@ -166,6 +177,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
               </animated.div>
             ),
         )}
+
         <AucctusMessageInput
           value={currentMessage || ''}
           onChange={(e) => setCurrentMessage(e.target.value)}

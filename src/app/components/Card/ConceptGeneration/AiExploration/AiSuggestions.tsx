@@ -14,7 +14,7 @@ import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import AiFrostedCard from './AiFrostedCard';
+import AiFrostedCard from '../../../AiInteraction/AiFrostedCard';
 
 // Component props interface
 interface AiSuggestionsProps {

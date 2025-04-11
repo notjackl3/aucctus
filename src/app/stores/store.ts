@@ -12,6 +12,9 @@ import conceptReportSlice, {
   IConceptReportState,
 } from './concept-report/store';
 import { AucctusStorage } from './utils/storage';
+import customerProfileConversationsSlice, {
+  ICustomerProfileConversationState,
+} from './customer_profile_conversations/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -19,6 +22,7 @@ export interface IAppStore {
   incubation: IConceptIncubationState;
   aiEditing: IAiEditingState;
   conceptReport: IConceptReportState;
+  customerProfileConversations: ICustomerProfileConversationState;
 }
 
 export interface IStoreApi<S> {
@@ -36,6 +40,7 @@ const useStore = create<IAppStore>()(
         incubation: conceptIncubationSlice,
         aiEditing: aiEditingSlice,
         conceptReport: conceptReportSlice,
+        customerProfileConversations: customerProfileConversationsSlice,
       }),
     ),
     {

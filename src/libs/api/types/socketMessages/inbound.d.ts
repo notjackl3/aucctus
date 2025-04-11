@@ -9,6 +9,10 @@ import {
 } from '../incubation/aiSuggestions';
 import { BaseSocketEvent } from './base';
 
+// ==========================================
+// Base Interfaces
+// ==========================================
+
 export interface ErrorEvent extends BaseSocketEvent {
   type: 'error';
   error: string;
@@ -19,7 +23,10 @@ interface IBaseInboundChatMessage {
   sessionId: string;
 }
 
-// The handshake simply responds back with the created session id after the user has sent the first message... Probably could have been a post...
+// ==========================================
+// General Chat Messages
+// ==========================================
+
 export interface IHandshakeMessage
   extends IBaseInboundChatMessage,
     BaseSocketEvent {
@@ -38,6 +45,10 @@ export interface IInboundChatMessage
   role: 'user' | 'assistant';
 }
 
+// ==========================================
+// AI Editing Related Messages
+// ==========================================
+
 export interface IAiEditingHandshakeMessage
   extends IBaseInboundChatMessage,
     BaseSocketEvent {
@@ -53,7 +64,6 @@ export interface IAiEditingInboundChatMessage
   conceptUuid: string;
 }
 
-// AI Editing Typing Message
 export interface IAiEditingTypingMessage extends BaseSocketEvent {
   type: 'ai.editing.chat.typing';
   conceptUuid: string;
@@ -61,7 +71,6 @@ export interface IAiEditingTypingMessage extends BaseSocketEvent {
   content?: string;
 }
 
-// AI Editing Error Message
 export interface IAiEditingErrorMessage extends BaseSocketEvent {
   type: 'ai.editing.error';
   conceptUuid: string;
@@ -79,6 +88,48 @@ export interface IAiEditingSuggestionsEvent extends BaseSocketEvent {
   timestamp?: number;
 }
 
+// ==========================================
+// Customer Profile Related Messages
+// ==========================================
+
+export interface ICustomerProfileHandshakeMessage
+  extends IBaseInboundChatMessage,
+    BaseSocketEvent {
+  type: 'customer.profile.handshake';
+  sessionId: string;
+  conceptUuid: string;
+  customerProfileUuid: string;
+}
+
+export interface ICustomerProfileInboundChatMessage
+  extends IInboundChatMessage,
+    BaseSocketEvent {
+  type: 'customer.profile.chat';
+  conceptUuid: string;
+  customerProfileUuid: string;
+}
+
+export interface ICustomerProfileInboundTypingMessage
+  extends IBaseInboundChatMessage,
+    BaseSocketEvent {
+  type: 'customer.profile.chat.typing';
+  value: boolean;
+  conceptUuid: string;
+  customerProfileUuid: string;
+}
+
+export interface ICustomerProfileInboundErrorEvent
+  extends IBaseInboundChatMessage,
+    BaseSocketEvent {
+  type: 'customer.profile.chat.error';
+  code: string;
+  message: string;
+}
+
+// ==========================================
+// Stream Event Interfaces
+// ==========================================
+
 /**
  * Base interface for all stream events.
  * Stream events represent data that is sent incrementally over time.
@@ -95,18 +146,6 @@ export interface IBaseStreamEvent<T extends string, C extends object>
  *
  * Represents an incremental update in a streaming response.
  * Used when data is being sent in chunks or partial updates.
- *
- * The 'delta' stage allows for progressive rendering of content as it arrives,
- * enabling real-time updates without waiting for the complete response.
- * This is particularly useful for:
- * - Long-running operations where partial results are valuable
- * - Chat interfaces showing typing indicators or partial messages
- * - Large data sets that can be processed incrementally
- *
- * @template T The complete data type that will eventually be assembled
- *
- * Note: For 'stream.chat' type, T will be string
- * For 'stream.structured' type, T will be an object
  */
 export interface IStreamDeltaEvent<
   T extends string,
@@ -121,13 +160,6 @@ export interface IStreamDeltaEvent<
  * Stream Done Event
  *
  * Signals the successful completion of a stream with the final complete data.
- * This event indicates that all data has been transmitted and no more
- * delta events will be sent for this stream.
- *
- * @template T The complete data type that has been assembled
- *
- * Note: For 'stream.chat' type, T will be string
- * For 'stream.structured' type, T will be an object
  */
 export interface IStreamDoneEvent<
   T extends string,
@@ -142,7 +174,6 @@ export interface IStreamDoneEvent<
  * Stream Error Event
  *
  * Indicates that an error occurred during streaming.
- * This terminates the stream and signals that no more data will be sent.
  */
 export interface IStreamErrorEvent<T extends string, C extends object>
   extends IBaseStreamEvent<T, C> {
@@ -150,28 +181,15 @@ export interface IStreamErrorEvent<T extends string, C extends object>
   content: null;
 }
 
+// ==========================================
+// Stream Event Types
+// ==========================================
+
 export type StreamEvent<T extends string, K extends string, C extends object> =
   | IStreamDeltaEvent<T, K, C>
   | IStreamDoneEvent<T, K, C>
   | IStreamErrorEvent<T, C>;
 
-/**
- * Union type representing all possible stream events.
- *
- * Streams are split into different stages (delta, done, error) to handle
- * the lifecycle of streaming data:
- *
- * 1. Delta: Partial updates arrive incrementally, allowing for real-time processing
- * 2. Done: The stream completes successfully with final data
- * 3. Error: The stream terminates due to an error
- *
- * This pattern enables efficient handling of streaming data while maintaining
- * type safety throughout the different stages of the stream lifecycle.
- *
- * @template T The type of data being streamed
-
- * Type-safe helpers for stream events based on their type
- */
 export type ChatStreamEvent<C = {}> = StreamEvent<'stream.chat', string, C>; // TODO: This needs to be properly updated to conform to the correct typing
 
 export type AISuggestionsStreamEvent = StreamEvent<
@@ -179,12 +197,22 @@ export type AISuggestionsStreamEvent = StreamEvent<
   IAISuggestionList,
   IAISuggestionsContext
 >;
+
 export type ConceptGenerationStreamEvent = StreamEvent<
   'stream.structured.concept.generation',
   IGeneratedConceptList,
   IConceptGenerationContext
 >;
 
+export type CustomerProfileStreamEvent = StreamEvent<
+  'customer.profile.chat.stream',
+  string,
+  ICustomerProfileContext
+>;
+
+// ==========================================
+// Union Types
+// ==========================================
 export type AiEditingChatStreamEvent = StreamEvent<
   'ai.editing.chat.stream',
   string,
@@ -209,7 +237,12 @@ export type InboundSocketEvent<C = {}> =
   | IAiEditingTypingMessage
   | IAiEditingErrorMessage
   | IAiEditingSuggestionsEvent
+  | ICustomerProfileHandshakeMessage
+  | ICustomerProfileInboundChatMessage
+  | ICustomerProfileInboundTypingMessage
+  | ICustomerProfileInboundErrorEvent
   | IAiEditingSuggestionsStreamEvent
-  | AiEditingChatStreamEvent;
+  | AiEditingChatStreamEvent
+  | CustomerProfileStreamEvent;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

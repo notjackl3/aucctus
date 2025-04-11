@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { ICustomerProfile } from '../../../libs/api/types';
-import Icon from '../Icon/Icon/Icon';
+import { ICustomerProfile } from '@libs/api/types';
+import Icon from '@components/Icon/Icon/Icon';
 // TODO: This should be a PNG
 import { Card } from '@components';
 import utils from '@libs/utils';

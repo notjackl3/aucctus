@@ -106,6 +106,7 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   jobs: string[];
   pains: string[];
   quotes: string[];
+  avatarUrl?: string;
 }
 
 export interface ICustomerProfileCreate {

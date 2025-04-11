@@ -1,6 +1,7 @@
-import AiFrostedCard from '@components/Card/ConceptGeneration/AiExploration/AiFrostedCard';
+import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
 import { IConceptReportEdit } from '@libs/api/types';
 import React from 'react';
+import { cn } from '@libs/utils/react';
 
 const CONCEPT_AI_EDITING_NOTE =
   'Note that AI editing is not perfect, some other sections may also be changed in the process. This process will take around 10 minutes.';
@@ -13,15 +14,17 @@ const sectionToIconMap: Record<string, IconVariant> = {
   financial_projection: 'line-chart-up',
 };
 
-interface AgentMessageCardProps {
+interface AiEditingAgentMessageCardProps {
   message: IConceptReportEdit | Partial<IConceptReportEdit>;
   isActiveAiEditMessage?: boolean;
   onConfirmation?: () => void;
   onRejection?: () => void;
+  className?: string;
 }
 
-const AgentMessageCard: React.FC<AgentMessageCardProps> = ({
+const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
   message,
+  className = '',
   isActiveAiEditMessage = false,
   onConfirmation,
   onRejection,
@@ -30,7 +33,7 @@ const AgentMessageCard: React.FC<AgentMessageCardProps> = ({
     <>
       <AiFrostedCard
         message={message.response || ''}
-        className='transition-all'
+        className={cn('transition-all', className)}
         variant='dark'
       >
         <div className='flex flex-col gap-4'>
@@ -69,4 +72,4 @@ const AgentMessageCard: React.FC<AgentMessageCardProps> = ({
   );
 };
 
-export default AgentMessageCard;
+export default AiEditingAgentMessageCard;

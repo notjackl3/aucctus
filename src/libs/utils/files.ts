@@ -54,3 +54,19 @@ export async function fileToBase64(file: File): Promise<{
     filename: file.name,
   };
 }
+
+/**
+ * Processes uploaded media file for sending
+ */
+export async function processMediaMessage(media: File | undefined) {
+  if (!media) {
+    return undefined;
+  }
+
+  const file = await fileToBase64(media);
+  return {
+    mediaData: file.mediaData,
+    mimetype: file.mimetype,
+    filename: file.filename,
+  };
+}
