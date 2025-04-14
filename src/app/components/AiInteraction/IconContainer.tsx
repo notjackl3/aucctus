@@ -2,12 +2,14 @@ import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import React from 'react';
 
-const IconContainer = ({
-  iconVariant,
-  iconClassName,
-}: {
+interface IconContainerProps {
   iconVariant: IconVariant;
   iconClassName: string;
+}
+
+const IconContainer: React.FC<IconContainerProps> = ({
+  iconVariant,
+  iconClassName,
 }) => (
   <span className='aucctus-border-primary mt-1 flex aspect-square h-10 w-10 items-center justify-center rounded-lg border border-opacity-50'>
     <Icon

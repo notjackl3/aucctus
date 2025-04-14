@@ -1,4 +1,4 @@
-import { Icon, Modal } from '@components';
+import { BetaDisclaimer, Icon, Modal } from '@components';
 import AiIntroMessage from '@components/AiInteraction/AiIntroMessage';
 import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
@@ -159,10 +159,6 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
             : null}
         </div>
         {/* Loading indicator when AI is thinking */}
-      </div>
-
-      {/* Message input - fixed at bottom */}
-      <div className='relative flex h-auto w-full shrink-0 flex-col justify-end gap-4 p-4'>
         {loadingTransition(
           (style, item) =>
             item && (
@@ -178,7 +174,10 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
               </animated.div>
             ),
         )}
+      </div>
 
+      {/* Message input - fixed at bottom */}
+      <div className='relative flex h-auto w-full shrink-0 flex-col justify-end gap-4 p-4'>
         <AucctusMessageInput
           value={currentMessage || ''}
           onChange={(e) => setCurrentMessage(e.target.value)}
@@ -189,6 +188,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
           disabled={isThinking}
           className='!max-h-[150px]'
         />
+        <BetaDisclaimer />
       </div>
 
       {/* Loading overlay */}

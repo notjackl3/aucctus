@@ -31,10 +31,12 @@ const AucctusMessageInput = React.forwardRef<
     ref,
   ) => {
     const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     const adjustHeight = () => {
       const textarea = textareaRef.current;
-      if (!textarea) return;
+      const container = containerRef.current;
+      if (!textarea || !container) return;
 
       // Reset height to auto to get the correct scrollHeight
       textarea.style.height = '0px';
@@ -50,8 +52,9 @@ const AucctusMessageInput = React.forwardRef<
       // Calculate the new height
       const newHeight = Math.min(Math.max(scrollHeight, minHeight), maxHeight);
 
-      // Apply the new height
+      // Apply the new height to both textarea and container
       textarea.style.height = `${newHeight}px`;
+      container.style.height = `${newHeight}px`;
     };
 
     // Combine refs
@@ -84,7 +87,7 @@ const AucctusMessageInput = React.forwardRef<
     }, []);
 
     return (
-      <div className='relative'>
+      <div className='relative' ref={containerRef}>
         <textarea
           ref={setRefs}
           value={value}
@@ -127,7 +130,7 @@ const AucctusMessageInput = React.forwardRef<
         <span className='absolute right-2 top-1/2 -translate-y-1/2 transform'>
           <button
             className='btn btn-primary aspect-square w-6 rounded-lg'
-            disabled={value.length === 0 || !allowAddAnswer || disabled}
+            disabled={value.trim().length === 0 || !allowAddAnswer || disabled}
             aria-label='Add Answer'
             onClick={onAddAnswer}
           >

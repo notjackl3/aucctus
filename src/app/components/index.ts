@@ -1,4 +1,5 @@
 // Component Groups
+import AiInteraction from './AiInteraction';
 import Badge from './Badges';
 import Button from './Button';
 import Card from './Card';
@@ -15,17 +16,21 @@ import Text from './Text';
 
 // Components
 import Avatar from './Avatar';
+import BetaDisclaimer from './BetaDisclaimer';
 import Loading from './Loading';
-import Tooltip from './ToolTip/Tooltip';
-import ComponentTooltip from './ToolTip/ComponentTooltip';
 import Toast from './Notification/Toast';
+import ComponentTooltip from './ToolTip/ComponentTooltip';
+import Tooltip from './ToolTip/Tooltip';
 
 export {
+  AiInteraction,
   Avatar,
   Badge,
+  BetaDisclaimer,
   Button,
   Card,
   Chart,
+  ComponentTooltip,
   Container,
   Header,
   Icon,
@@ -36,7 +41,6 @@ export {
   Select,
   Table,
   Text,
-  Tooltip,
-  ComponentTooltip,
   Toast,
+  Tooltip,
 };

@@ -1,3 +1,4 @@
+import Beta from './Beta';
 import AssumptionCategory from './AssumptionCategoryBadge';
 import Default from './Badge';
 import ConceptStatistic from './ConceptStatistic';
@@ -22,6 +23,7 @@ const Badges = {
   CostEstimate,
   Stage,
   Default,
+  Beta,
 };
 
 export default Badges;

@@ -1,6 +1,6 @@
-import React, { CSSProperties, HTMLAttributes, ReactNode } from 'react';
-import { cn } from '@libs/utils/react';
 import images from '@assets/img';
+import { cn } from '@libs/utils/react';
+import React, { CSSProperties, HTMLAttributes, ReactNode } from 'react';
 
 export interface AucctusMotionBackgroundProps {
   /**
@@ -73,7 +73,7 @@ const AiInteractionDiv = React.forwardRef<
     
     @keyframes moveBackground {
       0% { background-position: 0% 0%; }
-      50% { background-position: 100% 100%; }
+      50% { background-position: 60% 100%; }
       100% { background-position: 0% 0%; }
     }
   `;
