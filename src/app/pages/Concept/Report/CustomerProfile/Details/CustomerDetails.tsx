@@ -1,11 +1,11 @@
 import defaultAvatar from '@assets/img/avatar.png';
 import { Card } from '@components';
-import ConversationHead from '../ConversationHead';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { ICustomerProfile } from '@libs/api/types';
-import { FunctionComponent, useEffect } from 'react';
 import useStore from '@stores/store';
+import { FunctionComponent, useEffect } from 'react';
+import ConversationHead from '../ConversationHead';
 
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
@@ -92,7 +92,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
           data={profile.quotes}
         />
       </div>
-      <ConversationHead profile={profile} />
+      {FEATURE_CUSTOMER_PROFILE_CHAT && <ConversationHead profile={profile} />}
     </div>
   );
 };

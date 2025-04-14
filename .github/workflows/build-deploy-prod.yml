@@ -6,11 +6,15 @@ on:
 
 env:
   NODE_ENV: production
+  ENVIRONMENT: production
   VITE_AUCCTUS_BASE_RESOURCE_URL: https://api.aucctus.com
   VITE_AUCCTUS_BASE_WS_URL: wss://api.aucctus.com
   VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-  ENVIRONMENT: production
+
+  # Feature flags
+  FEATURE_VERSION_HISTORY: false
+  FEATURE_CUSTOMER_PROFILE_CHAT: false
 
 jobs:
   build_and_deploy_job:

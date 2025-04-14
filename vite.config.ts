@@ -71,7 +71,10 @@ export default defineConfig(async (config: ViteUserConfig) => {
       // Feature flags
       // Make sure when defining feature flags to add them to the vite-env.d.ts file
       // If the variable is not found in the .env the default value will be false (Boolean(undefined) === false)
-      FEATURE_VERSION_HISTORY: Boolean(env.FEATURE_VERSION_HISTORY),
+      FEATURE_VERSION_HISTORY: Boolean(env.FEATURE_VERSION_HISTORY === 'true'),
+      FEATURE_CUSTOMER_PROFILE_CHAT: Boolean(
+        env.FEATURE_CUSTOMER_PROFILE_CHAT === 'true',
+      ),
     },
     css: {
       preprocessorOptions: {
