@@ -1,7 +1,7 @@
 import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
 import { IConceptReportEdit } from '@libs/api/types';
-import React from 'react';
 import { cn } from '@libs/utils/react';
+import React from 'react';
 
 const CONCEPT_AI_EDITING_NOTE =
   'Note that AI editing is not perfect, some other sections may also be changed in the process. This process will take around 10 minutes.';
@@ -32,19 +32,19 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
   return (
     <>
       <AiFrostedCard
-        message={message.response || ''}
+        message={message.reply || ''}
         className={cn('transition-all', className)}
         variant='dark'
       >
         <div className='flex flex-col gap-4'>
           <span className='aucctus-text-sm text-gray-light-200'>
-            {message.response || ''}
+            {message.reply || ''}
           </span>
           {(message.edits ?? []).map((edit, index) => (
             <AiFrostedCard
               key={index}
               title={edit.title}
-              message={edit.content}
+              message={edit.description}
               variant='dark'
               leadingIcon={sectionToIconMap[edit.section]}
             />

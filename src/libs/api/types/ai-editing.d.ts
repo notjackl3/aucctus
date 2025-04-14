@@ -4,16 +4,14 @@ export interface IAiEditingSuggestion {
     | 'market_scan'
     | 'assumptions'
     | 'customer_profiles'
-    | 'financial_projection'
-    | 'risks'
-    | 'next_steps';
+    | 'financial_projection';
   title: string;
-  content: string;
+  description: string;
   reason: string;
 }
 
 export interface IConceptReportEdit {
-  response: string;
+  reply: string;
   edits: IAiEditingSuggestion[];
   uuid: string;
 }
