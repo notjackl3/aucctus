@@ -1,6 +1,9 @@
 import { Icon, Modal } from '@components';
+import AiIntroMessage from '@components/AiInteraction/AiIntroMessage';
+import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
+import Toast from '@components/Notification/Toast';
 import { useModal } from '@context/ModalContextProvider';
 import { useConceptAiEditing } from '@hooks/query/concepts.hook';
 import { IConceptReportEdit } from '@libs/api/types';
@@ -11,9 +14,6 @@ import { useNavigate } from 'react-router-dom';
 import { animated, useTransition } from 'react-spring';
 import { toast } from 'react-toastify';
 import AiEditingChatMessage from './AiEditingChatMessage';
-import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
-import AiIntroMessage from '@components/AiInteraction/AiIntroMessage';
-import Toast from '@components/Notification/Toast';
 
 interface AiEditingCardProps {
   onClose: () => void;
@@ -105,7 +105,8 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
   }, []);
 
   return (
-    <div className='flex h-full w-full flex-col overflow-hidden'>
+    // This has relative positioning for the use of the confirmation modal defined at the bottom of the component
+    <div className='relative flex h-full w-full flex-col overflow-hidden'>
       {/* Header with close button */}
       <div className='flex shrink-0 flex-row justify-end gap-4 p-4'>
         <button
