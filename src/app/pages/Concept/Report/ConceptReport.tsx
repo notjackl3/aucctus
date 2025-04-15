@@ -6,7 +6,6 @@ import {
   useCommitConceptVersionRevert,
   useConcept,
   useConceptUpdate,
-  useSaveConceptVersion,
 } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import api from '@libs/api';
@@ -68,7 +67,6 @@ const ConceptReport: FunctionComponent = () => {
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
   const [isLoading, setIsLoading] = useState(false);
-  const { mutate: saveConceptVersion } = useSaveConceptVersion();
   const { openModal, closeModal } = useModal();
   const { mutate: commitConceptVersionRevert, isLoading: isReverting } =
     useCommitConceptVersionRevert();
@@ -171,14 +169,6 @@ const ConceptReport: FunctionComponent = () => {
           </div>
         </div>
         <div className='flex gap-4'>
-          {concept && !concept.isHistoricalVersion && (
-            <button
-              onClick={() => saveConceptVersion(conceptUuid!)}
-              className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-            >
-              SAVE VERSION (TEMP)
-            </button>
-          )}
           {concept && !concept.isHistoricalVersion && (
             <ConceptVersionsButton conceptUuid={conceptUuid} />
           )}
