@@ -3,7 +3,7 @@ import { IAiEditingHandshakeMessage } from '@libs/api/types';
 import telemetry from '@libs/telemetry';
 import { processMediaMessage } from '@libs/utils/files';
 import { produce } from 'immer';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import { v4 as uuidv4 } from 'uuid';
 import type { IStoreApi } from '../store';
 import { IAiEditingState, IAssistantMessage, IUserMessage } from './store';

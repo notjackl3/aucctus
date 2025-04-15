@@ -1,10 +1,16 @@
 import { Lens, lens } from '@dhmk/zustand-lens';
 import type { IAppStore } from '../store';
-import { IConceptReportActions, setConceptUuid } from './actions';
+import {
+  IConceptReportActions,
+  setConceptUuid,
+  setActiveConcept,
+} from './actions';
 
 export interface IConceptReportState extends IConceptReportActions {
   // The currently selected concept uuid
   conceptUuid?: string;
+  isHistoricalVersion?: boolean;
+  conceptVersionId?: number;
 }
 
 const conceptReportSlice: Lens<IConceptReportState, IAppStore> = (
@@ -16,8 +22,10 @@ const conceptReportSlice: Lens<IConceptReportState, IAppStore> = (
 
   return {
     conceptUuid: undefined,
-
+    isHistoricalVersion: undefined,
+    conceptVersionId: undefined,
     setConceptUuid: setConceptUuid.bind(actionContext),
+    setActiveConcept: setActiveConcept.bind(actionContext),
   };
 };
 

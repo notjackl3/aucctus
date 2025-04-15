@@ -13,12 +13,12 @@ import Modal from './Modal';
 import Select from './Select';
 import Table from './Tables';
 import Text from './Text';
+import { toast } from './Notification/toast';
 
 // Components
 import Avatar from './Avatar';
 import BetaDisclaimer from './BetaDisclaimer';
 import Loading from './Loading';
-import Toast from './Notification/Toast';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
 import Tooltip from './ToolTip/Tooltip';
 
@@ -41,6 +41,6 @@ export {
   Select,
   Table,
   Text,
-  Toast,
   Tooltip,
+  toast,
 };

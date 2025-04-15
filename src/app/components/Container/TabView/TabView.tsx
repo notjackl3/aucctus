@@ -14,8 +14,9 @@ export interface TabElement {
 export interface TabsProps {
   tabs: TabElement[];
   className?: string;
+  tabGroupClassName?: string;
   tabClassName?: string;
-  tabViewClassName?: string;
+  tabContentClassName?: string;
   variant?: 'default' | 'button' | 'button-separated';
   onTabSelect: (value: string) => void;
   children?: ReactNode;
@@ -29,7 +30,8 @@ const TabView: FunctionComponent<TabsProps> = ({
   className = '',
   variant = 'default',
   tabClassName = '',
-  tabViewClassName = '',
+  tabGroupClassName = '',
+  tabContentClassName = '',
   actionButtons,
   activeTab,
   onTabSelect,
@@ -41,7 +43,12 @@ const TabView: FunctionComponent<TabsProps> = ({
         className,
       )}
     >
-      <div className='flex flex-row items-start justify-between self-stretch overflow-x-auto overflow-y-hidden py-4'>
+      <div
+        className={cn(
+          'flex flex-row items-start justify-between self-stretch overflow-x-auto overflow-y-hidden py-4',
+          tabGroupClassName,
+        )}
+      >
         <div className='flex list-none items-center justify-start pl-0'>
           {tabs.map((tab, index) => (
             <Tab
@@ -64,7 +71,7 @@ const TabView: FunctionComponent<TabsProps> = ({
       <div
         className={cn(
           'flex h-full w-full items-center justify-center',
-          tabViewClassName,
+          tabContentClassName,
         )}
       >
         {children}

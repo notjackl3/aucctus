@@ -1,3 +1,4 @@
+import ConceptVersionCard from './ConceptVersionCard';
 import AiExplorationsCard from './ConceptGeneration/AiExplorationsCard';
 import IntroducingAucctusCard from './ConceptGeneration/AiExploration/IntroducingAucctusCard';
 import UserExplorationCard from './ConceptGeneration/UserExplorationCard';
@@ -37,6 +38,7 @@ const Card = {
   AiExplorationsCard,
   UserExplorationCard,
   IntroducingAucctusCard,
+  ConceptVersionCard,
 };
 
 export default Card;

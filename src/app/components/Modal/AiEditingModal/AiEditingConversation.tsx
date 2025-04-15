@@ -1,8 +1,7 @@
 import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
 import { IConceptReportEdit } from '@libs/api/types';
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { animated, useTransition } from 'react-spring';
-import { useMeasure } from 'react-use';
 import AiEditingChatMessage from './AiEditingChatMessage';
 
 interface AiEditingConversationProps {
@@ -28,20 +27,25 @@ const AiEditingConversation: React.FC<AiEditingConversationProps> = ({
   onConfirmation,
   onRejection,
 }) => {
-  const messageScrollRef = React.useRef<HTMLDivElement>(null);
-  const [ref, { height }] = useMeasure<HTMLDivElement>();
+  const messagesContainerRef = React.useRef<HTMLDivElement>(null);
 
   // Calculate container height when messages change
-  const scrollToBottom = () => {
-    if (messageScrollRef.current) {
-      messageScrollRef.current.scrollIntoView({ behavior: 'smooth' });
+  const scrollToBottom = useCallback(() => {
+    if (messagesContainerRef.current) {
+      const lastChild = messagesContainerRef.current.lastElementChild;
+      if (lastChild) {
+        lastChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
-  };
+  }, []);
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    scrollToBottom();
-  }, [height, messages, isThinking]);
+    setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [messages, isThinking]);
 
   const loadingTransition = useTransition(isThinking, {
     from: {
@@ -70,9 +74,8 @@ const AiEditingConversation: React.FC<AiEditingConversationProps> = ({
     <div className='flex h-full flex-1 flex-col overflow-hidden'>
       <div className='flex h-full flex-col justify-end overflow-auto'>
         <div
-          ref={ref}
+          ref={messagesContainerRef}
           className='no-scrollbar w-full scroll-smooth'
-          data-height={height}
         >
           {/* Conversation history */}
           {showConversation
@@ -85,7 +88,6 @@ const AiEditingConversation: React.FC<AiEditingConversationProps> = ({
                 />
               ))
             : null}
-          <div ref={messageScrollRef} />
         </div>
       </div>
       {/* Loading indicator when AI is thinking */}

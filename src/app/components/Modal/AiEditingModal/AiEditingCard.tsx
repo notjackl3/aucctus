@@ -2,7 +2,6 @@ import { BetaDisclaimer, Icon, Modal } from '@components';
 import AiIntroMessage from '@components/AiInteraction/AiIntroMessage';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
-import Toast from '@components/Notification/Toast';
 import { useModal } from '@context/ModalContextProvider';
 import { useConceptAiEditing } from '@hooks/query/concepts.hook';
 import { IConceptReportEdit } from '@libs/api/types';
@@ -11,7 +10,7 @@ import useStore from '@stores/store';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { animated, useTransition } from 'react-spring';
-import { toast } from 'react-toastify';
+import { toast } from '@components/Notification/toast';
 import AiEditingConversation from './AiEditingConversation';
 
 interface AiEditingCardProps {
@@ -158,14 +157,10 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                     {
                       onSuccess: () => {
                         setAiEditSubmission(undefined);
-                        toast(Toast, {
-                          data: {
-                            primaryMessage: 'Concept update started',
-                            secondaryMessage:
-                              'This may take up to 10 minutes. You can navigate away.',
-                            status: 'warning', // Use success/info for confirmation
-                          },
-                        });
+                        toast.warning(
+                          'Concept update started',
+                          'This may take up to 10 minutes. You can navigate away.',
+                        );
                         navigate(AppPath.ConceptBank);
                         closeModal();
                       },

@@ -1,7 +1,7 @@
 import utils from '@libs/utils';
 import { FunctionComponent, useEffect, useMemo } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import { AppPath } from '../../../routes/routes';
 import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import FeatureIcon, {

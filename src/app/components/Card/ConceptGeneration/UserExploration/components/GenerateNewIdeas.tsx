@@ -6,7 +6,7 @@ import {
 import { AppPath } from '@routes/routes';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import LoadingMask from './util/LoadingMask';
 
 type QuestionPath = 'expand-an-existing-idea' | 'identify-new-opportunities';

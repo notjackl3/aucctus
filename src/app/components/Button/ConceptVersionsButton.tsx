@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@libs/utils/react';
 import { Icon } from '@components';
-import ConceptVersionsDropdown from './ConceptVersionsDropdown';
+import ConceptVersionsDropdown from './Dropdown/ConceptVersionsDropdown';
 
 interface ConceptVersionsButtonProps {
   conceptUuid?: string;
@@ -35,22 +35,21 @@ const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
   useEffect(() => {
     if (isOpen && buttonRef.current && dropdownRef.current && portalContainer) {
       const buttonRect = buttonRef.current.getBoundingClientRect();
-      const dropdownWidth = Math.max(buttonRect.width, 300); // Default minimum width
 
       // Calculate left position to ensure dropdown stays within viewport
-      let leftPosition = buttonRect.left + window.scrollX;
+      let leftPosition = buttonRect.left + window.scrollX - 100;
 
       // Check if dropdown would extend beyond right edge of viewport
-      if (leftPosition + dropdownWidth > window.innerWidth + 20) {
+      if (leftPosition > window.innerWidth + 20) {
         // Adjust position to align with right edge of viewport
-        leftPosition = Math.max(0, window.innerWidth - dropdownWidth - 20);
+        leftPosition = Math.max(0, window.innerWidth - 20);
       }
 
       // Position dropdown below the button
       portalContainer.style.position = 'absolute';
       portalContainer.style.top = `${buttonRect.bottom + window.scrollY}px`;
       portalContainer.style.left = `${leftPosition}px`;
-      portalContainer.style.width = `${Math.max(buttonRect.width, dropdownWidth)}px`; // Min width of 200px
+      portalContainer.style.minWidth = `250px`;
       portalContainer.style.zIndex = '50';
     }
   }, [isOpen, portalContainer]);

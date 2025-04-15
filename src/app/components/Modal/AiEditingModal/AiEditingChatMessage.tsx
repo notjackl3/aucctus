@@ -53,7 +53,6 @@ const AiEditingChatMessage: React.FC<AiEditingChatMessageProps> = ({
         <AiEditingAgentMessageCard
           className='mx-4'
           message={message.content}
-          isActiveAiEditMessage={true}
           onConfirmation={() =>
             onConfirmation(
               message.content as

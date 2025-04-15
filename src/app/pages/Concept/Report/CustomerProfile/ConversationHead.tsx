@@ -8,7 +8,7 @@ import { createPortal } from 'react-dom';
 import {
   useConversationWindowPosition,
   WindowPosition,
-} from './window-position.hook';
+} from '@hooks/conversation/conversation-window-position.hook';
 import CustomerConversationSocketWrapper from './CustomerConversationSocketWrapper';
 
 // Constants

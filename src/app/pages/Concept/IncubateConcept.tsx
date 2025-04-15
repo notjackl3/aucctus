@@ -21,7 +21,7 @@ import React, {
   useState,
 } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 
 type ConceptGenerationState =
   | 'pre-generation'

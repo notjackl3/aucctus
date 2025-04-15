@@ -79,6 +79,7 @@ export interface IConcept extends IBaseConceptEntity {
   hasSeed: boolean;
   seedUuid: string;
   isHistoricalVersion: boolean;
+  conceptVersionId: number;
 }
 
 export interface IConceptOverview extends IBaseConceptEntity {

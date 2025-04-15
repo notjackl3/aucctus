@@ -14,7 +14,7 @@ import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedSt
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatchIncubationAnimation } from './incubation-animation-event.hook';
 import telemetry from '@libs/telemetry';
@@ -356,12 +356,7 @@ export const useUserInteraction = () => {
           ]);
         },
         onError: () => {
-          toast.error('Failed to submit answer', {
-            toastId: 'submit-answer-error',
-            autoClose: 2000,
-            hideProgressBar: true,
-            pauseOnHover: false,
-          });
+          toast.error('Failed to submit answer');
         },
       },
     );
@@ -471,22 +466,12 @@ export const useUserInteraction = () => {
     }
 
     if (!isQuestionAnswered && activeQuestion?.required) {
-      toast.error('Please provide a valid answer question', {
-        toastId: 'answer-required',
-        autoClose: 2000,
-        hideProgressBar: true,
-        pauseOnHover: false,
-      });
+      toast.error('Please provide a valid answer question');
       return;
     }
 
     if (draftSeedUuid.length === 0) {
-      toast.error('Failed to submit answer', {
-        toastId: 'submit-answer-error',
-        autoClose: 2000,
-        hideProgressBar: true,
-        pauseOnHover: false,
-      });
+      toast.error('Failed to submit answer');
       return;
     }
 
@@ -517,12 +502,7 @@ export const useUserInteraction = () => {
             ]);
           },
           onError: () => {
-            toast.error('Failed to submit answer', {
-              toastId: 'submit-answer-error',
-              autoClose: 2000,
-              hideProgressBar: true,
-              pauseOnHover: false,
-            });
+            toast.error('Failed to submit answer');
           },
         },
       );

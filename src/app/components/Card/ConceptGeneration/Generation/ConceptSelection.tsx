@@ -10,7 +10,6 @@ import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { toast } from 'react-toastify';
 import { v4 as uuidv4 } from 'uuid';
 import {
   animationStyles,
@@ -24,7 +23,7 @@ import PromptAnswers from './PromptAnswers';
 import SelectableConcept from './SelectableConcept';
 import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
-import Toast from '@components/Notification/Toast';
+import { toast } from '@components';
 
 // Constants
 const mainStyle = {
@@ -225,16 +224,15 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
   const showSuccessAndNavigate = useCallback(() => {
     handleLeaveAnimation(() => {
-      toast(Toast, {
-        data: {
-          primaryMessage: 'Concepts saved successfully',
-          secondaryMessage: 'Proceeding to the refinement step.',
-          status: 'success',
+      toast.success(
+        'Concepts saved successfully',
+        'Proceeding to the refinement step.',
+        {
+          autoClose: 2000,
+          hideProgressBar: true,
+          pauseOnHover: false,
         },
-        autoClose: 2000,
-        hideProgressBar: true,
-        pauseOnHover: false,
-      });
+      );
       setTimeout(() => {
         const event = new CustomEvent('aucctus-generate-concept', {
           detail: { refine: true },

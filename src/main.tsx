@@ -4,7 +4,7 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { QueryCache, QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
 import App from './App';

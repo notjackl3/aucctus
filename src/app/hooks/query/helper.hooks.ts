@@ -3,7 +3,7 @@ import analytics from '@libs/telemetry';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import { useMutation, useQueryClient } from 'react-query';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 
 // Common useMutation hook
 export function useGenericConceptMutate<T, K = Partial<T> & { uuid: string }>(

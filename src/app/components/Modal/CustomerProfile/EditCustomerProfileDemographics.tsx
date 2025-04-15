@@ -5,7 +5,7 @@ import styles from './add-customer-profile.module.scss';
 
 import { ICustomerProfile } from '@libs/api/types';
 import utils from '@libs/utils';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 interface IEditCustomerProfileDemographicsProps {
   conceptUuid?: string;

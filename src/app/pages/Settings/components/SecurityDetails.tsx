@@ -1,7 +1,7 @@
 import utils from '@libs/utils';
 import { FunctionComponent, useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import api from '../../../../libs/api';
 import { IUserPassword } from '../../../../libs/api/types';
 import { defaultToastConfig } from '../../../../libs/toast';
@@ -46,6 +46,7 @@ const SecurityDetails: FunctionComponent = () => {
       setCurrentPasswordError(message);
       toast.error(
         'Password could not be updated. Please try again later.',
+        undefined,
         defaultToastConfig,
       );
     },

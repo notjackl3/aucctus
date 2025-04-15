@@ -15,6 +15,7 @@ import styles from './customerProfile.module.scss';
 import { Icon, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import utils from '@libs/utils';
+import useStore from '@stores/store';
 
 const CustomerProfile: FunctionComponent = () => {
   const { id: conceptId } = useParams();
@@ -27,6 +28,9 @@ const CustomerProfile: FunctionComponent = () => {
   const selectedProfile = useMemo(
     () => profiles.find((item) => item.nickname === selectedProfileName),
     [profiles, selectedProfileName],
+  );
+  const isHistoricalConceptVersion = useStore(
+    (state) => state.conceptReport.isHistoricalVersion,
   );
 
   const customerTabs = useMemo(() => {
@@ -95,57 +99,62 @@ const CustomerProfile: FunctionComponent = () => {
     <div className={styles.customerProfile}>
       <TabView
         tabs={customerTabs}
+        tabGroupClassName='pointer-events-auto'
         className={styles.tabs}
         variant='button'
         onTabSelect={onTabSelect}
         activeTab={selectedProfileName || ''}
-        actionButtons={[
-          <button
-            key={utils.string.generateRandomString(5)}
-            className='btn btn-light'
-            disabled={!conceptId || !selectedProfile}
-            onClick={() => {
-              openModal(Modal.AddCustomerProfile, {
-                conceptUuid: conceptId || '',
-              });
-            }}
-          >
-            <Icon variant='plus' height={20} width={20} />
-          </button>,
+        actionButtons={
+          isHistoricalConceptVersion
+            ? []
+            : [
+                <button
+                  key={utils.string.generateRandomString(5)}
+                  className='btn btn-light'
+                  disabled={!conceptId || !selectedProfile}
+                  onClick={() => {
+                    openModal(Modal.AddCustomerProfile, {
+                      conceptUuid: conceptId || '',
+                    });
+                  }}
+                >
+                  <Icon variant='plus' height={20} width={20} />
+                </button>,
 
-          <button
-            key={utils.string.generateRandomString(5)}
-            className='btn btn-light'
-            disabled={!conceptId || !selectedProfile}
-            onClick={() => {
-              openModal(Modal.Confirmation, {
-                title: 'Are you sure?',
-                subtitle: `This will delete the \"${selectedProfileName}\" customer profile`,
-                actions: [
-                  {
-                    title: 'Cancel',
-                    onClick: () => {
-                      closeModal();
-                    },
-                    variant: 'light',
-                  },
-                  {
-                    title: 'Delete',
-                    variant: 'danger',
-                    onClick: () => {
-                      if (selectedProfile) {
-                        mutate(selectedProfile.uuid);
-                      }
-                      closeModal();
-                    },
-                  },
-                ],
-              });
-            }}
-          >
-            <Icon variant='trash' height={20} width={20} />
-          </button>,
-        ]}
+                <button
+                  key={utils.string.generateRandomString(5)}
+                  className='btn btn-light'
+                  disabled={!conceptId || !selectedProfile}
+                  onClick={() => {
+                    openModal(Modal.Confirmation, {
+                      title: 'Are you sure?',
+                      subtitle: `This will delete the \"${selectedProfileName}\" customer profile`,
+                      actions: [
+                        {
+                          title: 'Cancel',
+                          onClick: () => {
+                            closeModal();
+                          },
+                          variant: 'light',
+                        },
+                        {
+                          title: 'Delete',
+                          variant: 'danger',
+                          onClick: () => {
+                            if (selectedProfile) {
+                              mutate(selectedProfile.uuid);
+                            }
+                            closeModal();
+                          },
+                        },
+                      ],
+                    });
+                  }}
+                >
+                  <Icon variant='trash' height={20} width={20} />
+                </button>,
+              ]
+        }
       >
         {selectedProfile ? (
           <CustomerDetails profile={selectedProfile} />

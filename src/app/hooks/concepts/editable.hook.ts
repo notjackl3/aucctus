@@ -9,7 +9,7 @@ import { AxiosError } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { MutateOptions, UseMutateFunction } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import {
   IConcept,
   IConceptOverview,

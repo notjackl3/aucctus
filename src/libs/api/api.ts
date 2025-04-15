@@ -1,5 +1,5 @@
 import { HeadersDefaults } from 'axios';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import analytics from '../telemetry';
 import { AccountApi } from './account';
 import { ArticleApi } from './article';

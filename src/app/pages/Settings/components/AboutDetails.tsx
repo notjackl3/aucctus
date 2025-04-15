@@ -1,7 +1,7 @@
 import useStore from '@stores/store';
 import { FunctionComponent, useMemo, useState } from 'react';
 import Select, { StylesConfig } from 'react-select';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import { IUser } from '../../../../libs/api/types';
 import defaultAvatar from '../../../assets/img/avatar.png';
 import Icon from '../../../components/Icon/Icon/Icon';

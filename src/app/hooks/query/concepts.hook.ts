@@ -29,7 +29,7 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
 
@@ -540,7 +540,7 @@ const doRevertInvalidation = (queryClient: QueryClient, uuid: string) => {
       queryKey: [AucctusQueryKeys.conceptOverview, uuid],
     }),
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.marketScan, uuid],
+      queryKey: [AucctusQueryKeys.marketScan],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.customerProfile],
@@ -549,7 +549,7 @@ const doRevertInvalidation = (queryClient: QueryClient, uuid: string) => {
       queryKey: [AucctusQueryKeys.customerProfiles, uuid],
     }),
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.financialProjection, uuid],
+      queryKey: [AucctusQueryKeys.financialProjection],
     }),
   ]);
 };

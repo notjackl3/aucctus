@@ -12,7 +12,7 @@ import React, {
   useState,
 } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
 import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
 import { useQuestionTransition } from '../../hooks/question-transition.hook';

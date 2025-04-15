@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from '@components';
+import Icon from '../Icon';
 import { ToastContentProps } from 'react-toastify';
 
 // Define possible status types
@@ -36,7 +36,7 @@ const statusStyles: Record<
   },
 };
 
-const Toast: React.FC<CustomToastProps> = ({ closeToast, data }) => {
+const AucctusToast: React.FC<CustomToastProps> = ({ closeToast, data }) => {
   const primaryMessage = data?.primaryMessage || 'An update occurred.'; // Default primary message
   const secondaryMessage = data?.secondaryMessage;
   const status = data?.status || 'warning'; // Default to warning status
@@ -75,4 +75,4 @@ const Toast: React.FC<CustomToastProps> = ({ closeToast, data }) => {
   );
 };
 
-export default Toast;
+export default AucctusToast;

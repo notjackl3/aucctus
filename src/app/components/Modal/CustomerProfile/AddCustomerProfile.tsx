@@ -1,6 +1,6 @@
 import utils from '@libs/utils';
 import { FunctionComponent, useCallback, useState } from 'react';
-import { toast } from 'react-toastify';
+import { toast } from '@components';
 import { useCustomerProfileCreate } from '../../../hooks/query/concepts.hook';
 import InputField from '../../Input/InputField/InputField';
 import TextArea from '../../Input/TextArea/TextArea';

@@ -18,15 +18,15 @@ const AiEditing: React.FC = () => {
   }, [clearConversation]);
 
   return (
-    <>
-      <AiInteractionDiv className='h-full min-w-[500px] max-w-[500px] overflow-auto rounded-l-xl'>
+    <div className='flex h-full min-w-[500px] max-w-[500px] flex-col overflow-auto rounded-l-xl'>
+      <AiInteractionDiv className='h-full w-full'>
         <div className='flex h-full w-full flex-col'>
           <AiEditingCard onClose={closeModal} />
         </div>
       </AiInteractionDiv>
       {/* This is a wrapper for the socket events and handles receiving messages and updating the state */}
       <AiEditingSocketWrapper />
-    </>
+    </div>
   );
 };
 

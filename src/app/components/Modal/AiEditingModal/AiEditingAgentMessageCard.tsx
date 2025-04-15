@@ -1,7 +1,7 @@
 import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
 import { IConceptReportEdit } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import React from 'react';
+import React, { useMemo } from 'react';
 
 const CONCEPT_AI_EDITING_NOTE =
   'AI editing can make mistakes. Additional sections may be impacted. This process will take up to 10 minutes.';
@@ -16,7 +16,6 @@ const sectionToIconMap: Record<string, IconVariant> = {
 
 interface AiEditingAgentMessageCardProps {
   message: IConceptReportEdit | Partial<IConceptReportEdit>;
-  isActiveAiEditMessage?: boolean;
   onConfirmation?: () => void;
   onRejection?: () => void;
   className?: string;
@@ -25,10 +24,13 @@ interface AiEditingAgentMessageCardProps {
 const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
   message,
   className = '',
-  isActiveAiEditMessage = false,
   onConfirmation,
   onRejection,
 }) => {
+  const hasEdits = useMemo(() => {
+    return (message.edits ?? []).length > 0;
+  }, [message.edits]);
+
   return (
     <>
       <AiFrostedCard
@@ -50,7 +52,7 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
             />
           ))}
         </div>
-        {isActiveAiEditMessage && (
+        {hasEdits && (
           <>
             <span className='aucctus-text-sm flex-1 break-words text-gray-light-200'>
               {CONCEPT_AI_EDITING_NOTE}
