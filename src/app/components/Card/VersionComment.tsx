@@ -27,10 +27,10 @@ const VersionComment: React.FC<VersionCommentProps> = ({
 
         {sections.length > 0 && (
           <div className='mt-2 flex flex-row flex-wrap gap-2'>
-            {sections.map((match, index) => (
+            {sections.map((section) => (
               <Badge.Default
-                key={`section-${index}`}
-                value={match[1]}
+                key={`section-${section}`}
+                value={section}
                 classNameBadge='aucctus-border-brand-primary aucctus-bg-brand-subtle border rounded-lg items-center justify-center'
                 classNameLabel='aucctus-text-brand-primary aucctus-text-sm'
               />
