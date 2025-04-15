@@ -79,7 +79,12 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
             />
           )}
         </div>
-        {version.comment && <VersionComment comment={version.comment} />}
+        {version.comment && (
+          <VersionComment
+            comment={version.comment}
+            sections={version.conceptAffectedSections}
+          />
+        )}
       </div>
     </div>
   );
