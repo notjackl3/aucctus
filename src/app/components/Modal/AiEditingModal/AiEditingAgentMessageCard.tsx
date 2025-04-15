@@ -4,7 +4,7 @@ import { cn } from '@libs/utils/react';
 import React from 'react';
 
 const CONCEPT_AI_EDITING_NOTE =
-  'Note that AI editing is not perfect, some other sections may also be changed in the process. This process will take around 10 minutes.';
+  'AI editing can make mistakes. Additional sections may be impacted. This process will take up to 10 minutes.';
 
 const sectionToIconMap: Record<string, IconVariant> = {
   overview: 'eye',

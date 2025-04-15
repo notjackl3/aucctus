@@ -142,11 +142,11 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
       {!!aiEditSubmission && (
         <div className='aucctus-bg-tertiary absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transform animate-fade-in bg-opacity-50 px-4 pt-32'>
           <Modal.Confirmation
-            title='Confirm Edit'
-            subtitle='Are you sure you want to edit this concept?'
+            title='Are you sure you want to proceed?'
+            subtitle='Removed or changed content will be available in version history.'
             actions={[
               {
-                title: 'Confirm',
+                title: 'Proceed',
                 variant: 'primary',
                 onClick: () => {
                   aiEditConcept(
