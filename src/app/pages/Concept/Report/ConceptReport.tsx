@@ -171,23 +171,21 @@ const ConceptReport: FunctionComponent = () => {
           </div>
         </div>
         <div className='flex gap-4'>
-          {concept &&
-            !concept.isHistoricalVersion &&
-            FEATURE_VERSION_HISTORY && (
-              <button
-                onClick={() => saveConceptVersion(conceptUuid!)}
-                className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-              >
-                SAVE VERSION (TEMP)
-              </button>
-            )}
+          {concept && !concept.isHistoricalVersion && (
+            <button
+              onClick={() => saveConceptVersion(conceptUuid!)}
+              className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+            >
+              SAVE VERSION (TEMP)
+            </button>
+          )}
           {concept && !concept.isHistoricalVersion && (
             <ConceptVersionsButton conceptUuid={conceptUuid} />
           )}
           {concept && !concept.isHistoricalVersion && (
             <button
               aria-label='Download Opportunity Snapshot'
-              className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+              className='btn btn-bold aucctus-text-brand-primary group whitespace-nowrap hover:bg-primary-900 hover:text-white'
               onClick={onSnapshotClick}
               disabled={isLoading}
             >

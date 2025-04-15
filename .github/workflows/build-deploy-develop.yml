@@ -13,7 +13,6 @@ env:
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }} 
   
   # Feature flags
-  FEATURE_VERSION_HISTORY: true
   FEATURE_CUSTOMER_PROFILE_CHAT: false
 
 jobs:

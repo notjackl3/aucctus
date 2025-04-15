@@ -1,6 +1,7 @@
+/* eslint-disable no-console */
 import { IConceptVersion } from '@libs/api/types/concept/concept_versions';
 import useStore from '@stores/store';
-import React from 'react';
+import React, { useMemo } from 'react';
 import utils from '@libs/utils';
 import { Badge } from '@components';
 import VersionComment from './VersionComment';
@@ -28,7 +29,7 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
       const diffHours = utils.time.differenceInHours(date, now);
       const diffMinutes = utils.time.differenceInMinutes(date, now);
 
-      if (diffMinutes <= 3) {
+      if (diffMinutes <= 2) {
         return 'Just now';
       } else if (diffMinutes < 60) {
         return `${diffMinutes} minutes ago`;
@@ -48,16 +49,21 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
     (state) => state.conceptReport.conceptVersionId,
   );
 
+  const isActiveVersion = useMemo(
+    () => activeConceptVersion === version.versionId,
+    [activeConceptVersion, version.versionId],
+  );
+
   return (
     <div
-      key={version.versionId}
-      onClick={() => onSelect(version)}
+      key={version.revisionId}
+      onClick={() => !isActiveVersion && onSelect(version)}
       className='aucctus-text-primary aucctus-bg-primary-hover flex cursor-pointer flex-col p-3'
     >
       <div className='flex flex-col gap-2'>
         <div className='flex flex-row items-center gap-2'>
           <Badge.Default
-            value={`V${version.revisionId}`}
+            value={`V${version.conceptVersionNumber}`}
             classNameBadge='aucctus-border-secondary border items-center justify-center'
             classNameLabel='aucctus-text-secondary'
           />

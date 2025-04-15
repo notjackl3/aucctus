@@ -654,11 +654,10 @@ export const useRevertConceptVersion = () => {
     }) => await api.concept.revertConceptVersion(params.uuid, params.payload),
     onSuccess: (_, params) => {
       doRevertInvalidation(queryClient, params.uuid);
-      toast.success('Concept version revert initiated');
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to revert concept version');
+      toast.error(message || 'Failed to view historical version');
     },
   });
 };

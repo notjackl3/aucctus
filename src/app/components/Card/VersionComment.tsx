@@ -2,24 +2,21 @@ import React from 'react';
 import { Badge } from '@components';
 
 interface VersionCommentProps {
+  sections?: string[];
   comment?: string;
 }
 
-const VersionComment: React.FC<VersionCommentProps> = ({ comment }) => {
+const VersionComment: React.FC<VersionCommentProps> = ({
+  sections = [],
+  comment,
+}) => {
   const formattedComment = React.useMemo(() => {
     if (!comment) return undefined;
 
-    // Extract sections and create a modified comment text
-    const sectionRegex = /<section>(.*?)<\/section>/g;
-    const sections = [...comment.matchAll(sectionRegex)];
-
-    // Replace section tags with empty string to clean the comment
-    const cleanedComment = comment.replace(sectionRegex, '').trim();
-
     return (
       <div className='flex flex-col gap-1'>
-        {cleanedComment &&
-          cleanedComment.split('\n').map((line, index) => (
+        {comment &&
+          comment.split('\n').map((line, index) => (
             <span
               key={`line-${index}`}
               className='aucctus-text-secondary aucctus-text-sm'
@@ -42,7 +39,7 @@ const VersionComment: React.FC<VersionCommentProps> = ({ comment }) => {
         )}
       </div>
     );
-  }, [comment]);
+  }, [comment, sections]);
 
   return formattedComment || null;
 };

@@ -23,7 +23,7 @@ interface AucctusToastOptions extends ToastOptions {
  * Default toast configuration
  */
 const defaultOptions: ToastOptions = {
-  position: 'top-right',
+  position: 'top-center',
   autoClose: 5000,
   hideProgressBar: true,
   closeOnClick: true,

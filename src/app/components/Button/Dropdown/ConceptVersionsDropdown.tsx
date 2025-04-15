@@ -54,7 +54,7 @@ const ConceptVersionsDropdown: React.FC<ConceptVersionsDropdownProps> = ({
           {versions && versions.versions.length > 0 ? (
             versions.versions.map((v) => (
               <ConceptVersionCard
-                key={v.versionId}
+                key={v.revisionId}
                 version={v}
                 onSelect={handleVersionSelect}
               />

@@ -8,6 +8,8 @@ export interface IConceptVersion {
   title?: string;
   description?: string;
   comment?: string;
+  conceptVersionNumber?: number;
+  conceptAffectedSections?: string[];
   createdTimestamp?: number;
 }
 
