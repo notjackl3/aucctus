@@ -81,9 +81,8 @@ const AucctusMessageInput = React.forwardRef<
 
     // Handle window resize
     useEffect(() => {
-      const handleResize = () => adjustHeight();
-      window.addEventListener('resize', handleResize);
-      return () => window.removeEventListener('resize', handleResize);
+      window.addEventListener('resize', adjustHeight);
+      return () => window.removeEventListener('resize', adjustHeight);
     }, []);
 
     return (

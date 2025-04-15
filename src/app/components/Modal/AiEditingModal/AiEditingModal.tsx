@@ -1,9 +1,9 @@
+import AiInteractionDiv from '@components/AiInteraction/AiInteractionDiv';
 import { useModal } from '@context/ModalContextProvider';
 import useStore from '@stores/store';
 import React from 'react';
 import AiEditingCard from './AiEditingCard';
 import AiEditingSocketWrapper from './AiEditingSocketWrapper';
-import AiInteractionDiv from '@components/AiInteraction/AiInteractionDiv';
 
 const AiEditing: React.FC = () => {
   const { closeModal } = useModal();

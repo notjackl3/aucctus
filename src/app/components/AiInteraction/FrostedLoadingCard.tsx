@@ -1,7 +1,6 @@
 import { Loading } from '@components';
 
 import { cn } from '@libs/utils/react';
-import useStore from '@stores/store';
 import React from 'react';
 
 type cardVariant = 'light' | 'dark';
@@ -10,6 +9,7 @@ interface FrostedLoadingCardProps {
   className?: string;
   defaultMessage?: string;
   variant?: cardVariant;
+  message?: string;
 }
 
 const cardStyle = {
@@ -20,10 +20,9 @@ const FrostedLoadingCard: React.FC<FrostedLoadingCardProps> = ({
   className,
   defaultMessage,
   variant = 'light',
+  message,
 }) => {
-  const thinkingMessage = useStore((state) => state.aiEditing.thinkingMessage);
-
-  const message = thinkingMessage || defaultMessage;
+  const msg = message || defaultMessage;
 
   const cardClassName =
     variant === 'light' ? 'aucctus-bg-tertiary' : 'aucctus-bg-primary-solid';
@@ -39,19 +38,16 @@ const FrostedLoadingCard: React.FC<FrostedLoadingCardProps> = ({
         cardClassName,
       )}
     >
-      {message && (
+      {msg ? (
         <div className='flex flex-1 flex-row gap-2'>
-          <span className={cn('aucctus-text-sm', textClassName)}>
-            {message}
-          </span>
+          <span className={cn('aucctus-text-sm', textClassName)}>{msg}</span>
           <span className='flex-1' />
           <Loading
             className={cn({ invert: variant === 'dark' })}
             isSmall={true}
           />
         </div>
-      )}
-      {!message && (
+      ) : (
         <Loading
           className={cn({ invert: variant === 'dark' })}
           isSmall={true}

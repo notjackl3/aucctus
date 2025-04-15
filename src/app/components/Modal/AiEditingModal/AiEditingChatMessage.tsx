@@ -1,9 +1,9 @@
-import React from 'react';
 import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
-import AiEditingAgentMessageCard from './AiEditingAgentMessageCard';
-import { EditMessage } from '@stores/ai-editing/store';
 import { IConceptReportEdit } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { EditMessage } from '@stores/ai-editing/store';
+import React from 'react';
+import AiEditingAgentMessageCard from './AiEditingAgentMessageCard';
 
 interface AiEditingChatMessageProps {
   message: EditMessage;
@@ -53,6 +53,7 @@ const AiEditingChatMessage: React.FC<AiEditingChatMessageProps> = ({
         <AiEditingAgentMessageCard
           className='mx-4'
           message={message.content}
+          isActiveAiEditMessage={true}
           onConfirmation={() =>
             onConfirmation(
               message.content as

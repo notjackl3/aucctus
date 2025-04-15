@@ -1,12 +1,15 @@
+import { cn } from '@libs/utils/react';
 import React from 'react';
 
 // Note: there is also a Beta Badge component in the Badge folder with out the text and uses a different styling
 
-interface BetaDisclaimerProps {}
+interface BetaDisclaimerProps {
+  className?: string;
+}
 
-const BetaDisclaimer: React.FC<BetaDisclaimerProps> = ({}) => {
+const BetaDisclaimer: React.FC<BetaDisclaimerProps> = ({ className }) => {
   return (
-    <div className='flex w-full flex-row items-center justify-center gap-2 self-stretch'>
+    <div className={cn('flex w-full flex-row gap-2 self-stretch', className)}>
       <span className='aucctus-text-xs-medium aucctus-text-white'>
         <span className='aucctus-text-xs-bold aucctus-text-white mr-2 rounded-md border border-white p-1.5'>
           BETA
