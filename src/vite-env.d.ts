@@ -28,3 +28,4 @@ declare const __ENVIRONMENT__: 'development' | 'staging' | 'production';
 
 // Feature flags
 declare const FEATURE_CUSTOMER_PROFILE_CHAT: boolean;
+declare const FEATURE_CONCEPT_VERSIONING: boolean;

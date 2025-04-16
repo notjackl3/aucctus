@@ -74,6 +74,9 @@ export default defineConfig(async (config: ViteUserConfig) => {
       FEATURE_CUSTOMER_PROFILE_CHAT: Boolean(
         env.FEATURE_CUSTOMER_PROFILE_CHAT === 'true',
       ),
+      FEATURE_CONCEPT_VERSIONING: Boolean(
+        env.FEATURE_CONCEPT_VERSIONING === 'true',
+      ),
     },
     css: {
       preprocessorOptions: {

@@ -169,9 +169,11 @@ const ConceptReport: FunctionComponent = () => {
           </div>
         </div>
         <div className='flex gap-4'>
-          {concept && !concept.isHistoricalVersion && (
-            <ConceptVersionsButton conceptUuid={conceptUuid} />
-          )}
+          {concept &&
+            !concept.isHistoricalVersion &&
+            FEATURE_CONCEPT_VERSIONING && (
+              <ConceptVersionsButton conceptUuid={conceptUuid} />
+            )}
           {concept && !concept.isHistoricalVersion && (
             <button
               aria-label='Download Opportunity Snapshot'
@@ -244,7 +246,7 @@ const ConceptReport: FunctionComponent = () => {
         isLoading={isConceptLoading || isReverting || isCancelling}
       />
 
-      {concept?.isHistoricalVersion && (
+      {concept?.isHistoricalVersion && FEATURE_CONCEPT_VERSIONING && (
         <div className='aucctus-bg-primary fixed left-1/2 top-0 z-50 flex -translate-x-1/2 animate-fade-in flex-row items-center justify-center gap-2 rounded-b-md px-4 py-2 shadow-md'>
           <span className='flex min-h-6 min-w-6 items-center justify-center'>
             <Icon
