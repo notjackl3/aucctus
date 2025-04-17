@@ -1,15 +1,26 @@
+import useStore from '@stores/store';
 import React from 'react';
 import api from '../../libs/api';
 
 const AucctusSocketBootstrap: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
+  const isAuthenticated = useStore((state) => state.auth.access);
+
   React.useEffect(() => {
     (async () => {
-      await api.aucctusSocket.connect();
+      if (!api.aucctusSocket.isConnected && isAuthenticated) {
+        await api.aucctusSocket.connect();
+      }
     })();
-    return () => api.aucctusSocket.disconnect();
-  }, []);
+    return () => {
+      (async () => {
+        if (api.aucctusSocket.isConnected) {
+          await api.aucctusSocket.disconnect();
+        }
+      })();
+    };
+  }, [isAuthenticated]);
 
   return <>{children} </>;
 };

@@ -26,7 +26,7 @@ const ConfirmationModal: FunctionComponent<IConfirmationModalProps> = ({
   actions,
 }) => {
   return (
-    <div className='aucctus-bg-primary flex flex-col gap-4 rounded-lg p-6'>
+    <div className='aucctus-bg-primary flex max-w-[400px] flex-col gap-4 rounded-lg p-6'>
       <div className='flex flex-grow flex-col gap-4'>
         <h1 className='aucctus-text-xl-semibold aucctus-text-primary'>
           {title}

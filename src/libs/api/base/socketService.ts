@@ -18,7 +18,7 @@ export class SocketService {
   protected shouldReconnect: boolean = true;
   protected currentRetryCount: number = 0;
   protected deferredConnect: Promise<void> | undefined;
-  protected isConnected: boolean = false;
+  protected _isConnected: boolean = false;
 
   // Listeners for when max retries are exceeded
   protected maxRetriesExceededListeners: Array<(error: Error) => void> = [];
@@ -31,16 +31,20 @@ export class SocketService {
     // Default max retries to 5 if not provided
     this.config = Object.assign({ maxRetries: 5 }, config);
     this.reconnectInterval = config.reconnectInterval ?? 3000;
-    this.isConnected = false;
+    this._isConnected = false;
   }
 
   get ws() {
     return this._ws;
   }
 
+  get isConnected() {
+    return this._isConnected;
+  }
+
   public async connect(): Promise<void> {
     this.shouldReconnect = true;
-    if (!this._accessToken || this.isConnected) {
+    if (!this._accessToken || this._isConnected) {
       return;
     }
 
@@ -56,7 +60,7 @@ export class SocketService {
       if (this.config.debug) {
         analytics.debug('WebSocket connected', event);
       }
-      this.isConnected = true;
+      this._isConnected = true;
       // Reset retry count on successful connection.
       this.currentRetryCount = 0;
     };
@@ -69,7 +73,8 @@ export class SocketService {
       if (this.config.debug) {
         analytics.debug('WebSocket closed:', closeEvent.reason);
       }
-      this.isConnected = false;
+
+      this._isConnected = false;
       if (this.shouldReconnect) {
         if (this.currentRetryCount >= this.config.maxRetries) {
           // Maximum retry limit reached—notify all listeners.
@@ -93,9 +98,14 @@ export class SocketService {
     };
   }
 
-  public disconnect(): void {
+  public async disconnect(): Promise<void> {
+    if (this.deferredConnect) {
+      await this.deferredConnect;
+    }
+
     this.shouldReconnect = false;
-    this.isConnected = false;
+    this._isConnected = false;
+
     this._ws?.close();
   }
 
@@ -111,13 +121,20 @@ export class SocketService {
 
   public set accessToken(token: string | undefined) {
     this._accessToken = token;
-    this._ws?.close();
-    if (token) {
-      (async () => {
+    (async () => {
+      if (this.deferredConnect) {
+        await this.deferredConnect;
+      }
+
+      if (this._ws?.readyState === WebSocket.OPEN) {
+        this._ws?.close();
+      }
+
+      if (token) {
         this.deferredConnect = this.connect();
         await this.deferredConnect;
-      })();
-    }
+      }
+    })();
   }
 
   public get accessToken() {
