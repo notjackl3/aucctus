@@ -1,5 +1,5 @@
 import Assumptions from './Assumptions';
-import Default from './ConceptReport';
+import Default from './ConceptReport/ConceptReport';
 import ConceptSettings from './ConceptSettings/ConceptSettings';
 import CustomerProfile from './CustomerProfile';
 import FinancialProjection from './FinancialDetails';
