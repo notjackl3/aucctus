@@ -49,7 +49,8 @@ const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
       portalContainer.style.position = 'absolute';
       portalContainer.style.top = `${buttonRect.bottom + window.scrollY}px`;
       portalContainer.style.left = `${leftPosition}px`;
-      portalContainer.style.minWidth = `250px`;
+      portalContainer.style.minWidth = `320px`;
+      portalContainer.style.maxWidth = `320px`;
       portalContainer.style.zIndex = '50';
     }
   }, [isOpen, portalContainer]);
