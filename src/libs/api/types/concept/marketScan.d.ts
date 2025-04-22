@@ -58,7 +58,7 @@ export interface IStartup extends IBaseMarketScanCompany {
 
   keyContacts: IContact[];
   keyFacts: IKeyFact[];
-
+  hasCompetitiveProduct: boolean;
   potentialEngagements?: IPotentialEngagement[];
 }
 
