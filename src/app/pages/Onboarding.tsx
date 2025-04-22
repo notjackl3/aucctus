@@ -11,7 +11,7 @@ import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
 import InputField from '../components/Input/InputField/InputField';
 import { useRegisterAccount } from '../hooks/query/account.hook';
 
-const GOAL_MAX_LENGTH = 500;
+const GOAL_MAX_LENGTH = 1000;
 
 const OnBoarding: FunctionComponent = () => {
   const account = useStore((state) => state.auth.account);
@@ -106,7 +106,7 @@ const OnBoarding: FunctionComponent = () => {
                   setGoalInputError(undefined);
                 }
               }}
-              maxLength={1000}
+              maxLength={GOAL_MAX_LENGTH}
               onFocus={() => setGoalInputError(undefined)}
             />
 

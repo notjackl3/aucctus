@@ -528,7 +528,10 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 //   );
 // };
 
-const doRevertInvalidation = (queryClient: QueryClient, uuid: string) => {
+export const doFullConceptInvalidation = (
+  queryClient: QueryClient,
+  uuid: string,
+) => {
   Promise.all([
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.concept, uuid],
@@ -653,7 +656,7 @@ export const useRevertConceptVersion = () => {
       payload: { versionId: number };
     }) => await api.concept.revertConceptVersion(params.uuid, params.payload),
     onSuccess: (_, params) => {
-      doRevertInvalidation(queryClient, params.uuid);
+      doFullConceptInvalidation(queryClient, params.uuid);
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -673,7 +676,7 @@ export const useCommitConceptVersionRevert = () => {
     mutationFn: async (uuid: string) =>
       await api.concept.commitConceptVersionRevert(uuid),
     onSuccess: (_, uuid) => {
-      doRevertInvalidation(queryClient, uuid);
+      doFullConceptInvalidation(queryClient, uuid);
       toast.success('Concept version revert committed successfully');
     },
     onError: (e) => {
@@ -694,7 +697,7 @@ export const useCancelConceptVersionRevert = () => {
     mutationFn: async (uuid: string) =>
       await api.concept.cancelConceptVersionRevert(uuid),
     onSuccess: (_, uuid) => {
-      doRevertInvalidation(queryClient, uuid);
+      doFullConceptInvalidation(queryClient, uuid);
       toast.success('Concept version revert canceled');
     },
     onError: (e) => {

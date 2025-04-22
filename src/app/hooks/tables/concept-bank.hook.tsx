@@ -25,7 +25,8 @@ import {
 } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { doFullConceptInvalidation } from '@hooks/query/concepts.hook';
+import { useQueryClient } from 'react-query';
 export interface IConceptFilterOptions {
   status: Set<ConceptStatus>;
   createdBy?: IUser;
@@ -62,6 +63,7 @@ export const useConceptBank = (
   const navigate = useNavigate();
   const { mutate: updateConcept } = useConceptUpdate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
+  const queryClient = useQueryClient();
 
   // Use refs for values that don't need to trigger re-renders when updated internally
   const filterOptionsRef = React.useRef<IConceptFilterOptions>(INITIAL_FILTER);
@@ -149,13 +151,14 @@ export const useConceptBank = (
             retryConceptReport(row.original.uuid);
             break;
           case 'complete':
+            doFullConceptInvalidation(queryClient, row.original.uuid);
             navigate(AppPath.ConceptOverview.replace(':id', row.original.uuid));
             break;
           default:
             e.stopPropagation();
         }
       },
-    [navigate, retryConceptReport, updateConcept],
+    [navigate, retryConceptReport, updateConcept, queryClient],
   );
 
   const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(

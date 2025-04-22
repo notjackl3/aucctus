@@ -12,6 +12,8 @@ import { useNavigate } from 'react-router-dom';
 import { animated, useTransition } from 'react-spring';
 import { toast } from '@components/Notification/toast';
 import AiEditingConversation from './AiEditingConversation';
+import { doFullConceptInvalidation } from '@hooks/query/concepts.hook';
+import { useQueryClient } from 'react-query';
 
 interface AiEditingCardProps {
   onClose: () => void;
@@ -41,6 +43,8 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
   const clearConversation = useStore(
     (state) => state.aiEditing.clearConversation,
   );
+
+  const queryClient = useQueryClient();
 
   const isThinking = useStore((state) => state.aiEditing.isAucctusThinking);
   const thinkingMessage = useStore((state) => state.aiEditing.thinkingMessage);
@@ -148,9 +152,11 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                 title: 'Proceed',
                 variant: 'primary',
                 onClick: () => {
+                  const editConceptUuid = conceptUuid!;
+
                   aiEditConcept(
                     {
-                      concept_uuid: conceptUuid!,
+                      concept_uuid: editConceptUuid,
                       session_id: sessionId!,
                       edit: aiEditSubmission,
                     },
@@ -161,6 +167,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                           'Concept update started',
                           'This may take up to 10 minutes. You can navigate away.',
                         );
+                        doFullConceptInvalidation(queryClient, editConceptUuid);
                         navigate(AppPath.ConceptBank);
                         closeModal();
                       },

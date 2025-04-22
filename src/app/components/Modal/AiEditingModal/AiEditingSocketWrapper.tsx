@@ -34,6 +34,7 @@ const AiEditingSocketWrapper: React.FC<AiEditingSocketWrapperProps> = ({}) => {
         | IAiEditingSuggestionsStreamEvent
         | AiEditingChatStreamEvent,
     ) => {
+      console.log('received ai editing message', message);
       // For direct messages
       if (isAiEditingDirectMessage(message)) {
         if (message.conceptUuid === conceptUuid) {
