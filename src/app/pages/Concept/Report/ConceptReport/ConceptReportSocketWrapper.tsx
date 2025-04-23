@@ -27,7 +27,9 @@ const ConceptReportSocketWrapper: React.FC = () => {
               title: 'Go to Concept Bank',
               variant: 'primary',
               onClick: () => {
-                navigate(AppPath.ConceptBank);
+                navigate(AppPath.ConceptBank, {
+                  replace: true,
+                });
                 closeModal();
               },
             },
