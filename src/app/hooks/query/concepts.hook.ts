@@ -60,7 +60,9 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
     keepPreviousData: true, // Keep previous data while loading new data
     refetchInterval: (data?: IConceptPage) => {
       return data &&
-        data.results.some((concept) => concept.reportStatus === 'pending')
+        data.results.some(
+          (concept) => concept.reportStatusAggregate === 'pending',
+        )
         ? 5000
         : false;
     },
@@ -441,6 +443,17 @@ export const useUnarchiveConcept = () => {
 export const useRetryConceptReport = () => {
   return createConceptMutation()<IConcept, IFormError<IConcept>, string>(
     async (conceptUuid: string) => await api.concept.retryReport(conceptUuid),
+  );
+};
+
+/**
+ * Custom hook for generating a concept report.
+ * @returns The result of the useMutation hook.
+ */
+export const useConceptReportGenerate = () => {
+  return createConceptMutation()<IConcept, IFormError<IConcept>, string>(
+    async (conceptUuid: string) =>
+      await api.concept.generateReport(conceptUuid),
   );
 };
 

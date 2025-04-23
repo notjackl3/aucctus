@@ -1,8 +1,8 @@
 import { Button, Table, Text } from '@components';
 import {
   useConcepts,
-  useConceptUpdate,
   useRetryConceptReport,
+  useConceptReportGenerate,
 } from '@hooks/query/concepts.hook';
 import {
   ConceptSort,
@@ -27,6 +27,9 @@ import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { doFullConceptInvalidation } from '@hooks/query/concepts.hook';
 import { useQueryClient } from 'react-query';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
+import { toast } from '@components/Notification/toast';
+
 export interface IConceptFilterOptions {
   status: Set<ConceptStatus>;
   createdBy?: IUser;
@@ -61,7 +64,7 @@ export const useConceptBank = (
   ) => void,
 ) => {
   const navigate = useNavigate();
-  const { mutate: updateConcept } = useConceptUpdate();
+  const { mutate: generateConceptReport } = useConceptReportGenerate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
   const queryClient = useQueryClient();
 
@@ -139,16 +142,32 @@ export const useConceptBank = (
   const handleGenerateConceptButton = React.useCallback(
     (row: Row<IConcept>) =>
       (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const reportStatus = row.original.reportStatus;
+        const reportStatus = row.original.reportStatusAggregate;
         switch (reportStatus) {
           case 'notStarted':
-            updateConcept({
-              uuid: row.original.uuid,
-              status: 'ideating',
+            generateConceptReport(row.original.uuid, {
+              onSuccess: () => {
+                // Manually invalidate the concepts query to trigger the polling mechanism
+                queryClient.invalidateQueries({
+                  queryKey: [AucctusQueryKeys.concepts],
+                });
+              },
             });
             break;
           case 'error':
-            retryConceptReport(row.original.uuid);
+            retryConceptReport(row.original.uuid, {
+              onSuccess: () => {
+                // Trigger toast notification
+                toast.warning(
+                  'Report retry started',
+                  'The system will now process your request. This may take a few minutes.',
+                );
+                // Manually invalidate the concepts query to trigger the polling mechanism
+                queryClient.invalidateQueries({
+                  queryKey: [AucctusQueryKeys.concepts],
+                });
+              },
+            });
             break;
           case 'complete':
             doFullConceptInvalidation(queryClient, row.original.uuid);
@@ -158,7 +177,7 @@ export const useConceptBank = (
             e.stopPropagation();
         }
       },
-    [navigate, retryConceptReport, updateConcept, queryClient],
+    [navigate, retryConceptReport, generateConceptReport, queryClient],
   );
 
   const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(
@@ -280,8 +299,11 @@ export const useConceptBank = (
         cell: ({ row }) => (
           <span className='m-auto flex h-full w-full items-center justify-end self-stretch align-middle'>
             <Button.ConceptGenerate
-              variant={row.original.reportStatus}
+              variant={row.original.reportStatusAggregate}
               onClick={handleGenerateConceptButton(row)}
+              reportStatusBySection={row.original.reportStatusBySection}
+              dateReportStarted={row.original.dateReportStarted}
+              dateReportCompleted={row.original.dateReportCompleted}
             />
           </span>
         ),

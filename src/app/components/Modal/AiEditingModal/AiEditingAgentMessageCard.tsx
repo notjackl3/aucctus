@@ -10,7 +10,7 @@ const sectionToIconMap: Record<string, IconVariant> = {
   overview: 'eye',
   market_scan: 'compass-03',
   assumptions: 'lightbulb',
-  customer_profiles: 'users-03',
+  key_assumptions: 'lightbulb', // key_assumptions or assumptions are the same
   financial_projection: 'line-chart-up',
 };
 

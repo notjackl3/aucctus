@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 
-import styles from '../assets/styles/components/loading.module.scss';
+import styles from '../../assets/styles/components/loading.module.scss';
 import { cn } from '@libs/utils/react';
 
 interface LoadingProps {

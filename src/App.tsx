@@ -1,5 +1,4 @@
-import images from '@assets/img';
-import Loading from '@components/Loading';
+import { Loading } from '@components';
 import Page from '@pages';
 import AuthGuard from '@routes/guards/auth.guard';
 import { usePrivateRoutes, usePublicRoutes } from '@routes/hooks';
@@ -40,25 +39,6 @@ function App() {
     return () => {
       document.head.removeChild(styleSheet);
     };
-  }, []);
-
-  // Preload Concept Generation Background Images
-  React.useEffect(() => {
-    const preloadImage = (src: string) => {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.onload = () => resolve(img);
-        img.onerror = reject;
-        img.src = src;
-      });
-    };
-
-    Promise.all([
-      preloadImage(images.aiExplorationsBackground),
-      preloadImage(images.incubationCard),
-      preloadImage(images.incubationCard2),
-      preloadImage(images.readyToGenerateGradient),
-    ]);
   }, []);
 
   return (

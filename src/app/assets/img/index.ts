@@ -14,6 +14,7 @@ import incubationCard from './aucctus-incubation-card-1.png';
 import incubationCard2 from './aucctus-incubation-card-2.png';
 import incubationLineChart from './aucctus-incubation-line-chart.png';
 import readyToGenerateGradient from './ready-to-generate-gradient.png';
+import generatingAnimated from './generating-animated.webm';
 
 import avatar from './avatar.png';
 
@@ -41,6 +42,7 @@ const images = {
   incubationCard2,
   incubationLineChart,
   readyToGenerateGradient,
+  generatingAnimated,
 
   // User
   avatar,

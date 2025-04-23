@@ -55,9 +55,6 @@ const ConceptReport: FunctionComponent = () => {
   const activeTab = useRoutePattern();
   const account = useStore((state) => state.auth.account);
   const { title: titleEdit } = useEditConcept();
-  const setConceptUuid = useStore(
-    (state) => state.conceptReport.setConceptUuid,
-  );
 
   const {
     concept,
@@ -119,18 +116,6 @@ const ConceptReport: FunctionComponent = () => {
     },
     [updateConcept, conceptUuid],
   );
-
-  // Set the concept uuid in the store when the concept uuid changes
-  // This is used to ensure that the concept uuid is available inside our store
-  React.useEffect(() => {
-    if (conceptUuid) {
-      setConceptUuid(conceptUuid);
-    }
-
-    return () => {
-      setConceptUuid(undefined);
-    };
-  }, [conceptUuid, setConceptUuid]);
 
   if (!concept && isConceptFetched) {
     toast.error('Concept Not Found.');

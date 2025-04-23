@@ -43,6 +43,10 @@ export class Endpoints {
     return `api/v1/concept/${conceptUuid}/retry`;
   }
 
+  static conceptReportGenerate(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/generate`;
+  }
+
   static conceptSeed(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/seed`;
   }
