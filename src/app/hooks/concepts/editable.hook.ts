@@ -386,7 +386,7 @@ export function useEditFinancialProjections() {
 
 export function useEditCustomerProfile(profileUuid: string) {
   const { id: conceptUuid = undefined } = useParams();
-  const { profile } = useConceptCustomerProfile(profileUuid);
+  const { profile, isLoading } = useConceptCustomerProfile(profileUuid);
   const { mutate } = useCustomerProfileUpdate(profileUuid, conceptUuid);
 
   const validationOptions: IValidationOptions = { maxLength: 2500 };
@@ -417,5 +417,6 @@ export function useEditCustomerProfile(profileUuid: string) {
 
   return {
     description,
+    isLoading,
   };
 }

@@ -1,20 +1,24 @@
-import defaultAvatar from '@assets/img/avatar.png';
-import { Card } from '@components';
-import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
+import { Card, Loading } from '@components';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import useStore from '@stores/store';
-import { FunctionComponent, useEffect } from 'react';
-import ConversationHead from '../ConversationHead';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { cn } from '@libs/utils/react';
+import CustomerOverview from './CustomerOverview';
+import CustomerConversation from './CustomerConversation';
 
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
+  className?: string;
 }
 
 const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   profile,
+  className = '',
 }) => {
-  const { description } = useEditCustomerProfile(profile.uuid);
+  const { description, isLoading } = useEditCustomerProfile(profile.uuid);
+  const [overviewHeight, setOverviewHeight] = useState<number | null>(null);
+  const overviewRef = useRef<HTMLDivElement>(null);
 
   const setCustomerProfileUuid = useStore(
     (state) => state.customerProfileConversations.setCustomerProfileUuid,
@@ -28,46 +32,57 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
     };
   }, [profile.uuid, setCustomerProfileUuid]);
 
-  return (
-    <div className='flex h-full w-full flex-col items-start gap-6 self-stretch'>
-      <div className='mt-8 flex min-h-12 w-full items-center justify-start gap-4'>
-        <img
-          className='flex h-[5.5rem] w-[5.5rem] items-center justify-center rounded-full border border-white'
-          alt='avatar'
-          src={defaultAvatar}
-        />
-        <div className='flex flex-col items-start'>
-          <span className='aucctus-text-secondary mb-2 font-[inherit] text-lg font-normal'>
-            {profile?.nickname}
-          </span>
-          <span className='aucctus-text-brand-secondary aucctus-header-sm-semibold'>
-            {profile?.name}
-          </span>
-        </div>
-      </div>
+  // Measure the height of CustomerOverview after render
+  useEffect(() => {
+    const overviewElement = overviewRef.current;
+    if (overviewElement && !isLoading) {
+      const updateHeight = () => {
+        if (overviewElement) {
+          setOverviewHeight(overviewElement.offsetHeight);
+        }
+      };
 
-      <div className='mt-4 flex w-full flex-row flex-wrap items-start justify-start gap-8'>
-        <div className='flex w-[40rem] flex-col'>
-          <div className='flex w-full flex-col items-start gap-0'>
-            <h2 className='aucctus-text-brand-secondary aucctus-text-lg-bold'>
-              Overview
-            </h2>
-            <EditModeSwitcher
-              containerClassName='aucctus-text-secondary aucctus-text-md !cursor-pencil'
-              name='description'
-              value={description.value}
-              onChange={description.handleChange}
-              handleSave={description.handleSave}
-              handleCancel={description.handleCancel}
-            />
-          </div>
+      // Create a ResizeObserver to detect changes in the overview component
+      const resizeObserver = new ResizeObserver(updateHeight);
+      resizeObserver.observe(overviewElement);
+
+      // Also keep the window resize listener for other layout changes
+      window.addEventListener('resize', updateHeight);
+
+      return () => {
+        if (overviewElement) {
+          resizeObserver.unobserve(overviewElement);
+        }
+        resizeObserver.disconnect();
+        window.removeEventListener('resize', updateHeight);
+      };
+    }
+  }, [isLoading]);
+
+  return (
+    <div
+      className={cn(
+        'flex h-full w-full flex-col items-start gap-6 self-stretch',
+        className,
+      )}
+    >
+      {isLoading ? (
+        <div className='flex flex-1 items-center justify-center'>
+          <Loading />
         </div>
-        <div className='flex max-w-[30%] flex-col justify-start'>
-          <div className='flex items-start gap-4 self-stretch'>
-            <Card.Demographics profile={profile} canEdit={true} />
-          </div>
+      ) : (
+        <div className='flex flex-row gap-4'>
+          <CustomerOverview
+            ref={overviewRef}
+            profile={profile}
+            description={description}
+          />
+          <CustomerConversation
+            profile={profile}
+            style={overviewHeight ? { maxHeight: `${overviewHeight}px` } : {}}
+          />
         </div>
-      </div>
+      )}
 
       <div className='flex flex-wrap gap-4'>
         <Card.CustomerProfileContextList
@@ -92,7 +107,6 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
           data={profile.quotes}
         />
       </div>
-      {FEATURE_CUSTOMER_PROFILE_CHAT && <ConversationHead profile={profile} />}
     </div>
   );
 };

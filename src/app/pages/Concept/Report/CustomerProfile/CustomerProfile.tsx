@@ -157,7 +157,7 @@ const CustomerProfile: FunctionComponent = () => {
         }
       >
         {selectedProfile ? (
-          <CustomerDetails profile={selectedProfile} />
+          <CustomerDetails profile={selectedProfile} className='mt-4' />
         ) : // Render nothing if no profile is selected after loading
         null}
       </TabView>
