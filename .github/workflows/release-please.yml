@@ -1,0 +1,79 @@
+name: Release Please
+
+on:
+  push:
+    branches:
+      - prod
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - uses: google-github-actions/release-please-action@v3
+        id: release
+        with:
+          release-type: node
+          package-name: "aucctus"
+          token: ${{ secrets.GITHUB_TOKEN }}
+          changelog-types: |
+            [
+              {"type":"feat","section":"Features","hidden":false},
+              {"type":"fix","section":"Bug Fixes","hidden":false},
+              {"type":"chore","section":"Miscellaneous","hidden":false},
+              {"type":"docs","section":"Documentation","hidden":false},
+              {"type":"style","section":"Styles","hidden":false},
+              {"type":"refactor","section":"Code Refactoring","hidden":false},
+              {"type":"perf","section":"Performance Improvements","hidden":false},
+              {"type":"test","section":"Tests","hidden":false},
+              {"type":"build","section":"Build System","hidden":false},
+              {"type":"ci","section":"Continuous Integration","hidden":false}
+            ]
+
+  # Only run deployment if a new release was created
+  deploy:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    runs-on: ubuntu-latest
+    environment: prod
+    name: Build and Deploy Release
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+          lfs: false
+          ref: ${{ needs.release-please.outputs.tag_name }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Set up Node
+        uses: actions/setup-node@v4.0.2
+        with:
+          node-version: '20'
+      - name: Install dependencies
+        run: npm install --include=dev
+      - name: Build
+        run: npm run build
+        env:
+          NODE_ENV: production
+          VITE_AUCCTUS_BASE_RESOURCE_URL: https://api.aucctus.com
+          VITE_AUCCTUS_BASE_WS_URL: wss://api.aucctus.com
+          VITE_SECRET_KEY: ${{ secrets.VITE_SECRET_KEY }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          ENVIRONMENT: production
+      # upload all static assets w/ cache control
+      - name: Deploy assets to S3
+        run: aws s3 sync ./build/ s3://aucctus-react --cache-control 'public,max-age=31536000,immutable'
+      # overwrite index file with correct TTLs so latest changes are reflected immediately
+      - name: Deploy index to S3
+        run: aws s3 cp ./build/index.html s3://aucctus-react --cache-control 'public,max-age=60' 
