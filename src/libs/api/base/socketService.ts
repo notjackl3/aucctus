@@ -115,6 +115,10 @@ export class SocketService {
     this._ws = new WebSocket(url);
 
     this._ws.onopen = (event: Event) => {
+      if (this._isConnected) {
+        return;
+      }
+
       if (this.config.debug) {
         analytics.debug('WebSocket connected', event);
       }
@@ -167,6 +171,7 @@ export class SocketService {
             'WebSocket closed due to server internal error',
             closeEvent,
           );
+
           break;
 
         default:

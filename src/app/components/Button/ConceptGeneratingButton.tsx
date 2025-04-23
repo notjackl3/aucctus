@@ -1,31 +1,36 @@
-import { ConceptReportStatusBySection } from '@libs/api/types';
-import { FunctionComponent, useRef, useEffect, useCallback } from 'react';
 import images from '@assets/img';
 import { ComponentTooltip } from '@components';
-import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
 import useGenerationStatus from '@hooks/concepts/generation-status.hook';
+import { ConceptReportStatusBySection } from '@libs/api/types';
+import * as browser from '@libs/utils/browser';
+import { FunctionComponent, useCallback, useEffect, useRef } from 'react';
+import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
 
 type ConceptGeneratingButtonProps = {
-  onClick: (e: React.MouseEvent<HTMLButtonElement>) => void;
-  disabled?: boolean;
   reportStatusBySection?: ConceptReportStatusBySection;
   dateReportStarted?: string;
   dateReportCompleted?: string;
 };
 
+const SCALE_FACTOR = 1.6;
+
 const ConceptGeneratingButton: FunctionComponent<
   ConceptGeneratingButtonProps
-> = ({
-  onClick,
-  disabled,
-  reportStatusBySection,
-  dateReportStarted,
-  dateReportCompleted,
-}) => {
+> = ({ reportStatusBySection, dateReportStarted, dateReportCompleted }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { completedCount, totalCount } = useGenerationStatus(
     reportStatusBySection,
   );
+
+  const videoConfig = browser.isBrowser('Safari')
+    ? {
+        src: images.generatingAnimated.mp4,
+        type: 'video/mp4',
+      }
+    : {
+        src: images.generatingAnimated.webm,
+        type: 'video/webm',
+      };
 
   const updatePlaybackSpeed = useCallback(() => {
     if (!videoRef.current) return;
@@ -55,25 +60,25 @@ const ConceptGeneratingButton: FunctionComponent<
       }
       hideDelay={0}
     >
-      <button
-        onClick={onClick}
-        disabled={disabled}
-        className='min-w-[150px] overflow-hidden'
-        aria-label='Generate concept'
-      >
+      <span className='relative flex h-12 w-40 items-center justify-center'>
         <video
           ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
-          className='h-full w-full origin-center transform object-cover'
-          style={{ transform: 'scale(1.75)' }}
+          className='absolute right-[-12px] top-0 h-full w-full origin-center transform object-cover'
+          style={{
+            transform: `scale(${SCALE_FACTOR})`,
+            WebkitTransform: `scale(${SCALE_FACTOR})`,
+            MozTransform: `scale(${SCALE_FACTOR})`,
+            OTransform: `scale(${SCALE_FACTOR})`,
+          }}
         >
-          <source src={images.generatingAnimated} type='video/webm' />
+          <source src={videoConfig.src} type={videoConfig.type} />
           Your browser does not support the video tag.
         </video>
-      </button>
+      </span>
     </ComponentTooltip>
   );
 };

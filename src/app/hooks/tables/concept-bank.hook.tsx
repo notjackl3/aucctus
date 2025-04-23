@@ -1,9 +1,12 @@
 import { Button, Table, Text } from '@components';
+import { toast } from '@components/Notification/toast';
 import {
+  doFullConceptInvalidation,
+  useConceptReportGenerate,
   useConcepts,
   useRetryConceptReport,
-  useConceptReportGenerate,
 } from '@hooks/query/concepts.hook';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
   ConceptSort,
   ConceptStatus,
@@ -24,11 +27,8 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { doFullConceptInvalidation } from '@hooks/query/concepts.hook';
 import { useQueryClient } from 'react-query';
-import { AucctusQueryKeys } from '@hooks/query/query-keys';
-import { toast } from '@components/Notification/toast';
+import { useNavigate } from 'react-router-dom';
 
 export interface IConceptFilterOptions {
   status: Set<ConceptStatus>;
@@ -297,7 +297,7 @@ export const useConceptBank = (
         maxSize: 90,
         enableResizing: true,
         cell: ({ row }) => (
-          <span className='m-auto flex h-full w-full items-center justify-end self-stretch align-middle'>
+          <span className='m-auto flex h-full w-full items-end justify-end self-stretch'>
             <Button.ConceptGenerate
               variant={row.original.reportStatusAggregate}
               onClick={handleGenerateConceptButton(row)}

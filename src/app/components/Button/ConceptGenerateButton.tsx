@@ -1,11 +1,11 @@
+import { ComponentTooltip, Icon, Loading } from '@components';
 import {
   ConceptReportStatus,
   ConceptReportStatusBySection,
 } from '@libs/api/types';
 import { FunctionComponent, ReactNode } from 'react';
-import { Icon, Loading, ComponentTooltip } from '@components';
-import ConceptGeneratingButton from './ConceptGeneratingButton';
 import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
+import ConceptGeneratingButton from './ConceptGeneratingButton';
 
 type ConceptRowButtonProps = {
   variant: ConceptReportStatus;
@@ -68,11 +68,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   // If in pending state, use the ConceptGeneratingButton component
   if (variant === 'pending') {
     return (
-      <ConceptGeneratingButton
-        onClick={onClick}
-        disabled={disabled}
-        reportStatusBySection={reportStatusBySection}
-      />
+      <ConceptGeneratingButton reportStatusBySection={reportStatusBySection} />
     );
   }
 
