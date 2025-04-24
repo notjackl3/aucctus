@@ -292,9 +292,9 @@ export const useConceptBank = (
         id: 'actions',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 90,
-        minSize: 90,
-        maxSize: 90,
+        size: 120,
+        minSize: 120,
+        maxSize: 120,
         enableResizing: true,
         cell: ({ row }) => (
           <span className='m-auto flex h-full w-full items-end justify-end self-stretch'>

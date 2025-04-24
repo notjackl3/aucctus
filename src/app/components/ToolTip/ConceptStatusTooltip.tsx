@@ -22,6 +22,13 @@ const formatDuration = (startDateStr: string, endDateStr?: string) => {
     const endDate = endDateStr ? new Date(endDateStr).getTime() : Date.now();
     const durationMs = endDate - startDate;
     const totalSeconds = Math.floor(durationMs / 1000);
+
+    // If the duration is less than 10 seconds and we have an explicit end date (completed section),
+    // display the simplified label
+    if (totalSeconds < 10 && !!endDateStr) {
+      return '<10s';
+    }
+
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}m ${seconds}s`;
@@ -113,7 +120,7 @@ const ConceptStatusTooltip: FunctionComponent<ConceptStatusTooltipProps> = ({
                       {SECTION_NAMES[sectionKey] || sectionKey}
                     </span>
                   </div>
-                  <div className='aucctus-text-sm aucctus-text-secondary'>
+                  <div className='aucctus-text-xs aucctus-text-secondary'>
                     {section.status === 'complete' &&
                     section.dateStarted &&
                     section.dateCompleted ? (
@@ -148,7 +155,7 @@ const ConceptStatusTooltip: FunctionComponent<ConceptStatusTooltipProps> = ({
 
           <div className='mt-2 flex justify-between'>
             <span className='aucctus-text-md'>{progressPercentage}%</span>
-            <div className='aucctus-text-md aucctus-text-secondary'>
+            <div className='aucctus-text-sm aucctus-text-secondary'>
               {dateReportStarted && dateReportCompleted && (
                 <span>
                   Took {formatDuration(dateReportStarted, dateReportCompleted)}

@@ -58,14 +58,14 @@ const ConceptGeneratingButton: FunctionComponent<
       }
       hideDelay={0}
     >
-      <span className='flex h-[62px] min-w-[140px] items-end justify-end bg-transparent'>
+      <span className='flex h-[62px] min-w-[150px] items-end justify-end bg-transparent'>
         <video
           ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
-          className='mr-[-2px] h-full w-full transform object-cover'
+          className='mr-[-8px] h-full w-full transform object-cover'
         >
           <source src={videoConfig.src} type={videoConfig.type} />
           Your browser does not support the video tag.
