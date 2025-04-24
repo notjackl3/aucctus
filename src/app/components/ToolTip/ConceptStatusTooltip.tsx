@@ -82,17 +82,15 @@ const ConceptStatusTooltip: FunctionComponent<ConceptStatusTooltipProps> = ({
   dateReportStarted,
   dateReportCompleted,
 }) => {
-  const { progressPercentage, estimatedTimeRemaining } = useGenerationStatus(
-    reportStatusBySection,
-  );
+  const { progressPercentage } = useGenerationStatus(reportStatusBySection);
 
   return (
     <Card.Detail
       cardClassName={cn(
         'shadow-lg',
-        'aucctus-bg-primary border aucctus-border-secondary rounded-xl p-4',
+        'aucctus-bg-primary border aucctus-border-secondary rounded-xl p-3',
       )}
-      headerClassName='aucctus-bg-primary border-b aucctus-border-secondary px-4 py-3'
+      headerClassName='aucctus-bg-primary border-b aucctus-border-secondary'
       title='Concept Generation Status'
       isHideFooter={true}
     >
@@ -151,20 +149,10 @@ const ConceptStatusTooltip: FunctionComponent<ConceptStatusTooltipProps> = ({
           <div className='mt-2 flex justify-between'>
             <span className='aucctus-text-md'>{progressPercentage}%</span>
             <div className='aucctus-text-md aucctus-text-secondary'>
-              {progressPercentage < 100 ? (
-                <>
-                  ETA:
-                  <span className='aucctus-text-md ml-1'>
-                    {estimatedTimeRemaining.minutes}m{' '}
-                    {estimatedTimeRemaining.seconds}s
-                  </span>
-                </>
-              ) : dateReportStarted && dateReportCompleted ? (
+              {dateReportStarted && dateReportCompleted && (
                 <span>
                   Took {formatDuration(dateReportStarted, dateReportCompleted)}
                 </span>
-              ) : (
-                <span className='aucctus-text-success-600'>Complete</span>
               )}
             </div>
           </div>

@@ -58,7 +58,7 @@ const ConceptGeneratingButton: FunctionComponent<
       }
       hideDelay={0}
     >
-      <span className='flex h-[62px] w-fit items-end justify-end bg-transparent'>
+      <span className='flex h-[62px] min-w-[140px] items-end justify-end bg-transparent'>
         <video
           ref={videoRef}
           autoPlay
