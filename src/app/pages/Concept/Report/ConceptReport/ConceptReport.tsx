@@ -134,7 +134,8 @@ const ConceptReport: FunctionComponent = () => {
           <div className='flex flex-row items-center justify-start'>
             <EditModeSwitcher
               containerClassName={cn({
-                'pointer-events-none select-text': concept?.isHistoricalVersion,
+                'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
+                  concept?.isHistoricalVersion,
               })}
               pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
               textFieldClassName='!text-3xl max-w-[600px]'
@@ -207,7 +208,8 @@ const ConceptReport: FunctionComponent = () => {
           <Container.TabView
             className=''
             tabContentClassName={cn({
-              'pointer-events-none select-text': concept?.isHistoricalVersion,
+              'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
+                concept?.isHistoricalVersion,
             })}
             tabs={CONCEPT_TABS.filter(
               (v) => !(v.label === 'Context' && !concept?.hasSeed),
