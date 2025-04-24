@@ -12,8 +12,6 @@ type ConceptGeneratingButtonProps = {
   dateReportCompleted?: string;
 };
 
-const SCALE_FACTOR = 1.6;
-
 const ConceptGeneratingButton: FunctionComponent<
   ConceptGeneratingButtonProps
 > = ({ reportStatusBySection, dateReportStarted, dateReportCompleted }) => {
@@ -60,20 +58,14 @@ const ConceptGeneratingButton: FunctionComponent<
       }
       hideDelay={0}
     >
-      <span className='relative flex h-12 w-40 items-center justify-center'>
+      <span className='flex h-[62px] w-fit items-end justify-end bg-transparent'>
         <video
           ref={videoRef}
           autoPlay
           loop
           muted
           playsInline
-          className='absolute right-[-12px] top-0 h-full w-full origin-center transform object-cover'
-          style={{
-            transform: `scale(${SCALE_FACTOR})`,
-            WebkitTransform: `scale(${SCALE_FACTOR})`,
-            MozTransform: `scale(${SCALE_FACTOR})`,
-            OTransform: `scale(${SCALE_FACTOR})`,
-          }}
+          className='mr-[-2px] h-full w-full transform object-cover'
         >
           <source src={videoConfig.src} type={videoConfig.type} />
           Your browser does not support the video tag.

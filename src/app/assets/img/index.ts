@@ -10,6 +10,7 @@ import customerProfile from './customer-profile.png';
 import deliveryNews from './delivery-news.png';
 import deliveryTrend from './delivery-trend.png';
 import generatingAnimatedMp4 from './generating-animated.mp4';
+import generatingAnimatedMov from './generating-animated.mov';
 import generatingAnimated from './generating-animated.webm';
 import link from './link.png';
 import readyToGenerateGradient from './ready-to-generate-gradient.png';
@@ -46,6 +47,7 @@ const images = {
   generatingAnimated: {
     webm: generatingAnimated,
     mp4: generatingAnimatedMp4,
+    mov: generatingAnimatedMov,
   },
   // User
   avatar,
