@@ -275,7 +275,7 @@ const ConceptReport: FunctionComponent = () => {
               }
               className='btn btn-bold btn-primary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
             >
-              Commit
+              Revert
             </button>
             <button
               onClick={() => cancelConceptVersionRevert(conceptUuid!)}
