@@ -32,7 +32,7 @@ class Telemetry {
 
   constructor(config?: ITelemetryConfig) {
     this.config = {
-      enableDebug: import.meta.env.DEV,
+      enableDebug: __ENVIRONMENT__ === 'development',
       logger: {
         debug: console.debug.bind(console),
         log: console.log.bind(console),
