@@ -1,5 +1,5 @@
 import { Icon } from '@components';
-import { useConceptUpdate } from '@hooks/query/concepts.hook';
+import { useConceptReportGenerate } from '@hooks/query/concepts.hook';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
@@ -119,8 +119,8 @@ const PostGenerateQuestionDisplay: React.FC<
     return generatedConcepts[draftSeedUuid];
   }, [generatedConcepts, draftSeedUuid]);
 
-  const { mutate: updateConcept, isLoading: isUpdatingConcept } =
-    useConceptUpdate();
+  const { mutate: generateConceptReport, isLoading: isGeneratingConcept } =
+    useConceptReportGenerate();
 
   useQuestionIconLine(
     questionIconRef,
@@ -184,38 +184,32 @@ const PostGenerateQuestionDisplay: React.FC<
 
   const handleGenerateReport = useCallback(() => {
     if (activeGeneratedConcept) {
-      updateConcept(
-        {
-          uuid: activeGeneratedConcept.uuid,
-          status: 'ideating',
-        },
-        {
-          onSuccess: () => {
-            dispatchAnimationEvent('fade', () => {
-              const updatedConcept = { ...activeGeneratedConcept };
-              updatedConcept.isGenerating = true;
-              updateGeneratedConcept(draftSeedUuid, updatedConcept);
+      generateConceptReport(activeGeneratedConcept.uuid, {
+        onSuccess: () => {
+          dispatchAnimationEvent('fade', () => {
+            const updatedConcept = { ...activeGeneratedConcept };
+            updatedConcept.isGenerating = true;
+            updateGeneratedConcept(draftSeedUuid, updatedConcept);
 
-              // Find next non-generated concept
-              const nextNonGeneratedConcept = currentGeneratedConcepts.find(
-                (concept) =>
-                  !concept.isGenerating && concept.uuid !== updatedConcept.uuid,
-              );
+            // Find next non-generated concept
+            const nextNonGeneratedConcept = currentGeneratedConcepts.find(
+              (concept) =>
+                !concept.isGenerating && concept.uuid !== updatedConcept.uuid,
+            );
 
-              setActiveGeneratedConcept(
-                nextNonGeneratedConcept ?? updatedConcept,
-              );
-            });
-          },
-          onError: () => {
-            toast.error('Failed to generate report');
-          },
+            setActiveGeneratedConcept(
+              nextNonGeneratedConcept ?? updatedConcept,
+            );
+          });
         },
-      );
+        onError: () => {
+          toast.error('Failed to generate report');
+        },
+      });
     }
   }, [
     activeGeneratedConcept,
-    updateConcept,
+    generateConceptReport,
     setActiveGeneratedConcept,
     updateGeneratedConcept,
     draftSeedUuid,
@@ -315,7 +309,7 @@ const PostGenerateQuestionDisplay: React.FC<
           )}
 
         <PointerEventMask showMask={showMask} />
-        <LoadingMask isLoading={isUpdatingConcept} />
+        <LoadingMask isLoading={isGeneratingConcept} />
       </div>
     </>
   );

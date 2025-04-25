@@ -112,6 +112,16 @@ export interface IConceptOverview extends IBaseConceptEntity {
   financialProjection?: IFinancialProjection;
 }
 
+export interface ICustomerJob {
+  description: string;
+  importance: number;
+}
+
+export interface ICustomerPain {
+  description: string;
+  importance: number;
+}
+
 export interface ICustomerProfile extends IBaseConceptEntity {
   name: string;
   description: string;
@@ -124,8 +134,8 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   incomeUpper: number;
   incomeLower: number;
   incomeRange: string;
-  jobs: string[];
-  pains: string[];
+  jobs: ICustomerJob[];
+  pains: ICustomerPain[];
   quotes: string[];
   avatarUrl?: string;
 }

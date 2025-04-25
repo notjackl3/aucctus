@@ -134,7 +134,8 @@ const ConceptReport: FunctionComponent = () => {
           <div className='flex flex-row items-center justify-start'>
             <EditModeSwitcher
               containerClassName={cn({
-                'pointer-events-none': concept?.isHistoricalVersion,
+                'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
+                  concept?.isHistoricalVersion,
               })}
               pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
               textFieldClassName='!text-3xl max-w-[600px]'
@@ -207,7 +208,8 @@ const ConceptReport: FunctionComponent = () => {
           <Container.TabView
             className=''
             tabContentClassName={cn({
-              'pointer-events-none': concept?.isHistoricalVersion,
+              'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
+                concept?.isHistoricalVersion,
             })}
             tabs={CONCEPT_TABS.filter(
               (v) => !(v.label === 'Context' && !concept?.hasSeed),
@@ -249,12 +251,12 @@ const ConceptReport: FunctionComponent = () => {
             <button
               onClick={() =>
                 openModal(Modal.Confirmation, {
-                  title: 'Are you sure you want to commit the revert?',
+                  title: 'Are you sure you want to revert to this version?',
                   subtitle:
                     'Once reverted, you will lose any current changes you have made to this concept.\nWARNING: This action cannot be undone!',
                   actions: [
                     {
-                      title: 'Commit',
+                      title: 'Revert',
                       onClick: () =>
                         commitConceptVersionRevert(conceptUuid!, {
                           onSuccess: () => {
@@ -275,7 +277,7 @@ const ConceptReport: FunctionComponent = () => {
               }
               className='btn btn-bold btn-primary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
             >
-              Commit
+              Revert
             </button>
             <button
               onClick={() => cancelConceptVersionRevert(conceptUuid!)}

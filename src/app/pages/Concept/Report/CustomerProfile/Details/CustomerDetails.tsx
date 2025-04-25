@@ -2,7 +2,7 @@ import { Card, Loading } from '@components';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import useStore from '@stores/store';
-import { FunctionComponent, useEffect, useRef, useState } from 'react';
+import { FunctionComponent, useEffect, useRef } from 'react';
 import { cn } from '@libs/utils/react';
 import CustomerOverview from './CustomerOverview';
 import CustomerConversation from './CustomerConversation';
@@ -17,8 +17,8 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   className = '',
 }) => {
   const { description, isLoading } = useEditCustomerProfile(profile.uuid);
-  const [overviewHeight, setOverviewHeight] = useState<number | null>(null);
   const overviewRef = useRef<HTMLDivElement>(null);
+  const conversationRef = useRef<HTMLDivElement>(null);
 
   const setCustomerProfileUuid = useStore(
     (state) => state.customerProfileConversations.setCustomerProfileUuid,
@@ -35,10 +35,11 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   // Measure the height of CustomerOverview after render
   useEffect(() => {
     const overviewElement = overviewRef.current;
-    if (overviewElement && !isLoading) {
+    const conversationElement = conversationRef.current;
+    if (overviewElement && conversationElement && !isLoading) {
       const updateHeight = () => {
         if (overviewElement) {
-          setOverviewHeight(overviewElement.offsetHeight);
+          conversationElement.style.maxHeight = `${overviewElement.offsetHeight}px`;
         }
       };
 
@@ -78,8 +79,8 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
             description={description}
           />
           <CustomerConversation
+            ref={conversationRef}
             profile={profile}
-            style={overviewHeight ? { maxHeight: `${overviewHeight}px` } : {}}
           />
         </div>
       )}
@@ -90,14 +91,14 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
           title={'Jobs to be Done'}
           icon={'clipboard'}
           field={'jobs'}
-          data={profile.jobs}
+          data={profile.jobs.map((job) => job.description)}
         />
         <Card.CustomerProfileContextList
           profileUuid={profile.uuid}
           title={'Pains'}
           icon={'user-group'}
           field={'pains'}
-          data={profile.pains}
+          data={profile.pains.map((pain) => pain.description)}
         />
         <Card.CustomerProfileContextList
           profileUuid={profile.uuid}

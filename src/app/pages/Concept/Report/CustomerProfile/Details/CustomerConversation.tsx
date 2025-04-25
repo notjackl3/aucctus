@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useEffect, useCallback } from 'react';
+import React, { useMemo, useRef, useEffect, useCallback, forwardRef } from 'react';
 import { cn } from '@libs/utils/react';
 import { ICustomerProfile } from '@libs/api/types';
 import Icon from '@components/Icon/Icon/Icon';
@@ -17,11 +17,11 @@ interface CustomerConversationProps {
   style?: React.CSSProperties;
 }
 
-const CustomerConversation: React.FC<CustomerConversationProps> = ({
+const CustomerConversation = forwardRef<HTMLDivElement, CustomerConversationProps>(({
   profile,
   className = '',
   style = {},
-}) => {
+}, ref) => {
   // Store hooks - group related state together
   const {
     sendMessage,
@@ -115,7 +115,7 @@ const CustomerConversation: React.FC<CustomerConversationProps> = ({
 
   return (
     <div
-      ref={containerRef}
+      ref={ref || containerRef}
       className={cn(
         'aucctus-bg-primary aucctus-border-primary w-full rounded-lg border shadow-sm',
         'flex flex-col',
@@ -207,6 +207,9 @@ const CustomerConversation: React.FC<CustomerConversationProps> = ({
       </div>
     </div>
   );
-};
+});
+
+// Add display name for better debugging
+CustomerConversation.displayName = 'CustomerConversation';
 
 export default CustomerConversation;
