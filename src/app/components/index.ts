@@ -18,7 +18,8 @@ import { toast } from './Notification/toast';
 // Components
 import Avatar from './Avatar';
 import BetaDisclaimer from './BetaDisclaimer';
-import Loading from './Loading';
+import Loading from './Loading/Loading';
+import Progress from './Loading/Progress';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
 import Tooltip from './ToolTip/Tooltip';
 
@@ -37,6 +38,7 @@ export {
   Input,
   Legend,
   Loading,
+  Progress,
   Modal,
   Select,
   Table,

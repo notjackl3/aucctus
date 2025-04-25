@@ -81,6 +81,10 @@ export class ConceptApi extends ApiService {
     return this.post<IConcept>(endpoints.conceptReportRetry(uuid));
   }
 
+  generateReport(uuid: string) {
+    return this.post<IConcept>(endpoints.conceptReportGenerate(uuid));
+  }
+
   getSeedDraftAnswers(uuid: string) {
     return this.get<IncubationAnswer[]>(
       endpoints.conceptIncubationSeedUuidAnswers(uuid),

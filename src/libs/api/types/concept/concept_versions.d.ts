@@ -11,6 +11,7 @@ export interface IConceptVersion {
   conceptVersionNumber?: number;
   conceptAffectedSections?: string[];
   createdTimestamp?: number;
+  editSummary?: string;
 }
 
 export interface IConceptVersionList {

@@ -88,6 +88,14 @@ export interface IAiEditingSuggestionsEvent extends BaseSocketEvent {
   timestamp?: number;
 }
 
+export interface IAIEditingStartedMessage extends BaseSocketEvent {
+  type: 'ai.editing.started';
+  conceptUuid: string;
+  userUuid: string;
+  userFirstName: string;
+  userLastName: string;
+}
+
 // ==========================================
 // Customer Profile Related Messages
 // ==========================================
@@ -243,6 +251,7 @@ export type InboundSocketEvent<C = {}> =
   | ICustomerProfileInboundErrorEvent
   | IAiEditingSuggestionsStreamEvent
   | AiEditingChatStreamEvent
-  | CustomerProfileStreamEvent;
+  | CustomerProfileStreamEvent
+  | IAIEditingStartedMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

@@ -19,7 +19,7 @@
     },
     {
       "src": "favicon.png",
-      "sizes": "any",
+      "sizes": "45x45",
       "type": "image/png"
     }
   ],

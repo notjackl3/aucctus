@@ -2,15 +2,19 @@ import { BetaDisclaimer, Icon, Modal } from '@components';
 import AiIntroMessage from '@components/AiInteraction/AiIntroMessage';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
+import { toast } from '@components/Notification/toast';
 import { useModal } from '@context/ModalContextProvider';
-import { useConceptAiEditing } from '@hooks/query/concepts.hook';
+import {
+  doFullConceptInvalidation,
+  useConceptAiEditing,
+} from '@hooks/query/concepts.hook';
 import { IConceptReportEdit } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import React, { useEffect, useState } from 'react';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { animated, useTransition } from 'react-spring';
-import { toast } from '@components/Notification/toast';
 import AiEditingConversation from './AiEditingConversation';
 
 interface AiEditingCardProps {
@@ -41,6 +45,8 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
   const clearConversation = useStore(
     (state) => state.aiEditing.clearConversation,
   );
+
+  const queryClient = useQueryClient();
 
   const isThinking = useStore((state) => state.aiEditing.isAucctusThinking);
   const thinkingMessage = useStore((state) => state.aiEditing.thinkingMessage);
@@ -148,9 +154,11 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                 title: 'Proceed',
                 variant: 'primary',
                 onClick: () => {
+                  const editConceptUuid = conceptUuid!;
+
                   aiEditConcept(
                     {
-                      concept_uuid: conceptUuid!,
+                      concept_uuid: editConceptUuid,
                       session_id: sessionId!,
                       edit: aiEditSubmission,
                     },
@@ -161,7 +169,10 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                           'Concept update started',
                           'This may take up to 10 minutes. You can navigate away.',
                         );
-                        navigate(AppPath.ConceptBank);
+                        doFullConceptInvalidation(queryClient, editConceptUuid);
+                        navigate(AppPath.ConceptBank, {
+                          replace: true,
+                        });
                         closeModal();
                       },
                     },

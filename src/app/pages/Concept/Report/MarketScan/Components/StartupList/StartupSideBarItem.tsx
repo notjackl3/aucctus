@@ -1,5 +1,5 @@
 import images from '@assets/img';
-import { Button, Icon } from '@components';
+import { Badge, Button, Icon } from '@components';
 import { IStartup } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React from 'react';
@@ -60,6 +60,19 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
       <p className='aucctus-text-xs aucctus-text-secondary line-clamp-3'>
         {startup.overview}
       </p>
+      {startup.hasCompetitiveProduct !== undefined && (
+        <Badge.Default
+          classNameLabel={cn({
+            'aucctus-text-warning-primary': startup.hasCompetitiveProduct,
+            'aucctus-text-primary': !startup.hasCompetitiveProduct,
+          })}
+          value={
+            startup.hasCompetitiveProduct
+              ? 'Competitive Product'
+              : 'No Competitive Product'
+          }
+        />
+      )}
     </div>
   );
 };

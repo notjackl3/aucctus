@@ -4,9 +4,9 @@ import {
   Chart,
   Header,
   Icon,
+  Loading,
   Modal,
   Table,
-  Loading,
 } from '@components';
 import { Point } from '@components/Charts/ScatterChart/ScatterChart';
 import { useModal } from '@context/ModalContextProvider';
@@ -22,7 +22,7 @@ import {
 } from '@libs/utils/concepts';
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
-import { IConceptReportContext } from './ConceptReport';
+import { IConceptReportContext } from './ConceptReport/ConceptReport';
 
 const KeyAssumptions: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();

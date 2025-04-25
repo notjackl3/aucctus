@@ -64,7 +64,7 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
         <div className='flex flex-row items-center gap-2'>
           <Badge.Default
             value={`V${version.conceptVersionNumber}`}
-            classNameBadge='aucctus-border-secondary border items-center justify-center'
+            classNameBadge='aucctus-border-secondary border rounded-lg items-center justify-center'
             classNameLabel='aucctus-text-secondary'
           />
           <span className='aucctus-text-secondary aucctus-text-sm items-center justify-center'>
@@ -82,6 +82,7 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
         {version.comment && (
           <VersionComment
             comment={version.comment}
+            editSummary={version.editSummary}
             sections={version.conceptAffectedSections}
           />
         )}

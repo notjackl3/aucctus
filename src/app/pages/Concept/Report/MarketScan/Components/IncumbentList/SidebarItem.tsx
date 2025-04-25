@@ -63,7 +63,6 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
       <Badge.Default
         classNameBadge={cn('aucctus-bg-secondary', {
           'aucctus-bg-warning-primary': incumbent.hasCompetitiveProduct,
-          'aucctus-bg-opacity-75': incumbent.hasCompetitiveProduct,
           'aucctus-bg-secondary': !incumbent.hasCompetitiveProduct,
         })}
         classNameLabel={cn({

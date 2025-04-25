@@ -6,7 +6,7 @@ import { IUser } from '../../../../libs/api/types';
 import defaultAvatar from '../../../assets/img/avatar.png';
 import Icon from '../../../components/Icon/Icon/Icon';
 import InputField from '../../../components/Input/InputField/InputField';
-import Loading from '../../../components/Loading';
+import { Loading } from '@components';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import { useUpdateUser } from '../../../hooks/query/account.hook';
 

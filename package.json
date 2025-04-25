@@ -22,7 +22,9 @@
     "generate-sprite": "npm run generate-sprite-svg && npm run generate-icon-types && npm run icon-hash-buster",
     "analyze": "ANALYZE=true NODE_ENV=production vite build",
     "analyze-bundle": "NODE_ENV=production npx vite-bundle-visualizer -c vite.config.ts --open",
-    "check-deps": "npx depcheck"
+    "check-deps": "npx depcheck",
+    "release": "node scripts/prepare-release.js",
+    "release-github": "node scripts/github-release.js"
   },
   "dependencies": {
     "@dhmk/zustand-lens": "^5.0.0",

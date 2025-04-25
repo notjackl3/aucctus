@@ -1,11 +1,16 @@
 /// <reference types="vite/client" />
 /// <reference types="vite-plugin-svgr/client" />
+/// <reference types="vitest/globals" />
 
 interface ImportMetaEnv {
   readonly VITE_AUCCTUS_BASE_RESOURCE_URL: string;
   readonly VITE_AUCCTUS_BASE_WS_URL: string;
   readonly VITE_SENTRY_DNS: string;
   readonly VITE_SECRET_KEY: string;
+  readonly VITE_API_BASE_URL: string;
+  readonly VITE_AUTH_STS_URL: string;
+  readonly VITE_AUTH_CLIENT_ID: string;
+  readonly VITE_AUTH_REDIRECT_URL: string;
 }
 
 interface ImportMeta {
@@ -19,6 +24,11 @@ declare module '*.svg' {
     React.SVGProps<SVGSVGElement> & { title?: string }
   >;
 
+  const src: string;
+  export default src;
+}
+
+declare module '*.webm' {
   const src: string;
   export default src;
 }

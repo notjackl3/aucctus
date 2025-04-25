@@ -67,15 +67,35 @@ export interface IGeneratedConcept extends IGeneratedConceptBase {
   generationOrder?: number;
 }
 
+/**
+ * Represents the status of a specific section within a concept report.
+ */
+export interface IConceptReportStatusSection {
+  status: ConceptReportStatus; // Reusing the existing ConceptReportStatus type seems appropriate here
+  dateStarted: string;
+  dateCompleted: string;
+}
+
+/**
+ * Represents the status of the report generation for each section.
+ * The keys are the names of the sections.
+ */
+export type ConceptReportStatusBySection = {
+  [sectionName: string]: IConceptReportStatusSection;
+};
+
 export interface IConcept extends IBaseConceptEntity {
   uuid: string;
   title: string;
   description: string;
   identifier: string;
-  reportStatus: ConceptReportStatus;
+  reportStatusAggregate: ConceptReportStatus;
+  reportStatusBySection: ConceptReportStatusBySection; // Use the new type here
+  dateReportStarted: string;
+  dateReportCompleted: string;
   status: ConceptStatus;
   category: ConceptCategory;
-  createdBy: IUser;
+  createdBy: IUser; // Assuming IUser is defined elsewhere
   hasSeed: boolean;
   seedUuid: string;
   isHistoricalVersion: boolean;

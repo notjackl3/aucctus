@@ -60,7 +60,9 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
     keepPreviousData: true, // Keep previous data while loading new data
     refetchInterval: (data?: IConceptPage) => {
       return data &&
-        data.results.some((concept) => concept.reportStatus === 'pending')
+        data.results.some(
+          (concept) => concept.reportStatusAggregate === 'pending',
+        )
         ? 5000
         : false;
     },
@@ -444,6 +446,17 @@ export const useRetryConceptReport = () => {
   );
 };
 
+/**
+ * Custom hook for generating a concept report.
+ * @returns The result of the useMutation hook.
+ */
+export const useConceptReportGenerate = () => {
+  return createConceptMutation()<IConcept, IFormError<IConcept>, string>(
+    async (conceptUuid: string) =>
+      await api.concept.generateReport(conceptUuid),
+  );
+};
+
 // Specific hooks using the generic one
 /**
  * Custom hook for updating the concept overview.
@@ -528,7 +541,10 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 //   );
 // };
 
-const doRevertInvalidation = (queryClient: QueryClient, uuid: string) => {
+export const doFullConceptInvalidation = (
+  queryClient: QueryClient,
+  uuid: string,
+) => {
   Promise.all([
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.concept, uuid],
@@ -653,7 +669,7 @@ export const useRevertConceptVersion = () => {
       payload: { versionId: number };
     }) => await api.concept.revertConceptVersion(params.uuid, params.payload),
     onSuccess: (_, params) => {
-      doRevertInvalidation(queryClient, params.uuid);
+      doFullConceptInvalidation(queryClient, params.uuid);
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -673,7 +689,7 @@ export const useCommitConceptVersionRevert = () => {
     mutationFn: async (uuid: string) =>
       await api.concept.commitConceptVersionRevert(uuid),
     onSuccess: (_, uuid) => {
-      doRevertInvalidation(queryClient, uuid);
+      doFullConceptInvalidation(queryClient, uuid);
       toast.success('Concept version revert committed successfully');
     },
     onError: (e) => {
@@ -694,7 +710,7 @@ export const useCancelConceptVersionRevert = () => {
     mutationFn: async (uuid: string) =>
       await api.concept.cancelConceptVersionRevert(uuid),
     onSuccess: (_, uuid) => {
-      doRevertInvalidation(queryClient, uuid);
+      doFullConceptInvalidation(queryClient, uuid);
       toast.success('Concept version revert canceled');
     },
     onError: (e) => {

@@ -1,9 +1,12 @@
 import { Button, Table, Text } from '@components';
+import { toast } from '@components/Notification/toast';
 import {
+  doFullConceptInvalidation,
+  useConceptReportGenerate,
   useConcepts,
-  useConceptUpdate,
   useRetryConceptReport,
 } from '@hooks/query/concepts.hook';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
   ConceptSort,
   ConceptStatus,
@@ -24,6 +27,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import React, { useMemo } from 'react';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 
 export interface IConceptFilterOptions {
@@ -60,8 +64,9 @@ export const useConceptBank = (
   ) => void,
 ) => {
   const navigate = useNavigate();
-  const { mutate: updateConcept } = useConceptUpdate();
+  const { mutate: generateConceptReport } = useConceptReportGenerate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
+  const queryClient = useQueryClient();
 
   // Use refs for values that don't need to trigger re-renders when updated internally
   const filterOptionsRef = React.useRef<IConceptFilterOptions>(INITIAL_FILTER);
@@ -137,25 +142,42 @@ export const useConceptBank = (
   const handleGenerateConceptButton = React.useCallback(
     (row: Row<IConcept>) =>
       (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        const reportStatus = row.original.reportStatus;
+        const reportStatus = row.original.reportStatusAggregate;
         switch (reportStatus) {
           case 'notStarted':
-            updateConcept({
-              uuid: row.original.uuid,
-              status: 'ideating',
+            generateConceptReport(row.original.uuid, {
+              onSuccess: () => {
+                // Manually invalidate the concepts query to trigger the polling mechanism
+                queryClient.invalidateQueries({
+                  queryKey: [AucctusQueryKeys.concepts],
+                });
+              },
             });
             break;
           case 'error':
-            retryConceptReport(row.original.uuid);
+            retryConceptReport(row.original.uuid, {
+              onSuccess: () => {
+                // Trigger toast notification
+                toast.warning(
+                  'Report retry started',
+                  'The system will now process your request. This may take a few minutes.',
+                );
+                // Manually invalidate the concepts query to trigger the polling mechanism
+                queryClient.invalidateQueries({
+                  queryKey: [AucctusQueryKeys.concepts],
+                });
+              },
+            });
             break;
           case 'complete':
+            doFullConceptInvalidation(queryClient, row.original.uuid);
             navigate(AppPath.ConceptOverview.replace(':id', row.original.uuid));
             break;
           default:
             e.stopPropagation();
         }
       },
-    [navigate, retryConceptReport, updateConcept],
+    [navigate, retryConceptReport, generateConceptReport, queryClient],
   );
 
   const handleSortingChange: OnChangeFn<SortingState> = React.useCallback(
@@ -270,15 +292,18 @@ export const useConceptBank = (
         id: 'actions',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 90,
-        minSize: 90,
-        maxSize: 90,
+        size: 120,
+        minSize: 120,
+        maxSize: 120,
         enableResizing: true,
         cell: ({ row }) => (
-          <span className='m-auto flex h-full w-full items-center justify-end self-stretch align-middle'>
+          <span className='m-auto flex h-full w-full items-end justify-end self-stretch'>
             <Button.ConceptGenerate
-              variant={row.original.reportStatus}
+              variant={row.original.reportStatusAggregate}
               onClick={handleGenerateConceptButton(row)}
+              reportStatusBySection={row.original.reportStatusBySection}
+              dateReportStarted={row.original.dateReportStarted}
+              dateReportCompleted={row.original.dateReportCompleted}
             />
           </span>
         ),

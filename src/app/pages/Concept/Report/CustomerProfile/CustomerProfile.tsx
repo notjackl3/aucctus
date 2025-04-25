@@ -1,6 +1,6 @@
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
-import Loading from '@components/Loading';
+import { Loading } from '@components';
 import {
   useConceptCustomerProfiles,
   useDeleteCustomerProfile,
