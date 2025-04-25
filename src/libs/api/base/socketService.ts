@@ -281,7 +281,12 @@ export class SocketService {
       ].includes(code)
     ) {
       try {
-        await this.api.refreshToken();
+        // Attempt to refresh the token
+        if (this.api.pendingRefresh) {
+          await this.api.pendingRefresh;
+        } else {
+          await this.api.refreshToken();
+        }
         return true;
       } catch (error) {
         analytics.error('Failed to refresh token', error);

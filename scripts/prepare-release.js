@@ -5,6 +5,7 @@ const {
   runCommand,
   prompt,
   checkReleasePleaseCLI,
+  buildReleasePleaseFlags,
   checkBranch,
   parseArguments,
   rl,
