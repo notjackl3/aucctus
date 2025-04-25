@@ -222,7 +222,7 @@ export const useConceptBank = (
             <Text.Collapsible
               title={info.getValue()}
               maxDescriptionHeight={35}
-              description={info.row.original.description}
+              description={info.row.original.summary}
             />
           </div>
         ),

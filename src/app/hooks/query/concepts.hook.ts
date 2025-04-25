@@ -1,3 +1,4 @@
+import { toast } from '@components';
 import api from '@libs/api';
 import {
   EditConceptReportRequest,
@@ -6,7 +7,6 @@ import {
 } from '@libs/api/concepts';
 import {
   IConcept,
-  IConceptOverview,
   IConceptPage,
   IConceptQueryOptions,
   IConceptSeed,
@@ -29,16 +29,12 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
-import { toast } from '@components';
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
   uuid: string;
 };
-export type PartialConceptOverviewWithRequiredUuid =
-  Partial<IConceptOverview> & { uuid: string };
-
 /**
  * Custom hook for fetching list concepts.
  * @param queryOptions - Options for filtering, sorting, and pagination
@@ -305,22 +301,6 @@ export const useSaveGeneratedConcepts = (seedUuid: string) => {
 };
 
 /**
- * Custom hook for fetching a concept overview by their concept UUID.
- * @param uuid - The UUID of the concept to fetch.
- * @returns An object containing the query result and the concept overview data.
- */
-export const useConceptOverview = (uuid: string) => {
-  const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptOverview, uuid],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    queryFn: async () => await api.concept.getConceptOverview(uuid),
-    enabled: !!uuid,
-  });
-
-  return { ...query, overview: query.data };
-};
-
-/**
  * Custom hook for fetching a concept market scan by their Concept UUID.
  * @param uuid - The UUID of the concept.
  * @returns An object containing the query result and the concept market scan data.
@@ -454,20 +434,6 @@ export const useConceptReportGenerate = () => {
   return createConceptMutation()<IConcept, IFormError<IConcept>, string>(
     async (conceptUuid: string) =>
       await api.concept.generateReport(conceptUuid),
-  );
-};
-
-// Specific hooks using the generic one
-/**
- * Custom hook for updating the concept overview.
- *
- * @param uuid - The UUID of the concept.
- * @returns The result of the generic concept update.
- */
-export const useConceptOverviewUpdate = (conceptUuid: string) => {
-  return useGenericConceptMutate<IConceptOverview>(
-    (data) => api.concept.updateConceptOverview(data.uuid, data),
-    [[AucctusQueryKeys.conceptOverview, conceptUuid]],
   );
 };
 

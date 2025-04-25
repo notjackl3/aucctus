@@ -71,6 +71,10 @@ export class SocketService {
   }
 
   public set accessToken(token: string | undefined) {
+    if (token === this._accessToken) {
+      return;
+    }
+
     this._accessToken = token;
     (async () => {
       if (this.deferredConnect) {
@@ -81,7 +85,7 @@ export class SocketService {
         this._ws?.close();
       }
 
-      if (token) {
+      if (token && this._ws?.readyState === WebSocket.CLOSED) {
         this.deferredConnect = this.connect();
         await this.deferredConnect;
       }

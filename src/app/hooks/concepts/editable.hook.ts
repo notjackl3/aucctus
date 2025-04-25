@@ -1,3 +1,4 @@
+import { toast } from '@components';
 import {
   IBusinessModel,
   IFinancialMarketSizeItem,
@@ -9,10 +10,8 @@ import { AxiosError } from 'axios';
 import React, { useCallback, useEffect, useState } from 'react';
 import { MutateOptions, UseMutateFunction } from 'react-query';
 import { useParams } from 'react-router-dom';
-import { toast } from '@components';
 import {
   IConcept,
-  IConceptOverview,
   ICustomerProfile,
   IFinancialProjection,
   IFormError,
@@ -21,8 +20,6 @@ import {
   useConcept,
   useConceptCustomerProfile,
   useConceptMarketScan,
-  useConceptOverview,
-  useConceptOverviewUpdate,
   useConceptUpdate,
   useCustomerProfileUpdate,
   useFinancialProjection,
@@ -204,6 +201,7 @@ export function useEditConcept() {
   const { id: conceptUuid = '' } = useParams();
   const { concept } = useConcept(conceptUuid);
   const { mutate: updateConcept } = useConceptUpdate();
+  const validationOptions: IValidationOptions = { maxLength: 250 };
 
   const titleField = useEditableField<string, IConcept>({
     initialValue: concept?.title || '',
@@ -212,54 +210,43 @@ export function useEditConcept() {
     identifier: conceptUuid,
   });
 
-  const descriptionField = useEditableField<string, IConcept>({
-    initialValue: concept?.description || '',
-    fieldName: 'description',
+  const summaryField = useEditableField<string, IConcept>({
+    initialValue: concept?.summary || '',
+    fieldName: 'summary',
     updateMutation: updateConcept,
     identifier: conceptUuid,
   });
 
+  const overviewField = useEditableField<string, IConcept>({
+    initialValue: concept?.overview || '',
+    fieldName: 'overview',
+    updateMutation: updateConcept,
+    identifier: conceptUuid,
+  });
+
+  const valueProposition = useEditableField<string, IConcept>({
+    initialValue: concept?.valueProposition || '',
+    fieldName: 'valueProposition',
+    updateMutation: updateConcept,
+    identifier: conceptUuid,
+    validation: validationOptions,
+  });
+
+  const problemStatement = useEditableField<string, IConcept>({
+    initialValue: concept?.problemStatement || '',
+    fieldName: 'problemStatement',
+    updateMutation: updateConcept,
+    identifier: conceptUuid,
+    validation: validationOptions,
+  });
+
   return {
     title: titleField,
-    description: descriptionField,
-  };
-}
+    summary: summaryField,
+    overview: overviewField,
 
-export function useEditOverview() {
-  const { id: conceptUuid = '' } = useParams();
-  const { overview } = useConceptOverview(conceptUuid);
-  const { mutate: updateConceptOverview } =
-    useConceptOverviewUpdate(conceptUuid);
-  const validationOptions: IValidationOptions = { maxLength: 250 };
-
-  const text = useEditableField<string, IConceptOverview>({
-    initialValue: overview?.text || '',
-    fieldName: 'text',
-    updateMutation: updateConceptOverview,
-    identifier: overview?.uuid || '',
-    validation: { maxLength: 1500 },
-  });
-
-  const valueProposition = useEditableField<string, IConceptOverview>({
-    initialValue: overview?.valueProposition || '',
-    fieldName: 'valueProposition',
-    updateMutation: updateConceptOverview,
-    identifier: overview?.uuid || '',
-    validation: validationOptions,
-  });
-
-  const problemStatement = useEditableField<string, IConceptOverview>({
-    initialValue: overview?.problemStatement || '',
-    fieldName: 'problemStatement',
-    updateMutation: updateConceptOverview,
-    identifier: overview?.uuid || '',
-    validation: validationOptions,
-  });
-
-  return {
-    text,
-    problemStatement,
     valueProposition,
+    problemStatement,
   };
 }
 

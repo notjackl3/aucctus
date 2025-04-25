@@ -5,7 +5,6 @@ import {
   ConceptIncubationQuestion,
   ConceptStatus,
   IConcept,
-  IConceptOverview,
   IConceptPage,
   IConceptQueryOptions,
   IConceptReportEdit,
@@ -182,17 +181,6 @@ export class ConceptApi extends ApiService {
 
   deleteConcept(uuid: string) {
     return this.delete<IConcept>(endpoints.conceptUuid(uuid));
-  }
-
-  getConceptOverview(uuid: string) {
-    return this.get<IConceptOverview>(endpoints.conceptOverview(uuid));
-  }
-
-  updateConceptOverview(uuid: string, overview: Partial<IConceptOverview>) {
-    return this.patch<IConceptOverview, Partial<IConceptOverview>>(
-      endpoints.conceptOverviewUuid(uuid),
-      overview,
-    );
   }
 
   getConceptCustomerProfiles(uuid: string) {

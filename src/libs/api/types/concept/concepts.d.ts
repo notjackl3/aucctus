@@ -87,7 +87,10 @@ export type ConceptReportStatusBySection = {
 export interface IConcept extends IBaseConceptEntity {
   uuid: string;
   title: string;
-  description: string;
+  summary: string;
+  overview: string;
+  valueProposition: string;
+  problemStatement?: string;
   identifier: string;
   reportStatusAggregate: ConceptReportStatus;
   reportStatusBySection: ConceptReportStatusBySection; // Use the new type here
@@ -100,16 +103,6 @@ export interface IConcept extends IBaseConceptEntity {
   seedUuid: string;
   isHistoricalVersion: boolean;
   conceptVersionId: number;
-}
-
-export interface IConceptOverview extends IBaseConceptEntity {
-  text: string;
-  valueProposition: string;
-  problemStatement?: string;
-
-  // TODO: Remove and use API instead.
-  persona?: ICustomerProfile;
-  financialProjection?: IFinancialProjection;
 }
 
 export interface ICustomerProfile extends IBaseConceptEntity {
