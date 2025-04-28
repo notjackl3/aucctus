@@ -210,3 +210,24 @@ export function getMarketMetricTitle(metricType: MarketMetricType) {
   };
   return marketMetricTitleObj[metricType];
 }
+
+/**
+ * Returns a readable display name for a concept status
+ *
+ * @param status - The concept status
+ * @returns The formatted display name for the status
+ */
+export function getConceptStatusDisplayName(status: ConceptStatus): string {
+  const statusDisplayNameMap: Record<ConceptStatus, string> = {
+    new: 'New',
+    ideating: 'Ideating',
+    inReview: 'In Review',
+    prototyping: 'Prototyping',
+    proofOfConcept: 'POC',
+    minimumViableProduct: 'MVP',
+    commercialized: 'Commercialized',
+    archived: 'Archived',
+  };
+
+  return statusDisplayNameMap[status];
+}

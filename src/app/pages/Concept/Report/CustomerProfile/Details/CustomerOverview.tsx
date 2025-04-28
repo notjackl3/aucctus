@@ -22,7 +22,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
       <div
         ref={ref}
         className={cn(
-          'aucctus-bg-primary aucctus-border-primary w-full rounded-lg border shadow-sm',
+          'aucctus-bg-primary aucctus-border-primary w-full rounded-lg border shadow-sm h-fit',
           className,
         )}
       >

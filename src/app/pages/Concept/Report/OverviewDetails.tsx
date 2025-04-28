@@ -1,7 +1,10 @@
 import { Card, Header, Loading, Text } from '@components';
-import { useEditOverview } from '@hooks/concepts/editable.hook';
+import { useEditConcept } from '@hooks/concepts/editable.hook';
 import { useAssumptions } from '@hooks/query/assumptions.hook';
-import { useConceptOverview } from '@hooks/query/concepts.hook';
+import {
+  useConceptCustomerProfiles,
+  useFinancialProjection,
+} from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext, useParams } from 'react-router-dom';
@@ -9,21 +12,27 @@ import { IConceptReportContext } from './ConceptReport/ConceptReport';
 
 const OverviewDetails: FunctionComponent = () => {
   const { id: conceptId = '' } = useParams();
-  const { navigateToTab } = useOutletContext<IConceptReportContext>();
-  const { overview, isLoading: isOverviewLoading } =
-    useConceptOverview(conceptId);
+  const { navigateToTab, concept } = useOutletContext<IConceptReportContext>();
+  const { profiles, isLoading: isCustomerProfilesLoading } =
+    useConceptCustomerProfiles(conceptId);
+  const { financialProjection, isLoading: isFinancialProjectionLoading } =
+    useFinancialProjection(conceptId);
+
   const { assumptions, isLoading: isAssumptionsLoading } =
     useAssumptions(conceptId);
-  const { valueProposition, problemStatement, text } = useEditOverview();
+  const { valueProposition, problemStatement, overview } = useEditConcept();
 
-  const isLoading = isOverviewLoading || isAssumptionsLoading;
+  const isLoading =
+    isAssumptionsLoading ||
+    isCustomerProfilesLoading ||
+    isFinancialProjectionLoading;
 
   const firstCustomerPersona = useMemo(() => {
-    if (!overview || !overview.persona) {
+    if (!profiles || profiles.length === 0) {
       return undefined;
     }
-    return overview.persona;
-  }, [overview]);
+    return profiles[0];
+  }, [profiles]);
 
   if (isLoading) {
     return (
@@ -36,7 +45,7 @@ const OverviewDetails: FunctionComponent = () => {
   }
 
   // Handle case where loading is finished but no overview data exists
-  if (!isLoading && !overview) {
+  if (!isLoading && !concept) {
     return (
       <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
         Overview data is not available for this concept.
@@ -63,7 +72,7 @@ const OverviewDetails: FunctionComponent = () => {
             />
           </div>
 
-          {overview?.problemStatement ? (
+          {concept?.problemStatement ? (
             <div className='inline-flex flex-col items-start justify-start gap-5'>
               <Header.Three text='Problem Statement' />
               <Text.EditModeSwitcher
@@ -86,13 +95,13 @@ const OverviewDetails: FunctionComponent = () => {
             <Header.Three text='Overview' />
             <Text.EditModeSwitcher
               pClassName='self-stretch aucctus-text-tertiary aucctus-text-md'
-              value={text.value}
+              value={overview.value}
               label=''
-              name='description'
-              maxLength={text.validation.maxLength}
-              onChange={text.handleChange}
-              handleSave={text.handleSave}
-              handleCancel={text.handleCancel}
+              name='overview'
+              maxLength={overview.validation.maxLength}
+              onChange={overview.handleChange}
+              handleSave={overview.handleSave}
+              handleCancel={overview.handleCancel}
             />
           </div>
         </div>
@@ -109,7 +118,7 @@ const OverviewDetails: FunctionComponent = () => {
         />
 
         <Card.FinancialProjects
-          projection={overview?.financialProjection}
+          projection={financialProjection}
           onViewClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
         />
 

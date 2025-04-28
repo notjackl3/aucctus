@@ -87,7 +87,10 @@ export type ConceptReportStatusBySection = {
 export interface IConcept extends IBaseConceptEntity {
   uuid: string;
   title: string;
-  description: string;
+  summary: string;
+  overview: string;
+  valueProposition: string;
+  problemStatement?: string;
   identifier: string;
   reportStatusAggregate: ConceptReportStatus;
   reportStatusBySection: ConceptReportStatusBySection; // Use the new type here

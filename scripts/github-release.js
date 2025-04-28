@@ -54,7 +54,7 @@ const createGithubRelease = async () => {
     if (shouldTryAgain.toLowerCase() === 'y') {
       log.info('Running with debug output...')
 
-      const debugCmd = `release-please github-release token=${token} --repo-url=${remoteUrl} --debug`
+      const debugCmd = `release-please github-release --token=${token} --repo-url=${remoteUrl}`
       const debugResult = runCommand(debugCmd)
 
       if (debugResult) {

@@ -11,7 +11,7 @@ const SECTION_NAMES: Record<string, string> = {
   marketScan: 'Market Scan',
   customerProfiles: 'Customer Profiles',
   financialProjection: 'Financial Projection',
-  keyAssumptions: 'Key Assumptions',
+  assumptions: 'Key Assumptions',
 };
 
 const formatDuration = (startDateStr: string, endDateStr?: string) => {

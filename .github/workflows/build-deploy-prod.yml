@@ -11,7 +11,7 @@ env:
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
   # Feature flags
   FEATURE_CUSTOMER_PROFILE_CHAT: false
-  FEATURE_CONCEPT_VERSIONING: false
+  FEATURE_CONCEPT_VERSIONING: true
 jobs:
   build_and_deploy_job:
     runs-on: ubuntu-latest

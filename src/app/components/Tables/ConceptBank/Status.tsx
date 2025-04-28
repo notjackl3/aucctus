@@ -1,5 +1,8 @@
 import { ConceptStatus } from '@libs/api/types';
-import { getConceptStatusStyles } from '@libs/utils/concepts';
+import {
+  getConceptStatusDisplayName,
+  getConceptStatusStyles,
+} from '@libs/utils/concepts';
 import React from 'react';
 import { cn } from '@libs/utils/react';
 
@@ -21,7 +24,7 @@ const Status: React.FC<IStatusProps> = ({ value }) => {
     <div
       className={cn(
         'flex items-center justify-center rounded-full px-4 py-1.5',
-        'w-fit',
+        'w-fit max-w-[160px]',
         style.bg,
         borderClass,
       )}
@@ -29,10 +32,11 @@ const Status: React.FC<IStatusProps> = ({ value }) => {
       <span
         className={cn(
           'font-inter h-[20px] text-center text-sm font-medium capitalize leading-[20px]',
+          'overflow-hidden truncate',
           style.text,
         )}
       >
-        {value}
+        {getConceptStatusDisplayName(value)}
       </span>
     </div>
   );
