@@ -9,7 +9,6 @@ import InsightCard from './InsightCard';
 import Testing from './TestingCard';
 
 import AssumptionsTestingStatus from './AssumptionsTestingStatus/AssumptionsTestingStatus';
-import CustomerProfileContextList from './CustomerProfileContextList/CustomerProfileContextList';
 import CustomerProfiles from './CustomerProfilesCard';
 import Demographics from './DemographicsCard/DemographicsCard';
 import FinancialModel from './FinancialModelCard';
@@ -25,7 +24,6 @@ const Card = {
   FinancialProjects,
   CustomerProfiles,
   Insight,
-  CustomerProfileContextList,
   FinancialModel,
   MarketSize,
   AssumptionsTestingStatus,

@@ -3,13 +3,10 @@ import { cn } from '@libs/utils/react';
 import { ICustomerProfile } from '@libs/api/types';
 import Icon from '@components/Icon/Icon/Icon';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
-import { animated, useTransition } from 'react-spring';
 import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
 import CustomerChatMessage from './CustomerChatMessage';
 import useStore from '@stores/store';
 import CustomerConversationSocketWrapper from '../CustomerConversationSocketWrapper';
-import { useFloatingAnimation } from '@hooks/animation/animation.hook';
-import { easings } from 'react-spring';
 
 interface CustomerConversationProps {
   profile: ICustomerProfile;
@@ -44,21 +41,6 @@ const CustomerConversation = forwardRef<HTMLDivElement, CustomerConversationProp
   // Refs
   const conversationRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  const floatingAnimation = useFloatingAnimation({
-    easing: easings.easeOutSine,
-    amplitude: 10,
-    duration: 3000,
-    delay: 0,
-  });
-
-  // Animations
-  const transition = useTransition(messages.length === 0, {
-    from: { opacity: 0, scale: 0 },
-    enter: { opacity: 1, scale: 1 },
-    leave: { opacity: 0, scale: 0 },
-    config: { tension: 280, friction: 60 },
-  });
 
   // Scroll handling
   const scrollToBottom = useCallback((delay = 300) => {
@@ -159,21 +141,6 @@ const CustomerConversation = forwardRef<HTMLDivElement, CustomerConversationProp
         className='no-scrollbar flex flex-1 flex-col scroll-smooth px-4'
         aria-live='polite'
       >
-        {/* Intro message (shown when no messages exist) */}
-        {transition(
-          (style, item) =>
-            item && (
-              <animated.div
-                style={style}
-                className='flex flex-1 flex-col items-center justify-center'
-              >
-                <animated.div style={floatingAnimation}>
-                  Chat with me!
-                </animated.div>
-              </animated.div>
-            ),
-        )}
-
         <span className='flex-1' />
 
         {/* Message history */}

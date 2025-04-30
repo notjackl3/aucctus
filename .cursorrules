@@ -150,4 +150,13 @@
 - No need to include both the base class and hover class - the hover class already includes the base styling
 - Example: Use `className="aucctus-bg-primary-hover"` instead of `className="aucctus-bg-primary hover:aucctus-bg-primary-hover"`
 
-  
+## ComponentU Usage
+Specific component use cases are listed below:
+
+### Icon
+- Use the Icon component for all icon needs
+- use -> import { Icon } from '@components';
+- Example: <Icon variant="clipboard" className="aucctus-fill-brand-primary h-5 w-5" />
+
+### Toast
+- use -> import { toast } from '@components';

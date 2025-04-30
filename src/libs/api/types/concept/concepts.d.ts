@@ -117,12 +117,14 @@ export interface IConceptOverview extends IBaseConceptEntity {
 
 export interface ICustomerJob {
   description: string;
-  importance: number;
+  order: number;
+  icon?: IconVariant
 }
 
 export interface ICustomerPain {
   description: string;
-  importance: number;
+  order: number;
+  icon?: IconVariant;
 }
 
 export interface ICustomerProfile extends IBaseConceptEntity {
@@ -139,7 +141,6 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   incomeRange: string;
   jobs: ICustomerJob[];
   pains: ICustomerPain[];
-  quotes: string[];
   avatarUrl?: string;
 }
 
@@ -155,7 +156,6 @@ export interface ICustomerProfileCreate {
   incomeLower: number;
   jobs: string[];
   pains: string[];
-  quotes: string[];
 }
 
 export type SortableConceptProperties =

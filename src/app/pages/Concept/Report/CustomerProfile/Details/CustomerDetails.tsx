@@ -1,4 +1,4 @@
-import { Card, Loading } from '@components';
+import { Loading } from '@components';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import useStore from '@stores/store';
@@ -6,6 +6,8 @@ import { FunctionComponent, useEffect, useRef } from 'react';
 import { cn } from '@libs/utils/react';
 import CustomerOverview from './CustomerOverview';
 import CustomerConversation from './CustomerConversation';
+import JobsToBeDone from './jobs/JobsToBeDone';
+import Pains from './pains/Pains';
 
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
@@ -85,28 +87,9 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         </div>
       )}
 
-      <div className='flex flex-wrap gap-4'>
-        <Card.CustomerProfileContextList
-          profileUuid={profile.uuid}
-          title={'Jobs to be Done'}
-          icon={'clipboard'}
-          field={'jobs'}
-          data={profile.jobs.map((job) => job.description)}
-        />
-        <Card.CustomerProfileContextList
-          profileUuid={profile.uuid}
-          title={'Pains'}
-          icon={'user-group'}
-          field={'pains'}
-          data={profile.pains.map((pain) => pain.description)}
-        />
-        <Card.CustomerProfileContextList
-          profileUuid={profile.uuid}
-          title={'Quotes'}
-          icon={'message-circle'}
-          field={'quotes'}
-          data={profile.quotes}
-        />
+      <div className='flex flex-row gap-4'>
+        <JobsToBeDone />
+        <Pains />
       </div>
     </div>
   );
