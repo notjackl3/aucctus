@@ -41,13 +41,16 @@ export function dateFormatter(
   });
 }
 
-export function formatDate(date: string) {
-  const formattedDate = new Date(date);
-  return formattedDate.toLocaleDateString('en-US', {
+export function formatDate(
+  date: string,
+  options: Intl.DateTimeFormatOptions = {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
-  });
+  },
+) {
+  const formattedDate = new Date(date);
+  return formattedDate.toLocaleDateString('en-US', options);
 }
 
 export function differenceInMinutes(firstDate: Date, secondDate: Date) {

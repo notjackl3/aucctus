@@ -1,4 +1,5 @@
 import Confirmation from './ConfirmationModal/ConfirmationModal';
+import CustomerConversationSearch from './CustomerProfile/CustomerConversationSearch';
 import AddCustomerProfile from './CustomerProfile/AddCustomerProfile';
 import EditCustomerProfileDemographics from './CustomerProfile/EditCustomerProfileDemographics';
 import EvidenceAndReasoning from './EvidenceAndReasoningModal';
@@ -14,6 +15,7 @@ const Modal = {
   Base,
   AiEditing,
   Confirmation,
+  CustomerConversationSearch,
   EditCustomerProfileDemographics,
   AddCustomerProfile,
   EditKeyAssumptionModal,

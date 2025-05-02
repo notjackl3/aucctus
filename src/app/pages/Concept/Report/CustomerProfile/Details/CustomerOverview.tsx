@@ -1,6 +1,5 @@
 import defaultAvatar from '@assets/img/avatar.png';
 import { Badge, Card } from '@components';
-import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { forwardRef } from 'react';
@@ -22,7 +21,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
       <div
         ref={ref}
         className={cn(
-          'aucctus-bg-primary aucctus-border-primary w-full rounded-lg border shadow-sm h-fit',
+          'aucctus-bg-primary aucctus-border-primary h-fit w-full rounded-lg border shadow-sm',
           className,
         )}
       >
@@ -56,14 +55,9 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                 <h3 className='aucctus-text-secondary aucctus-text-md-medium mb-2 uppercase tracking-wider'>
                   OVERVIEW
                 </h3>
-                <EditModeSwitcher
-                  containerClassName='aucctus-text-secondary aucctus-text-md !cursor-pencil'
-                  name='description'
-                  value={description.value}
-                  onChange={(e) => description.handleChange(e.target.value)}
-                  handleSave={description.handleSave}
-                  handleCancel={description.handleCancel}
-                />
+                <p className='aucctus-text-secondary aucctus-text-md'>
+                  {description.value}
+                </p>
               </div>
 
               {/* Demographics section */}
@@ -71,7 +65,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                 <h3 className='aucctus-text-secondary aucctus-text-md-medium mb-2 uppercase tracking-wider'>
                   DEMOGRAPHICS
                 </h3>
-                <Card.Demographics profile={profile} canEdit={true} />
+                <Card.Demographics profile={profile} canEdit={false} />
               </div>
             </div>
           </div>

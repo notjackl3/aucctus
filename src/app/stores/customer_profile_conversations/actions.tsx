@@ -1,5 +1,8 @@
 import api from '@libs/api';
-import { ICustomerProfileHandshakeMessage } from '@libs/api/types';
+import {
+  ICustomerProfileConversation,
+  ICustomerProfileHandshakeMessage,
+} from '@libs/api/types';
 import telemetry from '@libs/telemetry';
 import { produce } from 'immer';
 import { toast } from '@components';
@@ -15,8 +18,9 @@ export interface ICustomerProfileConversationActions {
   setCurrentMessage: (message: string) => void;
   setCustomerProfileUuid: (customerProfileUuid: string) => void;
   sendMessage: () => Promise<void>;
-  handleMessage: (handshake: ICustomerProfileHandshakeMessage) => void;
+  handleMessage: (handshake: ICustomerProfileHandshakeMessage) => boolean;
   performHandshake: (message: IUserMessage) => Promise<void>;
+  setConversation: (conversation: ICustomerProfileConversation) => void;
   clearConversation: (resetCurrentMessage?: boolean) => void;
   addAssistantMessage: (message: IAssistantMessage) => void;
   agentIsThinking: (value: boolean, thinkingMessage?: string) => void;
@@ -35,6 +39,22 @@ export function clearConversation(
       state.currentMessage = resetCurrentMessage
         ? undefined
         : state.currentMessage;
+    }),
+  );
+}
+
+export function setConversation(
+  this: IStoreApi<ICustomerProfileConversationState>,
+  conversation: ICustomerProfileConversation,
+) {
+  const { set } = this;
+
+  set(
+    produce((state: ICustomerProfileConversationState) => {
+      state.messages = conversation.messages ?? [];
+      state.sessionId = conversation.uuid;
+      state.currentMessage = undefined;
+      state.agentIsThinking(false);
     }),
   );
 }
@@ -183,18 +203,24 @@ export function handleMessage(
   if (handshake.conceptUuid !== conceptUuid) {
     toast.error('Unable to find Concept to edit.');
 
-    telemetry.debug('Ai Editing Handshake Concept Mismatch', {
-      handshakeConceptUuid: handshake.conceptUuid,
-      conceptUuid,
-    });
+    telemetry.debug(
+      'Customer Profile Conversation Handshake Concept Mismatch',
+      {
+        handshakeConceptUuid: handshake.conceptUuid,
+        conceptUuid,
+      },
+    );
 
-    return;
+    return false;
   }
+
   set(
     produce((state: ICustomerProfileConversationState) => {
       state.sessionId = handshake.sessionId;
     }),
   );
+
+  return true;
 }
 
 export function agentIsThinking(

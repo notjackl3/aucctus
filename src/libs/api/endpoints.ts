@@ -4,6 +4,7 @@ import {
   ISeedQueryOptions,
   IUserQueryOptions,
 } from './types';
+import { IMessageFilterOptions } from '@hooks/query/concepts.hook';
 
 export class Endpoints {
   static login = '/api/v1/login';
@@ -134,11 +135,25 @@ export class Endpoints {
     return `api/${version}/concept/${conceptUuid}/customer-profile`;
   }
 
-  static conceptCustomerProfileUuid(
+  static conceptCustomerProfileUuid(customerProfileUuid: string) {
+    return `api/v2/concept/customer-profile/${customerProfileUuid}`;
+  }
+
+  static conceptCustomerProfileConversationMessages(
     customerProfileUuid: string,
-    version: 'v1' | 'v2' = 'v1',
+    sessionId: string,
   ) {
-    return `api/${version}/concept/customer-profile/${customerProfileUuid}`;
+    return `api/v2/concept/customer-profile/${customerProfileUuid}/conversation/${sessionId}/messages`;
+  }
+
+  static conceptCustomerProfileConversationList(
+    customerProfileUuid: string,
+    filterOptions?: IMessageFilterOptions,
+  ) {
+    return utils.string.queryStringGenerator(
+      `api/v2/concept/customer-profile/${customerProfileUuid}/conversation`,
+      filterOptions,
+    );
   }
 
   static conceptKeyAssumptions(conceptUuid: string) {

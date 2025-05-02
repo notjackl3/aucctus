@@ -7,6 +7,7 @@ interface LoadingMaskProps {
   message?: string;
   zIndex?: number;
   bgOpacity?: number;
+  target?: Element | DocumentFragment;
 }
 
 const LoadingMask: React.FC<LoadingMaskProps> = ({
@@ -14,6 +15,7 @@ const LoadingMask: React.FC<LoadingMaskProps> = ({
   message,
   zIndex = 50,
   bgOpacity = 50,
+  target = document.body,
 }) => {
   if (!isLoading) return null;
 
@@ -29,7 +31,7 @@ const LoadingMask: React.FC<LoadingMaskProps> = ({
         </p>
       )}
     </div>,
-    document.body,
+    target,
   );
 };
 

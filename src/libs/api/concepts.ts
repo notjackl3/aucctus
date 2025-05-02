@@ -16,12 +16,14 @@ import {
   IPageResponse,
   ITrendsAndDrivers,
   QuestionFieldType,
+  CustomerProfileMessage,
+  ICustomerProfileConversationSearchResult,
 } from './types'; // Import the missing type
 import {
   IConceptVersionList,
   IConceptVersionRevertRequestPayload,
 } from './types/concept/concept_versions';
-
+import { IMessageFilterOptions } from '@hooks/query/concepts.hook';
 export interface EditConceptReportRequest {
   concept_uuid: string;
   session_id: string; // UUID as string
@@ -191,7 +193,31 @@ export class ConceptApi extends ApiService {
 
   getConceptCustomerProfile(customerProfileUuid: string) {
     return this.get<ICustomerProfile>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+    );
+  }
+
+  getConceptCustomerProfileConversationMessages(
+    customerProfileUuid: string,
+    sessionId: string,
+  ) {
+    return this.get<CustomerProfileMessage[]>(
+      endpoints.conceptCustomerProfileConversationMessages(
+        customerProfileUuid,
+        sessionId,
+      ),
+    );
+  }
+
+  getCustomerProfileConversationList(
+    customerProfileUuid: string,
+    filterOptions?: IMessageFilterOptions,
+  ) {
+    return this.get<ICustomerProfileConversationSearchResult[]>(
+      endpoints.conceptCustomerProfileConversationList(
+        customerProfileUuid,
+        filterOptions,
+      ),
     );
   }
 
@@ -200,7 +226,7 @@ export class ConceptApi extends ApiService {
     data: Partial<ICustomerProfile>,
   ) {
     return this.patch<ICustomerProfile, Partial<ICustomerProfile>>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
       data,
     );
   }
@@ -216,7 +242,7 @@ export class ConceptApi extends ApiService {
 
   deleteConceptCustomerProfile(customerProfileUuid: string) {
     return this.delete<ICustomerProfile>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
     );
   }
 

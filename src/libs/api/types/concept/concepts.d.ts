@@ -118,13 +118,27 @@ export interface IConceptOverview extends IBaseConceptEntity {
 export interface ICustomerJob {
   description: string;
   order: number;
-  icon?: IconVariant
+  icon?: IconVariant;
 }
 
 export interface ICustomerPain {
   description: string;
   order: number;
   icon?: IconVariant;
+}
+
+export type CustomerProfileMessage = IUserMessage | IAssistantMessage;
+
+export interface ICustomerProfileConversationSearchResult {
+  conversation: ICustomerProfileConversation;
+  messageSnippet?: string;
+}
+
+export interface ICustomerProfileConversation {
+  uuid: string;
+  summary?: string;
+  createdAt: string;
+  messages?: CustomerProfileMessage[];
 }
 
 export interface ICustomerProfile extends IBaseConceptEntity {
@@ -142,6 +156,8 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   jobs: ICustomerJob[];
   pains: ICustomerPain[];
   avatarUrl?: string;
+
+  conversations?: ICustomerProfileConversation[]; // Returned from additional API call
 }
 
 export interface ICustomerProfileCreate {

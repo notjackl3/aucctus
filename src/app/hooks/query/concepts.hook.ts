@@ -32,6 +32,10 @@ import {
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
 
+export interface IMessageFilterOptions {
+  query: string;
+}
+
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
   uuid: string;
 };
@@ -319,12 +323,67 @@ export const useConceptMarketScan = (uuid: string) => {
 export const useConceptCustomerProfiles = (uuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.customerProfiles, uuid],
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0,
+    cacheTime: 0,
     queryFn: async () => await api.concept.getConceptCustomerProfiles(uuid),
     enabled: !!uuid,
   });
 
   return { ...query, profiles: query.data?.results || [] };
+};
+
+export const useConceptCustomerProfileConversationMessages = (
+  profileUuid?: string,
+  sessionId?: string,
+  enabled?: boolean,
+) => {
+  const isEnabled =
+    enabled !== undefined ? enabled : !!profileUuid && !!sessionId;
+
+  const query = useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfileConversation,
+      profileUuid,
+      sessionId,
+    ],
+    staleTime: 0,
+    queryFn: async () => {
+      if (!profileUuid || !sessionId) return null;
+      return await api.concept.getConceptCustomerProfileConversationMessages(
+        profileUuid,
+        sessionId,
+      );
+    },
+    enabled: isEnabled,
+  });
+
+  return { ...query, conversation: query.data };
+};
+
+export const useConceptCustomerProfileConversationList = (
+  profileUuid: string,
+  filterOptions?: IMessageFilterOptions,
+) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfileConversationSearch,
+      profileUuid,
+      filterOptions?.query,
+    ],
+    staleTime: 0,
+    queryFn: async () => {
+      return await api.concept.getCustomerProfileConversationList(
+        profileUuid,
+        filterOptions,
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Failed to search conversation. Please try again.',
+      );
+    },
+  });
 };
 
 export const useConceptCustomerProfile = (profileUuid: string) => {
