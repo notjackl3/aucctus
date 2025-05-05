@@ -23,40 +23,6 @@
 
 ## Styling Guidelines
 
-### Theme System
-- Always use Aucctus theme classes as the primary styling approach
-- Theme classes are organized into four main categories:
-  - Background: `aucctus-bg-*` for consistent background colors
-  - Text: `aucctus-text-*` for typography colors
-  - Border: `aucctus-border-*` for border colors
-  - Typography: `aucctus-header-*` and `aucctus-text-*` for text styles
-
-#### Background Colors
-- Use semantic background classes:
-  - `aucctus-bg-primary` for main surfaces
-  - `aucctus-bg-secondary` for secondary surfaces
-  - `aucctus-bg-brand-*` for branded elements
-  - `aucctus-bg-error/warning/success-*` for status indicators
-- Add `-hover` suffix for hover states
-- Use `-alt` and `-subtle` variants where appropriate
-
-#### Typography
-- Use semantic text color classes:
-  - `aucctus-text-primary` for main content
-  - `aucctus-text-secondary` for supporting text
-  - `aucctus-text-brand-*` for branded text
-  - `aucctus-text-error/warning/success-*` for status text
-- Apply typography scales consistently:
-  - Headers: `aucctus-header-{2xl|xl|lg|md|sm|xs}`
-  - Body text: `aucctus-text-{xl|lg|md|sm|xs}`
-  - Use weight modifiers: `-medium`, `-semibold`, `-bold`
-
-#### Borders
-- Use semantic border classes:
-  - `aucctus-border-primary` for main borders
-  - `aucctus-border-brand` for branded elements
-  - `aucctus-border-error` for error states
-
 ### Tailwind Best Practices
 - Use Aucctus theme classes first, then supplement with Tailwind utilities
 - Implement responsive utilities for different screen sizes
@@ -76,3 +42,121 @@
 - Optimize for performance
 - Ensure component accessibility
 - Be vigilant about type safety and type inference
+
+### Theme System
+- Always use Aucctus theme classes as the primary styling approach
+- Below are the theme classes that are available:
+
+## Text Colors
+- aucctus-text-primary - Main text color
+- aucctus-text-secondary / aucctus-text-secondary-hover - Secondary text color
+- aucctus-text-tertiary / aucctus-text-tertiary-hover - Tertiary text color
+- aucctus-text-quaternary / aucctus-text-quaternary-hover - Quaternary text color
+- aucctus-text-white - White text
+- aucctus-text-disabled - Disabled text
+- aucctus-text-placeholder / aucctus-text-placeholder-subtle - Placeholder text
+- aucctus-text-brand-primary - Primary brand text
+- aucctus-text-brand-secondary - Secondary brand text
+- aucctus-text-brand-tertiary / aucctus-text-brand-tertiary-alt - Tertiary brand text
+- aucctus-text-error-primary - Error text
+- aucctus-text-warning-primary - Warning text
+- aucctus-text-success-primary - Success text
+
+## Background Colors
+- aucctus-bg-primary / aucctus-bg-primary-alt / aucctus-bg-primary-hover - Primary background
+- aucctus-bg-primary-solid / aucctus-bg-primary-solid-hover / aucctus-bg-primary-solid-alt / aucctus-bg-primary-solid-alt-hover - Solid primary background
+- aucctus-bg-secondary / aucctus-bg-secondary-alt / aucctus-bg-secondary-hover / aucctus-bg-secondary-subtle / aucctus-bg-secondary-extra-subtle - Secondary background
+- aucctus-bg-secondary-solid / aucctus-bg-secondary-solid-hover - Solid secondary background
+- aucctus-bg-tertiary / aucctus-bg-tertiary-hover - Tertiary background
+- aucctus-bg-quaternary / aucctus-bg-quaternary-hover - Quaternary background
+- aucctus-bg-active - Active state background
+- aucctus-bg-disabled / aucctus-bg-disabled-subtle / aucctus-bg-disabled-hover - Disabled background
+- aucctus-bg-overlay - Overlay background
+- aucctus-bg-brand-primary / aucctus-bg-brand-primary-alt / aucctus-bg-brand-primary-hover - Primary brand background
+- aucctus-bg-brand-secondary / aucctus-bg-brand-secondary-hover - Secondary brand background
+- aucctus-bg-brand-solid / aucctus-bg-brand-solid-hover - Solid brand background
+- aucctus-bg-brand-section / aucctus-bg-brand-section-subtle - Brand section background
+- aucctus-bg-error-primary / aucctus-bg-error-secondary / aucctus-bg-error-solid / aucctus-bg-error-solid-hover - Error backgrounds
+- aucctus-bg-warning-primary / aucctus-bg-warning-secondary / aucctus-bg-warning-solid / aucctus-bg-warning-solid-hover - Warning backgrounds
+- aucctus-bg-success-primary / aucctus-bg-success-primary-hover / aucctus-bg-success-secondary / aucctus-bg-success-solid / aucctus-bg-success-solid-hover - Success backgrounds
+- aucctus-bg-frosted-glass - Frosted glass effect
+
+## Border Colors
+- aucctus-border-primary - Primary border
+- aucctus-border-secondary - Secondary border
+- aucctus-border-tertiary - Tertiary border
+- aucctus-border-disabled / aucctus-border-disabled-subtle - Disabled border
+- aucctus-border-brand / aucctus-border-brand-alt / aucctus-border-brand-subtle - Brand borders
+- aucctus-border-error / aucctus-border-error-subtle - Error borders
+
+## Fill Colors (for SVGs)
+- aucctus-fill-primary - Primary fill
+- aucctus-fill-secondary / aucctus-fill-secondary-hover - Secondary fill
+- aucctus-fill-tertiary / aucctus-fill-tertiary-hover - Tertiary fill
+- aucctus-fill-quaternary / aucctus-fill-quaternary-hover - Quaternary fill
+- aucctus-fill-quinary / aucctus-fill-quinary-hover - Quinary fill
+- aucctus-fill-senary - Senary fill
+- aucctus-fill-white - White fill
+- aucctus-fill-disabled / aucctus-fill-disabled-subtle - Disabled fill
+- aucctus-fill-brand-primary / aucctus-fill-brand-primary-alt - Primary brand fill
+- aucctus-fill-brand-secondary - Secondary brand fill
+- aucctus-fill-brand-tertiary - Tertiary brand fill
+- aucctus-fill-error-primary / aucctus-fill-error-secondary - Error fills
+- aucctus-fill-warning-primary / aucctus-fill-warning-secondary - Warning fills
+- aucctus-fill-success-primary / aucctus-fill-success-secondary - Success fills
+
+## Stroke Colors (for SVGs)
+- IMPORTANT: Stroke classes are equally important as fill classes when styling SVG and Icon components
+- aucctus-stroke-primary - Primary stroke
+- aucctus-stroke-secondary / aucctus-stroke-secondary-hover - Secondary stroke
+- aucctus-stroke-tertiary / aucctus-stroke-tertiary-hover - Tertiary stroke
+- aucctus-stroke-quaternary / aucctus-stroke-quaternary-hover - Quaternary stroke
+- aucctus-stroke-quinary / aucctus-stroke-quinary-hover - Quinary stroke
+- aucctus-stroke-senary - Senary stroke
+- aucctus-stroke-white - White stroke
+- aucctus-stroke-disabled / aucctus-stroke-disabled-subtle - Disabled stroke
+- aucctus-stroke-brand-primary / aucctus-stroke-brand-primary-alt - Primary brand stroke
+- aucctus-stroke-brand-secondary - Secondary brand stroke
+- aucctus-stroke-brand-tertiary - Tertiary brand stroke
+- aucctus-stroke-error-primary / aucctus-stroke-error-secondary - Error strokes
+- aucctus-stroke-warning-primary / aucctus-stroke-warning-secondary - Warning strokes
+- aucctus-stroke-success-primary / aucctus-stroke-success-secondary - Success strokes
+
+## Typography
+- aucctus-header-2xl / aucctus-header-2xl-medium / aucctus-header-2xl-semibold / aucctus-header-2xl-bold - 2XL headers
+- aucctus-header-xl / aucctus-header-xl-medium / aucctus-header-xl-semibold / aucctus-header-xl-bold - XL headers
+- aucctus-header-lg / aucctus-header-lg-medium / aucctus-header-lg-semibold / aucctus-header-lg-bold - Large headers
+- aucctus-header-md / aucctus-header-md-medium / aucctus-header-md-semibold / aucctus-header-md-bold - Medium headers
+- aucctus-header-sm / aucctus-header-sm-medium / aucctus-header-sm-semibold / aucctus-header-sm-bold - Small headers
+- aucctus-header-xs / aucctus-header-xs-medium / aucctus-header-xs-semibold / aucctus-header-xs-bold - XS headers
+- aucctus-text-xl / aucctus-text-xl-medium / aucctus-text-xl-semibold / aucctus-text-xl-bold - XL text
+- aucctus-text-lg / aucctus-text-lg-medium / aucctus-text-lg-semibold / aucctus-text-lg-bold - Large text
+- aucctus-text-md / aucctus-text-md-medium / aucctus-text-md-semibold / aucctus-text-md-bold - Medium text
+- aucctus-text-sm / aucctus-text-sm-medium / aucctus-text-sm-semibold / aucctus-text-sm-bold - Small text
+- aucctus-text-xs / aucctus-text-xs-medium / aucctus-text-xs-semibold / aucctus-text-xs-bold - XS text
+
+## Button Classes
+- btn - Base button class
+- btn-primary, btn-primary-light, btn-light, btn-grey, btn-secondary, btn-success, btn-danger, btn-warning, btn-info, btn-disabled - Button variants
+- btn-xs, btn-sm, btn-md, btn-lg - Button sizes
+- btn-bold - Bold text button
+- btn-no-border, btn-link - Borderless button styles
+- btn-no-hover - Disable hover effects
+- example usage: <button className="btn btn-primary">Click me</button>
+
+## Important Notes on Hover Classes
+- For classes with "-hover" suffix (like aucctus-bg-primary-hover, aucctus-text-secondary-hover), use them directly in your className
+- Do NOT use with the hover: prefix (e.g., use "aucctus-bg-primary-hover" instead of "hover:aucctus-bg-primary")
+- No need to include both the base class and hover class - the hover class already includes the base styling
+- Example: Use `className="aucctus-bg-primary-hover"` instead of `className="aucctus-bg-primary hover:aucctus-bg-primary-hover"`
+
+## ComponentU Usage
+Specific component use cases are listed below:
+
+### Icon
+- Use the Icon component for all icon needs
+- use -> import { Icon } from '@components';
+- Example: <Icon variant="clipboard" className="aucctus-fill-brand-primary h-5 w-5" />
+
+### Toast
+- use -> import { toast } from '@components';

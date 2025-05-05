@@ -9,6 +9,7 @@ interface SelectableConceptProps {
   concept: IGeneratedConcept;
   onClick: () => void;
   onSelect: () => void;
+  className?: string;
 }
 
 const SelectableConcept: React.FC<SelectableConceptProps> = ({
@@ -17,6 +18,7 @@ const SelectableConcept: React.FC<SelectableConceptProps> = ({
   concept,
   onClick,
   onSelect,
+  className,
 }) => {
   return (
     <div
@@ -25,6 +27,7 @@ const SelectableConcept: React.FC<SelectableConceptProps> = ({
         'flex cursor-pointer flex-col gap-2 rounded-xl p-4 transition-all duration-300',
         isActive && 'aucctus-bg-primary border-brand-primary border-2',
         !isActive && 'aucctus-bg-secondary-hover border-2 border-transparent',
+        className,
       )}
       onClick={onClick}
     >

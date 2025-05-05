@@ -1,6 +1,10 @@
 import React from 'react';
-import { animated, easings, useSpring } from '@react-spring/web';
+import { animated } from '@react-spring/web';
 import { Icon } from '@components';
+import {
+  useFloatingAnimation,
+  usePulseAnimation,
+} from '@hooks/animation/animation.hook';
 
 interface FloatingAiIconProps {
   showPulse?: boolean;
@@ -9,25 +13,19 @@ interface FloatingAiIconProps {
 const FloatingAiIcon: React.FC<FloatingAiIconProps> = ({
   showPulse = true,
 }) => {
-  // Animation configurations
-  const floatingAnimation = useSpring({
-    from: { transform: 'translateY(3px)' },
-    to: { transform: 'translateY(-3px)' },
-    config: {
-      duration: 1500,
-      easing: easings.easeInOutSine,
-    },
-    loop: { reverse: true },
+  // Use custom animation hooks instead of direct useSpring
+  const floatingAnimation = useFloatingAnimation({
+    amplitude: 3,
+    duration: 1500,
+    delay: 0,
   });
 
-  const echoAnimation = useSpring({
-    from: { transform: 'scale(1)', opacity: 0.3 },
-    to: { transform: 'scale(2)', opacity: 0 },
-    config: {
-      duration: 1000,
-      easing: easings.easeInOutSine,
-    },
-    loop: true,
+  const echoAnimation = usePulseAnimation({
+    startScale: 1,
+    endScale: 2,
+    startOpacity: 0.3,
+    endOpacity: 0,
+    duration: 1000,
     delay: 1000,
   });
 

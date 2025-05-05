@@ -10,6 +10,7 @@ import axios, {
 import analytics from '../../telemetry';
 import { Api } from '../api';
 import { IAuthSuccessResponse } from '../types';
+import telemetry from '../../telemetry';
 
 export const isAuthSuccessResponse = (
   value: unknown,
@@ -112,7 +113,9 @@ export abstract class ApiService {
         const config = error.config as ExtendedAxiosRequestConfig;
         if (config && !config._retry) {
           config._retry = true; // This is required to prevent infinite loops
-
+          telemetry.debug(
+            `apiService: Attempting to refresh token - status=${status}`,
+          );
           // Attempt to refresh the token
           if (this.apiInstance.pendingRefresh) {
             await this.apiInstance.pendingRefresh;

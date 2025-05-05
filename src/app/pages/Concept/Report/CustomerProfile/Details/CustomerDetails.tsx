@@ -1,98 +1,141 @@
-import defaultAvatar from '@assets/img/avatar.png';
-import { Card } from '@components';
-import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
+import { Loading } from '@components';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
+import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
+import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileConversationEvent';
+import { cn } from '@libs/utils/react';
+import { ICustomerProfileConversation } from '@stores/customer_profile_conversations/store';
 import useStore from '@stores/store';
-import { FunctionComponent, useEffect } from 'react';
-import ConversationHead from '../ConversationHead';
+import { FunctionComponent, useEffect, useRef, useState } from 'react';
+import CustomerAlternatives from './CustomerAlternatives';
+import CustomerConversation from './CustomerConversation';
+import CustomerJobs from './CustomerJobs';
+import CustomerOverview from './CustomerOverview';
+import CustomerPains from './CustomerPains';
 
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
+  className?: string;
 }
 
 const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   profile,
+  className = '',
 }) => {
-  const { description } = useEditCustomerProfile(profile.uuid);
-
-  const setCustomerProfileUuid = useStore(
-    (state) => state.customerProfileConversations.setCustomerProfileUuid,
+  const { description, isLoading } = useEditCustomerProfile(profile.uuid);
+  const overviewRef = useRef<HTMLDivElement>(null);
+  const conversationRef = useRef<HTMLDivElement>(null);
+  const [conversations, setConversations] = useState<
+    ICustomerProfileConversation[]
+  >([]);
+  const { setCustomerProfileUuid } = useStore(
+    (state) => state.customerProfileConversations,
   );
+  const { data: conversationResults } =
+    useConceptCustomerProfileConversationList(profile.uuid);
 
+  useEffect(() => {
+    if (conversationResults) {
+      setConversations(
+        conversationResults.map((conversation) => ({
+          uuid: conversation.uuid,
+          createdAt: conversation.createdAt,
+        })),
+      );
+    }
+  }, [conversationResults]);
+
+  // Set customer profile UUID and handle new conversations
   useEffect(() => {
     setCustomerProfileUuid(profile.uuid);
 
+    // Add event listener for the customer-profile-new-conversation event
+    const handleHandshake = (event: CustomerProfileConversationEvent) => {
+      const { sessionId } = event.detail;
+      setConversations([
+        ...(conversations || []),
+        {
+          uuid: sessionId,
+          createdAt: new Date().toISOString(),
+        },
+      ]);
+    };
+
+    // Add the event listener with proper typing
+    window.addEventListener(
+      CustomerProfileConversationEvent.eventName,
+      handleHandshake,
+    );
+
     return () => {
       setCustomerProfileUuid('');
+      window.removeEventListener(
+        CustomerProfileConversationEvent.eventName,
+        handleHandshake,
+      );
     };
-  }, [profile.uuid, setCustomerProfileUuid]);
+  }, [profile, profile.uuid, setCustomerProfileUuid, conversations]);
+
+  // Synchronize conversation height with overview height
+  useEffect(() => {
+    const overviewElement = overviewRef.current;
+    const conversationElement = conversationRef.current;
+
+    if (overviewElement && conversationElement && !isLoading) {
+      const updateHeight = () => {
+        if (overviewElement) {
+          conversationElement.style.maxHeight = `${overviewElement.offsetHeight}px`;
+        }
+      };
+
+      // Create a ResizeObserver to detect changes in the overview component
+      const resizeObserver = new ResizeObserver(updateHeight);
+      resizeObserver.observe(overviewElement);
+
+      // Also keep the window resize listener for other layout changes
+      window.addEventListener('resize', updateHeight);
+
+      return () => {
+        if (overviewElement) {
+          resizeObserver.unobserve(overviewElement);
+        }
+        resizeObserver.disconnect();
+        window.removeEventListener('resize', updateHeight);
+      };
+    }
+  }, [isLoading]);
 
   return (
-    <div className='flex h-full w-full flex-col items-start gap-6 self-stretch'>
-      <div className='mt-8 flex min-h-12 w-full items-center justify-start gap-4'>
-        <img
-          className='flex h-[5.5rem] w-[5.5rem] items-center justify-center rounded-full border border-white'
-          alt='avatar'
-          src={defaultAvatar}
-        />
-        <div className='flex flex-col items-start'>
-          <span className='aucctus-text-secondary mb-2 font-[inherit] text-lg font-normal'>
-            {profile?.nickname}
-          </span>
-          <span className='aucctus-text-brand-secondary aucctus-header-sm-semibold'>
-            {profile?.name}
-          </span>
+    <div
+      className={cn(
+        'flex h-full w-full flex-col items-start gap-6 self-stretch',
+        className,
+      )}
+    >
+      {isLoading ? (
+        <div className='flex flex-1 items-center justify-center'>
+          <Loading />
         </div>
-      </div>
+      ) : (
+        <div className='flex w-full flex-row gap-4'>
+          <CustomerOverview
+            ref={overviewRef}
+            profile={profile}
+            description={description}
+          />
+          <CustomerConversation
+            ref={conversationRef}
+            profile={profile}
+            conversations={conversations}
+          />
+        </div>
+      )}
 
-      <div className='mt-4 flex w-full flex-row flex-wrap items-start justify-start gap-8'>
-        <div className='flex w-[40rem] flex-col'>
-          <div className='flex w-full flex-col items-start gap-0'>
-            <h2 className='aucctus-text-brand-secondary aucctus-text-lg-bold'>
-              Overview
-            </h2>
-            <EditModeSwitcher
-              containerClassName='aucctus-text-secondary aucctus-text-md !cursor-pencil'
-              name='description'
-              value={description.value}
-              onChange={description.handleChange}
-              handleSave={description.handleSave}
-              handleCancel={description.handleCancel}
-            />
-          </div>
-        </div>
-        <div className='flex max-w-[30%] flex-col justify-start'>
-          <div className='flex items-start gap-4 self-stretch'>
-            <Card.Demographics profile={profile} canEdit={true} />
-          </div>
-        </div>
+      <div className='flex w-full flex-row gap-4'>
+        <CustomerJobs profile={profile} />
+        <CustomerPains profile={profile} />
+        <CustomerAlternatives profile={profile} />
       </div>
-
-      <div className='flex flex-wrap gap-4'>
-        <Card.CustomerProfileContextList
-          profileUuid={profile.uuid}
-          title={'Jobs to be Done'}
-          icon={'clipboard'}
-          field={'jobs'}
-          data={profile.jobs}
-        />
-        <Card.CustomerProfileContextList
-          profileUuid={profile.uuid}
-          title={'Pains'}
-          icon={'user-group'}
-          field={'pains'}
-          data={profile.pains}
-        />
-        <Card.CustomerProfileContextList
-          profileUuid={profile.uuid}
-          title={'Quotes'}
-          icon={'message-circle'}
-          field={'quotes'}
-          data={profile.quotes}
-        />
-      </div>
-      {FEATURE_CUSTOMER_PROFILE_CHAT && <ConversationHead profile={profile} />}
     </div>
   );
 };

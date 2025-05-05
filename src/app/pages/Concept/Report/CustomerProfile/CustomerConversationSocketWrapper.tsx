@@ -9,6 +9,7 @@ import { isCustomerProfileDirectMessage } from '@libs/api/utils/typeGuards';
 import telemetry from '@libs/telemetry';
 import useStore from '@stores/store';
 import React from 'react';
+import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileConversationEvent';
 
 interface CustomerConversationSocketWrapperProps {}
 
@@ -25,12 +26,18 @@ const CustomerConversationSocketWrapper: React.FC<
     (state) => state.customerProfileConversations.agentIsThinking,
   );
   const conceptUuid = useStore((state) => state.conceptReport.conceptUuid);
+  const sessionId = useStore(
+    (state) => state.customerProfileConversations.sessionId,
+  );
 
   const processMessage = React.useCallback(
     (message: ICustomerProfileInboundChatMessage) => {
       // For direct messages
       if (isCustomerProfileDirectMessage(message)) {
-        if (message.conceptUuid === conceptUuid) {
+        if (
+          message.conceptUuid === conceptUuid &&
+          message.sessionId === sessionId
+        ) {
           addAssistantMessage({
             uuid: message.uuid,
             content: message.content,
@@ -38,6 +45,7 @@ const CustomerConversationSocketWrapper: React.FC<
             name: message.name,
             timestamp: message.timestamp || Date.now(),
           });
+          agentIsThinking(false);
         }
       }
       // // For stream events
@@ -52,18 +60,25 @@ const CustomerConversationSocketWrapper: React.FC<
       //   }
       // }
     },
-    [addAssistantMessage, conceptUuid],
+    [addAssistantMessage, conceptUuid, agentIsThinking, sessionId],
   );
 
   useSocketEvent(
     'customer.profile.handshake',
     (handshake: ICustomerProfileHandshakeMessage) => {
-      handleMessage(handshake);
+      const handshakeSuccess = handleMessage(handshake);
+
+      if (handshakeSuccess) {
+        CustomerProfileConversationEvent.dispatch({
+          sessionId: handshake.sessionId,
+        });
+      }
     },
   );
 
   useSocketEvent('customer.profile.chat.error', (message) => {
     telemetry.error('customer.profile.chat.error', message);
+    agentIsThinking(false);
     // TODO: Create action to show error message in chat
   });
 

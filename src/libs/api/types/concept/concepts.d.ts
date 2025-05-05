@@ -105,6 +105,39 @@ export interface IConcept extends IBaseConceptEntity {
   conceptVersionId: number;
 }
 
+export interface IConceptOverview extends IBaseConceptEntity {
+  text: string;
+  valueProposition: string;
+  problemStatement?: string;
+
+  // TODO: Remove and use API instead.
+  persona?: ICustomerProfile;
+  financialProjection?: IFinancialProjection;
+}
+
+export interface ICustomerListItem {
+  uuid: string;
+  description: string;
+  order: number;
+  icon?: IconVariant;
+}
+
+export interface ICustomerJob extends ICustomerListItem {}
+
+export interface ICustomerPain extends ICustomerListItem {}
+
+/**
+ * Represents a customer alternative product or solution.
+ */
+export interface ICustomerAlternative {
+  name: string;
+  usage?: string;
+  pros: string[];
+  cons: string[];
+  price: string;
+  uuid?: string;
+}
+
 export interface ICustomerProfile extends IBaseConceptEntity {
   name: string;
   description: string;
@@ -117,10 +150,11 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   incomeUpper: number;
   incomeLower: number;
   incomeRange: string;
-  jobs: string[];
-  pains: string[];
-  quotes: string[];
+  jobs: ICustomerJob[];
+  pains: ICustomerPain[];
   avatarUrl?: string;
+
+  conversations?: ICustomerProfileConversation[]; // Returned from additional API call
 }
 
 export interface ICustomerProfileCreate {
@@ -135,7 +169,6 @@ export interface ICustomerProfileCreate {
   incomeLower: number;
   jobs: string[];
   pains: string[];
-  quotes: string[];
 }
 
 export type SortableConceptProperties =
@@ -158,4 +191,9 @@ export interface IConceptQueryOptions extends IPageQueryOptions {
 
 export interface IConceptPage extends IPageResponse<IConcept> {
   statusCounts: { [key in ConceptStatus]: number };
+}
+
+// For EditableList usage, allow uuid as optional (for new/unsaved items)
+export interface ICustomerListItemWithUuid extends ICustomerListItem {
+  uuid?: string;
 }

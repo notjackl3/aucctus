@@ -9,6 +9,7 @@ import {
   handleMessage,
   performHandshake,
   sendMessage,
+  setConversation,
   setCurrentMessage,
   setCustomerProfileUuid,
 } from './actions';
@@ -27,14 +28,18 @@ export interface IAssistantMessage
   content: string;
 }
 
-export type EditMessage = IUserMessage | IAssistantMessage;
-
 export type CustomerProfileMessage = IUserMessage | IAssistantMessage;
+
+export interface ICustomerProfileConversation {
+  uuid: string;
+  summary?: string;
+  createdAt: string;
+  messages?: CustomerProfileMessage[];
+}
 
 export interface ICustomerProfileConversationState
   extends ICustomerProfileConversationActions {
   sessionId?: string;
-  conversationUuid?: string;
   customerProfileUuid?: string;
   messages: CustomerProfileMessage[];
   currentMessage?: string;
@@ -53,7 +58,6 @@ const customerProfileConversationSlice: Lens<
 
   return {
     sessionId: undefined,
-    conversationUuid: undefined,
     customerProfileUuid: undefined,
     messages: [],
     currentMessage: undefined,
@@ -66,6 +70,7 @@ const customerProfileConversationSlice: Lens<
     setCustomerProfileUuid: setCustomerProfileUuid.bind(actionContext),
     handleMessage: handleMessage.bind(actionContext),
     performHandshake: performHandshake.bind(actionContext),
+    setConversation: setConversation.bind(actionContext),
     clearConversation: clearConversation.bind(actionContext),
     addAssistantMessage: addAssistantMessage.bind(actionContext),
     agentIsThinking: agentIsThinking.bind(actionContext),

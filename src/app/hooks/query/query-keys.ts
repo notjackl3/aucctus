@@ -16,6 +16,9 @@ export enum AucctusQueryKeys {
   conceptOverview = 'overview',
   customerProfiles = 'customerProfiles',
   customerProfile = 'customerProfile',
+  customerProfileJobs = 'customerProfileJobs',
+  customerJob = 'customerJob',
+  customerPain = 'customerPain',
   financialProjection = 'financialProjection',
   marketScan = 'marketScan',
   assumption = 'assumption',
@@ -25,6 +28,8 @@ export enum AucctusQueryKeys {
   assumptionTestStatusOverview = 'assumptionTestStatusOverview',
   incumbent = 'incumbent',
   startup = 'startup',
+  customerProfileConversation = 'customerProfileConversation',
+  customerProfileConversationSearch = 'customerProfileConversationSearch',
 
   /* External APIs */
   clearbitCompany = 'clearbitCompany',

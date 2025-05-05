@@ -24,6 +24,7 @@ npm run start:dev
 npm run start:prod
 
 ```
+
 ## Release Process
 
 This project uses [release-please](https://github.com/googleapis/release-please) for semantic versioning and automatic changelog generation.
@@ -50,18 +51,20 @@ Breaking changes should include `BREAKING CHANGE:` in the commit message body.
 Our release process follows these steps:
 
 1. Development happens on feature branches
-2. Features are merged to the `develop` branch 
+2. Features are merged to the `develop` branch
 3. When ready for release, run the release helper script:
+
    ```bash
    # Basic interactive mode
    npm run release
-   
+
    # Force a release (regardless of conventional commits)
    npm run release -- --force-release
-   
+
    # Specify exact version
    npm run release -- --release-as 2.2.1
    ```
+
 4. The script will:
    - Verify you're on the `develop` branch
    - Pull the latest changes
@@ -90,6 +93,7 @@ You can use either interactive prompts or command-line arguments to control this
 ### Versioning
 
 Version numbers follow semantic versioning (MAJOR.MINOR.PATCH):
+
 - Major: Breaking changes
 - Minor: New features (backwards compatible)
 - Patch: Bug fixes (backwards compatible)

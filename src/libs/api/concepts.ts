@@ -1,3 +1,4 @@
+import { CustomerProfileMessage } from '@stores/customer_profile_conversations/store';
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
@@ -8,6 +9,11 @@ import {
   IConceptPage,
   IConceptQueryOptions,
   IConceptReportEdit,
+  IConversation,
+  IConversationFilterOptions,
+  ICustomerAlternative,
+  ICustomerJob,
+  ICustomerPain,
   ICustomerProfile,
   ICustomerProfileCreate,
   IFinancialProjection,
@@ -21,7 +27,6 @@ import {
   IConceptVersionList,
   IConceptVersionRevertRequestPayload,
 } from './types/concept/concept_versions';
-
 export interface EditConceptReportRequest {
   concept_uuid: string;
   session_id: string; // UUID as string
@@ -191,7 +196,31 @@ export class ConceptApi extends ApiService {
 
   getConceptCustomerProfile(customerProfileUuid: string) {
     return this.get<ICustomerProfile>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+    );
+  }
+
+  getConceptCustomerProfileConversationMessages(
+    customerProfileUuid: string,
+    sessionId: string,
+  ) {
+    return this.get<CustomerProfileMessage[]>(
+      endpoints.conceptCustomerProfileConversationMessages(
+        customerProfileUuid,
+        sessionId,
+      ),
+    );
+  }
+
+  getCustomerProfileConversationList(
+    customerProfileUuid: string,
+    filterOptions?: IConversationFilterOptions,
+  ) {
+    return this.get<IConversation[]>(
+      endpoints.conceptCustomerProfileConversationList(
+        customerProfileUuid,
+        filterOptions,
+      ),
     );
   }
 
@@ -200,7 +229,7 @@ export class ConceptApi extends ApiService {
     data: Partial<ICustomerProfile>,
   ) {
     return this.patch<ICustomerProfile, Partial<ICustomerProfile>>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
       data,
     );
   }
@@ -216,7 +245,7 @@ export class ConceptApi extends ApiService {
 
   deleteConceptCustomerProfile(customerProfileUuid: string) {
     return this.delete<ICustomerProfile>(
-      endpoints.conceptCustomerProfileUuid(customerProfileUuid, 'v2'),
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
     );
   }
 
@@ -253,6 +282,93 @@ export class ConceptApi extends ApiService {
   deleteTrendAndDriver(uuid: string) {
     return this.delete<ITrendsAndDrivers>(
       endpoints.conceptTrendAndDriver(uuid),
+    );
+  }
+
+  // Customer Jobs API
+  getCustomerJobs(customerProfileUuid: string) {
+    return this.get<ICustomerJob[]>(
+      endpoints.customerProfileJobs(customerProfileUuid),
+    );
+  }
+
+  getCustomerJob(customerProfileUuid: string, jobUuid: string) {
+    return this.get<ICustomerJob>(
+      endpoints.customerProfileJob(customerProfileUuid, jobUuid),
+    );
+  }
+
+  createCustomerJob(
+    customerProfileUuid: string,
+    data: { description: string; order?: number; icon?: IconVariant },
+  ) {
+    return this.post<ICustomerJob>(
+      endpoints.customerProfileJobs(customerProfileUuid),
+      data,
+    );
+  }
+
+  updateCustomerJob(
+    customerProfileUuid: string,
+    jobUuid: string,
+    data: Partial<ICustomerJob>,
+  ) {
+    return this.patch<ICustomerJob>(
+      endpoints.customerProfileJob(customerProfileUuid, jobUuid),
+      data,
+    );
+  }
+
+  deleteCustomerJob(customerProfileUuid: string, jobUuid: string) {
+    return this.delete<void>(
+      endpoints.customerProfileJob(customerProfileUuid, jobUuid),
+    );
+  }
+
+  // Customer Pains API
+  getCustomerPains(customerProfileUuid: string) {
+    return this.get<ICustomerPain[]>(
+      endpoints.customerProfilePains(customerProfileUuid),
+    );
+  }
+
+  getCustomerPain(customerProfileUuid: string, painUuid: string) {
+    return this.get<ICustomerPain>(
+      endpoints.customerProfilePain(customerProfileUuid, painUuid),
+    );
+  }
+
+  createCustomerPain(
+    customerProfileUuid: string,
+    data: { description: string; order?: number; icon?: IconVariant },
+  ) {
+    return this.post<ICustomerPain>(
+      endpoints.customerProfilePains(customerProfileUuid),
+      data,
+    );
+  }
+
+  updateCustomerPain(
+    customerProfileUuid: string,
+    painUuid: string,
+    data: Partial<ICustomerPain>,
+  ) {
+    return this.patch<ICustomerPain>(
+      endpoints.customerProfilePain(customerProfileUuid, painUuid),
+      data,
+    );
+  }
+
+  deleteCustomerPain(customerProfileUuid: string, painUuid: string) {
+    return this.delete<void>(
+      endpoints.customerProfilePain(customerProfileUuid, painUuid),
+    );
+  }
+
+  // Customer Alternatives API
+  getCustomerAlternatives(customerProfileUuid: string) {
+    return this.get<ICustomerAlternative[]>(
+      endpoints.customerProfileAlternatives(customerProfileUuid),
     );
   }
 }

@@ -8,7 +8,6 @@ import type {
 } from '@libs/api/types';
 import { AiSuggestionEvent } from '@libs/events';
 import { IncubationAnswerEvent } from '@libs/events/IncumbentAnswerEvent';
-import telemetry from '@libs/telemetry';
 import { cn } from '@libs/utils/react';
 import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
@@ -157,11 +156,6 @@ const AiSuggestions: React.FC<AiSuggestionsProps> = ({
   // --- Socket event handling ---
   useSocketEvent('stream.structured.ai.suggestions', (data) => {
     if ('done' === data.stage || 'delta' === data.stage) {
-      telemetry.log(
-        'aiSuggestions',
-        data.context,
-        data.content.suggestions ?? [],
-      );
       setSuggestions(data.context.questionId, data.content.suggestions ?? []);
     }
   });

@@ -290,7 +290,6 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({
                 incomeLower,
                 familySize,
                 geoLocation,
-                quotes: [] as string[],
                 jobs: [] as string[],
                 pains: [] as string[],
               },

@@ -12,6 +12,7 @@ import {
   IConceptSeed,
   IConceptSeedCreate,
   IConceptSeedUpdate,
+  IConversationFilterOptions,
   ICustomerProfile,
   ICustomerProfileCreate,
   IFinancialProjection,
@@ -20,6 +21,8 @@ import {
   IMarketScan,
   ISeedQueryOptions,
   ITrendsAndDrivers,
+  ICustomerJob,
+  ICustomerPain,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
@@ -29,8 +32,8 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
-import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
+import { useGenericConceptMutate } from './helper.hooks';
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
   uuid: string;
@@ -319,12 +322,67 @@ export const useConceptMarketScan = (uuid: string) => {
 export const useConceptCustomerProfiles = (uuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.customerProfiles, uuid],
-    staleTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 0,
+    cacheTime: 0,
     queryFn: async () => await api.concept.getConceptCustomerProfiles(uuid),
     enabled: !!uuid,
   });
 
   return { ...query, profiles: query.data?.results || [] };
+};
+
+export const useConceptCustomerProfileConversationMessages = (
+  profileUuid?: string,
+  sessionId?: string,
+  enabled?: boolean,
+) => {
+  const isEnabled =
+    enabled !== undefined ? enabled : !!profileUuid && !!sessionId;
+
+  const query = useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfileConversation,
+      profileUuid,
+      sessionId,
+    ],
+    staleTime: 0,
+    queryFn: async () => {
+      if (!profileUuid || !sessionId) return null;
+      return await api.concept.getConceptCustomerProfileConversationMessages(
+        profileUuid,
+        sessionId,
+      );
+    },
+    enabled: isEnabled,
+  });
+
+  return { ...query, conversation: query.data };
+};
+
+export const useConceptCustomerProfileConversationList = (
+  profileUuid: string,
+  filterOptions?: IConversationFilterOptions,
+) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfileConversationSearch,
+      profileUuid,
+      filterOptions?.message,
+    ],
+    staleTime: 0,
+    queryFn: async () => {
+      return await api.concept.getCustomerProfileConversationList(
+        profileUuid,
+        filterOptions,
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Failed to search conversation. Please try again.',
+      );
+    },
+  });
 };
 
 export const useConceptCustomerProfile = (profileUuid: string) => {
@@ -683,5 +741,254 @@ export const useCancelConceptVersionRevert = () => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to cancel concept version revert');
     },
+  });
+};
+
+/**
+ * Customer Jobs API hooks using api.concept methods
+ */
+export const useCustomerJobsList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.customerProfile, customerProfileUuid, 'jobs'],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerJobs(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+
+export const useCustomerJob = (
+  customerProfileUuid: string,
+  jobUuid: string,
+) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.customerJob, customerProfileUuid, jobUuid],
+    queryFn: async () => {
+      if (!customerProfileUuid || !jobUuid) return null;
+      return await api.concept.getCustomerJob(customerProfileUuid, jobUuid);
+    },
+    enabled: !!customerProfileUuid && !!jobUuid,
+  });
+};
+
+export const useCustomerJobCreate = (customerProfileUuid: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      description: string;
+      order?: number;
+      icon?: IconVariant;
+    }) => {
+      return await api.concept.createCustomerJob(customerProfileUuid, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          customerProfileUuid,
+          'jobs',
+        ],
+      });
+      toast.success('Job created');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to create job');
+    },
+  });
+};
+
+export const useCustomerJobUpdate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      jobUuid: string;
+      data: Partial<ICustomerJob>;
+    }) => {
+      const { customerProfileUuid, jobUuid, data } = params;
+      return await api.concept.updateCustomerJob(
+        customerProfileUuid,
+        jobUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'jobs',
+        ],
+      });
+      toast.success('Job updated');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to update job');
+    },
+  });
+};
+
+export const useCustomerJobDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      jobUuid: string;
+    }) => {
+      const { customerProfileUuid, jobUuid } = params;
+      return await api.concept.deleteCustomerJob(customerProfileUuid, jobUuid);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'jobs',
+        ],
+      });
+      toast.success('Job deleted');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to delete job');
+    },
+  });
+};
+
+/**
+ * Customer Pains API hooks using api.concept methods
+ */
+export const useCustomerPainsList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.customerProfile, customerProfileUuid, 'pains'],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerPains(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+
+export const useCustomerPain = (
+  customerProfileUuid: string,
+  painUuid: string,
+) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.customerPain, customerProfileUuid, painUuid],
+    queryFn: async () => {
+      if (!customerProfileUuid || !painUuid) return null;
+      return await api.concept.getCustomerPain(customerProfileUuid, painUuid);
+    },
+    enabled: !!customerProfileUuid && !!painUuid,
+  });
+};
+
+export const useCustomerPainCreate = (customerProfileUuid: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      description: string;
+      order?: number;
+      icon?: IconVariant;
+    }) => {
+      return await api.concept.createCustomerPain(customerProfileUuid, data);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          customerProfileUuid,
+          'pains',
+        ],
+      });
+      toast.success('Pain point created');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to create pain point');
+    },
+  });
+};
+
+export const useCustomerPainUpdate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      painUuid: string;
+      data: Partial<ICustomerPain>;
+    }) => {
+      const { customerProfileUuid, painUuid, data } = params;
+      return await api.concept.updateCustomerPain(
+        customerProfileUuid,
+        painUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'pains',
+        ],
+      });
+      toast.success('Pain point updated');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to update pain point');
+    },
+  });
+};
+
+export const useCustomerPainDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      painUuid: string;
+    }) => {
+      const { customerProfileUuid, painUuid } = params;
+      return await api.concept.deleteCustomerPain(
+        customerProfileUuid,
+        painUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'pains',
+        ],
+      });
+      toast.success('Pain point deleted');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to delete pain point');
+    },
+  });
+};
+
+/**
+ * Customer Alternatives API hooks
+ */
+export const useCustomerAlternativesList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfile,
+      customerProfileUuid,
+      'alternatives',
+    ],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerAlternatives(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
   });
 };

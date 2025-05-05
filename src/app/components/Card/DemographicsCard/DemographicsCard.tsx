@@ -24,7 +24,7 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
 
   return (
     <div
-      className={`flex flex-1 flex-col items-start gap-7 rounded-lg p-4 hover:bg-white ${
+      className={`flex flex-1 flex-col items-start gap-7 rounded-lg hover:bg-white ${
         canEdit ? 'cursor-pencil' : ''
       }`}
       onClick={() => {
@@ -36,17 +36,19 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
       }}
     >
       <div className='flex flex-col items-start gap-1 self-stretch'>
-        <h2 className='aucctus-text-lg-bold aucctus-text-brand-secondary mb-2'>
-          Demographics
-        </h2>
-        <div className='flex flex-col gap-2'>
+        <div className='flex flex-col gap-2 self-stretch'>
           <span className='inline-flex items-start gap-4'>
             <Icon
               variant='globe'
               {...iconDefaultProps}
               className='h-6 w-6 stroke-primary-600'
             />
-            <p className='aucctus-text-brand-tertiary aucctus-text-sm-medium'>{`Geographic Location: ${profile.geoLocation}`}</p>
+            <p className='aucctus-text-brand-tertiary aucctus-text-sm-bold flex-1'>
+              Geographic Location:
+            </p>
+            <p className='aucctus-text-brand-tertiary aucctus-text-sm-medium flex-1'>
+              {profile.geoLocation}
+            </p>
           </span>
           <span className='inline-flex items-start gap-4'>
             <Icon
@@ -54,7 +56,12 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
               {...iconDefaultProps}
               className='h-6 w-6 stroke-primary-600'
             />
-            <p className='aucctus-text-brand-tertiary aucctus-text-sm-medium'>{`Age Range: ${profile.ageRange}`}</p>
+            <p className='aucctus-text-brand-tertiary aucctus-text-sm-bold flex-1'>
+              Age Range:
+            </p>
+            <p className='aucctus-text-brand-tertiary aucctus-text-sm-medium flex-1'>
+              {profile.ageRange}
+            </p>
           </span>
           <span className='inline-flex items-start gap-4'>
             <Icon
@@ -62,7 +69,12 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
               {...iconDefaultProps}
               className='h-6 w-6 stroke-primary-600'
             />
-            <p className='aucctus-text-brand-tertiary aucctus-text-sm-medium'>{`Family Size: ${profile.familySize}`}</p>
+            <p className='aucctus-text-brand-tertiary aucctus-text-sm-bold flex-1'>
+              Family Size:
+            </p>
+            <p className='aucctus-text-brand-tertiary aucctus-text-sm-medium flex-1'>
+              {profile.familySize}
+            </p>
           </span>
           <span className='inline-flex items-start gap-4'>
             <Icon
@@ -70,7 +82,12 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
               {...iconDefaultProps}
               className='h-6 w-6 stroke-primary-600'
             />
-            <p className='aucctus-text-brand-tertiary aucctus-text-sm-medium'>{`Average Income: ${profile.incomeRange}`}</p>
+            <p className='aucctus-text-brand-tertiary aucctus-text-sm-bold flex-1'>
+              Average Income:
+            </p>
+            <p className='aucctus-text-brand-tertiary aucctus-text-sm-medium flex-1'>
+              {profile.incomeRange}
+            </p>
           </span>
         </div>
       </div>

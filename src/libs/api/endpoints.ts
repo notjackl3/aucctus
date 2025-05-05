@@ -1,6 +1,7 @@
 import utils from '@libs/utils';
 import {
   IConceptQueryOptions,
+  IConversationFilterOptions,
   ISeedQueryOptions,
   IUserQueryOptions,
 } from './types';
@@ -134,11 +135,25 @@ export class Endpoints {
     return `api/${version}/concept/${conceptUuid}/customer-profile`;
   }
 
-  static conceptCustomerProfileUuid(
+  static conceptCustomerProfileUuid(customerProfileUuid: string) {
+    return `api/v2/concept/customer-profile/${customerProfileUuid}`;
+  }
+
+  static conceptCustomerProfileConversationMessages(
     customerProfileUuid: string,
-    version: 'v1' | 'v2' = 'v1',
+    sessionId: string,
   ) {
-    return `api/${version}/concept/customer-profile/${customerProfileUuid}`;
+    return `api/v2/concept/customer-profile/${customerProfileUuid}/conversation/${sessionId}/messages`;
+  }
+
+  static conceptCustomerProfileConversationList(
+    customerProfileUuid: string,
+    filterOptions?: IConversationFilterOptions,
+  ) {
+    return utils.string.queryStringGenerator(
+      `api/v2/concept/customer-profile/${customerProfileUuid}/conversation`,
+      filterOptions,
+    );
   }
 
   static conceptKeyAssumptions(conceptUuid: string) {
@@ -224,6 +239,27 @@ export class Endpoints {
   }
 
   // TODO: Add trends and drivers and ecosystem endpoints for v2
+
+  // Customer Jobs Endpoints
+  static customerProfileJobs(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/jobs`;
+  }
+  static customerProfileJob(customerProfileUuid: string, jobUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/jobs/${jobUuid}`;
+  }
+
+  // Customer Pains Endpoints
+  static customerProfilePains(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/pains`;
+  }
+  static customerProfilePain(customerProfileUuid: string, painUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/pains/${painUuid}`;
+  }
+
+  // Customer Alternatives Endpoints
+  static customerProfileAlternatives(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/alternatives`;
+  }
 }
 
 export class SocketEndpoints {

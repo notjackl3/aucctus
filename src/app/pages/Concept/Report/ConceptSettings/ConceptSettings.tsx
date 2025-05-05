@@ -6,9 +6,9 @@ import { snakeToTitleCase } from '@libs/utils/string';
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
-import { useClarifyingQuestionsWithAnswers } from './clarifying-questions.hook';
 import { ClarifyingQuestion } from './components/ClarifyingQuestion';
 import { IgnitionQuestion } from './components/IgnitionQuestion';
+import { useClarifyingQuestionsWithAnswers } from '@hooks/concepts/clarifying-questions.hook';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatAnswer = (

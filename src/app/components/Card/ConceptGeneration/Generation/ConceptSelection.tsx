@@ -285,6 +285,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
           {currentGeneratedConcepts.map((concept) => (
             <SelectableConcept
               key={concept.uuid}
+              className='animate-expand'
               isActive={activeConcept?.uuid === concept.uuid}
               isSelected={selectedConcepts.some((c) => c.uuid === concept.uuid)}
               concept={concept}

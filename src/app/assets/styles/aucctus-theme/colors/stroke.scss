@@ -1,0 +1,116 @@
+/* Primary stroke styles */
+.aucctus-stroke-primary {
+  @apply stroke-gray-light-900 dark:stroke-white;
+}
+
+.aucctus-stroke-secondary {
+  @apply stroke-gray-light-700 dark:stroke-gray-light-300;
+
+  &-hover {
+    @extend .aucctus-stroke-secondary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply stroke-gray-light-800 dark:stroke-gray-light-200;
+    }
+  }
+}
+
+.aucctus-stroke-tertiary {
+  @apply stroke-gray-light-600 dark:stroke-gray-light-400;
+
+  &-hover {
+    @extend .aucctus-stroke-tertiary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply stroke-gray-light-700 dark:stroke-gray-light-300;
+    }
+  }
+}
+
+.aucctus-stroke-quaternary {
+  @apply stroke-gray-light-500 dark:stroke-gray-light-400;
+
+  &-hover {
+    @extend .aucctus-stroke-quaternary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply stroke-gray-light-600 dark:stroke-gray-light-300;
+    }
+  }
+}
+
+.aucctus-stroke-quinary {
+  @apply stroke-gray-light-400 dark:stroke-gray-light-500;
+
+  &-hover {
+    @extend .aucctus-stroke-quinary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply stroke-gray-light-500 dark:stroke-gray-light-400;
+    }
+  }
+}
+
+.aucctus-stroke-senary {
+  @apply stroke-gray-light-300 dark:stroke-gray-light-600;
+}
+
+/* Static stroke */
+.aucctus-stroke-white {
+  @apply stroke-base-white;
+}
+
+/* Disabled states */
+.aucctus-stroke-disabled {
+  @apply stroke-gray-light-400 dark:stroke-gray-light-500;
+
+  &-subtle {
+    @apply stroke-gray-light-300 dark:stroke-gray-light-600;
+  }
+}
+
+/* Brand strokes */
+.aucctus-stroke-brand-primary {
+  @apply stroke-primary-600 dark:stroke-primary-500;
+
+  &-alt {
+    @apply stroke-primary-600 dark:stroke-gray-light-300;
+  }
+}
+
+.aucctus-stroke-brand-secondary {
+  @apply stroke-primary-500;
+}
+
+.aucctus-stroke-brand-tertiary {
+  @apply stroke-primary-200;
+}
+
+/* Semantic strokes */
+.aucctus-stroke-error-primary {
+  @apply stroke-error-600 dark:stroke-error-500;
+}
+
+.aucctus-stroke-error-secondary {
+  @apply stroke-error-500 dark:stroke-error-400;
+}
+
+.aucctus-stroke-warning-primary {
+  @apply stroke-warning-600 dark:stroke-warning-500;
+}
+
+.aucctus-stroke-warning-secondary {
+  @apply stroke-warning-500 dark:stroke-warning-400;
+}
+
+.aucctus-stroke-success-primary {
+  @apply stroke-success-600 dark:stroke-success-500;
+}
+
+.aucctus-stroke-success-secondary {
+  @apply stroke-success-500 dark:stroke-success-400;
+}
