@@ -41,7 +41,8 @@ const AiEditingSocketWrapper: React.FC<AiEditingSocketWrapperProps> = ({}) => {
             content: message.content,
             role: 'assistant',
             name: message.name,
-            timestamp: message.timestamp || Date.now(),
+            timestamp:
+              message.timestamp?.toString() || new Date().toISOString(),
           });
         }
       }
@@ -53,7 +54,8 @@ const AiEditingSocketWrapper: React.FC<AiEditingSocketWrapperProps> = ({}) => {
             content: message.content,
             role: 'assistant',
             name: message.context.name,
-            timestamp: message.context.timestamp,
+            timestamp:
+              message.context.timestamp?.toString() || new Date().toISOString(),
           });
         }
       }

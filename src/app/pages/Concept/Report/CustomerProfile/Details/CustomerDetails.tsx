@@ -37,7 +37,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   useEffect(() => {
     if (conversationResults) {
       setConversations(
-        conversationResults.map((conversation) => ({
+        conversationResults.results.map((conversation) => ({
           uuid: conversation.uuid,
           createdAt: conversation.createdAt,
         })),

@@ -1,13 +1,13 @@
 import { Icon, Loading } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
-import { IConversation } from '@libs/api/types';
+import { ICustomerProfileConversation } from '@libs/api/types';
 import React, { useEffect, useRef, useState } from 'react';
 import ConversationSearchResult from './ConversationSearchResult';
 
 interface CustomerConversationSearchProps {
   customerProfileUuid: string;
-  onSelectConversation?: (conversation: IConversation) => void;
+  onSelectConversation?: (conversation: ICustomerProfileConversation) => void;
 }
 
 const CustomerConversationSearch: React.FC<CustomerConversationSearchProps> = ({
@@ -31,12 +31,14 @@ const CustomerConversationSearch: React.FC<CustomerConversationSearchProps> = ({
   useEffect(() => () => clearTimeout(timerRef.current), []);
 
   // Use debounced query for API calls
-  const { data: searchResults = [], isLoading: isSearching } =
+  const { data: searchResults = { results: [] }, isLoading: isSearching } =
     useConceptCustomerProfileConversationList(customerProfileUuid, {
       message: debouncedQuery,
     });
 
-  const handleSelectConversation = (conversation: IConversation) => {
+  const handleSelectConversation = (
+    conversation: ICustomerProfileConversation,
+  ) => {
     if (onSelectConversation) {
       onSelectConversation(conversation);
     }
@@ -73,9 +75,9 @@ const CustomerConversationSearch: React.FC<CustomerConversationSearchProps> = ({
             <div className='flex items-center justify-center py-4'>
               <Loading />
             </div>
-          ) : searchResults.length > 0 ? (
+          ) : searchResults.results.length > 0 ? (
             <ul className='flex flex-col px-2'>
-              {searchResults
+              {searchResults.results
                 .filter((result) => result.message.content)
                 .map((result, index) => (
                   <ConversationSearchResult

@@ -121,6 +121,8 @@ export async function sendMessage(
     uuid: uuidv4(),
     content: currentMessage || '',
     role: 'user',
+    timestamp: new Date().toISOString(),
+    createdAt: new Date().toISOString(),
   };
 
   // Update state with the new message

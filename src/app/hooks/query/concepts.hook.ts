@@ -13,6 +13,8 @@ import {
   IConceptSeedCreate,
   IConceptSeedUpdate,
   IConversationFilterOptions,
+  ICustomerJob,
+  ICustomerPain,
   ICustomerProfile,
   ICustomerProfileCreate,
   IFinancialProjection,
@@ -21,8 +23,6 @@ import {
   IMarketScan,
   ISeedQueryOptions,
   ITrendsAndDrivers,
-  ICustomerJob,
-  ICustomerPain,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
@@ -32,8 +32,8 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
-import { AucctusQueryKeys } from './query-keys';
 import { useGenericConceptMutate } from './helper.hooks';
+import { AucctusQueryKeys } from './query-keys';
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
   uuid: string;
@@ -368,6 +368,7 @@ export const useConceptCustomerProfileConversationList = (
       AucctusQueryKeys.customerProfileConversationSearch,
       profileUuid,
       filterOptions?.message,
+      filterOptions?.page,
     ],
     staleTime: 0,
     queryFn: async () => {

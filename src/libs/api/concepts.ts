@@ -1,4 +1,3 @@
-import { CustomerProfileMessage } from '@stores/customer_profile_conversations/store';
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
@@ -9,12 +8,13 @@ import {
   IConceptPage,
   IConceptQueryOptions,
   IConceptReportEdit,
-  IConversation,
   IConversationFilterOptions,
+  IConversationMessagePage,
   ICustomerAlternative,
   ICustomerJob,
   ICustomerPain,
   ICustomerProfile,
+  ICustomerProfileConversationPage,
   ICustomerProfileCreate,
   IFinancialProjection,
   IGeneratedConcept,
@@ -204,7 +204,7 @@ export class ConceptApi extends ApiService {
     customerProfileUuid: string,
     sessionId: string,
   ) {
-    return this.get<CustomerProfileMessage[]>(
+    return this.get<IConversationMessagePage>(
       endpoints.conceptCustomerProfileConversationMessages(
         customerProfileUuid,
         sessionId,
@@ -216,7 +216,7 @@ export class ConceptApi extends ApiService {
     customerProfileUuid: string,
     filterOptions?: IConversationFilterOptions,
   ) {
-    return this.get<IConversation[]>(
+    return this.get<ICustomerProfileConversationPage>(
       endpoints.conceptCustomerProfileConversationList(
         customerProfileUuid,
         filterOptions,

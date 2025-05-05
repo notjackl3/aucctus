@@ -153,8 +153,6 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   jobs: ICustomerJob[];
   pains: ICustomerPain[];
   avatarUrl?: string;
-
-  conversations?: ICustomerProfileConversation[]; // Returned from additional API call
 }
 
 export interface ICustomerProfileCreate {

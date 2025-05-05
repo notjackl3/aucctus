@@ -64,7 +64,7 @@ const CustomerConversation = forwardRef<
 
   // Query hooks
   const {
-    data: conversationMessages,
+    data: conversationMessages = { results: [] },
     isLoading: isLoadingConversationMessages,
     refetch: refetchConversationMessages,
   } = useConceptCustomerProfileConversationMessages(
@@ -83,6 +83,7 @@ const CustomerConversation = forwardRef<
       content: `Hi there! I'm ${profile.name}. Feel free to ask me anything about my preferences, habits, or needs as a potential customer.`,
       uuid: uuidv4(),
       timestamp: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       name: profile.name,
     };
   }, [profile]);
@@ -135,7 +136,7 @@ const CustomerConversation = forwardRef<
       );
 
       if (fullConversation) {
-        fullConversation.messages = conversationMessages;
+        fullConversation.messages = conversationMessages.results;
         setConversation(fullConversation);
       }
     }

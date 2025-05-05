@@ -1,12 +1,15 @@
 import { Icon } from '@components';
-import { IConversation } from '@libs/api/types';
+import {
+  IAggregatedMessage,
+  ICustomerProfileConversation,
+} from '@libs/api/types';
 import { formatDate } from '@libs/utils/time';
 import React from 'react';
 
 interface ConversationSearchResultProps {
-  result: IConversation;
+  result: ICustomerProfileConversation;
   index: number;
-  onClick?: (conversation: IConversation) => void;
+  onClick?: (conversation: ICustomerProfileConversation) => void;
 }
 
 const ConversationSearchResult: React.FC<ConversationSearchResultProps> = ({
@@ -14,6 +17,11 @@ const ConversationSearchResult: React.FC<ConversationSearchResultProps> = ({
   index,
   onClick,
 }) => {
+  const getSnippet = (message: IAggregatedMessage) => {
+    const snippet = message.messageSnippet || message.content.slice(0, 25);
+    return snippet;
+  };
+
   return (
     <div
       style={{ animationDelay: `${index * 0.1}s` }}
@@ -30,7 +38,7 @@ const ConversationSearchResult: React.FC<ConversationSearchResultProps> = ({
           </span>
         )}
         <span className='aucctus-text-xs aucctus-text-tertiary'>
-          {`...${result.message.content.slice(0, 25)}...`}
+          {getSnippet(result.message)}
         </span>
       </div>
       <span className='flex flex-1' />

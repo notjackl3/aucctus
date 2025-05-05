@@ -1,4 +1,5 @@
 import { IAiEditingContext, IConceptReportEdit } from '../ai-editing';
+import { IBaseMessage } from '../chat';
 import {
   IConceptGenerationContext,
   IGeneratedConceptList,
@@ -35,14 +36,11 @@ export interface IHandshakeMessage
 }
 
 export interface IInboundChatMessage
-  extends IBaseInboundChatMessage,
+  extends Omit<IBaseMessage, 'createdAt'>,
+    IBaseInboundChatMessage,
     BaseSocketEvent {
   type: 'chat.message';
   uuid: string; // The uuid of the message
-  content: string;
-  timestamp: number | str; // The timestamp of the message
-  name: string; // The name of the user who sent the message or Aucctus
-  role: 'user' | 'assistant';
 }
 
 // ==========================================

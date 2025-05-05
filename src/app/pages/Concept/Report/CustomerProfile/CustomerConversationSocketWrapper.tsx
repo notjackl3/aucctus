@@ -6,10 +6,10 @@ import {
   ICustomerProfileInboundTypingMessage,
 } from '@libs/api/types';
 import { isCustomerProfileDirectMessage } from '@libs/api/utils/typeGuards';
+import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileConversationEvent';
 import telemetry from '@libs/telemetry';
 import useStore from '@stores/store';
 import React from 'react';
-import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileConversationEvent';
 
 interface CustomerConversationSocketWrapperProps {}
 
@@ -43,7 +43,7 @@ const CustomerConversationSocketWrapper: React.FC<
             content: message.content,
             role: 'assistant',
             name: message.name,
-            timestamp: message.timestamp || Date.now(),
+            timestamp: message.timestamp || new Date().toISOString(),
           });
           agentIsThinking(false);
         }

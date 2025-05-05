@@ -1,5 +1,9 @@
 import { Lens, lens } from '@dhmk/zustand-lens';
-import { IInboundChatMessage, IMediaMessage } from '@libs/api/types';
+import {
+  IBaseMessage,
+  IInboundChatMessage,
+  IMediaMessage,
+} from '@libs/api/types';
 import type { IAppStore } from '../store';
 import {
   ICustomerProfileConversationActions,
@@ -15,9 +19,7 @@ import {
 } from './actions';
 
 // This is just a placeholder for now...
-export interface IUserMessage {
-  uuid: string;
-  content: string;
+export interface IUserMessage extends Omit<IBaseMessage, 'role'> {
   role: 'user';
   media?: IMediaMessage;
 }
