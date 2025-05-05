@@ -1,9 +1,5 @@
 import { Lens, lens } from '@dhmk/zustand-lens';
-import {
-  CustomerProfileMessage,
-  IInboundChatMessage,
-  IMediaMessage,
-} from '@libs/api/types';
+import { IInboundChatMessage, IMediaMessage } from '@libs/api/types';
 import type { IAppStore } from '../store';
 import {
   ICustomerProfileConversationActions,
@@ -32,7 +28,14 @@ export interface IAssistantMessage
   content: string;
 }
 
-export type EditMessage = IUserMessage | IAssistantMessage;
+export type CustomerProfileMessage = IUserMessage | IAssistantMessage;
+
+export interface ICustomerProfileConversation {
+  uuid: string;
+  summary?: string;
+  createdAt: string;
+  messages?: CustomerProfileMessage[];
+}
 
 export interface ICustomerProfileConversationState
   extends ICustomerProfileConversationActions {

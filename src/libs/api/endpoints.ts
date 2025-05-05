@@ -1,10 +1,10 @@
 import utils from '@libs/utils';
 import {
   IConceptQueryOptions,
+  IConversationFilterOptions,
   ISeedQueryOptions,
   IUserQueryOptions,
 } from './types';
-import { IMessageFilterOptions } from '@hooks/query/concepts.hook';
 
 export class Endpoints {
   static login = '/api/v1/login';
@@ -148,7 +148,7 @@ export class Endpoints {
 
   static conceptCustomerProfileConversationList(
     customerProfileUuid: string,
-    filterOptions?: IMessageFilterOptions,
+    filterOptions?: IConversationFilterOptions,
   ) {
     return utils.string.queryStringGenerator(
       `api/v2/concept/customer-profile/${customerProfileUuid}/conversation`,

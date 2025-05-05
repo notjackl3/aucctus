@@ -1,3 +1,4 @@
+import { CustomerProfileMessage } from '@stores/customer_profile_conversations/store';
 import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
@@ -8,6 +9,11 @@ import {
   IConceptPage,
   IConceptQueryOptions,
   IConceptReportEdit,
+  IConversation,
+  IConversationFilterOptions,
+  ICustomerAlternative,
+  ICustomerJob,
+  ICustomerPain,
   ICustomerProfile,
   ICustomerProfileCreate,
   IFinancialProjection,
@@ -16,17 +22,11 @@ import {
   IPageResponse,
   ITrendsAndDrivers,
   QuestionFieldType,
-  ICustomerJob,
-  ICustomerPain,
-  ICustomerAlternative,
-  CustomerProfileMessage,
-  ICustomerProfileConversationSearchResult,
 } from './types'; // Import the missing type
 import {
   IConceptVersionList,
   IConceptVersionRevertRequestPayload,
 } from './types/concept/concept_versions';
-import { IMessageFilterOptions } from '@hooks/query/concepts.hook';
 export interface EditConceptReportRequest {
   concept_uuid: string;
   session_id: string; // UUID as string
@@ -214,9 +214,9 @@ export class ConceptApi extends ApiService {
 
   getCustomerProfileConversationList(
     customerProfileUuid: string,
-    filterOptions?: IMessageFilterOptions,
+    filterOptions?: IConversationFilterOptions,
   ) {
-    return this.get<ICustomerProfileConversationSearchResult[]>(
+    return this.get<IConversation[]>(
       endpoints.conceptCustomerProfileConversationList(
         customerProfileUuid,
         filterOptions,

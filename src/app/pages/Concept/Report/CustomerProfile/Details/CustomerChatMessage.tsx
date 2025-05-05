@@ -1,10 +1,10 @@
 import defaultAvatar from '@assets/img/avatar.png';
-import React from 'react';
-import { CustomerProfileMessage } from '@libs/api/types';
-import { ICustomerProfile } from '@libs/api/types';
-import useStore from '@stores/store';
 import Avatar from '@components/Avatar';
+import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { CustomerProfileMessage } from '@stores/customer_profile_conversations/store';
+import useStore from '@stores/store';
+import React from 'react';
 
 interface CustomerProfileChatMessage {
   agentId: string;

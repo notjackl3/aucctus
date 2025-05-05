@@ -1,6 +1,6 @@
-import React from 'react';
 import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
-import { CustomerProfileMessage } from '@libs/api/types';
+import { CustomerProfileMessage } from '@stores/customer_profile_conversations/store';
+import React from 'react';
 
 interface CustomerProfileChatMessage {
   agentId: string;

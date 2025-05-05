@@ -1,8 +1,8 @@
-import React, { useCallback } from 'react';
 import { cn } from '@libs/utils/react';
-import { ICustomerProfileConversation } from '@libs/api/types';
-import SelectableCustomerConversation from './SelectableCustomerConversation';
+import { ICustomerProfileConversation } from '@stores/customer_profile_conversations/store';
 import useStore from '@stores/store';
+import React, { useCallback } from 'react';
+import SelectableCustomerConversation from './SelectableCustomerConversation';
 
 interface SelectableCustomerConversationListProps {
   conversations?: ICustomerProfileConversation[];

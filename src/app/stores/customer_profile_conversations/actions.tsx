@@ -1,15 +1,13 @@
+import { toast } from '@components';
 import api from '@libs/api';
-import {
-  ICustomerProfileConversation,
-  ICustomerProfileHandshakeMessage,
-} from '@libs/api/types';
+import { ICustomerProfileHandshakeMessage } from '@libs/api/types';
 import telemetry from '@libs/telemetry';
 import { produce } from 'immer';
-import { toast } from '@components';
 import { v4 as uuidv4 } from 'uuid';
 import type { IStoreApi } from '../store';
 import {
   IAssistantMessage,
+  ICustomerProfileConversation,
   ICustomerProfileConversationState,
   IUserMessage,
 } from './store';

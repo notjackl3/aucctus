@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
 import { Icon, Loading } from '@components';
 import { useModal } from '@context/ModalContextProvider';
+import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
+import { IConversation } from '@libs/api/types';
+import React, { useEffect, useRef, useState } from 'react';
 import ConversationSearchResult from './ConversationSearchResult';
-import { ICustomerProfileConversation } from '@libs/api/types/concept/concepts';
 
 interface CustomerConversationSearchProps {
   customerProfileUuid: string;
-  onSelectConversation?: (conversation: ICustomerProfileConversation) => void;
+  onSelectConversation?: (conversation: IConversation) => void;
 }
 
 const CustomerConversationSearch: React.FC<CustomerConversationSearchProps> = ({
@@ -33,12 +33,10 @@ const CustomerConversationSearch: React.FC<CustomerConversationSearchProps> = ({
   // Use debounced query for API calls
   const { data: searchResults = [], isLoading: isSearching } =
     useConceptCustomerProfileConversationList(customerProfileUuid, {
-      query: debouncedQuery,
+      message: debouncedQuery,
     });
 
-  const handleSelectConversation = (
-    conversation: ICustomerProfileConversation,
-  ) => {
+  const handleSelectConversation = (conversation: IConversation) => {
     if (onSelectConversation) {
       onSelectConversation(conversation);
     }
@@ -78,10 +76,10 @@ const CustomerConversationSearch: React.FC<CustomerConversationSearchProps> = ({
           ) : searchResults.length > 0 ? (
             <ul className='flex flex-col px-2'>
               {searchResults
-                .filter((result) => result.messageSnippet)
+                .filter((result) => result.message.content)
                 .map((result, index) => (
                   <ConversationSearchResult
-                    key={result.conversation.uuid}
+                    key={result.uuid}
                     result={result}
                     index={index}
                     onClick={handleSelectConversation}

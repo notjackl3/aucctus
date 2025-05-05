@@ -1,6 +1,7 @@
 export * from './ai-editing';
 export * from './assumptions';
 export * from './auth/accounts';
+export * from './chat';
 export * from './concept/assumptions';
 export * from './concept/concepts';
 export * from './concept/financialProjection';

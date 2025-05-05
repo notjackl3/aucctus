@@ -1,7 +1,7 @@
-import React, { useMemo } from 'react';
 import { cn } from '@libs/utils/react';
-import { ICustomerProfileConversation } from '@libs/api/types';
 import { formatDate } from '@libs/utils/time';
+import { ICustomerProfileConversation } from '@stores/customer_profile_conversations/store';
+import React, { useMemo } from 'react';
 
 /**
  * Props for the SelectableCustomerConversation component

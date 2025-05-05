@@ -1,15 +1,12 @@
-import React from 'react';
 import { Icon } from '@components';
+import { IConversation } from '@libs/api/types';
 import { formatDate } from '@libs/utils/time';
-import {
-  ICustomerProfileConversation,
-  ICustomerProfileConversationSearchResult,
-} from '@libs/api/types/concept/concepts';
+import React from 'react';
 
 interface ConversationSearchResultProps {
-  result: ICustomerProfileConversationSearchResult;
+  result: IConversation;
   index: number;
-  onClick?: (conversation: ICustomerProfileConversation) => void;
+  onClick?: (conversation: IConversation) => void;
 }
 
 const ConversationSearchResult: React.FC<ConversationSearchResultProps> = ({
@@ -21,24 +18,24 @@ const ConversationSearchResult: React.FC<ConversationSearchResultProps> = ({
     <div
       style={{ animationDelay: `${index * 0.1}s` }}
       className='aucctus-bg-primary-hover flex animate-fade-in cursor-pointer flex-row gap-2 rounded-md p-3 opacity-0'
-      onClick={() => onClick?.(result.conversation)}
+      onClick={() => onClick?.(result)}
     >
       <span className='flex items-center justify-center'>
         <Icon variant='message-circle' width={20} height={20} />
       </span>
       <div className='flex flex-col'>
-        {result.conversation.summary && (
+        {result.summary && (
           <span className='aucctus-text-sm-semibold aucctus-text-primary'>
-            {result.conversation.summary}
+            {result.summary}
           </span>
         )}
         <span className='aucctus-text-xs aucctus-text-tertiary'>
-          {`...${result.messageSnippet}...`}
+          {`...${result.message.content.slice(0, 25)}...`}
         </span>
       </div>
       <span className='flex flex-1' />
       <span className='aucctus-text-xs aucctus-text-tertiary self-end'>
-        {formatDate(result.conversation.createdAt)}
+        {formatDate(result.createdAt)}
       </span>
     </div>
   );

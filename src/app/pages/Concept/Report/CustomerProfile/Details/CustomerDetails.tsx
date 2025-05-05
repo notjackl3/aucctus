@@ -1,19 +1,17 @@
 import { Loading } from '@components';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
-import {
-  ICustomerProfile,
-  ICustomerProfileConversation,
-} from '@libs/api/types';
+import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
+import { ICustomerProfile } from '@libs/api/types';
+import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileConversationEvent';
+import { cn } from '@libs/utils/react';
+import { ICustomerProfileConversation } from '@stores/customer_profile_conversations/store';
 import useStore from '@stores/store';
 import { FunctionComponent, useEffect, useRef, useState } from 'react';
-import { cn } from '@libs/utils/react';
-import CustomerOverview from './CustomerOverview';
+import CustomerAlternatives from './CustomerAlternatives';
 import CustomerConversation from './CustomerConversation';
 import CustomerJobs from './CustomerJobs';
+import CustomerOverview from './CustomerOverview';
 import CustomerPains from './CustomerPains';
-import CustomerAlternatives from './CustomerAlternatives';
-import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
-import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileConversationEvent';
 
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
@@ -40,8 +38,8 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
     if (conversationResults) {
       setConversations(
         conversationResults.map((conversation) => ({
-          uuid: conversation.conversation.uuid,
-          createdAt: conversation.conversation.createdAt,
+          uuid: conversation.uuid,
+          createdAt: conversation.createdAt,
         })),
       );
     }
@@ -59,7 +57,6 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         {
           uuid: sessionId,
           createdAt: new Date().toISOString(),
-          messages: [],
         },
       ]);
     };

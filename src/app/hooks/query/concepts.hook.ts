@@ -12,6 +12,7 @@ import {
   IConceptSeed,
   IConceptSeedCreate,
   IConceptSeedUpdate,
+  IConversationFilterOptions,
   ICustomerProfile,
   ICustomerProfileCreate,
   IFinancialProjection,
@@ -33,10 +34,6 @@ import {
 } from 'react-query';
 import { AucctusQueryKeys } from './query-keys';
 import { useGenericConceptMutate } from './helper.hooks';
-
-export interface IMessageFilterOptions {
-  query: string;
-}
 
 export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
   uuid: string;
@@ -364,13 +361,13 @@ export const useConceptCustomerProfileConversationMessages = (
 
 export const useConceptCustomerProfileConversationList = (
   profileUuid: string,
-  filterOptions?: IMessageFilterOptions,
+  filterOptions?: IConversationFilterOptions,
 ) => {
   return useQuery({
     queryKey: [
       AucctusQueryKeys.customerProfileConversationSearch,
       profileUuid,
-      filterOptions?.query,
+      filterOptions?.message,
     ],
     staleTime: 0,
     queryFn: async () => {

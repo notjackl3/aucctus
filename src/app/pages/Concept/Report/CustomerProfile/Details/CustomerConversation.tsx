@@ -1,30 +1,30 @@
+import { useModal } from '@context/ModalContextProvider';
+import { useConceptCustomerProfileConversationMessages } from '@hooks/query/concepts.hook';
+import { ICustomerProfile } from '@libs/api/types';
+import { cn } from '@libs/utils/react';
+import {
+  IAssistantMessage,
+  ICustomerProfileConversation,
+} from '@stores/customer_profile_conversations/store';
+import useStore from '@stores/store';
 import React, {
+  forwardRef,
+  useCallback,
+  useEffect,
   useMemo,
   useRef,
-  useEffect,
-  useCallback,
-  forwardRef,
   useState,
 } from 'react';
 import { v4 as uuidv4 } from 'uuid';
-import { cn } from '@libs/utils/react';
-import {
-  ICustomerProfile,
-  ICustomerProfileConversation,
-} from '@libs/api/types';
-import { IAssistantMessage } from '@stores/customer_profile_conversations/store';
-import useStore from '@stores/store';
-import { useModal } from '@context/ModalContextProvider';
-import { useConceptCustomerProfileConversationMessages } from '@hooks/query/concepts.hook';
 
 // Components
 import { Icon, Modal } from '@components';
-import AucctusMessageInput from '@components/Input/AucctusMessageInput';
 import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
-import Tooltip from '@components/ToolTip/Tooltip';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
-import CustomerChatMessage from './CustomerChatMessage';
+import AucctusMessageInput from '@components/Input/AucctusMessageInput';
+import Tooltip from '@components/ToolTip/Tooltip';
 import CustomerConversationSocketWrapper from '../CustomerConversationSocketWrapper';
+import CustomerChatMessage from './CustomerChatMessage';
 import SelectableCustomerConversationList from './SelectableCustomerConversationList';
 
 // Types

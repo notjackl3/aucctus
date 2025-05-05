@@ -137,19 +137,6 @@ export interface ICustomerAlternative {
   price: string;
   uuid?: string;
 }
-export type CustomerProfileMessage = IUserMessage | IAssistantMessage;
-
-export interface ICustomerProfileConversationSearchResult {
-  conversation: ICustomerProfileConversation;
-  messageSnippet?: string;
-}
-
-export interface ICustomerProfileConversation {
-  uuid: string;
-  summary?: string;
-  createdAt: string;
-  messages?: CustomerProfileMessage[];
-}
 
 export interface ICustomerProfile extends IBaseConceptEntity {
   name: string;
