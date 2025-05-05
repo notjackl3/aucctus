@@ -115,18 +115,28 @@ export interface IConceptOverview extends IBaseConceptEntity {
   financialProjection?: IFinancialProjection;
 }
 
-export interface ICustomerJob {
+export interface ICustomerListItem {
+  uuid: string;
   description: string;
   order: number;
   icon?: IconVariant;
 }
 
-export interface ICustomerPain {
-  description: string;
-  order: number;
-  icon?: IconVariant;
-}
+export interface ICustomerJob extends ICustomerListItem {}
 
+export interface ICustomerPain extends ICustomerListItem {}
+
+/**
+ * Represents a customer alternative product or solution.
+ */
+export interface ICustomerAlternative {
+  name: string;
+  usage?: string;
+  pros: string[];
+  cons: string[];
+  price: string;
+  uuid?: string;
+}
 export type CustomerProfileMessage = IUserMessage | IAssistantMessage;
 
 export interface ICustomerProfileConversationSearchResult {
@@ -194,4 +204,9 @@ export interface IConceptQueryOptions extends IPageQueryOptions {
 
 export interface IConceptPage extends IPageResponse<IConcept> {
   statusCounts: { [key in ConceptStatus]: number };
+}
+
+// For EditableList usage, allow uuid as optional (for new/unsaved items)
+export interface ICustomerListItemWithUuid extends ICustomerListItem {
+  uuid?: string;
 }

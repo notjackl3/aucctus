@@ -9,8 +9,9 @@ import { FunctionComponent, useEffect, useRef, useState } from 'react';
 import { cn } from '@libs/utils/react';
 import CustomerOverview from './CustomerOverview';
 import CustomerConversation from './CustomerConversation';
-import JobsToBeDone from './jobs/JobsToBeDone';
-import Pains from './pains/Pains';
+import CustomerJobs from './CustomerJobs';
+import CustomerPains from './CustomerPains';
+import CustomerAlternatives from './CustomerAlternatives';
 import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
 import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileConversationEvent';
 
@@ -119,7 +120,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
           <Loading />
         </div>
       ) : (
-        <div className='flex flex-row gap-4'>
+        <div className='flex w-full flex-row gap-4'>
           <CustomerOverview
             ref={overviewRef}
             profile={profile}
@@ -133,9 +134,10 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         </div>
       )}
 
-      <div className='flex flex-row gap-4'>
-        <JobsToBeDone />
-        <Pains />
+      <div className='flex w-full flex-row gap-4'>
+        <CustomerJobs profile={profile} />
+        <CustomerPains profile={profile} />
+        <CustomerAlternatives profile={profile} />
       </div>
     </div>
   );

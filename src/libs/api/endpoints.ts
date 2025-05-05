@@ -239,6 +239,27 @@ export class Endpoints {
   }
 
   // TODO: Add trends and drivers and ecosystem endpoints for v2
+
+  // Customer Jobs Endpoints
+  static customerProfileJobs(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/jobs`;
+  }
+  static customerProfileJob(customerProfileUuid: string, jobUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/jobs/${jobUuid}`;
+  }
+
+  // Customer Pains Endpoints
+  static customerProfilePains(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/pains`;
+  }
+  static customerProfilePain(customerProfileUuid: string, painUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/pains/${painUuid}`;
+  }
+
+  // Customer Alternatives Endpoints
+  static customerProfileAlternatives(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/alternatives`;
+  }
 }
 
 export class SocketEndpoints {
