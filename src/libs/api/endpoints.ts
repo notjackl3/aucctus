@@ -260,6 +260,17 @@ export class Endpoints {
   static customerProfileAlternatives(customerProfileUuid: string) {
     return `/api/v2/concept/customer-profile/${customerProfileUuid}/alternatives`;
   }
+
+  // User Journey Steps Endpoints
+  static customerProfileJourneySteps(customerProfileUuid: string) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/journey-steps`;
+  }
+  static customerProfileJourneyStep(
+    customerProfileUuid: string,
+    stepUuid: string,
+  ) {
+    return `/api/v2/concept/customer-profile/${customerProfileUuid}/journey-steps/${stepUuid}`;
+  }
 }
 
 export class SocketEndpoints {

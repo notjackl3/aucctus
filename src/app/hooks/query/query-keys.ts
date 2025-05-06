@@ -19,6 +19,7 @@ export enum AucctusQueryKeys {
   customerProfileJobs = 'customerProfileJobs',
   customerJob = 'customerJob',
   customerPain = 'customerPain',
+  customerJourneyStep = 'customerJourneyStep',
   financialProjection = 'financialProjection',
   marketScan = 'marketScan',
   assumption = 'assumption',

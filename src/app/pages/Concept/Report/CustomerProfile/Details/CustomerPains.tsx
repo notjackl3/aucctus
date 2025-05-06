@@ -1,10 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Icon } from '@components';
-import {
-  ICustomerProfile,
-  ICustomerPain,
-  ICustomerListItemWithUuid,
-} from '@libs/api/types';
+import { ICustomerPain, ICustomerListItemWithUuid } from '@libs/api/types';
 import EditableList from './components/EditableList';
 import {
   useCustomerPainsList,
@@ -23,7 +19,9 @@ export interface Pain {
 }
 
 interface PainPointsProps {
-  profile?: ICustomerProfile;
+  customerProfileUuid: string;
+  pains?: ICustomerPain[];
+  insight?: string;
 }
 
 const PRIORITY_COLOR_TEXT = 'text-orangeDark-600';
@@ -35,11 +33,14 @@ const PRIORITY_COLOR_ICON_BG = 'bg-orangeDark-100';
 const AI_INSIGHT_TEXT_COLOR = 'text-orangeDark-600';
 const AI_INSIGHT_ICON_STROKE = 'stroke-orangeDark-600';
 
-const PainPoints: React.FC<PainPointsProps> = ({ profile }) => {
+const PainPoints: React.FC<PainPointsProps> = ({
+  customerProfileUuid,
+  pains: initialPains,
+  insight,
+}) => {
   const [insightExpanded, setInsightExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
-  const customerProfileUuid = profile?.uuid;
   const painsQuery = useCustomerPainsList(customerProfileUuid || '');
   const createPain = useCustomerPainCreate(customerProfileUuid || '');
 
@@ -49,8 +50,8 @@ const PainPoints: React.FC<PainPointsProps> = ({ profile }) => {
 
   // Memoize pains and items
   const pains: ICustomerPain[] = useMemo(
-    () => painsQuery.data || [],
-    [painsQuery.data],
+    () => painsQuery.data || initialPains || [],
+    [painsQuery.data, initialPains],
   );
   telemetry;
   const sortedPains = useMemo(
@@ -152,13 +153,14 @@ const PainPoints: React.FC<PainPointsProps> = ({ profile }) => {
         </div>
 
         {/* AI Insight */}
-        {topPain && (
+        {(topPain || insight) && (
           <AiInsight
             topJob={topPain}
             insightExpanded={insightExpanded}
             setInsightExpanded={setInsightExpanded}
             textColorClass={AI_INSIGHT_TEXT_COLOR}
             iconStrokeClass={AI_INSIGHT_ICON_STROKE}
+            customInsight={insight}
           />
         )}
       </div>

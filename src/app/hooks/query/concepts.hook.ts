@@ -23,6 +23,7 @@ import {
   IMarketScan,
   ISeedQueryOptions,
   ITrendsAndDrivers,
+  IUserJourneyStep,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
@@ -377,7 +378,10 @@ export const useConceptCustomerProfileConversationList = (
         filterOptions,
       );
     },
-    onError: (e) => {
+    onError: (e: AxiosError) => {
+      if (e.response?.status === 404) {
+        return; // Don't show error toast for 404 responses
+      }
       const message = utils.osiris.parseFormError(e);
       toast.error(
         message || 'Failed to search conversation. Please try again.',
@@ -991,5 +995,138 @@ export const useCustomerAlternativesList = (customerProfileUuid: string) => {
       return await api.concept.getCustomerAlternatives(customerProfileUuid);
     },
     enabled: !!customerProfileUuid,
+  });
+};
+
+/**
+ * User Journey Steps API hooks
+ */
+export const useCustomerJourneyStepsList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfile,
+      customerProfileUuid,
+      'journey-steps',
+    ],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerJourneySteps(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+
+export const useCustomerJourneyStep = (
+  customerProfileUuid: string,
+  stepUuid: string,
+) => {
+  return useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerJourneyStep,
+      customerProfileUuid,
+      stepUuid,
+    ],
+    queryFn: async () => {
+      if (!customerProfileUuid || !stepUuid) return null;
+      return await api.concept.getCustomerJourneyStep(
+        customerProfileUuid,
+        stepUuid,
+      );
+    },
+    enabled: !!customerProfileUuid && !!stepUuid,
+  });
+};
+
+export const useCustomerJourneyStepCreate = (customerProfileUuid: string) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (data: {
+      title: string;
+      description: string;
+      order?: number;
+      relationType?: string;
+      isProductIntervention?: boolean;
+    }) => {
+      return await api.concept.createCustomerJourneyStep(
+        customerProfileUuid,
+        data,
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          customerProfileUuid,
+          'journey-steps',
+        ],
+      });
+      toast.success('Journey step created');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to create journey step');
+    },
+  });
+};
+
+export const useCustomerJourneyStepUpdate = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      stepUuid: string;
+      data: Partial<IUserJourneyStep>;
+    }) => {
+      const { customerProfileUuid, stepUuid, data } = params;
+      return await api.concept.updateCustomerJourneyStep(
+        customerProfileUuid,
+        stepUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'journey-steps',
+        ],
+      });
+      toast.success('Journey step updated');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to update journey step');
+    },
+  });
+};
+
+export const useCustomerJourneyStepDelete = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (params: {
+      customerProfileUuid: string;
+      stepUuid: string;
+    }) => {
+      const { customerProfileUuid, stepUuid } = params;
+      return await api.concept.deleteCustomerJourneyStep(
+        customerProfileUuid,
+        stepUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfile,
+          variables.customerProfileUuid,
+          'journey-steps',
+        ],
+      });
+      toast.success('Journey step deleted');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to delete journey step');
+    },
   });
 };

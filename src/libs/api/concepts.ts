@@ -21,6 +21,7 @@ import {
   IMarketScan,
   IPageResponse,
   ITrendsAndDrivers,
+  IUserJourneyStep,
   QuestionFieldType,
 } from './types'; // Import the missing type
 import {
@@ -369,6 +370,52 @@ export class ConceptApi extends ApiService {
   getCustomerAlternatives(customerProfileUuid: string) {
     return this.get<ICustomerAlternative[]>(
       endpoints.customerProfileAlternatives(customerProfileUuid),
+    );
+  }
+
+  // User Journey Steps API
+  getCustomerJourneySteps(customerProfileUuid: string) {
+    return this.get<IUserJourneyStep[]>(
+      endpoints.customerProfileJourneySteps(customerProfileUuid),
+    );
+  }
+
+  getCustomerJourneyStep(customerProfileUuid: string, stepUuid: string) {
+    return this.get<IUserJourneyStep>(
+      endpoints.customerProfileJourneyStep(customerProfileUuid, stepUuid),
+    );
+  }
+
+  createCustomerJourneyStep(
+    customerProfileUuid: string,
+    data: {
+      title: string;
+      description: string;
+      order?: number;
+      relationType?: string;
+      isProductIntervention?: boolean;
+    },
+  ) {
+    return this.post<IUserJourneyStep>(
+      endpoints.customerProfileJourneySteps(customerProfileUuid),
+      data,
+    );
+  }
+
+  updateCustomerJourneyStep(
+    customerProfileUuid: string,
+    stepUuid: string,
+    data: Partial<IUserJourneyStep>,
+  ) {
+    return this.patch<IUserJourneyStep>(
+      endpoints.customerProfileJourneyStep(customerProfileUuid, stepUuid),
+      data,
+    );
+  }
+
+  deleteCustomerJourneyStep(customerProfileUuid: string, stepUuid: string) {
+    return this.delete<void>(
+      endpoints.customerProfileJourneyStep(customerProfileUuid, stepUuid),
     );
   }
 }

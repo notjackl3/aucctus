@@ -7,11 +7,12 @@ import { cn } from '@libs/utils/react';
 import { ICustomerProfileConversation } from '@stores/customer_profile_conversations/store';
 import useStore from '@stores/store';
 import { FunctionComponent, useEffect, useRef, useState } from 'react';
-import CustomerAlternatives from './CustomerAlternatives';
 import CustomerConversation from './CustomerConversation';
 import CustomerJobs from './CustomerJobs';
 import CustomerOverview from './CustomerOverview';
 import CustomerPains from './CustomerPains';
+import CustomerAlternatives from './CustomerAlternatives';
+import UserJourneyFlow from './UserJourneyFlow';
 
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
@@ -132,9 +133,29 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
       )}
 
       <div className='flex w-full flex-row gap-4'>
-        <CustomerJobs profile={profile} />
-        <CustomerPains profile={profile} />
-        <CustomerAlternatives profile={profile} />
+        <CustomerJobs
+          customerProfileUuid={profile.uuid}
+          jobs={profile.jobs}
+          insight={profile.jobsToBeDoneInsight}
+        />
+        <CustomerPains
+          customerProfileUuid={profile.uuid}
+          pains={profile.pains}
+          insight={profile.painsInsight}
+        />
+        <CustomerAlternatives
+          customerProfileUuid={profile.uuid}
+          insight={profile.alternativesInsight}
+        />
+      </div>
+
+      <div className='flex w-full flex-row gap-4'>
+        <UserJourneyFlow
+          customerProfileUuid={profile.uuid}
+          journey={profile.journey}
+          productName='High Fibre Cheese Bites'
+          insight={profile.journeyInsight}
+        />
       </div>
     </div>
   );

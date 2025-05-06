@@ -152,7 +152,14 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   incomeRange: string;
   jobs: ICustomerJob[];
   pains: ICustomerPain[];
+  journey: IUserJourneyStep[];
   avatarUrl?: string;
+  jobsToBeDoneInsight?: string;
+  painsInsight?: string;
+  alternativesInsight?: string;
+  journeyInsight?: string;
+
+  conversations?: ICustomerProfileConversation[]; // Returned from additional API call
 }
 
 export interface ICustomerProfileCreate {
@@ -167,6 +174,7 @@ export interface ICustomerProfileCreate {
   incomeLower: number;
   jobs: string[];
   pains: string[];
+  journey: IUserJourneyStep[];
 }
 
 export type SortableConceptProperties =
@@ -194,4 +202,35 @@ export interface IConceptPage extends IPageResponse<IConcept> {
 // For EditableList usage, allow uuid as optional (for new/unsaved items)
 export interface ICustomerListItemWithUuid extends ICustomerListItem {
   uuid?: string;
+}
+
+/**
+ * Represents a step in the user journey.
+ */
+export interface IUserJourneyStep {
+  uuid: string;
+  title: string;
+  description: string;
+  order: number;
+  relationType?:
+    | 'job'
+    | 'pain'
+    | 'Journey Step'
+    | 'JTBD'
+    | 'Pain'
+    | 'Moment of Intervention';
+  icon?: IconVariant;
+}
+
+export interface IUserJourneyStepCreate {
+  title: string;
+  description: string;
+  order: number;
+  relationType?:
+    | 'job'
+    | 'pain'
+    | 'Journey Step'
+    | 'JTBD'
+    | 'Pain'
+    | 'Moment of Intervention';
 }

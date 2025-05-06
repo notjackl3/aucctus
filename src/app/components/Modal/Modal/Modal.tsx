@@ -72,7 +72,7 @@ const Modal: FunctionComponent<IModalProps> = ({
   return (
     <div
       className={cn(
-        'fixed inset-0 flex w-full overflow-y-auto overflow-x-hidden',
+        'fixed inset-0 z-50 flex w-full overflow-y-auto overflow-x-hidden',
         backgroundAnimation,
         backgroundClassName,
       )}

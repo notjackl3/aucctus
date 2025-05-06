@@ -10,6 +10,7 @@ import Base from './Modal/Modal';
 import ConclusionVisualization from './ConclusionVisualizationModal/ConclusionVisualizationModal';
 import AiEditing from './AiEditingModal/AiEditingModal';
 import TestModal from './TestModal/TestModal';
+import JourneyStep from './JourneyStepModal';
 
 const Modal = {
   Base,
@@ -24,6 +25,7 @@ const Modal = {
   ConclusionVisualization,
   SupportInsights,
   TestModal,
+  JourneyStep,
 };
 
 export default Modal;

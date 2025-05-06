@@ -1,10 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { Icon } from '@components';
-import {
-  ICustomerProfile,
-  ICustomerJob,
-  ICustomerListItemWithUuid,
-} from '@libs/api/types';
+import { ICustomerJob, ICustomerListItemWithUuid } from '@libs/api/types';
 import EditableList from './components/EditableList';
 import {
   useCustomerJobsList,
@@ -22,7 +18,9 @@ export interface Job {
 }
 
 interface JobsToBeDoneProps {
-  profile?: ICustomerProfile;
+  customerProfileUuid: string;
+  jobs?: ICustomerJob[];
+  insight?: string;
 }
 
 const PRIORITY_COLOR_TEXT = 'text-orangeDark-900';
@@ -34,11 +32,14 @@ const PRIORITY_COLOR_ICON_BG = 'bg-orangeDark-100';
 const AI_INSIGHT_TEXT_COLOR = 'text-orangeDark-900';
 const AI_INSIGHT_ICON_STROKE = 'stroke-orangeDark-900';
 
-const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({ profile }) => {
+const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
+  customerProfileUuid,
+  jobs: initialJobs,
+  insight,
+}) => {
   const [insightExpanded, setInsightExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
-  const customerProfileUuid = profile?.uuid;
   const jobsQuery = useCustomerJobsList(customerProfileUuid || '');
   const createJob = useCustomerJobCreate(customerProfileUuid || '');
 
@@ -48,8 +49,8 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({ profile }) => {
 
   // Memoize jobs and items
   const jobs: ICustomerJob[] = useMemo(
-    () => jobsQuery.data || [],
-    [jobsQuery.data],
+    () => jobsQuery.data || initialJobs || [],
+    [jobsQuery.data, initialJobs],
   );
   const sortedJobs = useMemo(
     () => [...jobs].sort((a, b) => (b.order || 0) - (a.order || 0)),
@@ -150,13 +151,14 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({ profile }) => {
         </div>
 
         {/* AI Insight */}
-        {topJob && (
+        {(topJob || insight) && (
           <AiInsight
             topJob={topJob}
             insightExpanded={insightExpanded}
             setInsightExpanded={setInsightExpanded}
             textColorClass={AI_INSIGHT_TEXT_COLOR}
             iconStrokeClass={AI_INSIGHT_ICON_STROKE}
+            customInsight={insight}
           />
         )}
       </div>

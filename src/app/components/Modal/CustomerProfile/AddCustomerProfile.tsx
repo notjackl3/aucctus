@@ -6,6 +6,7 @@ import InputField from '../../Input/InputField/InputField';
 import TextArea from '../../Input/TextArea/TextArea';
 import styles from './add-customer-profile.module.scss';
 import { useModal } from '@context/ModalContextProvider';
+import { IUserJourneyStep } from '@libs/api/types';
 interface IAddCustomerProfileProps {
   conceptUuid: string;
 }
@@ -292,6 +293,7 @@ const AddCustomerProfile: FunctionComponent<IAddCustomerProfileProps> = ({
                 geoLocation,
                 jobs: [] as string[],
                 pains: [] as string[],
+                journey: [] as IUserJourneyStep[],
               },
               {
                 onSuccess: () => {

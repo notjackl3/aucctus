@@ -3,15 +3,17 @@ import Badges from '@components/Badges';
 import { Icon, Container } from '@components';
 import SectionHeader from './components/SectionHeader';
 import AiInsight from './components/AiInsight';
-import type { ICustomerAlternative, ICustomerProfile } from '@libs/api/types';
+import type { ICustomerAlternative } from '@libs/api/types';
 import { useCustomerAlternativesList } from '@hooks/query/concepts.hook';
 
 /**
  * Props for CustomerAlternatives component.
- * @param profile Customer profile
+ * @param customerProfileUuid Customer profile UUID
+ * @param insight Optional AI-generated insight about alternatives
  */
 export interface CustomerAlternativesProps {
-  profile: ICustomerProfile;
+  customerProfileUuid: string;
+  insight?: string;
 }
 
 const MAIN_ICON_STROKE = 'aucctus-stroke-brand-primary';
@@ -19,9 +21,11 @@ const CHECK_ICON_STROKE = 'aucctus-stroke-success-primary';
 const CLOSE_ICON_STROKE = 'aucctus-stroke-error-primary';
 
 const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
-  profile,
+  customerProfileUuid,
+  insight,
 }) => {
-  const { data: alternatives = [] } = useCustomerAlternativesList(profile.uuid);
+  const { data: alternatives = [] } =
+    useCustomerAlternativesList(customerProfileUuid);
   const [open, setOpen] = React.useState<string[]>(
     alternatives[0] ? [alternatives[0].name] : [],
   );
@@ -173,13 +177,13 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
             },
           )}
         </div>
-        {topAlt && (
+        {(topAlt || insight) && (
           <AiInsight
             topJob={{
               uuid:
-                topAlt.uuid ||
-                `alt-${topAlt.name.replace(/\s+/g, '-').toLowerCase()}`,
-              description: topAlt.name,
+                topAlt?.uuid ||
+                `alt-${topAlt?.name?.replace(/\s+/g, '-').toLowerCase() || 'default'}`,
+              description: topAlt?.name || '',
               order: 10,
               icon: 'clipboard',
             }}
@@ -187,6 +191,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
             setInsightExpanded={setInsightExpanded}
             textColorClass='aucctus-text-brand-primary'
             iconStrokeClass='aucctus-stroke-brand-primary'
+            customInsight={insight}
           />
         )}
       </div>
