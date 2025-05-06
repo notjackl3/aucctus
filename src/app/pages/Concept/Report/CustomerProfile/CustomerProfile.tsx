@@ -88,7 +88,7 @@ const CustomerProfile: FunctionComponent = () => {
         tabs={customerTabs}
         tabGroupClassName='pointer-events-auto'
         className={styles.tabs}
-        variant='button-separated'
+        variant='button'
         onTabSelect={onTabSelect}
         activeTab={selectedProfileName || ''}
       >

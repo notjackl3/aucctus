@@ -29,14 +29,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
   const [open, setOpen] = React.useState<string[]>(
     alternatives[0] ? [alternatives[0].name] : [],
   );
-  const [insightExpanded, setInsightExpanded] = React.useState(true);
-
-  // Update open state when alternatives data changes
-  React.useEffect(() => {
-    if (alternatives[0] && !open.length) {
-      setOpen([alternatives[0].name]);
-    }
-  }, [alternatives, open.length]);
+  const [insightExpanded, setInsightExpanded] = React.useState(false);
 
   const handleToggle = (name: string) => {
     setOpen((prev) =>
@@ -45,6 +38,11 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
   };
 
   const topAlt = alternatives[0];
+
+  // Return null if there are no alternatives
+  if (!alternatives.length) {
+    return null;
+  }
 
   return (
     <div className='aucctus-bg-primary aucctus-border-secondary flex min-w-0 flex-1 flex-col rounded-lg border shadow-sm'>
