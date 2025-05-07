@@ -224,14 +224,10 @@ export class ConceptApi extends ApiService {
 
   createConceptCustomerProfileRealWorldSignal(
     customerProfileUuid: string,
-    realWorldSignalUuid: string,
     data: ICreateRealWorldSignal,
   ) {
     return this.post<ICustomerProfileRealWorldSignal>(
-      endpoints.conceptCustomerProfileRealWorldSignalUuid(
-        customerProfileUuid,
-        realWorldSignalUuid,
-      ),
+      endpoints.conceptCustomerProfileRealWorldSignals(customerProfileUuid),
       data,
     );
   }

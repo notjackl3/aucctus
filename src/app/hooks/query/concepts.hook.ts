@@ -443,13 +443,11 @@ export const useCustomerProfileRealWorldSignalCreate = () => {
   return useMutation({
     mutationFn: async (params: {
       profileUuid: string;
-      signalUuid: string;
       signal: ICreateRealWorldSignal;
     }) => {
-      const { profileUuid, signalUuid, signal } = params;
+      const { profileUuid, signal } = params;
       return await api.concept.createConceptCustomerProfileRealWorldSignal(
         profileUuid,
-        signalUuid,
         signal,
       );
     },

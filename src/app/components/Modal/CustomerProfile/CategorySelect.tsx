@@ -8,6 +8,8 @@ interface CategorySelectProps<T extends string> {
   selectedValue: T;
   options: readonly T[];
   onChange: (value: T) => void;
+  errorMessage?: string;
+  required?: boolean;
 }
 
 const CategorySelect = <T extends string>({
@@ -15,6 +17,8 @@ const CategorySelect = <T extends string>({
   selectedValue,
   options,
   onChange,
+  errorMessage,
+  required,
 }: CategorySelectProps<T>) => {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -60,6 +64,7 @@ const CategorySelect = <T extends string>({
     <div className='mb-4'>
       <label className='aucctus-text-sm aucctus-text-primary mb-2 block'>
         {label}
+        {required && <span className='aucctus-text-error-primary ml-1'>*</span>}
       </label>
       <div className='relative' ref={dropdownRef}>
         {/* Custom select trigger */}
@@ -68,7 +73,8 @@ const CategorySelect = <T extends string>({
             'flex w-full cursor-pointer items-center justify-between rounded-md border p-3 transition-all duration-200':
               true,
             'aucctus-bg-primary aucctus-text-primary': true,
-            'aucctus-border-secondary': !isOpen,
+            'aucctus-border-secondary': !isOpen && !errorMessage,
+            'aucctus-border-error': !isOpen && !!errorMessage,
             'aucctus-border-brand': isOpen,
             'focus:aucctus-border-brand': true,
           })}
@@ -91,6 +97,13 @@ const CategorySelect = <T extends string>({
             })}
           />
         </div>
+
+        {/* Error message */}
+        {errorMessage && (
+          <span className='aucctus-text-error-primary mt-1 block text-sm'>
+            {errorMessage}
+          </span>
+        )}
 
         {/* Dropdown options */}
         {isOpen && (

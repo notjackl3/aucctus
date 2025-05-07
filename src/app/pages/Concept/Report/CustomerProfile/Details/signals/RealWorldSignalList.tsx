@@ -55,7 +55,7 @@ const RealWorldSignalList: React.FC<IRealWorldSignalListProps> = ({
 
   return (
     <div className={containerClassName}>
-      <SignalHeader onAddSignal={() => {}} />
+      <SignalHeader profileUuid={profileUuid} />
 
       {signals.length > 0 && (
         <GroupedSignals profileUuid={profileUuid} signals={signals} />

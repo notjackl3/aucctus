@@ -40,6 +40,10 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
   const [errors, setErrors] = useState({
     title: undefined as string | undefined,
     description: undefined as string | undefined,
+    sourceCategory: undefined as string | undefined,
+    stance: undefined as string | undefined,
+    sourceTitle: undefined as string | undefined,
+    sourceUrl: undefined as string | undefined,
   });
 
   // Use the create mutation if no signal is provided (new signal)
@@ -58,15 +62,36 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
     error?: string,
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: error }));
+  };
 
-    if (field === 'title' || field === 'description') {
-      setErrors((prev) => ({ ...prev, [field]: error }));
-    }
+  const validateForm = () => {
+    const newErrors = {
+      title: !formData.title ? 'Title is required.' : undefined,
+      description: !formData.description
+        ? 'Description is required.'
+        : undefined,
+      sourceCategory: !formData.sourceCategory
+        ? 'Source category is required.'
+        : undefined,
+      stance: !formData.stance ? 'Stance is required.' : undefined,
+      sourceTitle: !formData.sourceTitle
+        ? 'Source title is required.'
+        : undefined,
+      sourceUrl: !formData.sourceUrl ? 'Source URL is required.' : undefined,
+    };
+
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error !== undefined);
   };
 
   const handleSave = () => {
     if (!profileUuid) {
       toast.error('Profile UUID is required');
+      return;
+    }
+
+    if (!validateForm()) {
       return;
     }
 
@@ -79,22 +104,13 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
       sourceUrl,
     } = formData;
 
-    if (!title || !description) {
-      setErrors({
-        title: !title ? 'Title is required.' : undefined,
-        description: !description ? 'Description is required.' : undefined,
-      });
-      return;
-    }
-
-    // Prepare source data if citation is provided
-    const updatedSources: Partial<ISource>[] = [];
-    if (sourceTitle?.trim() && sourceUrl?.trim()) {
-      updatedSources.push({
+    // Prepare source data
+    const updatedSources: Partial<ISource>[] = [
+      {
         title: sourceTitle.trim(),
         url: sourceUrl.trim(),
-      });
-    }
+      },
+    ];
 
     const signalData: ICreateRealWorldSignal = {
       title,
@@ -128,7 +144,6 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
       createSignal(
         {
           profileUuid,
-          signalUuid: '', // This should be handled by the API
           signal: signalData,
         },
         {
@@ -149,7 +164,7 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
     () => (
       <div className='relative mb-2 flex w-full flex-row items-center justify-between'>
         <span className='aucctus-text-primary aucctus-text-lg-medium'>
-          Edit Signal
+          {signal ? 'Edit Signal' : 'Create Signal'}
         </span>
         <span className='flex flex-1' />
         <button
@@ -165,8 +180,20 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
         </button>
       </div>
     ),
-    [closeModal],
+    [closeModal, signal],
   );
+
+  const isFormValid = useMemo(() => {
+    return (
+      formData.title &&
+      formData.description &&
+      formData.sourceCategory &&
+      formData.stance &&
+      formData.sourceTitle &&
+      formData.sourceUrl &&
+      !Object.values(errors).some((error) => error !== undefined)
+    );
+  }, [formData, errors]);
 
   return (
     <div className={styles.container}>
@@ -184,13 +211,7 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
         </button>
         <button
           className='btn btn-primary'
-          disabled={
-            !formData.title ||
-            !formData.description ||
-            !!errors.title ||
-            !!errors.description ||
-            isLoading
-          }
+          disabled={!isFormValid || isLoading}
           onClick={handleSave}
         >
           {isLoading ? 'Saving...' : 'Save'}

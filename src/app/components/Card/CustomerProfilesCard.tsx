@@ -84,7 +84,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
           <img
             className='aucctus-border-secondary relative h-16 w-16 rounded-full border'
             alt='avatar'
-            src={defaultAvatar}
+            src={profile?.avatarUrl || defaultAvatar}
           />
           <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-1'>
             <h6 className='aucctus-text-primary aucctus-text-md self-stretch text-base'>
