@@ -324,8 +324,8 @@ export const useConceptMarketScan = (uuid: string) => {
 export const useConceptCustomerProfiles = (uuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.customerProfiles, uuid],
-    staleTime: 0,
-    cacheTime: 0,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
     queryFn: async () => await api.concept.getConceptCustomerProfiles(uuid),
     enabled: !!uuid,
   });
@@ -372,7 +372,8 @@ export const useConceptCustomerProfileConversationList = (
       filterOptions?.message,
       filterOptions?.page,
     ],
-    staleTime: 0,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
     queryFn: async () => {
       return await api.concept.getCustomerProfileConversationList(
         profileUuid,
@@ -409,8 +410,8 @@ export const useCustomerProfileRealWorldSignals = (profileUuid: string) => {
     queryFn: async () =>
       await api.concept.getConceptCustomerProfileRealWorldSignals(profileUuid),
     enabled: !!profileUuid,
-    staleTime: 0,
-    cacheTime: 0,
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
   });
 
   return { ...query, signalsResponse: query.data };
@@ -809,7 +810,7 @@ export const useConceptVersions = (uuid?: string) => {
       uuid ? await api.concept.getConceptVersions(uuid) : undefined,
     enabled: !!uuid,
     staleTime: 0,
-    cacheTime: 0,
+    cacheTime: 1000 * 60 * 2, // 2 minutes
   });
 
   return {

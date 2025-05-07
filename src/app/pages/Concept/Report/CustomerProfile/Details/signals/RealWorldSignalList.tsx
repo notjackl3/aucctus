@@ -79,7 +79,7 @@ const RealWorldSignalList: React.FC<IRealWorldSignalListProps> = ({
       )}
 
       {signals.length === 0 && (
-        <div className='flex justify-center py-4'>
+        <div className='flex justify-center pb-6 pt-4'>
           <span className='aucctus-text-tertiary aucctus-text-sm'>
             No signals available yet.
           </span>

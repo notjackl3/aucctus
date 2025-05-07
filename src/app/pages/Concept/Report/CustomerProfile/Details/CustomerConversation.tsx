@@ -39,14 +39,17 @@ const CustomerConversation = forwardRef<
   HTMLDivElement,
   CustomerConversationProps
 >(({ profile, conversations, className = '', style = {} }, ref) => {
+  // Refs
+  const conversationRef = useRef<HTMLDivElement>(null);
+  const conversationMessagesRef = useRef<ICustomerProfileConversation[]>([]);
+
   // State
   const [activeConversation, setActiveConversation] = useState<
     ICustomerProfileConversation | undefined
   >(conversations?.[0]);
 
-  useEffect(() => {
-    setActiveConversation(conversations?.[0]);
-  }, [conversations]);
+  // Context hooks
+  const { openModal, closeModal } = useModal();
 
   // Store hooks
   const {
@@ -59,9 +62,6 @@ const CustomerConversation = forwardRef<
     setConversation,
   } = useStore((state) => state.customerProfileConversations);
 
-  // Context hooks
-  const { openModal, closeModal } = useModal();
-
   // Query hooks
   const {
     data: conversationMessages = { results: [] },
@@ -72,9 +72,6 @@ const CustomerConversation = forwardRef<
     activeConversation?.uuid,
     false,
   );
-
-  // Refs
-  const conversationRef = useRef<HTMLDivElement>(null);
 
   // Memoized values
   const introMessage: IAssistantMessage = useMemo(() => {
@@ -89,6 +86,12 @@ const CustomerConversation = forwardRef<
   }, [profile]);
 
   // Callbacks
+  const doConversationClear = useCallback(() => {
+    conversationMessagesRef.current = [];
+    clearConversation();
+    setActiveConversation(undefined);
+  }, [clearConversation, setActiveConversation]);
+
   const scrollToBottom = useCallback((delay = 300) => {
     setTimeout(() => {
       if (conversationRef.current) {
@@ -128,12 +131,30 @@ const CustomerConversation = forwardRef<
     });
   };
 
-  // Effects
+  // Effects - Initialization
+  useEffect(() => {
+    setActiveConversation(conversations?.[0]);
+  }, [conversations]);
+
+  useEffect(() => {
+    doConversationClear();
+  }, [profile, doConversationClear]);
+
+  // Effects - Data synchronization
   useEffect(() => {
     if (conversationMessages && activeConversation) {
       const fullConversation = (conversations ?? []).find(
         (c) => c.uuid === activeConversation.uuid,
       );
+
+      if (
+        JSON.stringify(conversationMessagesRef.current) ===
+        JSON.stringify(conversationMessages.results)
+      ) {
+        return;
+      }
+
+      conversationMessagesRef.current = conversationMessages.results;
 
       if (fullConversation) {
         fullConversation.messages = conversationMessages.results;
@@ -141,17 +162,20 @@ const CustomerConversation = forwardRef<
       }
     }
   }, [
-    conversationMessages,
     conversations,
+    conversationMessages,
     activeConversation,
     setConversation,
   ]);
 
   useEffect(() => {
-    clearConversation();
-    setActiveConversation(undefined);
-  }, [profile, clearConversation]);
+    if (profile.uuid && activeConversation?.uuid) {
+      refetchConversationMessages();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refetchConversationMessages, activeConversation]);
 
+  // Effects - UI Updates
   useEffect(() => {
     if (!conversationRef.current) return;
 
@@ -175,14 +199,6 @@ const CustomerConversation = forwardRef<
       scrollToBottom();
     }
   }, [messages, isThinking, scrollToBottom]);
-
-  // Add an effect to manually trigger the fetch only when profile changes
-  useEffect(() => {
-    if (profile.uuid && activeConversation?.uuid) {
-      refetchConversationMessages();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetchConversationMessages, activeConversation]);
 
   return (
     <div
@@ -228,7 +244,7 @@ const CustomerConversation = forwardRef<
           </Tooltip>
           <Tooltip tip='Start a new conversation'>
             <button
-              onClick={() => clearConversation()}
+              onClick={doConversationClear}
               className={cn(
                 'aspect-square w-8 rounded-lg',
                 'transition-all duration-200',
@@ -264,8 +280,11 @@ const CustomerConversation = forwardRef<
 
           {/* Message history */}
           {!isLoadingConversationMessages &&
-            messages.map((message) => (
-              <div key={message.uuid} className='flex flex-row gap-4'>
+            messages.map((message, index) => (
+              <div
+                key={message.role + message.content + index}
+                className='flex flex-row gap-4'
+              >
                 <CustomerChatMessage profile={profile} message={message} />
               </div>
             ))}

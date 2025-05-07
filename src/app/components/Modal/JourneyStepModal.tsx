@@ -114,10 +114,7 @@ const JourneyStepModal: React.FC<JourneyStepModalProps> = ({
             <button
               type='button'
               onClick={handleCancel}
-              className={cn('btn btn-secondary', {
-                'cursor-not-allowed opacity-50':
-                  !title.trim() || !description.trim(),
-              })}
+              className='btn btn-secondary'
             >
               Cancel
             </button>
