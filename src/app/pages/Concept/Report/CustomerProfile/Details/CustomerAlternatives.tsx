@@ -57,7 +57,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
           Products and solutions the customer currently uses instead of our
           offering
         </p>
-        <div className='max-h-[420px] flex-grow overflow-y-auto pr-1'>
+        <div className='max-h-[400px] flex-grow overflow-y-auto pr-1'>
           <div className='flex flex-col gap-3'>
             {alternatives.map(
               (alternative: ICustomerAlternative, idx: number) => {

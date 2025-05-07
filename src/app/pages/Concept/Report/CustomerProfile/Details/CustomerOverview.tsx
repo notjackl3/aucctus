@@ -139,7 +139,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                     <div className='grid w-full grid-cols-3'>
                       <span className='aucctus-text-md-semibold'>Income:</span>
                       <span className='aucctus-text-md col-span-2'>
-                        {`${profile?.incomeLower ? `$${profile.incomeLower / 1000}K` : '$40K'}-${profile?.incomeUpper ? `$${profile.incomeUpper / 1000}K` : '$75K'} (Student with part-time job)`}
+                        {`${profile?.incomeLower ? `$${profile.incomeLower / 1000}K` : '$40K'}-${profile?.incomeUpper ? `$${profile.incomeUpper / 1000}K` : '$75K'}`}
                       </span>
                     </div>
                   </div>

@@ -40,7 +40,9 @@ const CustomerProfileChatMessage: React.FC<CustomerProfileChatMessageProps> = ({
           lastName={user?.lastName || ''}
           src={user?.profileImage}
           hideImage={!!user?.profileImage}
-          className={cn('h-6 w-6 transition-all duration-300')}
+          className={cn(
+            'aucctus-border-primary h-6 w-6 rounded-full border transition-all duration-300',
+          )}
         />
       </div>
     );
@@ -52,6 +54,9 @@ const CustomerProfileChatMessage: React.FC<CustomerProfileChatMessageProps> = ({
         firstName={profile.name}
         lastName={profile.name}
         src={profile?.avatarUrl || defaultAvatar}
+        className={cn(
+          'aucctus-border-primary h-6 w-6 rounded-full border transition-all duration-300',
+        )}
       />
       <div className='aucctus-text-primary aucctus-bg-secondary ml-4 h-fit max-w-[70%] rounded-lg p-4'>
         {message.content}

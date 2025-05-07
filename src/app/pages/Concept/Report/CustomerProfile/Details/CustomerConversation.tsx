@@ -94,7 +94,7 @@ const CustomerConversation = forwardRef<
       if (conversationRef.current) {
         const lastChild = conversationRef.current.lastElementChild;
         if (lastChild) {
-          lastChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          // lastChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
           conversationRef.current.scrollTop =
             conversationRef.current.scrollHeight;

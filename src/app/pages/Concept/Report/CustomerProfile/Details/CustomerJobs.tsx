@@ -126,40 +126,47 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
       />
 
       <div className='px-4 py-2'>
+        <p className='aucctus-text-secondary aucctus-text-sm mb-4'>
+          Tasks your customer needs to accomplish
+        </p>
+
         <div className='flex w-full'>
           <PriorityIndicator
             textColorClass={PRIORITY_COLOR_TEXT}
             lineColorClass={PRIORITY_COLOR_LINE}
           />
-          {/* Jobs list */}
-          <EditableList
-            items={items}
-            onCreate={async (val) => {
-              await handleCreate(val);
-              handleAddComplete();
-            }}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            itemLabel='job'
-            maxVisible={4}
-            isAdding={isAdding}
-            onStartAdding={handleStartAdding}
-            onCancelAdding={handleCancelAdding}
-            iconColorClass={PRIORITY_COLOR_ICON}
-            iconBgClass={PRIORITY_COLOR_ICON_BG}
-          />
+          <div className='max-h-[400px] min-w-0 flex-1 overflow-y-auto pr-1'>
+            {/* Jobs list */}
+            <EditableList
+              items={items}
+              onCreate={async (val) => {
+                await handleCreate(val);
+                handleAddComplete();
+              }}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              itemLabel='job'
+              isAdding={isAdding}
+              onStartAdding={handleStartAdding}
+              onCancelAdding={handleCancelAdding}
+              iconColorClass={PRIORITY_COLOR_ICON}
+              iconBgClass={PRIORITY_COLOR_ICON_BG}
+            />
+          </div>
         </div>
 
         {/* AI Insight */}
         {(topJob || insight) && (
-          <AiInsight
-            topJob={topJob}
-            insightExpanded={insightExpanded}
-            setInsightExpanded={setInsightExpanded}
-            textColorClass={AI_INSIGHT_TEXT_COLOR}
-            iconStrokeClass={AI_INSIGHT_ICON_STROKE}
-            customInsight={insight}
-          />
+          <div className='mt-auto pt-2'>
+            <AiInsight
+              topJob={topJob}
+              insightExpanded={insightExpanded}
+              setInsightExpanded={setInsightExpanded}
+              textColorClass={AI_INSIGHT_TEXT_COLOR}
+              iconStrokeClass={AI_INSIGHT_ICON_STROKE}
+              customInsight={insight}
+            />
+          </div>
         )}
       </div>
     </div>

@@ -24,12 +24,12 @@ const Avatar: React.FC<AvatarProps> = ({
   return (
     <Av.Root
       className={cn(
-        'aucctus-border-secondary aucctus-bg-primary-solid h-12 min-h-12 w-12 min-w-12 rounded-full border bg-opacity-5',
+        'aucctus-border-secondary aucctus-bg-primary-solid h-12 min-h-12 w-12 min-w-12 overflow-hidden rounded-full border bg-opacity-5',
         className,
       )}
     >
       <Av.Image
-        className='h-full w-full border-r-inherit object-cover'
+        className='h-full w-full rounded-full object-cover'
         src={src}
         alt={`${firstName} ${lastName}`}
       />

@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import { cn } from '@libs/utils/react';
 import { Button, Icon, Input } from '@components';
 import type { ICustomerListItemWithUuid } from '@libs/api/types';
@@ -49,7 +49,6 @@ const EditableList: React.FC<EditableListProps> = ({
   onCreate,
   onDelete,
   itemLabel = 'item',
-  maxVisible = 4,
   isAdding = false,
   onCancelAdding,
   iconBgClass = 'aucctus-bg-secondary-subtle',
@@ -58,26 +57,10 @@ const EditableList: React.FC<EditableListProps> = ({
   const [newValue, setNewValue] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
-  const [showAll, setShowAll] = useState(false);
   const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
   const [addingLoading, setAddingLoading] = useState(false);
 
-  // Derived values
-  const visibleItems = useMemo(
-    () => (showAll ? items : items.slice(0, maxVisible)),
-    [items, showAll, maxVisible],
-  );
-  const hiddenCount = useMemo(
-    () => items.length - maxVisible,
-    [items.length, maxVisible],
-  );
-
   // Handlers
-  const handleToggleShowAll = useCallback(
-    () => setShowAll((prev) => !prev),
-    [],
-  );
-
   const handleAdd = useCallback(async () => {
     if (!newValue.trim()) return;
     setAddingLoading(true);
@@ -138,8 +121,8 @@ const EditableList: React.FC<EditableListProps> = ({
       )}
 
       {/* List */}
-      {visibleItems.length > 0 ? (
-        visibleItems.map((item, index) => {
+      {items.length > 0 ? (
+        items.map((item, index) => {
           const isEditing = editingIndex === index;
           const isLoading = loadingIndex === index;
           // Fallbacks
@@ -242,21 +225,8 @@ const EditableList: React.FC<EditableListProps> = ({
           </p>
         </div>
       )}
-
-      {/* Show More/Less */}
-      {hiddenCount > 0 && (
-        <button
-          className={cn(
-            'flex w-full items-center justify-center rounded-md py-1.5',
-            'aucctus-text-secondary aucctus-text-sm hover:aucctus-text-secondary-hover',
-          )}
-          onClick={handleToggleShowAll}
-        >
-          {showAll ? 'Show Less' : `Show ${hiddenCount} More`}
-        </button>
-      )}
     </div>
   );
 };
 
-export default React.memo(EditableList);
+export default EditableList;
