@@ -212,6 +212,7 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   painsInsight?: string;
   alternativesInsight?: string;
   journeyInsight?: string;
+  customerInsight?: string;
 
   conversations?: ICustomerProfileConversation[]; // Returned from additional API call
 }

@@ -1,8 +1,9 @@
 import defaultAvatar from '@assets/img/avatar.png';
-import { Badge, Icon } from '@components';
+import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import { forwardRef } from 'react';
+import { forwardRef, useState } from 'react';
+import AiInsight from './components/AiInsight';
 
 interface CustomerOverviewProps {
   profile: ICustomerProfile;
@@ -25,6 +26,10 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
   ({ profile, description, className }, ref) => {
     // Cast to extended profile for the demo
     const extendedProfile = profile as ExtendedCustomerProfile;
+    const [insightExpanded, setInsightExpanded] = useState(false);
+
+    // Mock top job for AiInsight (can be empty since we use customInsight)
+    const mockTopJob = { uuid: '', description: '', order: 0 };
 
     return (
       <div
@@ -34,7 +39,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
           className,
         )}
       >
-        <div className='flex flex-col p-6'>
+        <div className='flex flex-col px-6 py-2 pt-4'>
           {/* Header with avatar, nickname and name */}
           <div className='mb-6 flex items-start gap-4'>
             <img
@@ -43,18 +48,11 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
               src={profile?.avatarUrl || defaultAvatar}
             />
             <div className='flex flex-col'>
-              <div className='aucctus-bg-brand-subtle inline-block rounded-full'>
-                <Badge.Default
-                  value={profile?.nickname || 'Primary'}
-                  classNameBadge='aucctus-border-brand-secondary aucctus-bg-secondary-subtle border rounded-full items-center justify-center'
-                  classNameLabel='aucctus-text-brand-secondary aucctus-text-sm-medium'
-                />
-              </div>
               <h2 className='aucctus-text-primary aucctus-header-xs-semibold mt-2'>
-                {profile?.name || 'Global Students'}
+                {profile?.nickname || 'Global Students'}
               </h2>
               <div className='aucctus-text-tertiary aucctus-text-sm mt-1'>
-                Represented by Sarah Lim
+                Represented by {profile?.name}
               </div>
             </div>
           </div>
@@ -181,6 +179,18 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                     </div>
                   </div>
                 </div>
+
+                {/* Customer Insight */}
+                {profile?.customerInsight && (
+                  <AiInsight
+                    topJob={mockTopJob}
+                    insightExpanded={insightExpanded}
+                    setInsightExpanded={setInsightExpanded}
+                    textColorClass='aucctus-text-brand-primary'
+                    iconStrokeClass='aucctus-stroke-brand-primary'
+                    customInsight={profile.customerInsight}
+                  />
+                )}
               </div>
             </div>
           </div>

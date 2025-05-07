@@ -208,6 +208,11 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
     [customerProfileUuid, steps, deleteJourneyStepMutation],
   );
 
+  // Hide the component completely if there are no steps and not loading
+  if (!isLoading && steps.length === 0) {
+    return null;
+  }
+
   return (
     <div className={containerStyles}>
       <SectionHeader

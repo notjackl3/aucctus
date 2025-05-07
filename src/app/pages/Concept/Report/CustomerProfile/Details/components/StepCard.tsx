@@ -107,7 +107,7 @@ const StepCard: React.FC<StepCardProps> = ({
   // Determine the card styling based on relation type
   let cardStyle = baseCardStyles;
   if (isInterventionStep) {
-    cardStyle = `${baseCardStyles} ${INTERVENTION_CARD_BG} ${INTERVENTION_CARD_BORDER} mt-2`;
+    cardStyle = `${baseCardStyles} ${INTERVENTION_CARD_BG} ${INTERVENTION_CARD_BORDER}`;
   } else if (isJobStep) {
     cardStyle = `${baseCardStyles} ${JOB_CARD_BG} ${JOB_CARD_BORDER}`;
   } else if (isPainStep) {

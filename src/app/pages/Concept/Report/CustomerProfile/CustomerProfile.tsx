@@ -7,7 +7,6 @@ import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import CustomerDetails from './Details/CustomerDetails';
-import styles from './customerProfile.module.scss';
 
 const CustomerProfile: FunctionComponent = () => {
   const { id: conceptId } = useParams();
@@ -83,19 +82,18 @@ const CustomerProfile: FunctionComponent = () => {
   }
 
   return (
-    <div className={styles.customerProfile}>
+    <div className='flex h-full w-full flex-col flex-wrap items-start self-stretch'>
       <TabView
         tabs={customerTabs}
         tabGroupClassName='pointer-events-auto'
-        className={styles.tabs}
+        className='mt-4 flex h-full w-full items-start justify-center'
         variant='button'
         onTabSelect={onTabSelect}
         activeTab={selectedProfileName || ''}
       >
-        {selectedProfile ? (
+        {selectedProfile && (
           <CustomerDetails profile={selectedProfile} className='mt-4' />
-        ) : // Render nothing if no profile is selected after loading
-        null}
+        )}
       </TabView>
     </div>
   );
