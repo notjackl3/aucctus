@@ -88,7 +88,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
           />
           <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-1'>
             <h6 className='aucctus-text-primary aucctus-text-md self-stretch text-base'>
-              {profile?.nickname}
+              {profile?.segment}
             </h6>
             <span className='aucctus-text-primary aucctus-text-md-bold h-7 self-stretch text-xl'>
               {profile?.name}

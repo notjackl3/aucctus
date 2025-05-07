@@ -386,9 +386,9 @@ export function useEditCustomerProfile(profileUuid: string) {
   //   validation: validationOptions,
   // });
 
-  // const nickname = useEditableField<string, ICustomerProfile>({
-  //   initialValue: profile?.nickname || '',
-  //   fieldName: 'nickname',
+  // const segment = useEditableField<string, ICustomerProfile>({
+  //   initialValue: profile?.segment || '',
+  //   fieldName: 'segment',
   //   updateMutation: mutate,
   //   identifier: profileUuid,
   //   validation: validationOptions,

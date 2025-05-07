@@ -195,7 +195,7 @@ export interface ICustomerRealWorldSignalSummary extends IBaseConceptEntity {
 export interface ICustomerProfile extends IBaseConceptEntity {
   name: string;
   description: string;
-  nickname: string;
+  segment: string;
   geoLocation: string;
   familySize: number;
   ageUpper: number;
@@ -213,6 +213,7 @@ export interface ICustomerProfile extends IBaseConceptEntity {
   alternativesInsight?: string;
   journeyInsight?: string;
   customerInsight?: string;
+  isPrimary?: boolean;
 
   conversations?: ICustomerProfileConversation[]; // Returned from additional API call
 }
@@ -220,7 +221,7 @@ export interface ICustomerProfile extends IBaseConceptEntity {
 export interface ICustomerProfileCreate {
   name: string;
   description: string;
-  nickname: string;
+  segment: string;
   geoLocation: string;
   familySize: number;
   ageUpper: number;

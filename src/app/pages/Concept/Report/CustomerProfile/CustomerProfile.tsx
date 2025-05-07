@@ -1,6 +1,6 @@
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
-import { Loading } from '@components';
+import { Loading, Icon } from '@components';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
@@ -15,14 +15,29 @@ const CustomerProfile: FunctionComponent = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedProfileName = searchParams.get('persona');
   const selectedProfile = useMemo(
-    () => profiles.find((item) => item.nickname === selectedProfileName),
+    () => profiles.find((item) => item.segment === selectedProfileName),
     [profiles, selectedProfileName],
   );
 
   const customerTabs = useMemo(() => {
     return profiles.map<TabElement>((item: ICustomerProfile) => ({
-      label: item.nickname,
-      value: item.nickname,
+      label: (
+        <div className='flex items-center gap-2'>
+          <span>{item.segment}</span>
+          {item.isPrimary && (
+            <span className='aucctus-bg-brand-secondary aucctus-text-brand-tertiary flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs'>
+              <Icon
+                variant='briefcase'
+                height={14}
+                width={14}
+                className='aucctus-stroke-brand-primary'
+              />
+              Primary
+            </span>
+          )}
+        </div>
+      ),
+      value: item.segment,
     }));
   }, [profiles]);
 
@@ -46,7 +61,7 @@ const CustomerProfile: FunctionComponent = () => {
       navigate(
         {
           pathname: AppPath.ConceptCustomerProfile.replace(':id', conceptId),
-          search: `?persona=${firstPersona.nickname}`,
+          search: `?persona=${firstPersona.segment}`,
         },
         {
           replace: true,
@@ -86,7 +101,7 @@ const CustomerProfile: FunctionComponent = () => {
       <TabView
         tabs={customerTabs}
         tabGroupClassName='pointer-events-auto'
-        className='mt-4 flex h-full w-full items-start justify-center'
+        className='mt-2 flex h-full w-full items-start justify-center'
         variant='button'
         onTabSelect={onTabSelect}
         activeTab={selectedProfileName || ''}

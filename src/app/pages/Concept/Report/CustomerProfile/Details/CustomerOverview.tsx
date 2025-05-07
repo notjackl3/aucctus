@@ -5,6 +5,9 @@ import { cn } from '@libs/utils/react';
 import { forwardRef } from 'react';
 import AiInsight from './components/AiInsight';
 
+// Icon stroke constant for consistency
+const MAIN_ICON_STROKE = 'aucctus-stroke-brand-primary';
+
 interface CustomerOverviewProps {
   profile: ICustomerProfile;
   description: {
@@ -39,7 +42,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
         )}
       >
         <div className='flex flex-col px-6 py-2 pt-4'>
-          {/* Header with avatar, nickname and name */}
+          {/* Header with avatar, segment and name */}
           <div className='mb-6 flex items-start gap-4'>
             <img
               className='aucctus-border-primary h-16 w-16 self-center rounded-full border'
@@ -47,8 +50,22 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
               src={profile?.avatarUrl || defaultAvatar}
             />
             <div className='flex flex-col'>
+              {/* Primary badge */}
+              {profile?.isPrimary && (
+                <div className='mb-1 flex'>
+                  <span className='aucctus-bg-brand-secondary aucctus-text-brand-tertiary flex items-center gap-1 rounded-full px-3 py-1 text-sm'>
+                    <Icon
+                      variant='briefcase'
+                      height={14}
+                      width={14}
+                      className={MAIN_ICON_STROKE}
+                    />
+                    Primary
+                  </span>
+                </div>
+              )}
               <h2 className='aucctus-text-primary aucctus-header-xs-semibold mt-2'>
-                {profile?.nickname || 'Global Students'}
+                {profile?.segment || 'Global Students'}
               </h2>
               <div className='aucctus-text-tertiary aucctus-text-sm mt-1'>
                 Represented by {profile?.name}

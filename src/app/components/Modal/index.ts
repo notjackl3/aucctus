@@ -1,6 +1,5 @@
 import Confirmation from './ConfirmationModal/ConfirmationModal';
 import CustomerConversationSearch from './CustomerProfile/CustomerConversationSearch';
-import AddCustomerProfile from './CustomerProfile/AddCustomerProfile';
 import EditCustomerProfileDemographics from './CustomerProfile/EditCustomerProfileDemographics';
 import EvidenceAndReasoning from './EvidenceAndReasoningModal';
 import SupportInsights from './SupportInsights';
@@ -19,7 +18,6 @@ const Modal = {
   Confirmation,
   CustomerConversationSearch,
   EditCustomerProfileDemographics,
-  AddCustomerProfile,
   EditKeyAssumptionModal,
   AddKeyAssumptionModal,
   EvidenceAndReasoning,
