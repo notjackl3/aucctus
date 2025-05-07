@@ -31,6 +31,8 @@ export enum AucctusQueryKeys {
   startup = 'startup',
   customerProfileConversation = 'customerProfileConversation',
   customerProfileConversationSearch = 'customerProfileConversationSearch',
+  customerProfileRealWorldSignals = 'customerProfileRealWorldSignals',
+  customerProfileRealWorldSignal = 'customerProfileRealWorldSignal',
 
   /* External APIs */
   clearbitCompany = 'clearbitCompany',

@@ -1,0 +1,44 @@
+import React, { FunctionComponent } from 'react';
+import InputField from '../../../Input/InputField/InputField';
+
+interface SourceFieldsProps {
+  sourceTitle: string;
+  sourceUrl: string;
+  onSourceTitleChange: (value: string) => void;
+  onSourceUrlChange: (value: string) => void;
+}
+
+const SourceFields: FunctionComponent<SourceFieldsProps> = ({
+  sourceTitle,
+  sourceUrl,
+  onSourceTitleChange,
+  onSourceUrlChange,
+}) => {
+  return (
+    <div className='flex flex-col'>
+      <h5 className='aucctus-text-md-semibold mb-2'>Source</h5>
+      <div className='flex flex-row gap-3'>
+        <span className='flex-1'>
+          <InputField
+            label='Citation'
+            name='sourceCitation'
+            value={sourceTitle}
+            placeholder='Enter source citation'
+            onChange={(e) => onSourceTitleChange(e.target.value)}
+          />
+        </span>
+        <span className='flex-1'>
+          <InputField
+            label='URL (optional)'
+            name='sourceUrl'
+            value={sourceUrl}
+            placeholder='Enter source URL'
+            onChange={(e) => onSourceUrlChange(e.target.value)}
+          />
+        </span>
+      </div>
+    </div>
+  );
+};
+
+export default SourceFields;

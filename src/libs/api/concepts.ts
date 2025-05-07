@@ -10,12 +10,15 @@ import {
   IConceptReportEdit,
   IConversationFilterOptions,
   IConversationMessagePage,
+  ICreateRealWorldSignal,
   ICustomerAlternative,
   ICustomerJob,
   ICustomerPain,
   ICustomerProfile,
   ICustomerProfileConversationPage,
   ICustomerProfileCreate,
+  ICustomerProfileRealWorldSignal,
+  ICustomerProfileRealWorldSignalsList,
   IFinancialProjection,
   IGeneratedConcept,
   IMarketScan,
@@ -198,6 +201,64 @@ export class ConceptApi extends ApiService {
   getConceptCustomerProfile(customerProfileUuid: string) {
     return this.get<ICustomerProfile>(
       endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+    );
+  }
+
+  getConceptCustomerProfileRealWorldSignals(customerProfileUuid: string) {
+    return this.get<ICustomerProfileRealWorldSignalsList>(
+      endpoints.conceptCustomerProfileRealWorldSignals(customerProfileUuid),
+    );
+  }
+
+  getConceptCustomerProfileRealWorldSignalUuid(
+    customerProfileUuid: string,
+    realWorldSignalUuid: string,
+  ) {
+    return this.get<ICustomerProfileRealWorldSignal>(
+      endpoints.conceptCustomerProfileRealWorldSignalUuid(
+        customerProfileUuid,
+        realWorldSignalUuid,
+      ),
+    );
+  }
+
+  createConceptCustomerProfileRealWorldSignal(
+    customerProfileUuid: string,
+    realWorldSignalUuid: string,
+    data: ICreateRealWorldSignal,
+  ) {
+    return this.post<ICustomerProfileRealWorldSignal>(
+      endpoints.conceptCustomerProfileRealWorldSignalUuid(
+        customerProfileUuid,
+        realWorldSignalUuid,
+      ),
+      data,
+    );
+  }
+
+  updateConceptCustomerProfileRealWorldSignal(
+    customerProfileUuid: string,
+    realWorldSignalUuid: string,
+    data: Partial<ICreateRealWorldSignal>,
+  ) {
+    return this.patch<ICustomerProfileRealWorldSignal>(
+      endpoints.conceptCustomerProfileRealWorldSignalUuid(
+        customerProfileUuid,
+        realWorldSignalUuid,
+      ),
+      data,
+    );
+  }
+
+  deleteConceptCustomerProfileRealWorldSignal(
+    customerProfileUuid: string,
+    realWorldSignalUuid: string,
+  ) {
+    return this.delete<void>(
+      endpoints.conceptCustomerProfileRealWorldSignalUuid(
+        customerProfileUuid,
+        realWorldSignalUuid,
+      ),
     );
   }
 

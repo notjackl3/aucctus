@@ -1,4 +1,5 @@
 import { easings, useSpring, SpringConfig } from 'react-spring';
+import { useTransition } from 'react-spring';
 
 /**
  * Configuration options for the floating animation
@@ -90,4 +91,76 @@ export const usePulseAnimation = (
     delay,
     loop,
   });
+};
+
+/**
+ * Configuration options for the expand/collapse animation
+ */
+export interface ExpandCollapseOptions {
+  /** Whether the element is expanded (default: false) */
+  isExpanded?: boolean;
+  /** Maximum height when expanded in pixels (default: 'auto') */
+  maxHeight?: number | 'auto';
+  /** Duration of the animation in milliseconds (default: 300) */
+  duration?: number;
+  /** Easing function to use (default: easeOutCubic) */
+  easing?: (t: number) => number;
+  /** Delay before animation starts in milliseconds (default: 0) */
+  delay?: number;
+  /** Custom spring configuration (overrides duration and easing if provided) */
+  config?: SpringConfig;
+  /** Whether to include opacity transition (default: true) */
+  withOpacity?: boolean;
+  /** Initial height when collapsed (default: 0) */
+  collapsedHeight?: number;
+}
+
+/**
+ * Hook for creating expand/collapse transition animations
+ * @param options - Configuration options for the animation
+ * @returns Animation spring object and ref to be applied to an animated component
+ */
+export const useExpandCollapseTransition = (
+  options: ExpandCollapseOptions = {},
+) => {
+  const {
+    isExpanded = false,
+    maxHeight = 1000,
+    duration = 300,
+    easing = undefined,
+    delay = 0,
+    config,
+    withOpacity = true,
+    collapsedHeight = 0,
+  } = options;
+
+  // Use transition to handle mount/unmount animations
+  const transitions = useTransition(isExpanded, {
+    from: {
+      maxHeight: collapsedHeight,
+      opacity: withOpacity ? 0 : 1,
+      overflow: 'hidden',
+    },
+    enter: {
+      maxHeight: maxHeight, // Use a large value for 'auto'
+      opacity: 1,
+      overflow: 'hidden',
+    },
+    leave: {
+      maxHeight: collapsedHeight,
+      opacity: withOpacity ? 0 : 1,
+      overflow: 'hidden',
+    },
+    config: config || {
+      tension: 100, // Default tension value
+      friction: 26, // Default friction value
+      mass: 0.6, // Default mass value
+      // Only use duration and easing if specifically provided
+      ...(duration && { duration }),
+      ...(easing && { easing }),
+    },
+    delay,
+  });
+
+  return transitions;
 };

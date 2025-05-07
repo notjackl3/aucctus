@@ -11,6 +11,7 @@ import CustomerConversation from './CustomerConversation';
 import CustomerJobs from './CustomerJobs';
 import CustomerOverview from './CustomerOverview';
 import CustomerPains from './CustomerPains';
+import RealWorldSignalList from './signals/RealWorldSignalList';
 import CustomerAlternatives from './CustomerAlternatives';
 import UserJourneyFlow from './UserJourneyFlow';
 
@@ -156,6 +157,9 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
           productName='High Fibre Cheese Bites'
           insight={profile.journeyInsight}
         />
+      </div>
+      <div className='flex w-full flex-row gap-4'>
+        <RealWorldSignalList profileUuid={profile.uuid} />
       </div>
     </div>
   );

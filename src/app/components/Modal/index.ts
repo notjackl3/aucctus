@@ -11,6 +11,7 @@ import ConclusionVisualization from './ConclusionVisualizationModal/ConclusionVi
 import AiEditing from './AiEditingModal/AiEditingModal';
 import TestModal from './TestModal/TestModal';
 import JourneyStep from './JourneyStepModal';
+import EditRealWorldSignal from './CustomerProfile/EditRealWorldSignal/EditRealWorldSignal';
 
 const Modal = {
   Base,
@@ -26,6 +27,7 @@ const Modal = {
   SupportInsights,
   TestModal,
   JourneyStep,
+  EditRealWorldSignal,
 };
 
 export default Modal;

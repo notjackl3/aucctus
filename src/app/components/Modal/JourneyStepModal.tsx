@@ -4,6 +4,7 @@ import { useModal } from '@context/ModalContextProvider';
 import { IUserJourneyStep } from '@libs/api/types';
 import { RELATION_TYPE } from '../../pages/Concept/Report/CustomerProfile/Details/UserJourneyFlow';
 import { cn } from '@libs/utils/react';
+import CategorySelect from './CustomerProfile/CategorySelect';
 
 interface JourneyStepModalProps {
   onSubmit: (step: IUserJourneyStep) => void;
@@ -20,7 +21,7 @@ const JourneyStepModal: React.FC<JourneyStepModalProps> = ({
   const [description, setDescription] = React.useState(
     initialStep?.description || '',
   );
-  const [relationType, setRelationType] = React.useState<string | undefined>(
+  const [relationType, setRelationType] = React.useState<string>(
     initialStep?.relationType || RELATION_TYPE.JOURNEY_STEP,
   );
 
@@ -28,11 +29,13 @@ const JourneyStepModal: React.FC<JourneyStepModalProps> = ({
     closeModal();
   };
 
-  const handleRelationTypeChange = (
-    e: React.ChangeEvent<HTMLSelectElement>,
-  ) => {
-    setRelationType(e.target.value);
-  };
+  // Define step type options
+  const stepTypeOptions = [
+    RELATION_TYPE.JOURNEY_STEP,
+    RELATION_TYPE.JTBD,
+    RELATION_TYPE.PAIN,
+    RELATION_TYPE.MOMENT_OF_INTERVENTION,
+  ] as const;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,16 +60,16 @@ const JourneyStepModal: React.FC<JourneyStepModalProps> = ({
   return (
     <div className='aucctus-bg-primary inline-flex max-h-[100vh] w-[600px] flex-col items-center justify-start rounded-xl'>
       {/* Header */}
-      <div className='aucctus-border-primary inline-flex w-full items-center justify-between border-b p-4'>
-        <h5 className='aucctus-header-md aucctus-text-primary'>
+      <div className='aucctus-border-primary inline-flex w-full items-center justify-between p-4'>
+        <span className='aucctus-text-lg-medium aucctus-text-primary pl-2'>
           {initialStep ? 'Edit' : 'Add'} Journey Step
-        </h5>
+        </span>
         <button
-          className='aucctus-bg-secondary-hover rounded-lg p-2'
+          className='aucctus-bg-primary-hover rounded-lg p-2'
           onClick={closeModal}
           aria-label='Close modal'
         >
-          <Icon variant='closeX' className='aucctus-fill-secondary h-5 w-5' />
+          <Icon variant='closeX' className='aucctus-stroke-secondary h-6 w-6' />
         </button>
       </div>
 
@@ -100,23 +103,12 @@ const JourneyStepModal: React.FC<JourneyStepModalProps> = ({
             />
           </div>
 
-          <div className='mb-6'>
-            <label className='aucctus-text-sm aucctus-text-primary mb-2 block'>
-              Step Type
-            </label>
-            <select
-              className='aucctus-border-secondary aucctus-text-primary w-full rounded-md border bg-white p-3 focus:outline-none focus:ring-2 focus:ring-blue-500'
-              value={relationType}
-              onChange={handleRelationTypeChange}
-            >
-              <option value={RELATION_TYPE.JOURNEY_STEP}>Journey Step</option>
-              <option value={RELATION_TYPE.JTBD}>Job to be Done</option>
-              <option value={RELATION_TYPE.PAIN}>Pain Point</option>
-              <option value={RELATION_TYPE.MOMENT_OF_INTERVENTION}>
-                Moment of Intervention
-              </option>
-            </select>
-          </div>
+          <CategorySelect
+            label='Step Type'
+            selectedValue={relationType}
+            options={stepTypeOptions}
+            onChange={(value) => setRelationType(value)}
+          />
 
           <div className='flex justify-end gap-3'>
             <button

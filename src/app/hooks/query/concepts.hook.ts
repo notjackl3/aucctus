@@ -17,6 +17,7 @@ import {
   ICustomerPain,
   ICustomerProfile,
   ICustomerProfileCreate,
+  ICreateRealWorldSignal,
   IFinancialProjection,
   IFormError,
   IGeneratedConcept,
@@ -402,6 +403,137 @@ export const useConceptCustomerProfile = (profileUuid: string) => {
   return { ...query, profile: query.data };
 };
 
+export const useCustomerProfileRealWorldSignals = (profileUuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.customerProfileRealWorldSignals, profileUuid],
+    queryFn: async () =>
+      await api.concept.getConceptCustomerProfileRealWorldSignals(profileUuid),
+    enabled: !!profileUuid,
+    staleTime: 0,
+    cacheTime: 0,
+  });
+
+  return { ...query, signalsResponse: query.data };
+};
+
+export const useCustomerProfileRealWorldSignal = (
+  profileUuid: string,
+  signalUuid: string,
+) => {
+  const query = useQuery({
+    queryKey: [
+      AucctusQueryKeys.customerProfileRealWorldSignal,
+      profileUuid,
+      signalUuid,
+    ],
+    queryFn: async () =>
+      await api.concept.getConceptCustomerProfileRealWorldSignalUuid(
+        profileUuid,
+        signalUuid,
+      ),
+    enabled: !!profileUuid && !!signalUuid,
+  });
+
+  return { ...query, signal: query.data };
+};
+
+export const useCustomerProfileRealWorldSignalCreate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      profileUuid: string;
+      signalUuid: string;
+      signal: ICreateRealWorldSignal;
+    }) => {
+      const { profileUuid, signalUuid, signal } = params;
+      return await api.concept.createConceptCustomerProfileRealWorldSignal(
+        profileUuid,
+        signalUuid,
+        signal,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfileRealWorldSignals,
+          variables.profileUuid,
+        ],
+      });
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message ||
+          'Failed to create real world signal. Please try again later.',
+      );
+    },
+  });
+};
+
+export const useCustomerProfileRealWorldSignalUpdate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      profileUuid: string;
+      signalUuid: string;
+      signal: Partial<ICreateRealWorldSignal>;
+    }) => {
+      const { profileUuid, signalUuid, signal } = params;
+      return await api.concept.updateConceptCustomerProfileRealWorldSignal(
+        profileUuid,
+        signalUuid,
+        signal,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfileRealWorldSignals,
+          variables.profileUuid,
+        ],
+      });
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message ||
+          'Failed to update real world signal. Please try again later.',
+      );
+    },
+  });
+};
+
+export const useCustomerProfileRealWorldSignalDelete = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { profileUuid: string; signalUuid: string }) => {
+      const { profileUuid, signalUuid } = params;
+      return await api.concept.deleteConceptCustomerProfileRealWorldSignal(
+        profileUuid,
+        signalUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.customerProfileRealWorldSignals,
+          variables.profileUuid,
+        ],
+      });
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message ||
+          'Failed to delete real world signal. Please try again later.',
+      );
+    },
+  });
+};
+
 export const useFinancialProjection = (uuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.financialProjection, uuid],
@@ -592,6 +724,9 @@ export const doFullConceptInvalidation = (
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.customerProfiles, uuid],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.customerProfileRealWorldSignals],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.financialProjection],

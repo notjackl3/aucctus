@@ -3,6 +3,8 @@ import { cn } from '@libs/utils/react';
 import { Button, Icon, Input } from '@components';
 import type { ICustomerListItemWithUuid } from '@libs/api/types';
 import AddItemForm from './AddItemForm';
+import { animated } from 'react-spring';
+import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
 
 export interface EditableListProps {
   items: ICustomerListItemWithUuid[];
@@ -108,19 +110,31 @@ const EditableList: React.FC<EditableListProps> = ({
     [onDelete],
   );
 
+  const addItemTransitions = useExpandCollapseTransition({
+    isExpanded: isAdding,
+    withOpacity: true,
+    collapsedHeight: 0,
+    maxHeight: 250,
+  });
+
   // Render
   return (
     <div className='min-w-0 flex-1 space-y-2'>
       {/* Add Form */}
-      {isAdding && (
-        <AddItemForm
-          value={newValue}
-          onChange={(e) => setNewValue(e.target.value)}
-          onAdd={handleAdd}
-          onCancel={onCancelAdding || (() => setNewValue(''))}
-          loading={addingLoading}
-          itemLabel={itemLabel}
-        />
+      {addItemTransitions(
+        (style, item) =>
+          item && (
+            <animated.div style={style} className='p-2'>
+              <AddItemForm
+                value={newValue}
+                onChange={(e) => setNewValue(e.target.value)}
+                onAdd={handleAdd}
+                onCancel={onCancelAdding || (() => setNewValue(''))}
+                loading={addingLoading}
+                itemLabel={itemLabel}
+              />
+            </animated.div>
+          ),
       )}
 
       {/* List */}

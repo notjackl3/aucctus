@@ -34,6 +34,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
   <div className='space-y-2'>
     <Input
       name={`new-${itemLabel}`}
+      className='!rounded-md p-1'
       placeholder={`Enter a new ${itemLabel}...`}
       value={value}
       onChange={onChange}
@@ -46,19 +47,23 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
         size='sm'
         color='light'
         onClick={onCancel}
-        className='px-2 py-1 text-xs'
+        className='text-xs'
         disabled={loading}
       >
         <span className='flex items-center'>
-          <Icon variant='closeX' height={14} width={14} className='mr-1' />
-          Cancel
+          <Icon
+            className='aucctus-stroke-primary'
+            variant='closeX'
+            height={14}
+            width={14}
+          />
         </span>
       </Button>
       <Button
         size='sm'
         color='primary'
         onClick={onAdd}
-        className='px-2 py-1 text-xs'
+        className='text-xs'
         disabled={loading}
       >
         <span className='flex items-center'>
@@ -66,9 +71,8 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
             variant='check'
             height={14}
             width={14}
-            className='aucctus-stroke-white mr-1'
+            className='aucctus-stroke-white'
           />
-          Add
           {loading && (
             <Icon.LoadingSpinner className='ml-2' height={16} width={16} />
           )}

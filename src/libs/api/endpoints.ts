@@ -139,6 +139,17 @@ export class Endpoints {
     return `api/v2/concept/customer-profile/${customerProfileUuid}`;
   }
 
+  static conceptCustomerProfileRealWorldSignals(customerProfileUuid: string) {
+    return `api/v2/concept/customer-profile/${customerProfileUuid}/real-world-signals`;
+  }
+
+  static conceptCustomerProfileRealWorldSignalUuid(
+    customerProfileUuid: string,
+    realWorldSignalUuid: string,
+  ) {
+    return `api/v2/concept/customer-profile/${customerProfileUuid}/real-world-signals/${realWorldSignalUuid}`;
+  }
+
   static conceptCustomerProfileConversationMessages(
     customerProfileUuid: string,
     sessionId: string,

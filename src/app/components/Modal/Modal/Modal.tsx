@@ -25,10 +25,18 @@ const Modal: FunctionComponent<IModalProps> = ({
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
+      // Check if the click is on an explicitly ignored element
+      const isAucctusPortalTarget =
+        (event.target as Element)?.closest(
+          '[data-aucctus-portal-target="true"]',
+        ) ||
+        (event.target as Element)?.hasAttribute('data-aucctus-portal-target');
+
       if (
         shouldCloseOnOverlayClick &&
         contentRef.current &&
-        !contentRef.current.contains(event.target as Node)
+        !contentRef.current.contains(event.target as Node) &&
+        !isAucctusPortalTarget
       ) {
         closeModal();
       }

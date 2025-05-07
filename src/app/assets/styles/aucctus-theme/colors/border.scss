@@ -41,3 +41,11 @@
     @apply border-error-300 dark:border-error-400;
   }
 }
+
+.aucctus-border-success {
+  @apply border-success-500 dark:border-success-400;
+
+  &-subtle {
+    @apply border-success-300 dark:border-success-400;
+  }
+}

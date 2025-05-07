@@ -1,4 +1,5 @@
 import type { IPageQueryOptions, IPageResponse } from '../osiris';
+import type { ISource } from './support';
 
 export type ConceptStatus =
   | 'new'
@@ -136,6 +137,59 @@ export interface ICustomerAlternative {
   cons: string[];
   price: string;
   uuid?: string;
+}
+
+export interface ICustomerProfileRealWorldSignalsList
+  extends IBaseConceptEntity {
+  realWorldSignals: ICustomerProfileRealWorldSignal[];
+  summary: ICustomerRealWorldSignalSummary;
+}
+
+export type SignalStanceType = 'In Favour' | 'Against' | 'Neutral';
+export type SignalSourceCategoryType =
+  | 'First-Party Research'
+  | 'Online Article'
+  | 'Government Report'
+  | 'Academic Study'
+  | 'Social Media'
+  | 'User Forum'
+  | 'Other';
+
+export interface ICustomerProfileRealWorldSignal extends IBaseConceptEntity {
+  uuid: string;
+  title: string;
+  description: string;
+  sourceCategory:
+    | 'First Party'
+    | 'Online Article'
+    | 'Government'
+    | 'Academic'
+    | 'Social Media'
+    | 'User Forum'
+    | 'Other';
+  stance: 'In Favour' | 'Against' | 'Neutral';
+  sources?: ISource[];
+}
+
+export interface ICreateRealWorldSignal {
+  title: string;
+  description: string;
+  source_category:
+    | 'First Party'
+    | 'Online Article'
+    | 'Government'
+    | 'Academic'
+    | 'Social Media'
+    | 'User Forum'
+    | 'Other';
+  stance: 'In Favour' | 'Against' | 'Neutral';
+  sources: Partial<ISource>[];
+}
+
+export interface ICustomerRealWorldSignalSummary extends IBaseConceptEntity {
+  customerProfileUuid: string;
+  status: 'Not Started' | 'Pending' | 'Error' | 'Complete';
+  summary?: string;
 }
 
 export interface ICustomerProfile extends IBaseConceptEntity {
