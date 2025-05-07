@@ -52,8 +52,6 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
   productName = 'High Fibre Portable Cheese Bites',
   insight,
 }) => {
-  const [insightExpanded, setInsightExpanded] = React.useState(false);
-
   const { openModal, closeModal } = useModal();
 
   const {
@@ -279,8 +277,6 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
                   order: 10,
                   icon: 'briefcase',
                 }}
-                insightExpanded={insightExpanded}
-                setInsightExpanded={setInsightExpanded}
                 textColorClass={AI_INSIGHT_TEXT_COLOR}
                 iconStrokeClass={AI_INSIGHT_ICON_STROKE}
                 customInsight={insight}

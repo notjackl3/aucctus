@@ -2,7 +2,7 @@ import defaultAvatar from '@assets/img/avatar.png';
 import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import { forwardRef, useState } from 'react';
+import { forwardRef } from 'react';
 import AiInsight from './components/AiInsight';
 
 interface CustomerOverviewProps {
@@ -26,7 +26,6 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
   ({ profile, description, className }, ref) => {
     // Cast to extended profile for the demo
     const extendedProfile = profile as ExtendedCustomerProfile;
-    const [insightExpanded, setInsightExpanded] = useState(false);
 
     // Mock top job for AiInsight (can be empty since we use customInsight)
     const mockTopJob = { uuid: '', description: '', order: 0 };
@@ -184,8 +183,6 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                 {profile?.customerInsight && (
                   <AiInsight
                     topJob={mockTopJob}
-                    insightExpanded={insightExpanded}
-                    setInsightExpanded={setInsightExpanded}
                     textColorClass='aucctus-text-brand-primary'
                     iconStrokeClass='aucctus-stroke-brand-primary'
                     customInsight={profile.customerInsight}

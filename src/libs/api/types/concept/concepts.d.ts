@@ -142,7 +142,7 @@ export interface ICustomerAlternative {
 export interface ICustomerProfileRealWorldSignalsList
   extends IBaseConceptEntity {
   realWorldSignals: ICustomerProfileRealWorldSignal[];
-  summary: ICustomerRealWorldSignalSummary;
+  realWorldSignalsSummary: ICustomerRealWorldSignalSummary;
 }
 
 export type SignalStanceType = 'In Favour' | 'Against' | 'Neutral';

@@ -38,7 +38,6 @@ const PainPoints: React.FC<PainPointsProps> = ({
   pains: initialPains,
   insight,
 }) => {
-  const [insightExpanded, setInsightExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
   const painsQuery = useCustomerPainsList(customerProfileUuid || '');
@@ -162,8 +161,6 @@ const PainPoints: React.FC<PainPointsProps> = ({
           <div className='mt-auto pt-2'>
             <AiInsight
               topJob={topPain}
-              insightExpanded={insightExpanded}
-              setInsightExpanded={setInsightExpanded}
               textColorClass={AI_INSIGHT_TEXT_COLOR}
               iconStrokeClass={AI_INSIGHT_ICON_STROKE}
               customInsight={insight}

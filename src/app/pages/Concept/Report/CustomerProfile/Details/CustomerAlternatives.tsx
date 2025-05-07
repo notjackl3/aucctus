@@ -29,7 +29,6 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
   const [open, setOpen] = React.useState<string[]>(
     alternatives[0] ? [alternatives[0].name] : [],
   );
-  const [insightExpanded, setInsightExpanded] = React.useState(false);
 
   const handleToggle = (name: string) => {
     setOpen((prev) =>
@@ -192,8 +191,6 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                 order: 10,
                 icon: 'clipboard',
               }}
-              insightExpanded={insightExpanded}
-              setInsightExpanded={setInsightExpanded}
               textColorClass='aucctus-text-brand-primary'
               iconStrokeClass='aucctus-stroke-brand-primary'
               customInsight={insight}

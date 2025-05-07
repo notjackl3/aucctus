@@ -1,11 +1,12 @@
 import { Loading } from '@components';
 import { useCustomerProfileRealWorldSignals } from '@hooks/query/concepts.hook';
-import React from 'react';
+import React, { useEffect, useMemo } from 'react';
 import GroupedSignals from './GroupedSignals';
 import SignalHeader from './SignalHeader';
+import AiInsight from '../components/AiInsight';
 
 const containerClassName =
-  'flex flex-1 flex-col gap-2 rounded-lg border aucctus-border-primary aucctus-bg-primary px-4 py-6';
+  'flex flex-1 flex-col gap-2 rounded-lg border aucctus-border-primary aucctus-bg-primary px-4 pt-6 pb-2';
 
 interface IRealWorldSignalListProps {
   profileUuid: string;
@@ -20,16 +21,23 @@ const RealWorldSignalList: React.FC<IRealWorldSignalListProps> = ({
     isFetched: isFetchedSignals,
   } = useCustomerProfileRealWorldSignals(profileUuid);
 
+  const signals = useMemo(
+    () => signalsResponse?.realWorldSignals || [],
+    [signalsResponse],
+  );
+  const summary = useMemo(
+    () => signalsResponse?.realWorldSignalsSummary,
+    [signalsResponse],
+  );
+  const isAgentResearching = useMemo(
+    () => ['Pending', 'Not Started'].includes(summary?.status || ''),
+    [summary],
+  );
+
   // Early return if no data after fetch
   if (isFetchedSignals && !signalsResponse) {
     return null;
   }
-
-  const signals = signalsResponse?.realWorldSignals || [];
-  const summary = signalsResponse?.summary;
-  const isAgentResearching = ['Pending', 'Not Started'].includes(
-    summary?.status || '',
-  );
 
   if (isLoadingSignals) {
     return (
@@ -58,7 +66,16 @@ const RealWorldSignalList: React.FC<IRealWorldSignalListProps> = ({
       <SignalHeader profileUuid={profileUuid} />
 
       {signals.length > 0 && (
-        <GroupedSignals profileUuid={profileUuid} signals={signals} />
+        <>
+          <GroupedSignals profileUuid={profileUuid} signals={signals} />
+          {summary?.summary && (
+            <AiInsight
+              textColorClass='aucctus-text-brand-primary'
+              iconStrokeClass='aucctus-stroke-brand-primary'
+              customInsight={summary?.summary}
+            />
+          )}
+        </>
       )}
 
       {signals.length === 0 && (

@@ -37,7 +37,6 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
   jobs: initialJobs,
   insight,
 }) => {
-  const [insightExpanded, setInsightExpanded] = useState(false);
   const [isAdding, setIsAdding] = useState(false);
 
   const jobsQuery = useCustomerJobsList(customerProfileUuid || '');
@@ -160,8 +159,6 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
           <div className='mt-auto pt-2'>
             <AiInsight
               topJob={topJob}
-              insightExpanded={insightExpanded}
-              setInsightExpanded={setInsightExpanded}
               textColorClass={AI_INSIGHT_TEXT_COLOR}
               iconStrokeClass={AI_INSIGHT_ICON_STROKE}
               customInsight={insight}
