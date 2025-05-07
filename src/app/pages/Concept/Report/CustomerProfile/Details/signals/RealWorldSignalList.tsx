@@ -1,6 +1,6 @@
 import { Loading } from '@components';
 import { useCustomerProfileRealWorldSignals } from '@hooks/query/concepts.hook';
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import GroupedSignals from './GroupedSignals';
 import SignalHeader from './SignalHeader';
 import AiInsight from '../components/AiInsight';
