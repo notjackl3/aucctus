@@ -218,7 +218,10 @@ const CustomerConversation = forwardRef<
           <Icon variant='message-circle' width={20} height={20} />
         </span>
         <span className='aucctus-text-primary aucctus-text-lg'>
-          Chat with {profile.name.split(' ').length > 1 ? profile.name.split(' ').slice(0, -1).join(' ') : profile.name}
+          Chat with{' '}
+          {profile.name.split(' ').length > 1
+            ? profile.name.split(' ').slice(0, -1).join(' ')
+            : profile.name}
         </span>
         <span className='flex-1' />
         <span className='mr-2 flex flex-row gap-2'>

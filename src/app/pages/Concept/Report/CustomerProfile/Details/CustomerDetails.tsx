@@ -158,9 +158,11 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
           insight={profile.journeyInsight}
         />
       </div>
-      <div className='flex w-full flex-row gap-4'>
-        <RealWorldSignalList profileUuid={profile.uuid} />
-      </div>
+      {FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS && (
+        <div className='flex w-full flex-row gap-4'>
+          <RealWorldSignalList profileUuid={profile.uuid} />
+        </div>
+      )}
     </div>
   );
 };

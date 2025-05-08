@@ -11,6 +11,7 @@ env:
   SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
   # Feature flags
   FEATURE_CUSTOMER_PROFILE_CHAT: false
+  FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS: false
   FEATURE_CONCEPT_VERSIONING: true
 jobs:
   build_and_deploy_job:
