@@ -54,7 +54,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
   );
   telemetry;
   const sortedPains = useMemo(
-    () => [...pains].sort((a, b) => (b.order || 0) - (a.order || 0)),
+    () => [...pains].sort((a, b) => (a.order || 0) - (b.order || 0)),
     [pains],
   );
   const topPain = sortedPains[0];

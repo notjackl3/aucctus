@@ -44,7 +44,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
   }
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary flex min-w-0 flex-1 flex-col rounded-lg border shadow-sm'>
+    <div className='aucctus-bg-primary aucctus-border-secondary h-fit flex-1 overflow-hidden rounded-lg border shadow-sm'>
       <SectionHeader
         icon={'clipboard' as any}
         iconClass={MAIN_ICON_STROKE}
@@ -56,7 +56,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
           Products and solutions the customer currently uses instead of our
           offering
         </p>
-        <div className='max-h-[400px] flex-grow overflow-y-auto pr-1'>
+        <div className='max-h-[400px] overflow-y-auto pr-1'>
           <div className='flex flex-col gap-3'>
             {alternatives.map(
               (alternative: ICustomerAlternative, idx: number) => {
@@ -95,7 +95,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                           <Badges.Default
                             value={alternative.price}
                             classNameBadge='aucctus-bg-brand-secondary'
-                            classNameLabel='aucctus-text-brand-tertiary'
+                            classNameLabel='aucctus-text-brand-tertiary text-[10px]'
                           />
                         </div>
                       </div>

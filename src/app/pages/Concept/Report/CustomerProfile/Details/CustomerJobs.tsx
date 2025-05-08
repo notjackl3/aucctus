@@ -52,7 +52,7 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
     [jobsQuery.data, initialJobs],
   );
   const sortedJobs = useMemo(
-    () => [...jobs].sort((a, b) => (b.order || 0) - (a.order || 0)),
+    () => [...jobs].sort((a, b) => (a.order || 0) - (b.order || 0)),
     [jobs],
   );
   const topJob = sortedJobs[0];
