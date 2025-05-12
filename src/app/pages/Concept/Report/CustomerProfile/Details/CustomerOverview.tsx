@@ -2,7 +2,7 @@ import defaultAvatar from '@assets/img/avatar.png';
 import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import { forwardRef } from 'react';
+import { forwardRef, useCallback } from 'react';
 import AiInsight from './components/AiInsight';
 
 // Icon stroke constant for consistency
@@ -32,6 +32,16 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
 
     // Mock top job for AiInsight (can be empty since we use customInsight)
     const mockTopJob = { uuid: '', description: '', order: 0 };
+
+    const formatIncome = useCallback((income: number) => {
+      if (income < 1000) {
+        // If income is a small number like 80 or 85, assume it's already in thousands
+        return `$${income}K`;
+      } else {
+        // Otherwise divide by 1000
+        return `$${income / 1000}K`;
+      }
+    }, []);
 
     return (
       <div
@@ -155,7 +165,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                     <div className='grid w-full grid-cols-3'>
                       <span className='aucctus-text-md-semibold'>Income:</span>
                       <span className='aucctus-text-md col-span-2'>
-                        {`${profile?.incomeLower ? `$${profile.incomeLower / 1000}K` : '$40K'}-${profile?.incomeUpper ? `$${profile.incomeUpper / 1000}K` : '$75K'}`}
+                        {`${profile?.incomeLower ? formatIncome(profile.incomeLower) : '$40K'}-${profile?.incomeUpper ? formatIncome(profile.incomeUpper) : '$75K'}`}
                       </span>
                     </div>
                   </div>

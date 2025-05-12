@@ -33,7 +33,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   const { setCustomerProfileUuid } = useStore(
     (state) => state.customerProfileConversations,
   );
-  const { data: conversationResults } =
+  const { data: conversationResults, refetch } =
     useConceptCustomerProfileConversationList(profile.uuid);
 
   useEffect(() => {
@@ -46,6 +46,11 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
       );
     }
   }, [conversationResults]);
+
+  // Refetch conversation list when profile.uuid changes
+  useEffect(() => {
+    refetch();
+  }, [profile.uuid, refetch]);
 
   // Set customer profile UUID and handle new conversations
   useEffect(() => {

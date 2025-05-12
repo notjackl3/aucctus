@@ -1,21 +1,19 @@
 import React, { FunctionComponent, useCallback } from 'react';
-import InputField from '../../../Input/InputField/InputField';
 import TextArea from '../../../Input/TextArea/TextArea';
 import { sourceCategories, stanceOptions } from './constants';
 import CategorySelect from '../CategorySelect';
 import SourceFields from './SourceFields';
+import { SignalSourceCategoryType, SignalStanceType } from '@libs/api/types';
 
 interface FormData {
-  title: string;
-  description: string;
-  sourceCategory: (typeof sourceCategories)[number];
-  stance: (typeof stanceOptions)[number];
-  sourceTitle: string;
-  sourceUrl: string;
+  description?: string;
+  sourceCategory?: SignalSourceCategoryType;
+  stance?: SignalStanceType;
+  sourceTitle?: string;
+  sourceUrl?: string;
 }
 
 interface FormErrors {
-  title?: string;
   description?: string;
   sourceCategory?: string;
   stance?: string;
@@ -36,7 +34,7 @@ const SignalForm: FunctionComponent<SignalFormProps> = ({
 }) => {
   const handleTextFieldChange = useCallback(
     (
-      fieldName: 'title' | 'description' | 'sourceTitle' | 'sourceUrl',
+      fieldName: 'description' | 'sourceTitle' | 'sourceUrl',
       displayName: string,
       maxLength?: number,
     ) =>
@@ -66,16 +64,6 @@ const SignalForm: FunctionComponent<SignalFormProps> = ({
 
   return (
     <div className='flex flex-col gap-4'>
-      <InputField
-        label='Title'
-        name='title'
-        placeholder='Required...'
-        value={formData.title}
-        errorMessage={errors.title}
-        onChange={handleTextFieldChange('title', 'Title', 100)}
-        required
-      />
-
       <TextArea
         label='Description'
         name='description'
@@ -90,7 +78,7 @@ const SignalForm: FunctionComponent<SignalFormProps> = ({
 
       <CategorySelect
         label='Source Category'
-        selectedValue={formData.sourceCategory}
+        selectedValue={formData.sourceCategory || ''}
         options={sourceCategories}
         onChange={handleSelectChange('sourceCategory', 'Source category')}
         errorMessage={errors.sourceCategory}
@@ -99,7 +87,7 @@ const SignalForm: FunctionComponent<SignalFormProps> = ({
 
       <CategorySelect
         label='Stance'
-        selectedValue={formData.stance}
+        selectedValue={formData.stance || ''}
         options={stanceOptions}
         onChange={handleSelectChange('stance', 'Stance')}
         errorMessage={errors.stance}
@@ -107,8 +95,8 @@ const SignalForm: FunctionComponent<SignalFormProps> = ({
       />
 
       <SourceFields
-        sourceTitle={formData.sourceTitle}
-        sourceUrl={formData.sourceUrl}
+        sourceTitle={formData.sourceTitle || ''}
+        sourceUrl={formData.sourceUrl || ''}
         onSourceTitleChange={(value) =>
           handleTextFieldChange(
             'sourceTitle',

@@ -85,7 +85,10 @@ const CustomerConversationSocketWrapper: React.FC<
   useSocketEvent(
     'customer.profile.chat.typing',
     (message: ICustomerProfileInboundTypingMessage) => {
-      if (message.conceptUuid === conceptUuid) {
+      if (
+        message.conceptUuid === conceptUuid &&
+        message.sessionId === sessionId
+      ) {
         agentIsThinking(message.value);
       }
     },

@@ -81,7 +81,7 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
 
   const handleDeleteSignal = useCallback(() => {
     openModal(Modal.Confirmation, {
-      title: `Are you sure you want to delete ${signal.title}?`,
+      title: `Are you sure you want to delete ${signal.description}?`,
       subtitle: 'This action cannot be undone.',
       actions: [
         {
@@ -136,8 +136,8 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
           stanceStyles.border,
         )}
       >
-        <span className='aucctus-text-primary aucctus-text-lg-semibold'>
-          {signal.title}
+        <span className='aucctus-text-primary aucctus-text-md-semibold'>
+          {signal.description}
         </span>
         <span className='flex-1' />
         <Badge.Default
@@ -153,10 +153,6 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
           )}
         />
       </div>
-
-      <span className='aucctus-text-tertiary aucctus-text-xs mt-2'>
-        {signal.description}
-      </span>
 
       {/* Source category */}
       <div className='flex flex-row items-center gap-2'>

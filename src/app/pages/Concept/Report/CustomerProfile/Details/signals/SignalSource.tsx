@@ -20,11 +20,16 @@ export const SignalSource: React.FC<SignalSourceProps> = ({ source }) => {
       className='group flex cursor-pointer flex-row items-center gap-2 transition-all duration-300'
       onClick={handleSourceClick}
     >
-      <Icon
-        variant='file'
-        className='aucctus-stroke-tertiary group-hover:aucctus-stroke-brand-primary h-4 w-4 transition-colors duration-300'
-      />
-      <span className='aucctus-text-tertiary-hover group-hover:aucctus-text-brand-primary aucctus-text-sm transition-colors duration-300'>
+      <span>
+        <Icon
+          variant='file'
+          className='aucctus-stroke-tertiary group-hover:aucctus-stroke-brand-primary h-4 w-4 transition-colors duration-300'
+        />
+      </span>
+      <span
+        title={source.title}
+        className='aucctus-text-tertiary-hover group-hover:aucctus-text-brand-primary aucctus-text-sm line-clamp-1 transition-colors duration-300'
+      >
         {source.title}
       </span>
       <span className='flex-1' />

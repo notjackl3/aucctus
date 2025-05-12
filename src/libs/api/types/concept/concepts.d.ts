@@ -166,32 +166,16 @@ export type SignalSourceCategoryType =
 
 export interface ICustomerProfileRealWorldSignal extends IBaseConceptEntity {
   uuid: string;
-  title: string;
   description: string;
-  sourceCategory:
-    | 'First Party'
-    | 'Online Article'
-    | 'Government'
-    | 'Academic'
-    | 'Social Media'
-    | 'User Forum'
-    | 'Other';
-  stance: 'In Favour' | 'Against' | 'Neutral';
+  sourceCategory: SignalSourceCategoryType;
+  stance: SignalStanceType;
   sources?: ISource[];
 }
 
 export interface ICreateRealWorldSignal {
-  title: string;
   description: string;
-  source_category:
-    | 'First Party'
-    | 'Online Article'
-    | 'Government'
-    | 'Academic'
-    | 'Social Media'
-    | 'User Forum'
-    | 'Other';
-  stance: 'In Favour' | 'Against' | 'Neutral';
+  sourceCategory: SignalSourceCategoryType;
+  stance: SignalStanceType;
   sources: Partial<ISource>[];
 }
 

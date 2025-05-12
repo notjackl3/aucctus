@@ -13,7 +13,6 @@ import {
 } from '@hooks/query/concepts.hook';
 import utils from '@libs/utils';
 import SignalForm from './SignalForm';
-import { sourceCategories, stanceOptions } from './constants';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 
 interface EditRealWorldSignalProps {
@@ -27,18 +26,14 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
 }) => {
   const { closeModal } = useModal();
   const [formData, setFormData] = useState({
-    title: signal?.title || '',
     description: signal?.description || '',
-    sourceCategory:
-      signal?.sourceCategory ||
-      ('First Party' as (typeof sourceCategories)[number]),
-    stance: signal?.stance || ('Neutral' as (typeof stanceOptions)[number]),
+    sourceCategory: signal?.sourceCategory,
+    stance: signal?.stance,
     sourceTitle: signal?.sources?.[0]?.title || '',
     sourceUrl: signal?.sources?.[0]?.url || '',
   });
 
   const [errors, setErrors] = useState({
-    title: undefined as string | undefined,
     description: undefined as string | undefined,
     sourceCategory: undefined as string | undefined,
     stance: undefined as string | undefined,
@@ -67,7 +62,6 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
 
   const validateForm = () => {
     const newErrors = {
-      title: !formData.title ? 'Title is required.' : undefined,
       description: !formData.description
         ? 'Description is required.'
         : undefined,
@@ -95,14 +89,8 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
       return;
     }
 
-    const {
-      title,
-      description,
-      sourceCategory,
-      stance,
-      sourceTitle,
-      sourceUrl,
-    } = formData;
+    const { description, sourceCategory, stance, sourceTitle, sourceUrl } =
+      formData;
 
     // Prepare source data
     const updatedSources: Partial<ISource>[] = [
@@ -113,10 +101,9 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
     ];
 
     const signalData: ICreateRealWorldSignal = {
-      title,
       description,
-      source_category: sourceCategory,
-      stance,
+      sourceCategory: sourceCategory!,
+      stance: stance!,
       sources: updatedSources,
     };
 
@@ -185,7 +172,6 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
 
   const isFormValid = useMemo(() => {
     return (
-      formData.title &&
       formData.description &&
       formData.sourceCategory &&
       formData.stance &&

@@ -3,6 +3,9 @@ import TabView, { TabElement } from '@components/Container/TabView/TabView';
 import { ICustomerProfileRealWorldSignal } from '@libs/api/types';
 import RealWorldSignalCard from './RealWorldSignalCard';
 
+// Define the stance order as a constant to reuse
+const stanceOrder = ['In Favour', 'Neutral', 'Against'];
+
 interface IGroupedSignalsProps {
   profileUuid: string;
   signals: ICustomerProfileRealWorldSignal[];
@@ -30,13 +33,17 @@ const GroupedSignals: React.FC<IGroupedSignalsProps> = ({
     return grouped;
   }, [signals]);
 
-  // Get all available stances that have at least one signal
+  // Get all available stances that have at least one signal, in the specific order
   const availableStances = useMemo(() => {
-    const stances: string[] = ['all']; // Always include 'all'
+    const tabOrder = ['all', ...stanceOrder];
+    const stances: string[] = [];
 
-    // Add other stances that have signals
-    Object.entries(groupedSignals).forEach(([stance, stanceSignals]) => {
-      if (stance !== 'all' && stanceSignals.length > 0) {
+    // Filter and order stances based on the predefined order
+    tabOrder.forEach((stance) => {
+      if (
+        stance === 'all' ||
+        (groupedSignals[stance] && groupedSignals[stance].length > 0)
+      ) {
         stances.push(stance);
       }
     });
@@ -65,7 +72,33 @@ const GroupedSignals: React.FC<IGroupedSignalsProps> = ({
 
   // Get the signals to display based on the selected stance
   const displayedSignals = useMemo(() => {
-    return groupedSignals[selectedStance] || [];
+    const signals = groupedSignals[selectedStance] || [];
+
+    // If we're in the 'all' tab, sort signals by stance order
+    if (selectedStance === 'all') {
+      return [...signals].sort((a, b) => {
+        const stanceA = a.stance || '';
+        const stanceB = b.stance || '';
+
+        const indexA = stanceOrder.indexOf(stanceA);
+        const indexB = stanceOrder.indexOf(stanceB);
+
+        // If both stances are in the stanceOrder array, sort by that order
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        }
+
+        // If only one stance is in the array, prioritize it
+        if (indexA !== -1) return -1;
+        if (indexB !== -1) return 1;
+
+        // If neither stance is in the array, maintain original order
+        return 0;
+      });
+    }
+
+    // For specific stance tabs, the signals are already filtered by that stance
+    return signals;
   }, [groupedSignals, selectedStance]);
 
   return (

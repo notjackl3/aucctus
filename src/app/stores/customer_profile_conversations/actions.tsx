@@ -34,6 +34,7 @@ export function clearConversation(
     produce((state: ICustomerProfileConversationState) => {
       state.messages = [];
       state.sessionId = undefined;
+      state.isAucctusTyping = false;
       state.currentMessage = resetCurrentMessage
         ? undefined
         : state.currentMessage;
@@ -52,7 +53,8 @@ export function setConversation(
       state.messages = conversation.messages ?? [];
       state.sessionId = conversation.uuid;
       state.currentMessage = undefined;
-      state.agentIsThinking(false);
+      state.isAucctusTyping = false;
+      state.thinkingMessage = undefined;
     }),
   );
 }
@@ -111,6 +113,7 @@ export async function sendMessage(
     set(
       produce((state: ICustomerProfileConversationState) => {
         state.isAucctusTyping = false;
+        state.thinkingMessage = undefined;
       }),
     );
     return;
@@ -256,6 +259,9 @@ export function addAssistantMessage(
         // Add new message
         state.messages.push(message);
       }
+
+      state.isAucctusTyping = false;
+      state.thinkingMessage = undefined;
     }),
   );
 }

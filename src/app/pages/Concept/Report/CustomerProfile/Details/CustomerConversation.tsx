@@ -3,6 +3,7 @@ import { useConceptCustomerProfileConversationMessages } from '@hooks/query/conc
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import {
+  CustomerProfileMessage,
   IAssistantMessage,
   ICustomerProfileConversation,
 } from '@stores/customer_profile_conversations/store';
@@ -48,19 +49,26 @@ const CustomerConversation = forwardRef<
     ICustomerProfileConversation | undefined
   >(conversations?.[0]);
 
+  const [activeMessages, setActiveMessages] = useState<
+    CustomerProfileMessage[]
+  >([]);
+
   // Context hooks
   const { openModal, closeModal } = useModal();
 
   // Store hooks
   const {
     sendMessage,
-    messages,
     currentMessage,
     setCurrentMessage,
     clearConversation,
     isAucctusTyping: isThinking,
     setConversation,
   } = useStore((state) => state.customerProfileConversations);
+
+  const messages = useStore(
+    (state) => state.customerProfileConversations.messages,
+  );
 
   // Query hooks
   const {
@@ -72,6 +80,10 @@ const CustomerConversation = forwardRef<
     activeConversation?.uuid,
     false,
   );
+
+  React.useEffect(() => {
+    setActiveMessages(messages);
+  }, [messages]);
 
   // Memoized values
   const introMessage: IAssistantMessage = useMemo(() => {
@@ -95,13 +107,8 @@ const CustomerConversation = forwardRef<
   const scrollToBottom = useCallback((delay = 300) => {
     setTimeout(() => {
       if (conversationRef.current) {
-        const lastChild = conversationRef.current.lastElementChild;
-        if (lastChild) {
-          // lastChild.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        } else {
-          conversationRef.current.scrollTop =
-            conversationRef.current.scrollHeight;
-        }
+        conversationRef.current.scrollTop =
+          conversationRef.current.scrollHeight;
       }
     }, delay);
   }, []);
@@ -159,14 +166,13 @@ const CustomerConversation = forwardRef<
       if (fullConversation) {
         fullConversation.messages = conversationMessages.results;
         setConversation(fullConversation);
+        // Stupid workaround to circumvent issues with Zustand not pushing a state update immediately after a page refresh.
+        setActiveMessages(conversationMessages.results);
       }
     }
-  }, [
-    conversations,
-    conversationMessages,
-    activeConversation,
-    setConversation,
-  ]);
+    // ignore conversations to prevent conversation refresh on new conversation
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationMessages, activeConversation, setConversation]);
 
   useEffect(() => {
     if (profile.uuid && activeConversation?.uuid) {
@@ -283,7 +289,7 @@ const CustomerConversation = forwardRef<
 
           {/* Message history */}
           {!isLoadingConversationMessages &&
-            messages.map((message, index) => (
+            activeMessages.map((message, index) => (
               <div
                 key={message.role + message.content + index}
                 className='flex flex-row gap-4'
@@ -307,6 +313,7 @@ const CustomerConversation = forwardRef<
         <div className='aucctus-border-primary flex min-w-[100px] max-w-[100px] flex-col gap-4 border-l p-1'>
           <SelectableCustomerConversationList
             conversations={conversations}
+            activeConversation={activeConversation}
             onSelectConversation={handleSelectConversation}
           />
         </div>

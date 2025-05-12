@@ -1,28 +1,29 @@
 import { cn } from '@libs/utils/react';
 import { ICustomerProfileConversation } from '@stores/customer_profile_conversations/store';
-import useStore from '@stores/store';
 import React, { useCallback } from 'react';
 import SelectableCustomerConversation from './SelectableCustomerConversation';
 
 interface SelectableCustomerConversationListProps {
   conversations?: ICustomerProfileConversation[];
+  activeConversation?: ICustomerProfileConversation;
   onSelectConversation: (conversation: ICustomerProfileConversation) => void;
   className?: string;
 }
 
 const SelectableCustomerConversationList: React.FC<
   SelectableCustomerConversationListProps
-> = ({ conversations, onSelectConversation, className }) => {
-  const sessionId = useStore(
-    (state) => state.customerProfileConversations.sessionId,
-  );
-
+> = ({
+  conversations,
+  activeConversation,
+  onSelectConversation,
+  className,
+}) => {
   // Check if a conversation is active
   const isConversationActive = useCallback(
     (conversation: ICustomerProfileConversation) => {
-      return conversation.uuid === sessionId;
+      return conversation.uuid === activeConversation?.uuid;
     },
-    [sessionId],
+    [activeConversation],
   );
 
   // Render
