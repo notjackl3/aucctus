@@ -1264,3 +1264,24 @@ export const useCustomerJourneyStepDelete = () => {
     },
   });
 };
+
+/**
+ * Custom hook for tracking when a user views a concept.
+ * @returns The result of the useMutation hook.
+ */
+export const useTrackConceptView = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (conceptUuid: string) =>
+      await api.concept.trackConceptView(conceptUuid),
+    onSuccess: () => {
+      // Invalidate the concepts query to force a refetch when returning to the concept bank
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
+    },
+    onError: () => {
+      // Silent failure - don't show error to user as this is non-critical tracking
+      // Error logging handled by API service
+    },
+  });
+};

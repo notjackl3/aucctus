@@ -16,10 +16,9 @@ const BankConcepts: React.FC = () => {
   const { filterOptions, updateTableFiltering } =
     useOutletContext<ConceptBankContextType>();
 
-  const { table, page, setPage, numberOfPages, isLoading } = useConceptBank(
-    filterOptions,
-    updateTableFiltering,
-  );
+  const hookResult = useConceptBank(filterOptions, updateTableFiltering);
+
+  const { table, page, setPage, numberOfPages, isLoading } = hookResult;
 
   return (
     <>

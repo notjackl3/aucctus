@@ -282,6 +282,10 @@ export class Endpoints {
   ) {
     return `/api/v2/concept/customer-profile/${customerProfileUuid}/journey-steps/${stepUuid}`;
   }
+
+  static conceptSeen(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/seen`;
+  }
 }
 
 export class SocketEndpoints {

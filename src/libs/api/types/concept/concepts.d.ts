@@ -104,6 +104,15 @@ export interface IConcept extends IBaseConceptEntity {
   seedUuid: string;
   isHistoricalVersion: boolean;
   conceptVersionId: number;
+  hasSeenConceptChange: boolean;
+  lastModifiedBy?: {
+    id: number;
+    userId: number;
+    firstName: string;
+    lastName: string;
+    modifiedAt: string;
+  };
+  conceptVersionNumber?: number;
 }
 
 export interface IConceptOverview extends IBaseConceptEntity {

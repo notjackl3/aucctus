@@ -475,4 +475,13 @@ export class ConceptApi extends ApiService {
       endpoints.customerProfileJourneyStep(customerProfileUuid, stepUuid),
     );
   }
+
+  /**
+   * Tracks when a concept is viewed
+   * @param conceptUuid - The UUID of the concept to track
+   * @returns A promise with the response
+   */
+  async trackConceptView(conceptUuid: string): Promise<void> {
+    return this.post(endpoints.conceptSeen(conceptUuid));
+  }
 }

@@ -1,5 +1,6 @@
 import { Button, Table, Text } from '@components';
 import { toast } from '@components/Notification/toast';
+import { ComponentTooltip } from '@components';
 import {
   doFullConceptInvalidation,
   useConceptReportGenerate,
@@ -29,6 +30,7 @@ import {
 import React, { useMemo } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { UnseenChangesTooltip } from '@components/ToolTip/UnseenChangesTooltip';
 
 export interface IConceptFilterOptions {
   status: Set<ConceptStatus>;
@@ -57,12 +59,27 @@ function isSortableConceptProperty(
   return (arr as string[]).includes(value);
 }
 
+/**
+ * Interface defining the return type of the useConceptBank hook
+ */
+interface UseConceptBankResult {
+  isLoading: boolean;
+  numberOfPages: number;
+  page: number;
+  setPage: React.Dispatch<React.SetStateAction<number>>;
+  table: ReturnType<typeof useReactTable<IConcept>>;
+  updateTableFiltering: (value: Partial<IConceptFilterOptions>) => void;
+  resetFilter: () => void;
+  filterOptions: IConceptFilterOptions;
+  handleRowClick: (rowId: string) => void;
+}
+
 export const useConceptBank = (
   externalFilterOptions?: IConceptFilterOptions,
   externalUpdateTableFiltering?: (
     value: Partial<IConceptFilterOptions>,
   ) => void,
-) => {
+): UseConceptBankResult => {
   const navigate = useNavigate();
   const { mutate: generateConceptReport } = useConceptReportGenerate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
@@ -202,8 +219,60 @@ export const useConceptBank = (
     [sorting, updateTableFiltering],
   );
 
+  const handleRowClick = React.useCallback(
+    (rowId: string) => {
+      // Get the row data from the table data using rowId
+      const concept = data?.results.find((row) => row.uuid === rowId);
+
+      if (concept) {
+        // Navigate to the concept page
+        navigate(AppPath.ConceptOverview.replace(':id', concept.uuid));
+      }
+    },
+    [navigate, data?.results],
+  );
+
   const columns = useMemo<ColumnDef<IConcept, any>[]>(() => {
     return [
+      columnHelper.accessor('uuid', {
+        id: 'recentActivity',
+        enableColumnFilter: false,
+        enableSorting: false,
+        size: 30,
+        minSize: 30,
+        maxSize: 30,
+        enableResizing: false,
+        header: () => null,
+        cell: (info) => {
+          const { hasSeenConceptChange, title, uuid, updatedAt } =
+            info.row.original;
+
+          // Only show indicator when user hasn't seen the changes (hasSeenConceptChange is false)
+          if (hasSeenConceptChange) return null;
+
+          return (
+            <ComponentTooltip
+              tip={
+                <UnseenChangesTooltip
+                  conceptTitle={title}
+                  updatedAt={updatedAt}
+                />
+              }
+              hideDelay={0}
+            >
+              <div
+                className='flex h-full w-full items-center justify-center'
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRowClick(uuid);
+                }}
+              >
+                <div className='aucctus-bg-primary-solid h-2.5 w-2.5 cursor-pointer rounded-full' />
+              </div>
+            </ComponentTooltip>
+          );
+        },
+      }),
       columnHelper.accessor('title', {
         id: 'title',
         sortingFn: 'text',
@@ -217,15 +286,17 @@ export const useConceptBank = (
             Concept
           </div>
         ),
-        cell: (info) => (
-          <div className='flex max-w-[700px] items-center p-2'>
-            <Text.Collapsible
-              title={info.getValue()}
-              maxDescriptionHeight={35}
-              description={info.row.original.summary}
-            />
-          </div>
-        ),
+        cell: (info) => {
+          return (
+            <div className='flex max-w-[700px] items-center p-2'>
+              <Text.Collapsible
+                title={info.getValue()}
+                maxDescriptionHeight={35}
+                description={info.row.original.summary}
+              />
+            </div>
+          );
+        },
       }),
       columnHelper.accessor((row) => utils.time.dateFormatter(row.createdAt), {
         id: 'createdAt',
@@ -269,6 +340,54 @@ export const useConceptBank = (
         header: () => (
           <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
             Created
+          </div>
+        ),
+      }),
+      columnHelper.accessor((row) => utils.time.dateFormatter(row.updatedAt), {
+        id: 'updatedAt',
+        enableColumnFilter: false,
+        sortingFn: 'datetime',
+        size: 130,
+        minSize: 130,
+        maxSize: 130,
+        enableResizing: true,
+        cell: (info) => {
+          const lastModifiedBy = info.row.original.lastModifiedBy;
+          const initials = lastModifiedBy
+            ? `${lastModifiedBy.firstName?.charAt(0) || ''}${lastModifiedBy.lastName?.charAt(0) || ''}`
+            : '';
+          const fullName = lastModifiedBy
+            ? `${lastModifiedBy.firstName || ''} ${lastModifiedBy.lastName || ''}`
+            : '';
+
+          return (
+            <span className='flex w-full flex-row items-center justify-start gap-2'>
+              {lastModifiedBy && (
+                <ComponentTooltip tip={fullName} hideDelay={0}>
+                  <div className='flex items-center'>
+                    <div className='aucctus-bg-secondary aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium'>
+                      {initials}
+                    </div>
+                  </div>
+                </ComponentTooltip>
+              )}
+              <div className='ml-2 flex flex-col'>
+                <span className='aucctus-text-primary max-w-[160px] truncate text-sm font-medium'>
+                  {utils.time.dateFormatter(info.row.original.updatedAt)}
+                </span>
+                <span className='aucctus-text-tertiary text-xs'>
+                  {utils.time.formatDate(info.row.original.updatedAt, {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
+                </span>
+              </div>
+            </span>
+          );
+        },
+        header: () => (
+          <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
+            Last updated
           </div>
         ),
       }),
@@ -325,7 +444,7 @@ export const useConceptBank = (
         ),
       }),
     ];
-  }, [handleGenerateConceptButton]);
+  }, [handleGenerateConceptButton, handleRowClick]);
 
   // Create table configuration outside of useMemo
   const tableOptions = {
@@ -345,6 +464,9 @@ export const useConceptBank = (
     onSortingChange: handleSortingChange,
     enableColumnResizing: true,
     columnResizeMode: 'onChange' as ColumnResizeMode,
+    meta: {
+      onRowClick: handleRowClick,
+    },
   };
 
   // Use useReactTable directly at the top level, not inside a callback
@@ -361,6 +483,7 @@ export const useConceptBank = (
       updateTableFiltering,
       resetFilter,
       filterOptions,
+      handleRowClick,
     }),
     [
       isLoading,
@@ -371,6 +494,7 @@ export const useConceptBank = (
       updateTableFiltering,
       resetFilter,
       filterOptions,
+      handleRowClick,
     ],
   );
 };

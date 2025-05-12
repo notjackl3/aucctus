@@ -6,6 +6,7 @@ import {
   useCommitConceptVersionRevert,
   useConcept,
   useConceptUpdate,
+  useTrackConceptView,
 } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import api from '@libs/api';
@@ -55,6 +56,7 @@ const ConceptReport: FunctionComponent = () => {
   const activeTab = useRoutePattern();
   const account = useStore((state) => state.auth.account);
   const { title: titleEdit } = useEditConcept();
+  const { mutate: trackConceptView } = useTrackConceptView();
 
   const {
     concept,
@@ -78,6 +80,12 @@ const ConceptReport: FunctionComponent = () => {
       setActiveConcept(concept);
     }
   }, [concept, setActiveConcept]);
+
+  useEffect(() => {
+    if (conceptUuid) {
+      trackConceptView(conceptUuid);
+    }
+  }, [conceptUuid, trackConceptView]);
 
   const onTabSelect = useCallback(
     (value: string) => {
