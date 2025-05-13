@@ -261,7 +261,7 @@ export const useConceptBank = (
               hideDelay={0}
             >
               <div
-                className='flex h-full w-full items-center justify-center'
+                className='flex h-full w-full min-w-[30px] items-center justify-center'
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRowClick(uuid);
@@ -277,9 +277,9 @@ export const useConceptBank = (
         id: 'title',
         sortingFn: 'text',
         enableColumnFilter: false,
-        size: 600,
-        minSize: 600,
-        maxSize: 600,
+        size: 500,
+        minSize: 500,
+        maxSize: 500,
         enableResizing: true,
         header: () => (
           <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
@@ -288,7 +288,7 @@ export const useConceptBank = (
         ),
         cell: (info) => {
           return (
-            <div className='flex max-w-[700px] items-center p-2'>
+            <div className='flex max-w-[700px] items-center py-2'>
               <Text.Collapsible
                 title={info.getValue()}
                 maxDescriptionHeight={35}
@@ -302,9 +302,9 @@ export const useConceptBank = (
         id: 'createdAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
-        size: 130,
-        minSize: 130,
-        maxSize: 130,
+        size: 150,
+        minSize: 150,
+        maxSize: 150,
         enableResizing: true,
         cell: (info) => {
           const createdBy = info.row.original.createdBy;
@@ -347,9 +347,9 @@ export const useConceptBank = (
         id: 'updatedAt',
         enableColumnFilter: false,
         sortingFn: 'datetime',
-        size: 130,
-        minSize: 130,
-        maxSize: 130,
+        size: 150,
+        minSize: 150,
+        maxSize: 150,
         enableResizing: true,
         cell: (info) => {
           const lastModifiedBy = info.row.original.lastModifiedBy;
@@ -363,25 +363,31 @@ export const useConceptBank = (
           return (
             <span className='flex w-full flex-row items-center justify-start gap-2'>
               {lastModifiedBy && (
-                <ComponentTooltip tip={fullName} hideDelay={0}>
-                  <div className='flex items-center'>
-                    <div className='aucctus-bg-secondary aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium'>
-                      {initials}
+                <>
+                  <ComponentTooltip tip={fullName} hideDelay={0}>
+                    <div className='flex items-center'>
+                      <div className='aucctus-bg-secondary aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium'>
+                        {initials}
+                      </div>
                     </div>
+                  </ComponentTooltip>
+                  <div className='ml-2 flex flex-col'>
+                    <span className='aucctus-text-tertiary text-xs'>
+                      {utils.time.formatDate(info.row.original.updatedAt, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                      })}
+                    </span>
+                    <span className='aucctus-text-tertiary text-xs'>
+                      {utils.time.formatDate(info.row.original.updatedAt, {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      })}
+                    </span>
                   </div>
-                </ComponentTooltip>
+                </>
               )}
-              <div className='ml-2 flex flex-col'>
-                <span className='aucctus-text-primary max-w-[160px] truncate text-sm font-medium'>
-                  {utils.time.dateFormatter(info.row.original.updatedAt)}
-                </span>
-                <span className='aucctus-text-tertiary text-xs'>
-                  {utils.time.formatDate(info.row.original.updatedAt, {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </span>
-              </div>
             </span>
           );
         },
