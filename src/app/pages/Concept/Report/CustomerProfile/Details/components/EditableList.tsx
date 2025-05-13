@@ -37,6 +37,13 @@ export interface EditableListProps {
    * Custom class for the icon color (e.g. aucctus-stroke-brand-primary or stroke-orangeDark-900)
    */
   iconColorClass?: string;
+  /**
+   * Custom size for the icon container
+   * 'sm' = h-5 w-5
+   * 'md' = h-6 w-6
+   * 'lg' = h-7 w-7
+   */
+  iconSize?: 'sm' | 'md' | 'lg';
 }
 
 /**
@@ -53,12 +60,20 @@ const EditableList: React.FC<EditableListProps> = ({
   onCancelAdding,
   iconBgClass = 'aucctus-bg-secondary-subtle',
   iconColorClass = '',
+  iconSize = 'sm',
 }) => {
   const [newValue, setNewValue] = useState('');
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [editingValue, setEditingValue] = useState('');
   const [loadingIndex, setLoadingIndex] = useState<number | null>(null);
   const [addingLoading, setAddingLoading] = useState(false);
+
+  // Get icon size classes
+  const iconSizeClasses = {
+    sm: 'h-5 w-5',
+    md: 'h-6 w-6',
+    lg: 'h-7 w-7',
+  }[iconSize];
 
   // Handlers
   const handleAdd = useCallback(async () => {
@@ -139,7 +154,7 @@ const EditableList: React.FC<EditableListProps> = ({
             >
               <span
                 className={cn(
-                  'mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full',
+                  `mt-0.5 flex ${iconSizeClasses} flex-shrink-0 items-center justify-center rounded-full`,
                   iconBgClass,
                 )}
               >

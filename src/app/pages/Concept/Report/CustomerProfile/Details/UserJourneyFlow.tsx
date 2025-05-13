@@ -218,6 +218,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
         iconClass={ICON_STROKE}
         iconBgClass='aucctus-bg-primary aucctus-border-secondary'
         title='User Journey Flow'
+        noDivider={true}
         rightAction={
           <button
             className={addButtonStyles}

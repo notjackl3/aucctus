@@ -86,10 +86,15 @@ const PainPoints: React.FC<PainPointsProps> = ({
     newValue: string,
   ) => {
     if (!item.uuid || !customerProfileUuid) return;
+
+    // Find the original pain object to preserve all its data
+    const originalPain = pains.find((pain) => pain.uuid === item.uuid);
+    if (!originalPain) return;
+
     await updatePainMutation.mutateAsync({
       customerProfileUuid,
       painUuid: item.uuid,
-      data: { ...item, description: newValue, uuid: item.uuid },
+      data: { ...originalPain, description: newValue },
     });
   };
 
@@ -114,6 +119,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
         iconClass={PRIORITY_COLOR_ICON}
         iconBgClass='aucctus-bg-primary aucctus-border-secondary'
         title='Pain Points'
+        noDivider={true}
         rightAction={
           <button
             className='aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50'
@@ -127,7 +133,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
       />
 
       <div className='px-4 py-2'>
-        <p className='aucctus-text-secondary aucctus-text-sm mb-4'>
+        <p className='aucctus-text-secondary aucctus-text-sm mb-6'>
           Issues and challenges affecting your customer
         </p>
 
@@ -152,6 +158,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
               onCancelAdding={handleCancelAdding}
               iconColorClass={PRIORITY_COLOR_ICON}
               iconBgClass={PRIORITY_COLOR_ICON_BG}
+              iconSize='md'
             />
           </div>
         </div>

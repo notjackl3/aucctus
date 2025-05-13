@@ -14,7 +14,7 @@ import {
   downloadPdf,
   generateConceptSnapshotFileName,
 } from '@libs/utils/files';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
@@ -57,6 +57,7 @@ const ConceptReport: FunctionComponent = () => {
   const account = useStore((state) => state.auth.account);
   const { title: titleEdit } = useEditConcept();
   const { mutate: trackConceptView } = useTrackConceptView();
+  const hasTrackedView = useRef(false);
 
   const {
     concept,
@@ -82,8 +83,9 @@ const ConceptReport: FunctionComponent = () => {
   }, [concept, setActiveConcept]);
 
   useEffect(() => {
-    if (conceptUuid) {
+    if (conceptUuid && !hasTrackedView.current) {
       trackConceptView(conceptUuid);
+      hasTrackedView.current = true;
     }
   }, [conceptUuid, trackConceptView]);
 

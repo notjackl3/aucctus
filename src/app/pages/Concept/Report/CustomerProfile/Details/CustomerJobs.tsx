@@ -84,10 +84,15 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
     newValue: string,
   ) => {
     if (!item.uuid || !customerProfileUuid) return;
+
+    // Find the original job object to preserve all its data
+    const originalJob = jobs.find((job) => job.uuid === item.uuid);
+    if (!originalJob) return;
+
     await updateJobMutation.mutateAsync({
       customerProfileUuid,
       jobUuid: item.uuid,
-      data: { ...item, description: newValue, uuid: item.uuid },
+      data: { ...originalJob, description: newValue },
     });
   };
 
@@ -112,6 +117,7 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
         iconClass={PRIORITY_COLOR_ICON}
         iconBgClass='aucctus-bg-primary aucctus-border-secondary'
         title='Jobs to be Done'
+        noDivider={true}
         rightAction={
           <button
             className='aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50'
@@ -125,7 +131,7 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
       />
 
       <div className='px-4 py-2'>
-        <p className='aucctus-text-secondary aucctus-text-sm mb-4'>
+        <p className='aucctus-text-secondary aucctus-text-sm mb-6'>
           Tasks your customer needs to accomplish
         </p>
 
@@ -150,6 +156,7 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
               onCancelAdding={handleCancelAdding}
               iconColorClass={PRIORITY_COLOR_ICON}
               iconBgClass={PRIORITY_COLOR_ICON_BG}
+              iconSize='md'
             />
           </div>
         </div>
