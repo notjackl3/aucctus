@@ -4,12 +4,11 @@ import { cn } from '@libs/utils/react';
 import utils from '@libs/utils';
 
 interface UnseenChangesTooltipProps {
-  conceptTitle: string;
+  conceptTitle?: string;
   updatedAt: string;
 }
 
 const UnseenChangesTooltip: FunctionComponent<UnseenChangesTooltipProps> = ({
-  conceptTitle,
   updatedAt,
 }) => {
   // Format the time since last update using the utility functions
@@ -21,9 +20,10 @@ const UnseenChangesTooltip: FunctionComponent<UnseenChangesTooltipProps> = ({
         'shadow-lg',
         'aucctus-bg-primary border aucctus-border-secondary rounded-xl p-3',
       )}
-      headerClassName='aucctus-bg-primary border-b aucctus-border-secondary'
       title='New Changes Available'
+      headerClassName='aucctus-bg-primary border-b aucctus-border-secondary'
       isHideFooter={true}
+      isHideHeader={true}
     >
       <div className='flex w-full flex-col'>
         <div className='mb-1 w-full'>
@@ -37,10 +37,6 @@ const UnseenChangesTooltip: FunctionComponent<UnseenChangesTooltipProps> = ({
             <div className='flex flex-col'>
               <span className='aucctus-text-md'>
                 This concept was updated {timeAgo}
-              </span>
-              <span className='aucctus-text-sm aucctus-text-secondary mt-0.5'>
-                Click to view{' '}
-                <span className='font-medium'>{conceptTitle}</span>
               </span>
             </div>
           </div>

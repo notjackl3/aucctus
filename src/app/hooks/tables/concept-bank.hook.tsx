@@ -244,29 +244,17 @@ export const useConceptBank = (
         enableResizing: false,
         header: () => null,
         cell: (info) => {
-          const { hasSeenConceptChange, title, uuid, updatedAt } =
-            info.row.original;
+          const { hasSeenConceptChange, updatedAt } = info.row.original;
 
           // Only show indicator when user hasn't seen the changes (hasSeenConceptChange is false)
           if (hasSeenConceptChange) return null;
 
           return (
             <ComponentTooltip
-              tip={
-                <UnseenChangesTooltip
-                  conceptTitle={title}
-                  updatedAt={updatedAt}
-                />
-              }
+              tip={<UnseenChangesTooltip updatedAt={updatedAt} />}
               hideDelay={0}
             >
-              <div
-                className='flex h-full w-full min-w-[30px] items-center justify-center'
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleRowClick(uuid);
-                }}
-              >
+              <div className='flex h-full w-full min-w-[30px] items-center justify-center'>
                 <div className='aucctus-bg-primary-solid h-2.5 w-2.5 cursor-pointer rounded-full' />
               </div>
             </ComponentTooltip>
@@ -331,7 +319,12 @@ export const useConceptBank = (
                   </span>
                 )}
                 <span className='aucctus-text-tertiary text-xs'>
-                  {info.getValue()}
+                  {utils.time.formatDate(info.row.original.createdAt, {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  })}
                 </span>
               </div>
             </span>
@@ -364,23 +357,19 @@ export const useConceptBank = (
             <span className='flex w-full flex-row items-center justify-start gap-2'>
               {lastModifiedBy && (
                 <>
-                  <ComponentTooltip tip={fullName} hideDelay={0}>
-                    <div className='flex items-center'>
-                      <div className='aucctus-bg-secondary aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium'>
-                        {initials}
-                      </div>
+                  <div className='flex items-center'>
+                    <div className='aucctus-bg-secondary aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full text-xs font-medium'>
+                      {initials}
                     </div>
-                  </ComponentTooltip>
+                  </div>
                   <div className='ml-2 flex flex-col'>
-                    <span className='aucctus-text-tertiary text-xs'>
-                      {utils.time.formatDate(info.row.original.updatedAt, {
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric',
-                      })}
+                    <span className='aucctus-text-primary max-w-[160px] truncate text-sm font-medium'>
+                      {fullName}
                     </span>
                     <span className='aucctus-text-tertiary text-xs'>
                       {utils.time.formatDate(info.row.original.updatedAt, {
+                        month: 'short',
+                        day: 'numeric',
                         hour: '2-digit',
                         minute: '2-digit',
                       })}
@@ -393,7 +382,7 @@ export const useConceptBank = (
         },
         header: () => (
           <div className='font-inter aucctus-text-tertiary text-xs font-semibold normal-case'>
-            Last updated
+            Last Modified
           </div>
         ),
       }),
@@ -450,7 +439,7 @@ export const useConceptBank = (
         ),
       }),
     ];
-  }, [handleGenerateConceptButton, handleRowClick]);
+  }, [handleGenerateConceptButton]);
 
   // Create table configuration outside of useMemo
   const tableOptions = {
