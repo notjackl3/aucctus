@@ -187,8 +187,10 @@ export const useConceptBank = (
             });
             break;
           case 'complete':
-            doFullConceptInvalidation(queryClient, row.original.uuid);
-            navigate(AppPath.ConceptOverview.replace(':id', row.original.uuid));
+            doFullConceptInvalidation(queryClient);
+            navigate(
+              AppPath.ConceptOverview.replace(':id', row.original.identifier),
+            );
             break;
           default:
             e.stopPropagation();
@@ -434,7 +436,7 @@ export const useConceptBank = (
         cell: (info) => (
           <Table.ConceptBank.ConceptActionMenuButton
             status={info.row.original.status}
-            uuid={info.getValue()}
+            identifier={info.row.original.identifier}
           />
         ),
       }),

@@ -37,8 +37,8 @@ import {
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
 
-export type PartialConceptWithRequiredUuid = Partial<IConcept> & {
-  uuid: string;
+export type PartialConceptWithRequiredIdentifier = Partial<IConcept> & {
+  identifier: string;
 };
 /**
  * Custom hook for fetching list concepts.
@@ -261,13 +261,14 @@ export const useConceptIncubationQuestionnaire = () => {
  * @param uuid - The UUID of the concept to fetch.
  * @returns An object containing the query result and the concept data.
  */
-export const useConcept = (uuid?: string) => {
+export const useConcept = (identifier?: string) => {
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.concept, uuid],
+    queryKey: [AucctusQueryKeys.concept, identifier],
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 2, // 2 minutes
-    queryFn: async () => (uuid ? await api.concept.getConcept(uuid) : void 0),
-    enabled: !!uuid,
+    queryFn: async () =>
+      identifier ? await api.concept.getConcept(identifier) : void 0,
+    enabled: !!identifier,
   });
 
   return { ...query, concept: query.data };
@@ -596,8 +597,11 @@ export const useConceptUpdate = () => {
   return createConceptMutation()<
     IConcept,
     IFormError<IConcept>,
-    PartialConceptWithRequiredUuid
-  >(async (concept) => await api.concept.updateConcept(concept, concept.uuid));
+    PartialConceptWithRequiredIdentifier
+  >(
+    async (concept) =>
+      await api.concept.updateConcept(concept, concept.identifier),
+  );
 };
 
 /**
@@ -701,19 +705,16 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 //   );
 // };
 
-export const doFullConceptInvalidation = (
-  queryClient: QueryClient,
-  uuid: string,
-) => {
+export const doFullConceptInvalidation = (queryClient: QueryClient) => {
   Promise.all([
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.concept, uuid],
+      queryKey: [AucctusQueryKeys.concept],
     }),
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.conceptVersions, uuid],
+      queryKey: [AucctusQueryKeys.conceptVersions],
     }),
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.conceptOverview, uuid],
+      queryKey: [AucctusQueryKeys.conceptOverview],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.marketScan],
@@ -722,7 +723,7 @@ export const doFullConceptInvalidation = (
       queryKey: [AucctusQueryKeys.customerProfile],
     }),
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.customerProfiles, uuid],
+      queryKey: [AucctusQueryKeys.customerProfiles],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.customerProfileRealWorldSignals],
@@ -831,54 +832,12 @@ export const useRevertConceptVersion = () => {
       uuid: string;
       payload: { versionId: number };
     }) => await api.concept.revertConceptVersion(params.uuid, params.payload),
-    onSuccess: (_, params) => {
-      doFullConceptInvalidation(queryClient, params.uuid);
+    onSuccess: () => {
+      doFullConceptInvalidation(queryClient);
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to view historical version');
-    },
-  });
-};
-
-/**
- * Custom hook for committing a concept version revert.
- * @returns The result of the useMutation hook.
- */
-export const useCommitConceptVersionRevert = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (uuid: string) =>
-      await api.concept.commitConceptVersionRevert(uuid),
-    onSuccess: (_, uuid) => {
-      doFullConceptInvalidation(queryClient, uuid);
-      toast.success('Concept version revert committed successfully');
-    },
-    onError: (e) => {
-      const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to commit concept version revert');
-    },
-  });
-};
-
-/**
- * Custom hook for canceling a concept version revert.
- * @returns The result of the useMutation hook.
- */
-export const useCancelConceptVersionRevert = () => {
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (uuid: string) =>
-      await api.concept.cancelConceptVersionRevert(uuid),
-    onSuccess: (_, uuid) => {
-      doFullConceptInvalidation(queryClient, uuid);
-      toast.success('Concept version revert canceled');
-    },
-    onError: (e) => {
-      const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to cancel concept version revert');
     },
   });
 };

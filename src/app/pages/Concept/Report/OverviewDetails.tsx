@@ -7,19 +7,22 @@ import {
 } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
-import { useOutletContext, useParams } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { IConceptReportContext } from './ConceptReport/ConceptReport';
+import useStore from '@stores/store';
 
 const OverviewDetails: FunctionComponent = () => {
-  const { id: conceptId = '' } = useParams();
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid ?? '',
+  );
   const { navigateToTab, concept } = useOutletContext<IConceptReportContext>();
   const { profiles, isLoading: isCustomerProfilesLoading } =
-    useConceptCustomerProfiles(conceptId);
+    useConceptCustomerProfiles(activeConceptUuid);
   const { financialProjection, isLoading: isFinancialProjectionLoading } =
-    useFinancialProjection(conceptId);
+    useFinancialProjection(activeConceptUuid);
 
   const { assumptions, isLoading: isAssumptionsLoading } =
-    useAssumptions(conceptId);
+    useAssumptions(activeConceptUuid);
   const { valueProposition, problemStatement, overview } = useEditConcept();
 
   const isLoading =

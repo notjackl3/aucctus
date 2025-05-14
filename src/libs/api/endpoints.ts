@@ -32,8 +32,8 @@ export class Endpoints {
 
   static conceptQuestionnaire = '/api/v1/concept/ignition/questionnaires';
 
-  static conceptUuid(conceptUuid: string) {
-    return `api/v1/concept/${conceptUuid}/`;
+  static conceptIdentifier(identifier: string) {
+    return `api/v1/concept/${identifier}/`;
   }
 
   static conceptSnapshotUuid(conceptUuid: string) {
@@ -106,14 +106,6 @@ export class Endpoints {
 
   static revertConceptVersion(conceptUuid: string) {
     return `api/v2/concept/version/${conceptUuid}/revert`;
-  }
-
-  static commitConceptReversion(conceptUuid: string) {
-    return `api/v2/concept/version/${conceptUuid}/commit`;
-  }
-
-  static cancelConceptReversion(conceptUuid: string) {
-    return `api/v2/concept/version/${conceptUuid}/cancel`;
   }
 
   static unarchiveConcept(conceptUuid: string) {

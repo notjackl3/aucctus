@@ -2,8 +2,6 @@ import { Container, Icon, Loading, Modal, Select } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import {
-  useCancelConceptVersionRevert,
-  useCommitConceptVersionRevert,
   useConcept,
   useConceptUpdate,
   useTrackConceptView,
@@ -28,6 +26,7 @@ import { cn } from '@libs/utils/react';
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
+
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
   concept: IConcept;
@@ -51,7 +50,7 @@ const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
 ];
 
 const ConceptReport: FunctionComponent = () => {
-  const { id: conceptUuid } = useParams();
+  const { id: conceptIdentifier } = useParams();
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
   const account = useStore((state) => state.auth.account);
@@ -63,15 +62,13 @@ const ConceptReport: FunctionComponent = () => {
     concept,
     isFetched: isConceptFetched,
     isLoading: isConceptLoading,
-  } = useConcept(conceptUuid);
+    isFetching: isConceptFetching,
+  } = useConcept(conceptIdentifier);
+  const conceptUuid = useMemo(() => concept?.uuid || '', [concept]);
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
   const [isLoading, setIsLoading] = useState(false);
-  const { openModal, closeModal } = useModal();
-  const { mutate: commitConceptVersionRevert, isLoading: isReverting } =
-    useCommitConceptVersionRevert();
-  const { mutate: cancelConceptVersionRevert, isLoading: isCancelling } =
-    useCancelConceptVersionRevert();
+  const { openModal } = useModal();
   const setActiveConcept = useStore(
     (state) => state.conceptReport.setActiveConcept,
   );
@@ -91,11 +88,11 @@ const ConceptReport: FunctionComponent = () => {
 
   const onTabSelect = useCallback(
     (value: string) => {
-      if (conceptUuid === undefined) return;
-      const route = value.replace(':id', conceptUuid);
+      if (conceptIdentifier === undefined) return;
+      const route = value.replace(':id', conceptIdentifier);
       navigate(route);
     },
-    [conceptUuid, navigate],
+    [conceptIdentifier, navigate],
   );
 
   const onSnapshotClick = useCallback(async () => {
@@ -118,13 +115,13 @@ const ConceptReport: FunctionComponent = () => {
 
   const changeConceptStatus = useCallback(
     (value: string) => {
-      if (!conceptUuid) return;
+      if (!conceptIdentifier) return;
       updateConcept({
-        uuid: conceptUuid,
+        identifier: conceptIdentifier,
         status: value as ConceptStatus,
       });
     },
-    [updateConcept, conceptUuid],
+    [updateConcept, conceptIdentifier],
   );
 
   if (!concept && isConceptFetched) {
@@ -135,18 +132,10 @@ const ConceptReport: FunctionComponent = () => {
   return (
     <>
       <ConceptReportSocketWrapper />
-      <div
-        className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8', {
-          'aucctus-bg-secondary-extra-subtle': !concept?.isHistoricalVersion,
-        })}
-      >
+      <div className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8')}>
         <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
           <div className='flex flex-row items-center justify-start'>
             <EditModeSwitcher
-              containerClassName={cn({
-                'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
-                  concept?.isHistoricalVersion,
-              })}
               pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
               textFieldClassName='!text-3xl max-w-[600px]'
               value={titleEdit.value}
@@ -160,19 +149,16 @@ const ConceptReport: FunctionComponent = () => {
             />
             <div className='ml-4 flex'>
               <Select.ConceptStatus
-                disabled={concept?.isHistoricalVersion}
                 value={status}
                 onChange={changeConceptStatus}
               />
             </div>
           </div>
           <div className='flex gap-4'>
-            {concept &&
-              !concept.isHistoricalVersion &&
-              FEATURE_CONCEPT_VERSIONING && (
-                <ConceptVersionsButton conceptUuid={conceptUuid} />
-              )}
-            {concept && !concept.isHistoricalVersion && (
+            {concept && FEATURE_CONCEPT_VERSIONING && (
+              <ConceptVersionsButton conceptUuid={conceptUuid} />
+            )}
+            {concept && (
               <button
                 aria-label='Download Opportunity Snapshot'
                 className='btn btn-bold aucctus-text-brand-primary group whitespace-nowrap hover:bg-primary-900 hover:text-white'
@@ -192,35 +178,29 @@ const ConceptReport: FunctionComponent = () => {
                 Opportunity Snapshot
               </button>
             )}
-            {!concept?.isHistoricalVersion && (
-              <button
-                onClick={() =>
-                  openModal(
-                    Modal.AiEditing,
-                    {},
-                    {
-                      position: 'right',
-                      modalClassName: 'max-h-[90vh]',
-                      hideBodyScroll: true,
-                      shouldCloseOnOverlayClick: true,
-                      shouldCloseOnEscape: true,
-                    },
-                  )
-                }
-                className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-              >
-                Refine
-              </button>
-            )}
+            <button
+              onClick={() =>
+                openModal(
+                  Modal.AiEditing,
+                  {},
+                  {
+                    position: 'right',
+                    modalClassName: 'max-h-[90vh]',
+                    hideBodyScroll: true,
+                    shouldCloseOnOverlayClick: true,
+                    shouldCloseOnEscape: true,
+                  },
+                )
+              }
+              className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+            >
+              Refine
+            </button>
           </div>
         </div>
         <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
           <Container.TabView
             className=''
-            tabContentClassName={cn({
-              'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
-                concept?.isHistoricalVersion,
-            })}
             tabs={CONCEPT_TABS.filter(
               (v) => !(v.label === 'Context' && !concept?.hasSeed),
             )}
@@ -241,62 +221,7 @@ const ConceptReport: FunctionComponent = () => {
             )}
           </Container.TabView>
         </div>
-        <LoadingMask
-          isLoading={isConceptLoading || isReverting || isCancelling}
-        />
-
-        {concept?.isHistoricalVersion && FEATURE_CONCEPT_VERSIONING && (
-          <div className='aucctus-bg-primary fixed left-1/2 top-0 z-50 flex -translate-x-1/2 animate-fade-in flex-row items-center justify-center gap-2 rounded-b-md px-4 py-2 shadow-md'>
-            <span className='flex min-h-6 min-w-6 items-center justify-center'>
-              <Icon
-                variant='alert-triangle'
-                height={16}
-                width={16}
-                className='stroke-warning-500'
-              />
-            </span>
-            <span className='aucctus-text-brand-secondary aucctus-text-sm-medium mr-2'>
-              You are viewing a historical version of this concept
-            </span>
-            <button
-              onClick={() =>
-                openModal(Modal.Confirmation, {
-                  title: 'Are you sure you want to revert to this version?',
-                  subtitle:
-                    'Once reverted, you will lose any current changes you have made to this concept.\nWARNING: This action cannot be undone!',
-                  actions: [
-                    {
-                      title: 'Revert',
-                      onClick: () =>
-                        commitConceptVersionRevert(conceptUuid!, {
-                          onSuccess: () => {
-                            closeModal();
-                          },
-                        }),
-                      variant: 'warning',
-                    },
-                    {
-                      title: 'Cancel',
-                      onClick: () => {
-                        closeModal();
-                      },
-                      variant: 'secondary',
-                    },
-                  ],
-                })
-              }
-              className='btn btn-bold btn-primary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-            >
-              Revert
-            </button>
-            <button
-              onClick={() => cancelConceptVersionRevert(conceptUuid!)}
-              className='btn btn-bold btn-secondary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-            >
-              Cancel
-            </button>
-          </div>
-        )}
+        <LoadingMask isLoading={isConceptLoading || isConceptFetching} />
       </div>
     </>
   );

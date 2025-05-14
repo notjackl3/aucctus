@@ -9,20 +9,20 @@ import React from 'react';
 
 // Concept-specific wrapper that uses the generic component
 interface IConceptActionMenuButton {
-  uuid: string;
   status: ConceptStatus;
+  identifier: string;
 }
 
 const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
-  uuid,
   status,
+  identifier,
 }) => {
   const { mutate: unarchiveConcept } = useUnarchiveConcept();
   const { mutate: updateConcept } = useConceptUpdate();
 
-  const handleArchive = (id: string) => {
+  const handleArchive = (identifier: string) => {
     updateConcept({
-      uuid: id,
+      identifier: identifier,
       status: 'archived',
     });
   };
@@ -33,7 +33,7 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
 
   return (
     <Button.ActionsMenuButton
-      uuid={uuid}
+      identifier={identifier}
       status={status}
       onArchive={handleArchive}
       onUnarchive={handleUnarchive}

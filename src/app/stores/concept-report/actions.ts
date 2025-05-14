@@ -28,9 +28,8 @@ export function setActiveConcept(
   const { set } = this;
   set(
     produce((state: IConceptReportState) => {
-      state.isHistoricalVersion = concept.isHistoricalVersion;
-      state.conceptVersionId = concept.conceptVersionId;
       state.conceptUuid = concept.uuid;
+      state.identifier = concept.identifier;
     }),
   );
 }

@@ -3,15 +3,12 @@ export interface IConceptVersionRevertRequestPayload {
 }
 
 export interface IConceptVersion {
-  versionId: number;
-  revisionId: number;
-  title?: string;
-  description?: string;
+  isCurrent?: boolean;
   comment?: string;
-  conceptVersionNumber?: number;
-  conceptAffectedSections?: string[];
+  versionNumber: number;
+  affectedSections?: string[];
   createdTimestamp?: number;
-  editSummary?: string;
+  aiSummary?: string;
 }
 
 export interface IConceptVersionList {

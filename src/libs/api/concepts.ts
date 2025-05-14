@@ -72,8 +72,8 @@ export class ConceptApi extends ApiService {
     this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
-  getConcept(uuid: string) {
-    return this.get<IConcept>(endpoints.conceptUuid(uuid));
+  getConcept(identifier: string) {
+    return this.get<IConcept>(endpoints.conceptIdentifier(identifier));
   }
 
   downloadConcept(uuid: string) {
@@ -157,14 +157,6 @@ export class ConceptApi extends ApiService {
     );
   }
 
-  commitConceptVersionRevert(uuid: string) {
-    return this.post(endpoints.commitConceptReversion(uuid));
-  }
-
-  cancelConceptVersionRevert(uuid: string) {
-    return this.post(endpoints.cancelConceptReversion(uuid));
-  }
-
   aiEditConcept(payload: EditConceptReportRequest) {
     return this.post<IConcept>(endpoints.conceptAiEditing, payload);
   }
@@ -173,23 +165,25 @@ export class ConceptApi extends ApiService {
     return this.post<IConcept>(endpoints.unarchiveConcept(uuid));
   }
 
-  updateConcept(concept: Partial<IConcept>, uuid: string) {
+  updateConcept(concept: Partial<IConcept>, identifier: string) {
     return this.patch<IConcept, Partial<IConcept>>(
-      endpoints.conceptUuid(uuid),
+      endpoints.conceptIdentifier(identifier),
       concept,
     );
   }
 
-  updateConceptStatus(uuid: string, status: ConceptStatus) {
-    return this.patch<IConcept>(endpoints.conceptUuid(uuid), { status });
+  updateConceptStatus(identifier: string, status: ConceptStatus) {
+    return this.patch<IConcept>(endpoints.conceptIdentifier(identifier), {
+      status,
+    });
   }
 
   getConcepts(options?: IConceptQueryOptions) {
     return this.get<IConceptPage>(endpoints.conceptQueries(options));
   }
 
-  deleteConcept(uuid: string) {
-    return this.delete<IConcept>(endpoints.conceptUuid(uuid));
+  deleteConcept(identifier: string) {
+    return this.delete<IConcept>(endpoints.conceptIdentifier(identifier));
   }
 
   getConceptCustomerProfiles(uuid: string) {

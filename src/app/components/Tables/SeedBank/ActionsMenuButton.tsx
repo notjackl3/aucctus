@@ -30,7 +30,7 @@ const SeedActionMenuButton: React.FC<ISeedActionMenuButton> = ({
 
   return (
     <Button.ActionsMenuButton
-      uuid={uuid}
+      identifier={uuid}
       status={status}
       onArchive={handleArchive}
       onUnarchive={handleUnarchive}

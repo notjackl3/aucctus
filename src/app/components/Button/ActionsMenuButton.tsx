@@ -8,17 +8,17 @@ import { cn } from '@libs/utils/react';
 
 // Common interface for all action menu buttons
 interface IActionsMenuButtonProps {
-  uuid: string;
+  identifier: string;
   status?: ConceptStatus | SeedStatus;
-  onArchive: (uuid: string) => void;
-  onUnarchive: (uuid: string) => void;
+  onArchive: (identifier: string) => void;
+  onUnarchive: (identifier: string) => void;
   buttonClassName?: string;
   iconSize?: number;
 }
 
 // Generic Actions Menu Button that can be used for both concepts and seeds
 const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
-  uuid,
+  identifier,
   status,
   onArchive,
   onUnarchive,
@@ -52,9 +52,9 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
                 className='btn btn-no-border btn-light'
                 onClick={() => {
                   if (status === 'archived') {
-                    onUnarchive(uuid);
+                    onUnarchive(identifier);
                   } else {
-                    onArchive(uuid);
+                    onArchive(identifier);
                   }
                   setOpen(false);
                 }}

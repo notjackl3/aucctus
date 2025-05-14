@@ -9,8 +9,7 @@ import {
 export interface IConceptReportState extends IConceptReportActions {
   // The currently selected concept uuid
   conceptUuid?: string;
-  isHistoricalVersion?: boolean;
-  conceptVersionId?: number;
+  identifier?: string;
 }
 
 const conceptReportSlice: Lens<IConceptReportState, IAppStore> = (
@@ -22,8 +21,7 @@ const conceptReportSlice: Lens<IConceptReportState, IAppStore> = (
 
   return {
     conceptUuid: undefined,
-    isHistoricalVersion: undefined,
-    conceptVersionId: undefined,
+    identifier: undefined,
     setConceptUuid: setConceptUuid.bind(actionContext),
     setActiveConcept: setActiveConcept.bind(actionContext),
   };

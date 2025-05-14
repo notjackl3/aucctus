@@ -28,7 +28,7 @@ const ConceptVersionsDropdown: React.FC<ConceptVersionsDropdownProps> = ({
     revertConceptVersion(
       {
         uuid: conceptUuid,
-        payload: { versionId: version.versionId },
+        payload: { versionId: version.versionNumber },
       },
       {
         onSuccess: () => {
@@ -54,7 +54,7 @@ const ConceptVersionsDropdown: React.FC<ConceptVersionsDropdownProps> = ({
           {versions && versions.versions.length > 0 ? (
             versions.versions.map((v) => (
               <ConceptVersionCard
-                key={v.revisionId}
+                key={v.versionNumber}
                 version={v}
                 onSelect={handleVersionSelect}
               />

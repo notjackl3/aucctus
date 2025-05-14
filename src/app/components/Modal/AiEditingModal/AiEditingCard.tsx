@@ -169,7 +169,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                           'Concept update started',
                           'This may take up to 10 minutes. You can navigate away.',
                         );
-                        doFullConceptInvalidation(queryClient, editConceptUuid);
+                        doFullConceptInvalidation(queryClient);
                         navigate(AppPath.ConceptBank, {
                           replace: true,
                         });
