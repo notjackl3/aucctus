@@ -6,6 +6,7 @@ import images from '@assets/img';
 import AucctusImg from '@components/Image/AucctusImg';
 import { IGeneratedConcept } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 
 const ReadyToGenerateIcon: React.FC = () => {
   return (
@@ -28,6 +29,9 @@ interface ReadyToGenerateProps {
 const READY_TO_GENERATE_TEXT =
   'Aucctus is ready to generate some concepts on the right, based on your answers or you can refine some of your answers, note that the more questions and accurate your answers, the better Aucctus can help generate the concepts for you.';
 
+const EXPAND_IDEA_TEXT =
+  'Aucctus is ready to help validate and expand your idea. Based on your answers, we can generate concepts that build upon your existing idea.';
+
 const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
   concept = undefined,
   compact = false,
@@ -41,27 +45,36 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
     headerButtonAnimation,
   } = useReadyToGenerateAnimations(compact && !concept);
 
+  const { activeQuestionnaire } = useConceptIncubationStore();
+
   const headerMessage = useMemo(() => {
     if (concept) {
       return concept.isGenerating
         ? 'Report generation is in progress'
         : `We have enough information to generate your concept report`;
     } else {
-      return 'We have enough information to generate concepts for you';
+      return activeQuestionnaire?.type === 'EXPAND_AN_EXISTING_IDEA'
+        ? 'We have enough information to validate and expand your idea'
+        : 'We have enough information to generate concepts for you';
     }
-  }, [concept]);
+  }, [concept, activeQuestionnaire]);
+
   const buttonText = useMemo(
     () => (concept ? 'Generate Report' : 'Generate'),
     [concept],
   );
+
   const cardHeaderText = useMemo(
     () => (concept ? concept.title : 'Generate Concepts'),
     [concept],
   );
-  const cardText = useMemo(
-    () => (concept ? concept.summary : READY_TO_GENERATE_TEXT),
-    [concept],
-  );
+
+  const cardText = useMemo(() => {
+    if (concept) return concept.summary;
+    return activeQuestionnaire?.type === 'EXPAND_AN_EXISTING_IDEA'
+      ? EXPAND_IDEA_TEXT
+      : READY_TO_GENERATE_TEXT;
+  }, [concept, activeQuestionnaire]);
 
   return (
     <span className='z-[999] mt-4 flex flex-col gap-4'>

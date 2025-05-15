@@ -145,7 +145,7 @@ const ConceptGeneration = React.forwardRef<
         style={getFadeInStyle(500, 1000)}
         className='aucctus-text-white aucctus-text-xs'
       >
-        This will take just a few seconds to complete
+        This can take up to 2 minutes to complete
       </div>
     </div>
   );

@@ -25,6 +25,8 @@ import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
 import { toast } from '@components';
 
+declare const FEATURE_CONCEPT_CLARIFYING_QUESTIONS: boolean;
+
 // Constants
 const mainStyle = {
   backgroundImage: `url(${images.aiExplorationsBackground})`,
@@ -245,9 +247,13 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   const handleContinue = useCallback(() => {
     saveGeneratedConcepts(selectedConcepts, {
       onSuccess: async () => {
-        const updatedConcepts =
-          await generateClarifyingQuestionsForConcepts(selectedConcepts);
-        setGeneratedConcepts(draftSeedUuid, updatedConcepts);
+        if (FEATURE_CONCEPT_CLARIFYING_QUESTIONS) {
+          const updatedConcepts =
+            await generateClarifyingQuestionsForConcepts(selectedConcepts);
+          setGeneratedConcepts(draftSeedUuid, updatedConcepts);
+        } else {
+          setGeneratedConcepts(draftSeedUuid, selectedConcepts);
+        }
         showSuccessAndNavigate();
       },
     });
