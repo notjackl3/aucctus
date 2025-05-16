@@ -35,7 +35,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
 }) => (
   <div
     className={cn(
-      'aucctus-border-secondary flex items-center justify-between px-4 py-3',
+      'aucctus-border-secondary flex items-center justify-between px-4 pt-3',
       !noDivider && 'border-b',
       className,
     )}

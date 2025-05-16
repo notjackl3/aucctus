@@ -2,6 +2,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import TabView, { TabElement } from '@components/Container/TabView/TabView';
 import { ICustomerProfileRealWorldSignal } from '@libs/api/types';
 import RealWorldSignalCard from './RealWorldSignalCard';
+import { capitalize } from '@libs/utils/string';
 
 // Define the stance order as a constant to reuse
 const stanceOrder = ['In Favour', 'Neutral', 'Against'];
@@ -60,7 +61,7 @@ const GroupedSignals: React.FC<IGroupedSignalsProps> = ({
   const signalTabs = useMemo(() => {
     // Create tab elements for each available stance
     return availableStances.map<TabElement>((stance) => ({
-      label: `${stance} (${groupedSignals[stance]?.length || 0})`,
+      label: `${capitalize(stance)} (${groupedSignals[stance]?.length || 0})`,
       value: stance,
     }));
   }, [groupedSignals, availableStances]);
@@ -105,8 +106,7 @@ const GroupedSignals: React.FC<IGroupedSignalsProps> = ({
     <>
       <TabView
         tabs={signalTabs}
-        tabGroupClassName='pointer-events-auto'
-        className='mt-4'
+        tabGroupClassName='pointer-events-auto !py-2 mt-2'
         variant='button-separated'
         onTabSelect={onTabSelect}
         activeTab={selectedStance}
