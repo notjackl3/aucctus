@@ -19,7 +19,7 @@ const ideaCards = [
     icon: 'lightbulb' as IconVariant,
     path: 'expand-an-existing-idea' as QuestionPath,
     animationDelay: 600,
-    disabled: true,
+    disabled: false,
   },
   {
     title: 'Identify New Opportunities',
@@ -122,8 +122,31 @@ const GenerateNewIdeas: React.FC = () => {
   const selectQuestionPath = React.useCallback(
     (questionPath: QuestionPath) => {
       const contentElement = contentRef.current;
-      if (questionPath === 'expand-an-existing-idea') {
-        // TODO: Implement expand an existing idea
+      if (questionPath === 'expand-an-existing-idea' && contentElement) {
+        saveConceptSeedDraft(
+          {
+            type: 'EXPAND_AN_EXISTING_IDEA',
+          },
+          {
+            onSuccess: (response) => {
+              handleTransition(contentElement, () => {
+                resetQuestionnaire();
+                setActiveQuestionnaire(questionnaires?.expandAnExistingIdea);
+                setDraftSeedUuid(response.uuid);
+                setCurrentQuestionOrder(1);
+                // Update the URL to include the seed UUID without refreshing the page
+                window.history.pushState(
+                  { seedUuid: response.uuid },
+                  '',
+                  `${AppPath.IncubateConcept}?seed=${response.uuid}`,
+                );
+              });
+            },
+            onError: () => {
+              toast.error('Error saving concept seed draft');
+            },
+          },
+        );
       } else if (
         questionPath === 'identify-new-opportunities' &&
         contentElement

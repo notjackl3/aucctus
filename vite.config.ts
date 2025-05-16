@@ -80,6 +80,9 @@ export default defineConfig(async (config: ViteUserConfig) => {
       FEATURE_CONCEPT_VERSIONING: Boolean(
         env.FEATURE_CONCEPT_VERSIONING === 'true',
       ),
+      FEATURE_CONCEPT_CLARIFYING_QUESTIONS: Boolean(
+        env.FEATURE_CONCEPT_CLARIFYING_QUESTIONS === 'true',
+      ),
     },
     css: {
       preprocessorOptions: {
