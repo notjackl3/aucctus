@@ -4,6 +4,7 @@ import ConceptSelection from '@components/Card/ConceptGeneration/Generation/Conc
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import {
   useConceptIncubationQuestionnaire,
+  useConceptReportGenerate,
   useDeleteSeed,
   useGetConceptSeedDraftAnswers,
   useSeed,
@@ -13,6 +14,7 @@ import { animated, easings, useTransition } from '@react-spring/web';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import { IGeneratedConcept } from '@libs/api/types';
 import React, {
   useCallback,
   useEffect,
@@ -22,6 +24,8 @@ import React, {
 } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@components';
+import { useQueryClient } from 'react-query';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 
 type ConceptGenerationState =
   | 'pre-generation'
@@ -40,6 +44,7 @@ const IncubateConcept: React.FC = () => {
   const [pregenToGenAnimationComplete, setPregenToGenAnimationComplete] =
     useState(false);
   const userExplorationRef = useRef<HTMLDivElement>(null);
+  const queryClient = useQueryClient();
 
   // Data Fetching & Store Access
   const {
@@ -50,6 +55,7 @@ const IncubateConcept: React.FC = () => {
   const { questionnaires, isLoading: isQuestionnaireLoading } =
     useConceptIncubationQuestionnaire();
   const { mutate: deleteDraft } = useDeleteSeed({ status: 'draft' });
+  const { mutate: generateConceptReport } = useConceptReportGenerate();
   const {
     currentQuestionOrder,
     activeQuestionnaire,
@@ -63,7 +69,8 @@ const IncubateConcept: React.FC = () => {
     setClarifyingQuestions,
   } = useConceptIncubationStore();
 
-  const { setGeneratedConcepts } = useConceptGenerationStore();
+  const { generatedConcepts, setGeneratedConcepts } =
+    useConceptGenerationStore();
 
   // Fetch answers if we have a seed UUID
   const { data: seedDraftAnswers, isLoading: isAnswersLoading } =
@@ -246,11 +253,49 @@ const IncubateConcept: React.FC = () => {
   useEffect(() => {
     const handleGenerateConcept = (event?: Event) => {
       const customEvent = event as
-        | CustomEvent<{ revert?: boolean; refine?: boolean; error?: boolean }>
+        | CustomEvent<{
+            revert?: boolean;
+            refine?: boolean;
+            generate?: boolean;
+            error?: boolean;
+          }>
         | undefined;
 
       const revert = customEvent?.detail?.revert;
       const refine = customEvent?.detail?.refine;
+      const generate = customEvent?.detail?.generate;
+
+      if (generate) {
+        // Get generated concepts from store
+        if (draftSeedUuid && generatedConcepts[draftSeedUuid]?.length > 0) {
+          // Generate reports for all selected concepts
+          generatedConcepts[draftSeedUuid].forEach(
+            (concept: IGeneratedConcept) => {
+              generateConceptReport(concept.uuid, {
+                onSuccess: () => {
+                  // Clear generated concepts after successful generation
+                  setGeneratedConcepts(
+                    draftSeedUuid,
+                    generatedConcepts[draftSeedUuid].map(
+                      (c: IGeneratedConcept) => ({
+                        ...c,
+                        isGenerating: true,
+                      }),
+                    ),
+                  );
+                  queryClient.invalidateQueries({
+                    queryKey: [AucctusQueryKeys.concepts],
+                  });
+                },
+              });
+            },
+          );
+
+          // Navigate to concept bank
+          navigate(AppPath.ConceptBank);
+        }
+        return;
+      }
 
       if (revert || refine) {
         setConceptGenerationState(
@@ -292,7 +337,15 @@ const IncubateConcept: React.FC = () => {
         'aucctus-generate-concept',
         handleGenerateConcept,
       );
-  }, [hasSubmittedAnswers]);
+  }, [
+    hasSubmittedAnswers,
+    navigate,
+    draftSeedUuid,
+    generatedConcepts,
+    setGeneratedConcepts,
+    generateConceptReport,
+    queryClient,
+  ]);
 
   // Animation Transitions
   const userExplorationTransition = useTransition(

@@ -45,7 +45,7 @@ const SelectedConceptFooter: React.FC<SelectedConceptFooterProps> = ({
           className='btn btn-primary'
           onClick={onContinue}
         >
-          Continue
+          Generate {selectedCount === 1 ? 'Report' : 'Reports'}
         </button>
       </div>
     </div>
