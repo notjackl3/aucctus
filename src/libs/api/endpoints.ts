@@ -32,8 +32,8 @@ export class Endpoints {
 
   static conceptQuestionnaire = '/api/v1/concept/ignition/questionnaires';
 
-  static conceptUuid(conceptUuid: string) {
-    return `api/v1/concept/${conceptUuid}/`;
+  static conceptIdentifier(identifier: string) {
+    return `api/v1/concept/${identifier}/`;
   }
 
   static conceptSnapshotUuid(conceptUuid: string) {

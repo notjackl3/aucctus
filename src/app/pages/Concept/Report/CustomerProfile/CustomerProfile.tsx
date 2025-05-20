@@ -5,13 +5,21 @@ import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import CustomerDetails from './Details/CustomerDetails';
+import useStore from '@stores/store';
 
 const CustomerProfile: FunctionComponent = () => {
-  const { id: conceptId } = useParams();
+  const activeConceptIdentifier = useStore(
+    (state) => state.conceptReport.identifier,
+  );
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid,
+  );
   const navigate = useNavigate();
-  const { profiles, isLoading } = useConceptCustomerProfiles(conceptId || '');
+  const { profiles, isLoading } = useConceptCustomerProfiles(
+    activeConceptUuid || '',
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedProfileName = searchParams.get('persona');
   const selectedProfile = useMemo(
@@ -55,12 +63,15 @@ const CustomerProfile: FunctionComponent = () => {
     const firstPersona = profiles.length > 0 ? profiles[0] : undefined;
     if (
       (!selectedProfileName || !selectedProfile) &&
-      conceptId &&
+      activeConceptIdentifier &&
       firstPersona
     ) {
       navigate(
         {
-          pathname: AppPath.ConceptCustomerProfile.replace(':id', conceptId),
+          pathname: AppPath.ConceptCustomerProfile.replace(
+            ':id',
+            activeConceptIdentifier,
+          ),
           search: `?persona=${firstPersona.segment}`,
         },
         {
@@ -71,10 +82,10 @@ const CustomerProfile: FunctionComponent = () => {
   }, [
     selectedProfileName,
     onTabSelect,
-    conceptId,
     navigate,
     profiles,
     selectedProfile,
+    activeConceptIdentifier,
   ]);
   if (isLoading) {
     return (

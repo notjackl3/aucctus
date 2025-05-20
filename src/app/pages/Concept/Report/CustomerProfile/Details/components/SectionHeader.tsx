@@ -12,6 +12,7 @@ export type IconVariant = 'alert-circle' | 'briefcase' | 'plus';
  * @param title The section title
  * @param rightAction Optional React node to render on the right (e.g., add button)
  * @param className Optional className for the header container
+ * @param noDivider When true, removes the bottom border divider
  */
 export interface SectionHeaderProps {
   icon: IconVariant;
@@ -20,6 +21,7 @@ export interface SectionHeaderProps {
   title: string;
   rightAction?: React.ReactNode;
   className?: string;
+  noDivider?: boolean;
 }
 
 const SectionHeader: React.FC<SectionHeaderProps> = ({
@@ -29,10 +31,12 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   title,
   rightAction,
   className = '',
+  noDivider = false,
 }) => (
   <div
     className={cn(
-      'aucctus-border-secondary flex items-center justify-between border-b px-4 py-3',
+      'aucctus-border-secondary flex items-center justify-between px-4 pt-3',
+      !noDivider && 'border-b',
       className,
     )}
   >

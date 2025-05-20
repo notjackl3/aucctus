@@ -2,11 +2,11 @@ import { Container, Icon, Loading, Modal, Select } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import {
-  useCancelConceptVersionRevert,
-  useCommitConceptVersionRevert,
   useConcept,
   useConceptUpdate,
   useTrackConceptView,
+  useCommitConceptVersionRevert,
+  useCancelConceptVersionRevert,
 } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import api from '@libs/api';
@@ -14,7 +14,7 @@ import {
   downloadPdf,
   generateConceptSnapshotFileName,
 } from '@libs/utils/files';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
@@ -28,6 +28,7 @@ import { cn } from '@libs/utils/react';
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
+
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
   concept: IConcept;
@@ -51,29 +52,32 @@ const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
 ];
 
 const ConceptReport: FunctionComponent = () => {
-  const { id: conceptUuid } = useParams();
+  const { id: conceptIdentifier } = useParams();
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
   const account = useStore((state) => state.auth.account);
   const { title: titleEdit } = useEditConcept();
   const { mutate: trackConceptView } = useTrackConceptView();
+  const hasTrackedView = useRef(false);
 
   const {
     concept,
     isFetched: isConceptFetched,
     isLoading: isConceptLoading,
-  } = useConcept(conceptUuid);
+    isFetching: isConceptFetching,
+  } = useConcept(conceptIdentifier);
+  const conceptUuid = useMemo(() => concept?.uuid || '', [concept]);
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
   const [isLoading, setIsLoading] = useState(false);
   const { openModal, closeModal } = useModal();
+  const setActiveConcept = useStore(
+    (state) => state.conceptReport.setActiveConcept,
+  );
   const { mutate: commitConceptVersionRevert, isLoading: isReverting } =
     useCommitConceptVersionRevert();
   const { mutate: cancelConceptVersionRevert, isLoading: isCancelling } =
     useCancelConceptVersionRevert();
-  const setActiveConcept = useStore(
-    (state) => state.conceptReport.setActiveConcept,
-  );
 
   useEffect(() => {
     if (concept) {
@@ -82,18 +86,19 @@ const ConceptReport: FunctionComponent = () => {
   }, [concept, setActiveConcept]);
 
   useEffect(() => {
-    if (conceptUuid) {
+    if (conceptUuid && !hasTrackedView.current) {
       trackConceptView(conceptUuid);
+      hasTrackedView.current = true;
     }
   }, [conceptUuid, trackConceptView]);
 
   const onTabSelect = useCallback(
     (value: string) => {
-      if (conceptUuid === undefined) return;
-      const route = value.replace(':id', conceptUuid);
+      if (conceptIdentifier === undefined) return;
+      const route = value.replace(':id', conceptIdentifier);
       navigate(route);
     },
-    [conceptUuid, navigate],
+    [conceptIdentifier, navigate],
   );
 
   const onSnapshotClick = useCallback(async () => {
@@ -116,13 +121,13 @@ const ConceptReport: FunctionComponent = () => {
 
   const changeConceptStatus = useCallback(
     (value: string) => {
-      if (!conceptUuid) return;
+      if (!conceptIdentifier) return;
       updateConcept({
-        uuid: conceptUuid,
+        identifier: conceptIdentifier,
         status: value as ConceptStatus,
       });
     },
-    [updateConcept, conceptUuid],
+    [updateConcept, conceptIdentifier],
   );
 
   if (!concept && isConceptFetched) {
@@ -133,11 +138,7 @@ const ConceptReport: FunctionComponent = () => {
   return (
     <>
       <ConceptReportSocketWrapper />
-      <div
-        className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8', {
-          'aucctus-bg-secondary-extra-subtle': !concept?.isHistoricalVersion,
-        })}
-      >
+      <div className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8')}>
         <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
           <div className='flex flex-row items-center justify-start'>
             <EditModeSwitcher
@@ -240,62 +241,70 @@ const ConceptReport: FunctionComponent = () => {
           </Container.TabView>
         </div>
         <LoadingMask
-          isLoading={isConceptLoading || isReverting || isCancelling}
+          isLoading={
+            isConceptLoading || isConceptFetching || isReverting || isCancelling
+          }
         />
-
-        {concept?.isHistoricalVersion && FEATURE_CONCEPT_VERSIONING && (
-          <div className='aucctus-bg-primary fixed left-1/2 top-0 z-50 flex -translate-x-1/2 animate-fade-in flex-row items-center justify-center gap-2 rounded-b-md px-4 py-2 shadow-md'>
-            <span className='flex min-h-6 min-w-6 items-center justify-center'>
-              <Icon
-                variant='alert-triangle'
-                height={16}
-                width={16}
-                className='stroke-warning-500'
-              />
-            </span>
-            <span className='aucctus-text-brand-secondary aucctus-text-sm-medium mr-2'>
-              You are viewing a historical version of this concept
-            </span>
-            <button
-              onClick={() =>
-                openModal(Modal.Confirmation, {
-                  title: 'Are you sure you want to revert to this version?',
-                  subtitle:
-                    'Once reverted, you will lose any current changes you have made to this concept.\nWARNING: This action cannot be undone!',
-                  actions: [
-                    {
-                      title: 'Revert',
-                      onClick: () =>
-                        commitConceptVersionRevert(conceptUuid!, {
-                          onSuccess: () => {
-                            closeModal();
-                          },
-                        }),
-                      variant: 'warning',
-                    },
-                    {
-                      title: 'Cancel',
-                      onClick: () => {
-                        closeModal();
-                      },
-                      variant: 'secondary',
-                    },
-                  ],
-                })
-              }
-              className='btn btn-bold btn-primary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-            >
-              Revert
-            </button>
-            <button
-              onClick={() => cancelConceptVersionRevert(conceptUuid!)}
-              className='btn btn-bold btn-secondary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-            >
-              Cancel
-            </button>
-          </div>
-        )}
       </div>
+
+      {concept?.isHistoricalVersion && FEATURE_CONCEPT_VERSIONING && (
+        <div className='aucctus-bg-primary fixed left-1/2 top-0 z-50 flex -translate-x-1/2 animate-fade-in flex-row items-center justify-center gap-2 rounded-b-md px-4 py-2 shadow-md'>
+          <span className='flex min-h-6 min-w-6 items-center justify-center'>
+            <Icon
+              variant='alert-triangle'
+              height={16}
+              width={16}
+              className='stroke-warning-500'
+            />
+          </span>
+          <span className='aucctus-text-brand-secondary aucctus-text-sm-medium mr-2'>
+            You are viewing a historical version of this concept
+          </span>
+          <button
+            onClick={() =>
+              openModal(Modal.Confirmation, {
+                title: 'Are you sure you want to revert to this version?',
+                subtitle: (
+                  <>
+                    Once reverted, you will lose any current changes you have
+                    made to this concept.
+                    <br />
+                    <strong>WARNING:</strong> This action cannot be undone!
+                  </>
+                ),
+                actions: [
+                  {
+                    title: 'Revert',
+                    onClick: () =>
+                      commitConceptVersionRevert(conceptUuid!, {
+                        onSuccess: () => {
+                          closeModal();
+                        },
+                      }),
+                    variant: 'warning',
+                  },
+                  {
+                    title: 'Cancel',
+                    onClick: () => {
+                      closeModal();
+                    },
+                    variant: 'secondary',
+                  },
+                ],
+              })
+            }
+            className='btn btn-bold btn-primary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+          >
+            Revert
+          </button>
+          <button
+            onClick={() => cancelConceptVersionRevert(conceptUuid!)}
+            className='btn btn-bold btn-secondary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </>
   );
 };

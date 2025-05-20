@@ -8,7 +8,7 @@ interface DebouncedInputProps
 const DebouncedInput: React.FC<DebouncedInputProps> = ({
   value: initialValue,
   onChange,
-  debounce = 500,
+  debounce = 0,
   ...props
 }) => {
   const [value, setValue] = React.useState(initialValue);

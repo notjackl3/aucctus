@@ -50,9 +50,10 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
         iconClass={MAIN_ICON_STROKE}
         iconBgClass='aucctus-bg-primary aucctus-border-secondary'
         title='Current Alternatives'
+        noDivider={true}
       />
       <div className='flex h-full flex-col px-4 py-2'>
-        <p className='aucctus-text-secondary aucctus-text-sm mb-4'>
+        <p className='aucctus-text-secondary aucctus-text-sm mb-6'>
           Products and solutions the customer currently uses instead of our
           offering
         </p>
@@ -87,7 +88,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                           {alternative.name}
                         </h3>
                         {alternative.usage && (
-                          <div className='aucctus-text-tertiary aucctus-text-xs mt-0.5 truncate'>
+                          <div className='aucctus-text-tertiary aucctus-text-xs mt-0.5 whitespace-normal break-words'>
                             {alternative.usage}
                           </div>
                         )}

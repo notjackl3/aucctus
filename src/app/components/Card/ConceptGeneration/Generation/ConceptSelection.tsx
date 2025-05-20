@@ -25,7 +25,7 @@ import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
 import { toast } from '@components';
 
-declare const FEATURE_CONCEPT_CLARIFYING_QUESTIONS: boolean;
+declare const FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS: boolean;
 
 // Constants
 const mainStyle = {
@@ -228,7 +228,9 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     handleLeaveAnimation(() => {
       toast.success(
         'Concepts saved successfully',
-        'Proceeding to the refinement step.',
+        FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS
+          ? 'Proceeding to the refinement step.'
+          : 'Report generation started.',
         {
           autoClose: 2000,
           hideProgressBar: true,
@@ -237,7 +239,10 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
       );
       setTimeout(() => {
         const event = new CustomEvent('aucctus-generate-concept', {
-          detail: { refine: true },
+          detail: {
+            refine: FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS,
+            generate: !FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS,
+          },
         });
         window.dispatchEvent(event);
       }, 1000);
@@ -246,13 +251,13 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
   const handleContinue = useCallback(() => {
     saveGeneratedConcepts(selectedConcepts, {
-      onSuccess: async () => {
-        if (FEATURE_CONCEPT_CLARIFYING_QUESTIONS) {
+      onSuccess: async (createdConcepts) => {
+        if (FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS) {
           const updatedConcepts =
-            await generateClarifyingQuestionsForConcepts(selectedConcepts);
+            await generateClarifyingQuestionsForConcepts(createdConcepts);
           setGeneratedConcepts(draftSeedUuid, updatedConcepts);
         } else {
-          setGeneratedConcepts(draftSeedUuid, selectedConcepts);
+          setGeneratedConcepts(draftSeedUuid, createdConcepts);
         }
         showSuccessAndNavigate();
       },

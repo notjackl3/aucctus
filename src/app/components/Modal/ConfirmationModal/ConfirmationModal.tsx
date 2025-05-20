@@ -16,7 +16,7 @@ export interface IActionButton {
 
 interface IConfirmationModalProps {
   title: string;
-  subtitle?: string;
+  subtitle?: string | React.ReactNode;
   actions: IActionButton[];
 }
 

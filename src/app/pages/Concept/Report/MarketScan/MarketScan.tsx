@@ -3,14 +3,16 @@ import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher
 import { useEditMarketScan } from '@hooks/concepts/editable.hook';
 import { useConceptMarketScan } from '@hooks/query/concepts.hook';
 import { FunctionComponent } from 'react';
-import { useParams } from 'react-router-dom';
 import IncumbentsList from './Components/IncumbentList/IncumbentList';
 import StartupList from './Components/StartupList/StartupList';
 import TrendAndDriverCard from './Components/TrendAndDriverCard';
-
+import useStore from '@stores/store';
 const MarketScan: FunctionComponent = () => {
-  const { id: conceptId = '' } = useParams();
-  const { data: marketScan, isLoading } = useConceptMarketScan(conceptId || '');
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid ?? '',
+  );
+  const { data: marketScan, isLoading } =
+    useConceptMarketScan(activeConceptUuid);
   const { trendsAndDriversDescription, ecosystemDescription } =
     useEditMarketScan();
 

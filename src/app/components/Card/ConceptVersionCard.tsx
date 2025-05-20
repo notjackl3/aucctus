@@ -1,7 +1,6 @@
 /* eslint-disable no-console */
 import { IConceptVersion } from '@libs/api/types/concept/concept_versions';
-import useStore from '@stores/store';
-import React, { useMemo } from 'react';
+import React from 'react';
 import utils from '@libs/utils';
 import { Badge } from '@components';
 import VersionComment from './VersionComment';
@@ -16,11 +15,11 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
   onSelect,
 }) => {
   const formatVersionDate = React.useCallback((version: IConceptVersion) => {
-    if (!version.createdTimestamp) {
+    if (!version.createdAt) {
       return '';
     }
 
-    const date = new Date(version.createdTimestamp * 1000); // s -> ms
+    const date = new Date(version.createdAt * 1000); // s -> ms
     const now = new Date();
 
     if (!isNaN(date.getTime())) {
@@ -45,25 +44,16 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
     }
   }, []);
 
-  const activeConceptVersion = useStore(
-    (state) => state.conceptReport.conceptVersionId,
-  );
-
-  const isActiveVersion = useMemo(
-    () => activeConceptVersion === version.versionId,
-    [activeConceptVersion, version.versionId],
-  );
-
   return (
     <div
-      key={version.revisionId}
-      onClick={() => !isActiveVersion && onSelect(version)}
+      key={version.versionNumber}
+      onClick={() => !version.isCurrent && onSelect(version)}
       className='aucctus-text-primary aucctus-bg-primary-hover flex cursor-pointer flex-col p-3'
     >
       <div className='flex flex-col gap-2'>
         <div className='flex flex-row items-center gap-2'>
           <Badge.Default
-            value={`V${version.conceptVersionNumber}`}
+            value={`V${version.versionNumber}`}
             classNameBadge='aucctus-border-secondary border rounded-lg items-center justify-center'
             classNameLabel='aucctus-text-secondary'
           />
@@ -71,7 +61,7 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
             {formatVersionDate(version)}
           </span>
           <span className='flex-1' />
-          {activeConceptVersion === version.versionId && (
+          {version.isCurrent && (
             <Badge.Default
               value={'Current'}
               classNameBadge='aucctus-border-success aucctus-bg-success-primary border rounded-full items-center justify-center ml-3'
@@ -79,11 +69,17 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
             />
           )}
         </div>
+        {version.fromVersionNumber && (
+          <div className='aucctus-text-tertiary aucctus-text-sm flex flex-row items-center gap-2'>
+            {`From V${version.fromVersionNumber}`}
+            <span className='flex-1' />
+          </div>
+        )}
         {version.comment && (
           <VersionComment
             comment={version.comment}
-            editSummary={version.editSummary}
-            sections={version.conceptAffectedSections}
+            editSummary={version.aiSummary}
+            sections={version.affectedSections}
           />
         )}
       </div>

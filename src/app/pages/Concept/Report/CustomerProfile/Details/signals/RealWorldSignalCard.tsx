@@ -175,6 +175,7 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
           {
             'pointer-events-none opacity-0': !isHovering,
             'pointer-events-auto opacity-100': isHovering,
+            hidden: true, // TODO: Remove this once in future once button design is approved
           },
         )}
       >

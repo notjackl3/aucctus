@@ -1,4 +1,5 @@
 import { toast } from '@components';
+import useStore from '@stores/store';
 import {
   IBusinessModel,
   IFinancialMarketSizeItem,
@@ -7,9 +8,8 @@ import {
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { MutateOptions, UseMutateFunction } from 'react-query';
-import { useParams } from 'react-router-dom';
 import {
   IConcept,
   ICustomerProfile,
@@ -56,38 +56,48 @@ interface EditableFieldOptions<
   TVariables = unknown,
 > {
   initialValue: T;
-  fieldName: keyof Exclude<Partial<TData>, 'uuid'>;
+  fieldName: keyof Exclude<Partial<TData>, 'uuid' | 'identifier'>;
   updateMutation: UseMutateFunction<TData, TError, TVariables, unknown>;
-  identifier: string;
+  identifier?: string;
+  uuid?: string;
   validation?: IValidationOptions;
 }
 
-type PartialWithUUid<T> = Partial<T> & { uuid: string };
+// Define more specific types for the different API requirements
+type PartialWithIdentifier<T> = Partial<T> & { identifier: string };
+type PartialWithUuid<T> = Partial<T> & { uuid: string };
 
 /**
  * Custom hook for managing an editable field.
+ * This hook is designed to work with different API mutation patterns, supporting:
+ * - Objects that require an identifier property
+ * - Objects that require a uuid property
+ * - Objects that can work with either identifier or uuid
  *
  * @template T - The type of the field value.
  * @template TData - The type of the mutation data.
  * @template TError - The type of the mutation error.
  * @template TVariables - The type of the mutation variables.
- * @param {T} initialValue - The initial value of the field.
- * @param {keyof Exclude<TVariables, 'uuid'>} fieldName - The name of the field in the mutation variables.
- * @param {UseMutateFunction<TData, TError, TVariables, unknown>} mutate - The mutation function.
- * @param {string} identifier - The identifier for the mutation.
- * @param {number} [maxLength] - The maximum length of the field value.
+ * @param {EditableFieldOptions<T, TData, TError, TVariables>} options - The options for the editable field.
+ * @param {T} options.initialValue - The initial value of the field.
+ * @param {keyof Exclude<Partial<TData>, 'uuid' | 'identifier'>} options.fieldName - The name of the field in the mutation variables.
+ * @param {UseMutateFunction<TData, TError, TVariables, unknown>} options.updateMutation - The mutation function.
+ * @param {string} [options.identifier] - The identifier for the mutation (used for some APIs).
+ * @param {string} [options.uuid] - The UUID for the mutation (used for some APIs).
+ * @param {IValidationOptions} [options.validation] - Validation options for the field.
  * @returns {EditableField<T, TData, TError, TVariables>} - An object containing the field value and various handlers.
  */
 function useEditableField<
   T,
   TData = unknown,
   TError = AxiosError<IFormError<TData>>,
-  TVariables = PartialWithUUid<TData>,
+  TVariables = any,
 >({
   initialValue,
   fieldName,
   updateMutation,
   identifier,
+  uuid,
   validation,
 }: EditableFieldOptions<T, TData, TError, TVariables>): EditableField<
   T,
@@ -136,11 +146,12 @@ function useEditableField<
   const handleSave = async (
     options?: MutateOptions<TData, TError, TVariables>,
   ): Promise<void> => {
-    if (!identifier) {
+    if (!identifier && !uuid) {
       toast.error('Oops! Something went wrong. Please try again.');
+      return;
     }
 
-    if (!isEdited || !identifier) {
+    if (!isEdited) {
       return;
     }
 
@@ -150,7 +161,19 @@ function useEditableField<
       return;
     }
 
-    const input = { [fieldName]: value, uuid: identifier } as TVariables;
+    // Create input object based on which identifier is available
+    const input = {
+      [fieldName]: value,
+    } as any;
+
+    // Only add properties that are provided
+    if (uuid) {
+      input.uuid = uuid;
+    }
+    if (identifier) {
+      input.identifier = identifier;
+    }
+
     updateMutation(input, {
       ...options,
       onError: (error, variables, context) => {
@@ -198,45 +221,76 @@ function useEditableField<
 }
 
 export function useEditConcept() {
-  const { id: conceptUuid = '' } = useParams();
-  const { concept } = useConcept(conceptUuid);
+  const activeConceptIdentifier = useStore(
+    (state) => state.conceptReport.identifier,
+  );
+  const conceptIdentifier = useMemo(
+    () => activeConceptIdentifier ?? '',
+    [activeConceptIdentifier],
+  );
+  const { concept } = useConcept(conceptIdentifier);
   const { mutate: updateConcept } = useConceptUpdate();
   const validationOptions: IValidationOptions = { maxLength: 250 };
 
-  const titleField = useEditableField<string, IConcept>({
+  const titleField = useEditableField<
+    string,
+    IConcept,
+    AxiosError<IFormError<IConcept>>,
+    PartialWithIdentifier<IConcept>
+  >({
     initialValue: concept?.title || '',
     fieldName: 'title',
     updateMutation: updateConcept,
-    identifier: conceptUuid,
+    identifier: conceptIdentifier,
   });
 
-  const summaryField = useEditableField<string, IConcept>({
+  const summaryField = useEditableField<
+    string,
+    IConcept,
+    AxiosError<IFormError<IConcept>>,
+    PartialWithIdentifier<IConcept>
+  >({
     initialValue: concept?.summary || '',
     fieldName: 'summary',
     updateMutation: updateConcept,
-    identifier: conceptUuid,
+    identifier: conceptIdentifier,
   });
 
-  const overviewField = useEditableField<string, IConcept>({
+  const overviewField = useEditableField<
+    string,
+    IConcept,
+    AxiosError<IFormError<IConcept>>,
+    PartialWithIdentifier<IConcept>
+  >({
     initialValue: concept?.overview || '',
     fieldName: 'overview',
     updateMutation: updateConcept,
-    identifier: conceptUuid,
+    identifier: conceptIdentifier,
   });
 
-  const valueProposition = useEditableField<string, IConcept>({
+  const valueProposition = useEditableField<
+    string,
+    IConcept,
+    AxiosError<IFormError<IConcept>>,
+    PartialWithIdentifier<IConcept>
+  >({
     initialValue: concept?.valueProposition || '',
     fieldName: 'valueProposition',
     updateMutation: updateConcept,
-    identifier: conceptUuid,
+    identifier: conceptIdentifier,
     validation: validationOptions,
   });
 
-  const problemStatement = useEditableField<string, IConcept>({
+  const problemStatement = useEditableField<
+    string,
+    IConcept,
+    AxiosError<IFormError<IConcept>>,
+    PartialWithIdentifier<IConcept>
+  >({
     initialValue: concept?.problemStatement || '',
     fieldName: 'problemStatement',
     updateMutation: updateConcept,
-    identifier: conceptUuid,
+    identifier: concept?.identifier || '',
     validation: validationOptions,
   });
 
@@ -244,31 +298,46 @@ export function useEditConcept() {
     title: titleField,
     summary: summaryField,
     overview: overviewField,
-
     valueProposition,
     problemStatement,
   };
 }
 
 export function useEditMarketScan() {
-  const { id: conceptUuid = '' } = useParams();
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid,
+  );
+  const conceptUuid = useMemo(
+    () => activeConceptUuid ?? '',
+    [activeConceptUuid],
+  );
   const { marketScan } = useConceptMarketScan(conceptUuid);
   const { mutate } = useMarketScanUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 500 };
 
-  const trendsAndDriversDescription = useEditableField<string, IMarketScan>({
+  const trendsAndDriversDescription = useEditableField<
+    string,
+    IMarketScan,
+    AxiosError<IFormError<IMarketScan>>,
+    PartialWithUuid<IMarketScan>
+  >({
     initialValue: marketScan?.trendsAndDriversDescription || '',
     fieldName: 'trendsAndDriversDescription',
     updateMutation: mutate,
-    identifier: marketScan?.uuid || '',
+    uuid: marketScan?.uuid || '',
     validation: validationOptions,
   });
 
-  const ecosystemDescription = useEditableField<string, IMarketScan>({
+  const ecosystemDescription = useEditableField<
+    string,
+    IMarketScan,
+    AxiosError<IFormError<IMarketScan>>,
+    PartialWithUuid<IMarketScan>
+  >({
     initialValue: marketScan?.ecosystemDescription || '',
     fieldName: 'ecosystemDescription',
     updateMutation: mutate,
-    identifier: marketScan?.uuid || '',
+    uuid: marketScan?.uuid || '',
     validation: validationOptions,
   });
 
@@ -315,41 +384,67 @@ const DEFAULT_MARKET_SIZE: IFinancialMarketSizeItem = {
   updatedAt: '',
 };
 export function useEditFinancialProjections() {
-  const { id: conceptUuid = '' } = useParams();
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid,
+  );
+  const conceptUuid = useMemo(
+    () => activeConceptUuid ?? '',
+    [activeConceptUuid],
+  );
   const { financialProjection, isLoading } =
     useFinancialProjection(conceptUuid);
   const { mutate } = useFinancialProjectionUpdate(conceptUuid);
   const validationOptions: IValidationOptions = { maxLength: 2500 };
 
-  const overview = useEditableField<string, IFinancialProjection>({
+  const overview = useEditableField<
+    string,
+    IFinancialProjection,
+    AxiosError<IFormError<IFinancialProjection>>,
+    PartialWithUuid<IFinancialProjection>
+  >({
     initialValue: financialProjection?.overview || '',
     fieldName: 'overview',
     updateMutation: mutate,
-    identifier: financialProjection?.uuid || '',
+    uuid: financialProjection?.uuid || '',
     validation: validationOptions,
   });
 
-  const tam = useEditableField<number, IFinancialProjection>({
+  const tam = useEditableField<
+    number,
+    IFinancialProjection,
+    AxiosError<IFormError<IFinancialProjection>>,
+    PartialWithUuid<IFinancialProjection>
+  >({
     initialValue: financialProjection?.tam || 0,
     fieldName: 'tam',
     updateMutation: mutate,
-    identifier: financialProjection?.uuid || '',
+    uuid: financialProjection?.uuid || '',
     validation: validationOptions,
   });
 
-  const sam = useEditableField<number, IFinancialProjection>({
+  const sam = useEditableField<
+    number,
+    IFinancialProjection,
+    AxiosError<IFormError<IFinancialProjection>>,
+    PartialWithUuid<IFinancialProjection>
+  >({
     initialValue: financialProjection?.sam || 0,
     fieldName: 'sam',
     updateMutation: mutate,
-    identifier: financialProjection?.uuid || '',
+    uuid: financialProjection?.uuid || '',
     validation: validationOptions,
   });
 
-  const som = useEditableField<number, IFinancialProjection>({
+  const som = useEditableField<
+    number,
+    IFinancialProjection,
+    AxiosError<IFormError<IFinancialProjection>>,
+    PartialWithUuid<IFinancialProjection>
+  >({
     initialValue: financialProjection?.som || 0,
     fieldName: 'som',
     updateMutation: mutate,
-    identifier: financialProjection?.uuid || '',
+    uuid: financialProjection?.uuid || '',
     validation: validationOptions,
   });
 
@@ -372,7 +467,13 @@ export function useEditFinancialProjections() {
 }
 
 export function useEditCustomerProfile(profileUuid: string) {
-  const { id: conceptUuid = undefined } = useParams();
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid,
+  );
+  const conceptUuid = useMemo(
+    () => activeConceptUuid ?? '',
+    [activeConceptUuid],
+  );
   const { profile, isLoading } = useConceptCustomerProfile(profileUuid);
   const { mutate } = useCustomerProfileUpdate(profileUuid, conceptUuid);
 
@@ -382,7 +483,7 @@ export function useEditCustomerProfile(profileUuid: string) {
   //   initialValue: profile?.name || '',
   //   fieldName: 'name',
   //   updateMutation: mutate,
-  //   identifier: profileUuid,
+  //   uuid: profileUuid,
   //   validation: validationOptions,
   // });
 
@@ -390,15 +491,20 @@ export function useEditCustomerProfile(profileUuid: string) {
   //   initialValue: profile?.segment || '',
   //   fieldName: 'segment',
   //   updateMutation: mutate,
-  //   identifier: profileUuid,
+  //   uuid: profileUuid,
   //   validation: validationOptions,
   // });
 
-  const description = useEditableField<string, ICustomerProfile>({
+  const description = useEditableField<
+    string,
+    ICustomerProfile,
+    AxiosError<IFormError<ICustomerProfile>>,
+    PartialWithUuid<ICustomerProfile>
+  >({
     initialValue: profile?.description || '',
     fieldName: 'description',
     updateMutation: mutate,
-    identifier: profileUuid,
+    uuid: profileUuid,
     validation: validationOptions,
   });
 

@@ -7,7 +7,6 @@ import utils from '@libs/utils';
 import React, { FunctionComponent } from 'react';
 
 const FinancialDetails: FunctionComponent = () => {
-  // const { id: conceptId } = useParams();
   const {
     overview,
     tam,
