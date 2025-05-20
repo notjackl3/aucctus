@@ -110,7 +110,7 @@ export interface IConcept extends IBaseConceptEntity {
     lastName: string;
     modifiedAt: string;
   };
-  conceptVersionNumber?: number;
+  isHistoricalVersion?: boolean;
 }
 
 export interface IConceptOverview extends IBaseConceptEntity {

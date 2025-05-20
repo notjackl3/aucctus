@@ -157,6 +157,14 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  commitConceptVersionRevert(uuid: string) {
+    return this.post(endpoints.commitConceptReversion(uuid));
+  }
+
+  cancelConceptVersionRevert(uuid: string) {
+    return this.post(endpoints.cancelConceptReversion(uuid));
+  }
+
   aiEditConcept(payload: EditConceptReportRequest) {
     return this.post<IConcept>(endpoints.conceptAiEditing, payload);
   }

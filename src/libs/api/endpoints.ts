@@ -108,6 +108,14 @@ export class Endpoints {
     return `api/v2/concept/version/${conceptUuid}/revert`;
   }
 
+  static commitConceptReversion(conceptUuid: string) {
+    return `api/v2/concept/version/${conceptUuid}/commit`;
+  }
+
+  static cancelConceptReversion(conceptUuid: string) {
+    return `api/v2/concept/version/${conceptUuid}/cancel`;
+  }
+
   static unarchiveConcept(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/unarchive`;
   }

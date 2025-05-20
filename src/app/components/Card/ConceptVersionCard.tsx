@@ -15,11 +15,11 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
   onSelect,
 }) => {
   const formatVersionDate = React.useCallback((version: IConceptVersion) => {
-    if (!version.createdTimestamp) {
+    if (!version.createdAt) {
       return '';
     }
 
-    const date = new Date(version.createdTimestamp * 1000); // s -> ms
+    const date = new Date(version.createdAt * 1000); // s -> ms
     const now = new Date();
 
     if (!isNaN(date.getTime())) {
@@ -69,6 +69,12 @@ const ConceptVersionCard: React.FC<ConceptVersionCardProps> = ({
             />
           )}
         </div>
+        {version.fromVersionNumber && (
+          <div className='aucctus-text-tertiary aucctus-text-sm flex flex-row items-center gap-2'>
+            {`From V${version.fromVersionNumber}`}
+            <span className='flex-1' />
+          </div>
+        )}
         {version.comment && (
           <VersionComment
             comment={version.comment}

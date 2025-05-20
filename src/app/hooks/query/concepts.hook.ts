@@ -843,6 +843,56 @@ export const useRevertConceptVersion = () => {
 };
 
 /**
+
+
+ * Custom hook for committing a concept version revert.
+
+
+ * @returns The result of the useMutation hook.
+
+
+ */
+
+export const useCommitConceptVersionRevert = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (uuid: string) =>
+      await api.concept.commitConceptVersionRevert(uuid),
+
+    onSuccess: () => {
+      doFullConceptInvalidation(queryClient);
+      toast.success('Concept version revert committed successfully');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to commit concept version revert');
+    },
+  });
+};
+
+/**
+ * Custom hook for canceling a concept version revert.
+ * @returns The result of the useMutation hook.
+ */
+
+export const useCancelConceptVersionRevert = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (uuid: string) =>
+      await api.concept.cancelConceptVersionRevert(uuid),
+    onSuccess: () => {
+      doFullConceptInvalidation(queryClient);
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to cancel concept version revert');
+    },
+  });
+};
+
+/**
  * Customer Jobs API hooks using api.concept methods
  */
 export const useCustomerJobsList = (customerProfileUuid: string) => {

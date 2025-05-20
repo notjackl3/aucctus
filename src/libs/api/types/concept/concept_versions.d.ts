@@ -6,8 +6,9 @@ export interface IConceptVersion {
   isCurrent?: boolean;
   comment?: string;
   versionNumber: number;
+  fromVersionNumber?: number;
   affectedSections?: string[];
-  createdTimestamp?: number;
+  createdAt?: number;
   aiSummary?: string;
 }
 
