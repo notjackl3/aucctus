@@ -13,11 +13,11 @@ import {
   IConceptSeedCreate,
   IConceptSeedUpdate,
   IConversationFilterOptions,
+  ICreateRealWorldSignal,
   ICustomerJob,
   ICustomerPain,
   ICustomerProfile,
   ICustomerProfileCreate,
-  ICreateRealWorldSignal,
   IFinancialProjection,
   IFormError,
   IGeneratedConcept,
@@ -577,7 +577,7 @@ const createConceptMutation = () => {
             queryKey: [AucctusQueryKeys.dashboard],
           }),
           queryClient.invalidateQueries({
-            queryKey: [AucctusQueryKeys.concept, data.uuid],
+            queryKey: [AucctusQueryKeys.concept, data.identifier],
           }),
         ]);
       },
@@ -682,10 +682,7 @@ export function useDeleteCustomerProfile() {
 export const useFinancialProjectionUpdate = (uuid: string) => {
   return useGenericConceptMutate<IFinancialProjection>(
     (data) => api.concept.updateConceptFinancialProjection(data.uuid, data),
-    [
-      [AucctusQueryKeys.financialProjection, uuid],
-      [AucctusQueryKeys.conceptOverview, uuid],
-    ],
+    [[AucctusQueryKeys.financialProjection, uuid]],
   );
 };
 
@@ -712,9 +709,6 @@ export const doFullConceptInvalidation = (queryClient: QueryClient) => {
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.conceptVersions],
-    }),
-    queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.conceptOverview],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.marketScan],
