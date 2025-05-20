@@ -13,7 +13,6 @@ export enum AucctusQueryKeys {
   conceptSeedDraft = 'conceptSeedDraft',
   conceptSeedDraftAnswers = 'conceptSeedDraftAnswers',
   seeds = 'seeds',
-  conceptOverview = 'overview',
   customerProfiles = 'customerProfiles',
   customerProfile = 'customerProfile',
   customerProfileJobs = 'customerProfileJobs',
