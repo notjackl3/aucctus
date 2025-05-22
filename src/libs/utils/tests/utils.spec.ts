@@ -116,3 +116,9 @@ describe('toTitleCase', () => {
     expect(utils.string.toTitleCase('  hello world  ')).toBe('  Hello World  ');
   });
 });
+
+describe('createPaginationNumbers', () => {
+  it('returns only first and last pages when maxPages equals start and end pages length', () => {
+    expect(utils.array.createPaginationNumbers(5, 10, 2)).toEqual([1, 10]);
+  });
+});

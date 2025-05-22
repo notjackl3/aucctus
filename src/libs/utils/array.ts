@@ -34,7 +34,7 @@ export function createPaginationNumbers(
   if (remainingButtons < 0) {
     return [...startPages, '...', ...endPages];
   } else if (remainingButtons === 0) {
-    [...startPages, ...endPages];
+    return [...startPages, ...endPages];
   }
 
   // Calculate the middle range, ensuring the current page is centered when possible
