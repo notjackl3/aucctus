@@ -67,12 +67,12 @@ describe('dateFormatter', () => {
     expect(utils.time.dateFormatter(oneHourAgo)).toBe('1 hour ago');
   });
 
-  it('should return "Aug 14, 2024" for a date more than 24 hours ago', () => {
+  it('should return "Aug 14, 2023" for a date more than 24 hours ago', () => {
     const pastDate = new Date('2023-08-14T12:00:00Z').toISOString();
     expect(utils.time.dateFormatter(pastDate)).toBe('Aug 14, 2023');
   });
 
-  it('should return "Aug 14, 2024" with custom formatting options', () => {
+  it('should return "Aug 14, 2023" with custom formatting options', () => {
     const pastDate = new Date('2023-08-14T12:00:00Z').toISOString();
     expect(
       utils.time.dateFormatter(pastDate, {
