@@ -3,8 +3,8 @@ import CustomerConversationSearch from './CustomerProfile/CustomerConversationSe
 import EditCustomerProfileDemographics from './CustomerProfile/EditCustomerProfileDemographics';
 import EvidenceAndReasoning from './EvidenceAndReasoningModal';
 import SupportInsights from './SupportInsights';
-import AddKeyAssumptionModal from './KeyAssumtionModal/AddKeyAssumptionModal';
-import EditKeyAssumptionModal from './KeyAssumtionModal/EditKeyAssumtionModal';
+import AddKeyAssumptionModal from './KeyAssumptionModal/AddKeyAssumptionModal';
+import EditKeyAssumptionModal from './KeyAssumptionModal/EditKeyAssumptionModal';
 import Base from './Modal/Modal';
 import ConclusionVisualization from './ConclusionVisualizationModal/ConclusionVisualizationModal';
 import AiEditing from './AiEditingModal/AiEditingModal';
