@@ -14,7 +14,7 @@
 
 ### Bug Fixes
 
-* adding missing sections for version card ([#265](https://github.com/Aucctus/aucctus/issues/265)) ([1de119e](https://github.com/Aucctus/aucctus/commit/1de119e840a210bce2c182c7a1fbfdb2d16dd4b8))
-* clean and organize frontend ENV ([#248](https://github.com/Aucctus/aucctus/issues/248)) ([301ed79](https://github.com/Aucctus/aucctus/commit/301ed79db949264e9eb32fcee677da2ce712a199))
-* fixing section mapping for version list ([a2b44dc](https://github.com/Aucctus/aucctus/commit/a2b44dc2501f758a11b6951f84300cd86f86452a))
-* more versioning fixes ([#263](https://github.com/Aucctus/aucctus/issues/263)) ([c964092](https://github.com/Aucctus/aucctus/commit/c964092d93dbb548907a9c06cd0198f730775f9e))
+- adding missing sections for version card ([#265](https://github.com/Aucctus/aucctus/issues/265)) ([1de119e](https://github.com/Aucctus/aucctus/commit/1de119e840a210bce2c182c7a1fbfdb2d16dd4b8))
+- clean and organize frontend ENV ([#248](https://github.com/Aucctus/aucctus/issues/248)) ([301ed79](https://github.com/Aucctus/aucctus/commit/301ed79db949264e9eb32fcee677da2ce712a199))
+- fixing section mapping for version list ([a2b44dc](https://github.com/Aucctus/aucctus/commit/a2b44dc2501f758a11b6951f84300cd86f86452a))
+- more versioning fixes ([#263](https://github.com/Aucctus/aucctus/issues/263)) ([c964092](https://github.com/Aucctus/aucctus/commit/c964092d93dbb548907a9c06cd0198f730775f9e))

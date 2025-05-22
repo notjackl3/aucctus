@@ -82,10 +82,11 @@ export class SocketService {
       }
 
       if (this._ws?.readyState === WebSocket.OPEN) {
-        this._ws?.close();
-      }
-
-      if (token && this._ws?.readyState === WebSocket.CLOSED) {
+        this._ws.close();
+      } else if (
+        token &&
+        (!this._ws || this._ws.readyState === WebSocket.CLOSED)
+      ) {
         this.deferredConnect = this.connect();
         await this.deferredConnect;
       }
@@ -136,7 +137,7 @@ export class SocketService {
     };
 
     this._ws.onclose = async (closeEvent: CloseEvent) => {
-      if (this._ws?.readyState === WebSocket.CLOSED || !this._isConnected) {
+      if (!this._isConnected) {
         return;
       }
 
@@ -149,6 +150,7 @@ export class SocketService {
       }
 
       this._isConnected = false;
+      this._ws = null;
 
       // Handle specific close codes
       let shouldAttemptReconnect = this.shouldReconnect;
