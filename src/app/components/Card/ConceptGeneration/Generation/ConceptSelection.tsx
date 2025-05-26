@@ -24,7 +24,6 @@ import SelectableConcept from './SelectableConcept';
 import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
 import { toast } from '@components';
-import telemetry from '@libs/telemetry';
 
 declare const FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS: boolean;
 
@@ -258,7 +257,6 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
             await generateClarifyingQuestionsForConcepts(createdConcepts);
           setGeneratedConcepts(draftSeedUuid, updatedConcepts);
         } else {
-          telemetry.log('generated_concepts', createdConcepts);
           setGeneratedConcepts(draftSeedUuid, createdConcepts);
         }
         showSuccessAndNavigate();
