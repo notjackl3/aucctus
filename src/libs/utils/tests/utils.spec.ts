@@ -67,12 +67,12 @@ describe('dateFormatter', () => {
     expect(utils.time.dateFormatter(oneHourAgo)).toBe('1 hour ago');
   });
 
-  it('should return "Aug 14, 2024" for a date more than 24 hours ago', () => {
+  it('should return "Aug 14, 2023" for a date more than 24 hours ago', () => {
     const pastDate = new Date('2023-08-14T12:00:00Z').toISOString();
     expect(utils.time.dateFormatter(pastDate)).toBe('Aug 14, 2023');
   });
 
-  it('should return "Aug 14, 2024" with custom formatting options', () => {
+  it('should return "Aug 14, 2023" with custom formatting options', () => {
     const pastDate = new Date('2023-08-14T12:00:00Z').toISOString();
     expect(
       utils.time.dateFormatter(pastDate, {
@@ -114,5 +114,11 @@ describe('toTitleCase', () => {
 
   it('should handle strings with leading and trailing spaces', () => {
     expect(utils.string.toTitleCase('  hello world  ')).toBe('  Hello World  ');
+  });
+});
+
+describe('createPaginationNumbers', () => {
+  it('returns only first and last pages when maxPages equals start and end pages length', () => {
+    expect(utils.array.createPaginationNumbers(5, 10, 2)).toEqual([1, 10]);
   });
 });
