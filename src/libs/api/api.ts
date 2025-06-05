@@ -9,6 +9,7 @@ import { IApiServiceConfig } from './base/apiService';
 import { ISocketConfig, SocketService } from './base/socketService';
 import { ConceptApi } from './concepts';
 import { SocketEndpoints } from './endpoints';
+import { FinancialProjectionApi } from './financial_projection';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { SeedApi } from './seed';
@@ -43,6 +44,7 @@ export class Api {
   conceptIncubate!: IncubateConceptApi;
   aucctusSocket!: SocketService;
   article!: ArticleApi;
+  financialProjection!: FinancialProjectionApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -71,6 +73,7 @@ export class Api {
       { key: 'conceptIncubate', class: IncubateConceptApi },
       { key: 'article', class: ArticleApi },
       { key: 'seed', class: SeedApi },
+      { key: 'financialProjection', class: FinancialProjectionApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {
@@ -105,6 +108,7 @@ export class Api {
       this.assumption,
       this.marketScan,
       this.seed,
+      this.financialProjection,
     ].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
       api.config.headers = Object.assign({}, api.config.headers, {

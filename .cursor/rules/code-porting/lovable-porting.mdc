@@ -1,0 +1,1266 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+
+# Aucctus External Code Porting Guide
+
+This comprehensive guide outlines the process, patterns, and specific mappings for porting code from external sources (specifically from `@lovable` directory) to the internal Aucctus codebase.
+
+## Table of Contents
+1. [Porting Process Overview](#porting-process-overview)
+2. [Detailed Workflow Steps](#detailed-workflow-steps)
+3. [Component Libraries & Imports](#component-libraries--imports)
+4. [Styling Patterns](#styling-patterns)
+5. [State Management & Data Flow](#state-management--data-flow)
+6. [Component Structure](#component-structure)
+7. [Type System](#type-system)
+8. [Accessibility & UI Patterns](#accessibility--ui-patterns) 
+9. [Performance Considerations](#performance-considerations)
+10. [Component Mapping Table](#component-mapping-table)
+11. [Pattern Templates](#pattern-templates)
+12. [Transformation Algorithms](#transformation-algorithms)
+13. [Decision Trees](#decision-trees)
+14. [Common Pitfalls](#common-pitfalls)
+15. [Edge Cases](#edge-cases)
+16. [Validation Checklist](#validation-checklist)
+17. [Complete Transformation Examples](#complete-transformation-examples)
+
+## Porting Process Overview
+
+1. **Analyze External Component**
+2. **Identify Internal Equivalents**
+3. **Transform Imports**
+4. **Convert UI Components**
+5. **Update State Management with Mock Data**
+6. **Apply Aucctus Theme Classes**
+7. **Add Performance Optimizations**
+8. **Test and Validate**
+
+## Detailed Workflow Steps
+
+### 1. Analyze External Component
+- Understand the component's purpose and functionality
+- Identify the key UI elements and their relationships
+- Map out the state management flow
+- Analyze prop structures and data flow
+
+### 2. Identify Internal Equivalents
+- Find equivalent internal components for each external component
+- Refer to the component mapping table in this guide for common mappings
+- Identify any missing components that need to be created
+
+### 3. Transform Imports
+```tsx
+// EXTERNAL IMPORTS
+import React, { useState, useEffect } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Briefcase, ArrowDown, Plus } from 'lucide-react';
+import { toast } from 'sonner';
+
+// INTERNAL IMPORTS
+import React, { useState, useMemo } from 'react';
+import { Icon } from '@components';
+import { toast } from '@components';
+```
+
+### 4. Convert UI Components
+- Replace shadcn/ui or other external components with Aucctus equivalents
+- Extract reusable UI elements into separate components
+- Apply the component structure transformation patterns:
+  - Cards → Container divs with Aucctus theme classes
+  - External buttons → Native buttons with Aucctus styling
+  - Lucide icons → Aucctus Icon component
+
+### 5. Update State Management with Mock Data
+- Use data fixtures provided by the external components
+- Implement local state management with React's useState/useReducer
+- Use the mock data structure for component rendering and manipulation
+- Convert local state operations to work with the mock data:
+  ```tsx
+  // EXTERNAL
+  const handleRemoveJob = (index: number) => {
+    const newJobs = [...jobs];
+    newJobs.splice(index, 1);
+    setJobs(newJobs);
+    toast.success('Job removed');
+  };
+
+  // INTERNAL with mock data
+  const handleDelete = (id: string) => {
+    const updatedJobs = mockJobs.filter(job => job.id !== id);
+    setMockJobs(updatedJobs);
+    toast.success('Job removed');
+  };
+  ```
+
+### 6. Apply Aucctus Theme Classes
+- Always use Aucctus theme classes as the primary styling approach
+- Update text styles using Aucctus typography classes
+- Apply the correct Aucctus background, border, and other theme classes
+
+### 7. Add Performance Optimizations
+- Add useMemo for derived state calculations
+- Implement useCallback for handler functions
+- Add React.memo for component memoization
+- Consider virtualization for long lists
+- Apply proper dependency arrays for hooks
+
+### 8. Test and Validate
+- Verify the component renders correctly with mock data
+- Test all state operations
+- Ensure responsive behavior works as expected
+- Validate accessibility compliance
+- Check for performance issues
+
+## Component Libraries & Imports
+
+### External → Internal
+- Replace shadcn/ui components with Aucctus components
+  - `Card` → Custom containers with `aucctus-bg-primary` and `aucctus-border-secondary` classes
+  - `Button` → Native buttons with Aucctus styling classes
+- Replace `lucide-react` icons with the internal Icon component
+- For internal icon variants, select the most appropriate variant
+  ```tsx
+  // External
+  import { Briefcase } from 'lucide-react';
+  <Briefcase className="h-5 w-5 text-primary" />
+  
+  // Internal
+  import { Icon } from '@components';
+  <Icon variant="briefcase" className={'aucctus-stroke-primary'} height={18} width={18} />
+  ```
+- Replace `sonner` toast with internal toast system
+  ```tsx
+  // External
+  import { toast } from 'sonner';
+  toast.success('Job updated');
+  
+  // Internal
+  import { toast } from '@components';
+  toast.success('Job updated');
+  ```
+
+## Styling Patterns
+
+### External → Internal
+- Replace Tailwind utility classes with Aucctus theme classes
+  ```tsx
+  // External
+  className="text-sm text-muted-foreground mb-4"
+  
+  // Internal
+  className="aucctus-text-secondary aucctus-text-sm mb-6"
+  ```
+- Replace arbitrary style props with className
+  ```tsx
+  // External
+  style={{ writingMode: 'vertical-lr', transform: 'rotate(180deg)' }}
+  
+  // Internal
+  // Use a tailwind class-based approach instead (if applicable)
+  ```
+
+## State Management & Data Flow
+
+### External → Internal
+- Use mock data fixtures provided by external components
+  ```tsx
+  // External
+  const [jobs, setJobs] = useState<Job[]>(sortedJobs);
+  
+  // Internal with mock data
+  const [mockJobs, setMockJobs] = useState<MockJob[]>(initialMockJobs);
+  ```
+- Create local state management functions for CRUD operations
+  ```tsx
+  // Internal with mock data
+  const addJob = (newJob: MockJob) => {
+    setMockJobs([...mockJobs, newJob]);
+    toast.success('Job added');
+  };
+  
+  const updateJob = (id: string, updates: Partial<MockJob>) => {
+    setMockJobs(mockJobs.map(job => 
+      job.id === id ? { ...job, ...updates } : job
+    ));
+    toast.success('Job updated');
+  };
+  
+  const deleteJob = (id: string) => {
+    setMockJobs(mockJobs.filter(job => job.id !== id));
+    toast.success('Job deleted');
+  };
+  ```
+- Use useMemo for derived state
+  ```tsx
+  // Internal
+  const sortedJobs = useMemo(
+    () => [...mockJobs].sort((a, b) => (a.order || 0) - (b.order || 0)),
+    [mockJobs],
+  );
+  ```
+
+## Component Structure
+
+### External → Internal
+- Extract reusable UI elements into separate components
+  ```tsx
+  // External - inline rendering
+  <div className="flex flex-col items-center mr-3 pt-2">
+    {/* Priority indicator UI */}
+  </div>
+  
+  // Internal - extracted component
+  <PriorityIndicator
+    textColorClass={PRIORITY_COLOR_TEXT}
+    lineColorClass={PRIORITY_COLOR_LINE}
+  />
+  ```
+- Use more modular component architecture
+  - Break down large components into smaller ones
+  - Use composition over inheritance
+- Add React.memo for performance optimization where appropriate
+  ```tsx
+  export default React.memo(JobsToBeDone);
+  ```
+
+## Type System
+
+### External → Internal
+- Use type definitions that match the mock data structure
+  ```tsx
+  // External
+  interface Job {
+    text: string;
+    priority?: number;
+  }
+  
+  // Internal with mock data
+  interface MockJob {
+    id: string;
+    text: string;
+    priority?: number;
+    createdAt: string;
+  }
+  ```
+- Ensure proper typing for component props and state
+
+## Accessibility & UI Patterns
+
+### External → Internal
+- Maintain semantic HTML structures
+- Ensure proper ARIA attributes
+- Use Aucctus design system components and patterns
+- Implement proper event handling and callbacks
+
+## Performance Considerations
+
+### External → Internal
+- Add explicit dependencies to useCallback and useMemo hooks
+- Add proper memoization for derived data
+- Consider virtual scrolling for long lists
+
+## Component Mapping Table
+
+| External Component | External Props | Internal Component | Internal Props | Notes |
+|-------------------|----------------|-------------------|----------------|-------|
+| `Card` | className | `<div>` | className="aucctus-bg-primary aucctus-border-secondary rounded-lg border shadow-sm" | Base container |
+| `CardHeader` | className="pb-3" | `<SectionHeader />` | noDivider={true} | Header container |
+| `CardTitle` | className="text-lg" | Part of `<SectionHeader />` | title="Title Text" | Title component |
+| `CardContent` | className="pt-0 pb-0" | `<div>` | className="px-4 py-2" | Content container |
+| `Button` variant="ghost" size="sm" | `<button>` | className="aucctus-bg-secondary-hover rounded-full p-2 transition-colors" | Ghost button style |
+| `Button` variant="outline" size="sm" | `<button>` | className="btn btn-light btn-sm" | Outline button style |
+| `Button` variant="default" size="sm" | `<button>` | className="btn btn-primary btn-sm" | Default button style |
+| `Briefcase` icon (lucide) | className="h-5 w-5" | `<Icon variant="briefcase" />` | className="aucctus-stroke-primary" height={18} width={18} | Briefcase icon |
+| `ArrowDown` icon (lucide) | className="h-5 w-5" | `<Icon variant="chevron-down" />` | className="aucctus-stroke-primary" height={18} width={18} | Arrow down icon |
+| `Plus` icon (lucide) | className="h-4 w-4" | `<Icon variant="plus" />` | className="aucctus-stroke-primary" height={18} width={18} | Plus icon |
+| `Check` icon (lucide) | className="h-4 w-4" | `<Icon variant="check" />` | className="aucctus-stroke-primary" height={18} width={18} | Check icon |
+| `Trash` icon (lucide) | className="h-4 w-4" | `<Icon variant="trash" />` | className="aucctus-stroke-error-primary" height={18} width={18} | Trash icon |
+| `ExpandableAIInsight` | data={insightData} | `<AiInsight />` | data={insightData} | AI insight component |
+| `JobItem` | job={job} onDelete={handleDelete} | Part of `<EditableList />` | items={jobs} onDeleteItem={handleDelete} | List item component |
+| `AddJobForm` | onAdd={handleAdd} | Part of `<EditableList />` | onAddItem={handleAdd} | Form component |
+| `Input` | placeholder="Add job..." | `<input>` | className="aucctus-bg-primary aucctus-border-secondary aucctus-text-primary p-2 rounded-md border w-full" placeholder="Add job..." | Input component |
+| `Label` | htmlFor="jobTitle" | `<label>` | className="aucctus-text-primary aucctus-text-sm block mb-1" htmlFor="jobTitle" | Label component |
+| `Select` | value={value} onChange={onChange} | `<select>` | className="aucctus-bg-primary aucctus-border-secondary aucctus-text-primary p-2 rounded-md border w-full" value={value} onChange={onChange} | Select component |
+| `Checkbox` | checked={checked} onChange={onChange} | `<input type="checkbox">` | className="h-4 w-4 aucctus-border-secondary rounded" checked={checked} onChange={onChange} | Checkbox component |
+| `Dialog` | open={open} onOpenChange={setOpen} | Custom modal implementation | isOpen={open} onClose={() => setOpen(false)} | Dialog component |
+
+## Pattern Templates
+
+### PATTERN: Card Component Transformation
+```tsx
+// BEFORE
+<Card className="h-fit">
+  <CardHeader className="pb-3">
+    <CardTitle className="text-lg flex items-center gap-2">
+      <Briefcase className="h-5 w-5 text-primary" />
+      Jobs to be Done
+    </CardTitle>
+  </CardHeader>
+  <CardContent className="pt-0 pb-0">
+    {/* Content here */}
+  </CardContent>
+</Card>
+
+// AFTER
+<div className="aucctus-bg-primary aucctus-border-secondary h-fit rounded-lg border shadow-sm">
+  <SectionHeader
+    icon="briefcase"
+    iconClass="aucctus-stroke-primary"
+    iconBgClass="aucctus-bg-primary aucctus-border-secondary"
+    title="Jobs to be Done"
+    noDivider={true}
+  />
+  <div className="px-4 py-2">
+    {/* Content here */}
+  </div>
+</div>
+```
+
+### PATTERN: Button Component Transformation
+```tsx
+// BEFORE
+<Button 
+  variant="ghost" 
+  size="icon" 
+  className="h-8 w-8"
+  onClick={() => setIsAdding(true)}
+>
+  <Plus className="h-4 w-4" />
+</Button>
+
+// AFTER
+<button
+  className="aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50"
+  aria-label="Add job"
+  onClick={handleStartAdding}
+  disabled={isAdding}
+>
+  <Icon variant="plus" className="aucctus-stroke-primary" height={18} width={18} />
+</button>
+```
+
+### PATTERN: Form Component Transformation
+```tsx
+// BEFORE
+<form onSubmit={handleSubmit}>
+  <Label htmlFor="jobTitle">Job Title</Label>
+  <Input
+    id="jobTitle"
+    placeholder="Enter job title"
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    className="mb-2"
+  />
+  <div className="flex justify-end gap-2">
+    <Button variant="outline" type="button" onClick={handleCancel}>
+      Cancel
+    </Button>
+    <Button type="submit">Add</Button>
+  </div>
+</form>
+
+// AFTER
+<form onSubmit={handleSubmit}>
+  <label 
+    htmlFor="jobTitle" 
+    className="aucctus-text-primary aucctus-text-sm block mb-1"
+  >
+    Job Title
+  </label>
+  <input
+    id="jobTitle"
+    placeholder="Enter job title"
+    value={title}
+    onChange={(e) => setTitle(e.target.value)}
+    className="aucctus-bg-primary aucctus-border-secondary aucctus-text-primary p-2 rounded-md border w-full mb-2"
+  />
+  <div className="flex justify-end gap-2">
+    <button 
+      type="button" 
+      className="btn btn-light btn-sm" 
+      onClick={handleCancel}
+    >
+      Cancel
+    </button>
+    <button type="submit" className="btn btn-primary btn-sm">
+      Add
+    </button>
+  </div>
+</form>
+```
+
+### PATTERN: List Item Component Transformation
+```tsx
+// BEFORE
+<div className="flex items-center justify-between p-2 hover:bg-accent rounded-md">
+  <div className="flex items-center gap-2">
+    <Checkbox checked={item.completed} onChange={() => handleToggleComplete(item.id)} />
+    <span className={item.completed ? "line-through text-muted-foreground" : ""}>
+      {item.text}
+    </span>
+  </div>
+  <Button variant="ghost" size="icon" onClick={() => handleDelete(item.id)}>
+    <Trash className="h-4 w-4" />
+  </Button>
+</div>
+
+// AFTER
+<div className="aucctus-bg-primary-hover flex items-center justify-between p-2 rounded-md">
+  <div className="flex items-center gap-2">
+    <input 
+      type="checkbox"
+      className="h-4 w-4 aucctus-border-secondary rounded"
+      checked={item.completed}
+      onChange={() => handleToggleComplete(item.id)}
+    />
+    <span className={item.completed ? "line-through aucctus-text-secondary" : "aucctus-text-primary"}>
+      {item.text}
+    </span>
+  </div>
+  <button 
+    className="aucctus-bg-secondary-hover rounded-full p-2 transition-colors"
+    onClick={() => handleDelete(item.id)}
+    aria-label="Delete item"
+  >
+    <Icon variant="trash" className="aucctus-stroke-error-primary" height={16} width={16} />
+  </button>
+</div>
+```
+
+## Transformation Algorithms
+
+### Algorithm: Transforming Lucide Icons to Aucctus Icon Component
+```
+INPUTS: 
+- Icon name from lucide-react (e.g., "Briefcase")
+- Icon props (className, size, etc.)
+
+STEPS:
+1. Replace import statement:
+   FROM: import { Briefcase } from 'lucide-react';
+   TO:   import { Icon } from '@components';
+
+2. Identify matching icon variant:
+   - Use exact match when available (briefcase → briefcase)
+   - Use closest match when exact isn't available:
+     - ArrowDown → chevron-down
+     - X → close
+     - Check → check-circle
+   - Refer to component mapping table for common mappings
+
+3. Transform className:
+   - text-primary → aucctus-stroke-primary
+   - text-muted-foreground → aucctus-stroke-secondary
+   - text-destructive → aucctus-stroke-error-primary
+
+4. Set explicit dimensions:
+   - h-4 w-4 → height={16} width={16}
+   - h-5 w-5 → height={18} width={18}
+   - h-6 w-6 → height={24} width={24}
+
+5. Replace icon JSX:
+   FROM: <Briefcase className="h-5 w-5 text-primary" />
+   TO:   <Icon variant="briefcase" className="aucctus-stroke-primary" height={18} width={18} />
+```
+
+### Algorithm: Transforming Tailwind Classes to Aucctus Theme Classes
+```
+INPUTS:
+- Tailwind className string (e.g., "text-sm text-muted-foreground mb-4")
+
+STEPS:
+1. Identify and replace text color classes:
+   - text-primary → aucctus-text-primary
+   - text-muted-foreground → aucctus-text-secondary
+   - text-destructive → aucctus-text-error-primary
+
+2. Identify and replace background color classes:
+   - bg-background → aucctus-bg-primary
+   - bg-muted → aucctus-bg-secondary
+   - bg-destructive → aucctus-bg-error-primary
+
+3. Identify and replace border color classes:
+   - border-primary → aucctus-border-primary
+   - border-muted → aucctus-border-secondary
+   - border-destructive → aucctus-border-error
+
+4. Identify and replace typography classes:
+   - text-xs → aucctus-text-xs
+   - text-sm → aucctus-text-sm
+   - text-base → aucctus-text-md
+   - text-lg → aucctus-text-lg
+   - text-xl → aucctus-text-xl
+   - font-medium → aucctus-text-md-medium (or appropriate size)
+   - font-semibold → aucctus-text-md-semibold (or appropriate size)
+   - font-bold → aucctus-text-md-bold (or appropriate size)
+
+5. Retain spacing, sizing, flex, and other utility classes:
+   - mr-4, p-2, h-full, w-full, flex, gap-2, etc.
+
+6. Replace hover classes:
+   - hover:bg-accent → aucctus-bg-primary-hover
+   - hover:text-accent-foreground → aucctus-text-secondary-hover
+
+7. Structure final className value:
+   - Group related classes together (aucctus theme classes first, then utilities)
+   - Use consistent ordering (text, bg, border, size, spacing, flex, other)
+```
+
+### Algorithm: Converting State Management with Mock Data
+```
+INPUTS:
+- External state implementation
+- External state operations
+
+STEPS:
+1. Define mock data structure:
+   - Ensure it has proper id fields (string, not number)
+   - Include all necessary properties from external data
+   - Add timestamps or other internal required properties
+
+2. Initialize state with mock data:
+   FROM: const [jobs, setJobs] = useState<Job[]>(initialJobs);
+   TO:   const [mockJobs, setMockJobs] = useState<MockJob[]>(initialMockJobs);
+
+3. Transform CRUD operations:
+   - Create: Add id generation and timestamp creation
+   - Read: Use useMemo for derived lists or filtered data
+   - Update: Use id-based updates instead of index-based
+   - Delete: Use id-based filtering instead of splice
+
+4. Add appropriate toast notifications:
+   - toast.success for successful operations
+   - toast.error for error handling
+
+5. Implement additional sorting or filtering with useMemo:
+   const sortedJobs = useMemo(
+     () => [...mockJobs].sort((a, b) => (a.order || 0) - (b.order || 0)),
+     [mockJobs],
+   );
+```
+
+## Decision Trees
+
+### Decision Tree: Component Selection
+
+```
+IF external component is Card
+  THEN use div with aucctus-bg-primary aucctus-border-secondary classes
+  
+ELSE IF external component is CardHeader
+  THEN use SectionHeader component
+  
+ELSE IF external component is CardTitle
+  THEN use title prop of SectionHeader
+  
+ELSE IF external component is CardContent
+  THEN use div with px-4 py-2 classes
+  
+ELSE IF external component is Button
+  IF variant is "ghost"
+    THEN use button with aucctus-bg-secondary-hover class
+  ELSE IF variant is "outline"
+    THEN use button with btn btn-light class
+  ELSE IF variant is "default"
+    THEN use button with btn btn-primary class
+  ELSE IF variant is "destructive"
+    THEN use button with btn btn-danger class
+  
+ELSE IF external component is a Lucide icon
+  THEN use Icon component with variant property and proper stroke class
+  
+ELSE IF external component is Input
+  THEN use input with aucctus-bg-primary aucctus-border-secondary classes
+  
+ELSE IF external component is Label
+  THEN use label with aucctus-text-primary aucctus-text-sm classes
+  
+ELSE IF external component is Select
+  THEN use select with aucctus-bg-primary aucctus-border-secondary classes
+  
+ELSE IF external component is Checkbox
+  THEN use input type="checkbox" with aucctus-border-secondary class
+  
+ELSE IF external component is Dialog
+  THEN use custom modal implementation
+```
+
+### Decision Tree: Text Class Selection
+
+```
+IF external class contains text-primary
+  THEN use aucctus-text-primary
+  
+ELSE IF external class contains text-secondary or text-muted-foreground
+  THEN use aucctus-text-secondary
+  
+ELSE IF external class contains text-destructive or text-error
+  THEN use aucctus-text-error-primary
+  
+ELSE IF external class contains text-success
+  THEN use aucctus-text-success-primary
+  
+ELSE IF external class contains text-warning
+  THEN use aucctus-text-warning-primary
+  
+IF external class contains text-xs
+  THEN include aucctus-text-xs
+  
+ELSE IF external class contains text-sm
+  THEN include aucctus-text-sm
+  
+ELSE IF external class contains text-base
+  THEN include aucctus-text-md
+  
+ELSE IF external class contains text-lg
+  THEN include aucctus-text-lg
+  
+ELSE IF external class contains text-xl
+  THEN include aucctus-text-xl
+  
+IF external class contains font-medium
+  THEN append -medium to the text size class
+  
+ELSE IF external class contains font-semibold
+  THEN append -semibold to the text size class
+  
+ELSE IF external class contains font-bold
+  THEN append -bold to the text size class
+```
+
+### Decision Tree: Background Class Selection
+
+```
+IF external class contains bg-background or bg-white
+  THEN use aucctus-bg-primary
+  
+ELSE IF external class contains bg-muted or bg-gray-100
+  THEN use aucctus-bg-secondary
+  
+ELSE IF external class contains bg-destructive or bg-red
+  THEN use aucctus-bg-error-primary
+  
+ELSE IF external class contains bg-success or bg-green
+  THEN use aucctus-bg-success-primary
+  
+ELSE IF external class contains bg-warning or bg-yellow
+  THEN use aucctus-bg-warning-primary
+  
+IF external class contains hover:bg
+  THEN replace with corresponding aucctus-bg-*-hover class
+```
+
+## Common Pitfalls
+
+### 1. Class Name Transformation Errors
+```
+❌ INCORRECT: hover:aucctus-bg-primary
+✅ CORRECT: aucctus-bg-primary-hover
+
+❌ INCORRECT: text-muted-foreground
+✅ CORRECT: aucctus-text-secondary
+
+❌ INCORRECT: className="aucctus-bg-primary hover:aucctus-bg-primary-hover"
+✅ CORRECT: className="aucctus-bg-primary-hover"
+```
+
+### 2. Icon Component Implementation
+```
+❌ INCORRECT: <Icon variant="briefcase" className="h-5 w-5 text-primary" />
+✅ CORRECT: <Icon variant="briefcase" className="aucctus-stroke-primary" height={18} width={18} />
+
+❌ INCORRECT: <Icon type="briefcase" />
+✅ CORRECT: <Icon variant="briefcase" />
+```
+
+### 3. Button Component Styling
+```
+❌ INCORRECT: <button className="bg-blue-500 hover:bg-blue-700">Submit</button>
+✅ CORRECT: <button className="btn btn-primary">Submit</button>
+
+❌ INCORRECT: <button className="aucctus-text-primary aucctus-bg-primary">Cancel</button>
+✅ CORRECT: <button className="btn btn-light">Cancel</button>
+```
+
+### 4. Missing or Incorrect ARIA Attributes
+```
+❌ INCORRECT: <button onClick={handleDelete}><Icon variant="trash" /></button>
+✅ CORRECT: <button onClick={handleDelete} aria-label="Delete item"><Icon variant="trash" /></button>
+```
+
+### 5. State Management Approaches
+```
+❌ INCORRECT: Using index-based updates with mockJobs
+✅ CORRECT: Using id-based updates with mockJobs
+
+❌ INCORRECT: Modifying mockJobs directly
+✅ CORRECT: Using setMockJobs with a new array
+```
+
+## Edge Cases
+
+### Complex Form Elements
+When porting form elements with validation:
+```tsx
+// EXTERNAL
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+
+const formSchema = z.object({
+  name: z.string().min(2).max(50),
+  email: z.string().email(),
+});
+
+function ProfileForm() {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+    },
+  });
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log(values);
+  }
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input placeholder="Your name" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* More fields */}
+        <Button type="submit">Submit</Button>
+      </form>
+    </Form>
+  );
+}
+
+// INTERNAL
+import React, { useState } from 'react';
+import { FormField } from '@components';
+
+interface FormValues {
+  name: string;
+  email: string;
+}
+
+function ProfileForm() {
+  const [formValues, setFormValues] = useState<FormValues>({
+    name: '',
+    email: '',
+  });
+  const [errors, setErrors] = useState<Partial<FormValues>>({});
+
+  const validateForm = (): boolean => {
+    const newErrors: Partial<FormValues> = {};
+    
+    if (!formValues.name || formValues.name.length < 2 || formValues.name.length > 50) {
+      newErrors.name = 'Name must be between 2 and 50 characters';
+    }
+    
+    if (!formValues.email || !/^\S+@\S+\.\S+$/.test(formValues.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormValues(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      console.log(formValues);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-8">
+      <FormField
+        label="Name"
+        name="name"
+        error={errors.name}
+      >
+        <input
+          className="aucctus-bg-primary aucctus-border-secondary aucctus-text-primary p-2 rounded-md border w-full"
+          name="name"
+          value={formValues.name}
+          onChange={handleChange}
+          placeholder="Your name"
+        />
+      </FormField>
+      
+      {/* More fields */}
+      <button type="submit" className="btn btn-primary">Submit</button>
+    </form>
+  );
+}
+```
+
+### Complex Data Visualization Components
+When porting data visualization components:
+```tsx
+// EXTERNAL
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+function DataChart({ data }) {
+  return (
+    <Card className="w-full h-80">
+      <CardHeader>
+        <CardTitle>Monthly Sales</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#8884d8" />
+          </BarChart>
+        </ResponsiveContainer>
+      </CardContent>
+    </Card>
+  );
+}
+
+// INTERNAL - Retain the same chart library but wrap in Aucctus styling
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { SectionHeader } from '@components';
+
+function DataChart({ data }) {
+  return (
+    <div className="aucctus-bg-primary aucctus-border-secondary w-full h-80 rounded-lg border shadow-sm">
+      <SectionHeader
+        title="Monthly Sales"
+        noDivider={true}
+      />
+      <div className="px-4 py-2 h-[calc(100%-60px)]">
+        <ResponsiveContainer width="100%" height="100%">
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="name" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="value" fill="#5A66DF" /> {/* Use Aucctus brand color */}
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
+```
+
+## Validation Checklist
+
+Use this checklist to verify that your ported component meets all Aucctus requirements:
+
+- [ ] **Imports**
+  - [ ] All external component libraries removed (shadcn/ui, lucide-react, sonner, etc.)
+  - [ ] All internal component imports added (@components)
+  - [ ] No unused imports remain
+
+- [ ] **Component Structure**
+  - [ ] External component structure transformed to internal patterns
+  - [ ] Card patterns replaced with appropriate div+SectionHeader structure
+  - [ ] Child components properly extracted and composed
+
+- [ ] **Styling**
+  - [ ] All Tailwind utility classes replaced with Aucctus theme classes
+  - [ ] All button styles use btn classes
+  - [ ] All text styles use aucctus-text-* classes
+  - [ ] All background styles use aucctus-bg-* classes
+  - [ ] All border styles use aucctus-border-* classes
+  - [ ] All hover styles use *-hover classes (not hover: prefix)
+  - [ ] All icon components use proper stroke classes
+
+- [ ] **Icons**
+  - [ ] All lucide icons replaced with Icon component
+  - [ ] All icons have variant prop
+  - [ ] All icons have proper aucctus-stroke-* classes
+  - [ ] All icons have explicit height and width
+
+- [ ] **State Management**
+  - [ ] Mock data implementation for state
+  - [ ] ID-based CRUD operations (not index-based)
+  - [ ] Proper immutable state updates
+  - [ ] useMemo for derived state calculations
+  - [ ] useCallback for handler functions
+  - [ ] React.memo for component optimization where appropriate
+
+- [ ] **Accessibility**
+  - [ ] Semantic HTML maintained
+  - [ ] ARIA attributes added where needed
+  - [ ] Keyboard navigation supported
+  - [ ] Color contrast requirements met
+
+- [ ] **Performance**
+  - [ ] No unnecessary re-renders
+  - [ ] Proper dependency arrays in hooks
+  - [ ] List virtualization for long lists
+  - [ ] Proper loading states
+
+- [ ] **Edge Cases**
+  - [ ] Form validation handled properly
+  - [ ] Complex UI interactions preserved
+  - [ ] Error states handled
+
+## Complete Transformation Examples
+
+### Example: JobsToBeDone to CustomerJobs
+
+#### BEFORE:
+```tsx
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Briefcase, ArrowDown, Plus, Trash } from 'lucide-react';
+import { toast } from 'sonner';
+
+interface Job {
+  id: number;
+  text: string;
+  priority?: number;
+}
+
+const sortJobs = (jobs: Job[]) => {
+  return [...jobs].sort((a, b) => (a.priority || 0) - (b.priority || 0));
+};
+
+export function JobsToBeDone() {
+  const [jobs, setJobs] = useState<Job[]>([
+    { id: 1, text: 'Improve onboarding process', priority: 1 },
+    { id: 2, text: 'Simplify checkout flow', priority: 2 },
+    { id: 3, text: 'Add saved payment methods', priority: 3 },
+  ]);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newJobText, setNewJobText] = useState('');
+
+  const handleAddJob = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newJobText.trim()) return;
+
+    const newJob: Job = {
+      id: Date.now(),
+      text: newJobText.trim(),
+      priority: jobs.length + 1,
+    };
+
+    setJobs([...jobs, newJob]);
+    setNewJobText('');
+    setIsAdding(false);
+    toast.success('Job added');
+  };
+
+  const handleRemoveJob = (id: number) => {
+    setJobs(jobs.filter(job => job.id !== id));
+    toast.success('Job removed');
+  };
+
+  const sortedJobs = sortJobs(jobs);
+
+  const renderPriorityIndicator = (priority: number = 0) => {
+    const priorityColor = priority === 1 ? 'text-red-500' : priority === 2 ? 'text-amber-500' : 'text-green-500';
+    const priorityLine = priority === 1 ? 'bg-red-500' : priority === 2 ? 'bg-amber-500' : 'bg-green-500';
+    
+    return (
+      <div className="flex flex-col items-center mr-3 pt-2">
+        <span className={`text-xs font-semibold ${priorityColor}`}>{priority}</span>
+        <div className={`w-0.5 h-12 mt-1 ${priorityLine}`}></div>
+      </div>
+    );
+  };
+
+  return (
+    <Card className="h-fit">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg flex items-center gap-2">
+            <Briefcase className="h-5 w-5 text-primary" />
+            Jobs to be Done
+          </CardTitle>
+          <Button 
+            variant="ghost" 
+            size="icon"
+            className="h-8 w-8"
+            onClick={() => setIsAdding(true)}
+            disabled={isAdding}
+          >
+            <Plus className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
+      <CardContent className="pt-0 pb-3">
+        {isAdding ? (
+          <form onSubmit={handleAddJob} className="mb-4">
+            <Input
+              value={newJobText}
+              onChange={(e) => setNewJobText(e.target.value)}
+              placeholder="Add a new job..."
+              className="mb-2"
+            />
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" size="sm" onClick={() => setIsAdding(false)}>
+                Cancel
+              </Button>
+              <Button type="submit" size="sm">
+                Add Job
+              </Button>
+            </div>
+          </form>
+        ) : null}
+        
+        <div className="space-y-3">
+          {sortedJobs.map((job) => (
+            <div key={job.id} className="flex items-start border rounded-md p-2">
+              {renderPriorityIndicator(job.priority)}
+              <div className="flex-1">
+                <p className="text-sm">{job.text}</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="h-8 w-8 text-muted-foreground"
+                onClick={() => handleRemoveJob(job.id)}
+              >
+                <Trash className="h-4 w-4" />
+              </Button>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+```
+
+#### AFTER:
+
+```tsx
+import React, { useState, useMemo, useCallback } from 'react';
+import { Icon, toast, SectionHeader } from '@components';
+
+interface MockJob {
+  id: string;
+  text: string;
+  priority?: number;
+  createdAt: string;
+}
+
+// Extracted component for priority indicator
+const PriorityIndicator = ({ priority }: { priority?: number }) => {
+  const getPriorityColor = () => {
+    if (priority === 1) return { 
+      text: 'aucctus-text-error-primary', 
+      line: 'bg-red-500' 
+    };
+    if (priority === 2) return { 
+      text: 'aucctus-text-warning-primary', 
+      line: 'bg-amber-500' 
+    };
+    return { 
+      text: 'aucctus-text-success-primary', 
+      line: 'bg-green-500' 
+    };
+  };
+  
+  const { text, line } = getPriorityColor();
+  
+  return (
+    <div className="flex flex-col items-center mr-3 pt-2">
+      <span className={`aucctus-text-xs-semibold ${text}`}>{priority}</span>
+      <div className={`w-0.5 h-12 mt-1 ${line}`}></div>
+    </div>
+  );
+};
+
+const CustomerJobs = () => {
+  // Initial mock data
+  const initialMockJobs: MockJob[] = [
+    { 
+      id: '1', 
+      text: 'Improve onboarding process', 
+      priority: 1, 
+      createdAt: new Date().toISOString() 
+    },
+    { 
+      id: '2', 
+      text: 'Simplify checkout flow', 
+      priority: 2, 
+      createdAt: new Date().toISOString() 
+    },
+    { 
+      id: '3', 
+      text: 'Add saved payment methods', 
+      priority: 3, 
+      createdAt: new Date().toISOString() 
+    },
+  ];
+  
+  const [mockJobs, setMockJobs] = useState<MockJob[]>(initialMockJobs);
+  const [isAdding, setIsAdding] = useState(false);
+  const [newJobText, setNewJobText] = useState('');
+  
+  // Sort jobs by priority using useMemo
+  const sortedJobs = useMemo(
+    () => [...mockJobs].sort((a, b) => (a.priority || 0) - (b.priority || 0)),
+    [mockJobs],
+  );
+  
+  // Use useCallback for event handlers
+  const handleStartAdding = useCallback(() => {
+    setIsAdding(true);
+  }, []);
+  
+  const handleCancel = useCallback(() => {
+    setIsAdding(false);
+    setNewJobText('');
+  }, []);
+  
+  const handleAddJob = useCallback((e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newJobText.trim()) return;
+    
+    const newJob: MockJob = {
+      id: Date.now().toString(),
+      text: newJobText.trim(),
+      priority: mockJobs.length + 1,
+      createdAt: new Date().toISOString(),
+    };
+    
+    setMockJobs([...mockJobs, newJob]);
+    setNewJobText('');
+    setIsAdding(false);
+    toast.success('Job added');
+  }, [mockJobs, newJobText]);
+  
+  const handleDelete = useCallback((id: string) => {
+    setMockJobs(mockJobs.filter(job => job.id !== id));
+    toast.success('Job removed');
+  }, [mockJobs]);
+  
+  return (
+    <div className="aucctus-bg-primary aucctus-border-secondary h-fit rounded-lg border shadow-sm">
+      <SectionHeader
+        icon="briefcase"
+        iconClass="aucctus-stroke-primary"
+        iconBgClass="aucctus-bg-primary aucctus-border-secondary"
+        title="Customer Jobs"
+        noDivider={true}
+        rightAction={
+          <button
+            className="aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50"
+            aria-label="Add job"
+            onClick={handleStartAdding}
+            disabled={isAdding}
+          >
+            <Icon variant="plus" className="aucctus-stroke-primary" height={16} width={16} />
+          </button>
+        }
+      />
+      <div className="px-4 py-2">
+        {isAdding ? (
+          <form onSubmit={handleAddJob} className="mb-4">
+            <input
+              value={newJobText}
+              onChange={(e) => setNewJobText(e.target.value)}
+              placeholder="Add a new job..."
+              className="aucctus-bg-primary aucctus-border-secondary aucctus-text-primary p-2 rounded-md border w-full mb-2"
+            />
+            <div className="flex justify-end gap-2">
+              <button 
+                type="button" 
+                className="btn btn-light btn-sm" 
+                onClick={handleCancel}
+              >
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary btn-sm">
+                Add Job
+              </button>
+            </div>
+          </form>
+        ) : null}
+        
+        <div className="space-y-3">
+          {sortedJobs.map((job) => (
+            <div key={job.id} className="aucctus-bg-primary aucctus-border-secondary flex items-start rounded-md border p-2">
+              <PriorityIndicator priority={job.priority} />
+              <div className="flex-1">
+                <p className="aucctus-text-primary aucctus-text-sm">{job.text}</p>
+              </div>
+              <button 
+                className="aucctus-bg-secondary-hover rounded-full p-2 transition-colors"
+                onClick={() => handleDelete(job.id)}
+                aria-label="Delete job"
+              >
+                <Icon variant="trash" className="aucctus-stroke-error-primary" height={16} width={16} />
+              </button>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default React.memo(CustomerJobs);
+```
+
+This transformation example demonstrates:
+
+1. **Component Structure Changes**:
+   - Card → div with Aucctus theme classes
+   - CardHeader → SectionHeader component
+   - CardTitle → SectionHeader title prop
+   - Button → native button with Aucctus classes
+   - Extracted PriorityIndicator into its own component
+
+2. **Styling Transformations**:
+   - Replaced Tailwind classes with Aucctus theme classes
+   - Added proper button styling with btn classes
+   - Applied proper text styling with aucctus-text-* classes
+   - Added appropriate icon styling with aucctus-stroke-* classes
+
+3. **State Management Improvements**:
+   - Used string IDs instead of number IDs
+   - Added createdAt timestamp field
+   - Implemented useMemo for sorting
+   - Added useCallback for event handlers
+   - Used proper immutable state updates
+
+4. **Performance Optimizations**:
+   - Added React.memo to the entire component
+   - Applied proper dependency arrays to hooks
+   - Used memoization for derived data
+
+5. **Accessibility Enhancements**:
+   - Added aria-label attributes to icon buttons
+   - Maintained semantic HTML structure
+   - Provided proper keyboard navigation
+
+By following this transformation pattern, the component has been successfully ported from the external implementation to an Aucctus-compliant internal component.
+

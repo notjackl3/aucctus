@@ -56,7 +56,7 @@ const CustomerConversationSearch: React.FC<CustomerConversationSearchProps> = ({
           />
           <Icon
             variant='search-md'
-            className='aucctus-fill-tertiary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2'
+            className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2'
           />
         </span>
         <span>

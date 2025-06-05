@@ -5,6 +5,7 @@ export * from './chat';
 export * from './concept/assumptions';
 export * from './concept/concepts';
 export * from './concept/financialProjection';
+export * from './concept/financialProjectionV2';
 export * from './concept/marketScan';
 export * from './concept/support';
 export * from './fastService';

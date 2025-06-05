@@ -13,7 +13,7 @@ const ConclusionVisualizationSources: React.FC<
   const renderLinkButton = (source: ISource) => {
     return (
       <div
-        className='cursor-pointer items-center rounded-lg px-2.5 py-2.5 transition-all !duration-200 hover:scale-105 hover:bg-gray-100'
+        className='aucctus-bg-primary-hover cursor-pointer items-center rounded-lg px-2.5 py-2.5 transition-all !duration-200 hover:scale-105'
         onClick={() => window.open(source.url, '_blank')}
       >
         <Icon variant='link-external' />

@@ -33,6 +33,15 @@ export enum AucctusQueryKeys {
   customerProfileRealWorldSignals = 'customerProfileRealWorldSignals',
   customerProfileRealWorldSignal = 'customerProfileRealWorldSignal',
 
+  /* Financial Projection V2 */
+  financialProjectionV2 = 'financialProjectionV2',
+  pricingV2 = 'pricingV2',
+  businessModelV2 = 'businessModelV2',
+  marketSizingV2 = 'marketSizingV2',
+  marketSizingAssumptionV2 = 'marketSizingAssumptionV2',
+  costDriverV2 = 'costDriverV2',
+  distributionChannelV2 = 'distributionChannelV2',
+
   /* External APIs */
   clearbitCompany = 'clearbitCompany',
   articlePublishedDate = 'articlePublishedDate',

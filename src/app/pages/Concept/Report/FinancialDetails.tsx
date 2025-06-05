@@ -2,13 +2,18 @@ import { Card, Chart, Header, Modal } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useModal } from '@context/ModalContextProvider';
 import { useEditFinancialProjections } from '@hooks/concepts/editable.hook';
-import { ISource } from '@libs/api/types';
+import { IFinancialProjection, ISource } from '@libs/api/types';
 import utils from '@libs/utils';
-import React, { FunctionComponent } from 'react';
+import React, { FunctionComponent, useMemo } from 'react';
 
-const FinancialDetails: FunctionComponent = () => {
+interface FinancialDetailsProps {
+  financialProjection: IFinancialProjection;
+}
+
+const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
+  financialProjection,
+}) => {
   const {
-    overview,
     tam,
     sam,
     som,
@@ -17,7 +22,9 @@ const FinancialDetails: FunctionComponent = () => {
     totalUsers,
     serviceableAddressablePercent,
     serviceableObtainablePercent,
-  } = useEditFinancialProjections();
+  } = useMemo(() => financialProjection, [financialProjection]);
+
+  const { overview } = useEditFinancialProjections();
 
   // Formate Large numbers
   const formattedPrice = React.useMemo(
@@ -29,16 +36,16 @@ const FinancialDetails: FunctionComponent = () => {
     [totalUsers.value],
   );
   const formattedTam = React.useMemo(
-    () => utils.number.formatter.format(tam.value),
-    [tam.value],
+    () => utils.number.formatter.format(tam),
+    [tam],
   );
   const formattedSam = React.useMemo(
-    () => utils.number.formatter.format(sam.value),
-    [sam.value],
+    () => utils.number.formatter.format(sam),
+    [sam],
   );
   const formattedSom = React.useMemo(
-    () => utils.number.formatter.format(som.value),
-    [som.value],
+    () => utils.number.formatter.format(som),
+    [som],
   );
 
   const { openModal } = useModal();
@@ -160,12 +167,7 @@ const FinancialDetails: FunctionComponent = () => {
           </div>
 
           <div className='m-auto inline-flex h-full w-96 flex-col items-center justify-center gap-12'>
-            <Chart.MarketChart
-              className={''}
-              tam={tam.value}
-              sam={sam.value}
-              som={som.value}
-            />
+            <Chart.MarketChart className={''} tam={tam} sam={sam} som={som} />
           </div>
         </div>
       </section>

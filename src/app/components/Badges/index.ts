@@ -1,5 +1,6 @@
 import Beta from './Beta';
 import AssumptionCategory from './AssumptionCategoryBadge';
+import FinancialProjectionSource from './FinancialProjectionSourceBadge';
 import Default from './Badge';
 import ConceptStatistic from './ConceptStatistic';
 import ConceptStatus from './ConceptStatus';
@@ -14,6 +15,7 @@ import ValidationStatus from './ValidationStatus';
 const Badges = {
   RiskLevel,
   SourceInfo,
+  FinancialProjectionSource,
   AssumptionCategory,
   ConceptStatistic,
   ConceptStatus,

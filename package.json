@@ -58,6 +58,7 @@
     "react-spring": "^9.7.4",
     "react-toastify": "^10.0.4",
     "react-use": "^17.5.0",
+    "recharts": "^2.15.3",
     "resize-observer-polyfill": "^1.5.1",
     "scss": "^0.2.4",
     "tailwind-merge": "^2.5.2",

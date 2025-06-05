@@ -1,3 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
 # Aucctus Development Rules
 
 ## React TypeScript Guidelines
@@ -75,7 +80,7 @@
 - aucctus-bg-brand-primary / aucctus-bg-brand-primary-alt / aucctus-bg-brand-primary-hover - Primary brand background
 - aucctus-bg-brand-secondary / aucctus-bg-brand-secondary-hover - Secondary brand background
 - aucctus-bg-brand-solid / aucctus-bg-brand-solid-hover - Solid brand background
-- aucctus-bg-brand-section / aucctus-bg-brand-section-subtle - Brand section background
+- aucctus-bg-brand-section / Brand section background
 - aucctus-bg-error-primary / aucctus-bg-error-secondary / aucctus-bg-error-solid / aucctus-bg-error-solid-hover - Error backgrounds
 - aucctus-bg-warning-primary / aucctus-bg-warning-secondary / aucctus-bg-warning-solid / aucctus-bg-warning-solid-hover - Warning backgrounds
 - aucctus-bg-success-primary / aucctus-bg-success-primary-hover / aucctus-bg-success-secondary / aucctus-bg-success-solid / aucctus-bg-success-solid-hover - Success backgrounds
@@ -88,22 +93,6 @@
 - aucctus-border-disabled / aucctus-border-disabled-subtle - Disabled border
 - aucctus-border-brand / aucctus-border-brand-alt / aucctus-border-brand-subtle - Brand borders
 - aucctus-border-error / aucctus-border-error-subtle - Error borders
-
-## Fill Colors (for SVGs)
-- aucctus-fill-primary - Primary fill
-- aucctus-fill-secondary / aucctus-fill-secondary-hover - Secondary fill
-- aucctus-fill-tertiary / aucctus-fill-tertiary-hover - Tertiary fill
-- aucctus-fill-quaternary / aucctus-fill-quaternary-hover - Quaternary fill
-- aucctus-fill-quinary / aucctus-fill-quinary-hover - Quinary fill
-- aucctus-fill-senary - Senary fill
-- aucctus-fill-white - White fill
-- aucctus-fill-disabled / aucctus-fill-disabled-subtle - Disabled fill
-- aucctus-fill-brand-primary / aucctus-fill-brand-primary-alt - Primary brand fill
-- aucctus-fill-brand-secondary - Secondary brand fill
-- aucctus-fill-brand-tertiary - Tertiary brand fill
-- aucctus-fill-error-primary / aucctus-fill-error-secondary - Error fills
-- aucctus-fill-warning-primary / aucctus-fill-warning-secondary - Warning fills
-- aucctus-fill-success-primary / aucctus-fill-success-secondary - Success fills
 
 ## Stroke Colors (for SVGs)
 - IMPORTANT: Stroke classes are equally important as fill classes when styling SVG and Icon components
@@ -121,6 +110,16 @@
 - aucctus-stroke-error-primary / aucctus-stroke-error-secondary - Error strokes
 - aucctus-stroke-warning-primary / aucctus-stroke-warning-secondary - Warning strokes
 - aucctus-stroke-success-primary / aucctus-stroke-success-secondary - Success strokes
+
+## Slider Accent Colors
+- aucctus-slider-primary - Primary accent for range inputs
+- aucctus-slider-secondary - Secondary accent for range inputs
+- aucctus-slider-tertiary - Tertiary accent for range inputs
+- aucctus-slider-brand / aucctus-slider-brand-alt - Brand accent for range inputs
+- aucctus-slider-error - Error accent for range inputs
+- aucctus-slider-warning - Warning accent for range inputs
+- aucctus-slider-success - Success accent for range inputs
+- aucctus-slider-disabled - Disabled accent for range inputs
 
 ## Typography
 - aucctus-header-2xl / aucctus-header-2xl-medium / aucctus-header-2xl-semibold / aucctus-header-2xl-bold - 2XL headers
@@ -160,3 +159,55 @@ Specific component use cases are listed below:
 
 ### Toast
 - use -> import { toast } from '@components';
+
+## Theme Files
+[colors.scss](mdc:src/app/assets/styles/colors.scss)
+[text.scss](mdc:src/app/assets/styles/aucctus-theme/colors/text.scss)
+[text.scss](mdc:src/app/assets/styles/aucctus-theme/typography/text.scss)
+[border.scss](mdc:src/app/assets/styles/aucctus-theme/colors/border.scss)
+[button.scss](mdc:src/app/assets/styles/button.scss)
+[background.scss](mdc:src/app/assets/styles/aucctus-theme/colors/background.scss)
+
+# Aucctus React TypeScript Development Rules
+
+## Best Practices
+
+1. **Components Rules**
+   - Use functional components with hooks instead of class components
+   - Use arrow functions for component definitions
+   - Use destructuring for props
+   - Lazy load components and routes
+   - Use code splitting
+   - Optimize images and assets
+   - Use memoization for expensive calculations
+
+2. **Security**
+   - Sanitize user input
+   - Avoid storing sensitive information in local storage
+   - Use environment variables for sensitive configuration
+
+3. **Documentation**
+   - Document complex logic with comments
+   - Document component props with JSDoc
+   - Document custom hooks with JSDoc
+
+## Code Quality and Standards
+
+1. **ESLint and Prettier**
+   - Follow the ESLint rules defined in @.eslintrc.js
+   - Follow the Prettier rules defined in @.prettierrc
+
+2. **Performance**
+   - Avoid unnecessary re-renders
+   - Use useMemo and useCallback for expensive calculations and callbacks
+
+3. **Accessibility**
+   - Ensure components are accessible
+   - Use semantic HTML elements
+   - Provide appropriate ARIA attributes
+   - Support keyboard navigation
+
+## Build and Development
+
+1. **Icon Management**
+   - When using icons from @Icon.tsx, consider variants from @icons.d.ts

@@ -1,10 +1,7 @@
 import { Card, Header, Loading, Text } from '@components';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import { useAssumptions } from '@hooks/query/assumptions.hook';
-import {
-  useConceptCustomerProfiles,
-  useFinancialProjection,
-} from '@hooks/query/concepts.hook';
+import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
@@ -18,17 +15,12 @@ const OverviewDetails: FunctionComponent = () => {
   const { navigateToTab, concept } = useOutletContext<IConceptReportContext>();
   const { profiles, isLoading: isCustomerProfilesLoading } =
     useConceptCustomerProfiles(activeConceptUuid);
-  const { financialProjection, isLoading: isFinancialProjectionLoading } =
-    useFinancialProjection(activeConceptUuid);
 
   const { assumptions, isLoading: isAssumptionsLoading } =
     useAssumptions(activeConceptUuid);
   const { valueProposition, problemStatement, overview } = useEditConcept();
 
-  const isLoading =
-    isAssumptionsLoading ||
-    isCustomerProfilesLoading ||
-    isFinancialProjectionLoading;
+  const isLoading = isAssumptionsLoading || isCustomerProfilesLoading;
 
   const firstCustomerPersona = useMemo(() => {
     if (!profiles || profiles.length === 0) {
@@ -118,11 +110,6 @@ const OverviewDetails: FunctionComponent = () => {
           onViewProfilesClick={() =>
             navigateToTab(AppPath.ConceptCustomerProfile)
           }
-        />
-
-        <Card.FinancialProjects
-          projection={financialProjection}
-          onViewClick={() => navigateToTab(AppPath.ConceptFinancialProjection)}
         />
 
         <Card.KeyAssumptions

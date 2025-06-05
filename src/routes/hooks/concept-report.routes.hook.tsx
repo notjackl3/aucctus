@@ -12,7 +12,7 @@ const useConceptReportRoutes = () => {
       />
       <Route
         path={ConceptPath.FinancialProjection}
-        element={<Page.Concept.Report.FinancialProjection />}
+        element={<Page.Concept.Report.FinancialProjectionWrapper />}
       />
       <Route
         path={ConceptPath.CustomerProfile}

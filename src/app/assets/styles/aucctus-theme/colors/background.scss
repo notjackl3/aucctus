@@ -96,8 +96,29 @@
 .aucctus-bg-quaternary {
   @apply bg-gray-light-200 dark:bg-gray-light-700;
 
+  &-alt {
+    @apply bg-gray-light-300 dark:bg-gray-light-700;
+  }
+
   &-hover {
     @extend .aucctus-bg-quaternary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-gray-light-300 dark:bg-gray-light-800;
+    }
+  }
+}
+
+.aucctus-bg-quinary {
+  @apply bg-gray-light-400 dark:bg-gray-light-700;
+
+  &-alt {
+    @apply bg-gray-light-500 dark:bg-gray-light-700;
+  }
+
+  &-hover {
+    @extend .aucctus-bg-quinary;
     @apply transition-colors duration-300;
 
     &:hover {

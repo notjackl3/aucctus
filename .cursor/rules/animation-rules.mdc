@@ -1,0 +1,232 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Aucctus Animation Hooks Guide
+
+This guide explains how to use the animation hooks in the Aucctus codebase for creating consistent and performant animations.
+
+**Note:** These animation rules and patterns may change as the Aucctus design system evolves. Always refer to the latest documentation and existing component implementations for the most up-to-date guidance: [animation.hook.ts](mdc:src/app/hooks/animation/animation.hook.ts)
+
+## Available Animation Hooks
+
+### 1. useFloatingAnimation
+
+Creates a gentle floating movement animation, ideal for drawing attention to elements or indicating interactivity.
+
+```tsx
+import { useFloatingAnimation } from '@hooks/animation/animation.hook';
+import { animated } from 'react-spring';
+
+// Basic usage
+const floatingAnimation = useFloatingAnimation();
+
+return (
+  <animated.div style={floatingAnimation}>
+    Content that floats
+  </animated.div>
+);
+
+// Advanced usage with options
+const customFloatingAnimation = useFloatingAnimation({
+  amplitude: 5,           // 5px movement distance
+  duration: 2000,         // 2 seconds per cycle 
+  direction: 'x',         // Horizontal movement
+  delay: 300,             // Start after 300ms
+});
+```
+
+#### Options
+- `amplitude`: Movement distance in pixels (default: 3)
+- `duration`: Animation duration in milliseconds (default: 1500)
+- `easing`: Custom easing function (default: easeInOutSine)
+- `delay`: Delay before animation starts (default: 0)
+- `config`: Custom spring configuration (overrides duration and easing)
+- `loop`: Animation loop behavior (default: `{ reverse: true }`)
+- `direction`: 'x' for horizontal or 'y' for vertical movement (default: 'y')
+
+### 2. usePulseAnimation
+
+Creates a pulsing effect that scales and fades an element, ideal for notifications or emphasizing elements.
+
+```tsx
+import { usePulseAnimation } from '@hooks/animation/animation.hook';
+import { animated } from 'react-spring';
+
+// Basic usage
+const pulseAnimation = usePulseAnimation();
+
+return (
+  <animated.div style={pulseAnimation}>
+    Pulsing content
+  </animated.div>
+);
+
+// Advanced usage with options
+const customPulseAnimation = usePulseAnimation({
+  startScale: 0.9,        // Start slightly smaller
+  endScale: 1.1,          // End slightly larger
+  startOpacity: 1,        // Start fully visible
+  endOpacity: 0.7,        // Fade slightly
+  duration: 800,          // 800ms per cycle
+  loop: { reverse: true } // Pulse back and forth
+});
+```
+
+#### Options
+- `startScale`: Initial scale value (default: 1)
+- `endScale`: Target scale value (default: 2)
+- `startOpacity`: Initial opacity value (default: 0.3)
+- `endOpacity`: Target opacity value (default: 0)
+- `duration`: Animation duration in milliseconds (default: 1000)
+- `delay`: Delay before animation starts (default: 0)
+- `easing`: Custom easing function (default: easeInOutSine)
+- `loop`: Animation loop behavior (default: true)
+
+### 3. useExpandCollapseTransition
+
+Creates smooth expand/collapse transitions for elements like accordions, dropdowns, or any content that needs to be shown/hidden with animation.
+
+```tsx
+import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
+import { animated } from 'react-spring';
+
+// Component with expand/collapse functionality
+const ExpandableContent = ({ isOpen }) => {
+  const transitions = useExpandCollapseTransition({
+    isExpanded: isOpen,
+    withOpacity: true,
+    maxHeight: 500,
+    duration: 300
+  });
+
+  return transitions(
+    (style, item) => 
+      item && (
+        <animated.div style={style}>
+          Content to expand/collapse
+        </animated.div>
+      )
+  );
+};
+```
+
+#### Options
+- `isExpanded`: Boolean to control expanded state (default: false)
+- `maxHeight`: Maximum height when expanded in pixels (default: 'auto')
+- `duration`: Animation duration in milliseconds (default: 300)
+- `easing`: Custom easing function (default: undefined)
+- `delay`: Delay before animation starts (default: 0)
+- `config`: Custom spring configuration (overrides duration and easing)
+- `withOpacity`: Whether to include opacity transition (default: true)
+- `collapsedHeight`: Initial height when collapsed (default: 0)
+
+## Best Practices
+
+1. **Import Dependencies**
+   ```tsx
+   import { animated } from 'react-spring';
+   import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
+   ```
+
+2. **Apply Animations to `animated` Components**
+   Always wrap components with `animated.div` (or other animated elements) to apply the animations.
+
+3. **Handle Conditional Rendering with Transitions**
+   For expand/collapse transitions, use the functional pattern to conditionally render content:
+   ```tsx
+   transitions(
+     (style, item) => item && <animated.div style={style}>Content</animated.div>
+   )
+   ```
+
+4. **Performance Considerations**
+   - Use `withOpacity: false` when opacity transitions aren't needed
+   - Specify a reasonable `maxHeight` value instead of 'auto' for smoother height transitions
+   - For complex animations, consider using the React Profiler to measure performance
+
+5. **Accessibility**
+   - Ensure animated content doesn't interfere with screen readers
+   - Consider users who prefer reduced motion (use CSS `prefers-reduced-motion` media query)
+
+## Example: Expandable Section
+
+```tsx
+import React, { useState } from 'react';
+import { animated } from 'react-spring';
+import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
+import { Button } from '@components';
+
+const ExpandableSection = ({ title, children }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  const transitions = useExpandCollapseTransition({
+    isExpanded,
+    withOpacity: true,
+    maxHeight: 1000,
+    duration: 300
+  });
+  
+  return (
+    <div className="rounded-md border aucctus-border-secondary">
+      <div className="p-4 flex justify-between items-center">
+        <h3 className="aucctus-text-md-semibold">{title}</h3>
+        <Button 
+          onClick={() => setIsExpanded(!isExpanded)}
+          size="sm"
+        >
+          {isExpanded ? 'Collapse' : 'Expand'}
+        </Button>
+      </div>
+      
+      {transitions(
+        (style, item) => 
+          item && (
+            <animated.div style={style} className="px-4 pb-4">
+              {children}
+            </animated.div>
+          )
+      )}
+    </div>
+  );
+};
+```
+
+## Real-World Example: EditableList
+
+The `EditableList` component uses `useExpandCollapseTransition` to smoothly show/hide the add item form:
+
+```tsx
+// Inside EditableList.tsx
+const addItemTransitions = useExpandCollapseTransition({
+  isExpanded: isAdding,
+  withOpacity: true,
+  collapsedHeight: 0,
+  maxHeight: 250,
+});
+
+// Render
+return (
+  <div className='min-w-0 flex-1 space-y-2'>
+    {/* Add Form */}
+    {addItemTransitions(
+      (style, item) =>
+        item && (
+          <animated.div style={style} className='p-2'>
+            <AddItemForm
+              value={newValue}
+              onChange={(e) => setNewValue(e.target.value)}
+              onAdd={handleAdd}
+              onCancel={onCancelAdding || (() => setNewValue(''))}
+              loading={addingLoading}
+              itemLabel={itemLabel}
+            />
+          </animated.div>
+        ),
+    )}
+    
+    {/* List items... */}
+  </div>
+);
+```

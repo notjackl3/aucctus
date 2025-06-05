@@ -15,6 +15,9 @@ import { AucctusStorage } from './utils/storage';
 import customerProfileConversationsSlice, {
   ICustomerProfileConversationState,
 } from './customer_profile_conversations/store';
+import financialProjectionSlice, {
+  IFinancialProjectionState,
+} from './financial-projection/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -22,6 +25,7 @@ export interface IAppStore {
   incubation: IConceptIncubationState;
   aiEditing: IAiEditingState;
   conceptReport: IConceptReportState;
+  financialProjection: IFinancialProjectionState;
   customerProfileConversations: ICustomerProfileConversationState;
 }
 
@@ -40,6 +44,7 @@ const useStore = create<IAppStore>()(
         incubation: conceptIncubationSlice,
         aiEditing: aiEditingSlice,
         conceptReport: conceptReportSlice,
+        financialProjection: financialProjectionSlice,
         customerProfileConversations: customerProfileConversationsSlice,
       }),
     ),
@@ -84,6 +89,7 @@ const useStore = create<IAppStore>()(
           incubation: state.incubation,
           aiEditing: state.aiEditing,
           conceptReport: state.conceptReport,
+          financialProjection: state.financialProjection,
         }),
         merge: (persistedState: unknown, currentState: IAppStore): IAppStore =>
           mergeDeep(currentState, persistedState as IAppStore),

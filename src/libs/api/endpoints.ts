@@ -286,6 +286,57 @@ export class Endpoints {
   static conceptSeen(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/seen`;
   }
+  // Financial Projection V2 Endpoints
+  static financialProjectionV2(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/financial-projection`;
+  }
+
+  // Pricing endpoints
+  static financialProjectionPricing(financialProjectionUuid: string) {
+    return `api/v2/concept/financial-projection/${financialProjectionUuid}/pricing`;
+  }
+
+  static pricingUuid(pricingUuid: string) {
+    return `api/v2/concept/financial-projection/pricing/${pricingUuid}`;
+  }
+
+  // Business Model endpoints
+  static financialProjectionBusinessModel(financialProjectionUuid: string) {
+    return `api/v2/concept/financial-projection/${financialProjectionUuid}/business-model`;
+  }
+
+  static businessModelUuid(businessModelUuid: string) {
+    return `api/v2/concept/financial-projection/business-model/${businessModelUuid}`;
+  }
+
+  // Market Sizing endpoints
+  static financialProjectionMarketSizing(financialProjectionUuid: string) {
+    return `api/v2/concept/financial-projection/${financialProjectionUuid}/market-sizing`;
+  }
+
+  static marketSizingUuid(marketSizingUuid: string) {
+    return `api/v2/concept/financial-projection/market-sizing/${marketSizingUuid}`;
+  }
+
+  // Cost Driver endpoints
+  static financialProjectionCostDriver(financialProjectionUuid: string) {
+    return `api/v2/concept/financial-projection/${financialProjectionUuid}/cost-driver`;
+  }
+
+  static costDriverUuid(costDriverUuid: string) {
+    return `api/v2/concept/financial-projection/cost-driver/${costDriverUuid}`;
+  }
+
+  // Distribution Channel endpoints
+  static financialProjectionDistributionChannel(
+    financialProjectionUuid: string,
+  ) {
+    return `api/v2/concept/financial-projection/${financialProjectionUuid}/distribution-channel`;
+  }
+
+  static distributionChannelUuid(distributionChannelUuid: string) {
+    return `api/v2/concept/financial-projection/distribution-channel/${distributionChannelUuid}`;
+  }
 }
 
 export class SocketEndpoints {

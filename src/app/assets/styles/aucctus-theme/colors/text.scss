@@ -47,6 +47,22 @@
   @apply text-base-white;
 }
 
+.aucctus-text-light {
+  @apply text-gray-light-50 dark:text-gray-light-900;
+
+  &-alt {
+    @apply text-gray-light-100 dark:text-gray-light-900;
+  }
+
+  &-hover {
+    @extend .aucctus-text-light;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply text-gray-light-100 dark:text-gray-light-900;
+    }
+  }
+}
 /* State-based text */
 .aucctus-text-disabled {
   @apply text-gray-light-500 dark:text-gray-light-500;

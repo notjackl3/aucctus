@@ -1,0 +1,710 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Aucctus Django to React TypeScript Porting Rules
+
+## Overview
+This document provides comprehensive rules for porting Django backend implementations to React TypeScript frontend code, following established patterns in the Aucctus codebase.
+
+## Backend to Frontend Mapping
+
+### Directory Structure Mapping
+```
+Backend (Django)                    Frontend (React TypeScript)
+├── models/                         ├── types/ (interfaces)
+├── schemas/                        ├── types/ (API schemas)
+├── routes/                         ├── api/ (endpoints & services)
+├── services/                       ├── hooks/ (React Query hooks)
+├── tasks/                          ├── hooks/ (async operations)
+├── events/                         ├── hooks/ (event handling)
+└── migrations/                     └── (not applicable)
+```
+
+## 1. Model to TypeScript Interface Conversion
+
+### Important: Frontend Interfaces Come From Schemas, Not Models
+
+**Critical Rule**: Frontend TypeScript interfaces should be derived from **Django Ninja Schemas**, not directly from Django Models. The schema defines the actual API contract and data structure that gets serialized to the frontend.
+
+### Django Ninja Schema Analysis → TypeScript Interface
+
+When analyzing Django Ninja schemas, you need to examine both the Schema definition AND the underlying Model to understand the complete data structure.
+
+#### For ModelSchema: Schema + Model Analysis
+
+**Backend Example:**
+```python
+# Django Model (models/customer_profile.py)
+class CustomerProfile(BaseConceptReportModel):
+    uuid = models.UUIDField(default=uuid.uuid4)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    age_upper = models.SmallIntegerField()
+    age_lower = models.SmallIntegerField()
+    income_upper = models.BigIntegerField()
+    income_lower = models.BigIntegerField()
+    is_primary = models.BooleanField(default=False)
+    concept = models.ForeignKey("concepts.Concept")
+    avatar_url = models.URLField(null=True, blank=True)
+    
+    # Model Properties (computed fields)
+    @property
+    def age_range(self):
+        return f"{self.age_lower} - {self.age_upper}"
+    
+    @property
+    def income_range(self):
+        return f"${self.income_lower} - ${self.income_upper}"
+
+# Django Ninja Schema (schemas/customer_profile_schema.py)
+class CustomerProfileSchema(ModelSchema):
+    """
+    Schema for the CustomerProfile model - THIS defines the API response structure
+    """
+    # Explicitly defined fields (override model field behavior)
+    name: str
+    segment: str
+    description: str
+    
+    # Related objects resolved via static methods
+    jobs: List[CustomerJobSchema]
+    pains: List[CustomerPainSchema]
+    
+    # Computed properties from model included
+    age_range: str
+    income_range: str
+    
+    # Custom resolver methods that modify the output
+    @staticmethod
+    def resolve_jobs(obj):
+        """Resolve jobs to list of job schemas"""
+        return obj.customer_jobs.all()
+    
+    @staticmethod
+    def resolve_avatar_url(obj: CustomerProfile):
+        """Resolve avatar_url to use presigned URL from S3"""
+        return obj.presign_avatar_url()
+    
+    class Meta:
+        model = CustomerProfile
+        exclude = ["concept", "conversations"]  # These fields won't appear in API response
+```
+
+**Frontend Interface Analysis Process:**
+
+1. **Start with the Schema Meta configuration**:
+   - `model = CustomerProfile` - base fields come from this model
+   - `exclude = ["concept", "conversations"]` - these model fields are NOT in the API response
+   - `fields_optional = "__all__"` (if present) - all fields become optional
+
+2. **Include Schema-defined fields** (these override model fields):
+   - `jobs: List[CustomerJobSchema]` - populated via `resolve_jobs` method
+   - `pains: List[CustomerPainSchema]` - populated via `resolve_pains` method
+   - `age_range: str` - computed property from model
+   - `income_range: str` - computed property from model
+
+3. **Include Model fields not excluded**:
+   - All model fields except those in `exclude` list
+   - Apply any transformations from resolver methods (like `resolve_avatar_url`)
+
+**Frontend Conversion:**
+```typescript
+// TypeScript Interface - Represents the ACTUAL API response structure
+export interface ICustomerProfile extends IBaseConceptEntity {
+  // Model fields (not excluded)
+  uuid: string;
+  name: string;
+  description: string;
+  segment: string;
+  ageUpper: number;      // age_upper from model
+  ageLower: number;      // age_lower from model
+  incomeUpper: number;   // income_upper from model
+  incomeLower: number;   // income_lower from model
+  isPrimary: boolean;    // is_primary from model
+  avatarUrl?: string;    // avatar_url, transformed by resolve_avatar_url
+  
+  // Computed properties from model (included in schema)
+  ageRange: string;      // age_range property
+  incomeRange: string;   // income_range property
+  
+  // Related entities (defined in schema with resolvers)
+  jobs: ICustomerJob[];   // from resolve_jobs method
+  pains: ICustomerPain[]; // from resolve_pains method
+  
+  // Fields excluded in schema Meta are NOT included:
+  // concept - excluded
+  // conversations - excluded
+}
+```
+
+#### For Regular Schema: Direct Field Analysis
+
+**Backend Example:**
+```python
+# Regular Schema (not ModelSchema)
+class CreateCustomerProfileSchema(Schema):
+    name: str = Field(...)
+    description: str = Field(...)
+    age_upper: int = Field(..., ge=0, le=150)
+    age_lower: int = Field(..., ge=0, le=150)
+    income_upper: int = Field(..., ge=0)
+    income_lower: int = Field(..., ge=0)
+    is_primary: bool = Field(False)
+    jobs: Optional[List[str]] = Field(None)
+```
+
+**Frontend Conversion:**
+```typescript
+// Direct mapping from schema fields
+export interface ICustomerProfileCreate {
+  name: string;
+  description: string;
+  ageUpper: number;    // age_upper
+  ageLower: number;    // age_lower  
+  incomeUpper: number; // income_upper
+  incomeLower: number; // income_lower
+  isPrimary?: boolean; // is_primary with default
+  jobs?: string[];     // Optional list
+}
+```
+
+### Schema Analysis Checklist
+
+When converting Django Ninja schemas to TypeScript interfaces:
+
+1. **✅ Check Schema Type**:
+   - `ModelSchema` - analyze Meta + model fields + schema overrides
+   - Regular `Schema` - direct field mapping
+
+2. **✅ For ModelSchema, examine Meta configuration**:
+   - `model` - source of base fields
+   - `exclude` - fields to remove from API response
+   - `fields` - if present, only include these fields
+   - `fields_optional` - make fields optional
+
+3. **✅ Look for Schema field overrides**:
+   - Explicit field definitions override model fields
+   - Custom field types or validation
+
+4. **✅ Find resolver methods**:
+   - `@staticmethod def resolve_field_name(obj)` - custom field population
+   - These often add computed or related data
+
+5. **✅ Include model properties**:
+   - `@property` methods in the model may be included
+   - Check if they're referenced in the schema
+
+6. **✅ Handle nested schemas**:
+   - `List[RelatedSchema]` - becomes arrays of related interfaces
+   - Nested object structures
+
+### Conversion Rules:
+1. **Primary Source**: Django Ninja Schema defines the API contract
+2. **Secondary Source**: Django Model provides base field definitions
+3. **Field Naming**: Convert snake_case to camelCase
+4. **Excluded Fields**: Never include fields listed in `exclude`
+5. **Resolver Methods**: Include fields populated by `resolve_*` methods
+6. **Optional Fields**: Use `?` for fields with defaults or marked optional
+7. **Nested Objects**: Convert related schemas to nested interfaces
+
+## 2. Schema to TypeScript Type Conversion
+
+### Django Schema → TypeScript Type
+
+**Backend Example:**
+```python
+# Django Schema
+class CreateCustomerProfileSchema(Schema):
+    name: str = Field(...)
+    description: str = Field(...)
+    age_upper: int = Field(...)
+    age_lower: int = Field(...)
+    jobs: Optional[List[CustomerJobSchema]] = Field(None)
+    is_primary: bool = Field(False)
+
+class CustomerProfileSchema(ModelSchema):
+    jobs: List[CustomerJobSchema]
+    age_range: str  # Computed property
+    
+    class Meta:
+        model = CustomerProfile
+        exclude = ["concept", "conversations"]
+```
+
+**Frontend Conversion:**
+```typescript
+// API Request/Response Types
+export interface ICustomerProfileCreate {
+  name: string;
+  description: string;
+  ageUpper: number;
+  ageLower: number;
+  jobs?: ICustomerJob[];
+  isPrimary?: boolean;
+}
+
+export interface ICustomerProfileResponse {
+  uuid: string;
+  name: string;
+  description: string;
+  ageUpper: number;
+  ageLower: number;
+  jobs: ICustomerJob[];
+  ageRange: string; // From Django property
+  isPrimary: boolean;
+}
+```
+
+## 3. Routes to API Endpoints Conversion
+
+### Django Route → Frontend Endpoint
+
+**Backend Example:**
+```python
+# Django Route
+@router.get("/{concept_uuid}/customer-profile", response=list[CustomerProfileSchema])
+async def get_all(request: HttpRequest, concept_uuid: str):
+    profiles = await CustomerProfileService.aget_all(request, concept_uuid=concept_uuid)
+    return profiles
+
+@router.post("/{concept_uuid}/customer-profile", response=CustomerProfileSchema)
+async def create_customer_profile(request: HttpRequest, concept_uuid: str, data: CreateCustomerProfileSchema):
+    # Implementation...
+    return new_profile
+```
+
+**Frontend Conversion:**
+
+**Step 1: Endpoints (`src/libs/api/endpoints.ts`)**
+```typescript
+export class Endpoints {
+  static conceptCustomerProfiles(conceptUuid: string, version: 'v1' | 'v2' = 'v1') {
+    return `api/${version}/concept/${conceptUuid}/customer-profile`;
+  }
+  
+  static conceptCustomerProfileUuid(customerProfileUuid: string) {
+    return `api/v2/concept/customer-profile/${customerProfileUuid}`;
+  }
+}
+```
+
+**Step 2: API Service (`src/libs/api/concepts.ts`)**
+```typescript
+export class ConceptApi extends ApiService {
+  getConceptCustomerProfiles(uuid: string) {
+    return this.get<IPageResponse<ICustomerProfile>>(
+      endpoints.conceptCustomerProfiles(uuid, 'v2')
+    );
+  }
+
+  createConceptCustomerProfile(conceptUuid: string, data: ICustomerProfileCreate) {
+    return this.post<ICustomerProfile, ICustomerProfileCreate>(
+      endpoints.conceptCustomerProfiles(conceptUuid, 'v2'),
+      data
+    );
+  }
+
+  updateConceptCustomerProfile(customerProfileUuid: string, data: Partial<ICustomerProfile>) {
+    return this.patch<ICustomerProfile, Partial<ICustomerProfile>>(
+      endpoints.conceptCustomerProfileUuid(customerProfileUuid),
+      data
+    );
+  }
+}
+```
+
+**Step 3: React Query Hooks (`src/app/hooks/query/concepts.hook.ts`)**
+```typescript
+export const useConceptCustomerProfiles = (uuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.customerProfiles, uuid],
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
+    queryFn: async () => await api.concept.getConceptCustomerProfiles(uuid),
+    enabled: !!uuid,
+  });
+
+  return { ...query, profiles: query.data?.results || [] };
+};
+
+export const useCustomerProfileCreate = (conceptUuid: string) => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: ICustomerProfileCreate) => 
+      api.concept.createConceptCustomerProfile(conceptUuid, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.customerProfiles, conceptUuid],
+      });
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to create customer profile');
+    },
+  });
+};
+```
+
+## 4. Nested Resource Patterns
+
+### Parent-Child Resource Routing
+
+**Backend Pattern:**
+```python
+# Parent resource: /customer-profile/{uuid}/jobs
+@router.get("/customer-profile/{customer_profile_uuid}/jobs")
+@router.post("/customer-profile/{customer_profile_uuid}/jobs")
+@router.get("/customer-profile/{customer_profile_uuid}/jobs/{uuid}")
+@router.patch("/customer-profile/{customer_profile_uuid}/jobs/{uuid}")
+@router.delete("/customer-profile/{customer_profile_uuid}/jobs/{uuid}")
+```
+
+**Frontend Pattern:**
+```typescript
+// Endpoints
+static customerProfileJobs(customerProfileUuid: string) {
+  return `/api/v2/concept/customer-profile/${customerProfileUuid}/jobs`;
+}
+static customerProfileJob(customerProfileUuid: string, jobUuid: string) {
+  return `/api/v2/concept/customer-profile/${customerProfileUuid}/jobs/${jobUuid}`;
+}
+
+// API Methods
+getCustomerJobs(customerProfileUuid: string) {
+  return this.get<ICustomerJob[]>(
+    endpoints.customerProfileJobs(customerProfileUuid)
+  );
+}
+
+createCustomerJob(customerProfileUuid: string, data: { description: string; order?: number }) {
+  return this.post<ICustomerJob>(
+    endpoints.customerProfileJobs(customerProfileUuid),
+    data
+  );
+}
+
+// Query Keys for nested resources
+export const useCustomerJobsList = (customerProfileUuid: string) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.customerProfile, customerProfileUuid, 'jobs'],
+    queryFn: async () => {
+      if (!customerProfileUuid) return [];
+      return await api.concept.getCustomerJobs(customerProfileUuid);
+    },
+    enabled: !!customerProfileUuid,
+  });
+};
+```
+
+## 5. Service to Hook Conversion
+
+### Django Service → React Query Hook
+
+**Backend Service Pattern:**
+```python
+class CustomerProfileService:
+    @staticmethod
+    async def aget_all(request, concept_uuid: str):
+        # Service logic
+        return profiles
+    
+    @staticmethod 
+    async def aget(request, uuid: str):
+        # Get single profile
+        return profile
+```
+
+**Frontend Hook Pattern:**
+```typescript
+// List Hook
+export const useCustomerProfiles = (conceptUuid: string) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.customerProfiles, conceptUuid],
+    queryFn: async () => await api.concept.getConceptCustomerProfiles(conceptUuid),
+    enabled: !!conceptUuid,
+    staleTime: 1000 * 60 * 2,
+  });
+};
+
+// Single Item Hook
+export const useCustomerProfile = (profileUuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.customerProfile, profileUuid],
+    queryFn: async () => await api.concept.getConceptCustomerProfile(profileUuid),
+    enabled: !!profileUuid,
+  });
+
+  return { ...query, profile: query.data };
+};
+```
+
+## 6. Command Pattern to Mutation Hooks
+
+### Django Command → React Mutation
+
+**Backend Command Pattern:**
+```python
+await dispatcher.dispatch_command(
+    "customer_profile.create",
+    concept_id=concept_id,
+    payload=data,
+    context={"request": request, "user": request.user}
+)
+```
+
+**Frontend Mutation Pattern:**
+```typescript
+export const useCustomerProfileCreate = (conceptUuid: string) => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: async (data: ICustomerProfileCreate) =>
+      api.concept.createConceptCustomerProfile(conceptUuid, data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.customerProfiles, conceptUuid],
+      });
+      toast.success('Customer profile created');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to create customer profile');
+    },
+  });
+};
+```
+
+## 7. Query Key Patterns
+
+### Hierarchical Query Keys
+```typescript
+// Follow Django URL hierarchy in query keys
+export const AucctusQueryKeys = {
+  // Parent resources
+  concepts: 'concepts',
+  customerProfiles: 'customerProfiles',
+  
+  // Single resources
+  concept: 'concept',
+  customerProfile: 'customerProfile',
+  
+  // Nested resources
+  customerJob: 'customerJob',
+  customerPain: 'customerPain',
+} as const;
+
+// Usage patterns:
+[AucctusQueryKeys.customerProfiles, conceptUuid]                    // List
+[AucctusQueryKeys.customerProfile, profileUuid]                     // Single
+[AucctusQueryKeys.customerProfile, profileUuid, 'jobs']             // Nested list
+[AucctusQueryKeys.customerJob, profileUuid, jobUuid]                // Nested single
+```
+
+## 8. Error Handling Patterns
+
+### Backend Error → Frontend Error Handling
+
+**Backend:**
+```python
+raise PermissionDenied(_("Customer profile does not belong to your account."))
+```
+
+**Frontend:**
+```typescript
+onError: (e) => {
+  const message = utils.osiris.parseFormError(e);
+  toast.error(message || 'Default error message');
+}
+```
+
+## 9. Pagination Patterns
+
+### Django Pagination → Frontend Pagination
+
+**Backend:**
+```python
+@paginate(AucctusPageNumberPagination)
+async def get_all(request: HttpRequest, concept_uuid: str):
+    return profiles
+```
+
+**Frontend:**
+```typescript
+export interface IPageResponse<T> {
+  results: T[];
+  count: number;
+  next: string | null;
+  previous: string | null;
+}
+
+// Query with pagination
+export const useCustomerProfiles = (conceptUuid: string, page?: number) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.customerProfiles, conceptUuid, page],
+    queryFn: async () => await api.concept.getConceptCustomerProfiles(conceptUuid, { page }),
+    keepPreviousData: true, // For pagination
+  });
+};
+```
+
+## 10. Validation and Form Handling
+
+### Django Field Validation → Frontend Form Validation
+
+**Backend:**
+```python
+class CreateCustomerProfileSchema(Schema):
+    name: str = Field(..., min_length=1, max_length=255)
+    age_upper: int = Field(..., ge=0, le=150)
+    family_size: int = Field(..., ge=1)
+```
+
+**Frontend:**
+```typescript
+// Zod schema for form validation
+const customerProfileSchema = z.object({
+  name: z.string().min(1).max(255),
+  ageUpper: z.number().min(0).max(150),
+  familySize: z.number().min(1),
+});
+
+type CustomerProfileFormData = z.infer<typeof customerProfileSchema>;
+```
+
+## 11. File Structure Conventions
+
+### Organizing Frontend Files
+
+```
+src/
+├── libs/api/
+│   ├── endpoints.ts           # All API endpoints
+│   ├── concepts.ts            # Concept-related API methods
+│   └── types/
+│       └── concept/
+│           ├── concepts.d.ts  # Main concept interfaces
+│           └── customer_profile.d.ts  # Profile-specific interfaces
+├── app/hooks/query/
+│   ├── concepts.hook.ts       # All concept-related hooks
+│   └── query-keys.ts          # Centralized query keys
+└── components/
+    └── CustomerProfile/       # Component implementations
+```
+
+## 12. Async/Await Patterns
+
+### Django Async → Frontend Async
+
+**Backend:**
+```python
+async def get_profile(request: HttpRequest, uuid: str):
+    instance = await CustomerProfileService.aget(request=request, uuid=uuid)
+    return instance
+```
+
+**Frontend:**
+```typescript
+// API method
+async getConceptCustomerProfile(customerProfileUuid: string): Promise<ICustomerProfile> {
+  return this.get<ICustomerProfile>(
+    endpoints.conceptCustomerProfileUuid(customerProfileUuid)
+  );
+}
+
+// Hook usage
+const { data: profile, isLoading, error } = useCustomerProfile(profileUuid);
+```
+
+## 13. Cache Invalidation Patterns
+
+### Django Signal → Frontend Cache Invalidation
+
+**Backend (Signal/Event handling):**
+```python
+@receiver(post_save, sender=CustomerProfile)
+def invalidate_profile_cache(sender, instance, **kwargs):
+    # Cache invalidation logic
+```
+
+**Frontend (Query invalidation):**
+```typescript
+onSuccess: (_data, variables) => {
+  // Invalidate related queries
+  queryClient.invalidateQueries({
+    queryKey: [AucctusQueryKeys.customerProfiles, variables.conceptUuid],
+  });
+  queryClient.invalidateQueries({
+    queryKey: [AucctusQueryKeys.customerProfile, variables.profileUuid],
+  });
+},
+```
+
+## 14. Testing Patterns
+
+### Backend Test → Frontend Test
+
+**Backend:**
+```python
+async def test_create_customer_profile():
+    response = await client.post(f"/api/v2/concept/{concept_uuid}/customer-profile", data)
+    assert response.status_code == 201
+```
+
+**Frontend:**
+```typescript
+// Mock API response
+const mockProfile: ICustomerProfile = { /* mock data */ };
+
+// Test hook
+const { result } = renderHook(() => useCustomerProfileCreate(conceptUuid), {
+  wrapper: createQueryClientWrapper(),
+});
+
+await act(async () => {
+  result.current.mutate(mockProfileData);
+});
+
+expect(result.current.isSuccess).toBe(true);
+```
+
+## 15. Key Implementation Guidelines
+
+### Always Follow These Rules:
+
+1. **Naming Conventions:**
+   - Convert snake_case (Python) to camelCase (TypeScript)
+   - Maintain semantic meaning across languages
+
+2. **Type Safety:**
+   - Define separate interfaces for Create, Update, and Response schemas
+   - Use Partial<T> for update operations
+   - Make computed fields read-only in interfaces
+
+3. **Query Key Hierarchy:**
+   - Mirror Django URL structure in query keys
+   - Use consistent naming with backend routes
+
+4. **Error Handling:**
+   - Always provide fallback error messages
+   - Use toast notifications for user feedback
+   - Parse Django form errors with utility functions
+
+5. **Cache Management:**
+   - Invalidate parent collections when child items change
+   - Use optimistic updates where appropriate
+   - Set appropriate stale times based on data volatility
+
+6. **Performance:**
+   - Use React Query's `enabled` option to prevent unnecessary requests
+   - Implement proper loading states
+   - Use `keepPreviousData` for pagination
+
+7. **API Versioning:**
+   - Support version parameters in endpoints
+   - Default to latest stable version
+   - Maintain backward compatibility
+
+This comprehensive guide ensures consistent patterns when porting Django backend implementations to React TypeScript frontend code, maintaining the established architecture and conventions of the Aucctus codebase.

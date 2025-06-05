@@ -119,3 +119,112 @@
 .aucctus-fill-success-secondary {
   @apply fill-success-500 dark:fill-success-400;
 }
+
+/* Slider input accent colors */
+.aucctus-slider-primary {
+  @apply accent-gray-light-900 dark:accent-white;
+
+  &::-webkit-slider-thumb {
+    @apply bg-gray-light-900 dark:bg-white;
+  }
+
+  &::-moz-range-thumb {
+    @apply bg-gray-light-900 dark:bg-white;
+  }
+}
+
+.aucctus-slider-secondary {
+  @apply accent-gray-light-700 dark:accent-gray-light-300;
+
+  &::-webkit-slider-thumb {
+    @apply bg-gray-light-700 dark:bg-gray-light-300;
+  }
+
+  &::-moz-range-thumb {
+    @apply bg-gray-light-700 dark:bg-gray-light-300;
+  }
+}
+
+.aucctus-slider-tertiary {
+  @apply accent-gray-light-600 dark:accent-gray-light-400;
+
+  &::-webkit-slider-thumb {
+    @apply bg-gray-light-600 dark:bg-gray-light-400;
+  }
+
+  &::-moz-range-thumb {
+    @apply bg-gray-light-600 dark:bg-gray-light-400;
+  }
+}
+
+.aucctus-slider-brand {
+  @apply accent-primary-600 dark:accent-primary-500;
+
+  &::-webkit-slider-thumb {
+    @apply bg-primary-600 dark:bg-primary-500;
+  }
+
+  &::-moz-range-thumb {
+    @apply bg-primary-600 dark:bg-primary-500;
+  }
+
+  &-alt {
+    @apply accent-primary-600 dark:accent-gray-light-300;
+
+    &::-webkit-slider-thumb {
+      @apply bg-primary-600 dark:bg-gray-light-300;
+    }
+
+    &::-moz-range-thumb {
+      @apply bg-primary-600 dark:bg-gray-light-300;
+    }
+  }
+}
+
+.aucctus-slider-error {
+  @apply accent-error-600 dark:accent-error-500;
+
+  &::-webkit-slider-thumb {
+    @apply bg-error-600 dark:bg-error-500;
+  }
+
+  &::-moz-range-thumb {
+    @apply bg-error-600 dark:bg-error-500;
+  }
+}
+
+.aucctus-slider-warning {
+  @apply accent-warning-600 dark:accent-warning-500;
+
+  &::-webkit-slider-thumb {
+    @apply bg-warning-600 dark:bg-warning-500;
+  }
+
+  &::-moz-range-thumb {
+    @apply bg-warning-600 dark:bg-warning-500;
+  }
+}
+
+.aucctus-slider-success {
+  @apply accent-success-600 dark:accent-success-500;
+
+  &::-webkit-slider-thumb {
+    @apply bg-success-600 dark:bg-success-500;
+  }
+
+  &::-moz-range-thumb {
+    @apply bg-success-600 dark:bg-success-500;
+  }
+}
+
+.aucctus-slider-disabled {
+  @apply accent-gray-light-400 dark:accent-gray-light-500;
+
+  &::-webkit-slider-thumb {
+    @apply bg-gray-light-400 dark:bg-gray-light-500;
+  }
+
+  &::-moz-range-thumb {
+    @apply bg-gray-light-400 dark:bg-gray-light-500;
+  }
+}
