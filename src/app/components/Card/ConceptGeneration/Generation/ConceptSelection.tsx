@@ -24,6 +24,7 @@ import SelectableConcept from './SelectableConcept';
 import SelectedConcept from './SelectedConcept';
 import SelectedConceptFooter from './SelectedConceptFooter';
 import { toast } from '@components';
+import telemetry from '@libs/telemetry';
 
 declare const FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS: boolean;
 
@@ -129,6 +130,9 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
       const newConcepts = (eventConcepts as IGeneratedConcept[]).map(
         (concept) => ({ ...concept, generationOrder: regenerations.current }),
       );
+
+      telemetry.log('websocket.concept.generation.final_concepts', newConcepts);
+
       const existingConcepts = generatedConcepts[draftSeedUuid] || [];
       const uniqueConcepts = new Set([...existingConcepts, ...newConcepts]);
 
@@ -137,6 +141,16 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
       setGeneratedConcepts(draftSeedUuid, Array.from(uniqueConcepts));
       setIsGeneratingMoreConcepts(false);
+
+      telemetry.log(
+        'websocket.concept.generation.state_updated',
+        Array.from(uniqueConcepts),
+      );
+    } else {
+      telemetry.log('websocket.concept.generation.intermediate_stage', {
+        stage: data?.stage,
+        content: data?.content,
+      });
     }
   });
 
@@ -250,8 +264,18 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   }, [handleLeaveAnimation]);
 
   const handleContinue = useCallback(() => {
-    saveGeneratedConcepts(selectedConcepts, {
+    // Get the latest versions of selected concepts from the store
+    const latestSelectedConcepts = selectedConcepts.map((selectedConcept) => {
+      const latestVersion = currentGeneratedConcepts.find(
+        (concept) => concept.uuid === selectedConcept.uuid,
+      );
+      return latestVersion || selectedConcept; // Fallback to original if not found
+    });
+
+    saveGeneratedConcepts(latestSelectedConcepts, {
       onSuccess: async (createdConcepts) => {
+        telemetry.log('save.concepts.response', createdConcepts);
+
         if (FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS) {
           const updatedConcepts =
             await generateClarifyingQuestionsForConcepts(createdConcepts);
@@ -264,6 +288,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     });
   }, [
     selectedConcepts,
+    currentGeneratedConcepts,
     saveGeneratedConcepts,
     generateClarifyingQuestionsForConcepts,
     showSuccessAndNavigate,
