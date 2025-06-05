@@ -43,6 +43,7 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
   React.useEffect(() => {
     setValueProposition(activeConcept.valueProposition);
     setOverview(activeConcept.overview);
+    setProblemStatement(activeConcept.problemStatement);
   }, [activeConcept]);
 
   const { draftSeedUuid } = useConceptIncubationStore();
@@ -51,10 +52,14 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
     activeConcept.valueProposition,
   );
   const [overview, setOverview] = React.useState(activeConcept.overview);
+  const [problemStatement, setProblemStatement] = React.useState(
+    activeConcept.problemStatement,
+  );
 
   const handleSave = () => {
     activeConcept.valueProposition = valueProposition;
     activeConcept.overview = overview;
+    activeConcept.problemStatement = problemStatement;
     updateGeneratedConcept(draftSeedUuid, activeConcept);
   };
 
@@ -81,6 +86,27 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
           }}
         />
       </div>
+
+      <div className='aucctus-text-primary aucctus-text-md-semibold mx-4 mt-4'>
+        Problem Statement
+      </div>
+      <div className='aucctus-text-secondary aucctus-text-sm mx-4 flex flex-row gap-2'>
+        <EditModeSwitcher
+          pClassName='aucctus-text-brand-secondary aucctus-text-sm'
+          textFieldClassName='aucctus-text-brand-secondary aucctus-text-sm'
+          value={problemStatement}
+          label=''
+          name='problemStatement'
+          maxLength={1000}
+          rows={1}
+          onChange={(e) => setProblemStatement(e.target.value)}
+          handleSave={handleSave}
+          handleCancel={() =>
+            setProblemStatement(activeConcept.problemStatement)
+          }
+        />
+      </div>
+
       <div className='aucctus-text-primary aucctus-text-md-semibold mx-4 mt-4'>
         Value Proposition
       </div>

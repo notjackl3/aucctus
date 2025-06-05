@@ -59,6 +59,7 @@ interface IGeneratedConceptBase {
   summary: string;
   overview: string;
   valueProposition: string;
+  problemStatement: string;
 }
 
 export interface IGeneratedConcept extends IGeneratedConceptBase {
@@ -91,7 +92,7 @@ export interface IConcept extends IBaseConceptEntity {
   summary: string;
   overview: string;
   valueProposition: string;
-  problemStatement?: string;
+  problemStatement: string;
   identifier: string;
   reportStatusAggregate: ConceptReportStatus;
   reportStatusBySection: ConceptReportStatusBySection; // Use the new type here
@@ -116,7 +117,7 @@ export interface IConcept extends IBaseConceptEntity {
 export interface IConceptOverview extends IBaseConceptEntity {
   text: string;
   valueProposition: string;
-  problemStatement?: string;
+  problemStatement: string;
 
   // TODO: Remove and use API instead.
   persona?: ICustomerProfile;
