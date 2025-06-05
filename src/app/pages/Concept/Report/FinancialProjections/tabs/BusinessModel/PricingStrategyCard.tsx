@@ -18,7 +18,11 @@ const PricingStrategyCard: React.FC<PricingStrategyCardProps> = ({
   pricingConsiderations,
 }) => {
   const price = pricingData?.price;
-  const unit = (pricingData?.unit ?? 'unit').replace(/per/gi, '/');
+  const unit = (pricingData?.unit ?? 'unit')
+    .replace(/per/gi, '/')
+    .startsWith('/')
+    ? (pricingData?.unit ?? 'unit').replace(/per/gi, '/')
+    : `/${(pricingData?.unit ?? 'unit').replace(/per/gi, '/')}`;
   const currency = pricingData?.currency ?? 'USD';
   const reasoning = pricingData?.reasoning;
 
