@@ -256,6 +256,7 @@ export interface IAssumptionV2 {
   validationPercentage?: number; // 0-100, computed validation progress
   tests?: AssumptionTest[];
   priority?: AssumptionPriority;
+  benchmark?: string; // Validation benchmark for testing
 }
 
 // Color constants for assumption categories - using more subtle, balanced colors

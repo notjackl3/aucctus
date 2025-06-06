@@ -5,6 +5,7 @@ export interface Assumption {
   confidence?: number;
   risk?: 'high' | 'medium' | 'low';
   status?: 'validated' | 'invalidated' | 'untested';
+  benchmark?: string;
 }
 
 export interface Test {

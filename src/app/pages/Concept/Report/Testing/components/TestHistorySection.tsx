@@ -1,6 +1,6 @@
 import { Icon, Container } from '@components';
 import { cn } from '@libs/utils/react';
-import React, { useState, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { Test } from '../types';
 import AssumptionDetailCard from '../../Assumptions/components/cards/AssumptionDetailCard';
 import GenericStatusBadge from '../../Assumptions/components/shared/GenericStatusBadge';
@@ -54,7 +54,6 @@ interface TestHistorySectionProps {
 interface TestHistoryItemProps {
   test: Test;
   isExpanded: boolean;
-  onToggle: () => void;
   conceptUuid?: string;
 }
 
@@ -66,7 +65,6 @@ const TestStatusBadge: React.FC<{ status: string }> = ({ status }) => {
 const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
   test,
   isExpanded,
-  onToggle,
   conceptUuid,
 }) => {
   // Fetch test results to get learnings and recommendations
@@ -156,6 +154,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
           },
         ],
         priority: 'medium',
+        benchmark: assumption.benchmark,
       } as IAssumptionV2;
     });
   }, [test]);
@@ -182,18 +181,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
   return (
     <div className='aucctus-border-secondary aucctus-bg-primary overflow-hidden rounded-xl border shadow-sm'>
       {/* Test Header */}
-      <div
-        className='p-6'
-        role='button'
-        tabIndex={0}
-        onClick={onToggle}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onToggle();
-          }
-        }}
-      >
+      <div className='p-6'>
         <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
           {/* Left Section - Test Info */}
           <div className='flex-1 space-y-3'>
@@ -300,35 +288,23 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
             {/* Action Button */}
             <button
               className={cn(
-                'btn w-full transition-all duration-200',
-                isExpanded
-                  ? 'btn-secondary aucctus-text-brand-primary'
-                  : 'btn-primary',
+                'btn btn-disabled w-full transition-all duration-200',
               )}
               onClick={(e) => {
                 e.stopPropagation();
-                onToggle();
+                // Disabled - no action
               }}
-              aria-expanded={isExpanded}
+              disabled={true}
+              aria-expanded={false}
               aria-controls={`test-details-${test.id}`}
             >
-              {isExpanded ? (
-                <>
-                  <Icon
-                    variant='chevronup'
-                    className='aucctus-stroke-secondary mr-2 h-4 w-4'
-                  />
-                  Hide Details
-                </>
-              ) : (
-                <>
-                  <Icon
-                    variant='chevrondown'
-                    className='aucctus-stroke-white mr-2 h-4 w-4'
-                  />
-                  View Details
-                </>
-              )}
+              <>
+                <Icon
+                  variant='clock'
+                  className='aucctus-stroke-disabled mr-2 h-4 w-4'
+                />
+                Coming Soon
+              </>
             </button>
           </div>
         </div>
@@ -514,6 +490,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
                   <AssumptionDetailCard
                     key={assumption.id}
                     assumption={assumption}
+                    showBenchmark={true}
                   />
                 ))}
               </div>
@@ -529,10 +506,6 @@ const TestHistorySection: React.FC<TestHistorySectionProps> = ({
   tests,
   conceptUuid,
 }) => {
-  const [expandedTests, setExpandedTests] = useState<Record<string, boolean>>(
-    {},
-  );
-
   if (tests.length === 0) {
     return (
       <div className='space-y-4'>
@@ -568,13 +541,6 @@ const TestHistorySection: React.FC<TestHistorySectionProps> = ({
     );
   }
 
-  const toggleTestExpansion = (testId: string) => {
-    setExpandedTests((prev) => ({
-      ...prev,
-      [testId]: !prev[testId],
-    }));
-  };
-
   return (
     <div className='space-y-4'>
       <div className='flex items-center justify-between'>
@@ -597,8 +563,7 @@ const TestHistorySection: React.FC<TestHistorySectionProps> = ({
           <TestHistoryItem
             key={test.id}
             test={test}
-            isExpanded={!!expandedTests[test.id]}
-            onToggle={() => toggleTestExpansion(test.id)}
+            isExpanded={false}
             conceptUuid={conceptUuid}
           />
         ))}

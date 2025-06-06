@@ -1,11 +1,5 @@
 import telemetry from '@libs/telemetry';
-import React, {
-  useState,
-  useEffect,
-  useMemo,
-  createContext,
-  useContext,
-} from 'react';
+import React, { useState, useMemo, createContext, useContext } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import {
   RecommendedTest,
@@ -104,7 +98,6 @@ const Testing: React.FC = () => {
     error: testDetailsError,
   } = useTestDetails(conceptUuid);
 
-  const [isHighlighted, setIsHighlighted] = useState(false);
   const [isCompletingTest, setIsCompletingTest] = useState(false);
 
   // Get the first non-completed test as the "next test" for the Run Test functionality
@@ -127,14 +120,6 @@ const Testing: React.FC = () => {
     }
     return [];
   }, [testDetails]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsHighlighted(true);
-    }, 800);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   // Generate recommended test based on API data
   const getRecommendedTest = (): RecommendedTest | null => {
@@ -280,34 +265,29 @@ const Testing: React.FC = () => {
         {hasNoData ? (
           // No data state
           <div className='space-y-6'>
-            <div
-              className={`transition-all duration-500 ${isHighlighted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-90'}`}
-              aria-live='polite'
-            >
-              <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6 shadow-sm'>
-                <div className='flex flex-col items-center justify-center py-8'>
+            <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6 shadow-sm'>
+              <div className='flex flex-col items-center justify-center py-8'>
+                <Icon
+                  variant='clipboard'
+                  height={48}
+                  width={48}
+                  className='aucctus-stroke-brand-tertiary mb-4'
+                />
+                <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
+                  Ready to start testing?
+                </h3>
+                <p className='aucctus-text-sm-regular aucctus-text-brand-secondary mb-4 max-w-md text-center'>
+                  Testing helps you validate your assumptions and reduce risk.
+                  Create your first test to start gathering valuable insights
+                  from your target audience.
+                </p>
+                <button className='btn btn-primary'>
                   <Icon
-                    variant='clipboard'
-                    height={48}
-                    width={48}
-                    className='aucctus-stroke-brand-tertiary mb-4'
+                    variant='plus'
+                    className='aucctus-stroke-white mr-2 h-4 w-4'
                   />
-                  <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
-                    Ready to start testing?
-                  </h3>
-                  <p className='aucctus-text-sm-regular aucctus-text-brand-secondary mb-4 max-w-md text-center'>
-                    Testing helps you validate your assumptions and reduce risk.
-                    Create your first test to start gathering valuable insights
-                    from your target audience.
-                  </p>
-                  <button className='btn btn-primary'>
-                    <Icon
-                      variant='plus'
-                      className='aucctus-stroke-white mr-2 h-4 w-4'
-                    />
-                    Create Your First Test
-                  </button>
-                </div>
+                  Create Your First Test
+                </button>
               </div>
             </div>
 
@@ -347,14 +327,12 @@ const Testing: React.FC = () => {
           // Data available state
           <>
             {/* Recommended Test Section */}
-            <div
-              className={`transition-all duration-500 ${isHighlighted ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-90'}`}
-              aria-live='polite'
-            >
+            <div>
               <RecommendedTestSection
                 recommendedTest={getRecommendedTest()}
                 onRunTest={handleRunTest}
                 onSelectAssumption={handleSelectAssumption}
+                showBenchmark={true}
               />
             </div>
 

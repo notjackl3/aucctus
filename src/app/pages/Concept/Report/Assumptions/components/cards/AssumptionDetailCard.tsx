@@ -4,17 +4,21 @@ import StatusBadge from '../badges/StatusBadge';
 import RiskBadge from '../badges/RiskBadge';
 import ImportanceMeter from '../badges/ImportanceMeter';
 import CertaintyMeter from '../badges/CertaintyMeter';
+import ValidationBenchmarkCard from '../../../Testing/components/modal-sections/test-impact/components/ValidationBenchmarkCard';
 import { getCategoryColors } from '../../constants/categoryColors';
+import { getCategoryIcon } from '../../utils/assumptionUtils';
 import { IAssumptionV2 } from '@libs/api/types';
 
 interface AssumptionDetailCardProps {
   assumption: IAssumptionV2;
   onClick?: () => void;
+  showBenchmark?: boolean;
 }
 
 const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   assumption,
   onClick,
+  showBenchmark,
 }) => {
   // Get category colors
   const categoryColors = getCategoryColors(assumption.category);
@@ -24,39 +28,16 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   const certaintyPercentage = Math.round(assumption.certainty * 100);
   const importancePercentage = Math.round(assumption.importance * 100);
 
-  // Helper to get category icon
-  const getCategoryIcon = (): React.ReactNode => {
-    switch (assumption.category) {
-      case 'desirability':
-        return (
-          <Icon
-            variant='heart'
-            className={`${categoryColors.stroke} h-5 w-5`}
-          />
-        );
-      case 'viability':
-        return (
-          <Icon
-            variant='currency-dollar'
-            className={`${categoryColors.stroke} h-5 w-5`}
-          />
-        );
-      case 'feasibility':
-        return (
-          <Icon variant='gear' className={`${categoryColors.stroke} h-5 w-5`} />
-        );
-      case 'adaptability':
-        return (
-          <Icon
-            variant='refresh'
-            className={`${categoryColors.stroke} h-5 w-5`}
-          />
-        );
-      default:
-        return null;
-    }
+  // Helper to render category icon using utility function
+  const renderCategoryIcon = (): React.ReactNode => {
+    const iconVariant = getCategoryIcon(assumption.category);
+    return (
+      <Icon
+        variant={iconVariant as any}
+        className={`${categoryColors.stroke} h-5 w-5`}
+      />
+    );
   };
-
   return (
     <div
       className='aucctus-bg-primary hover:aucctus-bg-primary-hover aucctus-border-secondary cursor-pointer rounded-lg border p-5 transition-colors'
@@ -65,7 +46,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
       {/* Assumption header */}
       <div className='mb-3 flex flex-wrap items-start justify-between gap-2'>
         <div className='flex items-center'>
-          {getCategoryIcon()}
+          {renderCategoryIcon()}
           <span className='aucctus-text-sm-medium ml-2 capitalize'>
             {assumption.category}
           </span>
@@ -82,10 +63,14 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
       </p>
 
       {/* Meters */}
-      <div className='mt-3 flex flex-wrap gap-2'>
+      <div className='mb-4 mt-3 flex flex-wrap gap-2'>
         <ImportanceMeter importance={importancePercentage} />
         <CertaintyMeter certainty={certaintyPercentage} />
       </div>
+
+      {showBenchmark && assumption.benchmark && (
+        <ValidationBenchmarkCard benchmark={assumption.benchmark} />
+      )}
     </div>
   );
 };

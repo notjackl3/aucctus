@@ -21,7 +21,7 @@ import TestParticipants from './modal-sections/TestParticipants';
 import TestCollateral from './modal-sections/TestCollateral';
 import TestExecution from './modal-sections/TestExecution';
 import TestResults from './modal-sections/TestResults';
-import TestImpact from './modal-sections/TestImpact';
+import TestImpact from './modal-sections/test-impact/TestImpact';
 
 interface TestExecutionModalProps {
   assumptions?: Assumption[];

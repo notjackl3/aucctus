@@ -1,33 +1,27 @@
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Assumption, RecommendedTest } from '../types';
 import { RISK_LEVEL_CONFIGS } from '../../Assumptions/constants/statusConfigs';
 import CategoryIcon from '../../Assumptions/components/cards/category-progress-card/CategoryIcon';
 import GenericStatusBadge from '../../Assumptions/components/shared/GenericStatusBadge';
+import ValidationBenchmarkCard from './modal-sections/test-impact/components/ValidationBenchmarkCard';
 import { useTestCompletion } from '../Testing';
 
 interface RecommendedTestSectionProps {
   recommendedTest: RecommendedTest | null;
   onRunTest: () => void;
   onSelectAssumption: (assumption: Assumption) => void;
+  showBenchmark?: boolean;
 }
 
 const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   recommendedTest,
   onRunTest,
   onSelectAssumption,
+  showBenchmark = false,
 }) => {
-  const [isHighlighted, setIsHighlighted] = useState(false);
   const { isCompletingTest } = useTestCompletion();
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsHighlighted(true);
-    }, 800);
-
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSelectAssumption = (assumption: Assumption) => {
     if (assumption && assumption.id) {
@@ -39,10 +33,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
     return (
       <div
         className={cn(
-          'aucctus-bg-primary aucctus-border-secondary relative rounded-lg border p-6 shadow-sm transition-all duration-500',
-          isHighlighted
-            ? 'translate-y-0 opacity-100'
-            : 'translate-y-4 opacity-90',
+          'aucctus-bg-primary aucctus-border-secondary relative rounded-lg border p-6 shadow-sm',
           isCompletingTest && 'pointer-events-none',
         )}
       >
@@ -82,10 +73,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
     <div className='space-y-3'>
       <div
         className={cn(
-          'aucctus-bg-primary aucctus-border-secondary relative rounded-lg border border-l-4 border-l-[#5D4037] p-5 shadow-sm transition-all duration-500',
-          isHighlighted
-            ? 'translate-y-0 opacity-100'
-            : 'translate-y-4 opacity-90',
+          'aucctus-bg-primary aucctus-border-secondary relative rounded-lg border border-l-4 border-l-[#5D4037] p-5 shadow-sm',
           isCompletingTest && 'pointer-events-none',
         )}
       >
@@ -116,14 +104,24 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
           {/* Run Test Button */}
           <button
             onClick={onRunTest}
-            className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+            className={cn(
+              'btn btn-primary flex items-center gap-1',
+              isCompletingTest && 'cursor-not-allowed opacity-50',
+            )}
             disabled={isCompletingTest}
           >
-            Run Test
-            <Icon
-              variant='chevronright'
-              className='aucctus-stroke-brand-primary h-3.5 w-3.5'
-            />
+            {isCompletingTest ? (
+              <Icon
+                variant='refresh'
+                className='aucctus-stroke-white h-4 w-4 animate-spin'
+              />
+            ) : (
+              <Icon
+                variant='arrowright'
+                className='aucctus-stroke-white h-4 w-4'
+              />
+            )}
+            {isCompletingTest ? 'Running...' : 'Run Test'}
           </button>
         </div>
 
@@ -179,6 +177,11 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                   <p className='aucctus-text-md-medium aucctus-text-brand-primary'>
                     {assumption.description}
                   </p>
+
+                  {/* Benchmark Section */}
+                  {showBenchmark && assumption.benchmark && (
+                    <ValidationBenchmarkCard benchmark={assumption.benchmark} />
+                  )}
                 </li>
               );
             })}

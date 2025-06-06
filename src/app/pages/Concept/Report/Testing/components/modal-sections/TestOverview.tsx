@@ -36,19 +36,41 @@ const TestOverview: React.FC<TestOverviewProps> = ({
     ? `${testName}`
     : testName;
 
-  // Convert API assumptions from testDetail to component format
-  const convertApiAssumptions = (apiAssumptions: any[]): Assumption[] => {
-    return apiAssumptions.map((assumption) => ({
-      id: assumption.uuid,
-      description: assumption.statement,
-      category: assumption.category,
-      confidence: Math.round(assumption.certainty * 100), // Convert 0-1 to 0-100
-      risk: assumption.riskCategory as 'high' | 'medium' | 'low',
-      status: 'untested' as const,
-    }));
+  // Convert API assumptions directly to IAssumptionV2 format (skip intermediate Assumption format)
+  const convertApiToAssumptionCard = (apiAssumption: any): IAssumptionV2 => {
+    return {
+      uuid: apiAssumption.uuid,
+      id: apiAssumption.uuid, // Alias for backward compatibility
+      statement: apiAssumption.statement,
+      category: apiAssumption.category as AssumptionCategory,
+      risk: apiAssumption.riskScore || 0.5, // Use riskScore from API or default
+      certainty: apiAssumption.certainty, // Already in 0-1 range
+      importance: apiAssumption.importance, // Already in 0-1 range
+      certaintyCategory: (apiAssumption.riskLevel as RiskCategory) || 'medium',
+      importanceCategory: 'high' as RiskCategory, // Default based on importance value
+      riskCategory: (apiAssumption.riskLevel as RiskCategory) || 'medium',
+      metadata: {},
+      createdAt: apiAssumption.createdAt || new Date().toISOString(),
+      lastModified: apiAssumption.updatedAt || new Date().toISOString(),
+
+      // Computed display fields
+      status: (apiAssumption.validationType === 'validated'
+        ? 'validated'
+        : apiAssumption.validationType === 'invalidated'
+          ? 'invalidated'
+          : apiAssumption.validationType === 'partiallyValidated'
+            ? 'partially_validated'
+            : 'untested') as AssumptionStatusV2,
+      confidence: apiAssumption.certainty, // Alias for certainty
+      impactPoints: Math.round(apiAssumption.importance * 10), // Convert 0-1 to 0-10
+      validationPercentage: 0, // Will be updated based on test results
+      tests: [], // Empty tests array for now
+      priority: 'medium',
+      benchmark: apiAssumption.benchmark, // Include benchmark from API
+    };
   };
 
-  // Convert Testing assumptions to Assumption card format
+  // Convert Testing assumptions to Assumption card format (for props fallback)
   const convertToAssumptionCard = (assumption: Assumption): IAssumptionV2 => {
     // Map risk from string to number
     const riskValue = (() => {
@@ -87,18 +109,19 @@ const TestOverview: React.FC<TestOverviewProps> = ({
       validationPercentage: 0, // Will be updated based on test results
       tests: [], // Empty tests array for now
       priority: 'medium',
+      benchmark: assumption.benchmark, // Include benchmark from original assumption
     };
   };
 
-  // Determine which assumptions to display - use testDetail.assumptions first
-  const getDisplayAssumptions = (): Assumption[] => {
+  // Determine which assumptions to display - convert directly to IAssumptionV2
+  const getDisplayAssumptions = (): IAssumptionV2[] => {
     // Use assumptions from testDetail if available
     if (testDetail?.assumptions && testDetail.assumptions.length > 0) {
-      return convertApiAssumptions(testDetail.assumptions);
+      return testDetail.assumptions.map(convertApiToAssumptionCard);
     }
-    // Fallback to props assumptions
+    // Fallback to props assumptions - convert them to IAssumptionV2 format
     if (assumptions.length > 0) {
-      return assumptions;
+      return assumptions.map(convertToAssumptionCard);
     }
     return [];
   };
@@ -185,8 +208,9 @@ const TestOverview: React.FC<TestOverviewProps> = ({
           <div className='space-y-3'>
             {displayAssumptions.map((assumption) => (
               <AssumptionDetailCard
-                key={assumption.id || assumption.description}
-                assumption={convertToAssumptionCard(assumption)}
+                key={assumption.uuid || assumption.statement}
+                assumption={assumption}
+                showBenchmark={true}
               />
             ))}
           </div>
