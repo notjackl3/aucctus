@@ -32,7 +32,13 @@ export enum AucctusQueryKeys {
   customerProfileConversationSearch = 'customerProfileConversationSearch',
   customerProfileRealWorldSignals = 'customerProfileRealWorldSignals',
   customerProfileRealWorldSignal = 'customerProfileRealWorldSignal',
-
+  /* Testing */
+  testDetails = 'testDetails',
+  testDetail = 'testDetail',
+  testCollateral = 'testCollateral',
+  testParticipants = 'testParticipants',
+  testResults = 'testResults',
+  testAssumptions = 'testAssumptions',
   /* Financial Projection V2 */
   financialProjectionV2 = 'financialProjectionV2',
   pricingV2 = 'pricingV2',

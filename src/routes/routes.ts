@@ -6,6 +6,7 @@ export enum ConceptPath {
   CustomerProfile = 'customer-profile',
   Assumptions = 'assumptions',
   Settings = 'settings',
+  Testing = 'testing',
 }
 
 export enum AppPath {
@@ -25,6 +26,7 @@ export enum AppPath {
   ConceptKeyAssumptions = `/concept/:id/${ConceptPath.Assumptions}`,
   ConceptMarketScan = `/concept/:id/${ConceptPath.MarketScan}`,
   ConceptSettings = `/concept/:id/${ConceptPath.Settings}`,
+  ConceptTesting = `/concept/:id/${ConceptPath.Testing}`,
 
   /* Challenges */
   ChallengeCenter = '/challenge',

@@ -13,6 +13,7 @@ import { FinancialProjectionApi } from './financial_projection';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { SeedApi } from './seed';
+import { TestingApi } from './testing';
 import { ITokenResponse } from './types';
 
 export interface IApiConfig {
@@ -44,6 +45,7 @@ export class Api {
   conceptIncubate!: IncubateConceptApi;
   aucctusSocket!: SocketService;
   article!: ArticleApi;
+  testing!: TestingApi;
   financialProjection!: FinancialProjectionApi;
 
   constructor(apiConfig: IApiConfig) {
@@ -73,6 +75,7 @@ export class Api {
       { key: 'conceptIncubate', class: IncubateConceptApi },
       { key: 'article', class: ArticleApi },
       { key: 'seed', class: SeedApi },
+      { key: 'testing', class: TestingApi },
       { key: 'financialProjection', class: FinancialProjectionApi },
     ];
 
@@ -108,6 +111,7 @@ export class Api {
       this.assumption,
       this.marketScan,
       this.seed,
+      this.testing,
       this.financialProjection,
     ].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });

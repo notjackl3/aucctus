@@ -2,14 +2,30 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
-  IAssumption,
+  IAssumptionV1,
+  IAssumptionV2,
   IAssumptionCreate,
   IAssumptionTestDetails,
   IAssumptionTestStatus,
   IConceptTestDetails,
   IPageResponse,
   ITestStep,
+  AssumptionCategory,
 } from './types'; // Import the missing type
+
+// Define the category metrics structure for V2 API response
+interface CategoryMetric {
+  category: AssumptionCategory;
+  count: number;
+  cumulativeCertainty: number;
+  cumulativeImportance: number;
+  averageRisk: number;
+}
+
+// Extended response interface for V2 API
+interface IAssumptionsV2PageResponse extends IPageResponse<IAssumptionV2> {
+  categoryMetrics?: Record<AssumptionCategory, CategoryMetric>;
+}
 
 export class AssumptionsApi extends ApiService {
   protected _excludeAllFromRefresh: boolean = false;
@@ -21,28 +37,38 @@ export class AssumptionsApi extends ApiService {
     this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
+  // TODO: DEPRECATE - V1 API method. Remove once all components use getAllFiltered (V2)
   getAll(conceptUuid: string) {
-    return this.get<IPageResponse<IAssumption>>(
+    return this.get<IPageResponse<IAssumptionV1>>(
       endpoints.conceptKeyAssumptions(conceptUuid),
     );
   }
 
-  update(uuid: string, data: Partial<IAssumption>) {
-    return this.patch<IAssumption, Partial<IAssumption>>(
+  getAllFiltered(rootIdentifier: string, filters?: Record<string, any>) {
+    return this.get<IAssumptionsV2PageResponse>(
+      endpoints.conceptKeyAssumptionsFiltered(rootIdentifier, filters),
+    );
+  }
+
+  // TODO: DEPRECATE - V1 API method. Remove once assumption editing migrates to V2
+  update(uuid: string, data: Partial<IAssumptionV1>) {
+    return this.patch<IAssumptionV1, Partial<IAssumptionV1>>(
       endpoints.conceptKeyAssumption(uuid),
       data,
     );
   }
 
+  // TODO: DEPRECATE - V1 API method. Remove once assumption creation migrates to V2
   create(conceptUuid: string, data: IAssumptionCreate) {
-    return this.post<IAssumption, IAssumptionCreate>(
+    return this.post<IAssumptionV1, IAssumptionCreate>(
       endpoints.conceptKeyAssumptions(conceptUuid),
       data,
     );
   }
 
+  // TODO: DEPRECATE - V1 API method. Remove once assumption deletion migrates to V2
   deleteAssumption(assumptionUuid: string) {
-    return this.delete<IAssumption>(
+    return this.delete<IAssumptionV1>(
       endpoints.conceptKeyAssumption(assumptionUuid),
     );
   }

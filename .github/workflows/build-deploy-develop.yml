@@ -16,6 +16,7 @@ env:
   FEATURE_CONCEPT_CLARIFYING_QUESTIONS: false
   FEATURE_FINANCIAL_PROJECTIONS_V2: false
   FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS: false
+  FEATURE_ASSUMPTIONS_V2: true
 jobs:
   build_and_deploy_job:
     runs-on: ubuntu-latest

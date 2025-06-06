@@ -11,6 +11,7 @@ import AiEditing from './AiEditingModal/AiEditingModal';
 import TestModal from './TestModal/TestModal';
 import JourneyStep from './JourneyStepModal';
 import EditRealWorldSignal from './CustomerProfile/EditRealWorldSignal/EditRealWorldSignal';
+import TestExecutionModal from '../../pages/Concept/Report/Testing/components/TestExecutionModal';
 
 const Modal = {
   Base,
@@ -26,6 +27,7 @@ const Modal = {
   TestModal,
   JourneyStep,
   EditRealWorldSignal,
+  TestExecutionModal,
 };
 
 export default Modal;

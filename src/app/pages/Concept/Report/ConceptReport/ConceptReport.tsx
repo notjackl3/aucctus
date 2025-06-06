@@ -2,11 +2,11 @@ import { Container, Icon, Loading, Modal, Select } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import {
+  useCancelConceptVersionRevert,
+  useCommitConceptVersionRevert,
   useConcept,
   useConceptUpdate,
   useTrackConceptView,
-  useCommitConceptVersionRevert,
-  useCancelConceptVersionRevert,
 } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
 import api from '@libs/api';
@@ -14,7 +14,7 @@ import {
   downloadPdf,
   generateConceptSnapshotFileName,
 } from '@libs/utils/files';
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
@@ -37,18 +37,25 @@ export interface IConceptReportContext {
 type TabTitles =
   | 'Overview'
   | 'Market Scan'
-  | 'Market Scan V2'
   | 'Financial Projection'
   | 'Customer Profile'
   | 'Key Assumptions'
-  | 'Context';
+  | 'Context'
+  | 'Testing';
+
+// Declare feature flag
+declare const FEATURE_ASSUMPTIONS_V2: boolean;
+
 const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
   { label: 'Overview', value: AppPath.ConceptOverview },
   { label: 'Market Scan', value: AppPath.ConceptMarketScan },
   { label: 'Financial Projection', value: AppPath.ConceptFinancialProjection },
   { label: 'Customer Profile', value: AppPath.ConceptCustomerProfile },
   { label: 'Key Assumptions', value: AppPath.ConceptKeyAssumptions },
-  { label: 'Context', value: AppPath.ConceptSettings },
+  ...(FEATURE_ASSUMPTIONS_V2
+    ? [{ label: 'Testing' as TabTitles, value: AppPath.ConceptTesting }]
+    : []),
+  { label: 'Context' as TabTitles, value: AppPath.ConceptSettings },
 ];
 
 const ConceptReport: FunctionComponent = () => {

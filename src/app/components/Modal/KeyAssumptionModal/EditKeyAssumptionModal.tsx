@@ -1,10 +1,13 @@
+// TODO: DEPRECATE - This modal component uses IAssumptionV1 format.
+// Remove once assumption editing migrates to V2 format and new modal design.
+
 import { FunctionComponent } from 'react';
-import { IAssumption } from '../../../../libs/api/types';
+import { IAssumptionV1 } from '../../../../libs/api/types';
 
 import styles from './edit-key-assumption.module.scss';
 
 interface IEditKeyAssumptionModalProps {
-  assumption: IAssumption;
+  assumption: IAssumptionV1;
 }
 
 const EditKeyAssumptionModal: FunctionComponent<

@@ -5,6 +5,7 @@ import Button from './Button';
 import Card from './Card';
 import Chart from './Charts';
 import Container from './Container';
+import FileDropzone from './FileDropzone';
 import Header from './Header';
 import Icon from './Icon';
 import Input from './Input';
@@ -33,6 +34,7 @@ export {
   Chart,
   ComponentTooltip,
   Container,
+  FileDropzone,
   Header,
   Icon,
   Input,

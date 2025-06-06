@@ -1,0 +1,55 @@
+import React from 'react';
+import AssumptionsTable from './AssumptionsTable';
+import { useOutletContext } from 'react-router-dom';
+import { IConceptReportContext } from '../ConceptReport/ConceptReport';
+import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
+import { Loading } from '@components';
+import { AssumptionCategory } from '@libs/api/types';
+
+const AssumptionsV2: React.FC = () => {
+  const { concept } = useOutletContext<IConceptReportContext>();
+  const [selectedCategory, setSelectedCategory] =
+    React.useState<AssumptionCategory>('desirability');
+
+  const filters = React.useMemo(
+    () => ({
+      category: selectedCategory,
+      page: 1,
+      page_size: 20,
+    }),
+    [selectedCategory],
+  );
+
+  const { isLoading, assumptions, categoryMetrics } = useFilteredAssumptions(
+    concept.identifier,
+    filters,
+  );
+
+  const handleCategoryChange = (category: AssumptionCategory) => {
+    setSelectedCategory(category);
+  };
+
+  if (isLoading) {
+    return (
+      <div className='flex h-full w-full flex-col gap-6'>
+        <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
+          <Loading />
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className='space-y-6'>
+      <AssumptionsTable
+        assumptions={assumptions}
+        categoryMetrics={categoryMetrics}
+        selectedCategory={selectedCategory}
+        onCategoryChange={handleCategoryChange}
+        isLoading={isLoading}
+      />
+    </div>
+  );
+};
+
+export default AssumptionsV2;

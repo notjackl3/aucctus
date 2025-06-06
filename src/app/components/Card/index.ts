@@ -1,4 +1,5 @@
 import AiConclusionBox from './AiConclusionBox';
+import AiInsightCard from './AiInsightCard';
 import AssumptionOverview from './AssumptionOverview';
 import IntroducingAucctusCard from './ConceptGeneration/AiExploration/IntroducingAucctusCard';
 import AiExplorationsCard from './ConceptGeneration/AiExplorationsCard';
@@ -30,6 +31,7 @@ const Card = {
   AssumptionOverview,
   Testing,
   AiConclusionBox,
+  AiInsightCard,
   InsightCard,
   AiExplorationsCard,
   UserExplorationCard,

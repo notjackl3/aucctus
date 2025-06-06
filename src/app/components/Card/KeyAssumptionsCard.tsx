@@ -1,9 +1,12 @@
+// TODO: DEPRECATE - This component uses IAssumptionV1 format.
+// Remove once all assumption displays migrate to V2 format.
+
 import { Badge, Card, Icon } from '@components';
-import { IAssumption } from '@libs/api/types';
+import { IAssumptionV1 } from '@libs/api/types';
 import React from 'react';
 
 interface IKeyAssumptionsCardProps {
-  assumptions: IAssumption[] | undefined;
+  assumptions: IAssumptionV1[] | undefined;
   onViewClick: React.MouseEventHandler<HTMLButtonElement> | undefined;
 }
 
