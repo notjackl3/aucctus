@@ -13,37 +13,6 @@ interface CostDriversSectionProps {
   costDrivers?: ICostDriverV2[];
 }
 
-const defaultCostDrivers: CostDriver[] = [
-  {
-    name: 'Ingredients & Raw Materials',
-    percentage: 42,
-    description: 'Dairy products and packaging materials',
-    mitigation:
-      'Consider forward contracts with suppliers to lock in prices and invest in packaging optimization to reduce material usage.',
-  },
-  {
-    name: 'Manufacturing',
-    percentage: 25,
-    description: 'Production line operations and processing',
-    mitigation:
-      'Focus on lean manufacturing principles and consider automation for repetitive tasks to increase production efficiency.',
-  },
-  {
-    name: 'Distribution & Logistics',
-    percentage: 18,
-    description: 'Transportation and warehousing',
-    mitigation:
-      'Optimize transportation routes and consider consolidating shipments when possible to reduce logistics costs.',
-  },
-  {
-    name: 'Marketing & Sales',
-    percentage: 15,
-    description: 'Trade promotions and retail partnerships',
-    mitigation:
-      'Track ROI on marketing spend closely and focus on high-performing channels and retailer relationships.',
-  },
-];
-
 const CostDriversSection: React.FC<CostDriversSectionProps> = ({
   costDrivers,
 }) => {
@@ -54,7 +23,7 @@ const CostDriversSection: React.FC<CostDriversSectionProps> = ({
       percentage: driver.costPercentageEstimate,
       description: driver.description,
       mitigation: driver.mitigationStatement,
-    })) ?? defaultCostDrivers;
+    })) ?? [];
 
   return (
     <div className='aucctus-bg-primary rounded-lg p-6 shadow-md'>

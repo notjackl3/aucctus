@@ -121,10 +121,7 @@ export interface ICostDriverV2 extends IBaseFinancialProjectionEntity {
   description: string;
   costPercentageEstimate: number;
   mitigationStatement: string;
-  costDriverSources: ICostDriverSourceV2[];
 }
-
-export interface ICostDriverSourceV2 extends IBaseFinancialProjectionSourceV2 {}
 
 export interface ICreateCostDriverV2 {
   title: string;
@@ -145,11 +142,7 @@ export interface IDistributionChannelV2 extends IBaseFinancialProjectionEntity {
   channelType: string;
   title: string;
   description: string;
-  distributionChannelSources: IDistributionChannelSourceV2[];
 }
-
-export interface IDistributionChannelSourceV2
-  extends IBaseFinancialProjectionSourceV2 {}
 
 export interface ICreateDistributionChannelV2 {
   channelType: string;
