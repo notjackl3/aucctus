@@ -1,21 +1,16 @@
 import React from 'react';
 import { Icon, ComponentTooltip } from '@components';
-import { IPricingV2 } from '@libs/api/types/concept/financialProjectionV2';
-
-interface PricingConsideration {
-  title: string;
-  description?: string;
-  icon: string;
-}
+import {
+  IPricingV2,
+  IPricingConsiderationV2,
+} from '@libs/api/types/concept/financialProjectionV2';
 
 interface PricingStrategyCardProps {
   pricingData?: IPricingV2;
-  pricingConsiderations?: PricingConsideration[];
 }
 
 const PricingStrategyCard: React.FC<PricingStrategyCardProps> = ({
   pricingData,
-  pricingConsiderations,
 }) => {
   const price = pricingData?.price;
   const unit = (pricingData?.unit ?? 'unit')
@@ -26,15 +21,9 @@ const PricingStrategyCard: React.FC<PricingStrategyCardProps> = ({
   const currency = pricingData?.currency ?? 'USD';
   const reasoning = pricingData?.reasoning;
 
-  const considerations =
-    pricingData?.additionalConsiderations?.map((consideration) => ({
-      title: consideration,
-      icon: 'clipboard' as const,
-    })) ?? pricingConsiderations;
-
   return (
     <div className='aucctus-bg-primary aucctus-border-primary rounded-lg border p-6 shadow-sm'>
-      <h3 className='aucctus-text-lg-medium aucctus-text-tertiary mb-4'>
+      <h3 className='aucctus-text-sm-medium aucctus-text-tertiary mb-2'>
         Pricing Strategy
       </h3>
       <div className='mb-4 flex items-center gap-1'>
@@ -64,24 +53,26 @@ const PricingStrategyCard: React.FC<PricingStrategyCardProps> = ({
       <h4 className='aucctus-text-xs aucctus-text-tertiary mb-2'>
         Additional Considerations
       </h4>
-      {considerations && (
+      {pricingData?.additionalConsiderations && (
         <div className='space-y-3'>
-          {considerations.map((consideration, index) => (
-            <div
-              key={index}
-              className='aucctus-border-secondary flex items-center gap-2 rounded-md border p-3'
-            >
-              <div className='aucctus-bg-brand-secondary-hover flex h-6 w-6 items-center justify-center rounded-full'>
-                <Icon
-                  variant={consideration.icon as any}
-                  className='aucctus-stroke-brand-primary h-6 w-6 p-1'
-                />
+          {pricingData.additionalConsiderations.map(
+            (consideration: IPricingConsiderationV2, index) => (
+              <div
+                key={index}
+                className='aucctus-border-secondary flex items-center gap-2 rounded-md border p-3'
+              >
+                <div className='aucctus-bg-secondary aucctus-border-secondary flex items-center justify-center rounded-full border border-opacity-50'>
+                  <Icon
+                    variant={consideration.icon as any}
+                    className='aucctus-stroke-brand-primary h-7 w-7 p-[0.3rem]'
+                  />
+                </div>
+                <span className='aucctus-text-sm aucctus-text-secondary'>
+                  {consideration.consideration}
+                </span>
               </div>
-              <span className='aucctus-text-sm aucctus-text-secondary'>
-                {consideration.title}
-              </span>
-            </div>
-          ))}
+            ),
+          )}
         </div>
       )}
     </div>

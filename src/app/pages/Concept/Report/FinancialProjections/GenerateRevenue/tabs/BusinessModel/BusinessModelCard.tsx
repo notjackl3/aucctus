@@ -57,7 +57,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
   return (
     <div className='aucctus-bg-primary aucctus-border-primary rounded-lg border p-6 shadow-sm'>
       <span className='flex flex-1 flex-row items-center gap-2'>
-        <h3 className='aucctus-text-lg-medium aucctus-text-tertiary mb-4'>
+        <h3 className='aucctus-text-sm-medium aucctus-text-tertiary mb-2'>
           Business Model
         </h3>
         <span className='flex flex-1' />

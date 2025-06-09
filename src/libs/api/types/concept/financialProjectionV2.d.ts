@@ -18,12 +18,18 @@ export interface IBaseFinancialProjectionSourceV2 {
 // =============================================================================
 
 // Pricing types
+export interface IPricingConsiderationV2 {
+  uuid: string;
+  consideration: string;
+  icon: string;
+}
+
 export interface IPricingV2 extends IBaseFinancialProjectionEntity {
   price: number;
   currency?: string;
   unit: string;
   reasoning: string;
-  additionalConsiderations: string[];
+  additionalConsiderations: IPricingConsiderationV2[];
   pricingSources: IPricingSourceV2[];
 }
 
@@ -34,7 +40,7 @@ export interface ICreatePricingV2 {
   currency?: string;
   unit: string;
   reasoning: string;
-  additionalConsiderations?: string[];
+  additionalConsiderations?: IPricingConsiderationV2[];
 }
 
 export interface IPatchPricingV2 {
@@ -42,7 +48,7 @@ export interface IPatchPricingV2 {
   currency?: string;
   unit?: string;
   reasoning?: string;
-  additionalConsiderations?: string[];
+  additionalConsiderations?: IPricingConsiderationV2[];
 }
 
 // Business Model types
@@ -125,6 +131,7 @@ export interface ICostDriverV2 extends IBaseFinancialProjectionEntity {
   description: string;
   costPercentageEstimate: number;
   mitigationStatement: string;
+  icon?: IconVariant;
 }
 
 export interface ICreateCostDriverV2 {
@@ -132,6 +139,7 @@ export interface ICreateCostDriverV2 {
   description: string;
   costPercentageEstimate: number;
   mitigationStatement: string;
+  icon?: IconVariant;
 }
 
 export interface IPatchCostDriverV2 {
@@ -139,6 +147,7 @@ export interface IPatchCostDriverV2 {
   description?: string;
   costPercentageEstimate?: number;
   mitigationStatement?: string;
+  icon?: IconVariant;
 }
 
 // Distribution Channel types
@@ -171,6 +180,13 @@ export interface ISavingsSourceV2 extends IBaseFinancialProjectionEntity {
   reasoning: string;
 }
 
+// Savings Assumption types
+export interface ISavingsAssumptionV2 {
+  uuid: string;
+  assumption: string;
+  icon: string;
+}
+
 // Savings types
 export interface ISavingsV2 extends IBaseFinancialProjectionEntity {
   financialProjection: string; // UUID reference
@@ -178,7 +194,7 @@ export interface ISavingsV2 extends IBaseFinancialProjectionEntity {
   currency?: string;
   unit: string;
   reasoning: string;
-  savingsAssumptions: string[];
+  savingsAssumptions: ISavingsAssumptionV2[];
   savingsSources: ISavingsSourceV2[];
 }
 
@@ -187,7 +203,7 @@ export interface ICreateSavingsV2 {
   currency?: string;
   unit: string;
   reasoning: string;
-  savingsAssumptions?: string[];
+  savingsAssumptions?: ISavingsAssumptionV2[];
 }
 
 export interface IPatchSavingsV2 {
@@ -195,7 +211,7 @@ export interface IPatchSavingsV2 {
   currency?: string;
   unit?: string;
   reasoning?: string;
-  savingsAssumptions?: string[];
+  savingsAssumptions?: ISavingsAssumptionV2[];
 }
 
 // Target Savings Area types
@@ -240,6 +256,7 @@ export interface ICostInterferenceV2 extends IBaseFinancialProjectionEntity {
   title: string;
   interferenceInsight: string;
   mitigationStatement: string;
+  icon?: IconVariant;
 }
 
 export interface ICreateCostInterferenceV2 {
@@ -247,6 +264,7 @@ export interface ICreateCostInterferenceV2 {
   description: string;
   interferenceInsight: string;
   mitigationStatement: string;
+  icon?: IconVariant;
 }
 
 export interface IPatchCostInterferenceV2 {
@@ -254,6 +272,7 @@ export interface IPatchCostInterferenceV2 {
   description?: string;
   interferenceInsight?: string;
   mitigationStatement?: string;
+  icon?: IconVariant;
 }
 
 // Impact Sizing types

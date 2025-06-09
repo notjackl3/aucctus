@@ -1,22 +1,15 @@
 import React from 'react';
 import { Icon, ComponentTooltip } from '@components';
-import { ISavingsV2 } from '@libs/api/types/concept/financialProjectionV2';
-
-interface SavingsConsideration {
-  title: string;
-  description?: string;
-  icon: string;
-}
+import {
+  ISavingsAssumptionV2,
+  ISavingsV2,
+} from '@libs/api/types/concept/financialProjectionV2';
 
 interface SavingsModelCardProps {
   savingsData?: ISavingsV2;
-  savingsConsiderations?: SavingsConsideration[];
 }
 
-const SavingsModelCard: React.FC<SavingsModelCardProps> = ({
-  savingsData,
-  savingsConsiderations,
-}) => {
+const SavingsModelCard: React.FC<SavingsModelCardProps> = ({ savingsData }) => {
   const price = savingsData?.savingsAmount;
   const unit = (savingsData?.unit ?? 'unit')
     .replace(/per/gi, '/')
@@ -26,17 +19,12 @@ const SavingsModelCard: React.FC<SavingsModelCardProps> = ({
   const currency = savingsData?.currency ?? 'USD';
   const reasoning = savingsData?.reasoning;
 
-  const considerations =
-    savingsData?.savingsAssumptions?.map((assumption) => ({
-      title: assumption,
-      icon: 'clipboard' as const,
-    })) ?? savingsConsiderations;
-
   return (
     <div className='aucctus-bg-primary aucctus-border-primary rounded-lg border p-6 shadow-sm'>
-      <h3 className='aucctus-text-lg-medium aucctus-text-tertiary mb-4'>
-        Savings Model
+      <h3 className='aucctus-text-sm-medium aucctus-text-tertiary mb-2'>
+        Savings Potential
       </h3>
+
       <div className='mb-4 flex items-center gap-1'>
         <span className='aucctus-text-lg-semibold aucctus-text-primary'>
           {currency === 'USD' ? '$' : currency} {price}
@@ -64,24 +52,26 @@ const SavingsModelCard: React.FC<SavingsModelCardProps> = ({
       <h4 className='aucctus-text-xs aucctus-text-tertiary mb-2'>
         Savings Assumptions
       </h4>
-      {considerations && (
+      {savingsData?.savingsAssumptions && (
         <div className='space-y-3'>
-          {considerations.map((consideration, index) => (
-            <div
-              key={index}
-              className='aucctus-border-secondary flex items-center gap-2 rounded-md border p-3'
-            >
-              <div className='aucctus-bg-brand-secondary-hover flex h-6 w-6 items-center justify-center rounded-full'>
-                <Icon
-                  variant={consideration.icon as any}
-                  className='aucctus-stroke-brand-primary h-6 w-6 p-1'
-                />
+          {savingsData.savingsAssumptions.map(
+            (assumption: ISavingsAssumptionV2, index) => (
+              <div
+                key={index}
+                className='aucctus-border-secondary flex items-center gap-2 rounded-md border p-3'
+              >
+                <div className='aucctus-bg-secondary aucctus-border-secondary flex items-center justify-center rounded-full border border-opacity-50'>
+                  <Icon
+                    variant={assumption.icon as any}
+                    className='aucctus-stroke-brand-primary h-7 w-7 p-[0.3rem]'
+                  />
+                </div>
+                <span className='aucctus-text-sm aucctus-text-secondary'>
+                  {assumption.assumption}
+                </span>
               </div>
-              <span className='aucctus-text-sm aucctus-text-secondary'>
-                {consideration.title}
-              </span>
-            </div>
-          ))}
+            ),
+          )}
         </div>
       )}
     </div>
