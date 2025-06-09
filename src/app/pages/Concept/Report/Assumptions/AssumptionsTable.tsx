@@ -8,9 +8,10 @@ import { IAssumptionV2, AssumptionCategory } from '@libs/api/types';
 import { CategoryMetric } from '@hooks/query/assumptions.hook';
 import {
   CATEGORY_CONFIG,
+  getValidationStatusFromMetrics,
   getValidationPercentageFromMetrics,
-  getCategoryInsight,
-  getCategoryInsightTitle,
+  getCategoryInsightByStatus,
+  getCategoryInsightTitleByStatus,
 } from './utils/assumptionUtils';
 
 interface AssumptionsTableProps {
@@ -42,22 +43,27 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
     onCategoryChange?.(category);
   };
 
-  // Calculate validation percentages from categoryMetrics
+  // Get validation status from categoryMetrics
+  const getValidationStatus = (category: AssumptionCategory) => {
+    return getValidationStatusFromMetrics(category, categoryMetrics);
+  };
+
+  // Calculate validation percentages from categoryMetrics (for legacy AI insights)
   const getValidationPercentage = (category: AssumptionCategory): number => {
     return getValidationPercentageFromMetrics(category, categoryMetrics);
   };
 
-  // Get the insight for the selected category
-  const categoryProgress = getValidationPercentage(selectedCategory);
+  // Get the insight for the selected category using validation status
+  const categoryValidationStatus = getValidationStatus(selectedCategory);
 
-  const categoryInsight = getCategoryInsight(
+  const categoryInsight = getCategoryInsightByStatus(
     selectedCategory,
-    categoryProgress,
+    categoryValidationStatus,
   );
 
-  const insightTitle = getCategoryInsightTitle(
+  const insightTitle = getCategoryInsightTitleByStatus(
     selectedCategory,
-    categoryProgress,
+    categoryValidationStatus,
   );
 
   telemetry.log('progress', {
@@ -82,37 +88,21 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
               category={categoryConfig.category}
               title={categoryConfig.title}
               description={categoryConfig.description}
-              validationPercentage={getValidationPercentage(
-                categoryConfig.category,
-              )}
+              validationStatus={getValidationStatus(categoryConfig.category)}
+              validationPercentage={
+                categoryMetrics?.[categoryConfig.category]?.validationPercentage
+              }
               isSelected={selectedCategory === categoryConfig.category}
               onClick={() => handleCategorySelect(categoryConfig.category)}
             />
           ))}
         </div>
 
-        {/* Right column: Selected category details - takes ~70% of space */}
         <div className='flex-1 p-6'>
-          <div className='mb-6'>
-            <h3 className='aucctus-header-xs-semibold aucctus-text-primary mb-2'>
-              {selectedCategory.charAt(0).toUpperCase() +
-                selectedCategory.slice(1)}{' '}
-              Assumptions
-            </h3>
-            <p className='aucctus-text-sm aucctus-text-tertiary'>
-              {
-                CATEGORY_CONFIG.find((c) => c.category === selectedCategory)
-                  ?.description
-              }
-            </p>
-          </div>
-
-          {/* AI Insights Card */}
           <Card.AiInsightCard title={insightTitle} className='mb-6'>
             {categoryInsight}
           </Card.AiInsightCard>
 
-          {/* Assumptions List */}
           {isLoading ? (
             <div className='flex justify-center py-8'>
               <Loading />

@@ -1,50 +1,23 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Icon, FileDropzone, toast } from '@components';
-import Collapsible from '@components/Container/Collapsible';
 import {
   useTestResults,
   useCreateTestResultWithFile,
   useDeleteTestResult,
 } from '@hooks/query/testing.hook';
-
-// Extended interface to include additional properties from API response
-interface ExtendedTestResult {
-  uuid: string;
-  title: string;
-  description?: string;
-  fileType: string;
-  testDetailsUuid: string;
-  sourceUuid: string;
-  fileUrl: string;
-  filePath: string;
-  fileSize: number;
-  originalFilename: string;
-  summary?: string;
-  learnings?: Array<{
-    uuid: string;
-    learning: string;
-    impact: string;
-    testResultUuid: string;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  createdAt: string;
-  updatedAt: string;
-  editRecommendations?: Array<{
-    title: string;
-    reason: string;
-    section: string;
-    description: string;
-    testEvidence: string;
-  }>;
-}
+import { ITestResult } from '@libs/api/types/concept/testing';
 
 interface TestResultsProps {
   conceptUuid?: string;
   testUuid?: string;
+  onResultsChange?: (hasResults: boolean, hasRecommendations: boolean) => void;
 }
 
-const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
+const TestResults: React.FC<TestResultsProps> = ({
+  conceptUuid,
+  testUuid,
+  onResultsChange,
+}) => {
   // Use props data if available, otherwise fetch (for backward compatibility)
   const shouldFetch = !!conceptUuid && !!testUuid;
 
@@ -52,7 +25,7 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
     useTestResults(conceptUuid || '', testUuid || '', { enabled: shouldFetch });
 
   // Type cast the results to include extended properties
-  const results = fetchedResults as ExtendedTestResult[];
+  const results = fetchedResults as ITestResult[];
   const isResultsLoading = isFetchedResultsLoading;
 
   // Hook for creating test results with file upload
@@ -64,8 +37,22 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
   // State to trigger dropzone reset
   const [dropzoneKey, setDropzoneKey] = useState(0);
 
-  // State for collapsible summary
-  const [isSummaryOpen, setIsSummaryOpen] = useState(false);
+  // Notify parent about results state changes
+  useEffect(() => {
+    if (onResultsChange && !isResultsLoading) {
+      const hasResults = results && results.length > 0;
+      const hasRecommendations =
+        hasResults &&
+        results.some(
+          (result: any) =>
+            result.editRecommendations && result.editRecommendations.length > 0,
+        );
+      onResultsChange(hasResults, hasRecommendations);
+    }
+    // Deliberately excluding onResultsChange from dependencies to avoid loops
+    // The callback should be memoized in the parent component
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [results, isResultsLoading]);
 
   // Helper function to format file size
   const formatFileSize = (bytes: number): string => {
@@ -175,7 +162,7 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
   const hasResults = results && results.length > 0;
 
   return (
-    <div className='relative space-y-6'>
+    <div className='relative space-y-4'>
       {/* Loading Overlay for Test Result Analysis */}
       {createTestResultWithFile.isLoading && (
         <div className='absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/90 backdrop-blur-sm'>
@@ -222,25 +209,25 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
 
       {/* Results Grid */}
       {hasResults && (
-        <div className='space-y-4'>
+        <div className='space-y-3'>
           <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
             Uploaded Results
           </h4>
-          <div className='grid gap-4'>
+          <div className='grid gap-3'>
             {results.map((result) => (
               <div
                 key={result.uuid}
-                className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-6 transition-all hover:shadow-sm'
+                className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4 transition-all hover:shadow-sm'
               >
                 <div className='flex items-start gap-4'>
                   {/* File Icon */}
-                  <div className='aucctus-bg-secondary aucctus-border-secondary flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-lg border'>
-                    <Icon variant='pdf' className='h-10 w-10' />
+                  <div className='aucctus-bg-secondary aucctus-border-secondary flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border'>
+                    <Icon variant='pdf' className='h-6 w-6' />
                   </div>
 
                   {/* File Details */}
                   <div className='min-w-0 flex-1'>
-                    <div className='mb-3 flex items-start justify-between'>
+                    <div className='mb-2 flex items-start justify-between'>
                       <div className='min-w-0 flex-1'>
                         <h5 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-1 truncate'>
                           {result.title}
@@ -259,34 +246,32 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
                             href={result.fileUrl}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='btn btn-secondary btn-sm aucctus-text-secondary flex items-center gap-1'
+                            className='btn btn-primary btn-sm flex items-center justify-center'
                           >
                             <Icon
                               variant='download'
-                              className='aucctus-stroke-secondary h-4 w-4'
+                              className='aucctus-stroke-white h-4 w-4'
                             />
-                            Download
                           </a>
                         )}
                         <button
                           onClick={() =>
                             handleDeleteResult(result.uuid, result.title)
                           }
-                          className='btn btn-secondary btn-sm flex items-center gap-1'
+                          className='btn btn-primary btn-sm flex items-center justify-center'
                           disabled={deleteTestResult.isLoading}
                         >
                           <Icon
                             variant='trash'
-                            className='aucctus-stroke-secondary h-4 w-4'
+                            className='aucctus-stroke-white h-4 w-4'
                           />
-                          Delete
                         </button>
                       </div>
                     </div>
 
                     {/* Metadata Grid */}
-                    <div className='aucctus-bg-secondary-subtle rounded-lg p-4'>
-                      <div className='grid grid-cols-2 gap-4 lg:grid-cols-4'>
+                    <div className='aucctus-bg-secondary-subtle rounded-lg p-3'>
+                      <div className='grid grid-cols-2 gap-3 lg:grid-cols-4'>
                         {/* File Name */}
                         <div className='flex items-center gap-2'>
                           <Icon
@@ -359,48 +344,12 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
             ))}
           </div>
 
-          {/* Analysis Summary Section - Outside of individual cards */}
-          {results.length > 0 && results[0].summary && (
-            <div className='aucctus-bg-secondary-extra-subtle aucctus-border-secondary rounded-lg border'>
-              <button
-                onClick={() => setIsSummaryOpen(!isSummaryOpen)}
-                className='flex w-full items-center justify-between p-4 text-left'
-              >
-                <div className='flex items-center gap-3'>
-                  <Icon
-                    variant='file'
-                    className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
-                  />
-                  <div>
-                    <h5 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
-                      Analysis Summary
-                    </h5>
-                    <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-                      AI-generated insights from your test results
-                    </p>
-                  </div>
-                </div>
-                <Icon
-                  variant={isSummaryOpen ? 'chevronup' : 'chevrondown'}
-                  className='aucctus-stroke-tertiary h-5 w-5 flex-shrink-0'
-                />
-              </button>
-              <Collapsible open={isSummaryOpen}>
-                <div className='aucctus-border-secondary border-t p-4'>
-                  <div className='aucctus-text-sm-regular aucctus-text-secondary whitespace-pre-line leading-relaxed'>
-                    {results[0].summary}
-                  </div>
-                </div>
-              </Collapsible>
-            </div>
-          )}
-
           {/* Key Learnings Section - Outside of individual cards, Two Columns */}
           {results.length > 0 &&
             results[0].learnings &&
             results[0].learnings.length > 0 && (
               <div>
-                <div className='mb-4 flex items-center gap-3'>
+                <div className='mb-3 flex items-center gap-3'>
                   <Icon
                     variant='lightbulb'
                     className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
@@ -409,11 +358,11 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
                     Key Learnings
                   </h4>
                 </div>
-                <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
+                <div className='grid grid-cols-1 gap-3 lg:grid-cols-2'>
                   {results[0].learnings.map((learning) => (
                     <div
                       key={learning.uuid}
-                      className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-4'
+                      className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-3'
                     >
                       <div className='flex items-start gap-3'>
                         <div className='aucctus-bg-brand-secondary aucctus-border-brand mt-1 flex-shrink-0 rounded-full border p-1'>
@@ -426,7 +375,7 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
                           <p className='aucctus-text-sm-semibold aucctus-text-brand-primary mb-2'>
                             {learning.learning}
                           </p>
-                          <div className='aucctus-bg-primary rounded p-3'>
+                          <div className='aucctus-bg-primary rounded p-2'>
                             <p className='aucctus-text-xs-regular aucctus-text-tertiary mb-1'>
                               Impact:
                             </p>
@@ -446,7 +395,7 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
 
       {/* Information Section - Only show when no results */}
       {!hasResults && (
-        <div className='aucctus-bg-secondary-extra-subtle aucctus-border-secondary rounded-lg border p-6'>
+        <div className='aucctus-bg-secondary-extra-subtle aucctus-border-secondary rounded-lg border p-4'>
           <div className='flex items-start gap-3'>
             <div className='mt-1'>
               <Icon
@@ -455,10 +404,10 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
               />
             </div>
             <div>
-              <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-3'>
+              <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
                 Adding Test Results
               </h4>
-              <p className='aucctus-text-sm-regular aucctus-text-secondary mb-3'>
+              <p className='aucctus-text-sm-regular aucctus-text-secondary mb-2'>
                 Record key findings from your test sessions. These will be used
                 to validate your assumptions and improve your concept.
               </p>
@@ -476,11 +425,11 @@ const TestResults: React.FC<TestResultsProps> = ({ conceptUuid, testUuid }) => {
 
       {/* Add Test Results - Only show when no results */}
       {!hasResults && (
-        <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-6'>
+        <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4'>
           <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
             Add Test Results
           </h4>
-          <p className='aucctus-text-sm-regular aucctus-text-secondary mb-6'>
+          <p className='aucctus-text-sm-regular aucctus-text-secondary mb-4'>
             Upload a file containing your test results. Include a descriptive
             name and optional description to help organize your findings.
           </p>

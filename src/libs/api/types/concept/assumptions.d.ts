@@ -210,6 +210,7 @@ export interface IAssumptionTestStatusOverview {
 // V2 Types - updated to match actual API response
 export type AssumptionStatusV2 =
   | 'validated'
+  | 'unvalidated'
   | 'partially_validated'
   | 'invalidated'
   | 'untested';
@@ -244,9 +245,10 @@ export interface IAssumptionV2 {
   certaintyCategory: RiskCategory;
   importanceCategory: RiskCategory;
   riskCategory: RiskCategory;
-  metadata: Record<string, any>;
+  validationStatus: 'validated' | 'invalidated' | 'untested'; // New field from API
+  createdBy: number;
   createdAt: string;
-  lastModified: string;
+  updatedAt: string;
 
   // Optional computed fields for backward compatibility
   id?: string; // Alias for uuid for backward compatibility
@@ -257,6 +259,8 @@ export interface IAssumptionV2 {
   tests?: AssumptionTest[];
   priority?: AssumptionPriority;
   benchmark?: string; // Validation benchmark for testing
+  metadata?: Record<string, any>;
+  lastModified?: string; // Keep for backward compatibility
 }
 
 // Color constants for assumption categories - using more subtle, balanced colors

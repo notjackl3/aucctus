@@ -1,10 +1,11 @@
-import { AssumptionCategory } from '@libs/api/types';
+import { AssumptionCategory, AssumptionStatusV2 } from '@libs/api/types';
 
 export interface CategoryProgressCardProps {
   category: AssumptionCategory;
   title: string;
   description: string;
-  validationPercentage: number;
+  validationStatus: AssumptionStatusV2;
+  validationPercentage?: number; // 0-1 range from API
   isSelected?: boolean;
   onClick?: () => void;
   isInvalidated?: boolean;

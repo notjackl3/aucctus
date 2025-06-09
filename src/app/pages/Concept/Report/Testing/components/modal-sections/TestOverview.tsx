@@ -40,7 +40,6 @@ const TestOverview: React.FC<TestOverviewProps> = ({
   const convertApiToAssumptionCard = (apiAssumption: any): IAssumptionV2 => {
     return {
       uuid: apiAssumption.uuid,
-      id: apiAssumption.uuid, // Alias for backward compatibility
       statement: apiAssumption.statement,
       category: apiAssumption.category as AssumptionCategory,
       risk: apiAssumption.riskScore || 0.5, // Use riskScore from API or default
@@ -49,17 +48,24 @@ const TestOverview: React.FC<TestOverviewProps> = ({
       certaintyCategory: (apiAssumption.riskLevel as RiskCategory) || 'medium',
       importanceCategory: 'high' as RiskCategory, // Default based on importance value
       riskCategory: (apiAssumption.riskLevel as RiskCategory) || 'medium',
-      metadata: {},
+      validationStatus:
+        apiAssumption.validationStatus === 'validated'
+          ? 'validated'
+          : 'untested',
+      createdBy: apiAssumption.createdBy || 1, // Default createdBy
       createdAt: apiAssumption.createdAt || new Date().toISOString(),
-      lastModified: apiAssumption.updatedAt || new Date().toISOString(),
+      updatedAt: apiAssumption.updatedAt || new Date().toISOString(),
 
-      // Computed display fields
-      status: (apiAssumption.validationType === 'validated'
+      // Optional computed fields for backward compatibility
+      id: apiAssumption.uuid, // Alias for backward compatibility
+      lastModified: apiAssumption.updatedAt || new Date().toISOString(),
+      metadata: {},
+      status: (apiAssumption.validationStatus === 'validated'
         ? 'validated'
-        : apiAssumption.validationType === 'invalidated'
+        : apiAssumption.validationStatus === 'invalidated'
           ? 'invalidated'
-          : apiAssumption.validationType === 'partiallyValidated'
-            ? 'partially_validated'
+          : apiAssumption.validationStatus === 'untested'
+            ? 'untested'
             : 'untested') as AssumptionStatusV2,
       confidence: apiAssumption.certainty, // Alias for certainty
       impactPoints: Math.round(apiAssumption.importance * 10), // Convert 0-1 to 0-10
@@ -88,8 +94,7 @@ const TestOverview: React.FC<TestOverviewProps> = ({
 
     return {
       uuid: assumption.id || '',
-      id: assumption.id || '',
-      statement: assumption.description,
+      statement: assumption.description || '',
       category: (assumption.category?.toLowerCase() ||
         'desirability') as AssumptionCategory,
       risk: riskValue, // 0-1 range as expected by API
@@ -98,11 +103,16 @@ const TestOverview: React.FC<TestOverviewProps> = ({
       certaintyCategory: 'medium' as RiskCategory,
       importanceCategory: 'high' as RiskCategory,
       riskCategory: (assumption.risk as RiskCategory) || 'medium',
-      metadata: {},
+      validationStatus:
+        assumption.status === 'validated' ? 'validated' : 'untested',
+      createdBy: 1, // Default createdBy
       createdAt: new Date().toISOString(),
-      lastModified: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
 
-      // Computed display fields
+      // Optional computed fields for backward compatibility
+      id: assumption.id || '',
+      lastModified: new Date().toISOString(),
+      metadata: {},
       status: (assumption.status || 'untested') as AssumptionStatusV2,
       confidence: (assumption.confidence || 0) / 100, // Convert to 0-1 range
       impactPoints: 7, // Default impact points (0-10)

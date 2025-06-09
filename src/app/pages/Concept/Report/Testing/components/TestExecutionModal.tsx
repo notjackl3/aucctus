@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Icon } from '@components';
 import LoadingSpinner from '@components/Icon/LoadingSpinner';
 import { cn } from '@libs/utils/react';
@@ -6,7 +6,6 @@ import { useModal } from '@context/ModalContextProvider';
 import TabView, { TabElement } from '@components/Container/TabView/TabView';
 import {
   useTestDetail,
-  useTestResults,
   useCompleteTestDetail,
 } from '@hooks/query/testing.hook';
 import { Assumption } from '../types';
@@ -46,8 +45,8 @@ const setStoredActiveTab = (tab: string): void => {
   try {
     localStorage.setItem(TEST_MODAL_TAB_STORAGE_KEY, tab);
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.warn('Failed to store active tab in localStorage:', error);
+    // Silent fail - localStorage might be disabled
+    // Tab state will still work, just won't persist across sessions
   }
 };
 
@@ -74,13 +73,6 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     error: testDetailError,
   } = useTestDetail(conceptUuid, testUuid || '');
 
-  // Fetch test results when results tab is visited (needed for Complete button logic)
-  const shouldFetchResults =
-    visitedTabs.has('results') && !!conceptUuid && !!testUuid;
-  const { results } = useTestResults(conceptUuid, testUuid || '', {
-    enabled: shouldFetchResults,
-  });
-
   // Hook for completing test
   const completeTestDetail = useCompleteTestDetail();
 
@@ -93,8 +85,24 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     setStoredActiveTab(activeTab);
   }, [activeTab]);
 
-  // Check if test can be completed (requires test results)
-  const canCompleteTest = results && results.length > 0;
+  // Check if test can be completed (will be determined by Results tab)
+  const [canCompleteTest, setCanCompleteTest] = useState(false);
+
+  // Disabled tabs list - impact tab will be enabled by Results tab when appropriate
+  const [disabledTabs, setDisabledTabs] = useState(['impact']);
+
+  // Memoized callback to avoid infinite loops
+  const handleResultsChange = useCallback(
+    (hasResults: boolean, hasRecommendations: boolean) => {
+      setCanCompleteTest(hasResults);
+      setDisabledTabs((prev) =>
+        hasRecommendations
+          ? prev.filter((tab) => tab !== 'impact')
+          : [...prev.filter((tab) => tab !== 'impact'), 'impact'],
+      );
+    },
+    [],
+  );
 
   // Enhanced close modal function
   const handleCloseModal = () => {
@@ -192,11 +200,6 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             className='aucctus-stroke-secondary h-4 w-4'
           />
           <span>Results</span>
-          {results && results.length > 0 && (
-            <span className='aucctus-bg-brand-secondary aucctus-text-brand-primary rounded-full px-2 py-0.5 text-xs'>
-              {results.length}
-            </span>
-          )}
         </div>
       ),
     },
@@ -213,19 +216,6 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
       ),
     },
   ];
-
-  // Disabled tabs list
-  const disabledTabs = ['impact'].filter((tabId) => {
-    // Enable impact tab if we have test results with recommendations
-    if (tabId === 'impact' && results && results.length > 0) {
-      const hasRecommendations = results.some(
-        (result: any) =>
-          result.editRecommendations && result.editRecommendations.length > 0,
-      );
-      return !hasRecommendations; // Only disable if no recommendations
-    }
-    return true; // Keep other tabs disabled
-  });
 
   const getTabIndex = (tabId: string) => {
     return tabs.findIndex((tab) => tab.value === tabId);
@@ -309,7 +299,13 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
         return <TestExecution />;
 
       case 'results':
-        return <TestResults conceptUuid={conceptUuid} testUuid={testUuid} />;
+        return (
+          <TestResults
+            conceptUuid={conceptUuid}
+            testUuid={testUuid}
+            onResultsChange={handleResultsChange}
+          />
+        );
 
       case 'impact':
         return (

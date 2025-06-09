@@ -5,40 +5,14 @@ import { getCategoryColors } from '../../../../../Assumptions/constants/category
 import { AssumptionCategory } from '@libs/api/types';
 import ValidationBenchmarkCard from './ValidationBenchmarkCard';
 import ValidationOptionsSection from './ValidationOptionsSection';
-
-interface TestAssumption {
-  uuid: string;
-  testDetailsUuid: string;
-  assumptionUuid: string;
-  validationType:
-    | 'validated'
-    | 'unvalidated'
-    | 'partiallyValidated'
-    | 'noChange'
-    | 'invalidated';
-  benchmark: string;
-  statement: string;
-  importance: number;
-  category: string;
-  certainty: number;
-  riskLevel: 'high' | 'medium' | 'low';
-  riskScore: number;
-  testName: string;
-  createdAt: string;
-  updatedAt: string;
-}
+import { ITestAssumptionDetailed } from '../../../../types';
 
 interface AssumptionValidationCardProps {
-  assumption: TestAssumption;
+  assumption: ITestAssumptionDetailed;
   isUpdating: boolean;
   onValidationChange: (
-    assumption: TestAssumption,
-    newValidationType:
-      | 'validated'
-      | 'unvalidated'
-      | 'partiallyValidated'
-      | 'noChange'
-      | 'invalidated',
+    assumption: ITestAssumptionDetailed,
+    newValidationStatus: 'validated' | 'invalidated' | 'untested',
   ) => void;
 }
 
@@ -75,7 +49,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
             className='aucctus-stroke-success-primary h-4 w-4'
           />
         ),
-        isSelected: assumption.validationType === 'validated',
+        isSelected: assumption.validationStatus === 'validated',
       },
       {
         type: 'invalidated',
@@ -86,18 +60,18 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
             className='aucctus-stroke-error-primary h-4 w-4'
           />
         ),
-        isSelected: assumption.validationType === 'invalidated',
+        isSelected: assumption.validationStatus === 'invalidated',
       },
       {
-        type: 'noChange',
-        label: 'No Change',
+        type: 'untested',
+        label: 'Untested',
         icon: (
           <Icon
             variant='help-circle'
             className='aucctus-stroke-tertiary h-4 w-4'
           />
         ),
-        isSelected: assumption.validationType === 'noChange',
+        isSelected: assumption.validationStatus === 'untested',
       },
     ];
     return options;
@@ -106,12 +80,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
   const handleOptionSelect = (optionType: string) => {
     onValidationChange(
       assumption,
-      optionType as
-        | 'validated'
-        | 'unvalidated'
-        | 'partiallyValidated'
-        | 'noChange'
-        | 'invalidated',
+      optionType as 'validated' | 'invalidated' | 'untested',
     );
   };
 

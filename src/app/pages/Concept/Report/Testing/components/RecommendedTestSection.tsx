@@ -1,7 +1,7 @@
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import React from 'react';
-import { Assumption, RecommendedTest } from '../types';
+import { RecommendedTest } from '../types';
 import { RISK_LEVEL_CONFIGS } from '../../Assumptions/constants/statusConfigs';
 import CategoryIcon from '../../Assumptions/components/cards/category-progress-card/CategoryIcon';
 import GenericStatusBadge from '../../Assumptions/components/shared/GenericStatusBadge';
@@ -11,7 +11,7 @@ import { useTestCompletion } from '../Testing';
 interface RecommendedTestSectionProps {
   recommendedTest: RecommendedTest | null;
   onRunTest: () => void;
-  onSelectAssumption: (assumption: Assumption) => void;
+  onSelectAssumption: (assumptionId: string) => void;
   showBenchmark?: boolean;
 }
 
@@ -23,9 +23,9 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
 }) => {
   const { isCompletingTest } = useTestCompletion();
 
-  const handleSelectAssumption = (assumption: Assumption) => {
-    if (assumption && assumption.id) {
-      onSelectAssumption(assumption);
+  const handleSelectAssumption = (assumptionId: string) => {
+    if (assumptionId) {
+      onSelectAssumption(assumptionId);
     }
   };
 
@@ -68,6 +68,9 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
       </div>
     );
   }
+
+  // Get assumptions from test details
+  const assumptions = recommendedTest.testDetails.assumptions || [];
 
   return (
     <div className='space-y-3'>
@@ -146,8 +149,8 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
           </h4>
 
           <ul className='space-y-3'>
-            {recommendedTest.assumptions.map((assumption, index) => {
-              const riskLevel = assumption.risk || 'medium';
+            {assumptions.map((assumption) => {
+              const riskLevel = assumption.riskLevel || 'medium';
               const riskColors = RISK_LEVEL_CONFIGS[riskLevel];
               // Convert string to AssumptionCategory type for CategoryIcon
               const categoryVal = (assumption.category?.toLowerCase() ||
@@ -159,9 +162,9 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
 
               return (
                 <li
-                  key={index}
+                  key={assumption.uuid}
                   className='aucctus-text-sm-regular aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-hover cursor-pointer rounded-md border p-4 transition-colors'
-                  onClick={() => handleSelectAssumption(assumption)}
+                  onClick={() => handleSelectAssumption(assumption.uuid)}
                 >
                   <div className='mb-2 flex items-start justify-between'>
                     <div className='flex items-center gap-1.5'>
@@ -174,8 +177,8 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                     </div>
                     <GenericStatusBadge config={riskColors} />
                   </div>
-                  <p className='aucctus-text-md-medium aucctus-text-brand-primary'>
-                    {assumption.description}
+                  <p className='aucctus-text-md-medium aucctus-text-brand-primary pb-4'>
+                    {assumption.statement}
                   </p>
 
                   {/* Benchmark Section */}

@@ -3,18 +3,10 @@ import { Icon, toast } from '@components';
 import { cn } from '@libs/utils/react';
 import { useTestCollateral } from '@hooks/query/testing.hook';
 import ReactMarkdown from 'react-markdown';
-
-// Define types for test collateral
-type CollateralType = 'text' | 'image' | 'file';
-
-interface CollateralItem {
-  id: string;
-  title: string;
-  description: string;
-  type: CollateralType;
-  content: string;
-  format?: string; // for files: pdf, docx, etc.
-}
+import {
+  CollateralType,
+  ITestCollateral,
+} from '@libs/api/types/concept/testing';
 
 interface TestCollateralProps {
   conceptUuid?: string;
@@ -39,10 +31,12 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   const collateral = fetchedCollateral;
   const isCollateralLoading = isFetchedCollateralLoading;
 
-  const [selectedItem, setSelectedItem] = useState<CollateralItem | null>(null);
+  const [selectedItem, setSelectedItem] = useState<ITestCollateral | null>(
+    null,
+  );
 
-  // Convert API collateral to CollateralItem format
-  const convertApiCollateral = (apiCollateral: any[]): CollateralItem[] => {
+  // Convert API collateral to ITestCollateral format
+  const convertApiCollateral = (apiCollateral: any[]): ITestCollateral[] => {
     return apiCollateral.map((item) => {
       // Map API types to component types
       let componentType: CollateralType = 'text'; // default
@@ -75,7 +69,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   };
 
   // Get display collateral from API only
-  const getDisplayCollateral = (): CollateralItem[] => {
+  const getDisplayCollateral = (): ITestCollateral[] => {
     if (!collateral) return [];
 
     // Handle direct array format
@@ -106,7 +100,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   }, [displayCollateral, selectedItem]);
 
   // Handle item selection
-  const handleItemSelect = (item: CollateralItem) => {
+  const handleItemSelect = (item: ITestCollateral) => {
     setSelectedItem(item);
   };
 

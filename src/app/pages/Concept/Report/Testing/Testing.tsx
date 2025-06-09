@@ -1,13 +1,6 @@
 import telemetry from '@libs/telemetry';
 import React, { useState, useMemo, createContext, useContext } from 'react';
 import { useOutletContext } from 'react-router-dom';
-import {
-  RecommendedTest,
-  Test,
-  ITestDetails,
-  ITestDetailsExtended,
-  Assumption,
-} from './types';
 import RecommendedTestSection from './components/RecommendedTestSection';
 import TestHistorySection from './components/TestHistorySection';
 import { useModal } from '@context/ModalContextProvider';
@@ -27,64 +20,6 @@ const TestCompletionContext = createContext<TestCompletionContextType>({
 });
 
 export const useTestCompletion = () => useContext(TestCompletionContext);
-
-// Utility function to convert API test details to Test format for TestHistorySection
-const convertApiTestsToTestFormat = (apiTests: ITestDetails[]): Test[] => {
-  return apiTests.map((apiTest) => {
-    // Cast to extended interface to access additional properties
-    const extendedTest = apiTest as ITestDetailsExtended;
-
-    return {
-      id: apiTest.uuid,
-      testName: apiTest.name,
-      description: apiTest.description,
-      type: 'manual' as const, // API tests are considered manual
-      status:
-        apiTest.status === 'completed'
-          ? 'completed'
-          : apiTest.status === 'active'
-            ? 'in-progress'
-            : 'planned',
-      assumptions:
-        extendedTest.assumptions?.map((assumption) => ({
-          id: assumption.uuid,
-          description: assumption.statement,
-          category: assumption.category,
-          confidence: Math.round(assumption.certainty * 100), // Convert 0-1 to 0-100
-          risk: assumption.riskCategory as 'high' | 'medium' | 'low',
-          status:
-            assumption.validationType === 'validated'
-              ? 'validated'
-              : assumption.validationType === 'invalidated'
-                ? 'invalidated'
-                : assumption.validationType === 'partiallyValidated'
-                  ? 'validated' // For display purposes, treat partial as validated
-                  : 'untested',
-        })) || [],
-      date: new Date(apiTest.createdAt).toLocaleDateString(),
-      // Enhanced results with API data
-      results:
-        apiTest.status === 'completed'
-          ? {
-              status: 'mixed' as const, // We'll calculate this based on validation results
-              summary: extendedTest.insight || 'Test completed successfully',
-              learnings: [], // This will be populated from actual test results
-              nextSteps: [],
-            }
-          : undefined,
-      // Add API-specific data for enhanced display
-      apiData: {
-        testType: apiTest.testType,
-        objective: apiTest.objective,
-        methodology: apiTest.methodology,
-        targetParticipants: apiTest.targetParticipants,
-        insight: extendedTest.insight,
-        createdAt: apiTest.createdAt,
-        updatedAt: apiTest.updatedAt,
-      },
-    };
-  });
-};
 
 const Testing: React.FC = () => {
   const { openModal } = useModal();
@@ -109,44 +44,25 @@ const Testing: React.FC = () => {
     return null;
   }, [testDetails]);
 
-  // Convert only completed tests to format expected by TestHistorySection
-  const convertedTests = useMemo(() => {
+  // Filter completed tests for history section
+  const completedTests = useMemo(() => {
     if (testDetails && testDetails.length > 0) {
-      // Filter to only show completed tests in history
-      const completedTests = testDetails.filter(
-        (test) => test.status === 'completed',
-      );
-      return convertApiTestsToTestFormat(completedTests);
+      return testDetails.filter((test) => test.status === 'completed');
     }
     return [];
   }, [testDetails]);
 
   // Generate recommended test based on API data
-  const getRecommendedTest = (): RecommendedTest | null => {
-    // If we have a real test from API, use it
+  const recommendedTest = useMemo(() => {
     if (nextTest) {
-      // Convert API assumptions to RecommendedTestSection format
-      const convertedAssumptions: Assumption[] = nextTest.assumptions.map(
-        (apiAssumption) => ({
-          id: apiAssumption.uuid,
-          description: apiAssumption.statement,
-          category: apiAssumption.category,
-          confidence: Math.round(apiAssumption.certainty * 100), // Convert 0-1 to 0-100
-          risk: apiAssumption.riskCategory as 'high' | 'medium' | 'low',
-          status: 'untested' as const,
-        }),
-      );
-
       return {
         testName: nextTest.name,
         description: nextTest.description,
-        assumptions: convertedAssumptions,
+        testDetails: nextTest,
       };
     }
-
-    // No recommended test if no API data
     return null;
-  };
+  }, [nextTest]);
 
   const handleRunTest = () => {
     if (nextTest) {
@@ -175,9 +91,9 @@ const Testing: React.FC = () => {
     }
   };
 
-  const handleSelectAssumption = () => {
-    // Placeholder for future functionality when we add the modal back
-    // TODO: Implement assumption selection logic
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const handleSelectAssumption = (_assumptionId: string) => {
+    // TODO: Implement assumption selection logic when modal is added back
   };
 
   // Show loading state while fetching test details
@@ -256,7 +172,7 @@ const Testing: React.FC = () => {
             {!hasNoData && (
               <span className='aucctus-text-brand-primary ml-2'>
                 ({testDetails.length} test{testDetails.length !== 1 ? 's' : ''}{' '}
-                total, {convertedTests.length} completed)
+                total, {completedTests.length} completed)
               </span>
             )}
           </p>
@@ -329,16 +245,16 @@ const Testing: React.FC = () => {
             {/* Recommended Test Section */}
             <div>
               <RecommendedTestSection
-                recommendedTest={getRecommendedTest()}
+                recommendedTest={recommendedTest}
                 onRunTest={handleRunTest}
                 onSelectAssumption={handleSelectAssumption}
                 showBenchmark={true}
               />
             </div>
 
-            {/* Test History Section - Use converted API data */}
+            {/* Test History Section - Use API data directly */}
             <TestHistorySection
-              tests={convertedTests}
+              tests={completedTests}
               conceptUuid={conceptUuid}
             />
           </>

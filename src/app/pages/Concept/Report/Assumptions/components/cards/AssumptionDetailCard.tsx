@@ -7,7 +7,7 @@ import CertaintyMeter from '../badges/CertaintyMeter';
 import ValidationBenchmarkCard from '../../../Testing/components/modal-sections/test-impact/components/ValidationBenchmarkCard';
 import { getCategoryColors } from '../../constants/categoryColors';
 import { getCategoryIcon } from '../../utils/assumptionUtils';
-import { IAssumptionV2 } from '@libs/api/types';
+import { IAssumptionV2, AssumptionStatusV2 } from '@libs/api/types';
 
 interface AssumptionDetailCardProps {
   assumption: IAssumptionV2;
@@ -27,6 +27,12 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   const riskPercentage = Math.round(assumption.risk * 100);
   const certaintyPercentage = Math.round(assumption.certainty * 100);
   const importancePercentage = Math.round(assumption.importance * 100);
+
+  // Determine validation status from the validationStatus field
+  const getValidationStatus = (): AssumptionStatusV2 => {
+    // Use the validationStatus field directly, with fallback to status or untested
+    return assumption.validationStatus || assumption.status || 'untested';
+  };
 
   // Helper to render category icon using utility function
   const renderCategoryIcon = (): React.ReactNode => {
@@ -53,7 +59,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
         </div>
         <div className='flex items-center gap-2'>
           <RiskBadge risk={riskPercentage} />
-          <StatusBadge status={assumption.status || 'untested'} />
+          <StatusBadge status={getValidationStatus()} />
         </div>
       </div>
 

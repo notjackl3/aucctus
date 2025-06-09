@@ -1,16 +1,9 @@
 import React from 'react';
 import { Icon } from '@components';
-
-interface EditRecommendation {
-  title: string;
-  reason: string;
-  section: string;
-  description: string;
-  testEvidence: string;
-}
+import { IEditRecommendation } from '@libs/api/types/concept/testing';
 
 interface RecommendedChangesSectionProps {
-  recommendations: EditRecommendation[];
+  recommendations: IEditRecommendation[];
   onApplyRecommendations: () => void;
 }
 

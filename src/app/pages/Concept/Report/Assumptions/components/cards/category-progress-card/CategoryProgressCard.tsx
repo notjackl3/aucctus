@@ -11,6 +11,7 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
   category,
   title,
   description,
+  validationStatus,
   validationPercentage,
   isSelected = false,
   onClick,
@@ -19,14 +20,30 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
   // Get category colors from centralized source
   const categoryColors = getCategoryColors(category);
 
-  // Determine status based on validation percentage and category
+  // Use validationStatus directly, with override for invalidated
   const getStatus = (): AssumptionStatusV2 => {
     if (isInvalidated) return 'invalidated';
+    return validationStatus;
+  };
 
-    // Use validation percentage to determine status
-    if (validationPercentage >= 70) return 'validated';
-    if (validationPercentage >= 30) return 'partially_validated';
-    return 'untested';
+  // Use validation percentage from API (0-1 range), convert to 0-100 for progress bar
+  const getPercentageForProgressBar = (): number => {
+    if (validationPercentage !== undefined) {
+      return Math.round(validationPercentage * 100); // Convert 0-1 to 0-100
+    }
+
+    // Fallback for backward compatibility if validationPercentage is not provided
+    switch (validationStatus) {
+      case 'validated':
+        return 100;
+      case 'partially_validated':
+        return 50;
+      case 'invalidated':
+        return 0;
+      case 'untested':
+      default:
+        return 0;
+    }
   };
 
   return (
@@ -62,7 +79,7 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
         <div className='flex flex-1 items-center justify-end'>
           <ProgressBar
             category={category}
-            percentage={validationPercentage}
+            percentage={getPercentageForProgressBar()}
             isInvalidated={isInvalidated}
             className='aucctus-border-tertiary h-6 border'
             width={128}

@@ -171,16 +171,6 @@ export class Endpoints {
     return `api/v1/concept/${conceptUuid}/key-assumptions`;
   }
 
-  static conceptKeyAssumptionsFiltered(
-    rootIdentifier: string,
-    filters?: Record<string, any>,
-  ) {
-    return utils.string.queryStringGenerator(
-      `api/v2/concept/${rootIdentifier}/assumptions`,
-      filters,
-    );
-  }
-
   static conceptKeyAssumption(assumptionUuid: string) {
     return `api/v1/concept/key-assumption/${assumptionUuid}`;
   }
@@ -297,21 +287,32 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/seen`;
   }
 
-  // Testing Endpoints
+  // Assumptions & Testing v2 Endpoints
+
+  static conceptKeyAssumptionsFiltered(
+    rootIdentifier: string,
+    filters?: Record<string, any>,
+  ) {
+    return utils.string.queryStringGenerator(
+      `api/v2/concept/${rootIdentifier}/key-assumptions`,
+      filters,
+    );
+  }
+
   static conceptTestingDetails(conceptUuid: string) {
-    return `api/v1/concept/${conceptUuid}/testing`;
+    return `api/v2/concept/${conceptUuid}/testing`;
   }
 
   static conceptTestingDetail(conceptUuid: string, testUuid: string) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/details`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/details`;
   }
 
   static conceptTestingComplete(conceptUuid: string, testUuid: string) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/complete`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/complete`;
   }
 
   static conceptTestCollateral(conceptUuid: string, testUuid: string) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/collateral`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/collateral`;
   }
 
   static conceptTestCollateralItem(
@@ -319,11 +320,11 @@ export class Endpoints {
     testUuid: string,
     collateralUuid: string,
   ) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/collateral/${collateralUuid}`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/collateral/${collateralUuid}`;
   }
 
   static conceptTestParticipants(conceptUuid: string, testUuid: string) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/participants`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/participants`;
   }
 
   static conceptTestParticipant(
@@ -331,11 +332,11 @@ export class Endpoints {
     testUuid: string,
     participantUuid: string,
   ) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/participants/${participantUuid}`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/participants/${participantUuid}`;
   }
 
   static conceptTestResults(conceptUuid: string, testUuid: string) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/results`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/results`;
   }
 
   static conceptTestResult(
@@ -343,11 +344,11 @@ export class Endpoints {
     testUuid: string,
     resultUuid: string,
   ) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/results/${resultUuid}`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/results/${resultUuid}`;
   }
 
   static conceptTestAssumptions(conceptUuid: string, testUuid: string) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/assumptions`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/assumptions`;
   }
 
   static conceptTestAssumption(
@@ -355,7 +356,7 @@ export class Endpoints {
     testUuid: string,
     assumptionUuid: string,
   ) {
-    return `api/v1/concept/${conceptUuid}/testing/${testUuid}/assumptions/${assumptionUuid}`;
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/assumptions/${assumptionUuid}`;
   }
 
   // Financial Projection V2 Endpoints

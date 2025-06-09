@@ -19,6 +19,7 @@ export const calculateValidationPercentage = (
   // Different statuses have different weights
   const statusWeights: Record<AssumptionStatusV2, number> = {
     validated: 100,
+    unvalidated: 0,
     partially_validated: 50,
     invalidated: 0,
     untested: 0,
@@ -170,7 +171,33 @@ export const CATEGORY_CONFIG = [
 ] as const;
 
 /**
+ * Gets validation status directly from category metrics
+ *
+ * @param category - The assumption category
+ * @param categoryMetrics - The category metrics from API
+ * @returns The validation status
+ */
+export const getValidationStatusFromMetrics = (
+  category: AssumptionCategory,
+  categoryMetrics?: Record<AssumptionCategory, CategoryMetric>,
+): AssumptionStatusV2 => {
+  if (categoryMetrics?.[category]) {
+    const metric = categoryMetrics[category];
+
+    // Map API validation status to our internal status
+    if (metric.validationStatus === 'validated') return 'validated';
+    if (metric.validationStatus === 'partially_validated')
+      return 'partially_validated';
+    if (metric.validationStatus === 'invalidated') return 'invalidated';
+    if (metric.validationStatus === 'unvalidated') return 'unvalidated';
+  }
+
+  return 'untested'; // Default fallback
+};
+
+/**
  * Calculates validation percentage from category metrics
+ * @deprecated Use getValidationStatusFromMetrics instead for new code
  *
  * @param category - The assumption category
  * @param categoryMetrics - The category metrics from API
@@ -182,18 +209,107 @@ export const getValidationPercentageFromMetrics = (
 ): number => {
   if (categoryMetrics?.[category]) {
     const metric = categoryMetrics[category];
-    if (metric.count === 0) return 0;
-
-    // Use average certainty as validation percentage (convert from 0-1 to 0-100)
-    const averageCertainty = metric.cumulativeCertainty / metric.count;
-    return Math.round(averageCertainty * 100);
+    // Since API doesn't provide validationPercentage, create a synthetic one based on validationStatus
+    // and use average certainty as a fallback indicator
+    if (metric.validationStatus === 'validated') {
+      return 100; // Fully validated
+    } else if (metric.validationStatus === 'unvalidated') {
+      if (metric.count === 0) return 0;
+      // Use average certainty as validation indicator for unvalidated categories
+      const averageCertainty = metric.cumulativeCertainty / metric.count;
+      return Math.round(averageCertainty * 100);
+    }
   }
 
   return 0;
 };
 
 /**
+ * Gets AI insights based on category and validation status
+ *
+ * @param category - The assumption category
+ * @param status - The validation status
+ * @returns AI insight text for the category
+ */
+export const getCategoryInsightByStatus = (
+  category: AssumptionCategory,
+  status: AssumptionStatusV2,
+): string => {
+  switch (category) {
+    case 'desirability':
+      if (status === 'untested' || status === 'unvalidated')
+        return 'Your desirability assumptions need validation. Focus on gathering customer feedback to verify if your target audience actually wants this product.';
+      if (status === 'partially_validated')
+        return "You've started validating customer desire for your product, but key questions about market fit remain. Consider additional user interviews and prototype testing.";
+      if (status === 'validated')
+        return 'You have strong validation that customers want your product. Keep refining your understanding of specific user needs and preferences.';
+      return 'Your desirability assumptions have been invalidated. Re-examine your target market and value proposition.';
+    case 'viability':
+      if (status === 'untested' || status === 'unvalidated')
+        return 'Your business model assumptions require validation. Start with financial modeling and market sizing to establish a clearer path to profitability.';
+      if (status === 'partially_validated')
+        return "You've made progress on validating your business model, but important questions about pricing and margins remain. Consider pricing experiments and cost analysis.";
+      if (status === 'validated')
+        return 'Your business model appears sound based on current validation. Monitor customer acquisition costs and lifetime value to refine your understanding.';
+      return 'Your business model assumptions have been invalidated. Re-evaluate your pricing strategy and cost structure.';
+    case 'feasibility':
+      if (status === 'untested' || status === 'unvalidated')
+        return 'Technical feasibility requires validation. Create technical prototypes to verify your ability to deliver on product promises.';
+      if (status === 'partially_validated')
+        return "You've validated some technical aspects, but challenges remain. Identify your highest technical risks and prioritize validating those assumptions.";
+      if (status === 'validated')
+        return 'Technical feasibility appears strong. Continue refining your production process and consider scalability challenges.';
+      return 'Technical feasibility assumptions have been invalidated. Consider alternative technical approaches or simplifying your product.';
+    case 'adaptability':
+      if (status === 'untested' || status === 'unvalidated')
+        return "You need validation around your product's ability to adapt to market changes. Research upcoming trends and regulatory shifts in your industry.";
+      if (status === 'partially_validated')
+        return "You've considered adaptability, but uncertainties remain about how resilient your concept is to market shifts. Develop contingency plans for key risks.";
+      if (status === 'validated')
+        return 'Your concept shows good adaptability to potential market changes. Continue monitoring industry trends and competitor moves.';
+      return 'Your adaptability assumptions have been invalidated. Consider pivoting your approach to better handle market changes.';
+    default:
+      return 'Select a category to see AI insights about your assumptions.';
+  }
+};
+
+/**
+ * Gets insight titles based on category and validation status
+ *
+ * @param category - The assumption category
+ * @param status - The validation status
+ * @returns Insight title for the category
+ */
+export const getCategoryInsightTitleByStatus = (
+  category: AssumptionCategory,
+  status: AssumptionStatusV2,
+): string => {
+  const statusText =
+    status === 'untested' || status === 'unvalidated'
+      ? 'Validation Needed'
+      : status === 'partially_validated'
+        ? 'Partial Validation'
+        : status === 'validated'
+          ? 'Strong Validation'
+          : 'Invalidated';
+
+  switch (category) {
+    case 'desirability':
+      return `Customer ${statusText}`;
+    case 'viability':
+      return `Business Model ${statusText}`;
+    case 'feasibility':
+      return `Technical ${statusText}`;
+    case 'adaptability':
+      return `Adaptability ${statusText}`;
+    default:
+      return 'Validation Status';
+  }
+};
+
+/**
  * Gets AI insights based on category and validation percentage
+ * @deprecated Use getCategoryInsightByStatus instead for new code
  *
  * @param category - The assumption category
  * @param progress - The validation progress percentage (0-100)
@@ -203,38 +319,19 @@ export const getCategoryInsight = (
   category: AssumptionCategory,
   progress: number,
 ): string => {
-  switch (category) {
-    case 'desirability':
-      if (progress < 30)
-        return 'Your desirability assumptions need significant validation. Focus on gathering more customer feedback to verify if your target audience actually wants this product.';
-      if (progress < 70)
-        return "You've started validating customer desire for your product, but there are still key questions about market fit. Consider additional user interviews and prototype testing.";
-      return 'You have strong validation that customers want your product. Keep refining your understanding of specific user needs and preferences.';
-    case 'viability':
-      if (progress < 30)
-        return 'Your business model assumptions require validation. Start with financial modeling and market sizing to establish a clearer path to profitability.';
-      if (progress < 70)
-        return "You've made progress on validating your business model, but important questions about pricing and margins remain. Consider pricing experiments and cost analysis.";
-      return 'Your business model appears sound based on current validation. Monitor customer acquisition costs and lifetime value to refine your understanding.';
-    case 'feasibility':
-      if (progress < 30)
-        return 'Technical feasibility requires further validation. Create technical prototypes to verify your ability to deliver on product promises.';
-      if (progress < 70)
-        return "You've validated some technical aspects, but challenges remain. Identify your highest technical risks and prioritize validating those assumptions.";
-      return 'Technical feasibility appears strong. Continue refining your production process and consider scalability challenges.';
-    case 'adaptability':
-      if (progress < 30)
-        return "You need more validation around your product's ability to adapt to market changes. Research upcoming trends and regulatory shifts in your industry.";
-      if (progress < 70)
-        return "You've considered adaptability, but uncertainties remain about how resilient your concept is to market shifts. Develop contingency plans for key risks.";
-      return 'Your concept shows good adaptability to potential market changes. Continue monitoring industry trends and competitor moves.';
-    default:
-      return 'Select a category to see AI insights about your assumptions.';
-  }
+  // Convert percentage to status for backward compatibility
+  const status: AssumptionStatusV2 =
+    progress === 0
+      ? 'untested'
+      : progress < 100
+        ? 'partially_validated'
+        : 'validated';
+  return getCategoryInsightByStatus(category, status);
 };
 
 /**
  * Gets insight titles based on category and validation percentage
+ * @deprecated Use getCategoryInsightTitleByStatus instead for new code
  *
  * @param category - The assumption category
  * @param progress - The validation progress percentage (0-100)
@@ -244,24 +341,12 @@ export const getCategoryInsightTitle = (
   category: AssumptionCategory,
   progress: number,
 ): string => {
-  switch (category) {
-    case 'desirability':
-      if (progress < 30) return 'Customer Validation Needed';
-      if (progress < 70) return 'Moderate Customer Validation';
-      return 'Strong Customer Validation';
-    case 'viability':
-      if (progress < 30) return 'Business Model Validation Needed';
-      if (progress < 70) return 'Partial Business Model Validation';
-      return 'Strong Business Model Validation';
-    case 'feasibility':
-      if (progress < 30) return 'Technical Validation Needed';
-      if (progress < 70) return 'Partial Technical Validation';
-      return 'Strong Technical Validation';
-    case 'adaptability':
-      if (progress < 30) return 'Adaptability Validation Needed';
-      if (progress < 70) return 'Partial Adaptability Validation';
-      return 'Strong Adaptability Validation';
-    default:
-      return 'Validation Status';
-  }
+  // Convert percentage to status for backward compatibility
+  const status: AssumptionStatusV2 =
+    progress === 0
+      ? 'untested'
+      : progress < 100
+        ? 'partially_validated'
+        : 'validated';
+  return getCategoryInsightTitleByStatus(category, status);
 };

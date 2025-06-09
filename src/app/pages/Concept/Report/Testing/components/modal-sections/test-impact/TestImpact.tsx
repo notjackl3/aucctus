@@ -5,72 +5,18 @@ import {
   useTestResults,
   useUpdateTestAssumption,
 } from '@hooks/query/testing.hook';
+import { handleApplyRecommendations } from '../../../utils/testUtils';
 import LoadingState from './components/LoadingState';
 import NoDataState from './components/NoDataState';
 import AssumptionValidationCard from './components/AssumptionValidationCard';
 import RecommendedChangesSection from './components/RecommendedChangesSection';
+import { ITestAssumptionDetailed } from '../../../types';
+import { ITestResult } from '@libs/api/types/concept/testing';
 
 interface TestImpactProps {
   assumptions?: any[]; // Keep for backward compatibility but won't use
   conceptUuid?: string;
   testUuid?: string;
-}
-
-// Interface for assumptions from test detail endpoint (matches the actual API response)
-interface TestAssumption {
-  uuid: string;
-  testDetailsUuid: string;
-  assumptionUuid: string;
-  validationType:
-    | 'validated'
-    | 'unvalidated'
-    | 'partiallyValidated'
-    | 'noChange'
-    | 'invalidated';
-  benchmark: string;
-  statement: string;
-  importance: number;
-  category: string;
-  certainty: number;
-  riskLevel: 'high' | 'medium' | 'low';
-  riskScore: number;
-  testName: string;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface EditRecommendation {
-  title: string;
-  reason: string;
-  section: string;
-  description: string;
-  testEvidence: string;
-}
-
-// Extended interface to include additional properties from API response
-interface ExtendedTestResult {
-  uuid: string;
-  title: string;
-  description?: string;
-  fileType: string;
-  testDetailsUuid: string;
-  sourceUuid: string;
-  fileUrl: string;
-  filePath: string;
-  fileSize: number;
-  originalFilename: string;
-  summary?: string;
-  learnings?: Array<{
-    uuid: string;
-    learning: string;
-    impact: string;
-    testResultUuid: string;
-    createdAt: string;
-    updatedAt: string;
-  }>;
-  createdAt: string;
-  updatedAt: string;
-  editRecommendations?: EditRecommendation[];
 }
 
 const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
@@ -96,25 +42,19 @@ const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
   const updateTestAssumptionValidation = useUpdateTestAssumption();
 
   // Type cast the results to include extended properties
-  const results = fetchedResults as ExtendedTestResult[];
+  const results = fetchedResults as ITestResult[];
 
   // Extract assumptions and recommendations
-  // Cast the assumptions to our extended interface since the API returns more data than the base ITestAssumption
-  const assumptions = (testDetail?.assumptions ||
-    []) as unknown as TestAssumption[];
+  // Assumptions come directly from API with validationStatus
+  const assumptions: ITestAssumptionDetailed[] = testDetail?.assumptions || [];
 
   const recommendations =
     results && results.length > 0 ? results[0].editRecommendations || [] : [];
 
-  // Handle validation type change using the mutation hook
-  const handleValidationTypeChange = async (
-    assumption: TestAssumption,
-    newValidationType:
-      | 'validated'
-      | 'unvalidated'
-      | 'partiallyValidated'
-      | 'noChange'
-      | 'invalidated',
+  // Handle validation status change using the mutation hook
+  const handleValidationStatusChange = async (
+    assumption: ITestAssumptionDetailed,
+    newValidationStatus: 'validated' | 'invalidated' | 'untested',
   ) => {
     if (!conceptUuid || !testUuid) {
       return;
@@ -124,6 +64,11 @@ const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
       return; // Prevent multiple calls while loading
     }
 
+    // Type assertion for the mutation data
+    const validationData = {
+      validationStatus: newValidationStatus,
+    };
+
     // Set loading state immediately to prevent flicker
     setUpdatingAssumptionUuid(assumption.uuid);
 
@@ -132,7 +77,7 @@ const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
         conceptUuid,
         testUuid,
         assumptionUuid: assumption.uuid,
-        data: { validationType: newValidationType },
+        data: validationData,
       });
     } catch (error) {
       // Error handling is done by the mutation hook
@@ -142,10 +87,7 @@ const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
     }
   };
 
-  const handleApplyRecommendations = () => {
-    // Show alert instead of opening confirmation dialog
-    alert('Apply Recommendations feature is coming soon!');
-  };
+  // Using shared utility function for handleApplyRecommendations
 
   const handleConfirmChanges = () => {
     // This function is no longer used but keeping for consistency
@@ -210,7 +152,7 @@ const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
                     key={assumption.uuid}
                     assumption={assumption}
                     isUpdating={updatingAssumptionUuid === assumption.uuid}
-                    onValidationChange={handleValidationTypeChange}
+                    onValidationChange={handleValidationStatusChange}
                   />
                 ))}
               </div>

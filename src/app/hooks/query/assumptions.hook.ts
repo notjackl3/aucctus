@@ -19,6 +19,13 @@ export interface CategoryMetric {
   cumulativeCertainty: number;
   cumulativeImportance: number;
   averageRisk: number;
+  validationStatus:
+    | 'validated'
+    | 'unvalidated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
+  validationPercentage: number; // 0-1 range from API
 }
 
 /**

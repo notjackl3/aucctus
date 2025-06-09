@@ -41,7 +41,7 @@ export interface TestResult {
 export interface RecommendedTest {
   testName: string;
   description: string;
-  assumptions: Assumption[];
+  testDetails: ITestDetails;
 }
 
 // API Types for Testing Endpoints
@@ -67,7 +67,7 @@ export interface ITestDetails {
     firstName: string;
     lastName: string;
   };
-  assumptions: ITestAssumption[];
+  assumptions: ITestAssumptionDetailed[];
   createdAt: string;
   updatedAt: string;
   concept: number;
@@ -280,33 +280,35 @@ export interface ITestAssumptionCreate {
 }
 
 export interface ITestAssumptionUpdate {
-  validationType?:
-    | 'validated'
-    | 'unvalidated'
-    | 'partiallyValidated'
-    | 'noChange'
-    | 'invalidated';
+  validationStatus?: 'validated' | 'invalidated' | 'untested';
   benchmark?: string;
   notes?: string;
 }
 
-// Extended test assumption interface matching API response
+// Extended test assumption interface matching API response from test details
+export interface ITestAssumptionDetailed extends ITestAssumption {
+  testDetailsUuid: string;
+  assumptionUuid: string;
+  validationStatus: 'validated' | 'invalidated' | 'untested';
+  benchmark: string;
+  testName: string;
+  riskLevel: 'high' | 'medium' | 'low';
+  riskScore: number;
+  updatedAt: string;
+}
+
+// Legacy interface for backward compatibility
 export interface ITestAssumptionExtended extends ITestAssumption {
   testDetailsUuid: string;
   assumptionUuid: string;
-  validationType:
-    | 'validated'
-    | 'unvalidated'
-    | 'partiallyValidated'
-    | 'noChange'
-    | 'invalidated';
+  validationStatus: 'validated' | 'invalidated' | 'untested';
   benchmark: string;
   testName: string;
 }
 
 // Extended test details interface matching API response
 export interface ITestDetailsExtended extends ITestDetails {
-  assumptions: ITestAssumptionExtended[];
+  assumptions: ITestAssumptionDetailed[];
   insight?: string;
 }
 
