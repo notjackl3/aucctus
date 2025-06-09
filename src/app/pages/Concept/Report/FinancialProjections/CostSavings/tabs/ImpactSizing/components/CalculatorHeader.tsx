@@ -10,11 +10,11 @@ export const CalculatorHeader: React.FC<CalculatorHeaderProps> = ({
   title,
   description,
 }) => (
-  <div className='aucctus-bg-secondary-subtle aucctus-border-primary rounded-lg border p-4'>
+  <div className='aucctus-bg-secondary-subtle aucctus-border-primary rounded-lg border bg-opacity-50 p-4'>
     <div className='flex items-start gap-3'>
       <Icon
         variant='book-open'
-        className='aucctus-stroke-brand-primary h-5 w-5 self-center justify-self-center'
+        className='aucctus-stroke-brand-primary mt-2 h-5 w-5'
       />
       <div>
         <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-1'>

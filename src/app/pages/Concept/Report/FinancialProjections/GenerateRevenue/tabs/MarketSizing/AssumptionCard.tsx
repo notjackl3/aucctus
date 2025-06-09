@@ -52,11 +52,11 @@ const AssumptionCard: React.FC<AssumptionCardProps> = ({
         className={`absolute bottom-0 left-0 top-0 w-1.5 rounded-l-lg ${styles.accentColor}`}
       ></div>
 
-      <div className='flex flex-col gap-3 pl-2'>
+      <div className='flex flex-col gap-2 pl-2'>
         {/* Title and description area */}
         <div>
-          <div className='mb-2'>
-            <span className='aucctus-text-sm-semibold aucctus-text-primary'>
+          <div className='mb-1'>
+            <span className='aucctus-text-lg-medium aucctus-text-primary'>
               {assumption.title}
             </span>
           </div>

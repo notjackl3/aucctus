@@ -20,7 +20,7 @@ const ProjectionsTab: React.FC<ProjectionsTabProps> = ({
   return (
     <div className='relative space-y-6'>
       {/* Blurred background content */}
-      <div className='pointer-events-none blur-sm'>
+      <div className='pointer-events-none blur-[10px]'>
         <div className='aucctus-bg-primary aucctus-border-primary rounded-lg border p-6 shadow-sm'>
           <div className='mb-4 flex items-center gap-2'>
             <Icon
@@ -54,12 +54,15 @@ const ProjectionsTab: React.FC<ProjectionsTabProps> = ({
       </div>
 
       {/* Coming Soon overlay card */}
-      <div className='absolute inset-0 flex items-center justify-center pb-32'>
+      <div
+        style={{ animationDelay: '0.5s' }}
+        className='absolute inset-0 flex animate-fade-in items-center justify-center pb-32 opacity-0'
+      >
         <div className='aucctus-bg-tertiary aucctus-border-primary rounded-lg border-2 bg-opacity-50 px-8 py-6 shadow-lg backdrop-blur-sm'>
-          <div className='flex items-center gap-3'>
+          <div className='flex items-center justify-center gap-3'>
             <Icon
               variant='clock'
-              className='aucctus-stroke-brand-primary h-6 w-6'
+              className='aucctus-stroke-brand-primary h-5 w-5'
             />
             <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
               Coming Soon

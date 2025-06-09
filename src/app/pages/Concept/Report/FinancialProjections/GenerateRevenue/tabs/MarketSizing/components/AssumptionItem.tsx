@@ -15,7 +15,7 @@ export const AssumptionItem: React.FC<AssumptionItemProps> = ({
   return (
     <div className='aucctus-bg-secondary-extra-subtle aucctus-border-secondary rounded-lg border p-4'>
       <div className='mb-1 flex items-center justify-between'>
-        <span className='aucctus-text-sm-semibold aucctus-text-primary'>
+        <span className='aucctus-text-md-medium aucctus-text-primary'>
           {assumption.title}
         </span>
       </div>

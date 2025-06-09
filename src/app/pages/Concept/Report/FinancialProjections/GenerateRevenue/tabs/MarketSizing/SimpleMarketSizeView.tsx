@@ -133,11 +133,11 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
 
   return (
     <div className='space-y-4'>
-      <div className='aucctus-bg-secondary-subtle aucctus-border-primary rounded-lg border p-4'>
+      <div className='aucctus-bg-secondary-subtle aucctus-border-primary rounded-lg border bg-opacity-50 p-4'>
         <div className='flex items-start gap-3'>
           <Icon
             variant='book-open'
-            className='aucctus-stroke-brand-primary h-6 w-6 self-center justify-self-center'
+            className='aucctus-stroke-brand-primary mt-2 h-6 w-6'
           />
           <div>
             <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-1'>

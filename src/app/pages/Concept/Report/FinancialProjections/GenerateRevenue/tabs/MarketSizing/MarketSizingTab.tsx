@@ -42,7 +42,7 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
 
   return (
     <div className='space-y-6'>
-      <div className='aucctus-bg-primary h-full overflow-hidden rounded-lg shadow-md'>
+      <div className='aucctus-bg-primary aucctus-border-tertiary h-full overflow-hidden rounded-lg border'>
         {/* Only show toggle for regular financial projections, not for cost savings */}
         {!isCostSavingsPage && (
           <div className='aucctus-bg-secondary flex border-b'>
@@ -51,8 +51,8 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
               className={cn(
                 'flex flex-1 items-center justify-center gap-2 px-4 py-2.5',
                 activeView === 'top-down'
-                  ? 'aucctus-text-brand-primary border-b-brand-primary border-b-2'
-                  : 'aucctus-text-tertiary-hover',
+                  ? 'aucctus-text-brand-primary aucctus-bg-primary aucctus-border-primary border-b-2'
+                  : 'aucctus-text-tertiary-hover aucctus-bg-primary-hover',
               )}
             >
               <Icon
@@ -66,8 +66,8 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
               className={cn(
                 'flex flex-1 items-center justify-center gap-2 px-4 py-2.5',
                 activeView === 'bottom-up'
-                  ? 'aucctus-text-brand-primary border-b-brand-primary border-b-2'
-                  : 'aucctus-text-tertiary-hover',
+                  ? 'aucctus-text-brand-primary aucctus-bg-primary aucctus-border-primary border-b-2'
+                  : 'aucctus-text-tertiary-hover aucctus-bg-primary-hover',
               )}
             >
               <Icon

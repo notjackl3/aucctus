@@ -203,7 +203,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
           </h3>
         </div>
 
-        <div className='aucctus-text-3xl aucctus-text-brand-primary mb-4 font-bold'>
+        <div className='aucctus-header-sm-bold aucctus-text-brand-primary mb-4'>
           {formatCurrency(calculatedValue)}
         </div>
 

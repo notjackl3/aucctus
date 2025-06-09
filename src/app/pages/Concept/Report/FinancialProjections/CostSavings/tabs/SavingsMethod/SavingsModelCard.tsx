@@ -4,6 +4,7 @@ import {
   ISavingsAssumptionV2,
   ISavingsV2,
 } from '@libs/api/types/concept/financialProjectionV2';
+import { formatNumber } from '@libs/utils/number';
 
 interface SavingsModelCardProps {
   savingsData?: ISavingsV2;
@@ -27,7 +28,8 @@ const SavingsModelCard: React.FC<SavingsModelCardProps> = ({ savingsData }) => {
 
       <div className='mb-4 flex items-center gap-1'>
         <span className='aucctus-text-lg-semibold aucctus-text-primary'>
-          {currency === 'USD' ? '$' : currency} {price}
+          {currency === 'USD' ? '$' : currency}{' '}
+          {price ? formatNumber(price) : ''}
         </span>
         <ComponentTooltip
           tip={
@@ -50,7 +52,7 @@ const SavingsModelCard: React.FC<SavingsModelCardProps> = ({ savingsData }) => {
       </div>
 
       <h4 className='aucctus-text-xs aucctus-text-tertiary mb-2'>
-        Savings Assumptions
+        Savings Considerations
       </h4>
       {savingsData?.savingsAssumptions && (
         <div className='space-y-3'>

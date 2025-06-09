@@ -4,6 +4,7 @@ import {
   IPricingV2,
   IPricingConsiderationV2,
 } from '@libs/api/types/concept/financialProjectionV2';
+import { formatNumber } from '@libs/utils/number';
 
 interface PricingStrategyCardProps {
   pricingData?: IPricingV2;
@@ -28,7 +29,8 @@ const PricingStrategyCard: React.FC<PricingStrategyCardProps> = ({
       </h3>
       <div className='mb-4 flex items-center gap-1'>
         <span className='aucctus-text-lg-semibold aucctus-text-primary'>
-          {currency === 'USD' ? '$' : currency} {price}
+          {currency === 'USD' ? '$' : currency}{' '}
+          {price ? formatNumber(price) : ''}
         </span>
         <ComponentTooltip
           tip={

@@ -29,17 +29,15 @@ const CostSavingsProjections: React.FC<CostSavingsProjectionsProps> = ({
 
   return (
     <div className='flex flex-1 flex-col gap-4'>
-      <span className='aucctus-text-md aucctus-text-secondary my-4'>
-        Build and analyze cost savings models for your business concepts
-      </span>
-
-      <div className='flex flex-row gap-2 border-b px-2'>
+      <div className='aucctus-border-primary flex flex-row gap-2 px-2'>
         <button
           onClick={() => setActiveTab('savings-method')}
           className={cn(
-            'aucctus-text-tertiary-hover flex flex-1 items-center justify-center gap-2 rounded-t-md px-4 py-3 transition-colors',
+            'flex flex-1 items-center justify-center gap-2 rounded-t-lg px-4 py-3 transition-colors',
             {
-              'aucctus-text-primary aucctus-bg-brand-primary-alt border-b-brand-primary border-b-2':
+              'aucctus-bg-secondary-hover aucctus-text-tertiary-hover':
+                activeTab !== 'savings-method',
+              'aucctus-text-primary aucctus-bg-primary aucctus-border-primary border-b-2':
                 activeTab === 'savings-method',
             },
           )}
@@ -56,9 +54,11 @@ const CostSavingsProjections: React.FC<CostSavingsProjectionsProps> = ({
         <button
           onClick={() => setActiveTab('impact-sizing')}
           className={cn(
-            'aucctus-text-tertiary-hover flex flex-1 items-center justify-center gap-2 rounded-t-md px-4 py-3 transition-colors',
+            'flex flex-1 items-center justify-center gap-2 rounded-t-lg px-4 py-3 transition-colors',
             {
-              'aucctus-text-primary aucctus-bg-brand-primary-alt border-b-brand-primary border-b-2':
+              'aucctus-bg-secondary-hover aucctus-text-tertiary-hover':
+                activeTab !== 'impact-sizing',
+              'aucctus-text-primary aucctus-bg-primary aucctus-border-primary border-b-2':
                 activeTab === 'impact-sizing',
             },
           )}
@@ -75,9 +75,11 @@ const CostSavingsProjections: React.FC<CostSavingsProjectionsProps> = ({
         <button
           onClick={() => setActiveTab('projections')}
           className={cn(
-            'aucctus-text-tertiary-hover flex flex-1 items-center justify-center gap-2 rounded-t-md px-4 py-3 transition-colors',
+            'flex flex-1 items-center justify-center gap-2 rounded-t-lg px-4 py-3 transition-colors',
             {
-              'aucctus-text-primary aucctus-bg-brand-primary-alt border-b-brand-primary border-b-2':
+              'aucctus-bg-secondary-hover aucctus-text-tertiary-hover':
+                activeTab !== 'projections',
+              'aucctus-text-primary aucctus-bg-primary aucctus-border-primary border-b-2':
                 activeTab === 'projections',
             },
           )}
