@@ -21,7 +21,7 @@ const ProjectionsTab: React.FC<ProjectionsTabProps> = ({
     <div className='relative space-y-6'>
       {/* Blurred background content */}
       <div className='pointer-events-none blur-sm'>
-        <div className='aucctus-bg-primary rounded-lg p-6 shadow-md'>
+        <div className='aucctus-bg-primary aucctus-border-primary rounded-lg border p-6 shadow-sm'>
           <div className='mb-4 flex items-center gap-2'>
             <Icon
               variant='trendup'
@@ -61,7 +61,7 @@ const ProjectionsTab: React.FC<ProjectionsTabProps> = ({
               variant='clock'
               className='aucctus-stroke-brand-primary h-6 w-6'
             />
-            <h3 className='aucctus-header-sm-semibold aucctus-text-primary'>
+            <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
               Coming Soon
             </h3>
           </div>

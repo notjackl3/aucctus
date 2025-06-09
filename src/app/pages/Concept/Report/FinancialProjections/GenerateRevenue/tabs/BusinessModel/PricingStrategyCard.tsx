@@ -33,7 +33,7 @@ const PricingStrategyCard: React.FC<PricingStrategyCardProps> = ({
     })) ?? pricingConsiderations;
 
   return (
-    <div className='aucctus-bg-primary rounded-lg p-6 shadow-md'>
+    <div className='aucctus-bg-primary aucctus-border-primary rounded-lg border p-6 shadow-sm'>
       <h3 className='aucctus-text-lg-medium aucctus-text-tertiary mb-4'>
         Pricing Strategy
       </h3>

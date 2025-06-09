@@ -55,7 +55,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
   businessModelData,
 }) => {
   return (
-    <div className='aucctus-bg-primary rounded-lg p-6 shadow-md'>
+    <div className='aucctus-bg-primary aucctus-border-primary rounded-lg border p-6 shadow-sm'>
       <span className='flex flex-1 flex-row items-center gap-2'>
         <h3 className='aucctus-text-lg-medium aucctus-text-tertiary mb-4'>
           Business Model
@@ -72,7 +72,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
           <>
             <Icon
               variant={BusinessModelSubtypeIconMap[businessModelData.subtype]}
-              className='aucctus-stroke-brand-primary h-8 w-8'
+              className='aucctus-stroke-brand-primary mr-1 h-6 w-6'
             />
             <div className='aucctus-text-lg-medium aucctus-text-secondary'>
               {businessModelData.subtype}

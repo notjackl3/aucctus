@@ -21,7 +21,7 @@ export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({
   <div ref={assumptionsRef}>
     <div className='aucctus-bg-primary sticky top-0 z-10 mb-4 flex items-center justify-between p-6'>
       <div>
-        <span className='aucctus-header-sm-semibold aucctus-text-primary'>
+        <span className='aucctus-text-xl-semibold aucctus-text-primary'>
           Assumptions
         </span>
         <p className='aucctus-text-xs aucctus-text-tertiary'>

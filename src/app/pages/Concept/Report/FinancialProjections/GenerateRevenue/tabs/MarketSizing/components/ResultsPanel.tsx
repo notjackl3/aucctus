@@ -188,7 +188,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
   return (
     <div ref={resultsRef} className='h-fit p-6'>
       <div className='mb-4'>
-        <h3 className='aucctus-header-sm-semibold aucctus-text-primary'>
+        <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
           {resultsTitle}
         </h3>
         <p className='aucctus-text-xs aucctus-text-tertiary'>

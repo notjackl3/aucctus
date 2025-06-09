@@ -13,6 +13,10 @@ export interface IBaseFinancialProjectionSourceV2 {
   reasoning: string;
 }
 
+// =============================================================================
+// GENERATE REVENUE TYPES
+// =============================================================================
+
 // Pricing types
 export interface IPricingV2 extends IBaseFinancialProjectionEntity {
   price: number;
@@ -156,6 +160,168 @@ export interface IPatchDistributionChannelV2 {
   description?: string;
 }
 
+// =============================================================================
+// COST SAVINGS TYPES
+// =============================================================================
+
+// Savings Source types
+export interface ISavingsSourceV2 extends IBaseFinancialProjectionEntity {
+  title: string;
+  url?: string;
+  reasoning: string;
+}
+
+// Savings types
+export interface ISavingsV2 extends IBaseFinancialProjectionEntity {
+  financialProjection: string; // UUID reference
+  savingsAmount: number;
+  currency?: string;
+  unit: string;
+  reasoning: string;
+  savingsAssumptions: string[];
+  savingsSources: ISavingsSourceV2[];
+}
+
+export interface ICreateSavingsV2 {
+  savingsAmount: number;
+  currency?: string;
+  unit: string;
+  reasoning: string;
+  savingsAssumptions?: string[];
+}
+
+export interface IPatchSavingsV2 {
+  savingsAmount?: number;
+  currency?: string;
+  unit?: string;
+  reasoning?: string;
+  savingsAssumptions?: string[];
+}
+
+// Target Savings Area types
+export interface ITargetSavingsAreaV2 extends IBaseFinancialProjectionEntity {
+  financialProjection: string; // UUID reference
+  areaType: 'primary' | 'alternative';
+  title: string;
+  description: string;
+}
+
+export interface ICreateTargetSavingsAreaV2 {
+  areaType: 'primary' | 'alternative';
+  title: string;
+  description: string;
+}
+
+export interface IPatchTargetSavingsAreaV2 {
+  areaType?: 'primary' | 'alternative';
+  title?: string;
+  description?: string;
+}
+
+export interface ISavingMethodV2 extends IBaseFinancialProjectionEntity {
+  financialProjection: string; // UUID reference
+  type: string;
+  description: string;
+}
+
+export interface ICreateSavingMethodV2 {
+  type: string;
+  description: string;
+}
+
+export interface IPatchSavingMethodV2 {
+  type?: string;
+  description?: string;
+}
+
+// Cost Interference types
+export interface ICostInterferenceV2 extends IBaseFinancialProjectionEntity {
+  financialProjection: string; // UUID reference
+  title: string;
+  interferenceInsight: string;
+  mitigationStatement: string;
+}
+
+export interface ICreateCostInterferenceV2 {
+  title: string;
+  description: string;
+  interferenceInsight: string;
+  mitigationStatement: string;
+}
+
+export interface IPatchCostInterferenceV2 {
+  title?: string;
+  description?: string;
+  interferenceInsight?: string;
+  mitigationStatement?: string;
+}
+
+// Impact Sizing types
+export type ImpactSizingType = 'bottom_up';
+
+export interface IImpactSizingV2 extends IBaseFinancialProjectionEntity {
+  financialProjection: string; // UUID reference
+  type: ImpactSizingType;
+  assumptionEntries: IImpactSizingAssumptionEntryV2[];
+}
+
+export interface ICreateImpactSizingV2 {
+  type: ImpactSizingType;
+}
+
+// Impact Sizing Assumption Entry types
+export type ImpactSizingOperator = '*' | '/' | '+' | '(+)' | '-' | '(-)';
+export type ImpactSizingUnit = '%' | '$' | 'magnitude';
+
+export interface IImpactSizingAssumptionEntryV2
+  extends IBaseFinancialProjectionEntity {
+  impactSizing: string; // UUID reference
+  order: number;
+  scalar: number;
+  unit: ImpactSizingUnit;
+  unitDescription?: string;
+  operator?: ImpactSizingOperator;
+  title: string;
+  description: string;
+  impactAssumptionSources: IImpactAssumptionSourceV2[];
+}
+
+export interface ICreateImpactSizingAssumptionEntryV2 {
+  order: number;
+  scalar: number;
+  unit: ImpactSizingUnit;
+  unitDescription?: string;
+  operator?: ImpactSizingOperator;
+  title: string;
+  description: string;
+}
+
+export interface IPatchImpactSizingAssumptionEntryV2 {
+  order?: number;
+  scalar?: number;
+  unit?: ImpactSizingUnit;
+  unitDescription?: string;
+  operator?: ImpactSizingOperator;
+  title?: string;
+  description?: string;
+}
+
+// Impact Assumption Source types
+export interface IImpactAssumptionSourceV2
+  extends IBaseFinancialProjectionEntity {
+  title: string;
+  url?: string;
+  reasoning: string;
+}
+
+export interface ICreateImpactAssumptionSourceV2 {
+  title: string;
+  url?: string;
+  reasoning: string;
+}
+
+// =============================================================================
+
 export interface IFinancialProjectionResponse {
   financialProjection: IFinancialProjectionV2 | IFinancialProjection;
   isV2: boolean;
@@ -163,11 +329,19 @@ export interface IFinancialProjectionResponse {
 
 // Main Financial Projection V2 type
 export interface IFinancialProjectionV2 extends IBaseFinancialProjectionEntity {
-  marketSizings: IMarketSizingV2[];
+  // Generate Revenue related fields
   businessModel?: IBusinessModelV2;
   pricingModel?: IPricingV2;
-  costDrivers: ICostDriverV2[];
   distributionChannels: IDistributionChannelV2[];
+  costDrivers: ICostDriverV2[];
+  marketSizings: IMarketSizingV2[];
+
+  // Cost Savings related fields
+  savingMethod?: ISavingMethodV2;
+  savingsModel?: ISavingsV2;
+  targetSavingsAreas: ITargetSavingsAreaV2[];
+  costInterferences: ICostInterferenceV2[];
+  impactSizings: IImpactSizingV2[];
 }
 
 // Response types for API
