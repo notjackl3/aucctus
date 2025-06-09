@@ -259,27 +259,6 @@ const Testing: React.FC = () => {
             />
           </>
         )}
-
-        {/* Debug info for development */}
-        {__ENVIRONMENT__ === 'development' && testDetails.length > 0 && (
-          <div className='aucctus-bg-secondary mt-8 rounded-lg p-4'>
-            <h3 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
-              API Test Data (Development Only)
-            </h3>
-            <div className='space-y-2'>
-              {testDetails.map((test) => (
-                <div
-                  key={test.uuid}
-                  className='aucctus-text-sm aucctus-text-secondary'
-                >
-                  <strong>{test.name}</strong> - {test.testType} - {test.status}
-                  <br />
-                  <span className='aucctus-text-xs'>{test.description}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </TestCompletionContext.Provider>
   );
