@@ -9,16 +9,6 @@ const TestExecution: React.FC = () => {
 
   return (
     <div className='space-y-6'>
-      {/* Header Section */}
-      <div className='space-y-2'>
-        <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
-          Test Execution
-        </h3>
-        <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-          Choose how you want to conduct your test
-        </p>
-      </div>
-
       {/* Execution Mode Selection - 2x2 Grid */}
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {/* Facilitated Option */}

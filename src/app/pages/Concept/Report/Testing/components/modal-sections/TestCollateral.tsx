@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Icon, toast } from '@components';
 import { cn } from '@libs/utils/react';
 import { useTestCollateral } from '@hooks/query/testing.hook';
-import ReactMarkdown from 'react-markdown';
+
 import {
   CollateralType,
   ITestCollateral,
@@ -155,44 +155,8 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   // Show no data state if no collateral available
   const hasNoCollateral = displayCollateral.length === 0;
 
-  // Get collateral count for display
-  const getCollateralCount = (): number => {
-    if (!collateral) return 0;
-
-    if (Array.isArray(collateral)) {
-      return collateral.length;
-    }
-
-    if (
-      typeof collateral === 'object' &&
-      collateral !== null &&
-      'results' in collateral
-    ) {
-      const resultsArray = (collateral as any).results;
-      if (Array.isArray(resultsArray)) {
-        return resultsArray.length;
-      }
-    }
-
-    return 0;
-  };
-
-  const collateralCount = getCollateralCount();
-
   return (
     <div className='flex h-full flex-col space-y-4'>
-      {/* Header Section */}
-      <div className='flex-shrink-0'>
-        <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
-          Test Collateral
-          {!hasNoCollateral && (
-            <span className='aucctus-text-brand-primary ml-2'>
-              ({collateralCount} item{collateralCount !== 1 ? 's' : ''})
-            </span>
-          )}
-        </h3>
-      </div>
-
       {hasNoCollateral ? (
         // No data state
         <div className='aucctus-bg-secondary-subtle aucctus-border-secondary flex flex-1 items-center justify-center rounded-lg border p-6'>
@@ -283,23 +247,23 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
           <div className='min-h-0 flex-1'>
             <div className='aucctus-border-secondary aucctus-bg-primary flex h-full flex-col overflow-hidden rounded-lg border'>
               {/* Header Section - Fixed at top */}
-              <div className='aucctus-border-secondary aucctus-bg-secondary-subtle flex flex-shrink-0 items-center justify-between border-b px-4 py-3'>
+              <div className='aucctus-border-secondary aucctus-bg-secondary-subtle flex flex-shrink-0 items-center justify-between border-b px-6 py-4'>
                 <div className='min-w-0 flex-1'>
-                  <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary truncate'>
+                  <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary truncate'>
                     {selectedItem?.title || 'No item selected'}
                   </h4>
                   {selectedItem?.description && (
-                    <p className='aucctus-text-sm-regular aucctus-text-secondary line-clamp-1'>
+                    <p className='aucctus-text-md-regular aucctus-text-secondary mt-1 line-clamp-1'>
                       {selectedItem.description}
                     </p>
                   )}
                 </div>
                 {selectedItem && (
-                  <div className='flex shrink-0 gap-2'>
+                  <div className='flex shrink-0 gap-3'>
                     {selectedItem.type === 'text' && (
                       <>
                         <button
-                          className='btn btn-secondary btn-sm flex items-center gap-1'
+                          className='btn btn-secondary flex items-center gap-2'
                           onClick={handleCopyContent}
                         >
                           <Icon
@@ -309,7 +273,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                           Copy
                         </button>
                         <button
-                          className='btn btn-secondary btn-sm flex items-center gap-1'
+                          className='btn btn-secondary flex items-center gap-2'
                           onClick={handleDownloadContent}
                         >
                           <Icon
@@ -322,7 +286,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                     )}
                     {selectedItem.type === 'image' && (
                       <button
-                        className='btn btn-secondary btn-sm flex items-center gap-1'
+                        className='btn btn-secondary flex items-center gap-2'
                         onClick={handleDownloadContent}
                       >
                         <Icon
@@ -341,12 +305,10 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                   {/* Content Section - Scrollable */}
                   <div className='flex-1 overflow-y-auto'>
                     {selectedItem.type === 'text' ? (
-                      <div className='aucctus-bg-secondary-subtle aucctus-text-primary overflow-y-auto rounded-md'>
-                        <div className='prose prose-sm aucctus-text-primary max-w-none p-4'>
-                          <ReactMarkdown>
-                            {selectedItem.content.replace(/\\n/g, '\n')}
-                          </ReactMarkdown>
-                        </div>
+                      <div className='aucctus-bg-secondary-subtle h-full overflow-y-auto p-6'>
+                        <pre className='aucctus-text-sm aucctus-text-primary whitespace-pre-wrap font-mono leading-relaxed'>
+                          {selectedItem.content.replace(/\\n/g, '\n')}
+                        </pre>
                       </div>
                     ) : selectedItem.type === 'image' ? (
                       <div className='flex h-full items-center justify-center'>

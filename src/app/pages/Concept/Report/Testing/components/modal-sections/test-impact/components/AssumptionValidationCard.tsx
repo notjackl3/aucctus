@@ -64,7 +64,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
       },
       {
         type: 'untested',
-        label: 'Untested',
+        label: 'Unchanged',
         icon: (
           <Icon
             variant='help-circle'

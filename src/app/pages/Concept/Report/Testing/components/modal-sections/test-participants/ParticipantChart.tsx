@@ -132,7 +132,7 @@ const ParticipantChart: React.FC<ParticipantChartProps> = ({
               r='80'
               fill='none'
               stroke='#f1f5f9'
-              strokeWidth='20'
+              strokeWidth='30'
             />
             {chartData.map((segment, index) => {
               const circumference = 2 * Math.PI * 80;
@@ -153,7 +153,7 @@ const ParticipantChart: React.FC<ParticipantChartProps> = ({
                   r='80'
                   fill='none'
                   stroke={COLORS[index % COLORS.length]}
-                  strokeWidth='20'
+                  strokeWidth='30'
                   strokeDasharray={`${strokeDasharray} ${circumference}`}
                   strokeDashoffset='0'
                   style={{

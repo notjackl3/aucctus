@@ -16,11 +16,13 @@ const ThresholdMarker: React.FC<ThresholdMarkerProps> = ({
   return (
     <div
       className='absolute z-10'
-      style={{ left: `${pixelPosition}px`, top: '0' }}
+      style={{
+        left: `${pixelPosition}px`,
+        top: '0',
+        transform: 'translateX(-50%)',
+      }}
     >
-      <div
-        className={`h-6 w-0 w-0.5 p-0 ${COMMON_COLORS.thresholdMarker}`}
-      ></div>
+      <div className={`h-6 w-0.5 ${COMMON_COLORS.thresholdMarker}`}></div>
     </div>
   );
 };

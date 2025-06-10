@@ -147,73 +147,8 @@ const TestOverview: React.FC<TestOverviewProps> = ({
         insight={testObjective}
       />
 
-      {/* Test Details from API */}
-      {testDetail && (
-        <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-6'>
-          <h3 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-4'>
-            Test Details
-          </h3>
-          <div className='space-y-3'>
-            <div className='flex items-center gap-2'>
-              <span className='aucctus-text-sm-semibold aucctus-text-secondary min-w-0 flex-shrink-0'>
-                Status:
-              </span>
-              <span
-                className={`aucctus-text-sm-semibold capitalize ${
-                  testDetail.status === 'active'
-                    ? 'aucctus-text-success-primary'
-                    : testDetail.status === 'completed'
-                      ? 'aucctus-text-brand-primary'
-                      : 'aucctus-text-tertiary'
-                }`}
-              >
-                {testDetail.status}
-              </span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <span className='aucctus-text-sm-semibold aucctus-text-secondary min-w-0 flex-shrink-0'>
-                Target Participants:
-              </span>
-              <span className='aucctus-text-sm-regular aucctus-text-brand-primary'>
-                {testDetail.targetParticipants}
-              </span>
-            </div>
-            <div className='flex items-center gap-2'>
-              <span className='aucctus-text-sm-semibold aucctus-text-secondary min-w-0 flex-shrink-0'>
-                Notes:
-              </span>
-              <span className='aucctus-text-sm-regular aucctus-text-brand-primary'>
-                {testDetail.notes || 'No notes available'}
-              </span>
-            </div>
-            {testDetail.methodology && (
-              <div>
-                <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
-                  Methodology:
-                </span>
-                <p className='aucctus-text-sm-regular aucctus-text-brand-primary mt-1'>
-                  {testDetail.methodology}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
       {/* Assumptions Section */}
       <div className='space-y-4'>
-        <div className='flex items-center justify-between'>
-          <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
-            Assumptions Being Tested
-          </h3>
-          {testDetail?.assumptions && testDetail.assumptions.length > 0 && (
-            <span className='aucctus-text-sm-regular aucctus-text-secondary'>
-              {testDetail.assumptions.length} assumption
-              {testDetail.assumptions.length !== 1 ? 's' : ''}
-            </span>
-          )}
-        </div>
-
         {displayAssumptions.length > 0 ? (
           <div className='space-y-3'>
             {displayAssumptions.map((assumption) => (

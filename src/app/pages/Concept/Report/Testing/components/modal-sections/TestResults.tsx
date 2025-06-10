@@ -6,6 +6,7 @@ import {
   useDeleteTestResult,
 } from '@hooks/query/testing.hook';
 import { ITestResult } from '@libs/api/types/concept/testing';
+import TestCompletionLoadingOverlay from './test-impact/components/TestCompletionLoadingOverlay';
 
 interface TestResultsProps {
   conceptUuid?: string;
@@ -165,47 +166,12 @@ const TestResults: React.FC<TestResultsProps> = ({
     <div className='relative space-y-4'>
       {/* Loading Overlay for Test Result Analysis */}
       {createTestResultWithFile.isLoading && (
-        <div className='absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-white/90 backdrop-blur-sm'>
-          <div className='flex flex-col items-center gap-4 text-center'>
-            <div className='relative'>
-              <Icon
-                variant='refresh'
-                className='aucctus-stroke-brand-primary h-12 w-12 animate-spin'
-              />
-              <div className='absolute inset-0 flex items-center justify-center'>
-                <div className='aucctus-bg-brand-primary h-3 w-3 animate-pulse rounded-full'></div>
-              </div>
-            </div>
-            <div className='space-y-2'>
-              <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
-                Analyzing Test Results
-              </h4>
-              <p className='aucctus-text-sm-regular aucctus-text-secondary max-w-md'>
-                We&apos;re processing your test data and extracting key
-                insights. This may take up to a minute.
-              </p>
-              <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
-                Our AI will provide learnings and recommendations soon...
-              </p>
-            </div>
-          </div>
-        </div>
+        <TestCompletionLoadingOverlay
+          title='Analyzing Test Results'
+          description="We're processing your test data and extracting key insights. This may take up to a minute."
+          subtitle='Our AI will provide learnings and recommendations soon...'
+        />
       )}
-
-      {/* Header Section */}
-      <div className='space-y-2'>
-        <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
-          Test Results
-        </h3>
-        <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-          Record and analyze findings from your test
-          {hasResults && (
-            <span className='aucctus-text-brand-primary ml-2'>
-              ({results.length} file{results.length !== 1 ? 's' : ''})
-            </span>
-          )}
-        </p>
-      </div>
 
       {/* Results Grid */}
       {hasResults && (
@@ -270,8 +236,8 @@ const TestResults: React.FC<TestResultsProps> = ({
                     </div>
 
                     {/* Metadata Grid */}
-                    <div className='aucctus-bg-secondary-subtle rounded-lg p-3'>
-                      <div className='grid grid-cols-2 gap-3 lg:grid-cols-4'>
+                    <div className='aucctus-bg-secondary-subtle rounded-lg p-4'>
+                      <div className='grid grid-cols-2 gap-4 lg:grid-cols-4'>
                         {/* File Name */}
                         <div className='flex items-center gap-2'>
                           <Icon
@@ -327,14 +293,9 @@ const TestResults: React.FC<TestResultsProps> = ({
                             variant='check'
                             className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
                           />
-                          <div>
-                            <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
-                              Status
-                            </p>
-                            <span className='aucctus-bg-success-secondary aucctus-text-success-primary rounded-full px-2 py-0.5 text-xs font-semibold'>
-                              Processed
-                            </span>
-                          </div>
+                          <span className='aucctus-bg-success-secondary aucctus-text-success-primary rounded-full px-2 py-0.5 text-xs font-semibold'>
+                            Processed
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -364,25 +325,17 @@ const TestResults: React.FC<TestResultsProps> = ({
                       key={learning.uuid}
                       className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-3'
                     >
-                      <div className='flex items-start gap-3'>
-                        <div className='aucctus-bg-brand-secondary aucctus-border-brand mt-1 flex-shrink-0 rounded-full border p-1'>
-                          <Icon
-                            variant='check'
-                            className='aucctus-stroke-brand-primary h-3 w-3'
-                          />
-                        </div>
-                        <div className='min-w-0 flex-1'>
-                          <p className='aucctus-text-sm-semibold aucctus-text-brand-primary mb-2'>
-                            {learning.learning}
+                      <div>
+                        <p className='aucctus-text-sm-regular aucctus-text-brand-primary mb-2'>
+                          {learning.learning}
+                        </p>
+                        <div className='aucctus-bg-primary rounded p-2'>
+                          <p className='aucctus-text-xs-regular aucctus-text-tertiary mb-1'>
+                            Impact:
                           </p>
-                          <div className='aucctus-bg-primary rounded p-2'>
-                            <p className='aucctus-text-xs-regular aucctus-text-tertiary mb-1'>
-                              Impact:
-                            </p>
-                            <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-                              {learning.impact}
-                            </p>
-                          </div>
+                          <p className='aucctus-text-sm-semibold aucctus-text-secondary'>
+                            {learning.impact}
+                          </p>
                         </div>
                       </div>
                     </div>

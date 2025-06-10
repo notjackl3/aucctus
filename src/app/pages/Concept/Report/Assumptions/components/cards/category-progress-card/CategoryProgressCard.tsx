@@ -51,7 +51,7 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
       className={cn(
         'mb-5 cursor-pointer rounded-lg border p-4 transition-colors',
         {
-          [`aucctus-bg-secondary border-l-4 ${categoryColors.borderColor}`]:
+          [`${categoryColors.bgColor} border-l-4 ${categoryColors.borderColor}`]:
             isSelected,
           'aucctus-border-tertiary aucctus-bg-primary aucctus-bg-primary-hover':
             !isSelected,
@@ -64,9 +64,7 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
           <div className='mr-2'>
             <CategoryIcon category={category} />
           </div>
-          <h4 className='aucctus-text-md-semibold aucctus-text-primary'>
-            {title}
-          </h4>
+          <h4 className='aucctus-text-lg-bold aucctus-text-primary'>{title}</h4>
         </div>
         <StatusBadge status={getStatus()} />
       </div>

@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import { Icon } from '@components';
 import {
   useTestDetail,
   useTestResults,
   useUpdateTestAssumption,
 } from '@hooks/query/testing.hook';
-import { handleApplyRecommendations } from '../../../utils/testUtils';
 import LoadingState from './components/LoadingState';
 import NoDataState from './components/NoDataState';
 import AssumptionValidationCard from './components/AssumptionValidationCard';
 import RecommendedChangesSection from './components/RecommendedChangesSection';
+import TestCompletionLoadingOverlay from './components/TestCompletionLoadingOverlay';
 import { ITestAssumptionDetailed } from '../../../types';
 import { ITestResult } from '@libs/api/types/concept/testing';
+import { useTestCompletion } from '../../../Testing';
 
 interface TestImpactProps {
   assumptions?: any[]; // Keep for backward compatibility but won't use
@@ -24,6 +25,9 @@ const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
   const [updatingAssumptionUuid, setUpdatingAssumptionUuid] = useState<
     string | null
   >(null);
+
+  // Get completion context to show loading overlay during test completion
+  const { isCompletingTest } = useTestCompletion();
 
   // Fetch test detail to get assumptions
   const shouldFetchDetail = !!conceptUuid && !!testUuid;
@@ -110,37 +114,21 @@ const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
   const isDisabled = hasNoTestResults;
 
   return (
-    <div className='space-y-6'>
-      {/* Header Section */}
-      <div className='space-y-2'>
-        <div className='flex items-center gap-2'>
-          <h3
-            className={`aucctus-text-lg-semibold ${isDisabled ? 'aucctus-text-disabled' : 'aucctus-text-brand-primary'}`}
-          >
-            Results Impact
-          </h3>
-          {isDisabled && (
-            <ComponentTooltip tip='Upload test results first to see impact analysis and assumption validation'>
-              <Icon
-                variant='help-circle'
-                className='aucctus-stroke-disabled h-4 w-4'
-              />
-            </ComponentTooltip>
-          )}
-        </div>
-        <p
-          className={`aucctus-text-sm-regular ${isDisabled ? 'aucctus-text-disabled' : 'aucctus-text-secondary'}`}
-        >
-          How your test results affect your assumptions and what changes to
-          consider for your concept.
-        </p>
-      </div>
+    <div className='relative space-y-6'>
+      {/* Loading Overlay for Test Completion */}
+      {isCompletingTest && (
+        <TestCompletionLoadingOverlay
+          title='Completing Test'
+          description="We're analyzing your results and preparing recommendations for your next test."
+          subtitle='This may take a moment as we process your findings...'
+        />
+      )}
 
       <div className={`${isDisabled ? 'pointer-events-none opacity-50' : ''}`}>
         {hasNoData ? (
           <NoDataState />
         ) : (
-          <>
+          <div className='space-y-6'>
             {/* Assumptions Validation Results */}
             {!hasNoAssumptions && (
               <div className='space-y-4'>
@@ -159,60 +147,59 @@ const TestImpact: React.FC<TestImpactProps> = ({ conceptUuid, testUuid }) => {
             )}
 
             {/* Recommended Concept Changes */}
-            <RecommendedChangesSection
-              recommendations={recommendations}
-              onApplyRecommendations={handleApplyRecommendations}
-            />
-
-            {/* Confirmation Dialog */}
-            {showConfirmation && (
-              <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-6'>
-                <div className='mb-4 flex items-center gap-3'>
-                  <Icon
-                    variant='check'
-                    className='aucctus-stroke-brand-primary h-5 w-5'
-                  />
-                  <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
-                    Confirm Changes
-                  </h4>
-                </div>
-
-                <p className='aucctus-text-sm-regular aucctus-text-secondary mb-4'>
-                  Review the changes that will be applied to your concept
-                </p>
-
-                <div className='mb-6 space-y-3'>
-                  {recommendations.map((recommendation, index) => (
-                    <div key={index} className='space-y-2'>
-                      <div className='aucctus-text-sm-semibold aucctus-text-brand-primary'>
-                        {recommendation.title}
-                      </div>
-                      <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-3'>
-                        <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-                          {recommendation.description}
-                        </p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className='flex justify-end gap-3'>
-                  <button
-                    className='btn btn-secondary'
-                    onClick={() => setShowConfirmation(false)}
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    className='btn btn-primary'
-                    onClick={handleConfirmChanges}
-                  >
-                    Apply Changes
-                  </button>
-                </div>
-              </div>
+            {!hasNoRecommendations && (
+              <RecommendedChangesSection recommendations={recommendations} />
             )}
-          </>
+          </div>
+        )}
+
+        {/* Confirmation Dialog */}
+        {showConfirmation && (
+          <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-6'>
+            <div className='mb-4 flex items-center gap-3'>
+              <Icon
+                variant='check'
+                className='aucctus-stroke-brand-primary h-5 w-5'
+              />
+              <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
+                Confirm Changes
+              </h4>
+            </div>
+
+            <p className='aucctus-text-sm-regular aucctus-text-secondary mb-4'>
+              Review the changes that will be applied to your concept
+            </p>
+
+            <div className='mb-6 space-y-3'>
+              {recommendations.map((recommendation, index) => (
+                <div key={index} className='space-y-2'>
+                  <div className='aucctus-text-sm-semibold aucctus-text-brand-primary'>
+                    {recommendation.title}
+                  </div>
+                  <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-3'>
+                    <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                      {recommendation.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className='flex justify-end gap-3'>
+              <button
+                className='btn btn-secondary'
+                onClick={() => setShowConfirmation(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className='btn btn-primary'
+                onClick={handleConfirmChanges}
+              >
+                Apply Changes
+              </button>
+            </div>
+          </div>
         )}
       </div>
     </div>

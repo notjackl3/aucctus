@@ -29,27 +29,6 @@ interface TestExecutionModalProps {
   concept: any;
 }
 
-// Storage key for remembering the last active tab
-const TEST_MODAL_TAB_STORAGE_KEY = 'test-execution-modal-active-tab';
-
-// Helper functions for localStorage
-const getStoredActiveTab = (): string => {
-  try {
-    return localStorage.getItem(TEST_MODAL_TAB_STORAGE_KEY) || 'overview';
-  } catch (error) {
-    return 'overview';
-  }
-};
-
-const setStoredActiveTab = (tab: string): void => {
-  try {
-    localStorage.setItem(TEST_MODAL_TAB_STORAGE_KEY, tab);
-  } catch (error) {
-    // Silent fail - localStorage might be disabled
-    // Tab state will still work, just won't persist across sessions
-  }
-};
-
 const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   assumptions = [],
   testType = 'Customer Interviews',
@@ -60,8 +39,8 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   const queryClient = useQueryClient();
   const conceptUuid = concept?.uuid || '';
 
-  // Initialize with stored tab or default to 'overview'
-  const [activeTab, setActiveTab] = useState(() => getStoredActiveTab());
+  // Always start with 'overview' tab
+  const [activeTab, setActiveTab] = useState('overview');
   const [visitedTabs, setVisitedTabs] = useState<Set<string>>(
     new Set(['overview']),
   );
@@ -79,10 +58,9 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   // Get completion context
   const { setIsCompletingTest } = useTestCompletion();
 
-  // Update visited tabs when activeTab changes and save to localStorage
+  // Update visited tabs when activeTab changes
   useEffect(() => {
     setVisitedTabs((prev) => new Set([...prev, activeTab]));
-    setStoredActiveTab(activeTab);
   }, [activeTab]);
 
   // Check if test can be completed (will be determined by Results tab)
@@ -391,19 +369,6 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
 
       {/* Footer - flex-shrink-0 to maintain fixed height */}
       <div className='aucctus-border-secondary rounded-lg border p-6'>
-        {/* Information about completion requirement */}
-        {isLastTab && !canCompleteTest && (
-          <div className='aucctus-bg-secondary-extra-subtle aucctus-border-secondary mb-4 flex items-center gap-2 rounded-lg border p-2'>
-            <Icon
-              variant='help-circle'
-              className='aucctus-stroke-brand-primary h-4 w-4 flex-shrink-0'
-            />
-            <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-              Add results to complete this test
-            </p>
-          </div>
-        )}
-
         <div className='flex justify-between'>
           <button
             className={cn(

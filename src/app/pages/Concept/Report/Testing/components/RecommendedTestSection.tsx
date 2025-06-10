@@ -5,21 +5,19 @@ import { RecommendedTest } from '../types';
 import { RISK_LEVEL_CONFIGS } from '../../Assumptions/constants/statusConfigs';
 import CategoryIcon from '../../Assumptions/components/cards/category-progress-card/CategoryIcon';
 import GenericStatusBadge from '../../Assumptions/components/shared/GenericStatusBadge';
-import ValidationBenchmarkCard from './modal-sections/test-impact/components/ValidationBenchmarkCard';
+
 import { useTestCompletion } from '../Testing';
 
 interface RecommendedTestSectionProps {
   recommendedTest: RecommendedTest | null;
   onRunTest: () => void;
   onSelectAssumption: (assumptionId: string) => void;
-  showBenchmark?: boolean;
 }
 
 const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   recommendedTest,
   onRunTest,
   onSelectAssumption,
-  showBenchmark = false,
 }) => {
   const { isCompletingTest } = useTestCompletion();
 
@@ -76,7 +74,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
     <div className='space-y-3'>
       <div
         className={cn(
-          'aucctus-bg-primary aucctus-border-secondary relative rounded-lg border border-l-4 border-l-[#5D4037] p-5 shadow-sm',
+          'aucctus-border-secondary relative rounded-lg border border-l-4 border-l-[#5D4037] bg-primary-25 p-5 shadow-sm',
           isCompletingTest && 'pointer-events-none',
         )}
       >
@@ -96,7 +94,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
 
         <div className='mb-4 flex items-start justify-between'>
           {/* Recommended Label */}
-          <div className='aucctus-bg-brand-secondary aucctus-text-xs-semibold aucctus-text-brand-primary mb-1 inline-flex items-center gap-1.5 rounded-md px-2 py-1'>
+          <div className='aucctus-bg-brand-secondary aucctus-border-secondary aucctus-text-xs-semibold aucctus-text-brand-primary mb-1 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5'>
             <Icon
               variant='ai-conclusion'
               className='aucctus-stroke-brand-primary h-3.5 w-3.5'
@@ -130,7 +128,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
 
         {/* Test Name and Description */}
         <div className='mb-4 space-y-2'>
-          <h3 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
+          <h3 className='aucctus-text-lg-bold aucctus-text-brand-primary'>
             {recommendedTest.testName}
           </h3>
           <p className='aucctus-text-sm-regular aucctus-text-brand-secondary'>
@@ -177,14 +175,9 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                     </div>
                     <GenericStatusBadge config={riskColors} />
                   </div>
-                  <p className='aucctus-text-md-medium aucctus-text-brand-primary pb-4'>
+                  <p className='aucctus-text-md-medium aucctus-text-brand-primary'>
                     {assumption.statement}
                   </p>
-
-                  {/* Benchmark Section */}
-                  {showBenchmark && assumption.benchmark && (
-                    <ValidationBenchmarkCard benchmark={assumption.benchmark} />
-                  )}
                 </li>
               );
             })}

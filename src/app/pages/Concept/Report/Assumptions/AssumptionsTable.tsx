@@ -74,11 +74,11 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
   });
 
   return (
-    <div className='aucctus-border-tertiary overflow-hidden rounded-lg border shadow-sm'>
+    <div className='aucctus-border-primary overflow-hidden rounded-lg border shadow-sm'>
       <div className='flex flex-col md:flex-row'>
         {/* Left column: Category cards - takes ~30% of space */}
-        <div className='aucctus-bg-primary aucctus-border-tertiary border-r p-6 md:w-[30%]'>
-          <h3 className='aucctus-header-sm-semibold aucctus-text-sm mb-4'>
+        <div className='aucctus-bg-primary aucctus-border-primary border-r p-6 md:w-[30%]'>
+          <h3 className='aucctus-header-md-bold aucctus-text-md mb-4'>
             Categories
           </h3>
 

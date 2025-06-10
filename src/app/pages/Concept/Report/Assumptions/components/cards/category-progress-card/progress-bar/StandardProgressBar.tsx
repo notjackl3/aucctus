@@ -75,7 +75,6 @@ const StandardProgressBar: React.FC<StandardProgressBarProps> = ({
         style={{
           left: `${(Math.min(effectiveProgress, thresholdValue) * width) / 100}px`,
           width: `${(Math.max(0, thresholdValue - effectiveProgress) * width) / 100}px`,
-          borderRadius: '0',
         }}
         onMouseEnter={() => setHoveredSection('remaining')}
         onMouseLeave={() => setHoveredSection(null)}

@@ -46,7 +46,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   };
   return (
     <div
-      className='aucctus-bg-primary hover:aucctus-bg-primary-hover aucctus-border-secondary cursor-pointer rounded-lg border p-5 transition-colors'
+      className='aucctus-bg-primary hover:aucctus-bg-primary-hover aucctus-border-primary cursor-pointer rounded-lg border p-5 shadow-sm transition-colors'
       onClick={onClick}
     >
       {/* Assumption header */}

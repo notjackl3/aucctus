@@ -30,7 +30,7 @@ const GenericStatusBadge: React.FC<GenericStatusBadgeProps> = ({
   return (
     <span
       className={cn(
-        'aucctus-text-xs-medium inline-flex items-center gap-1 rounded-md px-2 py-1',
+        'aucctus-text-xs-medium aucctus-border-secondary inline-flex items-center gap-1 rounded-md border px-2 py-1',
         config.bg,
         config.text,
         className,

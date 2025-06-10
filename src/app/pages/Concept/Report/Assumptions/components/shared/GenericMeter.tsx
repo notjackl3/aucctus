@@ -23,12 +23,12 @@ const METER_CONFIGS: Record<MeterType, MeterConfig> = {
     tooltip: 'How certain we are that this assumption is valid.',
     colors: {
       high: {
-        text: 'text-green-500',
-        blocks: ['bg-green-500', 'bg-green-500', 'bg-green-500'],
+        text: 'text-green-600',
+        blocks: ['bg-green-600', 'bg-green-600', 'bg-green-600'],
       },
       medium: {
-        text: 'text-orange-500',
-        blocks: ['bg-orange-500', 'bg-orange-500', 'bg-gray-200'],
+        text: 'text-yellow-500',
+        blocks: ['bg-yellow-400', 'bg-yellow-400', 'bg-gray-200'],
       },
       low: {
         text: 'text-red-500',
@@ -46,12 +46,12 @@ const METER_CONFIGS: Record<MeterType, MeterConfig> = {
         blocks: ['bg-red-500', 'bg-red-500', 'bg-red-500'],
       },
       medium: {
-        text: 'text-orange-500',
-        blocks: ['bg-orange-500', 'bg-orange-500', 'bg-gray-200'],
+        text: 'text-yellow-500',
+        blocks: ['bg-yellow-400', 'bg-yellow-400', 'bg-gray-200'],
       },
       low: {
-        text: 'text-green-500',
-        blocks: ['bg-green-500', 'bg-gray-200', 'bg-gray-200'],
+        text: 'text-green-600',
+        blocks: ['bg-green-600', 'bg-gray-200', 'bg-gray-200'],
       },
     },
   },

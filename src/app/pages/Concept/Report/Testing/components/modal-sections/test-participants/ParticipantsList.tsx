@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Icon } from '@components';
-import { cn } from '@libs/utils/react';
+
 import defaultAvatar from '@assets/img/avatar.png';
 
 interface PersonaDistribution {
@@ -222,22 +222,6 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({
                     {persona.occupation}
                   </span>
                 </div>
-              </div>
-
-              {/* Status */}
-              <div className='flex items-center justify-between'>
-                <span
-                  className={cn(
-                    'aucctus-text-xs-semibold rounded-full px-2 py-1',
-                    persona.status === 'confirmed'
-                      ? 'aucctus-bg-success-secondary aucctus-text-success-primary'
-                      : persona.status === 'invited'
-                        ? 'aucctus-bg-warning-secondary aucctus-text-warning-primary'
-                        : 'aucctus-bg-secondary aucctus-text-tertiary',
-                  )}
-                >
-                  {persona.status}
-                </span>
               </div>
             </div>
           </div>

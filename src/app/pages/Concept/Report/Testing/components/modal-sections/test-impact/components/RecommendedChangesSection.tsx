@@ -4,19 +4,17 @@ import { IEditRecommendation } from '@libs/api/types/concept/testing';
 
 interface RecommendedChangesSectionProps {
   recommendations: IEditRecommendation[];
-  onApplyRecommendations: () => void;
 }
 
 const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
   recommendations,
-  onApplyRecommendations,
 }) => {
   if (recommendations.length === 0) {
     return null;
   }
 
   return (
-    <div className='aucctus-bg-brand-secondary aucctus-border-brand-primary mt-8 space-y-4 rounded-lg border p-6'>
+    <div className='aucctus-bg-secondary-subtle aucctus-border-secondary mt-8 space-y-4 rounded-lg border p-6'>
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <Icon
@@ -28,31 +26,57 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
           </h3>
         </div>
         <button
-          className='btn btn-primary flex items-center gap-2'
-          onClick={onApplyRecommendations}
+          className='btn btn-disabled flex items-center gap-2'
+          disabled={true}
         >
-          <Icon variant='check' className='aucctus-stroke-white h-4 w-4' />
-          Apply Recommendations
+          <Icon variant='clock' className='aucctus-stroke-disabled h-4 w-4' />
+          Coming Soon
         </button>
       </div>
 
-      {/* Simplified Recommendations List */}
-      <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4'>
-        <ul className='space-y-3'>
-          {recommendations.map((recommendation, index) => (
-            <li key={index} className='flex items-center gap-3'>
+      {/* Detailed Recommendations List */}
+      <div className='space-y-4'>
+        {recommendations.map((recommendation, index) => (
+          <div
+            key={index}
+            className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4'
+          >
+            <div className='flex items-start gap-3'>
               <div className='aucctus-bg-brand-secondary aucctus-border-brand-primary flex-shrink-0 rounded-full border p-1'>
                 <Icon
                   variant='arrowright'
                   className='aucctus-stroke-brand-primary h-3 w-3'
                 />
               </div>
-              <span className='aucctus-text-sm-regular aucctus-text-brand-primary'>
-                {recommendation.title}
-              </span>
-            </li>
-          ))}
-        </ul>
+              <div className='flex-1 space-y-2'>
+                <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
+                  {recommendation.title}
+                </h4>
+                <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                  {recommendation.description}
+                </p>
+                <div className='aucctus-bg-secondary-subtle rounded-md p-3'>
+                  <p className='aucctus-text-xs-medium aucctus-text-tertiary mb-1'>
+                    Reason:
+                  </p>
+                  <p className='aucctus-text-xs-regular aucctus-text-secondary'>
+                    {recommendation.reason}
+                  </p>
+                </div>
+                {recommendation.testEvidence && (
+                  <div className='aucctus-bg-brand-section rounded-md p-3'>
+                    <p className='aucctus-text-xs-medium aucctus-text-brand-primary mb-1'>
+                      Test Evidence:
+                    </p>
+                    <p className='aucctus-text-xs-regular aucctus-text-brand-secondary'>
+                      {recommendation.testEvidence}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

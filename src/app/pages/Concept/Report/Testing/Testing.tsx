@@ -248,7 +248,6 @@ const Testing: React.FC = () => {
                 recommendedTest={recommendedTest}
                 onRunTest={handleRunTest}
                 onSelectAssumption={handleSelectAssumption}
-                showBenchmark={true}
               />
             </div>
 

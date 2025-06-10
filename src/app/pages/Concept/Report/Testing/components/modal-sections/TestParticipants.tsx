@@ -62,22 +62,6 @@ const TestParticipants: React.FC<TestParticipantsProps> = ({
 
   return (
     <div className='relative space-y-6'>
-      {/* Header Section */}
-      <div className='space-y-2'>
-        <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
-          Test Participants
-        </h3>
-        <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-          Manage participants for your test
-          {!hasNoParticipants && (
-            <span className='aucctus-text-brand-primary ml-2'>
-              ({personaDistribution.length} participant group
-              {personaDistribution.length !== 1 ? 's' : ''})
-            </span>
-          )}
-        </p>
-      </div>
-
       {hasNoParticipants ? (
         // No data state
         <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-8'>
