@@ -77,9 +77,6 @@ export default defineConfig(async (config: ViteUserConfig) => {
       FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS: Boolean(
         env.FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS === 'true',
       ),
-      FEATURE_FINANCIAL_PROJECTIONS_V2: Boolean(
-        env.FEATURE_FINANCIAL_PROJECTIONS_V2 === 'true',
-      ),
       FEATURE_CONCEPT_VERSIONING: Boolean(
         env.FEATURE_CONCEPT_VERSIONING === 'true',
       ),
