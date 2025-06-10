@@ -13,10 +13,10 @@ interface SavingsModelCardProps {
 const SavingsModelCard: React.FC<SavingsModelCardProps> = ({ savingsData }) => {
   const price = savingsData?.savingsAmount;
   const unit = (savingsData?.unit ?? 'unit')
-    .replace(/per/gi, '/')
-    .startsWith('/')
-    ? (savingsData?.unit ?? 'unit').replace(/per/gi, '/')
-    : `/${(savingsData?.unit ?? 'unit').replace(/per/gi, '/')}`;
+    .replace(/per/gi, '/ ')
+    .startsWith('/ ')
+    ? (savingsData?.unit ?? 'unit').replace(/per/gi, '/ ')
+    : `/ ${(savingsData?.unit ?? 'unit').replace(/per/gi, '/ ')}`;
   const currency = savingsData?.currency ?? 'USD';
   const reasoning = savingsData?.reasoning;
 

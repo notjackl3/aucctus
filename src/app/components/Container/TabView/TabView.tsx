@@ -16,6 +16,7 @@ export interface TabsProps {
   className?: string;
   tabGroupClassName?: string;
   tabClassName?: string;
+  tabContainerClassName?: string;
   tabContentClassName?: string;
   variant?: 'default' | 'button' | 'button-separated';
   onTabSelect: (value: string) => void;
@@ -31,6 +32,7 @@ const TabView: FunctionComponent<TabsProps> = ({
   variant = 'default',
   tabClassName = '',
   tabGroupClassName = '',
+  tabContainerClassName = '',
   tabContentClassName = '',
   actionButtons,
   activeTab,
@@ -49,7 +51,12 @@ const TabView: FunctionComponent<TabsProps> = ({
           tabGroupClassName,
         )}
       >
-        <div className='flex list-none items-center justify-start pl-0'>
+        <div
+          className={cn(
+            'flex list-none items-center justify-start pl-0',
+            tabContainerClassName,
+          )}
+        >
           {tabs.map((tab, index) => (
             <Tab
               key={`tab-label-${index}`}

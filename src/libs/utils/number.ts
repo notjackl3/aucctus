@@ -32,10 +32,10 @@ export function formatLargeNumber(num: number) {
   }
 }
 
-export const formatNumber = (num: number) => {
+export const formatNumber = (num: number, fractionDigits: number = 2) => {
   // Ensure num is a number and format it, otherwise return empty string
   return num.toLocaleString('en-US', {
-    maximumFractionDigits: 0, // Ensure no fractional digits in the formatted output
+    maximumFractionDigits: fractionDigits, // Ensure no fractional digits in the formatted output
   });
 };
 

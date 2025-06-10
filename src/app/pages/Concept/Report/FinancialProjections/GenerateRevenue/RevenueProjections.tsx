@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { cn } from '@libs/utils/react';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import TabView from '@components/Container/TabView';
+import { TabElement } from '@components/Container/TabView/TabView';
 import { Icon } from '@components';
 import useStore from '@stores/store';
 
@@ -27,81 +28,82 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
 
   const [activeTab, setActiveTab] = useState<string>('business-model');
 
+  const revenueProjectionTabs = useMemo(() => {
+    return [
+      {
+        label: (
+          <div className='flex items-center gap-2'>
+            <Icon
+              variant='building'
+              className='aucctus-stroke-brand-primary h-4 w-4'
+            />
+            <span>Business Model</span>
+          </div>
+        ),
+        value: 'business-model',
+      },
+      {
+        label: (
+          <div className='flex items-center gap-2'>
+            <Icon
+              variant='currency-dollar'
+              className='aucctus-stroke-brand-primary h-4 w-4'
+            />
+            <span>Market Sizing</span>
+          </div>
+        ),
+        value: 'market-sizing',
+      },
+      {
+        label: (
+          <div className='flex items-center gap-2'>
+            <Icon
+              variant='trendup'
+              className='aucctus-stroke-brand-primary h-4 w-4'
+            />
+            <span>Projections</span>
+          </div>
+        ),
+        value: 'projections',
+      },
+    ] as TabElement[];
+  }, []);
+
+  const onTabSelect = useCallback(
+    (value: string) => {
+      setActiveTab(value);
+    },
+    [setActiveTab],
+  );
+
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'business-model':
+        return <BusinessModelTab />;
+      case 'market-sizing':
+        return <MarketSizingTab />;
+      case 'projections':
+        return <ProjectionsTab />;
+      default:
+        return <BusinessModelTab />;
+    }
+  };
+
   return (
     <div className='flex flex-1 flex-col gap-4'>
-      <div className='aucctus-border-primary flex flex-row gap-2 px-2'>
-        <button
-          onClick={() => setActiveTab('business-model')}
-          className={cn(
-            'flex flex-1 items-center justify-center gap-2 rounded-t-lg px-4 py-3 transition-colors',
-            {
-              'aucctus-bg-secondary-hover aucctus-text-tertiary-hover':
-                activeTab !== 'business-model',
-              'aucctus-text-primary aucctus-bg-primary aucctus-border-primary border-b-2':
-                activeTab === 'business-model',
-            },
-          )}
-        >
-          <Icon
-            variant='building'
-            className={cn('h-4 w-4', {
-              'aucctus-stroke-primary': activeTab === 'business-model',
-              'aucctus-stroke-brand-primary': activeTab !== 'business-model',
-            })}
-          />
-          <span>Business Model</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('market-sizing')}
-          className={cn(
-            'flex flex-1 items-center justify-center gap-2 rounded-t-lg px-4 py-3 transition-colors',
-            {
-              'aucctus-bg-secondary-hover aucctus-text-tertiary-hover':
-                activeTab !== 'market-sizing',
-              'aucctus-text-primary aucctus-bg-primary aucctus-border-primary border-b-2':
-                activeTab === 'market-sizing',
-            },
-          )}
-        >
-          <Icon
-            variant='currency-dollar'
-            className={cn('h-4 w-4', {
-              'aucctus-stroke-primary': activeTab === 'market-sizing',
-              'aucctus-stroke-brand-primary': activeTab !== 'market-sizing',
-            })}
-          />
-          <span>Market Sizing</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('projections')}
-          className={cn(
-            'flex flex-1 items-center justify-center gap-2 rounded-t-lg px-4 py-3 transition-colors',
-            {
-              'aucctus-bg-secondary-hover aucctus-text-tertiary-hover':
-                activeTab !== 'projections',
-              'aucctus-text-primary aucctus-bg-primary aucctus-border-primary border-b-2':
-                activeTab === 'projections',
-            },
-          )}
-        >
-          <Icon
-            variant='trendup'
-            className={cn('h-4 w-4', {
-              'aucctus-stroke-primary': activeTab === 'projections',
-              'aucctus-stroke-brand-primary': activeTab !== 'projections',
-            })}
-          />
-          <span>Projections</span>
-        </button>
-      </div>
-
-      <div>
-        {activeTab === 'business-model' && <BusinessModelTab />}
-
-        {activeTab === 'market-sizing' && <MarketSizingTab />}
-
-        {activeTab === 'projections' && <ProjectionsTab />}
-      </div>
+      <TabView
+        tabs={revenueProjectionTabs}
+        tabGroupClassName='pointer-events-auto flex flex-1'
+        tabContainerClassName='flex flex-1 items-center justify-center !shadow-none'
+        tabContentClassName='!block'
+        tabClassName='flex flex-1 aucctus-bg-primary-hover items-center justify-center !shadow-none border aucctus-border-secondary'
+        className='flex h-full w-full items-start justify-center'
+        variant='button'
+        onTabSelect={onTabSelect}
+        activeTab={activeTab}
+      >
+        {renderTabContent()}
+      </TabView>
     </div>
   );
 };
