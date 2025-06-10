@@ -314,6 +314,8 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
         <TabView
           tabs={tabs}
           tabGroupClassName='w-full px-6 flex-shrink-0'
+          tabContainerClassName='flex flex-1 items-center justify-center'
+          tabClassName='flex flex-1 aucctus-bg-primary-hover items-center justify-center'
           className='flex min-h-0 w-full flex-1 flex-col'
           variant='button'
           onTabSelect={(value) => {

@@ -64,6 +64,12 @@ const useStore = create<IAppStore>()(
             user: state.auth.user,
             account: state.auth.account,
           },
+          financialProjection: {
+            marketSizingAssumptions:
+              state.financialProjection.marketSizingAssumptions,
+            impactSizingAssumptions:
+              state.financialProjection.impactSizingAssumptions,
+          },
         }),
         merge: (
           persistedState: unknown,

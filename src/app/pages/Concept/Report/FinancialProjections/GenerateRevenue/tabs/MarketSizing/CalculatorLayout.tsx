@@ -6,6 +6,7 @@ import {
 import { CalculatorHeader } from './components/CalculatorHeader';
 import { AssumptionsPanel } from './components/AssumptionsPanel';
 import { ResultsPanel } from './components/ResultsPanel';
+import useStore from '@stores/store';
 
 export interface BaseCalculatorProps {
   marketSizing: IMarketSizingV2;
@@ -34,17 +35,52 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
 }) => {
   const [assumptions, setAssumptions] = useState<
     IMarketSizingAssumptionEntryV2[]
-  >(marketSizing.assumptionEntries);
+  >([]);
+
+  // Store actions for persisting assumptions
+  const {
+    marketSizingAssumptions,
+    setMarketSizingAssumptions,
+    resetMarketSizingAssumptions,
+  } = useStore((state) => state.financialProjection);
+
+  // Initialize assumptions from persisted data or API data
+  useEffect(() => {
+    if (!marketSizing?.uuid) return;
+
+    // Check if we have persisted assumptions for this market sizing
+    const persistedAssumptions = marketSizingAssumptions[marketSizing.uuid];
+
+    if (persistedAssumptions && persistedAssumptions.length > 0) {
+      // Use persisted assumptions
+      setAssumptions(persistedAssumptions);
+    } else if (
+      marketSizing?.assumptionEntries &&
+      marketSizing.assumptionEntries.length > 0
+    ) {
+      // Use API data as fallback
+      setAssumptions(marketSizing.assumptionEntries);
+    }
+  }, [marketSizing, marketSizingAssumptions]);
 
   const handleAssumptionChange = (uuid: string, value: number) => {
     const updatedAssumptions = assumptions.map((assumption) =>
       assumption.uuid === uuid ? { ...assumption, scalar: value } : assumption,
     );
     setAssumptions(updatedAssumptions);
+
+    // Persist updated assumptions to store
+    if (marketSizing?.uuid) {
+      setMarketSizingAssumptions(marketSizing.uuid, updatedAssumptions);
+    }
   };
 
   const resetToDefaults = () => {
-    setAssumptions(marketSizing.assumptionEntries);
+    if (marketSizing?.assumptionEntries && marketSizing?.uuid) {
+      setAssumptions(marketSizing.assumptionEntries);
+      // Clear persisted assumptions to reset to API defaults
+      resetMarketSizingAssumptions(marketSizing.uuid);
+    }
   };
 
   const assumptionsRef = useRef<HTMLDivElement>(null);

@@ -111,8 +111,10 @@ const CustomerProfile: FunctionComponent = () => {
     <div className='flex h-full w-full flex-col flex-wrap items-start self-stretch'>
       <TabView
         tabs={customerTabs}
-        tabGroupClassName='pointer-events-auto'
-        className='mt-2 flex h-full w-full items-start justify-center'
+        tabGroupClassName='pointer-events-auto flex flex-1'
+        tabContainerClassName='flex flex-1 items-center justify-center'
+        tabClassName='flex flex-1 aucctus-bg-primary-hover items-center justify-center'
+        className='flex h-full w-full items-start justify-center'
         variant='button'
         onTabSelect={onTabSelect}
         activeTab={selectedProfileName || ''}

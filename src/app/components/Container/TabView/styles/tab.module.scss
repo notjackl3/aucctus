@@ -28,6 +28,7 @@
     @include body-200;
     font-weight: 700;
     @apply aucctus-text-tertiary-hover;
+
     &.active {
       font-family: $font-family;
       @include body-200;
@@ -52,16 +53,13 @@
   min-height: 2.5rem;
   padding: 0.5rem 1rem;
   gap: 0.5rem;
-  @apply aucctus-bg-primary #{!important};
-  @apply aucctus-border-secondary border-r;
-
-  box-shadow: $shadow-100;
+  @apply aucctus-bg-primary border-t border-b border-r #{!important};
 
   &:first-child {
     border-radius: 0.5rem 0 0 0.5rem;
-    border-right: none;
-    @apply aucctus-border-secondary border-l #{!important};
+    @apply aucctus-border-secondary border #{!important};
   }
+
   &:last-child {
     border-radius: 0 0.5rem 0.5rem 0;
     @apply aucctus-border-secondary border-r #{!important};
@@ -78,10 +76,12 @@
     margin-right: 3%;
     font-family: $font-family;
     font-weight: 600;
+
     &.active {
       font-family: $font-family;
       font-weight: 700;
     }
+
     &:hover,
     .a {
       font-weight: 700;
@@ -119,11 +119,13 @@
     font-family: $font-family;
     @include body-200;
     font-weight: 600;
+
     &.active {
       font-family: $font-family;
       @include body-200;
       font-weight: 700;
     }
+
     &:hover,
     .a {
       font-weight: 700;

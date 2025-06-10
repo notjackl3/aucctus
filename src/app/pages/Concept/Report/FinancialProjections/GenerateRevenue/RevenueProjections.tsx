@@ -94,9 +94,8 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
       <TabView
         tabs={revenueProjectionTabs}
         tabGroupClassName='pointer-events-auto flex flex-1'
-        tabContainerClassName='flex flex-1 items-center justify-center !shadow-none'
-        tabContentClassName='!block'
-        tabClassName='flex flex-1 aucctus-bg-primary-hover items-center justify-center !shadow-none border aucctus-border-secondary'
+        tabContainerClassName='flex flex-1 items-center justify-center'
+        tabClassName='flex flex-1 aucctus-bg-primary-hover items-center justify-center'
         className='flex h-full w-full items-start justify-center'
         variant='button'
         onTabSelect={onTabSelect}

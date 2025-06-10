@@ -6,6 +6,7 @@ import {
 import { CalculatorHeader } from './components/CalculatorHeader';
 import { AssumptionsPanel } from './components/AssumptionsPanel';
 import { ResultsPanel } from './components/ResultsPanel';
+import useStore from '@stores/store';
 
 export interface BaseCalculatorProps {
   impactSizing: IImpactSizingV2;
@@ -34,17 +35,52 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
 }) => {
   const [assumptions, setAssumptions] = useState<
     IImpactSizingAssumptionEntryV2[]
-  >(impactSizing.assumptionEntries);
+  >([]);
+
+  // Store actions for persisting assumptions
+  const {
+    impactSizingAssumptions,
+    setImpactSizingAssumptions,
+    resetImpactSizingAssumptions,
+  } = useStore((state) => state.financialProjection);
+
+  // Initialize assumptions from persisted data or API data
+  useEffect(() => {
+    if (!impactSizing?.uuid) return;
+
+    // Check if we have persisted assumptions for this impact sizing
+    const persistedAssumptions = impactSizingAssumptions[impactSizing.uuid];
+
+    if (persistedAssumptions && persistedAssumptions.length > 0) {
+      // Use persisted assumptions
+      setAssumptions(persistedAssumptions);
+    } else if (
+      impactSizing?.assumptionEntries &&
+      impactSizing.assumptionEntries.length > 0
+    ) {
+      // Use API data as fallback
+      setAssumptions(impactSizing.assumptionEntries);
+    }
+  }, [impactSizing, impactSizingAssumptions]);
 
   const handleAssumptionChange = (uuid: string, value: number) => {
     const updatedAssumptions = assumptions.map((assumption) =>
       assumption.uuid === uuid ? { ...assumption, scalar: value } : assumption,
     );
     setAssumptions(updatedAssumptions);
+
+    // Persist updated assumptions to store
+    if (impactSizing?.uuid) {
+      setImpactSizingAssumptions(impactSizing.uuid, updatedAssumptions);
+    }
   };
 
   const resetToDefaults = () => {
-    setAssumptions(impactSizing.assumptionEntries);
+    if (impactSizing?.assumptionEntries && impactSizing?.uuid) {
+      setAssumptions(impactSizing.assumptionEntries);
+      // Clear persisted assumptions to reset to API defaults
+      resetImpactSizingAssumptions(impactSizing.uuid);
+    }
   };
 
   const assumptionsRef = useRef<HTMLDivElement>(null);

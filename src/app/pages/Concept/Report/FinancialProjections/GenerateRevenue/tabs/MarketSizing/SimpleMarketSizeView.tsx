@@ -7,6 +7,7 @@ import {
 import { getAssumptionsByGroup, updateAssumption } from './assumptionsUtils';
 import AssumptionsList from './AssumptionsList';
 import MarketSizeVisualization from './MarketSizeVisualization';
+import useStore from '@stores/store';
 
 interface SimpleMarketSizeViewProps {
   marketSizing?: IMarketSizingV2;
@@ -25,15 +26,31 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
   const visualizationRef = useRef<HTMLDivElement>(null);
   const assumptionsListRef = useRef<HTMLDivElement>(null);
 
-  // Initialize assumptions from API data
+  // Store actions for persisting assumptions
+  const {
+    marketSizingAssumptions,
+    setMarketSizingAssumptions,
+    resetMarketSizingAssumptions,
+  } = useStore((state) => state.financialProjection);
+
+  // Initialize assumptions from persisted data or API data
   useEffect(() => {
-    if (
+    if (!marketSizing?.uuid) return;
+
+    // Check if we have persisted assumptions for this market sizing
+    const persistedAssumptions = marketSizingAssumptions[marketSizing.uuid];
+
+    if (persistedAssumptions && persistedAssumptions.length > 0) {
+      // Use persisted assumptions
+      setAssumptions(persistedAssumptions);
+    } else if (
       marketSizing?.assumptionEntries &&
       marketSizing.assumptionEntries.length > 0
     ) {
+      // Use API data as fallback
       setAssumptions(marketSizing.assumptionEntries);
     }
-  }, [marketSizing]);
+  }, [marketSizing, marketSizingAssumptions]);
 
   // Sync height between visualization and assumptions list
   useEffect(() => {
@@ -71,24 +88,34 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
 
   // Reset to original values from API data
   const resetToDefaults = () => {
-    if (marketSizing?.assumptionEntries) {
+    if (marketSizing?.assumptionEntries && marketSizing?.uuid) {
       setAssumptions(marketSizing.assumptionEntries);
+      // Clear persisted assumptions to reset to API defaults
+      resetMarketSizingAssumptions(marketSizing.uuid);
     }
     setActiveFilter(undefined);
   };
 
   // Handle assumption value change
-  const handleAssumptionChange = useCallback((id: string, newValue: number) => {
-    setAssumptions((currentAssumptions) => {
-      const { updatedAssumptions } = updateAssumption(
-        currentAssumptions,
-        id,
-        newValue,
-      );
+  const handleAssumptionChange = useCallback(
+    (id: string, newValue: number) => {
+      setAssumptions((currentAssumptions) => {
+        const { updatedAssumptions } = updateAssumption(
+          currentAssumptions,
+          id,
+          newValue,
+        );
 
-      return updatedAssumptions;
-    });
-  }, []);
+        // Persist updated assumptions to store
+        if (marketSizing?.uuid) {
+          setMarketSizingAssumptions(marketSizing.uuid, updatedAssumptions);
+        }
+
+        return updatedAssumptions;
+      });
+    },
+    [marketSizing?.uuid, setMarketSizingAssumptions],
+  );
 
   // Toggle filter on/off
   const handleFilterToggle = (filter: 'tam' | 'sam' | 'som') => {
@@ -121,10 +148,6 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
             <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-1'>
               No Market Sizing Data Available
             </h3>
-            <p className='aucctus-text-xs aucctus-text-secondary'>
-              Please configure market sizing assumptions to view the
-              visualization.
-            </p>
           </div>
         </div>
       </div>
