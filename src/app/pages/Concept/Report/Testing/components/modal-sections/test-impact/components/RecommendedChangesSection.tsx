@@ -30,7 +30,7 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
           disabled={true}
         >
           <Icon variant='clock' className='aucctus-stroke-disabled h-4 w-4' />
-          Coming Soon
+          Apply Recommendations (coming soon)
         </button>
       </div>
 
@@ -64,11 +64,11 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
                   </p>
                 </div>
                 {recommendation.testEvidence && (
-                  <div className='aucctus-bg-brand-section rounded-md p-3'>
-                    <p className='aucctus-text-xs-medium aucctus-text-brand-primary mb-1'>
+                  <div className='aucctus-bg-secondary-subtle mt-2 rounded-md p-3'>
+                    <p className='aucctus-text-xs-medium aucctus-text-tertiary mb-1'>
                       Test Evidence:
                     </p>
-                    <p className='aucctus-text-xs-regular aucctus-text-brand-secondary'>
+                    <p className='aucctus-text-xs-regular aucctus-text-secondary'>
                       {recommendation.testEvidence}
                     </p>
                   </div>

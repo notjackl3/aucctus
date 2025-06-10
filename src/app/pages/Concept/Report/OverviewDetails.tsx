@@ -18,7 +18,6 @@ const OverviewDetails: FunctionComponent = () => {
 
   const assumptionsFilters = useMemo(
     () => ({
-      category: 'desirability' as const,
       page: 1,
       page_size: 20,
     }),

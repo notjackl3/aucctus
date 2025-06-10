@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, Tooltip } from '@components';
+import { Icon, ComponentTooltip } from '@components';
 import { cn } from '@libs/utils/react';
 import MeterSquares from './MeterSquares';
 
@@ -76,7 +76,15 @@ const GenericMeter: React.FC<GenericMeterProps> = ({ type, value }) => {
   const levelColors = config.colors[level];
 
   return (
-    <Tooltip tip={config.tooltip}>
+    <ComponentTooltip
+      tip={
+        <div className='aucctus-bg-primary aucctus-border-secondary max-w-xs rounded-lg border p-4 shadow-lg'>
+          <p className='aucctus-text-xs aucctus-text-secondary leading-relaxed'>
+            {config.tooltip}
+          </p>
+        </div>
+      }
+    >
       <div className='aucctus-bg-secondary aucctus-border-tertiary inline-block rounded p-2'>
         <div className='flex items-center gap-3'>
           <div className='flex items-center'>
@@ -96,7 +104,7 @@ const GenericMeter: React.FC<GenericMeterProps> = ({ type, value }) => {
           </div>
         </div>
       </div>
-    </Tooltip>
+    </ComponentTooltip>
   );
 };
 

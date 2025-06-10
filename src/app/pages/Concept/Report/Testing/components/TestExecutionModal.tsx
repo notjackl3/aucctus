@@ -304,11 +304,8 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
       {/* Header */}
       <div className='aucctus-border-secondary flex flex-shrink-0 items-center gap-3 border-b p-6'>
         <Icon variant='plus' className='aucctus-stroke-brand-primary h-5 w-5' />
-        <h2 className='aucctus-text-xl-semibold aucctus-text-brand-primary flex items-center gap-2'>
+        <h2 className='aucctus-text-xl-semibold aucctus-text-brand-primary'>
           {testDetail ? testDetail.name : 'New Test'}
-          <span className='aucctus-text-xs-medium aucctus-text-brand-primary aucctus-border-brand rounded-full border px-2.5 py-0.5'>
-            {displayTestType}
-          </span>
         </h2>
       </div>
 
