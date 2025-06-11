@@ -72,9 +72,11 @@ const IncubateConcept: React.FC = () => {
   const { generatedConcepts, setGeneratedConcepts } =
     useConceptGenerationStore();
 
-  // Fetch answers if we have a seed UUID
+  // Fetch answers if we have a seed UUID and the seed exists
   const { data: seedDraftAnswers, isLoading: isAnswersLoading } =
-    useGetConceptSeedDraftAnswers(draftSeedUuid || '');
+    useGetConceptSeedDraftAnswers(
+      draftSeedUuid && seedDraftData && !seedError ? draftSeedUuid : '',
+    );
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -91,12 +93,14 @@ const IncubateConcept: React.FC = () => {
 
   useEffect(() => {
     if (seedError) {
-      const status = (seedError as any).response.status;
+      const status = (seedError as any)?.response?.status;
       if (status === 404) {
+        // Clear the draftSeedUuid from store before navigating to prevent further API calls
+        setDraftSeedUuid('');
         handleResetAndNavigate();
       }
     }
-  }, [seedError, handleResetAndNavigate]);
+  }, [seedError, handleResetAndNavigate, setDraftSeedUuid]);
 
   // Update store with UUID from props if available and not already set
   useEffect(() => {
@@ -226,13 +230,24 @@ const IncubateConcept: React.FC = () => {
     const { draftSeedUuid, submittedAnswers, deleteDraft } =
       latestValuesRef.current;
 
-    if (submittedAnswers.length === 0 && draftSeedUuid) {
+    // Only delete if we have a valid draftSeedUuid, no submitted answers, and the seed actually exists
+    if (
+      submittedAnswers.length === 0 &&
+      draftSeedUuid &&
+      seedDraftData && // Only delete if we have confirmed the seed exists
+      !seedError // Don't try to delete if there was an error fetching the seed
+    ) {
       deleteDraft(draftSeedUuid, {
         onSuccess: () => handleResetAndNavigate(),
-        onError: () => handleResetAndNavigate(),
+        onError: (error: any) => {
+          // Only navigate on non-404 errors (404 means it's already deleted)
+          if (error?.response?.status !== 404) {
+            handleResetAndNavigate();
+          }
+        },
       });
     }
-  }, [handleResetAndNavigate]);
+  }, [handleResetAndNavigate, seedDraftData, seedError]);
 
   const unsetGenerateConcepts = useCallback(() => {
     if (draftSeedUuid) {
@@ -246,8 +261,11 @@ const IncubateConcept: React.FC = () => {
   }, [deleteAnswerlessDraft, unsetGenerateConcepts]);
 
   useEffect(() => {
-    return () => cleanup();
-  }, [cleanup]);
+    // Only setup cleanup if we have a valid draft seed
+    if (draftSeedUuid && !seedError) {
+      return () => cleanup();
+    }
+  }, [cleanup, draftSeedUuid, seedError]);
 
   // Concept Generation Event Handling
   useEffect(() => {

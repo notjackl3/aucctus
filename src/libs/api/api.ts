@@ -99,8 +99,6 @@ export class Api {
       return;
     }
 
-    this.aucctusSocket.accessToken = token;
-
     // Update all pointing to the resource server with the new tokens
     // By default however,  the access token and refresh token are set to the httpOnly cookies
     // This is simply just an extra layer.
@@ -120,6 +118,7 @@ export class Api {
       });
     });
 
+    // Set socket token ONCE (removed duplicate assignment)
     this.aucctusSocket.accessToken = token;
 
     analytics.debug('Setting Access Token');

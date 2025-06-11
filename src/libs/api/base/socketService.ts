@@ -1,4 +1,5 @@
 import analytics from '../../telemetry';
+import telemetry from '../../telemetry';
 import { Api } from '../api';
 import { OutboundSocketEvent } from '../types';
 
@@ -68,6 +69,14 @@ export class SocketService {
     this._isConnected = false;
 
     this.addAuthErrorListener(this._handleRefreshToken);
+
+    // Log socket service initialization
+    telemetry.log('websocket.service.initialized', {
+      baseUrl: config.baseUrl,
+      autoConnect: config.autoConnect,
+      maxRetries: this.config.maxRetries,
+      reconnectInterval: this.reconnectInterval,
+    });
   }
 
   public set accessToken(token: string | undefined) {
@@ -75,18 +84,40 @@ export class SocketService {
       return;
     }
 
+    const previousToken = this._accessToken;
+    const previousConnectionState = this._isConnected;
     this._accessToken = token;
+
+    // Log token update
+    telemetry.log('websocket.token.updated', {
+      hadPreviousToken: !!previousToken,
+      hasNewToken: !!token,
+      wasConnected: previousConnectionState,
+      willReconnect:
+        !!token && (!this._ws || this._ws.readyState === WebSocket.CLOSED),
+      willDisconnect: !token && this._ws?.readyState === WebSocket.OPEN,
+    });
+
     (async () => {
       if (this.deferredConnect) {
         await this.deferredConnect;
       }
 
       if (this._ws?.readyState === WebSocket.OPEN) {
+        telemetry.log('websocket.token.change.closing_existing', {
+          baseUrl: this.config.baseUrl,
+          hadToken: !!previousToken,
+          hasNewToken: !!token,
+        });
         this._ws.close();
       } else if (
         token &&
         (!this._ws || this._ws.readyState === WebSocket.CLOSED)
       ) {
+        telemetry.log('websocket.token.change.connecting', {
+          baseUrl: this.config.baseUrl,
+          previousState: this._ws?.readyState,
+        });
         this.deferredConnect = this.connect();
         await this.deferredConnect;
       }
@@ -107,9 +138,31 @@ export class SocketService {
 
   public async connect(): Promise<void> {
     this.shouldReconnect = true;
-    if (!this._accessToken || this._isConnected) {
+
+    // Add guard against duplicate connection attempts
+    if (this._isConnected) {
+      telemetry.log('websocket.connection.attempt.already_connected', {
+        baseUrl: this.config.baseUrl,
+        retryCount: this.currentRetryCount,
+      });
       return;
     }
+
+    if (!this._accessToken) {
+      telemetry.log('websocket.connection.attempt.no_token', {
+        baseUrl: this.config.baseUrl,
+        retryCount: this.currentRetryCount,
+      });
+      return;
+    }
+
+    // Log connection attempt
+    telemetry.log('websocket.connection.attempt', {
+      baseUrl: this.config.baseUrl,
+      retryCount: this.currentRetryCount,
+      maxRetries: this.config.maxRetries,
+      hasToken: !!this._accessToken,
+    });
 
     // Build the URL by appending the token as a query parameter.
     const urlObj = new URL(this.config.baseUrl);
@@ -121,23 +174,48 @@ export class SocketService {
 
     this._ws.onopen = (event: Event) => {
       if (this._isConnected) {
+        telemetry.log('websocket.connection.onopen.already_connected', {
+          baseUrl: this.config.baseUrl,
+        });
         return;
       }
 
       if (this.config.debug) {
         analytics.debug('WebSocket connected', event);
       }
+
       this._isConnected = true;
       // Reset retry count on successful connection.
       this.currentRetryCount = 0;
+
+      // Log successful connection
+      telemetry.log('websocket.connection.established', {
+        baseUrl: this.config.baseUrl,
+        retryCount: this.currentRetryCount,
+        readyState: this._ws?.readyState,
+      });
     };
 
     this._ws.onerror = (error: Event) => {
       analytics.error('WebSocket encountered an error', error);
+
+      // Log websocket error
+      telemetry.log('websocket.connection.error', {
+        baseUrl: this.config.baseUrl,
+        retryCount: this.currentRetryCount,
+        isConnected: this._isConnected,
+        readyState: this._ws?.readyState,
+        error: error.type || 'unknown_error',
+      });
     };
 
     this._ws.onclose = async (closeEvent: CloseEvent) => {
       if (!this._isConnected) {
+        telemetry.log('websocket.connection.onclose.not_connected', {
+          baseUrl: this.config.baseUrl,
+          code: closeEvent.code,
+          reason: closeEvent.reason,
+        });
         return;
       }
 
@@ -149,6 +227,16 @@ export class SocketService {
         );
       }
 
+      // Log connection closed
+      telemetry.log('websocket.connection.closed', {
+        baseUrl: this.config.baseUrl,
+        code: closeEvent.code,
+        reason: closeEvent.reason,
+        wasClean: closeEvent.wasClean,
+        retryCount: this.currentRetryCount,
+        readyState: this._ws?.readyState,
+      });
+
       this._isConnected = false;
       this._ws = null;
 
@@ -159,11 +247,21 @@ export class SocketService {
         case WebSocketCloseCode.NORMAL_CLOSURE:
           // Normal closure, don't reconnect unless explicitly required
           shouldAttemptReconnect = false;
+          telemetry.log('websocket.connection.normal_closure', {
+            baseUrl: this.config.baseUrl,
+          });
           break;
 
         case WebSocketCloseCode.NO_AUTHENTICATION:
         case WebSocketCloseCode.INVALID_TOKEN:
         case WebSocketCloseCode.POLICY_VIOLATION: // Often used for auth issues
+          // Log authentication error
+          telemetry.log('websocket.authentication.error', {
+            code: closeEvent.code,
+            reason: closeEvent.reason,
+            retryCount: this.currentRetryCount,
+          });
+
           // Handle authentication errors
           shouldAttemptReconnect = await this.handleAuthenticationError(
             closeEvent.code as WebSocketCloseCode,
@@ -178,10 +276,23 @@ export class SocketService {
             closeEvent,
           );
 
+          // Log server error
+          telemetry.log('websocket.server.error', {
+            code: closeEvent.code,
+            reason: closeEvent.reason,
+            retryCount: this.currentRetryCount,
+          });
+
           break;
 
         default:
           // Default behavior for unhandled codes
+          // Log unknown close code
+          telemetry.log('websocket.connection.closed.unknown', {
+            code: closeEvent.code,
+            reason: closeEvent.reason,
+            retryCount: this.currentRetryCount,
+          });
           break;
       }
 
@@ -191,11 +302,29 @@ export class SocketService {
           const error = new Error(
             `Max reconnect attempts (${this.config.maxRetries}) reached`,
           );
+
+          // Log max retries exceeded
+          telemetry.log('websocket.reconnect.max_retries_exceeded', {
+            baseUrl: this.config.baseUrl,
+            maxRetries: this.config.maxRetries,
+            finalCloseCode: closeEvent.code,
+            finalCloseReason: closeEvent.reason,
+          });
+
           this.maxRetriesExceededListeners.forEach((listener) =>
             listener(error),
           );
         } else {
           this.currentRetryCount++;
+
+          // Log reconnection attempt
+          telemetry.log('websocket.reconnect.scheduled', {
+            baseUrl: this.config.baseUrl,
+            retryCount: this.currentRetryCount,
+            maxRetries: this.config.maxRetries,
+            delayMs: this.reconnectInterval,
+          });
+
           setTimeout(async () => {
             if (this.deferredConnect) {
               await this.deferredConnect;
@@ -224,6 +353,13 @@ export class SocketService {
         code,
         reason,
       });
+
+      // Log no auth handlers
+      telemetry.log('websocket.authentication.no_handlers', {
+        code,
+        reason,
+      });
+
       return false;
     }
 
@@ -232,15 +368,32 @@ export class SocketService {
       try {
         const shouldReconnect = await listener(code, reason);
         if (shouldReconnect) {
+          // Log successful auth recovery
+          telemetry.log('websocket.authentication.recovery.success', {
+            code,
+            reason,
+          });
           // If any listener indicates we should reconnect, return true
           return true;
         }
       } catch (error) {
         analytics.error('Error in auth error listener', error);
+
+        // Log auth recovery failure
+        telemetry.log('websocket.authentication.recovery.error', {
+          code,
+          reason,
+          error: error instanceof Error ? error.message : 'unknown_error',
+        });
       }
     }
 
     // If no listener successfully handled the error, don't reconnect
+    telemetry.log('websocket.authentication.recovery.failed', {
+      code,
+      reason,
+    });
+
     return false;
   }
 
@@ -250,8 +403,13 @@ export class SocketService {
     }
 
     this.shouldReconnect = false;
-    this._isConnected = false;
+    // Log manual disconnect with correct state before changing it
+    telemetry.log('websocket.connection.disconnect', {
+      baseUrl: this.config.baseUrl,
+      wasConnected: this._isConnected,
+    });
 
+    this._isConnected = false;
     this._ws?.close();
   }
 
@@ -260,8 +418,56 @@ export class SocketService {
     if (this._ws && this._ws.readyState === WebSocket.OPEN) {
       const payload = typeof data === 'string' ? data : JSON.stringify(data);
       this._ws.send(payload);
+
+      // Log message sent
+      telemetry.log('websocket.message.sent', {
+        baseUrl: this.config.baseUrl,
+        messageType:
+          typeof data === 'string' ? 'string' : (data as any).type || 'unknown',
+        payloadSize: payload.length,
+      });
     } else {
-      analytics.debug('WebSocket is not open; cannot send data');
+      // Determine the specific reason for send failure
+      const wsState = this._ws?.readyState;
+      let failureReason = 'unknown';
+      let stateDescription = 'unknown';
+
+      if (!this._ws) {
+        failureReason = 'no_websocket_instance';
+        stateDescription = 'WebSocket instance is null';
+      } else {
+        switch (wsState) {
+          case WebSocket.CONNECTING:
+            failureReason = 'still_connecting';
+            stateDescription = 'WebSocket is still connecting';
+            break;
+          case WebSocket.CLOSING:
+            failureReason = 'closing';
+            stateDescription = 'WebSocket is closing';
+            break;
+          case WebSocket.CLOSED:
+            failureReason = 'closed';
+            stateDescription = 'WebSocket is closed';
+            break;
+          default:
+            failureReason = 'invalid_state';
+            stateDescription = `Unknown WebSocket state: ${wsState}`;
+        }
+      }
+
+      // Log detailed send failure information
+      telemetry.log('websocket.message.send_failed', {
+        baseUrl: this.config.baseUrl,
+        readyState: wsState,
+        isConnected: this._isConnected,
+        messageType:
+          typeof data === 'string' ? 'string' : (data as any).type || 'unknown',
+        failureReason,
+        stateDescription,
+        hasWebSocketInstance: !!this._ws,
+        shouldReconnect: this.shouldReconnect,
+        currentRetryCount: this.currentRetryCount,
+      });
     }
   }
 
@@ -287,15 +493,34 @@ export class SocketService {
       ].includes(code)
     ) {
       try {
+        // Log token refresh attempt
+        telemetry.log('websocket.token.refresh.attempt', {
+          code,
+          hasPendingRefresh: !!this.api.pendingRefresh,
+        });
+
         // Attempt to refresh the token
         if (this.api.pendingRefresh) {
           await this.api.pendingRefresh;
         } else {
           await this.api.refreshToken();
         }
+
+        // Log successful token refresh
+        telemetry.log('websocket.token.refresh.success', {
+          code,
+        });
+
         return true;
       } catch (error) {
         analytics.error('Failed to refresh token', error);
+
+        // Log failed token refresh
+        telemetry.log('websocket.token.refresh.failed', {
+          code,
+          error: error instanceof Error ? error.message : 'unknown_error',
+        });
+
         return false;
       }
     }
