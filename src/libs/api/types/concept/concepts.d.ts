@@ -147,10 +147,11 @@ export interface ICustomerAlternative {
   uuid?: string;
 }
 
-export interface ICustomerProfileRealWorldSignalsList
+export interface ICustomerProfileRealWorldSignalsResponse
   extends IBaseConceptEntity {
-  realWorldSignals: ICustomerProfileRealWorldSignal[];
-  realWorldSignalsSummary: ICustomerRealWorldSignalSummary;
+  status: 'Not Started' | 'Pending' | 'Error' | 'Complete';
+  summary?: string;
+  signals: ICustomerProfileRealWorldSignal[];
 }
 
 export type SignalStanceType = 'In Favour' | 'Against' | 'Neutral';
@@ -176,12 +177,6 @@ export interface ICreateRealWorldSignal {
   sourceCategory: SignalSourceCategoryType;
   stance: SignalStanceType;
   sources: Partial<ISource>[];
-}
-
-export interface ICustomerRealWorldSignalSummary extends IBaseConceptEntity {
-  customerProfileUuid: string;
-  status: 'Not Started' | 'Pending' | 'Error' | 'Complete';
-  summary?: string;
 }
 
 export interface ICustomerProfile extends IBaseConceptEntity {

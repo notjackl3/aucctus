@@ -22,16 +22,13 @@ const RealWorldSignalList: React.FC<IRealWorldSignalListProps> = ({
   } = useCustomerProfileRealWorldSignals(profileUuid);
 
   const signals = useMemo(
-    () => signalsResponse?.realWorldSignals || [],
+    () => signalsResponse?.signals || [],
     [signalsResponse],
   );
-  const summary = useMemo(
-    () => signalsResponse?.realWorldSignalsSummary,
-    [signalsResponse],
-  );
+  const summary = useMemo(() => signalsResponse?.summary, [signalsResponse]);
   const isAgentResearching = useMemo(
-    () => ['Pending', 'Not Started'].includes(summary?.status || ''),
-    [summary],
+    () => ['Pending', 'Not Started'].includes(signalsResponse?.status || ''),
+    [signalsResponse],
   );
 
   // Early return if no data after fetch
@@ -68,11 +65,11 @@ const RealWorldSignalList: React.FC<IRealWorldSignalListProps> = ({
       {signals.length > 0 && (
         <>
           <GroupedSignals profileUuid={profileUuid} signals={signals} />
-          {summary?.summary && (
+          {summary && (
             <AiInsight
               textColorClass='aucctus-text-brand-primary'
               iconStrokeClass='aucctus-stroke-brand-primary'
-              customInsight={summary?.summary}
+              customInsight={summary}
             />
           )}
         </>

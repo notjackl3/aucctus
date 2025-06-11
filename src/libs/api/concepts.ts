@@ -18,7 +18,7 @@ import {
   ICustomerProfileConversationPage,
   ICustomerProfileCreate,
   ICustomerProfileRealWorldSignal,
-  ICustomerProfileRealWorldSignalsList,
+  ICustomerProfileRealWorldSignalsResponse,
   IFinancialProjection,
   IGeneratedConcept,
   IMarketScan,
@@ -207,7 +207,7 @@ export class ConceptApi extends ApiService {
   }
 
   getConceptCustomerProfileRealWorldSignals(customerProfileUuid: string) {
-    return this.get<ICustomerProfileRealWorldSignalsList>(
+    return this.get<ICustomerProfileRealWorldSignalsResponse>(
       endpoints.conceptCustomerProfileRealWorldSignals(customerProfileUuid),
     );
   }
