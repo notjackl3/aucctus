@@ -10,11 +10,13 @@ import {
 interface AssumptionCardProps {
   assumption: IMarketSizingAssumptionEntryV2;
   handleAssumptionChange: (id: string, newValue: number) => void;
+  isModified?: boolean;
 }
 
 const AssumptionCard: React.FC<AssumptionCardProps> = ({
   assumption,
   handleAssumptionChange,
+  isModified = false,
 }) => {
   // Get style based on assumption group using the shared styles
   const assumptionGroup = (assumption.group?.toLowerCase() ||
@@ -41,10 +43,13 @@ const AssumptionCard: React.FC<AssumptionCardProps> = ({
   return (
     <div
       className={cn(
-        'relative rounded-lg p-4 transition-all',
-        'aucctus-border-secondary aucctus-bg-primary border',
+        'relative rounded-lg p-4 transition-all duration-300',
+        'aucctus-bg-primary overflow-hidden',
         styles.hoverShadowClass,
-        'overflow-hidden',
+        {
+          'aucctus-border-secondary border': !isModified,
+          'aucctus-border-brand-subtle border-2': isModified,
+        },
       )}
     >
       {/* Left accent border */}

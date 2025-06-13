@@ -123,6 +123,7 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
           {/* Left side: Assumptions List */}
           <AssumptionsPanel
             assumptions={assumptions}
+            originalAssumptions={impactSizing.assumptionEntries}
             assumptionsTitle={assumptionsTitle}
             onAssumptionChange={handleAssumptionChange}
             resetToDefaults={resetToDefaults}

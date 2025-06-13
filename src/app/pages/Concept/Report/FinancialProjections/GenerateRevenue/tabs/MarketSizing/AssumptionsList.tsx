@@ -22,11 +22,26 @@ const AssumptionsList = forwardRef<HTMLDivElement, AssumptionsListProps>(
       activeFilter,
       isFilterActive,
       filteredAssumptions,
+      marketSizing,
       resetToDefaults,
       handleAssumptionChange,
     },
     ref,
   ) => {
+    // Helper function to check if an assumption is modified
+    const isAssumptionModified = (
+      assumption: IMarketSizingAssumptionEntryV2,
+    ): boolean => {
+      if (!marketSizing?.assumptionEntries) return false;
+
+      const originalAssumption = marketSizing.assumptionEntries.find(
+        (orig) => orig.uuid === assumption.uuid,
+      );
+      return originalAssumption
+        ? assumption.scalar !== originalAssumption.scalar
+        : false;
+    };
+
     return (
       <div ref={ref}>
         <AssumptionsHeader
@@ -42,6 +57,7 @@ const AssumptionsList = forwardRef<HTMLDivElement, AssumptionsListProps>(
               key={assumption.uuid}
               assumption={assumption}
               handleAssumptionChange={handleAssumptionChange}
+              isModified={isAssumptionModified(assumption)}
             />
           ))}
         </div>

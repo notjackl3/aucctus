@@ -6,14 +6,24 @@ import { Badge } from '@components';
 export interface AssumptionItemProps {
   assumption: IImpactSizingAssumptionEntryV2;
   onChange: (uuid: string, value: number) => void;
+  isModified?: boolean;
 }
 
 export const AssumptionItem: React.FC<AssumptionItemProps> = ({
   assumption,
   onChange,
+  isModified = false,
 }) => {
   return (
-    <div className='aucctus-bg-secondary-extra-subtle aucctus-border-secondary rounded-lg border p-4'>
+    <div
+      className={cn(
+        'aucctus-bg-secondary-extra-subtle rounded-lg border p-4 transition-all duration-300',
+        {
+          'aucctus-border-secondary border': !isModified,
+          'aucctus-border-brand-subtle border-2': isModified,
+        },
+      )}
+    >
       <div className='mb-1 flex items-center justify-between'>
         <span className='aucctus-text-md-medium aucctus-text-primary'>
           {assumption.title}
@@ -51,7 +61,7 @@ export const AssumptionItem: React.FC<AssumptionItemProps> = ({
           <span className='aucctus-text-sm aucctus-text-tertiary'>%</span>
         )}
       </div>
-      <div className='mt-3 flex flex-row gap-2'>
+      <div className='mt-3 flex flex-wrap gap-2'>
         {assumption.impactAssumptionSources.map((source) => (
           <Badge.FinancialProjectionSource
             key={source.uuid}
