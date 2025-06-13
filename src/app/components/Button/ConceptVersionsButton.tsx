@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@libs/utils/react';
 import { Icon } from '@components';
@@ -23,6 +23,7 @@ const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
   // Create portal container on mount
   useEffect(() => {
     const div = document.createElement('div');
+    div.style.transition = 'all 0.2s ease-in-out';
     document.body.appendChild(div);
     setPortalContainer(div);
 
@@ -31,29 +32,55 @@ const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
     };
   }, []);
 
-  // Position dropdown below button
-  useEffect(() => {
+  // Extract positioning logic into a separate function
+  const positionDropdown = useCallback(() => {
     if (isOpen && buttonRef.current && dropdownRef.current && portalContainer) {
       const buttonRect = buttonRef.current.getBoundingClientRect();
+      const dropdownWidth = 320;
 
       // Calculate left position to ensure dropdown stays within viewport
       let leftPosition = buttonRect.left + window.scrollX - 100;
 
       // Check if dropdown would extend beyond right edge of viewport
-      if (leftPosition > window.innerWidth + 20) {
+      if (leftPosition + dropdownWidth > window.innerWidth + 20) {
         // Adjust position to align with right edge of viewport
-        leftPosition = Math.max(0, window.innerWidth - 20);
+        leftPosition = Math.max(0, window.innerWidth - 20 - dropdownWidth);
       }
 
       // Position dropdown below the button
       portalContainer.style.position = 'absolute';
       portalContainer.style.top = `${buttonRect.bottom + window.scrollY}px`;
       portalContainer.style.left = `${leftPosition}px`;
-      portalContainer.style.minWidth = `320px`;
-      portalContainer.style.maxWidth = `320px`;
+      portalContainer.style.minWidth = `${dropdownWidth}px`;
+      portalContainer.style.maxWidth = `${dropdownWidth}px`;
       portalContainer.style.zIndex = '50';
     }
   }, [isOpen, portalContainer]);
+
+  // Position dropdown when it opens
+  useEffect(() => {
+    positionDropdown();
+  }, [isOpen, portalContainer, positionDropdown]);
+
+  // Reposition dropdown on window resize (debounced)
+  useEffect(() => {
+    if (!isOpen) return;
+
+    let resizeTimeout: NodeJS.Timeout;
+
+    const handleResize = () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        positionDropdown();
+      }, 100); // 100ms debounce delay
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearTimeout(resizeTimeout);
+    };
+  }, [isOpen, positionDropdown]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -101,7 +128,10 @@ const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
         portalContainer &&
         conceptUuid &&
         createPortal(
-          <div ref={dropdownRef} className='animate-fade-in'>
+          <div
+            ref={dropdownRef}
+            className='animate-fade-in transition-all duration-200'
+          >
             <ConceptVersionsDropdown
               conceptUuid={conceptUuid}
               onClose={() => setIsOpen(false)}
