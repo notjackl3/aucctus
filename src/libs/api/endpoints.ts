@@ -359,6 +359,14 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/assumptions/${assumptionUuid}`;
   }
 
+  static generateKeyAssumptions(conceptIdentifier: string) {
+    return `api/v2/concept/${conceptIdentifier}/key-assumptions/generate`;
+  }
+
+  static generateFinancialProjection(conceptIdentifier: string) {
+    return `api/v2/concept/${conceptIdentifier}/financial-projection/generate`;
+  }
+
   // Financial Projection V2 Endpoints
   static financialProjectionV2(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/financial-projection`;

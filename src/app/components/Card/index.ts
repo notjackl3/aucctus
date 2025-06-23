@@ -16,12 +16,14 @@ import FinancialModel from './FinancialModelCard';
 import FinancialProjects from './FinancialProjectsCard';
 import Insight from './InsightCard';
 import KeyAssumptions from './KeyAssumptionsCard';
+import AssumptionsCardWrapper from './AssumptionsCardWrapper';
 import MarketSize from './MarketSizeCard';
 
 const Card = {
   Detail,
   Demographics,
   KeyAssumptions,
+  AssumptionsCardWrapper,
   FinancialProjects,
   CustomerProfiles,
   Insight,

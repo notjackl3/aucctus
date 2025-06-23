@@ -30,7 +30,7 @@ import {
 import {
   IConceptVersionList,
   IConceptVersionRevertRequestPayload,
-} from './types/concept/concept_versions';
+} from './types/concept/conceptVersions';
 export interface EditConceptReportRequest {
   concept_uuid: string;
   session_id: string; // UUID as string
@@ -167,6 +167,12 @@ export class ConceptApi extends ApiService {
 
   aiEditConcept(payload: EditConceptReportRequest) {
     return this.post<IConcept>(endpoints.conceptAiEditing, payload);
+  }
+
+  generateKeyAssumptions(conceptIdentifier: string) {
+    return this.post<{ message: string }>(
+      endpoints.generateKeyAssumptions(conceptIdentifier),
+    );
   }
 
   unarchive(uuid: string) {

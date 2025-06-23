@@ -1,24 +1,24 @@
 import React from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { useGenerateFinancialProjection } from '@hooks/query/financial_projections.hook';
-import FinancialProjectionsV2 from './FinancialProjections/FinancialProjectionsV2';
-import FinancialProjectionsV1 from './FinancialProjectionsV1';
+import { useGenerateKeyAssumptions } from '@hooks/query/concepts.hook';
+import AssumptionsV1 from './Assumptions/AssumptionsV1';
+import AssumptionsV2 from './Assumptions/AssumptionsV2';
 import { VersionUpgradeBanner } from '@components';
 import { IConceptReportContext } from './ConceptReport/ConceptReport';
 import { AppPath } from '@routes/routes';
 
-const FinancialProjectionsWrapper: React.FC = () => {
+const AssumptionsWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
   const navigate = useNavigate();
-  const { mutate: generateFinancialProjection, isLoading } =
-    useGenerateFinancialProjection();
+  const { mutate: generateKeyAssumptions, isLoading } =
+    useGenerateKeyAssumptions();
 
   // Use concept's featureVersions to determine which version to render
-  const featureVersion = concept.featureVersions?.financialProjection || 'v1';
+  const featureVersion = concept.featureVersions?.assumptions || 'v1';
   const shouldRenderV2 = featureVersion === 'v2';
 
   const handleUpgrade = () => {
-    generateFinancialProjection(concept.identifier, {
+    generateKeyAssumptions(concept.identifier, {
       onSuccess: () => {
         // Navigate to concept bank after starting generation
         navigate(AppPath.ConceptBank, {
@@ -32,14 +32,14 @@ const FinancialProjectionsWrapper: React.FC = () => {
     <>
       {!shouldRenderV2 && (
         <VersionUpgradeBanner
-          featureName='Financial Projection'
+          featureName='Key Assumptions'
           onUpgrade={handleUpgrade}
           isLoading={isLoading}
         />
       )}
-      {shouldRenderV2 ? <FinancialProjectionsV2 /> : <FinancialProjectionsV1 />}
+      {shouldRenderV2 ? <AssumptionsV2 /> : <AssumptionsV1 />}
     </>
   );
 };
 
-export default FinancialProjectionsWrapper;
+export default AssumptionsWrapper;

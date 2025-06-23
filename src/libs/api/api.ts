@@ -94,6 +94,12 @@ export class Api {
     return this._accessToken;
   }
 
+  /**
+   * 🚨 BUG FIX: Fixed duplicate WebSocket token assignment
+   * ISSUE: this.aucctusSocket.accessToken = token called TWICE, causing multiple connections
+   * FIX: Removed duplicate assignment
+   * Lesson: Watch for copy-paste errors, use telemetry to track token changes
+   */
   set accessToken(token: string | undefined) {
     if (token === this._accessToken) {
       return;

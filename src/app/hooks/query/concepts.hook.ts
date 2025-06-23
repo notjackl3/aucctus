@@ -122,6 +122,28 @@ export const useConceptAiEditing = () => {
   });
 };
 
+export const useGenerateKeyAssumptions = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (conceptIdentifier: string) =>
+      await api.concept.generateKeyAssumptions(conceptIdentifier),
+    onSuccess: () => {
+      doFullConceptInvalidation(queryClient);
+      toast.warning(
+        'Key assumptions and tests generation started',
+        'This may take up to 10 minutes. You can navigate away.',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Key assumptions generation failed. Please try again.',
+      );
+    },
+  });
+};
+
 export const useSeed = (uuid?: string, options?: ISeedQueryOptions) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeedDraft, uuid],

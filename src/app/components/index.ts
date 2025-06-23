@@ -23,6 +23,7 @@ import Loading from './Loading/Loading';
 import Progress from './Loading/Progress';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
 import Tooltip from './ToolTip/Tooltip';
+import VersionUpgradeBanner from './Banner/VersionUpgradeBanner';
 
 export {
   AiInteraction,
@@ -46,5 +47,6 @@ export {
   Table,
   Text,
   Tooltip,
+  VersionUpgradeBanner,
   toast,
 };

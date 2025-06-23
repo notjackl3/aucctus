@@ -17,6 +17,7 @@ import {
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { doFullConceptInvalidation } from './concepts.hook';
 import { AucctusQueryKeys } from './query-keys';
 
 // Financial Projection hooks
@@ -29,7 +30,7 @@ export const useFinancialProjectionV2 = (conceptUuid: string) => {
     enabled: !!conceptUuid,
   });
 
-  return { ...query, financialProjectionResponse: query.data };
+  return { ...query, financialProjectionV2: query.data };
 };
 
 // Pricing hooks
@@ -583,6 +584,30 @@ export const useMarketSizingAssumptionDeleteV2 = () => {
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to delete market sizing assumption');
+    },
+  });
+};
+
+export const useGenerateFinancialProjection = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (conceptIdentifier: string) =>
+      await api.financialProjection.generateFinancialProjection(
+        conceptIdentifier,
+      ),
+    onSuccess: () => {
+      doFullConceptInvalidation(queryClient);
+      toast.warning(
+        'Financial projection generation started',
+        'This may take up to 10 minutes. You can navigate away.',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Financial projection generation failed. Please try again.',
+      );
     },
   });
 };

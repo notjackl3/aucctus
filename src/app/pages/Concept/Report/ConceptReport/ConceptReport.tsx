@@ -43,18 +43,13 @@ type TabTitles =
   | 'Context'
   | 'Testing';
 
-// Declare feature flag
-declare const FEATURE_ASSUMPTIONS_V2: boolean;
-
+// Base tabs - Testing will be added dynamically based on concept version
 const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
   { label: 'Overview', value: AppPath.ConceptOverview },
   { label: 'Market Scan', value: AppPath.ConceptMarketScan },
   { label: 'Financial Projection', value: AppPath.ConceptFinancialProjection },
   { label: 'Customer Profile', value: AppPath.ConceptCustomerProfile },
   { label: 'Key Assumptions', value: AppPath.ConceptKeyAssumptions },
-  ...(FEATURE_ASSUMPTIONS_V2
-    ? [{ label: 'Testing' as TabTitles, value: AppPath.ConceptTesting }]
-    : []),
   { label: 'Context' as TabTitles, value: AppPath.ConceptSettings },
 ];
 
@@ -85,6 +80,23 @@ const ConceptReport: FunctionComponent = () => {
     useCommitConceptVersionRevert();
   const { mutate: cancelConceptVersionRevert, isLoading: isCancelling } =
     useCancelConceptVersionRevert();
+
+  // Build tabs dynamically based on concept feature version
+  const conceptTabs = useMemo(() => {
+    const tabs = [...CONCEPT_TABS];
+
+    // Add Testing tab if concept has assumptions v2
+    if (concept?.featureVersions?.assumptions === 'v2') {
+      const contextIndex = tabs.findIndex((tab) => tab.label === 'Context');
+      tabs.splice(contextIndex, 0, {
+        label: 'Testing',
+        value: AppPath.ConceptTesting,
+      });
+    }
+
+    // Filter out Context tab if concept doesn't have seed
+    return tabs.filter((v) => !(v.label === 'Context' && !concept?.hasSeed));
+  }, [concept?.featureVersions?.assumptions, concept?.hasSeed]);
 
   useEffect(() => {
     if (concept) {
@@ -227,9 +239,7 @@ const ConceptReport: FunctionComponent = () => {
               'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
                 concept?.isHistoricalVersion,
             })}
-            tabs={CONCEPT_TABS.filter(
-              (v) => !(v.label === 'Context' && !concept?.hasSeed),
-            )}
+            tabs={conceptTabs}
             onTabSelect={onTabSelect}
             activeTab={activeTab || ''}
           >

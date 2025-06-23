@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { IConceptVersion } from '@libs/api/types/concept/concept_versions';
+import { IConceptVersion } from '@libs/api/types/concept/conceptVersions';
 import React from 'react';
 import utils from '@libs/utils';
 import { Badge } from '@components';

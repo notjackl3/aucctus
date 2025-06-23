@@ -4,7 +4,7 @@ import {
   useConceptVersions,
   useRevertConceptVersion,
 } from '@hooks/query/concepts.hook';
-import { IConceptVersion } from '@libs/api/types/concept/concept_versions';
+import { IConceptVersion } from '@libs/api/types/concept/conceptVersions';
 import { Loading } from '@components';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import ConceptVersionCard from '@components/Card/ConceptVersionCard';
@@ -52,7 +52,7 @@ const ConceptVersionsDropdown: React.FC<ConceptVersionsDropdownProps> = ({
       ) : (
         <div className='flex !max-h-[500px] flex-col gap-2 overflow-auto py-1'>
           {versions && versions.versions.length > 0 ? (
-            versions.versions.map((v) => (
+            versions.versions.map((v: IConceptVersion) => (
               <ConceptVersionCard
                 key={v.versionNumber}
                 version={v}

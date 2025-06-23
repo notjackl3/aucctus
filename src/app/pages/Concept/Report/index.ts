@@ -1,24 +1,22 @@
-import Assumptions from './Assumptions';
+import AssumptionsWrapper from './AssumptionsWrapper';
 import ConceptReport, {
   IConceptReportContext,
 } from './ConceptReport/ConceptReport';
 import ConceptReportSocketWrapper from './ConceptReport/ConceptReportSocketWrapper';
 import ConceptSettings from './ConceptSettings/ConceptSettings';
 import CustomerProfile from './CustomerProfile/CustomerProfile';
-import FinancialDetails from './FinancialDetails';
+import FinancialProjectionsWrapper from './FinancialProjectionsWrapper';
 import MarketScan from './MarketScan/MarketScan';
 import OverviewDetails from './OverviewDetails';
 import Testing from './Testing/Testing';
-import FinancialProjectionsWrapper from './FinancialProjectionsWrapper';
 
 // Regular exports
 export {
-  Assumptions,
+  AssumptionsWrapper,
   ConceptReport,
   ConceptReportSocketWrapper,
   ConceptSettings,
   CustomerProfile,
-  FinancialDetails,
   FinancialProjectionsWrapper,
   MarketScan,
   OverviewDetails,
@@ -33,8 +31,8 @@ const ReportWithTabs = ConceptReport as unknown as typeof ConceptReport & {
   Overview: typeof OverviewDetails;
   MarketScan: typeof MarketScan;
   CustomerProfile: typeof CustomerProfile;
-  FinancialProjection: typeof FinancialDetails;
-  Assumptions: typeof Assumptions;
+  FinancialProjection: typeof FinancialProjectionsWrapper;
+  Assumptions: typeof AssumptionsWrapper;
   ConceptSettings: typeof ConceptSettings;
   Testing: typeof Testing;
 };
@@ -43,8 +41,8 @@ const ReportWithTabs = ConceptReport as unknown as typeof ConceptReport & {
 ReportWithTabs.Overview = OverviewDetails;
 ReportWithTabs.MarketScan = MarketScan;
 ReportWithTabs.CustomerProfile = CustomerProfile;
-ReportWithTabs.FinancialProjection = FinancialDetails;
-ReportWithTabs.Assumptions = Assumptions;
+ReportWithTabs.FinancialProjection = FinancialProjectionsWrapper;
+ReportWithTabs.Assumptions = AssumptionsWrapper;
 ReportWithTabs.ConceptSettings = ConceptSettings;
 ReportWithTabs.Testing = Testing;
 

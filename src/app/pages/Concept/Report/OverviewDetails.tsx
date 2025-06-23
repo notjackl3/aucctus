@@ -1,6 +1,5 @@
 import { Card, Header, Loading, Text } from '@components';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
-import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
@@ -16,35 +15,9 @@ const OverviewDetails: FunctionComponent = () => {
   const { profiles, isLoading: isCustomerProfilesLoading } =
     useConceptCustomerProfiles(activeConceptUuid);
 
-  const assumptionsFilters = useMemo(
-    () => ({
-      page: 1,
-      page_size: 20,
-    }),
-    [],
-  );
-
-  const { assumptions: assumptionsV2, isLoading: isAssumptionsLoading } =
-    useFilteredAssumptions(concept?.identifier || '', assumptionsFilters);
   const { valueProposition, problemStatement, overview } = useEditConcept();
 
-  // Convert V2 assumptions to V1 format for compatibility with existing Card component
-  const assumptions = useMemo(() => {
-    return (
-      assumptionsV2?.map((assumption) => ({
-        ...assumption,
-        name: assumption.statement,
-        text: assumption.statement,
-        importanceRationale: '',
-        certaintyRationale: '',
-        status: 'notStarted' as const,
-        testProgress: [],
-        version: 1,
-      })) || []
-    );
-  }, [assumptionsV2]);
-
-  const isLoading = isAssumptionsLoading || isCustomerProfilesLoading;
+  const isLoading = isCustomerProfilesLoading;
 
   const firstCustomerPersona = useMemo(() => {
     if (!profiles || profiles.length === 0) {
@@ -137,8 +110,7 @@ const OverviewDetails: FunctionComponent = () => {
         </div>
 
         <div className='w-full flex-1 [&>div]:!w-full'>
-          <Card.KeyAssumptions
-            assumptions={assumptions || []}
+          <Card.AssumptionsCardWrapper
             onViewClick={() => navigateToTab(AppPath.ConceptKeyAssumptions)}
           />
         </div>

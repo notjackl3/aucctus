@@ -1,18 +1,23 @@
-import { Card, Chart, Header, Modal } from '@components';
+// TODO: DEPRECATE - This is the legacy V1 financial projections component.
+// Remove this file once all users have migrated to FinancialProjectionsV2.tsx
+
+import { Card, Chart, Header, Modal, Loading } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useModal } from '@context/ModalContextProvider';
 import { useEditFinancialProjections } from '@hooks/concepts/editable.hook';
-import { IFinancialProjection, ISource } from '@libs/api/types';
+import { useFinancialProjection } from '@hooks/query/concepts.hook';
+import { ISource } from '@libs/api/types';
 import utils from '@libs/utils';
 import React, { FunctionComponent, useMemo } from 'react';
+import { useOutletContext } from 'react-router-dom';
+import { IConceptReportContext } from './ConceptReport/ConceptReport';
 
-interface FinancialDetailsProps {
-  financialProjection: IFinancialProjection;
-}
+const FinancialProjectionsV1: FunctionComponent = () => {
+  const { concept } = useOutletContext<IConceptReportContext>();
+  const { financialProjection, isLoading } = useFinancialProjection(
+    concept.uuid,
+  );
 
-const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
-  financialProjection,
-}) => {
   const {
     tam,
     sam,
@@ -22,29 +27,45 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
     totalUsers,
     serviceableAddressablePercent,
     serviceableObtainablePercent,
-  } = useMemo(() => financialProjection, [financialProjection]);
+  } = useMemo(
+    () =>
+      financialProjection || {
+        tam: 0,
+        sam: 0,
+        som: 0,
+        businessModel: null,
+        pricing: null,
+        totalUsers: null,
+        serviceableAddressablePercent: null,
+        serviceableObtainablePercent: null,
+      },
+    [financialProjection],
+  );
 
   const { overview } = useEditFinancialProjections();
 
   // Formate Large numbers
   const formattedPrice = React.useMemo(
-    () => utils.number.formatter.format(pricing.price),
-    [pricing.price],
+    () => (pricing?.price ? utils.number.formatter.format(pricing.price) : '0'),
+    [pricing?.price],
   );
   const formattedTotalUsers = React.useMemo(
-    () => utils.number.formatLargeNumber(totalUsers.value),
-    [totalUsers.value],
+    () =>
+      totalUsers?.value
+        ? utils.number.formatLargeNumber(totalUsers.value)
+        : '0',
+    [totalUsers?.value],
   );
   const formattedTam = React.useMemo(
-    () => utils.number.formatter.format(tam),
+    () => (tam ? utils.number.formatter.format(tam) : '0'),
     [tam],
   );
   const formattedSam = React.useMemo(
-    () => utils.number.formatter.format(sam),
+    () => (sam ? utils.number.formatter.format(sam) : '0'),
     [sam],
   );
   const formattedSom = React.useMemo(
-    () => utils.number.formatter.format(som),
+    () => (som ? utils.number.formatter.format(som) : '0'),
     [som],
   );
 
@@ -63,6 +84,25 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
       },
     [openModal],
   );
+
+  if (isLoading) {
+    return (
+      <div className='flex h-full w-full flex-col gap-6'>
+        <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
+          <Loading />
+        </div>
+      </div>
+    );
+  }
+
+  // Handle case where loading is finished but no financial projection exists
+  if (!isLoading && !financialProjection) {
+    return (
+      <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
+        No financial projection found for this concept.
+      </div>
+    );
+  }
 
   return (
     <div className='align-self-lg-stretch flex h-full w-full flex-col items-start gap-6'>
@@ -85,32 +125,32 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
         <div className='inline-flex w-full items-start justify-start gap-5'>
           <Card.FinancialModel
             heading='Business Model'
-            value={businessModel.name}
-            content={businessModel.rationale}
+            value={businessModel?.name || ''}
+            content={businessModel?.rationale || ''}
             onClick={handleReasoningModelClick(
-              businessModel.name,
-              businessModel.rationale,
-              businessModel.sources,
+              businessModel?.name || '',
+              businessModel?.rationale || '',
+              businessModel?.sources || [],
             )}
           />
           <Card.FinancialModel
             heading='Price'
-            value={`${formattedPrice} / ${pricing.billing}`}
-            content={pricing.rationale}
+            value={`${formattedPrice} / ${pricing?.billing || ''}`}
+            content={pricing?.rationale || ''}
             onClick={handleReasoningModelClick(
-              `${formattedPrice} / ${pricing.billing}`,
-              pricing.rationale,
-              pricing.sources,
+              `${formattedPrice} / ${pricing?.billing || ''}`,
+              pricing?.rationale || '',
+              pricing?.sources || [],
             )}
           />
           <Card.FinancialModel
             heading='Total Users'
             value={formattedTotalUsers}
-            content={totalUsers.rationale}
+            content={totalUsers?.rationale || ''}
             onClick={handleReasoningModelClick(
               formattedTotalUsers,
-              totalUsers.rationale,
-              totalUsers.sources,
+              totalUsers?.rationale || '',
+              totalUsers?.sources || [],
             )}
           />
         </div>
@@ -133,11 +173,11 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
               title={'Total Addressable Market (TAM)'}
               value={formattedTam}
               descriptor='ARR'
-              assumptions={totalUsers.assumptions}
+              assumptions={totalUsers?.assumptions || []}
               onClick={handleReasoningModelClick(
                 formattedTam,
-                totalUsers.rationale,
-                totalUsers.sources,
+                totalUsers?.rationale || '',
+                totalUsers?.sources || [],
               )}
             />
             <Card.MarketSize
@@ -145,11 +185,11 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
               title={'Serviceable Addressable Market (SAM)'}
               value={formattedSam}
               descriptor='ARR'
-              assumptions={serviceableAddressablePercent.assumptions}
+              assumptions={serviceableAddressablePercent?.assumptions || []}
               onClick={handleReasoningModelClick(
                 formattedSam,
-                serviceableAddressablePercent.rationale,
-                serviceableAddressablePercent.sources,
+                serviceableAddressablePercent?.rationale || '',
+                serviceableAddressablePercent?.sources || [],
               )}
             />
             <Card.MarketSize
@@ -157,17 +197,22 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
               title={'Serviceable Obtainable Market (SOM)'}
               value={formattedSom}
               descriptor='ARR'
-              assumptions={serviceableObtainablePercent.assumptions}
+              assumptions={serviceableObtainablePercent?.assumptions || []}
               onClick={handleReasoningModelClick(
                 formattedSom,
-                serviceableObtainablePercent.rationale,
-                serviceableObtainablePercent.sources,
+                serviceableObtainablePercent?.rationale || '',
+                serviceableObtainablePercent?.sources || [],
               )}
             />
           </div>
 
           <div className='m-auto inline-flex h-full w-96 flex-col items-center justify-center gap-12'>
-            <Chart.MarketChart className={''} tam={tam} sam={sam} som={som} />
+            <Chart.MarketChart
+              className={''}
+              tam={tam || 0}
+              sam={sam || 0}
+              som={som || 0}
+            />
           </div>
         </div>
       </section>
@@ -175,4 +220,4 @@ const FinancialDetails: FunctionComponent<FinancialDetailsProps> = ({
   );
 };
 
-export default FinancialDetails;
+export default FinancialProjectionsV1;

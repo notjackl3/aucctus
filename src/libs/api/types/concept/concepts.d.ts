@@ -86,6 +86,14 @@ export type ConceptReportStatusBySection = {
   [sectionName: string]: IConceptReportStatusSection;
 };
 
+export type FeatureVersion = `v${number}`;
+
+export type FeatureName = 'assumptions' | 'financialProjection';
+
+export type IFeatureVersions = {
+  [K in FeatureName]?: FeatureVersion;
+};
+
 export interface IConcept extends IBaseConceptEntity {
   uuid: string;
   title: string;
@@ -112,6 +120,7 @@ export interface IConcept extends IBaseConceptEntity {
     modifiedAt: string;
   };
   isHistoricalVersion?: boolean;
+  featureVersions?: IFeatureVersions;
 }
 
 export interface IConceptOverview extends IBaseConceptEntity {

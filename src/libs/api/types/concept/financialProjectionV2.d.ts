@@ -1,5 +1,3 @@
-import { IFinancialProjection } from './financialProjection';
-
 export interface IBaseFinancialProjectionEntity {
   uuid: string;
   createdAt: string;
@@ -341,11 +339,6 @@ export interface ICreateImpactAssumptionSourceV2 {
 
 // =============================================================================
 
-export interface IFinancialProjectionResponse {
-  financialProjection: IFinancialProjectionV2 | IFinancialProjection;
-  isV2: boolean;
-}
-
 // Main Financial Projection V2 type
 export interface IFinancialProjectionV2 extends IBaseFinancialProjectionEntity {
   // Generate Revenue related fields
@@ -364,8 +357,6 @@ export interface IFinancialProjectionV2 extends IBaseFinancialProjectionEntity {
 }
 
 // Response types for API
-export interface IFinancialProjectionV2Response
-  extends IFinancialProjectionV2 {}
 
 export interface IMessageResponse {
   message: string;
