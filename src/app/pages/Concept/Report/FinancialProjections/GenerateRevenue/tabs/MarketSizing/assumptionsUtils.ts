@@ -1,6 +1,10 @@
 /* eslint-disable no-console */
 import { MarketMetrics } from '../../shared/types';
 import { IMarketSizingAssumptionEntryV2 } from '@libs/api/types';
+import {
+  buildExpression,
+  evaluateExpression,
+} from '../../../shared/expressionBuilder';
 
 export const calculateMarketMetrics = (
   assumptions: IMarketSizingAssumptionEntryV2[],
@@ -16,7 +20,7 @@ export const calculateMarketMetrics = (
     {} as Record<string, IMarketSizingAssumptionEntryV2[]>,
   );
 
-  // Calculate value for each group using the correct operator logic
+  // Calculate value for each group using the latest expression builder logic
   const calculateGroupValue = (
     groupAssumptions: IMarketSizingAssumptionEntryV2[],
   ): number => {
@@ -27,77 +31,9 @@ export const calculateMarketMetrics = (
 
     if (sortedAssumptions.length === 0) return 0;
 
-    // Build the mathematical expression string
-    let expression = '';
-
-    for (let i = 0; i < sortedAssumptions.length; i++) {
-      const assumption = sortedAssumptions[i];
-
-      // Apply factor for percentage units (convert to decimal)
-      const value =
-        assumption.unit === '%' ? assumption.scalar / 100 : assumption.scalar;
-
-      // Add the current assumption's value
-      expression += value.toString();
-
-      // Handle different operator types
-      if (assumption.operator && i < sortedAssumptions.length - 1) {
-        const nextAssumption = sortedAssumptions[i + 1];
-        const nextValue =
-          nextAssumption.unit === '%'
-            ? nextAssumption.scalar / 100
-            : nextAssumption.scalar;
-
-        if (assumption.operator === '(+)' || assumption.operator === '(-)') {
-          // Handle parenthetical operations
-          const operation = assumption.operator === '(+)' ? '+' : '-';
-
-          // Wrap current and next value in parentheses
-          // Remove the current value from expression and rebuild with parentheses
-          expression = expression.substring(
-            0,
-            expression.lastIndexOf(value.toString()),
-          );
-          expression += `(${value} ${operation} ${nextValue})`;
-
-          // Skip the next iteration since we've already processed the next value
-          i++;
-
-          // If there's another assumption after the next one, add its operator
-          if (
-            i < sortedAssumptions.length - 1 &&
-            sortedAssumptions[i].operator
-          ) {
-            expression += ` ${sortedAssumptions[i].operator} `;
-          }
-          // If no operator on the consumed assumption, we're done
-          else if (!sortedAssumptions[i].operator) {
-            break;
-          }
-        } else {
-          // Handle regular operations
-          expression += ` ${assumption.operator} `;
-        }
-      }
-      // If no operator is present, we're done with this group
-      else if (!assumption.operator) {
-        break;
-      }
-    }
-
-    // Safely evaluate the mathematical expression using Function constructor
-    // This ensures proper BEDMAS/PEMDAS evaluation
-    try {
-      const result = new Function(`return ${expression}`)();
-      return typeof result === 'number' && !isNaN(result) ? result : 0;
-    } catch (error) {
-      console.error(
-        'Error evaluating market sizing expression:',
-        expression,
-        error,
-      );
-      return 0;
-    }
+    // Use the shared expression builder for consistent, robust calculation
+    const expression = buildExpression(sortedAssumptions);
+    return evaluateExpression(expression, 'market sizing');
   };
 
   const tam = calculateGroupValue(groupedAssumptions.TAM || []);
