@@ -31,6 +31,7 @@ import React, { useMemo } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { UnseenChangesTooltip } from '@components/ToolTip/UnseenChangesTooltip';
+import { useDebugMode } from '@hooks/debug-mode.hook';
 
 export interface IConceptFilterOptions {
   status: Set<ConceptStatus>;
@@ -72,6 +73,7 @@ interface UseConceptBankResult {
   resetFilter: () => void;
   filterOptions: IConceptFilterOptions;
   handleRowClick: (rowId: string) => void;
+  isDebugModeEnabled: boolean;
 }
 
 export const useConceptBank = (
@@ -84,6 +86,9 @@ export const useConceptBank = (
   const { mutate: generateConceptReport } = useConceptReportGenerate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
   const queryClient = useQueryClient();
+
+  // Use global debug mode state
+  const isDebugModeEnabled = useDebugMode();
 
   // Use refs for values that don't need to trigger re-renders when updated internally
   const filterOptionsRef = React.useRef<IConceptFilterOptions>(INITIAL_FILTER);
@@ -234,6 +239,15 @@ export const useConceptBank = (
     [navigate, data?.results],
   );
 
+  const handleDebugTitleClick = React.useCallback(
+    (concept: IConcept) => {
+      // In debug mode, allow navigation to any concept using the complete state logic
+      doFullConceptInvalidation(queryClient);
+      navigate(AppPath.ConceptOverview.replace(':id', concept.identifier));
+    },
+    [navigate, queryClient],
+  );
+
   const columns = useMemo<ColumnDef<IConcept, any>[]>(() => {
     return [
       columnHelper.accessor('uuid', {
@@ -277,13 +291,41 @@ export const useConceptBank = (
           </div>
         ),
         cell: (info) => {
+          const concept = info.row.original;
+
           return (
-            <div className='flex max-w-[700px] items-center py-2'>
-              <Text.Collapsible
-                title={info.getValue()}
-                maxDescriptionHeight={35}
-                description={info.row.original.summary}
-              />
+            <div className='flex max-w-[700px] flex-col py-2'>
+              <div
+                className={isDebugModeEnabled ? 'cursor-pointer' : ''}
+                onClick={
+                  isDebugModeEnabled
+                    ? (e) => {
+                        e.stopPropagation();
+                        handleDebugTitleClick(concept);
+                      }
+                    : undefined
+                }
+                title={
+                  isDebugModeEnabled
+                    ? '🐛 Debug Mode: Click to navigate to concept'
+                    : undefined
+                }
+              >
+                <Text.Collapsible
+                  title={info.getValue()}
+                  maxDescriptionHeight={35}
+                  description={concept.summary}
+                />
+              </div>
+
+              {/* Debug Mode UUID Display */}
+              {isDebugModeEnabled && (
+                <div className='mt-1'>
+                  <span className='aucctus-text-quaternary font-mono text-xs'>
+                    {concept.uuid}
+                  </span>
+                </div>
+              )}
             </div>
           );
         },
@@ -436,12 +478,13 @@ export const useConceptBank = (
         cell: (info) => (
           <Table.ConceptBank.ConceptActionMenuButton
             status={info.row.original.status}
+            reportStatus={info.row.original.reportStatusAggregate}
             identifier={info.row.original.identifier}
           />
         ),
       }),
     ];
-  }, [handleGenerateConceptButton]);
+  }, [handleGenerateConceptButton, isDebugModeEnabled, handleDebugTitleClick]);
 
   // Create table configuration outside of useMemo
   const tableOptions = {
@@ -481,6 +524,7 @@ export const useConceptBank = (
       resetFilter,
       filterOptions,
       handleRowClick,
+      isDebugModeEnabled,
     }),
     [
       isLoading,
@@ -492,6 +536,7 @@ export const useConceptBank = (
       resetFilter,
       filterOptions,
       handleRowClick,
+      isDebugModeEnabled,
     ],
   );
 };

@@ -1,5 +1,9 @@
 import { Icon } from '@components';
-import { ConceptStatus, SeedStatus } from '@libs/api/types';
+import {
+  ConceptStatus,
+  SeedStatus,
+  ConceptReportStatus,
+} from '@libs/api/types';
 import * as Popover from '@radix-ui/react-popover';
 import React from 'react';
 import ClickAwayListener from 'react-click-away-listener';
@@ -10,23 +14,27 @@ import { cn } from '@libs/utils/react';
 interface IActionsMenuButtonProps {
   identifier: string;
   status?: ConceptStatus | SeedStatus;
-  onArchive: (identifier: string) => void;
-  onUnarchive: (identifier: string) => void;
+  reportStatus?: ConceptReportStatus;
+  onArchive: (uuid: string) => void;
+  onUnarchive: (uuid: string) => void;
+  onCancelReport?: (uuid: string) => void;
   buttonClassName?: string;
   iconSize?: number;
 }
 
-// Generic Actions Menu Button that can be used for both concepts and seeds
 const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
   identifier,
   status,
+  reportStatus,
   onArchive,
   onUnarchive,
+  onCancelReport,
   buttonClassName = 'btn flex h-8 w-8 items-center justify-center rounded-lg border border-gray-100 bg-white p-0 shadow-sm transition-all hover:bg-gray-50',
   iconSize = 24,
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
-  const label = status !== 'archived' ? 'Archive' : 'Unarchive';
+  const archiveLabel = status !== 'archived' ? 'Archive' : 'Unarchive';
+  const showCancelReport = reportStatus === 'pending' && onCancelReport;
 
   return (
     <Popover.Root open={open}>
@@ -44,12 +52,12 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
       <Popover.Portal>
         <ClickAwayListener onClickAway={() => setOpen(false)}>
           <Popover.Content
-            className='aucctus-bg-primary rounded p-2 shadow-lg will-change-[transform,opacity] focus:shadow-lg'
+            className='aucctus-bg-primary min-w-[160px] rounded p-2 shadow-lg will-change-[transform,opacity] focus:shadow-lg'
             side='left'
           >
-            <div className='flex flex-col gap-4'>
+            <div className='flex flex-col'>
               <button
-                className='btn btn-no-border btn-light'
+                className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
                 onClick={() => {
                   if (status === 'archived') {
                     onUnarchive(identifier);
@@ -59,8 +67,27 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
                   setOpen(false);
                 }}
               >
-                {label}
+                <span className='aucctus-text-primary text-base'>
+                  {archiveLabel}
+                </span>
               </button>
+
+              {showCancelReport && (
+                <>
+                  <div className='aucctus-bg-secondary mx-2 h-px' />
+                  <button
+                    className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
+                    onClick={() => {
+                      onCancelReport?.(identifier);
+                      setOpen(false);
+                    }}
+                  >
+                    <span className='aucctus-text-primary text-base'>
+                      Cancel Report
+                    </span>
+                  </button>
+                </>
+              )}
             </div>
             <Popover.Arrow className='fill-white' />
           </Popover.Content>

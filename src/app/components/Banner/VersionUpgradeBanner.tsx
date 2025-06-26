@@ -7,6 +7,7 @@ interface IVersionUpgradeBannerProps {
   onUpgrade: () => void;
   className?: string;
   isLoading?: boolean;
+  buttonText?: string;
 }
 
 const VersionUpgradeBanner: FunctionComponent<IVersionUpgradeBannerProps> = ({
@@ -14,6 +15,7 @@ const VersionUpgradeBanner: FunctionComponent<IVersionUpgradeBannerProps> = ({
   onUpgrade,
   className,
   isLoading = false,
+  buttonText = 'Upgrade',
 }) => {
   return (
     <div
@@ -43,7 +45,7 @@ const VersionUpgradeBanner: FunctionComponent<IVersionUpgradeBannerProps> = ({
           disabled={isLoading}
           className='btn btn-primary btn-sm whitespace-nowrap'
         >
-          {isLoading ? 'Upgrading...' : 'Upgrade'}
+          {isLoading ? 'Upgrading...' : buttonText}
         </button>
       </div>
       <div className='aucctus-border-brand-subtle mt-3 border-t pt-3'>

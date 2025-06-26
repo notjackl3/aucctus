@@ -23,6 +23,7 @@ export interface IConcept extends IBaseConceptEntity {
 ```
 
 Example concept data:
+
 ```json
 {
   "featureVersions": {
@@ -46,6 +47,7 @@ Each feature that has multiple versions should have a dedicated wrapper componen
 ### 2. Example Implementation
 
 #### Page-Level Wrapper
+
 ```typescript
 // FeatureWrapper.tsx
 import React from 'react';
@@ -56,7 +58,7 @@ import { IConceptReportContext } from './ConceptReport/ConceptReport';
 
 const FeatureWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  
+
   // Use concept's featureVersions to determine which version to render
   const featureVersion = concept.featureVersions?.featureName || 'v1';
   const shouldRenderV2 = featureVersion === 'v2';
@@ -76,6 +78,7 @@ export default FeatureWrapper;
 ```
 
 #### Component-Level Wrapper (for Cards, etc.)
+
 ```typescript
 // FeatureCardWrapper.tsx
 import React from 'react';
@@ -88,15 +91,15 @@ const FeatureCardWrapper: React.FC<{ onViewClick: () => void }> = ({
   onViewClick,
 }) => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  
+
   // Use concept's featureVersions to determine which hook to use
   const featureVersion = concept.featureVersions?.featureName || 'v1';
   const shouldUseV2 = featureVersion === 'v2';
-  
+
   // Call appropriate hooks
   const { data: dataV1, isLoading: isV1Loading } = useFeatureV1(concept.uuid);
   const { data: dataV2, isLoading: isV2Loading } = useFeatureV2(concept.uuid);
-  
+
   // Use appropriate data and loading state
   const data = shouldUseV2 ? dataV2 : dataV1;
   const isLoading = shouldUseV2 ? isV2Loading : isV1Loading;
@@ -195,4 +198,4 @@ When deprecating older versions:
 
 - `src/libs/api/types/concept/concepts.d.ts` - IConcept interface definition
 - `src/app/pages/Concept/Report/ConceptReport/ConceptReport.tsx` - Context provider
-- `src/app/pages/Concept/Report/index.ts` - Component exports 
+- `src/app/pages/Concept/Report/index.ts` - Component exports

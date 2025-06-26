@@ -18,6 +18,7 @@ import customerProfileConversationsSlice, {
 import financialProjectionSlice, {
   IFinancialProjectionState,
 } from './financial-projection/store';
+import debugModeSlice, { IDebugModeState } from './debug-mode/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -27,6 +28,7 @@ export interface IAppStore {
   conceptReport: IConceptReportState;
   financialProjection: IFinancialProjectionState;
   customerProfileConversations: ICustomerProfileConversationState;
+  debugMode: IDebugModeState;
 }
 
 export interface IStoreApi<S> {
@@ -46,6 +48,7 @@ const useStore = create<IAppStore>()(
         conceptReport: conceptReportSlice,
         financialProjection: financialProjectionSlice,
         customerProfileConversations: customerProfileConversationsSlice,
+        debugMode: debugModeSlice,
       }),
     ),
     {

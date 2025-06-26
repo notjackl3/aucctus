@@ -351,6 +351,10 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  cancelReport(uuid: string) {
+    return this.post<IConcept>(endpoints.conceptReportCancel(uuid));
+  }
+
   // Customer Jobs API
   getCustomerJobs(customerProfileUuid: string) {
     return this.get<ICustomerJob[]>(

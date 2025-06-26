@@ -6,10 +6,14 @@ import { AppPath } from '@routes/routes';
 import React, { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
+import { useDebugModeListener } from '@hooks/debug-mode.hook';
 
 // const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
 function App() {
+  // Initialize global debug mode listener
+  useDebugModeListener();
+
   // Public Routes (Unauthenticated)
   const PublicRoutes = usePublicRoutes();
 

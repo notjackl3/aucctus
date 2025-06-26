@@ -657,6 +657,23 @@ export const useConceptReportGenerate = () => {
   );
 };
 
+export const useConceptReportCancel = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (conceptUuid: string) =>
+      await api.concept.cancelReport(conceptUuid),
+    onSuccess: () => {
+      doFullConceptInvalidation(queryClient);
+      toast.success('Report generation cancelled successfully');
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to cancel report generation');
+    },
+  });
+};
+
 /**
  * Custom hook for updating the concept market scan.
  *
@@ -746,6 +763,9 @@ export const doFullConceptInvalidation = (queryClient: QueryClient) => {
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.financialProjection],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.concepts],
     }),
   ]);
 };

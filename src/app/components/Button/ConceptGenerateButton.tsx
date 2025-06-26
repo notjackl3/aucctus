@@ -68,18 +68,19 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   // If in pending state, use the ConceptGeneratingButton component
   if (variant === 'pending') {
     return (
-      <ConceptGeneratingButton reportStatusBySection={reportStatusBySection} />
+      <ConceptGeneratingButton
+        reportStatusBySection={reportStatusBySection}
+        dateReportStarted={dateReportStarted}
+        dateReportCompleted={dateReportCompleted}
+      />
     );
   }
 
   // Get button style and label
   const { style, label } = getButtonContext(variant);
 
-  // For complete or error state, wrap with tooltip
-  if (
-    (variant === 'complete' || variant === 'error') &&
-    reportStatusBySection
-  ) {
+  // For all states with reportStatusBySection data, wrap with tooltip
+  if (reportStatusBySection) {
     return (
       <ComponentTooltip
         tip={
