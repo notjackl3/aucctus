@@ -10,11 +10,6 @@ export const useDebugModeListener = () => {
   const toggleDebugMode = useStore((state) => state.debugMode.toggleDebugMode);
 
   React.useEffect(() => {
-    // Only enable debug mode in development
-    if (process.env.NODE_ENV === 'production') {
-      return;
-    }
-
     let keySequence = '';
     let shiftPressed = false;
     let sequenceTimeout: NodeJS.Timeout;
@@ -87,10 +82,6 @@ export const useDebugMode = () => {
   const isDebugModeEnabled = useStore(
     (state) => state.debugMode.isDebugModeEnabled,
   );
-
-  if (process.env.NODE_ENV === 'production') {
-    return false;
-  }
 
   return isDebugModeEnabled;
 };
