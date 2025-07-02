@@ -1,12 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { Icon, FileDropzone, toast } from '@components';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
+import telemetry from '@libs/telemetry';
 import {
   useTestResults,
   useCreateTestResultWithFile,
   useDeleteTestResult,
 } from '@hooks/query/testing.hook';
+import { useQueryClient } from 'react-query';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { ITestResult } from '@libs/api/types/concept/testing';
+import {
+  ITestResultHandshakeMessage,
+  ITestResultProcessingMessage,
+  ITestResultCompletedMessage,
+  ITestResultErrorMessage,
+} from '@libs/api/types';
 import TestCompletionLoadingOverlay from './test-impact/components/TestCompletionLoadingOverlay';
+import TestResultProcessingStatus, {
+  ITestResultProcessingState,
+} from './TestResultProcessingStatus';
 
 interface TestResultsProps {
   conceptUuid?: string;
@@ -35,8 +48,189 @@ const TestResults: React.FC<TestResultsProps> = ({
   // Hook for deleting test results
   const deleteTestResult = useDeleteTestResult();
 
+  // Query client for invalidating cache
+  const queryClient = useQueryClient();
+
   // State to trigger dropzone reset
   const [dropzoneKey, setDropzoneKey] = useState(0);
+
+  // Test result processing state
+  const [processingState, setProcessingState] =
+    useState<ITestResultProcessingState>({
+      isProcessing: false,
+      stage: null,
+      message: '',
+      progress: 0,
+      error: null,
+      testResultUuid: undefined,
+      conceptUuid: undefined,
+      testUuid: undefined,
+      summary: undefined,
+      learnings: [],
+      keywords: [],
+    });
+
+  // Socket event handlers for test result processing
+  // NOTE: Multitenancy validation (account_uuid/user_uuid) is handled automatically by useSocketEvent hook
+  useSocketEvent(
+    'test.result.handshake',
+    (handshake: ITestResultHandshakeMessage) => {
+      telemetry.log('test.result.handshake received', {
+        testResultUuid: handshake.testResultUuid,
+        conceptUuid: handshake.conceptUuid,
+        testUuid: handshake.testUuid,
+      });
+
+      // Validate that this message is for this specific component
+      if (
+        handshake.conceptUuid !== conceptUuid ||
+        handshake.testUuid !== testUuid
+      ) {
+        telemetry.log('test.result.handshake ignored - component mismatch', {
+          messageConceptUuid: handshake.conceptUuid,
+          messageTestUuid: handshake.testUuid,
+          componentConceptUuid: conceptUuid,
+          componentTestUuid: testUuid,
+        });
+        return;
+      }
+
+      setProcessingState((prev) => {
+        const newState = {
+          ...prev,
+          isProcessing: true, // Set processing to true when handshake is received
+          stage: 'initializing',
+          message: 'Initializing analysis...',
+          progress: 0, // Start with 0 progress
+          error: null,
+          testResultUuid: handshake.testResultUuid,
+          conceptUuid: handshake.conceptUuid,
+          testUuid: handshake.testUuid,
+        };
+
+        telemetry.log('test.result.handshake state updated', {
+          previousUuid: prev.testResultUuid,
+          newUuid: newState.testResultUuid,
+          isProcessing: true,
+        });
+
+        return newState;
+      });
+    },
+  );
+
+  useSocketEvent(
+    'test.result.processing',
+    (message: ITestResultProcessingMessage) => {
+      telemetry.log('test.result.processing received', {
+        testResultUuid: message.testResultUuid,
+        stage: message.stage,
+        progress: message.progress,
+        value: message.value,
+        currentStateUuid: processingState.testResultUuid,
+      });
+
+      setProcessingState((prev) => {
+        // Validate that this message is for this specific component and matches current processing
+        if (
+          prev.testResultUuid !== message.testResultUuid &&
+          prev.testResultUuid // Only validate if we have a UUID (allow initial state)
+        ) {
+          telemetry.log('test.result.processing ignored - UUID mismatch', {
+            messageUuid: message.testResultUuid,
+            stateUuid: prev.testResultUuid,
+          });
+          return prev;
+        }
+
+        // Determine if processing should be active
+        // If message.value is explicitly false, processing is inactive
+        // If message.value is true or undefined, check for progress/stage indicators
+        const isActivelyProcessing =
+          message.value === false
+            ? false
+            : message.value === true ||
+              message.progress !== undefined ||
+              Boolean(message.stage);
+
+        const newState = {
+          ...prev,
+          testResultUuid: message.testResultUuid, // Ensure UUID is set
+          isProcessing: isActivelyProcessing,
+          stage: message.stage,
+          progress:
+            message.progress !== undefined ? message.progress : prev.progress, // Handle progress 0 properly
+          message: `Processing: ${message.stage?.replace(/_/g, ' ') || prev.stage?.replace(/_/g, ' ') || 'in progress'}`,
+          error: null,
+        };
+
+        telemetry.log('test.result.processing state updated', {
+          newState: newState,
+          messageUuid: message.testResultUuid,
+          progress: message.progress,
+          isProcessing: isActivelyProcessing,
+          messageValue: message.value,
+        });
+
+        return newState;
+      });
+    },
+  );
+
+  useSocketEvent(
+    'test.result.completed',
+    (message: ITestResultCompletedMessage) => {
+      telemetry.log('test.result.completed received', {
+        testResultUuid: message.testResultUuid,
+        summary: message.summary,
+        learningsCount: message.learnings.length,
+        keywordsCount: message.keywords.length,
+      });
+
+      if (processingState.testResultUuid === message.testResultUuid) {
+        setProcessingState((prev) => ({
+          ...prev,
+          isProcessing: false,
+          stage: 'completed',
+          progress: 100,
+          message: 'Analysis complete',
+          summary: message.summary,
+          learnings: message.learnings,
+          keywords: message.keywords,
+          error: null,
+        }));
+
+        // Refetch test results to show learnings in the main UI
+        telemetry.log('test.result.completed invalidating queries', {
+          conceptUuid,
+          testUuid,
+          testResultUuid: message.testResultUuid,
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.testResults, conceptUuid, testUuid],
+        });
+      }
+    },
+  );
+
+  useSocketEvent('test.result.error', (message: ITestResultErrorMessage) => {
+    telemetry.error('test.result.error received', {
+      testResultUuid: message.testResultUuid,
+      code: message.code,
+      message: message.message,
+    });
+
+    if (processingState.testResultUuid === message.testResultUuid) {
+      setProcessingState((prev) => ({
+        ...prev,
+        isProcessing: false,
+        stage: 'error',
+        progress: 0,
+        error: message.message,
+      }));
+    }
+  });
 
   // Notify parent about results state changes
   useEffect(() => {
@@ -88,12 +282,35 @@ const TestResults: React.FC<TestResultsProps> = ({
     }
 
     try {
-      await createTestResultWithFile.mutateAsync({
+      const result = await createTestResultWithFile.mutateAsync({
         conceptUuid,
         testUuid,
         file: uploadedFile.file,
         summary: uploadedFile.description || undefined,
         recommendations: undefined, // Could be added to the FileDropzone form later
+      });
+
+      // Set initial processing state
+      telemetry.log('test.result.upload.success', {
+        testResultUuid: result.uuid,
+        conceptUuid,
+        testUuid,
+        fileName: uploadedFile.file.name,
+        fileSize: uploadedFile.file.size,
+      });
+
+      setProcessingState({
+        isProcessing: true,
+        stage: null,
+        message: 'Starting analysis...',
+        progress: 0,
+        error: null,
+        testResultUuid: result.uuid,
+        conceptUuid: conceptUuid,
+        testUuid: testUuid,
+        summary: undefined,
+        learnings: [],
+        keywords: [],
       });
 
       // Clear the dropzone by updating its key to force re-render
@@ -102,6 +319,11 @@ const TestResults: React.FC<TestResultsProps> = ({
       // The query will be invalidated and refetch the updated results
     } catch (error) {
       // The hook already shows a toast error message
+      setProcessingState((prev) => ({
+        ...prev,
+        isProcessing: false,
+        error: 'Upload failed. Please try again.',
+      }));
     }
   };
 
@@ -172,6 +394,9 @@ const TestResults: React.FC<TestResultsProps> = ({
           subtitle='Our AI will provide learnings and recommendations soon...'
         />
       )}
+
+      {/* Real-time Processing Status */}
+      <TestResultProcessingStatus processingState={processingState} />
 
       {/* Results Grid */}
       {hasResults && (

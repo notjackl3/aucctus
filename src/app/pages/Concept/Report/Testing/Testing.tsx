@@ -1,4 +1,3 @@
-import telemetry from '@libs/telemetry';
 import React, { useState, useMemo, createContext, useContext } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import RecommendedTestSection from './components/RecommendedTestSection';
@@ -81,13 +80,6 @@ const Testing: React.FC = () => {
           shouldCloseOnEscape: true,
         },
       );
-
-      // For telemetry purposes
-      telemetry.log('testing_run_test', {
-        testUuid: nextTest.uuid,
-        testName: nextTest.name,
-        testType: nextTest.testType,
-      });
     }
   };
 
@@ -255,6 +247,7 @@ const Testing: React.FC = () => {
             <TestHistorySection
               tests={completedTests}
               conceptUuid={conceptUuid}
+              concept={concept}
             />
           </>
         )}

@@ -1,13 +1,17 @@
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
-import { Loading, Icon } from '@components';
-import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
+import { Loading, Icon, VersionUpgradeBanner, toast } from '@components';
+import {
+  useConceptCustomerProfiles,
+  useGenerateCustomerProfile,
+} from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useCallback, useEffect, useMemo } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import CustomerDetails from './Details/CustomerDetails';
 import useStore from '@stores/store';
+import { useDebugMode } from '@hooks/debug-mode.hook';
 
 const CustomerProfile: FunctionComponent = () => {
   const activeConceptIdentifier = useStore(
@@ -20,12 +24,17 @@ const CustomerProfile: FunctionComponent = () => {
   const { profiles, isLoading } = useConceptCustomerProfiles(
     activeConceptUuid || '',
   );
+  const { mutate: generateCustomerProfile, isLoading: isGenerating } =
+    useGenerateCustomerProfile();
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedProfileName = searchParams.get('persona');
   const selectedProfile = useMemo(
     () => profiles.find((item) => item.segment === selectedProfileName),
     [profiles, selectedProfileName],
   );
+
+  // Use global debug mode state
+  const isDebugModeEnabled = useDebugMode();
 
   const customerTabs = useMemo(() => {
     return profiles.map<TabElement>((item: ICustomerProfile) => ({
@@ -59,6 +68,27 @@ const CustomerProfile: FunctionComponent = () => {
     [setSearchParams],
   );
 
+  const handleDebugModeGenerate = () => {
+    if (!activeConceptIdentifier) return;
+
+    generateCustomerProfile(activeConceptIdentifier, {
+      onSuccess: () => {
+        toast.success(
+          '👥 Customer Profile generated successfully!',
+          undefined,
+          {
+            autoClose: 2000,
+          },
+        );
+      },
+      onError: () => {
+        toast.error('❌ Failed to generate Customer Profile', undefined, {
+          autoClose: 2000,
+        });
+      },
+    });
+  };
+
   useEffect(() => {
     const firstPersona = profiles.length > 0 ? profiles[0] : undefined;
     if (
@@ -87,6 +117,7 @@ const CustomerProfile: FunctionComponent = () => {
     selectedProfile,
     activeConceptIdentifier,
   ]);
+
   if (isLoading) {
     return (
       <div className='flex h-full w-full flex-col gap-6'>
@@ -100,15 +131,37 @@ const CustomerProfile: FunctionComponent = () => {
   // Handle case where loading is finished but no profiles exist
   if (!isLoading && profiles.length === 0) {
     return (
-      <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
-        No customer profiles found for this concept.
-        {/* Optionally add a button to create one? */}
+      <div className='flex h-full w-full flex-col'>
+        {/* Show debug mode banner if debug mode is enabled */}
+        {isDebugModeEnabled && (
+          <VersionUpgradeBanner
+            featureName='Debug Mode 🐛'
+            onUpgrade={handleDebugModeGenerate}
+            isLoading={isGenerating}
+            buttonText='Generate Section'
+          />
+        )}
+
+        <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
+          No customer profiles found for this concept.
+          {/* Optionally add a button to create one? */}
+        </div>
       </div>
     );
   }
 
   return (
     <div className='flex h-full w-full flex-col flex-wrap items-start self-stretch'>
+      {/* Show debug mode banner if debug mode is enabled */}
+      {isDebugModeEnabled && (
+        <VersionUpgradeBanner
+          featureName='Debug Mode 🐛'
+          onUpgrade={handleDebugModeGenerate}
+          isLoading={isGenerating}
+          buttonText='Generate Section'
+        />
+      )}
+
       <TabView
         tabs={customerTabs}
         tabGroupClassName='pointer-events-auto flex flex-1'

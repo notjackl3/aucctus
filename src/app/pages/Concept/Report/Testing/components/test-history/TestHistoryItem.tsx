@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
-import { Icon, Container } from '@components';
+import { Icon, Container, Modal } from '@components';
 import { cn } from '@libs/utils/react';
+import { useModal } from '@context/ModalContextProvider';
 import { ITestDetails } from '../../types';
 import GenericStatusBadge from '../../../Assumptions/components/shared/GenericStatusBadge';
 import { TEST_STATUS_CONFIGS } from '../../../Assumptions/constants/statusConfigs';
@@ -22,6 +23,7 @@ interface TestHistoryItemProps {
   test: ITestDetails;
   isExpanded: boolean;
   conceptUuid?: string;
+  concept?: any; // Add concept prop needed for the modal
 }
 
 const TestStatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -33,7 +35,9 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
   test,
   isExpanded,
   conceptUuid,
+  concept,
 }) => {
+  const { openModal } = useModal();
   // Fetch test results to get learnings and recommendations
   const { results: fetchedResults } = useTestResults(
     conceptUuid || '',
@@ -111,6 +115,27 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
     });
   }, [test]);
 
+  // Handle opening test details modal
+  const handleViewTestDetails = () => {
+    if (concept && test.uuid) {
+      openModal(
+        Modal.TestExecutionModal,
+        {
+          testUuid: test.uuid,
+          testType: test.testType,
+          concept,
+          mode: 'view', // Always open completed tests in view mode
+        },
+        {
+          position: 'center',
+          backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-25',
+          shouldCloseOnOverlayClick: true,
+          shouldCloseOnEscape: true,
+        },
+      );
+    }
+  };
+
   return (
     <div className='aucctus-border-secondary aucctus-bg-primary overflow-hidden rounded-xl border shadow-sm'>
       {/* Test Header */}
@@ -152,7 +177,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
                     Key Insight
                   </h4>
                   <p className='aucctus-text-sm-regular aucctus-text-brand-secondary'>
-                    Test completed successfully
+                    {test.objective}
                   </p>
                 </div>
               )}
@@ -160,7 +185,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
           </div>
 
           {/* Right Section - Metrics and Actions */}
-          <div className='flex h-full flex-col justify-between gap-3 lg:w-80'>
+          <div className='space-between flex h-full flex-col gap-8 lg:w-80'>
             {/* Validation Results using TestValidationStats component */}
             <TestValidationStats
               validationStats={validationStats}
@@ -172,22 +197,28 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
             {/* Action Button */}
             <button
               className={cn(
-                'btn btn-disabled w-full transition-all duration-200',
+                'btn btn-light w-full transition-all duration-200',
+                !concept && 'cursor-not-allowed opacity-50',
               )}
               onClick={(e) => {
                 e.stopPropagation();
-                // Disabled - no action
+                handleViewTestDetails();
               }}
-              disabled={true}
+              disabled={!concept}
               aria-expanded={false}
               aria-controls={`test-details-${test.uuid}`}
+              title={
+                !concept
+                  ? 'Test details will be available shortly'
+                  : 'View test details'
+              }
             >
               <>
                 <Icon
-                  variant='clock'
-                  className='aucctus-stroke-disabled mr-2 h-4 w-4'
+                  variant='eye'
+                  className='aucctus-stroke-primary mr-2 h-4 w-4'
                 />
-                Coming Soon
+                View Details
               </>
             </button>
           </div>

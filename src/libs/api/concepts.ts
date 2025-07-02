@@ -175,6 +175,12 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  generateCustomerProfile(conceptIdentifier: string) {
+    return this.post<{ message: string }>(
+      endpoints.generateCustomerProfile(conceptIdentifier),
+    );
+  }
+
   unarchive(uuid: string) {
     return this.post<IConcept>(endpoints.unarchiveConcept(uuid));
   }

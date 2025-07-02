@@ -53,6 +53,8 @@ export interface IAiEditingHandshakeMessage
   type: 'ai.editing.handshake';
   sessionId: string;
   conceptUuid: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 export interface IAiEditingInboundChatMessage
@@ -60,6 +62,8 @@ export interface IAiEditingInboundChatMessage
     BaseSocketEvent {
   type: 'ai.editing.chat';
   conceptUuid: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 export interface IAiEditingTypingMessage extends BaseSocketEvent {
@@ -67,6 +71,8 @@ export interface IAiEditingTypingMessage extends BaseSocketEvent {
   conceptUuid: string;
   value: boolean;
   content?: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 export interface IAiEditingErrorMessage extends BaseSocketEvent {
@@ -74,6 +80,8 @@ export interface IAiEditingErrorMessage extends BaseSocketEvent {
   conceptUuid: string;
   code: string; // This should match your ConsumerErrorCodes enum
   message: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 export interface IAiEditingSuggestionsEvent extends BaseSocketEvent {
@@ -84,6 +92,8 @@ export interface IAiEditingSuggestionsEvent extends BaseSocketEvent {
   sessionId: string;
   content: IConceptReportEdit;
   timestamp?: number;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 export interface IAIEditingStartedMessage extends BaseSocketEvent {
@@ -92,6 +102,62 @@ export interface IAIEditingStartedMessage extends BaseSocketEvent {
   userUuid: string;
   userFirstName: string;
   userLastName: string;
+  account_uuid: string;
+  user_uuid: string;
+}
+
+// ==========================================
+// Test Result Related Messages
+// ==========================================
+
+export interface ITestLearningData {
+  uuid: string;
+  learning: string;
+  impact: string;
+}
+
+export interface ITestResultHandshakeMessage extends BaseSocketEvent {
+  type: 'test.result.handshake';
+  conceptUuid: string;
+  testUuid: string;
+  testResultUuid: string;
+  account_uuid: string;
+  user_uuid: string;
+}
+
+export interface ITestResultProcessingMessage extends BaseSocketEvent {
+  type: 'test.result.processing';
+  conceptUuid: string;
+  testUuid: string;
+  testResultUuid: string;
+  stage: 'extracting_text' | 'analyzing_content' | 'generating_insights';
+  progress?: number; // 0-100
+  value: boolean; // Whether processing is active
+  account_uuid: string;
+  user_uuid: string;
+}
+
+export interface ITestResultCompletedMessage extends BaseSocketEvent {
+  type: 'test.result.completed';
+  conceptUuid: string;
+  testUuid: string;
+  testResultUuid: string;
+  summary: string;
+  learnings: ITestLearningData[];
+  keywords: string[];
+  account_uuid: string;
+  user_uuid: string;
+}
+
+export interface ITestResultErrorMessage extends BaseSocketEvent {
+  type: 'test.result.error';
+  conceptUuid: string;
+  testUuid: string;
+  testResultUuid: string;
+  code: string;
+  message: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 // ==========================================
@@ -105,6 +171,8 @@ export interface ICustomerProfileHandshakeMessage
   sessionId: string;
   conceptUuid: string;
   customerProfileUuid: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 export interface ICustomerProfileInboundChatMessage
@@ -113,6 +181,8 @@ export interface ICustomerProfileInboundChatMessage
   type: 'customer.profile.chat';
   conceptUuid: string;
   customerProfileUuid: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 export interface ICustomerProfileInboundTypingMessage
@@ -122,6 +192,8 @@ export interface ICustomerProfileInboundTypingMessage
   value: boolean;
   conceptUuid: string;
   customerProfileUuid: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 export interface ICustomerProfileInboundErrorEvent
@@ -130,6 +202,8 @@ export interface ICustomerProfileInboundErrorEvent
   type: 'customer.profile.chat.error';
   code: string;
   message: string;
+  account_uuid: string;
+  user_uuid: string;
 }
 
 // ==========================================
@@ -250,6 +324,10 @@ export type InboundSocketEvent<C = {}> =
   | IAiEditingSuggestionsStreamEvent
   | AiEditingChatStreamEvent
   | CustomerProfileStreamEvent
-  | IAIEditingStartedMessage;
+  | IAIEditingStartedMessage
+  | ITestResultHandshakeMessage
+  | ITestResultProcessingMessage
+  | ITestResultCompletedMessage
+  | ITestResultErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

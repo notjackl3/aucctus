@@ -6,11 +6,13 @@ import { TestHistoryItem } from './test-history';
 interface TestHistorySectionProps {
   tests: ITestDetails[];
   conceptUuid?: string;
+  concept?: any; // Add concept prop to pass down to TestHistoryItem
 }
 
 const TestHistorySection: React.FC<TestHistorySectionProps> = ({
   tests,
   conceptUuid,
+  concept,
 }) => {
   if (tests.length === 0) {
     return (
@@ -71,6 +73,7 @@ const TestHistorySection: React.FC<TestHistorySectionProps> = ({
             test={test}
             isExpanded={false}
             conceptUuid={conceptUuid}
+            concept={concept}
           />
         ))}
       </div>

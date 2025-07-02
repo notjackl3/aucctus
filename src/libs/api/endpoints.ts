@@ -371,6 +371,10 @@ export class Endpoints {
     return `api/v2/concept/${conceptIdentifier}/financial-projection/generate`;
   }
 
+  static generateCustomerProfile(conceptIdentifier: string) {
+    return `api/v2/concept/${conceptIdentifier}/customer-profile/generate`;
+  }
+
   // Financial Projection V2 Endpoints
   static financialProjectionV2(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/financial-projection`;

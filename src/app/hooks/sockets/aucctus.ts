@@ -1,6 +1,8 @@
 import api from '@libs/api';
 import { SocketService } from '@libs/api/base';
 import { InboundSocketEvent, InboundSocketEventType } from '@libs/api/types';
+import telemetry from '@libs/telemetry';
+import useStore from '@stores/store';
 import React from 'react';
 
 function isSocketEventOfType<
@@ -11,6 +13,59 @@ function isSocketEventOfType<
   type: T,
 ): data is Extract<InboundSocketEvent<C>, { type: T }> {
   return data.type === type;
+}
+
+/**
+ * Validates that a websocket message is intended for the current user and account
+ * @param message The websocket message to validate
+ * @param currentAccountUuid The current user's account UUID
+ * @param currentUserUuid The current user's UUID
+ * @returns true if the message is valid for this user/account, false otherwise
+ */
+function validateMessageMultitenancy(
+  message: any,
+  currentAccountUuid?: string,
+  currentUserUuid?: string,
+): boolean {
+  // If the message doesn't have account_uuid or user_uuid, allow it (backward compatibility)
+  if (!message.account_uuid && !message.user_uuid) {
+    return true;
+  }
+
+  // If we don't have current user/account info, reject the message
+  if (!currentAccountUuid || !currentUserUuid) {
+    telemetry.log('websocket.security.multitenancy.validation.failed', {
+      reason: 'missing_current_user_info',
+      messageType: message.type,
+      hasMessageAccountUuid: !!message.account_uuid,
+      hasMessageUserUuid: !!message.user_uuid,
+    });
+    return false;
+  }
+
+  // Validate account UUID
+  if (message.account_uuid && message.account_uuid !== currentAccountUuid) {
+    telemetry.log('websocket.security.multitenancy.validation.failed', {
+      reason: 'account_uuid_mismatch',
+      messageType: message.type,
+      messageAccountUuid: message.account_uuid,
+      currentAccountUuid,
+    });
+    return false;
+  }
+
+  // Validate user UUID
+  if (message.user_uuid && message.user_uuid !== currentUserUuid) {
+    telemetry.log('websocket.security.multitenancy.validation.failed', {
+      reason: 'user_uuid_mismatch',
+      messageType: message.type,
+      messageUserUuid: message.user_uuid,
+      currentUserUuid,
+    });
+    return false;
+  }
+
+  return true;
 }
 
 /**
@@ -37,6 +92,21 @@ export function useSocketEvent<
       try {
         const data: InboundSocketEvent<C> = JSON.parse(e.data);
         if (isSocketEventOfType<T, C>(data, eventName)) {
+          // Get current user and account info for validation
+          const currentUser = useStore.getState().auth.user;
+          const currentAccount = useStore.getState().auth.account;
+
+          // Validate multitenancy
+          if (
+            !validateMessageMultitenancy(
+              data,
+              currentAccount?.uuid,
+              currentUser?.uuid,
+            )
+          ) {
+            return; // Reject the message
+          }
+
           savedCallback(data as Extract<InboundSocketEvent<C>, { type: T }>);
         }
       } catch (error) {

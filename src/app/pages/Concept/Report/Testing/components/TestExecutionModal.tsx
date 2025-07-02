@@ -27,6 +27,7 @@ interface TestExecutionModalProps {
   testType?: string;
   testUuid?: string;
   concept: any;
+  mode?: 'edit' | 'view'; // Add mode prop to control edit/view behavior
 }
 
 const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
@@ -34,6 +35,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   testType = 'Customer Interviews',
   testUuid,
   concept,
+  mode = 'edit', // Default to edit mode for backward compatibility
 }) => {
   const { closeModal } = useModal();
   const queryClient = useQueryClient();
@@ -57,6 +59,9 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
 
   // Get completion context
   const { setIsCompletingTest } = useTestCompletion();
+
+  // Determine if we're in view mode (completed tests are always view-only)
+  const isViewMode = mode === 'view' || testDetail?.status === 'completed';
 
   // Update visited tabs when activeTab changes
   useEffect(() => {
@@ -302,11 +307,24 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   return (
     <div className='aucctus-bg-primary flex h-[920px] w-[1200px] flex-col rounded-xl'>
       {/* Header */}
-      <div className='aucctus-border-secondary flex flex-shrink-0 items-center gap-3 border-b p-6'>
-        <Icon variant='plus' className='aucctus-stroke-brand-primary h-5 w-5' />
-        <h2 className='aucctus-text-xl-semibold aucctus-text-brand-primary'>
-          {testDetail ? testDetail.name : 'New Test'}
-        </h2>
+      <div className='aucctus-border-secondary flex flex-shrink-0 items-center justify-between border-b p-6'>
+        <div className='flex items-center gap-3'>
+          <Icon
+            variant={isViewMode ? 'eye' : 'plus'}
+            className='aucctus-stroke-brand-primary h-5 w-5'
+          />
+          <h2 className='aucctus-text-xl-semibold aucctus-text-brand-primary'>
+            {testDetail ? testDetail.name : 'New Test'}
+          </h2>
+        </div>
+        {isViewMode && (
+          <div className='flex items-center gap-2'>
+            <Icon variant='lock' className='aucctus-stroke-secondary h-4 w-4' />
+            <span className='aucctus-text-sm-medium aucctus-text-secondary'>
+              View Only
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Tab Navigation and Content Area - flex-1 to take remaining space */}
@@ -369,76 +387,90 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
       {/* Footer - flex-shrink-0 to maintain fixed height */}
       <div className='aucctus-border-secondary rounded-lg border p-6'>
         <div className='flex justify-between'>
-          <button
-            className={cn(
-              'btn btn-secondary flex items-center gap-1',
-              isFirstTab && 'cursor-not-allowed opacity-50',
-            )}
-            onClick={goToPreviousTab}
-            disabled={isFirstTab}
-          >
-            <Icon
-              variant='arrowleft'
-              className='aucctus-stroke-secondary h-4 w-4'
-            />
-            Previous
-          </button>
-
-          <div className='flex gap-2'>
-            <button
-              className={cn(
-                'btn btn-secondary',
-                completeTestDetail.isLoading && 'cursor-not-allowed opacity-50',
-              )}
-              onClick={handleCloseModal}
-              disabled={completeTestDetail.isLoading}
-            >
-              Cancel
-            </button>
-
-            {isLastTab ? (
+          {!isViewMode ? (
+            <>
               <button
                 className={cn(
-                  'btn btn-primary flex items-center gap-1',
-                  (!canCompleteTest || completeTestDetail.isLoading) &&
-                    'cursor-not-allowed opacity-50',
+                  'btn btn-secondary flex items-center gap-1',
+                  isFirstTab && 'cursor-not-allowed opacity-50',
                 )}
-                onClick={handleCompleteTest}
-                disabled={!canCompleteTest || completeTestDetail.isLoading}
-                title={
-                  !canCompleteTest
-                    ? 'Add results to complete this test'
-                    : completeTestDetail.isLoading
-                      ? 'Completing test...'
-                      : 'Complete test'
-                }
+                onClick={goToPreviousTab}
+                disabled={isFirstTab}
               >
-                {completeTestDetail.isLoading ? (
-                  <Icon
-                    variant='refresh'
-                    className='aucctus-stroke-white h-4 w-4 animate-spin'
-                  />
-                ) : (
-                  <Icon
-                    variant='check'
-                    className='aucctus-stroke-white h-4 w-4'
-                  />
-                )}
-                {completeTestDetail.isLoading ? 'Completing...' : 'Complete'}
-              </button>
-            ) : (
-              <button
-                className='btn btn-primary flex items-center gap-1'
-                onClick={goToNextTab}
-              >
-                Next
                 <Icon
-                  variant='arrowright'
-                  className='aucctus-stroke-white h-4 w-4'
+                  variant='arrowleft'
+                  className='aucctus-stroke-secondary h-4 w-4'
                 />
+                Previous
               </button>
-            )}
-          </div>
+
+              <div className='flex gap-2'>
+                <button
+                  className={cn(
+                    'btn btn-secondary',
+                    completeTestDetail.isLoading &&
+                      'cursor-not-allowed opacity-50',
+                  )}
+                  onClick={handleCloseModal}
+                  disabled={completeTestDetail.isLoading}
+                >
+                  Cancel
+                </button>
+
+                {isLastTab ? (
+                  <button
+                    className={cn(
+                      'btn btn-primary flex items-center gap-1',
+                      (!canCompleteTest || completeTestDetail.isLoading) &&
+                        'cursor-not-allowed opacity-50',
+                    )}
+                    onClick={handleCompleteTest}
+                    disabled={!canCompleteTest || completeTestDetail.isLoading}
+                    title={
+                      !canCompleteTest
+                        ? 'Add results to complete this test'
+                        : completeTestDetail.isLoading
+                          ? 'Completing test...'
+                          : 'Complete test'
+                    }
+                  >
+                    {completeTestDetail.isLoading ? (
+                      <Icon
+                        variant='refresh'
+                        className='aucctus-stroke-white h-4 w-4 animate-spin'
+                      />
+                    ) : (
+                      <Icon
+                        variant='check'
+                        className='aucctus-stroke-white h-4 w-4'
+                      />
+                    )}
+                    {completeTestDetail.isLoading
+                      ? 'Completing...'
+                      : 'Complete'}
+                  </button>
+                ) : (
+                  <button
+                    className='btn btn-primary flex items-center gap-1'
+                    onClick={goToNextTab}
+                  >
+                    Next
+                    <Icon
+                      variant='arrowright'
+                      className='aucctus-stroke-white h-4 w-4'
+                    />
+                  </button>
+                )}
+              </div>
+            </>
+          ) : (
+            // View mode footer - only close button
+            <div className='flex w-full justify-end'>
+              <button className='btn btn-secondary' onClick={handleCloseModal}>
+                Close
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </div>
