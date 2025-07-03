@@ -131,52 +131,56 @@ const CustomerProfile: FunctionComponent = () => {
   // Handle case where loading is finished but no profiles exist
   if (!isLoading && profiles.length === 0) {
     return (
-      <div className='flex h-full w-full flex-col'>
+      <>
         {/* Show debug mode banner if debug mode is enabled */}
         {isDebugModeEnabled && (
           <VersionUpgradeBanner
-            featureName='Debug Mode 🐛'
             onUpgrade={handleDebugModeGenerate}
             isLoading={isGenerating}
             buttonText='Generate Section'
+            debugMode={true}
           />
         )}
 
-        <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
-          No customer profiles found for this concept.
-          {/* Optionally add a button to create one? */}
+        <div className='flex h-full w-full flex-col'>
+          <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
+            No customer profiles found for this concept.
+            {/* Optionally add a button to create one? */}
+          </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className='flex h-full w-full flex-col flex-wrap items-start self-stretch'>
+    <>
       {/* Show debug mode banner if debug mode is enabled */}
       {isDebugModeEnabled && (
         <VersionUpgradeBanner
-          featureName='Debug Mode 🐛'
           onUpgrade={handleDebugModeGenerate}
           isLoading={isGenerating}
           buttonText='Generate Section'
+          debugMode={true}
         />
       )}
 
-      <TabView
-        tabs={customerTabs}
-        tabGroupClassName='pointer-events-auto flex flex-1'
-        tabContainerClassName='flex flex-1 items-center justify-center'
-        tabClassName='flex flex-1 aucctus-bg-primary-hover items-center justify-center'
-        className='flex h-full w-full items-start justify-center'
-        variant='button'
-        onTabSelect={onTabSelect}
-        activeTab={selectedProfileName || ''}
-      >
-        {selectedProfile && (
-          <CustomerDetails profile={selectedProfile} className='mt-4' />
-        )}
-      </TabView>
-    </div>
+      <div className='flex h-full w-full flex-col flex-wrap items-start self-stretch'>
+        <TabView
+          tabs={customerTabs}
+          tabGroupClassName='pointer-events-auto flex flex-1'
+          tabContainerClassName='flex flex-1 items-center justify-center'
+          tabClassName='flex flex-1 aucctus-bg-primary-hover items-center justify-center'
+          className='flex h-full w-full items-start justify-center'
+          variant='button'
+          onTabSelect={onTabSelect}
+          activeTab={selectedProfileName || ''}
+        >
+          {selectedProfile && (
+            <CustomerDetails profile={selectedProfile} className='mt-4' />
+          )}
+        </TabView>
+      </div>
+    </>
   );
 };
 

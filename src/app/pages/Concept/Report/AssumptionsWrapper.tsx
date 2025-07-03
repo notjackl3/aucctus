@@ -53,19 +53,19 @@ const AssumptionsWrapper: React.FC = () => {
       {/* Show upgrade banner if not v2 */}
       {!shouldRenderV2 && (
         <VersionUpgradeBanner
-          featureName='Key Assumptions'
           onUpgrade={handleUpgrade}
           isLoading={isLoading}
+          featureName='assumptions'
         />
       )}
 
       {/* Show debug mode banner if debug mode is enabled */}
       {isDebugModeEnabled && (
         <VersionUpgradeBanner
-          featureName='Debug Mode 🐛'
           onUpgrade={handleDebugModeGenerate}
           isLoading={isLoading}
           buttonText='Generate Section'
+          debugMode={true}
         />
       )}
 

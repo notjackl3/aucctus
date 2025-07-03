@@ -3,56 +3,77 @@ import { cn } from '@libs/utils/react';
 import { FunctionComponent } from 'react';
 
 interface IVersionUpgradeBannerProps {
-  featureName: string;
   onUpgrade: () => void;
   className?: string;
   isLoading?: boolean;
   buttonText?: string;
+  debugMode?: boolean;
+  featureName?: string;
 }
 
 const VersionUpgradeBanner: FunctionComponent<IVersionUpgradeBannerProps> = ({
-  featureName,
   onUpgrade,
   className,
   isLoading = false,
-  buttonText = 'Upgrade',
+  buttonText = 'Update',
+  debugMode = false,
 }) => {
   return (
     <div
       className={cn(
-        'aucctus-bg-brand-primary aucctus-border-brand-subtle mb-6 rounded-lg border p-4',
+        'aucctus-bg-primary aucctus-border-secondary relative mb-6 overflow-hidden rounded-lg border',
+        'aucctus-bg-primary-hover transition-all duration-300',
         className,
       )}
     >
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-3'>
-          <Icon
-            variant='announcement'
-            className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
-          />
-          <div>
-            <p className='aucctus-text-brand-primary aucctus-text-md-semibold'>
-              New {featureName} version available
-            </p>
-            <p className='aucctus-text-brand-secondary aucctus-text-sm'>
-              Experience enhanced features and improved performance with the
-              latest version.
-            </p>
+      {/* Subtle primary accent line */}
+      <div className='aucctus-bg-brand-solid absolute left-0 top-0 h-0.5 w-full'></div>
+
+      <div className='flex w-full items-center justify-between p-4'>
+        <div className='flex flex-1 items-start gap-3'>
+          {/* Icon with subtle primary accent */}
+          <div className='aucctus-bg-brand-primary mt-0.5 rounded-full p-1'>
+            <Icon
+              variant='announcement'
+              className='aucctus-stroke-brand-primary'
+              height={16}
+              width={16}
+            />
+          </div>
+
+          <div className='flex-1'>
+            <div className='aucctus-text-primary aucctus-text-md-semibold mb-0.5'>
+              {debugMode ? 'Debug Mode Regeneration' : 'New Features Available'}
+            </div>
+            <div className='aucctus-text-secondary aucctus-text-sm'>
+              {debugMode ? (
+                <>
+                  This will regenerate the current section with fresh data for
+                  testing purposes.
+                  <br />
+                  Previous content will be replaced.
+                </>
+              ) : (
+                <>
+                  This page has been upgraded and is ready to be updated with
+                  the latest features.
+                  <br />
+                  Current content will be saved to version history.
+                </>
+              )}
+            </div>
           </div>
         </div>
-        <button
-          onClick={onUpgrade}
-          disabled={isLoading}
-          className='btn btn-primary btn-sm whitespace-nowrap'
-        >
-          {isLoading ? 'Upgrading...' : buttonText}
-        </button>
-      </div>
-      <div className='aucctus-border-brand-subtle mt-3 border-t pt-3'>
-        <p className='aucctus-text-brand-tertiary aucctus-text-xs'>
-          You can always switch back to the previous version if you prefer the
-          original experience.
-        </p>
+
+        <div className='ml-6 flex items-center'>
+          <button
+            onClick={onUpgrade}
+            disabled={isLoading}
+            className='btn btn-primary btn-md gap-1 px-4'
+          >
+            {isLoading ? 'Updating...' : buttonText}
+          </button>
+        </div>
       </div>
     </div>
   );

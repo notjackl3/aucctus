@@ -48,15 +48,15 @@ export default defineConfig(async (config: ViteUserConfig) => {
   const plugins = [
     ...defaultPlugins,
     ...(isDevelopment ? devPlugins : []),
-    // Sentry must be the last plugin
-    sentryVitePlugin({
+    // Sentry must be the last plugin - only add if auth token is available
+    ...(env.SENTRY_AUTH_TOKEN ? [sentryVitePlugin({
       org: 'aucctus',
       project: 'front-end-react',
       authToken: env.SENTRY_AUTH_TOKEN,
       sourcemaps: {
         filesToDeleteAfterUpload: '**/*.map', // Clean up after upload
       },
-    }),
+    })] : []),
   ];
 
   const allowedHosts = env.ALLOWED_HOSTS ? env.ALLOWED_HOSTS.split(',') : [];

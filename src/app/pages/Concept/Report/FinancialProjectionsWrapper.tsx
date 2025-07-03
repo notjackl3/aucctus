@@ -55,19 +55,19 @@ const FinancialProjectionsWrapper: React.FC = () => {
       {/* Show upgrade banner if not v2 */}
       {!shouldRenderV2 && (
         <VersionUpgradeBanner
-          featureName='Financial Projection'
           onUpgrade={handleUpgrade}
           isLoading={isLoading}
+          featureName='financialProjection'
         />
       )}
 
       {/* Show debug mode banner if debug mode is enabled */}
       {isDebugModeEnabled && (
         <VersionUpgradeBanner
-          featureName='Debug Mode 🐛'
           onUpgrade={handleDebugModeGenerate}
           isLoading={isLoading}
           buttonText='Generate Section'
+          debugMode={true}
         />
       )}
 
