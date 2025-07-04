@@ -8,6 +8,7 @@ export interface IAiEditingSuggestion {
   title: string;
   description: string;
   reason: string;
+  icon?: IconVariant;
 }
 
 export interface IConceptReportEdit {

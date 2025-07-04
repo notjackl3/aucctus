@@ -49,7 +49,7 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
               title={edit.title}
               message={edit.description}
               variant='dark'
-              leadingIcon={sectionToIconMap[edit.section]}
+              leadingIcon={sectionToIconMap[edit.section] ?? edit.icon ?? ''}
             />
           ))}
         </div>

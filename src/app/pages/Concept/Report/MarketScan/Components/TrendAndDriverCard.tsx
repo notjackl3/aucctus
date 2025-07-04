@@ -29,14 +29,14 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
   const sources = useMemo<ISource[]>(() => {
     // Create a Map where each key is a source's URL and each value is the source object
     const sourceMap: Map<string, ISource> = new Map(
-      trendAndDriver.support.insights
+      (trendAndDriver.support?.insights ?? [])
         .flatMap((insight: IInsight) => insight.sources)
         .map((source: ISource) => [source.url, source]),
     );
 
     // Convert the Map's values to an array
     return Array.from(sourceMap.values());
-  }, [trendAndDriver.support.insights]);
+  }, [trendAndDriver.support?.insights]);
 
   const handleSupportModalClick = useCallback(
     (title: string, conclusion: string, support: ISupport) => {
