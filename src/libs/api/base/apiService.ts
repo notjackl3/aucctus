@@ -11,6 +11,7 @@ import analytics from '../../telemetry';
 import { Api } from '../api';
 import { IAuthSuccessResponse } from '../types';
 import telemetry from '../../telemetry';
+import { isTokenExpired, shouldRefreshToken } from '../../utils/jwt';
 
 export const isAuthSuccessResponse = (
   value: unknown,
@@ -77,6 +78,43 @@ export abstract class ApiService {
   private async _requestMiddleware(config: InternalAxiosRequestConfig) {
     Object.assign(config.headers || {}, this.config.headers);
 
+    // Skip token refresh check for excluded paths
+    if (config.url && this._shouldSkipRefresh(config.url)) {
+      return config;
+    }
+
+    // Check if we need to refresh the token proactively
+    const accessToken = this.apiInstance.accessToken;
+    if (accessToken) {
+      try {
+        // Check if token is expired or needs refresh (5 minutes buffer)
+        if (
+          isTokenExpired(accessToken, 60) ||
+          shouldRefreshToken(accessToken, 300)
+        ) {
+          telemetry.debug(
+            'Token expired or needs refresh, refreshing proactively',
+          );
+
+          // Prevent concurrent refresh attempts
+          if (this.apiInstance.pendingRefresh) {
+            await this.apiInstance.pendingRefresh;
+          } else {
+            await this.apiInstance.refreshToken();
+          }
+
+          // Update the request headers with the new token
+          const newToken = this.apiInstance.accessToken;
+          if (newToken && config.headers) {
+            config.headers.Authorization = `Bearer ${newToken}`;
+          }
+        }
+      } catch (error) {
+        analytics.error('Failed to refresh token proactively', error);
+        // If proactive refresh fails, let the request proceed and handle 401 reactively
+      }
+    }
+
     return config;
   }
 
@@ -109,32 +147,53 @@ export abstract class ApiService {
       LOGOUT_STATUSES.includes(status) &&
       !this._shouldSkipRefresh(url)
     ) {
-      try {
-        const config = error.config as ExtendedAxiosRequestConfig;
-        if (config && !config._retry) {
-          config._retry = true; // This is required to prevent infinite loops
-          telemetry.debug(
-            `apiService: Attempting to refresh token - status=${status}`,
-          );
+      const config = error.config as ExtendedAxiosRequestConfig;
+      if (config && !config._retry) {
+        config._retry = true; // This is required to prevent infinite loops
+        telemetry.debug(
+          `apiService: Attempting to refresh token - status=${status}`,
+        );
+
+        try {
           // Attempt to refresh the token
+          let refreshResult;
           if (this.apiInstance.pendingRefresh) {
-            await this.apiInstance.pendingRefresh;
+            refreshResult = await this.apiInstance.pendingRefresh;
           } else {
-            await this.apiInstance.refreshToken();
+            refreshResult = await this.apiInstance.refreshToken();
           }
 
-          analytics.debug('Retrying request after token refresh', config.url);
-          // Retry the original request
-          return this.api.request({
-            ...config,
-            ...this._handleAccessToken(),
-            withCredentials: true,
-          } as AxiosRequestConfig);
+          // Check if refresh was successful and we have a new token
+          if (refreshResult && this.apiInstance.accessToken) {
+            analytics.debug(
+              'Token refresh successful, retrying request',
+              config.url,
+            );
+
+            // Update the authorization header with the new token
+            if (!config.headers) {
+              config.headers = {};
+            }
+            config.headers.Authorization = `Bearer ${this.apiInstance.accessToken}`;
+
+            // Retry the original request with the new token
+            return this.api.request({
+              ...config,
+              withCredentials: true,
+            } as AxiosRequestConfig);
+          } else {
+            throw new Error('Token refresh failed - no new token received');
+          }
+        } catch (refreshError) {
+          analytics.error('Token refresh failed', refreshError);
+          telemetry.debug('Logging out due to failed token refresh');
+          this.apiInstance.logout();
+          return Promise.reject(refreshError);
         }
-      } catch (err) {
-        analytics.debug('Logging out due to unauthenticated status');
+      } else {
+        // If this is a retry attempt that failed, logout
+        analytics.debug('Retry attempt failed, logging out');
         this.apiInstance.logout();
-        return Promise.reject(err);
       }
     }
 

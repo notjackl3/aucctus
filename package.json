@@ -47,6 +47,7 @@
     "classnames": "^2.5.1",
     "clsx": "^2.1.1",
     "crypto-js": "^4.2.0",
+    "jwt-decode": "^4.0.0",
     "react": "^18.2.0",
     "react-click-away-listener": "^2.2.4",
     "react-dom": "^18.2.0",
@@ -69,6 +70,7 @@
   },
   "devDependencies": {
     "@sentry/vite-plugin": "^2.22.6",
+    "@types/jwt-decode": "^2.2.1",
     "@types/postcss-import": "^14.0.3",
     "@types/react": "^18.0.15",
     "@types/react-dom": "^18.0.6",

@@ -7,12 +7,14 @@ interface SelectedConceptFooterProps {
   selectedConcepts: IGeneratedConcept[];
   currentGeneratedConcepts: IGeneratedConcept[];
   onContinue: () => void;
+  onSave?: () => void;
 }
 
 const SelectedConceptFooter: React.FC<SelectedConceptFooterProps> = ({
   selectedConcepts,
   currentGeneratedConcepts,
   onContinue,
+  onSave,
 }) => {
   const selectedCount = selectedConcepts.length;
   const allConceptsSelected = selectedCount === currentGeneratedConcepts.length;
@@ -39,7 +41,14 @@ const SelectedConceptFooter: React.FC<SelectedConceptFooterProps> = ({
         </span>
       </div>
       <span className='flex flex-1' />
-      <div className='m-4 self-center'>
+      <div className='m-4 flex flex-row gap-2 self-center'>
+        <button
+          disabled={!hasSelections}
+          className='btn btn-secondary aucctus-text-secondary'
+          onClick={onSave}
+        >
+          Save
+        </button>
         <button
           disabled={!hasSelections}
           className='btn btn-primary'

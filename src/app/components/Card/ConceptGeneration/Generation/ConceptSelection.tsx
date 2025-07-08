@@ -263,6 +263,42 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
     });
   }, [handleLeaveAnimation]);
 
+  const handleSave = useCallback(() => {
+    // Get the latest versions of selected concepts from the store
+    const latestSelectedConcepts = selectedConcepts.map((selectedConcept) => {
+      const latestVersion = currentGeneratedConcepts.find(
+        (concept) => concept.uuid === selectedConcept.uuid,
+      );
+      return latestVersion || selectedConcept; // Fallback to original if not found
+    });
+
+    saveGeneratedConcepts(latestSelectedConcepts, {
+      onSuccess: (createdConcepts) => {
+        telemetry.log('save.concepts.response', createdConcepts);
+        setGeneratedConcepts(draftSeedUuid, createdConcepts);
+
+        handleLeaveAnimation(() => {
+          toast.success('Concepts saved successfully', '', {
+            autoClose: 2000,
+            hideProgressBar: true,
+            pauseOnHover: false,
+          });
+          setTimeout(() => {
+            const event = new CustomEvent('aucctus-save-concept');
+            window.dispatchEvent(event);
+          }, 1000);
+        });
+      },
+    });
+  }, [
+    selectedConcepts,
+    currentGeneratedConcepts,
+    saveGeneratedConcepts,
+    draftSeedUuid,
+    setGeneratedConcepts,
+    handleLeaveAnimation,
+  ]);
+
   const handleContinue = useCallback(() => {
     // Get the latest versions of selected concepts from the store
     const latestSelectedConcepts = selectedConcepts.map((selectedConcept) => {
@@ -381,6 +417,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
                 selectedConcepts={selectedConcepts}
                 currentGeneratedConcepts={currentGeneratedConcepts}
                 onContinue={handleContinue}
+                onSave={handleSave}
               />
             </div>
           </div>

@@ -349,12 +349,21 @@ const IncubateConcept: React.FC = () => {
       }
     };
 
+    // Save concepts handler - saves selected concepts without generating reports
+    const handleSaveConcept = () => {
+      // Navigate to concept bank after concepts have been saved
+      navigate(AppPath.ConceptBank);
+    };
+
     window.addEventListener('aucctus-generate-concept', handleGenerateConcept);
-    return () =>
+    window.addEventListener('aucctus-save-concept', handleSaveConcept);
+    return () => {
       window.removeEventListener(
         'aucctus-generate-concept',
         handleGenerateConcept,
       );
+      window.removeEventListener('aucctus-save-concept', handleSaveConcept);
+    };
   }, [
     hasSubmittedAnswers,
     navigate,

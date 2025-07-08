@@ -3,6 +3,8 @@ import { IAccount, IUser } from '@libs/api/types';
 import { produce } from 'immer';
 import type { IStoreApi } from '../store';
 import { IAuthState } from './store';
+import { isTokenExpired } from '../../../libs/utils/jwt';
+import analytics from '../../../libs/telemetry';
 
 export interface IAuthActions {
   setInitialized: (value: boolean) => void;
@@ -83,6 +85,19 @@ export async function storeTokens(
   const { set, get } = this;
 
   if (!access || !refresh) {
+    get().clearTokens();
+    return;
+  }
+
+  // Validate access token before storing
+  try {
+    if (isTokenExpired(access, 0)) {
+      analytics.warn('Received expired access token, clearing tokens');
+      get().clearTokens();
+      return;
+    }
+  } catch (error) {
+    analytics.error('Invalid access token format, clearing tokens', error);
     get().clearTokens();
     return;
   }

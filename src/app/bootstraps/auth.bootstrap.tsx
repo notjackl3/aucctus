@@ -4,6 +4,7 @@ import useStore from '@stores/store';
 import React from 'react';
 import api from '../../libs/api';
 import LoadingScreen from '../pages/LoadingScreen';
+import { useTokenRefreshWatcher } from '../hooks/auth/token-refresh.hook';
 
 const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -14,6 +15,9 @@ const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
 
   const { mutateAsync: refreshAsync } = useRefresh();
   const { refetch: checkAuthentication } = useUser();
+
+  // Add token refresh watcher
+  useTokenRefreshWatcher();
 
   // Use state to trigger a re-render.
   const [refreshActionSet, setRefreshActionSet] = React.useState(false);

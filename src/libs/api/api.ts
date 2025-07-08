@@ -166,14 +166,17 @@ export class Api {
     try {
       if (this._refreshTokenAction !== undefined) {
         this.pendingRefresh = this._refreshTokenAction();
-        return await this.pendingRefresh.finally(() => {
+        const result = await this.pendingRefresh.finally(() => {
           this.pendingRefresh = void 0;
         });
+        return result;
       } else {
         throw new Error('Refresh token action has not been set.');
       }
     } catch (error) {
       analytics.error('Error refreshing token', error);
+      // Re-throw the error so the caller can handle it
+      throw error;
     }
   }
 
