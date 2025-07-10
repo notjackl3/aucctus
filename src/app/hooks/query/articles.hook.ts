@@ -35,11 +35,15 @@ export const useClearbitCompany = (url: string) => {
 };
 
 // TODO: Combine this with the published dates on server side
-export const usePublishedDatesQuery = (source: ISource) => {
+export const usePublishedDatesQuery = (
+  source: ISource,
+  enabled: boolean = true,
+) => {
   return useQuery({
     queryKey: [AucctusQueryKeys.articlePublishedDate, source.url],
     staleTime: Infinity,
     cacheTime: Infinity,
+    enabled: enabled,
     queryFn: async () => {
       try {
         const date = await api.article.getArticlePublishedDate(source.url);

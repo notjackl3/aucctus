@@ -49,6 +49,7 @@ const FinancialProjectionSourceBadge: React.FC<
           url: source.url!,
         }
       : { uuid: '', title: '', url: '' },
+    showPublishedDate && !!hasValidUrl,
   );
 
   useEffect(() => {

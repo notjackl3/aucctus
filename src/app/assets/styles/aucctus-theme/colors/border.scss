@@ -49,3 +49,11 @@
     @apply border-success-300 dark:border-success-400;
   }
 }
+
+.aucctus-border-warning {
+  @apply border-warning-500 dark:border-warning-400;
+
+  &-subtle {
+    @apply border-warning-300 dark:border-warning-400;
+  }
+}

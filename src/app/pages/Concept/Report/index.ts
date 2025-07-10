@@ -6,7 +6,7 @@ import ConceptReportSocketWrapper from './ConceptReport/ConceptReportSocketWrapp
 import ConceptSettings from './ConceptSettings/ConceptSettings';
 import CustomerProfile from './CustomerProfile/CustomerProfile';
 import FinancialProjectionsWrapper from './FinancialProjectionsWrapper';
-import MarketScan from './MarketScan/MarketScan';
+import MarketScan from './MarketScanBase';
 import OverviewDetails from './OverviewDetails';
 import Testing from './Testing/Testing';
 

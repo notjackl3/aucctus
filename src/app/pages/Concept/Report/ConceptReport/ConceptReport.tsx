@@ -248,12 +248,14 @@ const ConceptReport: FunctionComponent = () => {
                 <Loading />
               </div>
             ) : (
-              <Outlet
-                context={{
-                  navigateToTab: onTabSelect,
-                  concept: concept,
-                }}
-              />
+              <div key={activeTab} className='animate-fade-in'>
+                <Outlet
+                  context={{
+                    navigateToTab: onTabSelect,
+                    concept: concept,
+                  }}
+                />
+              </div>
             )}
           </Container.TabView>
         </div>

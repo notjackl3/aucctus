@@ -375,6 +375,10 @@ export class Endpoints {
     return `api/v2/concept/${conceptIdentifier}/customer-profile/generate`;
   }
 
+  static generateMarketScan(conceptIdentifier: string) {
+    return `api/v3/concept/${conceptIdentifier}/market-scan/generate`;
+  }
+
   // Financial Projection V2 Endpoints
   static financialProjectionV2(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/financial-projection`;
@@ -425,6 +429,44 @@ export class Endpoints {
 
   static distributionChannelUuid(distributionChannelUuid: string) {
     return `api/v2/concept/financial-projection/distribution-channel/${distributionChannelUuid}`;
+  }
+
+  // Trends and Drivers V3 Endpoints
+  static conceptTrendsV3(conceptUuid: string) {
+    return `api/v3/concept/${conceptUuid}/trends/`;
+  }
+
+  static conceptTrendV3(conceptUuid: string, trendUuid: string) {
+    return `api/v3/concept/${conceptUuid}/trends/${trendUuid}`;
+  }
+
+  static conceptTrendKeyFindings(conceptUuid: string, trendUuid: string) {
+    return `api/v3/concept/${conceptUuid}/trends/${trendUuid}/key-findings/`;
+  }
+
+  static conceptTrendKeyFinding(
+    conceptUuid: string,
+    trendUuid: string,
+    keyFindingUuid: string,
+  ) {
+    return `api/v3/concept/${conceptUuid}/trends/${trendUuid}/key-findings/${keyFindingUuid}`;
+  }
+
+  static conceptTrendAnalysisV3(conceptUuid: string) {
+    return `api/v3/concept/${conceptUuid}/trend-analysis/`;
+  }
+
+  // Market Scan V3 Endpoints
+  static conceptMarketScanTrendsV3(conceptUuid: string) {
+    return `api/v3/concept/${conceptUuid}/market-scan/trends/`;
+  }
+
+  static conceptMarketScanPriorityInsightsV3(conceptUuid: string) {
+    return `api/v3/concept/${conceptUuid}/market-scan/priority-insights/`;
+  }
+
+  static conceptMarketScanMarketForcesV3(conceptUuid: string) {
+    return `api/v3/concept/${conceptUuid}/market-scan/market-forces/`;
   }
 }
 

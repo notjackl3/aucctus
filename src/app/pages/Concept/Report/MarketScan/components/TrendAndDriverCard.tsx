@@ -7,7 +7,7 @@ import {
   ITrendsAndDrivers,
 } from '@libs/api/types';
 import { FunctionComponent, useCallback, useMemo, useRef } from 'react';
-import SourceBadgeFooter from './Sources/SourceBadgeFooter';
+import SourceBadgeFooter from './sources/SourceBadgeFooter';
 
 const iconDefaultProps = {
   height: 19,

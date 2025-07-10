@@ -166,6 +166,28 @@ export const useGenerateCustomerProfile = () => {
   });
 };
 
+export const useGenerateMarketScan = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (conceptIdentifier: string) =>
+      await api.concept.generateMarketScan(conceptIdentifier),
+    onSuccess: () => {
+      doFullConceptInvalidation(queryClient);
+      toast.warning(
+        'Market scan generation started',
+        'This may take up to 10 minutes. You can navigate away.',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Market scan generation failed. Please try again.',
+      );
+    },
+  });
+};
+
 export const useSeed = (uuid?: string, options?: ISeedQueryOptions) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeedDraft, uuid],
@@ -364,6 +386,58 @@ export const useConceptMarketScan = (uuid: string) => {
   });
 
   return { ...query, marketScan: query.data };
+};
+
+/**
+ * Custom hook for fetching market scan trends V3 by concept UUID.
+ * @param uuid - The UUID of the concept.
+ * @returns An object containing the query result and the trends data.
+ */
+export const useMarketScanTrendsV3 = (uuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.marketScanTrendsV3, uuid],
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
+    queryFn: async () => await api.marketScan.getMarketScanTrendsV3(uuid),
+    enabled: !!uuid,
+  });
+
+  return { ...query, trends: query.data || [] };
+};
+
+/**
+ * Custom hook for fetching market scan priority insights V3 by concept UUID.
+ * @param uuid - The UUID of the concept.
+ * @returns An object containing the query result and the priority insights data.
+ */
+export const useMarketScanPriorityInsightsV3 = (uuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.marketScanPriorityInsightsV3, uuid],
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
+    queryFn: async () =>
+      await api.marketScan.getMarketScanPriorityInsightsV3(uuid),
+    enabled: !!uuid,
+  });
+
+  return { ...query, priorityInsights: query.data || [] };
+};
+
+/**
+ * Custom hook for fetching market scan market forces V3 by concept UUID.
+ * @param uuid - The UUID of the concept.
+ * @returns An object containing the query result and the market forces data.
+ */
+export const useMarketScanMarketForcesV3 = (uuid: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.marketScanMarketForcesV3, uuid],
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
+    queryFn: async () => await api.marketScan.getMarketScanMarketForcesV3(uuid),
+    enabled: !!uuid,
+  });
+
+  return { ...query, marketForces: query.data || [] };
 };
 
 export const useConceptCustomerProfiles = (uuid: string) => {

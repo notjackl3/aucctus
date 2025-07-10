@@ -3,6 +3,7 @@ export interface ISource {
   title: string;
   description?: string;
   url: string;
+  classification?: string;
 }
 
 export interface IInsight {

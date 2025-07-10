@@ -22,6 +22,7 @@ import BetaDisclaimer from './BetaDisclaimer';
 import Loading from './Loading/Loading';
 import Progress from './Loading/Progress';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
+import ComponentCarousel from './Carousel/ComponentCarousel';
 import Tooltip from './ToolTip/Tooltip';
 import VersionUpgradeBanner from './Banner/VersionUpgradeBanner';
 
@@ -32,6 +33,7 @@ export {
   BetaDisclaimer,
   Button,
   Card,
+  ComponentCarousel,
   Chart,
   ComponentTooltip,
   Container,

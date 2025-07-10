@@ -88,7 +88,7 @@ export type ConceptReportStatusBySection = {
 
 export type FeatureVersion = `v${number}`;
 
-export type FeatureName = 'assumptions' | 'financialProjection';
+export type FeatureName = 'assumptions' | 'financialProjection' | 'marketScan';
 
 export type IFeatureVersions = {
   [K in FeatureName]?: FeatureVersion;

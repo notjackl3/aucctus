@@ -1,5 +1,6 @@
 import { Badge, Card, ComponentTooltip } from '@components';
 import { cn } from '@libs/utils/react';
+import { debounce } from '@libs/utils/source';
 import React, {
   FunctionComponent,
   useCallback,
@@ -12,43 +13,45 @@ import ComponentList from './ComponentList';
 import MultiSourceBadge from './MultiSourceBadge';
 import { ISource } from '@libs/api/types';
 
-const renderSourceHeader = (source: ISource) => (
-  <div className='flex w-full'>
-    <Badge.SourceInfo
-      source={source}
-      onClick={() => window.open(source.url, '_blank')}
-      showPublishedDate={true}
-    />
-  </div>
-);
-
-const renderSourceContent = (source: ISource) => (
-  <div className='mx-2 mb-2 flex w-full flex-col gap-4 break-words px-2 pb-2'>
-    <div className='aucctus-text-brand-primary aucctus-text-md-medium'>
-      {source.title}
-    </div>
-    <div className='aucctus-text-secondary aucctus-text-sm'>
-      {source.description}
-    </div>
-  </div>
-);
-
+// Shared source card rendering function
 const renderSourceCard = (
   source: ISource,
   cardClassName?: string,
   onClick?: () => void,
+  showPublishedDate: boolean = true,
 ) => {
+  const renderSourceHeader = () => (
+    <div className='flex w-full'>
+      <Badge.SourceInfo
+        source={source}
+        onClick={() => window.open(source.url, '_blank')}
+        showPublishedDate={showPublishedDate}
+      />
+    </div>
+  );
+
+  const renderSourceContent = () => (
+    <div className='mx-2 mb-2 flex w-full flex-col gap-4 break-words px-2 pb-2'>
+      <div className='aucctus-text-brand-primary aucctus-text-md-medium'>
+        {source.title}
+      </div>
+      <div className='aucctus-text-secondary aucctus-text-sm'>
+        {source.description}
+      </div>
+    </div>
+  );
+
   return (
     <div className='flex max-w-[500px] flex-col' onClick={onClick}>
       <Card.Detail
-        key={`${source.uuid}`}
+        key={source.uuid}
         cardClassName={cn('w-full', cardClassName)}
         headerClassName='border-none !px-2'
         title={''}
         isHideFooter={true}
-        headerAction={renderSourceHeader(source)}
+        headerAction={renderSourceHeader()}
       >
-        {renderSourceContent(source)}
+        {renderSourceContent()}
       </Card.Detail>
     </div>
   );
@@ -58,26 +61,35 @@ interface SourceBadgeFooterProps {
   parentContainerRef: React.RefObject<HTMLDivElement>;
   sources: ISource[];
   className?: string;
+  showPublishedDate?: boolean;
 }
 
 interface SourceBadgesProps {
   sources: ISource[];
+  showPublishedDate?: boolean;
 }
 
-const SourceBadges: FunctionComponent<SourceBadgesProps> = ({ sources }) => {
+const SourceBadges: FunctionComponent<SourceBadgesProps> = ({
+  sources,
+  showPublishedDate = true,
+}) => {
   return (
     <>
       {sources.map((source) => (
         <ComponentTooltip
-          tip={renderSourceCard(source)}
-          key={source.uuid + Math.random()}
+          tip={renderSourceCard(
+            source,
+            undefined,
+            undefined,
+            showPublishedDate,
+          )}
+          key={source.uuid}
           hideDelay={300}
         >
           <Badge.SourceInfo
             badgeSize='small'
             badgeClassName='aucctus-text-primary whitespace-nowrap'
             source={source}
-            key={source.url + Math.random()}
             onClick={() => window.open(source.url, '_blank')}
           />
         </ComponentTooltip>
@@ -89,33 +101,22 @@ const SourceBadges: FunctionComponent<SourceBadgesProps> = ({ sources }) => {
 const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
   sources,
   className = '',
+  showPublishedDate = true,
 }) => {
   const footerRef = useRef<HTMLDivElement>(null);
   const badgesRef = useRef<HTMLDivElement>(null);
-  const prevWindowWidth = useRef(window.innerWidth);
-
   const [overflowIndex, setOverflowIndex] = useState(3);
 
-  const visibleSources = useMemo(
-    () => sources.slice(0, overflowIndex),
-    [sources, overflowIndex],
-  );
-  const overflowingSources = useMemo(
-    () => sources.slice(overflowIndex),
+  // Memoized computed values
+  const { visibleSources, overflowingSources } = useMemo(
+    () => ({
+      visibleSources: sources.slice(0, overflowIndex),
+      overflowingSources: sources.slice(overflowIndex),
+    }),
     [sources, overflowIndex],
   );
 
-  const debounce = <T extends (...args: any[]) => void>(
-    func: T,
-    delay: number,
-  ): ((...args: Parameters<T>) => void) => {
-    let timeoutId: NodeJS.Timeout;
-    return (...args: Parameters<T>) => {
-      clearTimeout(timeoutId);
-      timeoutId = setTimeout(() => func(...args), delay);
-    };
-  };
-
+  // Simplified overflow handling
   const handleOverflow = useCallback(() => {
     if (footerRef.current && badgesRef.current) {
       const footerRect = footerRef.current.getBoundingClientRect();
@@ -123,32 +124,29 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
       const isOverflowing = badgesRect.right > footerRect.right;
 
       if (isOverflowing && overflowIndex > 1) {
-        setOverflowIndex(overflowIndex - 1);
+        setOverflowIndex((prev) => prev - 1);
       }
     }
   }, [overflowIndex]);
 
-  const debouncedHandleOverflow = useMemo(
+  // Debounced resize handler
+  const debouncedHandleResize = useMemo(
     () =>
       debounce(() => {
-        const currentWidth = window.innerWidth;
-        const isWindowShrinking = currentWidth < prevWindowWidth.current;
-        prevWindowWidth.current = currentWidth;
-
-        if (isWindowShrinking) {
-          handleOverflow();
-        } else {
-          setOverflowIndex(3);
-        }
+        // Reset to default on window resize, then check for overflow
+        setOverflowIndex(3);
+        setTimeout(handleOverflow, 0); // Allow DOM to update
       }, 300),
     [handleOverflow],
   );
 
+  // Single effect for resize handling
   useEffect(() => {
-    window.addEventListener('resize', debouncedHandleOverflow);
-    return () => window.removeEventListener('resize', debouncedHandleOverflow);
-  }, [debouncedHandleOverflow]);
+    window.addEventListener('resize', debouncedHandleResize);
+    return () => window.removeEventListener('resize', debouncedHandleResize);
+  }, [debouncedHandleResize]);
 
+  // Single effect for mutation observation
   useEffect(() => {
     if (badgesRef.current) {
       const observer = new MutationObserver(handleOverflow);
@@ -171,12 +169,13 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
               source,
               'cursor-pointer aucctus-bg-primary-hover !border-none !shadow-none !rounded-none',
               () => window.open(source.url, '_blank'),
+              showPublishedDate,
             ),
           )}
         </div>
       </ComponentList>
     ),
-    [],
+    [showPublishedDate],
   );
 
   return (
@@ -185,7 +184,10 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
       ref={footerRef}
     >
       <div ref={badgesRef} className='flex flex-row gap-2'>
-        <SourceBadges sources={visibleSources} />
+        <SourceBadges
+          sources={visibleSources}
+          showPublishedDate={showPublishedDate}
+        />
         {overflowingSources.length > 0 && (
           <ComponentTooltip
             hideDelay={300}

@@ -216,4 +216,10 @@ export class FinancialProjectionApi extends ApiService {
       endpoints.distributionChannelUuid(distributionChannelUuid),
     );
   }
+
+  generateFinancialProjection(conceptIdentifier: string) {
+    return this.post<{ message: string }>(
+      endpoints.generateFinancialProjection(conceptIdentifier),
+    );
+  }
 }

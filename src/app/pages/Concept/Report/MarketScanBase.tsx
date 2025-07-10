@@ -1,10 +1,10 @@
 import { FunctionComponent } from 'react';
-import MarketScan from './MarketScan/MarketScan';
+import MarketScanWrapper from './MarketScan/MarketScanWrapper';
 
 const MarketScanBase: FunctionComponent = () => {
   return (
     <div>
-      <MarketScan />
+      <MarketScanWrapper />
     </div>
   );
 };

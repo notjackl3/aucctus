@@ -1,5 +1,5 @@
 import type { IBaseConceptEntity } from './concepts';
-import type { ISupport } from './support';
+import type { ISupport, ISource } from './support';
 
 export type EngagementAction =
   | 'partnership'
@@ -89,8 +89,126 @@ export interface IMarketScan extends IBaseConceptEntity {
 
   ecosystemDescription: string;
   startups: IStartup[];
-  incumbents: IIncumbents[];
+  incumbents: IIncumbent[];
 
   trendsAndDriversDescription: string;
   trendsAndDrivers: ITrendsAndDrivers[];
+}
+
+// ===== MarketScan V3 Visualization Types =====
+
+export type IconVariant =
+  | 'activity'
+  | 'gear'
+  | 'trendup'
+  | 'user-group'
+  | 'shield-dollar'
+  | 'globe'
+  | 'lifebuoy'
+  | 'arrowup'
+  | 'arrowdown'
+  | 'check'
+  | 'arrowright'
+  | 'chevronup'
+  | 'chevrondown'
+  | 'political'
+  | 'economic'
+  | 'social'
+  | 'technological'
+  | 'environmental'
+  | 'legal';
+
+export interface ITrendCategory {
+  name: string;
+  icon: IconVariant;
+  status: 'favorable' | 'manageable' | 'challenging';
+  position: { x: number; y: number };
+  radarValue: number;
+  conclusion: string;
+  explanation: string;
+  mitigation: string[];
+}
+
+export interface IPriorityInsight {
+  title: string;
+  impact: string;
+  direction: 'up' | 'down';
+  sources: Array<{
+    name: string;
+    count: number;
+  }>;
+}
+
+export interface IPESTELSection {
+  category: string;
+  icon: IconVariant;
+  summary: string;
+  impact: string;
+  keyFindings: Array<{
+    text: string;
+    source: string;
+    type: string;
+    direction: 'up' | 'down';
+  }>;
+}
+
+// ===== MarketScan V3 API Response Types =====
+
+export interface IKeyFindingSourceV3 {
+  uuid: string;
+  type: string;
+  classification: string;
+  url: string;
+  title: string;
+  summary: string;
+  keywords: string[];
+  credibility: number;
+  timestamp: string;
+  metadata: Record<string, any>;
+}
+
+export interface IKeyFindingV3 {
+  uuid: string;
+  text: string;
+  source: string;
+  type: string;
+  direction: string;
+  sources?: IKeyFindingSourceV3[];
+  sourcesCount?: number;
+  createdAt?: string;
+  id?: number;
+  updatedAt?: string;
+}
+
+export interface ITrendV3 {
+  uuid: string;
+  category: string; // PESTEL category (Political, Economic, etc.)
+  icon: string; // Icon identifier
+  summary: string; // Trend description
+  impact: string; // Impact assessment
+  keyFinding: IKeyFindingV3[];
+  keyFindingsCount?: number;
+  trendStrength?: string;
+  riskLevel?: string;
+  createdAt?: string;
+  id?: number;
+  updatedAt?: string;
+}
+
+export interface IPriorityInsightV3 {
+  uuid: string;
+  title: string;
+  description: string;
+  priority_level: string; // High, Medium, Low
+  category: string;
+  // Additional fields per backend schema
+}
+
+export interface IMarketForceV3 {
+  uuid: string;
+  category: string; // PESTEL category
+  icon: string; // Icon identifier
+  summary: string; // Force description
+  impact: string; // Impact assessment
+  // Similar structure to trends but without key_findings
 }

@@ -9,11 +9,12 @@ import { IApiServiceConfig } from './base/apiService';
 import { ISocketConfig, SocketService } from './base/socketService';
 import { ConceptApi } from './concepts';
 import { SocketEndpoints } from './endpoints';
-import { FinancialProjectionApi } from './financial_projection';
+import { FinancialProjectionApi } from './financialProjection';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { SeedApi } from './seed';
 import { TestingApi } from './testing';
+import { TrendsAndDriversV3Api } from './trendsAndDrivers';
 import { ITokenResponse } from './types';
 
 export interface IApiConfig {
@@ -47,6 +48,7 @@ export class Api {
   article!: ArticleApi;
   testing!: TestingApi;
   financialProjection!: FinancialProjectionApi;
+  trendsAndDriversV3!: TrendsAndDriversV3Api;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -77,6 +79,7 @@ export class Api {
       { key: 'seed', class: SeedApi },
       { key: 'testing', class: TestingApi },
       { key: 'financialProjection', class: FinancialProjectionApi },
+      { key: 'trendsAndDriversV3', class: TrendsAndDriversV3Api },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {
@@ -117,6 +120,7 @@ export class Api {
       this.seed,
       this.testing,
       this.financialProjection,
+      this.trendsAndDriversV3,
     ].forEach((api) => {
       api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
       api.config.headers = Object.assign({}, api.config.headers, {

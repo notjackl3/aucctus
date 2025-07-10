@@ -62,7 +62,7 @@ const AiInsightCard: React.FC<AiInsightCardProps> = ({
           </span>
         </div>
       </div>
-      <p className='aucctus-text-md aucctus-text-secondary'>{children}</p>
+      <div className='aucctus-text-md aucctus-text-secondary'>{children}</div>
     </div>
   );
 };

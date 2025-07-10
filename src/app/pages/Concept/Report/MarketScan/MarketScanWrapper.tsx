@@ -1,29 +1,28 @@
 import React from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
-import { useGenerateFinancialProjection } from '@hooks/query/financialProjections.hook';
-import FinancialProjectionsV2 from './FinancialProjections/FinancialProjectionsV2';
-import FinancialProjectionsV1 from './FinancialProjectionsV1';
+import { useGenerateMarketScan } from '@hooks/query/concepts.hook';
+import MarketScanV2 from './v2/MarketScanV2';
+import MarketScanV3 from './v3/MarketScanV3';
 import { VersionUpgradeBanner } from '@components';
-import { IConceptReportContext } from './ConceptReport/ConceptReport';
+import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { AppPath } from '@routes/routes';
 import { toast } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 
-const FinancialProjectionsWrapper: React.FC = () => {
+const MarketScanWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
   const navigate = useNavigate();
-  const { mutate: generateFinancialProjection, isLoading } =
-    useGenerateFinancialProjection();
+  const { mutate: generateMarketScan, isLoading } = useGenerateMarketScan();
 
   // Use global debug mode state
   const isDebugModeEnabled = useDebugMode();
 
   // Use concept's featureVersions to determine which version to render
-  const featureVersion = concept.featureVersions?.financialProjection || 'v1';
-  const shouldRenderV2 = featureVersion === 'v2';
+  const featureVersion = concept.featureVersions?.marketScan || 'v2';
+  const shouldRenderV3 = featureVersion === 'v3';
 
   const handleUpgrade = () => {
-    generateFinancialProjection(concept.identifier, {
+    generateMarketScan(concept.identifier, {
       onSuccess: () => {
         // Navigate to concept bank after starting generation
         navigate(AppPath.ConceptBank, {
@@ -34,16 +33,14 @@ const FinancialProjectionsWrapper: React.FC = () => {
   };
 
   const handleDebugModeGenerate = () => {
-    generateFinancialProjection(concept.identifier, {
+    generateMarketScan(concept.identifier, {
       onSuccess: () => {
-        toast.success(
-          '✨ Financial Projections generated successfully!',
-          undefined,
-          { autoClose: 2000 },
-        );
+        toast.success('🔍 Market Scan generated successfully!', undefined, {
+          autoClose: 2000,
+        });
       },
       onError: () => {
-        toast.error('❌ Failed to generate Financial Projections', undefined, {
+        toast.error('❌ Failed to generate Market Scan', undefined, {
           autoClose: 2000,
         });
       },
@@ -52,12 +49,12 @@ const FinancialProjectionsWrapper: React.FC = () => {
 
   return (
     <>
-      {/* Show upgrade banner if not v2 */}
-      {!shouldRenderV2 && (
+      {/* Show upgrade banner if not v3 */}
+      {!shouldRenderV3 && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}
           isLoading={isLoading}
-          featureName='financialProjection'
+          featureName='marketScan'
         />
       )}
 
@@ -71,9 +68,9 @@ const FinancialProjectionsWrapper: React.FC = () => {
         />
       )}
 
-      {shouldRenderV2 ? <FinancialProjectionsV2 /> : <FinancialProjectionsV1 />}
+      {shouldRenderV3 ? <MarketScanV3 /> : <MarketScanV2 />}
     </>
   );
 };
 
-export default FinancialProjectionsWrapper;
+export default MarketScanWrapper;

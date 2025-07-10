@@ -21,6 +21,9 @@ export enum AucctusQueryKeys {
   customerJourneyStep = 'customerJourneyStep',
   financialProjection = 'financialProjection',
   marketScan = 'marketScan',
+  marketScanTrendsV3 = 'marketScanTrendsV3',
+  marketScanPriorityInsightsV3 = 'marketScanPriorityInsightsV3',
+  marketScanMarketForcesV3 = 'marketScanMarketForcesV3',
   assumption = 'assumption',
   assumptions = 'assumptions',
   assumptionTestDetails = 'assumptionTestDetails',
@@ -47,6 +50,11 @@ export enum AucctusQueryKeys {
   marketSizingAssumptionV2 = 'marketSizingAssumptionV2',
   costDriverV2 = 'costDriverV2',
   distributionChannelV2 = 'distributionChannelV2',
+
+  /* Trends and Drivers V3 */
+  trendsAndDriversV3 = 'trendsAndDriversV3',
+  trendV3 = 'trendV3',
+  keyFindingV3 = 'keyFindingV3',
 
   /* External APIs */
   clearbitCompany = 'clearbitCompany',

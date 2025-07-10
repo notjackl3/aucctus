@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import useStore from '@stores/store';
-import { useFinancialProjectionV2 } from '@hooks/query/financial_projections.hook';
+import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
 import { Loading } from '@components';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 
