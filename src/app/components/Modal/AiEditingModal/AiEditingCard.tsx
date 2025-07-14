@@ -8,18 +8,52 @@ import {
   doFullConceptInvalidation,
   useConceptAiEditing,
 } from '@hooks/query/concepts.hook';
-import { IConceptReportEdit } from '@libs/api/types';
+import {
+  IConceptReportEdit,
+  IFeatureVersions,
+  FeatureName,
+} from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { animated, useTransition } from 'react-spring';
 import AiEditingConversation from './AiEditingConversation';
+import OutdatedSectionsBanner from './OutdatedSectionsBanner';
+import { LATEST_FEATURE_VERSIONS } from '@libs/constants';
 
 interface AiEditingCardProps {
   onClose: () => void;
 }
+
+/**
+ * Helper function to get outdated sections
+ */
+const getOutdatedSections = (featureVersions?: IFeatureVersions): string[] => {
+  if (!featureVersions) return [];
+
+  const outdatedSections: string[] = [];
+
+  (Object.keys(LATEST_FEATURE_VERSIONS) as FeatureName[]).forEach((feature) => {
+    // Skip assumptions for now
+    if (feature === 'assumptions') return;
+
+    const currentVersion = featureVersions[feature];
+    const latestVersion = LATEST_FEATURE_VERSIONS[feature];
+
+    if (currentVersion && currentVersion !== latestVersion) {
+      // Convert camelCase to readable format
+      const readableFeature = feature
+        .replace(/([A-Z])/g, ' $1')
+        .toLowerCase()
+        .replace(/^\w/, (c) => c.toUpperCase());
+      outdatedSections.push(readableFeature);
+    }
+  });
+
+  return outdatedSections;
+};
 
 /**
  * AiEditingCard - A component that provides an AI-assisted editing experience
@@ -33,6 +67,9 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
 
   // Identifiers for the concept and session
   const conceptUuid = useStore((state) => state.conceptReport.conceptUuid);
+  const featureVersions = useStore(
+    (state) => state.conceptReport.featureVersions,
+  );
   const sessionId = useStore((state) => state.aiEditing.sessionId);
 
   // User input and messages
@@ -50,6 +87,12 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
 
   const isThinking = useStore((state) => state.aiEditing.isAucctusThinking);
   const thinkingMessage = useStore((state) => state.aiEditing.thinkingMessage);
+
+  // Check for outdated sections
+  const outdatedSections = useMemo(
+    () => getOutdatedSections(featureVersions),
+    [featureVersions],
+  );
 
   // ===== Hooks =====
   const { mutate: aiEditConcept, isLoading: isAiEditConceptLoading } =
@@ -81,21 +124,26 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     // This has relative positioning for the use of the confirmation modal defined at the bottom of the component
     <div className='relative flex h-full w-full flex-col overflow-hidden'>
       {/* Header with close button */}
-      <div className='flex shrink-0 flex-row justify-between gap-4 p-4'>
-        <BetaDisclaimer />
-        <button
-          onClick={onClose}
-          className='aspect-square w-6 rounded-lg transition-all duration-200 hover:bg-gray-light-100 hover:bg-opacity-20'
-        >
-          <span className='flex items-center justify-center'>
-            <Icon
-              variant='closeX'
-              width={20}
-              height={20}
-              className='stroke-gray-light-100'
-            />
-          </span>
-        </button>
+      <div className='flex shrink-0 flex-col gap-4 p-4'>
+        <div className='flex flex-row justify-between gap-4'>
+          <BetaDisclaimer />
+          <button
+            onClick={onClose}
+            className='aspect-square w-6 rounded-lg transition-all duration-200 hover:bg-gray-light-100 hover:bg-opacity-20'
+          >
+            <span className='flex items-center justify-center'>
+              <Icon
+                variant='closeX'
+                width={20}
+                height={20}
+                className='stroke-gray-light-100'
+              />
+            </span>
+          </button>
+        </div>
+
+        {/* Outdated sections banner */}
+        <OutdatedSectionsBanner outdatedSections={outdatedSections} />
       </div>
 
       {/* Main content area with flex-grow to take available space */}

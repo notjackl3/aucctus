@@ -30,6 +30,7 @@ export function setActiveConcept(
     produce((state: IConceptReportState) => {
       state.conceptUuid = concept.uuid;
       state.identifier = concept.identifier;
+      state.featureVersions = concept.featureVersions;
     }),
   );
 }
