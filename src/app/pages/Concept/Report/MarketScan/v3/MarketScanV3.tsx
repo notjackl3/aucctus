@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { Icon, Loading } from '@components';
+import { Icon, UnifiedLoadingState } from '@components';
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import MarketForcesRadar from './components/MarketForcesRadar';
@@ -12,12 +12,17 @@ import {
   useMarketScanPriorityInsightsV3,
   useMarketScanMarketForcesV3,
 } from '@hooks/query/concepts.hook';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
+import { AppPath } from '@routes/routes';
+import { useOutletContext } from 'react-router-dom';
 import { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
+import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
 
 const MarketScanV3: React.FC = () => {
   const activeConceptUuid = useStore(
     (state) => state.conceptReport.conceptUuid,
   );
+  const { concept } = useOutletContext<IConceptReportContext>();
 
   const { trends = [], isLoading: isTrendsLoading } = useMarketScanTrendsV3(
     activeConceptUuid || '',
@@ -26,6 +31,17 @@ const MarketScanV3: React.FC = () => {
     useMarketScanPriorityInsightsV3(activeConceptUuid || '');
   const { marketForces = [], isLoading: isMarketForcesLoading } =
     useMarketScanMarketForcesV3(activeConceptUuid || '');
+
+  // Use unified loading state
+  const { isLoading } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptMarketScan,
+    concept,
+    additionalLoadingStates: [
+      isTrendsLoading,
+      isPriorityInsightsLoading,
+      isMarketForcesLoading,
+    ],
+  });
 
   const [selectedRadarCategory, setSelectedRadarCategory] =
     useState<IMarketForceV3 | null>(null);
@@ -74,22 +90,11 @@ const MarketScanV3: React.FC = () => {
     [setActiveTab],
   );
 
-  const isLoading =
-    isTrendsLoading || isPriorityInsightsLoading || isMarketForcesLoading;
-
   const renderTrendsAndDriversContent = () => {
     if (!activeConceptUuid) {
       return (
         <div className='flex h-64 items-center justify-center'>
           <p className='aucctus-text-secondary'>No concept selected</p>
-        </div>
-      );
-    }
-
-    if (isLoading) {
-      return (
-        <div className='flex h-64 items-center justify-center'>
-          <Loading />
         </div>
       );
     }
@@ -149,6 +154,11 @@ const MarketScanV3: React.FC = () => {
         return renderTrendsAndDriversContent();
     }
   };
+
+  // Show unified loading state
+  if (isLoading) {
+    return <UnifiedLoadingState />;
+  }
 
   return (
     <div className='flex flex-1 flex-col gap-4'>

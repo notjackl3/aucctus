@@ -1,7 +1,7 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import SourceBadgeFooter from '../../components/sources/SourceBadgeFooter';
+import SourceBadgeList from './SourceBadgeList';
 import type { ISource } from '@libs/api/types';
 import type { IKeyFindingSourceV3 } from '@libs/api/types/concept/marketScan';
 
@@ -16,8 +16,6 @@ interface KeyFindingCardProps {
 }
 
 const KeyFindingCard: React.FC<KeyFindingCardProps> = ({ finding }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-
   // Adapt sources from API format to ISource format
   const adaptedSources: ISource[] =
     finding.sources?.map((source) => ({
@@ -29,10 +27,7 @@ const KeyFindingCard: React.FC<KeyFindingCardProps> = ({ finding }) => {
     })) || [];
 
   return (
-    <div
-      ref={cardRef}
-      className='aucctus-bg-primary aucctus-border-secondary h-full rounded-lg border p-4 shadow-sm transition-all duration-200 hover:shadow-md'
-    >
+    <div className='aucctus-bg-primary aucctus-border-secondary h-full rounded-lg border p-4 shadow-sm transition-all duration-200 hover:shadow-md'>
       <div className='flex items-start gap-3'>
         <div
           className={cn({
@@ -56,10 +51,9 @@ const KeyFindingCard: React.FC<KeyFindingCardProps> = ({ finding }) => {
           <p className='aucctus-text-xs aucctus-text-secondary mb-3 leading-relaxed'>
             {finding.text}
           </p>
-          {/* Source footer with classification badges in tooltip */}
+          {/* Source badges that wrap naturally */}
           {adaptedSources.length > 0 && (
-            <SourceBadgeFooter
-              parentContainerRef={cardRef}
+            <SourceBadgeList
               sources={adaptedSources}
               className='mt-1'
               showPublishedDate={false}

@@ -1,6 +1,7 @@
-import { Card, Header, Loading, Text } from '@components';
+import { Card, Header, Text, UnifiedLoadingState } from '@components';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
@@ -17,7 +18,12 @@ const OverviewDetails: FunctionComponent = () => {
 
   const { valueProposition, problemStatement, overview } = useEditConcept();
 
-  const isLoading = isCustomerProfilesLoading;
+  // Use unified loading state
+  const { isLoading } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptOverview,
+    concept,
+    additionalLoadingStates: [isCustomerProfilesLoading],
+  });
 
   const firstCustomerPersona = useMemo(() => {
     if (!profiles || profiles.length === 0) {
@@ -26,18 +32,13 @@ const OverviewDetails: FunctionComponent = () => {
     return profiles[0];
   }, [profiles]);
 
+  // Show unified loading state
   if (isLoading) {
-    return (
-      <div className='flex h-full w-full flex-col gap-6'>
-        <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
-          <Loading />
-        </div>
-      </div>
-    );
+    return <UnifiedLoadingState />;
   }
 
-  // Handle case where loading is finished but no overview data exists
-  if (!isLoading && !concept) {
+  // Handle case where concept is not available but we're not loading
+  if (!concept) {
     return (
       <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
         Overview data is not available for this concept.

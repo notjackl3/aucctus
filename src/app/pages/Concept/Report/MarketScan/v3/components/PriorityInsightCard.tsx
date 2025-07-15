@@ -1,9 +1,9 @@
-import React, { useRef } from 'react';
+import React from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import type { IPriorityInsightV3 } from '@libs/api/types/concept/marketScan';
 import type { ISource } from '@libs/api/types';
-import SourceBadgeFooter from '../../components/sources/SourceBadgeFooter';
+import SourceBadgeList from './SourceBadgeList';
 
 // Extend the IPriorityInsightV3 interface with the fields we're using from the API
 interface ExtendedPriorityInsight extends IPriorityInsightV3 {
@@ -29,15 +29,13 @@ const PriorityInsightCard: React.FC<PriorityInsightCardProps> = ({
   insight,
   index,
 }) => {
-  const cardRef = useRef<HTMLDivElement>(null);
-
   // Determine direction based on insight data
   const direction: 'up' | 'down' =
     insight.direction === 'up' || insight.direction === 'tailwind'
       ? 'up'
       : 'down';
 
-  // Adapt sources from API format to ISource format expected by SourceBadgeFooter
+  // Adapt sources from API format to ISource format expected by SourceBadgeList
   const adaptedSources: ISource[] =
     insight.sources?.map((source) => ({
       uuid: source.uuid || '',
@@ -50,7 +48,6 @@ const PriorityInsightCard: React.FC<PriorityInsightCardProps> = ({
   return (
     <div
       key={insight.uuid || index}
-      ref={cardRef}
       className='aucctus-bg-primary aucctus-border-secondary group overflow-hidden rounded-xl border shadow-sm transition-all duration-300 hover:-translate-y-1'
     >
       {/* Top colored bar indicating direction */}
@@ -98,10 +95,9 @@ const PriorityInsightCard: React.FC<PriorityInsightCardProps> = ({
           </p>
         </div>
 
-        {/* Source footer */}
+        {/* Source badges that wrap naturally */}
         {adaptedSources.length > 0 && (
-          <SourceBadgeFooter
-            parentContainerRef={cardRef}
+          <SourceBadgeList
             sources={adaptedSources}
             className='mt-1'
             showPublishedDate={false}

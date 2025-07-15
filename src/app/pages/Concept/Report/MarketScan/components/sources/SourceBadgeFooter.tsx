@@ -9,8 +9,6 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import ComponentList from './ComponentList';
-import MultiSourceBadge from './MultiSourceBadge';
 import { ISource } from '@libs/api/types';
 
 // Shared source card rendering function
@@ -108,10 +106,9 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
   const [overflowIndex, setOverflowIndex] = useState(3);
 
   // Memoized computed values
-  const { visibleSources, overflowingSources } = useMemo(
+  const { visibleSources } = useMemo(
     () => ({
       visibleSources: sources.slice(0, overflowIndex),
-      overflowingSources: sources.slice(overflowIndex),
     }),
     [sources, overflowIndex],
   );
@@ -160,24 +157,6 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
     }
   }, [handleOverflow]);
 
-  const renderMultiSourceList = useCallback(
-    (sources: ISource[]) => (
-      <ComponentList className='max-h-[50vh] max-w-[500px] overflow-y-auto overscroll-contain py-4 shadow-lg'>
-        <div className='flex flex-col'>
-          {sources.map((source) =>
-            renderSourceCard(
-              source,
-              'cursor-pointer aucctus-bg-primary-hover !border-none !shadow-none !rounded-none',
-              () => window.open(source.url, '_blank'),
-              showPublishedDate,
-            ),
-          )}
-        </div>
-      </ComponentList>
-    ),
-    [showPublishedDate],
-  );
-
   return (
     <div
       className={`${className} animate-fade-in opacity-0 duration-300`}
@@ -188,14 +167,14 @@ const SourceBadgeFooter: FunctionComponent<SourceBadgeFooterProps> = ({
           sources={visibleSources}
           showPublishedDate={showPublishedDate}
         />
-        {overflowingSources.length > 0 && (
+        {/* {overflowingSources.length > 0 && (
           <ComponentTooltip
             hideDelay={300}
             tip={renderMultiSourceList(overflowingSources)}
           >
             <MultiSourceBadge sources={overflowingSources} />
           </ComponentTooltip>
-        )}
+        )} */}
       </div>
     </div>
   );

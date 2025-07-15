@@ -1,11 +1,13 @@
 // TODO: DEPRECATE - This is the legacy V1 financial projections component.
 // Remove this file once all users have migrated to FinancialProjectionsV2.tsx
 
-import { Card, Chart, Header, Modal, Loading } from '@components';
+import { Card, Chart, Header, Modal, UnifiedLoadingState } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useModal } from '@context/ModalContextProvider';
 import { useEditFinancialProjections } from '@hooks/concepts/editable.hook';
 import { useFinancialProjection } from '@hooks/query/concepts.hook';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
+import { AppPath } from '@routes/routes';
 import { ISource } from '@libs/api/types';
 import utils from '@libs/utils';
 import React, { FunctionComponent, useMemo } from 'react';
@@ -14,9 +16,15 @@ import { IConceptReportContext } from './ConceptReport/ConceptReport';
 
 const FinancialProjectionsV1: FunctionComponent = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  const { financialProjection, isLoading } = useFinancialProjection(
-    concept.uuid,
-  );
+  const { financialProjection, isLoading: isFinancialProjectionLoading } =
+    useFinancialProjection(concept.uuid);
+
+  // Use unified loading state
+  const { isLoading } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptFinancialProjection,
+    concept,
+    additionalLoadingStates: [isFinancialProjectionLoading],
+  });
 
   const {
     tam,
@@ -85,18 +93,13 @@ const FinancialProjectionsV1: FunctionComponent = () => {
     [openModal],
   );
 
+  // Show unified loading state
   if (isLoading) {
-    return (
-      <div className='flex h-full w-full flex-col gap-6'>
-        <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
-          <Loading />
-        </div>
-      </div>
-    );
+    return <UnifiedLoadingState />;
   }
 
-  // Handle case where loading is finished but no financial projection exists
-  if (!isLoading && !financialProjection) {
+  // Handle case where financial projection doesn't exist
+  if (!financialProjection) {
     return (
       <div className='aucctus-text-secondary flex h-full w-full flex-col items-center justify-center gap-6 p-8'>
         No financial projection found for this concept.

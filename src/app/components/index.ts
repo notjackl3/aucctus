@@ -21,6 +21,7 @@ import Avatar from './Avatar';
 import BetaDisclaimer from './BetaDisclaimer';
 import Loading from './Loading/Loading';
 import Progress from './Loading/Progress';
+import UnifiedLoadingState from './Loading/UnifiedLoadingState';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
 import ComponentCarousel from './Carousel/ComponentCarousel';
 import Tooltip from './ToolTip/Tooltip';
@@ -49,6 +50,7 @@ export {
   Table,
   Text,
   Tooltip,
+  UnifiedLoadingState,
   VersionUpgradeBanner,
   toast,
 };

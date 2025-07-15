@@ -211,24 +211,32 @@ const ConceptReport: FunctionComponent = () => {
               </button>
             )} */}
             {!concept?.isHistoricalVersion && (
-              <button
-                onClick={() =>
-                  openModal(
-                    Modal.AiEditing,
-                    {},
-                    {
-                      position: 'right',
-                      modalClassName: 'max-h-[90vh]',
-                      hideBodyScroll: true,
-                      shouldCloseOnOverlayClick: true,
-                      shouldCloseOnEscape: true,
-                    },
-                  )
-                }
-                className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-              >
-                Refine
-              </button>
+              <div className='group relative'>
+                <button
+                  disabled
+                  onClick={() =>
+                    openModal(
+                      Modal.AiEditing,
+                      {},
+                      {
+                        position: 'right',
+                        modalClassName: 'max-h-[90vh]',
+                        hideBodyScroll: true,
+                        shouldCloseOnOverlayClick: true,
+                        shouldCloseOnEscape: true,
+                      },
+                    )
+                  }
+                  className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+                >
+                  Refine
+                </button>
+                <div className='absolute right-0 top-full mb-2 hidden group-hover:block'>
+                  <div className='aucctus-bg-primary aucctus-text-secondary whitespace-nowrap rounded px-2 py-1 text-xs shadow-lg'>
+                    Feature is temporarily disabled for maintenance.
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>

@@ -2,7 +2,9 @@ import React, { useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import useStore from '@stores/store';
 import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
-import { Loading } from '@components';
+import { UnifiedLoadingState } from '@components';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
+import { AppPath } from '@routes/routes';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 
 import RevenueProjections from './GenerateRevenue/RevenueProjections';
@@ -11,9 +13,15 @@ import { IFinancialProjectionV2 } from '@libs/api/types/concept/financialProject
 
 const FinancialProjectionsV2: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  const { financialProjectionV2, isLoading } = useFinancialProjectionV2(
-    concept.uuid,
-  );
+  const { financialProjectionV2, isLoading: isFinancialProjectionLoading } =
+    useFinancialProjectionV2(concept.uuid);
+
+  // Use unified loading state
+  const { isLoading } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptFinancialProjection,
+    concept,
+    additionalLoadingStates: [isFinancialProjectionLoading],
+  });
 
   const { setActiveFinancialProjection } = useStore(
     (state) => state.financialProjection,
@@ -51,14 +59,9 @@ const FinancialProjectionsV2: React.FC = () => {
     [],
   );
 
+  // Show unified loading state
   if (isLoading) {
-    return (
-      <div className='flex h-full w-full flex-col gap-6'>
-        <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
-          <Loading />
-        </div>
-      </div>
-    );
+    return <UnifiedLoadingState />;
   }
 
   if (!financialProjectionV2) {

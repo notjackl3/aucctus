@@ -82,15 +82,21 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
 
   const renderTooltipContent = () => (
     <div className='aucctus-bg-primary aucctus-border-secondary max-w-xs rounded-xl border p-4 shadow-lg'>
-      {/* Classification badge in top right */}
-      {source.classification && (
-        <div className='mb-2 flex justify-end'>
+      {/* Top row with circular icon and classification badge */}
+      <div className='mb-3 flex items-start justify-between'>
+        {/* Circular icon at top left */}
+        <div className='aucctus-bg-secondary rounded-full border border-transparent p-1'>
+          {renderSourceLogo()}
+        </div>
+
+        {/* Classification badge in top right */}
+        {source.classification && (
           <ClassificationBadge
             classification={source.classification}
             size='small'
           />
-        </div>
-      )}
+        )}
+      </div>
 
       <div className='aucctus-text-sm-semibold aucctus-text-primary mb-2'>
         {source.title}

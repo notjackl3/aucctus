@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Icon } from '@components';
 
 interface ComponentCarouselProps {
@@ -29,37 +29,72 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
   arrowPlacement = 'bottom',
 }) => {
   const carouselRef = useRef<HTMLDivElement>(null);
-  const [maxScroll, setMaxScroll] = useState(0);
-  const [containerWidth, setContainerWidth] = useState(0);
+  const [scrollState, setScrollState] = useState({
+    scrollLeft: 0,
+    maxScroll: 0,
+    containerWidth: 0,
+    canScrollLeft: false,
+    canScrollRight: false,
+  });
 
+  // Update scroll state and button states
+  const updateScrollState = useCallback(() => {
+    if (!carouselRef.current) return;
+
+    const container = carouselRef.current;
+    const scrollLeft = Math.round(container.scrollLeft);
+    const containerWidth = container.clientWidth;
+    const scrollWidth = container.scrollWidth;
+    const maxScroll = Math.max(0, scrollWidth - containerWidth);
+
+    // Simple threshold check - at start/end with small tolerance
+    const canScrollLeft = scrollLeft > 1;
+    const canScrollRight = scrollLeft < maxScroll - 1;
+
+    setScrollState({
+      scrollLeft,
+      maxScroll,
+      containerWidth,
+      canScrollLeft,
+      canScrollRight,
+    });
+  }, []);
+
+  // Debounced resize handler
+  const handleResize = useCallback(() => {
+    // Add small delay to allow DOM to settle after resize
+    setTimeout(() => {
+      updateScrollState();
+    }, 50);
+  }, [updateScrollState]);
+
+  // Set up resize listener
   useEffect(() => {
-    const updateScrollLimits = () => {
-      if (carouselRef.current) {
-        const containerWidth = carouselRef.current.clientWidth;
-        setContainerWidth(containerWidth);
-        const scrollWidth = carouselRef.current.scrollWidth;
-        const newMaxScroll = Math.max(0, scrollWidth - containerWidth);
-        setMaxScroll(newMaxScroll);
-      }
-    };
+    updateScrollState();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [updateScrollState, handleResize]);
 
-    updateScrollLimits();
-    window.addEventListener('resize', updateScrollLimits);
+  // Update scroll state when children change
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      updateScrollState();
+    }, 100);
+    return () => clearTimeout(timeoutId);
+  }, [children, updateScrollState]);
 
-    return () => {
-      window.removeEventListener('resize', updateScrollLimits);
-    };
-  }, [children]);
-
+  // Auto-scroll to center functionality
   useEffect(() => {
     if (carouselRef.current && autoScrollToCenter && centerIndex >= 0) {
-      setTimeout(() => {
+      const timeoutId = setTimeout(() => {
         if (carouselRef.current) {
           const carousel = carouselRef.current;
-          const cards = carousel.querySelectorAll('[data-carousel-card]');
+          const cards = Array.from(
+            carousel.querySelectorAll('[data-carousel-card]'),
+          ) as HTMLElement[];
 
           if (cards.length > 0 && centerIndex < cards.length) {
-            const targetCard = cards[centerIndex] as HTMLElement;
+            const targetCard = cards[centerIndex];
             const containerWidth = carousel.clientWidth;
             const cardWidth = targetCard.offsetWidth;
             const targetPosition = targetCard.offsetLeft;
@@ -68,120 +103,60 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
               targetPosition - containerWidth / 2 + cardWidth / 2;
 
             carousel.scrollTo({
-              left: newScrollPosition,
+              left: Math.max(0, newScrollPosition),
               behavior: 'smooth',
             });
           }
         }
       }, 100);
+      return () => clearTimeout(timeoutId);
     }
-  }, [centerIndex, autoScrollToCenter, children]);
+  }, [centerIndex, autoScrollToCenter]);
 
-  const handleScroll = () => {
-    if (carouselRef.current) {
-      const containerWidth = carouselRef.current.clientWidth;
-      const scrollWidth = carouselRef.current.scrollWidth;
-      const newMaxScroll = Math.max(0, scrollWidth - containerWidth);
+  // Scroll event handler with debouncing
+  const handleScroll = useCallback(() => {
+    updateScrollState();
+  }, [updateScrollState]);
 
-      setMaxScroll(newMaxScroll);
-    }
-  };
-
-  // Helper to get all card elements
-  const getCards = () => {
-    if (!carouselRef.current) return [];
-    return Array.from(
-      carouselRef.current.querySelectorAll('[data-carousel-card]'),
-    ) as HTMLElement[];
-  };
-
-  // Helper to check if a card is fully in view (no partial cutoff)
-  const isCardFullyInView = (card: HTMLElement) => {
-    if (!carouselRef.current) return false;
-    const containerLeft = carouselRef.current.scrollLeft;
-    const containerRight = containerLeft + carouselRef.current.clientWidth;
-    const cardLeft = card.offsetLeft;
-    const cardRight = cardLeft + card.offsetWidth;
-    // Only fully in view if the entire card is within the container
-    return cardLeft >= containerLeft && cardRight <= containerRight;
-  };
-
-  // Arrow disabling logic
-  const cards = getCards();
-  const firstCardFullyVisible = cards.length > 0 && isCardFullyInView(cards[0]);
-  const lastCardFullyVisible =
-    cards.length > 0 && isCardFullyInView(cards[cards.length - 1]);
-
-  // Scroll to the previous card so it is fully in view
-  const scrollPrev = () => {
+  // Simple scroll left by container width
+  const scrollPrev = useCallback(() => {
     if (!carouselRef.current) return;
-    const cards = getCards();
-    const containerLeft = carouselRef.current.scrollLeft;
-    // Find the last card that is at least partially left of the viewport
-    let targetIndex = -1;
-    for (let i = cards.length - 1; i >= 0; i--) {
-      const card = cards[i];
-      const cardRight = card.offsetLeft + card.offsetWidth;
-      if (cardRight > containerLeft && card.offsetLeft < containerLeft) {
-        // Partially visible on the left
-        targetIndex = i;
-        break;
-      }
-      if (cardRight - 1 < containerLeft) {
-        targetIndex = i;
-        break;
-      }
-    }
-    if (targetIndex !== -1) {
-      const targetCard = cards[targetIndex];
-      carouselRef.current.scrollTo({
-        left: targetCard.offsetLeft,
-        behavior: 'smooth',
-      });
-    } else {
-      // If no card is left, scroll to start
-      carouselRef.current.scrollTo({ left: 0, behavior: 'smooth' });
-    }
-  };
 
-  // Scroll to the next card so it is fully in view (align right edge)
-  const scrollNext = () => {
+    const container = carouselRef.current;
+    const containerWidth = container.clientWidth;
+    const currentScrollLeft = container.scrollLeft;
+
+    // Calculate scroll distance (80% of container width for better UX)
+    const scrollDistance = containerWidth * 0.8;
+    const newScrollLeft = Math.max(0, currentScrollLeft - scrollDistance);
+
+    container.scrollTo({
+      left: newScrollLeft,
+      behavior: 'smooth',
+    });
+  }, []);
+
+  // Simple scroll right by container width
+  const scrollNext = useCallback(() => {
     if (!carouselRef.current) return;
-    const cards = getCards();
-    const containerLeft = carouselRef.current.scrollLeft;
-    const containerRight = containerLeft + carouselRef.current.clientWidth;
-    // Find the first card that is at least partially right of the viewport
-    let targetIndex = -1;
-    for (let i = 0; i < cards.length; i++) {
-      const card = cards[i];
-      const cardLeft = card.offsetLeft;
-      const cardRight = cardLeft + card.offsetWidth;
-      if (cardLeft < containerRight && cardRight > containerRight) {
-        // Partially visible on the right
-        targetIndex = i;
-        break;
-      }
-      if (cardLeft >= containerRight - 1) {
-        targetIndex = i;
-        break;
-      }
-    }
-    if (targetIndex !== -1) {
-      const targetCard = cards[targetIndex];
-      // Align the right edge of the card with the right edge of the carousel
-      const newScrollLeft =
-        targetCard.offsetLeft +
-        targetCard.offsetWidth -
-        carouselRef.current.clientWidth;
-      carouselRef.current.scrollTo({
-        left: newScrollLeft,
-        behavior: 'smooth',
-      });
-    } else {
-      // If no card is right, scroll to end
-      carouselRef.current.scrollTo({ left: maxScroll, behavior: 'smooth' });
-    }
-  };
+
+    const container = carouselRef.current;
+    const containerWidth = container.clientWidth;
+    const currentScrollLeft = container.scrollLeft;
+    const maxScroll = Math.max(0, container.scrollWidth - containerWidth);
+
+    // Calculate scroll distance (80% of container width for better UX)
+    const scrollDistance = containerWidth * 0.8;
+    const newScrollLeft = Math.min(
+      maxScroll,
+      currentScrollLeft + scrollDistance,
+    );
+
+    container.scrollTo({
+      left: newScrollLeft,
+      behavior: 'smooth',
+    });
+  }, []);
 
   return (
     <div className={`relative ${className}`}>
@@ -192,7 +167,7 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
             <button
               className={navButtonStyles}
               onClick={scrollPrev}
-              disabled={firstCardFullyVisible}
+              disabled={!scrollState.canScrollLeft}
             >
               <Icon
                 variant='arrowleft'
@@ -204,7 +179,7 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
             <button
               className={navButtonStyles}
               onClick={scrollNext}
-              disabled={lastCardFullyVisible}
+              disabled={!scrollState.canScrollRight}
             >
               <Icon
                 variant='arrowright'
@@ -229,7 +204,8 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
               style={{
                 width: cardWidth,
                 marginRight: gap,
-                maxWidth: Math.max(containerWidth - 10, 200) || undefined,
+                maxWidth:
+                  Math.max(scrollState.containerWidth - 10, 200) || undefined,
               }}
               data-carousel-card
             >
@@ -244,7 +220,7 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
             <button
               className={navButtonStyles}
               onClick={scrollPrev}
-              disabled={firstCardFullyVisible}
+              disabled={!scrollState.canScrollLeft}
             >
               <Icon
                 variant='arrowleft'
@@ -256,7 +232,7 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
             <button
               className={navButtonStyles}
               onClick={scrollNext}
-              disabled={lastCardFullyVisible}
+              disabled={!scrollState.canScrollRight}
             >
               <Icon
                 variant='arrowright'

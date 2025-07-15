@@ -166,6 +166,18 @@ const HexagonChart: React.FC<HexagonChartProps> = ({
         const iconX = centerX + iconRadius * Math.cos(angle);
         const iconY = centerY + iconRadius * Math.sin(angle);
 
+        // Calculate the data point position for this category
+        const radarValue = getRadarValueFromCategory(category);
+        const invertedRadarValue = 10 - radarValue;
+        const dataRadius = (invertedRadarValue / 10) * outerRadius;
+
+        // Hide the category icon if the data point is too close to the edge (> 85% of max radius)
+        const shouldHideIcon = dataRadius > outerRadius * 0.85;
+
+        if (shouldHideIcon) {
+          return null; // Don't render the icon when data point is at the edge
+        }
+
         return (
           <g key={`icon-${index}`}>
             {/* Icon */}
