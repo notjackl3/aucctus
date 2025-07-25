@@ -213,7 +213,6 @@ const ConceptReport: FunctionComponent = () => {
             {!concept?.isHistoricalVersion && (
               <div className='group relative'>
                 <button
-                  disabled
                   onClick={() =>
                     openModal(
                       Modal.AiEditing,
@@ -231,11 +230,6 @@ const ConceptReport: FunctionComponent = () => {
                 >
                   Refine
                 </button>
-                <div className='absolute right-0 top-full mb-2 hidden group-hover:block'>
-                  <div className='aucctus-bg-primary aucctus-text-secondary whitespace-nowrap rounded px-2 py-1 text-xs shadow-lg'>
-                    Feature is temporarily disabled for maintenance.
-                  </div>
-                </div>
               </div>
             )}
           </div>
