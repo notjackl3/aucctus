@@ -101,17 +101,6 @@ const MarketScanV3: React.FC = () => {
 
     return (
       <div className='mx-auto flex max-w-[1600px] flex-col gap-8 p-4'>
-        {/* Header */}
-        <div>
-          <h1 className='aucctus-text-brand-primary aucctus-header-sm-medium'>
-            Trends & Drivers
-          </h1>
-          <p className='aucctus-text-secondary aucctus-text-sm'>
-            Analyze market forces and external factors that could impact your
-            concept
-          </p>
-        </div>
-
         {/* Market Forces Radar Chart */}
         {marketForces.length > 0 && selectedRadarCategory && (
           <div>

@@ -227,7 +227,7 @@ const MarketForcesRadar: React.FC<MarketForcesRadarProps> = ({
                       size='md'
                       onClick={() => onCategorySelect(category)}
                       className={cn({
-                        'aucctus-text-sm-semibold flex h-auto items-center gap-2 px-4 py-3 transition-all':
+                        'aucctus-text-sm-semibold flex h-auto w-full items-center justify-center gap-2 px-4 py-3 transition-all':
                           true,
                         [getTabButtonStyle(category, isSelected)]: true,
                       })}
@@ -264,7 +264,7 @@ const MarketForcesRadar: React.FC<MarketForcesRadarProps> = ({
                         size='md'
                         onClick={() => onCategorySelect(category)}
                         className={cn({
-                          'aucctus-text-sm-semibold flex h-auto items-center gap-2 px-4 py-3 transition-all':
+                          'aucctus-text-sm-semibold flex h-auto w-full items-center justify-center gap-2 px-4 py-3 transition-all':
                             true,
                           [getTabButtonStyle(category, isSelected)]: true,
                         })}
