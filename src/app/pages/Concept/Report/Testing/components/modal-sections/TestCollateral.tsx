@@ -40,10 +40,11 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
     return apiCollateral.map((item) => {
       // Map API types to component types
       let componentType: CollateralType = 'text'; // default
-
+      let content = item?.content;
       switch (item.type) {
         case 'image':
           componentType = 'image';
+          content = item?.contentUrl;
           break;
         case 'text':
         case 'guide':
@@ -62,7 +63,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
         title: item.title,
         description: item.description,
         type: componentType,
-        content: item.content,
+        content,
         format: item.format,
       };
     });
