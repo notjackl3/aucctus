@@ -15,7 +15,7 @@ import {
 } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { animated, useTransition } from 'react-spring';
@@ -65,6 +65,9 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     IConceptReportEdit | Partial<IConceptReportEdit> | undefined
   >(undefined);
 
+  // Ref for the message input to enable auto-focus
+  const messageInputRef = useRef<HTMLTextAreaElement>(null);
+
   // Identifiers for the concept and session
   const conceptUuid = useStore((state) => state.conceptReport.conceptUuid);
   const featureVersions = useStore(
@@ -111,6 +114,16 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     },
   });
 
+  // Auto-focus the message input when component mounts
+  useEffect(() => {
+    // Small delay to ensure the modal is fully rendered and animated
+    const focusTimeout = setTimeout(() => {
+      messageInputRef.current?.focus();
+    }, 500);
+
+    return () => clearTimeout(focusTimeout);
+  }, []);
+
   // Cleanup function
   useEffect(() => {
     return () => {
@@ -127,19 +140,36 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
       <div className='flex shrink-0 flex-col gap-4 p-4'>
         <div className='flex flex-row justify-between gap-4'>
           <BetaDisclaimer />
-          <button
-            onClick={onClose}
-            className='aspect-square w-6 rounded-lg transition-all duration-200 hover:bg-gray-light-100 hover:bg-opacity-20'
-          >
-            <span className='flex items-center justify-center'>
-              <Icon
-                variant='closeX'
-                width={20}
-                height={20}
-                className='stroke-gray-light-100'
-              />
-            </span>
-          </button>
+          <div className='flex gap-2'>
+            <button
+              onClick={() => clearConversation()}
+              className='aspect-square w-6 rounded-lg transition-all duration-200 hover:bg-gray-light-100 hover:bg-opacity-20'
+              title='Clear conversation'
+            >
+              <span className='flex items-center justify-center'>
+                <Icon
+                  variant='trash'
+                  width={16}
+                  height={16}
+                  className='stroke-gray-light-100'
+                />
+              </span>
+            </button>
+            <button
+              onClick={onClose}
+              className='aspect-square w-6 rounded-lg transition-all duration-200 hover:bg-gray-light-100 hover:bg-opacity-20'
+              title='Close window'
+            >
+              <span className='flex items-center justify-center'>
+                <Icon
+                  variant='closeX'
+                  width={20}
+                  height={20}
+                  className='stroke-gray-light-100'
+                />
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Outdated sections banner */}
@@ -177,6 +207,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
       {/* Message input - fixed at bottom */}
       <div className='relative flex h-auto w-full flex-col justify-end gap-4 p-4'>
         <AucctusMessageInput
+          ref={messageInputRef}
           value={currentMessage || ''}
           onChange={(e) => setCurrentMessage(e.target.value)}
           onSubmitMessage={async () => {
@@ -193,7 +224,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
 
       {/* Confirmation modal */}
       {!!aiEditSubmission && (
-        <div className='aucctus-bg-tertiary absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transform animate-fade-in bg-opacity-50 px-4 pt-32'>
+        <div className='aucctus-bg-tertiary absolute left-1/2 top-1/2 h-full w-full -translate-x-1/2 -translate-y-1/2 transform bg-opacity-50 px-4 pt-32'>
           <Modal.Confirmation
             title='Are you sure you want to proceed?'
             subtitle='Removed or changed content will be available in version history.'

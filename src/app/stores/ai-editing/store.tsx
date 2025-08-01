@@ -8,6 +8,7 @@ import {
   clearConversation,
   handleAiEditingMessage,
   IAiEditingActions,
+  initializeListeners,
   performHandshake,
   sendMessage,
   setCurrentMessage,
@@ -62,6 +63,7 @@ const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
     clearConversation: clearConversation.bind(actionContext),
     addAssistantMessage: addAssistantMessage.bind(actionContext),
     agentIsThinking: agentIsThinking.bind(actionContext),
+    initializeListeners: initializeListeners.bind(actionContext),
   };
 };
 

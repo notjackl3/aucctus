@@ -118,42 +118,70 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
     updateScrollState();
   }, [updateScrollState]);
 
-  // Simple scroll left by container width
+  // Scroll left by one card - align previous card to left edge
   const scrollPrev = useCallback(() => {
     if (!carouselRef.current) return;
 
     const container = carouselRef.current;
-    const containerWidth = container.clientWidth;
+    const cards = Array.from(
+      container.querySelectorAll('[data-carousel-card]'),
+    ) as HTMLElement[];
+
+    if (cards.length === 0) return;
+
     const currentScrollLeft = container.scrollLeft;
 
-    // Calculate scroll distance (80% of container width for better UX)
-    const scrollDistance = containerWidth * 0.8;
-    const newScrollLeft = Math.max(0, currentScrollLeft - scrollDistance);
+    // Find the current card that's closest to the left edge
+    let currentCardIndex = 0;
+    for (let i = 0; i < cards.length; i++) {
+      const cardLeft = cards[i].offsetLeft;
+      if (cardLeft >= currentScrollLeft - 5) {
+        // 5px tolerance
+        currentCardIndex = i;
+        break;
+      }
+    }
+
+    // Move to previous card
+    const targetIndex = Math.max(0, currentCardIndex - 1);
+    const targetCard = cards[targetIndex];
 
     container.scrollTo({
-      left: newScrollLeft,
+      left: targetCard.offsetLeft,
       behavior: 'smooth',
     });
   }, []);
 
-  // Simple scroll right by container width
+  // Scroll right by one card - align next card to left edge
   const scrollNext = useCallback(() => {
     if (!carouselRef.current) return;
 
     const container = carouselRef.current;
-    const containerWidth = container.clientWidth;
-    const currentScrollLeft = container.scrollLeft;
-    const maxScroll = Math.max(0, container.scrollWidth - containerWidth);
+    const cards = Array.from(
+      container.querySelectorAll('[data-carousel-card]'),
+    ) as HTMLElement[];
 
-    // Calculate scroll distance (80% of container width for better UX)
-    const scrollDistance = containerWidth * 0.8;
-    const newScrollLeft = Math.min(
-      maxScroll,
-      currentScrollLeft + scrollDistance,
-    );
+    if (cards.length === 0) return;
+
+    const currentScrollLeft = container.scrollLeft;
+
+    // Find the current card that's closest to the left edge
+    let currentCardIndex = 0;
+    for (let i = 0; i < cards.length; i++) {
+      const cardLeft = cards[i].offsetLeft;
+      if (cardLeft >= currentScrollLeft - 5) {
+        // 5px tolerance
+        currentCardIndex = i;
+        break;
+      }
+    }
+
+    // Move to next card
+    const targetIndex = Math.min(cards.length - 1, currentCardIndex + 1);
+    const targetCard = cards[targetIndex];
 
     container.scrollTo({
-      left: newScrollLeft,
+      left: targetCard.offsetLeft,
       behavior: 'smooth',
     });
   }, []);

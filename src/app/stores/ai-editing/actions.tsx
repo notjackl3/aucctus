@@ -19,6 +19,7 @@ export interface IAiEditingActions {
   clearConversation: (resetCurrentMessage?: boolean) => void;
   addAssistantMessage: (message: IAssistantMessage) => void;
   agentIsThinking: (value: boolean, thinkingMessage?: string) => void;
+  initializeListeners: () => (() => void) | undefined;
 }
 
 /**
@@ -236,4 +237,86 @@ export async function sendMessage(this: IStoreApi<IAiEditingState>) {
     content: message.content,
     media: message.media,
   });
+}
+
+/**
+ * Initializes store listeners for auto-clearing conversation
+ * Returns a cleanup function to remove the listeners
+ */
+export function initializeListeners(
+  this: IStoreApi<IAiEditingState>,
+): (() => void) | undefined {
+  const { storeApi } = this;
+
+  if (!storeApi.subscribe) {
+    return undefined;
+  }
+
+  // Track previous values to detect changes
+  let previousAccess = storeApi.getState().auth.access;
+  let previousConceptUuid = storeApi.getState().conceptReport.conceptUuid;
+  let isClearing = false; // Flag to prevent recursive calls
+
+  // Subscribe to store changes
+  const unsubscribe = storeApi.subscribe((state) => {
+    // Prevent recursive calls during clearing
+    if (isClearing) return;
+
+    const currentAccess = state.auth.access;
+    const currentConceptUuid = state.conceptReport.conceptUuid;
+
+    // Check for logout (access token was removed)
+    if (previousAccess && !currentAccess) {
+      telemetry.debug('AI Editing: Clearing conversation due to logout');
+      isClearing = true;
+
+      // Clear conversation directly using the app store's setState
+      storeApi.setState(
+        produce((state) => {
+          state.aiEditing.messages = [];
+          state.aiEditing.sessionId = undefined;
+          state.aiEditing.isAucctusThinking = false;
+          state.aiEditing.thinkingMessage = undefined;
+          state.aiEditing.currentMessage = undefined; // Reset current message on logout
+        }),
+      );
+
+      isClearing = false;
+    }
+
+    // Check for concept change (concept UUID changed to a different non-undefined value)
+    if (
+      previousConceptUuid !== currentConceptUuid &&
+      currentConceptUuid !== undefined &&
+      previousConceptUuid !== undefined
+    ) {
+      telemetry.debug(
+        'AI Editing: Clearing conversation due to concept change',
+        {
+          previousConceptUuid,
+          currentConceptUuid,
+        },
+      );
+      isClearing = true;
+
+      // Clear conversation directly using the app store's setState
+      storeApi.setState(
+        produce((state) => {
+          state.aiEditing.messages = [];
+          state.aiEditing.sessionId = undefined;
+          state.aiEditing.isAucctusThinking = false;
+          state.aiEditing.thinkingMessage = undefined;
+          // Don't reset current message on concept change
+        }),
+      );
+
+      isClearing = false;
+    }
+
+    // Update previous values
+    previousAccess = currentAccess;
+    previousConceptUuid = currentConceptUuid;
+  });
+
+  return unsubscribe;
 }
