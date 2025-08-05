@@ -9,11 +9,11 @@ import {
   useTrackConceptView,
 } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
-// import api from '@libs/api';
-// import {
-//   downloadPdf,
-//   generateConceptSnapshotFileName,
-// } from '@libs/utils/files';
+import api from '@libs/api';
+import {
+  downloadPdf,
+  generateConceptSnapshotFileName,
+} from '@libs/utils/files';
 import { useEffect, useRef } from 'react';
 
 import { ConceptStatus, IConcept } from '@libs/api/types';
@@ -25,9 +25,10 @@ import ConceptVersionsButton from '@components/Button/ConceptVersionsButton';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
-import { FunctionComponent, useCallback, useMemo /*useState*/ } from 'react';
+import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
+import { useDebugMode } from '@hooks/debug-mode.hook';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
@@ -57,7 +58,7 @@ const ConceptReport: FunctionComponent = () => {
   const { id: conceptIdentifier } = useParams();
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
-  // const account = useStore((state) => state.auth.account);
+  const account = useStore((state) => state.auth.account);
   const { title: titleEdit } = useEditConcept();
   const { mutate: trackConceptView } = useTrackConceptView();
   const hasTrackedView = useRef(false);
@@ -71,7 +72,7 @@ const ConceptReport: FunctionComponent = () => {
   const conceptUuid = useMemo(() => concept?.uuid || '', [concept]);
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
-  // const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { openModal, closeModal } = useModal();
   const setActiveConcept = useStore(
     (state) => state.conceptReport.setActiveConcept,
@@ -80,6 +81,7 @@ const ConceptReport: FunctionComponent = () => {
     useCommitConceptVersionRevert();
   const { mutate: cancelConceptVersionRevert, isLoading: isCancelling } =
     useCancelConceptVersionRevert();
+  const isDebugModeEnabled = useDebugMode();
 
   // Build tabs dynamically based on concept feature version
   const conceptTabs = useMemo(() => {
@@ -120,23 +122,23 @@ const ConceptReport: FunctionComponent = () => {
     [conceptIdentifier, navigate],
   );
 
-  // const onSnapshotClick = useCallback(async () => {
-  //   if (conceptUuid === undefined) return;
-  //   setIsLoading(true);
+  const onSnapshotClick = useCallback(async () => {
+    if (conceptUuid === undefined) return;
+    setIsLoading(true);
 
-  //   try {
-  //     const pdf = await api.concept.downloadConcept(conceptUuid);
-  //     const fileName = generateConceptSnapshotFileName(
-  //       account?.name || '',
-  //       concept?.title || '',
-  //     );
-  //     await downloadPdf(pdf, fileName);
-  //   } catch (error) {
-  //     toast.error('Failed to download snapshot.');
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // }, [conceptUuid, account?.name, concept?.title]);
+    try {
+      const pdf = await api.concept.downloadConcept(conceptUuid);
+      const fileName = generateConceptSnapshotFileName(
+        account?.name || '',
+        concept?.title || '',
+      );
+      await downloadPdf(pdf, fileName);
+    } catch (error) {
+      toast.error('Failed to download snapshot.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [conceptUuid, account?.name, concept?.title]);
 
   const changeConceptStatus = useCallback(
     (value: string) => {
@@ -190,7 +192,7 @@ const ConceptReport: FunctionComponent = () => {
               FEATURE_CONCEPT_VERSIONING && (
                 <ConceptVersionsButton conceptUuid={conceptUuid} />
               )}
-            {/* {concept && !concept.isHistoricalVersion && (
+            {isDebugModeEnabled && concept && !concept.isHistoricalVersion && (
               <button
                 aria-label='Download Opportunity Snapshot'
                 className='btn btn-bold aucctus-text-brand-primary group whitespace-nowrap hover:bg-primary-900 hover:text-white'
@@ -209,7 +211,7 @@ const ConceptReport: FunctionComponent = () => {
                 )}
                 Opportunity Snapshot
               </button>
-            )} */}
+            )}
             {!concept?.isHistoricalVersion && (
               <div className='group relative'>
                 <button
