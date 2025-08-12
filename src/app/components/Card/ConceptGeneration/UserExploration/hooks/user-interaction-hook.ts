@@ -5,6 +5,7 @@ import {
   useSaveConceptSeedDraftAnswer,
   useUpdateConceptSeedDraftAnswer,
   useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers,
+  useSeed,
 } from '@hooks/query/concepts.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { IncubationAnswer, IncubationAnswerRequest } from '@libs/api/concepts';
@@ -13,7 +14,7 @@ import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@components';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatchIncubationAnimation } from './incubation-animation-event.hook';
@@ -44,8 +45,37 @@ export const useUserInteraction = () => {
     setActiveClarifyingQuestion,
   } = useConceptIncubationStore();
 
-  const queryClient = useQueryClient();
+  // ===== ROUTE PARAMS =====
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  // Get seed data to check for cached concepts
+  const [searchParams] = useSearchParams();
+  const seedUuid = searchParams.get('seed') || undefined;
+  const { data: seedDraftData } = useSeed(seedUuid, { status: 'draft' });
+
+  // Check if we have cached concepts
+  const hasCachedConcepts = useMemo(() => {
+    return (
+      seedDraftData?.cachedConcepts &&
+      Array.isArray(seedDraftData.cachedConcepts) &&
+      seedDraftData.cachedConcepts.length > 0
+    );
+  }, [seedDraftData]);
+
+  // Check if this is the final question
+  const isFinalQuestion = useMemo(() => {
+    const nextQuestion = getNextQuestion(submittedAnswers);
+    return !nextQuestion; // If no next question, this is the final one
+  }, [getNextQuestion, submittedAnswers]);
+
+  // Check if there are existing clarifying questions
+  const hasExistingClarifyingQuestions = useMemo(() => {
+    return (
+      seedDraftData?.clarifyingQuestions &&
+      seedDraftData.clarifyingQuestions.length > 0
+    );
+  }, [seedDraftData]);
 
   // ===== LOCAL STATE =====
   const [answerValue, setAnswerValue] = useState<string>('');
@@ -519,12 +549,20 @@ export const useUserInteraction = () => {
     }
 
     if (activeAnswer) {
-      // Show confirmation for main questions that affect subsequent questions
-      if (
-        !!activeAnswer.question.identifier &&
-        activeAnswer.question.order <
-          submittedAnswers[submittedAnswers.length - 1].question.order
-      ) {
+      // For final question, show confirmation if we have cached concepts OR existing clarifying questions
+      // Both scenarios require user awareness as changing final answer invalidates existing data
+      if (isFinalQuestion) {
+        if (hasCachedConcepts || hasExistingClarifyingQuestions) {
+          setShowConfirmation(true);
+        } else {
+          // No cached concepts or clarifying questions, proceed without confirmation
+          doUpdateAnswer();
+        }
+        return;
+      }
+
+      // Show confirmation for main questions that might affect subsequent questions or generated concepts
+      if (!!activeAnswer.question.identifier) {
         setShowConfirmation(true);
       } else {
         doUpdateAnswer();
@@ -567,6 +605,10 @@ export const useUserInteraction = () => {
     saveAnswer,
     setActiveClarifyingQuestion,
     submittedAnswers,
+    isFinalQuestion,
+    hasCachedConcepts,
+    hasExistingClarifyingQuestions,
+    setShowConfirmation,
   ]);
 
   const loadingMessage = useMemo(

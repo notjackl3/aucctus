@@ -163,12 +163,16 @@ const IncubateConcept: React.FC = () => {
     ) {
       setGeneratedConcepts(draftSeedUuid, seedDraftData.cachedConcepts);
       setConceptGenerationState('selecting');
+      setTimeout(() => {
+        setCurrentQuestionOrder(Infinity);
+      }, 100); // This is the worst hack ever, but it works
     }
   }, [
     seedDraftData,
     draftSeedUuid,
     setGeneratedConcepts,
     conceptGenerationState,
+    setCurrentQuestionOrder,
   ]);
 
   // Determine the current question based on answers
@@ -193,9 +197,13 @@ const IncubateConcept: React.FC = () => {
           // Set current question to the next question after the last answered one
           const nextQuestionOrder = questionOrders[0];
           setCurrentQuestionOrder(nextQuestionOrder);
-        } else {
-          setCurrentQuestionOrder(Infinity);
         }
+        // Fix: Don't auto-set currentQuestionOrder to Infinity when all questions answered
+        // Let the user interaction flow (goToNextQuestion) handle clarifying questions properly
+        // This prevents showing clarifying questions UI before questions are generated
+        // else {
+        //   setCurrentQuestionOrder(Infinity);
+        // }
       } else if (Object.values(activeQuestionnaire.questions).length > 0) {
         // If no questions answered yet, set to the first question (lowest order)
         const firstQuestionOrder = Math.min(
