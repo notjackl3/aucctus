@@ -193,10 +193,9 @@ const IncubateConcept: React.FC = () => {
           // Set current question to the next question after the last answered one
           const nextQuestionOrder = questionOrders[0];
           setCurrentQuestionOrder(nextQuestionOrder);
+        } else {
+          setCurrentQuestionOrder(Infinity);
         }
-        // Fix: Don't auto-set to Infinity when all questions answered
-        // Let user interaction flow handle clarifying questions transition properly
-        // This prevents race condition where UI shows before questions are generated
       } else if (Object.values(activeQuestionnaire.questions).length > 0) {
         // If no questions answered yet, set to the first question (lowest order)
         const firstQuestionOrder = Math.min(
@@ -349,7 +348,7 @@ const IncubateConcept: React.FC = () => {
         ) {
           setGeneratedConcepts(draftSeedUuid, seedDraftData.cachedConcepts);
         }
-        setConceptGenerationState('generating'); // use this state and let the generation component handle cached concepts
+        setConceptGenerationState('selecting'); // use this state and let the generation component handle cached concepts
         return;
       }
 
@@ -446,6 +445,10 @@ const IncubateConcept: React.FC = () => {
 
   // Render Functions
   const renderExploration = useCallback(() => {
+    if (conceptGenerationState === 'selecting') {
+      return;
+    }
+
     return (
       <>
         {userExplorationTransition(
@@ -511,25 +514,27 @@ const IncubateConcept: React.FC = () => {
 
   return (
     <>
-      <div
-        className={cn(
-          'ease flex h-[100vh] flex-row overflow-hidden transition-all duration-300',
-          {
-            'p-8': conceptGenerationState !== 'selecting',
-          },
-        )}
-      >
-        {renderExploration()}
-        {conceptGenerationState === 'generating' &&
-          pregenToGenAnimationComplete &&
-          renderConceptGeneration(
-            'flex flex-col rounded-xl flex-1 ease h-full p-4 transition-all duration-300 mr-4',
+      {!(isSeedLoading || isQuestionnaireLoading || isAnswersLoading) && (
+        <div
+          className={cn(
+            'ease flex h-[100vh] flex-row overflow-hidden transition-all duration-300',
+            {
+              'p-8': conceptGenerationState !== 'selecting',
+            },
           )}
-        {conceptGenerationState === 'selecting' &&
-          renderConceptSelection(
-            'flex flex-col flex-1 ease h-full transition-all duration-300',
-          )}
-      </div>
+        >
+          {renderExploration()}
+          {conceptGenerationState === 'generating' &&
+            pregenToGenAnimationComplete &&
+            renderConceptGeneration(
+              'flex flex-col rounded-xl flex-1 ease h-full p-4 transition-all duration-300 mr-4',
+            )}
+          {conceptGenerationState === 'selecting' &&
+            renderConceptSelection(
+              'flex flex-col flex-1 ease h-full transition-all duration-300',
+            )}
+        </div>
+      )}
       <LoadingMask
         isLoading={isSeedLoading || isQuestionnaireLoading || isAnswersLoading}
       />
