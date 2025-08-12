@@ -41,34 +41,47 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
   isSelected,
 }) => {
   React.useEffect(() => {
-    setValueProposition(activeConcept.valueProposition);
-    setOverview(activeConcept.overview);
-    setProblemStatement(activeConcept.problemStatement);
+    if (activeConcept) {
+      setValueProposition(activeConcept.valueProposition);
+      setOverview(activeConcept.overview);
+      setProblemStatement(activeConcept.problemStatement);
+    }
   }, [activeConcept]);
 
   const { draftSeedUuid } = useConceptIncubationStore();
   const { updateGeneratedConcept } = useConceptGenerationStore();
   const [valueProposition, setValueProposition] = React.useState(
-    activeConcept.valueProposition,
+    activeConcept?.valueProposition || '',
   );
-  const [overview, setOverview] = React.useState(activeConcept.overview);
+  const [overview, setOverview] = React.useState(activeConcept?.overview || '');
   const [problemStatement, setProblemStatement] = React.useState(
-    activeConcept.problemStatement,
+    activeConcept?.problemStatement || '',
   );
 
   const handleSave = () => {
-    activeConcept.valueProposition = valueProposition;
-    activeConcept.overview = overview;
-    activeConcept.problemStatement = problemStatement;
-    updateGeneratedConcept(draftSeedUuid, activeConcept);
+    if (activeConcept && draftSeedUuid) {
+      activeConcept.valueProposition = valueProposition;
+      activeConcept.overview = overview;
+      activeConcept.problemStatement = problemStatement;
+      updateGeneratedConcept(draftSeedUuid, activeConcept);
+    }
   };
+
+  // Don't render if no active concept
+  if (!activeConcept) {
+    return (
+      <div className='flex h-full items-center justify-center'>
+        <span className='aucctus-text-secondary'>Loading concept...</span>
+      </div>
+    );
+  }
 
   return (
     <>
       <ConceptHeader
         isSelected={isSelected}
-        title={activeConcept.title!}
-        onSelect={() => onSelect(activeConcept)}
+        title={activeConcept?.title || ''}
+        onSelect={() => activeConcept && onSelect(activeConcept)}
       />
       <div className='aucctus-text-secondary aucctus-text-sm mx-4 flex flex-row gap-2'>
         <EditModeSwitcher

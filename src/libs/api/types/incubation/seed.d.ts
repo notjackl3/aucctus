@@ -4,6 +4,7 @@ import type {
   ConceptIncubationQuestion,
   IClarifyingQuestion,
 } from './questionnaire';
+import type { IGeneratedConcept } from '../concept/concepts';
 
 export interface IConceptSeedAnswer {
   answer: string[];
@@ -40,6 +41,7 @@ export interface IConceptSeed {
   createdBy: IUser;
 
   clarifyingQuestions: IClarifyingQuestion[];
+  cachedConcepts?: IGeneratedConcept[];
 }
 
 export interface IConceptSeedUpdate {

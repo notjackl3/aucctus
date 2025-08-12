@@ -136,7 +136,7 @@ export const useUserInteraction = () => {
   );
 
   useEffect(() => {
-    const answers = (seedDraftAnswers ?? []).sort(
+    const answers = [...(seedDraftAnswers ?? [])].sort(
       (a, b) => a.question.order - b.question.order,
     );
 
@@ -370,6 +370,43 @@ export const useUserInteraction = () => {
     updateAnswer,
   ]);
 
+  const doConfirmAnswer = useCallback(() => {
+    if (activeAnswer) {
+      // Update existing answer
+      doUpdateAnswer();
+    } else {
+      // Create new answer (for clarifying questions without existing answers)
+      saveAnswer(
+        {
+          uuid: draftSeedUuid,
+          body: formattedAnswerPayload,
+        },
+        {
+          onSuccess: async () => {
+            advanceAction.current = activeClarifyingQuestion
+              ? 'to-clarifying-questions'
+              : 'to-next-question';
+            await queryClient.refetchQueries([
+              AucctusQueryKeys.conceptSeedDraftAnswers,
+              draftSeedUuid,
+            ]);
+          },
+          onError: () => {
+            toast.error('Failed to submit answer');
+          },
+        },
+      );
+    }
+  }, [
+    activeAnswer,
+    doUpdateAnswer,
+    saveAnswer,
+    draftSeedUuid,
+    formattedAnswerPayload,
+    activeClarifyingQuestion,
+    queryClient,
+  ]);
+
   const onInputChange = useCallback(
     (e: React.ChangeEvent<HTMLTextAreaElement>) => {
       setAnswerValue(e.target.value);
@@ -475,7 +512,14 @@ export const useUserInteraction = () => {
       return;
     }
 
+    // Show confirmation for clarifying questions (whether new or updating)
+    if (activeClarifyingQuestion) {
+      setShowConfirmation(true);
+      return;
+    }
+
     if (activeAnswer) {
+      // Show confirmation for main questions that affect subsequent questions
       if (
         !!activeAnswer.question.identifier &&
         activeAnswer.question.order <
@@ -554,6 +598,7 @@ export const useUserInteraction = () => {
     handleGoBack,
     handleSubmitAnswer,
     doUpdateAnswer,
+    doConfirmAnswer,
     doRevertAnswer,
     dispatchAiSuggestionsEvent,
   };

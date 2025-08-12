@@ -7,6 +7,8 @@ import AucctusImg from '@components/Image/AucctusImg';
 import { IGeneratedConcept } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import { useSeed } from '@hooks/query/concepts.hook';
+import { useSearchParams } from 'react-router-dom';
 
 const ReadyToGenerateIcon: React.FC = () => {
   return (
@@ -45,7 +47,36 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
     headerButtonAnimation,
   } = useReadyToGenerateAnimations(compact && !concept);
 
+  const [searchParams] = useSearchParams();
+  const seedUuid = searchParams.get('seed') || undefined;
+
   const { activeQuestionnaire } = useConceptIncubationStore();
+
+  // Fetch seed data to check for cached concepts
+  const { data: seedDraftData } = useSeed(seedUuid, { status: 'draft' });
+
+  // Check if we have cached concepts for this seed
+  const hasCachedConcepts = useMemo(() => {
+    return (
+      seedDraftData?.cachedConcepts &&
+      Array.isArray(seedDraftData.cachedConcepts) &&
+      seedDraftData.cachedConcepts.length > 0
+    );
+  }, [seedDraftData]);
+
+  const handleButtonClick = () => {
+    if (hasCachedConcepts) {
+      // If we have cached concepts, go directly to selection
+      window.dispatchEvent(
+        new CustomEvent('aucctus-generate-concept', {
+          detail: { viewCachedConcepts: true },
+        }),
+      );
+    } else {
+      // Normal generation flow
+      window.dispatchEvent(new CustomEvent('aucctus-generate-concept'));
+    }
+  };
 
   const headerMessage = useMemo(() => {
     if (concept) {
@@ -59,10 +90,11 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
     }
   }, [concept, activeQuestionnaire]);
 
-  const buttonText = useMemo(
-    () => (concept ? 'Generate Report' : 'Generate'),
-    [concept],
-  );
+  const buttonText = useMemo(() => {
+    if (concept) return 'Generate Report';
+    if (hasCachedConcepts) return 'View Concepts';
+    return 'Generate';
+  }, [concept, hasCachedConcepts]);
 
   const cardHeaderText = useMemo(
     () => (concept ? concept.title : 'Generate Concepts'),
@@ -97,12 +129,7 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
             'pointer-events-none': !compact,
           })}
         >
-          <button
-            className='btn btn-primary'
-            onClick={() =>
-              window.dispatchEvent(new CustomEvent('aucctus-generate-concept'))
-            }
-          >
+          <button className='btn btn-primary' onClick={handleButtonClick}>
             {buttonText}
           </button>
         </animated.span>
@@ -125,7 +152,7 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
             {!concept?.isGenerating && (
               <button
                 className='btn btn-primary self-start'
-                onClick={onGenerate}
+                onClick={hasCachedConcepts ? handleButtonClick : onGenerate}
               >
                 {buttonText}
               </button>

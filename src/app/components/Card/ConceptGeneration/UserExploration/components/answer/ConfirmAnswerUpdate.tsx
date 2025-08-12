@@ -7,14 +7,31 @@ interface ConfirmAnswerUpdateProps {
   show: boolean;
   onCancel: () => void;
   onConfirm: () => void;
+  isClarifyingQuestion?: boolean;
 }
 
 const ConfirmAnswerUpdate: React.FC<ConfirmAnswerUpdateProps> = ({
   show,
   onCancel,
   onConfirm,
+  isClarifyingQuestion = false,
 }) => {
   const { openModal, closeModal } = useModal();
+
+  const modalContent = useMemo(() => {
+    if (isClarifyingQuestion) {
+      return {
+        title: 'Answer clarifying question?',
+        subtitle:
+          'Answering or updating clarifying questions will delete your previous concepts. This action cannot be reversed.',
+      };
+    }
+    return {
+      title:
+        'Updating this answer will delete answers to subsequent questions.',
+      subtitle: 'This action can not be reversed. Continue?',
+    };
+  }, [isClarifyingQuestion]);
 
   const actions: IActionButton[] = useMemo(
     () => [
@@ -43,15 +60,14 @@ const ConfirmAnswerUpdate: React.FC<ConfirmAnswerUpdateProps> = ({
       openModal(
         Modal.Confirmation,
         {
-          title:
-            'Updating this answer will delete answers to subsequent questions.',
-          subtitle: 'This action can not be reversed. Continue?',
+          title: modalContent.title,
+          subtitle: modalContent.subtitle,
           actions: actions,
         },
         { position: 'center', shouldCloseOnOverlayClick: true },
       );
     }
-  }, [show, onCancel, onConfirm, openModal, closeModal, actions]);
+  }, [show, onCancel, onConfirm, openModal, closeModal, actions, modalContent]);
 
   return null;
 };

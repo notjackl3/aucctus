@@ -1,11 +1,12 @@
 import images from '@assets/img';
-import { useConceptGeneration } from '@hooks/query/concepts.hook';
+import { useConceptGeneration, useSeed } from '@hooks/query/concepts.hook';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { IGeneratedConcept } from '@libs/api/types';
 import { animated, useTransition } from '@react-spring/web';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
-import React, { useCallback, useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   animationStyles,
   getAnimationStyle,
@@ -43,8 +44,26 @@ const ConceptGeneration = React.forwardRef<
   const { setGeneratedConcepts } = useConceptGenerationStore();
   const hasGenerated = useRef(false);
 
-  // Handle socket events for concept generation
+  // Get search params and seed data to check for cached concepts
+  const [searchParams] = useSearchParams();
+  const seedUuid = searchParams.get('seed') || undefined;
+  const { data: seedDraftData } = useSeed(seedUuid, { status: 'draft' });
+
+  // Check if we have cached concepts
+  const hasCachedConcepts = useMemo(() => {
+    return (
+      seedDraftData?.cachedConcepts &&
+      Array.isArray(seedDraftData.cachedConcepts) &&
+      seedDraftData.cachedConcepts.length > 0
+    );
+  }, [seedDraftData]);
+
+  // Handle socket events for concept generation (only if no cached concepts)
+  // When cached concepts exist, we skip real-time generation and use cached data
   useSocketEvent('stream.structured.concept.generation', (data) => {
+    // Skip socket handling if we have cached concepts
+    if (hasCachedConcepts) return;
+
     const { concepts: eventConcepts } = data?.content ?? {};
 
     if ('done' === data.stage && eventConcepts) {
@@ -122,6 +141,18 @@ const ConceptGeneration = React.forwardRef<
     if (hasGenerated.current) return;
     hasGenerated.current = true;
 
+    // If we have cached concepts, use them directly instead of generating new ones
+    if (hasCachedConcepts && seedDraftData?.cachedConcepts) {
+      // Set the cached concepts immediately
+      setConcepts(seedDraftData.cachedConcepts);
+      setGeneratedConcepts(draftSeedUuid, seedDraftData.cachedConcepts);
+
+      // Simulate the generation timing but complete faster since we have the data
+      setTimeout(() => handleGenerateComplete(), 2000);
+      return;
+    }
+
+    // Normal generation flow for new concepts
     generateConcept(undefined, {
       onError: () => {
         const event = new CustomEvent('aucctus-generate-concept', {
@@ -130,7 +161,15 @@ const ConceptGeneration = React.forwardRef<
         window.dispatchEvent(event);
       },
     });
-  }, [generateConcept]);
+  }, [
+    generateConcept,
+    hasCachedConcepts,
+    seedDraftData,
+    setConcepts,
+    setGeneratedConcepts,
+    draftSeedUuid,
+    handleGenerateComplete,
+  ]);
 
   // UI Component renderers
   const renderLoadingText = () => (
@@ -139,13 +178,15 @@ const ConceptGeneration = React.forwardRef<
         style={getFadeInStyle(500, 500)}
         className='aucctus-text-white aucctus-text-lg'
       >
-        Generating concepts
+        {hasCachedConcepts ? 'Loading your concepts' : 'Generating concepts'}
       </div>
       <div
         style={getFadeInStyle(500, 1000)}
         className='aucctus-text-white aucctus-text-xs'
       >
-        This can take up to 2 minutes to complete
+        {hasCachedConcepts
+          ? 'Using your previously generated concepts'
+          : 'This can take up to 2 minutes to complete'}
       </div>
     </div>
   );

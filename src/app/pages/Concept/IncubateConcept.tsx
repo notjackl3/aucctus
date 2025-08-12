@@ -44,6 +44,7 @@ const IncubateConcept: React.FC = () => {
   const [pregenToGenAnimationComplete, setPregenToGenAnimationComplete] =
     useState(false);
   const userExplorationRef = useRef<HTMLDivElement>(null);
+  const isBackingFromSelectionRef = useRef(false);
   const queryClient = useQueryClient();
 
   // Data Fetching & Store Access
@@ -63,7 +64,6 @@ const IncubateConcept: React.FC = () => {
     submittedAnswers,
     resetQuestionnaire,
     setDraftSeedUuid,
-    setSubmittedAnswers,
     setActiveQuestionnaire,
     setCurrentQuestionOrder,
     setClarifyingQuestions,
@@ -73,10 +73,9 @@ const IncubateConcept: React.FC = () => {
     useConceptGenerationStore();
 
   // Fetch answers if we have a seed UUID and the seed exists
-  const { data: seedDraftAnswers, isLoading: isAnswersLoading } =
-    useGetConceptSeedDraftAnswers(
-      draftSeedUuid && seedDraftData && !seedError ? draftSeedUuid : '',
-    );
+  const { isLoading: isAnswersLoading } = useGetConceptSeedDraftAnswers(
+    draftSeedUuid && seedDraftData && !seedError ? draftSeedUuid : '',
+  );
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -150,20 +149,31 @@ const IncubateConcept: React.FC = () => {
     setClarifyingQuestions,
   ]);
 
-  // Update store with answers when they are loaded
+  // NOTE: submittedAnswers is now set in user-interaction-hook.ts to avoid race conditions
+
+  // Handle cached concepts - populate store and skip to selection
   useEffect(() => {
-    if (seedDraftAnswers && seedDraftAnswers.length > 0) {
-      setSubmittedAnswers(seedDraftAnswers);
+    if (
+      seedDraftData?.cachedConcepts &&
+      Array.isArray(seedDraftData.cachedConcepts) &&
+      seedDraftData.cachedConcepts.length > 0 &&
+      draftSeedUuid &&
+      conceptGenerationState === 'pre-generation' &&
+      !isBackingFromSelectionRef.current // Don't auto-skip if user is backing from selection
+    ) {
+      setGeneratedConcepts(draftSeedUuid, seedDraftData.cachedConcepts);
+      setConceptGenerationState('selecting');
     }
-  }, [seedDraftAnswers, setSubmittedAnswers]);
+  }, [
+    seedDraftData,
+    draftSeedUuid,
+    setGeneratedConcepts,
+    conceptGenerationState,
+  ]);
 
   // Determine the current question based on answers
   useEffect(() => {
-    if (
-      activeQuestionnaire &&
-      activeQuestionnaire.questions &&
-      (!currentQuestionOrder || currentQuestionOrder === Infinity)
-    ) {
+    if (activeQuestionnaire && activeQuestionnaire.questions) {
       if (submittedAnswers.length > 0) {
         // Sort answers by question order to find the latest answered question
         const sortedAnswers = [...submittedAnswers].sort(
@@ -183,10 +193,10 @@ const IncubateConcept: React.FC = () => {
           // Set current question to the next question after the last answered one
           const nextQuestionOrder = questionOrders[0];
           setCurrentQuestionOrder(nextQuestionOrder);
-        } else {
-          // If all questions are answered, set to Infinity (questionnaire complete)
-          setCurrentQuestionOrder(Infinity);
         }
+        // Fix: Don't auto-set to Infinity when all questions answered
+        // Let user interaction flow handle clarifying questions transition properly
+        // This prevents race condition where UI shows before questions are generated
       } else if (Object.values(activeQuestionnaire.questions).length > 0) {
         // If no questions answered yet, set to the first question (lowest order)
         const firstQuestionOrder = Math.min(
@@ -197,12 +207,7 @@ const IncubateConcept: React.FC = () => {
         setCurrentQuestionOrder(firstQuestionOrder);
       }
     }
-  }, [
-    activeQuestionnaire,
-    submittedAnswers,
-    currentQuestionOrder,
-    setCurrentQuestionOrder,
-  ]);
+  }, [activeQuestionnaire, submittedAnswers, setCurrentQuestionOrder]);
 
   const hasSubmittedAnswers = useMemo(
     () => submittedAnswers.length > 0,
@@ -249,16 +254,9 @@ const IncubateConcept: React.FC = () => {
     }
   }, [handleResetAndNavigate, seedDraftData, seedError]);
 
-  const unsetGenerateConcepts = useCallback(() => {
-    if (draftSeedUuid) {
-      setGeneratedConcepts(draftSeedUuid, []);
-    }
-  }, [draftSeedUuid, setGeneratedConcepts]);
-
   const cleanup = useCallback(() => {
     deleteAnswerlessDraft();
-    unsetGenerateConcepts();
-  }, [deleteAnswerlessDraft, unsetGenerateConcepts]);
+  }, [deleteAnswerlessDraft]);
 
   useEffect(() => {
     // Only setup cleanup if we have a valid draft seed
@@ -276,12 +274,16 @@ const IncubateConcept: React.FC = () => {
             refine?: boolean;
             generate?: boolean;
             error?: boolean;
+            backToPreGeneration?: boolean;
+            viewCachedConcepts?: boolean;
           }>
         | undefined;
 
       const revert = customEvent?.detail?.revert;
       const refine = customEvent?.detail?.refine;
       const generate = customEvent?.detail?.generate;
+      const backToPreGeneration = customEvent?.detail?.backToPreGeneration;
+      const viewCachedConcepts = customEvent?.detail?.viewCachedConcepts;
 
       if (generate) {
         // Get generated concepts from store
@@ -330,7 +332,31 @@ const IncubateConcept: React.FC = () => {
         return;
       }
 
+      if (backToPreGeneration) {
+        isBackingFromSelectionRef.current = true;
+        setConceptGenerationState('pre-generation');
+        setPregenToGenAnimationComplete(false);
+        return;
+      }
+
+      if (viewCachedConcepts) {
+        // Populate store with cached concepts before going to selection
+        if (
+          seedDraftData?.cachedConcepts &&
+          Array.isArray(seedDraftData.cachedConcepts) &&
+          seedDraftData.cachedConcepts.length > 0 &&
+          draftSeedUuid
+        ) {
+          setGeneratedConcepts(draftSeedUuid, seedDraftData.cachedConcepts);
+        }
+        setConceptGenerationState('generating'); // use this state and let the generation component handle cached concepts
+        return;
+      }
+
       if (hasSubmittedAnswers) {
+        // Reset the backing flag when user starts generating concepts
+        isBackingFromSelectionRef.current = false;
+
         const userExplorationElement = userExplorationRef.current;
 
         if (userExplorationElement) {
@@ -372,6 +398,7 @@ const IncubateConcept: React.FC = () => {
     setGeneratedConcepts,
     generateConceptReport,
     queryClient,
+    seedDraftData?.cachedConcepts,
   ]);
 
   // Animation Transitions

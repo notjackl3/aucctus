@@ -14,7 +14,7 @@ const ConceptSelectionHeader: React.FC<ConceptSelectionHeaderProps> = ({
     </span>
     <span className='flex flex-1' />
     <button onClick={onClose} className='btn btn-light aspect-square !p-2'>
-      <Icon variant='closeX' height={20} width={20} />
+      <Icon variant='arrowleft' height={20} width={20} />
     </button>
   </div>
 );

@@ -32,7 +32,7 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     handleAddAnswer,
     handleGoBack,
     handleSubmitAnswer,
-    doUpdateAnswer,
+    doConfirmAnswer,
     doRevertAnswer,
     dispatchAiSuggestionsEvent,
   } = useUserInteraction();
@@ -97,9 +97,10 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
           setShowConfirmation(false);
         }}
         onConfirm={() => {
-          doUpdateAnswer();
+          doConfirmAnswer();
           setShowConfirmation(false);
         }}
+        isClarifyingQuestion={!!activeClarifyingQuestion}
       />
     </>
   );

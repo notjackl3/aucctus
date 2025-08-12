@@ -87,6 +87,13 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
   const [inputValue, setValue] = useState<string>('');
   const [promptAnswers, setPromptAnswers] = useState<AnswerItem[]>([]);
 
+  // Set activeConcept when currentGeneratedConcepts updates (for cached concepts)
+  React.useEffect(() => {
+    if (!activeConcept && currentGeneratedConcepts.length > 0) {
+      setActiveConcept(currentGeneratedConcepts[0]);
+    }
+  }, [currentGeneratedConcepts, activeConcept]);
+
   // API mutations
   const { mutate: generateConcept } = useConceptGeneration(draftSeedUuid);
   const { mutate: saveGeneratedConcepts, isLoading: isSaving } =
@@ -201,10 +208,13 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
   const handleClose = useCallback(() => {
     handleLeaveAnimation(() => {
+      // Clear generated concepts and selected concepts
       clearGeneratedConceptsBySeedUuid(draftSeedUuid);
       setSelectedConcepts([]);
+
+      // Go back to pre-generation state instead of reverting to questionnaire
       const event = new CustomEvent('aucctus-generate-concept', {
-        detail: { revert: true },
+        detail: { backToPreGeneration: true },
       });
       window.dispatchEvent(event);
     });

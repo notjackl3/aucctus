@@ -34,8 +34,9 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
     totalSteps,
     currentQuestionOrder,
     activeClarifyingQuestion,
-    activeGeneratedConcept,
-    activeQuestion,
+    // activeGeneratedConcept,
+    // activeQuestion,
+    submittedAnswers,
   } = useConceptIncubationStore();
 
   const progressText = useMemo(() => {
@@ -45,15 +46,17 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
     return `${currentStep} / ${totalSteps} steps`;
   }, [currentStep, totalSteps]);
 
-  const backButtonTransition = useTransition(
-    !activeGeneratedConcept || activeClarifyingQuestion || activeQuestion,
-    {
-      from: { opacity: 0, maxWidth: '0px' },
-      enter: { opacity: 1, maxWidth: '200px' },
-      leave: { opacity: 0, maxWidth: '0px' },
-      config: { tension: 100, friction: 12, mass: 0.5 },
-    },
-  );
+  const showBackButton = useMemo(() => {
+    // Show back button when we have progress (submitted answers) or active clarifying question
+    return submittedAnswers.length > 0 || activeClarifyingQuestion;
+  }, [submittedAnswers, activeClarifyingQuestion]);
+
+  const backButtonTransition = useTransition(showBackButton, {
+    from: { opacity: 0, maxWidth: '0px' },
+    enter: { opacity: 1, maxWidth: '200px' },
+    leave: { opacity: 0, maxWidth: '0px' },
+    config: { tension: 100, friction: 12, mass: 0.5 },
+  });
 
   const buttonTransition = useTransition(
     currentQuestionOrder !== Infinity || activeClarifyingQuestion,
