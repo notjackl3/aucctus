@@ -16,7 +16,7 @@ interface IOrganizationSetupProps {
  * Component to handle automatic organization creation for new Clerk users
  * This ensures that every user has an organization associated with their account
  */
-export const OrganizationSetup: FunctionComponent<IOrganizationSetupProps> = ({
+const OrganizationSetup: FunctionComponent<IOrganizationSetupProps> = ({
   onComplete,
   onSkip,
 }) => {
