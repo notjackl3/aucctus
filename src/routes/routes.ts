@@ -41,19 +41,19 @@ export enum AppPath {
   /* Auth */
   Login = '/login',
   SignUp = '/sign-up',
+  VerifyEmail = '/verify-email',
   ConfirmEmail = '/confirm-email',
   EmailConfirmation = '/email-confirmation',
   ForgotPassword = '/forgot-password',
   ResetPassword = '/reset-password',
-  ResetPasswordSuccess = '/reset-password/success',
 }
 
 export const UNAUTH_ROUTES = [
   AppPath.Login,
   AppPath.SignUp,
+  AppPath.VerifyEmail,
   AppPath.ConfirmEmail,
   AppPath.EmailConfirmation,
   AppPath.ForgotPassword,
   AppPath.ResetPassword,
-  AppPath.ResetPasswordSuccess,
 ];

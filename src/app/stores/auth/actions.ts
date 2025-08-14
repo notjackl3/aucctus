@@ -1,9 +1,7 @@
-import api from '@libs/api';
 import { IAccount, IUser } from '@libs/api/types';
 import { produce } from 'immer';
 import type { IStoreApi } from '../store';
 import { IAuthState } from './store';
-import { isTokenExpired } from '../../../libs/utils/jwt';
 import analytics from '../../../libs/telemetry';
 
 export interface IAuthActions {
@@ -77,45 +75,24 @@ export function logout(this: IStoreApi<IAuthState>) {
   );
 }
 
+// Legacy JWT token storage - no longer used with Clerk authentication
 export async function storeTokens(
   this: IStoreApi<IAuthState>,
-  access: string | undefined,
-  refresh: string | undefined,
+  // _access: string | undefined,
+  // _refresh: string | undefined,
 ) {
-  const { set, get } = this;
-
-  if (!access || !refresh) {
-    get().clearTokens();
-    return;
-  }
-
-  // Validate access token before storing
-  try {
-    if (isTokenExpired(access, 0)) {
-      analytics.warn('Received expired access token, clearing tokens');
-      get().clearTokens();
-      return;
-    }
-  } catch (error) {
-    analytics.error('Invalid access token format, clearing tokens', error);
-    get().clearTokens();
-    return;
-  }
-
-  if (access !== api.accessToken) {
-    await api.setAccessToken(access);
-  }
-
-  set({ access, refresh });
+  // This function is kept for backward compatibility but does nothing
+  // All authentication is now handled by Clerk
+  analytics.debug(
+    'storeTokens called but JWT tokens are no longer used - using Clerk authentication',
+  );
 }
 
+// Legacy JWT token clearing - no longer used with Clerk authentication
 export function clearTokens(this: IStoreApi<IAuthState>) {
-  const { set } = this;
-
-  set(
-    produce((state: IAuthState) => {
-      state.access = undefined;
-      state.refresh = undefined;
-    }),
+  // This function is kept for backward compatibility but does nothing
+  // All authentication is now handled by Clerk
+  analytics.debug(
+    'clearTokens called but JWT tokens are no longer used - using Clerk authentication',
   );
 }

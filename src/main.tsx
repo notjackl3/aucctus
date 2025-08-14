@@ -5,10 +5,20 @@ import ReactDOM from 'react-dom/client';
 import { QueryCache, QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { toast } from '@components';
+import { ClerkProvider } from '@clerk/clerk-react';
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
 import App from './App';
 import { ModalProvider } from './app/context/ModalContextProvider';
+
+// Import Clerk Publishable Key
+const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if (!CLERK_PUBLISHABLE_KEY) {
+  throw new Error(
+    'Missing Clerk Publishable Key. Add VITE_CLERK_PUBLISHABLE_KEY to your .env file',
+  );
+}
 
 // if (__ENVIRONMENT__ !== 'development') {
 //   Sentry.init({
@@ -59,14 +69,16 @@ const queryClient = new QueryClient({
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <AuthBootstrap>
-          <ModalProvider>
-            <App />
-          </ModalProvider>
-        </AuthBootstrap>
-      </QueryClientProvider>
-    </BrowserRouter>
+    <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY}>
+      <BrowserRouter>
+        <QueryClientProvider client={queryClient}>
+          <AuthBootstrap>
+            <ModalProvider>
+              <App />
+            </ModalProvider>
+          </AuthBootstrap>
+        </QueryClientProvider>
+      </BrowserRouter>
+    </ClerkProvider>
   </React.StrictMode>,
 );

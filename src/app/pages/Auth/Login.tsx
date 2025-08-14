@@ -1,56 +1,109 @@
 import utils from '@libs/utils';
 import { FunctionComponent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { useAuth, useSignIn } from '@clerk/clerk-react';
 import { AppPath } from '../../../routes/routes';
 import InputField from '../../components/Input/InputField/InputField';
-import { useLogin } from '../../hooks/query/auth.hook';
+import { toast } from '@components';
+import telemetry from '@libs/telemetry';
 
 const Login: FunctionComponent = () => {
-  const { mutate: login, error, isLoading } = useLogin();
+  const { isLoaded, isSignedIn } = useAuth();
+  const { signIn, isLoaded: signInLoaded, setActive } = useSignIn();
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const handleSubmit = () => {
-    if (!email || !password || emailInputError) return;
+  // Handle sign-in with email/password
+  const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!signInLoaded || !signIn) return;
+
+    if (!email || !password) return;
 
     if (!utils.string.validEmail(email)) {
       setEmailInputError('Email is Invalid.');
       return;
     }
     setEmailInputError(undefined);
-    login({ email, password });
+
+    setIsLoading(true);
+
+    try {
+      const result = await signIn.create({
+        identifier: email,
+        password,
+      });
+
+      if (result.status === 'complete') {
+        await setActive({ session: result.createdSessionId });
+        toast.success('Successfully signed in!');
+        // Don't navigate immediately - let AuthBootstrap handle routing after user data is loaded
+      } else {
+        // Handle multi-factor auth or other verification steps
+        telemetry.log('Additional verification required:', result);
+        toast.error('Additional verification required');
+      }
+    } catch (err: any) {
+      telemetry.error('Sign-in error:', err);
+      const code = err?.errors?.[0]?.code;
+      if (code === 'strategy_for_user_invalid') {
+        // Migrated user without a password: redirect to Forgot Password to set one
+        toast.info('This account requires a password reset to sign in.');
+        const query = `${email ? `?email=${encodeURIComponent(email)}` : ''}${email ? '&' : '?'}resetRequired=1`;
+        navigate(`${AppPath.ForgotPassword}${query}`);
+        return;
+      }
+      if (err.errors?.[0]?.message) {
+        toast.error(err.errors[0].message);
+      } else {
+        toast.error('Sign-in failed. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return (
-    <>
-      <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
-        <span className='aucctus-text-brand-primary aucctus-header-sm-medium relative self-stretch'>
-          Login
-        </span>
-        <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
-          Welcome back! Please enter your details.
-        </span>
-        {error && (
-          <div className='aucctus-text-error-primary aucctus-text-lg'>
-            {utils.osiris.parseFormError(error)}
-          </div>
-        )}
+  // If Clerk is not loaded yet, show loading
+  if (!isLoaded || !signInLoaded) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        Loading...
       </div>
+    );
+  }
+
+  // If user is already signed in with Clerk, show loading while AuthBootstrap handles routing
+  if (isSignedIn) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        Loading...
+      </div>
+    );
+  }
+
+  // Main login form using Clerk authentication
+  return (
+    <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
+      <span className='aucctus-text-brand-primary aucctus-header-sm-medium relative self-stretch'>
+        Welcome back
+      </span>
+      <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
+        Sign in to your account
+      </span>
 
       <form
         className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault(); // Prevent default form submission
-            handleSubmit(); // Call the submit handler
-          }
-        }}
+        onSubmit={handleSignIn}
       >
         <InputField
           label='Email'
           name='email'
-          autoComplete='on'
+          autoComplete='email'
           errorMessage={emailInputError}
           value={email}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -62,7 +115,7 @@ const Login: FunctionComponent = () => {
         <InputField
           label='Password'
           name='password'
-          autoComplete='on'
+          autoComplete='current-password'
           isPassword
           value={password}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
@@ -70,22 +123,27 @@ const Login: FunctionComponent = () => {
           }
         />
 
-        <div className='aucctus-text-sm-medium aucctus-text-secondary px- flex w-full flex-row items-center justify-between'>
+        <div className='aucctus-text-sm-medium aucctus-text-secondary flex w-full flex-row items-center justify-between px-0'>
           <Link
-            className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
-            to='/forgot-password'
+            className='btn btn-link p-0 !text-gray-light-700 hover:!text-primary-900'
+            to={AppPath.ForgotPassword}
           >
             Forgot password
+          </Link>
+          <Link
+            className='btn btn-link p-0 !text-gray-light-700 hover:!text-primary-900'
+            to={`${AppPath.VerifyEmail}${email ? `?email=${encodeURIComponent(email)}` : ''}`}
+          >
+            Verify email
           </Link>
         </div>
 
         <button
-          type='button'
+          type='submit'
           className='btn btn-primary'
-          onClick={handleSubmit}
           disabled={!email || !password || !!emailInputError || isLoading}
         >
-          Login
+          {isLoading ? 'Signing in...' : 'Sign in'}
         </button>
 
         <div className='flex flex-row items-center justify-between px-1'>
@@ -100,7 +158,7 @@ const Login: FunctionComponent = () => {
           </Link>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 

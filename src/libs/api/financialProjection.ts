@@ -30,13 +30,9 @@ import {
  * Handles all the requests for the Financial Projection V2 backend.
  */
 export class FinancialProjectionApi extends ApiService {
-  protected _excludeAllFromRefresh: boolean = false;
-  protected _excludePathFromRefresh: string[] = [];
-
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     super(apiInstance, apiConfig);
     this._setupMiddleware();
-    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
   // Financial Projection methods

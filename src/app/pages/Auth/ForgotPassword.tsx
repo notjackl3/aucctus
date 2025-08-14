@@ -1,91 +1,167 @@
-import utils from '@libs/utils';
-import { FunctionComponent, useCallback, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { FunctionComponent, useEffect, useState } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { useAuth, useSignIn } from '@clerk/clerk-react';
+import utils from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import FeatureIcon from '../../components/Icon/FeatureIcon';
-import Icon from '../../components/Icon/Icon/Icon';
 import InputField from '../../components/Input/InputField/InputField';
-import { useRequestPasswordReset } from '../../hooks/query/auth.hook';
+import { toast } from '@components';
+import telemetry from '@libs/telemetry';
 
 const ForgotPassword: FunctionComponent = () => {
-  const [email, setEmail] = useState('');
+  const { isLoaded, isSignedIn } = useAuth();
+  const { signIn, isLoaded: signInLoaded } = useSignIn();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState<string>('');
   const [emailInputError, setEmailInputError] = useState<string | undefined>();
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const {
-    mutate: requestPasswordReset,
-    isSuccess,
-    error,
-  } = useRequestPasswordReset();
+  const emailFromParams = searchParams.get('email') || '';
+  const resetRequired = searchParams.get('resetRequired') === '1';
 
-  const _handleEmailValidation = useCallback(
-    (e: React.FocusEvent) => {
-      if (email && !utils.string.validEmail(email)) {
-        setEmailInputError('Email is Invalid.');
+  useEffect(() => {
+    if (emailFromParams) {
+      setEmail(emailFromParams);
+    }
+  }, [emailFromParams]);
+
+  // Handle sending password reset code
+  const handleSendResetCode = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!signInLoaded || !signIn) return;
+
+    if (!email?.trim()) {
+      toast.error('Email is required');
+      return;
+    }
+
+    if (!utils.string.validEmail(email)) {
+      setEmailInputError('Email is Invalid.');
+      return;
+    }
+
+    setEmailInputError(undefined);
+    setIsLoading(true);
+
+    try {
+      telemetry.debug('Initiating password reset for:', {
+        email: email.trim(),
+      });
+
+      await signIn.create({
+        strategy: 'reset_password_email_code',
+        identifier: email.trim(),
+      });
+
+      toast.success(
+        resetRequired
+          ? 'Password reset required. Check your email for the reset code.'
+          : 'Password reset code sent to your email!',
+      );
+      // Redirect directly to reset password page
+      navigate(`${AppPath.ResetPassword}?email=${encodeURIComponent(email)}`);
+    } catch (err: any) {
+      telemetry.error('Password reset request error:', err);
+
+      if (err.errors?.[0]?.code === 'form_identifier_not_found') {
+        toast.error(
+          'No account found with this email address. Please check your email or sign up for a new account.',
+        );
+      } else if (err.errors?.[0]?.message) {
+        toast.error(err.errors[0].message);
       } else {
-        setEmailInputError(undefined);
+        toast.error('Failed to send reset code. Please try again.');
       }
-      e.preventDefault();
-    },
-    [email],
-  );
-
-  const handleRequestPasswordReset = (e?: React.FormEvent) => {
-    e?.preventDefault();
-    requestPasswordReset(email, {
-      onSuccess: () => setIsSubmitted(true),
-    });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  // If Clerk is not loaded yet, show loading
+  if (!isLoaded || !signInLoaded) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        Loading...
+      </div>
+    );
+  }
+
+  // If user is already signed in with Clerk, show loading while AuthBootstrap handles routing
+  if (isSignedIn) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        Loading...
+      </div>
+    );
+  }
+
+  // Main forgot password form
   return (
-    <>
-      <div className={`${styles.header} ${styles.h2}`}>
-        <FeatureIcon icon={'key'} color={'primary'} />
-        <span className={styles.title}>Forgot Password</span>
-        <span className={styles.success}>
-          {isSuccess && isSubmitted
-            ? 'Instructions to reset your password have been emailed to you.'
-            : ''}
-        </span>
-        <span className={styles.error}>
-          {!!error ? utils.osiris.parseFormError(error) : ''}
-        </span>
-      </div>
-      {!isSubmitted ? (
-        <form
-          className={styles.basicForm}
-          onSubmit={handleRequestPasswordReset}
+    <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
+      <span className='aucctus-text-brand-primary aucctus-header-sm-medium relative self-stretch'>
+        {resetRequired ? 'Reset your password' : 'Forgot Your Password?'}
+      </span>
+      <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
+        Enter your email address and we&apos;ll send you a code to reset your
+        password. If you&apos;re a new user or haven&apos;t set a password yet,
+        this will let you create one.
+      </span>
+
+      <form
+        className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
+        onSubmit={handleSendResetCode}
+      >
+        <InputField
+          label='Email'
+          name='email'
+          autoComplete='email'
+          errorMessage={emailInputError}
+          value={email}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setEmail(e.target.value)
+          }
+          onFocus={() => setEmailInputError(undefined)}
+          required
+          disabled={resetRequired}
+        />
+
+        <button
+          type='submit'
+          className='btn btn-primary'
+          disabled={!email?.trim() || !!emailInputError || isLoading}
         >
-          <InputField
-            name='email'
-            label={'Email'}
-            type='email'
-            placeholder='Enter your email'
-            value={email}
-            autoComplete='on'
-            errorMessage={emailInputError}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setEmail(e.target.value)
-            }
-            onFocus={() => setEmailInputError(undefined)}
-            onBlur={_handleEmailValidation}
-          />
-          <button
-            type='submit'
-            className='btn btn-primary'
-            disabled={!email || !!emailInputError}
-          >
-            Reset Password
-          </button>
-        </form>
-      ) : null}
-      <div className={styles.signUp}>
-        <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-          <Icon variant='arrowleft' width={20} height={20} /> Back to login
-        </Link>
-      </div>
-    </>
+          {isLoading ? 'Sending Code...' : 'Send Reset Code'}
+        </button>
+
+        <div className='flex flex-col items-center gap-4'>
+          <div className='flex flex-row items-center justify-between px-1'>
+            <span className='aucctus-text-tertiary aucctus-text-md'>
+              Remember your password?
+            </span>
+            <Link
+              className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
+              to={AppPath.Login}
+            >
+              Sign in
+            </Link>
+          </div>
+
+          <div className='flex flex-row items-center justify-between px-1'>
+            <span className='aucctus-text-tertiary aucctus-text-md'>
+              Don&apos;t have an account?
+            </span>
+            <Link
+              className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
+              to={AppPath.SignUp}
+            >
+              Sign up
+            </Link>
+          </div>
+        </div>
+      </form>
+    </div>
   );
 };
 

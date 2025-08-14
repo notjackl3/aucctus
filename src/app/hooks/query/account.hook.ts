@@ -10,7 +10,7 @@ import {
   IUserDetailsResponse,
   IUserQueryOptions,
 } from '../../../libs/api/types';
-import { useLogout } from './auth.hook';
+import { useClerk } from '@clerk/clerk-react';
 import { AucctusQueryKeys } from './query-keys';
 
 const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
@@ -45,7 +45,7 @@ export const useUserDetails = (enabled: boolean) => {
 
 export const useUser = () => {
   const { setUser, setAccount } = useStore((state) => state.auth);
-  const { mutate: logout } = useLogout();
+  const { signOut } = useClerk();
 
   const query = useQuery({
     queryKey: [AucctusQueryKeys.userDetails],
@@ -60,7 +60,7 @@ export const useUser = () => {
         const status = error.response?.status;
         if ([401, 403, 419].includes(status || 0)) {
           // Log the user out if we have an unauthenticated error
-          logout();
+          signOut();
         }
       }
     },

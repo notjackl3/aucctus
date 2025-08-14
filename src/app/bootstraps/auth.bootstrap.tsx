@@ -1,111 +1,77 @@
 import { useUser } from '@hooks/query/account.hook';
-import { useRefresh } from '@hooks/query/auth.hook';
 import useStore from '@stores/store';
 import React from 'react';
 import api from '../../libs/api';
 import LoadingScreen from '../pages/LoadingScreen';
-import { useTokenRefreshWatcher } from '../hooks/auth/token-refresh.hook';
-import { shouldRefreshToken } from '../../libs/utils/jwt';
-import telemetry from '../../libs/telemetry';
+import { useAuth, useUser as useClerkUser } from '@clerk/clerk-react';
+import telemetry from '@libs/telemetry';
 
 const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { access, initialized, clearTokens, setInitialized, isAuthenticated } =
-    useStore((state) => state.auth);
+  const { setInitialized } = useStore((state) => state.auth);
+  const { refetch: checkAuthentication, isLoading: isUserDataLoading } =
+    useUser();
 
-  const { mutateAsync: refreshAsync, mutateAsync: refreshToken } = useRefresh();
-  const { refetch: checkAuthentication } = useUser();
-  const isReauthingRef = React.useRef(false);
+  // Clerk hooks
+  const { isSignedIn, getToken, isLoaded } = useAuth();
+  const { user: clerkUser } = useClerkUser();
 
-  // Add token refresh watcher
-  useTokenRefreshWatcher();
+  // Track if we've set up Clerk token getter and if user data has been fetched
+  const [clerkTokenSetupComplete, setClerkTokenSetupComplete] =
+    React.useState(false);
+  const [userDataFetched, setUserDataFetched] = React.useState(false);
 
-  // Use state to trigger a re-render.
-  const [refreshActionSet, setRefreshActionSet] = React.useState(false);
-  // Use a ref to track if we've already executed the effect logic.
-  const effectRan = React.useRef(false);
-
-  // Attempt to re-authenticate when user re-activates the page (blur/focus, visibility change)
+  // Set up Clerk token getter once when Clerk is loaded
   React.useEffect(() => {
-    const handleReauth = async () => {
-      if (isReauthingRef.current) {
-        return;
-      }
+    if (isLoaded && !clerkTokenSetupComplete) {
+      // Set Clerk token getter for API calls
+      api.setClerkTokenGetter(getToken);
+      setClerkTokenSetupComplete(true);
+      setInitialized(true);
+    }
+  }, [isLoaded, getToken, clerkTokenSetupComplete, setInitialized]);
 
-      isReauthingRef.current = true;
-
-      if (
-        document.visibilityState === 'visible' &&
-        isAuthenticated() &&
-        access &&
-        shouldRefreshToken(access, 300)
-      ) {
-        try {
-          telemetry.log(
-            'handleReauth - document.visibilityState:',
-            document.visibilityState,
-            'isAuthenticated',
-            isAuthenticated(),
-            'access',
-            access,
-          );
-          await refreshToken();
-        } catch (error) {
-          telemetry.error('Visibility change token refresh failed', error);
+  // Handle Clerk authentication state changes
+  React.useEffect(() => {
+    if (isLoaded && clerkTokenSetupComplete) {
+      if (isSignedIn && clerkUser) {
+        // User is signed in with Clerk, fetch user data from Django backend
+        if (!userDataFetched) {
+          checkAuthentication().finally(() => {
+            setUserDataFetched(true);
+          });
         }
-      } else {
-        telemetry.log(
-          'handleReauth - document.visibilityState:',
-          document.visibilityState,
-          'isAuthenticated',
-          isAuthenticated(),
-          'access',
-          access,
-        );
-      }
 
-      isReauthingRef.current = false;
-    };
-
-    document.addEventListener('visibilitychange', handleReauth);
-    window.addEventListener('focus', handleReauth);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleReauth);
-      window.removeEventListener('focus', handleReauth);
-    };
-  }, [access, isAuthenticated, refreshToken]);
-
-  React.useEffect(() => {
-    // Guard against running twice (e.g. due to StrictMode)
-    if (effectRan.current) return;
-    effectRan.current = true;
-
-    (async () => {
-      if (!refreshActionSet) {
-        api.setRefreshTokenAction(refreshAsync, () => {
-          setRefreshActionSet(true);
+        // Reconnect WebSocket with fresh Clerk token
+        api.aucctusSocket.reconnectWithClerkToken().catch((error) => {
+          telemetry.error(
+            'Failed to reconnect WebSocket with Clerk token:',
+            error,
+          );
         });
-        api.setLogoutAction(clearTokens);
-        setInitialized(true);
+      } else if (!isSignedIn) {
+        // User is not signed in, disconnect WebSocket and reset user data state
+        api.aucctusSocket.disconnect();
+        setUserDataFetched(false);
       }
-    })();
+    }
   }, [
-    refreshAsync,
-    clearTokens,
-    refreshActionSet,
+    isLoaded,
+    isSignedIn,
+    clerkUser,
+    clerkTokenSetupComplete,
     checkAuthentication,
-    setInitialized,
+    userDataFetched,
   ]);
 
-  React.useEffect(() => {
-    if (initialized && !!access) {
-      checkAuthentication();
-    }
-  }, [initialized, access, checkAuthentication]);
+  // Show loading until Clerk is loaded, token setup is complete, and user data is fetched (if signed in)
+  if (!isLoaded || !clerkTokenSetupComplete) {
+    return <LoadingScreen />;
+  }
 
-  if (!refreshActionSet) {
+  // If user is signed in but we haven't fetched user data yet, show loading
+  if (isSignedIn && clerkUser && (!userDataFetched || isUserDataLoading)) {
     return <LoadingScreen />;
   }
 

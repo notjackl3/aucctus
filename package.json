@@ -27,6 +27,7 @@
     "release-github": "node scripts/github-release.js"
   },
   "dependencies": {
+    "@clerk/clerk-react": "^5.38.0",
     "@dhmk/zustand-lens": "^5.0.0",
     "@floating-ui/react-dom": "^2.1.1",
     "@radix-ui/react-avatar": "^1.1.0",

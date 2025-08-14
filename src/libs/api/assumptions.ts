@@ -35,13 +35,9 @@ interface IAssumptionsV2PageResponse extends IPageResponse<IAssumptionV2> {
 }
 
 export class AssumptionsApi extends ApiService {
-  protected _excludeAllFromRefresh: boolean = false;
-  protected _excludePathFromRefresh: string[] = [];
-
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     super(apiInstance, apiConfig);
     this._setupMiddleware(); // Rebind interceptor functions
-    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
   // TODO: DEPRECATE - V1 API method. Remove once all components use getAllFiltered (V2)

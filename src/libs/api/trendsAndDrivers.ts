@@ -11,13 +11,9 @@ import type {
 } from './types/concept/trendsAndDriversV3';
 
 export class TrendsAndDriversV3Api extends ApiService {
-  protected _excludeAllFromRefresh: boolean = false;
-  protected _excludePathFromRefresh: string[] = [];
-
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     super(apiInstance, apiConfig);
     this._setupMiddleware();
-    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
   // Trend CRUD operations

@@ -1,12 +1,13 @@
 import NavLogo from '@assets/aucctus_logo.png';
 import NavWord from '@assets/aucctus_nav_word.png';
 import { Avatar } from '@components';
+import { useClerk } from '@clerk/clerk-react';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useLogout } from '../../../hooks/query/auth.hook';
+// Legacy useLogout hook removed - using Clerk's useClerk hook
 import styles from './drawer.module.scss';
 import NavButton from './NavButton';
 import NavLink from './NavLink';
@@ -17,7 +18,7 @@ interface NavDrawerProps {
 
 const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
   const { user, account } = useStore((state) => state.auth);
-  const { mutate: logout } = useLogout();
+  const { signOut } = useClerk();
   const [collapsed, setCollapsed] = useState(true);
 
   const navigate = useNavigate();
@@ -106,9 +107,9 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
             <NavButton
               title='Logout'
               icon='logout'
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.preventDefault();
-                logout();
+                await signOut();
               }}
               collapsed={collapsed}
             />
@@ -118,6 +119,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
               [styles.collapsed]: collapsed,
             })}
           >
+            {/* Always show local user data with traditional Avatar component */}
             <Avatar
               firstName={user?.firstName || ''}
               lastName={user?.lastName || ''}

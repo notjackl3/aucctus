@@ -62,7 +62,9 @@ export class SocketService {
     protected api: Api,
     config: ISocketConfig,
   ) {
-    this._accessToken = api.accessToken;
+    // Legacy JWT token support maintained for backward compatibility
+    // Primary authentication now uses Clerk tokens via api.getToken()
+    this._accessToken = undefined;
     // Default max retries to 5 if not provided
     this.config = Object.assign({ maxRetries: 5 }, config);
     this.reconnectInterval = config.reconnectInterval ?? 3000;
@@ -148,10 +150,23 @@ export class SocketService {
       return;
     }
 
-    if (!this._accessToken) {
+    // Get Clerk token from API instance
+    let clerkToken: string | undefined;
+    try {
+      clerkToken = await this.api.getToken();
+    } catch (error) {
+      analytics.error('Failed to get Clerk token for WebSocket', error);
+    }
+
+    // Use Clerk token if available, otherwise fall back to legacy token
+    const tokenToUse = clerkToken || this._accessToken;
+
+    if (!tokenToUse) {
       telemetry.log('websocket.connection.attempt.no_token', {
         baseUrl: this.config.baseUrl,
         retryCount: this.currentRetryCount,
+        hasClerkToken: !!clerkToken,
+        hasLegacyToken: !!this._accessToken,
       });
       return;
     }
@@ -161,12 +176,13 @@ export class SocketService {
       baseUrl: this.config.baseUrl,
       retryCount: this.currentRetryCount,
       maxRetries: this.config.maxRetries,
-      hasToken: !!this._accessToken,
+      hasToken: !!tokenToUse,
+      tokenType: clerkToken ? 'clerk' : 'legacy',
     });
 
     // Build the URL by appending the token as a query parameter.
     const urlObj = new URL(this.config.baseUrl);
-    urlObj.searchParams.append('token', this._accessToken);
+    urlObj.searchParams.append('token', tokenToUse);
     const url = urlObj.toString();
 
     // Create the WebSocket connection.
@@ -493,27 +509,30 @@ export class SocketService {
       ].includes(code)
     ) {
       try {
-        // Log token refresh attempt
-        telemetry.log('websocket.token.refresh.attempt', {
-          code,
-          hasPendingRefresh: !!this.api.pendingRefresh,
-        });
+        // Try to get a fresh Clerk token
+        const clerkToken = await this.api.getToken();
 
-        // Attempt to refresh the token
-        if (this.api.pendingRefresh) {
-          await this.api.pendingRefresh;
+        if (clerkToken) {
+          telemetry.log('websocket.token.refresh.success', {
+            code,
+            message: 'Got fresh Clerk token for WebSocket reconnection',
+          });
+
+          // Return true to indicate we should attempt reconnection with the new token
+          return true;
         } else {
-          await this.api.refreshToken();
+          telemetry.log('websocket.token.refresh.no_clerk_token', {
+            code,
+            message: 'No Clerk token available for WebSocket reconnection',
+          });
+
+          return false;
         }
-
-        // Log successful token refresh
-        telemetry.log('websocket.token.refresh.success', {
-          code,
-        });
-
-        return true;
       } catch (error) {
-        analytics.error('Failed to refresh token', error);
+        analytics.error(
+          'Failed to get Clerk token for WebSocket reconnection',
+          error,
+        );
 
         // Log failed token refresh
         telemetry.log('websocket.token.refresh.failed', {
@@ -547,5 +566,31 @@ export class SocketService {
     this.authErrorListeners = this.authErrorListeners.filter(
       (l) => l !== listener,
     );
+  }
+
+  /**
+   * Force reconnection with fresh Clerk token
+   * Useful when user authentication state changes
+   */
+  public async reconnectWithClerkToken(): Promise<void> {
+    telemetry.log('websocket.reconnect.clerk_token_requested', {
+      baseUrl: this.config.baseUrl,
+      currentlyConnected: this._isConnected,
+    });
+
+    // Disconnect if currently connected
+    if (this._ws && this._ws.readyState === WebSocket.OPEN) {
+      this._ws.close(
+        WebSocketCloseCode.NORMAL_CLOSURE,
+        'Reconnecting with fresh token',
+      );
+    }
+
+    // Reset connection state
+    this._isConnected = false;
+    this.currentRetryCount = 0;
+
+    // Attempt to connect with fresh Clerk token
+    await this.connect();
   }
 }

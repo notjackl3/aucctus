@@ -16,13 +16,9 @@ import type {
  * Handles all the requests for the Seed.
  */
 export class SeedApi extends ApiService {
-  protected _excludeAllFromRefresh: boolean = false;
-  protected _excludePathFromRefresh: string[] = [];
-
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     super(apiInstance, apiConfig);
     this._setupMiddleware(); // Rebind interceptor functions
-    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
   getSeed(

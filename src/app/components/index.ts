@@ -15,6 +15,7 @@ import Select from './Select';
 import Table from './Tables';
 import Text from './Text';
 import { toast } from './Notification/toast';
+import OrganizationSetup from './Auth/OrganizationSetup';
 
 // Components
 import Avatar from './Avatar';
@@ -34,8 +35,8 @@ export {
   BetaDisclaimer,
   Button,
   Card,
-  ComponentCarousel,
   Chart,
+  ComponentCarousel,
   ComponentTooltip,
   Container,
   FileDropzone,
@@ -44,8 +45,9 @@ export {
   Input,
   Legend,
   Loading,
-  Progress,
   Modal,
+  OrganizationSetup,
+  Progress,
   Select,
   Table,
   Text,

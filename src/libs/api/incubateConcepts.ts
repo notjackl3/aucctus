@@ -9,13 +9,9 @@ import type {
 } from './types';
 
 export class IncubateConceptApi extends ApiService {
-  protected _excludeAllFromRefresh: boolean = false;
-  protected _excludePathFromRefresh: string[] = [];
-
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     super(apiInstance, apiConfig);
     this._setupMiddleware(); // Rebind interceptor functions
-    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
   generateClarifyingQuestions(uuid: string, conceptUuid?: string) {

@@ -9,6 +9,7 @@ const usePublicRoutes = () => {
     <Route element={<Layout.Public />}>
       <Route index path={AppPath.Login} element={<Page.Auth.Login />} />
       <Route path={AppPath.SignUp} element={<Page.Auth.SignUp />} />
+      <Route path={AppPath.VerifyEmail} element={<Page.Auth.VerifyEmail />} />
       <Route
         path={AppPath.ForgotPassword}
         element={<Page.Auth.ForgotPassword />}
@@ -17,15 +18,7 @@ const usePublicRoutes = () => {
         path={AppPath.ResetPassword}
         element={<Page.Auth.ResetPassword />}
       />
-      <Route
-        path={AppPath.ResetPasswordSuccess}
-        element={<Page.Auth.ResetPasswordSuccess />}
-      />
       <Route path={AppPath.ConfirmEmail} element={<Page.Auth.ConfirmEmail />} />
-      <Route
-        path={AppPath.EmailConfirmation}
-        element={<Page.Auth.EmailConfirmation />}
-      />
     </Route>
   );
 };

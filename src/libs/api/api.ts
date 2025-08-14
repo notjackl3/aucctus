@@ -1,10 +1,9 @@
 import { HeadersDefaults } from 'axios';
-import { toast } from '@components';
 import analytics from '../telemetry';
 import { AccountApi } from './account';
 import { ArticleApi } from './article';
 import { AssumptionsApi } from './assumptions';
-import { AuthApi } from './auth';
+// AuthApi removed - using Clerk for authentication
 import { IApiServiceConfig } from './base/apiService';
 import { ISocketConfig, SocketService } from './base/socketService';
 import { ConceptApi } from './concepts';
@@ -15,7 +14,7 @@ import { MarketScanApi } from './marketScan';
 import { SeedApi } from './seed';
 import { TestingApi } from './testing';
 import { TrendsAndDriversV3Api } from './trendsAndDrivers';
-import { ITokenResponse } from './types';
+// ITokenResponse no longer needed - using Clerk tokens
 
 export interface IApiConfig {
   /* End Points */
@@ -30,14 +29,8 @@ export interface IApiConfig {
 
 export class Api {
   private _config: IApiConfig;
+  private _clerkTokenGetter?: () => Promise<string | null>;
 
-  private _accessToken?: string;
-  private _refreshTokenAction?: () => Promise<ITokenResponse | undefined>;
-  private _logoutAction?: () => void;
-
-  pendingRefresh?: Promise<ITokenResponse | undefined> = void 0;
-
-  auth: AuthApi;
   account!: AccountApi;
   concept!: ConceptApi;
   seed!: SeedApi;
@@ -52,13 +45,6 @@ export class Api {
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
-
-    this.auth = new AuthApi(
-      this,
-      this.buildConfig({
-        baseURL: this._config.baseUrl,
-      }),
-    );
 
     // Configure socket settings.
     const socketConfig: ISocketConfig = {
@@ -93,50 +79,24 @@ export class Api {
     });
   }
 
-  get accessToken() {
-    return this._accessToken;
-  }
-
-  /**
-   * 🚨 BUG FIX: Fixed duplicate WebSocket token assignment
-   * ISSUE: this.aucctusSocket.accessToken = token called TWICE, causing multiple connections
-   * FIX: Removed duplicate assignment
-   * Lesson: Watch for copy-paste errors, use telemetry to track token changes
-   */
-  set accessToken(token: string | undefined) {
-    if (token === this._accessToken) {
-      return;
+  // Method to get Clerk token for API requests
+  async getToken(): Promise<string | undefined> {
+    if (this._clerkTokenGetter) {
+      try {
+        const clerkToken = await this._clerkTokenGetter();
+        if (clerkToken) {
+          return clerkToken;
+        }
+      } catch (error) {
+        analytics.error('Failed to get Clerk token', error);
+      }
     }
-
-    // Update all pointing to the resource server with the new tokens
-    // By default however,  the access token and refresh token are set to the httpOnly cookies
-    // This is simply just an extra layer.
-    [
-      this.account,
-      this.concept,
-      this.conceptIncubate,
-      this.assumption,
-      this.marketScan,
-      this.seed,
-      this.testing,
-      this.financialProjection,
-      this.trendsAndDriversV3,
-    ].forEach((api) => {
-      api.updateConfigHeaders({ Authorization: `Bearer ${token}` });
-      api.config.headers = Object.assign({}, api.config.headers, {
-        Authorization: `Bearer ${token}`,
-      });
-    });
-
-    // Set socket token ONCE (removed duplicate assignment)
-    this.aucctusSocket.accessToken = token;
-
-    analytics.debug('Setting Access Token');
-    this._accessToken = token;
+    return undefined;
   }
 
-  async setAccessToken(token: string | undefined) {
-    this.accessToken = token;
+  // Method to set Clerk token getter
+  setClerkTokenGetter(getter: () => Promise<string | null>) {
+    this._clerkTokenGetter = getter;
   }
 
   buildConfig(config: IApiServiceConfig): IApiServiceConfig {
@@ -147,50 +107,6 @@ export class Api {
       timeoutSeconds: this._config.timeoutSeconds,
       debug: this._config.debug,
     });
-  }
-
-  // Method to update the refresh token action dynamically
-  setRefreshTokenAction(
-    action: () => Promise<ITokenResponse | undefined>,
-    callback?: () => void,
-  ) {
-    this._refreshTokenAction = action;
-    if (callback) {
-      callback();
-    }
-  }
-
-  // Method to update the logout action dynamically
-  setLogoutAction(action: () => void) {
-    this._logoutAction = action;
-  }
-
-  // Expose these actions through methods to be used in ApiService
-  async refreshToken() {
-    try {
-      if (this._refreshTokenAction !== undefined) {
-        this.pendingRefresh = this._refreshTokenAction();
-        const result = await this.pendingRefresh.finally(() => {
-          this.pendingRefresh = void 0;
-        });
-        return result;
-      } else {
-        throw new Error('Refresh token action has not been set.');
-      }
-    } catch (error) {
-      analytics.error('Error refreshing token', error);
-      // Re-throw the error so the caller can handle it
-      throw error;
-    }
-  }
-
-  logout() {
-    if (this._logoutAction !== undefined) {
-      toast.warning('You have been logged out. Please login again.');
-      return this._logoutAction();
-    } else {
-      analytics.warn('Logout action has not been set.');
-    }
   }
 }
 

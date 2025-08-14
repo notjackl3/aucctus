@@ -18,14 +18,9 @@ import {
  * Handles all the requests for the accounts and users that require authentication.
  */
 export class AccountApi extends ApiService {
-  protected _excludeAllFromRefresh: boolean = false;
-  protected _excludePathFromRefresh: string[] = [];
-
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     super(apiInstance, apiConfig);
     this._setupMiddleware(); // Rebind interceptor functions
-
-    this._shouldSkipRefresh = this._shouldSkipRefresh.bind(this);
   }
 
   getAccount() {

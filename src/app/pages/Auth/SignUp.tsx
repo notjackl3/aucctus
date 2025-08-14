@@ -1,12 +1,18 @@
-import { FunctionComponent, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { FunctionComponent, useState, useEffect } from 'react';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
+import { useAuth, useSignUp } from '@clerk/clerk-react';
 import utils from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import styles from '../../assets/styles/pages/auth-screens.module.scss';
 import InputField from '../../components/Input/InputField/InputField';
-import { useSignUp } from '../../hooks/query/auth.hook';
+import { toast } from '@components';
+import telemetry from '@libs/telemetry';
 
 const SignUp: FunctionComponent = () => {
+  const { isLoaded, isSignedIn } = useAuth();
+  const { signUp, isLoaded: signUpLoaded, setActive } = useSignUp();
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -16,145 +22,383 @@ const SignUp: FunctionComponent = () => {
   const [confirmPassInputError, setConfirmPassInputError] = useState<
     string | undefined
   >();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const { mutate: signUp, error, isLoading } = useSignUp();
+  // Extract invitation token from URL
+  const invitationToken = searchParams.get('__clerk_ticket');
+  const isInvitationFlow = !!invitationToken;
 
-  const handleSignUp = () => {
-    if (!utils.string.validEmail(email)) {
-      setEmailInputError('Email is invalid.');
-      return;
+  // If there's no invitation token but user accessed with clerk status, show error
+  const clerkStatus = searchParams.get('__clerk_status');
+  const hasInvalidInvitation = clerkStatus === 'sign_up' && !invitationToken;
+
+  // Clear email field when in invitation mode since it's not needed
+  useEffect(() => {
+    if (isInvitationFlow && email) {
+      setEmail('');
+      setEmailInputError(undefined);
+    }
+  }, [isInvitationFlow, email]);
+
+  // Handle sign-up with email/password or invitation
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!signUpLoaded || !signUp) return;
+
+    // For invitation flow, we need password and preferably names
+    // Email is automatically set from the invitation
+    if (isInvitationFlow) {
+      if (!password || !confirmPassword) {
+        if (!password) toast.error('Password is required');
+        else if (!confirmPassword)
+          toast.error('Password confirmation is required');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setConfirmPassInputError('Passwords do not match');
+        return;
+      }
+
+      // Encourage providing names for invitation flow
+      if (!firstName?.trim() || !lastName?.trim()) {
+        telemetry.debug(
+          'Names not provided for invitation flow, but continuing',
+        );
+      }
+    } else {
+      // Regular signup flow validation
+      if (
+        !firstName?.trim() ||
+        !lastName?.trim() ||
+        !email?.trim() ||
+        !password ||
+        !confirmPassword
+      ) {
+        if (!firstName?.trim()) toast.error('First name is required');
+        else if (!lastName?.trim()) toast.error('Last name is required');
+        else if (!email?.trim()) toast.error('Email is required');
+        else if (!password) toast.error('Password is required');
+        else if (!confirmPassword)
+          toast.error('Password confirmation is required');
+        return;
+      }
+
+      if (!utils.string.validEmail(email)) {
+        setEmailInputError('Email is Invalid.');
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setConfirmPassInputError('Passwords do not match');
+        return;
+      }
     }
 
     setEmailInputError(undefined);
+    setConfirmPassInputError(undefined);
+    setIsLoading(true);
 
-    signUp({ firstName, lastName, email, password, confirmPassword });
-  };
+    try {
+      let result;
 
-  const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    handleSignUp();
-  };
+      if (isInvitationFlow && invitationToken) {
+        // Handle invitation-based signup
+        telemetry.debug('Creating Clerk account with invitation token:', {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          hasPassword: !!password,
+          hasToken: !!invitationToken,
+        });
 
-  const _handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const pass = e.target.value;
-    setPassword(pass);
-    setConfirmPassErrorOnCondition(
-      !!confirmPassword && confirmPassword !== pass,
-    );
-  };
+        // For invitation flow, only use strategy, ticket, and password in create
+        result = await signUp.create({
+          strategy: 'ticket',
+          ticket: invitationToken,
+          password,
+        });
 
-  const _handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const cPassword = e.target.value;
-    setConfirmPassword(cPassword);
-    setConfirmPassErrorOnCondition(cPassword !== password);
-  };
+        telemetry.debug('Initial signup result:', result);
 
-  const setConfirmPassErrorOnCondition = (condition: boolean) => {
-    if (condition) {
-      setConfirmPassInputError('Passwords do not match');
-    } else {
-      setConfirmPassInputError(undefined);
+        // After successful create, update with names if provided and if signup allows updates
+        if (
+          (result.status === 'missing_requirements' ||
+            result.status === 'complete') &&
+          (firstName.trim() || lastName.trim())
+        ) {
+          try {
+            const updateParams: any = {};
+            if (firstName.trim()) updateParams.firstName = firstName.trim();
+            if (lastName.trim()) updateParams.lastName = lastName.trim();
+
+            telemetry.debug('Updating signup with names:', updateParams);
+            const updateResult = await signUp.update(updateParams);
+
+            // Use the update result if it's more complete
+            if (
+              updateResult.status === 'complete' ||
+              updateResult.status !== result.status
+            ) {
+              result = updateResult;
+            }
+
+            telemetry.debug('Update result:', updateResult);
+          } catch (updateErr: any) {
+            telemetry.error(
+              'Failed to update signup with name fields:',
+              updateErr,
+            );
+            // Continue with the original result - names might not be required
+          }
+        }
+      } else {
+        // Regular signup flow
+        telemetry.debug('Creating Clerk account with:', {
+          emailAddress: email.trim(),
+          hasPassword: !!password,
+        });
+
+        // Create with only allowed params
+        result = await signUp.create({
+          emailAddress: email.trim(),
+          password,
+        });
+
+        // Best-effort: attach names after create if provided
+        if (firstName.trim() || lastName.trim()) {
+          try {
+            const updateParams: any = {};
+            if (firstName.trim()) updateParams.firstName = firstName.trim();
+            if (lastName.trim()) updateParams.lastName = lastName.trim();
+            telemetry.debug(
+              'Updating signup with names (regular flow):',
+              updateParams,
+            );
+            const updateResult = await signUp.update(updateParams);
+            if (
+              updateResult.status === 'complete' ||
+              updateResult.status !== result.status
+            ) {
+              result = updateResult;
+            }
+          } catch (updateErr: any) {
+            telemetry.error(
+              'Failed to update signup with name fields (regular flow):',
+              updateErr,
+            );
+          }
+        }
+      }
+
+      if (result.status === 'complete') {
+        // Account created and user signed in automatically
+        await setActive({ session: result.createdSessionId });
+        if (isInvitationFlow) {
+          toast.success('Invitation accepted! Account created successfully!');
+        } else {
+          toast.success('Account created successfully!');
+        }
+        // Don't navigate immediately - let AuthBootstrap handle routing after user data is loaded
+      } else {
+        // For regular signup, delegate verification to VerifyEmail page
+        if (!isInvitationFlow) {
+          await signUp.prepareEmailAddressVerification({
+            strategy: 'email_code',
+          });
+          toast.info('Please check your email for a verification code');
+          const emailParam = email
+            ? `email=${encodeURIComponent(email.trim())}`
+            : '';
+          const sentParam = 'sent=1';
+          const query = [emailParam, sentParam].filter(Boolean).join('&');
+          navigate(`${AppPath.VerifyEmail}${query ? `?${query}` : ''}`);
+        } else {
+          // This shouldn't happen with invitation flow, but handle it just in case
+          toast.error('Unable to complete account creation. Please try again.');
+        }
+      }
+    } catch (err: any) {
+      telemetry.error('Sign-up error:', err);
+      if (err.errors?.[0]?.message) {
+        toast.error(err.errors[0].message);
+      } else {
+        if (isInvitationFlow) {
+          toast.error('Failed to accept invitation. Please try again.');
+        } else {
+          toast.error('Sign-up failed. Please try again.');
+        }
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <>
+  // Email verification handled by dedicated VerifyEmail page
+
+  // If Clerk is not loaded yet, show loading
+  if (!isLoaded || !signUpLoaded) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        Loading...
+      </div>
+    );
+  }
+
+  // If user is already signed in with Clerk, show loading while AuthBootstrap handles routing
+  if (isSignedIn) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        Loading...
+      </div>
+    );
+  }
+
+  // If there's an invalid invitation (clerk status but no token), show error
+  if (hasInvalidInvitation) {
+    return (
       <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
-        <span className='aucctus-header-sm-medium aucctus-text-brand-primary relative self-stretch'>
-          Sign Up
+        <span className='aucctus-text-error-primary aucctus-header-sm-medium relative self-stretch'>
+          Invalid Invitation
         </span>
         <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
-          After completing the form below, check your email for a confirmation
-          link.
+          The invitation link appears to be invalid or has expired. Please
+          contact the person who invited you for a new invitation link.
         </span>
-        {error && (
-          <div className={styles.error}>
-            {utils.osiris.parseFormError(error)}
-          </div>
-        )}
+        <Link className='btn btn-primary' to={AppPath.SignUp}>
+          Sign up with regular account
+        </Link>
       </div>
-      <form className={styles.basicForm} onSubmit={handleFormSubmit}>
-        <div className={styles.inputGroup}>
-          <InputField
-            name={'first name'}
-            label={'First Name*'}
-            autoComplete='on'
-            value={firstName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFirstName(e.target.value)
-            }
-          />
-          <InputField
-            name={'last name'}
-            label={'Last Name*'}
-            autoComplete='on'
-            value={lastName}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setLastName(e.target.value)
-            }
-          />
-        </div>
+    );
+  }
+
+  // Verification form is no longer shown here; handled in VerifyEmail page
+
+  // Main signup form using Clerk authentication
+  return (
+    <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
+      <span className='aucctus-text-brand-primary aucctus-header-sm-medium relative self-stretch'>
+        {isInvitationFlow ? 'Accept Invitation' : 'Create Your Account'}
+      </span>
+      <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
+        {isInvitationFlow
+          ? 'Complete your account setup to accept the invitation'
+          : 'Sign up for your account'}
+      </span>
+
+      <form
+        className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
+        onSubmit={handleSignUp}
+      >
         <InputField
-          name={'email'}
-          label={'Email*'}
-          autoComplete='on'
-          errorMessage={emailInputError}
-          value={email}
+          label='First Name'
+          name='firstName'
+          autoComplete='given-name'
+          value={firstName}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setEmail(e.target.value)
+            setFirstName(e.target.value)
           }
-          onFocus={() => setEmailInputError(undefined)}
-        />
-        <InputField
-          name={'password'}
-          label={'Password*'}
-          autoComplete='on'
-          isPassword
-          value={password}
-          onChange={_handlePasswordChange}
+          required={!isInvitationFlow}
         />
 
         <InputField
-          name={'confirm-password'}
-          label={'Confirm Password*'}
-          autoComplete='on'
+          label='Last Name'
+          name='lastName'
+          autoComplete='family-name'
+          value={lastName}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setLastName(e.target.value)
+          }
+          required={!isInvitationFlow}
+        />
+
+        {/* Only show email field for regular signup, not for invitation flow */}
+        {!isInvitationFlow && (
+          <InputField
+            label='Email'
+            name='email'
+            autoComplete='email'
+            errorMessage={emailInputError}
+            value={email}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setEmail(e.target.value)
+            }
+            onFocus={() => setEmailInputError(undefined)}
+            required
+          />
+        )}
+
+        <InputField
+          label='Password'
+          name='password'
+          autoComplete='new-password'
+          isPassword
+          value={password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
+          required
+        />
+
+        <InputField
+          label='Confirm Password'
+          name='confirmPassword'
+          autoComplete='new-password'
           isPassword
           errorMessage={confirmPassInputError}
           value={confirmPassword}
-          onChange={_handleConfirmPasswordChange}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            setConfirmPassword(e.target.value);
+            if (e.target.value !== password) {
+              setConfirmPassInputError('Passwords do not match');
+            } else {
+              setConfirmPassInputError(undefined);
+            }
+          }}
+          required
         />
 
         <button
           type='submit'
           className='btn btn-primary'
           disabled={
-            !firstName ||
-            !lastName ||
-            !email ||
+            (!isInvitationFlow && !firstName?.trim()) ||
+            (!isInvitationFlow && !lastName?.trim()) ||
+            (!isInvitationFlow && !email?.trim()) ||
             !password ||
+            !confirmPassword ||
             !!emailInputError ||
             !!confirmPassInputError ||
             isLoading
           }
         >
-          Sign Up
+          {isLoading
+            ? isInvitationFlow
+              ? 'Accepting Invitation...'
+              : 'Creating Account...'
+            : isInvitationFlow
+              ? 'Accept Invitation'
+              : 'Create Account'}
         </button>
 
-        <div className={styles.signUp}>
-          <span className='aucctus-text-tertiary aucctus-text-md'>
-            Already have an account?
-          </span>
-          <Link
-            className='aucctus-text-sm-medium btn btn-link !text-gray-light-700 hover:!text-primary-900'
-            to={AppPath.Login}
-          >
-            Sign In
-          </Link>
-        </div>
+        {/* Only show sign in link for regular signup */}
+        {!isInvitationFlow && (
+          <div className='flex flex-col items-center gap-4'>
+            <div className='flex flex-row items-center justify-between px-1'>
+              <span className='aucctus-text-tertiary aucctus-text-md'>
+                Already have an account?
+              </span>
+              <Link
+                className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
+                to={AppPath.Login}
+              >
+                Sign in
+              </Link>
+            </div>
+          </div>
+        )}
       </form>
-    </>
+    </div>
   );
 };
 

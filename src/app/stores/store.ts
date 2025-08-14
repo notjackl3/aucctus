@@ -1,5 +1,4 @@
 import { mergeDeep, withLenses } from '@dhmk/zustand-lens';
-import api from '@libs/api';
 import { create, StoreApi } from 'zustand';
 import { multiPersist } from 'zustand-multi-persist';
 import { createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
@@ -82,10 +81,7 @@ const useStore = create<IAppStore>()(
             currentState,
             persistedState as IAppStore,
           );
-          // If the access token is set, set it in the api to ensure connections are maintained
-          if (mergedState.auth.access) {
-            api.accessToken = mergedState.auth.access;
-          }
+          // JWT token management removed - using Clerk authentication only
           return mergedState;
         },
       },

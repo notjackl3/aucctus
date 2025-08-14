@@ -3,13 +3,13 @@ import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import { FunctionComponent, useCallback, useState } from 'react';
-import { Navigate } from 'react-router-dom';
-import styles from '../assets/styles/pages/auth-screens.module.scss';
+import { Navigate, Link } from 'react-router-dom';
 import Footer from '../components/Auth/Footer/Footer';
 import OnboardingIntoSection from '../components/Auth/OnboardingIntroSection';
 import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
 import InputField from '../components/Input/InputField/InputField';
 import { useRegisterAccount } from '../hooks/query/account.hook';
+import { useAuth } from '@clerk/clerk-react';
 
 const GOAL_MAX_LENGTH = 1000;
 
@@ -17,6 +17,7 @@ const OnBoarding: FunctionComponent = () => {
   const account = useStore((state) => state.auth.account);
   const user = useStore((state) => state.auth.user);
   const { mutate: registerAccount, isLoading } = useRegisterAccount();
+  const { signOut } = useAuth();
   const [name, setName] = useState<string>('');
   const [domain, setDomain] = useState<string>('');
   const [innovationGoal, setGoal] = useState<string>('');
@@ -53,17 +54,22 @@ const OnBoarding: FunctionComponent = () => {
   }
 
   return (
-    <div className={styles.authContainer}>
-      <div className={styles.formSection}>
+    <div className='aucctus-bg-primary grid min-h-screen grid-cols-1 md:grid-cols-2'>
+      {/* Left: Form Section */}
+      <div className='flex flex-col justify-between p-6 md:p-12'>
         <AuthHeader />
-        <div className={styles.form}>
-          <div className={styles.header}>
-            <span className={styles.title}>Welcome aboard!</span>
-            <span className={styles.supportingText}>
+
+        <div className='flex flex-col gap-8'>
+          <div className='mb-2'>
+            <span className='aucctus-header-sm-medium aucctus-text-brand-primary block'>
+              Welcome aboard!
+            </span>
+            <span className='aucctus-text-md aucctus-text-tertiary block'>
               Answer the prompts below to start innovating
             </span>
           </div>
-          <div className={styles.basicForm}>
+
+          <div className='aucctus-text-sm-medium flex flex-col items-stretch gap-8'>
             <InputField
               name={'companyName'}
               label={'Company Name'}
@@ -73,6 +79,7 @@ const OnBoarding: FunctionComponent = () => {
                 setName(e.target.value);
               }}
             />
+
             <InputField
               name={'companyUrl'}
               label={'Company URL'}
@@ -127,11 +134,29 @@ const OnBoarding: FunctionComponent = () => {
             >
               Complete
             </button>
+
+            <div className='flex flex-row items-center justify-between px-1'>
+              <span className='aucctus-text-tertiary aucctus-text-md'>
+                Need to use a different account?
+              </span>
+              <Link
+                className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
+                to={AppPath.Login}
+                onClick={() => signOut()}
+              >
+                Sign out
+              </Link>
+            </div>
           </div>
         </div>
+
         <Footer />
       </div>
-      <OnboardingIntoSection />
+
+      {/* Right: Intro Section */}
+      <div className='aucctus-bg-secondary hidden md:block'>
+        <OnboardingIntoSection />
+      </div>
     </div>
   );
 };

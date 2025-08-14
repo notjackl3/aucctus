@@ -10,8 +10,7 @@ import axios, {
 import analytics from '../../telemetry';
 import { Api } from '../api';
 import { IAuthSuccessResponse } from '../types';
-import telemetry from '../../telemetry';
-import { isTokenExpired, shouldRefreshToken } from '../../utils/jwt';
+// JWT utilities no longer needed as we only use Clerk tokens
 
 export const isAuthSuccessResponse = (
   value: unknown,
@@ -36,11 +35,6 @@ export interface IApiServiceConfig {
   logout?: () => void | Promise<void>;
 }
 
-// Extend AxiosRequestConfig to include the _retry property
-interface ExtendedAxiosRequestConfig extends AxiosRequestConfig {
-  _retry?: boolean;
-}
-
 export interface AbortableRequest<T> {
   response: Promise<AxiosResponse<T>>;
   abort: () => void;
@@ -50,9 +44,6 @@ export abstract class ApiService {
   apiInstance: Api;
   api: AxiosInstance;
   config: IApiServiceConfig;
-
-  protected abstract _excludeAllFromRefresh: boolean;
-  protected abstract _excludePathFromRefresh: string[];
 
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
     this.apiInstance = apiInstance;
@@ -78,41 +69,19 @@ export abstract class ApiService {
   private async _requestMiddleware(config: InternalAxiosRequestConfig) {
     Object.assign(config.headers || {}, this.config.headers);
 
-    // Skip token refresh check for excluded paths
-    if (config.url && this._shouldSkipRefresh(config.url)) {
-      return config;
-    }
+    try {
+      // Get Clerk token for authorization
+      const clerkToken = await this.apiInstance.getToken();
 
-    // Check if we need to refresh the token proactively
-    const accessToken = this.apiInstance.accessToken;
-    if (accessToken) {
-      try {
-        // Check if token is expired or needs refresh (5 minutes buffer)
-        if (
-          isTokenExpired(accessToken, 60) ||
-          shouldRefreshToken(accessToken, 300)
-        ) {
-          telemetry.debug(
-            'Token expired or needs refresh, refreshing proactively',
-          );
-
-          // Prevent concurrent refresh attempts
-          if (this.apiInstance.pendingRefresh) {
-            await this.apiInstance.pendingRefresh;
-          } else {
-            await this.apiInstance.refreshToken();
-          }
-
-          // Update the request headers with the new token
-          const newToken = this.apiInstance.accessToken;
-          if (newToken && config.headers) {
-            config.headers.Authorization = `Bearer ${newToken}`;
-          }
+      if (clerkToken) {
+        // Set authorization header with Clerk token
+        if (config.headers) {
+          config.headers.Authorization = `Bearer ${clerkToken}`;
         }
-      } catch (error) {
-        analytics.error('Failed to refresh token proactively', error);
-        // If proactive refresh fails, let the request proceed and handle 401 reactively
       }
+    } catch (error) {
+      analytics.error('Failed to get Clerk token for request', error);
+      // If token retrieval fails, let the request proceed and handle 401 reactively
     }
 
     return config;
@@ -140,82 +109,20 @@ export abstract class ApiService {
     }
 
     const status = (error.response && error.response.status) || 0;
-    const url = error && error.config && error.config.url;
 
-    if (
-      url &&
-      LOGOUT_STATUSES.includes(status) &&
-      !this._shouldSkipRefresh(url)
-    ) {
-      const config = error.config as ExtendedAxiosRequestConfig;
-      if (config && !config._retry) {
-        config._retry = true; // This is required to prevent infinite loops
-        telemetry.debug(
-          `apiService: Attempting to refresh token - status=${status}`,
-        );
-
-        try {
-          // Attempt to refresh the token
-          let refreshResult;
-          if (this.apiInstance.pendingRefresh) {
-            refreshResult = await this.apiInstance.pendingRefresh;
-          } else {
-            refreshResult = await this.apiInstance.refreshToken();
-          }
-
-          // Check if refresh was successful and we have a new token
-          if (refreshResult && this.apiInstance.accessToken) {
-            analytics.debug(
-              'Token refresh successful, retrying request',
-              config.url,
-            );
-
-            // Update the authorization header with the new token
-            if (!config.headers) {
-              config.headers = {};
-            }
-            config.headers.Authorization = `Bearer ${this.apiInstance.accessToken}`;
-
-            // Retry the original request with the new token
-            return this.api.request({
-              ...config,
-              withCredentials: true,
-            } as AxiosRequestConfig);
-          } else {
-            throw new Error('Token refresh failed - no new token received');
-          }
-        } catch (refreshError) {
-          analytics.error('Token refresh failed', refreshError);
-          telemetry.debug('Logging out due to failed token refresh');
-          this.apiInstance.logout();
-          return Promise.reject(refreshError);
-        }
-      } else {
-        // If this is a retry attempt that failed, logout
-        analytics.debug('Retry attempt failed, logging out');
-        this.apiInstance.logout();
-      }
+    // For authentication errors, let Clerk handle session management
+    if (LOGOUT_STATUSES.includes(status)) {
+      analytics.debug(
+        `Authentication error (${status}) - Clerk will handle session management`,
+      );
+      // Don't attempt token refresh - Clerk manages its own tokens
+      // Let the error propagate to trigger Clerk's authentication flow
     }
 
     return Promise.reject(error);
   }
 
-  protected _handleAccessToken() {
-    const accessToken = this.apiInstance.accessToken;
-    const config = Object.assign({ headers: {} }, this.config);
-    config.headers.Authorization = `Bearer ${accessToken}`;
-    return config;
-  }
-
-  protected _shouldSkipRefresh(url: string): boolean {
-    if (this._excludeAllFromRefresh) {
-      return true;
-    }
-
-    const path = url.split('?')[0];
-    // analytics.debug('Checking if path should be excluded from refresh:', path, url);
-    return this._excludePathFromRefresh.includes(path);
-  }
+  // Removed JWT-related helper methods as they're no longer needed with Clerk
 
   updateConfigHeaders(headers: Partial<AxiosRequestHeaders>) {
     this.config.headers = Object.assign(

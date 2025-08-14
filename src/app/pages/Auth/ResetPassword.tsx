@@ -1,118 +1,212 @@
-import utils from '@libs/utils';
-import { FunctionComponent, useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { FunctionComponent, useState, useEffect } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { useAuth, useSignIn } from '@clerk/clerk-react';
 import { AppPath } from '../../../routes/routes';
-import styles from '../../assets/styles/pages/auth-screens.module.scss';
-import FeatureIcon from '../../components/Icon/FeatureIcon';
-import Icon from '../../components/Icon/Icon/Icon';
 import InputField from '../../components/Input/InputField/InputField';
-import { usePasswordReset } from '../../hooks/query/auth.hook';
-
-const HEADER_TEXT = 'Reset Password';
-const SUPPORTING_TEXT =
-  'Your new password must be different to previously used passwords.';
-const ICON_VARIANT: IconVariant = 'key';
-const ICON_COLOR = 'primary';
+import { toast } from '@components';
+import telemetry from '@libs/telemetry';
 
 const ResetPassword: FunctionComponent = () => {
-  const navigate = useNavigate();
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const { isLoaded, isSignedIn } = useAuth();
+  const { signIn, isLoaded: signInLoaded } = useSignIn();
+  const [searchParams] = useSearchParams();
+
+  const [code, setCode] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [confirmPassInputError, setConfirmPassInputError] = useState<
     string | undefined
   >();
-  const [searchParams] = useSearchParams();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const token = searchParams.get('token');
+  // Get email from URL params (passed from ForgotPassword component)
+  const emailFromParams = searchParams.get('email') || '';
 
-  const { mutate, error } = usePasswordReset();
+  // Clear password mismatch error when passwords match
+  useEffect(() => {
+    if (password && confirmPassword) {
+      if (password === confirmPassword) {
+        setConfirmPassInputError(undefined);
+      } else {
+        setConfirmPassInputError('Passwords do not match');
+      }
+    }
+  }, [password, confirmPassword]);
 
-  const _handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const pass = e.target.value;
-    setPassword(pass);
-    setConfirmPassErrorOnCondition(
-      !!confirmPassword && confirmPassword !== pass,
-    );
-  };
+  // Handle password reset with verification code
+  const handleResetPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const _handleConfirmPasswordChange = (
-    e: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    const cPassword = e.target.value;
-    setConfirmPassword(cPassword);
-    setConfirmPassErrorOnCondition(cPassword !== password);
-  };
+    if (!signInLoaded || !signIn) return;
 
-  const setConfirmPassErrorOnCondition = (condition: boolean) => {
-    if (condition) {
+    if (!code?.trim() || !password || !confirmPassword) {
+      if (!code?.trim()) toast.error('Verification code is required');
+      else if (!password) toast.error('Password is required');
+      else if (!confirmPassword)
+        toast.error('Password confirmation is required');
+      return;
+    }
+
+    if (password !== confirmPassword) {
       setConfirmPassInputError('Passwords do not match');
-    } else {
-      setConfirmPassInputError(undefined);
+      return;
+    }
+
+    setConfirmPassInputError(undefined);
+    setIsLoading(true);
+
+    try {
+      telemetry.debug('Attempting password reset with code');
+
+      const result = await signIn.attemptFirstFactor({
+        strategy: 'reset_password_email_code',
+        code: code.trim(),
+        password,
+      });
+
+      if (result.status === 'complete') {
+        // Password reset successful
+        toast.success('Password reset successful!');
+
+        // Full page refresh to homepage so authentication state is re-initialized
+        window.location.replace(AppPath.Home);
+      } else {
+        // Handle any additional verification steps if needed
+        telemetry.log(
+          'Additional verification required after password reset:',
+          result,
+        );
+        toast.error('Password reset incomplete. Please try again.');
+      }
+    } catch (err: any) {
+      telemetry.error('Password reset error:', err);
+
+      if (err.errors?.[0]?.message) {
+        if (
+          err.errors[0].message.includes('Invalid code') ||
+          err.errors[0].message.includes('expired')
+        ) {
+          toast.error(
+            'Invalid or expired verification code. Please request a new one.',
+          );
+        } else {
+          toast.error(err.errors[0].message);
+        }
+      } else {
+        toast.error('Failed to reset password. Please try again.');
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  return (
-    <>
-      <div className={`${styles.header} ${styles.h2}`}>
-        <FeatureIcon icon={ICON_VARIANT} color={ICON_COLOR} />
-        <span className={styles.title}>{HEADER_TEXT}</span>
-        <span className={styles.supportingText}>{SUPPORTING_TEXT}</span>
-        {error && (
-          <div className={styles.error}>
-            {utils.osiris.parseFormError(error)}
-          </div>
-        )}
+  // If Clerk is not loaded yet, show loading
+  if (!isLoaded || !signInLoaded) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        Loading...
       </div>
-      <form className={styles.basicForm}>
+    );
+  }
+
+  // If user is already signed in with Clerk, show loading while AuthBootstrap handles routing
+  if (isSignedIn) {
+    return (
+      <div className='flex min-h-screen items-center justify-center'>
+        Loading...
+      </div>
+    );
+  }
+
+  // Main reset password form
+  return (
+    <div className='flex flex-col items-center justify-center gap-4 self-stretch'>
+      <span className='aucctus-text-brand-primary aucctus-header-sm-medium relative self-stretch'>
+        Reset Your Password
+      </span>
+      <span className='aucctus-text-md aucctus-text-tertiary relative self-stretch'>
+        {emailFromParams
+          ? `Enter the verification code sent to ${emailFromParams} and choose your new password`
+          : 'Enter the verification code from your email and choose your new password'}
+      </span>
+
+      <form
+        className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
+        onSubmit={handleResetPassword}
+      >
         <InputField
-          name={'password'}
-          label={'Password*'}
-          autoComplete='on'
-          isPassword
-          value={password}
-          onChange={_handlePasswordChange}
+          label='Verification Code'
+          name='code'
+          autoComplete='one-time-code'
+          value={code}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setCode(e.target.value)
+          }
+          placeholder='Enter the code from your email'
+          required
         />
 
         <InputField
-          name={'confirm-password'}
-          label={'Confirm Password*'}
-          autoComplete='on'
+          label='New Password'
+          name='password'
+          autoComplete='new-password'
           isPassword
-          error={!!confirmPassInputError}
+          value={password}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setPassword(e.target.value)
+          }
+          required
+        />
+
+        <InputField
+          label='Confirm New Password'
+          name='confirmPassword'
+          autoComplete='new-password'
+          isPassword
           errorMessage={confirmPassInputError}
           value={confirmPassword}
-          onChange={_handleConfirmPasswordChange}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+            setConfirmPassword(e.target.value)
+          }
+          required
         />
 
         <button
           type='submit'
           className='btn btn-primary'
           disabled={
-            !password || !confirmPassword || !!confirmPassInputError || !token
+            !code?.trim() ||
+            !password ||
+            !confirmPassword ||
+            !!confirmPassInputError ||
+            isLoading
           }
-          onClick={(e) => {
-            if (token) {
-              mutate(
-                { password, confirmPassword, token },
-                {
-                  onSuccess: () => {
-                    navigate(AppPath.ResetPasswordSuccess);
-                  },
-                },
-              );
-            }
-            e.preventDefault();
-          }}
         >
-          Reset Password
+          {isLoading ? 'Resetting Password...' : 'Reset Password'}
         </button>
-        <div className={styles.signUp}>
-          <Link className={`${styles.backArrow}`} to={AppPath.Login}>
-            <Icon variant='arrowleft' /> Back to log in
+
+        <div className='flex flex-col items-center gap-4'>
+          <Link
+            className='aucctus-text-brand-primary hover:aucctus-text-brand-primary-hover aucctus-text-sm underline'
+            to={AppPath.ForgotPassword}
+          >
+            ← Need a new code? Go back
           </Link>
+
+          <div className='flex flex-row items-center justify-between px-1'>
+            <span className='aucctus-text-tertiary aucctus-text-md'>
+              Remember your password?
+            </span>
+            <Link
+              className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
+              to={AppPath.Login}
+            >
+              Sign in
+            </Link>
+          </div>
         </div>
       </form>
-    </>
+    </div>
   );
 };
 
