@@ -22,6 +22,7 @@ export interface IConceptIncubationActions {
   setActiveQuestionnaire: (
     questionnaire?: IConceptIncubationQuestionnaireSection,
   ) => void;
+  setIsNewSeed: (isNewSeed: boolean) => void;
   setDraftSeedUuid: (uuid: string) => void;
   setCurrentTextAnswerList: (answerList: AnswerItem[]) => void;
   setCurrentMultiSelectAnswerList: (answerList: AnswerItem[]) => void;
@@ -47,6 +48,13 @@ export function setActiveQuestionnaire(
   questionnaire?: IConceptIncubationQuestionnaireSection,
 ) {
   this.set({ activeQuestionnaire: questionnaire });
+}
+
+export function setIsNewSeed(
+  this: IStoreApi<IConceptIncubationState>,
+  isNewSeed: boolean,
+) {
+  this.set({ isNewSeed });
 }
 
 export function setDraftSeedUuid(

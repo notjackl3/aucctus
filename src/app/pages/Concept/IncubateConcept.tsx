@@ -22,7 +22,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@components';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
@@ -67,6 +67,7 @@ const IncubateConcept: React.FC = () => {
     setActiveQuestionnaire,
     setCurrentQuestionOrder,
     setClarifyingQuestions,
+    setIsNewSeed,
   } = useConceptIncubationStore();
 
   const { generatedConcepts, setGeneratedConcepts } =
@@ -78,17 +79,6 @@ const IncubateConcept: React.FC = () => {
   );
 
   const navigate = useNavigate();
-  const location = useLocation();
-
-  const handleResetAndNavigate = useCallback(() => {
-    resetQuestionnaire();
-    if (
-      location.pathname.includes('/concept/incubate') &&
-      searchParams.has('seed')
-    ) {
-      navigate(AppPath.IncubateConcept, { replace: true });
-    }
-  }, [navigate, resetQuestionnaire, location, searchParams]);
 
   useEffect(() => {
     if (seedError) {
@@ -96,10 +86,10 @@ const IncubateConcept: React.FC = () => {
       if (status === 404) {
         // Clear the draftSeedUuid from store before navigating to prevent further API calls
         setDraftSeedUuid('');
-        handleResetAndNavigate();
+        resetQuestionnaire();
       }
     }
-  }, [seedError, handleResetAndNavigate, setDraftSeedUuid]);
+  }, [seedError, resetQuestionnaire, setDraftSeedUuid]);
 
   // Update store with UUID from props if available and not already set
   useEffect(() => {
@@ -174,6 +164,12 @@ const IncubateConcept: React.FC = () => {
     conceptGenerationState,
     setCurrentQuestionOrder,
   ]);
+
+  useEffect(() => {
+    if (submittedAnswers.length > 0) {
+      setCurrentQuestionOrder(Infinity);
+    }
+  }, [submittedAnswers, setCurrentQuestionOrder]);
 
   // Determine the current question based on answers
   useEffect(() => {
@@ -250,16 +246,10 @@ const IncubateConcept: React.FC = () => {
       !seedError // Don't try to delete if there was an error fetching the seed
     ) {
       deleteDraft(draftSeedUuid, {
-        onSuccess: () => handleResetAndNavigate(),
-        onError: (error: any) => {
-          // Only navigate on non-404 errors (404 means it's already deleted)
-          if (error?.response?.status !== 404) {
-            handleResetAndNavigate();
-          }
-        },
+        onSuccess: () => resetQuestionnaire(),
       });
     }
-  }, [handleResetAndNavigate, seedDraftData, seedError]);
+  }, [resetQuestionnaire, seedDraftData, seedError]);
 
   const cleanup = useCallback(() => {
     deleteAnswerlessDraft();

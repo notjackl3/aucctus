@@ -19,6 +19,7 @@ import {
   setCurrentQuestionOrder,
   setCurrentTextAnswerList,
   setDraftSeedUuid,
+  setIsNewSeed,
   setSubmittedAnswers,
   setSuggestions,
 } from './actions';
@@ -27,6 +28,7 @@ export interface IConceptIncubationState extends IConceptIncubationActions {
   status: 'pre-generation' | 'generating' | 'selecting' | 'post-generation';
 
   currentQuestionOrder?: number;
+  isNewSeed: boolean;
   activeQuestionnaire?: IConceptIncubationQuestionnaireSection;
   draftSeedUuid: string;
   currentTextAnswerList: AnswerItem[];
@@ -48,6 +50,7 @@ const conceptIncubationSlice: Lens<IConceptIncubationState, IAppStore> = (
   return {
     // State
     status: 'pre-generation',
+    isNewSeed: true,
     currentQuestionOrder: undefined,
     activeQuestionnaire: undefined,
     activeClarifyingQuestion: undefined,
@@ -62,6 +65,7 @@ const conceptIncubationSlice: Lens<IConceptIncubationState, IAppStore> = (
     // Actions
     setCurrentQuestionOrder: setCurrentQuestionOrder.bind(actionContext),
     setActiveQuestionnaire: setActiveQuestionnaire.bind(actionContext),
+    setIsNewSeed: setIsNewSeed.bind(actionContext),
     setDraftSeedUuid: setDraftSeedUuid.bind(actionContext),
     setCurrentTextAnswerList: setCurrentTextAnswerList.bind(actionContext),
     setCurrentMultiSelectAnswerList:

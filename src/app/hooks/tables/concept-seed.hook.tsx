@@ -22,6 +22,7 @@ import {
 } from '@tanstack/react-table';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 
 // Shared interfaces and constants
 export interface ISeedFilterOptions {
@@ -67,9 +68,7 @@ export const useSeedsBank = (
   externalUpdateTableFiltering?: (value: Partial<ISeedFilterOptions>) => void,
 ) => {
   const navigate = useNavigate();
-  const resetIncubationState = useStore(
-    (state) => state.incubation.resetQuestionnaire,
-  );
+  const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
 
   // Use useRef for values that don't need to trigger re-renders when updated internally
   const filterOptionsRef = React.useRef<ISeedFilterOptions>({
@@ -360,7 +359,8 @@ export const useSeedsBank = (
                 <Button.ConceptGenerate
                   variant='draft'
                   onClick={() => {
-                    resetIncubationState();
+                    resetQuestionnaire();
+                    setIsNewSeed(false);
                     navigate(
                       `${AppPath.IncubateConcept}?seed=${info.getValue()}`,
                     );
@@ -394,7 +394,8 @@ export const useSeedsBank = (
     extractConceptDescription,
     getAnsweredQuestionsCount,
     determineConceptStage,
-    resetIncubationState,
+    resetQuestionnaire,
+    setIsNewSeed,
     navigate,
   ]);
 

@@ -18,7 +18,7 @@ const defaultIconProps = {
 
 const Dashboard: FunctionComponent = () => {
   const navigate = useNavigate();
-  const { resetQuestionnaire } = useConceptIncubationStore();
+  const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
   const { account, isAuthenticated } = useStore((state) => state.auth);
   const { data } = useDashboard(isAuthenticated());
 
@@ -33,6 +33,7 @@ const Dashboard: FunctionComponent = () => {
             className='btn btn-bold btn-primary'
             onClick={() => {
               resetQuestionnaire();
+              setIsNewSeed(true);
               navigate(AppPath.IncubateConcept);
             }}
           >

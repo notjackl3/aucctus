@@ -47,7 +47,7 @@ const areFilterOptionsSet = (
 const ConceptBank: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { resetQuestionnaire } = useConceptIncubationStore();
+  const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
 
   // Determine if we're on the drafts route
   const isDraftsRoute = location.pathname.includes('/drafts');
@@ -73,8 +73,9 @@ const ConceptBank: React.FC = () => {
 
   const handleAddConcept = useCallback(() => {
     resetQuestionnaire();
+    setIsNewSeed(true);
     navigate(AppPath.IncubateConcept);
-  }, [resetQuestionnaire, navigate]);
+  }, [resetQuestionnaire, navigate, setIsNewSeed]);
 
   const handleTabChange = useCallback(
     (tabPath: string) => {

@@ -1,5 +1,4 @@
 import {
-  useDeleteSeed,
   useGenerateConceptIncubationClarifyingQuestions,
   useGetConceptSeedDraftAnswers,
   useSaveConceptSeedDraftAnswer,
@@ -18,7 +17,6 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from '@components';
 import { v4 as uuidv4 } from 'uuid';
 import { useDispatchIncubationAnimation } from './incubation-animation-event.hook';
-import telemetry from '@libs/telemetry';
 import { IClarifyingQuestion } from '@libs/api/types';
 
 type AdvanceActionType = 'to-next-question' | 'to-clarifying-questions' | false;
@@ -33,6 +31,7 @@ export const useUserInteraction = () => {
     currentTextAnswerList,
     currentMultiSelectAnswerList,
     submittedAnswers,
+    isNewSeed,
     activeClarifyingQuestion,
     setCurrentQuestionOrder,
     getNextQuestion,
@@ -41,6 +40,7 @@ export const useUserInteraction = () => {
     setCurrentMultiSelectAnswerList,
     resetQuestionnaire,
     setSubmittedAnswers,
+    setIsNewSeed,
     setClarifyingQuestions,
     setActiveClarifyingQuestion,
   } = useConceptIncubationStore();
@@ -83,8 +83,6 @@ export const useUserInteraction = () => {
   const [showConfirmation, setShowConfirmation] = useState(false);
 
   // ===== API MUTATIONS AND QUERIES =====
-  const { mutate: deleteDraft, isLoading: isDeleteDraftLoading } =
-    useDeleteSeed({ status: 'draft' });
   const { mutate: saveAnswer, isLoading: isSaveAnswerLoading } =
     useSaveConceptSeedDraftAnswer();
   const { mutateAsync: updateAnswer, isLoading: isUpdateAnswerLoading } =
@@ -105,14 +103,12 @@ export const useUserInteraction = () => {
   const isLoading = useMemo(
     () =>
       isSeedDraftAnswersLoading ||
-      isDeleteDraftLoading ||
       isSaveAnswerLoading ||
       isUpdateAnswerLoading ||
       isUpdateAnswerAndDeleteHigherOrderLoading ||
       isGenerateClarifyingQuestionsLoading,
     [
       isSeedDraftAnswersLoading,
-      isDeleteDraftLoading,
       isSaveAnswerLoading,
       isUpdateAnswerLoading,
       isUpdateAnswerAndDeleteHigherOrderLoading,
@@ -151,6 +147,7 @@ export const useUserInteraction = () => {
       } else {
         dispatchAnimationEvent('question-transition', () => {
           setCurrentQuestionOrder(nextOrder);
+          setSubmittedAnswers(answers);
           setAnswerValue('');
         });
       }
@@ -158,6 +155,7 @@ export const useUserInteraction = () => {
     [
       dispatchAnimationEvent,
       getNextQuestion,
+      setSubmittedAnswers,
       setCurrentQuestionOrder,
       setClarifyingQuestions,
       draftSeedUuid,
@@ -170,7 +168,17 @@ export const useUserInteraction = () => {
       (a, b) => a.question.order - b.question.order,
     );
 
-    setSubmittedAnswers(answers);
+    console.log('isNewSeed', isNewSeed);
+
+    // Populate store with submitted answers if not already set
+    if (
+      !isNewSeed &&
+      seedDraftAnswers &&
+      seedDraftAnswers.length > 0 &&
+      submittedAnswers.length === 0
+    ) {
+      setSubmittedAnswers(answers);
+    }
 
     if (advanceAction.current === 'to-next-question') {
       goToNextQuestion(answers);
@@ -183,7 +191,7 @@ export const useUserInteraction = () => {
       advanceAction.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedDraftAnswers]);
+  }, [seedDraftAnswers, submittedAnswers, setSubmittedAnswers]);
 
   useEffect(() => {
     const handleAnswerUpdate = (event: CustomEvent) =>
@@ -475,25 +483,8 @@ export const useUserInteraction = () => {
     const previousQuestion = getPreviousQuestion(submittedAnswers);
 
     if (!previousQuestion) {
-      if ((seedDraftAnswers ?? []).length === 0) {
-        deleteDraft(draftSeedUuid || '', {
-          onSuccess: () => {
-            resetQuestionnaire();
-            navigate(AppPath.IncubateConcept, { replace: true });
-          },
-          onError: (error: unknown) => {
-            telemetry.error('Failed to delete unused draft', {
-              seedUuid: draftSeedUuid,
-              error: error instanceof Error ? error.message : 'Unknown error',
-            });
-            resetQuestionnaire();
-            navigate(AppPath.IncubateConcept, { replace: true });
-          },
-        });
-      } else {
-        resetQuestionnaire();
-        navigate(AppPath.IncubateConcept, { replace: true });
-      }
+      resetQuestionnaire();
+      navigate(AppPath.IncubateConcept, { replace: true });
     } else {
       dispatchAnimationEvent('fade', () => {
         setCurrentQuestionOrder(previousQuestion.order);
@@ -503,10 +494,7 @@ export const useUserInteraction = () => {
   }, [
     currentQuestionOrder,
     setCurrentQuestionOrder,
-    draftSeedUuid,
-    deleteDraft,
     resetQuestionnaire,
-    seedDraftAnswers,
     dispatchAnimationEvent,
     activeClarifyingQuestion,
     submittedAnswers,
