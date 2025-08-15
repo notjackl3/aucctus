@@ -1,11 +1,10 @@
 import { useCustomerProfileUpdate } from '@hooks/query/concepts.hook';
 import { FunctionComponent, useCallback, useState } from 'react';
-import InputField from '../../Input/InputField/InputField';
 import styles from './add-customer-profile.module.scss';
 
 import { ICustomerProfile } from '@libs/api/types';
 import utils from '@libs/utils';
-import { toast } from '@components';
+import { toast, Input } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 interface IEditCustomerProfileDemographicsProps {
   conceptUuid?: string;
@@ -100,7 +99,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
       </div>
       <div className={styles.content}>
         <h4>Demographics</h4>
-        <InputField
+        <Input.Field
           label='Geo Location'
           name='geoLocation'
           value={geoLocation}
@@ -112,7 +111,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
           )}
         />
         <div className={styles.inputRow}>
-          <InputField
+          <Input.Field
             label='Lower Age Ranger'
             name='lowerAgeRange'
             value={ageLower}
@@ -126,7 +125,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
               ageUpper,
             )}
           />
-          <InputField
+          <Input.Field
             label='Upper Age Ranger'
             name='upperAgeRange'
             value={ageUpper}
@@ -142,7 +141,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
             )}
           />
         </div>
-        <InputField
+        <Input.Field
           label='Family Size'
           name='familySize'
           value={familySize}
@@ -153,7 +152,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
           }}
         />
         <div className={styles.inputRow}>
-          <InputField
+          <Input.Field
             label='Lower Income Ranger'
             name='lowerIncomeRange'
             value={incomeLower}
@@ -167,7 +166,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
               incomeUpper,
             )}
           />
-          <InputField
+          <Input.Field
             label='Upper Income Ranger'
             name='upperIncomeRange'
             value={incomeUpper}

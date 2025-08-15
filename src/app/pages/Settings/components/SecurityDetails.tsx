@@ -1,12 +1,11 @@
 import utils from '@libs/utils';
 import { FunctionComponent, useMemo, useState } from 'react';
 import { useMutation } from 'react-query';
-import { toast } from '@components';
+import { toast, Input } from '@components';
 import api from '../../../../libs/api';
 import { IUserPassword } from '../../../../libs/api/types';
 import { defaultToastConfig } from '../../../../libs/toast';
 import Icon from '../../../components/Icon/Icon/Icon';
-import InputField from '../../../components/Input/InputField/InputField';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 
 const defaultIconProps = {
@@ -134,7 +133,7 @@ const SecurityDetails: FunctionComponent = () => {
           label={info.label}
           render={
             <div className='w-full max-w-md'>
-              <InputField
+              <Input.Field
                 variant='settings'
                 type='password'
                 isPassword

@@ -2,7 +2,7 @@ import { FunctionComponent, useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth, useSignIn } from '@clerk/clerk-react';
 import { AppPath } from '../../../routes/routes';
-import InputField from '../../components/Input/InputField/InputField';
+import { Input } from '@components';
 import { toast } from '@components';
 import telemetry from '@libs/telemetry';
 
@@ -134,7 +134,7 @@ const ResetPassword: FunctionComponent = () => {
         className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
         onSubmit={handleResetPassword}
       >
-        <InputField
+        <Input.Field
           label='Verification Code'
           name='code'
           autoComplete='one-time-code'
@@ -146,7 +146,7 @@ const ResetPassword: FunctionComponent = () => {
           required
         />
 
-        <InputField
+        <Input.Field
           label='New Password'
           name='password'
           autoComplete='new-password'
@@ -158,7 +158,7 @@ const ResetPassword: FunctionComponent = () => {
           required
         />
 
-        <InputField
+        <Input.Field
           label='Confirm New Password'
           name='confirmPassword'
           autoComplete='new-password'

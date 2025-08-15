@@ -75,7 +75,6 @@ export function logout(this: IStoreApi<IAuthState>) {
   );
 }
 
-// Legacy JWT token storage - no longer used with Clerk authentication
 export async function storeTokens(
   this: IStoreApi<IAuthState>,
   // _access: string | undefined,
@@ -88,7 +87,6 @@ export async function storeTokens(
   );
 }
 
-// Legacy JWT token clearing - no longer used with Clerk authentication
 export function clearTokens(this: IStoreApi<IAuthState>) {
   // This function is kept for backward compatibility but does nothing
   // All authentication is now handled by Clerk

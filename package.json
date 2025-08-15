@@ -8,7 +8,7 @@
     "start:dev": "npm run dev",
     "build": "vite build",
     "build:debug": "vite build --debug",
-    "preview": "NODE_ENV=production vite build && vite preview",
+    "preview": "NODE_ENV=production vite preview",
     "format": "prettier --config ./.prettierrc --write .",
     "lint": "eslint . --max-warnings=0",
     "prettier-check": "prettier --config ./.prettierrc --check .",

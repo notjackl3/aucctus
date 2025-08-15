@@ -3,7 +3,7 @@ import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import { useAuth, useSignUp } from '@clerk/clerk-react';
 import utils from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import InputField from '../../components/Input/InputField/InputField';
+import { Input } from '@components';
 import { toast } from '@components';
 import telemetry from '@libs/telemetry';
 
@@ -167,7 +167,7 @@ const VerifyEmail: FunctionComponent = () => {
           className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
           onSubmit={handleVerifyCode}
         >
-          <InputField
+          <Input.Field
             label='Verification Code'
             name='code'
             autoComplete='one-time-code'
@@ -225,7 +225,7 @@ const VerifyEmail: FunctionComponent = () => {
         className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
         onSubmit={handleSendVerification}
       >
-        <InputField
+        <Input.Field
           label='Email'
           name='email'
           autoComplete='email'

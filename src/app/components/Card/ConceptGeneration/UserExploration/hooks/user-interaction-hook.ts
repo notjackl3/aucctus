@@ -40,7 +40,7 @@ export const useUserInteraction = () => {
     setCurrentMultiSelectAnswerList,
     resetQuestionnaire,
     setSubmittedAnswers,
-    setIsNewSeed,
+
     setClarifyingQuestions,
     setActiveClarifyingQuestion,
   } = useConceptIncubationStore();
@@ -167,8 +167,6 @@ export const useUserInteraction = () => {
     const answers = [...(seedDraftAnswers ?? [])].sort(
       (a, b) => a.question.order - b.question.order,
     );
-
-    console.log('isNewSeed', isNewSeed);
 
     // Populate store with submitted answers if not already set
     if (

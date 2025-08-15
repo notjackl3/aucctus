@@ -3,7 +3,7 @@ import { FunctionComponent, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth, useSignIn } from '@clerk/clerk-react';
 import { AppPath } from '../../../routes/routes';
-import InputField from '../../components/Input/InputField/InputField';
+import { Input } from '@components';
 import { toast } from '@components';
 import telemetry from '@libs/telemetry';
 
@@ -100,7 +100,7 @@ const Login: FunctionComponent = () => {
         className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
         onSubmit={handleSignIn}
       >
-        <InputField
+        <Input.Field
           label='Email'
           name='email'
           autoComplete='email'
@@ -112,7 +112,7 @@ const Login: FunctionComponent = () => {
           onFocus={() => setEmailInputError(undefined)}
         />
 
-        <InputField
+        <Input.Field
           label='Password'
           name='password'
           autoComplete='current-password'

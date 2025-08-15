@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react';
-import InputField from '../../../Input/InputField/InputField';
+import { Input } from '@components';
 
 interface SourceFieldsProps {
   sourceTitle: string;
@@ -28,7 +28,7 @@ const SourceFields: FunctionComponent<SourceFieldsProps> = ({
       </h5>
       <div className='flex flex-row gap-3'>
         <span className='flex-1'>
-          <InputField
+          <Input.Field
             label='Citation'
             name='sourceCitation'
             value={sourceTitle}
@@ -39,7 +39,7 @@ const SourceFields: FunctionComponent<SourceFieldsProps> = ({
           />
         </span>
         <span className='flex-1'>
-          <InputField
+          <Input.Field
             label='URL'
             name='sourceUrl'
             value={sourceUrl}

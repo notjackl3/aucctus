@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { Icon } from '@components';
+import Icon from '../Icon';
 
 interface ComponentCarouselProps {
   children: React.ReactNode;

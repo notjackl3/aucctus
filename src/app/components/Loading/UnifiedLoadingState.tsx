@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loading } from '@components';
+import Loading from './Loading';
 
 interface UnifiedLoadingStateProps {
   /**

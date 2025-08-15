@@ -3,7 +3,7 @@ import analytics from '../telemetry';
 import { AccountApi } from './account';
 import { ArticleApi } from './article';
 import { AssumptionsApi } from './assumptions';
-// AuthApi removed - using Clerk for authentication
+
 import { IApiServiceConfig } from './base/apiService';
 import { ISocketConfig, SocketService } from './base/socketService';
 import { ConceptApi } from './concepts';
@@ -14,7 +14,6 @@ import { MarketScanApi } from './marketScan';
 import { SeedApi } from './seed';
 import { TestingApi } from './testing';
 import { TrendsAndDriversV3Api } from './trendsAndDrivers';
-// ITokenResponse no longer needed - using Clerk tokens
 
 export interface IApiConfig {
   /* End Points */

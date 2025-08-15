@@ -129,7 +129,7 @@ export default defineConfig(async (config: ViteUserConfig) => {
     },
     build: {
       outDir: 'build',
-      sourcemap: !isDevelopment ? 'hidden' : true,
+      sourcemap: true,
       manifest: true,
       minify: 'terser',
       assetsInlineLimit: 4096,
@@ -143,10 +143,11 @@ export default defineConfig(async (config: ViteUserConfig) => {
         compress: {
           drop_console: false,
           drop_debugger: true,
-          passes: 2,
+          passes: 1,
         },
         mangle: {
           safari10: true,
+          keep_fnames: true,
         },
         format: {
           comments: false,

@@ -1,12 +1,10 @@
 import useStore from '@stores/store';
 import { FunctionComponent, useMemo, useState } from 'react';
 import Select, { StylesConfig } from 'react-select';
-import { toast } from '@components';
+import { toast, Input, Loading } from '@components';
 import { IUser } from '../../../../libs/api/types';
 import defaultAvatar from '../../../assets/img/avatar.png';
 import Icon from '../../../components/Icon/Icon/Icon';
-import InputField from '../../../components/Input/InputField/InputField';
-import { Loading } from '@components';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import { useUpdateUser } from '../../../hooks/query/account.hook';
 
@@ -180,7 +178,7 @@ const AboutDetails: FunctionComponent = () => {
         render={
           <div className='flex flex-1 gap-4'>
             {userNames.map((info, i) => (
-              <InputField
+              <Input.Field
                 key={`${info.name}-${i}`}
                 variant='settings'
                 name={info.name}
@@ -200,7 +198,7 @@ const AboutDetails: FunctionComponent = () => {
           label={info.label}
           render={
             <div className='flex flex-1 gap-4'>
-              <InputField
+              <Input.Field
                 variant='settings'
                 name={info.name}
                 disabled={info.isDisabled}

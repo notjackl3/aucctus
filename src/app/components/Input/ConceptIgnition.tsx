@@ -1,7 +1,7 @@
-import Button from '@components/Button';
-import Icon from '@components/Icon';
-import React from 'react';
+import Button from '../Button';
+import Icon from '../Icon';
 import InputField from './InputField/InputField';
+import React from 'react';
 import TextArea from './TextArea/TextArea';
 import { ConceptIncubationQuestion, IDetailQuestion } from '@libs/api/types';
 

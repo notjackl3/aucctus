@@ -6,8 +6,8 @@ import { FunctionComponent, useCallback, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import Footer from '../components/Auth/Footer/Footer';
 import OnboardingIntoSection from '../components/Auth/OnboardingIntroSection';
-import AuthHeader from '../components/Header/AuthHeader/AuthHeader';
-import InputField from '../components/Input/InputField/InputField';
+import { Header } from '@components';
+// InputField will be accessed via Input.Field from @components
 import { useRegisterAccount } from '../hooks/query/account.hook';
 import { useAuth } from '@clerk/clerk-react';
 
@@ -57,7 +57,7 @@ const OnBoarding: FunctionComponent = () => {
     <div className='aucctus-bg-primary grid min-h-screen grid-cols-1 md:grid-cols-2'>
       {/* Left: Form Section */}
       <div className='flex flex-col justify-between p-6 md:p-12'>
-        <AuthHeader />
+        <Header.Auth />
 
         <div className='flex flex-col gap-8'>
           <div className='mb-2'>
@@ -70,7 +70,7 @@ const OnBoarding: FunctionComponent = () => {
           </div>
 
           <div className='aucctus-text-sm-medium flex flex-col items-stretch gap-8'>
-            <InputField
+            <Input.Field
               name={'companyName'}
               label={'Company Name'}
               value={name}
@@ -80,7 +80,7 @@ const OnBoarding: FunctionComponent = () => {
               }}
             />
 
-            <InputField
+            <Input.Field
               name={'companyUrl'}
               label={'Company URL'}
               error={!!domainInputError}

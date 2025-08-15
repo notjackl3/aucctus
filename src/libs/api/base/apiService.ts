@@ -10,7 +10,6 @@ import axios, {
 import analytics from '../../telemetry';
 import { Api } from '../api';
 import { IAuthSuccessResponse } from '../types';
-// JWT utilities no longer needed as we only use Clerk tokens
 
 export const isAuthSuccessResponse = (
   value: unknown,
@@ -121,8 +120,6 @@ export abstract class ApiService {
 
     return Promise.reject(error);
   }
-
-  // Removed JWT-related helper methods as they're no longer needed with Clerk
 
   updateConfigHeaders(headers: Partial<AxiosRequestHeaders>) {
     this.config.headers = Object.assign(

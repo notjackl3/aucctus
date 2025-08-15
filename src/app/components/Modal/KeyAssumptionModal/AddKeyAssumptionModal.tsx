@@ -1,11 +1,10 @@
-import { Badge } from '@components';
+import { Badge, Input } from '@components';
 import { FunctionComponent, useCallback, useState } from 'react';
 import { AssumptionCategory } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
 import { useAssumptionCreate } from '../../../hooks/query/assumptions.hook';
 import Dropdown, { Option } from '../../Button/Dropdown/Dropdown';
 import Icon from '../../Icon/Icon/Icon';
-import InputField from '../../Input/InputField/InputField';
 import TextArea from '../../Input/TextArea/TextArea';
 
 import styles from './edit-key-assumption.module.scss';
@@ -146,7 +145,7 @@ const AddKeyAssumptionModal: FunctionComponent<
           }}
         />
         <div className={styles.levels}>
-          <InputField
+          <Input.Field
             label={'Risk Level'}
             name={'risk-level'}
             value={riskLevel}
@@ -155,7 +154,7 @@ const AddKeyAssumptionModal: FunctionComponent<
             max={10}
             onChange={(e) => setRiskLevel(parseInt(e.target.value))}
           />
-          <InputField
+          <Input.Field
             label={'Difficulty Level'}
             name={'difficulty-level'}
             value={difficultyLevel}
@@ -164,7 +163,7 @@ const AddKeyAssumptionModal: FunctionComponent<
             max={10}
             onChange={(e) => setDifficultyLevel(parseInt(e.target.value))}
           />
-          <InputField
+          <Input.Field
             label={'Impact Level'}
             name={'impact-level'}
             value={impactLevel}
@@ -174,7 +173,7 @@ const AddKeyAssumptionModal: FunctionComponent<
             onChange={(e) => setImpactLevel(parseInt(e.target.value))}
           />
         </div>
-        <InputField
+        <Input.Field
           name='title'
           label='Title'
           value={title}

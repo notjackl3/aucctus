@@ -1,4 +1,4 @@
-import { Icon } from '@components';
+import Icon from '../Icon';
 import { cn } from '@libs/utils/react';
 import { FunctionComponent } from 'react';
 

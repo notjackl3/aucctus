@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth, useSignIn } from '@clerk/clerk-react';
 import utils from '../../../libs/utils';
 import { AppPath } from '../../../routes/routes';
-import InputField from '../../components/Input/InputField/InputField';
+import { Input } from '@components';
 import { toast } from '@components';
 import telemetry from '@libs/telemetry';
 
@@ -113,7 +113,7 @@ const ForgotPassword: FunctionComponent = () => {
         className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
         onSubmit={handleSendResetCode}
       >
-        <InputField
+        <Input.Field
           label='Email'
           name='email'
           autoComplete='email'

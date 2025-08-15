@@ -7,7 +7,7 @@ import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-// Legacy useLogout hook removed - using Clerk's useClerk hook
+
 import styles from './drawer.module.scss';
 import NavButton from './NavButton';
 import NavLink from './NavLink';

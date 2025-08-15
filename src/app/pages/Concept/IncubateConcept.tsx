@@ -67,7 +67,6 @@ const IncubateConcept: React.FC = () => {
     setActiveQuestionnaire,
     setCurrentQuestionOrder,
     setClarifyingQuestions,
-    setIsNewSeed,
   } = useConceptIncubationStore();
 
   const { generatedConcepts, setGeneratedConcepts } =
