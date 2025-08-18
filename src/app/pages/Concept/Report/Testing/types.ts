@@ -124,6 +124,7 @@ export interface ITestCollateralCreate {
   description: string;
   type: 'text' | 'image' | 'file' | 'url' | 'prototype' | 'survey' | 'guide';
   content: string;
+  test_details_uuid?: string;
   format?: string;
   order?: number;
 }

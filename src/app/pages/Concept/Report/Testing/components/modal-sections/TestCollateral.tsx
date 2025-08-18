@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
-import { Icon, toast } from '@components';
+import React from 'react';
+import { Icon, toast, Loading } from '@components';
 import { cn } from '@libs/utils/react';
-import { useTestCollateral } from '@hooks/query/testing.hook';
+import {
+  useTestCollateral,
+  useTestCollateralRequest,
+} from '@hooks/query/testing.hook';
 
 import {
   CollateralType,
@@ -27,13 +30,21 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
     enabled: shouldFetch,
   });
 
+  // Hook for creating custom collateral requests
+  const {
+    customRequest,
+    setCustomRequest,
+    handleCustomRequest,
+    handleKeyDown,
+    isLoading: isSubmittingRequest,
+  } = useTestCollateralRequest(conceptUuid || '', testUuid || '');
+
   // Use provided data or fallback to fetched data
   const collateral = fetchedCollateral;
   const isCollateralLoading = isFetchedCollateralLoading;
 
-  const [selectedItem, setSelectedItem] = useState<ITestCollateral | null>(
-    null,
-  );
+  const [selectedItem, setSelectedItem] =
+    React.useState<ITestCollateral | null>(null);
 
   // Convert API collateral to ITestCollateral format
   const convertApiCollateral = (apiCollateral: any[]): ITestCollateral[] => {
@@ -235,10 +246,46 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                     Request Custom Collateral
                   </span>
                 </div>
-                <div className='aucctus-bg-disabled aucctus-border-disabled rounded border p-3 text-center'>
-                  <p className='aucctus-text-sm-regular aucctus-text-disabled'>
-                    Coming Soon
-                  </p>
+                <div className='flex gap-2'>
+                  {isSubmittingRequest ? (
+                    <div className='aucctus-bg-secondary-subtle aucctus-border-secondary flex flex-1 items-center justify-center gap-2 rounded border p-3'>
+                      <Loading />
+                      <span className='aucctus-text-sm-regular aucctus-text-secondary'>
+                        Generating collateral...
+                      </span>
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        type='text'
+                        value={customRequest}
+                        onChange={(e) => setCustomRequest(e.target.value)}
+                        onKeyDown={handleKeyDown}
+                        placeholder='Describe the collateral you need'
+                        className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary placeholder:aucctus-text-placeholder focus:aucctus-border-brand-primary flex-1 rounded border px-3 py-2 text-sm focus:outline-none'
+                      />
+                      <button
+                        onClick={handleCustomRequest}
+                        disabled={!customRequest.trim() || isSubmittingRequest}
+                        className='btn btn-primary btn-sm flex items-center gap-1 disabled:opacity-50'
+                      >
+                        {isSubmittingRequest ? (
+                          <Loading isSmall />
+                        ) : (
+                          <Icon
+                            variant='arrowright'
+                            className={cn(
+                              'h-4 w-4',
+                              !customRequest.trim()
+                                ? 'stroke-gray-400'
+                                : 'stroke-white',
+                            )}
+                          />
+                        )}
+                        {isSubmittingRequest ? 'Sending...' : 'Send'}
+                      </button>
+                    </>
+                  )}
                 </div>
               </div>
             </div>

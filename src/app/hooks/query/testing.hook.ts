@@ -16,6 +16,7 @@ import {
   ITestAssumptionCreate,
   ITestAssumptionUpdate,
 } from '@pages/Concept/Report/Testing/types';
+import { useState } from 'react';
 
 /**
  * Custom hook for fetching test details for a concept.
@@ -802,4 +803,122 @@ export const useDeleteTestAssumption = () => {
       toast.error(message || 'Failed to unlink assumption. Please try again.');
     },
   });
+};
+
+/**
+ * Hook for handling custom test collateral requests with smart type detection
+ */
+export const useTestCollateralRequest = (
+  conceptUuid: string,
+  testUuid: string,
+) => {
+  const [customRequest, setCustomRequest] = useState('');
+  const createTestCollateral = useCreateTestCollateral();
+
+  /**
+   * Extract type from request text based on keywords
+   */
+  const extractTypeFromRequest = (
+    request: string,
+  ): 'text' | 'image' | 'file' | 'url' | 'prototype' | 'survey' | 'guide' => {
+    const lowerRequest = request.toLowerCase();
+
+    if (
+      lowerRequest.includes('image') ||
+      lowerRequest.includes('picture') ||
+      lowerRequest.includes('photo') ||
+      lowerRequest.includes('visual')
+    ) {
+      return 'image';
+    }
+    if (
+      lowerRequest.includes('file') ||
+      lowerRequest.includes('document') ||
+      lowerRequest.includes('pdf')
+    ) {
+      return 'file';
+    }
+    if (
+      lowerRequest.includes('url') ||
+      lowerRequest.includes('link') ||
+      lowerRequest.includes('website')
+    ) {
+      return 'url';
+    }
+    if (
+      lowerRequest.includes('prototype') ||
+      lowerRequest.includes('mockup') ||
+      lowerRequest.includes('wireframe')
+    ) {
+      return 'prototype';
+    }
+    if (
+      lowerRequest.includes('survey') ||
+      lowerRequest.includes('questionnaire') ||
+      lowerRequest.includes('poll')
+    ) {
+      return 'survey';
+    }
+    if (
+      lowerRequest.includes('guide') ||
+      lowerRequest.includes('manual') ||
+      lowerRequest.includes('instruction')
+    ) {
+      return 'guide';
+    }
+
+    return 'text'; // Default fallback
+  };
+
+  /**
+   * Handle custom collateral request submission
+   */
+  const handleCustomRequest = () => {
+    if (!customRequest.trim() || !conceptUuid || !testUuid) return;
+
+    const type = extractTypeFromRequest(customRequest);
+
+    createTestCollateral.mutate(
+      {
+        conceptUuid,
+        testUuid,
+        data: {
+          title: `Custom ${type.charAt(0).toUpperCase() + type.slice(1)} Request`,
+          description: `User requested: ${customRequest}`,
+          type,
+          content: customRequest,
+          test_details_uuid: testUuid,
+        },
+      },
+      {
+        onSuccess: () => {
+          toast.success('Collateral request submitted successfully!');
+          setCustomRequest(''); // Clear input on success
+        },
+        onError: (error) => {
+          const errorMessage = utils.osiris.parseFormError(error);
+          toast.error(errorMessage || 'Failed to submit collateral request');
+        },
+      },
+    );
+  };
+
+  /**
+   * Handle Enter key press
+   */
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleCustomRequest();
+    }
+  };
+
+  return {
+    customRequest,
+    setCustomRequest,
+    handleCustomRequest,
+    handleKeyDown,
+    isLoading: createTestCollateral.isLoading,
+    extractTypeFromRequest,
+  };
 };
