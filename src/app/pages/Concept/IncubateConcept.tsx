@@ -120,6 +120,7 @@ const IncubateConcept: React.FC = () => {
         questionnaires.expandAnExistingIdea.type === 'EXPAND_AN_EXISTING_IDEA'
       ) {
         setActiveQuestionnaire(questionnaires.expandAnExistingIdea);
+        setClarifyingQuestions(seedDraftData.clarifyingQuestions);
       } else if (
         seedDraftData.type === 'IDENTIFY_NEW_OPPORTUNITIES' &&
         questionnaires.identifyNewOpportunities.questions &&
