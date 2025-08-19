@@ -17,6 +17,12 @@ import {
   ITestAssumptionUpdate,
 } from '@pages/Concept/Report/Testing/types';
 import { useState } from 'react';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
+import {
+  ITestCollateralProgressMessage,
+  ITestCollateralCompletedMessage,
+  ITestCollateralErrorMessage,
+} from '@libs/api/types/socketMessages/inbound';
 
 /**
  * Custom hook for fetching test details for a concept.
@@ -208,40 +214,141 @@ export const useTestCollateral = (
 };
 
 /**
- * Custom hook for creating test collateral.
- * @returns The result of the useMutation hook.
+ * Creates test collateral with WebSocket progress tracking.
+ * @returns Mutation with processingState and clearProcessingState
  */
 export const useCreateTestCollateral = () => {
   const queryClient = useQueryClient();
+  const [processingState, setProcessingState] = useState<{
+    isProcessing: boolean;
+    progress: number;
+    message: string;
+    stage?: string;
+    error: string | null;
+    collateralUuid?: string;
+  }>({
+    isProcessing: false,
+    progress: 0,
+    message: '',
+    stage: undefined,
+    error: null,
+    collateralUuid: undefined,
+  });
 
-  return useMutation({
+  // Listen for WebSocket events for collateral creation progress
+  useSocketEvent(
+    'test_collateral.progress.user',
+    (data: ITestCollateralProgressMessage) => {
+      setProcessingState((prev) => ({
+        ...prev,
+        isProcessing: true,
+        progress: data.progress,
+        message: data.message,
+        stage: data.stage,
+        error: null,
+        collateralUuid: data.collateralUuid,
+      }));
+    },
+  );
+
+  // Listen for completion event
+  useSocketEvent(
+    'test_collateral.completed.user',
+    (data: ITestCollateralCompletedMessage) => {
+      setProcessingState({
+        isProcessing: false,
+        progress: 100,
+        message: 'Collateral created successfully!',
+        stage: 'completed',
+        error: null,
+        collateralUuid: data.collateralUuid,
+      });
+
+      // Invalidate queries to refresh the collateral list
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testCollateral,
+          data.conceptUuid,
+          data.testUuid,
+        ],
+      });
+
+      toast.success('Collateral created successfully');
+    },
+  );
+
+  // Listen for error events
+  useSocketEvent(
+    'test_collateral.error.user',
+    (data: ITestCollateralErrorMessage) => {
+      setProcessingState((prev) => ({
+        ...prev,
+        isProcessing: false,
+        progress: 0,
+        message: '',
+        stage: 'error',
+        error: data.message,
+        collateralUuid: data.collateralUuid || prev.collateralUuid,
+      }));
+
+      toast.error(data.message || 'Failed to create collateral');
+    },
+  );
+
+  const mutation = useMutation({
     mutationFn: async (params: {
       conceptUuid: string;
       testUuid: string;
       data: ITestCollateralCreate;
     }) => {
       const { conceptUuid, testUuid, data } = params;
+
+      // Set initial processing state
+      setProcessingState({
+        isProcessing: true,
+        progress: 0,
+        message: 'Starting collateral creation...',
+        stage: 'starting',
+        error: null,
+        collateralUuid: undefined,
+      });
+
       return await api.testing.createTestCollateral(
         conceptUuid,
         testUuid,
         data,
       );
     },
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: [
-          AucctusQueryKeys.testCollateral,
-          variables.conceptUuid,
-          variables.testUuid,
-        ],
-      });
-      toast.success('Collateral created successfully');
+    onSuccess: () => {
+      // Initiates async processing. WebSocket events handle progress updates.
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
+      setProcessingState({
+        isProcessing: false,
+        progress: 0,
+        message: '',
+        stage: 'error',
+        error: message || 'Failed to create collateral. Please try again.',
+        collateralUuid: undefined,
+      });
       toast.error(message || 'Failed to create collateral. Please try again.');
     },
   });
+
+  return {
+    ...mutation,
+    processingState,
+    clearProcessingState: () =>
+      setProcessingState({
+        isProcessing: false,
+        progress: 0,
+        message: '',
+        stage: undefined,
+        error: null,
+        collateralUuid: undefined,
+      }),
+  };
 };
 
 /**
@@ -816,76 +923,18 @@ export const useTestCollateralRequest = (
   const createTestCollateral = useCreateTestCollateral();
 
   /**
-   * Extract type from request text based on keywords
-   */
-  const extractTypeFromRequest = (
-    request: string,
-  ): 'text' | 'image' | 'file' | 'url' | 'prototype' | 'survey' | 'guide' => {
-    const lowerRequest = request.toLowerCase();
-
-    if (
-      lowerRequest.includes('image') ||
-      lowerRequest.includes('picture') ||
-      lowerRequest.includes('photo') ||
-      lowerRequest.includes('visual')
-    ) {
-      return 'image';
-    }
-    if (
-      lowerRequest.includes('file') ||
-      lowerRequest.includes('document') ||
-      lowerRequest.includes('pdf')
-    ) {
-      return 'file';
-    }
-    if (
-      lowerRequest.includes('url') ||
-      lowerRequest.includes('link') ||
-      lowerRequest.includes('website')
-    ) {
-      return 'url';
-    }
-    if (
-      lowerRequest.includes('prototype') ||
-      lowerRequest.includes('mockup') ||
-      lowerRequest.includes('wireframe')
-    ) {
-      return 'prototype';
-    }
-    if (
-      lowerRequest.includes('survey') ||
-      lowerRequest.includes('questionnaire') ||
-      lowerRequest.includes('poll')
-    ) {
-      return 'survey';
-    }
-    if (
-      lowerRequest.includes('guide') ||
-      lowerRequest.includes('manual') ||
-      lowerRequest.includes('instruction')
-    ) {
-      return 'guide';
-    }
-
-    return 'text'; // Default fallback
-  };
-
-  /**
    * Handle custom collateral request submission
    */
   const handleCustomRequest = () => {
     if (!customRequest.trim() || !conceptUuid || !testUuid) return;
-
-    const type = extractTypeFromRequest(customRequest);
 
     createTestCollateral.mutate(
       {
         conceptUuid,
         testUuid,
         data: {
-          title: `Custom ${type.charAt(0).toUpperCase() + type.slice(1)} Request`,
+          title: `Custom Collateral Request`,
           description: `User requested: ${customRequest}`,
-          type,
           content: customRequest,
           test_details_uuid: testUuid,
         },
@@ -919,6 +968,5 @@ export const useTestCollateralRequest = (
     handleCustomRequest,
     handleKeyDown,
     isLoading: createTestCollateral.isLoading,
-    extractTypeFromRequest,
   };
 };

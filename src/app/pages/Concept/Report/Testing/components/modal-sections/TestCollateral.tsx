@@ -3,6 +3,7 @@ import { Icon, toast, Loading } from '@components';
 import { cn } from '@libs/utils/react';
 import {
   useTestCollateral,
+  useCreateTestCollateral,
   useTestCollateralRequest,
 } from '@hooks/query/testing.hook';
 
@@ -30,7 +31,10 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
     enabled: shouldFetch,
   });
 
-  // Hook for creating custom collateral requests
+  // Hook for creating test collateral with WebSocket processing
+  const { processingState, clearProcessingState } = useCreateTestCollateral();
+
+  // Use the dedicated hook for custom collateral requests
   const {
     customRequest,
     setCustomRequest,
@@ -39,12 +43,35 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
     isLoading: isSubmittingRequest,
   } = useTestCollateralRequest(conceptUuid || '', testUuid || '');
 
+  // Local state for retry functionality (only for WebSocket processing errors)
+  const [lastRequest, setLastRequest] = React.useState('');
+
+  // Track the last submitted request for WebSocket retry purposes
+  React.useEffect(() => {
+    if (customRequest.trim()) {
+      setLastRequest(customRequest.trim());
+    }
+  }, [customRequest]);
+
+  // Handle retry for WebSocket processing errors only
+  const handleRetry = () => {
+    if (!lastRequest) return;
+    setCustomRequest(lastRequest);
+    handleCustomRequest();
+  };
+
+  // Check if we're currently processing
+  const isProcessing = processingState.isProcessing;
+  const isSubmittingOrProcessing = isSubmittingRequest || isProcessing;
+
+  // Format stage name from snake_case to readable text
+  const formatStageName = (stage: string): string => {
+    return stage.replace(/_/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
+  };
+
   // Use provided data or fallback to fetched data
   const collateral = fetchedCollateral;
   const isCollateralLoading = isFetchedCollateralLoading;
-
-  const [selectedItem, setSelectedItem] =
-    React.useState<ITestCollateral | null>(null);
 
   // Convert API collateral to ITestCollateral format
   const convertApiCollateral = (apiCollateral: any[]): ITestCollateral[] => {
@@ -81,7 +108,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   };
 
   // Get display collateral from API only
-  const getDisplayCollateral = (): ITestCollateral[] => {
+  const displayCollateral = React.useMemo(() => {
     if (!collateral) return [];
 
     // Handle direct array format
@@ -100,16 +127,39 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
     }
 
     return [];
-  };
+  }, [collateral]);
 
-  const displayCollateral = getDisplayCollateral();
+  const [selectedItem, setSelectedItem] =
+    React.useState<ITestCollateral | null>(null);
 
-  // Update selected item when collateral changes
+  // Simple effect to select first item when collateral first loads
   React.useEffect(() => {
     if (displayCollateral.length > 0 && !selectedItem) {
       setSelectedItem(displayCollateral[0]);
     }
   }, [displayCollateral, selectedItem]);
+
+  // Separate effect to handle WebSocket completion auto-selection
+  React.useEffect(() => {
+    if (
+      processingState.stage === 'completed' &&
+      processingState.collateralUuid
+    ) {
+      const completedItem = displayCollateral.find(
+        (item) => item.id === processingState.collateralUuid,
+      );
+      if (completedItem) {
+        setSelectedItem(completedItem);
+      } else if (displayCollateral.length > 0) {
+        // Fallback to first item if specific item not found
+        setSelectedItem(displayCollateral[0]);
+      }
+    }
+  }, [
+    processingState.stage,
+    processingState.collateralUuid,
+    displayCollateral,
+  ]);
 
   // Handle item selection
   const handleItemSelect = (item: ITestCollateral) => {
@@ -247,12 +297,81 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                   </span>
                 </div>
                 <div className='flex gap-2'>
-                  {isSubmittingRequest ? (
-                    <div className='aucctus-bg-secondary-subtle aucctus-border-secondary flex flex-1 items-center justify-center gap-2 rounded border p-3'>
-                      <Loading />
-                      <span className='aucctus-text-sm-regular aucctus-text-secondary'>
-                        Generating collateral...
-                      </span>
+                  {isSubmittingOrProcessing ? (
+                    <div className='aucctus-bg-secondary-subtle aucctus-border-secondary flex flex-1 flex-col gap-3 rounded border p-4'>
+                      <div className='flex items-center gap-2'>
+                        <Loading isSmall />
+                        <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
+                          {isProcessing
+                            ? 'Creating Collateral'
+                            : 'Submitting Request'}
+                        </span>
+                      </div>
+
+                      {isProcessing && (
+                        <>
+                          <div className='space-y-2'>
+                            <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                              {processingState.message ||
+                                'Processing your request...'}
+                            </p>
+
+                            {/* Progress Bar */}
+                            <div className='aucctus-bg-secondary h-2 w-full rounded-full'>
+                              <div
+                                className='aucctus-bg-success-primary h-2 rounded-full transition-all duration-300'
+                                style={{
+                                  width: `${processingState.progress}%`,
+                                }}
+                              />
+                            </div>
+
+                            {/* Progress Details */}
+                            <div className='flex items-center justify-between'>
+                              <span className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                                {processingState.stage &&
+                                  `Stage: ${formatStageName(processingState.stage)}`}
+                              </span>
+                              <span className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                                {processingState.progress}%
+                              </span>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ) : processingState.error ? (
+                    <div className='aucctus-bg-error-secondary aucctus-border-error flex flex-1 flex-col gap-3 rounded border p-4'>
+                      <div className='flex items-center gap-2'>
+                        <Icon
+                          variant='alert-circle'
+                          className='aucctus-stroke-error-primary h-5 w-5'
+                        />
+                        <span className='aucctus-text-sm-semibold aucctus-text-error-primary'>
+                          Processing Failed
+                        </span>
+                      </div>
+
+                      <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                        {processingState.error}
+                      </p>
+
+                      {/* Action Buttons */}
+                      <div className='flex gap-2'>
+                        <button
+                          onClick={clearProcessingState}
+                          className='btn btn-secondary btn-sm'
+                        >
+                          Close
+                        </button>
+                        <button
+                          onClick={handleRetry}
+                          className='btn btn-primary btn-sm'
+                          disabled={!lastRequest.trim()}
+                        >
+                          Retry
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <>
@@ -266,10 +385,12 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                       />
                       <button
                         onClick={handleCustomRequest}
-                        disabled={!customRequest.trim() || isSubmittingRequest}
+                        disabled={
+                          !customRequest.trim() || isSubmittingOrProcessing
+                        }
                         className='btn btn-primary btn-sm flex items-center gap-1 disabled:opacity-50'
                       >
-                        {isSubmittingRequest ? (
+                        {isSubmittingOrProcessing ? (
                           <Loading isSmall />
                         ) : (
                           <Icon
@@ -282,7 +403,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                             )}
                           />
                         )}
-                        {isSubmittingRequest ? 'Sending...' : 'Send'}
+                        {isSubmittingOrProcessing ? 'Sending...' : 'Send'}
                       </button>
                     </>
                   )}

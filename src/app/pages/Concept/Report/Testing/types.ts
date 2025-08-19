@@ -122,7 +122,7 @@ export interface ITestCollateral {
 export interface ITestCollateralCreate {
   title: string;
   description: string;
-  type: 'text' | 'image' | 'file' | 'url' | 'prototype' | 'survey' | 'guide';
+  type?: 'text' | 'image' | 'file' | 'url' | 'prototype' | 'survey' | 'guide';
   content: string;
   test_details_uuid?: string;
   format?: string;
