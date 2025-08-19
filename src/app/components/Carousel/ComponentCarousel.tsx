@@ -20,7 +20,7 @@ const navContainerStyles = 'flex justify-end gap-2';
 
 const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
   children,
-  cardWidth = '240px',
+  cardWidth,
   gap = '16px',
   showNavigation = true,
   autoScrollToCenter = false,
@@ -230,7 +230,10 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
               key={index}
               className='flex-shrink-0'
               style={{
-                width: cardWidth,
+                width:
+                  cardWidth ||
+                  Math.max(scrollState.containerWidth - 10, 200) ||
+                  undefined,
                 marginRight: gap,
                 maxWidth:
                   Math.max(scrollState.containerWidth - 10, 200) || undefined,

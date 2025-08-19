@@ -77,7 +77,6 @@ const TrendCard: React.FC<TrendCardProps> = ({ section, index }) => {
           {/* Carousel arrows are handled by the carousel itself */}
         </div>
         <ComponentCarousel
-          cardWidth='280px'
           gap='12px'
           showNavigation={true}
           arrowPlacement='top'
