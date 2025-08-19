@@ -195,16 +195,20 @@ export class TestingApi extends ApiService {
     );
   }
 
-  // New method for creating test results with file upload
-  async createTestResultWithFile(
+  // Method for creating test results with multiple files upload
+  async createTestResultWithFiles(
     conceptUuid: string,
     testUuid: string,
-    file: File,
+    files: File[],
     summary?: string,
     recommendations?: string,
-  ): Promise<ITestResult> {
+  ): Promise<ITestResult[]> {
     const formData = new FormData();
-    formData.append('file', file);
+
+    // Append each file
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
 
     if (summary) {
       formData.append('summary', summary);
@@ -214,7 +218,7 @@ export class TestingApi extends ApiService {
       formData.append('recommendations', recommendations);
     }
 
-    return this.post<ITestResult>(
+    return this.post<ITestResult[]>(
       endpoints.conceptTestResults(conceptUuid, testUuid),
       formData,
       {
@@ -237,6 +241,42 @@ export class TestingApi extends ApiService {
     );
   }
 
+  // Method for adding additional files to existing test results
+  async addFilesToTestResult(
+    conceptUuid: string,
+    testUuid: string,
+    resultUuid: string,
+    files: File[],
+    data?: { summary?: string; recommendations?: string },
+  ): Promise<ITestResult> {
+    const formData = new FormData();
+
+    // Append each file
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    // Append any additional data
+    if (data?.summary) {
+      formData.append('summary', data.summary);
+    }
+
+    if (data?.recommendations) {
+      formData.append('recommendations', data.recommendations);
+    }
+
+    // Use POST to add files to existing result
+    return this.post<ITestResult>(
+      endpoints.conceptTestResultFiles(conceptUuid, testUuid, resultUuid),
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+  }
+
   async deleteTestResult(
     conceptUuid: string,
     testUuid: string,
@@ -244,6 +284,22 @@ export class TestingApi extends ApiService {
   ): Promise<void> {
     return this.delete<void>(
       endpoints.conceptTestResult(conceptUuid, testUuid, resultUuid),
+    );
+  }
+
+  async deleteTestResultFile(
+    conceptUuid: string,
+    testUuid: string,
+    resultUuid: string,
+    fileUuid: string,
+  ): Promise<void> {
+    return this.delete<void>(
+      endpoints.conceptTestResultFile(
+        conceptUuid,
+        testUuid,
+        resultUuid,
+        fileUuid,
+      ),
     );
   }
 

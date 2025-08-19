@@ -287,6 +287,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             conceptUuid={conceptUuid}
             testUuid={testUuid}
             onResultsChange={handleResultsChange}
+            isViewMode={isViewMode} // Pass view mode to TestResults
           />
         );
 

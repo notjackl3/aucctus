@@ -351,6 +351,23 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/results/${resultUuid}`;
   }
 
+  static conceptTestResultFile(
+    conceptUuid: string,
+    testUuid: string,
+    resultUuid: string,
+    fileUuid: string,
+  ) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/results/${resultUuid}/files/${fileUuid}`;
+  }
+
+  static conceptTestResultFiles(
+    conceptUuid: string,
+    testUuid: string,
+    resultUuid: string,
+  ) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/results/${resultUuid}/files`;
+  }
+
   static conceptTestAssumptions(conceptUuid: string, testUuid: string) {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/assumptions`;
   }

@@ -15,6 +15,17 @@ export interface ITestResult {
   createdAt: string;
   updatedAt: string;
   editRecommendations?: IEditRecommendation[];
+  files: ITestFile[];
+}
+
+export interface ITestFile {
+  uuid: string;
+  originalFilename: string;
+  fileExtension: string;
+  fileSize: number;
+  fileUrl: string;
+  filePath: string;
+  createdAt: string;
 }
 
 // Test Learning Types
@@ -25,6 +36,8 @@ export interface ITestLearning {
   testResultUuid: string;
   createdAt: string;
   updatedAt: string;
+  sourceUuid: string;
+  sourceFilename: string;
 }
 
 // Edit Recommendation Types

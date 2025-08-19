@@ -28,7 +28,7 @@ interface TestResultProcessingStatusProps {
   className?: string;
 }
 
-const getStageDisplay = (stage: string): string => {
+export const getStageDisplay = (stage: string): string => {
   const stageLabels: Record<string, string> = {
     extracting_text: 'Extracting Text',
     analyzing_content: 'Analyzing Content',
@@ -72,6 +72,18 @@ const TestResultProcessingStatus: React.FC<TestResultProcessingStatusProps> = ({
   ) {
     telemetry.log(
       '[TestResultProcessingStatus] Hiding component - no processing activity',
+    );
+    return null;
+  }
+
+  // Also hide if there's no testResultUuid and no active processing
+  if (
+    !processingState.testResultUuid &&
+    !processingState.isProcessing &&
+    processingState.stage !== 'completed'
+  ) {
+    telemetry.log(
+      '[TestResultProcessingStatus] Hiding component - no test result context',
     );
     return null;
   }
@@ -126,9 +138,9 @@ const TestResultProcessingStatus: React.FC<TestResultProcessingStatusProps> = ({
             {/* Progress Bar */}
             {processingState.isProcessing && processingState.progress > 0 && (
               <div className='mt-3'>
-                <div className='aucctus-bg-secondary h-2 w-full rounded-full'>
+                <div className='aucctus-bg-tertiary h-2 w-full rounded-full'>
                   <div
-                    className='aucctus-bg-brand-primary h-2 rounded-full transition-all duration-500'
+                    className='aucctus-bg-success-primary h-2 rounded-full transition-all duration-500'
                     style={{ width: `${processingState.progress}%` }}
                   />
                 </div>

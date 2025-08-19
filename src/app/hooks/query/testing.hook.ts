@@ -628,25 +628,25 @@ export const useCreateTestResult = () => {
 };
 
 /**
- * Custom hook for creating test results with file upload.
+ * Custom hook for creating test results with multiple files upload.
  * @returns The result of the useMutation hook.
  */
-export const useCreateTestResultWithFile = () => {
+export const useCreateTestResultWithFiles = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (params: {
       conceptUuid: string;
       testUuid: string;
-      file: File;
+      files: File[];
       summary?: string;
       recommendations?: string;
     }) => {
-      const { conceptUuid, testUuid, file, summary, recommendations } = params;
-      return await api.testing.createTestResultWithFile(
+      const { conceptUuid, testUuid, files, summary, recommendations } = params;
+      return await api.testing.createTestResultWithFiles(
         conceptUuid,
         testUuid,
-        file,
+        files,
         summary,
         recommendations,
       );
@@ -675,11 +675,11 @@ export const useCreateTestResultWithFile = () => {
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
 
-      toast.success('File uploaded successfully');
+      toast.success(`${variables.files.length} files uploaded successfully`);
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to upload file. Please try again.');
+      toast.error(message || 'Failed to upload files. Please try again.');
     },
   });
 };
@@ -697,8 +697,24 @@ export const useUpdateTestResult = () => {
       testUuid: string;
       resultUuid: string;
       data: ITestResultUpdate;
+      files?: File[]; // Optional files parameter
     }) => {
-      const { conceptUuid, testUuid, resultUuid, data } = params;
+      const { conceptUuid, testUuid, resultUuid, data, files } = params;
+
+      // If files are provided, use the files upload method
+      if (files && files.length > 0) {
+        return await api.testing.addFilesToTestResult(
+          conceptUuid,
+          testUuid,
+          resultUuid,
+          files,
+          {
+            summary: data.description, // Map description to summary if needed
+          },
+        );
+      }
+
+      // Otherwise, use the regular update method
       return await api.testing.updateTestResult(
         conceptUuid,
         testUuid,
@@ -707,6 +723,7 @@ export const useUpdateTestResult = () => {
       );
     },
     onSuccess: (_data, variables) => {
+      // Invalidate test results query
       queryClient.invalidateQueries({
         queryKey: [
           AucctusQueryKeys.testResults,
@@ -714,11 +731,92 @@ export const useUpdateTestResult = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Result updated successfully');
+
+      // If files were uploaded, also invalidate other related queries
+      if (variables.files && variables.files.length > 0) {
+        queryClient.invalidateQueries({
+          queryKey: [
+            AucctusQueryKeys.testDetail,
+            variables.conceptUuid,
+            variables.testUuid,
+          ],
+        });
+
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+        });
+
+        toast.success(
+          `Result updated with ${variables.files.length} additional files`,
+        );
+      } else {
+        toast.success('Result updated successfully');
+      }
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to update result. Please try again.');
+    },
+  });
+};
+
+/**
+ * Custom hook for adding files to existing test results.
+ * @returns The result of the useMutation hook.
+ */
+export const useUpdateTestResultWithFiles = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      testUuid: string;
+      resultUuid: string;
+      files: File[];
+      data?: { summary?: string; recommendations?: string };
+    }) => {
+      const { conceptUuid, testUuid, resultUuid, files, data } = params;
+      return await api.testing.addFilesToTestResult(
+        conceptUuid,
+        testUuid,
+        resultUuid,
+        files,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate test results query
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testResults,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+
+      // Invalidate test detail query since results can update assumptions validation status
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testDetail,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+
+      // Invalidate test details list query
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+      });
+
+      toast.success(
+        `Result updated with ${variables.files.length} additional files`,
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Failed to update result with files. Please try again.',
+      );
     },
   });
 };
@@ -756,6 +854,45 @@ export const useDeleteTestResult = () => {
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to delete result. Please try again.');
+    },
+  });
+};
+
+/**
+ * Custom hook for deleting test result files.
+ * @returns The result of the useMutation hook.
+ */
+export const useDeleteTestResultFile = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      testUuid: string;
+      resultUuid: string;
+      fileUuid: string;
+    }) => {
+      const { conceptUuid, testUuid, resultUuid, fileUuid } = params;
+      return await api.testing.deleteTestResultFile(
+        conceptUuid,
+        testUuid,
+        resultUuid,
+        fileUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testResults,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      toast.success('File deleted successfully');
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to delete file. Please try again.');
     },
   });
 };

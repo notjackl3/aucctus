@@ -2,10 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Icon, FileDropzone, toast } from '@components';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import telemetry from '@libs/telemetry';
+import { cn } from '@libs/utils/react';
 import {
   useTestResults,
-  useCreateTestResultWithFile,
+  useCreateTestResultWithFiles,
   useDeleteTestResult,
+  useDeleteTestResultFile,
+  useUpdateTestResult,
 } from '@hooks/query/testing.hook';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
@@ -25,12 +28,14 @@ interface TestResultsProps {
   conceptUuid?: string;
   testUuid?: string;
   onResultsChange?: (hasResults: boolean, hasRecommendations: boolean) => void;
+  isViewMode?: boolean; // Add prop to control view-only behavior
 }
 
 const TestResults: React.FC<TestResultsProps> = ({
   conceptUuid,
   testUuid,
   onResultsChange,
+  isViewMode = false, // Default to false for backward compatibility
 }) => {
   // Use props data if available, otherwise fetch (for backward compatibility)
   const shouldFetch = !!conceptUuid && !!testUuid;
@@ -42,11 +47,17 @@ const TestResults: React.FC<TestResultsProps> = ({
   const results = fetchedResults as ITestResult[];
   const isResultsLoading = isFetchedResultsLoading;
 
-  // Hook for creating test results with file upload
-  const createTestResultWithFile = useCreateTestResultWithFile();
+  // Hook for creating test results with multiple files upload
+  const createTestResultWithFiles = useCreateTestResultWithFiles();
 
   // Hook for deleting test results
   const deleteTestResult = useDeleteTestResult();
+
+  // Hook for deleting individual test result files
+  const deleteTestResultFile = useDeleteTestResultFile();
+
+  // Hook for updating test results with files
+  const updateTestResult = useUpdateTestResult();
 
   // Query client for invalidating cache
   const queryClient = useQueryClient();
@@ -69,6 +80,23 @@ const TestResults: React.FC<TestResultsProps> = ({
       learnings: [],
       keywords: [],
     });
+
+  // Clear stale processing state when component mounts or test changes
+  useEffect(() => {
+    setProcessingState({
+      isProcessing: false,
+      stage: null,
+      message: '',
+      progress: 0,
+      error: null,
+      testResultUuid: undefined,
+      conceptUuid: undefined,
+      testUuid: undefined,
+      summary: undefined,
+      learnings: [],
+      keywords: [],
+    });
+  }, [conceptUuid, testUuid]);
 
   // Socket event handlers for test result processing
   // NOTE: Multitenancy validation (account_uuid/user_uuid) is handled automatically by useSocketEvent hook
@@ -271,47 +299,107 @@ const TestResults: React.FC<TestResultsProps> = ({
   };
 
   // Handle file upload
-  const handleFileUpload = async (uploadedFile: {
-    file: File;
-    name: string;
-    description: string;
-  }) => {
+  const handleFilesUpload = async (
+    uploadedFiles: {
+      id: string;
+      file: File;
+      name: string;
+      description: string;
+    }[],
+  ) => {
     if (!conceptUuid || !testUuid) {
       toast.error('Missing concept or test information');
       return;
     }
 
+    if (uploadedFiles.length === 0) {
+      return;
+    }
+
     try {
-      const result = await createTestResultWithFile.mutateAsync({
-        conceptUuid,
-        testUuid,
-        file: uploadedFile.file,
-        summary: uploadedFile.description || undefined,
-        recommendations: undefined, // Could be added to the FileDropzone form later
-      });
+      // Extract files and summary
+      const files = uploadedFiles.map((uploadedFile) => uploadedFile.file);
+      const summary =
+        uploadedFiles.length > 0
+          ? uploadedFiles[0].description || undefined
+          : undefined;
 
-      // Set initial processing state
-      telemetry.log('test.result.upload.success', {
-        testResultUuid: result.uuid,
-        conceptUuid,
-        testUuid,
-        fileName: uploadedFile.file.name,
-        fileSize: uploadedFile.file.size,
-      });
+      // Check if there are existing results
+      const hasExistingResults = results && results.length > 0;
 
-      setProcessingState({
-        isProcessing: true,
-        stage: null,
-        message: 'Starting analysis...',
-        progress: 0,
-        error: null,
-        testResultUuid: result.uuid,
-        conceptUuid: conceptUuid,
-        testUuid: testUuid,
-        summary: undefined,
-        learnings: [],
-        keywords: [],
-      });
+      if (hasExistingResults) {
+        // Update the first existing result with additional files
+        const firstResult = results[0];
+
+        const updatedResult = await updateTestResult.mutateAsync({
+          conceptUuid,
+          testUuid,
+          resultUuid: firstResult.uuid,
+          data: {
+            // Keep existing data, just add files
+            title: firstResult.title,
+            description: firstResult.description,
+          },
+          files, // Add the new files
+        });
+
+        // Set processing state for the updated result
+        setProcessingState({
+          isProcessing: true,
+          stage: null,
+          message: `Adding ${files.length} more files to existing results...`,
+          progress: 0,
+          error: null,
+          testResultUuid: updatedResult.uuid,
+          conceptUuid: conceptUuid,
+          testUuid: testUuid,
+          summary: undefined,
+          learnings: [],
+          keywords: [],
+        });
+
+        telemetry.log('test.result.update.success', {
+          testResultUuid: updatedResult.uuid,
+          conceptUuid,
+          testUuid,
+          fileCount: files.length,
+          totalSize: uploadedFiles.reduce((sum, f) => sum + f.file.size, 0),
+        });
+      } else {
+        // Create new test results
+        const newResults = await createTestResultWithFiles.mutateAsync({
+          conceptUuid,
+          testUuid,
+          files,
+          summary,
+          recommendations: undefined,
+        });
+
+        // Set initial processing state for the batch
+        if (newResults.length > 0) {
+          setProcessingState({
+            isProcessing: true,
+            stage: null,
+            message: `Starting analysis of ${newResults.length} files...`,
+            progress: 0,
+            error: null,
+            testResultUuid: newResults[0].uuid,
+            conceptUuid: conceptUuid,
+            testUuid: testUuid,
+            summary: undefined,
+            learnings: [],
+            keywords: [],
+          });
+        }
+
+        telemetry.log('test.result.batch.upload.success', {
+          testResultUuids: newResults.map((r) => r.uuid),
+          conceptUuid,
+          testUuid,
+          fileCount: files.length,
+          totalSize: uploadedFiles.reduce((sum, f) => sum + f.file.size, 0),
+        });
+      }
 
       // Clear the dropzone by updating its key to force re-render
       setDropzoneKey((prev) => prev + 1);
@@ -325,12 +413,6 @@ const TestResults: React.FC<TestResultsProps> = ({
         error: 'Upload failed. Please try again.',
       }));
     }
-  };
-
-  // Handle file removal - only needed for dropzone component
-  const handleFileRemove = () => {
-    // This will be called when the user removes a file from the dropzone
-    // The dropzone component handles its own state for the current file
   };
 
   // Handle delete result
@@ -365,6 +447,40 @@ const TestResults: React.FC<TestResultsProps> = ({
     }
   };
 
+  // Handle delete individual file
+  const handleDeleteFile = async (
+    resultUuid: string,
+    fileUuid: string,
+    fileName: string,
+  ) => {
+    if (!conceptUuid || !testUuid) {
+      toast.error('Missing concept or test information');
+      return;
+    }
+
+    // Confirm deletion
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${fileName}"? This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    try {
+      await deleteTestResultFile.mutateAsync({
+        conceptUuid,
+        testUuid,
+        resultUuid,
+        fileUuid,
+      });
+
+      // The query will be invalidated and refetch the updated results
+    } catch (error) {
+      // The hook already shows a toast error message
+    }
+  };
+
   if (isResultsLoading) {
     return (
       <div className='flex items-center justify-center py-12'>
@@ -383,11 +499,20 @@ const TestResults: React.FC<TestResultsProps> = ({
 
   // Show no data state if no results from API
   const hasResults = results && results.length > 0;
+  const allFiles = results.flatMap((result) => result.files);
+
+  // Determine processing completion status
+  const isProcessingComplete =
+    !processingState.isProcessing &&
+    (processingState.stage === 'completed' || processingState.stage === null);
+
+  // Allow deletions only if not in view mode and processing is complete
+  const canDelete = !isViewMode && isProcessingComplete;
 
   return (
     <div className='relative space-y-4'>
       {/* Loading Overlay for Test Result Analysis */}
-      {createTestResultWithFile.isLoading && (
+      {(createTestResultWithFiles.isLoading || updateTestResult.isLoading) && (
         <TestCompletionLoadingOverlay
           title='Analyzing Test Results'
           description="We're processing your test data and extracting key insights. This may take up to a minute."
@@ -397,179 +522,6 @@ const TestResults: React.FC<TestResultsProps> = ({
 
       {/* Real-time Processing Status */}
       <TestResultProcessingStatus processingState={processingState} />
-
-      {/* Results Grid */}
-      {hasResults && (
-        <div className='space-y-3'>
-          <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
-            Uploaded Results
-          </h4>
-          <div className='grid gap-3'>
-            {results.map((result) => (
-              <div
-                key={result.uuid}
-                className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4 transition-all hover:shadow-sm'
-              >
-                <div className='flex items-start gap-4'>
-                  {/* File Icon */}
-                  <div className='aucctus-bg-secondary aucctus-border-secondary flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-lg border'>
-                    <Icon variant='pdf' className='h-6 w-6' />
-                  </div>
-
-                  {/* File Details */}
-                  <div className='min-w-0 flex-1'>
-                    <div className='mb-2 flex items-start justify-between'>
-                      <div className='min-w-0 flex-1'>
-                        <h5 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-1 truncate'>
-                          {result.title}
-                        </h5>
-                        {result.description && (
-                          <p className='aucctus-text-sm-regular aucctus-text-secondary mb-2 line-clamp-2'>
-                            {result.description}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Action Buttons */}
-                      <div className='ml-4 flex items-center gap-2'>
-                        {result.fileUrl && (
-                          <a
-                            href={result.fileUrl}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='btn btn-primary btn-sm flex items-center justify-center'
-                          >
-                            <Icon
-                              variant='download'
-                              className='aucctus-stroke-white h-4 w-4'
-                            />
-                          </a>
-                        )}
-                        <button
-                          onClick={() =>
-                            handleDeleteResult(result.uuid, result.title)
-                          }
-                          className='btn btn-primary btn-sm flex items-center justify-center'
-                          disabled={deleteTestResult.isLoading}
-                        >
-                          <Icon
-                            variant='trash'
-                            className='aucctus-stroke-white h-4 w-4'
-                          />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Metadata Grid */}
-                    <div className='aucctus-bg-secondary-subtle rounded-lg p-4'>
-                      <div className='grid grid-cols-2 gap-4 lg:grid-cols-4'>
-                        {/* File Name */}
-                        <div className='flex items-center gap-2'>
-                          <Icon
-                            variant='file'
-                            className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
-                          />
-                          <div className='min-w-0'>
-                            <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
-                              Original File
-                            </p>
-                            <p className='aucctus-text-sm-semibold aucctus-text-brand-primary truncate'>
-                              {result.originalFilename}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* File Type & Size */}
-                        <div className='flex items-center gap-2'>
-                          <Icon
-                            variant='filecode'
-                            className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
-                          />
-                          <div>
-                            <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
-                              Type & Size
-                            </p>
-                            <p className='aucctus-text-sm-semibold aucctus-text-brand-primary'>
-                              {result.fileType.toUpperCase()} •{' '}
-                              {formatFileSize(result.fileSize)}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Upload Date */}
-                        <div className='flex items-center gap-2'>
-                          <Icon
-                            variant='calendar'
-                            className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
-                          />
-                          <div>
-                            <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
-                              Uploaded
-                            </p>
-                            <p className='aucctus-text-sm-semibold aucctus-text-brand-primary'>
-                              {formatDate(result.createdAt)}
-                            </p>
-                          </div>
-                        </div>
-
-                        {/* Status */}
-                        <div className='flex items-center gap-2'>
-                          <Icon
-                            variant='check'
-                            className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
-                          />
-                          <span className='aucctus-bg-success-secondary aucctus-text-success-primary rounded-full px-2 py-0.5 text-xs font-semibold'>
-                            Processed
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Key Learnings Section - Outside of individual cards, Two Columns */}
-          {results.length > 0 &&
-            results[0].learnings &&
-            results[0].learnings.length > 0 && (
-              <div>
-                <div className='mb-3 flex items-center gap-3'>
-                  <Icon
-                    variant='lightbulb'
-                    className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
-                  />
-                  <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
-                    Key Learnings
-                  </h4>
-                </div>
-                <div className='grid grid-cols-1 gap-3 lg:grid-cols-2'>
-                  {results[0].learnings.map((learning) => (
-                    <div
-                      key={learning.uuid}
-                      className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-3'
-                    >
-                      <div>
-                        <p className='aucctus-text-sm-regular aucctus-text-brand-primary mb-2'>
-                          {learning.learning}
-                        </p>
-                        <div className='aucctus-bg-primary rounded p-2'>
-                          <p className='aucctus-text-xs-regular aucctus-text-tertiary mb-1'>
-                            Impact:
-                          </p>
-                          <p className='aucctus-text-sm-semibold aucctus-text-secondary'>
-                            {learning.impact}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-        </div>
-      )}
 
       {/* Information Section - Only show when no results */}
       {!hasResults && (
@@ -583,41 +535,300 @@ const TestResults: React.FC<TestResultsProps> = ({
             </div>
             <div>
               <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
-                Adding Test Results
+                Getting Started with Test Results
               </h4>
               <p className='aucctus-text-sm-regular aucctus-text-secondary mb-2'>
-                Record key findings from your test sessions. These will be used
-                to validate your assumptions and improve your concept.
+                Upload files from your test sessions to validate assumptions and
+                improve your concept.
               </p>
               <ul className='aucctus-text-sm-regular aucctus-text-secondary list-disc space-y-1 pl-5'>
                 <li>Focus on clear, objective observations</li>
                 <li>Include specific numbers or quotes when possible</li>
-                <li>
-                  Categorize each finding to connect it to your assumptions
-                </li>
+                <li>Upload multiple test result files in one batch</li>
+                <li>Categorize findings to connect them to your assumptions</li>
               </ul>
             </div>
           </div>
         </div>
       )}
 
-      {/* Add Test Results - Only show when no results */}
-      {!hasResults && (
-        <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4'>
-          <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
-            Add Test Results
-          </h4>
-          <p className='aucctus-text-sm-regular aucctus-text-secondary mb-4'>
-            Upload a file containing your test results. Include a descriptive
-            name and optional description to help organize your findings.
-          </p>
+      {/* Add Test Results - Show before results, but hide during processing */}
+      {!processingState.isProcessing &&
+        !createTestResultWithFiles.isLoading &&
+        !updateTestResult.isLoading &&
+        !isViewMode && ( // Hide upload zone in view mode
+          <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4'>
+            <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
+              {hasResults ? 'Add More Test Results' : 'Add Test Results'}
+            </h4>
+            <p className='aucctus-text-sm-regular aucctus-text-secondary mb-4'>
+              {hasResults
+                ? 'Upload additional files containing more test results to expand your analysis.'
+                : 'Upload multiple files containing your test results. Add descriptive names and optional descriptions to help organize your findings.'}
+            </p>
 
-          <FileDropzone
-            key={dropzoneKey}
-            onFileUpload={handleFileUpload}
-            onFileRemove={handleFileRemove}
-            maxSizeInMB={25}
-          />
+            <FileDropzone key={dropzoneKey} onFilesUpload={handleFilesUpload} />
+          </div>
+        )}
+
+      {/* Results Grid */}
+      {hasResults && (
+        <div className='space-y-6'>
+          <div className='flex items-center justify-between'>
+            <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
+              Test Results ({allFiles.length} files)
+            </h4>
+            <div className='flex items-center gap-2'>
+              <Icon
+                variant={isProcessingComplete ? 'check' : 'refresh'}
+                className={cn(
+                  'h-4 w-4',
+                  isProcessingComplete
+                    ? 'aucctus-stroke-success-primary'
+                    : 'aucctus-stroke-brand-primary animate-spin',
+                )}
+              />
+              <span
+                className={cn(
+                  'aucctus-text-sm-regular',
+                  isProcessingComplete
+                    ? 'aucctus-text-success-primary'
+                    : 'aucctus-text-brand-primary',
+                )}
+              >
+                {isProcessingComplete
+                  ? 'All files processed'
+                  : 'Processing files...'}
+              </span>
+            </div>
+          </div>
+
+          {/* Files Grid - Responsive layout for multiple files */}
+          <div
+            className={cn(
+              'grid gap-4',
+              results.length === 1
+                ? 'grid-cols-1'
+                : 'grid-cols-1 lg:grid-cols-2',
+            )}
+          >
+            {results.map((result) => (
+              <div
+                key={result.uuid}
+                className='aucctus-border-secondary aucctus-bg-primary rounded-lg border transition-all hover:shadow-sm'
+              >
+                {/* File Header */}
+                <div className='aucctus-bg-secondary-subtle aucctus-border-secondary border-b px-4 py-3'>
+                  <div className='flex items-center justify-between'>
+                    <div className='flex items-center gap-3'>
+                      <Icon
+                        variant='pdf'
+                        className='aucctus-fill-brand-primary h-6 w-6'
+                      />
+                      <div className='min-w-0 flex-1'>
+                        <h5 className='aucctus-text-md-semibold aucctus-text-brand-primary truncate'>
+                          {result.title}
+                        </h5>
+                      </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className='flex items-center gap-2'>
+                      {canDelete && ( // Hide delete button in view mode
+                        <button
+                          onClick={() =>
+                            handleDeleteResult(result.uuid, result.title)
+                          }
+                          className='btn btn-secondary btn-xs flex items-center gap-1'
+                          disabled={deleteTestResult.isLoading}
+                          title='Delete file'
+                        >
+                          <Icon
+                            variant='trash'
+                            className='aucctus-stroke-secondary h-3 w-3'
+                          />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* File Content */}
+                {result.files.map((file) => (
+                  <div className='p-4' key={file.uuid}>
+                    {/* Description if available */}
+                    {file.originalFilename && (
+                      <div className='mb-3'>
+                        <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                          {file.originalFilename}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Metadata in compact grid */}
+                    <div className='grid grid-cols-2 gap-3 text-xs'>
+                      <div className='flex items-center gap-2'>
+                        <Icon
+                          variant='filecode'
+                          className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0'
+                        />
+                        <div>
+                          <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                            Size
+                          </p>
+                          <p className='aucctus-text-xs-semibold aucctus-text-brand-primary'>
+                            {formatFileSize(file.fileSize)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className='flex items-center gap-2'>
+                        <Icon
+                          variant='calendar'
+                          className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0'
+                        />
+                        <div>
+                          <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                            Uploaded
+                          </p>
+                          <p className='aucctus-text-xs-semibold aucctus-text-brand-primary'>
+                            {formatDate(file.createdAt)}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Status indicator */}
+                    <div className='mt-3 flex items-center justify-between'>
+                      <div className='flex items-center gap-2'>
+                        <Icon
+                          variant={isProcessingComplete ? 'check' : 'refresh'}
+                          className={cn(
+                            'h-3 w-3',
+                            isProcessingComplete
+                              ? 'aucctus-stroke-success-primary'
+                              : 'aucctus-stroke-brand-primary animate-spin',
+                          )}
+                        />
+                        <span
+                          className={cn(
+                            'rounded px-2 py-0.5 text-xs font-medium',
+                            isProcessingComplete
+                              ? 'aucctus-bg-success-secondary aucctus-text-success-primary'
+                              : 'aucctus-bg-brand-secondary aucctus-text-brand-primary',
+                          )}
+                        >
+                          {isProcessingComplete ? 'Processed' : 'Processing...'}
+                        </span>
+                      </div>
+                      <div className='flex items-center gap-2'>
+                        <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                          {file.fileExtension.toUpperCase()}
+                        </p>
+                        {file.fileUrl && (
+                          <a
+                            href={file.fileUrl}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='btn btn-primary btn-xs flex items-center gap-1'
+                            title='Download file'
+                          >
+                            <Icon
+                              variant='download'
+                              className='aucctus-stroke-white h-3 w-3'
+                            />
+                          </a>
+                        )}
+                        {canDelete && ( // Hide delete button in view mode
+                          <button
+                            onClick={() =>
+                              handleDeleteFile(
+                                result.uuid,
+                                file.uuid,
+                                file.originalFilename || 'file',
+                              )
+                            }
+                            className='btn btn-secondary btn-xs flex items-center gap-1'
+                            disabled={deleteTestResultFile.isLoading}
+                            title='Delete file'
+                          >
+                            <Icon
+                              variant='trash'
+                              className='aucctus-stroke-secondary h-3 w-3'
+                            />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          {/* Key Learnings Section - Enhanced for multiple files */}
+          {results.length > 0 &&
+            results[0].learnings &&
+            results[0].learnings.length > 0 && (
+              <div>
+                <div className='mb-4 flex items-center justify-between'>
+                  <div className='flex items-center gap-3'>
+                    <Icon
+                      variant='lightbulb'
+                      className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
+                    />
+                    <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
+                      Key Learnings from Analysis
+                    </h4>
+                  </div>
+                  {results.length > 1 && (
+                    <span className='aucctus-bg-brand-secondary aucctus-text-brand-primary rounded-full px-3 py-1 text-xs font-medium'>
+                      From {results.length} files
+                    </span>
+                  )}
+                </div>
+                <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
+                  {results[0].learnings.map((learning, index) => (
+                    <div
+                      key={learning.uuid}
+                      className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-4'
+                    >
+                      <div className='mb-3 flex items-start justify-between'>
+                        <div className='flex items-center gap-2'>
+                          <span className='aucctus-bg-brand-primary aucctus-text-white flex h-6 w-6 items-center justify-center rounded-full text-xs font-semibold'>
+                            {index + 1}
+                          </span>
+                          <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                            Learning #{index + 1}
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className='aucctus-text-sm-regular aucctus-text-brand-primary mb-3 leading-relaxed'>
+                        {learning.learning}
+                      </p>
+
+                      <div className='aucctus-bg-primary rounded-lg p-3'>
+                        <p className='aucctus-text-xs-regular aucctus-text-tertiary mb-1'>
+                          Impact Assessment:
+                        </p>
+                        <p className='aucctus-text-sm-semibold aucctus-text-secondary'>
+                          {learning.impact}
+                        </p>
+                      </div>
+                      <div className='aucctus-bg-tertiary mt-3 rounded-lg p-3'>
+                        <p className='aucctus-text-xs-regular aucctus-text-tertiary mb-1'>
+                          Source File:
+                        </p>
+                        <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                          {learning.sourceFilename}
+                        </p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
         </div>
       )}
     </div>
