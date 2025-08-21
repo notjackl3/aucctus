@@ -306,7 +306,8 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   };
 
   return (
-    <div className='aucctus-bg-primary flex h-[920px] w-[1200px] flex-col rounded-xl'>
+    // Parent modal container height is 90vh, this container height needs to match
+    <div className='aucctus-bg-primary flex h-[90vh] w-[1200px] flex-col rounded-xl'>
       {/* Header */}
       <div className='aucctus-border-secondary flex flex-shrink-0 items-center justify-between border-b p-6'>
         <div className='flex items-center gap-3'>
