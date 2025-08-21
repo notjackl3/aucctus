@@ -1,5 +1,5 @@
-import React from 'react';
-import { Icon } from '@components';
+import React, { useState, useCallback } from 'react';
+import { Icon, Modal } from '@components';
 import StatusBadge from '../badges/StatusBadge';
 import RiskBadge from '../badges/RiskBadge';
 import ImportanceMeter from '../badges/ImportanceMeter';
@@ -8,18 +8,35 @@ import ValidationBenchmarkCard from '../../../Testing/components/modal-sections/
 import { getCategoryColors } from '../../constants/categoryColors';
 import { getCategoryIcon } from '../../utils/assumptionUtils';
 import { IAssumptionV2, AssumptionStatusV2 } from '@libs/api/types';
+import {
+  useAssumptionUpdate,
+  useAssumptionRemove,
+} from '@hooks/query/concepts.hook';
+import { useModal } from '@context/ModalContextProvider';
+import { cn } from '@libs/utils/react';
+import useStore from '@stores/store';
 
 interface AssumptionDetailCardProps {
   assumption: IAssumptionV2;
   onClick?: () => void;
   showBenchmark?: boolean;
+  showActions?: boolean;
 }
 
 const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   assumption,
   onClick,
   showBenchmark,
+  showActions = true,
 }) => {
+  const conceptIdentifier = useStore((state) => state.conceptReport.identifier);
+  const { openModal } = useModal();
+  const [isHovering, setIsHovering] = useState(false);
+
+  // Mutation hooks
+  const { mutate: updateAssumption } = useAssumptionUpdate();
+  const { mutate: removeAssumption } = useAssumptionRemove();
+
   // Get category colors
   const categoryColors = getCategoryColors(assumption.category);
 
@@ -44,10 +61,75 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
       />
     );
   };
+
+  // Event handlers
+  const handleMouseEnter = useCallback(() => setIsHovering(true), []);
+  const handleMouseLeave = useCallback(() => setIsHovering(false), []);
+
+  const handleEditAssumption = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      openModal(
+        Modal.AssumptionStatementModal,
+        {
+          mode: 'edit',
+          initialStatement: assumption.statement,
+          onSubmit: () => {
+            // This won't be called when onConfirm is provided
+          },
+          onConfirm: async (statement: string) => {
+            updateAssumption({
+              rootIdentifier: conceptIdentifier!,
+              assumptionUuid: assumption.uuid,
+              data: { statement },
+            });
+          },
+        },
+        {
+          position: 'center',
+          backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-20',
+        },
+      );
+    },
+    [assumption, conceptIdentifier, openModal, updateAssumption],
+  );
+
+  const handleDeleteAssumption = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+
+      openModal(
+        Modal.AssumptionLifecycleConfirmationModal,
+        {
+          mode: 'delete',
+          assumptionStatement: assumption.statement,
+          onConfirm: async () => {
+            removeAssumption({
+              rootIdentifier: conceptIdentifier!,
+              assumptionUuid: assumption.uuid,
+            });
+          },
+        },
+        {
+          position: 'center',
+          backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-20',
+        },
+      );
+    },
+    [assumption, conceptIdentifier, openModal, removeAssumption],
+  );
   return (
     <div
-      className='aucctus-bg-primary hover:aucctus-bg-primary-hover aucctus-border-primary cursor-pointer rounded-lg border p-5 shadow-sm transition-colors'
+      className={cn(
+        'aucctus-bg-primary hover:aucctus-bg-primary-hover aucctus-border-primary relative rounded-lg border p-5 shadow-sm transition-colors',
+        {
+          'cursor-pointer': showActions,
+        },
+      )}
       onClick={onClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Assumption header */}
       <div className='mb-3 flex flex-wrap items-start justify-between gap-2'>
@@ -76,6 +158,37 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
 
       {showBenchmark && assumption.benchmark && (
         <ValidationBenchmarkCard benchmark={assumption.benchmark} />
+      )}
+
+      {/* Action buttons - shown on hover only when showActions is true */}
+      {showActions && (
+        <div
+          className={cn(
+            'absolute bottom-3 right-3 flex gap-2 transition-all duration-300',
+            {
+              'pointer-events-none opacity-0': !isHovering,
+              'pointer-events-auto opacity-100': isHovering,
+            },
+          )}
+        >
+          <button
+            onClick={handleEditAssumption}
+            className='aucctus-bg-primary-hover aucctus-border-secondary rounded-md border p-2 shadow-sm'
+            aria-label='Edit assumption'
+          >
+            <Icon variant='edit' className='aucctus-stroke-secondary h-4 w-4' />
+          </button>
+          <button
+            onClick={handleDeleteAssumption}
+            className='aucctus-bg-primary-hover aucctus-border-secondary rounded-md border p-2 shadow-sm'
+            aria-label='Delete assumption'
+          >
+            <Icon
+              variant='trash'
+              className='aucctus-stroke-error-primary h-4 w-4'
+            />
+          </button>
+        </div>
       )}
     </div>
   );

@@ -5,9 +5,12 @@ import {
   IAssumptionV1,
   IAssumptionV2,
   IAssumptionCreate,
+  IAssumptionLifecycleAddRequest,
+  IAssumptionLifecycleUpdateRequest,
   IAssumptionTestDetails,
   IAssumptionTestStatus,
   IConceptTestDetails,
+  IMessageResponse,
   IPageResponse,
   ITestStep,
   AssumptionCategory,
@@ -128,6 +131,31 @@ export class AssumptionsApi extends ApiService {
     return this.patch<ITestStep, Partial<ITestStep> & { uuid: string }>(
       endpoints.conceptTestStepUuid(conceptTestUuid, stepUuid),
       data,
+    );
+  }
+
+  // V2 Assumption Lifecycle Methods
+  addAssumption(rootIdentifier: string, data: IAssumptionLifecycleAddRequest) {
+    return this.post<IMessageResponse, IAssumptionLifecycleAddRequest>(
+      endpoints.addKeyAssumption(rootIdentifier),
+      data,
+    );
+  }
+
+  updateAssumption(
+    rootIdentifier: string,
+    assumptionUuid: string,
+    data: IAssumptionLifecycleUpdateRequest,
+  ) {
+    return this.put<IMessageResponse, IAssumptionLifecycleUpdateRequest>(
+      endpoints.updateKeyAssumption(rootIdentifier, assumptionUuid),
+      data,
+    );
+  }
+
+  removeAssumption(rootIdentifier: string, assumptionUuid: string) {
+    return this.delete<IMessageResponse>(
+      endpoints.removeKeyAssumption(rootIdentifier, assumptionUuid),
     );
   }
 }

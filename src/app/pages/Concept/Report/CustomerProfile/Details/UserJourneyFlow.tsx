@@ -36,8 +36,7 @@ const containerStyles =
 const emptyStateTextStyles = 'aucctus-text-secondary mb-2';
 const loadingStateStyles = 'flex justify-center py-8';
 const emptyStateContainerStyles = 'flex flex-col items-center py-8';
-const addButtonStyles =
-  'aucctus-bg-secondary-hover flex items-center justify-center rounded-full p-2 transition-colors disabled:opacity-50';
+const addButtonStyles = 'aucctus-bg-primary-hover aspect-square rounded-lg p-1';
 
 interface UserJourneyFlowProps {
   customerProfileUuid: string;
@@ -226,7 +225,10 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
             onClick={handleOpenAddStepModal}
             disabled={isLoading}
           >
-            <Icon variant='plus' height={18} width={18} />
+            <Icon
+              variant='plus'
+              className='aucctus-stroke-brand-primary h-5 w-5'
+            />
           </button>
         }
       />

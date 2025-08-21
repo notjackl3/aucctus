@@ -6,6 +6,8 @@ import {
   IncubationAnswerUpdateRequest,
 } from '@libs/api/concepts';
 import {
+  IAssumptionLifecycleAddRequest,
+  IAssumptionLifecycleUpdateRequest,
   IConcept,
   IConceptPage,
   IConceptQueryOptions,
@@ -1423,6 +1425,121 @@ export const useTrackConceptView = () => {
     onError: () => {
       // Silent failure - don't show error to user as this is non-critical tracking
       // Error logging handled by API service
+    },
+  });
+};
+
+// V2 Assumption Lifecycle Hooks
+
+/**
+ * Custom hook for adding a new assumption to a concept.
+ * @returns The result of the useMutation hook.
+ */
+export const useAssumptionAdd = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      rootIdentifier: string;
+      data: IAssumptionLifecycleAddRequest;
+    }) => {
+      const { rootIdentifier, data } = params;
+      return await api.assumption.addAssumption(rootIdentifier, data);
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate assumptions queries to force a refetch
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.assumptions,
+          'filtered',
+          variables.rootIdentifier,
+        ],
+      });
+      toast.success(
+        'Assumption added successfully. Tests are being regenerated.',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to add assumption. Please try again.');
+    },
+  });
+};
+
+/**
+ * Custom hook for updating an existing assumption.
+ * @returns The result of the useMutation hook.
+ */
+export const useAssumptionUpdate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      rootIdentifier: string;
+      assumptionUuid: string;
+      data: IAssumptionLifecycleUpdateRequest;
+    }) => {
+      const { rootIdentifier, assumptionUuid, data } = params;
+      return await api.assumption.updateAssumption(
+        rootIdentifier,
+        assumptionUuid,
+        data,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate assumptions queries to force a refetch
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.assumptions,
+          'filtered',
+          variables.rootIdentifier,
+        ],
+      });
+      toast.success(
+        'Assumption updated successfully. Tests are being regenerated.',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to update assumption. Please try again.');
+    },
+  });
+};
+
+/**
+ * Custom hook for removing an assumption from a concept.
+ * @returns The result of the useMutation hook.
+ */
+export const useAssumptionRemove = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      rootIdentifier: string;
+      assumptionUuid: string;
+    }) => {
+      const { rootIdentifier, assumptionUuid } = params;
+      return await api.assumption.removeAssumption(
+        rootIdentifier,
+        assumptionUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate assumptions queries to force a refetch
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.assumptions,
+          'filtered',
+          variables.rootIdentifier,
+        ],
+      });
+      toast.success(
+        'Assumption removed successfully. Tests are being regenerated.',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to remove assumption. Please try again.');
     },
   });
 };

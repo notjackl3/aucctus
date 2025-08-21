@@ -11,21 +11,13 @@ import { useTestCompletion } from '../Testing';
 interface RecommendedTestSectionProps {
   recommendedTest: RecommendedTest | null;
   onRunTest: () => void;
-  onSelectAssumption: (assumptionId: string) => void;
 }
 
 const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   recommendedTest,
   onRunTest,
-  onSelectAssumption,
 }) => {
   const { isCompletingTest } = useTestCompletion();
-
-  const handleSelectAssumption = (assumptionId: string) => {
-    if (assumptionId) {
-      onSelectAssumption(assumptionId);
-    }
-  };
 
   if (!recommendedTest) {
     return (
@@ -161,8 +153,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
               return (
                 <li
                   key={assumption.uuid}
-                  className='aucctus-text-sm-regular aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-hover cursor-pointer rounded-md border p-4 transition-colors'
-                  onClick={() => handleSelectAssumption(assumption.uuid)}
+                  className='aucctus-text-sm-regular aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-hover rounded-md border p-4 transition-colors'
                 >
                   <div className='mb-2 flex items-start justify-between'>
                     <div className='flex items-center gap-1.5'>

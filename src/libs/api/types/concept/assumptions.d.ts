@@ -64,6 +64,15 @@ export interface IAssumptionCreate {
   assumptionsType: AssumptionCategory;
 }
 
+// V2 Assumption Lifecycle Types
+export interface IAssumptionLifecycleAddRequest {
+  statement: string;
+}
+
+export interface IAssumptionLifecycleUpdateRequest {
+  statement: string;
+}
+
 // TODO: DEPRECATE - V1 assumption interface. Remove once all components migrate to IAssumptionV2
 export interface IAssumptionV1 extends IBaseConceptEntity {
   name: string;

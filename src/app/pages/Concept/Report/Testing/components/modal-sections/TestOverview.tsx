@@ -156,6 +156,7 @@ const TestOverview: React.FC<TestOverviewProps> = ({
                 key={assumption.uuid || assumption.statement}
                 assumption={assumption}
                 showBenchmark={true}
+                showActions={false}
               />
             ))}
           </div>

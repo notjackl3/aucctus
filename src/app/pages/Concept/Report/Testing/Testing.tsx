@@ -83,11 +83,6 @@ const Testing: React.FC = () => {
     }
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleSelectAssumption = (_assumptionId: string) => {
-    // TODO: Implement assumption selection logic when modal is added back
-  };
-
   // Show loading state while fetching test details
   if (isTestDetailsLoading) {
     return (
@@ -239,7 +234,6 @@ const Testing: React.FC = () => {
               <RecommendedTestSection
                 recommendedTest={recommendedTest}
                 onRunTest={handleRunTest}
-                onSelectAssumption={handleSelectAssumption}
               />
             </div>
 

@@ -384,6 +384,19 @@ export class Endpoints {
     return `api/v2/concept/${conceptIdentifier}/key-assumptions/generate`;
   }
 
+  // Assumption Lifecycle Endpoints (V2)
+  static addKeyAssumption(rootIdentifier: string) {
+    return `api/v2/concept/${rootIdentifier}/key-assumptions/add`;
+  }
+
+  static updateKeyAssumption(rootIdentifier: string, assumptionUuid: string) {
+    return `api/v2/concept/${rootIdentifier}/key-assumptions/${assumptionUuid}/update`;
+  }
+
+  static removeKeyAssumption(rootIdentifier: string, assumptionUuid: string) {
+    return `api/v2/concept/${rootIdentifier}/key-assumptions/${assumptionUuid}/remove`;
+  }
+
   static generateFinancialProjection(conceptIdentifier: string) {
     return `api/v2/concept/${conceptIdentifier}/financial-projection/generate`;
   }

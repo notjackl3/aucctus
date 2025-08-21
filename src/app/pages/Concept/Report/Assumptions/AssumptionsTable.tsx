@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import AssumptionDetailCard from './components/cards/AssumptionDetailCard';
 import Card from '@components/Card';
 import CategoryProgressCard from './components/cards/category-progress-card/CategoryProgressCard';
 import telemetry from '@libs/telemetry';
-import { Loading } from '@components';
+import { Loading, Icon, Modal } from '@components';
 import { IAssumptionV2, AssumptionCategory } from '@libs/api/types';
 import { CategoryMetric } from '@hooks/query/assumptions.hook';
 import {
@@ -13,6 +13,10 @@ import {
   getCategoryInsightByStatus,
   getCategoryInsightTitleByStatus,
 } from './utils/assumptionUtils';
+import { useAssumptionAdd } from '@hooks/query/concepts.hook';
+import { useModal } from '@context/ModalContextProvider';
+import { useOutletContext } from 'react-router-dom';
+import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 
 interface AssumptionsTableProps {
   assumptions: IAssumptionV2[];
@@ -29,6 +33,10 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
   onCategoryChange,
   isLoading = false,
 }) => {
+  const { concept } = useOutletContext<IConceptReportContext>();
+  const { openModal } = useModal();
+  const { mutate: addAssumption } = useAssumptionAdd();
+
   // State to track which category is selected
   const [internalSelectedCategory, setInternalSelectedCategory] =
     useState<AssumptionCategory>('desirability');
@@ -42,6 +50,29 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
     }
     onCategoryChange?.(category);
   };
+
+  // Handle adding new assumption
+  const handleAddAssumption = useCallback(() => {
+    openModal(
+      Modal.AssumptionStatementModal,
+      {
+        mode: 'add',
+        onSubmit: () => {
+          // This won't be called when onConfirm is provided
+        },
+        onConfirm: async (statement: string) => {
+          addAssumption({
+            rootIdentifier: concept.identifier,
+            data: { statement },
+          });
+        },
+      },
+      {
+        position: 'center',
+        backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-20',
+      },
+    );
+  }, [concept.identifier, openModal, addAssumption]);
 
   // Get validation status from categoryMetrics
   const getValidationStatus = (category: AssumptionCategory) => {
@@ -107,19 +138,38 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
             <div className='flex justify-center py-8'>
               <Loading />
             </div>
-          ) : assumptions.length > 0 ? (
-            <div className='space-y-4'>
-              {assumptions.map((assumption) => (
-                <AssumptionDetailCard
-                  key={assumption.uuid}
-                  assumption={assumption}
-                />
-              ))}
-            </div>
           ) : (
-            <p className='aucctus-text-tertiary p-4'>
-              No assumptions in this category yet.
-            </p>
+            <>
+              {/* Add New Assumption Plus Button */}
+              <div className='mb-4 flex justify-end'>
+                <button
+                  onClick={handleAddAssumption}
+                  className='aucctus-bg-primary-hover aspect-square rounded-lg p-1'
+                  aria-label='Add new assumption'
+                  disabled={isLoading}
+                >
+                  <Icon
+                    variant='plus'
+                    className='aucctus-stroke-brand-primary h-5 w-5'
+                  />
+                </button>
+              </div>
+
+              {assumptions.length > 0 ? (
+                <div className='space-y-4'>
+                  {assumptions.map((assumption) => (
+                    <AssumptionDetailCard
+                      key={assumption.uuid}
+                      assumption={assumption}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <p className='aucctus-text-tertiary p-4'>
+                  No assumptions in this category yet.
+                </p>
+              )}
+            </>
           )}
         </div>
       </div>

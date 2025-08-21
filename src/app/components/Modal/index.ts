@@ -5,6 +5,10 @@ import EvidenceAndReasoning from './EvidenceAndReasoningModal';
 import SupportInsights from './SupportInsights';
 import AddKeyAssumptionModal from './KeyAssumptionModal/AddKeyAssumptionModal';
 import EditKeyAssumptionModal from './KeyAssumptionModal/EditKeyAssumptionModal';
+import {
+  AssumptionStatementModal,
+  AssumptionLifecycleConfirmationModal,
+} from './AssumptionLifecycleModal';
 import Base from './Modal/Modal';
 import ConclusionVisualization from './ConclusionVisualizationModal/ConclusionVisualizationModal';
 import AiEditing from './AiEditingModal/AiEditingModal';
@@ -21,6 +25,8 @@ const Modal = {
   EditCustomerProfileDemographics,
   EditKeyAssumptionModal,
   AddKeyAssumptionModal,
+  AssumptionStatementModal,
+  AssumptionLifecycleConfirmationModal,
   EvidenceAndReasoning,
   ConclusionVisualization,
   SupportInsights,
