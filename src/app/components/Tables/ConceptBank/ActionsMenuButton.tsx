@@ -11,6 +11,7 @@ import { AppPath } from '@routes/routes';
 import utils from '@libs/utils';
 
 import React from 'react';
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 
 // Concept-specific wrapper that uses the generic component
 interface IConceptActionMenuButton {
@@ -31,6 +32,7 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
   const { mutate: cancelReport } = useConceptReportCancel();
   const { mutate: cloneSeed } = useCloneSeed();
   const navigate = useNavigate();
+  const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
 
   const handleArchive = (identifier: string) => {
     updateConcept({
@@ -58,6 +60,8 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
       onSuccess: (clonedSeed) => {
         toast.success('Concept seed cloned successfully!');
         // Navigate to the incubation page with the cloned seed
+        resetQuestionnaire();
+        setIsNewSeed(false);
         navigate(
           `${AppPath.IncubateConcept}/?${new URLSearchParams({
             seed: clonedSeed.uuid,
