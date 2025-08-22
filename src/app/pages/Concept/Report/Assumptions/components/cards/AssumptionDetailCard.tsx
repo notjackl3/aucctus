@@ -15,12 +15,15 @@ import {
 import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
 import useStore from '@stores/store';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '@routes/routes';
 
 interface AssumptionDetailCardProps {
   assumption: IAssumptionV2;
   onClick?: () => void;
   showBenchmark?: boolean;
   showActions?: boolean;
+  onEdit?: () => void;
 }
 
 const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
@@ -28,9 +31,11 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   onClick,
   showBenchmark,
   showActions = true,
+  onEdit,
 }) => {
   const conceptIdentifier = useStore((state) => state.conceptReport.identifier);
   const { openModal } = useModal();
+  const navigate = useNavigate();
   const [isHovering, setIsHovering] = useState(false);
 
   // Mutation hooks
@@ -70,6 +75,13 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
     (e: React.MouseEvent) => {
       e.stopPropagation();
 
+      // Use onEdit prop if provided (for inline editing)
+      if (onEdit) {
+        onEdit();
+        return;
+      }
+
+      // Fallback to old modal behavior
       openModal(
         Modal.AssumptionStatementModal,
         {
@@ -79,10 +91,38 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
             // This won't be called when onConfirm is provided
           },
           onConfirm: async (statement: string) => {
+            // Helper functions for data transformation
+            const convertToBackendCategory = (
+              frontendCategory: string,
+            ): string => {
+              const categoryMap: Record<string, string> = {
+                desirability: 'Desirability',
+                viability: 'Viability',
+                feasibility: 'Feasibility',
+                adaptability: 'Adaptability',
+              };
+              return categoryMap[frontendCategory] || frontendCategory;
+            };
+
+            const convertToBackendScore = (frontendScore: number): number => {
+              // Convert 0-1 range to 1-3 range
+              if (frontendScore < 0.33) return 1; // Low
+              if (frontendScore < 0.66) return 2; // Medium
+              return 3; // High
+            };
+
             updateAssumption({
               rootIdentifier: conceptIdentifier!,
               assumptionUuid: assumption.uuid,
-              data: { statement },
+              data: {
+                statement,
+                category: convertToBackendCategory(assumption.category),
+                importance: convertToBackendScore(assumption.importance),
+                certainty: convertToBackendScore(assumption.certainty),
+              } as any, // Type assertion needed due to API type mismatch
+            });
+            navigate(AppPath.ConceptBank, {
+              replace: true,
             });
           },
         },
@@ -92,7 +132,14 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
         },
       );
     },
-    [assumption, conceptIdentifier, openModal, updateAssumption],
+    [
+      assumption,
+      conceptIdentifier,
+      openModal,
+      updateAssumption,
+      onEdit,
+      navigate,
+    ],
   );
 
   const handleDeleteAssumption = useCallback(
@@ -109,6 +156,9 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
               rootIdentifier: conceptIdentifier!,
               assumptionUuid: assumption.uuid,
             });
+            navigate(AppPath.ConceptBank, {
+              replace: true,
+            });
           },
         },
         {
@@ -117,7 +167,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
         },
       );
     },
-    [assumption, conceptIdentifier, openModal, removeAssumption],
+    [assumption, conceptIdentifier, openModal, removeAssumption, navigate],
   );
   return (
     <div

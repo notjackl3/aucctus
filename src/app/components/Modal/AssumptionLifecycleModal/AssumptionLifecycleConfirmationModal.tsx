@@ -1,18 +1,109 @@
 import React, { useCallback, useState } from 'react';
 import { Icon } from '@components';
 import { useModal } from '@context/ModalContextProvider';
+import {
+  IAssumptionLifecycleAddRequest,
+  IAssumptionLifecycleUpdateRequest,
+} from '@libs/api/types';
+import { getCategoryColors } from '../../../pages/Concept/Report/Assumptions/constants/categoryColors';
+import { getCategoryIcon } from '../../../pages/Concept/Report/Assumptions/utils/assumptionUtils';
 
 interface AssumptionLifecycleConfirmationModalProps {
   mode: 'add_edit' | 'delete';
   assumptionStatement?: string;
+  assumptionData?:
+    | IAssumptionLifecycleAddRequest
+    | IAssumptionLifecycleUpdateRequest;
   onConfirm: () => Promise<void>;
 }
 
 const AssumptionLifecycleConfirmationModal: React.FC<
   AssumptionLifecycleConfirmationModalProps
-> = ({ mode, assumptionStatement, onConfirm }) => {
+> = ({ mode, assumptionStatement, assumptionData, onConfirm }) => {
   const { closeModal } = useModal();
   const [isProcessing, setIsProcessing] = useState(false);
+
+  // Helper functions for displaying assumption data
+  const getLevel = (value: number): string => {
+    // Handle both backend format (1-3) and frontend format (0-1)
+    if (value >= 3 || value >= 0.66) return 'High';
+    if (value >= 2 || value >= 0.33) return 'Medium';
+    return 'Low';
+  };
+
+  const formatCategoryForDisplay = (category: string): string => {
+    // Convert backend format back to frontend format for display
+    return category.toLowerCase();
+  };
+
+  const renderAssumptionDetails = () => {
+    if (mode === 'delete' || !assumptionData) {
+      return (
+        <div className='aucctus-bg-secondary mt-4 w-full rounded-lg p-3'>
+          <p className='aucctus-text-sm aucctus-text-secondary mb-1'>
+            {mode === 'delete' ? 'Assumption to be deleted:' : 'Assumption:'}
+          </p>
+          <p className='aucctus-text-sm aucctus-text-primary italic'>
+            &ldquo;{assumptionStatement}&rdquo;
+          </p>
+        </div>
+      );
+    }
+
+    // Show complete assumption details for add/edit
+    const frontendCategory = formatCategoryForDisplay(assumptionData.category);
+    const categoryColors = getCategoryColors(frontendCategory as any);
+    const iconVariant = getCategoryIcon(frontendCategory);
+
+    return (
+      <div className='aucctus-bg-secondary mt-4 w-full rounded-lg p-4'>
+        <h4 className='aucctus-text-md-semibold aucctus-text-primary mb-3'>
+          Review Your Assumption
+        </h4>
+
+        {/* Category */}
+        <div className='mb-3 flex items-center'>
+          <Icon
+            variant={iconVariant as any}
+            className={`${categoryColors.stroke} mr-2 h-5 w-5`}
+          />
+          <span className='aucctus-text-sm-medium capitalize'>
+            {frontendCategory}
+          </span>
+        </div>
+
+        {/* Statement */}
+        <div className='mb-3'>
+          <p className='aucctus-text-sm aucctus-text-secondary mb-1'>
+            Statement:
+          </p>
+          <p className='aucctus-text-sm aucctus-text-primary'>
+            &ldquo;{assumptionData.statement}&rdquo;
+          </p>
+        </div>
+
+        {/* Metrics */}
+        <div className='flex gap-4'>
+          <div>
+            <p className='aucctus-text-xs aucctus-text-secondary mb-1'>
+              Importance:
+            </p>
+            <p className='aucctus-text-sm aucctus-text-primary font-medium'>
+              {getLevel(assumptionData.importance)}
+            </p>
+          </div>
+          <div>
+            <p className='aucctus-text-xs aucctus-text-secondary mb-1'>
+              Certainty:
+            </p>
+            <p className='aucctus-text-sm aucctus-text-primary font-medium'>
+              {getLevel(assumptionData.certainty)}
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   const getModalContent = () => {
     if (mode === 'delete') {
@@ -88,16 +179,9 @@ const AssumptionLifecycleConfirmationModal: React.FC<
             <p className='aucctus-text-md aucctus-text-primary mb-2'>
               {content.message}
             </p>
-            {mode === 'delete' && assumptionStatement && (
-              <div className='aucctus-bg-secondary mt-4 w-full rounded-lg p-3'>
-                <p className='aucctus-text-sm aucctus-text-secondary mb-1'>
-                  Assumption to be deleted:
-                </p>
-                <p className='aucctus-text-sm aucctus-text-primary italic'>
-                  &ldquo;{assumptionStatement}&rdquo;
-                </p>
-              </div>
-            )}
+            {/* Show assumption details */}
+            {(assumptionStatement || assumptionData) &&
+              renderAssumptionDetails()}
           </div>
 
           {/* Action Buttons */}

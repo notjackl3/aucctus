@@ -3,6 +3,7 @@ import { animated, useTransition } from 'react-spring';
 import { Icon } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useNavigate } from 'react-router-dom';
+import { AppPath } from '@routes/routes';
 
 interface AssumptionStatementModalProps {
   mode: 'add' | 'edit';
@@ -78,7 +79,9 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
       await onConfirm(statement.trim());
       closeModal();
       // Navigate to Concept Bank after successful submission
-      navigate('/concept/bank');
+      navigate(AppPath.ConceptBank, {
+        replace: true,
+      });
     } catch (error) {
       // Error handling is done in the parent component/hook
       setIsSubmitting(false);

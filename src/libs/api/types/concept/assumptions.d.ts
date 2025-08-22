@@ -67,10 +67,16 @@ export interface IAssumptionCreate {
 // V2 Assumption Lifecycle Types
 export interface IAssumptionLifecycleAddRequest {
   statement: string;
+  category: 'Desirability' | 'Viability' | 'Feasibility' | 'Adaptability'; // Backend expects capitalized
+  importance: number; // Backend expects 1-3 integers
+  certainty: number; // Backend expects 1-3 integers
 }
 
 export interface IAssumptionLifecycleUpdateRequest {
   statement: string;
+  category: 'Desirability' | 'Viability' | 'Feasibility' | 'Adaptability'; // Backend expects capitalized
+  importance: number; // Backend expects 1-3 integers
+  certainty: number; // Backend expects 1-3 integers
 }
 
 // TODO: DEPRECATE - V1 assumption interface. Remove once all components migrate to IAssumptionV2
