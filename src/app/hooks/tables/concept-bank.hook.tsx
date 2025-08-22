@@ -480,6 +480,7 @@ export const useConceptBank = (
             status={info.row.original.status}
             reportStatus={info.row.original.reportStatusAggregate}
             identifier={info.row.original.identifier}
+            seedUuid={info.row.original.seedUuid}
           />
         ),
       }),

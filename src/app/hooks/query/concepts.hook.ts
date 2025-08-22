@@ -225,6 +225,18 @@ export const useDeleteSeed = (options?: ISeedQueryOptions) => {
   });
 };
 
+export const useCloneSeed = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (seedUuid: string) => await api.seed.cloneSeed(seedUuid),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.seeds] });
+      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.dashboard] });
+    },
+  });
+};
+
 export const useGetConceptSeedDraftAnswers = (seedDraftUuid: string) => {
   return useQuery({
     queryKey: [AucctusQueryKeys.conceptSeedDraftAnswers, seedDraftUuid],

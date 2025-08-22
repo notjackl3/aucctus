@@ -70,6 +70,10 @@ export class Endpoints {
     return url;
   }
 
+  static cloneSeed(seedUuid: string) {
+    return `${this.seed}/${seedUuid}/clone`;
+  }
+
   static conceptIncubationSeedUuidAnswer(draftUuid: string) {
     return `api/v2/concept/incubation/seed/${draftUuid}/answer`;
   }

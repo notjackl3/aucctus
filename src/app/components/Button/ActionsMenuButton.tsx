@@ -18,6 +18,7 @@ interface IActionsMenuButtonProps {
   onArchive: (uuid: string) => void;
   onUnarchive: (uuid: string) => void;
   onCancelReport?: (uuid: string) => void;
+  onCloneConceptSeed?: (conceptUuid: string) => void; // Receives concept UUID, parent should handle getting seedUuid and cloning
   buttonClassName?: string;
   iconSize?: number;
 }
@@ -29,12 +30,14 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
   onArchive,
   onUnarchive,
   onCancelReport,
+  onCloneConceptSeed,
   buttonClassName = 'btn flex h-8 w-8 items-center justify-center rounded-lg border border-gray-100 bg-white p-0 shadow-sm transition-all hover:bg-gray-50',
   iconSize = 24,
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const archiveLabel = status !== 'archived' ? 'Archive' : 'Unarchive';
   const showCancelReport = reportStatus === 'pending' && onCancelReport;
+  const showCloneConceptSeed = status !== 'draft' && onCloneConceptSeed;
 
   return (
     <Popover.Root open={open}>
@@ -84,6 +87,23 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
                   >
                     <span className='aucctus-text-primary text-base'>
                       Cancel Report
+                    </span>
+                  </button>
+                </>
+              )}
+
+              {showCloneConceptSeed && (
+                <>
+                  <div className='aucctus-bg-secondary mx-2 h-px' />
+                  <button
+                    className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
+                    onClick={() => {
+                      onCloneConceptSeed?.(identifier);
+                      setOpen(false);
+                    }}
+                  >
+                    <span className='aucctus-text-primary text-base'>
+                      Clone Concept Seed
                     </span>
                   </button>
                 </>

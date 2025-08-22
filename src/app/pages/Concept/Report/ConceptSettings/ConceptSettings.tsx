@@ -9,6 +9,11 @@ import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { ClarifyingQuestion } from './components/ClarifyingQuestion';
 import { IgnitionQuestion } from './components/IgnitionQuestion';
 import { useClarifyingQuestionsWithAnswers } from '@hooks/concepts/clarifying-questions.hook';
+import { useCloneSeed } from '@hooks/query/concepts.hook';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '@routes/routes';
+import { toast } from '@components';
+import utils from '@libs/utils';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatAnswer = (
@@ -48,6 +53,9 @@ const formatAnswer = (
 const ConceptSettings: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
   const { seedDraft, isLoading } = useSeed(concept.seedUuid || '');
+  const navigate = useNavigate();
+
+  const { mutate: cloneSeed, isLoading: isCloning } = useCloneSeed();
 
   // Get all ignition questions
   const ignitionQuestions = React.useMemo(
@@ -63,6 +71,31 @@ const ConceptSettings: React.FC = () => {
     seedDraft?.answers,
   );
 
+  const handleCloneConceptSeed = () => {
+    if (!seedDraft?.uuid) {
+      toast.error('No seed available to clone');
+      return;
+    }
+
+    cloneSeed(seedDraft.uuid, {
+      onSuccess: (clonedSeed) => {
+        toast.success('Concept seed cloned successfully!');
+        // Navigate to the incubation page with the cloned seed
+        navigate(
+          `${AppPath.IncubateConcept}/?${new URLSearchParams({
+            seed: clonedSeed.uuid,
+          }).toString()}`,
+        );
+      },
+      onError: (error) => {
+        const message = utils.osiris.parseFormError(error);
+        toast.error(
+          message || 'Failed to clone concept seed. Please try again.',
+        );
+      },
+    });
+  };
+
   return (
     <div className='h-full w-full'>
       <div className='mx-0 max-w-3xl'>
@@ -74,9 +107,19 @@ const ConceptSettings: React.FC = () => {
           <div className='no-scrollbar mt-4 flex flex-1 flex-col gap-6'>
             {ignitionQuestions.length > 0 && (
               <>
-                <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
-                  Initial Questions
-                </h2>
+                <div className='flex items-center justify-between'>
+                  <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
+                    Initial Questions
+                  </h2>
+                  {/* Clone Concept Seed Button */}
+                  <button
+                    onClick={handleCloneConceptSeed}
+                    className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+                    disabled={isLoading || isCloning || !seedDraft}
+                  >
+                    {isCloning ? 'Cloning...' : 'Clone Concept Seed'}
+                  </button>
+                </div>
                 <div className='no-scrollbar flex flex-1 flex-col gap-3'>
                   {ignitionQuestions.map((answer) => (
                     <IgnitionQuestion

@@ -48,4 +48,8 @@ export class SeedApi extends ApiService {
   deleteSeed(seedUuid: string, options?: ISeedQueryOptions) {
     return this.delete<IMessageResponse>(endpoints.seedUuid(seedUuid, options));
   }
+
+  cloneSeed(seedUuid: string) {
+    return this.post<IConceptSeed>(endpoints.cloneSeed(seedUuid));
+  }
 }
