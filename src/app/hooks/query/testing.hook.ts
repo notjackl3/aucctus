@@ -22,7 +22,11 @@ import {
   ITestCollateralProgressMessage,
   ITestCollateralCompletedMessage,
   ITestCollateralErrorMessage,
+  ITestCollateralUpdateProgressMessage,
+  ITestCollateralUpdateCompletedMessage,
+  ITestCollateralUpdateErrorMessage,
 } from '@libs/api/types/socketMessages/inbound';
+import useStore from '@stores/store';
 
 /**
  * Custom hook for fetching test details for a concept.
@@ -206,8 +210,8 @@ export const useTestCollateral = (
       options?.enabled !== undefined
         ? options.enabled
         : !!conceptUuid && !!testUuid,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    cacheTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 0, // 2 minutes
+    cacheTime: 0, // 2 minutes
   });
 
   return { ...query, collateral: query.data?.results || [] };
@@ -1105,5 +1109,269 @@ export const useTestCollateralRequest = (
     handleCustomRequest,
     handleKeyDown,
     isLoading: createTestCollateral.isLoading,
+  };
+};
+
+/**
+ * Hook for managing all test collateral feedback states with store persistence.
+ * @returns Methods to manage feedback states for all collateral items in a test
+ */
+export const useTestCollateralManager = (
+  conceptUuid: string,
+  testUuid: string,
+  onFeedbackSuccess?: (updatedData: any) => void,
+) => {
+  const queryClient = useQueryClient();
+  const [feedbackTexts, setFeedbackTexts] = useState<Record<string, string>>(
+    {},
+  );
+
+  // Use store for persistent processing state
+  const store = useStore();
+  const testCollateral = store.testCollateral || {
+    collateralFeedbackStates: {},
+  };
+
+  // Get all processing states for this test
+  const getAllProcessingStates = () => {
+    return testCollateral?.collateralFeedbackStates || {};
+  };
+
+  // Get processing state for specific collateral
+  const getProcessingState = (collateralUuid: string) => {
+    return (
+      testCollateral?.collateralFeedbackStates?.[collateralUuid] || {
+        isProcessing: false,
+        progress: 0,
+        message: '',
+        stage: undefined,
+        error: null,
+        collateralUuid: undefined,
+      }
+    );
+  };
+
+  // Set processing state for specific collateral
+  const setProcessingState = (collateralUuid: string, state: any) => {
+    if (store.testCollateral?.setCollateralFeedbackProcessingState) {
+      store.testCollateral.setCollateralFeedbackProcessingState(
+        collateralUuid,
+        state,
+      );
+    }
+  };
+
+  // Clear processing state for specific collateral
+  const clearProcessingState = (collateralUuid: string) => {
+    if (store.testCollateral?.clearCollateralFeedbackProcessingState) {
+      store.testCollateral.clearCollateralFeedbackProcessingState(
+        collateralUuid,
+      );
+    }
+  };
+
+  // Check if collateral feedback processing is complete based on updatedAt time
+  const checkCompletedFeedback = (
+    collateralUuid: string,
+    currentUpdatedAt: string,
+  ) => {
+    if (store.testCollateral?.checkAndClearCompletedFeedback) {
+      return store.testCollateral.checkAndClearCompletedFeedback(
+        collateralUuid,
+        currentUpdatedAt,
+      );
+    }
+    return false;
+  };
+
+  // Feedback text management
+  const getFeedbackText = (collateralUuid: string) => {
+    return feedbackTexts[collateralUuid] || '';
+  };
+
+  const setFeedbackText = (collateralUuid: string, text: string) => {
+    setFeedbackTexts((prev) => ({ ...prev, [collateralUuid]: text }));
+  };
+
+  // Listen for WebSocket events for collateral update progress
+  useSocketEvent(
+    'test_collateral.update.progress.user',
+    (data: ITestCollateralUpdateProgressMessage) => {
+      if (data.collateralUuid) {
+        setProcessingState(data.collateralUuid, {
+          isProcessing: true,
+          progress: data.progress,
+          message: data.message,
+          stage: data.stage,
+          error: null,
+          collateralUuid: data.collateralUuid,
+        });
+      }
+    },
+  );
+
+  // Listen for completion event
+  useSocketEvent(
+    'test_collateral.update.completed.user',
+    (data: ITestCollateralUpdateCompletedMessage) => {
+      if (data.collateralUuid) {
+        setProcessingState(data.collateralUuid, {
+          isProcessing: false,
+          progress: 100,
+          message: 'Feedback processed successfully!',
+          stage: 'completed',
+          error: null,
+          collateralUuid: data.collateralUuid,
+        });
+        // Clear the feedback text after successful submission
+        setFeedbackText(data.collateralUuid, '');
+      }
+
+      // Invalidate queries to refresh the collateral list
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testCollateral,
+          data.conceptUuid,
+          data.testUuid,
+        ],
+      });
+
+      toast.success('Feedback submitted successfully!');
+
+      // Call the callback to update the selectedItem
+      if (onFeedbackSuccess) {
+        onFeedbackSuccess(data.collateral);
+      }
+    },
+  );
+
+  // Listen for error events
+  useSocketEvent(
+    'test_collateral.update.error.user',
+    (data: ITestCollateralUpdateErrorMessage) => {
+      const targetCollateralUuid = data.collateralUuid;
+      if (targetCollateralUuid) {
+        setProcessingState(targetCollateralUuid, {
+          isProcessing: false,
+          progress: 0,
+          message: '',
+          stage: 'error',
+          error: data.message,
+          collateralUuid: targetCollateralUuid,
+        });
+      }
+
+      toast.error(data.message || 'Failed to process feedback');
+    },
+  );
+
+  const updateMutation = useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      testUuid: string;
+      collateralUuid: string;
+      data: ITestCollateralUpdate;
+      submittedAt?: string; // Current updatedAt time before submission
+    }) => {
+      const { conceptUuid, testUuid, collateralUuid, data, submittedAt } =
+        params;
+
+      // Set initial processing state with the current updatedAt time
+      setProcessingState(collateralUuid, {
+        isProcessing: true,
+        progress: 0,
+        message: 'Starting feedback processing...',
+        stage: 'starting',
+        error: null,
+        collateralUuid,
+        submittedAt, // Store the updatedAt time when feedback was submitted
+      });
+
+      return await api.testing.updateTestCollateral(
+        conceptUuid,
+        testUuid,
+        collateralUuid,
+        data,
+      );
+    },
+    onSuccess: () => {
+      // Initiates async processing. WebSocket events handle progress updates.
+    },
+    onError: (e: AxiosError, variables) => {
+      const message = utils.osiris.parseFormError(e);
+
+      // Clear timeout since we got an error response
+      clearProcessingState(variables.collateralUuid);
+
+      // Set error state
+      setProcessingState(variables.collateralUuid, {
+        isProcessing: false,
+        progress: 0,
+        message: '',
+        stage: 'error',
+        error: message || 'Failed to submit feedback. Please try again.',
+        collateralUuid: variables.collateralUuid,
+      });
+
+      toast.error(message || 'Failed to submit feedback. Please try again.');
+    },
+  });
+
+  /**
+   * Submit feedback for a specific collateral item
+   */
+  const submitFeedback = (
+    collateralUuid: string,
+    feedbackText: string,
+    currentUpdatedAt?: string,
+  ) => {
+    if (!feedbackText.trim() || !conceptUuid || !testUuid || !collateralUuid)
+      return;
+
+    updateMutation.mutate({
+      conceptUuid,
+      testUuid,
+      collateralUuid,
+      data: {
+        userInput: feedbackText,
+      },
+      submittedAt: currentUpdatedAt,
+    });
+  };
+
+  /**
+   * Handle Enter key press for feedback submission
+   */
+  const handleKeyDown = (
+    collateralUuid: string,
+    e: React.KeyboardEvent,
+    currentUpdatedAt?: string,
+  ) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      const feedbackText = getFeedbackText(collateralUuid);
+      if (feedbackText.trim()) {
+        submitFeedback(collateralUuid, feedbackText, currentUpdatedAt);
+      }
+    }
+  };
+
+  return {
+    // State getters
+    getAllProcessingStates,
+    getProcessingState,
+    getFeedbackText,
+
+    // State setters
+    setFeedbackText,
+    clearProcessingState,
+
+    // Actions
+    submitFeedback,
+    handleKeyDown,
+    checkCompletedFeedback,
+
+    // Mutation state
+    isLoading: updateMutation.isLoading,
   };
 };

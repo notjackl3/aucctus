@@ -5,6 +5,7 @@ import {
   useTestCollateral,
   useCreateTestCollateral,
   useTestCollateralRequest,
+  useTestCollateralManager,
 } from '@hooks/query/testing.hook';
 
 import {
@@ -34,7 +35,6 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   // Hook for creating test collateral with WebSocket processing
   const { processingState, clearProcessingState } = useCreateTestCollateral();
 
-  // Use the dedicated hook for custom collateral requests
   const {
     customRequest,
     setCustomRequest,
@@ -73,6 +73,56 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   const collateral = fetchedCollateral;
   const isCollateralLoading = isFetchedCollateralLoading;
 
+  const [selectedItem, setSelectedItem] =
+    React.useState<ITestCollateral | null>(null);
+
+  // Hook for managing all collateral feedback states
+  const {
+    getProcessingState,
+    getFeedbackText,
+    setFeedbackText,
+    clearProcessingState: clearFeedbackProcessingState,
+    submitFeedback,
+    handleKeyDown: handleKeyDownFeedback,
+    checkCompletedFeedback,
+    isLoading: isSubmittingFeedback,
+  } = useTestCollateralManager(conceptUuid || '', testUuid || '', () => {
+    // The update was successful, the query cache will be invalidated automatically
+    // by the WebSocket events, so the collateral data will refresh
+  });
+
+  // Get processing state for selected item
+  const feedbackProcessingState = selectedItem
+    ? getProcessingState(selectedItem.id)
+    : {
+        isProcessing: false,
+        progress: 0,
+        message: '',
+        stage: undefined,
+        error: null,
+        collateralUuid: undefined,
+      };
+
+  // Check if feedback is processing
+  const isFeedbackProcessing = feedbackProcessingState.isProcessing;
+  const isSubmittingOrProcessingFeedback =
+    isSubmittingFeedback || isFeedbackProcessing;
+
+  // Get feedback text for selected item
+  const feedback = selectedItem ? getFeedbackText(selectedItem.id) : '';
+  const setFeedback = (text: string) => {
+    if (selectedItem) {
+      setFeedbackText(selectedItem.id, text);
+    }
+  };
+
+  // Handle feedback submission for selected item
+  const handleFeedbackSubmission = () => {
+    if (selectedItem && feedback.trim()) {
+      submitFeedback(selectedItem.id, feedback, selectedItem.updatedAt);
+    }
+  };
+
   // Convert API collateral to ITestCollateral format
   const convertApiCollateral = (apiCollateral: any[]): ITestCollateral[] => {
     return apiCollateral.map((item) => {
@@ -103,6 +153,8 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
         type: componentType,
         content,
         format: item.format,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
       };
     });
   };
@@ -129,15 +181,37 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
     return [];
   }, [collateral]);
 
-  const [selectedItem, setSelectedItem] =
-    React.useState<ITestCollateral | null>(null);
-
-  // Simple effect to select first item when collateral first loads
+  // Update selected item when collateral changes (including after feedback updates)
   React.useEffect(() => {
-    if (displayCollateral.length > 0 && !selectedItem) {
-      setSelectedItem(displayCollateral[0]);
+    if (displayCollateral.length > 0) {
+      // Check all items for completed feedback based on updatedAt changes
+      displayCollateral.forEach((item) => {
+        if (item.updatedAt) {
+          checkCompletedFeedback(item.id, item.updatedAt);
+        }
+      });
+
+      setSelectedItem((prevSelectedItem) => {
+        if (!prevSelectedItem) {
+          // Select first item if none selected
+          return displayCollateral[0];
+        } else {
+          // Update selectedItem with fresh data if it exists in the new collateral
+          const updatedSelectedItem = displayCollateral.find(
+            (item) => item.id === prevSelectedItem.id,
+          );
+          if (
+            updatedSelectedItem &&
+            JSON.stringify(updatedSelectedItem) !==
+              JSON.stringify(prevSelectedItem)
+          ) {
+            return updatedSelectedItem;
+          }
+          return prevSelectedItem;
+        }
+      });
     }
-  }, [displayCollateral, selectedItem]);
+  }, [displayCollateral, checkCompletedFeedback]);
 
   // Separate effect to handle WebSocket completion auto-selection
   React.useEffect(() => {
@@ -164,6 +238,11 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   // Handle item selection
   const handleItemSelect = (item: ITestCollateral) => {
     setSelectedItem(item);
+
+    // Check if this item's feedback processing might be complete based on updatedAt time
+    if (item.updatedAt) {
+      checkCompletedFeedback(item.id, item.updatedAt);
+    }
   };
 
   // Handle content copy
@@ -244,44 +323,69 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
           <div className='flex h-full w-1/3 flex-col'>
             {/* Scrollable list */}
             <div className='min-h-0 flex-1 space-y-4 overflow-y-auto pr-1'>
-              {displayCollateral.map((item) => (
-                <div
-                  key={item.id}
-                  className={cn(
-                    'aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-subtle cursor-pointer rounded-lg border p-4 transition-colors',
-                    selectedItem?.id === item.id &&
-                      'aucctus-border-brand-primary aucctus-bg-secondary-extra-subtle',
-                  )}
-                  onClick={() => handleItemSelect(item)}
-                >
-                  <div className='flex items-start gap-3'>
-                    {item.type === 'text' ? (
-                      <Icon
-                        variant='file'
-                        className='aucctus-stroke-tertiary h-5 w-5 shrink-0'
-                      />
-                    ) : item.type === 'image' ? (
-                      <Icon
-                        variant='filecode'
-                        className='aucctus-stroke-tertiary h-5 w-5 shrink-0'
-                      />
-                    ) : (
-                      <Icon
-                        variant='file-attachment'
-                        className='aucctus-stroke-tertiary h-5 w-5 shrink-0'
-                      />
+              {displayCollateral.map((item) => {
+                const itemProcessingState = getProcessingState(item.id);
+                const isItemProcessing = itemProcessingState.isProcessing;
+                const hasItemError = itemProcessingState.error;
+
+                return (
+                  <div
+                    key={item.id}
+                    className={cn(
+                      'aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-subtle cursor-pointer rounded-lg border p-4 transition-colors',
+                      selectedItem?.id === item.id &&
+                        'aucctus-border-brand-primary aucctus-bg-secondary-extra-subtle',
+                      isItemProcessing && 'aucctus-border-brand-secondary',
+                      hasItemError && 'aucctus-border-error',
                     )}
-                    <div className='min-w-0 flex-1'>
-                      <h5 className='aucctus-text-sm-semibold aucctus-text-brand-primary mb-1 truncate'>
-                        {item.title}
-                      </h5>
-                      <p className='aucctus-text-xs-regular aucctus-text-secondary line-clamp-2'>
-                        {item.description}
-                      </p>
+                    onClick={() => handleItemSelect(item)}
+                  >
+                    <div className='flex items-start gap-3'>
+                      <div className='relative'>
+                        {item.type === 'text' ? (
+                          <Icon
+                            variant='file'
+                            className='aucctus-stroke-tertiary h-5 w-5 shrink-0'
+                          />
+                        ) : item.type === 'image' ? (
+                          <Icon
+                            variant='filecode'
+                            className='aucctus-stroke-tertiary h-5 w-5 shrink-0'
+                          />
+                        ) : (
+                          <Icon
+                            variant='file-attachment'
+                            className='aucctus-stroke-tertiary h-5 w-5 shrink-0'
+                          />
+                        )}
+                        {isItemProcessing && (
+                          <div className='absolute -right-1 -top-1'>
+                            <div className='aucctus-bg-brand-primary h-3 w-3 animate-pulse rounded-full' />
+                          </div>
+                        )}
+                        {hasItemError && (
+                          <div className='absolute -right-1 -top-1'>
+                            <Icon
+                              variant='alert-circle'
+                              className='aucctus-stroke-error-primary h-3 w-3'
+                            />
+                          </div>
+                        )}
+                      </div>
+                      <div className='min-w-0 flex-1'>
+                        <div className='mb-1 flex items-center gap-2'>
+                          <h5 className='aucctus-text-sm-semibold aucctus-text-brand-primary truncate'>
+                            {item.title}
+                          </h5>
+                        </div>
+                        <p className='aucctus-text-xs-regular aucctus-text-secondary line-clamp-2'>
+                          {item.description}
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
             {/* Fixed input at bottom */}
@@ -382,11 +486,17 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                         onKeyDown={handleKeyDown}
                         placeholder='Describe the collateral you need'
                         className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary placeholder:aucctus-text-placeholder focus:aucctus-border-brand-primary flex-1 rounded border px-3 py-2 text-sm focus:outline-none'
+                        disabled={
+                          isSubmittingOrProcessing ||
+                          isSubmittingOrProcessingFeedback
+                        }
                       />
                       <button
                         onClick={handleCustomRequest}
                         disabled={
-                          !customRequest.trim() || isSubmittingOrProcessing
+                          !customRequest.trim() ||
+                          isSubmittingOrProcessing ||
+                          isSubmittingOrProcessingFeedback
                         }
                         className='btn btn-primary btn-sm flex items-center gap-1 disabled:opacity-50'
                       >
@@ -509,10 +619,147 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                             Provide Feedback
                           </span>
                         </div>
-                        <div className='aucctus-bg-disabled aucctus-border-disabled rounded border p-3 text-center'>
-                          <p className='aucctus-text-sm-regular aucctus-text-disabled'>
-                            Coming Soon
+                        <div className='space-y-3'>
+                          <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                            Share your thoughts or request improvements to the
+                            test collateral.
                           </p>
+                          {!selectedItem ? (
+                            <div className='aucctus-bg-disabled aucctus-border-disabled rounded border p-3 text-center'>
+                              <p className='aucctus-text-sm-regular aucctus-text-disabled'>
+                                Select a collateral item above to provide
+                                feedback
+                              </p>
+                            </div>
+                          ) : (
+                            <div className='flex gap-2'>
+                              {isSubmittingOrProcessingFeedback ? (
+                                <div className='aucctus-bg-secondary-subtle aucctus-border-secondary flex flex-1 flex-col gap-3 rounded border p-4'>
+                                  <div className='flex items-center gap-2'>
+                                    <Loading isSmall />
+                                    <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
+                                      {isFeedbackProcessing
+                                        ? 'Processing Feedback'
+                                        : 'Submitting Feedback'}
+                                    </span>
+                                  </div>
+
+                                  {isFeedbackProcessing && (
+                                    <>
+                                      <div className='space-y-2'>
+                                        <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                                          {feedbackProcessingState.message ||
+                                            'Processing your feedback...'}
+                                        </p>
+
+                                        {/* Progress Bar */}
+                                        <div className='aucctus-bg-secondary h-2 w-full rounded-full'>
+                                          <div
+                                            className='aucctus-bg-success-primary h-2 rounded-full transition-all duration-300'
+                                            style={{
+                                              width: `${feedbackProcessingState.progress}%`,
+                                            }}
+                                          />
+                                        </div>
+
+                                        {/* Progress Details */}
+                                        <div className='flex items-center justify-between'>
+                                          <span className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                                            {feedbackProcessingState.stage &&
+                                              `Stage: ${formatStageName(feedbackProcessingState.stage)}`}
+                                          </span>
+                                          <span className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                                            {feedbackProcessingState.progress}%
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </>
+                                  )}
+                                </div>
+                              ) : feedbackProcessingState.error ? (
+                                <div className='aucctus-bg-error-secondary aucctus-border-error flex flex-1 flex-col gap-3 rounded border p-4'>
+                                  <div className='flex items-center gap-2'>
+                                    <Icon
+                                      variant='alert-circle'
+                                      className='aucctus-stroke-error-primary h-5 w-5'
+                                    />
+                                    <span className='aucctus-text-sm-semibold aucctus-text-error-primary'>
+                                      Feedback Processing Failed
+                                    </span>
+                                  </div>
+
+                                  <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                                    {feedbackProcessingState.error}
+                                  </p>
+
+                                  {/* Action Buttons */}
+                                  <div className='flex gap-2'>
+                                    <button
+                                      onClick={() =>
+                                        selectedItem &&
+                                        clearFeedbackProcessingState(
+                                          selectedItem.id,
+                                        )
+                                      }
+                                      className='btn btn-secondary btn-sm'
+                                    >
+                                      Close
+                                    </button>
+                                  </div>
+                                </div>
+                              ) : (
+                                <>
+                                  <input
+                                    type='text'
+                                    value={feedback}
+                                    onChange={(e) =>
+                                      setFeedback(e.target.value)
+                                    }
+                                    onKeyDown={(e) =>
+                                      selectedItem &&
+                                      handleKeyDownFeedback(
+                                        selectedItem.id,
+                                        e,
+                                        selectedItem.updatedAt,
+                                      )
+                                    }
+                                    placeholder='Share your feedback or suggestions...'
+                                    className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary placeholder:aucctus-text-placeholder focus:aucctus-border-brand-primary flex-1 rounded border px-3 py-2 text-sm focus:outline-none'
+                                    disabled={
+                                      isSubmittingOrProcessing ||
+                                      isSubmittingOrProcessingFeedback
+                                    }
+                                  />
+                                  <button
+                                    onClick={handleFeedbackSubmission}
+                                    disabled={
+                                      !feedback.trim() ||
+                                      isSubmittingOrProcessing ||
+                                      isSubmittingOrProcessingFeedback
+                                    }
+                                    className='btn btn-primary btn-sm flex items-center gap-1 disabled:opacity-50'
+                                  >
+                                    {isSubmittingOrProcessingFeedback ? (
+                                      <Loading isSmall />
+                                    ) : (
+                                      <Icon
+                                        variant='arrowright'
+                                        className={cn(
+                                          'h-4 w-4',
+                                          !feedback.trim()
+                                            ? 'stroke-gray-400'
+                                            : 'stroke-white',
+                                        )}
+                                      />
+                                    )}
+                                    {isSubmittingOrProcessingFeedback
+                                      ? 'Sending...'
+                                      : 'Send'}
+                                  </button>
+                                </>
+                              )}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

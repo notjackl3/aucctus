@@ -198,6 +198,43 @@ export interface ITestCollateralErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Test Collateral Update Processing Messages
+// ==========================================
+
+export interface ITestCollateralUpdateProgressMessage extends BaseSocketEvent {
+  type: 'test_collateral.update.progress.user';
+  conceptUuid: string;
+  testUuid: string;
+  collateralUuid: string;
+  progress: number; // 0-100
+  message: string;
+  stage: string;
+  account_uuid: string;
+  user_uuid: string;
+}
+
+export interface ITestCollateralUpdateCompletedMessage extends BaseSocketEvent {
+  type: 'test_collateral.update.completed.user';
+  conceptUuid: string;
+  testUuid: string;
+  collateralUuid: string;
+  collateral: any; // The updated collateral data
+  account_uuid: string;
+  user_uuid: string;
+}
+
+export interface ITestCollateralUpdateErrorMessage extends BaseSocketEvent {
+  type: 'test_collateral.update.error.user';
+  conceptUuid: string;
+  testUuid: string;
+  collateralUuid?: string;
+  message: string;
+  details?: string;
+  account_uuid: string;
+  user_uuid: string;
+}
+
+// ==========================================
 // Customer Profile Related Messages
 // ==========================================
 
@@ -368,6 +405,9 @@ export type InboundSocketEvent<C = {}> =
   | ITestResultErrorMessage
   | ITestCollateralProgressMessage
   | ITestCollateralCompletedMessage
-  | ITestCollateralErrorMessage;
+  | ITestCollateralErrorMessage
+  | ITestCollateralUpdateProgressMessage
+  | ITestCollateralUpdateCompletedMessage
+  | ITestCollateralUpdateErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

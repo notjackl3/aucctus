@@ -59,6 +59,8 @@ export interface ITestCollateral {
   type: CollateralType;
   content: string;
   format?: string; // for files: pdf, docx, etc.
+  createdAt: string;
+  updatedAt: string;
 }
 
 // Test Status Types

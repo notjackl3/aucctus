@@ -136,6 +136,7 @@ export interface ITestCollateralUpdate {
   content?: string;
   format?: string;
   order?: number;
+  userInput?: string;
 }
 
 export interface ITestParticipant {

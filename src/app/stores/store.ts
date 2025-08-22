@@ -18,6 +18,9 @@ import financialProjectionSlice, {
   IFinancialProjectionState,
 } from './financial-projection/store';
 import debugModeSlice, { IDebugModeState } from './debug-mode/store';
+import testCollateralSlice, {
+  ITestCollateralState,
+} from './testCollateral/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -28,6 +31,7 @@ export interface IAppStore {
   financialProjection: IFinancialProjectionState;
   customerProfileConversations: ICustomerProfileConversationState;
   debugMode: IDebugModeState;
+  testCollateral: ITestCollateralState;
 }
 
 export interface IStoreApi<S> {
@@ -48,6 +52,7 @@ const useStore = create<IAppStore>()(
         financialProjection: financialProjectionSlice,
         customerProfileConversations: customerProfileConversationsSlice,
         debugMode: debugModeSlice,
+        testCollateral: testCollateralSlice,
       }),
     ),
     {
@@ -95,6 +100,7 @@ const useStore = create<IAppStore>()(
           aiEditing: state.aiEditing,
           conceptReport: state.conceptReport,
           financialProjection: state.financialProjection,
+          testCollateral: state.testCollateral,
         }),
         merge: (persistedState: unknown, currentState: IAppStore): IAppStore =>
           mergeDeep(currentState, persistedState as IAppStore),
