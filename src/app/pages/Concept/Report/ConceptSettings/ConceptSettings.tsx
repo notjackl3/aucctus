@@ -15,6 +15,8 @@ import { AppPath } from '@routes/routes';
 import { toast } from '@components';
 import utils from '@libs/utils';
 
+import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatAnswer = (
   answer: IConceptSeedAnswer,
@@ -54,7 +56,7 @@ const ConceptSettings: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
   const { seedDraft, isLoading } = useSeed(concept.seedUuid || '');
   const navigate = useNavigate();
-
+  const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
   const { mutate: cloneSeed, isLoading: isCloning } = useCloneSeed();
 
   // Get all ignition questions
@@ -81,6 +83,8 @@ const ConceptSettings: React.FC = () => {
       onSuccess: (clonedSeed) => {
         toast.success('Concept seed cloned successfully!');
         // Navigate to the incubation page with the cloned seed
+        resetQuestionnaire();
+        setIsNewSeed(false);
         navigate(
           `${AppPath.IncubateConcept}/?${new URLSearchParams({
             seed: clonedSeed.uuid,
