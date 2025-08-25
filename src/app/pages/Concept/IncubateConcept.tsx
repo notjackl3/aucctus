@@ -139,8 +139,6 @@ const IncubateConcept: React.FC = () => {
     setClarifyingQuestions,
   ]);
 
-  // NOTE: submittedAnswers is now set in user-interaction-hook.ts to avoid race conditions
-
   // Handle cached concepts - populate store and skip to selection
   useEffect(() => {
     if (
@@ -165,41 +163,20 @@ const IncubateConcept: React.FC = () => {
     setCurrentQuestionOrder,
   ]);
 
-  useEffect(() => {
-    if (submittedAnswers.length > 0) {
-      setCurrentQuestionOrder(Infinity);
-    }
-  }, [submittedAnswers, setCurrentQuestionOrder]);
-
   // Determine the current question based on answers
   useEffect(() => {
     if (activeQuestionnaire && activeQuestionnaire.questions) {
       if (submittedAnswers.length > 0) {
-        // Sort answers by question order to find the latest answered question
-        const sortedAnswers = [...submittedAnswers].sort(
-          (a, b) => b.question.order - a.question.order,
+        const highestOrderQuestion = Math.max(
+          ...Object.values(activeQuestionnaire.questions).map((q) => q.order),
+        );
+        const highestOrderAnswer = Math.max(
+          ...submittedAnswers.map((a) => a.question.order),
         );
 
-        // Get the order of the last answered question
-        const lastAnsweredQuestionOrder = sortedAnswers[0].question.order;
-
-        // We need to find the next unanswered question
-        const questionOrders = Object.values(activeQuestionnaire.questions)
-          .map((q) => q.order)
-          .filter((order) => order > lastAnsweredQuestionOrder)
-          .sort((a, b) => a - b);
-
-        if (questionOrders.length > 0) {
-          // Set current question to the next question after the last answered one
-          const nextQuestionOrder = questionOrders[0];
-          setCurrentQuestionOrder(nextQuestionOrder);
+        if (highestOrderAnswer >= highestOrderQuestion) {
+          setCurrentQuestionOrder(Infinity);
         }
-        // Fix: Don't auto-set currentQuestionOrder to Infinity when all questions answered
-        // Let the user interaction flow (goToNextQuestion) handle clarifying questions properly
-        // This prevents showing clarifying questions UI before questions are generated
-        // else {
-        //   setCurrentQuestionOrder(Infinity);
-        // }
       } else if (Object.values(activeQuestionnaire.questions).length > 0) {
         // If no questions answered yet, set to the first question (lowest order)
         const firstQuestionOrder = Math.min(
@@ -210,6 +187,7 @@ const IncubateConcept: React.FC = () => {
         setCurrentQuestionOrder(firstQuestionOrder);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeQuestionnaire, submittedAnswers, setCurrentQuestionOrder]);
 
   const hasSubmittedAnswers = useMemo(

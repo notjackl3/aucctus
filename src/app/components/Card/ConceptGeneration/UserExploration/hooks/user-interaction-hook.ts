@@ -146,8 +146,8 @@ export const useUserInteraction = () => {
         );
       } else {
         dispatchAnimationEvent('question-transition', () => {
-          setCurrentQuestionOrder(nextOrder);
           setSubmittedAnswers(answers);
+          setCurrentQuestionOrder(nextOrder);
           setAnswerValue('');
         });
       }
@@ -176,6 +176,19 @@ export const useUserInteraction = () => {
       submittedAnswers.length === 0
     ) {
       setSubmittedAnswers(answers);
+      const highestOrderAnswer = Math.max(
+        ...answers.map((a) => a.question.order),
+      );
+      const highestOrderQuestion = Math.max(
+        ...Object.values(activeQuestionnaire?.questions ?? {}).map(
+          (q) => q.order,
+        ),
+      );
+      if (highestOrderAnswer >= highestOrderQuestion) {
+        setCurrentQuestionOrder(Infinity);
+      } else {
+        setCurrentQuestionOrder(highestOrderAnswer);
+      }
     }
 
     if (advanceAction.current === 'to-next-question') {
@@ -189,7 +202,13 @@ export const useUserInteraction = () => {
       advanceAction.current = false;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [seedDraftAnswers, submittedAnswers, setSubmittedAnswers]);
+  }, [
+    seedDraftAnswers,
+    submittedAnswers,
+    setSubmittedAnswers,
+    hasExistingClarifyingQuestions,
+    activeQuestionnaire,
+  ]);
 
   useEffect(() => {
     const handleAnswerUpdate = (event: CustomEvent) =>
