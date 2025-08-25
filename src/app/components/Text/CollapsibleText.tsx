@@ -91,6 +91,8 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
         ref={textRef}
         className={cn(
           'aucctus-text-tertiary self-start text-sm font-medium leading-tight',
+          // Add word breaking and overflow handling to prevent horizontal overflow
+          'hyphens-auto break-words',
           {
             [truncationClassName]: !open,
             'cursor-pointer': isTruncated,
@@ -99,7 +101,12 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
           // This is to ensure relative is set and takes priority
           'relative',
         )}
-        style={animatedStyles}
+        style={{
+          ...animatedStyles,
+          // Additional CSS properties for better text wrapping
+          overflowWrap: 'anywhere',
+          wordBreak: 'break-word',
+        }}
       >
         {description}
         {!open && isTruncated && (

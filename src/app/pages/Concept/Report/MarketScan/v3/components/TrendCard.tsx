@@ -57,7 +57,7 @@ const TrendCard: React.FC<TrendCardProps> = ({ section, index }) => {
       </div>
 
       {/* Impact/Why it matters */}
-      <div className='px-6 pb-2 pt-3'>
+      <div className='overflow-hidden px-6 pb-2 pt-3'>
         <Text.Collapsible
           title='WHY IT MATTERS?'
           titleClassName='aucctus-text-xs-semibold aucctus-text-tertiary mb-1 tracking-wide'
