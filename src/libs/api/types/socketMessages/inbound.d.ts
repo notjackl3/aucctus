@@ -20,6 +20,25 @@ export interface ErrorEvent extends BaseSocketEvent {
   details: string | object | number | boolean;
 }
 
+export interface ConceptWorkflowUpdateAccountEvent extends BaseSocketEvent {
+  type: 'concept.workflow.update.account';
+  completedSections: string[];
+  conceptRootIdentifier: string;
+  conceptUuid: string;
+  durationSeconds: number;
+  errorDetails: string | null;
+  eventType:
+    | 'workflow_completed'
+    | 'workflow_started'
+    | 'workflow_progress'
+    | 'workflow_error';
+  message: string;
+  progressPercentage: number;
+  section: string | null;
+  sectionStatus: string | null;
+  totalSections: number;
+}
+
 interface IBaseInboundChatMessage {
   sessionId: string;
 }
@@ -406,6 +425,7 @@ export type InboundSocketEvent<C = {}> =
   | ITestCollateralProgressMessage
   | ITestCollateralCompletedMessage
   | ITestCollateralErrorMessage
+  | ConceptWorkflowUpdateAccountEvent
   | ITestCollateralUpdateProgressMessage
   | ITestCollateralUpdateCompletedMessage
   | ITestCollateralUpdateErrorMessage;
