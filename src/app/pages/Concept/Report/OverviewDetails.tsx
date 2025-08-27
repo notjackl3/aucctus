@@ -1,18 +1,21 @@
 import { Card, Header, Text, UnifiedLoadingState } from '@components';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
-import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
+import { useDebugMode } from '@hooks/debug-mode.hook';
+import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
+import useStore from '@stores/store';
 import { FunctionComponent, useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { IConceptReportContext } from './ConceptReport/ConceptReport';
-import useStore from '@stores/store';
 
 const OverviewDetails: FunctionComponent = () => {
   const activeConceptUuid = useStore(
     (state) => state.conceptReport.conceptUuid ?? '',
   );
   const { navigateToTab, concept } = useOutletContext<IConceptReportContext>();
+  const isDebugModeEnabled = useDebugMode();
+
   const { profiles, isLoading: isCustomerProfilesLoading } =
     useConceptCustomerProfiles(activeConceptUuid);
 
@@ -115,6 +118,15 @@ const OverviewDetails: FunctionComponent = () => {
             onViewClick={() => navigateToTab(AppPath.ConceptKeyAssumptions)}
           />
         </div>
+      </section>
+      <section className='flex w-full gap-6 pt-8'>
+        {concept?.conceptImageUrl && isDebugModeEnabled && (
+          <img
+            src={concept.conceptImageUrl}
+            alt='Concept Image'
+            className='h-64 w-64 object-cover'
+          />
+        )}
       </section>
     </div>
   );

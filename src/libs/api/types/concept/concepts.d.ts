@@ -121,6 +121,7 @@ export interface IConcept extends IBaseConceptEntity {
   };
   isHistoricalVersion?: boolean;
   featureVersions?: IFeatureVersions;
+  conceptImageUrl?: string;
 }
 
 export interface IConceptOverview extends IBaseConceptEntity {
