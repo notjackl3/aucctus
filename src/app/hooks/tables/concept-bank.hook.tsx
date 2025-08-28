@@ -9,9 +9,11 @@ import {
 } from '@hooks/query/concepts.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
+  ConceptReportStatus,
   ConceptSort,
   ConceptStatus,
   IConcept,
+  IConceptPage,
   IUser,
   SortableConceptProperties,
 } from '@libs/api/types';
@@ -32,6 +34,9 @@ import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { UnseenChangesTooltip } from '@components/ToolTip/UnseenChangesTooltip';
 import { useDebugMode } from '@hooks/debug-mode.hook';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
+import { IConceptWorkflowMessage } from '@libs/api/types/socketMessages/inbound';
+import telemetry from '@libs/telemetry';
 
 export interface IConceptFilterOptions {
   status: Set<ConceptStatus>;
@@ -86,6 +91,107 @@ export const useConceptBank = (
   const { mutate: generateConceptReport } = useConceptReportGenerate();
   const { mutate: retryConceptReport } = useRetryConceptReport();
   const queryClient = useQueryClient();
+
+  // WebSocket listener for concept workflow status updates
+  // Event name: 'concept.workflow.update.account'
+  useSocketEvent<'concept.workflow.update.account', IConceptWorkflowMessage>(
+    'concept.workflow.update.account',
+    React.useCallback(
+      (data: IConceptWorkflowMessage) => {
+        const {
+          conceptUuid,
+          eventType,
+          reportStatusBySection, // CRITICAL: Use complete section data
+          aggregateStatus, // CRITICAL: Backend-calculated aggregate status
+          progressPercentage,
+          completedSections,
+          totalSections,
+          message,
+          errorDetails,
+        } = data;
+
+        telemetry.log('concept.websocket.update.received', {
+          conceptUuid,
+          eventType,
+          aggregateStatus,
+          progressPercentage,
+          completedSectionsCount: completedSections?.length || 0,
+          totalSections,
+          message,
+          hasErrorDetails: !!errorDetails,
+          hasSectionData: !!reportStatusBySection,
+          hasAggregateStatus: !!aggregateStatus,
+        });
+
+        // Update all relevant concept queries in cache
+        const conceptsQueries = queryClient.getQueriesData<IConceptPage>([
+          AucctusQueryKeys.concepts,
+        ]);
+
+        let updateApplied = false;
+
+        conceptsQueries.forEach(([queryKey, oldData]) => {
+          if (!oldData?.results) return;
+
+          const conceptIndex = oldData.results.findIndex(
+            (concept) => concept.uuid === conceptUuid,
+          );
+
+          if (conceptIndex === -1) return;
+
+          const updatedResults = [...oldData.results];
+          const oldConcept = updatedResults[conceptIndex];
+          const updatedConcept: IConcept = {
+            ...oldConcept,
+            // CRITICAL: Use backend-provided aggregate status when available, otherwise fall back to mapping
+            reportStatusAggregate:
+              (aggregateStatus as ConceptReportStatus) ||
+              oldConcept.reportStatusAggregate,
+
+            // CRITICAL: Update section-level data from WebSocket when available
+            ...(reportStatusBySection && {
+              reportStatusBySection: reportStatusBySection,
+            }),
+
+            // Update progress-related fields from WebSocket event
+            ...(progressPercentage !== undefined && {
+              progressPercentage: progressPercentage,
+            }),
+            ...(completedSections && {
+              completedSections: completedSections,
+            }),
+            ...(totalSections !== undefined && {
+              totalSections: totalSections,
+            }),
+          };
+
+          updatedResults[conceptIndex] = updatedConcept;
+
+          // Update this specific query
+          queryClient.setQueryData<IConceptPage>(queryKey, {
+            ...oldData,
+            results: updatedResults,
+          });
+
+          if (!updateApplied) {
+            telemetry.log('concept.websocket.update.applied', {
+              conceptUuid,
+              eventType,
+              aggregateStatus,
+              oldStatus: oldConcept.reportStatusAggregate,
+              newStatus: updatedConcept.reportStatusAggregate,
+              progressPercentage: updatedConcept.progressPercentage,
+              completedSections: updatedConcept.completedSections?.length,
+              totalSections: updatedConcept.totalSections,
+              sectionsUpdated: Object.keys(reportStatusBySection || {}).length,
+            });
+            updateApplied = true;
+          }
+        });
+      },
+      [queryClient],
+    ),
+  );
 
   // Use global debug mode state
   const isDebugModeEnabled = useDebugMode();
@@ -169,7 +275,7 @@ export const useConceptBank = (
           case 'notStarted':
             generateConceptReport(row.original.uuid, {
               onSuccess: () => {
-                // Manually invalidate the concepts query to trigger the polling mechanism
+                // Invalidate the concepts query to refresh initial data (WebSocket will handle subsequent updates)
                 queryClient.invalidateQueries({
                   queryKey: [AucctusQueryKeys.concepts],
                 });
@@ -184,7 +290,7 @@ export const useConceptBank = (
                   'Report retry started',
                   'The system will now process your request. This may take a few minutes.',
                 );
-                // Manually invalidate the concepts query to trigger the polling mechanism
+                // Invalidate the concepts query to refresh initial data (WebSocket will handle subsequent updates)
                 queryClient.invalidateQueries({
                   queryKey: [AucctusQueryKeys.concepts],
                 });

@@ -58,6 +58,10 @@ export class SocketService {
     (code: WebSocketCloseCode, reason: string) => Promise<boolean>
   > = [];
 
+  // WebSocket instance change listeners for React hooks
+  protected wsInstanceChangeListeners: Array<(ws: WebSocket | null) => void> =
+    [];
+
   constructor(
     protected api: Api,
     config: ISocketConfig,
@@ -210,6 +214,8 @@ export class SocketService {
         retryCount: this.currentRetryCount,
         readyState: this._ws?.readyState,
       });
+
+      this.notifyWsInstanceChange();
     };
 
     this._ws.onerror = (error: Event) => {
@@ -255,6 +261,9 @@ export class SocketService {
 
       this._isConnected = false;
       this._ws = null;
+
+      // Notify listeners that WebSocket instance changed (now null)
+      this.notifyWsInstanceChange();
 
       // Handle specific close codes
       let shouldAttemptReconnect = this.shouldReconnect;
@@ -592,5 +601,39 @@ export class SocketService {
 
     // Attempt to connect with fresh Clerk token
     await this.connect();
+  }
+
+  /**
+   * Notify all listeners that the WebSocket instance has changed
+   */
+  protected notifyWsInstanceChange(): void {
+    this.wsInstanceChangeListeners.forEach((listener) => {
+      try {
+        listener(this._ws);
+      } catch (error) {
+        analytics.error('Error in WebSocket instance change listener', error);
+      }
+    });
+  }
+
+  /**
+   * Register a listener for WebSocket instance changes
+   * Useful for React hooks that need to re-run when the WebSocket reconnects
+   */
+  public addWsInstanceChangeListener(
+    listener: (ws: WebSocket | null) => void,
+  ): void {
+    this.wsInstanceChangeListeners.push(listener);
+  }
+
+  /**
+   * Remove a WebSocket instance change listener
+   */
+  public removeWsInstanceChangeListener(
+    listener: (ws: WebSocket | null) => void,
+  ): void {
+    this.wsInstanceChangeListeners = this.wsInstanceChangeListeners.filter(
+      (l) => l !== listener,
+    );
   }
 }

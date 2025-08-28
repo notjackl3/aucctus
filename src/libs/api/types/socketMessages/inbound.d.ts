@@ -3,6 +3,7 @@ import { IBaseMessage } from '../chat';
 import {
   IConceptGenerationContext,
   IGeneratedConceptList,
+  ConceptReportStatusBySection,
 } from '../concept/concepts';
 import {
   IAISuggestionList,
@@ -18,25 +19,6 @@ export interface ErrorEvent extends BaseSocketEvent {
   type: 'error';
   error: string;
   details: string | object | number | boolean;
-}
-
-export interface ConceptWorkflowUpdateAccountEvent extends BaseSocketEvent {
-  type: 'concept.workflow.update.account';
-  completedSections: string[];
-  conceptRootIdentifier: string;
-  conceptUuid: string;
-  durationSeconds: number;
-  errorDetails: string | null;
-  eventType:
-    | 'workflow_completed'
-    | 'workflow_started'
-    | 'workflow_progress'
-    | 'workflow_error';
-  message: string;
-  progressPercentage: number;
-  section: string | null;
-  sectionStatus: string | null;
-  totalSections: number;
 }
 
 interface IBaseInboundChatMessage {
@@ -398,6 +380,44 @@ export type IAiEditingSuggestionsStreamEvent = StreamEvent<
   IAiEditingContext
 >;
 
+// ==========================================
+// Concept Workflow Event Interfaces
+// ==========================================
+
+/**
+ * Interface for concept workflow status update events.
+ * Sent when concept report generation status changes.
+ * Updated to match backend ConceptWorkflowMessage class.
+ */
+export interface IConceptWorkflowMessage extends BaseSocketEvent {
+  type: 'concept.workflow.update.account';
+
+  // Core identifiers
+  conceptUuid: string;
+  conceptRootIdentifier?: string;
+
+  // Event details
+  eventType:
+    | 'workflow_completed'
+    | 'workflow_error'
+    | 'section_started'
+    | 'section_completed';
+
+  progressPercentage?: number;
+  completedSections?: string[];
+  totalSections?: number;
+
+  // Section-level status data (for real-time updates)
+  reportStatusBySection?: ConceptReportStatusBySection;
+
+  // Backend-calculated aggregate status (CRITICAL for real-time updates)
+  aggregateStatus?: string;
+
+  // Additional context
+  message?: string;
+  errorDetails?: any;
+}
+
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -425,9 +445,10 @@ export type InboundSocketEvent<C = {}> =
   | ITestCollateralProgressMessage
   | ITestCollateralCompletedMessage
   | ITestCollateralErrorMessage
-  | ConceptWorkflowUpdateAccountEvent
+  | IConceptWorkflowMessage
   | ITestCollateralUpdateProgressMessage
   | ITestCollateralUpdateCompletedMessage
-  | ITestCollateralUpdateErrorMessage;
+  | ITestCollateralUpdateErrorMessage
+  | IConceptWorkflowMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

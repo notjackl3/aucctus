@@ -121,6 +121,11 @@ export interface IConcept extends IBaseConceptEntity {
   };
   isHistoricalVersion?: boolean;
   featureVersions?: IFeatureVersions;
+
+  // Progress tracking fields for real-time WebSocket updates
+  progressPercentage?: number;
+  completedSections?: string[];
+  totalSections?: number;
   conceptImageUrl?: string;
 }
 

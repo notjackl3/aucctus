@@ -53,10 +53,7 @@ const AucctusSocketBootstrap: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   // Use universal socket events with default concept workflow handling
-  useUniversalSocketEvents(
-    socketEventConfigs.conceptWorkflowDefault(),
-    isAuthenticated,
-  );
+  useUniversalSocketEvents(socketEventConfigs.conceptWorkflowDefault());
 
   return <>{children}</>;
 };

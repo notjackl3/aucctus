@@ -85,6 +85,25 @@ export function useSocketEvent<
 ) {
   const savedCallback = React.useCallback(callback, [callback]);
 
+  // State counter that increments when WebSocket instance changes
+  const [wsInstanceCounter, setWsInstanceCounter] = React.useState(0);
+
+  // Listen for WebSocket instance changes from SocketService
+  React.useEffect(() => {
+    if (!api.aucctusSocket) return;
+
+    const handleWsInstanceChange = () => {
+      setWsInstanceCounter((prev) => prev + 1);
+    };
+
+    api.aucctusSocket.addWsInstanceChangeListener(handleWsInstanceChange);
+
+    return () => {
+      api.aucctusSocket?.removeWsInstanceChangeListener(handleWsInstanceChange);
+    };
+  }, []); // Only run once on mount
+
+  // Main effect that handles WebSocket message listening
   React.useEffect(() => {
     if (!api.aucctusSocket || !api.aucctusSocket.ws) return;
 
@@ -119,7 +138,7 @@ export function useSocketEvent<
     return () => {
       api.aucctusSocket.ws?.removeEventListener('message', handleIncoming);
     };
-  }, [eventName, savedCallback]);
+  }, [eventName, savedCallback, wsInstanceCounter]);
 }
 
 export function useSocketMaxRetriesExceeded(

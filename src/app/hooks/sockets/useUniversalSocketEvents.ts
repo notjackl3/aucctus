@@ -25,12 +25,8 @@ export interface SocketEventConfig {
  * Provides a centralized way to handle different types of socket events
  *
  * @param config - Configuration object for different event handlers
- * @param enabled - Whether the hook should be active (default: true)
  */
-export const useUniversalSocketEvents = (
-  config: SocketEventConfig,
-  enabled: boolean = true,
-) => {
+export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   const navigate = useNavigate();
 
   // Prevent duplicate toasts by tracking recent messages
@@ -52,7 +48,7 @@ export const useUniversalSocketEvents = (
 
   // Register concept workflow socket event
   useSocketEvent('concept.workflow.update.account', (message) => {
-    if (!enabled || !config.conceptWorkflow) return;
+    if (!config.conceptWorkflow) return;
 
     if (message.eventType === 'workflow_completed') {
       // Check for duplicates
