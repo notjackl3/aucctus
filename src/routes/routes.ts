@@ -38,6 +38,10 @@ export enum AppPath {
   SettingsAbout = '/settings/about',
   SettingsSecurity = '/settings/security',
 
+  /* Testing */
+  Testing = '/testing',
+  TestingNucleus = '/testing/nucleus',
+
   /* Auth */
   Login = '/login',
   SignUp = '/sign-up',

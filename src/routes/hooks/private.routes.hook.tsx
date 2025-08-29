@@ -31,6 +31,13 @@ const usePrivateRoutes = () => {
 
       {/* Settings Routes */}
       {SettingsRoutes}
+
+      {/* Testing Routes */}
+      <Route path={AppPath.Testing} element={<Page.TestingPages.Testing />} />
+      <Route
+        path={AppPath.TestingNucleus}
+        element={<Page.TestingPages.NucleusTesting />}
+      />
     </Route>
   );
 };

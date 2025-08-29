@@ -111,6 +111,39 @@ alwaysApply: true
 - aucctus-stroke-warning-primary / aucctus-stroke-warning-secondary - Warning strokes
 - aucctus-stroke-success-primary / aucctus-stroke-success-secondary - Success strokes
 
+## Semantic Color Palette
+Additional semantic color variants for specialized use cases:
+
+### Info Colors (Blue)
+Use for information, sources, and general informational content
+- aucctus-bg-info-primary / aucctus-bg-info-secondary / aucctus-bg-info-solid - Info backgrounds
+- aucctus-text-info-primary / aucctus-text-info-secondary - Info text
+- aucctus-stroke-info-primary / aucctus-stroke-info-secondary - Info strokes
+
+### Data Colors (Emerald)
+Use for data-related content, facts, and metrics
+- aucctus-bg-data-primary / aucctus-bg-data-secondary / aucctus-bg-data-solid - Data backgrounds
+- aucctus-text-data-primary / aucctus-text-data-secondary - Data text
+- aucctus-stroke-data-primary / aucctus-stroke-data-secondary - Data strokes
+
+### Research Colors (Purple)
+Use for research-related content and discovery features
+- aucctus-bg-research-primary / aucctus-bg-research-secondary / aucctus-bg-research-solid - Research backgrounds
+- aucctus-text-research-primary / aucctus-text-research-secondary - Research text
+- aucctus-stroke-research-primary / aucctus-stroke-research-secondary - Research strokes
+
+### Analytics Colors (Indigo)
+Use for analytics, data points, and reporting features
+- aucctus-bg-analytics-primary / aucctus-bg-analytics-secondary / aucctus-bg-analytics-solid - Analytics backgrounds
+- aucctus-text-analytics-primary / aucctus-text-analytics-secondary - Analytics text
+- aucctus-stroke-analytics-primary / aucctus-stroke-analytics-secondary - Analytics strokes
+
+### Accent Colors (Stone/Taupe)
+Use for neutral UI accents, tabs, and secondary elements
+- aucctus-bg-accent-primary / aucctus-bg-accent-secondary / aucctus-bg-accent-solid - Accent backgrounds
+- aucctus-text-accent-primary / aucctus-text-accent-secondary - Accent text
+- aucctus-stroke-accent-primary / aucctus-stroke-accent-secondary - Accent strokes
+
 ## Slider Accent Colors
 - aucctus-slider-primary - Primary accent for range inputs
 - aucctus-slider-secondary - Secondary accent for range inputs

@@ -57,3 +57,44 @@
     @apply border-warning-300 dark:border-warning-400;
   }
 }
+
+/* Semantic Color Palette Borders */
+.aucctus-border-info {
+  @apply border-blue-500 dark:border-blue-400;
+
+  &-subtle {
+    @apply border-blue-300 dark:border-blue-400;
+  }
+}
+
+.aucctus-border-data {
+  @apply border-emerald-500 dark:border-emerald-400;
+
+  &-subtle {
+    @apply border-emerald-300 dark:border-emerald-400;
+  }
+}
+
+.aucctus-border-research {
+  @apply border-purple-500 dark:border-purple-400;
+
+  &-subtle {
+    @apply border-purple-300 dark:border-purple-400;
+  }
+}
+
+.aucctus-border-analytics {
+  @apply border-indigo-500 dark:border-indigo-400;
+
+  &-subtle {
+    @apply border-indigo-300 dark:border-indigo-400;
+  }
+}
+
+.aucctus-border-accent {
+  @apply border-stone-500 dark:border-stone-400;
+
+  &-subtle {
+    @apply border-stone-300 dark:border-stone-400;
+  }
+}

@@ -63,6 +63,7 @@
     }
   }
 }
+
 /* State-based text */
 .aucctus-text-disabled {
   @apply text-gray-light-500 dark:text-gray-light-500;
@@ -104,4 +105,45 @@
 
 .aucctus-text-success-primary {
   @apply text-success-600 dark:text-success-400;
+}
+
+/* Semantic color palette text */
+.aucctus-text-info-primary {
+  @apply text-blue-600 dark:text-blue-400;
+}
+
+.aucctus-text-info-secondary {
+  @apply text-blue-500 dark:text-blue-300;
+}
+
+.aucctus-text-data-primary {
+  @apply text-emerald-600 dark:text-emerald-400;
+}
+
+.aucctus-text-data-secondary {
+  @apply text-emerald-500 dark:text-emerald-300;
+}
+
+.aucctus-text-research-primary {
+  @apply text-purple-600 dark:text-purple-400;
+}
+
+.aucctus-text-research-secondary {
+  @apply text-purple-500 dark:text-purple-300;
+}
+
+.aucctus-text-analytics-primary {
+  @apply text-indigo-600 dark:text-indigo-400;
+}
+
+.aucctus-text-analytics-secondary {
+  @apply text-indigo-500 dark:text-indigo-300;
+}
+
+.aucctus-text-accent-primary {
+  @apply text-stone-600 dark:text-stone-400;
+}
+
+.aucctus-text-accent-secondary {
+  @apply text-stone-500 dark:text-stone-300;
 }

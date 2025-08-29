@@ -114,3 +114,44 @@
 .aucctus-stroke-success-secondary {
   @apply stroke-success-500 dark:stroke-success-400;
 }
+
+/* Semantic color palette strokes */
+.aucctus-stroke-info-primary {
+  @apply stroke-blue-600 dark:stroke-blue-500;
+}
+
+.aucctus-stroke-info-secondary {
+  @apply stroke-blue-500 dark:stroke-blue-400;
+}
+
+.aucctus-stroke-data-primary {
+  @apply stroke-emerald-600 dark:stroke-emerald-500;
+}
+
+.aucctus-stroke-data-secondary {
+  @apply stroke-emerald-500 dark:stroke-emerald-400;
+}
+
+.aucctus-stroke-research-primary {
+  @apply stroke-purple-600 dark:stroke-purple-500;
+}
+
+.aucctus-stroke-research-secondary {
+  @apply stroke-purple-500 dark:stroke-purple-400;
+}
+
+.aucctus-stroke-analytics-primary {
+  @apply stroke-indigo-600 dark:stroke-indigo-500;
+}
+
+.aucctus-stroke-analytics-secondary {
+  @apply stroke-indigo-500 dark:stroke-indigo-400;
+}
+
+.aucctus-stroke-accent-primary {
+  @apply stroke-stone-600 dark:stroke-stone-500;
+}
+
+.aucctus-stroke-accent-secondary {
+  @apply stroke-stone-500 dark:stroke-stone-400;
+}

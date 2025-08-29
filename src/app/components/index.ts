@@ -11,21 +11,27 @@ import Icon from './Icon';
 import Input from './Input';
 import Legend from './Legends'; // Object with legend components - keep for compatibility
 import Modal from './Modal';
+import { toast } from './Notification/toast';
+import Portal from './Portal';
 import Select from './Select';
 import Table from './Tables';
 import Text from './Text';
-import { toast } from './Notification/toast';
+import ToggleSwitch from './ToggleSwitch';
 
 // Components
 import Avatar from './Avatar';
+import VersionUpgradeBanner from './Banner/VersionUpgradeBanner';
 import BetaDisclaimer from './BetaDisclaimer';
+import { ComponentCarousel } from './Carousel';
 import Loading from './Loading/Loading';
 import Progress from './Loading/Progress';
 import UnifiedLoadingState from './Loading/UnifiedLoadingState';
+import NucleusPage from './Nucleus/NucleusPage/NucleusPage';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
-import { ComponentCarousel } from './Carousel';
 import Tooltip from './ToolTip/Tooltip';
-import VersionUpgradeBanner from './Banner/VersionUpgradeBanner';
+
+// Nucleus Components
+export * from './Nucleus';
 
 export {
   AiInteraction, // This is an object with AI components - keep for compatibility
@@ -45,12 +51,18 @@ export {
   Legend, // This is an object with legend components - keep for compatibility
   Loading,
   Modal,
+  NucleusPage,
+  Portal,
   Progress,
   Select,
   Table, // This is a component with attached properties - keep
   Text,
+  toast,
+  ToggleSwitch,
   Tooltip,
   UnifiedLoadingState,
   VersionUpgradeBanner,
-  toast,
 };
+
+// Explicit exports for Nucleus components to ensure they're available
+// export { NucleusPage } from './Nucleus';
