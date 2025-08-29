@@ -67,6 +67,7 @@ const IncubateConcept: React.FC = () => {
     setActiveQuestionnaire,
     setCurrentQuestionOrder,
     setClarifyingQuestions,
+    setIsNewSeed,
   } = useConceptIncubationStore();
 
   const { generatedConcepts, setGeneratedConcepts } =
@@ -78,6 +79,14 @@ const IncubateConcept: React.FC = () => {
   );
 
   const navigate = useNavigate();
+
+  // Set isNewSeed to false when loading an existing seed from URL
+  useEffect(() => {
+    if (seedUuid) {
+      setIsNewSeed(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (seedError) {
