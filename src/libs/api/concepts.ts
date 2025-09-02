@@ -56,6 +56,12 @@ export interface IncubationAnswer {
   id: number;
 }
 
+export interface IncubationAnswerUpdateResponse {
+  answer: IncubationAnswer;
+  requires_confirmation?: boolean;
+  message?: string;
+}
+
 /**
  * Concept API
  *
@@ -112,13 +118,15 @@ export class ConceptApi extends ApiService {
   updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
     answerId: number,
     answer: IncubationAnswerRequest,
+    forceDelete: boolean = false,
   ) {
-    return this.patch<IncubationAnswer>(
+    const url =
       endpoints.conceptIncubationSeedAnswerIdAndDeleteHigherOrderAnswers(
         answerId,
-      ),
-      answer,
-    );
+      );
+    const urlWithParams = forceDelete ? `${url}?force_delete=true` : url;
+
+    return this.patch<IncubationAnswerUpdateResponse>(urlWithParams, answer);
   }
 
   deleteSeedDraftAnswer(answerId: number) {

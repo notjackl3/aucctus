@@ -47,6 +47,8 @@ const IncubateConcept: React.FC = () => {
   const isBackingFromSelectionRef = useRef(false);
   const queryClient = useQueryClient();
 
+  const autoSetCurrentQuestionOrderRef = useRef(false);
+
   // Data Fetching & Store Access
   const {
     data: seedDraftData,
@@ -68,6 +70,7 @@ const IncubateConcept: React.FC = () => {
     setCurrentQuestionOrder,
     setClarifyingQuestions,
     setIsNewSeed,
+    setIsClonedSeed,
   } = useConceptIncubationStore();
 
   const { generatedConcepts, setGeneratedConcepts } =
@@ -109,10 +112,19 @@ const IncubateConcept: React.FC = () => {
       seedDraftData.uuid !== draftSeedUuid
     ) {
       setDraftSeedUuid(seedDraftData.uuid);
+      setIsClonedSeed(seedDraftData.isCloned || false);
     } else if (seedUuid && seedUuid !== draftSeedUuid) {
       setDraftSeedUuid(seedUuid);
     }
-  }, [seedUuid, seedDraftData, draftSeedUuid, setDraftSeedUuid]);
+
+    setIsClonedSeed(seedDraftData?.isCloned || false);
+  }, [
+    seedUuid,
+    seedDraftData,
+    draftSeedUuid,
+    setDraftSeedUuid,
+    setIsClonedSeed,
+  ]);
 
   // Set the active questionnaire if we have seed data with a type
   useEffect(() => {
@@ -174,7 +186,11 @@ const IncubateConcept: React.FC = () => {
 
   // Determine the current question based on answers
   useEffect(() => {
-    if (activeQuestionnaire && activeQuestionnaire.questions) {
+    if (
+      activeQuestionnaire &&
+      activeQuestionnaire.questions &&
+      !autoSetCurrentQuestionOrderRef.current
+    ) {
       if (submittedAnswers.length > 0) {
         const highestOrderQuestion = Math.max(
           ...Object.values(activeQuestionnaire.questions).map((q) => q.order),
@@ -185,6 +201,7 @@ const IncubateConcept: React.FC = () => {
 
         if (highestOrderAnswer >= highestOrderQuestion) {
           setCurrentQuestionOrder(Infinity);
+          autoSetCurrentQuestionOrderRef.current = true;
         }
       } else if (Object.values(activeQuestionnaire.questions).length > 0) {
         // If no questions answered yet, set to the first question (lowest order)
@@ -194,6 +211,7 @@ const IncubateConcept: React.FC = () => {
             .filter((order) => order > 0),
         );
         setCurrentQuestionOrder(firstQuestionOrder);
+        autoSetCurrentQuestionOrderRef.current = true;
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

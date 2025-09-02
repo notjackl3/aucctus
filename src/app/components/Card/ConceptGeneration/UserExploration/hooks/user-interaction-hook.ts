@@ -65,9 +65,11 @@ export const useUserInteraction = () => {
 
   // Check if this is the final question
   const isFinalQuestion = useMemo(() => {
+    if (!activeQuestion) return false;
+
     const nextQuestion = getNextQuestion(submittedAnswers);
     return !nextQuestion; // If no next question, this is the final one
-  }, [getNextQuestion, submittedAnswers]);
+  }, [activeQuestion, getNextQuestion, submittedAnswers]);
 
   // Check if there are existing clarifying questions
   const hasExistingClarifyingQuestions = useMemo(() => {
@@ -116,6 +118,8 @@ export const useUserInteraction = () => {
     ],
   );
 
+  const answersHaveChanged = useRef(false);
+
   const activeAnswer = useMemo(() => {
     return seedDraftAnswers?.find(
       (answer) =>
@@ -136,6 +140,7 @@ export const useUserInteraction = () => {
           },
           {
             onSuccess: (data: IClarifyingQuestion[]) => {
+              answersHaveChanged.current = false;
               setClarifyingQuestions(data);
               dispatchAnimationEvent('question-transition', () => {
                 setCurrentQuestionOrder(nextOrder);
@@ -196,6 +201,7 @@ export const useUserInteraction = () => {
       advanceAction.current = false;
     } else if (advanceAction.current === 'to-clarifying-questions') {
       dispatchAnimationEvent('fade', () => {
+        setSubmittedAnswers(answers);
         setActiveClarifyingQuestion(undefined);
         setAnswerValue('');
       });
@@ -385,45 +391,71 @@ export const useUserInteraction = () => {
     updateCurrentAnswerLists(activeAnswer);
   }, [activeAnswer, updateCurrentAnswerLists]);
 
-  const doUpdateAnswer = useCallback(() => {
-    if (!activeAnswer) return;
+  const doUpdateAnswer = useCallback(
+    (forceDelete: boolean = false) => {
+      if (!activeAnswer) return;
 
-    const updateMethod = activeClarifyingQuestion
-      ? updateAnswer
-      : updateAnswerAndDeleteHigherOrder;
-
-    updateMethod(
-      {
-        answerId: activeAnswer.id,
-        body: {
-          ...formattedAnswerPayload,
-          answerId: activeAnswer.id,
-        },
-      },
-      {
-        onSuccess: async () => {
-          advanceAction.current = activeClarifyingQuestion
-            ? 'to-clarifying-questions'
-            : 'to-next-question';
-          await queryClient.refetchQueries([
-            AucctusQueryKeys.conceptSeedDraftAnswers,
-            draftSeedUuid,
-          ]);
-        },
-        onError: () => {
-          toast.error('Failed to submit answer');
-        },
-      },
-    );
-  }, [
-    activeAnswer,
-    formattedAnswerPayload,
-    draftSeedUuid,
-    queryClient,
-    updateAnswerAndDeleteHigherOrder,
-    activeClarifyingQuestion,
-    updateAnswer,
-  ]);
+      if (activeClarifyingQuestion) {
+        // For clarifying questions, use the regular update method
+        updateAnswer(
+          {
+            answerId: activeAnswer.id,
+            body: {
+              ...formattedAnswerPayload,
+              answerId: activeAnswer.id,
+            },
+          },
+          {
+            onSuccess: async () => {
+              advanceAction.current = 'to-clarifying-questions';
+              answersHaveChanged.current = true;
+              await queryClient.refetchQueries([
+                AucctusQueryKeys.conceptSeedDraftAnswers,
+                draftSeedUuid,
+              ]);
+            },
+            onError: () => {
+              toast.error('Failed to submit answer');
+            },
+          },
+        );
+      } else {
+        // For regular questions, use the delete higher order method
+        updateAnswerAndDeleteHigherOrder(
+          {
+            answerId: activeAnswer.id,
+            body: {
+              ...formattedAnswerPayload,
+              answerId: activeAnswer.id,
+            },
+            forceDelete,
+          },
+          {
+            onSuccess: async () => {
+              advanceAction.current = 'to-next-question';
+              answersHaveChanged.current = true;
+              await queryClient.refetchQueries([
+                AucctusQueryKeys.conceptSeedDraftAnswers,
+                draftSeedUuid,
+              ]);
+            },
+            onError: () => {
+              toast.error('Failed to submit answer');
+            },
+          },
+        );
+      }
+    },
+    [
+      activeAnswer,
+      formattedAnswerPayload,
+      draftSeedUuid,
+      queryClient,
+      updateAnswerAndDeleteHigherOrder,
+      activeClarifyingQuestion,
+      updateAnswer,
+    ],
+  );
 
   const doConfirmAnswer = useCallback(() => {
     if (activeAnswer) {
@@ -532,7 +564,7 @@ export const useUserInteraction = () => {
           setActiveClarifyingQuestion(undefined);
         });
       } else {
-        goToNextQuestion(submittedAnswers, false);
+        goToNextQuestion(submittedAnswers, answersHaveChanged.current);
       }
       return;
     }
@@ -548,7 +580,7 @@ export const useUserInteraction = () => {
     }
 
     // Show confirmation for clarifying questions (whether new or updating)
-    if (activeClarifyingQuestion) {
+    if (activeClarifyingQuestion && hasCachedConcepts) {
       setShowConfirmation(true);
       return;
     }
@@ -583,6 +615,9 @@ export const useUserInteraction = () => {
             advanceAction.current = activeClarifyingQuestion
               ? 'to-clarifying-questions'
               : 'to-next-question';
+            if (advanceAction.current === 'to-next-question') {
+              answersHaveChanged.current = true;
+            }
             await queryClient.refetchQueries([
               AucctusQueryKeys.conceptSeedDraftAnswers,
               draftSeedUuid,
@@ -636,6 +671,7 @@ export const useUserInteraction = () => {
     isQuestionAnswered,
     allowAddAnswer,
     activeAnswer,
+    seedDraftData,
 
     // Actions
     setAnswerValue,

@@ -39,6 +39,7 @@ export interface IConceptSeed {
   updatedAt: string;
   status?: SeedStatus;
   createdBy: IUser;
+  isCloned?: boolean;
 
   clarifyingQuestions: IClarifyingQuestion[];
   cachedConcepts?: IGeneratedConcept[];

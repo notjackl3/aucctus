@@ -52,72 +52,116 @@ const ConfirmAnswerUpdate: React.FC<ConfirmAnswerUpdateProps> = ({
     );
   }, [seedDraftData]);
 
+  // Check if this is a cloned seed
+  const isClonedSeed = useMemo(() => {
+    return seedDraftData?.isCloned === true;
+  }, [seedDraftData]);
+
+  const getWarningMessage = useMemo(() => {
+    return (
+      scenario: 'regular' | 'final' | 'clarifying',
+      isCloned: boolean,
+    ) => {
+      if (isCloned) {
+        // Cloned seed warning copy matrix
+        switch (scenario) {
+          case 'regular':
+            const baseMessage =
+              'Changing this answer may require updates to subsequent answers. Please review them after making this change. Clarifying questions will need to be regenerated.';
+            const cachedMessage = hasCachedConcepts
+              ? ' Your cached concepts will also be removed and re-generation will be required. This action cannot be reversed.'
+              : '';
+            return baseMessage + cachedMessage;
+          case 'final':
+            const finalBaseMessage =
+              'Changing this answer will require you to regenerate your clarifying questions.';
+            const finalCachedMessage = hasCachedConcepts
+              ? ' Your cached concepts will also be removed and re-generation will be required.'
+              : '';
+            return (
+              finalBaseMessage +
+              finalCachedMessage +
+              ' This action cannot be reversed.'
+            );
+          case 'clarifying':
+            const baseMsg =
+              'Answering or updating clarifying questions will delete your previously generated concepts, requiring regeneration.';
+            return baseMsg + ' This action cannot be reversed.';
+        }
+      }
+
+      // Non-cloned seed warning copy (existing behavior)
+      switch (scenario) {
+        case 'regular':
+          const baseMessage =
+            'Updating this answer will delete answers to subsequent questions.';
+          const cachedMessage = hasCachedConcepts
+            ? ' Your cached concepts will also be removed.'
+            : '';
+          return (
+            baseMessage +
+            cachedMessage +
+            ' This action can not be reversed. Continue?'
+          );
+        case 'final':
+          let message = 'Changing your final answer will';
+          const items = [];
+          if (hasCachedConcepts) items.push('remove your generated concepts');
+          if (hasExistingClarifyingQuestions)
+            items.push('delete your clarifying question answers');
+
+          if (items.length === 1) {
+            message += ` ${items[0]}`;
+          } else if (items.length === 2) {
+            message += ` ${items[0]} and ${items[1]}`;
+          }
+
+          message += hasCachedConcepts
+            ? " and you'll have to generate new ones. This action cannot be reversed."
+            : '. This action cannot be reversed.';
+          return message;
+        case 'clarifying':
+          const baseMsg =
+            'Answering or updating clarifying questions will delete your previously generated concepts, requiring regeneration.';
+          return baseMsg + ' This action cannot be reversed.';
+      }
+    };
+  }, [hasCachedConcepts, hasExistingClarifyingQuestions]);
+
   const modalContent = useMemo(() => {
+    let scenario: 'regular' | 'final' | 'clarifying';
+    let title: string;
+
     if (isClarifyingQuestion) {
-      const baseMessage =
-        'Answering or updating clarifying questions will delete your previous concepts.';
-      const cachedMessage = hasCachedConcepts
-        ? " Your previously generated concepts will also be removed and you'll need to generate new ones."
-        : '';
-
-      return {
-        title: 'Answer clarifying question?',
-        subtitle:
-          baseMessage + cachedMessage + ' This action cannot be reversed.',
-      };
-    }
-
-    // For final question - warn about cached concepts and/or clarifying questions
-    if (
+      scenario = 'clarifying';
+      title = 'Answer clarifying question?';
+    } else if (
       isFinalQuestion &&
       (hasCachedConcepts || hasExistingClarifyingQuestions)
     ) {
-      let message = 'Changing your final answer will';
-      const items = [];
-
-      if (hasCachedConcepts) {
-        items.push('remove your generated concepts');
-      }
-      if (hasExistingClarifyingQuestions) {
-        items.push('delete your clarifying question answers');
-      }
-
-      if (items.length === 1) {
-        message += ` ${items[0]}`;
-      } else if (items.length === 2) {
-        message += ` ${items[0]} and ${items[1]}`;
-      }
-
-      message += hasCachedConcepts
-        ? " and you'll have to generate new ones. This action cannot be reversed."
-        : '. This action cannot be reversed.';
-
-      return {
-        title: 'Update final answer?',
-        subtitle: message,
-      };
+      scenario = 'final';
+      title = 'Update final answer?';
+    } else {
+      scenario = 'regular';
+      // For cloned seeds, use different title since nothing gets deleted
+      title = isClonedSeed
+        ? 'Confirm answer update?'
+        : 'Updating this answer will delete answers to subsequent questions.';
     }
 
-    // For regular questions - warn about subsequent questions and cached concepts
-    const baseMessage =
-      'Updating this answer will delete answers to subsequent questions.';
-    const cachedMessage = hasCachedConcepts
-      ? ' Your cached concepts will also be removed.'
-      : '';
+    const subtitle = getWarningMessage(scenario, isClonedSeed);
 
     return {
-      title:
-        'Updating this answer will delete answers to subsequent questions.',
-      subtitle:
-        baseMessage +
-        cachedMessage +
-        ' This action can not be reversed. Continue?',
+      title,
+      subtitle,
     };
   }, [
     isClarifyingQuestion,
     isFinalQuestion,
     hasCachedConcepts,
     hasExistingClarifyingQuestions,
+    isClonedSeed,
+    getWarningMessage,
   ]);
 
   const actions: IActionButton[] = useMemo(

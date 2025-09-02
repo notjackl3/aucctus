@@ -5,7 +5,7 @@ import React from 'react';
 
 export const useConceptIncubationStore = () => {
   const store = useStore((state) => state.incubation);
-  const { activeQuestionnaire, currentQuestionOrder } = store;
+  const { activeQuestionnaire, currentQuestionOrder, isClonedSeed } = store;
 
   const questions = React.useMemo(() => {
     if (!activeQuestionnaire) return [];
@@ -38,19 +38,25 @@ export const useConceptIncubationStore = () => {
     (answers: IncubationAnswer[]): ConceptIncubationQuestion | undefined => {
       if (currentQuestionOrder === undefined) return;
 
+      const checkAnswers = isClonedSeed
+        ? answers.filter(
+            (answer) => answer.question.order <= currentQuestionOrder,
+          )
+        : answers;
+
       const eligibleQuestions = questions
         .filter((question) => !!question.identifier)
         .filter(
           (question) =>
             question.order > currentQuestionOrder &&
-            shouldShowQuestion(question, answers),
+            shouldShowQuestion(question, checkAnswers),
         )
         .sort((a, b) => a.order - b.order);
 
       // Return the first eligible question (the one with the lowest order above currentQuestionOrder)
       return eligibleQuestions[0];
     },
-    [currentQuestionOrder, questions, shouldShowQuestion],
+    [currentQuestionOrder, questions, shouldShowQuestion, isClonedSeed],
   );
 
   const getPreviousQuestion = React.useCallback(

@@ -23,6 +23,7 @@ export interface IConceptIncubationActions {
     questionnaire?: IConceptIncubationQuestionnaireSection,
   ) => void;
   setIsNewSeed: (isNewSeed: boolean) => void;
+  setIsClonedSeed: (isClonedSeed: boolean) => void;
   setDraftSeedUuid: (uuid: string) => void;
   setCurrentTextAnswerList: (answerList: AnswerItem[]) => void;
   setCurrentMultiSelectAnswerList: (answerList: AnswerItem[]) => void;
@@ -55,6 +56,13 @@ export function setIsNewSeed(
   isNewSeed: boolean,
 ) {
   this.set({ isNewSeed });
+}
+
+export function setIsClonedSeed(
+  this: IStoreApi<IConceptIncubationState>,
+  isClonedSeed: boolean,
+) {
+  this.set({ isClonedSeed });
 }
 
 export function setDraftSeedUuid(
@@ -112,6 +120,7 @@ export function resetQuestionnaire(this: IStoreApi<IConceptIncubationState>) {
     currentQuestionOrder: undefined,
     activeQuestionnaire: undefined,
     activeClarifyingQuestion: undefined,
+    isClonedSeed: false,
     draftSeedUuid: '',
     currentTextAnswerList: [],
     currentMultiSelectAnswerList: [],

@@ -4,6 +4,7 @@ import {
   EditConceptReportRequest,
   IncubationAnswerRequest,
   IncubationAnswerUpdateRequest,
+  IncubationAnswerUpdateResponse,
 } from '@libs/api/concepts';
 import {
   IAssumptionLifecycleAddRequest,
@@ -265,14 +266,20 @@ export const useUpdateConceptSeedDraftAnswer = () => {
 
 export const useUpdateConceptSeedDraftAnswerAndDeleteHigherOrderAnswers =
   () => {
-    return useMutation({
-      mutationFn: async (params: {
+    return useMutation<
+      IncubationAnswerUpdateResponse,
+      Error,
+      {
         answerId: number;
         body: IncubationAnswerUpdateRequest;
-      }) =>
+        forceDelete?: boolean;
+      }
+    >({
+      mutationFn: async (params) =>
         await api.concept.updateSeedDraftAnswerAndDeleteHigherOrderAnswers(
           params.answerId,
           params.body,
+          params.forceDelete || false,
         ),
     });
   };

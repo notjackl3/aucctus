@@ -26,12 +26,15 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     currentQuestionOrder,
     isQuestionAnswered,
     allowAddAnswer,
+    activeAnswer,
+    seedDraftData,
 
     setShowConfirmation,
     onInputChange,
     handleAddAnswer,
     handleGoBack,
     handleSubmitAnswer,
+    doUpdateAnswer,
     doConfirmAnswer,
     doRevertAnswer,
     dispatchAiSuggestionsEvent,
@@ -97,7 +100,13 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
           setShowConfirmation(false);
         }}
         onConfirm={() => {
-          doConfirmAnswer();
+          // For cloned seeds showing preservation warning, preserve answers when user confirms
+          // For other scenarios, use the regular confirm flow
+          if (seedDraftData?.isCloned === true && activeAnswer) {
+            doUpdateAnswer(false);
+          } else {
+            doConfirmAnswer();
+          }
           setShowConfirmation(false);
         }}
         isClarifyingQuestion={!!activeClarifyingQuestion}
