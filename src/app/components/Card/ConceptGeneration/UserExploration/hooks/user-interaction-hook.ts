@@ -143,6 +143,7 @@ export const useUserInteraction = () => {
               answersHaveChanged.current = false;
               setClarifyingQuestions(data);
               dispatchAnimationEvent('question-transition', () => {
+                setSubmittedAnswers(answers);
                 setCurrentQuestionOrder(nextOrder);
                 setAnswerValue('');
               });
