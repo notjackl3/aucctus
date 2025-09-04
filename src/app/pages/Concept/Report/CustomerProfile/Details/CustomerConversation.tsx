@@ -70,6 +70,17 @@ const CustomerConversation = forwardRef<
     (state) => state.customerProfileConversations.messages,
   );
 
+  const shouldFetchMessages = useMemo(() => {
+    if (!activeConversation?.uuid || isThinking) return false;
+
+    // Don't fetch if we already have messages in the store for this conversation
+    if (messages.length > 0) return false;
+
+    return (
+      conversations?.some((c) => c.uuid === activeConversation.uuid) ?? false
+    );
+  }, [activeConversation?.uuid, conversations, isThinking, messages.length]);
+
   // Query hooks
   const {
     data: conversationMessages = { results: [] },
@@ -78,7 +89,7 @@ const CustomerConversation = forwardRef<
   } = useConceptCustomerProfileConversationMessages(
     profile.uuid,
     activeConversation?.uuid,
-    false,
+    shouldFetchMessages,
   );
 
   React.useEffect(() => {
@@ -175,11 +186,11 @@ const CustomerConversation = forwardRef<
   }, [conversationMessages, activeConversation, setConversation]);
 
   useEffect(() => {
-    if (profile.uuid && activeConversation?.uuid) {
+    if (profile.uuid && activeConversation?.uuid && shouldFetchMessages) {
       refetchConversationMessages();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refetchConversationMessages, activeConversation]);
+  }, [refetchConversationMessages, activeConversation, shouldFetchMessages]);
 
   // Effects - UI Updates
   useEffect(() => {
@@ -345,7 +356,8 @@ const CustomerConversation = forwardRef<
         </div>
       </div>
 
-      <LoadingMask isLoading={isLoadingConversationMessages} />
+      {/* Don't show LoadingMask when we're already in thinking state (waiting for AI response) */}
+      <LoadingMask isLoading={isLoadingConversationMessages && !isThinking} />
     </div>
   );
 });

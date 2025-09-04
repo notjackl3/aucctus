@@ -59,12 +59,13 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
     // Add event listener for the customer-profile-new-conversation event
     const handleHandshake = (event: CustomerProfileConversationEvent) => {
       const { sessionId } = event.detail;
+      // Add new conversation to the beginning so it becomes the active conversation
       setConversations([
-        ...(conversations || []),
         {
           uuid: sessionId,
           createdAt: new Date().toISOString(),
         },
+        ...(conversations || []),
       ]);
     };
 
