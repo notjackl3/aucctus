@@ -9,6 +9,7 @@ import {
   IAssistantMessage,
   ICustomerProfileConversation,
   ICustomerProfileConversationState,
+  IErrorMessage,
   IUserMessage,
 } from './store';
 
@@ -21,6 +22,7 @@ export interface ICustomerProfileConversationActions {
   setConversation: (conversation: ICustomerProfileConversation) => void;
   clearConversation: (resetCurrentMessage?: boolean) => void;
   addAssistantMessage: (message: IAssistantMessage) => void;
+  addErrorMessage: (message: IErrorMessage) => void;
   agentIsThinking: (value: boolean, thinkingMessage?: string) => void;
 }
 
@@ -260,6 +262,21 @@ export function addAssistantMessage(
         state.messages.push(message);
       }
 
+      state.isAucctusTyping = false;
+      state.thinkingMessage = undefined;
+    }),
+  );
+}
+
+export function addErrorMessage(
+  this: IStoreApi<ICustomerProfileConversationState>,
+  message: IErrorMessage,
+) {
+  const { set } = this;
+
+  set(
+    produce((state: ICustomerProfileConversationState) => {
+      state.messages.push(message);
       state.isAucctusTyping = false;
       state.thinkingMessage = undefined;
     }),

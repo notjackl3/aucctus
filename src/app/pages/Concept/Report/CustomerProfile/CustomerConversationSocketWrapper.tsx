@@ -3,6 +3,7 @@ import { useSocketEvent } from '@hooks/sockets/aucctus';
 import {
   ICustomerProfileHandshakeMessage,
   ICustomerProfileInboundChatMessage,
+  ICustomerProfileInboundErrorEvent,
   ICustomerProfileInboundTypingMessage,
 } from '@libs/api/types';
 import { isCustomerProfileDirectMessage } from '@libs/api/utils/typeGuards';
@@ -21,6 +22,9 @@ const CustomerConversationSocketWrapper: React.FC<
   );
   const addAssistantMessage = useStore(
     (state) => state.customerProfileConversations.addAssistantMessage,
+  );
+  const addErrorMessage = useStore(
+    (state) => state.customerProfileConversations.addErrorMessage,
   );
   const agentIsThinking = useStore(
     (state) => state.customerProfileConversations.agentIsThinking,
@@ -76,11 +80,25 @@ const CustomerConversationSocketWrapper: React.FC<
     },
   );
 
-  useSocketEvent('customer.profile.chat.error', (message) => {
-    telemetry.error('customer.profile.chat.error', message);
-    agentIsThinking(false);
-    // TODO: Create action to show error message in chat
-  });
+  useSocketEvent(
+    'customer.profile.error',
+    (message: ICustomerProfileInboundErrorEvent) => {
+      telemetry.error('customer.profile.error', message);
+      agentIsThinking(false);
+
+      // Add error message to chat
+      const errorMessage = {
+        uuid: `error-${Date.now()}`,
+        content: message.message || 'Something went wrong. Please try again.',
+        role: 'error' as const,
+        timestamp: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+        code: message.code || 'UNKNOWN',
+      };
+
+      addErrorMessage(errorMessage);
+    },
+  );
 
   useSocketEvent(
     'customer.profile.chat.typing',

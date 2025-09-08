@@ -274,7 +274,7 @@ export interface ICustomerProfileInboundTypingMessage
 export interface ICustomerProfileInboundErrorEvent
   extends IBaseInboundChatMessage,
     BaseSocketEvent {
-  type: 'customer.profile.chat.error';
+  type: 'customer.profile.error';
   code: string;
   message: string;
   account_uuid: string;

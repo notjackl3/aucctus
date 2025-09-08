@@ -8,6 +8,7 @@ import type { IAppStore } from '../store';
 import {
   ICustomerProfileConversationActions,
   addAssistantMessage,
+  addErrorMessage,
   agentIsThinking,
   clearConversation,
   handleMessage,
@@ -30,7 +31,16 @@ export interface IAssistantMessage
   content: string;
 }
 
-export type CustomerProfileMessage = IUserMessage | IAssistantMessage;
+export interface IErrorMessage extends Omit<IBaseMessage, 'role'> {
+  role: 'error';
+  content: string;
+  code?: string;
+}
+
+export type CustomerProfileMessage =
+  | IUserMessage
+  | IAssistantMessage
+  | IErrorMessage;
 
 export interface ICustomerProfileConversation {
   uuid: string;
@@ -75,6 +85,7 @@ const customerProfileConversationSlice: Lens<
     setConversation: setConversation.bind(actionContext),
     clearConversation: clearConversation.bind(actionContext),
     addAssistantMessage: addAssistantMessage.bind(actionContext),
+    addErrorMessage: addErrorMessage.bind(actionContext),
     agentIsThinking: agentIsThinking.bind(actionContext),
   };
 };
