@@ -9,6 +9,7 @@ import useGenerationStatus from '@hooks/concepts/generation-status.hook';
 const SECTION_NAMES: Record<string, string> = {
   overview: 'Overview',
   marketScan: 'Market Scan',
+  trends: 'Trends',
   customerProfiles: 'Customer Profiles',
   financialProjection: 'Financial Projection',
   assumptions: 'Key Assumptions',
