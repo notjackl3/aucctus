@@ -40,6 +40,10 @@
   &-subtle {
     @apply border-error-300 dark:border-error-400;
   }
+
+  &-extra-subtle {
+    @apply border-red-200 dark:border-error-400;
+  }
 }
 
 .aucctus-border-success {
@@ -47,6 +51,10 @@
 
   &-subtle {
     @apply border-success-300 dark:border-success-400;
+  }
+
+  &-extra-subtle {
+    @apply border-green-200 dark:border-success-400;
   }
 }
 
@@ -56,6 +64,10 @@
   &-subtle {
     @apply border-warning-300 dark:border-warning-400;
   }
+
+  &-extra-subtle {
+    @apply border-yellow-200 dark:border-warning-400;
+  }
 }
 
 /* Semantic Color Palette Borders */
@@ -64,6 +76,10 @@
 
   &-subtle {
     @apply border-blue-300 dark:border-blue-400;
+  }
+
+  &-extra-subtle {
+    @apply border-blue-200 dark:border-blue-400;
   }
 }
 

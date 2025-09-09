@@ -81,9 +81,9 @@ alwaysApply: true
 - aucctus-bg-brand-secondary / aucctus-bg-brand-secondary-hover - Secondary brand background
 - aucctus-bg-brand-solid / aucctus-bg-brand-solid-hover - Solid brand background
 - aucctus-bg-brand-section / Brand section background
-- aucctus-bg-error-primary / aucctus-bg-error-secondary / aucctus-bg-error-solid / aucctus-bg-error-solid-hover - Error backgrounds
-- aucctus-bg-warning-primary / aucctus-bg-warning-secondary / aucctus-bg-warning-solid / aucctus-bg-warning-solid-hover - Warning backgrounds
-- aucctus-bg-success-primary / aucctus-bg-success-primary-hover / aucctus-bg-success-secondary / aucctus-bg-success-solid / aucctus-bg-success-solid-hover - Success backgrounds
+- aucctus-bg-error-primary / aucctus-bg-error-secondary / aucctus-bg-error-subtle / aucctus-bg-error-solid / aucctus-bg-error-solid-hover - Error backgrounds
+- aucctus-bg-warning-primary / aucctus-bg-warning-secondary / aucctus-bg-warning-subtle / aucctus-bg-warning-solid / aucctus-bg-warning-solid-hover - Warning backgrounds
+- aucctus-bg-success-primary / aucctus-bg-success-primary-hover / aucctus-bg-success-secondary / aucctus-bg-success-subtle / aucctus-bg-success-solid / aucctus-bg-success-solid-hover - Success backgrounds
 - aucctus-bg-frosted-glass - Frosted glass effect
 
 ## Border Colors
@@ -92,7 +92,10 @@ alwaysApply: true
 - aucctus-border-tertiary - Tertiary border
 - aucctus-border-disabled / aucctus-border-disabled-subtle - Disabled border
 - aucctus-border-brand / aucctus-border-brand-alt / aucctus-border-brand-subtle - Brand borders
-- aucctus-border-error / aucctus-border-error-subtle - Error borders
+- aucctus-border-error / aucctus-border-error-subtle / aucctus-border-error-extra-subtle - Error borders
+- aucctus-border-warning / aucctus-border-warning-subtle / aucctus-border-warning-extra-subtle - Warning borders
+- aucctus-border-success / aucctus-border-success-subtle / aucctus-border-success-extra-subtle - Success borders
+- aucctus-border-info / aucctus-border-info-subtle / aucctus-border-info-extra-subtle - Info borders
 
 ## Stroke Colors (for SVGs)
 - IMPORTANT: Stroke classes are equally important as fill classes when styling SVG and Icon components
@@ -116,7 +119,7 @@ Additional semantic color variants for specialized use cases:
 
 ### Info Colors (Blue)
 Use for information, sources, and general informational content
-- aucctus-bg-info-primary / aucctus-bg-info-secondary / aucctus-bg-info-solid - Info backgrounds
+- aucctus-bg-info-primary / aucctus-bg-info-secondary / aucctus-bg-info-subtle / aucctus-bg-info-solid - Info backgrounds
 - aucctus-text-info-primary / aucctus-text-info-secondary - Info text
 - aucctus-stroke-info-primary / aucctus-stroke-info-secondary - Info strokes
 

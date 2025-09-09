@@ -33,6 +33,9 @@ import Tooltip from './ToolTip/Tooltip';
 // Nucleus Components
 export * from './Nucleus';
 
+// Concept Overview Components
+import ConceptOverview from './ConceptOverview';
+
 export {
   AiInteraction, // This is an object with AI components - keep for compatibility
   Avatar,
@@ -43,6 +46,7 @@ export {
   Chart, // This is an object with chart components - keep for compatibility
   ComponentCarousel,
   ComponentTooltip,
+  ConceptOverview,
   Container,
   FileDropzone,
   Header,

@@ -210,6 +210,10 @@
   @apply bg-error-100 dark:bg-error-600;
 }
 
+.aucctus-bg-error-subtle {
+  background-color: rgb(254, 242, 242, 0.5);
+}
+
 .aucctus-bg-error-solid {
   @apply bg-error-600;
 
@@ -229,6 +233,10 @@
 
 .aucctus-bg-warning-secondary {
   @apply bg-warning-100 dark:bg-warning-600;
+}
+
+.aucctus-bg-warning-subtle {
+  background-color: rgb(254, 252, 232, 0.5);
 }
 
 .aucctus-bg-warning-solid {
@@ -261,6 +269,10 @@
   @apply bg-success-100 dark:bg-success-600;
 }
 
+.aucctus-bg-success-subtle {
+  background-color: rgb(187, 247, 208, 0.1);
+}
+
 .aucctus-bg-success-solid {
   @apply bg-success-600;
 
@@ -281,6 +293,10 @@
 
 .aucctus-bg-info-secondary {
   @apply bg-blue-100 dark:bg-blue-600;
+}
+
+.aucctus-bg-info-subtle {
+  background-color: rgb(239, 246, 255, 0.3);
 }
 
 .aucctus-bg-info-solid {

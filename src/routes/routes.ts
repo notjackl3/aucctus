@@ -41,6 +41,7 @@ export enum AppPath {
   /* Testing */
   Testing = '/testing',
   TestingNucleus = '/testing/nucleus',
+  TestingConceptOverview = '/testing/concept-overview',
 
   /* Auth */
   Login = '/login',
