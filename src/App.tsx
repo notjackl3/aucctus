@@ -1,6 +1,7 @@
 import { Loading } from '@components';
 import Page from '@pages';
 import AuthGuard from '@routes/guards/auth.guard';
+import AccessGuard from '@routes/guards/access.guard';
 import { usePrivateRoutes, usePublicRoutes } from '@routes/hooks';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
@@ -65,11 +66,13 @@ function App() {
         <Routes>
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>
-            <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
+            <Route element={<AccessGuard />}>
+              <Route path={AppPath.Onboarding} element={<Page.Onboarding />} />
 
-            {/* Private Routes */}
-            {/* These are nested inside the Layout Component */}
-            {PrivateRoutes}
+              {/* Private Routes */}
+              {/* These are nested inside the Layout Component */}
+              {PrivateRoutes}
+            </Route>
 
             {/* Public Routes  */}
             {PublicRoutes}

@@ -1,6 +1,7 @@
-import { FunctionComponent, useCallback, useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { useNavigate } from 'react-router-dom';
+import { Banner } from '@components';
+import useStore from '@stores/store';
+import { FunctionComponent, useCallback, useMemo, useState } from 'react';
+import { Outlet, useNavigate } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import TabView from '../../components/Container/TabView/TabView';
 
@@ -12,18 +13,39 @@ export const SETTING_TABS = [
 const Settings: FunctionComponent = () => {
   const [activeTab, setActiveTab] = useState<string>(AppPath.SettingsAbout);
   const navigate = useNavigate();
+  const { user } = useStore((state) => state.auth);
+
+  const missingFields = useMemo(() => {
+    if (!user) return [];
+
+    const missing = [];
+    if (!user.firstName) missing.push('First Name');
+    if (!user.lastName) missing.push('Last Name');
+
+    return missing;
+  }, [user]);
 
   const onTabSelect = useCallback(
     (value: string) => {
+      if (missingFields.length > 0) return;
       setActiveTab(value);
       const route = value;
       navigate(route);
     },
-    [navigate],
+    [navigate, missingFields],
   );
 
   return (
     <div className='box-border flex h-auto w-full flex-col items-center p-8 pb-12'>
+      {missingFields.length > 0 && (
+        <Banner
+          title='Complete your profile'
+          description={`Please complete the following required fields: ${missingFields.join(', ')}`}
+          variant='warning'
+          iconVariant='alert-circle'
+          showButton={false}
+        />
+      )}
       <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
         <div className='flex flex-row items-center justify-start'>
           <h1 className='aucctus-header-sm-medium aucctus-text-brand-primary'>

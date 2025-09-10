@@ -20,6 +20,7 @@ import ToggleSwitch from './ToggleSwitch';
 
 // Components
 import Avatar from './Avatar';
+import Banner from './Banner/Banner';
 import VersionUpgradeBanner from './Banner/VersionUpgradeBanner';
 import BetaDisclaimer from './BetaDisclaimer';
 import { ComponentCarousel } from './Carousel';
@@ -40,6 +41,7 @@ export {
   AiInteraction, // This is an object with AI components - keep for compatibility
   Avatar,
   Badge, // This is an object with badge components - keep for compatibility
+  Banner,
   BetaDisclaimer,
   Button, // This is a component with attached properties - keep
   Card, // This is an object with card components - keep for compatibility

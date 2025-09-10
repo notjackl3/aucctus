@@ -1,3 +1,5 @@
+import { useClerk, useUser as useClerkUser } from '@clerk/clerk-react';
+import { toast } from '@components';
 import useStore from '@stores/store';
 import { AxiosError, isAxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -10,8 +12,29 @@ import {
   IUserDetailsResponse,
   IUserQueryOptions,
 } from '../../../libs/api/types';
-import { useClerk } from '@clerk/clerk-react';
 import { AucctusQueryKeys } from './query-keys';
+import telemetry from '@libs/telemetry';
+
+/**
+ * Helper function to update Clerk user profile with firstName and/or lastName
+ */
+const updateClerkUserProfile = async (
+  clerkUser: any,
+  userObj: Partial<IUser>,
+): Promise<void> => {
+  if (!clerkUser || (!userObj.firstName && !userObj.lastName)) {
+    return;
+  }
+
+  try {
+    await clerkUser.update({
+      firstName: userObj.firstName || clerkUser.firstName,
+      lastName: userObj.lastName || clerkUser.lastName,
+    });
+  } catch (clerkError) {
+    telemetry.error('Failed to update Clerk user profile:', clerkError);
+  }
+};
 
 const INITIAL_USER_DETAILS: Partial<IUserDetailsResponse> = {
   user: undefined,
@@ -130,17 +153,32 @@ export const useRegisterAccount = () => {
 
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
+  const setUser = useStore((state) => state.auth.setUser);
+  const setAccount = useStore((state) => state.auth.setAccount);
+  const { user: clerkUser } = useClerkUser();
+
   return useMutation<
     IUserDetailsResponse,
     AxiosError<IFormError>,
     Partial<IUser>,
     unknown
   >({
-    mutationFn: async (userObj) => await api.account.updateUser(userObj),
-    onSuccess: () => {
+    mutationFn: async (userObj) => {
+      // Update backend user
+      const result = await api.account.updateUser(userObj);
+
+      // Update Clerk user profile if firstName or lastName are being updated
+      await updateClerkUserProfile(clerkUser, userObj);
+
+      return result;
+    },
+    onSuccess: (data) => {
+      setUser(data.user);
+      setAccount(data.account);
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.userDetails],
       });
+      toast.success('User updated successfully');
     },
   });
 };

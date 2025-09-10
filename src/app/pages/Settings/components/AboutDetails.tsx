@@ -1,9 +1,7 @@
+import { Input, Loading, toast } from '@components';
 import useStore from '@stores/store';
 import { FunctionComponent, useMemo, useState } from 'react';
-import Select, { StylesConfig } from 'react-select';
-import { toast, Input, Loading } from '@components';
 import { IUser } from '../../../../libs/api/types';
-import defaultAvatar from '../../../assets/img/avatar.png';
 import Icon from '../../../components/Icon/Icon/Icon';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import { useUpdateUser } from '../../../hooks/query/account.hook';
@@ -13,20 +11,6 @@ const defaultIconProps = {
   height: 20,
   className: 'stroke-white',
 };
-
-//TODO - placeholder options
-const COUNTRY_OPTIONS = [
-  { value: 'canada', label: '🇨🇦 Canada' },
-  { value: 'united states', label: '🇺🇸 United States' },
-  { value: 'mexico', label: '🇲🇽 Mexico' },
-];
-
-const TIME_ZONE_OPTIONS = [
-  { value: 'pst', label: '(GMT -8:00) Pacific Time (US & Canada)' },
-  { value: 'mst', label: '(GMT -7:00) Mountain Time (US & Canada)' },
-  { value: 'cst', label: '(GMT -6:00) Central Time (US & Canada)' },
-  { value: 'est', label: '(GMT -5:00)  Eastern Time (US & Canada)' },
-];
 
 const AboutDetails: FunctionComponent = () => {
   const [isFormDisabled, setIsFormDisabled] = useState(true);
@@ -106,6 +90,14 @@ const AboutDetails: FunctionComponent = () => {
       className='flex h-full w-full flex-col items-start'
       onSubmit={(e) => {
         e.preventDefault();
+        if (
+          aboutForm.firstName === '' ||
+          aboutForm.lastName === '' ||
+          aboutForm.jobTitle === ''
+        ) {
+          toast.error('Fields cannot be empty.');
+          return;
+        }
         updateUser(aboutForm, {
           onSuccess: () => {
             setIsFormDisabled(true);
@@ -122,7 +114,7 @@ const AboutDetails: FunctionComponent = () => {
             Personal Info
           </h3>
           <div className='aucctus-text-sm aucctus-text-secondary'>
-            Update your photo and personal details here.
+            Update your personal details here.
           </div>
         </div>
         <div className='flex gap-2'>
@@ -164,16 +156,6 @@ const AboutDetails: FunctionComponent = () => {
         </div>
       </div>
       <RowInfo
-        label={'Your photo'}
-        tooltipContent='photo'
-        sublabel='This will be displayed on your profile.'
-        render={
-          <div className='flex flex-1 gap-4'>
-            <img className='h-16 w-16' alt='avatar' src={defaultAvatar} />
-          </div>
-        }
-      />
-      <RowInfo
         label={'Name'}
         render={
           <div className='flex flex-1 gap-4'>
@@ -187,6 +169,9 @@ const AboutDetails: FunctionComponent = () => {
                 autoComplete='on'
                 value={info.value}
                 onChange={handleInputChange}
+                placeholder='Required'
+                error={!user?.[info.name as keyof IUser]}
+                required={true}
               />
             ))}
           </div>
@@ -211,59 +196,10 @@ const AboutDetails: FunctionComponent = () => {
           }
         />
       ))}
-      <RowInfo
-        label={'Based In'}
-        render={
-          <Select
-            isDisabled={isFormDisabled}
-            styles={customSelectStyles}
-            options={COUNTRY_OPTIONS}
-            defaultValue={COUNTRY_OPTIONS[0]}
-            isSearchable={false}
-          />
-        }
-      />
-      <RowInfo
-        label={'Timezone'}
-        render={
-          <Select
-            isDisabled={isFormDisabled}
-            styles={customSelectStyles}
-            options={TIME_ZONE_OPTIONS}
-            defaultValue={TIME_ZONE_OPTIONS[0]}
-            isSearchable={false}
-          />
-        }
-      />
     </form>
   ) : (
     <Loading />
   );
-};
-
-const customSelectStyles: StylesConfig = {
-  container: (provided) => ({
-    ...provided,
-    position: 'relative',
-    display: 'flex',
-    flexGrow: 1,
-    border: 'none',
-    maxWidth: '25rem',
-    fontFamily: 'Inter',
-    fontSize: '1rem',
-    fontWeight: 500,
-  }),
-  singleValue: (styles) => ({ ...styles, color: 'black' }),
-  control: (provided) => ({
-    ...provided,
-    borderRadius: 8,
-    flexGrow: 1,
-    background: 'white',
-  }),
-  menu: (provided) => ({
-    ...provided,
-    position: 'absolute',
-  }),
 };
 
 export default AboutDetails;
