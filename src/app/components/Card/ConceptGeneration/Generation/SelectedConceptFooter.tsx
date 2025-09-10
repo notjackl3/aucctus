@@ -26,7 +26,7 @@ const SelectedConceptFooter: React.FC<SelectedConceptFooterProps> = ({
     : 'Select more concepts or continue to generation';
 
   return (
-    <div className='aucctus-border-primary m-2 flex flex-row rounded-xl border-2'>
+    <div className='aucctus-border-primary aucctus-bg-primary m-2 flex flex-row rounded-xl border-2'>
       <div className='m-4 self-center'>
         <button className='btn btn-light pointer-events-none aspect-square !p-0'>
           <Icon variant='cube' height={30} width={30} />

@@ -182,6 +182,26 @@ export const useGenerateMarketScan = () => {
   });
 };
 
+export const useGenerateConceptOverview = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (conceptIdentifier: string) =>
+      await api.concept.generateConceptOverview(conceptIdentifier),
+    onSuccess: () => {
+      doFullConceptInvalidation(queryClient);
+      toast.warning(
+        'Overview generation started',
+        'This may take up to 10 minutes. You can navigate away.',
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Overview generation failed. Please try again.');
+    },
+  });
+};
+
 export const useSeed = (uuid?: string, options?: ISeedQueryOptions) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptSeedDraft, uuid],
@@ -350,6 +370,19 @@ export const useConcept = (identifier?: string) => {
   });
 
   return { ...query, concept: query.data };
+};
+
+export const useConceptOverview = (uuid?: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.conceptOverview, uuid],
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
+    queryFn: async () =>
+      uuid ? await api.concept.getConceptOverview(uuid) : void 0,
+    enabled: !!uuid,
+  });
+
+  return { ...query, conceptOverview: query.data };
 };
 
 export const useDownloadConcept = (uuid?: string) => {

@@ -52,6 +52,16 @@ export interface IBaseConceptEntity {
   updatedAt: string;
 }
 
+export interface IGeneratedConceptDifferentiator {
+  order: number;
+  description: string;
+}
+
+export interface IGeneratedConceptRightToWin {
+  order: number;
+  description: string;
+}
+
 interface IGeneratedConceptBase {
   // API provided properties
   uuid: string;
@@ -60,6 +70,8 @@ interface IGeneratedConceptBase {
   overview: string;
   valueProposition: string;
   problemStatement: string;
+  differentiators: IGeneratedConceptDifferentiator[];
+  rightsToWin: IGeneratedConceptRightToWin[];
 }
 
 export interface IGeneratedConcept extends IGeneratedConceptBase {
@@ -94,6 +106,24 @@ export type IFeatureVersions = {
   [K in FeatureName]?: FeatureVersion;
 };
 
+export interface IConceptDifferentiator
+  extends IGeneratedConceptDifferentiator {
+  uuid: string;
+}
+
+export interface IConceptRightToWin extends IGeneratedConceptRightToWin {
+  uuid: string;
+}
+
+export interface IConceptOverview extends IBaseConceptEntity {
+  uuid: string;
+  conceptOverview: string;
+  valueProposition: string;
+  problemStatement: string;
+  conceptImageUrl: string;
+  differentiators: IConceptDifferentiator[];
+  rightToWin: IConceptRightToWin[];
+}
 export interface IConcept extends IBaseConceptEntity {
   uuid: string;
   title: string;
@@ -101,6 +131,8 @@ export interface IConcept extends IBaseConceptEntity {
   overview: string;
   valueProposition: string;
   problemStatement: string;
+  differentiators: IConceptDifferentiator[];
+  rightsToWin: IConceptRightToWin[];
   identifier: string;
   reportStatusAggregate: ConceptReportStatus;
   reportStatusBySection: ConceptReportStatusBySection; // Use the new type here

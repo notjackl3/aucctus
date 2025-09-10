@@ -5,6 +5,7 @@ import {
   ConceptIncubationQuestion,
   ConceptStatus,
   IConcept,
+  IConceptOverview,
   IConceptPage,
   IConceptQueryOptions,
   IConceptReportEdit,
@@ -76,6 +77,10 @@ export class ConceptApi extends ApiService {
 
   getConcept(identifier: string) {
     return this.get<IConcept>(endpoints.conceptIdentifier(identifier));
+  }
+
+  getConceptOverview(identifier: string) {
+    return this.get<IConceptOverview>(endpoints.conceptOverview(identifier));
   }
 
   downloadConcept(uuid: string) {
@@ -171,6 +176,12 @@ export class ConceptApi extends ApiService {
 
   aiEditConcept(payload: EditConceptReportRequest) {
     return this.post<IConcept>(endpoints.conceptAiEditing, payload);
+  }
+
+  generateConceptOverview(conceptIdentifier: string) {
+    return this.post<{ message: string }>(
+      endpoints.generateConceptOverview(conceptIdentifier),
+    );
   }
 
   generateKeyAssumptions(conceptIdentifier: string) {

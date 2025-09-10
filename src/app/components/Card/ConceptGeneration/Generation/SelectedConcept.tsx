@@ -40,14 +40,6 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
   onSelect,
   isSelected,
 }) => {
-  React.useEffect(() => {
-    if (activeConcept) {
-      setValueProposition(activeConcept.valueProposition);
-      setOverview(activeConcept.overview);
-      setProblemStatement(activeConcept.problemStatement);
-    }
-  }, [activeConcept]);
-
   const { draftSeedUuid } = useConceptIncubationStore();
   const { updateGeneratedConcept } = useConceptGenerationStore();
   const [valueProposition, setValueProposition] = React.useState(
@@ -57,14 +49,44 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
   const [problemStatement, setProblemStatement] = React.useState(
     activeConcept?.problemStatement || '',
   );
+  const [differentiators, setDifferentiators] = React.useState(
+    activeConcept?.differentiators || [],
+  );
+  const [rightsToWin, setRightToWin] = React.useState(
+    activeConcept?.rightsToWin || [],
+  );
+
+  React.useEffect(() => {
+    if (activeConcept) {
+      setValueProposition(activeConcept.valueProposition);
+      setOverview(activeConcept.overview);
+      setProblemStatement(activeConcept.problemStatement);
+      setDifferentiators(activeConcept.differentiators || []);
+      setRightToWin(activeConcept.rightsToWin || []);
+    }
+  }, [activeConcept]);
 
   const handleSave = () => {
     if (activeConcept && draftSeedUuid) {
       activeConcept.valueProposition = valueProposition;
       activeConcept.overview = overview;
       activeConcept.problemStatement = problemStatement;
+      activeConcept.differentiators = differentiators;
+      activeConcept.rightsToWin = rightsToWin;
       updateGeneratedConcept(draftSeedUuid, activeConcept);
     }
+  };
+
+  const handleDifferentiatorChange = (index: number, value: string) => {
+    const updated = [...differentiators];
+    updated[index] = { ...updated[index], description: value };
+    setDifferentiators(updated);
+  };
+
+  const handleRightToWinChange = (index: number, value: string) => {
+    const updated = [...rightsToWin];
+    updated[index] = { ...updated[index], description: value };
+    setRightToWin(updated);
   };
 
   // Don't render if no active concept
@@ -100,7 +122,7 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
         />
       </div>
 
-      <div className='aucctus-text-primary aucctus-text-md-semibold mx-4 mt-4'>
+      <div className='aucctus-text-primary aucctus-text-md-semibold mx-4 mb-1 mt-4'>
         Problem Statement
       </div>
       <div className='aucctus-text-secondary aucctus-text-sm mx-4 flex flex-row gap-2'>
@@ -120,7 +142,7 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
         />
       </div>
 
-      <div className='aucctus-text-primary aucctus-text-md-semibold mx-4 mt-4'>
+      <div className='aucctus-text-primary aucctus-text-md-semibold mx-4 mb-1 mt-4'>
         Value Proposition
       </div>
       <div className='aucctus-text-secondary aucctus-text-sm mx-4 flex flex-row gap-2'>
@@ -138,6 +160,72 @@ const SelectedConcept: React.FC<SelectedConceptProps> = ({
             setValueProposition(activeConcept.valueProposition)
           }
         />
+      </div>
+
+      <div className='aucctus-text-primary aucctus-text-md-semibold mx-4 mb-1 mt-4'>
+        Differentiators
+      </div>
+      <div className='mx-4 flex flex-col gap-2'>
+        {differentiators
+          .sort((a, b) => a.order - b.order)
+          .map((item, index) => (
+            <div
+              key={index}
+              className='aucctus-text-secondary aucctus-text-sm flex flex-row gap-2'
+            >
+              <span className='aucctus-text-tertiary flex min-w-[1.5rem] items-center justify-center'>
+                •
+              </span>
+              <EditModeSwitcher
+                pClassName='aucctus-text-brand-secondary aucctus-text-sm flex-1'
+                textFieldClassName='aucctus-text-brand-secondary aucctus-text-sm flex-1'
+                value={item.description}
+                label=''
+                name={`differentiator-${index}`}
+                maxLength={500}
+                rows={1}
+                onChange={(e) =>
+                  handleDifferentiatorChange(index, e.target.value)
+                }
+                handleSave={handleSave}
+                handleCancel={() => {
+                  setDifferentiators(activeConcept.differentiators || []);
+                }}
+              />
+            </div>
+          ))}
+      </div>
+
+      <div className='aucctus-text-primary aucctus-text-md-semibold mx-4 mb-1 mt-4'>
+        Rights to Win
+      </div>
+      <div className='mx-4 flex flex-col gap-2'>
+        {rightsToWin
+          .sort((a, b) => a.order - b.order)
+          .map((item, index) => (
+            <div
+              key={index}
+              className='aucctus-text-secondary aucctus-text-sm flex flex-row gap-2'
+            >
+              <span className='aucctus-text-tertiary flex min-w-[1.5rem] items-center justify-center'>
+                •
+              </span>
+              <EditModeSwitcher
+                pClassName='aucctus-text-brand-secondary aucctus-text-sm flex-1'
+                textFieldClassName='aucctus-text-brand-secondary aucctus-text-sm flex-1'
+                value={item.description}
+                label=''
+                name={`rightToWin-${index}`}
+                maxLength={500}
+                rows={1}
+                onChange={(e) => handleRightToWinChange(index, e.target.value)}
+                handleSave={handleSave}
+                handleCancel={() => {
+                  setRightToWin(activeConcept.rightsToWin || []);
+                }}
+              />
+            </div>
+          ))}
       </div>
     </>
   );

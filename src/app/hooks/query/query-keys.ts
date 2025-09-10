@@ -8,6 +8,7 @@ export enum AucctusQueryKeys {
   /* Concepts */
   concepts = 'concepts',
   concept = 'concept',
+  conceptOverview = 'conceptOverview',
   conceptVersions = 'conceptVersions',
   conceptSeed = 'conceptSeed',
   conceptSeedDraft = 'conceptSeedDraft',

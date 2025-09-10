@@ -129,7 +129,7 @@ export class Endpoints {
   }
 
   static conceptOverview(conceptUuid: string) {
-    return `api/v1/concept/${conceptUuid}/overview`;
+    return `api/v2/concept/${conceptUuid}/overview`;
   }
 
   static conceptOverviewUuid(overviewUuid: string) {
@@ -399,6 +399,10 @@ export class Endpoints {
 
   static removeKeyAssumption(rootIdentifier: string, assumptionUuid: string) {
     return `api/v2/concept/${rootIdentifier}/key-assumptions/${assumptionUuid}/remove`;
+  }
+
+  static generateConceptOverview(conceptIdentifier: string) {
+    return `api/v2/concept/${conceptIdentifier}/overview/generate`;
   }
 
   static generateFinancialProjection(conceptIdentifier: string) {

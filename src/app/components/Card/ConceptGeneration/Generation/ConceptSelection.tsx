@@ -414,21 +414,24 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
           <ConceptSelectionHeader onClose={handleClose} />
           <div className='mt-4 flex flex-1 flex-row gap-2 overflow-hidden'>
             {renderConceptSelection()}
-            <div className='aucctus-bg-primary border-brand-primary flex flex-[5] flex-col gap-2 rounded-xl border-2'>
-              <SelectedConcept
-                activeConcept={activeConcept}
-                isSelected={selectedConcepts.some(
-                  (c) => c.uuid === activeConcept?.uuid,
-                )}
-                onSelect={handleSelectConcept}
-              />
-              <span className='flex flex-1' />
-              <SelectedConceptFooter
-                selectedConcepts={selectedConcepts}
-                currentGeneratedConcepts={currentGeneratedConcepts}
-                onContinue={handleContinue}
-                onSave={handleSave}
-              />
+            <div className='aucctus-bg-primary border-brand-primary relative flex flex-[5] flex-col rounded-xl border-2'>
+              <div className='absolute bottom-24 left-0 right-0 top-0 overflow-y-auto'>
+                <SelectedConcept
+                  activeConcept={activeConcept}
+                  isSelected={selectedConcepts.some(
+                    (c) => c.uuid === activeConcept?.uuid,
+                  )}
+                  onSelect={handleSelectConcept}
+                />
+              </div>
+              <div className='h-26 absolute bottom-0 left-0 right-0'>
+                <SelectedConceptFooter
+                  selectedConcepts={selectedConcepts}
+                  currentGeneratedConcepts={currentGeneratedConcepts}
+                  onContinue={handleContinue}
+                  onSave={handleSave}
+                />
+              </div>
             </div>
           </div>
         </div>

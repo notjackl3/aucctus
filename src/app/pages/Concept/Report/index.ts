@@ -8,6 +8,7 @@ import CustomerProfile from './CustomerProfile/CustomerProfile';
 import FinancialProjectionsWrapper from './FinancialProjectionsWrapper';
 import MarketScan from './MarketScanBase';
 import OverviewDetails from './OverviewDetails';
+import OverviewWrapper from './OverviewWrapper';
 import Testing from './Testing/Testing';
 
 // Regular exports
@@ -20,6 +21,7 @@ export {
   FinancialProjectionsWrapper,
   MarketScan,
   OverviewDetails,
+  OverviewWrapper,
   Testing,
 };
 
@@ -28,7 +30,7 @@ export type { IConceptReportContext };
 
 // Add properties to ConceptReport using type assertion
 const ReportWithTabs = ConceptReport as unknown as typeof ConceptReport & {
-  Overview: typeof OverviewDetails;
+  Overview: typeof OverviewWrapper;
   MarketScan: typeof MarketScan;
   CustomerProfile: typeof CustomerProfile;
   FinancialProjection: typeof FinancialProjectionsWrapper;
@@ -38,7 +40,7 @@ const ReportWithTabs = ConceptReport as unknown as typeof ConceptReport & {
 };
 
 // Assign components as properties
-ReportWithTabs.Overview = OverviewDetails;
+ReportWithTabs.Overview = OverviewWrapper;
 ReportWithTabs.MarketScan = MarketScan;
 ReportWithTabs.CustomerProfile = CustomerProfile;
 ReportWithTabs.FinancialProjection = FinancialProjectionsWrapper;
