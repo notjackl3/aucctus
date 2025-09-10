@@ -6,7 +6,9 @@ import {
   addAssistantMessage,
   agentIsThinking,
   clearConversation,
+  clearError,
   handleAiEditingMessage,
+  handleError,
   IAiEditingActions,
   initializeListeners,
   performHandshake,
@@ -40,6 +42,9 @@ export interface IAiEditingState extends IAiEditingActions {
   isAucctusThinking: boolean;
 
   thinkingMessage?: string;
+
+  currentError?: { conceptUuid: string; message: string; code: string };
+  hasError: boolean;
 }
 
 const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
@@ -55,6 +60,8 @@ const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
     currentMessage: undefined,
     isAucctusThinking: false,
     thinkingMessage: undefined,
+    currentError: undefined,
+    hasError: false,
 
     sendMessage: sendMessage.bind(actionContext),
     setCurrentMessage: setCurrentMessage.bind(actionContext),
@@ -64,6 +71,8 @@ const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
     addAssistantMessage: addAssistantMessage.bind(actionContext),
     agentIsThinking: agentIsThinking.bind(actionContext),
     initializeListeners: initializeListeners.bind(actionContext),
+    handleError: handleError.bind(actionContext),
+    clearError: clearError.bind(actionContext),
   };
 };
 

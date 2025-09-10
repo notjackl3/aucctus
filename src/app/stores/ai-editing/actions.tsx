@@ -8,6 +8,9 @@ import { v4 as uuidv4 } from 'uuid';
 import type { IStoreApi } from '../store';
 import { IAiEditingState, IAssistantMessage, IUserMessage } from './store';
 
+// Constants
+const SYSTEM_ERROR_MESSAGE_NAME = 'system_error';
+
 /**
  * Actions for AI editing conversation management
  */
@@ -20,6 +23,12 @@ export interface IAiEditingActions {
   addAssistantMessage: (message: IAssistantMessage) => void;
   agentIsThinking: (value: boolean, thinkingMessage?: string) => void;
   initializeListeners: () => (() => void) | undefined;
+  handleError: (error: {
+    conceptUuid: string;
+    message: string;
+    code: string;
+  }) => void;
+  clearError: () => void;
 }
 
 /**
@@ -319,4 +328,83 @@ export function initializeListeners(
   });
 
   return unsubscribe;
+}
+
+/**
+ * Handles AI editing errors from backend
+ */
+export function handleError(
+  this: IStoreApi<IAiEditingState>,
+  error: { conceptUuid: string; message: string; code: string },
+) {
+  const { set, storeApi, get } = this;
+  const conceptUuid = storeApi.getState().conceptReport.conceptUuid;
+
+  // Validate the incoming error.conceptUuid matches the UUID of the currently open concept
+  if (error.conceptUuid !== conceptUuid) {
+    // If it does not match, do not alter UI state. Still log at debug level
+    telemetry.debug('AI Editing: Error concept UUID mismatch', {
+      errorConceptUuid: error.conceptUuid,
+      currentConceptUuid: conceptUuid,
+    });
+    return;
+  }
+
+  // Determine the message to display
+  let displayMessage = error.message;
+  if (!displayMessage || displayMessage.trim() === '') {
+    // Fall back based on code
+    switch (error.code) {
+      case 'ACCOUNT_NOT_FOUND':
+        displayMessage = 'Account not found';
+        break;
+      case 'UNKNOWN':
+      default:
+        displayMessage = 'Something went wrong';
+        break;
+    }
+  }
+
+  // Convert the error into an assistant chat message and append it to conversation history
+  const errorMessage: IAssistantMessage = {
+    uuid: uuidv4(),
+    role: 'assistant',
+    name: SYSTEM_ERROR_MESSAGE_NAME,
+    content: displayMessage,
+    timestamp: new Date().toISOString(),
+    // Note: Metadata preserved in error state, not in message due to type constraints
+  };
+
+  const { messages } = get();
+  const updatedMessages = [...messages, errorMessage];
+
+  set(
+    produce((state: IAiEditingState) => {
+      // Stop the "thinking" state
+      state.isAucctusThinking = false;
+      state.thinkingMessage = undefined;
+
+      // Update error state
+      state.currentError = error;
+      state.hasError = true;
+
+      // Add error message to conversation history
+      state.messages = updatedMessages;
+    }),
+  );
+}
+
+/**
+ * Clears error state only
+ */
+export function clearError(this: IStoreApi<IAiEditingState>) {
+  const { set } = this;
+
+  set(
+    produce((state: IAiEditingState) => {
+      state.currentError = undefined;
+      state.hasError = false;
+      // Do not remove the previously appended error message from history
+    }),
+  );
 }

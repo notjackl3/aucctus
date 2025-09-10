@@ -1,6 +1,7 @@
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import {
   AiEditingChatStreamEvent,
+  IAiEditingErrorMessage,
   IAiEditingInboundChatMessage,
   IAiEditingSuggestionsEvent,
   IAiEditingSuggestionsStreamEvent,
@@ -23,6 +24,7 @@ const AiEditingSocketWrapper: React.FC<AiEditingSocketWrapperProps> = ({}) => {
     (state) => state.aiEditing.addAssistantMessage,
   );
   const agentIsThinking = useStore((state) => state.aiEditing.agentIsThinking);
+  const handleError = useStore((state) => state.aiEditing.handleError);
   const conceptUuid = useStore((state) => state.conceptReport.conceptUuid);
 
   const processMessage = React.useCallback(
@@ -67,9 +69,9 @@ const AiEditingSocketWrapper: React.FC<AiEditingSocketWrapperProps> = ({}) => {
     handleAiEditingHandshake(handshake);
   });
 
-  useSocketEvent('ai.editing.error', (message) => {
-    telemetry.error('ai.editing.error', message);
-    // TODO: Create action to show error message in chat
+  useSocketEvent('ai.editing.error', (error: IAiEditingErrorMessage) => {
+    telemetry.error('ai.editing.error', error);
+    handleError(error);
   });
 
   useSocketEvent('ai.editing.chat.typing', (message) => {
