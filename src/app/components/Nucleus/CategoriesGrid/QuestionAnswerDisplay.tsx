@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { Button, Icon } from '@components';
+import { Icon } from '@components';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { expandedCategoryViewUIText } from './expandedCategoryViewFixtures';
 import { NucleusReportQuestion } from '@libs/api/types';

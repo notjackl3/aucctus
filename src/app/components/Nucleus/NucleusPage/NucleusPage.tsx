@@ -234,7 +234,7 @@ const NucleusPage: React.FC = () => {
             }));
             setActiveDropdown(null);
           },
-          onError: (error: any) => {
+          onError: () => {
             // Don't update local state on error - let the user try again
           },
         },
@@ -280,7 +280,7 @@ const NucleusPage: React.FC = () => {
             });
             setActiveDropdown(null);
           },
-          onError: (error: any) => {
+          onError: () => {
             // Revert optimistic update on error
             setCategoryStatusOverrides((prev) => {
               const updated = { ...prev };

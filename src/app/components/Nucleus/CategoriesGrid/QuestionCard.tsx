@@ -104,7 +104,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
         </div>
       </div>
       <p
-        className={cn('aucctus-text-sm line-clamp-3 pr-12 leading-relaxed', {
+        className={cn('aucctus-text-sm pr-12 leading-relaxed', {
           'aucctus-text-secondary': isCore,
           'aucctus-text-tertiary': !isCore,
         })}
