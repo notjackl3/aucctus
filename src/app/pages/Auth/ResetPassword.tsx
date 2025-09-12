@@ -133,16 +133,41 @@ const ResetPassword: FunctionComponent = () => {
       <form
         className='aucctus-text-sm-medium flex flex-col items-center gap-8 self-stretch'
         onSubmit={handleResetPassword}
+        autoComplete='off'
+        data-lpignore='true'
       >
+        {/* Hidden username field to prevent autofill confusion on macOS */}
+        <input
+          type='text'
+          name='username'
+          autoComplete='username'
+          value={emailFromParams}
+          readOnly
+          style={{
+            position: 'absolute',
+            left: '-9999px',
+            width: '1px',
+            height: '1px',
+            opacity: 0,
+            pointerEvents: 'none',
+          }}
+          tabIndex={-1}
+          aria-hidden='true'
+        />
+
         <Input.Field
           label='Verification Code'
           name='code'
-          autoComplete='one-time-code'
+          autoComplete='off'
           value={code}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setCode(e.target.value)
           }
           placeholder='Enter the code from your email'
+          data-lpignore='true'
+          data-form-type='other'
+          inputMode='numeric'
+          pattern='[0-9]*'
           required
         />
 
@@ -155,6 +180,7 @@ const ResetPassword: FunctionComponent = () => {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setPassword(e.target.value)
           }
+          data-lpignore='true'
           required
         />
 
@@ -168,6 +194,7 @@ const ResetPassword: FunctionComponent = () => {
           onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
             setConfirmPassword(e.target.value)
           }
+          data-lpignore='true'
           required
         />
 
