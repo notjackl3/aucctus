@@ -17,3 +17,4 @@ export * from './osiris';
 export * from './socketMessages/base';
 export * from './socketMessages/inbound';
 export * from './socketMessages/outbound';
+export * from './nucleus';

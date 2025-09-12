@@ -1,5 +1,5 @@
-export type CategoryState = 'validated' | 'new-details' | 'needs-input';
-export type QuestionState = 'validated' | 'new-detail' | 'needs-input';
+export type CategoryState = 'validated' | 'new_details' | 'needs_input';
+export type QuestionState = 'validated' | 'new_details' | 'needs_input';
 
 export interface StatusDropdownProps {
   currentStatus: CategoryState | QuestionState;

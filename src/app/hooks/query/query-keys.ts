@@ -57,6 +57,11 @@ export enum AucctusQueryKeys {
   trendV3 = 'trendV3',
   keyFindingV3 = 'keyFindingV3',
 
+  /* Nucleus Reports */
+  nucleusReport = 'nucleusReport',
+  nucleusReportLatest = 'nucleusReportLatest',
+  nucleusReportsList = 'nucleusReportsList',
+
   /* External APIs */
   clearbitCompany = 'clearbitCompany',
   articlePublishedDate = 'articlePublishedDate',

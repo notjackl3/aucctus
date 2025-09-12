@@ -1,67 +1,141 @@
 import images from '@assets/img';
 import { Icon } from '@components';
+import { useNucleusReportLatest } from '../../../hooks/query/nucleus.hook';
 import { cn } from '@libs/utils/react';
-import React, { useEffect, useState } from 'react';
+import {
+  NucleusReportSection,
+  NucleusReportQuestion,
+  NucleusReportAnswer,
+  ProcessingStatus,
+  AssessmentStatus,
+} from '@libs/api/types';
+import useStore from '../../../stores/store';
+import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import { CategoriesGrid } from '../CategoriesGrid';
-import { mockCompanyContext, mockQuestions } from '../CategoriesGrid/fixtures';
-import { Overview } from '../Overview';
 import { CategoryState, QuestionState } from '../StatusDropdown';
-import { proposedAdditions } from './fixtures';
-import { CategoryStateInfo, CompanyContext, Question } from './types';
+import {
+  useUpdateQuestion,
+  useUpdateSection,
+} from '../../../hooks/query/nucleusCrud.hook';
+import LoadingMask from '../../Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
+
+interface StatusIndicatorProps {
+  status: ProcessingStatus;
+}
+
+const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status }) => {
+  return (
+    <div className='relative'>
+      <div
+        className={cn('h-1.5 w-1.5 animate-pulse rounded-full', {
+          'aucctus-bg-success-solid-alt': status === 'completed',
+          'aucctus-bg-secondary':
+            status === 'processing' || status === 'pending',
+          'aucctus-bg-error-solid': status === 'failed',
+        })}
+      ></div>
+      <div
+        className={cn(
+          'absolute inset-0 h-1.5 w-1.5 animate-ping rounded-full opacity-75',
+          {
+            'aucctus-bg-success-solid-alt': status === 'completed',
+            'aucctus-bg-secondary':
+              status === 'processing' || status === 'pending',
+            'aucctus-bg-error-solid': status === 'failed',
+          },
+        )}
+      ></div>
+    </div>
+  );
+};
 
 const NucleusPage: React.FC = () => {
-  const [companyContext] = useState<CompanyContext>(mockCompanyContext);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [activeTimelineTab, setActiveTimelineTab] = useState('short');
-  const [shortTermCarousel, setShortTermCarousel] = useState(0);
-  const [midTermCarousel, setMidTermCarousel] = useState(0);
-  const [longTermCarousel, setLongTermCarousel] = useState(0);
+  // Fetch real nucleus data
+  const { nucleusReport, isLoading, hasNucleusReport, isNoReportFound } =
+    useNucleusReportLatest();
+  const { account } = useStore((state: any) => state.auth);
+
+  // Hook for updating question assessment status
+  const { mutate: updateQuestion, isLoading: isUpdatingQuestion } =
+    useUpdateQuestion(nucleusReport?.uuid || '');
+
+  // Hook for updating section assessment status
+  const { mutate: updateSection, isLoading: isUpdatingSection } =
+    useUpdateSection(nucleusReport?.uuid || '');
+
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+
+  const handleExpandedCategoryChange = useCallback(
+    (categoryId: string | null) => {
+      setExpandedCategory(categoryId);
+    },
+    [],
+  );
 
   // Manual status override states
   const [categoryStatusOverrides, setCategoryStatusOverrides] = useState<
     Record<string, CategoryState>
-  >({
-    // Set some categories to different statuses for demonstration
-    'company-identity': 'validated',
-    'geographic-footprint': 'validated',
-    'corporate-strategy': 'new-details',
-    offerings: 'new-details',
-    customers: 'needs-input',
-    brand: 'needs-input',
-    'operating-model': 'validated',
-    financial: 'new-details',
-    ecosystem: 'needs-input',
-    'innovation-capability': 'needs-input',
-  });
+  >({});
   const [questionStatusOverrides, setQuestionStatusOverrides] = useState<
     Record<string, QuestionState>
   >({});
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
 
+  // Helper functions for determining question and category states based on real data
+  const isAiReasoningSource = useCallback(
+    (answer: NucleusReportAnswer): boolean => {
+      return answer.sources.some((source) =>
+        source.title?.toLowerCase().startsWith('ai reasoning'),
+      );
+    },
+    [],
+  );
+
+  const questionNeedsReview = useCallback(
+    (question: NucleusReportQuestion): boolean => {
+      if (question.answers.length === 0) return true;
+      return question.answers.every((answer) => isAiReasoningSource(answer));
+    },
+    [isAiReasoningSource],
+  );
+
   // Helper functions for state determination
-  const getQuestionState = (question: Question): QuestionState => {
-    if (questionStatusOverrides[question.id]) {
-      return questionStatusOverrides[question.id];
-    }
+  const getQuestionState = useCallback(
+    (question: NucleusReportQuestion): QuestionState => {
+      // Check for manual override first
+      if (questionStatusOverrides[question.uuid]) {
+        return questionStatusOverrides[question.uuid];
+      }
 
-    if (!question.isAnswered) return 'needs-input';
+      // Use the actual assessmentStatus from the question data if available
+      const questionWithAssessment = question as any;
+      if (questionWithAssessment.assessmentStatus) {
+        return questionWithAssessment.assessmentStatus as QuestionState;
+      }
 
-    // Check if recent updates (within 7 days) indicate new details
-    const hasRecentUpdates = question.answers.some((answer) => {
-      const updateDate = new Date(answer.lastUpdated);
-      const weekAgo = new Date();
-      weekAgo.setDate(weekAgo.getDate() - 7);
-      return updateDate > weekAgo;
-    });
+      // Fallback to automatic determination based on answers
+      if (questionNeedsReview(question)) return 'needs_input';
 
-    if (hasRecentUpdates) return 'new-detail';
-    return 'validated';
-  };
+      // Check if recent updates (within 7 days) indicate new details
+      const hasRecentUpdates = question.answers.some((answer) => {
+        const updateDate = new Date(answer.updatedAt);
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        return updateDate > weekAgo;
+      });
 
-  const getCategoryStateInfo = (categoryId: string): CategoryStateInfo => {
-    if (categoryStatusOverrides[categoryId]) {
-      const questions = mockQuestions[categoryId] || [];
+      if (hasRecentUpdates) return 'new_details';
+      return 'validated';
+    },
+    [questionStatusOverrides, questionNeedsReview],
+  );
+
+  const getCategoryStateInfo = useMemo(
+    () => (section: NucleusReportSection) => {
+      const categoryId = section.sectionType;
+
+      // Calculate question stats for display
+      const questions = section.questions;
       let validated = 0;
       let newDetails = 0;
       let needsInput = 0;
@@ -70,60 +144,222 @@ const NucleusPage: React.FC = () => {
       questions.forEach((question) => {
         const state = getQuestionState(question);
         if (state === 'validated') validated++;
-        else if (state === 'new-detail') newDetails++;
-        else if (state === 'needs-input') needsInput++;
+        else if (state === 'new_details') newDetails++;
+        else if (state === 'needs_input') needsInput++;
 
-        totalSources += question.answers.length;
+        totalSources += question.answers.reduce(
+          (sum, answer) => sum + answer.sources.length,
+          0,
+        );
       });
 
+      // Determine section state priority:
+      // 1. Manual override (user changed it via dropdown)
+      // 2. Section's assessmentStatus from API (database state)
+      // 3. Calculated state based on questions (fallback)
+      let sectionState: CategoryState;
+
+      if (categoryStatusOverrides[categoryId]) {
+        // User manually changed it via dropdown
+        sectionState = categoryStatusOverrides[categoryId];
+      } else if (section.assessmentStatus) {
+        // Use the section's assessmentStatus from the API/database
+        sectionState = section.assessmentStatus as CategoryState;
+      } else {
+        // Fallback: calculate from questions
+        sectionState = 'validated';
+        if (needsInput > 0) sectionState = 'needs_input';
+        else if (newDetails > 0) sectionState = 'new_details';
+      }
+
       return {
-        state: categoryStatusOverrides[categoryId],
+        state: sectionState,
         validated,
         newDetails,
         needsInput,
         totalSources,
       };
-    }
+    },
+    [categoryStatusOverrides, getQuestionState],
+  );
 
-    const questions = mockQuestions[categoryId] || [];
-    let validated = 0;
-    let newDetails = 0;
-    let needsInput = 0;
-    let totalSources = 0;
+  // Derived data from real nucleus report
+  const companyName = account?.name || 'Company';
+  const reportSections = useMemo(
+    () => nucleusReport?.sections || [],
+    [nucleusReport?.sections],
+  );
 
-    questions.forEach((question) => {
-      const state = getQuestionState(question);
-      if (state === 'validated') validated++;
-      else if (state === 'new-detail') newDetails++;
-      else if (state === 'needs-input') needsInput++;
+  // Use sections directly - no transformation needed!
+  const allSections = useMemo(() => {
+    const sortedSections = [...reportSections].sort(
+      (a: NucleusReportSection, b: NucleusReportSection) => a.order - b.order,
+    );
 
-      totalSources += question.answers.length;
-    });
+    return sortedSections;
+  }, [reportSections]);
 
-    // Determine overall category state
-    let overallState: CategoryState = 'validated';
-    if (needsInput > 0) overallState = 'needs-input';
-    else if (newDetails > 0) overallState = 'new-details';
+  // Handle question status changes - must be after allSections is defined
+  const handleQuestionStatusChange = useCallback(
+    (questionId: string, newStatus: QuestionState) => {
+      // Find the question to get its current data
+      const question = allSections
+        .flatMap((section) => section.questions)
+        .find((q) => q.uuid === questionId);
 
-    return {
-      state: overallState,
-      validated,
-      newDetails,
-      needsInput,
-      totalSources,
+      if (!question || !nucleusReport?.uuid) {
+        return;
+      }
+
+      // QuestionState now matches AssessmentStatus format directly
+      const assessmentStatus = newStatus as AssessmentStatus;
+
+      // Update the question in the database
+      updateQuestion(
+        {
+          questionUuid: questionId,
+          data: {
+            question: question.question,
+            whyItMatters: question.whyItMatters,
+            priority: question.priority,
+            assessmentStatus,
+          },
+        },
+        {
+          onSuccess: () => {
+            // Update local state override for immediate UI feedback
+            setQuestionStatusOverrides((prev) => ({
+              ...prev,
+              [questionId]: newStatus,
+            }));
+            setActiveDropdown(null);
+          },
+          onError: (error: any) => {
+            // Don't update local state on error - let the user try again
+          },
+        },
+      );
+    },
+    [updateQuestion, allSections, nucleusReport?.uuid],
+  );
+
+  // Handle section status changes
+  const handleSectionStatusChange = useCallback(
+    (sectionId: string, newStatus: CategoryState) => {
+      // Find the section to get its current data
+      const section = allSections.find((s) => s.sectionType === sectionId);
+
+      if (!section || !nucleusReport?.uuid) {
+        return;
+      }
+
+      // Optimistic update: Set override immediately for responsive UI
+      setCategoryStatusOverrides((prev) => ({
+        ...prev,
+        [sectionId]: newStatus,
+      }));
+
+      // CategoryState now matches AssessmentStatus format directly
+      const assessmentStatus = newStatus as AssessmentStatus;
+
+      // Update the section in the database
+      updateSection(
+        {
+          sectionUuid: section.uuid,
+          data: {
+            assessmentStatus,
+          },
+        },
+        {
+          onSuccess: () => {
+            // Clear override - let the fresh API data be the source of truth
+            setCategoryStatusOverrides((prev) => {
+              const updated = { ...prev };
+              delete updated[sectionId];
+              return updated;
+            });
+            setActiveDropdown(null);
+          },
+          onError: (error: any) => {
+            // Revert optimistic update on error
+            setCategoryStatusOverrides((prev) => {
+              const updated = { ...prev };
+              delete updated[sectionId];
+              return updated;
+            });
+          },
+        },
+      );
+    },
+    [updateSection, allSections, nucleusReport?.uuid],
+  );
+
+  // Add click outside handler for dropdowns
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        activeDropdown &&
+        !(event.target as Element).closest('[data-dropdown]')
+      ) {
+        setActiveDropdown(null);
+      }
     };
-  };
 
-  const handleQuestionStatusChange = (
-    questionId: string,
-    newStatus: QuestionState,
-  ) => {
-    setQuestionStatusOverrides((prev) => ({
-      ...prev,
-      [questionId]: newStatus,
-    }));
-    setActiveDropdown(null);
-  };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [activeDropdown]);
+
+  // Loading and error states
+  if (isLoading) {
+    return (
+      <div className='aucctus-bg-primary flex min-h-screen items-center justify-center'>
+        <div className='text-center'>
+          <div className='aucctus-text-lg aucctus-text-primary mb-4'>
+            Loading Nucleus Report...
+          </div>
+          <div className='mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900'></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (isNoReportFound) {
+    return (
+      <div className='aucctus-bg-primary flex min-h-screen items-center justify-center'>
+        <div className='text-center'>
+          <Icon
+            variant='alert-triangle'
+            className='aucctus-text-warning-primary mx-auto mb-4 h-12 w-12'
+          />
+          <div className='aucctus-text-xl aucctus-text-primary mb-2'>
+            No Nucleus Report Found
+          </div>
+          <div className='aucctus-text-md aucctus-text-secondary'>
+            No nucleus report has been generated for this account yet.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!hasNucleusReport || !nucleusReport) {
+    return (
+      <div className='aucctus-bg-primary flex min-h-screen items-center justify-center'>
+        <div className='text-center'>
+          <Icon
+            variant='alert-circle'
+            className='aucctus-text-error-primary mx-auto mb-4 h-12 w-12'
+          />
+          <div className='aucctus-text-xl aucctus-text-primary mb-2'>
+            Error Loading Report
+          </div>
+          <div className='aucctus-text-md aucctus-text-secondary'>
+            There was an error loading the nucleus report.
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const getStateConfig = (state: CategoryState | QuestionState) => {
     switch (state) {
@@ -135,16 +371,15 @@ const NucleusPage: React.FC = () => {
           borderColor: 'aucctus-border-success',
           label: 'Validated',
         };
-      case 'new-details':
-      case 'new-detail':
+      case 'new_details':
         return {
           icon: 'refresh',
           color: 'aucctus-text-brand-primary',
           bgColor: 'aucctus-bg-brand-secondary',
           borderColor: 'aucctus-border-brand',
-          label: state === 'new-details' ? 'New Details Found' : 'New Detail',
+          label: 'New Details Found',
         };
-      case 'needs-input':
+      case 'needs_input':
         return {
           icon: 'alert-triangle',
           color: 'aucctus-text-warning-primary',
@@ -163,23 +398,7 @@ const NucleusPage: React.FC = () => {
     }
   };
 
-  // Add click outside handler for dropdowns
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        activeDropdown &&
-        !(event.target as Element).closest('[data-dropdown]')
-      ) {
-        setActiveDropdown(null);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [activeDropdown]);
-
   const handleCategoryBadgeClick = (categoryId: string) => {
-    setActiveTab('categories');
     setExpandedCategory(categoryId);
 
     // Use multiple RAF to ensure DOM has fully updated
@@ -219,9 +438,6 @@ const NucleusPage: React.FC = () => {
     });
   };
 
-  const allCategories = companyContext.categories;
-  const disruptionRisk = Math.round((5 - companyContext.overallMaturity) * 20);
-
   return (
     <div className='aucctus-bg-primary min-h-screen'>
       {/* Hero Header Section */}
@@ -240,19 +456,22 @@ const NucleusPage: React.FC = () => {
         <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-12'>
           <div className='mb-4'>
             <div className='aucctus-border-success relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1 shadow-lg backdrop-blur-md'>
-              <div className='relative'>
-                <div className='aucctus-bg-success-primary h-1.5 w-1.5 animate-pulse rounded-full'></div>
-                <div className='aucctus-bg-success-primary absolute inset-0 h-1.5 w-1.5 animate-ping rounded-full opacity-75'></div>
-              </div>
+              <StatusIndicator status={nucleusReport.processingStatus} />
               <span className='aucctus-text-xs-medium tracking-wide text-white'>
-                {companyContext.status}
+                {nucleusReport.processingStatus === 'completed'
+                  ? 'Report Complete'
+                  : nucleusReport.processingStatus === 'processing'
+                    ? 'Processing Report'
+                    : nucleusReport.processingStatus === 'pending'
+                      ? 'Report Pending'
+                      : 'Report Failed'}
               </span>
             </div>
           </div>
 
           {/* Company Name */}
           <h1 className='aucctus-header-2xl-bold mb-4 text-center tracking-tight text-white drop-shadow-xl'>
-            {companyContext.companyName}
+            {companyName}
           </h1>
 
           {/* Subtitle */}
@@ -262,42 +481,23 @@ const NucleusPage: React.FC = () => {
 
           {/* Context Status Pills */}
           <div className='mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-3'>
-            {allCategories.map((category) => {
-              const shortName =
-                category.name === 'Corporate Strategy & Structure'
-                  ? 'Strategy'
-                  : category.name === 'Innovation Maturity'
-                    ? 'Innovation'
-                    : category.name === 'Customer Profiles & Segments'
-                      ? 'Customers'
-                      : category.name === 'SWOT Analysis (Innovation Lens)'
-                        ? 'SWOT'
-                        : category.name === 'Brand & Brand Equity'
-                          ? 'Brand'
-                          : category.name ===
-                              'Market Research & Customer Behavior'
-                            ? 'Research'
-                            : category.name === 'Financial Performance'
-                              ? 'Financial'
-                              : category.name === 'Ecosystem & Partnerships'
-                                ? 'Ecosystem'
-                                : category.name === 'Risk Aversion / Risk Index'
-                                  ? 'Risk'
-                                  : category.name
-                                      .split(' & ')[0]
-                                      .split(' /')[0]
-                                      .split(' ')[0];
-              const stateInfo = getCategoryStateInfo(category.id);
+            {allSections.map((section: NucleusReportSection) => {
+              // Create short names from section titles
+              const shortName = section.title
+                .split(' & ')[0]
+                .split(' /')[0]
+                .split(' ')[0];
+              const stateInfo = getCategoryStateInfo(section);
               const stateConfig = getStateConfig(stateInfo.state);
 
               return (
                 <button
-                  key={category.id}
+                  key={section.sectionType}
                   className='group relative cursor-pointer border-0 bg-transparent p-0'
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    handleCategoryBadgeClick(category.id);
+                    handleCategoryBadgeClick(section.sectionType);
                   }}
                 >
                   {/* Glassmorphic pill container */}
@@ -308,9 +508,9 @@ const NucleusPage: React.FC = () => {
                           'relative h-2 w-2 rounded-full transition-all duration-500',
                           {
                             'aucctus-bg-brand-solid':
-                              stateInfo.state === 'new-details',
+                              stateInfo.state === 'new_details',
                             'aucctus-bg-warning-solid':
-                              stateInfo.state === 'needs-input',
+                              stateInfo.state === 'needs_input',
                             'aucctus-bg-success-solid':
                               stateInfo.state === 'validated',
                           },
@@ -333,39 +533,12 @@ const NucleusPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Floating Tab Navigation */}
+      {/* Header for Categories */}
       <div className='relative'>
         <div className='absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 transform'>
           <div className='aucctus-border-primary rounded-lg border bg-white px-1 py-1 shadow-sm backdrop-blur-sm'>
-            <div className='grid h-auto grid-cols-3 gap-0.5 rounded-lg border-0 bg-transparent'>
-              <button
-                onClick={() => setActiveTab('overview')}
-                className={cn({
-                  'aucctus-text-sm-medium rounded-md px-3 py-1.5 transition-all duration-200':
-                    true,
-                  'btn btn-bold btn-primary': activeTab === 'overview',
-                  'aucctus-text-secondary hover:aucctus-text-primary hover:aucctus-bg-secondary-hover':
-                    activeTab !== 'overview',
-                })}
-              >
-                Overview
-              </button>
-              <button
-                onClick={() => setActiveTab('categories')}
-                className={cn({
-                  'aucctus-text-sm-medium rounded-md px-3 py-1.5 transition-all duration-200':
-                    true,
-                  'btn btn-bold btn-primary': activeTab === 'categories',
-                  'aucctus-text-secondary hover:aucctus-text-primary hover:aucctus-bg-secondary-hover':
-                    activeTab !== 'categories',
-                })}
-              >
-                Categories
-              </button>
-              <div className='aucctus-text-sm-medium aucctus-text-quaternary aucctus-bg-disabled flex cursor-not-allowed items-center gap-1.5 rounded-md px-3 py-1.5 opacity-60 transition-all duration-200'>
-                <Icon variant='lock' className='h-3 w-3' />
-                AI Insights
-              </div>
+            <div className='aucctus-text-sm-medium btn btn-bold btn-primary rounded-md px-3 py-1.5'>
+              Categories
             </div>
           </div>
         </div>
@@ -374,47 +547,51 @@ const NucleusPage: React.FC = () => {
         <div className='h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent'></div>
       </div>
 
-      {/* Tab Content */}
-      {activeTab === 'overview' && (
-        <Overview
-          companyContext={companyContext}
-          disruptionRisk={disruptionRisk}
-          activeTimelineTab={activeTimelineTab}
-          setActiveTimelineTab={setActiveTimelineTab}
-          shortTermCarousel={shortTermCarousel}
-          setShortTermCarousel={setShortTermCarousel}
-          midTermCarousel={midTermCarousel}
-          setMidTermCarousel={setMidTermCarousel}
-          longTermCarousel={longTermCarousel}
-          setLongTermCarousel={setLongTermCarousel}
+      {/* Categories Content */}
+      <div
+        className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'
+        data-tab='categories'
+      >
+        <CategoriesGrid
+          allCategories={allSections}
           expandedCategory={expandedCategory}
-          setExpandedCategory={setExpandedCategory}
-          proposedAdditions={proposedAdditions}
+          setExpandedCategory={handleExpandedCategoryChange}
+          getCategoryStateInfo={(categoryId: string) => {
+            const section = reportSections.find(
+              (s: NucleusReportSection) => s.sectionType === categoryId,
+            );
+            return section
+              ? getCategoryStateInfo(section)
+              : {
+                  state: 'needs_input' as CategoryState,
+                  validated: 0,
+                  newDetails: 0,
+                  needsInput: 0,
+                  totalSources: 0,
+                };
+          }}
+          getStateConfig={getStateConfig}
+          setCategoryStatusOverrides={setCategoryStatusOverrides}
+          activeDropdown={activeDropdown}
+          setActiveDropdown={setActiveDropdown}
+          questionStatusOverrides={questionStatusOverrides}
+          handleQuestionStatusChange={handleQuestionStatusChange}
+          handleSectionStatusChange={handleSectionStatusChange}
+          getQuestionState={getQuestionState}
+          reportUuid={nucleusReport?.uuid || ''}
         />
-      )}
+      </div>
 
-      {activeTab === 'categories' && (
-        <div
-          className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'
-          data-tab='categories'
-        >
-          <CategoriesGrid
-            companyContext={companyContext}
-            allCategories={allCategories}
-            mockQuestions={mockQuestions}
-            expandedCategory={expandedCategory}
-            setExpandedCategory={setExpandedCategory}
-            getCategoryStateInfo={getCategoryStateInfo}
-            getStateConfig={getStateConfig}
-            setCategoryStatusOverrides={setCategoryStatusOverrides}
-            activeDropdown={activeDropdown}
-            setActiveDropdown={setActiveDropdown}
-            questionStatusOverrides={questionStatusOverrides}
-            handleQuestionStatusChange={handleQuestionStatusChange}
-            getQuestionState={getQuestionState}
-          />
-        </div>
-      )}
+      {/* Loading mask for question and section status updates */}
+      <LoadingMask
+        isLoading={isUpdatingQuestion || isUpdatingSection}
+        message={
+          isUpdatingSection
+            ? 'Updating section status...'
+            : 'Updating question status...'
+        }
+        zIndex={60}
+      />
     </div>
   );
 };

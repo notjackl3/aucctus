@@ -506,6 +506,37 @@ export class Endpoints {
   static conceptMarketScanMarketForcesV3(conceptUuid: string) {
     return `api/v3/concept/${conceptUuid}/market-scan/market-forces/`;
   }
+
+  // Nucleus Report Endpoints
+  static nucleusReportLatest = '/api/v1/nucleus-reports/latest';
+  static nucleusReportsList = '/api/v1/nucleus-reports/';
+
+  static nucleusReportByUuid(reportUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}`;
+  }
+
+  // Nucleus Sections Endpoints
+  static nucleusSection(reportUuid: string, sectionUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/sections/${sectionUuid}`;
+  }
+
+  // Nucleus Questions Endpoints
+  static nucleusQuestions(reportUuid: string, sectionUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/sections/${sectionUuid}/questions`;
+  }
+
+  static nucleusQuestion(reportUuid: string, questionUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/questions/${questionUuid}`;
+  }
+
+  // Nucleus Answers Endpoints
+  static nucleusAnswers(reportUuid: string, questionUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/questions/${questionUuid}/answers`;
+  }
+
+  static nucleusAnswer(reportUuid: string, answerUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/answers/${answerUuid}`;
+  }
 }
 
 export class SocketEndpoints {

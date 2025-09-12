@@ -217,6 +217,10 @@
 .aucctus-bg-error-solid {
   @apply bg-error-600;
 
+  &-alt {
+    @apply bg-error-400 dark:bg-gray-light-800;
+  }
+
   &-hover {
     @extend .aucctus-bg-error-solid;
     @apply transition-colors duration-300;
@@ -275,6 +279,10 @@
 
 .aucctus-bg-success-solid {
   @apply bg-success-600;
+
+  &-alt {
+    @apply bg-success-400 dark:bg-gray-light-800;
+  }
 
   &-hover {
     @extend .aucctus-bg-success-solid;

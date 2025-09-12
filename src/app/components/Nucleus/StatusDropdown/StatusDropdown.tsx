@@ -1,34 +1,32 @@
-import { Icon, Portal } from '@components';
+import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { categoryStatusOptions, questionStatusOptions } from './fixtures';
-import { StatusDropdownProps } from './types';
+import React, {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  useMemo,
+} from 'react';
+import {
+  categoryStatusOptions,
+  questionStatusOptions,
+  StatusOption,
+} from './fixtures';
+import { StatusDropdownProps, CategoryState, QuestionState } from './types';
+import DropdownMenu, { DropdownPosition } from './DropdownMenu';
 
-const StatusDropdown: React.FC<StatusDropdownProps> = ({
-  currentStatus,
-  onStatusChange,
-  dropdownId,
-  isCategory = true,
-  activeDropdown,
-  setActiveDropdown,
-  compact = false,
-}) => {
-  const isOpen = activeDropdown === dropdownId;
-  const buttonRef = useRef<HTMLButtonElement>(null);
-  const [dropdownPosition, setDropdownPosition] = useState<{
-    top: number;
-    left: number;
-    width: number;
-  } | null>(null);
+// Constants
+const MIN_DROPDOWN_WIDTH = 192; // 192px (w-48 equivalent)
+const DROPDOWN_GAP = 8; // 8px gap below button
 
-  const statusOptions = isCategory
-    ? categoryStatusOptions
-    : questionStatusOptions;
-  const currentConfig = statusOptions.find(
-    (opt) => opt.value === currentStatus,
-  );
+// Custom hook for dropdown positioning
+const useDropdownPosition = (
+  isOpen: boolean,
+  buttonRef: React.RefObject<HTMLButtonElement>,
+) => {
+  const [dropdownPosition, setDropdownPosition] =
+    useState<DropdownPosition | null>(null);
 
-  // Calculate dropdown position when opened
   const updatePosition = useCallback(() => {
     if (isOpen && buttonRef.current) {
       const rect = buttonRef.current.getBoundingClientRect();
@@ -36,20 +34,19 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
       const scrollX = window.scrollX || document.documentElement.scrollLeft;
 
       setDropdownPosition({
-        top: rect.bottom + scrollY + 8, // 8px gap below button
+        top: rect.bottom + scrollY + DROPDOWN_GAP,
         left: rect.left + scrollX,
-        width: Math.max(rect.width, 192), // min-width of 192px (w-48)
+        width: Math.max(rect.width, MIN_DROPDOWN_WIDTH),
       });
     } else {
       setDropdownPosition(null);
     }
-  }, [isOpen]);
+  }, [isOpen, buttonRef]);
 
   useEffect(() => {
     updatePosition();
   }, [updatePosition]);
 
-  // Update position on scroll/resize
   useEffect(() => {
     if (isOpen) {
       const handleUpdate = () => updatePosition();
@@ -63,120 +60,128 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
     }
   }, [isOpen, updatePosition]);
 
+  return dropdownPosition;
+};
+
+const StatusDropdown: React.FC<StatusDropdownProps> = ({
+  currentStatus,
+  onStatusChange,
+  dropdownId,
+  isCategory = true,
+  activeDropdown,
+  setActiveDropdown,
+  compact = false,
+}) => {
+  const isOpen = activeDropdown === dropdownId;
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const dropdownPosition = useDropdownPosition(isOpen, buttonRef);
+
+  // Memoize status options and current config for performance
+  const statusOptions = useMemo(() => {
+    return isCategory ? categoryStatusOptions : questionStatusOptions;
+  }, [isCategory]);
+
+  const currentConfig = useMemo(() => {
+    return statusOptions.find((opt) => opt.value === currentStatus);
+  }, [statusOptions, currentStatus]);
+
+  // Event handlers
+  const handleToggleDropdown = useCallback(
+    (e: React.MouseEvent) => {
+      e.stopPropagation();
+      setActiveDropdown(isOpen ? null : dropdownId);
+    },
+    [isOpen, dropdownId, setActiveDropdown],
+  );
+
+  const handleOptionClick = useCallback(
+    (optionValue: CategoryState | QuestionState) => {
+      onStatusChange(optionValue);
+      setActiveDropdown(null);
+    },
+    [onStatusChange, setActiveDropdown],
+  );
+
+  const handleBackdropClick = useCallback(() => {
+    setActiveDropdown(null);
+  }, [setActiveDropdown]);
+
+  // Memoize button styles for performance
+  const buttonClassNames = useMemo(() => {
+    return cn({
+      'flex items-center border transition-all duration-200 focus:outline-none':
+        true,
+      'gap-1 rounded-md px-2 py-1': compact,
+      'gap-2 rounded-lg px-3 py-1.5': !compact,
+      [currentConfig?.borderClass || 'aucctus-border-secondary']: true,
+      [currentConfig?.bgClass || 'aucctus-bg-secondary']: true,
+      'hover:aucctus-bg-secondary-hover focus:aucctus-border-brand': true,
+    });
+  }, [compact, currentConfig]);
+
   return (
     <div className='relative' data-dropdown>
-      <button
+      <DropdownTrigger
         ref={buttonRef}
-        onClick={(e) => {
-          e.stopPropagation();
-          setActiveDropdown(isOpen ? null : dropdownId);
-        }}
-        className={cn({
-          'flex items-center border transition-all duration-200 focus:outline-none':
-            true,
-          'gap-1 rounded-md px-2 py-1': compact,
-          'gap-2 rounded-lg px-3 py-1.5': !compact,
-          [currentConfig?.borderClass || 'aucctus-border-secondary']: true,
-          [currentConfig?.bgClass || 'aucctus-bg-secondary']: true,
-          'hover:aucctus-bg-secondary-hover focus:aucctus-border-brand': true,
-        })}
-      >
-        {currentConfig && (
-          <Icon
-            variant={currentConfig.icon}
-            className={currentConfig.colorClass.replace(
-              'aucctus-text-',
-              'aucctus-stroke-',
-            )}
-            height={compact ? 12 : 16}
-            width={compact ? 12 : 16}
-          />
-        )}
-        {!compact && currentConfig && (
-          <span
-            className={cn('aucctus-text-sm-medium', currentConfig.colorClass)}
-          >
-            {currentConfig.label}
-          </span>
-        )}
-        <Icon
-          variant={isOpen ? 'chevronup' : 'chevrondown'}
-          className='aucctus-stroke-quaternary'
-          height={12}
-          width={12}
-        />
-      </button>
+        isOpen={isOpen}
+        compact={compact}
+        currentConfig={currentConfig}
+        buttonClassNames={buttonClassNames}
+        onToggle={handleToggleDropdown}
+      />
 
       {isOpen && dropdownPosition && (
-        <Portal>
-          {/* Backdrop */}
-          <div
-            className='fixed inset-0 z-[9998]'
-            onClick={() => setActiveDropdown(null)}
-            style={{ pointerEvents: 'auto' }}
-          />
-
-          {/* Dropdown Menu */}
-          <div
-            className='aucctus-bg-primary aucctus-border-primary animate-in fade-in-0 zoom-in-95 absolute z-[9999] rounded-lg border py-1 shadow-lg duration-200'
-            style={{
-              top: dropdownPosition.top,
-              left: dropdownPosition.left,
-              width: dropdownPosition.width,
-              minWidth: '192px', // w-48 equivalent
-              pointerEvents: 'auto',
-            }}
-          >
-            {statusOptions.map((option) => {
-              const isSelected = option.value === currentStatus;
-
-              return (
-                <button
-                  key={option.value}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onStatusChange(option.value);
-                    setActiveDropdown(null);
-                  }}
-                  className={cn({
-                    'flex w-full items-center gap-3 px-3 py-2.5 text-left transition-colors duration-150':
-                      true,
-                    [option.bgClass]: isSelected,
-                    [option.colorClass]: isSelected,
-                    'aucctus-text-secondary hover:aucctus-bg-secondary-hover':
-                      !isSelected,
-                    [option.hoverBgClass]: true,
-                  })}
-                >
-                  <Icon
-                    variant={option.icon}
-                    className={cn({
-                      [option.colorClass.replace(
-                        'aucctus-text-',
-                        'aucctus-stroke-',
-                      )]: isSelected,
-                      'aucctus-stroke-quaternary': !isSelected,
-                    })}
-                    height={16}
-                    width={16}
-                  />
-
-                  <span className='aucctus-text-sm-medium'>{option.label}</span>
-                  {isSelected && (
-                    <div className='ml-auto'>
-                      <div
-                        className={`h-2 w-2 rounded-full bg-${option.colorClass}`}
-                      />
-                    </div>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </Portal>
+        <DropdownMenu
+          position={dropdownPosition}
+          options={statusOptions}
+          currentStatus={currentStatus}
+          onOptionClick={handleOptionClick}
+          onBackdropClick={handleBackdropClick}
+        />
       )}
     </div>
   );
 };
+
+// Dropdown Trigger Component
+interface DropdownTriggerProps {
+  isOpen: boolean;
+  compact: boolean;
+  currentConfig: StatusOption | undefined;
+  buttonClassNames: string;
+  onToggle: (e: React.MouseEvent) => void;
+}
+
+const DropdownTrigger = React.forwardRef<
+  HTMLButtonElement,
+  DropdownTriggerProps
+>(({ isOpen, compact, currentConfig, buttonClassNames, onToggle }, ref) => (
+  <button ref={ref} onClick={onToggle} className={buttonClassNames}>
+    {currentConfig && (
+      <Icon
+        variant={currentConfig.icon}
+        className={currentConfig.colorClass.replace(
+          'aucctus-text-',
+          'aucctus-stroke-',
+        )}
+        height={compact ? 12 : 16}
+        width={compact ? 12 : 16}
+      />
+    )}
+    {!compact && currentConfig && (
+      <span className={cn('aucctus-text-sm-medium', currentConfig.colorClass)}>
+        {currentConfig.label}
+      </span>
+    )}
+    <Icon
+      variant={isOpen ? 'chevronup' : 'chevrondown'}
+      className='aucctus-stroke-quaternary'
+      height={12}
+      width={12}
+    />
+  </button>
+));
+
+DropdownTrigger.displayName = 'DropdownTrigger';
 
 export default StatusDropdown;

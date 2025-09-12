@@ -16,6 +16,10 @@ import TestModal from './TestModal/TestModal';
 import JourneyStep from './JourneyStepModal';
 import EditRealWorldSignal from './CustomerProfile/EditRealWorldSignal/EditRealWorldSignal';
 import TestExecutionModal from '../../pages/Concept/Report/Testing/components/TestExecutionModal';
+import AddQuestionModal from './Nucleus/AddQuestionModal';
+import EditQuestionModal from './Nucleus/EditQuestionModal';
+import AddAnswerModal from './Nucleus/AddAnswerModal';
+import EditAnswerModal from './Nucleus/EditAnswerModal';
 
 const Modal = {
   Base,
@@ -34,6 +38,10 @@ const Modal = {
   JourneyStep,
   EditRealWorldSignal,
   TestExecutionModal,
+  AddQuestionModal,
+  EditQuestionModal,
+  AddAnswerModal,
+  EditAnswerModal,
 };
 
 export default Modal;

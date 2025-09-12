@@ -24,7 +24,7 @@ export const categoryStatusOptions: StatusOption[] = [
     hoverBgClass: 'aucctus-bg-success-primary-hover',
   },
   {
-    value: 'new-details' as CategoryState,
+    value: 'new_details' as CategoryState,
     label: 'New Details',
     icon: 'refresh',
     colorClass: 'aucctus-text-brand-tertiary', // Using tertiary brand for blue
@@ -33,7 +33,7 @@ export const categoryStatusOptions: StatusOption[] = [
     hoverBgClass: 'aucctus-bg-brand-primary-hover',
   },
   {
-    value: 'needs-input' as CategoryState,
+    value: 'needs_input' as CategoryState,
     label: 'Needs Input',
     icon: 'alert-triangle',
     colorClass: 'aucctus-text-warning-primary',
@@ -54,8 +54,8 @@ export const questionStatusOptions: StatusOption[] = [
     hoverBgClass: 'aucctus-bg-success-primary-hover',
   },
   {
-    value: 'new-detail' as QuestionState,
-    label: 'New Detail',
+    value: 'new_details' as QuestionState,
+    label: 'New Details',
     icon: 'refresh',
     colorClass: 'aucctus-text-brand-tertiary', // Using tertiary brand for blue
     bgClass: 'aucctus-bg-brand-secondary',
@@ -63,7 +63,7 @@ export const questionStatusOptions: StatusOption[] = [
     hoverBgClass: 'aucctus-bg-brand-primary-hover',
   },
   {
-    value: 'needs-input' as QuestionState,
+    value: 'needs_input' as QuestionState,
     label: 'Needs Input',
     icon: 'alert-triangle',
     colorClass: 'aucctus-text-warning-primary',

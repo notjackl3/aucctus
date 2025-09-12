@@ -49,7 +49,8 @@ export const expandedCategoryViewUIText: ExpandedCategoryViewUIText = {
   placeholders: {
     noQuestionsAvailable: 'No core questions available yet.',
     selectQuestionToView: 'Select a question to view details',
-    questionNotAnswered: "This question hasn't been answered yet.",
+    questionNotAnswered:
+      "Our agents weren't able to find external sources to reliably answer this question.",
     enterAnswerHere: 'Enter your answer here...',
     sourceExample: 'Source (e.g., Internal Report)',
   },

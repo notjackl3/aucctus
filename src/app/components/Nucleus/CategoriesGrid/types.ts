@@ -1,7 +1,7 @@
-import { CategoryData, QuestionData } from './fixtures';
+import { NucleusReportQuestion, NucleusReportSection } from '@libs/api/types';
 
-export type CategoryState = 'validated' | 'new-details' | 'needs-input';
-export type QuestionState = 'validated' | 'new-detail' | 'needs-input';
+export type CategoryState = 'validated' | 'new_details' | 'needs_input';
+export type QuestionState = 'validated' | 'new_details' | 'needs_input';
 
 export interface CategoryStateInfo {
   state: CategoryState;
@@ -12,29 +12,11 @@ export interface CategoryStateInfo {
 }
 
 export interface CategoriesGridProps {
-  companyContext: any;
-  allCategories: any[];
-  mockQuestions: Record<
-    string,
-    Array<{
-      id: string;
-      question: string;
-      answers: Array<{
-        id: string;
-        content: string;
-        source: string;
-        sourceType: 'external' | 'internal' | 'ai-reasoning';
-        lastUpdated: string;
-        author?: string;
-      }>;
-      isAnswered: boolean;
-    }>
-  >;
-  calculateProgress: (categoryId: string) => number;
+  allCategories: NucleusReportSection[];
   expandedCategory: string | null;
   setExpandedCategory: (categoryId: string | null) => void;
   getCategoryStateInfo: (categoryId: string) => CategoryStateInfo;
-  getStateConfig: (state: any) => any;
+  getStateConfig: (state: CategoryState | QuestionState) => any;
   setCategoryStatusOverrides: React.Dispatch<
     React.SetStateAction<Record<string, CategoryState>>
   >;
@@ -45,40 +27,35 @@ export interface CategoriesGridProps {
     questionId: string,
     newStatus: QuestionState,
   ) => void;
-  getQuestionState: (question: any) => QuestionState;
+  handleSectionStatusChange: (
+    sectionId: string,
+    newStatus: CategoryState,
+  ) => void;
+  getQuestionState: (question: NucleusReportQuestion) => QuestionState;
+  reportUuid: string;
 }
 
 export interface CategoryCardProps {
-  category: CategoryData;
+  category: NucleusReportSection;
   isExpanded: boolean;
-  questions: QuestionData[];
+  questions: NucleusReportQuestion[];
   answeredQuestions: number;
   onToggleExpand: (categoryId: string | null) => void;
   getCategoryStateInfo: (categoryId: string) => any;
   setCategoryStatusOverrides: React.Dispatch<
     React.SetStateAction<Record<string, any>>
   >;
+  handleSectionStatusChange: (
+    sectionId: string,
+    newStatus: CategoryState,
+  ) => void;
   activeDropdown: string | null;
   setActiveDropdown: (id: string | null) => void;
   expandedContent?: React.ReactNode;
 }
 
 export interface ExpandedCategoryViewProps {
-  questions: Array<{
-    id: string;
-    question: string;
-    answers: Array<{
-      id: string;
-      content: string;
-      source: string;
-      sourceType: 'external' | 'internal' | 'ai-reasoning';
-      lastUpdated: string;
-      author?: string;
-    }>;
-    isAnswered: boolean;
-    priority?: 'core' | 'deeper';
-    cluster?: string;
-  }>;
+  questions: NucleusReportQuestion[];
   handleQuestionStatusChange: (
     questionId: string,
     newStatus: QuestionState,
@@ -86,4 +63,7 @@ export interface ExpandedCategoryViewProps {
   activeDropdown: string | null;
   setActiveDropdown: (id: string | null) => void;
   getQuestionState: (question: any) => QuestionState;
+  onClose: () => void;
+  reportUuid: string;
+  sectionUuid: string;
 }

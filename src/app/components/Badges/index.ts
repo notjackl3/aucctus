@@ -11,6 +11,7 @@ import SourceInfo from './SourceInfoBadge';
 import Stage from './StageBadge';
 import TestStatus from './TestStatus';
 import ValidationStatus from './ValidationStatus';
+import AnswerSource from './AnswerSourceBadge';
 
 const Badges = {
   RiskLevel,
@@ -26,6 +27,7 @@ const Badges = {
   Stage,
   Default,
   Beta,
+  AnswerSource,
 };
 
 export default Badges;

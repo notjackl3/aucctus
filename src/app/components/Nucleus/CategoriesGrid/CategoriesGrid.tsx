@@ -1,47 +1,11 @@
 import React from 'react';
+import { NucleusReportQuestion } from '@libs/api/types';
 import CategoryCard from './CategoryCard';
 import ExpandedCategoryView from './ExpandedCategoryView';
-import { QuestionState } from './types';
-
-export interface CategoriesGridProps {
-  companyContext: any;
-  allCategories: any[];
-  mockQuestions: Record<
-    string,
-    Array<{
-      id: string;
-      question: string;
-      answers: Array<{
-        id: string;
-        content: string;
-        source: string;
-        sourceType: 'external' | 'internal' | 'ai-reasoning';
-        lastUpdated: string;
-        author?: string;
-      }>;
-      isAnswered: boolean;
-    }>
-  >;
-  expandedCategory: string | null;
-  setExpandedCategory: (categoryId: string | null) => void;
-  getCategoryStateInfo: (categoryId: string) => any;
-  getStateConfig: (state: any) => any;
-  setCategoryStatusOverrides: React.Dispatch<
-    React.SetStateAction<Record<string, any>>
-  >;
-  activeDropdown: string | null;
-  setActiveDropdown: (id: string | null) => void;
-  questionStatusOverrides: Record<string, QuestionState>;
-  handleQuestionStatusChange: (
-    questionId: string,
-    newStatus: QuestionState,
-  ) => void;
-  getQuestionState: (question: any) => QuestionState;
-}
+import { CategoriesGridProps } from './types';
 
 const CategoriesGrid: React.FC<CategoriesGridProps> = ({
   allCategories,
-  mockQuestions,
   expandedCategory,
   setExpandedCategory,
   getCategoryStateInfo,
@@ -49,15 +13,47 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
   activeDropdown,
   setActiveDropdown,
   handleQuestionStatusChange,
+  handleSectionStatusChange,
   getQuestionState,
+  reportUuid,
 }) => {
-  const getQuestionsForCategory = (categoryId: string) => {
-    return mockQuestions[categoryId] || [];
+  // Debug logging
+  // eslint-disable-next-line no-console
+  console.log('🔍 CategoriesGrid render:', {
+    allCategories: allCategories.map((s) => ({
+      sectionType: s.sectionType,
+      title: s.title,
+      hasSectionType: 'sectionType' in s,
+      allKeys: Object.keys(s),
+    })),
+    expandedCategory,
+    totalCategories: allCategories.length,
+  });
+  const getQuestionsForCategory = (sectionType: string) => {
+    const section = allCategories.find((s) => s.sectionType === sectionType);
+    const questions = section ? section.questions : [];
+    // eslint-disable-next-line no-console
+    console.log('🔍 getQuestionsForCategory:', {
+      sectionType,
+      found: !!section,
+      questionsCount: questions.length,
+      sectionTitle: section?.title,
+    });
+    return questions;
   };
 
   // Reorganize cards for proper expansion layout - avoid solo cards above expansion
   const organizeCardsForExpansion = () => {
+    // eslint-disable-next-line no-console
+    console.log('🔍 organizeCardsForExpansion:', {
+      expandedCategory,
+      hasExpandedCategory: !!expandedCategory,
+      allSectionTypes: allCategories.map((s) => s.sectionType),
+    });
+
     if (!expandedCategory) {
+      // eslint-disable-next-line no-console
+      console.log('🔍 No expanded category, showing all collapsed');
       return allCategories.map((category, index) => ({
         category,
         isExpanded: false,
@@ -66,11 +62,21 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
     }
 
     const expandedIndex = allCategories.findIndex(
-      (cat) => cat.id === expandedCategory,
+      (section) => section.sectionType === expandedCategory,
     );
+
+    // eslint-disable-next-line no-console
+    console.log('🔍 Expanded category search:', {
+      searchingFor: expandedCategory,
+      foundIndex: expandedIndex,
+      foundSection:
+        expandedIndex >= 0 ? allCategories[expandedIndex]?.title : 'NOT FOUND',
+    });
 
     // If expanded category not found, fall back to showing all categories collapsed
     if (expandedIndex === -1) {
+      // eslint-disable-next-line no-console
+      console.log('🔍 Expanded category not found, fallback to all collapsed');
       return allCategories.map((category, index) => ({
         category,
         isExpanded: false,
@@ -123,15 +129,27 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
 
   const organizedCards = organizeCardsForExpansion();
 
+  // eslint-disable-next-line no-console
+  console.log(
+    '🔍 Final organized cards:',
+    organizedCards.map(({ category, isExpanded }) => ({
+      sectionType: category.sectionType,
+      title: category.title,
+      isExpanded,
+    })),
+  );
+
   return (
     <div className='grid auto-rows-min grid-cols-1 gap-6 lg:grid-cols-2'>
       {organizedCards.map(({ category, isExpanded }) => {
-        const questions = getQuestionsForCategory(category.id);
-        const answeredQuestions = questions.filter((q) => q.isAnswered).length;
+        const questions = getQuestionsForCategory(category.sectionType);
+        const answeredQuestions = questions.filter(
+          (q: NucleusReportQuestion) => q.answers.length > 0,
+        ).length;
 
         return (
           <CategoryCard
-            key={category.id}
+            key={category.sectionType}
             category={category}
             isExpanded={isExpanded}
             questions={questions}
@@ -139,6 +157,7 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
             onToggleExpand={setExpandedCategory}
             getCategoryStateInfo={getCategoryStateInfo}
             setCategoryStatusOverrides={setCategoryStatusOverrides}
+            handleSectionStatusChange={handleSectionStatusChange}
             activeDropdown={activeDropdown}
             setActiveDropdown={setActiveDropdown}
             expandedContent={
@@ -148,6 +167,9 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                 activeDropdown={activeDropdown}
                 setActiveDropdown={setActiveDropdown}
                 getQuestionState={getQuestionState}
+                onClose={() => setExpandedCategory(null)}
+                reportUuid={reportUuid}
+                sectionUuid={category.uuid}
               />
             }
           />
