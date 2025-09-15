@@ -16,19 +16,8 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
   handleSectionStatusChange,
   getQuestionState,
   reportUuid,
+  isAdmin,
 }) => {
-  // Debug logging
-  // eslint-disable-next-line no-console
-  console.log('🔍 CategoriesGrid render:', {
-    allCategories: allCategories.map((s) => ({
-      sectionType: s.sectionType,
-      title: s.title,
-      hasSectionType: 'sectionType' in s,
-      allKeys: Object.keys(s),
-    })),
-    expandedCategory,
-    totalCategories: allCategories.length,
-  });
   const getQuestionsForCategory = (sectionType: string) => {
     const section = allCategories.find((s) => s.sectionType === sectionType);
     const questions = section ? section.questions : [];
@@ -44,16 +33,7 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
 
   // Reorganize cards for proper expansion layout - avoid solo cards above expansion
   const organizeCardsForExpansion = () => {
-    // eslint-disable-next-line no-console
-    console.log('🔍 organizeCardsForExpansion:', {
-      expandedCategory,
-      hasExpandedCategory: !!expandedCategory,
-      allSectionTypes: allCategories.map((s) => s.sectionType),
-    });
-
     if (!expandedCategory) {
-      // eslint-disable-next-line no-console
-      console.log('🔍 No expanded category, showing all collapsed');
       return allCategories.map((category, index) => ({
         category,
         isExpanded: false,
@@ -65,18 +45,8 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
       (section) => section.sectionType === expandedCategory,
     );
 
-    // eslint-disable-next-line no-console
-    console.log('🔍 Expanded category search:', {
-      searchingFor: expandedCategory,
-      foundIndex: expandedIndex,
-      foundSection:
-        expandedIndex >= 0 ? allCategories[expandedIndex]?.title : 'NOT FOUND',
-    });
-
     // If expanded category not found, fall back to showing all categories collapsed
     if (expandedIndex === -1) {
-      // eslint-disable-next-line no-console
-      console.log('🔍 Expanded category not found, fallback to all collapsed');
       return allCategories.map((category, index) => ({
         category,
         isExpanded: false,
@@ -129,16 +99,6 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
 
   const organizedCards = organizeCardsForExpansion();
 
-  // eslint-disable-next-line no-console
-  console.log(
-    '🔍 Final organized cards:',
-    organizedCards.map(({ category, isExpanded }) => ({
-      sectionType: category.sectionType,
-      title: category.title,
-      isExpanded,
-    })),
-  );
-
   return (
     <div className='grid auto-rows-min grid-cols-1 gap-6 lg:grid-cols-2'>
       {organizedCards.map(({ category, isExpanded }) => {
@@ -160,6 +120,7 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
             handleSectionStatusChange={handleSectionStatusChange}
             activeDropdown={activeDropdown}
             setActiveDropdown={setActiveDropdown}
+            isAdmin={isAdmin}
             expandedContent={
               <ExpandedCategoryView
                 questions={questions}
@@ -170,6 +131,8 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
                 onClose={() => setExpandedCategory(null)}
                 reportUuid={reportUuid}
                 sectionUuid={category.uuid}
+                section={category}
+                isAdmin={isAdmin}
               />
             }
           />

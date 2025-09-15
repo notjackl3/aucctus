@@ -2,11 +2,13 @@ import { Icon, ToggleSwitch, Modal } from '@components';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import SourceBadgeList from '@pages/Concept/Report/MarketScan/v3/components/SourceBadgeList';
 import React, { useCallback, useMemo, useState } from 'react';
+import { cn } from '@libs/utils/react';
 import { expandedCategoryViewUIText } from './expandedCategoryViewFixtures';
 import { useModal } from '../../../context/ModalContextProvider';
 import {
   useDeleteQuestion,
   useDeleteAnswer,
+  useUpdateSection,
 } from '../../../hooks/query/nucleusCrud.hook';
 
 import { ExpandedCategoryViewProps } from './types';
@@ -22,10 +24,11 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
   onClose,
   reportUuid,
   sectionUuid,
+  section, // Add section prop to get the includeDeepResearchContext value
+  isAdmin,
 }) => {
   // State management for Core/Deeper Questions structure
   const [deeperResearchExpanded, setDeeperResearchExpanded] = useState(false);
-  const [includeInContext, setIncludeInContext] = useState(true);
   const [selectedQuestion, setSelectedQuestion] = useState<string | null>(
     questions.find((q) => q.answers && q.answers.length > 0)?.uuid ||
       questions[0]?.uuid ||
@@ -38,6 +41,8 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
     useDeleteQuestion(reportUuid);
   const { mutate: deleteAnswer, isLoading: isAnswerDeleting } =
     useDeleteAnswer(reportUuid);
+  const { mutate: updateSection, isLoading: isSectionUpdating } =
+    useUpdateSection(reportUuid);
 
   // CRUD handlers
   const handleAddQuestion = useCallback(() => {
@@ -151,6 +156,21 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
     [openModal, closeModal, deleteAnswer],
   );
 
+  // Handler for updating include in context toggle
+  const handleIncludeInContextChange = useCallback(
+    (newValue: boolean) => {
+      // Only allow admin users to change include in context
+      if (!isAdmin) {
+        return;
+      }
+      updateSection({
+        sectionUuid,
+        data: { includeDeepResearchContext: newValue },
+      });
+    },
+    [updateSection, sectionUuid, isAdmin],
+  );
+
   // Sort questions alphabetically by question text
   const sortQuestions = useCallback(
     (questionsToSort: typeof questions) => {
@@ -200,13 +220,25 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
               </h4>
               <div className='flex items-center gap-2'>
                 <button
-                  className='aucctus-bg-primary-hover aspect-square rounded-lg p-1'
-                  onClick={handleAddQuestion}
+                  className={cn(
+                    'aspect-square rounded-lg p-1',
+                    isAdmin
+                      ? 'aucctus-bg-primary-hover cursor-pointer'
+                      : 'aucctus-bg-disabled cursor-not-allowed opacity-50',
+                  )}
+                  onClick={isAdmin ? handleAddQuestion : undefined}
+                  disabled={!isAdmin}
                   aria-label='Add Question'
+                  title={isAdmin ? 'Add Question' : 'Admin access required'}
                 >
                   <Icon
                     variant='plus'
-                    className='aucctus-stroke-brand-primary h-5 w-5'
+                    className={cn(
+                      'h-5 w-5',
+                      isAdmin
+                        ? 'aucctus-stroke-brand-primary'
+                        : 'aucctus-stroke-disabled',
+                    )}
                   />
                 </button>
                 <button
@@ -256,6 +288,7 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
                         onEdit={handleEditQuestion}
                         onDelete={handleDeleteQuestion}
                         setActiveDropdown={setActiveDropdown}
+                        isAdmin={isAdmin}
                       />
                     ))}
                   </div>
@@ -323,13 +356,18 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
                             className='aucctus-stroke-quaternary hover:aucctus-stroke-tertiary h-3 w-3'
                           />
                         </div>
-                        <ToggleSwitch
-                          checked={includeInContext}
-                          onChange={setIncludeInContext}
-                          size='md'
-                          variant='primary'
-                          aria-label='Include deeper research questions in agent context'
-                        />
+                        <div title={isAdmin ? '' : 'Admin access required'}>
+                          <ToggleSwitch
+                            checked={
+                              section?.includeDeepResearchContext ?? true
+                            }
+                            onChange={handleIncludeInContextChange}
+                            disabled={isSectionUpdating || !isAdmin}
+                            size='md'
+                            variant='primary'
+                            aria-label='Include deeper research questions in agent context'
+                          />
+                        </div>
                       </div>
                     </div>
 
@@ -350,6 +388,7 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
                             onEdit={handleEditQuestion}
                             onDelete={handleDeleteQuestion}
                             setActiveDropdown={setActiveDropdown}
+                            isAdmin={isAdmin}
                           />
                         ))}
                       </div>
@@ -369,6 +408,7 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
             onEditAnswer={handleEditAnswer}
             onDeleteAnswer={handleDeleteAnswer}
             isDeletingLoading={isAnswerDeleting}
+            isAdmin={isAdmin}
           />
         </div>
       </div>

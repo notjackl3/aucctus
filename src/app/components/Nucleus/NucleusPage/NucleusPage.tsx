@@ -8,6 +8,7 @@ import {
   NucleusReportAnswer,
   ProcessingStatus,
   AssessmentStatus,
+  SectionType,
 } from '@libs/api/types';
 import useStore from '../../../stores/store';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
@@ -18,6 +19,7 @@ import {
   useUpdateSection,
 } from '../../../hooks/query/nucleusCrud.hook';
 import LoadingMask from '../../Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
+import { animationStyles } from '../../Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
 
 interface StatusIndicatorProps {
   status: ProcessingStatus;
@@ -51,9 +53,17 @@ const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status }) => {
 
 const NucleusPage: React.FC = () => {
   // Fetch real nucleus data
-  const { nucleusReport, isLoading, hasNucleusReport, isNoReportFound } =
-    useNucleusReportLatest();
-  const { account } = useStore((state: any) => state.auth);
+  const {
+    nucleusReport,
+    isLoading,
+    hasNucleusReport,
+    isNoReportFound,
+    isRefetching,
+  } = useNucleusReportLatest();
+  const { account, user } = useStore((state: any) => state.auth);
+
+  // Check if current user is admin
+  const isAdmin = user?.role.toLowerCase() === 'admin';
 
   // Hook for updating question assessment status
   const { mutate: updateQuestion, isLoading: isUpdatingQuestion } =
@@ -64,6 +74,23 @@ const NucleusPage: React.FC = () => {
     useUpdateSection(nucleusReport?.uuid || '');
 
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+
+  // Mapping from section type to display name for pills
+  const sectionTypeDisplayNames = useMemo(
+    (): Record<SectionType, string> => ({
+      basic_profile: 'Company',
+      geographic: 'Geographic',
+      strategic: 'Corporate',
+      products_services: 'Offerings',
+      ecosystem: 'Ecosystem',
+      technology: 'Technology',
+      organizational: 'Customers',
+      brand_communications: 'Brand',
+      talent_culture: 'Culture',
+      financial: 'Financial',
+    }),
+    [],
+  );
 
   const handleExpandedCategoryChange = useCallback(
     (categoryId: string | null) => {
@@ -202,6 +229,10 @@ const NucleusPage: React.FC = () => {
   // Handle question status changes - must be after allSections is defined
   const handleQuestionStatusChange = useCallback(
     (questionId: string, newStatus: QuestionState) => {
+      // Only allow admin users to change question status
+      if (!isAdmin) {
+        return;
+      }
       // Find the question to get its current data
       const question = allSections
         .flatMap((section) => section.questions)
@@ -240,12 +271,16 @@ const NucleusPage: React.FC = () => {
         },
       );
     },
-    [updateQuestion, allSections, nucleusReport?.uuid],
+    [updateQuestion, allSections, nucleusReport?.uuid, isAdmin],
   );
 
   // Handle section status changes
   const handleSectionStatusChange = useCallback(
     (sectionId: string, newStatus: CategoryState) => {
+      // Only allow admin users to change section status
+      if (!isAdmin) {
+        return;
+      }
       // Find the section to get its current data
       const section = allSections.find((s) => s.sectionType === sectionId);
 
@@ -291,7 +326,7 @@ const NucleusPage: React.FC = () => {
         },
       );
     },
-    [updateSection, allSections, nucleusReport?.uuid],
+    [updateSection, allSections, nucleusReport?.uuid, isAdmin],
   );
 
   // Add click outside handler for dropdowns
@@ -439,160 +474,165 @@ const NucleusPage: React.FC = () => {
   };
 
   return (
-    <div className='aucctus-bg-primary min-h-screen'>
-      {/* Hero Header Section */}
-      <div className='relative h-[32rem] overflow-hidden'>
-        <div className='absolute inset-0'>
-          {/* Video Background Placeholder */}
-          <div
-            className='h-full w-full bg-cover bg-center'
-            style={{
-              backgroundImage: `url(${images.aiExplorationsBackground})`,
-            }}
-          ></div>
-        </div>
-
-        {/* Header Content */}
-        <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-12'>
-          <div className='mb-4'>
-            <div className='aucctus-border-success relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1 shadow-lg backdrop-blur-md'>
-              <StatusIndicator status={nucleusReport.processingStatus} />
-              <span className='aucctus-text-xs-medium tracking-wide text-white'>
-                {nucleusReport.processingStatus === 'completed'
-                  ? 'Report Complete'
-                  : nucleusReport.processingStatus === 'processing'
-                    ? 'Processing Report'
-                    : nucleusReport.processingStatus === 'pending'
-                      ? 'Report Pending'
-                      : 'Report Failed'}
-              </span>
-            </div>
+    <>
+      <style>{animationStyles}</style>
+      <div className='aucctus-bg-primary min-h-screen'>
+        {/* Hero Header Section */}
+        <div className='relative h-[32rem] overflow-hidden rounded-xl'>
+          <div className='absolute inset-0'>
+            {/* Video Background Placeholder */}
+            <div
+              className='h-full w-full bg-cover bg-center'
+              style={{
+                backgroundImage: `url(${images.aiExplorationsBackground})`,
+                backgroundSize: 'cover',
+                animation: 'moveBackground 30s ease infinite',
+              }}
+            ></div>
           </div>
 
-          {/* Company Name */}
-          <h1 className='aucctus-header-2xl-bold mb-4 text-center tracking-tight text-white drop-shadow-xl'>
-            {companyName}
-          </h1>
+          {/* Header Content */}
+          <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-12'>
+            <div className='mb-4'>
+              <div className='aucctus-border-success relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1 shadow-lg backdrop-blur-md'>
+                <StatusIndicator status={nucleusReport.processingStatus} />
+                <span className='aucctus-text-xs-medium tracking-wide text-white'>
+                  {nucleusReport.processingStatus === 'completed'
+                    ? 'Report Complete'
+                    : nucleusReport.processingStatus === 'processing'
+                      ? 'Processing Report'
+                      : nucleusReport.processingStatus === 'pending'
+                        ? 'Report Pending'
+                        : 'Report Failed'}
+                </span>
+              </div>
+            </div>
 
-          {/* Subtitle */}
-          <p className='aucctus-text-lg mx-auto mb-12 max-w-2xl text-center leading-relaxed text-white/80'>
-            Your central hub of company context used by Aucctus AI Agents
-          </p>
+            {/* Company Name */}
+            <h1 className='aucctus-header-2xl-bold mb-4 text-center tracking-tight text-white drop-shadow-xl'>
+              {companyName}
+            </h1>
 
-          {/* Context Status Pills */}
-          <div className='mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-3'>
-            {allSections.map((section: NucleusReportSection) => {
-              // Create short names from section titles
-              const shortName = section.title
-                .split(' & ')[0]
-                .split(' /')[0]
-                .split(' ')[0];
-              const stateInfo = getCategoryStateInfo(section);
-              const stateConfig = getStateConfig(stateInfo.state);
+            {/* Subtitle */}
+            <p className='aucctus-text-lg mx-auto mb-12 max-w-2xl text-center leading-relaxed text-white/80'>
+              Your central hub of company context used by Aucctus AI Agents
+            </p>
 
-              return (
-                <button
-                  key={section.sectionType}
-                  className='group relative cursor-pointer border-0 bg-transparent p-0'
-                  onClick={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    handleCategoryBadgeClick(section.sectionType);
-                  }}
-                >
-                  {/* Glassmorphic pill container */}
-                  <div className='rounded-full border border-white/20 bg-white/10 px-4 py-2.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/30 hover:bg-white/15'>
-                    <div className='flex items-center gap-2'>
-                      <div
-                        className={cn(
-                          'relative h-2 w-2 rounded-full transition-all duration-500',
-                          {
-                            'aucctus-bg-brand-solid':
-                              stateInfo.state === 'new_details',
-                            'aucctus-bg-warning-solid':
-                              stateInfo.state === 'needs_input',
-                            'aucctus-bg-success-solid':
-                              stateInfo.state === 'validated',
-                          },
-                        )}
-                      ></div>
-                      {/* Category name */}
-                      <span className='aucctus-text-xs-medium text-white/90'>
-                        {shortName}
-                      </span>
-                      {/* State label */}
-                      <span className='aucctus-text-xs-bold text-white'>
-                        {stateConfig.label}
-                      </span>
+            {/* Context Status Pills */}
+            <div className='mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-3'>
+              {allSections.map((section: NucleusReportSection) => {
+                // Get display name from mapping
+                const displayName =
+                  sectionTypeDisplayNames[section.sectionType] ||
+                  section.sectionType;
+                const stateInfo = getCategoryStateInfo(section);
+                const stateConfig = getStateConfig(stateInfo.state);
+
+                return (
+                  <button
+                    key={section.sectionType}
+                    className='group relative cursor-pointer border-0 bg-transparent p-0'
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      handleCategoryBadgeClick(section.sectionType);
+                    }}
+                  >
+                    {/* Glassmorphic pill container */}
+                    <div className='rounded-full border border-white/20 bg-white/10 px-4 py-2.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/30 hover:bg-white/15'>
+                      <div className='flex items-center gap-2'>
+                        <div
+                          className={cn(
+                            'relative h-2 w-2 rounded-full transition-all duration-500',
+                            {
+                              'aucctus-bg-brand-solid':
+                                stateInfo.state === 'new_details',
+                              'aucctus-bg-warning-solid':
+                                stateInfo.state === 'needs_input',
+                              'aucctus-bg-success-solid':
+                                stateInfo.state === 'validated',
+                            },
+                          )}
+                        ></div>
+                        {/* Category name */}
+                        <span className='aucctus-text-xs-medium text-white/90'>
+                          {displayName}
+                        </span>
+                        {/* State label */}
+                        <span className='aucctus-text-xs-bold text-white'>
+                          {stateConfig.label}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      </div>
-
-      {/* Header for Categories */}
-      <div className='relative'>
-        <div className='absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 transform'>
-          <div className='aucctus-border-primary rounded-lg border bg-white px-1 py-1 shadow-sm backdrop-blur-sm'>
-            <div className='aucctus-text-sm-medium btn btn-bold btn-primary rounded-md px-3 py-1.5'>
-              Categories
+                  </button>
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* Dividing line */}
-        <div className='h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent'></div>
-      </div>
+        {/* Header for Categories */}
+        <div className='relative'>
+          <div className='absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 transform'>
+            <div className='aucctus-border-primary rounded-lg border bg-white px-1 py-1 shadow-sm backdrop-blur-sm'>
+              <div className='aucctus-text-sm-medium btn btn-bold btn-primary rounded-md px-3 py-1.5'>
+                Categories
+              </div>
+            </div>
+          </div>
 
-      {/* Categories Content */}
-      <div
-        className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'
-        data-tab='categories'
-      >
-        <CategoriesGrid
-          allCategories={allSections}
-          expandedCategory={expandedCategory}
-          setExpandedCategory={handleExpandedCategoryChange}
-          getCategoryStateInfo={(categoryId: string) => {
-            const section = reportSections.find(
-              (s: NucleusReportSection) => s.sectionType === categoryId,
-            );
-            return section
-              ? getCategoryStateInfo(section)
-              : {
-                  state: 'needs_input' as CategoryState,
-                  validated: 0,
-                  newDetails: 0,
-                  needsInput: 0,
-                  totalSources: 0,
-                };
-          }}
-          getStateConfig={getStateConfig}
-          setCategoryStatusOverrides={setCategoryStatusOverrides}
-          activeDropdown={activeDropdown}
-          setActiveDropdown={setActiveDropdown}
-          questionStatusOverrides={questionStatusOverrides}
-          handleQuestionStatusChange={handleQuestionStatusChange}
-          handleSectionStatusChange={handleSectionStatusChange}
-          getQuestionState={getQuestionState}
-          reportUuid={nucleusReport?.uuid || ''}
+          {/* Dividing line */}
+          <div className='h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent'></div>
+        </div>
+
+        {/* Categories Content */}
+        <div
+          className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'
+          data-tab='categories'
+        >
+          <CategoriesGrid
+            allCategories={allSections}
+            expandedCategory={expandedCategory}
+            setExpandedCategory={handleExpandedCategoryChange}
+            getCategoryStateInfo={(categoryId: string) => {
+              const section = reportSections.find(
+                (s: NucleusReportSection) => s.sectionType === categoryId,
+              );
+              return section
+                ? getCategoryStateInfo(section)
+                : {
+                    state: 'needs_input' as CategoryState,
+                    validated: 0,
+                    newDetails: 0,
+                    needsInput: 0,
+                    totalSources: 0,
+                  };
+            }}
+            getStateConfig={getStateConfig}
+            setCategoryStatusOverrides={setCategoryStatusOverrides}
+            activeDropdown={activeDropdown}
+            setActiveDropdown={setActiveDropdown}
+            questionStatusOverrides={questionStatusOverrides}
+            handleQuestionStatusChange={handleQuestionStatusChange}
+            handleSectionStatusChange={handleSectionStatusChange}
+            getQuestionState={getQuestionState}
+            reportUuid={nucleusReport?.uuid || ''}
+            isAdmin={isAdmin}
+          />
+        </div>
+
+        {/* Loading mask for question and section status updates */}
+        <LoadingMask
+          isLoading={isUpdatingQuestion || isUpdatingSection || isRefetching}
+          message={
+            isUpdatingSection
+              ? 'Updating section status...'
+              : 'Updating question status...'
+          }
+          zIndex={60}
         />
       </div>
-
-      {/* Loading mask for question and section status updates */}
-      <LoadingMask
-        isLoading={isUpdatingQuestion || isUpdatingSection}
-        message={
-          isUpdatingSection
-            ? 'Updating section status...'
-            : 'Updating question status...'
-        }
-        zIndex={60}
-      />
-    </div>
+    </>
   );
 };
 

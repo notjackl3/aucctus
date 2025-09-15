@@ -233,6 +233,15 @@
 
 .aucctus-bg-warning-primary {
   @apply bg-warning-50 dark:bg-warning-500;
+
+  &-hover {
+    @extend .aucctus-bg-warning-primary;
+    @apply transition-colors duration-300;
+
+    &:hover {
+      @apply bg-warning-100;
+    }
+  }
 }
 
 .aucctus-bg-warning-secondary {

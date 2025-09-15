@@ -27,7 +27,7 @@ export const categoryStatusOptions: StatusOption[] = [
     value: 'new_details' as CategoryState,
     label: 'New Details',
     icon: 'refresh',
-    colorClass: 'aucctus-text-brand-tertiary', // Using tertiary brand for blue
+    colorClass: 'aucctus-text-brand-primary', // Using primary brand for darker blue
     bgClass: 'aucctus-bg-brand-secondary',
     borderClass: 'aucctus-border-brand',
     hoverBgClass: 'aucctus-bg-brand-primary-hover',
@@ -57,7 +57,7 @@ export const questionStatusOptions: StatusOption[] = [
     value: 'new_details' as QuestionState,
     label: 'New Details',
     icon: 'refresh',
-    colorClass: 'aucctus-text-brand-tertiary', // Using tertiary brand for blue
+    colorClass: 'aucctus-text-brand-primary', // Using primary brand for darker blue
     bgClass: 'aucctus-bg-brand-secondary',
     borderClass: 'aucctus-border-brand',
     hoverBgClass: 'aucctus-bg-brand-primary-hover',

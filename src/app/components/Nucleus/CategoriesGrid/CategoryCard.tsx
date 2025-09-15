@@ -17,6 +17,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   activeDropdown,
   setActiveDropdown,
   expandedContent,
+  isAdmin,
 }) => {
   // Static icon map keyed by section_type - single source of truth for category icons
   const ICONS_BY_SECTION_TYPE: Record<string, string> = {
@@ -32,60 +33,34 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
     technology: 'lightbulb',
   };
 
-  const colorSchemes: Record<
-    string,
-    { bg: string; border: string; stroke: string }
-  > = {
-    basic_profile: {
-      bg: 'aucctus-bg-brand-primary',
-      border: 'aucctus-border-brand',
-      stroke: 'aucctus-stroke-brand-primary',
-    },
-    geographic: {
-      bg: 'aucctus-bg-info-primary',
-      border: 'aucctus-border-info',
-      stroke: 'aucctus-stroke-info-primary',
-    },
-    strategic: {
-      bg: 'aucctus-bg-analytics-primary',
-      border: 'aucctus-border-analytics',
-      stroke: 'aucctus-stroke-analytics-primary',
-    },
-    products_services: {
-      bg: 'aucctus-bg-data-primary',
-      border: 'aucctus-border-data',
-      stroke: 'aucctus-stroke-data-primary',
-    },
-    organizational: {
-      bg: 'aucctus-bg-research-primary',
-      border: 'aucctus-border-research',
-      stroke: 'aucctus-stroke-research-primary',
-    },
-    brand_communications: {
-      bg: 'aucctus-bg-accent-primary',
-      border: 'aucctus-border-accent',
-      stroke: 'aucctus-stroke-accent-primary',
-    },
-    talent_culture: {
-      bg: 'aucctus-bg-success-primary',
-      border: 'aucctus-border-success',
-      stroke: 'aucctus-stroke-success-primary',
-    },
-    financial: {
-      bg: 'aucctus-bg-warning-primary',
-      border: 'aucctus-border-warning',
-      stroke: 'aucctus-stroke-warning-primary',
-    },
-    ecosystem: {
-      bg: 'aucctus-bg-error-primary',
-      border: 'aucctus-border-error',
-      stroke: 'aucctus-stroke-error-primary',
-    },
-    technology: {
-      bg: 'aucctus-bg-brand-secondary',
-      border: 'aucctus-border-brand',
-      stroke: 'aucctus-stroke-brand-secondary',
-    },
+  // Status-based color schemes that match StatusDropdown colors
+  const getStatusColorScheme = (status: string) => {
+    switch (status) {
+      case 'validated':
+        return {
+          bg: 'aucctus-bg-success-secondary',
+          border: 'aucctus-border-success',
+          stroke: 'aucctus-stroke-success-primary',
+        };
+      case 'new_details':
+        return {
+          bg: 'aucctus-bg-brand-secondary',
+          border: 'aucctus-border-brand',
+          stroke: 'aucctus-stroke-brand-secondary',
+        };
+      case 'needs_input':
+        return {
+          bg: 'aucctus-bg-warning-secondary',
+          border: 'aucctus-border-warning-subtle',
+          stroke: 'aucctus-stroke-warning-primary',
+        };
+      default:
+        return {
+          bg: 'aucctus-bg-secondary',
+          border: 'aucctus-border-secondary',
+          stroke: 'aucctus-stroke-quaternary',
+        };
+    }
   };
 
   // Generic category information - hardcoded for consistent card faces
@@ -147,11 +122,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
 
   const sectionType = category.sectionType || 'basic_profile';
   const icon = (ICONS_BY_SECTION_TYPE[sectionType] || 'help-circle') as any;
-  const colorScheme =
-    colorSchemes[sectionType] || colorSchemes['basic_profile'];
   const genericInfo =
     GENERIC_CATEGORY_INFO[sectionType] ||
     GENERIC_CATEGORY_INFO['basic_profile'];
+
+  // Get current status and corresponding colors
+  const currentStatus = getCategoryStateInfo(category.sectionType).state;
+  const colorScheme = getStatusColorScheme(currentStatus);
 
   // Calculate metrics for individual category using real questions data
   const calculateCategoryMetrics = () => {
@@ -447,6 +424,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                     isCategory={true}
                     activeDropdown={activeDropdown}
                     setActiveDropdown={setActiveDropdown}
+                    disabled={!isAdmin}
                   />
                 </div>
 
@@ -676,6 +654,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                       isCategory={true}
                       activeDropdown={activeDropdown}
                       setActiveDropdown={setActiveDropdown}
+                      disabled={!isAdmin}
                     />
                   </div>
                 </div>

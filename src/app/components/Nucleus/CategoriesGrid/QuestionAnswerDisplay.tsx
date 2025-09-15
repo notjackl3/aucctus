@@ -3,6 +3,7 @@ import { Icon } from '@components';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { expandedCategoryViewUIText } from './expandedCategoryViewFixtures';
 import { NucleusReportQuestion } from '@libs/api/types';
+import { cn } from '@libs/utils/react';
 import AnswerCard from './AnswerCard';
 
 interface QuestionAnswerDisplayProps {
@@ -13,6 +14,7 @@ interface QuestionAnswerDisplayProps {
   isAddingLoading?: boolean;
   isEditingLoading?: boolean;
   isDeletingLoading?: boolean;
+  isAdmin: boolean;
 }
 
 const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
@@ -23,6 +25,7 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
   isAddingLoading = false,
   isEditingLoading = false,
   isDeletingLoading = false,
+  isAdmin,
 }) => {
   // Aggregate loading states
   const isLoading = useMemo(
@@ -50,13 +53,27 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
           {expandedCategoryViewUIText.headers.answers}
         </h4>
         <button
-          className='aucctus-bg-primary-hover aspect-square rounded-lg p-1'
+          className={cn(
+            'aspect-square rounded-lg p-1',
+            isAdmin
+              ? 'aucctus-bg-primary-hover cursor-pointer'
+              : 'aucctus-bg-disabled cursor-not-allowed opacity-50',
+          )}
           aria-label='Add Answer'
-          onClick={() => onAddAnswer(selectedQuestionData.uuid)}
+          title={isAdmin ? 'Add Answer' : 'Admin access required'}
+          onClick={
+            isAdmin ? () => onAddAnswer(selectedQuestionData.uuid) : undefined
+          }
+          disabled={!isAdmin}
         >
           <Icon
             variant='plus'
-            className='aucctus-stroke-brand-primary h-5 w-5'
+            className={cn(
+              'h-5 w-5',
+              isAdmin
+                ? 'aucctus-stroke-brand-primary'
+                : 'aucctus-stroke-disabled',
+            )}
           />
         </button>
       </div>
@@ -75,6 +92,7 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
                 onDelete={onDeleteAnswer}
                 isEditingLoading={isEditingLoading}
                 isDeletingLoading={isDeletingLoading}
+                isAdmin={isAdmin}
               />
             ))}
           </div>

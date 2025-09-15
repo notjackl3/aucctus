@@ -102,9 +102,12 @@ const DropdownOption: React.FC<DropdownOptionProps> = ({
     (e: React.PointerEvent) => {
       e.stopPropagation();
       e.preventDefault();
-      onClick();
+      // Only trigger onClick if the option is not already selected
+      if (!isSelected) {
+        onClick();
+      }
     },
-    [onClick],
+    [onClick, isSelected],
   );
 
   // Handle keyboard-initiated clicks (e.g., Enter/Space) where detail === 0
@@ -115,9 +118,12 @@ const DropdownOption: React.FC<DropdownOptionProps> = ({
       }
       e.stopPropagation();
       e.preventDefault();
-      onClick();
+      // Only trigger onClick if the option is not already selected
+      if (!isSelected) {
+        onClick();
+      }
     },
-    [onClick],
+    [onClick, isSelected],
   );
 
   const optionClassNames = useMemo(() => {
@@ -127,7 +133,8 @@ const DropdownOption: React.FC<DropdownOptionProps> = ({
       [option.bgClass]: isSelected,
       [option.colorClass]: isSelected,
       'aucctus-text-secondary hover:aucctus-bg-secondary-hover': !isSelected,
-      [option.hoverBgClass]: true,
+      [option.hoverBgClass]: !isSelected,
+      'cursor-default': isSelected,
     });
   }, [option, isSelected]);
 
@@ -152,7 +159,14 @@ const DropdownOption: React.FC<DropdownOptionProps> = ({
         height={16}
         width={16}
       />
-      <span className='aucctus-text-sm-medium'>{option.label}</span>
+      <span
+        className={cn({
+          'aucctus-text-sm-medium': !isSelected,
+          'aucctus-text-sm-bold': isSelected,
+        })}
+      >
+        {option.label}
+      </span>
       {isSelected && (
         <div className='ml-auto'>
           <div className={`h-2 w-2 rounded-full bg-${option.colorClass}`} />

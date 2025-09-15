@@ -17,6 +17,7 @@ interface QuestionCardProps {
   onEdit: (question: NucleusReportQuestion) => void;
   onDelete: (question: NucleusReportQuestion) => void;
   setActiveDropdown: (dropdownId: string | null) => void;
+  isAdmin: boolean;
 }
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
@@ -31,6 +32,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   onEdit,
   onDelete,
   setActiveDropdown,
+  isAdmin,
 }) => {
   return (
     <div
@@ -50,32 +52,34 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       )}
       onClick={() => onSelect(question.uuid)}
     >
-      {/* Hover actions for edit and delete - positioned to avoid status dropdown */}
-      <div className='absolute bottom-2 right-2 z-20 flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
-        <button
-          className='aucctus-bg-primary aucctus-border-secondary hover:aucctus-bg-primary-hover rounded-md border p-1 shadow-sm'
-          onClick={(e) => {
-            e.stopPropagation();
-            onEdit(question);
-          }}
-          aria-label='Edit question'
-        >
-          <Icon variant='edit' className='aucctus-stroke-secondary h-3 w-3' />
-        </button>
-        <button
-          className='aucctus-bg-primary aucctus-border-secondary hover:aucctus-bg-primary-hover rounded-md border p-1 shadow-sm'
-          onClick={(e) => {
-            e.stopPropagation();
-            onDelete(question);
-          }}
-          aria-label='Delete question'
-        >
-          <Icon
-            variant='trash'
-            className='aucctus-stroke-error-primary h-3 w-3'
-          />
-        </button>
-      </div>
+      {/* Hover actions for edit and delete - positioned to avoid status dropdown - only for admin */}
+      {isAdmin && (
+        <div className='absolute bottom-2 right-2 z-20 flex gap-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100'>
+          <button
+            className='aucctus-bg-primary aucctus-border-secondary hover:aucctus-bg-primary-hover rounded-md border p-1 shadow-sm'
+            onClick={(e) => {
+              e.stopPropagation();
+              onEdit(question);
+            }}
+            aria-label='Edit question'
+          >
+            <Icon variant='edit' className='aucctus-stroke-secondary h-3 w-3' />
+          </button>
+          <button
+            className='aucctus-bg-primary aucctus-border-secondary hover:aucctus-bg-primary-hover rounded-md border p-1 shadow-sm'
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete(question);
+            }}
+            aria-label='Delete question'
+          >
+            <Icon
+              variant='trash'
+              className='aucctus-stroke-error-primary h-3 w-3'
+            />
+          </button>
+        </div>
+      )}
 
       <div className='mb-2 flex items-start justify-between gap-2'>
         <span
@@ -100,6 +104,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             activeDropdown={activeDropdown}
             setActiveDropdown={setActiveDropdown}
             compact={true}
+            disabled={!isAdmin}
           />
         </div>
       </div>

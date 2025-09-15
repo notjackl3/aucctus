@@ -16,6 +16,7 @@ interface SourceInfoBadgeProps {
   showPublishedDate?: boolean;
   badgeClassName?: string;
   badgeSize?: 'small' | 'medium';
+  sourceDescription?: React.ReactNode;
 }
 
 const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
@@ -24,6 +25,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
   badgeClassName = '',
   badgeSize = 'medium',
   showPublishedDate = false,
+  sourceDescription,
 }) => {
   const publishedDatesQuery = usePublishedDatesQuery(source, showPublishedDate);
   const clearbitCompanyQuery = useClearbitCompany(source.url);
@@ -102,7 +104,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
         {source.title}
       </div>
       <div className='aucctus-text-xs aucctus-text-secondary'>
-        {getBaseUrl(source.url)}
+        {sourceDescription || getBaseUrl(source.url)}
       </div>
     </div>
   );

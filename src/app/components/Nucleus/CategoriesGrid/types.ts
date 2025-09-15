@@ -33,6 +33,7 @@ export interface CategoriesGridProps {
   ) => void;
   getQuestionState: (question: NucleusReportQuestion) => QuestionState;
   reportUuid: string;
+  isAdmin: boolean;
 }
 
 export interface CategoryCardProps {
@@ -52,6 +53,7 @@ export interface CategoryCardProps {
   activeDropdown: string | null;
   setActiveDropdown: (id: string | null) => void;
   expandedContent?: React.ReactNode;
+  isAdmin: boolean;
 }
 
 export interface ExpandedCategoryViewProps {
@@ -66,4 +68,6 @@ export interface ExpandedCategoryViewProps {
   onClose: () => void;
   reportUuid: string;
   sectionUuid: string;
+  section?: NucleusReportSection; // Add section prop for accessing includeDeepResearchContext
+  isAdmin: boolean;
 }

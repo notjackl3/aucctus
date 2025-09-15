@@ -71,6 +71,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
   activeDropdown,
   setActiveDropdown,
   compact = false,
+  disabled = false,
 }) => {
   const isOpen = activeDropdown === dropdownId;
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -89,9 +90,10 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
   const handleToggleDropdown = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
+      if (disabled) return;
       setActiveDropdown(isOpen ? null : dropdownId);
     },
-    [isOpen, dropdownId, setActiveDropdown],
+    [isOpen, dropdownId, setActiveDropdown, disabled],
   );
 
   const handleOptionClick = useCallback(
@@ -113,11 +115,14 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
         true,
       'gap-1 rounded-md px-2 py-1': compact,
       'gap-2 rounded-lg px-3 py-1.5': !compact,
-      [currentConfig?.borderClass || 'aucctus-border-secondary']: true,
-      [currentConfig?.bgClass || 'aucctus-bg-secondary']: true,
-      'hover:aucctus-bg-secondary-hover focus:aucctus-border-brand': true,
+      [currentConfig?.borderClass || 'aucctus-border-secondary']: !disabled,
+      [currentConfig?.bgClass || 'aucctus-bg-secondary']: !disabled,
+      'aucctus-border-disabled aucctus-bg-disabled': disabled,
+      'hover:aucctus-bg-secondary-hover focus:aucctus-border-brand': !disabled,
+      'cursor-not-allowed opacity-50': disabled,
+      'cursor-pointer': !disabled,
     });
-  }, [compact, currentConfig]);
+  }, [compact, currentConfig, disabled]);
 
   return (
     <div className='relative' data-dropdown>
@@ -128,9 +133,10 @@ const StatusDropdown: React.FC<StatusDropdownProps> = ({
         currentConfig={currentConfig}
         buttonClassNames={buttonClassNames}
         onToggle={handleToggleDropdown}
+        disabled={disabled}
       />
 
-      {isOpen && dropdownPosition && (
+      {isOpen && dropdownPosition && !disabled && (
         <DropdownMenu
           position={dropdownPosition}
           options={statusOptions}
@@ -150,37 +156,59 @@ interface DropdownTriggerProps {
   currentConfig: StatusOption | undefined;
   buttonClassNames: string;
   onToggle: (e: React.MouseEvent) => void;
+  disabled: boolean;
 }
 
 const DropdownTrigger = React.forwardRef<
   HTMLButtonElement,
   DropdownTriggerProps
->(({ isOpen, compact, currentConfig, buttonClassNames, onToggle }, ref) => (
-  <button ref={ref} onClick={onToggle} className={buttonClassNames}>
-    {currentConfig && (
+>(
+  (
+    { isOpen, compact, currentConfig, buttonClassNames, onToggle, disabled },
+    ref,
+  ) => (
+    <button
+      ref={ref}
+      onClick={onToggle}
+      className={buttonClassNames}
+      disabled={disabled}
+      title={disabled ? 'Admin access required' : ''}
+    >
+      {currentConfig && (
+        <Icon
+          variant={currentConfig.icon}
+          className={cn(
+            currentConfig.colorClass.replace(
+              'aucctus-text-',
+              'aucctus-stroke-',
+            ),
+            disabled ? 'aucctus-stroke-disabled' : '',
+          )}
+          height={compact ? 12 : 16}
+          width={compact ? 12 : 16}
+        />
+      )}
+      {!compact && currentConfig && (
+        <span
+          className={cn(
+            'aucctus-text-sm-medium',
+            disabled ? 'aucctus-text-disabled' : currentConfig.colorClass,
+          )}
+        >
+          {currentConfig.label}
+        </span>
+      )}
       <Icon
-        variant={currentConfig.icon}
-        className={currentConfig.colorClass.replace(
-          'aucctus-text-',
-          'aucctus-stroke-',
+        variant={isOpen ? 'chevronup' : 'chevrondown'}
+        className={cn(
+          disabled ? 'aucctus-stroke-disabled' : 'aucctus-stroke-quaternary',
         )}
-        height={compact ? 12 : 16}
-        width={compact ? 12 : 16}
+        height={12}
+        width={12}
       />
-    )}
-    {!compact && currentConfig && (
-      <span className={cn('aucctus-text-sm-medium', currentConfig.colorClass)}>
-        {currentConfig.label}
-      </span>
-    )}
-    <Icon
-      variant={isOpen ? 'chevronup' : 'chevrondown'}
-      className='aucctus-stroke-quaternary'
-      height={12}
-      width={12}
-    />
-  </button>
-));
+    </button>
+  ),
+);
 
 DropdownTrigger.displayName = 'DropdownTrigger';
 

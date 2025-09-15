@@ -65,6 +65,7 @@ export interface NucleusReportSection {
   order: number;
   questions: NucleusReportQuestion[];
   assessmentStatus?: AssessmentStatus;
+  includeDeepResearchContext: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -154,4 +155,5 @@ export interface NucleusSectionUpdateRequest {
   description?: string;
   order?: number;
   assessmentStatus?: AssessmentStatus;
+  includeDeepResearchContext?: boolean;
 }

@@ -9,4 +9,5 @@ export interface StatusDropdownProps {
   activeDropdown: string | null;
   setActiveDropdown: (id: string | null) => void;
   compact?: boolean;
+  disabled?: boolean;
 }

@@ -10,6 +10,7 @@ interface AnswerCardProps {
   onDelete: (answer: NucleusReportAnswer) => void;
   isEditingLoading?: boolean;
   isDeletingLoading?: boolean;
+  isAdmin: boolean;
 }
 
 const AnswerCard: React.FC<AnswerCardProps> = ({
@@ -18,6 +19,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
   onDelete,
   isEditingLoading = false,
   isDeletingLoading = false,
+  isAdmin,
 }) => {
   // Aggregate loading states
   const isLoading = useMemo(
@@ -27,6 +29,81 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
 
   // Determine if this is AI-generated content using the actual field
   const isAiGenerated = answer.isAiGenerated;
+
+  // Helper function to create rich source description
+  const createSourceDescription = (source: any) => {
+    const hasDescription = source.description;
+    const hasCitations = source.citations;
+    const hasConfidence = source.confidenceLevel;
+
+    if (!hasDescription && !hasCitations && !hasConfidence) {
+      return null; // Will fallback to URL
+    }
+
+    // Parse citations - handle bracket-separated format [citation1],[citation2] or single citation
+    const parsedCitations = hasCitations
+      ? (() => {
+          const citationsString = source.citations.trim();
+
+          // Check if it contains bracket separators (], [)
+          if (citationsString.includes('], [')) {
+            // Split by '], [' pattern for bracket-separated citations
+            const citations = citationsString
+              .split('], [')
+              .map((citation: string) => {
+                // Clean leading [ and trailing ] from citations
+                let cleaned = citation
+                  .replace(/^\[/, '')
+                  .replace(/\]$/, '')
+                  .trim();
+                // Remove existing quotes to prevent double-quoting
+                cleaned = cleaned.replace(/^[""]/, '').replace(/[""]$/, '');
+                return cleaned;
+              })
+              .filter((citation: string) => citation.length > 0);
+
+            return citations;
+          }
+
+          // Check if it's a single bracketed citation
+          if (
+            citationsString.startsWith('[') &&
+            citationsString.endsWith(']')
+          ) {
+            let cleaned = citationsString
+              .replace(/^\[/, '')
+              .replace(/\]$/, '')
+              .trim();
+            // Remove existing quotes to prevent double-quoting
+            cleaned = cleaned.replace(/^[""]/, '').replace(/[""]$/, '');
+            return [cleaned];
+          }
+
+          // Otherwise treat as single citation
+          let cleaned = citationsString;
+          // Remove existing quotes to prevent double-quoting
+          cleaned = cleaned.replace(/^[""]/, '').replace(/[""]$/, '');
+          return [cleaned];
+        })()
+      : [];
+
+    return (
+      <div className='space-y-2'>
+        {hasDescription && (
+          <div className='aucctus-text-xs aucctus-text-secondary'>
+            {source.description}
+          </div>
+        )}
+        {hasCitations && parsedCitations.length > 0 && (
+          <div className='aucctus-text-xs aucctus-text-tertiary space-y-1 italic'>
+            {parsedCitations.map((citation: string, index: number) => (
+              <div key={index}>&ldquo;{citation}&rdquo;</div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div
@@ -59,38 +136,62 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
 
         {/* Action buttons at top right */}
         <div className='ml-2 flex gap-1'>
-          {/* Edit button - available for both AI and User answers */}
+          {/* Edit button - available for both AI and User answers but only for admin */}
           <button
-            className='aucctus-bg-primary-hover aucctus-border-secondary rounded-md border p-2 shadow-sm'
-            onClick={() => onEdit(answer)}
+            className={cn(
+              'rounded-md border p-2 shadow-sm',
+              isAdmin
+                ? 'aucctus-bg-primary-hover aucctus-border-secondary cursor-pointer'
+                : 'aucctus-bg-disabled aucctus-border-disabled cursor-not-allowed opacity-50',
+            )}
+            onClick={isAdmin ? () => onEdit(answer) : undefined}
+            disabled={!isAdmin}
             aria-label='Edit answer'
+            title={isAdmin ? 'Edit answer' : 'Admin access required'}
           >
-            <Icon variant='edit' className='aucctus-stroke-secondary h-4 w-4' />
+            <Icon
+              variant='edit'
+              className={cn(
+                'h-4 w-4',
+                isAdmin
+                  ? 'aucctus-stroke-secondary'
+                  : 'aucctus-stroke-disabled',
+              )}
+            />
           </button>
-          {/* Delete button - only for user-created answers */}
-          {
-            <button
-              className='aucctus-bg-primary-hover aucctus-border-secondary rounded-md border p-2 shadow-sm'
-              onClick={() => onDelete(answer)}
-              aria-label='Delete answer'
-            >
-              <Icon
-                variant='trash'
-                className='aucctus-stroke-error-primary h-4 w-4'
-              />
-            </button>
-          }
+          {/* Delete button - only for admin users */}
+          <button
+            className={cn(
+              'rounded-md border p-2 shadow-sm',
+              isAdmin
+                ? 'aucctus-bg-primary-hover aucctus-border-secondary cursor-pointer'
+                : 'aucctus-bg-disabled aucctus-border-disabled cursor-not-allowed opacity-50',
+            )}
+            onClick={isAdmin ? () => onDelete(answer) : undefined}
+            disabled={!isAdmin}
+            aria-label='Delete answer'
+            title={isAdmin ? 'Delete answer' : 'Admin access required'}
+          >
+            <Icon
+              variant='trash'
+              className={cn(
+                'h-4 w-4',
+                isAdmin
+                  ? 'aucctus-stroke-error-primary'
+                  : 'aucctus-stroke-disabled',
+              )}
+            />
+          </button>
         </div>
       </div>
 
       {/* Bottom row spanning full width with sources left and updated right */}
-      <div className='flex items-center justify-between'>
-        <div className='flex items-center gap-2'>
+      <div className='flex items-start justify-between'>
+        <div className='mr-3 flex flex-1 flex-wrap items-center gap-2'>
           {/* Source badges using Badge.SourceInfo */}
           {answer.sources &&
             answer.sources
               .filter((source) => source.url) // Only show sources with valid URLs
-              .slice(0, 3)
               .map((source) => (
                 <Badge.SourceInfo
                   key={source.uuid}
@@ -99,14 +200,9 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
                   badgeClassName='aucctus-text-primary whitespace-nowrap'
                   onClick={() => window.open(source.url!, '_blank')}
                   showPublishedDate={false}
+                  sourceDescription={createSourceDescription(source)}
                 />
               ))}
-          {answer.sources &&
-            answer.sources.filter((source) => source.url).length > 3 && (
-              <div className='aucctus-bg-quaternary aucctus-text-quaternary aucctus-text-xs rounded-full px-2 py-1 font-medium'>
-                +{answer.sources.filter((source) => source.url).length - 3} more
-              </div>
-            )}
         </div>
 
         {/* Last updated badge aligned to far right - only show if valid date */}
