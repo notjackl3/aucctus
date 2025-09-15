@@ -90,6 +90,12 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
               collapsed={collapsed}
             />
             <NavLink
+              to={AppPath.Nucleus}
+              title='Nucleus'
+              icon='compass-03'
+              collapsed={collapsed}
+            />
+            <NavLink
               to={AppPath.ChallengeCenter}
               title='Challenges'
               icon='rocket'

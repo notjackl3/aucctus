@@ -3,6 +3,7 @@ import { useConceptReportRoutes, useSettingsRoutes } from '@routes/hooks';
 import Layout from '@routes/layouts';
 import { AppPath } from '@routes/routes';
 import { Route } from 'react-router-dom';
+import { NucleusPage } from '@components';
 
 const usePrivateRoutes = () => {
   const ConceptReportRoutes = useConceptReportRoutes();
@@ -32,16 +33,8 @@ const usePrivateRoutes = () => {
       {/* Settings Routes */}
       {SettingsRoutes}
 
-      {/* Testing Routes */}
-      <Route path={AppPath.Testing} element={<Page.TestingPages.Testing />} />
-      <Route
-        path={AppPath.TestingNucleus}
-        element={<Page.TestingPages.NucleusTesting />}
-      />
-      <Route
-        path={AppPath.TestingConceptOverview}
-        element={<Page.TestingPages.ConceptOverviewTesting />}
-      />
+      {/* Nucleus Routes */}
+      <Route path={AppPath.Nucleus} element={<NucleusPage />} />
     </Route>
   );
 };

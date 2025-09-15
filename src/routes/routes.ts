@@ -33,6 +33,9 @@ export enum AppPath {
   ChallengeWizard = '/challenge/wizards',
   ChallengeDetails = '/challenge/:id',
 
+  /* Nucleus */
+  Nucleus = '/nucleus',
+
   /* Settings */
   Settings = '/settings',
   SettingsAbout = '/settings/about',
@@ -40,7 +43,6 @@ export enum AppPath {
 
   /* Testing */
   Testing = '/testing',
-  TestingNucleus = '/testing/nucleus',
   TestingConceptOverview = '/testing/concept-overview',
 
   /* Auth */

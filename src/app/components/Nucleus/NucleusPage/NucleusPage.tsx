@@ -474,7 +474,7 @@ const NucleusPage: React.FC = () => {
   };
 
   return (
-    <>
+    <div className='aucctus-bg-primary min-h-screen p-8'>
       <style>{animationStyles}</style>
       <div className='aucctus-bg-primary min-h-screen'>
         {/* Hero Header Section */}
@@ -632,7 +632,7 @@ const NucleusPage: React.FC = () => {
           zIndex={60}
         />
       </div>
-    </>
+    </div>
   );
 };
 
