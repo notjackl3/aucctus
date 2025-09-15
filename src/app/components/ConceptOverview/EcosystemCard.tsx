@@ -1,14 +1,19 @@
 import { Button, Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  useConceptMarketScan,
+  useConceptOverview,
+} from '@hooks/query/concepts.hook';
 import type { IEcosystemPlayer } from './fixtures';
-import { mockEcosystemPlayers, mockEcosystemSummary } from './fixtures';
 
 interface EcosystemCardProps {
   currentCardIndex: number;
   progress: number;
   totalCards: number;
   onCardClick: (index: number) => void;
+  conceptId?: string;
+  conceptUuid?: string;
 }
 
 const EcosystemCard: React.FC<EcosystemCardProps> = ({
@@ -16,15 +21,54 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   progress,
   totalCards,
   onCardClick,
+  conceptId,
+  conceptUuid,
 }) => {
   const navigate = useNavigate();
+
+  // Fetch real market scan data
+  const { marketScan, isLoading } = useConceptMarketScan(conceptUuid || '');
+
+  // Fetch concept overview for summary data
+  const { conceptOverview } = useConceptOverview(conceptUuid);
+
+  // Create ecosystem players from real data or fallback to mock
+  const ecosystemPlayers = useMemo((): IEcosystemPlayer[] => {
+    if (
+      marketScan &&
+      (marketScan.startups.length > 0 || marketScan.incumbents.length > 0)
+    ) {
+      return [
+        {
+          id: '1',
+          type: 'startups',
+          name: 'Startups',
+          count: marketScan.startups.length,
+          iconVariant: 'lightbulb',
+          description: 'Emerging companies disrupting the market',
+        },
+        {
+          id: '2',
+          type: 'incumbents',
+          name: 'Incumbents',
+          count: marketScan.incumbents.length,
+          iconVariant: 'building',
+          description: 'Established market leaders',
+        },
+      ];
+    }
+    return [];
+  }, [marketScan]);
+
+  // Get real summary data (no mock fallback)
+  const ecosystemSummary = conceptOverview?.ecosystemSummary || null;
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate('/market-scan');
+      navigate(`/concept/${conceptId}/market-scan?tab=ecosystem`);
     },
-    [navigate],
+    [navigate, conceptId],
   );
 
   const handleProgressBarClick = useCallback(
@@ -37,7 +81,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
 
   // Memoize player cards for performance
   const playerCards = useMemo(() => {
-    return mockEcosystemPlayers.map((player) => {
+    return ecosystemPlayers.map((player) => {
       const isStartup = player.type === 'startups';
 
       return {
@@ -56,7 +100,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
           : 'aucctus-header-xs-bold aucctus-text-brand-secondary',
       };
     });
-  }, []);
+  }, [ecosystemPlayers]);
 
   const renderPlayerCard = useCallback(
     (
@@ -135,21 +179,53 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
           </Button>
         </div>
 
-        <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
-          {/* Left - Competitive Landscape Summary */}
-          <div className='flex flex-col justify-center px-2'>
-            <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
-              {mockEcosystemSummary.summary}
-            </p>
-          </div>
+        {ecosystemSummary ? (
+          // Two-column layout: Summary + Player Cards
+          <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
+            {/* Left - Competitive Landscape Summary */}
+            <div className='flex flex-col justify-center px-2'>
+              {isLoading ? (
+                <div className='aucctus-text-lg aucctus-text-secondary'>
+                  Loading ecosystem data...
+                </div>
+              ) : (
+                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                  {ecosystemSummary}
+                </p>
+              )}
+            </div>
 
-          {/* Right - Player Count Cards */}
-          <div className='flex min-h-0 flex-col items-center justify-center gap-4'>
-            <div className='w-full max-w-[200px] space-y-3'>
-              {playerCards.map(renderPlayerCard)}
+            {/* Right - Player Count Cards */}
+            <div className='flex min-h-0 flex-col items-center justify-center gap-4'>
+              <div className='w-full max-w-[200px] space-y-3'>
+                {playerCards.length > 0 ? (
+                  playerCards.map(renderPlayerCard)
+                ) : (
+                  <div className='aucctus-text-sm aucctus-text-secondary text-center'>
+                    No ecosystem data available
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          // Single-column layout: Player Cards only (expanded)
+          <div className='flex flex-1 items-center justify-center'>
+            {isLoading ? (
+              <div className='aucctus-text-lg aucctus-text-secondary'>
+                Loading ecosystem data...
+              </div>
+            ) : playerCards.length > 0 ? (
+              <div className='w-full max-w-[320px] space-y-4'>
+                {playerCards.map(renderPlayerCard)}
+              </div>
+            ) : (
+              <div className='aucctus-text-sm aucctus-text-secondary'>
+                No ecosystem data available
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

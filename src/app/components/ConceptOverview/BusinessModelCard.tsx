@@ -1,14 +1,19 @@
 import { Button, Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import type { IBusinessMetric } from './fixtures';
-import { mockBusinessMetrics, mockBusinessModelSummary } from './fixtures';
+import { useConceptOverview } from '@hooks/query/concepts.hook';
+import type { IBusinessMetric, BusinessMetricType } from './fixtures';
+import { formatCurrency } from '@pages/Concept/Report/FinancialProjections/GenerateRevenue/tabs/MarketSizing/assumptionsUtils';
 
 interface BusinessModelCardProps {
   currentCardIndex: number;
   progress: number;
   totalCards: number;
   onCardClick: (index: number) => void;
+  conceptId?: string;
+  conceptUuid?: string;
+  financialProjectionV2?: any;
+  isLoadingFinancial?: boolean;
 }
 
 const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
@@ -16,15 +21,22 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
   progress,
   totalCards,
   onCardClick,
+  conceptId,
+  conceptUuid,
+  financialProjectionV2,
+  isLoadingFinancial,
 }) => {
   const navigate = useNavigate();
+
+  // Fetch concept overview for summary data
+  const { conceptOverview } = useConceptOverview(conceptUuid);
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate('/financial-projection');
+      navigate(`/concept/${conceptId}/financial-projection?tab=business-model`);
     },
-    [navigate],
+    [navigate, conceptId],
   );
 
   const handleProgressBarClick = useCallback(
@@ -35,9 +47,42 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
     [onCardClick],
   );
 
+  // Create business metrics from real data or fallback to mock
+  const businessMetrics = useMemo((): IBusinessMetric[] => {
+    if (
+      financialProjectionV2 &&
+      (financialProjectionV2.businessModel ||
+        financialProjectionV2.pricingModel)
+    ) {
+      const businessModel =
+        financialProjectionV2.businessModel?.type || 'B2B2C';
+      const price = financialProjectionV2.pricingModel?.price || 4.99;
+
+      return [
+        {
+          id: '1',
+          type: 'model' as BusinessMetricType,
+          label: 'Model',
+          value: businessModel,
+          iconVariant: 'package',
+          colorTheme: 'primary' as const,
+        },
+        {
+          id: '2',
+          type: 'price' as BusinessMetricType,
+          label: 'Price',
+          value: formatCurrency(price),
+          iconVariant: 'currencydollar',
+          colorTheme: 'success' as const,
+        },
+      ];
+    }
+    return [];
+  }, [financialProjectionV2]);
+
   // Memoize metric cards with themed styling for performance
   const metricCards = useMemo(() => {
-    return mockBusinessMetrics.map((metric) => {
+    return businessMetrics.map((metric) => {
       let cardClasses = '';
       let iconClasses = '';
       let labelClasses = '';
@@ -82,7 +127,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
         valueClasses,
       };
     });
-  }, []);
+  }, [businessMetrics]);
 
   const renderMetricCard = useCallback(
     (
@@ -164,21 +209,51 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
           </Button>
         </div>
 
-        <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
-          {/* Left - Business Model Summary */}
-          <div className='flex flex-col justify-center px-2'>
-            <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
-              {mockBusinessModelSummary.summary}
-            </p>
-          </div>
+        {conceptOverview?.businessModelSummary ? (
+          // Two-column layout: Summary + Metrics
+          <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
+            {/* Left - Business Model Summary */}
+            <div className='flex flex-col justify-center px-2'>
+              <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                {conceptOverview.businessModelSummary}
+              </p>
+            </div>
 
-          {/* Right - Key Metrics Cards */}
-          <div className='flex min-h-0 flex-col items-center justify-center gap-3'>
-            <div className='w-full max-w-[200px] space-y-3'>
-              {metricCards.map(renderMetricCard)}
+            {/* Right - Key Metrics Cards */}
+            <div className='flex min-h-0 flex-col items-center justify-center gap-3'>
+              {isLoadingFinancial ? (
+                <div className='aucctus-text-lg aucctus-text-secondary'>
+                  Loading metrics...
+                </div>
+              ) : metricCards.length > 0 ? (
+                <div className='w-full max-w-[200px] space-y-3'>
+                  {metricCards.map(renderMetricCard)}
+                </div>
+              ) : (
+                <div className='aucctus-text-sm aucctus-text-secondary'>
+                  No business metrics available
+                </div>
+              )}
             </div>
           </div>
-        </div>
+        ) : (
+          // Single-column layout: Metrics only (expanded)
+          <div className='flex flex-1 items-center justify-center'>
+            {isLoadingFinancial ? (
+              <div className='aucctus-text-lg aucctus-text-secondary'>
+                Loading metrics...
+              </div>
+            ) : metricCards.length > 0 ? (
+              <div className='w-full max-w-[320px] space-y-4'>
+                {metricCards.map(renderMetricCard)}
+              </div>
+            ) : (
+              <div className='aucctus-text-sm aucctus-text-secondary'>
+                No business metrics available
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

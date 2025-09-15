@@ -2,13 +2,18 @@ import { Button, Icon } from '@components';
 import HexagonChart from '@pages/Concept/Report/MarketScan/v3/components/HexagonChart';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockMarketForces, mockTrendsDriversSummary } from './fixtures';
+import {
+  useMarketScanMarketForcesV3,
+  useConceptOverview,
+} from '@hooks/query/concepts.hook';
 
 interface TrendsDriversCardProps {
   currentCardIndex: number;
   progress: number;
   totalCards: number;
   onCardClick: (index: number) => void;
+  conceptId?: string;
+  conceptUuid?: string;
 }
 
 const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
@@ -16,15 +21,33 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
   progress,
   totalCards,
   onCardClick,
+  conceptId,
+  conceptUuid,
 }) => {
   const navigate = useNavigate();
+
+  // Fetch real market forces data for hexagon
+  const { marketForces = [], isLoading: isMarketForcesLoading } =
+    useMarketScanMarketForcesV3(conceptUuid || '');
+
+  // Fetch concept overview for summary data
+  const { conceptOverview } = useConceptOverview(conceptUuid);
+
+  // Use real data if available
+  const displayMarketForces = marketForces.length > 0 ? marketForces : [];
+  const selectedCategory = displayMarketForces[0] || null;
+
+  // Get real summary data (no mock fallback)
+  const executiveSummary = conceptOverview?.trendsDriversSummary || null;
+
+  const isLoading = isMarketForcesLoading;
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate('/market-scan');
+      navigate(`/concept/${conceptId}/market-scan?tab=trends-drivers`);
     },
-    [navigate],
+    [navigate, conceptId],
   );
 
   const handleProgressBarClick = useCallback(
@@ -90,26 +113,73 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
           </Button>
         </div>
 
-        <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
-          <div className='flex flex-col justify-center px-2'>
-            <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
-              {mockTrendsDriversSummary.summary}
-            </p>
-          </div>
+        {executiveSummary ? (
+          // Two-column layout: Summary + Visualization
+          <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
+            <div className='flex flex-col justify-center px-2'>
+              {isLoading ? (
+                <div className='aucctus-text-lg aucctus-text-secondary'>
+                  Loading trends analysis...
+                </div>
+              ) : (
+                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                  {executiveSummary}
+                </p>
+              )}
+            </div>
 
-          <div className='flex min-h-0 items-center justify-center'>
-            <div className='aspect-square max-h-[180px] w-full max-w-[180px]'>
-              {/* This would be replaced by MarketForcesRadar component with real data */}
-              <HexagonChart
-                trendCategories={mockMarketForces}
-                selectedCategory={mockMarketForces[0]}
-                onCategorySelect={() => {
-                  // no-op
-                }}
-              />
+            <div className='flex min-h-0 items-center justify-center'>
+              <div className='aspect-square max-h-[180px] w-full max-w-[180px]'>
+                {isLoading ? (
+                  <div className='flex h-full items-center justify-center'>
+                    <div className='aucctus-text-sm aucctus-text-secondary'>
+                      Loading...
+                    </div>
+                  </div>
+                ) : displayMarketForces.length > 0 ? (
+                  <HexagonChart
+                    trendCategories={displayMarketForces}
+                    selectedCategory={selectedCategory}
+                    onCategorySelect={() => {
+                      // no-op for overview card
+                    }}
+                  />
+                ) : (
+                  <div className='aucctus-text-sm aucctus-text-secondary'>
+                    No trends data available
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          // Single-column layout: Visualization only (expanded)
+          <div className='flex flex-1 items-start justify-center px-4 pb-2 pt-0'>
+            <div className='aspect-square max-h-[220px] w-full max-w-[220px]'>
+              {isLoading ? (
+                <div className='flex h-full items-center justify-center'>
+                  <div className='aucctus-text-lg aucctus-text-secondary'>
+                    Loading trends analysis...
+                  </div>
+                </div>
+              ) : displayMarketForces.length > 0 ? (
+                <HexagonChart
+                  trendCategories={displayMarketForces}
+                  selectedCategory={selectedCategory}
+                  onCategorySelect={() => {
+                    // no-op for overview card
+                  }}
+                />
+              ) : (
+                <div className='flex h-full items-center justify-center'>
+                  <div className='aucctus-text-sm aucctus-text-secondary'>
+                    No trends data available
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

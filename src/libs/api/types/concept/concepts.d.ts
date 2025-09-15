@@ -100,7 +100,11 @@ export type ConceptReportStatusBySection = {
 
 export type FeatureVersion = `v${number}`;
 
-export type FeatureName = 'assumptions' | 'financialProjection' | 'marketScan';
+export type FeatureName =
+  | 'assumptions'
+  | 'financialProjection'
+  | 'marketScan'
+  | 'conceptOverview';
 
 export type IFeatureVersions = {
   [K in FeatureName]?: FeatureVersion;
@@ -117,12 +121,23 @@ export interface IConceptRightToWin extends IGeneratedConceptRightToWin {
 
 export interface IConceptOverview extends IBaseConceptEntity {
   uuid: string;
-  conceptOverview: string;
+  overview: string; // matches actual API response
   valueProposition: string;
   problemStatement: string;
+  whatIsThis: string; // concise product definition
+  shouldWeDoThis: string; // executive recommendation
+  heroImagePrompt: string; // detailed prompt for image generation
   conceptImageUrl: string;
+  overviewVersion: string;
   differentiators: IConceptDifferentiator[];
-  rightToWin: IConceptRightToWin[];
+  rightsToWin: IConceptRightToWin[]; // matches actual API response
+  // Executive summary fields for rotating cards
+  marketSizeSummary?: string;
+  trendsDriversSummary?: string;
+  businessModelSummary?: string;
+  ecosystemSummary?: string;
+  customerProfilesSummary?: string;
+  keyAssumptionsSummary?: string;
 }
 export interface IConcept extends IBaseConceptEntity {
   uuid: string;
@@ -176,6 +191,12 @@ export interface ICustomerListItem {
   description: string;
   order: number;
   icon?: IconVariant;
+}
+
+// Common response type for generation endpoints (matches Django MessageSchema)
+export interface IGenerationResponse {
+  uuid: string;
+  detail: string;
 }
 
 export interface ICustomerJob extends ICustomerListItem {}

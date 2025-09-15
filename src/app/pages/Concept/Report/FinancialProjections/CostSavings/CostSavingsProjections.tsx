@@ -3,6 +3,7 @@ import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import { Icon } from '@components';
 import useStore from '@stores/store';
+import { useSearchParams } from 'react-router-dom';
 
 import { SavingsMethodTab } from './tabs/SavingsMethod';
 import { ImpactSizingTab } from './tabs/ImpactSizing';
@@ -19,6 +20,7 @@ const CostSavingsProjections: React.FC<CostSavingsProjectionsProps> = ({
   const { setActiveFinancialProjection } = useStore(
     (state) => state.financialProjection,
   );
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (financialProjection) {
@@ -27,6 +29,17 @@ const CostSavingsProjections: React.FC<CostSavingsProjectionsProps> = ({
   }, [financialProjection, setActiveFinancialProjection]);
 
   const [activeTab, setActiveTab] = useState<string>('savings-method');
+
+  // Handle URL query parameter for tab selection
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (
+      tabFromUrl &&
+      ['savings-method', 'impact-sizing', 'projections'].includes(tabFromUrl)
+    ) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   const costSavingsTabs = useMemo(() => {
     return [

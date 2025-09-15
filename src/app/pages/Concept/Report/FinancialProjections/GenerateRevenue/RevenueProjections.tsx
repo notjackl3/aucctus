@@ -3,6 +3,7 @@ import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import { Icon } from '@components';
 import useStore from '@stores/store';
+import { useSearchParams } from 'react-router-dom';
 
 import { BusinessModelTab } from './tabs/BusinessModel';
 import { MarketSizingTab } from './tabs/MarketSizing';
@@ -19,6 +20,7 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
   const { setActiveFinancialProjection } = useStore(
     (state) => state.financialProjection,
   );
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
     if (financialProjection) {
@@ -27,6 +29,17 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
   }, [financialProjection, setActiveFinancialProjection]);
 
   const [activeTab, setActiveTab] = useState<string>('business-model');
+
+  // Handle URL query parameter for tab selection
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (
+      tabFromUrl &&
+      ['business-model', 'market-sizing', 'projections'].includes(tabFromUrl)
+    ) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   const revenueProjectionTabs = useMemo(() => {
     return [

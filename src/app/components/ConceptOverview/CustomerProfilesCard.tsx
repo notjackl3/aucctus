@@ -1,14 +1,20 @@
 import { Button, Icon } from '@components';
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import {
+  useConceptCustomerProfiles,
+  useConceptOverview,
+} from '@hooks/query/concepts.hook';
+import type { ICustomerProfile as ICustomerProfileAPI } from '@libs/api/types/concept/concepts';
 import type { ICustomerProfile } from './fixtures';
-import { mockCustomerProfiles, mockCustomerProfilesSummary } from './fixtures';
 
 interface CustomerProfilesCardProps {
   currentCardIndex: number;
   progress: number;
   totalCards: number;
   onCardClick: (index: number) => void;
+  conceptUuid?: string; // For fetching real customer profile data
+  conceptId?: string; // For navigation routing
 }
 
 const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
@@ -16,16 +22,85 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
   progress,
   totalCards,
   onCardClick,
+  conceptUuid,
+  conceptId,
 }) => {
   const navigate = useNavigate();
+
+  // State to track the selected profile
+  const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+    null,
+  );
+
+  // Fetch real customer profiles data
+  const { profiles: realProfiles, isLoading } = useConceptCustomerProfiles(
+    conceptUuid || '',
+  );
+
+  // Fetch concept overview for summary data
+  const { conceptOverview } = useConceptOverview(conceptUuid);
+
+  // Transform real API data to match component interface
+  const transformedProfiles = useMemo((): ICustomerProfile[] => {
+    if (!realProfiles || realProfiles.length === 0) {
+      return [];
+    }
+
+    return realProfiles.map((profile: ICustomerProfileAPI, index: number) => {
+      // Generate initials from name
+      const initials = profile.name
+        .split(' ')
+        .map((word) => word.charAt(0))
+        .join('')
+        .toUpperCase()
+        .slice(0, 2);
+
+      // Gradient colors for profiles without avatars
+      const gradientOptions = [
+        'from-blue-400 to-blue-600',
+        'from-green-400 to-green-600',
+        'from-purple-400 to-purple-600',
+        'from-pink-400 to-pink-600',
+        'from-indigo-400 to-indigo-600',
+      ];
+
+      return {
+        id: profile.uuid,
+        name: profile.name,
+        avatar: profile.avatarUrl || '',
+        isPrimary: profile.isPrimary || false,
+        segment: profile.segment,
+        initials,
+        gradientColors: gradientOptions[index % gradientOptions.length],
+      };
+    });
+  }, [realProfiles]);
+
+  // Set initial selection to primary profile when data loads
+  useEffect(() => {
+    if (realProfiles && realProfiles.length > 0 && !selectedProfileId) {
+      const primaryProfile =
+        realProfiles.find((p) => p.isPrimary) || realProfiles[0];
+      if (primaryProfile) {
+        setSelectedProfileId(primaryProfile.uuid);
+      }
+    }
+  }, [realProfiles, selectedProfileId]);
+
+  // Get real summary data (no mock fallback)
+  const profilesSummary = conceptOverview?.customerProfilesSummary || null;
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate('/customer-profiles');
+      navigate(`/concept/${conceptId}/customer-profile`);
     },
-    [navigate],
+    [navigate, conceptId],
   );
+
+  const handleProfileClick = useCallback((profileId: string) => {
+    setSelectedProfileId(profileId);
+  }, []);
 
   const handleProgressBarClick = useCallback(
     (e: React.MouseEvent, index: number) => {
@@ -60,22 +135,27 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
 
   const renderProfileCard = useCallback(
     (profile: ICustomerProfile) => {
+      const isSelected = selectedProfileId === profile.id;
+
       if (profile.isPrimary) {
         return (
           <div
             key={profile.id}
-            className='aucctus-border-brand aucctus-bg-brand-secondary rounded-lg border p-2'
+            className={`aucctus-border-secondary aucctus-bg-tertiary min-h-[60px] cursor-pointer rounded-lg border p-2 transition-shadow hover:shadow-md ${
+              isSelected ? 'aucctus-border-brand ring-2 ring-offset-1' : ''
+            }`}
+            onClick={() => handleProfileClick(profile.id)}
           >
             <div className='flex items-center gap-2'>
-              <div className='aucctus-border-brand aucctus-bg-primary h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border-2'>
+              <div className='aucctus-border-tertiary aucctus-bg-quaternary h-6 w-6 flex-shrink-0 overflow-hidden rounded-full border-2'>
                 {renderAvatar(profile)}
               </div>
-              <div className='flex-1'>
-                <p className='aucctus-text-xs-semibold aucctus-text-brand-primary leading-tight'>
+              <div className='min-w-0 flex-1'>
+                <p className='aucctus-text-xs-semibold aucctus-text-primary truncate leading-tight'>
                   {profile.segment}
                 </p>
-                <div className='mt-0.5 flex items-center gap-2'>
-                  <span className='aucctus-bg-accent-solid aucctus-text-white aucctus-text-xs-semibold rounded-full px-1 py-0.5'>
+                <div className='mt-0.5 flex items-center gap-1'>
+                  <span className='aucctus-text-xs aucctus-bg-brand-primary aucctus-text-brand-primary aucctus-border-brand rounded-full border px-1.5 py-0.5'>
                     Primary
                   </span>
                 </div>
@@ -88,18 +168,21 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
       return (
         <div
           key={profile.id}
-          className='aucctus-border-secondary aucctus-bg-tertiary rounded-lg border p-2'
+          className={`aucctus-border-secondary aucctus-bg-tertiary min-h-[60px] cursor-pointer rounded-lg border p-2 transition-shadow hover:shadow-md ${
+            isSelected ? 'aucctus-border-brand ring-2 ring-offset-1' : ''
+          }`}
+          onClick={() => handleProfileClick(profile.id)}
         >
           <div className='flex items-center gap-2'>
-            <div className='aucctus-border-tertiary aucctus-bg-quaternary h-8 w-8 flex-shrink-0 overflow-hidden rounded-full border-2'>
+            <div className='aucctus-border-tertiary aucctus-bg-quaternary h-6 w-6 flex-shrink-0 overflow-hidden rounded-full border-2'>
               {renderAvatar(profile)}
             </div>
-            <div className='flex-1'>
-              <p className='aucctus-text-xs-semibold aucctus-text-primary leading-tight'>
+            <div className='min-w-0 flex-1'>
+              <p className='aucctus-text-xs-semibold aucctus-text-primary truncate leading-tight'>
                 {profile.segment}
               </p>
-              <div className='mt-0.5 flex items-center gap-2'>
-                <span className='aucctus-bg-quaternary aucctus-text-white aucctus-text-xs-semibold rounded-full px-1 py-0.5'>
+              <div className='mt-0.5 flex items-center gap-1'>
+                <span className='aucctus-text-xs rounded-full bg-gray-600 px-1.5 py-0.5 text-white'>
                   Secondary
                 </span>
               </div>
@@ -108,7 +191,7 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
         </div>
       );
     },
-    [renderAvatar],
+    [renderAvatar, handleProfileClick, selectedProfileId],
   );
 
   return (
@@ -166,19 +249,51 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
           </Button>
         </div>
 
-        <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
-          {/* Left - Primary Customer Summary */}
-          <div className='flex flex-col justify-center px-2'>
-            <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
-              {mockCustomerProfilesSummary.solution}
-            </p>
-          </div>
+        {profilesSummary ? (
+          // Two-column layout: Summary + Profile Cards
+          <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
+            {/* Left - Primary Customer Summary */}
+            <div className='flex flex-col justify-start px-2 py-2'>
+              {isLoading ? (
+                <div className='aucctus-text-sm aucctus-text-secondary'>
+                  Loading customer profiles...
+                </div>
+              ) : (
+                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                  {profilesSummary}
+                </p>
+              )}
+            </div>
 
-          {/* Right - Profile Cards List */}
-          <div className='flex min-h-0 flex-col justify-center gap-2 overflow-hidden'>
-            {mockCustomerProfiles.map(renderProfileCard)}
+            {/* Right - Profile Cards List */}
+            <div className='flex max-h-[180px] min-h-0 flex-col gap-2 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+              {isLoading ? (
+                <div className='aucctus-text-sm aucctus-text-secondary'>
+                  Loading...
+                </div>
+              ) : transformedProfiles.length > 0 ? (
+                transformedProfiles.slice(0, 4).map(renderProfileCard)
+              ) : (
+                <div className='aucctus-text-sm aucctus-text-secondary'>
+                  No customer profiles available
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          // Single-column layout: Profile Cards only (expanded)
+          <div className='flex flex-1 items-center justify-center'>
+            {isLoading ? (
+              <div className='aucctus-text-lg aucctus-text-secondary'>
+                Loading customer profiles...
+              </div>
+            ) : (
+              <div className='grid w-full max-w-[420px] grid-cols-2 gap-4'>
+                {transformedProfiles.slice(0, 4).map(renderProfileCard)}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

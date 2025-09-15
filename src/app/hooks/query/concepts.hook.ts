@@ -186,8 +186,12 @@ export const useGenerateConceptOverview = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (conceptIdentifier: string) =>
-      await api.concept.generateConceptOverview(conceptIdentifier),
+    mutationFn: async (conceptIdentifier: string) => {
+      const result =
+        await api.concept.generateConceptOverview(conceptIdentifier);
+
+      return result;
+    },
     onSuccess: () => {
       doFullConceptInvalidation(queryClient);
       toast.warning(
@@ -377,8 +381,11 @@ export const useConceptOverview = (uuid?: string) => {
     queryKey: [AucctusQueryKeys.conceptOverview, uuid],
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 2, // 2 minutes
-    queryFn: async () =>
-      uuid ? await api.concept.getConceptOverview(uuid) : void 0,
+    queryFn: async () => {
+      if (!uuid) return undefined;
+      const result = await api.concept.getConceptOverview(uuid);
+      return result;
+    },
     enabled: !!uuid,
   });
 
@@ -388,7 +395,7 @@ export const useConceptOverview = (uuid?: string) => {
 export const useDownloadConcept = (uuid?: string) => {
   const query = useQuery({
     queryFn: async () =>
-      uuid ? await api.concept.downloadConcept(uuid) : void 0,
+      uuid ? await api.concept.downloadConcept(uuid) : undefined,
     enabled: !!uuid,
     cacheTime: 0, // disable caching
   });

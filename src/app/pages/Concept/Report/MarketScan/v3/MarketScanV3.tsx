@@ -14,6 +14,7 @@ import {
 } from '@hooks/query/concepts.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
+import { useSearchParams } from 'react-router-dom';
 import { useOutletContext } from 'react-router-dom';
 import { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
 import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
@@ -23,6 +24,7 @@ const MarketScanV3: React.FC = () => {
     (state) => state.conceptReport.conceptUuid,
   );
   const { concept } = useOutletContext<IConceptReportContext>();
+  const [searchParams] = useSearchParams();
 
   const { trends = [], isLoading: isTrendsLoading } = useMarketScanTrendsV3(
     activeConceptUuid || '',
@@ -46,6 +48,14 @@ const MarketScanV3: React.FC = () => {
   const [selectedRadarCategory, setSelectedRadarCategory] =
     useState<IMarketForceV3 | null>(null);
   const [activeTab, setActiveTab] = useState<string>('trends-drivers');
+
+  // Handle URL query parameter for tab selection
+  useEffect(() => {
+    const tabFromUrl = searchParams.get('tab');
+    if (tabFromUrl && ['trends-drivers', 'ecosystem'].includes(tabFromUrl)) {
+      setActiveTab(tabFromUrl);
+    }
+  }, [searchParams]);
 
   // Update selected categories when data is loaded
   useEffect(() => {

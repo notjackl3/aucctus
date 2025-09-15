@@ -17,7 +17,8 @@ const ConceptOverviewTesting: React.FC = () => {
 
         <div className='space-y-8'>
           <section>
-            <ConceptOverview.ExecutiveDashboard />
+            {/* Pass a test concept UUID to demonstrate real API data integration */}
+            <ConceptOverview.ExecutiveDashboard conceptUuid='4d2c6f73-ad9d-4d81-b893-059970471242' />
           </section>
         </div>
       </div>

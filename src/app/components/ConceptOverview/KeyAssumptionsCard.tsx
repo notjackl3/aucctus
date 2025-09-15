@@ -1,14 +1,18 @@
 import { Button, Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
+import { useConceptOverview } from '@hooks/query/concepts.hook';
+import type { AssumptionCategory } from '@libs/api/types/concept/assumptions';
 import type { RiskLevel } from './fixtures';
-import { mockKeyAssumptionsSummary, mockRiskCategories } from './fixtures';
 
 interface KeyAssumptionsCardProps {
   currentCardIndex: number;
   progress: number;
   totalCards: number;
   onCardClick: (index: number) => void;
+  conceptId?: string; // For navigation routing and API calls (root identifier)
+  conceptUuid?: string; // For fetching concept overview data
 }
 
 interface RiskColors {
@@ -23,8 +27,69 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   progress,
   totalCards,
   onCardClick,
+  conceptId,
+  conceptUuid,
 }) => {
   const navigate = useNavigate();
+
+  // Fetch real assumptions data using V2 API
+  const { categoryMetrics, isLoading } = useFilteredAssumptions(
+    conceptId || '',
+  );
+
+  // Fetch concept overview for summary data
+  const { conceptOverview } = useConceptOverview(conceptUuid);
+
+  // Convert averageRisk (0-1) to risk level
+  const getRiskLevelFromValue = useCallback(
+    (averageRisk: number): { level: RiskLevel; text: string } => {
+      if (averageRisk >= 0.7) {
+        return { level: 'high', text: 'High' };
+      } else if (averageRisk >= 0.4) {
+        return { level: 'medium', text: 'Medium' };
+      } else {
+        return { level: 'low', text: 'Low' };
+      }
+    },
+    [],
+  );
+
+  // Transform categoryMetrics to risk categories
+  const transformedRiskCategories = useMemo(() => {
+    if (!categoryMetrics) {
+      return [];
+    }
+
+    // Map categories to display format
+    const categoryMap: Record<
+      AssumptionCategory,
+      { name: string; iconVariant: string }
+    > = {
+      desirability: { name: 'Desirability', iconVariant: 'heart' },
+      viability: { name: 'Viability', iconVariant: 'currency-dollar' },
+      feasibility: { name: 'Feasibility', iconVariant: 'gear' },
+      adaptability: { name: 'Adaptability', iconVariant: 'refresh' },
+    };
+
+    return Object.entries(categoryMetrics).map(([category, metrics], index) => {
+      const categoryKey = category as AssumptionCategory;
+      const riskInfo = getRiskLevelFromValue(metrics.averageRisk);
+      const riskPercentage = Math.round(metrics.averageRisk * 100);
+
+      return {
+        id: (index + 1).toString(),
+        name: categoryMap[categoryKey].name,
+        category: categoryKey.toLowerCase(),
+        risk: riskInfo.text,
+        riskLevel: riskInfo.level,
+        riskValue: riskPercentage,
+        iconVariant: categoryMap[categoryKey].iconVariant,
+      };
+    });
+  }, [categoryMetrics, getRiskLevelFromValue]);
+
+  // Get real summary data (no mock fallback)
+  const assumptionsSummary = conceptOverview?.keyAssumptionsSummary || null;
 
   // Transform risk level colors to Aucctus theme classes
   const getRiskColor = useCallback((riskLevel: RiskLevel): RiskColors => {
@@ -63,9 +128,9 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      navigate('/assumptions');
+      navigate(`/concept/${conceptId}/assumptions`);
     },
-    [navigate],
+    [navigate, conceptId],
   );
 
   const handleProgressBarClick = useCallback(
@@ -79,11 +144,11 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   // Memoize risk categories with colors
   const riskCategoriesWithColors = useMemo(
     () =>
-      mockRiskCategories.map((category) => ({
+      transformedRiskCategories.map((category) => ({
         ...category,
         colors: getRiskColor(category.riskLevel),
       })),
-    [getRiskColor],
+    [transformedRiskCategories, getRiskColor],
   );
 
   return (
@@ -141,39 +206,93 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
           </Button>
         </div>
 
-        <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
-          {/* Left - Biggest Risk Summary */}
-          <div className='flex flex-col justify-center px-2'>
-            <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
-              {mockKeyAssumptionsSummary.summary}
-            </p>
-          </div>
-
-          {/* Right - Risk Category Cards */}
-          <div className='grid min-h-0 grid-cols-2 content-center gap-2'>
-            {riskCategoriesWithColors.map((category) => (
-              <div
-                key={category.id}
-                className={`border ${category.colors.border} ${category.colors.bg} flex min-h-[80px] flex-col justify-center rounded-lg p-2`}
-              >
-                <div className='flex h-full flex-col items-center justify-center text-center'>
-                  <Icon
-                    variant={category.iconVariant as any}
-                    className={`h-4 w-4 ${category.colors.icon} mb-1`}
-                  />
-                  <p className='aucctus-text-xs-semibold aucctus-text-primary leading-tight'>
-                    {category.name}
-                  </p>
-                  <span
-                    className={`aucctus-text-xs-semibold mt-1 rounded-full px-1.5 py-0.5 ${category.colors.text} ${category.colors.bg}`}
-                  >
-                    {category.risk} Risk
-                  </span>
+        {assumptionsSummary ? (
+          // Two-column layout: Summary + Risk Category Cards
+          <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
+            {/* Left - Biggest Risk Summary */}
+            <div className='flex flex-col justify-center px-2'>
+              {isLoading ? (
+                <div className='aucctus-text-lg aucctus-text-secondary'>
+                  Loading assumptions...
                 </div>
-              </div>
-            ))}
+              ) : (
+                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                  {assumptionsSummary}
+                </p>
+              )}
+            </div>
+
+            {/* Right - Risk Category Cards */}
+            <div className='grid min-h-0 grid-cols-2 content-center gap-3'>
+              {riskCategoriesWithColors.length > 0 ? (
+                riskCategoriesWithColors.map((category) => (
+                  <div
+                    key={category.id}
+                    className={`border ${category.colors.border} ${category.colors.bg} flex min-h-[90px] flex-col justify-center rounded-lg p-3`}
+                  >
+                    <div className='flex h-full flex-col items-center justify-center text-center'>
+                      <Icon
+                        variant={category.iconVariant as any}
+                        className={`h-5 w-5 ${category.colors.icon} mb-2`}
+                      />
+                      <p className='aucctus-text-sm-semibold aucctus-text-primary leading-tight'>
+                        {category.name}
+                      </p>
+                      <span
+                        className={`aucctus-text-xs-semibold mt-2 rounded-full px-2 py-1 ${category.colors.text} ${category.colors.bg}`}
+                      >
+                        {category.risk} Risk
+                      </span>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className='col-span-2 flex items-center justify-center'>
+                  <div className='aucctus-text-sm aucctus-text-secondary'>
+                    No assumptions data available
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          // Single-column layout: Risk Category Cards only (expanded)
+          <div className='flex flex-1 items-start justify-center px-4 pb-2 pt-0'>
+            {isLoading ? (
+              <div className='aucctus-text-lg aucctus-text-secondary'>
+                Loading assumptions...
+              </div>
+            ) : riskCategoriesWithColors.length > 0 ? (
+              <div className='grid w-full max-w-[320px] grid-cols-2 gap-3'>
+                {riskCategoriesWithColors.map((category) => (
+                  <div
+                    key={category.id}
+                    className={`border ${category.colors.border} ${category.colors.bg} flex min-h-[85px] flex-col justify-center rounded-lg p-3`}
+                  >
+                    <div className='flex h-full flex-col items-center justify-center text-center'>
+                      <Icon
+                        variant={category.iconVariant as any}
+                        className={`h-5 w-5 ${category.colors.icon} mb-1`}
+                      />
+                      <p className='aucctus-text-sm-semibold aucctus-text-primary leading-tight'>
+                        {category.name}
+                      </p>
+                      <span
+                        className={`aucctus-text-xs-semibold mt-1 rounded-full px-2 py-1 ${category.colors.text} ${category.colors.bg}`}
+                      >
+                        {category.risk} Risk
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className='aucctus-text-sm aucctus-text-secondary'>
+                No assumptions data available
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

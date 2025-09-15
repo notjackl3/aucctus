@@ -18,6 +18,7 @@ import {
   ICustomerProfile,
   ICustomerProfileConversationPage,
   ICustomerProfileCreate,
+  IGenerationResponse,
   ICustomerProfileRealWorldSignal,
   ICustomerProfileRealWorldSignalsResponse,
   IFinancialProjection,
@@ -179,25 +180,27 @@ export class ConceptApi extends ApiService {
   }
 
   generateConceptOverview(conceptIdentifier: string) {
-    return this.post<{ message: string }>(
+    const result = this.post<IGenerationResponse>(
       endpoints.generateConceptOverview(conceptIdentifier),
     );
+
+    return result;
   }
 
   generateKeyAssumptions(conceptIdentifier: string) {
-    return this.post<{ message: string }>(
+    return this.post<IGenerationResponse>(
       endpoints.generateKeyAssumptions(conceptIdentifier),
     );
   }
 
   generateCustomerProfile(conceptIdentifier: string) {
-    return this.post<{ message: string }>(
+    return this.post<IGenerationResponse>(
       endpoints.generateCustomerProfile(conceptIdentifier),
     );
   }
 
   generateMarketScan(conceptIdentifier: string) {
-    return this.post<{ message: string }>(
+    return this.post<IGenerationResponse>(
       endpoints.generateMarketScan(conceptIdentifier),
     );
   }

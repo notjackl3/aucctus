@@ -72,6 +72,12 @@ export interface IPatchBusinessModelV2 {
 export interface IMarketSizingV2 extends IBaseFinancialProjectionEntity {
   type: string;
   assumptionEntries: IMarketSizingAssumptionEntryV2[];
+  // Top-down specific fields
+  expectedTam?: number;
+  expectedSam?: number;
+  expectedSom?: number;
+  // Bottom-up specific field
+  expectedValue?: number;
 }
 
 export interface IMarketSizingAssumptionEntryV2
