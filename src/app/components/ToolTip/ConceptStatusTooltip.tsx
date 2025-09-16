@@ -7,12 +7,12 @@ import useGenerationStatus from '@hooks/concepts/generation-status.hook';
 
 // Friendly names for section keys
 const SECTION_NAMES: Record<string, string> = {
-  overview: 'Overview',
   marketScan: 'Market Scan',
   trends: 'Trends',
   customerProfiles: 'Customer Profiles',
   financialProjection: 'Financial Projection',
   assumptions: 'Key Assumptions',
+  overview: 'Overview',
 };
 
 const formatDuration = (startDateStr: string, endDateStr?: string) => {
