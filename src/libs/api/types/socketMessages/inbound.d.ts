@@ -418,6 +418,40 @@ export interface IConceptWorkflowMessage extends BaseSocketEvent {
   errorDetails?: any;
 }
 
+// ==========================================
+// Synthetic Execution Messages
+// ==========================================
+
+export interface ISyntheticExecutionProgressMessage extends BaseSocketEvent {
+  type: 'synthetic.execution.progress.user';
+  conceptUuid: string;
+  testUuid: string;
+  accountUuid: string;
+  stage: string;
+  message: string;
+  progress: number;
+  currentPersona?: string;
+  totalPersonas?: number;
+}
+
+export interface ISyntheticExecutionCompletedMessage extends BaseSocketEvent {
+  type: 'synthetic.execution.completed.user';
+  conceptUuid: string;
+  testUuid: string;
+  accountUuid: string;
+  resultsCount: number;
+  message: string;
+}
+
+export interface ISyntheticExecutionErrorMessage extends BaseSocketEvent {
+  type: 'synthetic.execution.error.user';
+  conceptUuid: string;
+  testUuid: string;
+  accountUuid: string;
+  errorMessage: string;
+  details?: any;
+}
+
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -449,6 +483,9 @@ export type InboundSocketEvent<C = {}> =
   | ITestCollateralUpdateProgressMessage
   | ITestCollateralUpdateCompletedMessage
   | ITestCollateralUpdateErrorMessage
-  | IConceptWorkflowMessage;
+  | IConceptWorkflowMessage
+  | ISyntheticExecutionProgressMessage
+  | ISyntheticExecutionCompletedMessage
+  | ISyntheticExecutionErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

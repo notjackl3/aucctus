@@ -279,7 +279,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
         return <TestCollateral conceptUuid={conceptUuid} testUuid={testUuid} />;
 
       case 'execute':
-        return <TestExecution />;
+        return <TestExecution conceptUuid={conceptUuid} testUuid={testUuid} />;
 
       case 'results':
         return (

@@ -364,6 +364,14 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/results/${resultUuid}/files/${fileUuid}`;
   }
 
+  static conceptTestResultsExport(
+    conceptUuid: string,
+    testUuid: string,
+    format: string = 'pdf',
+  ) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/results/export?format=${format}`;
+  }
+
   static conceptTestResultFiles(
     conceptUuid: string,
     testUuid: string,
@@ -382,6 +390,41 @@ export class Endpoints {
     assumptionUuid: string,
   ) {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/assumptions/${assumptionUuid}`;
+  }
+
+  static conceptTestSyntheticExecution(conceptUuid: string, testUuid: string) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/synthetic-execution`;
+  }
+
+  static conceptTestSyntheticExecutionStatus(
+    conceptUuid: string,
+    testUuid: string,
+    executionId: string,
+  ) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/synthetic-execution/${executionId}/status`;
+  }
+
+  static conceptTestSyntheticExecutionCancel(
+    conceptUuid: string,
+    testUuid: string,
+    executionId: string,
+  ) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/synthetic-execution/${executionId}`;
+  }
+
+  static conceptTestSyntheticExecutionHistory(
+    conceptUuid: string,
+    testUuid: string,
+  ) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/synthetic-execution/history`;
+  }
+
+  static conceptTestDistributionPreview(conceptUuid: string, testUuid: string) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/distribution-preview`;
+  }
+
+  static conceptTestCollaterals(conceptUuid: string, testUuid: string) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/collaterals`;
   }
 
   static generateKeyAssumptions(conceptIdentifier: string) {

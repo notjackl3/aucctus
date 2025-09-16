@@ -16,6 +16,24 @@ export interface ITestResult {
   updatedAt: string;
   editRecommendations?: IEditRecommendation[];
   files: ITestFile[];
+
+  // Synthetic testing fields
+  isSynthetic?: boolean; // Maps to is_synthetic from Django model
+  personaName?: string; // Maps to persona_name from Django model
+  personaUuid?: string; // Maps to persona_uuid from Django model
+
+  // Phase 1: Synthetic distribution fields
+  baseProfileUuid?: string; // Maps to base_profile_uuid from Django model
+  variationMetadata?: Record<string, any>; // Maps to variation_metadata from Django model
+  syntheticWeight?: number; // Maps to synthetic_weight from Django model
+  collateralUuid?: string; // Maps to collateral_uuid from Django model
+
+  // Structured synthetic interview fields
+  keyInsights?: string; // Maps to key_insights from Django model
+  painPoints?: string; // Maps to pain_points from Django model
+  solutionFeedback?: string; // Maps to solution_feedback from Django model
+  willingnessToPayFeedback?: string; // Maps to willingness_to_pay from Django model
+  overallSentiment?: string; // Maps to overall_sentiment from Django model
 }
 
 export interface ITestFile {
@@ -72,3 +90,60 @@ export type TestExecutionMode =
   | 'expertLed'
   | 'automated'
   | 'synthetic';
+
+// Synthetic Distribution Types (Phase 1)
+export interface IProfileDistribution {
+  profileUuid: string;
+  profileName: string;
+  isPrimary: boolean;
+  testCount: number;
+  weight: number;
+}
+
+export interface IDistributionPreview {
+  totalTests: number;
+  totalAllocatedTests: number;
+  distributionStrategy: string;
+  collateralUuid?: string;
+  collateralTitle?: string;
+  profileDistributions: IProfileDistribution[];
+}
+
+export interface IDistributionPreviewRequest {
+  totalTests?: number;
+  collateralUuid?: string;
+  customWeights?: Record<string, number>;
+}
+
+export interface ISyntheticExecutionRequest {
+  total_tests?: number;
+  collateral_uuids?: string[];
+  collateral_uuid?: string; // DEPRECATED: Use collateral_uuids instead
+  distribution_weights?: Record<string, number>;
+}
+
+export interface ITestCollateralOption {
+  uuid: string;
+  title: string;
+  description?: string;
+  type: CollateralType;
+  createdAt: string;
+}
+
+// Synthetic Execution Response Types
+export interface ISyntheticExecutionStartResponse {
+  executionId: string;
+  conceptUuid: string;
+  testUuid: string;
+  message: string;
+}
+
+export interface ISyntheticExecutionStatusResponse {
+  status: 'pending' | 'running' | 'completed' | 'error' | 'cancelled';
+  progress: number;
+  message: string;
+  resultsCount?: number;
+  currentPersona?: string;
+  totalPersonas?: number;
+  errorDetails?: any;
+}

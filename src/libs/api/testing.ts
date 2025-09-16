@@ -19,6 +19,13 @@ import {
   ITestAssumptionUpdate,
   IPageResponse,
 } from '@pages/Concept/Report/Testing/types';
+import {
+  IDistributionPreview,
+  IDistributionPreviewRequest,
+  ISyntheticExecutionRequest,
+  ISyntheticExecutionStartResponse,
+  ITestCollateralOption,
+} from './types/concept/testing';
 
 export class TestingApi extends ApiService {
   constructor(apiInstance: Api, apiConfig: IApiServiceConfig) {
@@ -303,6 +310,23 @@ export class TestingApi extends ApiService {
     );
   }
 
+  // Export test results as PDF
+  async exportTestResults(
+    conceptUuid: string,
+    testUuid: string,
+    format: string = 'pdf',
+  ): Promise<Blob> {
+    return this.get<Blob>(
+      endpoints.conceptTestResultsExport(conceptUuid, testUuid, format),
+      {
+        headers: {
+          Accept: 'application/pdf',
+        },
+        responseType: 'blob',
+      },
+    );
+  }
+
   // Test Assumptions endpoints
   async getTestAssumptions(
     conceptUuid: string,
@@ -344,5 +368,105 @@ export class TestingApi extends ApiService {
     return this.delete<void>(
       endpoints.conceptTestAssumption(conceptUuid, testUuid, assumptionUuid),
     );
+  }
+
+  // Execute synthetic test with real-time progress
+  async executeSyntheticTest(
+    conceptUuid: string,
+    testUuid: string,
+    data?: ISyntheticExecutionRequest,
+  ): Promise<ISyntheticExecutionStartResponse> {
+    return this.post(
+      endpoints.conceptTestSyntheticExecution(conceptUuid, testUuid),
+      data || {},
+    );
+  }
+
+  // Get synthetic execution status
+  async getSyntheticExecutionStatus(
+    conceptUuid: string,
+    testUuid: string,
+    executionId: string,
+  ): Promise<{
+    status: 'pending' | 'running' | 'completed' | 'error' | 'cancelled';
+    progress: number;
+    message: string;
+    resultsCount?: number;
+  }> {
+    return this.get(
+      endpoints.conceptTestSyntheticExecutionStatus(
+        conceptUuid,
+        testUuid,
+        executionId,
+      ),
+    );
+  }
+
+  // Cancel synthetic execution
+  async cancelSyntheticExecution(
+    conceptUuid: string,
+    testUuid: string,
+    executionId: string,
+  ): Promise<{
+    success: boolean;
+    executionId: string;
+    workflowExecutionUuid?: string;
+    message: string;
+    revokedTasks?: any;
+  }> {
+    return this.delete(
+      endpoints.conceptTestSyntheticExecutionCancel(
+        conceptUuid,
+        testUuid,
+        executionId,
+      ),
+    );
+  }
+
+  // Get synthetic execution history
+  async getSyntheticExecutionHistory(
+    conceptUuid: string,
+    testUuid: string,
+    limit: number = 10,
+  ): Promise<{
+    executions: Array<{
+      executionId: string;
+      conceptUuid: string;
+      testUuid: string;
+      workflowExecutionUuid: string;
+      status: string;
+      progress: number;
+      message: string;
+      startedAt?: string;
+      completedAt?: string;
+      resultsCount?: number;
+      durationSeconds?: number;
+      error?: any;
+    }>;
+    totalCount: number;
+  }> {
+    return this.get(
+      `${endpoints.conceptTestSyntheticExecutionHistory(conceptUuid, testUuid)}?limit=${limit}`,
+    );
+  }
+
+  // Get distribution preview for synthetic testing
+  async getDistributionPreview(
+    conceptUuid: string,
+    testUuid: string,
+    data: IDistributionPreviewRequest,
+  ): Promise<IDistributionPreview> {
+    return this.post(
+      endpoints.conceptTestDistributionPreview(conceptUuid, testUuid),
+      data,
+    );
+  }
+
+  // Get available test collaterals for synthetic testing
+  async getTestCollaterals(
+    conceptUuid: string,
+    testUuid: string,
+  ): Promise<ITestCollateralOption[]> {
+    return this.get(endpoints.conceptTestCollaterals(conceptUuid, testUuid));
   }
 }

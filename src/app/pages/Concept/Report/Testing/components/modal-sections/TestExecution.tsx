@@ -1,15 +1,84 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
+import { Icon, toast } from '@components';
 import { cn } from '@libs/utils/react';
+import api from '@libs/api';
+import { useSyntheticExecutionEvents } from '@hooks/sockets/testing';
+import {
+  useSyntheticExecutionStart,
+  useSyntheticExecutionCancel,
+} from '@hooks/query/synthetic-execution.hook';
+import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
+import SyntheticExecutionPanel from './SyntheticExecutionPanel';
 
-const TestExecution: React.FC = () => {
+interface TestExecutionProps {
+  conceptUuid?: string;
+  testUuid?: string;
+}
+
+const TestExecution: React.FC<TestExecutionProps> = ({
+  conceptUuid,
+  testUuid,
+}) => {
   const [selectedMode, setSelectedMode] = useState<string | null>(
     'facilitated',
   );
 
+  // WebSocket events for real-time execution
+  const { executionState, resetExecution, setExecutionId } =
+    useSyntheticExecutionEvents(
+      conceptUuid || '',
+      testUuid || '',
+      (resultsCount) => {
+        // Auto-switch to Results tab when completed
+        // TODO: This could be enhanced to trigger tab switch via parent component
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.log(`Execution completed with ${resultsCount} results`);
+        }
+      },
+    );
+
+  // Execution mutations
+  const startExecution = useSyntheticExecutionStart(
+    conceptUuid || '',
+    testUuid || '',
+  );
+  const cancelExecution = useSyntheticExecutionCancel(
+    conceptUuid || '',
+    testUuid || '',
+  );
+
+  // Handlers for real-time execution
+  const handleExecuteSynthetic = async (config: ISyntheticExecutionRequest) => {
+    if (!conceptUuid || !testUuid) {
+      toast.error('Missing test information. Please try again.');
+      return;
+    }
+
+    try {
+      resetExecution();
+      const result = await startExecution.mutateAsync(config);
+      setExecutionId(result.executionId);
+      // Execution started, WebSocket will handle progress updates
+    } catch (error) {
+      // Error is already handled by the mutation's onError callback
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('Failed to start execution:', error);
+      }
+    }
+  };
+
+  const handleCancelExecution = async () => {
+    if (executionState.executionId) {
+      await cancelExecution.mutateAsync(executionState.executionId);
+      resetExecution();
+    }
+  };
+
   return (
     <div className='space-y-6'>
-      {/* Execution Mode Selection - 2x2 Grid */}
+      {/* Test Mode Selection - 2x2 Grid */}
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {/* Facilitated Option */}
         <div
@@ -101,28 +170,71 @@ const TestExecution: React.FC = () => {
           </p>
         </div>
 
-        {/* Synthetic Option - Coming Soon */}
-        <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4 opacity-70'>
+        {/* Synthetic Option */}
+        <div
+          className={cn(
+            'cursor-pointer rounded-lg border p-4 transition-colors',
+            selectedMode === 'synthetic'
+              ? 'aucctus-border-brand-primary aucctus-bg-secondary-extra-subtle'
+              : 'aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-subtle',
+          )}
+          onClick={() => setSelectedMode('synthetic')}
+        >
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
               <Icon
                 variant='ai-conclusion'
-                className='aucctus-stroke-tertiary h-5 w-5'
+                className={cn(
+                  'h-5 w-5',
+                  selectedMode === 'synthetic'
+                    ? 'aucctus-stroke-brand-primary'
+                    : 'aucctus-stroke-tertiary',
+                )}
               />
-              <h4 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
+              <h4
+                className={cn(
+                  'aucctus-text-sm-semibold',
+                  selectedMode === 'synthetic'
+                    ? 'aucctus-text-brand-primary'
+                    : 'aucctus-text-brand-primary',
+                )}
+              >
                 Synthetic
               </h4>
             </div>
-            <span className='aucctus-bg-secondary-subtle aucctus-text-tertiary aucctus-border-secondary rounded-full border px-2 py-0.5 text-xs'>
-              Coming soon
-            </span>
+            {selectedMode === 'synthetic' && (
+              <Icon
+                variant='check'
+                className='aucctus-stroke-brand-primary h-5 w-5'
+              />
+            )}
           </div>
-          <p className='aucctus-text-sm-regular aucctus-text-tertiary'>
+          <p className='aucctus-text-sm-regular aucctus-text-secondary'>
             Simulate this test with AI-agents trained to behave like your target
             profiles
           </p>
         </div>
       </div>
+
+      {/* Synthetic Mode Actions */}
+      {selectedMode === 'synthetic' && (
+        <div className='space-y-4'>
+          {/* Real-time Execution Panel */}
+          <SyntheticExecutionPanel
+            status={executionState.status}
+            progress={executionState.progress}
+            message={executionState.message}
+            currentPersona={executionState.currentPersona}
+            totalPersonas={executionState.totalPersonas}
+            resultsCount={executionState.resultsCount}
+            error={executionState.error}
+            onCancel={handleCancelExecution}
+            conceptUuid={conceptUuid || ''}
+            testUuid={testUuid || ''}
+            onExecute={handleExecuteSynthetic}
+          />
+        </div>
+      )}
 
       {/* Information Section */}
       <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-6'>

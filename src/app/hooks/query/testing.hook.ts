@@ -863,6 +863,45 @@ export const useDeleteTestResult = () => {
 };
 
 /**
+ * Custom hook for deleting a test result without showing individual toast notifications.
+ * Useful for bulk operations where you want to show one final toast instead of multiple.
+ * @returns The result of the useMutation hook.
+ */
+export const useDeleteTestResultSilent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      testUuid: string;
+      resultUuid: string;
+    }) => {
+      const { conceptUuid, testUuid, resultUuid } = params;
+      return await api.testing.deleteTestResult(
+        conceptUuid,
+        testUuid,
+        resultUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testResults,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      // No toast notification for silent deletion
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      // Still show error toasts since those are important
+      toast.error(message || 'Failed to delete result. Please try again.');
+    },
+  });
+};
+
+/**
  * Custom hook for deleting test result files.
  * @returns The result of the useMutation hook.
  */

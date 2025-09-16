@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { Icon, FileDropzone, toast } from '@components';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import telemetry from '@libs/telemetry';
 import { cn } from '@libs/utils/react';
+import api from '@libs/api';
 import {
   useTestResults,
   useCreateTestResultWithFiles,
   useDeleteTestResult,
+  useDeleteTestResultSilent,
   useDeleteTestResultFile,
   useUpdateTestResult,
 } from '@hooks/query/testing.hook';
@@ -53,6 +56,9 @@ const TestResults: React.FC<TestResultsProps> = ({
   // Hook for deleting test results
   const deleteTestResult = useDeleteTestResult();
 
+  // Hook for deleting test results without individual toasts (for bulk operations)
+  const deleteTestResultSilent = useDeleteTestResultSilent();
+
   // Hook for deleting individual test result files
   const deleteTestResultFile = useDeleteTestResultFile();
 
@@ -62,8 +68,23 @@ const TestResults: React.FC<TestResultsProps> = ({
   // Query client for invalidating cache
   const queryClient = useQueryClient();
 
+  // Local confirmation dialog state
+  const [confirmationDialog, setConfirmationDialog] = useState<{
+    isOpen: boolean;
+    type: 'deleteResult' | 'deleteFile' | 'deleteAll';
+    title: string;
+    message: string;
+    onConfirm: () => Promise<void>;
+  } | null>(null);
+
   // State to trigger dropzone reset
   const [dropzoneKey, setDropzoneKey] = useState(0);
+
+  // State for bulk delete operation
+  const [isDeletingAll, setIsDeletingAll] = useState(false);
+
+  // State for download operation
+  const [isDownloading, setIsDownloading] = useState(false);
 
   // Test result processing state
   const [processingState, setProcessingState] =
@@ -425,26 +446,27 @@ const TestResults: React.FC<TestResultsProps> = ({
       return;
     }
 
-    // Confirm deletion
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${resultTitle}"? This action cannot be undone.`,
-    );
+    // Show local confirmation dialog
+    setConfirmationDialog({
+      isOpen: true,
+      type: 'deleteResult',
+      title: 'Delete Test Result',
+      message: `Are you sure you want to delete "${resultTitle}"? This action cannot be undone.`,
+      onConfirm: async () => {
+        try {
+          await deleteTestResult.mutateAsync({
+            conceptUuid,
+            testUuid,
+            resultUuid,
+          });
 
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await deleteTestResult.mutateAsync({
-        conceptUuid,
-        testUuid,
-        resultUuid,
-      });
-
-      // The query will be invalidated and refetch the updated results
-    } catch (error) {
-      // The hook already shows a toast error message
-    }
+          // The query will be invalidated and refetch the updated results
+        } catch (error) {
+          // The hook already shows a toast error message
+        }
+        setConfirmationDialog(null);
+      },
+    });
   };
 
   // Handle delete individual file
@@ -458,27 +480,28 @@ const TestResults: React.FC<TestResultsProps> = ({
       return;
     }
 
-    // Confirm deletion
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${fileName}"? This action cannot be undone.`,
-    );
+    // Show local confirmation dialog
+    setConfirmationDialog({
+      isOpen: true,
+      type: 'deleteFile',
+      title: 'Delete File',
+      message: `Are you sure you want to delete "${fileName}"? This action cannot be undone.`,
+      onConfirm: async () => {
+        try {
+          await deleteTestResultFile.mutateAsync({
+            conceptUuid,
+            testUuid,
+            resultUuid,
+            fileUuid,
+          });
 
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      await deleteTestResultFile.mutateAsync({
-        conceptUuid,
-        testUuid,
-        resultUuid,
-        fileUuid,
-      });
-
-      // The query will be invalidated and refetch the updated results
-    } catch (error) {
-      // The hook already shows a toast error message
-    }
+          // The query will be invalidated and refetch the updated results
+        } catch (error) {
+          // The hook already shows a toast error message
+        }
+        setConfirmationDialog(null);
+      },
+    });
   };
 
   if (isResultsLoading) {
@@ -499,7 +522,6 @@ const TestResults: React.FC<TestResultsProps> = ({
 
   // Show no data state if no results from API
   const hasResults = results && results.length > 0;
-  const allFiles = results.flatMap((result) => result.files);
 
   // Determine processing completion status
   const isProcessingComplete =
@@ -508,6 +530,89 @@ const TestResults: React.FC<TestResultsProps> = ({
 
   // Allow deletions only if not in view mode and processing is complete
   const canDelete = !isViewMode && isProcessingComplete;
+
+  // Handle bulk delete of all test results
+  const handleDeleteAll = async () => {
+    if (!conceptUuid || !testUuid || results.length === 0) return;
+
+    // Show local confirmation dialog
+    setConfirmationDialog({
+      isOpen: true,
+      type: 'deleteAll',
+      title: 'Delete All Test Results',
+      message: `Are you sure you want to delete all ${results.length} test results? This action cannot be undone.`,
+      onConfirm: async () => {
+        try {
+          setIsDeletingAll(true);
+
+          // Delete all test results sequentially using silent version to avoid multiple toasts
+          for (const result of results) {
+            await deleteTestResultSilent.mutateAsync({
+              conceptUuid,
+              testUuid,
+              resultUuid: result.uuid,
+            });
+          }
+
+          toast.success(
+            `Successfully deleted all ${results.length} test results`,
+          );
+        } catch (error) {
+          console.error('Error deleting all results:', error);
+          toast.error('Failed to delete some results. Please try again.');
+        } finally {
+          setIsDeletingAll(false);
+        }
+        setConfirmationDialog(null);
+      },
+    });
+  };
+
+  // Handle download of synthetic test results as CSV
+  const handleDownloadResults = async () => {
+    if (!conceptUuid || !testUuid) {
+      toast.error('Missing test information. Please try again.');
+      return;
+    }
+
+    try {
+      setIsDownloading(true);
+
+      // Filter only synthetic results for CSV export
+      const syntheticResults = results.filter((result) => result.isSynthetic);
+
+      if (syntheticResults.length === 0) {
+        toast.error('No synthetic test results found to download.');
+        return;
+      }
+
+      // Call the backend export API
+      const blob = await api.testing.exportTestResults(
+        conceptUuid,
+        testUuid,
+        'pdf',
+      );
+
+      // Create download link
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `synthetic_customer_interviews_${testUuid}_${new Date().toISOString().split('T')[0]}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+
+      toast.success(
+        `Downloaded ${syntheticResults.length} synthetic test results as PDF`,
+      );
+    } catch (error) {
+      console.error('Error downloading results:', error);
+      toast.error('Failed to download test results. Please try again.');
+    } finally {
+      setIsDownloading(false);
+    }
+  };
 
   return (
     <div className='relative space-y-4'>
@@ -576,9 +681,36 @@ const TestResults: React.FC<TestResultsProps> = ({
         <div className='space-y-6'>
           <div className='flex items-center justify-between'>
             <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
-              Test Results ({allFiles.length} files)
+              Test Results ({results.length} results)
             </h4>
             <div className='flex items-center gap-2'>
+              {/* Download Button for Synthetic Results */}
+              {results.some((result) => result.isSynthetic) && (
+                <button
+                  className='btn btn-light btn-sm flex items-center gap-2'
+                  onClick={handleDownloadResults}
+                  disabled={isDownloading}
+                >
+                  <Icon
+                    variant='download'
+                    className='aucctus-stroke-secondary h-4 w-4'
+                  />
+                  {isDownloading ? 'Downloading...' : 'Download PDF'}
+                </button>
+              )}
+              {canDelete && results.length > 0 && (
+                <button
+                  className='btn btn-danger btn-sm flex items-center gap-2'
+                  onClick={handleDeleteAll}
+                  disabled={isDeletingAll}
+                >
+                  <Icon
+                    variant='trash'
+                    className='aucctus-stroke-white h-4 w-4'
+                  />
+                  {isDeletingAll ? 'Deleting...' : 'Delete All'}
+                </button>
+              )}
               <Icon
                 variant={isProcessingComplete ? 'check' : 'refresh'}
                 className={cn(
@@ -617,35 +749,45 @@ const TestResults: React.FC<TestResultsProps> = ({
                 key={result.uuid}
                 className='aucctus-border-secondary aucctus-bg-primary rounded-lg border transition-all hover:shadow-sm'
               >
-                {/* File Header */}
-                <div className='aucctus-bg-secondary-subtle aucctus-border-secondary border-b px-4 py-3'>
+                {/* File Header - Minimal */}
+                <div className='px-4 py-3'>
                   <div className='flex items-center justify-between'>
-                    <div className='flex items-center gap-3'>
+                    <div className='flex items-center gap-2'>
                       <Icon
-                        variant='pdf'
-                        className='aucctus-fill-brand-primary h-6 w-6'
+                        variant={result.isSynthetic ? 'ai-conclusion' : 'pdf'}
+                        className={cn(
+                          'h-5 w-5',
+                          result.isSynthetic
+                            ? 'aucctus-stroke-brand-primary'
+                            : 'aucctus-fill-brand-primary',
+                        )}
                       />
                       <div className='min-w-0 flex-1'>
-                        <h5 className='aucctus-text-md-semibold aucctus-text-brand-primary truncate'>
+                        <h5 className='aucctus-text-sm-semibold aucctus-text-primary truncate'>
                           {result.title}
                         </h5>
+                        {result.isSynthetic && result.personaName && (
+                          <p className='aucctus-text-xs aucctus-text-secondary'>
+                            {result.personaName}
+                          </p>
+                        )}
                       </div>
                     </div>
 
                     {/* Action Buttons */}
                     <div className='flex items-center gap-2'>
-                      {canDelete && ( // Hide delete button in view mode
+                      {canDelete && (
                         <button
                           onClick={() =>
                             handleDeleteResult(result.uuid, result.title)
                           }
-                          className='btn btn-secondary btn-xs flex items-center gap-1'
+                          className='aucctus-bg-secondary-hover rounded p-1'
                           disabled={deleteTestResult.isLoading}
                           title='Delete file'
                         >
                           <Icon
                             variant='trash'
-                            className='aucctus-stroke-secondary h-3 w-3'
+                            className='aucctus-stroke-secondary h-4 w-4'
                           />
                         </button>
                       )}
@@ -654,114 +796,242 @@ const TestResults: React.FC<TestResultsProps> = ({
                 </div>
 
                 {/* File Content */}
-                {result.files.map((file) => (
-                  <div className='p-4' key={file.uuid}>
-                    {/* Description if available */}
-                    {file.originalFilename && (
-                      <div className='mb-3'>
-                        <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-                          {file.originalFilename}
-                        </p>
+                {result.isSynthetic ? (
+                  // Synthetic interview content with structured sections
+                  <div className='px-4 pb-4'>
+                    {result.description && (
+                      <div className='mb-4'>
+                        <h6 className='aucctus-text-sm-semibold aucctus-text-primary mb-2'>
+                          Interview Content
+                        </h6>
+                        <div className='aucctus-bg-secondary-subtle rounded-md p-3'>
+                          <pre className='aucctus-text-sm aucctus-text-secondary whitespace-pre-wrap font-sans'>
+                            {result.description}
+                          </pre>
+                        </div>
                       </div>
                     )}
 
-                    {/* Metadata in compact grid */}
-                    <div className='grid grid-cols-2 gap-3 text-xs'>
-                      <div className='flex items-center gap-2'>
-                        <Icon
-                          variant='filecode'
-                          className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0'
-                        />
+                    {/* Structured Synthetic Interview Sections */}
+                    <div className='space-y-4'>
+                      {result.keyInsights && (
                         <div>
-                          <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
-                            Size
-                          </p>
-                          <p className='aucctus-text-xs-semibold aucctus-text-brand-primary'>
-                            {formatFileSize(file.fileSize)}
-                          </p>
+                          <h6 className='aucctus-text-sm-semibold aucctus-text-primary mb-2 flex items-center gap-2'>
+                            <Icon
+                              variant='lightbulb'
+                              className='aucctus-stroke-brand-primary h-4 w-4'
+                            />
+                            Key Insights
+                          </h6>
+                          <div className='aucctus-bg-secondary-subtle rounded-md p-3'>
+                            <p className='aucctus-text-sm aucctus-text-secondary'>
+                              {result.keyInsights}
+                            </p>
+                          </div>
                         </div>
-                      </div>
+                      )}
 
-                      <div className='flex items-center gap-2'>
-                        <Icon
-                          variant='calendar'
-                          className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0'
-                        />
+                      {result.painPoints && (
                         <div>
-                          <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
-                            Uploaded
-                          </p>
-                          <p className='aucctus-text-xs-semibold aucctus-text-brand-primary'>
-                            {formatDate(file.createdAt)}
-                          </p>
+                          <h6 className='aucctus-text-sm-semibold aucctus-text-primary mb-2 flex items-center gap-2'>
+                            <Icon
+                              variant='alert-triangle'
+                              className='aucctus-stroke-brand-primary h-4 w-4'
+                            />
+                            Pain Points
+                          </h6>
+                          <div className='aucctus-bg-secondary-subtle rounded-md p-3'>
+                            <p className='aucctus-text-sm aucctus-text-secondary'>
+                              {result.painPoints}
+                            </p>
+                          </div>
                         </div>
-                      </div>
-                    </div>
+                      )}
 
-                    {/* Status indicator */}
-                    <div className='mt-3 flex items-center justify-between'>
-                      <div className='flex items-center gap-2'>
-                        <Icon
-                          variant={isProcessingComplete ? 'check' : 'refresh'}
-                          className={cn(
-                            'h-3 w-3',
-                            isProcessingComplete
-                              ? 'aucctus-stroke-success-primary'
-                              : 'aucctus-stroke-brand-primary animate-spin',
-                          )}
-                        />
-                        <span
-                          className={cn(
-                            'rounded px-2 py-0.5 text-xs font-medium',
-                            isProcessingComplete
-                              ? 'aucctus-bg-success-secondary aucctus-text-success-primary'
-                              : 'aucctus-bg-brand-secondary aucctus-text-brand-primary',
-                          )}
-                        >
-                          {isProcessingComplete ? 'Processed' : 'Processing...'}
-                        </span>
-                      </div>
-                      <div className='flex items-center gap-2'>
-                        <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
-                          {file.fileExtension.toUpperCase()}
-                        </p>
-                        {file.fileUrl && (
-                          <a
-                            href={file.fileUrl}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='btn btn-primary btn-xs flex items-center gap-1'
-                            title='Download file'
-                          >
+                      {result.solutionFeedback && (
+                        <div>
+                          <h6 className='aucctus-text-sm-semibold aucctus-text-primary mb-2 flex items-center gap-2'>
                             <Icon
-                              variant='download'
-                              className='aucctus-stroke-white h-3 w-3'
+                              variant='message-circle'
+                              className='aucctus-stroke-brand-primary h-4 w-4'
                             />
-                          </a>
-                        )}
-                        {canDelete && ( // Hide delete button in view mode
-                          <button
-                            onClick={() =>
-                              handleDeleteFile(
-                                result.uuid,
-                                file.uuid,
-                                file.originalFilename || 'file',
-                              )
-                            }
-                            className='btn btn-secondary btn-xs flex items-center gap-1'
-                            disabled={deleteTestResultFile.isLoading}
-                            title='Delete file'
-                          >
+                            Solution Feedback
+                          </h6>
+                          <div className='aucctus-bg-secondary-subtle rounded-md p-3'>
+                            <p className='aucctus-text-sm aucctus-text-secondary'>
+                              {result.solutionFeedback}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {result.willingnessToPayFeedback && (
+                        <div>
+                          <h6 className='aucctus-text-sm-semibold aucctus-text-primary mb-2 flex items-center gap-2'>
                             <Icon
-                              variant='trash'
-                              className='aucctus-stroke-secondary h-3 w-3'
+                              variant='currency-dollar'
+                              className='aucctus-stroke-brand-primary h-4 w-4'
                             />
-                          </button>
+                            Willingness to Pay
+                          </h6>
+                          <div className='aucctus-bg-secondary-subtle rounded-md p-3'>
+                            <p className='aucctus-text-sm aucctus-text-secondary'>
+                              {result.willingnessToPayFeedback}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {result.overallSentiment && (
+                        <div>
+                          <h6 className='aucctus-text-sm-semibold aucctus-text-primary mb-2 flex items-center gap-2'>
+                            <Icon
+                              variant='heart'
+                              className='aucctus-stroke-brand-primary h-4 w-4'
+                            />
+                            Overall Sentiment
+                          </h6>
+                          <div className='aucctus-bg-secondary-subtle rounded-md p-3'>
+                            <p className='aucctus-text-sm aucctus-text-secondary'>
+                              {result.overallSentiment}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Fallback to summary if structured fields are not available */}
+                      {!result.keyInsights &&
+                        !result.painPoints &&
+                        !result.solutionFeedback &&
+                        !result.willingnessToPayFeedback &&
+                        !result.overallSentiment &&
+                        result.summary && (
+                          <div>
+                            <h6 className='aucctus-text-sm-semibold aucctus-text-primary mb-2'>
+                              Summary
+                            </h6>
+                            <div className='aucctus-bg-secondary-subtle rounded-md p-3'>
+                              <p className='aucctus-text-sm aucctus-text-secondary'>
+                                {result.summary}
+                              </p>
+                            </div>
+                          </div>
                         )}
-                      </div>
                     </div>
                   </div>
-                ))}
+                ) : (
+                  // Regular file content
+                  result.files.map((file) => (
+                    <div className='p-4' key={file.uuid}>
+                      {/* Description if available */}
+                      {file.originalFilename && (
+                        <div className='mb-3'>
+                          <p className='aucctus-text-sm-regular aucctus-text-secondary'>
+                            {file.originalFilename}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Metadata in compact grid */}
+                      <div className='grid grid-cols-2 gap-3 text-xs'>
+                        <div className='flex items-center gap-2'>
+                          <Icon
+                            variant='filecode'
+                            className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0'
+                          />
+                          <div>
+                            <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                              Size
+                            </p>
+                            <p className='aucctus-text-xs-semibold aucctus-text-brand-primary'>
+                              {formatFileSize(file.fileSize)}
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className='flex items-center gap-2'>
+                          <Icon
+                            variant='calendar'
+                            className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0'
+                          />
+                          <div>
+                            <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                              Uploaded
+                            </p>
+                            <p className='aucctus-text-xs-semibold aucctus-text-brand-primary'>
+                              {formatDate(file.createdAt)}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Status indicator */}
+                      <div className='mt-3 flex items-center justify-between'>
+                        <div className='flex items-center gap-2'>
+                          <Icon
+                            variant={isProcessingComplete ? 'check' : 'refresh'}
+                            className={cn(
+                              'h-3 w-3',
+                              isProcessingComplete
+                                ? 'aucctus-stroke-success-primary'
+                                : 'aucctus-stroke-brand-primary animate-spin',
+                            )}
+                          />
+                          <span
+                            className={cn(
+                              'rounded px-2 py-0.5 text-xs font-medium',
+                              isProcessingComplete
+                                ? 'aucctus-bg-success-secondary aucctus-text-success-primary'
+                                : 'aucctus-bg-brand-secondary aucctus-text-brand-primary',
+                            )}
+                          >
+                            {isProcessingComplete
+                              ? 'Processed'
+                              : 'Processing...'}
+                          </span>
+                        </div>
+                        <div className='flex items-center gap-2'>
+                          <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
+                            {file.fileExtension.toUpperCase()}
+                          </p>
+                          {file.fileUrl && (
+                            <a
+                              href={file.fileUrl}
+                              target='_blank'
+                              rel='noopener noreferrer'
+                              className='btn btn-primary btn-xs flex items-center gap-1'
+                              title='Download file'
+                            >
+                              <Icon
+                                variant='download'
+                                className='aucctus-stroke-white h-3 w-3'
+                              />
+                            </a>
+                          )}
+                          {canDelete && ( // Hide delete button in view mode
+                            <button
+                              onClick={() =>
+                                handleDeleteFile(
+                                  result.uuid,
+                                  file.uuid,
+                                  file.originalFilename || 'file',
+                                )
+                              }
+                              className='btn btn-secondary btn-xs flex items-center gap-1'
+                              disabled={deleteTestResultFile.isLoading}
+                              title='Delete file'
+                            >
+                              <Icon
+                                variant='trash'
+                                className='aucctus-stroke-secondary h-3 w-3'
+                              />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
               </div>
             ))}
           </div>
@@ -831,6 +1101,51 @@ const TestResults: React.FC<TestResultsProps> = ({
             )}
         </div>
       )}
+
+      {/* Local Confirmation Dialog - Use Portal for full screen coverage */}
+      {confirmationDialog &&
+        typeof document !== 'undefined' &&
+        document.body &&
+        createPortal(
+          <div className='fixed inset-0 z-50 flex items-center justify-center'>
+            {/* Backdrop */}
+            <div
+              className='aucctus-bg-secondary-solid absolute inset-0 bg-opacity-50'
+              onClick={() => setConfirmationDialog(null)}
+            />
+
+            {/* Dialog */}
+            <div className='aucctus-bg-primary aucctus-border-secondary relative max-w-md rounded-lg border p-6 shadow-lg'>
+              <h3 className='aucctus-text-lg-semibold aucctus-text-primary mb-2'>
+                {confirmationDialog.title}
+              </h3>
+              <p className='aucctus-text-sm aucctus-text-secondary mb-6'>
+                {confirmationDialog.message}
+              </p>
+
+              <div className='flex justify-end gap-3'>
+                <button
+                  className='btn btn-light btn-sm'
+                  onClick={() => setConfirmationDialog(null)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className='btn btn-danger btn-sm'
+                  onClick={confirmationDialog.onConfirm}
+                  disabled={isDeletingAll}
+                >
+                  {confirmationDialog.type === 'deleteAll' && isDeletingAll
+                    ? 'Deleting...'
+                    : confirmationDialog.type === 'deleteAll'
+                      ? 'Delete All'
+                      : 'Delete'}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 };

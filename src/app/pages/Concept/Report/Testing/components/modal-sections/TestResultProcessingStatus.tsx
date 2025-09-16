@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import telemetry from '@libs/telemetry';
@@ -54,15 +54,29 @@ const TestResultProcessingStatus: React.FC<TestResultProcessingStatusProps> = ({
   processingState,
   className,
 }) => {
-  // Debug logging
-  telemetry.log('[TestResultProcessingStatus] State:', {
-    isProcessing: processingState.isProcessing,
-    stage: processingState.stage,
-    message: processingState.message,
-    progress: processingState.progress,
-    error: processingState.error,
-    testResultUuid: processingState.testResultUuid,
-  });
+  const prevStateRef = useRef(processingState);
+
+  // Debug logging - only log when state actually changes
+  useEffect(() => {
+    const prevState = prevStateRef.current;
+    const hasChanged =
+      prevState.isProcessing !== processingState.isProcessing ||
+      prevState.stage !== processingState.stage ||
+      prevState.progress !== processingState.progress ||
+      prevState.error !== processingState.error;
+
+    if (hasChanged) {
+      telemetry.log('[TestResultProcessingStatus] State:', {
+        isProcessing: processingState.isProcessing,
+        stage: processingState.stage,
+        message: processingState.message,
+        progress: processingState.progress,
+        error: processingState.error,
+        testResultUuid: processingState.testResultUuid,
+      });
+      prevStateRef.current = processingState;
+    }
+  }, [processingState]);
 
   if (
     !processingState.isProcessing &&
@@ -70,9 +84,6 @@ const TestResultProcessingStatus: React.FC<TestResultProcessingStatusProps> = ({
     !processingState.stage &&
     processingState.progress === 0
   ) {
-    telemetry.log(
-      '[TestResultProcessingStatus] Hiding component - no processing activity',
-    );
     return null;
   }
 
@@ -82,9 +93,6 @@ const TestResultProcessingStatus: React.FC<TestResultProcessingStatusProps> = ({
     !processingState.isProcessing &&
     processingState.stage !== 'completed'
   ) {
-    telemetry.log(
-      '[TestResultProcessingStatus] Hiding component - no test result context',
-    );
     return null;
   }
 
