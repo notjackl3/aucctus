@@ -12,6 +12,7 @@ interface ImportMetaEnv {
   readonly VITE_AUTH_CLIENT_ID: string;
   readonly VITE_AUTH_REDIRECT_URL: string;
   readonly VITE_CLERK_PUBLISHABLE_KEY: string;
+  readonly VITE_HOTJAR_ID: string;
 }
 
 interface ImportMeta {
