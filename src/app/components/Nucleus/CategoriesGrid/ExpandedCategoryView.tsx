@@ -1,6 +1,5 @@
 import { Icon, ToggleSwitch, Modal } from '@components';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
-import SourceBadgeList from '@pages/Concept/Report/MarketScan/v3/components/SourceBadgeList';
 import React, { useCallback, useMemo, useState } from 'react';
 import { cn } from '@libs/utils/react';
 import { expandedCategoryViewUIText } from './expandedCategoryViewFixtures';
@@ -205,6 +204,40 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
 
   const selectedQuestionData = questions.find(
     (q) => q.uuid === selectedQuestion,
+  );
+
+  // Calculate category metrics similar to CategoryCard
+  const calculateCategoryMetrics = useCallback(() => {
+    const questionsWithAnswers = questions.filter(
+      (q) => q.answers && q.answers.length > 0,
+    );
+    const allDataPoints = questions
+      .flatMap((q) => q.answers || [])
+      .filter((answer) => !answer.isAiReasoning);
+    const allSources = allDataPoints.flatMap((answer) => answer.sources || []);
+    const uniqueSources = new Set(
+      allSources
+        .filter((source) => source.url?.toUpperCase().trim() !== 'AI REASONING')
+        .filter((source) => source.url)
+        .map((source) => source.url?.trim()),
+    );
+
+    // Use section.hoursSaved if available, otherwise calculate estimate
+    const hoursSaved =
+      section?.hoursSaved || Math.round(questionsWithAnswers.length * 2.5);
+
+    return {
+      totalQuestions: questions.length,
+      answeredQuestions: questionsWithAnswers.length,
+      dataPoints: allDataPoints.length,
+      uniqueSources: uniqueSources.size,
+      hoursSaved: hoursSaved,
+    };
+  }, [questions, section]);
+
+  const categoryMetrics = useMemo(
+    () => calculateCategoryMetrics(),
+    [calculateCategoryMetrics],
   );
 
   return (
@@ -413,11 +446,48 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
         </div>
       </div>
 
-      {/* Source Metrics at Bottom */}
+      {/* Category Metrics at Bottom */}
       <div className='aucctus-border-primary aucctus-bg-tertiary border-t p-4'>
-        {(() => {
-          return <SourceBadgeList sources={[]} />;
-        })()}
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center gap-6'>
+            <div className='flex items-center gap-2'>
+              <Icon
+                variant='check-circle-broken'
+                className='aucctus-stroke-success-primary h-4 w-4'
+              />
+              <span className='aucctus-text-sm aucctus-text-secondary font-medium'>
+                {categoryMetrics.answeredQuestions} answered
+              </span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <Icon
+                variant='globe'
+                className='aucctus-stroke-tertiary h-4 w-4'
+              />
+              <span className='aucctus-text-sm aucctus-text-secondary font-medium'>
+                {categoryMetrics.uniqueSources} sources
+              </span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <Icon
+                variant='dataflow-04'
+                className='aucctus-stroke-tertiary h-4 w-4'
+              />
+              <span className='aucctus-text-sm aucctus-text-secondary font-medium'>
+                {categoryMetrics.dataPoints} data points
+              </span>
+            </div>
+            <div className='flex items-center gap-2'>
+              <Icon
+                variant='clock-fast-forward'
+                className='aucctus-stroke-brand-primary h-4 w-4'
+              />
+              <span className='aucctus-text-sm aucctus-text-brand-primary font-semibold'>
+                {categoryMetrics.hoursSaved}h saved
+              </span>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Loading overlay for question operations */}

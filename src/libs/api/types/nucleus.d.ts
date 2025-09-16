@@ -66,6 +66,7 @@ export interface NucleusReportSection {
   questions: NucleusReportQuestion[];
   assessmentStatus?: AssessmentStatus;
   includeDeepResearchContext: boolean;
+  hoursSaved: number;
   createdAt: string;
   updatedAt: string;
 }

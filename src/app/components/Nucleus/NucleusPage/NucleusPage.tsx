@@ -6,7 +6,6 @@ import {
   NucleusReportSection,
   NucleusReportQuestion,
   NucleusReportAnswer,
-  ProcessingStatus,
   AssessmentStatus,
   SectionType,
 } from '@libs/api/types';
@@ -20,36 +19,7 @@ import {
 } from '../../../hooks/query/nucleusCrud.hook';
 import LoadingMask from '../../Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { animationStyles } from '../../Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
-
-interface StatusIndicatorProps {
-  status: ProcessingStatus;
-}
-
-const StatusIndicator: React.FC<StatusIndicatorProps> = ({ status }) => {
-  return (
-    <div className='relative'>
-      <div
-        className={cn('h-1.5 w-1.5 animate-pulse rounded-full', {
-          'aucctus-bg-success-solid-alt': status === 'completed',
-          'aucctus-bg-secondary':
-            status === 'processing' || status === 'pending',
-          'aucctus-bg-error-solid': status === 'failed',
-        })}
-      ></div>
-      <div
-        className={cn(
-          'absolute inset-0 h-1.5 w-1.5 animate-ping rounded-full opacity-75',
-          {
-            'aucctus-bg-success-solid-alt': status === 'completed',
-            'aucctus-bg-secondary':
-              status === 'processing' || status === 'pending',
-            'aucctus-bg-error-solid': status === 'failed',
-          },
-        )}
-      ></div>
-    </div>
-  );
-};
+import StatusBadge from '../StatusBadge';
 
 const NucleusPage: React.FC = () => {
   // Fetch real nucleus data
@@ -493,20 +463,7 @@ const NucleusPage: React.FC = () => {
 
           {/* Header Content */}
           <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-12'>
-            <div className='mb-4'>
-              <div className='aucctus-border-success relative inline-flex items-center gap-1.5 rounded-full border px-3 py-1 shadow-lg backdrop-blur-md'>
-                <StatusIndicator status={nucleusReport.processingStatus} />
-                <span className='aucctus-text-xs-medium tracking-wide text-white'>
-                  {nucleusReport.processingStatus === 'completed'
-                    ? 'Report Complete'
-                    : nucleusReport.processingStatus === 'processing'
-                      ? 'Processing Report'
-                      : nucleusReport.processingStatus === 'pending'
-                        ? 'Report Pending'
-                        : 'Report Failed'}
-                </span>
-              </div>
-            </div>
+            <StatusBadge status={nucleusReport.processingStatus} />
 
             {/* Company Name */}
             <h1 className='aucctus-header-2xl-bold mb-4 text-center tracking-tight text-white drop-shadow-xl'>
@@ -575,8 +532,17 @@ const NucleusPage: React.FC = () => {
         <div className='relative'>
           <div className='absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 transform'>
             <div className='aucctus-border-primary rounded-lg border bg-white px-1 py-1 shadow-sm backdrop-blur-sm'>
-              <div className='aucctus-text-sm-medium btn btn-bold btn-primary rounded-md px-3 py-1.5'>
-                Categories
+              <div className='flex gap-2'>
+                <div className='aucctus-text-sm-medium btn btn-bold btn-primary rounded-md px-3 py-1.5'>
+                  Categories
+                </div>
+                <div className='aucctus-text-sm-medium btn btn-disabled flex items-center rounded-md px-3 py-1.5'>
+                  <Icon
+                    variant='lock'
+                    className='aucctus-fill-disabled aucctus-stroke-disabled h-4 w-4'
+                  />
+                  AI Insights
+                </div>
               </div>
             </div>
           </div>

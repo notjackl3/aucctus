@@ -10,7 +10,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
   category,
   isExpanded,
   questions,
-  answeredQuestions,
   onToggleExpand,
   getCategoryStateInfo,
   handleSectionStatusChange,
@@ -151,13 +150,18 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
       (q) => q.priority === 'P1' || q.priority === 'P2',
     );
 
+    // Use section.hoursSaved if available, otherwise calculate estimate
+    const hoursSaved =
+      category.hoursSaved ||
+      Math.round(Math.max(questionsWithAnswers.length * 0.25, 1));
+
     return {
       totalQuestions: questions.length,
       answeredQuestions: questionsWithAnswers.length,
       dataPoints: allDataPoints.length,
       uniqueSources: uniqueSources.size,
       deeperQuestions: deeperQuestions.length,
-      equivalentHours: Math.round(questionsWithAnswers.length * 2.5), // Estimate: 2.5 hours per answered question
+      hoursSaved: hoursSaved,
     };
   };
   return (
@@ -172,7 +176,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         className={cn(
           'aucctus-bg-primary aucctus-border-primary rounded-lg border shadow-sm transition-shadow duration-200 hover:shadow-md',
           {
-            'min-h-80': !isExpanded,
             'overflow-hidden':
               !activeDropdown ||
               (!activeDropdown.includes(
@@ -396,6 +399,25 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                               </span>
                             </div>
                           </ComponentTooltip>
+
+                          <ComponentTooltip
+                            tip={
+                              <StatusTooltip
+                                text={'Hours saved through research automation'}
+                              />
+                            }
+                            hideDelay={0}
+                          >
+                            <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-2 py-1 transition-colors'>
+                              <Icon
+                                variant='clock-fast-forward'
+                                className='aucctus-stroke-tertiary h-4 w-4'
+                              />
+                              <span className='aucctus-text-tertiary font-medium'>
+                                {categoryMetrics.hoursSaved}h
+                              </span>
+                            </div>
+                          </ComponentTooltip>
                         </div>
                       </>
                     );
@@ -472,25 +494,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
               <p className='aucctus-text-sm aucctus-text-secondary -mt-1 mb-4 leading-relaxed'>
                 {genericInfo.description}
               </p>
-
-              {/* AI Summary - only shown when collapsed and has answers */}
-              {answeredQuestions > 0 && (
-                <div className='aucctus-bg-brand-primary aucctus-border-brand mb-4 rounded-lg border p-3'>
-                  <div className='mb-2 flex items-center gap-2'>
-                    <Icon
-                      variant='star-01'
-                      className='aucctus-stroke-brand-primary h-4 w-4'
-                    />
-                    <span className='aucctus-text-xs aucctus-text-brand-primary font-semibold uppercase tracking-wide'>
-                      AI Executive Summary
-                    </span>
-                  </div>
-                  <p className='aucctus-text-sm aucctus-text-secondary leading-relaxed'>
-                    AI summary will be generated based on answered questions in
-                    this category.
-                  </p>
-                </div>
-              )}
 
               {/* Status Bar at Bottom */}
               <div className='aucctus-border-primary mt-4 border-t pt-3'>
@@ -623,6 +626,27 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                                 />
                                 <span className='aucctus-text-tertiary font-medium'>
                                   {categoryMetrics.dataPoints}
+                                </span>
+                              </div>
+                            </ComponentTooltip>
+
+                            <ComponentTooltip
+                              tip={
+                                <StatusTooltip
+                                  text={
+                                    'Hours saved through research automation'
+                                  }
+                                />
+                              }
+                              hideDelay={0}
+                            >
+                              <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors'>
+                                <Icon
+                                  variant='clock-fast-forward'
+                                  className='aucctus-stroke-tertiary h-4 w-4'
+                                />
+                                <span className='aucctus-text-tertiary font-medium'>
+                                  {categoryMetrics.hoursSaved}h
                                 </span>
                               </div>
                             </ComponentTooltip>
