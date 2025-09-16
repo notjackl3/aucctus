@@ -1,3 +1,4 @@
+import MarketSizeCard from './MarketSizeCard';
 import InfoSectionCard from './InfoSectionCard';
 import BusinessModelCard from './BusinessModelCard';
 import CustomerProfilesCard from './CustomerProfilesCard';
@@ -14,6 +15,7 @@ const ConceptOverview = {
   EcosystemCard,
   BusinessModelCard,
   InfoSectionCard,
+  MarketSizeCard,
 };
 
 export default ConceptOverview;

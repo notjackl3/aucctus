@@ -9,12 +9,13 @@ import {
 } from './fixtures';
 
 import images from '@assets/img';
-import BusinessModelCard from './BusinessModelCard';
-import CustomerProfilesCard from './CustomerProfilesCard';
-import EcosystemCard from './EcosystemCard';
+// import BusinessModelCard from './BusinessModelCard';
+// import CustomerProfilesCard from './CustomerProfilesCard';
+// import EcosystemCard from './EcosystemCard';
 import InfoSectionCard from './InfoSectionCard';
-import KeyAssumptionsCard from './KeyAssumptionsCard';
-import TrendsDriversCard from './TrendsDriversCard';
+// import KeyAssumptionsCard from './KeyAssumptionsCard';
+// import MarketSizeCard from './MarketSizeCard';
+// import TrendsDriversCard from './TrendsDriversCard';
 
 interface ExecutiveDashboardProps {
   className?: string;
@@ -38,9 +39,9 @@ interface TabSummaryCard {
 const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   className = '',
   conceptUuid,
-  conceptId,
+  // conceptId,
 }) => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -119,230 +120,112 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     setProgress(0);
   }, []);
 
-  // MarketSizeCard component - converted to use Aucctus components
-  const MarketSizeCard: React.FC<CardComponentProps> = useCallback(
-    ({
-      currentCardIndex: cardIndex,
-      progress: cardProgress,
-      totalCards,
-      onCardClick,
-    }) => (
-      <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
-        <div className='flex h-full flex-col p-6'>
-          {/* Progress Bar Navigation */}
-          <div className='mb-4'>
-            <div className='flex gap-2'>
-              {Array.from({ length: totalCards }).map((_, index: number) => (
-                <div key={index} className='flex-1'>
-                  <div
-                    className='aucctus-bg-disabled h-1 cursor-pointer overflow-hidden rounded-full'
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onCardClick(index);
-                    }}
-                  >
-                    <div
-                      className={`h-full rounded-full transition-all duration-300 ${
-                        index === cardIndex
-                          ? 'aucctus-bg-primary-solid'
-                          : index < cardIndex
-                            ? 'aucctus-bg-primary-solid'
-                            : 'bg-transparent'
-                      }`}
-                      style={{
-                        width:
-                          index === cardIndex
-                            ? `${cardProgress}%`
-                            : index < cardIndex
-                              ? '100%'
-                              : '0%',
-                      }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
+  // ComingSoonCard component - temporarily replaces all tab summary cards
+  const ComingSoonCard: React.FC<CardComponentProps> = useCallback(
+    () => (
+      <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] rounded-lg border transition-all duration-200'>
+        <div className='flex h-full flex-col items-center justify-center p-6 text-center'>
+          <div className='m-6'>
+            <Icon
+              variant='clock'
+              className='aucctus-stroke-tertiary mx-auto mb-4 h-12 w-12'
+            />
+            <h3 className='aucctus-header-md-semibold aucctus-text-primary mb-2'>
+              Coming Soon
+            </h3>
           </div>
-
-          <div className='mb-6 flex items-center justify-between'>
-            <div className='flex items-center gap-2'>
-              <Icon
-                variant='globe'
-                className='aucctus-stroke-tertiary h-4 w-4'
-              />
-              <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
-                {mockExecutiveDashboardUIText.marketSize.title}
-              </h3>
-            </div>
-            <Button
-              color='secondary'
-              size='sm'
-              onClick={() =>
-                navigate(
-                  `/concept/${conceptId}/financial-projection?tab=market-sizing`,
-                )
-              }
-              className='aucctus-text-sm-medium aucctus-text-secondary-hover'
-            >
-              {mockExecutiveDashboardUIText.marketSize.detailsButton}
-            </Button>
-          </div>
-
-          {marketSizeData && marketSizeData.marketSummary ? (
-            // Two-column layout: Summary + Visualization
-            <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
-              {/* Left - Market Summary Text */}
-              <div className='flex flex-col justify-center px-2 py-2'>
-                {isLoadingFinancial ? (
-                  <div className='aucctus-text-lg aucctus-text-secondary'>
-                    Loading market data...
-                  </div>
-                ) : (
-                  <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
-                    {marketSizeData.marketSummary}
-                  </p>
-                )}
-              </div>
-
-              {/* Right - TAM SAM SOM Nested Squares */}
-              <div className='flex min-h-0 items-center justify-center'>
-                <div className='relative aspect-square w-full max-w-[200px] overflow-hidden rounded-tl-xl bg-gray-100 shadow-inner'>
-                  {/* TAM - Outer square */}
-                  <div className='absolute inset-0 rounded-tl-xl bg-[#F5F3F3] p-2'>
-                    <div className='text-xs font-bold text-gray-800'>
-                      {marketSizeData.tam}
-                    </div>
-                    <div className='text-xs font-semibold text-gray-800'>
-                      TAM
-                    </div>
-                  </div>
-
-                  {/* SAM - Middle square */}
-                  <div className='absolute bottom-0 right-0 h-[60%] w-[60%] rounded-tl-xl bg-[#DAD5D5] p-2'>
-                    <div className='text-xs font-bold text-gray-800'>
-                      {marketSizeData.sam}
-                    </div>
-                    <div className='text-xs font-semibold text-gray-800'>
-                      SAM
-                    </div>
-                  </div>
-
-                  {/* SOM - Inner square */}
-                  <div className='absolute bottom-0 right-0 h-[36%] w-[36%] rounded-tl-xl bg-[#514141] p-2 shadow-md'>
-                    <div className='text-xs font-bold text-white'>
-                      {marketSizeData.som}
-                    </div>
-                    <div className='text-xs font-semibold text-white'>SOM</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          ) : (
-            // Single-column layout: Visualization only (expanded)
-            <div className='flex flex-1 items-center justify-center px-4 py-2'>
-              <div className='relative aspect-square w-full max-w-[200px] overflow-hidden rounded-tl-xl bg-gray-100 shadow-inner'>
-                {/* TAM - Outer square */}
-                <div className='absolute inset-0 rounded-tl-xl bg-[#F5F3F3] p-2'>
-                  <div className='text-xs font-bold text-gray-800'>
-                    {marketSizeData?.tam || 'N/A'}
-                  </div>
-                  <div className='text-xs font-semibold text-gray-800'>TAM</div>
-                </div>
-
-                {/* SAM - Middle square */}
-                <div className='absolute bottom-0 right-0 h-[60%] w-[60%] rounded-tl-xl bg-[#DAD5D5] p-2'>
-                  <div className='text-xs font-bold text-gray-800'>
-                    {marketSizeData?.sam || 'N/A'}
-                  </div>
-                  <div className='text-xs font-semibold text-gray-800'>SAM</div>
-                </div>
-
-                {/* SOM - Inner square */}
-                <div className='absolute bottom-0 right-0 h-[36%] w-[36%] rounded-tl-xl bg-[#514141] p-2 shadow-md'>
-                  <div className='text-xs font-bold text-white'>
-                    {marketSizeData?.som || 'N/A'}
-                  </div>
-                  <div className='text-xs font-semibold text-white'>SOM</div>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     ),
-    [navigate, isLoadingFinancial, marketSizeData, conceptId],
+    [],
   );
 
-  // Tab summary cards for carousel - exact order from lovable ExecutiveDashboard
-  const tabSummaryCards: TabSummaryCard[] = [
-    { component: MarketSizeCard },
-    {
-      component: (props: CardComponentProps) => (
-        <TrendsDriversCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <EcosystemCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <BusinessModelCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          financialProjectionV2={financialProjectionV2}
-          isLoadingFinancial={isLoadingFinancial}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <CustomerProfilesCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptUuid={conceptUuid}
-          conceptId={conceptId}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <KeyAssumptionsCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-        />
-      ),
-    },
-  ];
+  // Original tab summary cards - kept for future use but not currently displayed
+  // const originalTabSummaryCards: TabSummaryCard[] = [
+  //   {
+  //     component: (props: CardComponentProps) => (
+  //       <MarketSizeCard
+  //         currentCardIndex={props.currentCardIndex}
+  //         progress={props.progress}
+  //         totalCards={props.totalCards}
+  //         onCardClick={props.onCardClick}
+  //         conceptId={conceptId}
+  //         marketSizeData={marketSizeData}
+  //         isLoadingFinancial={isLoadingFinancial}
+  //       />
+  //     ),
+  //   },
+  //   {
+  //     component: (props: CardComponentProps) => (
+  //       <TrendsDriversCard
+  //         currentCardIndex={props.currentCardIndex}
+  //         progress={props.progress}
+  //         totalCards={props.totalCards}
+  //         onCardClick={props.onCardClick}
+  //         conceptId={conceptId}
+  //         conceptUuid={conceptUuid}
+  //       />
+  //     ),
+  //   },
+  //   {
+  //     component: (props: CardComponentProps) => (
+  //       <EcosystemCard
+  //         currentCardIndex={props.currentCardIndex}
+  //         progress={props.progress}
+  //         totalCards={props.totalCards}
+  //         onCardClick={props.onCardClick}
+  //         conceptId={conceptId}
+  //         conceptUuid={conceptUuid}
+  //       />
+  //     ),
+  //   },
+  //   {
+  //     component: (props: CardComponentProps) => (
+  //       <BusinessModelCard
+  //         currentCardIndex={props.currentCardIndex}
+  //         progress={props.progress}
+  //         totalCards={props.totalCards}
+  //         onCardClick={props.onCardClick}
+  //         conceptId={conceptId}
+  //         conceptUuid={conceptUuid}
+  //         financialProjectionV2={financialProjectionV2}
+  //         isLoadingFinancial={isLoadingFinancial}
+  //       />
+  //     ),
+  //   },
+  //   {
+  //     component: (props: CardComponentProps) => (
+  //       <CustomerProfilesCard
+  //         currentCardIndex={props.currentCardIndex}
+  //         progress={props.progress}
+  //         totalCards={props.totalCards}
+  //         onCardClick={props.onCardClick}
+  //         conceptUuid={conceptUuid}
+  //         conceptId={conceptId}
+  //       />
+  //     ),
+  //   },
+  //   {
+  //     component: (props: CardComponentProps) => (
+  //       <KeyAssumptionsCard
+  //         currentCardIndex={props.currentCardIndex}
+  //         progress={props.progress}
+  //         totalCards={props.totalCards}
+  //         onCardClick={props.onCardClick}
+  //         conceptId={conceptId}
+  //         conceptUuid={conceptUuid}
+  //       />
+  //     ),
+  //   },
+  // ];
 
-  // Auto-progression logic
+  // Currently active cards - showing only "Coming Soon" for now
+  // To restore original cards, replace the line below with: const tabSummaryCards = originalTabSummaryCards;
+  const tabSummaryCards: TabSummaryCard[] = [{ component: ComingSoonCard }];
+
+  // Auto-progression logic - disabled for "Coming Soon" card but kept for when original cards are restored
   useEffect(() => {
-    if (!isAutoPlaying) return;
+    if (!isAutoPlaying || tabSummaryCards.length <= 1) return;
 
     const progressTimer = setInterval(() => {
       setProgress((prev) => {
