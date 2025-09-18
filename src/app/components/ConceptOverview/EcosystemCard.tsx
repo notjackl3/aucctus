@@ -1,11 +1,7 @@
 import { Button, Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  useConceptMarketScan,
-  useConceptOverview,
-} from '@hooks/query/concepts.hook';
-import type { IEcosystemPlayer } from './fixtures';
+import type { IEcosystemPlayer } from './config';
 
 interface EcosystemCardProps {
   currentCardIndex: number;
@@ -14,6 +10,10 @@ interface EcosystemCardProps {
   onCardClick: (index: number) => void;
   conceptId?: string;
   conceptUuid?: string;
+  // Centralized data props
+  marketScan?: any;
+  isLoadingMarketScan?: boolean;
+  executiveSummary?: string;
 }
 
 const EcosystemCard: React.FC<EcosystemCardProps> = ({
@@ -23,14 +23,11 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   onCardClick,
   conceptId,
   conceptUuid,
+  marketScan,
+  isLoadingMarketScan = false,
+  executiveSummary,
 }) => {
   const navigate = useNavigate();
-
-  // Fetch real market scan data
-  const { marketScan, isLoading } = useConceptMarketScan(conceptUuid || '');
-
-  // Fetch concept overview for summary data
-  const { conceptOverview } = useConceptOverview(conceptUuid);
 
   // Create ecosystem players from real data or fallback to mock
   const ecosystemPlayers = useMemo((): IEcosystemPlayer[] => {
@@ -61,7 +58,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   }, [marketScan]);
 
   // Get real summary data (no mock fallback)
-  const ecosystemSummary = conceptOverview?.ecosystemSummary || null;
+  const ecosystemSummary = executiveSummary || null;
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
@@ -128,7 +125,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   );
 
   return (
-    <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
+    <div className='aucctus-bg-secondary aucctus-border-secondary h-full cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
         {/* Progress Bar Navigation */}
         <div className='mb-4'>
@@ -184,12 +181,12 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Competitive Landscape Summary */}
             <div className='flex flex-col justify-center px-2'>
-              {isLoading ? (
+              {isLoadingMarketScan ? (
                 <div className='aucctus-text-lg aucctus-text-secondary'>
                   Loading ecosystem data...
                 </div>
               ) : (
-                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                <p className='aucctus-text-sm aucctus-text-primary'>
                   {ecosystemSummary}
                 </p>
               )}
@@ -197,7 +194,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
 
             {/* Right - Player Count Cards */}
             <div className='flex min-h-0 flex-col items-center justify-center gap-4'>
-              <div className='w-full max-w-[200px] space-y-3'>
+              <div className='w-full max-w-[220px] space-y-3'>
                 {playerCards.length > 0 ? (
                   playerCards.map(renderPlayerCard)
                 ) : (
@@ -211,12 +208,12 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
         ) : (
           // Single-column layout: Player Cards only (expanded)
           <div className='flex flex-1 items-center justify-center'>
-            {isLoading ? (
+            {isLoadingMarketScan ? (
               <div className='aucctus-text-lg aucctus-text-secondary'>
                 Loading ecosystem data...
               </div>
             ) : playerCards.length > 0 ? (
-              <div className='w-full max-w-[320px] space-y-4'>
+              <div className='w-full max-w-[380px] space-y-4'>
                 {playerCards.map(renderPlayerCard)}
               </div>
             ) : (

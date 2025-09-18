@@ -20,6 +20,7 @@ import {
   ICustomerPain,
   ICustomerProfile,
   ICustomerProfileCreate,
+  IExecutiveSummaries,
   IFinancialProjection,
   IFormError,
   IGeneratedConcept,
@@ -379,8 +380,8 @@ export const useConcept = (identifier?: string) => {
 export const useConceptOverview = (uuid?: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptOverview, uuid],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    cacheTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 30, // 30 seconds
+    cacheTime: 1000 * 30, // 30 seconds
     queryFn: async () => {
       if (!uuid) return undefined;
       const result = await api.concept.getConceptOverview(uuid);
@@ -390,6 +391,23 @@ export const useConceptOverview = (uuid?: string) => {
   });
 
   return { ...query, conceptOverview: query.data };
+};
+
+export const useConceptExecutiveSummaries = (conceptUuid?: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.conceptExecutiveSummaries, conceptUuid],
+    staleTime: 1000 * 60 * 2, // 2 minutes - summaries are relatively stable
+    cacheTime: 1000 * 60 * 2, // 2 minutes
+    queryFn: async () => {
+      if (!conceptUuid) return undefined;
+      const result =
+        await api.concept.getConceptExecutiveSummaries(conceptUuid);
+      return result;
+    },
+    enabled: !!conceptUuid,
+  });
+
+  return { ...query, executiveSummaries: query.data };
 };
 
 export const useDownloadConcept = (uuid?: string) => {
@@ -893,6 +911,9 @@ export const doFullConceptInvalidation = (queryClient: QueryClient) => {
   Promise.all([
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.concept],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.conceptOverview],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.conceptVersions],

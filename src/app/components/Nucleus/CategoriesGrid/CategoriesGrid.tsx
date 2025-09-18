@@ -20,15 +20,7 @@ const CategoriesGrid: React.FC<CategoriesGridProps> = ({
 }) => {
   const getQuestionsForCategory = (sectionType: string) => {
     const section = allCategories.find((s) => s.sectionType === sectionType);
-    const questions = section ? section.questions : [];
-    // eslint-disable-next-line no-console
-    console.log('🔍 getQuestionsForCategory:', {
-      sectionType,
-      found: !!section,
-      questionsCount: questions.length,
-      sectionTitle: section?.title,
-    });
-    return questions;
+    return section ? section.questions : [];
   };
 
   // Reorganize cards for proper expansion layout - avoid solo cards above expansion

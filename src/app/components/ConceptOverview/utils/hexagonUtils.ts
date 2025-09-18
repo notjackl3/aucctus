@@ -3,7 +3,7 @@
  * Ported from lovable trends utilities
  */
 
-import type { ITrendCategory } from '../fixtures';
+import type { ITrendCategory } from '../config';
 
 /**
  * Creates an SVG path for a hexagon

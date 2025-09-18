@@ -1,10 +1,24 @@
 import { Button, Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
-import { useConceptOverview } from '@hooks/query/concepts.hook';
 import type { AssumptionCategory } from '@libs/api/types/concept/assumptions';
-import type { RiskLevel } from './fixtures';
+import type { RiskLevel } from './config';
+
+// Import CategoryMetric from assumptions API
+interface CategoryMetric {
+  category: AssumptionCategory;
+  count: number;
+  cumulativeCertainty: number;
+  cumulativeImportance: number;
+  averageRisk: number;
+  validationStatus:
+    | 'validated'
+    | 'unvalidated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
+  validationPercentage: number;
+}
 
 interface KeyAssumptionsCardProps {
   currentCardIndex: number;
@@ -13,6 +27,10 @@ interface KeyAssumptionsCardProps {
   onCardClick: (index: number) => void;
   conceptId?: string; // For navigation routing and API calls (root identifier)
   conceptUuid?: string; // For fetching concept overview data
+  // Centralized data props
+  categoryMetrics?: Record<AssumptionCategory, CategoryMetric>;
+  isLoadingAssumptions?: boolean;
+  executiveSummary?: string;
 }
 
 interface RiskColors {
@@ -29,16 +47,11 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   onCardClick,
   conceptId,
   conceptUuid,
+  categoryMetrics,
+  isLoadingAssumptions = false,
+  executiveSummary,
 }) => {
   const navigate = useNavigate();
-
-  // Fetch real assumptions data using V2 API
-  const { categoryMetrics, isLoading } = useFilteredAssumptions(
-    conceptId || '',
-  );
-
-  // Fetch concept overview for summary data
-  const { conceptOverview } = useConceptOverview(conceptUuid);
 
   // Convert averageRisk (0-1) to risk level
   const getRiskLevelFromValue = useCallback(
@@ -89,7 +102,7 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   }, [categoryMetrics, getRiskLevelFromValue]);
 
   // Get real summary data (no mock fallback)
-  const assumptionsSummary = conceptOverview?.keyAssumptionsSummary || null;
+  const assumptionsSummary = executiveSummary;
 
   // Transform risk level colors to Aucctus theme classes
   const getRiskColor = useCallback((riskLevel: RiskLevel): RiskColors => {
@@ -152,7 +165,7 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   );
 
   return (
-    <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
+    <div className='aucctus-bg-secondary aucctus-border-secondary h-full cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
         {/* Progress Bar Navigation */}
         <div className='mb-4'>
@@ -211,12 +224,12 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Biggest Risk Summary */}
             <div className='flex flex-col justify-center px-2'>
-              {isLoading ? (
+              {isLoadingAssumptions ? (
                 <div className='aucctus-text-lg aucctus-text-secondary'>
                   Loading assumptions...
                 </div>
               ) : (
-                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                <p className='aucctus-text-sm aucctus-text-primary'>
                   {assumptionsSummary}
                 </p>
               )}
@@ -258,12 +271,12 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
         ) : (
           // Single-column layout: Risk Category Cards only (expanded)
           <div className='flex flex-1 items-start justify-center px-4 pb-2 pt-0'>
-            {isLoading ? (
+            {isLoadingAssumptions ? (
               <div className='aucctus-text-lg aucctus-text-secondary'>
                 Loading assumptions...
               </div>
             ) : riskCategoriesWithColors.length > 0 ? (
-              <div className='grid w-full max-w-[320px] grid-cols-2 gap-3'>
+              <div className='grid w-full max-w-[380px] grid-cols-2 gap-3'>
                 {riskCategoriesWithColors.map((category) => (
                   <div
                     key={category.id}

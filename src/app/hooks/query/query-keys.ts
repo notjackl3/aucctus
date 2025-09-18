@@ -9,6 +9,7 @@ export enum AucctusQueryKeys {
   concepts = 'concepts',
   concept = 'concept',
   conceptOverview = 'conceptOverview',
+  conceptExecutiveSummaries = 'conceptExecutiveSummaries',
   conceptVersions = 'conceptVersions',
   conceptSeed = 'conceptSeed',
   conceptSeedDraft = 'conceptSeedDraft',

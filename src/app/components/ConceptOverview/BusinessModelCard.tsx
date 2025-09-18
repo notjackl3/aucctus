@@ -1,8 +1,7 @@
 import { Button, Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useConceptOverview } from '@hooks/query/concepts.hook';
-import type { IBusinessMetric, BusinessMetricType } from './fixtures';
+import type { IBusinessMetric, BusinessMetricType } from './config';
 import { formatCurrency } from '@pages/Concept/Report/FinancialProjections/GenerateRevenue/tabs/MarketSizing/assumptionsUtils';
 
 interface BusinessModelCardProps {
@@ -14,6 +13,8 @@ interface BusinessModelCardProps {
   conceptUuid?: string;
   financialProjectionV2?: any;
   isLoadingFinancial?: boolean;
+  // Centralized data props
+  executiveSummary?: string;
 }
 
 const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
@@ -25,11 +26,9 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
   conceptUuid,
   financialProjectionV2,
   isLoadingFinancial,
+  executiveSummary,
 }) => {
   const navigate = useNavigate();
-
-  // Fetch concept overview for summary data
-  const { conceptOverview } = useConceptOverview(conceptUuid);
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
@@ -155,7 +154,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
   );
 
   return (
-    <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
+    <div className='aucctus-bg-secondary aucctus-border-secondary h-full cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
         {/* Progress Bar Navigation */}
         <div className='mb-4'>
@@ -209,13 +208,13 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
           </Button>
         </div>
 
-        {conceptOverview?.businessModelSummary ? (
+        {executiveSummary ? (
           // Two-column layout: Summary + Metrics
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Business Model Summary */}
             <div className='flex flex-col justify-center px-2'>
-              <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
-                {conceptOverview.businessModelSummary}
+              <p className='aucctus-text-sm aucctus-text-primary'>
+                {executiveSummary}
               </p>
             </div>
 
@@ -226,7 +225,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
                   Loading metrics...
                 </div>
               ) : metricCards.length > 0 ? (
-                <div className='w-full max-w-[200px] space-y-3'>
+                <div className='w-full max-w-[220px] space-y-3'>
                   {metricCards.map(renderMetricCard)}
                 </div>
               ) : (
@@ -244,7 +243,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
                 Loading metrics...
               </div>
             ) : metricCards.length > 0 ? (
-              <div className='w-full max-w-[320px] space-y-4'>
+              <div className='w-full max-w-[380px] space-y-4'>
                 {metricCards.map(renderMetricCard)}
               </div>
             ) : (

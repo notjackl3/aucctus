@@ -18,6 +18,7 @@ import {
   ICustomerProfile,
   ICustomerProfileConversationPage,
   ICustomerProfileCreate,
+  IExecutiveSummaries,
   IGenerationResponse,
   ICustomerProfileRealWorldSignal,
   ICustomerProfileRealWorldSignalsResponse,
@@ -82,6 +83,12 @@ export class ConceptApi extends ApiService {
 
   getConceptOverview(identifier: string) {
     return this.get<IConceptOverview>(endpoints.conceptOverview(identifier));
+  }
+
+  getConceptExecutiveSummaries(conceptUuid: string) {
+    return this.get<IExecutiveSummaries>(
+      endpoints.conceptExecutiveSummaries(conceptUuid),
+    );
   }
 
   downloadConcept(uuid: string) {

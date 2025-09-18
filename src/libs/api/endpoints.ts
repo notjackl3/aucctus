@@ -136,6 +136,10 @@ export class Endpoints {
     return `api/v1/concept/overview/${overviewUuid}`;
   }
 
+  static conceptExecutiveSummaries(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/executive-summaries`;
+  }
+
   static conceptCustomerProfiles(
     conceptUuid: string,
     version: 'v1' | 'v2' = 'v1',

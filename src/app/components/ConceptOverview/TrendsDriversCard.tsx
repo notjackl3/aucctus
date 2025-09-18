@@ -2,10 +2,6 @@ import { Button, Icon } from '@components';
 import HexagonChart from '@pages/Concept/Report/MarketScan/v3/components/HexagonChart';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  useMarketScanMarketForcesV3,
-  useConceptOverview,
-} from '@hooks/query/concepts.hook';
 
 interface TrendsDriversCardProps {
   currentCardIndex: number;
@@ -14,6 +10,10 @@ interface TrendsDriversCardProps {
   onCardClick: (index: number) => void;
   conceptId?: string;
   conceptUuid?: string;
+  // Centralized data props
+  marketForces?: any[];
+  isLoadingMarketForces?: boolean;
+  executiveSummary?: string;
 }
 
 const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
@@ -23,24 +23,17 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
   onCardClick,
   conceptId,
   conceptUuid,
+  marketForces = [],
+  isLoadingMarketForces = false,
+  executiveSummary,
 }) => {
   const navigate = useNavigate();
 
-  // Fetch real market forces data for hexagon
-  const { marketForces = [], isLoading: isMarketForcesLoading } =
-    useMarketScanMarketForcesV3(conceptUuid || '');
-
-  // Fetch concept overview for summary data
-  const { conceptOverview } = useConceptOverview(conceptUuid);
-
-  // Use real data if available
+  // Use the passed-in data
   const displayMarketForces = marketForces.length > 0 ? marketForces : [];
   const selectedCategory = displayMarketForces[0] || null;
 
-  // Get real summary data (no mock fallback)
-  const executiveSummary = conceptOverview?.trendsDriversSummary || null;
-
-  const isLoading = isMarketForcesLoading;
+  const isLoading = isLoadingMarketForces;
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
@@ -59,7 +52,7 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
   );
 
   return (
-    <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
+    <div className='aucctus-bg-secondary aucctus-border-secondary h-full cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
         {/* Progress Bar Navigation */}
         <div className='mb-4'>
@@ -122,14 +115,14 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
                   Loading trends analysis...
                 </div>
               ) : (
-                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                <p className='aucctus-text-sm aucctus-text-primary'>
                   {executiveSummary}
                 </p>
               )}
             </div>
 
             <div className='flex min-h-0 items-center justify-center'>
-              <div className='aspect-square max-h-[180px] w-full max-w-[180px]'>
+              <div className='aspect-square max-h-[200px] w-full max-w-[200px]'>
                 {isLoading ? (
                   <div className='flex h-full items-center justify-center'>
                     <div className='aucctus-text-sm aucctus-text-secondary'>
@@ -155,7 +148,7 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
         ) : (
           // Single-column layout: Visualization only (expanded)
           <div className='flex flex-1 items-start justify-center px-4 pb-2 pt-0'>
-            <div className='aspect-square max-h-[220px] w-full max-w-[220px]'>
+            <div className='aspect-square max-h-[280px] w-full max-w-[280px]'>
               {isLoading ? (
                 <div className='flex h-full items-center justify-center'>
                   <div className='aucctus-text-lg aucctus-text-secondary'>

@@ -1,21 +1,26 @@
 import { Badge, Button, Icon } from '@components';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useConceptOverview } from '@hooks/query/concepts.hook';
-import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
 import {
-  EXECUTIVE_DASHBOARD_CONFIG,
-  mockExecutiveDashboardUIText,
-} from './fixtures';
+  useConceptOverview,
+  useConceptExecutiveSummaries,
+  useConceptCustomerProfiles,
+  useConceptMarketScan,
+  useMarketScanMarketForcesV3,
+} from '@hooks/query/concepts.hook';
+import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
+import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
+import { EXECUTIVE_DASHBOARD_CONFIG, executiveDashboardUIText } from './config';
 
 import images from '@assets/img';
-// import BusinessModelCard from './BusinessModelCard';
-// import CustomerProfilesCard from './CustomerProfilesCard';
-// import EcosystemCard from './EcosystemCard';
+import BusinessModelCard from './BusinessModelCard';
+import CustomerProfilesCard from './CustomerProfilesCard';
+import EcosystemCard from './EcosystemCard';
+import TrendsDriversCard from './TrendsDriversCard';
+import KeyAssumptionsCard from './KeyAssumptionsCard';
+import MarketSizeCard from './MarketSizeCard';
 import InfoSectionCard from './InfoSectionCard';
-// import KeyAssumptionsCard from './KeyAssumptionsCard';
-// import MarketSizeCard from './MarketSizeCard';
-// import TrendsDriversCard from './TrendsDriversCard';
+import ShouldWeDoThisBanner from './ShouldWeDoThisBanner';
 
 interface ExecutiveDashboardProps {
   className?: string;
@@ -39,19 +44,41 @@ interface TabSummaryCard {
 const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   className = '',
   conceptUuid,
-  // conceptId,
+  conceptId,
 }) => {
   // const navigate = useNavigate();
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
 
-  // Fetch real concept overview data
-  const { conceptOverview, isLoading } = useConceptOverview(conceptUuid);
-
-  // Fetch financial projection data for market sizing
+  // Centralized data fetching - load all data for the cards
+  const { conceptOverview, isLoading: isLoadingOverview } =
+    useConceptOverview(conceptUuid);
+  const { executiveSummaries, isLoading: isLoadingExecutiveSummaries } =
+    useConceptExecutiveSummaries(conceptUuid);
   const { financialProjectionV2, isLoading: isLoadingFinancial } =
     useFinancialProjectionV2(conceptUuid || '');
+  const { profiles: customerProfiles, isLoading: isLoadingCustomerProfiles } =
+    useConceptCustomerProfiles(conceptUuid || '');
+  const { marketScan, isLoading: isLoadingMarketScan } = useConceptMarketScan(
+    conceptUuid || '',
+  );
+  const { marketForces, isLoading: isLoadingMarketForces } =
+    useMarketScanMarketForcesV3(conceptUuid || '');
+  const {
+    categoryMetrics: assumptionsCategoryMetrics,
+    isLoading: isLoadingAssumptions,
+  } = useFilteredAssumptions(conceptId || '');
+
+  // Calculate overall loading state
+  const isLoading =
+    isLoadingOverview ||
+    isLoadingExecutiveSummaries ||
+    isLoadingFinancial ||
+    isLoadingCustomerProfiles ||
+    isLoadingMarketScan ||
+    isLoadingMarketForces ||
+    isLoadingAssumptions;
 
   const differentiators =
     conceptOverview?.differentiators &&
@@ -98,13 +125,16 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         tam: formatCurrency(marketSizing.expectedTam!),
         sam: formatCurrency(marketSizing.expectedSam!),
         som: formatCurrency(marketSizing.expectedSom!),
-        marketSummary: conceptOverview?.marketSizeSummary || null, // Real data or null
+        marketSummary:
+          executiveSummaries?.financialMarketSizeRevenue ||
+          conceptOverview?.marketSizeSummary ||
+          null,
         growthTrajectory: null,
       };
     }
 
     return null;
-  }, [financialProjectionV2, conceptOverview]);
+  }, [financialProjectionV2, executiveSummaries, conceptOverview]);
 
   const handleCardClick = useCallback((index: number) => {
     setCurrentCardIndex(index);
@@ -123,7 +153,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   // ComingSoonCard component - temporarily replaces all tab summary cards
   const ComingSoonCard: React.FC<CardComponentProps> = useCallback(
     () => (
-      <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] rounded-lg border transition-all duration-200'>
+      <div className='aucctus-bg-secondary aucctus-border-secondary h-full rounded-lg border transition-all duration-200'>
         <div className='flex h-full flex-col items-center justify-center p-6 text-center'>
           <div className='m-6'>
             <Icon
@@ -140,88 +170,105 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     [],
   );
 
-  // Original tab summary cards - kept for future use but not currently displayed
-  // const originalTabSummaryCards: TabSummaryCard[] = [
-  //   {
-  //     component: (props: CardComponentProps) => (
-  //       <MarketSizeCard
-  //         currentCardIndex={props.currentCardIndex}
-  //         progress={props.progress}
-  //         totalCards={props.totalCards}
-  //         onCardClick={props.onCardClick}
-  //         conceptId={conceptId}
-  //         marketSizeData={marketSizeData}
-  //         isLoadingFinancial={isLoadingFinancial}
-  //       />
-  //     ),
-  //   },
-  //   {
-  //     component: (props: CardComponentProps) => (
-  //       <TrendsDriversCard
-  //         currentCardIndex={props.currentCardIndex}
-  //         progress={props.progress}
-  //         totalCards={props.totalCards}
-  //         onCardClick={props.onCardClick}
-  //         conceptId={conceptId}
-  //         conceptUuid={conceptUuid}
-  //       />
-  //     ),
-  //   },
-  //   {
-  //     component: (props: CardComponentProps) => (
-  //       <EcosystemCard
-  //         currentCardIndex={props.currentCardIndex}
-  //         progress={props.progress}
-  //         totalCards={props.totalCards}
-  //         onCardClick={props.onCardClick}
-  //         conceptId={conceptId}
-  //         conceptUuid={conceptUuid}
-  //       />
-  //     ),
-  //   },
-  //   {
-  //     component: (props: CardComponentProps) => (
-  //       <BusinessModelCard
-  //         currentCardIndex={props.currentCardIndex}
-  //         progress={props.progress}
-  //         totalCards={props.totalCards}
-  //         onCardClick={props.onCardClick}
-  //         conceptId={conceptId}
-  //         conceptUuid={conceptUuid}
-  //         financialProjectionV2={financialProjectionV2}
-  //         isLoadingFinancial={isLoadingFinancial}
-  //       />
-  //     ),
-  //   },
-  //   {
-  //     component: (props: CardComponentProps) => (
-  //       <CustomerProfilesCard
-  //         currentCardIndex={props.currentCardIndex}
-  //         progress={props.progress}
-  //         totalCards={props.totalCards}
-  //         onCardClick={props.onCardClick}
-  //         conceptUuid={conceptUuid}
-  //         conceptId={conceptId}
-  //       />
-  //     ),
-  //   },
-  //   {
-  //     component: (props: CardComponentProps) => (
-  //       <KeyAssumptionsCard
-  //         currentCardIndex={props.currentCardIndex}
-  //         progress={props.progress}
-  //         totalCards={props.totalCards}
-  //         onCardClick={props.onCardClick}
-  //         conceptId={conceptId}
-  //         conceptUuid={conceptUuid}
-  //       />
-  //     ),
-  //   },
-  // ];
+  // Original tab summary cards - now with centralized data passed as props
+  const originalTabSummaryCards: TabSummaryCard[] = [
+    {
+      component: (props: CardComponentProps) => (
+        <MarketSizeCard
+          currentCardIndex={props.currentCardIndex}
+          progress={props.progress}
+          totalCards={props.totalCards}
+          onCardClick={props.onCardClick}
+          conceptId={conceptId}
+          marketSizeData={marketSizeData}
+          isLoadingFinancial={isLoadingFinancial}
+        />
+      ),
+    },
+    {
+      component: (props: CardComponentProps) => (
+        <TrendsDriversCard
+          currentCardIndex={props.currentCardIndex}
+          progress={props.progress}
+          totalCards={props.totalCards}
+          onCardClick={props.onCardClick}
+          conceptId={conceptId}
+          conceptUuid={conceptUuid}
+          // Pass centralized data
+          marketForces={marketForces}
+          isLoadingMarketForces={isLoadingMarketForces}
+          executiveSummary={executiveSummaries?.marketScanTrendsDrivers}
+        />
+      ),
+    },
+    {
+      component: (props: CardComponentProps) => (
+        <EcosystemCard
+          currentCardIndex={props.currentCardIndex}
+          progress={props.progress}
+          totalCards={props.totalCards}
+          onCardClick={props.onCardClick}
+          conceptId={conceptId}
+          conceptUuid={conceptUuid}
+          // Pass centralized data
+          marketScan={marketScan}
+          isLoadingMarketScan={isLoadingMarketScan}
+          executiveSummary={executiveSummaries?.marketScanEcosystem}
+        />
+      ),
+    },
+    {
+      component: (props: CardComponentProps) => (
+        <BusinessModelCard
+          currentCardIndex={props.currentCardIndex}
+          progress={props.progress}
+          totalCards={props.totalCards}
+          onCardClick={props.onCardClick}
+          conceptId={conceptId}
+          conceptUuid={conceptUuid}
+          // Pass centralized data
+          financialProjectionV2={financialProjectionV2}
+          isLoadingFinancial={isLoadingFinancial}
+          executiveSummary={executiveSummaries?.financialBusinessModel}
+        />
+      ),
+    },
+    {
+      component: (props: CardComponentProps) => (
+        <CustomerProfilesCard
+          currentCardIndex={props.currentCardIndex}
+          progress={props.progress}
+          totalCards={props.totalCards}
+          onCardClick={props.onCardClick}
+          conceptUuid={conceptUuid}
+          conceptId={conceptId}
+          // Pass centralized data
+          customerProfiles={customerProfiles}
+          isLoadingCustomerProfiles={isLoadingCustomerProfiles}
+          executiveSummary={executiveSummaries?.customerProfiles}
+        />
+      ),
+    },
+    {
+      component: (props: CardComponentProps) => (
+        <KeyAssumptionsCard
+          currentCardIndex={props.currentCardIndex}
+          progress={props.progress}
+          totalCards={props.totalCards}
+          onCardClick={props.onCardClick}
+          conceptId={conceptId}
+          conceptUuid={conceptUuid}
+          // Pass centralized data
+          categoryMetrics={assumptionsCategoryMetrics}
+          isLoadingAssumptions={isLoadingAssumptions}
+          executiveSummary={executiveSummaries?.keyAssumptions}
+        />
+      ),
+    },
+  ];
 
-  // Currently active cards - showing only "Coming Soon" for now
-  // To restore original cards, replace the line below with: const tabSummaryCards = originalTabSummaryCards;
-  const tabSummaryCards: TabSummaryCard[] = [{ component: ComingSoonCard }];
+  // Currently active cards
+  const tabSummaryCards: TabSummaryCard[] = originalTabSummaryCards;
 
   // Auto-progression logic - disabled for "Coming Soon" card but kept for when original cards are restored
   useEffect(() => {
@@ -265,6 +312,12 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
   return (
     <div className={`space-y-8 ${className}`}>
+      {/* Should We Do This Banner */}
+      <ShouldWeDoThisBanner
+        recommendation={conceptOverview?.shouldWeDoThis}
+        isLoading={isLoadingOverview}
+      />
+
       {/* Hero Section with Concept Image and Value Prop */}
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
         {/* Left - Concept Image */}
@@ -275,15 +328,13 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                 conceptOverview?.conceptImageUrl ||
                 images.aiExplorationsBackground
               }
-              alt={mockExecutiveDashboardUIText.conceptVisualization.altText}
+              alt={executiveDashboardUIText.conceptVisualization.altText}
               className='h-full w-full object-cover'
             />
             <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent' />
             <div className='absolute bottom-4 left-4 right-4'>
               <Badge.Default
-                value={
-                  mockExecutiveDashboardUIText.conceptVisualization.badgeText
-                }
+                value={executiveDashboardUIText.conceptVisualization.badgeText}
                 classNameBadge='aucctus-bg-primary aucctus-text-primary aucctus-border-primary'
               />
             </div>
@@ -294,7 +345,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         <div className='space-y-6'>
           <InfoSectionCard
             iconVariant='lightbulb'
-            title={mockExecutiveDashboardUIText.sections.whatIsIt}
+            title={executiveDashboardUIText.sections.whatIsIt}
             content={
               conceptOverview?.whatIsThis || 'No product description available'
             }
@@ -302,7 +353,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
           <InfoSectionCard
             iconVariant='target'
-            title={mockExecutiveDashboardUIText.sections.valueProposition}
+            title={executiveDashboardUIText.sections.valueProposition}
             content={
               conceptOverview?.valueProposition ||
               'No value proposition available'
@@ -311,7 +362,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
           <InfoSectionCard
             iconVariant='alert-triangle'
-            title={mockExecutiveDashboardUIText.sections.problemStatement}
+            title={executiveDashboardUIText.sections.problemStatement}
             content={
               conceptOverview?.problemStatement ||
               'No problem statement available'
@@ -330,7 +381,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                 variant='star-01'
                 className='aucctus-stroke-info-primary h-5 w-5'
               />
-              {mockExecutiveDashboardUIText.sections.differentiators}
+              {executiveDashboardUIText.sections.differentiators}
             </h3>
 
             <div className='max-h-60 flex-1 space-y-3 overflow-y-auto'>
@@ -401,7 +452,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                 variant='target'
                 className='aucctus-stroke-success-primary h-5 w-5'
               />
-              {mockExecutiveDashboardUIText.sections.ourRightToWin}
+              {executiveDashboardUIText.sections.ourRightToWin}
             </h3>
 
             <div className='max-h-60 flex-1 space-y-3 overflow-y-auto'>

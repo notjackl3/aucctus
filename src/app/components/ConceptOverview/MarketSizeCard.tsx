@@ -1,7 +1,7 @@
 import { Button, Icon } from '@components';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { mockExecutiveDashboardUIText } from './fixtures';
+import { executiveDashboardUIText } from './config';
 
 interface MarketSizeData {
   tam: string;
@@ -33,7 +33,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
+    <div className='aucctus-bg-secondary aucctus-border-secondary h-full cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
         {/* Progress Bar Navigation */}
         <div className='mb-4'>
@@ -74,7 +74,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
           <div className='flex items-center gap-2'>
             <Icon variant='globe' className='aucctus-stroke-tertiary h-4 w-4' />
             <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
-              {mockExecutiveDashboardUIText.marketSize.title}
+              {executiveDashboardUIText.marketSize.title}
             </h3>
           </div>
           <Button
@@ -87,7 +87,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
             }
             className='aucctus-text-sm-medium aucctus-text-secondary-hover'
           >
-            {mockExecutiveDashboardUIText.marketSize.detailsButton}
+            {executiveDashboardUIText.marketSize.detailsButton}
           </Button>
         </div>
 
@@ -101,7 +101,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
                   Loading market data...
                 </div>
               ) : (
-                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                <p className='aucctus-text-sm aucctus-text-primary'>
                   {marketSizeData.marketSummary}
                 </p>
               )}
@@ -109,7 +109,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
 
             {/* Right - TAM SAM SOM Nested Squares */}
             <div className='flex min-h-0 items-center justify-center'>
-              <div className='relative aspect-square w-full max-w-[200px] overflow-hidden rounded-tl-xl bg-gray-100 shadow-inner'>
+              <div className='relative aspect-square w-full max-w-[220px] overflow-hidden rounded-tl-xl bg-gray-100 shadow-inner'>
                 {/* TAM - Outer square */}
                 <div className='absolute inset-0 rounded-tl-xl bg-[#F5F3F3] p-2'>
                   <div className='text-xs font-bold text-gray-800'>
@@ -139,7 +139,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
         ) : (
           // Single-column layout: Visualization only (expanded)
           <div className='flex flex-1 items-center justify-center px-4 py-2'>
-            <div className='relative aspect-square w-full max-w-[200px] overflow-hidden rounded-tl-xl bg-gray-100 shadow-inner'>
+            <div className='relative aspect-square w-full max-w-[280px] overflow-hidden rounded-tl-xl bg-gray-100 shadow-inner'>
               {/* TAM - Outer square */}
               <div className='absolute inset-0 rounded-tl-xl bg-[#F5F3F3] p-2'>
                 <div className='text-xs font-bold text-gray-800'>

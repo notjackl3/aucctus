@@ -345,3 +345,23 @@ export interface IUserJourneyStepCreate {
     | 'Pain'
     | 'Moment of Intervention';
 }
+
+/**
+ * Executive summaries for each major section of the concept report.
+ * Each summary is 1-2 sentences (~35 words) identifying the primary opportunity driver
+ * and primary challenge for that section, contextualized by the concept and company.
+ */
+export interface IExecutiveSummaries extends IBaseConceptEntity {
+  // Market Scan summaries
+  marketScanTrendsDrivers?: string; // market_scan_trends_drivers from Django
+  marketScanEcosystem?: string; // market_scan_ecosystem from Django
+
+  // Financial Projections summaries
+  financialBusinessModel?: string; // financial_business_model from Django
+  financialMarketSizeRevenue?: string; // financial_market_size_revenue from Django
+  financialMarketSizeCostSavings?: string; // financial_market_size_cost_savings from Django
+
+  // Other sections
+  customerProfiles?: string; // customer_profiles from Django
+  keyAssumptions?: string; // key_assumptions from Django
+}

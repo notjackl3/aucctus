@@ -1,20 +1,20 @@
 import { Button, Icon } from '@components';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  useConceptCustomerProfiles,
-  useConceptOverview,
-} from '@hooks/query/concepts.hook';
 import type { ICustomerProfile as ICustomerProfileAPI } from '@libs/api/types/concept/concepts';
-import type { ICustomerProfile } from './fixtures';
+import type { ICustomerProfile } from './config';
 
 interface CustomerProfilesCardProps {
   currentCardIndex: number;
   progress: number;
   totalCards: number;
   onCardClick: (index: number) => void;
-  conceptUuid?: string; // For fetching real customer profile data
+  conceptUuid?: string; // For navigation routing
   conceptId?: string; // For navigation routing
+  // Centralized data props
+  customerProfiles?: any[];
+  isLoadingCustomerProfiles?: boolean;
+  executiveSummary?: string;
 }
 
 const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
@@ -24,6 +24,9 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
   onCardClick,
   conceptUuid,
   conceptId,
+  customerProfiles = [],
+  isLoadingCustomerProfiles = false,
+  executiveSummary,
 }) => {
   const navigate = useNavigate();
 
@@ -32,63 +35,57 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
     null,
   );
 
-  // Fetch real customer profiles data
-  const { profiles: realProfiles, isLoading } = useConceptCustomerProfiles(
-    conceptUuid || '',
-  );
-
-  // Fetch concept overview for summary data
-  const { conceptOverview } = useConceptOverview(conceptUuid);
-
   // Transform real API data to match component interface
   const transformedProfiles = useMemo((): ICustomerProfile[] => {
-    if (!realProfiles || realProfiles.length === 0) {
+    if (!customerProfiles || customerProfiles.length === 0) {
       return [];
     }
 
-    return realProfiles.map((profile: ICustomerProfileAPI, index: number) => {
-      // Generate initials from name
-      const initials = profile.name
-        .split(' ')
-        .map((word) => word.charAt(0))
-        .join('')
-        .toUpperCase()
-        .slice(0, 2);
+    return customerProfiles.map(
+      (profile: ICustomerProfileAPI, index: number) => {
+        // Generate initials from name
+        const initials = profile.name
+          .split(' ')
+          .map((word) => word.charAt(0))
+          .join('')
+          .toUpperCase()
+          .slice(0, 2);
 
-      // Gradient colors for profiles without avatars
-      const gradientOptions = [
-        'from-blue-400 to-blue-600',
-        'from-green-400 to-green-600',
-        'from-purple-400 to-purple-600',
-        'from-pink-400 to-pink-600',
-        'from-indigo-400 to-indigo-600',
-      ];
+        // Gradient colors for profiles without avatars
+        const gradientOptions = [
+          'from-blue-400 to-blue-600',
+          'from-green-400 to-green-600',
+          'from-purple-400 to-purple-600',
+          'from-pink-400 to-pink-600',
+          'from-indigo-400 to-indigo-600',
+        ];
 
-      return {
-        id: profile.uuid,
-        name: profile.name,
-        avatar: profile.avatarUrl || '',
-        isPrimary: profile.isPrimary || false,
-        segment: profile.segment,
-        initials,
-        gradientColors: gradientOptions[index % gradientOptions.length],
-      };
-    });
-  }, [realProfiles]);
+        return {
+          id: profile.uuid,
+          name: profile.name,
+          avatar: profile.avatarUrl || '',
+          isPrimary: profile.isPrimary || false,
+          segment: profile.segment,
+          initials,
+          gradientColors: gradientOptions[index % gradientOptions.length],
+        };
+      },
+    );
+  }, [customerProfiles]);
 
   // Set initial selection to primary profile when data loads
   useEffect(() => {
-    if (realProfiles && realProfiles.length > 0 && !selectedProfileId) {
+    if (customerProfiles && customerProfiles.length > 0 && !selectedProfileId) {
       const primaryProfile =
-        realProfiles.find((p) => p.isPrimary) || realProfiles[0];
+        customerProfiles.find((p) => p.isPrimary) || customerProfiles[0];
       if (primaryProfile) {
         setSelectedProfileId(primaryProfile.uuid);
       }
     }
-  }, [realProfiles, selectedProfileId]);
+  }, [customerProfiles, selectedProfileId]);
 
   // Get real summary data (no mock fallback)
-  const profilesSummary = conceptOverview?.customerProfilesSummary || null;
+  const profilesSummary = executiveSummary;
 
   const handleDetailsClick = useCallback(
     (e: React.MouseEvent) => {
@@ -195,7 +192,7 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
   );
 
   return (
-    <div className='aucctus-bg-secondary aucctus-border-secondary h-[320px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
+    <div className='aucctus-bg-secondary aucctus-border-secondary h-full cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
         {/* Progress Bar Navigation */}
         <div className='mb-4'>
@@ -254,20 +251,20 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Primary Customer Summary */}
             <div className='flex flex-col justify-start px-2 py-2'>
-              {isLoading ? (
+              {isLoadingCustomerProfiles ? (
                 <div className='aucctus-text-sm aucctus-text-secondary'>
                   Loading customer profiles...
                 </div>
               ) : (
-                <p className='aucctus-text-lg aucctus-text-primary leading-tight'>
+                <p className='aucctus-text-sm aucctus-text-primary'>
                   {profilesSummary}
                 </p>
               )}
             </div>
 
             {/* Right - Profile Cards List */}
-            <div className='flex max-h-[180px] min-h-0 flex-col gap-2 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
-              {isLoading ? (
+            <div className='flex max-h-[220px] min-h-0 flex-col gap-2 overflow-y-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
+              {isLoadingCustomerProfiles ? (
                 <div className='aucctus-text-sm aucctus-text-secondary'>
                   Loading...
                 </div>
@@ -283,12 +280,12 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
         ) : (
           // Single-column layout: Profile Cards only (expanded)
           <div className='flex flex-1 items-center justify-center'>
-            {isLoading ? (
+            {isLoadingCustomerProfiles ? (
               <div className='aucctus-text-lg aucctus-text-secondary'>
                 Loading customer profiles...
               </div>
             ) : (
-              <div className='grid w-full max-w-[420px] grid-cols-2 gap-4'>
+              <div className='grid w-full max-w-[480px] grid-cols-2 gap-4'>
                 {transformedProfiles.slice(0, 4).map(renderProfileCard)}
               </div>
             )}
