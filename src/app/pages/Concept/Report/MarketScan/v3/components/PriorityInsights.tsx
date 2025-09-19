@@ -21,6 +21,7 @@ interface ExtendedPriorityInsight extends IPriorityInsightV3 {
     url?: string;
     summary?: string;
     classification?: string;
+    citations?: string[];
   }>;
 }
 

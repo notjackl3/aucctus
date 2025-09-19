@@ -162,6 +162,7 @@ export interface IKeyFindingSourceV3 {
   title: string;
   summary: string;
   keywords: string[];
+  citations: string[];
   credibility: number;
   timestamp: string;
   metadata: Record<string, any>;

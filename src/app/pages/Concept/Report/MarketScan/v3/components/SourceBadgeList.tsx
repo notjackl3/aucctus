@@ -6,12 +6,14 @@ interface SourceBadgeListProps {
   sources: ISource[];
   className?: string;
   showPublishedDate?: boolean;
+  createSourceDescription?: (source: ISource) => React.ReactNode;
 }
 
 const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
   sources,
   className = '',
   showPublishedDate = true,
+  createSourceDescription,
 }) => {
   if (!sources || sources.length === 0) {
     return null;
@@ -27,6 +29,7 @@ const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
           source={source}
           onClick={() => window.open(source.url, '_blank')}
           showPublishedDate={showPublishedDate}
+          sourceDescription={createSourceDescription?.(source)}
         />
       ))}
     </div>
