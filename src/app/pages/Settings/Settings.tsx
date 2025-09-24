@@ -1,7 +1,7 @@
 import { Banner } from '@components';
 import useStore from '@stores/store';
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
 import TabView from '../../components/Container/TabView/TabView';
 
@@ -11,8 +11,17 @@ export const SETTING_TABS = [
 ];
 
 const Settings: FunctionComponent = () => {
-  const [activeTab, setActiveTab] = useState<string>(AppPath.SettingsAbout);
   const navigate = useNavigate();
+  const location = useLocation();
+  // Initialize activeTab based on current route
+  const getActiveTabFromRoute = (pathname: string) => {
+    const matchingTab = SETTING_TABS.find((tab) => tab.value === pathname);
+    return matchingTab ? matchingTab.value : AppPath.SettingsAbout;
+  };
+
+  const [activeTab, setActiveTab] = useState<string>(() =>
+    getActiveTabFromRoute(location.pathname),
+  );
   const { user } = useStore((state) => state.auth);
 
   const missingFields = useMemo(() => {

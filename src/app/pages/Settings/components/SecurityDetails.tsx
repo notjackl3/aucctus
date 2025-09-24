@@ -1,9 +1,10 @@
-import utils from '@libs/utils';
 import { FunctionComponent, useMemo, useState } from 'react';
-import { useMutation } from 'react-query';
 import { toast, Input } from '@components';
-import api from '../../../../libs/api';
-import { IUserPassword } from '../../../../libs/api/types';
+import { useReverification, useUser } from '@clerk/clerk-react';
+import {
+  isClerkRuntimeError,
+  isReverificationCancelledError,
+} from '@clerk/clerk-react/errors';
 import { defaultToastConfig } from '../../../../libs/toast';
 import Icon from '../../../components/Icon/Icon/Icon';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
@@ -23,40 +24,98 @@ interface PasswordForm {
 const SecurityDetails: FunctionComponent = () => {
   const [isFormDisabled, setIsFormDisabled] = useState(true);
   const [currentPasswordError, setCurrentPasswordError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const [passwordForm, setPasswordForm] = useState<PasswordForm>({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   });
-
   const { currentPassword, newPassword, confirmPassword } = passwordForm;
+  const { user } = useUser();
 
-  const updatePasswordMutation = useMutation({
-    mutationFn: async (passwordObj: IUserPassword) => {
-      return api.account.updateUserPassword(passwordObj);
-    },
-    onSuccess: () => {
+  // Define the protected password update function that requires reverification
+  const performPasswordUpdate = async () => {
+    if (!user) {
+      throw new Error('User not found. Please try again.');
+    }
+
+    await user.updatePassword({
+      currentPassword: currentPassword,
+      newPassword: newPassword,
+      signOutOfOtherSessions: true,
+    });
+  };
+
+  // Use useReverification to wrap the password update function
+  const updatePasswordWithReverification = useReverification(
+    performPasswordUpdate,
+  );
+
+  const updatePassword = async () => {
+    // Validate passwords match
+    if (newPassword !== confirmPassword) {
+      setCurrentPasswordError('New passwords do not match.');
+      return;
+    }
+
+    // Validate password length
+    if (newPassword.length < 8) {
+      setCurrentPasswordError('Password must be at least 8 characters.');
+      return;
+    }
+
+    setIsLoading(true);
+    setCurrentPasswordError('');
+
+    try {
+      // This will trigger reverification if needed, then execute performPasswordUpdate
+      await updatePasswordWithReverification();
+
+      toast.success(
+        'Password updated successfully!',
+        undefined,
+        defaultToastConfig,
+      );
       resetFormState();
       setIsFormDisabled(true);
-    },
-    onError: (error) => {
-      const message = utils.osiris.parseFormError<IUserPassword>(error);
-      setCurrentPasswordError(message);
+    } catch (error: any) {
+      // Handle if user cancels the reverification process
+      if (isClerkRuntimeError(error) && isReverificationCancelledError(error)) {
+        toast.info('Password update was cancelled.');
+        setCurrentPasswordError('');
+        return;
+      }
+
+      // Handle Clerk-specific errors
+      const errorMessage = error?.errors?.[0]?.message || error?.message;
+
+      if (
+        errorMessage?.includes('current password') ||
+        errorMessage?.includes('incorrect')
+      ) {
+        setCurrentPasswordError('Current password is incorrect.');
+      } else if (
+        errorMessage?.includes('password') &&
+        errorMessage?.includes('weak')
+      ) {
+        setCurrentPasswordError(
+          'New password is too weak. Please choose a stronger password.',
+        );
+      } else {
+        setCurrentPasswordError(
+          errorMessage || 'Failed to update password. Please try again.',
+        );
+      }
+
       toast.error(
         'Password could not be updated. Please try again later.',
         undefined,
         defaultToastConfig,
       );
-    },
-  });
-
-  const updatePassword = () => {
-    updatePasswordMutation.mutate({
-      current_password: passwordForm.currentPassword,
-      password: passwordForm.newPassword,
-      confirm_password: passwordForm.confirmPassword,
-    });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const resetFormState = () => {
@@ -180,7 +239,7 @@ const SecurityDetails: FunctionComponent = () => {
           <button
             className='btn btn-primary btn-bold'
             type='submit'
-            disabled={updatePasswordMutation.isLoading}
+            disabled={isLoading}
           >
             <Icon variant='save' {...defaultIconProps} />
             Save

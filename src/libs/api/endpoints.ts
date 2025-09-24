@@ -7,20 +7,10 @@ import {
 } from './types';
 
 export class Endpoints {
-  static login = '/api/v1/login';
-  static signup = '/api/v1/sign-up';
-  static logout = '/api/v1/logout';
-  static refresh = '/api/v1/token/refresh';
-
   static user = '/api/v1/user/';
   static allUsers = '/api/v1/user/list';
 
   static articlePublishedDate = '/article-published-date';
-
-  static confirmEmail = `/api/v1/confirm-email`;
-  static forgotPassword = `/api/v1/forgot-password`;
-  static requestPasswordReset = `/api/v1/request-reset-email`;
-  static updatePassword = `/api/v1/user/update-password`;
 
   static account = `/api/v1/account`;
   static dashboard = `/api/v1/dashboard`;
