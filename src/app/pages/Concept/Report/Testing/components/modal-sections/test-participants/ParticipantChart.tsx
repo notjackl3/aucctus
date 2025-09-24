@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
 import { Icon } from '@components';
+import React, { useState } from 'react';
 
 interface ChartData {
   name: string;
@@ -208,8 +208,8 @@ const ParticipantChart: React.FC<ParticipantChartProps> = ({
           Number of participants
         </h5>
         <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-          For customer interviews, a panel size of up to 20 respondents is
-          recommended for qualitative insights.
+          For customer interviews, a panel size of {totalParticipants}{' '}
+          respondents is recommended for qualitative insights.
         </p>
       </div>
     </div>
