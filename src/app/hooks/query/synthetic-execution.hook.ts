@@ -14,7 +14,16 @@ export const useSyntheticExecutionStart = (
   return useMutation({
     mutationFn: async (data?: ISyntheticExecutionRequest) =>
       api.testing.executeSyntheticTest(conceptUuid, testUuid, data),
-    onError: (e) => {
+    onError: (e: any) => {
+      // Handle 409 Conflict specifically - execution already running
+      if (e?.response?.status === 409) {
+        toast.error(
+          'A synthetic execution is already running for this test. Please wait for it to complete before starting a new one.',
+        );
+        return;
+      }
+
+      // Handle other errors with generic parsing
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to start synthetic execution');
     },
@@ -28,9 +37,6 @@ export const useSyntheticExecutionCancel = (
   return useMutation({
     mutationFn: async (executionId: string) =>
       api.testing.cancelSyntheticExecution(conceptUuid, testUuid, executionId),
-    onSuccess: () => {
-      toast.success('Execution cancelled');
-    },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to cancel execution');

@@ -1,23 +1,33 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import {
   useSyntheticDistributionPreview,
   useTestCollaterals,
 } from '@hooks/query/synthetic-execution.hook';
+import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import {
   ISyntheticExecutionRequest,
-  IDistributionPreview,
   ITestCollateralOption,
-  IProfileDistribution,
 } from '@libs/api/types/concept/testing';
-import MultiCollateralSelector from '@components/Testing/MultiCollateralSelector';
+import StepNavigation from './components/StepNavigation';
+import ParticipantSelectionStep from './components/ParticipantSelectionStep';
+import CollateralSelectionStep from './components/CollateralSelectionStep';
+import ConfigureLaunchStep from './components/ConfigureLaunchStep';
+import SyntheticLoadingUI from './components/SyntheticLoadingUI';
 
 interface ISyntheticExecutionPanelProps {
   // Existing props
-  status: 'idle' | 'running' | 'completed' | 'error' | 'cancelled';
+  status:
+    | 'idle'
+    | 'running'
+    | 'cancelling'
+    | 'completed'
+    | 'error'
+    | 'cancelled';
   progress: number;
   message: string;
+  currentStage?: string;
   currentPersona?: string;
   totalPersonas?: number;
   resultsCount?: number;
@@ -28,12 +38,22 @@ interface ISyntheticExecutionPanelProps {
   conceptUuid: string;
   testUuid: string;
   onExecute: (config: ISyntheticExecutionRequest) => void;
+  onReset: () => void;
+  onNavigateToCollateral?: (collateralUuid: string) => void;
+  onNavigateToResults?: () => void;
 }
+
+/**
+ * Utility function to normalize UUID format from underscores to hyphens
+ * This ensures consistency between frontend state and backend expectations
+ */
+const normalizeUuid = (uuid: string): string => uuid.replace(/_/g, '-');
 
 const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   status,
   progress,
   message,
+  currentStage,
   currentPersona,
   totalPersonas,
   resultsCount,
@@ -42,22 +62,67 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   conceptUuid,
   testUuid,
   onExecute,
+  onReset,
+  onNavigateToCollateral,
+  onNavigateToResults,
 }) => {
   // Configuration state
-  const [totalTests, setTotalTests] = useState<number>(2);
   const [selectedCollateralUuids, setSelectedCollateralUuids] = useState<
     string[]
   >([]);
-  const [showDistributionPreview, setShowDistributionPreview] =
-    useState<boolean>(false);
+
+  // Participant selection state - maps profile UUID to count
+  const [participantCounts, setParticipantCounts] = useState<
+    Record<string, number>
+  >({});
+  const [skippedParticipants, setSkippedParticipants] = useState<Set<string>>(
+    new Set(),
+  );
 
   // Hooks for data fetching
   const { data: collaterals, isLoading: collateralsLoading } =
     useTestCollaterals(conceptUuid, testUuid);
+  const { profiles, isLoading: profilesLoading } =
+    useConceptCustomerProfiles(conceptUuid);
   const distributionPreview = useSyntheticDistributionPreview(
     conceptUuid,
     testUuid,
   );
+
+  // Computed values
+  const totalTests = useMemo(() => {
+    return Object.entries(participantCounts)
+      .filter(([uuid]) => !skippedParticipants.has(uuid))
+      .reduce((sum, [, count]) => sum + count, 0);
+  }, [participantCounts, skippedParticipants]);
+
+  // Filter profiles to only show selected ones for loading UI
+  const selectedProfiles = useMemo(() => {
+    return profiles.filter((profile) => {
+      const normalizedUuid = normalizeUuid(profile.uuid);
+      return (
+        !skippedParticipants.has(normalizedUuid) &&
+        participantCounts[normalizedUuid] > 0
+      );
+    });
+  }, [profiles, skippedParticipants, participantCounts]);
+
+  // Initialize participant counts when profiles load (but not during execution)
+  useEffect(() => {
+    if (profiles.length > 0 && status === 'idle') {
+      const initialCounts: Record<string, number> = {};
+      profiles.forEach((profile) => {
+        // Ensure UUID format is consistent (hyphens, not underscores)
+        const normalizedUuid = normalizeUuid(profile.uuid);
+        initialCounts[normalizedUuid] = 5; // Default to 5 variants per profile
+      });
+
+      setParticipantCounts(initialCounts);
+
+      // Also reset skipped participants to ensure clean state
+      setSkippedParticipants(new Set());
+    }
+  }, [profiles, status]); // Only reset when status is idle
 
   // Memoized configuration object
   const executionConfig = useMemo(
@@ -67,13 +132,31 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
         selectedCollateralUuids.length > 0
           ? selectedCollateralUuids
           : undefined,
-      distribution_weights: undefined, // TODO: Add custom weights UI later
+      distribution_weights:
+        Object.keys(participantCounts).length > 0
+          ? Object.fromEntries(
+              Object.entries(participantCounts)
+                .filter(([uuid]) => !skippedParticipants.has(uuid))
+                .map(([uuid, count]) => [uuid, count]), // Send raw counts, backend will normalize
+            )
+          : undefined,
     }),
-    [totalTests, selectedCollateralUuids],
+    [
+      totalTests,
+      selectedCollateralUuids,
+      participantCounts,
+      skippedParticipants,
+    ],
   );
 
   // Handler functions
   const handleExecute = () => {
+    // Validate that at least one collateral is selected
+    if (selectedCollateralUuids.length === 0) {
+      // You can add toast notification here if needed
+      return;
+    }
+
     onExecute(executionConfig);
   };
 
@@ -86,16 +169,97 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
             ? selectedCollateralUuids[0]
             : undefined,
       });
-      setShowDistributionPreview(true);
     } catch (error) {
       // Error handled by the hook
     }
+  };
+
+  // Auto-trigger distribution preview when totalTests changes
+  useEffect(() => {
+    if (totalTests > 0 && totalTests <= 100) {
+      handlePreviewDistribution();
+    }
+  }, [totalTests]);
+
+  // Step validation
+  const isStep1Complete = totalTests >= 1; // Participants step (for now, just check totalTests)
+  const isStep2Complete = selectedCollateralUuids.length > 0; // Collateral step
+  const isStep3Complete = isStep1Complete && isStep2Complete; // Configure & Launch step
+
+  const isReady = isStep3Complete && totalTests >= 1 && totalTests <= 100;
+
+  // Collateral selection handler
+  const handleCollateralSelectionChange = (uuids: string[]) => {
+    setSelectedCollateralUuids(uuids);
+  };
+
+  // Participant count handlers
+  const handleParticipantCountChange = (
+    profileUuid: string,
+    newCount: number,
+  ) => {
+    if (newCount < 1) newCount = 1; // Minimum 1 variant per participant
+    if (newCount > 20) newCount = 20; // Max 20 variants per participant
+
+    // Ensure UUID format is consistent (hyphens, not underscores)
+    const normalizedUuid = normalizeUuid(profileUuid);
+    setParticipantCounts((prev) => ({
+      ...prev,
+      [normalizedUuid]: newCount,
+    }));
+  };
+
+  const handleRemoveParticipant = (profileUuid: string) => {
+    // Ensure UUID format is consistent (hyphens, not underscores)
+    const normalizedUuid = normalizeUuid(profileUuid);
+    setParticipantCounts((prev) => {
+      const newCounts = { ...prev };
+      delete newCounts[normalizedUuid];
+      return newCounts;
+    });
+    // Also remove from skipped if it was skipped
+    setSkippedParticipants((prev) => {
+      const newSkipped = new Set(prev);
+      newSkipped.delete(normalizedUuid);
+      return newSkipped;
+    });
+  };
+
+  const handleSkipParticipant = (profileUuid: string) => {
+    // Ensure UUID format is consistent (hyphens, not underscores)
+    const normalizedUuid = normalizeUuid(profileUuid);
+    // Remove from participant counts completely
+    setParticipantCounts((prev) => {
+      const newCounts = { ...prev };
+      delete newCounts[normalizedUuid];
+      return newCounts;
+    });
+    // Add to skipped set
+    setSkippedParticipants((prev) => new Set(prev).add(normalizedUuid));
+  };
+
+  const handleUnskipParticipant = (profileUuid: string) => {
+    // Ensure UUID format is consistent (hyphens, not underscores)
+    const normalizedUuid = normalizeUuid(profileUuid);
+    // Remove from skipped set
+    setSkippedParticipants((prev) => {
+      const newSkipped = new Set(prev);
+      newSkipped.delete(normalizedUuid);
+      return newSkipped;
+    });
+    // Add back to participant counts with default value
+    setParticipantCounts((prev) => ({
+      ...prev,
+      [normalizedUuid]: 5,
+    }));
   };
 
   const getStatusColor = () => {
     switch (status) {
       case 'running':
         return 'aucctus-text-brand-primary';
+      case 'cancelling':
+        return 'aucctus-text-warning-primary';
       case 'completed':
         return 'aucctus-text-success-primary';
       case 'error':
@@ -110,6 +274,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   const getStatusIcon = () => {
     switch (status) {
       case 'running':
+        return 'loading-02';
+      case 'cancelling':
         return 'loading-02';
       case 'completed':
         return 'check';
@@ -127,7 +293,9 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       case 'idle':
         return 'Ready to Execute';
       case 'running':
-        return 'Generating Synthetic Interviews';
+        return 'Execution in Progress';
+      case 'cancelling':
+        return 'Cancelling Execution';
       case 'completed':
         return 'Execution Completed';
       case 'error':
@@ -140,238 +308,243 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   };
 
   return (
-    <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-6'>
-      <div className='flex items-start gap-3'>
-        <div className='mt-1'>
-          <Icon
-            variant={getStatusIcon()}
-            className={cn('h-5 w-5', getStatusColor())}
-          />
-        </div>
-
-        <div className='flex-1'>
-          <h4 className={cn('aucctus-text-md-semibold mb-3', getStatusColor())}>
-            {getStatusTitle()}
-          </h4>
-
-          {/* Configuration Form - Only show when idle */}
-          {status === 'idle' && (
-            <div className='mb-6 space-y-4'>
-              {/* Total Tests Input */}
+    <div className='space-y-6'>
+      {/* Test Preview Section - Hide when execution is running */}
+      {status === 'idle' && (
+        <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-xl border border-l-4 border-l-black shadow-sm'>
+          <div className='px-6 py-4'>
+            <div className='flex items-center justify-between'>
               <div>
-                <label className='aucctus-text-sm-medium aucctus-text-primary mb-2 block'>
-                  Total Synthetic Tests
-                </label>
-                <input
-                  type='number'
-                  min='1'
-                  max='100'
-                  value={totalTests}
-                  onChange={(e) => setTotalTests(Number(e.target.value))}
-                  className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary focus:border-brand-primary w-full rounded-md border px-3 py-2 text-sm focus:outline-none'
-                  placeholder='5'
-                />
-                <p className='aucctus-text-xs aucctus-text-secondary mt-1'>
-                  Number of synthetic interviews to generate (1-100)
+                <h2 className='aucctus-text-primary text-3xl font-bold'>
+                  Test Preview
+                </h2>
+                <p className='aucctus-text-sm aucctus-text-secondary mt-1'>
+                  Synthetic 1-1 Customer Interviews
                 </p>
               </div>
 
-              {/* Multi-Collateral Selection */}
-              <div>
-                <label className='aucctus-text-sm-medium aucctus-text-primary mb-2 block'>
-                  Interview Materials (Optional)
-                </label>
-                <MultiCollateralSelector
-                  collaterals={collaterals || []}
-                  selectedCollateralUuids={selectedCollateralUuids}
-                  onSelectionChange={setSelectedCollateralUuids}
-                  isLoading={collateralsLoading}
-                  disabled={status !== 'idle'}
-                />
-              </div>
-
-              {/* Distribution Preview */}
-              <div>
-                <button
-                  type='button'
-                  onClick={handlePreviewDistribution}
-                  disabled={distributionPreview.isLoading}
-                  className='btn btn-light btn-sm flex items-center gap-2'
-                >
-                  {distributionPreview.isLoading ? (
+              {/* Metrics Row */}
+              <div className='flex items-center gap-12'>
+                <div className='flex items-center gap-3'>
+                  <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
                     <Icon
-                      variant='loading-02'
-                      className='aucctus-stroke-secondary h-4 w-4'
+                      variant='users-03'
+                      className='aucctus-stroke-brand-primary h-4 w-4'
                     />
-                  ) : (
-                    <Icon
-                      variant='eye'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
-                  )}
-                  Preview Distribution
-                </button>
-              </div>
-
-              {/* Distribution Preview Results */}
-              {showDistributionPreview && distributionPreview.data && (
-                <div className='aucctus-bg-primary aucctus-border-secondary rounded-md border p-4'>
-                  <h5 className='aucctus-text-sm-semibold aucctus-text-primary mb-3'>
-                    Distribution Preview
-                  </h5>
-                  <div className='space-y-2'>
-                    <div className='flex justify-between text-sm'>
-                      <span className='aucctus-text-secondary'>Strategy:</span>
-                      <span className='aucctus-text-primary capitalize'>
-                        {distributionPreview.data.distributionStrategy.replace(
-                          '_',
-                          ' ',
-                        )}
-                      </span>
-                    </div>
-                    <div className='flex justify-between text-sm'>
-                      <span className='aucctus-text-secondary'>
-                        Total Tests:
-                      </span>
-                      <span className='aucctus-text-primary'>
-                        {distributionPreview.data.totalTests}
-                      </span>
-                    </div>
-                    {distributionPreview.data.collateralTitle && (
-                      <div className='flex justify-between text-sm'>
-                        <span className='aucctus-text-secondary'>
-                          Collateral:
-                        </span>
-                        <span className='aucctus-text-primary'>
-                          {distributionPreview.data.collateralTitle}
-                        </span>
-                      </div>
-                    )}
                   </div>
-
-                  <div className='mt-3'>
-                    <h6 className='aucctus-text-xs-semibold aucctus-text-secondary mb-2'>
-                      Profile Distribution:
-                    </h6>
-                    <div className='space-y-1'>
-                      {distributionPreview.data.profileDistributions.map(
-                        (profile: IProfileDistribution) => (
-                          <div
-                            key={profile.profileUuid}
-                            className='flex justify-between text-xs'
-                          >
-                            <span className='aucctus-text-secondary'>
-                              {profile.profileName}{' '}
-                              {profile.isPrimary && '(Primary)'}
-                            </span>
-                            <span className='aucctus-text-primary'>
-                              {profile.testCount} tests (
-                              {Math.round(profile.weight * 100)}%)
-                            </span>
-                          </div>
-                        ),
-                      )}
+                  <div>
+                    <div className='aucctus-text-xl-bold aucctus-text-primary'>
+                      {totalTests}
+                    </div>
+                    <div className='aucctus-text-xs aucctus-text-secondary'>
+                      Participants
                     </div>
                   </div>
                 </div>
-              )}
 
-              {/* Execute Button */}
-              <div className='flex gap-3'>
-                <button
-                  onClick={handleExecute}
-                  className='btn btn-primary btn-md flex items-center gap-2'
-                >
-                  <Icon
-                    variant='play-square'
-                    className='aucctus-stroke-white h-4 w-4'
-                  />
-                  Execute Synthetic Testing
-                </button>
+                <div className='flex items-center gap-3'>
+                  <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
+                    <Icon
+                      variant='file-attachment'
+                      className='aucctus-stroke-brand-primary h-4 w-4'
+                    />
+                  </div>
+                  <div>
+                    <div className='aucctus-text-xl-bold aucctus-text-primary'>
+                      {selectedCollateralUuids.length}
+                    </div>
+                    <div className='aucctus-text-xs aucctus-text-secondary'>
+                      Collateral
+                    </div>
+                  </div>
+                </div>
+
+                <div className='flex items-center gap-3'>
+                  <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
+                    <Icon
+                      variant='clock'
+                      className='aucctus-stroke-brand-primary h-4 w-4'
+                    />
+                  </div>
+                  <div>
+                    <div className='aucctus-text-xl-bold aucctus-text-primary'>
+                      5-10 min
+                    </div>
+                    <div className='aucctus-text-xs aucctus-text-secondary'>
+                      Runtime
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
-          {/* Progress Bar */}
-          {(status === 'running' || status === 'completed') && (
-            <div className='mb-4'>
-              <div className='aucctus-bg-secondary mb-2 h-2 rounded-full'>
-                <div
-                  className='aucctus-bg-brand-primary h-2 rounded-full transition-all duration-300'
-                  style={{ width: `${progress}%` }}
+      {/* Step-based Configuration - Only show when idle */}
+      {status === 'idle' && (
+        <div className='space-y-6'>
+          {/* Step 1: Select Participants */}
+          <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border shadow-sm'>
+            <div className='px-6 py-4'>
+              <StepNavigation
+                stepNumber={1}
+                title='Select Participants'
+                description='Choose participant profiles for your synthetic test'
+                isComplete={isStep1Complete}
+              />
+
+              <ParticipantSelectionStep
+                profiles={profiles}
+                participantCounts={participantCounts}
+                skippedParticipants={skippedParticipants}
+                onParticipantCountChange={handleParticipantCountChange}
+                onRemoveParticipant={handleRemoveParticipant}
+                onSkipParticipant={handleSkipParticipant}
+                onUnskipParticipant={handleUnskipParticipant}
+                isLoading={profilesLoading}
+              />
+            </div>
+          </div>
+
+          {/* Step 2: Select Collateral */}
+          <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border shadow-sm'>
+            <div className='px-6 py-4'>
+              <StepNavigation
+                stepNumber={2}
+                title='Select Collateral'
+                description='Choose materials for your synthetic interviews'
+                isComplete={isStep2Complete}
+              />
+
+              <CollateralSelectionStep
+                collaterals={collaterals || []}
+                selectedCollateralUuids={selectedCollateralUuids}
+                onSelectionChange={handleCollateralSelectionChange}
+                isLoading={collateralsLoading}
+                maxSelection={4}
+                onNavigateToCollateral={onNavigateToCollateral}
+              />
+            </div>
+          </div>
+
+          {/* Step 3: Configure & Launch */}
+          <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border shadow-sm'>
+            <div className='px-6 py-4'>
+              <div className='flex items-center justify-between'>
+                <StepNavigation
+                  stepNumber={3}
+                  title='Configure & Launch'
+                  description='Ready to start your synthetic test'
+                  isComplete={isStep3Complete}
                 />
-              </div>
-              <div className='aucctus-text-xs aucctus-text-secondary flex justify-between'>
-                <span>{progress}% Complete</span>
-                {currentPersona && totalPersonas && (
-                  <span>
-                    Processing {currentPersona} ({totalPersonas} total)
-                  </span>
-                )}
+
+                <ConfigureLaunchStep
+                  isReady={isReady}
+                  onExecute={handleExecute}
+                />
               </div>
             </div>
-          )}
+          </div>
+        </div>
+      )}
 
-          {/* Status Message */}
-          {status !== 'completed' && (
-            <p className='aucctus-text-sm-regular aucctus-text-secondary mb-4'>
-              {message ||
-                (status === 'idle'
-                  ? 'Configure your synthetic testing parameters above and click Execute to start'
-                  : 'Processing synthetic interviews...')}
-            </p>
-          )}
+      {/* New Loading UI - Show during execution states */}
+      {(status === 'running' || status === 'completed') && (
+        <SyntheticLoadingUI
+          progress={progress}
+          status={status}
+          message={message}
+          currentStage={currentStage}
+          profiles={selectedProfiles}
+          currentPersona={currentPersona}
+          totalPersonas={totalPersonas}
+          resultsCount={resultsCount}
+          onViewResults={onNavigateToResults}
+        />
+      )}
 
-          {/* Results Count */}
-          {status === 'completed' && resultsCount && (
-            <div className='aucctus-bg-success-secondary mb-4 rounded-md p-3'>
-              <div className='flex items-center gap-2'>
-                <Icon
-                  variant='check'
-                  className='aucctus-stroke-success-primary h-4 w-4'
-                />
-                <p className='aucctus-text-sm-medium aucctus-text-success-primary'>
-                  {resultsCount} results generated
+      {/* Legacy Progress Section - Show for error/cancelled states */}
+      {(status === 'cancelling' ||
+        status === 'error' ||
+        status === 'cancelled') && (
+        <div className='aucctus-border-secondary border-t p-6'>
+          <div className='space-y-4'>
+            <div className='flex items-center justify-between'>
+              <div>
+                <h4 className='aucctus-text-sm-semibold aucctus-text-primary'>
+                  Execution Progress
+                </h4>
+                <p className='aucctus-text-xs aucctus-text-secondary'>
+                  {status === 'error'
+                    ? 'Interview generation failed'
+                    : status === 'cancelled'
+                      ? 'Interview generation cancelled'
+                      : status === 'cancelling'
+                        ? 'Stopping current operations'
+                        : 'Generating synthetic customer interviews...'}
                 </p>
               </div>
+              <div className='text-right'>
+                <div className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
+                  {status === 'cancelling' ? '' : `${progress}%`}
+                </div>
+                <div className='aucctus-text-xs aucctus-text-secondary'>
+                  {status === 'cancelling' ? '' : 'Complete'}
+                </div>
+              </div>
             </div>
-          )}
+            <div className='aucctus-bg-secondary-subtle h-3 overflow-hidden rounded-full'>
+              <div
+                className='aucctus-bg-brand-primary h-full rounded-full transition-all duration-500 ease-out'
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
 
-          {/* Error Display */}
-          {status === 'error' && error && (
-            <div className='aucctus-bg-error-secondary mb-4 rounded-md p-3'>
-              <div className='flex items-start gap-2'>
+      {/* Error Display */}
+      {status === 'error' && error && (
+        <div className='aucctus-border-error border-t p-6'>
+          <div className='aucctus-bg-error-subtle rounded-lg p-4'>
+            <div className='flex items-start gap-3'>
+              <div className='aucctus-bg-error-primary mt-0.5 rounded-full p-1.5'>
                 <Icon
                   variant='alert-circle'
-                  className='aucctus-stroke-error-primary mt-0.5 h-4 w-4'
+                  className='aucctus-stroke-white h-4 w-4'
                 />
-                <div>
-                  <p className='aucctus-text-sm-medium aucctus-text-error-primary mb-1'>
-                    Execution Failed
-                  </p>
-                  <p className='aucctus-text-sm-regular aucctus-text-error-primary'>
-                    {error}
-                  </p>
-                </div>
+              </div>
+              <div className='flex-1'>
+                <h4 className='aucctus-text-sm-semibold aucctus-text-error-primary mb-1'>
+                  Execution Failed
+                </h4>
+                <p className='aucctus-text-sm aucctus-text-error-primary'>
+                  {error}
+                </p>
               </div>
             </div>
-          )}
-
-          {/* Cancel Button */}
-          {status === 'running' && (
-            <button
-              className='btn btn-light btn-sm flex items-center gap-2'
-              onClick={onCancel}
-            >
-              <Icon
-                variant='closeX'
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
-              Cancel Execution
-            </button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Action Buttons - Cancel button removed */}
+
+      {/* Back Button for Completed State */}
+      {status === 'completed' && (
+        <div className='aucctus-border-secondary border-t p-6'>
+          <button
+            className='btn btn-light btn-sm flex items-center gap-2'
+            onClick={onReset}
+          >
+            <Icon
+              variant='arrowleft'
+              className='aucctus-stroke-secondary h-4 w-4'
+            />
+            Back
+          </button>
+        </div>
+      )}
     </div>
   );
 };

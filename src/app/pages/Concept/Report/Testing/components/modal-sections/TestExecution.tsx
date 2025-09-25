@@ -9,22 +9,29 @@ import {
 } from '@hooks/query/synthetic-execution.hook';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
+import { useEffect } from 'react';
 
 interface TestExecutionProps {
   conceptUuid?: string;
   testUuid?: string;
+  onNavigateToCollateral?: (collateralUuid: string) => void;
+  onNavigateToResults?: () => void;
+  onExecutionStateChange?: (executionState: any) => void; // Expose execution state to parent
 }
 
 const TestExecution: React.FC<TestExecutionProps> = ({
   conceptUuid,
   testUuid,
+  onNavigateToCollateral,
+  onNavigateToResults,
+  onExecutionStateChange,
 }) => {
   const [selectedMode, setSelectedMode] = useState<string | null>(
     'facilitated',
   );
 
   // WebSocket events for real-time execution
-  const { executionState, resetExecution, setExecutionId } =
+  const { executionState, resetExecution, setCancellingState, setExecutionId } =
     useSyntheticExecutionEvents(
       conceptUuid || '',
       testUuid || '',
@@ -37,6 +44,11 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         }
       },
     );
+
+  // Notify parent when execution state changes
+  useEffect(() => {
+    onExecutionStateChange?.(executionState);
+  }, [executionState, onExecutionStateChange]);
 
   // Execution mutations
   const startExecution = useSyntheticExecutionStart(
@@ -71,8 +83,20 @@ const TestExecution: React.FC<TestExecutionProps> = ({
 
   const handleCancelExecution = async () => {
     if (executionState.executionId) {
-      await cancelExecution.mutateAsync(executionState.executionId);
-      resetExecution();
+      // Immediately set to cancelling state for instant user feedback
+      setCancellingState();
+
+      try {
+        await cancelExecution.mutateAsync(executionState.executionId);
+        // Don't call resetExecution here - let the WebSocket error event handle the final state
+      } catch (error) {
+        // If the cancel request fails, reset to previous state
+        // The error is already handled by the mutation's onError callback
+        if (process.env.NODE_ENV === 'development') {
+          // eslint-disable-next-line no-console
+          console.error('Failed to cancel execution:', error);
+        }
+      }
     }
   };
 
@@ -224,6 +248,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             status={executionState.status}
             progress={executionState.progress}
             message={executionState.message}
+            currentStage={executionState.currentStage}
             currentPersona={executionState.currentPersona}
             totalPersonas={executionState.totalPersonas}
             resultsCount={executionState.resultsCount}
@@ -232,6 +257,9 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             conceptUuid={conceptUuid || ''}
             testUuid={testUuid || ''}
             onExecute={handleExecuteSynthetic}
+            onReset={resetExecution}
+            onNavigateToCollateral={onNavigateToCollateral}
+            onNavigateToResults={onNavigateToResults}
           />
         </div>
       )}
@@ -247,21 +275,60 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           </div>
           <div>
             <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-3'>
-              How facilitated testing works
+              {selectedMode === 'synthetic'
+                ? 'How synthetic testing works'
+                : 'How facilitated testing works'}
             </h4>
             <ul className='aucctus-text-sm-regular aucctus-text-secondary list-disc space-y-2 pl-5'>
-              <li>
-                Schedule interview sessions with your selected participants
-              </li>
-              <li>
-                Use the interview guide from the Collateral tab to conduct the
-                session
-              </li>
-              <li>
-                Take detailed notes or record the session (with permission)
-              </li>
-              <li>Return to Aucctus to log your findings in the Results tab</li>
-              <li>Update your assumptions based on what you learned</li>
+              {selectedMode === 'synthetic' ? (
+                <>
+                  <li>
+                    Select your interview materials (mockups, surveys,
+                    prototypes)
+                  </li>
+                  <li>
+                    Configure the number of AI-generated customer interviews
+                  </li>
+                  <li>
+                    Interviews are distributed across your customer personas
+                    (e.g., 7 interviews ÷ 3 personas = 2-3 interviews per
+                    persona)
+                  </li>
+                  <li>
+                    Each persona gets 1 interview from the original profile + 1
+                    interview from a demographic variation
+                  </li>
+                  <li>
+                    AI agents analyze your materials and respond as different
+                    customer personas
+                  </li>
+                  <li>
+                    Review structured insights and raw interview transcripts in
+                    the Results tab
+                  </li>
+                  <li>
+                    Update your assumptions based on the synthetic customer
+                    feedback
+                  </li>
+                </>
+              ) : (
+                <>
+                  <li>
+                    Schedule interview sessions with your selected participants
+                  </li>
+                  <li>
+                    Use the interview guide from the Collateral tab to conduct
+                    the session
+                  </li>
+                  <li>
+                    Take detailed notes or record the session (with permission)
+                  </li>
+                  <li>
+                    Return to Aucctus to log your findings in the Results tab
+                  </li>
+                  <li>Update your assumptions based on what you learned</li>
+                </>
+              )}
             </ul>
           </div>
         </div>

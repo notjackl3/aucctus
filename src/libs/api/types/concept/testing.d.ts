@@ -34,6 +34,7 @@ export interface ITestResult {
   solutionFeedback?: string; // Maps to solution_feedback from Django model
   willingnessToPayFeedback?: string; // Maps to willingness_to_pay from Django model
   overallSentiment?: string; // Maps to overall_sentiment from Django model
+  rawInterviewTranscript?: string; // Maps to raw_interview_transcript from Django model
 }
 
 export interface ITestFile {
@@ -139,9 +140,19 @@ export interface ISyntheticExecutionStartResponse {
 }
 
 export interface ISyntheticExecutionStatusResponse {
+  execution_id: string;
+  concept_uuid: string;
+  test_uuid: string;
+  workflow_execution_uuid: string;
   status: 'pending' | 'running' | 'completed' | 'error' | 'cancelled';
   progress: number;
   message: string;
+  started_at?: string;
+  completed_at?: string;
+  results_count?: number;
+  duration_seconds?: number;
+  error?: any;
+  // Legacy fields for backward compatibility
   resultsCount?: number;
   currentPersona?: string;
   totalPersonas?: number;

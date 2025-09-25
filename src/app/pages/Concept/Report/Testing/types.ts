@@ -72,6 +72,17 @@ export interface ITestDetails {
   updatedAt: string;
   concept: number;
   notes: string;
+  // Aggregated AI-extracted findings from all test results
+  affirmingFindings?: Array<{
+    uuid: string;
+    learning: string;
+    impact: string;
+  }>;
+  challengingFindings?: Array<{
+    uuid: string;
+    learning: string;
+    impact: string;
+  }>;
 }
 
 export interface ITestDetailsCreate {

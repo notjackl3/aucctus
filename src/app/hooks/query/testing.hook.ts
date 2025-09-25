@@ -53,11 +53,33 @@ export const useTestDetails = (conceptUuid: string) => {
  * @param testUuid - The UUID of the test.
  * @returns The result of the useQuery hook.
  */
-export const useTestDetail = (conceptUuid: string, testUuid: string) => {
+export const useTestDetail = (
+  conceptUuid: string,
+  testUuid: string,
+  options?: { enabled?: boolean },
+) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
-    queryFn: async () => await api.testing.getTestDetail(conceptUuid, testUuid),
-    enabled: !!conceptUuid && !!testUuid,
+    queryFn: async () => {
+      console.log('🔍 [DEBUG] useTestDetail fetching data', {
+        conceptUuid,
+        testUuid,
+        timestamp: new Date().toISOString(),
+      });
+      const result = await api.testing.getTestDetail(conceptUuid, testUuid);
+      console.log('📥 [DEBUG] useTestDetail received data', {
+        conceptUuid,
+        testUuid,
+        hasAffirming: result?.affirmingFindings?.length || 0,
+        hasChallenging: result?.challengingFindings?.length || 0,
+        timestamp: new Date().toISOString(),
+      });
+      return result;
+    },
+    enabled:
+      options?.enabled !== undefined
+        ? options.enabled
+        : !!conceptUuid && !!testUuid,
     staleTime: 1000 * 30, // 30 seconds - shorter for more frequent updates
     cacheTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: true, // Refetch when user returns to tab
@@ -935,6 +957,47 @@ export const useDeleteTestResultFile = () => {
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to delete file. Please try again.');
+    },
+  });
+};
+
+/**
+ * Custom hook for deleting test result files without showing individual toast notifications.
+ * Useful for bulk operations where you want to show one final toast instead of multiple.
+ * @returns The result of the useMutation hook.
+ */
+export const useDeleteTestResultFileSilent = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      testUuid: string;
+      resultUuid: string;
+      fileUuid: string;
+    }) => {
+      const { conceptUuid, testUuid, resultUuid, fileUuid } = params;
+      return await api.testing.deleteTestResultFile(
+        conceptUuid,
+        testUuid,
+        resultUuid,
+        fileUuid,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testResults,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      // No toast notification for silent deletion
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      // Still show error toasts since those are important
       toast.error(message || 'Failed to delete file. Please try again.');
     },
   });

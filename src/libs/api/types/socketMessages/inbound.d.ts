@@ -131,7 +131,13 @@ export interface ITestResultProcessingMessage extends BaseSocketEvent {
   conceptUuid: string;
   testUuid: string;
   testResultUuid: string;
-  stage: 'extracting_text' | 'analyzing_content' | 'generating_insights';
+  stage:
+    | 'extracting_text'
+    | 'analyzing_content'
+    | 'generating_insights'
+    | 'analyzing_results'
+    | 'processing_files'
+    | 'extracting_findings';
   progress?: number; // 0-100
   value: boolean; // Whether processing is active
   account_uuid: string;

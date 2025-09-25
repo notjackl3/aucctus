@@ -11,8 +11,8 @@ import {
 import { Assumption } from '../types';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
-import { animated, easings, useTransition } from '@react-spring/web';
 import { useTestCompletion } from '../Testing';
+import { useSyntheticExecutionEvents } from '@hooks/sockets/testing';
 
 // Test Execution Modal Sections
 import TestOverview from './modal-sections/TestOverview';
@@ -47,6 +47,15 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     new Set(['overview']),
   );
 
+  // State for tracking selected collateral when navigating from execute tab
+  const [selectedCollateralUuid, setSelectedCollateralUuid] = useState<
+    string | undefined
+  >();
+
+  // Track synthetic execution state for coordinating Results tab display
+  // Note: We get execution state from TestExecution component to avoid duplicate socket listeners
+  const [executionState, setExecutionState] = useState<any>(null);
+
   // Only fetch test detail initially (needed for all tabs)
   const {
     testDetail,
@@ -66,7 +75,12 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   // Update visited tabs when activeTab changes
   useEffect(() => {
     setVisitedTabs((prev) => new Set([...prev, activeTab]));
-  }, [activeTab]);
+
+    // Clear selected collateral UUID when navigating away from collateral tab
+    if (activeTab !== 'collateral' && selectedCollateralUuid) {
+      setSelectedCollateralUuid(undefined);
+    }
+  }, [activeTab, selectedCollateralUuid]);
 
   // Check if test can be completed (will be determined by Results tab)
   const [canCompleteTest, setCanCompleteTest] = useState(false);
@@ -242,12 +256,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   const displayAssumptions = assumptions;
   const displayTestType = testDetail?.testType || testType;
 
-  const transition = useTransition(activeTab, {
-    from: { opacity: 0, transform: 'translateX(-20px)' },
-    enter: { opacity: 1, transform: 'translateX(0px)' },
-    leave: { opacity: 0, transform: 'translateX(20px)' },
-    config: { duration: 500, easing: easings.easeInOutCubic },
-  });
+  // Removed React Spring transition to prevent component unmounting
 
   // Render tab content with lazy loading
   const renderTabContent = (item: string) => {
@@ -276,10 +285,32 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
         );
 
       case 'collateral':
-        return <TestCollateral conceptUuid={conceptUuid} testUuid={testUuid} />;
+        return (
+          <TestCollateral
+            conceptUuid={conceptUuid}
+            testUuid={testUuid}
+            initialSelectedCollateralUuid={selectedCollateralUuid}
+          />
+        );
 
       case 'execute':
-        return <TestExecution conceptUuid={conceptUuid} testUuid={testUuid} />;
+        return (
+          <TestExecution
+            conceptUuid={conceptUuid}
+            testUuid={testUuid}
+            onNavigateToCollateral={(collateralUuid) => {
+              // Set the selected collateral UUID
+              setSelectedCollateralUuid(collateralUuid);
+              // Navigate to collateral tab
+              setActiveTab('collateral');
+            }}
+            onNavigateToResults={() => {
+              // Navigate to results tab
+              setActiveTab('results');
+            }}
+            onExecutionStateChange={setExecutionState}
+          />
+        );
 
       case 'results':
         return (
@@ -288,6 +319,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             testUuid={testUuid}
             onResultsChange={handleResultsChange}
             isViewMode={isViewMode} // Pass view mode to TestResults
+            executionState={executionState} // Pass execution state for progress coordination
           />
         );
 
@@ -371,13 +403,17 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
                 </div>
               ) : (
                 <>
-                  {transition((style, item) => (
-                    <animated.div
-                      style={style}
-                      className='absolute inset-0 overflow-y-auto p-6'
+                  {/* Render all visited tabs but only show the active one */}
+                  {Array.from(visitedTabs).map((tabKey) => (
+                    <div
+                      key={tabKey}
+                      className={cn(
+                        'absolute inset-0 overflow-y-auto p-6',
+                        activeTab !== tabKey && 'hidden',
+                      )}
                     >
-                      {renderTabContent(item)}
-                    </animated.div>
+                      {renderTabContent(tabKey)}
+                    </div>
                   ))}
                 </>
               )}

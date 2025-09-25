@@ -10,9 +10,16 @@ import {
 } from '@libs/api/types';
 
 interface ISyntheticExecutionState {
-  status: 'idle' | 'running' | 'completed' | 'error' | 'cancelled';
+  status:
+    | 'idle'
+    | 'running'
+    | 'cancelling'
+    | 'completed'
+    | 'error'
+    | 'cancelled';
   progress: number;
   message: string;
+  currentStage?: string;
   currentPersona?: string;
   totalPersonas?: number;
   resultsCount?: number;
@@ -46,14 +53,43 @@ export const useSyntheticExecutionEvents = (
           console.log(
             '🔵 FRONTEND: Message matches current concept/test, updating state',
           );
-          setExecutionState((prev) => ({
-            ...prev,
-            status: 'running',
-            progress: data.progress,
-            message: data.message,
-            currentPersona: data.currentPersona,
-            totalPersonas: data.totalPersonas,
-          }));
+
+          // Check if this is the final completion (100% progress)
+          const isComplete = data.progress >= 100;
+
+          setExecutionState((prev) => {
+            const newState: ISyntheticExecutionState = {
+              ...prev,
+              status: isComplete ? 'completed' : 'running',
+              progress: data.progress,
+              message: data.message,
+              currentStage: data.stage,
+              currentPersona: data.currentPersona,
+              totalPersonas: data.totalPersonas,
+            };
+
+            // Only invalidate queries and show completion toast when reaching 100%
+            if (isComplete) {
+              console.log(
+                '🎉 FRONTEND: Pipeline fully complete (100%), showing results and invalidating queries',
+              );
+
+              // Invalidate test results queries to show new synthetic results
+              queryClient.invalidateQueries({
+                queryKey: [AucctusQueryKeys.testResults, conceptUuid, testUuid],
+              });
+
+              // Show final success toast
+              toast.success(
+                'Synthetic testing complete! All results are now available.',
+              );
+
+              // Call completion callback with results count
+              onComplete?.(prev.resultsCount || 0);
+            }
+
+            return newState;
+          });
         } else {
           console.log(
             '🔵 FRONTEND: Message does not match current concept/test',
@@ -66,11 +102,11 @@ export const useSyntheticExecutionEvents = (
           );
         }
       },
-      [conceptUuid, testUuid],
+      [conceptUuid, testUuid, queryClient, onComplete],
     ),
   );
 
-  // Completion
+  // Completion (now only for synthetic execution phase, not final completion)
   useSocketEvent<
     'synthetic.execution.completed.user',
     ISyntheticExecutionCompletedMessage
@@ -78,25 +114,29 @@ export const useSyntheticExecutionEvents = (
     'synthetic.execution.completed.user',
     useCallback(
       (data: ISyntheticExecutionCompletedMessage) => {
+        console.log(
+          '🟢 FRONTEND: Received synthetic execution phase completion:',
+          data,
+        );
         if (data.conceptUuid === conceptUuid && data.testUuid === testUuid) {
+          console.log(
+            '🟢 FRONTEND: Synthetic execution phase completed, but analysis pipeline is still running...',
+          );
+          // Don't set status to 'completed' or invalidate queries yet
+          // Just update the message and results count
           setExecutionState((prev) => ({
             ...prev,
-            status: 'completed',
-            progress: 100,
             message: data.message,
             resultsCount: data.resultsCount,
           }));
 
-          // Invalidate test results queries to show new synthetic results immediately
-          queryClient.invalidateQueries({
-            queryKey: [AucctusQueryKeys.testResults, conceptUuid, testUuid],
-          });
-
-          toast.success(`Generated ${data.resultsCount} synthetic interviews`);
-          onComplete?.(data.resultsCount);
+          // Show a brief intermediate toast, but don't mark as complete
+          console.log(
+            `🟢 FRONTEND: Generated ${data.resultsCount} synthetic interviews. Analysis pipeline is running...`,
+          );
         }
       },
-      [conceptUuid, testUuid, onComplete, queryClient],
+      [conceptUuid, testUuid],
     ),
   );
 
@@ -109,14 +149,29 @@ export const useSyntheticExecutionEvents = (
     useCallback(
       (data: ISyntheticExecutionErrorMessage) => {
         if (data.conceptUuid === conceptUuid && data.testUuid === testUuid) {
-          setExecutionState((prev) => ({
-            ...prev,
-            status: 'error',
-            message: data.errorMessage,
-            error: data.errorMessage,
-          }));
+          // Check if this is a cancellation error
+          const isCancellation = data.errorMessage
+            ?.toLowerCase()
+            .includes('cancel');
 
-          toast.error(`Execution failed: ${data.errorMessage}`);
+          if (isCancellation) {
+            // For cancellation, revert to idle state and show success toast
+            setExecutionState({
+              status: 'idle',
+              progress: 0,
+              message: '',
+            });
+            toast.success('Execution cancelled');
+          } else {
+            // For actual errors, show error state
+            setExecutionState((prev) => ({
+              ...prev,
+              status: 'error',
+              message: data.errorMessage,
+              error: data.errorMessage,
+            }));
+            toast.error(`Execution failed: ${data.errorMessage}`);
+          }
         }
       },
       [conceptUuid, testUuid],
@@ -131,6 +186,14 @@ export const useSyntheticExecutionEvents = (
     });
   }, []);
 
+  const setCancellingState = useCallback(() => {
+    setExecutionState((prev) => ({
+      ...prev,
+      status: 'cancelling',
+      message: 'Cancelling...',
+    }));
+  }, []);
+
   const setExecutionId = useCallback((executionId: string) => {
     setExecutionState((prev) => ({
       ...prev,
@@ -142,6 +205,7 @@ export const useSyntheticExecutionEvents = (
     executionState,
     setExecutionState,
     resetExecution,
+    setCancellingState,
     setExecutionId,
   };
 };

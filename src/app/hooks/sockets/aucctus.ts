@@ -83,7 +83,12 @@ export function useSocketEvent<
   eventName: T,
   callback: (data: Extract<InboundSocketEvent<C>, { type: T }>) => void,
 ) {
-  const savedCallback = React.useCallback(callback, [callback]);
+  const savedCallback = React.useRef(callback);
+
+  // Update the ref whenever callback changes, but don't trigger re-subscription
+  React.useEffect(() => {
+    savedCallback.current = callback;
+  }, [callback]);
 
   // State counter that increments when WebSocket instance changes
   const [wsInstanceCounter, setWsInstanceCounter] = React.useState(0);
@@ -126,7 +131,9 @@ export function useSocketEvent<
             return; // Reject the message
           }
 
-          savedCallback(data as Extract<InboundSocketEvent<C>, { type: T }>);
+          savedCallback.current(
+            data as Extract<InboundSocketEvent<C>, { type: T }>,
+          );
         }
       } catch (error) {
         // eslint-disable-next-line no-console
@@ -138,7 +145,7 @@ export function useSocketEvent<
     return () => {
       api.aucctusSocket.ws?.removeEventListener('message', handleIncoming);
     };
-  }, [eventName, savedCallback, wsInstanceCounter]);
+  }, [eventName, wsInstanceCounter]);
 }
 
 export function useSocketMaxRetriesExceeded(

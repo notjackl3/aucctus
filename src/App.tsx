@@ -29,6 +29,28 @@ function App() {
     return cleanup;
   }, [initializeAiEditingListeners]);
 
+  // Add portal target attribute to toast container
+  React.useEffect(() => {
+    const addPortalTargetToToasts = () => {
+      // Find the toast container
+      const toastContainer = document.querySelector(
+        '.Toastify__toast-container',
+      );
+      if (toastContainer) {
+        toastContainer.setAttribute('data-aucctus-portal-target', 'true');
+      }
+    };
+
+    // Add attribute immediately and also observe for new toasts
+    addPortalTargetToToasts();
+
+    // Create observer to watch for toast container changes
+    const observer = new MutationObserver(addPortalTargetToToasts);
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    return () => observer.disconnect();
+  }, []);
+
   // Public Routes (Unauthenticated)
   const PublicRoutes = usePublicRoutes();
 

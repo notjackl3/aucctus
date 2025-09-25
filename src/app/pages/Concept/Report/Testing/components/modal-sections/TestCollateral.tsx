@@ -16,11 +16,13 @@ import {
 interface TestCollateralProps {
   conceptUuid?: string;
   testUuid?: string;
+  initialSelectedCollateralUuid?: string;
 }
 
 const TestCollateral: React.FC<TestCollateralProps> = ({
   conceptUuid,
   testUuid,
+  initialSelectedCollateralUuid,
 }) => {
   // Use props data if available, otherwise fetch (for backward compatibility)
   const shouldFetch = !!conceptUuid && !!testUuid;
@@ -192,6 +194,16 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
       });
 
       setSelectedItem((prevSelectedItem) => {
+        // Check if we have an initial selection to make
+        if (initialSelectedCollateralUuid && !prevSelectedItem) {
+          const initialItem = displayCollateral.find(
+            (item) => item.id === initialSelectedCollateralUuid,
+          );
+          if (initialItem) {
+            return initialItem;
+          }
+        }
+
         if (!prevSelectedItem) {
           // Select first item if none selected
           return displayCollateral[0];
@@ -211,7 +223,23 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
         }
       });
     }
-  }, [displayCollateral, checkCompletedFeedback]);
+  }, [
+    displayCollateral,
+    checkCompletedFeedback,
+    initialSelectedCollateralUuid,
+  ]);
+
+  // Additional effect to handle initial selection when both data and UUID are available
+  React.useEffect(() => {
+    if (initialSelectedCollateralUuid && displayCollateral.length > 0) {
+      const targetItem = displayCollateral.find(
+        (item) => item.id === initialSelectedCollateralUuid,
+      );
+      if (targetItem) {
+        setSelectedItem(targetItem);
+      }
+    }
+  }, [initialSelectedCollateralUuid, displayCollateral]);
 
   // Separate effect to handle WebSocket completion auto-selection
   React.useEffect(() => {
