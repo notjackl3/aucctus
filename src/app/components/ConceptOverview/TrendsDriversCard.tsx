@@ -121,8 +121,8 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
               )}
             </div>
 
-            <div className='flex min-h-0 items-center justify-center'>
-              <div className='aspect-square max-h-[200px] w-full max-w-[200px]'>
+            <div className='flex items-center justify-center overflow-hidden'>
+              <div className='h-[200px] w-[200px] flex-shrink-0'>
                 {isLoading ? (
                   <div className='flex h-full items-center justify-center'>
                     <div className='aucctus-text-sm aucctus-text-secondary'>
@@ -138,8 +138,10 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
                     }}
                   />
                 ) : (
-                  <div className='aucctus-text-sm aucctus-text-secondary'>
-                    No trends data available
+                  <div className='flex h-full items-center justify-center'>
+                    <div className='aucctus-text-sm aucctus-text-secondary'>
+                      No trends data available
+                    </div>
                   </div>
                 )}
               </div>
@@ -147,8 +149,8 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
           </div>
         ) : (
           // Single-column layout: Visualization only (expanded)
-          <div className='flex flex-1 items-start justify-center px-4 pb-2 pt-0'>
-            <div className='aspect-square max-h-[280px] w-full max-w-[280px]'>
+          <div className='flex flex-1 items-start justify-center overflow-hidden px-4 pb-2 pt-0'>
+            <div className='h-[280px] w-[280px] flex-shrink-0'>
               {isLoading ? (
                 <div className='flex h-full items-center justify-center'>
                   <div className='aucctus-text-lg aucctus-text-secondary'>

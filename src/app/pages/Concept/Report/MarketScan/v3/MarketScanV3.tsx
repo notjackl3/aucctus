@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { Icon, UnifiedLoadingState } from '@components';
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
+import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
 import MarketForcesRadar from './components/MarketForcesRadar';
 import PriorityInsights from './components/PriorityInsights';
 import PESTELAnalysis from './components/PESTELAnalysis';
@@ -11,6 +12,7 @@ import {
   useMarketScanTrendsV3,
   useMarketScanPriorityInsightsV3,
   useMarketScanMarketForcesV3,
+  useConceptExecutiveSummaries,
 } from '@hooks/query/concepts.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
@@ -33,6 +35,8 @@ const MarketScanV3: React.FC = () => {
     useMarketScanPriorityInsightsV3(activeConceptUuid || '');
   const { marketForces = [], isLoading: isMarketForcesLoading } =
     useMarketScanMarketForcesV3(activeConceptUuid || '');
+  const { executiveSummaries, isLoading: isExecutiveSummariesLoading } =
+    useConceptExecutiveSummaries(activeConceptUuid || '');
 
   // Use unified loading state
   const { isLoading } = useUnifiedLoading({
@@ -42,6 +46,7 @@ const MarketScanV3: React.FC = () => {
       isTrendsLoading,
       isPriorityInsightsLoading,
       isMarketForcesLoading,
+      isExecutiveSummariesLoading,
     ],
   });
 
@@ -111,6 +116,12 @@ const MarketScanV3: React.FC = () => {
 
     return (
       <div className='mx-auto flex max-w-[1600px] flex-col gap-8 p-4'>
+        {/* Executive Summary */}
+        <ExecutiveSummaryBanner
+          summary={executiveSummaries?.marketScanTrendsDrivers}
+          isLoading={isExecutiveSummariesLoading}
+        />
+
         {/* Market Forces Radar Chart */}
         {marketForces.length > 0 && selectedRadarCategory && (
           <div>
@@ -143,12 +154,33 @@ const MarketScanV3: React.FC = () => {
     );
   };
 
+  const renderEcosystemContent = () => {
+    if (!activeConceptUuid) {
+      return (
+        <div className='flex h-64 items-center justify-center'>
+          <p className='aucctus-text-secondary'>No concept selected</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className='mx-auto flex max-w-[1600px] flex-col gap-8 p-4'>
+        {/* Executive Summary */}
+        <ExecutiveSummaryBanner
+          summary={executiveSummaries?.marketScanEcosystem}
+          isLoading={isExecutiveSummariesLoading}
+        />
+        <Ecosystem />
+      </div>
+    );
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'trends-drivers':
         return renderTrendsAndDriversContent();
       case 'ecosystem':
-        return <Ecosystem />;
+        return renderEcosystemContent();
       default:
         return renderTrendsAndDriversContent();
     }

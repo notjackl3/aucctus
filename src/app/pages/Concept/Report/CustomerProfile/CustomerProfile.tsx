@@ -1,9 +1,11 @@
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import { Loading, Icon, VersionUpgradeBanner, toast } from '@components';
+import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
 import {
   useConceptCustomerProfiles,
   useGenerateCustomerProfile,
+  useConceptExecutiveSummaries,
 } from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
@@ -26,6 +28,8 @@ const CustomerProfile: FunctionComponent = () => {
   );
   const { mutate: generateCustomerProfile, isLoading: isGenerating } =
     useGenerateCustomerProfile();
+  const { executiveSummaries, isLoading: isExecutiveSummariesLoading } =
+    useConceptExecutiveSummaries(activeConceptUuid || '');
   const [searchParams, setSearchParams] = useSearchParams();
   const selectedProfileName = searchParams.get('persona');
   const selectedProfile = useMemo(
@@ -165,6 +169,12 @@ const CustomerProfile: FunctionComponent = () => {
       )}
 
       <div className='flex h-full w-full flex-col flex-wrap items-start self-stretch'>
+        <div className='w-full p-4'>
+          <ExecutiveSummaryBanner
+            summary={executiveSummaries?.customerProfiles}
+            isLoading={isExecutiveSummariesLoading}
+          />
+        </div>
         <TabView
           tabs={customerTabs}
           tabGroupClassName='pointer-events-auto flex flex-1'

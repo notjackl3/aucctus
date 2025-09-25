@@ -2,8 +2,10 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import { Icon } from '@components';
+import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
 import useStore from '@stores/store';
 import { useSearchParams } from 'react-router-dom';
+import { useConceptExecutiveSummaries } from '@hooks/query/concepts.hook';
 
 import { SavingsMethodTab } from './tabs/SavingsMethod';
 import { ImpactSizingTab } from './tabs/ImpactSizing';
@@ -20,7 +22,12 @@ const CostSavingsProjections: React.FC<CostSavingsProjectionsProps> = ({
   const { setActiveFinancialProjection } = useStore(
     (state) => state.financialProjection,
   );
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid,
+  );
   const [searchParams] = useSearchParams();
+  const { executiveSummaries, isLoading: isExecutiveSummariesLoading } =
+    useConceptExecutiveSummaries(activeConceptUuid || '');
 
   useEffect(() => {
     if (financialProjection) {
@@ -89,17 +96,36 @@ const CostSavingsProjections: React.FC<CostSavingsProjectionsProps> = ({
     [setActiveTab],
   );
 
+  const getExecutiveSummaryForTab = () => {
+    // All cost savings tabs use the same executive summary key
+    return executiveSummaries?.financialMarketSizeCostSavings;
+  };
+
   const renderTabContent = () => {
-    switch (activeTab) {
-      case 'savings-method':
-        return <SavingsMethodTab />;
-      case 'impact-sizing':
-        return <ImpactSizingTab />;
-      case 'projections':
-        return <ProjectionsTab />;
-      default:
-        return <SavingsMethodTab />;
-    }
+    const summary = getExecutiveSummaryForTab();
+
+    const content = (() => {
+      switch (activeTab) {
+        case 'savings-method':
+          return <SavingsMethodTab />;
+        case 'impact-sizing':
+          return <ImpactSizingTab />;
+        case 'projections':
+          return <ProjectionsTab />;
+        default:
+          return <SavingsMethodTab />;
+      }
+    })();
+
+    return (
+      <div className='flex flex-col gap-8 p-4'>
+        <ExecutiveSummaryBanner
+          summary={summary}
+          isLoading={isExecutiveSummariesLoading}
+        />
+        {content}
+      </div>
+    );
   };
 
   return (

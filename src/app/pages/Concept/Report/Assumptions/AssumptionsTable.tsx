@@ -255,10 +255,6 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
         </div>
 
         <div className='flex-1 p-6'>
-          <Card.AiInsightCard title={insightTitle} className='mb-6'>
-            {categoryInsight}
-          </Card.AiInsightCard>
-
           {isLoading ? (
             <div className='flex justify-center py-8'>
               <Loading />

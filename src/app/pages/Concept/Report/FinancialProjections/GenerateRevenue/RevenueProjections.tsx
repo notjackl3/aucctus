@@ -2,8 +2,10 @@ import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import { Icon } from '@components';
+import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
 import useStore from '@stores/store';
 import { useSearchParams } from 'react-router-dom';
+import { useConceptExecutiveSummaries } from '@hooks/query/concepts.hook';
 
 import { BusinessModelTab } from './tabs/BusinessModel';
 import { MarketSizingTab } from './tabs/MarketSizing';
@@ -20,7 +22,12 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
   const { setActiveFinancialProjection } = useStore(
     (state) => state.financialProjection,
   );
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid,
+  );
   const [searchParams] = useSearchParams();
+  const { executiveSummaries, isLoading: isExecutiveSummariesLoading } =
+    useConceptExecutiveSummaries(activeConceptUuid || '');
 
   useEffect(() => {
     if (financialProjection) {
@@ -89,17 +96,44 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
     [setActiveTab],
   );
 
-  const renderTabContent = () => {
+  const getExecutiveSummaryForTab = () => {
     switch (activeTab) {
       case 'business-model':
-        return <BusinessModelTab />;
+        return executiveSummaries?.financialBusinessModel;
       case 'market-sizing':
-        return <MarketSizingTab />;
+        return executiveSummaries?.financialMarketSizeRevenue;
       case 'projections':
-        return <ProjectionsTab />;
+        return executiveSummaries?.financialMarketSizeRevenue;
       default:
-        return <BusinessModelTab />;
+        return executiveSummaries?.financialBusinessModel;
     }
+  };
+
+  const renderTabContent = () => {
+    const summary = getExecutiveSummaryForTab();
+
+    const content = (() => {
+      switch (activeTab) {
+        case 'business-model':
+          return <BusinessModelTab />;
+        case 'market-sizing':
+          return <MarketSizingTab />;
+        case 'projections':
+          return <ProjectionsTab />;
+        default:
+          return <BusinessModelTab />;
+      }
+    })();
+
+    return (
+      <div className='flex flex-col gap-8 p-4'>
+        <ExecutiveSummaryBanner
+          summary={summary}
+          isLoading={isExecutiveSummariesLoading}
+        />
+        {content}
+      </div>
+    );
   };
 
   return (

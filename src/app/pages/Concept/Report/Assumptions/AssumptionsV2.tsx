@@ -3,7 +3,9 @@ import AssumptionsTable from './AssumptionsTable';
 import { useOutletContext } from 'react-router-dom';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
+import { useConceptExecutiveSummaries } from '@hooks/query/concepts.hook';
 import { Loading } from '@components';
+import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
 import { AssumptionCategory } from '@libs/api/types';
 
 const AssumptionsV2: React.FC = () => {
@@ -24,6 +26,8 @@ const AssumptionsV2: React.FC = () => {
     concept.identifier,
     filters,
   );
+  const { executiveSummaries, isLoading: isExecutiveSummariesLoading } =
+    useConceptExecutiveSummaries(concept.uuid || '');
 
   const handleCategoryChange = (category: AssumptionCategory) => {
     setSelectedCategory(category);
@@ -41,6 +45,10 @@ const AssumptionsV2: React.FC = () => {
 
   return (
     <div className='space-y-6'>
+      <ExecutiveSummaryBanner
+        summary={executiveSummaries?.keyAssumptions}
+        isLoading={isExecutiveSummariesLoading}
+      />
       <AssumptionsTable
         assumptions={assumptions}
         categoryMetrics={categoryMetrics}
