@@ -169,7 +169,7 @@ const CustomerProfile: FunctionComponent = () => {
       )}
 
       <div className='flex h-full w-full flex-col flex-wrap items-start self-stretch'>
-        <div className='w-full p-4'>
+        <div className='w-full'>
           <ExecutiveSummaryBanner
             summary={executiveSummaries?.customerProfiles}
             isLoading={isExecutiveSummariesLoading}

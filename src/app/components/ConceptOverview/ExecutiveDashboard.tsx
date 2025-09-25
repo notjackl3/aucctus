@@ -374,7 +374,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       {/* Three Column Layout: Differentiators, Our Right to Win, Tab Summary Carousel */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-4'>
         {/* Differentiators Card */}
-        <div className='aucctus-border-secondary aucctus-bg-secondary h-[320px] rounded-lg border lg:col-span-1'>
+        <div className='aucctus-border-secondary aucctus-bg-secondary h-full min-h-[350px] rounded-lg border lg:col-span-1'>
           <div className='flex h-full flex-col p-6'>
             <h3 className='aucctus-header-xs-semibold aucctus-text-primary mb-4 flex items-center gap-2'>
               <Icon
@@ -445,7 +445,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         </div>
 
         {/* Our Right to Win Card */}
-        <div className='aucctus-border-secondary aucctus-bg-secondary h-[320px] rounded-lg border lg:col-span-1'>
+        <div className='aucctus-border-secondary aucctus-bg-secondary h-full min-h-[350px] rounded-lg border lg:col-span-1'>
           <div className='flex h-full flex-col p-6'>
             <h3 className='aucctus-header-xs-semibold aucctus-text-primary mb-4 flex items-center gap-2'>
               <Icon
@@ -509,7 +509,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
         <div className='relative h-fit lg:col-span-2'>
           {/* Current Card Display */}
           <div
-            className='min-h-[400px] transition-all duration-500 ease-in-out'
+            className='transition-all duration-500 ease-in-out'
             onMouseEnter={handleCardHover}
             onMouseLeave={handleCardLeave}
           >

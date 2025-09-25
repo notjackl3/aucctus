@@ -234,10 +234,6 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
       <div className='flex flex-col md:flex-row'>
         {/* Left column: Category cards - takes ~30% of space */}
         <div className='aucctus-bg-primary aucctus-border-primary border-r p-6 md:w-[30%]'>
-          <h3 className='aucctus-header-md-bold aucctus-text-md mb-4'>
-            Categories
-          </h3>
-
           {CATEGORY_CONFIG.map((categoryConfig) => (
             <CategoryProgressCard
               key={categoryConfig.category}
