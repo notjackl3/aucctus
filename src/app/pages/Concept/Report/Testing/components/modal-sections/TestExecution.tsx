@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Icon, toast } from '@components';
 import { cn } from '@libs/utils/react';
 import api from '@libs/api';
@@ -6,10 +6,10 @@ import { useSyntheticExecutionEvents } from '@hooks/sockets/testing';
 import {
   useSyntheticExecutionStart,
   useSyntheticExecutionCancel,
+  useSyntheticExecutionStatus,
 } from '@hooks/query/synthetic-execution.hook';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
-import { useEffect } from 'react';
 
 interface TestExecutionProps {
   conceptUuid?: string;
@@ -29,6 +29,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
   const [selectedMode, setSelectedMode] = useState<string | null>(
     'facilitated',
   );
+  const [isInitializing, setIsInitializing] = useState(true);
 
   // WebSocket events for real-time execution
   const { executionState, resetExecution, setCancellingState, setExecutionId } =
@@ -45,11 +46,6 @@ const TestExecution: React.FC<TestExecutionProps> = ({
       },
     );
 
-  // Notify parent when execution state changes
-  useEffect(() => {
-    onExecutionStateChange?.(executionState);
-  }, [executionState, onExecutionStateChange]);
-
   // Execution mutations
   const startExecution = useSyntheticExecutionStart(
     conceptUuid || '',
@@ -59,6 +55,120 @@ const TestExecution: React.FC<TestExecutionProps> = ({
     conceptUuid || '',
     testUuid || '',
   );
+
+  // Status polling for persistence (complements WebSocket)
+  const { data: persistentStatus } = useSyntheticExecutionStatus(
+    conceptUuid || '',
+    testUuid || '',
+    executionState.executionId,
+    {
+      enabled: !!executionState.executionId && executionState.status !== 'idle',
+      refetchInterval: executionState.status === 'running' ? 2000 : 10000, // Faster polling when running
+      isWebSocketActive: executionState.status !== 'idle', // Indicate WebSocket activity
+    },
+  );
+
+  // Merge WebSocket state with persistent API state
+  const displayState = useMemo(() => {
+    // If we have persistent API status and WebSocket is idle (likely reconnecting)
+    // and the API shows an active execution, prioritize API data
+    if (
+      persistentStatus &&
+      executionState.status === 'idle' &&
+      persistentStatus.status !== 'completed' &&
+      ['running', 'pending'].includes(persistentStatus.status)
+    ) {
+      return {
+        status: persistentStatus.status as any,
+        progress: persistentStatus.progress || 0,
+        message: persistentStatus.message || 'Reconnecting...',
+        executionId: persistentStatus.executionId,
+        resultsCount: persistentStatus.resultsCount,
+        currentStage: undefined, // API doesn't provide stage details
+        currentPersona: persistentStatus.currentPersona,
+        totalPersonas: persistentStatus.totalPersonas,
+        error: persistentStatus.error
+          ? JSON.stringify(persistentStatus.error)
+          : undefined,
+      };
+    }
+
+    // WebSocket takes priority when it has active execution data
+    if (executionState.status !== 'idle' && executionState.executionId) {
+      return executionState;
+    }
+
+    // Fallback to persistent status from API
+    if (persistentStatus) {
+      return {
+        status: persistentStatus.status as any,
+        progress: persistentStatus.progress || 0,
+        message: persistentStatus.message,
+        executionId: persistentStatus.executionId,
+        resultsCount: persistentStatus.resultsCount,
+        currentStage: undefined, // API doesn't provide stage details
+        currentPersona: persistentStatus.currentPersona,
+        totalPersonas: persistentStatus.totalPersonas,
+        error: persistentStatus.error
+          ? JSON.stringify(persistentStatus.error)
+          : undefined,
+      };
+    }
+
+    // Default to WebSocket state
+    return executionState;
+  }, [executionState, persistentStatus]);
+
+  // Check for existing running execution on component mount and handle initialization
+  useEffect(() => {
+    const checkForRunningExecution = async () => {
+      if (!conceptUuid || !testUuid) {
+        setIsInitializing(false);
+        return;
+      }
+
+      try {
+        // Use the dedicated current execution endpoint
+        const currentExecution = await api.testing.getCurrentSyntheticExecution(
+          conceptUuid,
+          testUuid,
+        );
+
+        if (
+          currentExecution &&
+          ['running', 'starting'].includes(currentExecution.status)
+        ) {
+          setExecutionId(currentExecution.executionId);
+        } else if (process.env.NODE_ENV === 'development') {
+          console.log('No running execution found for this test');
+        }
+      } catch (error) {
+        // No running execution found or error accessing endpoint - this is fine
+        if (process.env.NODE_ENV === 'development') {
+          console.log('Could not check for running execution:', error);
+        }
+      } finally {
+        // Set initialization complete after checking for running execution
+        setTimeout(() => setIsInitializing(false), 1000); // Give WebSocket time to connect
+      }
+    };
+
+    checkForRunningExecution();
+  }, [conceptUuid, testUuid, setExecutionId]);
+
+  // Additional initialization timeout as fallback
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 2000); // Fallback timeout
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Notify parent when execution state changes
+  useEffect(() => {
+    onExecutionStateChange?.(displayState);
+  }, [displayState, onExecutionStateChange]);
 
   // Handlers for real-time execution
   const handleExecuteSynthetic = async (config: ISyntheticExecutionRequest) => {
@@ -82,12 +192,12 @@ const TestExecution: React.FC<TestExecutionProps> = ({
   };
 
   const handleCancelExecution = async () => {
-    if (executionState.executionId) {
+    if (displayState.executionId) {
       // Immediately set to cancelling state for instant user feedback
       setCancellingState();
 
       try {
-        await cancelExecution.mutateAsync(executionState.executionId);
+        await cancelExecution.mutateAsync(displayState.executionId);
         // Don't call resetExecution here - let the WebSocket error event handle the final state
       } catch (error) {
         // If the cancel request fails, reset to previous state
@@ -245,14 +355,16 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         <div className='space-y-4'>
           {/* Real-time Execution Panel */}
           <SyntheticExecutionPanel
-            status={executionState.status}
-            progress={executionState.progress}
-            message={executionState.message}
-            currentStage={executionState.currentStage}
-            currentPersona={executionState.currentPersona}
-            totalPersonas={executionState.totalPersonas}
-            resultsCount={executionState.resultsCount}
-            error={executionState.error}
+            status={displayState.status}
+            progress={displayState.progress}
+            message={displayState.message}
+            currentStage={displayState.currentStage}
+            currentPersona={displayState.currentPersona}
+            totalPersonas={displayState.totalPersonas}
+            resultsCount={displayState.resultsCount}
+            error={displayState.error}
+            isInitializing={isInitializing}
+            isExecuting={startExecution.isLoading}
             onCancel={handleCancelExecution}
             conceptUuid={conceptUuid || ''}
             testUuid={testUuid || ''}

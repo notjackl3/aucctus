@@ -90,15 +90,6 @@ export const useTestResultsSocket = ({
       });
 
       // Log processing messages (don't invalidate at start - let enabled:false handle it)
-      console.log('🔍 [DEBUG] Processing message received', {
-        stage: message.stage,
-        progress: message.progress,
-        isProcessingStart:
-          message.stage === 'extracting_text' && message.progress === 0,
-        conceptUuid,
-        testUuid,
-        testResultUuid: message.testResultUuid,
-      });
 
       setProcessingState((prev) => {
         // Validate that this message is for this specific component and matches current processing
@@ -175,16 +166,6 @@ export const useTestResultsSocket = ({
           conceptUuid,
           testUuid,
           testResultUuid: message.testResultUuid,
-        });
-
-        console.log('🔄 [DEBUG] Processing completed - invalidating queries', {
-          conceptUuid,
-          testUuid,
-          testResultUuid: message.testResultUuid,
-          queryKeys: [
-            [AucctusQueryKeys.testResults, conceptUuid, testUuid],
-            [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
-          ],
         });
 
         queryClient.invalidateQueries({

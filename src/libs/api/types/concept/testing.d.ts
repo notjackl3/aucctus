@@ -140,20 +140,19 @@ export interface ISyntheticExecutionStartResponse {
 }
 
 export interface ISyntheticExecutionStatusResponse {
-  execution_id: string;
-  concept_uuid: string;
-  test_uuid: string;
-  workflow_execution_uuid: string;
+  executionId: string;
+  conceptUuid: string;
+  testUuid: string;
+  workflowExecutionUuid: string;
   status: 'pending' | 'running' | 'completed' | 'error' | 'cancelled';
   progress: number;
   message: string;
-  started_at?: string;
-  completed_at?: string;
-  results_count?: number;
-  duration_seconds?: number;
+  startedAt?: string;
+  completedAt?: string;
+  resultsCount?: number;
+  durationSeconds?: number;
   error?: any;
   // Legacy fields for backward compatibility
-  resultsCount?: number;
   currentPersona?: string;
   totalPersonas?: number;
   errorDetails?: any;

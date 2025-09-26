@@ -5,7 +5,7 @@ import { ICustomerProfile } from '@libs/api/types/concept/concepts';
 
 interface ISyntheticLoadingUIProps {
   // Progress data
-  progress: number;
+  progress?: number; // Made optional to handle initialization state
   status: 'running' | 'completed' | 'error' | 'cancelled';
   message?: string;
   currentStage?: string;
@@ -18,6 +18,9 @@ interface ISyntheticLoadingUIProps {
   // Results data for completion state
   resultsCount?: number;
 
+  // Initialization state
+  isInitializing?: boolean;
+
   // Navigation callback
   onViewResults?: () => void;
 }
@@ -28,7 +31,7 @@ interface IPersonaProgressItem {
 }
 
 const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
-  progress,
+  progress = 0,
   status,
   message,
   currentStage,
@@ -36,6 +39,7 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
   currentPersona,
   totalPersonas,
   resultsCount,
+  isInitializing = false,
   onViewResults,
 }) => {
   // Hybrid pulsing system - combines timer-based and real progress-based pulsing
@@ -204,6 +208,7 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
         progress={progress}
         message={message}
         currentStage={currentStage}
+        isInitializing={isInitializing}
       />
 
       {/* Interview Progress Card */}
@@ -217,7 +222,8 @@ const RunningTestCard: React.FC<{
   progress: number;
   message?: string;
   currentStage?: string;
-}> = ({ progress, message, currentStage }) => {
+  isInitializing?: boolean;
+}> = ({ progress, message, currentStage, isInitializing = false }) => {
   // Smart progress normalization to handle 3-stage pipeline
   const [normalizedProgress, setNormalizedProgress] = useState(0);
   const [currentStageState, setCurrentStageState] = useState<string>('');
@@ -408,10 +414,10 @@ const RunningTestCard: React.FC<{
             </div>
             <div className='text-right'>
               <div className='aucctus-text-primary text-3xl font-bold'>
-                {Math.round(normalizedProgress)}%
+                {isInitializing ? '...' : `${Math.round(normalizedProgress)}%`}
               </div>
               <div className='aucctus-text-secondary aucctus-text-xs'>
-                Complete
+                {isInitializing ? 'Reconnecting' : 'Complete'}
               </div>
             </div>
           </div>
@@ -419,9 +425,14 @@ const RunningTestCard: React.FC<{
           {/* Progress Bar */}
           <div className='aucctus-bg-secondary-subtle h-3 overflow-hidden rounded-full'>
             <div
-              className='h-full rounded-full bg-amber-600 transition-all duration-1000 ease-out'
+              className={cn(
+                'h-full rounded-full transition-all duration-1000 ease-out',
+                isInitializing ? 'animate-pulse bg-gray-400' : 'bg-amber-600',
+              )}
               style={{
-                width: `${Math.max(0, Math.min(100, normalizedProgress))}%`,
+                width: isInitializing
+                  ? '100%'
+                  : `${Math.max(0, Math.min(100, normalizedProgress))}%`,
               }}
             />
           </div>

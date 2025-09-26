@@ -61,19 +61,7 @@ export const useTestDetail = (
   const query = useQuery({
     queryKey: [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
     queryFn: async () => {
-      console.log('🔍 [DEBUG] useTestDetail fetching data', {
-        conceptUuid,
-        testUuid,
-        timestamp: new Date().toISOString(),
-      });
       const result = await api.testing.getTestDetail(conceptUuid, testUuid);
-      console.log('📥 [DEBUG] useTestDetail received data', {
-        conceptUuid,
-        testUuid,
-        hasAffirming: result?.affirmingFindings?.length || 0,
-        hasChallenging: result?.challengingFindings?.length || 0,
-        timestamp: new Date().toISOString(),
-      });
       return result;
     },
     enabled:

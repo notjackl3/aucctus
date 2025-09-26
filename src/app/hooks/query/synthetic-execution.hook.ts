@@ -48,21 +48,53 @@ export const useSyntheticExecutionStatus = (
   conceptUuid: string,
   testUuid: string,
   executionId?: string,
+  options?: {
+    enabled?: boolean;
+    refetchInterval?: number | false;
+    isWebSocketActive?: boolean; // New option to indicate WebSocket state
+  },
 ) => {
-  return useMutation({
-    mutationFn: async () => {
-      if (!executionId) throw new Error('No execution ID provided');
+  return useQuery({
+    queryKey: ['syntheticExecutionStatus', conceptUuid, testUuid, executionId],
+    queryFn: async () => {
+      if (!executionId) return null;
       return api.testing.getSyntheticExecutionStatus(
         conceptUuid,
         testUuid,
         executionId,
       );
     },
-    onError: (e) => {
-      const message = utils.osiris.parseFormError(e);
+    enabled:
+      !!conceptUuid &&
+      !!testUuid &&
+      !!executionId &&
+      options?.enabled !== false,
+    refetchInterval: (() => {
+      if (options?.refetchInterval !== undefined) {
+        return options.refetchInterval;
+      }
+      // Adjust polling based on WebSocket activity
+      if (options?.isWebSocketActive) {
+        return 5000; // Slower polling when WebSocket is active
+      }
+      return 2000; // Faster polling when WebSocket is not active
+    })(),
+    staleTime: 0, // Always fetch fresh data
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
+    retry: (failureCount, error: any) => {
+      // Don't retry on 404 (execution not found) or 403 (access denied)
+      if (error?.response?.status === 404 || error?.response?.status === 403) {
+        return false;
+      }
+      // Retry up to 3 times for other errors
+      return failureCount < 3;
+    },
+    onError: (e: any) => {
       // Status polling errors are expected when execution is not running
       // No need to show error to user, just log for debugging
       if (process.env.NODE_ENV === 'development') {
+        const message = utils.osiris.parseFormError(e);
         // eslint-disable-next-line no-console
         console.error('Failed to get execution status:', message);
       }

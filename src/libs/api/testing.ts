@@ -24,6 +24,7 @@ import {
   IDistributionPreviewRequest,
   ISyntheticExecutionRequest,
   ISyntheticExecutionStartResponse,
+  ISyntheticExecutionStatusResponse,
   ITestCollateralOption,
 } from './types/concept/testing';
 
@@ -382,26 +383,6 @@ export class TestingApi extends ApiService {
     );
   }
 
-  // Get synthetic execution status
-  async getSyntheticExecutionStatus(
-    conceptUuid: string,
-    testUuid: string,
-    executionId: string,
-  ): Promise<{
-    status: 'pending' | 'running' | 'completed' | 'error' | 'cancelled';
-    progress: number;
-    message: string;
-    resultsCount?: number;
-  }> {
-    return this.get(
-      endpoints.conceptTestSyntheticExecutionStatus(
-        conceptUuid,
-        testUuid,
-        executionId,
-      ),
-    );
-  }
-
   // Cancel synthetic execution
   async cancelSyntheticExecution(
     conceptUuid: string,
@@ -468,5 +449,30 @@ export class TestingApi extends ApiService {
     testUuid: string,
   ): Promise<ITestCollateralOption[]> {
     return this.get(endpoints.conceptTestCollaterals(conceptUuid, testUuid));
+  }
+
+  // Get synthetic execution status
+  async getSyntheticExecutionStatus(
+    conceptUuid: string,
+    testUuid: string,
+    executionId: string,
+  ): Promise<ISyntheticExecutionStatusResponse> {
+    return this.get(
+      endpoints.conceptTestSyntheticExecutionStatus(
+        conceptUuid,
+        testUuid,
+        executionId,
+      ),
+    );
+  }
+
+  // Get current running execution
+  async getCurrentSyntheticExecution(
+    conceptUuid: string,
+    testUuid: string,
+  ): Promise<ISyntheticExecutionStatusResponse | null> {
+    return this.get(
+      endpoints.conceptTestSyntheticExecutionCurrent(conceptUuid, testUuid),
+    );
   }
 }

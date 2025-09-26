@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useSocketEvent } from './aucctus';
 import { toast } from '@components';
@@ -27,18 +27,101 @@ interface ISyntheticExecutionState {
   executionId?: string;
 }
 
+// State persistence utilities
+const EXECUTION_STATE_KEY = (conceptUuid: string, testUuid: string) =>
+  `synthetic_execution_state_${conceptUuid}_${testUuid}`;
+
+const persistExecutionState = (
+  conceptUuid: string,
+  testUuid: string,
+  state: ISyntheticExecutionState,
+) => {
+  if (state.status !== 'idle') {
+    try {
+      sessionStorage.setItem(
+        EXECUTION_STATE_KEY(conceptUuid, testUuid),
+        JSON.stringify(state),
+      );
+    } catch (error) {
+      // Handle storage errors gracefully
+      console.warn('Failed to persist execution state:', error);
+    }
+  }
+};
+
+const getPersistedExecutionState = (
+  conceptUuid: string,
+  testUuid: string,
+): ISyntheticExecutionState | null => {
+  try {
+    const stored = sessionStorage.getItem(
+      EXECUTION_STATE_KEY(conceptUuid, testUuid),
+    );
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Validate the parsed state has required properties
+      if (
+        parsed &&
+        typeof parsed.status === 'string' &&
+        typeof parsed.progress === 'number'
+      ) {
+        return parsed;
+      }
+    }
+  } catch (error) {
+    // Handle parsing errors gracefully
+    console.warn('Failed to parse persisted execution state:', error);
+  }
+  return null;
+};
+
+const clearPersistedExecutionState = (
+  conceptUuid: string,
+  testUuid: string,
+) => {
+  try {
+    sessionStorage.removeItem(EXECUTION_STATE_KEY(conceptUuid, testUuid));
+  } catch (error) {
+    console.warn('Failed to clear persisted execution state:', error);
+  }
+};
+
 export const useSyntheticExecutionEvents = (
   conceptUuid: string,
   testUuid: string,
   onComplete?: (resultsCount: number) => void,
 ) => {
   const queryClient = useQueryClient();
+
+  // Initialize state from persisted data or default
   const [executionState, setExecutionState] =
-    useState<ISyntheticExecutionState>({
-      status: 'idle',
-      progress: 0,
-      message: '',
+    useState<ISyntheticExecutionState>(() => {
+      const persisted = getPersistedExecutionState(conceptUuid, testUuid);
+      return (
+        persisted || {
+          status: 'idle',
+          progress: 0,
+          message: '',
+        }
+      );
     });
+
+  // Persist state changes to sessionStorage
+  useEffect(() => {
+    persistExecutionState(conceptUuid, testUuid, executionState);
+  }, [conceptUuid, testUuid, executionState]);
+
+  // Cleanup persisted state on unmount if execution is not active
+  useEffect(() => {
+    return () => {
+      if (
+        executionState.status === 'idle' ||
+        executionState.status === 'completed'
+      ) {
+        clearPersistedExecutionState(conceptUuid, testUuid);
+      }
+    };
+  }, [conceptUuid, testUuid, executionState.status]);
 
   // Progress updates
   useSocketEvent<
@@ -73,6 +156,9 @@ export const useSyntheticExecutionEvents = (
               console.log(
                 '🎉 FRONTEND: Pipeline fully complete (100%), showing results and invalidating queries',
               );
+
+              // Clear persisted state on completion
+              clearPersistedExecutionState(conceptUuid, testUuid);
 
               // Invalidate test results queries to show new synthetic results
               queryClient.invalidateQueries({
@@ -155,6 +241,9 @@ export const useSyntheticExecutionEvents = (
             .includes('cancel');
 
           if (isCancellation) {
+            // Clear persisted state on cancellation
+            clearPersistedExecutionState(conceptUuid, testUuid);
+
             // For cancellation, revert to idle state and show success toast
             setExecutionState({
               status: 'idle',
@@ -179,12 +268,15 @@ export const useSyntheticExecutionEvents = (
   );
 
   const resetExecution = useCallback(() => {
+    // Clear persisted state when resetting
+    clearPersistedExecutionState(conceptUuid, testUuid);
+
     setExecutionState({
       status: 'idle',
       progress: 0,
       message: '',
     });
-  }, []);
+  }, [conceptUuid, testUuid]);
 
   const setCancellingState = useCallback(() => {
     setExecutionState((prev) => ({

@@ -60,16 +60,6 @@ const TestResults: React.FC<TestResultsProps> = ({
   const shouldFetchTestDetail =
     shouldFetch && !state.processingState.isProcessing;
 
-  // Debug log for enabled state changes
-  React.useEffect(() => {
-    console.log('🎛️ [DEBUG] TestDetail enabled state changed', {
-      shouldFetch,
-      isProcessing: state.processingState.isProcessing,
-      shouldFetchTestDetail,
-      timestamp: new Date().toISOString(),
-    });
-  }, [shouldFetch, state.processingState.isProcessing, shouldFetchTestDetail]);
-
   const { testDetail } = useTestDetail(conceptUuid || '', testUuid || '', {
     enabled: shouldFetchTestDetail,
   });

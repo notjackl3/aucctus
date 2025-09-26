@@ -27,21 +27,6 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
     const affirming: Finding[] = testDetail?.affirmingFindings || [];
     const challenging: Finding[] = testDetail?.challengingFindings || [];
 
-    console.log('📊 [DEBUG] SummaryOfFindings data update', {
-      testDetail: testDetail ? 'present' : 'null',
-      affirmingCount: affirming.length,
-      challengingCount: challenging.length,
-      affirmingFindings: affirming.map((f) => ({
-        uuid: f.uuid,
-        learning: f.learning?.substring(0, 50) + '...',
-      })),
-      challengingFindings: challenging.map((f) => ({
-        uuid: f.uuid,
-        learning: f.learning?.substring(0, 50) + '...',
-      })),
-      timestamp: new Date().toISOString(),
-    });
-
     return { affirmingFindings: affirming, challengingFindings: challenging };
   }, [testDetail]);
 

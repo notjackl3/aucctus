@@ -32,6 +32,8 @@ interface ISyntheticExecutionPanelProps {
   totalPersonas?: number;
   resultsCount?: number;
   error?: string;
+  isInitializing?: boolean; // New prop for initialization state
+  isExecuting?: boolean; // New prop for execution loading state
   onCancel: () => void;
 
   // New props for configuration
@@ -58,6 +60,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   totalPersonas,
   resultsCount,
   error,
+  isInitializing = false,
+  isExecuting = false,
   onCancel,
   conceptUuid,
   testUuid,
@@ -98,31 +102,72 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
 
   // Filter profiles to only show selected ones for loading UI
   const selectedProfiles = useMemo(() => {
-    return profiles.filter((profile) => {
+    const filtered = profiles.filter((profile) => {
       const normalizedUuid = normalizeUuid(profile.uuid);
-      return (
-        !skippedParticipants.has(normalizedUuid) &&
-        participantCounts[normalizedUuid] > 0
-      );
+      const isNotSkipped = !skippedParticipants.has(normalizedUuid);
+      const hasCount = participantCounts[normalizedUuid] > 0;
+
+      return isNotSkipped && hasCount;
     });
+
+    return filtered;
   }, [profiles, skippedParticipants, participantCounts]);
 
-  // Initialize participant counts when profiles load (but not during execution)
+  // Storage key for preserving execution configuration
+  const executionConfigKey = `synthetic-execution-config-${conceptUuid}-${testUuid}`;
+
+  // Save execution configuration when it changes (during active execution)
   useEffect(() => {
-    if (profiles.length > 0 && status === 'idle') {
-      const initialCounts: Record<string, number> = {};
-      profiles.forEach((profile) => {
-        // Ensure UUID format is consistent (hyphens, not underscores)
-        const normalizedUuid = normalizeUuid(profile.uuid);
-        initialCounts[normalizedUuid] = 5; // Default to 5 variants per profile
-      });
-
-      setParticipantCounts(initialCounts);
-
-      // Also reset skipped participants to ensure clean state
-      setSkippedParticipants(new Set());
+    if (status !== 'idle' && Object.keys(participantCounts).length > 0) {
+      const config = {
+        participantCounts,
+        skippedParticipants: Array.from(skippedParticipants),
+        timestamp: Date.now(),
+      };
+      sessionStorage.setItem(executionConfigKey, JSON.stringify(config));
+    } else if (status === 'idle') {
+      // Clean up storage when execution is idle
+      sessionStorage.removeItem(executionConfigKey);
     }
-  }, [profiles, status]); // Only reset when status is idle
+  }, [participantCounts, skippedParticipants, status, executionConfigKey]);
+
+  // Initialize participant counts when profiles load
+  useEffect(() => {
+    const shouldInitialize =
+      profiles.length > 0 && Object.keys(participantCounts).length === 0;
+
+    if (shouldInitialize) {
+      // First, try to restore from storage (for active executions)
+      const savedConfig = sessionStorage.getItem(executionConfigKey);
+      if (savedConfig && status !== 'idle') {
+        try {
+          const config = JSON.parse(savedConfig);
+          const configAge = Date.now() - config.timestamp;
+
+          // Only restore if config is recent (within 1 hour)
+          if (configAge < 60 * 60 * 1000) {
+            setParticipantCounts(config.participantCounts);
+            setSkippedParticipants(new Set(config.skippedParticipants));
+            return;
+          }
+        } catch (error) {
+          console.warn('Failed to restore execution config:', error);
+        }
+      }
+
+      // Fallback: Initialize defaults (only when idle)
+      if (status === 'idle') {
+        const initialCounts: Record<string, number> = {};
+        profiles.forEach((profile) => {
+          const normalizedUuid = normalizeUuid(profile.uuid);
+          initialCounts[normalizedUuid] = 5; // Default to 5 variants per profile
+        });
+
+        setParticipantCounts(initialCounts);
+        setSkippedParticipants(new Set());
+      }
+    }
+  }, [profiles, status, participantCounts, executionConfigKey]);
 
   // Memoized configuration object
   const executionConfig = useMemo(
@@ -186,7 +231,12 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   const isStep2Complete = selectedCollateralUuids.length > 0; // Collateral step
   const isStep3Complete = isStep1Complete && isStep2Complete; // Configure & Launch step
 
-  const isReady = isStep3Complete && totalTests >= 1 && totalTests <= 100;
+  const isReady =
+    isStep3Complete &&
+    totalTests >= 1 &&
+    totalTests <= 100 &&
+    status === 'idle' &&
+    !isExecuting;
 
   // Collateral selection handler
   const handleCollateralSelectionChange = (uuids: string[]) => {
@@ -442,6 +492,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
                 <ConfigureLaunchStep
                   isReady={isReady}
                   onExecute={handleExecute}
+                  isLoading={isExecuting}
                 />
               </div>
             </div>
@@ -452,14 +503,15 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       {/* New Loading UI - Show during execution states */}
       {(status === 'running' || status === 'completed') && (
         <SyntheticLoadingUI
-          progress={progress}
+          progress={isInitializing ? undefined : progress}
           status={status}
-          message={message}
+          message={isInitializing ? 'Reconnecting...' : message}
           currentStage={currentStage}
           profiles={selectedProfiles}
           currentPersona={currentPersona}
           totalPersonas={totalPersonas}
           resultsCount={resultsCount}
+          isInitializing={isInitializing}
           onViewResults={onNavigateToResults}
         />
       )}

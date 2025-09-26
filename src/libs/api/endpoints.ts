@@ -413,6 +413,13 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/synthetic-execution/history`;
   }
 
+  static conceptTestSyntheticExecutionCurrent(
+    conceptUuid: string,
+    testUuid: string,
+  ) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/synthetic-execution/current`;
+  }
+
   static conceptTestDistributionPreview(conceptUuid: string, testUuid: string) {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/distribution-preview`;
   }
