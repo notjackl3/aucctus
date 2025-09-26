@@ -1,9 +1,9 @@
+import { toast } from '@components';
 import api from '@libs/api';
 import { IAiEditingHandshakeMessage } from '@libs/api/types';
 import telemetry from '@libs/telemetry';
 import { processMediaMessage } from '@libs/utils/files';
 import { produce } from 'immer';
-import { toast } from '@components';
 import { v4 as uuidv4 } from 'uuid';
 import type { IStoreApi } from '../store';
 import { IAiEditingState, IAssistantMessage, IUserMessage } from './store';
@@ -38,7 +38,26 @@ export function clearConversation(
   this: IStoreApi<IAiEditingState>,
   resetCurrentMessage?: boolean,
 ) {
-  const { set } = this;
+  const { get, set, storeApi } = this;
+  const conceptUuid = storeApi.getState().conceptReport.conceptUuid;
+
+  // Dispatch cancel event to backend if we have a conceptUuid
+  if (conceptUuid) {
+    try {
+      api.aucctusSocket.send({
+        type: 'ai.editing.cancel',
+        conceptUuid: conceptUuid,
+      });
+      telemetry.debug('AI Editing: Cancel event dispatched', {
+        conceptUuid,
+      });
+    } catch (error) {
+      telemetry.error('AI Editing: Failed to dispatch cancel event', {
+        conceptUuid,
+        error,
+      });
+    }
+  }
 
   set(
     produce((state: IAiEditingState) => {
@@ -279,16 +298,11 @@ export function initializeListeners(
       telemetry.debug('AI Editing: Clearing conversation due to logout');
       isClearing = true;
 
-      // Clear conversation directly using the app store's setState
-      storeApi.setState(
-        produce((state) => {
-          state.aiEditing.messages = [];
-          state.aiEditing.sessionId = undefined;
-          state.aiEditing.isAucctusThinking = false;
-          state.aiEditing.thinkingMessage = undefined;
-          state.aiEditing.currentMessage = undefined; // Reset current message on logout
-        }),
-      );
+      // Use clearConversation function to ensure cancel event is dispatched
+      const aiEditingStore = storeApi.getState().aiEditing;
+      if (aiEditingStore.clearConversation) {
+        aiEditingStore.clearConversation(true);
+      }
 
       isClearing = false;
     }
@@ -308,16 +322,10 @@ export function initializeListeners(
       );
       isClearing = true;
 
-      // Clear conversation directly using the app store's setState
-      storeApi.setState(
-        produce((state) => {
-          state.aiEditing.messages = [];
-          state.aiEditing.sessionId = undefined;
-          state.aiEditing.isAucctusThinking = false;
-          state.aiEditing.thinkingMessage = undefined;
-          // Don't reset current message on concept change
-        }),
-      );
+      const aiEditingStore = storeApi.getState().aiEditing;
+      if (aiEditingStore.clearConversation) {
+        aiEditingStore.clearConversation(false);
+      }
 
       isClearing = false;
     }

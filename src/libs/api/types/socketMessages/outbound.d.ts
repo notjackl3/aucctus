@@ -109,6 +109,15 @@ export interface IAiEditingOutboundFileMessage
 }
 
 /**
+ * Interface for AI cancelling ai edit tasks
+ */
+export interface IAiEditingOutboundCancelMessage
+  extends BaseAiEditingMessage,
+    BaseSocketEvent {
+  type: 'ai.editing.cancel';
+}
+
+/**
  * Interface for AI editing typing indicators
  */
 export interface IAiEditingOutboundTypingMessage
@@ -196,6 +205,7 @@ export type OutboundSocketEvent =
   | IAiEditingConversationStartMessage
   | IAiEditingOutboundChatMessage
   | IAiEditingOutboundFileMessage
+  | IAiEditingOutboundCancelMessage
   | IAiEditingOutboundTypingMessage
   | ICustomerProfileOutboundConversationStartMessage
   | ICustomerProfileOutboundChatMessage
