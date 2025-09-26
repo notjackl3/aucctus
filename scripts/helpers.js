@@ -49,18 +49,6 @@ const prompt = (question) => {
   })
 }
 
-// Check if release-please CLI is installed
-const checkReleasePleaseCLI = () => {
-  const result = runCommand('release-please --version')
-  if (!result) {
-    log.error('release-please CLI is not installed or not in your PATH')
-    log.info('Please install it globally:')
-    log.info('npm install -g release-please')
-    process.exit(1)
-  }
-  log.success(`release-please CLI detected (${result.trim()}) ✓`)
-}
-
 // Check if we're on the develop branch
 const checkBranch = async (branchName) => {
   const currentBranch = runCommand('git branch --show-current').trim()
@@ -109,51 +97,12 @@ const parseArguments = () => {
   return argMap
 }
 
-/**
- * Build flags for release-please based on command line args or interactive prompts
- * @param {Object} argMap - Parsed command line arguments
- * @param {Function} prompt - Function to prompt for user input
- * @returns {Promise<string>} String of additional flags for release-please
- */
-const buildReleasePleaseFlags = async (argMap, prompt) => {
-  let additionalFlags = ''
-
-  // Use command-line args if provided, otherwise prompt user
-  if (argMap['release-as']) {
-    additionalFlags = `--release-as=${argMap['release-as']}`
-    log.info(`Using specific version: ${argMap['release-as']}`)
-  } else if (argMap['force-release']) {
-    additionalFlags = '--force-release=.'
-    log.info('Forcing release regardless of conventional commits')
-  } else {
-    // Interactive prompt if no args were provided
-    const releaseType = await prompt(
-      'Choose release type (force/version/auto): ',
-    )
-
-    if (releaseType.toLowerCase() === 'force') {
-      additionalFlags = '--force-release=.'
-    } else if (releaseType.toLowerCase() === 'version') {
-      const version = await prompt(
-        'Enter specific version to release (e.g., 2.2.1): ',
-      )
-      if (version && version.trim()) {
-        additionalFlags = `--release-as=${version.trim()}`
-      }
-    }
-  }
-
-  return additionalFlags
-}
-
 module.exports = {
   rl,
   runCommand,
   prompt,
   colors,
   log,
-  checkReleasePleaseCLI,
   checkBranch,
   parseArguments,
-  buildReleasePleaseFlags,
 }

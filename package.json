@@ -22,9 +22,7 @@
     "generate-sprite": "npm run generate-sprite-svg && npm run generate-icon-types && npm run icon-hash-buster",
     "analyze": "ANALYZE=true NODE_ENV=production vite build",
     "analyze-bundle": "NODE_ENV=production npx vite-bundle-visualizer -c vite.config.mts --open",
-    "check-deps": "npx depcheck",
-    "release": "node scripts/prepare-release.js",
-    "release-github": "node scripts/github-release.js"
+    "check-deps": "npx depcheck"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.38.0",
