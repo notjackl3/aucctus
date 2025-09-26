@@ -1,28 +1,27 @@
-import { Badge, Button, Icon } from '@components';
-import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Badge, Icon, Loading } from '@components';
+import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
 import {
-  useConceptOverview,
-  useConceptExecutiveSummaries,
   useConceptCustomerProfiles,
+  useConceptExecutiveSummaries,
   useConceptMarketScan,
+  useConceptOverview,
   useMarketScanMarketForcesV3,
 } from '@hooks/query/concepts.hook';
 import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
-import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
+import React, { useCallback, useEffect, useState } from 'react';
 import { EXECUTIVE_DASHBOARD_CONFIG, executiveDashboardUIText } from './config';
 
 import images from '@assets/img';
 import BusinessModelCard from './BusinessModelCard';
 import CustomerProfilesCard from './CustomerProfilesCard';
+import DifferentiatorsCard from './DifferentiatorsCard';
 import EcosystemCard from './EcosystemCard';
-import TrendsDriversCard from './TrendsDriversCard';
+import InfoSectionCard from './InfoSectionCard';
 import KeyAssumptionsCard from './KeyAssumptionsCard';
 import MarketSizeCard from './MarketSizeCard';
-import InfoSectionCard from './InfoSectionCard';
-import ShouldWeDoThisBanner from './ShouldWeDoThisBanner';
-import DifferentiatorsCard from './DifferentiatorsCard';
 import OurRightToWinCard from './OurRightToWinCard';
+import ShouldWeDoThisBanner from './ShouldWeDoThisBanner';
+import TrendsDriversCard from './TrendsDriversCard';
 
 interface ExecutiveDashboardProps {
   className?: string;
@@ -304,10 +303,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       <div
         className={`flex min-h-[400px] items-center justify-center ${className}`}
       >
-        <div className='text-center'>
-          <div className='border-primary mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2'></div>
-          <p className='text-secondary'>Loading concept overview...</p>
-        </div>
+        <Loading />
       </div>
     );
   }
