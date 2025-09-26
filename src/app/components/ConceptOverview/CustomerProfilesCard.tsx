@@ -256,7 +256,7 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
                   Loading customer profiles...
                 </div>
               ) : (
-                <p className='aucctus-text-sm aucctus-text-primary'>
+                <p className='aucctus-text-sm-semibold aucctus-text-primary'>
                   {profilesSummary}
                 </p>
               )}

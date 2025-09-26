@@ -396,8 +396,8 @@ export const useConceptOverview = (uuid?: string) => {
 export const useConceptExecutiveSummaries = (conceptUuid?: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptExecutiveSummaries, conceptUuid],
-    staleTime: 1000 * 60 * 2, // 2 minutes - summaries are relatively stable
-    cacheTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 20, // 20 seconds - summaries are relatively stable
+    cacheTime: 1000 * 20, // 20 seconds
     queryFn: async () => {
       if (!conceptUuid) return undefined;
       const result =
@@ -926,6 +926,9 @@ export const doFullConceptInvalidation = (queryClient: QueryClient) => {
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.customerProfiles],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.conceptExecutiveSummaries],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.customerProfileRealWorldSignals],

@@ -115,7 +115,7 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
                   Loading trends analysis...
                 </div>
               ) : (
-                <p className='aucctus-text-sm aucctus-text-primary'>
+                <p className='aucctus-text-sm-semibold aucctus-text-primary'>
                   {executiveSummary}
                 </p>
               )}

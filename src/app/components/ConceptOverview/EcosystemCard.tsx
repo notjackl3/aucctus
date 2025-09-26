@@ -186,7 +186,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
                   Loading ecosystem data...
                 </div>
               ) : (
-                <p className='aucctus-text-sm aucctus-text-primary'>
+                <p className='aucctus-text-sm-semibold aucctus-text-primary'>
                   {ecosystemSummary}
                 </p>
               )}

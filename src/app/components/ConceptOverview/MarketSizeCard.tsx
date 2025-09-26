@@ -101,7 +101,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
                   Loading market data...
                 </div>
               ) : (
-                <p className='aucctus-text-sm aucctus-text-primary'>
+                <p className='aucctus-text-sm-semibold aucctus-text-primary'>
                   {marketSizeData.marketSummary}
                 </p>
               )}

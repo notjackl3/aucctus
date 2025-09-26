@@ -229,7 +229,7 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
                   Loading assumptions...
                 </div>
               ) : (
-                <p className='aucctus-text-sm aucctus-text-primary'>
+                <p className='aucctus-text-sm-semibold aucctus-text-primary'>
                   {assumptionsSummary}
                 </p>
               )}

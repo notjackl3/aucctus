@@ -21,6 +21,8 @@ import KeyAssumptionsCard from './KeyAssumptionsCard';
 import MarketSizeCard from './MarketSizeCard';
 import InfoSectionCard from './InfoSectionCard';
 import ShouldWeDoThisBanner from './ShouldWeDoThisBanner';
+import DifferentiatorsCard from './DifferentiatorsCard';
+import OurRightToWinCard from './OurRightToWinCard';
 
 interface ExecutiveDashboardProps {
   className?: string;
@@ -374,136 +376,10 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       {/* Three Column Layout: Differentiators, Our Right to Win, Tab Summary Carousel */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-4'>
         {/* Differentiators Card */}
-        <div className='aucctus-border-secondary aucctus-bg-secondary h-full min-h-[350px] rounded-lg border lg:col-span-1'>
-          <div className='flex h-full flex-col p-6'>
-            <h3 className='aucctus-header-xs-semibold aucctus-text-primary mb-4 flex items-center gap-2'>
-              <Icon
-                variant='star-01'
-                className='aucctus-stroke-info-primary h-5 w-5'
-              />
-              {executiveDashboardUIText.sections.differentiators}
-            </h3>
-
-            <div className='max-h-60 flex-1 space-y-3 overflow-y-auto'>
-              {differentiators.length > 0 ? (
-                differentiators.map((differentiator, index) => (
-                  <div
-                    key={
-                      (differentiator &&
-                      typeof differentiator === 'object' &&
-                      'uuid' in differentiator
-                        ? (differentiator.uuid as string)
-                        : null) ||
-                      (differentiator &&
-                      typeof differentiator === 'object' &&
-                      'id' in differentiator
-                        ? (differentiator.id as string)
-                        : null) ||
-                      index
-                    }
-                    className='aucctus-border-info-extra-subtle aucctus-bg-info-subtle rounded-lg border p-3'
-                  >
-                    <div className='flex items-center gap-2'>
-                      <div className='aucctus-bg-info-secondary flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full'>
-                        <span className='aucctus-text-xs-semibold aucctus-text-info-primary'>
-                          {(differentiator &&
-                          typeof differentiator === 'object' &&
-                          'order' in differentiator
-                            ? (differentiator.order as number)
-                            : null) ||
-                            (differentiator &&
-                            typeof differentiator === 'object' &&
-                            'id' in differentiator
-                              ? (differentiator.id as string)
-                              : null) ||
-                            index + 1}
-                        </span>
-                      </div>
-                      <p className='aucctus-text-xs aucctus-text-primary break-words'>
-                        {(differentiator &&
-                        typeof differentiator === 'object' &&
-                        'description' in differentiator
-                          ? (differentiator.description as string)
-                          : null) ||
-                          (differentiator &&
-                          typeof differentiator === 'object' &&
-                          'title' in differentiator
-                            ? (differentiator.title as string)
-                            : null) ||
-                          'No description'}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className='aucctus-text-sm aucctus-text-secondary'>
-                  No differentiators available
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <DifferentiatorsCard differentiators={differentiators} />
 
         {/* Our Right to Win Card */}
-        <div className='aucctus-border-secondary aucctus-bg-secondary h-full min-h-[350px] rounded-lg border lg:col-span-1'>
-          <div className='flex h-full flex-col p-6'>
-            <h3 className='aucctus-header-xs-semibold aucctus-text-primary mb-4 flex items-center gap-2'>
-              <Icon
-                variant='target'
-                className='aucctus-stroke-success-primary h-5 w-5'
-              />
-              {executiveDashboardUIText.sections.ourRightToWin}
-            </h3>
-
-            <div className='max-h-60 flex-1 space-y-3 overflow-y-auto'>
-              {rightsToWin.length > 0 ? (
-                rightsToWin.map((item, index) => (
-                  <div
-                    key={
-                      (item && typeof item === 'object' && 'uuid' in item
-                        ? (item.uuid as string)
-                        : null) ||
-                      (item && typeof item === 'object' && 'id' in item
-                        ? (item.id as string)
-                        : null) ||
-                      index
-                    }
-                    className='aucctus-border-success-extra-subtle aucctus-bg-success-subtle rounded-lg border p-3'
-                  >
-                    <div className='flex items-center gap-2'>
-                      <div className='aucctus-bg-success-secondary flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full'>
-                        <span className='aucctus-text-xs-semibold aucctus-text-success-primary'>
-                          {(item && typeof item === 'object' && 'order' in item
-                            ? (item.order as number)
-                            : null) ||
-                            (item && typeof item === 'object' && 'id' in item
-                              ? (item.id as string)
-                              : null) ||
-                            index + 1}
-                        </span>
-                      </div>
-                      <p className='aucctus-text-xs aucctus-text-primary break-words'>
-                        {(item &&
-                        typeof item === 'object' &&
-                        'description' in item
-                          ? (item.description as string)
-                          : null) ||
-                          (item && typeof item === 'object' && 'title' in item
-                            ? (item.title as string)
-                            : null) ||
-                          'No description'}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className='aucctus-text-sm aucctus-text-secondary'>
-                  No rights to win available
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
+        <OurRightToWinCard rightsToWin={rightsToWin} />
 
         {/* Tab Summary Cards with Progress Navigation */}
         <div className='relative h-fit lg:col-span-2'>

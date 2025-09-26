@@ -213,7 +213,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Business Model Summary */}
             <div className='flex flex-col justify-center px-2'>
-              <p className='aucctus-text-sm aucctus-text-primary'>
+              <p className='aucctus-text-sm-semibold aucctus-text-primary'>
                 {executiveSummary}
               </p>
             </div>

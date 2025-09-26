@@ -18,7 +18,7 @@ const ShouldWeDoThisBanner: React.FC<ShouldWeDoThisBannerProps> = ({
   // Loading state
   if (isLoading) {
     return (
-      <div className='aucctus-bg-primary aucctus-border-secondary w-full rounded-lg border p-6 shadow-sm'>
+      <div className='aucctus-bg-primary w-full rounded-lg border-b border-l-4 border-r border-t border-gray-light-200 border-l-primary-500 px-6 py-4 shadow-sm dark:border-gray-light-800 dark:border-l-primary-400'>
         <div className='flex items-start gap-3'>
           <Icon
             variant='help-circle'
@@ -30,7 +30,7 @@ const ShouldWeDoThisBanner: React.FC<ShouldWeDoThisBannerProps> = ({
             <h3 className='aucctus-text-tertiary aucctus-text-sm mb-3 font-medium uppercase tracking-wider'>
               SHOULD WE DO THIS?
             </h3>
-            <div className='aucctus-bg-secondary h-16 animate-pulse rounded'></div>
+            <div className='aucctus-bg-secondary h-12 animate-pulse rounded'></div>
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@ const ShouldWeDoThisBanner: React.FC<ShouldWeDoThisBannerProps> = ({
   }
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary w-full rounded-lg border p-6 shadow-sm'>
+    <div className='aucctus-bg-primary w-full rounded-lg border-b border-l-4 border-r border-t border-gray-light-200 border-l-primary-500 px-6 py-4 shadow-sm dark:border-gray-light-800 dark:border-l-primary-400'>
       <div className='mb-3 flex items-center gap-3'>
         <Icon
           variant='help-circle'
@@ -50,7 +50,7 @@ const ShouldWeDoThisBanner: React.FC<ShouldWeDoThisBannerProps> = ({
           SHOULD WE DO THIS?
         </h3>
       </div>
-      <p className='aucctus-text-primary aucctus-text-lg leading-relaxed'>
+      <p className='aucctus-text-primary aucctus-text-xl-semibold leading-relaxed'>
         {recommendation}
       </p>
     </div>
