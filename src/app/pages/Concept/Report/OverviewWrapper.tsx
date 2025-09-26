@@ -28,7 +28,8 @@ const OverviewWrapper: React.FC = () => {
     (concept.featureVersions as any)?.concept_overview ||
     concept.featureVersions?.conceptOverview ||
     'v1';
-  const shouldRenderV2 = featureVersion === 'v2';
+  const shouldRenderV2 = featureVersion !== 'v1';
+  const shouldRenderBanner = featureVersion !== 'v3';
 
   const handleUpgrade = () => {
     generateOverview(concept.identifier, {
@@ -66,7 +67,7 @@ const OverviewWrapper: React.FC = () => {
   return (
     <>
       {/* Show upgrade banner if not v2 */}
-      {!shouldRenderV2 && (
+      {shouldRenderBanner && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}
           isLoading={isLoading}
