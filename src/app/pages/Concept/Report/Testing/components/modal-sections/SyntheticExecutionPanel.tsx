@@ -1,19 +1,16 @@
-import React, { useState, useMemo, useEffect } from 'react';
 import { Icon } from '@components';
-import { cn } from '@libs/utils/react';
+import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import {
   useSyntheticDistributionPreview,
   useTestCollaterals,
 } from '@hooks/query/synthetic-execution.hook';
-import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
-import {
-  ISyntheticExecutionRequest,
-  ITestCollateralOption,
-} from '@libs/api/types/concept/testing';
-import StepNavigation from './components/StepNavigation';
-import ParticipantSelectionStep from './components/ParticipantSelectionStep';
+import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
+import telemetry from '@libs/telemetry';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CollateralSelectionStep from './components/CollateralSelectionStep';
 import ConfigureLaunchStep from './components/ConfigureLaunchStep';
+import ParticipantSelectionStep from './components/ParticipantSelectionStep';
+import StepNavigation from './components/StepNavigation';
 import SyntheticLoadingUI from './components/SyntheticLoadingUI';
 
 interface ISyntheticExecutionPanelProps {
@@ -62,7 +59,6 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   error,
   isInitializing = false,
   isExecuting = false,
-  onCancel,
   conceptUuid,
   testUuid,
   onExecute,
@@ -151,7 +147,11 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
             return;
           }
         } catch (error) {
-          console.warn('Failed to restore execution config:', error);
+          telemetry.warn('synthetic.execution.config.restore_failed', {
+            conceptUuid,
+            testUuid,
+            error: error instanceof Error ? error.message : error,
+          });
         }
       }
 
@@ -167,7 +167,14 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
         setSkippedParticipants(new Set());
       }
     }
-  }, [profiles, status, participantCounts, executionConfigKey]);
+  }, [
+    profiles,
+    status,
+    participantCounts,
+    executionConfigKey,
+    conceptUuid,
+    testUuid,
+  ]);
 
   // Memoized configuration object
   const executionConfig = useMemo(
@@ -205,7 +212,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     onExecute(executionConfig);
   };
 
-  const handlePreviewDistribution = async () => {
+  const handlePreviewDistribution = useCallback(async () => {
     try {
       await distributionPreview.mutateAsync({
         totalTests,
@@ -217,14 +224,14 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     } catch (error) {
       // Error handled by the hook
     }
-  };
+  }, [distributionPreview, totalTests, selectedCollateralUuids]);
 
   // Auto-trigger distribution preview when totalTests changes
   useEffect(() => {
     if (totalTests > 0 && totalTests <= 100) {
       handlePreviewDistribution();
     }
-  }, [totalTests]);
+  }, [totalTests, handlePreviewDistribution]);
 
   // Step validation
   const isStep1Complete = totalTests >= 1; // Participants step (for now, just check totalTests)
@@ -302,59 +309,6 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       ...prev,
       [normalizedUuid]: 5,
     }));
-  };
-
-  const getStatusColor = () => {
-    switch (status) {
-      case 'running':
-        return 'aucctus-text-brand-primary';
-      case 'cancelling':
-        return 'aucctus-text-warning-primary';
-      case 'completed':
-        return 'aucctus-text-success-primary';
-      case 'error':
-        return 'aucctus-text-error-primary';
-      case 'cancelled':
-        return 'aucctus-text-secondary';
-      default:
-        return 'aucctus-text-secondary';
-    }
-  };
-
-  const getStatusIcon = () => {
-    switch (status) {
-      case 'running':
-        return 'loading-02';
-      case 'cancelling':
-        return 'loading-02';
-      case 'completed':
-        return 'check';
-      case 'error':
-        return 'alert-circle';
-      case 'cancelled':
-        return 'closeX';
-      default:
-        return 'ai-conclusion';
-    }
-  };
-
-  const getStatusTitle = () => {
-    switch (status) {
-      case 'idle':
-        return 'Ready to Execute';
-      case 'running':
-        return 'Execution in Progress';
-      case 'cancelling':
-        return 'Cancelling Execution';
-      case 'completed':
-        return 'Execution Completed';
-      case 'error':
-        return 'Execution Failed';
-      case 'cancelled':
-        return 'Execution Cancelled';
-      default:
-        return 'Ready to Execute';
-    }
   };
 
   return (

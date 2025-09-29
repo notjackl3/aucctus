@@ -1,6 +1,5 @@
 import React from 'react';
 import { Icon } from '@components';
-import { cn } from '@libs/utils/react';
 import { TestResultsHeaderProps } from '../TestResults.types';
 
 const TestResultsHeader: React.FC<TestResultsHeaderProps> = ({

@@ -12,7 +12,6 @@ import { Assumption } from '../types';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useTestCompletion } from '../Testing';
-import { useSyntheticExecutionEvents } from '@hooks/sockets/testing';
 
 // Test Execution Modal Sections
 import TestOverview from './modal-sections/TestOverview';

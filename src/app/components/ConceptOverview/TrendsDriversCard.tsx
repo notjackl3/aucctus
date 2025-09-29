@@ -22,7 +22,6 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
   totalCards,
   onCardClick,
   conceptId,
-  conceptUuid,
   marketForces = [],
   isLoadingMarketForces = false,
   executiveSummary,

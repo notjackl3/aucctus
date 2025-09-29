@@ -2,7 +2,6 @@ import React, { useState, useCallback } from 'react';
 import { animated } from 'react-spring';
 import AssumptionDetailCard from './components/cards/AssumptionDetailCard';
 import EditableAssumptionCard from './components/cards/EditableAssumptionCard';
-import Card from '@components/Card';
 import CategoryProgressCard from './components/cards/category-progress-card/CategoryProgressCard';
 import telemetry from '@libs/telemetry';
 import { Loading, Icon, Modal } from '@components';
@@ -17,8 +16,6 @@ import {
   CATEGORY_CONFIG,
   getValidationStatusFromMetrics,
   getValidationPercentageFromMetrics,
-  getCategoryInsightByStatus,
-  getCategoryInsightTitleByStatus,
 } from './utils/assumptionUtils';
 import {
   useAssumptionAdd,
@@ -208,19 +205,6 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
   const getValidationPercentage = (category: AssumptionCategory): number => {
     return getValidationPercentageFromMetrics(category, categoryMetrics);
   };
-
-  // Get the insight for the selected category using validation status
-  const categoryValidationStatus = getValidationStatus(selectedCategory);
-
-  const categoryInsight = getCategoryInsightByStatus(
-    selectedCategory,
-    categoryValidationStatus,
-  );
-
-  const insightTitle = getCategoryInsightTitleByStatus(
-    selectedCategory,
-    categoryValidationStatus,
-  );
 
   telemetry.log('progress', {
     desirabilityProgress: getValidationPercentage('desirability'),

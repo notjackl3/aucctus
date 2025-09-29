@@ -23,7 +23,6 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
   totalCards,
   onCardClick,
   conceptId,
-  conceptUuid,
   financialProjectionV2,
   isLoadingFinancial,
   executiveSummary,

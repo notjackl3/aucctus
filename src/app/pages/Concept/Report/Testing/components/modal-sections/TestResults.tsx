@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Icon } from '@components';
-import { cn } from '@libs/utils/react';
 import { useTestResults, useTestDetail } from '@hooks/query/testing.hook';
 import { ITestResult } from '@libs/api/types/concept/testing';
 import TestCompletionLoadingOverlay from './test-impact/components/TestCompletionLoadingOverlay';

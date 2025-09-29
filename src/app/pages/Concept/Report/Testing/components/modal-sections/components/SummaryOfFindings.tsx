@@ -1,14 +1,6 @@
 import React, { useMemo } from 'react';
 import { Icon } from '@components';
 
-interface Learning {
-  uuid: string;
-  learning: string;
-  impact: string;
-  testResultUuid: string;
-  sourceFilename: string;
-}
-
 interface Finding {
   uuid: string;
   learning: string;

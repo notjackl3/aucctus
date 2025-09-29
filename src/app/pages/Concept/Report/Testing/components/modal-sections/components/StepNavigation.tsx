@@ -1,5 +1,4 @@
 import React from 'react';
-import { cn } from '@libs/utils/react';
 
 interface IStepNavigationProps {
   stepNumber: number;
@@ -12,7 +11,6 @@ const StepNavigation: React.FC<IStepNavigationProps> = ({
   stepNumber,
   title,
   description,
-  isComplete,
 }) => {
   return (
     <div className='mb-4 flex items-center gap-3'>

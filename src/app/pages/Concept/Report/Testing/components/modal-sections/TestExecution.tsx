@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Icon, toast } from '@components';
 import { cn } from '@libs/utils/react';
 import api from '@libs/api';
+import telemetry from '@libs/telemetry';
 import { useSyntheticExecutionEvents } from '@hooks/sockets/testing';
 import {
   useSyntheticExecutionStart,
@@ -140,12 +141,19 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         ) {
           setExecutionId(currentExecution.executionId);
         } else if (process.env.NODE_ENV === 'development') {
-          console.log('No running execution found for this test');
+          telemetry.debug('synthetic.execution.check.no_running', {
+            conceptUuid,
+            testUuid,
+          });
         }
       } catch (error) {
         // No running execution found or error accessing endpoint - this is fine
         if (process.env.NODE_ENV === 'development') {
-          console.log('Could not check for running execution:', error);
+          telemetry.debug('synthetic.execution.check.error', {
+            conceptUuid,
+            testUuid,
+            error: error instanceof Error ? error.message : error,
+          });
         }
       } finally {
         // Set initialization complete after checking for running execution

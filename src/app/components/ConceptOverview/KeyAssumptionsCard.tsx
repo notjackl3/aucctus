@@ -46,7 +46,6 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
   totalCards,
   onCardClick,
   conceptId,
-  conceptUuid,
   categoryMetrics,
   isLoadingAssumptions = false,
   executiveSummary,

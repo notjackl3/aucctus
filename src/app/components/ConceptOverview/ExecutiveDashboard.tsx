@@ -1,4 +1,4 @@
-import { Badge, Icon, Loading } from '@components';
+import { Badge, Loading } from '@components';
 import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
 import {
   useConceptCustomerProfiles,
@@ -150,26 +150,6 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     setIsAutoPlaying(true);
     setProgress(0);
   }, []);
-
-  // ComingSoonCard component - temporarily replaces all tab summary cards
-  const ComingSoonCard: React.FC<CardComponentProps> = useCallback(
-    () => (
-      <div className='aucctus-bg-secondary aucctus-border-secondary h-full rounded-lg border transition-all duration-200'>
-        <div className='flex h-full flex-col items-center justify-center p-6 text-center'>
-          <div className='m-6'>
-            <Icon
-              variant='clock'
-              className='aucctus-stroke-tertiary mx-auto mb-4 h-12 w-12'
-            />
-            <h3 className='aucctus-header-md-semibold aucctus-text-primary mb-2'>
-              Coming Soon
-            </h3>
-          </div>
-        </div>
-      </div>
-    ),
-    [],
-  );
 
   // Original tab summary cards - now with centralized data passed as props
   const originalTabSummaryCards: TabSummaryCard[] = [

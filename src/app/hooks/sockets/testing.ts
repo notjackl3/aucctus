@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
 import { useSocketEvent } from './aucctus';
 import { toast } from '@components';
+import telemetry from '@libs/telemetry';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
   ISyntheticExecutionProgressMessage,
@@ -44,7 +45,11 @@ const persistExecutionState = (
       );
     } catch (error) {
       // Handle storage errors gracefully
-      console.warn('Failed to persist execution state:', error);
+      telemetry.warn('synthetic.execution.persistence.failed', {
+        conceptUuid,
+        testUuid,
+        error: error instanceof Error ? error.message : error,
+      });
     }
   }
 };
@@ -70,7 +75,11 @@ const getPersistedExecutionState = (
     }
   } catch (error) {
     // Handle parsing errors gracefully
-    console.warn('Failed to parse persisted execution state:', error);
+    telemetry.warn('synthetic.execution.persistence.parse_failed', {
+      conceptUuid,
+      testUuid,
+      error: error instanceof Error ? error.message : error,
+    });
   }
   return null;
 };
@@ -82,7 +91,11 @@ const clearPersistedExecutionState = (
   try {
     sessionStorage.removeItem(EXECUTION_STATE_KEY(conceptUuid, testUuid));
   } catch (error) {
-    console.warn('Failed to clear persisted execution state:', error);
+    telemetry.warn('synthetic.execution.persistence.clear_failed', {
+      conceptUuid,
+      testUuid,
+      error: error instanceof Error ? error.message : error,
+    });
   }
 };
 
@@ -131,12 +144,14 @@ export const useSyntheticExecutionEvents = (
     'synthetic.execution.progress.user',
     useCallback(
       (data: ISyntheticExecutionProgressMessage) => {
-        console.log('🔵 FRONTEND: Received synthetic progress message:', data);
+        telemetry.debug('synthetic.execution.progress.received', {
+          conceptUuid: data.conceptUuid,
+          testUuid: data.testUuid,
+          progress: data.progress,
+          stage: data.stage,
+          currentPersona: data.currentPersona,
+        });
         if (data.conceptUuid === conceptUuid && data.testUuid === testUuid) {
-          console.log(
-            '🔵 FRONTEND: Message matches current concept/test, updating state',
-          );
-
           // Check if this is the final completion (100% progress)
           const isComplete = data.progress >= 100;
 
@@ -153,10 +168,6 @@ export const useSyntheticExecutionEvents = (
 
             // Only invalidate queries and show completion toast when reaching 100%
             if (isComplete) {
-              console.log(
-                '🎉 FRONTEND: Pipeline fully complete (100%), showing results and invalidating queries',
-              );
-
               // Clear persisted state on completion
               clearPersistedExecutionState(conceptUuid, testUuid);
 
@@ -177,15 +188,14 @@ export const useSyntheticExecutionEvents = (
             return newState;
           });
         } else {
-          console.log(
-            '🔵 FRONTEND: Message does not match current concept/test',
-            {
-              received: { concept: data.conceptUuid, test: data.testUuid },
-              expected: { concept: conceptUuid, test: testUuid },
-              conceptMatch: data.conceptUuid === conceptUuid,
-              testMatch: data.testUuid === testUuid,
-            },
-          );
+          telemetry.debug('synthetic.execution.progress.mismatch', {
+            receivedConceptUuid: data.conceptUuid,
+            receivedTestUuid: data.testUuid,
+            expectedConceptUuid: conceptUuid,
+            expectedTestUuid: testUuid,
+            conceptMatch: data.conceptUuid === conceptUuid,
+            testMatch: data.testUuid === testUuid,
+          });
         }
       },
       [conceptUuid, testUuid, queryClient, onComplete],
@@ -200,14 +210,18 @@ export const useSyntheticExecutionEvents = (
     'synthetic.execution.completed.user',
     useCallback(
       (data: ISyntheticExecutionCompletedMessage) => {
-        console.log(
-          '🟢 FRONTEND: Received synthetic execution phase completion:',
-          data,
-        );
+        telemetry.debug('synthetic.execution.phase.completed', {
+          conceptUuid: data.conceptUuid,
+          testUuid: data.testUuid,
+          resultsCount: data.resultsCount,
+          message: data.message,
+        });
         if (data.conceptUuid === conceptUuid && data.testUuid === testUuid) {
-          console.log(
-            '🟢 FRONTEND: Synthetic execution phase completed, but analysis pipeline is still running...',
-          );
+          telemetry.debug('synthetic.execution.phase.analysis_pending', {
+            conceptUuid,
+            testUuid,
+            resultsCount: data.resultsCount,
+          });
           // Don't set status to 'completed' or invalidate queries yet
           // Just update the message and results count
           setExecutionState((prev) => ({
@@ -217,9 +231,12 @@ export const useSyntheticExecutionEvents = (
           }));
 
           // Show a brief intermediate toast, but don't mark as complete
-          console.log(
-            `🟢 FRONTEND: Generated ${data.resultsCount} synthetic interviews. Analysis pipeline is running...`,
-          );
+          telemetry.debug('synthetic.execution.interviews.generated', {
+            conceptUuid,
+            testUuid,
+            resultsCount: data.resultsCount,
+            message: `Generated ${data.resultsCount} synthetic interviews`,
+          });
         }
       },
       [conceptUuid, testUuid],

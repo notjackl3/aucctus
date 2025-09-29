@@ -20,7 +20,6 @@ import {
   ICustomerPain,
   ICustomerProfile,
   ICustomerProfileCreate,
-  IExecutiveSummaries,
   IFinancialProjection,
   IFormError,
   IGeneratedConcept,

@@ -22,7 +22,6 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
   progress,
   totalCards,
   onCardClick,
-  conceptUuid,
   conceptId,
   customerProfiles = [],
   isLoadingCustomerProfiles = false,

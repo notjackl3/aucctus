@@ -5,7 +5,6 @@ import { SyntheticResultViewProps } from '../TestResults.types';
 const SyntheticResultView: React.FC<SyntheticResultViewProps> = ({
   result,
   viewMode,
-  onToggleViewMode,
 }) => {
   return (
     <div className='px-4 pb-4'>

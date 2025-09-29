@@ -22,7 +22,6 @@ const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
   participantCounts,
   skippedParticipants,
   onParticipantCountChange,
-  onRemoveParticipant,
   onSkipParticipant,
   onUnskipParticipant,
   isLoading,

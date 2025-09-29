@@ -22,7 +22,6 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   totalCards,
   onCardClick,
   conceptId,
-  conceptUuid,
   marketScan,
   isLoadingMarketScan = false,
   executiveSummary,

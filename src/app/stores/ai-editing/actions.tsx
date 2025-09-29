@@ -38,7 +38,7 @@ export function clearConversation(
   this: IStoreApi<IAiEditingState>,
   resetCurrentMessage?: boolean,
 ) {
-  const { get, set, storeApi } = this;
+  const { set, storeApi } = this;
   const conceptUuid = storeApi.getState().conceptReport.conceptUuid;
 
   // Dispatch cancel event to backend if we have a conceptUuid

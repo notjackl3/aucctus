@@ -1,7 +1,7 @@
-import React, { useMemo, useEffect, useState } from 'react';
 import { Icon } from '@components';
-import { cn } from '@libs/utils/react';
 import { ICustomerProfile } from '@libs/api/types/concept/concepts';
+import { cn } from '@libs/utils/react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 interface ISyntheticLoadingUIProps {
   // Progress data
@@ -36,8 +36,6 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
   message,
   currentStage,
   profiles,
-  currentPersona,
-  totalPersonas,
   resultsCount,
   isInitializing = false,
   onViewResults,
@@ -81,24 +79,27 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
   };
 
   // Helper function to find profile index by name
-  const findProfileIndexByName = (personName: string): number => {
-    const normalizedPersonName = normalizeName(personName);
+  const findProfileIndexByName = useCallback(
+    (personName: string): number => {
+      const normalizedPersonName = normalizeName(personName);
 
-    return profiles.findIndex((profile) => {
-      // Try multiple profile fields and normalize them for comparison
-      const profileNames = [
-        profile.segment,
-        profile.name,
-        // Also try just first name + last name if segment is longer
-        profile.segment?.split(' ').slice(0, 2).join(' '),
-      ].filter(Boolean);
+      return profiles.findIndex((profile) => {
+        // Try multiple profile fields and normalize them for comparison
+        const profileNames = [
+          profile.segment,
+          profile.name,
+          // Also try just first name + last name if segment is longer
+          profile.segment?.split(' ').slice(0, 2).join(' '),
+        ].filter(Boolean);
 
-      return profileNames.some(
-        (profileName) =>
-          normalizeName(profileName || '') === normalizedPersonName,
-      );
-    });
-  };
+        return profileNames.some(
+          (profileName) =>
+            normalizeName(profileName || '') === normalizedPersonName,
+        );
+      });
+    },
+    [profiles],
+  );
 
   // Handle stage-specific pulsing behavior
   useEffect(() => {
@@ -135,7 +136,7 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
       // Stage 1: Timer-based pulsing
       setPulsingStageBehavior('timer');
     }
-  }, [currentStage, message, profiles, status]);
+  }, [currentStage, message, profiles, status, findProfileIndexByName]);
 
   // Timer-based pulsing setup (for Stage 1 and Stage 3)
   useEffect(() => {
@@ -394,6 +395,7 @@ const RunningTestCard: React.FC<{
     progress,
     currentStage,
     message,
+    lastStageProgress,
     normalizedProgress,
     currentStageState,
     stageMessage,
@@ -473,7 +475,7 @@ const PersonaIndicator: React.FC<{
   profile: ICustomerProfile;
   status: 'pending' | 'processing' | 'completed';
   isLast: boolean;
-}> = ({ profile, status, isLast }) => {
+}> = ({ profile, status }) => {
   const getStatusStyles = () => {
     switch (status) {
       case 'processing':
