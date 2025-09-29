@@ -6,7 +6,7 @@ import {
 } from '@hooks/query/synthetic-execution.hook';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import telemetry from '@libs/telemetry';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import CollateralSelectionStep from './components/CollateralSelectionStep';
 import ConfigureLaunchStep from './components/ConfigureLaunchStep';
 import ParticipantSelectionStep from './components/ParticipantSelectionStep';
@@ -212,26 +212,24 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     onExecute(executionConfig);
   };
 
-  const handlePreviewDistribution = useCallback(async () => {
-    try {
-      await distributionPreview.mutateAsync({
-        totalTests,
-        collateralUuid:
-          selectedCollateralUuids.length === 1
-            ? selectedCollateralUuids[0]
-            : undefined,
-      });
-    } catch (error) {
-      // Error handled by the hook
-    }
-  }, [distributionPreview, totalTests, selectedCollateralUuids]);
-
   // Auto-trigger distribution preview when totalTests changes
   useEffect(() => {
     if (totalTests > 0 && totalTests <= 100) {
-      handlePreviewDistribution();
+      distributionPreview
+        .mutateAsync({
+          totalTests,
+          collateralUuid:
+            selectedCollateralUuids.length === 1
+              ? selectedCollateralUuids[0]
+              : undefined,
+        })
+        .catch(() => {
+          // Error handled by the hook
+        });
     }
-  }, [totalTests, handlePreviewDistribution]);
+    // Ignore distribution preview mutation, it causes an infinite when included in the deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalTests, selectedCollateralUuids]);
 
   // Step validation
   const isStep1Complete = totalTests >= 1; // Participants step (for now, just check totalTests)
