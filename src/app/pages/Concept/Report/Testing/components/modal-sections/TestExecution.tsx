@@ -71,18 +71,26 @@ const TestExecution: React.FC<TestExecutionProps> = ({
 
   // Merge WebSocket state with persistent API state
   const displayState = useMemo(() => {
-    // If we have persistent API status and WebSocket is idle (likely reconnecting)
-    // and the API shows an active execution, prioritize API data
+    // If we have persistent API status, prioritize it in these cases:
+    // 1. WebSocket is idle and API shows active execution (reconnecting scenario)
+    // 2. API shows completed status (regardless of WebSocket state)
     if (
       persistentStatus &&
-      executionState.status === 'idle' &&
-      persistentStatus.status !== 'completed' &&
-      ['running', 'pending'].includes(persistentStatus.status)
+      // Case 1: WebSocket idle, API shows active execution
+      ((executionState.status === 'idle' &&
+        ['running', 'pending'].includes(persistentStatus.status)) ||
+        // Case 2: API shows completed (trust this over stale WebSocket state)
+        persistentStatus.status === 'completed')
     ) {
+      const isCompleted = persistentStatus.status === 'completed';
+
       return {
         status: persistentStatus.status as any,
-        progress: persistentStatus.progress || 0,
-        message: persistentStatus.message || 'Reconnecting...',
+        // Force 100% progress when completed, since API doesn't store progress
+        progress: isCompleted ? 100 : persistentStatus.progress || 0,
+        message:
+          persistentStatus.message ||
+          (isCompleted ? 'Execution completed' : 'Reconnecting...'),
         executionId: persistentStatus.executionId,
         resultsCount: persistentStatus.resultsCount,
         currentStage: undefined, // API doesn't provide stage details
@@ -101,10 +109,15 @@ const TestExecution: React.FC<TestExecutionProps> = ({
 
     // Fallback to persistent status from API
     if (persistentStatus) {
+      const isCompleted = persistentStatus.status === 'completed';
+
       return {
         status: persistentStatus.status as any,
-        progress: persistentStatus.progress || 0,
-        message: persistentStatus.message,
+        // Force 100% progress when completed, since API doesn't store progress
+        progress: isCompleted ? 100 : persistentStatus.progress || 0,
+        message:
+          persistentStatus.message ||
+          (isCompleted ? 'Execution completed' : ''),
         executionId: persistentStatus.executionId,
         resultsCount: persistentStatus.resultsCount,
         currentStage: undefined, // API doesn't provide stage details
@@ -140,11 +153,6 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           ['running', 'starting'].includes(currentExecution.status)
         ) {
           setExecutionId(currentExecution.executionId);
-        } else if (process.env.NODE_ENV === 'development') {
-          telemetry.debug('synthetic.execution.check.no_running', {
-            conceptUuid,
-            testUuid,
-          });
         }
       } catch (error) {
         // No running execution found or error accessing endpoint - this is fine
