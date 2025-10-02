@@ -581,6 +581,11 @@ export class Endpoints {
   static nucleusAnswer(reportUuid: string, answerUuid: string) {
     return `/api/v1/nucleus-reports/${reportUuid}/answers/${answerUuid}`;
   }
+
+  // Nucleus Documents Endpoints
+  static nucleusDocuments(reportUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/upload`;
+  }
 }
 
 export class SocketEndpoints {

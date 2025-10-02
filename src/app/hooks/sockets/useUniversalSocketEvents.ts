@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@components';
 import { useSocketEvent } from './aucctus';
 import { AppPath } from '@routes/routes';
+import { useQueryClient } from 'react-query';
+import { AucctusQueryKeys } from '../query/query-keys';
+import {
+  INucleusUploadProgressMessage,
+  INucleusUploadCompletedMessage,
+  INucleusUploadErrorMessage,
+} from '@libs/api/types';
 
 // Define event handler types
 export interface ConceptWorkflowHandler {
@@ -10,10 +17,20 @@ export interface ConceptWorkflowHandler {
   onWorkflowError?: (message: any) => void;
 }
 
+// Nucleus upload event handler types
+export interface NucleusUploadHandler {
+  onUploadProgress?: (message: INucleusUploadProgressMessage) => void;
+  onUploadCompleted?: (message: INucleusUploadCompletedMessage) => void;
+  onUploadError?: (message: INucleusUploadErrorMessage) => void;
+}
+
 // Universal socket event configuration
 export interface SocketEventConfig {
   // Concept workflow events
   conceptWorkflow?: ConceptWorkflowHandler;
+
+  // Nucleus upload events
+  nucleusUpload?: NucleusUploadHandler;
 
   // Add more event types here as needed
   // customerProfile?: CustomerProfileHandler;
@@ -28,6 +45,7 @@ export interface SocketEventConfig {
  */
 export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   // Prevent duplicate toasts by tracking recent messages
   const recentMessages = React.useRef(new Set<string>());
@@ -89,15 +107,96 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       handler(message);
     }
   });
+
+  // Register nucleus upload progress events
+  useSocketEvent<
+    'nucleus_upload.progress.account',
+    INucleusUploadProgressMessage
+  >('nucleus_upload.progress.account', (message) => {
+    if (!config.nucleusUpload) return;
+
+    const handler =
+      config.nucleusUpload.onUploadProgress ||
+      ((msg: INucleusUploadProgressMessage) => {
+        if (msg.stage === 'completed') {
+          toast.success('Document processing completed!', msg.message, {
+            autoClose: 5000,
+          });
+        } else if (msg.stage === 'processing' && msg.progress) {
+          toast.info(`Processing documents: ${msg.progress}%`, msg.message, {
+            autoClose: 5000,
+          });
+        } else if (msg.stage === 'validating') {
+          toast.info('Validating uploaded documents...', msg.message, {
+            autoClose: 5000,
+          });
+        }
+      });
+    handler(message);
+  });
+
+  // Register nucleus upload completed events
+  useSocketEvent<
+    'nucleus_upload.completed.account',
+    INucleusUploadCompletedMessage
+  >('nucleus_upload.completed.account', (message) => {
+    if (!config.nucleusUpload) return;
+
+    // Check for duplicates
+    const messageKey = `nucleus-completed-${message.nucleusReportUuid}-${message.uploadedCount}`;
+    if (preventDuplicate(messageKey)) return;
+
+    const handler =
+      config.nucleusUpload.onUploadCompleted ||
+      ((msg: INucleusUploadCompletedMessage) => {
+        // Invalidate nucleus queries to refresh data
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.nucleusReportLatest],
+        });
+
+        toast.success(
+          'Document upload completed!',
+          `Successfully uploaded ${msg.uploadedCount} file${msg.uploadedCount > 1 ? 's' : ''} for processing.`,
+          { autoClose: 5000 },
+        );
+      });
+    handler(message);
+  });
+
+  // Register nucleus upload error events
+  useSocketEvent<'nucleus_upload.error.account', INucleusUploadErrorMessage>(
+    'nucleus_upload.error.account',
+    (message) => {
+      if (!config.nucleusUpload) return;
+
+      // Check for duplicates
+      const messageKey = `nucleus-error-${message.nucleusReportUuid || 'unknown'}-${message.errorCode || message.message}`;
+      if (preventDuplicate(messageKey)) return;
+
+      const handler =
+        config.nucleusUpload.onUploadError ||
+        ((msg: INucleusUploadErrorMessage) => {
+          toast.error(
+            'Document upload failed',
+            msg.message || 'Please try uploading your documents again.',
+            { autoClose: 5000 },
+          );
+        });
+      handler(message);
+    },
+  );
 };
 
 /**
  * Predefined configurations for common use cases
  */
 export const socketEventConfigs = {
-  // Default concept workflow handling (same as original bootstrap)
-  conceptWorkflowDefault: (): SocketEventConfig => ({
+  // Universal default handling for all application socket events
+  universalDefault: (): SocketEventConfig => ({
     conceptWorkflow: {
+      // Uses default handlers defined in the hook
+    },
+    nucleusUpload: {
       // Uses default handlers defined in the hook
     },
   }),

@@ -1,5 +1,1 @@
-import DocumentUpload from './DocumentUpload';
-
-export default {
-  DocumentUpload,
-};
+export { default } from './DocumentUpload';

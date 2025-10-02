@@ -135,4 +135,22 @@ export class NucleusApi extends ApiService {
   deleteAnswer(reportUuid: string, answerUuid: string) {
     return this.delete(endpoints.nucleusAnswer(reportUuid, answerUuid));
   }
+
+  /**
+   * Upload documents to a nucleus report for processing.
+   */
+  uploadDocuments(reportUuid: string, files: File[]) {
+    const formData = new FormData();
+
+    // Append each file
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
+
+    return this.post(endpoints.nucleusDocuments(reportUuid), formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  }
 }

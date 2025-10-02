@@ -43,13 +43,15 @@ const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
           });
         }
 
-        // Reconnect WebSocket with fresh Clerk token
-        api.aucctusSocket.reconnectWithClerkToken().catch((error) => {
-          telemetry.error(
-            'Failed to reconnect WebSocket with Clerk token:',
-            error,
-          );
-        });
+        if (!api.aucctusSocket.isConnected) {
+          // Reconnect WebSocket with fresh Clerk token
+          api.aucctusSocket.reconnectWithClerkToken().catch((error) => {
+            telemetry.error(
+              'Failed to reconnect WebSocket with Clerk token:',
+              error,
+            );
+          });
+        }
       } else if (!isSignedIn) {
         // User is not signed in, disconnect WebSocket and reset user data state
         api.aucctusSocket.disconnect();

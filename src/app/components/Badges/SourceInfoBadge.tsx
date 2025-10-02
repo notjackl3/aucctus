@@ -38,12 +38,13 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
         badgeSize === 'small' ? 'text-xs font-normal' : 'text-sm font-medium';
 
       let sourceTitle = 'loading...';
-      if (clearbitCompanyQuery.data?.[0]?.name) {
+      if (!!source?.nucleusFileSource?.title) {
+        sourceTitle = source.nucleusFileSource.title;
+      } else if (clearbitCompanyQuery.data?.[0]?.name) {
         sourceTitle = clearbitCompanyQuery.data[0].name;
       } else {
         sourceTitle = getBaseUrl(source.url);
       }
-
       let publishedDate = '';
       if (publishedDatesQuery.data && showPublishedDate) {
         publishedDate = formatRelativeDate(
@@ -58,10 +59,11 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
       publishedDatesQuery.data,
       showPublishedDate,
       source.url,
+      source.nucleusFileSource,
     ]);
 
   const renderSourceLogo = () => {
-    const sourceBaseUrl = getBaseUrl(source.url);
+    const sourceBaseUrl = source.url ? getBaseUrl(source.url) : null;
 
     return (
       <div
@@ -70,14 +72,23 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
           logoSizeClass,
         )}
       >
-        <img
-          className='h-full w-full object-contain'
-          alt='source-logo'
-          src={`https://logo.clearbit.com/${sourceBaseUrl || ''}`}
-          onError={(e) => {
-            (e.currentTarget as HTMLImageElement).src = images.link;
-          }}
-        />
+        {sourceBaseUrl ? (
+          <img
+            className='h-full w-full object-contain'
+            alt='source-logo'
+            src={`https://logo.clearbit.com/${sourceBaseUrl}`}
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).src = images.link;
+            }}
+          />
+        ) : (
+          // Show document icon for nucleus file sources (user uploaded files)
+          <img
+            className='h-full w-full object-contain'
+            alt='document-icon'
+            src={images.link} // or use a document-specific icon if available
+          />
+        )}
       </div>
     );
   };
@@ -104,13 +115,16 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
         {source.title}
       </div>
       <div className='aucctus-text-xs aucctus-text-secondary'>
-        {sourceDescription || getBaseUrl(source.url)}
+        {sourceDescription ||
+          (source.url ? getBaseUrl(source.url) : 'User uploaded document')}
       </div>
     </div>
   );
 
   const displayTitle =
-    sourceTitle.length > 25 ? `${sourceTitle.slice(0, 25)}...` : sourceTitle;
+    sourceTitle && sourceTitle.length > 25
+      ? `${sourceTitle.slice(0, 25)}...`
+      : sourceTitle || 'Unknown Source';
 
   return (
     <ComponentTooltip tip={renderTooltipContent()} hideDelay={300}>

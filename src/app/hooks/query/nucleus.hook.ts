@@ -2,7 +2,7 @@ import { toast } from '@components';
 import api from '@libs/api';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
-import { useQuery } from 'react-query';
+import { useQuery, useMutation } from 'react-query';
 import { AucctusQueryKeys } from './query-keys';
 
 /**
@@ -84,5 +84,74 @@ export const useNucleusReport = (reportUuid?: string) => {
     ...query,
     nucleusReport: query.data,
     hasNucleusReport: !!query.data,
+  };
+};
+
+/**
+ * Custom hook for uploading documents to a nucleus report.
+ * Returns a mutation function for uploading files with progress and error handling.
+ */
+export const useNucleusDocumentUpload = () => {
+  const { mutate, isLoading, error, isSuccess, reset } = useMutation({
+    mutationFn: async ({
+      reportUuid,
+      files,
+    }: {
+      reportUuid: string;
+      files: File[];
+    }) => {
+      if (!reportUuid) {
+        throw new Error('Report UUID is required');
+      }
+      if (!files || files.length === 0) {
+        throw new Error('At least one file is required');
+      }
+
+      // Validate file types (PDF, TXT)
+      const allowedTypes = ['application/pdf', 'text/plain'];
+
+      const invalidFiles = files.filter(
+        (file) => !allowedTypes.includes(file.type),
+      );
+      if (invalidFiles.length > 0) {
+        throw new Error(
+          `Invalid file types: ${invalidFiles.map((f) => f.name).join(', ')}. Only PDF and TXT files are allowed.`,
+        );
+      }
+
+      // Validate file sizes (max 10MB per file)
+      const maxSize = 10 * 1024 * 1024; // 10MB
+      const oversizedFiles = files.filter((file) => file.size > maxSize);
+      if (oversizedFiles.length > 0) {
+        throw new Error(
+          `Files too large: ${oversizedFiles.map((f) => f.name).join(', ')}. Maximum size is 10MB per file.`,
+        );
+      }
+
+      return await api.nucleus.uploadDocuments(reportUuid, files);
+    },
+    onSuccess: (data, variables) => {
+      toast.success(
+        `Successfully uploaded ${variables.files.length} document${variables.files.length > 1 ? 's' : ''} for processing`,
+        undefined,
+        { autoClose: 3000 },
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Failed to upload documents. Please try again.',
+        undefined,
+        { autoClose: 5000 },
+      );
+    },
+  });
+
+  return {
+    uploadDocuments: mutate,
+    isUploading: isLoading,
+    uploadError: error,
+    isUploadSuccess: isSuccess,
+    resetUpload: reset,
   };
 };

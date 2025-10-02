@@ -4,6 +4,9 @@ export interface ISource {
   description?: string;
   url: string;
   classification?: string;
+  nucleusFileSource?: {
+    title: string;
+  };
 }
 
 export interface IInsight {

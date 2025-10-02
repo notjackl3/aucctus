@@ -52,8 +52,8 @@ const AucctusSocketBootstrap: React.FC<{ children: React.ReactNode }> = ({
     };
   }, []);
 
-  // Use universal socket events with default concept workflow handling
-  useUniversalSocketEvents(socketEventConfigs.conceptWorkflowDefault());
+  // Use universal socket events with default application-wide handling
+  useUniversalSocketEvents(socketEventConfigs.universalDefault());
 
   return <>{children}</>;
 };

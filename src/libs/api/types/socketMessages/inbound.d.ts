@@ -458,6 +458,36 @@ export interface ISyntheticExecutionErrorMessage extends BaseSocketEvent {
   details?: any;
 }
 
+// Nucleus Upload Event Messages
+export interface INucleusUploadProgressMessage extends BaseSocketEvent {
+  type: 'nucleus_upload.progress.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  stage: 'uploading' | 'validating' | 'processing' | 'completed';
+  message: string;
+  progress?: number;
+  filesProcessed?: number;
+  totalFiles?: number;
+}
+
+export interface INucleusUploadCompletedMessage extends BaseSocketEvent {
+  type: 'nucleus_upload.completed.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  uploadedCount: number;
+  sourceUuids: string[];
+  totalFileSize: number;
+}
+
+export interface INucleusUploadErrorMessage extends BaseSocketEvent {
+  type: 'nucleus_upload.error.account';
+  accountUuid: string;
+  nucleusReportUuid?: string;
+  message: string;
+  errorCode?: string;
+  details?: any;
+}
+
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -492,6 +522,9 @@ export type InboundSocketEvent<C = {}> =
   | IConceptWorkflowMessage
   | ISyntheticExecutionProgressMessage
   | ISyntheticExecutionCompletedMessage
-  | ISyntheticExecutionErrorMessage;
+  | ISyntheticExecutionErrorMessage
+  | INucleusUploadProgressMessage
+  | INucleusUploadCompletedMessage
+  | INucleusUploadErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

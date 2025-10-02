@@ -20,6 +20,8 @@ import {
 import LoadingMask from '../../Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { animationStyles } from '../../Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
 import StatusBadge from '../StatusBadge';
+import DocumentUpload from '../DocumentUpload';
+import { useDebugMode } from '@hooks/debug-mode.hook';
 
 const NucleusPage: React.FC = () => {
   // Fetch real nucleus data
@@ -34,6 +36,7 @@ const NucleusPage: React.FC = () => {
 
   // Check if current user is admin
   const isAdmin = user?.role.toLowerCase() === 'admin';
+  const isDebugModeEnabled = useDebugMode();
 
   // Hook for updating question assessment status
   const { mutate: updateQuestion, isLoading: isUpdatingQuestion } =
@@ -597,6 +600,10 @@ const NucleusPage: React.FC = () => {
           }
           zIndex={60}
         />
+
+        {isDebugModeEnabled && nucleusReport?.uuid && (
+          <DocumentUpload reportUuid={nucleusReport?.uuid} />
+        )}
       </div>
     </div>
   );

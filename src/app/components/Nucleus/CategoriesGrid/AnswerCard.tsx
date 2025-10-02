@@ -191,14 +191,21 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
           {/* Source badges using Badge.SourceInfo */}
           {answer.sources &&
             answer.sources
-              .filter((source) => source.url) // Only show sources with valid URLs
+              .filter((source) => {
+                // Show sources with URLs (web sources) OR sources without URLs that might be user uploaded files
+                return source.url || source.title; // User uploaded files might not have URLs but will have titles
+              })
               .map((source) => (
                 <Badge.SourceInfo
                   key={source.uuid}
-                  source={source as any} // Type assertion since we filtered for valid URLs
+                  source={source as any}
                   badgeSize='small'
                   badgeClassName='aucctus-text-primary whitespace-nowrap'
-                  onClick={() => window.open(source.url!, '_blank')}
+                  onClick={
+                    source.url
+                      ? () => window.open(source.url!, '_blank')
+                      : undefined
+                  }
                   showPublishedDate={false}
                   sourceDescription={createSourceDescription(source)}
                 />
