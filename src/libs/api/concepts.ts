@@ -91,6 +91,12 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  generateConceptVideo(conceptUuid: string) {
+    return this.post<{ detail: string; task_id: string }>(
+      endpoints.conceptVideoGenerate(conceptUuid),
+    );
+  }
+
   downloadConcept(uuid: string) {
     return this.get<BlobPart>(endpoints.conceptSnapshotUuid(uuid), {
       headers: {

@@ -4,5 +4,5 @@ export const LATEST_FEATURE_VERSIONS = {
   assumptions: 'v2',
   financialProjection: 'v2',
   marketScan: 'v3',
-  conceptOverview: 'v2',
+  conceptOverview: 'v3',
 };

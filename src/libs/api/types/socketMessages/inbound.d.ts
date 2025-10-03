@@ -458,7 +458,48 @@ export interface ISyntheticExecutionErrorMessage extends BaseSocketEvent {
   details?: any;
 }
 
+// ==========================================
+// Concept Video Generation Messages
+// ==========================================
+
+export interface IConceptVideoGenerationStartedMessage extends BaseSocketEvent {
+  type: 'concept.video.generation.started.user';
+  conceptUuid: string;
+  accountUuid: string;
+  message: string;
+}
+
+export interface IConceptVideoGenerationProgressMessage
+  extends BaseSocketEvent {
+  type: 'concept.video.generation.progress.user';
+  conceptUuid: string;
+  accountUuid: string;
+  stage: string;
+  message: string;
+  progress: number;
+}
+
+export interface IConceptVideoGenerationCompletedMessage
+  extends BaseSocketEvent {
+  type: 'concept.video.generation.completed.user';
+  conceptUuid: string;
+  accountUuid: string;
+  videoUrl: string;
+  message: string;
+}
+
+export interface IConceptVideoGenerationErrorMessage extends BaseSocketEvent {
+  type: 'concept.video.generation.error.user';
+  conceptUuid: string;
+  accountUuid: string;
+  errorMessage: string;
+  details?: any;
+}
+
+// ==========================================
 // Nucleus Upload Event Messages
+// ==========================================
+
 export interface INucleusUploadProgressMessage extends BaseSocketEvent {
   type: 'nucleus_upload.progress.account';
   accountUuid: string;
@@ -523,6 +564,10 @@ export type InboundSocketEvent<C = {}> =
   | ISyntheticExecutionProgressMessage
   | ISyntheticExecutionCompletedMessage
   | ISyntheticExecutionErrorMessage
+  | IConceptVideoGenerationStartedMessage
+  | IConceptVideoGenerationProgressMessage
+  | IConceptVideoGenerationCompletedMessage
+  | IConceptVideoGenerationErrorMessage
   | INucleusUploadProgressMessage
   | INucleusUploadCompletedMessage
   | INucleusUploadErrorMessage;

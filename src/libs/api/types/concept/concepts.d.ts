@@ -128,6 +128,10 @@ export interface IConceptOverview extends IBaseConceptEntity {
   shouldWeDoThis: string; // executive recommendation
   heroImagePrompt: string; // detailed prompt for image generation
   conceptImageUrl: string;
+  conceptVideoUrl?: string; // S3 URL for AI generated video
+  videoStatus?: 'generating' | 'complete' | 'error'; // Video generation status
+  videoGenerationStage?: string; // Current stage of video generation (persisted)
+  videoGenerationProgress?: number; // Current progress percentage (persisted)
   overviewVersion: string;
   differentiators: IConceptDifferentiator[];
   rightsToWin: IConceptRightToWin[]; // matches actual API response
@@ -180,6 +184,10 @@ export interface IConceptOverview extends IBaseConceptEntity {
   text: string;
   valueProposition: string;
   problemStatement: string;
+  conceptVideoUrl?: string; // S3 URL for AI generated video
+  videoStatus?: 'generating' | 'complete' | 'error'; // Video generation status
+  videoGenerationStage?: string; // Current stage of video generation (persisted)
+  videoGenerationProgress?: number; // Current progress percentage (persisted)
 
   // TODO: Remove and use API instead.
   persona?: ICustomerProfile;

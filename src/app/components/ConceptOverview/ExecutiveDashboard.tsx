@@ -1,4 +1,5 @@
 import { Badge, Loading } from '@components';
+import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
 import {
   useConceptCustomerProfiles,
@@ -13,6 +14,7 @@ import { EXECUTIVE_DASHBOARD_CONFIG, executiveDashboardUIText } from './config';
 
 import images from '@assets/img';
 import BusinessModelCard from './BusinessModelCard';
+import ConceptVideoGeneration from './ConceptVideoGeneration';
 import CustomerProfilesCard from './CustomerProfilesCard';
 import DifferentiatorsCard from './DifferentiatorsCard';
 import EcosystemCard from './EcosystemCard';
@@ -51,6 +53,9 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [progress, setProgress] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
+
+  // Debug mode check
+  const isDebugMode = useDebugMode();
 
   // Centralized data fetching - load all data for the cards
   const { conceptOverview, isLoading: isLoadingOverview } =
@@ -374,6 +379,35 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Concept Video Generation - Debug Mode Only */}
+      {isDebugMode && conceptUuid && (
+        <div className='mt-8'>
+          <ConceptVideoGeneration
+            conceptUuid={conceptUuid}
+            existingVideoUrl={
+              (conceptOverview as any)?.conceptVideoUrl as string | undefined
+            }
+            videoStatus={
+              (conceptOverview as any)?.videoStatus as
+                | 'generating'
+                | 'complete'
+                | 'error'
+                | undefined
+            }
+            videoGenerationStage={
+              (conceptOverview as any)?.videoGenerationStage as
+                | string
+                | undefined
+            }
+            videoGenerationProgress={
+              (conceptOverview as any)?.videoGenerationProgress as
+                | number
+                | undefined
+            }
+          />
+        </div>
+      )}
     </div>
   );
 };
