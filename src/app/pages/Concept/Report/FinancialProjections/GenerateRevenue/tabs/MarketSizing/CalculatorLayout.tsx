@@ -3,7 +3,6 @@ import {
   IMarketSizingAssumptionEntryV2,
   IMarketSizingV2,
 } from '@libs/api/types/concept/financialProjectionV2';
-import { CalculatorHeader } from './components/CalculatorHeader';
 import { AssumptionsPanel } from './components/AssumptionsPanel';
 import { ResultsPanel } from './components/ResultsPanel';
 import useStore from '@stores/store';
@@ -14,8 +13,8 @@ export interface BaseCalculatorProps {
 
 interface CalculatorLayoutProps extends BaseCalculatorProps {
   marketSizing: IMarketSizingV2;
-  title: string;
-  description: string;
+  title?: string;
+  description?: string;
   assumptionsTitle: string;
   resultsTitle: string;
   resultsSubtitle: string;
@@ -25,8 +24,7 @@ interface CalculatorLayoutProps extends BaseCalculatorProps {
 
 export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
   marketSizing,
-  title,
-  description,
+  // title and description are reserved for future use
   assumptionsTitle,
   resultsTitle,
   resultsSubtitle,
@@ -116,8 +114,6 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
 
   return (
     <div className='space-y-4'>
-      <CalculatorHeader title={title} description={description} />
-
       <div className='aucctus-bg-primary overflow-hidden rounded-lg border shadow-sm'>
         <div className='grid grid-cols-1 divide-y lg:grid-cols-2 lg:divide-x lg:divide-y-0'>
           {/* Left side: Assumptions List */}

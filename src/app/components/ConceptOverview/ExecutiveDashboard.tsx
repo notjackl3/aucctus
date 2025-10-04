@@ -31,19 +31,6 @@ interface ExecutiveDashboardProps {
   conceptId?: string; // ID for navigation routing
 }
 
-interface CardComponentProps {
-  currentCardIndex: number;
-  progress: number;
-  totalCards: number;
-  onCardClick: (index: number) => void;
-}
-
-interface TabSummaryCard {
-  component:
-    | React.ComponentType<CardComponentProps>
-    | (() => React.ReactElement);
-}
-
 const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   className = '',
   conceptUuid,
@@ -156,123 +143,29 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     setProgress(0);
   }, []);
 
-  // Original tab summary cards - now with centralized data passed as props
-  const originalTabSummaryCards: TabSummaryCard[] = [
-    {
-      component: (props: CardComponentProps) => (
-        <MarketSizeCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          marketSizeData={marketSizeData}
-          isLoadingFinancial={isLoadingFinancial}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <TrendsDriversCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          // Pass centralized data
-          marketForces={marketForces}
-          isLoadingMarketForces={isLoadingMarketForces}
-          executiveSummary={executiveSummaries?.marketScanTrendsDrivers}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <EcosystemCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          // Pass centralized data
-          marketScan={marketScan}
-          isLoadingMarketScan={isLoadingMarketScan}
-          executiveSummary={executiveSummaries?.marketScanEcosystem}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <BusinessModelCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          // Pass centralized data
-          financialProjectionV2={financialProjectionV2}
-          isLoadingFinancial={isLoadingFinancial}
-          executiveSummary={executiveSummaries?.financialBusinessModel}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <CustomerProfilesCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptUuid={conceptUuid}
-          conceptId={conceptId}
-          // Pass centralized data
-          customerProfiles={customerProfiles}
-          isLoadingCustomerProfiles={isLoadingCustomerProfiles}
-          executiveSummary={executiveSummaries?.customerProfiles}
-        />
-      ),
-    },
-    {
-      component: (props: CardComponentProps) => (
-        <KeyAssumptionsCard
-          currentCardIndex={props.currentCardIndex}
-          progress={props.progress}
-          totalCards={props.totalCards}
-          onCardClick={props.onCardClick}
-          conceptId={conceptId}
-          conceptUuid={conceptUuid}
-          // Pass centralized data
-          categoryMetrics={assumptionsCategoryMetrics}
-          isLoadingAssumptions={isLoadingAssumptions}
-          executiveSummary={executiveSummaries?.keyAssumptions}
-        />
-      ),
-    },
-  ];
+  // Total number of cards
+  const totalCards = 6;
 
-  // Currently active cards
-  const tabSummaryCards: TabSummaryCard[] = originalTabSummaryCards;
-
-  // Auto-progression logic - disabled for "Coming Soon" card but kept for when original cards are restored
+  // Auto-progression logic
   useEffect(() => {
-    if (!isAutoPlaying || tabSummaryCards.length <= 1) return;
+    if (!isAutoPlaying || totalCards <= 1) return;
 
     const progressTimer = setInterval(() => {
       setProgress((prev) => {
-        const newProgress =
-          prev +
+        const increment =
           (EXECUTIVE_DASHBOARD_CONFIG.PROGRESS_INTERVAL /
             EXECUTIVE_DASHBOARD_CONFIG.CARD_DURATION) *
-            100;
+          100;
+        const newProgress = prev + increment;
 
+        // Clamp to 100% to ensure we show full progress
         if (newProgress >= 100) {
-          setCurrentCardIndex(
-            (current) => (current + 1) % tabSummaryCards.length,
-          );
-          return 0;
+          // Set to 100% first, then switch on next tick
+          if (prev >= 100) {
+            setCurrentCardIndex((current) => (current + 1) % totalCards);
+            return 0;
+          }
+          return 100;
         }
 
         return newProgress;
@@ -280,7 +173,87 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     }, EXECUTIVE_DASHBOARD_CONFIG.PROGRESS_INTERVAL);
 
     return () => clearInterval(progressTimer);
-  }, [isAutoPlaying, currentCardIndex, tabSummaryCards.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAutoPlaying, totalCards]); // Intentionally exclude currentCardIndex to avoid restarting timer
+
+  // Render current card based on index
+  const renderCurrentCard = () => {
+    const commonProps = {
+      currentCardIndex,
+      progress,
+      totalCards,
+      onCardClick: handleCardClick,
+    };
+
+    switch (currentCardIndex) {
+      case 0:
+        return (
+          <MarketSizeCard
+            {...commonProps}
+            conceptId={conceptId}
+            marketSizeData={marketSizeData}
+            isLoadingFinancial={isLoadingFinancial}
+          />
+        );
+      case 1:
+        return (
+          <TrendsDriversCard
+            {...commonProps}
+            conceptId={conceptId}
+            conceptUuid={conceptUuid}
+            marketForces={marketForces}
+            isLoadingMarketForces={isLoadingMarketForces}
+            executiveSummary={executiveSummaries?.marketScanTrendsDrivers}
+          />
+        );
+      case 2:
+        return (
+          <EcosystemCard
+            {...commonProps}
+            conceptId={conceptId}
+            conceptUuid={conceptUuid}
+            marketScan={marketScan}
+            isLoadingMarketScan={isLoadingMarketScan}
+            executiveSummary={executiveSummaries?.marketScanEcosystem}
+          />
+        );
+      case 3:
+        return (
+          <BusinessModelCard
+            {...commonProps}
+            conceptId={conceptId}
+            conceptUuid={conceptUuid}
+            financialProjectionV2={financialProjectionV2}
+            isLoadingFinancial={isLoadingFinancial}
+            executiveSummary={executiveSummaries?.financialBusinessModel}
+          />
+        );
+      case 4:
+        return (
+          <CustomerProfilesCard
+            {...commonProps}
+            conceptUuid={conceptUuid}
+            conceptId={conceptId}
+            customerProfiles={customerProfiles}
+            isLoadingCustomerProfiles={isLoadingCustomerProfiles}
+            executiveSummary={executiveSummaries?.customerProfiles}
+          />
+        );
+      case 5:
+        return (
+          <KeyAssumptionsCard
+            {...commonProps}
+            conceptId={conceptId}
+            conceptUuid={conceptUuid}
+            categoryMetrics={assumptionsCategoryMetrics}
+            isLoadingAssumptions={isLoadingAssumptions}
+            executiveSummary={executiveSummaries?.keyAssumptions}
+          />
+        );
+      default:
+        return null;
+    }
+  };
 
   // Show loading state while fetching data
   if (conceptUuid && isLoading) {
@@ -370,12 +343,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             onMouseEnter={handleCardHover}
             onMouseLeave={handleCardLeave}
           >
-            {React.createElement(tabSummaryCards[currentCardIndex].component, {
-              currentCardIndex,
-              progress,
-              totalCards: tabSummaryCards.length,
-              onCardClick: handleCardClick,
-            })}
+            {renderCurrentCard()}
           </div>
         </div>
       </div>

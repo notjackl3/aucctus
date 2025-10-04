@@ -1,0 +1,39 @@
+---
+description: Guidelines for generating git commit messages
+---
+
+# Git Commit Message Guidelines
+
+When this rule is attached or when asked to create a commit message or review git changes for committing, automatically perform the commit procedure below without asking for confirmation:
+
+## Process
+1. Always run `git status` first to see all modified files
+2. Run `git diff --staged --stat` to understand the scope of changes
+3. Review the conversation history to understand what was implemented
+
+## Commit Message Format
+- **Maximum 2 sentences**
+- First sentence: High-level summary of what was added/changed (start with action verb)
+- Second sentence: Key details about the implementation or scope
+
+## Style Guidelines
+- Use imperative mood ("Add", "Update", "Fix", "Refactor", not "Added", "Updated")
+- Be specific about what changed (mention key features, components, or systems)
+- Include numbers when relevant (e.g., "23 query keys", "6 new components")
+- Mention both UI and backend changes if applicable
+- Keep it concise but informative enough for future reference
+
+## Example Good Commit Messages
+```
+Add icon-button variant to TabView with uppercase labels and comprehensive query invalidation. Introduced new tab styling with icons for concept report navigation (Overview, Market Scan, Financial Projection, Customer Profile, Assumptions, Context, Testing) and expanded doFullConceptInvalidation to cover all 23 concept-related query keys.
+
+Fix customer profile conversation loading state and add error handling. Updated useConceptCustomerProfileConversationMessages hook to properly handle empty states and added toast notifications for failed requests.
+
+Refactor financial projections tabs to use new TabView variant. Consolidated 3 separate tab implementations into a single reusable component with improved type safety and reduced code duplication by 40%.
+```
+
+## What to Avoid
+- Generic messages like "Update files" or "Fix bugs"
+- Overly technical jargon that doesn't explain the user-facing impact
+- Messages longer than 2 sentences
+- Listing every single file changed (focus on the feature/fix instead)

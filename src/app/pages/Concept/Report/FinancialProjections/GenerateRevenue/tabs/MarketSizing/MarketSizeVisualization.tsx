@@ -32,12 +32,12 @@ const MarketSizeVisualization = forwardRef<
 
   return (
     <div className={className} ref={ref}>
-      <div>
-        <h3 className='aucctus-text-xl-semibold aucctus-text-primary mb-1'>
+      <div className='mb-4'>
+        <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
           Market Size Visualization
         </h3>
-        <p className='aucctus-text-xs aucctus-text-secondary mb-4'>
-          Click on any area to filter related assumptions
+        <p className='aucctus-text-xs aucctus-text-tertiary'>
+          Total addressable market breakdown
         </p>
       </div>
 

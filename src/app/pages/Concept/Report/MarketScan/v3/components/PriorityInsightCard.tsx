@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon } from '@components';
+import { Icon, Text } from '@components';
 import { cn } from '@libs/utils/react';
 import type { IPriorityInsightV3 } from '@libs/api/types/concept/marketScan';
 import type { ISource } from '@libs/api/types';
@@ -118,43 +118,24 @@ const PriorityInsightCard: React.FC<PriorityInsightCardProps> = ({
           </div>
         </div>
 
-        {/* Explanation */}
-        <div className='mb-4'>
-          <p className='aucctus-text-xs-semibold aucctus-text-brand-tertiary mb-2 tracking-wide'>
-            WHY IT MATTERS?
-          </p>
-          <p className='aucctus-text-sm aucctus-text-secondary leading-relaxed'>
-            {insight.explanation || insight.description}
-          </p>
+        {/* Explanation - Collapsible */}
+        <div className='mb-4 overflow-hidden'>
+          <Text.Collapsible
+            title='WHY IT MATTERS?'
+            titleClassName='aucctus-text-xs-semibold aucctus-text-brand-tertiary mb-1 tracking-wide'
+            description={insight.explanation || insight.description || ''}
+            descriptionClassName='aucctus-text-sm aucctus-text-secondary leading-relaxed'
+            maxDescriptionHeight={140}
+            truncationClassName='line-clamp-6'
+          />
         </div>
 
-        {/* APPROACH 1: Separate citations display (current implementation) */}
-        {/* Uncomment this block to show citations separately */}
-        {/* 
-        {insight.sources && insight.sources.some(source => source.citations && source.citations.length > 0) && (
-          <div className='mb-4'>
-            {insight.sources
-              .filter(source => source.citations && source.citations.length > 0)
-              .map((source, sourceIndex) => (
-                <div key={sourceIndex}>
-                  {createCitationDisplay(source.citations!)}
-                </div>
-              ))
-            }
-          </div>
-        )}
-        */}
-
-        {/* APPROACH 2: Integrated citations in source badges (like AnswerCard) */}
-        {/* Source badges with integrated citations */}
-        {adaptedSources.length > 0 && (
-          <SourceBadgeList
-            sources={adaptedSources}
-            className='mt-1'
-            showPublishedDate={false}
-            createSourceDescription={createSourceDescriptionWithCitations}
-          />
-        )}
+        {/* Source badges */}
+        <SourceBadgeList
+          sources={adaptedSources}
+          maxVisibleSources={3}
+          createSourceDescription={createSourceDescriptionWithCitations}
+        />
       </div>
     </div>
   );

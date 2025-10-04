@@ -20,7 +20,7 @@ const OurRightToWinCard: React.FC<OurRightToWinCardProps> = ({
           {executiveDashboardUIText.sections.ourRightToWin}
         </h3>
 
-        <div className='max-h-60 flex-1 space-y-3 overflow-y-auto'>
+        <div className='flex-1 space-y-3 overflow-y-auto'>
           {rightsToWin.length > 0 ? (
             rightsToWin.map((item, index) => (
               <div

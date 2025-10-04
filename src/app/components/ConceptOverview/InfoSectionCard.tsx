@@ -27,12 +27,7 @@ const InfoSectionCard: React.FC<InfoSectionCardProps> = ({
   className,
 }) => {
   return (
-    <div
-      className={cn(
-        'aucctus-border-secondary aucctus-bg-secondary rounded-lg border',
-        className,
-      )}
-    >
+    <div className={cn('aucctus-border-primary rounded-lg border', className)}>
       <div className='p-5'>
         <div className='mb-3 flex items-center gap-2'>
           <Icon

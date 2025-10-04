@@ -20,7 +20,7 @@ const DifferentiatorsCard: React.FC<DifferentiatorsCardProps> = ({
           {executiveDashboardUIText.sections.differentiators}
         </h3>
 
-        <div className='max-h-60 flex-1 space-y-3 overflow-y-auto'>
+        <div className='flex-1 space-y-3 overflow-y-auto'>
           {differentiators.length > 0 ? (
             differentiators.map((differentiator, index) => (
               <div

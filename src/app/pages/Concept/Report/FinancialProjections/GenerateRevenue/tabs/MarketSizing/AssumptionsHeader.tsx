@@ -23,13 +23,13 @@ const AssumptionsHeader: React.FC<AssumptionsHeaderProps> = ({
       )}
     >
       <div>
-        <h3 className='aucctus-text-xl-semibold aucctus-text-primary mb-1'>
+        <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
           Assumptions
         </h3>
-        <p className='aucctus-text-xs aucctus-text-secondary'>
+        <p className='aucctus-text-xs aucctus-text-tertiary'>
           {isFilterActive
             ? `Filtered by ${activeFilter?.toUpperCase()}`
-            : 'Alter your market size assumptions to see how they affect your projections'}
+            : 'Determined assumptions for the market size'}
         </p>
       </div>
 

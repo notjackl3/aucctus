@@ -156,26 +156,6 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
 
   return (
     <div className='space-y-4'>
-      <div className='aucctus-bg-secondary-subtle aucctus-border-primary rounded-lg border bg-opacity-50 p-4'>
-        <div className='flex items-start gap-3'>
-          <Icon
-            variant='book-open'
-            className='aucctus-stroke-brand-primary mt-2 h-6 w-6'
-          />
-          <div>
-            <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-1'>
-              How Top-Down Market Sizing Works
-            </h3>
-            <p className='aucctus-text-xs aucctus-text-secondary'>
-              Start with the total market size (TAM) and narrow down to your
-              specific opportunity (SAM and SOM). Adjust assumptions to see how
-              they impact each market tier. Click on the market areas to filter
-              relevant assumptions.
-            </p>
-          </div>
-        </div>
-      </div>
-
       <div className='aucctus-bg-primary overflow-hidden rounded-lg border shadow-sm'>
         <div className='grid grid-cols-1 divide-y lg:grid-cols-2 lg:divide-x lg:divide-y-0'>
           {/* Left side: Assumptions List */}

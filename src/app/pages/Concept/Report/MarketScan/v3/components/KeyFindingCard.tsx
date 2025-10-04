@@ -1,9 +1,9 @@
 import React from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import SourceBadgeList from './SourceBadgeList';
 import type { ISource } from '@libs/api/types';
 import type { IKeyFindingSourceV3 } from '@libs/api/types/concept/marketScan';
+import SourceBadgeList from './SourceBadgeList';
 
 interface KeyFindingCardProps {
   finding: {
@@ -84,33 +84,12 @@ const KeyFindingCard: React.FC<KeyFindingCardProps> = ({ finding }) => {
             {finding.text}
           </p>
 
-          {/* APPROACH 1: Separate citations display (current implementation) */}
-          {/* Uncomment this block to show citations separately */}
-          {/* 
-          {finding.sources && finding.sources.some(source => source.citations && source.citations.length > 0) && (
-            <div className='mb-3'>
-              {finding.sources
-                .filter(source => source.citations && source.citations.length > 0)
-                .map((source, sourceIndex) => (
-                  <div key={sourceIndex}>
-                    {createCitationDisplay(source.citations!)}
-                  </div>
-                ))
-              }
-            </div>
-          )}
-          */}
-
-          {/* APPROACH 2: Integrated citations in source badges (like AnswerCard) */}
-          {/* Source badges with integrated citations */}
-          {adaptedSources.length > 0 && (
-            <SourceBadgeList
-              sources={adaptedSources}
-              className='mt-1'
-              showPublishedDate={false}
-              createSourceDescription={createSourceDescriptionWithCitations}
-            />
-          )}
+          {/* Source badges */}
+          <SourceBadgeList
+            sources={adaptedSources}
+            maxVisibleSources={2}
+            createSourceDescription={createSourceDescriptionWithCitations}
+          />
         </div>
       </div>
     </div>

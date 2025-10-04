@@ -9,6 +9,10 @@ export interface TabElement {
    *
    */
   value: string;
+  /**
+   * Optional icon variant to display with the tab label
+   */
+  icon?: IconVariant;
 }
 
 export interface TabsProps {
@@ -18,7 +22,7 @@ export interface TabsProps {
   tabClassName?: string;
   tabContainerClassName?: string;
   tabContentClassName?: string;
-  variant?: 'default' | 'button' | 'button-separated';
+  variant?: 'default' | 'button' | 'button-separated' | 'icon-button';
   onTabSelect: (value: string) => void;
   children?: ReactNode;
   actionButtons?: ReactNode | ReactNode[];
@@ -63,6 +67,7 @@ const TabView: FunctionComponent<TabsProps> = ({
               className={tabClassName}
               label={tab.label}
               value={tab.value}
+              icon={tab.icon}
               variant={variant}
               isActive={activeTab === tab.value}
               onSelect={onTabSelect}

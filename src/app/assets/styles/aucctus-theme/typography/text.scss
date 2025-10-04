@@ -6,10 +6,12 @@
     @extend .aucctus-header-2xl;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-header-2xl;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-header-2xl;
     @apply font-bold;
@@ -23,10 +25,12 @@
     @extend .aucctus-header-xl;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-header-xl;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-header-xl;
     @apply font-bold;
@@ -40,10 +44,12 @@
     @extend .aucctus-header-lg;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-header-lg;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-header-lg;
     @apply font-bold;
@@ -57,10 +63,12 @@
     @extend .aucctus-header-md;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-header-md;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-header-md;
     @apply font-bold;
@@ -74,10 +82,12 @@
     @extend .aucctus-header-sm;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-header-sm;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-header-sm;
     @apply font-bold;
@@ -91,10 +101,12 @@
     @extend .aucctus-header-xs;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-header-xs;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-header-xs;
     @apply font-bold;
@@ -109,10 +121,12 @@
     @extend .aucctus-text-xl;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-text-xl;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-text-xl;
     @apply font-bold;
@@ -126,10 +140,12 @@
     @extend .aucctus-text-lg;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-text-lg;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-text-lg;
     @apply font-bold;
@@ -143,10 +159,12 @@
     @extend .aucctus-text-md;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-text-md;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-text-md;
     @apply font-bold;
@@ -160,10 +178,12 @@
     @extend .aucctus-text-sm;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-text-sm;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-text-sm;
     @apply font-bold;
@@ -177,12 +197,33 @@
     @extend .aucctus-text-xs;
     @apply font-medium;
   }
+
   &-semibold {
     @extend .aucctus-text-xs;
     @apply font-semibold;
   }
+
   &-bold {
     @extend .aucctus-text-xs;
+    @apply font-bold;
+  }
+}
+
+.aucctus-text-2xs {
+  @apply text-[0.625rem] font-normal leading-[0.875rem];
+
+  &-medium {
+    @extend .aucctus-text-2xs;
+    @apply font-medium;
+  }
+
+  &-semibold {
+    @extend .aucctus-text-2xs;
+    @apply font-semibold;
+  }
+
+  &-bold {
+    @extend .aucctus-text-2xs;
     @apply font-bold;
   }
 }

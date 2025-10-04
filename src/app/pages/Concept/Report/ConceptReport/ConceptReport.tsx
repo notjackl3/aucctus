@@ -36,23 +36,44 @@ export interface IConceptReportContext {
 }
 
 type TabTitles =
-  | 'Overview'
-  | 'Market Scan'
-  | 'Financial Projection'
-  | 'Customer Profile'
-  | 'Key Assumptions'
-  | 'Context'
-  | 'Testing';
+  | 'OVERVIEW'
+  | 'MARKET SCAN'
+  | 'FINANCIAL PROJECTION'
+  | 'CUSTOMER PROFILE'
+  | 'ASSUMPTIONS'
+  | 'CONTEXT'
+  | 'TESTING';
 
 // Base tabs - Testing will be added dynamically based on concept version
-const CONCEPT_TABS: { label: TabTitles; value: AppPath }[] = [
-  { label: 'Overview', value: AppPath.ConceptOverview },
-  { label: 'Market Scan', value: AppPath.ConceptMarketScan },
-  { label: 'Financial Projection', value: AppPath.ConceptFinancialProjection },
-  { label: 'Customer Profile', value: AppPath.ConceptCustomerProfile },
-  { label: 'Key Assumptions', value: AppPath.ConceptKeyAssumptions },
-  { label: 'Context' as TabTitles, value: AppPath.ConceptSettings },
-];
+const CONCEPT_TABS: { label: TabTitles; value: AppPath; icon: IconVariant }[] =
+  [
+    {
+      label: 'OVERVIEW',
+      value: AppPath.ConceptOverview,
+      icon: 'presentation-chart',
+    },
+    {
+      label: 'MARKET SCAN',
+      value: AppPath.ConceptMarketScan,
+      icon: 'search-md',
+    },
+    {
+      label: 'FINANCIAL PROJECTION',
+      value: AppPath.ConceptFinancialProjection,
+      icon: 'trendup',
+    },
+    {
+      label: 'CUSTOMER PROFILE',
+      value: AppPath.ConceptCustomerProfile,
+      icon: 'users-03',
+    },
+    {
+      label: 'ASSUMPTIONS',
+      value: AppPath.ConceptKeyAssumptions,
+      icon: 'book-open',
+    },
+    { label: 'CONTEXT', value: AppPath.ConceptSettings, icon: 'globe' },
+  ];
 
 const ConceptReport: FunctionComponent = () => {
   const { id: conceptIdentifier } = useParams();
@@ -89,15 +110,16 @@ const ConceptReport: FunctionComponent = () => {
 
     // Add Testing tab if concept has assumptions v2
     if (concept?.featureVersions?.assumptions === 'v2') {
-      const contextIndex = tabs.findIndex((tab) => tab.label === 'Context');
+      const contextIndex = tabs.findIndex((tab) => tab.label === 'CONTEXT');
       tabs.splice(contextIndex, 0, {
-        label: 'Testing',
+        label: 'TESTING',
         value: AppPath.ConceptTesting,
+        icon: 'beaker',
       });
     }
 
     // Filter out Context tab if concept doesn't have seed
-    return tabs.filter((v) => !(v.label === 'Context' && !concept?.hasSeed));
+    return tabs.filter((v) => !(v.label === 'CONTEXT' && !concept?.hasSeed));
   }, [concept?.featureVersions?.assumptions, concept?.hasSeed]);
 
   useEffect(() => {
@@ -239,11 +261,14 @@ const ConceptReport: FunctionComponent = () => {
         <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
           <Container.TabView
             className=''
+            tabGroupClassName='rounded-lg p-1 mb-2'
+            tabContainerClassName='gap-1'
             tabContentClassName={cn({
               'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
                 concept?.isHistoricalVersion,
             })}
             tabs={conceptTabs}
+            variant='icon-button'
             onTabSelect={onTabSelect}
             activeTab={activeTab || ''}
           >

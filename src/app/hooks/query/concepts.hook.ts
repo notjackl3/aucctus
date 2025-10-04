@@ -379,9 +379,8 @@ export const useConcept = (identifier?: string) => {
 export const useConceptOverview = (uuid?: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.conceptOverview, uuid],
-    staleTime: 1000 * 0, // 30 seconds
-    cacheTime: 1000 * 0, // 30 seconds
-    refetchOnMount: true,
+    staleTime: 1000 * 60, // 1 minute
+    cacheTime: 1000 * 60, // 1 minute
     queryFn: async () => {
       if (!uuid) return undefined;
       const result = await api.concept.getConceptOverview(uuid);
@@ -925,18 +924,36 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 
 export const doFullConceptInvalidation = (queryClient: QueryClient) => {
   Promise.all([
+    // Core concept queries
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.concept],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.concepts],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.conceptOverview],
     }),
     queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.conceptExecutiveSummaries],
+    }),
+    queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.conceptVersions],
     }),
+    // Market scan queries
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.marketScan],
     }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.marketScanTrendsV3],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.marketScanPriorityInsightsV3],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.marketScanMarketForcesV3],
+    }),
+    // Customer profile queries
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.customerProfile],
     }),
@@ -944,16 +961,38 @@ export const doFullConceptInvalidation = (queryClient: QueryClient) => {
       queryKey: [AucctusQueryKeys.customerProfiles],
     }),
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.conceptExecutiveSummaries],
+      queryKey: [AucctusQueryKeys.customerProfileConversation],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.customerProfileConversationSearch],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.customerProfileRealWorldSignals],
     }),
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.financialProjection],
+      queryKey: [AucctusQueryKeys.customerProfileRealWorldSignal],
+    }),
+    // Customer profile sub-entities
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.customerJob],
     }),
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.concepts],
+      queryKey: [AucctusQueryKeys.customerPain],
+    }),
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.customerJourneyStep],
+    }),
+    // Financial projection queries
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.financialProjection],
+    }),
+    // Assumptions queries
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.assumptions],
+    }),
+    // Dashboard for concept counts/stats
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.dashboard],
     }),
   ]);
 };

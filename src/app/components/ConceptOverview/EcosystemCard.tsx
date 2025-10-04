@@ -2,6 +2,7 @@ import { Button, Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { IEcosystemPlayer } from './config';
+import ProgressBar from './ProgressBar';
 
 interface EcosystemCardProps {
   currentCardIndex: number;
@@ -67,14 +68,6 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
     [navigate, conceptId],
   );
 
-  const handleProgressBarClick = useCallback(
-    (e: React.MouseEvent, index: number) => {
-      e.stopPropagation();
-      onCardClick(index);
-    },
-    [onCardClick],
-  );
-
   // Memoize player cards for performance
   const playerCards = useMemo(() => {
     return ecosystemPlayers.map((player) => {
@@ -126,37 +119,13 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   return (
     <div className='aucctus-bg-secondary aucctus-border-secondary h-full min-h-[350px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
-        {/* Progress Bar Navigation */}
-        <div className='mb-4'>
-          <div className='flex gap-2'>
-            {Array.from({ length: totalCards }).map((_, index) => (
-              <div key={index} className='flex-1'>
-                <div
-                  className='aucctus-bg-disabled h-1 cursor-pointer overflow-hidden rounded-full'
-                  onClick={(e) => handleProgressBarClick(e, index)}
-                >
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      index === currentCardIndex
-                        ? 'aucctus-bg-primary-solid'
-                        : index < currentCardIndex
-                          ? 'aucctus-bg-primary-solid'
-                          : 'bg-transparent'
-                    }`}
-                    style={{
-                      width:
-                        index === currentCardIndex
-                          ? `${progress}%`
-                          : index < currentCardIndex
-                            ? '100%'
-                            : '0%',
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Progress Bar Navigation - Isolated component for performance */}
+        <ProgressBar
+          currentCardIndex={currentCardIndex}
+          progress={progress}
+          totalCards={totalCards}
+          onCardClick={onCardClick}
+        />
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
@@ -179,13 +148,13 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
           // Two-column layout: Summary + Player Cards
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Competitive Landscape Summary */}
-            <div className='flex flex-col justify-center px-2'>
+            <div className='flex flex-col justify-start px-2'>
               {isLoadingMarketScan ? (
                 <div className='aucctus-text-lg aucctus-text-secondary'>
                   Loading ecosystem data...
                 </div>
               ) : (
-                <p className='aucctus-text-sm-semibold aucctus-text-primary'>
+                <p className='aucctus-text-md-semibold aucctus-text-primary'>
                   {ecosystemSummary}
                 </p>
               )}
@@ -227,4 +196,4 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   );
 };
 
-export default React.memo(EcosystemCard);
+export default EcosystemCard;

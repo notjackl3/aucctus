@@ -2,6 +2,7 @@ import { Button, Icon } from '@components';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { executiveDashboardUIText } from './config';
+import ProgressBar from './ProgressBar';
 
 interface MarketSizeData {
   tam: string;
@@ -35,40 +36,13 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
   return (
     <div className='aucctus-bg-secondary aucctus-border-secondary h-full min-h-[350px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
-        {/* Progress Bar Navigation */}
-        <div className='mb-4'>
-          <div className='flex gap-2'>
-            {Array.from({ length: totalCards }).map((_, index: number) => (
-              <div key={index} className='flex-1'>
-                <div
-                  className='aucctus-bg-disabled h-1 cursor-pointer overflow-hidden rounded-full'
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCardClick(index);
-                  }}
-                >
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${
-                      index === cardIndex
-                        ? 'aucctus-bg-primary-solid'
-                        : index < cardIndex
-                          ? 'aucctus-bg-primary-solid'
-                          : 'bg-transparent'
-                    }`}
-                    style={{
-                      width:
-                        index === cardIndex
-                          ? `${cardProgress}%`
-                          : index < cardIndex
-                            ? '100%'
-                            : '0%',
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Progress Bar Navigation - Isolated component for performance */}
+        <ProgressBar
+          currentCardIndex={cardIndex}
+          progress={cardProgress}
+          totalCards={totalCards}
+          onCardClick={onCardClick}
+        />
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
@@ -95,13 +69,13 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
           // Two-column layout: Summary + Visualization
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Market Summary Text */}
-            <div className='flex flex-col justify-center px-2 py-2'>
+            <div className='flex flex-col justify-start px-2 py-2'>
               {isLoadingFinancial ? (
                 <div className='aucctus-text-lg aucctus-text-secondary'>
                   Loading market data...
                 </div>
               ) : (
-                <p className='aucctus-text-sm-semibold aucctus-text-primary'>
+                <p className='aucctus-text-md-semibold aucctus-text-primary'>
                   {marketSizeData.marketSummary}
                 </p>
               )}
@@ -171,4 +145,4 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
   );
 };
 
-export default React.memo(MarketSizeCard);
+export default MarketSizeCard;
