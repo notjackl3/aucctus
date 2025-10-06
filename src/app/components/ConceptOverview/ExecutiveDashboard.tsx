@@ -18,11 +18,11 @@ import ConceptVideoGeneration from './ConceptVideoGeneration';
 import CustomerProfilesCard from './CustomerProfilesCard';
 import DifferentiatorsCard from './DifferentiatorsCard';
 import EcosystemCard from './EcosystemCard';
+import GutCheckBanner from './GutCheckBanner';
 import InfoSectionCard from './InfoSectionCard';
 import KeyAssumptionsCard from './KeyAssumptionsCard';
 import MarketSizeCard from './MarketSizeCard';
 import OurRightToWinCard from './OurRightToWinCard';
-import ShouldWeDoThisBanner from './ShouldWeDoThisBanner';
 import TrendsDriversCard from './TrendsDriversCard';
 
 interface ExecutiveDashboardProps {
@@ -268,8 +268,8 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
   return (
     <div className={`space-y-8 ${className}`}>
-      {/* Should We Do This Banner */}
-      <ShouldWeDoThisBanner
+      {/* Gut Check Banner */}
+      <GutCheckBanner
         recommendation={conceptOverview?.shouldWeDoThis}
         isLoading={isLoadingOverview}
       />
@@ -278,17 +278,39 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
         {/* Left - Concept Image */}
         <div className='flex items-start justify-center'>
-          <div className='aucctus-bg-primary aucctus-border-secondary relative h-[420px] w-full overflow-hidden rounded-xl border shadow-lg'>
+          <div
+            className='aucctus-border-primary relative h-[420px] w-full overflow-hidden rounded-xl border shadow-lg'
+            style={{
+              backgroundImage: `url(${conceptOverview?.conceptImageUrl || images.aiExplorationsBackground})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center',
+            }}
+          >
+            {/* Subtle blur overlay for background */}
+            <div
+              className='absolute inset-0'
+              style={{
+                backdropFilter: 'blur(14px)',
+                WebkitBackdropFilter: 'blur(14px)',
+              }}
+            />
+
+            {/* Gradient overlay */}
+            <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent' />
+
+            {/* Concept image */}
             <img
               src={
                 conceptOverview?.conceptImageUrl ||
                 images.aiExplorationsBackground
               }
               alt={executiveDashboardUIText.conceptVisualization.altText}
-              className='h-full w-full object-cover'
+              className='relative z-10 h-full w-full object-contain'
+              loading='eager'
             />
-            <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent' />
-            <div className='absolute bottom-4 left-4 right-4'>
+
+            {/* Badge */}
+            <div className='absolute bottom-4 left-4 right-4 z-20'>
               <Badge.Default
                 value={executiveDashboardUIText.conceptVisualization.badgeText}
                 classNameBadge='aucctus-bg-primary aucctus-text-primary aucctus-border-primary'

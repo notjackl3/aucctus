@@ -1,12 +1,12 @@
 import React from 'react';
 import { Icon } from '@components';
 
-interface ShouldWeDoThisBannerProps {
+interface GutCheckBannerProps {
   recommendation?: string;
   isLoading?: boolean;
 }
 
-const ShouldWeDoThisBanner: React.FC<ShouldWeDoThisBannerProps> = ({
+const GutCheckBanner: React.FC<GutCheckBannerProps> = ({
   recommendation,
   isLoading = false,
 }) => {
@@ -28,7 +28,7 @@ const ShouldWeDoThisBanner: React.FC<ShouldWeDoThisBannerProps> = ({
           />
           <div className='min-w-0 flex-1'>
             <h3 className='aucctus-text-tertiary aucctus-text-sm mb-3 font-medium uppercase tracking-wider'>
-              SHOULD WE DO THIS?
+              GUT CHECK: DOES THIS SOUND PROMISING?
             </h3>
             <div className='aucctus-bg-secondary h-12 animate-pulse rounded'></div>
           </div>
@@ -47,7 +47,7 @@ const ShouldWeDoThisBanner: React.FC<ShouldWeDoThisBannerProps> = ({
           width={20}
         />
         <h3 className='aucctus-text-tertiary aucctus-text-sm font-medium uppercase tracking-wider'>
-          SHOULD WE DO THIS?
+          GUT CHECK: DOES THIS SOUND PROMISING?
         </h3>
       </div>
       <p className='aucctus-text-primary aucctus-text-xl-semibold leading-relaxed'>
@@ -57,4 +57,4 @@ const ShouldWeDoThisBanner: React.FC<ShouldWeDoThisBannerProps> = ({
   );
 };
 
-export default React.memo(ShouldWeDoThisBanner);
+export default React.memo(GutCheckBanner);

@@ -12,7 +12,7 @@ When this rule is attached or when asked to create a commit message or review gi
 3. Review the conversation history to understand what was implemented
 
 ## Commit Message Format
-- **Maximum 2 sentences**
+- **Maximum 2 sentences (35 words max)**
 - First sentence: High-level summary of what was added/changed (start with action verb)
 - Second sentence: Key details about the implementation or scope
 
@@ -35,5 +35,5 @@ Refactor financial projections tabs to use new TabView variant. Consolidated 3 s
 ## What to Avoid
 - Generic messages like "Update files" or "Fix bugs"
 - Overly technical jargon that doesn't explain the user-facing impact
-- Messages longer than 2 sentences
+- Messages longer than 2 sentences (35 words maximum)
 - Listing every single file changed (focus on the feature/fix instead)

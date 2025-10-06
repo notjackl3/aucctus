@@ -37,6 +37,7 @@ const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
             onClick={() => window.open(source.url, '_blank')}
             showPublishedDate={false}
             sourceDescription={createSourceDescription(source)}
+            hideDelay={0}
           />
         ))
       ) : (
@@ -51,6 +52,7 @@ const SourceBadgeList: React.FC<SourceBadgeListProps> = ({
               onClick={() => window.open(source.url, '_blank')}
               showPublishedDate={false}
               sourceDescription={createSourceDescription(source)}
+              hideDelay={0}
             />
           ))}
 

@@ -6,7 +6,7 @@ import EcosystemCard from './EcosystemCard';
 import ExecutiveDashboard from './ExecutiveDashboard';
 import KeyAssumptionsCard from './KeyAssumptionsCard';
 import TrendsDriversCard from './TrendsDriversCard';
-import ShouldWeDoThisBanner from './ShouldWeDoThisBanner';
+import GutCheckBanner from './GutCheckBanner';
 
 const ConceptOverview = {
   ExecutiveDashboard,
@@ -17,7 +17,7 @@ const ConceptOverview = {
   BusinessModelCard,
   InfoSectionCard,
   MarketSizeCard,
-  ShouldWeDoThisBanner,
+  GutCheckBanner,
 };
 
 export default ConceptOverview;

@@ -41,26 +41,27 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
     }
   }, [isCostSavingsPage]);
 
-  const tooltipContent =
-    activeView === 'top-down' ? (
-      <div className='aucctus-bg-primary aucctus-border-primary aucctus-text-secondary max-w-sm rounded-lg border p-3 shadow-lg'>
-        <p className='aucctus-text-sm'>
-          Start with the total market size (TAM) and narrow down to your
-          specific opportunity (SAM and SOM). Adjust assumptions to see how they
-          impact each market tier.
-        </p>
-        <p className='aucctus-text-sm-medium mt-2'>
-          Click on the market areas to filter relevant assumptions.
-        </p>
-      </div>
-    ) : (
-      <div className='aucctus-bg-primary aucctus-border-primary aucctus-text-secondary max-w-sm rounded-lg border p-3 shadow-lg'>
-        <p className='aucctus-text-sm'>
-          Start with key operational metrics like distribution points, units
-          sold, and pricing to build your market size from the ground up.
-        </p>
-      </div>
-    );
+  const topDownTooltip = (
+    <div className='aucctus-bg-primary aucctus-border-primary aucctus-text-secondary max-w-sm rounded-lg border p-3 shadow-lg'>
+      <p className='aucctus-text-sm'>
+        Start with the total market size (TAM) and narrow down to your specific
+        opportunity (SAM and SOM). Adjust assumptions to see how they impact
+        each market tier.
+      </p>
+      <p className='aucctus-text-sm-medium mt-2'>
+        Click on the market areas to filter relevant assumptions.
+      </p>
+    </div>
+  );
+
+  const bottomUpTooltip = (
+    <div className='aucctus-bg-primary aucctus-border-primary aucctus-text-secondary max-w-sm rounded-lg border p-3 shadow-lg'>
+      <p className='aucctus-text-sm'>
+        Start with key operational metrics like distribution points, units sold,
+        and pricing to build your market size from the ground up.
+      </p>
+    </div>
+  );
 
   return (
     <div className='space-y-6'>
@@ -82,15 +83,13 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
                 className='aucctus-stroke-brand-primary h-4 w-4'
               />
               Top Down
-            </button>
-            <div className='aucctus-bg-secondary flex items-center justify-center px-3'>
-              <ComponentTooltip tip={tooltipContent}>
+              <ComponentTooltip tip={topDownTooltip} preferredPosition='above'>
                 <Icon
                   variant='help-circle'
                   className='aucctus-stroke-tertiary h-4 w-4'
                 />
               </ComponentTooltip>
-            </div>
+            </button>
             <button
               onClick={() => setActiveView('bottom-up')}
               className={cn(
@@ -105,6 +104,12 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
                 className='aucctus-stroke-brand-primary h-4 w-4'
               />
               Bottom Up
+              <ComponentTooltip tip={bottomUpTooltip} preferredPosition='above'>
+                <Icon
+                  variant='help-circle'
+                  className='aucctus-stroke-tertiary h-4 w-4'
+                />
+              </ComponentTooltip>
             </button>
           </div>
         )}

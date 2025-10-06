@@ -17,6 +17,7 @@ interface SourceInfoBadgeProps {
   badgeClassName?: string;
   badgeSize?: 'small' | 'medium';
   sourceDescription?: React.ReactNode;
+  hideDelay?: number;
 }
 
 const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
@@ -26,6 +27,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
   badgeSize = 'medium',
   showPublishedDate = false,
   sourceDescription,
+  hideDelay = 0,
 }) => {
   const publishedDatesQuery = usePublishedDatesQuery(source, showPublishedDate);
   const clearbitCompanyQuery = useClearbitCompany(source.url);
@@ -133,7 +135,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
       : sourceTitle || 'Unknown Source';
 
   return (
-    <ComponentTooltip tip={renderTooltipContent()} hideDelay={300}>
+    <ComponentTooltip tip={renderTooltipContent()} hideDelay={hideDelay}>
       <div className='flex flex-row items-center gap-2'>
         <div
           onClick={onClick}

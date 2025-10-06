@@ -13,12 +13,14 @@ interface ComponentTooltipProps {
   tip: React.ReactNode;
   children: React.ReactNode;
   hideDelay?: number; // Optional delay in milliseconds
+  preferredPosition?: 'above' | 'below'; // Preferred position for the tooltip
 }
 
 const ComponentTooltip: FunctionComponent<ComponentTooltipProps> = ({
   tip,
   children,
   hideDelay = 0,
+  preferredPosition,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [calculatedMaxHeight, setCalculatedMaxHeight] = useState<
@@ -43,16 +45,28 @@ const ComponentTooltip: FunctionComponent<ComponentTooltipProps> = ({
       // Ensure tooltip doesn't go off the right side
       centerX = Math.min(windowWidth - tooltipRect.width - 10, centerX);
 
-      // Determine if cursor is closer to top or bottom of viewport
-      const distanceFromTop = childRect.top;
-      const distanceFromBottom = windowHeight - childRect.bottom;
-      const shouldShowBelow = distanceFromTop < distanceFromBottom;
-
       // Calculate available space and max height
       const gap = 5; // 5px gap between tooltip and trigger
       const padding = 10; // padding from viewport edge
       const maxHeightAbove = childRect.top - gap - padding;
       const maxHeightBelow = windowHeight - childRect.bottom - gap - padding;
+
+      // Determine position based on preferred position or available space
+      let shouldShowBelow: boolean;
+      if (preferredPosition === 'above') {
+        // Try above first, fall back to below if not enough space
+        shouldShowBelow =
+          maxHeightAbove < 100 && maxHeightBelow > maxHeightAbove;
+      } else if (preferredPosition === 'below') {
+        // Try below first, fall back to above if not enough space
+        shouldShowBelow =
+          maxHeightBelow >= 100 || maxHeightBelow > maxHeightAbove;
+      } else {
+        // Default behavior: show on side with more space
+        const distanceFromTop = childRect.top;
+        const distanceFromBottom = windowHeight - childRect.bottom;
+        shouldShowBelow = distanceFromTop < distanceFromBottom;
+      }
 
       // Set max height based on position (min of 500px or available space)
       const maxHeight = shouldShowBelow
@@ -82,7 +96,7 @@ const ComponentTooltip: FunctionComponent<ComponentTooltipProps> = ({
       tooltipRef.current.style.left = `${centerX}px`;
       tooltipRef.current.style.top = `${clampedTopPosition}px`;
     }
-  }, [isHovered]);
+  }, [isHovered, preferredPosition]);
 
   const handleMouseEnter = useCallback(() => {
     if (hideTimeoutRef.current) {
