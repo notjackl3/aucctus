@@ -19,7 +19,6 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
   const [activeFilter, setActiveFilter] = useState<
     'tam' | 'sam' | 'som' | undefined
   >(undefined);
-  const [isFilterActive, setIsFilterActive] = useState(false);
   const [assumptions, setAssumptions] = useState<
     IMarketSizingAssumptionEntryV2[]
   >([]);
@@ -80,11 +79,6 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
       resizeObserver.disconnect();
     };
   }, []);
-
-  // Update isFilterActive when activeFilter changes
-  useEffect(() => {
-    setIsFilterActive(activeFilter !== undefined);
-  }, [activeFilter]);
 
   // Reset to original values from API data
   const resetToDefaults = () => {
@@ -163,8 +157,6 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
             <AssumptionsList
               ref={assumptionsListRef}
               bodyClassName='p-6'
-              activeFilter={activeFilter}
-              isFilterActive={isFilterActive}
               filteredAssumptions={getFilteredAssumptions()}
               marketSizing={marketSizing}
               resetToDefaults={resetToDefaults}

@@ -3,15 +3,11 @@ import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 
 interface AssumptionsHeaderProps {
-  activeFilter?: 'tam' | 'sam' | 'som';
-  isFilterActive: boolean;
   resetToDefaults: () => void;
   bodyClassName?: string;
 }
 
 const AssumptionsHeader: React.FC<AssumptionsHeaderProps> = ({
-  activeFilter,
-  isFilterActive,
   resetToDefaults,
   bodyClassName,
 }) => {
@@ -26,11 +22,6 @@ const AssumptionsHeader: React.FC<AssumptionsHeaderProps> = ({
         <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
           Assumptions
         </h3>
-        <p className='aucctus-text-xs aucctus-text-tertiary'>
-          {isFilterActive
-            ? `Filtered by ${activeFilter?.toUpperCase()}`
-            : 'Determined assumptions for the market size'}
-        </p>
       </div>
 
       <button

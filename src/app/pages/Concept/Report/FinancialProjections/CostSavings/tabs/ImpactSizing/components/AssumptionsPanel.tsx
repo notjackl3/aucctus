@@ -6,7 +6,6 @@ import { AssumptionItem } from './AssumptionItem';
 export interface AssumptionsPanelProps {
   assumptions: IImpactSizingAssumptionEntryV2[];
   originalAssumptions: IImpactSizingAssumptionEntryV2[];
-  assumptionsTitle: string;
   onAssumptionChange: (uuid: string, value: number) => void;
   resetToDefaults: () => void;
   assumptionsRef: React.RefObject<HTMLDivElement>;
@@ -15,7 +14,6 @@ export interface AssumptionsPanelProps {
 export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({
   assumptions,
   originalAssumptions,
-  assumptionsTitle,
   onAssumptionChange,
   resetToDefaults,
   assumptionsRef,
@@ -39,9 +37,6 @@ export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({
           <span className='aucctus-text-xl-semibold aucctus-text-primary'>
             Assumptions
           </span>
-          <p className='aucctus-text-xs aucctus-text-tertiary'>
-            {assumptionsTitle}
-          </p>
         </div>
         <button
           onClick={resetToDefaults}

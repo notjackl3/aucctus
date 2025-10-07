@@ -44,12 +44,9 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
   const topDownTooltip = (
     <div className='aucctus-bg-primary aucctus-border-primary aucctus-text-secondary max-w-sm rounded-lg border p-3 shadow-lg'>
       <p className='aucctus-text-sm'>
-        Start with the total market size (TAM) and narrow down to your specific
-        opportunity (SAM and SOM). Adjust assumptions to see how they impact
-        each market tier.
-      </p>
-      <p className='aucctus-text-sm-medium mt-2'>
-        Click on the market areas to filter relevant assumptions.
+        We start with total reported market size for the broad category (TAM),
+        narrow to the specific segment and geography served (SAM), then apply
+        realistic market-share assumptions to estimate achievable portion (SOM).
       </p>
     </div>
   );
@@ -57,8 +54,9 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
   const bottomUpTooltip = (
     <div className='aucctus-bg-primary aucctus-border-primary aucctus-text-secondary max-w-sm rounded-lg border p-3 shadow-lg'>
       <p className='aucctus-text-sm'>
-        Start with key operational metrics like distribution points, units sold,
-        and pricing to build your market size from the ground up.
+        We define assumptions about customers, units, and pricing under
+        realistic go-to-market conditions, then scale these inputs to calculate
+        total annual revenue potential.
       </p>
     </div>
   );

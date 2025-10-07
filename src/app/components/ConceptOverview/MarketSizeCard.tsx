@@ -1,4 +1,4 @@
-import { Button, Icon } from '@components';
+import { Icon } from '@components';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { executiveDashboardUIText } from './config';
@@ -34,7 +34,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
   const navigate = useNavigate();
 
   return (
-    <div className='aucctus-bg-secondary aucctus-border-secondary h-full min-h-[350px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
+    <div className='aucctus-bg-primary aucctus-border-secondary h-full min-h-[350px] cursor-pointer rounded-lg border transition-all duration-200 hover:shadow-lg'>
       <div className='flex h-full flex-col p-6'>
         {/* Progress Bar Navigation - Isolated component for performance */}
         <ProgressBar
@@ -51,18 +51,16 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
               {executiveDashboardUIText.marketSize.title}
             </h3>
           </div>
-          <Button
-            color='secondary'
-            size='sm'
+          <button
             onClick={() =>
               navigate(
                 `/concept/${conceptId}/financial-projection?tab=market-sizing`,
               )
             }
-            className='aucctus-text-sm-medium aucctus-text-secondary-hover'
+            className='aucctus-bg-primary-hover aucctus-text-sm-medium aucctus-text-secondary-hover rounded-lg px-3 py-1.5'
           >
             {executiveDashboardUIText.marketSize.detailsButton}
-          </Button>
+          </button>
         </div>
 
         {marketSizeData && marketSizeData.marketSummary ? (

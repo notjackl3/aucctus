@@ -10,7 +10,6 @@ import {
 
 export interface ResultsPanelProps {
   resultsTitle: string;
-  resultsSubtitle: string;
   resultValueTitle: string;
   resultValueDescription: string;
   assumptions: IMarketSizingAssumptionEntryV2[];
@@ -19,7 +18,6 @@ export interface ResultsPanelProps {
 
 export const ResultsPanel: React.FC<ResultsPanelProps> = ({
   resultsTitle,
-  resultsSubtitle,
   resultValueTitle,
   resultValueDescription,
   assumptions,
@@ -61,9 +59,6 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
         <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
           {resultsTitle}
         </h3>
-        <p className='aucctus-text-xs aucctus-text-tertiary'>
-          {resultsSubtitle}
-        </p>
       </div>
 
       <div className='aucctus-bg-tertiary aucctus-border-primary rounded-lg border p-6'>

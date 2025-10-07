@@ -7,9 +7,7 @@ const ImpactCalculator: React.FC<BaseCalculatorProps> = ({ impactSizing }) => {
       impactSizing={impactSizing}
       title='How Bottom-Up Impact Sizing Works'
       description='Start with key operational metrics like process improvements, efficiency gains, and cost reduction opportunities to build your impact estimate from the ground up.'
-      assumptionsTitle='Edit impact sizing assumptions for operational optimization'
       resultsTitle='Impact Analysis'
-      resultsSubtitle='Annual impact potential'
       resultValueTitle='Annual Impact Potential'
       resultValueDescription='Based on operational optimization assumptions'
     />

@@ -15,9 +15,7 @@ interface CalculatorLayoutProps extends BaseCalculatorProps {
   marketSizing: IMarketSizingV2;
   title?: string;
   description?: string;
-  assumptionsTitle: string;
   resultsTitle: string;
-  resultsSubtitle: string;
   resultValueTitle: string;
   resultValueDescription: string;
 }
@@ -25,9 +23,7 @@ interface CalculatorLayoutProps extends BaseCalculatorProps {
 export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
   marketSizing,
   // title and description are reserved for future use
-  assumptionsTitle,
   resultsTitle,
-  resultsSubtitle,
   resultValueTitle,
   resultValueDescription,
 }) => {
@@ -120,7 +116,6 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
           <AssumptionsPanel
             assumptions={assumptions}
             originalAssumptions={marketSizing.assumptionEntries}
-            assumptionsTitle={assumptionsTitle}
             onAssumptionChange={handleAssumptionChange}
             resetToDefaults={resetToDefaults}
             assumptionsRef={assumptionsRef}
@@ -129,7 +124,6 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
           {/* Right side: Results */}
           <ResultsPanel
             resultsTitle={resultsTitle}
-            resultsSubtitle={resultsSubtitle}
             resultValueTitle={resultValueTitle}
             resultValueDescription={resultValueDescription}
             assumptions={assumptions}

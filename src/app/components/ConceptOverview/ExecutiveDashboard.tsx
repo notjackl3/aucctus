@@ -278,23 +278,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
         {/* Left - Concept Image */}
         <div className='flex items-start justify-center'>
-          <div
-            className='aucctus-border-primary relative h-[420px] w-full overflow-hidden rounded-xl border shadow-lg'
-            style={{
-              backgroundImage: `url(${conceptOverview?.conceptImageUrl || images.aiExplorationsBackground})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
-            {/* Subtle blur overlay for background */}
-            <div
-              className='absolute inset-0'
-              style={{
-                backdropFilter: 'blur(14px)',
-                WebkitBackdropFilter: 'blur(14px)',
-              }}
-            />
-
+          <div className='aucctus-border-primary relative h-[420px] w-full overflow-hidden rounded-xl border shadow-lg'>
             {/* Gradient overlay */}
             <div className='absolute inset-0 bg-gradient-to-t from-black/20 to-transparent' />
 
@@ -305,7 +289,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
                 images.aiExplorationsBackground
               }
               alt={executiveDashboardUIText.conceptVisualization.altText}
-              className='relative z-10 h-full w-full object-contain'
+              className='relative z-10 h-full w-full object-cover'
               loading='eager'
             />
 

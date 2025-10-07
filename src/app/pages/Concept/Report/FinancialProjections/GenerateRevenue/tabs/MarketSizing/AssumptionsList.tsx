@@ -7,8 +7,6 @@ import { IMarketSizingV2 } from '@libs/api/types';
 
 interface AssumptionsListProps {
   bodyClassName?: string;
-  activeFilter?: 'tam' | 'sam' | 'som';
-  isFilterActive: boolean;
   filteredAssumptions: IMarketSizingAssumptionEntryV2[];
   marketSizing?: IMarketSizingV2;
   resetToDefaults: () => void;
@@ -19,8 +17,6 @@ const AssumptionsList = forwardRef<HTMLDivElement, AssumptionsListProps>(
   (
     {
       bodyClassName,
-      activeFilter,
-      isFilterActive,
       filteredAssumptions,
       marketSizing,
       resetToDefaults,
@@ -45,8 +41,6 @@ const AssumptionsList = forwardRef<HTMLDivElement, AssumptionsListProps>(
     return (
       <div ref={ref}>
         <AssumptionsHeader
-          activeFilter={activeFilter}
-          isFilterActive={isFilterActive}
           resetToDefaults={resetToDefaults}
           bodyClassName={bodyClassName}
         />

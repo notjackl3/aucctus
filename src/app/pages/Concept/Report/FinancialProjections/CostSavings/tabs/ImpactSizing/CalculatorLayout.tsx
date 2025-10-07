@@ -16,9 +16,7 @@ interface CalculatorLayoutProps extends BaseCalculatorProps {
   impactSizing: IImpactSizingV2;
   title: string;
   description: string;
-  assumptionsTitle: string;
   resultsTitle: string;
-  resultsSubtitle: string;
   resultValueTitle: string;
   resultValueDescription: string;
 }
@@ -27,9 +25,7 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
   impactSizing,
   title,
   description,
-  assumptionsTitle,
   resultsTitle,
-  resultsSubtitle,
   resultValueTitle,
   resultValueDescription,
 }) => {
@@ -124,7 +120,6 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
           <AssumptionsPanel
             assumptions={assumptions}
             originalAssumptions={impactSizing.assumptionEntries}
-            assumptionsTitle={assumptionsTitle}
             onAssumptionChange={handleAssumptionChange}
             resetToDefaults={resetToDefaults}
             assumptionsRef={assumptionsRef}
@@ -133,7 +128,6 @@ export const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
           {/* Right side: Results */}
           <ResultsPanel
             resultsTitle={resultsTitle}
-            resultsSubtitle={resultsSubtitle}
             resultValueTitle={resultValueTitle}
             resultValueDescription={resultValueDescription}
             assumptions={assumptions}

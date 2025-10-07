@@ -14,9 +14,7 @@ const MarketSizingCalculator: React.FC<MarketSizingCalculatorProps> = ({
       marketSizing={marketSizing}
       title='How Bottom-Up Market Sizing Works'
       description='Start with key operational metrics like distribution points, units sold, and pricing to build your market size from the ground up.'
-      assumptionsTitle='Determined assumptions for the market size'
       resultsTitle='Market Size Analysis'
-      resultsSubtitle='Annual revenue potential'
       resultValueTitle='Annual Revenue Potential'
       resultValueDescription='Based on associated market sizing assumptions'
     />

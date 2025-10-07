@@ -36,9 +36,6 @@ const MarketSizeVisualization = forwardRef<
         <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
           Market Size Visualization
         </h3>
-        <p className='aucctus-text-xs aucctus-text-tertiary'>
-          Total addressable market breakdown
-        </p>
       </div>
 
       <div className='aucctus-bg-primary relative aspect-square w-full overflow-hidden rounded-lg'>
