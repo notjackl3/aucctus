@@ -529,6 +529,38 @@ export interface INucleusUploadErrorMessage extends BaseSocketEvent {
   details?: any;
 }
 
+// Nucleus Answer Generation Event Messages
+export interface INucleusAnswerProgressMessage extends BaseSocketEvent {
+  type: 'nucleus_answer.progress.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  questionUuid: string;
+  stage: 'started' | 'researching' | 'extracting' | 'generating' | 'completed';
+  message: string;
+  progress?: number;
+}
+
+export interface INucleusAnswerCompletedMessage extends BaseSocketEvent {
+  type: 'nucleus_answer.completed.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  questionUuid: string;
+  answerUuid: string;
+  sourceCount: number;
+  isAiReasoning: boolean;
+  confidenceLevel: string;
+}
+
+export interface INucleusAnswerErrorMessage extends BaseSocketEvent {
+  type: 'nucleus_answer.error.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  questionUuid: string;
+  message: string;
+  errorCode?: string;
+  details?: any;
+}
+
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -570,6 +602,9 @@ export type InboundSocketEvent<C = {}> =
   | IConceptVideoGenerationErrorMessage
   | INucleusUploadProgressMessage
   | INucleusUploadCompletedMessage
-  | INucleusUploadErrorMessage;
+  | INucleusUploadErrorMessage
+  | INucleusAnswerProgressMessage
+  | INucleusAnswerCompletedMessage
+  | INucleusAnswerErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

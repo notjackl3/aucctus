@@ -21,6 +21,9 @@ import debugModeSlice, { IDebugModeState } from './debug-mode/store';
 import testCollateralSlice, {
   ITestCollateralState,
 } from './testCollateral/store';
+import nucleusAnswerSlice, {
+  INucleusAnswerState,
+} from './nucleus-answer/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -32,6 +35,7 @@ export interface IAppStore {
   customerProfileConversations: ICustomerProfileConversationState;
   debugMode: IDebugModeState;
   testCollateral: ITestCollateralState;
+  nucleusAnswer: INucleusAnswerState;
 }
 
 export interface IStoreApi<S> {
@@ -53,6 +57,7 @@ const useStore = create<IAppStore>()(
         customerProfileConversations: customerProfileConversationsSlice,
         debugMode: debugModeSlice,
         testCollateral: testCollateralSlice,
+        nucleusAnswer: nucleusAnswerSlice,
       }),
     ),
     {

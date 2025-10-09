@@ -9,6 +9,9 @@ import {
   INucleusUploadProgressMessage,
   INucleusUploadCompletedMessage,
   INucleusUploadErrorMessage,
+  INucleusAnswerProgressMessage,
+  INucleusAnswerCompletedMessage,
+  INucleusAnswerErrorMessage,
 } from '@libs/api/types';
 
 // Define event handler types
@@ -24,6 +27,13 @@ export interface NucleusUploadHandler {
   onUploadError?: (message: INucleusUploadErrorMessage) => void;
 }
 
+// Nucleus answer generation event handler types
+export interface NucleusAnswerHandler {
+  onAnswerProgress?: (message: INucleusAnswerProgressMessage) => void;
+  onAnswerCompleted?: (message: INucleusAnswerCompletedMessage) => void;
+  onAnswerError?: (message: INucleusAnswerErrorMessage) => void;
+}
+
 // Universal socket event configuration
 export interface SocketEventConfig {
   // Concept workflow events
@@ -31,6 +41,9 @@ export interface SocketEventConfig {
 
   // Nucleus upload events
   nucleusUpload?: NucleusUploadHandler;
+
+  // Nucleus answer generation events
+  nucleusAnswer?: NucleusAnswerHandler;
 
   // Add more event types here as needed
   // customerProfile?: CustomerProfileHandler;
@@ -185,6 +198,45 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       handler(message);
     },
   );
+
+  // Register nucleus answer generation progress events
+  useSocketEvent<
+    'nucleus_answer.progress.account',
+    INucleusAnswerProgressMessage
+  >('nucleus_answer.progress.account', () => {
+    return;
+  });
+
+  // Register nucleus answer generation completed events
+  useSocketEvent<
+    'nucleus_answer.completed.account',
+    INucleusAnswerCompletedMessage
+  >('nucleus_answer.completed.account', (message) => {
+    // Check for duplicates
+    const messageKey = `nucleus-answer-completed-${message.questionUuid}-${message.answerUuid}`;
+    if (preventDuplicate(messageKey)) return;
+
+    const handler = (msg: INucleusAnswerCompletedMessage) => {
+      // Show toast in the future if needed
+
+      // Invalidate nucleus queries to refresh data
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.nucleusReportLatest],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.nucleusReport, msg.nucleusReportUuid],
+      });
+    };
+    handler(message);
+  });
+
+  // Register nucleus answer generation error events
+  useSocketEvent<'nucleus_answer.error.account', INucleusAnswerErrorMessage>(
+    'nucleus_answer.error.account',
+    () => {
+      return;
+    },
+  );
 };
 
 /**
@@ -197,6 +249,9 @@ export const socketEventConfigs = {
       // Uses default handlers defined in the hook
     },
     nucleusUpload: {
+      // Uses default handlers defined in the hook
+    },
+    nucleusAnswer: {
       // Uses default handlers defined in the hook
     },
   }),

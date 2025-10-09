@@ -14,6 +14,7 @@ interface QuestionAnswerDisplayProps {
   isAddingLoading?: boolean;
   isEditingLoading?: boolean;
   isDeletingLoading?: boolean;
+  isResearching?: boolean;
   isAdmin: boolean;
 }
 
@@ -25,6 +26,7 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
   isAddingLoading = false,
   isEditingLoading = false,
   isDeletingLoading = false,
+  isResearching = false,
   isAdmin,
 }) => {
   // Aggregate loading states
@@ -32,6 +34,7 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
     () => isAddingLoading || isEditingLoading || isDeletingLoading,
     [isAddingLoading, isEditingLoading, isDeletingLoading],
   );
+
   if (!selectedQuestionData) {
     return (
       <div className='flex h-full items-center justify-center'>
@@ -80,8 +83,21 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
 
       {/* Answer Content */}
       <div className='flex-1 overflow-y-auto'>
-        {selectedQuestionData.answers &&
-        selectedQuestionData.answers.length > 0 ? (
+        {isResearching ? (
+          /* Researching Overlay */
+          <div className='flex h-full items-center justify-center'>
+            <div className='flex flex-col items-center justify-center py-8 text-center'>
+              <h5 className='aucctus-text-primary aucctus-text-lg mb-2 font-semibold'>
+                Researching Answer
+              </h5>
+              <p className='aucctus-text-secondary aucctus-text-sm max-w-md'>
+                Our AI agents are currently researching and generating an answer
+                for this question. This may take a few moments.
+              </p>
+            </div>
+          </div>
+        ) : selectedQuestionData.answers &&
+          selectedQuestionData.answers.length > 0 ? (
           <div className='space-y-4'>
             {/* Multiple Answers */}
             {selectedQuestionData.answers.map((answer) => (

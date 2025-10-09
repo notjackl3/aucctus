@@ -44,7 +44,7 @@ export const expandedCategoryViewUIText: ExpandedCategoryViewUIText = {
     addNewAssumption: 'Add new assumption',
     addNewAnswer: 'Add new answer',
     addingNewAnswer: 'Adding new answer',
-    generateAiAnswer: 'Generate AI Answer',
+    generateAiAnswer: 'Generate answer',
   },
   placeholders: {
     noQuestionsAvailable: 'No core questions available yet.',

@@ -9,7 +9,11 @@ export type ProcessingStatus =
 export type Priority = 'P1' | 'P2' | 'P3';
 export type Answerability = 'public' | 'internal' | 'mixed';
 export type ConfidenceLevel = 'high' | 'medium' | 'low';
-export type AssessmentStatus = 'validated' | 'new_details' | 'needs_input';
+export type AssessmentStatus =
+  | 'validated'
+  | 'new_details'
+  | 'needs_input'
+  | 'researching';
 
 export type SectionType =
   | 'basic_profile' // Company Identity & Value Proposition
@@ -53,6 +57,7 @@ export interface NucleusReportQuestion {
   priority: Priority;
   answerability: Answerability;
   answers: NucleusReportAnswer[];
+  assessmentStatus: AssessmentStatus;
   createdAt: string;
   updatedAt: string;
 }

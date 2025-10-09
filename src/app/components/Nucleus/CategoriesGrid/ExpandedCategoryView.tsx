@@ -407,6 +407,11 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
             onEditAnswer={handleEditAnswer}
             onDeleteAnswer={handleDeleteAnswer}
             isDeletingLoading={isAnswerDeleting}
+            isResearching={
+              selectedQuestionData?.assessmentStatus
+                ? selectedQuestionData.assessmentStatus === 'researching'
+                : false
+            }
             isAdmin={isAdmin}
           />
         </div>
