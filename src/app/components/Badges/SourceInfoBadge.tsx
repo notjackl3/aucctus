@@ -1,5 +1,5 @@
 import images from '@assets/img';
-import { ComponentTooltip } from '@components';
+import { ComponentTooltip, Icon } from '@components';
 import {
   useClearbitCompany,
   usePublishedDatesQuery,
@@ -32,6 +32,10 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
   const publishedDatesQuery = usePublishedDatesQuery(source, showPublishedDate);
   const clearbitCompanyQuery = useClearbitCompany(source.url);
 
+  // Check if this is an AI Reasoning source
+  const isAIReasoning =
+    source.title?.toLowerCase().startsWith('ai reasoning') || !source.url;
+
   // Memoized computed values to reduce re-renders
   const { sourceTitle, publishedDate, logoSizeClass, fontSizeClass } =
     useMemo(() => {
@@ -40,7 +44,10 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
         badgeSize === 'small' ? 'text-xs font-normal' : 'text-sm font-medium';
 
       let sourceTitle = 'loading...';
-      if (!!source?.nucleusFileSource?.title) {
+      // Handle AI Reasoning sources first
+      if (isAIReasoning) {
+        sourceTitle = 'AI Reasoning';
+      } else if (!!source?.nucleusFileSource?.title) {
         sourceTitle = source.nucleusFileSource.title;
       } else if (clearbitCompanyQuery.data?.[0]?.name) {
         sourceTitle = clearbitCompanyQuery.data[0].name;
@@ -62,9 +69,26 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
       showPublishedDate,
       source.url,
       source.nucleusFileSource,
+      isAIReasoning,
     ]);
 
   const renderSourceLogo = () => {
+    // Show lightbulb icon for AI Reasoning sources
+    if (isAIReasoning) {
+      return (
+        <div
+          className={cn(
+            'aucctus-border-primary flex h-fit w-fit items-center justify-center overflow-hidden rounded-full',
+          )}
+        >
+          <Icon
+            variant='lightbulb'
+            className={cn('aucctus-stroke-quaternary', logoSizeClass)}
+          />
+        </div>
+      );
+    }
+
     const sourceBaseUrl = source.url ? getBaseUrl(source.url) : null;
 
     return (
