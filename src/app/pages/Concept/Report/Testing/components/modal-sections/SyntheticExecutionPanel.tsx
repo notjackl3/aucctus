@@ -17,6 +17,7 @@ interface ISyntheticExecutionPanelProps {
   // Existing props
   status:
     | 'idle'
+    | 'starting'
     | 'running'
     | 'cancelling'
     | 'completed'
@@ -31,6 +32,8 @@ interface ISyntheticExecutionPanelProps {
   error?: string;
   isInitializing?: boolean; // New prop for initialization state
   isExecuting?: boolean; // New prop for execution loading state
+  quotes?: Array<{ text: string; profileUuid: string }>; // Live quotes from interviews with profile associations
+  completedProfileUuids?: Set<string>; // Track which profiles have completed
   onCancel: () => void;
 
   // New props for configuration
@@ -59,10 +62,13 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   error,
   isInitializing = false,
   isExecuting = false,
+  quotes = [],
+  completedProfileUuids,
   conceptUuid,
   testUuid,
   onExecute,
   onReset,
+  onCancel,
   onNavigateToCollateral,
   onNavigateToResults,
 }) => {
@@ -464,14 +470,53 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
           totalPersonas={totalPersonas}
           resultsCount={resultsCount}
           isInitializing={isInitializing}
+          quotes={quotes}
+          completedProfileUuids={completedProfileUuids}
           onViewResults={onNavigateToResults}
         />
       )}
 
-      {/* Legacy Progress Section - Show for error/cancelled states */}
-      {(status === 'cancelling' ||
-        status === 'error' ||
-        status === 'cancelled') && (
+      {/* Cancelling State - Modern UI */}
+      {status === 'cancelling' && (
+        <div className='p-6'>
+          <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-xl border shadow-sm'>
+            {/* Left border accent */}
+            <div className='aucctus-border-error border-l-4'>
+              <div className='p-6'>
+                <div className='mb-4'>
+                  <h2 className='aucctus-text-primary mb-1 flex items-center gap-3 text-2xl font-bold'>
+                    <Icon
+                      variant='loading-02'
+                      className='aucctus-stroke-error-primary h-6 w-6 animate-spin'
+                    />
+                    Cancelling Test
+                  </h2>
+                  <p className='aucctus-text-secondary aucctus-text-sm'>
+                    Stopping current operations and cleaning up...
+                  </p>
+                </div>
+
+                {/* Animated Progress Bar with Message */}
+                <div className='space-y-1.5'>
+                  <p className='aucctus-text-secondary aucctus-text-xs text-right'>
+                    This may take up to 2 minutes as we wait for in-flight
+                    operations to complete.
+                  </p>
+                  <div className='aucctus-bg-secondary-subtle h-3 overflow-hidden rounded-full'>
+                    <div
+                      className='aucctus-bg-error-solid h-full animate-pulse rounded-full'
+                      style={{ width: '100%' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Error and Cancelled States - Legacy Section */}
+      {(status === 'error' || status === 'cancelled') && (
         <div className='aucctus-border-secondary border-t p-6'>
           <div className='space-y-4'>
             <div className='flex items-center justify-between'>
@@ -482,19 +527,15 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
                 <p className='aucctus-text-xs aucctus-text-secondary'>
                   {status === 'error'
                     ? 'Interview generation failed'
-                    : status === 'cancelled'
-                      ? 'Interview generation cancelled'
-                      : status === 'cancelling'
-                        ? 'Stopping current operations'
-                        : 'Generating synthetic customer interviews...'}
+                    : 'Interview generation cancelled'}
                 </p>
               </div>
               <div className='text-right'>
                 <div className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
-                  {status === 'cancelling' ? '' : `${progress}%`}
+                  {progress}%
                 </div>
                 <div className='aucctus-text-xs aucctus-text-secondary'>
-                  {status === 'cancelling' ? '' : 'Complete'}
+                  Complete
                 </div>
               </div>
             </div>
@@ -532,7 +573,20 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
         </div>
       )}
 
-      {/* Action Buttons - Cancel button removed */}
+      {/* Action Buttons */}
+      {(status === 'running' || status === 'starting') && (
+        <div className='aucctus-border-secondary border-t p-6'>
+          <div className='flex justify-end'>
+            <button
+              className='btn btn-danger btn-sm flex items-center gap-2'
+              onClick={onCancel}
+            >
+              <Icon variant='closeX' className='aucctus-stroke-white h-4 w-4' />
+              Cancel Execution
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Back Button for Completed State */}
       {status === 'completed' && (

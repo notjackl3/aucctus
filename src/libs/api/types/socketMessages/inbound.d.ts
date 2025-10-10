@@ -458,6 +458,27 @@ export interface ISyntheticExecutionErrorMessage extends BaseSocketEvent {
   details?: any;
 }
 
+export interface ISyntheticInterviewQuoteMessage extends BaseSocketEvent {
+  type: 'synthetic.interview.quote.user';
+  conceptUuid: string;
+  testUuid: string;
+  accountUuid: string;
+  quote: string;
+  baseProfileUuid?: string; // UUID of the base customer profile this quote came from
+}
+
+export interface ISyntheticProfileCompletedMessage extends BaseSocketEvent {
+  type: 'synthetic.profile.completed.user';
+  conceptUuid: string;
+  testUuid: string;
+  accountUuid: string;
+  baseProfileUuid?: string;
+  profileName: string;
+  interviewType: 'original' | 'variation';
+  completedCount: number;
+  totalCount: number;
+}
+
 // ==========================================
 // Concept Video Generation Messages
 // ==========================================
@@ -596,6 +617,8 @@ export type InboundSocketEvent<C = {}> =
   | ISyntheticExecutionProgressMessage
   | ISyntheticExecutionCompletedMessage
   | ISyntheticExecutionErrorMessage
+  | ISyntheticInterviewQuoteMessage
+  | ISyntheticProfileCompletedMessage
   | IConceptVideoGenerationStartedMessage
   | IConceptVideoGenerationProgressMessage
   | IConceptVideoGenerationCompletedMessage

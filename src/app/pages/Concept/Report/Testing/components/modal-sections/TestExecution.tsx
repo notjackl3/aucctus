@@ -10,6 +10,7 @@ import {
   useSyntheticExecutionStatus,
 } from '@hooks/query/synthetic-execution.hook';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
+import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
 
 interface TestExecutionProps {
@@ -32,11 +33,15 @@ const TestExecution: React.FC<TestExecutionProps> = ({
   );
   const [isInitializing, setIsInitializing] = useState(true);
 
+  // Fetch customer profiles for quote assignment
+  const { profiles } = useConceptCustomerProfiles(conceptUuid || '');
+
   // WebSocket events for real-time execution
   const { executionState, resetExecution, setCancellingState, setExecutionId } =
     useSyntheticExecutionEvents(
       conceptUuid || '',
       testUuid || '',
+      profiles,
       (resultsCount) => {
         // Auto-switch to Results tab when completed
         // TODO: This could be enhanced to trigger tab switch via parent component
@@ -66,6 +71,11 @@ const TestExecution: React.FC<TestExecutionProps> = ({
       enabled: !!executionState.executionId && executionState.status !== 'idle',
       refetchInterval: executionState.status === 'running' ? 2000 : 10000, // Faster polling when running
       isWebSocketActive: executionState.status !== 'idle', // Indicate WebSocket activity
+      onExecutionNotFound: () => {
+        // 404 from polling means execution was cancelled or expired
+        resetExecution();
+        toast.info('Execution was cancelled or expired');
+      },
     },
   );
 
@@ -74,15 +84,38 @@ const TestExecution: React.FC<TestExecutionProps> = ({
     // If we have persistent API status, prioritize it in these cases:
     // 1. WebSocket is idle and API shows active execution (reconnecting scenario)
     // 2. API shows completed status (regardless of WebSocket state)
+    // 3. API shows cancelled status (should reset to idle)
     if (
       persistentStatus &&
-      // Case 1: WebSocket idle, API shows active execution
+      // Case 1: WebSocket idle, API shows active execution (including cancelling)
       ((executionState.status === 'idle' &&
-        ['running', 'pending'].includes(persistentStatus.status)) ||
+        ['running', 'pending', 'cancelling'].includes(
+          persistentStatus.status,
+        )) ||
         // Case 2: API shows completed (trust this over stale WebSocket state)
-        persistentStatus.status === 'completed')
+        persistentStatus.status === 'completed' ||
+        // Case 3: API shows cancelled (should reset to idle)
+        persistentStatus.status === 'cancelled')
     ) {
       const isCompleted = persistentStatus.status === 'completed';
+      const isCancelled = persistentStatus.status === 'cancelled';
+
+      // If cancelled, return to idle state
+      if (isCancelled) {
+        return {
+          status: 'idle' as any,
+          progress: 0,
+          message: '',
+          executionId: undefined,
+          resultsCount: 0,
+          currentStage: undefined,
+          currentPersona: undefined,
+          totalPersonas: undefined,
+          error: undefined,
+          quotes: [],
+          completedProfileUuids: new Set<string>(),
+        };
+      }
 
       return {
         status: persistentStatus.status as any,
@@ -99,6 +132,9 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         error: persistentStatus.error
           ? JSON.stringify(persistentStatus.error)
           : undefined,
+        quotes: executionState.quotes || [], // Include quotes from WebSocket state
+        completedProfileUuids:
+          executionState.completedProfileUuids || new Set<string>(), // Include completed profiles from WebSocket state
       };
     }
 
@@ -110,6 +146,23 @@ const TestExecution: React.FC<TestExecutionProps> = ({
     // Fallback to persistent status from API
     if (persistentStatus) {
       const isCompleted = persistentStatus.status === 'completed';
+      const isCancelled = persistentStatus.status === 'cancelled';
+
+      // If cancelled in fallback, reset to idle
+      if (isCancelled) {
+        return {
+          status: 'idle' as any,
+          progress: 0,
+          message: '',
+          executionId: undefined,
+          resultsCount: 0,
+          currentStage: undefined,
+          currentPersona: undefined,
+          totalPersonas: undefined,
+          error: undefined,
+          quotes: [],
+        };
+      }
 
       return {
         status: persistentStatus.status as any,
@@ -126,6 +179,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         error: persistentStatus.error
           ? JSON.stringify(persistentStatus.error)
           : undefined,
+        quotes: executionState.quotes || [], // Include quotes from WebSocket state
       };
     }
 
@@ -150,9 +204,17 @@ const TestExecution: React.FC<TestExecutionProps> = ({
 
         if (
           currentExecution &&
-          ['running', 'starting'].includes(currentExecution.status)
+          ['running', 'starting', 'cancelling'].includes(
+            currentExecution.status,
+          )
         ) {
           setExecutionId(currentExecution.executionId);
+
+          // CRITICAL FIX: Also restore the WebSocket state to match the API status
+          // This ensures the UI shows the correct state (especially 'cancelling')
+          if (currentExecution.status === 'cancelling') {
+            setCancellingState();
+          }
         }
       } catch (error) {
         // No running execution found or error accessing endpoint - this is fine
@@ -170,7 +232,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
     };
 
     checkForRunningExecution();
-  }, [conceptUuid, testUuid, setExecutionId]);
+  }, [conceptUuid, testUuid, setExecutionId, setCancellingState]);
 
   // Additional initialization timeout as fallback
   useEffect(() => {
@@ -207,14 +269,24 @@ const TestExecution: React.FC<TestExecutionProps> = ({
     }
   };
 
+  // Cancel execution handler with optimized mid-execution checks
+  // Backend now checks for cancellation every 5 completed interviews for faster response
   const handleCancelExecution = async () => {
     if (displayState.executionId) {
       // Immediately set to cancelling state for instant user feedback
       setCancellingState();
 
       try {
-        await cancelExecution.mutateAsync(displayState.executionId);
-        // Don't call resetExecution here - let the WebSocket error event handle the final state
+        const result = await cancelExecution.mutateAsync(
+          displayState.executionId,
+        );
+
+        // If no tasks were found, the execution is already cancelled/completed
+        // Reset immediately instead of waiting for websocket event
+        if (result?.revokedTasks?.status === 'no_tasks_found') {
+          resetExecution();
+        }
+        // Otherwise, let the WebSocket error event handle the final state
       } catch (error) {
         // If the cancel request fails, reset to previous state
         // The error is already handled by the mutation's onError callback
@@ -381,6 +453,8 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             error={displayState.error}
             isInitializing={isInitializing}
             isExecuting={startExecution.isLoading}
+            quotes={displayState.quotes}
+            completedProfileUuids={displayState.completedProfileUuids}
             onCancel={handleCancelExecution}
             conceptUuid={conceptUuid || ''}
             testUuid={testUuid || ''}

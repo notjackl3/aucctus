@@ -2,6 +2,7 @@ import { useMutation, useQuery } from 'react-query';
 import { toast } from '@components';
 import api from '@libs/api';
 import utils from '@libs/utils';
+import telemetry from '@libs/telemetry';
 import {
   IDistributionPreviewRequest,
   ISyntheticExecutionRequest,
@@ -37,6 +38,25 @@ export const useSyntheticExecutionCancel = (
   return useMutation({
     mutationFn: async (executionId: string) =>
       api.testing.cancelSyntheticExecution(conceptUuid, testUuid, executionId),
+    onSuccess: (data) => {
+      // Check if the task was already cancelled/completed (no_tasks_found)
+      if (data?.revokedTasks?.status === 'no_tasks_found') {
+        telemetry.log('synthetic.execution.cancel.already_cancelled', {
+          conceptUuid,
+          testUuid,
+          executionId: data.executionId,
+          message: 'Task was already cancelled or completed',
+        });
+        toast.info('Execution was already cancelled or completed');
+      } else {
+        telemetry.log('synthetic.execution.cancel.success', {
+          conceptUuid,
+          testUuid,
+          executionId: data.executionId,
+          revokedTasksCount: data.revokedTasks?.length || 0,
+        });
+      }
+    },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to cancel execution');
@@ -52,6 +72,7 @@ export const useSyntheticExecutionStatus = (
     enabled?: boolean;
     refetchInterval?: number | false;
     isWebSocketActive?: boolean; // New option to indicate WebSocket state
+    onExecutionNotFound?: () => void; // Callback when execution is 404'd (cancelled/expired)
   },
 ) => {
   return useQuery({
@@ -91,12 +112,24 @@ export const useSyntheticExecutionStatus = (
       return failureCount < 3;
     },
     onError: (e: any) => {
-      // Status polling errors are expected when execution is not running
-      // No need to show error to user, just log for debugging
-      if (process.env.NODE_ENV === 'development') {
-        const message = utils.osiris.parseFormError(e);
-        // eslint-disable-next-line no-console
-        console.error('Failed to get execution status:', message);
+      // A 404 means the execution doesn't exist or has expired (cancelled)
+      if (e?.response?.status === 404) {
+        telemetry.log('synthetic.execution.polling.not_found', {
+          conceptUuid,
+          testUuid,
+          executionId,
+          message: 'Execution not found - treating as cancelled/expired',
+        });
+        // Call the callback to reset execution state
+        options?.onExecutionNotFound?.();
+      } else {
+        // Status polling errors are expected when execution is not running
+        // No need to show error to user, just log for debugging
+        if (process.env.NODE_ENV === 'development') {
+          const message = utils.osiris.parseFormError(e);
+          // eslint-disable-next-line no-console
+          console.error('Failed to get execution status:', message);
+        }
       }
     },
   });

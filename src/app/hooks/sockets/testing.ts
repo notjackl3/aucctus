@@ -8,7 +8,10 @@ import {
   ISyntheticExecutionProgressMessage,
   ISyntheticExecutionCompletedMessage,
   ISyntheticExecutionErrorMessage,
+  ISyntheticInterviewQuoteMessage,
+  ISyntheticProfileCompletedMessage,
 } from '@libs/api/types';
+import { ICustomerProfile } from '@libs/api/types/concept/concepts';
 
 interface ISyntheticExecutionState {
   status:
@@ -26,6 +29,8 @@ interface ISyntheticExecutionState {
   resultsCount?: number;
   error?: string;
   executionId?: string;
+  quotes?: Array<{ text: string; profileUuid: string }>; // Live quotes from interviews with profile associations
+  completedProfileUuids?: Set<string>; // Track which profiles have completed
 }
 
 // State persistence utilities
@@ -37,7 +42,14 @@ const persistExecutionState = (
   testUuid: string,
   state: ISyntheticExecutionState,
 ) => {
-  if (state.status !== 'idle') {
+  // Persist active states including 'cancelling' (so it survives page navigation)
+  // Only exclude truly terminal states
+  if (
+    state.status !== 'idle' &&
+    state.status !== 'cancelled' && // Don't persist cancelled
+    state.status !== 'error' && // Don't persist error
+    state.status !== 'completed' // Don't persist completed
+  ) {
     try {
       sessionStorage.setItem(
         EXECUTION_STATE_KEY(conceptUuid, testUuid),
@@ -51,6 +63,14 @@ const persistExecutionState = (
         error: error instanceof Error ? error.message : error,
       });
     }
+  } else if (
+    state.status === 'idle' ||
+    state.status === 'cancelled' ||
+    state.status === 'error' ||
+    state.status === 'completed'
+  ) {
+    // Clear storage when in terminal states
+    clearPersistedExecutionState(conceptUuid, testUuid);
   }
 };
 
@@ -102,6 +122,7 @@ const clearPersistedExecutionState = (
 export const useSyntheticExecutionEvents = (
   conceptUuid: string,
   testUuid: string,
+  profiles: ICustomerProfile[],
   onComplete?: (resultsCount: number) => void,
 ) => {
   const queryClient = useQueryClient();
@@ -124,15 +145,19 @@ export const useSyntheticExecutionEvents = (
     persistExecutionState(conceptUuid, testUuid, executionState);
   }, [conceptUuid, testUuid, executionState]);
 
-  // Cleanup persisted state on unmount if execution is not active
+  // Cleanup persisted state on unmount only for terminal states
+  // Keep 'cancelling' persisted so it survives page navigation
   useEffect(() => {
     return () => {
       if (
         executionState.status === 'idle' ||
-        executionState.status === 'completed'
+        executionState.status === 'completed' ||
+        executionState.status === 'cancelled' ||
+        executionState.status === 'error'
       ) {
         clearPersistedExecutionState(conceptUuid, testUuid);
       }
+      // Note: 'cancelling' is intentionally NOT cleared here so it persists across navigation
     };
   }, [conceptUuid, testUuid, executionState.status]);
 
@@ -166,7 +191,7 @@ export const useSyntheticExecutionEvents = (
               totalPersonas: data.totalPersonas,
             };
 
-            // Only invalidate queries and show completion toast when reaching 100%
+            // Only invalidate queries when reaching 100%
             if (isComplete) {
               // Clear persisted state on completion
               clearPersistedExecutionState(conceptUuid, testUuid);
@@ -175,11 +200,6 @@ export const useSyntheticExecutionEvents = (
               queryClient.invalidateQueries({
                 queryKey: [AucctusQueryKeys.testResults, conceptUuid, testUuid],
               });
-
-              // Show final success toast
-              toast.success(
-                'Synthetic testing complete! All results are now available.',
-              );
 
               // Call completion callback with results count
               onComplete?.(prev.resultsCount || 0);
@@ -278,6 +298,73 @@ export const useSyntheticExecutionEvents = (
             }));
             toast.error(`Execution failed: ${data.errorMessage}`);
           }
+        }
+      },
+      [conceptUuid, testUuid],
+    ),
+  );
+
+  // Live quotes from interviews
+  useSocketEvent<
+    'synthetic.interview.quote.user',
+    ISyntheticInterviewQuoteMessage
+  >(
+    'synthetic.interview.quote.user',
+    useCallback(
+      (data: ISyntheticInterviewQuoteMessage) => {
+        if (data.conceptUuid === conceptUuid && data.testUuid === testUuid) {
+          // Determine which profile to assign this quote to
+          let assignedProfileUuid: string;
+
+          // Check if baseProfileUuid is provided and exists in profiles
+          if (
+            data.baseProfileUuid &&
+            profiles.some((p) => p.uuid === data.baseProfileUuid)
+          ) {
+            assignedProfileUuid = data.baseProfileUuid;
+          } else if (profiles.length > 0) {
+            // Randomly assign to one of the available profiles
+            const randomProfile =
+              profiles[Math.floor(Math.random() * profiles.length)];
+            assignedProfileUuid = randomProfile.uuid;
+          } else {
+            return; // No profiles available, skip this quote
+          }
+
+          setExecutionState((prev) => ({
+            ...prev,
+            quotes: [
+              ...(prev.quotes || []),
+              { text: data.quote, profileUuid: assignedProfileUuid },
+            ],
+          }));
+        }
+      },
+      [conceptUuid, testUuid, profiles],
+    ),
+  );
+
+  // Profile completion events
+  useSocketEvent<
+    'synthetic.profile.completed.user',
+    ISyntheticProfileCompletedMessage
+  >(
+    'synthetic.profile.completed.user',
+    useCallback(
+      (data: ISyntheticProfileCompletedMessage) => {
+        if (
+          data.conceptUuid === conceptUuid &&
+          data.testUuid === testUuid &&
+          data.baseProfileUuid
+        ) {
+          setExecutionState((prev) => {
+            const newCompleted = new Set(prev.completedProfileUuids || []);
+            newCompleted.add(data.baseProfileUuid!);
+            return {
+              ...prev,
+              completedProfileUuids: newCompleted,
+            };
+          });
         }
       },
       [conceptUuid, testUuid],

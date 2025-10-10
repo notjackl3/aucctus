@@ -6,6 +6,8 @@ import { AppPath } from '@routes/routes';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '../query/query-keys';
 import {
+  ISyntheticExecutionProgressMessage,
+  ISyntheticExecutionErrorMessage,
   INucleusUploadProgressMessage,
   INucleusUploadCompletedMessage,
   INucleusUploadErrorMessage,
@@ -18,6 +20,11 @@ import {
 export interface ConceptWorkflowHandler {
   onWorkflowCompleted?: (message: any) => void;
   onWorkflowError?: (message: any) => void;
+}
+
+export interface SyntheticTestingHandler {
+  onExecutionCompleted?: (message: ISyntheticExecutionProgressMessage) => void;
+  onExecutionError?: (message: ISyntheticExecutionErrorMessage) => void;
 }
 
 // Nucleus upload event handler types
@@ -38,6 +45,9 @@ export interface NucleusAnswerHandler {
 export interface SocketEventConfig {
   // Concept workflow events
   conceptWorkflow?: ConceptWorkflowHandler;
+
+  // Synthetic testing events
+  syntheticTesting?: SyntheticTestingHandler;
 
   // Nucleus upload events
   nucleusUpload?: NucleusUploadHandler;
@@ -119,6 +129,65 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         });
       handler(message);
     }
+  });
+
+  // Register synthetic execution completion event (GLOBAL)
+  useSocketEvent<
+    'synthetic.execution.progress.user',
+    ISyntheticExecutionProgressMessage
+  >('synthetic.execution.progress.user', (data) => {
+    if (!config.syntheticTesting) return;
+
+    // Only show toast for 100% completion
+    if (data.progress >= 100) {
+      const messageKey = `synthetic-complete-${data.conceptUuid}-${data.testUuid}`;
+      if (preventDuplicate(messageKey)) return;
+
+      const handler =
+        config.syntheticTesting.onExecutionCompleted ||
+        (() => {
+          toast.success(
+            'Synthetic testing complete!',
+            'Your synthetic interviews are ready to view.',
+            {
+              autoClose: 10000,
+            },
+          );
+        });
+
+      handler(data);
+    }
+  });
+
+  // Register synthetic execution error event (GLOBAL)
+  useSocketEvent<
+    'synthetic.execution.error.user',
+    ISyntheticExecutionErrorMessage
+  >('synthetic.execution.error.user', (data) => {
+    if (!config.syntheticTesting) return;
+
+    const messageKey = `synthetic-error-${data.conceptUuid}-${data.testUuid}`;
+    if (preventDuplicate(messageKey)) return;
+
+    const handler =
+      config.syntheticTesting.onExecutionError ||
+      ((msg: ISyntheticExecutionErrorMessage) => {
+        // Don't show toast for cancellation errors (user-initiated)
+        const isCancellation = msg.errorMessage
+          ?.toLowerCase()
+          .includes('cancel');
+        if (isCancellation) return;
+
+        toast.error(
+          'Synthetic testing failed',
+          msg.errorMessage || 'An error occurred during execution',
+          {
+            autoClose: 10000,
+          },
+        );
+      });
+
+    handler(data);
   });
 
   // Register nucleus upload progress events
@@ -246,6 +315,9 @@ export const socketEventConfigs = {
   // Universal default handling for all application socket events
   universalDefault: (): SocketEventConfig => ({
     conceptWorkflow: {
+      // Uses default handlers defined in the hook
+    },
+    syntheticTesting: {
       // Uses default handlers defined in the hook
     },
     nucleusUpload: {

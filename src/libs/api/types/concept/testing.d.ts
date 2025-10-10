@@ -144,7 +144,13 @@ export interface ISyntheticExecutionStatusResponse {
   conceptUuid: string;
   testUuid: string;
   workflowExecutionUuid: string;
-  status: 'pending' | 'running' | 'completed' | 'error' | 'cancelled';
+  status:
+    | 'pending'
+    | 'running'
+    | 'completed'
+    | 'error'
+    | 'cancelled'
+    | 'cancelling';
   progress: number;
   message: string;
   startedAt?: string;
