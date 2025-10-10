@@ -24,6 +24,12 @@ export interface ISyntheticLoadingUIProps {
   // Track which profiles have completed
   completedProfileUuids?: Set<string>;
 
+  // Estimated execution time
+  estimatedSeconds?: number | null;
+
+  // Concept UUID for agent timing
+  conceptUuid?: string;
+
   // Navigation callback
   onViewResults?: () => void;
 }

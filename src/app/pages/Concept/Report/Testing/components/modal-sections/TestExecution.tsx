@@ -9,6 +9,7 @@ import {
   useSyntheticExecutionCancel,
   useSyntheticExecutionStatus,
 } from '@hooks/query/synthetic-execution.hook';
+import { useSyntheticPipelineEstimate } from '@hooks/query/agent-timing.hook';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
@@ -51,6 +52,30 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         }
       },
     );
+
+  // Calculate number of profiles for timing estimate
+  // Use totalPersonas from execution state if available, otherwise default to 2
+  const numProfiles = executionState.totalPersonas || 2;
+
+  // Fetch estimated execution time for the complete synthetic pipeline
+  const { data: timingData } = useSyntheticPipelineEstimate(
+    conceptUuid || '',
+    numProfiles,
+    { enabled: !!conceptUuid },
+  );
+
+  // Debug: Log timing data
+  React.useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(
+        '[TestExecution] timingData:',
+        timingData,
+        'numProfiles:',
+        numProfiles,
+      );
+    }
+  }, [timingData, numProfiles]);
 
   // Execution mutations
   const startExecution = useSyntheticExecutionStart(
@@ -453,6 +478,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             error={displayState.error}
             isInitializing={isInitializing}
             isExecuting={startExecution.isLoading}
+            estimatedSeconds={timingData?.estimatedSeconds ?? null}
             quotes={displayState.quotes}
             completedProfileUuids={displayState.completedProfileUuids}
             onCancel={handleCancelExecution}

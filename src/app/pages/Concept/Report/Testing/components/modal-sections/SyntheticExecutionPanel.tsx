@@ -32,6 +32,7 @@ interface ISyntheticExecutionPanelProps {
   error?: string;
   isInitializing?: boolean; // New prop for initialization state
   isExecuting?: boolean; // New prop for execution loading state
+  estimatedSeconds?: number | null; // Estimated execution time from timing API
   quotes?: Array<{ text: string; profileUuid: string }>; // Live quotes from interviews with profile associations
   completedProfileUuids?: Set<string>; // Track which profiles have completed
   onCancel: () => void;
@@ -62,6 +63,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   error,
   isInitializing = false,
   isExecuting = false,
+  estimatedSeconds,
   quotes = [],
   completedProfileUuids,
   conceptUuid,
@@ -472,6 +474,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
           isInitializing={isInitializing}
           quotes={quotes}
           completedProfileUuids={completedProfileUuids}
+          estimatedSeconds={estimatedSeconds}
+          conceptUuid={conceptUuid}
           onViewResults={onNavigateToResults}
         />
       )}

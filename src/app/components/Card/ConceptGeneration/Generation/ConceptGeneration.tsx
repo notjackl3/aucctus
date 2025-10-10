@@ -12,6 +12,7 @@ import {
   getAnimationStyle,
 } from '../UserExploration/components/util/animation-keyframes';
 import FloatingAiIcon from './FloatingAiIcon';
+import { AgentProgressBar } from '@components/Progress';
 
 const getFadeInStyle = (duration: number, delay: number = 0) =>
   getAnimationStyle('fadeIn', duration, delay);
@@ -43,6 +44,7 @@ const ConceptGeneration = React.forwardRef<
   const conceptsContainerRef = React.useRef<HTMLDivElement>(null);
   const { setGeneratedConcepts } = useConceptGenerationStore();
   const hasGenerated = useRef(false);
+  const conceptArrivalTimes = useRef<number[]>([]);
 
   // Get search params and seed data to check for cached concepts
   const [searchParams] = useSearchParams();
@@ -72,6 +74,13 @@ const ConceptGeneration = React.forwardRef<
       setTimeout(() => handleGenerateComplete(), 3000);
     } else if ('delta' === data.stage && eventConcepts) {
       if (eventConcepts.length - 1 > concepts.length) {
+        const newConceptCount = eventConcepts.length - 1;
+
+        // Track arrival time when a new concept arrives
+        if (newConceptCount > conceptArrivalTimes.current.length) {
+          conceptArrivalTimes.current.push(Date.now());
+        }
+
         setConcepts(eventConcepts.slice(0, -1));
       }
     }
@@ -153,6 +162,9 @@ const ConceptGeneration = React.forwardRef<
     }
 
     // Normal generation flow for new concepts
+    // Reset timing trackers for this generation run
+    conceptArrivalTimes.current = [];
+
     generateConcept(undefined, {
       onError: () => {
         const event = new CustomEvent('aucctus-generate-concept', {
@@ -173,21 +185,36 @@ const ConceptGeneration = React.forwardRef<
 
   // UI Component renderers
   const renderLoadingText = () => (
-    <div className='my-4 flex flex-col items-center justify-center gap-2'>
+    <div className='my-4 flex flex-col items-center justify-center gap-4'>
       <div
         style={getFadeInStyle(500, 500)}
         className='aucctus-text-white aucctus-text-lg'
       >
         {hasCachedConcepts ? 'Loading your concepts' : 'Generating concepts'}
       </div>
-      <div
-        style={getFadeInStyle(500, 1000)}
-        className='aucctus-text-white aucctus-text-xs'
-      >
-        {hasCachedConcepts
-          ? 'Using your previously generated concepts'
-          : 'This can take up to 2 minutes to complete'}
-      </div>
+
+      {hasCachedConcepts ? (
+        <div
+          style={getFadeInStyle(500, 1000)}
+          className='aucctus-text-white aucctus-text-xs'
+        >
+          Using your previously generated concepts
+        </div>
+      ) : (
+        <div className='w-full max-w-md px-4' style={getFadeInStyle(500, 1000)}>
+          <AgentProgressBar
+            agentName='ConceptGenerationPipeline'
+            expectedItemCount={3}
+            completedItemCount={concepts.length}
+            itemCompletionTimestamps={conceptArrivalTimes.current}
+            showTimeRemaining
+            showPercentage={false}
+            size='md'
+            theme='brand'
+            className='[&_*]:!text-white'
+          />
+        </div>
+      )}
     </div>
   );
 

@@ -14,6 +14,8 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
   isInitializing = false,
   quotes = [],
   completedProfileUuids,
+  estimatedSeconds,
+  conceptUuid,
   onViewResults,
 }) => {
   // Calculate persona progress using completed profile UUIDs from WebSocket events
@@ -61,6 +63,9 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
         message={message}
         currentStage={currentStage}
         isInitializing={isInitializing}
+        conceptUuid={conceptUuid}
+        numProfiles={profiles.length}
+        estimatedSeconds={estimatedSeconds}
       />
 
       {/* Interview Progress Card */}

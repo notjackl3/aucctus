@@ -15,6 +15,9 @@ export const useSyntheticExecutionStart = (
   return useMutation({
     mutationFn: async (data?: ISyntheticExecutionRequest) =>
       api.testing.executeSyntheticTest(conceptUuid, testUuid, data),
+    onSuccess: () => {
+      toast.success('Synthetic test started successfully');
+    },
     onError: (e: any) => {
       // Handle 409 Conflict specifically - execution already running
       if (e?.response?.status === 409) {

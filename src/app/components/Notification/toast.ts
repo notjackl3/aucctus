@@ -1,3 +1,4 @@
+import React from 'react';
 import {
   toast as reactToast,
   ToastOptions,
@@ -6,6 +7,10 @@ import {
 } from 'react-toastify';
 import { cn } from '@libs/utils/react';
 import AucctusToast from './AucctusToast';
+import ProgressToast from './ProgressToast';
+import CompletedToast from './CompletedToast';
+import SimpleSuccessToast from './SimpleSuccessToast';
+import ErrorToast from './ErrorToast';
 
 /**
  * Toast type definitions for the application
@@ -23,7 +28,7 @@ interface AucctusToastOptions extends ToastOptions {
  * Default toast configuration
  */
 const defaultOptions: ToastOptions = {
-  position: 'top-center',
+  position: 'top-right',
   autoClose: 5000,
   hideProgressBar: true,
   closeOnClick: true,
@@ -213,6 +218,133 @@ const update = (
   });
 };
 
+/**
+ * Displays a progress toast with animated hourglass and progress tracking
+ * @param title Toast title
+ * @param progress Current progress percentage (0-100)
+ * @param estimatedTime Estimated completion time in seconds
+ * @param onCancel Optional cancel handler
+ * @param onEmailMe Optional email notification handler
+ * @param emailRequested Whether email has been requested
+ * @returns The toast ID
+ */
+const progress = (
+  title: string,
+  progress: number,
+  estimatedTime?: number,
+  onCancel?: () => void,
+  onEmailMe?: () => void,
+  emailRequested?: boolean,
+): Id => {
+  return reactToast((props) => React.createElement(ProgressToast, props), {
+    ...defaultOptions,
+    autoClose: false, // Don't auto-close progress toasts
+    closeOnClick: false,
+    data: {
+      title,
+      progress,
+      estimatedTime,
+      onCancel,
+      onEmailMe,
+      emailRequested,
+    },
+  });
+};
+
+/**
+ * Updates a progress toast with new progress value
+ * @param id Toast ID to update
+ * @param progress New progress percentage (0-100)
+ * @param title Optional new title
+ * @param estimatedTime Optional new estimated time
+ * @param onCancel Optional cancel handler (preserved from original toast)
+ */
+const updateProgress = (
+  id: Id,
+  progress: number,
+  title?: string,
+  estimatedTime?: number,
+  onCancel?: () => void,
+): void => {
+  reactToast.update(id, {
+    render: (props) => React.createElement(ProgressToast, props),
+    data: {
+      title: title || 'Processing',
+      progress,
+      estimatedTime,
+      onCancel,
+    },
+  });
+};
+
+/**
+ * Displays a completed toast with confetti animation and progress bar
+ * Use this for operations that had progress tracking
+ * @param title Toast title
+ * @param description Optional description
+ * @param completedTime Time taken to complete in seconds
+ * @param onViewNow Optional view action handler
+ * @returns The toast ID
+ */
+const completed = (
+  title: string,
+  description?: string,
+  completedTime?: number,
+  onViewNow?: () => void,
+): Id => {
+  return reactToast((props) => React.createElement(CompletedToast, props), {
+    ...defaultOptions,
+    autoClose: 5000,
+    data: {
+      title,
+      description,
+      completedTime,
+      onViewNow,
+    },
+  });
+};
+
+/**
+ * Displays a simple success toast with confetti animation (no progress bar)
+ * Use this for instant success notifications like "Version Restored"
+ * @param title Toast title
+ * @param description Optional description
+ * @returns The toast ID
+ */
+const successAnimated = (title: string, description?: string): Id => {
+  return reactToast((props) => React.createElement(SimpleSuccessToast, props), {
+    ...defaultOptions,
+    autoClose: 5000,
+    data: {
+      title,
+      description,
+    },
+  });
+};
+
+/**
+ * Displays an error toast with animated error icon
+ * @param title Error title
+ * @param description Error description
+ * @param onRetry Optional retry handler
+ * @returns The toast ID
+ */
+const errorAnimated = (
+  title: string,
+  description: string,
+  onRetry?: () => void,
+): Id => {
+  return reactToast((props) => React.createElement(ErrorToast, props), {
+    ...defaultOptions,
+    autoClose: 7000, // Slightly longer for errors
+    data: {
+      title,
+      description,
+      onRetry,
+    },
+  });
+};
+
 export const toast = {
   show,
   success,
@@ -222,4 +354,10 @@ export const toast = {
   dismiss,
   dismissAll,
   update,
+  // Enhanced toast variants with animations
+  progress,
+  updateProgress,
+  completed,
+  successAnimated,
+  errorAnimated,
 };

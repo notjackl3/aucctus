@@ -66,4 +66,8 @@ export enum AucctusQueryKeys {
   /* External APIs */
   clearbitCompany = 'clearbitCompany',
   articlePublishedDate = 'articlePublishedDate',
+
+  /* Agent Timing */
+  agentTiming = 'agentTiming',
+  syntheticPipelineEstimate = 'syntheticPipelineEstimate',
 }

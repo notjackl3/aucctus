@@ -105,9 +105,9 @@ function App() {
 
         {/* Global Toast Container Configuration */}
         <ToastContainer
-          className='flex flex-col items-center rounded-lg'
+          className='flex flex-col items-end rounded-lg'
           bodyClassName='p-0'
-          position='top-center'
+          position='top-right'
           autoClose={5000}
           hideProgressBar={true}
           closeOnClick

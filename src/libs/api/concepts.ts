@@ -539,4 +539,33 @@ export class ConceptApi extends ApiService {
   async trackConceptView(conceptUuid: string): Promise<void> {
     return this.post(endpoints.conceptSeen(conceptUuid));
   }
+
+  /**
+   * Get estimated execution time for an agent based on historical data
+   * @param agentName - The name of the agent (e.g., 'SyntheticInterviewAgent')
+   * @param conceptUuid - Optional concept UUID for concept-specific timing
+   * @returns Estimated seconds and history status
+   */
+  getAgentEstimatedTime(agentName: string, conceptUuid?: string) {
+    return this.get<{
+      agentName: string;
+      estimatedSeconds: number | null;
+      hasHistory: boolean;
+    }>(endpoints.agentTiming(agentName, conceptUuid));
+  }
+
+  /**
+   * Get estimated execution time for the complete synthetic interview pipeline
+   * Calculates total time for all agents involved in synthetic testing process
+   * @param conceptUuid - Concept UUID for concept-specific timing
+   * @param numProfiles - Number of customer profiles being tested
+   * @returns Total pipeline estimated seconds and history status
+   */
+  getSyntheticPipelineEstimate(conceptUuid: string, numProfiles: number) {
+    return this.get<{
+      agentName: string;
+      estimatedSeconds: number | null;
+      hasHistory: boolean;
+    }>(endpoints.syntheticPipelineEstimate(conceptUuid, numProfiles));
+  }
 }

@@ -22,6 +22,18 @@ export class Endpoints {
 
   static conceptQuestionnaire = '/api/v1/concept/ignition/questionnaires';
 
+  static agentTiming(agentName: string, conceptUuid?: string) {
+    const baseUrl = `api/v2/concept/agent-timing/${agentName}`;
+    if (conceptUuid) {
+      return `${baseUrl}?concept_uuid=${conceptUuid}`;
+    }
+    return baseUrl;
+  }
+
+  static syntheticPipelineEstimate(conceptUuid: string, numProfiles: number) {
+    return `api/v2/concept/agent-timing/synthetic-pipeline/estimate?concept_uuid=${conceptUuid}&num_profiles=${numProfiles}`;
+  }
+
   static conceptIdentifier(identifier: string) {
     return `api/v1/concept/${identifier}/`;
   }
