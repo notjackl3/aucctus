@@ -70,3 +70,66 @@ export async function processMediaMessage(media: File | undefined) {
     filename: file.filename,
   };
 }
+
+/**
+ * Converts a base64 string to a Blob
+ * @param base64 - The base64 string (with or without data URL prefix)
+ * @param contentType - The MIME type of the content (default: 'application/pdf')
+ * @returns Blob
+ */
+export function base64ToBlob(
+  base64: string,
+  contentType: string = 'application/pdf',
+): Blob {
+  // Remove the data URL prefix if present (e.g., "data:application/pdf;base64,")
+  const base64Data = base64.includes(',') ? base64.split(',')[1] : base64;
+
+  // Decode base64 string
+  const byteCharacters = atob(base64Data);
+  const byteNumbers = new Array(byteCharacters.length);
+
+  for (let i = 0; i < byteCharacters.length; i++) {
+    byteNumbers[i] = byteCharacters.charCodeAt(i);
+  }
+
+  const byteArray = new Uint8Array(byteNumbers);
+  return new Blob([byteArray], { type: contentType });
+}
+
+/**
+ * Converts a base64 string to a File object
+ * @param base64 - The base64 string (with or without data URL prefix)
+ * @param filename - The desired filename
+ * @param contentType - The MIME type of the content (default: 'application/pdf')
+ * @returns File
+ */
+export function base64ToFile(
+  base64: string,
+  filename: string = 'download.pdf',
+  contentType: string = 'application/pdf',
+): File {
+  const blob = base64ToBlob(base64, contentType);
+  return new File([blob], filename, { type: contentType });
+}
+
+/**
+ * Downloads a file from a base64 string
+ * @param base64 - The base64 string (with or without data URL prefix)
+ * @param filename - The desired filename for the downloaded file
+ * @param contentType - The MIME type of the content (default: 'application/pdf')
+ */
+export function downloadBase64File(
+  base64: string,
+  filename: string = 'download.pdf',
+  contentType: string = 'application/pdf',
+): void {
+  const blob = base64ToBlob(base64, contentType);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}

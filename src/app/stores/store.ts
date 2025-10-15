@@ -24,6 +24,7 @@ import testCollateralSlice, {
 import nucleusAnswerSlice, {
   INucleusAnswerState,
 } from './nucleus-answer/store';
+import magicShareSlice, { IMagicShareState } from './magic-share/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -36,6 +37,7 @@ export interface IAppStore {
   debugMode: IDebugModeState;
   testCollateral: ITestCollateralState;
   nucleusAnswer: INucleusAnswerState;
+  magicShare: IMagicShareState;
 }
 
 export interface IStoreApi<S> {
@@ -58,6 +60,7 @@ const useStore = create<IAppStore>()(
         debugMode: debugModeSlice,
         testCollateral: testCollateralSlice,
         nucleusAnswer: nucleusAnswerSlice,
+        magicShare: magicShareSlice,
       }),
     ),
     {
@@ -106,6 +109,7 @@ const useStore = create<IAppStore>()(
           conceptReport: state.conceptReport,
           financialProjection: state.financialProjection,
           testCollateral: state.testCollateral,
+          magicShare: state.magicShare, // Now safe to persist - snapshotUrl is just a URL, not base64
         }),
         merge: (persistedState: unknown, currentState: IAppStore): IAppStore =>
           mergeDeep(currentState, persistedState as IAppStore),

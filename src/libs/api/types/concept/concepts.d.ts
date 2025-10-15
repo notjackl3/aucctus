@@ -180,6 +180,10 @@ export interface IConcept extends IBaseConceptEntity {
   conceptImageUrl?: string;
 }
 
+export interface IConceptSnapshotDownloadServiceReady {
+  ready: boolean;
+}
+
 export interface IConceptOverview extends IBaseConceptEntity {
   text: string;
   valueProposition: string;

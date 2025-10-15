@@ -29,6 +29,7 @@ import {
   ITrendsAndDrivers,
   IUserJourneyStep,
   QuestionFieldType,
+  IConceptSnapshotDownloadServiceReady,
 } from './types'; // Import the missing type
 import {
   IConceptVersionList,
@@ -91,19 +92,20 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  getConceptSnapshotDownloadServiceReady() {
+    return this.get<IConceptSnapshotDownloadServiceReady>(
+      endpoints.conceptSnapshotDownloadServiceReady(),
+    );
+  }
+
   generateConceptVideo(conceptUuid: string) {
     return this.post<{ detail: string; task_id: string }>(
       endpoints.conceptVideoGenerate(conceptUuid),
     );
   }
 
-  downloadConcept(uuid: string) {
-    return this.get<BlobPart>(endpoints.conceptSnapshotUuid(uuid), {
-      headers: {
-        Accept: 'application/pdf',
-      },
-      responseType: 'blob', // Ensure response is treated as binary data
-    });
+  downloadConcept(uuid: string, payload?: { editInstructions?: string }) {
+    return this.post(endpoints.conceptSnapshotUuid(uuid), payload);
   }
 
   retryReport(uuid: string) {

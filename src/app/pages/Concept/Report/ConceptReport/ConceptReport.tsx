@@ -9,26 +9,18 @@ import {
   useTrackConceptView,
 } from '@hooks/query/concepts.hook';
 import { useRoutePattern } from '@hooks/router.hook';
-import api from '@libs/api';
-import {
-  downloadPdf,
-  generateConceptSnapshotFileName,
-} from '@libs/utils/files';
 import { useEffect, useRef } from 'react';
-
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-
 import { toast } from '@components';
 import ConceptVersionsButton from '@components/Button/ConceptVersionsButton';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
-import { FunctionComponent, useCallback, useMemo, useState } from 'react';
+import { FunctionComponent, useCallback, useMemo } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
-import { useDebugMode } from '@hooks/debug-mode.hook';
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
@@ -79,7 +71,6 @@ const ConceptReport: FunctionComponent = () => {
   const { id: conceptIdentifier } = useParams();
   const navigate = useNavigate();
   const activeTab = useRoutePattern();
-  const account = useStore((state) => state.auth.account);
   const { title: titleEdit } = useEditConcept();
   const { mutate: trackConceptView } = useTrackConceptView();
   const hasTrackedView = useRef(false);
@@ -93,8 +84,8 @@ const ConceptReport: FunctionComponent = () => {
   const conceptUuid = useMemo(() => concept?.uuid || '', [concept]);
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
-  const [isLoading, setIsLoading] = useState(false);
   const { openModal, closeModal } = useModal();
+
   const setActiveConcept = useStore(
     (state) => state.conceptReport.setActiveConcept,
   );
@@ -102,7 +93,6 @@ const ConceptReport: FunctionComponent = () => {
     useCommitConceptVersionRevert();
   const { mutate: cancelConceptVersionRevert, isLoading: isCancelling } =
     useCancelConceptVersionRevert();
-  const isDebugModeEnabled = useDebugMode();
 
   // Build tabs dynamically based on concept feature version
   const conceptTabs = useMemo(() => {
@@ -144,23 +134,20 @@ const ConceptReport: FunctionComponent = () => {
     [conceptIdentifier, navigate],
   );
 
-  const onSnapshotClick = useCallback(async () => {
-    if (conceptUuid === undefined) return;
-    setIsLoading(true);
-
-    try {
-      const pdf = await api.concept.downloadConcept(conceptUuid);
-      const fileName = generateConceptSnapshotFileName(
-        account?.name || '',
-        concept?.title || '',
-      );
-      await downloadPdf(pdf, fileName);
-    } catch (error) {
-      toast.error('Failed to download snapshot.');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [conceptUuid, account?.name, concept?.title]);
+  const onMagicShareClick = useCallback(() => {
+    openModal(
+      Modal.MagicShare,
+      {
+        conceptUuid,
+      },
+      {
+        position: 'center',
+        shouldCloseOnOverlayClick: true,
+        shouldCloseOnEscape: true,
+        modalClassName: 'max-w-xl',
+      },
+    );
+  }, [openModal, conceptUuid]);
 
   const changeConceptStatus = useCallback(
     (value: string) => {
@@ -214,47 +201,41 @@ const ConceptReport: FunctionComponent = () => {
               FEATURE_CONCEPT_VERSIONING && (
                 <ConceptVersionsButton conceptUuid={conceptUuid} />
               )}
-            {isDebugModeEnabled && concept && !concept.isHistoricalVersion && (
-              <button
-                aria-label='Download Opportunity Snapshot'
-                className='btn btn-bold aucctus-text-brand-primary group whitespace-nowrap hover:bg-primary-900 hover:text-white'
-                onClick={onSnapshotClick}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loading isSmall />
-                ) : (
-                  <Icon
-                    variant='download-cloud'
-                    height={20}
-                    width={20}
-                    className='stroke-primary-900 transition-colors duration-300 group-hover:stroke-primary-100'
-                  />
-                )}
-                Opportunity Snapshot
-              </button>
-            )}
             {!concept?.isHistoricalVersion && (
-              <div className='group relative'>
+              <>
                 <button
-                  onClick={() =>
-                    openModal(
-                      Modal.AiEditing,
-                      {},
-                      {
-                        position: 'right',
-                        modalClassName: 'max-h-[90vh]',
-                        hideBodyScroll: true,
-                        shouldCloseOnOverlayClick: true,
-                        shouldCloseOnEscape: true,
-                      },
-                    )
-                  }
-                  className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+                  onClick={onMagicShareClick}
+                  className='flex items-center gap-2 rounded-lg px-4 py-2 text-white transition-opacity hover:opacity-90'
+                  style={{ backgroundColor: '#120C0C' }}
+                  aria-label='Magic Share'
                 >
-                  Refine
+                  <Icon
+                    variant='threeStars'
+                    className='h-4 w-4 fill-white stroke-white'
+                  />
+                  Magic Share
                 </button>
-              </div>
+                <div className='group relative'>
+                  <button
+                    onClick={() =>
+                      openModal(
+                        Modal.AiEditing,
+                        {},
+                        {
+                          position: 'right',
+                          modalClassName: 'max-h-[90vh]',
+                          hideBodyScroll: true,
+                          shouldCloseOnOverlayClick: true,
+                          shouldCloseOnEscape: true,
+                        },
+                      )
+                    }
+                    className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+                  >
+                    Refine
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>

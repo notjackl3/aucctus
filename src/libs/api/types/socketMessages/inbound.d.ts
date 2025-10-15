@@ -582,6 +582,39 @@ export interface INucleusAnswerErrorMessage extends BaseSocketEvent {
   details?: any;
 }
 
+// Magic Share Event Messages
+export interface IMagicShareProgressMessage extends BaseSocketEvent {
+  type: 'magic_share.progress.account';
+  accountUuid: string;
+  conceptUuid: string;
+  stage:
+    | 'started'
+    | 'gathering_data'
+    | 'generating_html'
+    | 'generating_pdf'
+    | 'uploading'
+    | 'completed';
+  message: string;
+  progress?: number;
+}
+
+export interface IMagicShareCompletedMessage extends BaseSocketEvent {
+  type: 'magic_share.completed.account';
+  accountUuid: string;
+  conceptUuid: string;
+  snapshotUrl: string;
+  file?: string;
+}
+
+export interface IMagicShareErrorMessage extends BaseSocketEvent {
+  type: 'magic_share.error.account';
+  accountUuid: string;
+  conceptUuid: string;
+  message: string;
+  errorCode?: string;
+  details?: any;
+}
+
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -628,6 +661,9 @@ export type InboundSocketEvent<C = {}> =
   | INucleusUploadErrorMessage
   | INucleusAnswerProgressMessage
   | INucleusAnswerCompletedMessage
-  | INucleusAnswerErrorMessage;
+  | INucleusAnswerErrorMessage
+  | IMagicShareProgressMessage
+  | IMagicShareCompletedMessage
+  | IMagicShareErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

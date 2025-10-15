@@ -42,6 +42,10 @@ export class Endpoints {
     return `api/v1/concept/${conceptUuid}/snapshot/download`;
   }
 
+  static conceptSnapshotDownloadServiceReady() {
+    return `api/v1/concept/snapshot/download/service/status`;
+  }
+
   static conceptReportRetry(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/retry`;
   }

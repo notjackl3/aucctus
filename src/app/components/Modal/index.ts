@@ -20,6 +20,7 @@ import AddQuestionModal from './Nucleus/AddQuestionModal';
 import EditQuestionModal from './Nucleus/EditQuestionModal';
 import AddAnswerModal from './Nucleus/AddAnswerModal';
 import EditAnswerModal from './Nucleus/EditAnswerModal';
+import MagicShare from './MagicShareModal/MagicShareModal';
 
 const Modal = {
   Base,
@@ -42,6 +43,7 @@ const Modal = {
   EditQuestionModal,
   AddAnswerModal,
   EditAnswerModal,
+  MagicShare,
 };
 
 export default Modal;

@@ -1,0 +1,581 @@
+import React, { useState, useCallback, useMemo } from 'react';
+import { Icon, toast } from '@components';
+import { useModal } from '../../../context/ModalContextProvider';
+import { cn } from '@libs/utils/react';
+import magicShareBg from '../../../assets/magic-share-background.png';
+import api from '@libs/api';
+import useStore from '@stores/store';
+
+interface MagicShareModalProps {
+  conceptUuid: string;
+}
+
+type ShareFormat = 'pdf' | 'powerpoint' | 'video';
+
+interface PresetOption {
+  id: string;
+  title: string;
+  format: ShareFormat;
+  description: string;
+}
+
+const PRESET_OPTIONS: PresetOption[] = [
+  {
+    id: 'executive',
+    title: 'Exec 1-Pager',
+    format: 'pdf',
+    description: 'Create an executive one-pager for this concept.',
+  },
+  // Disabled for now - will be enabled when PowerPoint generation is ready
+  // {
+  //   id: 'pitch',
+  //   title: '10 Slide Pitch Deck',
+  //   format: 'powerpoint',
+  //   description: 'A comprehensive presentation for stakeholders',
+  // },
+  // {
+  //   id: 'promo',
+  //   title: 'Promotional Video',
+  //   format: 'video',
+  //   description: 'An engaging video showcasing your concept',
+  // },
+];
+
+const FORMAT_OPTIONS: Array<{
+  value: ShareFormat;
+  label: string;
+  icon: IconVariant;
+  enabled: boolean;
+}> = [
+  { value: 'pdf', label: 'PDF', icon: 'pdf', enabled: true },
+  {
+    value: 'powerpoint',
+    label: 'PowerPoint',
+    icon: 'presentation-chart',
+    enabled: false,
+  },
+  { value: 'video', label: 'Video', icon: 'play-square', enabled: false },
+];
+
+const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
+  const { closeModal } = useModal();
+  const [description, setDescription] = useState('');
+  const [format, setFormat] = useState<ShareFormat>('pdf');
+  const [isTyping, setIsTyping] = useState(false);
+  const [carouselScrollLeft, setCarouselScrollLeft] = useState(0);
+  const carouselRef = React.useRef<HTMLDivElement>(null);
+
+  // Get data from Zustand store
+  // This automatically restores progress if modal is reopened during generation
+  const shareProgress = useStore((state) =>
+    state.magicShare.getShareProgress(conceptUuid),
+  );
+
+  // Derive state from Zustand store
+  const progress = shareProgress?.progress ?? 0;
+  const isComplete =
+    progress >= 100 ||
+    (shareProgress?.stage === 'completed' && !!shareProgress.snapshotUrl);
+  const isGenerating =
+    shareProgress !== undefined &&
+    !isComplete &&
+    shareProgress.stage !== undefined;
+
+  // Map progress stages to user-friendly messages
+  const progressMessage = useMemo(() => {
+    if (!shareProgress) return 'Processing...';
+
+    const stageMessages: Record<string, string> = {
+      started: 'Starting generation...',
+      gathering_data: 'Gathering concept data...',
+      generating_html: 'Generating HTML...',
+      generating_pdf: 'Generating PDF...',
+      uploading: 'Uploading document...',
+      completed: 'Generation complete!',
+    };
+
+    return (
+      stageMessages[shareProgress.stage] ||
+      shareProgress.message ||
+      'Processing...'
+    );
+  }, [shareProgress]);
+
+  // Generate title based on format
+  const generatedTitle = useMemo(() => {
+    const formatOption = FORMAT_OPTIONS.find((o) => o.value === format);
+    return formatOption?.label || 'Document';
+  }, [format]);
+
+  const handlePresetClick = useCallback((preset: PresetOption) => {
+    if (preset.id === 'executive') {
+      // Typing animation for executive preset
+      setDescription('');
+      setFormat(preset.format);
+      setIsTyping(true);
+
+      const textToType = preset.description;
+      let index = 0;
+
+      const typeInterval = setInterval(() => {
+        if (index < textToType.length) {
+          setDescription(textToType.slice(0, index + 1));
+          index++;
+        } else {
+          setIsTyping(false);
+          clearInterval(typeInterval);
+        }
+      }, 3);
+    } else {
+      setDescription(preset.description);
+      setFormat(preset.format);
+    }
+  }, []);
+
+  const scrollPrev = useCallback(() => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  }, []);
+
+  const scrollNext = useCallback(() => {
+    if (carouselRef.current) {
+      carouselRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  }, []);
+
+  const handleScroll = useCallback(() => {
+    if (carouselRef.current) {
+      setCarouselScrollLeft(carouselRef.current.scrollLeft);
+    }
+  }, []);
+
+  const canScrollLeft = useMemo(
+    () => carouselScrollLeft > 0,
+    [carouselScrollLeft],
+  );
+  const canScrollRight = useMemo(() => {
+    if (!carouselRef.current) return false;
+    return (
+      carouselScrollLeft <
+      carouselRef.current.scrollWidth - carouselRef.current.clientWidth
+    );
+  }, [carouselScrollLeft]);
+
+  const clearShareProgress = useStore(
+    (state) => state.magicShare.clearShareProgress,
+  );
+
+  const handleGenerate = useCallback(async () => {
+    if (!conceptUuid) {
+      toast.error('Concept UUID is required');
+      return;
+    }
+
+    try {
+      await api.concept.downloadConcept(conceptUuid, {
+        editInstructions: description.trim(),
+      });
+
+      toast.success(
+        'Magic Share requested!',
+        'Your document will be generated shortly.',
+        { autoClose: 4000 },
+      );
+    } catch (error) {
+      toast.error('Failed to generate document. Please try again.');
+      clearShareProgress(conceptUuid);
+    }
+  }, [conceptUuid, description, clearShareProgress]);
+
+  const handleRestart = useCallback(() => {
+    // Clear progress from Zustand store
+    clearShareProgress(conceptUuid);
+
+    // Reset local state
+    setDescription('');
+  }, [conceptUuid, clearShareProgress]);
+
+  const handleDownload = useCallback(() => {
+    if (shareProgress?.snapshotUrl) {
+      // Open the snapshot URL in a new tab to trigger download
+      window.open(shareProgress.snapshotUrl, '_blank');
+
+      toast.success('Download started', 'Your Magic Share document is ready!');
+
+      // Clear progress and reset state
+      clearShareProgress(conceptUuid);
+      setDescription('');
+    } else {
+      toast.error('No file available', 'Please try generating again.');
+    }
+
+    closeModal();
+  }, [shareProgress, closeModal, clearShareProgress, conceptUuid]);
+
+  const getFormatIcon = useCallback((formatValue: ShareFormat) => {
+    return FORMAT_OPTIONS.find((o) => o.value === formatValue)?.icon || 'file';
+  }, []);
+
+  return (
+    <div className='flex w-full max-w-xl flex-col overflow-hidden'>
+      {/* Hero Section with Floating Cards */}
+      <div
+        className={cn(
+          'relative flex items-center justify-center overflow-hidden bg-cover bg-center transition-all duration-700',
+          isGenerating || isComplete ? 'h-64' : 'h-56',
+        )}
+        style={{ backgroundImage: `url(${magicShareBg})` }}
+      >
+        {/* Restart Button - top left when complete */}
+        {isComplete && (
+          <button
+            onClick={handleRestart}
+            className='group absolute left-4 top-4 z-50 flex h-8 items-center gap-1.5 rounded-full px-3 transition-colors hover:bg-white/20'
+            aria-label='Restart'
+          >
+            <Icon
+              variant='refresh'
+              className='h-3.5 w-3.5 stroke-white/70 group-hover:stroke-white'
+            />
+            <span className='text-sm font-medium text-white/70 group-hover:text-white'>
+              Restart
+            </span>
+          </button>
+        )}
+
+        {/* Close Button */}
+        <button
+          onClick={closeModal}
+          className='group absolute right-4 top-4 z-50 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/20'
+          aria-label='Close'
+        >
+          <Icon
+            variant='closeX'
+            className='h-4 w-4 stroke-white/70 group-hover:stroke-white'
+          />
+        </button>
+
+        {/* Floating Cards */}
+        <div className='absolute inset-0 flex items-center justify-center'>
+          {/* PDF Card */}
+          <div
+            className={cn(
+              'absolute left-1/4 -rotate-12 transition-transform duration-700',
+              isGenerating || isComplete ? 'translate-y-2' : 'translate-y-4',
+            )}
+          >
+            <div className='flex h-32 w-24 flex-col rounded-lg border border-white/20 bg-white/10 p-2.5 shadow-2xl backdrop-blur-md'>
+              <div className='h-1.5 w-full rounded bg-white/40'></div>
+              <div className='mt-1 h-1 w-3/4 rounded bg-white/30'></div>
+              <div className='mt-1.5 flex flex-1 flex-col gap-1'>
+                <div className='h-2 rounded bg-white/20'></div>
+                <div className='h-2 rounded bg-white/15'></div>
+                <div className='h-2 rounded bg-white/15'></div>
+                <div className='h-2 rounded bg-white/10'></div>
+              </div>
+              <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
+                <Icon
+                  variant='pdf'
+                  className='aucctus-stroke-white h-3.5 w-3.5'
+                />
+                <span className='aucctus-text-white text-[10px] font-medium'>
+                  PDF
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* PowerPoint Card */}
+          <div
+            className={cn(
+              'absolute left-1/2 z-10 -translate-x-1/2 rotate-0 transition-transform duration-700',
+              isGenerating || isComplete ? '-translate-y-2' : 'translate-y-0',
+            )}
+          >
+            <div className='flex h-36 w-28 flex-col rounded-lg border border-white/30 bg-white/15 p-2.5 shadow-2xl backdrop-blur-md'>
+              <div className='relative flex-1 overflow-hidden'>
+                <div className='flex flex-col gap-1.5'>
+                  <div className='aspect-video rounded border border-red-400/30 bg-gradient-to-br from-red-600/30 to-red-700/20 p-1.5'>
+                    <div className='mb-1 h-1 w-2/3 rounded bg-red-300/40'></div>
+                    <div className='h-0.5 w-1/2 rounded bg-red-300/30'></div>
+                  </div>
+                  <div className='aspect-video rounded border border-orange-400/30 bg-gradient-to-br from-orange-500/30 to-red-500/20 p-1.5'>
+                    <div className='mb-1 h-1 w-2/3 rounded bg-orange-300/40'></div>
+                    <div className='h-0.5 w-1/2 rounded bg-orange-300/30'></div>
+                  </div>
+                  <div className='aspect-video rounded border border-pink-400/30 bg-gradient-to-br from-pink-500/30 to-pink-600/20 p-1.5'>
+                    <div className='mb-1 h-1 w-2/3 rounded bg-pink-300/40'></div>
+                    <div className='h-0.5 w-1/2 rounded bg-pink-300/30'></div>
+                  </div>
+                </div>
+                <div className='via-white/8 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/15 via-30% to-transparent'></div>
+              </div>
+              <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
+                <Icon
+                  variant='presentation-chart'
+                  className='aucctus-stroke-orange-200 h-3.5 w-3.5'
+                />
+                <span className='text-[10px] font-medium text-orange-200/90'>
+                  PPT
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Video Card */}
+          <div
+            className={cn(
+              'absolute right-1/4 rotate-12 transition-transform duration-700',
+              isGenerating || isComplete ? 'translate-y-2' : 'translate-y-4',
+            )}
+          >
+            <div className='flex h-32 w-24 flex-col rounded-lg border border-white/20 bg-white/10 p-2.5 shadow-2xl backdrop-blur-md'>
+              <div className='flex flex-1 items-center justify-center'>
+                <div className='relative flex h-12 w-20 items-center justify-center rounded bg-gradient-to-br from-pink-600/30 to-rose-600/30'>
+                  <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white/90'>
+                    <Icon
+                      variant='play-square'
+                      className='ml-0.5 h-4 w-4 fill-pink-600 text-pink-600'
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
+                <Icon
+                  variant='play-square'
+                  className='aucctus-stroke-pink-200 h-3.5 w-3.5'
+                />
+                <span className='text-[10px] font-medium text-pink-200/80'>
+                  MOV
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Generation/Completion Section */}
+      {(isGenerating || isComplete) && (
+        <div className='aucctus-bg-primary animate-fade-in px-6 pb-6 pt-2'>
+          <div className='flex items-center gap-6'>
+            {/* Preview Icon */}
+            <div className='flex h-20 w-20 flex-shrink-0 flex-col items-center justify-center gap-1 rounded-lg bg-gradient-to-br from-pink-100 to-orange-100'>
+              <Icon
+                variant={getFormatIcon(format)}
+                className='h-8 w-8 text-pink-600'
+              />
+              <span className='aucctus-text-xs-semibold text-pink-600'>
+                {FORMAT_OPTIONS.find((o) => o.value === format)?.label}
+              </span>
+            </div>
+
+            {/* Content */}
+            <div className='flex-1'>
+              <h3 className='aucctus-text-primary aucctus-text-xl-bold'>
+                {isComplete
+                  ? generatedTitle
+                  : `Generating ${generatedTitle}...`}
+              </h3>
+
+              {/* Fun message below title */}
+              <p className='aucctus-text-secondary aucctus-text-sm mb-1.5 mt-0.5'>
+                {isComplete
+                  ? "Boom! That would've taken your intern 3 hours."
+                  : progressMessage}
+              </p>
+
+              {/* Progress Bar */}
+              <div className='relative w-[100%]'>
+                <div className='aucctus-bg-tertiary h-3 overflow-hidden rounded'>
+                  <div
+                    className={cn(
+                      'h-full transition-all duration-300',
+                      isComplete
+                        ? 'bg-green-600 bg-[linear-gradient(45deg,rgba(255,255,255,.08)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.08)_50%,rgba(255,255,255,.08)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem]'
+                        : 'bg-gradient-to-r from-pink-500 to-orange-500',
+                    )}
+                    style={{ width: isComplete ? '100%' : `${progress}%` }}
+                  >
+                    {/* Striped animation - only during generation */}
+                    {!isComplete && (
+                      <div className='absolute inset-0 animate-[shimmer_2s_linear_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%]'></div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Checkmark at end when complete */}
+                {isComplete && (
+                  <div className='absolute -right-1 top-1/2 flex h-5 w-5 -translate-y-1/2 transform items-center justify-center rounded-full border-[3px] border-white bg-green-600'>
+                    <Icon
+                      variant='check'
+                      className='aucctus-stroke-white h-3 w-3'
+                      strokeWidth={3}
+                    />
+                  </div>
+                )}
+              </div>
+
+              {/* Progress percentage below progress bar */}
+              <p className='aucctus-text-secondary aucctus-text-xs mt-1'>
+                {isComplete ? 'Completed' : `${Math.round(progress)}%`}
+              </p>
+            </div>
+
+            {/* Download Button */}
+            {
+              <button
+                onClick={handleDownload}
+                className='btn btn-primary btn-sm h-9 flex-shrink-0 px-3'
+                disabled={!isComplete}
+              >
+                {!isComplete ? 'Generating...' : 'Download'}
+              </button>
+            }
+          </div>
+        </div>
+      )}
+
+      {/* Content Section */}
+      {!isGenerating && !isComplete && (
+        <div className='aucctus-bg-primary max-h-[calc(90vh-14rem)] space-y-4 overflow-y-auto p-6'>
+          {/* Title */}
+          <div className='text-center'>
+            <div className='mb-2 flex items-center justify-center gap-2'>
+              <span className='text-2xl'>✨</span>
+              <h2 className='aucctus-text-primary aucctus-header-lg-bold leading-tight'>
+                Magic Share
+              </h2>
+            </div>
+            <p className='aucctus-text-secondary aucctus-text-xl mb-8'>
+              Share anything from your concept, instantly
+            </p>
+          </div>
+
+          {/* Description Input with Integrated Suggestions */}
+          <div className='aucctus-border-secondary focus-within:aucctus-border-brand overflow-hidden rounded-md border transition-colors'>
+            <textarea
+              placeholder='Describe what you want to share and who you want to share it with'
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className='aucctus-bg-primary aucctus-text-primary placeholder:aucctus-text-placeholder min-h-[120px] w-full resize-none rounded-none border-0 p-3 text-base focus:outline-none focus:ring-0'
+              autoFocus
+              disabled={isTyping}
+            />
+
+            {/* Quick Suggestions Carousel */}
+            <div className='aucctus-bg-brand-primary/5 aucctus-border-primary border-t px-2 py-3'>
+              <div className='flex items-center gap-2'>
+                <div
+                  className='flex-1 overflow-hidden'
+                  ref={carouselRef}
+                  onScroll={handleScroll}
+                >
+                  <div className='flex gap-2'>
+                    {PRESET_OPTIONS.map((preset) => (
+                      <button
+                        key={preset.id}
+                        onClick={() => handlePresetClick(preset)}
+                        className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary aucctus-text-sm-medium hover:aucctus-bg-primary-hover flex-shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 transition-colors'
+                      >
+                        {preset.title}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className='flex flex-shrink-0 items-center gap-0.5'>
+                  <button
+                    onClick={scrollPrev}
+                    disabled={!canScrollLeft}
+                    className='aucctus-bg-primary-hover flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:opacity-50'
+                    aria-label='Previous suggestions'
+                  >
+                    <Icon
+                      variant='chevronleft'
+                      className='aucctus-stroke-secondary h-3.5 w-3.5'
+                    />
+                  </button>
+
+                  <button
+                    onClick={scrollNext}
+                    disabled={!canScrollRight}
+                    className='aucctus-bg-primary-hover flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:opacity-50'
+                    aria-label='Next suggestions'
+                  >
+                    <Icon
+                      variant='chevronright'
+                      className='aucctus-stroke-secondary h-3.5 w-3.5'
+                    />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Format Selection */}
+          <div>
+            <div className='grid grid-cols-3 gap-2'>
+              {FORMAT_OPTIONS.map((option) => (
+                <button
+                  key={option.value}
+                  onClick={() => option.enabled && setFormat(option.value)}
+                  disabled={!option.enabled}
+                  className={cn(
+                    'aucctus-border-secondary flex items-center justify-center gap-2 rounded-md border p-3 transition-colors',
+                    !option.enabled &&
+                      'aucctus-bg-disabled cursor-not-allowed opacity-50',
+                    option.enabled && format === option.value
+                      ? 'aucctus-bg-brand-primary/5 aucctus-border-brand'
+                      : option.enabled && 'aucctus-bg-primary-hover',
+                  )}
+                >
+                  <Icon
+                    variant={option.icon}
+                    className={cn(
+                      'h-4 w-4',
+                      option.enabled
+                        ? 'aucctus-stroke-primary'
+                        : 'aucctus-stroke-disabled',
+                    )}
+                  />
+                  <span
+                    className={cn(
+                      'aucctus-text-sm-medium',
+                      option.enabled
+                        ? 'aucctus-text-primary'
+                        : 'aucctus-text-disabled',
+                    )}
+                  >
+                    {option.label}
+                  </span>
+                  {!option.enabled && (
+                    <span className='aucctus-text-disabled aucctus-text-xs ml-1'>
+                      (Soon)
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div>
+            <button
+              onClick={handleGenerate}
+              // disabled={!description.trim()}
+              className={cn(
+                'btn btn-primary w-full',
+                // !description.trim() && 'btn-disabled',
+              )}
+            >
+              Generate
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default React.memo(MagicShareModal);

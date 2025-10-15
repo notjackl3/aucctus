@@ -1558,6 +1558,22 @@ export const useTrackConceptView = () => {
   });
 };
 
+/**
+ * Custom hook for checking concept snapshot download service availability.
+ * Only runs when debug mode is enabled.
+ * @returns An object containing service status and loading state.
+ */
+export const useConceptSnapshotServiceStatus = (
+  isDebugModeEnabled: boolean,
+) => {
+  return useQuery({
+    queryKey: [AucctusQueryKeys.conceptSnapshotServiceStatus],
+    queryFn: async () =>
+      await api.concept.getConceptSnapshotDownloadServiceReady(),
+    enabled: isDebugModeEnabled,
+  });
+};
+
 // V2 Assumption Lifecycle Hooks
 
 /**
