@@ -118,14 +118,16 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
         ref={internalRef}
         name={name}
       />
-      {maxLength ? (
-        <span
-          className={`${styles.characterCount} ${characterCountErrorStyle}`}
-        >
-          {characterCount}/{maxLength}
-        </span>
-      ) : null}
       {showHint ? <div className={styles.hintText}>{hintText}</div> : null}
+      {maxLength ? (
+        <div className={styles.characterCountContainer}>
+          <span
+            className={`${styles.characterCount} ${characterCountErrorStyle}`}
+          >
+            {characterCount}/{maxLength}
+          </span>
+        </div>
+      ) : null}
     </div>
   );
 };

@@ -88,27 +88,36 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
         }
       }
 
-      // Validate and set errors
+      // Validate and set errors - only validate if source has any content
       const errors: { title?: string; url?: string; description?: string } = {};
+      const source = updatedSources[index];
+      const hasAnyContent =
+        source.title.trim() || source.url.trim() || source.description.trim();
 
-      if (field === 'title') {
-        if (!value.trim()) {
-          errors.title = 'Title is required.';
-        } else if (value.length > MAX_SOURCE_TITLE_LENGTH) {
-          errors.title = 'Title exceeds the maximum allowed length.';
+      if (hasAnyContent) {
+        if (field === 'title') {
+          if (!value.trim()) {
+            errors.title = 'Title is required.';
+          } else if (value.length > MAX_SOURCE_TITLE_LENGTH) {
+            errors.title = 'Title exceeds the maximum allowed length.';
+          }
         }
-      }
 
-      if (field === 'url') {
-        if (!value.trim()) {
-          errors.url = 'URL is required.';
-        } else if (!validateUrl(value)) {
-          errors.url = 'Invalid URL format.';
+        if (field === 'url') {
+          if (!value.trim()) {
+            errors.url = 'URL is required.';
+          } else if (!validateUrl(value)) {
+            errors.url = 'Invalid URL format.';
+          }
         }
-      }
 
-      if (field === 'description' && value.length > MAX_SOURCE_SUMMARY_LENGTH) {
-        errors.description = 'Description exceeds the maximum allowed length.';
+        if (
+          field === 'description' &&
+          value.length > MAX_SOURCE_SUMMARY_LENGTH
+        ) {
+          errors.description =
+            'Description exceeds the maximum allowed length.';
+        }
       }
 
       if (Object.keys(errors).length > 0) {
@@ -129,7 +138,7 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
 
   const removeSource = useCallback(
     (index: number) => {
-      if (sources.length > 1) {
+      if (sources.length > 0) {
         const updatedSources = sources.filter((_, i) => i !== index);
         setSources(updatedSources);
 
@@ -167,38 +176,43 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
       isValid = false;
     }
 
-    // Validate sources
+    // Validate sources - only validate sources that have any content
     sources.forEach((source, index) => {
-      const sourceError: {
-        title?: string;
-        url?: string;
-        description?: string;
-      } = {};
+      const hasAnyContent =
+        source.title.trim() || source.url.trim() || source.description.trim();
 
-      if (!source.title.trim()) {
-        sourceError.title = 'Title is required.';
-        isValid = false;
-      } else if (source.title.length > MAX_SOURCE_TITLE_LENGTH) {
-        sourceError.title = 'Title exceeds the maximum allowed length.';
-        isValid = false;
-      }
+      if (hasAnyContent) {
+        const sourceError: {
+          title?: string;
+          url?: string;
+          description?: string;
+        } = {};
 
-      if (!source.url.trim()) {
-        sourceError.url = 'URL is required.';
-        isValid = false;
-      } else if (!validateUrl(source.url)) {
-        sourceError.url = 'Invalid URL format.';
-        isValid = false;
-      }
+        if (!source.title.trim()) {
+          sourceError.title = 'Title is required.';
+          isValid = false;
+        } else if (source.title.length > MAX_SOURCE_TITLE_LENGTH) {
+          sourceError.title = 'Title exceeds the maximum allowed length.';
+          isValid = false;
+        }
 
-      if (source.description.length > MAX_SOURCE_SUMMARY_LENGTH) {
-        sourceError.description =
-          'Description exceeds the maximum allowed length.';
-        isValid = false;
-      }
+        if (!source.url.trim()) {
+          sourceError.url = 'URL is required.';
+          isValid = false;
+        } else if (!validateUrl(source.url)) {
+          sourceError.url = 'Invalid URL format.';
+          isValid = false;
+        }
 
-      if (Object.keys(sourceError).length > 0) {
-        errors[index] = sourceError;
+        if (source.description.length > MAX_SOURCE_SUMMARY_LENGTH) {
+          sourceError.description =
+            'Description exceeds the maximum allowed length.';
+          isValid = false;
+        }
+
+        if (Object.keys(sourceError).length > 0) {
+          errors[index] = sourceError;
+        }
       }
     });
 
@@ -216,11 +230,18 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
 
       const submissionData = {
         answer: answerText.trim(),
-        sources: sources.map((source) => ({
-          title: source.title.trim(),
-          url: source.url.trim(),
-          description: source.description.trim() || undefined,
-        })),
+        sources: sources
+          .filter(
+            (source) =>
+              source.title.trim() ||
+              source.url.trim() ||
+              source.description.trim(),
+          )
+          .map((source) => ({
+            title: source.title.trim(),
+            url: source.url.trim(),
+            description: source.description.trim() || undefined,
+          })),
       };
 
       updateAnswer(
@@ -254,10 +275,12 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
 
   const isFormValid =
     answerText.trim() &&
-    sources.length > 0 &&
-    sources.every(
-      (s) => s.title.trim() && s.url.trim() && validateUrl(s.url),
-    ) &&
+    // Allow empty sources, but if sources exist with content, they must be valid
+    sources.every((s) => {
+      const hasContent = s.title.trim() || s.url.trim() || s.description.trim();
+      if (!hasContent) return true; // Empty sources are valid
+      return s.title.trim() && s.url.trim() && validateUrl(s.url);
+    }) &&
     !answerError &&
     Object.keys(sourceErrors).length === 0;
 
@@ -305,7 +328,7 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
         <div className='flex flex-col gap-4'>
           <div className='flex items-center justify-between'>
             <h3 className='aucctus-text-md-semibold aucctus-text-primary'>
-              Sources *
+              Sources (Optional)
             </h3>
             <button
               type='button'

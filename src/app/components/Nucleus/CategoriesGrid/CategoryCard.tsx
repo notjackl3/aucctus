@@ -188,10 +188,11 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
         )}
       >
         {/* Category Header */}
-        <button
-          type='button'
+        <div
+          role='button'
+          tabIndex={0}
           className={cn(
-            'w-full cursor-pointer p-4 text-left transition-all duration-300 ease-in-out focus:outline-none',
+            'w-full cursor-pointer p-4 text-left transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-blue-500',
             {
               'aucctus-bg-secondary-subtle aucctus-border-secondary border-b shadow-sm':
                 isExpanded,
@@ -232,6 +233,13 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 });
               });
             });
+          }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              e.stopPropagation();
+              onToggleExpand(isExpanded ? null : category.sectionType);
+            }
           }}
           aria-expanded={isExpanded}
           aria-controls={`category-content-${category.sectionType}`}
@@ -685,7 +693,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
               </div>
             </div>
           )}
-        </button>
+        </div>
 
         {/* Expanded Content */}
         <div

@@ -59,38 +59,42 @@ const validateAnswerData = (
     errors.push('Answer must be 2000 characters or less');
   }
 
-  if (!data.sources || data.sources.length === 0) {
-    errors.push('At least one source is required');
-  }
-
-  if (data.sources) {
+  // Sources are optional, only validate if they exist and have content
+  if (data.sources && data.sources.length > 0) {
     data.sources.forEach((source, index) => {
-      if (!source.title || source.title.trim() === '') {
-        errors.push(`Source ${index + 1}: Title is required`);
-      }
+      const hasAnyContent =
+        source.title?.trim() ||
+        source.url?.trim() ||
+        source.description?.trim();
 
-      if (source.title && source.title.length > 200) {
-        errors.push(
-          `Source ${index + 1}: Title must be 200 characters or less`,
-        );
-      }
-
-      if (!source.url || source.url.trim() === '') {
-        errors.push(`Source ${index + 1}: URL is required`);
-      }
-
-      if (source.url) {
-        try {
-          new URL(source.url);
-        } catch {
-          errors.push(`Source ${index + 1}: Invalid URL format`);
+      if (hasAnyContent) {
+        if (!source.title || source.title.trim() === '') {
+          errors.push(`Source ${index + 1}: Title is required`);
         }
-      }
 
-      if (source.description && source.description.length > 500) {
-        errors.push(
-          `Source ${index + 1}: Description must be 500 characters or less`,
-        );
+        if (source.title && source.title.length > 200) {
+          errors.push(
+            `Source ${index + 1}: Title must be 200 characters or less`,
+          );
+        }
+
+        if (!source.url || source.url.trim() === '') {
+          errors.push(`Source ${index + 1}: URL is required`);
+        }
+
+        if (source.url) {
+          try {
+            new URL(source.url);
+          } catch {
+            errors.push(`Source ${index + 1}: Invalid URL format`);
+          }
+        }
+
+        if (source.description && source.description.length > 500) {
+          errors.push(
+            `Source ${index + 1}: Description must be 500 characters or less`,
+          );
+        }
       }
     });
   }
