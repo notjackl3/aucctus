@@ -397,6 +397,51 @@ export const useCreateTestCollateral = () => {
 };
 
 /**
+ * Upload user-provided image collateral.
+ */
+export const useUploadTestCollateralImage = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      testUuid: string;
+      file: File;
+      title?: string;
+      description?: string;
+      order?: number;
+    }) => {
+      const { conceptUuid, testUuid, file, title, description, order } = params;
+
+      return await api.testing.uploadTestCollateralImage(
+        conceptUuid,
+        testUuid,
+        file,
+        {
+          title,
+          description,
+          order,
+        },
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testCollateral,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      toast.success('Collateral uploaded successfully');
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to upload collateral. Please try again.');
+    },
+  });
+};
+
+/**
  * Custom hook for updating test collateral.
  * @returns The result of the useMutation hook.
  */

@@ -353,6 +353,10 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/collateral/${collateralUuid}`;
   }
 
+  static conceptTestCollateralUpload(conceptUuid: string, testUuid: string) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/collateral/upload-image`;
+  }
+
   static conceptTestParticipants(conceptUuid: string, testUuid: string) {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/participants`;
   }

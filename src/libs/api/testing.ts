@@ -109,6 +109,42 @@ export class TestingApi extends ApiService {
     );
   }
 
+  async uploadTestCollateralImage(
+    conceptUuid: string,
+    testUuid: string,
+    file: File,
+    options?: { title?: string; description?: string; order?: number },
+  ): Promise<ITestCollateral> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    if (options?.title) {
+      formData.append('title', options.title);
+    }
+
+    if (options?.description) {
+      formData.append('description', options.description);
+    }
+
+    if (
+      options?.order !== undefined &&
+      options.order !== null &&
+      !Number.isNaN(options.order)
+    ) {
+      formData.append('order', String(options.order));
+    }
+
+    return this.post<ITestCollateral>(
+      endpoints.conceptTestCollateralUpload(conceptUuid, testUuid),
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+  }
+
   async updateTestCollateral(
     conceptUuid: string,
     testUuid: string,
