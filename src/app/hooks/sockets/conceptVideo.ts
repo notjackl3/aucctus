@@ -153,7 +153,10 @@ export const useConceptVideoGenerationEvents = (
         });
 
         onComplete?.(data.videoUrl);
-        toast.success('Concept video generated successfully');
+        toast.completed(
+          'Video Generated',
+          'Your concept video has been created successfully',
+        );
       },
       [conceptUuid, queryClient, onComplete],
     ),
@@ -176,7 +179,10 @@ export const useConceptVideoGenerationEvents = (
           error: data.errorMessage,
         });
 
-        toast.error(`Video generation failed: ${data.errorMessage}`);
+        toast.errorAnimated(
+          'Video Generation Failed',
+          data.errorMessage || 'An error occurred while generating the video',
+        );
       },
       [conceptUuid],
     ),

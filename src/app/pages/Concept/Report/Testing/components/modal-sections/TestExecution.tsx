@@ -99,7 +99,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
       onExecutionNotFound: () => {
         // 404 from polling means execution was cancelled or expired
         resetExecution();
-        toast.info('Execution was cancelled or expired');
+        toast.info('Execution Cancelled', 'Execution was cancelled or expired');
       },
     },
   );
@@ -139,6 +139,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           error: undefined,
           quotes: [],
           completedProfileUuids: new Set<string>(),
+          startTime: undefined,
         };
       }
 
@@ -160,6 +161,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         quotes: executionState.quotes || [], // Include quotes from WebSocket state
         completedProfileUuids:
           executionState.completedProfileUuids || new Set<string>(), // Include completed profiles from WebSocket state
+        startTime: executionState.startTime, // Include startTime from WebSocket state
       };
     }
 
@@ -186,6 +188,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           totalPersonas: undefined,
           error: undefined,
           quotes: [],
+          startTime: undefined,
         };
       }
 
@@ -205,6 +208,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           ? JSON.stringify(persistentStatus.error)
           : undefined,
         quotes: executionState.quotes || [], // Include quotes from WebSocket state
+        startTime: executionState.startTime, // Include startTime from WebSocket state
       };
     }
 
@@ -276,7 +280,10 @@ const TestExecution: React.FC<TestExecutionProps> = ({
   // Handlers for real-time execution
   const handleExecuteSynthetic = async (config: ISyntheticExecutionRequest) => {
     if (!conceptUuid || !testUuid) {
-      toast.error('Missing test information. Please try again.');
+      toast.errorAnimated(
+        'Missing Test Information',
+        'Missing test information. Please try again',
+      );
       return;
     }
 
@@ -479,6 +486,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             isInitializing={isInitializing}
             isExecuting={startExecution.isLoading}
             estimatedSeconds={timingData?.estimatedSeconds ?? null}
+            startTime={displayState.startTime}
             quotes={displayState.quotes}
             completedProfileUuids={displayState.completedProfileUuids}
             onCancel={handleCancelExecution}

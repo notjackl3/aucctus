@@ -10,6 +10,7 @@ interface RunningTestCardProps {
   conceptUuid?: string;
   numProfiles: number;
   estimatedSeconds?: number | null;
+  startTime?: number;
 }
 
 export const RunningTestCard: React.FC<RunningTestCardProps> = ({
@@ -20,6 +21,7 @@ export const RunningTestCard: React.FC<RunningTestCardProps> = ({
   conceptUuid,
   numProfiles,
   estimatedSeconds: propEstimatedSeconds,
+  startTime,
 }) => {
   const [stageMessage, setStageMessage] = useState<string>('');
   const prevStageRef = useRef('');
@@ -104,6 +106,7 @@ export const RunningTestCard: React.FC<RunningTestCardProps> = ({
             theme='warning'
             size='lg'
             isLoading={isInitializing}
+            startTime={startTime}
           />
         </div>
       </div>

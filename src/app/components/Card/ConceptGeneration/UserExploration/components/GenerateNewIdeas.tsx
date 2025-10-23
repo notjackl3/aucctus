@@ -143,7 +143,10 @@ const GenerateNewIdeas: React.FC = () => {
               });
             },
             onError: () => {
-              toast.error('Error saving concept seed draft');
+              toast.errorAnimated(
+                'Save Failed',
+                'Could not save concept seed draft.',
+              );
             },
           },
         );
@@ -173,7 +176,10 @@ const GenerateNewIdeas: React.FC = () => {
               });
             },
             onError: () => {
-              toast.error('Error saving concept seed draft');
+              toast.errorAnimated(
+                'Save Failed',
+                'Could not save concept seed draft.',
+              );
             },
           },
         );

@@ -96,11 +96,17 @@ export const useCreateTestDetail = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
-      toast.success('Test created successfully');
+      toast.successAnimated(
+        'Test Created',
+        'Your test has been created successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to create test. Please try again.');
+      toast.errorAnimated(
+        'Test Creation Failed',
+        message || 'Unable to create test. Please try again',
+      );
     },
   });
 };
@@ -132,11 +138,17 @@ export const useUpdateTestDetail = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Test updated successfully');
+      toast.successAnimated(
+        'Test Updated',
+        'Your test has been updated successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to update test. Please try again.');
+      toast.errorAnimated(
+        'Test Update Failed',
+        message || 'Unable to update test. Please try again',
+      );
     },
   });
 };
@@ -164,13 +176,17 @@ export const useCompleteTestDetail = () => {
           variables.testUuid,
         ],
       });
-      toast.success(
-        'Test completed successfully! A new test has been generated.',
+      toast.completed(
+        'Test Completed',
+        'A new test has been generated for you',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to complete test. Please try again.');
+      toast.errorAnimated(
+        'Test Completion Failed',
+        message || 'Unable to complete test. Please try again',
+      );
     },
   });
 };
@@ -191,11 +207,17 @@ export const useDeleteTestDetail = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
-      toast.success('Test deleted successfully');
+      toast.successAnimated(
+        'Test Deleted',
+        'Your test has been removed successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete test. Please try again.');
+      toast.errorAnimated(
+        'Test Deletion Failed',
+        message || 'Unable to delete test. Please try again',
+      );
     },
   });
 };
@@ -287,7 +309,10 @@ export const useCreateTestCollateral = () => {
         ],
       });
 
-      toast.success('Collateral created successfully');
+      toast.successAnimated(
+        'Collateral Created',
+        'Test collateral has been added successfully',
+      );
     },
   );
 
@@ -305,7 +330,10 @@ export const useCreateTestCollateral = () => {
         collateralUuid: data.collateralUuid || prev.collateralUuid,
       }));
 
-      toast.error(data.message || 'Failed to create collateral');
+      toast.errorAnimated(
+        'Collateral Creation Failed',
+        data.message || 'Unable to create collateral',
+      );
     },
   );
 
@@ -346,7 +374,10 @@ export const useCreateTestCollateral = () => {
         error: message || 'Failed to create collateral. Please try again.',
         collateralUuid: undefined,
       });
-      toast.error(message || 'Failed to create collateral. Please try again.');
+      toast.errorAnimated(
+        'Collateral Creation Failed',
+        message || 'Unable to create collateral. Please try again',
+      );
     },
   });
 
@@ -395,11 +426,17 @@ export const useUpdateTestCollateral = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Collateral updated successfully');
+      toast.successAnimated(
+        'Collateral Updated',
+        'Test collateral has been updated successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to update collateral. Please try again.');
+      toast.errorAnimated(
+        'Collateral Update Failed',
+        message || 'Unable to update collateral. Please try again',
+      );
     },
   });
 };
@@ -432,11 +469,17 @@ export const useDeleteTestCollateral = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Collateral deleted successfully');
+      toast.successAnimated(
+        'Collateral Deleted',
+        'Test collateral has been removed successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete collateral. Please try again.');
+      toast.errorAnimated(
+        'Collateral Deletion Failed',
+        message || 'Unable to delete collateral. Please try again',
+      );
     },
   });
 };
@@ -496,11 +539,17 @@ export const useCreateTestParticipant = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Participant added successfully');
+      toast.successAnimated(
+        'Participant Added',
+        'Test participant has been added successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to add participant. Please try again.');
+      toast.errorAnimated(
+        'Participant Addition Failed',
+        message || 'Unable to add participant. Please try again',
+      );
     },
   });
 };
@@ -535,11 +584,17 @@ export const useUpdateTestParticipant = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Participant updated successfully');
+      toast.successAnimated(
+        'Participant Updated',
+        'Test participant has been updated successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to update participant. Please try again.');
+      toast.errorAnimated(
+        'Participant Update Failed',
+        message || 'Unable to update participant. Please try again',
+      );
     },
   });
 };
@@ -572,11 +627,17 @@ export const useDeleteTestParticipant = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Participant removed successfully');
+      toast.successAnimated(
+        'Participant Removed',
+        'Test participant has been removed successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to remove participant. Please try again.');
+      toast.errorAnimated(
+        'Participant Removal Failed',
+        message || 'Unable to remove participant. Please try again',
+      );
     },
   });
 };
@@ -632,11 +693,17 @@ export const useCreateTestResult = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Result uploaded successfully');
+      toast.successAnimated(
+        'Result Uploaded',
+        'Test result has been uploaded successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to upload result. Please try again.');
+      toast.errorAnimated(
+        'Result Upload Failed',
+        message || 'Unable to upload result. Please try again',
+      );
     },
   });
 };
@@ -689,11 +756,17 @@ export const useCreateTestResultWithFiles = () => {
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
 
-      toast.success(`${variables.files.length} files uploaded successfully`);
+      toast.successAnimated(
+        'Files Uploaded',
+        `${variables.files.length} file${variables.files.length > 1 ? 's' : ''} uploaded successfully`,
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to upload files. Please try again.');
+      toast.errorAnimated(
+        'File Upload Failed',
+        message || 'Unable to upload files. Please try again',
+      );
     },
   });
 };
@@ -760,16 +833,23 @@ export const useUpdateTestResult = () => {
           queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
         });
 
-        toast.success(
-          `Result updated with ${variables.files.length} additional files`,
+        toast.successAnimated(
+          'Result Updated',
+          `Added ${variables.files.length} additional file${variables.files.length > 1 ? 's' : ''} to result`,
         );
       } else {
-        toast.success('Result updated successfully');
+        toast.successAnimated(
+          'Result Updated',
+          'Test result has been updated successfully',
+        );
       }
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to update result. Please try again.');
+      toast.errorAnimated(
+        'Result Update Failed',
+        message || 'Unable to update result. Please try again',
+      );
     },
   });
 };
@@ -822,14 +902,16 @@ export const useUpdateTestResultWithFiles = () => {
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
 
-      toast.success(
-        `Result updated with ${variables.files.length} additional files`,
+      toast.successAnimated(
+        'Files Added',
+        `Added ${variables.files.length} file${variables.files.length > 1 ? 's' : ''} to result`,
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Failed to update result with files. Please try again.',
+      toast.errorAnimated(
+        'File Addition Failed',
+        message || 'Unable to update result with files. Please try again',
       );
     },
   });
@@ -863,11 +945,17 @@ export const useDeleteTestResult = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Result deleted successfully');
+      toast.successAnimated(
+        'Result Deleted',
+        'Test result has been removed successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete result. Please try again.');
+      toast.errorAnimated(
+        'Result Deletion Failed',
+        message || 'Unable to delete result. Please try again',
+      );
     },
   });
 };
@@ -906,7 +994,10 @@ export const useDeleteTestResultSilent = () => {
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       // Still show error toasts since those are important
-      toast.error(message || 'Failed to delete result. Please try again.');
+      toast.errorAnimated(
+        'Result Deletion Failed',
+        message || 'Unable to delete result. Please try again',
+      );
     },
   });
 };
@@ -941,11 +1032,17 @@ export const useDeleteTestResultFile = () => {
           variables.testUuid,
         ],
       });
-      toast.success('File deleted successfully');
+      toast.successAnimated(
+        'File Deleted',
+        'Test result file has been removed successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete file. Please try again.');
+      toast.errorAnimated(
+        'File Deletion Failed',
+        message || 'Unable to delete file. Please try again',
+      );
     },
   });
 };
@@ -986,7 +1083,10 @@ export const useDeleteTestResultFileSilent = () => {
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       // Still show error toasts since those are important
-      toast.error(message || 'Failed to delete file. Please try again.');
+      toast.errorAnimated(
+        'File Deletion Failed',
+        message || 'Unable to delete file. Please try again',
+      );
     },
   });
 };
@@ -1046,11 +1146,17 @@ export const useCreateTestAssumption = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Assumption linked successfully');
+      toast.successAnimated(
+        'Assumption Linked',
+        'Test assumption has been linked successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to link assumption. Please try again.');
+      toast.errorAnimated(
+        'Assumption Link Failed',
+        message || 'Unable to link assumption. Please try again',
+      );
     },
   });
 };
@@ -1095,12 +1201,16 @@ export const useUpdateTestAssumption = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
-      toast.success('Assumption validation updated successfully');
+      toast.successAnimated(
+        'Validation Updated',
+        'Assumption validation has been updated successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Failed to update assumption validation. Please try again.',
+      toast.errorAnimated(
+        'Validation Update Failed',
+        message || 'Unable to update assumption validation. Please try again',
       );
     },
   });
@@ -1134,11 +1244,17 @@ export const useDeleteTestAssumption = () => {
           variables.testUuid,
         ],
       });
-      toast.success('Assumption unlinked successfully');
+      toast.successAnimated(
+        'Assumption Unlinked',
+        'Test assumption has been unlinked successfully',
+      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to unlink assumption. Please try again.');
+      toast.errorAnimated(
+        'Assumption Unlink Failed',
+        message || 'Unable to unlink assumption. Please try again',
+      );
     },
   });
 };
@@ -1172,12 +1288,18 @@ export const useTestCollateralRequest = (
       },
       {
         onSuccess: () => {
-          toast.success('Collateral request submitted successfully!');
+          toast.successAnimated(
+            'Request Submitted',
+            'Your collateral request has been submitted successfully',
+          );
           setCustomRequest(''); // Clear input on success
         },
         onError: (error) => {
           const errorMessage = utils.osiris.parseFormError(error);
-          toast.error(errorMessage || 'Failed to submit collateral request');
+          toast.errorAnimated(
+            'Request Submission Failed',
+            errorMessage || 'Unable to submit collateral request',
+          );
         },
       },
     );
@@ -1326,7 +1448,10 @@ export const useTestCollateralManager = (
         ],
       });
 
-      toast.success('Feedback submitted successfully!');
+      toast.successAnimated(
+        'Feedback Submitted',
+        'Your feedback has been submitted successfully',
+      );
 
       // Call the callback to update the selectedItem
       if (onFeedbackSuccess) {
@@ -1351,7 +1476,10 @@ export const useTestCollateralManager = (
         });
       }
 
-      toast.error(data.message || 'Failed to process feedback');
+      toast.errorAnimated(
+        'Feedback Processing Failed',
+        data.message || 'Unable to process feedback',
+      );
     },
   );
 
@@ -1403,7 +1531,10 @@ export const useTestCollateralManager = (
         collateralUuid: variables.collateralUuid,
       });
 
-      toast.error(message || 'Failed to submit feedback. Please try again.');
+      toast.errorAnimated(
+        'Feedback Submission Failed',
+        message || 'Unable to submit feedback. Please try again',
+      );
     },
   });
 

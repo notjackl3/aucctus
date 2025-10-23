@@ -77,18 +77,16 @@ const CustomerProfile: FunctionComponent = () => {
 
     generateCustomerProfile(activeConceptIdentifier, {
       onSuccess: () => {
-        toast.success(
+        toast.successAnimated(
+          'Customer Profile Generated',
           '👥 Customer Profile generated successfully!',
-          undefined,
-          {
-            autoClose: 2000,
-          },
         );
       },
       onError: () => {
-        toast.error('❌ Failed to generate Customer Profile', undefined, {
-          autoClose: 2000,
-        });
+        toast.errorAnimated(
+          'Customer Profile Failed',
+          '❌ Failed to generate Customer Profile',
+        );
       },
     });
   };

@@ -41,27 +41,39 @@ const Login: FunctionComponent = () => {
 
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
-        toast.success('Successfully signed in!');
+        toast.successAnimated(
+          'Sign In Successful',
+          'Welcome back! You have been signed in successfully',
+        );
         // Don't navigate immediately - let AuthBootstrap handle routing after user data is loaded
       } else {
         // Handle multi-factor auth or other verification steps
         telemetry.log('Additional verification required:', result);
-        toast.error('Additional verification required');
+        toast.errorAnimated(
+          'Additional Verification Required',
+          'Please complete additional verification steps to continue',
+        );
       }
     } catch (err: any) {
       telemetry.error('Sign-in error:', err);
       const code = err?.errors?.[0]?.code;
       if (code === 'strategy_for_user_invalid') {
         // Migrated user without a password: redirect to Forgot Password to set one
-        toast.info('This account requires a password reset to sign in.');
+        toast.info(
+          'Password Reset Required',
+          'This account requires a password reset to sign in.',
+        );
         const query = `${email ? `?email=${encodeURIComponent(email)}` : ''}${email ? '&' : '?'}resetRequired=1`;
         navigate(`${AppPath.ForgotPassword}${query}`);
         return;
       }
       if (err.errors?.[0]?.message) {
-        toast.error(err.errors[0].message);
+        toast.errorAnimated('Sign In Failed', err.errors[0].message);
       } else {
-        toast.error('Sign-in failed. Please try again.');
+        toast.errorAnimated(
+          'Sign In Failed',
+          'Unable to sign in. Please check your credentials and try again',
+        );
       }
     } finally {
       setIsLoading(false);

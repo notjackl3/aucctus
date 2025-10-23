@@ -88,6 +88,12 @@ export interface AgentProgressBarProps {
    * Callback when progress completes
    */
   onComplete?: () => void;
+
+  /**
+   * Start time (Unix timestamp) for progress calculation
+   * Used to persist timing across component remounts
+   */
+  startTime?: number;
 }
 
 /**
@@ -140,8 +146,9 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   theme = 'brand',
   isLoading = false,
   onComplete,
+  startTime: initialStartTime,
 }) => {
-  const startTimeRef = useRef<number>(Date.now());
+  const startTimeRef = useRef<number>(initialStartTime || Date.now());
   const [smartRemainingTime, setSmartRemainingTime] = useState<number | null>(
     null,
   );

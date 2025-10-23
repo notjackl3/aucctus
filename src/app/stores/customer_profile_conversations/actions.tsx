@@ -87,7 +87,10 @@ export async function sendMessage(
   let error = false;
 
   if (!customerProfileUuid) {
-    toast.error('Unable to find Customer Profile to start conversation.');
+    toast.errorAnimated(
+      'Customer Profile Not Found',
+      'Unable to find Customer Profile to start conversation.',
+    );
     telemetry.debug('Customer Profile Send Message Profile Not Found', {
       customerProfileUuid,
     });
@@ -95,7 +98,10 @@ export async function sendMessage(
   }
 
   if (!conceptUuid) {
-    toast.error('Unable to find Concept associated with this profile.');
+    toast.errorAnimated(
+      'Concept Not Found',
+      'Unable to find Concept associated with this profile.',
+    );
     telemetry.debug('Customer Profile Send Message Concept Not Found', {
       conceptUuid,
     });
@@ -103,7 +109,7 @@ export async function sendMessage(
   }
 
   if (!currentMessage && !currentMediaUpload) {
-    toast.error('No message to send.');
+    toast.errorAnimated('No Message', 'No message to send.');
     telemetry.debug('Customer Profile Send Message No Message', {
       currentMessage,
       currentMediaUpload,
@@ -206,7 +212,7 @@ export function handleMessage(
   const conceptUuid = storeApi.getState().conceptReport.conceptUuid;
 
   if (handshake.conceptUuid !== conceptUuid) {
-    toast.error('Unable to find Concept to edit.');
+    toast.errorAnimated('Concept Not Found', 'Unable to find Concept to edit.');
 
     telemetry.debug(
       'Customer Profile Conversation Handshake Concept Mismatch',

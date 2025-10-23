@@ -95,7 +95,10 @@ export const useConceptGeneration = (uuid: string) => {
     onSuccess: () => {},
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Concept generation failed. Please try again.');
+      toast.errorAnimated(
+        'Concept Generation Failed',
+        message || 'Unable to generate concept. Please try again',
+      );
     },
   });
 };
@@ -111,7 +114,10 @@ export const useConceptAiEditing = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Concept edit request failed. Please try again.');
+      toast.errorAnimated(
+        'Concept Edit Failed',
+        message || 'Unable to edit concept. Please try again',
+      );
     },
   });
 };
@@ -125,14 +131,15 @@ export const useGenerateKeyAssumptions = () => {
     onSuccess: () => {
       doFullConceptInvalidation(queryClient);
       toast.warning(
-        'Key assumptions and tests generation started',
-        'This may take up to 10 minutes. You can navigate away.',
+        'Generation Started',
+        'Key assumptions and tests generation started. This may take up to 10 minutes. You can navigate away.',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Key assumptions generation failed. Please try again.',
+      toast.errorAnimated(
+        'Key Assumptions Generation Failed',
+        message || 'Unable to generate key assumptions. Please try again',
       );
     },
   });
@@ -153,8 +160,9 @@ export const useGenerateCustomerProfile = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Customer profile generation failed. Please try again.',
+      toast.errorAnimated(
+        'Customer Profile Generation Failed',
+        message || 'Unable to generate customer profile. Please try again',
       );
     },
   });
@@ -175,8 +183,9 @@ export const useGenerateMarketScan = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Market scan generation failed. Please try again.',
+      toast.errorAnimated(
+        'Market Scan Generation Failed',
+        message || 'Unable to generate market scan. Please try again',
       );
     },
   });
@@ -201,7 +210,10 @@ export const useGenerateConceptOverview = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Overview generation failed. Please try again.');
+      toast.errorAnimated(
+        'Overview Generation Failed',
+        message || 'Unable to generate overview. Please try again',
+      );
     },
   });
 };
@@ -416,11 +428,17 @@ export const useConceptVideoGenerate = (conceptUuid: string) => {
     },
     onSuccess: () => {
       // Query will be invalidated when WebSocket completion message is received
-      toast.success('Video generation started');
+      toast.successAnimated(
+        'Video Generation Started',
+        'Your concept video is being generated',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to start video generation');
+      toast.errorAnimated(
+        'Video Generation Failed',
+        message || 'Unable to start video generation',
+      );
     },
   });
 };
@@ -452,7 +470,10 @@ export const useSaveGeneratedConcepts = (seedUuid: string) => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
     },
     onError: () => {
-      toast.error('Concepts could not be saved. Please try again later.');
+      toast.errorAnimated(
+        'Save Failed',
+        'Concepts could not be saved. Please try again later',
+      );
     },
   });
 };
@@ -589,8 +610,9 @@ export const useConceptCustomerProfileConversationList = (
         return; // Don't show error toast for 404 responses
       }
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Failed to search conversation. Please try again.',
+      toast.errorAnimated(
+        'Search Failed',
+        message || 'Unable to search conversation. Please try again',
       );
     },
   });
@@ -666,9 +688,9 @@ export const useCustomerProfileRealWorldSignalCreate = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message ||
-          'Failed to create real world signal. Please try again later.',
+      toast.errorAnimated(
+        'Signal Creation Failed',
+        message || 'Unable to create real world signal. Please try again later',
       );
     },
   });
@@ -700,9 +722,9 @@ export const useCustomerProfileRealWorldSignalUpdate = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message ||
-          'Failed to update real world signal. Please try again later.',
+      toast.errorAnimated(
+        'Signal Update Failed',
+        message || 'Unable to update real world signal. Please try again later',
       );
     },
   });
@@ -729,9 +751,9 @@ export const useCustomerProfileRealWorldSignalDelete = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message ||
-          'Failed to delete real world signal. Please try again later.',
+      toast.errorAnimated(
+        'Signal Deletion Failed',
+        message || 'Unable to delete real world signal. Please try again later',
       );
     },
   });
@@ -786,7 +808,7 @@ const createConceptMutation = () => {
       },
       onError: (e) => {
         const message = utils.osiris.parseFormError(e);
-        toast.error(message);
+        toast.errorAnimated('Operation Failed', message || 'An error occurred');
       },
     });
   };
@@ -846,11 +868,17 @@ export const useConceptReportCancel = () => {
       await api.concept.cancelReport(conceptUuid),
     onSuccess: () => {
       doFullConceptInvalidation(queryClient);
-      toast.success('Report generation cancelled successfully');
+      toast.successAnimated(
+        'Report Cancelled',
+        'Report generation has been stopped successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to cancel report generation');
+      toast.errorAnimated(
+        'Cancellation Failed',
+        message || 'Unable to cancel report generation',
+      );
     },
   });
 };
@@ -1039,7 +1067,7 @@ export const useSeedUpdate = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message);
+      toast.errorAnimated('Operation Failed', message || 'An error occurred');
     },
   });
 };
@@ -1053,11 +1081,17 @@ export const useSaveConceptVersion = () => {
     mutationFn: async (uuid: string) =>
       await api.concept.saveConceptVersion(uuid),
     onSuccess: () => {
-      toast.success('Concept version saved successfully');
+      toast.successAnimated(
+        'Version Saved',
+        'Your concept version has been saved successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to save concept version');
+      toast.errorAnimated(
+        'Version Save Failed',
+        message || 'Unable to save concept version',
+      );
     },
   });
 };
@@ -1100,7 +1134,10 @@ export const useRevertConceptVersion = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to view historical version');
+      toast.errorAnimated(
+        'Version Revert Failed',
+        message || 'Unable to revert to historical version',
+      );
     },
   });
 };
@@ -1125,11 +1162,17 @@ export const useCommitConceptVersionRevert = () => {
 
     onSuccess: () => {
       doFullConceptInvalidation(queryClient);
-      toast.success('Concept version revert committed successfully');
+      toast.successAnimated(
+        'Version Restored',
+        'Your concept has been restored to the selected version',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to commit concept version revert');
+      toast.errorAnimated(
+        'Version Restore Failed',
+        message || 'Unable to restore concept version',
+      );
     },
   });
 };
@@ -1150,7 +1193,10 @@ export const useCancelConceptVersionRevert = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to cancel concept version revert');
+      toast.errorAnimated(
+        'Cancel Revert Failed',
+        message || 'Unable to cancel version revert',
+      );
     },
   });
 };
@@ -1201,11 +1247,17 @@ export const useCustomerJobCreate = (customerProfileUuid: string) => {
           'jobs',
         ],
       });
-      toast.success('Job created');
+      toast.successAnimated(
+        'Job Created',
+        'Customer job has been added successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to create job');
+      toast.errorAnimated(
+        'Job Creation Failed',
+        message || 'Unable to create customer job',
+      );
     },
   });
 };
@@ -1233,11 +1285,17 @@ export const useCustomerJobUpdate = () => {
           'jobs',
         ],
       });
-      toast.success('Job updated');
+      toast.successAnimated(
+        'Job Updated',
+        'Customer job has been updated successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to update job');
+      toast.errorAnimated(
+        'Job Update Failed',
+        message || 'Unable to update customer job',
+      );
     },
   });
 };
@@ -1260,11 +1318,17 @@ export const useCustomerJobDelete = () => {
           'jobs',
         ],
       });
-      toast.success('Job deleted');
+      toast.successAnimated(
+        'Job Deleted',
+        'Customer job has been removed successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete job');
+      toast.errorAnimated(
+        'Job Deletion Failed',
+        message || 'Unable to delete customer job',
+      );
     },
   });
 };
@@ -1315,11 +1379,17 @@ export const useCustomerPainCreate = (customerProfileUuid: string) => {
           'pains',
         ],
       });
-      toast.success('Pain point created');
+      toast.successAnimated(
+        'Pain Created',
+        'Customer pain point has been added successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to create pain point');
+      toast.errorAnimated(
+        'Pain Creation Failed',
+        message || 'Unable to create pain point',
+      );
     },
   });
 };
@@ -1347,11 +1417,17 @@ export const useCustomerPainUpdate = () => {
           'pains',
         ],
       });
-      toast.success('Pain point updated');
+      toast.successAnimated(
+        'Pain Updated',
+        'Customer pain point has been updated successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to update pain point');
+      toast.errorAnimated(
+        'Pain Update Failed',
+        message || 'Unable to update pain point',
+      );
     },
   });
 };
@@ -1377,11 +1453,17 @@ export const useCustomerPainDelete = () => {
           'pains',
         ],
       });
-      toast.success('Pain point deleted');
+      toast.successAnimated(
+        'Pain Deleted',
+        'Customer pain point has been removed successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete pain point');
+      toast.errorAnimated(
+        'Pain Deletion Failed',
+        message || 'Unable to delete pain point',
+      );
     },
   });
 };
@@ -1466,11 +1548,17 @@ export const useCustomerJourneyStepCreate = (customerProfileUuid: string) => {
           'journey-steps',
         ],
       });
-      toast.success('Journey step created');
+      toast.successAnimated(
+        'Journey Step Created',
+        'Step has been added to the customer journey',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to create journey step');
+      toast.errorAnimated(
+        'Journey Step Creation Failed',
+        message || 'Unable to create journey step',
+      );
     },
   });
 };
@@ -1498,11 +1586,17 @@ export const useCustomerJourneyStepUpdate = () => {
           'journey-steps',
         ],
       });
-      toast.success('Journey step updated');
+      toast.successAnimated(
+        'Journey Step Updated',
+        'Step has been updated successfully',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to update journey step');
+      toast.errorAnimated(
+        'Journey Step Update Failed',
+        message || 'Unable to update journey step',
+      );
     },
   });
 };
@@ -1528,11 +1622,17 @@ export const useCustomerJourneyStepDelete = () => {
           'journey-steps',
         ],
       });
-      toast.success('Journey step deleted');
+      toast.successAnimated(
+        'Journey Step Deleted',
+        'Step has been removed from the customer journey',
+      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete journey step');
+      toast.errorAnimated(
+        'Journey Step Deletion Failed',
+        message || 'Unable to delete journey step',
+      );
     },
   });
 };
@@ -1600,13 +1700,17 @@ export const useAssumptionAdd = () => {
           variables.rootIdentifier,
         ],
       });
-      toast.success(
-        'Assumption added successfully. Tests are being regenerated.',
+      toast.successAnimated(
+        'Assumption Added',
+        'Tests are being regenerated for your new assumption',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to add assumption. Please try again.');
+      toast.errorAnimated(
+        'Assumption Addition Failed',
+        message || 'Unable to add assumption. Please try again',
+      );
     },
   });
 };
@@ -1640,13 +1744,17 @@ export const useAssumptionUpdate = () => {
           variables.rootIdentifier,
         ],
       });
-      toast.success(
-        'Assumption updated successfully. Tests are being regenerated.',
+      toast.successAnimated(
+        'Assumption Updated',
+        'Tests are being regenerated for your updated assumption',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to update assumption. Please try again.');
+      toast.errorAnimated(
+        'Assumption Update Failed',
+        message || 'Unable to update assumption. Please try again',
+      );
     },
   });
 };
@@ -1678,13 +1786,17 @@ export const useAssumptionRemove = () => {
           variables.rootIdentifier,
         ],
       });
-      toast.success(
-        'Assumption removed successfully. Tests are being regenerated.',
+      toast.successAnimated(
+        'Assumption Removed',
+        'Tests are being regenerated with the updated assumptions',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to remove assumption. Please try again.');
+      toast.errorAnimated(
+        'Assumption Removal Failed',
+        message || 'Unable to remove assumption. Please try again',
+      );
     },
   });
 };

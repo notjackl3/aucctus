@@ -5,7 +5,6 @@ import {
   isClerkRuntimeError,
   isReverificationCancelledError,
 } from '@clerk/clerk-react/errors';
-import { defaultToastConfig } from '../../../../libs/toast';
 import Icon from '../../../components/Icon/Icon/Icon';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 
@@ -72,17 +71,19 @@ const SecurityDetails: FunctionComponent = () => {
       // This will trigger reverification if needed, then execute performPasswordUpdate
       await updatePasswordWithReverification();
 
-      toast.success(
+      toast.successAnimated(
+        'Password Updated',
         'Password updated successfully!',
-        undefined,
-        defaultToastConfig,
       );
       resetFormState();
       setIsFormDisabled(true);
     } catch (error: any) {
       // Handle if user cancels the reverification process
       if (isClerkRuntimeError(error) && isReverificationCancelledError(error)) {
-        toast.info('Password update was cancelled.');
+        toast.info(
+          'Password Update Cancelled',
+          'Password update was cancelled',
+        );
         setCurrentPasswordError('');
         return;
       }
@@ -108,10 +109,9 @@ const SecurityDetails: FunctionComponent = () => {
         );
       }
 
-      toast.error(
+      toast.errorAnimated(
+        'Password Update Failed',
         'Password could not be updated. Please try again later.',
-        undefined,
-        defaultToastConfig,
       );
     } finally {
       setIsLoading(false);

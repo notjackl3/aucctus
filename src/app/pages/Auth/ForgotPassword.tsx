@@ -33,7 +33,10 @@ const ForgotPassword: FunctionComponent = () => {
     if (!signInLoaded || !signIn) return;
 
     if (!email?.trim()) {
-      toast.error('Email is required');
+      toast.errorAnimated(
+        'Email Required',
+        'Please enter your email address to continue',
+      );
       return;
     }
 
@@ -55,7 +58,8 @@ const ForgotPassword: FunctionComponent = () => {
         identifier: email.trim(),
       });
 
-      toast.success(
+      toast.successAnimated(
+        'Reset Code Sent',
         resetRequired
           ? 'Password reset required. Check your email for the reset code.'
           : 'Password reset code sent to your email!',
@@ -66,13 +70,17 @@ const ForgotPassword: FunctionComponent = () => {
       telemetry.error('Password reset request error:', err);
 
       if (err.errors?.[0]?.code === 'form_identifier_not_found') {
-        toast.error(
+        toast.errorAnimated(
+          'Account Not Found',
           'No account found with this email address. Please check your email or sign up for a new account.',
         );
       } else if (err.errors?.[0]?.message) {
-        toast.error(err.errors[0].message);
+        toast.errorAnimated('Reset Code Failed', err.errors[0].message);
       } else {
-        toast.error('Failed to send reset code. Please try again.');
+        toast.errorAnimated(
+          'Reset Code Failed',
+          'Unable to send reset code. Please try again',
+        );
       }
     } finally {
       setIsLoading(false);

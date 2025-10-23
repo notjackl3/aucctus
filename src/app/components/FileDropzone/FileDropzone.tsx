@@ -122,7 +122,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
       // Validate all files first
       const validationError = validateFiles(files);
       if (validationError) {
-        toast.error(validationError);
+        toast.errorAnimated('Upload Error', validationError);
         return;
       }
 
@@ -130,7 +130,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
       for (const file of files) {
         const error = validateFile(file);
         if (error) {
-          toast.error(error);
+          toast.errorAnimated('Upload Error', error);
           return;
         }
       }

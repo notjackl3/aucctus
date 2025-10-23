@@ -24,7 +24,7 @@ const VerifyEmail: FunctionComponent = () => {
   // Shared logic for sending verification email
   const sendVerificationEmail = async () => {
     if (!email) {
-      toast.error('Please enter your email address');
+      toast.errorAnimated('Email Required', 'Please enter your email address');
       return;
     }
 
@@ -36,7 +36,10 @@ const VerifyEmail: FunctionComponent = () => {
     setEmailInputError(undefined);
 
     if (!signUpLoaded || !signUp) {
-      toast.error('Service not ready. Please try again.');
+      toast.errorAnimated(
+        'Service Not Ready',
+        'Service not ready. Please try again',
+      );
       return;
     }
 
@@ -61,13 +64,19 @@ const VerifyEmail: FunctionComponent = () => {
       });
 
       setVerificationSent(true);
-      toast.success('Verification email sent! Please check your inbox.');
+      toast.successAnimated(
+        'Verification Email Sent',
+        'Please check your inbox for the verification code',
+      );
     } catch (err: any) {
       telemetry.error('Send verification error:', err);
       if (err.errors?.[0]?.message) {
-        toast.error(err.errors[0].message);
+        toast.errorAnimated('Verification Failed', err.errors[0].message);
       } else {
-        toast.error('Failed to send verification email. Please try again.');
+        toast.errorAnimated(
+          'Verification Failed',
+          'Failed to send verification email. Please try again',
+        );
       }
     } finally {
       setIsLoading(false);
@@ -87,7 +96,10 @@ const VerifyEmail: FunctionComponent = () => {
     e.preventDefault();
 
     if (!signUp || !code) {
-      toast.error('Please enter the verification code');
+      toast.errorAnimated(
+        'Verification Code Required',
+        'Please enter the verification code',
+      );
       return;
     }
 
@@ -97,22 +109,32 @@ const VerifyEmail: FunctionComponent = () => {
       const result = await signUp.attemptEmailAddressVerification({ code });
 
       if (result.verifications?.emailAddress?.status === 'verified') {
-        toast.success('Email verified successfully!');
+        toast.successAnimated(
+          'Email Verified',
+          'Your email has been verified successfully!',
+        );
 
         // Check if this completes the sign-up process
         if (result.status === 'complete') {
           await setActive({ session: result.createdSessionId });
-          toast.success('Account activated! Redirecting...');
+          toast.successAnimated(
+            'Account Activated',
+            'Account activated! Redirecting...',
+          );
           // Don't navigate immediately - let AuthBootstrap handle routing
         } else {
-          toast.success(
+          toast.successAnimated(
+            'Email Verified',
             'Email verified! You can now sign in with your account.',
           );
           // Redirect to login page after successful verification
           navigate(AppPath.Login);
         }
       } else {
-        toast.error('Invalid verification code. Please try again.');
+        toast.errorAnimated(
+          'Invalid Verification Code',
+          'Invalid verification code. Please try again',
+        );
       }
     } catch (err: any) {
       telemetry.error('Verification error:', err);
@@ -122,12 +144,18 @@ const VerifyEmail: FunctionComponent = () => {
         err.errors?.[0]?.message?.includes('already been verified') ||
         err.errors?.[0]?.code === 'verification_already_verified'
       ) {
-        toast.success('Email already verified! You can now sign in.');
+        toast.successAnimated(
+          'Email Already Verified',
+          'Email already verified! You can now sign in',
+        );
         navigate(AppPath.Login);
       } else if (err.errors?.[0]?.message) {
-        toast.error(err.errors[0].message);
+        toast.errorAnimated('Verification Failed', err.errors[0].message);
       } else {
-        toast.error('Verification failed. Please try again.');
+        toast.errorAnimated(
+          'Verification Failed',
+          'Verification failed. Please try again',
+        );
       }
     } finally {
       setIsLoading(false);

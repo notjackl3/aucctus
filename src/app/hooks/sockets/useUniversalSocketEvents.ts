@@ -119,18 +119,16 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.conceptWorkflow.onWorkflowCompleted ||
         ((msg: any) => {
-          toast.success(
-            `Concept report generation completed successfully!`,
-            `Click to view concept ${msg.conceptRootIdentifier}`,
-            {
-              autoClose: 15000,
-              onClick: () => {
-                const conceptUrl = AppPath.ConceptOverview.replace(
-                  ':id',
-                  msg.conceptRootIdentifier,
-                );
-                navigate(conceptUrl);
-              },
+          toast.completed(
+            'Concept Report Ready',
+            `Your concept report has been generated successfully`,
+            undefined, // completedTime - can be added if available in message
+            () => {
+              const conceptUrl = AppPath.ConceptOverview.replace(
+                ':id',
+                msg.conceptRootIdentifier,
+              );
+              navigate(conceptUrl);
             },
           );
         });
@@ -143,9 +141,11 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.conceptWorkflow.onWorkflowError ||
         ((msg: any) => {
-          toast.error(`Concept report generation failed`, msg.message, {
-            autoClose: 10000,
-          });
+          toast.errorAnimated(
+            'Concept Generation Failed',
+            msg.message ||
+              'An error occurred while generating your concept report',
+          );
         });
       handler(message);
     }
@@ -166,12 +166,9 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.syntheticTesting.onExecutionCompleted ||
         (() => {
-          toast.success(
-            'Synthetic testing complete!',
-            'Your synthetic interviews are ready to view.',
-            {
-              autoClose: 10000,
-            },
+          toast.completed(
+            'Synthetic Testing Complete',
+            'Your synthetic interviews are ready to view',
           );
         });
 
@@ -198,12 +195,9 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           .includes('cancel');
         if (isCancellation) return;
 
-        toast.error(
-          'Synthetic testing failed',
+        toast.errorAnimated(
+          'Synthetic Testing Failed',
           msg.errorMessage || 'An error occurred during execution',
-          {
-            autoClose: 10000,
-          },
         );
       });
 
@@ -221,17 +215,17 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       config.nucleusUpload.onUploadProgress ||
       ((msg: INucleusUploadProgressMessage) => {
         if (msg.stage === 'completed') {
-          toast.success('Document processing completed!', msg.message, {
-            autoClose: 5000,
-          });
+          toast.completed(
+            'Documents Processed',
+            msg.message || 'Your documents have been processed successfully',
+          );
         } else if (msg.stage === 'processing' && msg.progress) {
-          toast.info(`Processing documents: ${msg.progress}%`, msg.message, {
-            autoClose: 5000,
-          });
+          // TODO: Track with toast ID and use toast.updateProgress() for real progress tracking
+          // For now, just show info about processing
+          return; // Skip progress notifications - will be handled by final completion toast
         } else if (msg.stage === 'validating') {
-          toast.info('Validating uploaded documents...', msg.message, {
-            autoClose: 5000,
-          });
+          // Skip validation notifications - completion toast is sufficient
+          return;
         }
       });
     handler(message);
@@ -256,10 +250,9 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           queryKey: [AucctusQueryKeys.nucleusReportLatest],
         });
 
-        toast.success(
-          'Document upload completed!',
-          `Successfully uploaded ${msg.uploadedCount} file${msg.uploadedCount > 1 ? 's' : ''} for processing.`,
-          { autoClose: 5000 },
+        toast.completed(
+          'Documents Uploaded',
+          `Successfully uploaded ${msg.uploadedCount} file${msg.uploadedCount > 1 ? 's' : ''} for processing`,
         );
       });
     handler(message);
@@ -278,10 +271,9 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.nucleusUpload.onUploadError ||
         ((msg: INucleusUploadErrorMessage) => {
-          toast.error(
-            'Document upload failed',
-            msg.message || 'Please try uploading your documents again.',
-            { autoClose: 5000 },
+          toast.errorAnimated(
+            'Document Upload Failed',
+            msg.message || 'Please try uploading your documents again',
           );
         });
       handler(message);

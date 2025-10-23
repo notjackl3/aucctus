@@ -50,9 +50,16 @@ const SignUp: FunctionComponent = () => {
     // Email is automatically set from the invitation
     if (isInvitationFlow) {
       if (!password || !confirmPassword) {
-        if (!password) toast.error('Password is required');
+        if (!password)
+          toast.errorAnimated(
+            'Password Required',
+            'Please enter a password to continue',
+          );
         else if (!confirmPassword)
-          toast.error('Password confirmation is required');
+          toast.errorAnimated(
+            'Password Confirmation Required',
+            'Please confirm your password',
+          );
         return;
       }
 
@@ -76,12 +83,28 @@ const SignUp: FunctionComponent = () => {
         !password ||
         !confirmPassword
       ) {
-        if (!firstName?.trim()) toast.error('First name is required');
-        else if (!lastName?.trim()) toast.error('Last name is required');
-        else if (!email?.trim()) toast.error('Email is required');
-        else if (!password) toast.error('Password is required');
+        if (!firstName?.trim())
+          toast.errorAnimated(
+            'First Name Required',
+            'Please enter your first name',
+          );
+        else if (!lastName?.trim())
+          toast.errorAnimated(
+            'Last Name Required',
+            'Please enter your last name',
+          );
+        else if (!email?.trim())
+          toast.errorAnimated(
+            'Email Required',
+            'Please enter your email address',
+          );
+        else if (!password)
+          toast.errorAnimated('Password Required', 'Please enter a password');
         else if (!confirmPassword)
-          toast.error('Password confirmation is required');
+          toast.errorAnimated(
+            'Password Confirmation Required',
+            'Please confirm your password',
+          );
         return;
       }
 
@@ -195,9 +218,15 @@ const SignUp: FunctionComponent = () => {
         // Account created and user signed in automatically
         await setActive({ session: result.createdSessionId });
         if (isInvitationFlow) {
-          toast.success('Invitation accepted! Account created successfully!');
+          toast.successAnimated(
+            'Invitation Accepted',
+            'Account created successfully! Welcome to Aucctus!',
+          );
         } else {
-          toast.success('Account created successfully!');
+          toast.successAnimated(
+            'Account Created',
+            'Your account has been created successfully!',
+          );
         }
         // Don't navigate immediately - let AuthBootstrap handle routing after user data is loaded
       } else {
@@ -206,7 +235,10 @@ const SignUp: FunctionComponent = () => {
           await signUp.prepareEmailAddressVerification({
             strategy: 'email_code',
           });
-          toast.info('Please check your email for a verification code');
+          toast.info(
+            'Email Verification Required',
+            'Please check your email for a verification code',
+          );
           const emailParam = email
             ? `email=${encodeURIComponent(email.trim())}`
             : '';
@@ -215,18 +247,27 @@ const SignUp: FunctionComponent = () => {
           navigate(`${AppPath.VerifyEmail}${query ? `?${query}` : ''}`);
         } else {
           // This shouldn't happen with invitation flow, but handle it just in case
-          toast.error('Unable to complete account creation. Please try again.');
+          toast.errorAnimated(
+            'Account Creation Failed',
+            'Unable to complete account creation. Please try again',
+          );
         }
       }
     } catch (err: any) {
       telemetry.error('Sign-up error:', err);
       if (err.errors?.[0]?.message) {
-        toast.error(err.errors[0].message);
+        toast.errorAnimated('Sign Up Failed', err.errors[0].message);
       } else {
         if (isInvitationFlow) {
-          toast.error('Failed to accept invitation. Please try again.');
+          toast.errorAnimated(
+            'Invitation Failed',
+            'Failed to accept invitation. Please try again',
+          );
         } else {
-          toast.error('Sign-up failed. Please try again.');
+          toast.errorAnimated(
+            'Sign Up Failed',
+            'Unable to create account. Please try again',
+          );
         }
       }
     } finally {

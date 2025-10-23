@@ -119,12 +119,18 @@ export const useUpdateSection = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.success('Section updated successfully');
+      toast.successAnimated(
+        'Section Updated',
+        'Nucleus section has been updated successfully',
+      );
     },
     onError: (e) => {
       analytics.debug('Error updating section:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.error(message || 'Failed to update section');
+      toast.errorAnimated(
+        'Section Update Failed',
+        message || 'Unable to update section',
+      );
     },
   });
 };
@@ -154,12 +160,18 @@ export const useCreateQuestion = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.success('Question created successfully');
+      toast.successAnimated(
+        'Question Created',
+        'Nucleus question has been created successfully',
+      );
     },
     onError: (e) => {
       analytics.debug('Error creating question:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.error(message || 'Failed to create question');
+      toast.errorAnimated(
+        'Question Creation Failed',
+        message || 'Unable to create question',
+      );
     },
   });
 };
@@ -188,12 +200,18 @@ export const useUpdateQuestion = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.success('Question updated successfully');
+      toast.successAnimated(
+        'Question Updated',
+        'Nucleus question has been updated successfully',
+      );
     },
     onError: (e) => {
       analytics.debug('Error updating question:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.error(message || 'Failed to update question');
+      toast.errorAnimated(
+        'Question Update Failed',
+        message || 'Unable to update question',
+      );
     },
   });
 };
@@ -214,12 +232,18 @@ export const useDeleteQuestion = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.success('Question deleted successfully');
+      toast.successAnimated(
+        'Question Deleted',
+        'Nucleus question has been removed successfully',
+      );
     },
     onError: (e: AxiosError<IFormError<any>>) => {
       analytics.debug('Error deleting question:', e);
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete question');
+      toast.errorAnimated(
+        'Question Deletion Failed',
+        message || 'Unable to delete question',
+      );
     },
   });
 
@@ -251,12 +275,18 @@ export const useCreateAnswer = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.success('Answer created successfully');
+      toast.successAnimated(
+        'Answer Created',
+        'Nucleus answer has been added successfully',
+      );
     },
     onError: (e) => {
       analytics.debug('Error creating answer:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.error(message || 'Failed to create answer');
+      toast.errorAnimated(
+        'Answer Creation Failed',
+        message || 'Unable to create answer',
+      );
     },
   });
 };
@@ -285,12 +315,18 @@ export const useUpdateAnswer = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.success('Answer updated successfully');
+      toast.successAnimated(
+        'Answer Updated',
+        'Nucleus answer has been updated successfully',
+      );
     },
     onError: (e) => {
       analytics.debug('Error updating answer:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.error(message || 'Failed to update answer');
+      toast.errorAnimated(
+        'Answer Update Failed',
+        message || 'Unable to update answer',
+      );
     },
   });
 };
@@ -311,12 +347,18 @@ export const useDeleteAnswer = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.success('Answer deleted successfully');
+      toast.successAnimated(
+        'Answer Deleted',
+        'Nucleus answer has been removed successfully',
+      );
     },
     onError: (e: AxiosError<IFormError<any>>) => {
       analytics.debug('Error deleting answer:', e);
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to delete answer');
+      toast.errorAnimated(
+        'Answer Deletion Failed',
+        message || 'Unable to delete answer',
+      );
     },
   });
 };

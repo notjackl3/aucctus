@@ -19,8 +19,9 @@ export const useNucleusReportLatest = () => {
       // Only show error if it's not a 404 (no reports found)
       if (e.response?.status !== 404) {
         const message = utils.osiris.parseFormError(e);
-        toast.error(
-          message || 'Failed to fetch nucleus report. Please try again.',
+        toast.errorAnimated(
+          'Nucleus Report Fetch Failed',
+          message || 'Unable to fetch nucleus report. Please try again',
         );
       }
     },
@@ -47,8 +48,9 @@ export const useNucleusReportsList = () => {
     cacheTime: 1000 * 60 * 10, // 10 minutes
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Failed to fetch nucleus reports list. Please try again.',
+      toast.errorAnimated(
+        'Reports List Fetch Failed',
+        message || 'Unable to fetch nucleus reports list. Please try again',
       );
     },
   });
@@ -74,8 +76,9 @@ export const useNucleusReport = (reportUuid?: string) => {
     cacheTime: 1000 * 60 * 10, // 10 minutes
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Failed to fetch nucleus report. Please try again.',
+      toast.errorAnimated(
+        'Nucleus Report Fetch Failed',
+        message || 'Unable to fetch nucleus report. Please try again',
       );
     },
   });
@@ -131,18 +134,16 @@ export const useNucleusDocumentUpload = () => {
       return await api.nucleus.uploadDocuments(reportUuid, files);
     },
     onSuccess: (data, variables) => {
-      toast.success(
+      toast.successAnimated(
+        'Documents Uploaded',
         `Successfully uploaded ${variables.files.length} document${variables.files.length > 1 ? 's' : ''} for processing`,
-        undefined,
-        { autoClose: 3000 },
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Failed to upload documents. Please try again.',
-        undefined,
-        { autoClose: 5000 },
+      toast.errorAnimated(
+        'Document Upload Failed',
+        message || 'Unable to upload documents. Please try again',
       );
     },
   });

@@ -27,6 +27,9 @@ export interface ISyntheticLoadingUIProps {
   // Estimated execution time
   estimatedSeconds?: number | null;
 
+  // Start time (Unix timestamp) for progress calculation
+  startTime?: number;
+
   // Concept UUID for agent timing
   conceptUuid?: string;
 

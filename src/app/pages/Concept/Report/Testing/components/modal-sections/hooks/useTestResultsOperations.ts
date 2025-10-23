@@ -48,7 +48,10 @@ export const useTestResultsOperations = ({
   // Handle file upload
   const handleFilesUpload = async (uploadedFiles: UploadedFile[]) => {
     if (!conceptUuid || !testUuid) {
-      toast.error('Missing concept or test information');
+      toast.errorAnimated(
+        'Missing Information',
+        'Missing concept or test information',
+      );
       return;
     }
 
@@ -161,7 +164,10 @@ export const useTestResultsOperations = ({
     resultTitle: string,
   ) => {
     if (!conceptUuid || !testUuid) {
-      toast.error('Missing concept or test information');
+      toast.errorAnimated(
+        'Missing Information',
+        'Missing concept or test information',
+      );
       return;
     }
 
@@ -195,7 +201,10 @@ export const useTestResultsOperations = ({
     fileName: string,
   ) => {
     if (!conceptUuid || !testUuid) {
-      toast.error('Missing concept or test information');
+      toast.errorAnimated(
+        'Missing Information',
+        'Missing concept or test information',
+      );
       return;
     }
 
@@ -246,11 +255,15 @@ export const useTestResultsOperations = ({
             });
           }
 
-          toast.success(
+          toast.successAnimated(
+            'Results Deleted',
             `Successfully deleted all ${results.length} test results`,
           );
         } catch (error) {
-          toast.error('Failed to delete some results. Please try again.');
+          toast.errorAnimated(
+            'Deletion Failed',
+            'Failed to delete some results. Please try again',
+          );
         } finally {
           setIsDeletingAll(false);
         }
@@ -303,9 +316,15 @@ export const useTestResultsOperations = ({
             });
           }
 
-          toast.success(`Successfully deleted all ${allFiles.length} files`);
+          toast.successAnimated(
+            'Files Deleted',
+            `Successfully deleted all ${allFiles.length} files`,
+          );
         } catch (error) {
-          toast.error('Failed to delete some files. Please try again.');
+          toast.errorAnimated(
+            'File Deletion Failed',
+            'Failed to delete some files. Please try again',
+          );
         } finally {
           setIsDeletingAll(false);
         }
@@ -317,7 +336,10 @@ export const useTestResultsOperations = ({
   // Handle download of synthetic test results as CSV
   const handleDownloadResults = async () => {
     if (!conceptUuid || !testUuid) {
-      toast.error('Missing test information. Please try again.');
+      toast.errorAnimated(
+        'Missing Test Information',
+        'Missing test information. Please try again',
+      );
       return;
     }
 
@@ -328,7 +350,10 @@ export const useTestResultsOperations = ({
       const syntheticResults = results.filter((result) => result.isSynthetic);
 
       if (syntheticResults.length === 0) {
-        toast.error('No synthetic test results found to download.');
+        toast.errorAnimated(
+          'No Results Found',
+          'No synthetic test results found to download',
+        );
         return;
       }
 
@@ -349,11 +374,15 @@ export const useTestResultsOperations = ({
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      toast.success(
+      toast.successAnimated(
+        'Download Complete',
         `Downloaded ${syntheticResults.length} synthetic test results as PDF`,
       );
     } catch (error) {
-      toast.error('Failed to download test results. Please try again.');
+      toast.errorAnimated(
+        'Download Failed',
+        'Failed to download test results. Please try again',
+      );
     } finally {
       setIsDownloading(false);
     }

@@ -40,10 +40,21 @@ const ResetPassword: FunctionComponent = () => {
     if (!signInLoaded || !signIn) return;
 
     if (!code?.trim() || !password || !confirmPassword) {
-      if (!code?.trim()) toast.error('Verification code is required');
-      else if (!password) toast.error('Password is required');
+      if (!code?.trim())
+        toast.errorAnimated(
+          'Verification Code Required',
+          'Please enter the verification code from your email',
+        );
+      else if (!password)
+        toast.errorAnimated(
+          'Password Required',
+          'Please enter your new password',
+        );
       else if (!confirmPassword)
-        toast.error('Password confirmation is required');
+        toast.errorAnimated(
+          'Password Confirmation Required',
+          'Please confirm your new password',
+        );
       return;
     }
 
@@ -66,7 +77,10 @@ const ResetPassword: FunctionComponent = () => {
 
       if (result.status === 'complete') {
         // Password reset successful
-        toast.success('Password reset successful!');
+        toast.successAnimated(
+          'Password Reset Successful',
+          'Your password has been updated successfully!',
+        );
 
         // Full page refresh to homepage so authentication state is re-initialized
         window.location.replace(AppPath.Home);
@@ -76,7 +90,10 @@ const ResetPassword: FunctionComponent = () => {
           'Additional verification required after password reset:',
           result,
         );
-        toast.error('Password reset incomplete. Please try again.');
+        toast.errorAnimated(
+          'Password Reset Incomplete',
+          'Please try again to complete the password reset',
+        );
       }
     } catch (err: any) {
       telemetry.error('Password reset error:', err);
@@ -86,14 +103,18 @@ const ResetPassword: FunctionComponent = () => {
           err.errors[0].message.includes('Invalid code') ||
           err.errors[0].message.includes('expired')
         ) {
-          toast.error(
+          toast.errorAnimated(
+            'Invalid Verification Code',
             'Invalid or expired verification code. Please request a new one.',
           );
         } else {
-          toast.error(err.errors[0].message);
+          toast.errorAnimated('Password Reset Failed', err.errors[0].message);
         }
       } else {
-        toast.error('Failed to reset password. Please try again.');
+        toast.errorAnimated(
+          'Password Reset Failed',
+          'Unable to reset password. Please try again',
+        );
       }
     } finally {
       setIsLoading(false);

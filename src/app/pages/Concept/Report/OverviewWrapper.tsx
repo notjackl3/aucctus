@@ -40,10 +40,9 @@ const OverviewWrapper: React.FC = () => {
         navigate(AppPath.ConceptBank);
       },
       onError: () => {
-        toast.error(
-          'Failed to start overview generation',
-          'Please try again. If the problem persists, contact support.',
-          { autoClose: 5000 },
+        toast.errorAnimated(
+          'Overview Generation Failed',
+          'Failed to start overview generation. Please try again. If the problem persists, contact support.',
         );
       },
     });
@@ -52,14 +51,16 @@ const OverviewWrapper: React.FC = () => {
   const handleDebugModeGenerate = () => {
     generateOverview(concept.identifier, {
       onSuccess: () => {
-        toast.success('📊 Overview generated successfully!', undefined, {
-          autoClose: 2000,
-        });
+        toast.successAnimated(
+          'Overview Generated',
+          '📊 Overview generated successfully!',
+        );
       },
       onError: () => {
-        toast.error('❌ Failed to generate Overview', undefined, {
-          autoClose: 2000,
-        });
+        toast.errorAnimated(
+          'Overview Generation Failed',
+          '❌ Failed to generate Overview',
+        );
       },
     });
   };

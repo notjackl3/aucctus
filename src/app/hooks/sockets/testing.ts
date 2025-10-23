@@ -29,6 +29,7 @@ interface ISyntheticExecutionState {
   resultsCount?: number;
   error?: string;
   executionId?: string;
+  startTime?: number; // Unix timestamp when execution started
   quotes?: Array<{ text: string; profileUuid: string }>; // Live quotes from interviews with profile associations
   completedProfileUuids?: Set<string>; // Track which profiles have completed
 }
@@ -189,6 +190,8 @@ export const useSyntheticExecutionEvents = (
               currentStage: data.stage,
               currentPersona: data.currentPersona,
               totalPersonas: data.totalPersonas,
+              // Capture start time on first progress update
+              startTime: prev.startTime || Date.now(),
             };
 
             // Only invalidate queries when reaching 100%
@@ -287,7 +290,10 @@ export const useSyntheticExecutionEvents = (
               progress: 0,
               message: '',
             });
-            toast.success('Execution cancelled');
+            toast.successAnimated(
+              'Test Cancelled',
+              'Synthetic test execution has been stopped',
+            );
           } else {
             // For actual errors, show error state
             setExecutionState((prev) => ({
@@ -296,7 +302,10 @@ export const useSyntheticExecutionEvents = (
               message: data.errorMessage,
               error: data.errorMessage,
             }));
-            toast.error(`Execution failed: ${data.errorMessage}`);
+            toast.errorAnimated(
+              'Test Execution Failed',
+              data.errorMessage || 'An error occurred during test execution',
+            );
           }
         }
       },

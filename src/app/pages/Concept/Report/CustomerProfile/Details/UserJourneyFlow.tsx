@@ -65,7 +65,10 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
   // Display API errors
   React.useEffect(() => {
     if (error) {
-      toast.error('Failed to load user journey steps. Please try again.');
+      toast.errorAnimated(
+        'Journey Load Failed',
+        'Failed to load user journey steps. Please try again',
+      );
       telemetry.error('Failed to load user journey steps', { error });
     }
   }, [error]);
@@ -89,12 +92,18 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
   const handleAddStep = React.useCallback(
     async (step: Omit<IUserJourneyStep, 'uuid'>) => {
       if (!customerProfileUuid) {
-        toast.error('Cannot add step: no customer profile selected');
+        toast.errorAnimated(
+          'No Profile Selected',
+          'Cannot add step: no customer profile selected',
+        );
         return;
       }
 
       if (!step.title || !step.description) {
-        toast.error('Cannot add step: title and description are required');
+        toast.errorAnimated(
+          'Missing Information',
+          'Cannot add step: title and description are required',
+        );
         return;
       }
 
@@ -118,7 +127,10 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
         closeModal();
       } catch (error) {
         telemetry.error('Failed to add journey step', { error });
-        toast.error('Failed to add journey step. Please try again.');
+        toast.errorAnimated(
+          'Step Addition Failed',
+          'Failed to add journey step. Please try again',
+        );
       }
     },
     [createJourneyStep, customerProfileUuid, steps, closeModal],
@@ -146,7 +158,10 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
         closeModal();
       } catch (error) {
         telemetry.error('Failed to update journey step', { error });
-        toast.error('Failed to update journey step. Please try again.');
+        toast.errorAnimated(
+          'Step Update Failed',
+          'Failed to update journey step. Please try again',
+        );
       }
     },
     [customerProfileUuid, updateJourneyStepMutation, closeModal],
@@ -188,7 +203,10 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
     async (index: number) => {
       const stepToRemove = steps[index];
       if (!customerProfileUuid || !stepToRemove?.uuid) {
-        toast.error('Cannot remove step: missing required information');
+        toast.errorAnimated(
+          'Missing Information',
+          'Cannot remove step: missing required information',
+        );
         return;
       }
 
@@ -199,7 +217,10 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
         });
       } catch (error) {
         telemetry.error('Failed to delete journey step', { error });
-        toast.error('Failed to delete journey step. Please try again.');
+        toast.errorAnimated(
+          'Step Deletion Failed',
+          'Failed to delete journey step. Please try again',
+        );
       }
     },
     [customerProfileUuid, steps, deleteJourneyStepMutation],

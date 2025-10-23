@@ -277,7 +277,10 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   const handleCopyContent = () => {
     if (selectedItem) {
       navigator.clipboard.writeText(selectedItem.content);
-      toast.success(`${selectedItem.title} copied to clipboard`);
+      toast.successAnimated(
+        'Content Copied',
+        `${selectedItem.title} copied to clipboard`,
+      );
     }
   };
 
@@ -302,7 +305,10 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
       document.body.removeChild(link);
     }
 
-    toast.success(`${selectedItem.title} downloaded successfully`);
+    toast.successAnimated(
+      'Download Complete',
+      `${selectedItem.title} downloaded successfully`,
+    );
   };
 
   if (isCollateralLoading) {

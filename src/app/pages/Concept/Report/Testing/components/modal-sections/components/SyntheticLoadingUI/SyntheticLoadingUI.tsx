@@ -15,6 +15,7 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
   quotes = [],
   completedProfileUuids,
   estimatedSeconds,
+  startTime,
   conceptUuid,
   onViewResults,
 }) => {
@@ -66,6 +67,7 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
         conceptUuid={conceptUuid}
         numProfiles={profiles.length}
         estimatedSeconds={estimatedSeconds}
+        startTime={startTime}
       />
 
       {/* Interview Progress Card */}

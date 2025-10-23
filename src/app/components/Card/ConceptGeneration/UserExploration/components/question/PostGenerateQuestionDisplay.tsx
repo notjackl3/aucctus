@@ -203,7 +203,10 @@ const PostGenerateQuestionDisplay: React.FC<
           });
         },
         onError: () => {
-          toast.error('Failed to generate report');
+          toast.errorAnimated(
+            'Report Generation Failed',
+            'Failed to generate report',
+          );
         },
       });
     }
@@ -234,7 +237,10 @@ const PostGenerateQuestionDisplay: React.FC<
         resetQuestionnaire();
         clearGeneratedConceptsBySeedUuid(draftSeedUuid);
       }, 50);
-      toast.success('Concept report generation successfully started');
+      toast.successAnimated(
+        'Concept Generation Started',
+        'Concept report generation successfully started',
+      );
       navigate(AppPath.ConceptBank);
     }
   }, [

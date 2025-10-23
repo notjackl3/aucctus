@@ -16,20 +16,27 @@ export const useSyntheticExecutionStart = (
     mutationFn: async (data?: ISyntheticExecutionRequest) =>
       api.testing.executeSyntheticTest(conceptUuid, testUuid, data),
     onSuccess: () => {
-      toast.success('Synthetic test started successfully');
+      toast.successAnimated(
+        'Test Started',
+        "Your synthetic test is now running. You'll be notified when it completes",
+      );
     },
     onError: (e: any) => {
       // Handle 409 Conflict specifically - execution already running
       if (e?.response?.status === 409) {
-        toast.error(
-          'A synthetic execution is already running for this test. Please wait for it to complete before starting a new one.',
+        toast.errorAnimated(
+          'Test Already Running',
+          'A synthetic execution is already running for this test. Please wait for it to complete',
         );
         return;
       }
 
       // Handle other errors with generic parsing
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to start synthetic execution');
+      toast.errorAnimated(
+        'Test Start Failed',
+        message || 'Unable to start synthetic execution. Please try again',
+      );
     },
   });
 };
@@ -50,7 +57,10 @@ export const useSyntheticExecutionCancel = (
           executionId: data.executionId,
           message: 'Task was already cancelled or completed',
         });
-        toast.info('Execution was already cancelled or completed');
+        toast.successAnimated(
+          'Already Cancelled',
+          'This execution was already cancelled or completed',
+        );
       } else {
         telemetry.log('synthetic.execution.cancel.success', {
           conceptUuid,
@@ -62,7 +72,10 @@ export const useSyntheticExecutionCancel = (
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to cancel execution');
+      toast.errorAnimated(
+        'Cancellation Failed',
+        message || 'Unable to cancel execution. Please try again',
+      );
     },
   });
 };
@@ -165,7 +178,10 @@ export const useSyntheticDistributionPreview = (
       api.testing.getDistributionPreview(conceptUuid, testUuid, data),
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(message || 'Failed to generate distribution preview');
+      toast.errorAnimated(
+        'Preview Generation Failed',
+        message || 'Unable to generate distribution preview. Please try again',
+      );
     },
   });
 };

@@ -250,16 +250,11 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
   const showSuccessAndNavigate = useCallback(() => {
     handleLeaveAnimation(() => {
-      toast.success(
-        'Concepts saved successfully',
+      toast.successAnimated(
+        'Concepts Saved',
         FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS
           ? 'Proceeding to the refinement step.'
           : 'Report generation started.',
-        {
-          autoClose: 2000,
-          hideProgressBar: true,
-          pauseOnHover: false,
-        },
       );
       setTimeout(() => {
         const event = new CustomEvent('aucctus-generate-concept', {
@@ -288,11 +283,10 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
         setGeneratedConcepts(draftSeedUuid, createdConcepts);
 
         handleLeaveAnimation(() => {
-          toast.success('Concepts saved successfully', '', {
-            autoClose: 2000,
-            hideProgressBar: true,
-            pauseOnHover: false,
-          });
+          toast.successAnimated(
+            'Concepts Saved',
+            'Your concepts have been saved successfully',
+          );
           setTimeout(() => {
             const event = new CustomEvent('aucctus-save-concept');
             window.dispatchEvent(event);

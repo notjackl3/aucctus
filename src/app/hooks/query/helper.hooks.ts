@@ -26,7 +26,10 @@ export function useGenericConceptMutate<T, K = Partial<T> & { uuid: string }>(
     onError: (e) => {
       analytics.debug(`Error:`, e);
       const message = utils.osiris.parseFormError(e);
-      toast.error(message);
+      toast.errorAnimated(
+        'Operation Failed',
+        message || 'An error occurred. Please try again',
+      );
     },
   });
 }
@@ -52,7 +55,10 @@ export function useGenericMutate<T, K = Partial<T>>(
     onError: (e) => {
       analytics.debug(`Error:`, e);
       const message = utils.osiris.parseFormError(e);
-      toast.error(message);
+      toast.errorAnimated(
+        'Operation Failed',
+        message || 'An error occurred. Please try again',
+      );
     },
   });
 }

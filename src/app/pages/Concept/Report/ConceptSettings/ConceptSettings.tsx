@@ -75,13 +75,16 @@ const ConceptSettings: React.FC = () => {
 
   const handleCloneConceptSeed = () => {
     if (!seedDraft?.uuid) {
-      toast.error('No seed available to clone');
+      toast.errorAnimated('No Seed Available', 'No seed available to clone');
       return;
     }
 
     cloneSeed(seedDraft.uuid, {
       onSuccess: (clonedSeed) => {
-        toast.success('Concept seed cloned successfully!');
+        toast.successAnimated(
+          'Seed Cloned',
+          'Concept seed cloned successfully!',
+        );
         // Navigate to the incubation page with the cloned seed
         resetQuestionnaire();
         setIsNewSeed(false);
@@ -93,7 +96,8 @@ const ConceptSettings: React.FC = () => {
       },
       onError: (error) => {
         const message = utils.osiris.parseFormError(error);
-        toast.error(
+        toast.errorAnimated(
+          'Seed Clone Failed',
           message || 'Failed to clone concept seed. Please try again.',
         );
       },
