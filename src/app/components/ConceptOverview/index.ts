@@ -7,6 +7,8 @@ import ExecutiveDashboard from './ExecutiveDashboard';
 import KeyAssumptionsCard from './KeyAssumptionsCard';
 import TrendsDriversCard from './TrendsDriversCard';
 import GutCheckBanner from './GutCheckBanner';
+import ImageUploadButton from './ImageUploadButton';
+import ImageToggleControls from './ImageToggleControls';
 
 const ConceptOverview = {
   ExecutiveDashboard,
@@ -18,6 +20,8 @@ const ConceptOverview = {
   InfoSectionCard,
   MarketSizeCard,
   GutCheckBanner,
+  ImageUploadButton,
+  ImageToggleControls,
 };
 
 export default ConceptOverview;

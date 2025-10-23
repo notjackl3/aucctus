@@ -7,6 +7,8 @@ import {
   useConceptMarketScan,
   useConceptOverview,
   useMarketScanMarketForcesV3,
+  useUploadConceptCustomImage,
+  useUpdateConceptImageSettings,
 } from '@hooks/query/concepts.hook';
 import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -19,6 +21,8 @@ import CustomerProfilesCard from './CustomerProfilesCard';
 import DifferentiatorsCard from './DifferentiatorsCard';
 import EcosystemCard from './EcosystemCard';
 import GutCheckBanner from './GutCheckBanner';
+import ImageUploadButton from './ImageUploadButton';
+import ImageToggleControls from './ImageToggleControls';
 import InfoSectionCard from './InfoSectionCard';
 import KeyAssumptionsCard from './KeyAssumptionsCard';
 import MarketSizeCard from './MarketSizeCard';
@@ -43,6 +47,10 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
   // Debug mode check
   const isDebugMode = useDebugMode();
+
+  // Image upload and settings mutations
+  const uploadMutation = useUploadConceptCustomImage(conceptUuid || '');
+  const updateSettings = useUpdateConceptImageSettings(conceptUuid || '');
 
   // Centralized data fetching - load all data for the cards
   const { conceptOverview, isLoading: isLoadingOverview } =
@@ -142,6 +150,13 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     setIsAutoPlaying(true);
     setProgress(0);
   }, []);
+
+  const handleRevertToAI = useCallback(() => {
+    updateSettings.mutate({
+      useCustomImage: false,
+      customImageUrl: undefined,
+    });
+  }, [updateSettings]);
 
   // Total number of cards
   const totalCards = 6;
@@ -285,13 +300,34 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             {/* Concept image */}
             <img
               src={
-                conceptOverview?.conceptImageUrl ||
-                images.aiExplorationsBackground
+                conceptOverview?.useCustomImage &&
+                conceptOverview?.customImageUrl
+                  ? conceptOverview.customImageUrl
+                  : conceptOverview?.conceptImageUrl ||
+                    images.aiExplorationsBackground
               }
               alt={executiveDashboardUIText.conceptVisualization.altText}
               className='relative z-10 h-full w-full object-cover'
               loading='eager'
             />
+
+            {/* Image controls overlay */}
+            <div className='absolute right-4 top-4 z-20'>
+              <div className='flex flex-col gap-2'>
+                <ImageUploadButton
+                  conceptUuid={conceptUuid || ''}
+                  isCustomActive={!!conceptOverview?.customImageUrl}
+                  uploadMutation={uploadMutation}
+                />
+                {conceptOverview?.useCustomImage &&
+                  conceptOverview?.customImageUrl && (
+                    <ImageToggleControls
+                      isReverting={updateSettings.isLoading}
+                      onRevertToAI={handleRevertToAI}
+                    />
+                  )}
+              </div>
+            </div>
 
             {/* Badge */}
             <div className='absolute bottom-4 left-4 right-4 z-20'>

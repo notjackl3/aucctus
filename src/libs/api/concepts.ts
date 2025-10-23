@@ -86,6 +86,28 @@ export class ConceptApi extends ApiService {
     return this.get<IConceptOverview>(endpoints.conceptOverview(identifier));
   }
 
+  uploadConceptCustomImage(conceptUuid: string, file: File) {
+    const formData = new FormData();
+    formData.append('image', file);
+    return this.post<IConceptOverview>(
+      endpoints.conceptOverviewUploadImage(conceptUuid),
+      formData,
+    );
+  }
+
+  updateConceptImageSettings(
+    conceptUuid: string,
+    settings: {
+      useCustomImage: boolean;
+      customImageUrl?: string;
+    },
+  ) {
+    return this.patch<IConceptOverview>(
+      endpoints.conceptOverviewImageSettings(conceptUuid),
+      settings,
+    );
+  }
+
   getConceptExecutiveSummaries(conceptUuid: string) {
     return this.get<IExecutiveSummaries>(
       endpoints.conceptExecutiveSummaries(conceptUuid),

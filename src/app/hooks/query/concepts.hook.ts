@@ -1800,3 +1800,54 @@ export const useAssumptionRemove = () => {
     },
   });
 };
+
+/**
+ * Custom hook for uploading custom images to concept overview.
+ * @param conceptUuid - UUID of the concept
+ * @returns The result of the useMutation hook.
+ */
+export const useUploadConceptCustomImage = (conceptUuid: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (file: File) =>
+      await api.concept.uploadConceptCustomImage(conceptUuid, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.conceptOverview, conceptUuid],
+      });
+      toast.success('Custom image uploaded successfully');
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to upload image. Please try again.');
+    },
+  });
+};
+
+/**
+ * Custom hook for updating concept image settings (AI vs custom).
+ * @param conceptUuid - UUID of the concept
+ * @returns The result of the useMutation hook.
+ */
+export const useUpdateConceptImageSettings = (conceptUuid: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (settings: {
+      useCustomImage: boolean;
+      customImageUrl?: string;
+    }) => await api.concept.updateConceptImageSettings(conceptUuid, settings),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.conceptOverview, conceptUuid],
+      });
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Failed to update image settings. Please try again.',
+      );
+    },
+  });
+};

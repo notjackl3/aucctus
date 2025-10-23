@@ -149,7 +149,6 @@ const ConceptReport: FunctionComponent = () => {
     );
   }, [openModal, conceptUuid]);
 
-
   const changeConceptStatus = useCallback(
     (value: string) => {
       if (!conceptIdentifier) return;

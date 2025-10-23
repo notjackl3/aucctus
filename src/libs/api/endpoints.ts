@@ -138,6 +138,14 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/overview`;
   }
 
+  static conceptOverviewUploadImage(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/overview/upload-image`;
+  }
+
+  static conceptOverviewImageSettings(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/overview/image-settings`;
+  }
+
   static conceptOverviewUuid(overviewUuid: string) {
     return `api/v1/concept/overview/${overviewUuid}`;
   }

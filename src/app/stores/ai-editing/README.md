@@ -7,9 +7,11 @@ This store manages the AI editing conversation state and provides automatic clea
 The AI editing conversation will automatically clear in the following scenarios:
 
 ### 1. User Logout
+
 When a user logs out (access token is removed), the conversation will be cleared and the current message will be reset.
 
 ### 2. Concept Change
+
 When the active concept changes (conceptUuid changes to a different non-undefined value), the conversation will be cleared but the current message will be preserved.
 
 ## Implementation
@@ -40,4 +42,4 @@ The auto-clear functionality is automatically initialized when the application s
 1. A user logs out
 2. The active concept changes
 
-This ensures that conversations are always properly cleaned up regardless of how the state changes occur. 
+This ensures that conversations are always properly cleaned up regardless of how the state changes occur.
