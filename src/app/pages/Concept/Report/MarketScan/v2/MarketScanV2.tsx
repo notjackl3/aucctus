@@ -18,14 +18,15 @@ const MarketScanV2: FunctionComponent = () => {
     useConceptMarketScan(activeConceptUuid);
 
   // Use unified loading state
-  const { isLoading } = useUnifiedLoading({
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
     currentRoute: AppPath.ConceptMarketScan,
     concept,
     additionalLoadingStates: [isMarketScanLoading],
   });
+  const shouldShowSkeletons = isSectionPending || hasBlockingLoad;
 
   // Show unified loading state
-  if (isLoading) {
+  if (shouldShowSkeletons) {
     return <UnifiedLoadingState />;
   }
 

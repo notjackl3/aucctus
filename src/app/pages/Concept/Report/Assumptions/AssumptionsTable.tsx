@@ -4,7 +4,8 @@ import AssumptionDetailCard from './components/cards/AssumptionDetailCard';
 import EditableAssumptionCard from './components/cards/EditableAssumptionCard';
 import CategoryProgressCard from './components/cards/category-progress-card/CategoryProgressCard';
 import telemetry from '@libs/telemetry';
-import { Loading, Icon, Modal } from '@components';
+import { Icon, Modal } from '@components';
+import { AssumptionCardsListSkeleton } from '@components/Skeleton/ConceptReport';
 import {
   IAssumptionV2,
   AssumptionCategory,
@@ -236,9 +237,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
 
         <div className='flex-1 p-6'>
           {isLoading ? (
-            <div className='flex justify-center py-8'>
-              <Loading />
-            </div>
+            <AssumptionCardsListSkeleton />
           ) : (
             <>
               {/* Add New Assumption Plus Button */}

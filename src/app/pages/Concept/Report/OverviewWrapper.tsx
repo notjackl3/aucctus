@@ -1,19 +1,19 @@
 import React from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import {
   useConceptOverview,
   useGenerateConceptOverview,
 } from '@hooks/query/concepts.hook';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import OverviewDetails from './OverviewDetails';
 import { ConceptOverview } from '@components';
 import { VersionUpgradeBanner, toast } from '@components';
 import { IConceptReportContext } from './ConceptReport/ConceptReport';
-import { AppPath } from '@routes/routes';
 import { useDebugMode } from '@hooks/debug-mode.hook';
+import { AppPath } from '@routes/routes';
 
 const OverviewWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  const navigate = useNavigate();
   const { mutate: generateOverview, isLoading } = useGenerateConceptOverview();
 
   // Use global debug mode state
@@ -22,6 +22,13 @@ const OverviewWrapper: React.FC = () => {
   // Check if v2 ConceptOverview data exists (for actual rendering)
   useConceptOverview(concept?.uuid);
 
+  // Check if overview section is pending (for hiding banner during updates)
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptOverview,
+    concept,
+    additionalLoadingStates: [isLoading],
+  });
+
   // Use concept's featureVersions to determine which version to render
   // Note: Backend uses snake_case 'concept_overview', frontend uses camelCase 'conceptOverview'
   const featureVersion =
@@ -29,16 +36,17 @@ const OverviewWrapper: React.FC = () => {
     concept.featureVersions?.conceptOverview ||
     'v1';
   const shouldRenderV2 = featureVersion !== 'v1';
-  const shouldRenderBanner = featureVersion !== 'v3';
+
+  // Hide banner during any loading state (pending section OR API loading)
+  // This prevents the flash of old content with banner during version upgrades
+  const shouldRenderBanner =
+    featureVersion !== 'v3' &&
+    !isSectionPending &&
+    !hasBlockingLoad &&
+    !isLoading;
 
   const handleUpgrade = () => {
     generateOverview(concept.identifier, {
-      onSuccess: () => {
-        // Note: The hook already shows a toast, so we don't need another one here
-
-        // Redirect to concept bank so user can see "Generating..." status
-        navigate(AppPath.ConceptBank);
-      },
       onError: () => {
         toast.errorAnimated(
           'Overview Generation Failed',
@@ -91,6 +99,7 @@ const OverviewWrapper: React.FC = () => {
         <ConceptOverview.ExecutiveDashboard
           conceptUuid={concept?.uuid}
           conceptId={concept?.identifier}
+          concept={concept}
         />
       ) : (
         <OverviewDetails />

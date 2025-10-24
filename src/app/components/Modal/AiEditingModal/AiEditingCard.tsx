@@ -5,7 +5,7 @@ import AucctusMessageInput from '@components/Input/AucctusMessageInput';
 import { toast } from '@components/Notification/toast';
 import { useModal } from '@context/ModalContextProvider';
 import {
-  doFullConceptInvalidation,
+  markConceptSectionsPending,
   useConceptAiEditing,
 } from '@hooks/query/concepts.hook';
 import {
@@ -13,11 +13,9 @@ import {
   IFeatureVersions,
   FeatureName,
 } from '@libs/api/types';
-import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useQueryClient } from 'react-query';
-import { useNavigate } from 'react-router-dom';
 import { animated, useTransition } from 'react-spring';
 import AiEditingConversation from './AiEditingConversation';
 import OutdatedSectionsBanner from './OutdatedSectionsBanner';
@@ -55,6 +53,53 @@ const getOutdatedSections = (featureVersions?: IFeatureVersions): string[] => {
   return outdatedSections;
 };
 
+// Map backend section names (snake_case) to frontend reportStatusBySection keys (camelCase)
+const SECTION_NAME_MAP: Record<string, string> = {
+  overview: 'overview',
+  market_scan: 'marketScan',
+  customer_profiles: 'customerProfiles',
+  financial_projection: 'financialProjection',
+  assumptions: 'assumptions',
+  // Additional mappings for AI editing response section names
+  concept: 'overview',
+  concept_title: 'overview',
+  concept_overview: 'overview',
+  concept_value_proposition: 'overview',
+  concept_problem_statement: 'overview',
+  what_is_this: 'overview',
+  should_we_do_this: 'overview',
+  regenerate_image: 'overview',
+  // Financial projection subsections
+  business_model: 'financialProjection',
+  pricing: 'financialProjection',
+  distribution_channels: 'financialProjection',
+  cost_drivers: 'financialProjection',
+  top_down_market_sizing: 'financialProjection',
+  bottom_up_market_sizing: 'financialProjection',
+  savings_method: 'financialProjection',
+  savings: 'financialProjection',
+  target_savings_areas: 'financialProjection',
+  cost_interferences: 'financialProjection',
+  impact_sizing: 'financialProjection',
+  // Customer profile subsections
+  customer_jobs: 'customerProfiles',
+  customer_pains: 'customerProfiles',
+  customer_alternatives: 'customerProfiles',
+  customer_journey_steps: 'customerProfiles',
+  customer_real_world_signals: 'customerProfiles',
+  // Market scan subsections
+  market_scan_ecosystem: 'marketScan',
+  market_scan_startups: 'marketScan',
+  market_scan_incumbents: 'marketScan',
+  // Trends subsections
+  trends_analysis: 'marketScan',
+  trends_key_findings: 'marketScan',
+  trends_priority_insights: 'marketScan',
+  trends_market_forces: 'marketScan',
+  // Assumptions/Tests subsections
+  tests: 'assumptions',
+};
+
 /**
  * AiEditingCard - A component that provides an AI-assisted editing experience
  * for concept reports. It manages a conversation flow between the user and AI.
@@ -70,6 +115,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
 
   // Identifiers for the concept and session
   const conceptUuid = useStore((state) => state.conceptReport.conceptUuid);
+  const conceptIdentifier = useStore((state) => state.conceptReport.identifier);
   const featureVersions = useStore(
     (state) => state.conceptReport.featureVersions,
   );
@@ -101,7 +147,6 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
   const { mutate: aiEditConcept, isLoading: isAiEditConceptLoading } =
     useConceptAiEditing();
   const { closeModal } = useModal();
-  const navigate = useNavigate();
 
   // ===== Animations =====
   const transition = useTransition(messages.length === 0, {
@@ -244,14 +289,43 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                     {
                       onSuccess: () => {
                         setAiEditSubmission(undefined);
-                        toast.warning(
-                          'Concept update started',
-                          'This may take up to 10 minutes. You can navigate away.',
+
+                        // Show info toast about regeneration starting
+                        toast.info(
+                          'Concept regeneration started',
+                          'We will refresh the report as updated sections complete.',
                         );
-                        doFullConceptInvalidation(queryClient);
-                        navigate(AppPath.ConceptBank, {
-                          replace: true,
-                        });
+
+                        // Mark sections as pending in the cache
+                        // DO NOT invalidate queries here - that would force a refetch from backend
+                        // which still shows "complete" status, overwriting our pending states.
+                        // WebSocket events will handle the actual data updates when backend completes.
+                        if (conceptIdentifier) {
+                          // Extract only the specific sections being edited from the AI response
+                          let sectionsToUpdate: string[] = [];
+
+                          if (aiEditSubmission?.edits) {
+                            sectionsToUpdate = Array.from(
+                              new Set(
+                                aiEditSubmission.edits
+                                  .map((edit) => SECTION_NAME_MAP[edit.section])
+                                  .filter(Boolean),
+                              ),
+                            );
+                          }
+
+                          // If no sections were mapped, skip updating
+                          if (sectionsToUpdate.length === 0) {
+                            return;
+                          }
+
+                          markConceptSectionsPending(
+                            queryClient,
+                            conceptIdentifier,
+                            sectionsToUpdate,
+                          );
+                        }
+
                         closeModal();
                       },
                     },

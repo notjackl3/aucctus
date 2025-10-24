@@ -1,4 +1,4 @@
-import { Loading } from '@components';
+import { ConceptReportSkeletons } from '@components';
 import { useEditCustomerProfile } from '@hooks/concepts/editable.hook';
 import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
@@ -15,14 +15,23 @@ import RealWorldSignalList from './signals/RealWorldSignalList';
 import CustomerAlternatives from './CustomerAlternatives';
 import UserJourneyFlow from './UserJourneyFlow';
 
+const {
+  ProfileOverviewSkeleton,
+  ProfileConversationSkeleton,
+  JobsToBeDoneSkeleton,
+  SkeletonBlock,
+} = ConceptReportSkeletons;
+
 export interface ICustomerDetailsProps {
   profile: ICustomerProfile;
   className?: string;
+  showSkeletons?: boolean;
 }
 
 const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   profile,
   className = '',
+  showSkeletons = false,
 }) => {
   const { description, isLoading } = useEditCustomerProfile(profile.uuid);
   const overviewRef = useRef<HTMLDivElement>(null);
@@ -113,6 +122,18 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
     }
   }, [isLoading]);
 
+  const shouldShowSkeleton = showSkeletons || isLoading;
+
+  const renderSupportSkeletonCard = () => (
+    <div className='aucctus-bg-primary aucctus-border-secondary flex flex-1 flex-col gap-3 rounded-lg border p-4 shadow-sm'>
+      <SkeletonBlock className='h-5 w-40' />
+      <SkeletonBlock className='h-3 w-28' />
+      <SkeletonBlock className='h-4 w-full' />
+      <SkeletonBlock className='h-4 w-3/4' />
+      <SkeletonBlock className='h-4 w-2/3' />
+    </div>
+  );
+
   return (
     <div
       className={cn(
@@ -120,9 +141,10 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         className,
       )}
     >
-      {isLoading ? (
-        <div className='flex flex-1 items-center justify-center'>
-          <Loading />
+      {shouldShowSkeleton ? (
+        <div className='flex w-full flex-row gap-4'>
+          <ProfileOverviewSkeleton />
+          <ProfileConversationSkeleton />
         </div>
       ) : (
         <div className='flex w-full flex-row gap-4'>
@@ -140,33 +162,53 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
       )}
 
       <div className='flex w-full flex-row gap-4'>
-        <CustomerJobs
-          customerProfileUuid={profile.uuid}
-          jobs={profile.jobs}
-          insight={profile.jobsToBeDoneInsight}
-        />
-        <CustomerPains
-          customerProfileUuid={profile.uuid}
-          pains={profile.pains}
-          insight={profile.painsInsight}
-        />
-        <CustomerAlternatives
-          customerProfileUuid={profile.uuid}
-          insight={profile.alternativesInsight}
-        />
+        {shouldShowSkeleton ? (
+          <JobsToBeDoneSkeleton />
+        ) : (
+          <CustomerJobs
+            customerProfileUuid={profile.uuid}
+            jobs={profile.jobs}
+            insight={profile.jobsToBeDoneInsight}
+          />
+        )}
+        {shouldShowSkeleton ? (
+          renderSupportSkeletonCard()
+        ) : (
+          <CustomerPains
+            customerProfileUuid={profile.uuid}
+            pains={profile.pains}
+            insight={profile.painsInsight}
+          />
+        )}
+        {shouldShowSkeleton ? (
+          renderSupportSkeletonCard()
+        ) : (
+          <CustomerAlternatives
+            customerProfileUuid={profile.uuid}
+            insight={profile.alternativesInsight}
+          />
+        )}
       </div>
 
       <div className='flex w-full flex-row gap-4'>
-        <UserJourneyFlow
-          customerProfileUuid={profile.uuid}
-          journey={profile.journey}
-          productName='High Fibre Cheese Bites'
-          insight={profile.journeyInsight}
-        />
+        {shouldShowSkeleton ? (
+          renderSupportSkeletonCard()
+        ) : (
+          <UserJourneyFlow
+            customerProfileUuid={profile.uuid}
+            journey={profile.journey}
+            productName='High Fibre Cheese Bites'
+            insight={profile.journeyInsight}
+          />
+        )}
       </div>
       {FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS && (
         <div className='flex w-full flex-row gap-4'>
-          <RealWorldSignalList profileUuid={profile.uuid} />
+          {shouldShowSkeleton ? (
+            renderSupportSkeletonCard()
+          ) : (
+            <RealWorldSignalList profileUuid={profile.uuid} />
+          )}
         </div>
       )}
     </div>

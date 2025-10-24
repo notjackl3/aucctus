@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { IConcept } from '@libs/api/types';
+import { ConceptReportStatus, IConcept } from '@libs/api/types';
 import { getSectionKeyForRoute } from '../../constants/conceptReportSections';
 
 interface UseUnifiedLoadingOptions {
@@ -21,12 +21,27 @@ interface UseUnifiedLoadingOptions {
 
 interface UseUnifiedLoadingResult {
   /**
-   * Whether the section should show loading state
+   * Whether downstream components should show skeleton placeholders
    */
-  isLoading: boolean;
+  isSectionPending: boolean;
 
   /**
-   * The reason for loading (for debugging purposes)
+   * Whether supporting data is currently loading (initial fetch, refetch, etc.)
+   */
+  hasBlockingLoad: boolean;
+
+  /**
+   * The mapped section key for the current route, if applicable
+   */
+  sectionKey: string | null;
+
+  /**
+   * The current status reported by the backend for this section
+   */
+  sectionStatus?: ConceptReportStatus;
+
+  /**
+   * Details to help with debugging different loading scenarios
    */
   loadingReason: 'section-pending' | 'api-loading' | 'no-concept' | null;
 }
@@ -50,7 +65,10 @@ export const useUnifiedLoading = (
     // If we don't have a concept yet, we're loading
     if (!concept) {
       return {
-        isLoading: true,
+        isSectionPending: false,
+        hasBlockingLoad: true,
+        sectionKey: null,
+        sectionStatus: undefined,
         loadingReason: 'no-concept',
       };
     }
@@ -59,12 +77,6 @@ export const useUnifiedLoading = (
     const hasApiLoading = additionalLoadingStates.some(
       (state) => state === true,
     );
-    if (hasApiLoading) {
-      return {
-        isLoading: true,
-        loadingReason: 'api-loading',
-      };
-    }
 
     // Get the section key for the current route
     const sectionKey = getSectionKeyForRoute(currentRoute);
@@ -73,26 +85,29 @@ export const useUnifiedLoading = (
     // we don't show loading based on reportStatusBySection
     if (!sectionKey) {
       return {
-        isLoading: false,
+        isSectionPending: false,
+        hasBlockingLoad: hasApiLoading,
+        sectionKey,
+        sectionStatus: undefined,
         loadingReason: null,
       };
     }
 
     // Check if the section status is 'pending' in reportStatusBySection
-    const sectionStatus = concept.reportStatusBySection?.[sectionKey]?.status;
+    const sectionStatus =
+      concept.reportStatusBySection?.[sectionKey]?.status || undefined;
     const isSectionPending = sectionStatus === 'pending';
 
-    if (isSectionPending) {
-      return {
-        isLoading: true,
-        loadingReason: 'section-pending',
-      };
-    }
-
-    // No loading conditions met
     return {
-      isLoading: false,
-      loadingReason: null,
+      isSectionPending,
+      hasBlockingLoad: hasApiLoading,
+      sectionKey,
+      sectionStatus,
+      loadingReason: hasApiLoading
+        ? 'api-loading'
+        : isSectionPending
+          ? 'section-pending'
+          : null,
     };
   }, [currentRoute, concept, additionalLoadingStates]);
 };

@@ -30,6 +30,7 @@ import UnifiedLoadingState from './Loading/UnifiedLoadingState';
 import NucleusPage from './Nucleus/NucleusPage/NucleusPage';
 import ComponentTooltip from './ToolTip/ComponentTooltip';
 import Tooltip from './ToolTip/Tooltip';
+import * as ConceptReportSkeletons from './Skeleton/ConceptReport';
 
 // Nucleus Components
 export * from './Nucleus';
@@ -50,6 +51,7 @@ export {
   ComponentTooltip,
   ConceptOverview,
   Container,
+  ConceptReportSkeletons,
   FileDropzone,
   Header,
   Icon,

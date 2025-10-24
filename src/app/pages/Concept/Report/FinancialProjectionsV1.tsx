@@ -20,11 +20,12 @@ const FinancialProjectionsV1: FunctionComponent = () => {
     useFinancialProjection(concept.uuid);
 
   // Use unified loading state
-  const { isLoading } = useUnifiedLoading({
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
     currentRoute: AppPath.ConceptFinancialProjection,
     concept,
     additionalLoadingStates: [isFinancialProjectionLoading],
   });
+  const shouldShowSkeletons = isSectionPending || hasBlockingLoad;
 
   const {
     tam,
@@ -94,7 +95,7 @@ const FinancialProjectionsV1: FunctionComponent = () => {
   );
 
   // Show unified loading state
-  if (isLoading) {
+  if (shouldShowSkeletons) {
     return <UnifiedLoadingState />;
   }
 

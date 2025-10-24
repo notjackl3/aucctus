@@ -7,6 +7,7 @@ import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '../query/query-keys';
 import useStore from '@stores/store';
 import {
+  IConcept,
   ISyntheticExecutionProgressMessage,
   ISyntheticExecutionErrorMessage,
   INucleusUploadProgressMessage,
@@ -93,6 +94,10 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   // Prevent duplicate toasts by tracking recent messages
   const recentMessages = React.useRef(new Set<string>());
 
+  // Track recent section completions to suppress full workflow toast for AI edits/partial regenerations
+  // Map: conceptIdentifier -> timestamp of last section completion
+  const recentSectionCompletions = React.useRef(new Map<string, number>());
+
   // Helper function to check and prevent duplicate messages
   const preventDuplicate = (messageKey: string): boolean => {
     if (recentMessages.current.has(messageKey)) {
@@ -116,13 +121,31 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const messageKey = `${message.eventType}-${message.conceptRootIdentifier || 'unknown'}`;
       if (preventDuplicate(messageKey)) return;
 
+      // Check if a section just completed within the last 5 seconds
+      // If so, this is a partial regeneration (AI edit), not a full concept generation
+      if (message.conceptRootIdentifier) {
+        const lastSectionCompletion = recentSectionCompletions.current.get(
+          message.conceptRootIdentifier,
+        );
+        const isPartialRegeneration =
+          lastSectionCompletion && Date.now() - lastSectionCompletion < 5000; // Within 5 seconds
+
+        if (isPartialRegeneration) {
+          // Clean up the tracking entry
+          recentSectionCompletions.current.delete(
+            message.conceptRootIdentifier,
+          );
+          return;
+        }
+      }
+
       const handler =
         config.conceptWorkflow.onWorkflowCompleted ||
         ((msg: any) => {
           toast.completed(
             'Concept Report Ready',
             `Your concept report has been generated successfully`,
-            undefined, // completedTime - can be added if available in message
+            undefined,
             () => {
               const conceptUrl = AppPath.ConceptOverview.replace(
                 ':id',
@@ -133,6 +156,70 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           );
         });
       handler(message);
+    } else if (message.eventType === 'section_completed') {
+      // Handle individual section completion - update cache with new data
+
+      // Track this section completion to suppress workflow_completed toast
+      // This indicates a partial regeneration (AI edit), not a full concept generation
+      if (message.conceptRootIdentifier) {
+        recentSectionCompletions.current.set(
+          message.conceptRootIdentifier,
+          Date.now(),
+        );
+      }
+
+      if (message.reportStatusBySection && message.conceptUuid) {
+        // Update the concept cache with the new section status data
+        queryClient.setQueryData<IConcept | undefined>(
+          [AucctusQueryKeys.concept, message.conceptUuid],
+          (existing) => {
+            if (!existing || !message.reportStatusBySection) return existing;
+
+            return {
+              ...existing,
+              reportStatusBySection: message.reportStatusBySection,
+            };
+          },
+        );
+
+        // Also update by identifier if different
+        if (
+          message.conceptRootIdentifier &&
+          message.conceptRootIdentifier !== message.conceptUuid
+        ) {
+          queryClient.setQueryData<IConcept | undefined>(
+            [AucctusQueryKeys.concept, message.conceptRootIdentifier],
+            (existing) => {
+              if (!existing || !message.reportStatusBySection) return existing;
+              return {
+                ...existing,
+                reportStatusBySection: message.reportStatusBySection,
+              };
+            },
+          );
+        }
+
+        // CRITICAL: Invalidate concept queries to force refetch of featureVersions
+        // This ensures we get the latest concept data including updated featureVersions
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.concept, message.conceptUuid],
+        });
+        if (
+          message.conceptRootIdentifier &&
+          message.conceptRootIdentifier !== message.conceptUuid
+        ) {
+          queryClient.invalidateQueries({
+            queryKey: [AucctusQueryKeys.concept, message.conceptRootIdentifier],
+          });
+        }
+
+        // Show completion toast for individual sections
+        toast.success(
+          `Section updated successfully!`,
+          message.message || 'Your changes have been applied.',
+          { autoClose: 5000 },
+        );
+      }
     } else if (message.eventType === 'workflow_error') {
       // Check for duplicates
       const messageKey = `${message.eventType}-${message.message || 'unknown'}`;

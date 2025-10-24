@@ -1,36 +1,37 @@
 import React from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { useGenerateKeyAssumptions } from '@hooks/query/concepts.hook';
 import AssumptionsV1 from './Assumptions/AssumptionsV1';
 import AssumptionsV2 from './Assumptions/AssumptionsV2';
-import { VersionUpgradeBanner } from '@components';
+import { VersionUpgradeBanner, ConceptReportSkeletons } from '@components';
 import { IConceptReportContext } from './ConceptReport/ConceptReport';
-import { AppPath } from '@routes/routes';
 import { toast } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
+import { AppPath } from '@routes/routes';
 
 const AssumptionsWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  const navigate = useNavigate();
   const { mutate: generateKeyAssumptions, isLoading } =
     useGenerateKeyAssumptions();
 
   // Use global debug mode state
   const isDebugModeEnabled = useDebugMode();
 
+  // Use unified loading state
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptKeyAssumptions,
+    concept,
+    additionalLoadingStates: [isLoading],
+  });
+  const shouldShowSkeletons = isSectionPending || hasBlockingLoad;
+
   // Use concept's featureVersions to determine which version to render
   const featureVersion = concept.featureVersions?.assumptions || 'v1';
   const shouldRenderV2 = featureVersion === 'v2';
 
   const handleUpgrade = () => {
-    generateKeyAssumptions(concept.identifier, {
-      onSuccess: () => {
-        // Navigate to concept bank after starting generation
-        navigate(AppPath.ConceptBank, {
-          replace: true,
-        });
-      },
-    });
+    generateKeyAssumptions(concept.identifier);
   };
 
   const handleDebugModeGenerate = () => {
@@ -71,7 +72,14 @@ const AssumptionsWrapper: React.FC = () => {
         />
       )}
 
-      {shouldRenderV2 ? <AssumptionsV2 /> : <AssumptionsV1 />}
+      {/* Show skeleton loading state */}
+      {shouldShowSkeletons ? (
+        <ConceptReportSkeletons.AssumptionsSkeleton />
+      ) : shouldRenderV2 ? (
+        <AssumptionsV2 />
+      ) : (
+        <AssumptionsV1 />
+      )}
     </>
   );
 };

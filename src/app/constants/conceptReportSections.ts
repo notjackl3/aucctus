@@ -9,8 +9,9 @@ export const CONCEPT_REPORT_SECTION_MAPPING: Record<string, string> = {
   [AppPath.ConceptCustomerProfile]: 'customerProfiles',
   [AppPath.ConceptFinancialProjection]: 'financialProjection',
   [AppPath.ConceptKeyAssumptions]: 'assumptions',
-  // Note: Settings and Testing tabs don't have corresponding reportStatusBySection entries
-  // as they are not part of the AI-generated report
+  [AppPath.ConceptTesting]: 'assumptions',
+  // Note: Settings tab doesn't have a corresponding reportStatusBySection entry
+  // as it is not part of the AI-generated report
 };
 
 /**

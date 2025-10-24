@@ -122,17 +122,124 @@ export const useConceptAiEditing = () => {
   });
 };
 
+export const markConceptSectionsPending = (
+  queryClient: QueryClient,
+  conceptIdentifier: string,
+  sectionKeys: string[],
+) => {
+  if (!conceptIdentifier || sectionKeys.length === 0) {
+    return;
+  }
+
+  const timestamp = new Date().toISOString();
+
+  const updateConcept = (concept?: IConcept) => {
+    if (!concept?.reportStatusBySection) {
+      return concept;
+    }
+
+    let didChange = false;
+    const nextSections = { ...concept.reportStatusBySection };
+
+    sectionKeys.forEach((key) => {
+      const current = nextSections[key];
+      if (!current) {
+        return;
+      }
+      if (current.status === 'pending') {
+        return;
+      }
+
+      nextSections[key] = {
+        ...current,
+        status: 'pending',
+        dateStarted: timestamp,
+        dateCompleted: '',
+      };
+      didChange = true;
+    });
+
+    if (!didChange) {
+      return concept;
+    }
+
+    return {
+      ...concept,
+      reportStatusBySection: nextSections,
+    };
+  };
+
+  // Update single concept query (by identifier)
+  queryClient.setQueryData<IConcept | undefined>(
+    [AucctusQueryKeys.concept, conceptIdentifier],
+    (existing) => {
+      return updateConcept(existing);
+    },
+  );
+
+  // Update concept by UUID query (if exists)
+  const allQueries = queryClient.getQueryCache().findAll();
+  const conceptUuidQuery = allQueries.find((query) => {
+    const key = query.queryKey as any[];
+    return key[0] === AucctusQueryKeys.concept && key[1] !== conceptIdentifier;
+  });
+
+  if (conceptUuidQuery) {
+    const conceptUuid = (conceptUuidQuery.queryKey as any[])[1];
+    queryClient.setQueryData<IConcept | undefined>(
+      [AucctusQueryKeys.concept, conceptUuid],
+      (existing) => updateConcept(existing),
+    );
+  }
+
+  // Update concepts list query
+  queryClient.setQueryData<{ results?: IConcept[] } | undefined>(
+    [AucctusQueryKeys.concepts],
+    (existing) => {
+      if (!existing?.results) {
+        return existing;
+      }
+
+      let didMutate = false;
+      const results = existing.results.map((concept) => {
+        if (concept.identifier !== conceptIdentifier) {
+          return concept;
+        }
+        const updated = updateConcept(concept);
+        if (updated && updated !== concept) {
+          didMutate = true;
+          return updated;
+        }
+        return concept;
+      });
+
+      if (!didMutate) {
+        return existing;
+      }
+
+      return {
+        ...existing,
+        results,
+      };
+    },
+  );
+};
+
 export const useGenerateKeyAssumptions = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (conceptIdentifier: string) =>
       await api.concept.generateKeyAssumptions(conceptIdentifier),
-    onSuccess: () => {
-      doFullConceptInvalidation(queryClient);
-      toast.warning(
-        'Generation Started',
-        'Key assumptions and tests generation started. This may take up to 10 minutes. You can navigate away.',
+    onSuccess: (_data, conceptIdentifier) => {
+      if (conceptIdentifier) {
+        markConceptSectionsPending(queryClient, conceptIdentifier, [
+          'assumptions',
+        ]);
+      }
+      toast.info(
+        'Key assumptions regeneration started',
+        "We'll refresh this section as soon as new insights are ready.",
       );
     },
     onError: (e) => {
@@ -151,11 +258,18 @@ export const useGenerateCustomerProfile = () => {
   return useMutation({
     mutationFn: async (conceptIdentifier: string) =>
       await api.concept.generateCustomerProfile(conceptIdentifier),
-    onSuccess: () => {
-      doFullConceptInvalidation(queryClient);
-      toast.warning(
-        'Customer profile generation started',
-        'This may take up to 10 minutes. You can navigate away.',
+    onSuccess: (_data, conceptIdentifier) => {
+      if (conceptIdentifier) {
+        markConceptSectionsPending(queryClient, conceptIdentifier, [
+          'customerProfiles',
+        ]);
+      }
+      // DO NOT invalidate queries here - that would force a refetch from backend
+      // which still shows "complete" status, overwriting our pending states.
+      // WebSocket events will handle the actual data updates when backend completes.
+      toast.info(
+        'Customer profile regeneration started',
+        "We'll refresh this section as soon as conversations complete.",
       );
     },
     onError: (e) => {
@@ -174,11 +288,18 @@ export const useGenerateMarketScan = () => {
   return useMutation({
     mutationFn: async (conceptIdentifier: string) =>
       await api.concept.generateMarketScan(conceptIdentifier),
-    onSuccess: () => {
-      doFullConceptInvalidation(queryClient);
-      toast.warning(
-        'Market scan generation started',
-        'This may take up to 10 minutes. You can navigate away.',
+    onSuccess: (_data, conceptIdentifier) => {
+      if (conceptIdentifier) {
+        markConceptSectionsPending(queryClient, conceptIdentifier, [
+          'marketScan',
+        ]);
+      }
+      // DO NOT invalidate queries here - that would force a refetch from backend
+      // which still shows "complete" status, overwriting our pending states.
+      // WebSocket events will handle the actual data updates when backend completes.
+      toast.info(
+        'Market scan regeneration started',
+        "We'll refresh this section as soon as new signals arrive.",
       );
     },
     onError: (e) => {
@@ -201,11 +322,18 @@ export const useGenerateConceptOverview = () => {
 
       return result;
     },
-    onSuccess: () => {
-      doFullConceptInvalidation(queryClient);
-      toast.warning(
-        'Overview generation started',
-        'This may take up to 10 minutes. You can navigate away.',
+    onSuccess: (_data, conceptIdentifier) => {
+      if (conceptIdentifier) {
+        markConceptSectionsPending(queryClient, conceptIdentifier, [
+          'overview',
+        ]);
+      }
+      // DO NOT invalidate queries here - that would force a refetch from backend
+      // which still shows "complete" status, overwriting our pending states.
+      // WebSocket events will handle the actual data updates when backend completes.
+      toast.info(
+        'Overview regeneration started',
+        "We'll refresh this section as soon as the updates finish.",
       );
     },
     onError: (e) => {

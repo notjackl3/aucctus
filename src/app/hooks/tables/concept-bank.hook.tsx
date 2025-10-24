@@ -18,6 +18,7 @@ import {
   SortableConceptProperties,
 } from '@libs/api/types';
 import utils from '@libs/utils';
+import { canOpenConceptWhilePending } from '@libs/utils/concepts';
 import { AppPath } from '@routes/routes';
 import {
   ColumnDef,
@@ -302,6 +303,21 @@ export const useConceptBank = (
             navigate(
               AppPath.ConceptOverview.replace(':id', row.original.identifier),
             );
+            break;
+          case 'pending':
+            if (
+              canOpenConceptWhilePending(
+                row.original.reportStatusBySection,
+                row.original.dateReportCompleted,
+              )
+            ) {
+              doFullConceptInvalidation(queryClient);
+              navigate(
+                AppPath.ConceptOverview.replace(':id', row.original.identifier),
+              );
+            } else {
+              e.stopPropagation();
+            }
             break;
           default:
             e.stopPropagation();

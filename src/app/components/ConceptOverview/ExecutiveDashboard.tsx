@@ -1,5 +1,6 @@
-import { Badge, Loading } from '@components';
+import { Badge, ConceptReportSkeletons } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
 import {
   useConceptCustomerProfiles,
@@ -11,6 +12,7 @@ import {
   useUpdateConceptImageSettings,
 } from '@hooks/query/concepts.hook';
 import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
+import { AppPath } from '@routes/routes';
 import React, { useCallback, useEffect, useState } from 'react';
 import { EXECUTIVE_DASHBOARD_CONFIG, executiveDashboardUIText } from './config';
 
@@ -33,12 +35,14 @@ interface ExecutiveDashboardProps {
   className?: string;
   conceptUuid?: string; // UUID for fetching real concept overview data
   conceptId?: string; // ID for navigation routing
+  concept?: any; // Add concept prop for unified loading detection
 }
 
 const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   className = '',
   conceptUuid,
   conceptId,
+  concept,
 }) => {
   // const navigate = useNavigate();
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
@@ -71,8 +75,25 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     isLoading: isLoadingAssumptions,
   } = useFilteredAssumptions(conceptId || '');
 
-  // Calculate overall loading state
+  // Use unified loading state to detect pending sections
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptOverview,
+    concept,
+    additionalLoadingStates: [
+      isLoadingOverview,
+      isLoadingExecutiveSummaries,
+      isLoadingFinancial,
+      isLoadingCustomerProfiles,
+      isLoadingMarketScan,
+      isLoadingMarketForces,
+      isLoadingAssumptions,
+    ],
+  });
+
+  // Calculate overall loading state - include section pending state
   const isLoading =
+    isSectionPending ||
+    hasBlockingLoad ||
     isLoadingOverview ||
     isLoadingExecutiveSummaries ||
     isLoadingFinancial ||
@@ -270,13 +291,11 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
     }
   };
 
-  // Show loading state while fetching data
+  // Show skeleton loading state while fetching data or when section is pending
   if (conceptUuid && isLoading) {
     return (
-      <div
-        className={`flex min-h-[400px] items-center justify-center ${className}`}
-      >
-        <Loading />
+      <div className={className}>
+        <ConceptReportSkeletons.ExecutiveDashboardSkeleton />
       </div>
     );
   }

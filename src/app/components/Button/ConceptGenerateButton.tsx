@@ -3,6 +3,7 @@ import {
   ConceptReportStatus,
   ConceptReportStatusBySection,
 } from '@libs/api/types';
+import { canOpenConceptWhilePending } from '@libs/utils/concepts';
 import { FunctionComponent, ReactNode } from 'react';
 import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
 import ConceptGeneratingButton from './ConceptGeneratingButton';
@@ -65,8 +66,13 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   dateReportStarted,
   dateReportCompleted,
 }) => {
+  const canOpenWhilePending = canOpenConceptWhilePending(
+    reportStatusBySection,
+    dateReportCompleted,
+  );
+
   // If in pending state, use the ConceptGeneratingButton component
-  if (variant === 'pending') {
+  if (variant === 'pending' && !canOpenWhilePending) {
     return (
       <ConceptGeneratingButton
         reportStatusBySection={reportStatusBySection}
@@ -76,8 +82,29 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
     );
   }
 
+  const effectiveVariant =
+    variant === 'pending' && canOpenWhilePending ? 'complete' : variant;
+
   // Get button style and label
-  const { style, label } = getButtonContext(variant);
+  const { style, label } = getButtonContext(effectiveVariant);
+  const resolvedLabel =
+    variant === 'pending' && canOpenWhilePending ? (
+      <span className='flex items-center gap-2'>
+        <span className='aucctus-text-primary flex'>
+          {'Updating'.split('').map((letter, index) => (
+            <span
+              key={index}
+              className='inline-block animate-pulse-slow'
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              {letter}
+            </span>
+          ))}
+        </span>
+      </span>
+    ) : (
+      label
+    );
 
   // For all states with reportStatusBySection data, wrap with tooltip
   if (reportStatusBySection) {
@@ -93,7 +120,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
         hideDelay={0}
       >
         <button className={style} onClick={onClick} disabled={disabled}>
-          {label}
+          {resolvedLabel}
         </button>
       </ComponentTooltip>
     );
@@ -102,7 +129,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   // Otherwise return the regular button
   return (
     <button className={style} onClick={onClick} disabled={disabled}>
-      {label}
+      {resolvedLabel}
     </button>
   );
 };

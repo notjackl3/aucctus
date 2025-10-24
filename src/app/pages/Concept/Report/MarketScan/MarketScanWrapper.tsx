@@ -1,17 +1,15 @@
 import React from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { useGenerateMarketScan } from '@hooks/query/concepts.hook';
 import MarketScanV2 from './v2/MarketScanV2';
 import MarketScanV3 from './v3/MarketScanV3';
 import { VersionUpgradeBanner } from '@components';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
-import { AppPath } from '@routes/routes';
 import { toast } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 
 const MarketScanWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  const navigate = useNavigate();
   const { mutate: generateMarketScan, isLoading } = useGenerateMarketScan();
 
   // Use global debug mode state
@@ -22,14 +20,7 @@ const MarketScanWrapper: React.FC = () => {
   const shouldRenderV3 = featureVersion === 'v3';
 
   const handleUpgrade = () => {
-    generateMarketScan(concept.identifier, {
-      onSuccess: () => {
-        // Navigate to concept bank after starting generation
-        navigate(AppPath.ConceptBank, {
-          replace: true,
-        });
-      },
-    });
+    generateMarketScan(concept.identifier);
   };
 
   const handleDebugModeGenerate = () => {

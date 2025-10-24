@@ -3,9 +3,11 @@ import { useOutletContext } from 'react-router-dom';
 import RecommendedTestSection from './components/RecommendedTestSection';
 import TestHistorySection from './components/TestHistorySection';
 import { useModal } from '@context/ModalContextProvider';
-import { Modal, Loading, Icon } from '@components';
+import { Modal, Icon, ConceptReportSkeletons } from '@components';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { useTestDetails } from '@hooks/query/testing.hook';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
+import { AppPath } from '@routes/routes';
 
 // Context for tracking test completion loading state
 interface TestCompletionContextType {
@@ -29,6 +31,7 @@ const Testing: React.FC = () => {
   const {
     testDetails,
     isLoading: isTestDetailsLoading,
+    isFetching: isTestDetailsFetching,
     error: testDetailsError,
   } = useTestDetails(conceptUuid);
 
@@ -83,14 +86,14 @@ const Testing: React.FC = () => {
     }
   };
 
-  // Show loading state while fetching test details
-  if (isTestDetailsLoading) {
-    return (
-      <div className='flex h-full w-full items-center justify-center'>
-        <Loading />
-      </div>
-    );
-  }
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptTesting,
+    concept,
+    additionalLoadingStates: [isTestDetailsLoading, isTestDetailsFetching],
+  });
+
+  const shouldShowSkeletons =
+    !testDetailsError && (isSectionPending || hasBlockingLoad);
 
   // Show error state if there's an error
   if (testDetailsError) {
@@ -139,6 +142,10 @@ const Testing: React.FC = () => {
 
   // Show no data state if no tests are available
   const hasNoData = !testDetails || testDetails.length === 0;
+
+  if (shouldShowSkeletons) {
+    return <ConceptReportSkeletons.TestingSkeleton />;
+  }
 
   return (
     <TestCompletionContext.Provider

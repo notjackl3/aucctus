@@ -17,7 +17,10 @@ import {
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
-import { doFullConceptInvalidation } from './concepts.hook';
+import {
+  doFullConceptInvalidation,
+  markConceptSectionsPending,
+} from './concepts.hook';
 import { AucctusQueryKeys } from './query-keys';
 
 // Financial Projection hooks
@@ -704,11 +707,16 @@ export const useGenerateFinancialProjection = () => {
       await api.financialProjection.generateFinancialProjection(
         conceptIdentifier,
       ),
-    onSuccess: () => {
+    onSuccess: (_data, conceptIdentifier) => {
+      if (conceptIdentifier) {
+        markConceptSectionsPending(queryClient, conceptIdentifier, [
+          'financialProjection',
+        ]);
+      }
       doFullConceptInvalidation(queryClient);
-      toast.warning(
-        'Financial projection generation started',
-        'This may take up to 10 minutes. You can navigate away.',
+      toast.info(
+        'Financial projection regeneration started',
+        "We'll refresh this section as soon as the numbers are ready.",
       );
     },
     onError: (e) => {

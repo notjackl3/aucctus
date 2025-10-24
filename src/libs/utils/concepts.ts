@@ -5,6 +5,7 @@ import type {
 import type {
   ActiveConceptStatus,
   ArchivedConceptStatus,
+  ConceptReportStatusBySection,
   ConceptStatus,
   DraftConceptStatus,
   MarketMetricType,
@@ -230,4 +231,33 @@ export function getConceptStatusDisplayName(status: ConceptStatus): string {
   };
 
   return statusDisplayNameMap[status];
+}
+
+/**
+ * Determines whether a concept can be opened while its aggregate status is still pending.
+ * We allow opening when the concept has previously completed at least once or
+ * when at least one section has already finished regenerating.
+ */
+export function canOpenConceptWhilePending(
+  reportStatusBySection?: ConceptReportStatusBySection,
+  dateReportCompleted?: string | null,
+): boolean {
+  if (dateReportCompleted) {
+    return true;
+  }
+
+  if (!reportStatusBySection) {
+    return false;
+  }
+
+  return Object.values(reportStatusBySection).some((section) => {
+    if (!section) {
+      return false;
+    }
+
+    const sectionStatus =
+      typeof section === 'string' ? section : section.status;
+
+    return sectionStatus === 'complete';
+  });
 }

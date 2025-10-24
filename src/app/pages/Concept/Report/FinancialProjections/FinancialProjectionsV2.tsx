@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import useStore from '@stores/store';
 import { useFinancialProjectionV2 } from '@hooks/query/financialProjections.hook';
-import { UnifiedLoadingState } from '@components';
+import { ConceptReportSkeletons } from '@components';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
@@ -17,11 +17,12 @@ const FinancialProjectionsV2: React.FC = () => {
     useFinancialProjectionV2(concept.uuid);
 
   // Use unified loading state
-  const { isLoading } = useUnifiedLoading({
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
     currentRoute: AppPath.ConceptFinancialProjection,
     concept,
     additionalLoadingStates: [isFinancialProjectionLoading],
   });
+  const shouldShowSkeletons = isSectionPending || hasBlockingLoad;
 
   const { setActiveFinancialProjection } = useStore(
     (state) => state.financialProjection,
@@ -59,9 +60,9 @@ const FinancialProjectionsV2: React.FC = () => {
     [],
   );
 
-  // Show unified loading state
-  if (isLoading) {
-    return <UnifiedLoadingState />;
+  // Show skeleton loading state
+  if (shouldShowSkeletons) {
+    return <ConceptReportSkeletons.FinancialProjectionSkeleton />;
   }
 
   if (!financialProjectionV2) {

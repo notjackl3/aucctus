@@ -1,4 +1,10 @@
-import { Card, Header, Text, UnifiedLoadingState } from '@components';
+import {
+  Card,
+  ConceptReportSkeletons,
+  Header,
+  Text,
+  UnifiedLoadingState,
+} from '@components';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { useDebugMode } from '@hooks/debug-mode.hook';
@@ -22,11 +28,12 @@ const OverviewDetails: FunctionComponent = () => {
   const { valueProposition, problemStatement, overview } = useEditConcept();
 
   // Use unified loading state
-  const { isLoading } = useUnifiedLoading({
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
     currentRoute: AppPath.ConceptOverview,
     concept,
     additionalLoadingStates: [isCustomerProfilesLoading],
   });
+  const shouldShowSkeletons = isSectionPending || hasBlockingLoad;
 
   const firstCustomerPersona = useMemo(() => {
     if (!profiles || profiles.length === 0) {
@@ -35,9 +42,8 @@ const OverviewDetails: FunctionComponent = () => {
     return profiles[0];
   }, [profiles]);
 
-  // Show unified loading state
-  if (isLoading) {
-    return <UnifiedLoadingState />;
+  if (shouldShowSkeletons) {
+    return <ConceptReportSkeletons.ExecutiveDashboardSkeleton />;
   }
 
   // Handle case where concept is not available but we're not loading

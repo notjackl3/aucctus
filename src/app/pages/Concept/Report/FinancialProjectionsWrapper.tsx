@@ -1,17 +1,15 @@
 import React from 'react';
-import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import { useGenerateFinancialProjection } from '@hooks/query/financialProjections.hook';
 import FinancialProjectionsV2 from './FinancialProjections/FinancialProjectionsV2';
 import FinancialProjectionsV1 from './FinancialProjectionsV1';
 import { VersionUpgradeBanner } from '@components';
 import { IConceptReportContext } from './ConceptReport/ConceptReport';
-import { AppPath } from '@routes/routes';
 import { toast } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 
 const FinancialProjectionsWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
-  const navigate = useNavigate();
   const { mutate: generateFinancialProjection, isLoading } =
     useGenerateFinancialProjection();
 
@@ -23,14 +21,7 @@ const FinancialProjectionsWrapper: React.FC = () => {
   const shouldRenderV2 = featureVersion === 'v2';
 
   const handleUpgrade = () => {
-    generateFinancialProjection(concept.identifier, {
-      onSuccess: () => {
-        // Navigate to concept bank after starting generation
-        navigate(AppPath.ConceptBank, {
-          replace: true,
-        });
-      },
-    });
+    generateFinancialProjection(concept.identifier);
   };
 
   const handleDebugModeGenerate = () => {

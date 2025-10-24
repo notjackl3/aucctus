@@ -268,6 +268,7 @@ module.exports = {
         'slide-out-left': 'slideOutLeft 0.3s ease both',
         'slide-in-right': 'slideInRight 0.3s ease both',
         'slide-out-right': 'slideOutRight 0.3s ease both',
+        'pulse-slow': 'pulseSlow 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
         incubationAnswerExpand: {
@@ -367,6 +368,10 @@ module.exports = {
         slideOutRight: {
           from: { transform: 'translateX(0)', opacity: '1' },
           to: { transform: 'translateX(100%)', opacity: '0' },
+        },
+        pulseSlow: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.5' },
         },
       },
     },
