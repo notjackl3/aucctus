@@ -17,6 +17,8 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
   estimatedSeconds,
   startTime,
   conceptUuid,
+  testUuid,
+  plannedParticipantCounts,
   onViewResults,
 }) => {
   // Calculate persona progress using completed profile UUIDs from WebSocket events
@@ -51,6 +53,9 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
       <CompletedState
         profiles={profiles}
         resultsCount={resultsCount}
+        conceptUuid={conceptUuid}
+        testUuid={testUuid}
+        plannedParticipantCounts={plannedParticipantCounts}
         onViewResults={onViewResults}
       />
     );

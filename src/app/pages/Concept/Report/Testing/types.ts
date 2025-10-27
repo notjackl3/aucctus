@@ -1,3 +1,5 @@
+import { ITestResult as ITestResultApi } from '@libs/api/types/concept/testing';
+
 export interface Assumption {
   id: string;
   description: string;
@@ -215,26 +217,8 @@ export interface ITestParticipantUpdate {
   notes?: string;
 }
 
-export interface ITestResult {
-  uuid: string;
-  title: string;
-  description?: string;
-  fileType:
-    | 'pdf'
-    | 'docx'
-    | 'xlsx'
-    | 'csv'
-    | 'txt'
-    | 'mp4'
-    | 'mp3'
-    | 'json'
-    | 'other';
-  filePath: string;
-  fileSize: number;
-  originalFilename: string;
-  downloadUrl?: string; // Pre-signed S3 URL
-  createdAt: string;
-  updatedAt: string;
+export interface ITestResult extends ITestResultApi {
+  downloadUrl?: string; // Pre-signed S3 URL for backward compatibility
 }
 
 export interface ITestResultCreate {
@@ -329,6 +313,6 @@ export interface ITestDetailsExtended extends ITestDetails {
 export interface IPageResponse<T> {
   results: T[];
   count: number;
-  next?: string;
-  previous?: string;
+  next?: string | null;
+  previous?: string | null;
 }

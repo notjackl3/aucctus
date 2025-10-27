@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Icon } from '@components';
 import { useTestResults, useTestDetail } from '@hooks/query/testing.hook';
 import { ITestResult } from '@libs/api/types/concept/testing';
@@ -31,6 +31,12 @@ const TestResults: React.FC<TestResultsProps> = ({
 }) => {
   // Custom hooks for state management
   const state = useTestResultsState({ conceptUuid, testUuid });
+
+  // Ref to track previous state and prevent unnecessary updates
+  const prevResultsStateRef = useRef<{
+    hasResults: boolean;
+    hasRecommendations: boolean;
+  }>({ hasResults: false, hasRecommendations: false });
 
   // State for multiple card expansion
   const [expandedCardIds, setExpandedCardIds] = useState<Set<string>>(
@@ -109,20 +115,27 @@ const TestResults: React.FC<TestResultsProps> = ({
   const shouldShowResults = hasResults; // Always show results if they exist
   const shouldShowFindings = hasResults; // Always show findings if results exist
 
-  // Notify parent about results state changes
+  // Notify parent about results state changes - only when values actually change
   useEffect(() => {
-    if (onResultsChange && !isResultsLoading) {
+    if (!isResultsLoading && onResultsChange) {
       const hasRecommendations =
         hasResults &&
         results.some(
           (result: any) =>
             result.editRecommendations && result.editRecommendations.length > 0,
         );
-      onResultsChange(hasResults, hasRecommendations);
+
+      // Only call onResultsChange if values have actually changed
+      const prevState = prevResultsStateRef.current;
+      if (
+        prevState.hasResults !== hasResults ||
+        prevState.hasRecommendations !== hasRecommendations
+      ) {
+        prevResultsStateRef.current = { hasResults, hasRecommendations };
+        onResultsChange(hasResults, hasRecommendations);
+      }
     }
-    // Deliberately excluding onResultsChange from dependencies to avoid loops
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [results, isResultsLoading, hasResults]);
+  }, [isResultsLoading, hasResults, results, onResultsChange]);
 
   // Loading state
   if (isResultsLoading) {

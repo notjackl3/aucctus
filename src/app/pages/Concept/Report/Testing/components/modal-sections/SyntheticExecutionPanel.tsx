@@ -479,6 +479,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
           estimatedSeconds={estimatedSeconds}
           startTime={startTime}
           conceptUuid={conceptUuid}
+          testUuid={testUuid}
+          plannedParticipantCounts={participantCounts}
           onViewResults={onNavigateToResults}
         />
       )}
