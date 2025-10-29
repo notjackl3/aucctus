@@ -48,10 +48,7 @@ export const useTestResultsOperations = ({
   // Handle file upload
   const handleFilesUpload = async (uploadedFiles: UploadedFile[]) => {
     if (!conceptUuid || !testUuid) {
-      toast.errorAnimated(
-        'Missing Information',
-        'Missing concept or test information',
-      );
+      toast.error('Missing Information', 'Missing concept or test information');
       return;
     }
 
@@ -164,10 +161,7 @@ export const useTestResultsOperations = ({
     resultTitle: string,
   ) => {
     if (!conceptUuid || !testUuid) {
-      toast.errorAnimated(
-        'Missing Information',
-        'Missing concept or test information',
-      );
+      toast.error('Missing Information', 'Missing concept or test information');
       return;
     }
 
@@ -201,10 +195,7 @@ export const useTestResultsOperations = ({
     fileName: string,
   ) => {
     if (!conceptUuid || !testUuid) {
-      toast.errorAnimated(
-        'Missing Information',
-        'Missing concept or test information',
-      );
+      toast.error('Missing Information', 'Missing concept or test information');
       return;
     }
 
@@ -255,12 +246,12 @@ export const useTestResultsOperations = ({
             });
           }
 
-          toast.successAnimated(
+          toast.success(
             'Results Deleted',
             `Successfully deleted all ${results.length} test results`,
           );
         } catch (error) {
-          toast.errorAnimated(
+          toast.error(
             'Deletion Failed',
             'Failed to delete some results. Please try again',
           );
@@ -316,12 +307,12 @@ export const useTestResultsOperations = ({
             });
           }
 
-          toast.successAnimated(
+          toast.success(
             'Files Deleted',
             `Successfully deleted all ${allFiles.length} files`,
           );
         } catch (error) {
-          toast.errorAnimated(
+          toast.error(
             'File Deletion Failed',
             'Failed to delete some files. Please try again',
           );
@@ -336,7 +327,7 @@ export const useTestResultsOperations = ({
   // Handle download of synthetic test results as CSV
   const handleDownloadResults = async () => {
     if (!conceptUuid || !testUuid) {
-      toast.errorAnimated(
+      toast.error(
         'Missing Test Information',
         'Missing test information. Please try again',
       );
@@ -350,7 +341,7 @@ export const useTestResultsOperations = ({
       const syntheticResults = results.filter((result) => result.isSynthetic);
 
       if (syntheticResults.length === 0) {
-        toast.errorAnimated(
+        toast.error(
           'No Results Found',
           'No synthetic test results found to download',
         );
@@ -374,12 +365,12 @@ export const useTestResultsOperations = ({
       document.body.removeChild(a);
       window.URL.revokeObjectURL(url);
 
-      toast.successAnimated(
+      toast.success(
         'Download Complete',
         `Downloaded ${syntheticResults.length} synthetic test results as PDF`,
       );
     } catch (error) {
-      toast.errorAnimated(
+      toast.error(
         'Download Failed',
         'Failed to download test results. Please try again',
       );

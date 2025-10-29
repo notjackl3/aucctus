@@ -9,6 +9,7 @@ import { ISocketConfig, SocketService } from './base/socketService';
 import { ConceptApi } from './concepts';
 import { SocketEndpoints } from './endpoints';
 import { FinancialProjectionApi } from './financialProjection';
+import { IdeaPlaygroundApi } from './ideaPlayground';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { NucleusApi } from './nucleus';
@@ -43,6 +44,7 @@ export class Api {
   financialProjection!: FinancialProjectionApi;
   trendsAndDriversV3!: TrendsAndDriversV3Api;
   nucleus!: NucleusApi;
+  ideaPlayground!: IdeaPlaygroundApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -68,6 +70,7 @@ export class Api {
       { key: 'financialProjection', class: FinancialProjectionApi },
       { key: 'trendsAndDriversV3', class: TrendsAndDriversV3Api },
       { key: 'nucleus', class: NucleusApi },
+      { key: 'ideaPlayground', class: IdeaPlaygroundApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

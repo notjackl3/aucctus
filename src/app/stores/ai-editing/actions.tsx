@@ -150,7 +150,7 @@ export function handleAiEditingMessage(
   const conceptUuid = storeApi.getState().conceptReport.conceptUuid;
 
   if (handshake.conceptUuid !== conceptUuid) {
-    toast.errorAnimated('Concept Not Found', 'Unable to find Concept to edit.');
+    toast.error('Concept Not Found', 'Unable to find Concept to edit.');
     telemetry.debug('Ai Editing Handshake Concept Mismatch', {
       handshakeConceptUuid: handshake.conceptUuid,
       conceptUuid,
@@ -205,7 +205,7 @@ export async function sendMessage(this: IStoreApi<IAiEditingState>) {
   // Validate required data
   let error = false;
   if (!conceptUuid) {
-    toast.errorAnimated('Concept Not Found', 'Unable to find Concept to edit.');
+    toast.error('Concept Not Found', 'Unable to find Concept to edit.');
     telemetry.debug('Ai Editing Send Message Concept Not Found', {
       conceptUuid,
     });
@@ -213,7 +213,7 @@ export async function sendMessage(this: IStoreApi<IAiEditingState>) {
   }
 
   if (!currentMessage && !currentMediaUpload) {
-    toast.errorAnimated('No Message', 'No message to send.');
+    toast.error('No Message', 'No message to send.');
     telemetry.debug('Ai Editing Send Message No Message', {
       currentMessage,
       currentMediaUpload,

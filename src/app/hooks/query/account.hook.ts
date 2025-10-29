@@ -178,7 +178,7 @@ export const useUpdateUser = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.userDetails],
       });
-      toast.successAnimated(
+      toast.success(
         'Profile Updated',
         'Your user profile has been updated successfully',
       );

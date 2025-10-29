@@ -290,7 +290,7 @@ export const useSyntheticExecutionEvents = (
               progress: 0,
               message: '',
             });
-            toast.successAnimated(
+            toast.success(
               'Test Cancelled',
               'Synthetic test execution has been stopped',
             );
@@ -302,7 +302,7 @@ export const useSyntheticExecutionEvents = (
               message: data.errorMessage,
               error: data.errorMessage,
             }));
-            toast.errorAnimated(
+            toast.error(
               'Test Execution Failed',
               data.errorMessage || 'An error occurred during test execution',
             );

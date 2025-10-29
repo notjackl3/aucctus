@@ -41,17 +41,14 @@ const ResetPassword: FunctionComponent = () => {
 
     if (!code?.trim() || !password || !confirmPassword) {
       if (!code?.trim())
-        toast.errorAnimated(
+        toast.error(
           'Verification Code Required',
           'Please enter the verification code from your email',
         );
       else if (!password)
-        toast.errorAnimated(
-          'Password Required',
-          'Please enter your new password',
-        );
+        toast.error('Password Required', 'Please enter your new password');
       else if (!confirmPassword)
-        toast.errorAnimated(
+        toast.error(
           'Password Confirmation Required',
           'Please confirm your new password',
         );
@@ -77,7 +74,7 @@ const ResetPassword: FunctionComponent = () => {
 
       if (result.status === 'complete') {
         // Password reset successful
-        toast.successAnimated(
+        toast.success(
           'Password Reset Successful',
           'Your password has been updated successfully!',
         );
@@ -90,7 +87,7 @@ const ResetPassword: FunctionComponent = () => {
           'Additional verification required after password reset:',
           result,
         );
-        toast.errorAnimated(
+        toast.error(
           'Password Reset Incomplete',
           'Please try again to complete the password reset',
         );
@@ -103,15 +100,15 @@ const ResetPassword: FunctionComponent = () => {
           err.errors[0].message.includes('Invalid code') ||
           err.errors[0].message.includes('expired')
         ) {
-          toast.errorAnimated(
+          toast.error(
             'Invalid Verification Code',
             'Invalid or expired verification code. Please request a new one.',
           );
         } else {
-          toast.errorAnimated('Password Reset Failed', err.errors[0].message);
+          toast.error('Password Reset Failed', err.errors[0].message);
         }
       } else {
-        toast.errorAnimated(
+        toast.error(
           'Password Reset Failed',
           'Unable to reset password. Please try again',
         );

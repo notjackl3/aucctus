@@ -36,6 +36,9 @@ export enum AppPath {
   /* Nucleus */
   Nucleus = '/nucleus',
 
+  /* Idea Playground */
+  IdeaPlayground = '/playground',
+
   /* Settings */
   Settings = '/settings',
   SettingsAbout = '/settings/about',

@@ -1,4 +1,4 @@
-import { Loading } from '@components';
+import { toast, ConceptReportSkeletons } from '@components';
 import { useSeed } from '@hooks/query/concepts.hook';
 import { ConceptIncubationQuestion, IConceptSeedAnswer } from '@libs/api/types';
 import { isMultiSelectQuestion } from '@libs/api/utils/typeGuards';
@@ -12,7 +12,6 @@ import { useClarifyingQuestionsWithAnswers } from '@hooks/concepts/clarifying-qu
 import { useCloneSeed } from '@hooks/query/concepts.hook';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
-import { toast } from '@components';
 import utils from '@libs/utils';
 
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
@@ -75,16 +74,13 @@ const ConceptSettings: React.FC = () => {
 
   const handleCloneConceptSeed = () => {
     if (!seedDraft?.uuid) {
-      toast.errorAnimated('No Seed Available', 'No seed available to clone');
+      toast.error('No Seed Available', 'No seed available to clone');
       return;
     }
 
     cloneSeed(seedDraft.uuid, {
       onSuccess: (clonedSeed) => {
-        toast.successAnimated(
-          'Seed Cloned',
-          'Concept seed cloned successfully!',
-        );
+        toast.success('Seed Cloned', 'Concept seed cloned successfully!');
         // Navigate to the incubation page with the cloned seed
         resetQuestionnaire();
         setIsNewSeed(false);
@@ -96,7 +92,7 @@ const ConceptSettings: React.FC = () => {
       },
       onError: (error) => {
         const message = utils.osiris.parseFormError(error);
-        toast.errorAnimated(
+        toast.error(
           'Seed Clone Failed',
           message || 'Failed to clone concept seed. Please try again.',
         );
@@ -104,64 +100,62 @@ const ConceptSettings: React.FC = () => {
     });
   };
 
+  if (isLoading) {
+    return <ConceptReportSkeletons.ConceptSettingsSkeleton />;
+  }
+
   return (
     <div className='h-full w-full'>
       <div className='mx-0 max-w-3xl'>
-        {isLoading ? (
-          <div className='flex w-full justify-center py-8'>
-            <Loading />
-          </div>
-        ) : (
-          <div className='no-scrollbar mt-4 flex flex-1 flex-col gap-6'>
-            {ignitionQuestions.length > 0 && (
-              <>
-                <div className='flex items-center justify-between'>
-                  <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
-                    Initial Questions
-                  </h2>
-                  {/* Clone Concept Seed Button */}
-                  <button
-                    onClick={handleCloneConceptSeed}
-                    className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-                    disabled={isLoading || isCloning || !seedDraft}
-                  >
-                    {isCloning ? 'Cloning...' : 'Clone Concept Seed'}
-                  </button>
-                </div>
-                <div className='no-scrollbar flex flex-1 flex-col gap-3'>
-                  {ignitionQuestions.map((answer) => (
-                    <IgnitionQuestion
-                      key={`ignition-${answer.question.id}`}
+        <div className='no-scrollbar mt-4 flex flex-1 flex-col gap-6'>
+          {ignitionQuestions.length > 0 && (
+            <>
+              <div className='flex items-center justify-between'>
+                <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
+                  Initial Questions
+                </h2>
+                {/* Clone Concept Seed Button */}
+                <button
+                  onClick={handleCloneConceptSeed}
+                  className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+                  disabled={isLoading || isCloning || !seedDraft}
+                >
+                  {isCloning ? 'Cloning...' : 'Clone Concept Seed'}
+                </button>
+              </div>
+              <div className='no-scrollbar flex flex-1 flex-col gap-3'>
+                {ignitionQuestions.map((answer) => (
+                  <IgnitionQuestion
+                    key={`ignition-${answer.question.id}`}
+                    answer={answer}
+                    question={answer.question}
+                    formatAnswer={formatAnswer}
+                  />
+                ))}
+              </div>
+            </>
+          )}
+
+          {filteredClarifyingQuestions.length > 0 && (
+            <>
+              <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
+                Clarifying Questions
+              </h2>
+              <div className='no-scrollbar flex flex-1 flex-col gap-3'>
+                {filteredClarifyingQuestions.map(({ question, answer }) => {
+                  return (
+                    <ClarifyingQuestion
+                      key={`clarifying-${question.uuid}`}
+                      question={question}
                       answer={answer}
-                      question={answer.question}
                       formatAnswer={formatAnswer}
                     />
-                  ))}
-                </div>
-              </>
-            )}
-
-            {filteredClarifyingQuestions.length > 0 && (
-              <>
-                <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
-                  Clarifying Questions
-                </h2>
-                <div className='no-scrollbar flex flex-1 flex-col gap-3'>
-                  {filteredClarifyingQuestions.map(({ question, answer }) => {
-                    return (
-                      <ClarifyingQuestion
-                        key={`clarifying-${question.uuid}`}
-                        question={question}
-                        answer={answer}
-                        formatAnswer={formatAnswer}
-                      />
-                    );
-                  })}
-                </div>
-              </>
-            )}
-          </div>
-        )}
+                  );
+                })}
+              </div>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

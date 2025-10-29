@@ -78,58 +78,6 @@ const show = (content: ToastContent, options?: AucctusToastOptions): Id => {
 };
 
 /**
- * Displays a success toast notification using the Toast component
- * @param message Primary message or Toast component
- * @param secondaryMessage Optional secondary message
- * @param options Additional toast options
- * @returns The toast ID
- */
-const success = (
-  message: string | ToastContent,
-  secondaryMessage?: string,
-  options?: Omit<AucctusToastOptions, 'type'>,
-): Id => {
-  if (typeof message === 'string') {
-    return reactToast(AucctusToast, {
-      ...defaultOptions,
-      ...options,
-      data: {
-        primaryMessage: message,
-        secondaryMessage,
-        status: 'success',
-      },
-    });
-  }
-  return show(message, { ...options, type: 'success' });
-};
-
-/**
- * Displays an error toast notification using the Toast component
- * @param message Primary message or Toast component
- * @param secondaryMessage Optional secondary message
- * @param options Additional toast options
- * @returns The toast ID
- */
-const error = (
-  message: string | ToastContent,
-  secondaryMessage?: string,
-  options?: Omit<AucctusToastOptions, 'type'>,
-): Id => {
-  if (typeof message === 'string') {
-    return reactToast(AucctusToast, {
-      ...defaultOptions,
-      ...options,
-      data: {
-        primaryMessage: message,
-        secondaryMessage,
-        status: 'alert',
-      },
-    });
-  }
-  return show(message, { ...options, type: 'error' });
-};
-
-/**
  * Displays an info toast notification using the Toast component
  * @param message Primary message or Toast component
  * @param secondaryMessage Optional secondary message
@@ -311,10 +259,14 @@ const completed = (
  * @param description Optional description
  * @returns The toast ID
  */
-const successAnimated = (title: string, description?: string): Id => {
+const success = (
+  title: string,
+  description?: string,
+  autoClose?: number,
+): Id => {
   return reactToast((props) => React.createElement(SimpleSuccessToast, props), {
     ...defaultOptions,
-    autoClose: 5000,
+    autoClose: autoClose || 5000,
     data: {
       title,
       description,
@@ -325,21 +277,25 @@ const successAnimated = (title: string, description?: string): Id => {
 /**
  * Displays an error toast with animated error icon
  * @param title Error title
- * @param description Error description
+ * @param description Error description (optional, defaults to "Please try again later. If the problem persists, please contact Aucctus.")
+ * @param autoClose Auto close duration (optional, defaults to 7000)  (in milliseconds)
  * @param onRetry Optional retry handler
  * @returns The toast ID
  */
-const errorAnimated = (
+const error = (
   title: string,
-  description: string,
+  description?: string,
+  autoClose?: number,
   onRetry?: () => void,
 ): Id => {
   return reactToast((props) => React.createElement(ErrorToast, props), {
     ...defaultOptions,
-    autoClose: 7000, // Slightly longer for errors
+    autoClose: autoClose || 7000, // Slightly longer for errors
     data: {
       title,
-      description,
+      description:
+        description ||
+        'Please try again later. If the problem persists, please contact Aucctus.',
       onRetry,
     },
   });
@@ -358,6 +314,4 @@ export const toast = {
   progress,
   updateProgress,
   completed,
-  successAnimated,
-  errorAnimated,
 };

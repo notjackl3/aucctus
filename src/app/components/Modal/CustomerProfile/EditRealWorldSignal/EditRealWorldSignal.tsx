@@ -81,7 +81,7 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
 
   const handleSave = () => {
     if (!profileUuid) {
-      toast.errorAnimated(
+      toast.error(
         'Profile UUID Required',
         'Profile UUID is required to continue',
       );
@@ -120,7 +120,7 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
         },
         {
           onSuccess: () => {
-            toast.successAnimated(
+            toast.success(
               'Signal Updated',
               'Real world signal updated successfully',
             );
@@ -128,7 +128,7 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
           },
           onError: (error) => {
             const message = utils.osiris.parseFormError(error);
-            toast.errorAnimated(
+            toast.error(
               'Signal Update Failed',
               message || 'Failed to update real world signal',
             );
@@ -144,7 +144,7 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
         },
         {
           onSuccess: () => {
-            toast.successAnimated(
+            toast.success(
               'Signal Created',
               'Real world signal created successfully',
             );
@@ -152,7 +152,7 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
           },
           onError: (error) => {
             const message = utils.osiris.parseFormError(error);
-            toast.errorAnimated(
+            toast.error(
               'Signal Creation Failed',
               message || 'Failed to create real world signal',
             );

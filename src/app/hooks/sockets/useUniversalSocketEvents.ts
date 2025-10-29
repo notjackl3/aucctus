@@ -217,7 +217,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         toast.success(
           `Section updated successfully!`,
           message.message || 'Your changes have been applied.',
-          { autoClose: 5000 },
+          5000,
         );
       }
     } else if (message.eventType === 'workflow_error') {
@@ -228,7 +228,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.conceptWorkflow.onWorkflowError ||
         ((msg: any) => {
-          toast.errorAnimated(
+          toast.error(
             'Concept Generation Failed',
             msg.message ||
               'An error occurred while generating your concept report',
@@ -282,7 +282,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           .includes('cancel');
         if (isCancellation) return;
 
-        toast.errorAnimated(
+        toast.error(
           'Synthetic Testing Failed',
           msg.errorMessage || 'An error occurred during execution',
         );
@@ -358,7 +358,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.nucleusUpload.onUploadError ||
         ((msg: INucleusUploadErrorMessage) => {
-          toast.errorAnimated(
+          toast.error(
             'Document Upload Failed',
             msg.message || 'Please try uploading your documents again',
           );
@@ -484,7 +484,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           toast.error(
             'Magic Share Failed',
             msg.message || 'Failed to generate document. Please try again.',
-            { autoClose: 5000 },
+            5000,
           );
         });
       handler(message);

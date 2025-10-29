@@ -1,10 +1,18 @@
 /* Primary stroke styles */
 .aucctus-stroke-primary {
   @apply stroke-gray-light-900 dark:stroke-white;
+
+  &-light {
+    @apply stroke-gray-light-100 dark:stroke-gray-light-100;
+  }
 }
 
 .aucctus-stroke-secondary {
   @apply stroke-gray-light-700 dark:stroke-gray-light-300;
+
+  &-light {
+    @apply stroke-gray-light-200 dark:stroke-gray-light-200;
+  }
 
   &-hover {
     @extend .aucctus-stroke-secondary;
@@ -18,6 +26,10 @@
 
 .aucctus-stroke-tertiary {
   @apply stroke-gray-light-600 dark:stroke-gray-light-400;
+
+  &-light {
+    @apply stroke-gray-light-300 dark:stroke-gray-light-300;
+  }
 
   &-hover {
     @extend .aucctus-stroke-tertiary;
@@ -105,6 +117,18 @@
 
 .aucctus-stroke-warning-secondary {
   @apply stroke-warning-500 dark:stroke-warning-400;
+}
+
+.aucctus-stroke-warning-tertiary {
+  @apply stroke-warning-400 dark:stroke-warning-300;
+}
+
+.aucctus-stroke-warning-quaternary {
+  @apply stroke-warning-300 dark:stroke-warning-200;
+}
+
+.aucctus-stroke-warning-quinary {
+  @apply stroke-warning-200 dark:stroke-warning-100;
 }
 
 .aucctus-stroke-success-primary {

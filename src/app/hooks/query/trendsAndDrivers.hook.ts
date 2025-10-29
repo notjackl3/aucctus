@@ -38,13 +38,10 @@ export const useCreateTrend = (conceptUuid: string) => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.trendsAndDriversV3, conceptUuid],
       });
-      toast.successAnimated(
-        'Trend Created',
-        'Your trend has been added successfully',
-      );
+      toast.success('Trend Created', 'Your trend has been added successfully');
     },
     onError: (error: any) => {
-      toast.errorAnimated(
+      toast.error(
         'Trend Creation Failed',
         error?.response?.data?.message || 'Unable to create trend',
       );
@@ -65,13 +62,13 @@ export const useUpdateTrend = (conceptUuid: string, trendUuid: string) => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.trendsAndDriversV3, conceptUuid],
       });
-      toast.successAnimated(
+      toast.success(
         'Trend Updated',
         'Your trend has been updated successfully',
       );
     },
     onError: (error: any) => {
-      toast.errorAnimated(
+      toast.error(
         'Trend Update Failed',
         error?.response?.data?.message || 'Unable to update trend',
       );
@@ -89,13 +86,13 @@ export const useDeleteTrend = (conceptUuid: string) => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.trendsAndDriversV3, conceptUuid],
       });
-      toast.successAnimated(
+      toast.success(
         'Trend Deleted',
         'Your trend has been removed successfully',
       );
     },
     onError: (error: any) => {
-      toast.errorAnimated(
+      toast.error(
         'Trend Deletion Failed',
         error?.response?.data?.message || 'Unable to delete trend',
       );
@@ -127,13 +124,13 @@ export const useCreateKeyFinding = (conceptUuid: string, trendUuid: string) => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.trendV3, conceptUuid, trendUuid],
       });
-      toast.successAnimated(
+      toast.success(
         'Key Finding Created',
         'Your key finding has been added successfully',
       );
     },
     onError: (error: any) => {
-      toast.errorAnimated(
+      toast.error(
         'Key Finding Creation Failed',
         error?.response?.data?.message || 'Unable to create key finding',
       );
@@ -163,13 +160,13 @@ export const useUpdateKeyFinding = (
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.trendV3, conceptUuid, trendUuid],
       });
-      toast.successAnimated(
+      toast.success(
         'Key Finding Updated',
         'Your key finding has been updated successfully',
       );
     },
     onError: (error: any) => {
-      toast.errorAnimated(
+      toast.error(
         'Key Finding Update Failed',
         error?.response?.data?.message || 'Unable to update key finding',
       );
@@ -194,13 +191,13 @@ export const useDeleteKeyFinding = (conceptUuid: string, trendUuid: string) => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.trendV3, conceptUuid, trendUuid],
       });
-      toast.successAnimated(
+      toast.success(
         'Key Finding Deleted',
         'Your key finding has been removed successfully',
       );
     },
     onError: (error: any) => {
-      toast.errorAnimated(
+      toast.error(
         'Key Finding Deletion Failed',
         error?.response?.data?.message || 'Unable to delete key finding',
       );

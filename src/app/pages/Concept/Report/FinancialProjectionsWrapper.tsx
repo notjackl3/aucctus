@@ -27,13 +27,13 @@ const FinancialProjectionsWrapper: React.FC = () => {
   const handleDebugModeGenerate = () => {
     generateFinancialProjection(concept.identifier, {
       onSuccess: () => {
-        toast.successAnimated(
+        toast.success(
           'Financial Projections Generated',
           '✨ Financial Projections generated successfully!',
         );
       },
       onError: () => {
-        toast.errorAnimated(
+        toast.error(
           'Financial Projections Failed',
           '❌ Failed to generate Financial Projections',
         );

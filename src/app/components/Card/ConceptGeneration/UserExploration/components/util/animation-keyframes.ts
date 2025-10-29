@@ -30,6 +30,52 @@ export const animationStyles = `
     from { opacity: 1; }
     to { opacity: 0; }
   }
+
+  @keyframes slideInFromRight {
+    from { transform: translateX(25%); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes slideOutToRight {
+    from { transform: translateX(0); }
+    to { transform: translateX(25%); }
+  }
+
+  @keyframes slideInFromTop {
+    from { transform: translateY(-100%); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes slideInFromBottom {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  @keyframes scaleIn {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+
+  @keyframes fadeSlideToPosition {
+    from { 
+      opacity: 0; 
+      transform: translate(var(--slide-x, 0), var(--slide-y, 0)) scale(0.5);
+    }
+    to { 
+      opacity: 1; 
+      transform: translate(0, 0) scale(1);
+    }
+  }
 `;
 
 type keyframes =
@@ -37,7 +83,14 @@ type keyframes =
   | 'fadeScaleIn'
   | 'fadeIn'
   | 'fadeOut'
-  | 'fadeScaleOut';
+  | 'fadeScaleOut'
+  | 'slideInFromRight'
+  | 'slideOutToRight'
+  | 'slideInFromTop'
+  | 'slideInFromBottom'
+  | 'float'
+  | 'scaleIn'
+  | 'pulse';
 
 const initialAnimationStyleMap: Record<keyframes, React.CSSProperties> = {
   fadeScaleIn: {
@@ -55,6 +108,24 @@ const initialAnimationStyleMap: Record<keyframes, React.CSSProperties> = {
     opacity: 1,
   },
   moveBackground: {},
+  slideInFromRight: {
+    transform: 'translateX(25%)',
+  },
+  slideOutToRight: {
+    transform: 'translateX(0)',
+  },
+  slideInFromTop: {
+    transform: 'translateY(-100%)',
+  },
+  slideInFromBottom: {
+    transform: 'translateY(100%)',
+  },
+  float: {},
+  scaleIn: {
+    opacity: 0,
+    transform: 'scale(0.7)',
+  },
+  pulse: {},
 };
 
 export const getAnimationStyle = (

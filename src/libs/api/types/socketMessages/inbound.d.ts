@@ -615,6 +615,92 @@ export interface IMagicShareErrorMessage extends BaseSocketEvent {
   details?: any;
 }
 
+// ==========================================
+// Idea Playground Event Messages
+// ==========================================
+
+export interface IIdeaPlaygroundInsightEnhancedMessage extends BaseSocketEvent {
+  type: 'idea_playground.insight.enhanced.user';
+  seedUuid: string;
+  questionUuid: string;
+  insightUuid: string;
+  accountUuid: string;
+  moreDetails: string;
+  goodNews: string;
+  badNews: string;
+}
+
+export interface IIdeaPlaygroundInsightValidationFailedMessage
+  extends BaseSocketEvent {
+  type: 'idea_playground.insight.validation_failed.user';
+  seedUuid: string;
+  questionUuid: string;
+  insightUuid: string;
+  accountUuid: string;
+  errorMessage: string;
+}
+
+export interface IIdeaPlaygroundQuestionsGeneratedMessage
+  extends BaseSocketEvent {
+  type: 'idea_playground.questions.generated.user';
+  seedUuid: string;
+  accountUuid: string;
+  questionCount: number;
+}
+
+export interface IIdeaPlaygroundConceptsGeneratedMessage
+  extends BaseSocketEvent {
+  type: 'idea_playground.concepts.generated.user';
+  seedUuid: string;
+  accountUuid: string;
+  conceptCount: number;
+  coreCount: number;
+  adjacentCount: number;
+  disruptiveCount: number;
+}
+
+export interface IIdeaPlaygroundErrorMessage extends BaseSocketEvent {
+  type: 'idea_playground.error.user';
+  seedUuid: string;
+  accountUuid: string;
+  operation: string;
+  errorMessage: string;
+  details?: Record<string, any>;
+}
+
+export interface IIdeaPlaygroundPossibleAnswerProcessingMessage
+  extends BaseSocketEvent {
+  type: 'idea_playground.possible_answer.processing.user';
+  seedUuid: string;
+  questionUuid: string;
+  accountUuid: string;
+}
+
+export interface IIdeaPlaygroundPossibleAnswerGeneratedMessage
+  extends BaseSocketEvent {
+  type: 'idea_playground.possible_answer.generated.user';
+  seedUuid: string;
+  questionUuid: string;
+  accountUuid: string;
+}
+
+export interface IIdeaPlaygroundResearchInsightsProcessingMessage
+  extends BaseSocketEvent {
+  type: 'idea_playground.research_insights.processing.user';
+  seedUuid: string;
+  questionUuid: string;
+  accountUuid: string;
+}
+
+export interface IIdeaPlaygroundResearchInsightsGeneratedMessage
+  extends BaseSocketEvent {
+  type: 'idea_playground.research_insights.generated.user';
+  seedUuid: string;
+  questionUuid: string;
+  accountUuid: string;
+  insightCount: number;
+}
+
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -664,6 +750,15 @@ export type InboundSocketEvent<C = {}> =
   | INucleusAnswerErrorMessage
   | IMagicShareProgressMessage
   | IMagicShareCompletedMessage
-  | IMagicShareErrorMessage;
+  | IMagicShareErrorMessage
+  | IIdeaPlaygroundInsightEnhancedMessage
+  | IIdeaPlaygroundInsightValidationFailedMessage
+  | IIdeaPlaygroundQuestionsGeneratedMessage
+  | IIdeaPlaygroundConceptsGeneratedMessage
+  | IIdeaPlaygroundErrorMessage
+  | IIdeaPlaygroundPossibleAnswerProcessingMessage
+  | IIdeaPlaygroundPossibleAnswerGeneratedMessage
+  | IIdeaPlaygroundResearchInsightsProcessingMessage
+  | IIdeaPlaygroundResearchInsightsGeneratedMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

@@ -214,6 +214,21 @@
   background-color: rgb(254, 242, 242, 0.5);
 }
 
+.aucctus-bg-error-glass {
+  background-color: rgba(208, 38, 53, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  &-hover {
+    @extend .aucctus-bg-error-glass;
+    @apply transition-all duration-300;
+
+    &:hover {
+      background-color: rgba(208, 38, 53, 0.25);
+    }
+  }
+}
+
 .aucctus-bg-error-solid {
   @apply bg-error-600;
 
@@ -252,6 +267,21 @@
   background-color: rgb(254, 252, 232, 0.5);
 }
 
+.aucctus-bg-warning-glass {
+  background-color: rgba(239, 104, 32, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  &-hover {
+    @extend .aucctus-bg-warning-glass;
+    @apply transition-all duration-300;
+
+    &:hover {
+      background-color: rgba(239, 104, 32, 0.25);
+    }
+  }
+}
+
 .aucctus-bg-warning-solid {
   @apply bg-warning-600;
 
@@ -284,6 +314,21 @@
 
 .aucctus-bg-success-subtle {
   background-color: rgb(187, 247, 208, 0.1);
+}
+
+.aucctus-bg-success-glass {
+  background-color: rgba(23, 178, 106, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+
+  &-hover {
+    @extend .aucctus-bg-success-glass;
+    @apply transition-all duration-300;
+
+    &:hover {
+      background-color: rgba(23, 178, 106, 0.25);
+    }
+  }
 }
 
 .aucctus-bg-success-solid {

@@ -65,6 +65,108 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
   const [carouselScrollLeft, setCarouselScrollLeft] = useState(0);
   const carouselRef = React.useRef<HTMLDivElement>(null);
 
+  // CSS for card carousel animation
+  const cardCarouselStyles = `
+    @keyframes card-carousel-pdf {
+      0%, 20% {
+        transform: translateX(calc(-50% - 5rem)) translateY(var(--card-y)) rotate(-12deg) scale(0.9);
+        z-index: 2;
+      }
+      23.33% {
+        transform: translateX(calc(-50% - 6rem)) translateY(var(--card-y)) rotate(-12deg) scale(0.9);
+        z-index: 3;
+      }
+      26.66%, 46.66% {
+        transform: translateX(-50%) translateY(var(--card-y-center)) rotate(0deg) scale(1.05);
+        z-index: 3;
+      }
+      50% {
+        z-index: 3;
+      }
+      53.33%, 73.33% {
+        transform: translateX(calc(-50% + 5rem)) translateY(var(--card-y)) rotate(12deg) scale(0.9);
+        z-index: 1;
+      }
+      76.66% {
+        z-index: 1;
+      }
+      80%, 100% {
+        transform: translateX(calc(-50% - 5rem)) translateY(var(--card-y)) rotate(-12deg) scale(0.9);
+        z-index: 2;
+      }
+    }
+    
+    @keyframes card-carousel-ppt {
+      0%, 20% {
+        transform: translateX(-50%) translateY(var(--card-y-center)) rotate(0deg) scale(1.05);
+        z-index: 3;
+      }
+      23.33% {
+        z-index: 3;
+      }
+      26.66%, 46.66% {
+        transform: translateX(calc(-50% + 5rem)) translateY(var(--card-y)) rotate(12deg) scale(0.9);
+        z-index: 1;
+      }
+      50% {
+        z-index: 1;
+      }
+      53.33%, 73.33% {
+        transform: translateX(calc(-50% - 5rem)) translateY(var(--card-y)) rotate(-12deg) scale(0.9);
+        z-index: 2;
+      }
+      76.66% {
+        transform: translateX(calc(-50% - 6rem)) translateY(var(--card-y)) rotate(-12deg) scale(0.9);
+        z-index: 3;
+      }
+      80%, 100% {
+        transform: translateX(-50%) translateY(var(--card-y-center)) rotate(0deg) scale(1.05);
+        z-index: 3;
+      }
+    }
+    
+    @keyframes card-carousel-mov {
+      0%, 20% {
+        transform: translateX(calc(-50% + 5rem)) translateY(var(--card-y)) rotate(12deg) scale(0.9);
+        z-index: 1;
+      }
+      23.33% {
+        z-index: 1;
+      }
+      26.66%, 46.66% {
+        transform: translateX(calc(-50% - 5rem)) translateY(var(--card-y)) rotate(-12deg) scale(0.9);
+        z-index: 2;
+      }
+      50% {
+        transform: translateX(calc(-50% - 6rem)) translateY(var(--card-y)) rotate(-12deg) scale(0.9);
+        z-index: 3;
+      }
+      53.33%, 73.33% {
+        transform: translateX(-50%) translateY(var(--card-y-center)) rotate(0deg) scale(1.05);
+        z-index: 3;
+      }
+      76.66% {
+        z-index: 3;
+      }
+      80%, 100% {
+        transform: translateX(calc(-50% + 5rem)) translateY(var(--card-y)) rotate(12deg) scale(0.9);
+        z-index: 1;
+      }
+    }
+
+    .animate-card-pdf {
+      animation: card-carousel-pdf 18s ease-in-out infinite;
+    }
+    
+    .animate-card-ppt {
+      animation: card-carousel-ppt 18s ease-in-out infinite;
+    }
+    
+    .animate-card-mov {
+      animation: card-carousel-mov 18s ease-in-out infinite;
+    }
+  `;
+
   // Get data from Zustand store
   // This automatically restores progress if modal is reopened during generation
   const shareProgress = useStore((state) =>
@@ -180,7 +282,6 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
       toast.success(
         'Magic Share requested!',
         'Your document will be generated shortly.',
-        { autoClose: 4000 },
       );
     } catch (error) {
       toast.error('Failed to generate document. Please try again.');
@@ -219,13 +320,22 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
 
   return (
     <div className='flex w-full max-w-xl flex-col overflow-hidden'>
+      {/* Inject card carousel animation styles */}
+      <style>{cardCarouselStyles}</style>
+
       {/* Hero Section with Floating Cards */}
       <div
         className={cn(
           'relative flex items-center justify-center overflow-hidden bg-cover bg-center transition-all duration-700',
           isGenerating || isComplete ? 'h-64' : 'h-56',
         )}
-        style={{ backgroundImage: `url(${magicShareBg})` }}
+        style={
+          {
+            backgroundImage: `url(${magicShareBg})`,
+            '--card-y': isGenerating || isComplete ? '0.5rem' : '1rem',
+            '--card-y-center': isGenerating || isComplete ? '-0.5rem' : '0rem',
+          } as React.CSSProperties
+        }
       >
         {/* Restart Button - top left when complete */}
         {isComplete && (
@@ -259,12 +369,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
         {/* Floating Cards */}
         <div className='absolute inset-0 flex items-center justify-center'>
           {/* PDF Card */}
-          <div
-            className={cn(
-              'absolute left-1/4 -rotate-12 transition-transform duration-700',
-              isGenerating || isComplete ? 'translate-y-2' : 'translate-y-4',
-            )}
-          >
+          <div className='animate-card-pdf absolute left-1/2'>
             <div className='flex h-32 w-24 flex-col rounded-lg border border-white/20 bg-white/10 p-2.5 shadow-2xl backdrop-blur-md'>
               <div className='h-1.5 w-full rounded bg-white/40'></div>
               <div className='mt-1 h-1 w-3/4 rounded bg-white/30'></div>
@@ -287,13 +392,8 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
           </div>
 
           {/* PowerPoint Card */}
-          <div
-            className={cn(
-              'absolute left-1/2 z-10 -translate-x-1/2 rotate-0 transition-transform duration-700',
-              isGenerating || isComplete ? '-translate-y-2' : 'translate-y-0',
-            )}
-          >
-            <div className='flex h-36 w-28 flex-col rounded-lg border border-white/30 bg-white/15 p-2.5 shadow-2xl backdrop-blur-md'>
+          <div className='animate-card-ppt absolute left-1/2'>
+            <div className='flex h-32 w-24 flex-col rounded-lg border border-white/30 bg-white/15 p-2.5 shadow-2xl backdrop-blur-md'>
               <div className='relative flex-1 overflow-hidden'>
                 <div className='flex flex-col gap-1.5'>
                   <div className='aspect-video rounded border border-red-400/30 bg-gradient-to-br from-red-600/30 to-red-700/20 p-1.5'>
@@ -324,12 +424,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
           </div>
 
           {/* Video Card */}
-          <div
-            className={cn(
-              'absolute right-1/4 rotate-12 transition-transform duration-700',
-              isGenerating || isComplete ? 'translate-y-2' : 'translate-y-4',
-            )}
-          >
+          <div className='animate-card-mov absolute left-1/2'>
             <div className='flex h-32 w-24 flex-col rounded-lg border border-white/20 bg-white/10 p-2.5 shadow-2xl backdrop-blur-md'>
               <div className='flex flex-1 items-center justify-center'>
                 <div className='relative flex h-12 w-20 items-center justify-center rounded bg-gradient-to-br from-pink-600/30 to-rose-600/30'>

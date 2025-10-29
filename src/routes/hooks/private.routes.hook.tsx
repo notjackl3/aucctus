@@ -35,6 +35,12 @@ const usePrivateRoutes = () => {
 
       {/* Nucleus Routes */}
       <Route path={AppPath.Nucleus} element={<NucleusPage />} />
+
+      {/* Idea Playground Routes */}
+      <Route
+        path={AppPath.IdeaPlayground}
+        element={<Page.IdeaPlayground.IdeaPlaygroundQBased />}
+      />
     </Route>
   );
 };

@@ -1,0 +1,502 @@
+---
+description: Guide for creating skeleton loading components that mirror real components
+---
+
+# Skeleton Component Creation Guide
+
+This guide documents the pattern for creating skeleton loading states for components in the Aucctus application.
+
+## Overview
+
+Skeleton components provide visual loading placeholders that mirror the structure and layout of real components. They use a consistent shimmer animation and Aucctus design tokens to create a polished loading experience.
+
+## Base Building Block
+
+All skeletons use the `SkeletonBlock` component as their foundation:
+
+[SkeletonBlock.tsx](mdc:src/app/components/Skeleton/ConceptReport/SkeletonBlock.tsx)
+
+### Key Features of SkeletonBlock:
+- Shimmer animation with 5-second ease-in-out infinite loop
+- Uses `aucctus-bg-secondary-subtle` background
+- Accepts `className` prop for custom sizing and shape
+- Includes `aria-hidden='true'` for accessibility
+
+## Reusable Skeleton Components
+
+### TabViewSkeleton
+
+For components that use TabView, use the reusable `TabViewSkeleton` component instead of creating custom tab skeletons:
+
+[TabViewSkeleton.tsx](mdc:src/app/components/Skeleton/ConceptReport/TabViewSkeleton.tsx)
+
+#### Key Features:
+- Mirrors the exact structure of the TabView component with Tab child components
+- Converts Tab button styles from SCSS to Tailwind classes
+- Automatically applies proper border radius to first and last tabs
+- Accepts configurable number of tabs with custom text widths
+- Matches TabView's layout classes and structure
+- Reusable across different skeleton components
+
+#### Usage Example:
+```typescript
+import TabViewSkeleton from './TabViewSkeleton';
+
+const MyComponentSkeleton: React.FC = () => {
+  return (
+    <div className='flex h-full w-full flex-col items-center self-stretch'>
+      {/* Tab Navigation Skeleton - using default MarketScan-style button tabs */}
+      <TabViewSkeleton
+        tabs={[
+          { textWidth: 'w-32' },
+          { textWidth: 'w-28' },
+          { textWidth: 'w-36' },
+        ]}
+        includeWrapper={false}
+      />
+
+      {/* Tab Content Skeleton */}
+      <div className='h-full w-full items-center justify-center'>
+        {/* Your content skeleton here */}
+      </div>
+    </div>
+  );
+};
+```
+
+#### Props:
+- `tabs`: Array of `TabSkeletonConfig` objects
+  - `textWidth`: Width class for the tab label text (e.g., 'w-24', 'w-32', 'w-40')
+  - Defaults to 2 tabs with medium widths if not provided
+- `className`: Optional className for the outer wrapper (mirrors TabView's `className` prop, default: `''`)
+- `tabGroupClassName`: Optional className for the tab group container (default: `'pointer-events-auto flex flex-1'`)
+- `tabContainerClassName`: Optional className for the tab container (default: `'flex flex-1 items-center justify-center'`)
+- `tabClassName`: Optional className for additional custom styling on each tab (default: `''`)
+- `includeWrapper`: Whether to include the outer wrapper div (default: `true`)
+  - Set to `false` if your parent component already provides the TabView wrapper structure
+
+**Note:** The TabViewSkeleton component automatically applies the `.tabButton` styles from `tab.module.scss` converted to Tailwind classes. This includes:
+- Button layout and sizing (`flex`, `justify-center`, `items-center`, `min-h-10`, `px-4`, `py-2`)
+- Border styling with proper first/last child rounded corners
+- Aucctus theme colors for background and borders
+- Label styles matching the Tab component's `.label` class
+
+The `tabClassName` prop is available for additional customization if needed, but the core button styles are already applied by default.
+
+#### Style Implementation:
+
+The TabViewSkeleton converts the `.tabButton` and `.label` SCSS styles from `tab.module.scss` to Tailwind classes:
+
+**Tab Button (`<li>` element):**
+- Base styles: `relative box-border flex h-8 min-h-10 shrink-0 cursor-pointer items-center justify-center gap-2 whitespace-nowrap px-4 py-2`
+- Colors: `aucctus-bg-primary border-b border-r border-t`
+- First tab: `rounded-l-lg aucctus-border-secondary border`
+- Last tab: `rounded-r-lg aucctus-border-secondary border-r`
+
+**Label (`<span>` element):**
+- Typography and colors: `aucctus-text-brand-tertiary aucctus-text-sm-bold`
+- Layout: `flex items-center gap-2`
+
+#### Why Use TabViewSkeleton:
+- **Consistency**: Ensures all tab skeletons match the real TabView structure
+- **Maintainability**: Changes to TabView structure only require updating one component
+- **Reusability**: Use across Financial Projections, Market Scan, and other tabbed interfaces
+- **Accuracy**: Mirrors the exact HTML structure including `li` elements, Tab component styles, and flex classes
+- **Style Parity**: Converts SCSS module styles to Tailwind for perfect visual matching
+
+#### Real-World Examples:
+- [FinancialProjectionSkeleton.tsx](mdc:src/app/components/Skeleton/ConceptReport/FinancialProjectionSkeleton.tsx) - 3 tabs with full skeleton
+
+#### Alternative Pattern: Skeleton Labels in Real TabView
+
+For cases where you want to use the real TabView component but with loading placeholders for the labels, you can pass SkeletonBlocks as the `label` prop:
+
+```typescript
+const marketScanTabs = useMemo(() => {
+  if (showSkeletons) {
+    return [
+      {
+        label: (
+          <div className='flex items-center gap-2'>
+            <SkeletonBlock className='h-4 w-4 rounded' />
+            <SkeletonBlock className='h-4 w-32' />
+          </div>
+        ),
+        value: 'trends-drivers',
+      },
+      {
+        label: (
+          <div className='flex items-center gap-2'>
+            <SkeletonBlock className='h-4 w-4 rounded' />
+            <SkeletonBlock className='h-4 w-24' />
+          </div>
+        ),
+        value: 'ecosystem',
+      },
+    ] as TabElement[];
+  }
+  
+  // Return normal tabs when loaded
+  return normalTabs;
+}, [showSkeletons]);
+
+// Use with real TabView component
+<TabView tabs={marketScanTabs} ... />
+```
+
+**When to use each pattern:**
+- **TabViewSkeleton**: When showing a complete skeleton loading state for the entire tab section
+- **Skeleton Labels**: When the tab structure is interactive but labels are still loading (see [MarketScanV3.tsx](mdc:src/app/pages/Concept/Report/MarketScan/v3/MarketScanV3.tsx))
+
+## Creating a Skeleton Component
+
+### Step 1: Analyze the Real Component Structure
+
+Before creating a skeleton, examine the real component to understand:
+- Overall layout structure (grid, flex, columns)
+- Card/container backgrounds and borders
+- Spacing between elements (gaps, padding, margins)
+- Element sizes (headers, text, images, icons, buttons)
+- Repeated patterns (lists, grids)
+
+**Example Analysis:**
+
+For [ExecutiveDashboard.tsx](mdc:src/app/components/ConceptOverview/ExecutiveDashboard.tsx):
+- Gut check banner with title, description, and action button
+- 2-column grid layout (image left, info cards right)
+- Multiple card sections with icons, titles, and text
+- List items with bullet points
+- Carousel section with navigation
+
+### Step 2: Mirror the Layout Structure
+
+Recreate the exact layout structure using the same Tailwind classes from the real component:
+
+**Real Component:**
+```typescript
+<div className='space-y-8'>
+  <div className='aucctus-bg-secondary rounded-lg p-6'>
+    {/* Gut Check Banner */}
+  </div>
+  <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
+    {/* Hero Section */}
+  </div>
+</div>
+```
+
+**Skeleton Component:**
+```typescript
+<div className='space-y-8'>
+  <div className='aucctus-bg-secondary rounded-lg p-6'>
+    {/* Gut Check Banner Skeleton */}
+  </div>
+  <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
+    {/* Hero Section Skeleton */}
+  </div>
+</div>
+```
+
+### Step 3: Replace Content with SkeletonBlocks
+
+Replace each content element with appropriately sized `SkeletonBlock` components:
+
+**Content Type Mappings:**
+
+| Real Content | Skeleton Replacement |
+|-------------|---------------------|
+| Large header (h1, h2) | `<SkeletonBlock className='h-8 w-48' />` |
+| Medium header (h3, h4) | `<SkeletonBlock className='h-6 w-32' />` |
+| Small header (h5, h6) | `<SkeletonBlock className='h-5 w-24' />` |
+| Body text (single line) | `<SkeletonBlock className='h-4 w-full' />` |
+| Body text (partial line) | `<SkeletonBlock className='h-4 w-3/4' />` |
+| Small text/label | `<SkeletonBlock className='h-3 w-24' />` |
+| Icon | `<SkeletonBlock className='h-6 w-6 rounded' />` |
+| Avatar/Profile Image | `<SkeletonBlock className='h-20 w-20 rounded-full' />` |
+| Button | `<SkeletonBlock className='h-8 w-24 rounded' />` |
+| Large image/card | `<SkeletonBlock className='h-[420px] w-full' />` |
+| Badge/Tag | `<SkeletonBlock className='h-6 w-32 rounded' />` |
+
+**Multi-line Text Pattern:**
+```typescript
+<div className='space-y-2'>
+  <SkeletonBlock className='h-4 w-full' />
+  <SkeletonBlock className='h-4 w-full' />
+  <SkeletonBlock className='h-4 w-3/4' />
+</div>
+```
+
+### Step 4: Handle Repeated Elements
+
+For lists, grids, or repeated components, use `Array.from()` or `[...Array(n)]`:
+
+**Example - List of Items:**
+```typescript
+<div className='space-y-3'>
+  {[...Array(3)].map((_, i) => (
+    <div key={i} className='flex items-center gap-3'>
+      <SkeletonBlock className='h-4 w-4 rounded' />
+      <SkeletonBlock className='h-4 w-full' />
+    </div>
+  ))}
+</div>
+```
+
+**Example - Grid with Optional Count:**
+```typescript
+interface PESTELSkeletonProps {
+  count?: number;
+}
+
+const PESTELSkeleton: React.FC<PESTELSkeletonProps> = ({ count = 3 }) => {
+  return (
+    <div className='grid gap-6 md:grid-cols-2 lg:grid-cols-3'>
+      {Array.from({ length: count }).map((_, index) => (
+        <div key={index} className='aucctus-bg-primary rounded-lg border'>
+          {/* Card skeleton content */}
+        </div>
+      ))}
+    </div>
+  );
+};
+```
+
+### Step 5: Preserve Visual Hierarchy
+
+Maintain the same visual structure and hierarchy:
+
+- Keep container backgrounds (`aucctus-bg-primary`, `aucctus-bg-secondary`)
+- Preserve borders (`aucctus-border-primary`, `aucctus-border-secondary`)
+- Match padding and spacing exactly
+- Include shadow classes if present (`shadow-sm`, `shadow-lg`)
+- Maintain border radius values
+
+**Example - Card with Header:**
+```typescript
+<div className='aucctus-bg-secondary rounded-lg p-6'>
+  <div className='mb-4 flex items-center gap-3'>
+    <SkeletonBlock className='h-6 w-6 rounded' /> {/* Icon */}
+    <SkeletonBlock className='h-6 w-32' /> {/* Title */}
+  </div>
+  <div className='space-y-2'>
+    <SkeletonBlock className='h-4 w-full' />
+    <SkeletonBlock className='h-4 w-full' />
+    <SkeletonBlock className='h-4 w-2/3' />
+  </div>
+</div>
+```
+
+## Complete Example
+
+**Real Component:**
+[ProfileOverview.tsx](mdc:src/app/components/ConceptOverview/CustomerProfileCard.tsx) (hypothetical)
+
+**Skeleton Implementation:**
+[ProfileOverviewSkeleton.tsx](mdc:src/app/components/Skeleton/ConceptReport/ProfileOverviewSkeleton.tsx)
+
+## File Organization
+
+### Skeleton Directory Structure:
+```
+src/app/components/Skeleton/ConceptReport/
+├── SkeletonBlock.tsx              # Base component
+├── ExecutiveDashboardSkeleton.tsx # Specific skeletons
+├── ProfileOverviewSkeleton.tsx
+├── PESTELSkeleton.tsx
+├── ...
+└── index.ts                        # Exports
+```
+
+### Export Pattern:
+
+In [index.ts](mdc:src/app/components/Skeleton/ConceptReport/index.ts):
+```typescript
+export { default as SkeletonBlock } from './SkeletonBlock';
+export { default as ExecutiveDashboardSkeleton } from './ExecutiveDashboardSkeleton';
+export { default as ProfileOverviewSkeleton } from './ProfileOverviewSkeleton';
+// ... other skeletons
+```
+
+### Main Component Exports:
+
+In [src/app/components/index.ts](mdc:src/app/components/index.ts):
+```typescript
+import * as ConceptReportSkeletons from './Skeleton/ConceptReport';
+```
+
+## Using Skeleton Components
+
+### Import Pattern:
+```typescript
+import { ConceptReportSkeletons } from '@components';
+```
+
+### Destructuring Specific Skeletons:
+```typescript
+const {
+  ExecutiveDashboardSkeleton,
+  ProfileOverviewSkeleton,
+  TabViewSkeleton,
+  SkeletonBlock,
+} = ConceptReportSkeletons;
+```
+
+### Conditional Rendering:
+```typescript
+const MyComponent: React.FC<Props> = ({ conceptUuid }) => {
+  const { data, isLoading } = useConceptData(conceptUuid);
+  
+  // Use unified loading state
+  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptOverview,
+    concept,
+    additionalLoadingStates: [isLoading],
+  });
+  
+  const shouldShowSkeleton = isSectionPending || hasBlockingLoad || isLoading;
+  
+  if (shouldShowSkeleton) {
+    return <ConceptReportSkeletons.ExecutiveDashboardSkeleton />;
+  }
+  
+  return (
+    <div>
+      {/* Real component content */}
+    </div>
+  );
+};
+```
+
+## Best Practices
+
+### 1. Match Exact Layout
+- Use identical container classes
+- Preserve responsive breakpoints (sm, md, lg, xl)
+- Match spacing, padding, and gaps exactly
+
+### 2. Vary Line Widths
+- Use different widths for text lines (full, 3/4, 2/3, 1/2) to create natural variation
+- Last line of multi-line text should typically be shorter
+- Example: `w-full`, then `w-full`, then `w-3/4`
+
+### 3. Maintain Visual Weight
+- Larger/more important elements should have proportionally larger skeletons
+- Headers should be taller than body text
+- Icons should maintain their aspect ratio
+
+### 4. Comments for Clarity
+- Add comments to identify sections: `{/* Gut Check Banner Skeleton */}`
+- Group related skeleton blocks logically
+- Mirror comment structure from real component when helpful
+
+### 5. Performance Considerations
+- Skeletons should be lightweight (no heavy logic or data fetching)
+- Use React.memo sparingly (usually not needed for simple skeletons)
+- Avoid unnecessary state or effects
+
+### 6. Accessibility
+- SkeletonBlock includes `aria-hidden='true'` automatically
+- No need for additional ARIA labels on skeleton containers
+- Ensure smooth transition to real content for screen readers
+
+### 7. Testing Consideration
+- Skeleton components should match the real component's height closely
+- This prevents layout shift when loading completes
+- Use fixed heights (`h-[420px]`) for images and large blocks
+
+## Common Patterns
+
+### Pattern 1: Info Card with Icon
+```typescript
+<div className='aucctus-bg-secondary rounded-lg p-6'>
+  <div className='mb-4 flex items-center gap-3'>
+    <SkeletonBlock className='h-6 w-6 rounded' />
+    <SkeletonBlock className='h-6 w-32' />
+  </div>
+  <div className='space-y-2'>
+    <SkeletonBlock className='h-4 w-full' />
+    <SkeletonBlock className='h-4 w-full' />
+    <SkeletonBlock className='h-4 w-3/4' />
+  </div>
+</div>
+```
+
+### Pattern 2: Two-Column Layout
+```typescript
+<div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>
+  <div>{/* Left column skeleton */}</div>
+  <div>{/* Right column skeleton */}</div>
+</div>
+```
+
+### Pattern 3: Profile/Avatar Card
+```typescript
+<div className='flex items-center gap-4'>
+  <SkeletonBlock className='h-20 w-20 rounded-full' />
+  <div className='flex-1 space-y-2'>
+    <SkeletonBlock className='h-5 w-40' />
+    <SkeletonBlock className='h-4 w-32' />
+  </div>
+</div>
+```
+
+### Pattern 4: List with Icons
+```typescript
+<div className='space-y-3'>
+  {[...Array(3)].map((_, i) => (
+    <div key={i} className='flex items-center gap-3'>
+      <SkeletonBlock className='h-4 w-4 rounded' />
+      <SkeletonBlock className='h-4 w-full' />
+    </div>
+  ))}
+</div>
+```
+
+## Checklist for New Skeleton Components
+
+When creating a new skeleton component, verify:
+
+- [ ] Imported `SkeletonBlock` from `./SkeletonBlock`
+- [ ] Used `React.FC` with proper TypeScript interface (if props needed)
+- [ ] Matched exact layout structure from real component
+- [ ] Used Aucctus theme classes consistently
+- [ ] Varied text line widths for natural appearance
+- [ ] Handled repeated elements with arrays
+- [ ] Added section comments for clarity
+- [ ] Exported component in `index.ts`
+- [ ] Tested alongside real component for layout match
+- [ ] Verified no layout shift when loading completes
+
+## Quick Reference
+
+### Common Height Classes:
+- `h-3`: Small label/caption text
+- `h-4`: Body text / list items
+- `h-5`: Small headers / emphasized text
+- `h-6`: Medium headers / section titles
+- `h-8`: Large headers / buttons
+- `h-20`: Avatars / small images
+- `h-32`: Medium content blocks
+- `h-[420px]`: Large images / hero sections
+
+### Common Width Classes:
+- `w-24`: ~6rem (short labels)
+- `w-32`: ~8rem (medium labels/buttons)
+- `w-40`: ~10rem (longer labels)
+- `w-48`: ~12rem (titles)
+- `w-1/2, w-2/3, w-3/4, w-4/5, w-5/6`: Fractional widths
+- `w-full`: Full width of container
+
+### Rounding Classes:
+- `rounded`: Standard border radius (buttons, tags)
+- `rounded-lg`: Larger radius (cards)
+- `rounded-xl`: Extra large (hero images)
+- `rounded-full`: Circular (icons, avatars)
+
+## Real-World Examples
+
+For reference, study these existing skeleton implementations:
+
+1. **Complex Dashboard:** [ExecutiveDashboardSkeleton.tsx](mdc:src/app/components/Skeleton/ConceptReport/ExecutiveDashboardSkeleton.tsx)
+2. **Profile Card:** [ProfileOverviewSkeleton.tsx](mdc:src/app/components/Skeleton/ConceptReport/ProfileOverviewSkeleton.tsx)
+3. **Grid with Props:** [PESTELSkeleton.tsx](mdc:src/app/components/Skeleton/ConceptReport/PESTELSkeleton.tsx)
+4. **Usage in Component:** [OverviewDetails.tsx](mdc:src/app/pages/Concept/Report/OverviewDetails.tsx)

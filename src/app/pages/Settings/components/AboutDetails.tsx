@@ -95,7 +95,7 @@ const AboutDetails: FunctionComponent = () => {
           aboutForm.lastName === '' ||
           aboutForm.jobTitle === ''
         ) {
-          toast.errorAnimated('Empty Fields', 'Fields cannot be empty');
+          toast.error('Empty Fields', 'Fields cannot be empty');
           return;
         }
         updateUser(aboutForm, {
@@ -103,7 +103,7 @@ const AboutDetails: FunctionComponent = () => {
             setIsFormDisabled(true);
           },
           onError: () => {
-            toast.errorAnimated(
+            toast.error(
               'Update Failed',
               'User could not be updated. Please try again later',
             );

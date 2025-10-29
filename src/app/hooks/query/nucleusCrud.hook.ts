@@ -123,7 +123,7 @@ export const useUpdateSection = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.successAnimated(
+      toast.success(
         'Section Updated',
         'Nucleus section has been updated successfully',
       );
@@ -131,7 +131,7 @@ export const useUpdateSection = (reportUuid: string) => {
     onError: (e) => {
       analytics.debug('Error updating section:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.errorAnimated(
+      toast.error(
         'Section Update Failed',
         message || 'Unable to update section',
       );
@@ -164,7 +164,7 @@ export const useCreateQuestion = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.successAnimated(
+      toast.success(
         'Question Created',
         'Nucleus question has been created successfully',
       );
@@ -172,7 +172,7 @@ export const useCreateQuestion = (reportUuid: string) => {
     onError: (e) => {
       analytics.debug('Error creating question:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.errorAnimated(
+      toast.error(
         'Question Creation Failed',
         message || 'Unable to create question',
       );
@@ -204,7 +204,7 @@ export const useUpdateQuestion = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.successAnimated(
+      toast.success(
         'Question Updated',
         'Nucleus question has been updated successfully',
       );
@@ -212,7 +212,7 @@ export const useUpdateQuestion = (reportUuid: string) => {
     onError: (e) => {
       analytics.debug('Error updating question:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.errorAnimated(
+      toast.error(
         'Question Update Failed',
         message || 'Unable to update question',
       );
@@ -236,7 +236,7 @@ export const useDeleteQuestion = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.successAnimated(
+      toast.success(
         'Question Deleted',
         'Nucleus question has been removed successfully',
       );
@@ -244,7 +244,7 @@ export const useDeleteQuestion = (reportUuid: string) => {
     onError: (e: AxiosError<IFormError<any>>) => {
       analytics.debug('Error deleting question:', e);
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Question Deletion Failed',
         message || 'Unable to delete question',
       );
@@ -279,7 +279,7 @@ export const useCreateAnswer = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.successAnimated(
+      toast.success(
         'Answer Created',
         'Nucleus answer has been added successfully',
       );
@@ -287,7 +287,7 @@ export const useCreateAnswer = (reportUuid: string) => {
     onError: (e) => {
       analytics.debug('Error creating answer:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.errorAnimated(
+      toast.error(
         'Answer Creation Failed',
         message || 'Unable to create answer',
       );
@@ -319,7 +319,7 @@ export const useUpdateAnswer = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.successAnimated(
+      toast.success(
         'Answer Updated',
         'Nucleus answer has been updated successfully',
       );
@@ -327,10 +327,7 @@ export const useUpdateAnswer = (reportUuid: string) => {
     onError: (e) => {
       analytics.debug('Error updating answer:', e);
       const message = utils.osiris.parseFormError(e) || e.message;
-      toast.errorAnimated(
-        'Answer Update Failed',
-        message || 'Unable to update answer',
-      );
+      toast.error('Answer Update Failed', message || 'Unable to update answer');
     },
   });
 };
@@ -351,7 +348,7 @@ export const useDeleteAnswer = (reportUuid: string) => {
           queryKey: [AucctusQueryKeys.nucleusReport, reportUuid],
         }),
       ]);
-      toast.successAnimated(
+      toast.success(
         'Answer Deleted',
         'Nucleus answer has been removed successfully',
       );
@@ -359,7 +356,7 @@ export const useDeleteAnswer = (reportUuid: string) => {
     onError: (e: AxiosError<IFormError<any>>) => {
       analytics.debug('Error deleting answer:', e);
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Answer Deletion Failed',
         message || 'Unable to delete answer',
       );

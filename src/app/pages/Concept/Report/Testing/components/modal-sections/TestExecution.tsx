@@ -280,7 +280,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
   // Handlers for real-time execution
   const handleExecuteSynthetic = async (config: ISyntheticExecutionRequest) => {
     if (!conceptUuid || !testUuid) {
-      toast.errorAnimated(
+      toast.error(
         'Missing Test Information',
         'Missing test information. Please try again',
       );

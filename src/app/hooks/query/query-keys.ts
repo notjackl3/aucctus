@@ -29,6 +29,17 @@ export enum AucctusQueryKeys {
   marketScanMarketForcesV3 = 'marketScanMarketForcesV3',
   assumption = 'assumption',
   assumptions = 'assumptions',
+
+  /* Idea Playground */
+  ideaPlaygroundAnchorThoughts = 'ideaPlaygroundAnchorThoughts',
+  ideaPlaygroundAnchorThought = 'ideaPlaygroundAnchorThought',
+  ideaPlaygroundSeed = 'ideaPlaygroundSeed',
+  ideaPlaygroundQuestions = 'ideaPlaygroundQuestions',
+  ideaPlaygroundResearchInsights = 'ideaPlaygroundResearchInsights',
+  ideaPlaygroundPossibleAnswer = 'ideaPlaygroundPossibleAnswer',
+  ideaPlaygroundUserAnswer = 'ideaPlaygroundUserAnswer',
+  ideaPlaygroundConcepts = 'ideaPlaygroundConcepts',
+  ideaPlaygroundGeneratedIdeas = 'ideaPlaygroundGeneratedIdeas',
   assumptionTestDetails = 'assumptionTestDetails',
   conceptTestDetails = 'conceptTestDetails',
   assumptionTestStatusOverview = 'assumptionTestStatusOverview',

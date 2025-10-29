@@ -52,13 +52,13 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const handleCloneConceptSeed = (_conceptUuid: string) => {
     if (!seedUuid) {
-      toast.errorAnimated('Clone Failed', 'No seed available to clone');
+      toast.error('Clone Failed', 'No seed available to clone');
       return;
     }
 
     cloneSeed(seedUuid, {
       onSuccess: (clonedSeed) => {
-        toast.successAnimated('Concept seed cloned successfully!');
+        toast.success('Concept seed cloned successfully!');
         // Navigate to the incubation page with the cloned seed
         resetQuestionnaire();
         setIsNewSeed(false);
@@ -70,7 +70,7 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
       },
       onError: (error) => {
         const message = utils.osiris.parseFormError(error);
-        toast.errorAnimated(
+        toast.error(
           'Clone Failed',
           message || 'Failed to clone concept seed. Please try again.',
         );

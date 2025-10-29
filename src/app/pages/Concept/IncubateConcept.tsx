@@ -326,7 +326,7 @@ const IncubateConcept: React.FC = () => {
         setPregenToGenAnimationComplete(false);
 
         if (customEvent?.detail?.error) {
-          toast.errorAnimated(
+          toast.error(
             'Concept Generation Failed',
             'An error occurred while generating the concept. Please try again.',
           );

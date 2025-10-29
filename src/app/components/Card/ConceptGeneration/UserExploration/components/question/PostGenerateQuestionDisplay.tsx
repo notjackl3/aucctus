@@ -203,10 +203,7 @@ const PostGenerateQuestionDisplay: React.FC<
           });
         },
         onError: () => {
-          toast.errorAnimated(
-            'Report Generation Failed',
-            'Failed to generate report',
-          );
+          toast.error('Report Generation Failed', 'Failed to generate report');
         },
       });
     }
@@ -237,7 +234,7 @@ const PostGenerateQuestionDisplay: React.FC<
         resetQuestionnaire();
         clearGeneratedConceptsBySeedUuid(draftSeedUuid);
       }, 50);
-      toast.successAnimated(
+      toast.success(
         'Concept Generation Started',
         'Concept report generation successfully started',
       );

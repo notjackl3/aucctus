@@ -94,6 +94,12 @@ export interface AgentProgressBarProps {
    * Used to persist timing across component remounts
    */
   startTime?: number;
+
+  /**
+   * Default message to show when no timing data is available
+   * @default "This could take up to 2 minutes"
+   */
+  defaultMessage?: string;
 }
 
 /**
@@ -147,6 +153,7 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   isLoading = false,
   onComplete,
   startTime: initialStartTime,
+  defaultMessage = 'This could take up to 2 minutes',
 }) => {
   const startTimeRef = useRef<number>(initialStartTime || Date.now());
   const [smartRemainingTime, setSmartRemainingTime] = useState<number | null>(
@@ -365,8 +372,16 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
     return (
       <div className={cn('w-full', className)}>
         <div className='flex w-full justify-center'>
-          <span className='aucctus-text-xs aucctus-text-secondary'>
-            This could take up to 2 minutes
+          <span className='aucctus-text-xs aucctus-text-secondary flex'>
+            {defaultMessage.split('').map((letter, index) => (
+              <span
+                key={index}
+                className='inline-block animate-pulse-slow'
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                {letter === ' ' ? '\u00A0' : letter}
+              </span>
+            ))}
           </span>
         </div>
       </div>

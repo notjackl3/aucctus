@@ -71,10 +71,7 @@ const SecurityDetails: FunctionComponent = () => {
       // This will trigger reverification if needed, then execute performPasswordUpdate
       await updatePasswordWithReverification();
 
-      toast.successAnimated(
-        'Password Updated',
-        'Password updated successfully!',
-      );
+      toast.success('Password Updated', 'Password updated successfully!');
       resetFormState();
       setIsFormDisabled(true);
     } catch (error: any) {
@@ -109,7 +106,7 @@ const SecurityDetails: FunctionComponent = () => {
         );
       }
 
-      toast.errorAnimated(
+      toast.error(
         'Password Update Failed',
         'Password could not be updated. Please try again later.',
       );

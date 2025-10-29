@@ -8,9 +8,7 @@ import useStore from '@stores/store';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import styles from './drawer.module.scss';
 import NavButton from './NavButton';
-import NavLink from './NavLink';
 
 interface NavDrawerProps {
   onExpandCollapse: (isCollapsed: boolean) => void;
@@ -34,136 +32,110 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
   };
   return (
     <div
-      className={cn(styles.container, {
-        [styles.collapsed]: collapsed,
-      })}
+      className={cn(
+        'aucctus-bg-primary aucctus-border-primary fixed z-[1] flex h-screen flex-col gap-4 border-r pt-9 transition-all duration-300',
+        {
+          'w-[var(--nav-drawer-collapsed-width)]': collapsed,
+          'w-[var(--nav-drawer-expanded-width)]': !collapsed,
+        },
+      )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       <div
-        className={cn(styles.wrapper, {
-          [styles.collapsed]: collapsed,
-        })}
+        className={cn(
+          'ml-6 flex cursor-pointer gap-2 pb-4 transition-all duration-300',
+          {
+            'pointer-events-none': collapsed,
+          },
+        )}
+        onClick={() => {
+          navigate(AppPath.Home);
+        }}
       >
-        <div
-          className={cn(styles.navDrawer, {
-            [styles.collapsed]: collapsed,
-          })}
-        >
-          <div
-            className={cn(
-              'ml-6 flex cursor-pointer gap-2 pb-4 transition-all duration-300',
-              {
-                'pointer-events-none': collapsed,
-              },
-            )}
-            onClick={() => {
-              navigate(AppPath.Home);
-            }}
-          >
-            <img alt='Aucctus' className='h-12 w-12' src={NavLogo} />
-            <img
-              alt='Aucctus'
-              style={{
-                clipPath: collapsed ? 'inset(0 100% 0 0)' : 'inset(0 0 0 0)',
-              }}
-              className='mt-1 h-10 w-[145px] min-w-[145px] overflow-hidden transition-all duration-300'
-              src={NavWord}
-            />
-          </div>
-          <div className={styles.content}>
-            <NavLink
-              to={AppPath.Home}
-              title='Dashboard'
-              icon='home'
-              collapsed={collapsed}
-            />
+        <img alt='Aucctus' className='h-12 w-12' src={NavLogo} />
+        <img
+          alt='Aucctus'
+          style={{
+            clipPath: collapsed ? 'inset(0 100% 0 0)' : 'inset(0 0 0 0)',
+          }}
+          className='mt-1 h-10 w-[145px] min-w-[145px] overflow-hidden transition-all duration-300'
+          src={NavWord}
+        />
+      </div>
+      <div className='mt-2 flex flex-1 flex-col gap-6 px-4'>
+        <NavButton
+          to={AppPath.Home}
+          title='Dashboard'
+          icon='home'
+          collapsed={collapsed}
+        />
 
-            <NavLink
-              to={
-                account?.hasConcepts || account?.hasSeeds
-                  ? AppPath.ConceptBank
-                  : AppPath.IncubateConcept
-              }
-              title='Concepts'
-              icon='lightbulb'
-              collapsed={collapsed}
-            />
-            <NavLink
-              to={AppPath.Nucleus}
-              title='Nucleus'
-              icon='compass-03'
-              collapsed={collapsed}
-            />
-            <NavLink
-              to={AppPath.ChallengeCenter}
-              title='Challenges'
-              icon='rocket'
-              locked
-              collapsed={collapsed}
-            />
-          </div>
-          <div className={styles.extras}>
-            <NavLink
-              to={AppPath.SettingsAbout}
-              title='Settings'
-              icon='file'
-              collapsed={collapsed}
-            />
-            <NavButton
-              title='Logout'
-              icon='logout'
-              onClick={async (e) => {
-                e.preventDefault();
-                await signOut();
-              }}
-              collapsed={collapsed}
-            />
-          </div>
-          <div
-            className={cn(styles.account, {
-              [styles.collapsed]: collapsed,
-            })}
-          >
-            {/* Always show local user data with traditional Avatar component */}
-            <Avatar
-              firstName={user?.firstName || ''}
-              lastName={user?.lastName || ''}
-              src={user?.profileImage}
-              hideImage={!!user?.profileImage}
-              className={cn('transition-all duration-300', {
-                'ml-[0.75rem]': collapsed,
-              })}
-            />
-            <div
-              className={cn(styles.userDetails, {
-                [styles.collapsed]: collapsed,
-              })}
-            >
-              <span
-                className={cn(
-                  'aucctus-text-md-medium aucctus-text-brand-secondary w-40 truncate transition-all duration-300',
-                  {
-                    'w-0': collapsed,
-                    'w-40': !collapsed,
-                  },
-                )}
-              >
-                {user?.firstName || ''}
-              </span>
-              <span
-                className={cn(
-                  'aucctus-text-xs aucctus-text-tertiary w-40 truncate transition-all duration-300',
-                  {
-                    'w-0': collapsed,
-                    'w-40': !collapsed,
-                  },
-                )}
-              >
-                {user?.email || ''}
-              </span>
-            </div>
-          </div>
+        <NavButton
+          to={
+            account?.hasConcepts || account?.hasSeeds
+              ? AppPath.ConceptBank
+              : AppPath.IncubateConcept
+          }
+          title='Concepts'
+          icon='lightbulb'
+          collapsed={collapsed}
+        />
+        <NavButton
+          to={AppPath.Nucleus}
+          title='Nucleus'
+          icon='compass-03'
+          collapsed={collapsed}
+        />
+        <NavButton
+          to={AppPath.IdeaPlayground}
+          title='Playground'
+          icon='test-drive'
+          collapsed={collapsed}
+        />
+      </div>
+      <div className='flex flex-col gap-6 px-4'>
+        <NavButton
+          to={AppPath.SettingsAbout}
+          title='Settings'
+          icon='file'
+          collapsed={collapsed}
+        />
+        <NavButton
+          title='Logout'
+          icon='logout'
+          onClick={async (e) => {
+            e.preventDefault();
+            await signOut();
+          }}
+          collapsed={collapsed}
+        />
+      </div>
+      <div className='aucctus-border-primary flex gap-3 border-t py-6 pl-4'>
+        <Avatar
+          firstName={user?.firstName || ''}
+          lastName={user?.lastName || ''}
+          src={user?.profileImage}
+          hideImage={!!user?.profileImage}
+          className={cn('flex-shrink-0', {
+            'ml-3': collapsed,
+          })}
+        />
+        <div
+          className={cn(
+            'flex flex-col overflow-hidden transition-all duration-300',
+            {
+              'w-0 opacity-0': collapsed,
+              'w-40 opacity-100': !collapsed,
+            },
+          )}
+        >
+          <span className='aucctus-text-md-medium aucctus-text-brand-secondary truncate'>
+            {user?.firstName || ''}
+          </span>
+          <span className='aucctus-text-xs aucctus-text-tertiary truncate'>
+            {user?.email || ''}
+          </span>
         </div>
       </div>
     </div>

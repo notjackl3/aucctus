@@ -622,6 +622,73 @@ export class Endpoints {
   static nucleusDocuments(reportUuid: string) {
     return `/api/v1/nucleus-reports/${reportUuid}/upload`;
   }
+
+  // Idea Playground Endpoints
+  static ideaPlaygroundAnchorThoughts =
+    'api/v2/concept/idea-playground/anchor-thoughts';
+  static ideaPlaygroundSeed = 'api/v2/concept/idea-playground/seed';
+
+  static ideaPlaygroundSeedAnchorThought(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/anchor-thought`;
+  }
+
+  static ideaPlaygroundSeedQuestions(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions`;
+  }
+
+  static ideaPlaygroundPossibleAnswer(seedUuid: string, questionUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/possible-answer`;
+  }
+
+  static ideaPlaygroundResearchInsights(
+    seedUuid: string,
+    questionUuid: string,
+  ) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/research-insights`;
+  }
+
+  static ideaPlaygroundUserAnswer(seedUuid: string, questionUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/user-answer`;
+  }
+
+  static ideaPlaygroundIncludeAnswer(
+    seedUuid: string,
+    questionUuid: string,
+    answerUuid: string,
+  ) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/answers/${answerUuid}/include`;
+  }
+
+  static ideaPlaygroundExcludeAnswer(
+    seedUuid: string,
+    questionUuid: string,
+    answerUuid: string,
+  ) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/answers/${answerUuid}/exclude`;
+  }
+
+  static ideaPlaygroundRemoveUserAnswer(
+    seedUuid: string,
+    questionUuid: string,
+  ) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/user-answer`;
+  }
+
+  static ideaPlaygroundGenerateIdeas(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/generate-ideas`;
+  }
+
+  static ideaPlaygroundGeneratedIdeas(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/generated-ideas`;
+  }
+
+  static ideaPlaygroundConcepts(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/concepts`;
+  }
+
+  static ideaPlaygroundSaveConcepts(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/save-concepts`;
+  }
 }
 
 export class SocketEndpoints {

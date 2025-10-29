@@ -51,12 +51,12 @@ const SignUp: FunctionComponent = () => {
     if (isInvitationFlow) {
       if (!password || !confirmPassword) {
         if (!password)
-          toast.errorAnimated(
+          toast.error(
             'Password Required',
             'Please enter a password to continue',
           );
         else if (!confirmPassword)
-          toast.errorAnimated(
+          toast.error(
             'Password Confirmation Required',
             'Please confirm your password',
           );
@@ -84,24 +84,15 @@ const SignUp: FunctionComponent = () => {
         !confirmPassword
       ) {
         if (!firstName?.trim())
-          toast.errorAnimated(
-            'First Name Required',
-            'Please enter your first name',
-          );
+          toast.error('First Name Required', 'Please enter your first name');
         else if (!lastName?.trim())
-          toast.errorAnimated(
-            'Last Name Required',
-            'Please enter your last name',
-          );
+          toast.error('Last Name Required', 'Please enter your last name');
         else if (!email?.trim())
-          toast.errorAnimated(
-            'Email Required',
-            'Please enter your email address',
-          );
+          toast.error('Email Required', 'Please enter your email address');
         else if (!password)
-          toast.errorAnimated('Password Required', 'Please enter a password');
+          toast.error('Password Required', 'Please enter a password');
         else if (!confirmPassword)
-          toast.errorAnimated(
+          toast.error(
             'Password Confirmation Required',
             'Please confirm your password',
           );
@@ -218,12 +209,12 @@ const SignUp: FunctionComponent = () => {
         // Account created and user signed in automatically
         await setActive({ session: result.createdSessionId });
         if (isInvitationFlow) {
-          toast.successAnimated(
+          toast.success(
             'Invitation Accepted',
             'Account created successfully! Welcome to Aucctus!',
           );
         } else {
-          toast.successAnimated(
+          toast.success(
             'Account Created',
             'Your account has been created successfully!',
           );
@@ -247,7 +238,7 @@ const SignUp: FunctionComponent = () => {
           navigate(`${AppPath.VerifyEmail}${query ? `?${query}` : ''}`);
         } else {
           // This shouldn't happen with invitation flow, but handle it just in case
-          toast.errorAnimated(
+          toast.error(
             'Account Creation Failed',
             'Unable to complete account creation. Please try again',
           );
@@ -256,15 +247,15 @@ const SignUp: FunctionComponent = () => {
     } catch (err: any) {
       telemetry.error('Sign-up error:', err);
       if (err.errors?.[0]?.message) {
-        toast.errorAnimated('Sign Up Failed', err.errors[0].message);
+        toast.error('Sign Up Failed', err.errors[0].message);
       } else {
         if (isInvitationFlow) {
-          toast.errorAnimated(
+          toast.error(
             'Invitation Failed',
             'Failed to accept invitation. Please try again',
           );
         } else {
-          toast.errorAnimated(
+          toast.error(
             'Sign Up Failed',
             'Unable to create account. Please try again',
           );

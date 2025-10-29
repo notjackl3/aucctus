@@ -29,7 +29,7 @@ const queryClient = new QueryClient({
     onError: (error, query) => {
       if (query.state.data !== undefined) {
         const message = utils.osiris.parseFormError(error);
-        toast.errorAnimated('Query Error', `Something went wrong: ${message}`);
+        toast.error('Query Error', `Something went wrong: ${message}`);
       }
     },
   }),

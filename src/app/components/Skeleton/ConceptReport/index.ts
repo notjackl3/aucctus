@@ -1,4 +1,5 @@
 export { default as SkeletonBlock } from './SkeletonBlock';
+export { default as TabViewSkeleton } from './TabViewSkeleton';
 export { default as ExecutiveSummarySkeleton } from './ExecutiveSummarySkeleton';
 export { default as PriorityInsightsSkeleton } from './PriorityInsightsSkeleton';
 export { default as PESTELSkeleton } from './PESTELSkeleton';
@@ -10,3 +11,4 @@ export { default as FinancialProjectionSkeleton } from './FinancialProjectionSke
 export { default as AssumptionsSkeleton } from './AssumptionsSkeleton';
 export { default as AssumptionCardsListSkeleton } from './AssumptionCardsListSkeleton';
 export { default as TestingSkeleton } from './TestingSkeleton';
+export { default as ConceptSettingsSkeleton } from './ConceptSettingsSkeleton';

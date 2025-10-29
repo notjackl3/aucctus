@@ -48,7 +48,7 @@ const OverviewWrapper: React.FC = () => {
   const handleUpgrade = () => {
     generateOverview(concept.identifier, {
       onError: () => {
-        toast.errorAnimated(
+        toast.error(
           'Overview Generation Failed',
           'Failed to start overview generation. Please try again. If the problem persists, contact support.',
         );
@@ -59,13 +59,13 @@ const OverviewWrapper: React.FC = () => {
   const handleDebugModeGenerate = () => {
     generateOverview(concept.identifier, {
       onSuccess: () => {
-        toast.successAnimated(
+        toast.success(
           'Overview Generated',
           '📊 Overview generated successfully!',
         );
       },
       onError: () => {
-        toast.errorAnimated(
+        toast.error(
           'Overview Generation Failed',
           '❌ Failed to generate Overview',
         );

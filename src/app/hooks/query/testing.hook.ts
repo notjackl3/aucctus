@@ -96,14 +96,11 @@ export const useCreateTestDetail = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
-      toast.successAnimated(
-        'Test Created',
-        'Your test has been created successfully',
-      );
+      toast.success('Test Created', 'Your test has been created successfully');
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Test Creation Failed',
         message || 'Unable to create test. Please try again',
       );
@@ -138,14 +135,11 @@ export const useUpdateTestDetail = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
-        'Test Updated',
-        'Your test has been updated successfully',
-      );
+      toast.success('Test Updated', 'Your test has been updated successfully');
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Test Update Failed',
         message || 'Unable to update test. Please try again',
       );
@@ -183,7 +177,7 @@ export const useCompleteTestDetail = () => {
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Test Completion Failed',
         message || 'Unable to complete test. Please try again',
       );
@@ -207,14 +201,11 @@ export const useDeleteTestDetail = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
-      toast.successAnimated(
-        'Test Deleted',
-        'Your test has been removed successfully',
-      );
+      toast.success('Test Deleted', 'Your test has been removed successfully');
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Test Deletion Failed',
         message || 'Unable to delete test. Please try again',
       );
@@ -309,7 +300,7 @@ export const useCreateTestCollateral = () => {
         ],
       });
 
-      toast.successAnimated(
+      toast.success(
         'Collateral Created',
         'Test collateral has been added successfully',
       );
@@ -330,7 +321,7 @@ export const useCreateTestCollateral = () => {
         collateralUuid: data.collateralUuid || prev.collateralUuid,
       }));
 
-      toast.errorAnimated(
+      toast.error(
         'Collateral Creation Failed',
         data.message || 'Unable to create collateral',
       );
@@ -374,7 +365,7 @@ export const useCreateTestCollateral = () => {
         error: message || 'Failed to create collateral. Please try again.',
         collateralUuid: undefined,
       });
-      toast.errorAnimated(
+      toast.error(
         'Collateral Creation Failed',
         message || 'Unable to create collateral. Please try again',
       );
@@ -471,14 +462,14 @@ export const useUpdateTestCollateral = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Collateral Updated',
         'Test collateral has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Collateral Update Failed',
         message || 'Unable to update collateral. Please try again',
       );
@@ -514,14 +505,14 @@ export const useDeleteTestCollateral = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Collateral Deleted',
         'Test collateral has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Collateral Deletion Failed',
         message || 'Unable to delete collateral. Please try again',
       );
@@ -584,14 +575,14 @@ export const useCreateTestParticipant = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Participant Added',
         'Test participant has been added successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Participant Addition Failed',
         message || 'Unable to add participant. Please try again',
       );
@@ -629,14 +620,14 @@ export const useUpdateTestParticipant = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Participant Updated',
         'Test participant has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Participant Update Failed',
         message || 'Unable to update participant. Please try again',
       );
@@ -672,14 +663,14 @@ export const useDeleteTestParticipant = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Participant Removed',
         'Test participant has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Participant Removal Failed',
         message || 'Unable to remove participant. Please try again',
       );
@@ -738,14 +729,14 @@ export const useCreateTestResult = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Result Uploaded',
         'Test result has been uploaded successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Result Upload Failed',
         message || 'Unable to upload result. Please try again',
       );
@@ -801,14 +792,14 @@ export const useCreateTestResultWithFiles = () => {
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
 
-      toast.successAnimated(
+      toast.success(
         'Files Uploaded',
         `${variables.files.length} file${variables.files.length > 1 ? 's' : ''} uploaded successfully`,
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'File Upload Failed',
         message || 'Unable to upload files. Please try again',
       );
@@ -878,12 +869,12 @@ export const useUpdateTestResult = () => {
           queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
         });
 
-        toast.successAnimated(
+        toast.success(
           'Result Updated',
           `Added ${variables.files.length} additional file${variables.files.length > 1 ? 's' : ''} to result`,
         );
       } else {
-        toast.successAnimated(
+        toast.success(
           'Result Updated',
           'Test result has been updated successfully',
         );
@@ -891,7 +882,7 @@ export const useUpdateTestResult = () => {
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Result Update Failed',
         message || 'Unable to update result. Please try again',
       );
@@ -947,14 +938,14 @@ export const useUpdateTestResultWithFiles = () => {
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
 
-      toast.successAnimated(
+      toast.success(
         'Files Added',
         `Added ${variables.files.length} file${variables.files.length > 1 ? 's' : ''} to result`,
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'File Addition Failed',
         message || 'Unable to update result with files. Please try again',
       );
@@ -990,14 +981,14 @@ export const useDeleteTestResult = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Result Deleted',
         'Test result has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Result Deletion Failed',
         message || 'Unable to delete result. Please try again',
       );
@@ -1039,7 +1030,7 @@ export const useDeleteTestResultSilent = () => {
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       // Still show error toasts since those are important
-      toast.errorAnimated(
+      toast.error(
         'Result Deletion Failed',
         message || 'Unable to delete result. Please try again',
       );
@@ -1077,14 +1068,14 @@ export const useDeleteTestResultFile = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'File Deleted',
         'Test result file has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'File Deletion Failed',
         message || 'Unable to delete file. Please try again',
       );
@@ -1128,7 +1119,7 @@ export const useDeleteTestResultFileSilent = () => {
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       // Still show error toasts since those are important
-      toast.errorAnimated(
+      toast.error(
         'File Deletion Failed',
         message || 'Unable to delete file. Please try again',
       );
@@ -1191,14 +1182,14 @@ export const useCreateTestAssumption = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Assumption Linked',
         'Test assumption has been linked successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Assumption Link Failed',
         message || 'Unable to link assumption. Please try again',
       );
@@ -1246,14 +1237,14 @@ export const useUpdateTestAssumption = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
       });
-      toast.successAnimated(
+      toast.success(
         'Validation Updated',
         'Assumption validation has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Validation Update Failed',
         message || 'Unable to update assumption validation. Please try again',
       );
@@ -1289,14 +1280,14 @@ export const useDeleteTestAssumption = () => {
           variables.testUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Assumption Unlinked',
         'Test assumption has been unlinked successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Assumption Unlink Failed',
         message || 'Unable to unlink assumption. Please try again',
       );
@@ -1333,7 +1324,7 @@ export const useTestCollateralRequest = (
       },
       {
         onSuccess: () => {
-          toast.successAnimated(
+          toast.success(
             'Request Submitted',
             'Your collateral request has been submitted successfully',
           );
@@ -1341,7 +1332,7 @@ export const useTestCollateralRequest = (
         },
         onError: (error) => {
           const errorMessage = utils.osiris.parseFormError(error);
-          toast.errorAnimated(
+          toast.error(
             'Request Submission Failed',
             errorMessage || 'Unable to submit collateral request',
           );
@@ -1493,7 +1484,7 @@ export const useTestCollateralManager = (
         ],
       });
 
-      toast.successAnimated(
+      toast.success(
         'Feedback Submitted',
         'Your feedback has been submitted successfully',
       );
@@ -1521,7 +1512,7 @@ export const useTestCollateralManager = (
         });
       }
 
-      toast.errorAnimated(
+      toast.error(
         'Feedback Processing Failed',
         data.message || 'Unable to process feedback',
       );
@@ -1576,7 +1567,7 @@ export const useTestCollateralManager = (
         collateralUuid: variables.collateralUuid,
       });
 
-      toast.errorAnimated(
+      toast.error(
         'Feedback Submission Failed',
         message || 'Unable to submit feedback. Please try again',
       );

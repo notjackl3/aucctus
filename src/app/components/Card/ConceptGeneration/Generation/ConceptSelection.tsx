@@ -250,7 +250,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
 
   const showSuccessAndNavigate = useCallback(() => {
     handleLeaveAnimation(() => {
-      toast.successAnimated(
+      toast.success(
         'Concepts Saved',
         FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS
           ? 'Proceeding to the refinement step.'
@@ -283,7 +283,7 @@ const ConceptSelection: React.FC<ConceptSelectionProps> = ({
         setGeneratedConcepts(draftSeedUuid, createdConcepts);
 
         handleLeaveAnimation(() => {
-          toast.successAnimated(
+          toast.success(
             'Concepts Saved',
             'Your concepts have been saved successfully',
           );

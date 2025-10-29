@@ -65,14 +65,14 @@ export const usePricingCreateV2 = (financialProjectionUuid: string) => {
           financialProjectionUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Pricing Model Created',
         'Your pricing model has been added successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Pricing Model Creation Failed',
         message || 'Unable to create pricing model',
       );
@@ -98,14 +98,14 @@ export const usePricingUpdateV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Pricing Model Updated',
         'Your pricing model has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Pricing Model Update Failed',
         message || 'Unable to update pricing model',
       );
@@ -124,14 +124,14 @@ export const usePricingDeleteV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Pricing Model Deleted',
         'Your pricing model has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Pricing Model Deletion Failed',
         message || 'Unable to delete pricing model',
       );
@@ -169,14 +169,14 @@ export const useBusinessModelCreateV2 = (financialProjectionUuid: string) => {
           financialProjectionUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Business Model Created',
         'Your business model has been added successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Business Model Creation Failed',
         message || 'Unable to create business model',
       );
@@ -208,14 +208,14 @@ export const useBusinessModelUpdateV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Business Model Updated',
         'Your business model has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Business Model Update Failed',
         message || 'Unable to update business model',
       );
@@ -236,14 +236,14 @@ export const useBusinessModelDeleteV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Business Model Deleted',
         'Your business model has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Business Model Deletion Failed',
         message || 'Unable to delete business model',
       );
@@ -281,14 +281,14 @@ export const useMarketSizingCreateV2 = (financialProjectionUuid: string) => {
           financialProjectionUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Market Sizing Created',
         'Your market sizing has been added successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Market Sizing Creation Failed',
         message || 'Unable to create market sizing',
       );
@@ -317,14 +317,14 @@ export const useMarketSizingUpdateV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Market Sizing Updated',
         'Your market sizing has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Market Sizing Update Failed',
         message || 'Unable to update market sizing',
       );
@@ -343,14 +343,14 @@ export const useMarketSizingDeleteV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Market Sizing Deleted',
         'Your market sizing has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Market Sizing Deletion Failed',
         message || 'Unable to delete market sizing',
       );
@@ -388,14 +388,14 @@ export const useCostDriverCreateV2 = (financialProjectionUuid: string) => {
           financialProjectionUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Cost Driver Created',
         'Your cost driver has been added successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Cost Driver Creation Failed',
         message || 'Unable to create cost driver',
       );
@@ -424,14 +424,14 @@ export const useCostDriverUpdateV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Cost Driver Updated',
         'Your cost driver has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Cost Driver Update Failed',
         message || 'Unable to update cost driver',
       );
@@ -450,14 +450,14 @@ export const useCostDriverDeleteV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Cost Driver Deleted',
         'Your cost driver has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Cost Driver Deletion Failed',
         message || 'Unable to delete cost driver',
       );
@@ -499,14 +499,14 @@ export const useDistributionChannelCreateV2 = (
           financialProjectionUuid,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Distribution Channel Created',
         'Your distribution channel has been added successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Distribution Channel Creation Failed',
         message || 'Unable to create distribution channel',
       );
@@ -538,14 +538,14 @@ export const useDistributionChannelUpdateV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Distribution Channel Updated',
         'Your distribution channel has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Distribution Channel Update Failed',
         message || 'Unable to update distribution channel',
       );
@@ -566,14 +566,14 @@ export const useDistributionChannelDeleteV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Distribution Channel Deleted',
         'Your distribution channel has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Distribution Channel Deletion Failed',
         message || 'Unable to delete distribution channel',
       );
@@ -611,14 +611,14 @@ export const useMarketSizingAssumptionCreateV2 = (marketSizingUuid: string) => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Assumption Created',
         'Your market sizing assumption has been added successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Assumption Creation Failed',
         message || 'Unable to create market sizing assumption',
       );
@@ -653,14 +653,14 @@ export const useMarketSizingAssumptionUpdateV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Assumption Updated',
         'Your market sizing assumption has been updated successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Assumption Update Failed',
         message || 'Unable to update market sizing assumption',
       );
@@ -684,14 +684,14 @@ export const useMarketSizingAssumptionDeleteV2 = () => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.financialProjectionV2],
       });
-      toast.successAnimated(
+      toast.success(
         'Assumption Deleted',
         'Your market sizing assumption has been removed successfully',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Assumption Deletion Failed',
         message || 'Unable to delete market sizing assumption',
       );
@@ -721,7 +721,7 @@ export const useGenerateFinancialProjection = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Financial Projection Failed',
         message || 'Unable to generate financial projection. Please try again',
       );

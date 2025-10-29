@@ -1,19 +1,12 @@
 import React from 'react';
 import SkeletonBlock from './SkeletonBlock';
+import ExecutiveSummarySkeleton from './ExecutiveSummarySkeleton';
 
 const ExecutiveDashboardSkeleton: React.FC = () => {
   return (
     <div className='space-y-8'>
       {/* Gut Check Banner Skeleton */}
-      <div className='aucctus-bg-secondary rounded-lg p-6'>
-        <div className='flex items-center justify-between'>
-          <div className='space-y-2'>
-            <SkeletonBlock className='h-6 w-48' />
-            <SkeletonBlock className='h-4 w-96' />
-          </div>
-          <SkeletonBlock className='h-8 w-24 rounded' />
-        </div>
-      </div>
+      <ExecutiveSummarySkeleton />
 
       {/* Hero Section Skeleton */}
       <div className='grid grid-cols-1 gap-8 lg:grid-cols-2'>

@@ -24,7 +24,7 @@ const VerifyEmail: FunctionComponent = () => {
   // Shared logic for sending verification email
   const sendVerificationEmail = async () => {
     if (!email) {
-      toast.errorAnimated('Email Required', 'Please enter your email address');
+      toast.error('Email Required', 'Please enter your email address');
       return;
     }
 
@@ -36,10 +36,7 @@ const VerifyEmail: FunctionComponent = () => {
     setEmailInputError(undefined);
 
     if (!signUpLoaded || !signUp) {
-      toast.errorAnimated(
-        'Service Not Ready',
-        'Service not ready. Please try again',
-      );
+      toast.error('Service Not Ready', 'Service not ready. Please try again');
       return;
     }
 
@@ -64,16 +61,16 @@ const VerifyEmail: FunctionComponent = () => {
       });
 
       setVerificationSent(true);
-      toast.successAnimated(
+      toast.success(
         'Verification Email Sent',
         'Please check your inbox for the verification code',
       );
     } catch (err: any) {
       telemetry.error('Send verification error:', err);
       if (err.errors?.[0]?.message) {
-        toast.errorAnimated('Verification Failed', err.errors[0].message);
+        toast.error('Verification Failed', err.errors[0].message);
       } else {
-        toast.errorAnimated(
+        toast.error(
           'Verification Failed',
           'Failed to send verification email. Please try again',
         );
@@ -96,7 +93,7 @@ const VerifyEmail: FunctionComponent = () => {
     e.preventDefault();
 
     if (!signUp || !code) {
-      toast.errorAnimated(
+      toast.error(
         'Verification Code Required',
         'Please enter the verification code',
       );
@@ -109,7 +106,7 @@ const VerifyEmail: FunctionComponent = () => {
       const result = await signUp.attemptEmailAddressVerification({ code });
 
       if (result.verifications?.emailAddress?.status === 'verified') {
-        toast.successAnimated(
+        toast.success(
           'Email Verified',
           'Your email has been verified successfully!',
         );
@@ -117,13 +114,13 @@ const VerifyEmail: FunctionComponent = () => {
         // Check if this completes the sign-up process
         if (result.status === 'complete') {
           await setActive({ session: result.createdSessionId });
-          toast.successAnimated(
+          toast.success(
             'Account Activated',
             'Account activated! Redirecting...',
           );
           // Don't navigate immediately - let AuthBootstrap handle routing
         } else {
-          toast.successAnimated(
+          toast.success(
             'Email Verified',
             'Email verified! You can now sign in with your account.',
           );
@@ -131,7 +128,7 @@ const VerifyEmail: FunctionComponent = () => {
           navigate(AppPath.Login);
         }
       } else {
-        toast.errorAnimated(
+        toast.error(
           'Invalid Verification Code',
           'Invalid verification code. Please try again',
         );
@@ -144,15 +141,15 @@ const VerifyEmail: FunctionComponent = () => {
         err.errors?.[0]?.message?.includes('already been verified') ||
         err.errors?.[0]?.code === 'verification_already_verified'
       ) {
-        toast.successAnimated(
+        toast.success(
           'Email Already Verified',
           'Email already verified! You can now sign in',
         );
         navigate(AppPath.Login);
       } else if (err.errors?.[0]?.message) {
-        toast.errorAnimated('Verification Failed', err.errors[0].message);
+        toast.error('Verification Failed', err.errors[0].message);
       } else {
-        toast.errorAnimated(
+        toast.error(
           'Verification Failed',
           'Verification failed. Please try again',
         );

@@ -16,7 +16,7 @@ export const useSyntheticExecutionStart = (
     mutationFn: async (data?: ISyntheticExecutionRequest) =>
       api.testing.executeSyntheticTest(conceptUuid, testUuid, data),
     onSuccess: () => {
-      toast.successAnimated(
+      toast.success(
         'Test Started',
         "Your synthetic test is now running. You'll be notified when it completes",
       );
@@ -24,7 +24,7 @@ export const useSyntheticExecutionStart = (
     onError: (e: any) => {
       // Handle 409 Conflict specifically - execution already running
       if (e?.response?.status === 409) {
-        toast.errorAnimated(
+        toast.error(
           'Test Already Running',
           'A synthetic execution is already running for this test. Please wait for it to complete',
         );
@@ -33,7 +33,7 @@ export const useSyntheticExecutionStart = (
 
       // Handle other errors with generic parsing
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Test Start Failed',
         message || 'Unable to start synthetic execution. Please try again',
       );
@@ -57,7 +57,7 @@ export const useSyntheticExecutionCancel = (
           executionId: data.executionId,
           message: 'Task was already cancelled or completed',
         });
-        toast.successAnimated(
+        toast.success(
           'Already Cancelled',
           'This execution was already cancelled or completed',
         );
@@ -72,7 +72,7 @@ export const useSyntheticExecutionCancel = (
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Cancellation Failed',
         message || 'Unable to cancel execution. Please try again',
       );
@@ -178,7 +178,7 @@ export const useSyntheticDistributionPreview = (
       api.testing.getDistributionPreview(conceptUuid, testUuid, data),
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Preview Generation Failed',
         message || 'Unable to generate distribution preview. Please try again',
       );

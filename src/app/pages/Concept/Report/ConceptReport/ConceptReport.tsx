@@ -161,7 +161,7 @@ const ConceptReport: FunctionComponent = () => {
   );
 
   if (!concept && isConceptFetched) {
-    toast.errorAnimated('Concept Not Found', 'Concept Not Found');
+    toast.error('Concept Not Found', 'Concept Not Found');
     return <Navigate to={AppPath.ConceptBank} />;
   }
 

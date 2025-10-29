@@ -96,7 +96,7 @@ export const useConceptGeneration = (uuid: string) => {
     onSuccess: () => {},
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Concept Generation Failed',
         message || 'Unable to generate concept. Please try again',
       );
@@ -115,7 +115,7 @@ export const useConceptAiEditing = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Concept Edit Failed',
         message || 'Unable to edit concept. Please try again',
       );
@@ -245,7 +245,7 @@ export const useGenerateKeyAssumptions = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Key Assumptions Generation Failed',
         message || 'Unable to generate key assumptions. Please try again',
       );
@@ -275,7 +275,7 @@ export const useGenerateCustomerProfile = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Customer Profile Generation Failed',
         message || 'Unable to generate customer profile. Please try again',
       );
@@ -305,7 +305,7 @@ export const useGenerateMarketScan = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Market Scan Generation Failed',
         message || 'Unable to generate market scan. Please try again',
       );
@@ -339,7 +339,7 @@ export const useGenerateConceptOverview = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Overview Generation Failed',
         message || 'Unable to generate overview. Please try again',
       );
@@ -557,14 +557,14 @@ export const useConceptVideoGenerate = (conceptUuid: string) => {
     },
     onSuccess: () => {
       // Query will be invalidated when WebSocket completion message is received
-      toast.successAnimated(
+      toast.success(
         'Video Generation Started',
         'Your concept video is being generated',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Video Generation Failed',
         message || 'Unable to start video generation',
       );
@@ -599,7 +599,7 @@ export const useSaveGeneratedConcepts = (seedUuid: string) => {
       queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
     },
     onError: () => {
-      toast.errorAnimated(
+      toast.error(
         'Save Failed',
         'Concepts could not be saved. Please try again later',
       );
@@ -739,7 +739,7 @@ export const useConceptCustomerProfileConversationList = (
         return; // Don't show error toast for 404 responses
       }
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Search Failed',
         message || 'Unable to search conversation. Please try again',
       );
@@ -817,7 +817,7 @@ export const useCustomerProfileRealWorldSignalCreate = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Signal Creation Failed',
         message || 'Unable to create real world signal. Please try again later',
       );
@@ -851,7 +851,7 @@ export const useCustomerProfileRealWorldSignalUpdate = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Signal Update Failed',
         message || 'Unable to update real world signal. Please try again later',
       );
@@ -880,7 +880,7 @@ export const useCustomerProfileRealWorldSignalDelete = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Signal Deletion Failed',
         message || 'Unable to delete real world signal. Please try again later',
       );
@@ -937,7 +937,7 @@ const createConceptMutation = () => {
       },
       onError: (e) => {
         const message = utils.osiris.parseFormError(e);
-        toast.errorAnimated('Operation Failed', message || 'An error occurred');
+        toast.error('Operation Failed', message || 'An error occurred');
       },
     });
   };
@@ -997,14 +997,14 @@ export const useConceptReportCancel = () => {
       await api.concept.cancelReport(conceptUuid),
     onSuccess: () => {
       doFullConceptInvalidation(queryClient);
-      toast.successAnimated(
+      toast.success(
         'Report Cancelled',
         'Report generation has been stopped successfully',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Cancellation Failed',
         message || 'Unable to cancel report generation',
       );
@@ -1196,7 +1196,7 @@ export const useSeedUpdate = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated('Operation Failed', message || 'An error occurred');
+      toast.error('Operation Failed', message || 'An error occurred');
     },
   });
 };
@@ -1210,14 +1210,14 @@ export const useSaveConceptVersion = () => {
     mutationFn: async (uuid: string) =>
       await api.concept.saveConceptVersion(uuid),
     onSuccess: () => {
-      toast.successAnimated(
+      toast.success(
         'Version Saved',
         'Your concept version has been saved successfully',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Version Save Failed',
         message || 'Unable to save concept version',
       );
@@ -1263,7 +1263,7 @@ export const useRevertConceptVersion = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Version Revert Failed',
         message || 'Unable to revert to historical version',
       );
@@ -1291,14 +1291,14 @@ export const useCommitConceptVersionRevert = () => {
 
     onSuccess: () => {
       doFullConceptInvalidation(queryClient);
-      toast.successAnimated(
+      toast.success(
         'Version Restored',
         'Your concept has been restored to the selected version',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Version Restore Failed',
         message || 'Unable to restore concept version',
       );
@@ -1322,7 +1322,7 @@ export const useCancelConceptVersionRevert = () => {
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Cancel Revert Failed',
         message || 'Unable to cancel version revert',
       );
@@ -1376,14 +1376,11 @@ export const useCustomerJobCreate = (customerProfileUuid: string) => {
           'jobs',
         ],
       });
-      toast.successAnimated(
-        'Job Created',
-        'Customer job has been added successfully',
-      );
+      toast.success('Job Created', 'Customer job has been added successfully');
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Job Creation Failed',
         message || 'Unable to create customer job',
       );
@@ -1414,14 +1411,14 @@ export const useCustomerJobUpdate = () => {
           'jobs',
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Job Updated',
         'Customer job has been updated successfully',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Job Update Failed',
         message || 'Unable to update customer job',
       );
@@ -1447,14 +1444,14 @@ export const useCustomerJobDelete = () => {
           'jobs',
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Job Deleted',
         'Customer job has been removed successfully',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Job Deletion Failed',
         message || 'Unable to delete customer job',
       );
@@ -1508,14 +1505,14 @@ export const useCustomerPainCreate = (customerProfileUuid: string) => {
           'pains',
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Pain Created',
         'Customer pain point has been added successfully',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Pain Creation Failed',
         message || 'Unable to create pain point',
       );
@@ -1546,14 +1543,14 @@ export const useCustomerPainUpdate = () => {
           'pains',
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Pain Updated',
         'Customer pain point has been updated successfully',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Pain Update Failed',
         message || 'Unable to update pain point',
       );
@@ -1582,14 +1579,14 @@ export const useCustomerPainDelete = () => {
           'pains',
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Pain Deleted',
         'Customer pain point has been removed successfully',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Pain Deletion Failed',
         message || 'Unable to delete pain point',
       );
@@ -1677,14 +1674,14 @@ export const useCustomerJourneyStepCreate = (customerProfileUuid: string) => {
           'journey-steps',
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Journey Step Created',
         'Step has been added to the customer journey',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Journey Step Creation Failed',
         message || 'Unable to create journey step',
       );
@@ -1715,14 +1712,14 @@ export const useCustomerJourneyStepUpdate = () => {
           'journey-steps',
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Journey Step Updated',
         'Step has been updated successfully',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Journey Step Update Failed',
         message || 'Unable to update journey step',
       );
@@ -1751,14 +1748,14 @@ export const useCustomerJourneyStepDelete = () => {
           'journey-steps',
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Journey Step Deleted',
         'Step has been removed from the customer journey',
       );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Journey Step Deletion Failed',
         message || 'Unable to delete journey step',
       );
@@ -1829,14 +1826,14 @@ export const useAssumptionAdd = () => {
           variables.rootIdentifier,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Assumption Added',
         'Tests are being regenerated for your new assumption',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Assumption Addition Failed',
         message || 'Unable to add assumption. Please try again',
       );
@@ -1873,14 +1870,14 @@ export const useAssumptionUpdate = () => {
           variables.rootIdentifier,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Assumption Updated',
         'Tests are being regenerated for your updated assumption',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Assumption Update Failed',
         message || 'Unable to update assumption. Please try again',
       );
@@ -1915,14 +1912,14 @@ export const useAssumptionRemove = () => {
           variables.rootIdentifier,
         ],
       });
-      toast.successAnimated(
+      toast.success(
         'Assumption Removed',
         'Tests are being regenerated with the updated assumptions',
       );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.errorAnimated(
+      toast.error(
         'Assumption Removal Failed',
         message || 'Unable to remove assumption. Please try again',
       );

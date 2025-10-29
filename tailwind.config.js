@@ -253,13 +253,18 @@ module.exports = {
         xs: '2px',
       },
       animation: {
+        // Expand/collapse (answer cards, etc)
         'incubation-answer-expand': 'incubationAnswerExpand 0.3s ease both',
         'incubation-answer-collapse': 'incubationAnswerCollapse 0.3s ease both',
         expand: 'expand 1s ease both',
         collapse: 'collapse 1s ease both',
+
+        // Fade and opacity
         'fade-in': 'fadeIn 0.2s ease-in forwards',
         'fade-out': 'fadeOut 0.2s ease-out forwards',
         'fade-oscillation': 'fadeIn 3s ease-in-out infinite alternate',
+
+        // Slide in/out from various directions
         'slide-in-center': 'slideInCenter 0.3s ease both',
         'slide-out-center': 'slideOutCenter 0.3s ease both',
         'slide-in-top': 'slideInTop 0.3s ease both',
@@ -268,6 +273,19 @@ module.exports = {
         'slide-out-left': 'slideOutLeft 0.3s ease both',
         'slide-in-right': 'slideInRight 0.3s ease both',
         'slide-out-right': 'slideOutRight 0.3s ease both',
+
+        // Combined fade+slide
+        'fade-slide-in-right': 'fadeSlideInRight 0.3s ease both',
+        'fade-slide-out-right': 'fadeSlideOutRight 0.3s ease both',
+
+        // Looping attention/decoration
+        'spin-slow': 'spin 3s linear infinite', // Slow spinner
+        'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite', // Subtle pulsing effect
+        'pulse-text': 'pulseText 2s ease-in-out infinite', // Subtle text pulse
+        'float-subtle': 'floatSubtle 2s ease-in-out infinite', // Floating subtle motion
+
+        // Error feedback
+        shake: 'shake 0.3s ease-in-out', // Shake animation for errors
         'pulse-slow': 'pulseSlow 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
@@ -368,6 +386,29 @@ module.exports = {
         slideOutRight: {
           from: { transform: 'translateX(0)', opacity: '1' },
           to: { transform: 'translateX(100%)', opacity: '0' },
+        },
+        fadeSlideInRight: {
+          from: { opacity: '0', transform: 'translateX(100%)' },
+          to: { opacity: '1', transform: 'translateX(0)' },
+        },
+        fadeSlideOutRight: {
+          from: { opacity: '1', transform: 'translateX(0)' },
+          to: { opacity: '0', transform: 'translateX(100%)' },
+        },
+        pulseSubtle: {
+          '0%, 100%': { opacity: '0.6', transform: 'scale(1)' },
+          '50%': { opacity: '0.9', transform: 'scale(1.15)' },
+        },
+        floatSubtle: {
+          '0%': { transform: 'translateY(0px)' },
+          '33%': { transform: 'translateY(-2px)' },
+          '66%': { transform: 'translateY(2px)' },
+          '100%': { transform: 'translateY(0px)' },
+        },
+        shake: {
+          '0%, 100%': { transform: 'translateX(0)' },
+          '10%, 30%, 50%, 70%, 90%': { transform: 'translateX(-2px)' },
+          '20%, 40%, 60%, 80%': { transform: 'translateX(2px)' },
         },
         pulseSlow: {
           '0%, 100%': { opacity: '1' },

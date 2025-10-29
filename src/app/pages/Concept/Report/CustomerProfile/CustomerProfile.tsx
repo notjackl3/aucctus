@@ -6,6 +6,7 @@ import {
   toast,
   ConceptReportSkeletons,
 } from '@components';
+const { TabViewSkeleton } = ConceptReportSkeletons;
 import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
 import {
   useConceptCustomerProfiles,
@@ -90,11 +91,15 @@ const CustomerProfile: FunctionComponent = () => {
   );
 
   const renderSkeletonTabs = () => (
-    <div className='flex w-full items-center justify-center gap-2 p-4'>
-      <SkeletonBlock className='h-10 w-40 rounded-lg' />
-      <SkeletonBlock className='h-10 w-40 rounded-lg' />
-      <SkeletonBlock className='h-10 w-40 rounded-lg' />
-    </div>
+    <TabViewSkeleton
+      tabs={[
+        { textWidth: 'w-40' },
+        { textWidth: 'w-40' },
+        { textWidth: 'w-40' },
+        { textWidth: 'w-40' },
+      ]}
+      className='w-full'
+    />
   );
 
   // Use global debug mode state
@@ -137,13 +142,13 @@ const CustomerProfile: FunctionComponent = () => {
 
     generateCustomerProfile(activeConceptIdentifier, {
       onSuccess: () => {
-        toast.successAnimated(
+        toast.success(
           'Customer Profile Generated',
           '👥 Customer Profile generated successfully!',
         );
       },
       onError: () => {
-        toast.errorAnimated(
+        toast.error(
           'Customer Profile Failed',
           '❌ Failed to generate Customer Profile',
         );

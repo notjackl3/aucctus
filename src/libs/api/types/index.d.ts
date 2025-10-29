@@ -10,6 +10,7 @@ export * from './concept/financialProjectionV2';
 export * from './concept/marketScan';
 export * from './concept/support';
 export * from './fastService';
+export * from './ideaPlayground/index';
 export * from './incubation/aiSuggestions';
 export * from './incubation/questionnaire';
 export * from './incubation/seed';

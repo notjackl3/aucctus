@@ -179,7 +179,7 @@ export const useConceptVideoGenerationEvents = (
           error: data.errorMessage,
         });
 
-        toast.errorAnimated(
+        toast.error(
           'Video Generation Failed',
           data.errorMessage || 'An error occurred while generating the video',
         );

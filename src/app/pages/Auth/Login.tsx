@@ -41,7 +41,7 @@ const Login: FunctionComponent = () => {
 
       if (result.status === 'complete') {
         await setActive({ session: result.createdSessionId });
-        toast.successAnimated(
+        toast.success(
           'Sign In Successful',
           'Welcome back! You have been signed in successfully',
         );
@@ -49,7 +49,7 @@ const Login: FunctionComponent = () => {
       } else {
         // Handle multi-factor auth or other verification steps
         telemetry.log('Additional verification required:', result);
-        toast.errorAnimated(
+        toast.error(
           'Additional Verification Required',
           'Please complete additional verification steps to continue',
         );
@@ -68,9 +68,9 @@ const Login: FunctionComponent = () => {
         return;
       }
       if (err.errors?.[0]?.message) {
-        toast.errorAnimated('Sign In Failed', err.errors[0].message);
+        toast.error('Sign In Failed', err.errors[0].message);
       } else {
-        toast.errorAnimated(
+        toast.error(
           'Sign In Failed',
           'Unable to sign in. Please check your credentials and try again',
         );

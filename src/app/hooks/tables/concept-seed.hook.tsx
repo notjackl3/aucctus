@@ -352,6 +352,8 @@ export const useSeedsBank = (
         header: () => {},
         cell: (info) => {
           const showButton = info.row.original.status === 'draft';
+          const seedType = info.row.original.type;
+          const seedUuid = info.getValue();
 
           return (
             <span className='m-auto flex h-full w-full items-center justify-end self-stretch'>
@@ -359,11 +361,15 @@ export const useSeedsBank = (
                 <Button.ConceptGenerate
                   variant='draft'
                   onClick={() => {
-                    resetQuestionnaire();
-                    setIsNewSeed(false);
-                    navigate(
-                      `${AppPath.IncubateConcept}?seed=${info.getValue()}`,
-                    );
+                    // Navigate to Idea Playground for IDEA_PLAYGROUND type seeds
+                    if (seedType === 'IDEA_PLAYGROUND') {
+                      navigate(`${AppPath.IdeaPlayground}?seed=${seedUuid}`);
+                    } else {
+                      // Default behavior for concept incubation seeds
+                      resetQuestionnaire();
+                      setIsNewSeed(false);
+                      navigate(`${AppPath.IncubateConcept}?seed=${seedUuid}`);
+                    }
                   }}
                 />
               )}

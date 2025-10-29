@@ -416,10 +416,7 @@ export const useUserInteraction = () => {
               ]);
             },
             onError: () => {
-              toast.errorAnimated(
-                'Submission Failed',
-                'Failed to submit answer',
-              );
+              toast.error('Submission Failed', 'Failed to submit answer');
             },
           },
         );
@@ -444,10 +441,7 @@ export const useUserInteraction = () => {
               ]);
             },
             onError: () => {
-              toast.errorAnimated(
-                'Submission Failed',
-                'Failed to submit answer',
-              );
+              toast.error('Submission Failed', 'Failed to submit answer');
             },
           },
         );
@@ -486,7 +480,7 @@ export const useUserInteraction = () => {
             ]);
           },
           onError: () => {
-            toast.errorAnimated('Submission Failed', 'Failed to submit answer');
+            toast.error('Submission Failed', 'Failed to submit answer');
           },
         },
       );
@@ -577,12 +571,12 @@ export const useUserInteraction = () => {
     }
 
     if (!isQuestionAnswered && activeQuestion?.required) {
-      toast.errorAnimated('Validation Error', 'Please provide a valid answer');
+      toast.error('Validation Error', 'Please provide a valid answer');
       return;
     }
 
     if (draftSeedUuid.length === 0) {
-      toast.errorAnimated('Submission Failed', 'Failed to submit answer');
+      toast.error('Submission Failed', 'Failed to submit answer');
       return;
     }
 
@@ -631,7 +625,7 @@ export const useUserInteraction = () => {
             ]);
           },
           onError: () => {
-            toast.errorAnimated('Submission Failed', 'Failed to submit answer');
+            toast.error('Submission Failed', 'Failed to submit answer');
           },
         },
       );

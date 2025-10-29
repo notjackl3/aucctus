@@ -62,7 +62,8 @@ export type QuestionFieldType = ConceptIncubationQuestion['fieldType'];
 
 export type ConceptIncubationQuestionnaireType =
   | 'EXPAND_AN_EXISTING_IDEA'
-  | 'IDENTIFY_NEW_OPPORTUNITIES';
+  | 'IDENTIFY_NEW_OPPORTUNITIES'
+  | 'IDEA_PLAYGROUND';
 
 export interface IConceptIncubationQuestionnaireSection<
   T extends string = string,

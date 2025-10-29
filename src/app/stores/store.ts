@@ -25,6 +25,12 @@ import nucleusAnswerSlice, {
   INucleusAnswerState,
 } from './nucleus-answer/store';
 import magicShareSlice, { IMagicShareState } from './magic-share/store';
+import ideaPlaygroundSlice, {
+  IIdeaPlaygroundState,
+} from './idea-playground/store';
+import queryInvalidationSlice, {
+  IQueryInvalidationState,
+} from './query-invalidation/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -38,6 +44,8 @@ export interface IAppStore {
   testCollateral: ITestCollateralState;
   nucleusAnswer: INucleusAnswerState;
   magicShare: IMagicShareState;
+  ideaPlayground: IIdeaPlaygroundState;
+  queryInvalidation: IQueryInvalidationState;
 }
 
 export interface IStoreApi<S> {
@@ -61,6 +69,8 @@ const useStore = create<IAppStore>()(
         testCollateral: testCollateralSlice,
         nucleusAnswer: nucleusAnswerSlice,
         magicShare: magicShareSlice,
+        ideaPlayground: ideaPlaygroundSlice,
+        queryInvalidation: queryInvalidationSlice,
       }),
     ),
     {

@@ -256,7 +256,7 @@ const EditCustomerProfileDemographics: FunctionComponent<
                   //     setUpperIncomeRangeError(iUpper[0].message);
                   // }
                   // }
-                  toast.errorAnimated('Update Failed', message);
+                  toast.error('Update Failed', message);
                 },
               },
             );

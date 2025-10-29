@@ -65,7 +65,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
   // Display API errors
   React.useEffect(() => {
     if (error) {
-      toast.errorAnimated(
+      toast.error(
         'Journey Load Failed',
         'Failed to load user journey steps. Please try again',
       );
@@ -92,7 +92,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
   const handleAddStep = React.useCallback(
     async (step: Omit<IUserJourneyStep, 'uuid'>) => {
       if (!customerProfileUuid) {
-        toast.errorAnimated(
+        toast.error(
           'No Profile Selected',
           'Cannot add step: no customer profile selected',
         );
@@ -100,7 +100,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
       }
 
       if (!step.title || !step.description) {
-        toast.errorAnimated(
+        toast.error(
           'Missing Information',
           'Cannot add step: title and description are required',
         );
@@ -127,7 +127,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
         closeModal();
       } catch (error) {
         telemetry.error('Failed to add journey step', { error });
-        toast.errorAnimated(
+        toast.error(
           'Step Addition Failed',
           'Failed to add journey step. Please try again',
         );
@@ -158,7 +158,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
         closeModal();
       } catch (error) {
         telemetry.error('Failed to update journey step', { error });
-        toast.errorAnimated(
+        toast.error(
           'Step Update Failed',
           'Failed to update journey step. Please try again',
         );
@@ -203,7 +203,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
     async (index: number) => {
       const stepToRemove = steps[index];
       if (!customerProfileUuid || !stepToRemove?.uuid) {
-        toast.errorAnimated(
+        toast.error(
           'Missing Information',
           'Cannot remove step: missing required information',
         );
@@ -217,7 +217,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
         });
       } catch (error) {
         telemetry.error('Failed to delete journey step', { error });
-        toast.errorAnimated(
+        toast.error(
           'Step Deletion Failed',
           'Failed to delete journey step. Please try again',
         );

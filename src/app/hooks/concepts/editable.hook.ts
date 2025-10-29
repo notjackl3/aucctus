@@ -147,10 +147,7 @@ function useEditableField<
     options?: MutateOptions<TData, TError, TVariables>,
   ): Promise<void> => {
     if (!identifier && !uuid) {
-      toast.errorAnimated(
-        'Update Failed',
-        'Something went wrong. Please try again',
-      );
+      toast.error('Update Failed', 'Something went wrong. Please try again');
       return;
     }
 
@@ -160,7 +157,7 @@ function useEditableField<
 
     // Validate the field value
     if (maxLength && typeof value === 'string' && value.length > maxLength) {
-      toast.errorAnimated(
+      toast.error(
         'Validation Error',
         `The maximum length is ${maxLength} characters`,
       );
@@ -184,7 +181,7 @@ function useEditableField<
       ...options,
       onError: (error, variables, context) => {
         const message = utils.osiris.parseFormError(error);
-        toast.errorAnimated(
+        toast.error(
           'Update Failed',
           message || 'Unable to save changes. Please try again',
         );
@@ -193,10 +190,7 @@ function useEditableField<
         }
       },
       onSuccess: (data, variables, context) => {
-        toast.successAnimated(
-          'Updated',
-          'Your changes have been saved successfully',
-        );
+        toast.success('Updated', 'Your changes have been saved successfully');
         setIsEdited(false);
         if (options?.onSuccess) {
           options.onSuccess(data, variables, context);

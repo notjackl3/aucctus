@@ -5,12 +5,14 @@ import SettingsPages from './Settings';
 import TestingPages from './Testing';
 
 import Concept from './Concept';
+import IdeaPlayground from './IdeaPlayground';
 
 const Page = {
   Auth,
   Dashboard,
   Onboarding,
   Concept,
+  IdeaPlayground,
   SettingsPages,
   TestingPages,
 };
