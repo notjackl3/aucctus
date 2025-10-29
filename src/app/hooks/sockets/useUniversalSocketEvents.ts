@@ -53,6 +53,11 @@ export interface MagicShareHandler {
   onShareError?: (message: IMagicShareErrorMessage) => void;
 }
 
+// Idea Playground event handler types
+export interface IdeaPlaygroundHandler {
+  onConceptsGenerated?: (message: any) => void;
+}
+
 // Universal socket event configuration
 export interface SocketEventConfig {
   // Concept workflow events
@@ -69,6 +74,9 @@ export interface SocketEventConfig {
 
   // Magic Share events
   magicShare?: MagicShareHandler;
+
+  // Idea Playground events
+  ideaPlayground?: IdeaPlaygroundHandler;
 
   // Add more event types here as needed
   // customerProfile?: CustomerProfileHandler;
@@ -444,6 +452,29 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     },
   );
 
+  // Register idea playground concepts generated events
+  useSocketEvent<'idea_playground.concepts.generated.user'>(
+    'idea_playground.concepts.generated.user',
+    (message) => {
+      const handler =
+        config?.ideaPlayground?.onConceptsGenerated ||
+        ((msg: any) => {
+          toast.completed(
+            'Concepts Generated',
+            `${msg.conceptCount} concepts generated!`,
+          );
+          queryClient.invalidateQueries({
+            queryKey: [
+              AucctusQueryKeys.ideaPlaygroundGeneratedIdeas,
+              msg.seedUuid,
+            ],
+          });
+        });
+
+      handler(message);
+    },
+  );
+
   // Register Magic Share completed events
   useSocketEvent<'magic_share.completed.account', IMagicShareCompletedMessage>(
     'magic_share.completed.account',
@@ -511,6 +542,9 @@ export const socketEventConfigs = {
       // Uses default handlers defined in the hook
     },
     magicShare: {
+      // Uses default handlers defined in the hook
+    },
+    ideaPlayground: {
       // Uses default handlers defined in the hook
     },
   }),

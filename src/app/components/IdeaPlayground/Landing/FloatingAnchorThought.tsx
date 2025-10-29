@@ -34,7 +34,7 @@ const FloatingAnchorThought: React.FC<FloatingAnchorThoughtProps> = ({
 
         return (
           <div
-            key={thought.uuid}
+            key={thought.uuid || `thought-${index}`}
             className={`pointer-events-auto absolute cursor-pointer transition-transform duration-150 hover:scale-105 active:scale-95 ${needsCentering ? '-translate-x-1/2' : ''}`}
             style={position}
             onClick={() => onCardClick(thought)}

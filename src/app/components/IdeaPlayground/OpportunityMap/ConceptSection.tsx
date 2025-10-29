@@ -41,7 +41,7 @@ const ConceptSection: React.FC<ConceptSectionProps> = ({
 
   return (
     <div
-      className={`h-1/3 ${sectionKey !== 'disruptive' ? 'border-b border-white/20' : ''} relative py-3 pl-6 pr-3`}
+      className={`h-1/3 ${sectionKey !== 'disruptive' ? 'border-b border-white/20' : ''} no-scrollbar relative overflow-scroll py-3 pl-6 pr-3`}
     >
       <div className='mb-6 flex items-baseline gap-2'>
         <h2 className='aucctus-text-sm aucctus-text-white opacity-70'>

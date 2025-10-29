@@ -79,7 +79,14 @@ const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
             >
               <Icon
                 variant='lightbulb'
-                className={cn('aucctus-stroke-white mr-2', {
+                className={cn('mr-2', {
+                  'aucctus-stroke-disabled':
+                    questions.length === 0 ||
+                    !questions.some((q) => isQuestionAnswered(q.id)),
+                  'aucctus-stroke-white': !(
+                    questions.length === 0 ||
+                    !questions.some((q) => isQuestionAnswered(q.id))
+                  ),
                   'animate-pulse-subtle':
                     questions.length !== 0 &&
                     questions.every((q) => isQuestionAnswered(q.id)),

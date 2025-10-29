@@ -11,10 +11,15 @@ import OpportunityMapFooter from './OpportunityMapFooter';
 import api from '@libs/api';
 import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
-import { useSocketEvent } from '@hooks/sockets/aucctus';
-import { useGetGeneratedIdeas } from '@hooks/query/ideaPlayground.hook';
+import {
+  useAnchorThought,
+  useGetGeneratedIdeas,
+} from '@hooks/query/ideaPlayground.hook';
 import { PlaygroundLoadingIndicator } from '../PlaygroundLoadingIndicator';
 import { AgentProgressBar } from '@components/Progress';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '@routes/routes';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
 
 interface OpportunityMapProps {
   seedUuid: string | null;
@@ -32,6 +37,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   const toggleConceptSelection = useStore(
     (state) => state.ideaPlayground.toggleConceptSelection,
   );
+  const navigate = useNavigate();
 
   // Use the GET hook to check and fetch generated concepts
   const {
@@ -40,6 +46,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     refetch: refetchGeneratedIdeas,
   } = useGetGeneratedIdeas(seedUuid || undefined);
 
+  const { data: anchorThoughts } = useAnchorThought(seedUuid || undefined);
   // Local state
   const [hoveredCard, setHoveredCard] = useState<string | null>(null);
   const [feedbackText, setFeedbackText] = useState('');
@@ -182,6 +189,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       });
       // Navigate or close after saving
       handleClose();
+      navigate(AppPath.ConceptBank);
     } catch (error) {
       telemetry.error('ideaPlayground.concepts.save.failed', error);
       toast.error('Failed to save concepts', undefined, 3000);
@@ -260,7 +268,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
               Concept Generator
             </h1>
             <p className='aucctus-text-white opacity-60'>
-              Cheese on Chicken in QSR
+              {anchorThoughts?.thought || 'Idea playground'}
             </p>
           </div>
 

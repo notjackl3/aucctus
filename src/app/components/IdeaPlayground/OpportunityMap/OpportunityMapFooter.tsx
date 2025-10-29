@@ -28,17 +28,25 @@ const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
               type='text'
               value={feedbackText}
               onChange={(e) => onFeedbackChange(e.target.value)}
-              placeholder='Provide Feedback on Ideas'
-              className='aucctus-text-white placeholder:aucctus-text-placeholder w-full rounded-full border border-white/20 bg-white/10 px-6 py-3 backdrop-blur-md transition-all duration-200 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/40'
+              placeholder='Provide Feedback on Ideas - Coming Soon...'
+              // Original enabled styles (preserved for reversion):
+              // className='aucctus-text-white placeholder:aucctus-text-placeholder w-full rounded-full border border-white/20 bg-white/10 px-6 py-3 backdrop-blur-md transition-all duration-200 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/40'
+              className='w-full cursor-not-allowed rounded-full border border-white/10 bg-white/5 px-6 py-3 text-white/40 opacity-50 backdrop-blur-md placeholder:text-white/30'
               maxLength={500}
+              disabled={true}
             />
             <button
               type='submit'
-              className='absolute right-2 top-1/2 -translate-y-1/2 transform rounded-full bg-white/20 p-2 backdrop-blur-md transition-all duration-200 hover:bg-white/30'
+              // Original enabled styles (preserved for reversion):
+              // className='absolute right-2 top-1/2 -translate-y-1/2 transform rounded-full bg-white/20 p-2 backdrop-blur-md transition-all duration-200 hover:bg-white/30'
+              className='absolute right-2 top-1/2 -translate-y-1/2 transform cursor-not-allowed rounded-full bg-white/10 p-2 opacity-50 backdrop-blur-md'
+              disabled={true}
             >
               <Icon
                 variant='paper-airplane'
-                className='aucctus-stroke-white'
+                // Original enabled styles (preserved for reversion):
+                // className='aucctus-stroke-white'
+                className='stroke-white/40'
                 height={16}
                 width={16}
               />

@@ -5,6 +5,7 @@ import type {
   IClarifyingQuestion,
 } from './questionnaire';
 import type { IGeneratedConcept } from '../concept/concepts';
+import { IAnchorThought } from '../ideaPlayground';
 
 export interface IConceptSeedAnswer {
   answer: string[];
@@ -43,6 +44,7 @@ export interface IConceptSeed {
 
   clarifyingQuestions: IClarifyingQuestion[];
   cachedConcepts?: IGeneratedConcept[];
+  anchorThought?: IAnchorThought;
 }
 
 export interface IConceptSeedUpdate {

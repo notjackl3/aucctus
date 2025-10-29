@@ -26,7 +26,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
 }) => {
   return (
     <div
-      className={`relative h-[120px] w-[200px] flex-shrink-0 cursor-pointer rounded-lg border bg-white/10 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/15 ${
+      className={`relative max-h-none w-[200px] flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-white/10 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/15 xl:h-[120px] 2xl:h-[160px] ${
         isActive ? 'border-2 border-white/40' : 'border-white/20'
       }`}
       onMouseEnter={onMouseEnter}
@@ -52,14 +52,14 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
         ) : null}
       </div>
 
-      <div className='flex flex-col'>
+      <div className='flex flex-col gap-2'>
         <Icon
           variant={idea.icon as any}
-          className='aucctus-stroke-white mb-2 opacity-80'
+          className='aucctus-stroke-white flex-shrink-0 opacity-80'
           height={28}
           width={28}
         />
-        <h3 className='aucctus-text-white aucctus-text-md-bold leading-tight'>
+        <h3 className='aucctus-text-white aucctus-text-md-bold line-clamp-2 break-words leading-tight 2xl:line-clamp-4'>
           {idea.title}
         </h3>
       </div>

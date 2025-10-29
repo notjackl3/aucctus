@@ -25,7 +25,10 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
   onRestart,
 }) => {
   return (
-    <div className='absolute left-0 right-0 top-4 z-40'>
+    <div
+      className='absolute left-0 right-0 top-4 z-40'
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <div
         className='text-center'
         style={getAnimationStyle('fadeIn', 500, 600)}
@@ -84,7 +87,8 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
                     {explorationModes.map((mode) => (
                       <button
                         key={mode}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           onExplorationModeChange(mode);
                         }}
                         className='aucctus-text-primary aucctus-text-md-medium w-full border-b border-white/20 px-6 py-4 text-left capitalize transition-colors duration-200 last:border-b-0 hover:bg-white/50'

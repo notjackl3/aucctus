@@ -252,8 +252,13 @@ export const useSeedsBank = (
 
           const title =
             info.row.original.title ||
+            info.row.original?.anchorThought?.thought ||
             `${answeredCount} question${answeredCount !== 1 ? 's' : ''} answered`;
-          const description = info.row.original.description || info.getValue();
+          const description =
+            info.row.original.description ||
+            info.row.original?.type === 'IDEA_PLAYGROUND'
+              ? 'Idea playground'
+              : info.getValue();
 
           return (
             <div className='flex max-w-[700px] items-center p-3'>
