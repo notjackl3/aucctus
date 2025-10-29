@@ -24,6 +24,7 @@ interface AssumptionDetailCardProps {
   showBenchmark?: boolean;
   showActions?: boolean;
   onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
@@ -32,6 +33,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   showBenchmark,
   showActions = true,
   onEdit,
+  onDelete,
 }) => {
   const conceptIdentifier = useStore((state) => state.conceptReport.identifier);
   const { openModal } = useModal();
@@ -229,7 +231,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
             <Icon variant='edit' className='aucctus-stroke-secondary h-4 w-4' />
           </button>
           <button
-            onClick={handleDeleteAssumption}
+            onClick={onDelete || handleDeleteAssumption}
             className='aucctus-bg-primary-hover aucctus-border-secondary rounded-md border p-2 shadow-sm'
             aria-label='Delete assumption'
           >

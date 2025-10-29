@@ -9,6 +9,7 @@ import {
 import {
   IAssumptionLifecycleAddRequest,
   IAssumptionLifecycleUpdateRequest,
+  IAssumptionBatchRequest,
   IConcept,
   IConceptQueryOptions,
   IConceptSeed,
@@ -1975,6 +1976,48 @@ export const useUpdateConceptImageSettings = (conceptUuid: string) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(
         message || 'Failed to update image settings. Please try again.',
+      );
+    },
+  });
+};
+
+/**
+ * Custom hook for batch updating assumptions (create, update, delete).
+ * @returns The result of the useMutation hook.
+ */
+export const useAssumptionBatchUpdate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      rootIdentifier: string;
+      data: IAssumptionBatchRequest;
+    }) => {
+      const { rootIdentifier, data } = params;
+      return await api.assumption.batchUpdateAssumptions(rootIdentifier, data);
+    },
+    onSuccess: async (_data, variables) => {
+      // Invalidate assumptions queries to force a refetch
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.assumptions,
+          'filtered',
+          variables.rootIdentifier,
+          AucctusQueryKeys.concept,
+        ],
+      });
+
+      const { create, update, delete: deleteItems } = variables.data;
+      const totalChanges = create.length + update.length + deleteItems.length;
+
+      toast.success(
+        `Successfully applied ${totalChanges} changes! Tests are being regenerated.`,
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Failed to apply batch changes. Please try again.',
       );
     },
   });

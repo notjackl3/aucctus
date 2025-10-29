@@ -477,6 +477,10 @@ export class Endpoints {
     return `api/v2/concept/${rootIdentifier}/key-assumptions/${assumptionUuid}/remove`;
   }
 
+  static batchUpdateKeyAssumptions(rootIdentifier: string) {
+    return `api/v2/concept/${rootIdentifier}/key-assumptions/batch`;
+  }
+
   static generateConceptOverview(conceptIdentifier: string) {
     return `api/v2/concept/${conceptIdentifier}/overview/generate`;
   }

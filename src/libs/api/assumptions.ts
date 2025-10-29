@@ -7,6 +7,7 @@ import {
   IAssumptionCreate,
   IAssumptionLifecycleAddRequest,
   IAssumptionLifecycleUpdateRequest,
+  IAssumptionBatchRequest,
   IAssumptionTestDetails,
   IAssumptionTestStatus,
   IConceptTestDetails,
@@ -156,6 +157,16 @@ export class AssumptionsApi extends ApiService {
   removeAssumption(rootIdentifier: string, assumptionUuid: string) {
     return this.delete<IMessageResponse>(
       endpoints.removeKeyAssumption(rootIdentifier, assumptionUuid),
+    );
+  }
+
+  batchUpdateAssumptions(
+    rootIdentifier: string,
+    data: IAssumptionBatchRequest,
+  ) {
+    return this.post<IMessageResponse, IAssumptionBatchRequest>(
+      endpoints.batchUpdateKeyAssumptions(rootIdentifier),
+      data,
     );
   }
 }

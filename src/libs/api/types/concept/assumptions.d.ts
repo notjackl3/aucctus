@@ -79,6 +79,12 @@ export interface IAssumptionLifecycleUpdateRequest {
   certainty: number; // Backend expects 1-3 integers
 }
 
+export interface IAssumptionBatchRequest {
+  create: IAssumptionLifecycleAddRequest[];
+  update: (IAssumptionLifecycleUpdateRequest & { uuid: string })[];
+  delete: string[];
+}
+
 // TODO: DEPRECATE - V1 assumption interface. Remove once all components migrate to IAssumptionV2
 export interface IAssumptionV1 extends IBaseConceptEntity {
   name: string;

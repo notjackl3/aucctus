@@ -1,32 +1,21 @@
-import React, { useState, useCallback } from 'react';
+import React from 'react';
 import { animated } from 'react-spring';
 import AssumptionDetailCard from './components/cards/AssumptionDetailCard';
-import EditableAssumptionCard from './components/cards/EditableAssumptionCard';
+import BatchEditableAssumptionCard from './components/cards/BatchEditableAssumptionCard';
+import BatchChangesIndicator from './components/BatchChangesIndicator';
 import CategoryProgressCard from './components/cards/category-progress-card/CategoryProgressCard';
 import telemetry from '@libs/telemetry';
-import { Icon, Modal } from '@components';
+import { Icon } from '@components';
 import { AssumptionCardsListSkeleton } from '@components/Skeleton/ConceptReport';
-import {
-  IAssumptionV2,
-  AssumptionCategory,
-  IAssumptionLifecycleAddRequest,
-  IAssumptionLifecycleUpdateRequest,
-} from '@libs/api/types';
+import { IAssumptionV2, AssumptionCategory } from '@libs/api/types';
 import { CategoryMetric } from '@hooks/query/assumptions.hook';
 import {
   CATEGORY_CONFIG,
   getValidationStatusFromMetrics,
   getValidationPercentageFromMetrics,
 } from './utils/assumptionUtils';
-import {
-  useAssumptionAdd,
-  useAssumptionUpdate,
-} from '@hooks/query/concepts.hook';
-import { useModal } from '@context/ModalContextProvider';
-import { useOutletContext, useNavigate } from 'react-router-dom';
-import { IConceptReportContext } from '../ConceptReport/ConceptReport';
-import { AppPath } from '@routes/routes';
 import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
+import { useBatchAssumptionTable } from '@hooks/concepts/useBatchAssumptionTable';
 
 interface AssumptionsTableProps {
   assumptions: IAssumptionV2[];
@@ -43,32 +32,42 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
   onCategoryChange,
   isLoading = false,
 }) => {
-  const { concept } = useOutletContext<IConceptReportContext>();
-  const { openModal } = useModal();
-  const { mutate: addAssumption } = useAssumptionAdd();
-  const { mutate: updateAssumption } = useAssumptionUpdate();
-  const navigate = useNavigate();
+  const {
+    // State
+    selectedCategory,
+    isAdding,
+    editingAssumptionId,
+    isSubmitting,
 
-  // State to track which category is selected
-  const [internalSelectedCategory, setInternalSelectedCategory] =
-    useState<AssumptionCategory>('desirability');
+    // Batch changes state
+    hasUnsavedChanges,
+    unsavedChangesCount,
+    changesArray,
+    getChange,
+    hasChangeForAssumption,
+    getEffectiveAssumptionData,
+    isMarkedForDeletion,
+    getNewAssumptions,
 
-  // State for inline editing
-  const [isAdding, setIsAdding] = useState(false);
-  const [editingAssumptionId, setEditingAssumptionId] = useState<string | null>(
-    null,
-  );
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const selectedCategory = propSelectedCategory || internalSelectedCategory;
-
-  // Handle category selection
-  const handleCategorySelect = (category: AssumptionCategory) => {
-    if (!propSelectedCategory) {
-      setInternalSelectedCategory(category);
-    }
-    onCategoryChange?.(category);
-  };
+    // Handlers
+    handleCategorySelect,
+    handleStartAdding,
+    handleCancelAdding,
+    handleSaveNewAssumption,
+    handleStartEditing,
+    handleCancelEditing,
+    handleSaveEditedAssumption,
+    handleDeleteAssumption,
+    handleEditNewAssumption,
+    handleSaveAllChanges,
+    handleDiscardAllChanges,
+    removeChange,
+  } = useBatchAssumptionTable({
+    assumptions,
+    selectedCategory: propSelectedCategory,
+    onCategoryChange,
+    isLoading,
+  });
 
   // Animation for add form
   const addFormTransition = useExpandCollapseTransition({
@@ -77,125 +76,6 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
     collapsedHeight: 0,
     maxHeight: 300,
   });
-
-  // Handle adding new assumption (inline editing)
-  const handleStartAdding = useCallback(() => {
-    if (isSubmitting || editingAssumptionId) return; // Prevent if already editing
-    setIsAdding(true);
-  }, [isSubmitting, editingAssumptionId]);
-
-  const handleCancelAdding = useCallback(() => {
-    setIsAdding(false);
-  }, []);
-
-  const handleSaveNewAssumption = useCallback(
-    async (data: {
-      statement: string;
-      category: string; // Backend format
-      importance: number; // Backend format 1-3
-      certainty: number; // Backend format 1-3
-    }) => {
-      setIsSubmitting(true);
-
-      // Convert to API format
-      const apiData: IAssumptionLifecycleAddRequest = {
-        statement: data.statement,
-        category: data.category as any, // Backend format is already correct
-        importance: data.importance,
-        certainty: data.certainty,
-      };
-
-      // Open confirmation modal with the complete data
-      openModal(
-        Modal.AssumptionLifecycleConfirmationModal,
-        {
-          mode: 'add_edit',
-          assumptionStatement: apiData.statement,
-          assumptionData: apiData,
-          onConfirm: async () => {
-            addAssumption({
-              rootIdentifier: concept.identifier,
-              data: apiData,
-            });
-            setIsAdding(false);
-            setIsSubmitting(false);
-            navigate(AppPath.ConceptBank, {
-              replace: true,
-            });
-          },
-        },
-        {
-          position: 'center',
-          backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-20',
-        },
-      );
-      setIsSubmitting(false);
-    },
-    [concept.identifier, openModal, addAssumption, navigate],
-  );
-
-  // Handle editing existing assumption
-  const handleStartEditing = useCallback(
-    (assumptionId: string) => {
-      if (isSubmitting || isAdding) return; // Prevent if already adding
-      setEditingAssumptionId(assumptionId);
-    },
-    [isSubmitting, isAdding],
-  );
-
-  const handleCancelEditing = useCallback(() => {
-    setEditingAssumptionId(null);
-  }, []);
-
-  const handleSaveEditedAssumption = useCallback(
-    async (
-      assumptionId: string,
-      data: {
-        statement: string;
-        category: string; // Backend format
-        importance: number; // Backend format 1-3
-        certainty: number; // Backend format 1-3
-      },
-    ) => {
-      setIsSubmitting(true);
-
-      // Convert to API format
-      const apiData: IAssumptionLifecycleUpdateRequest = {
-        statement: data.statement,
-        category: data.category as any, // Backend format is already correct
-        importance: data.importance,
-        certainty: data.certainty,
-      };
-
-      // Open confirmation modal with the complete data
-      openModal(
-        Modal.AssumptionLifecycleConfirmationModal,
-        {
-          mode: 'add_edit',
-          assumptionStatement: apiData.statement,
-          assumptionData: apiData,
-          onConfirm: async () => {
-            updateAssumption({
-              rootIdentifier: concept.identifier,
-              assumptionUuid: assumptionId,
-              data: apiData,
-            });
-            setEditingAssumptionId(null);
-            setIsSubmitting(false);
-            navigate(AppPath.ConceptBank, {
-              replace: true,
-            });
-          },
-        },
-        {
-          position: 'center',
-          backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-20',
-        },
-      );
-      setIsSubmitting(false);
-    },
-    [concept.identifier, openModal, updateAssumption, navigate],
-  );
 
   // Get validation status from categoryMetrics
   const getValidationStatus = (category: AssumptionCategory) => {
@@ -216,6 +96,19 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
 
   return (
     <div className='aucctus-border-primary overflow-hidden rounded-lg border shadow-sm'>
+      {/* Batch changes indicator */}
+      {hasUnsavedChanges() && (
+        <div className='p-4'>
+          <BatchChangesIndicator
+            changesCount={unsavedChangesCount()}
+            changes={changesArray()}
+            onSaveAll={handleSaveAllChanges}
+            onDiscardAll={handleDiscardAllChanges}
+            isLoading={isSubmitting}
+          />
+        </div>
+      )}
+
       <div className='flex flex-col md:flex-row'>
         {/* Left column: Category cards - takes ~30% of space */}
         <div className='aucctus-bg-primary aucctus-border-primary border-r p-6 md:w-[30%]'>
@@ -265,36 +158,128 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                 (style, item) =>
                   item && (
                     <animated.div style={style} className='mb-4'>
-                      <EditableAssumptionCard
+                      <BatchEditableAssumptionCard
                         mode='add'
                         category={selectedCategory}
                         onSave={handleSaveNewAssumption}
                         onCancel={handleCancelAdding}
                         isLoading={isSubmitting}
+                        tempId={`temp_${Date.now()}`}
                       />
                     </animated.div>
                   ),
               )}
 
-              {assumptions.length > 0 ? (
+              {assumptions.length > 0 || getNewAssumptions().length > 0 ? (
                 <div className='space-y-4'>
+                  {/* Render existing assumptions */}
                   {assumptions.map((assumption) => {
                     const isEditingThis =
                       editingAssumptionId === assumption.uuid;
+                    const hasChange = hasChangeForAssumption(assumption.uuid);
+                    const isDeleted = isMarkedForDeletion(assumption.uuid);
+                    const effectiveData =
+                      getEffectiveAssumptionData(assumption);
+
+                    // Determine outline style based on change type
+                    let outlineClass = '';
+                    let statusText = '';
+
+                    if (isDeleted) {
+                      outlineClass = 'rounded-lg ring-2 ring-red-400';
+                      statusText = '• Marked for deletion';
+                    } else if (hasChange) {
+                      outlineClass = 'rounded-lg ring-2 ring-yellow-300';
+                      statusText = '• Unsaved changes';
+                    }
 
                     if (isEditingThis) {
                       return (
-                        <EditableAssumptionCard
+                        <BatchEditableAssumptionCard
                           key={assumption.uuid}
                           mode='edit'
                           category={assumption.category}
-                          initialData={{
-                            statement: assumption.statement,
-                            importance: assumption.importance, // Already in 0-1 format from backend
-                            certainty: assumption.certainty, // Already in 0-1 format from backend
-                          }}
-                          onSave={(data) =>
-                            handleSaveEditedAssumption(assumption.uuid, data)
+                          assumption={assumption}
+                          existingChange={
+                            getChange(assumption.uuid) || undefined
+                          }
+                          onSave={handleSaveEditedAssumption}
+                          onCancel={handleCancelEditing}
+                          isLoading={isSubmitting}
+                        />
+                      );
+                    }
+
+                    return (
+                      <div key={assumption.uuid} className={outlineClass}>
+                        <AssumptionDetailCard
+                          assumption={effectiveData}
+                          showActions={
+                            !isAdding &&
+                            !editingAssumptionId &&
+                            !isSubmitting &&
+                            !isDeleted
+                          }
+                          onEdit={() => handleStartEditing(assumption.uuid)}
+                          onDelete={() =>
+                            handleDeleteAssumption(assumption.uuid, assumption)
+                          }
+                        />
+                        {(hasChange || isDeleted) && (
+                          <div
+                            className={`aucctus-text-xs mt-1 text-center ${
+                              isDeleted
+                                ? 'aucctus-text-error-primary'
+                                : 'aucctus-text-warning-primary'
+                            }`}
+                          >
+                            {statusText}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                  {/* Render new assumptions from batch */}
+                  {getNewAssumptions().map((newAssumption) => {
+                    if (!newAssumption.changes) return null;
+
+                    const isEditingThis =
+                      editingAssumptionId === newAssumption.id;
+                    const hasAdditionalChanges =
+                      hasChangeForAssumption(newAssumption.id) &&
+                      getChange(newAssumption.id)?.type === 'edit';
+
+                    // Create a base assumption object for the new assumption
+                    const baseAssumption = {
+                      uuid: newAssumption.id,
+                      statement: newAssumption.changes.statement,
+                      category: newAssumption.changes.category,
+                      importance: newAssumption.changes.importance,
+                      certainty: newAssumption.changes.certainty,
+                      status: 'untested',
+                      validationStatus: 'untested',
+                      risk: 0,
+                      createdAt: new Date().toISOString(),
+                      updatedAt: new Date().toISOString(),
+                    } as IAssumptionV2;
+
+                    // Get effective data (this will apply any additional changes)
+                    const effectiveData =
+                      getEffectiveAssumptionData(baseAssumption);
+
+                    if (isEditingThis) {
+                      return (
+                        <BatchEditableAssumptionCard
+                          key={newAssumption.id}
+                          mode='edit'
+                          category={newAssumption.changes.category}
+                          assumption={effectiveData}
+                          existingChange={
+                            getChange(newAssumption.id) || undefined
+                          }
+                          onSave={(change) =>
+                            handleEditNewAssumption(newAssumption.id, change)
                           }
                           onCancel={handleCancelEditing}
                           isLoading={isSubmitting}
@@ -303,14 +288,23 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                     }
 
                     return (
-                      <AssumptionDetailCard
-                        key={assumption.uuid}
-                        assumption={assumption}
-                        showActions={
-                          !isAdding && !editingAssumptionId && !isSubmitting
-                        }
-                        onEdit={() => handleStartEditing(assumption.uuid)}
-                      />
+                      <div
+                        key={newAssumption.id}
+                        className='rounded-lg ring-2 ring-yellow-300'
+                      >
+                        <AssumptionDetailCard
+                          assumption={effectiveData}
+                          showActions={
+                            !isAdding && !editingAssumptionId && !isSubmitting
+                          }
+                          onEdit={() => handleStartEditing(newAssumption.id)}
+                          onDelete={() => removeChange(newAssumption.id)}
+                        />
+                        <div className='aucctus-text-xs aucctus-text-warning-primary mt-1 text-center'>
+                          • New assumption (unsaved)
+                          {hasAdditionalChanges && ' • Modified'}
+                        </div>
+                      </div>
                     );
                   })}
                 </div>
