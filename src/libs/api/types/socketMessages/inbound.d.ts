@@ -592,6 +592,8 @@ export interface IMagicShareProgressMessage extends BaseSocketEvent {
     | 'gathering_data'
     | 'generating_html'
     | 'generating_pdf'
+    | 'generating_video'
+    | 'generating_slides'
     | 'uploading'
     | 'completed';
   message: string;
@@ -603,7 +605,8 @@ export interface IMagicShareCompletedMessage extends BaseSocketEvent {
   accountUuid: string;
   conceptUuid: string;
   snapshotUrl: string;
-  file?: string;
+  magicShareUuid: string;
+  fileUrl?: string;
 }
 
 export interface IMagicShareErrorMessage extends BaseSocketEvent {

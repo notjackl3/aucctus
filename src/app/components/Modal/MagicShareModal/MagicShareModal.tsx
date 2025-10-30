@@ -1,16 +1,16 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { Icon, toast } from '@components';
+import React, { useCallback } from 'react';
+import { Icon } from '@components';
 import { useModal } from '../../../context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
 import magicShareBg from '../../../assets/magic-share-background.png';
-import api from '@libs/api';
-import useStore from '@stores/store';
+import { ConceptShareFormat } from '@libs/api/types';
+import { useMagicShareModal } from '@components/Modal/MagicShareModal/hooks/useMagicShareModal';
 
 interface MagicShareModalProps {
   conceptUuid: string;
 }
 
-type ShareFormat = 'pdf' | 'powerpoint' | 'video';
+type ShareFormat = ConceptShareFormat;
 
 interface PresetOption {
   id: string;
@@ -24,21 +24,20 @@ const PRESET_OPTIONS: PresetOption[] = [
     id: 'executive',
     title: 'Exec 1-Pager',
     format: 'pdf',
-    description: 'Create an executive one-pager for this concept.',
+    description: 'Create a single-paged Executive Report.',
   },
-  // Disabled for now - will be enabled when PowerPoint generation is ready
-  // {
-  //   id: 'pitch',
-  //   title: '10 Slide Pitch Deck',
-  //   format: 'powerpoint',
-  //   description: 'A comprehensive presentation for stakeholders',
-  // },
-  // {
-  //   id: 'promo',
-  //   title: 'Promotional Video',
-  //   format: 'video',
-  //   description: 'An engaging video showcasing your concept',
-  // },
+  {
+    id: 'pitch',
+    title: '10 Slide Pitch Deck',
+    format: 'pdf',
+    description: 'Create a 10-slide pitch deck for stakeholders.',
+  },
+  {
+    id: 'promo',
+    title: 'Promotional Video',
+    format: 'video',
+    description: 'Create an engaging video showcasing your concept.',
+  },
 ];
 
 const FORMAT_OPTIONS: Array<{
@@ -48,21 +47,17 @@ const FORMAT_OPTIONS: Array<{
   enabled: boolean;
 }> = [
   { value: 'pdf', label: 'PDF', icon: 'pdf', enabled: true },
+  { value: 'video', label: 'Video', icon: 'play-square', enabled: true },
   {
-    value: 'powerpoint',
+    value: 'ppt',
     label: 'PowerPoint',
     icon: 'presentation-chart',
     enabled: false,
   },
-  { value: 'video', label: 'Video', icon: 'play-square', enabled: false },
 ];
 
 const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
   const { closeModal } = useModal();
-  const [description, setDescription] = useState('');
-  const [format, setFormat] = useState<ShareFormat>('pdf');
-  const [isTyping, setIsTyping] = useState(false);
-  const [carouselScrollLeft, setCarouselScrollLeft] = useState(0);
   const carouselRef = React.useRef<HTMLDivElement>(null);
 
   // CSS for card carousel animation
@@ -167,72 +162,34 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
     }
   `;
 
-  // Get data from Zustand store
-  // This automatically restores progress if modal is reopened during generation
-  const shareProgress = useStore((state) =>
-    state.magicShare.getShareProgress(conceptUuid),
-  );
-
-  // Derive state from Zustand store
-  const progress = shareProgress?.progress ?? 0;
-  const isComplete =
-    progress >= 100 ||
-    (shareProgress?.stage === 'completed' && !!shareProgress.snapshotUrl);
-  const isGenerating =
-    shareProgress !== undefined &&
-    !isComplete &&
-    shareProgress.stage !== undefined;
-
-  // Map progress stages to user-friendly messages
-  const progressMessage = useMemo(() => {
-    if (!shareProgress) return 'Processing...';
-
-    const stageMessages: Record<string, string> = {
-      started: 'Starting generation...',
-      gathering_data: 'Gathering concept data...',
-      generating_html: 'Generating HTML...',
-      generating_pdf: 'Generating PDF...',
-      uploading: 'Uploading document...',
-      completed: 'Generation complete!',
-    };
-
-    return (
-      stageMessages[shareProgress.stage] ||
-      shareProgress.message ||
-      'Processing...'
-    );
-  }, [shareProgress]);
-
-  // Generate title based on format
-  const generatedTitle = useMemo(() => {
-    const formatOption = FORMAT_OPTIONS.find((o) => o.value === format);
-    return formatOption?.label || 'Document';
-  }, [format]);
-
-  const handlePresetClick = useCallback((preset: PresetOption) => {
-    if (preset.id === 'executive') {
-      // Typing animation for executive preset
-      setDescription('');
-      setFormat(preset.format);
-      setIsTyping(true);
-
-      const textToType = preset.description;
-      let index = 0;
-
-      const typeInterval = setInterval(() => {
-        if (index < textToType.length) {
-          setDescription(textToType.slice(0, index + 1));
-          index++;
-        } else {
-          setIsTyping(false);
-          clearInterval(typeInterval);
-        }
-      }, 3);
-    } else {
-      setDescription(preset.description);
-      setFormat(preset.format);
-    }
-  }, []);
+  const {
+    description,
+    setDescription,
+    format,
+    setFormat,
+    isTyping,
+    isSendingEmail,
+    isLoading,
+    shouldEmail,
+    hasMagicShareUuid,
+    isSubmittingGenerate,
+    progress,
+    hasError,
+    errorMessage,
+    isComplete,
+    isGenerating,
+    progressMessage,
+    generatedTitle,
+    handlePresetClick,
+    handleGenerate,
+    handleCancel,
+    handleRestart,
+    handleDownload,
+    handleEmail,
+    handleScroll,
+    canScrollLeft,
+    canScrollRight,
+  } = useMagicShareModal({ conceptUuid, onClose: closeModal });
 
   const scrollPrev = useCallback(() => {
     if (carouselRef.current) {
@@ -246,88 +203,49 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
     }
   }, []);
 
-  const handleScroll = useCallback(() => {
+  const onScroll = useCallback(() => {
     if (carouselRef.current) {
-      setCarouselScrollLeft(carouselRef.current.scrollLeft);
+      handleScroll(carouselRef.current.scrollLeft);
     }
-  }, []);
+  }, [handleScroll]);
 
-  const canScrollLeft = useMemo(
-    () => carouselScrollLeft > 0,
-    [carouselScrollLeft],
-  );
-  const canScrollRight = useMemo(() => {
+  const canScrollRightWithRef = useCallback(() => {
     if (!carouselRef.current) return false;
-    return (
-      carouselScrollLeft <
-      carouselRef.current.scrollWidth - carouselRef.current.clientWidth
+    return canScrollRight(
+      carouselRef.current.scrollWidth,
+      carouselRef.current.clientWidth,
     );
-  }, [carouselScrollLeft]);
-
-  const clearShareProgress = useStore(
-    (state) => state.magicShare.clearShareProgress,
-  );
-
-  const handleGenerate = useCallback(async () => {
-    if (!conceptUuid) {
-      toast.error('Concept UUID is required');
-      return;
-    }
-
-    try {
-      await api.concept.downloadConcept(conceptUuid, {
-        editInstructions: description.trim(),
-      });
-
-      toast.success(
-        'Magic Share requested!',
-        'Your document will be generated shortly.',
-      );
-    } catch (error) {
-      toast.error('Failed to generate document. Please try again.');
-      clearShareProgress(conceptUuid);
-    }
-  }, [conceptUuid, description, clearShareProgress]);
-
-  const handleRestart = useCallback(() => {
-    // Clear progress from Zustand store
-    clearShareProgress(conceptUuid);
-
-    // Reset local state
-    setDescription('');
-  }, [conceptUuid, clearShareProgress]);
-
-  const handleDownload = useCallback(() => {
-    if (shareProgress?.snapshotUrl) {
-      // Open the snapshot URL in a new tab to trigger download
-      window.open(shareProgress.snapshotUrl, '_blank');
-
-      toast.success('Download started', 'Your Magic Share document is ready!');
-
-      // Clear progress and reset state
-      clearShareProgress(conceptUuid);
-      setDescription('');
-    } else {
-      toast.error('No file available', 'Please try generating again.');
-    }
-
-    closeModal();
-  }, [shareProgress, closeModal, clearShareProgress, conceptUuid]);
+  }, [canScrollRight]);
 
   const getFormatIcon = useCallback((formatValue: ShareFormat) => {
     return FORMAT_OPTIONS.find((o) => o.value === formatValue)?.icon || 'file';
   }, []);
 
   return (
-    <div className='flex w-full max-w-xl flex-col overflow-hidden'>
+    <div className='relative flex w-full max-w-xl flex-col overflow-hidden'>
       {/* Inject card carousel animation styles */}
       <style>{cardCarouselStyles}</style>
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className='absolute inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm'>
+          <div className='flex flex-col items-center gap-3'>
+            <Icon
+              variant='loading-02'
+              className='h-8 w-8 animate-spin stroke-white'
+            />
+            <span className='aucctus-text-sm-medium text-white'>
+              Loading...
+            </span>
+          </div>
+        </div>
+      )}
 
       {/* Hero Section with Floating Cards */}
       <div
         className={cn(
           'relative flex items-center justify-center overflow-hidden bg-cover bg-center transition-all duration-700',
-          isGenerating || isComplete ? 'h-64' : 'h-56',
+          isGenerating || isComplete || hasError ? 'h-64' : 'h-56',
         )}
         style={
           {
@@ -337,11 +255,28 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
           } as React.CSSProperties
         }
       >
-        {/* Restart Button - top left when complete */}
-        {isComplete && (
+        {/* Cancel Button - top left when generating */}
+        {isGenerating && (
+          <button
+            onClick={handleCancel}
+            className='aucctus-border-secondary group absolute left-4 top-4 z-50 flex h-8 items-center gap-1.5 rounded-full border border-opacity-25 px-3 transition-colors hover:bg-white/20'
+            aria-label='Cancel'
+          >
+            <Icon
+              variant='closeX'
+              className='h-3.5 w-3.5 stroke-white/70 group-hover:stroke-white'
+            />
+            <span className='text-sm font-medium text-white/70 group-hover:text-white'>
+              Cancel
+            </span>
+          </button>
+        )}
+
+        {/* Restart Button - top left when complete or error */}
+        {(isComplete || hasError) && (
           <button
             onClick={handleRestart}
-            className='group absolute left-4 top-4 z-50 flex h-8 items-center gap-1.5 rounded-full px-3 transition-colors hover:bg-white/20'
+            className='aucctus-border-secondary group absolute left-4 top-4 z-50 flex h-8 items-center gap-1.5 rounded-full border border-opacity-25 px-3 transition-colors hover:bg-white/20'
             aria-label='Restart'
           >
             <Icon
@@ -450,89 +385,149 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
         </div>
       </div>
 
-      {/* Generation/Completion Section */}
-      {(isGenerating || isComplete) && (
+      {/* Generation/Completion/Error Section */}
+      {(isGenerating || isComplete || hasError) && (
         <div className='aucctus-bg-primary animate-fade-in px-6 pb-6 pt-2'>
           <div className='flex items-center gap-6'>
             {/* Preview Icon */}
-            <div className='flex h-20 w-20 flex-shrink-0 flex-col items-center justify-center gap-1 rounded-lg bg-gradient-to-br from-pink-100 to-orange-100'>
+            <div
+              className={cn(
+                'flex h-20 w-20 flex-shrink-0 flex-col items-center justify-center gap-1 rounded-lg',
+                hasError
+                  ? 'bg-gradient-to-br from-red-100 to-red-200'
+                  : 'bg-gradient-to-br from-pink-100 to-orange-100',
+              )}
+            >
               <Icon
-                variant={getFormatIcon(format)}
-                className='h-8 w-8 text-pink-600'
+                variant={hasError ? 'alert-circle' : getFormatIcon(format)}
+                className={cn(
+                  'h-8 w-8',
+                  hasError
+                    ? 'fill-red-600 stroke-red-600'
+                    : 'fill-pink-600 stroke-pink-600',
+                )}
               />
-              <span className='aucctus-text-xs-semibold text-pink-600'>
-                {FORMAT_OPTIONS.find((o) => o.value === format)?.label}
+              <span
+                className={cn(
+                  'aucctus-text-xs-semibold',
+                  hasError ? 'text-red-600' : 'text-pink-600',
+                )}
+              >
+                {hasError
+                  ? 'Error'
+                  : FORMAT_OPTIONS.find((o) => o.value === format)?.label}
               </span>
             </div>
 
             {/* Content */}
             <div className='flex-1'>
               <h3 className='aucctus-text-primary aucctus-text-xl-bold'>
-                {isComplete
-                  ? generatedTitle
-                  : `Generating ${generatedTitle}...`}
+                {hasError
+                  ? 'Generation Failed'
+                  : isComplete
+                    ? generatedTitle
+                    : `Generating ${generatedTitle}...`}
               </h3>
 
               {/* Fun message below title */}
-              <p className='aucctus-text-secondary aucctus-text-sm mb-1.5 mt-0.5'>
-                {isComplete
-                  ? "Boom! That would've taken your intern 3 hours."
-                  : progressMessage}
+              <p
+                className={cn(
+                  'aucctus-text-sm mb-1.5 mt-0.5',
+                  hasError
+                    ? 'aucctus-text-error-primary'
+                    : 'aucctus-text-secondary',
+                )}
+              >
+                {hasError
+                  ? errorMessage
+                  : isComplete
+                    ? "Boom! That would've taken your intern 3 hours."
+                    : progressMessage}
               </p>
 
               {/* Progress Bar */}
-              <div className='relative w-[100%]'>
-                <div className='aucctus-bg-tertiary h-3 overflow-hidden rounded'>
-                  <div
-                    className={cn(
-                      'h-full transition-all duration-300',
-                      isComplete
-                        ? 'bg-green-600 bg-[linear-gradient(45deg,rgba(255,255,255,.08)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.08)_50%,rgba(255,255,255,.08)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem]'
-                        : 'bg-gradient-to-r from-pink-500 to-orange-500',
-                    )}
-                    style={{ width: isComplete ? '100%' : `${progress}%` }}
-                  >
-                    {/* Striped animation - only during generation */}
-                    {!isComplete && (
-                      <div className='absolute inset-0 animate-[shimmer_2s_linear_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%]'></div>
-                    )}
+              {!hasError && (
+                <div className='relative w-[100%]'>
+                  <div className='aucctus-bg-tertiary h-3 overflow-hidden rounded'>
+                    <div
+                      className={cn(
+                        'h-full transition-all duration-300',
+                        isComplete
+                          ? 'bg-green-600 bg-[linear-gradient(45deg,rgba(255,255,255,.08)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.08)_50%,rgba(255,255,255,.08)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem]'
+                          : 'bg-gradient-to-r from-pink-500 to-orange-500',
+                      )}
+                      style={{ width: isComplete ? '100%' : `${progress}%` }}
+                    >
+                      {/* Striped animation - only during generation */}
+                      {!isComplete && (
+                        <div className='absolute inset-0 animate-[shimmer_2s_linear_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%]'></div>
+                      )}
+                    </div>
                   </div>
-                </div>
 
-                {/* Checkmark at end when complete */}
-                {isComplete && (
-                  <div className='absolute -right-1 top-1/2 flex h-5 w-5 -translate-y-1/2 transform items-center justify-center rounded-full border-[3px] border-white bg-green-600'>
-                    <Icon
-                      variant='check'
-                      className='aucctus-stroke-white h-3 w-3'
-                      strokeWidth={3}
-                    />
-                  </div>
-                )}
-              </div>
+                  {/* Checkmark at end when complete */}
+                  {isComplete && (
+                    <div className='absolute -right-1 top-1/2 flex h-5 w-5 -translate-y-1/2 transform items-center justify-center rounded-full border-[3px] border-white bg-green-600'>
+                      <Icon
+                        variant='check'
+                        className='aucctus-stroke-white h-3 w-3'
+                        strokeWidth={3}
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Progress percentage below progress bar */}
-              <p className='aucctus-text-secondary aucctus-text-xs mt-1'>
-                {isComplete ? 'Completed' : `${Math.round(progress)}%`}
-              </p>
+              {!hasError && (
+                <p className='aucctus-text-secondary aucctus-text-xs mt-1'>
+                  {isComplete ? 'Completed' : `${Math.round(progress)}%`}
+                </p>
+              )}
             </div>
 
-            {/* Download Button */}
-            {
+            {/* Action Buttons */}
+            {hasError ? (
               <button
-                onClick={handleDownload}
+                onClick={handleRestart}
                 className='btn btn-primary btn-sm h-9 flex-shrink-0 px-3'
-                disabled={!isComplete}
               >
-                {!isComplete ? 'Generating...' : 'Download'}
+                Try Again
               </button>
-            }
+            ) : (
+              <div className='flex flex-shrink-0 flex-col gap-2'>
+                <button
+                  onClick={handleEmail}
+                  className='btn btn-primary btn-sm h-9 px-3'
+                  disabled={isSendingEmail || shouldEmail || !hasMagicShareUuid}
+                >
+                  {isSendingEmail
+                    ? 'Sending...'
+                    : shouldEmail
+                      ? isComplete
+                        ? 'Email Sent'
+                        : 'Email Scheduled'
+                      : !hasMagicShareUuid
+                        ? 'Initializing...'
+                        : isComplete
+                          ? 'Email'
+                          : 'Email when ready'}
+                </button>
+                <button
+                  onClick={handleDownload}
+                  className='btn btn-primary btn-sm h-9 px-3'
+                  disabled={!isComplete}
+                >
+                  {'Download'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
 
       {/* Content Section */}
-      {!isGenerating && !isComplete && (
+      {!isGenerating && !isComplete && !hasError && (
         <div className='aucctus-bg-primary max-h-[calc(90vh-14rem)] space-y-4 overflow-y-auto p-6'>
           {/* Title */}
           <div className='text-center'>
@@ -564,7 +559,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                 <div
                   className='flex-1 overflow-hidden'
                   ref={carouselRef}
-                  onScroll={handleScroll}
+                  onScroll={onScroll}
                 >
                   <div className='flex gap-2'>
                     {PRESET_OPTIONS.map((preset) => (
@@ -594,7 +589,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
 
                   <button
                     onClick={scrollNext}
-                    disabled={!canScrollRight}
+                    disabled={!canScrollRightWithRef()}
                     className='aucctus-bg-primary-hover flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:opacity-50'
                     aria-label='Next suggestions'
                   >
@@ -658,13 +653,20 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
           <div>
             <button
               onClick={handleGenerate}
-              // disabled={!description.trim()}
+              disabled={isSubmittingGenerate}
               className={cn(
                 'btn btn-primary w-full',
-                // !description.trim() && 'btn-disabled',
+                isSubmittingGenerate && 'btn-disabled',
               )}
             >
-              Generate
+              {isSubmittingGenerate ? (
+                <div className='flex items-center justify-center gap-2'>
+                  <Icon variant='loading-02' className='h-5 w-5 animate-spin' />
+                  <span>Generating...</span>
+                </div>
+              ) : (
+                'Generate'
+              )}
             </button>
           </div>
         </div>

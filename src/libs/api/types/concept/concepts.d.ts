@@ -13,6 +13,8 @@ export type ConceptStatus =
 
 export type ConceptCategory = 'active' | 'draft' | 'archive';
 
+export type ConceptShareFormat = 'pdf' | 'video' | 'ppt';
+
 export type DraftConceptStatus = Exclude<
   ConceptStatus,
   | 'prototyping'
@@ -182,8 +184,28 @@ export interface IConcept extends IBaseConceptEntity {
   conceptImageUrl?: string;
 }
 
-export interface IConceptSnapshotDownloadServiceReady {
-  ready: boolean;
+export interface IConceptMagicShareLatest {
+  uuid: string;
+  status: 'generating' | 'completed' | 'failed';
+  fileType?: 'video' | 'pdf' | 'ppt';
+  fileUrl?: string;
+  lastAccessedAt?: string;
+  createdAt: string;
+  // Progress tracking fields (synced with WebSocket updates)
+  stage?:
+    | 'started'
+    | 'gathering_data'
+    | 'generating_html'
+    | 'generating_pdf'
+    | 'generating_video'
+    | 'generating_slides'
+    | 'uploading'
+    | 'completed';
+  message?: string;
+  progress?: number;
+  // Error tracking fields
+  errorCode?: string;
+  errorDetails?: string;
 }
 
 export interface IConceptOverview extends IBaseConceptEntity {

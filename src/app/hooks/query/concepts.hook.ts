@@ -572,10 +572,54 @@ export const useConceptVideoGenerate = (conceptUuid: string) => {
   });
 };
 
-export const useDownloadConcept = (uuid?: string) => {
+export const useConceptMagicShareLatest = (conceptUuid?: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.conceptMagicShareLatest, conceptUuid],
+    staleTime: 1000 * 60 * 2, // 2 minutes
+    cacheTime: 1000 * 60 * 2, // 2 minutes
+    queryFn: async () => {
+      if (!conceptUuid) return undefined;
+      try {
+        return await api.concept.getConceptMagicShareLatest(conceptUuid);
+      } catch (error: any) {
+        // 404 means no magic share exists, which is a valid state (not an error)
+        if (error?.response?.status === 404) {
+          return undefined;
+        }
+        throw error;
+      }
+    },
+    enabled: !!conceptUuid,
+    retry: (failureCount, error: any) => {
+      // Don't retry on 404s
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
+    },
+  });
+
+  return { ...query, magicShareLatest: query.data };
+};
+
+export const useConceptMagicShareEmail = () => {
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      magicShareUuid: string;
+    }) => {
+      return await api.concept.emailConceptMagicShare(
+        params.conceptUuid,
+        params.magicShareUuid,
+      );
+    },
+  });
+};
+
+export const useGenerateMagicShare = (uuid?: string) => {
   const query = useQuery({
     queryFn: async () =>
-      uuid ? await api.concept.downloadConcept(uuid) : undefined,
+      uuid ? await api.concept.generateMagicShare(uuid) : undefined,
     enabled: !!uuid,
     cacheTime: 0, // disable caching
   });
@@ -1781,22 +1825,6 @@ export const useTrackConceptView = () => {
       // Silent failure - don't show error to user as this is non-critical tracking
       // Error logging handled by API service
     },
-  });
-};
-
-/**
- * Custom hook for checking concept snapshot download service availability.
- * Only runs when debug mode is enabled.
- * @returns An object containing service status and loading state.
- */
-export const useConceptSnapshotServiceStatus = (
-  isDebugModeEnabled: boolean,
-) => {
-  return useQuery({
-    queryKey: [AucctusQueryKeys.conceptSnapshotServiceStatus],
-    queryFn: async () =>
-      await api.concept.getConceptSnapshotDownloadServiceReady(),
-    enabled: isDebugModeEnabled,
   });
 };
 

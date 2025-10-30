@@ -95,9 +95,6 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   const setShareProgress = useStore(
     (state) => state.magicShare.setShareProgress,
   );
-  const clearShareProgress = useStore(
-    (state) => state.magicShare.clearShareProgress,
-  );
 
   // Prevent duplicate toasts by tracking recent messages
   const recentMessages = React.useRef(new Set<string>());
@@ -418,12 +415,17 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   useSocketEvent<'magic_share.progress.account', IMagicShareProgressMessage>(
     'magic_share.progress.account',
     (message) => {
+      // Construct magicShareUuid from accountUuid:conceptUuid
+      const magicShareUuid = `${message.accountUuid}:${message.conceptUuid}`;
+
       // Store progress in Zustand store
       setShareProgress(
         message.conceptUuid,
         message.stage,
         message.message,
         message.progress,
+        undefined,
+        magicShareUuid,
       );
 
       const handler =
@@ -434,6 +436,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
             gathering_data: 'Gathering concept data...',
             generating_html: 'Generating HTML...',
             generating_pdf: 'Generating PDF...',
+            generating_video: 'Generating video...',
             uploading: 'Uploading document...',
             completed: 'Magic Share completed!',
           };
@@ -446,6 +449,8 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
             msg.stage,
             displayMessage,
             msg.progress,
+            undefined,
+            magicShareUuid,
           );
         });
       handler(message);
@@ -486,12 +491,20 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config?.magicShare?.onShareCompleted ||
         ((msg: IMagicShareCompletedMessage) => {
+          queryClient.invalidateQueries({
+            queryKey: [
+              AucctusQueryKeys.conceptMagicShareLatest,
+              msg.conceptUuid,
+            ],
+          });
+
           setShareProgress(
             msg.conceptUuid,
             'completed',
             'Magic Share completed!',
             100,
             msg.snapshotUrl,
+            msg.magicShareUuid,
           );
         });
       handler(message);
@@ -506,17 +519,22 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const messageKey = `magic-share-error-${message.conceptUuid}-${message.errorCode || message.message}`;
       if (preventDuplicate(messageKey)) return;
 
-      // Clear progress from store on error
-      clearShareProgress(message.conceptUuid);
-
       const handler =
         config?.magicShare?.onShareError ||
         ((msg: IMagicShareErrorMessage) => {
           toast.error(
             'Magic Share Failed',
-            msg.message || 'Failed to generate document. Please try again.',
+            msg.message || 'Failed magic share generation. Please try again.',
             5000,
           );
+
+          // Invalidate queries to trigger refetch of latest magic share data
+          queryClient.invalidateQueries({
+            queryKey: [
+              AucctusQueryKeys.conceptMagicShareLatest,
+              message.conceptUuid,
+            ],
+          });
         });
       handler(message);
     },

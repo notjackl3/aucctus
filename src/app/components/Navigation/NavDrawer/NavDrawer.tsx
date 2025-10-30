@@ -87,12 +87,13 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           icon='compass-03'
           collapsed={collapsed}
         />
-        <NavButton
+        {/* Uncomment this when we have the playground ready */}
+        {/* <NavButton
           to={AppPath.IdeaPlayground}
           title='Playground'
           icon='test-drive'
           collapsed={collapsed}
-        />
+        /> */}
       </div>
       <div className='flex flex-col gap-6 px-4'>
         <NavButton

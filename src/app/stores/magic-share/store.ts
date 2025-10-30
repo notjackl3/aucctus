@@ -11,8 +11,17 @@ const magicShareSlice: Lens<IMagicShareState, IAppStore> = (set, get) => {
   return {
     shareProgressByConcept: {},
 
-    setShareProgress: (conceptUuid, stage, message, progress, snapshotUrl) => {
+    setShareProgress: (
+      conceptUuid,
+      stage,
+      message,
+      progress,
+      snapshotUrl,
+      magicShareUuid,
+    ) => {
       const currentState = get();
+      const existingProgress = currentState.shareProgressByConcept[conceptUuid];
+
       set({
         ...currentState,
         shareProgressByConcept: {
@@ -23,10 +32,58 @@ const magicShareSlice: Lens<IMagicShareState, IAppStore> = (set, get) => {
             message,
             progress,
             snapshotUrl,
+            magicShareUuid,
             timestamp: Date.now(),
+            // Preserve shouldEmail flag from existing state
+            shouldEmail: existingProgress?.shouldEmail,
           },
         },
       });
+    },
+
+    setShareError: (conceptUuid, message, errorCode, details) => {
+      const currentState = get();
+      const existingProgress = currentState.shareProgressByConcept[conceptUuid];
+
+      set({
+        ...currentState,
+        shareProgressByConcept: {
+          ...currentState.shareProgressByConcept,
+          [conceptUuid]: {
+            conceptUuid,
+            stage: 'error',
+            message,
+            progress: 0,
+            timestamp: Date.now(),
+            error: {
+              message,
+              errorCode,
+              details,
+            },
+            // Preserve shouldEmail flag from existing state
+            shouldEmail: existingProgress?.shouldEmail,
+          },
+        },
+      });
+    },
+
+    setShouldEmail: (conceptUuid, shouldEmail) => {
+      const currentState = get();
+      const existingProgress = currentState.shareProgressByConcept[conceptUuid];
+
+      if (existingProgress) {
+        set({
+          ...currentState,
+          shareProgressByConcept: {
+            ...currentState.shareProgressByConcept,
+            [conceptUuid]: {
+              ...existingProgress,
+              shouldEmail,
+              timestamp: Date.now(),
+            },
+          },
+        });
+      }
     },
 
     clearShareProgress: (conceptUuid) => {

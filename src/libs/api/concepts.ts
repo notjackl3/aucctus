@@ -3,6 +3,7 @@ import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
   ConceptIncubationQuestion,
+  ConceptShareFormat,
   ConceptStatus,
   IConcept,
   IConceptOverview,
@@ -29,7 +30,7 @@ import {
   ITrendsAndDrivers,
   IUserJourneyStep,
   QuestionFieldType,
-  IConceptSnapshotDownloadServiceReady,
+  IConceptMagicShareLatest,
 } from './types'; // Import the missing type
 import {
   IConceptVersionList,
@@ -114,20 +115,36 @@ export class ConceptApi extends ApiService {
     );
   }
 
-  getConceptSnapshotDownloadServiceReady() {
-    return this.get<IConceptSnapshotDownloadServiceReady>(
-      endpoints.conceptSnapshotDownloadServiceReady(),
-    );
-  }
-
   generateConceptVideo(conceptUuid: string) {
     return this.post<{ detail: string; task_id: string }>(
       endpoints.conceptVideoGenerate(conceptUuid),
     );
   }
 
-  downloadConcept(uuid: string, payload?: { editInstructions?: string }) {
-    return this.post(endpoints.conceptSnapshotUuid(uuid), payload);
+  getConceptMagicShareLatest(conceptUuid: string) {
+    return this.get<IConceptMagicShareLatest>(
+      endpoints.conceptMagicShareLatest(conceptUuid),
+    );
+  }
+
+  emailConceptMagicShare(conceptUuid: string, magicShareUuid: string) {
+    return this.post(
+      endpoints.emailConceptMagicShare(conceptUuid, magicShareUuid),
+    );
+  }
+
+  clearConceptMagicShare(conceptUuid: string) {
+    return this.post(endpoints.clearConceptMagicShare(conceptUuid));
+  }
+
+  generateMagicShare(
+    uuid: string,
+    payload?: {
+      editInstructions?: string;
+      type?: ConceptShareFormat;
+    },
+  ) {
+    return this.post(endpoints.conceptMagicShareGenerate(uuid), payload);
   }
 
   retryReport(uuid: string) {

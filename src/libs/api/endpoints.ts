@@ -38,12 +38,8 @@ export class Endpoints {
     return `api/v1/concept/${identifier}/`;
   }
 
-  static conceptSnapshotUuid(conceptUuid: string) {
-    return `api/v1/concept/${conceptUuid}/snapshot/download`;
-  }
-
-  static conceptSnapshotDownloadServiceReady() {
-    return `api/v1/concept/snapshot/download/service/status`;
+  static conceptMagicShareGenerate(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/magic-share/generate`;
   }
 
   static conceptReportRetry(conceptUuid: string) {
@@ -547,6 +543,19 @@ export class Endpoints {
 
   static distributionChannelUuid(distributionChannelUuid: string) {
     return `api/v2/concept/financial-projection/distribution-channel/${distributionChannelUuid}`;
+  }
+
+  // Magic Share Endpoints
+  static conceptMagicShareLatest(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/magic-share/latest`;
+  }
+
+  static emailConceptMagicShare(conceptUuid: string, magicShareUuid: string) {
+    return `api/v2/concept/${conceptUuid}/magic-share/${magicShareUuid}/email`;
+  }
+
+  static clearConceptMagicShare(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/magic-share/clear`;
   }
 
   // Trends and Drivers V3 Endpoints
