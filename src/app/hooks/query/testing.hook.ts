@@ -186,6 +186,44 @@ export const useCompleteTestDetail = () => {
 };
 
 /**
+ * Custom hook for reverting a completed test back to active status.
+ * @returns The result of the useMutation hook.
+ */
+export const useRevertTestDetail = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { conceptUuid: string; testUuid: string }) => {
+      const { conceptUuid, testUuid } = params;
+      return await api.testing.revertTestDetails(conceptUuid, testUuid);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testDetail,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      toast.success(
+        'Test Reverted',
+        'The test has been moved back to active status. Your previous active test was removed.',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Test Revert Failed',
+        message || 'Unable to revert test. Please try again',
+      );
+    },
+  });
+};
+
+/**
  * Custom hook for deleting test details.
  * @returns The result of the useMutation hook.
  */

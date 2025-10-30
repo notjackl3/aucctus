@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Icon, Container, Modal } from '@components';
 import { cn } from '@libs/utils/react';
 import { useModal } from '@context/ModalContextProvider';
@@ -12,12 +12,13 @@ import {
   TestTypeV2,
   TestResult,
 } from '@libs/api/types';
-import { useTestResults } from '@hooks/query/testing.hook';
+import { useTestResults, useRevertTestDetail } from '@hooks/query/testing.hook';
 import { ITestResult } from '@libs/api/types/concept/testing';
 import { formatTestType, riskLevelToNumber } from '../../utils/testUtils';
 import TestValidationStats from './TestValidationStats';
 import TestResultsDisplay from './TestResultsDisplay';
 import TestAssumptionsDisplay from './TestAssumptionsDisplay';
+import RevertTestConfirmationModal from './RevertTestConfirmationModal';
 
 interface TestHistoryItemProps {
   test: ITestDetails;
@@ -38,6 +39,8 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
   concept,
 }) => {
   const { openModal } = useModal();
+  const [showRevertModal, setShowRevertModal] = useState(false);
+
   // Fetch test results to get learnings and recommendations
   const { results: fetchedResults } = useTestResults(
     conceptUuid || '',
@@ -46,6 +49,9 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
       enabled: !!conceptUuid && !!test.uuid && test.status === 'completed',
     },
   );
+
+  // Revert test mutation
+  const revertTestMutation = useRevertTestDetail();
 
   // Type cast the results to include extended properties
   const testResults = (fetchedResults as ITestResult[]) || [];
@@ -136,6 +142,22 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
     }
   };
 
+  // Handle revert test
+  const handleRevertTest = () => {
+    setShowRevertModal(true);
+  };
+
+  const handleConfirmRevert = async () => {
+    if (!conceptUuid || !test.uuid) return;
+
+    await revertTestMutation.mutateAsync({
+      conceptUuid,
+      testUuid: test.uuid,
+    });
+
+    setShowRevertModal(false);
+  };
+
   return (
     <div className='aucctus-border-secondary aucctus-bg-primary overflow-hidden rounded-xl border shadow-sm'>
       {/* Test Header */}
@@ -194,33 +216,61 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
               assumptionsCount={test.assumptions.length}
             />
 
-            {/* Action Button */}
-            <button
-              className={cn(
-                'btn btn-light w-full transition-all duration-200',
-                !concept && 'cursor-not-allowed opacity-50',
+            {/* Action Buttons */}
+            <div className='flex flex-col gap-2'>
+              <button
+                className={cn(
+                  'btn btn-light w-full transition-all duration-200',
+                  !concept && 'cursor-not-allowed opacity-50',
+                )}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleViewTestDetails();
+                }}
+                disabled={!concept}
+                aria-expanded={false}
+                aria-controls={`test-details-${test.uuid}`}
+                title={
+                  !concept
+                    ? 'Test details will be available shortly'
+                    : 'View test details'
+                }
+              >
+                <>
+                  <Icon
+                    variant='eye'
+                    className='aucctus-stroke-primary mr-2 h-4 w-4'
+                  />
+                  View Details
+                </>
+              </button>
+
+              {/* Revert Button - Only show for completed tests */}
+              {test.status === 'completed' && (
+                <button
+                  className={cn(
+                    'btn btn-primary w-full transition-all duration-200',
+                    !conceptUuid && 'cursor-not-allowed opacity-50',
+                  )}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRevertTest();
+                  }}
+                  disabled={!conceptUuid || revertTestMutation.isLoading}
+                  title='Revert this test back to active status'
+                >
+                  <>
+                    <Icon
+                      variant='refresh'
+                      className='aucctus-stroke-white mr-2 h-4 w-4'
+                    />
+                    {revertTestMutation.isLoading
+                      ? 'Reverting...'
+                      : 'Revert Test'}
+                  </>
+                </button>
               )}
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewTestDetails();
-              }}
-              disabled={!concept}
-              aria-expanded={false}
-              aria-controls={`test-details-${test.uuid}`}
-              title={
-                !concept
-                  ? 'Test details will be available shortly'
-                  : 'View test details'
-              }
-            >
-              <>
-                <Icon
-                  variant='eye'
-                  className='aucctus-stroke-primary mr-2 h-4 w-4'
-                />
-                View Details
-              </>
-            </button>
+            </div>
           </div>
         </div>
       </div>
@@ -275,6 +325,15 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
           </div>
         </div>
       </Container.Collapsible>
+
+      {/* Revert Confirmation Modal */}
+      <RevertTestConfirmationModal
+        isOpen={showRevertModal}
+        onConfirm={handleConfirmRevert}
+        onCancel={() => setShowRevertModal(false)}
+        testName={test.name}
+        isReverting={revertTestMutation.isLoading}
+      />
     </div>
   );
 };

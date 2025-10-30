@@ -337,6 +337,10 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/complete`;
   }
 
+  static conceptTestingRevert(conceptUuid: string, testUuid: string) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/revert`;
+  }
+
   static conceptTestCollateral(conceptUuid: string, testUuid: string) {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/collateral`;
   }

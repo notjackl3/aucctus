@@ -82,6 +82,16 @@ export class TestingApi extends ApiService {
     );
   }
 
+  async revertTestDetails(
+    conceptUuid: string,
+    testUuid: string,
+  ): Promise<ITestDetails> {
+    return this.post<ITestDetails>(
+      endpoints.conceptTestingRevert(conceptUuid, testUuid),
+      {},
+    );
+  }
+
   async deleteTestDetail(conceptUuid: string, testUuid: string): Promise<void> {
     return this.delete<void>(
       endpoints.conceptTestingDetail(conceptUuid, testUuid),
