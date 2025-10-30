@@ -188,6 +188,12 @@ export const useMagicShareModal = ({
     return currentMessage || 'Processing...';
   }, [shareProgress, magicShareLatest]);
 
+  // Get the actual format type (for icons, etc.)
+  const actualFormat = useMemo(() => {
+    // Use the actual fileType from the API response if available, otherwise fall back to local format state
+    return magicShareLatest?.fileType || format;
+  }, [format, magicShareLatest?.fileType]);
+
   // Generate title based on format
   const generatedTitle = useMemo(() => {
     const FORMAT_OPTIONS: Array<{
@@ -199,9 +205,9 @@ export const useMagicShareModal = ({
       { value: 'video', label: 'Video' },
     ];
 
-    const formatOption = FORMAT_OPTIONS.find((o) => o.value === format);
+    const formatOption = FORMAT_OPTIONS.find((o) => o.value === actualFormat);
     return formatOption?.label || 'Document';
-  }, [format]);
+  }, [actualFormat]);
 
   const handlePresetClick = useCallback((preset: PresetOption) => {
     setDescription('');
@@ -458,6 +464,7 @@ export const useMagicShareModal = ({
     isGenerating,
     progressMessage,
     generatedTitle,
+    actualFormat,
 
     // Handlers
     handlePresetClick,

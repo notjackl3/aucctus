@@ -180,6 +180,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
     isGenerating,
     progressMessage,
     generatedTitle,
+    actualFormat,
     handlePresetClick,
     handleGenerate,
     handleCancel,
@@ -399,7 +400,9 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
               )}
             >
               <Icon
-                variant={hasError ? 'alert-circle' : getFormatIcon(format)}
+                variant={
+                  hasError ? 'alert-circle' : getFormatIcon(actualFormat)
+                }
                 className={cn(
                   'h-8 w-8',
                   hasError
@@ -413,9 +416,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                   hasError ? 'text-red-600' : 'text-pink-600',
                 )}
               >
-                {hasError
-                  ? 'Error'
-                  : FORMAT_OPTIONS.find((o) => o.value === format)?.label}
+                {hasError ? 'Error' : generatedTitle}
               </span>
             </div>
 
