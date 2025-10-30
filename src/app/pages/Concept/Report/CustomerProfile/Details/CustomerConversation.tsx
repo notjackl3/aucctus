@@ -19,8 +19,9 @@ import React, {
 import { v4 as uuidv4 } from 'uuid';
 
 // Components
-import { Icon, Modal } from '@components';
-import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
+import { Icon, Loading, Modal } from '@components';
+import defaultAvatar from '@assets/img/avatar.png';
+import Avatar from '@components/Avatar';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
 import Tooltip from '@components/ToolTip/Tooltip';
@@ -52,6 +53,9 @@ const CustomerConversation = forwardRef<
   const [activeMessages, setActiveMessages] = useState<
     CustomerProfileMessage[]
   >([]);
+
+  const [isFirstMessage, setIsFirstMessage] = useState(true);
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
   // Context hooks
   const { openModal, closeModal } = useModal();
@@ -96,6 +100,19 @@ const CustomerConversation = forwardRef<
     setActiveMessages(messages);
   }, [messages]);
 
+  // Loading messages for first interaction
+  const loadingMessages = useMemo(() => {
+    const firstName = profile.name.split(' ')[0];
+    return [
+      `Bringing ${firstName} into the room...`,
+      `Offering ${firstName} coffee...`,
+      `Making sure ${firstName}'s phone is set to silent...`,
+      `${firstName} is reviewing your question...`,
+      `Getting ${firstName} comfortable...`,
+      `${firstName} is gathering their thoughts...`,
+    ];
+  }, [profile.name]);
+
   // Memoized values
   const introMessage: IAssistantMessage = useMemo(() => {
     return {
@@ -113,6 +130,8 @@ const CustomerConversation = forwardRef<
     conversationMessagesRef.current = [];
     clearConversation();
     setActiveConversation(undefined);
+    setIsFirstMessage(true);
+    setLoadingMessageIndex(0);
   }, [clearConversation, setActiveConversation]);
 
   const scrollToBottom = useCallback((delay = 300) => {
@@ -157,6 +176,27 @@ const CustomerConversation = forwardRef<
   useEffect(() => {
     doConversationClear();
   }, [profile, doConversationClear]);
+
+  // Effect - Rotate loading messages when thinking and it's the first message
+  useEffect(() => {
+    if (!isThinking || !isFirstMessage) {
+      setLoadingMessageIndex(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setLoadingMessageIndex((prev) => (prev + 1) % loadingMessages.length);
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [isThinking, isFirstMessage, loadingMessages.length]);
+
+  // Effect - Mark first message as complete when we get a response AND we're not thinking
+  useEffect(() => {
+    if (activeMessages.length > 0 && isFirstMessage && !isThinking) {
+      setIsFirstMessage(false);
+    }
+  }, [activeMessages.length, isFirstMessage, isThinking]);
 
   // Effects - Data synchronization
   useEffect(() => {
@@ -294,9 +334,31 @@ const CustomerConversation = forwardRef<
         >
           <span className='flex-1' />
 
-          <div key={introMessage.uuid} className='flex flex-row gap-4'>
-            <CustomerChatMessage profile={profile} message={introMessage} />
-          </div>
+          {/* Empty state with avatar */}
+          {activeMessages.length === 0 && !isThinking && (
+            <div className='mb-8 flex flex-col items-center justify-center space-y-6 py-16'>
+              <Avatar
+                firstName={profile.name}
+                lastName=''
+                src={profile?.avatarUrl || defaultAvatar}
+                className={cn(
+                  'aucctus-border-primary h-24 w-24 rounded-full border-2 shadow-md',
+                )}
+              />
+              <div className='aucctus-bg-secondary aucctus-border-secondary rounded-full border px-6 py-2.5 shadow-sm backdrop-blur-sm'>
+                <p className='aucctus-text-secondary aucctus-text-sm'>
+                  Ask me anything you want to know!
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* Initial greeting - only show if we have messages */}
+          {activeMessages.length > 0 && (
+            <div key={introMessage.uuid} className='flex flex-row gap-4'>
+              <CustomerChatMessage profile={profile} message={introMessage} />
+            </div>
+          )}
 
           {/* Message history */}
           {!isLoadingConversationMessages &&
@@ -311,11 +373,32 @@ const CustomerConversation = forwardRef<
 
           {/* Loading indicator */}
           {isThinking && (
-            <div
-              style={{ animationDelay: `1000ms` }}
-              className='mx-4 mb-4 flex animate-expand flex-row gap-4'
-            >
-              <FrostedLoadingCard className='h-fit' />
+            <div className='flex animate-expand flex-row'>
+              <Avatar
+                firstName={profile.name}
+                lastName=''
+                src={profile?.avatarUrl || defaultAvatar}
+                className={cn(
+                  'aucctus-border-primary h-6 w-6 rounded-full border transition-all duration-300',
+                )}
+              />
+              <div className='aucctus-bg-secondary ml-4 h-fit max-w-[70%] space-y-2 rounded-lg p-4'>
+                {isFirstMessage ? (
+                  <div className='flex items-center gap-3'>
+                    <div className='flex gap-1'>
+                      <Loading isSmall />
+                    </div>
+                    <span className='aucctus-text-secondary aucctus-text-sm animate-pulse'>
+                      {loadingMessages[loadingMessageIndex] || 'Thinking...'}
+                    </span>
+                  </div>
+                ) : (
+                  <div className='flex gap-1'>
+                    <Loading isSmall />
+                  </div>
+                )}
+              </div>
+              <div className='flex flex-1' />
             </div>
           )}
         </div>

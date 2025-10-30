@@ -91,7 +91,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                 <h3 className='aucctus-text-secondary aucctus-text-md-medium mb-2 uppercase tracking-wider'>
                   OVERVIEW
                 </h3>
-                <p className='aucctus-text-secondary aucctus-text-md'>
+                <p className='aucctus-text-secondary aucctus-text-md hyphens-auto break-words'>
                   {description.value ||
                     'Global Students represent a significant market opportunity with unique challenges in maintaining healthy eating habits while studying abroad. They exhibit distinct behavioral patterns including limited cooking facilities, irregular schedules, and a strong desire for wellness routines. This segment shows high nutritional awareness, growing purchasing power, and alignment with sustainability values.'}
                 </p>
@@ -104,101 +104,103 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                 </h3>
 
                 <div className='aucctus-text-secondary space-y-3'>
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-start gap-2'>
                     <Icon
                       variant='globe'
                       height={16}
                       width={16}
-                      className='aucctus-stroke-secondary mr-1'
+                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
-                    <div className='grid w-full grid-cols-3'>
-                      <span className='aucctus-text-md-semibold'>
+                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
+                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
                         Geography:
                       </span>
-                      <span className='aucctus-text-md col-span-2'>
+                      <span className='aucctus-text-md break-words'>
                         {profile?.geoLocation || 'Ontario, Canada'}
                       </span>
                     </div>
                   </div>
 
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-start gap-2'>
                     <Icon
                       variant='calendar'
                       height={16}
                       width={16}
-                      className='aucctus-stroke-secondary mr-1'
+                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
-                    <div className='grid w-full grid-cols-3'>
-                      <span className='aucctus-text-md-semibold'>
+                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
+                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
                         Age Range:
                       </span>
-                      <span className='aucctus-text-md col-span-2'>
+                      <span className='aucctus-text-md break-words'>
                         {profile?.ageRange || '24-35'}
                       </span>
                     </div>
                   </div>
 
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-start gap-2'>
                     <Icon
                       variant='user-group'
                       height={16}
                       width={16}
-                      className='aucctus-stroke-secondary mr-1'
+                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
-                    <div className='grid w-full grid-cols-3'>
-                      <span className='aucctus-text-md-semibold'>
+                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
+                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
                         Family Size:
                       </span>
-                      <span className='aucctus-text-md col-span-2'>
+                      <span className='aucctus-text-md break-words'>
                         {profile?.familySize || '2 (Lives with roommate)'}
                       </span>
                     </div>
                   </div>
 
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-start gap-2'>
                     <Icon
                       variant='currency-dollar'
                       height={16}
                       width={16}
-                      className='aucctus-stroke-secondary mr-1'
+                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
-                    <div className='grid w-full grid-cols-3'>
-                      <span className='aucctus-text-md-semibold'>Income:</span>
-                      <span className='aucctus-text-md col-span-2'>
+                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
+                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
+                        Income:
+                      </span>
+                      <span className='aucctus-text-md break-words'>
                         {`${profile?.incomeLower ? formatIncome(profile.incomeLower) : '$40K'}-${profile?.incomeUpper ? formatIncome(profile.incomeUpper) : '$75K'}`}
                       </span>
                     </div>
                   </div>
 
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-start gap-2'>
                     <Icon
                       variant='book-open'
                       height={16}
                       width={16}
-                      className='aucctus-stroke-secondary mr-1'
+                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
-                    <div className='grid w-full grid-cols-3'>
-                      <span className='aucctus-text-md-semibold'>
+                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
+                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
                         Education:
                       </span>
-                      <span className='aucctus-text-md col-span-2'>
+                      <span className='aucctus-text-md break-words'>
                         {extendedProfile?.educationLevel || 'Graduate Student'}
                       </span>
                     </div>
                   </div>
 
-                  <div className='flex items-center gap-2'>
+                  <div className='flex items-start gap-2'>
                     <Icon
                       variant='briefcase'
                       height={16}
                       width={16}
-                      className='aucctus-stroke-secondary mr-1'
+                      className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
-                    <div className='grid w-full grid-cols-3'>
-                      <span className='aucctus-text-md-semibold'>
+                    <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
+                      <span className='aucctus-text-md-semibold flex-shrink-0 sm:w-24'>
                         Occupation:
                       </span>
-                      <span className='aucctus-text-md col-span-2'>
+                      <span className='aucctus-text-md break-words'>
                         {extendedProfile?.occupation ||
                           'Part-time Marketing Assistant'}
                       </span>
