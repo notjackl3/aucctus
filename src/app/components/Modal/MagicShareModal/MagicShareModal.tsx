@@ -26,12 +26,12 @@ const PRESET_OPTIONS: PresetOption[] = [
     format: 'pdf',
     description: 'Create a single-paged Executive Report.',
   },
-  {
-    id: 'pitch',
-    title: '10 Slide Pitch Deck',
-    format: 'pdf',
-    description: 'Create a 10-slide pitch deck for stakeholders.',
-  },
+  // {
+  //   id: 'pitch',
+  //   title: '10 Slide Pitch Deck',
+  //   format: 'pdf',
+  //   description: 'Create a 10-slide pitch deck for stakeholders.',
+  // },
   {
     id: 'promo',
     title: 'Promotional Video',
@@ -46,7 +46,7 @@ const FORMAT_OPTIONS: Array<{
   icon: IconVariant;
   enabled: boolean;
 }> = [
-  { value: 'pdf', label: 'PDF', icon: 'pdf', enabled: true },
+  { value: 'pdf', label: 'PDF', icon: 'file-2', enabled: true },
   { value: 'video', label: 'Video', icon: 'play-square', enabled: true },
   {
     value: 'ppt',
@@ -317,10 +317,10 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
               </div>
               <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
                 <Icon
-                  variant='pdf'
-                  className='aucctus-stroke-white h-3.5 w-3.5'
+                  variant='file-2'
+                  className='h-3.5 w-3.5 fill-transparent stroke-slate-200'
                 />
-                <span className='aucctus-text-white text-[10px] font-medium'>
+                <span className='text-[10px] font-medium text-slate-200'>
                   PDF
                 </span>
               </div>
@@ -350,9 +350,9 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
               <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
                 <Icon
                   variant='presentation-chart'
-                  className='aucctus-stroke-orange-200 h-3.5 w-3.5'
+                  className='h-3.5 w-3.5 stroke-orange-200'
                 />
-                <span className='text-[10px] font-medium text-orange-200/90'>
+                <span className='text-[10px] font-medium text-orange-200'>
                   PPT
                 </span>
               </div>
@@ -375,9 +375,9 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
               <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
                 <Icon
                   variant='play-square'
-                  className='aucctus-stroke-pink-200 h-3.5 w-3.5'
+                  className='h-3.5 w-3.5 stroke-rose-200'
                 />
-                <span className='text-[10px] font-medium text-pink-200/80'>
+                <span className='text-[10px] font-medium text-rose-200'>
                   MOV
                 </span>
               </div>

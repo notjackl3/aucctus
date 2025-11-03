@@ -79,23 +79,18 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
     currentRoute: AppPath.ConceptOverview,
     concept,
-    additionalLoadingStates: [
-      isLoadingOverview,
-      isLoadingExecutiveSummaries,
-      isLoadingFinancial,
-      isLoadingCustomerProfiles,
-      isLoadingMarketScan,
-      isLoadingMarketForces,
-      isLoadingAssumptions,
-    ],
+    additionalLoadingStates: [isLoadingOverview, isLoadingExecutiveSummaries],
   });
 
-  // Calculate overall loading state - include section pending state
-  const isLoading =
+  // Calculate overall loading state for the main dashboard content
+  // Only block the entire dashboard for overview data (needed for hero section)
+  // Individual carousel cards will handle their own loading states
+  const isLoading = isSectionPending || hasBlockingLoad;
+
+  // Separate loading state for the carousel section
+  const isCarouselLoading =
     isSectionPending ||
     hasBlockingLoad ||
-    isLoadingOverview ||
-    isLoadingExecutiveSummaries ||
     isLoadingFinancial ||
     isLoadingCustomerProfiles ||
     isLoadingMarketScan ||
@@ -398,14 +393,19 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
         {/* Tab Summary Cards with Progress Navigation */}
         <div className='relative h-fit lg:col-span-2'>
-          {/* Current Card Display */}
-          <div
-            className='transition-all duration-500 ease-in-out'
-            onMouseEnter={handleCardHover}
-            onMouseLeave={handleCardLeave}
-          >
-            {renderCurrentCard()}
-          </div>
+          {/* Show loading skeleton for carousel section while data loads */}
+          {isCarouselLoading ? (
+            <ConceptReportSkeletons.DashboardCarouselCardSkeleton />
+          ) : (
+            /* Current Card Display */
+            <div
+              className='transition-all duration-500 ease-in-out'
+              onMouseEnter={handleCardHover}
+              onMouseLeave={handleCardLeave}
+            >
+              {renderCurrentCard()}
+            </div>
+          )}
         </div>
       </div>
 

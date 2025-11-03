@@ -338,10 +338,14 @@ export const useCreateTestCollateral = () => {
         ],
       });
 
-      toast.success(
-        'Collateral Created',
-        'Test collateral has been added successfully',
-      );
+      // Only show toast if this is for the currently active concept
+      const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
+      if (data.conceptUuid === activeConceptUuid) {
+        toast.success(
+          'Collateral Created',
+          'Test collateral has been added successfully',
+        );
+      }
     },
   );
 
@@ -359,10 +363,14 @@ export const useCreateTestCollateral = () => {
         collateralUuid: data.collateralUuid || prev.collateralUuid,
       }));
 
-      toast.error(
-        'Collateral Creation Failed',
-        data.message || 'Unable to create collateral',
-      );
+      // Only show toast if this is for the currently active concept
+      const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
+      if (data.conceptUuid === activeConceptUuid) {
+        toast.error(
+          'Collateral Creation Failed',
+          data.message || 'Unable to create collateral',
+        );
+      }
     },
   );
 
@@ -1522,10 +1530,14 @@ export const useTestCollateralManager = (
         ],
       });
 
-      toast.success(
-        'Feedback Submitted',
-        'Your feedback has been submitted successfully',
-      );
+      // Only show toast if this is for the currently active concept
+      const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
+      if (data.conceptUuid === activeConceptUuid) {
+        toast.success(
+          'Feedback Submitted',
+          'Your feedback has been submitted successfully',
+        );
+      }
 
       // Call the callback to update the selectedItem
       if (onFeedbackSuccess) {
@@ -1550,10 +1562,14 @@ export const useTestCollateralManager = (
         });
       }
 
-      toast.error(
-        'Feedback Processing Failed',
-        data.message || 'Unable to process feedback',
-      );
+      // Only show toast if this is for the currently active concept
+      const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
+      if (data.conceptUuid === activeConceptUuid) {
+        toast.error(
+          'Feedback Processing Failed',
+          data.message || 'Unable to process feedback',
+        );
+      }
     },
   );
 

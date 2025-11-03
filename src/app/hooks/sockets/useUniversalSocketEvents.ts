@@ -144,23 +144,32 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         }
       }
 
-      const handler =
-        config.conceptWorkflow.onWorkflowCompleted ||
-        ((msg: any) => {
-          toast.completed(
-            'Concept Report Ready',
-            `Your concept report has been generated successfully`,
-            undefined,
-            () => {
-              const conceptUrl = AppPath.ConceptOverview.replace(
-                ':id',
-                msg.conceptRootIdentifier,
-              );
-              navigate(conceptUrl);
-            },
-          );
-        });
-      handler(message);
+      // Only show toast if this is for the currently active concept
+      const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
+      const matchesActive =
+        message.conceptUuid === activeConceptUuid ||
+        message.conceptRootIdentifier === activeConceptUuid;
+
+      if (matchesActive || !activeConceptUuid) {
+        // Show toast if it matches active concept or if no concept is active (user is not on concept page)
+        const handler =
+          config.conceptWorkflow.onWorkflowCompleted ||
+          ((msg: any) => {
+            toast.completed(
+              'Concept Report Ready',
+              `Your concept report has been generated successfully`,
+              undefined,
+              () => {
+                const conceptUrl = AppPath.ConceptOverview.replace(
+                  ':id',
+                  msg.conceptRootIdentifier,
+                );
+                navigate(conceptUrl);
+              },
+            );
+          });
+        handler(message);
+      }
     } else if (message.eventType === 'section_completed') {
       // Handle individual section completion - update cache with new data
 
@@ -219,27 +228,44 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         }
 
         // Show completion toast for individual sections
-        toast.success(
-          `Section updated successfully!`,
-          message.message || 'Your changes have been applied.',
-          5000,
-        );
+        // Only show toast if this is for the currently active concept
+        const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
+        const matchesActive =
+          message.conceptUuid === activeConceptUuid ||
+          message.conceptRootIdentifier === activeConceptUuid;
+
+        if (matchesActive) {
+          toast.success(
+            `Section updated successfully!`,
+            message.message || 'Your changes have been applied.',
+            5000,
+          );
+        }
       }
     } else if (message.eventType === 'workflow_error') {
       // Check for duplicates
       const messageKey = `${message.eventType}-${message.message || 'unknown'}`;
       if (preventDuplicate(messageKey)) return;
 
-      const handler =
-        config.conceptWorkflow.onWorkflowError ||
-        ((msg: any) => {
-          toast.error(
-            'Concept Generation Failed',
-            msg.message ||
-              'An error occurred while generating your concept report',
-          );
-        });
-      handler(message);
+      // Only show toast if this is for the currently active concept
+      const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
+      const matchesActive =
+        message.conceptUuid === activeConceptUuid ||
+        message.conceptRootIdentifier === activeConceptUuid;
+
+      if (matchesActive || !activeConceptUuid) {
+        // Show toast if it matches active concept or if no concept is active (user is not on concept page)
+        const handler =
+          config.conceptWorkflow.onWorkflowError ||
+          ((msg: any) => {
+            toast.error(
+              'Concept Generation Failed',
+              msg.message ||
+                'An error occurred while generating your concept report',
+            );
+          });
+        handler(message);
+      }
     }
   });
 

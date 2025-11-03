@@ -78,7 +78,7 @@ const TestResultCard: React.FC<TestResultCardPropsExtended> = ({
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-secondary flex h-8 w-8 items-center justify-center rounded-full'>
             <Icon
-              variant={result.isSynthetic ? 'ai-conclusion' : 'pdf'}
+              variant={result.isSynthetic ? 'ai-conclusion' : 'file-2'}
               className='aucctus-stroke-brand-primary h-4 w-4'
             />
           </div>

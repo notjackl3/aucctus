@@ -286,7 +286,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
                   <Icon
                     variant={
                       stagedFile.file.type === 'application/pdf'
-                        ? 'pdf'
+                        ? 'file-2'
                         : 'filecode'
                     }
                     className='aucctus-fill-brand-primary h-8 w-8'
@@ -377,7 +377,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
                   <Icon
                     variant={
                       uploadedFile.file.type === 'application/pdf'
-                        ? 'pdf'
+                        ? 'file-2'
                         : 'filecode'
                     }
                     className='aucctus-fill-success-primary h-8 w-8'
