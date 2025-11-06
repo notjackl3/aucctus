@@ -26,6 +26,8 @@ import CustomerDetails from './Details/CustomerDetails';
 import useStore from '@stores/store';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
+import { useQueryClient } from 'react-query';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 
 const {
   ExecutiveSummarySkeleton,
@@ -44,6 +46,7 @@ const CustomerProfile: FunctionComponent = () => {
   );
   const { concept } = useOutletContext<IConceptReportContext>();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const profilesQuery = useConceptCustomerProfiles(activeConceptUuid || '');
   const { profiles } = profilesQuery;
   const isLoading = profilesQuery.isLoading;
@@ -133,8 +136,17 @@ const CustomerProfile: FunctionComponent = () => {
         prev.set('persona', value);
         return prev;
       });
+
+      // Find the profile being switched to and invalidate its RWS query
+      const newProfile = profiles.find((item) => item.segment === value);
+      if (newProfile?.uuid) {
+        queryClient.invalidateQueries([
+          AucctusQueryKeys.customerProfileRealWorldSignals,
+          newProfile.uuid,
+        ]);
+      }
     },
-    [setSearchParams],
+    [setSearchParams, profiles, queryClient],
   );
 
   const handleDebugModeGenerate = () => {

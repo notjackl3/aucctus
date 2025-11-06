@@ -806,11 +806,39 @@ export const useConceptCustomerProfile = (profileUuid: string) => {
 export const useCustomerProfileRealWorldSignals = (profileUuid: string) => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.customerProfileRealWorldSignals, profileUuid],
-    queryFn: async () =>
-      await api.concept.getConceptCustomerProfileRealWorldSignals(profileUuid),
+    queryFn: async () => {
+      try {
+        return await api.concept.getConceptCustomerProfileRealWorldSignals(
+          profileUuid,
+        );
+      } catch (error: any) {
+        // If it's a 404, return empty data structure instead of throwing
+        if (error?.response?.status === 404) {
+          return {
+            status: undefined,
+            summary: undefined,
+            signals: [],
+            uuid: '',
+            version: 0,
+            createdAt: '',
+            updatedAt: '',
+          };
+        }
+        // For other errors, re-throw to let React Query handle them
+        throw error;
+      }
+    },
     enabled: !!profileUuid,
     staleTime: 1000 * 60 * 2, // 2 minutes
     cacheTime: 1000 * 60 * 2, // 2 minutes
+    retry: (failureCount, error: any) => {
+      // Don't retry on 404 errors
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      // Retry up to 3 times for other errors
+      return failureCount < 3;
+    },
   });
 
   return { ...query, signalsResponse: query.data };
