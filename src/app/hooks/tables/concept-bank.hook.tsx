@@ -299,7 +299,7 @@ export const useConceptBank = (
             });
             break;
           case 'complete':
-            doFullConceptInvalidation(queryClient);
+            doFullConceptInvalidation(queryClient, row.original.identifier);
             navigate(
               AppPath.ConceptOverview.replace(':id', row.original.identifier),
             );
@@ -311,7 +311,7 @@ export const useConceptBank = (
                 row.original.dateReportCompleted,
               )
             ) {
-              doFullConceptInvalidation(queryClient);
+              doFullConceptInvalidation(queryClient, row.original.identifier);
               navigate(
                 AppPath.ConceptOverview.replace(':id', row.original.identifier),
               );
@@ -364,7 +364,7 @@ export const useConceptBank = (
   const handleDebugTitleClick = React.useCallback(
     (concept: IConcept) => {
       // In debug mode, allow navigation to any concept using the complete state logic
-      doFullConceptInvalidation(queryClient);
+      doFullConceptInvalidation(queryClient, concept.identifier);
       navigate(AppPath.ConceptOverview.replace(':id', concept.identifier));
     },
     [navigate, queryClient],

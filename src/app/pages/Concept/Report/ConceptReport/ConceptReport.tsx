@@ -1,4 +1,11 @@
-import { Container, Icon, Loading, Modal, Select } from '@components';
+import {
+  Container,
+  Icon,
+  Loading,
+  Modal,
+  Select,
+  ConceptReportSkeletons,
+} from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import {
@@ -21,6 +28,8 @@ import { cn } from '@libs/utils/react';
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
+
+const { SkeletonBlock } = ConceptReportSkeletons;
 
 export interface IConceptReportContext {
   navigateToTab: (tab: string) => void;
@@ -170,31 +179,41 @@ const ConceptReport: FunctionComponent = () => {
       <ConceptReportSocketWrapper />
       <div className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8')}>
         <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
-          <div className='flex flex-row items-center justify-start'>
-            <EditModeSwitcher
-              containerClassName={cn({
-                'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
-                  concept?.isHistoricalVersion,
-              })}
-              pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
-              textFieldClassName='!text-3xl max-w-[600px]'
-              value={titleEdit.value}
-              label=''
-              name='title'
-              maxLength={titleEdit.validation.maxLength}
-              rows={1}
-              onChange={(e) => titleEdit.handleChange(e)}
-              handleSave={() => titleEdit.handleSave()}
-              handleCancel={() => titleEdit.handleCancel()}
-            />
-            <div className='ml-4 flex'>
-              <Select.ConceptStatus
-                disabled={concept?.isHistoricalVersion}
-                value={status}
-                onChange={changeConceptStatus}
-              />
+          {/* Title and Status Section */}
+          {isConceptLoading || isConceptFetching ? (
+            <div className='aucctus-bg-secondary flex flex-row items-center justify-start gap-4 rounded-lg p-4'>
+              {/* Title Skeleton - matches text-3xl height */}
+              <SkeletonBlock className='h-9 w-80' />
+              {/* Status Dropdown Skeleton */}
+              <SkeletonBlock className='h-10 w-32 rounded' />
             </div>
-          </div>
+          ) : (
+            <div className='flex flex-row items-center justify-start'>
+              <EditModeSwitcher
+                containerClassName={cn({
+                  'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
+                    concept?.isHistoricalVersion,
+                })}
+                pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
+                textFieldClassName='!text-3xl max-w-[600px]'
+                value={titleEdit.value}
+                label=''
+                name='title'
+                maxLength={titleEdit.validation.maxLength}
+                rows={1}
+                onChange={(e) => titleEdit.handleChange(e)}
+                handleSave={() => titleEdit.handleSave()}
+                handleCancel={() => titleEdit.handleCancel()}
+              />
+              <div className='ml-4 flex'>
+                <Select.ConceptStatus
+                  disabled={concept?.isHistoricalVersion}
+                  value={status}
+                  onChange={changeConceptStatus}
+                />
+              </div>
+            </div>
+          )}
           <div className='flex gap-4'>
             {concept &&
               !concept.isHistoricalVersion &&

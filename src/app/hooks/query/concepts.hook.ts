@@ -1123,11 +1123,14 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 //   );
 // };
 
-export const doFullConceptInvalidation = (queryClient: QueryClient) => {
+export const doFullConceptInvalidation = (
+  queryClient: QueryClient,
+  identifier?: string,
+) => {
   Promise.all([
     // Core concept queries
     queryClient.invalidateQueries({
-      queryKey: [AucctusQueryKeys.concept],
+      queryKey: [AucctusQueryKeys.concept, identifier],
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.concepts],
