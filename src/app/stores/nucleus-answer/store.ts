@@ -11,7 +11,14 @@ const nucleusAnswerSlice: Lens<INucleusAnswerState, IAppStore> = (set, get) => {
   return {
     answerProgressByQuestion: {},
 
-    setAnswerProgress: (questionUuid, stage, message, progress) => {
+    setAnswerProgress: (
+      questionUuid,
+      stage,
+      message,
+      progress,
+      answerText,
+      sectionType,
+    ) => {
       const currentState = get();
       set({
         ...currentState,
@@ -23,6 +30,8 @@ const nucleusAnswerSlice: Lens<INucleusAnswerState, IAppStore> = (set, get) => {
             message,
             progress,
             timestamp: Date.now(),
+            answerText: answerText ?? '',
+            sectionType: sectionType ?? '',
           },
         },
       });

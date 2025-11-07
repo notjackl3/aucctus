@@ -3,13 +3,17 @@ import { cn } from '@libs/utils/react';
 
 interface SkeletonBlockProps {
   className?: string;
+  backgroundClassName?: string;
 }
 
 /**
  * Lightweight skeleton block that uses the Aucctus design tokens.
  * Provides a consistent base for all concept report skeletons.
  */
-const SkeletonBlock: React.FC<SkeletonBlockProps> = ({ className }) => {
+const SkeletonBlock: React.FC<SkeletonBlockProps> = ({
+  className,
+  backgroundClassName = 'aucctus-bg-secondary-subtle',
+}) => {
   return (
     <>
       <style>{`
@@ -37,7 +41,7 @@ const SkeletonBlock: React.FC<SkeletonBlockProps> = ({ className }) => {
           background: linear-gradient(
             60deg,
             transparent 0%,
-            transparent 20%,
+            transparent 30%,
             rgba(255, 255, 255, 0.15) 30%,
             rgba(255, 255, 255, 0.7) 50%,
             rgba(255, 255, 255, 0.15) 70%,
@@ -51,7 +55,8 @@ const SkeletonBlock: React.FC<SkeletonBlockProps> = ({ className }) => {
       <div
         aria-hidden='true'
         className={cn(
-          'aucctus-bg-secondary-subtle skeleton-shimmer rounded',
+          backgroundClassName,
+          'skeleton-shimmer rounded',
           className,
         )}
       />

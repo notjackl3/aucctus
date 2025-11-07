@@ -12,3 +12,9 @@ export type {
   CategoriesGridProps,
   ExpandedCategoryViewProps,
 } from './CategoriesGrid';
+
+export { default as NucleusLoadingState } from './NucleusLoadingState/NucleusLoadingState';
+export type { NucleusLoadingStateProps } from './NucleusLoadingState/NucleusLoadingState';
+
+export { NucleusHeroBackground } from './NucleusHeroBackground';
+export type { NucleusHeroBackgroundProps } from './NucleusHeroBackground';

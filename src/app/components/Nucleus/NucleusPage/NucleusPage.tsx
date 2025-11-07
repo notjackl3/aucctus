@@ -1,6 +1,6 @@
-import images from '@assets/img';
-import { Icon } from '@components';
+import { Icon, NucleusLoadingState } from '@components';
 import { useNucleusReportLatest } from '../../../hooks/query/nucleus.hook';
+import { NucleusHeroBackground } from '../NucleusHeroBackground';
 import { cn } from '@libs/utils/react';
 import {
   NucleusReportSection,
@@ -446,23 +446,19 @@ const NucleusPage: React.FC = () => {
     });
   };
 
+  if (!isLoading && nucleusReport?.processingStatus === 'processing') {
+    return <NucleusLoadingState />;
+  }
+
   return (
     <div className='aucctus-bg-primary min-h-screen p-8'>
       <style>{animationStyles}</style>
       <div className='aucctus-bg-primary min-h-screen'>
         {/* Hero Header Section */}
         <div className='relative h-[32rem] overflow-hidden rounded-xl'>
-          <div className='absolute inset-0'>
-            {/* Video Background Placeholder */}
-            <div
-              className='h-full w-full bg-cover bg-center'
-              style={{
-                backgroundImage: `url(${images.aiExplorationsBackground})`,
-                backgroundSize: 'cover',
-                animation: 'moveBackground 30s ease infinite',
-              }}
-            ></div>
-          </div>
+          <NucleusHeroBackground
+            videoUrl={nucleusReport.headquartersVideoUrl}
+          />
 
           {/* Header Content */}
           <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-12'>

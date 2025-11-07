@@ -398,14 +398,6 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     },
   );
 
-  // Register nucleus answer generation progress events
-  useSocketEvent<
-    'nucleus_answer.progress.account',
-    INucleusAnswerProgressMessage
-  >('nucleus_answer.progress.account', () => {
-    return;
-  });
-
   // Register nucleus answer generation completed events
   useSocketEvent<
     'nucleus_answer.completed.account',
@@ -415,18 +407,15 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     const messageKey = `nucleus-answer-completed-${message.questionUuid}-${message.answerUuid}`;
     if (preventDuplicate(messageKey)) return;
 
-    const handler = (msg: INucleusAnswerCompletedMessage) => {
-      // Show toast in the future if needed
+    // Note: No query invalidation needed here. The comprehensive nucleus_report.progress.account
+    // websocket events provide all progress updates via payload data, eliminating the need for
+    // additional API refetches. Components using useNucleusLoadingState will receive updates
+    // directly from the websocket payload.
 
-      // Invalidate nucleus queries to refresh data
-      queryClient.invalidateQueries({
-        queryKey: [AucctusQueryKeys.nucleusReportLatest],
-      });
-      queryClient.invalidateQueries({
-        queryKey: [AucctusQueryKeys.nucleusReport, msg.nucleusReportUuid],
-      });
-    };
-    handler(message);
+    // Show toast in the future if needed for individual answer completions
+    if (config.nucleusAnswer?.onAnswerCompleted) {
+      config.nucleusAnswer.onAnswerCompleted(message);
+    }
   });
 
   // Register nucleus answer generation error events

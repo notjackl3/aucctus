@@ -602,10 +602,16 @@ export class Endpoints {
 
   // Nucleus Report Endpoints
   static nucleusReportLatest = '/api/v1/nucleus-reports/latest';
+  static nucleusReportLatestProgress =
+    '/api/v1/nucleus-reports/latest/progress';
   static nucleusReportsList = '/api/v1/nucleus-reports/';
 
   static nucleusReportByUuid(reportUuid: string) {
     return `/api/v1/nucleus-reports/${reportUuid}`;
+  }
+
+  static nucleusReportEmailWhenReady(reportUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/email-when-ready`;
   }
 
   // Nucleus Sections Endpoints

@@ -4,6 +4,8 @@ export interface INucleusAnswerProgressState {
   message: string;
   progress?: number;
   timestamp: number;
+  answerText: string;
+  sectionType: string;
 }
 
 export interface INucleusAnswerActions {
@@ -12,6 +14,8 @@ export interface INucleusAnswerActions {
     stage: INucleusAnswerProgressState['stage'],
     message: string,
     progress?: number,
+    answerText?: string,
+    sectionType?: string,
   ) => void;
   clearAnswerProgress: (questionUuid: string) => void;
   clearAllAnswerProgress: () => void;

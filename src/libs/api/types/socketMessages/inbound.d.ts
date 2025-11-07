@@ -570,6 +570,8 @@ export interface INucleusAnswerCompletedMessage extends BaseSocketEvent {
   sourceCount: number;
   isAiReasoning: boolean;
   confidenceLevel: string;
+  sectionType: string;
+  answerText: string;
 }
 
 export interface INucleusAnswerErrorMessage extends BaseSocketEvent {
@@ -580,6 +582,43 @@ export interface INucleusAnswerErrorMessage extends BaseSocketEvent {
   message: string;
   errorCode?: string;
   details?: any;
+}
+
+export interface INucleusReportProgressMessage extends BaseSocketEvent {
+  type: 'nucleus_report.progress.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  overallProgressPercent: number;
+  totalSections: number;
+  sectionsPhase1Complete: number;
+  sectionsPhase2Complete: number;
+  sectionsPhase3Complete: number;
+  totalQuestions: number;
+  totalQuestionsWithAnswers: number;
+  totalQuestionsValidated: number;
+  sections: Record<
+    string,
+    {
+      totalQuestions: number;
+      questionsWithAnswers: number;
+      questionsValidated: number;
+      progressPercent: number;
+      currentPhase: string;
+      phase1Complete: boolean;
+      phase2Complete: boolean;
+      phase3Complete: boolean;
+      estimatedTotalSeconds: number;
+    }
+  >;
+  estimatedTotalSeconds?: number;
+  startTime?: number;
+  headquartersVideoUrl?: string;
+  emailWhenReadyEnabled?: boolean;
+  recentAnswers?: Array<{
+    questionUuid: string;
+    answerText: string;
+    sectionType: string;
+  }>;
 }
 
 // Magic Share Event Messages
@@ -751,6 +790,7 @@ export type InboundSocketEvent<C = {}> =
   | INucleusAnswerProgressMessage
   | INucleusAnswerCompletedMessage
   | INucleusAnswerErrorMessage
+  | INucleusReportProgressMessage
   | IMagicShareProgressMessage
   | IMagicShareCompletedMessage
   | IMagicShareErrorMessage

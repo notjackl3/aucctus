@@ -156,3 +156,81 @@ export const useNucleusDocumentUpload = () => {
     resetUpload: reset,
   };
 };
+
+const useNucleusReportLatestProgress = () => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.nucleusReportLatest, 'progress'],
+    queryFn: async () => await api.nucleus.getLatestReportProgress(),
+    staleTime: 1000 * 60 * 5, // 5 minutes (websockets provide real-time updates)
+    cacheTime: 1000 * 60 * 10, // 10 minutes
+    refetchInterval: false, // No polling - websockets provide real-time updates
+    refetchOnWindowFocus: true, // Refetch on window focus for fresh data when user returns
+    refetchOnMount: true, // Fetch on mount for initial load
+    onError: (e: AxiosError) => {
+      // Only show error if it's not a 404 (no reports found)
+      if (e.response?.status !== 404) {
+        const message = utils.osiris.parseFormError(e);
+        toast.error(
+          'Nucleus Report Progress Fetch Failed',
+          message ||
+            'Unable to fetch nucleus report progress. Please try again',
+        );
+      }
+    },
+  });
+
+  return {
+    ...query,
+    nucleusReportProgress: query.data,
+    hasProgress: !!query.data,
+    overallProgressPercent: query.data?.overallProgressPercent ?? 0,
+    totalSections: query.data?.totalSections ?? 0,
+    sectionsPhase1Complete: query.data?.sectionsPhase1Complete ?? 0,
+    sectionsPhase2Complete: query.data?.sectionsPhase2Complete ?? 0,
+    sectionsPhase3Complete: query.data?.sectionsPhase3Complete ?? 0,
+    totalQuestions: query.data?.totalQuestions ?? 0,
+    totalQuestionsWithAnswers: query.data?.totalQuestionsWithAnswers ?? 0,
+    totalQuestionsValidated: query.data?.totalQuestionsValidated ?? 0,
+    sections: query.data?.sections ?? {},
+    isNoReportFound:
+      query.error && (query.error as AxiosError)?.response?.status === 404,
+  };
+};
+
+/**
+ * Custom hook for requesting email notification when nucleus report is ready.
+ * Sends a POST request to mark user as wanting to be notified.
+ */
+export const useNucleusReportEmailWhenReady = () => {
+  const { mutate, isLoading, error, isSuccess, reset } = useMutation({
+    mutationFn: async (reportUuid: string) => {
+      if (!reportUuid) {
+        throw new Error('Report UUID is required');
+      }
+      return await api.nucleus.emailWhenReady(reportUuid);
+    },
+    onSuccess: () => {
+      toast.success(
+        'Notification Enabled',
+        'You will be notified when the report is ready',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Notification Setup Failed',
+        message || 'Unable to set up email notification. Please try again',
+      );
+    },
+  });
+
+  return {
+    emailWhenReady: mutate,
+    isLoading,
+    error,
+    isSuccess,
+    reset,
+  };
+};
+
+export { useNucleusReportLatestProgress };

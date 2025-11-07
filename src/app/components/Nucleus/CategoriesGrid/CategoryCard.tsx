@@ -201,13 +201,6 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
           )}
           style={{ scrollBehavior: 'auto' }}
           onClick={(e) => {
-            // eslint-disable-next-line no-console
-            console.log('🔍 CategoryCard clicked:', {
-              categoryId: category.sectionType,
-              isExpanded,
-              willToggleTo: isExpanded ? null : category.sectionType,
-            });
-
             e.preventDefault();
             e.stopPropagation();
 

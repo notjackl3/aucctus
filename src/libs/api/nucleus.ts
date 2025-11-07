@@ -12,6 +12,7 @@ import {
   NucleusReportQuestion,
   NucleusReportAnswer,
   NucleusReportSection,
+  NucleusReportProgress,
 } from './types/nucleus';
 
 /**
@@ -31,6 +32,16 @@ export class NucleusApi extends ApiService {
    */
   getLatestReport() {
     return this.get<NucleusReport>(endpoints.nucleusReportLatest);
+  }
+
+  /**
+   * Get the progress of the latest nucleus report for the authenticated user's account.
+   * Returns processing status and progress information.
+   */
+  getLatestReportProgress() {
+    return this.get<NucleusReportProgress>(
+      endpoints.nucleusReportLatestProgress,
+    );
   }
 
   /**
@@ -152,5 +163,9 @@ export class NucleusApi extends ApiService {
         'Content-Type': 'multipart/form-data',
       },
     });
+  }
+
+  emailWhenReady(reportUuid: string) {
+    return this.post(endpoints.nucleusReportEmailWhenReady(reportUuid));
   }
 }
