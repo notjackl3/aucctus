@@ -218,7 +218,10 @@ const ConceptReport: FunctionComponent = () => {
             {concept &&
               !concept.isHistoricalVersion &&
               FEATURE_CONCEPT_VERSIONING && (
-                <ConceptVersionsButton conceptUuid={conceptUuid} />
+                <ConceptVersionsButton
+                  conceptUuid={conceptUuid}
+                  conceptIdentifier={conceptIdentifier}
+                />
               )}
             {!concept?.isHistoricalVersion && (
               <>
@@ -324,11 +327,17 @@ const ConceptReport: FunctionComponent = () => {
                   {
                     title: 'Revert',
                     onClick: () =>
-                      commitConceptVersionRevert(conceptUuid!, {
-                        onSuccess: () => {
-                          closeModal();
+                      commitConceptVersionRevert(
+                        {
+                          uuid: conceptUuid!,
+                          conceptIdentifier: conceptIdentifier!,
                         },
-                      }),
+                        {
+                          onSuccess: () => {
+                            closeModal();
+                          },
+                        },
+                      ),
                     variant: 'warning',
                   },
                   {
@@ -346,7 +355,12 @@ const ConceptReport: FunctionComponent = () => {
             Revert
           </button>
           <button
-            onClick={() => cancelConceptVersionRevert(conceptUuid!)}
+            onClick={() =>
+              cancelConceptVersionRevert({
+                uuid: conceptUuid!,
+                conceptIdentifier: conceptIdentifier!,
+              })
+            }
             className='btn btn-bold btn-secondary aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
           >
             Cancel

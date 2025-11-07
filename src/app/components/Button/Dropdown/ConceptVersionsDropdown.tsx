@@ -11,12 +11,14 @@ import ConceptVersionCard from '@components/Card/ConceptVersionCard';
 
 interface ConceptVersionsDropdownProps {
   conceptUuid: string;
+  conceptIdentifier: string;
   className?: string;
   onClose: () => void;
 }
 
 const ConceptVersionsDropdown: React.FC<ConceptVersionsDropdownProps> = ({
   conceptUuid,
+  conceptIdentifier,
   className,
   onClose,
 }) => {
@@ -28,6 +30,7 @@ const ConceptVersionsDropdown: React.FC<ConceptVersionsDropdownProps> = ({
     revertConceptVersion(
       {
         uuid: conceptUuid,
+        conceptIdentifier,
         payload: { versionId: version.versionNumber },
       },
       {

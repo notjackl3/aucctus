@@ -45,8 +45,8 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
     unarchiveConcept(id);
   };
 
-  const handleCancelReport = (id: string) => {
-    cancelReport(id);
+  const handleCancelReport = (conceptUuid: string) => {
+    cancelReport({ conceptUuid, conceptIdentifier: identifier });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1065,10 +1065,12 @@ export const useConceptReportCancel = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (conceptUuid: string) =>
-      await api.concept.cancelReport(conceptUuid),
-    onSuccess: () => {
-      doFullConceptInvalidation(queryClient);
+    mutationFn: async (params: {
+      conceptUuid: string;
+      conceptIdentifier: string;
+    }) => await api.concept.cancelReport(params.conceptUuid),
+    onSuccess: (_data, variables) => {
+      doFullConceptInvalidation(queryClient, variables.conceptIdentifier);
       toast.success(
         'Report Cancelled',
         'Report generation has been stopped successfully',
@@ -1153,7 +1155,7 @@ export const useFinancialProjectionUpdate = (uuid: string) => {
 
 export const doFullConceptInvalidation = (
   queryClient: QueryClient,
-  identifier?: string,
+  identifier: string,
 ) => {
   Promise.all([
     // Core concept queries
@@ -1331,10 +1333,11 @@ export const useRevertConceptVersion = () => {
   return useMutation({
     mutationFn: async (params: {
       uuid: string;
+      conceptIdentifier: string;
       payload: { versionId: number };
     }) => await api.concept.revertConceptVersion(params.uuid, params.payload),
-    onSuccess: () => {
-      doFullConceptInvalidation(queryClient);
+    onSuccess: (_data, variables) => {
+      doFullConceptInvalidation(queryClient, variables.conceptIdentifier);
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -1361,11 +1364,11 @@ export const useCommitConceptVersionRevert = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (uuid: string) =>
-      await api.concept.commitConceptVersionRevert(uuid),
+    mutationFn: async (params: { uuid: string; conceptIdentifier: string }) =>
+      await api.concept.commitConceptVersionRevert(params.uuid),
 
-    onSuccess: () => {
-      doFullConceptInvalidation(queryClient);
+    onSuccess: (_data, variables) => {
+      doFullConceptInvalidation(queryClient, variables.conceptIdentifier);
       toast.success(
         'Version Restored',
         'Your concept has been restored to the selected version',
@@ -1390,10 +1393,10 @@ export const useCancelConceptVersionRevert = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (uuid: string) =>
-      await api.concept.cancelConceptVersionRevert(uuid),
-    onSuccess: () => {
-      doFullConceptInvalidation(queryClient);
+    mutationFn: async (params: { uuid: string; conceptIdentifier: string }) =>
+      await api.concept.cancelConceptVersionRevert(params.uuid),
+    onSuccess: (_data, variables) => {
+      doFullConceptInvalidation(queryClient, variables.conceptIdentifier);
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);

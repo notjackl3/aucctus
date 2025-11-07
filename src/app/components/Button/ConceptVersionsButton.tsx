@@ -6,11 +6,13 @@ import ConceptVersionsDropdown from './Dropdown/ConceptVersionsDropdown';
 
 interface ConceptVersionsButtonProps {
   conceptUuid?: string;
+  conceptIdentifier?: string;
   className?: string;
 }
 
 const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
   conceptUuid,
+  conceptIdentifier,
   className = '',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -127,6 +129,7 @@ const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
       {isOpen &&
         portalContainer &&
         conceptUuid &&
+        conceptIdentifier &&
         createPortal(
           <div
             ref={dropdownRef}
@@ -134,6 +137,7 @@ const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
           >
             <ConceptVersionsDropdown
               conceptUuid={conceptUuid}
+              conceptIdentifier={conceptIdentifier}
               onClose={() => setIsOpen(false)}
             />
           </div>,
