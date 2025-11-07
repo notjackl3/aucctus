@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import Icon from '../Icon';
 
 interface ComponentCarouselProps {
@@ -48,8 +48,8 @@ const ComponentCarousel: React.FC<ComponentCarouselProps> = ({
     const maxScroll = Math.max(0, scrollWidth - containerWidth);
 
     // Simple threshold check - at start/end with small tolerance
-    const canScrollLeft = scrollLeft > 1;
-    const canScrollRight = scrollLeft < maxScroll - 1;
+    const canScrollLeft = scrollLeft > 2;
+    const canScrollRight = scrollLeft < maxScroll - 2;
 
     setScrollState({
       scrollLeft,
