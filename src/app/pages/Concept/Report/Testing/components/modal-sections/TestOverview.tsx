@@ -51,7 +51,9 @@ const TestOverview: React.FC<TestOverviewProps> = ({
       validationStatus:
         apiAssumption.validationStatus === 'validated'
           ? 'validated'
-          : 'untested',
+          : apiAssumption.validationStatus === 'invalidated'
+            ? 'invalidated'
+            : 'untested',
       createdBy: apiAssumption.createdBy || 1, // Default createdBy
       createdAt: apiAssumption.createdAt || new Date().toISOString(),
       updatedAt: apiAssumption.updatedAt || new Date().toISOString(),

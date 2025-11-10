@@ -80,6 +80,8 @@ export const useFilteredAssumptions = (
     queryFn: async () =>
       await api.assumption.getAllFiltered(rootIdentifier, filters),
     enabled: !!rootIdentifier,
+    // Preserve existing metrics while new category data loads to prevent UI flicker
+    keepPreviousData: true,
   });
   return {
     ...query,

@@ -220,6 +220,46 @@ export interface ITestCollateralUpdateProgressMessage extends BaseSocketEvent {
   user_uuid: string;
 }
 
+// ==========================================
+// Test Generation Progress Messages
+// ==========================================
+
+export interface ITestGenerationStartedMessage extends BaseSocketEvent {
+  type: 'test.generation.started.user';
+  conceptUuid: string;
+  testUuid: string;
+  accountUuid: string;
+  message: string;
+}
+
+export interface ITestGenerationProgressMessage extends BaseSocketEvent {
+  type: 'test.generation.progress.user';
+  conceptUuid: string;
+  testUuid: string;
+  accountUuid: string;
+  progress: number;
+  stage: string;
+  message: string;
+}
+
+export interface ITestGenerationCompletedMessage extends BaseSocketEvent {
+  type: 'test.generation.completed.user';
+  conceptUuid: string;
+  testUuid: string;
+  accountUuid: string;
+  message: string;
+}
+
+export interface ITestGenerationErrorMessage extends BaseSocketEvent {
+  type: 'test.generation.error.user';
+  conceptUuid: string;
+  testUuid?: string;
+  accountUuid: string;
+  error: string;
+  message: string;
+  details?: Record<string, any>;
+}
+
 export interface ITestCollateralUpdateCompletedMessage extends BaseSocketEvent {
   type: 'test_collateral.update.completed.user';
   conceptUuid: string;
@@ -774,6 +814,10 @@ export type InboundSocketEvent<C = {}> =
   | ITestCollateralUpdateProgressMessage
   | ITestCollateralUpdateCompletedMessage
   | ITestCollateralUpdateErrorMessage
+  | ITestGenerationStartedMessage
+  | ITestGenerationProgressMessage
+  | ITestGenerationCompletedMessage
+  | ITestGenerationErrorMessage
   | IConceptWorkflowMessage
   | ISyntheticExecutionProgressMessage
   | ISyntheticExecutionCompletedMessage

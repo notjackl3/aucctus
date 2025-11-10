@@ -209,15 +209,24 @@ export const getValidationPercentageFromMetrics = (
 ): number => {
   if (categoryMetrics?.[category]) {
     const metric = categoryMetrics[category];
-    // Since API doesn't provide validationPercentage, create a synthetic one based on validationStatus
-    // and use average certainty as a fallback indicator
+
+    // Use the validationPercentage from API if available (0-1 range, convert to 0-100)
+    if (metric.validationPercentage !== undefined) {
+      return Math.round(metric.validationPercentage * 100);
+    }
+
+    // Fallback: create a synthetic percentage based on validationStatus
     if (metric.validationStatus === 'validated') {
-      return 100; // Fully validated
-    } else if (metric.validationStatus === 'unvalidated') {
-      if (metric.count === 0) return 0;
-      // Use average certainty as validation indicator for unvalidated categories
-      const averageCertainty = metric.cumulativeCertainty / metric.count;
-      return Math.round(averageCertainty * 100);
+      return 100;
+    } else if (metric.validationStatus === 'partially_validated') {
+      return 50; // Partially validated = 50%
+    } else if (metric.validationStatus === 'invalidated') {
+      return 0;
+    } else if (
+      metric.validationStatus === 'unvalidated' ||
+      metric.validationStatus === 'untested'
+    ) {
+      return 0;
     }
   }
 

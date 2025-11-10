@@ -170,10 +170,6 @@ export const useCompleteTestDetail = () => {
           variables.testUuid,
         ],
       });
-      toast.completed(
-        'Test Completed',
-        'A new test has been generated for you',
-      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
@@ -1282,6 +1278,10 @@ export const useUpdateTestAssumption = () => {
       });
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+      });
+      // Invalidate assumptions cache to update validation badges in Assumptions tab
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.assumptions],
       });
       toast.success(
         'Validation Updated',

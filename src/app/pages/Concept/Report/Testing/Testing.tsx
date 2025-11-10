@@ -1,4 +1,10 @@
-import React, { useState, useMemo, createContext, useContext } from 'react';
+import React, {
+  useState,
+  useMemo,
+  createContext,
+  useContext,
+  useEffect,
+} from 'react';
 import { useOutletContext } from 'react-router-dom';
 import RecommendedTestSection from './components/RecommendedTestSection';
 import TestHistorySection from './components/TestHistorySection';
@@ -8,6 +14,7 @@ import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { useTestDetails } from '@hooks/query/testing.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
+import { useTestGenerationEvents } from '@hooks/sockets/testing';
 
 // Context for tracking test completion loading state
 interface TestCompletionContextType {
@@ -26,6 +33,9 @@ const Testing: React.FC = () => {
   const { openModal } = useModal();
   const { concept } = useOutletContext<IConceptReportContext>();
   const conceptUuid = concept?.uuid || '';
+
+  const { generationState, resetGenerationState } =
+    useTestGenerationEvents(conceptUuid);
 
   // Fetch test details from API
   const {
@@ -56,15 +66,29 @@ const Testing: React.FC = () => {
 
   // Generate recommended test based on API data
   const recommendedTest = useMemo(() => {
-    if (nextTest) {
-      return {
-        testName: nextTest.name,
-        description: nextTest.description,
-        testDetails: nextTest,
+    const result = nextTest
+      ? {
+          testName: nextTest.name,
+          description: nextTest.description,
+          testDetails: nextTest,
+        }
+      : null;
+
+    return result;
+  }, [nextTest]);
+
+  useEffect(() => {
+    if (generationState.status === 'completed') {
+      // Small delay to ensure testDetails query completes before resetting
+      const timer = setTimeout(() => {
+        resetGenerationState();
+      }, 500);
+
+      return () => {
+        clearTimeout(timer);
       };
     }
-    return null;
-  }, [nextTest]);
+  }, [generationState.status, resetGenerationState]);
 
   const handleRunTest = () => {
     if (nextTest) {
@@ -239,8 +263,11 @@ const Testing: React.FC = () => {
             {/* Recommended Test Section */}
             <div>
               <RecommendedTestSection
+                conceptUuid={conceptUuid}
                 recommendedTest={recommendedTest}
                 onRunTest={handleRunTest}
+                generationState={generationState}
+                onCancelGeneration={resetGenerationState}
               />
             </div>
 

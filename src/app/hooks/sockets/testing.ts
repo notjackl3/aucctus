@@ -5,6 +5,10 @@ import { toast } from '@components';
 import telemetry from '@libs/telemetry';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
+  ITestGenerationStartedMessage,
+  ITestGenerationProgressMessage,
+  ITestGenerationCompletedMessage,
+  ITestGenerationErrorMessage,
   ISyntheticExecutionProgressMessage,
   ISyntheticExecutionCompletedMessage,
   ISyntheticExecutionErrorMessage,
@@ -12,6 +16,231 @@ import {
   ISyntheticProfileCompletedMessage,
 } from '@libs/api/types';
 import { ICustomerProfile } from '@libs/api/types/concept/concepts';
+
+export type TestGenerationStatus =
+  | 'idle'
+  | 'in_progress'
+  | 'completed'
+  | 'error';
+
+export interface ITestGenerationState {
+  status: TestGenerationStatus;
+  progress: number;
+  message?: string;
+  stage?: string;
+  testUuid?: string;
+  error?: string;
+  startTime?: number;
+}
+
+const TEST_GENERATION_STATE_KEY = (conceptUuid: string) =>
+  `test_generation_state_${conceptUuid}`;
+
+const DEFAULT_GENERATION_STATE: ITestGenerationState = {
+  status: 'idle',
+  progress: 0,
+  message: '',
+};
+
+const persistGenerationState = (
+  conceptUuid: string,
+  state: ITestGenerationState,
+) => {
+  if (state.status !== 'in_progress') {
+    clearPersistedGenerationState(conceptUuid);
+    return;
+  }
+
+  try {
+    sessionStorage.setItem(
+      TEST_GENERATION_STATE_KEY(conceptUuid),
+      JSON.stringify(state),
+    );
+  } catch (error) {
+    telemetry.warn('test.generation.persistence.failed', {
+      conceptUuid,
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+const getPersistedGenerationState = (
+  conceptUuid: string,
+): ITestGenerationState | null => {
+  try {
+    const stored = sessionStorage.getItem(
+      TEST_GENERATION_STATE_KEY(conceptUuid),
+    );
+    if (!stored) return null;
+
+    const parsed = JSON.parse(stored);
+
+    if (
+      parsed &&
+      typeof parsed.status === 'string' &&
+      typeof parsed.progress === 'number'
+    ) {
+      return parsed as ITestGenerationState;
+    }
+  } catch (error) {
+    telemetry.warn('test.generation.persistence.parse_failed', {
+      conceptUuid,
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+
+  return null;
+};
+
+const clearPersistedGenerationState = (conceptUuid: string) => {
+  try {
+    sessionStorage.removeItem(TEST_GENERATION_STATE_KEY(conceptUuid));
+  } catch (error) {
+    telemetry.warn('test.generation.persistence.clear_failed', {
+      conceptUuid,
+      error: error instanceof Error ? error.message : error,
+    });
+  }
+};
+
+export const useTestGenerationEvents = (conceptUuid: string) => {
+  const queryClient = useQueryClient();
+
+  const [generationState, setGenerationState] = useState<ITestGenerationState>(
+    () => getPersistedGenerationState(conceptUuid) ?? DEFAULT_GENERATION_STATE,
+  );
+
+  useEffect(() => {
+    persistGenerationState(conceptUuid, generationState);
+  }, [conceptUuid, generationState]);
+
+  useSocketEvent<'test.generation.started.user', ITestGenerationStartedMessage>(
+    'test.generation.started.user',
+    useCallback(
+      (data: ITestGenerationStartedMessage) => {
+        if (data.conceptUuid !== conceptUuid) return;
+
+        telemetry.debug('test.generation.started', {
+          conceptUuid: data.conceptUuid,
+          testUuid: data.testUuid,
+        });
+
+        setGenerationState({
+          status: 'in_progress',
+          progress: 0,
+          message: data.message,
+          stage: 'initializing',
+          testUuid: data.testUuid,
+          startTime: Date.now(),
+        });
+      },
+      [conceptUuid],
+    ),
+  );
+
+  useSocketEvent<
+    'test.generation.progress.user',
+    ITestGenerationProgressMessage
+  >(
+    'test.generation.progress.user',
+    useCallback(
+      (data: ITestGenerationProgressMessage) => {
+        if (data.conceptUuid !== conceptUuid) return;
+
+        telemetry.debug('test.generation.progress', {
+          conceptUuid: data.conceptUuid,
+          testUuid: data.testUuid,
+          progress: data.progress,
+          stage: data.stage,
+        });
+
+        setGenerationState((prev) => ({
+          status: 'in_progress',
+          progress: data.progress,
+          message: data.message,
+          stage: data.stage,
+          testUuid: data.testUuid ?? prev.testUuid,
+          startTime: prev.startTime ?? Date.now(),
+        }));
+      },
+      [conceptUuid],
+    ),
+  );
+
+  useSocketEvent<
+    'test.generation.completed.user',
+    ITestGenerationCompletedMessage
+  >(
+    'test.generation.completed.user',
+    useCallback(
+      (data: ITestGenerationCompletedMessage) => {
+        if (data.conceptUuid !== conceptUuid) return;
+
+        telemetry.debug('test.generation.completed', {
+          conceptUuid: data.conceptUuid,
+          testUuid: data.testUuid,
+        });
+
+        setGenerationState((prev) => ({
+          status: 'completed',
+          progress: 100,
+          message: data.message,
+          stage: 'completed',
+          testUuid: data.testUuid ?? prev.testUuid,
+          startTime: prev.startTime,
+        }));
+
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.testDetails, conceptUuid],
+        });
+      },
+      [conceptUuid, queryClient],
+    ),
+  );
+
+  useSocketEvent<'test.generation.error.user', ITestGenerationErrorMessage>(
+    'test.generation.error.user',
+    useCallback(
+      (data: ITestGenerationErrorMessage) => {
+        if (data.conceptUuid !== conceptUuid) return;
+
+        telemetry.warn('test.generation.error', {
+          conceptUuid: data.conceptUuid,
+          testUuid: data.testUuid,
+          error: data.error,
+        });
+
+        setGenerationState({
+          status: 'error',
+          progress: 0,
+          message: data.message,
+          stage: 'error',
+          testUuid: data.testUuid,
+          error: data.error,
+        });
+      },
+      [conceptUuid],
+    ),
+  );
+
+  useEffect(() => {
+    return () => {
+      if (generationState.status !== 'in_progress') {
+        clearPersistedGenerationState(conceptUuid);
+      }
+    };
+  }, [conceptUuid, generationState.status]);
+
+  const resetGenerationState = useCallback(() => {
+    clearPersistedGenerationState(conceptUuid);
+    setGenerationState(DEFAULT_GENERATION_STATE);
+  }, [conceptUuid]);
+
+  return {
+    generationState,
+    resetGenerationState,
+  };
+};
 
 interface ISyntheticExecutionState {
   status:

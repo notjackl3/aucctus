@@ -19,6 +19,8 @@ import {
   IMagicShareProgressMessage,
   IMagicShareCompletedMessage,
   IMagicShareErrorMessage,
+  ITestGenerationCompletedMessage,
+  ITestGenerationErrorMessage,
 } from '@libs/api/types';
 
 // Define event handler types
@@ -53,6 +55,11 @@ export interface MagicShareHandler {
   onShareError?: (message: IMagicShareErrorMessage) => void;
 }
 
+export interface TestGenerationHandler {
+  onGenerationCompleted?: (message: ITestGenerationCompletedMessage) => void;
+  onGenerationError?: (message: ITestGenerationErrorMessage) => void;
+}
+
 // Idea Playground event handler types
 export interface IdeaPlaygroundHandler {
   onConceptsGenerated?: (message: any) => void;
@@ -75,6 +82,8 @@ export interface SocketEventConfig {
   // Magic Share events
   magicShare?: MagicShareHandler;
 
+  // Test generation events
+  testGeneration?: TestGenerationHandler;
   // Idea Playground events
   ideaPlayground?: IdeaPlaygroundHandler;
 
@@ -321,6 +330,47 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
 
     handler(data);
   });
+
+  // Register test generation completion events (GLOBAL)
+  useSocketEvent<
+    'test.generation.completed.user',
+    ITestGenerationCompletedMessage
+  >('test.generation.completed.user', (data) => {
+    const messageKey = `test-generation-complete-${data.conceptUuid}-${data.testUuid}`;
+    if (preventDuplicate(messageKey)) return;
+
+    const handler =
+      config.testGeneration?.onGenerationCompleted ||
+      ((msg: ITestGenerationCompletedMessage) => {
+        toast.completed(
+          'Test Generated',
+          msg.message || 'Your new test is ready to run',
+        );
+      });
+
+    handler(data);
+  });
+
+  // Register test generation error events (GLOBAL)
+  useSocketEvent<'test.generation.error.user', ITestGenerationErrorMessage>(
+    'test.generation.error.user',
+    (data) => {
+      const messageKey = `test-generation-error-${data.conceptUuid}-${data.testUuid || 'unknown'}`;
+      if (preventDuplicate(messageKey)) return;
+
+      const handler =
+        config.testGeneration?.onGenerationError ||
+        ((msg: ITestGenerationErrorMessage) => {
+          toast.error(
+            'Test Generation Failed',
+            msg.message ||
+              'We could not generate a new test right now. Please try again.',
+          );
+        });
+
+      handler(data);
+    },
+  );
 
   // Register nucleus upload progress events
   useSocketEvent<
