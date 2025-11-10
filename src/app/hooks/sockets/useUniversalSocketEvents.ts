@@ -19,9 +19,12 @@ import {
   IMagicShareProgressMessage,
   IMagicShareCompletedMessage,
   IMagicShareErrorMessage,
+  ConceptReportStatusBySection,
+  ConceptReportStatus,
   ITestGenerationCompletedMessage,
   ITestGenerationErrorMessage,
 } from '@libs/api/types';
+import { normalizeReportSectionKey } from '@libs/utils/concepts';
 
 // Define event handler types
 export interface ConceptWorkflowHandler {
@@ -92,6 +95,32 @@ export interface SocketEventConfig {
   // aiEditing?: AiEditingHandler;
 }
 
+const normalizeStatusMap = (
+  statusMap?: ConceptReportStatusBySection,
+): ConceptReportStatusBySection | undefined => {
+  if (!statusMap) return undefined;
+  const normalized: Record<string, ConceptReportStatusBySection[string]> = {};
+
+  Object.entries(statusMap).forEach(([sectionKey, sectionStatus]) => {
+    const normalizedKey = normalizeReportSectionKey(sectionKey);
+    if (!normalizedKey) return;
+    normalized[normalizedKey] = sectionStatus;
+  });
+
+  return normalized as ConceptReportStatusBySection;
+};
+
+const mergeReportStatusBySection = (
+  existing?: ConceptReportStatusBySection,
+  incoming?: ConceptReportStatusBySection,
+): ConceptReportStatusBySection | undefined => {
+  if (!incoming) return existing;
+  return {
+    ...(existing || {}),
+    ...incoming,
+  };
+};
+
 /**
  * Universal hook for managing WebSocket events across the application
  * Provides a centralized way to handle different types of socket events
@@ -103,6 +132,12 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   const queryClient = useQueryClient();
   const setShareProgress = useStore(
     (state) => state.magicShare.setShareProgress,
+  );
+  const addPendingSections = useStore(
+    (state) => state.conceptReport.addPendingSections,
+  );
+  const clearPendingSections = useStore(
+    (state) => state.conceptReport.clearPendingSections,
   );
 
   // Prevent duplicate toasts by tracking recent messages
@@ -122,6 +157,71 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     recentMessages.current.add(messageKey);
     setTimeout(() => recentMessages.current.delete(messageKey), 2000);
     return false; // Not duplicate, can proceed
+  };
+
+  const syncPendingOverridesFromServer = (
+    identifier: string | undefined,
+    reportStatusBySection?: ConceptReportStatusBySection,
+  ) => {
+    if (!identifier || !reportStatusBySection) {
+      return;
+    }
+
+    const existingOverrides =
+      useStore.getState().conceptReport.pendingSectionOverrides?.[identifier] ||
+      {};
+
+    const sectionsToAdd: Record<string, string> = {};
+    const sectionsToClear: string[] = [];
+
+    Object.entries(reportStatusBySection).forEach(([sectionKey, status]) => {
+      if (!status) return;
+
+      const sectionStatus = typeof status === 'string' ? status : status.status;
+
+      if (sectionStatus === 'pending') {
+        const dateStarted =
+          typeof status === 'string' ? undefined : status.dateStarted;
+        sectionsToAdd[sectionKey] = dateStarted || new Date().toISOString();
+        return;
+      }
+
+      const override = existingOverrides[sectionKey];
+      if (!override) {
+        return;
+      }
+
+      const dateCompleted =
+        typeof status === 'string' ? undefined : status.dateCompleted;
+      const dateStarted =
+        typeof status === 'string' ? undefined : status.dateStarted;
+
+      if (
+        dateCompleted &&
+        override.appliedAt &&
+        dateCompleted >= override.appliedAt
+      ) {
+        sectionsToClear.push(sectionKey);
+        return;
+      }
+
+      if (
+        !dateCompleted &&
+        dateStarted &&
+        override.appliedAt &&
+        dateStarted > override.appliedAt
+      ) {
+        sectionsToClear.push(sectionKey);
+      }
+    });
+
+    if (Object.keys(sectionsToAdd).length > 0) {
+      addPendingSections(identifier, sectionsToAdd);
+    }
+
+    if (sectionsToClear.length > 0) {
+      clearPendingSections(identifier, sectionsToClear);
+    }
   };
 
   // Note: Concept workflow events are handled directly by useSocketEvent calls below
@@ -192,15 +292,29 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       }
 
       if (message.reportStatusBySection && message.conceptUuid) {
+        const normalizedStatus = normalizeStatusMap(
+          message.reportStatusBySection,
+        );
+        const aggregateStatus = message.aggregateStatus as
+          | ConceptReportStatus
+          | undefined;
+
         // Update the concept cache with the new section status data
         queryClient.setQueryData<IConcept | undefined>(
           [AucctusQueryKeys.concept, message.conceptUuid],
           (existing) => {
-            if (!existing || !message.reportStatusBySection) return existing;
+            if (!existing) return existing;
+            const mergedSections = mergeReportStatusBySection(
+              existing.reportStatusBySection,
+              normalizedStatus,
+            );
 
             return {
               ...existing,
-              reportStatusBySection: message.reportStatusBySection,
+              ...(mergedSections && { reportStatusBySection: mergedSections }),
+              ...(aggregateStatus && {
+                reportStatusAggregate: aggregateStatus,
+              }),
             };
           },
         );
@@ -213,10 +327,19 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           queryClient.setQueryData<IConcept | undefined>(
             [AucctusQueryKeys.concept, message.conceptRootIdentifier],
             (existing) => {
-              if (!existing || !message.reportStatusBySection) return existing;
+              if (!existing) return existing;
+              const mergedSections = mergeReportStatusBySection(
+                existing.reportStatusBySection,
+                normalizedStatus,
+              );
               return {
                 ...existing,
-                reportStatusBySection: message.reportStatusBySection,
+                ...(mergedSections && {
+                  reportStatusBySection: mergedSections,
+                }),
+                ...(aggregateStatus && {
+                  reportStatusAggregate: aggregateStatus,
+                }),
               };
             },
           );
@@ -235,6 +358,10 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
             queryKey: [AucctusQueryKeys.concept, message.conceptRootIdentifier],
           });
         }
+
+        const overrideIdentifier =
+          message.conceptRootIdentifier || message.conceptUuid;
+        syncPendingOverridesFromServer(overrideIdentifier, normalizedStatus);
 
         // Show completion toast for individual sections
         // Only show toast if this is for the currently active concept

@@ -68,6 +68,22 @@ export interface IEditRecommendation {
   testEvidence: string;
 }
 
+// Comprehensive Edit Recommendation Types (synthesized from multiple test results)
+export interface IComprehensiveEditRecommendation {
+  uuid: string;
+  section: string;
+  recommendation: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  rationale: string;
+  sourceCount: number;
+  sourceDetails: string[];
+  status: 'pending' | 'applied' | 'rejected';
+  appliedAt?: string;
+  rejectedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 // Test Collateral Types
 export type CollateralType = 'text' | 'image' | 'file';
 
@@ -162,4 +178,15 @@ export interface ISyntheticExecutionStatusResponse {
   currentPersona?: string;
   totalPersonas?: number;
   errorDetails?: any;
+}
+
+// Apply Recommendations Request/Response Types
+export interface IApplyRecommendationsRequest {
+  recommendationUuids: string[];
+}
+
+export interface IApplyRecommendationsResponse {
+  taskId: string;
+  status: string;
+  recommendationsCount: number;
 }

@@ -26,6 +26,7 @@ import {
   ISyntheticExecutionStartResponse,
   ISyntheticExecutionStatusResponse,
   ITestCollateralOption,
+  IApplyRecommendationsResponse,
 } from './types/concept/testing';
 
 export class TestingApi extends ApiService {
@@ -519,6 +520,18 @@ export class TestingApi extends ApiService {
   ): Promise<ISyntheticExecutionStatusResponse | null> {
     return this.get(
       endpoints.conceptTestSyntheticExecutionCurrent(conceptUuid, testUuid),
+    );
+  }
+
+  // Apply comprehensive edit recommendations
+  async applyRecommendations(
+    conceptUuid: string,
+    testUuid: string,
+    recommendationUuids: string[],
+  ): Promise<IApplyRecommendationsResponse> {
+    return this.post<IApplyRecommendationsResponse>(
+      `api/v2/concept/${conceptUuid}/testing/${testUuid}/apply-recommendations`,
+      { recommendationUuids },
     );
   }
 }

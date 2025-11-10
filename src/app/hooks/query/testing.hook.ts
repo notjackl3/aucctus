@@ -1686,3 +1686,46 @@ export const useTestCollateralManager = (
     isLoading: updateMutation.isLoading,
   };
 };
+
+/**
+ * Custom hook for applying comprehensive edit recommendations to a concept.
+ * This queues a Celery task that processes recommendations through AI editing workflow.
+ * @returns The result of the useMutation hook.
+ */
+export const useApplyRecommendations = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      testUuid: string;
+      recommendationUuids: string[];
+    }) => {
+      const { conceptUuid, testUuid, recommendationUuids } = params;
+      return await api.testing.applyRecommendations(
+        conceptUuid,
+        testUuid,
+        recommendationUuids,
+      );
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testDetail,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      toast.success('Recommendations are being applied.');
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Failed to apply recommendations. Please try again.',
+      );
+    },
+  });
+};

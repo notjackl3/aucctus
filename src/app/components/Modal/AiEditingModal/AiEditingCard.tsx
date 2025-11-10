@@ -20,6 +20,8 @@ import { animated, useTransition } from 'react-spring';
 import AiEditingConversation from './AiEditingConversation';
 import OutdatedSectionsBanner from './OutdatedSectionsBanner';
 import { LATEST_FEATURE_VERSIONS } from '@libs/constants';
+import { mapBackendSectionToReportKey } from '@libs/utils/concepts';
+import type { ConceptReportStatusBySection } from '@libs/api/types/concept/concepts';
 
 interface AiEditingCardProps {
   onClose: () => void;
@@ -51,53 +53,6 @@ const getOutdatedSections = (featureVersions?: IFeatureVersions): string[] => {
   });
 
   return outdatedSections;
-};
-
-// Map backend section names (snake_case) to frontend reportStatusBySection keys (camelCase)
-const SECTION_NAME_MAP: Record<string, string> = {
-  overview: 'overview',
-  market_scan: 'marketScan',
-  customer_profiles: 'customerProfiles',
-  financial_projection: 'financialProjection',
-  assumptions: 'assumptions',
-  // Additional mappings for AI editing response section names
-  concept: 'overview',
-  concept_title: 'overview',
-  concept_overview: 'overview',
-  concept_value_proposition: 'overview',
-  concept_problem_statement: 'overview',
-  what_is_this: 'overview',
-  should_we_do_this: 'overview',
-  regenerate_image: 'overview',
-  // Financial projection subsections
-  business_model: 'financialProjection',
-  pricing: 'financialProjection',
-  distribution_channels: 'financialProjection',
-  cost_drivers: 'financialProjection',
-  top_down_market_sizing: 'financialProjection',
-  bottom_up_market_sizing: 'financialProjection',
-  savings_method: 'financialProjection',
-  savings: 'financialProjection',
-  target_savings_areas: 'financialProjection',
-  cost_interferences: 'financialProjection',
-  impact_sizing: 'financialProjection',
-  // Customer profile subsections
-  customer_jobs: 'customerProfiles',
-  customer_pains: 'customerProfiles',
-  customer_alternatives: 'customerProfiles',
-  customer_journey_steps: 'customerProfiles',
-  customer_real_world_signals: 'customerProfiles',
-  // Market scan subsections
-  market_scan_ecosystem: 'marketScan',
-  market_scan_startups: 'marketScan',
-  market_scan_incumbents: 'marketScan',
-  // Trends subsections
-  trends_analysis: 'marketScan',
-  trends_key_findings: 'marketScan',
-  trends_priority_insights: 'marketScan',
-  trends_market_forces: 'marketScan',
-  // Assumptions/Tests subsections
-  tests: 'assumptions',
 };
 
 /**
@@ -305,13 +260,20 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                           let sectionsToUpdate: string[] = [];
 
                           if (aiEditSubmission?.edits) {
+                            const mappedSections = aiEditSubmission.edits
+                              .map((edit) =>
+                                mapBackendSectionToReportKey(edit.section),
+                              )
+                              .filter(
+                                (
+                                  section,
+                                ): section is keyof ConceptReportStatusBySection =>
+                                  !!section,
+                              );
+
                             sectionsToUpdate = Array.from(
-                              new Set(
-                                aiEditSubmission.edits
-                                  .map((edit) => SECTION_NAME_MAP[edit.section])
-                                  .filter(Boolean),
-                              ),
-                            );
+                              new Set(mappedSections),
+                            ).map((section) => section as string);
                           }
 
                           // If no sections were mapped, skip updating

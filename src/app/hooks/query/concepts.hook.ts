@@ -28,8 +28,12 @@ import {
   ISeedQueryOptions,
   ITrendsAndDrivers,
   IUserJourneyStep,
+  ConceptReportStatus,
+  IConceptPage,
 } from '@libs/api/types';
 import utils from '@libs/utils';
+import useStore from '@stores/store';
+import { normalizeReportSectionKey } from '@libs/utils/concepts';
 import { AxiosError } from 'axios';
 import {
   QueryClient,
@@ -37,6 +41,7 @@ import {
   useQuery,
   useQueryClient,
 } from 'react-query';
+import { useEffect, useMemo } from 'react';
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
 
@@ -49,7 +54,11 @@ export type PartialConceptWithRequiredIdentifier = Partial<IConcept> & {
  * @returns The result of the useQuery hook.
  */
 export const useConcepts = (queryOptions: IConceptQueryOptions) => {
-  return useQuery({
+  const pendingOverrides = useStore(
+    (state) => state.conceptReport.pendingSectionOverrides,
+  );
+
+  const query = useQuery({
     queryKey: [
       AucctusQueryKeys.concepts,
       queryOptions.status,
@@ -63,6 +72,74 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
     staleTime: 1000 * 60 * 2, // 2 minutes
     keepPreviousData: true, // Keep previous data while loading new data
   });
+
+  const dataWithOverrides = useMemo(() => {
+    const original = query.data;
+    if (!original?.results || !pendingOverrides) {
+      return original;
+    }
+
+    let didMutate = false;
+    const results = original.results.map((concept) => {
+      const overrides = concept.identifier
+        ? pendingOverrides[concept.identifier]
+        : undefined;
+
+      if (
+        !overrides ||
+        !concept.reportStatusBySection ||
+        Object.keys(overrides).length === 0
+      ) {
+        return concept;
+      }
+
+      let conceptMutated = false;
+      const nextSections = { ...concept.reportStatusBySection };
+
+      Object.entries(overrides).forEach(([sectionKey, override]) => {
+        const existing = nextSections[sectionKey];
+        if (!existing) {
+          return;
+        }
+
+        const overrideDateStarted =
+          override.appliedAt || new Date().toISOString();
+
+        nextSections[sectionKey] = {
+          ...existing,
+          status: 'pending',
+          dateStarted: overrideDateStarted,
+          dateCompleted: '',
+        };
+        conceptMutated = true;
+      });
+
+      if (!conceptMutated) {
+        return concept;
+      }
+
+      didMutate = true;
+
+      const updatedConcept: IConcept = {
+        ...concept,
+        reportStatusBySection: nextSections,
+        reportStatusAggregate: 'pending' as ConceptReportStatus,
+      };
+
+      return updatedConcept;
+    });
+
+    if (!didMutate) {
+      return original;
+    }
+
+    return {
+      ...original,
+      results,
+    };
+  }, [query.data, pendingOverrides]);
+
+  return { ...query, data: dataWithOverrides };
 };
 
 /**
@@ -128,7 +205,15 @@ export const markConceptSectionsPending = (
   conceptIdentifier: string,
   sectionKeys: string[],
 ) => {
-  if (!conceptIdentifier || sectionKeys.length === 0) {
+  const normalizedKeys = Array.from(
+    new Set(
+      sectionKeys
+        .map((key) => normalizeReportSectionKey(key))
+        .filter((key): key is string => Boolean(key)),
+    ),
+  );
+
+  if (!conceptIdentifier || normalizedKeys.length === 0) {
     return;
   }
 
@@ -142,7 +227,7 @@ export const markConceptSectionsPending = (
     let didChange = false;
     const nextSections = { ...concept.reportStatusBySection };
 
-    sectionKeys.forEach((key) => {
+    normalizedKeys.forEach((key) => {
       const current = nextSections[key];
       if (!current) {
         return;
@@ -167,36 +252,48 @@ export const markConceptSectionsPending = (
     return {
       ...concept,
       reportStatusBySection: nextSections,
-    };
+      reportStatusAggregate: 'pending' as ConceptReportStatus,
+    } as IConcept;
   };
 
-  // Update single concept query (by identifier)
-  queryClient.setQueryData<IConcept | undefined>(
-    [AucctusQueryKeys.concept, conceptIdentifier],
-    (existing) => {
-      return updateConcept(existing);
-    },
-  );
+  // Update concept queries scoped to this identifier/uuid only
+  const conceptQueries = queryClient
+    .getQueryCache()
+    .findAll({ queryKey: [AucctusQueryKeys.concept] });
 
-  // Update concept by UUID query (if exists)
-  const allQueries = queryClient.getQueryCache().findAll();
-  const conceptUuidQuery = allQueries.find((query) => {
-    const key = query.queryKey as any[];
-    return key[0] === AucctusQueryKeys.concept && key[1] !== conceptIdentifier;
+  conceptQueries.forEach((query) => {
+    const key = query.queryKey as unknown[];
+    if (key.length < 2) {
+      return;
+    }
+
+    const queryConcept = query.state.data as IConcept | undefined | null;
+
+    if (!queryConcept) {
+      return;
+    }
+
+    const matchesIdentifier = queryConcept.identifier === conceptIdentifier;
+    const matchesUuid = queryConcept.uuid && queryConcept.uuid === key[1];
+
+    if (!matchesIdentifier && !matchesUuid) {
+      return;
+    }
+
+    queryClient.setQueryData<IConcept | undefined>(key, (existing) =>
+      updateConcept(existing),
+    );
   });
 
-  if (conceptUuidQuery) {
-    const conceptUuid = (conceptUuidQuery.queryKey as any[])[1];
-    queryClient.setQueryData<IConcept | undefined>(
-      [AucctusQueryKeys.concept, conceptUuid],
-      (existing) => updateConcept(existing),
-    );
-  }
+  // Update concepts list queries (all filters)
+  const conceptListQueries = queryClient
+    .getQueryCache()
+    .findAll({ queryKey: [AucctusQueryKeys.concepts] });
 
-  // Update concepts list query
-  queryClient.setQueryData<{ results?: IConcept[] } | undefined>(
-    [AucctusQueryKeys.concepts],
-    (existing) => {
+  conceptListQueries.forEach((query) => {
+    const queryKey = query.queryKey as unknown[];
+
+    queryClient.setQueryData<IConceptPage | undefined>(queryKey, (existing) => {
       if (!existing?.results) {
         return existing;
       }
@@ -221,9 +318,18 @@ export const markConceptSectionsPending = (
       return {
         ...existing,
         results,
-      };
-    },
-  );
+      } as IConceptPage;
+    });
+  });
+
+  const addPendingSections =
+    useStore.getState().conceptReport.addPendingSections;
+  if (addPendingSections) {
+    const pendingMap = Object.fromEntries(
+      normalizedKeys.map((key) => [key, timestamp]),
+    );
+    addPendingSections(conceptIdentifier, pendingMap);
+  }
 };
 
 export const useGenerateKeyAssumptions = () => {
@@ -505,6 +611,15 @@ export const useConceptIncubationQuestionnaire = () => {
  * @returns An object containing the query result and the concept data.
  */
 export const useConcept = (identifier?: string) => {
+  const pendingOverrides = useStore((state) =>
+    identifier
+      ? state.conceptReport.pendingSectionOverrides?.[identifier]
+      : undefined,
+  );
+  const clearPendingSections = useStore(
+    (state) => state.conceptReport.clearPendingSections,
+  );
+
   const query = useQuery({
     queryKey: [AucctusQueryKeys.concept, identifier],
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -514,7 +629,102 @@ export const useConcept = (identifier?: string) => {
     enabled: !!identifier,
   });
 
-  return { ...query, concept: query.data };
+  const conceptWithOverrides = useMemo(() => {
+    const concept = query.data;
+    if (!concept || !pendingOverrides) {
+      return concept;
+    }
+
+    if (!concept.reportStatusBySection) {
+      return concept;
+    }
+
+    let didMutate = false;
+    const nextSections = { ...concept.reportStatusBySection };
+
+    Object.entries(pendingOverrides).forEach(([sectionKey, override]) => {
+      const existing = nextSections[sectionKey];
+      if (!existing) {
+        return;
+      }
+
+      const appliedAt = override.appliedAt;
+      const overrideDateStarted = appliedAt || new Date().toISOString();
+
+      if (
+        existing.status === 'pending' &&
+        existing.dateStarted === overrideDateStarted &&
+        existing.dateCompleted === ''
+      ) {
+        return;
+      }
+
+      nextSections[sectionKey] = {
+        ...existing,
+        status: 'pending',
+        dateStarted: overrideDateStarted,
+        dateCompleted: '',
+      };
+      didMutate = true;
+    });
+
+    if (!didMutate) {
+      return concept;
+    }
+
+    const updatedConcept: IConcept = {
+      ...concept,
+      reportStatusBySection: nextSections,
+      reportStatusAggregate: 'pending' as ConceptReportStatus,
+    };
+
+    return updatedConcept;
+  }, [query.data, pendingOverrides]);
+
+  useEffect(() => {
+    if (!identifier || !pendingOverrides) {
+      return;
+    }
+
+    const originalSections = query.data?.reportStatusBySection;
+    if (!originalSections) {
+      return;
+    }
+
+    const sectionsToClear = Object.entries(pendingOverrides)
+      .filter(([sectionKey, override]) => {
+        const current = originalSections[sectionKey];
+        if (!current) {
+          return true;
+        }
+
+        if (current.status === 'pending') {
+          return false;
+        }
+
+        if (current.dateCompleted && override.appliedAt) {
+          return current.dateCompleted > override.appliedAt;
+        }
+
+        if (current.dateStarted && override.appliedAt) {
+          return current.dateStarted > override.appliedAt;
+        }
+
+        return false;
+      })
+      .map(([sectionKey]) => sectionKey);
+
+    if (sectionsToClear.length > 0) {
+      clearPendingSections(identifier, sectionsToClear);
+    }
+  }, [
+    identifier,
+    pendingOverrides,
+    clearPendingSections,
+    query.data?.reportStatusBySection,
+  ]);
+
+  return { ...query, concept: conceptWithOverrides };
 };
 
 export const useConceptOverview = (uuid?: string) => {

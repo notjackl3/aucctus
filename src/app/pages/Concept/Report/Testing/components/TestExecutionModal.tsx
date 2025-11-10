@@ -328,6 +328,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             assumptions={displayAssumptions}
             conceptUuid={conceptUuid}
             testUuid={testUuid}
+            onCloseModal={closeModal}
           />
         );
 

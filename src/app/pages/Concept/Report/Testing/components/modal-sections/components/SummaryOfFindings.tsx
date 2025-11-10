@@ -60,8 +60,11 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
             </p>
           ) : (
             <div className='space-y-3'>
-              {affirmingFindings.map((finding) => (
-                <div key={finding.uuid} className='flex items-start gap-3'>
+              {affirmingFindings.map((finding, index) => (
+                <div
+                  key={`${finding.uuid || 'na'}-${index}`}
+                  className='flex items-start gap-3'
+                >
                   <div className='mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-green-500' />
                   <p className='aucctus-text-sm aucctus-text-secondary leading-relaxed'>
                     {finding.learning}
@@ -90,8 +93,11 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
             </p>
           ) : (
             <div className='space-y-3'>
-              {challengingFindings.map((finding) => (
-                <div key={finding.uuid} className='flex items-start gap-3'>
+              {challengingFindings.map((finding, index) => (
+                <div
+                  key={`${finding.uuid || 'na'}-${index}`}
+                  className='flex items-start gap-3'
+                >
                   <div className='mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-red-500' />
                   <p className='aucctus-text-sm aucctus-text-secondary leading-relaxed'>
                     {finding.learning}

@@ -23,6 +23,10 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
 }) => {
   const statement = assumption.statement || '';
   const category = assumption.category || '';
+  const normalizedStatus =
+    assumption.validationStatus === 'untested'
+      ? 'unchanged'
+      : assumption.validationStatus;
 
   // Helper to render category icon with proper colors
   const renderCategoryIcon = (category: string): React.ReactNode => {
@@ -49,7 +53,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
             className='aucctus-stroke-success-primary h-4 w-4'
           />
         ),
-        isSelected: assumption.validationStatus === 'validated',
+        isSelected: normalizedStatus === 'validated',
       },
       {
         type: 'invalidated',
@@ -60,10 +64,10 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
             className='aucctus-stroke-error-primary h-4 w-4'
           />
         ),
-        isSelected: assumption.validationStatus === 'invalidated',
+        isSelected: normalizedStatus === 'invalidated',
       },
       {
-        type: 'untested',
+        type: 'unchanged',
         label: 'Unchanged',
         icon: (
           <Icon
@@ -71,13 +75,18 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
             className='aucctus-stroke-tertiary h-4 w-4'
           />
         ),
-        isSelected: assumption.validationStatus === 'untested',
+        isSelected: normalizedStatus === 'unchanged',
       },
     ];
     return options;
   };
 
   const handleOptionSelect = (optionType: string) => {
+    if (optionType === 'unchanged') {
+      onValidationChange(assumption, 'untested');
+      return;
+    }
+
     onValidationChange(
       assumption,
       optionType as 'validated' | 'invalidated' | 'untested',

@@ -21,6 +21,7 @@ import EditQuestionModal from './Nucleus/EditQuestionModal';
 import AddAnswerModal from './Nucleus/AddAnswerModal';
 import EditAnswerModal from './Nucleus/EditAnswerModal';
 import MagicShare from './MagicShareModal/MagicShareModal';
+import { TestCompletionWarningModal } from './TestCompletionWarningModal';
 
 const Modal = {
   Base,
@@ -39,6 +40,7 @@ const Modal = {
   JourneyStep,
   EditRealWorldSignal,
   TestExecutionModal,
+  TestCompletionWarningModal,
   AddQuestionModal,
   EditQuestionModal,
   AddAnswerModal,

@@ -12,6 +12,79 @@ import type {
   SeedStatus,
 } from '../api/types';
 
+export const CONCEPT_REPORT_SECTION_KEY_MAP: Record<string, string> = {
+  overview: 'overview',
+  market_scan: 'marketScan',
+  customer_profiles: 'customerProfiles',
+  financial_projection: 'financialProjection',
+  assumptions: 'assumptions',
+  trends: 'marketScan',
+  concept: 'overview',
+  concept_title: 'overview',
+  concept_overview: 'overview',
+  concept_value_proposition: 'overview',
+  concept_problem_statement: 'overview',
+  what_is_this: 'overview',
+  should_we_do_this: 'overview',
+  regenerate_image: 'overview',
+  business_model: 'financialProjection',
+  pricing: 'financialProjection',
+  distribution_channels: 'financialProjection',
+  cost_drivers: 'financialProjection',
+  top_down_market_sizing: 'financialProjection',
+  bottom_up_market_sizing: 'financialProjection',
+  savings_method: 'financialProjection',
+  savings: 'financialProjection',
+  target_savings_areas: 'financialProjection',
+  cost_interferences: 'financialProjection',
+  impact_sizing: 'financialProjection',
+  customer_jobs: 'customerProfiles',
+  customer_pains: 'customerProfiles',
+  customer_alternatives: 'customerProfiles',
+  customer_journey_steps: 'customerProfiles',
+  customer_real_world_signals: 'customerProfiles',
+  market_scan_ecosystem: 'marketScan',
+  market_scan_startups: 'marketScan',
+  market_scan_incumbents: 'marketScan',
+  trends_analysis: 'marketScan',
+  trends_key_findings: 'marketScan',
+  trends_priority_insights: 'marketScan',
+  trends_market_forces: 'marketScan',
+  tests: 'assumptions',
+};
+
+export const mapBackendSectionToReportKey = (
+  section: string,
+): keyof ConceptReportStatusBySection | undefined => {
+  const key = CONCEPT_REPORT_SECTION_KEY_MAP[section];
+  if (!key) {
+    return undefined;
+  }
+  return key as keyof ConceptReportStatusBySection;
+};
+
+const CONCEPT_REPORT_SECTION_ALIASES: Record<string, string> = {
+  marketScan: 'marketScan',
+  customerProfiles: 'customerProfiles',
+  financialProjection: 'financialProjection',
+  assumptions: 'assumptions',
+  overview: 'overview',
+  trends: 'marketScan',
+  marketscan: 'marketScan',
+  market_scan: 'marketScan',
+  customer_profiles: 'customerProfiles',
+  financial_projection: 'financialProjection',
+};
+
+export const normalizeReportSectionKey = (section: string): string => {
+  if (!section) return section;
+  const mapped =
+    CONCEPT_REPORT_SECTION_KEY_MAP[section] ||
+    CONCEPT_REPORT_SECTION_ALIASES[section] ||
+    section;
+  return mapped;
+};
+
 export const SEED_STATUS_LIST: SeedStatus[] = [
   'draft',
   'published',

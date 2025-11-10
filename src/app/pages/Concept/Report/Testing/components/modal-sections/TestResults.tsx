@@ -119,11 +119,13 @@ const TestResults: React.FC<TestResultsProps> = ({
   useEffect(() => {
     if (!isResultsLoading && onResultsChange) {
       const hasRecommendations =
-        hasResults &&
-        results.some(
-          (result: any) =>
-            result.editRecommendations && result.editRecommendations.length > 0,
-        );
+        (testDetail?.comprehensiveRecommendations?.length ?? 0) > 0 ||
+        (hasResults &&
+          results.some(
+            (result: any) =>
+              result.editRecommendations &&
+              result.editRecommendations.length > 0,
+          ));
 
       // Only call onResultsChange if values have actually changed
       const prevState = prevResultsStateRef.current;
@@ -135,7 +137,13 @@ const TestResults: React.FC<TestResultsProps> = ({
         onResultsChange(hasResults, hasRecommendations);
       }
     }
-  }, [isResultsLoading, hasResults, results, onResultsChange]);
+  }, [
+    isResultsLoading,
+    hasResults,
+    results,
+    testDetail?.comprehensiveRecommendations,
+    onResultsChange,
+  ]);
 
   // Loading state
   if (isResultsLoading) {

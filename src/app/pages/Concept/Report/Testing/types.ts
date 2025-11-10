@@ -85,6 +85,22 @@ export interface ITestDetails {
     learning: string;
     impact: string;
   }>;
+  // Synthesized comprehensive edit recommendations from all test results
+  // Note: Backend returns as 'comprehensive_recommendations' but gets auto-converted to camelCase
+  comprehensiveRecommendations?: Array<{
+    uuid: string;
+    section: string;
+    recommendation: string;
+    priority: 'critical' | 'high' | 'medium' | 'low';
+    rationale: string;
+    sourceCount: number;
+    sourceDetails: string[];
+    status: 'pending' | 'applied' | 'rejected';
+    appliedAt?: string;
+    rejectedAt?: string;
+    createdAt: string;
+    updatedAt: string;
+  }>;
 }
 
 export interface ITestDetailsCreate {

@@ -5,6 +5,8 @@ import {
   IConceptReportActions,
   setConceptUuid,
   setActiveConcept,
+  addPendingSections,
+  clearPendingSections,
 } from './actions';
 
 export interface IConceptReportState extends IConceptReportActions {
@@ -12,6 +14,10 @@ export interface IConceptReportState extends IConceptReportActions {
   conceptUuid?: string;
   identifier?: string;
   featureVersions?: IFeatureVersions;
+  pendingSectionOverrides?: Record<
+    string,
+    Record<string, { appliedAt: string }>
+  >;
 }
 
 const conceptReportSlice: Lens<IConceptReportState, IAppStore> = (
@@ -25,8 +31,11 @@ const conceptReportSlice: Lens<IConceptReportState, IAppStore> = (
     conceptUuid: undefined,
     identifier: undefined,
     featureVersions: undefined,
+    pendingSectionOverrides: {},
     setConceptUuid: setConceptUuid.bind(actionContext),
     setActiveConcept: setActiveConcept.bind(actionContext),
+    addPendingSections: addPendingSections.bind(actionContext),
+    clearPendingSections: clearPendingSections.bind(actionContext),
   };
 };
 
