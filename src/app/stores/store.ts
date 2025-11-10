@@ -32,6 +32,10 @@ import queryInvalidationSlice, {
   IQueryInvalidationState,
 } from './query-invalidation/store';
 
+import syntheticTestingSlice, {
+  ISyntheticTestingState,
+} from './synthetic-testing/store';
+
 export interface IAppStore {
   // global: IGlobalState;
   auth: IAuthState;
@@ -46,6 +50,7 @@ export interface IAppStore {
   magicShare: IMagicShareState;
   ideaPlayground: IIdeaPlaygroundState;
   queryInvalidation: IQueryInvalidationState;
+  syntheticTesting: ISyntheticTestingState;
 }
 
 export interface IStoreApi<S> {
@@ -71,6 +76,7 @@ const useStore = create<IAppStore>()(
         magicShare: magicShareSlice,
         ideaPlayground: ideaPlaygroundSlice,
         queryInvalidation: queryInvalidationSlice,
+        syntheticTesting: syntheticTestingSlice,
       }),
     ),
     {

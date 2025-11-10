@@ -207,6 +207,7 @@ const ConceptGeneration = React.forwardRef<
             expectedItemCount={3}
             completedItemCount={concepts.length}
             itemCompletionTimestamps={conceptArrivalTimes.current}
+            fallbackEstimatedSeconds={120}
             showTimeRemaining
             showPercentage={false}
             size='md'

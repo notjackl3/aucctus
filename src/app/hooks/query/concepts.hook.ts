@@ -44,6 +44,7 @@ import {
 import { useEffect, useMemo } from 'react';
 import { useGenericConceptMutate } from './helper.hooks';
 import { AucctusQueryKeys } from './query-keys';
+import { dismissConceptWorkflowToastForConcept } from '@hooks/sockets/useUniversalSocketEvents';
 
 export type PartialConceptWithRequiredIdentifier = Partial<IConcept> & {
   identifier: string;
@@ -1279,8 +1280,8 @@ export const useConceptReportCancel = () => {
       conceptUuid: string;
       conceptIdentifier: string;
     }) => await api.concept.cancelReport(params.conceptUuid),
-    onSuccess: (_data, variables) => {
-      doFullConceptInvalidation(queryClient, variables.conceptIdentifier);
+    onSuccess: (_data, params) => {
+      doFullConceptInvalidation(queryClient, params.conceptIdentifier);
       toast.success(
         'Report Cancelled',
         'Report generation has been stopped successfully',

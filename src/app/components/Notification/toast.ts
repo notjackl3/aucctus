@@ -166,36 +166,30 @@ const update = (
   });
 };
 
+export interface ProgressToastPayload {
+  title: string;
+  progress?: number;
+  estimatedTime?: number;
+  onCancel?: () => void;
+  agentName?: string;
+  conceptUuid?: string;
+  message?: string;
+  startTime?: number;
+  overrideEstimatedSeconds?: number | null;
+  fallbackEstimatedSeconds?: number | null;
+  expectedItemCount?: number;
+  completedItemCount?: number;
+}
+
 /**
  * Displays a progress toast with animated hourglass and progress tracking
- * @param title Toast title
- * @param progress Current progress percentage (0-100)
- * @param estimatedTime Estimated completion time in seconds
- * @param onCancel Optional cancel handler
- * @param onEmailMe Optional email notification handler
- * @param emailRequested Whether email has been requested
- * @returns The toast ID
  */
-const progress = (
-  title: string,
-  progress: number,
-  estimatedTime?: number,
-  onCancel?: () => void,
-  onEmailMe?: () => void,
-  emailRequested?: boolean,
-): Id => {
+const progress = (payload: ProgressToastPayload): Id => {
   return reactToast((props) => React.createElement(ProgressToast, props), {
     ...defaultOptions,
     autoClose: false, // Don't auto-close progress toasts
     closeOnClick: false,
-    data: {
-      title,
-      progress,
-      estimatedTime,
-      onCancel,
-      onEmailMe,
-      emailRequested,
-    },
+    data: payload,
   });
 };
 
@@ -207,21 +201,10 @@ const progress = (
  * @param estimatedTime Optional new estimated time
  * @param onCancel Optional cancel handler (preserved from original toast)
  */
-const updateProgress = (
-  id: Id,
-  progress: number,
-  title?: string,
-  estimatedTime?: number,
-  onCancel?: () => void,
-): void => {
+const updateProgress = (id: Id, payload: ProgressToastPayload): void => {
   reactToast.update(id, {
     render: (props) => React.createElement(ProgressToast, props),
-    data: {
-      title: title || 'Processing',
-      progress,
-      estimatedTime,
-      onCancel,
-    },
+    data: payload,
   });
 };
 

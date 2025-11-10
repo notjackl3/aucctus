@@ -15,6 +15,7 @@ type ConceptRowButtonProps = {
   reportStatusBySection?: ConceptReportStatusBySection;
   dateReportStarted?: string;
   dateReportCompleted?: string;
+  conceptUuid?: string;
 };
 
 const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
@@ -65,6 +66,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   reportStatusBySection,
   dateReportStarted,
   dateReportCompleted,
+  conceptUuid,
 }) => {
   const canOpenWhilePending = canOpenConceptWhilePending(
     reportStatusBySection,
@@ -78,6 +80,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
         reportStatusBySection={reportStatusBySection}
         dateReportStarted={dateReportStarted}
         dateReportCompleted={dateReportCompleted}
+        conceptUuid={conceptUuid}
       />
     );
   }
@@ -115,6 +118,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
             reportStatusBySection={reportStatusBySection}
             dateReportStarted={dateReportStarted}
             dateReportCompleted={dateReportCompleted}
+            conceptUuid={conceptUuid}
           />
         }
         hideDelay={0}

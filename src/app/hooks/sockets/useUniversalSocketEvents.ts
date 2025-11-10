@@ -1,11 +1,22 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from '@components';
+import { toast as reactToast } from 'react-toastify';
 import { useSocketEvent } from './aucctus';
 import { AppPath } from '@routes/routes';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '../query/query-keys';
 import useStore from '@stores/store';
+import telemetry from '@libs/telemetry';
+import type { Id } from 'react-toastify';
+import type { ProgressToastPayload } from '@components/Notification/toast';
+import {
+  createStageMessage,
+  DEFAULT_CONCEPT_REPORT_ESTIMATE_SECONDS,
+  stageKeyFromMessage,
+  CONCEPT_REPORT_STAGE_ORDER,
+  type ConceptReportStageKey,
+} from '../../utils/conceptReportHelpers';
 import {
   IConcept,
   ISyntheticExecutionProgressMessage,
@@ -19,12 +30,121 @@ import {
   IMagicShareProgressMessage,
   IMagicShareCompletedMessage,
   IMagicShareErrorMessage,
+  IConceptWorkflowMessage,
   ConceptReportStatusBySection,
   ConceptReportStatus,
   ITestGenerationCompletedMessage,
   ITestGenerationErrorMessage,
 } from '@libs/api/types';
 import { normalizeReportSectionKey } from '@libs/utils/concepts';
+
+type ConceptWorkflowToastRecord = {
+  toastId: Id;
+  data: ProgressToastPayload;
+  keys: Set<string>;
+};
+
+const conceptWorkflowToasts = new Map<string, ConceptWorkflowToastRecord>();
+
+const registerToastRecordKeys = (
+  record: ConceptWorkflowToastRecord,
+  keys: string[],
+) => {
+  keys.forEach((key) => {
+    if (!key) return;
+    record.keys.add(key);
+    conceptWorkflowToasts.set(key, record);
+  });
+};
+
+const getToastRecordForKeys = (
+  keys: string[],
+  registerKeys = false,
+): ConceptWorkflowToastRecord | undefined => {
+  for (const key of keys) {
+    if (!key) continue;
+    const record = conceptWorkflowToasts.get(key);
+    if (record) {
+      if (registerKeys) {
+        registerToastRecordKeys(record, keys);
+      }
+      return record;
+    }
+  }
+  return undefined;
+};
+
+const clearToastRecord = (record: ConceptWorkflowToastRecord) => {
+  record.keys.forEach((key) => conceptWorkflowToasts.delete(key));
+  record.keys.clear();
+};
+
+const getToastKeysFromMessage = (
+  message: IConceptWorkflowMessage,
+): string[] => {
+  const keys: string[] = [];
+  if (message.conceptRootIdentifier) {
+    keys.push(message.conceptRootIdentifier);
+  }
+  if (message.conceptUuid) {
+    keys.push(message.conceptUuid);
+  }
+  return keys;
+};
+
+export const dismissConceptWorkflowToastForConcept = (
+  conceptUuid?: string,
+  conceptIdentifier?: string,
+) => {
+  const keys = [conceptIdentifier, conceptUuid].filter(
+    (value): value is string => Boolean(value),
+  );
+
+  if (!keys.length) {
+    return;
+  }
+
+  const record = getToastRecordForKeys(keys);
+  if (!record) return;
+
+  toast.dismiss(record.toastId);
+  clearToastRecord(record);
+};
+
+/**
+ * Restore/show the progress toast for a concept workflow
+ * Creates a new toast with the current progress data if a record exists and the toast is not already visible
+ * This is useful when the user has dismissed the toast but wants to see progress again
+ */
+export const restoreConceptWorkflowToast = (
+  conceptUuid?: string,
+  conceptIdentifier?: string,
+) => {
+  const keys = [conceptIdentifier, conceptUuid].filter(
+    (value): value is string => Boolean(value),
+  );
+
+  if (!keys.length) {
+    return;
+  }
+
+  const existing = getToastRecordForKeys(keys);
+
+  // If no record exists, we can't restore the toast
+  if (!existing) {
+    return;
+  }
+
+  // Check if the toast is still active/visible
+  // If it is, do nothing (don't create a duplicate)
+  if (reactToast.isActive(existing.toastId)) {
+    return;
+  }
+
+  // Toast was dismissed, create a new one with the existing data
+  const newToastId = toast.progress(existing.data);
+  existing.toastId = newToastId;
+};
 
 // Define event handler types
 export interface ConceptWorkflowHandler {
@@ -143,6 +263,156 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   // Prevent duplicate toasts by tracking recent messages
   const recentMessages = React.useRef(new Set<string>());
 
+  // Helper function to create/update synthetic execution toast
+  const upsertSyntheticToast = React.useCallback(
+    (data: {
+      conceptUuid: string;
+      testUuid: string;
+      progress: number;
+      message: string;
+      startTime?: number;
+    }) => {
+      const toastKey = `${data.conceptUuid}-${data.testUuid}`;
+      const existing = conceptWorkflowToasts.get(toastKey);
+
+      // Reset startTime when a new execution begins (progress === 0)
+      // Otherwise, reuse existing startTime or use provided startTime
+      const startTime =
+        data.progress === 0
+          ? Date.now()
+          : (data.startTime ?? existing?.data.startTime ?? Date.now());
+
+      telemetry.debug('synthetic.toast.startTime', {
+        toastKey,
+        progress: data.progress,
+        startTime,
+        existingStartTime: existing?.data.startTime,
+        isReset: data.progress === 0,
+      });
+
+      const payload: ProgressToastPayload = {
+        title: 'Running Synthetic Test',
+        agentName: 'SyntheticPipeline',
+        conceptUuid: data.conceptUuid,
+        message: data.message || 'Processing synthetic interviews...',
+        progress: data.progress,
+        startTime,
+        fallbackEstimatedSeconds: 300,
+      };
+
+      if (!existing) {
+        telemetry.debug('synthetic.execution.toast.create', {
+          toastKey,
+          progress: data.progress,
+        });
+        const toastId = toast.progress(payload);
+        const record: ConceptWorkflowToastRecord = {
+          toastId,
+          data: payload,
+          keys: new Set([toastKey]),
+        };
+        conceptWorkflowToasts.set(toastKey, record);
+      } else {
+        telemetry.debug('synthetic.execution.toast.update', {
+          toastKey,
+          progress: data.progress,
+        });
+        toast.updateProgress(existing.toastId, payload);
+        existing.data = payload;
+      }
+    },
+    [],
+  );
+
+  // Listen for modal close events to trigger toast creation
+  React.useEffect(() => {
+    const handleModalClosed = (event: CustomEvent) => {
+      const data = event.detail;
+      if (data && data.progress < 100) {
+        upsertSyntheticToast({
+          conceptUuid: data.conceptUuid,
+          testUuid: data.testUuid,
+          progress: data.progress,
+          message: data.message,
+          startTime: data.startTime,
+        });
+      }
+    };
+
+    const handleModalOpened = (event: CustomEvent) => {
+      const data = event.detail;
+
+      // Dismiss any existing toast for this execution
+      if (data?.conceptUuid && data?.testUuid) {
+        const toastKey = `${data.conceptUuid}-${data.testUuid}`;
+        const existing = conceptWorkflowToasts.get(toastKey);
+        if (existing) {
+          try {
+            toast.dismiss(existing.toastId);
+          } catch {
+            // Toast may have already been dismissed
+          }
+          conceptWorkflowToasts.delete(toastKey);
+        }
+      }
+    };
+
+    const handleExecutionCancelled = (event: CustomEvent) => {
+      const data = event.detail;
+
+      // Immediately dismiss toast when cancel button is clicked
+      if (data?.conceptUuid && data?.testUuid) {
+        const toastKey = `${data.conceptUuid}-${data.testUuid}`;
+        const existing = conceptWorkflowToasts.get(toastKey);
+        if (existing) {
+          try {
+            toast.dismiss(existing.toastId);
+          } catch {
+            // Toast may have already been dismissed
+          }
+          conceptWorkflowToasts.delete(toastKey);
+        }
+
+        // Clear the execution state so toast doesn't reappear when modal closes
+        const syntheticState = useStore.getState().syntheticTesting;
+        if (
+          syntheticState.lastExecutionState?.conceptUuid === data.conceptUuid &&
+          syntheticState.lastExecutionState?.testUuid === data.testUuid
+        ) {
+          syntheticState.setLastExecutionState(null);
+        }
+      }
+    };
+
+    window.addEventListener(
+      'synthetic-modal-closed',
+      handleModalClosed as EventListener,
+    );
+    window.addEventListener(
+      'synthetic-modal-opened',
+      handleModalOpened as EventListener,
+    );
+    window.addEventListener(
+      'synthetic-execution-cancelled',
+      handleExecutionCancelled as EventListener,
+    );
+
+    return () => {
+      window.removeEventListener(
+        'synthetic-modal-closed',
+        handleModalClosed as EventListener,
+      );
+      window.removeEventListener(
+        'synthetic-modal-opened',
+        handleModalOpened as EventListener,
+      );
+      window.removeEventListener(
+        'synthetic-execution-cancelled',
+        handleExecutionCancelled as EventListener,
+      );
+    };
+  }, [upsertSyntheticToast]);
+
   // Track recent section completions to suppress full workflow toast for AI edits/partial regenerations
   // Map: conceptIdentifier -> timestamp of last section completion
   const recentSectionCompletions = React.useRef(new Map<string, number>());
@@ -157,6 +427,128 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     recentMessages.current.add(messageKey);
     setTimeout(() => recentMessages.current.delete(messageKey), 2000);
     return false; // Not duplicate, can proceed
+  };
+
+  const resolveStageKey = (
+    message: IConceptWorkflowMessage,
+  ): ConceptReportStageKey | undefined => {
+    if (
+      message.eventType === 'section_started' &&
+      message.message?.toLowerCase().includes('workflow started')
+    ) {
+      return 'marketScan';
+    }
+
+    if (message.eventType === 'workflow_completed') {
+      return 'overview';
+    }
+
+    const derived = stageKeyFromMessage(message.message);
+    if (derived) return derived;
+
+    if (message.eventType === 'workflow_error') {
+      const activeStage = CONCEPT_REPORT_STAGE_ORDER.find(
+        (stage: (typeof CONCEPT_REPORT_STAGE_ORDER)[number]) =>
+          message.reportStatusBySection?.[stage.key]?.status === 'error',
+      );
+      return activeStage?.key;
+    }
+
+    return undefined;
+  };
+
+  const upsertConceptWorkflowToast = (message: IConceptWorkflowMessage) => {
+    const toastKeys = getToastKeysFromMessage(message);
+    if (toastKeys.length === 0) return;
+
+    const stageKey = resolveStageKey(message);
+    const stageMessage =
+      createStageMessage(stageKey, message.eventType) ||
+      message.message ||
+      undefined;
+
+    const existing = getToastRecordForKeys(toastKeys, true);
+    const startTime = existing?.data.startTime ?? Date.now();
+
+    telemetry.debug('concept_workflow.toast.upsert', {
+      toastKeys,
+      stageKey,
+      stageMessage,
+      hasExisting: Boolean(existing),
+    });
+
+    const payload: ProgressToastPayload = {
+      title: existing?.data.title || 'Generating Concept Report',
+      agentName: 'ConceptReportPipeline',
+      conceptUuid: message.conceptUuid || existing?.data.conceptUuid,
+      message: stageMessage,
+      startTime,
+      overrideEstimatedSeconds: existing?.data.overrideEstimatedSeconds,
+      fallbackEstimatedSeconds:
+        existing?.data.fallbackEstimatedSeconds ??
+        DEFAULT_CONCEPT_REPORT_ESTIMATE_SECONDS,
+    };
+
+    if (!existing) {
+      const toastId = toast.progress(payload);
+      const record: ConceptWorkflowToastRecord = {
+        toastId,
+        data: payload,
+        keys: new Set<string>(),
+      };
+      registerToastRecordKeys(record, toastKeys);
+    } else {
+      const mergedData = {
+        ...existing.data,
+        ...payload,
+        startTime,
+      } as ProgressToastPayload;
+
+      if (existing.data.progress === undefined) {
+        delete (mergedData as any).progress;
+      }
+
+      toast.updateProgress(existing.toastId, mergedData);
+      existing.data = mergedData;
+      registerToastRecordKeys(existing, toastKeys);
+    }
+  };
+
+  const finalizeConceptWorkflowToast = (
+    message: IConceptWorkflowMessage,
+    dismissDelayMs = 2000,
+  ) => {
+    const toastKeys = getToastKeysFromMessage(message);
+    if (toastKeys.length === 0) return;
+
+    const existing = getToastRecordForKeys(toastKeys, true);
+    if (!existing) return;
+
+    const stageKey = resolveStageKey(message);
+    const payload: ProgressToastPayload = {
+      ...existing.data,
+      progress:
+        message.eventType === 'workflow_error' ? existing.data.progress : 100,
+      message:
+        createStageMessage(stageKey, message.eventType) ||
+        message.message ||
+        existing.data.message,
+    };
+
+    toast.updateProgress(existing.toastId, payload);
+    existing.data = payload;
+
+    telemetry.debug('concept_workflow.toast.finalize', {
+      toastKeys,
+      stageKey,
+      dismissDelayMs,
+      eventType: message.eventType,
+    });
+
+    setTimeout(() => {
+      toast.dismiss(existing.toastId);
+      clearToastRecord(existing);
+    }, dismissDelayMs);
   };
 
   const syncPendingOverridesFromServer = (
@@ -227,111 +619,101 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   // Note: Concept workflow events are handled directly by useSocketEvent calls below
 
   // Register concept workflow socket event
-  useSocketEvent('concept.workflow.update.account', (message) => {
-    if (!config.conceptWorkflow) return;
+  useSocketEvent<'concept.workflow.update.account', IConceptWorkflowMessage>(
+    'concept.workflow.update.account',
+    (message) => {
+      if (!config.conceptWorkflow) return;
 
-    if (message.eventType === 'workflow_completed') {
-      // Check for duplicates
-      const messageKey = `${message.eventType}-${message.conceptRootIdentifier || 'unknown'}`;
-      if (preventDuplicate(messageKey)) return;
+      if (
+        message.eventType === 'section_started' ||
+        message.eventType === 'section_completed' ||
+        message.eventType === 'workflow_completed' ||
+        message.eventType === 'workflow_error'
+      ) {
+        upsertConceptWorkflowToast(message);
+      }
 
-      // Check if a section just completed within the last 5 seconds
-      // If so, this is a partial regeneration (AI edit), not a full concept generation
-      if (message.conceptRootIdentifier) {
-        const lastSectionCompletion = recentSectionCompletions.current.get(
-          message.conceptRootIdentifier,
-        );
-        const isPartialRegeneration =
-          lastSectionCompletion && Date.now() - lastSectionCompletion < 5000; // Within 5 seconds
+      if (message.eventType === 'workflow_completed') {
+        finalizeConceptWorkflowToast(message);
 
-        if (isPartialRegeneration) {
-          // Clean up the tracking entry
-          recentSectionCompletions.current.delete(
+        // Check for duplicates
+        const messageKey = `${message.eventType}-${message.conceptRootIdentifier || 'unknown'}`;
+        if (preventDuplicate(messageKey)) return;
+
+        // Check if a section just completed within the last 5 seconds
+        // If so, this is a partial regeneration (AI edit), not a full concept generation
+        if (message.conceptRootIdentifier) {
+          const lastSectionCompletion = recentSectionCompletions.current.get(
             message.conceptRootIdentifier,
           );
-          return;
+          const isPartialRegeneration =
+            lastSectionCompletion && Date.now() - lastSectionCompletion < 5000; // Within 5 seconds
+
+          if (isPartialRegeneration) {
+            // Clean up the tracking entry
+            recentSectionCompletions.current.delete(
+              message.conceptRootIdentifier,
+            );
+            return;
+          }
         }
-      }
 
-      // Only show toast if this is for the currently active concept
-      const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
-      const matchesActive =
-        message.conceptUuid === activeConceptUuid ||
-        message.conceptRootIdentifier === activeConceptUuid;
+        // Only show toast if this is for the currently active concept
+        const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
+        const matchesActive =
+          message.conceptUuid === activeConceptUuid ||
+          message.conceptRootIdentifier === activeConceptUuid;
 
-      if (matchesActive || !activeConceptUuid) {
-        // Show toast if it matches active concept or if no concept is active (user is not on concept page)
-        const handler =
-          config.conceptWorkflow.onWorkflowCompleted ||
-          ((msg: any) => {
-            toast.completed(
-              'Concept Report Ready',
-              `Your concept report has been generated successfully`,
-              undefined,
-              () => {
-                const conceptUrl = AppPath.ConceptOverview.replace(
-                  ':id',
-                  msg.conceptRootIdentifier,
-                );
-                navigate(conceptUrl);
-              },
-            );
-          });
-        handler(message);
-      }
-    } else if (message.eventType === 'section_completed') {
-      // Handle individual section completion - update cache with new data
+        if (matchesActive || !activeConceptUuid) {
+          // Show toast if it matches active concept or if no concept is active (user is not on concept page)
+          const handler =
+            config.conceptWorkflow.onWorkflowCompleted ||
+            ((msg: any) => {
+              toast.completed(
+                'Concept Report Ready',
+                `Your concept report has been generated successfully`,
+                undefined,
+                () => {
+                  const conceptUrl = AppPath.ConceptOverview.replace(
+                    ':id',
+                    msg.conceptRootIdentifier,
+                  );
+                  navigate(conceptUrl);
+                },
+              );
+            });
+          handler(message);
+        }
+      } else if (message.eventType === 'section_completed') {
+        // Handle individual section completion - update cache with new data
 
-      // Track this section completion to suppress workflow_completed toast
-      // This indicates a partial regeneration (AI edit), not a full concept generation
-      if (message.conceptRootIdentifier) {
-        recentSectionCompletions.current.set(
-          message.conceptRootIdentifier,
-          Date.now(),
-        );
-      }
+        // Track this section completion to suppress workflow_completed toast
+        // This indicates a partial regeneration (AI edit), not a full concept generation
+        if (message.conceptRootIdentifier) {
+          recentSectionCompletions.current.set(
+            message.conceptRootIdentifier,
+            Date.now(),
+          );
+        }
 
-      if (message.reportStatusBySection && message.conceptUuid) {
-        const normalizedStatus = normalizeStatusMap(
-          message.reportStatusBySection,
-        );
-        const aggregateStatus = message.aggregateStatus as
-          | ConceptReportStatus
-          | undefined;
+        if (message.reportStatusBySection && message.conceptUuid) {
+          const normalizedStatus = normalizeStatusMap(
+            message.reportStatusBySection,
+          );
+          const aggregateStatus = message.aggregateStatus as
+            | ConceptReportStatus
+            | undefined;
 
-        // Update the concept cache with the new section status data
-        queryClient.setQueryData<IConcept | undefined>(
-          [AucctusQueryKeys.concept, message.conceptUuid],
-          (existing) => {
-            if (!existing) return existing;
-            const mergedSections = mergeReportStatusBySection(
-              existing.reportStatusBySection,
-              normalizedStatus,
-            );
-
-            return {
-              ...existing,
-              ...(mergedSections && { reportStatusBySection: mergedSections }),
-              ...(aggregateStatus && {
-                reportStatusAggregate: aggregateStatus,
-              }),
-            };
-          },
-        );
-
-        // Also update by identifier if different
-        if (
-          message.conceptRootIdentifier &&
-          message.conceptRootIdentifier !== message.conceptUuid
-        ) {
+          // Update the concept cache with the new section status data
           queryClient.setQueryData<IConcept | undefined>(
-            [AucctusQueryKeys.concept, message.conceptRootIdentifier],
+            [AucctusQueryKeys.concept, message.conceptUuid],
             (existing) => {
               if (!existing) return existing;
               const mergedSections = mergeReportStatusBySection(
                 existing.reportStatusBySection,
                 normalizedStatus,
               );
+
               return {
                 ...existing,
                 ...(mergedSections && {
@@ -343,77 +725,161 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
               };
             },
           );
-        }
 
-        // CRITICAL: Invalidate concept queries to force refetch of featureVersions
-        // This ensures we get the latest concept data including updated featureVersions
-        queryClient.invalidateQueries({
-          queryKey: [AucctusQueryKeys.concept, message.conceptUuid],
-        });
-        if (
-          message.conceptRootIdentifier &&
-          message.conceptRootIdentifier !== message.conceptUuid
-        ) {
+          // Also update by identifier if different
+          if (
+            message.conceptRootIdentifier &&
+            message.conceptRootIdentifier !== message.conceptUuid
+          ) {
+            queryClient.setQueryData<IConcept | undefined>(
+              [AucctusQueryKeys.concept, message.conceptRootIdentifier],
+              (existing) => {
+                if (!existing) return existing;
+                const mergedSections = mergeReportStatusBySection(
+                  existing.reportStatusBySection,
+                  normalizedStatus,
+                );
+                return {
+                  ...existing,
+                  ...(mergedSections && {
+                    reportStatusBySection: mergedSections,
+                  }),
+                  ...(aggregateStatus && {
+                    reportStatusAggregate: aggregateStatus,
+                  }),
+                };
+              },
+            );
+          }
+
+          // CRITICAL: Invalidate concept queries to force refetch of featureVersions
+          // This ensures we get the latest concept data including updated featureVersions
           queryClient.invalidateQueries({
-            queryKey: [AucctusQueryKeys.concept, message.conceptRootIdentifier],
+            queryKey: [AucctusQueryKeys.concept, message.conceptUuid],
           });
+          if (
+            message.conceptRootIdentifier &&
+            message.conceptRootIdentifier !== message.conceptUuid
+          ) {
+            queryClient.invalidateQueries({
+              queryKey: [
+                AucctusQueryKeys.concept,
+                message.conceptRootIdentifier,
+              ],
+            });
+          }
+
+          const overrideIdentifier =
+            message.conceptRootIdentifier || message.conceptUuid;
+          syncPendingOverridesFromServer(overrideIdentifier, normalizedStatus);
+
+          // Show completion toast for individual sections
+          // Only show toast if this is for the currently active concept
+          const activeConceptUuid =
+            useStore.getState().conceptReport.conceptUuid;
+          const toastKeys = getToastKeysFromMessage(message);
+          const hasActiveProgressToast =
+            getToastRecordForKeys(toastKeys, true) !== undefined;
+          const matchesActive =
+            message.conceptUuid === activeConceptUuid ||
+            message.conceptRootIdentifier === activeConceptUuid;
+
+          if (matchesActive && !hasActiveProgressToast) {
+            toast.success(
+              `Section updated successfully!`,
+              message.message || 'Your changes have been applied.',
+              5000,
+            );
+          }
         }
+      } else if (message.eventType === 'workflow_error') {
+        finalizeConceptWorkflowToast(message, 4000);
 
-        const overrideIdentifier =
-          message.conceptRootIdentifier || message.conceptUuid;
-        syncPendingOverridesFromServer(overrideIdentifier, normalizedStatus);
+        // Check for duplicates
+        const messageKey = `${message.eventType}-${message.message || 'unknown'}`;
+        if (preventDuplicate(messageKey)) return;
 
-        // Show completion toast for individual sections
         // Only show toast if this is for the currently active concept
         const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
         const matchesActive =
           message.conceptUuid === activeConceptUuid ||
           message.conceptRootIdentifier === activeConceptUuid;
 
-        if (matchesActive) {
-          toast.success(
-            `Section updated successfully!`,
-            message.message || 'Your changes have been applied.',
-            5000,
-          );
+        if (matchesActive || !activeConceptUuid) {
+          // Show toast if it matches active concept or if no concept is active (user is not on concept page)
+          const handler =
+            config.conceptWorkflow.onWorkflowError ||
+            ((msg: any) => {
+              toast.error(
+                'Concept Generation Failed',
+                msg.message ||
+                  'An error occurred while generating your concept report',
+              );
+            });
+          handler(message);
         }
       }
-    } else if (message.eventType === 'workflow_error') {
-      // Check for duplicates
-      const messageKey = `${message.eventType}-${message.message || 'unknown'}`;
-      if (preventDuplicate(messageKey)) return;
+    },
+  );
 
-      // Only show toast if this is for the currently active concept
-      const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
-      const matchesActive =
-        message.conceptUuid === activeConceptUuid ||
-        message.conceptRootIdentifier === activeConceptUuid;
-
-      if (matchesActive || !activeConceptUuid) {
-        // Show toast if it matches active concept or if no concept is active (user is not on concept page)
-        const handler =
-          config.conceptWorkflow.onWorkflowError ||
-          ((msg: any) => {
-            toast.error(
-              'Concept Generation Failed',
-              msg.message ||
-                'An error occurred while generating your concept report',
-            );
-          });
-        handler(message);
-      }
-    }
-  });
-
-  // Register synthetic execution completion event (GLOBAL)
+  // Register synthetic execution progress event (GLOBAL) with toast management
   useSocketEvent<
     'synthetic.execution.progress.user',
     ISyntheticExecutionProgressMessage
   >('synthetic.execution.progress.user', (data) => {
     if (!config.syntheticTesting) return;
 
-    // Only show toast for 100% completion
+    const toastKey = `${data.conceptUuid}-${data.testUuid}`;
+    const syntheticState = useStore.getState().syntheticTesting;
+    const isModalOpen = syntheticState.isModalOpen;
+
+    // Store the latest execution state for toast creation when modal closes
+    // Capture startTime on first progress update (progress: 0) to match modal's timing
+    const currentState = syntheticState.lastExecutionState;
+    const startTime =
+      currentState?.startTime ||
+      (data.progress === 0 ? Date.now() : currentState?.startTime);
+
+    syntheticState.setLastExecutionState({
+      conceptUuid: data.conceptUuid,
+      testUuid: data.testUuid,
+      progress: data.progress,
+      message: data.message,
+      startTime,
+    });
+
+    // Show/update progress toast only when modal is closed and execution is running
+    if (!isModalOpen && data.progress < 100) {
+      upsertSyntheticToast({
+        conceptUuid: data.conceptUuid,
+        testUuid: data.testUuid,
+        progress: data.progress,
+        message: data.message,
+        startTime: syntheticState.lastExecutionState?.startTime,
+      });
+    }
+
+    // Dismiss toast when modal is opened (user returned to modal)
+    if (isModalOpen) {
+      const existing = conceptWorkflowToasts.get(toastKey);
+      if (existing) {
+        try {
+          toast.dismiss(existing.toastId);
+        } catch {
+          // Toast may have already been dismissed
+        }
+        conceptWorkflowToasts.delete(toastKey);
+      }
+    }
+
+    // Handle completion
     if (data.progress >= 100) {
+      const existing = conceptWorkflowToasts.get(toastKey);
+      if (existing) {
+        toast.dismiss(existing.toastId);
+        conceptWorkflowToasts.delete(toastKey);
+      }
+
       const messageKey = `synthetic-complete-${data.conceptUuid}-${data.testUuid}`;
       if (preventDuplicate(messageKey)) return;
 
@@ -436,6 +902,14 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     ISyntheticExecutionErrorMessage
   >('synthetic.execution.error.user', (data) => {
     if (!config.syntheticTesting) return;
+
+    // Dismiss any active progress toast
+    const toastKey = `${data.conceptUuid}-${data.testUuid}`;
+    const existing = conceptWorkflowToasts.get(toastKey);
+    if (existing) {
+      toast.dismiss(existing.toastId);
+      conceptWorkflowToasts.delete(toastKey);
+    }
 
     const messageKey = `synthetic-error-${data.conceptUuid}-${data.testUuid}`;
     if (preventDuplicate(messageKey)) return;

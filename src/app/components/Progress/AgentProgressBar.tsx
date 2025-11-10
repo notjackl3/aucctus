@@ -7,6 +7,7 @@ import React, {
 } from 'react';
 import { useAgentEstimatedTime } from '@hooks/query/agent-timing.hook';
 import { cn } from '@libs/utils/react';
+import telemetry from '@libs/telemetry';
 
 export interface AgentProgressBarProps {
   /**
@@ -30,6 +31,12 @@ export interface AgentProgressBarProps {
    * Useful for custom pipeline estimates or when timing is fetched externally
    */
   overrideEstimatedSeconds?: number | null;
+
+  /**
+   * Fallback estimated seconds used when timing data is unavailable
+   * Allows countdown UI to operate even without historical timing data
+   */
+  fallbackEstimatedSeconds?: number | null;
 
   /**
    * Number of items expected to be processed (e.g., 3 concepts, 5 profiles)
@@ -94,12 +101,6 @@ export interface AgentProgressBarProps {
    * Used to persist timing across component remounts
    */
   startTime?: number;
-
-  /**
-   * Default message to show when no timing data is available
-   * @default "This could take up to 2 minutes"
-   */
-  defaultMessage?: string;
 }
 
 /**
@@ -141,6 +142,7 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   conceptUuid,
   progress: explicitProgress,
   overrideEstimatedSeconds,
+  fallbackEstimatedSeconds,
   expectedItemCount,
   completedItemCount = 0,
   itemCompletionTimestamps = [],
@@ -153,7 +155,6 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   isLoading = false,
   onComplete,
   startTime: initialStartTime,
-  defaultMessage = 'This could take up to 2 minutes',
 }) => {
   const startTimeRef = useRef<number>(initialStartTime || Date.now());
   const [smartRemainingTime, setSmartRemainingTime] = useState<number | null>(
@@ -163,23 +164,119 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   const hasCompletedRef = useRef(false);
   const previousRemainingTime = useRef<number | null>(null);
   const maxProgressReached = useRef<number>(0);
+  const estimateSourceRef = useRef<string | null>(null);
 
   // Fetch timing estimate from backend (skip if override provided)
-  const { data: timingData, isLoading: isLoadingTiming } =
+  const shouldFetchTiming = overrideEstimatedSeconds === undefined;
+
+  const { data: conceptTimingData, isLoading: isLoadingConceptTiming } =
     useAgentEstimatedTime(agentName, conceptUuid, {
-      enabled: overrideEstimatedSeconds === undefined,
+      enabled: shouldFetchTiming && !!conceptUuid,
       staleTime: 1000 * 60 * 5, // 5 minutes
     });
+
+  const hasConceptTiming = conceptTimingData?.estimatedSeconds != null;
+
+  useEffect(() => {
+    telemetry.debug('agent_progress_bar.timing_fetch.status', {
+      agentName,
+      conceptUuid,
+      shouldFetchTiming,
+      hasConceptTiming,
+      conceptTimingMs: conceptTimingData?.estimatedSeconds,
+      isLoadingConceptTiming,
+    });
+  }, [
+    agentName,
+    conceptUuid,
+    shouldFetchTiming,
+    hasConceptTiming,
+    conceptTimingData?.estimatedSeconds,
+    isLoadingConceptTiming,
+  ]);
+
+  const { data: globalTimingData, isLoading: isLoadingGlobalTiming } =
+    useAgentEstimatedTime(agentName, undefined, {
+      enabled: shouldFetchTiming && (!conceptUuid || !hasConceptTiming),
+      staleTime: 1000 * 60 * 5, // 5 minutes
+    });
+
+  const isLoadingTiming = isLoadingConceptTiming || isLoadingGlobalTiming;
+
+  useEffect(() => {
+    telemetry.debug('agent_progress_bar.timing_fetch.global', {
+      agentName,
+      conceptUuid,
+      shouldFetchTiming,
+      hasConceptTiming,
+      globalTimingSeconds: globalTimingData?.estimatedSeconds,
+      isLoadingGlobalTiming,
+    });
+  }, [
+    agentName,
+    conceptUuid,
+    shouldFetchTiming,
+    hasConceptTiming,
+    globalTimingData?.estimatedSeconds,
+    isLoadingGlobalTiming,
+  ]);
 
   const estimatedSeconds =
     overrideEstimatedSeconds !== undefined
       ? overrideEstimatedSeconds
-      : timingData?.estimatedSeconds
-        ? Math.round(timingData.estimatedSeconds)
-        : null;
+      : conceptTimingData?.estimatedSeconds
+        ? Math.round(conceptTimingData.estimatedSeconds)
+        : globalTimingData?.estimatedSeconds
+          ? Math.round(globalTimingData.estimatedSeconds)
+          : fallbackEstimatedSeconds !== undefined
+            ? fallbackEstimatedSeconds
+            : null;
+
+  useEffect(() => {
+    const source =
+      overrideEstimatedSeconds !== undefined
+        ? 'override'
+        : conceptTimingData?.estimatedSeconds
+          ? 'concept-history'
+          : globalTimingData?.estimatedSeconds
+            ? 'global-history'
+            : fallbackEstimatedSeconds !== undefined
+              ? 'fallback'
+              : 'none';
+
+    if (estimateSourceRef.current !== source) {
+      estimateSourceRef.current = source;
+      telemetry.debug('agent_progress_bar.estimate_source', {
+        agentName,
+        conceptUuid,
+        source,
+        estimatedSeconds:
+          source === 'override'
+            ? overrideEstimatedSeconds
+            : source === 'concept-history'
+              ? conceptTimingData?.estimatedSeconds
+              : source === 'global-history'
+                ? globalTimingData?.estimatedSeconds
+                : fallbackEstimatedSeconds,
+        conceptEstimateSeconds: conceptTimingData?.estimatedSeconds,
+        globalEstimateSeconds: globalTimingData?.estimatedSeconds,
+        fallbackSeconds: fallbackEstimatedSeconds,
+      });
+    }
+  }, [
+    agentName,
+    conceptUuid,
+    overrideEstimatedSeconds,
+    fallbackEstimatedSeconds,
+    conceptTimingData?.estimatedSeconds,
+    globalTimingData?.estimatedSeconds,
+  ]);
 
   // Track if we have valid timing data from cache/history
-  const hasValidTimingData = estimatedSeconds !== null;
+  const hasValidTimingData =
+    (overrideEstimatedSeconds ?? undefined) !== undefined ||
+    conceptTimingData?.estimatedSeconds != null ||
+    globalTimingData?.estimatedSeconds != null;
 
   // Calculate smart remaining time using weighted moving average
   const calculateSmartRemainingTime = useCallback(() => {
@@ -367,26 +464,53 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   const stripePattern =
     'linear-gradient(45deg, rgba(255,255,255,.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.1) 75%, transparent 75%, transparent)';
 
-  // If no timing data and not loading, show fallback message only (no progress bar)
-  if (!isLoading && !isLoadingTiming && !hasValidTimingData) {
-    return (
-      <div className={cn('w-full', className)}>
-        <div className='flex w-full justify-center'>
-          <span className='aucctus-text-xs aucctus-text-secondary flex'>
-            {defaultMessage.split('').map((letter, index) => (
-              <span
-                key={index}
-                className='inline-block animate-pulse-slow'
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                {letter === ' ' ? '\u00A0' : letter}
-              </span>
-            ))}
-          </span>
-        </div>
-      </div>
-    );
-  }
+  // If no timing data and not loading, use fallback countdown
+  const usingFallbackTiming =
+    !isLoading && !isLoadingTiming && !hasValidTimingData;
+  const fallbackSeconds = fallbackEstimatedSeconds ?? 20 * 60; // Use prop or default to 20 minutes
+
+  // Calculate fallback progress and remaining time
+  const fallbackElapsedSeconds = usingFallbackTiming
+    ? Math.floor((Date.now() - startTimeRef.current) / 1000)
+    : 0;
+  const fallbackRemainingSeconds = usingFallbackTiming
+    ? Math.max(0, fallbackSeconds - fallbackElapsedSeconds)
+    : 0;
+  const fallbackProgress = usingFallbackTiming
+    ? Math.min(95, (fallbackElapsedSeconds / fallbackSeconds) * 100)
+    : 0;
+
+  // Update fallback progress every second
+  const [fallbackProgressState, setFallbackProgressState] =
+    useState(fallbackProgress);
+  const [fallbackRemainingState, setFallbackRemainingState] = useState(
+    fallbackRemainingSeconds,
+  );
+
+  useEffect(() => {
+    if (!usingFallbackTiming) return;
+
+    // Update immediately
+    setFallbackProgressState(fallbackProgress);
+    setFallbackRemainingState(fallbackRemainingSeconds);
+
+    // Then update every second
+    const interval = setInterval(() => {
+      const elapsed = Math.floor((Date.now() - startTimeRef.current) / 1000);
+      const remaining = Math.max(0, fallbackSeconds - elapsed);
+      const progress = Math.min(95, (elapsed / fallbackSeconds) * 100);
+
+      setFallbackProgressState(progress);
+      setFallbackRemainingState(remaining);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [
+    usingFallbackTiming,
+    fallbackProgress,
+    fallbackRemainingSeconds,
+    fallbackSeconds,
+  ]);
 
   return (
     <div className={cn('w-full space-y-2.5', className)}>
@@ -419,11 +543,11 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
             }}
           />
         ) : (
-          // Determinate progress
+          // Determinate progress (use fallback if no timing data available)
           <div
             className='h-full'
             style={{
-              width: `${Math.min(100, Math.max(0, displayProgress))}%`,
+              width: `${Math.min(100, Math.max(0, usingFallbackTiming ? fallbackProgressState : displayProgress))}%`,
               backgroundColor: themeColors[theme],
               backgroundImage: stripePattern,
               backgroundSize: '1rem 1rem',
@@ -446,15 +570,26 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
           </div>
 
           <div className='flex items-center gap-3 whitespace-nowrap'>
-            {showTimeRemaining && smartRemainingTime !== null && !isLoading && (
-              <span className='aucctus-text-xs aucctus-text-tertiary'>
-                {formatTimeRemaining(smartRemainingTime)}
-              </span>
-            )}
+            {showTimeRemaining &&
+              !isLoading &&
+              (usingFallbackTiming
+                ? fallbackRemainingState > 0
+                : smartRemainingTime !== null) && (
+                <span className='aucctus-text-xs aucctus-text-tertiary'>
+                  {formatTimeRemaining(
+                    usingFallbackTiming
+                      ? fallbackRemainingState
+                      : smartRemainingTime!,
+                  )}
+                </span>
+              )}
 
             {showPercentage && !isLoading && (
               <span className='aucctus-text-xs-medium aucctus-text-secondary'>
-                {Math.round(displayProgress)}%
+                {Math.round(
+                  usingFallbackTiming ? fallbackProgressState : displayProgress,
+                )}
+                %
               </span>
             )}
 
@@ -468,22 +603,35 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
       ) : (
         // When no message, center the time remaining
         <div className='flex w-full items-center justify-center gap-2'>
-          {showTimeRemaining && smartRemainingTime !== null && !isLoading && (
-            <span className='aucctus-text-xs aucctus-text-tertiary'>
-              {formatTimeRemaining(smartRemainingTime)}
-            </span>
-          )}
+          {showTimeRemaining &&
+            !isLoading &&
+            (usingFallbackTiming
+              ? fallbackRemainingState > 0
+              : smartRemainingTime !== null) && (
+              <span className='aucctus-text-xs aucctus-text-tertiary'>
+                {formatTimeRemaining(
+                  usingFallbackTiming
+                    ? fallbackRemainingState
+                    : smartRemainingTime!,
+                )}
+              </span>
+            )}
 
           {showPercentage &&
             !isLoading &&
             showTimeRemaining &&
-            smartRemainingTime !== null && (
+            (usingFallbackTiming
+              ? fallbackRemainingState > 0
+              : smartRemainingTime !== null) && (
               <span className='aucctus-text-xs aucctus-text-quaternary'>•</span>
             )}
 
           {showPercentage && !isLoading && (
             <span className='aucctus-text-xs-medium aucctus-text-secondary'>
-              {Math.round(displayProgress)}%
+              {Math.round(
+                usingFallbackTiming ? fallbackProgressState : displayProgress,
+              )}
+              %
             </span>
           )}
 

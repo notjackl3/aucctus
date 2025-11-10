@@ -4,6 +4,7 @@ import { Icon, Card } from '@components';
 import { cn } from '@libs/utils/react';
 import Progress from '../Loading/Progress';
 import useGenerationStatus from '@hooks/concepts/generation-status.hook';
+import { restoreConceptWorkflowToast } from '@hooks/sockets/useUniversalSocketEvents';
 
 // Friendly names for section keys
 const SECTION_NAMES: Record<string, string> = {
@@ -83,14 +84,24 @@ interface ConceptStatusTooltipProps {
   reportStatusBySection?: ConceptReportStatusBySection;
   dateReportStarted?: string;
   dateReportCompleted?: string;
+  conceptUuid?: string;
 }
 
 const ConceptStatusTooltip: FunctionComponent<ConceptStatusTooltipProps> = ({
   reportStatusBySection,
   dateReportStarted,
   dateReportCompleted,
+  conceptUuid,
 }) => {
-  const { progressPercentage } = useGenerationStatus(reportStatusBySection);
+  const { progressPercentage, isComplete } = useGenerationStatus(
+    reportStatusBySection,
+  );
+
+  const handleShowProgress = () => {
+    if (conceptUuid) {
+      restoreConceptWorkflowToast(conceptUuid);
+    }
+  };
 
   return (
     <Card.Detail
@@ -154,13 +165,22 @@ const ConceptStatusTooltip: FunctionComponent<ConceptStatusTooltipProps> = ({
             <Progress progress={progressPercentage} />
           </div>
 
-          <div className='mt-2 flex justify-between'>
+          <div className='mt-2 flex items-center justify-between'>
             <span className='aucctus-text-md'>{progressPercentage}%</span>
-            <div className='aucctus-text-sm aucctus-text-secondary'>
+            <div className='flex items-center gap-2'>
               {dateReportStarted && dateReportCompleted && (
-                <span>
+                <span className='aucctus-text-sm aucctus-text-secondary'>
                   Took {formatDuration(dateReportStarted, dateReportCompleted)}
                 </span>
+              )}
+              {!isComplete && conceptUuid && (
+                <button
+                  onClick={handleShowProgress}
+                  className='aucctus-text-brand-primary aucctus-text-xs-semibold aucctus-bg-secondary-hover rounded px-2 py-1 transition-colors'
+                  aria-label='Show progress toast'
+                >
+                  Show Progress
+                </button>
               )}
             </div>
           </div>

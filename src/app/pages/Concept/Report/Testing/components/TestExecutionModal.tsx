@@ -12,6 +12,7 @@ import { Assumption } from '../types';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useTestCompletion } from '../Testing';
+import useStore from '@stores/store';
 
 // Test Execution Modal Sections
 import TestOverview from './modal-sections/TestOverview';
@@ -39,6 +40,61 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   const { closeModal } = useModal();
   const queryClient = useQueryClient();
   const conceptUuid = concept?.uuid || '';
+
+  // Track modal open state for synthetic execution toast
+  const setModalOpen = useStore((state) => state.syntheticTesting.setModalOpen);
+
+  // Set modal as open on mount, closed on unmount
+  useEffect(() => {
+    // Set modal open FIRST (synchronously)
+    setModalOpen(true);
+
+    // Then dismiss any existing toast (use setTimeout to ensure state is updated)
+    const dismissTimeout = setTimeout(() => {
+      const state = useStore.getState().syntheticTesting.lastExecutionState;
+      if (state?.conceptUuid && state?.testUuid) {
+        window.dispatchEvent(
+          new CustomEvent('synthetic-modal-opened', {
+            detail: {
+              conceptUuid: state.conceptUuid,
+              testUuid: state.testUuid,
+            },
+          }),
+        );
+      }
+    }, 0);
+
+    return () => {
+      // Clear the dismiss timeout if component unmounts before it fires
+      clearTimeout(dismissTimeout);
+
+      // Set modal closed FIRST
+      setModalOpen(false);
+
+      // Then create toast if needed with a longer delay to avoid race with remount
+      const createTimeout = setTimeout(() => {
+        // Check if modal is still closed (not reopened)
+        const currentModalState =
+          useStore.getState().syntheticTesting.isModalOpen;
+        if (currentModalState) {
+          return;
+        }
+
+        const state = useStore.getState().syntheticTesting.lastExecutionState;
+
+        if (state && state.progress !== undefined && state.progress < 100) {
+          window.dispatchEvent(
+            new CustomEvent('synthetic-modal-closed', {
+              detail: state,
+            }),
+          );
+        }
+      }, 100); // Longer delay to ensure modal state is stable
+
+      // Store timeout ID so it can be cleared if needed
+      (window as any).__syntheticToastCreateTimeout = createTimeout;
+    };
+  }, [setModalOpen]);
 
   // Always start with 'overview' tab
   const [activeTab, setActiveTab] = useState('overview');

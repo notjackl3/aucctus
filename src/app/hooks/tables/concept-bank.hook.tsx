@@ -584,6 +584,7 @@ export const useConceptBank = (
               reportStatusBySection={row.original.reportStatusBySection}
               dateReportStarted={row.original.dateReportStarted}
               dateReportCompleted={row.original.dateReportCompleted}
+              conceptUuid={row.original.uuid}
             />
           </span>
         ),

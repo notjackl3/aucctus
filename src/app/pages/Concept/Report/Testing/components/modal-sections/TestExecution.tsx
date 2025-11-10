@@ -274,8 +274,21 @@ const TestExecution: React.FC<TestExecutionProps> = ({
 
   // Notify parent when execution state changes
   useEffect(() => {
-    onExecutionStateChange?.(displayState);
-  }, [displayState, onExecutionStateChange]);
+    onExecutionStateChange?.({
+      ...displayState,
+      estimatedSeconds: timingData?.estimatedSeconds ?? null,
+      isInitializing,
+      conceptUuid,
+      testUuid,
+    });
+  }, [
+    displayState,
+    onExecutionStateChange,
+    timingData?.estimatedSeconds,
+    isInitializing,
+    conceptUuid,
+    testUuid,
+  ]);
 
   // Handlers for real-time execution
   const handleExecuteSynthetic = async (config: ISyntheticExecutionRequest) => {
@@ -307,6 +320,16 @@ const TestExecution: React.FC<TestExecutionProps> = ({
     if (displayState.executionId) {
       // Immediately set to cancelling state for instant user feedback
       setCancellingState();
+
+      // Emit event to immediately dismiss progress toast
+      window.dispatchEvent(
+        new CustomEvent('synthetic-execution-cancelled', {
+          detail: {
+            conceptUuid,
+            testUuid,
+          },
+        }),
+      );
 
       try {
         const result = await cancelExecution.mutateAsync(

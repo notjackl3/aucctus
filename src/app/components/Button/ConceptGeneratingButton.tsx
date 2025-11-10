@@ -10,11 +10,17 @@ type ConceptGeneratingButtonProps = {
   reportStatusBySection?: ConceptReportStatusBySection;
   dateReportStarted?: string;
   dateReportCompleted?: string;
+  conceptUuid?: string;
 };
 
 const ConceptGeneratingButton: FunctionComponent<
   ConceptGeneratingButtonProps
-> = ({ reportStatusBySection, dateReportStarted, dateReportCompleted }) => {
+> = ({
+  reportStatusBySection,
+  dateReportStarted,
+  dateReportCompleted,
+  conceptUuid,
+}) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const { completedCount, totalCount } = useGenerationStatus(
     reportStatusBySection,
@@ -53,6 +59,7 @@ const ConceptGeneratingButton: FunctionComponent<
             reportStatusBySection={reportStatusBySection}
             dateReportStarted={dateReportStarted}
             dateReportCompleted={dateReportCompleted}
+            conceptUuid={conceptUuid}
           />
         )
       }

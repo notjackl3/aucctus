@@ -78,9 +78,10 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                   ? generationState.progress
                   : undefined
               }
-              message={currentMessage}
+              message={
+                currentMessage || 'This usually takes under three minutes'
+              }
               startTime={generationState.startTime}
-              defaultMessage='This usually takes under three minutes'
               overrideEstimatedSeconds={estimatedSeconds}
               showPercentage={false}
             />
@@ -191,9 +192,10 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                       ? generationState.progress
                       : undefined
                   }
-                  message={currentMessage}
+                  message={
+                    currentMessage || 'This usually takes under three minutes'
+                  }
                   startTime={generationState.startTime}
-                  defaultMessage='This usually takes under three minutes'
                   overrideEstimatedSeconds={estimatedSeconds}
                   showPercentage={false}
                 />

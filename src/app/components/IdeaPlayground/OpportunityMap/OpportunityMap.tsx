@@ -234,6 +234,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
           <div className='w-full max-w-md px-4'>
             <AgentProgressBar
               agentName='IdeaPlaygroundConceptGeneration'
+              fallbackEstimatedSeconds={120}
               showTimeRemaining
               showPercentage={false}
               size='md'
