@@ -16,6 +16,7 @@ interface IEditModeSwitcherProps {
   isDisableResize?: boolean;
   maxLength?: number;
   rows?: number;
+  saveOnBlur?: boolean;
 
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement> | undefined;
   handleSave?: () => void;
@@ -39,6 +40,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
   rows,
   hint,
   isDisableResize = false,
+  saveOnBlur = false,
   onChange,
   handleSave,
   handleCancel,
@@ -73,7 +75,11 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
     const handleClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setIsEditing(false);
-        handleCancel && handleCancel();
+        if (saveOnBlur) {
+          handleSave && handleSave();
+        } else {
+          handleCancel && handleCancel();
+        }
       }
     };
 
@@ -84,7 +90,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
       window.removeEventListener('mousedown', handleClick);
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [handleCancel, handleSave, isEditing, onChange, value]);
+  }, [handleCancel, handleSave, isEditing, onChange, value, saveOnBlur]);
 
   return (
     <div

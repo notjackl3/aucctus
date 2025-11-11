@@ -202,6 +202,7 @@ const ConceptReport: FunctionComponent = () => {
                 maxLength={titleEdit.validation.maxLength}
                 rows={1}
                 onChange={(e) => titleEdit.handleChange(e)}
+                saveOnBlur={true}
                 handleSave={() => titleEdit.handleSave()}
                 handleCancel={() => titleEdit.handleCancel()}
               />

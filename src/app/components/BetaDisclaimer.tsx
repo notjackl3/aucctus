@@ -5,13 +5,34 @@ import React from 'react';
 
 interface BetaDisclaimerProps {
   className?: string;
+  darkMode?: boolean;
 }
 
-const BetaDisclaimer: React.FC<BetaDisclaimerProps> = ({ className }) => {
+const BetaDisclaimer: React.FC<BetaDisclaimerProps> = ({
+  className,
+  darkMode = false,
+}) => {
   return (
-    <div className={cn('flex w-full flex-row gap-2 self-stretch', className)}>
-      <span className='aucctus-text-xs-medium aucctus-text-white'>
-        <span className='aucctus-text-xs-bold aucctus-text-white mr-2 rounded-md border border-white p-1.5'>
+    <div
+      className={cn(
+        'flex flex w-full flex-row items-center gap-2 self-stretch',
+        className,
+      )}
+    >
+      <span
+        className={cn(
+          'aucctus-text-xs-medium flex items-center',
+          darkMode ? 'aucctus-text-secondary' : 'aucctus-text-white',
+        )}
+      >
+        <span
+          className={cn(
+            'aucctus-text-xs-bold mr-2 rounded-md border p-1.5',
+            darkMode
+              ? 'aucctus-border-primary aucctus-text-secondary'
+              : 'aucctus-text-white border-white',
+          )}
+        >
           BETA
         </span>
         This is an early feature and may make mistakes.

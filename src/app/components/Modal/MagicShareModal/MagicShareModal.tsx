@@ -5,6 +5,7 @@ import { cn } from '@libs/utils/react';
 import magicShareBg from '../../../assets/magic-share-background.png';
 import { ConceptShareFormat } from '@libs/api/types';
 import { useMagicShareModal } from '@components/Modal/MagicShareModal/hooks/useMagicShareModal';
+import BetaDisclaimer from '@components/BetaDisclaimer';
 
 interface MagicShareModalProps {
   conceptUuid: string;
@@ -386,6 +387,11 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
         </div>
       </div>
 
+      {/* Beta Disclaimer - Always visible */}
+      <div className='aucctus-bg-primary flex px-6 pt-4'>
+        <BetaDisclaimer darkMode />
+      </div>
+
       {/* Generation/Completion/Error Section */}
       {(isGenerating || isComplete || hasError) && (
         <div className='aucctus-bg-primary animate-fade-in px-6 pb-6 pt-2'>
@@ -529,7 +535,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
 
       {/* Content Section */}
       {!isGenerating && !isComplete && !hasError && (
-        <div className='aucctus-bg-primary max-h-[calc(90vh-14rem)] space-y-4 overflow-y-auto p-6'>
+        <div className='aucctus-bg-primary max-h-[calc(90vh-14rem)] space-y-4 overflow-y-auto px-6 pb-6 pt-2'>
           {/* Title */}
           <div className='text-center'>
             <div className='mb-2 flex items-center justify-center gap-2'>

@@ -140,6 +140,58 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
     };
   }, [query.data, pendingOverrides]);
 
+  // Cleanup effect: Clear overrides when API data shows sections are no longer pending
+  useEffect(() => {
+    if (!pendingOverrides || !query.data?.results) {
+      return;
+    }
+
+    const clearPendingSections =
+      useStore.getState().conceptReport.clearPendingSections;
+    if (!clearPendingSections) {
+      return;
+    }
+
+    // Check each concept for stale overrides
+    query.data.results.forEach((concept) => {
+      const overrides = concept.identifier
+        ? pendingOverrides[concept.identifier]
+        : undefined;
+
+      if (!overrides || !concept.reportStatusBySection) {
+        return;
+      }
+
+      const sectionsToClear = Object.entries(overrides)
+        .filter(([sectionKey, override]) => {
+          const current = concept.reportStatusBySection?.[sectionKey];
+          if (!current) {
+            return true; // Clear if section doesn't exist
+          }
+
+          if (current.status === 'pending') {
+            return false; // Keep override if still pending
+          }
+
+          // Clear if API shows newer completion/start date than override
+          if (current.dateCompleted && override.appliedAt) {
+            return current.dateCompleted > override.appliedAt;
+          }
+
+          if (current.dateStarted && override.appliedAt) {
+            return current.dateStarted > override.appliedAt;
+          }
+
+          return false;
+        })
+        .map(([sectionKey]) => sectionKey);
+
+      if (sectionsToClear.length > 0) {
+        clearPendingSections(concept.identifier, sectionsToClear);
+      }
+    });
+  }, [pendingOverrides, query.data?.results]);
+
   return { ...query, data: dataWithOverrides };
 };
 
@@ -1281,6 +1333,19 @@ export const useConceptReportCancel = () => {
       conceptIdentifier: string;
     }) => await api.concept.cancelReport(params.conceptUuid),
     onSuccess: (_data, params) => {
+      // Dismiss the progress toast for this concept
+      dismissConceptWorkflowToastForConcept(
+        params.conceptUuid,
+        params.conceptIdentifier,
+      );
+
+      // Clear any pending section overrides for this concept
+      const clearPendingSections =
+        useStore.getState().conceptReport.clearPendingSections;
+      if (clearPendingSections) {
+        clearPendingSections(params.conceptIdentifier);
+      }
+
       doFullConceptInvalidation(queryClient, params.conceptIdentifier);
       toast.success(
         'Report Cancelled',

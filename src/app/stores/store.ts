@@ -122,7 +122,12 @@ const useStore = create<IAppStore>()(
           },
           incubation: state.incubation,
           aiEditing: state.aiEditing,
-          conceptReport: state.conceptReport,
+          conceptReport: {
+            conceptUuid: state.conceptReport.conceptUuid,
+            identifier: state.conceptReport.identifier,
+            featureVersions: state.conceptReport.featureVersions,
+            // pendingSectionOverrides excluded - it's optimistic UI state that should not survive refreshes
+          },
           financialProjection: state.financialProjection,
           testCollateral: state.testCollateral,
           magicShare: state.magicShare, // Now safe to persist - snapshotUrl is just a URL, not base64
