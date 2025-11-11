@@ -264,6 +264,7 @@ const Testing: React.FC = () => {
             <div>
               <RecommendedTestSection
                 conceptUuid={conceptUuid}
+                conceptIdentifier={concept?.identifier || ''}
                 recommendedTest={recommendedTest}
                 onRunTest={handleRunTest}
                 generationState={generationState}
@@ -276,6 +277,7 @@ const Testing: React.FC = () => {
               tests={completedTests}
               conceptUuid={conceptUuid}
               concept={concept}
+              generationState={generationState}
             />
           </>
         )}

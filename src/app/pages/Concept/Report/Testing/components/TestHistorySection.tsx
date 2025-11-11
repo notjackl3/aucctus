@@ -2,17 +2,20 @@ import { Icon } from '@components';
 import React from 'react';
 import { ITestDetails } from '../types';
 import { TestHistoryItem } from './test-history';
+import type { ITestGenerationState } from '@hooks/sockets/testing';
 
 interface TestHistorySectionProps {
   tests: ITestDetails[];
   conceptUuid?: string;
   concept?: any; // Add concept prop to pass down to TestHistoryItem
+  generationState: ITestGenerationState;
 }
 
 const TestHistorySection: React.FC<TestHistorySectionProps> = ({
   tests,
   conceptUuid,
   concept,
+  generationState,
 }) => {
   if (tests.length === 0) {
     return (
@@ -74,6 +77,7 @@ const TestHistorySection: React.FC<TestHistorySectionProps> = ({
             isExpanded={false}
             conceptUuid={conceptUuid}
             concept={concept}
+            generationState={generationState}
           />
         ))}
       </div>

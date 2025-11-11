@@ -19,12 +19,14 @@ import TestValidationStats from './TestValidationStats';
 import TestResultsDisplay from './TestResultsDisplay';
 import TestAssumptionsDisplay from './TestAssumptionsDisplay';
 import RevertTestConfirmationModal from './RevertTestConfirmationModal';
+import type { ITestGenerationState } from '@hooks/sockets/testing';
 
 interface TestHistoryItemProps {
   test: ITestDetails;
   isExpanded: boolean;
   conceptUuid?: string;
   concept?: any; // Add concept prop needed for the modal
+  generationState: ITestGenerationState;
 }
 
 const TestStatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -37,6 +39,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
   isExpanded,
   conceptUuid,
   concept,
+  generationState,
 }) => {
   const { openModal } = useModal();
   const [showRevertModal, setShowRevertModal] = useState(false);
@@ -52,6 +55,9 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
 
   // Revert test mutation
   const revertTestMutation = useRevertTestDetail();
+
+  // Check if a test is currently being generated
+  const isGeneratingTest = generationState.status === 'in_progress';
 
   // Type cast the results to include extended properties
   const testResults = (fetchedResults as ITestResult[]) || [];
@@ -250,19 +256,35 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
                 <button
                   className={cn(
                     'btn btn-primary w-full transition-all duration-200',
-                    !conceptUuid && 'cursor-not-allowed opacity-50',
+                    (!conceptUuid || isGeneratingTest) &&
+                      'cursor-not-allowed opacity-50',
                   )}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleRevertTest();
                   }}
-                  disabled={!conceptUuid || revertTestMutation.isLoading}
-                  title='Revert this test back to active status'
+                  disabled={
+                    !conceptUuid ||
+                    revertTestMutation.isLoading ||
+                    isGeneratingTest
+                  }
+                  title={
+                    isGeneratingTest
+                      ? 'Cannot revert while a new test is being generated'
+                      : 'Revert this test back to active status'
+                  }
                 >
                   <>
                     <Icon
                       variant='refresh'
-                      className='aucctus-stroke-white mr-2 h-4 w-4'
+                      className={cn(
+                        'mr-2 h-4 w-4',
+                        !conceptUuid ||
+                          revertTestMutation.isLoading ||
+                          isGeneratingTest
+                          ? 'aucctus-stroke-secondary'
+                          : 'aucctus-stroke-white',
+                      )}
                     />
                     {revertTestMutation.isLoading
                       ? 'Reverting...'
@@ -284,6 +306,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
               <TestResultsDisplay
                 testResults={testResults}
                 hasResults={hasResults}
+                testDetails={test}
               />
             )}
 

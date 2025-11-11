@@ -190,3 +190,12 @@ export interface IApplyRecommendationsResponse {
   status: string;
   recommendationsCount: number;
 }
+
+// Generate Next Test Response
+export interface IGenerateNextTestResponse {
+  taskId: string;
+  status: string;
+  generatedTestUuid: string;
+  conceptUuid: string;
+  message: string;
+}

@@ -27,6 +27,7 @@ import {
   ISyntheticExecutionStatusResponse,
   ITestCollateralOption,
   IApplyRecommendationsResponse,
+  IGenerateNextTestResponse,
 } from './types/concept/testing';
 
 export class TestingApi extends ApiService {
@@ -532,6 +533,16 @@ export class TestingApi extends ApiService {
     return this.post<IApplyRecommendationsResponse>(
       `api/v2/concept/${conceptUuid}/testing/${testUuid}/apply-recommendations`,
       { recommendationUuids },
+    );
+  }
+
+  // Generate next recommended test
+  async generateNextTest(
+    conceptUuid: string,
+  ): Promise<IGenerateNextTestResponse> {
+    return this.post<IGenerateNextTestResponse>(
+      endpoints.conceptTestingGenerateNext(conceptUuid),
+      {},
     );
   }
 }

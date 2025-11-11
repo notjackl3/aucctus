@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { createPortal } from 'react-dom';
 import { useQueryClient } from 'react-query';
 import {
   useTestDetail,
@@ -8,7 +7,6 @@ import {
   useApplyRecommendations,
 } from '@hooks/query/testing.hook';
 import { markConceptSectionsPending } from '@hooks/query/concepts.hook';
-import TestCompletionWarningModal from '@components/Modal/TestCompletionWarningModal/TestCompletionWarningModal';
 import LoadingState from './components/LoadingState';
 import NoDataState from './components/NoDataState';
 import AssumptionValidationCard from './components/AssumptionValidationCard';
@@ -36,11 +34,6 @@ const TestImpact: React.FC<TestImpactProps> = ({
   const [updatingAssumptionUuid, setUpdatingAssumptionUuid] = useState<
     string | null
   >(null);
-  const [showWarningModal, setShowWarningModal] = useState(false);
-  const [warningModalData, setWarningModalData] = useState<{
-    testName: string;
-    affectingSections: string[];
-  } | null>(null);
 
   const queryClient = useQueryClient();
   const conceptIdentifier = useStore((state) => state.conceptReport.identifier);
@@ -130,31 +123,6 @@ const TestImpact: React.FC<TestImpactProps> = ({
       selectedUuids.includes(rec.uuid),
     );
 
-    // Check if any selected recommendation affects testing or assumptions
-    const testAffectingSections = ['assumptions', 'tests'];
-    const hasTestAffectingRecs = selectedRecommendations.some((rec) =>
-      testAffectingSections.includes(rec.section),
-    );
-
-    // Validate test is completed before allowing test-affecting recommendations
-    if (hasTestAffectingRecs && testDetail?.status !== 'completed') {
-      const sections = Array.from(
-        new Set(
-          selectedRecommendations
-            .filter((rec) => testAffectingSections.includes(rec.section))
-            .map((rec) => rec.section),
-        ),
-      );
-
-      // Show local warning modal instead of global modal
-      setWarningModalData({
-        testName: testDetail?.name || 'Current Test',
-        affectingSections: sections,
-      });
-      setShowWarningModal(true);
-      return;
-    }
-
     const mappedSections = selectedRecommendations
       .map((rec) => mapBackendSectionToReportKey(rec.section))
       .filter(
@@ -204,82 +172,50 @@ const TestImpact: React.FC<TestImpactProps> = ({
   const isDisabled = hasNoTestResults;
 
   return (
-    <>
-      <div className='relative space-y-6'>
-        {/* Loading Overlay for Test Completion */}
-        {isCompletingTest && (
-          <TestCompletionLoadingOverlay
-            title='Completing Test'
-            description="We're analyzing your results and preparing recommendations for your next test."
-            subtitle='This may take a moment as we process your findings...'
-          />
-        )}
+    <div className='relative space-y-6'>
+      {/* Loading Overlay for Test Completion */}
+      {isCompletingTest && (
+        <TestCompletionLoadingOverlay
+          title='Completing Test'
+          description="We're analyzing your results and preparing recommendations for your next test."
+          subtitle='This may take a moment as we process your findings...'
+        />
+      )}
 
-        <div
-          className={`${isDisabled ? 'pointer-events-none opacity-50' : ''}`}
-        >
-          {hasNoData ? (
-            <NoDataState />
-          ) : (
-            <div className='space-y-6'>
-              {/* Assumptions Validation Results */}
-              {!hasNoAssumptions && (
-                <div className='space-y-4'>
-                  <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
-                    Assumption Validation Results
-                  </h4>
-                  {assumptions.map((assumption) => (
-                    <AssumptionValidationCard
-                      key={assumption.uuid}
-                      assumption={assumption}
-                      isUpdating={updatingAssumptionUuid === assumption.uuid}
-                      onValidationChange={handleValidationStatusChange}
-                    />
-                  ))}
-                </div>
-              )}
+      <div className={`${isDisabled ? 'pointer-events-none opacity-50' : ''}`}>
+        {hasNoData ? (
+          <NoDataState />
+        ) : (
+          <div className='space-y-6'>
+            {/* Assumptions Validation Results */}
+            {!hasNoAssumptions && (
+              <div className='space-y-4'>
+                <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
+                  Assumption Validation Results
+                </h4>
+                {assumptions.map((assumption) => (
+                  <AssumptionValidationCard
+                    key={assumption.uuid}
+                    assumption={assumption}
+                    isUpdating={updatingAssumptionUuid === assumption.uuid}
+                    onValidationChange={handleValidationStatusChange}
+                  />
+                ))}
+              </div>
+            )}
 
-              {/* Recommended Concept Changes */}
-              {!hasNoRecommendations && (
-                <RecommendedChangesSection
-                  recommendations={comprehensiveRecommendations}
-                  onApplyRecommendations={handleApplyRecommendations}
-                  isApplying={applyRecommendations.isLoading}
-                />
-              )}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Warning Modal Portal - renders to document.body for full-screen overlay */}
-      {showWarningModal &&
-        warningModalData &&
-        typeof document !== 'undefined' &&
-        document.body &&
-        createPortal(
-          <div
-            className='fixed inset-0 z-50 flex items-center justify-center'
-            data-aucctus-portal-target='true'
-          >
-            {/* Backdrop */}
-            <div className='aucctus-bg-secondary-solid absolute inset-0 bg-opacity-50' />
-
-            {/* Modal Content */}
-            <div className='relative'>
-              <TestCompletionWarningModal
-                testName={warningModalData.testName}
-                affectingSections={warningModalData.affectingSections}
-                onClose={() => {
-                  setShowWarningModal(false);
-                  setWarningModalData(null);
-                }}
+            {/* Recommended Concept Changes */}
+            {!hasNoRecommendations && (
+              <RecommendedChangesSection
+                recommendations={comprehensiveRecommendations}
+                onApplyRecommendations={handleApplyRecommendations}
+                isApplying={applyRecommendations.isLoading}
               />
-            </div>
-          </div>,
-          document.body,
+            )}
+          </div>
         )}
-    </>
+      </div>
+    </div>
   );
 };
 

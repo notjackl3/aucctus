@@ -740,8 +740,8 @@ export const useTestResults = (
       options?.enabled !== undefined
         ? options.enabled
         : !!conceptUuid && !!testUuid,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    cacheTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 0, // 2 minutes
+    cacheTime: 0, // 2 minutes
   });
 
   return { ...query, results: query.data?.results || [] };
@@ -1725,6 +1725,39 @@ export const useApplyRecommendations = () => {
       const message = utils.osiris.parseFormError(e);
       toast.error(
         message || 'Failed to apply recommendations. Please try again.',
+      );
+    },
+  });
+};
+
+/**
+ * Custom hook for generating the next recommended test without completing an existing test.
+ * This allows users to generate additional tests on-demand.
+ * @returns The result of the useMutation hook.
+ */
+export const useGenerateNextTest = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { conceptUuid: string }) => {
+      const { conceptUuid } = params;
+      return await api.testing.generateNextTest(conceptUuid);
+    },
+    onSuccess: (_data, variables) => {
+      // Invalidate test details to show the new test when generation completes
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+      });
+      toast.success(
+        'Generating Test',
+        'Your next recommended test is being generated...',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Generate Test Failed',
+        message || 'Unable to generate next test. Please try again',
       );
     },
   });

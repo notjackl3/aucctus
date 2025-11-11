@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import ApplyRecommendationsWarningModal from './ApplyRecommendationsWarningModal';
 
 interface ComprehensiveEditRecommendation {
   uuid: string;
@@ -65,6 +66,9 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
   // Track selected recommendation UUIDs (default all pending selected)
   const [selectedUuids, setSelectedUuids] = useState<Set<string>>(new Set());
 
+  // Track whether to show warning modal
+  const [showWarningModal, setShowWarningModal] = useState(false);
+
   // Sync selectedUuids when pendingRecommendations change (e.g., after deletion/regeneration)
   useEffect(() => {
     setSelectedUuids(new Set(pendingRecommendations.map((rec) => rec.uuid)));
@@ -103,8 +107,17 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
 
   const handleApply = () => {
     if (selectedUuids.size > 0) {
-      onApplyRecommendations(Array.from(selectedUuids));
+      setShowWarningModal(true);
     }
+  };
+
+  const handleConfirmApply = () => {
+    setShowWarningModal(false);
+    onApplyRecommendations(Array.from(selectedUuids));
+  };
+
+  const handleCancelApply = () => {
+    setShowWarningModal(false);
   };
 
   if (recommendations.length === 0) {
@@ -337,6 +350,15 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
           );
         })}
       </div>
+
+      {/* Warning Modal */}
+      {showWarningModal && (
+        <ApplyRecommendationsWarningModal
+          recommendationCount={selectedUuids.size}
+          onConfirm={handleConfirmApply}
+          onCancel={handleCancelApply}
+        />
+      )}
     </div>
   );
 };

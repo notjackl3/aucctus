@@ -11,9 +11,12 @@ import { useTestCompletion } from '../Testing';
 import type { ITestGenerationState } from '@hooks/sockets/testing';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useAgentEstimatedTime } from '@hooks/query/agent-timing.hook';
+import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
+import { useGenerateNextTest } from '@hooks/query/testing.hook';
 
 interface RecommendedTestSectionProps {
   conceptUuid: string;
+  conceptIdentifier: string;
   recommendedTest: RecommendedTest | null;
   onRunTest: () => void;
   generationState: ITestGenerationState;
@@ -22,6 +25,7 @@ interface RecommendedTestSectionProps {
 
 const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   conceptUuid,
+  conceptIdentifier,
   recommendedTest,
   onRunTest,
   generationState,
@@ -35,6 +39,31 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
     generationState.message || 'Generating your next recommended test...';
   const showDebugControls =
     __ENVIRONMENT__ === 'development' && isDebugModeEnabled;
+
+  // Fetch assumptions to check validation status using V2 API
+  // Fetch all assumptions across all categories with a high page size
+  const { assumptions: conceptAssumptions, isLoading: isLoadingAssumptions } =
+    useFilteredAssumptions(conceptIdentifier, {
+      page: 1,
+      page_size: 100,
+    });
+
+  // Generate next test mutation
+  const generateNextTest = useGenerateNextTest();
+
+  // Check if all assumptions are validated
+  const allAssumptionsValidated = useMemo(() => {
+    if (!conceptAssumptions || conceptAssumptions.length === 0) {
+      // If no assumptions exist, consider them "all validated" to avoid showing the button
+      return true;
+    }
+    // V2 assumptions use 'validationStatus' field
+    // Status can be: 'validated', 'invalidated', 'untested'
+    // We consider an assumption validated if its validationStatus is 'validated'
+    return conceptAssumptions.every(
+      (assumption) => assumption.validationStatus === 'validated',
+    );
+  }, [conceptAssumptions]);
 
   // Fetch timing estimate for TestGenerationPipeline
   const { data: timingData, refetch: refetchAgentTiming } =
@@ -65,7 +94,28 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
     }
   };
 
+  const handleGenerateNextTest = () => {
+    generateNextTest.mutate({ conceptUuid });
+  };
+
   if (!recommendedTest) {
+    // Show loading state while fetching assumptions
+    if (isLoadingAssumptions) {
+      return (
+        <div className='aucctus-bg-primary aucctus-border-secondary relative rounded-lg border p-6 shadow-sm'>
+          <div className='flex flex-col items-center justify-center py-8'>
+            <Icon
+              variant='refresh'
+              className='aucctus-stroke-brand-primary mb-3 h-8 w-8 animate-spin'
+            />
+            <p className='aucctus-text-sm-medium aucctus-text-brand-secondary'>
+              Checking assumptions...
+            </p>
+          </div>
+        </div>
+      );
+    }
+
     if (isGenerating) {
       return (
         <div className='aucctus-bg-primary aucctus-border-secondary relative rounded-lg border p-6 shadow-sm'>
@@ -129,6 +179,75 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
       );
     }
 
+    // No recommended test and not generating - check if all assumptions validated
+    if (!allAssumptionsValidated) {
+      // Some assumptions still need validation - show generate next test button
+      return (
+        <div
+          className={cn(
+            'aucctus-bg-primary aucctus-border-secondary relative rounded-lg border p-6 shadow-sm',
+            (isCompletingTest || generateNextTest.isLoading) &&
+              'pointer-events-none',
+          )}
+        >
+          {(isCompletingTest || generateNextTest.isLoading) && (
+            <div className='absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white bg-opacity-75'>
+              <div className='flex flex-col items-center gap-3'>
+                <Icon
+                  variant='refresh'
+                  className='aucctus-stroke-brand-primary h-8 w-8 animate-spin'
+                />
+                <p className='aucctus-text-sm-medium aucctus-text-brand-primary'>
+                  Generating next test...
+                </p>
+              </div>
+            </div>
+          )}
+          <div className='flex flex-col items-center justify-center py-8'>
+            <Icon
+              variant='telescope'
+              height={48}
+              width={48}
+              className='aucctus-stroke-brand-primary mb-4'
+            />
+            <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
+              No recommended test yet
+            </h3>
+            <p className='aucctus-text-sm-regular aucctus-text-brand-secondary mb-4 max-w-md text-center'>
+              You have{' '}
+              {
+                conceptAssumptions.filter(
+                  (a) => a.validationStatus !== 'validated',
+                ).length
+              }{' '}
+              assumption
+              {conceptAssumptions.filter(
+                (a) => a.validationStatus !== 'validated',
+              ).length !== 1
+                ? 's'
+                : ''}{' '}
+              that still need
+              {conceptAssumptions.filter(
+                (a) => a.validationStatus !== 'validated',
+              ).length !== 1
+                ? ''
+                : 's'}{' '}
+              validation. Generate a test to continue validating your concept.
+            </p>
+            <button
+              onClick={handleGenerateNextTest}
+              disabled={generateNextTest.isLoading}
+              className='btn btn-primary flex items-center gap-2'
+            >
+              <Icon variant='plus' className='aucctus-stroke-white h-4 w-4' />
+              Generate Next Test
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // All assumptions validated - show success state
     return (
       <div
         className={cn(
@@ -157,11 +276,13 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
             className='aucctus-stroke-success-primary mb-4'
           />
           <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
-            All assumptions tested!
+            All assumptions validated!
           </h3>
           <p className='aucctus-text-sm-regular aucctus-text-brand-secondary max-w-md text-center'>
-            You&apos;ve done a great job validating your assumptions. Continue
-            monitoring the market for new insights.
+            You&apos;ve done a great job validating all{' '}
+            {conceptAssumptions.length} assumption
+            {conceptAssumptions.length !== 1 ? 's' : ''}. Continue monitoring
+            the market for new insights.
           </p>
         </div>
       </div>

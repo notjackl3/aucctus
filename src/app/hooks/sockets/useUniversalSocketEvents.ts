@@ -333,6 +333,9 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   const clearPendingSections = useStore(
     (state) => state.conceptReport.clearPendingSections,
   );
+  const activeConceptUuid = useStore(
+    (state) => state.conceptReport.conceptUuid,
+  );
 
   // Prevent duplicate toasts by tracking recent messages
   const recentMessages = React.useRef(new Set<string>());
@@ -854,10 +857,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           queryClient.invalidateQueries({
             queryKey: [AucctusQueryKeys.concept, message.conceptUuid],
           });
-          if (
-            message.conceptRootIdentifier &&
-            message.conceptRootIdentifier !== message.conceptUuid
-          ) {
+          if (message.conceptRootIdentifier) {
             queryClient.invalidateQueries({
               queryKey: [
                 AucctusQueryKeys.concept,
@@ -871,17 +871,14 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           syncPendingOverridesFromServer(overrideIdentifier, normalizedStatus);
 
           // Show completion toast for individual sections
-          // Only show toast if this is for the currently active concept
-          const activeConceptUuid =
-            useStore.getState().conceptReport.conceptUuid;
+          // Only show toast if the concept UUID (NOT identifier) matches the active concept UUID
           const toastKeys = getToastKeysFromMessage(message);
           const hasActiveProgressToast =
             getToastRecordForKeys(toastKeys, true) !== undefined;
-          const matchesActive =
-            message.conceptUuid === activeConceptUuid ||
-            message.conceptRootIdentifier === activeConceptUuid;
+          const matchesActiveConcept =
+            activeConceptUuid && message.conceptUuid === activeConceptUuid;
 
-          if (matchesActive && !hasActiveProgressToast) {
+          if (matchesActiveConcept && !hasActiveProgressToast) {
             toast.success(
               `Section updated successfully!`,
               message.message || 'Your changes have been applied.',
