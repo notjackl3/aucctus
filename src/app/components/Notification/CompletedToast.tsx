@@ -19,7 +19,10 @@ interface CompletedToastProps extends Partial<ToastContentProps> {
  * CompletedToast Component
  * Displays a success toast with confetti animation and completion details
  */
-const CompletedToast: React.FC<CompletedToastProps> = ({ data }) => {
+const CompletedToast: React.FC<CompletedToastProps> = ({
+  data,
+  closeToast,
+}) => {
   const {
     title = 'Completed',
     description,
@@ -28,9 +31,18 @@ const CompletedToast: React.FC<CompletedToastProps> = ({ data }) => {
   } = data || {};
 
   return (
-    <div className='flex w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-lg border border-l-4 border-l-green-500 bg-white/80 p-4 shadow-lg backdrop-blur-md dark:bg-gray-900/80'>
+    <div className='relative flex w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-lg border border-l-4 border-l-green-500 bg-white/80 p-4 shadow-lg backdrop-blur-md dark:bg-gray-900/80'>
+      {/* Close button */}
+      <button
+        onClick={closeToast}
+        className='aucctus-stroke-secondary group absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-gray-200/50'
+        aria-label='Close'
+      >
+        <span className='text-gray-400 group-hover:text-gray-600'>×</span>
+      </button>
+
       {/* Title with confetti animation */}
-      <div className='mb-3 flex items-center gap-2'>
+      <div className='mb-3 flex items-center gap-2 pr-6'>
         <Lottie
           animationData={animations.confetti}
           loop={true}

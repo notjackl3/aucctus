@@ -46,6 +46,59 @@ type ConceptWorkflowToastRecord = {
 
 const conceptWorkflowToasts = new Map<string, ConceptWorkflowToastRecord>();
 
+// SessionStorage helpers for persistence across refreshes
+const STORAGE_KEY_PREFIX = 'concept-workflow-toast-';
+const TOAST_TTL_MS = 60 * 60 * 1000; // 1 hour in milliseconds
+
+type PersistedToastData = {
+  data: ProgressToastPayload;
+  timestamp: number;
+};
+
+const persistToastData = (key: string, data: ProgressToastPayload) => {
+  try {
+    const persistedData: PersistedToastData = {
+      data,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(
+      STORAGE_KEY_PREFIX + key,
+      JSON.stringify(persistedData),
+    );
+  } catch (e) {
+    // Silently fail if storage is unavailable
+  }
+};
+
+const getPersistedToastData = (key: string): ProgressToastPayload | null => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY_PREFIX + key);
+    if (!stored) return null;
+
+    const persistedData: PersistedToastData = JSON.parse(stored);
+
+    // Check if data has expired (older than 1 hour)
+    const age = Date.now() - persistedData.timestamp;
+    if (age > TOAST_TTL_MS) {
+      // Clean up expired data
+      clearPersistedToastData(key);
+      return null;
+    }
+
+    return persistedData.data;
+  } catch (e) {
+    return null;
+  }
+};
+
+const clearPersistedToastData = (key: string) => {
+  try {
+    localStorage.removeItem(STORAGE_KEY_PREFIX + key);
+  } catch (e) {
+    // Silently fail
+  }
+};
+
 const registerToastRecordKeys = (
   record: ConceptWorkflowToastRecord,
   keys: string[],
@@ -54,6 +107,7 @@ const registerToastRecordKeys = (
     if (!key) return;
     record.keys.add(key);
     conceptWorkflowToasts.set(key, record);
+    persistToastData(key, record.data);
   });
 };
 
@@ -75,7 +129,10 @@ const getToastRecordForKeys = (
 };
 
 const clearToastRecord = (record: ConceptWorkflowToastRecord) => {
-  record.keys.forEach((key) => conceptWorkflowToasts.delete(key));
+  record.keys.forEach((key) => {
+    conceptWorkflowToasts.delete(key);
+    clearPersistedToastData(key);
+  });
   record.keys.clear();
 };
 
@@ -115,6 +172,7 @@ export const dismissConceptWorkflowToastForConcept = (
  * Restore/show the progress toast for a concept workflow
  * Creates a new toast with the current progress data if a record exists and the toast is not already visible
  * This is useful when the user has dismissed the toast but wants to see progress again
+ * Also checks localStorage for persisted data after page refresh
  */
 export const restoreConceptWorkflowToast = (
   conceptUuid?: string,
@@ -128,10 +186,26 @@ export const restoreConceptWorkflowToast = (
     return;
   }
 
-  const existing = getToastRecordForKeys(keys);
+  let existing = getToastRecordForKeys(keys);
 
-  // If no record exists, we can't restore the toast
+  // If no in-memory record, try to restore from sessionStorage
   if (!existing) {
+    for (const key of keys) {
+      if (!key) continue;
+      const persistedData = getPersistedToastData(key);
+      if (persistedData) {
+        // Create a new toast from persisted data
+        const toastId = toast.progress(persistedData);
+        existing = {
+          toastId,
+          data: persistedData,
+          keys: new Set<string>(),
+        };
+        registerToastRecordKeys(existing, keys);
+        return;
+      }
+    }
+    // No persisted data either
     return;
   }
 
@@ -470,17 +544,30 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     const existing = getToastRecordForKeys(toastKeys, true);
     const startTime = existing?.data.startTime ?? Date.now();
 
+    // Try to get concept title from cache
+    const conceptUuid = message.conceptUuid || existing?.data.conceptUuid;
+    const conceptData = queryClient.getQueryData<IConcept>([
+      AucctusQueryKeys.conceptOverview,
+      conceptUuid,
+    ]);
+    const conceptTitle = conceptData?.title;
+
     telemetry.debug('concept_workflow.toast.upsert', {
       toastKeys,
       stageKey,
       stageMessage,
       hasExisting: Boolean(existing),
+      conceptTitle,
     });
 
     const payload: ProgressToastPayload = {
-      title: existing?.data.title || 'Generating Concept Report',
+      title:
+        existing?.data.title ||
+        (conceptTitle
+          ? `Generating ${conceptTitle}`
+          : 'Generating Concept Report'),
       agentName: 'ConceptReportPipeline',
-      conceptUuid: message.conceptUuid || existing?.data.conceptUuid,
+      conceptUuid: conceptUuid,
       message: stageMessage,
       startTime,
       overrideEstimatedSeconds: existing?.data.overrideEstimatedSeconds,
@@ -574,7 +661,17 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       if (sectionStatus === 'pending') {
         const dateStarted =
           typeof status === 'string' ? undefined : status.dateStarted;
-        sectionsToAdd[sectionKey] = dateStarted || new Date().toISOString();
+        // Only add override if the section has actually started (has a dateStarted value)
+        // Sections that are pending but haven't started yet should not have overrides
+        if (dateStarted) {
+          sectionsToAdd[sectionKey] = dateStarted;
+        } else {
+          // If section is pending but hasn't started, clear any stale overrides
+          const override = existingOverrides[sectionKey];
+          if (override) {
+            sectionsToClear.push(sectionKey);
+          }
+        }
         return;
       }
 

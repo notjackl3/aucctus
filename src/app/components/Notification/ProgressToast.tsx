@@ -27,7 +27,7 @@ interface ProgressToastProps extends Partial<ToastContentProps> {
  * ProgressToast Component
  * Displays a toast notification with animated progress indicator and cancel action
  */
-const ProgressToast: React.FC<ProgressToastProps> = ({ data }) => {
+const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
   const {
     title = 'Processing',
     estimatedTime = 5,
@@ -50,15 +50,24 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data }) => {
   const hasAgentProgress = Boolean(agentName);
 
   return (
-    <div className='flex w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-lg border border-l-4 border-l-blue-500 bg-white/80 p-4 shadow-lg backdrop-blur-md dark:bg-gray-900/80'>
+    <div className='relative flex w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-lg border border-l-4 border-l-blue-500 bg-white/80 p-4 shadow-lg backdrop-blur-md dark:bg-gray-900/80'>
+      {/* Close button */}
+      <button
+        onClick={closeToast}
+        className='aucctus-stroke-secondary group absolute right-2 top-2 flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:bg-gray-200/50'
+        aria-label='Close'
+      >
+        <span className='text-gray-400 group-hover:text-gray-600'>×</span>
+      </button>
+
       {/* Title with animation */}
-      <div className='mb-3 flex items-center gap-2'>
+      <div className='mb-3 flex items-center gap-2 pr-6'>
         <Lottie
           animationData={animations.hourglass}
           loop={true}
           className='h-5 w-5 [&_path]:!fill-[#120A0A]'
         />
-        <span className='aucctus-text-md-semibold aucctus-text-primary'>
+        <span className='aucctus-text-sm-semibold aucctus-text-primary line-clamp-1'>
           {title}
         </span>
       </div>

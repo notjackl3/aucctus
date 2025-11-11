@@ -5,7 +5,6 @@ import { cn } from '@libs/utils/react';
 import magicShareBg from '../../../assets/magic-share-background.png';
 import { ConceptShareFormat } from '@libs/api/types';
 import { useMagicShareModal } from '@components/Modal/MagicShareModal/hooks/useMagicShareModal';
-import BetaDisclaimer from '@components/BetaDisclaimer';
 
 interface MagicShareModalProps {
   conceptUuid: string;
@@ -305,6 +304,13 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
 
         {/* Floating Cards */}
         <div className='absolute inset-0 flex items-center justify-center'>
+          {/* Beta Badge - Bottom Left */}
+          <div className='absolute bottom-4 left-4'>
+            <span className='aucctus-text-xs-bold rounded-md border border-white px-2 py-1.5 text-white'>
+              BETA
+            </span>
+          </div>
+
           {/* PDF Card */}
           <div className='animate-card-pdf absolute left-1/2'>
             <div className='flex h-32 w-24 flex-col rounded-lg border border-white/20 bg-white/10 p-2.5 shadow-2xl backdrop-blur-md'>
@@ -385,11 +391,6 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
             </div>
           </div>
         </div>
-      </div>
-
-      {/* Beta Disclaimer - Always visible */}
-      <div className='aucctus-bg-primary flex px-6 pt-4'>
-        <BetaDisclaimer darkMode />
       </div>
 
       {/* Generation/Completion/Error Section */}

@@ -5,7 +5,7 @@ import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-import { FunctionComponent, useMemo } from 'react';
+import { FunctionComponent, useMemo, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { IConceptReportContext } from './ConceptReport/ConceptReport';
 
@@ -20,6 +20,9 @@ const OverviewDetails: FunctionComponent = () => {
     useConceptCustomerProfiles(activeConceptUuid);
 
   const { valueProposition, problemStatement, overview } = useEditConcept();
+
+  // State for toggling image object-fit
+  const [isObjectCover, setIsObjectCover] = useState(true);
 
   // Use unified loading state
   const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
@@ -124,7 +127,8 @@ const OverviewDetails: FunctionComponent = () => {
           <img
             src={concept.conceptImageUrl}
             alt='Concept Image'
-            className='h-64 w-64 object-cover'
+            className={`h-64 w-64 cursor-pointer ${isObjectCover ? 'object-cover' : 'object-contain'}`}
+            onClick={() => setIsObjectCover(!isObjectCover)}
           />
         )}
       </section>
