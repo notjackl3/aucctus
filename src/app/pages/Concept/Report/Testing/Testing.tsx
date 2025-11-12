@@ -16,7 +16,6 @@ import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
 import { useTestGenerationEvents } from '@hooks/sockets/testing';
 
-// Context for tracking test completion loading state
 interface TestCompletionContextType {
   isCompletingTest: boolean;
   setIsCompletingTest: (loading: boolean) => void;

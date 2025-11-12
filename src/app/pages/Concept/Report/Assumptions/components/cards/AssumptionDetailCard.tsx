@@ -2,28 +2,25 @@ import React, { useState, useCallback } from 'react';
 import { Icon, Modal } from '@components';
 import StatusBadge from '../badges/StatusBadge';
 import RiskBadge from '../badges/RiskBadge';
-import ImportanceMeter from '../badges/ImportanceMeter';
-import CertaintyMeter from '../badges/CertaintyMeter';
+import EditableImportanceMeter from '../badges/EditableImportanceMeter';
+import EditableCertaintyMeter from '../badges/EditableCertaintyMeter';
 import ValidationBenchmarkCard from '../../../Testing/components/modal-sections/test-impact/components/ValidationBenchmarkCard';
 import { getCategoryColors } from '../../constants/categoryColors';
 import { getCategoryIcon } from '../../utils/assumptionUtils';
 import { IAssumptionV2, AssumptionStatusV2 } from '@libs/api/types';
-import {
-  useAssumptionUpdate,
-  useAssumptionRemove,
-} from '@hooks/query/concepts.hook';
+import { useAssumptionRemove } from '@hooks/query/concepts.hook';
 import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
 import useStore from '@stores/store';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
+import { useBatchAssumptionChangesStore } from '@stores/batch-assumption-changes';
 
 interface AssumptionDetailCardProps {
   assumption: IAssumptionV2;
   onClick?: () => void;
   showBenchmark?: boolean;
   showActions?: boolean;
-  onEdit?: () => void;
   onDelete?: () => void;
 }
 
@@ -32,16 +29,19 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   onClick,
   showBenchmark,
   showActions = true,
-  onEdit,
   onDelete,
 }) => {
   const conceptIdentifier = useStore((state) => state.conceptReport.identifier);
   const { openModal } = useModal();
   const navigate = useNavigate();
   const [isHovering, setIsHovering] = useState(false);
+  const [isEditingStatement, setIsEditingStatement] = useState(false);
+  const [editedStatement, setEditedStatement] = useState(assumption.statement);
+
+  // Batch changes store
+  const { addChange } = useBatchAssumptionChangesStore();
 
   // Mutation hooks
-  const { mutate: updateAssumption } = useAssumptionUpdate();
   const { mutate: removeAssumption } = useAssumptionRemove();
 
   // Get category colors
@@ -73,75 +73,105 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   const handleMouseEnter = useCallback(() => setIsHovering(true), []);
   const handleMouseLeave = useCallback(() => setIsHovering(false), []);
 
-  const handleEditAssumption = useCallback(
-    (e: React.MouseEvent) => {
-      e.stopPropagation();
+  const handleStatementClick = useCallback(() => {
+    if (showActions && !isEditingStatement) {
+      setIsEditingStatement(true);
+      setEditedStatement(assumption.statement);
+    }
+  }, [showActions, isEditingStatement, assumption.statement]);
 
-      // Use onEdit prop if provided (for inline editing)
-      if (onEdit) {
-        onEdit();
-        return;
+  const handleSaveStatement = useCallback(() => {
+    const trimmedStatement = editedStatement.trim();
+
+    if (!trimmedStatement) {
+      // Don't save empty statements
+      setEditedStatement(assumption.statement);
+      setIsEditingStatement(false);
+      return;
+    }
+
+    if (trimmedStatement === assumption.statement) {
+      // No changes, just close editing
+      setIsEditingStatement(false);
+      return;
+    }
+
+    // Add change directly to batch store - this will show the yellow banner
+    // without triggering the card-level edit mode
+    addChange({
+      id: assumption.uuid,
+      type: 'edit',
+      originalData: assumption,
+      changes: {
+        statement: trimmedStatement,
+        category: assumption.category,
+        importance: assumption.importance,
+        certainty: assumption.certainty,
+      },
+    });
+
+    setIsEditingStatement(false);
+  }, [editedStatement, assumption, addChange]);
+
+  const handleCancelStatement = useCallback(() => {
+    setEditedStatement(assumption.statement);
+    setIsEditingStatement(false);
+  }, [assumption.statement]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === 'Escape') {
+        handleCancelStatement();
+      } else if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        handleSaveStatement();
       }
-
-      // Fallback to old modal behavior
-      openModal(
-        Modal.AssumptionStatementModal,
-        {
-          mode: 'edit',
-          initialStatement: assumption.statement,
-          onSubmit: () => {
-            // This won't be called when onConfirm is provided
-          },
-          onConfirm: async (statement: string) => {
-            // Helper functions for data transformation
-            const convertToBackendCategory = (
-              frontendCategory: string,
-            ): string => {
-              const categoryMap: Record<string, string> = {
-                desirability: 'Desirability',
-                viability: 'Viability',
-                feasibility: 'Feasibility',
-                adaptability: 'Adaptability',
-              };
-              return categoryMap[frontendCategory] || frontendCategory;
-            };
-
-            const convertToBackendScore = (frontendScore: number): number => {
-              // Convert 0-1 range to 1-3 range
-              if (frontendScore < 0.33) return 1; // Low
-              if (frontendScore < 0.66) return 2; // Medium
-              return 3; // High
-            };
-
-            updateAssumption({
-              rootIdentifier: conceptIdentifier!,
-              assumptionUuid: assumption.uuid,
-              data: {
-                statement,
-                category: convertToBackendCategory(assumption.category),
-                importance: convertToBackendScore(assumption.importance),
-                certainty: convertToBackendScore(assumption.certainty),
-              } as any, // Type assertion needed due to API type mismatch
-            });
-            navigate(AppPath.ConceptBank, {
-              replace: true,
-            });
-          },
-        },
-        {
-          position: 'center',
-          backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-20',
-        },
-      );
     },
-    [
-      assumption,
-      conceptIdentifier,
-      openModal,
-      updateAssumption,
-      onEdit,
-      navigate,
-    ],
+    [handleCancelStatement, handleSaveStatement],
+  );
+
+  const handleImportanceChange = useCallback(
+    (newImportance: number) => {
+      // Convert percentage (0-100) to 0-1 range
+      const importanceValue = newImportance / 100;
+
+      // Add change directly to batch store - this will show the yellow banner
+      // without triggering the card-level edit mode
+      addChange({
+        id: assumption.uuid,
+        type: 'edit',
+        originalData: assumption,
+        changes: {
+          statement: assumption.statement,
+          category: assumption.category,
+          importance: importanceValue, // 0-1 range (frontend format)
+          certainty: assumption.certainty, // Keep existing certainty
+        },
+      });
+    },
+    [assumption, addChange],
+  );
+
+  const handleCertaintyChange = useCallback(
+    (newCertainty: number) => {
+      // Convert percentage (0-100) to 0-1 range
+      const certaintyValue = newCertainty / 100;
+
+      // Add change directly to batch store - this will show the yellow banner
+      // without triggering the card-level edit mode
+      addChange({
+        id: assumption.uuid,
+        type: 'edit',
+        originalData: assumption,
+        changes: {
+          statement: assumption.statement,
+          category: assumption.category,
+          importance: assumption.importance, // Keep existing importance
+          certainty: certaintyValue, // 0-1 range (frontend format)
+        },
+      });
+    },
+    [assumption, addChange],
   );
 
   const handleDeleteAssumption = useCallback(
@@ -198,14 +228,42 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
       </div>
 
       {/* Assumption statement */}
-      <p className='aucctus-text-md-semibold aucctus-text-primary mb-4'>
-        {assumption.statement}
-      </p>
+      {isEditingStatement ? (
+        <div className='mb-4'>
+          <textarea
+            value={editedStatement}
+            onChange={(e) => setEditedStatement(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={handleSaveStatement}
+            className='aucctus-text-md-semibold aucctus-text-primary aucctus-bg-primary aucctus-border-brand w-full rounded-md border-2 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
+            rows={3}
+            autoFocus
+          />
+          <div className='aucctus-text-xs aucctus-text-tertiary mt-1'>
+            Press Cmd/Ctrl+Enter to save, Esc to cancel
+          </div>
+        </div>
+      ) : (
+        <p
+          className='aucctus-text-md-semibold aucctus-text-primary mb-4 cursor-text'
+          onClick={handleStatementClick}
+        >
+          {assumption.statement}
+        </p>
+      )}
 
-      {/* Meters */}
+      {/* Meters - Editable dropdowns */}
       <div className='mb-4 mt-3 flex flex-wrap gap-2'>
-        <ImportanceMeter importance={importancePercentage} />
-        <CertaintyMeter certainty={certaintyPercentage} />
+        <EditableImportanceMeter
+          importance={importancePercentage}
+          onChange={handleImportanceChange}
+          disabled={!showActions}
+        />
+        <EditableCertaintyMeter
+          certainty={certaintyPercentage}
+          onChange={handleCertaintyChange}
+          disabled={!showActions}
+        />
       </div>
 
       {showBenchmark && assumption.benchmark && (
@@ -216,20 +274,13 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
       {showActions && (
         <div
           className={cn(
-            'absolute bottom-3 right-3 flex gap-2 transition-all duration-300',
+            'absolute bottom-3 right-3 transition-all duration-300',
             {
               'pointer-events-none opacity-0': !isHovering,
               'pointer-events-auto opacity-100': isHovering,
             },
           )}
         >
-          <button
-            onClick={handleEditAssumption}
-            className='aucctus-bg-primary-hover aucctus-border-secondary rounded-md border p-2 shadow-sm'
-            aria-label='Edit assumption'
-          >
-            <Icon variant='edit' className='aucctus-stroke-secondary h-4 w-4' />
-          </button>
           <button
             onClick={onDelete || handleDeleteAssumption}
             className='aucctus-bg-primary-hover aucctus-border-secondary rounded-md border p-2 shadow-sm'

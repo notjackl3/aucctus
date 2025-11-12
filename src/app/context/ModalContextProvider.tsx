@@ -102,13 +102,27 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     }));
 
     const cleanup = () => {
-      document.body.style.overflow = '';
-      setModalState((prev) => ({
-        ...prev,
-        isOpen: false,
-        content: null,
-        isClosing: false,
-      }));
+      setModalState((prev) => {
+        if (!prev.isClosing) {
+          return prev;
+        }
+
+        if (prev.options.hideBodyScroll) {
+          document.body.style.overflow = '';
+        }
+
+        return {
+          ...prev,
+          isOpen: false,
+          content: null,
+          options: {
+            position: prev.options.position,
+            shouldCloseOnOverlayClick: prev.options.shouldCloseOnOverlayClick,
+            shouldCloseOnEscape: prev.options.shouldCloseOnEscape,
+          },
+          isClosing: false,
+        };
+      });
     };
 
     setTimeout(cleanup, 300);

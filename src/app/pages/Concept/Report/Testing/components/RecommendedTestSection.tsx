@@ -1,18 +1,26 @@
-import { Icon } from '@components';
+import { Icon, Modal } from '@components';
 import { AgentProgressBar } from '@components/Progress';
 import { cn } from '@libs/utils/react';
-import React, { useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { RecommendedTest } from '../types';
 import { RISK_LEVEL_CONFIGS } from '../../Assumptions/constants/statusConfigs';
 import CategoryIcon from '../../Assumptions/components/cards/category-progress-card/CategoryIcon';
 import GenericStatusBadge from '../../Assumptions/components/shared/GenericStatusBadge';
+import AssumptionDropdown from './AssumptionDropdown';
 
 import { useTestCompletion } from '../Testing';
 import type { ITestGenerationState } from '@hooks/sockets/testing';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useAgentEstimatedTime } from '@hooks/query/agent-timing.hook';
 import { useFilteredAssumptions } from '@hooks/query/assumptions.hook';
-import { useGenerateNextTest } from '@hooks/query/testing.hook';
+import {
+  useGenerateNextTest,
+  useCreateTestAssumption,
+  useDeleteTestAssumption,
+  useRegenerateTestDetails,
+} from '@hooks/query/testing.hook';
+import { useModal } from '@context/ModalContextProvider';
+import type { AssumptionCategory } from '@libs/api/types/concept/assumptions';
 
 interface RecommendedTestSectionProps {
   conceptUuid: string;
@@ -40,6 +48,22 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   const showDebugControls =
     __ENVIRONMENT__ === 'development' && isDebugModeEnabled;
 
+  // State for assumption management
+  const { openModal } = useModal();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [pendingAdditions, setPendingAdditions] = useState<string[]>([]);
+  const [pendingRemovals, setPendingRemovals] = useState<string[]>([]);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Mutation hooks for assumption management
+  const createTestAssumption = useCreateTestAssumption({
+    showSuccessToast: false,
+  });
+  const deleteTestAssumption = useDeleteTestAssumption({
+    showSuccessToast: false,
+  });
+  const regenerateTestDetails = useRegenerateTestDetails();
+
   // Fetch assumptions to check validation status using V2 API
   // Fetch all assumptions across all categories with a high page size
   const { assumptions: conceptAssumptions, isLoading: isLoadingAssumptions } =
@@ -64,6 +88,56 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
       (assumption) => assumption.validationStatus === 'validated',
     );
   }, [conceptAssumptions]);
+
+  // Get assumptions from recommended test and handle pending changes
+  const assumptions = useMemo(
+    () => recommendedTest?.testDetails.assumptions ?? [],
+    [recommendedTest],
+  );
+
+  const testUuid = recommendedTest?.testDetails.uuid ?? '';
+
+  // Extract existing assumption UUIDs
+  const existingAssumptionUuids = useMemo(() => {
+    return assumptions
+      .map((assumption) => {
+        const assumptionObj = assumption as unknown as Record<string, any>;
+        const possibleUuid =
+          assumption.assumptionUuid ||
+          assumptionObj.assumption_uuid ||
+          assumptionObj.assumptionUuid ||
+          null;
+        return possibleUuid ? String(possibleUuid) : null;
+      })
+      .filter((uuid): uuid is string => uuid !== null);
+  }, [assumptions]);
+
+  // Extract assumption statements for versioning compatibility
+  const existingAssumptionStatements = useMemo(
+    () => new Set(assumptions.map((a) => a.statement)),
+    [assumptions],
+  );
+
+  // Combine existing assumptions with pending ones for display
+  const displayAssumptions = useMemo(() => {
+    // Filter out assumptions marked for removal
+    const filteredAssumptions = assumptions.filter((a) => {
+      const uuid = a.assumptionUuid || (a as any).assumption_uuid || a.uuid;
+      return !pendingRemovals.includes(uuid);
+    });
+
+    // Get pending assumption objects from conceptAssumptions
+    const pendingAssumptionObjects = pendingAdditions
+      .map((uuid) => conceptAssumptions.find((a) => a.uuid === uuid))
+      .filter((a): a is (typeof conceptAssumptions)[0] => a !== undefined)
+      .map((a) => ({
+        ...a,
+        // Add a flag to indicate this is pending
+        isPending: true,
+      }));
+
+    return [...filteredAssumptions, ...pendingAssumptionObjects];
+  }, [assumptions, pendingAdditions, pendingRemovals, conceptAssumptions]);
 
   // Fetch timing estimate for TestGenerationPipeline
   const { data: timingData, refetch: refetchAgentTiming } =
@@ -97,6 +171,168 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
   const handleGenerateNextTest = () => {
     generateNextTest.mutate({ conceptUuid });
   };
+
+  // Handle selecting an assumption from dropdown
+  const handleSelectAssumption = useCallback(
+    (assumptionUuid: string) => {
+      if (!conceptUuid || !testUuid) {
+        return;
+      }
+
+      // Add to pending additions and mark as having unsaved changes
+      setPendingAdditions((prev) => [...prev, assumptionUuid]);
+      setHasUnsavedChanges(true);
+    },
+    [conceptUuid, testUuid],
+  );
+
+  // Handle removing an assumption
+  const handleRemoveAssumption = useCallback(
+    (assumptionUuid: string, isPending: boolean) => {
+      if (!conceptUuid || !testUuid) {
+        return;
+      }
+
+      // Mark as having unsaved changes
+      setHasUnsavedChanges(true);
+
+      if (isPending) {
+        // If it's a pending addition, remove from pending additions list
+        setPendingAdditions((prev) =>
+          prev.filter((id) => id !== assumptionUuid),
+        );
+      } else {
+        // If it's an existing assumption, add to pending removals list
+        setPendingRemovals((prev) => [...prev, assumptionUuid]);
+      }
+    },
+    [conceptUuid, testUuid],
+  );
+
+  // Handle clicking "Save Changes" - show regeneration warning
+  const handleSaveChanges = useCallback(() => {
+    if (!conceptUuid || !testUuid || !conceptIdentifier) {
+      return;
+    }
+
+    // Build removed assumptions display items from existing assumptions
+    const removedAssumptions = pendingRemovals
+      .map((uuid) => {
+        const assumption = assumptions.find((a) => {
+          const aUuid =
+            a.assumptionUuid || (a as any).assumption_uuid || a.uuid;
+          return aUuid === uuid;
+        });
+        if (!assumption) return null;
+
+        return {
+          uuid,
+          statement: assumption.statement,
+          category: assumption.category as AssumptionCategory,
+          riskCategory:
+            'riskLevel' in assumption ? assumption.riskLevel : 'medium',
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+
+    // Build added assumptions display items from concept assumptions
+    const addedAssumptions = pendingAdditions
+      .map((uuid) => {
+        const assumption = conceptAssumptions.find((a) => a.uuid === uuid);
+        if (!assumption) return null;
+
+        return {
+          uuid,
+          statement: assumption.statement,
+          category: assumption.category as AssumptionCategory,
+          riskCategory: assumption.riskCategory,
+        };
+      })
+      .filter((item): item is NonNullable<typeof item> => item !== null);
+
+    openModal(
+      Modal.RegenerateTestWarningModal,
+      {
+        onConfirm: async () => {
+          // First, remove assumptions marked for deletion
+          for (const assumptionUuid of pendingRemovals) {
+            await deleteTestAssumption.mutateAsync({
+              conceptUuid,
+              testUuid,
+              assumptionUuid,
+            });
+          }
+
+          // Then, link all pending additions
+          for (const assumptionUuid of pendingAdditions) {
+            await createTestAssumption.mutateAsync({
+              conceptUuid,
+              testUuid,
+              data: {
+                assumption_uuid: assumptionUuid,
+                test_details_uuid: testUuid,
+              },
+            });
+          }
+
+          // Calculate final assumption list
+          const finalAssumptionUuids = [
+            ...existingAssumptionUuids.filter(
+              (uuid) => !pendingRemovals.includes(uuid),
+            ),
+            ...pendingAdditions,
+          ];
+
+          // Trigger regeneration with all assumptions
+          await regenerateTestDetails.mutateAsync({
+            conceptUuid,
+            testUuid,
+            assumptionUuids: finalAssumptionUuids,
+            conceptIdentifier,
+          });
+
+          // Reset state
+          setPendingAdditions([]);
+          setPendingRemovals([]);
+          setHasUnsavedChanges(false);
+        },
+        removedAssumptions,
+        addedAssumptions,
+      },
+      {
+        position: 'center',
+        backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-25',
+        shouldCloseOnOverlayClick: true,
+        shouldCloseOnEscape: true,
+      },
+    );
+  }, [
+    conceptUuid,
+    testUuid,
+    conceptIdentifier,
+    existingAssumptionUuids,
+    pendingAdditions,
+    pendingRemovals,
+    regenerateTestDetails,
+    openModal,
+    createTestAssumption,
+    deleteTestAssumption,
+    assumptions,
+    conceptAssumptions,
+  ]);
+
+  // Handle clicking "Cancel" for assumption changes
+  const handleCancelAssumptionChanges = useCallback(() => {
+    // Reset state - we never actually linked/unlinked the pending changes via API
+    setPendingAdditions([]);
+    setPendingRemovals([]);
+    setHasUnsavedChanges(false);
+  }, []);
+
+  // Handle toggling the dropdown
+  const handleToggleDropdown = useCallback(() => {
+    setIsDropdownOpen((prev) => !prev);
+  }, []);
 
   if (!recommendedTest) {
     // Show loading state while fetching assumptions
@@ -289,8 +525,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
     );
   }
 
-  // Get assumptions from test details
-  const assumptions = recommendedTest.testDetails.assumptions || [];
+  // Disable interactions when completing test or generating
   const disableInteractions = isCompletingTest || isGenerating;
 
   return (
@@ -382,28 +617,51 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
             Recommended Next Test
           </div>
 
-          {/* Run Test Button */}
-          <button
-            onClick={onRunTest}
-            className={cn(
-              'btn btn-primary flex items-center gap-1',
-              disableInteractions && 'cursor-not-allowed opacity-50',
-            )}
-            disabled={disableInteractions}
-          >
-            {disableInteractions ? (
-              <Icon
-                variant='refresh'
-                className='aucctus-stroke-white h-4 w-4 animate-spin'
-              />
-            ) : (
-              <Icon
-                variant='arrowright'
-                className='aucctus-stroke-white h-4 w-4'
-              />
-            )}
-            {disableInteractions ? 'Running...' : 'Run Test'}
-          </button>
+          {/* Action Buttons - Run Test or Save Changes + Cancel */}
+          {hasUnsavedChanges ? (
+            <div className='flex items-center gap-2'>
+              <button
+                onClick={handleCancelAssumptionChanges}
+                className='btn btn-light'
+                disabled={regenerateTestDetails.isLoading}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveChanges}
+                className='btn btn-primary flex items-center gap-1'
+                disabled={regenerateTestDetails.isLoading}
+              >
+                <Icon
+                  variant='arrowright'
+                  className='aucctus-stroke-white h-4 w-4'
+                />
+                Save Changes
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onRunTest}
+              className={cn(
+                'btn btn-primary flex items-center gap-1',
+                disableInteractions && 'cursor-not-allowed opacity-50',
+              )}
+              disabled={disableInteractions}
+            >
+              {disableInteractions ? (
+                <Icon
+                  variant='refresh'
+                  className='aucctus-stroke-white h-4 w-4 animate-spin'
+                />
+              ) : (
+                <Icon
+                  variant='arrowright'
+                  className='aucctus-stroke-white h-4 w-4'
+                />
+              )}
+              {disableInteractions ? 'Running...' : 'Run Test'}
+            </button>
+          )}
         </div>
 
         {/* Test Name and Description */}
@@ -417,8 +675,8 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
         </div>
 
         {/* Assumptions to Test */}
-        <div>
-          <h4 className='aucctus-text-sm-semibold aucctus-text-brand-tertiary mb-3 flex items-center gap-1.5'>
+        <div className='relative'>
+          <h4 className='aucctus-text-sm-semibold aucctus-text-brand-tertiary mb-4 flex items-center gap-1.5'>
             <Icon
               variant='clipboard'
               className='aucctus-stroke-brand-primary h-4 w-4'
@@ -427,8 +685,19 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
           </h4>
 
           <ul className='space-y-3'>
-            {assumptions.map((assumption) => {
-              const riskLevel = assumption.riskLevel || 'medium';
+            {displayAssumptions.map((assumption) => {
+              // Check if this is a pending assumption
+              const isPending =
+                'isPending' in assumption && assumption.isPending;
+
+              // Get risk level (pending assumptions use 'riskCategory' field, existing use 'riskLevel')
+              const riskLevel = isPending
+                ? 'riskCategory' in assumption
+                  ? assumption.riskCategory
+                  : 'medium'
+                : ('riskLevel' in assumption
+                    ? assumption.riskLevel
+                    : 'medium') || 'medium';
               const riskColors = RISK_LEVEL_CONFIGS[riskLevel];
               // Convert string to AssumptionCategory type for CategoryIcon
               const categoryVal = (assumption.category?.toLowerCase() ||
@@ -438,10 +707,20 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                 | 'viability'
                 | 'adaptability';
 
+              // Get the assumption UUID for removal
+              const assumptionUuidForRemoval = isPending
+                ? assumption.uuid
+                : ('assumptionUuid' in assumption
+                    ? assumption.assumptionUuid
+                    : null) ||
+                  (assumption as unknown as Record<string, any>)
+                    .assumption_uuid ||
+                  assumption.uuid;
+
               return (
                 <li
-                  key={assumption.uuid}
-                  className='aucctus-text-sm-regular aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-hover rounded-md border p-4 transition-colors'
+                  key={`${assumption.uuid}-${isPending ? 'pending' : 'existing'}`}
+                  className='aucctus-text-sm-regular aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-hover group relative rounded-md border p-4 transition-colors'
                 >
                   <div className='mb-2 flex items-start justify-between'>
                     <div className='flex items-center gap-1.5'>
@@ -452,7 +731,27 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                         {assumption.category || 'General'}
                       </span>
                     </div>
-                    <GenericStatusBadge config={riskColors} />
+                    <div className='flex items-center gap-2'>
+                      <GenericStatusBadge config={riskColors} />
+                      {/* Remove button - appears on hover */}
+                      <button
+                        type='button'
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleRemoveAssumption(
+                            assumptionUuidForRemoval,
+                            isPending,
+                          );
+                        }}
+                        className='flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100'
+                        aria-label='Remove assumption'
+                      >
+                        <Icon
+                          variant='closeX'
+                          className='aucctus-stroke-error-primary h-4 w-4'
+                        />
+                      </button>
+                    </div>
                   </div>
                   <p className='aucctus-text-md-medium aucctus-text-brand-primary'>
                     {assumption.statement}
@@ -461,6 +760,32 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
               );
             })}
           </ul>
+
+          {/* Add Assumption Button - Dashed Border at Bottom */}
+          <div className='relative mt-3'>
+            <button
+              type='button'
+              onClick={handleToggleDropdown}
+              className={cn(
+                'aucctus-border-secondary aucctus-text-brand-tertiary hover:aucctus-bg-secondary-hover aucctus-text-sm-medium flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-3 transition-colors',
+                (!conceptUuid || !testUuid) && 'cursor-not-allowed opacity-60',
+              )}
+              disabled={!conceptUuid || !testUuid}
+            >
+              <Icon variant='plus' className='aucctus-stroke-primary h-4 w-4' />
+              Add assumption
+            </button>
+
+            {/* Assumption Dropdown */}
+            <AssumptionDropdown
+              isOpen={isDropdownOpen}
+              onClose={() => setIsDropdownOpen(false)}
+              availableAssumptions={conceptAssumptions}
+              onSelectAssumption={handleSelectAssumption}
+              existingAssumptionUuids={new Set(existingAssumptionUuids)}
+              existingAssumptionStatements={existingAssumptionStatements}
+            />
+          </div>
         </div>
       </div>
     </div>

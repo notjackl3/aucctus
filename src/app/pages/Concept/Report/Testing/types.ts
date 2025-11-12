@@ -290,6 +290,7 @@ export interface ITestAssumption {
 
 export interface ITestAssumptionCreate {
   assumption_uuid: string;
+  test_details_uuid: string;
 }
 
 export interface ITestAssumptionUpdate {

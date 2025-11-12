@@ -11,10 +11,8 @@ import LoadingState from './components/LoadingState';
 import NoDataState from './components/NoDataState';
 import AssumptionValidationCard from './components/AssumptionValidationCard';
 import RecommendedChangesSection from './components/RecommendedChangesSection';
-import TestCompletionLoadingOverlay from './components/TestCompletionLoadingOverlay';
 import { ITestAssumptionDetailed } from '../../../types';
 import { ITestResult } from '@libs/api/types/concept/testing';
-import { useTestCompletion } from '../../../Testing';
 import { mapBackendSectionToReportKey } from '@libs/utils/concepts';
 import type { ConceptReportStatusBySection } from '@libs/api/types/concept/concepts';
 import useStore from '@stores/store';
@@ -37,9 +35,6 @@ const TestImpact: React.FC<TestImpactProps> = ({
 
   const queryClient = useQueryClient();
   const conceptIdentifier = useStore((state) => state.conceptReport.identifier);
-
-  // Get completion context to show loading overlay during test completion
-  const { isCompletingTest } = useTestCompletion();
 
   // Fetch test detail to get assumptions and comprehensive recommendations
   // Force refetch when the Impact tab is opened
@@ -173,15 +168,6 @@ const TestImpact: React.FC<TestImpactProps> = ({
 
   return (
     <div className='relative space-y-6'>
-      {/* Loading Overlay for Test Completion */}
-      {isCompletingTest && (
-        <TestCompletionLoadingOverlay
-          title='Completing Test'
-          description="We're analyzing your results and preparing recommendations for your next test."
-          subtitle='This may take a moment as we process your findings...'
-        />
-      )}
-
       <div className={`${isDisabled ? 'pointer-events-none opacity-50' : ''}`}>
         {hasNoData ? (
           <NoDataState />

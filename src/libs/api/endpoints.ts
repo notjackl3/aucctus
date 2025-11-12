@@ -341,6 +341,10 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/testing/${testUuid}/revert`;
   }
 
+  static conceptTestingRegenerate(conceptUuid: string, testUuid: string) {
+    return `api/v2/concept/${conceptUuid}/testing/${testUuid}/regenerate`;
+  }
+
   static conceptTestingGenerateNext(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/testing/generate-next`;
   }

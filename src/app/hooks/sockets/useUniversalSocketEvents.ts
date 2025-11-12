@@ -758,6 +758,29 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           }
         }
 
+        // CRITICAL: Invalidate concept queries to force refetch of featureVersions
+        // This ensures we get the latest concept data including updated featureVersions
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.concept, message.conceptUuid],
+        });
+        if (
+          message.conceptRootIdentifier &&
+          message.conceptRootIdentifier !== message.conceptUuid
+        ) {
+          queryClient.invalidateQueries({
+            queryKey: [AucctusQueryKeys.concept, message.conceptRootIdentifier],
+          });
+        }
+
+        // Invalidate testDetails queries when assumptions section completes
+        // This ensures the Testing tab shows the latest regenerated test data
+        if (message.reportStatusBySection?.assumptions?.status === 'complete') {
+          queryClient.invalidateQueries({
+            queryKey: [AucctusQueryKeys.testDetails, message.conceptUuid],
+          });
+        }
+
+        // Show completion toast for individual sections
         // Only show toast if this is for the currently active concept
         const activeConceptUuid = useStore.getState().conceptReport.conceptUuid;
         const matchesActive =

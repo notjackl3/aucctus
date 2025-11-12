@@ -94,6 +94,17 @@ export class TestingApi extends ApiService {
     );
   }
 
+  async regenerateTestDetails(
+    conceptUuid: string,
+    testUuid: string,
+    data?: { assumption_uuids?: string[] },
+  ): Promise<{ detail: string }> {
+    return this.post<{ detail: string }>(
+      endpoints.conceptTestingRegenerate(conceptUuid, testUuid),
+      data ?? {},
+    );
+  }
+
   async deleteTestDetail(conceptUuid: string, testUuid: string): Promise<void> {
     return this.delete<void>(
       endpoints.conceptTestingDetail(conceptUuid, testUuid),

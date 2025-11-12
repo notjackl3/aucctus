@@ -4,6 +4,7 @@ import utils from '@libs/utils';
 import { AxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from './query-keys';
+import { markConceptSectionsPending } from './concepts.hook';
 import {
   ITestDetailsCreate,
   ITestDetailsUpdate,
@@ -214,6 +215,86 @@ export const useRevertTestDetail = () => {
       toast.error(
         'Test Revert Failed',
         message || 'Unable to revert test. Please try again',
+      );
+    },
+  });
+};
+
+/**
+ * Custom hook for triggering test regeneration after assumption changes.
+ * Uses the unified loading system via markConceptSectionsPending.
+ * Note: Testing route maps to 'assumptions' section, so marking 'assumptions' as pending
+ * will show skeleton loading on both Testing and Assumptions tabs.
+ * @returns The result of the useMutation hook.
+ */
+export const useRegenerateTestDetails = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: {
+      conceptUuid: string;
+      testUuid: string;
+      assumptionUuids?: string[];
+      conceptIdentifier?: string; // Optional: if provided, use directly instead of looking up
+    }) => {
+      const { conceptUuid, testUuid, assumptionUuids } = params;
+      return await api.testing.regenerateTestDetails(conceptUuid, testUuid, {
+        assumption_uuids: assumptionUuids,
+      });
+    },
+    onMutate: async (variables) => {
+      // Try to get concept identifier - prefer passed identifier, otherwise look up from cache
+      let conceptIdentifier: string | undefined = variables.conceptIdentifier;
+
+      if (!conceptIdentifier) {
+        // Try to find concept by UUID in query cache
+        const concept = queryClient.getQueryData([
+          AucctusQueryKeys.concept,
+          variables.conceptUuid,
+        ]) as any;
+
+        conceptIdentifier = concept?.identifier;
+
+        // If not found by UUID, try searching all concept queries
+        if (!conceptIdentifier) {
+          const allQueries = queryClient.getQueryCache().findAll();
+          const conceptQuery = allQueries.find((query) => {
+            const key = query.queryKey as any[];
+            if (key[0] === AucctusQueryKeys.concept) {
+              const conceptData = queryClient.getQueryData(key) as any;
+              return conceptData?.uuid === variables.conceptUuid;
+            }
+            return false;
+          });
+
+          if (conceptQuery) {
+            const conceptData = queryClient.getQueryData(
+              conceptQuery.queryKey,
+            ) as any;
+            conceptIdentifier = conceptData?.identifier;
+          }
+        }
+      }
+
+      if (conceptIdentifier) {
+        // Mark 'assumptions' section as pending (Testing route maps to 'assumptions')
+        // This will show skeleton loading on both Testing and Assumptions tabs
+        markConceptSectionsPending(queryClient, conceptIdentifier, [
+          'assumptions',
+        ]);
+      }
+
+      // Show info toast about regeneration starting
+      toast.success(
+        'Test regeneration started',
+        "We'll refresh the test once it's complete.",
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Regeneration Failed',
+        message || 'Unable to regenerate the test. Please try again.',
       );
     },
   });
@@ -740,8 +821,6 @@ export const useTestResults = (
       options?.enabled !== undefined
         ? options.enabled
         : !!conceptUuid && !!testUuid,
-    staleTime: 0, // 2 minutes
-    cacheTime: 0, // 2 minutes
   });
 
   return { ...query, results: query.data?.results || [] };
@@ -1200,8 +1279,11 @@ export const useTestAssumptions = (
  * Custom hook for creating test assumptions.
  * @returns The result of the useMutation hook.
  */
-export const useCreateTestAssumption = () => {
+export const useCreateTestAssumption = (options?: {
+  showSuccessToast?: boolean;
+}) => {
   const queryClient = useQueryClient();
+  const showSuccessToast = options?.showSuccessToast ?? true;
 
   return useMutation({
     mutationFn: async (params: {
@@ -1224,10 +1306,22 @@ export const useCreateTestAssumption = () => {
           variables.testUuid,
         ],
       });
-      toast.success(
-        'Assumption Linked',
-        'Test assumption has been linked successfully',
-      );
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testDetail,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+      });
+      if (showSuccessToast) {
+        toast.success(
+          'Assumption Linked',
+          'Test assumption has been linked successfully',
+        );
+      }
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
@@ -1302,8 +1396,11 @@ export const useUpdateTestAssumption = () => {
  * Custom hook for deleting test assumptions.
  * @returns The result of the useMutation hook.
  */
-export const useDeleteTestAssumption = () => {
+export const useDeleteTestAssumption = (options?: {
+  showSuccessToast?: boolean;
+}) => {
   const queryClient = useQueryClient();
+  const showSuccessToast = options?.showSuccessToast ?? true;
 
   return useMutation({
     mutationFn: async (params: {
@@ -1326,16 +1423,28 @@ export const useDeleteTestAssumption = () => {
           variables.testUuid,
         ],
       });
-      toast.success(
-        'Assumption Unlinked',
-        'Test assumption has been unlinked successfully',
-      );
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testDetail,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetails, variables.conceptUuid],
+      });
+      if (showSuccessToast) {
+        toast.success(
+          'Assumption Removed',
+          'Assumption has been removed from the test',
+        );
+      }
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(
-        'Assumption Unlink Failed',
-        message || 'Unable to unlink assumption. Please try again',
+        'Removal Failed',
+        message || 'Unable to remove assumption. Please try again',
       );
     },
   });

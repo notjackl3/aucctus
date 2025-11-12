@@ -1,5 +1,5 @@
-import React, { useCallback } from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import React, { useCallback, useState, useRef, useEffect } from 'react';
+import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 
 interface EditableImportanceMeterProps {
@@ -8,139 +8,156 @@ interface EditableImportanceMeterProps {
   disabled?: boolean;
 }
 
+type ImportanceLevel = 'low' | 'medium' | 'high';
+
 const EditableImportanceMeter: React.FC<EditableImportanceMeterProps> = ({
   importance,
   onChange,
   disabled = false,
 }) => {
-  // Determine level based on the value
-  const getLevel = (val: number): 'high' | 'medium' | 'low' => {
-    if (val >= 66) return 'high';
-    if (val >= 33) return 'medium';
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  // Convert percentage to level
+  const getImportanceLevel = (value: number): ImportanceLevel => {
+    if (value >= 75) return 'high';
+    if (value >= 50) return 'medium';
     return 'low';
   };
 
-  const level = getLevel(importance);
-
-  // Handle level clicks
-  const handleLevelClick = useCallback(
-    (newLevel: 'low' | 'medium' | 'high') => {
-      if (disabled) return;
-
-      const levelValues = {
-        low: 16, // Changed: below 33 threshold to ensure it's "low"
-        medium: 50, // Changed: between 33-65 to ensure it's "medium"
-        high: 83, // Changed: above 66 threshold to ensure it's "high"
-      };
-
-      onChange(levelValues[newLevel]);
-    },
-    [onChange, disabled],
-  );
-
-  // Color configurations for each level
-  const levelConfigs = {
-    high: {
-      text: 'text-red-500',
-      activeBlocks: ['bg-red-500', 'bg-red-500', 'bg-red-500'],
-      clickableBlocks: ['bg-red-500', 'bg-red-500', 'bg-red-500'],
-    },
-    medium: {
-      text: 'text-yellow-500',
-      activeBlocks: ['bg-yellow-400', 'bg-yellow-400', 'bg-gray-200'],
-      clickableBlocks: ['bg-yellow-400', 'bg-yellow-400', 'bg-gray-300'],
-    },
-    low: {
-      text: 'text-green-600',
-      activeBlocks: ['bg-green-600', 'bg-gray-200', 'bg-gray-200'],
-      clickableBlocks: ['bg-green-600', 'bg-gray-300', 'bg-gray-300'],
-    },
+  // Convert level to percentage
+  const levelToPercentage = (level: ImportanceLevel): number => {
+    switch (level) {
+      case 'high':
+        return 85;
+      case 'medium':
+        return 60;
+      case 'low':
+        return 35;
+    }
   };
 
-  const currentConfig = levelConfigs[level];
+  const currentLevel = getImportanceLevel(importance);
+
+  // Get blocks for display
+  const getImportanceBlocks = (level: ImportanceLevel) => {
+    const config = {
+      high: { blocks: 3, color: 'bg-red-500' },
+      medium: { blocks: 2, color: 'bg-yellow-500' },
+      low: { blocks: 1, color: 'bg-green-500' },
+    };
+    const { blocks, color } = config[level];
+    return Array.from({ length: 3 }, (_, i) => (
+      <div
+        key={i}
+        className={cn('h-2.5 w-1.5', i < blocks ? color : 'bg-gray-200')}
+      />
+    ));
+  };
+
+  const handleSelect = useCallback(
+    (level: ImportanceLevel) => {
+      const newValue = levelToPercentage(level);
+      onChange(newValue);
+      setIsOpen(false);
+    },
+    [onChange],
+  );
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen]);
 
   return (
-    <ComponentTooltip
-      tip={
-        <div className='aucctus-bg-primary aucctus-border-secondary max-w-xs rounded-lg border p-4 shadow-lg'>
-          <p className='aucctus-text-xs aucctus-text-secondary leading-relaxed'>
-            How important this assumption is to the concept&apos;s success.
-            Click to change.
-          </p>
-        </div>
-      }
-    >
-      <div className='aucctus-bg-secondary aucctus-border-tertiary inline-block rounded p-2'>
-        <div className='flex items-center gap-3'>
-          <div className='flex items-center'>
-            <Icon
-              variant='alert-circle'
-              className='aucctus-stroke-tertiary mr-1.5 h-3.5 w-3.5'
-            />
-            <span className='aucctus-text-primary aucctus-text-xs-medium'>
-              Importance
+    <div className='relative' ref={dropdownRef}>
+      <button
+        type='button'
+        onClick={(e) => {
+          e.stopPropagation();
+          if (!disabled) {
+            setIsOpen(!isOpen);
+          }
+        }}
+        disabled={disabled}
+        className={cn(
+          'aucctus-bg-secondary aucctus-border-secondary flex h-7 items-center gap-1.5 rounded-md border px-2 py-0.5 transition-opacity',
+          !disabled && 'hover:opacity-80',
+          disabled && 'cursor-not-allowed opacity-50',
+        )}
+      >
+        <span className='aucctus-text-xs aucctus-text-secondary'>
+          Importance
+        </span>
+        <div className='flex gap-0.5'>{getImportanceBlocks(currentLevel)}</div>
+        <span className='aucctus-text-xs-semibold aucctus-text-primary capitalize'>
+          {currentLevel}
+        </span>
+        <Icon
+          variant='chevrondown'
+          className='aucctus-stroke-secondary h-3 w-3'
+        />
+      </button>
+
+      {isOpen && (
+        <div className='aucctus-bg-primary aucctus-border-secondary absolute left-0 top-full z-50 mt-1 overflow-hidden rounded-md border shadow-lg'>
+          <button
+            type='button'
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelect('high');
+            }}
+            className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
+          >
+            <div className='flex gap-0.5'>{getImportanceBlocks('high')}</div>
+            <span className='aucctus-text-sm aucctus-text-error-primary'>
+              High
             </span>
-          </div>
-          <div className='flex items-center space-x-1.5'>
-            {/* Clickable meter squares */}
-            <div className='flex gap-0.5'>
-              {/* Box 1 (leftmost) */}
-              <button
-                type='button'
-                className={cn(
-                  'h-4 w-4 rounded-sm transition-colors',
-                  level === 'low'
-                    ? 'bg-green-600'
-                    : level === 'medium'
-                      ? 'bg-yellow-400'
-                      : level === 'high'
-                        ? 'bg-red-500'
-                        : 'bg-gray-300',
-                  !disabled && 'hover:opacity-80',
-                  disabled && 'cursor-not-allowed opacity-50',
-                )}
-                onClick={() => handleLevelClick('low')}
-                disabled={disabled}
-                title='Set to Low importance'
-              />
-              {/* Box 2 (middle) */}
-              <button
-                type='button'
-                className={cn(
-                  'h-4 w-4 rounded-sm transition-colors',
-                  level === 'medium'
-                    ? 'bg-yellow-400'
-                    : level === 'high'
-                      ? 'bg-red-500'
-                      : 'bg-gray-300',
-                  !disabled && 'hover:opacity-80',
-                  disabled && 'cursor-not-allowed opacity-50',
-                )}
-                onClick={() => handleLevelClick('medium')}
-                disabled={disabled}
-                title='Set to Medium importance'
-              />
-              {/* Box 3 (rightmost) */}
-              <button
-                type='button'
-                className={cn(
-                  'h-4 w-4 rounded-sm transition-colors',
-                  level === 'high' ? 'bg-red-500' : 'bg-gray-300',
-                  !disabled && 'hover:opacity-80',
-                  disabled && 'cursor-not-allowed opacity-50',
-                )}
-                onClick={() => handleLevelClick('high')}
-                disabled={disabled}
-                title='Set to High importance'
-              />
-            </div>
-            <span className={cn('aucctus-text-xs-medium', currentConfig.text)}>
-              {level.charAt(0).toUpperCase() + level.slice(1)}
+          </button>
+          <button
+            type='button'
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelect('medium');
+            }}
+            className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
+          >
+            <div className='flex gap-0.5'>{getImportanceBlocks('medium')}</div>
+            <span className='aucctus-text-sm aucctus-text-warning-primary'>
+              Medium
             </span>
-          </div>
+          </button>
+          <button
+            type='button'
+            onClick={(e) => {
+              e.stopPropagation();
+              handleSelect('low');
+            }}
+            className='aucctus-bg-primary-hover flex w-full items-center gap-2 px-3 py-2 text-left transition'
+          >
+            <div className='flex gap-0.5'>{getImportanceBlocks('low')}</div>
+            <span className='aucctus-text-sm aucctus-text-success-primary'>
+              Low
+            </span>
+          </button>
         </div>
-      </div>
-    </ComponentTooltip>
+      )}
+    </div>
   );
 };
 

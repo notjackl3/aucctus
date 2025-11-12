@@ -11,7 +11,6 @@ import {
 import { Assumption } from '../types';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
-import { useTestCompletion } from '../Testing';
 import useStore from '@stores/store';
 
 // Test Execution Modal Sections
@@ -121,9 +120,6 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   // Hook for completing test
   const completeTestDetail = useCompleteTestDetail();
 
-  // Get completion context
-  const { setIsCompletingTest } = useTestCompletion();
-
   // Determine if we're in view mode (completed tests are always view-only)
   const isViewMode = mode === 'view' || testDetail?.status === 'completed';
 
@@ -178,9 +174,6 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
       return;
     }
 
-    // Set loading state for the parent component
-    setIsCompletingTest(true);
-
     try {
       await completeTestDetail.mutateAsync({
         conceptUuid,
@@ -191,9 +184,6 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
       handleCloseModal();
     } catch (error) {
       // Error handling is done by the mutation hook
-    } finally {
-      // Clear loading state
-      setIsCompletingTest(false);
     }
   };
 
