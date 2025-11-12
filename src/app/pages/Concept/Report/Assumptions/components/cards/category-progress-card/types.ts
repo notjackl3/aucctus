@@ -1,5 +1,11 @@
 import { AssumptionCategory, AssumptionStatusV2 } from '@libs/api/types';
 
+export interface CategoryStatusCounts {
+  validated: number;
+  invalidated: number;
+  untested: number;
+}
+
 export interface CategoryProgressCardProps {
   category: AssumptionCategory;
   title: string;
@@ -9,6 +15,8 @@ export interface CategoryProgressCardProps {
   isSelected?: boolean;
   onClick?: () => void;
   isInvalidated?: boolean;
+  isLast?: boolean; // Whether this is the last card in the list
+  statusCounts?: CategoryStatusCounts;
 }
 
 export interface CategoryIconProps {

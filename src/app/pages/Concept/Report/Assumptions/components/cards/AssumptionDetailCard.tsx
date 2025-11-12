@@ -130,13 +130,16 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
     [handleCancelStatement, handleSaveStatement],
   );
 
+  const valuesMatch = (a: number, b: number) => Math.abs(a - b) < 0.001;
+
   const handleImportanceChange = useCallback(
     (newImportance: number) => {
-      // Convert percentage (0-100) to 0-1 range
-      const importanceValue = newImportance / 100;
+      const importanceValue = newImportance / 100; // Convert percentage (0-100) to 0-1 range
 
-      // Add change directly to batch store - this will show the yellow banner
-      // without triggering the card-level edit mode
+      if (valuesMatch(importanceValue, assumption.importance)) {
+        return; // Ignore no-op selections so we don't flag false edits
+      }
+
       addChange({
         id: assumption.uuid,
         type: 'edit',
@@ -144,8 +147,8 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
         changes: {
           statement: assumption.statement,
           category: assumption.category,
-          importance: importanceValue, // 0-1 range (frontend format)
-          certainty: assumption.certainty, // Keep existing certainty
+          importance: importanceValue,
+          certainty: assumption.certainty,
         },
       });
     },
@@ -154,11 +157,12 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
 
   const handleCertaintyChange = useCallback(
     (newCertainty: number) => {
-      // Convert percentage (0-100) to 0-1 range
-      const certaintyValue = newCertainty / 100;
+      const certaintyValue = newCertainty / 100; // Convert percentage (0-100) to 0-1 range
 
-      // Add change directly to batch store - this will show the yellow banner
-      // without triggering the card-level edit mode
+      if (valuesMatch(certaintyValue, assumption.certainty)) {
+        return; // Ignore no-op selections so banner stays hidden
+      }
+
       addChange({
         id: assumption.uuid,
         type: 'edit',
@@ -166,8 +170,8 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
         changes: {
           statement: assumption.statement,
           category: assumption.category,
-          importance: assumption.importance, // Keep existing importance
-          certainty: certaintyValue, // 0-1 range (frontend format)
+          importance: assumption.importance,
+          certainty: certaintyValue,
         },
       });
     },

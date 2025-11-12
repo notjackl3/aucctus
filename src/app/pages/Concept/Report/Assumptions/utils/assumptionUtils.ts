@@ -140,7 +140,7 @@ export const getCategoryIcon = (category: string): string => {
     case 'feasibility':
       return 'gear';
     case 'adaptability':
-      return 'lifebuoy';
+      return 'waves';
     default:
       return 'help-circle';
   }

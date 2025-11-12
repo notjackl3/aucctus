@@ -57,11 +57,16 @@ const EditableImportanceMeter: React.FC<EditableImportanceMeterProps> = ({
 
   const handleSelect = useCallback(
     (level: ImportanceLevel) => {
+      if (level === currentLevel) {
+        setIsOpen(false);
+        return; // No actual change, so skip notifying parent to avoid false banner
+      }
+
       const newValue = levelToPercentage(level);
       onChange(newValue);
       setIsOpen(false);
     },
-    [onChange],
+    [onChange, currentLevel],
   );
 
   // Close dropdown when clicking outside

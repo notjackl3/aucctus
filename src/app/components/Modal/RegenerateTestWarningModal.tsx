@@ -42,22 +42,20 @@ const RegenerateTestWarningModal: React.FC<RegenerateTestWarningModalProps> = ({
   }, [onCancel, closeModal]);
 
   return (
-    <div className='aucctus-bg-primary inline-flex max-h-[72vh] w-full max-w-[470px] flex-col items-center justify-start rounded-xl'>
+    <div className='aucctus-bg-primary inline-flex max-h-[30vh] w-full max-w-[500px] flex-col items-center justify-start rounded-xl'>
       {/* Header */}
-      <div className='w-full p-6 pb-4'>
-        <h2 className='aucctus-text-lg-bold aucctus-text-primary mx-auto max-w-xs text-center'>
+      <div className='w-full p-6 pb-2'>
+        <h2 className='aucctus-text-lg-bold aucctus-text-primary mx-auto max-w-xs text-center font-bold'>
           Changing Assumptions Will Regenerate Test Content
         </h2>
+        <p className='aucctus-text-sm aucctus-text-secondary mt-1 text-center'>
+          This action cannot be undone.
+        </p>
       </div>
 
       {/* Content */}
       <div className='w-full overflow-y-auto px-6 pb-6'>
         <div className='w-full space-y-4'>
-          {/* Warning Message */}
-          <p className='aucctus-text-sm aucctus-text-secondary text-center'>
-            This action cannot be undone.
-          </p>
-
           {(removedAssumptions.length > 0 || addedAssumptions.length > 0) && (
             <div className='space-y-4 pt-2'>
               {/* Removed Assumptions */}

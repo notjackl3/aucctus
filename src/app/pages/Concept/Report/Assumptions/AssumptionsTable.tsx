@@ -2,8 +2,9 @@ import React from 'react';
 import { animated } from 'react-spring';
 import AssumptionDetailCard from './components/cards/AssumptionDetailCard';
 import BatchEditableAssumptionCard from './components/cards/BatchEditableAssumptionCard';
-import BatchChangesIndicator from './components/BatchChangesIndicator';
+import RegenerateTestsBanner from './components/RegenerateTestsBanner';
 import CategoryProgressCard from './components/cards/category-progress-card/CategoryProgressCard';
+import { CategoryStatusCounts } from './components/cards/category-progress-card/types';
 import telemetry from '@libs/telemetry';
 import { Icon } from '@components';
 import { AssumptionCardsListSkeleton } from '@components/Skeleton/ConceptReport';
@@ -16,6 +17,45 @@ import {
 } from './utils/assumptionUtils';
 import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
 import { useBatchAssumptionTable } from '@hooks/concepts/useBatchAssumptionTable';
+
+const DEFAULT_STATUS_COUNTS: CategoryStatusCounts = {
+  validated: 0,
+  invalidated: 0,
+  untested: 0,
+};
+
+const buildInitialCategoryCounts = () =>
+  CATEGORY_CONFIG.reduce<Record<AssumptionCategory, CategoryStatusCounts>>(
+    (acc, config) => {
+      acc[config.category] = { ...DEFAULT_STATUS_COUNTS };
+      return acc;
+    },
+    {} as Record<AssumptionCategory, CategoryStatusCounts>,
+  );
+
+const calculateCategoryCounts = (
+  assumptionList: IAssumptionV2[],
+  category: AssumptionCategory,
+): CategoryStatusCounts => {
+  return assumptionList.reduce<CategoryStatusCounts>(
+    (counts, assumption) => {
+      if (assumption.category !== category) {
+        return counts;
+      }
+
+      if (assumption.validationStatus === 'validated') {
+        counts.validated += 1;
+      } else if (assumption.validationStatus === 'invalidated') {
+        counts.invalidated += 1;
+      } else if (assumption.validationStatus === 'untested') {
+        counts.untested += 1;
+      }
+
+      return counts;
+    },
+    { ...DEFAULT_STATUS_COUNTS },
+  );
+};
 
 interface AssumptionsTableProps {
   assumptions: IAssumptionV2[];
@@ -41,10 +81,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
 
     // Batch changes state
     hasUnsavedChanges,
-    unsavedChangesCount,
-    changesArray,
     getChange,
-    hasChangeForAssumption,
     getEffectiveAssumptionData,
     isMarkedForDeletion,
     getNewAssumptions,
@@ -69,13 +106,54 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
     isLoading,
   });
 
+  const [categoryStatusCounts, setCategoryStatusCounts] = React.useState<
+    Record<AssumptionCategory, CategoryStatusCounts>
+  >(buildInitialCategoryCounts);
+
+  const leftColumnRef = React.useRef<HTMLDivElement>(null);
+  const [leftColumnHeight, setLeftColumnHeight] = React.useState<number | null>(
+    null,
+  );
+
+  React.useEffect(() => {
+    setCategoryStatusCounts((prev) => ({
+      ...prev,
+      [selectedCategory]: calculateCategoryCounts(
+        assumptions,
+        selectedCategory,
+      ),
+    }));
+  }, [assumptions, selectedCategory]);
+
+  // Measure left column height and update right column max-height
+  React.useEffect(() => {
+    const updateHeight = () => {
+      if (leftColumnRef.current) {
+        setLeftColumnHeight(leftColumnRef.current.offsetHeight);
+      }
+    };
+
+    updateHeight();
+    window.addEventListener('resize', updateHeight);
+    return () => window.removeEventListener('resize', updateHeight);
+  }, [assumptions, selectedCategory, categoryStatusCounts]);
+
   // Animation for add form
   const addFormTransition = useExpandCollapseTransition({
     isExpanded: isAdding,
     withOpacity: true,
     collapsedHeight: 0,
     maxHeight: 300,
+    expandedOverflow: 'visible',
   });
+
+  const newAssumptionsForSelectedCategory = React.useMemo(
+    () =>
+      getNewAssumptions().filter(
+        (change) => change.changes?.category === selectedCategory,
+      ),
+    [getNewAssumptions, selectedCategory],
+  );
 
   // Get validation status from categoryMetrics
   const getValidationStatus = (category: AssumptionCategory) => {
@@ -95,24 +173,23 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
   });
 
   return (
-    <div className='aucctus-border-primary overflow-hidden rounded-lg border shadow-sm'>
-      {/* Batch changes indicator */}
+    <div className='aucctus-border-primary rounded-lg border shadow-sm'>
+      {/* Regenerate tests banner */}
       {hasUnsavedChanges() && (
-        <div className='p-4'>
-          <BatchChangesIndicator
-            changesCount={unsavedChangesCount()}
-            changes={changesArray()}
-            onSaveAll={handleSaveAllChanges}
-            onDiscardAll={handleDiscardAllChanges}
-            isLoading={isSubmitting}
-          />
-        </div>
+        <RegenerateTestsBanner
+          onRegenerate={handleSaveAllChanges}
+          onDismiss={handleDiscardAllChanges}
+          isLoading={isSubmitting}
+        />
       )}
 
-      <div className='flex flex-col md:flex-row'>
-        {/* Left column: Category cards - takes ~30% of space */}
-        <div className='aucctus-bg-primary aucctus-border-primary border-r p-6 md:w-[30%]'>
-          {CATEGORY_CONFIG.map((categoryConfig) => (
+      <div className='flex flex-col md:flex-row md:items-start'>
+        {/* Left column: Category cards - takes ~30% of space, fixed height */}
+        <div
+          ref={leftColumnRef}
+          className='aucctus-bg-primary aucctus-border-primary flex-shrink-0 border-r md:w-[30%]'
+        >
+          {CATEGORY_CONFIG.map((categoryConfig, index) => (
             <CategoryProgressCard
               key={categoryConfig.category}
               category={categoryConfig.category}
@@ -124,23 +201,33 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
               }
               isSelected={selectedCategory === categoryConfig.category}
               onClick={() => handleCategorySelect(categoryConfig.category)}
+              statusCounts={
+                categoryStatusCounts[categoryConfig.category] ||
+                DEFAULT_STATUS_COUNTS
+              }
+              isLast={index === CATEGORY_CONFIG.length - 1}
             />
           ))}
         </div>
 
-        <div className='flex-1 p-6'>
+        <div
+          className='min-h-0 flex-1 overflow-y-auto p-6'
+          style={{
+            maxHeight: leftColumnHeight ? `${leftColumnHeight}px` : 'none',
+          }}
+        >
           {isLoading ? (
             <AssumptionCardsListSkeleton />
           ) : (
             <>
-              {assumptions.length > 0 || getNewAssumptions().length > 0 ? (
+              {assumptions.length > 0 ||
+              newAssumptionsForSelectedCategory.length > 0 ? (
                 <>
                   <div className='space-y-4'>
                     {/* Render existing assumptions */}
                     {assumptions.map((assumption) => {
                       const isEditingThis =
                         editingAssumptionId === assumption.uuid;
-                      const hasChange = hasChangeForAssumption(assumption.uuid);
                       const isDeleted = isMarkedForDeletion(assumption.uuid);
                       const effectiveData =
                         getEffectiveAssumptionData(assumption);
@@ -152,9 +239,6 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                       if (isDeleted) {
                         outlineClass = 'rounded-lg ring-2 ring-red-400';
                         statusText = '• Marked for deletion';
-                      } else if (hasChange) {
-                        outlineClass = 'rounded-lg ring-2 ring-yellow-300';
-                        statusText = '• Unsaved changes';
                       }
 
                       if (isEditingThis) {
@@ -193,14 +277,8 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                               }
                             />
                           </div>
-                          {(hasChange || isDeleted) && (
-                            <div
-                              className={`aucctus-text-xs mt-1 text-center ${
-                                isDeleted
-                                  ? 'aucctus-text-error-primary'
-                                  : 'aucctus-text-warning-primary'
-                              }`}
-                            >
+                          {isDeleted && (
+                            <div className='aucctus-text-xs aucctus-text-error-primary mt-1 text-center'>
                               {statusText}
                             </div>
                           )}
@@ -209,14 +287,11 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                     })}
 
                     {/* Render new assumptions from batch */}
-                    {getNewAssumptions().map((newAssumption) => {
+                    {newAssumptionsForSelectedCategory.map((newAssumption) => {
                       if (!newAssumption.changes) return null;
 
                       const isEditingThis =
                         editingAssumptionId === newAssumption.id;
-                      const hasAdditionalChanges =
-                        hasChangeForAssumption(newAssumption.id) &&
-                        getChange(newAssumption.id)?.type === 'edit';
 
                       // Create a base assumption object for the new assumption
                       const baseAssumption = {
@@ -257,21 +332,13 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
 
                       return (
                         <div key={newAssumption.id}>
-                          <div className='rounded-lg ring-2 ring-yellow-300'>
-                            <AssumptionDetailCard
-                              assumption={effectiveData}
-                              showActions={
-                                !isAdding &&
-                                !editingAssumptionId &&
-                                !isSubmitting
-                              }
-                              onDelete={() => removeChange(newAssumption.id)}
-                            />
-                          </div>
-                          <div className='aucctus-text-xs aucctus-text-warning-primary mt-1 text-center'>
-                            • New assumption (unsaved)
-                            {hasAdditionalChanges && ' • Modified'}
-                          </div>
+                          <AssumptionDetailCard
+                            assumption={effectiveData}
+                            showActions={
+                              !isAdding && !editingAssumptionId && !isSubmitting
+                            }
+                            onDelete={() => removeChange(newAssumption.id)}
+                          />
                         </div>
                       );
                     })}
@@ -284,11 +351,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                         type='button'
                         onClick={handleStartAdding}
                         className='aucctus-border-secondary aucctus-text-brand-tertiary hover:aucctus-bg-secondary-hover aucctus-text-sm-medium flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-3 transition-colors disabled:cursor-not-allowed disabled:opacity-60'
-                        disabled={
-                          editingAssumptionId !== null ||
-                          isSubmitting ||
-                          hasUnsavedChanges()
-                        }
+                        disabled={editingAssumptionId !== null || isSubmitting}
                       >
                         <Icon
                           variant='plus'
@@ -313,11 +376,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                         type='button'
                         onClick={handleStartAdding}
                         className='aucctus-border-secondary aucctus-text-brand-tertiary hover:aucctus-bg-secondary-hover aucctus-text-sm-medium flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-3 transition-colors disabled:cursor-not-allowed disabled:opacity-60'
-                        disabled={
-                          editingAssumptionId !== null ||
-                          isSubmitting ||
-                          hasUnsavedChanges()
-                        }
+                        disabled={editingAssumptionId !== null || isSubmitting}
                       >
                         <Icon
                           variant='plus'

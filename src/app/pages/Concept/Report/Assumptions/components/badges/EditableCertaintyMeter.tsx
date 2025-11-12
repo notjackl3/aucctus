@@ -57,11 +57,16 @@ const EditableCertaintyMeter: React.FC<EditableCertaintyMeterProps> = ({
 
   const handleSelect = useCallback(
     (level: CertaintyLevel) => {
+      if (level === currentLevel) {
+        setIsOpen(false);
+        return; // Selecting the same level should not trigger a change
+      }
+
       const newValue = levelToPercentage(level);
       onChange(newValue);
       setIsOpen(false);
     },
-    [onChange],
+    [onChange, currentLevel],
   );
 
   // Close dropdown when clicking outside

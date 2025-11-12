@@ -123,4 +123,5 @@ type IconVariant = 'activity'
  | 'users-03' 
  | 'users-edit' 
  | 'warning' 
+ | 'waves' 
  | 'wizard-of-oz';

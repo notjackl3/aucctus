@@ -113,6 +113,8 @@ export interface ExpandCollapseOptions {
   withOpacity?: boolean;
   /** Initial height when collapsed (default: 0) */
   collapsedHeight?: number;
+  /** Overflow value while expanded (default: 'hidden') */
+  expandedOverflow?: 'visible' | 'hidden' | 'auto';
 }
 
 /**
@@ -132,6 +134,7 @@ export const useExpandCollapseTransition = (
     config,
     withOpacity = true,
     collapsedHeight = 0,
+    expandedOverflow = 'hidden',
   } = options;
 
   // Use transition to handle mount/unmount animations
@@ -144,7 +147,7 @@ export const useExpandCollapseTransition = (
     enter: {
       maxHeight: maxHeight, // Use a large value for 'auto'
       opacity: 1,
-      overflow: 'hidden',
+      overflow: expandedOverflow,
     },
     leave: {
       maxHeight: collapsedHeight,

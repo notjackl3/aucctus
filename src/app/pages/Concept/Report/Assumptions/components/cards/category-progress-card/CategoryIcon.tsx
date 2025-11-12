@@ -24,10 +24,7 @@ const CategoryIcon: React.FC<CategoryIconProps> = ({ category }) => {
       );
     case 'adaptability':
       return (
-        <Icon
-          variant='refresh'
-          className={`${categoryColors.stroke} h-5 w-5`}
-        />
+        <Icon variant='waves' className={`${categoryColors.stroke} h-5 w-5`} />
       );
     default:
       return (

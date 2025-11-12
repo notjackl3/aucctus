@@ -2,20 +2,21 @@ import React from 'react';
 import { cn } from '@libs/utils/react';
 import { CategoryProgressCardProps } from './types';
 import StatusBadge from '../../badges/StatusBadge';
-import ProgressBar from './progress-bar/ProgressBar';
 import CategoryIcon from './CategoryIcon';
 import { getCategoryColors } from '../../../constants/categoryColors';
 import { AssumptionStatusV2 } from '@libs/api/types';
+import { Icon } from '@components';
 
 const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
   category,
   title,
   description,
   validationStatus,
-  validationPercentage,
   isSelected = false,
   onClick,
   isInvalidated = false,
+  isLast = false,
+  statusCounts,
 }) => {
   // Get category colors from centralized source
   const categoryColors = getCategoryColors(category);
@@ -26,37 +27,18 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
     return validationStatus;
   };
 
-  // Use validation percentage from API (0-1 range), convert to 0-100 for progress bar
-  const getPercentageForProgressBar = (): number => {
-    if (validationPercentage !== undefined) {
-      return Math.round(validationPercentage * 100); // Convert 0-1 to 0-100
-    }
-
-    // Fallback for backward compatibility if validationPercentage is not provided
-    switch (validationStatus) {
-      case 'validated':
-        return 100;
-      case 'partially_validated':
-        return 50;
-      case 'invalidated':
-        return 0;
-      case 'untested':
-      default:
-        return 0;
-    }
-  };
+  const stats =
+    statusCounts || ({ validated: 0, invalidated: 0, untested: 0 } as const);
 
   return (
     <div
-      className={cn(
-        'mb-5 cursor-pointer rounded-lg border p-4 transition-colors',
-        {
-          [`${categoryColors.bgColor} border-l-4 ${categoryColors.borderColor}`]:
-            isSelected,
-          'aucctus-border-tertiary aucctus-bg-primary aucctus-bg-primary-hover':
-            !isSelected,
-        },
-      )}
+      className={cn('cursor-pointer border-r p-4 transition-colors', {
+        [`${categoryColors.bgColor} border-l-4 ${categoryColors.borderColor}`]:
+          isSelected,
+        'aucctus-border-tertiary aucctus-bg-primary aucctus-bg-primary-hover':
+          !isSelected,
+        'border-b': !isLast,
+      })}
       onClick={onClick}
     >
       <div className='mb-3 flex items-center justify-between'>
@@ -73,15 +55,31 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
         {description}
       </p>
 
-      <div className='flex items-center gap-4'>
-        <div className='flex flex-1 items-center justify-end'>
-          <ProgressBar
-            category={category}
-            percentage={getPercentageForProgressBar()}
-            isInvalidated={isInvalidated}
-            className='aucctus-border-tertiary h-6 border'
-            width={128}
+      {/* Status count badges */}
+      <div className='flex flex-wrap gap-2'>
+        <div className='flex items-center gap-1 rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700'>
+          <Icon
+            variant='check'
+            className='h-3 w-3'
+            style={{ stroke: 'rgb(21, 128, 61)' }}
           />
+          {stats.validated}
+        </div>
+        <div className='flex items-center gap-1 rounded border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700'>
+          <Icon
+            variant='closeX'
+            className='h-3 w-3'
+            style={{ stroke: 'rgb(185, 28, 28)' }}
+          />
+          {stats.invalidated}
+        </div>
+        <div className='flex items-center gap-1 rounded border border-yellow-200 bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700'>
+          <Icon
+            variant='clock'
+            className='h-3 w-3'
+            style={{ stroke: 'rgb(161, 98, 7)' }}
+          />
+          {stats.untested}
         </div>
       </div>
     </div>
