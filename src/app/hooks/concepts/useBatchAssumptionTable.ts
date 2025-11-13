@@ -11,16 +11,16 @@ import BatchConfirmationModal from '@components/Modal/AssumptionLifecycleModal/B
 
 interface UseBatchAssumptionTableProps {
   assumptions: IAssumptionV2[];
+  allAssumptions: IAssumptionV2[];
   selectedCategory?: AssumptionCategory;
   onCategoryChange?: (category: AssumptionCategory) => void;
-  isLoading?: boolean;
 }
 
 export const useBatchAssumptionTable = ({
   assumptions,
+  allAssumptions,
   selectedCategory: propSelectedCategory,
   onCategoryChange,
-  isLoading = false,
 }: UseBatchAssumptionTableProps) => {
   const { concept } = useOutletContext<IConceptReportContext>();
   const { openModal, closeModal } = useModal();
@@ -351,7 +351,6 @@ export const useBatchAssumptionTable = ({
     isAdding,
     editingAssumptionId,
     isSubmitting,
-    isLoading,
 
     // Batch changes state
     hasUnsavedChanges,
@@ -379,5 +378,6 @@ export const useBatchAssumptionTable = ({
 
     // Data
     assumptions,
+    allAssumptions,
   };
 };
