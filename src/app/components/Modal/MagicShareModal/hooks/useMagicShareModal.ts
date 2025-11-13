@@ -35,6 +35,7 @@ export const useMagicShareModal = ({
   const [carouselScrollLeft, setCarouselScrollLeft] = useState(0);
   const [isClearing, setIsClearing] = useState(false);
   const [isSubmittingGenerate, setIsSubmittingGenerate] = useState(false);
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
 
   const queryClient = useQueryClient();
   const setShareProgress = useStore.getState().magicShare.setShareProgress;
@@ -163,30 +164,38 @@ export const useMagicShareModal = ({
       shareProgress.stage !== undefined) ||
       magicShareLatest?.status === 'generating');
 
-  // Map progress stages to user-friendly messages
-  const progressMessage = useMemo(() => {
-    // Stage messages mapping
-    const stageMessages: Record<string, string> = {
-      started: 'Starting generation...',
-      gathering_data: 'Gathering concept data...',
-      generating_html: 'Generating HTML...',
-      generating_pdf: 'Generating PDF...',
-      generating_video: 'Generating video...',
-      generating_slides: 'Generating slides...',
-      uploading: 'Uploading document...',
-      completed: 'Generation complete!',
-    };
+  // Funny rotating messages for progress
+  const funnyMessages = useMemo(
+    () => [
+      'Aligning content left...',
+      'Adding corporate buzzwords...',
+      'Seeking unnecessary approvals...',
+      "Telling the intern 'Plz Fix'...",
+      'Pouring another cup of coffee...',
+      'Synergizing stakeholder outcomes...',
+      'Circling back on action items...',
+      'Boiling the ocean strategically...',
+    ],
+    [],
+  );
 
-    // Prefer WebSocket message, fall back to API message
-    const currentStage = shareProgress?.stage || magicShareLatest?.stage;
-    const currentMessage = shareProgress?.message || magicShareLatest?.message;
-
-    if (currentStage) {
-      return stageMessages[currentStage] || currentMessage || 'Processing...';
+  // Rotate through funny messages every 3 seconds when generating
+  useEffect(() => {
+    if (!isGenerating) {
+      setCurrentMessageIndex(0);
+      return;
     }
 
-    return currentMessage || 'Processing...';
-  }, [shareProgress, magicShareLatest]);
+    const interval = setInterval(() => {
+      setCurrentMessageIndex((prev) => (prev + 1) % funnyMessages.length);
+    }, 7000);
+
+    return () => clearInterval(interval);
+  }, [isGenerating, funnyMessages.length]);
+
+  const progressMessage = useMemo(() => {
+    return funnyMessages[currentMessageIndex];
+  }, [funnyMessages, currentMessageIndex]);
 
   // Get the actual format type (for icons, etc.)
   const actualFormat = useMemo(() => {

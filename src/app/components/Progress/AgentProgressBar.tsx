@@ -462,7 +462,7 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
 
   // Striped gradient pattern
   const stripePattern =
-    'linear-gradient(45deg, rgba(255,255,255,.1) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.1) 50%, rgba(255,255,255,.1) 75%, transparent 75%, transparent)';
+    'linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%, transparent)';
 
   // If no timing data and not loading, use fallback countdown
   const usingFallbackTiming =

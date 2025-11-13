@@ -60,8 +60,17 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
   const { closeModal } = useModal();
   const carouselRef = React.useRef<HTMLDivElement>(null);
 
-  // CSS for card carousel animation
+  // CSS for card carousel animation and progress bar stripes
   const cardCarouselStyles = `
+    @keyframes stripeSlide {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 2rem 0;
+      }
+    }
+
     @keyframes card-carousel-pdf {
       0%, 20% {
         transform: translateX(calc(-50% - 5rem)) translateY(var(--card-y)) rotate(-12deg) scale(0.9);
@@ -242,6 +251,13 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
         </div>
       )}
 
+      {/* Beta Badge - Always in top left */}
+      <div className='absolute left-4 top-4 z-50'>
+        <span className='aucctus-text-xs-bold rounded-md border border-white px-2 py-1.5 text-white'>
+          BETA
+        </span>
+      </div>
+
       {/* Hero Section with Floating Cards */}
       <div
         className={cn(
@@ -256,28 +272,11 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
           } as React.CSSProperties
         }
       >
-        {/* Cancel Button - top left when generating */}
-        {isGenerating && (
-          <button
-            onClick={handleCancel}
-            className='aucctus-border-secondary group absolute left-4 top-4 z-50 flex h-8 items-center gap-1.5 rounded-full border border-opacity-25 px-3 transition-colors hover:bg-white/20'
-            aria-label='Cancel'
-          >
-            <Icon
-              variant='closeX'
-              className='h-3.5 w-3.5 stroke-white/70 group-hover:stroke-white'
-            />
-            <span className='text-sm font-medium text-white/70 group-hover:text-white'>
-              Cancel
-            </span>
-          </button>
-        )}
-
-        {/* Restart Button - top left when complete or error */}
+        {/* Restart Button - bottom left when complete or error */}
         {(isComplete || hasError) && (
           <button
             onClick={handleRestart}
-            className='aucctus-border-secondary group absolute left-4 top-4 z-50 flex h-8 items-center gap-1.5 rounded-full border border-opacity-25 px-3 transition-colors hover:bg-white/20'
+            className='aucctus-border-secondary group absolute bottom-4 left-4 z-50 flex h-8 items-center gap-1.5 rounded-full border border-opacity-25 px-3 transition-colors hover:bg-white/20'
             aria-label='Restart'
           >
             <Icon
@@ -304,13 +303,6 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
 
         {/* Floating Cards */}
         <div className='absolute inset-0 flex items-center justify-center'>
-          {/* Beta Badge - Bottom Left */}
-          <div className='absolute bottom-4 left-4'>
-            <span className='aucctus-text-xs-bold rounded-md border border-white px-2 py-1.5 text-white'>
-              BETA
-            </span>
-          </div>
-
           {/* PDF Card */}
           <div className='animate-card-pdf absolute left-1/2'>
             <div className='flex h-32 w-24 flex-col rounded-lg border border-white/20 bg-white/10 p-2.5 shadow-2xl backdrop-blur-md'>
@@ -440,7 +432,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
               {/* Fun message below title */}
               <p
                 className={cn(
-                  'aucctus-text-sm mb-1.5 mt-0.5',
+                  'aucctus-text-xs mb-1.5 mt-0.5 min-w-[250px] max-w-[300px]',
                   hasError
                     ? 'aucctus-text-error-primary'
                     : 'aucctus-text-secondary',
@@ -456,21 +448,33 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
               {/* Progress Bar */}
               {!hasError && (
                 <div className='relative w-[100%]'>
-                  <div className='aucctus-bg-tertiary h-3 overflow-hidden rounded'>
+                  <div
+                    className={cn(
+                      'relative h-3 w-full overflow-hidden rounded-md border border-opacity-50',
+                      'bg-gray-light-200 dark:bg-gray-light-700',
+                      isComplete
+                        ? 'aucctus-border-success'
+                        : 'aucctus-border-brand',
+                    )}
+                    role='progressbar'
+                    aria-valuenow={Math.round(progress)}
+                    aria-valuemin={0}
+                    aria-valuemax={100}
+                  >
                     <div
-                      className={cn(
-                        'h-full transition-all duration-300',
-                        isComplete
-                          ? 'bg-green-600 bg-[linear-gradient(45deg,rgba(255,255,255,.08)_25%,transparent_25%,transparent_50%,rgba(255,255,255,.08)_50%,rgba(255,255,255,.08)_75%,transparent_75%,transparent)] bg-[length:1rem_1rem]'
-                          : 'bg-gradient-to-r from-pink-500 to-orange-500',
-                      )}
-                      style={{ width: isComplete ? '100%' : `${progress}%` }}
-                    >
-                      {/* Striped animation - only during generation */}
-                      {!isComplete && (
-                        <div className='absolute inset-0 animate-[shimmer_2s_linear_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent bg-[length:200%_100%]'></div>
-                      )}
-                    </div>
+                      className='h-full'
+                      style={{
+                        width: isComplete ? '100%' : `${progress}%`,
+                        backgroundColor: isComplete ? '#079455' : '#514141',
+                        backgroundImage:
+                          'linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%, transparent)',
+                        backgroundSize: '1rem 1rem',
+                        backgroundRepeat: 'repeat',
+                        transition: 'width 500ms ease-out',
+                        animation:
+                          'stripeSlide 7.5s ease-in-out infinite alternate',
+                      }}
+                    />
                   </div>
 
                   {/* Checkmark at end when complete */}
@@ -505,8 +509,20 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
             ) : (
               <div className='flex flex-shrink-0 flex-col gap-2'>
                 <button
+                  onClick={isGenerating ? handleCancel : handleDownload}
+                  className={cn(
+                    'aucctus-text-sm-medium h-9 rounded-lg px-3 transition-colors',
+                    isGenerating
+                      ? 'aucctus-bg-primary aucctus-text-error-primary border border-red-600 hover:bg-red-50'
+                      : 'bg-black text-white hover:bg-gray-800',
+                  )}
+                  disabled={!isGenerating && !isComplete}
+                >
+                  {isGenerating ? 'Cancel' : 'Download'}
+                </button>
+                <button
                   onClick={handleEmail}
-                  className='btn btn-primary btn-sm h-9 px-3'
+                  className='aucctus-text-sm-medium h-9 rounded-lg bg-black px-3 text-white transition-colors hover:bg-gray-800'
                   disabled={isSendingEmail || shouldEmail || !hasMagicShareUuid}
                 >
                   {isSendingEmail
@@ -521,13 +537,6 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                           ? 'Email'
                           : 'Email when ready'}
                 </button>
-                <button
-                  onClick={handleDownload}
-                  className='btn btn-primary btn-sm h-9 px-3'
-                  disabled={!isComplete}
-                >
-                  {'Download'}
-                </button>
               </div>
             )}
           </div>
@@ -540,12 +549,12 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
           {/* Title */}
           <div className='text-center'>
             <div className='mb-2 flex items-center justify-center gap-2'>
-              <span className='text-2xl'>✨</span>
-              <h2 className='aucctus-text-primary aucctus-header-lg-bold leading-tight'>
+              <span className='pt-4 text-2xl'>✨</span>
+              <h2 className='aucctus-text-primary aucctus-header-sm-bold pt-4 leading-tight'>
                 Magic Share
               </h2>
             </div>
-            <p className='aucctus-text-secondary aucctus-text-xl mb-8'>
+            <p className='aucctus-text-secondary aucctus-text-md mb-8'>
               Share anything from your concept, instantly
             </p>
           </div>
