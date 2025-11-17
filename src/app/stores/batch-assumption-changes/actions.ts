@@ -87,12 +87,31 @@ export const createBatchAssumptionChangesActions = (
     if (!change || change.type === 'delete') return assumption;
     if (!change.changes) return assumption; // Safety check
 
+    // Helper to ensure validationStatus matches IAssumptionV2 type
+    const getValidatedStatus = (
+      status: string | undefined,
+    ): 'validated' | 'partially_validated' | 'invalidated' | 'untested' => {
+      if (
+        status === 'validated' ||
+        status === 'partially_validated' ||
+        status === 'invalidated' ||
+        status === 'untested'
+      ) {
+        return status;
+      }
+      // Default to untested for any other status values
+      return 'untested';
+    };
+
     return {
       ...assumption,
       statement: change.changes.statement,
       category: change.changes.category,
       importance: change.changes.importance,
       certainty: change.changes.certainty,
+      ...(change.changes.validationStatus !== undefined && {
+        validationStatus: getValidatedStatus(change.changes.validationStatus),
+      }),
     };
   },
 

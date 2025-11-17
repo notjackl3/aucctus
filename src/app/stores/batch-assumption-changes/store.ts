@@ -1,7 +1,11 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { subscribeWithSelector } from 'zustand/middleware';
-import { IAssumptionV2, AssumptionCategory } from '@libs/api/types';
+import {
+  IAssumptionV2,
+  AssumptionCategory,
+  AssumptionStatusV2,
+} from '@libs/api/types';
 import {
   IBatchAssumptionChangesActions,
   createBatchAssumptionChangesActions,
@@ -18,6 +22,7 @@ export interface BatchAssumptionChange {
     category: AssumptionCategory;
     importance: number; // 0-1 range (frontend format)
     certainty: number; // 0-1 range (frontend format)
+    validationStatus?: AssumptionStatusV2; // Optional validation status
   };
   timestamp: number;
 }

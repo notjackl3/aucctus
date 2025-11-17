@@ -12,7 +12,11 @@ interface AssumptionValidationCardProps {
   isUpdating: boolean;
   onValidationChange: (
     assumption: ITestAssumptionDetailed,
-    newValidationStatus: 'validated' | 'invalidated' | 'untested',
+    newValidationStatus:
+      | 'validated'
+      | 'partially_validated'
+      | 'invalidated'
+      | 'untested',
   ) => void;
 }
 
@@ -23,10 +27,37 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
 }) => {
   const statement = assumption.statement || '';
   const category = assumption.category || '';
-  const normalizedStatus =
-    assumption.validationStatus === 'untested'
-      ? 'unchanged'
-      : assumption.validationStatus;
+  const normalizedStatus:
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'unchanged' = (() => {
+    // Normalize validation status to handle both snake_case and camelCase from API
+    const status = assumption.validationStatus || '';
+
+    // Convert camelCase to snake_case if needed (API returns camelCase)
+    const statusMap: Record<
+      string,
+      'validated' | 'partially_validated' | 'invalidated' | 'untested'
+    > = {
+      partiallyValidated: 'partially_validated',
+      partially_validated: 'partially_validated',
+      validated: 'validated',
+      invalidated: 'invalidated',
+      untested: 'untested',
+    };
+
+    const normalized =
+      statusMap[status] ||
+      (status as
+        | 'validated'
+        | 'partially_validated'
+        | 'invalidated'
+        | 'untested');
+
+    if (normalized === 'untested') return 'unchanged';
+    return normalized as 'validated' | 'partially_validated' | 'invalidated';
+  })();
 
   // Helper to render category icon with proper colors
   const renderCategoryIcon = (category: string): React.ReactNode => {
@@ -67,6 +98,17 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
         isSelected: normalizedStatus === 'invalidated',
       },
       {
+        type: 'partially_validated',
+        label: 'Partially validated',
+        icon: (
+          <Icon
+            variant='help-circle'
+            className='aucctus-stroke-warning-primary h-4 w-4'
+          />
+        ),
+        isSelected: normalizedStatus === 'partially_validated',
+      },
+      {
         type: 'unchanged',
         label: 'Unchanged',
         icon: (
@@ -89,7 +131,11 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
 
     onValidationChange(
       assumption,
-      optionType as 'validated' | 'invalidated' | 'untested',
+      optionType as
+        | 'validated'
+        | 'partially_validated'
+        | 'invalidated'
+        | 'untested',
     );
   };
 

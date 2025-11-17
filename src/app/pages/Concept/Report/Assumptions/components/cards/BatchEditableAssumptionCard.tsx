@@ -1,10 +1,15 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { Icon } from '@components';
-import { AssumptionCategory, IAssumptionV2 } from '@libs/api/types';
+import {
+  AssumptionCategory,
+  AssumptionStatusV2,
+  IAssumptionV2,
+} from '@libs/api/types';
 import { getCategoryColors } from '../../constants/categoryColors';
 import { getCategoryIcon } from '../../utils/assumptionUtils';
 import EditableImportanceMeter from '../badges/EditableImportanceMeter';
 import EditableCertaintyMeter from '../badges/EditableCertaintyMeter';
+import EditableStatusBadge from '../badges/EditableStatusBadge';
 import { BatchAssumptionChange } from '@stores/batch-assumption-changes';
 
 interface BatchEditableAssumptionCardProps {
@@ -38,6 +43,7 @@ const BatchEditableAssumptionCard: React.FC<
         importance: existingChange.changes.importance,
         certainty: existingChange.changes.certainty,
         category: existingChange.changes.category,
+        validationStatus: existingChange.changes.validationStatus || 'untested',
       };
     }
 
@@ -47,6 +53,7 @@ const BatchEditableAssumptionCard: React.FC<
         importance: assumption.importance,
         certainty: assumption.certainty,
         category: assumption.category,
+        validationStatus: assumption.validationStatus || 'untested',
       };
     }
 
@@ -55,6 +62,7 @@ const BatchEditableAssumptionCard: React.FC<
       importance: 0.16, // Default to "Low" (16% -> backend 1)
       certainty: 0.16, // Default to "Low" (16% -> backend 1)
       category,
+      validationStatus: 'untested' as AssumptionStatusV2, // Default status
     };
   };
 
@@ -64,6 +72,9 @@ const BatchEditableAssumptionCard: React.FC<
   const [certainty, setCertainty] = useState(initialData.certainty);
   const [selectedCategory, setSelectedCategory] = useState(
     initialData.category,
+  );
+  const [validationStatus, setValidationStatus] = useState<AssumptionStatusV2>(
+    initialData.validationStatus,
   );
 
   // Track if the form has been modified
@@ -76,14 +87,23 @@ const BatchEditableAssumptionCard: React.FC<
       importance,
       certainty,
       category: selectedCategory,
+      validationStatus,
     };
     const hasChanged =
       current.statement !== initialData.statement ||
       current.importance !== initialData.importance ||
       current.certainty !== initialData.certainty ||
-      current.category !== initialData.category;
+      current.category !== initialData.category ||
+      current.validationStatus !== initialData.validationStatus;
     setIsModified(hasChanged);
-  }, [statement, importance, certainty, selectedCategory, initialData]);
+  }, [
+    statement,
+    importance,
+    certainty,
+    selectedCategory,
+    validationStatus,
+    initialData,
+  ]);
 
   // Validation
   const isFormValid = statement.trim().length > 0;
@@ -112,6 +132,7 @@ const BatchEditableAssumptionCard: React.FC<
         category: selectedCategory,
         importance,
         certainty,
+        validationStatus,
       },
     };
 
@@ -121,6 +142,7 @@ const BatchEditableAssumptionCard: React.FC<
     selectedCategory,
     importance,
     certainty,
+    validationStatus,
     isFormValid,
     isLoading,
     isModified,
@@ -218,8 +240,16 @@ const BatchEditableAssumptionCard: React.FC<
         />
       </div>
 
-      {/* Editable meters */}
-      <div className='mb-4 flex flex-wrap gap-2'>
+      {/* Editable meters and status */}
+      <div className='mb-4 flex flex-wrap items-center gap-2'>
+        <div className='flex items-center gap-1'>
+          <span className='aucctus-text-xs aucctus-text-tertiary'>Status:</span>
+          <EditableStatusBadge
+            status={validationStatus}
+            onChange={setValidationStatus}
+            disabled={isLoading}
+          />
+        </div>
         <EditableImportanceMeter
           importance={importancePercentage}
           onChange={handleImportanceChange}
@@ -263,7 +293,7 @@ const BatchEditableAssumptionCard: React.FC<
                 Saving...
               </>
             ) : mode === 'add' ? (
-              'Add to Batch'
+              'Add'
             ) : (
               'Save Changes'
             )}

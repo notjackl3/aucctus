@@ -6,7 +6,7 @@ export interface Assumption {
   category?: string;
   confidence?: number;
   risk?: 'high' | 'medium' | 'low';
-  status?: 'validated' | 'invalidated' | 'untested';
+  status?: 'validated' | 'partially_validated' | 'invalidated' | 'untested';
   benchmark?: string;
 }
 
@@ -294,7 +294,11 @@ export interface ITestAssumptionCreate {
 }
 
 export interface ITestAssumptionUpdate {
-  validationStatus?: 'validated' | 'invalidated' | 'untested';
+  validationStatus?:
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
   benchmark?: string;
   notes?: string;
 }
@@ -303,7 +307,11 @@ export interface ITestAssumptionUpdate {
 export interface ITestAssumptionDetailed extends ITestAssumption {
   testDetailsUuid: string;
   assumptionUuid: string;
-  validationStatus: 'validated' | 'invalidated' | 'untested';
+  validationStatus:
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
   benchmark: string;
   testName: string;
   riskLevel: 'high' | 'medium' | 'low';
@@ -315,7 +323,11 @@ export interface ITestAssumptionDetailed extends ITestAssumption {
 export interface ITestAssumptionExtended extends ITestAssumption {
   testDetailsUuid: string;
   assumptionUuid: string;
-  validationStatus: 'validated' | 'invalidated' | 'untested';
+  validationStatus:
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
   benchmark: string;
   testName: string;
 }

@@ -1,6 +1,13 @@
 import { useState, useCallback, useEffect } from 'react';
-import { useNavigate, useOutletContext } from 'react-router-dom';
-import { IAssumptionV2, AssumptionCategory } from '@libs/api/types';
+import { useOutletContext } from 'react-router-dom';
+import {
+  IAssumptionV2,
+  AssumptionCategory,
+  AssumptionStatusV2,
+  IAssumptionBatchRequest,
+  IAssumptionLifecycleAddRequest,
+  IAssumptionLifecycleUpdateRequest,
+} from '@libs/api/types';
 import { useAssumptionBatchUpdate } from '@hooks/query/concepts.hook';
 import { useModal } from '@context/ModalContextProvider';
 import { useBatchAssumptionChangesStore } from '../../stores/batch-assumption-changes';
@@ -25,7 +32,6 @@ export const useBatchAssumptionTable = ({
   const { concept } = useOutletContext<IConceptReportContext>();
   const { openModal, closeModal } = useModal();
   const { mutate: batchUpdateAssumptions } = useAssumptionBatchUpdate();
-  const navigate = useNavigate();
 
   // Batch changes management - directly use the store
   const {
@@ -97,7 +103,7 @@ export const useBatchAssumptionTable = ({
     async (change: Parameters<typeof addChange>[0]) => {
       addChange(change);
       setIsAdding(false);
-      toast.success('Assumption added to batch. Save all changes to apply.');
+      toast.success('Assumption added. Regenerate tests to apply.');
     },
     [addChange],
   );
@@ -145,6 +151,26 @@ export const useBatchAssumptionTable = ({
     return 3; // High
   }, []);
 
+  type BatchValidationStatus =
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
+  const normalizeValidationStatus = useCallback(
+    (status?: AssumptionStatusV2): BatchValidationStatus | undefined => {
+      if (
+        status === 'validated' ||
+        status === 'partially_validated' ||
+        status === 'invalidated' ||
+        status === 'untested'
+      ) {
+        return status;
+      }
+      return undefined;
+    },
+    [],
+  );
+
   const performBatchSave = useCallback(async () => {
     setIsSubmitting(true);
 
@@ -156,24 +182,44 @@ export const useBatchAssumptionTable = ({
       const deletes = changes.filter((c) => c.type === 'delete');
 
       // Build the batch request payload according to new API format
-      const batchPayload = {
+      const batchPayload: IAssumptionBatchRequest = {
         create: adds
           .filter((change) => change.changes) // Type guard
-          .map((change) => ({
-            statement: change.changes!.statement,
-            category: convertToBackendCategory(change.changes!.category),
-            importance: convertToBackendScore(change.changes!.importance),
-            certainty: convertToBackendScore(change.changes!.certainty),
-          })),
+          .map((change) => {
+            const payload: IAssumptionLifecycleAddRequest = {
+              statement: change.changes!.statement,
+              category: convertToBackendCategory(change.changes!.category),
+              importance: convertToBackendScore(change.changes!.importance),
+              certainty: convertToBackendScore(change.changes!.certainty),
+            };
+            const normalizedStatus = normalizeValidationStatus(
+              change.changes?.validationStatus,
+            );
+            if (normalizedStatus !== undefined) {
+              payload.validationStatus = normalizedStatus;
+            }
+            return payload;
+          }),
         update: updates
           .filter((change) => change.originalData && change.changes) // Type guards
-          .map((change) => ({
-            uuid: change.originalData!.uuid,
-            statement: change.changes!.statement,
-            category: convertToBackendCategory(change.changes!.category),
-            importance: convertToBackendScore(change.changes!.importance),
-            certainty: convertToBackendScore(change.changes!.certainty),
-          })),
+          .map((change) => {
+            const payload: IAssumptionLifecycleUpdateRequest & {
+              uuid: string;
+            } = {
+              uuid: change.originalData!.uuid,
+              statement: change.changes!.statement,
+              category: convertToBackendCategory(change.changes!.category),
+              importance: convertToBackendScore(change.changes!.importance),
+              certainty: convertToBackendScore(change.changes!.certainty),
+            };
+            const normalizedStatus = normalizeValidationStatus(
+              change.changes?.validationStatus,
+            );
+            if (normalizedStatus !== undefined) {
+              payload.validationStatus = normalizedStatus;
+            }
+            return payload;
+          }),
         delete: deletes
           .filter((change) => change.originalData) // Type guard
           .map((change) => change.originalData!.uuid),
@@ -188,8 +234,6 @@ export const useBatchAssumptionTable = ({
       clearChanges();
       setIsAdding(false);
       setEditingAssumptionId(null);
-
-      navigate('/concept');
     } catch (error) {
       toast.error('Failed to save. Please try again.');
     } finally {
@@ -200,9 +244,9 @@ export const useBatchAssumptionTable = ({
     clearChanges,
     concept.identifier,
     batchUpdateAssumptions,
-    navigate,
     convertToBackendCategory,
     convertToBackendScore,
+    normalizeValidationStatus,
   ]);
 
   // Batch operations
@@ -280,44 +324,16 @@ export const useBatchAssumptionTable = ({
   // Handle deleting existing assumption (batch deletion)
   const handleDeleteAssumption = useCallback(
     (assumptionId: string, assumption: IAssumptionV2) => {
-      // Show modal confirmation dialog before adding to batch
-      openModal(
-        Modal.Confirmation,
-        {
-          title: 'Delete Assumption from Batch?',
-          subtitle: `Are you sure you want to delete this assumption?\n\n"${assumption.statement}"\n\nThis will add the deletion to your batch of changes. The assumption will be permanently deleted when you save all changes.`,
-          actions: [
-            {
-              title: 'Cancel',
-              variant: 'secondary',
-              onClick: () => {
-                closeModal();
-              },
-            },
-            {
-              title: 'Delete',
-              variant: 'danger',
-              onClick: () => {
-                addChange({
-                  id: assumptionId,
-                  type: 'delete',
-                  originalData: assumption,
-                });
-                toast.success(
-                  'Assumption marked for deletion. Save all changes to apply.',
-                );
-                closeModal();
-              },
-            },
-          ],
-        },
-        {
-          position: 'center',
-          backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-20',
-        },
+      addChange({
+        id: assumptionId,
+        type: 'delete',
+        originalData: assumption,
+      });
+      toast.success(
+        'Assumption marked for deletion. Regenerate tests to apply.',
       );
     },
-    [addChange, openModal, closeModal],
+    [addChange],
   );
 
   // Handle editing new assumptions
@@ -334,7 +350,7 @@ export const useBatchAssumptionTable = ({
           importance: change.changes!.importance,
           certainty: change.changes!.certainty,
           status: 'untested',
-          validationStatus: 'untested',
+          validationStatus: change.changes!.validationStatus ?? 'untested',
           risk: 0,
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString(),

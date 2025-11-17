@@ -47,6 +47,14 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
     return 'Low';
   };
 
+  // Helper function to convert status to display text
+  const getStatusDisplayText = (status: string): string => {
+    if (status === 'validated') return 'Validated';
+    if (status === 'invalidated') return 'Invalidated';
+    if (status === 'partially_validated') return 'Partially Validated';
+    return 'Untested';
+  };
+
   const renderChangesList = () => {
     if (changes.length === 0) return null;
 
@@ -130,7 +138,7 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
 
                 {/* Metrics - only show for add/edit, not delete */}
                 {change.type !== 'delete' && change.changes && (
-                  <div className='flex gap-3'>
+                  <div className='flex flex-wrap gap-3'>
                     <div className='flex items-center gap-1'>
                       <span className='aucctus-text-xs aucctus-text-tertiary'>
                         Importance:
@@ -147,6 +155,48 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
                         {getLevel(change.changes.certainty)}
                       </span>
                     </div>
+                    {/* Show status change if it was modified */}
+                    {change.changes.validationStatus !== undefined &&
+                      change.originalData &&
+                      change.changes.validationStatus !==
+                        (change.originalData.validationStatus ||
+                          change.originalData.status ||
+                          'untested') && (
+                        <div className='flex items-center gap-1'>
+                          <span className='aucctus-text-xs aucctus-text-tertiary'>
+                            Status:
+                          </span>
+                          <span className='aucctus-text-xs-semibold aucctus-text-primary line-through'>
+                            {getStatusDisplayText(
+                              change.originalData.validationStatus ||
+                                change.originalData.status ||
+                                'untested',
+                            )}
+                          </span>
+                          <span className='aucctus-text-xs-semibold aucctus-text-primary'>
+                            →
+                          </span>
+                          <span className='aucctus-text-xs-semibold aucctus-text-primary'>
+                            {getStatusDisplayText(
+                              change.changes.validationStatus || 'untested',
+                            )}
+                          </span>
+                        </div>
+                      )}
+                    {/* Show status for new assumptions */}
+                    {change.type === 'add' &&
+                      change.changes.validationStatus !== undefined && (
+                        <div className='flex items-center gap-1'>
+                          <span className='aucctus-text-xs aucctus-text-tertiary'>
+                            Status:
+                          </span>
+                          <span className='aucctus-text-xs-semibold aucctus-text-primary'>
+                            {getStatusDisplayText(
+                              change.changes.validationStatus || 'untested',
+                            )}
+                          </span>
+                        </div>
+                      )}
                   </div>
                 )}
 
@@ -166,7 +216,7 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
 
   const getModalContent = () => {
     return {
-      title: 'Confirm Batch Changes',
+      title: 'Confirm Changes',
       message: `You are about to apply ${changes.length} changes to your assumptions. Partially completed tests will be removed and next recommended test will be re-assessed. Only completed tests will remain unchanged. You cannot undo this.`,
       confirmButtonText: 'Apply All Changes',
       confirmButtonVariant: 'btn-primary',

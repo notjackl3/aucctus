@@ -65,31 +65,54 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
 
   // Calculate validation stats from assumptions
   const validationStats = useMemo(() => {
+    // Normalize validation status to handle both camelCase (from API) and snake_case
+    const normalizeStatus = (status: string | undefined): string => {
+      if (!status) return 'untested';
+      // Handle camelCase from API serializer
+      if (status === 'partiallyValidated') return 'partially_validated';
+      return status.toLowerCase();
+    };
+
     const validated = test.assumptions.filter(
-      (a) => a.validationStatus === 'validated',
+      (a) => normalizeStatus(a.validationStatus) === 'validated',
+    ).length;
+    const partiallyValidated = test.assumptions.filter(
+      (a) => normalizeStatus(a.validationStatus) === 'partially_validated',
     ).length;
     const invalidated = test.assumptions.filter(
-      (a) => a.validationStatus === 'invalidated',
+      (a) => normalizeStatus(a.validationStatus) === 'invalidated',
     ).length;
     const untested = test.assumptions.filter(
-      (a) => a.validationStatus === 'untested',
+      (a) => normalizeStatus(a.validationStatus) === 'untested',
     ).length;
 
-    return { validated, invalidated, untested, total: test.assumptions.length };
+    return {
+      validated,
+      partiallyValidated,
+      invalidated,
+      untested,
+      total: test.assumptions.length,
+    };
   }, [test.assumptions]);
 
   // Map our assumptions to the format expected by AssumptionDetailCard
   const mappedAssumptions = useMemo(() => {
+    // Normalize validation status to handle both camelCase (from API) and snake_case
+    const normalizeStatus = (
+      status: string | undefined,
+    ): AssumptionStatusV2 => {
+      if (!status) return 'untested';
+      // Handle camelCase from API serializer
+      if (status === 'partiallyValidated') return 'partially_validated';
+      return status.toLowerCase() as AssumptionStatusV2;
+    };
+
     return test.assumptions.map((assumption) => {
       // Convert risk level to number for processing
       const riskValue = riskLevelToNumber(assumption.riskLevel);
 
       // Map status from Testing types to Assumptions types
-      const statusValue = (() => {
-        if (!assumption.validationStatus)
-          return 'untested' as AssumptionStatusV2;
-        return assumption.validationStatus as unknown as AssumptionStatusV2;
-      })();
+      const statusValue = normalizeStatus(assumption.validationStatus);
 
       return {
         id: assumption.uuid,

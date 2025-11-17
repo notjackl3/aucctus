@@ -38,6 +38,38 @@ const TestOverview: React.FC<TestOverviewProps> = ({
 
   // Convert API assumptions directly to IAssumptionV2 format (skip intermediate Assumption format)
   const convertApiToAssumptionCard = (apiAssumption: any): IAssumptionV2 => {
+    // Normalize validation status to handle both camelCase and snake_case from API
+    // Return type matches IAssumptionV2.validationStatus (excludes 'unvalidated')
+    const normalizeValidationStatus = (
+      status: string | undefined,
+    ): 'validated' | 'partially_validated' | 'invalidated' | 'untested' => {
+      if (!status) return 'untested';
+
+      // Handle camelCase from API serializer
+      const normalized =
+        status === 'partiallyValidated'
+          ? 'partially_validated'
+          : status.toLowerCase();
+
+      if (
+        normalized === 'validated' ||
+        normalized === 'partially_validated' ||
+        normalized === 'invalidated' ||
+        normalized === 'untested'
+      ) {
+        return normalized as
+          | 'validated'
+          | 'partially_validated'
+          | 'invalidated'
+          | 'untested';
+      }
+      return 'untested';
+    };
+
+    const validationStatus = normalizeValidationStatus(
+      apiAssumption.validationStatus,
+    );
+
     return {
       uuid: apiAssumption.uuid,
       statement: apiAssumption.statement,
@@ -48,12 +80,7 @@ const TestOverview: React.FC<TestOverviewProps> = ({
       certaintyCategory: (apiAssumption.riskLevel as RiskCategory) || 'medium',
       importanceCategory: 'high' as RiskCategory, // Default based on importance value
       riskCategory: (apiAssumption.riskLevel as RiskCategory) || 'medium',
-      validationStatus:
-        apiAssumption.validationStatus === 'validated'
-          ? 'validated'
-          : apiAssumption.validationStatus === 'invalidated'
-            ? 'invalidated'
-            : 'untested',
+      validationStatus,
       createdBy: apiAssumption.createdBy || 1, // Default createdBy
       createdAt: apiAssumption.createdAt || new Date().toISOString(),
       updatedAt: apiAssumption.updatedAt || new Date().toISOString(),
@@ -62,13 +89,7 @@ const TestOverview: React.FC<TestOverviewProps> = ({
       id: apiAssumption.uuid, // Alias for backward compatibility
       lastModified: apiAssumption.updatedAt || new Date().toISOString(),
       metadata: {},
-      status: (apiAssumption.validationStatus === 'validated'
-        ? 'validated'
-        : apiAssumption.validationStatus === 'invalidated'
-          ? 'invalidated'
-          : apiAssumption.validationStatus === 'untested'
-            ? 'untested'
-            : 'untested') as AssumptionStatusV2,
+      status: validationStatus,
       confidence: apiAssumption.certainty, // Alias for certainty
       impactPoints: Math.round(apiAssumption.importance * 10), // Convert 0-1 to 0-10
       validationPercentage: 0, // Will be updated based on test results

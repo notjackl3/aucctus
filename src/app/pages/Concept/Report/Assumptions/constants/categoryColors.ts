@@ -20,6 +20,8 @@ export interface CategoryColorSet {
   stroke: string;
   // Text color for elements related to this category
   text: string;
+  // Text color for selected state (darker shade)
+  textSelected: string;
 }
 
 // Define colors for each category
@@ -34,6 +36,7 @@ export const CATEGORY_COLORS: Record<AssumptionCategory, CategoryColorSet> = {
     fill: 'fill-pink-500',
     stroke: 'stroke-pink-500',
     text: 'text-pink-500',
+    textSelected: 'text-pink-700',
   },
   viability: {
     iconBg: 'bg-purple-100',
@@ -45,6 +48,7 @@ export const CATEGORY_COLORS: Record<AssumptionCategory, CategoryColorSet> = {
     fill: 'fill-purple-500',
     stroke: 'stroke-purple-500',
     text: 'text-purple-500',
+    textSelected: 'text-purple-700',
   },
   feasibility: {
     iconBg: 'bg-blue-100',
@@ -52,10 +56,11 @@ export const CATEGORY_COLORS: Record<AssumptionCategory, CategoryColorSet> = {
     progressBarLight: 'bg-blue-300/30',
     progressBarDark: 'bg-blue-600',
     bgColor: 'bg-blue-50',
-    borderColor: 'border-l-blue-400',
+    borderColor: 'border-l-blue-500',
     fill: 'fill-blue-500',
     stroke: 'stroke-blue-500',
     text: 'text-blue-500',
+    textSelected: 'text-blue-700',
   },
   adaptability: {
     iconBg: 'bg-orange-100',
@@ -67,6 +72,7 @@ export const CATEGORY_COLORS: Record<AssumptionCategory, CategoryColorSet> = {
     fill: 'fill-orange-500',
     stroke: 'stroke-orange-500',
     text: 'text-orange-500',
+    textSelected: 'text-orange-700',
   },
 };
 

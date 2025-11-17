@@ -2,6 +2,7 @@ import { AssumptionCategory, AssumptionStatusV2 } from '@libs/api/types';
 
 export interface CategoryStatusCounts {
   validated: number;
+  partiallyValidated: number;
   invalidated: number;
   untested: number;
 }

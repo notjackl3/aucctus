@@ -70,6 +70,11 @@ export interface IAssumptionLifecycleAddRequest {
   category: 'Desirability' | 'Viability' | 'Feasibility' | 'Adaptability'; // Backend expects capitalized
   importance: number; // Backend expects 1-3 integers
   certainty: number; // Backend expects 1-3 integers
+  validationStatus?:
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
 }
 
 export interface IAssumptionLifecycleUpdateRequest {
@@ -77,6 +82,11 @@ export interface IAssumptionLifecycleUpdateRequest {
   category: 'Desirability' | 'Viability' | 'Feasibility' | 'Adaptability'; // Backend expects capitalized
   importance: number; // Backend expects 1-3 integers
   certainty: number; // Backend expects 1-3 integers
+  validationStatus?:
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
 }
 
 export interface IAssumptionBatchRequest {
@@ -266,7 +276,11 @@ export interface IAssumptionV2 {
   certaintyCategory: RiskCategory;
   importanceCategory: RiskCategory;
   riskCategory: RiskCategory;
-  validationStatus: 'validated' | 'invalidated' | 'untested'; // New field from API
+  validationStatus:
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested'; // New field from API
   createdBy: number;
   createdAt: string;
   updatedAt: string;

@@ -15,18 +15,19 @@ import { ITestAssumptionDetailed } from '../../../types';
 import { ITestResult } from '@libs/api/types/concept/testing';
 import { mapBackendSectionToReportKey } from '@libs/utils/concepts';
 import type { ConceptReportStatusBySection } from '@libs/api/types/concept/concepts';
-import useStore from '@stores/store';
 
 interface TestImpactProps {
   assumptions?: any[]; // Keep for backward compatibility but won't use
   conceptUuid?: string;
   testUuid?: string;
+  conceptIdentifier?: string; // Add conceptIdentifier prop for versioned concepts
   onCloseModal?: () => void;
 }
 
 const TestImpact: React.FC<TestImpactProps> = ({
   conceptUuid,
   testUuid,
+  conceptIdentifier,
   onCloseModal,
 }) => {
   const [updatingAssumptionUuid, setUpdatingAssumptionUuid] = useState<
@@ -34,7 +35,6 @@ const TestImpact: React.FC<TestImpactProps> = ({
   >(null);
 
   const queryClient = useQueryClient();
-  const conceptIdentifier = useStore((state) => state.conceptReport.identifier);
 
   // Fetch test detail to get assumptions and comprehensive recommendations
   // Force refetch when the Impact tab is opened
@@ -75,7 +75,11 @@ const TestImpact: React.FC<TestImpactProps> = ({
   // Handle validation status change using the mutation hook
   const handleValidationStatusChange = async (
     assumption: ITestAssumptionDetailed,
-    newValidationStatus: 'validated' | 'invalidated' | 'untested',
+    newValidationStatus:
+      | 'validated'
+      | 'partially_validated'
+      | 'invalidated'
+      | 'untested',
   ) => {
     if (!conceptUuid || !testUuid) {
       return;

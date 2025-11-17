@@ -3,6 +3,7 @@ import { Icon } from '@components';
 
 interface ValidationStats {
   validated: number;
+  partiallyValidated: number;
   invalidated: number;
   untested: number;
   total: number;
@@ -23,8 +24,8 @@ const TestValidationStats: React.FC<TestValidationStatsProps> = ({
 }) => {
   if (testStatus === 'completed') {
     return (
-      <div className='grid grid-cols-3 gap-2'>
-        <div className='aucctus-bg-success-secondary rounded-lg p-3 text-center'>
+      <div className='grid grid-cols-4 gap-2'>
+        <div className='aucctus-bg-success-secondary flex flex-col items-center justify-center rounded-lg p-3 text-center'>
           <div className='aucctus-text-success-primary text-xl font-bold'>
             {validationStats.validated}
           </div>
@@ -32,7 +33,15 @@ const TestValidationStats: React.FC<TestValidationStatsProps> = ({
             Validated
           </div>
         </div>
-        <div className='aucctus-bg-error-secondary rounded-lg p-3 text-center'>
+        <div className='aucctus-bg-warning-secondary flex flex-col items-center justify-center rounded-lg p-3 text-center'>
+          <div className='aucctus-text-warning-primary text-xl font-bold'>
+            {validationStats.partiallyValidated}
+          </div>
+          <div className='aucctus-text-xs-medium aucctus-text-warning-primary'>
+            Partial
+          </div>
+        </div>
+        <div className='aucctus-bg-error-secondary flex flex-col items-center justify-center rounded-lg p-3 text-center'>
           <div className='aucctus-text-error-primary text-xl font-bold'>
             {validationStats.invalidated}
           </div>
@@ -40,7 +49,7 @@ const TestValidationStats: React.FC<TestValidationStatsProps> = ({
             Invalidated
           </div>
         </div>
-        <div className='aucctus-bg-secondary rounded-lg p-3 text-center'>
+        <div className='aucctus-bg-secondary flex flex-col items-center justify-center rounded-lg p-3 text-center'>
           <div className='aucctus-text-brand-primary text-xl font-bold'>
             {validationStats.untested}
           </div>

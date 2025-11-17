@@ -19,6 +19,7 @@ import { useBatchAssumptionTable } from '@hooks/concepts/useBatchAssumptionTable
 
 const DEFAULT_STATUS_COUNTS: CategoryStatusCounts = {
   validated: 0,
+  partiallyValidated: 0,
   invalidated: 0,
   untested: 0,
 };
@@ -44,6 +45,8 @@ const calculateCategoryCounts = (
 
       if (assumption.validationStatus === 'validated') {
         counts.validated += 1;
+      } else if (assumption.validationStatus === 'partially_validated') {
+        counts.partiallyValidated += 1;
       } else if (assumption.validationStatus === 'invalidated') {
         counts.invalidated += 1;
       } else if (assumption.validationStatus === 'untested') {
@@ -148,12 +151,8 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
     expandedOverflow: 'visible',
   });
 
-  const newAssumptionsForSelectedCategory = React.useMemo(
-    () =>
-      getNewAssumptions().filter(
-        (change) => change.changes?.category === selectedCategory,
-      ),
-    [getNewAssumptions, selectedCategory],
+  const newAssumptionsForSelectedCategory = getNewAssumptions().filter(
+    (change) => change.changes?.category === selectedCategory,
   );
 
   // Get validation status from categoryMetrics
@@ -188,7 +187,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
         {/* Left column: Category cards - takes ~30% of space, fixed height */}
         <div
           ref={leftColumnRef}
-          className='aucctus-bg-primary aucctus-border-primary flex-shrink-0 border-r md:w-[30%]'
+          className='aucctus-bg-primary aucctus-border-primary flex-shrink-0 border-r md:w-[26%]'
         >
           {CATEGORY_CONFIG.map((categoryConfig, index) => (
             <CategoryProgressCard
@@ -221,60 +220,46 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
           newAssumptionsForSelectedCategory.length > 0 ? (
             <>
               <div className='space-y-4'>
-                {/* Render existing assumptions */}
-                {assumptions.map((assumption) => {
-                  const isEditingThis = editingAssumptionId === assumption.uuid;
-                  const isDeleted = isMarkedForDeletion(assumption.uuid);
-                  const effectiveData = getEffectiveAssumptionData(assumption);
+                {/* Render existing assumptions - filter out deleted ones */}
+                {assumptions
+                  .filter((assumption) => !isMarkedForDeletion(assumption.uuid))
+                  .map((assumption) => {
+                    const isEditingThis =
+                      editingAssumptionId === assumption.uuid;
+                    const effectiveData =
+                      getEffectiveAssumptionData(assumption);
 
-                  // Determine outline style based on change type
-                  let outlineClass = '';
-                  let statusText = '';
+                    if (isEditingThis) {
+                      return (
+                        <BatchEditableAssumptionCard
+                          key={assumption.uuid}
+                          mode='edit'
+                          category={assumption.category}
+                          assumption={assumption}
+                          existingChange={
+                            getChange(assumption.uuid) || undefined
+                          }
+                          onSave={handleSaveEditedAssumption}
+                          onCancel={handleCancelEditing}
+                          isLoading={isSubmitting}
+                        />
+                      );
+                    }
 
-                  if (isDeleted) {
-                    outlineClass = 'rounded-lg ring-2 ring-red-400';
-                    statusText = '• Marked for deletion';
-                  }
-
-                  if (isEditingThis) {
                     return (
-                      <BatchEditableAssumptionCard
-                        key={assumption.uuid}
-                        mode='edit'
-                        category={assumption.category}
-                        assumption={assumption}
-                        existingChange={getChange(assumption.uuid) || undefined}
-                        onSave={handleSaveEditedAssumption}
-                        onCancel={handleCancelEditing}
-                        isLoading={isSubmitting}
-                      />
-                    );
-                  }
-
-                  return (
-                    <div key={assumption.uuid}>
-                      <div className={outlineClass}>
+                      <div key={assumption.uuid}>
                         <AssumptionDetailCard
                           assumption={effectiveData}
                           showActions={
-                            !isAdding &&
-                            !editingAssumptionId &&
-                            !isSubmitting &&
-                            !isDeleted
+                            !isAdding && !editingAssumptionId && !isSubmitting
                           }
                           onDelete={() =>
                             handleDeleteAssumption(assumption.uuid, assumption)
                           }
                         />
                       </div>
-                      {isDeleted && (
-                        <div className='aucctus-text-xs aucctus-text-error-primary mt-1 text-center'>
-                          {statusText}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
+                    );
+                  })}
 
                 {/* Render new assumptions from batch */}
                 {newAssumptionsForSelectedCategory.map((newAssumption) => {

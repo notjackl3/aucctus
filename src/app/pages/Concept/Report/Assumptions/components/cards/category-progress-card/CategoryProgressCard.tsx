@@ -5,7 +5,7 @@ import StatusBadge from '../../badges/StatusBadge';
 import CategoryIcon from './CategoryIcon';
 import { getCategoryColors } from '../../../constants/categoryColors';
 import { AssumptionStatusV2 } from '@libs/api/types';
-import { Icon } from '@components';
+import { Icon, ComponentTooltip } from '@components';
 
 const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
   category,
@@ -28,7 +28,13 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
   };
 
   const stats =
-    statusCounts || ({ validated: 0, invalidated: 0, untested: 0 } as const);
+    statusCounts ||
+    ({
+      validated: 0,
+      partiallyValidated: 0,
+      invalidated: 0,
+      untested: 0,
+    } as const);
 
   return (
     <div
@@ -46,7 +52,14 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
           <div className='mr-2'>
             <CategoryIcon category={category} />
           </div>
-          <h4 className='aucctus-text-lg-bold aucctus-text-primary'>{title}</h4>
+          <h4
+            className={cn('aucctus-text-lg-bold', {
+              [categoryColors.textSelected]: isSelected,
+              'aucctus-text-primary': !isSelected,
+            })}
+          >
+            {title}
+          </h4>
         </div>
         <StatusBadge status={getStatus()} />
       </div>
@@ -57,30 +70,65 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
 
       {/* Status count badges */}
       <div className='flex flex-wrap gap-2'>
-        <div className='flex items-center gap-1 rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700'>
-          <Icon
-            variant='check'
-            className='h-3 w-3'
-            style={{ stroke: 'rgb(21, 128, 61)' }}
-          />
-          {stats.validated}
-        </div>
-        <div className='flex items-center gap-1 rounded border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700'>
-          <Icon
-            variant='closeX'
-            className='h-3 w-3'
-            style={{ stroke: 'rgb(185, 28, 28)' }}
-          />
-          {stats.invalidated}
-        </div>
-        <div className='flex items-center gap-1 rounded border border-yellow-200 bg-yellow-50 px-2 py-1 text-xs font-medium text-yellow-700'>
-          <Icon
-            variant='clock'
-            className='h-3 w-3'
-            style={{ stroke: 'rgb(161, 98, 7)' }}
-          />
-          {stats.untested}
-        </div>
+        {/* Validated badge with tooltip */}
+        <ComponentTooltip
+          tip={
+            <div className='aucctus-bg-primary aucctus-border-secondary rounded border px-3 py-2 shadow-lg'>
+              <p className='aucctus-text-primary aucctus-text-xs'>
+                Validated assumptions
+              </p>
+            </div>
+          }
+        >
+          <div className='flex items-center gap-1 rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700'>
+            <Icon
+              variant='check'
+              className='h-3 w-3'
+              style={{ stroke: 'rgb(21, 128, 61)' }}
+            />
+            {stats.validated}
+          </div>
+        </ComponentTooltip>
+
+        {/* Invalidated badge with tooltip */}
+        <ComponentTooltip
+          tip={
+            <div className='aucctus-bg-primary aucctus-border-secondary rounded border px-3 py-2 shadow-lg'>
+              <p className='aucctus-text-primary aucctus-text-xs'>
+                Invalidated assumptions
+              </p>
+            </div>
+          }
+        >
+          <div className='flex items-center gap-1 rounded border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700'>
+            <Icon
+              variant='closeX'
+              className='h-3 w-3'
+              style={{ stroke: 'rgb(185, 28, 28)' }}
+            />
+            {stats.invalidated}
+          </div>
+        </ComponentTooltip>
+
+        {/* Combined untested + partially validated badge with tooltip */}
+        <ComponentTooltip
+          tip={
+            <div className='aucctus-bg-primary aucctus-border-secondary rounded border px-3 py-2 shadow-lg'>
+              <p className='aucctus-text-primary aucctus-text-xs'>
+                Partially validated or untested assumptions
+              </p>
+            </div>
+          }
+        >
+          <div className='flex items-center gap-1 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700'>
+            <Icon
+              variant='alert-circle'
+              className='h-3 w-3'
+              style={{ stroke: 'rgb(146, 64, 14)' }}
+            />
+            {stats.partiallyValidated + stats.untested}
+          </div>
+        </ComponentTooltip>
       </div>
     </div>
   );

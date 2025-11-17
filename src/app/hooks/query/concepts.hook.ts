@@ -2318,6 +2318,7 @@ export const useUpdateConceptImageSettings = (conceptUuid: string) => {
 
 /**
  * Custom hook for batch updating assumptions (create, update, delete).
+ * Marks 'assumptions' section as pending to show skeleton loading on both Testing and Assumptions tabs.
  * @returns The result of the useMutation hook.
  */
 export const useAssumptionBatchUpdate = () => {
@@ -2330,6 +2331,13 @@ export const useAssumptionBatchUpdate = () => {
     }) => {
       const { rootIdentifier, data } = params;
       return await api.assumption.batchUpdateAssumptions(rootIdentifier, data);
+    },
+    onMutate: async (variables) => {
+      // Mark 'assumptions' section as pending immediately
+      // This will show skeleton loading on both Testing and Assumptions tabs
+      markConceptSectionsPending(queryClient, variables.rootIdentifier, [
+        'assumptions',
+      ]);
     },
     onSuccess: async (_data, variables) => {
       // Invalidate assumptions queries to force a refetch
@@ -2351,9 +2359,7 @@ export const useAssumptionBatchUpdate = () => {
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
-      toast.error(
-        message || 'Failed to apply batch changes. Please try again.',
-      );
+      toast.error(message || 'Failed to apply changes. Please try again.');
     },
   });
 };

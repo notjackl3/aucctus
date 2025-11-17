@@ -1,12 +1,10 @@
 import React, { useState, useCallback } from 'react';
 import { Icon, Modal } from '@components';
-import StatusBadge from '../badges/StatusBadge';
+import EditableStatusBadge from '../badges/EditableStatusBadge';
 import RiskBadge from '../badges/RiskBadge';
 import EditableImportanceMeter from '../badges/EditableImportanceMeter';
 import EditableCertaintyMeter from '../badges/EditableCertaintyMeter';
 import ValidationBenchmarkCard from '../../../Testing/components/modal-sections/test-impact/components/ValidationBenchmarkCard';
-import { getCategoryColors } from '../../constants/categoryColors';
-import { getCategoryIcon } from '../../utils/assumptionUtils';
 import { IAssumptionV2, AssumptionStatusV2 } from '@libs/api/types';
 import { useAssumptionRemove } from '@hooks/query/concepts.hook';
 import { useModal } from '@context/ModalContextProvider';
@@ -44,9 +42,6 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   // Mutation hooks
   const { mutate: removeAssumption } = useAssumptionRemove();
 
-  // Get category colors
-  const categoryColors = getCategoryColors(assumption.category);
-
   // Convert 0-1 values to 0-100 percentages for display
   const riskPercentage = Math.round(assumption.risk * 100);
   const certaintyPercentage = Math.round(assumption.certainty * 100);
@@ -56,17 +51,6 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
   const getValidationStatus = (): AssumptionStatusV2 => {
     // Use the validationStatus field directly, with fallback to status or untested
     return assumption.validationStatus || assumption.status || 'untested';
-  };
-
-  // Helper to render category icon using utility function
-  const renderCategoryIcon = (): React.ReactNode => {
-    const iconVariant = getCategoryIcon(assumption.category);
-    return (
-      <Icon
-        variant={iconVariant as any}
-        className={`${categoryColors.stroke} h-5 w-5`}
-      />
-    );
   };
 
   // Event handlers
@@ -107,6 +91,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
         category: assumption.category,
         importance: assumption.importance,
         certainty: assumption.certainty,
+        validationStatus: assumption.validationStatus,
       },
     });
 
@@ -149,6 +134,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
           category: assumption.category,
           importance: importanceValue,
           certainty: assumption.certainty,
+          validationStatus: assumption.validationStatus,
         },
       });
     },
@@ -172,6 +158,32 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
           category: assumption.category,
           importance: assumption.importance,
           certainty: certaintyValue,
+          validationStatus: assumption.validationStatus,
+        },
+      });
+    },
+    [assumption, addChange],
+  );
+
+  const handleStatusChange = useCallback(
+    (newStatus: AssumptionStatusV2) => {
+      const currentStatus =
+        assumption.validationStatus || assumption.status || 'untested';
+
+      if (newStatus === currentStatus) {
+        return; // Ignore no-op selections so banner stays hidden
+      }
+
+      addChange({
+        id: assumption.uuid,
+        type: 'edit',
+        originalData: assumption,
+        changes: {
+          statement: assumption.statement,
+          category: assumption.category,
+          importance: assumption.importance,
+          certainty: assumption.certainty,
+          validationStatus: newStatus,
         },
       });
     },
@@ -217,44 +229,42 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {/* Assumption header */}
-      <div className='mb-3 flex flex-wrap items-start justify-between gap-2'>
-        <div className='flex items-center'>
-          {renderCategoryIcon()}
-          <span className='aucctus-text-sm-medium ml-2 capitalize'>
-            {assumption.category}
-          </span>
-        </div>
-        <div className='flex items-center gap-2'>
+      {/* Assumption statement with badges on the right */}
+      <div className='mb-4 flex items-start justify-between gap-4'>
+        {isEditingStatement ? (
+          <div className='flex-1'>
+            <textarea
+              value={editedStatement}
+              onChange={(e) => setEditedStatement(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={handleSaveStatement}
+              className='aucctus-text-md-bold aucctus-text-primary aucctus-bg-primary aucctus-border-brand w-full rounded-md border-2 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
+              rows={3}
+              autoFocus
+            />
+            <div className='aucctus-text-xs aucctus-text-tertiary mt-1'>
+              Press Cmd/Ctrl+Enter to save, Esc to cancel
+            </div>
+          </div>
+        ) : (
+          <p
+            className='aucctus-text-md-bold aucctus-text-primary flex-1 cursor-text'
+            onClick={handleStatementClick}
+          >
+            {assumption.statement}
+          </p>
+        )}
+
+        {/* Badges aligned to top-right */}
+        <div className='flex flex-shrink-0 items-start gap-2'>
           <RiskBadge risk={riskPercentage} />
-          <StatusBadge status={getValidationStatus()} />
+          <EditableStatusBadge
+            status={getValidationStatus()}
+            onChange={handleStatusChange}
+            disabled={!showActions}
+          />
         </div>
       </div>
-
-      {/* Assumption statement */}
-      {isEditingStatement ? (
-        <div className='mb-4'>
-          <textarea
-            value={editedStatement}
-            onChange={(e) => setEditedStatement(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onBlur={handleSaveStatement}
-            className='aucctus-text-md-semibold aucctus-text-primary aucctus-bg-primary aucctus-border-brand w-full rounded-md border-2 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500'
-            rows={3}
-            autoFocus
-          />
-          <div className='aucctus-text-xs aucctus-text-tertiary mt-1'>
-            Press Cmd/Ctrl+Enter to save, Esc to cancel
-          </div>
-        </div>
-      ) : (
-        <p
-          className='aucctus-text-md-semibold aucctus-text-primary mb-4 cursor-text'
-          onClick={handleStatementClick}
-        >
-          {assumption.statement}
-        </p>
-      )}
 
       {/* Meters - Editable dropdowns */}
       <div className='mb-4 mt-3 flex flex-wrap gap-2'>

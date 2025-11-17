@@ -54,7 +54,7 @@ const ValidationOptionsSection: React.FC<ValidationOptionsSectionProps> = ({
             >
               <div className='flex-shrink-0'>{option.icon}</div>
               <span
-                className={`aucctus-text-xs-regular ${
+                className={`aucctus-text-xs-regular whitespace-nowrap ${
                   option.isSelected
                     ? 'aucctus-text-brand-primary'
                     : 'aucctus-text-secondary'
