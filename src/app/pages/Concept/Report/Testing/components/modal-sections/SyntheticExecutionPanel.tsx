@@ -45,6 +45,8 @@ interface ISyntheticExecutionPanelProps {
   onReset: () => void;
   onNavigateToCollateral?: (collateralUuid: string) => void;
   onNavigateToResults?: () => void;
+  initialParticipantCounts?: Record<string, number>;
+  lockedSkippedParticipants?: Set<string>;
 }
 
 /**
@@ -75,6 +77,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   onCancel,
   onNavigateToCollateral,
   onNavigateToResults,
+  initialParticipantCounts,
+  lockedSkippedParticipants,
 }) => {
   // Configuration state
   const [selectedCollateralUuids, setSelectedCollateralUuids] = useState<
@@ -84,10 +88,22 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   // Participant selection state - maps profile UUID to count
   const [participantCounts, setParticipantCounts] = useState<
     Record<string, number>
-  >({});
-  const [skippedParticipants, setSkippedParticipants] = useState<Set<string>>(
-    new Set(),
-  );
+  >(initialParticipantCounts || {});
+  const [syntheticSkippedParticipants, setSyntheticSkippedParticipants] =
+    useState<Set<string>>(new Set());
+
+  const lockedParticipants = useMemo(() => {
+    if (lockedSkippedParticipants) {
+      return new Set(lockedSkippedParticipants);
+    }
+    return new Set<string>();
+  }, [lockedSkippedParticipants]);
+
+  const effectiveSkippedParticipants = useMemo(() => {
+    const combined = new Set<string>(lockedParticipants);
+    syntheticSkippedParticipants.forEach((uuid) => combined.add(uuid));
+    return combined;
+  }, [lockedParticipants, syntheticSkippedParticipants]);
 
   // Hooks for data fetching
   const { data: collaterals, isLoading: collateralsLoading } =
@@ -102,32 +118,36 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   // Computed values
   const totalTests = useMemo(() => {
     return Object.entries(participantCounts)
-      .filter(([uuid]) => !skippedParticipants.has(uuid))
+      .filter(([uuid]) => !effectiveSkippedParticipants.has(uuid))
       .reduce((sum, [, count]) => sum + count, 0);
-  }, [participantCounts, skippedParticipants]);
+  }, [participantCounts, effectiveSkippedParticipants]);
 
   // Filter profiles to only show selected ones for loading UI
   const selectedProfiles = useMemo(() => {
     const filtered = profiles.filter((profile) => {
       const normalizedUuid = normalizeUuid(profile.uuid);
-      const isNotSkipped = !skippedParticipants.has(normalizedUuid);
+      const isNotSkipped = !effectiveSkippedParticipants.has(normalizedUuid);
       const hasCount = participantCounts[normalizedUuid] > 0;
 
       return isNotSkipped && hasCount;
     });
 
     return filtered;
-  }, [profiles, skippedParticipants, participantCounts]);
+  }, [profiles, effectiveSkippedParticipants, participantCounts]);
 
   // Storage key for preserving execution configuration
   const executionConfigKey = `synthetic-execution-config-${conceptUuid}-${testUuid}`;
 
   // Save execution configuration when it changes (during active execution)
   useEffect(() => {
-    if (status !== 'idle' && Object.keys(participantCounts).length > 0) {
+    if (
+      status !== 'idle' &&
+      (Object.keys(participantCounts).length > 0 ||
+        syntheticSkippedParticipants.size > 0)
+    ) {
       const config = {
         participantCounts,
-        skippedParticipants: Array.from(skippedParticipants),
+        skippedParticipants: Array.from(syntheticSkippedParticipants),
         timestamp: Date.now(),
       };
       sessionStorage.setItem(executionConfigKey, JSON.stringify(config));
@@ -135,47 +155,75 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       // Clean up storage when execution is idle
       sessionStorage.removeItem(executionConfigKey);
     }
-  }, [participantCounts, skippedParticipants, status, executionConfigKey]);
+  }, [
+    participantCounts,
+    syntheticSkippedParticipants,
+    status,
+    executionConfigKey,
+  ]);
 
   // Initialize participant counts when profiles load
+  // Initialize from server-provided defaults once when they change
   useEffect(() => {
+    const hasInitialCounts =
+      initialParticipantCounts &&
+      Object.keys(initialParticipantCounts).length > 0;
+
+    if (!hasInitialCounts) {
+      return;
+    }
+
+    setParticipantCounts(initialParticipantCounts);
+    setSyntheticSkippedParticipants(new Set());
+  }, [initialParticipantCounts]);
+
+  // Fallback initialization (session restore or default counts)
+  useEffect(() => {
+    const hasInitialCountsProp =
+      initialParticipantCounts &&
+      Object.keys(initialParticipantCounts).length > 0;
+    if (hasInitialCountsProp) {
+      return;
+    }
+
     const shouldInitialize =
       profiles.length > 0 && Object.keys(participantCounts).length === 0;
 
-    if (shouldInitialize) {
-      // First, try to restore from storage (for active executions)
-      const savedConfig = sessionStorage.getItem(executionConfigKey);
-      if (savedConfig && status !== 'idle') {
-        try {
-          const config = JSON.parse(savedConfig);
-          const configAge = Date.now() - config.timestamp;
+    if (!shouldInitialize) {
+      return;
+    }
 
-          // Only restore if config is recent (within 1 hour)
-          if (configAge < 60 * 60 * 1000) {
-            setParticipantCounts(config.participantCounts);
-            setSkippedParticipants(new Set(config.skippedParticipants));
-            return;
-          }
-        } catch (error) {
-          telemetry.warn('synthetic.execution.config.restore_failed', {
-            conceptUuid,
-            testUuid,
-            error: error instanceof Error ? error.message : error,
-          });
+    const savedConfig = sessionStorage.getItem(executionConfigKey);
+    if (savedConfig && status !== 'idle') {
+      try {
+        const config = JSON.parse(savedConfig);
+        const configAge = Date.now() - config.timestamp;
+
+        if (configAge < 60 * 60 * 1000) {
+          setParticipantCounts(config.participantCounts);
+          setSyntheticSkippedParticipants(
+            new Set(config.skippedParticipants || []),
+          );
+          return;
         }
-      }
-
-      // Fallback: Initialize defaults (only when idle)
-      if (status === 'idle') {
-        const initialCounts: Record<string, number> = {};
-        profiles.forEach((profile) => {
-          const normalizedUuid = normalizeUuid(profile.uuid);
-          initialCounts[normalizedUuid] = 5; // Default to 5 variants per profile
+      } catch (error) {
+        telemetry.warn('synthetic.execution.config.restore_failed', {
+          conceptUuid,
+          testUuid,
+          error: error instanceof Error ? error.message : error,
         });
-
-        setParticipantCounts(initialCounts);
-        setSkippedParticipants(new Set());
       }
+    }
+
+    if (status === 'idle') {
+      const defaultCounts: Record<string, number> = {};
+      profiles.forEach((profile) => {
+        const normalizedUuid = normalizeUuid(profile.uuid);
+        defaultCounts[normalizedUuid] = 5;
+      });
+
+      setParticipantCounts(defaultCounts);
+      setSyntheticSkippedParticipants(new Set());
     }
   }, [
     profiles,
@@ -184,6 +232,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     executionConfigKey,
     conceptUuid,
     testUuid,
+    initialParticipantCounts,
   ]);
 
   // Memoized configuration object
@@ -198,7 +247,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
         Object.keys(participantCounts).length > 0
           ? Object.fromEntries(
               Object.entries(participantCounts)
-                .filter(([uuid]) => !skippedParticipants.has(uuid))
+                .filter(([uuid]) => !effectiveSkippedParticipants.has(uuid))
                 .map(([uuid, count]) => [uuid, count]), // Send raw counts, backend will normalize
             )
           : undefined,
@@ -207,7 +256,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       totalTests,
       selectedCollateralUuids,
       participantCounts,
-      skippedParticipants,
+      effectiveSkippedParticipants,
     ],
   );
 
@@ -282,40 +331,56 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       delete newCounts[normalizedUuid];
       return newCounts;
     });
-    // Also remove from skipped if it was skipped
-    setSkippedParticipants((prev) => {
-      const newSkipped = new Set(prev);
-      newSkipped.delete(normalizedUuid);
-      return newSkipped;
+
+    setSyntheticSkippedParticipants((prev) => {
+      if (!prev.has(normalizedUuid)) {
+        return prev;
+      }
+      const updated = new Set(prev);
+      updated.delete(normalizedUuid);
+      return updated;
     });
   };
 
   const handleSkipParticipant = (profileUuid: string) => {
-    // Ensure UUID format is consistent (hyphens, not underscores)
     const normalizedUuid = normalizeUuid(profileUuid);
-    // Remove from participant counts completely
+
+    if (lockedParticipants.has(normalizedUuid)) {
+      return;
+    }
+
     setParticipantCounts((prev) => {
       const newCounts = { ...prev };
       delete newCounts[normalizedUuid];
       return newCounts;
     });
-    // Add to skipped set
-    setSkippedParticipants((prev) => new Set(prev).add(normalizedUuid));
+
+    setSyntheticSkippedParticipants((prev) => {
+      const updated = new Set(prev);
+      updated.add(normalizedUuid);
+      return updated;
+    });
   };
 
   const handleUnskipParticipant = (profileUuid: string) => {
-    // Ensure UUID format is consistent (hyphens, not underscores)
     const normalizedUuid = normalizeUuid(profileUuid);
-    // Remove from skipped set
-    setSkippedParticipants((prev) => {
-      const newSkipped = new Set(prev);
-      newSkipped.delete(normalizedUuid);
-      return newSkipped;
+
+    if (lockedParticipants.has(normalizedUuid)) {
+      return;
+    }
+
+    setSyntheticSkippedParticipants((prev) => {
+      if (!prev.has(normalizedUuid)) {
+        return prev;
+      }
+      const updated = new Set(prev);
+      updated.delete(normalizedUuid);
+      return updated;
     });
-    // Add back to participant counts with default value
+
     setParticipantCounts((prev) => ({
       ...prev,
-      [normalizedUuid]: 5,
+      [normalizedUuid]: prev[normalizedUuid] || 5,
     }));
   };
 
@@ -409,7 +474,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
               <ParticipantSelectionStep
                 profiles={profiles}
                 participantCounts={participantCounts}
-                skippedParticipants={skippedParticipants}
+                skippedParticipants={effectiveSkippedParticipants}
+                lockedParticipants={lockedParticipants}
                 onParticipantCountChange={handleParticipantCountChange}
                 onRemoveParticipant={handleRemoveParticipant}
                 onSkipParticipant={handleSkipParticipant}

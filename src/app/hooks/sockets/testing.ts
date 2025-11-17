@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useQueryClient } from 'react-query';
 import { useSocketEvent } from './aucctus';
 import { toast } from '@components';
@@ -14,6 +14,9 @@ import {
   ISyntheticExecutionErrorMessage,
   ISyntheticInterviewQuoteMessage,
   ISyntheticProfileCompletedMessage,
+  ITestCollateralProgressMessage,
+  ITestCollateralCompletedMessage,
+  ITestCollateralErrorMessage,
 } from '@libs/api/types';
 import { ICustomerProfile } from '@libs/api/types/concept/concepts';
 
@@ -240,6 +243,144 @@ export const useTestGenerationEvents = (conceptUuid: string) => {
     generationState,
     resetGenerationState,
   };
+};
+
+/**
+ * Hook to listen for collateral regeneration WebSocket events.
+ * Manages loading state during collateral regeneration triggered by participant changes.
+ * Persists regeneration state in sessionStorage to survive page refreshes.
+ */
+export const useCollateralRegenerationEvents = (
+  conceptUuid: string,
+  testUuid: string,
+) => {
+  const queryClient = useQueryClient();
+  const storageKey = `collateral_regenerating_${conceptUuid}_${testUuid}`;
+  const [isRegenerating, setIsRegenerating] = useState(() => {
+    // Check sessionStorage on mount to restore regeneration state
+    if (typeof window !== 'undefined') {
+      const stored = sessionStorage.getItem(storageKey);
+      if (stored) {
+        const { timestamp } = JSON.parse(stored);
+        // Only restore if regeneration started within last 10 minutes (safety timeout)
+        const tenMinutesAgo = Date.now() - 10 * 60 * 1000;
+        if (timestamp > tenMinutesAgo) {
+          return true;
+        } else {
+          // Clear stale state
+          sessionStorage.removeItem(storageKey);
+        }
+      }
+    }
+    return false;
+  });
+  const toastShownRef = useRef(false);
+  const completedCollateralsRef = useRef<Set<string>>(new Set());
+
+  // Persist regeneration state to sessionStorage
+  const setRegeneratingState = useCallback(
+    (value: boolean) => {
+      setIsRegenerating(value);
+      if (typeof window !== 'undefined') {
+        if (value) {
+          sessionStorage.setItem(
+            storageKey,
+            JSON.stringify({ timestamp: Date.now() }),
+          );
+        } else {
+          sessionStorage.removeItem(storageKey);
+        }
+      }
+    },
+    [storageKey],
+  );
+
+  // Listen for progress events
+  useSocketEvent(
+    'test_collateral.progress.user',
+    (data: ITestCollateralProgressMessage) => {
+      if (data.conceptUuid !== conceptUuid || data.testUuid !== testUuid) {
+        return;
+      }
+
+      telemetry.debug('test_collateral.progress', {
+        conceptUuid: data.conceptUuid,
+        testUuid: data.testUuid,
+        progress: data.progress,
+        stage: data.stage,
+      });
+
+      setRegeneratingState(true);
+      // Reset toast tracking when regeneration starts
+      toastShownRef.current = false;
+      completedCollateralsRef.current.clear();
+    },
+  );
+
+  // Listen for completion event
+  useSocketEvent(
+    'test_collateral.completed.user',
+    (data: ITestCollateralCompletedMessage) => {
+      if (data.conceptUuid !== conceptUuid || data.testUuid !== testUuid)
+        return;
+
+      telemetry.debug('test_collateral.completed', {
+        conceptUuid: data.conceptUuid,
+        testUuid: data.testUuid,
+        collateralUuid: data.collateralUuid,
+      });
+
+      // Track completed collaterals
+      completedCollateralsRef.current.add(data.collateralUuid);
+
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testCollateral, conceptUuid, testUuid],
+      });
+
+      // Only show toast once per regeneration cycle
+      if (!toastShownRef.current) {
+        toastShownRef.current = true;
+        setRegeneratingState(false);
+        toast.success(
+          'Collateral Updated',
+          'Test collateral has been regenerated successfully',
+        );
+      }
+    },
+  );
+
+  // Listen for error events
+  useSocketEvent(
+    'test_collateral.error.user',
+    (data: ITestCollateralErrorMessage) => {
+      if (data.conceptUuid !== conceptUuid || data.testUuid !== testUuid)
+        return;
+
+      telemetry.debug('test_collateral.error', {
+        conceptUuid: data.conceptUuid,
+        testUuid: data.testUuid,
+        message: data.message,
+      });
+
+      setRegeneratingState(false);
+
+      toast.error(
+        'Collateral Regeneration Failed',
+        data.message || 'Unable to regenerate collateral',
+      );
+    },
+  );
+
+  // Cleanup: Clear storage when component unmounts if regeneration is complete
+  useEffect(() => {
+    return () => {
+      if (!isRegenerating && typeof window !== 'undefined') {
+        sessionStorage.removeItem(storageKey);
+      }
+    };
+  }, [isRegenerating, storageKey]);
+
+  return { isRegenerating };
 };
 
 interface ISyntheticExecutionState {

@@ -71,6 +71,8 @@ export const useParticipantManagement = ({
 
     const personas = participants.map((participant, index) => ({
       id: participant.uuid,
+      participantUuid: participant.uuid,
+      profileUuid: participant.customerProfile.uuid,
       name: participant.customerProfile.name,
       segment: participant.customerProfile.segment,
       description: participant.customerProfile.description,
@@ -78,6 +80,7 @@ export const useParticipantManagement = ({
       count: participant.count,
       ratio: Math.round(participant.ratioPercentage),
       status: participant.status,
+      isSkipped: participant.status === 'cancelled',
       isPrimary: participant.customerProfile.isPrimary,
       geoLocation: participant.customerProfile.geoLocation,
       ageRange: participant.customerProfile.ageRange,
@@ -88,7 +91,7 @@ export const useParticipantManagement = ({
     }));
 
     const chartData = personas
-      .filter((p) => p.count > 0)
+      .filter((p) => p.count > 0 && !p.isSkipped)
       .map((persona) => ({
         name: persona.segment,
         value: persona.count,

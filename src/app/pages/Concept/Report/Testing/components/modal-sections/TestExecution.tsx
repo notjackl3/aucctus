@@ -13,6 +13,7 @@ import { useSyntheticPipelineEstimate } from '@hooks/query/agent-timing.hook';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
+import { useTestParticipants } from '@hooks/query/testing.hook';
 
 interface TestExecutionProps {
   conceptUuid?: string;
@@ -36,6 +37,39 @@ const TestExecution: React.FC<TestExecutionProps> = ({
 
   // Fetch customer profiles for quote assignment
   const { profiles } = useConceptCustomerProfiles(conceptUuid || '');
+  const { participants } = useTestParticipants(
+    conceptUuid || '',
+    testUuid || '',
+    { enabled: !!conceptUuid && !!testUuid },
+  );
+
+  const participantCountsFromApi = useMemo(() => {
+    if (!participants || participants.length === 0) {
+      return undefined;
+    }
+    const counts: Record<string, number> = {};
+    participants.forEach((participant) => {
+      if (participant.status === 'cancelled') {
+        return;
+      }
+      const normalized = participant.customerProfile.uuid.replace(/_/g, '-');
+      counts[normalized] = participant.count;
+    });
+    return counts;
+  }, [participants]);
+
+  const skippedParticipantsFromApi = useMemo(() => {
+    if (!participants) {
+      return new Set<string>();
+    }
+    return new Set(
+      participants
+        .filter((participant) => participant.status === 'cancelled')
+        .map((participant) =>
+          participant.customerProfile.uuid.replace(/_/g, '-'),
+        ),
+    );
+  }, [participants]);
 
   // WebSocket events for real-time execution
   const { executionState, resetExecution, setCancellingState, setExecutionId } =
@@ -519,6 +553,8 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             onReset={resetExecution}
             onNavigateToCollateral={onNavigateToCollateral}
             onNavigateToResults={onNavigateToResults}
+            initialParticipantCounts={participantCountsFromApi}
+            lockedSkippedParticipants={skippedParticipantsFromApi}
           />
         </div>
       )}

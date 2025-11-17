@@ -13,4 +13,5 @@ export { default as AssumptionsSkeleton } from './AssumptionsSkeleton';
 export { default as AssumptionsTableSkeleton } from './AssumptionsTableSkeleton';
 export { default as AssumptionCardsListSkeleton } from './AssumptionCardsListSkeleton';
 export { default as TestingSkeleton } from './TestingSkeleton';
+export { default as TestCollateralSkeleton } from './TestCollateralSkeleton';
 export { default as ConceptSettingsSkeleton } from './ConceptSettingsSkeleton';

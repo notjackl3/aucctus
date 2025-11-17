@@ -10,21 +10,25 @@ interface IParticipantSelectionStepProps {
   profiles: ICustomerProfile[];
   participantCounts: Record<string, number>;
   skippedParticipants: Set<string>;
+  lockedParticipants?: Set<string>;
   onParticipantCountChange: (profileUuid: string, newCount: number) => void;
   onRemoveParticipant: (profileUuid: string) => void;
-  onSkipParticipant: (profileUuid: string) => void;
-  onUnskipParticipant: (profileUuid: string) => void;
+  onSkipParticipant?: (profileUuid: string) => void;
+  onUnskipParticipant?: (profileUuid: string) => void;
   isLoading: boolean;
+  canEditSkip?: boolean;
 }
 
 const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
   profiles,
   participantCounts,
   skippedParticipants,
+  lockedParticipants,
   onParticipantCountChange,
   onSkipParticipant,
   onUnskipParticipant,
   isLoading,
+  canEditSkip = true,
 }) => {
   if (isLoading) {
     return (
@@ -64,16 +68,22 @@ const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
         const count = participantCounts[normalizedUuid] || 5; // Default to 5 if not set
         const isSelected = count >= 1;
         const isSkipped = skippedParticipants.has(normalizedUuid);
+        const isLockedSkip = lockedParticipants?.has(normalizedUuid) ?? false;
+        const allowSkipControls =
+          canEditSkip &&
+          !isLockedSkip &&
+          onSkipParticipant &&
+          onUnskipParticipant;
 
         return (
           <div
             key={profile.uuid}
-            className='relative rounded-xl border border-gray-200 transition-all'
+            className='relative overflow-hidden rounded-xl border border-gray-200 bg-white transition-all'
           >
             {/* Main content area with conditional background */}
             <div
               className={cn(
-                'p-6 transition-all',
+                'h-full p-6 transition-all',
                 isSkipped
                   ? 'bg-gray-50 opacity-60'
                   : isSelected
@@ -157,21 +167,36 @@ const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
             </div>
 
             {/* Button positioned outside the grey background */}
-            <div className='absolute right-4 top-4'>
-              {isSkipped ? (
-                <button
-                  onClick={() => onUnskipParticipant(normalizedUuid)}
-                  className='cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md'
-                >
-                  Unskip
-                </button>
+            <div
+              className={cn(
+                'absolute right-4',
+                allowSkipControls ? 'top-4' : 'bottom-4',
+              )}
+            >
+              {allowSkipControls ? (
+                isSkipped ? (
+                  <button
+                    onClick={() => onUnskipParticipant(normalizedUuid)}
+                    className='cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md'
+                  >
+                    Unskip
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => onSkipParticipant(normalizedUuid)}
+                    className='flex h-6 w-6 items-center justify-center rounded-full text-xl text-gray-400 transition-colors hover:text-gray-600'
+                  >
+                    ×
+                  </button>
+                )
               ) : (
-                <button
-                  onClick={() => onSkipParticipant(normalizedUuid)}
-                  className='flex h-6 w-6 items-center justify-center rounded-full text-xl text-gray-400 transition-colors hover:text-gray-600'
-                >
-                  ×
-                </button>
+                isSkipped && (
+                  <span className='aucctus-text-xs-semibold aucctus-text-secondary rounded-full bg-gray-100 px-3 py-1'>
+                    {isLockedSkip
+                      ? 'Managed in Participants tab'
+                      : 'Skipped for this run'}
+                  </span>
+                )
               )}
             </div>
           </div>

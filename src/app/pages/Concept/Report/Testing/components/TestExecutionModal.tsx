@@ -12,6 +12,7 @@ import { Assumption } from '../types';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import useStore from '@stores/store';
+import { useCollateralRegenerationEvents } from '@hooks/sockets/testing';
 
 // Test Execution Modal Sections
 import TestOverview from './modal-sections/TestOverview';
@@ -105,6 +106,10 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   const [selectedCollateralUuid, setSelectedCollateralUuid] = useState<
     string | undefined
   >();
+
+  // Listen for collateral regeneration WebSocket events
+  const { isRegenerating: isCollateralRegenerating } =
+    useCollateralRegenerationEvents(conceptUuid, testUuid || '');
 
   // Track synthetic execution state for coordinating Results tab display
   // Note: We get execution state from TestExecution component to avoid duplicate socket listeners
@@ -326,6 +331,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             conceptUuid={conceptUuid}
             testUuid={testUuid}
             testDetail={testDetail}
+            isCollateralRegenerating={isCollateralRegenerating}
           />
         );
 
@@ -335,6 +341,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             conceptUuid={conceptUuid}
             testUuid={testUuid}
             initialSelectedCollateralUuid={selectedCollateralUuid}
+            isRegenerating={isCollateralRegenerating}
           />
         );
 

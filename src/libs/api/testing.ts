@@ -121,6 +121,16 @@ export class TestingApi extends ApiService {
     );
   }
 
+  async regenerateTestCollateral(
+    conceptUuid: string,
+    testUuid: string,
+  ): Promise<ITestCollateral[]> {
+    return this.post<ITestCollateral[]>(
+      endpoints.conceptTestCollateralRegenerate(conceptUuid, testUuid),
+      {},
+    );
+  }
+
   async createTestCollateral(
     conceptUuid: string,
     testUuid: string,

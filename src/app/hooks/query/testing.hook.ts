@@ -355,6 +355,50 @@ export const useTestCollateral = (
   return { ...query, collateral: query.data?.results || [] };
 };
 
+export const useRegenerateTestCollateral = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (params: { conceptUuid: string; testUuid: string }) => {
+      const { conceptUuid, testUuid } = params;
+
+      // Immediately persist regeneration state to sessionStorage
+      // This ensures skeleton shows even if user refreshes before WebSocket events arrive
+      if (typeof window !== 'undefined') {
+        const storageKey = `collateral_regenerating_${conceptUuid}_${testUuid}`;
+        sessionStorage.setItem(
+          storageKey,
+          JSON.stringify({ timestamp: Date.now() }),
+        );
+      }
+
+      return await api.testing.regenerateTestCollateral(conceptUuid, testUuid);
+    },
+    onSuccess: (_data, variables) => {
+      queryClient.invalidateQueries({
+        queryKey: [
+          AucctusQueryKeys.testCollateral,
+          variables.conceptUuid,
+          variables.testUuid,
+        ],
+      });
+    },
+    onError: (e: AxiosError, variables) => {
+      // Clear regeneration state on error
+      if (typeof window !== 'undefined') {
+        const storageKey = `collateral_regenerating_${variables.conceptUuid}_${variables.testUuid}`;
+        sessionStorage.removeItem(storageKey);
+      }
+
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Collateral Update Failed',
+        message || 'Unable to regenerate collateral. Please try again.',
+      );
+    },
+  });
+};
+
 /**
  * Creates test collateral with WebSocket progress tracking.
  * @returns Mutation with processingState and clearProcessingState
