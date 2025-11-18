@@ -176,6 +176,7 @@ export interface IConcept extends IBaseConceptEntity {
   };
   isHistoricalVersion?: boolean;
   featureVersions?: IFeatureVersions;
+  financialProjectionType: 'cost_savings' | 'generate_revenue';
 
   // Progress tracking fields for real-time WebSocket updates
   progressPercentage?: number;

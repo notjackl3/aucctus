@@ -38,15 +38,13 @@ export const useDebugModeListener = () => {
           toggleDebugMode();
 
           if (newState) {
-            toast.info(
+            toast.success(
               '🐛 Debug Mode activated! Developer features enabled.',
               undefined,
-              { autoClose: 3000 },
+              3000,
             );
           } else {
-            toast.info('🐛 Debug Mode disabled.', undefined, {
-              autoClose: 2000,
-            });
+            toast.success('🐛 Debug Mode disabled.', undefined, 2000);
           }
 
           // Reset sequence

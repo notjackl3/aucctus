@@ -58,12 +58,6 @@ const OverviewWrapper: React.FC = () => {
 
   const handleDebugModeGenerate = () => {
     generateOverview(concept.identifier, {
-      onSuccess: () => {
-        toast.success(
-          'Overview Generated',
-          '📊 Overview generated successfully!',
-        );
-      },
       onError: () => {
         toast.error(
           'Overview Generation Failed',

@@ -25,12 +25,6 @@ const MarketScanWrapper: React.FC = () => {
 
   const handleDebugModeGenerate = () => {
     generateMarketScan(concept.identifier, {
-      onSuccess: () => {
-        toast.success(
-          'Market Scan Generated',
-          '🔍 Market Scan generated successfully!',
-        );
-      },
       onError: () => {
         toast.error('Market Scan Failed', '❌ Failed to generate Market Scan');
       },

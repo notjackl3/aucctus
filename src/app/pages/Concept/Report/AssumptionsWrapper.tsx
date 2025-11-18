@@ -36,12 +36,6 @@ const AssumptionsWrapper: React.FC = () => {
 
   const handleDebugModeGenerate = () => {
     generateKeyAssumptions(concept.identifier, {
-      onSuccess: () => {
-        toast.success(
-          'Key Assumptions Generated',
-          '🎯 Key Assumptions generated successfully!',
-        );
-      },
       onError: () => {
         toast.error(
           'Key Assumptions Failed',
