@@ -1,3 +1,5 @@
+import type { IPageResponse } from '../osiris';
+
 // Test Result Types
 export interface ITestResult {
   uuid: string;
@@ -98,6 +100,14 @@ export interface ITestCollateral {
   updatedAt: string;
 }
 
+export interface ICollateralRegenerationStatus {
+  status: 'idle' | 'running' | 'completed' | 'error';
+  startedAt?: string;
+  updatedAt?: string;
+  completedAt?: string;
+  message?: string;
+}
+
 // Test Status Types
 export type TestExecutionStatus = 'notStarted' | 'inProgress' | 'completed';
 
@@ -145,6 +155,16 @@ export interface ITestCollateralOption {
   description?: string;
   type: CollateralType;
   createdAt: string;
+}
+
+export interface ITestCollateralPageResponse
+  extends IPageResponse<ITestCollateral> {
+  collateralRegeneration?: ICollateralRegenerationStatus;
+}
+
+export interface ITestCollateralOptionPageResponse
+  extends IPageResponse<ITestCollateralOption> {
+  collateralRegeneration?: ICollateralRegenerationStatus;
 }
 
 // Synthetic Execution Response Types

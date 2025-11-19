@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Icon } from '@components';
 import LoadingSpinner from '@components/Icon/LoadingSpinner';
+import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import { cn } from '@libs/utils/react';
 import { useModal } from '@context/ModalContextProvider';
 import TabView, { TabElement } from '@components/Container/TabView/TabView';
@@ -108,12 +109,18 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   >();
 
   // Listen for collateral regeneration WebSocket events
-  const { isRegenerating: isCollateralRegenerating } =
+  const { isRegenerating: socketCollateralRegenerating } =
     useCollateralRegenerationEvents(conceptUuid, testUuid || '');
 
   // Track synthetic execution state for coordinating Results tab display
   // Note: We get execution state from TestExecution component to avoid duplicate socket listeners
   const [executionState, setExecutionState] = useState<any>(null);
+  const isSyntheticExecutionRunning = React.useMemo(() => {
+    const status = executionState?.status;
+    return (
+      status === 'running' || status === 'starting' || status === 'cancelling'
+    );
+  }, [executionState?.status]);
 
   // Only fetch test detail initially (needed for all tabs)
   const {
@@ -121,6 +128,12 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     isLoading: isTestDetailLoading,
     error: testDetailError,
   } = useTestDetail(conceptUuid, testUuid || '');
+
+  const collateralRegenerationStatus = testDetail?.collateralRegenerationStatus;
+  const isCollateralRegeneratingFromServer =
+    collateralRegenerationStatus?.status === 'running';
+  const isCollateralRegenerating =
+    socketCollateralRegenerating || isCollateralRegeneratingFromServer;
 
   // Hook for completing test
   const completeTestDetail = useCompleteTestDetail();
@@ -136,7 +149,21 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     if (activeTab !== 'collateral' && selectedCollateralUuid) {
       setSelectedCollateralUuid(undefined);
     }
-  }, [activeTab, selectedCollateralUuid]);
+
+    // Invalidate collateral query when switching to collateral tab
+    if (activeTab === 'collateral' && conceptUuid && testUuid) {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testCollateral, conceptUuid, testUuid],
+      });
+    }
+
+    // Invalidate synthetic execution status query when switching to execute tab
+    if (activeTab === 'execute' && conceptUuid && testUuid) {
+      queryClient.invalidateQueries({
+        queryKey: ['syntheticExecutionStatus', conceptUuid, testUuid],
+      });
+    }
+  }, [activeTab, conceptUuid, testUuid, queryClient, selectedCollateralUuid]);
 
   // Check if test can be completed (will be determined by Results tab)
   const [canCompleteTest, setCanCompleteTest] = useState(false);
@@ -144,17 +171,38 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   // Disabled tabs list - impact tab will be enabled by Results tab when appropriate
   const [disabledTabs, setDisabledTabs] = useState(['impact']);
 
+  // Update disabled tabs when synthetic execution state changes
+  useEffect(() => {
+    setDisabledTabs((prev) => {
+      const hasRecommendations = !prev.includes('impact');
+
+      if (isSyntheticExecutionRunning) {
+        // Add results and impact to disabled tabs when synthetic is running
+        const tabs = ['results', 'impact'];
+        return Array.from(new Set([...prev, ...tabs]));
+      } else {
+        // Remove results from disabled tabs when synthetic is not running
+        // Keep impact disabled if there are no recommendations
+        return hasRecommendations ? [] : ['impact'];
+      }
+    });
+  }, [isSyntheticExecutionRunning]);
+
   // Memoized callback to avoid infinite loops
   const handleResultsChange = useCallback(
     (hasResults: boolean, hasRecommendations: boolean) => {
       setCanCompleteTest(hasResults);
-      setDisabledTabs((prev) =>
-        hasRecommendations
-          ? prev.filter((tab) => tab !== 'impact')
-          : [...prev.filter((tab) => tab !== 'impact'), 'impact'],
-      );
+
+      // Only update impact tab if synthetic is not running
+      if (!isSyntheticExecutionRunning) {
+        setDisabledTabs((prev) =>
+          hasRecommendations
+            ? prev.filter((tab) => tab !== 'impact')
+            : [...prev.filter((tab) => tab !== 'impact'), 'impact'],
+        );
+      }
     },
-    [],
+    [isSyntheticExecutionRunning],
   );
 
   // Enhanced close modal function
@@ -192,77 +240,78 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     }
   };
 
-  const tabs: TabElement[] = [
-    {
-      value: 'overview',
-      label: (
-        <div className='flex items-center gap-2'>
-          <Icon variant='file' className='aucctus-stroke-secondary h-4 w-4' />
-          <span>Overview</span>
+  // Helper function to wrap tab label with tooltip if disabled
+  const createTabLabel = useCallback(
+    (icon: string, label: string, tabValue: string): React.ReactNode => {
+      const isDisabled = disabledTabs.includes(tabValue);
+      const iconClass = cn(
+        'h-4 w-4',
+        isDisabled ? 'aucctus-stroke-disabled' : 'aucctus-stroke-secondary',
+      );
+      const textClass = isDisabled ? 'aucctus-text-disabled' : '';
+
+      const tabContent = (
+        <div className={cn('flex items-center gap-2', textClass)}>
+          <Icon variant={icon as any} className={iconClass} />
+          <span>{label}</span>
         </div>
-      ),
+      );
+
+      // Add tooltip for disabled tabs when synthetic is running
+      if (
+        isDisabled &&
+        isSyntheticExecutionRunning &&
+        (tabValue === 'results' || tabValue === 'impact')
+      ) {
+        return (
+          <ComponentTooltip
+            tip={
+              <div className='aucctus-bg-primary aucctus-border-secondary rounded border px-3 py-2 shadow-lg'>
+                <p className='aucctus-text-primary aucctus-text-xs'>
+                  Complete synthetic test execution to view {tabValue}
+                </p>
+              </div>
+            }
+          >
+            <span className='inline-flex'>{tabContent}</span>
+          </ComponentTooltip>
+        );
+      }
+
+      return tabContent;
     },
-    {
-      value: 'participants',
-      label: (
-        <div className='flex items-center gap-2'>
-          <Icon
-            variant='users-03'
-            className='aucctus-stroke-secondary h-4 w-4'
-          />
-          <span>Participants</span>
-        </div>
-      ),
-    },
-    {
-      value: 'collateral',
-      label: (
-        <div className='flex items-center gap-2'>
-          <Icon
-            variant='file-attachment'
-            className='aucctus-stroke-secondary h-4 w-4'
-          />
-          <span>Collateral</span>
-        </div>
-      ),
-    },
-    {
-      value: 'execute',
-      label: (
-        <div className='flex items-center gap-2'>
-          <Icon
-            variant='play-square'
-            className='aucctus-stroke-secondary h-4 w-4'
-          />
-          <span>Execute</span>
-        </div>
-      ),
-    },
-    {
-      value: 'results',
-      label: (
-        <div className='flex items-center gap-2'>
-          <Icon
-            variant='barchart'
-            className='aucctus-stroke-secondary h-4 w-4'
-          />
-          <span>Results</span>
-        </div>
-      ),
-    },
-    {
-      value: 'impact',
-      label: (
-        <div className='flex items-center gap-2'>
-          <Icon
-            variant='lightbulb'
-            className='aucctus-stroke-secondary h-4 w-4'
-          />
-          <span>Impact</span>
-        </div>
-      ),
-    },
-  ];
+    [disabledTabs, isSyntheticExecutionRunning],
+  );
+
+  const tabs: TabElement[] = React.useMemo(
+    () => [
+      {
+        value: 'overview',
+        label: createTabLabel('file', 'Overview', 'overview'),
+      },
+      {
+        value: 'participants',
+        label: createTabLabel('users-03', 'Participants', 'participants'),
+      },
+      {
+        value: 'collateral',
+        label: createTabLabel('file-attachment', 'Collateral', 'collateral'),
+      },
+      {
+        value: 'execute',
+        label: createTabLabel('play-square', 'Execute', 'execute'),
+      },
+      {
+        value: 'results',
+        label: createTabLabel('barchart', 'Results', 'results'),
+      },
+      {
+        value: 'impact',
+        label: createTabLabel('lightbulb', 'Impact', 'impact'),
+      },
+    ],
+    [createTabLabel],
+  );
 
   const getTabIndex = (tabId: string) => {
     return tabs.findIndex((tab) => tab.value === tabId);
@@ -332,6 +381,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             testUuid={testUuid}
             testDetail={testDetail}
             isCollateralRegenerating={isCollateralRegenerating}
+            isSyntheticRunning={isSyntheticExecutionRunning}
           />
         );
 
@@ -342,6 +392,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             testUuid={testUuid}
             initialSelectedCollateralUuid={selectedCollateralUuid}
             isRegenerating={isCollateralRegenerating}
+            regenerationStatus={collateralRegenerationStatus}
           />
         );
 
@@ -350,6 +401,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
           <TestExecution
             conceptUuid={conceptUuid}
             testUuid={testUuid}
+            isCollateralRegenerating={isCollateralRegenerating}
             onNavigateToCollateral={(collateralUuid) => {
               // Set the selected collateral UUID
               setSelectedCollateralUuid(collateralUuid);

@@ -47,6 +47,7 @@ interface ISyntheticExecutionPanelProps {
   onNavigateToResults?: () => void;
   initialParticipantCounts?: Record<string, number>;
   lockedSkippedParticipants?: Set<string>;
+  isCollateralRegenerating?: boolean;
 }
 
 /**
@@ -79,6 +80,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   onNavigateToResults,
   initialParticipantCounts,
   lockedSkippedParticipants,
+  isCollateralRegenerating = false,
 }) => {
   // Configuration state
   const [selectedCollateralUuids, setSelectedCollateralUuids] = useState<
@@ -106,14 +108,30 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   }, [lockedParticipants, syntheticSkippedParticipants]);
 
   // Hooks for data fetching
-  const { data: collaterals, isLoading: collateralsLoading } =
-    useTestCollaterals(conceptUuid, testUuid);
+  const collateralQuery = useTestCollaterals(conceptUuid, testUuid);
+  const collateralOptions = collateralQuery.collaterals;
+  const collateralsLoading = collateralQuery.isLoading;
+  const refetchCollaterals = collateralQuery.refetch;
   const { profiles, isLoading: profilesLoading } =
     useConceptCustomerProfiles(conceptUuid);
   const distributionPreview = useSyntheticDistributionPreview(
     conceptUuid,
     testUuid,
   );
+
+  // Clear selected collaterals when regeneration completes to avoid stale UUIDs
+  const prevRegeneratingRef = React.useRef(isCollateralRegenerating);
+  React.useEffect(() => {
+    // Detect when regeneration transitions from true to false (completion)
+    if (prevRegeneratingRef.current && !isCollateralRegenerating) {
+      setSelectedCollateralUuids([]);
+      if (conceptUuid && testUuid) {
+        // Ensure synthetic panel sees the freshly generated collateral list
+        refetchCollaterals();
+      }
+    }
+    prevRegeneratingRef.current = isCollateralRegenerating;
+  }, [conceptUuid, testUuid, isCollateralRegenerating, refetchCollaterals]);
 
   // Computed values
   const totalTests = useMemo(() => {
@@ -278,9 +296,12 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
         .mutateAsync({
           totalTests,
           collateralUuid:
-            selectedCollateralUuids.length === 1
-              ? selectedCollateralUuids[0]
-              : undefined,
+            // Don't send collateral UUID if it's regenerating (old UUID may be invalid)
+            isCollateralRegenerating
+              ? undefined
+              : selectedCollateralUuids.length === 1
+                ? selectedCollateralUuids[0]
+                : undefined,
         })
         .catch(() => {
           // Error handled by the hook
@@ -288,7 +309,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     }
     // Ignore distribution preview mutation, it causes an infinite when included in the deps
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [totalTests, selectedCollateralUuids]);
+  }, [totalTests, selectedCollateralUuids, isCollateralRegenerating]);
 
   // Step validation
   const isStep1Complete = totalTests >= 1; // Participants step (for now, just check totalTests)
@@ -301,6 +322,9 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     totalTests <= 100 &&
     status === 'idle' &&
     !isExecuting;
+  const collateralBlockedMessage = isCollateralRegenerating
+    ? 'Collateral is regenerating. Wait until the update finishes before running a synthetic test.'
+    : undefined;
 
   // Collateral selection handler
   const handleCollateralSelectionChange = (uuids: string[]) => {
@@ -496,10 +520,10 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
               />
 
               <CollateralSelectionStep
-                collaterals={collaterals || []}
+                collaterals={collateralOptions}
                 selectedCollateralUuids={selectedCollateralUuids}
                 onSelectionChange={handleCollateralSelectionChange}
-                isLoading={collateralsLoading}
+                isLoading={collateralsLoading || isCollateralRegenerating}
                 maxSelection={4}
                 onNavigateToCollateral={onNavigateToCollateral}
               />
@@ -521,6 +545,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
                   isReady={isReady}
                   onExecute={handleExecute}
                   isLoading={isExecuting}
+                  disabledReason={collateralBlockedMessage}
                 />
               </div>
             </div>

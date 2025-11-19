@@ -17,6 +17,7 @@ import {
   ITestAssumptionCreate,
   ITestAssumptionUpdate,
 } from '@pages/Concept/Report/Testing/types';
+import { ITestCollateralPageResponse } from '@libs/api/types/concept/testing';
 import { useState } from 'react';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import {
@@ -348,11 +349,17 @@ export const useTestCollateral = (
       options?.enabled !== undefined
         ? options.enabled
         : !!conceptUuid && !!testUuid,
-    staleTime: 0, // 2 minutes
-    cacheTime: 0, // 2 minutes
+    staleTime: 1000 * 60 * 2, // 2 minutes - prevent unnecessary refetches
+    cacheTime: 1000 * 60 * 5, // 5 minutes
   });
 
-  return { ...query, collateral: query.data?.results || [] };
+  const data = query.data as ITestCollateralPageResponse | undefined;
+
+  return {
+    ...query,
+    collateral: data?.results || [],
+    collateralRegeneration: data?.collateralRegeneration,
+  };
 };
 
 export const useRegenerateTestCollateral = () => {

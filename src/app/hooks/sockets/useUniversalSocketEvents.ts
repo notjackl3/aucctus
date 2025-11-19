@@ -954,16 +954,20 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     // Capture startTime on first progress update (progress: 0) to match modal's timing
     const currentState = syntheticState.lastExecutionState;
     const startTime =
-      currentState?.startTime ||
-      (data.progress === 0 ? Date.now() : currentState?.startTime);
+      currentState?.startTime ?? (data.progress === 0 ? Date.now() : undefined);
 
-    syntheticState.setLastExecutionState({
-      conceptUuid: data.conceptUuid,
-      testUuid: data.testUuid,
-      progress: data.progress,
-      message: data.message,
-      startTime,
-    });
+    if (data.progress < 100) {
+      syntheticState.setLastExecutionState({
+        conceptUuid: data.conceptUuid,
+        testUuid: data.testUuid,
+        progress: data.progress,
+        message: data.message,
+        startTime,
+      });
+    } else {
+      // Execution finished — clear persisted state so stale toasts don't reappear
+      syntheticState.setLastExecutionState(null);
+    }
 
     // Show/update progress toast only when modal is closed and execution is running
     if (!isModalOpen && data.progress < 100) {
@@ -972,7 +976,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         testUuid: data.testUuid,
         progress: data.progress,
         message: data.message,
-        startTime: syntheticState.lastExecutionState?.startTime,
+        startTime,
       });
     }
 
@@ -1026,6 +1030,15 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     if (existing) {
       toast.dismiss(existing.toastId);
       conceptWorkflowToasts.delete(toastKey);
+    }
+
+    // Clear persisted execution progress so stale toasts don't appear later
+    const syntheticState = useStore.getState().syntheticTesting;
+    if (
+      syntheticState.lastExecutionState?.conceptUuid === data.conceptUuid &&
+      syntheticState.lastExecutionState?.testUuid === data.testUuid
+    ) {
+      syntheticState.setLastExecutionState(null);
     }
 
     const messageKey = `synthetic-error-${data.conceptUuid}-${data.testUuid}`;

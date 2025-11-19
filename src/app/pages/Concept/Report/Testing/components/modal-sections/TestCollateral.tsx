@@ -9,6 +9,7 @@ import { UploadImageCollateral, RequestCustomCollateral } from './components';
 
 import {
   CollateralType,
+  ICollateralRegenerationStatus,
   ITestCollateral,
 } from '@libs/api/types/concept/testing';
 
@@ -17,6 +18,7 @@ interface TestCollateralProps {
   testUuid?: string;
   initialSelectedCollateralUuid?: string;
   isRegenerating?: boolean;
+  regenerationStatus?: ICollateralRegenerationStatus;
 }
 
 const TestCollateral: React.FC<TestCollateralProps> = ({
@@ -24,6 +26,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   testUuid,
   initialSelectedCollateralUuid,
   isRegenerating = false,
+  regenerationStatus,
 }) => {
   // Use props data if available, otherwise fetch (for backward compatibility)
   const shouldFetch = !!conceptUuid && !!testUuid;
@@ -31,6 +34,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   const {
     collateral: fetchedCollateral,
     isLoading: isFetchedCollateralLoading,
+    collateralRegeneration,
   } = useTestCollateral(conceptUuid || '', testUuid || '', {
     enabled: shouldFetch,
   });
@@ -38,6 +42,10 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   // Use provided data or fallback to fetched data
   const collateral = fetchedCollateral;
   const isCollateralLoading = isFetchedCollateralLoading;
+  const isRegeneratingFromApi =
+    collateralRegeneration?.status === 'running' ||
+    regenerationStatus?.status === 'running';
+  const effectiveIsRegenerating = isRegenerating || isRegeneratingFromApi;
 
   const [selectedItem, setSelectedItem] =
     React.useState<ITestCollateral | null>(null);
@@ -279,10 +287,10 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
     <div
       className={cn(
         'relative flex h-full flex-col',
-        !isRegenerating && 'space-y-4',
+        !effectiveIsRegenerating && 'space-y-4',
       )}
     >
-      {!isRegenerating && (
+      {!effectiveIsRegenerating && (
         <>
           {hasNoCollateral ? (
             // No data state
@@ -659,7 +667,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
         </>
       )}
 
-      {isRegenerating && (
+      {effectiveIsRegenerating && (
         <div className='aucctus-bg-primary absolute inset-0 z-20 flex rounded-lg p-0'>
           <div className='w-full p-0'>
             <ConceptReportSkeletons.TestCollateralSkeleton />

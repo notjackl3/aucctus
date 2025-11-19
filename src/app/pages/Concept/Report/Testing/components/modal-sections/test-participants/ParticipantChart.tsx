@@ -13,6 +13,7 @@ interface PersonaDistribution {
   segment: string;
   count: number;
   color: string;
+  isSkipped?: boolean;
 }
 
 interface ParticipantChartProps {
@@ -38,6 +39,10 @@ const ParticipantChart: React.FC<ParticipantChartProps> = ({
   const [isEditingTotal, setIsEditingTotal] = useState(false);
   const [localTotalParticipants, setLocalTotalParticipants] =
     useState(totalParticipants);
+  const activeParticipantsTotal = React.useMemo(
+    () => chartData.reduce((sum, segment) => sum + segment.value, 0),
+    [chartData],
+  );
 
   React.useEffect(() => {
     setLocalTotalParticipants(totalParticipants);
@@ -134,42 +139,43 @@ const ParticipantChart: React.FC<ParticipantChartProps> = ({
               stroke='#f1f5f9'
               strokeWidth='30'
             />
-            {chartData.map((segment, index) => {
+            {(() => {
               const circumference = 2 * Math.PI * 80;
-              const strokeDasharray =
-                (segment.value / totalParticipants) * circumference;
-              const rotation = chartData
-                .slice(0, index)
-                .reduce(
-                  (acc, prev) => acc + (prev.value / totalParticipants) * 360,
-                  0,
-                );
+              const safeTotal = activeParticipantsTotal || 1;
+              let rotationAccumulator = 0;
 
-              return (
-                <circle
-                  key={segment.id}
-                  cx='100'
-                  cy='100'
-                  r='80'
-                  fill='none'
-                  stroke={COLORS[index % COLORS.length]}
-                  strokeWidth='30'
-                  strokeDasharray={`${strokeDasharray} ${circumference}`}
-                  strokeDashoffset='0'
-                  style={{
-                    transformOrigin: '100px 100px',
-                    transform: `rotate(${rotation}deg)`,
-                  }}
-                />
-              );
-            })}
+              return chartData.map((segment, index) => {
+                const ratio = segment.value / safeTotal;
+                const strokeDasharray = ratio * circumference;
+                const rotation = rotationAccumulator;
+                rotationAccumulator += ratio * 360;
+
+                return (
+                  <circle
+                    key={segment.id}
+                    cx='100'
+                    cy='100'
+                    r='80'
+                    fill='none'
+                    stroke={COLORS[index % COLORS.length]}
+                    strokeWidth='30'
+                    strokeDasharray={`${strokeDasharray} ${circumference}`}
+                    strokeDashoffset='0'
+                    style={{
+                      transformOrigin: '100px 100px',
+                      transform: `rotate(${rotation}deg)`,
+                    }}
+                  />
+                );
+              });
+            })()}
           </svg>
 
           {/* Center Total */}
           <div className='absolute inset-0 flex items-center justify-center'>
             <div className='text-center'>
               <div className='aucctus-text-2xl-bold aucctus-text-brand-primary'>
-                {totalParticipants}
+                {activeParticipantsTotal}
               </div>
               <div className='aucctus-text-xs-regular aucctus-text-secondary'>
                 Total
@@ -182,7 +188,7 @@ const ParticipantChart: React.FC<ParticipantChartProps> = ({
         {personaDistribution.length > 0 && (
           <div className='mt-4 grid w-full grid-cols-2 gap-3'>
             {personaDistribution
-              .filter((p) => p.count > 0)
+              .filter((p) => p.count > 0 && !p.isSkipped)
               .map((persona, personaIndex) => (
                 <div key={persona.id} className='flex items-center gap-2'>
                   <div
@@ -208,7 +214,7 @@ const ParticipantChart: React.FC<ParticipantChartProps> = ({
           Number of participants
         </h5>
         <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-          For customer interviews, a panel size of {totalParticipants}{' '}
+          For customer interviews, a panel size of {activeParticipantsTotal}{' '}
           respondents is recommended for qualitative insights.
         </p>
       </div>

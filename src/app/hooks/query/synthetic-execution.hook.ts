@@ -188,7 +188,7 @@ export const useSyntheticDistributionPreview = (
 
 // Test collaterals query hook
 export const useTestCollaterals = (conceptUuid: string, testUuid: string) => {
-  return useQuery({
+  const query = useQuery({
     queryKey: ['testCollaterals', conceptUuid, testUuid],
     queryFn: async () => api.testing.getTestCollaterals(conceptUuid, testUuid),
     enabled: !!conceptUuid && !!testUuid,
@@ -201,4 +201,9 @@ export const useTestCollaterals = (conceptUuid: string, testUuid: string) => {
       }
     },
   });
+
+  return {
+    ...query,
+    collaterals: query.data || [],
+  };
 };

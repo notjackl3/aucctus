@@ -21,6 +21,7 @@ interface TestExecutionProps {
   onNavigateToCollateral?: (collateralUuid: string) => void;
   onNavigateToResults?: () => void;
   onExecutionStateChange?: (executionState: any) => void; // Expose execution state to parent
+  isCollateralRegenerating?: boolean;
 }
 
 const TestExecution: React.FC<TestExecutionProps> = ({
@@ -29,6 +30,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
   onNavigateToCollateral,
   onNavigateToResults,
   onExecutionStateChange,
+  isCollateralRegenerating = false,
 }) => {
   const [selectedMode, setSelectedMode] = useState<string | null>(
     'facilitated',
@@ -555,6 +557,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             onNavigateToResults={onNavigateToResults}
             initialParticipantCounts={participantCountsFromApi}
             lockedSkippedParticipants={skippedParticipantsFromApi}
+            isCollateralRegenerating={isCollateralRegenerating}
           />
         </div>
       )}

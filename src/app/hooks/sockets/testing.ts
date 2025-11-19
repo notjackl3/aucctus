@@ -333,8 +333,15 @@ export const useCollateralRegenerationEvents = (
       // Track completed collaterals
       completedCollateralsRef.current.add(data.collateralUuid);
 
+      // Invalidate testing modal queries
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.testCollateral, conceptUuid, testUuid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
+      });
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.testDetails, conceptUuid],
       });
 
       // Only show toast once per regeneration cycle

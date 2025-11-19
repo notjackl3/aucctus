@@ -25,6 +25,7 @@ import {
   ISyntheticExecutionRequest,
   ISyntheticExecutionStartResponse,
   ISyntheticExecutionStatusResponse,
+  ITestCollateralPageResponse,
   ITestCollateralOption,
   IApplyRecommendationsResponse,
   IGenerateNextTestResponse,
@@ -115,8 +116,8 @@ export class TestingApi extends ApiService {
   async getTestCollateral(
     conceptUuid: string,
     testUuid: string,
-  ): Promise<IPageResponse<ITestCollateral>> {
-    return this.get<IPageResponse<ITestCollateral>>(
+  ): Promise<ITestCollateralPageResponse> {
+    return this.get<ITestCollateralPageResponse>(
       endpoints.conceptTestCollateral(conceptUuid, testUuid),
     );
   }
@@ -517,7 +518,9 @@ export class TestingApi extends ApiService {
     conceptUuid: string,
     testUuid: string,
   ): Promise<ITestCollateralOption[]> {
-    return this.get(endpoints.conceptTestCollaterals(conceptUuid, testUuid));
+    return this.get<ITestCollateralOption[]>(
+      endpoints.conceptTestCollaterals(conceptUuid, testUuid),
+    );
   }
 
   // Get synthetic execution status

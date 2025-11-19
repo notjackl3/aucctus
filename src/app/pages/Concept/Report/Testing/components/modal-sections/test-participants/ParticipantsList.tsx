@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Icon } from '@components';
+import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 
 import defaultAvatar from '@assets/img/avatar.png';
 
@@ -34,6 +35,7 @@ interface ParticipantsListProps {
   disableActions?: boolean;
   onRequestSkip?: (participant: PersonaDistribution) => void;
   onRequestUnskip?: (participant: PersonaDistribution) => void;
+  isSyntheticRunning?: boolean;
 }
 
 const ParticipantsList: React.FC<ParticipantsListProps> = ({
@@ -43,6 +45,7 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({
   disableActions = false,
   onRequestSkip,
   onRequestUnskip,
+  isSyntheticRunning = false,
 }) => {
   const [editingParticipantId, setEditingParticipantId] = useState<
     string | null
@@ -73,6 +76,27 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({
     }
   };
 
+  const wrapWithTooltip = (
+    element: React.ReactElement,
+    tip?: string,
+  ): React.ReactElement => {
+    if (!tip) {
+      return element;
+    }
+
+    return (
+      <ComponentTooltip
+        tip={
+          <div className='aucctus-bg-primary aucctus-border-secondary rounded border px-3 py-2 shadow-lg'>
+            <p className='aucctus-text-primary aucctus-text-xs'>{tip}</p>
+          </div>
+        }
+      >
+        <span className='inline-flex'>{element}</span>
+      </ComponentTooltip>
+    );
+  };
+
   return (
     <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-6'>
       <div className='mb-4 flex items-center justify-between'>
@@ -85,6 +109,9 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({
         {personaDistribution.map((persona) => {
           const isSkipped = persona.isSkipped;
           const actionsDisabled = isUpdating || disableActions;
+          const syntheticLockMessage = isSyntheticRunning
+            ? 'Synthetic test is running. Please wait until execution completes to modify participants.'
+            : undefined;
 
           return (
             <div
@@ -250,23 +277,35 @@ const ParticipantsList: React.FC<ParticipantsListProps> = ({
                     ? 'Skipped personas are excluded from collateral updates.'
                     : 'Skip personas to focus collateral on your key audiences.'}
                 </span>
-                {isSkipped ? (
-                  <button
-                    className='btn btn-primary btn-xs'
-                    onClick={() => onRequestUnskip?.(persona)}
-                    disabled={actionsDisabled || !onRequestUnskip}
-                  >
-                    Unskip
-                  </button>
-                ) : (
-                  <button
-                    className='btn btn-text btn-xs aucctus-text-error-primary'
-                    onClick={() => onRequestSkip?.(persona)}
-                    disabled={actionsDisabled || !onRequestSkip}
-                  >
-                    Skip
-                  </button>
-                )}
+                {isSkipped
+                  ? wrapWithTooltip(
+                      <button
+                        className='btn btn-primary btn-xs'
+                        onClick={() => onRequestUnskip?.(persona)}
+                        disabled={
+                          actionsDisabled ||
+                          !onRequestUnskip ||
+                          isSyntheticRunning
+                        }
+                      >
+                        Unskip
+                      </button>,
+                      syntheticLockMessage,
+                    )
+                  : wrapWithTooltip(
+                      <button
+                        className='btn btn-text btn-xs aucctus-text-error-primary'
+                        onClick={() => onRequestSkip?.(persona)}
+                        disabled={
+                          actionsDisabled ||
+                          !onRequestSkip ||
+                          isSyntheticRunning
+                        }
+                      >
+                        Skip
+                      </button>,
+                      syntheticLockMessage,
+                    )}
               </div>
             </div>
           );

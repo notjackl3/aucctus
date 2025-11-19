@@ -1,4 +1,7 @@
-import { ITestResult as ITestResultApi } from '@libs/api/types/concept/testing';
+import {
+  ICollateralRegenerationStatus,
+  ITestResult as ITestResultApi,
+} from '@libs/api/types/concept/testing';
 
 export interface Assumption {
   id: string;
@@ -101,6 +104,7 @@ export interface ITestDetails {
     createdAt: string;
     updatedAt: string;
   }>;
+  collateralRegenerationStatus?: ICollateralRegenerationStatus;
 }
 
 export interface ITestDetailsCreate {

@@ -22,6 +22,7 @@ interface TestParticipantsProps {
   // New props for centralized data management
   testDetail?: any | null;
   isCollateralRegenerating?: boolean;
+  isSyntheticRunning?: boolean;
 }
 
 const TestParticipants: React.FC<TestParticipantsProps> = ({
@@ -29,6 +30,7 @@ const TestParticipants: React.FC<TestParticipantsProps> = ({
   testUuid,
   testDetail: propsTestDetail,
   isCollateralRegenerating = false,
+  isSyntheticRunning = false,
 }) => {
   const {
     // Data
@@ -184,6 +186,7 @@ const TestParticipants: React.FC<TestParticipantsProps> = ({
         disableActions={disablePersonaActions}
         onRequestSkip={handleSkipRequest}
         onRequestUnskip={(persona) => openWarningDialog(persona, 'unskip')}
+        isSyntheticRunning={isSyntheticRunning}
       />
     </div>
   );
