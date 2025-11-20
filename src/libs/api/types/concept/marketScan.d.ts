@@ -213,3 +213,87 @@ export interface IMarketForceV3 {
   impact: string; // Impact assessment
   // Similar structure to trends but without key_findings
 }
+
+// ===== Ecosystem V2 API Response Types =====
+
+export interface IEcosystemProduct {
+  id: number;
+  name: string;
+  company: string;
+  image?: string | null;
+  price: string;
+  format: string;
+  differentiator: string;
+  strength: number;
+  tags: string[];
+  url: string;
+  sources: ISource[];
+}
+
+export interface IEcosystemCompetitiveAdvantage {
+  id: number;
+  advantage: string;
+  sources: ISource[];
+}
+
+export interface IEcosystemRecommendedAction {
+  id: number;
+  action: string;
+  description: string;
+}
+
+export interface IStrategicTag {
+  tag: string;
+  confidence: number;
+  reason: string;
+}
+
+export interface IEcosystemCompany {
+  id: number;
+  uuid: string;
+  name: string;
+  type: 'startup' | 'incumbent';
+  foundedYear: number;
+  headquarters: string;
+  x: number;
+  y: number;
+  size: number;
+  brandColor: string;
+  logoType: 'image' | 'text';
+  logoUrl?: string | null;
+  logoText?: string | null;
+  product: string;
+  differentiator: string;
+  website: string;
+  description: string;
+  competitiveAdvantage: string;
+  strategicTags?: IStrategicTag[] | null;
+  recommendation: 'monitor' | 'partner' | 'compete';
+  recommendationReasoning: string;
+  relevantProducts: IEcosystemProduct[];
+  competitiveAdvantages: IEcosystemCompetitiveAdvantage[];
+  recommendedActions: IEcosystemRecommendedAction[];
+}
+
+export interface IEcosystemPrediction {
+  id: number;
+  title: string;
+  description: string;
+  category: string;
+  categoryIcon: string | null;
+  sources: ISource[];
+}
+
+export interface IEcosystemV2Response {
+  needsUpgrade?: boolean;
+  ecosystemData: IEcosystemCompany[];
+  headwinds: Array<{ id: number; description: string }>;
+  tailwinds: Array<{ id: number; description: string }>;
+  crowdedness: {
+    score: number;
+    lowValue: number;
+    highValue: number;
+    directCompetitors: number;
+  };
+  futurePredictions: IEcosystemPrediction[];
+}

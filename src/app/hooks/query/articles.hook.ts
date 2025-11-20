@@ -15,19 +15,29 @@ const getBaseUrl = (url: string): string => {
 // TODO: Combine this with the published dates on server side
 export const useClearbitCompany = (url: string) => {
   const baseUrl = getBaseUrl(url);
+  const hasValidUrl = Boolean(
+    url && url.trim() !== '' && baseUrl && baseUrl !== '',
+  );
 
   const query = useQuery({
     queryKey: [AucctusQueryKeys.clearbitCompany, baseUrl],
     staleTime: Infinity,
     cacheTime: Infinity,
+    enabled: hasValidUrl,
     queryFn: async () => {
-      const response = await fetch(
-        `https://autocomplete.clearbit.com/v1/companies/suggest?query=${baseUrl}`,
-      );
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
+      try {
+        const response = await fetch(
+          `https://autocomplete.clearbit.com/v1/companies/suggest?query=${baseUrl}`,
+        );
+        if (!response.ok) {
+          // Clearbit API failed, return empty array instead of throwing
+          return [];
+        }
+        return response.json();
+      } catch (error) {
+        // Network error or other failure, return empty array
+        return [];
       }
-      return response.json();
     },
   });
 

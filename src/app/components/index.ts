@@ -15,6 +15,7 @@ import { toast } from './Notification/toast';
 import Portal from './Portal';
 import Select from './Select';
 import Table from './Tables';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 import Text from './Text';
 import ToggleSwitch from './ToggleSwitch';
 
@@ -38,6 +39,14 @@ export * from './Nucleus';
 // Concept Overview Components
 import ConceptOverview from './ConceptOverview';
 
+// Ecosystem Components
+import {
+  EcosystemV2,
+  DialGauge,
+  CompanyListPanel,
+  CompanyDetailPanel,
+} from './EcosystemV2';
+
 export {
   AiInteraction, // This is an object with AI components - keep for compatibility
   Avatar,
@@ -49,9 +58,13 @@ export {
   Chart, // This is an object with chart components - keep for compatibility
   ComponentCarousel,
   ComponentTooltip,
+  CompanyDetailPanel,
+  CompanyListPanel,
   ConceptOverview,
   Container,
   ConceptReportSkeletons,
+  DialGauge,
+  EcosystemV2,
   FileDropzone,
   Header,
   Icon,
@@ -64,6 +77,10 @@ export {
   Progress,
   Select,
   Table, // This is a component with attached properties - keep
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
   Text,
   toast,
   ToggleSwitch,

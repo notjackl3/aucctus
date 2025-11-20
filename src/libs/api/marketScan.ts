@@ -8,6 +8,7 @@ import {
   ITrendV3,
   IPriorityInsightV3,
   IMarketForceV3,
+  IEcosystemV2Response,
 } from './types';
 
 export class MarketScanApi extends ApiService {
@@ -52,6 +53,16 @@ export class MarketScanApi extends ApiService {
     return this.get<IMarketForceV3[]>(
       endpoints.conceptMarketScanMarketForcesV3(conceptUuid),
     );
+  }
+
+  getEcosystemV2(conceptUuid: string) {
+    return this.get<IEcosystemV2Response>(
+      endpoints.conceptEcosystemV2(conceptUuid),
+    );
+  }
+
+  generateEcosystemV2(rootIdentifier: string) {
+    return this.post(endpoints.conceptEcosystemV2Generate(rootIdentifier), {});
   }
 
   // TODO: Add trends and drivers and ecosystem endpoints for v2

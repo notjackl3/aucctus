@@ -15,3 +15,4 @@ export { default as AssumptionCardsListSkeleton } from './AssumptionCardsListSke
 export { default as TestingSkeleton } from './TestingSkeleton';
 export { default as TestCollateralSkeleton } from './TestCollateralSkeleton';
 export { default as ConceptSettingsSkeleton } from './ConceptSettingsSkeleton';
+export { default as EcosystemV2Skeleton } from './EcosystemV2Skeleton';

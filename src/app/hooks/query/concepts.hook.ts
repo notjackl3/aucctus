@@ -472,6 +472,33 @@ export const useGenerateMarketScan = () => {
   });
 };
 
+export const useGenerateEcosystemV2 = () => {
+  return useMutation({
+    mutationFn: async (conceptIdentifier: string) =>
+      await api.marketScan.generateEcosystemV2(conceptIdentifier),
+    onSuccess: () => {
+      // Don't mark the entire marketScan section as pending since we want
+      // loading to be isolated to just the Ecosystem subtab.
+      // The isUpgrading state from the mutation handles immediate skeleton display.
+
+      // DO NOT invalidate queries here - that would force a refetch from backend
+      // which still shows "complete" status, overwriting our pending states.
+      // WebSocket events will handle the actual data updates when backend completes.
+      toast.success(
+        'Ecosystem upgrade started',
+        "We'll refresh this section as soon as the new ecosystem is ready.",
+      );
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Ecosystem Upgrade Failed',
+        message || 'Unable to upgrade ecosystem. Please try again',
+      );
+    },
+  });
+};
+
 export const useGenerateConceptOverview = () => {
   const queryClient = useQueryClient();
 

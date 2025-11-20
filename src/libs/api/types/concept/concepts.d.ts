@@ -106,7 +106,8 @@ export type FeatureName =
   | 'assumptions'
   | 'financialProjection'
   | 'marketScan'
-  | 'conceptOverview';
+  | 'conceptOverview'
+  | 'ecosystem';
 
 export type IFeatureVersions = {
   [K in FeatureName]?: FeatureVersion;

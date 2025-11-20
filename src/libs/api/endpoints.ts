@@ -622,6 +622,14 @@ export class Endpoints {
     return `api/v3/concept/${conceptUuid}/market-scan/market-forces/`;
   }
 
+  static conceptEcosystemV2(conceptUuid: string) {
+    return `api/v3/concept/${conceptUuid}/ecosystem/`;
+  }
+
+  static conceptEcosystemV2Generate(rootIdentifier: string) {
+    return `api/v3/concept/${rootIdentifier}/ecosystem/generate`;
+  }
+
   // Nucleus Report Endpoints
   static nucleusReportLatest = '/api/v1/nucleus-reports/latest';
   static nucleusReportLatestProgress =
