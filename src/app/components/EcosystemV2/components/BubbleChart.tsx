@@ -8,8 +8,14 @@ interface BubbleChartProps {
 
 const BubbleChart = ({ data }: BubbleChartProps) => {
   const [hoveredBubble, setHoveredBubble] = useState<string | null>(null);
+  const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
 
   const memoizedData = useMemo(() => data, [data]);
+
+  const handleImageError = (companyId: number, companyName: string) => {
+    const key = `${companyId}-${companyName}`;
+    setBrokenImages((prev) => new Set(prev).add(key));
+  };
 
   return (
     <div className='aucctus-bg-primary rounded-lg border'>
@@ -86,6 +92,13 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
             {memoizedData.map((company, index) => {
               const x = (company.competitorScore / 100) * 100;
               const y = (company.establishedScore / 100) * 100;
+              const companyKey = `${company.id}-${company.name}`;
+              const isImageBroken = brokenImages.has(companyKey);
+              const shouldShowImage =
+                company.logoType === 'image' &&
+                company.logoUrl &&
+                !isImageBroken;
+
               return (
                 <div
                   key={`${company.type}-${company.id}-${company.name}-${index}`}
@@ -94,14 +107,9 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
                     left: `${x}%`,
                     top: `${y}%`,
                     transform: 'translate(-50%, -50%)',
-                    zIndex:
-                      hoveredBubble === `${company.id}-${company.name}`
-                        ? 20
-                        : 1,
+                    zIndex: hoveredBubble === companyKey ? 20 : 1,
                   }}
-                  onMouseEnter={() =>
-                    setHoveredBubble(`${company.id}-${company.name}`)
-                  }
+                  onMouseEnter={() => setHoveredBubble(companyKey)}
                   onMouseLeave={() => setHoveredBubble(null)}
                 >
                   <div
@@ -110,26 +118,28 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
                       width: `${Math.max(company.companySizeScore, 40)}px`,
                       height: `${Math.max(company.companySizeScore, 40)}px`,
                       transform:
-                        hoveredBubble === `${company.id}-${company.name}`
+                        hoveredBubble === companyKey
                           ? 'scale(1.1)'
                           : 'scale(1)',
-                      backgroundColor:
-                        company.logoType === 'image'
-                          ? 'white'
-                          : company.brandColor,
+                      backgroundColor: shouldShowImage
+                        ? 'white'
+                        : company.brandColor,
                       boxShadow:
-                        hoveredBubble === `${company.id}-${company.name}`
+                        hoveredBubble === companyKey
                           ? '0 8px 30px rgba(0,0,0,0.25)'
                           : '0 4px 15px rgba(0,0,0,0.15)',
                       border: '2px solid rgba(100,100,100,0.3)',
                       borderRadius: '50%',
                     }}
                   >
-                    {company.logoType === 'image' && company.logoUrl ? (
+                    {shouldShowImage ? (
                       <img
                         src={company.logoUrl}
                         alt={company.name}
                         className='h-full w-full object-contain'
+                        onError={() =>
+                          handleImageError(company.id, company.name)
+                        }
                       />
                     ) : (
                       <span
@@ -147,9 +157,7 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
                   {/* Tooltip */}
                   <CompanyTooltip
                     company={company}
-                    isVisible={
-                      hoveredBubble === `${company.id}-${company.name}`
-                    }
+                    isVisible={hoveredBubble === companyKey}
                   />
                 </div>
               );

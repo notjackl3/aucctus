@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { Company } from '../hooks/useEcosystem';
 
 interface CompanyTooltipProps {
@@ -10,7 +10,12 @@ const CompanyTooltip: React.FC<CompanyTooltipProps> = ({
   company,
   isVisible,
 }) => {
+  const [isImageBroken, setIsImageBroken] = useState(false);
+
   if (!isVisible) return null;
+
+  const shouldShowImage =
+    company.logoType === 'image' && company.logoUrl && !isImageBroken;
 
   return (
     <div className='aucctus-bg-primary aucctus-border-secondary absolute left-1/2 top-full z-50 mt-3 w-72 -translate-x-1/2 rounded-lg border p-4 shadow-2xl'>
@@ -18,15 +23,15 @@ const CompanyTooltip: React.FC<CompanyTooltipProps> = ({
         <div
           className='flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white font-bold text-white shadow-md'
           style={{
-            backgroundColor:
-              company.logoType === 'image' ? 'white' : company.brandColor,
+            backgroundColor: shouldShowImage ? 'white' : company.brandColor,
           }}
         >
-          {company.logoType === 'image' && company.logoUrl ? (
+          {shouldShowImage ? (
             <img
               src={company.logoUrl}
               alt={company.name}
               className='h-full w-full object-contain'
+              onError={() => setIsImageBroken(true)}
             />
           ) : (
             <span className='font-bold text-white'>

@@ -134,31 +134,43 @@ const mapProduct = (
   url: product.url,
 });
 
-const mapCompany = (company: IEcosystemCompany): Company => ({
-  id: company.id,
-  name: company.name,
-  type: company.type,
-  foundedYear: company.foundedYear,
-  headquarters: company.headquarters,
-  competitorScore: company.x,
-  establishedScore: company.y,
-  companySizeScore: company.size,
-  brandColor: company.brandColor || '#111827',
-  logoType: company.logoType,
-  logoUrl: company.logoUrl || undefined,
-  logoText: company.logoText || undefined,
-  product: company.product,
-  differentiator: company.differentiator,
-  website: company.website,
-  description: company.description,
-  competitiveAdvantage: buildAdvantageCopy(company),
-  strategicTags: company.strategicTags || undefined,
-  relevantProducts: (company.relevantProducts || []).map((product) =>
-    mapProduct(product, company.name),
-  ),
-  recommendation: company.recommendation,
-  recommendationReasoning: company.recommendationReasoning,
-});
+const mapCompany = (
+  company: IEcosystemCompany,
+  oldestYear: number,
+  currentYear: number,
+): Company => {
+  // Calculate establishedScore based on founded year
+  // 0 = oldest (top), 100 = newest (bottom)
+  const yearRange = currentYear - oldestYear;
+  const establishedScore =
+    yearRange > 0 ? ((company.foundedYear - oldestYear) / yearRange) * 100 : 50; // Default to middle if all companies same year
+
+  return {
+    id: company.id,
+    name: company.name,
+    type: company.type,
+    foundedYear: company.foundedYear,
+    headquarters: company.headquarters,
+    competitorScore: company.x,
+    establishedScore,
+    companySizeScore: company.size,
+    brandColor: company.brandColor || '#111827',
+    logoType: company.logoType,
+    logoUrl: company.logoUrl || undefined,
+    logoText: company.logoText || undefined,
+    product: company.product,
+    differentiator: company.differentiator,
+    website: company.website,
+    description: company.description,
+    competitiveAdvantage: buildAdvantageCopy(company),
+    strategicTags: company.strategicTags || undefined,
+    relevantProducts: (company.relevantProducts || []).map((product) =>
+      mapProduct(product, company.name),
+    ),
+    recommendation: company.recommendation,
+    recommendationReasoning: company.recommendationReasoning,
+  };
+};
 
 export const useEcosystem = (conceptId: string): EcosystemCompanyData => {
   const { data, isLoading, error } = useQuery<IEcosystemV2Response>({
@@ -185,8 +197,17 @@ export const useEcosystem = (conceptId: string): EcosystemCompanyData => {
       return EMPTY_STATE;
     }
 
+    // Calculate oldest year and current year for establishedScore calculation
+    const currentYear = new Date().getFullYear();
+    const oldestYear =
+      data.ecosystemData.length > 0
+        ? Math.min(...data.ecosystemData.map((c) => c.foundedYear))
+        : currentYear;
+
     return {
-      ecosystemData: data.ecosystemData.map(mapCompany),
+      ecosystemData: data.ecosystemData.map((company) =>
+        mapCompany(company, oldestYear, currentYear),
+      ),
       headwinds: data.headwinds,
       tailwinds: data.tailwinds,
       crowdedness: {

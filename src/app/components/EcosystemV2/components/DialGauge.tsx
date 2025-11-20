@@ -24,41 +24,40 @@ const DialGauge: React.FC<DialGaugeProps> = ({
     // Clamp between 0 and 1 (Correct)
     const clampedValue = Math.max(0, Math.min(1, normalizedValue));
 
-    // 2. Constants (Correct)
+    // 2. Constants
     const CX = 120;
     const CY = 165 - Math.sqrt(2800); // Center Y: ~112.085
-    const R = 80;
+    const R = 80; // Arc radius - matches the path definition
 
-    // 3. Angle Calculations (FIXED)
-    // The second argument to atan2 is the X-difference, the first is the Y-difference.
+    // 3. Angle Calculations
+    // Arc path is: M 60 165 A 80 80 0 1 1 180 165
+    // This means: Move to (60, 165), then draw an arc with radius 80
+    // from (60, 165) to (180, 165) going counter-clockwise (the "1 1" flags)
 
-    // Y-difference for both start/end is 165 - CY (~52.915)
-    const DELTA_Y = 165 - CY;
+    // Calculate angles from center (CX, CY) to arc endpoints
+    // Start point: (60, 165)
+    const THETA_START = Math.atan2(165 - CY, 60 - CX);
 
-    // Start angle (60, 165)
-    // X-difference: 60 - CX = 60 - 120 = -60
-    const THETA_START = Math.atan2(DELTA_Y, 60 - CX);
+    // End point: (180, 165)
+    const THETA_END = Math.atan2(165 - CY, 180 - CX);
 
-    // End angle (180, 165)
-    // X-difference: 180 - CX = 180 - 120 = 60
-    const THETA_END = Math.atan2(DELTA_Y, 180 - CX);
-
-    // Adjust THETA_END for the required counter-clockwise MAJOR arc sweep (Correct)
-    // Since THETA_START (~2.433 rad) > THETA_END (~0.709 rad), we must add 2*PI to sweep CCW.
+    // Since we're sweeping counter-clockwise and THETA_START > THETA_END,
+    // we need to add 2π to THETA_END to get the proper sweep
     const THETA_END_ADJUSTED = THETA_END + 2 * Math.PI;
 
-    // Total angular distance (Correct)
+    // Total angular sweep
     const THETA_SWEEP = THETA_END_ADJUSTED - THETA_START;
 
-    // 4. Interpolate Angle and Calculate Position (Correct)
+    // 4. Interpolate Angle and Calculate Position
     const currentTheta = THETA_START + THETA_SWEEP * clampedValue;
 
+    // Position the indicator on the arc (radius R from center)
     const indicatorCx = CX + R * Math.cos(currentTheta);
     const indicatorCy = CY + R * Math.sin(currentTheta);
 
-    // 5. Calculate Rotation (Correct)
-    // Convert currentTheta to degrees, and subtract 90° because 0 radians (3 o'clock)
-    // corresponds to a needle pointing straight right, but we want it to point UP (12 o'clock) at 0° rotation.
+    // 5. Calculate Needle Rotation
+    // Convert angle to degrees and adjust so needle points correctly
+    // At THETA_START, needle should point toward start of arc
     const needleRotation = (currentTheta * 180) / Math.PI - 90;
 
     return { needleRotation, indicatorCx, indicatorCy };
@@ -109,12 +108,12 @@ const DialGauge: React.FC<DialGaugeProps> = ({
           />
 
           {/* Needle - pointing to calculated position */}
-          <g transform='translate(120, 165)'>
+          <g transform={`translate(120, ${165 - Math.sqrt(2800)})`}>
             <line
               x1='0'
               y1='0'
               x2='0'
-              y2='-67'
+              y2='-80'
               stroke='white'
               strokeWidth='5'
               strokeLinecap='round'
@@ -129,10 +128,10 @@ const DialGauge: React.FC<DialGaugeProps> = ({
           <circle
             cx={indicatorCx}
             cy={indicatorCy}
-            r='15.18'
+            r='14'
             fill='black'
             stroke='white'
-            strokeWidth='5.85'
+            strokeWidth='3'
           />
 
           {/* Center metric number */}
