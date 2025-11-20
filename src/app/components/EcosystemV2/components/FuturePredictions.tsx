@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Icon, Button, Badge } from '@components';
+import { Icon, Button } from '@components';
 import ComponentCarousel, {
   ComponentCarouselRef,
 } from '../../Carousel/ComponentCarousel';
@@ -69,15 +69,9 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
               key={prediction.id}
               className='aucctus-bg-primary aucctus-border-secondary flex h-full flex-col space-y-3 overflow-hidden rounded-lg border p-4'
             >
-              <div className='flex items-start justify-between gap-3'>
-                <h4 className='aucctus-text-primary flex-1 text-base font-semibold leading-snug'>
-                  {prediction.title}
-                </h4>
-                <Badge.Default
-                  value={prediction.category}
-                  classNameBadge='aucctus-bg-secondary-subtle aucctus-border-primary w-fit flex-shrink-0 capitalize'
-                />
-              </div>
+              <h4 className='aucctus-text-primary text-base font-semibold leading-snug'>
+                {prediction.title}
+              </h4>
               <p className='aucctus-text-secondary flex-1 text-sm leading-relaxed'>
                 {prediction.description}
               </p>

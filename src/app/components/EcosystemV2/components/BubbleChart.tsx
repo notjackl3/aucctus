@@ -50,10 +50,10 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
           <svg
             className='pointer-events-none absolute inset-0 h-full w-full'
             style={{
-              paddingLeft: '80px',
-              paddingRight: '80px',
-              paddingTop: '40px',
-              paddingBottom: '40px',
+              paddingLeft: '100px',
+              paddingRight: '100px',
+              paddingTop: '60px',
+              paddingBottom: '60px',
             }}
           >
             <line
@@ -83,15 +83,27 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
           <div
             className='absolute inset-0'
             style={{
-              paddingLeft: '80px',
-              paddingRight: '80px',
-              paddingTop: '40px',
-              paddingBottom: '40px',
+              paddingLeft: '100px',
+              paddingRight: '100px',
+              paddingTop: '0px',
+              paddingBottom: '0px',
             }}
           >
             {memoizedData.map((company, index) => {
-              const x = (company.competitorScore / 100) * 100;
-              const y = (company.establishedScore / 100) * 100;
+              const bubbleSize = Math.max(company.companySizeScore, 40);
+              const maxBubbleRadius = 80; // Maximum expected bubble radius for clamping
+
+              // Calculate the percentage of the container that the bubble radius represents
+              // We need to keep bubbles within bounds by clamping their position
+              const minPercent = 10; // 5% margin from edges
+              const maxPercent = 90; // 95% margin from edges
+
+              // Clamp the position to keep bubbles within bounds
+              const rawX = (company.competitorScore / 100) * 100;
+              const rawY = (company.establishedScore / 100) * 100;
+              const x = Math.max(minPercent, Math.min(maxPercent, rawX));
+              const y = Math.max(minPercent, Math.min(maxPercent, rawY));
+
               const companyKey = `${company.id}-${company.name}`;
               const isImageBroken = brokenImages.has(companyKey);
               const shouldShowImage =
@@ -115,8 +127,8 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
                   <div
                     className='flex cursor-pointer items-center justify-center overflow-hidden font-bold shadow-lg transition-all duration-300'
                     style={{
-                      width: `${Math.max(company.companySizeScore, 40)}px`,
-                      height: `${Math.max(company.companySizeScore, 40)}px`,
+                      width: `${bubbleSize}px`,
+                      height: `${bubbleSize}px`,
                       transform:
                         hoveredBubble === companyKey
                           ? 'scale(1.1)'
