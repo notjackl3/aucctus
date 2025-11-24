@@ -1,28 +1,12 @@
 import React from 'react';
 import { Company } from '../hooks/useEcosystem';
 import { cn } from '@libs/utils/react';
-import { Badge } from '@components';
 
 interface CompanyListPanelProps {
   companies: Company[];
   selectedCompany: Company | null;
   onSelectCompany: (company: Company) => void;
 }
-
-const getRecommendationStyle = (
-  recommendation: 'partner' | 'invest' | 'monitor' | 'compete',
-) => {
-  switch (recommendation) {
-    case 'partner':
-      return 'bg-blue-50 text-blue-700 border-blue-200 border';
-    case 'invest':
-      return 'bg-green-50 text-green-700 border-green-200 border';
-    case 'monitor':
-      return 'bg-yellow-50 text-yellow-700 border-yellow-200 border';
-    case 'compete':
-      return 'bg-red-50 text-red-700 border-red-200 border';
-  }
-};
 
 const CompanyListPanel: React.FC<CompanyListPanelProps> = ({
   companies,
@@ -68,11 +52,6 @@ const CompanyListPanel: React.FC<CompanyListPanelProps> = ({
                       Founded {company.foundedYear}
                     </p>
                   </div>
-                  <Badge.Default
-                    value={company.recommendation}
-                    classNameBadge={`flex-shrink-0 ${getRecommendationStyle(company.recommendation)}`}
-                    classNameLabel='capitalize font-bold'
-                  />
                 </div>
                 <p className='aucctus-text-secondary line-clamp-2 truncate text-xs'>
                   {company.product}

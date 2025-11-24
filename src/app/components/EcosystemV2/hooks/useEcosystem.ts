@@ -35,8 +35,25 @@ export interface Company {
   competitiveAdvantage: string;
   strategicTags?: StrategicTag[];
   relevantProducts: Array<Product>;
-  recommendation: 'monitor' | 'partner' | 'compete';
-  recommendationReasoning: string;
+  nextSteps?: string[];
+
+  // Metric fields
+  revenue?: number | null;
+  revenueSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
+  revenueSourceLabel?: string | null;
+  revenueAiExplanation?: string | null;
+
+  employees?: number | null;
+  employeesSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
+  employeesSourceLabel?: string | null;
+  employeesAiExplanation?: string | null;
+
+  funding?: number | null;
+  fundingSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
+  fundingSourceLabel?: string | null;
+  fundingAiExplanation?: string | null;
+
+  parentCompany?: string | null;
 }
 
 export interface Product {
@@ -167,8 +184,21 @@ const mapCompany = (
     relevantProducts: (company.relevantProducts || []).map((product) =>
       mapProduct(product, company.name),
     ),
-    recommendation: company.recommendation,
-    recommendationReasoning: company.recommendationReasoning,
+    nextSteps: company.nextSteps || [],
+    // Metric fields
+    revenue: company.revenue,
+    revenueSourceType: company.revenueSourceType,
+    revenueSourceLabel: company.revenueSourceLabel,
+    revenueAiExplanation: company.revenueAiExplanation,
+    employees: company.employees,
+    employeesSourceType: company.employeesSourceType,
+    employeesSourceLabel: company.employeesSourceLabel,
+    employeesAiExplanation: company.employeesAiExplanation,
+    funding: company.funding,
+    fundingSourceType: company.fundingSourceType,
+    fundingSourceLabel: company.fundingSourceLabel,
+    fundingAiExplanation: company.fundingAiExplanation,
+    parentCompany: company.parentCompany,
   };
 };
 

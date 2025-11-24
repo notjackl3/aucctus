@@ -457,7 +457,7 @@ export const useGenerateMarketScan = () => {
       // DO NOT invalidate queries here - that would force a refetch from backend
       // which still shows "complete" status, overwriting our pending states.
       // WebSocket events will handle the actual data updates when backend completes.
-      toast.info(
+      toast.success(
         'Market scan regeneration started',
         "We'll refresh this section as soon as new signals arrive.",
       );
@@ -1489,6 +1489,10 @@ export const doFullConceptInvalidation = (
     }),
     queryClient.invalidateQueries({
       queryKey: [AucctusQueryKeys.marketScanMarketForcesV3],
+    }),
+    // Ecosystem v2 queries
+    queryClient.invalidateQueries({
+      queryKey: ['ecosystem-v2', identifier],
     }),
     // Customer profile queries
     queryClient.invalidateQueries({

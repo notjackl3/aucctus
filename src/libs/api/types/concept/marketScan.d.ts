@@ -268,11 +268,28 @@ export interface IEcosystemCompany {
   description: string;
   competitiveAdvantage: string;
   strategicTags?: IStrategicTag[] | null;
-  recommendation: 'monitor' | 'partner' | 'compete';
-  recommendationReasoning: string;
   relevantProducts: IEcosystemProduct[];
   competitiveAdvantages: IEcosystemCompetitiveAdvantage[];
   recommendedActions: IEcosystemRecommendedAction[];
+  nextSteps?: string[];
+
+  // Metric fields
+  revenue?: number | null;
+  revenueSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
+  revenueSourceLabel?: string | null;
+  revenueAiExplanation?: string | null;
+
+  employees?: number | null;
+  employeesSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
+  employeesSourceLabel?: string | null;
+  employeesAiExplanation?: string | null;
+
+  funding?: number | null;
+  fundingSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
+  fundingSourceLabel?: string | null;
+  fundingAiExplanation?: string | null;
+
+  parentCompany?: string | null;
 }
 
 export interface IEcosystemPrediction {

@@ -84,18 +84,13 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
                       key={idx}
                       source={source}
                       badgeSize='small'
+                      onClick={
+                        source.url
+                          ? () => window.open(source.url!, '_blank')
+                          : undefined
+                      }
                     />
                   ))}
-                  <SourceInfoBadge
-                    source={{
-                      uuid: 'ai-reasoning',
-                      title: 'AI Reasoning',
-                      url: '',
-                      description:
-                        'AI-generated insight based on ecosystem analysis',
-                    }}
-                    badgeSize='small'
-                  />
                 </div>
               )}
             </div>

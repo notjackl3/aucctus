@@ -91,7 +91,6 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
           >
             {memoizedData.map((company, index) => {
               const bubbleSize = Math.max(company.companySizeScore, 40);
-              const maxBubbleRadius = 80; // Maximum expected bubble radius for clamping
 
               // Calculate the percentage of the container that the bubble radius represents
               // We need to keep bubbles within bounds by clamping their position

@@ -233,9 +233,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
         {/* Product Carousel */}
         <ProductCarousel ecosystemData={ecosystemData} />
         {/* Future Predictions */}
-        <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border px-4 py-4'>
-          <FuturePredictions predictions={futurePredictions} />
-        </div>
+        <FuturePredictions predictions={futurePredictions} />
       </div>
     </div>
   );
