@@ -76,9 +76,25 @@ export const useSeedsBank = (
     status: new Set<SeedStatus>(['draft']), // Default to only show 'draft' seeds
   });
 
-  const [filterOptions, setFilterOptions] = React.useState<ISeedFilterOptions>(
-    externalFilterOptions || filterOptionsRef.current,
-  );
+  // Initialize with defensive check for status Set
+  const initialOptions = React.useMemo(() => {
+    const options = externalFilterOptions || filterOptionsRef.current;
+
+    // Ensure status is always a Set
+    if (!options.status || !(options.status instanceof Set)) {
+      return {
+        ...options,
+        status: new Set<SeedStatus>(
+          options.status ? Array.from(options.status as any) : [],
+        ),
+      };
+    }
+
+    return options;
+  }, [externalFilterOptions]);
+
+  const [filterOptions, setFilterOptions] =
+    React.useState<ISeedFilterOptions>(initialOptions);
 
   const [page, setPage] = React.useState<number>(1);
   const [sorting, setSorting] = React.useState<SortingState>([
@@ -88,7 +104,16 @@ export const useSeedsBank = (
   // If we receive external filter options, use those instead
   React.useEffect(() => {
     if (externalFilterOptions) {
-      setFilterOptions({ ...filterOptions, ...externalFilterOptions });
+      const mergedOptions = { ...filterOptions, ...externalFilterOptions };
+
+      // Ensure status is always a Set after merging
+      if (!mergedOptions.status || !(mergedOptions.status instanceof Set)) {
+        mergedOptions.status = new Set(
+          mergedOptions.status ? Array.from(mergedOptions.status as any) : [],
+        );
+      }
+
+      setFilterOptions(mergedOptions);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [externalFilterOptions]);
@@ -96,7 +121,10 @@ export const useSeedsBank = (
   // Memoize the query options to prevent unnecessary API calls
   const queryOptions = useMemo(
     () => ({
-      status: Array.from(filterOptions.status).join(',') || undefined,
+      status:
+        filterOptions.status && filterOptions.status.size > 0
+          ? Array.from(filterOptions.status).join(',')
+          : undefined,
       createdBy: filterOptions.createdBy
         ? `${filterOptions.createdBy.firstName} ${filterOptions.createdBy.lastName}`
         : undefined,

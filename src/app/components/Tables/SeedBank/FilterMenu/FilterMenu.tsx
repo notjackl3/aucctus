@@ -119,7 +119,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
         </Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content
-            className='aucctus-bg-primary flex w-auto flex-col gap-1 rounded-md p-2 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
+            className='aucctus-bg-primary z-[9999] flex w-auto flex-col gap-1 rounded-md p-2 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
             align='end'
             side='bottom'
           >

@@ -5,6 +5,7 @@ import {
 } from '@libs/api/types';
 import { canOpenConceptWhilePending } from '@libs/utils/concepts';
 import { FunctionComponent, ReactNode } from 'react';
+import { animated, useSpring } from 'react-spring';
 import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
 import ConceptGeneratingButton from './ConceptGeneratingButton';
 
@@ -73,14 +74,26 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
     dateReportCompleted,
   );
 
+  const isGenerating = variant === 'pending' && !canOpenWhilePending;
+
+  // Animate width transition between Generate (120px) and Generating (150px)
+  const animationStyle = useSpring({
+    maxWidth: isGenerating ? '150px' : '120px',
+    config: {
+      tension: 280,
+      friction: 60,
+    },
+  });
+
   // If in pending state, use the ConceptGeneratingButton component
-  if (variant === 'pending' && !canOpenWhilePending) {
+  if (isGenerating) {
     return (
       <ConceptGeneratingButton
         reportStatusBySection={reportStatusBySection}
         dateReportStarted={dateReportStarted}
         dateReportCompleted={dateReportCompleted}
         conceptUuid={conceptUuid}
+        animationStyle={animationStyle}
       />
     );
   }
@@ -123,18 +136,28 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
         }
         hideDelay={0}
       >
-        <button className={style} onClick={onClick} disabled={disabled}>
+        <animated.button
+          className={style}
+          onClick={onClick}
+          disabled={disabled}
+          style={animationStyle}
+        >
           {resolvedLabel}
-        </button>
+        </animated.button>
       </ComponentTooltip>
     );
   }
 
   // Otherwise return the regular button
   return (
-    <button className={style} onClick={onClick} disabled={disabled}>
+    <animated.button
+      className={style}
+      onClick={onClick}
+      disabled={disabled}
+      style={animationStyle}
+    >
       {resolvedLabel}
-    </button>
+    </animated.button>
   );
 };
 

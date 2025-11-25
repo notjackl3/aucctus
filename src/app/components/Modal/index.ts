@@ -22,6 +22,8 @@ import AddAnswerModal from './Nucleus/AddAnswerModal';
 import EditAnswerModal from './Nucleus/EditAnswerModal';
 import MagicShare from './MagicShareModal/MagicShareModal';
 import RegenerateTestWarningModal from './RegenerateTestWarningModal';
+import PropertyDefinitionModal from './PropertyDefinitionModal/PropertyDefinitionModal';
+import IconPickerModal from './IconPickerModal/IconPickerModal';
 
 const Modal = {
   Base,
@@ -46,6 +48,8 @@ const Modal = {
   EditAnswerModal,
   MagicShare,
   RegenerateTestWarningModal,
+  PropertyDefinitionModal,
+  IconPickerModal,
 };
 
 export default Modal;

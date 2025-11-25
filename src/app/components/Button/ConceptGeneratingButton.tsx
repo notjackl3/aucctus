@@ -1,9 +1,7 @@
-import images from '@assets/img';
 import { ComponentTooltip } from '@components';
-import useGenerationStatus from '@hooks/concepts/generation-status.hook';
 import { ConceptReportStatusBySection } from '@libs/api/types';
-import * as browser from '@libs/utils/browser';
-import { FunctionComponent, useCallback, useEffect, useRef } from 'react';
+import { FunctionComponent } from 'react';
+import { animated, SpringValue } from 'react-spring';
 import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
 
 type ConceptGeneratingButtonProps = {
@@ -11,6 +9,10 @@ type ConceptGeneratingButtonProps = {
   dateReportStarted?: string;
   dateReportCompleted?: string;
   conceptUuid?: string;
+  animationStyle?: {
+    width?: SpringValue<string>;
+    maxWidth?: SpringValue<string>;
+  };
 };
 
 const ConceptGeneratingButton: FunctionComponent<
@@ -20,36 +22,9 @@ const ConceptGeneratingButton: FunctionComponent<
   dateReportStarted,
   dateReportCompleted,
   conceptUuid,
+  animationStyle,
 }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const { completedCount, totalCount } = useGenerationStatus(
-    reportStatusBySection,
-  );
-
-  const videoConfig = browser.isBrowser('Safari')
-    ? {
-        src: images.generatingAnimated.mp4,
-        type: 'video/mp4',
-      }
-    : {
-        src: images.generatingAnimated.webm,
-        type: 'video/webm',
-      };
-
-  const updatePlaybackSpeed = useCallback(() => {
-    if (!videoRef.current) return;
-
-    if (totalCount > 0) {
-      const speed = completedCount / totalCount;
-      videoRef.current.playbackRate = Math.max(1, speed);
-    } else {
-      videoRef.current.playbackRate = 1;
-    }
-  }, [completedCount, totalCount]);
-
-  useEffect(() => {
-    updatePlaybackSpeed();
-  }, [updatePlaybackSpeed]);
+  const ButtonComponent = animationStyle ? animated.button : 'button';
 
   return (
     <ComponentTooltip
@@ -65,19 +40,25 @@ const ConceptGeneratingButton: FunctionComponent<
       }
       hideDelay={0}
     >
-      <span className='flex h-[62px] min-w-[150px] items-end justify-end bg-transparent'>
-        <video
-          ref={videoRef}
-          autoPlay
-          loop
-          muted
-          playsInline
-          className='mr-[-8px] h-full w-full transform object-cover'
-        >
-          <source src={videoConfig.src} type={videoConfig.type} />
-          Your browser does not support the video tag.
-        </video>
-      </span>
+      <ButtonComponent
+        className='btn btn-generating btn-bold'
+        disabled
+        style={animationStyle as any}
+      >
+        <span className='flex'>
+          {'Generating'.split('').map((letter, index) => (
+            <span
+              key={index}
+              className='letter-bounce'
+              style={{
+                animationDelay: `${index * 30}ms`,
+              }}
+            >
+              {letter}
+            </span>
+          ))}
+        </span>
+      </ButtonComponent>
     </ComponentTooltip>
   );
 };

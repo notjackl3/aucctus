@@ -2,7 +2,6 @@ import { BetaDisclaimer, Icon, Modal } from '@components';
 import AiIntroMessage from '@components/AiInteraction/AiIntroMessage';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
-import { toast } from '@components/Notification/toast';
 import { useModal } from '@context/ModalContextProvider';
 import {
   markConceptSectionsPending,
@@ -244,12 +243,6 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                     {
                       onSuccess: () => {
                         setAiEditSubmission(undefined);
-
-                        // Show info toast about regeneration starting
-                        toast.info(
-                          'Concept regeneration started',
-                          'We will refresh the report as updated sections complete.',
-                        );
 
                         // Mark sections as pending in the cache
                         // DO NOT invalidate queries here - that would force a refetch from backend

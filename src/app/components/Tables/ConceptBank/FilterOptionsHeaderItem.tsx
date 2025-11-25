@@ -5,7 +5,7 @@ import utils from '@libs/utils';
 import React from 'react';
 
 interface IFilterOptionsHeaderItemProps {
-  propertyName: keyof IConceptFilterOptions;
+  propertyName: keyof IConceptFilterOptions | 'propertyFilter';
   value: string;
   onRemove?: () => void;
 }
@@ -15,16 +15,25 @@ const FilterOptionsHeaderItem: React.FC<IFilterOptionsHeaderItemProps> = ({
   value,
   onRemove,
 }) => {
+  // For property filters, the value already contains the full display text (e.g., "Delivery Type: Supplier")
+  // so we don't need a prefix
+  const isPropertyFilter = propertyName === 'propertyFilter';
+
   const prefix =
     propertyName === 'sort' ? removeFirstCharIfDash(value) : propertyName;
   const suffix = propertyName === 'sort' ? checkStringOrder(value) : value;
+
+  // Determine display text
+  const displayText = isPropertyFilter
+    ? value // Already formatted with property name and value
+    : `${utils.string.camelCaseToTitleCase(prefix)}: ${suffix}`;
 
   return (
     <span className='flex h-full w-fit max-w-96 items-center gap-2 rounded-lg bg-primary-50 px-3 py-2 align-middle text-primary-600 [&>svg]:stroke-primary-600'>
       <span className='[&>svg]:stroke-primary-600'>
         <Icon variant={getPropertyIcon(propertyName)} width={16} height={16} />
       </span>
-      <span className='truncate'>{`${utils.string.camelCaseToTitleCase(prefix)}: ${suffix}`}</span>
+      <span className='truncate'>{displayText}</span>
       {onRemove && (
         <button
           onClick={onRemove}
@@ -52,15 +61,19 @@ function checkStringOrder(str: string) {
 }
 
 const getPropertyIcon = (
-  propertyName: keyof IConceptFilterOptions,
+  propertyName: keyof IConceptFilterOptions | 'propertyFilter',
 ): IconVariant => {
   switch (propertyName) {
     case 'status':
       return 'loading-02';
     case 'createdBy':
       return 'user-group';
+    case 'lastModifiedBy':
+      return 'user-group';
     case 'sort':
       return 'switch-vertical-01';
+    case 'propertyFilter':
+      return 'filter-lines';
     default:
       return 'search-refraction';
   }

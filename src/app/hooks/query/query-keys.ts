@@ -30,6 +30,11 @@ export enum AucctusQueryKeys {
   assumption = 'assumption',
   assumptions = 'assumptions',
 
+  /* Properties */
+  propertyDefinitions = 'propertyDefinitions',
+  propertyDefinition = 'propertyDefinition',
+  conceptProperties = 'conceptProperties',
+
   /* Idea Playground */
   ideaPlaygroundAnchorThoughts = 'ideaPlaygroundAnchorThoughts',
   ideaPlaygroundAnchorThought = 'ideaPlaygroundAnchorThought',

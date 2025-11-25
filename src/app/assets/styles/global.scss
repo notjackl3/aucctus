@@ -6,6 +6,7 @@
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100;0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900;0,9..40,1000;1,9..40,100;1,9..40,300;1,9..40,400;1,9..40,500;1,9..40,600;1,9..40,700;1,9..40,800;1,9..40,900;1,9..40,1000&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 @import '~button.scss';
+@import './animations/glow.scss';
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
@@ -29,6 +30,7 @@ body {
   height: 100%;
   width: 100%;
 }
+
 .App {
   position: relative;
 }
@@ -220,6 +222,7 @@ select:focus {
 
 /* Custom Scrollbar Styling */
 * {
+
   /* For Webkit browsers (Chrome, Safari) */
   &::-webkit-scrollbar {
     width: 10px;
@@ -248,11 +251,13 @@ select:focus {
 
 .no-scrollbar {
   overflow: auto;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .no-scrollbar::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Edge */
+  display: none;
+  /* Chrome, Safari, Edge */
 }
 
 /* React-Toastify Custom Styling - Remove default white container background */

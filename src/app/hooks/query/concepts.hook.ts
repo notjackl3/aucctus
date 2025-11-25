@@ -66,12 +66,18 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
       queryOptions.category,
       queryOptions.search,
       queryOptions.createdBy,
+      queryOptions.lastModifiedBy,
       queryOptions.page,
       queryOptions.sort,
+      queryOptions.properties, // Use the JSON-encoded properties array for cache key
     ],
     queryFn: () => api.concept.getConcepts(queryOptions),
-    staleTime: 1000 * 60 * 2, // 2 minutes
+    staleTime: 1000 * 0, // 10 seconds - fresher data for active filtering/sorting
+    cacheTime: 1000 * 60 * 5, // 5 minutes - keep in cache longer
     keepPreviousData: true, // Keep previous data while loading new data
+    refetchOnWindowFocus: true, // Refetch when user returns to tab
+    refetchOnMount: true, // Always refetch when component mounts
+    refetchOnReconnect: true, // Refetch when reconnecting to the network
   });
 
   const dataWithOverrides = useMemo(() => {

@@ -23,7 +23,7 @@ const Status: React.FC<IStatusProps> = ({ value }) => {
   return (
     <div
       className={cn(
-        'flex items-center justify-center rounded-full px-4 py-1.5',
+        'flex items-center justify-center rounded-full px-2 py-1',
         'w-fit max-w-[160px]',
         style.bg,
         borderClass,
@@ -31,7 +31,7 @@ const Status: React.FC<IStatusProps> = ({ value }) => {
     >
       <span
         className={cn(
-          'font-inter h-[20px] text-center text-sm font-medium capitalize leading-[20px]',
+          'font-inter text-center text-xs font-medium capitalize',
           'overflow-hidden truncate',
           style.text,
         )}

@@ -6,6 +6,7 @@ import Collapsible from './Collapsible';
 import ConceptGenerate from './ConceptGenerateButton';
 import Dropdown from './Dropdown/Dropdown';
 import RadioGroup from './RadioGroup';
+import NaturalLanguageFilterButton from './NaturalLanguageFilterButton';
 
 // Attach other components as properties to Default
 
@@ -16,6 +17,7 @@ import RadioGroup from './RadioGroup';
 (Default as any).Collapsible = Collapsible;
 (Default as any).ConceptGenerate = ConceptGenerate;
 (Default as any).RadioGroup = RadioGroup;
+(Default as any).NaturalLanguageFilter = NaturalLanguageFilterButton;
 
 const Button = Default as typeof Default & {
   Dropdown: typeof Dropdown;
@@ -25,6 +27,7 @@ const Button = Default as typeof Default & {
   RadioButtonGroup: typeof RadioButtonGroup;
   ActionsMenuButton: typeof ActionsMenuButton;
   ConceptVersionsButton: typeof ConceptVersionsButton;
+  NaturalLanguageFilter: typeof NaturalLanguageFilterButton;
 };
 
 export default Button;

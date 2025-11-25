@@ -184,6 +184,9 @@ export interface IConcept extends IBaseConceptEntity {
   completedSections?: string[];
   totalSections?: number;
   conceptImageUrl?: string;
+
+  // Custom properties from dynamic property definitions
+  customProperties?: Record<string, any>;
 }
 
 export interface IConceptMagicShareLatest {
@@ -327,13 +330,31 @@ export interface ICustomerProfileCreate {
 }
 
 export type SortableConceptProperties =
-  | 'createdAt'
-  | 'updatedAt'
+  | 'created_at'
+  | 'updated_at'
+  | 'created_by__first_name'
+  | 'created_by__last_name'
+  | 'updated_by__first_name'
+  | 'updated_by__last_name'
   | 'status'
   | 'title';
-export type ConceptSort =
+
+// Single sort field (standard field or property)
+export type ConceptSortField =
   | SortableConceptProperties
-  | `-${SortableConceptProperties}`;
+  | `-${SortableConceptProperties}`
+  | `property:${string}`
+  | `-property:${string}`;
+
+// Legacy: Single sort (backward compatible)
+export type ConceptSort = ConceptSortField;
+
+// New: Multiple sorts as comma-separated string
+// Examples:
+// - "status,-createdAt" (status asc, then createdAt desc)
+// - "property:priority,-updatedAt" (priority asc, then updatedAt desc)
+// - "-property:priority,property:team_size,status" (priority desc, team_size asc, status asc)
+export type ConceptSortString = string;
 
 export interface IConceptQueryOptions extends IPageQueryOptions {
   search?: string;
@@ -341,7 +362,13 @@ export interface IConceptQueryOptions extends IPageQueryOptions {
   status?: string;
   category?: string;
   createdBy?: string;
-  sort?: ConceptSort;
+  lastModifiedBy?: string;
+  sort?: ConceptSortString; // Now accepts comma-separated sort fields
+  properties?: string; // JSON-encoded array of property filters with AND logic
+  // Legacy single-property filter (deprecated, use properties instead)
+  property_key?: string;
+  property_value?: any;
+  property_operator?: string;
 }
 
 export interface IConceptPage extends IPageResponse<IConcept> {

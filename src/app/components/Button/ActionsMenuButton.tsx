@@ -7,6 +7,7 @@ import {
 import * as Popover from '@radix-ui/react-popover';
 import React from 'react';
 import ClickAwayListener from 'react-click-away-listener';
+import { animated, useTransition } from 'react-spring';
 
 import { cn } from '@libs/utils/react';
 
@@ -39,6 +40,26 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
   const showCancelReport = reportStatus === 'pending' && onCancelReport;
   const showCloneConceptSeed = status !== 'draft' && onCloneConceptSeed;
 
+  // Smooth animation for menu appearance
+  const menuTransition = useTransition(open, {
+    from: {
+      opacity: 0,
+      transform: 'scale(0.95) translateY(-8px)',
+    },
+    enter: {
+      opacity: 1,
+      transform: 'scale(1) translateY(0px)',
+    },
+    leave: {
+      opacity: 0,
+      transform: 'scale(0.95) translateY(-8px)',
+    },
+    config: {
+      tension: 300,
+      friction: 25,
+    },
+  });
+
   return (
     <Popover.Root open={open}>
       <Popover.Trigger asChild>
@@ -54,63 +75,71 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
       </Popover.Trigger>
       <Popover.Portal>
         <ClickAwayListener onClickAway={() => setOpen(false)}>
-          <Popover.Content
-            className='aucctus-bg-primary min-w-[160px] rounded p-2 shadow-lg will-change-[transform,opacity] focus:shadow-lg'
-            side='left'
-          >
-            <div className='flex flex-col'>
-              <button
-                className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
-                onClick={() => {
-                  if (status === 'archived') {
-                    onUnarchive(identifier);
-                  } else {
-                    onArchive(identifier);
-                  }
-                  setOpen(false);
-                }}
-              >
-                <span className='aucctus-text-primary text-base'>
-                  {archiveLabel}
-                </span>
-              </button>
+          {menuTransition(
+            (styles, item) =>
+              item && (
+                <Popover.Content
+                  asChild
+                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[160px] rounded-lg border p-2 shadow-lg'
+                  side='left'
+                  sideOffset={5}
+                >
+                  <animated.div style={styles}>
+                    <div className='flex flex-col'>
+                      <button
+                        className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
+                        onClick={() => {
+                          if (status === 'archived') {
+                            onUnarchive(identifier);
+                          } else {
+                            onArchive(identifier);
+                          }
+                          setOpen(false);
+                        }}
+                      >
+                        <span className='aucctus-text-primary text-base'>
+                          {archiveLabel}
+                        </span>
+                      </button>
 
-              {showCancelReport && (
-                <>
-                  <div className='aucctus-bg-secondary mx-2 h-px' />
-                  <button
-                    className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
-                    onClick={() => {
-                      onCancelReport?.(identifier);
-                      setOpen(false);
-                    }}
-                  >
-                    <span className='aucctus-text-primary text-base'>
-                      Cancel Report
-                    </span>
-                  </button>
-                </>
-              )}
+                      {showCancelReport && (
+                        <>
+                          <div className='aucctus-bg-secondary mx-2 h-px' />
+                          <button
+                            className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
+                            onClick={() => {
+                              onCancelReport?.(identifier);
+                              setOpen(false);
+                            }}
+                          >
+                            <span className='aucctus-text-primary text-base'>
+                              Cancel Report
+                            </span>
+                          </button>
+                        </>
+                      )}
 
-              {showCloneConceptSeed && (
-                <>
-                  <div className='aucctus-bg-secondary mx-2 h-px' />
-                  <button
-                    className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
-                    onClick={() => {
-                      onCloneConceptSeed?.(identifier);
-                      setOpen(false);
-                    }}
-                  >
-                    <span className='aucctus-text-primary text-base'>
-                      Clone Concept Seed
-                    </span>
-                  </button>
-                </>
-              )}
-            </div>
-            <Popover.Arrow className='fill-white' />
-          </Popover.Content>
+                      {showCloneConceptSeed && (
+                        <>
+                          <div className='aucctus-bg-secondary mx-2 h-px' />
+                          <button
+                            className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
+                            onClick={() => {
+                              onCloneConceptSeed?.(identifier);
+                              setOpen(false);
+                            }}
+                          >
+                            <span className='aucctus-text-primary text-base'>
+                              Clone Concept Seed
+                            </span>
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </animated.div>
+                </Popover.Content>
+              ),
+          )}
         </ClickAwayListener>
       </Popover.Portal>
     </Popover.Root>

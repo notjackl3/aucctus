@@ -1,0 +1,135 @@
+// Glowing animation for buttons
+// Based on rainbow gradient glow effect
+
+@keyframes glowing {
+    0% {
+        background-position: 0 0;
+    }
+
+    50% {
+        background-position: 400% 0;
+    }
+
+    100% {
+        background-position: 0 0;
+    }
+}
+
+// Letter bounce animation for generating text
+@keyframes letter-bounce {
+    0% {
+        transform: translateY(0) skewX(0deg);
+        opacity: 1;
+    }
+
+    10% {
+        transform: translateY(-0.25px) skewX(-1.5deg);
+        opacity: 0.90;
+    }
+
+    20% {
+        transform: translateY(-0.5px) skewX(1.5deg);
+        opacity: 0.80;
+    }
+
+    40% {
+        transform: translateY(0) skewX(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(0) skewX(0deg);
+    }
+}
+
+// Apply letter bounce animation
+.letter-bounce {
+    display: inline-block;
+    animation: letter-bounce 4s ease-in-out infinite;
+}
+
+// Glow effect mixin for reusability
+@mixin glow-effect($border-width: 2px, $blur: 5px, $animation-duration: 40s) {
+    position: relative;
+    z-index: 0;
+
+    &::before {
+        content: '';
+        background: linear-gradient(45deg,
+                #8b0000,
+                #dc143c,
+                #b22222,
+                #cd5c5c,
+                #a52a2a,
+                #8b0000,
+                #dc143c,
+                #ff0000,
+                #c41e3a,
+                #8b0000);
+        position: absolute;
+        top: -#{$border-width};
+        left: -#{$border-width};
+        background-size: 600%;
+        z-index: -1;
+        filter: blur($blur);
+        width: calc(100% + #{$border-width * 2});
+        height: calc(100% + #{$border-width * 2});
+        animation: glowing $animation-duration linear infinite;
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+        border-radius: inherit;
+    }
+
+    &::after {
+        z-index: -1;
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: inherit;
+        left: 0;
+        top: 0;
+        border-radius: inherit;
+    }
+
+    &:hover::before {
+        opacity: 1;
+    }
+
+    &:active::after {
+        background: transparent;
+    }
+}
+
+// Apply glow effect to primary buttons
+.btn-primary-glow {
+    @include glow-effect($border-width: 2px, $blur: 5px, $animation-duration: 20s);
+}
+
+// Shake animation for validation errors
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-4px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(4px);
+    }
+}
+
+.animate-shake {
+    animation: shake 0.5s;
+}

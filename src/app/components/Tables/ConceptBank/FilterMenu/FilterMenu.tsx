@@ -119,7 +119,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
         </Menubar.Trigger>
         <Menubar.Portal>
           <Menubar.Content
-            className='aucctus-bg-primary flex w-auto flex-col gap-1 rounded-md p-2 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
+            className='aucctus-bg-primary z-[9999] flex w-auto flex-col gap-1 rounded-md p-2 shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
             align='end'
             side='bottom'
           >
@@ -163,8 +163,11 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                   <div className='max-h-80 min-h-[240px] overflow-y-auto rounded-lg'>
                     {users.length > 0 ? (
                       users.map((user) => {
-                        const filterCreatedByIsUser =
-                          user.uuid === filterOptions.createdBy?.uuid;
+                        const isUserSelected = filterOptions.createdBy
+                          ? Array.from(filterOptions.createdBy).some(
+                              (u) => u.uuid === user.uuid,
+                            )
+                          : false;
 
                         return (
                           <Menubar.Item
@@ -174,19 +177,32 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                               'hover:shadow-md',
                               'aucctus-border-tertiary border',
                               {
-                                'bg-primary-100': filterCreatedByIsUser,
+                                'bg-primary-100': isUserSelected,
                               },
                             )}
                             key={`uf-${user.uuid}`}
                             disabled
                             onClick={() => {
-                              let value: Partial<IConceptFilterOptions> = {
-                                createdBy: undefined,
-                              };
-                              if (!filterCreatedByIsUser) {
-                                value.createdBy = user;
+                              const currentSet = new Set(
+                                filterOptions.createdBy || [],
+                              );
+
+                              if (isUserSelected) {
+                                // Remove user
+                                const newSet = new Set(
+                                  Array.from(currentSet).filter(
+                                    (u) => u.uuid !== user.uuid,
+                                  ),
+                                );
+                                updateFilterOptions({
+                                  createdBy:
+                                    newSet.size > 0 ? newSet : undefined,
+                                });
+                              } else {
+                                // Add user
+                                currentSet.add(user);
+                                updateFilterOptions({ createdBy: currentSet });
                               }
-                              updateFilterOptions(value);
                             }}
                           >
                             <Avatar
@@ -196,7 +212,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
                             />
                             <span
                               className={cn(spanClassName, {
-                                'text-primary-700': filterCreatedByIsUser,
+                                'text-primary-700': isUserSelected,
                               })}
                             >
                               {utils.account.getUsersFullName(user)}

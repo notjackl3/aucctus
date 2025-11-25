@@ -44,7 +44,7 @@ const DetailCard: FunctionComponent<DetailCardProps> = ({
   return (
     <div
       {...rest}
-      className={`aucctus-border-secondary aucctus-bg-primary flex w-[22.5rem] flex-col items-center self-stretch rounded-xl border shadow-sm  ${cardClassName ? cardClassName : ''}`}
+      className={`aucctus-border-secondary aucctus-bg-primary flex w-[22.5rem] flex-col items-center self-stretch rounded-md border shadow-sm  ${cardClassName ? cardClassName : ''}`}
     >
       {!isHideHeader && (
         <div

@@ -13,7 +13,7 @@ const ConceptTableCard: React.FC<ConceptTableCardProps> = ({
   isLoading,
 }) => {
   return (
-    <div className='aucctus-border-secondary aucctus-bg-primary  inline-flex h-auto min-h-96 w-full flex-col items-start justify-between rounded-xl border shadow-sm'>
+    <div className='aucctus-border-secondary aucctus-bg-primary  inline-flex h-auto min-h-24 w-full flex-col items-start justify-between rounded-lg border'>
       <div className='inline-flex w-full flex-col items-start justify-start'>
         {/* Content */}
         {isLoading ? (
@@ -23,7 +23,7 @@ const ConceptTableCard: React.FC<ConceptTableCardProps> = ({
           </div>
         ) : (
           // Table
-          <div className='max-h-[calc(100vh-360px)] w-full overflow-y-scroll'>
+          <div className='max-h-[calc(100vh-360px)] w-full overflow-y-auto'>
             {children}
           </div>
         )}

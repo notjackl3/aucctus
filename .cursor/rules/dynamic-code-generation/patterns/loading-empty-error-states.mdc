@@ -1,0 +1,453 @@
+# Loading, Empty & Error States Guide
+
+Handle all component states gracefully with Aucctus patterns.
+
+---
+
+## When to Use This Guide
+
+Every component that fetches or displays data needs:
+- **Loading states** - While data is being fetched
+- **Empty states** - When no data exists
+- **Error states** - When something goes wrong
+
+---
+
+## Loading States
+
+### Basic Loading Pattern
+
+```typescript
+const Component: React.FC<Props> = ({ uuid }) => {
+  const { data, isLoading, isError, error } = useData(uuid);
+  
+  if (isLoading) return <ComponentSkeleton />;
+  if (isError) return <ErrorState error={error} />;
+  if (!data) return <EmptyState />;
+  
+  return <ActualContent data={data} />;
+};
+```
+
+---
+
+## Skeleton Components
+
+### Creating Skeletons
+
+Skeletons should **mirror the structure** of the actual component:
+
+```typescript
+import SkeletonBlock from '@components/Skeleton/ConceptReport/SkeletonBlock';
+
+const ComponentSkeleton: React.FC = () => {
+  return (
+    <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6'>
+      {/* Header skeleton */}
+      <div className='mb-4 flex items-center justify-between'>
+        <div className='flex items-center gap-2'>
+          <SkeletonBlock className='h-4 w-4 rounded' />
+          <SkeletonBlock className='h-4 w-32' />
+        </div>
+        <SkeletonBlock className='h-8 w-20 rounded-lg' />
+      </div>
+      
+      {/* Content skeleton */}
+      <div className='space-y-3'>
+        <SkeletonBlock className='h-4 w-full' />
+        <SkeletonBlock className='h-4 w-full' />
+        <SkeletonBlock className='h-4 w-5/6' />
+      </div>
+    </div>
+  );
+};
+```
+
+### SkeletonBlock Usage
+
+```typescript
+// Basic usage
+<SkeletonBlock className='h-4 w-32' />
+
+// Custom background
+<SkeletonBlock 
+  className='h-8 w-full rounded-lg' 
+  backgroundClassName='aucctus-bg-tertiary'
+/>
+
+// Multiple blocks
+{[...Array(5)].map((_, i) => (
+  <SkeletonBlock key={i} className='h-4 w-full' />
+))}
+```
+
+### Full-Page Loading
+
+```typescript
+import { UnifiedLoadingState } from '@components';
+
+const PageComponent: React.FC = () => {
+  const { data, isLoading } = usePageData();
+  
+  if (isLoading) {
+    return <UnifiedLoadingState message="Loading your data..." />;
+  }
+  
+  return <PageContent data={data} />;
+};
+```
+
+### Progressive Loading
+
+Load critical data first, show skeletons for secondary data:
+
+```typescript
+const Component: React.FC<Props> = ({ uuid }) => {
+  const { data: primary, isLoading: isPrimaryLoading } = usePrimaryData(uuid);
+  const { data: secondary, isLoading: isSecondaryLoading } = useSecondaryData(uuid);
+  
+  // Block on critical data
+  if (isPrimaryLoading) {
+    return <PrimarySkeleton />;
+  }
+  
+  return (
+    <div>
+      <PrimaryContent data={primary} />
+      
+      {/* Show skeleton while secondary loads */}
+      {isSecondaryLoading ? (
+        <SecondarySkeleton />
+      ) : (
+        <SecondaryContent data={secondary} />
+      )}
+    </div>
+  );
+};
+```
+
+---
+
+## Empty States
+
+### Standard Empty State
+
+```typescript
+const EmptyState: React.FC = () => {
+  return (
+    <div className='aucctus-text-secondary flex flex-col items-center justify-center gap-4 p-8 text-center'>
+      <Icon 
+        variant='inbox-02' 
+        className='aucctus-stroke-tertiary h-12 w-12' 
+      />
+      <div>
+        <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-2'>
+          No Data Available
+        </h3>
+        <p className='aucctus-text-sm aucctus-text-secondary'>
+          There is no data to display at this time.
+        </p>
+      </div>
+    </div>
+  );
+};
+```
+
+### Context-Specific Empty States
+
+```typescript
+// Empty list
+const EmptyListState: React.FC = () => (
+  <div className='aucctus-text-secondary py-8 text-center'>
+    <Icon 
+      variant='file' 
+      className='aucctus-stroke-tertiary mx-auto mb-2 h-8 w-8 opacity-50' 
+    />
+    <p className='aucctus-text-sm'>No items found</p>
+  </div>
+);
+
+// Empty search results
+const EmptySearchState: React.FC<{ query: string }> = ({ query }) => (
+  <div className='flex flex-col items-center justify-center gap-4 p-8'>
+    <Icon variant='search-md' className='aucctus-stroke-tertiary h-12 w-12' />
+    <div className='text-center'>
+      <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-2'>
+        No results for "{query}"
+      </h3>
+      <p className='aucctus-text-sm aucctus-text-secondary'>
+        Try adjusting your search terms
+      </p>
+    </div>
+  </div>
+);
+
+// Empty chart data
+const EmptyChartState: React.FC = () => (
+  <div className='flex h-64 items-center justify-center'>
+    <div className='aucctus-text-secondary text-center'>
+      <Icon variant='line-chart-up' className='aucctus-stroke-tertiary mx-auto mb-2 h-10 w-10' />
+      <p className='aucctus-text-sm'>No data available for visualization</p>
+    </div>
+  </div>
+);
+```
+
+### Empty State with Action
+
+```typescript
+const EmptyStateWithAction: React.FC<{ onAction: () => void }> = ({ onAction }) => (
+  <div className='flex flex-col items-center justify-center gap-4 p-8'>
+    <Icon variant='plus' className='aucctus-stroke-brand-primary h-12 w-12' />
+    <div className='text-center'>
+      <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-2'>
+        Get Started
+      </h3>
+      <p className='aucctus-text-sm aucctus-text-secondary mb-4'>
+        No items yet. Create your first one to begin.
+      </p>
+      <button className='btn btn-primary btn-md' onClick={onAction}>
+        Create New
+      </button>
+    </div>
+  </div>
+);
+```
+
+---
+
+## Error States
+
+### Standard Error State
+
+```typescript
+const ErrorState: React.FC<{ error?: Error }> = ({ error }) => {
+  return (
+    <div className='aucctus-bg-primary flex min-h-[400px] items-center justify-center'>
+      <div className='text-center'>
+        <Icon
+          variant='alert-circle'
+          className='aucctus-stroke-error-primary mx-auto mb-4 h-12 w-12'
+        />
+        <div className='aucctus-text-xl aucctus-text-primary mb-2'>
+          Error Loading Data
+        </div>
+        <div className='aucctus-text-md aucctus-text-secondary mb-4'>
+          {error?.message || 'There was an error loading the data.'}
+        </div>
+        <button 
+          className='btn btn-primary btn-md'
+          onClick={() => window.location.reload()}
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  );
+};
+```
+
+### Inline Error State
+
+For smaller components:
+
+```typescript
+const InlineErrorState: React.FC = () => (
+  <div className='aucctus-bg-error-subtle aucctus-border-error rounded border p-4'>
+    <div className='flex items-start gap-3'>
+      <Icon 
+        variant='alert-triangle' 
+        className='aucctus-stroke-error-primary h-5 w-5 flex-shrink-0' 
+      />
+      <div>
+        <p className='aucctus-text-sm-semibold aucctus-text-error-primary mb-1'>
+          Unable to load data
+        </p>
+        <p className='aucctus-text-xs aucctus-text-secondary'>
+          Please try again or contact support if the problem persists.
+        </p>
+      </div>
+    </div>
+  </div>
+);
+```
+
+### Error State with Retry
+
+```typescript
+const ErrorStateWithRetry: React.FC<{ onRetry: () => void }> = ({ onRetry }) => (
+  <div className='flex flex-col items-center justify-center gap-4 p-8'>
+    <Icon 
+      variant='alert-octagon' 
+      className='aucctus-stroke-error-primary h-12 w-12' 
+    />
+    <div className='text-center'>
+      <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-2'>
+        Something went wrong
+      </h3>
+      <p className='aucctus-text-sm aucctus-text-secondary mb-4'>
+        We couldn't load this content. Please try again.
+      </p>
+      <button className='btn btn-primary btn-md' onClick={onRetry}>
+        Retry
+      </button>
+    </div>
+  </div>
+);
+```
+
+---
+
+## Fallback Data Patterns
+
+### Semantic Fallbacks
+
+Use semantically appropriate fallbacks:
+
+```typescript
+// ✅ GOOD - Semantic fallbacks
+const displayData = {
+  title: data?.title || 'Untitled',
+  description: data?.description || 'No description provided',
+  value: data?.value ?? 0,              // 0 for numeric defaults
+  status: data?.status || 'pending',
+  items: data?.items ?? [],             // Empty array for lists
+  timestamp: data?.timestamp || undefined, // undefined for truly missing
+};
+
+// ❌ BAD - Fake or misleading data
+const displayData = {
+  timestamp: data?.timestamp || Date.now(),     // Don't generate fake timestamps
+  status: data?.status || 'Complete',           // Don't use status that doesn't match reality
+};
+```
+
+### Safe Property Access
+
+```typescript
+// Optional chaining
+const value = data?.nested?.property ?? 'default';
+
+// For uncertain structures
+const value = 
+  (data && 
+   typeof data === 'object' && 
+   'property' in data
+    ? (data.property as string)
+    : null) || 'default value';
+```
+
+---
+
+## Complete Example
+
+```typescript
+import React from 'react';
+import { Icon } from '@components';
+import SkeletonBlock from '@components/Skeleton/ConceptReport/SkeletonBlock';
+
+interface DataDisplayProps {
+  uuid: string;
+}
+
+// Skeleton
+const DataDisplaySkeleton: React.FC = () => (
+  <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6'>
+    <div className='mb-4'>
+      <SkeletonBlock className='h-6 w-48 mb-2' />
+      <SkeletonBlock className='h-4 w-full' />
+    </div>
+    <div className='space-y-3'>
+      {[...Array(3)].map((_, i) => (
+        <SkeletonBlock key={i} className='h-20 w-full rounded' />
+      ))}
+    </div>
+  </div>
+);
+
+// Empty State
+const EmptyState: React.FC = () => (
+  <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-12'>
+    <div className='flex flex-col items-center justify-center gap-4 text-center'>
+      <Icon variant='inbox-02' className='aucctus-stroke-tertiary h-12 w-12' />
+      <div>
+        <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-2'>
+          No Data Available
+        </h3>
+        <p className='aucctus-text-sm aucctus-text-secondary'>
+          There is no data to display at this time.
+        </p>
+      </div>
+    </div>
+  </div>
+);
+
+// Error State
+const ErrorState: React.FC<{ error?: Error; onRetry: () => void }> = ({ error, onRetry }) => (
+  <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-12'>
+    <div className='flex flex-col items-center justify-center gap-4 text-center'>
+      <Icon variant='alert-circle' className='aucctus-stroke-error-primary h-12 w-12' />
+      <div>
+        <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-2'>
+          Error Loading Data
+        </h3>
+        <p className='aucctus-text-sm aucctus-text-secondary mb-4'>
+          {error?.message || 'There was an error loading the data.'}
+        </p>
+        <button className='btn btn-primary btn-md' onClick={onRetry}>
+          Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+);
+
+// Main Component
+const DataDisplay: React.FC<DataDisplayProps> = ({ uuid }) => {
+  const { data, isLoading, isError, error, refetch } = useData(uuid);
+  
+  // Loading state
+  if (isLoading) {
+    return <DataDisplaySkeleton />;
+  }
+  
+  // Error state
+  if (isError) {
+    return <ErrorState error={error} onRetry={refetch} />;
+  }
+  
+  // Empty state
+  if (!data || data.length === 0) {
+    return <EmptyState />;
+  }
+  
+  // Success state
+  return (
+    <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6'>
+      <h2 className='aucctus-text-xl-semibold aucctus-text-primary mb-4'>
+        {data.title}
+      </h2>
+      <div className='space-y-4'>
+        {data.items.map(item => (
+          <div key={item.id} className='aucctus-bg-secondary rounded p-4'>
+            {item.content}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default DataDisplay;
+```
+
+---
+
+## Quick Checklist
+
+✅ **Loading**: Show skeleton that mirrors final structure
+✅ **Empty**: Provide clear message and optional action
+✅ **Error**: Show error message with retry option
+✅ **Fallbacks**: Use semantic defaults, not fake data
+✅ **Icons**: Use appropriate icons for each state
+✅ **Styling**: Use Aucctus theme classes consistently

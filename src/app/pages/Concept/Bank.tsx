@@ -1,6 +1,8 @@
-import React, { ReactNode, useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 
 import { Header, Icon, Input, Table } from '@components';
+import NaturalLanguageFilterButton from '@components/Button/NaturalLanguageFilterButton';
+import CompactFilterRibbon from '@components/Tables/ConceptBank/CompactFilterRibbon';
 import {
   IConceptFilterOptions,
   useConceptBank,
@@ -9,17 +11,17 @@ import {
   ISeedFilterOptions,
   useSeedsBank,
 } from '@hooks/tables/concept-seed.hook';
-import utils from '@libs/utils';
-import { isUser } from '@libs/utils/account';
+import { usePropertyDefinitions } from '@hooks/query/properties.hook';
+import { IPropertyFilter } from '@libs/api/types';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
   ARCHIVE_CONCEPT_STATUS_LIST,
   DRAFT_CONCEPT_STATUS_LIST,
 } from '@libs/utils/concepts';
 import { cn } from '@libs/utils/react';
-import { camelCaseToTitleCase } from '@libs/utils/string';
 import { AppPath } from '@routes/routes';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import useStore from '@stores/store';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 
 export const CONCEPT_STATUS_LIST_MAP = {
@@ -40,14 +42,35 @@ const areFilterOptionsSet = (
   filterOptions: IConceptFilterOptions | ISeedFilterOptions,
 ) => {
   const { status, createdBy, search, sort } = filterOptions;
+  const lastModifiedBy =
+    'lastModifiedBy' in filterOptions
+      ? filterOptions.lastModifiedBy
+      : undefined;
+  const propertyFilters =
+    'propertyFilters' in filterOptions
+      ? filterOptions.propertyFilters
+      : undefined;
 
-  return (status && status.size > 0) || !!createdBy || !!search || !!sort;
+  return (
+    (status && status.size > 0) ||
+    !!createdBy ||
+    !!lastModifiedBy ||
+    !!search ||
+    !!sort ||
+    (propertyFilters && propertyFilters.length > 0)
+  );
 };
 
 const ConceptBank: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
+
+  // Get account UUID for property definitions
+  const accountUuid = useStore((state) => state.auth.user?.account?.uuid);
+
+  // Fetch property definitions for column visibility menu
+  const { data: propertyDefinitions } = usePropertyDefinitions(accountUuid);
 
   // Determine if we're on the drafts route
   const isDraftsRoute = location.pathname.includes('/drafts');
@@ -94,55 +117,77 @@ const ConceptBank: React.FC = () => {
     [filterOptions.search, updateTableFiltering],
   );
 
-  // Create filter header chips
-  const createFilterHeader = useCallback(() => {
-    return Object.entries(filterOptions).reduce<ReactNode[]>(
-      (headerItems, [key, value]) => {
-        let itemValue = '';
+  // Handle natural language filter application
+  const handleNaturalLanguageFilters = useCallback(
+    (
+      filters: IPropertyFilter[],
+      standardFilters?: Array<{ filterType: string; value: string | string[] }>,
+    ) => {
+      // Only apply to concepts, not drafts
+      if (!isDraftsRoute) {
+        const updates: Partial<IConceptFilterOptions> = {
+          propertyFilters: filters,
+        };
 
-        if (value instanceof Set) {
-          itemValue = Array.from(value).map(camelCaseToTitleCase).join(', ');
-        } else if (typeof value === 'string') {
-          itemValue = value;
-        } else if (isUser(value)) {
-          itemValue = utils.account.getUsersFullName(value);
-        }
+        // Process standardFilters if present
+        if (standardFilters && standardFilters.length > 0) {
+          standardFilters.forEach((filter) => {
+            switch (filter.filterType) {
+              case 'sort':
+                // Merge AI-generated sorts with existing sorts
+                if (typeof filter.value === 'string') {
+                  const currentSort = conceptFilterOptions.sort;
 
-        if (itemValue) {
-          headerItems.push(
-            <Table.ConceptBank.FilterOptionsHeaderItem
-              key={`${key}-${itemValue}`}
-              propertyName={key as 'status' | 'createdBy' | 'search' | 'sort'}
-              value={itemValue}
-              onRemove={() => {
-                // Handle removal of individual filter
-                if (key === 'status') {
-                  // @ts-ignore
-                  updateTableFiltering({ status: new Set() });
-                } else if (key === 'createdBy') {
-                  updateTableFiltering({ createdBy: undefined });
-                } else if (key === 'search') {
-                  updateTableFiltering({ search: '' });
-                } else if (key === 'sort') {
-                  updateTableFiltering({ sort: undefined });
+                  // If there are existing sorts, append the new sorts
+                  if (currentSort) {
+                    // Combine: existing sorts + AI sorts
+                    updates.sort = `${currentSort},${filter.value}` as any;
+                  } else {
+                    // No existing sorts, just use AI sorts
+                    updates.sort = filter.value as any;
+                  }
                 }
-              }}
-            />,
-          );
+                break;
+              case 'status':
+                // Handle status filter if needed
+                // updates.status = ...
+                break;
+              case 'createdBy':
+                // Handle createdBy filter if needed
+                // updates.createdBy = ...
+                break;
+              case 'lastModifiedBy':
+                // Handle lastModifiedBy filter if needed
+                // updates.lastModifiedBy = ...
+                break;
+              default:
+                break;
+            }
+          });
         }
 
-        return headerItems;
-      },
-      [],
-    );
-  }, [filterOptions, updateTableFiltering]);
+        // Use updateConceptFiltering directly since we know we're not on drafts route
+        updateConceptFiltering(updates);
+      }
+    },
+    [isDraftsRoute, updateConceptFiltering, conceptFilterOptions.sort],
+  );
 
   // Memoize UI parts to prevent unnecessary recalculations
   const filterHeaderSection = useMemo(() => {
     return areFilterOptionsSet(filterOptions) ? (
-      <div className='mr-2 flex items-center gap-1'>{createFilterHeader()}</div>
+      <CompactFilterRibbon
+        filterOptions={conceptFilterOptions}
+        propertyDefinitions={propertyDefinitions}
+        onUpdateFilters={updateConceptFiltering}
+      />
     ) : null;
-  }, [filterOptions, createFilterHeader]);
+  }, [
+    filterOptions,
+    conceptFilterOptions,
+    propertyDefinitions,
+    updateConceptFiltering,
+  ]);
 
   // Create context value for child components
   const outletContext = useMemo(
@@ -174,7 +219,7 @@ const ConceptBank: React.FC = () => {
 
       <div className='flex h-full w-full flex-col gap-3'>
         {/* Top navigation bar with tabs on left and search/filter on right */}
-        <div className='mb-4 flex w-full flex-row items-center justify-between'>
+        <div className='flex w-full flex-row items-center justify-between'>
           {/* Tabs grouped on the left */}
           <div className='flex items-center'>
             <button
@@ -199,8 +244,105 @@ const ConceptBank: React.FC = () => {
 
           {/* Search and filter controls moved from child components */}
           <div className='flex items-center gap-3'>
-            {/* Filter chips appear here when active */}
-            {filterHeaderSection}
+            {/* Natural Language Filter Button (only show for concepts, not drafts) */}
+            {!isDraftsRoute && (
+              <NaturalLanguageFilterButton
+                onFiltersApplied={handleNaturalLanguageFilters}
+              />
+            )}
+
+            {/* Property management and column visibility (only show for concepts, not drafts) */}
+            {!isDraftsRoute && (
+              <>
+                <Table.PropertyColumns.FiltersMenu
+                  propertyDefinitions={propertyDefinitions}
+                  filterOptions={conceptFilterOptions}
+                  onUpdateFilters={updateConceptFiltering}
+                />
+                <Table.PropertyColumns.SortsMenu
+                  propertyDefinitions={propertyDefinitions}
+                  currentSort={conceptFilterOptions.sort}
+                  onSort={(field, direction, isProperty) => {
+                    // Parse current sorts
+                    const currentSortConfigs = conceptFilterOptions.sort
+                      ? conceptFilterOptions.sort.split(',').map((s) => {
+                          const trimmed = s.trim();
+                          const isDesc = trimmed.startsWith('-');
+                          const fieldStr = isDesc ? trimmed.slice(1) : trimmed;
+                          return { field: fieldStr, isDesc };
+                        })
+                      : [];
+
+                    // Build the field string with proper prefix
+                    const fieldStr = isProperty ? `property:${field}` : field;
+                    const directionPrefix = direction === 'desc' ? '-' : '';
+                    const newSortField = `${directionPrefix}${fieldStr}`;
+
+                    // Check if this field already exists in sorts
+                    const existingIndex = currentSortConfigs.findIndex(
+                      (c) =>
+                        c.field === fieldStr ||
+                        c.field === `property:${field}` ||
+                        c.field === field,
+                    );
+
+                    let newSorts: string[];
+                    if (existingIndex >= 0) {
+                      // Update existing sort
+                      const sortStrings = currentSortConfigs.map(
+                        (c) => `${c.isDesc ? '-' : ''}${c.field}`,
+                      );
+                      sortStrings[existingIndex] = newSortField;
+                      newSorts = sortStrings;
+                    } else {
+                      // Add new sort
+                      newSorts = [
+                        ...currentSortConfigs.map(
+                          (c) => `${c.isDesc ? '-' : ''}${c.field}`,
+                        ),
+                        newSortField,
+                      ];
+                    }
+
+                    updateConceptFiltering({ sort: newSorts.join(',') } as any);
+                  }}
+                  onRemoveSort={(field, isProperty) => {
+                    const currentSortConfigs = conceptFilterOptions.sort
+                      ? conceptFilterOptions.sort.split(',').map((s) => {
+                          const trimmed = s.trim();
+                          const isDesc = trimmed.startsWith('-');
+                          const fieldStr = isDesc ? trimmed.slice(1) : trimmed;
+                          return { field: fieldStr, isDesc };
+                        })
+                      : [];
+
+                    const fieldStr = isProperty ? `property:${field}` : field;
+                    const remainingSorts = currentSortConfigs.filter(
+                      (c) =>
+                        c.field !== fieldStr &&
+                        c.field !== `property:${field}` &&
+                        c.field !== field,
+                    );
+
+                    if (remainingSorts.length === 0) {
+                      updateConceptFiltering({ sort: undefined } as any);
+                    } else {
+                      updateConceptFiltering({
+                        sort: remainingSorts
+                          .map((c) => `${c.isDesc ? '-' : ''}${c.field}`)
+                          .join(','),
+                      } as any);
+                    }
+                  }}
+                />
+                <Table.PropertyColumns.PropertyManager
+                  propertyDefinitions={propertyDefinitions}
+                />
+                <Table.PropertyColumns.ColumnVisibilityMenu
+                  propertyDefinitions={propertyDefinitions}
+                />
+              </>
+            )}
 
             <div className='w-64'>
               <Input.Search
@@ -212,7 +354,8 @@ const ConceptBank: React.FC = () => {
               />
             </div>
 
-            {isDraftsRoute ? (
+            {/* Keep FilterMenubar for drafts route only */}
+            {isDraftsRoute && (
               <Table.SeedBank.FilterMenubar
                 updateFilterOptions={
                   updateTableFiltering as (
@@ -222,18 +365,18 @@ const ConceptBank: React.FC = () => {
                 filterOptions={filterOptions as ISeedFilterOptions}
                 statusOptions={SEED_STATUS_OPTIONS}
               />
-            ) : (
-              <Table.ConceptBank.FilterMenubar
-                updateFilterOptions={
-                  updateTableFiltering as (
-                    value: Partial<IConceptFilterOptions>,
-                  ) => void
-                }
-                filterOptions={filterOptions as IConceptFilterOptions}
-              />
             )}
           </div>
         </div>
+
+        {/* Filter ribbons row - only shows when filters/sorts are active */}
+        {filterHeaderSection && (
+          <div className='w-full overflow-hidden'>
+            <div className='flex flex-wrap items-center gap-2'>
+              {filterHeaderSection}
+            </div>
+          </div>
+        )}
 
         {/* Outlet component will render the child routes with context */}
         <Outlet context={outletContext} />

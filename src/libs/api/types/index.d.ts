@@ -15,6 +15,7 @@ export * from './incubation/aiSuggestions';
 export * from './incubation/questionnaire';
 export * from './incubation/seed';
 export * from './osiris';
+export * from './property';
 export * from './socketMessages/base';
 export * from './socketMessages/inbound';
 export * from './socketMessages/outbound';

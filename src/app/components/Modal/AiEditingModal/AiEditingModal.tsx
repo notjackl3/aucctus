@@ -8,7 +8,7 @@ const AiEditing: React.FC = () => {
   const { closeModal } = useModal();
 
   return (
-    <div className='flex h-full min-w-[500px] max-w-[500px] flex-col overflow-auto rounded-l-xl'>
+    <div className='flex h-full min-w-[500px] max-w-[500px] flex-col overflow-auto rounded-l-md'>
       <AiInteractionDiv className='h-full w-full'>
         <div className='flex h-full w-full flex-col'>
           <AiEditingCard onClose={closeModal} />

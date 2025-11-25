@@ -3,6 +3,7 @@ import Column from './Columns';
 import ConceptBank from './ConceptBank';
 import Header from './Header';
 import Pagination from './Pagination';
+import PropertyColumns from './PropertyColumns';
 import Row from './Row';
 import SeedBank from './SeedBank';
 import Default from './Table';
@@ -15,6 +16,7 @@ import Default from './Table';
 (Default as any).Pagination = Pagination;
 (Default as any).Column = Column;
 (Default as any).Assumptions = Assumptions;
+(Default as any).PropertyColumns = PropertyColumns;
 
 const Table = Default as typeof Default & {
   ConceptBank: typeof ConceptBank;
@@ -24,6 +26,7 @@ const Table = Default as typeof Default & {
   Column: typeof Column;
   Assumptions: typeof Assumptions;
   SeedBank: typeof SeedBank;
+  PropertyColumns: typeof PropertyColumns;
 };
 
 export default Table;
