@@ -174,6 +174,24 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
     return filterOptions.propertyFilters?.find((f) => f.key === key);
   };
 
+  // Get default operator for a property type
+  const getDefaultOperator = (
+    propertyType: IPropertyDefinition['propertyType'],
+  ): IPropertyFilter['operator'] => {
+    switch (propertyType) {
+      case 'text':
+        return 'contains';
+      case 'number':
+        return 'exact';
+      case 'select':
+      case 'multi_select':
+        return 'in';
+      case 'checkbox':
+      default:
+        return 'exact';
+    }
+  };
+
   // Update local property filter state (buffered)
   const updateLocalPropertyFilter = (
     key: string,
@@ -201,11 +219,17 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
 
     if (filterValue === undefined) return;
 
+    // For is_null and not_blank operators, don't check if value is empty
+    // These operators send 'true' as the value to the backend
+    const isOperatorWithoutUserInput =
+      filterOperator === 'is_null' || filterOperator === 'not_blank';
+
     const shouldClearFilter =
-      filterValue === null ||
-      filterValue === undefined ||
-      filterValue === '' ||
-      (Array.isArray(filterValue) && filterValue.length === 0);
+      !isOperatorWithoutUserInput &&
+      (filterValue === null ||
+        filterValue === undefined ||
+        filterValue === '' ||
+        (Array.isArray(filterValue) && filterValue.length === 0));
 
     if (shouldClearFilter) {
       const updatedFilters = (filterOptions.propertyFilters || []).filter(
@@ -641,19 +665,33 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                               </div>
                               <PropertyFilterContent
                                 propDef={item.definition}
-                                filterValue={
-                                  localPropertyFilters.get(item.definition.key)
-                                    ?.value ||
-                                  getPropertyFilter(item.definition.key)
-                                    ?.value ||
-                                  ''
-                                }
+                                filterValue={(() => {
+                                  const localValue = localPropertyFilters.get(
+                                    item.definition.key,
+                                  )?.value;
+                                  if (
+                                    localValue !== undefined &&
+                                    localValue !== null
+                                  )
+                                    return localValue;
+                                  const currentValue = getPropertyFilter(
+                                    item.definition.key,
+                                  )?.value;
+                                  if (
+                                    currentValue !== undefined &&
+                                    currentValue !== null
+                                  )
+                                    return currentValue;
+                                  return '';
+                                })()}
                                 filterOperator={
                                   localPropertyFilters.get(item.definition.key)
                                     ?.operator ||
                                   getPropertyFilter(item.definition.key)
                                     ?.operator ||
-                                  'exact'
+                                  getDefaultOperator(
+                                    item.definition.propertyType,
+                                  )
                                 }
                                 onFilterValueChange={(value) => {
                                   // Update local state only (buffered)
@@ -663,7 +701,9 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                     )?.operator ||
                                     getPropertyFilter(item.definition.key)
                                       ?.operator ||
-                                    'exact';
+                                    getDefaultOperator(
+                                      item.definition.propertyType,
+                                    );
 
                                   // Store in ref for synchronous access (checkbox case)
                                   pendingFilterValueRef.current = {
@@ -682,13 +722,22 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                 }}
                                 onFilterOperatorChange={(operator) => {
                                   // Update operator in local state
-                                  const currentValue =
+                                  let currentValue =
                                     localPropertyFilters.get(
                                       item.definition.key,
                                     )?.value ||
                                     getPropertyFilter(item.definition.key)
                                       ?.value ||
                                     '';
+
+                                  // For is_null and not_blank operators, set value to 'true'
+                                  if (
+                                    operator === 'is_null' ||
+                                    operator === 'not_blank'
+                                  ) {
+                                    currentValue = 'true';
+                                  }
+
                                   updateLocalPropertyFilter(
                                     item.definition.key,
                                     currentValue,
@@ -745,6 +794,33 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                   setHoveredColumn(null);
                                 }}
                               />
+
+                              {/* Clear filter button - shown when filter is active */}
+                              {getPropertyFilter(item.definition.key) && (
+                                <button
+                                  onClick={() => {
+                                    // Clear the filter
+                                    const updatedFilters = (
+                                      filterOptions.propertyFilters || []
+                                    ).filter(
+                                      (f) => f.key !== item.definition.key,
+                                    );
+                                    onUpdateFilters({
+                                      propertyFilters: updatedFilters,
+                                    });
+                                    // Clear local state
+                                    setLocalPropertyFilters((prev) => {
+                                      const newMap = new Map(prev);
+                                      newMap.delete(item.definition.key);
+                                      return newMap;
+                                    });
+                                    setHoveredColumn(null);
+                                  }}
+                                  className='aucctus-text-error-primary hover:aucctus-text-error-primary mt-3 w-full text-left text-sm transition-colors'
+                                >
+                                  Clear filter
+                                </button>
+                              )}
                             </>
                           )}
                         </div>

@@ -10,7 +10,7 @@ interface ICheckboxFilterInputProps {
 
 /**
  * Checkbox property filter input
- * Allows filtering by checked, unchecked, or all
+ * Allows filtering by checked or unchecked
  */
 export const CheckboxFilterInput: React.FC<ICheckboxFilterInputProps> = ({
   filterValue,
@@ -25,17 +25,6 @@ export const CheckboxFilterInput: React.FC<ICheckboxFilterInputProps> = ({
         Select a value:
       </div>
       <div className='space-y-1'>
-        <button
-          className={cn(
-            'aucctus-text-sm w-full rounded px-3 py-2 text-left transition-colors',
-            !boolValue
-              ? 'aucctus-bg-brand-secondary aucctus-text-brand-primary'
-              : 'aucctus-text-primary aucctus-bg-primary-hover',
-          )}
-          onClick={() => onSelect('', null)}
-        >
-          All
-        </button>
         <button
           className={cn(
             'aucctus-text-sm w-full rounded px-3 py-2 text-left transition-colors',

@@ -145,122 +145,83 @@ const ConceptBank: React.FC = () => {
       if (!isDraftsRoute) {
         const updates: Partial<IConceptFilterOptions> = {};
 
-        // Only set propertyFilters if there are actually filters to apply
-        if (filters && filters.length > 0) {
-          updates.propertyFilters = filters;
+        // Always set propertyFilters - this replaces existing filters completely
+        // If filters array is empty, this will clear existing property filters
+        if (filters !== undefined) {
+          updates.propertyFilters = filters.length > 0 ? filters : [];
         }
 
         // Process standardFilters if present
-        if (standardFilters && standardFilters.length > 0) {
-          standardFilters.forEach((filter) => {
-            switch (filter.filterType) {
-              case 'sort':
-                // Merge AI-generated sorts with existing sorts
-                if (typeof filter.value === 'string') {
-                  const currentSort = conceptFilterOptions.sort;
-
-                  // If there are existing sorts, append the new sorts
-                  if (currentSort) {
-                    // Combine: existing sorts + AI sorts
-                    updates.sort = `${currentSort},${filter.value}` as any;
-                  } else {
-                    // No existing sorts, just use AI sorts
+        if (standardFilters !== undefined) {
+          if (standardFilters.length > 0) {
+            standardFilters.forEach((filter) => {
+              switch (filter.filterType) {
+                case 'sort':
+                  // Replace existing sorts completely (don't merge)
+                  if (typeof filter.value === 'string') {
                     updates.sort = filter.value as any;
                   }
-                }
-                break;
+                  break;
 
-              case 'status': {
-                // Convert comma-separated snake_case status values to Set<ConceptStatus>
-                // API returns: "ideating,in_review,prototyping"
-                // Need to convert to: Set(['ideating', 'inReview', 'prototyping'])
-                const statusString =
-                  typeof filter.value === 'string'
+                case 'status': {
+                  // Convert comma-separated snake_case status values to Set<ConceptStatus>
+                  // API returns: "ideating,in_review,prototyping"
+                  // Need to convert to: Set(['ideating', 'inReview', 'prototyping'])
+                  const statusString =
+                    typeof filter.value === 'string'
+                      ? filter.value
+                      : Array.isArray(filter.value)
+                        ? filter.value.join(',')
+                        : '';
+
+                  if (statusString) {
+                    const statusValues = statusString
+                      .split(',')
+                      .map((s) => s.trim())
+                      .filter(Boolean);
+
+                    // Convert snake_case to camelCase and validate
+                    const validStatuses = statusValues
+                      .map((status) => {
+                        // Convert snake_case to camelCase (e.g., "in_review" -> "inReview")
+                        const camelStatus = toCamelCase(status);
+                        return camelStatus as ConceptStatus;
+                      })
+                      .filter((status): status is ConceptStatus => {
+                        // Validate against known ConceptStatus values
+                        const validStatusList: ConceptStatus[] = [
+                          'new',
+                          'ideating',
+                          'inReview',
+                          'prototyping',
+                          'proofOfConcept',
+                          'minimumViableProduct',
+                          'commercialized',
+                          'archived',
+                        ];
+                        return validStatusList.includes(status);
+                      });
+
+                    if (validStatuses.length > 0) {
+                      updates.status = new Set(validStatuses);
+                    }
+                  }
+                  break;
+                }
+
+                case 'createdBy': {
+                  // Convert user name(s) to Set<IUser>
+                  // API returns: "John Doe" or ["John Doe", "Jane Smith"]
+                  const createdByNames = Array.isArray(filter.value)
                     ? filter.value
-                    : Array.isArray(filter.value)
-                      ? filter.value.join(',')
-                      : '';
+                    : [filter.value];
 
-                if (statusString) {
-                  const statusValues = statusString
-                    .split(',')
-                    .map((s) => s.trim())
-                    .filter(Boolean);
-
-                  // Convert snake_case to camelCase and validate
-                  const validStatuses = statusValues
-                    .map((status) => {
-                      // Convert snake_case to camelCase (e.g., "in_review" -> "inReview")
-                      const camelStatus = toCamelCase(status);
-                      return camelStatus as ConceptStatus;
-                    })
-                    .filter((status): status is ConceptStatus => {
-                      // Validate against known ConceptStatus values
-                      const validStatusList: ConceptStatus[] = [
-                        'new',
-                        'ideating',
-                        'inReview',
-                        'prototyping',
-                        'proofOfConcept',
-                        'minimumViableProduct',
-                        'commercialized',
-                        'archived',
-                      ];
-                      return validStatusList.includes(status);
-                    });
-
-                  if (validStatuses.length > 0) {
-                    updates.status = new Set(validStatuses);
-                  }
-                }
-                break;
-              }
-
-              case 'createdBy': {
-                // Convert user name(s) to Set<IUser>
-                // API returns: "John Doe" or ["John Doe", "Jane Smith"]
-                const createdByNames = Array.isArray(filter.value)
-                  ? filter.value
-                  : [filter.value];
-
-                if (
-                  createdByNames.length > 0 &&
-                  allUsersRef.current.length > 0
-                ) {
-                  const createdByUsers = allUsersRef.current.filter((user) =>
-                    createdByNames.some((name) => {
-                      const fullName =
-                        `${user.firstName} ${user.lastName}`.toLowerCase();
-                      const searchName = name.toLowerCase();
-                      // Match if either the full name contains the search or vice versa
-                      return (
-                        fullName.includes(searchName) ||
-                        searchName.includes(fullName)
-                      );
-                    }),
-                  );
-
-                  if (createdByUsers.length > 0) {
-                    updates.createdBy = new Set(createdByUsers);
-                  }
-                }
-                break;
-              }
-
-              case 'lastModifiedBy': {
-                // Convert user name(s) to Set<IUser>
-                // API returns: "John Doe" or ["John Doe", "Jane Smith"]
-                const lastModifiedByNames = Array.isArray(filter.value)
-                  ? filter.value
-                  : [filter.value];
-
-                if (
-                  lastModifiedByNames.length > 0 &&
-                  allUsersRef.current.length > 0
-                ) {
-                  const lastModifiedByUsers = allUsersRef.current.filter(
-                    (user) =>
-                      lastModifiedByNames.some((name) => {
+                  if (
+                    createdByNames.length > 0 &&
+                    allUsersRef.current.length > 0
+                  ) {
+                    const createdByUsers = allUsersRef.current.filter((user) =>
+                      createdByNames.some((name) => {
                         const fullName =
                           `${user.firstName} ${user.lastName}`.toLowerCase();
                         const searchName = name.toLowerCase();
@@ -270,44 +231,85 @@ const ConceptBank: React.FC = () => {
                           searchName.includes(fullName)
                         );
                       }),
-                  );
+                    );
 
-                  if (lastModifiedByUsers.length > 0) {
-                    updates.lastModifiedBy = new Set(lastModifiedByUsers);
+                    if (createdByUsers.length > 0) {
+                      updates.createdBy = new Set(createdByUsers);
+                    }
                   }
+                  break;
                 }
-                break;
-              }
 
-              case 'search': {
-                // Handle search filter
-                // API returns: "hydration" or search term
-                const searchValue =
-                  typeof filter.value === 'string'
+                case 'lastModifiedBy': {
+                  // Convert user name(s) to Set<IUser>
+                  // API returns: "John Doe" or ["John Doe", "Jane Smith"]
+                  const lastModifiedByNames = Array.isArray(filter.value)
                     ? filter.value
-                    : Array.isArray(filter.value)
-                      ? filter.value[0]
-                      : '';
+                    : [filter.value];
 
-                if (searchValue) {
-                  updates.search = searchValue;
-                  // Update the ref to prevent handleSearchChange from triggering again
-                  lastSearchValueRef.current = searchValue;
+                  if (
+                    lastModifiedByNames.length > 0 &&
+                    allUsersRef.current.length > 0
+                  ) {
+                    const lastModifiedByUsers = allUsersRef.current.filter(
+                      (user) =>
+                        lastModifiedByNames.some((name) => {
+                          const fullName =
+                            `${user.firstName} ${user.lastName}`.toLowerCase();
+                          const searchName = name.toLowerCase();
+                          // Match if either the full name contains the search or vice versa
+                          return (
+                            fullName.includes(searchName) ||
+                            searchName.includes(fullName)
+                          );
+                        }),
+                    );
+
+                    if (lastModifiedByUsers.length > 0) {
+                      updates.lastModifiedBy = new Set(lastModifiedByUsers);
+                    }
+                  }
+                  break;
                 }
-                break;
-              }
 
-              default:
-                break;
-            }
-          });
+                case 'search': {
+                  // Handle search filter
+                  // API returns: "hydration" or search term
+                  const searchValue =
+                    typeof filter.value === 'string'
+                      ? filter.value
+                      : Array.isArray(filter.value)
+                        ? filter.value[0]
+                        : '';
+
+                  if (searchValue) {
+                    updates.search = searchValue;
+                    // Update the ref to prevent handleSearchChange from triggering again
+                    lastSearchValueRef.current = searchValue;
+                  }
+                  break;
+                }
+
+                default:
+                  break;
+              }
+            });
+          } else {
+            // Empty standardFilters array means clear all standard filters
+            updates.sort = undefined;
+            updates.status = undefined;
+            updates.createdBy = undefined;
+            updates.lastModifiedBy = undefined;
+            updates.search = '';
+            lastSearchValueRef.current = '';
+          }
         }
 
         // Use updateConceptFiltering directly since we know we're not on drafts route
         updateConceptFiltering(updates);
       }
     },
-    [isDraftsRoute, updateConceptFiltering, conceptFilterOptions.sort],
+    [isDraftsRoute, updateConceptFiltering],
   );
 
   // Memoize UI parts to prevent unnecessary recalculations

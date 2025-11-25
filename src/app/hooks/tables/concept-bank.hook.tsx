@@ -533,12 +533,12 @@ export const useConceptBank = (
     (filter: IPropertyFilter) => {
       // Check if filter should be cleared
       // Note: false is a valid boolean value, so we need to check for null/undefined/empty string explicitly
-      // IMPORTANT: For operators like 'is_null' and 'not_blank', empty string is a valid value
-      const isOperatorWithoutValue =
+      // IMPORTANT: For operators like 'is_null' and 'not_blank', they send value='true' to the backend
+      const isOperatorWithoutUserInput =
         filter.operator === 'is_null' || filter.operator === 'not_blank';
 
       const shouldClearFilter =
-        !isOperatorWithoutValue &&
+        !isOperatorWithoutUserInput &&
         (filter.value === null ||
           filter.value === undefined ||
           filter.value === '');

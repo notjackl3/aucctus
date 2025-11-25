@@ -130,9 +130,9 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
           return 'contains';
         case 'number':
           return 'exact';
+        case 'select':
         case 'multi_select':
           return 'in';
-        case 'select':
         case 'checkbox':
         default:
           return 'exact';
@@ -140,34 +140,59 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
     }, [definition.propertyType]);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [filterValue, setFilterValue] = useState(currentFilter?.value || '');
+  const [filterValue, setFilterValue] = useState(
+    currentFilter?.value !== undefined && currentFilter?.value !== null
+      ? currentFilter.value
+      : '',
+  );
   const [filterOperator, setFilterOperator] = useState<
     IPropertyFilter['operator']
   >(currentFilter?.operator || getDefaultOperator());
 
+  // Ref to capture immediate filter value for synchronous access (checkbox case)
+  const pendingFilterValueRef = React.useRef<any>(null);
+
   // Sync local state with currentFilter when it changes
   useEffect(() => {
-    setFilterValue(currentFilter?.value || '');
+    setFilterValue(
+      currentFilter?.value !== undefined && currentFilter?.value !== null
+        ? currentFilter.value
+        : '',
+    );
     setFilterOperator(currentFilter?.operator || getDefaultOperator());
   }, [currentFilter, getDefaultOperator]);
 
   const handleApplyFilter = () => {
-    // For 'is_null' and 'not_blank' operators, no value is needed
+    // For 'is_null' and 'not_blank' operators, send 'true' as the value
     if (filterOperator === 'is_null' || filterOperator === 'not_blank') {
       onFilterChange({
         key: definition.key,
-        value: '', // Empty value for existence checks
+        value: 'true', // Backend expects 'true' for is_null/not_blank operators
         operator: filterOperator,
       });
       setIsOpen(false);
       return;
     }
 
-    // For other operators, require a value
-    if (filterValue) {
+    // For checkbox, use pending ref value if available (synchronous)
+    // This ensures we capture the actual boolean value (true/false/null) immediately
+    const valueToApply =
+      pendingFilterValueRef.current !== null
+        ? pendingFilterValueRef.current
+        : filterValue;
+
+    // Clear the ref after reading
+    pendingFilterValueRef.current = null;
+
+    // For other operators, require a value (but false is valid for checkboxes)
+    if (
+      valueToApply !== null &&
+      valueToApply !== undefined &&
+      valueToApply !== ''
+    ) {
       onFilterChange({
         key: definition.key,
-        value: filterValue,
+        value: valueToApply,
         operator: filterOperator || getDefaultOperator(),
       });
     }
@@ -473,53 +498,27 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                                   </span>
                                 </div>
 
-                                <div className='mb-3'>
-                                  <PropertyFilterContent
-                                    propDef={definition}
-                                    filterValue={filterValue}
-                                    filterOperator={filterOperator}
-                                    onFilterValueChange={setFilterValue}
-                                    onFilterOperatorChange={setFilterOperator}
-                                    onApply={handleApplyFilterWrapper}
-                                    onCancel={() => setHoveredSubmenu(null)}
-                                  />
-                                </div>
+                                <PropertyFilterContent
+                                  propDef={definition}
+                                  filterValue={filterValue}
+                                  filterOperator={filterOperator}
+                                  onFilterValueChange={(value) => {
+                                    // Store in ref for synchronous access (checkbox case)
+                                    pendingFilterValueRef.current = value;
+                                    setFilterValue(value);
+                                  }}
+                                  onFilterOperatorChange={setFilterOperator}
+                                  onApply={handleApplyFilterWrapper}
+                                  onCancel={() => setHoveredSubmenu(null)}
+                                />
 
                                 {hasActiveFilter && (
                                   <button
                                     onClick={handleClearFilter}
-                                    className='aucctus-text-error-primary hover:aucctus-text-error-primary mb-3 w-full text-left text-sm transition-colors'
+                                    className='aucctus-text-error-primary hover:aucctus-text-error-primary mt-3 w-full text-left text-sm transition-colors'
                                   >
                                     Clear filter
                                   </button>
-                                )}
-
-                                {/* Only show Cancel/Apply footer for text and number filters */}
-                                {(definition.propertyType === 'text' ||
-                                  definition.propertyType === 'number') && (
-                                  <div className='flex justify-end gap-2'>
-                                    <button
-                                      onClick={() => {
-                                        setFilterValue(
-                                          currentFilter?.value || '',
-                                        );
-                                        setFilterOperator(
-                                          currentFilter?.operator ||
-                                            getDefaultOperator(),
-                                        );
-                                        setHoveredSubmenu(null);
-                                      }}
-                                      className='aucctus-text-secondary hover:aucctus-text-primary rounded px-2 py-1.5 text-sm transition-colors'
-                                    >
-                                      Cancel
-                                    </button>
-                                    <button
-                                      onClick={handleApplyFilter}
-                                      className='aucctus-bg-brand-solid hover:aucctus-bg-brand-solid-hover rounded px-2 py-1.5 text-sm text-white transition-colors'
-                                    >
-                                      Apply
-                                    </button>
-                                  </div>
                                 )}
                               </div>
                             </div>

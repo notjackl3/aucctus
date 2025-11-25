@@ -187,6 +187,7 @@ export class PropertyApi extends ApiService {
       }>;
       explanation: string;
       originalQuery: string;
+      noResultsExplanation?: string;
       // Legacy format for backward compatibility
       filters?: Array<{
         key: string;

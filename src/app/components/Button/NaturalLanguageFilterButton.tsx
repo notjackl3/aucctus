@@ -13,6 +13,14 @@ interface IStandardFilter {
   value: string | string[];
 }
 
+/**
+ * Converts snake_case to camelCase
+ * e.g., "created_by" -> "createdBy"
+ */
+const toCamelCase = (str: string): string => {
+  return str.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+};
+
 interface INaturalLanguageFilterButtonProps {
   onFiltersApplied: (
     filters: IPropertyFilter[],
@@ -86,7 +94,10 @@ const NaturalLanguageFilterButton: React.FC<
         const standardFilters: IStandardFilter[] | undefined =
           hasStandardFilters
             ? response.standardFilters.map((filter) => ({
-                filterType: filter.filterType as IStandardFilter['filterType'],
+                // Convert snake_case to camelCase (e.g., "created_by" -> "createdBy")
+                filterType: toCamelCase(
+                  filter.filterType,
+                ) as IStandardFilter['filterType'],
                 value: filter.value,
               }))
             : undefined;
@@ -103,11 +114,30 @@ const NaturalLanguageFilterButton: React.FC<
         setExplanation('');
       } else {
         // No filters generated
-        setExplanation(
-          response.explanation ||
-            'No filters could be generated from your query. Try being more specific.',
-        );
-        toast.warning('No filters found. Try rephrasing your query.');
+        // Check if noResultsExplanation is '-' which means we should clear all filters
+        if (
+          response.noResultsExplanation &&
+          (response.noResultsExplanation.trim() === '-' ||
+            response.noResultsExplanation.length < 3)
+        ) {
+          // Clear all filters and sorts
+          onFiltersApplied([], []);
+          toast.success('All filters and sorts cleared');
+
+          // Close the popover
+          setIsOpen(false);
+          setQuery('');
+          setExplanation('');
+        } else {
+          // Prioritize noResultsExplanation if available, otherwise fall back to explanation
+          const noResultsMessage =
+            response.noResultsExplanation ||
+            response.explanation ||
+            'No filters could be generated from your query. Try being more specific.';
+
+          setExplanation(noResultsMessage);
+          toast.warning('No filters found. Try rephrasing your query.');
+        }
       }
     } catch (error: any) {
       // Log error for debugging
@@ -265,7 +295,7 @@ const NaturalLanguageFilterButton: React.FC<
                           <>
                             <Icon
                               variant='loading-02'
-                              className='h-4 w-4 animate-spin'
+                              className='aucctus-stroke-white h-4 w-4 animate-spin'
                             />
                             <span>Searching...</span>
                           </>

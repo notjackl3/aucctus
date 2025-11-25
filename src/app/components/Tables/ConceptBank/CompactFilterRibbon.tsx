@@ -8,6 +8,7 @@ import {
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { camelCaseToTitleCase } from '@libs/utils/string';
+import { getPropertyIcon } from '@libs/utils/propertyIcons';
 import React, { ReactNode, useState } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { animated, useTransition } from 'react-spring';
@@ -253,7 +254,7 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
       const propDef = propertyDefinitions?.find(
         (def) => def.key === filter.key,
       );
-      const icon = propDef?.icon || 'clipboard';
+      const icon = propDef ? getPropertyIcon(propDef) : 'clipboard';
       const name = propDef?.name || filter.key;
 
       // Format the filter value
@@ -927,11 +928,16 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
   setSubmenuImmediate,
   setSubmenuDelayed,
 }) => {
-  const [filterValue, setFilterValue] = useState(filter.value || '');
+  const [filterValue, setFilterValue] = useState(
+    filter.value !== undefined && filter.value !== null ? filter.value : '',
+  );
   const [filterOperator, setFilterOperator] = useState<
     IPropertyFilter['operator']
   >(filter.operator || 'exact');
   const filterButtonRef = React.useRef<HTMLButtonElement>(null);
+
+  // Ref to capture immediate filter value for synchronous access (checkbox case)
+  const pendingFilterValueRef = React.useRef<any>(null);
 
   const dropdownTransition = useTransition(isOpen, {
     from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
@@ -942,7 +948,9 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
 
   React.useEffect(() => {
     if (isOpen) {
-      setFilterValue(filter.value || '');
+      setFilterValue(
+        filter.value !== undefined && filter.value !== null ? filter.value : '',
+      );
       setFilterOperator(filter.operator || 'exact');
     }
   }, [isOpen, filter]);
@@ -951,7 +959,7 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
     if (filterOperator === 'is_null' || filterOperator === 'not_blank') {
       const updatedFilters = (filterOptions.propertyFilters || []).map((f) =>
         f.key === filter.key
-          ? { key: filter.key, value: '', operator: filterOperator }
+          ? { key: filter.key, value: 'true', operator: filterOperator }
           : f,
       );
       onUpdateFilters({ propertyFilters: updatedFilters });
@@ -959,14 +967,24 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
       return;
     }
 
+    // For checkbox, use pending ref value if available (synchronous)
+    // This ensures we capture the actual boolean value (true/false/null) immediately
+    const valueToApply =
+      pendingFilterValueRef.current !== null
+        ? pendingFilterValueRef.current
+        : filterValue;
+
+    // Clear the ref after reading
+    pendingFilterValueRef.current = null;
+
     if (
-      filterValue !== null &&
-      filterValue !== undefined &&
-      filterValue !== ''
+      valueToApply !== null &&
+      valueToApply !== undefined &&
+      valueToApply !== ''
     ) {
       const updatedFilters = (filterOptions.propertyFilters || []).map((f) =>
         f.key === filter.key
-          ? { key: filter.key, value: filterValue, operator: filterOperator }
+          ? { key: filter.key, value: valueToApply, operator: filterOperator }
           : f,
       );
       onUpdateFilters({ propertyFilters: updatedFilters });
@@ -1075,7 +1093,11 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
                                 propDef={propDef}
                                 filterValue={filterValue}
                                 filterOperator={filterOperator}
-                                onFilterValueChange={setFilterValue}
+                                onFilterValueChange={(value) => {
+                                  // Store in ref for synchronous access (checkbox case)
+                                  pendingFilterValueRef.current = value;
+                                  setFilterValue(value);
+                                }}
                                 onFilterOperatorChange={setFilterOperator}
                                 onApply={handleApplyFilter}
                                 onCancel={() => setSubmenuImmediate(null)}
