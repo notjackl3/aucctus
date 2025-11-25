@@ -9,7 +9,7 @@ import api from '@libs/api';
 import useStore from '@stores/store';
 
 interface IStandardFilter {
-  filterType: 'sort' | 'status' | 'createdBy' | 'lastModifiedBy';
+  filterType: 'sort' | 'status' | 'createdBy' | 'lastModifiedBy' | 'search';
   value: string | string[];
 }
 
