@@ -80,8 +80,7 @@ export interface Tailwind {
 }
 
 export interface Crowdedness {
-  lowValue: number;
-  highValue: number;
+  score: number;
   directCompetitors: number;
 }
 
@@ -113,8 +112,7 @@ const EMPTY_STATE: Omit<
   headwinds: [],
   tailwinds: [],
   crowdedness: {
-    lowValue: 0,
-    highValue: 100,
+    score: 0,
     directCompetitors: 0,
   },
   futurePredictions: [],
@@ -241,10 +239,8 @@ export const useEcosystem = (conceptId: string): EcosystemCompanyData => {
       headwinds: data.headwinds,
       tailwinds: data.tailwinds,
       crowdedness: {
-        lowValue: data.crowdedness.lowValue,
-        highValue: data.crowdedness.highValue,
-        directCompetitors:
-          data.crowdedness.score || data.crowdedness.directCompetitors,
+        score: data.crowdedness.score,
+        directCompetitors: data.crowdedness.directCompetitors,
       },
       futurePredictions: data.futurePredictions.map(
         (prediction: IEcosystemPrediction) => ({

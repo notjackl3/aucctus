@@ -255,7 +255,7 @@ const EditableStatusCell: React.FC<IEditableStatusCellProps> = ({
           onMouseDown={(e) => e.stopPropagation()}
           disabled={isUpdating}
           className={cn(
-            'group flex w-full items-center justify-center rounded px-2 py-1 text-left',
+            'group flex w-full items-center justify-start rounded px-2 py-1 text-left',
             {
               'cursor-pointer': !isUpdating,
               'cursor-not-allowed opacity-50': isUpdating,

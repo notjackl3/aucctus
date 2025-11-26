@@ -34,7 +34,7 @@ const TableRow: React.FC<ITableRowProps<any>> = <T,>({
     >
       {row.getVisibleCells().map((cell) => (
         <td
-          className='break-words bg-inherit p-3 text-base font-normal first:pl-6 last:pr-6'
+          className='break-words bg-inherit p-2 text-base font-normal first:pl-4'
           style={{
             width: cell.column.getSize(),
             maxWidth: cell.column.columnDef.maxSize || cell.column.getSize(),

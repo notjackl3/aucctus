@@ -310,7 +310,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
 
       {/* Content */}
       <div className='max-h-[70vh] space-y-6 overflow-y-auto px-6 py-4'>
-        {/* Property Name */}
+        {/* Property Name with Icon */}
         <div
           ref={nameRef}
           className={cn('space-y-2', shakeField === 'name' && 'animate-shake')}
@@ -321,29 +321,8 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
           <label className='aucctus-text-sm-medium aucctus-text-secondary block'>
             Property Name <span className='aucctus-text-error-primary'>*</span>
           </label>
-          <Input.Field
-            name='propertyName'
-            value={formData.name}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setFormData({ ...formData, name: e.target.value })
-            }
-            placeholder='e.g., Priority, Status, Budget'
-            disabled={isLoading}
-            className={cn(errors.name && 'aucctus-border-error')}
-          />
-          {errors.name && (
-            <p className='aucctus-text-xs aucctus-text-error-primary'>
-              {errors.name}
-            </p>
-          )}
-        </div>
-
-        {/* Icon Selection */}
-        <div className='space-y-2'>
-          <label className='aucctus-text-sm-medium aucctus-text-secondary block'>
-            Column Icon
-          </label>
-          <div className='aucctus-bg-secondary aucctus-border-secondary flex w-full items-center gap-3 rounded-lg border p-3'>
+          <div className='flex items-center gap-2'>
+            {/* Icon Selector */}
             <IconPickerDropdown
               currentIcon={
                 formData.icon || getPropertyTypeIcon(formData.property_type)
@@ -353,7 +332,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                 <button
                   type='button'
                   disabled={isLoading}
-                  className='aucctus-bg-primary aucctus-border-secondary hover:aucctus-bg-primary-hover flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border transition-all disabled:cursor-not-allowed disabled:opacity-50'
+                  className='aucctus-bg-secondary aucctus-border-secondary hover:aucctus-bg-secondary-hover flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border transition-all disabled:cursor-not-allowed disabled:opacity-50'
                 >
                   <Icon
                     variant={
@@ -362,22 +341,30 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                           formData.property_type,
                         )) as IconVariant
                     }
-                    className='aucctus-stroke-primary h-6 w-6'
+                    className='aucctus-stroke-secondary h-5 w-5'
                   />
                 </button>
               }
             />
-            <div className='flex-1 text-left'>
-              <p className='aucctus-text-sm aucctus-text-primary font-medium'>
-                {formData.icon ||
-                  getPropertyTypeIcon(formData.property_type) ||
-                  'No icon selected'}
-              </p>
-              <p className='aucctus-text-xs aucctus-text-quaternary'>
-                Click icon to change
-              </p>
+            {/* Property Name Input - Flexes to fill remaining space */}
+            <div className='flex-1'>
+              <Input.Field
+                name='propertyName'
+                value={formData.name}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
+                placeholder='e.g., Priority, Status, Budget'
+                disabled={isLoading}
+                className={cn(errors.name && 'aucctus-border-error')}
+              />
             </div>
           </div>
+          {errors.name && (
+            <p className='aucctus-text-xs aucctus-text-error-primary'>
+              {errors.name}
+            </p>
+          )}
         </div>
 
         {/* Property Type (disabled for existing) */}

@@ -1,27 +1,23 @@
 import React, { useMemo } from 'react';
 
 interface DialGaugeProps {
-  lowValue?: number;
-  highValue?: number;
-  directCompetitors: number;
+  score: number;
+  directCompetitors?: number; // Optional, kept for potential future use
   emergingLabel?: string;
   moderateLabel?: string;
   crowdedLabel?: string;
 }
 
 const DialGauge: React.FC<DialGaugeProps> = ({
-  lowValue = 0,
-  highValue = 100,
-  directCompetitors,
+  score,
   emergingLabel = 'EMERGING',
   moderateLabel = 'MODERATE',
   crowdedLabel = 'CROWDED',
 }) => {
   const { needleRotation, indicatorCx, indicatorCy } = useMemo(() => {
-    // 1. Min-Max Normalization (Correct)
-    const normalizedValue =
-      (directCompetitors - lowValue) / (highValue - lowValue);
-    // Clamp between 0 and 1 (Correct)
+    // 1. Normalize score (0-100) to 0-1 range
+    const normalizedValue = score / 100;
+    // Clamp between 0 and 1
     const clampedValue = Math.max(0, Math.min(1, normalizedValue));
 
     // 2. Constants
@@ -32,7 +28,7 @@ const DialGauge: React.FC<DialGaugeProps> = ({
     // 3. Angle Calculations
     // Arc path is: M 60 165 A 80 80 0 1 1 180 165
     // This means: Move to (60, 165), then draw an arc with radius 80
-    // from (60, 165) to (180, 165) going counter-clockwise (the "1 1" flags)
+    // from (60, 165) to (180, 165) going clockwise (sweep-flag = 1)
 
     // Calculate angles from center (CX, CY) to arc endpoints
     // Start point: (60, 165)
@@ -61,7 +57,7 @@ const DialGauge: React.FC<DialGaugeProps> = ({
     const needleRotation = (currentTheta * 180) / Math.PI - 90;
 
     return { needleRotation, indicatorCx, indicatorCy };
-  }, [directCompetitors, lowValue, highValue]);
+  }, [score]);
 
   return (
     <div className='flex flex-col items-center py-2'>
@@ -134,7 +130,7 @@ const DialGauge: React.FC<DialGaugeProps> = ({
             strokeWidth='3'
           />
 
-          {/* Center metric number */}
+          {/* Center metric number - showing score */}
           <text
             x='120'
             y='125'
@@ -142,7 +138,7 @@ const DialGauge: React.FC<DialGaugeProps> = ({
             style={{ fontSize: '48px', fontWeight: 'bold' }}
             textAnchor='middle'
           >
-            {directCompetitors}
+            {score}
           </text>
 
           {/* Text labels following the arc - outside */}

@@ -44,7 +44,8 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
     <th
       {...props}
       className={cn(
-        'aucctus-text-primary aucctus-border-secondary aucctus-bg-primary text-nowrap border-b border-r p-3 align-top text-base font-medium leading-normal first:pl-6 last:pr-6',
+        'aucctus-text-primary aucctus-border-secondary aucctus-bg-primary-hover text-nowrap border-b p-3 align-top text-base font-medium leading-normal transition-colors first:pl-6 last:pr-6',
+        'hover:border-l hover:border-r',
         props.className,
       )}
       key={header.id}

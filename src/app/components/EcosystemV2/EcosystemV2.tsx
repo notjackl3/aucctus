@@ -55,8 +55,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
             </div>
             <div className='pt-2'>
               <DialGauge
-                lowValue={crowdedness.lowValue}
-                highValue={crowdedness.highValue}
+                score={crowdedness.score}
                 directCompetitors={crowdedness.directCompetitors}
               />
             </div>

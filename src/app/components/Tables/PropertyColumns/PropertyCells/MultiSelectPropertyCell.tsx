@@ -41,7 +41,7 @@ export const MultiSelectPropertyCell: React.FC<
     <div className='relative w-full' ref={selectRef}>
       {/* Show existing values at reduced opacity while dropdown is open */}
       {Array.isArray(editValue) && editValue.length > 0 && (
-        <div className='flex w-full flex-wrap gap-1 px-4 py-1 opacity-40'>
+        <div className='flex w-full flex-wrap gap-1 py-1 opacity-40'>
           {editValue.map((val: string, idx: number) => (
             <span
               key={idx}

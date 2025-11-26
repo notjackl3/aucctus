@@ -1,4 +1,4 @@
-import { Input } from '@components';
+import { Icon } from '@components';
 import { IPropertyDefinition, IPropertyOption } from '@libs/api/types';
 import React from 'react';
 import { createPortal } from 'react-dom';
@@ -22,7 +22,7 @@ interface IInlineMultiSelectDropdownProps {
 
 /**
  * Inline multi-select dropdown menu for multi-select property cells
- * Uses portal rendering and checkboxes for multiple selections
+ * Uses portal rendering with check icons on the right for selected items
  * Features smooth mount/unmount animations with react-spring
  * Saves on blur/unmount (no "Done" button)
  */
@@ -67,18 +67,15 @@ export const InlineMultiSelectDropdown: React.FC<
                 const colorScheme = getColorScheme(color);
 
                 return (
-                  <label
+                  <button
                     key={option}
-                    className='aucctus-text-sm aucctus-text-primary aucctus-bg-primary-hover flex cursor-pointer items-center gap-2 whitespace-nowrap px-3 py-2 transition-all duration-200'
+                    className='aucctus-text-sm aucctus-text-primary aucctus-bg-primary-hover flex w-full cursor-pointer items-center justify-between whitespace-nowrap px-3 py-2 transition-all duration-200'
                     onClick={(e) => {
                       e.stopPropagation();
+                      onToggle(option);
                     }}
                     data-aucctus-portal-target='true'
                   >
-                    <Input.CheckBox
-                      checked={isSelected}
-                      onChange={() => onToggle(option)}
-                    />
                     <div className='flex items-center gap-2'>
                       <div
                         className='h-3 w-3 flex-shrink-0 rounded-full border'
@@ -89,7 +86,13 @@ export const InlineMultiSelectDropdown: React.FC<
                       />
                       <span>{option}</span>
                     </div>
-                  </label>
+                    {isSelected && (
+                      <Icon
+                        variant='check'
+                        className='aucctus-stroke-brand-primary h-4 w-4 flex-shrink-0'
+                      />
+                    )}
+                  </button>
                 );
               })}
             </div>

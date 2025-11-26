@@ -300,7 +300,7 @@ const EditablePropertyCell: React.FC<IEditablePropertyCellProps> = ({
           onMouseDown={(e) => e.stopPropagation()}
           disabled={isUpdating}
           className={cn(
-            'aucctus-text-primary group flex w-full items-center rounded px-4 py-1 text-left text-sm transition-colors',
+            'aucctus-text-primary group flex w-full items-center rounded py-1 text-left text-sm transition-colors',
             {
               'cursor-pointer':
                 propertyType === 'select' || propertyType === 'multi_select',

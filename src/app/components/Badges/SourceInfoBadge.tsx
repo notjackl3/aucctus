@@ -32,9 +32,11 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
   const publishedDatesQuery = usePublishedDatesQuery(source, showPublishedDate);
   const clearbitCompanyQuery = useClearbitCompany(source.url);
 
-  // Check if this is an AI Reasoning source
-  const isAIReasoning =
-    source.title?.toLowerCase().startsWith('ai reasoning') || !source.url;
+  // Check if this is an AI-generated source (AI Reasoning or AI Synthesis)
+  const isAIGenerated =
+    source.title?.toLowerCase().includes('ai reasoning') ||
+    source.title?.toLowerCase().includes('ai synthesis') ||
+    (!source.url && source.description);
 
   // Memoized computed values to reduce re-renders
   const { sourceTitle, publishedDate, logoSizeClass, fontSizeClass } =
@@ -44,9 +46,14 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
         badgeSize === 'small' ? 'text-xs font-normal' : 'text-sm font-medium';
 
       let sourceTitle = 'loading...';
-      // Handle AI Reasoning sources first
-      if (isAIReasoning) {
-        sourceTitle = 'AI Reasoning';
+      // Handle AI-generated sources first
+      if (isAIGenerated) {
+        // Determine if it's AI Reasoning or AI Synthesis based on title
+        if (source.title?.toLowerCase().includes('ai synthesis')) {
+          sourceTitle = 'AI Synthesis';
+        } else {
+          sourceTitle = 'AI Reasoning';
+        }
       } else if (!!source?.nucleusFileSource?.title) {
         sourceTitle = source.nucleusFileSource.title;
       } else if (clearbitCompanyQuery.data?.[0]?.name) {
@@ -69,12 +76,13 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
       showPublishedDate,
       source.url,
       source.nucleusFileSource,
-      isAIReasoning,
+      source.title,
+      isAIGenerated,
     ]);
 
   const renderSourceLogo = () => {
-    // Show lightbulb icon for AI Reasoning sources
-    if (isAIReasoning) {
+    // Show lightbulb icon for AI-generated sources
+    if (isAIGenerated) {
       return (
         <div
           className={cn(
@@ -148,6 +156,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
       </div>
       <div className='aucctus-text-xs aucctus-text-secondary'>
         {sourceDescription ||
+          source.description ||
           (source.url ? getBaseUrl(source.url) : 'User uploaded document')}
       </div>
     </div>
@@ -162,11 +171,12 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
     <ComponentTooltip tip={renderTooltipContent()} hideDelay={hideDelay}>
       <div className='flex flex-row items-center gap-2'>
         <div
-          onClick={onClick}
+          onClick={!isAIGenerated ? onClick : undefined}
           className={cn(
             'aucctus-border-primary flex items-center gap-2 rounded-full border p-1',
             badgeClassName,
             onClick &&
+              !isAIGenerated &&
               'aucctus-bg-primary-hover cursor-pointer transition-all !duration-200',
           )}
         >

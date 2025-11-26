@@ -17,6 +17,7 @@ import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedSt
 interface IConceptActionMenuButton {
   status: ConceptStatus;
   identifier: string;
+  conceptUuid: string; // Add conceptUuid for operations that need it
   reportStatus: ConceptReportStatus;
   seedUuid?: string; // Add seedUuid to enable cloning
 }
@@ -24,6 +25,7 @@ interface IConceptActionMenuButton {
 const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
   status,
   identifier,
+  conceptUuid,
   reportStatus,
   seedUuid,
 }) => {
@@ -45,12 +47,12 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
     unarchiveConcept(id);
   };
 
-  const handleCancelReport = (conceptUuid: string) => {
+  const handleCancelReport = () => {
+    // Use conceptUuid for the mutation, not the identifier
     cancelReport({ conceptUuid, conceptIdentifier: identifier });
   };
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const handleCloneConceptSeed = (_conceptUuid: string) => {
+  const handleCloneConceptSeed = () => {
     if (!seedUuid) {
       toast.error('Clone Failed', 'No seed available to clone');
       return;
@@ -85,8 +87,8 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
       reportStatus={reportStatus}
       onArchive={handleArchive}
       onUnarchive={handleUnarchive}
-      onCancelReport={handleCancelReport}
-      onCloneConceptSeed={seedUuid ? handleCloneConceptSeed : undefined}
+      onCancelReport={() => handleCancelReport()}
+      onCloneConceptSeed={seedUuid ? () => handleCloneConceptSeed() : undefined}
       buttonClassName='btn btn-light btn-bold p-2'
       iconSize={28}
     />

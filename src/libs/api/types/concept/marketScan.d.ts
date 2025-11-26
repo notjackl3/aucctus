@@ -308,8 +308,6 @@ export interface IEcosystemV2Response {
   tailwinds: Array<{ id: number; description: string }>;
   crowdedness: {
     score: number;
-    lowValue: number;
-    highValue: number;
     directCompetitors: number;
   };
   futurePredictions: IEcosystemPrediction[];

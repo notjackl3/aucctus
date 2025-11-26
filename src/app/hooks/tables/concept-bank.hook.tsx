@@ -1095,12 +1095,12 @@ export const useConceptBank = (
         id: 'actions',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 120,
-        minSize: 100,
-        maxSize: 200,
+        size: 200,
+        minSize: 200,
+        maxSize: 300,
         enableResizing: true,
         cell: ({ row }) => (
-          <span className='m-auto flex h-full w-full items-end justify-end self-stretch'>
+          <span className='m-auto flex h-full w-full min-w-[200px] max-w-[300px] items-center justify-center self-stretch'>
             <Button.ConceptGenerate
               variant={row.original.reportStatusAggregate}
               onClick={handleGenerateConceptButton(row)}
@@ -1126,6 +1126,7 @@ export const useConceptBank = (
             status={info.row.original.status}
             reportStatus={info.row.original.reportStatusAggregate}
             identifier={info.row.original.identifier}
+            conceptUuid={info.row.original.uuid}
             seedUuid={info.row.original.seedUuid}
           />
         ),

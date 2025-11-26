@@ -5,5 +5,5 @@ export const LATEST_FEATURE_VERSIONS = {
   financialProjection: 'v2',
   marketScan: 'v3',
   conceptOverview: 'v3',
-  ecosystem: 'v2',
+  ecosystem: 'v1',
 };
