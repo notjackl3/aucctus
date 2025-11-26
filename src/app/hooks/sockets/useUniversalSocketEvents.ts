@@ -513,7 +513,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       message.eventType === 'section_started' &&
       message.message?.toLowerCase().includes('workflow started')
     ) {
-      return 'marketScan';
+      return 'ecosystem';
     }
 
     if (message.eventType === 'workflow_completed') {

@@ -5,7 +5,7 @@ import { AppPath } from '@routes/routes';
  */
 export const CONCEPT_REPORT_SECTION_MAPPING: Record<string, string> = {
   [AppPath.ConceptOverview]: 'overview',
-  [AppPath.ConceptMarketScan]: 'marketScan',
+  [AppPath.ConceptMarketScan]: 'ecosystem',
   [AppPath.ConceptCustomerProfile]: 'customerProfiles',
   [AppPath.ConceptFinancialProjection]: 'financialProjection',
   [AppPath.ConceptKeyAssumptions]: 'assumptions',

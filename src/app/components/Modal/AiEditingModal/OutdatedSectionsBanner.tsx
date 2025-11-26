@@ -7,6 +7,7 @@ import { animated } from 'react-spring';
 interface OutdatedSectionsBannerProps {
   outdatedSections: string[];
   className?: string;
+  additionalMessage?: string;
 }
 
 // Consistent styles extracted as constants
@@ -26,6 +27,7 @@ const STYLES = {
 const OutdatedSectionsBanner: React.FC<OutdatedSectionsBannerProps> = ({
   outdatedSections,
   className,
+  additionalMessage,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
 
@@ -37,7 +39,8 @@ const OutdatedSectionsBanner: React.FC<OutdatedSectionsBannerProps> = ({
     duration: 300,
   });
 
-  if (outdatedSections.length === 0) {
+  // Show banner if there are outdated sections OR an additional message
+  if (outdatedSections.length === 0 && !additionalMessage) {
     return null;
   }
 
@@ -46,7 +49,7 @@ const OutdatedSectionsBanner: React.FC<OutdatedSectionsBannerProps> = ({
       style={isHovered ? STYLES.card : undefined}
       className={cn(
         {
-          'aucctus-border-primary aucctus-bg-tertiary flex animate-fade-in flex-row':
+          'aucctus-border-primary aucctus-bg-tertiary flex animate-fade-in flex-row items-center':
             true,
           'h-fit gap-2 rounded-lg border transition-all duration-200': true,
           'border-opacity-50 bg-opacity-25': isHovered,
@@ -68,42 +71,62 @@ const OutdatedSectionsBanner: React.FC<OutdatedSectionsBannerProps> = ({
         />
       </div>
 
-      {/* Expandable content */}
-      {contentTransitions(
-        (style, item) =>
-          item && (
-            <animated.div style={style} className='flex-1 overflow-hidden'>
-              <div className='flex flex-col gap-3 p-4 pl-0'>
-                <div
-                  style={STYLES.text}
-                  className='aucctus-text-md-medium !text-gray-light-200'
-                >
-                  Sections requiring updates
-                </div>
-
-                <div
-                  style={STYLES.text}
-                  className='aucctus-text-sm !text-gray-light-200'
-                >
-                  The following sections are ineligible for AI editing until
-                  they are updated:
-                </div>
-
-                <ul className='ml-4 space-y-1'>
-                  {outdatedSections.map((section, index) => (
-                    <li
-                      key={index}
-                      style={STYLES.text}
-                      className='aucctus-text-sm list-disc !text-gray-light-200'
-                    >
-                      {section}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </animated.div>
-          ),
+      {/* Inline message when only additionalMessage exists */}
+      {additionalMessage && outdatedSections.length === 0 && (
+        <div
+          style={STYLES.text}
+          className='aucctus-text-sm-medium pr-4 !text-gray-light-200'
+        >
+          {additionalMessage}
+        </div>
       )}
+
+      {/* Expandable content when there are outdated sections */}
+      {outdatedSections.length > 0 &&
+        contentTransitions(
+          (style, item) =>
+            item && (
+              <animated.div style={style} className='flex-1 overflow-hidden'>
+                <div className='flex flex-col gap-3 p-4 pl-0'>
+                  {additionalMessage && (
+                    <div
+                      style={STYLES.text}
+                      className='aucctus-text-sm !text-gray-light-200'
+                    >
+                      {additionalMessage}
+                    </div>
+                  )}
+
+                  <div
+                    style={STYLES.text}
+                    className='aucctus-text-md-medium !text-gray-light-200'
+                  >
+                    Sections requiring updates
+                  </div>
+
+                  <div
+                    style={STYLES.text}
+                    className='aucctus-text-sm !text-gray-light-200'
+                  >
+                    The following sections are ineligible for AI editing until
+                    they are updated:
+                  </div>
+
+                  <ul className='ml-4 space-y-1'>
+                    {outdatedSections.map((section, index) => (
+                      <li
+                        key={index}
+                        style={STYLES.text}
+                        className='aucctus-text-sm list-disc !text-gray-light-200'
+                      >
+                        {section}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </animated.div>
+            ),
+        )}
     </div>
   );
 };

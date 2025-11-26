@@ -3,14 +3,14 @@ import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher
 import { useEditMarketScan } from '@hooks/concepts/editable.hook';
 import {
   useConceptMarketScan,
-  // useGenerateEcosystemV2, // Temporarily disabled while V2 is in development
+  useGenerateEcosystemV2,
 } from '@hooks/query/concepts.hook';
 import IncumbentsList from '../components/Incumbent-list/IncumbentList';
 import StartupList from '../components/startup-list/StartupList';
 import useStore from '@stores/store';
 import {
   EcosystemV2,
-  // VersionUpgradeBanner, // Temporarily disabled while V2 is in development
+  VersionUpgradeBanner,
   ConceptReportSkeletons,
 } from '@components';
 import { useOutletContext } from 'react-router-dom';
@@ -26,9 +26,8 @@ const Ecosystem: React.FC = () => {
   );
   const { data: marketScan } = useConceptMarketScan(activeConceptUuid);
   const { ecosystemDescription } = useEditMarketScan();
-  // Temporarily disabled while V2 is in development
-  // const { mutate: generateEcosystem, isLoading: isUpgrading } =
-  //   useGenerateEcosystemV2();
+  const { mutate: generateEcosystem, isLoading: isUpgrading } =
+    useGenerateEcosystemV2();
   const [isAwaitingEcosystemUpgrade, setIsAwaitingEcosystemUpgrade] =
     useState(false);
 
@@ -51,13 +50,12 @@ const Ecosystem: React.FC = () => {
     isAwaitingEcosystemUpgrade || isEcosystemV2Loading;
   const isV2ExperienceActive = shouldRenderV2 || isAwaitingEcosystemUpgrade;
 
-  // Temporarily disabled while V2 is in development
-  // const handleUpgrade = () => {
-  //   setIsAwaitingEcosystemUpgrade(true);
-  //   generateEcosystem(concept.identifier, {
-  //     onError: () => setIsAwaitingEcosystemUpgrade(false),
-  //   });
-  // };
+  const handleUpgrade = () => {
+    setIsAwaitingEcosystemUpgrade(true);
+    generateEcosystem(concept.identifier, {
+      onError: () => setIsAwaitingEcosystemUpgrade(false),
+    });
+  };
 
   useEffect(() => {
     if (!isAwaitingEcosystemUpgrade) return;
@@ -72,14 +70,13 @@ const Ecosystem: React.FC = () => {
 
   return (
     <div className='flex w-full flex-col gap-6'>
-      {/* Version Upgrade Banner - Temporarily disabled while V2 is in development */}
-      {/* {!shouldRenderV2 && (
+      {!shouldRenderV2 && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}
           isLoading={isUpgrading || isAwaitingEcosystemUpgrade}
           buttonText='Upgrade to new Ecosystem'
         />
-      )} */}
+      )}
       {isV2ExperienceActive ? (
         shouldShowSkeletons ? (
           <EcosystemV2Skeleton />

@@ -14,11 +14,12 @@ import type {
 
 export const CONCEPT_REPORT_SECTION_KEY_MAP: Record<string, string> = {
   overview: 'overview',
-  market_scan: 'marketScan',
+  market_scan: 'ecosystem',
+  ecosystem: 'ecosystem',
   customer_profiles: 'customerProfiles',
   financial_projection: 'financialProjection',
   assumptions: 'assumptions',
-  trends: 'marketScan',
+  trends: 'trends',
   concept: 'overview',
   concept_title: 'overview',
   concept_overview: 'overview',
@@ -43,13 +44,13 @@ export const CONCEPT_REPORT_SECTION_KEY_MAP: Record<string, string> = {
   customer_alternatives: 'customerProfiles',
   customer_journey_steps: 'customerProfiles',
   customer_real_world_signals: 'customerProfiles',
-  market_scan_ecosystem: 'marketScan',
-  market_scan_startups: 'marketScan',
-  market_scan_incumbents: 'marketScan',
-  trends_analysis: 'marketScan',
-  trends_key_findings: 'marketScan',
-  trends_priority_insights: 'marketScan',
-  trends_market_forces: 'marketScan',
+  market_scan_ecosystem: 'ecosystem',
+  market_scan_startups: 'ecosystem',
+  market_scan_incumbents: 'ecosystem',
+  trends_analysis: 'trends',
+  trends_key_findings: 'trends',
+  trends_priority_insights: 'trends',
+  trends_market_forces: 'trends',
   tests: 'assumptions',
 };
 
@@ -64,14 +65,15 @@ export const mapBackendSectionToReportKey = (
 };
 
 const CONCEPT_REPORT_SECTION_ALIASES: Record<string, string> = {
-  marketScan: 'marketScan',
+  ecosystem: 'ecosystem',
   customerProfiles: 'customerProfiles',
   financialProjection: 'financialProjection',
   assumptions: 'assumptions',
   overview: 'overview',
-  trends: 'marketScan',
-  marketscan: 'marketScan',
-  market_scan: 'marketScan',
+  trends: 'trends',
+  marketScan: 'ecosystem',
+  marketscan: 'ecosystem',
+  market_scan: 'ecosystem',
   customer_profiles: 'customerProfiles',
   financial_projection: 'financialProjection',
 };

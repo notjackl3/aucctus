@@ -35,8 +35,8 @@ const getOutdatedSections = (featureVersions?: IFeatureVersions): string[] => {
   const outdatedSections: string[] = [];
 
   (Object.keys(LATEST_FEATURE_VERSIONS) as FeatureName[]).forEach((feature) => {
-    // Skip assumptions for now
-    if (feature === 'assumptions') return;
+    // Skip assumptions and ecosystem
+    if (feature === 'assumptions' || feature === 'ecosystem') return;
 
     const currentVersion = featureVersions[feature];
     const latestVersion = LATEST_FEATURE_VERSIONS[feature];
@@ -172,7 +172,10 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
         </div>
 
         {/* Outdated sections banner */}
-        <OutdatedSectionsBanner outdatedSections={outdatedSections} />
+        <OutdatedSectionsBanner
+          outdatedSections={outdatedSections}
+          additionalMessage='Ecosystem temporarily disabled for AI Editing.'
+        />
       </div>
 
       {/* Main content area with flex-grow to take available space */}

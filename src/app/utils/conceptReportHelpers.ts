@@ -1,7 +1,7 @@
 import { ConceptReportStatusBySection } from '@libs/api/types';
 
 export const CONCEPT_REPORT_STAGE_ORDER = [
-  { key: 'marketScan', label: 'Market Scan' },
+  { key: 'ecosystem', label: 'Ecosystem' },
   { key: 'trends', label: 'Trends' },
   { key: 'customerProfiles', label: 'Customer Profiles' },
   { key: 'financialProjection', label: 'Financial Projection' },
@@ -26,7 +26,7 @@ export interface ConceptReportStage {
 export const DEFAULT_CONCEPT_REPORT_ESTIMATE_SECONDS = 20 * 60;
 
 const STAGE_KEYWORDS: Record<ConceptReportStageKey, string[]> = {
-  marketScan: ['market scan'],
+  ecosystem: ['ecosystem'],
   trends: ['trend'],
   customerProfiles: ['customer profile', 'customers'],
   financialProjection: ['financial projection', 'financial'],
@@ -35,7 +35,7 @@ const STAGE_KEYWORDS: Record<ConceptReportStageKey, string[]> = {
 };
 
 const PROGRESS_TRACKED_STAGE_KEYS: ConceptReportStageKey[] = [
-  'marketScan',
+  'ecosystem',
   'customerProfiles',
   'financialProjection',
   'assumptions',

@@ -12,6 +12,66 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
 
   const memoizedData = useMemo(() => data, [data]);
 
+  // Calculate dynamic bubble sizes based on revenue and employees
+  const companySizes = useMemo(() => {
+    if (memoizedData.length === 0) return new Map<string, number>();
+
+    // Get all valid revenue and employee values
+    const revenues = memoizedData
+      .map((c) => c.revenue)
+      .filter((r): r is number => r !== null && r !== undefined && r > 0);
+    const employees = memoizedData
+      .map((c) => c.employees)
+      .filter((e): e is number => e !== null && e !== undefined && e > 0);
+
+    // Calculate min/max for normalization
+    const minRevenue = revenues.length > 0 ? Math.min(...revenues) : 0;
+    const maxRevenue = revenues.length > 0 ? Math.max(...revenues) : 1;
+    const minEmployees = employees.length > 0 ? Math.min(...employees) : 0;
+    const maxEmployees = employees.length > 0 ? Math.max(...employees) : 1;
+
+    // Calculate size score for each company (0-100 scale)
+    const sizeMap = new Map<string, number>();
+
+    memoizedData.forEach((company) => {
+      const companyKey = `${company.id}-${company.name}`;
+
+      // Normalize revenue (0-100)
+      const revenueScore =
+        company.revenue && company.revenue > 0 && maxRevenue > minRevenue
+          ? ((company.revenue - minRevenue) / (maxRevenue - minRevenue)) * 100
+          : 0;
+
+      // Normalize employees (0-100)
+      const employeeScore =
+        company.employees &&
+        company.employees > 0 &&
+        maxEmployees > minEmployees
+          ? ((company.employees - minEmployees) /
+              (maxEmployees - minEmployees)) *
+            100
+          : 0;
+
+      // Combine scores (weighted average: 60% revenue, 40% employees)
+      // If only one metric is available, use that one
+      let combinedScore = 0;
+      if (revenueScore > 0 && employeeScore > 0) {
+        combinedScore = revenueScore * 0.6 + employeeScore * 0.4;
+      } else if (revenueScore > 0) {
+        combinedScore = revenueScore;
+      } else if (employeeScore > 0) {
+        combinedScore = employeeScore;
+      } else {
+        // Fallback to companySizeScore if no metrics available
+        combinedScore = company.companySizeScore;
+      }
+
+      sizeMap.set(companyKey, combinedScore);
+    });
+
+    return sizeMap;
+  }, [memoizedData]);
+
   const handleImageError = (companyId: number, companyName: string) => {
     const key = `${companyId}-${companyName}`;
     setBrokenImages((prev) => new Set(prev).add(key));
@@ -90,7 +150,14 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
             }}
           >
             {memoizedData.map((company, index) => {
-              const bubbleSize = Math.max(company.companySizeScore, 40);
+              const companyKey = `${company.id}-${company.name}`;
+
+              // Get dynamic size score (0-100) and map to pixel size (40-120px)
+              const sizeScore = companySizes.get(companyKey) || 50;
+              const minSize = 40;
+              const maxSize = 120;
+              const bubbleSize =
+                minSize + (sizeScore / 100) * (maxSize - minSize);
 
               // Calculate the percentage of the container that the bubble radius represents
               // We need to keep bubbles within bounds by clamping their position
@@ -103,7 +170,6 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
               const x = Math.max(minPercent, Math.min(maxPercent, rawX));
               const y = Math.max(minPercent, Math.min(maxPercent, rawY));
 
-              const companyKey = `${company.id}-${company.name}`;
               const isImageBroken = brokenImages.has(companyKey);
               const shouldShowImage =
                 company.logoType === 'image' &&
@@ -156,7 +222,7 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
                       <span
                         className='font-extrabold text-white drop-shadow-lg'
                         style={{
-                          fontSize: `${Math.max(company.companySizeScore, 40) / 3.5}px`,
+                          fontSize: `${bubbleSize / 3.5}px`,
                           textShadow: '2px 2px 4px rgba(0,0,0,0.3)',
                         }}
                       >

@@ -421,7 +421,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
 
             {/* Content */}
             <div className='flex-1'>
-              <h3 className='aucctus-text-primary aucctus-text-xl-bold'>
+              <h3 className='aucctus-text-primary aucctus-text-xl-bold animate-pulse-slow'>
                 {hasError
                   ? 'Generation Failed'
                   : isComplete

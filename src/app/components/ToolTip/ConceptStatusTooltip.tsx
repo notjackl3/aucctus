@@ -7,8 +7,10 @@ import useGenerationStatus from '@hooks/concepts/generation-status.hook';
 import { restoreConceptWorkflowToast } from '@hooks/sockets/useUniversalSocketEvents';
 
 // Friendly names for section keys
+// Note: ecosystem and trends run in parallel
+// Order here is for display purposes only, not execution order
 const SECTION_NAMES: Record<string, string> = {
-  marketScan: 'Market Scan',
+  ecosystem: 'Ecosystem',
   trends: 'Trends',
   customerProfiles: 'Customer Profiles',
   financialProjection: 'Financial Projection',
