@@ -11,6 +11,7 @@
 export interface IAnchorThought {
   uuid: string;
   thought: string;
+  title: string;
   createdAt: string;
 }
 
@@ -53,6 +54,8 @@ export interface IAnchorQuestion {
   description: string;
   possibleAnswers?: IPossibleAnswer[];
   researchInsights?: IResearchInsight[];
+  nucleusInsights?: INucleusInsight[];
+  insights?: IResearchInsight[];
   userAnswer?: IUserAnswer | null; // Single user answer per question
   includedAnswers?: string[]; // UUIDs of answers that are selected/included for this question
   createdAt?: string;
@@ -106,6 +109,23 @@ export interface IResearchInsight {
   moreDetails?: string | null;
   whyItMatters?: IWhyItMatters | null;
   createdAt?: string;
+  sentiment: 'headwind' | 'tailwind' | 'neutral';
+}
+
+/**
+ * Nucleus Insight - AI-generated insight from Nucleus database
+ */
+export interface INucleusInsight {
+  uuid: string;
+  questionUuid: string;
+  insight: string;
+  sourceUrl: string;
+  sourceTitle: string;
+  sourceCredibility: number;
+  moreDetails?: string | null;
+  whyItMatters?: IWhyItMatters | null;
+  createdAt?: string;
+  sentiment: 'headwind' | 'tailwind' | 'neutral';
 }
 
 /**
@@ -140,11 +160,13 @@ export interface IGeneratedIdeaPlaygroundConcept {
   description: string;
   conceptType: ConceptType;
   rationale: string;
+  initialGutCheck?: string;
   problemItSolves: string;
   uniqueValueProposition: string;
   reasonsToBelieve: string[]; // 3-4 bullet points (each 5-10 words)
   reasonsToChallenge: string[]; // 3-4 bullet points (each 5-10 words)
   keyThingsToValidate: string[]; // 3-4 bullet points (each 5-10 words)
+  momentumScore?: string; // "1-3" score representing idea momentum (Early/Emerging/High)
   createdAt: string;
 }
 
@@ -187,6 +209,9 @@ export interface IGenerationInProgress {
 export type IPossibleAnswerResponse = IPossibleAnswer | IGenerationInProgress;
 export type IResearchInsightsResponse =
   | IResearchInsight[]
+  | IGenerationInProgress;
+export type INucleusInsightsResponse =
+  | INucleusInsight[]
   | IGenerationInProgress;
 export type IConceptGenerationResponse =
   | IIdeaPlaygroundGenerateIdeasResponse

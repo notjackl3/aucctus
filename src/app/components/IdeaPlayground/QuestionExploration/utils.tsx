@@ -17,7 +17,7 @@ export const getSentimentIcon = (sentiment: InsightCard['sentiment']) => {
     case 'headwind':
       return (
         <Icon
-          variant='decreasing'
+          variant='trending-down'
           className='aucctus-stroke-error-primary'
           height={12}
           width={12}

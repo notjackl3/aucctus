@@ -2,79 +2,72 @@ import React from 'react';
 import { Icon } from '@components';
 
 interface OpportunityMapFooterProps {
-  feedbackText: string;
   selectedIdeasCount: number;
-  onFeedbackChange: (value: string) => void;
-  onFeedbackSubmit: (e: React.FormEvent) => void;
   onGenerateReports: () => void;
 }
 
 const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
-  feedbackText,
   selectedIdeasCount,
-  onFeedbackChange,
-  onFeedbackSubmit,
   onGenerateReports,
 }) => {
   return (
-    <div className='border-t border-white/10 p-4'>
-      <div className='flex items-center justify-between'>
-        <form
-          onSubmit={onFeedbackSubmit}
-          className='flex flex-1 justify-center'
-        >
-          <div className='relative w-full max-w-md'>
-            <input
-              type='text'
-              value={feedbackText}
-              onChange={(e) => onFeedbackChange(e.target.value)}
-              placeholder='Provide Feedback on Ideas - Coming Soon...'
-              // Original enabled styles (preserved for reversion):
-              // className='aucctus-text-white placeholder:aucctus-text-placeholder w-full rounded-full border border-white/20 bg-white/10 px-6 py-3 backdrop-blur-md transition-all duration-200 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/40'
-              className='w-full cursor-not-allowed rounded-full border border-white/10 bg-white/5 px-6 py-3 text-white/40 opacity-50 backdrop-blur-md placeholder:text-white/30'
-              maxLength={500}
-              disabled={true}
+    <div className='flex border-t border-white/10 bg-black/20 backdrop-blur-md'>
+      {/* Left Side - Feedback Input (Coming Soon) */}
+      <div className='flex w-1/2 items-center gap-2 border-r border-white/10 p-6'>
+        <div className='flex flex-1 items-center gap-2 opacity-50'>
+          <input
+            type='text'
+            placeholder='Provide feedback to regenerate ideas...'
+            maxLength={500}
+            className='aucctus-text-white placeholder:aucctus-text-placeholder flex-1 cursor-not-allowed rounded-md border border-white/20 bg-white/10 px-3 py-2 transition-all duration-200 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/30'
+            disabled={true}
+          />
+          <button
+            disabled={true}
+            className='flex h-9 w-9 flex-shrink-0 cursor-not-allowed items-center justify-center rounded-md border border-white/20 bg-white/10 p-2 transition-all duration-200'
+          >
+            <Icon
+              variant='paper-airplane'
+              className='aucctus-stroke-white'
+              height={16}
+              width={16}
             />
-            <button
-              type='submit'
-              // Original enabled styles (preserved for reversion):
-              // className='absolute right-2 top-1/2 -translate-y-1/2 transform rounded-full bg-white/20 p-2 backdrop-blur-md transition-all duration-200 hover:bg-white/30'
-              className='absolute right-2 top-1/2 -translate-y-1/2 transform cursor-not-allowed rounded-full bg-white/10 p-2 opacity-50 backdrop-blur-md'
-              disabled={true}
-            >
-              <Icon
-                variant='paper-airplane'
-                // Original enabled styles (preserved for reversion):
-                // className='aucctus-stroke-white'
-                className='stroke-white/40'
-                height={16}
-                width={16}
-              />
-            </button>
-          </div>
-        </form>
+          </button>
+        </div>
+        <div className='flex flex-shrink-0 items-center rounded-md border border-white/20 bg-white/10 px-3 py-1.5'>
+          <span className='aucctus-text-xs aucctus-text-secondary'>
+            Coming Soon
+          </span>
+        </div>
+      </div>
 
-        {/* Generate Reports Button */}
+      {/* Right Side - Selected Count and Generate Reports Button */}
+      <div className='flex w-1/2 items-center justify-end gap-3 p-6'>
+        <div className='aucctus-text-secondary aucctus-text-sm'>
+          {selectedIdeasCount} idea{selectedIdeasCount !== 1 ? 's' : ''}{' '}
+          selected
+        </div>
+
         <button
           onClick={onGenerateReports}
           disabled={selectedIdeasCount === 0}
-          className={`btn whitespace-nowrap border px-3 py-2 backdrop-blur-md transition-all duration-300 ${
+          className={`flex items-center gap-2 whitespace-nowrap rounded-md border px-4 py-2 transition-all duration-300 ${
             selectedIdeasCount === 0
               ? 'aucctus-bg-disabled aucctus-text-disabled aucctus-border-disabled cursor-not-allowed opacity-50'
-              : 'btn-success animate-pulse'
+              : 'aucctus-bg-brand-solid aucctus-text-white hover:aucctus-bg-brand-solid-hover border-transparent'
           }`}
         >
           <Icon
             variant='presentation-chart'
-            className={
+            className={`${
               selectedIdeasCount === 0
-                ? 'aucctus-stroke-disabled mr-2'
-                : 'aucctus-stroke-white mr-2'
-            }
+                ? 'aucctus-stroke-disabled'
+                : 'aucctus-stroke-white'
+            }`}
             height={16}
             width={16}
           />
-          Generate Reports
+          <span>Generate Reports</span>
         </button>
       </div>
     </div>

@@ -39,7 +39,6 @@ import { animated } from 'react-spring';
 import { InsightCard } from '../Insights';
 
 interface QuestionCarouselProps {
-  explorationMode: string;
   topic: string;
   seedUuid: string | null;
   onGenerateIdeas?: () => void;
@@ -457,10 +456,10 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
   ): InsightCardType => ({
     id: insight.uuid,
     insight: insight.insight,
-    source: insight.sourceTitle || insight.sourceUrl,
-    url: insight.sourceUrl,
+    source: insight?.sourceTitle || insight?.sourceUrl || 'nucleus',
+    url: insight?.sourceUrl || '',
     type: 'opportunity' as any,
-    sentiment: 'neutral' as any,
+    sentiment: insight.sentiment,
     moreDetails: insight.moreDetails,
     whyItMatters: insight.whyItMatters,
   });
@@ -482,8 +481,8 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
   );
 
   // Get research insights from React Query data
-  const apiInsights = currentApiQuestion?.researchInsights
-    ? currentApiQuestion.researchInsights.map(convertInsightToCard)
+  const apiInsights = currentApiQuestion?.insights
+    ? currentApiQuestion.insights.map(convertInsightToCard)
     : [];
 
   const currentInsights = currentQuestion
@@ -766,7 +765,10 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
   }, [currentQuestion?.id, apiQuestions, manualAnswerOpen]);
 
   const renderFloatingInsights = () => {
-    const allCards = [...currentInsights];
+    // Build limited insights array: nucleus first (if exists), then non-nucleus up to 3 more
+    const limitedInsights = currentInsights.slice(0, 5);
+
+    const allCards = [...limitedInsights];
 
     // Add possible answer cards if available (now supports multiple)
     const currentApiQuestion = apiQuestions.find(

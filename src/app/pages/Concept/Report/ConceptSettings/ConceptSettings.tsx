@@ -104,25 +104,47 @@ const ConceptSettings: React.FC = () => {
     return <ConceptReportSkeletons.ConceptSettingsSkeleton />;
   }
 
+  // Check if there's any content to display
+  const hasContent =
+    ignitionQuestions.length > 0 ||
+    filteredClarifyingQuestions.length > 0 ||
+    seedDraft?.anchorThought;
+
   return (
     <div className='h-full w-full'>
       <div className='mx-0 max-w-3xl'>
         <div className='no-scrollbar mt-4 flex flex-1 flex-col gap-6'>
-          {ignitionQuestions.length > 0 && (
-            <>
-              <div className='flex items-center justify-between'>
-                <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
-                  Initial Questions
-                </h2>
-                {/* Clone Concept Seed Button */}
-                <button
-                  onClick={handleCloneConceptSeed}
-                  className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-                  disabled={isLoading || isCloning || !seedDraft}
-                >
-                  {isCloning ? 'Cloning...' : 'Clone Concept Seed'}
-                </button>
+          {/* Clone Concept Seed Button - Always visible if seedDraft exists */}
+          {seedDraft && (
+            <div className='flex items-center justify-end'>
+              <button
+                onClick={handleCloneConceptSeed}
+                className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+                disabled={isLoading || isCloning}
+              >
+                {isCloning ? 'Cloning...' : 'Clone Concept Seed'}
+              </button>
+            </div>
+          )}
+
+          {/* Anchor Thought - Display if it exists */}
+          {seedDraft?.anchorThought && (
+            <div className='flex flex-col gap-3'>
+              <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
+                Anchor Thought
+              </h2>
+              <div className='aucctus-bg-primary aucctus-text-secondary rounded-lg p-4'>
+                {seedDraft.anchorThought.thought}
               </div>
+            </div>
+          )}
+
+          {/* Initial Questions */}
+          {ignitionQuestions.length > 0 && (
+            <div className='flex flex-col gap-3'>
+              <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
+                Initial Questions
+              </h2>
               <div className='no-scrollbar flex flex-1 flex-col gap-3'>
                 {ignitionQuestions.map((answer) => (
                   <IgnitionQuestion
@@ -133,11 +155,12 @@ const ConceptSettings: React.FC = () => {
                   />
                 ))}
               </div>
-            </>
+            </div>
           )}
 
+          {/* Clarifying Questions */}
           {filteredClarifyingQuestions.length > 0 && (
-            <>
+            <div className='flex flex-col gap-3'>
               <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
                 Clarifying Questions
               </h2>
@@ -153,7 +176,16 @@ const ConceptSettings: React.FC = () => {
                   );
                 })}
               </div>
-            </>
+            </div>
+          )}
+
+          {/* No Content Message */}
+          {!hasContent && (
+            <div className='flex items-center justify-center py-12'>
+              <p className='aucctus-text-secondary aucctus-text-md'>
+                No seed information available
+              </p>
+            </div>
           )}
         </div>
       </div>

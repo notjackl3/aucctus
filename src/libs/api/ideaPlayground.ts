@@ -6,6 +6,7 @@ import type {
   IAnchorQuestion,
   IPossibleAnswer,
   IResearchInsight,
+  INucleusInsight,
   IUserAnswer,
   IGeneratedIdeaPlaygroundConcept,
   ICreateSeedRequest,
@@ -16,6 +17,7 @@ import type {
   ISaveConceptsRequest,
   IPossibleAnswerResponse,
   IResearchInsightsResponse,
+  INucleusInsightsResponse,
   IConceptGenerationResponse,
   IGenerationInProgress,
 } from './types';
@@ -98,6 +100,19 @@ export class IdeaPlaygroundApi extends ApiService {
   ): Promise<IResearchInsightsResponse> {
     return this.post<IResearchInsightsResponse>(
       endpoints.ideaPlaygroundResearchInsights(seedUuid, questionUuid),
+    );
+  }
+
+  /**
+   * Generate nucleus insights for a question
+   * Returns 202 Accepted if generation is in progress
+   */
+  generateNucleusInsights(
+    seedUuid: string,
+    questionUuid: string,
+  ): Promise<INucleusInsightsResponse> {
+    return this.post<INucleusInsightsResponse>(
+      endpoints.ideaPlaygroundNucleusInsights(seedUuid, questionUuid),
     );
   }
 
@@ -219,6 +234,12 @@ export function isPossibleAnswer(
 export function isResearchInsights(
   response: IResearchInsightsResponse,
 ): response is IResearchInsight[] {
+  return Array.isArray(response);
+}
+
+export function isNucleusInsights(
+  response: INucleusInsightsResponse,
+): response is INucleusInsight[] {
   return Array.isArray(response);
 }
 

@@ -1,67 +1,172 @@
 import React from 'react';
 import { Icon } from '@components';
-import { ConceptIdea } from '../types';
+import type { IGeneratedIdeaPlaygroundConcept } from '../types';
 
 interface ConceptCardProps {
-  idea: ConceptIdea;
-  section: 'core' | 'adjacent' | 'disruptive';
+  concept: IGeneratedIdeaPlaygroundConcept;
   isSelected: boolean;
-  isHovered: boolean;
   isActive: boolean;
-  onMouseEnter: () => void;
-  onMouseLeave: () => void;
-  onClick: () => void;
-  onSelectToggle: (e: React.MouseEvent) => void;
+  onCardClick: () => void;
+  onCardSelect: (e: React.MouseEvent) => void;
+  animationDelay?: number;
 }
 
+/**
+ * Grid Card Component for 2x2 OpportunityMap Layout
+ * Displays concept card with:
+ * - Selection checkbox
+ * - Category badge (Core/Adjacent/Disruptive)
+ * - Icon, title, description
+ * - Score placeholder (3 bars)
+ */
 const ConceptCard: React.FC<ConceptCardProps> = ({
-  idea,
+  concept,
   isSelected,
-  isHovered,
   isActive,
-  onMouseEnter,
-  onMouseLeave,
-  onClick,
-  onSelectToggle,
+  onCardClick,
+  onCardSelect,
+  animationDelay = 0,
 }) => {
+  // Determine category badge styling
+  const getBadgeStyle = () => {
+    switch (concept.conceptType) {
+      case 'Core':
+        return 'border border-blue-400/30 bg-blue-500/20 text-blue-300';
+      case 'Adjacent':
+        return 'border border-purple-400/30 bg-purple-500/20 text-purple-300';
+      case 'Disruptive':
+        return 'border border-orange-400/30 bg-orange-500/20 text-orange-300';
+      default:
+        return 'border border-white/20 bg-white/10 text-white/70';
+    }
+  };
+
+  // Determine icon based on concept type
+  const getIconVariant = ():
+    | 'droplets'
+    | 'layers'
+    | 'chef-hat'
+    | 'lightbulb' => {
+    switch (concept.conceptType) {
+      case 'Core':
+        return 'droplets';
+      case 'Adjacent':
+        return 'layers';
+      case 'Disruptive':
+        return 'chef-hat';
+      default:
+        return 'lightbulb';
+    }
+  };
+
   return (
     <div
-      className={`relative max-h-none w-[200px] flex-shrink-0 cursor-pointer overflow-hidden rounded-lg border bg-white/10 p-3 backdrop-blur-sm transition-all duration-200 hover:bg-white/15 xl:h-[120px] 2xl:h-[160px] ${
-        isActive ? 'border-2 border-white/40' : 'border-white/20'
+      onClick={onCardClick}
+      className={`relative flex h-[220px] cursor-pointer flex-col rounded-xl border p-4 transition-all duration-200 ${
+        isActive
+          ? 'border-white/60 bg-white/20 shadow-lg'
+          : 'border-white/30 bg-white/10 hover:border-white/40 hover:bg-white/15'
       }`}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      onClick={onClick}
+      style={{
+        animation: `fadeIn 0.6s ease-out ${animationDelay}s both`,
+      }}
     >
+      {/* Selection checkbox */}
       <div
-        className='absolute right-2 top-2 z-10 cursor-pointer'
-        onClick={onSelectToggle}
+        className='absolute right-3 top-3 z-10'
+        onClick={(e) => onCardSelect(e)}
       >
-        {isSelected ? (
-          <div className='aucctus-bg-success-solid flex h-5 w-5 items-center justify-center rounded-full'>
+        <div
+          className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all ${
+            isSelected
+              ? 'aucctus-bg-success-solid border-green-500'
+              : 'border-white/50 hover:border-white/70'
+          }`}
+        >
+          {isSelected && (
             <Icon
               variant='check'
               className='aucctus-stroke-white'
               height={12}
               width={12}
-              strokeWidth={3}
             />
-          </div>
-        ) : isHovered || isSelected ? (
-          <div className='h-5 w-5 rounded-full border-2 border-white/40'></div>
-        ) : null}
+          )}
+        </div>
       </div>
 
-      <div className='flex flex-col gap-2'>
-        <Icon
-          variant={idea.icon as any}
-          className='aucctus-stroke-white flex-shrink-0 opacity-80'
-          height={28}
-          width={28}
-        />
-        <h3 className='aucctus-text-white aucctus-text-md-bold line-clamp-2 break-words leading-tight 2xl:line-clamp-4'>
-          {idea.title}
-        </h3>
+      {/* Category Badge */}
+      <div className='absolute left-3 top-3'>
+        <span
+          className={`rounded-full px-2 py-1 text-[10px] font-semibold ${getBadgeStyle()}`}
+        >
+          {concept.conceptType}
+        </span>
+      </div>
+
+      {/* Content */}
+      <div className='flex h-full flex-col pt-8'>
+        <div className='mb-2 flex items-start gap-2 pr-8'>
+          <Icon
+            variant={getIconVariant()}
+            className='aucctus-stroke-white mt-0.5 h-6 w-6 flex-shrink-0'
+          />
+          <h3 className='aucctus-text-sm-bold aucctus-text-white leading-tight'>
+            {concept.title}
+          </h3>
+        </div>
+
+        <p className='aucctus-text-xs aucctus-text-white mb-4 line-clamp-3 flex-1 leading-relaxed opacity-70'>
+          {concept.description}
+        </p>
+
+        {/* Idea Score */}
+        <div className='flex-start flex items-center gap-2 border-t border-white/20 pt-3'>
+          <div className='flex items-center gap-2'>
+            <span className='aucctus-text-xs aucctus-text-white opacity-70'>
+              Idea Score
+            </span>
+            <div className='flex gap-1'>
+              {[1, 2, 3].map((bar) => {
+                const score = concept.momentumScore
+                  ? parseInt(concept.momentumScore, 10)
+                  : 0;
+                return (
+                  <div
+                    key={bar}
+                    className={`h-4 w-1 rounded-full ${
+                      bar <= score
+                        ? score === 3
+                          ? 'bg-green-400'
+                          : score === 2
+                            ? 'bg-yellow-400'
+                            : 'bg-orange-400'
+                        : 'bg-white/20'
+                    }`}
+                  ></div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Momentum Label */}
+          {concept.momentumScore && (
+            <span
+              className={`aucctus-text-xs font-semibold ${
+                concept.momentumScore === '3'
+                  ? 'text-green-400'
+                  : concept.momentumScore === '2'
+                    ? 'text-yellow-400'
+                    : 'text-orange-400'
+              }`}
+            >
+              {concept.momentumScore === '3'
+                ? 'High Momentum'
+                : concept.momentumScore === '2'
+                  ? 'Emerging Momentum'
+                  : 'Early Momentum'}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );

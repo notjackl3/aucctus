@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTransition, animated } from 'react-spring';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
 import {
   QuestionCarousel,
   OpportunityMap,
@@ -11,7 +10,6 @@ import {
   PlaygroundLoadingIndicator,
 } from '@components/IdeaPlayground';
 import type { IAnchorThought } from '@components/IdeaPlayground/types';
-import { explorationModes } from './fixtures/explorationModes';
 import { animationStyles } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
 import images from '@assets/img';
 import useStore from '@stores/store';
@@ -30,7 +28,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const [inputValue, setInputValue] = useState('');
   const [currentTopic, setCurrentTopic] = useState('');
   const [hasStartedTyping, setHasStartedTyping] = useState(false);
-  const [explorationMode, setExplorationMode] = useState('Explore New Domains');
   const [showDropdown, setShowDropdown] = useState(false);
   const [showOpportunityMap, setShowOpportunityMap] = useState(false);
 
@@ -111,7 +108,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
         setCurrentSeedUuid(seedUuidFromUrl);
         setHasStartedTyping(true);
         // Use anchor thought as the current topic instead of first question
-        setCurrentTopic(seedAnchorThought.thought);
+        setCurrentTopic(seedAnchorThought.title || seedAnchorThought.thought);
         setHasRestoredSession(true);
         // Reset the newly created seed flag since we're now in restoration mode
         setIsNewlyCreatedSeed(false);
@@ -184,14 +181,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
     leave: { opacity: 0 },
     config: { duration: 600 },
     delay: 300,
-  });
-
-  // Dropdown animation
-  const dropdownTransition = useExpandCollapseTransition({
-    isExpanded: showDropdown,
-    withOpacity: true,
-    maxHeight: 200,
-    duration: 200,
   });
 
   useEffect(() => {
@@ -283,11 +272,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
     ideaPlaygroundStore.reset();
   };
 
-  const handleExplorationModeChange = (mode: string) => {
-    setExplorationMode(mode);
-    setShowDropdown(false);
-  };
-
   const handleGenerateIdeas = () => {
     // Trigger concept generation with force regenerate
     if (currentSeedUuid) {
@@ -375,12 +359,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
                   <div className='px-8 pb-4 pt-8'>
                     <ExplorationModeSelector
                       currentTopic={currentTopic}
-                      explorationMode={explorationMode}
-                      explorationModes={explorationModes}
-                      showDropdown={showDropdown}
-                      dropdownTransition={dropdownTransition}
-                      onExplorationModeChange={handleExplorationModeChange}
-                      onDropdownToggle={() => setShowDropdown(!showDropdown)}
                       onRestart={handleRestart}
                     />
                   </div>
@@ -388,7 +366,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
                   {/* Main Map Area - Question Carousel */}
                   <div className='relative flex-1 pt-24'>
                     <QuestionCarousel
-                      explorationMode={explorationMode}
                       topic={currentTopic || 'Cheese on chicken in QSR'}
                       seedUuid={currentSeedUuid}
                       onGenerateIdeas={handleGenerateIdeas}

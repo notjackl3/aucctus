@@ -1,13 +1,13 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Icon, toast } from '@components';
-import type { ConceptIdea, IGeneratedIdeaPlaygroundConcept } from '../types';
+import type { IGeneratedIdeaPlaygroundConcept } from '../types';
 import {
   getAnimationStyle,
   animationStyles,
 } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
-import ConceptSection from './ConceptSection';
 import ConceptDetailPanel from './ConceptDetailPanel';
 import OpportunityMapFooter from './OpportunityMapFooter';
+import ConceptCard from './ConceptCard';
 import api from '@libs/api';
 import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
@@ -48,8 +48,6 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
 
   const { data: anchorThoughts } = useAnchorThought(seedUuid || undefined);
   // Local state
-  const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-  const [feedbackText, setFeedbackText] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const [selectedIdeaDetail, setSelectedIdeaDetail] = useState<{
     title: string;
@@ -57,31 +55,13 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     icon: string;
     description?: string;
     rationale?: string;
+    initialGutCheck?: string;
     problemItSolves?: string;
     uniqueValueProposition?: string;
     reasonsToBelieve?: string[];
     reasonsToChallenge?: string[];
     keyThingsToValidate?: string[];
   } | null>(null);
-
-  // Convert API concepts to legacy format for display
-  const convertConceptToIdea = (
-    concept: IGeneratedIdeaPlaygroundConcept,
-  ): ConceptIdea => ({
-    uuid: concept.uuid,
-    title: concept.title,
-    icon: 'lightbulb', // Default icon, can be improved later
-  });
-
-  const coreIdeas = concepts
-    .filter((c) => c.conceptType === 'Core')
-    .map(convertConceptToIdea);
-  const adjacentIdeas = concepts
-    .filter((c) => c.conceptType === 'Adjacent')
-    .map(convertConceptToIdea);
-  const disruptiveIdeas = concepts
-    .filter((c) => c.conceptType === 'Disruptive')
-    .map(convertConceptToIdea);
 
   const handleClose = useCallback(() => {
     setIsClosing(true);
@@ -135,42 +115,45 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     toggleConceptSelection(conceptUuid);
   };
 
-  const handleCardClick = (idea: ConceptIdea, section: string) => {
-    // Find the full concept data from store
-    const fullConcept = concepts.find((c) => c.title === idea.title);
-    if (fullConcept) {
-      setSelectedIdeaDetail({
-        title: fullConcept.title,
-        section: section.toUpperCase(),
-        icon: idea.icon,
-        description: fullConcept.description,
-        rationale: fullConcept.rationale,
-        problemItSolves: fullConcept.problemItSolves,
-        uniqueValueProposition: fullConcept.uniqueValueProposition,
-        reasonsToBelieve: fullConcept.reasonsToBelieve,
-        reasonsToChallenge: fullConcept.reasonsToChallenge,
-        keyThingsToValidate: fullConcept.keyThingsToValidate,
-      });
+  // Determine icon based on concept type
+  const getIconVariant = (
+    conceptType: string,
+  ): 'droplets' | 'layers' | 'chef-hat' | 'lightbulb' => {
+    switch (conceptType) {
+      case 'Core':
+        return 'droplets';
+      case 'Adjacent':
+        return 'layers';
+      case 'Disruptive':
+        return 'chef-hat';
+      default:
+        return 'lightbulb';
     }
   };
 
-  const handleCircleClick = (idea: ConceptIdea, e: React.MouseEvent) => {
-    e.stopPropagation();
-    handleCardSelect(idea.uuid);
+  const handleCardClick = (concept: IGeneratedIdeaPlaygroundConcept) => {
+    setSelectedIdeaDetail({
+      title: concept.title,
+      section: concept.conceptType,
+      icon: getIconVariant(concept.conceptType),
+      description: concept.description,
+      rationale: concept.rationale,
+      initialGutCheck: concept.initialGutCheck,
+      problemItSolves: concept.problemItSolves,
+      uniqueValueProposition: concept.uniqueValueProposition,
+      reasonsToBelieve: concept.reasonsToBelieve,
+      reasonsToChallenge: concept.reasonsToChallenge,
+      keyThingsToValidate: concept.keyThingsToValidate,
+    });
   };
 
-  const getCardId = (section: string, title: string) => `${section}-${title}`;
+  const handleCircleClick = (conceptUuid: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    handleCardSelect(conceptUuid);
+  };
 
   // Backend generates fixed set of concepts (3+3+3), so remove "generate more" functionality
   // const generateMoreIdeas = ... (removed)
-
-  const handleFeedbackSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (feedbackText.trim()) {
-      // Handle feedback submission here
-      setFeedbackText('');
-    }
-  };
 
   const handleGenerateReports = async () => {
     if (!seedUuid || selectedConceptUuids.length === 0) {
@@ -196,12 +179,26 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     }
   };
 
+  // Get momentumScore from concepts
+  const getMomentumScore = (): string | undefined => {
+    return concepts.find((c) => c.title === selectedIdeaDetail?.title)
+      ?.momentumScore;
+  };
+
   const conceptDetail = selectedIdeaDetail
     ? {
         shouldWeDo:
           selectedIdeaDetail.rationale || 'Rationale being generated...',
         whatIsIt:
           selectedIdeaDetail.description || 'Description being generated...',
+        description:
+          selectedIdeaDetail.description || 'Description being generated...',
+        conceptType: selectedIdeaDetail.section as
+          | 'Core'
+          | 'Adjacent'
+          | 'Disruptive',
+        momentumScore: getMomentumScore(),
+        initialGutCheck: selectedIdeaDetail.initialGutCheck,
         problemItSolves:
           selectedIdeaDetail.problemItSolves || 'Analysis in progress',
         uniqueValue:
@@ -212,7 +209,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         reasonsToChallenge: selectedIdeaDetail.reasonsToChallenge || [
           'Risk assessment pending',
         ],
-        keyThingsToValidate: selectedIdeaDetail.keyThingsToValidate || [
+        alignment: selectedIdeaDetail.keyThingsToValidate || [
           'Validation criteria being determined',
         ],
       }
@@ -257,99 +254,80 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       >
         {/* Header */}
         <div
-          className={`flex items-center justify-between border-b border-white/20 p-6 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+          className={`relative flex items-center justify-center border-b border-white/20 p-6 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
           style={
             !isClosing
               ? getAnimationStyle('slideInFromTop', 600, 200)
               : undefined
           }
         >
-          <div>
+          {/* Back Button - Left */}
+          <div className='absolute left-6'>
+            <button
+              onClick={handleClose}
+              className='btn btn-secondary aucctus-text-white flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 transition-colors hover:bg-white/15'
+            >
+              <Icon
+                variant='arrowleft'
+                className='aucctus-stroke-white'
+                height={16}
+                width={16}
+              />
+              <span className='aucctus-text-sm aucctus-text-white'>
+                Back to Playground
+              </span>
+            </button>
+          </div>
+
+          {/* Center Content */}
+          <div className='text-center'>
             <h1 className='aucctus-text-xl-bold aucctus-text-white'>
               Concept Generator
             </h1>
             <p className='aucctus-text-white opacity-60'>
-              {anchorThoughts?.thought || 'Idea playground'}
+              {anchorThoughts?.title ||
+                anchorThoughts?.thought ||
+                'Idea playground'}
             </p>
           </div>
-
-          <button
-            onClick={handleClose}
-            className='btn btn-secondary aucctus-text-white flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 transition-colors hover:bg-white/15'
-          >
-            <Icon
-              variant='arrowleft'
-              className='aucctus-stroke-white'
-              height={16}
-              width={16}
-            />
-            <span className='aucctus-text-sm aucctus-text-white'>
-              Back to Playground
-            </span>
-          </button>
         </div>
 
         {/* Split Content */}
         <div className='flex h-[calc(100vh-200px)]'>
-          {/* Left Side - Three Sections */}
-          <div className='relative flex flex-[1.5] flex-col overflow-hidden'>
-            <ConceptSection
-              title='CORE'
-              description='Traditional innovations using existing capabilities'
-              ideas={coreIdeas}
-              sectionKey='core'
-              selectedConceptUuids={selectedConceptUuids}
-              hoveredCard={hoveredCard}
-              selectedIdeaTitle={selectedIdeaDetail?.title || null}
-              onCardMouseEnter={setHoveredCard}
-              onCardMouseLeave={() => setHoveredCard(null)}
-              onCardClick={handleCardClick}
-              onCardSelect={handleCircleClick}
-              onGenerateMore={undefined}
-              getCardId={getCardId}
-            />
+          {/* Left Side - 2x2 Grid */}
+          <div className='flex w-1/2 flex-col border-r border-white/10'>
+            {/* Ideas Grid - Scrollable */}
+            <div className='flex-1 overflow-y-auto p-6'>
+              <div className='grid grid-cols-2 gap-4'>
+                {concepts.slice(0, 6).map((concept, index) => (
+                  <ConceptCard
+                    key={concept.uuid}
+                    concept={concept}
+                    isSelected={selectedConceptUuids.includes(concept.uuid)}
+                    isActive={selectedIdeaDetail?.title === concept.title}
+                    onCardClick={() => handleCardClick(concept)}
+                    onCardSelect={(e) => handleCircleClick(concept.uuid, e)}
+                    animationDelay={index * 0.1}
+                  />
+                ))}
+              </div>
+            </div>
 
-            <ConceptSection
-              title='ADJACENT'
-              description='Extensions of current capabilities into new market areas'
-              ideas={adjacentIdeas}
-              sectionKey='adjacent'
-              selectedConceptUuids={selectedConceptUuids}
-              hoveredCard={hoveredCard}
-              selectedIdeaTitle={selectedIdeaDetail?.title || null}
-              onCardMouseEnter={setHoveredCard}
-              onCardMouseLeave={() => setHoveredCard(null)}
-              onCardClick={handleCardClick}
-              onCardSelect={handleCircleClick}
-              onGenerateMore={undefined}
-              getCardId={getCardId}
-            />
-
-            <ConceptSection
-              title='DISRUPTIVE'
-              description='Revolutionary innovations that transform entire markets'
-              ideas={disruptiveIdeas}
-              sectionKey='disruptive'
-              selectedConceptUuids={selectedConceptUuids}
-              hoveredCard={hoveredCard}
-              selectedIdeaTitle={selectedIdeaDetail?.title || null}
-              onCardMouseEnter={setHoveredCard}
-              onCardMouseLeave={() => setHoveredCard(null)}
-              onCardClick={handleCardClick}
-              onCardSelect={handleCircleClick}
-              onGenerateMore={undefined}
-              getCardId={getCardId}
-            />
+            {/* Generate More Button - Disabled */}
+            <div className='px-6 pb-4'>
+              <button
+                className='aucctus-text-white aucctus-text-sm w-full rounded-lg border border-white/30 bg-transparent py-2 transition-all hover:border-white/40 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50'
+                disabled
+              >
+                Generate More (Coming Soon)
+              </button>
+            </div>
           </div>
 
-          {/* Dividing line */}
-          <div className='aucctus-bg-secondary w-px'></div>
-
-          {/* Right Side - Content Cards */}
-          <div className='flex-1 overflow-y-auto p-6'>
+          {/* Right Side - Detail Panel */}
+          <div className='w-1/2 overflow-y-auto p-6'>
             <ConceptDetailPanel
               title={selectedIdeaDetail?.title || ''}
-              section={selectedIdeaDetail?.section || ''}
               icon={selectedIdeaDetail?.icon || ''}
               conceptDetail={conceptDetail}
             />
@@ -366,10 +344,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
           }
         >
           <OpportunityMapFooter
-            feedbackText={feedbackText}
             selectedIdeasCount={selectedConceptUuids.length}
-            onFeedbackChange={setFeedbackText}
-            onFeedbackSubmit={handleFeedbackSubmit}
             onGenerateReports={handleGenerateReports}
           />
         </div>

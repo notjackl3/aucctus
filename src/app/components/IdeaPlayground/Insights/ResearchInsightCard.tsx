@@ -9,6 +9,7 @@ import {
 } from '@hooks/query/ideaPlayground.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
+import AucctusLogo from '@assets/aucctus_logo.png';
 interface ResearchInsightCardProps {
   card: InsightCardType;
   isSelected: boolean;
@@ -32,6 +33,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
   seedUuid,
   questionUuid,
   getSentimentColor,
+  getSentimentIcon,
   onSelectionChange,
   onDoubleClick,
 }) => {
@@ -146,6 +148,25 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   // Render source logo similar to SourceInfoBadge
   const renderSourceLogo = useMemo(() => {
+    const isNucleus = card.source?.toLowerCase().includes('nucleus') || false;
+
+    if (isNucleus) {
+      return (
+        <div
+          className={cn(
+            'flex items-center justify-center overflow-hidden rounded-full border border-transparent bg-white',
+            'h-4 w-4',
+          )}
+        >
+          <img
+            src={AucctusLogo}
+            alt='Aucctus Nucleus'
+            className='h-full w-full object-contain p-0.5'
+          />
+        </div>
+      );
+    }
+
     const sourceBaseUrl = card.url ? getBaseUrl(card.url) : null;
     return (
       <div
@@ -174,7 +195,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         )}
       </div>
     );
-  }, [card.url]);
+  }, [card.url, card.source]);
 
   const displayTitle = useMemo(() => {
     let title = card.source;
@@ -267,14 +288,21 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
       <div className='flex justify-end'>
         <div
-          className='inline-flex cursor-pointer items-center gap-2 rounded-full border border-white/30 bg-white/10 px-2 py-1 transition-colors hover:bg-white/15'
+          className={cn(
+            'inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-2 py-1 transition-colors',
+            card.source?.includes('Nucleus')
+              ? 'cursor-default'
+              : 'cursor-pointer hover:bg-white/15',
+          )}
           onClick={handleSourceClick}
           onDoubleClick={handleSourceClick}
           title={card.url ? `Open ${card.source}` : undefined}
         >
+          {getSentimentIcon(card.sentiment)}
+
           {renderSourceLogo}
           <span className='aucctus-text-xs font-normal'>{displayTitle}</span>
-          {card.url && (
+          {card.url && !card.source?.includes('Nucleus') && (
             <Icon
               variant='link-external'
               className='aucctus-stroke-white opacity-70'

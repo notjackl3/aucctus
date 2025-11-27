@@ -23,7 +23,6 @@ export { PlaygroundLoadingIndicator } from './PlaygroundLoadingIndicator';
 export { default as OpportunityMap } from './OpportunityMap';
 export {
   ConceptCard,
-  ConceptSection,
   ConceptDetailPanel,
   OpportunityMapFooter,
 } from './OpportunityMap';
