@@ -163,9 +163,7 @@ const calculatePositionsFromCenters = (
   topCenterY: number,
   bottomCenterY: number,
 ) => {
-  let x = 0;
-  let y = 0;
-
+  // For small counts (4-6), use predefined positions for aesthetic control
   if (totalCards === 4) {
     const positions = [
       { x: 0, y: topCenterY }, // top
@@ -173,10 +171,10 @@ const calculatePositionsFromCenters = (
       { x: 0, y: bottomCenterY }, // bottom
       { x: leftCenterX, y: 0 }, // left
     ];
-    const pos = positions[index];
-    x = pos.x;
-    y = pos.y;
-  } else if (totalCards === 5) {
+    return positions[index];
+  }
+
+  if (totalCards === 5) {
     const positions = [
       { x: 0, y: topCenterY }, // top
       { x: rightCenterX, y: topCenterY / 2 }, // right-top
@@ -184,10 +182,10 @@ const calculatePositionsFromCenters = (
       { x: 0, y: bottomCenterY }, // bottom
       { x: leftCenterX, y: 0 }, // left-center
     ];
-    const pos = positions[index];
-    x = pos.x;
-    y = pos.y;
-  } else if (totalCards === 6) {
+    return positions[index];
+  }
+
+  if (totalCards === 6) {
     const positions = [
       { x: 0, y: topCenterY }, // top
       { x: rightCenterX, y: topCenterY / 2 }, // right-top
@@ -196,35 +194,22 @@ const calculatePositionsFromCenters = (
       { x: leftCenterX, y: bottomCenterY / 2 }, // left-bottom
       { x: leftCenterX, y: topCenterY / 2 }, // left-top
     ];
-    const pos = positions[index];
-    x = pos.x;
-    y = pos.y;
-  } else {
-    // For other counts, distribute around the perimeter
-    const positions = [
-      { x: 0, y: topCenterY }, // Always start with top
-      { x: rightCenterX, y: 0 }, // right
-      { x: 0, y: bottomCenterY }, // bottom
-      { x: leftCenterX, y: 0 }, // left
-    ];
-
-    // Cycle through positions for any number of cards
-    const pos = positions[index % 4];
-    x = pos.x;
-    y = pos.y;
-
-    // For more than 6 cards, add slight variations to avoid overlap
-    if (totalCards > 6) {
-      const variation = Math.floor(index / 4) * 50;
-      if (index % 4 === 0 || index % 4 === 2) {
-        x += (index % 2 === 0 ? 1 : -1) * variation;
-      } else {
-        y += (index % 2 === 0 ? 1 : -1) * variation;
-      }
-    }
+    return positions[index];
   }
 
-  return { x, y };
+  // For 7+ cards, use elliptical distribution
+  // Calculate ellipse radii from available space
+  const radiusX = (Math.abs(leftCenterX) + Math.abs(rightCenterX)) / 2;
+  const radiusY = (Math.abs(topCenterY) + Math.abs(bottomCenterY)) / 2;
+
+  // Start from top (-90°) and distribute clockwise
+  const startAngle = -Math.PI / 2;
+  const angle = startAngle + (index / totalCards) * 2 * Math.PI;
+
+  return {
+    x: radiusX * Math.cos(angle),
+    y: radiusY * Math.sin(angle),
+  };
 };
 
 export const generateCustomInsights = (
