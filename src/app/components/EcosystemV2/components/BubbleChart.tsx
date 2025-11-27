@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useRef, useCallback } from 'react';
 import type { Company } from '../hooks/useEcosystem';
 import CompanyTooltip from './CompanyTooltip';
 
@@ -6,11 +6,205 @@ interface BubbleChartProps {
   data: Company[];
 }
 
+interface PlacedBubble {
+  x: number; // percentage (0-100)
+  y: number; // percentage (0-100)
+  radius: number; // pixels
+  company: Company;
+}
+
+/**
+ * Calculate the overlap area between two circles
+ * Returns the overlap area as a percentage of the smaller circle's area
+ */
+const calculateOverlapPercentage = (
+  x1: number,
+  y1: number,
+  r1: number,
+  x2: number,
+  y2: number,
+  r2: number,
+  containerWidth: number,
+  containerHeight: number,
+): number => {
+  // Convert percentage positions to pixels for accurate calculation
+  const px1 = (x1 / 100) * containerWidth;
+  const py1 = (y1 / 100) * containerHeight;
+  const px2 = (x2 / 100) * containerWidth;
+  const py2 = (y2 / 100) * containerHeight;
+
+  // Calculate distance between centers
+  const d = Math.sqrt(Math.pow(px2 - px1, 2) + Math.pow(py2 - py1, 2));
+
+  // No overlap if circles are far apart
+  if (d >= r1 + r2) return 0;
+
+  // Complete overlap if one circle is inside the other
+  if (d <= Math.abs(r1 - r2)) {
+    return 100; // 100% overlap
+  }
+
+  // Partial overlap - calculate intersection area using circle intersection formula
+  const r1Sq = r1 * r1;
+  const r2Sq = r2 * r2;
+  const dSq = d * d;
+
+  // Area of intersection
+  const area1 = r1Sq * Math.acos((dSq + r1Sq - r2Sq) / (2 * d * r1));
+  const area2 = r2Sq * Math.acos((dSq + r2Sq - r1Sq) / (2 * d * r2));
+  const area3 =
+    0.5 *
+    Math.sqrt((r1 + r2 - d) * (d + r1 - r2) * (d - r1 + r2) * (d + r1 + r2));
+
+  const overlapArea = area1 + area2 - area3;
+
+  // Calculate as percentage of the smaller circle's area
+  const smallerArea = Math.PI * Math.pow(Math.min(r1, r2), 2);
+  const overlapPercentage = (overlapArea / smallerArea) * 100;
+
+  return overlapPercentage;
+};
+
+/**
+ * Check if a position is valid (has < 30% overlap with all placed bubbles)
+ */
+const isValidPosition = (
+  x: number,
+  y: number,
+  radius: number,
+  placedBubbles: PlacedBubble[],
+  containerWidth: number,
+  containerHeight: number,
+  maxOverlapPercent: number = 30,
+): boolean => {
+  for (const placed of placedBubbles) {
+    const overlapPercent = calculateOverlapPercentage(
+      x,
+      y,
+      radius,
+      placed.x,
+      placed.y,
+      placed.radius,
+      containerWidth,
+      containerHeight,
+    );
+
+    if (overlapPercent > maxOverlapPercent) {
+      return false;
+    }
+  }
+  return true;
+};
+
+/**
+ * Find the closest valid position using spiral search from semantic position
+ */
+const findSafePosition = (
+  semanticX: number,
+  semanticY: number,
+  radius: number,
+  placedBubbles: PlacedBubble[],
+  containerWidth: number,
+  containerHeight: number,
+  minPercent: number,
+  maxPercent: number,
+): { x: number; y: number } => {
+  // First check if semantic position is already valid
+  if (
+    isValidPosition(
+      semanticX,
+      semanticY,
+      radius,
+      placedBubbles,
+      containerWidth,
+      containerHeight,
+    )
+  ) {
+    return { x: semanticX, y: semanticY };
+  }
+
+  // Spiral search parameters
+  const maxSearchDistance = 30; // Maximum distance in percentage points to search
+  const angleSteps = 16; // Number of angles to check per distance ring
+  const distanceSteps = 20; // Number of distance rings to check
+
+  for (let distStep = 1; distStep <= distanceSteps; distStep++) {
+    const distance = (distStep / distanceSteps) * maxSearchDistance;
+
+    for (let angleStep = 0; angleStep < angleSteps; angleStep++) {
+      const angle = (angleStep / angleSteps) * 2 * Math.PI;
+
+      // Calculate candidate position
+      const candidateX = semanticX + distance * Math.cos(angle);
+      const candidateY = semanticY + distance * Math.sin(angle);
+
+      // Ensure candidate is within bounds
+      const clampedX = Math.max(minPercent, Math.min(maxPercent, candidateX));
+      const clampedY = Math.max(minPercent, Math.min(maxPercent, candidateY));
+
+      // Check if this position is valid
+      if (
+        isValidPosition(
+          clampedX,
+          clampedY,
+          radius,
+          placedBubbles,
+          containerWidth,
+          containerHeight,
+        )
+      ) {
+        return { x: clampedX, y: clampedY };
+      }
+    }
+  }
+
+  // If no valid position found, return semantic position (fallback)
+  // This means the chart is too crowded
+  return { x: semanticX, y: semanticY };
+};
+
 const BubbleChart = ({ data }: BubbleChartProps) => {
   const [hoveredBubble, setHoveredBubble] = useState<string | null>(null);
   const [brokenImages, setBrokenImages] = useState<Set<string>>(new Set());
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const memoizedData = useMemo(() => data, [data]);
+
+  // Clear any pending hide timeout
+  const clearHideTimeout = useCallback(() => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+      hideTimeoutRef.current = null;
+    }
+  }, []);
+
+  // Handle mouse entering bubble
+  const handleBubbleEnter = useCallback(
+    (companyKey: string) => {
+      clearHideTimeout();
+      setHoveredBubble(companyKey);
+    },
+    [clearHideTimeout],
+  );
+
+  // Handle mouse leaving bubble
+  const handleBubbleLeave = useCallback(() => {
+    clearHideTimeout();
+    // Start 300ms grace period
+    hideTimeoutRef.current = setTimeout(() => {
+      setHoveredBubble(null);
+    }, 300);
+  }, [clearHideTimeout]);
+
+  // Handle mouse entering tooltip
+  const handleTooltipEnter = useCallback(() => {
+    clearHideTimeout();
+  }, [clearHideTimeout]);
+
+  // Handle mouse leaving tooltip
+  const handleTooltipLeave = useCallback(() => {
+    setHoveredBubble(null);
+  }, []);
 
   // Calculate dynamic bubble sizes based on revenue and employees
   const companySizes = useMemo(() => {
@@ -76,6 +270,105 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
     const key = `${companyId}-${companyName}`;
     setBrokenImages((prev) => new Set(prev).add(key));
   };
+
+  // Pre-calculate all bubble positions with collision avoidance
+  const bubblePositions = useMemo(() => {
+    const minPercent = 10;
+    const maxPercent = 90;
+    const minSize = 40;
+    const maxSize = 120;
+
+    // Container dimensions (estimated for calculation purposes)
+    // These are approximate since the actual container is percentage-based
+    const containerWidth = 1000; // pixels (approximate)
+    const containerHeight = 500; // pixels (approximate)
+
+    const placedBubbles: PlacedBubble[] = [];
+    const positions = new Map<
+      string,
+      {
+        x: number;
+        y: number;
+        size: number;
+        wasJittered: boolean;
+        zIndex: number;
+      }
+    >();
+
+    // Sort companies alphabetically by name for consistent placement order
+    const sortedData = [...memoizedData].sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+
+    sortedData.forEach((company) => {
+      const companyKey = `${company.id}-${company.name}`;
+
+      // Get bubble size
+      const sizeScore =
+        companySizes.get(companyKey) ??
+        (company.type === 'incumbent' ? 20 : 10);
+      const bubbleSize = minSize + (sizeScore / 100) * (maxSize - minSize);
+
+      // Get semantic position
+      const rawX = (company.competitorScore / 100) * 100;
+      const rawY = (company.establishedScore / 100) * 100;
+      const semanticX = Math.max(minPercent, Math.min(maxPercent, rawX));
+      const semanticY = Math.max(minPercent, Math.min(maxPercent, rawY));
+
+      // Find safe position
+      const safePos = findSafePosition(
+        semanticX,
+        semanticY,
+        bubbleSize / 2, // radius is half the diameter
+        placedBubbles,
+        containerWidth,
+        containerHeight,
+        minPercent,
+        maxPercent,
+      );
+
+      const wasJittered = safePos.x !== semanticX || safePos.y !== semanticY;
+
+      // Store position (z-index will be calculated after all positions are known)
+      positions.set(companyKey, {
+        x: safePos.x,
+        y: safePos.y,
+        size: bubbleSize,
+        wasJittered,
+        zIndex: 0, // Temporary, will be updated
+      });
+
+      // Add to placed bubbles for next iteration
+      placedBubbles.push({
+        x: safePos.x,
+        y: safePos.y,
+        radius: bubbleSize / 2,
+        company,
+      });
+    });
+
+    // Calculate z-index: smaller bubbles on top, tiebreaker by y position (top first)
+    // Sort by size (ascending) then by y (ascending)
+    const sortedEntries = Array.from(positions.entries()).sort((a, b) => {
+      const [, posA] = a;
+      const [, posB] = b;
+
+      // Primary sort: smaller size = higher z-index
+      if (posA.size !== posB.size) {
+        return posA.size - posB.size;
+      }
+
+      // Tiebreaker: lower y (closer to top) = higher z-index
+      return posA.y - posB.y;
+    });
+
+    // Assign z-index based on sort order
+    sortedEntries.forEach(([key, pos], index) => {
+      positions.set(key, { ...pos, zIndex: index + 1 });
+    });
+
+    return positions;
+  }, [memoizedData, companySizes]);
 
   return (
     <div className='aucctus-bg-primary rounded-lg border'>
@@ -152,23 +445,11 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
             {memoizedData.map((company, index) => {
               const companyKey = `${company.id}-${company.name}`;
 
-              // Get dynamic size score (0-100) and map to pixel size (40-120px)
-              const sizeScore = companySizes.get(companyKey) || 50;
-              const minSize = 40;
-              const maxSize = 120;
-              const bubbleSize =
-                minSize + (sizeScore / 100) * (maxSize - minSize);
+              // Get pre-calculated position and size
+              const position = bubblePositions.get(companyKey);
+              if (!position) return null; // Safety check
 
-              // Calculate the percentage of the container that the bubble radius represents
-              // We need to keep bubbles within bounds by clamping their position
-              const minPercent = 10; // 5% margin from edges
-              const maxPercent = 90; // 95% margin from edges
-
-              // Clamp the position to keep bubbles within bounds
-              const rawX = (company.competitorScore / 100) * 100;
-              const rawY = (company.establishedScore / 100) * 100;
-              const x = Math.max(minPercent, Math.min(maxPercent, rawX));
-              const y = Math.max(minPercent, Math.min(maxPercent, rawY));
+              const { x, y, size: bubbleSize, wasJittered, zIndex } = position;
 
               const isImageBroken = brokenImages.has(companyKey);
               const shouldShowImage =
@@ -184,10 +465,10 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
                     left: `${x}%`,
                     top: `${y}%`,
                     transform: 'translate(-50%, -50%)',
-                    zIndex: hoveredBubble === companyKey ? 20 : 1,
+                    zIndex: hoveredBubble === companyKey ? 9999 : zIndex,
                   }}
-                  onMouseEnter={() => setHoveredBubble(companyKey)}
-                  onMouseLeave={() => setHoveredBubble(null)}
+                  onMouseEnter={() => handleBubbleEnter(companyKey)}
+                  onMouseLeave={handleBubbleLeave}
                 >
                   <div
                     className='flex cursor-pointer items-center justify-center overflow-hidden font-bold shadow-lg transition-all duration-300'
@@ -205,7 +486,9 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
                         hoveredBubble === companyKey
                           ? '0 8px 30px rgba(0,0,0,0.25)'
                           : '0 4px 15px rgba(0,0,0,0.15)',
-                      border: '2px solid rgba(100,100,100,0.3)',
+                      border: wasJittered
+                        ? '2px dashed rgba(100,100,100,0.5)'
+                        : '2px solid rgba(100,100,100,0.3)',
                       borderRadius: '50%',
                     }}
                   >
@@ -235,6 +518,8 @@ const BubbleChart = ({ data }: BubbleChartProps) => {
                   <CompanyTooltip
                     company={company}
                     isVisible={hoveredBubble === companyKey}
+                    onMouseEnter={handleTooltipEnter}
+                    onMouseLeave={handleTooltipLeave}
                   />
                 </div>
               );

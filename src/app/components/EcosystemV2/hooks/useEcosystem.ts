@@ -41,16 +41,19 @@ export interface Company {
   revenue?: number | null;
   revenueSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
   revenueSourceLabel?: string | null;
+  revenueSourceUrl?: string | null;
   revenueAiExplanation?: string | null;
 
   employees?: number | null;
   employeesSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
   employeesSourceLabel?: string | null;
+  employeesSourceUrl?: string | null;
   employeesAiExplanation?: string | null;
 
   funding?: number | null;
   fundingSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
   fundingSourceLabel?: string | null;
+  fundingSourceUrl?: string | null;
   fundingAiExplanation?: string | null;
 
   parentCompany?: string | null;
@@ -187,14 +190,17 @@ const mapCompany = (
     revenue: company.revenue,
     revenueSourceType: company.revenueSourceType,
     revenueSourceLabel: company.revenueSourceLabel,
+    revenueSourceUrl: company.revenueSourceUrl,
     revenueAiExplanation: company.revenueAiExplanation,
     employees: company.employees,
     employeesSourceType: company.employeesSourceType,
     employeesSourceLabel: company.employeesSourceLabel,
+    employeesSourceUrl: company.employeesSourceUrl,
     employeesAiExplanation: company.employeesAiExplanation,
     funding: company.funding,
     fundingSourceType: company.fundingSourceType,
     fundingSourceLabel: company.fundingSourceLabel,
+    fundingSourceUrl: company.fundingSourceUrl,
     fundingAiExplanation: company.fundingAiExplanation,
     parentCompany: company.parentCompany,
   };
@@ -206,6 +212,8 @@ export const useEcosystem = (conceptId: string): EcosystemCompanyData => {
     queryFn: () => api.marketScan.getEcosystemV2(conceptId),
     enabled: Boolean(conceptId),
     retry: false, // Don't retry on 404 - data isn't ready yet
+    staleTime: 1000 * 60 * 5, // 5 minutes - same as trends query
+    cacheTime: 1000 * 60 * 5, // 5 minutes
     refetchInterval: (data) => {
       // If concept needs upgrade, stop polling
       if (data?.needsUpgrade) return false;

@@ -138,49 +138,71 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
   // Helper function to render source badge with optional tooltip for AI reasoning
   const renderSourceBadge = (
     source: SourceDisplay | null,
+    sourceUrl?: string | null,
     aiExplanation?: string | null,
   ) => {
     if (!source) return null;
 
+    const handleClick = () => {
+      if (sourceUrl) {
+        window.open(sourceUrl, '_blank');
+      }
+    };
+
     const badgeContent = (
-      <Badge.WithIcon className='aucctus-border-primary aucctus-text-primary w-fit gap-1.5'>
-        {source.iconUrl ? (
-          <img
-            src={source.iconUrl as string}
-            alt={source.label}
-            className='h-4 w-4 rounded'
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.display = 'none';
-            }}
-          />
-        ) : (
-          <Icon
-            variant={source.iconVariant || 'link-external'}
-            className='aucctus-stroke-primary h-4 w-4'
-          />
-        )}
-        <span className='text-xs font-medium'>{source.label}</span>
-      </Badge.WithIcon>
+      <div
+        className={cn('inline-flex', sourceUrl && 'cursor-pointer')}
+        onClick={sourceUrl ? handleClick : undefined}
+      >
+        <Badge.WithIcon
+          className={cn(
+            'aucctus-border-primary aucctus-text-primary w-fit max-w-[200px] gap-1.5',
+            sourceUrl && 'transition-colors hover:bg-gray-100',
+          )}
+        >
+          {source.iconUrl ? (
+            <img
+              src={source.iconUrl as string}
+              alt={source.label}
+              className='h-4 w-4 flex-shrink-0 rounded'
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          ) : (
+            <Icon
+              variant={source.iconVariant || 'link-external'}
+              className='aucctus-stroke-primary h-4 w-4 flex-shrink-0'
+            />
+          )}
+          <span className='line-clamp-1 text-xs font-medium'>
+            {source.label}
+          </span>
+        </Badge.WithIcon>
+      </div>
     );
 
-    // If it's AI reasoning and we have an explanation, wrap in tooltip
-    if (source.label === 'AI Reasoning' && aiExplanation) {
-      return (
-        <ComponentTooltip
-          tip={
-            <div className='aucctus-bg-primary aucctus-border-secondary max-w-xs rounded border px-3 py-2 shadow-lg'>
-              <p className='aucctus-text-primary aucctus-text-xs'>
-                {aiExplanation}
-              </p>
-            </div>
-          }
-        >
-          <span className='inline-flex'>{badgeContent}</span>
-        </ComponentTooltip>
-      );
-    }
+    // Always wrap in tooltip to show full label
+    const tooltipContent = aiExplanation ? (
+      <div className='aucctus-bg-primary aucctus-border-secondary max-w-xs rounded border px-3 py-2 shadow-lg'>
+        <p className='aucctus-text-primary aucctus-text-xs mb-2 font-semibold'>
+          {source.label}
+        </p>
+        <p className='aucctus-text-secondary aucctus-text-xs'>
+          {aiExplanation}
+        </p>
+      </div>
+    ) : (
+      <div className='aucctus-bg-primary aucctus-border-secondary rounded border px-2 py-1 shadow-lg'>
+        <p className='aucctus-text-primary aucctus-text-xs'>{source.label}</p>
+      </div>
+    );
 
-    return badgeContent;
+    return (
+      <ComponentTooltip tip={tooltipContent}>
+        <span className='inline-flex'>{badgeContent}</span>
+      </ComponentTooltip>
+    );
   };
 
   return (
@@ -237,14 +259,6 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
               </span>
             </Badge.WithIcon>
             <div className='flex items-center gap-2'>
-              <a
-                href={`mailto:contact@${company.website?.replace('https://', '').replace('http://', '').replace('www.', '')}`}
-                target='_blank'
-                rel='noopener noreferrer'
-                className='flex h-8 w-8 items-center justify-center rounded bg-black hover:bg-black/90'
-              >
-                <Icon variant='mail' className='aucctus-stroke-white h-4 w-4' />
-              </a>
               {company.website && (
                 <a
                   href={company.website}
@@ -288,7 +302,11 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                   }).format(company.revenue)
                 : 'N/A'}
             </div>
-            {renderSourceBadge(revenueSource, company.revenueAiExplanation)}
+            {renderSourceBadge(
+              revenueSource,
+              company.revenueSourceUrl,
+              company.revenueAiExplanation,
+            )}
           </div>
 
           {/* Employees Card */}
@@ -297,7 +315,11 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
             <div className='aucctus-text-primary mb-3 text-2xl font-bold'>
               {company.employees?.toLocaleString() || 'N/A'}
             </div>
-            {renderSourceBadge(employeesSource, company.employeesAiExplanation)}
+            {renderSourceBadge(
+              employeesSource,
+              company.employeesSourceUrl,
+              company.employeesAiExplanation,
+            )}
           </div>
 
           {/* Funding Raised / Parent Company Card */}
@@ -315,7 +337,11 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                 : company.parentCompany || 'Independent'}
             </div>
             {company.type === 'startup' &&
-              renderSourceBadge(fundingSource, company.fundingAiExplanation)}
+              renderSourceBadge(
+                fundingSource,
+                company.fundingSourceUrl,
+                company.fundingAiExplanation,
+              )}
           </div>
         </div>
 
@@ -383,7 +409,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                 >
                   {/* Product Image - Wider, full width */}
                   <div
-                    className='aucctus-bg-secondary relative overflow-hidden'
+                    className='aucctus-bg-secondary group relative overflow-hidden'
                     style={{ height: '180px' }}
                   >
                     {product.image ? (
@@ -400,6 +426,25 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                         />
                       </div>
                     )}
+                    {/* View Product Button */}
+                    <button
+                      className='absolute right-2 top-2 flex items-center gap-1.5 rounded border border-white/60 bg-black/40 px-2 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md transition-all hover:bg-black/50'
+                      onClick={() => {
+                        if (product.url) {
+                          window.open(product.url, '_blank');
+                          return;
+                        }
+                        if (company.website) {
+                          window.open(company.website, '_blank');
+                        }
+                      }}
+                    >
+                      <Icon
+                        variant='link-external'
+                        className='h-3.5 w-3.5 stroke-white'
+                      />
+                      View Product
+                    </button>
                   </div>
 
                   {/* Product Info */}

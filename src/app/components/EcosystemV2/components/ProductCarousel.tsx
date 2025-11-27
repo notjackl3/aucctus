@@ -145,7 +145,13 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ ecosystemData }) => {
 
                   {/* Company Badge */}
                   <ComponentTooltip
-                    tip={<CompanyTooltip company={company} isVisible={true} />}
+                    tip={
+                      <CompanyTooltip
+                        company={company}
+                        isVisible={true}
+                        productDifferentiator={product.differentiator}
+                      />
+                    }
                     preferredPosition='below'
                   >
                     <div

@@ -277,16 +277,19 @@ export interface IEcosystemCompany {
   revenue?: number | null;
   revenueSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
   revenueSourceLabel?: string | null;
+  revenueSourceUrl?: string | null;
   revenueAiExplanation?: string | null;
 
   employees?: number | null;
   employeesSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
   employeesSourceLabel?: string | null;
+  employeesSourceUrl?: string | null;
   employeesAiExplanation?: string | null;
 
   funding?: number | null;
   fundingSourceType?: 'direct' | 'ai_reasoning' | 'unknown' | null;
   fundingSourceLabel?: string | null;
+  fundingSourceUrl?: string | null;
   fundingAiExplanation?: string | null;
 
   parentCompany?: string | null;

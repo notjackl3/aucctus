@@ -4,11 +4,17 @@ import type { Company } from '../hooks/useEcosystem';
 interface CompanyTooltipProps {
   company: Company;
   isVisible: boolean;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+  productDifferentiator?: string; // Optional: override with product differentiator
 }
 
 const CompanyTooltip: React.FC<CompanyTooltipProps> = ({
   company,
   isVisible,
+  onMouseEnter,
+  onMouseLeave,
+  productDifferentiator,
 }) => {
   const [isImageBroken, setIsImageBroken] = useState(false);
 
@@ -17,8 +23,18 @@ const CompanyTooltip: React.FC<CompanyTooltipProps> = ({
   const shouldShowImage =
     company.logoType === 'image' && company.logoUrl && !isImageBroken;
 
+  // Use product differentiator if provided, otherwise fall back to first relevant product's differentiator, then company differentiator
+  const displayDifferentiator =
+    productDifferentiator ||
+    company.relevantProducts?.[0]?.differentiator ||
+    company.differentiator;
+
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary absolute left-1/2 top-full z-50 mt-3 w-72 -translate-x-1/2 rounded-lg border p-4 shadow-2xl'>
+    <div
+      className='aucctus-bg-primary aucctus-border-secondary absolute left-1/2 top-full z-50 mt-3 w-72 -translate-x-1/2 rounded-lg border p-4 shadow-2xl'
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <div className='mb-2 flex items-center gap-3'>
         <div
           className='flex h-10 w-10 items-center justify-center overflow-hidden rounded-full border-2 border-white font-bold text-white shadow-md'
@@ -47,7 +63,7 @@ const CompanyTooltip: React.FC<CompanyTooltipProps> = ({
         {company.product}
       </p>
       <p className='aucctus-text-xs aucctus-text-primary mb-3 leading-relaxed'>
-        {company.differentiator}
+        {displayDifferentiator}
       </p>
       <a
         href={company.website}
