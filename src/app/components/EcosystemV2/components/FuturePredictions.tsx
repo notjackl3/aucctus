@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
-import { Icon, Button } from '@components';
+import React, { useRef, useCallback } from 'react';
+import { Icon, Button, Badge, ComponentTooltip } from '@components';
 import ComponentCarousel, {
   ComponentCarouselRef,
 } from '../../Carousel/ComponentCarousel';
-import SourceInfoBadge from '../../Badges/SourceInfoBadge';
+import MultiSourceBadge from '../../../pages/Concept/Report/MarketScan/components/sources/MultiSourceBadge';
 import type { FuturePrediction } from '../hooks/useEcosystem';
+import type { ISource } from '@libs/api/types';
+import { cn } from '@libs/utils/react';
 
 interface FuturePredictionsProps {
   predictions: FuturePrediction[];
@@ -14,6 +16,152 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
   predictions,
 }) => {
   const predictionsCarouselRef = useRef<ComponentCarouselRef>(null);
+
+  // Create source description with citations (similar to PriorityInsightCard)
+  const createSourceDescriptionWithCitations = useCallback(
+    (source: ISource, prediction: FuturePrediction) => {
+      // Check if the source has citations in the original prediction data
+      const originalSource = prediction.sources?.find(
+        (s) => s.uuid === source.uuid,
+      );
+      const citations =
+        (originalSource as any)?.citations || (source as any)?.citations || [];
+
+      if (!source.description && (!citations || citations.length === 0)) {
+        return null; // Will fallback to URL
+      }
+
+      return (
+        <div className='space-y-2'>
+          {source.description && (
+            <div className='aucctus-text-xs aucctus-text-secondary'>
+              {source.description}
+            </div>
+          )}
+          {citations && citations.length > 0 && (
+            <div className='aucctus-text-xs aucctus-text-tertiary space-y-1 italic'>
+              {citations.map((citation: string, index: number) => {
+                // Strip existing quotes to prevent double-quoting
+                let cleaned = citation.trim();
+                cleaned = cleaned.replace(/^[""]/, '').replace(/[""]$/, '');
+                cleaned = cleaned.replace(/^['']/, '').replace(/['']$/, '');
+                cleaned = cleaned.replace(/^[`]/, '').replace(/[`]$/, '');
+                return <div key={index}>&ldquo;{cleaned}&rdquo;</div>;
+              })}
+            </div>
+          )}
+        </div>
+      );
+    },
+    [],
+  );
+
+  // Render source badges with "more sources" functionality
+  const renderSourceBadges = useCallback(
+    (sources: ISource[], prediction: FuturePrediction) => {
+      if (!sources || sources.length === 0) {
+        return null;
+      }
+
+      const maxVisibleSources = 3;
+      const shouldUseMultiBadge = sources.length > maxVisibleSources;
+      const visibleCount = shouldUseMultiBadge
+        ? maxVisibleSources - 1
+        : sources.length;
+
+      return (
+        <div className='mt-1 flex flex-wrap items-center gap-2'>
+          {sources.length <= maxVisibleSources ? (
+            // Show all sources if <= maxVisibleSources
+            sources.map((source) => (
+              <Badge.SourceInfo
+                key={source.uuid}
+                badgeSize='small'
+                badgeClassName='aucctus-text-primary whitespace-nowrap'
+                source={source}
+                onClick={() => window.open(source.url, '_blank')}
+                showPublishedDate={false}
+                sourceDescription={createSourceDescriptionWithCitations(
+                  source,
+                  prediction,
+                )}
+                hideDelay={0}
+              />
+            ))
+          ) : (
+            // Show first (maxVisibleSources - 1) sources + MultiSourceBadge for the rest
+            <>
+              {sources.slice(0, visibleCount).map((source) => (
+                <Badge.SourceInfo
+                  key={source.uuid}
+                  badgeSize='small'
+                  badgeClassName='aucctus-text-primary whitespace-nowrap'
+                  source={source}
+                  onClick={() => window.open(source.url, '_blank')}
+                  showPublishedDate={false}
+                  sourceDescription={createSourceDescriptionWithCitations(
+                    source,
+                    prediction,
+                  )}
+                  hideDelay={0}
+                />
+              ))}
+
+              {/* Remaining sources - MultiSourceBadge with tooltip */}
+              <ComponentTooltip
+                tip={
+                  <div
+                    className='aucctus-bg-primary aucctus-border-secondary max-w-sm overflow-y-auto overscroll-contain rounded-lg border'
+                    style={{
+                      boxShadow:
+                        '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
+                    }}
+                  >
+                    {sources.slice(visibleCount).map((source, index) => (
+                      <div
+                        key={source.uuid}
+                        className={cn(
+                          'flex cursor-pointer flex-col gap-2 p-3 transition-colors hover:bg-gray-50',
+                          index < sources.slice(visibleCount).length - 1 &&
+                            'aucctus-border-secondary border-b',
+                        )}
+                        onClick={() => window.open(source.url, '_blank')}
+                      >
+                        <div className='pointer-events-none'>
+                          <Badge.SourceInfo
+                            badgeSize='small'
+                            badgeClassName='aucctus-text-primary whitespace-nowrap'
+                            source={source}
+                            showPublishedDate={false}
+                          />
+                        </div>
+                        <div className='aucctus-text-xs-semibold aucctus-text-primary'>
+                          {source.title}
+                        </div>
+                        {createSourceDescriptionWithCitations(
+                          source,
+                          prediction,
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                }
+                hideDelay={300}
+              >
+                <div className='cursor-pointer'>
+                  <MultiSourceBadge
+                    sources={sources.slice(visibleCount)}
+                    width={80}
+                  />
+                </div>
+              </ComponentTooltip>
+            </>
+          )}
+        </div>
+      );
+    },
+    [createSourceDescriptionWithCitations],
+  );
 
   return (
     <>
@@ -76,23 +224,8 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
                 {prediction.description}
               </p>
 
-              {/* Source Badges */}
-              {prediction.sources && prediction.sources.length > 0 && (
-                <div className='flex flex-wrap items-center gap-2'>
-                  {prediction.sources.map((source, idx) => (
-                    <SourceInfoBadge
-                      key={idx}
-                      source={source}
-                      badgeSize='small'
-                      onClick={
-                        source.url
-                          ? () => window.open(source.url!, '_blank')
-                          : undefined
-                      }
-                    />
-                  ))}
-                </div>
-              )}
+              {/* Source Badges with "more sources" functionality */}
+              {renderSourceBadges(prediction.sources, prediction)}
             </div>
           ))}
         </ComponentCarousel>
