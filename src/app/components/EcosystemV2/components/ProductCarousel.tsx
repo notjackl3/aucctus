@@ -28,7 +28,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ ecosystemData }) => {
   return (
     <>
       {/* Header with Navigation */}
-      <div className='px-0 pb-4'>
+      <div className='px-0 pt-4'>
         <div className='flex items-center justify-between'>
           <div className='flex-1'>
             <h3 className='aucctus-text-primary flex items-center gap-2 text-xl font-semibold tracking-tight'>
@@ -67,7 +67,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ ecosystemData }) => {
       </div>
 
       {/* Carousel */}
-      <div className='rounded-lg'>
+      <div className='rounded-lg' style={{ marginTop: '1rem' }}>
         <ComponentCarousel
           ref={carouselRef}
           cardWidth='280px'

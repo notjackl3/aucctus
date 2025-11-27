@@ -214,6 +214,7 @@ export const useEcosystem = (conceptId: string): EcosystemCompanyData => {
     retry: false, // Don't retry on 404 - data isn't ready yet
     staleTime: 1000 * 60 * 5, // 5 minutes - same as trends query
     cacheTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: false, // Don't refetch when window regains focus - prevents jarring refresh
     refetchInterval: (data) => {
       // If concept needs upgrade, stop polling
       if (data?.needsUpgrade) return false;

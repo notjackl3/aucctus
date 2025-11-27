@@ -133,7 +133,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
           className='space-y-4'
         >
           {/* Card Header */}
-          <div className='px-0 pb-4'>
+          <div className='px-0 pt-2'>
             <div className='flex items-center justify-between'>
               <div className='flex-1'>
                 <h3 className='aucctus-text-primary flex items-center gap-2 text-xl font-semibold tracking-tight'>

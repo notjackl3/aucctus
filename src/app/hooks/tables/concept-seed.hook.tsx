@@ -396,7 +396,7 @@ export const useSeedsBank = (
                   onClick={() => {
                     // Navigate to Idea Playground for IDEA_PLAYGROUND type seeds
                     if (seedType === 'IDEA_PLAYGROUND') {
-                      navigate(`${AppPath.IdeaPlayground}?seed=${seedUuid}`);
+                      // navigate(`${AppPath.IdeaPlayground}?seed=${seedUuid}`);
                     } else {
                       // Default behavior for concept incubation seeds
                       resetQuestionnaire();

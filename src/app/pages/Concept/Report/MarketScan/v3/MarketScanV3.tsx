@@ -59,10 +59,13 @@ const MarketScanV3: React.FC = () => {
       trendsQuery.isLoading || trendsQuery.isFetching,
       priorityInsightsQuery.isLoading || priorityInsightsQuery.isFetching,
       marketForcesQuery.isLoading || marketForcesQuery.isFetching,
-      executiveSummariesQuery.isLoading || executiveSummariesQuery.isFetching,
     ],
   });
-  const showSkeletons = isSectionPending || hasBlockingLoad;
+
+  // Separate loading states for better granularity
+  const showTrendsSkeletons = isSectionPending || hasBlockingLoad;
+  const showExecutiveSummarySkeleton =
+    executiveSummariesQuery.isLoading || executiveSummariesQuery.isFetching;
 
   const [selectedRadarCategory, setSelectedRadarCategory] =
     useState<IMarketForceV3 | null>(null);
@@ -85,7 +88,7 @@ const MarketScanV3: React.FC = () => {
 
   const marketScanTabs = useMemo(() => {
     // Show skeleton placeholders for tab labels during loading
-    if (showSkeletons) {
+    if (showTrendsSkeletons) {
       return [
         {
           label: (
@@ -135,7 +138,7 @@ const MarketScanV3: React.FC = () => {
         value: 'ecosystem',
       },
     ] as TabElement[];
-  }, [showSkeletons]);
+  }, [showTrendsSkeletons]);
 
   const onTabSelect = useCallback(
     (value: string) => {
@@ -155,8 +158,9 @@ const MarketScanV3: React.FC = () => {
 
     return (
       <div className='mx-auto flex max-w-[1600px] flex-col gap-8 p-4'>
+        {/* Executive Summary - separate loading state */}
         <div className='w-full'>
-          {showSkeletons ? (
+          {showExecutiveSummarySkeleton ? (
             <ExecutiveSummarySkeleton />
           ) : (
             <ExecutiveSummaryBanner
@@ -166,8 +170,9 @@ const MarketScanV3: React.FC = () => {
           )}
         </div>
 
+        {/* Trends content - uses trends loading state */}
         <div>
-          {showSkeletons ? (
+          {showTrendsSkeletons ? (
             <div className='aucctus-bg-primary aucctus-border-secondary flex h-[420px] w-full flex-col gap-4 rounded-lg border p-6 shadow-sm'>
               <div className='flex items-center justify-between'>
                 <SkeletonBlock className='h-4 w-48' />
@@ -192,7 +197,7 @@ const MarketScanV3: React.FC = () => {
         </div>
 
         <div>
-          {showSkeletons ? (
+          {showTrendsSkeletons ? (
             <PriorityInsightsSkeleton />
           ) : (
             priorityInsights.length > 0 && (
@@ -205,7 +210,7 @@ const MarketScanV3: React.FC = () => {
         </div>
 
         <div>
-          {showSkeletons ? (
+          {showTrendsSkeletons ? (
             <PESTELSkeleton count={Math.max(3, trends.length)} />
           ) : (
             trends.length > 0 && (
@@ -231,8 +236,9 @@ const MarketScanV3: React.FC = () => {
 
     return (
       <div className='mx-auto flex max-w-[1600px] flex-col gap-8 p-4'>
+        {/* Executive Summary - separate loading state */}
         <div className='w-full'>
-          {showSkeletons ? (
+          {showExecutiveSummarySkeleton ? (
             <ExecutiveSummarySkeleton />
           ) : (
             <ExecutiveSummaryBanner
@@ -241,15 +247,9 @@ const MarketScanV3: React.FC = () => {
             />
           )}
         </div>
-        {showSkeletons ? (
-          <div className='aucctus-bg-primary aucctus-border-secondary flex h-[560px] w-full flex-col gap-4 rounded-lg border p-6 shadow-sm'>
-            <SkeletonBlock className='h-4 w-40' />
-            <SkeletonBlock className='h-4 w-28' />
-            <SkeletonBlock className='h-full w-full rounded-xl' />
-          </div>
-        ) : (
-          <Ecosystem />
-        )}
+
+        {/* Ecosystem handles its own loading state internally */}
+        <Ecosystem />
       </div>
     );
   };

@@ -834,6 +834,7 @@ export const useConceptExecutiveSummaries = (conceptUuid?: string) => {
     queryKey: [AucctusQueryKeys.conceptExecutiveSummaries, conceptUuid],
     staleTime: 1000 * 20, // 20 seconds - summaries are relatively stable
     cacheTime: 1000 * 20, // 20 seconds
+    refetchOnWindowFocus: false, // Don't refetch on window focus - prevents full skeleton refresh
     queryFn: async () => {
       if (!conceptUuid) return undefined;
       const result =
