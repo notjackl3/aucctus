@@ -41,7 +41,7 @@ const ConceptGeneratingButton: FunctionComponent<
       hideDelay={0}
     >
       <ButtonComponent
-        className='btn btn-generating btn-bold'
+        className='btn btn-generating btn-bold btn-sm'
         disabled
         style={animationStyle as any}
       >

@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
 import { Header, Icon, Input, Table } from '@components';
-import NaturalLanguageFilterButton from '@components/Button/NaturalLanguageFilterButton';
 import CompactFilterRibbon from '@components/Tables/ConceptBank/CompactFilterRibbon';
 import {
   IConceptFilterOptions,
@@ -383,13 +382,6 @@ const ConceptBank: React.FC = () => {
 
           {/* Search and filter controls moved from child components */}
           <div className='flex items-center gap-3'>
-            {/* Natural Language Filter Button (only show for concepts, not drafts) */}
-            {!isDraftsRoute && (
-              <NaturalLanguageFilterButton
-                onFiltersApplied={handleNaturalLanguageFilters}
-              />
-            )}
-
             {/* Property management and column visibility (only show for concepts, not drafts) */}
             {!isDraftsRoute && (
               <>
@@ -483,16 +475,6 @@ const ConceptBank: React.FC = () => {
               </>
             )}
 
-            <div className='w-64'>
-              <Input.Search
-                name=''
-                type='text'
-                placeholder='Search'
-                value={filterOptions.search || ''}
-                onChange={handleSearchChange}
-              />
-            </div>
-
             {/* Keep FilterMenubar for drafts route only */}
             {isDraftsRoute && (
               <Table.SeedBank.FilterMenubar
@@ -505,6 +487,24 @@ const ConceptBank: React.FC = () => {
                 statusOptions={SEED_STATUS_OPTIONS}
               />
             )}
+
+            {/* Search input - Natural Language for concepts, regular for drafts */}
+            <div className='w-64'>
+              {!isDraftsRoute ? (
+                <Input.NaturalLanguageSearch
+                  onFiltersApplied={handleNaturalLanguageFilters}
+                  placeholder='Search with AI...'
+                />
+              ) : (
+                <Input.Search
+                  name=''
+                  type='text'
+                  placeholder='Search'
+                  value={filterOptions.search || ''}
+                  onChange={handleSearchChange}
+                />
+              )}
+            </div>
           </div>
         </div>
 

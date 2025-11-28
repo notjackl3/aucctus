@@ -81,7 +81,7 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
     >
       <span
         className={cn(
-          'aucctus-text-primary aucctus-text-md self-start',
+          'aucctus-text-primary aucctus-text-sm self-start',
           titleClassName,
         )}
       >
@@ -90,7 +90,7 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
       <animated.span
         ref={textRef}
         className={cn(
-          'aucctus-text-tertiary self-start text-sm font-medium leading-tight',
+          'aucctus-text-tertiary aucctus-text-sm self-start leading-tight',
           // Add word breaking and overflow handling to prevent horizontal overflow
           'hyphens-auto break-words',
           {

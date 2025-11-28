@@ -879,7 +879,7 @@ export const useConceptBank = (
                       {initials}
                     </div>
                   </div>
-                  <span className='aucctus-text-primary ml-2 max-w-[160px] truncate text-sm font-medium'>
+                  <span className='aucctus-text-primary aucctus-text-sm ml-2 max-w-[160px] truncate'>
                     {fullName}
                   </span>
                 </>
@@ -921,7 +921,7 @@ export const useConceptBank = (
         enableResizing: true,
         cell: (info) => {
           return (
-            <span className='aucctus-text-tertiary text-sm'>
+            <span className='aucctus-text-tertiary aucctus-text-sm'>
               {utils.time.formatDate(info.row.original.createdAt, {
                 month: 'short',
                 day: 'numeric',
@@ -971,7 +971,7 @@ export const useConceptBank = (
                       {initials}
                     </div>
                   </div>
-                  <span className='aucctus-text-primary ml-2 max-w-[160px] truncate text-sm font-medium'>
+                  <span className='aucctus-text-primary aucctus-text-sm ml-2 max-w-[160px] truncate'>
                     {fullName}
                   </span>
                 </>
@@ -1016,7 +1016,7 @@ export const useConceptBank = (
         enableResizing: true,
         cell: (info) => {
           return (
-            <span className='aucctus-text-tertiary text-sm'>
+            <span className='aucctus-text-tertiary aucctus-text-sm'>
               {utils.time.formatDate(info.row.original.updatedAt, {
                 month: 'short',
                 day: 'numeric',

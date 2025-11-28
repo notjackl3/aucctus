@@ -117,7 +117,7 @@ const LastModifiedByFilterSubmenu: React.FC<
           />
         </div>
 
-        {/* User list with checkboxes */}
+        {/* User list */}
         <div className='max-h-80 min-h-[240px] overflow-y-auto'>
           {users.length > 0 ? (
             users.map((user) => {
@@ -126,21 +126,13 @@ const LastModifiedByFilterSubmenu: React.FC<
               return (
                 <div
                   key={`user-${user.uuid}`}
-                  className='aucctus-bg-primary-hover flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 transition-colors'
+                  className='aucctus-bg-primary-hover flex cursor-pointer items-center justify-between gap-2 rounded-md px-3 py-2 transition-colors'
                   onClick={(e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     handleUserToggle(user);
                   }}
                 >
-                  <Input.CheckBox
-                    key={`checkbox-${user.uuid}-${isSelected}`}
-                    id={`filter-lastModifiedBy-${user.uuid}`}
-                    checked={isSelected}
-                    onChange={(e) => {
-                      e.stopPropagation();
-                    }}
-                  />
                   <div className='flex flex-1 items-center gap-2'>
                     <Avatar
                       firstName={user.firstName}
@@ -151,6 +143,12 @@ const LastModifiedByFilterSubmenu: React.FC<
                       {utils.account.getUsersFullName(user)}
                     </span>
                   </div>
+                  {isSelected && (
+                    <Icon
+                      variant='check'
+                      className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
+                    />
+                  )}
                 </div>
               );
             })

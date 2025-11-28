@@ -1,4 +1,4 @@
-import { Icon, Input } from '@components';
+import { Icon } from '@components';
 import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import { ConceptStatus } from '@libs/api/types';
 import utils from '@libs/utils';
@@ -44,76 +44,76 @@ const StatusFilterSubmenu: React.FC<IStatusFilterSubmenuProps> = ({
 
   const hasActiveFilter = localSelection && localSelection.size > 0;
 
-  const createStatusCheckItem = (value: ConceptStatus) => (
-    <div
-      key={value}
-      className='flex cursor-pointer items-center px-3 py-2'
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        setLocalSelection((prev) => {
-          const newSet = new Set(prev);
-          if (newSet.has(value)) {
-            newSet.delete(value);
-          } else {
-            newSet.add(value);
-          }
-          return newSet;
-        });
-      }}
-    >
-      <Input.CheckBox
-        key={`checkbox-${value}-${localSelection.has(value)}`}
-        id={`filter-status-${value}`}
-        checked={localSelection.has(value)}
-        onChange={(e) => {
+  const createStatusCheckItem = (value: ConceptStatus) => {
+    const isSelected = localSelection.has(value);
+    return (
+      <div
+        key={value}
+        className='aucctus-bg-primary-hover flex cursor-pointer items-center justify-between gap-2 rounded px-3 py-2 transition-colors'
+        onClick={(e) => {
+          e.preventDefault();
           e.stopPropagation();
-          // Toggle is handled by parent div onClick
+
+          setLocalSelection((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(value)) {
+              newSet.delete(value);
+            } else {
+              newSet.add(value);
+            }
+            return newSet;
+          });
         }}
-      />
-      <span className='aucctus-text-secondary ml-2 text-sm font-medium'>
-        {utils.string.camelCaseToTitleCase(value)}
-      </span>
-    </div>
-  );
+      >
+        <span className='aucctus-text-secondary text-sm font-medium'>
+          {utils.string.camelCaseToTitleCase(value)}
+        </span>
+        {isSelected && (
+          <Icon
+            variant='check'
+            className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
+          />
+        )}
+      </div>
+    );
+  };
 
   const createCustomStatusCheckItem = (option: {
     value: string;
     label: string;
-  }) => (
-    <div
-      key={option.value}
-      className='flex cursor-pointer items-center px-3 py-2'
-      onClick={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-
-        setLocalSelection((prev) => {
-          const newSet = new Set(prev);
-          if (newSet.has(option.value as ConceptStatus)) {
-            newSet.delete(option.value as ConceptStatus);
-          } else {
-            newSet.add(option.value as ConceptStatus);
-          }
-          return newSet;
-        });
-      }}
-    >
-      <Input.CheckBox
-        key={`checkbox-${option.value}-${localSelection.has(option.value as ConceptStatus)}`}
-        id={`filter-status-${option.value}`}
-        checked={localSelection.has(option.value as ConceptStatus)}
-        onChange={(e) => {
+  }) => {
+    const isSelected = localSelection.has(option.value as ConceptStatus);
+    return (
+      <div
+        key={option.value}
+        className='aucctus-bg-primary-hover flex cursor-pointer items-center justify-between gap-2 rounded px-3 py-2 transition-colors'
+        onClick={(e) => {
+          e.preventDefault();
           e.stopPropagation();
-          // Toggle is handled by parent div onClick
+
+          setLocalSelection((prev) => {
+            const newSet = new Set(prev);
+            if (newSet.has(option.value as ConceptStatus)) {
+              newSet.delete(option.value as ConceptStatus);
+            } else {
+              newSet.add(option.value as ConceptStatus);
+            }
+            return newSet;
+          });
         }}
-      />
-      <span className='aucctus-text-secondary ml-2 text-sm font-medium'>
-        {option.label}
-      </span>
-    </div>
-  );
+      >
+        <span className='aucctus-text-secondary text-sm font-medium'>
+          {option.label}
+        </span>
+        {isSelected && (
+          <Icon
+            variant='check'
+            className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
+          />
+        )}
+      </div>
+    );
+  };
 
   const handleClearFilter = () => {
     setLocalSelection(new Set());

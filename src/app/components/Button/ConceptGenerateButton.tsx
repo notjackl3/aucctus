@@ -25,12 +25,12 @@ const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
     { style: string; label: string | ReactNode }
   > = {
     complete: {
-      style: `btn btn-light btn-bold`,
+      style: `btn btn-light btn-bold btn-sm`,
       label: 'Open',
     },
 
     pending: {
-      style: `btn btn-light btn-bold`,
+      style: `btn btn-light btn-bold btn-sm`,
       label: (
         <span className='flex flex-row gap-2'>
           Loading
@@ -39,12 +39,12 @@ const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
       ),
     },
     notStarted: {
-      style: `btn btn-primary btn-bold`,
+      style: `btn btn-primary btn-bold btn-sm`,
       label: 'Generate',
     },
 
     error: {
-      style: `btn btn-light btn-bold`,
+      style: `btn btn-light btn-bold btn-sm`,
       label: (
         <>
           <Icon variant='refresh' height={20} width={20} /> Retry
@@ -52,7 +52,7 @@ const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
       ),
     },
     draft: {
-      style: `btn btn-light btn-bold`,
+      style: `btn btn-light btn-bold btn-sm`,
       label: 'Continue',
     },
   };

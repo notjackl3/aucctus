@@ -382,22 +382,19 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
         onOpenChange={(open) => setOpenDropdown(open ? dropdownKey : null)}
       >
         <Popover.Trigger asChild>
-          <div className='aucctus-bg-secondary flex max-w-md items-center gap-1.5 rounded-md px-2 py-1'>
+          <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700'>
             <Icon
               variant='search-md'
-              className='aucctus-stroke-tertiary h-3.5 w-3.5 flex-shrink-0'
+              className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
             />
-            <span className='aucctus-text-sm aucctus-text-secondary flex-shrink-0'>
+            <span className='aucctus-text-sm flex-shrink-0 text-blue-700'>
               Search:
             </span>
-            <span className='aucctus-text-sm aucctus-text-primary truncate'>
+            <span className='aucctus-text-sm truncate text-blue-700'>
               {filterOptions.search}
             </span>
-            <button className='aucctus-bg-tertiary-hover ml-0.5 flex-shrink-0 rounded p-0.5'>
-              <Icon
-                variant='chevrondown'
-                className='aucctus-stroke-tertiary h-3 w-3'
-              />
+            <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
+              <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-700' />
             </button>
           </div>
         </Popover.Trigger>
@@ -517,6 +514,10 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
     filterOptions.status,
   );
   const filterButtonRef = React.useRef<HTMLButtonElement>(null);
+  const hasSubmenuChangesRef = React.useRef(false);
+  const prevHoveredSubmenuRef = React.useRef<string | null>(null);
+
+  const submenuKey = 'status-filter-submenu';
 
   const dropdownTransition = useTransition(isOpen, {
     from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
@@ -528,17 +529,29 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
   React.useEffect(() => {
     if (isOpen) {
       setLocalSelection(filterOptions.status);
+      hasSubmenuChangesRef.current = false;
     }
   }, [isOpen, filterOptions.status]);
 
+  // Apply filter when submenu closes (hover away)
+  React.useEffect(() => {
+    const wasOpen = prevHoveredSubmenuRef.current === submenuKey;
+    const isNowClosed = hoveredSubmenu !== submenuKey;
+
+    if (wasOpen && isNowClosed && hasSubmenuChangesRef.current) {
+      onUpdateFilters({ status: localSelection });
+      hasSubmenuChangesRef.current = false;
+    }
+
+    prevHoveredSubmenuRef.current = hoveredSubmenu;
+  }, [hoveredSubmenu, localSelection, onUpdateFilters, submenuKey]);
+
   const handleClose = () => {
     onOpenChange(false);
-    if (localSelection !== filterOptions.status) {
-      onUpdateFilters({ status: localSelection });
-    }
   };
 
   const handleToggle = (status: ConceptStatus) => {
+    hasSubmenuChangesRef.current = true;
     setLocalSelection((prev) => {
       const newSet = new Set(prev);
       if (newSet.has(status)) {
@@ -550,27 +563,22 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
     });
   };
 
-  const submenuKey = 'status-filter-submenu';
-
   return (
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
-        <div className='aucctus-bg-secondary flex max-w-md items-center gap-1.5 rounded-md px-2 py-1'>
+        <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700'>
           <Icon
             variant='loading-02'
-            className='aucctus-stroke-tertiary h-3.5 w-3.5 flex-shrink-0'
+            className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
           />
-          <span className='aucctus-text-sm aucctus-text-secondary flex-shrink-0'>
+          <span className='aucctus-text-sm flex-shrink-0 text-blue-700'>
             Status:
           </span>
-          <span className='aucctus-text-sm aucctus-text-primary truncate'>
+          <span className='aucctus-text-sm truncate text-blue-700'>
             {statusValues}
           </span>
-          <button className='aucctus-bg-tertiary-hover ml-0.5 flex-shrink-0 rounded p-0.5'>
-            <Icon
-              variant='chevrondown'
-              className='aucctus-stroke-tertiary h-3 w-3'
-            />
+          <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
+            <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-700' />
           </button>
         </div>
       </Popover.Trigger>
@@ -776,22 +784,19 @@ const UserFilterDropdown: React.FC<IUserFilterDropdownProps> = ({
   return (
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
-        <div className='aucctus-bg-secondary flex max-w-md items-center gap-1.5 rounded-md px-2 py-1'>
+        <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700'>
           <Icon
             variant={icon as any}
-            className='aucctus-stroke-tertiary h-3.5 w-3.5 flex-shrink-0'
+            className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
           />
-          <span className='aucctus-text-sm aucctus-text-secondary flex-shrink-0'>
+          <span className='aucctus-text-sm flex-shrink-0 text-blue-700'>
             {label}:
           </span>
-          <span className='aucctus-text-sm aucctus-text-primary truncate'>
+          <span className='aucctus-text-sm truncate text-blue-700'>
             {userNames}
           </span>
-          <button className='aucctus-bg-tertiary-hover ml-0.5 flex-shrink-0 rounded p-0.5'>
-            <Icon
-              variant='chevrondown'
-              className='aucctus-stroke-tertiary h-3 w-3'
-            />
+          <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
+            <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-700' />
           </button>
         </div>
       </Popover.Trigger>
@@ -1005,23 +1010,20 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
   return (
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
-        <div className='aucctus-bg-secondary flex max-w-md items-center gap-1.5 rounded-md px-2 py-1'>
+        <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700'>
           <Icon
             variant={icon as any}
-            className='aucctus-stroke-tertiary h-3.5 w-3.5 flex-shrink-0'
+            className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
           />
-          <span className='aucctus-text-sm aucctus-text-secondary flex-shrink-0'>
+          <span className='aucctus-text-sm flex-shrink-0 text-blue-700'>
             {name}:
           </span>
-          <span className='aucctus-text-sm aucctus-text-primary truncate'>
+          <span className='aucctus-text-sm truncate text-blue-700'>
             {operatorPrefix}
             {formattedValue}
           </span>
-          <button className='aucctus-bg-tertiary-hover ml-0.5 flex-shrink-0 rounded p-0.5'>
-            <Icon
-              variant='chevrondown'
-              className='aucctus-stroke-tertiary h-3 w-3'
-            />
+          <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
+            <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-700' />
           </button>
         </div>
       </Popover.Trigger>

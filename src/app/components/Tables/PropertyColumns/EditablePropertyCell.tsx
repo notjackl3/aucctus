@@ -244,7 +244,7 @@ const EditablePropertyCell: React.FC<IEditablePropertyCellProps> = ({
             {values.map((val: string, idx: number) => (
               <span
                 key={idx}
-                className='line-clamp-1 inline-flex items-center rounded-md border px-2 py-1 text-xs font-medium'
+                className='aucctus-text-sm line-clamp-1 inline-flex items-center rounded-md border px-2 py-1 font-medium'
                 style={getColoredTagStyles(
                   getOptionColor(String(val), definition),
                 )}

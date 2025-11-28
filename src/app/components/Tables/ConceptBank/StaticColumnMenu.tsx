@@ -210,7 +210,7 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
               e.stopPropagation();
             }}
           >
-            <span className='flex items-center gap-1.5'>
+            <span className='flex items-center gap-2'>
               {leadingIcon && (
                 <Icon
                   variant={leadingIcon}

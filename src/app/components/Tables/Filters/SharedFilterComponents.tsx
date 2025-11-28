@@ -1,4 +1,4 @@
-import { Avatar, Input } from '@components';
+import { Avatar, Icon, Input } from '@components';
 import { useAllUsers } from '@hooks/query/account.hook';
 import {
   ConceptStatus,
@@ -36,24 +36,22 @@ export const StatusFilterContent: React.FC<IStatusFilterContentProps> = ({
         return (
           <div
             key={status}
-            className='flex cursor-pointer items-center px-3 py-2'
+            className='aucctus-text-sm aucctus-text-primary aucctus-bg-primary-hover flex cursor-pointer items-center justify-between gap-2 rounded px-3 py-2 transition-colors'
             onClick={(e) => {
               e.preventDefault();
               e.stopPropagation();
               onToggle(status);
             }}
           >
-            <Input.CheckBox
-              key={`checkbox-${status}-${isSelected}`}
-              id={`filter-status-${status}`}
-              checked={isSelected}
-              onChange={(e) => {
-                e.stopPropagation();
-              }}
-            />
-            <span className='aucctus-text-secondary ml-2 text-sm font-medium'>
+            <span className='aucctus-text-secondary text-sm font-medium'>
               {utils.string.camelCaseToTitleCase(status)}
             </span>
+            {isSelected && (
+              <Icon
+                variant='check'
+                className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
+              />
+            )}
           </div>
         );
       })}
@@ -68,13 +66,13 @@ export const StatusFilterContent: React.FC<IStatusFilterContentProps> = ({
 interface IUserFilterContentProps {
   localSelection: Set<IUser> | undefined;
   onToggle: (user: IUser) => void;
-  filterType: 'createdBy' | 'lastModifiedBy';
+  /** @deprecated No longer used, kept for backwards compatibility */
+  filterType?: 'createdBy' | 'lastModifiedBy';
 }
 
 export const UserFilterContent: React.FC<IUserFilterContentProps> = ({
   localSelection,
   onToggle,
-  filterType,
 }) => {
   const [search, setSearch] = useState<string>('');
   const { users } = useAllUsers({ search });
@@ -104,21 +102,13 @@ export const UserFilterContent: React.FC<IUserFilterContentProps> = ({
             return (
               <div
                 key={`user-${user.uuid}`}
-                className='aucctus-bg-primary-hover flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 transition-colors'
+                className='aucctus-bg-primary-hover flex cursor-pointer items-center justify-between gap-2 rounded-md px-3 py-2 transition-colors'
                 onClick={(e) => {
                   e.preventDefault();
                   e.stopPropagation();
                   onToggle(user);
                 }}
               >
-                <Input.CheckBox
-                  key={`checkbox-${user.uuid}-${isSelected}`}
-                  id={`filter-${filterType}-${user.uuid}`}
-                  checked={isSelected}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                  }}
-                />
                 <div className='flex flex-1 items-center gap-2'>
                   <Avatar
                     firstName={user.firstName}
@@ -129,6 +119,12 @@ export const UserFilterContent: React.FC<IUserFilterContentProps> = ({
                     {utils.account.getUsersFullName(user)}
                   </span>
                 </div>
+                {isSelected && (
+                  <Icon
+                    variant='check'
+                    className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
+                  />
+                )}
               </div>
             );
           })

@@ -114,7 +114,7 @@ const InlineStatusDropdown: React.FC<InlineStatusDropdownProps> = ({
                       >
                         <span
                           className={cn(
-                            'text-xs font-medium capitalize',
+                            'aucctus-text-sm font-medium capitalize',
                             styles.text,
                           )}
                         >
@@ -255,7 +255,7 @@ const EditableStatusCell: React.FC<IEditableStatusCellProps> = ({
           onMouseDown={(e) => e.stopPropagation()}
           disabled={isUpdating}
           className={cn(
-            'group flex w-full items-center justify-start rounded px-2 py-1 text-left',
+            'group flex w-full items-center justify-start rounded py-1 text-left',
             {
               'cursor-pointer': !isUpdating,
               'cursor-not-allowed opacity-50': isUpdating,
@@ -274,7 +274,7 @@ const EditableStatusCell: React.FC<IEditableStatusCellProps> = ({
           >
             <span
               className={cn(
-                'font-inter text-center text-xs font-medium capitalize',
+                'font-inter aucctus-text-sm text-center font-medium capitalize',
                 'overflow-hidden truncate',
                 styles.text,
               )}
@@ -324,7 +324,7 @@ const EditableStatusCell: React.FC<IEditableStatusCellProps> = ({
                 >
                   <span
                     className={cn(
-                      'font-inter h-[20px] text-center text-sm font-medium capitalize leading-[20px]',
+                      'font-inter aucctus-text-sm h-[20px] text-center font-medium capitalize leading-[20px]',
                       'overflow-hidden truncate',
                       styles.text,
                     )}

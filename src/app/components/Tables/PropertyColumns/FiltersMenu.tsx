@@ -97,11 +97,39 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
   };
 
   // Helper to set submenu with delay (for mouse leave)
+  // Also applies buffered filters when closing a static column submenu
   const setSubmenuDelayed = (column: string | null) => {
     if (submenuCloseTimeoutRef.current) {
       clearTimeout(submenuCloseTimeoutRef.current);
     }
     submenuCloseTimeoutRef.current = setTimeout(() => {
+      // If closing (column is null) and we had a static column open, apply filters
+      if (column === null && hoveredColumn) {
+        const currentColumnKey = hoveredColumn;
+        const staticColumn = STATIC_FILTER_COLUMNS.find(
+          (col) => `static-${col.id}` === currentColumnKey,
+        );
+        if (staticColumn) {
+          // Apply buffered filters for static columns
+          if (staticColumn.type === 'status') {
+            if (localStatusSelection !== filterOptions.status) {
+              onUpdateFilters({ status: localStatusSelection });
+            }
+          } else if (staticColumn.type === 'user') {
+            if (
+              staticColumn.id === 'createdBy' &&
+              localCreatedBySelection !== filterOptions.createdBy
+            ) {
+              onUpdateFilters({ createdBy: localCreatedBySelection });
+            } else if (
+              staticColumn.id === 'lastModifiedBy' &&
+              localLastModifiedBySelection !== filterOptions.lastModifiedBy
+            ) {
+              onUpdateFilters({ lastModifiedBy: localLastModifiedBySelection });
+            }
+          }
+        }
+      }
       setHoveredColumn(column);
     }, 150);
   };
@@ -304,33 +332,6 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
         return newSet;
       });
     }
-  };
-
-  // Apply status filter
-  const applyStatusFilter = () => {
-    onUpdateFilters({
-      status: localStatusSelection.size > 0 ? localStatusSelection : undefined,
-    });
-  };
-
-  // Apply created by filter
-  const applyCreatedByFilter = () => {
-    onUpdateFilters({
-      createdBy:
-        localCreatedBySelection && localCreatedBySelection.size > 0
-          ? localCreatedBySelection
-          : undefined,
-    });
-  };
-
-  // Apply last modified by filter
-  const applyLastModifiedByFilter = () => {
-    onUpdateFilters({
-      lastModifiedBy:
-        localLastModifiedBySelection && localLastModifiedBySelection.size > 0
-          ? localLastModifiedBySelection
-          : undefined,
-    });
   };
 
   // Apply buffered filters when submenu closes
@@ -549,30 +550,23 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                     localSelection={localStatusSelection}
                                     onToggle={handleStatusToggle}
                                   />
-                                  {/* Apply/Clear buttons for Status */}
-                                  <div className='aucctus-border-secondary mt-3 flex items-center justify-end gap-2 border-t pt-2'>
-                                    <button
-                                      onClick={() => {
-                                        onUpdateFilters({ status: undefined });
-                                        setLocalStatusSelection(new Set());
-                                        setHoveredColumn(null);
-                                      }}
-                                      className='aucctus-text-sm aucctus-text-tertiary hover:aucctus-text-secondary rounded px-2 py-1 transition-colors'
-                                    >
-                                      Clear
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        applyStatusFilter();
-                                        setHoveredColumn(null);
-                                      }}
-                                      className='aucctus-text-sm aucctus-text-brand-primary aucctus-bg-brand-primary rounded px-2 py-1 font-medium transition-colors'
-                                    >
-                                      Apply{' '}
-                                      {localStatusSelection.size > 0 &&
-                                        `(${localStatusSelection.size})`}
-                                    </button>
-                                  </div>
+                                  {/* Clear button for Status */}
+                                  {localStatusSelection.size > 0 && (
+                                    <div className='aucctus-border-secondary mt-3 flex items-center justify-end border-t pt-2'>
+                                      <button
+                                        onClick={() => {
+                                          onUpdateFilters({
+                                            status: undefined,
+                                          });
+                                          setLocalStatusSelection(new Set());
+                                          setHoveredColumn(null);
+                                        }}
+                                        className='aucctus-text-sm aucctus-text-tertiary hover:aucctus-text-secondary rounded px-2 py-1 transition-colors'
+                                      >
+                                        Clear
+                                      </button>
+                                    </div>
+                                  )}
                                 </>
                               )}
                               {item.column.type === 'user' && (
@@ -606,48 +600,40 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                         | 'lastModifiedBy'
                                     }
                                   />
-                                  {/* Apply/Clear buttons for User filters */}
-                                  <div className='aucctus-border-secondary mt-3 flex items-center justify-end gap-2 border-t pt-2'>
-                                    <button
-                                      onClick={() => {
-                                        if (item.column.id === 'createdBy') {
-                                          onUpdateFilters({
-                                            createdBy: undefined,
-                                          });
-                                          setLocalCreatedBySelection(undefined);
-                                        } else {
-                                          onUpdateFilters({
-                                            lastModifiedBy: undefined,
-                                          });
-                                          setLocalLastModifiedBySelection(
-                                            undefined,
-                                          );
-                                        }
-                                        setHoveredColumn(null);
-                                      }}
-                                      className='aucctus-text-sm aucctus-text-tertiary hover:aucctus-text-secondary rounded px-2 py-1 transition-colors'
-                                    >
-                                      Clear
-                                    </button>
-                                    <button
-                                      onClick={() => {
-                                        if (item.column.id === 'createdBy') {
-                                          applyCreatedByFilter();
-                                        } else {
-                                          applyLastModifiedByFilter();
-                                        }
-                                        setHoveredColumn(null);
-                                      }}
-                                      className='aucctus-text-sm aucctus-text-brand-primary aucctus-bg-brand-primary rounded px-2 py-1 font-medium transition-colors'
-                                    >
-                                      Apply{' '}
-                                      {(item.column.id === 'createdBy'
-                                        ? localCreatedBySelection?.size
-                                        : localLastModifiedBySelection?.size) ||
-                                        (0 > 0 &&
-                                          `(${(item.column.id === 'createdBy' ? localCreatedBySelection?.size : localLastModifiedBySelection?.size) || 0})`)}
-                                    </button>
-                                  </div>
+                                  {/* Clear button for User filters */}
+                                  {((item.column.id === 'createdBy' &&
+                                    localCreatedBySelection &&
+                                    localCreatedBySelection.size > 0) ||
+                                    (item.column.id === 'lastModifiedBy' &&
+                                      localLastModifiedBySelection &&
+                                      localLastModifiedBySelection.size >
+                                        0)) && (
+                                    <div className='aucctus-border-secondary mt-3 flex items-center justify-end border-t pt-2'>
+                                      <button
+                                        onClick={() => {
+                                          if (item.column.id === 'createdBy') {
+                                            onUpdateFilters({
+                                              createdBy: undefined,
+                                            });
+                                            setLocalCreatedBySelection(
+                                              undefined,
+                                            );
+                                          } else {
+                                            onUpdateFilters({
+                                              lastModifiedBy: undefined,
+                                            });
+                                            setLocalLastModifiedBySelection(
+                                              undefined,
+                                            );
+                                          }
+                                          setHoveredColumn(null);
+                                        }}
+                                        className='aucctus-text-sm aucctus-text-tertiary hover:aucctus-text-secondary rounded px-2 py-1 transition-colors'
+                                      >
+                                        Clear
+                                      </button>
+                                    </div>
+                                  )}
                                 </>
                               )}
                             </>

@@ -357,6 +357,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                 placeholder='e.g., Priority, Status, Budget'
                 disabled={isLoading}
                 className={cn(errors.name && 'aucctus-border-error')}
+                variant='settings'
               />
             </div>
           </div>
@@ -466,6 +467,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                   }
                 }}
                 disabled={isLoading}
+                variant='settings'
               />
               <button
                 onClick={handleAddOption}

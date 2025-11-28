@@ -3,17 +3,20 @@ import ConceptIgnition from './ConceptIgnition';
 import Default from './DebounceInput';
 import Field from './InputField/InputField';
 import Search from './SearchField';
+import NaturalLanguageSearch from './NaturalLanguageSearchInput';
 import TextArea from './TextArea/TextArea';
 
 (Default as any).CheckBox = CheckBox;
 (Default as any).ConceptIgnition = ConceptIgnition;
 (Default as any).Search = Search;
+(Default as any).NaturalLanguageSearch = NaturalLanguageSearch;
 (Default as any).TextArea = TextArea;
 (Default as any).Field = Field;
 
 const Input = Default as typeof Default & {
   CheckBox: typeof CheckBox;
   Search: typeof Search;
+  NaturalLanguageSearch: typeof NaturalLanguageSearch;
   TextArea: typeof TextArea;
   Field: typeof Field;
   ConceptIgnition: typeof ConceptIgnition;
