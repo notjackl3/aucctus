@@ -372,65 +372,31 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
     );
   }
 
-  // Search filter
+  // Search filter - simple chip with X button to clear
   if (filterOptions.search && filterOptions.search.trim()) {
-    const dropdownKey = 'search-filter';
     filterItems.push(
-      <Popover.Root
-        key={dropdownKey}
-        open={openDropdown === dropdownKey}
-        onOpenChange={(open) => setOpenDropdown(open ? dropdownKey : null)}
+      <div
+        key='search-filter'
+        className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-100 bg-blue-25 px-2 py-1 text-blue-800'
       >
-        <Popover.Trigger asChild>
-          <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700'>
-            <Icon
-              variant='search-md'
-              className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
-            />
-            <span className='aucctus-text-sm flex-shrink-0 text-blue-700'>
-              Search:
-            </span>
-            <span className='aucctus-text-sm truncate text-blue-700'>
-              {filterOptions.search}
-            </span>
-            <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
-              <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-700' />
-            </button>
-          </div>
-        </Popover.Trigger>
-
-        <Popover.Portal>
-          {dropdownTransition(
-            (styles, item) =>
-              item &&
-              openDropdown === dropdownKey && (
-                <Popover.Content asChild align='end' sideOffset={4}>
-                  <animated.div
-                    style={styles}
-                    className='aucctus-bg-primary aucctus-border-secondary z-[9999] w-[200px] rounded-md border p-1 shadow-lg'
-                  >
-                    {/* Remove Filter */}
-                    <button
-                      onClick={() => {
-                        onUpdateFilters({ search: '' });
-                        setOpenDropdown(null);
-                      }}
-                      className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                    >
-                      <Icon
-                        variant='trash'
-                        className='aucctus-stroke-error-primary h-4 w-4'
-                      />
-                      <span className='aucctus-text-error-primary'>
-                        Clear search
-                      </span>
-                    </button>
-                  </animated.div>
-                </Popover.Content>
-              ),
-          )}
-        </Popover.Portal>
-      </Popover.Root>,
+        <Icon
+          variant='search-md'
+          className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-800'
+        />
+        <span className='aucctus-text-sm flex-shrink-0 text-blue-800'>
+          Search:
+        </span>
+        <span className='aucctus-text-sm truncate text-blue-800'>
+          {filterOptions.search}
+        </span>
+        <button
+          onClick={() => onUpdateFilters({ search: '' })}
+          className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-100'
+          aria-label='Clear search'
+        >
+          <Icon variant='closeX' className='h-3 w-3 stroke-blue-800' />
+        </button>
+      </div>,
     );
   }
 
@@ -566,19 +532,19 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
   return (
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
-        <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700'>
+        <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-100 bg-blue-25 px-2 py-1 text-blue-800'>
           <Icon
             variant='loading-02'
-            className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
+            className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-800'
           />
-          <span className='aucctus-text-sm flex-shrink-0 text-blue-700'>
+          <span className='aucctus-text-sm flex-shrink-0 text-blue-800'>
             Status:
           </span>
-          <span className='aucctus-text-sm truncate text-blue-700'>
+          <span className='aucctus-text-sm truncate text-blue-800'>
             {statusValues}
           </span>
           <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
-            <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-700' />
+            <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-800' />
           </button>
         </div>
       </Popover.Trigger>

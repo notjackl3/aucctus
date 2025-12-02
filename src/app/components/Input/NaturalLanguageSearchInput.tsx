@@ -2,7 +2,7 @@ import { Icon } from '@components';
 import { toast } from '@components/Notification/toast';
 import { IPropertyFilter } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback } from 'react';
 import api from '@libs/api';
 import useStore from '@stores/store';
 
@@ -26,7 +26,6 @@ interface INaturalLanguageSearchInputProps {
   ) => void;
   placeholder?: string;
   className?: string;
-  debounceMs?: number;
 }
 
 /**
@@ -40,12 +39,10 @@ const NaturalLanguageSearchInput: React.FC<
   onFiltersApplied,
   placeholder = 'Search with natural language...',
   className,
-  debounceMs = 800,
 }) => {
   const [query, setQuery] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const accountUuid = useStore((state) => state.auth.user?.account?.uuid);
 
@@ -110,6 +107,9 @@ const NaturalLanguageSearchInput: React.FC<
           // Apply the filters
           onFiltersApplied(propertyFilters, standardFilters);
 
+          // Clear the query after successful filter application
+          setQuery('');
+
           // Show success message with explanation
           if (response.explanation) {
             toast.success(response.explanation);
@@ -123,6 +123,7 @@ const NaturalLanguageSearchInput: React.FC<
           ) {
             // Clear all filters and sorts
             onFiltersApplied([], []);
+            setQuery('');
           } else {
             const noResultsMessage =
               response.noResultsExplanation ||
@@ -146,46 +147,19 @@ const NaturalLanguageSearchInput: React.FC<
     [accountUuid, onFiltersApplied],
   );
 
-  const handleChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const newValue = e.target.value;
-      setQuery(newValue);
-
-      // Clear existing timeout
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-
-      // Debounce the search
-      debounceTimeoutRef.current = setTimeout(() => {
-        handleSearch(newValue);
-      }, debounceMs);
-    },
-    [handleSearch, debounceMs],
-  );
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  }, []);
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter') {
         e.preventDefault();
-        // Clear debounce and search immediately
-        if (debounceTimeoutRef.current) {
-          clearTimeout(debounceTimeoutRef.current);
-        }
         handleSearch(query);
       }
     },
     [handleSearch, query],
   );
-
-  // Cleanup timeout on unmount
-  React.useEffect(() => {
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-    };
-  }, []);
 
   return (
     <div className={cn('relative w-full', className)}>

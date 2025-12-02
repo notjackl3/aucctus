@@ -119,6 +119,8 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [colorPickerOpen, setColorPickerOpen] = useState<string | null>(null); // Track which option's color picker is open
   const [shakeField, setShakeField] = useState<string | null>(null);
+  const [editingOption, setEditingOption] = useState<string | null>(null); // Track which option is being edited
+  const [editingValue, setEditingValue] = useState(''); // The current value being edited
 
   // Refs for scrolling to error fields
   const nameRef = useRef<HTMLDivElement>(null);
@@ -209,6 +211,50 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
         opt.value === optionValue ? { ...opt, color: newColor } : opt,
       ),
     );
+  };
+
+  const handleStartEditOption = (optionValue: string) => {
+    if (existingProperty) return; // Don't allow editing for existing properties
+    setEditingOption(optionValue);
+    setEditingValue(optionValue);
+  };
+
+  const handleSaveEditOption = (oldValue: string) => {
+    const trimmedValue = editingValue.trim();
+
+    // Validate: not empty and not duplicate (unless same as original)
+    if (
+      !trimmedValue ||
+      (trimmedValue !== oldValue &&
+        selectOptions.some((opt) => opt.value === trimmedValue))
+    ) {
+      // Reset without saving if invalid
+      setEditingOption(null);
+      setEditingValue('');
+      return;
+    }
+
+    // Update the option value
+    setSelectOptions(
+      selectOptions.map((opt) =>
+        opt.value === oldValue ? { ...opt, value: trimmedValue } : opt,
+      ),
+    );
+    setEditingOption(null);
+    setEditingValue('');
+  };
+
+  const handleEditKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    oldValue: string,
+  ) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleSaveEditOption(oldValue);
+    } else if (e.key === 'Escape') {
+      setEditingOption(null);
+      setEditingValue('');
+    }
   };
 
   const validateForm = (): boolean => {
@@ -579,18 +625,42 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                     </div>
 
                     {/* Option value with colored background and border */}
-                    <div
-                      className='flex-1 rounded-full border px-3 py-1'
-                      style={{
-                        backgroundColor: colorScheme.bg,
-                        color: colorScheme.text,
-                        borderColor: colorScheme.border,
-                      }}
-                    >
-                      <span className='aucctus-text-sm font-medium'>
-                        {option.value}
-                      </span>
-                    </div>
+                    {editingOption === option.value && !existingProperty ? (
+                      <input
+                        type='text'
+                        value={editingValue}
+                        onChange={(e) => setEditingValue(e.target.value)}
+                        onBlur={() => handleSaveEditOption(option.value)}
+                        onKeyDown={(e) => handleEditKeyDown(e, option.value)}
+                        autoFocus
+                        disabled={isLoading}
+                        className='aucctus-text-sm flex-1 rounded-full border px-3 py-1 font-medium outline-none ring-2 ring-blue-500'
+                        style={{
+                          backgroundColor: colorScheme.bg,
+                          color: colorScheme.text,
+                          borderColor: colorScheme.border,
+                        }}
+                      />
+                    ) : (
+                      <div
+                        onClick={() => handleStartEditOption(option.value)}
+                        className={cn(
+                          'flex-1 rounded-full border px-3 py-1',
+                          !existingProperty &&
+                            'cursor-text hover:ring-2 hover:ring-blue-300',
+                        )}
+                        style={{
+                          backgroundColor: colorScheme.bg,
+                          color: colorScheme.text,
+                          borderColor: colorScheme.border,
+                        }}
+                        title={!existingProperty ? 'Click to edit' : undefined}
+                      >
+                        <span className='aucctus-text-sm font-medium'>
+                          {option.value}
+                        </span>
+                      </div>
+                    )}
 
                     {/* Remove button */}
                     <button
@@ -700,7 +770,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
         </div>
 
         {/* Required checkbox */}
-        <div className='flex items-center gap-2'>
+        {/* <div className='flex items-center gap-2'>
           <Input.CheckBox
             id='is-required'
             checked={formData.is_required}
@@ -715,7 +785,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
           >
             Required property
           </label>
-        </div>
+        </div> */}
       </div>
 
       {/* Footer */}
