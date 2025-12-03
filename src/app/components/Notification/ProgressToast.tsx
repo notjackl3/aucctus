@@ -3,14 +3,23 @@ import Lottie from 'lottie-react';
 import { ToastContentProps } from 'react-toastify';
 import animations from '@assets/animations';
 import AgentProgressBar from '@components/Progress/AgentProgressBar';
+import Avatar from '@components/Avatar';
+import useStore from '@stores/store';
+import {
+  useConceptReportCancel,
+  useConceptNotifyOnComplete,
+  useConceptNotifyOnCompleteStatus,
+} from '@hooks/query/concepts.hook';
 
 interface ProgressToastData {
   title: string;
+  conceptTitle?: string;
   progress?: number;
   estimatedTime?: number;
   onCancel?: () => void;
   agentName?: string;
   conceptUuid?: string;
+  conceptIdentifier?: string;
   message?: string;
   startTime?: number;
   overrideEstimatedSeconds?: number | null;
@@ -30,11 +39,13 @@ interface ProgressToastProps extends Partial<ToastContentProps> {
 const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
   const {
     title = 'Processing',
+    conceptTitle,
     estimatedTime = 5,
     progress: explicitProgress,
     onCancel,
     agentName,
     conceptUuid,
+    conceptIdentifier,
     message,
     startTime,
     overrideEstimatedSeconds,
@@ -42,6 +53,30 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
     expectedItemCount,
     completedItemCount,
   } = data || {};
+
+  const user = useStore((state) => state.auth.user);
+
+  // Hooks for cancel and email notification
+  const { mutate: cancelReport, isLoading: isCancelling } =
+    useConceptReportCancel();
+  const { mutate: scheduleNotification } = useConceptNotifyOnComplete();
+  const { hasNotificationScheduled } =
+    useConceptNotifyOnCompleteStatus(conceptUuid);
+
+  const handleCancel = () => {
+    if (conceptUuid && conceptIdentifier) {
+      cancelReport({ conceptUuid, conceptIdentifier });
+      closeToast?.();
+    } else if (onCancel) {
+      onCancel();
+    }
+  };
+
+  const handleEmail = () => {
+    if (conceptUuid && !hasNotificationScheduled) {
+      scheduleNotification(conceptUuid);
+    }
+  };
 
   const progress = explicitProgress ?? 0;
 
@@ -60,16 +95,36 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
         <span className='text-gray-400 group-hover:text-gray-600'>×</span>
       </button>
 
-      {/* Title with animation */}
-      <div className='mb-3 flex items-center gap-2 pr-6'>
-        <Lottie
-          animationData={animations.hourglass}
-          loop={true}
-          className='h-5 w-5 [&_path]:!fill-[#120A0A]'
-        />
-        <span className='aucctus-text-sm-semibold aucctus-text-primary line-clamp-1'>
-          {title}
-        </span>
+      {/* Header with avatar and title */}
+      <div className='mb-3 flex items-center gap-3 pr-6'>
+        {/* User Avatar */}
+        {user && (
+          <Avatar
+            firstName={user.firstName || ''}
+            lastName={user.lastName || ''}
+            src={user.profileImage}
+            className='h-8 min-h-8 w-8 min-w-8 flex-shrink-0 border-none !bg-blue-100 [&_span]:!text-blue-700'
+          />
+        )}
+
+        {/* Title with hourglass animation */}
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center gap-2'>
+            <Lottie
+              animationData={animations.hourglass}
+              loop={true}
+              className='h-5 w-5 [&_path]:!fill-blue-500'
+            />
+            <span className='aucctus-text-primary aucctus-text-md line-clamp-1 font-semibold'>
+              {title}
+            </span>
+          </div>
+          {conceptTitle && (
+            <span className='aucctus-text-xs aucctus-text-secondary line-clamp-1'>
+              {conceptTitle}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Progress section */}
@@ -85,11 +140,18 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
               expectedItemCount={expectedItemCount}
               completedItemCount={completedItemCount}
               message={message}
-              showPercentage={false}
+              showPercentage
               showTimeRemaining
               size='md'
               theme='brand'
               startTime={startTime}
+              onCancel={
+                conceptUuid && conceptIdentifier && !isCancelling
+                  ? handleCancel
+                  : undefined
+              }
+              onEmail={conceptUuid ? handleEmail : undefined}
+              isEmailScheduled={hasNotificationScheduled}
             />
           </div>
         ) : (
@@ -105,6 +167,9 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
                 }}
               />
             </div>
+            <span className='aucctus-text-xs-medium aucctus-text-secondary min-w-[36px] text-right'>
+              {Math.round(progress)}%
+            </span>
           </div>
         )}
 

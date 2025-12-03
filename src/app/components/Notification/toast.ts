@@ -168,11 +168,13 @@ const update = (
 
 export interface ProgressToastPayload {
   title: string;
+  conceptTitle?: string;
   progress?: number;
   estimatedTime?: number;
   onCancel?: () => void;
   agentName?: string;
   conceptUuid?: string;
+  conceptIdentifier?: string;
   message?: string;
   startTime?: number;
   overrideEstimatedSeconds?: number | null;

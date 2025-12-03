@@ -714,10 +714,6 @@ export const useGenerateFinancialProjection = () => {
         ]);
       }
       doFullConceptInvalidation(queryClient, conceptIdentifier);
-      toast.info(
-        'Financial projection regeneration started',
-        "We'll refresh this section as soon as the numbers are ready.",
-      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);

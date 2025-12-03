@@ -124,7 +124,6 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
       if (valuesMatch(importanceValue, assumption.importance)) {
         return; // Ignore no-op selections so we don't flag false edits
       }
-
       addChange({
         id: assumption.uuid,
         type: 'edit',

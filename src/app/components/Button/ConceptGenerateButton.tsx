@@ -98,8 +98,14 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
     );
   }
 
+  // Determine effective variant:
+  // - If pending but can open (has completed sections), show as 'complete'
+  // - If error but has dateReportCompleted, show as 'complete' (don't show Retry)
   const effectiveVariant =
-    variant === 'pending' && canOpenWhilePending ? 'complete' : variant;
+    (variant === 'pending' && canOpenWhilePending) ||
+    (variant === 'error' && dateReportCompleted)
+      ? 'complete'
+      : variant;
 
   // Get button style and label
   const { style, label } = getButtonContext(effectiveVariant);

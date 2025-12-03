@@ -403,10 +403,6 @@ export const useGenerateKeyAssumptions = () => {
           'assumptions',
         ]);
       }
-      toast.info(
-        'Key assumptions regeneration started',
-        "We'll refresh this section as soon as new insights are ready.",
-      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -433,10 +429,6 @@ export const useGenerateCustomerProfile = () => {
       // DO NOT invalidate queries here - that would force a refetch from backend
       // which still shows "complete" status, overwriting our pending states.
       // WebSocket events will handle the actual data updates when backend completes.
-      toast.info(
-        'Customer profile regeneration started',
-        "We'll refresh this section as soon as conversations complete.",
-      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -524,10 +516,6 @@ export const useGenerateConceptOverview = () => {
       // DO NOT invalidate queries here - that would force a refetch from backend
       // which still shows "complete" status, overwriting our pending states.
       // WebSocket events will handle the actual data updates when backend completes.
-      toast.info(
-        'Overview regeneration started',
-        "We'll refresh this section as soon as the updates finish.",
-      );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -2388,16 +2376,65 @@ export const useAssumptionBatchUpdate = () => {
         ],
       });
 
-      const { create, update, delete: deleteItems } = variables.data;
-      const totalChanges = create.length + update.length + deleteItems.length;
+      // const { create, update, delete: deleteItems } = variables.data;
+      // const totalChanges = create.length + update.length + deleteItems.length;
 
-      toast.success(
-        `Successfully applied ${totalChanges} changes! Tests are being regenerated.`,
-      );
+      // toast.success(
+      //   `Successfully applied ${totalChanges} changes! Tests are being regenerated.`,
+      // );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(message || 'Failed to apply changes. Please try again.');
+    },
+  });
+};
+
+/**
+ * Custom hook for checking if email notification is scheduled for concept report completion.
+ * @param conceptUuid - The UUID of the concept.
+ * @returns The result of the useQuery hook with notification status.
+ */
+export const useConceptNotifyOnCompleteStatus = (conceptUuid?: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.conceptNotifyOnComplete, conceptUuid],
+    queryFn: async () => {
+      if (!conceptUuid) return { hasNotificationScheduled: false };
+      return await api.concept.getNotifyOnCompleteStatus(conceptUuid);
+    },
+    enabled: !!conceptUuid,
+    staleTime: 1000 * 30, // 30 seconds
+    cacheTime: 1000 * 60, // 1 minute
+  });
+
+  return {
+    ...query,
+    hasNotificationScheduled: query.data?.hasNotificationScheduled ?? false,
+  };
+};
+
+/**
+ * Custom hook for scheduling email notification when concept report completes.
+ * @returns The result of the useMutation hook.
+ */
+export const useConceptNotifyOnComplete = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (conceptUuid: string) =>
+      await api.concept.notifyOnComplete(conceptUuid),
+    onSuccess: (_data, conceptUuid) => {
+      // Invalidate the status query to reflect the new state
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.conceptNotifyOnComplete, conceptUuid],
+      });
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Notification Failed',
+        message || 'Unable to schedule email notification. Please try again.',
+      );
     },
   });
 };

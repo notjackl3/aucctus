@@ -8,6 +8,7 @@ import React, {
 import { useAgentEstimatedTime } from '@hooks/query/agent-timing.hook';
 import { cn } from '@libs/utils/react';
 import telemetry from '@libs/telemetry';
+import Icon from '@components/Icon';
 
 export interface AgentProgressBarProps {
   /**
@@ -101,6 +102,21 @@ export interface AgentProgressBarProps {
    * Used to persist timing across component remounts
    */
   startTime?: number;
+
+  /**
+   * Callback when cancel button is clicked
+   */
+  onCancel?: () => void;
+
+  /**
+   * Callback when email button is clicked
+   */
+  onEmail?: () => void;
+
+  /**
+   * Whether email notification is scheduled
+   */
+  isEmailScheduled?: boolean;
 }
 
 /**
@@ -146,7 +162,8 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   expectedItemCount,
   completedItemCount = 0,
   itemCompletionTimestamps = [],
-  message,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  message: _message,
   showPercentage = true,
   showTimeRemaining = true,
   className,
@@ -155,6 +172,9 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   isLoading = false,
   onComplete,
   startTime: initialStartTime,
+  onCancel,
+  onEmail,
+  isEmailScheduled,
 }) => {
   const startTimeRef = useRef<number>(initialStartTime || Date.now());
   const [smartRemainingTime, setSmartRemainingTime] = useState<number | null>(
@@ -513,135 +533,115 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
   ]);
 
   return (
-    <div className={cn('w-full space-y-2.5', className)}>
-      {/* Progress bar */}
-      <div
-        className={cn(
-          'relative w-full overflow-hidden rounded-md',
-          'bg-gray-light-200 dark:bg-gray-light-700',
-          'border border-opacity-50',
-          borderClasses[theme],
-          sizeClasses[size],
+    <div className={cn('w-full space-y-2', className)}>
+      {/* Progress bar with percentage on the right */}
+      <div className='flex items-center gap-3'>
+        <div
+          className={cn(
+            'relative flex-1 overflow-hidden rounded-md',
+            'bg-gray-light-200 dark:bg-gray-light-700',
+            'border border-opacity-50',
+            borderClasses[theme],
+            sizeClasses[size],
+          )}
+          role='progressbar'
+          aria-valuenow={Math.round(displayProgress)}
+          aria-valuemin={0}
+          aria-valuemax={100}
+        >
+          {isLoading || isLoadingTiming ? (
+            // Indeterminate progress animation
+            <div
+              className='h-full'
+              style={{
+                width: '30%',
+                backgroundColor: themeColors[theme],
+                backgroundImage: stripePattern,
+                backgroundSize: '1rem 1rem',
+                backgroundRepeat: 'repeat',
+                animation:
+                  'indeterminate 1.5s ease-in-out infinite, stripeSlide 2.5s ease-in-out infinite alternate',
+              }}
+            />
+          ) : (
+            // Determinate progress (use fallback if no timing data available)
+            <div
+              className='h-full'
+              style={{
+                width: `${Math.min(100, Math.max(0, usingFallbackTiming ? fallbackProgressState : displayProgress))}%`,
+                backgroundColor: themeColors[theme],
+                backgroundImage: stripePattern,
+                backgroundSize: '1rem 1rem',
+                backgroundRepeat: 'repeat',
+                transition: 'width 500ms ease-out',
+                animation: 'stripeSlide 7.5s ease-in-out infinite alternate',
+              }}
+            />
+          )}
+        </div>
+
+        {/* Percentage on the right of progress bar */}
+        {showPercentage && !isLoading && (
+          <span className='aucctus-text-xs-medium aucctus-text-secondary min-w-[36px] text-right'>
+            {Math.round(
+              usingFallbackTiming ? fallbackProgressState : displayProgress,
+            )}
+            %
+          </span>
         )}
-        role='progressbar'
-        aria-valuenow={Math.round(displayProgress)}
-        aria-valuemin={0}
-        aria-valuemax={100}
-      >
-        {isLoading || isLoadingTiming ? (
-          // Indeterminate progress animation
-          <div
-            className='h-full'
-            style={{
-              width: '30%',
-              backgroundColor: themeColors[theme],
-              backgroundImage: stripePattern,
-              backgroundSize: '1rem 1rem',
-              backgroundRepeat: 'repeat',
-              animation:
-                'indeterminate 1.5s ease-in-out infinite, stripeSlide 2.5s ease-in-out infinite alternate',
-            }}
-          />
-        ) : (
-          // Determinate progress (use fallback if no timing data available)
-          <div
-            className='h-full'
-            style={{
-              width: `${Math.min(100, Math.max(0, usingFallbackTiming ? fallbackProgressState : displayProgress))}%`,
-              backgroundColor: themeColors[theme],
-              backgroundImage: stripePattern,
-              backgroundSize: '1rem 1rem',
-              backgroundRepeat: 'repeat',
-              transition: 'width 500ms ease-out',
-              animation: 'stripeSlide 7.5s ease-in-out infinite alternate',
-            }}
-          />
+
+        {isLoading && (
+          <span className='aucctus-text-xs aucctus-text-tertiary min-w-[36px] animate-pulse text-right'>
+            ...
+          </span>
         )}
       </div>
 
-      {/* Info row */}
-      {message ? (
-        // When there's a message, use justify-between layout
-        <div className='flex items-center justify-between gap-3'>
-          <div className='min-w-0 flex-1'>
-            <p className='aucctus-text-sm aucctus-text-secondary truncate'>
-              {message}
-            </p>
-          </div>
-
-          <div className='flex items-center gap-3 whitespace-nowrap'>
-            {showTimeRemaining &&
-              !isLoading &&
-              (usingFallbackTiming
-                ? fallbackRemainingState > 0
-                : smartRemainingTime !== null) && (
-                <span className='aucctus-text-xs aucctus-text-tertiary'>
-                  {formatTimeRemaining(
-                    usingFallbackTiming
-                      ? fallbackRemainingState
-                      : smartRemainingTime!,
-                  )}
-                </span>
+      {/* Estimated time remaining and action buttons */}
+      <div className='flex items-center justify-between'>
+        {showTimeRemaining &&
+          !isLoading &&
+          (usingFallbackTiming
+            ? fallbackRemainingState > 0
+            : smartRemainingTime !== null) && (
+            <span className='aucctus-text-xs aucctus-text-tertiary'>
+              {formatTimeRemaining(
+                usingFallbackTiming
+                  ? fallbackRemainingState
+                  : smartRemainingTime!,
               )}
-
-            {showPercentage && !isLoading && (
-              <span className='aucctus-text-xs-medium aucctus-text-secondary'>
-                {Math.round(
-                  usingFallbackTiming ? fallbackProgressState : displayProgress,
-                )}
-                %
-              </span>
-            )}
-
-            {isLoading && (
-              <span className='aucctus-text-xs aucctus-text-tertiary animate-pulse'>
-                Loading...
-              </span>
-            )}
-          </div>
-        </div>
-      ) : (
-        // When no message, center the time remaining
-        <div className='flex w-full items-center justify-center gap-2'>
-          {showTimeRemaining &&
-            !isLoading &&
-            (usingFallbackTiming
-              ? fallbackRemainingState > 0
-              : smartRemainingTime !== null) && (
-              <span className='aucctus-text-xs aucctus-text-tertiary'>
-                {formatTimeRemaining(
-                  usingFallbackTiming
-                    ? fallbackRemainingState
-                    : smartRemainingTime!,
-                )}
-              </span>
-            )}
-
-          {showPercentage &&
-            !isLoading &&
-            showTimeRemaining &&
-            (usingFallbackTiming
-              ? fallbackRemainingState > 0
-              : smartRemainingTime !== null) && (
-              <span className='aucctus-text-xs aucctus-text-quaternary'>•</span>
-            )}
-
-          {showPercentage && !isLoading && (
-            <span className='aucctus-text-xs-medium aucctus-text-secondary'>
-              {Math.round(
-                usingFallbackTiming ? fallbackProgressState : displayProgress,
-              )}
-              %
             </span>
           )}
 
-          {isLoading && (
-            <span className='aucctus-text-xs aucctus-text-tertiary animate-pulse'>
-              Loading...
-            </span>
-          )}
-        </div>
-      )}
+        {/* Action buttons */}
+        {(onCancel || onEmail) && (
+          <div className='flex items-center gap-2'>
+            {onCancel && (
+              <button
+                className='aucctus-text-xs-medium aucctus-bg-primary aucctus-text-error-primary h-7 rounded-md border border-red-600 px-2.5 transition-colors hover:bg-red-50'
+                onClick={onCancel}
+              >
+                Cancel
+              </button>
+            )}
+            {onEmail && (
+              <button
+                className='aucctus-text-xs-medium transition-color flex h-7 items-center gap-2  rounded-md bg-[#120C0C] px-2.5 text-white hover:bg-[#0A0606]'
+                onClick={onEmail}
+                disabled={isEmailScheduled}
+              >
+                <Icon
+                  variant='mail'
+                  width={16}
+                  height={16}
+                  className='aucctus-stroke-white'
+                />
+                {isEmailScheduled ? 'Email scheduled' : 'Email me'}
+              </button>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

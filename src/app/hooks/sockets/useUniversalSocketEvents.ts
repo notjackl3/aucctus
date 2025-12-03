@@ -547,13 +547,11 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     const existing = getToastRecordForKeys(toastKeys, true);
     const startTime = existing?.data.startTime ?? Date.now();
 
-    // Try to get concept title from cache
+    // Use concept data from message directly (backend now sends conceptTitle)
     const conceptUuid = message.conceptUuid || existing?.data.conceptUuid;
-    const conceptData = queryClient.getQueryData<IConcept>([
-      AucctusQueryKeys.conceptOverview,
-      conceptUuid,
-    ]);
-    const conceptTitle = conceptData?.title;
+    const conceptTitle = message.conceptTitle || existing?.data.conceptTitle;
+    const conceptIdentifier =
+      message.conceptRootIdentifier || existing?.data.conceptIdentifier;
 
     telemetry.debug('concept_workflow.toast.upsert', {
       toastKeys,
@@ -561,16 +559,15 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       stageMessage,
       hasExisting: Boolean(existing),
       conceptTitle,
+      conceptIdentifier,
     });
 
     const payload: ProgressToastPayload = {
-      title:
-        existing?.data.title ||
-        (conceptTitle
-          ? `Generating ${conceptTitle}`
-          : 'Generating Concept Report'),
+      title: message.message || 'Generating Concept Report',
+      conceptTitle: conceptTitle,
       agentName: 'ConceptReportPipeline',
       conceptUuid: conceptUuid,
+      conceptIdentifier: conceptIdentifier,
       message: stageMessage,
       startTime,
       overrideEstimatedSeconds: existing?.data.overrideEstimatedSeconds,
@@ -1070,16 +1067,15 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     const messageKey = `test-generation-complete-${data.conceptUuid}-${data.testUuid}`;
     if (preventDuplicate(messageKey)) return;
 
-    const handler =
-      config.testGeneration?.onGenerationCompleted ||
-      ((msg: ITestGenerationCompletedMessage) => {
-        toast.completed(
-          'Test Generated',
-          msg.message || 'Your new test is ready to run',
-        );
-      });
+    const handler = config.testGeneration?.onGenerationCompleted;
+    // ((msg: ITestGenerationCompletedMessage) => {
+    //   toast.completed(
+    //     'Test Generated',
+    //     msg.message || 'Your new test is ready to run',
+    //   );
+    // });
 
-    handler(data);
+    handler?.(data);
   });
 
   // Register test generation error events (GLOBAL)
@@ -1089,17 +1085,16 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const messageKey = `test-generation-error-${data.conceptUuid}-${data.testUuid || 'unknown'}`;
       if (preventDuplicate(messageKey)) return;
 
-      const handler =
-        config.testGeneration?.onGenerationError ||
-        ((msg: ITestGenerationErrorMessage) => {
-          toast.error(
-            'Test Generation Failed',
-            msg.message ||
-              'We could not generate a new test right now. Please try again.',
-          );
-        });
+      const handler = config.testGeneration?.onGenerationError;
+      // ((msg: ITestGenerationErrorMessage) => {
+      //   toast.error(
+      //     'Test Generation Failed',
+      //     msg.message ||
+      //       'We could not generate a new test right now. Please try again.',
+      //   );
+      // });
 
-      handler(data);
+      handler?.(data);
     },
   );
 

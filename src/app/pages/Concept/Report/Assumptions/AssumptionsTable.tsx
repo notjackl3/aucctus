@@ -277,7 +277,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                     certainty: newAssumption.changes.certainty,
                     status: 'untested',
                     validationStatus: 'untested',
-                    risk: 0,
+                    risk: newAssumption.changes.risk ?? 0,
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                   } as IAssumptionV2;

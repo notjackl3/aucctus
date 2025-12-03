@@ -441,6 +441,7 @@ export interface IConceptWorkflowMessage extends BaseSocketEvent {
   // Core identifiers
   conceptUuid: string;
   conceptRootIdentifier?: string;
+  conceptTitle?: string;
 
   // Event details
   eventType:

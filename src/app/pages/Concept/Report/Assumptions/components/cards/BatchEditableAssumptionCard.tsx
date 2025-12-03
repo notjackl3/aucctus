@@ -116,6 +116,12 @@ const BatchEditableAssumptionCard: React.FC<
   const importancePercentage = Math.round(importance * 100);
   const certaintyPercentage = Math.round(certainty * 100);
 
+  // Calculate risk from importance and certainty
+  // Risk = importance * (1 - certainty) - higher importance + lower certainty = higher risk
+  const calculateRisk = (imp: number, cert: number): number => {
+    return imp * (1 - cert);
+  };
+
   // Handle save
   const handleSave = useCallback(async () => {
     if (!isFormValid || isLoading || !isModified) return;
@@ -132,6 +138,7 @@ const BatchEditableAssumptionCard: React.FC<
         category: selectedCategory,
         importance,
         certainty,
+        risk: calculateRisk(importance, certainty),
         validationStatus,
       },
     };

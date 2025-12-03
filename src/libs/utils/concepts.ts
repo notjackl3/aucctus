@@ -319,6 +319,8 @@ export function canOpenConceptWhilePending(
 ): boolean {
   if (dateReportCompleted) {
     return true;
+  } else if (dateReportCompleted === null) {
+    return false;
   }
 
   if (!reportStatusBySection) {

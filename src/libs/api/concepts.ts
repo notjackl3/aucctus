@@ -439,6 +439,24 @@ export class ConceptApi extends ApiService {
     return this.post<IConcept>(endpoints.conceptReportCancel(uuid));
   }
 
+  /**
+   * Check if email notification is scheduled for concept report completion
+   */
+  getNotifyOnCompleteStatus(conceptUuid: string) {
+    return this.get<{ hasNotificationScheduled: boolean }>(
+      endpoints.conceptReportNotifyOnComplete(conceptUuid),
+    );
+  }
+
+  /**
+   * Schedule email notification for when concept report completes
+   */
+  notifyOnComplete(conceptUuid: string) {
+    return this.post<{ message: string }>(
+      endpoints.conceptReportNotifyOnComplete(conceptUuid),
+    );
+  }
+
   // Customer Jobs API
   getCustomerJobs(customerProfileUuid: string) {
     return this.get<ICustomerJob[]>(

@@ -54,6 +54,10 @@ export class Endpoints {
     return `api/v1/concept/${conceptUuid}/cancel`;
   }
 
+  static conceptReportNotifyOnComplete(conceptUuid: string) {
+    return `api/v1/concept/${conceptUuid}/notify-on-complete`;
+  }
+
   static conceptSeed(conceptUuid: string) {
     return `api/v1/concept/${conceptUuid}/seed`;
   }

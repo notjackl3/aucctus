@@ -31,15 +31,24 @@ export const createBatchAssumptionChangesActions = (
   },
 
   addChange: (change: Omit<BatchAssumptionChange, 'timestamp'>) => {
-    set((state: { batchChanges: Record<string, BatchAssumptionChange> }) => ({
-      batchChanges: {
-        ...state.batchChanges,
-        [change.id]: {
-          ...change,
-          timestamp: Date.now(),
+    set((state: { batchChanges: Record<string, BatchAssumptionChange> }) => {
+      const existingChange = state.batchChanges[change.id];
+      // If editing an existing 'add' change, preserve the 'add' type
+      // This prevents new assumptions from being accidentally converted to 'edit' type
+      const effectiveType =
+        existingChange?.type === 'add' ? 'add' : change.type;
+
+      return {
+        batchChanges: {
+          ...state.batchChanges,
+          [change.id]: {
+            ...change,
+            type: effectiveType,
+            timestamp: Date.now(),
+          },
         },
-      },
-    }));
+      };
+    });
   },
 
   removeChange: (id: string) => {

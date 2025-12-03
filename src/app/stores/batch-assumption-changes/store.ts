@@ -22,6 +22,7 @@ export interface BatchAssumptionChange {
     category: AssumptionCategory;
     importance: number; // 0-1 range (frontend format)
     certainty: number; // 0-1 range (frontend format)
+    risk?: number; // 0-1 range (frontend format) - calculated from importance/certainty
     validationStatus?: AssumptionStatusV2; // Optional validation status
   };
   timestamp: number;
