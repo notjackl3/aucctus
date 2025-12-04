@@ -6,9 +6,11 @@ export interface ISyntheticTestingState {
   lastExecutionState: {
     conceptUuid?: string;
     testUuid?: string;
+    executionId?: string;
     progress?: number;
     message?: string;
     startTime?: number;
+    conceptTitle?: string;
   } | null;
   setModalOpen: (isOpen: boolean) => void;
   setLastExecutionState: (

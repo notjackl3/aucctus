@@ -1,4 +1,4 @@
-import { UnifiedLoadingState } from '@components';
+import { ConceptReportSkeletons } from '@components';
 import { useConceptMarketScan } from '@hooks/query/concepts.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
@@ -8,6 +8,8 @@ import TrendsAndDrivers from '../TrendsAndDrivers/TrendsAndDrivers';
 import Ecosystem from '../ecosystem/Ecosystem';
 import useStore from '@stores/store';
 import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
+
+const { MarketScanSkeleton } = ConceptReportSkeletons;
 
 const MarketScanV2: FunctionComponent = () => {
   const activeConceptUuid = useStore(
@@ -25,9 +27,9 @@ const MarketScanV2: FunctionComponent = () => {
   });
   const shouldShowSkeletons = isSectionPending || hasBlockingLoad;
 
-  // Show unified loading state
+  // Show skeleton loading state
   if (shouldShowSkeletons) {
-    return <UnifiedLoadingState />;
+    return <MarketScanSkeleton />;
   }
 
   // Handle case where loading is finished but no market scan data exists

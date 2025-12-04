@@ -42,7 +42,7 @@ const RegenerateTestWarningModal: React.FC<RegenerateTestWarningModalProps> = ({
   }, [onCancel, closeModal]);
 
   return (
-    <div className='aucctus-bg-primary inline-flex max-h-[30vh] w-full max-w-[500px] flex-col items-center justify-start rounded-xl'>
+    <div className='aucctus-bg-primary relative inline-flex max-h-[100vh] w-[600px] flex-col items-center justify-start rounded-xl'>
       {/* Header */}
       <div className='w-full p-6 pb-2'>
         <h2 className='aucctus-text-lg-bold aucctus-text-primary mx-auto max-w-xs text-center font-bold'>

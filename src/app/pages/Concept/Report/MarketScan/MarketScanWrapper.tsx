@@ -7,6 +7,8 @@ import { VersionUpgradeBanner } from '@components';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { toast } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
+import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
+import { AppPath } from '@routes/routes';
 
 const MarketScanWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
@@ -14,6 +16,13 @@ const MarketScanWrapper: React.FC = () => {
 
   // Use global debug mode state
   const isDebugModeEnabled = useDebugMode();
+
+  // Use unified loading state to detect pending section
+  const { isSectionPending } = useUnifiedLoading({
+    currentRoute: AppPath.ConceptMarketScan,
+    concept,
+    additionalLoadingStates: [isLoading],
+  });
 
   // Use concept's featureVersions to determine which version to render
   const featureVersion = concept.featureVersions?.marketScan || 'v2';
@@ -33,8 +42,8 @@ const MarketScanWrapper: React.FC = () => {
 
   return (
     <>
-      {/* Show upgrade banner if not v3 */}
-      {!shouldRenderV3 && (
+      {/* Show upgrade banner if not v3 and not currently upgrading */}
+      {!shouldRenderV3 && !isLoading && !isSectionPending && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}
           isLoading={isLoading}

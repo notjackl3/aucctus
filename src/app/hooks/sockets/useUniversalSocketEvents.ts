@@ -8,6 +8,7 @@ import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '../query/query-keys';
 import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
+import api from '@libs/api';
 import type { Id } from 'react-toastify';
 import type { ProgressToastPayload } from '@components/Notification/toast';
 import {
@@ -345,9 +346,11 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     (data: {
       conceptUuid: string;
       testUuid: string;
+      executionId: string;
       progress: number;
       message: string;
       startTime?: number;
+      conceptTitle?: string;
     }) => {
       const toastKey = `${data.conceptUuid}-${data.testUuid}`;
       const existing = conceptWorkflowToasts.get(toastKey);
@@ -367,14 +370,38 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         isReset: data.progress === 0,
       });
 
+      // Cancel handler for the toast
+      const handleCancel = async () => {
+        try {
+          await api.testing.cancelSyntheticExecution(
+            data.conceptUuid,
+            data.testUuid,
+            data.executionId,
+          );
+          // Dismiss toast
+          const toastRecord = conceptWorkflowToasts.get(toastKey);
+          if (toastRecord) {
+            toast.dismiss(toastRecord.toastId);
+            conceptWorkflowToasts.delete(toastKey);
+          }
+          // Clear store state
+          useStore.getState().syntheticTesting.setLastExecutionState(null);
+        } catch (error) {
+          toast.error('Cancellation Failed', 'Unable to cancel execution');
+        }
+      };
+
       const payload: ProgressToastPayload = {
         title: 'Running Synthetic Test',
         agentName: 'SyntheticPipeline',
         conceptUuid: data.conceptUuid,
+        conceptTitle: data.conceptTitle,
         message: data.message || 'Processing synthetic interviews...',
         progress: data.progress,
         startTime,
         fallbackEstimatedSeconds: 300,
+        onCancel: handleCancel,
+        sectionKey: 'synthetic_execution',
       };
 
       if (!existing) {
@@ -405,13 +432,15 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   React.useEffect(() => {
     const handleModalClosed = (event: CustomEvent) => {
       const data = event.detail;
-      if (data && data.progress < 100) {
+      if (data && data.progress < 100 && data.executionId) {
         upsertSyntheticToast({
           conceptUuid: data.conceptUuid,
           testUuid: data.testUuid,
+          executionId: data.executionId,
           progress: data.progress,
           message: data.message,
           startTime: data.startTime,
+          conceptTitle: data.conceptTitle,
         });
       }
     };
@@ -489,10 +518,6 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       );
     };
   }, [upsertSyntheticToast]);
-
-  // Track recent section completions to suppress full workflow toast for AI edits/partial regenerations
-  // Map: conceptIdentifier -> timestamp of last section completion
-  const recentSectionCompletions = React.useRef(new Map<string, number>());
 
   // Helper function to check and prevent duplicate messages
   const preventDuplicate = (messageKey: string): boolean => {
@@ -737,22 +762,23 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         const messageKey = `${message.eventType}-${message.conceptRootIdentifier || 'unknown'}`;
         if (preventDuplicate(messageKey)) return;
 
-        // Check if a section just completed within the last 5 seconds
-        // If so, this is a partial regeneration (AI edit), not a full concept generation
-        if (message.conceptRootIdentifier) {
-          const lastSectionCompletion = recentSectionCompletions.current.get(
-            message.conceptRootIdentifier,
-          );
-          const isPartialRegeneration =
-            lastSectionCompletion && Date.now() - lastSectionCompletion < 5000; // Within 5 seconds
+        // Determine if this is a partial regeneration (AI edit) vs full workflow
+        // Full workflow: completedSections === totalSections (all sections regenerated)
+        // Partial regeneration: completedSections < totalSections (only some sections updated)
+        const completedSections =
+          typeof message.completedSections === 'number'
+            ? message.completedSections
+            : Array.isArray(message.completedSections)
+              ? message.completedSections.length
+              : 0;
+        const totalSections = message.totalSections ?? 0;
+        const isPartialRegeneration =
+          totalSections > 0 && completedSections < totalSections;
 
-          if (isPartialRegeneration) {
-            // Clean up the tracking entry
-            recentSectionCompletions.current.delete(
-              message.conceptRootIdentifier,
-            );
-            return;
-          }
+        if (isPartialRegeneration) {
+          // Skip showing the "Concept Report Ready" toast for partial regenerations
+          // The section_completed handler already shows "Section updated successfully!"
+          return;
         }
 
         // CRITICAL: Invalidate concept queries to force refetch of featureVersions
@@ -791,7 +817,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
             ((msg: any) => {
               toast.completed(
                 'Concept Report Ready',
-                `Your concept report has been generated successfully`,
+                msg.conceptTitle,
                 undefined,
                 () => {
                   const conceptUrl = AppPath.ConceptOverview.replace(
@@ -806,15 +832,6 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         }
       } else if (message.eventType === 'section_completed') {
         // Handle individual section completion - update cache with new data
-
-        // Track this section completion to suppress workflow_completed toast
-        // This indicates a partial regeneration (AI edit), not a full concept generation
-        if (message.conceptRootIdentifier) {
-          recentSectionCompletions.current.set(
-            message.conceptRootIdentifier,
-            Date.now(),
-          );
-        }
 
         if (message.reportStatusBySection && message.conceptUuid) {
           const normalizedStatus = normalizeStatusMap(
@@ -945,7 +962,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
 
     const toastKey = `${data.conceptUuid}-${data.testUuid}`;
     const syntheticState = useStore.getState().syntheticTesting;
-    const isModalOpen = syntheticState.isModalOpen;
+    // const isModalOpen = syntheticState.isModalOpen;
 
     // Store the latest execution state for toast creation when modal closes
     // Capture startTime on first progress update (progress: 0) to match modal's timing
@@ -957,37 +974,28 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       syntheticState.setLastExecutionState({
         conceptUuid: data.conceptUuid,
         testUuid: data.testUuid,
+        executionId: data.executionId,
         progress: data.progress,
         message: data.message,
         startTime,
+        conceptTitle: data.conceptTitle,
       });
     } else {
       // Execution finished — clear persisted state so stale toasts don't reappear
       syntheticState.setLastExecutionState(null);
     }
 
-    // Show/update progress toast only when modal is closed and execution is running
-    if (!isModalOpen && data.progress < 100) {
+    // Show/update progress toast regardless of modal state
+    if (data.progress < 100) {
       upsertSyntheticToast({
         conceptUuid: data.conceptUuid,
         testUuid: data.testUuid,
+        executionId: data.executionId,
         progress: data.progress,
         message: data.message,
         startTime,
+        conceptTitle: data.conceptTitle,
       });
-    }
-
-    // Dismiss toast when modal is opened (user returned to modal)
-    if (isModalOpen) {
-      const existing = conceptWorkflowToasts.get(toastKey);
-      if (existing) {
-        try {
-          toast.dismiss(existing.toastId);
-        } catch {
-          // Toast may have already been dismissed
-        }
-        conceptWorkflowToasts.delete(toastKey);
-      }
     }
 
     // Handle completion
@@ -1004,10 +1012,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.syntheticTesting.onExecutionCompleted ||
         (() => {
-          toast.completed(
-            'Synthetic Testing Complete',
-            'Your synthetic interviews are ready to view',
-          );
+          toast.completed('Synthetic Testing Complete', data.conceptTitle);
         });
 
       handler(data);
@@ -1109,10 +1114,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       config.nucleusUpload.onUploadProgress ||
       ((msg: INucleusUploadProgressMessage) => {
         if (msg.stage === 'completed') {
-          toast.completed(
-            'Documents Processed',
-            msg.message || 'Your documents have been processed successfully',
-          );
+          toast.completed('Documents Processed');
         } else if (msg.stage === 'processing' && msg.progress) {
           // TODO: Track with toast ID and use toast.updateProgress() for real progress tracking
           // For now, just show info about processing
@@ -1145,8 +1147,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
         });
 
         toast.completed(
-          'Documents Uploaded',
-          `Successfully uploaded ${msg.uploadedCount} file${msg.uploadedCount > 1 ? 's' : ''} for processing`,
+          `${msg.uploadedCount} Document${msg.uploadedCount > 1 ? 's' : ''} Uploaded`,
         );
       });
     handler(message);
@@ -1255,10 +1256,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config?.ideaPlayground?.onConceptsGenerated ||
         ((msg: any) => {
-          toast.completed(
-            'Concepts Generated',
-            `${msg.conceptCount} concepts generated!`,
-          );
+          toast.completed(`${msg.conceptCount} Concepts Generated`);
           queryClient.invalidateQueries({
             queryKey: [
               AucctusQueryKeys.ideaPlaygroundGeneratedIdeas,

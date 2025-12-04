@@ -11,6 +11,7 @@ import ProgressToast from './ProgressToast';
 import CompletedToast from './CompletedToast';
 import SimpleSuccessToast from './SimpleSuccessToast';
 import ErrorToast from './ErrorToast';
+import { NotificationSectionKey } from '@libs/api/types';
 
 /**
  * Toast type definitions for the application
@@ -90,15 +91,18 @@ const info = (
   options?: Omit<AucctusToastOptions, 'type'>,
 ): Id => {
   if (typeof message === 'string') {
-    return reactToast(AucctusToast, {
-      ...defaultOptions,
-      ...options,
-      data: {
-        primaryMessage: message,
-        secondaryMessage,
-        status: 'success',
+    return reactToast(
+      (props) => React.createElement(AucctusToast, props as any),
+      {
+        ...defaultOptions,
+        ...options,
+        data: {
+          primaryMessage: message,
+          secondaryMessage,
+          status: 'success' as const,
+        },
       },
-    });
+    );
   }
   return show(message, { ...options, type: 'info' });
 };
@@ -116,15 +120,18 @@ const warning = (
   options?: Omit<AucctusToastOptions, 'type'>,
 ): Id => {
   if (typeof message === 'string') {
-    return reactToast(AucctusToast, {
-      ...defaultOptions,
-      ...options,
-      data: {
-        primaryMessage: message,
-        secondaryMessage,
-        status: 'warning',
+    return reactToast(
+      (props) => React.createElement(AucctusToast, props as any),
+      {
+        ...defaultOptions,
+        ...options,
+        data: {
+          primaryMessage: message,
+          secondaryMessage,
+          status: 'warning' as const,
+        },
       },
-    });
+    );
   }
   return show(message, { ...options, type: 'warning' });
 };
@@ -181,6 +188,7 @@ export interface ProgressToastPayload {
   fallbackEstimatedSeconds?: number | null;
   expectedItemCount?: number;
   completedItemCount?: number;
+  sectionKey?: NotificationSectionKey;
 }
 
 /**
@@ -214,14 +222,14 @@ const updateProgress = (id: Id, payload: ProgressToastPayload): void => {
  * Displays a completed toast with confetti animation and progress bar
  * Use this for operations that had progress tracking
  * @param title Toast title
- * @param description Optional description
+ * @param conceptTitle Optional concept title to display below the main title
  * @param completedTime Time taken to complete in seconds
  * @param onViewNow Optional view action handler
  * @returns The toast ID
  */
 const completed = (
   title: string,
-  description?: string,
+  conceptTitle?: string,
   completedTime?: number,
   onViewNow?: () => void,
 ): Id => {
@@ -230,7 +238,7 @@ const completed = (
     autoClose: 5000,
     data: {
       title,
-      description,
+      conceptTitle,
       completedTime,
       onViewNow,
     },

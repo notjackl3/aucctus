@@ -54,8 +54,12 @@ export class Endpoints {
     return `api/v1/concept/${conceptUuid}/cancel`;
   }
 
-  static conceptReportNotifyOnComplete(conceptUuid: string) {
-    return `api/v1/concept/${conceptUuid}/notify-on-complete`;
+  static conceptReportNotifyOnComplete(
+    conceptUuid: string,
+    sectionKey?: string,
+  ) {
+    const base = `api/v1/concept/${conceptUuid}/notify-on-complete`;
+    return sectionKey ? `${base}?section_key=${sectionKey}` : base;
   }
 
   static conceptSeed(conceptUuid: string) {

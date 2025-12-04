@@ -2,11 +2,13 @@ import React from 'react';
 import Lottie from 'lottie-react';
 import { ToastContentProps } from 'react-toastify';
 import { Icon } from '@components';
+import Avatar from '@components/Avatar';
 import animations from '@assets/animations';
+import useStore from '@stores/store';
 
 interface CompletedToastData {
   title: string;
-  description?: string;
+  conceptTitle?: string;
   completedTime?: number;
   onViewNow?: () => void;
 }
@@ -18,6 +20,7 @@ interface CompletedToastProps extends Partial<ToastContentProps> {
 /**
  * CompletedToast Component
  * Displays a success toast with confetti animation and completion details
+ * Styled to match ProgressToast with Avatar and concept title
  */
 const CompletedToast: React.FC<CompletedToastProps> = ({
   data,
@@ -25,10 +28,12 @@ const CompletedToast: React.FC<CompletedToastProps> = ({
 }) => {
   const {
     title = 'Completed',
-    description,
+    conceptTitle,
     completedTime,
     onViewNow,
   } = data || {};
+
+  const user = useStore((state) => state.auth.user);
 
   return (
     <div className='relative flex w-[400px] max-w-[calc(100vw-2rem)] flex-col overflow-hidden rounded-lg border border-l-4 border-l-green-500 bg-white/80 p-4 shadow-lg backdrop-blur-md dark:bg-gray-900/80'>
@@ -41,24 +46,37 @@ const CompletedToast: React.FC<CompletedToastProps> = ({
         <span className='text-gray-400 group-hover:text-gray-600'>×</span>
       </button>
 
-      {/* Title with confetti animation */}
-      <div className='mb-3 flex items-center gap-2 pr-6'>
-        <Lottie
-          animationData={animations.confetti}
-          loop={true}
-          className='h-5 w-5'
-        />
-        <span className='aucctus-text-md-semibold aucctus-text-primary'>
-          {title}
-        </span>
-      </div>
+      {/* Header with avatar and title */}
+      <div className='mb-3 flex items-center gap-3 pr-6'>
+        {/* User Avatar */}
+        {user && (
+          <Avatar
+            firstName={user.firstName || ''}
+            lastName={user.lastName || ''}
+            src={user.profileImage}
+            className='h-8 min-h-8 w-8 min-w-8 flex-shrink-0 border-none !bg-green-100 [&_span]:!text-green-700'
+          />
+        )}
 
-      {/* Description if provided */}
-      {description && (
-        <p className='aucctus-text-sm aucctus-text-secondary mb-3'>
-          {description}
-        </p>
-      )}
+        {/* Title with confetti animation */}
+        <div className='flex flex-col gap-1'>
+          <div className='flex items-center gap-2'>
+            <Lottie
+              animationData={animations.confetti}
+              loop={true}
+              className='h-5 w-5'
+            />
+            <span className='aucctus-text-primary aucctus-text-md line-clamp-1 font-semibold'>
+              {title}
+            </span>
+          </div>
+          {conceptTitle && (
+            <span className='aucctus-text-xs aucctus-text-secondary line-clamp-1'>
+              {conceptTitle}
+            </span>
+          )}
+        </div>
+      </div>
 
       {/* Completion status section */}
       <div className='space-y-3'>

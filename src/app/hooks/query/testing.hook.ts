@@ -286,10 +286,10 @@ export const useRegenerateTestDetails = () => {
       }
 
       // Show info toast about regeneration starting
-      toast.success(
-        'Test regeneration started',
-        "We'll refresh the test once it's complete.",
-      );
+      // toast.success(
+      //   'Test regeneration started',
+      //   "We'll refresh the test once it's complete.",
+      // );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);

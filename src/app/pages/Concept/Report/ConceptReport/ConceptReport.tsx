@@ -98,6 +98,9 @@ const ConceptReport: FunctionComponent = () => {
   const setActiveConcept = useStore(
     (state) => state.conceptReport.setActiveConcept,
   );
+  const setConceptUuid = useStore(
+    (state) => state.conceptReport.setConceptUuid,
+  );
   const { mutate: commitConceptVersionRevert, isLoading: isReverting } =
     useCommitConceptVersionRevert();
   const { mutate: cancelConceptVersionRevert, isLoading: isCancelling } =
@@ -126,6 +129,14 @@ const ConceptReport: FunctionComponent = () => {
       setActiveConcept(concept);
     }
   }, [concept, setActiveConcept]);
+
+  // Clear active concept UUID when leaving the concept report page
+  // This ensures workflow_completed toasts show for any concept, not just the last viewed one
+  useEffect(() => {
+    return () => {
+      setConceptUuid(undefined);
+    };
+  }, [setConceptUuid]);
 
   useEffect(() => {
     if (conceptUuid && !hasTrackedView.current) {

@@ -47,6 +47,11 @@ export type ConceptReportStatus =
   | 'error'
   | 'draft';
 
+/**
+ * Section keys for email notification scheduling
+ */
+export type NotificationSectionKey = 'synthetic_execution';
+
 export interface IBaseConceptEntity {
   uuid: string;
   version: number;

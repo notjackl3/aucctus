@@ -10,6 +10,7 @@ import {
   useConceptNotifyOnComplete,
   useConceptNotifyOnCompleteStatus,
 } from '@hooks/query/concepts.hook';
+import { NotificationSectionKey } from '@libs/api/types';
 
 interface ProgressToastData {
   title: string;
@@ -26,6 +27,7 @@ interface ProgressToastData {
   fallbackEstimatedSeconds?: number | null;
   expectedItemCount?: number;
   completedItemCount?: number;
+  sectionKey?: NotificationSectionKey;
 }
 
 interface ProgressToastProps extends Partial<ToastContentProps> {
@@ -52,6 +54,7 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
     fallbackEstimatedSeconds,
     expectedItemCount,
     completedItemCount,
+    sectionKey,
   } = data || {};
 
   const user = useStore((state) => state.auth.user);
@@ -60,21 +63,26 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
   const { mutate: cancelReport, isLoading: isCancelling } =
     useConceptReportCancel();
   const { mutate: scheduleNotification } = useConceptNotifyOnComplete();
-  const { hasNotificationScheduled } =
-    useConceptNotifyOnCompleteStatus(conceptUuid);
+  const { hasNotificationScheduled } = useConceptNotifyOnCompleteStatus(
+    conceptUuid,
+    sectionKey,
+  );
 
   const handleCancel = () => {
-    if (conceptUuid && conceptIdentifier) {
+    if (onCancel) {
+      // Use provided cancel handler (e.g., for synthetic tests)
+      onCancel();
+      closeToast?.();
+    } else if (conceptUuid && conceptIdentifier) {
+      // Fallback to concept report cancel
       cancelReport({ conceptUuid, conceptIdentifier });
       closeToast?.();
-    } else if (onCancel) {
-      onCancel();
     }
   };
 
   const handleEmail = () => {
     if (conceptUuid && !hasNotificationScheduled) {
-      scheduleNotification(conceptUuid);
+      scheduleNotification({ conceptUuid, sectionKey });
     }
   };
 
@@ -146,7 +154,8 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
               theme='brand'
               startTime={startTime}
               onCancel={
-                conceptUuid && conceptIdentifier && !isCancelling
+                (onCancel || (conceptUuid && conceptIdentifier)) &&
+                !isCancelling
                   ? handleCancel
                   : undefined
               }
@@ -179,14 +188,6 @@ const ProgressToast: React.FC<ProgressToastProps> = ({ data, closeToast }) => {
             <span className='aucctus-text-xs aucctus-text-secondary'>
               ~{remainingTime}s remaining
             </span>
-          )}
-          {onCancel && (
-            <button
-              className='aucctus-text-sm aucctus-border-error aucctus-text-error-primary aucctus-bg-error-subtle h-7 rounded-md border px-3 transition-colors hover:opacity-80'
-              onClick={onCancel}
-            >
-              Cancel
-            </button>
           )}
         </div>
       </div>

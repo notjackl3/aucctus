@@ -23,8 +23,8 @@ import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
 
 const {
   ExecutiveSummarySkeleton,
-  PriorityInsightsSkeleton,
-  PESTELSkeleton,
+  MarketScanSkeleton,
+  EcosystemV2Skeleton,
   SkeletonBlock,
 } = ConceptReportSkeletons;
 
@@ -156,6 +156,11 @@ const MarketScanV3: React.FC = () => {
       );
     }
 
+    // Show unified skeleton when loading
+    if (showTrendsSkeletons) {
+      return <MarketScanSkeleton showEcosystem={false} />;
+    }
+
     return (
       <div className='mx-auto flex max-w-[1600px] flex-col gap-8 p-4'>
         {/* Executive Summary - separate loading state */}
@@ -170,57 +175,28 @@ const MarketScanV3: React.FC = () => {
           )}
         </div>
 
-        {/* Trends content - uses trends loading state */}
-        <div>
-          {showTrendsSkeletons ? (
-            <div className='aucctus-bg-primary aucctus-border-secondary flex h-[420px] w-full flex-col gap-4 rounded-lg border p-6 shadow-sm'>
-              <div className='flex items-center justify-between'>
-                <SkeletonBlock className='h-4 w-48' />
-                <div className='flex gap-2'>
-                  <SkeletonBlock className='h-8 w-8 rounded-full' />
-                  <SkeletonBlock className='h-8 w-8 rounded-full' />
-                </div>
-              </div>
-              <SkeletonBlock className='h-full w-full rounded-xl' />
-            </div>
-          ) : (
-            marketForces.length > 0 &&
-            selectedRadarCategory && (
-              <MarketForcesRadar
-                conceptUuid={activeConceptUuid}
-                trendCategories={marketForces}
-                selectedCategory={selectedRadarCategory}
-                onCategorySelect={setSelectedRadarCategory}
-              />
-            )
-          )}
-        </div>
+        {/* Market Forces Radar */}
+        {marketForces.length > 0 && selectedRadarCategory && (
+          <MarketForcesRadar
+            conceptUuid={activeConceptUuid}
+            trendCategories={marketForces}
+            selectedCategory={selectedRadarCategory}
+            onCategorySelect={setSelectedRadarCategory}
+          />
+        )}
 
-        <div>
-          {showTrendsSkeletons ? (
-            <PriorityInsightsSkeleton />
-          ) : (
-            priorityInsights.length > 0 && (
-              <PriorityInsights
-                conceptUuid={activeConceptUuid}
-                insights={priorityInsights}
-              />
-            )
-          )}
-        </div>
+        {/* Priority Insights */}
+        {priorityInsights.length > 0 && (
+          <PriorityInsights
+            conceptUuid={activeConceptUuid}
+            insights={priorityInsights}
+          />
+        )}
 
-        <div>
-          {showTrendsSkeletons ? (
-            <PESTELSkeleton count={Math.max(3, trends.length)} />
-          ) : (
-            trends.length > 0 && (
-              <PESTELAnalysis
-                conceptUuid={activeConceptUuid}
-                sections={trends}
-              />
-            )
-          )}
-        </div>
+        {/* PESTEL Analysis */}
+        {trends.length > 0 && (
+          <PESTELAnalysis conceptUuid={activeConceptUuid} sections={trends} />
+        )}
       </div>
     );
   };
@@ -230,6 +206,16 @@ const MarketScanV3: React.FC = () => {
       return (
         <div className='flex h-64 items-center justify-center'>
           <p className='aucctus-text-secondary'>No concept selected</p>
+        </div>
+      );
+    }
+
+    // Show skeleton when loading
+    if (showTrendsSkeletons) {
+      return (
+        <div className='mx-auto flex max-w-[1600px] flex-col gap-8 p-4'>
+          <ExecutiveSummarySkeleton />
+          <EcosystemV2Skeleton />
         </div>
       );
     }

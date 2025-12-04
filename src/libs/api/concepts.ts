@@ -31,6 +31,7 @@ import {
   IUserJourneyStep,
   QuestionFieldType,
   IConceptMagicShareLatest,
+  NotificationSectionKey,
 } from './types'; // Import the missing type
 import {
   IConceptVersionList,
@@ -441,19 +442,27 @@ export class ConceptApi extends ApiService {
 
   /**
    * Check if email notification is scheduled for concept report completion
+   * @param conceptUuid - The concept UUID
+   * @param sectionKey - Optional section key (e.g., 'synthetic_execution')
    */
-  getNotifyOnCompleteStatus(conceptUuid: string) {
+  getNotifyOnCompleteStatus(
+    conceptUuid: string,
+    sectionKey?: NotificationSectionKey,
+  ) {
     return this.get<{ hasNotificationScheduled: boolean }>(
-      endpoints.conceptReportNotifyOnComplete(conceptUuid),
+      endpoints.conceptReportNotifyOnComplete(conceptUuid, sectionKey),
     );
   }
 
   /**
    * Schedule email notification for when concept report completes
+   * @param conceptUuid - The concept UUID
+   * @param sectionKey - Optional section key (e.g., 'synthetic_execution')
    */
-  notifyOnComplete(conceptUuid: string) {
+  notifyOnComplete(conceptUuid: string, sectionKey?: NotificationSectionKey) {
     return this.post<{ message: string }>(
       endpoints.conceptReportNotifyOnComplete(conceptUuid),
+      sectionKey ? { sectionKey } : undefined,
     );
   }
 

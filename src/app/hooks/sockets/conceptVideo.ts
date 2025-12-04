@@ -153,7 +153,7 @@ export const useConceptVideoGenerationEvents = (
         });
 
         onComplete?.(data.videoUrl);
-        toast.completed(
+        toast.success(
           'Video Generated',
           'Your concept video has been created successfully',
         );

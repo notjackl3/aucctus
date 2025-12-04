@@ -16,10 +16,10 @@ export const useSyntheticExecutionStart = (
     mutationFn: async (data?: ISyntheticExecutionRequest) =>
       api.testing.executeSyntheticTest(conceptUuid, testUuid, data),
     onSuccess: () => {
-      toast.success(
-        'Test Started',
-        "Your synthetic test is now running. You'll be notified when it completes",
-      );
+      // toast.success(
+      //   'Test Started',
+      //   "Your synthetic test is now running. You'll be notified when it completes",
+      // );
     },
     onError: (e: any) => {
       // Handle 409 Conflict specifically - execution already running

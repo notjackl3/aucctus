@@ -474,11 +474,13 @@ export interface ISyntheticExecutionProgressMessage extends BaseSocketEvent {
   conceptUuid: string;
   testUuid: string;
   accountUuid: string;
+  executionId: string;
   stage: string;
   message: string;
   progress: number;
   currentPersona?: string;
   totalPersonas?: number;
+  conceptTitle?: string;
 }
 
 export interface ISyntheticExecutionCompletedMessage extends BaseSocketEvent {

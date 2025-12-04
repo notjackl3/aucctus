@@ -31,6 +31,7 @@ import {
   IUserJourneyStep,
   ConceptReportStatus,
   IConceptPage,
+  NotificationSectionKey,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import useStore from '@stores/store';
@@ -455,10 +456,10 @@ export const useGenerateMarketScan = () => {
       // DO NOT invalidate queries here - that would force a refetch from backend
       // which still shows "complete" status, overwriting our pending states.
       // WebSocket events will handle the actual data updates when backend completes.
-      toast.success(
-        'Market scan regeneration started',
-        "We'll refresh this section as soon as new signals arrive.",
-      );
+      // toast.success(
+      //   'Market scan regeneration started',
+      //   "We'll refresh this section as soon as new signals arrive.",
+      // );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -478,14 +479,13 @@ export const useGenerateEcosystemV2 = () => {
       // Don't mark the entire marketScan section as pending since we want
       // loading to be isolated to just the Ecosystem subtab.
       // The isUpgrading state from the mutation handles immediate skeleton display.
-
       // DO NOT invalidate queries here - that would force a refetch from backend
       // which still shows "complete" status, overwriting our pending states.
       // WebSocket events will handle the actual data updates when backend completes.
-      toast.success(
-        'Ecosystem upgrade started',
-        "We'll refresh this section as soon as the new ecosystem is ready.",
-      );
+      // toast.success(
+      //   'Ecosystem upgrade started',
+      //   "We'll refresh this section as soon as the new ecosystem is ready.",
+      // );
     },
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
@@ -2393,14 +2393,25 @@ export const useAssumptionBatchUpdate = () => {
 /**
  * Custom hook for checking if email notification is scheduled for concept report completion.
  * @param conceptUuid - The UUID of the concept.
+ * @param sectionKey - Optional section key (e.g., 'synthetic_execution').
  * @returns The result of the useQuery hook with notification status.
  */
-export const useConceptNotifyOnCompleteStatus = (conceptUuid?: string) => {
+export const useConceptNotifyOnCompleteStatus = (
+  conceptUuid?: string,
+  sectionKey?: NotificationSectionKey,
+) => {
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.conceptNotifyOnComplete, conceptUuid],
+    queryKey: [
+      AucctusQueryKeys.conceptNotifyOnComplete,
+      conceptUuid,
+      sectionKey,
+    ],
     queryFn: async () => {
       if (!conceptUuid) return { hasNotificationScheduled: false };
-      return await api.concept.getNotifyOnCompleteStatus(conceptUuid);
+      return await api.concept.getNotifyOnCompleteStatus(
+        conceptUuid,
+        sectionKey,
+      );
     },
     enabled: !!conceptUuid,
     staleTime: 1000 * 30, // 30 seconds
@@ -2413,6 +2424,11 @@ export const useConceptNotifyOnCompleteStatus = (conceptUuid?: string) => {
   };
 };
 
+interface NotifyOnCompleteParams {
+  conceptUuid: string;
+  sectionKey?: NotificationSectionKey;
+}
+
 /**
  * Custom hook for scheduling email notification when concept report completes.
  * @returns The result of the useMutation hook.
@@ -2421,12 +2437,16 @@ export const useConceptNotifyOnComplete = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (conceptUuid: string) =>
-      await api.concept.notifyOnComplete(conceptUuid),
-    onSuccess: (_data, conceptUuid) => {
+    mutationFn: async ({ conceptUuid, sectionKey }: NotifyOnCompleteParams) =>
+      await api.concept.notifyOnComplete(conceptUuid, sectionKey),
+    onSuccess: (_data, { conceptUuid, sectionKey }) => {
       // Invalidate the status query to reflect the new state
       queryClient.invalidateQueries({
-        queryKey: [AucctusQueryKeys.conceptNotifyOnComplete, conceptUuid],
+        queryKey: [
+          AucctusQueryKeys.conceptNotifyOnComplete,
+          conceptUuid,
+          sectionKey,
+        ],
       });
     },
     onError: (e) => {
