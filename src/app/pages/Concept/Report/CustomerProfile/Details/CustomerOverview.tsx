@@ -55,7 +55,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
           {/* Header with avatar, segment and name */}
           <div className='mb-6 flex items-start gap-4'>
             <img
-              className='aucctus-border-primary h-16 w-16 self-center rounded-full border'
+              className='aucctus-border-primary h-16 w-16 self-center rounded-full border object-cover'
               alt='avatar'
               src={profile?.avatarUrl || defaultAvatar}
             />
