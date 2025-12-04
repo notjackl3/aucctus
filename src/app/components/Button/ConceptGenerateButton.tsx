@@ -1,9 +1,10 @@
-import { ComponentTooltip, Icon, Loading } from '@components';
+import { ComponentTooltip, Icon, Loading, PulsatingText } from '@components';
 import {
   ConceptReportStatus,
   ConceptReportStatusBySection,
 } from '@libs/api/types';
 import { canOpenConceptWhilePending } from '@libs/utils/concepts';
+import { cn } from '@libs/utils/react';
 import { FunctionComponent, ReactNode } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
@@ -109,61 +110,99 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
 
   // Get button style and label
   const { style, label } = getButtonContext(effectiveVariant);
-  const resolvedLabel =
-    variant === 'pending' && canOpenWhilePending ? (
-      <span className='flex items-center gap-2'>
-        <span className='aucctus-text-primary flex'>
-          {'Updating'.split('').map((letter, index) => (
-            <span
-              key={index}
-              className='inline-block animate-pulse-slow'
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              {letter}
-            </span>
-          ))}
-        </span>
-      </span>
-    ) : (
-      label
-    );
+  const isUpdating = variant === 'pending' && canOpenWhilePending;
+
+  const resolvedLabel = isUpdating ? (
+    <PulsatingText text='Open' delayPerLetter={100} />
+  ) : (
+    label
+  );
+
+  // CSS for border trace pseudo-element
+  const borderTraceStyles = isUpdating ? (
+    <style>{`
+      @keyframes borderTrace {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+      .btn-border-trace {
+        position: relative;
+        overflow: hidden;
+      }
+      .btn-border-trace::after {
+        content: '';
+        position: absolute;
+        inset: -100%;
+        background: conic-gradient(
+          from 0deg,
+          transparent 0%,
+          transparent 88%,
+          rgba(174, 164, 164, 0.5) 93%,
+          rgba(128, 113, 113, 0.7) 96%,
+          rgba(174, 164, 164, 0.5) 100%
+        );
+        animation: borderTrace 3s linear infinite;
+        pointer-events: none;
+        z-index: 0;
+      }
+      .btn-border-trace::before {
+        content: '';
+        position: absolute;
+        inset: 1px;
+        border-radius: 6px;
+        background: inherit;
+        z-index: 1;
+        pointer-events: none;
+      }
+      .btn-border-trace > * {
+        position: relative;
+        z-index: 2;
+      }
+    `}</style>
+  ) : null;
 
   // For all states with reportStatusBySection data, wrap with tooltip
   if (reportStatusBySection) {
     return (
-      <ComponentTooltip
-        tip={
-          <ConceptStatusTooltip
-            reportStatusBySection={reportStatusBySection}
-            dateReportStarted={dateReportStarted}
-            dateReportCompleted={dateReportCompleted}
-            conceptUuid={conceptUuid}
-          />
-        }
-        hideDelay={0}
-      >
-        <animated.button
-          className={style}
-          onClick={onClick}
-          disabled={disabled}
-          style={animationStyle}
+      <>
+        {borderTraceStyles}
+        <ComponentTooltip
+          tip={
+            <ConceptStatusTooltip
+              reportStatusBySection={reportStatusBySection}
+              dateReportStarted={dateReportStarted}
+              dateReportCompleted={dateReportCompleted}
+              conceptUuid={conceptUuid}
+            />
+          }
+          hideDelay={0}
         >
-          {resolvedLabel}
-        </animated.button>
-      </ComponentTooltip>
+          <animated.button
+            className={cn(style, { 'btn-border-trace': isUpdating })}
+            onClick={onClick}
+            disabled={disabled}
+            style={animationStyle}
+          >
+            <span>{resolvedLabel}</span>
+          </animated.button>
+        </ComponentTooltip>
+      </>
     );
   }
 
   // Otherwise return the regular button
   return (
-    <animated.button
-      className={style}
-      onClick={onClick}
-      disabled={disabled}
-      style={animationStyle}
-    >
-      {resolvedLabel}
-    </animated.button>
+    <>
+      {borderTraceStyles}
+      <animated.button
+        className={cn(style, { 'btn-border-trace': isUpdating })}
+        onClick={onClick}
+        disabled={disabled}
+        style={animationStyle}
+      >
+        <span>{resolvedLabel}</span>
+      </animated.button>
+    </>
   );
 };
 

@@ -45,6 +45,15 @@ type TabTitles =
   | 'CONTEXT'
   | 'TESTING';
 
+// Map tab labels to section keys in reportStatusBySection
+const TAB_TO_SECTION_MAP: Partial<Record<TabTitles, string>> = {
+  OVERVIEW: 'overview',
+  'MARKET SCAN': 'ecosystem',
+  'FINANCIAL PROJECTION': 'financialProjection',
+  'CUSTOMER PROFILE': 'customerProfiles',
+  ASSUMPTIONS: 'assumptions',
+};
+
 // Base tabs - Testing will be added dynamically based on concept version
 const CONCEPT_TABS: { label: TabTitles; value: AppPath; icon: IconVariant }[] =
   [
@@ -121,8 +130,29 @@ const ConceptReport: FunctionComponent = () => {
     }
 
     // Filter out Context tab if concept doesn't have seed
-    return tabs.filter((v) => !(v.label === 'CONTEXT' && !concept?.hasSeed));
-  }, [concept?.featureVersions?.assumptions, concept?.hasSeed]);
+    const filteredTabs = tabs.filter(
+      (v) => !(v.label === 'CONTEXT' && !concept?.hasSeed),
+    );
+
+    // Add isLoading state based on section status
+    return filteredTabs.map((tab) => {
+      const sectionKey = TAB_TO_SECTION_MAP[tab.label];
+      const sectionStatus = sectionKey
+        ? concept?.reportStatusBySection?.[sectionKey]?.status
+        : undefined;
+      // Tab is loading if section is pending
+      const isLoading = sectionStatus === 'pending';
+
+      return {
+        ...tab,
+        isLoading,
+      };
+    });
+  }, [
+    concept?.featureVersions?.assumptions,
+    concept?.hasSeed,
+    concept?.reportStatusBySection,
+  ]);
 
   useEffect(() => {
     if (concept) {

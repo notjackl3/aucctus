@@ -287,6 +287,10 @@ module.exports = {
         // Error feedback
         shake: 'shake 0.3s ease-in-out', // Shake animation for errors
         'pulse-slow': 'pulseSlow 5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+
+        // Border trace animations
+        'stroke-trace': 'strokeTrace 3s linear infinite',
+        'border-trace': 'borderTrace 3s linear infinite',
       },
       keyframes: {
         incubationAnswerExpand: {
@@ -413,6 +417,15 @@ module.exports = {
         pulseSlow: {
           '0%, 100%': { opacity: '1' },
           '50%': { opacity: '0.5' },
+        },
+        // Border trace animations
+        strokeTrace: {
+          '0%': { 'stroke-dashoffset': '200' },
+          '100%': { 'stroke-dashoffset': '0' },
+        },
+        borderTrace: {
+          '0%': { transform: 'rotate(0deg)' },
+          '100%': { transform: 'rotate(360deg)' },
         },
       },
     },

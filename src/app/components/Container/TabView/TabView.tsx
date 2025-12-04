@@ -13,6 +13,10 @@ export interface TabElement {
    * Optional icon variant to display with the tab label
    */
   icon?: IconVariant;
+  /**
+   * Whether the tab content is currently loading/updating
+   */
+  isLoading?: boolean;
 }
 
 export interface TabsProps {
@@ -71,6 +75,7 @@ const TabView: FunctionComponent<TabsProps> = ({
               variant={variant}
               isActive={activeTab === tab.value}
               onSelect={onTabSelect}
+              isLoading={tab.isLoading}
             />
           ))}
         </div>

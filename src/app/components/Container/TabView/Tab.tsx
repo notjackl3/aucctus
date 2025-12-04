@@ -1,6 +1,7 @@
 import { FunctionComponent, ReactNode } from 'react';
 import styles from './styles/tab.module.scss';
-import { Icon } from '@components';
+import { BorderTraceWrapper, Icon, PulsatingText } from '@components';
+import { cn } from '@libs/utils/react';
 
 export type TabVariant =
   | 'default'
@@ -26,6 +27,10 @@ export interface ITabProps<T = string> {
    * The variant of the tab for different styles
    */
   variant?: 'default' | 'button' | 'button-separated' | 'icon-button';
+  /**
+   * Whether the tab content is currently loading/updating
+   */
+  isLoading?: boolean;
 }
 
 function getTabStyle(variant: TabVariant) {
@@ -49,13 +54,14 @@ const Tab: FunctionComponent<ITabProps> = ({
   icon,
   onSelect,
   variant = 'default',
+  isLoading = false,
 }) => {
   const activeClassName = isActive ? styles.active : '';
   const tabStyle = getTabStyle(variant);
 
-  return (
+  const tabContent = (
     <li
-      className={`${tabStyle} ${activeClassName} ${className}`}
+      className={cn(tabStyle, activeClassName, className)}
       onClick={(e) => {
         e.preventDefault();
         onSelect(value);
@@ -64,8 +70,20 @@ const Tab: FunctionComponent<ITabProps> = ({
       {icon && variant === 'icon-button' && (
         <Icon variant={icon} className='h-4 w-4' />
       )}
-      <span className={`${styles.label} ${activeClassName}`}>{label}</span>
+      <span className={`${styles.label} ${activeClassName}`}>
+        {isLoading && typeof label === 'string' ? (
+          <PulsatingText text={label} delayPerLetter={60} />
+        ) : (
+          label
+        )}
+      </span>
     </li>
+  );
+
+  return (
+    <BorderTraceWrapper isActive={isLoading} traceLength={20}>
+      {tabContent}
+    </BorderTraceWrapper>
   );
 };
 

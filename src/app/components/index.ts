@@ -1,5 +1,6 @@
 // Component Groups
 import AiInteraction from './AiInteraction'; // Object with AI components - keep for compatibility
+import { PulsatingText, BorderTraceWrapper } from './Animation';
 import Badge from './Badges'; // Object with badge components - keep for compatibility
 import Button from './Button';
 import Card from './Card'; // Object with card components - keep for compatibility
@@ -52,6 +53,7 @@ export {
   Avatar,
   Badge, // This is an object with badge components - keep for compatibility
   Banner,
+  BorderTraceWrapper,
   BetaDisclaimer,
   Button, // This is a component with attached properties - keep
   Card, // This is an object with card components - keep for compatibility
@@ -75,6 +77,7 @@ export {
   NucleusPage,
   Portal,
   Progress,
+  PulsatingText,
   Select,
   Table, // This is a component with attached properties - keep
   Tabs,
