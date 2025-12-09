@@ -191,6 +191,13 @@ export class Endpoints {
     return `api/v2/concept/customer-profile/${customerProfileUuid}/conversation/${sessionId}/messages`;
   }
 
+  static conceptCustomerProfileConversationExport(
+    customerProfileUuid: string,
+    sessionId: string,
+  ) {
+    return `api/v2/concept/customer-profile/${customerProfileUuid}/conversation/${sessionId}/export`;
+  }
+
   static conceptCustomerProfileConversationList(
     customerProfileUuid: string,
     filterOptions?: IConversationFilterOptions,

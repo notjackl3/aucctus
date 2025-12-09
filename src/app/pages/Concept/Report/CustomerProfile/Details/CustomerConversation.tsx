@@ -1,6 +1,8 @@
 import { useModal } from '@context/ModalContextProvider';
 import { useConceptCustomerProfileConversationMessages } from '@hooks/query/concepts.hook';
 import { ICustomerProfile } from '@libs/api/types';
+import api from '@libs/api';
+import { downloadPdf } from '@libs/utils/files';
 import { cn } from '@libs/utils/react';
 import {
   CustomerProfileMessage,
@@ -19,7 +21,7 @@ import React, {
 import { v4 as uuidv4 } from 'uuid';
 
 // Components
-import { Icon, Loading, Modal } from '@components';
+import { Icon, Loading, Modal, toast } from '@components';
 import defaultAvatar from '@assets/img/avatar.png';
 import Avatar from '@components/Avatar';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
@@ -56,11 +58,15 @@ const CustomerConversation = forwardRef<
 
   const [isFirstMessage, setIsFirstMessage] = useState(true);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+  const [isExporting, setIsExporting] = useState(false);
 
   // Context hooks
   const { openModal, closeModal } = useModal();
 
   // Store hooks
+  const storeSessionId = useStore(
+    (state) => state.customerProfileConversations.sessionId,
+  );
   const {
     sendMessage,
     currentMessage,
@@ -125,6 +131,11 @@ const CustomerConversation = forwardRef<
     };
   }, [profile]);
 
+  const canExport = useMemo(() => {
+    const sessionId = activeConversation?.uuid || storeSessionId;
+    return !!sessionId && activeMessages.length > 0;
+  }, [activeConversation?.uuid, activeMessages.length, storeSessionId]);
+
   // Callbacks
   const doConversationClear = useCallback(() => {
     conversationMessagesRef.current = [];
@@ -167,6 +178,47 @@ const CustomerConversation = forwardRef<
       },
     });
   };
+
+  const handleExportConversation = useCallback(async () => {
+    const sessionId = activeConversation?.uuid || storeSessionId;
+
+    if (!sessionId) {
+      toast.error(
+        'No conversation found',
+        'Start a conversation before exporting.',
+      );
+      return;
+    }
+
+    if (activeMessages.length === 0) {
+      toast.error('No messages', 'Send a message to export this chat.');
+      return;
+    }
+
+    setIsExporting(true);
+    try {
+      const blob = await api.concept.exportConceptCustomerProfileConversation(
+        profile.uuid,
+        sessionId,
+      );
+      const safeName =
+        profile.name.replace(/[^a-z0-9]/gi, '_') || 'customer_profile';
+      await downloadPdf(blob, `${safeName}_chat.pdf`);
+    } catch (error) {
+      toast.error(
+        'Export failed',
+        'Unable to export this conversation right now. Please try again.',
+      );
+    } finally {
+      setIsExporting(false);
+    }
+  }, [
+    activeConversation?.uuid,
+    activeMessages.length,
+    profile.name,
+    profile.uuid,
+    storeSessionId,
+  ]);
 
   // Effects - Initialization
   useEffect(() => {
@@ -299,6 +351,32 @@ const CustomerConversation = forwardRef<
                   height={20}
                   className='aucctus-stroke-secondary'
                 />
+              </span>
+            </button>
+          </Tooltip>
+          <Tooltip tip='Export chat as PDF'>
+            <button
+              onClick={handleExportConversation}
+              disabled={!canExport || isExporting}
+              className={cn(
+                'aspect-square w-8 rounded-lg',
+                'transition-all duration-200',
+                'aucctus-bg-secondary-hover',
+                (!canExport || isExporting) && 'cursor-not-allowed opacity-50',
+              )}
+              aria-label='Export conversation'
+            >
+              <span className='flex items-center justify-center'>
+                {isExporting ? (
+                  <Loading isSmall />
+                ) : (
+                  <Icon
+                    variant='download'
+                    width={20}
+                    height={20}
+                    className='aucctus-stroke-secondary'
+                  />
+                )}
               </span>
             </button>
           </Tooltip>

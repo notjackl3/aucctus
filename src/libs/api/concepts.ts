@@ -363,6 +363,19 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  exportConceptCustomerProfileConversation(
+    customerProfileUuid: string,
+    sessionId: string,
+  ) {
+    return this.get<Blob>(
+      endpoints.conceptCustomerProfileConversationExport(
+        customerProfileUuid,
+        sessionId,
+      ),
+      { responseType: 'blob' },
+    );
+  }
+
   getCustomerProfileConversationList(
     customerProfileUuid: string,
     filterOptions?: IConversationFilterOptions,
