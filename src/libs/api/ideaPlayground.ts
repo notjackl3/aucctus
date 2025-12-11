@@ -104,19 +104,6 @@ export class IdeaPlaygroundApi extends ApiService {
   }
 
   /**
-   * Generate nucleus insights for a question
-   * Returns 202 Accepted if generation is in progress
-   */
-  generateNucleusInsights(
-    seedUuid: string,
-    questionUuid: string,
-  ): Promise<INucleusInsightsResponse> {
-    return this.post<INucleusInsightsResponse>(
-      endpoints.ideaPlaygroundNucleusInsights(seedUuid, questionUuid),
-    );
-  }
-
-  /**
    * Add a user's own answer to a question
    * User answers are automatically included when created
    */

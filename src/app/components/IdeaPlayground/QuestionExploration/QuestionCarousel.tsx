@@ -319,11 +319,15 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     'idea_playground.insight.validation_failed.user',
     (data) => {
       if (data.seedUuid === seedUuid) {
+        // Invalidate questions query to get updated insight with failed status
+        debouncedInvalidate([
+          AucctusQueryKeys.ideaPlaygroundQuestions,
+          data.seedUuid,
+        ]);
         telemetry.log('ideaPlayground.insight.validation_failed.websocket', {
           insightUuid: data.insightUuid,
           error: data.errorMessage,
         });
-        toast.warning('Citation validation failed for one insight');
       }
     },
   );
@@ -462,6 +466,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     sentiment: insight.sentiment,
     moreDetails: insight.moreDetails,
     whyItMatters: insight.whyItMatters,
+    citationValidationStatus: insight.citationValidationStatus,
   });
 
   // Convert API questions to legacy format for existing UI

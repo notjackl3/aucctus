@@ -98,11 +98,18 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
     );
   };
 
+  const isNucleusInsight =
+    card.source?.toLowerCase().includes('nucleus report') || false;
+  const canOpenDetails =
+    !isNucleusInsight && card.citationValidationStatus !== 'error';
+
   const handleDoubleClick = () => {
     if (clickTimerRef.current) {
       clearTimeout(clickTimerRef.current);
       clickTimerRef.current = null;
     }
+    // Don't open modal for Nucleus insights or failed validations
+    if (!canOpenDetails) return;
     onDoubleClick();
   };
 
@@ -120,27 +127,29 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   // Determine citation validation status
   const getCitationStatus = () => {
-    if (card.moreDetails === null) {
-      return {
-        icon: 'beaker' as const,
-        color: 'aucctus-stroke-quaternary',
-        tooltip: 'Researching and validating...',
-        animate: true,
-      };
-    } else if (card.moreDetails) {
-      return {
-        icon: 'check-circle-broken' as const,
-        color: 'aucctus-stroke-success-primary',
-        tooltip: 'Citation validated - Double click for details',
-        animate: false,
-      };
-    } else {
-      return {
-        icon: 'closeX' as const,
-        color: 'aucctus-stroke-error-primary',
-        tooltip: 'Citation validation failed',
-        animate: false,
-      };
+    switch (card.citationValidationStatus) {
+      case 'success':
+        return {
+          icon: 'check-circle-broken' as const,
+          color: 'aucctus-stroke-success-primary',
+          tooltip: 'Citation validated - Double click for details',
+          animate: false,
+        };
+      case 'error':
+        return {
+          icon: 'closeX' as const,
+          color: 'aucctus-stroke-error-primary',
+          tooltip: 'Citation validation failed',
+          animate: false,
+        };
+      case 'pending':
+      default:
+        return {
+          icon: 'beaker' as const,
+          color: 'aucctus-stroke-quaternary',
+          tooltip: 'Researching and validating...',
+          animate: true,
+        };
     }
   };
 
@@ -221,30 +230,34 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      {/* Citation validation status icon - top right */}
-      <div className='absolute right-2 top-2'>
-        <ComponentTooltip
-          tip={
-            <div
-              className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary max-w-xs rounded-lg border px-3 py-2 shadow-lg'
-              style={{
-                boxShadow:
-                  '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
-              }}
-            >
-              <span className='aucctus-text-xs'>{citationStatus.tooltip}</span>
-            </div>
-          }
-          preferredPosition='below'
-        >
-          <Icon
-            variant={citationStatus.icon}
-            className={`${citationStatus.color} ${citationStatus.animate ? 'animate-pulse' : ''}`}
-            height={16}
-            width={16}
-          />
-        </ComponentTooltip>
-      </div>
+      {/* Citation validation status icon - top right (hidden for Nucleus insights) */}
+      {!isNucleusInsight && (
+        <div className='absolute right-2 top-2'>
+          <ComponentTooltip
+            tip={
+              <div
+                className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary max-w-xs rounded-lg border px-3 py-2 shadow-lg'
+                style={{
+                  boxShadow:
+                    '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
+                }}
+              >
+                <span className='aucctus-text-xs'>
+                  {citationStatus.tooltip}
+                </span>
+              </div>
+            }
+            preferredPosition='below'
+          >
+            <Icon
+              variant={citationStatus.icon}
+              className={`${citationStatus.color} ${citationStatus.animate ? 'animate-pulse' : ''}`}
+              height={16}
+              width={16}
+            />
+          </ComponentTooltip>
+        </div>
+      )}
 
       {/* Selected indicator or loading spinner */}
       {optimisticSelected || isLoading ? (

@@ -136,7 +136,7 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
               <div className='aucctus-text-xs-medium aucctus-text-placeholder mb-2 uppercase tracking-wider'>
                 MORE DETAILS
               </div>
-              {!selectedInsight.moreDetails && (
+              {selectedInsight.citationValidationStatus === 'pending' && (
                 <div className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-4'>
                   <Loading isSmall />
                   <span className='aucctus-text-tertiary aucctus-text-sm'>
@@ -144,11 +144,23 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
                   </span>
                 </div>
               )}
-              {selectedInsight.moreDetails && (
-                <p className='aucctus-text-secondary leading-relaxed'>
-                  {selectedInsight.moreDetails}
-                </p>
+              {selectedInsight.citationValidationStatus === 'error' && (
+                <div className='flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/5 p-4'>
+                  <Icon
+                    variant='closeX'
+                    className='aucctus-stroke-error-primary h-4 w-4'
+                  />
+                  <span className='aucctus-text-error-primary aucctus-text-sm'>
+                    Citation validation failed
+                  </span>
+                </div>
               )}
+              {selectedInsight.citationValidationStatus === 'success' &&
+                selectedInsight.moreDetails && (
+                  <p className='aucctus-text-secondary leading-relaxed'>
+                    {selectedInsight.moreDetails}
+                  </p>
+                )}
             </div>
           </div>
 

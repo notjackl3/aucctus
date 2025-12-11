@@ -711,10 +711,6 @@ export class Endpoints {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/research-insights`;
   }
 
-  static ideaPlaygroundNucleusInsights(seedUuid: string, questionUuid: string) {
-    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/nucleus-insights`;
-  }
-
   static ideaPlaygroundUserAnswer(seedUuid: string, questionUuid: string) {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}/user-answer`;
   }

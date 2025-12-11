@@ -17,7 +17,11 @@ export type {
   IGeneratedIdeaPlaygroundConcept,
   QuestionType,
   ConceptType,
+  CitationValidationStatus,
 } from '@libs/api/types';
+
+// Import for local use in this file
+import type { CitationValidationStatus } from '@libs/api/types';
 
 // ============================================
 // Display/UI Types
@@ -47,6 +51,7 @@ export interface InsightCard {
     goodNews: string;
     badNews: string;
   } | null;
+  citationValidationStatus?: CitationValidationStatus;
 }
 
 export interface SavedItem {

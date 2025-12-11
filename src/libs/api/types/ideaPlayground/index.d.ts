@@ -96,6 +96,11 @@ export interface IWhyItMatters {
 }
 
 /**
+ * Citation validation status for research insights
+ */
+export type CitationValidationStatus = 'pending' | 'success' | 'error';
+
+/**
  * Research Insight - AI-generated insight with source validation
  * Backend returns flat source fields (sourceUrl, sourceTitle, sourceCredibility)
  */
@@ -108,6 +113,7 @@ export interface IResearchInsight {
   sourceCredibility: number;
   moreDetails?: string | null;
   whyItMatters?: IWhyItMatters | null;
+  citationValidationStatus?: CitationValidationStatus;
   createdAt?: string;
   sentiment: 'headwind' | 'tailwind' | 'neutral';
 }
@@ -124,6 +130,7 @@ export interface INucleusInsight {
   sourceCredibility: number;
   moreDetails?: string | null;
   whyItMatters?: IWhyItMatters | null;
+  citationValidationStatus?: CitationValidationStatus;
   createdAt?: string;
   sentiment: 'headwind' | 'tailwind' | 'neutral';
 }
