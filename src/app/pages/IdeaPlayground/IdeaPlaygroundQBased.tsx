@@ -8,6 +8,8 @@ import {
   LandingView,
   ExplorationModeSelector,
   PlaygroundLoadingIndicator,
+  PlaygroundLoadingTransition,
+  IdeationModeSwitcher,
 } from '@components/IdeaPlayground';
 import type { IAnchorThought } from '@components/IdeaPlayground/types';
 import { animationStyles } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
@@ -30,6 +32,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const [hasStartedTyping, setHasStartedTyping] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const [showOpportunityMap, setShowOpportunityMap] = useState(false);
+  // Track if data is ready to show carousel (after loading transition completes)
+  const [isDataReady, setIsDataReady] = useState(false);
 
   // URL parameter handling
   const [searchParams, setSearchParams] = useSearchParams();
@@ -113,10 +117,26 @@ const IdeaPlaygroundQBased: React.FC = () => {
         // Reset the newly created seed flag since we're now in restoration mode
         setIsNewlyCreatedSeed(false);
 
+        // Check if all questions already have data (restored session with complete data)
+        const allQuestionsHaveData = existingQuestions.every((q) => {
+          const hasPossibleAnswers =
+            q.possibleAnswers && q.possibleAnswers.length > 0;
+          const hasResearchInsights =
+            (q.researchInsights && q.researchInsights.length > 0) ||
+            (q.insights && q.insights.length > 0);
+          return hasPossibleAnswers && hasResearchInsights;
+        });
+
+        if (allQuestionsHaveData) {
+          // Skip loading transition if data is already available
+          setIsDataReady(true);
+        }
+
         telemetry.log('ideaPlayground.session.restored', {
           seedUuid: seedUuidFromUrl,
           questionCount: existingQuestions.length,
           anchorThought: seedAnchorThought.thought,
+          dataReady: allQuestionsHaveData,
         });
       } else if (
         !isLoadingExistingQuestions &&
@@ -267,6 +287,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setCurrentSeedUuid(null);
     setHasRestoredSession(false);
     setIsNewlyCreatedSeed(false);
+    setIsDataReady(false);
     // Clear URL parameter and reset UI state
     setSearchParams({});
     ideaPlaygroundStore.reset();
@@ -355,23 +376,44 @@ const IdeaPlaygroundQBased: React.FC = () => {
                 style={style}
                 className='relative z-10 flex min-h-screen'
               >
-                <div className='flex flex-1 flex-col'>
-                  <div className='px-8 pb-4 pt-8'>
-                    <ExplorationModeSelector
-                      currentTopic={currentTopic}
-                      onRestart={handleRestart}
-                    />
+                {/* Loading Transition - Show until data is ready */}
+                {!isDataReady && (
+                  <div className='flex flex-1 flex-col'>
+                    <div className='px-8 pb-4 pt-8'>
+                      <ExplorationModeSelector
+                        currentTopic={currentTopic}
+                        onRestart={handleRestart}
+                      />
+                    </div>
+                    <div className='relative flex-1 pt-24'>
+                      <PlaygroundLoadingTransition
+                        seedUuid={currentSeedUuid}
+                        onReady={() => setIsDataReady(true)}
+                      />
+                    </div>
                   </div>
+                )}
 
-                  {/* Main Map Area - Question Carousel */}
-                  <div className='relative flex-1 pt-24'>
-                    <QuestionCarousel
-                      topic={currentTopic || 'Cheese on chicken in QSR'}
-                      seedUuid={currentSeedUuid}
-                      onGenerateIdeas={handleGenerateIdeas}
-                    />
+                {/* Question Carousel - Show when data is ready */}
+                {isDataReady && (
+                  <div className='flex flex-1 flex-col'>
+                    <div className='px-8 pb-4 pt-8'>
+                      <ExplorationModeSelector
+                        currentTopic={currentTopic}
+                        onRestart={handleRestart}
+                      />
+                    </div>
+
+                    {/* Main Map Area - Question Carousel */}
+                    <div className='relative flex-1 pt-24'>
+                      <QuestionCarousel
+                        topic={currentTopic || 'Cheese on chicken in QSR'}
+                        seedUuid={currentSeedUuid}
+                        onGenerateIdeas={handleGenerateIdeas}
+                      />
+                    </div>
                   </div>
-                </div>
+                )}
               </animated.div>
             ),
         )}
@@ -381,6 +423,14 @@ const IdeaPlaygroundQBased: React.FC = () => {
         <OpportunityMap
           seedUuid={currentSeedUuid}
           onClose={handleCloseOpportunityMap}
+        />
+      )}
+
+      {/* Mode Switcher - Bottom Left (only on intro/landing page) */}
+      {!hasStartedTyping && (
+        <IdeationModeSwitcher
+          currentMode='playground'
+          className='absolute bottom-6 left-6'
         />
       )}
     </div>

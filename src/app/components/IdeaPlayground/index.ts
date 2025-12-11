@@ -18,6 +18,10 @@ export {
 
 // Loading components
 export { PlaygroundLoadingIndicator } from './PlaygroundLoadingIndicator';
+export { PlaygroundLoadingTransition } from './PlaygroundLoadingTransition';
+
+// Mode Switcher
+export { IdeationModeSwitcher } from './IdeationModeSwitcher';
 
 // OpportunityMap components
 export { default as OpportunityMap } from './OpportunityMap';

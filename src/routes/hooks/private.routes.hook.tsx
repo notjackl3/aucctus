@@ -41,6 +41,12 @@ const usePrivateRoutes = () => {
         path={AppPath.IdeaPlayground}
         element={<Page.IdeaPlayground.IdeaPlaygroundQBased />}
       />
+
+      {/* Testing/Demo Routes */}
+      <Route
+        path={AppPath.TestingConceptOverview}
+        element={<Page.Testing.ConceptOverviewTesting />}
+      />
     </Route>
   );
 };

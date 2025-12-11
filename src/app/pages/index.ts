@@ -14,7 +14,7 @@ const Page = {
   Concept,
   IdeaPlayground,
   SettingsPages,
-  TestingPages,
+  Testing: TestingPages,
 };
 
 export default Page;

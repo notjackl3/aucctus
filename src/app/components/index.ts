@@ -1,6 +1,6 @@
 // Component Groups
 import AiInteraction from './AiInteraction'; // Object with AI components - keep for compatibility
-import { PulsatingText, BorderTraceWrapper } from './Animation';
+import { PulsatingText, BorderTraceWrapper, LogoAnimation } from './Animation';
 import Badge from './Badges'; // Object with badge components - keep for compatibility
 import Button from './Button';
 import Card from './Card'; // Object with card components - keep for compatibility
@@ -73,6 +73,7 @@ export {
   Input,
   Legend, // This is an object with legend components - keep for compatibility
   Loading,
+  LogoAnimation,
   Modal,
   NucleusPage,
   Portal,

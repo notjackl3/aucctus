@@ -2,6 +2,7 @@ import { Card } from '@components';
 import ConceptGeneration from '@components/Card/ConceptGeneration/Generation/ConceptGeneration';
 import ConceptSelection from '@components/Card/ConceptGeneration/Generation/ConceptSelection';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
+import { IdeationModeSwitcher } from '@components/IdeaPlayground';
 import {
   useConceptIncubationQuestionnaire,
   useConceptReportGenerate,
@@ -521,7 +522,7 @@ const IncubateConcept: React.FC = () => {
       {!(isSeedLoading || isQuestionnaireLoading || isAnswersLoading) && (
         <div
           className={cn(
-            'ease flex h-[100vh] flex-row overflow-hidden transition-all duration-300',
+            'ease relative flex h-[100vh] flex-row overflow-hidden transition-all duration-300',
             {
               'p-8': conceptGenerationState !== 'selecting',
             },
@@ -536,6 +537,16 @@ const IncubateConcept: React.FC = () => {
           {conceptGenerationState === 'selecting' &&
             renderConceptSelection(
               'flex flex-col flex-1 ease h-full transition-all duration-300',
+            )}
+
+          {/* Mode Switcher - Bottom Left (only before selecting a questionnaire type) */}
+          {conceptGenerationState === 'pre-generation' &&
+            !activeQuestionnaire && (
+              <IdeationModeSwitcher
+                currentMode='ideate'
+                variant='light'
+                className='absolute bottom-6 left-6 z-50'
+              />
             )}
         </div>
       )}
