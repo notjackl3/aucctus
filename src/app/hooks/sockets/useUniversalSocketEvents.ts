@@ -812,10 +812,12 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
 
         if (matchesActive || !activeConceptUuid) {
           // Show toast if it matches active concept or if no concept is active (user is not on concept page)
+          // Use toast.deferred to avoid "setState during render" warning
+          // when this event arrives while a component (like ConceptReport) is rendering
           const handler =
             config.conceptWorkflow.onWorkflowCompleted ||
             ((msg: any) => {
-              toast.completed(
+              toast.deferred.completed(
                 'Concept Report Ready',
                 msg.conceptTitle,
                 undefined,
@@ -916,7 +918,8 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
             activeConceptUuid && message.conceptUuid === activeConceptUuid;
 
           if (matchesActiveConcept && !hasActiveProgressToast) {
-            toast.success(
+            // Use toast.deferred to avoid "setState during render" warning
+            toast.deferred.success(
               `Section updated successfully!`,
               message.message || 'Your changes have been applied.',
               5000,
@@ -938,10 +941,11 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
 
         if (matchesActive || !activeConceptUuid) {
           // Show toast if it matches active concept or if no concept is active (user is not on concept page)
+          // Use toast.deferred to avoid "setState during render" warning
           const handler =
             config.conceptWorkflow.onWorkflowError ||
             ((msg: any) => {
-              toast.error(
+              toast.deferred.error(
                 'Concept Generation Failed',
                 msg.message ||
                   'An error occurred while generating your concept report',
@@ -1012,7 +1016,11 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.syntheticTesting.onExecutionCompleted ||
         (() => {
-          toast.completed('Synthetic Testing Complete', data.conceptTitle);
+          // Use toast.deferred to avoid "setState during render" warning
+          toast.deferred.completed(
+            'Synthetic Testing Complete',
+            data.conceptTitle,
+          );
         });
 
       handler(data);
@@ -1055,7 +1063,8 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           .includes('cancel');
         if (isCancellation) return;
 
-        toast.error(
+        // Use toast.deferred to avoid "setState during render" warning
+        toast.deferred.error(
           'Synthetic Testing Failed',
           msg.errorMessage || 'An error occurred during execution',
         );
@@ -1114,7 +1123,8 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       config.nucleusUpload.onUploadProgress ||
       ((msg: INucleusUploadProgressMessage) => {
         if (msg.stage === 'completed') {
-          toast.completed('Documents Processed');
+          // Use toast.deferred to avoid "setState during render" warning
+          toast.deferred.completed('Documents Processed');
         } else if (msg.stage === 'processing' && msg.progress) {
           // TODO: Track with toast ID and use toast.updateProgress() for real progress tracking
           // For now, just show info about processing
@@ -1146,7 +1156,8 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
           queryKey: [AucctusQueryKeys.nucleusReportLatest],
         });
 
-        toast.completed(
+        // Use toast.deferred to avoid "setState during render" warning
+        toast.deferred.completed(
           `${msg.uploadedCount} Document${msg.uploadedCount > 1 ? 's' : ''} Uploaded`,
         );
       });
@@ -1166,7 +1177,8 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config.nucleusUpload.onUploadError ||
         ((msg: INucleusUploadErrorMessage) => {
-          toast.error(
+          // Use toast.deferred to avoid "setState during render" warning
+          toast.deferred.error(
             'Document Upload Failed',
             msg.message || 'Please try uploading your documents again',
           );
@@ -1256,7 +1268,8 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config?.ideaPlayground?.onConceptsGenerated ||
         ((msg: any) => {
-          toast.completed(`${msg.conceptCount} Concepts Generated`);
+          // Use toast.deferred to avoid "setState during render" warning
+          toast.deferred.completed(`${msg.conceptCount} Concepts Generated`);
           queryClient.invalidateQueries({
             queryKey: [
               AucctusQueryKeys.ideaPlaygroundGeneratedIdeas,
@@ -1311,7 +1324,8 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config?.magicShare?.onShareError ||
         ((msg: IMagicShareErrorMessage) => {
-          toast.error(
+          // Use toast.deferred to avoid "setState during render" warning
+          toast.deferred.error(
             'Magic Share Failed',
             msg.message || 'Failed magic share generation. Please try again.',
             5000,

@@ -146,6 +146,13 @@ const dismiss = (id?: Id): void => {
 };
 
 /**
+ * Checks if a toast is currently active/visible
+ */
+const isActive = (id: Id): boolean => {
+  return reactToast.isActive(id);
+};
+
+/**
  * Dismisses all active toasts
  */
 const dismissAll = (): void => {
@@ -294,6 +301,38 @@ const error = (
   });
 };
 
+/**
+ * Helper to create a deferred version of a toast function.
+ * Uses queueMicrotask to defer execution until after the current sync code completes.
+ * This prevents "Cannot update a component while rendering" warnings in WebSocket handlers.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const defer = <T extends (...args: any[]) => any>(fn: T) => {
+  return (...args: Parameters<T>) => {
+    queueMicrotask(() => fn(...args));
+  };
+};
+
+/**
+ * Deferred toast methods - use these in WebSocket event handlers to avoid
+ * "Cannot update a component while rendering" warnings.
+ *
+ * @example
+ * // In a WebSocket handler:
+ * toast.deferred.error('Upload Failed', 'Please try again');
+ * toast.deferred.success('Operation Complete');
+ * toast.deferred.completed('Report Ready', conceptTitle);
+ */
+const deferred = {
+  show: defer(show),
+  success: defer(success),
+  error: defer(error),
+  info: defer(info),
+  warning: defer(warning),
+  completed: defer(completed),
+  progress: defer(progress),
+};
+
 export const toast = {
   show,
   success,
@@ -303,8 +342,11 @@ export const toast = {
   dismiss,
   dismissAll,
   update,
+  isActive,
   // Enhanced toast variants with animations
   progress,
   updateProgress,
   completed,
+  // Deferred versions for WebSocket handlers
+  deferred,
 };

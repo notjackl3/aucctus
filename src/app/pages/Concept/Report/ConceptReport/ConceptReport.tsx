@@ -95,7 +95,6 @@ const ConceptReport: FunctionComponent = () => {
 
   const {
     concept,
-    isFetched: isConceptFetched,
     isLoading: isConceptLoading,
     isFetching: isConceptFetching,
   } = useConcept(conceptIdentifier);
@@ -210,8 +209,16 @@ const ConceptReport: FunctionComponent = () => {
     [updateConcept, conceptIdentifier],
   );
 
-  if (!concept && isConceptFetched) {
-    toast.error('Concept Not Found', 'Concept Not Found');
+  // Show toast and redirect if concept not found
+  // Only redirect when query is idle (not loading/fetching) and no concept exists
+  const shouldRedirect = !concept && !isConceptLoading && !isConceptFetching;
+  useEffect(() => {
+    if (shouldRedirect) {
+      toast.error('Concept Not Found', 'Concept Not Found');
+    }
+  }, [shouldRedirect]);
+
+  if (shouldRedirect) {
     return <Navigate to={AppPath.ConceptBank} />;
   }
 
