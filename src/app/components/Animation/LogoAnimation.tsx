@@ -83,7 +83,7 @@ const LogoAnimation = forwardRef<LogoAnimationRef, LogoAnimationProps>(
   (
     {
       size = 200,
-      fps = 45,
+      fps = 60,
       loop = false,
       pingPong = true,
       loopDelay = 1000,
@@ -278,7 +278,7 @@ const LogoAnimation = forwardRef<LogoAnimationRef, LogoAnimationProps>(
       <div className={cn('relative inline-block', className)}>
         <div style={{ width: size, height: size }}>
           {!isLoaded && (
-            <div className='aucctus-bg-secondary absolute inset-0 flex flex-col items-center justify-center rounded-lg'>
+            <div className='aucctus-bg-secondary absolute inset-0 flex flex-col items-center justify-center rounded-lg !opacity-0'>
               <div className='aucctus-text-sm aucctus-text-secondary mb-2'>
                 Loading animation...
               </div>

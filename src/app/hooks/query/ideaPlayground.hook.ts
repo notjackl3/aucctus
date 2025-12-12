@@ -778,6 +778,16 @@ export const useGetGeneratedIdeas = (seedUuid?: string) => {
       ? query.data.concepts.length > 0
       : false;
 
+  // Extract generatingMore and canGenerateMore from response
+  const generatingMore =
+    query.data && !isGenerationInProgress(query.data)
+      ? (query.data.generatingMore ?? false)
+      : false;
+  const canGenerateMore =
+    query.data && !isGenerationInProgress(query.data)
+      ? (query.data.canGenerateMore ?? true)
+      : true;
+
   return {
     ...query,
     generatedIdeasResponse: query.data,
@@ -787,6 +797,109 @@ export const useGetGeneratedIdeas = (seedUuid?: string) => {
       query.data && !isGenerationInProgress(query.data)
         ? query.data.concepts
         : [],
+    generatingMore,
+    canGenerateMore,
+  };
+};
+
+/**
+ * Custom hook for generating additional concepts for a seed.
+ * Triggers the "Generate More" feature which creates 4 new concepts different from existing ones.
+ * Returns a mutation function for generating more concepts.
+ */
+export const useGenerateMoreConcepts = (seedUuid: string) => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      if (!seedUuid) {
+        throw new Error('Seed UUID is required');
+      }
+      return await api.ideaPlayground.generateMoreIdeas(seedUuid);
+    },
+    onSuccess: () => {
+      telemetry.log('ideaPlayground.generateMore.started', {
+        seedUuid,
+      });
+      // Invalidate the GET query to update generatingMore status
+      queryClient.invalidateQueries([
+        AucctusQueryKeys.ideaPlaygroundGeneratedIdeas,
+        seedUuid,
+      ]);
+    },
+    onError: (e: AxiosError | Error) => {
+      const message =
+        'response' in e
+          ? utils.osiris.parseFormError(e as AxiosError)
+          : e.message;
+      toast.error(message || 'Failed to generate more concepts.');
+      telemetry.error('ideaPlayground.generateMore.failed', e);
+    },
+    retry: false,
+  });
+
+  return {
+    generateMore: mutation.mutate,
+    generateMoreAsync: mutation.mutateAsync,
+    isLoading: mutation.isLoading,
+    error: mutation.error,
+    isSuccess: mutation.isSuccess,
+    reset: mutation.reset,
+  };
+};
+
+/**
+ * Custom hook for regenerating concepts with user feedback.
+ * Triggers a fresh concept generation using user feedback, replacing existing concepts.
+ * Returns a mutation function for regenerating concepts with feedback.
+ */
+export const useRegenerateConceptsWithFeedback = (seedUuid: string) => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (feedback: string) => {
+      if (!seedUuid) {
+        throw new Error('Seed UUID is required');
+      }
+      if (!feedback || feedback.trim().length === 0) {
+        throw new Error('Feedback is required');
+      }
+      if (feedback.length > 1000) {
+        throw new Error('Feedback must be 1000 characters or less');
+      }
+      return await api.ideaPlayground.regenerateIdeasWithFeedback(
+        seedUuid,
+        feedback.trim(),
+      );
+    },
+    onSuccess: () => {
+      telemetry.log('ideaPlayground.regenerateWithFeedback.started', {
+        seedUuid,
+      });
+      // Invalidate the GET query to update generatingMore status
+      queryClient.invalidateQueries([
+        AucctusQueryKeys.ideaPlaygroundGeneratedIdeas,
+        seedUuid,
+      ]);
+    },
+    onError: (e: AxiosError | Error) => {
+      const message =
+        'response' in e
+          ? utils.osiris.parseFormError(e as AxiosError)
+          : e.message;
+      toast.error(message || 'Failed to regenerate concepts with feedback.');
+      telemetry.error('ideaPlayground.regenerateWithFeedback.failed', e);
+    },
+    retry: false,
+  });
+
+  return {
+    regenerateWithFeedback: mutation.mutate,
+    regenerateWithFeedbackAsync: mutation.mutateAsync,
+    isLoading: mutation.isLoading,
+    error: mutation.error,
+    isSuccess: mutation.isSuccess,
+    reset: mutation.reset,
   };
 };
 

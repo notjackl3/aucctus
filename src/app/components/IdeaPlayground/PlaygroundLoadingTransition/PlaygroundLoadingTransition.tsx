@@ -1,5 +1,6 @@
 import React, { useEffect, useCallback, useState, useRef } from 'react';
 import { LogoAnimation } from '@components';
+import { BarberPoleProgressBar } from '@components/Progress';
 import { useQuestions } from '@hooks/query/ideaPlayground.hook';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
@@ -269,7 +270,7 @@ const PlaygroundLoadingTransition: React.FC<
     <div className='flex h-full w-full flex-col items-center justify-center'>
       <div className='flex flex-col items-center gap-8'>
         {/* Logo Animation */}
-        <LogoAnimation size={200} loop fps={45} />
+        <LogoAnimation size={200} loop fps={75} />
 
         {/* Loading Message with fade animation */}
         <div className='flex h-8 flex-col items-center justify-center'>
@@ -281,20 +282,15 @@ const PlaygroundLoadingTransition: React.FC<
           </p>
         </div>
 
-        {/* Asymptotic progress bar */}
-        <div className='flex w-64 flex-col items-center gap-2'>
-          <div className='h-1.5 w-full overflow-hidden rounded-full bg-white/20'>
-            <div
-              className='h-full rounded-full bg-white/80'
-              style={{
-                width: `${progress}%`,
-                transition: 'width 150ms ease-out',
-              }}
-            />
-          </div>
-          <span className='aucctus-text-xs text-white/50'>
-            {Math.round(progress)}%
-          </span>
+        {/* Asymptotic progress bar with barber pole effect */}
+        <div className='w-64'>
+          <BarberPoleProgressBar
+            progress={progress}
+            theme='white'
+            size='xs'
+            showPercentage
+            percentageClassName='text-white/50'
+          />
         </div>
       </div>
     </div>

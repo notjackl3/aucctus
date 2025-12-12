@@ -1268,8 +1268,6 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       const handler =
         config?.ideaPlayground?.onConceptsGenerated ||
         ((msg: any) => {
-          // Use toast.deferred to avoid "setState during render" warning
-          toast.deferred.completed(`${msg.conceptCount} Concepts Generated`);
           queryClient.invalidateQueries({
             queryKey: [
               AucctusQueryKeys.ideaPlaygroundGeneratedIdeas,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Icon, toast } from '@components';
 import type { IGeneratedIdeaPlaygroundConcept } from '../types';
 import {
@@ -8,15 +8,17 @@ import {
 import ConceptDetailPanel from './ConceptDetailPanel';
 import OpportunityMapFooter from './OpportunityMapFooter';
 import ConceptCard from './ConceptCard';
+import LogoAnimation from '@components/Animation/LogoAnimation';
 import api from '@libs/api';
 import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
 import {
   useAnchorThought,
   useGetGeneratedIdeas,
+  useGenerateMoreConcepts,
+  useRegenerateConceptsWithFeedback,
 } from '@hooks/query/ideaPlayground.hook';
-import { PlaygroundLoadingIndicator } from '../PlaygroundLoadingIndicator';
-import { AgentProgressBar } from '@components/Progress';
+import { ConceptGenerationLoading } from '../ConceptGenerationLoading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
@@ -25,6 +27,25 @@ interface OpportunityMapProps {
   seedUuid: string | null;
   onClose: () => void;
 }
+
+// Fun rotating messages for concept generation loading
+const GENERATION_MESSAGES = [
+  'Brewing innovative ideas...',
+  'Exploring new possibilities...',
+  'Connecting the dots...',
+  'Thinking outside the box...',
+  'Sparking creativity...',
+  'Discovering hidden gems...',
+  'Crafting unique concepts...',
+  'Mixing inspiration with insight...',
+  'Unlocking potential...',
+  'Dreaming up the future...',
+  'Weaving ideas together...',
+  'Chasing brilliance...',
+  'Hatching something special...',
+  'Polishing rough diamonds...',
+  'Igniting imagination...',
+];
 
 const OpportunityMap: React.FC<OpportunityMapProps> = ({
   seedUuid,
@@ -37,6 +58,9 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   const toggleConceptSelection = useStore(
     (state) => state.ideaPlayground.toggleConceptSelection,
   );
+  const clearSelectedConcepts = useStore(
+    (state) => state.ideaPlayground.clearSelectedConcepts,
+  );
   const navigate = useNavigate();
 
   // Use the GET hook to check and fetch generated concepts
@@ -44,11 +68,46 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     isGenerating: isGeneratingConcepts,
     concepts,
     refetch: refetchGeneratedIdeas,
+    generatingMore,
+    canGenerateMore,
   } = useGetGeneratedIdeas(seedUuid || undefined);
+
+  // Hook for generating more concepts
+  const { generateMore, isLoading: isGenerateMoreLoading } =
+    useGenerateMoreConcepts(seedUuid || '');
+
+  // Hook for regenerating concepts with feedback
+  const { regenerateWithFeedback, isLoading: isRegenerateLoading } =
+    useRegenerateConceptsWithFeedback(seedUuid || '');
 
   const { data: anchorThoughts } = useAnchorThought(seedUuid || undefined);
   // Local state
   const [isClosing, setIsClosing] = useState(false);
+  const [isInitialMount, setIsInitialMount] = useState(true);
+  // Track if we're in a regeneration flow (to show loading state immediately)
+  const [isRegenerating, setIsRegenerating] = useState(false);
+  // Rotating message index for loading overlay
+  const [messageIndex, setMessageIndex] = useState(0);
+
+  // Determine if we should show the loading overlay on concepts grid
+  const showConceptsLoadingOverlay = useMemo(
+    () => generatingMore || isRegenerateLoading || isRegenerating,
+    [generatingMore, isRegenerateLoading, isRegenerating],
+  );
+
+  // Rotate messages every 3 seconds when loading overlay is visible
+  useEffect(() => {
+    if (!showConceptsLoadingOverlay) {
+      setMessageIndex(0);
+      return;
+    }
+
+    const interval = setInterval(() => {
+      setMessageIndex((prev) => (prev + 1) % GENERATION_MESSAGES.length);
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [showConceptsLoadingOverlay]);
   const [selectedIdeaDetail, setSelectedIdeaDetail] = useState<{
     title: string;
     section: string;
@@ -63,12 +122,65 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     keyThingsToValidate?: string[];
   } | null>(null);
 
+  // Handle initial mount - show loading until we have concepts or confirm we're generating
+  useEffect(() => {
+    if (isInitialMount && (concepts.length > 0 || isGeneratingConcepts)) {
+      setIsInitialMount(false);
+    }
+  }, [isInitialMount, concepts.length, isGeneratingConcepts]);
+
+  // Reset regenerating state when concepts are refreshed (generation complete)
+  useEffect(() => {
+    if (
+      isRegenerating &&
+      concepts.length > 0 &&
+      !isGeneratingConcepts &&
+      !generatingMore
+    ) {
+      setIsRegenerating(false);
+    }
+  }, [isRegenerating, concepts.length, isGeneratingConcepts, generatingMore]);
+
+  /**
+   * Handle regeneration with feedback
+   * Shows loading state immediately, triggers the mutation
+   */
+  const handleRegenerateWithFeedback = useCallback(
+    (feedback: string) => {
+      // Clear any selected concepts before regenerating
+      clearSelectedConcepts();
+      setSelectedIdeaDetail(null);
+      setIsRegenerating(true);
+      regenerateWithFeedback(feedback, {
+        onError: () => {
+          setIsRegenerating(false);
+        },
+      });
+      telemetry.log('ideaPlayground.regenerateWithFeedback.initiated', {
+        seedUuid,
+        feedbackLength: feedback.length,
+      });
+    },
+    [regenerateWithFeedback, seedUuid, clearSelectedConcepts],
+  );
+
   const handleClose = useCallback(() => {
     setIsClosing(true);
     setTimeout(() => {
       onClose();
     }, 300);
   }, [onClose]);
+
+  /**
+   * Handle generating more concepts
+   * Clears selections before generating
+   */
+  const handleGenerateMore = useCallback(() => {
+    // Clear any selected concepts before generating more
+    clearSelectedConcepts();
+    setSelectedIdeaDetail(null);
+    generateMore();
+  }, [generateMore, clearSelectedConcepts]);
 
   // WebSocket listener for concepts generated - refetch when ready
   useSocketEvent<'idea_playground.concepts.generated.user'>(
@@ -81,7 +193,21 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
           adjacentCount: data.adjacentCount,
           disruptiveCount: data.disruptiveCount,
         });
-        toast.success(`${data.conceptCount} concepts generated!`);
+        // Refetch the generated concepts
+        refetchGeneratedIdeas();
+      }
+    },
+  );
+
+  // WebSocket listener for more concepts generated - refetch when ready
+  useSocketEvent<'idea_playground.more_concepts.generated.user'>(
+    'idea_playground.more_concepts.generated.user',
+    (data) => {
+      if (data.seedUuid === seedUuid) {
+        telemetry.log('ideaPlayground.moreConceptsGenerated.websocket', {
+          newConceptCount: data.newConceptCount,
+          totalConceptCount: data.totalConceptCount,
+        });
         // Refetch the generated concepts
         refetchGeneratedIdeas();
       }
@@ -106,7 +232,20 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     if (!document.getElementById(styleId)) {
       const style = document.createElement('style');
       style.id = styleId;
-      style.textContent = animationStyles;
+      style.textContent =
+        animationStyles +
+        `
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `;
       document.head.appendChild(style);
     }
   }, []);
@@ -151,9 +290,6 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     e.stopPropagation();
     handleCardSelect(conceptUuid);
   };
-
-  // Backend generates fixed set of concepts (3+3+3), so remove "generate more" functionality
-  // const generateMoreIdeas = ... (removed)
 
   const handleGenerateReports = async () => {
     if (!seedUuid || selectedConceptUuids.length === 0) {
@@ -215,31 +351,11 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       }
     : null;
 
-  // Show loading state while generating concepts
-  if (isGeneratingConcepts) {
+  // Show loading state while generating/regenerating concepts or on initial mount (prevents flash of content)
+  if (isGeneratingConcepts || isInitialMount || isRegenerating) {
     return (
-      <div className='absolute inset-0 z-50 bg-black/30 backdrop-blur-xl'>
-        <div className='absolute left-1/2 top-1/2 z-[9999] flex -translate-x-1/2 -translate-y-1/2 transform flex-col items-center gap-6'>
-          <PlaygroundLoadingIndicator
-            show={true}
-            message='Generating concepts...'
-            className='flex items-center gap-3'
-            usePortal={false}
-          />
-
-          {/* Progress Bar */}
-          <div className='w-full max-w-md px-4'>
-            <AgentProgressBar
-              agentName='IdeaPlaygroundConceptGeneration'
-              fallbackEstimatedSeconds={120}
-              showTimeRemaining
-              showPercentage={false}
-              size='md'
-              theme='brand'
-              className='[&_*]:!text-white'
-            />
-          </div>
-        </div>
+      <div className='absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-xl'>
+        <ConceptGenerationLoading />
       </div>
     );
   }
@@ -295,11 +411,27 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         {/* Split Content */}
         <div className='flex h-[calc(100vh-200px)]'>
           {/* Left Side - 2x2 Grid */}
-          <div className='flex w-1/2 flex-col border-r border-white/10'>
+          <div className='relative flex w-1/2 flex-col border-r border-white/10'>
+            {/* Loading Overlay for Concepts Grid */}
+            {showConceptsLoadingOverlay && (
+              <div className='absolute inset-0 z-10 flex animate-fade-in flex-col items-center justify-center bg-black bg-opacity-40'>
+                <LogoAnimation size={120} loop autoPlay fps={45} />
+                <p
+                  key={messageIndex}
+                  className='aucctus-text-md-medium mt-6 animate-fade-in text-white/90'
+                  style={{
+                    animation: 'fadeInUp 0.5s ease-out',
+                  }}
+                >
+                  {GENERATION_MESSAGES[messageIndex]}
+                </p>
+              </div>
+            )}
+
             {/* Ideas Grid - Scrollable */}
             <div className='flex-1 overflow-y-auto p-6'>
               <div className='grid grid-cols-2 gap-4'>
-                {concepts.slice(0, 6).map((concept, index) => (
+                {concepts.map((concept, index) => (
                   <ConceptCard
                     key={concept.uuid}
                     concept={concept}
@@ -313,13 +445,23 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
               </div>
             </div>
 
-            {/* Generate More Button - Disabled */}
-            <div className='px-6 pb-4'>
+            {/* Generate More Button */}
+            <div className='px-6 pb-6'>
               <button
                 className='aucctus-text-white aucctus-text-sm w-full rounded-lg border border-white/30 bg-transparent py-2 transition-all hover:border-white/40 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50'
-                disabled
+                disabled={
+                  !canGenerateMore ||
+                  generatingMore ||
+                  isGenerateMoreLoading ||
+                  isRegenerateLoading
+                }
+                onClick={handleGenerateMore}
               >
-                Generate More (Coming Soon)
+                {generatingMore || isGenerateMoreLoading
+                  ? 'Generating More...'
+                  : canGenerateMore
+                    ? 'Generate More'
+                    : 'Generate More Limit Reached'}
               </button>
             </div>
           </div>
@@ -346,6 +488,9 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
           <OpportunityMapFooter
             selectedIdeasCount={selectedConceptUuids.length}
             onGenerateReports={handleGenerateReports}
+            onRegenerateWithFeedback={handleRegenerateWithFeedback}
+            isRegenerating={isRegenerateLoading || generatingMore}
+            disabled={generatingMore || isGenerateMoreLoading}
           />
         </div>
       </div>

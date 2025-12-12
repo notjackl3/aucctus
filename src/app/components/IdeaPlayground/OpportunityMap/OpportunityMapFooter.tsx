@@ -1,43 +1,90 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon } from '@components';
+import { cn } from '@libs/utils/react';
 
 interface OpportunityMapFooterProps {
   selectedIdeasCount: number;
   onGenerateReports: () => void;
+  onRegenerateWithFeedback: (feedback: string) => void;
+  isRegenerating: boolean;
+  disabled?: boolean;
 }
+
+const MAX_FEEDBACK_LENGTH = 1000;
 
 const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
   selectedIdeasCount,
   onGenerateReports,
+  onRegenerateWithFeedback,
+  isRegenerating,
+  disabled = false,
 }) => {
+  const [feedback, setFeedback] = useState('');
+
+  const canSubmit =
+    feedback.trim().length > 0 &&
+    feedback.length <= MAX_FEEDBACK_LENGTH &&
+    !isRegenerating &&
+    !disabled;
+
+  const handleSubmit = () => {
+    if (canSubmit) {
+      onRegenerateWithFeedback(feedback.trim());
+      setFeedback('');
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && canSubmit) {
+      e.preventDefault();
+      handleSubmit();
+    }
+  };
+
   return (
     <div className='flex border-t border-white/10 bg-black/20 backdrop-blur-md'>
-      {/* Left Side - Feedback Input (Coming Soon) */}
+      {/* Left Side - Feedback Input */}
       <div className='flex w-1/2 items-center gap-2 border-r border-white/10 p-6'>
-        <div className='flex flex-1 items-center gap-2 opacity-50'>
+        <div className='flex flex-1 items-center gap-2'>
           <input
             type='text'
+            value={feedback}
+            onChange={(e) => setFeedback(e.target.value)}
+            onKeyDown={handleKeyDown}
             placeholder='Provide feedback to regenerate ideas...'
-            maxLength={500}
-            className='aucctus-text-white placeholder:aucctus-text-placeholder flex-1 cursor-not-allowed rounded-md border border-white/20 bg-white/10 px-3 py-2 transition-all duration-200 focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/30'
-            disabled={true}
+            maxLength={MAX_FEEDBACK_LENGTH}
+            disabled={isRegenerating || disabled}
+            className={cn(
+              'aucctus-text-white placeholder:aucctus-text-placeholder flex-1 rounded-md border border-white/20 bg-white/10 px-3 py-2 transition-all duration-200',
+              'focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/30',
+              {
+                'cursor-not-allowed opacity-50': isRegenerating || disabled,
+              },
+            )}
           />
           <button
-            disabled={true}
-            className='flex h-9 w-9 flex-shrink-0 cursor-not-allowed items-center justify-center rounded-md border border-white/20 bg-white/10 p-2 transition-all duration-200'
+            onClick={handleSubmit}
+            disabled={!canSubmit}
+            className={cn(
+              'flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md border p-2 transition-all duration-200',
+              {
+                'border-white/40 bg-white/20 hover:bg-white/30': canSubmit,
+                'cursor-not-allowed border-white/20 bg-white/10 opacity-50':
+                  !canSubmit,
+              },
+            )}
           >
-            <Icon
-              variant='paper-airplane'
-              className='aucctus-stroke-white'
-              height={16}
-              width={16}
-            />
+            {isRegenerating ? (
+              <div className='h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white' />
+            ) : (
+              <Icon
+                variant='refresh'
+                className='aucctus-stroke-white'
+                height={16}
+                width={16}
+              />
+            )}
           </button>
-        </div>
-        <div className='flex flex-shrink-0 items-center rounded-md border border-white/20 bg-white/10 px-3 py-1.5'>
-          <span className='aucctus-text-xs aucctus-text-secondary'>
-            Coming Soon
-          </span>
         </div>
       </div>
 

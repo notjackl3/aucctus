@@ -19,9 +19,13 @@ export {
 // Loading components
 export { PlaygroundLoadingIndicator } from './PlaygroundLoadingIndicator';
 export { PlaygroundLoadingTransition } from './PlaygroundLoadingTransition';
+export { ConceptGenerationLoading } from './ConceptGenerationLoading';
 
 // Mode Switcher
 export { IdeationModeSwitcher } from './IdeationModeSwitcher';
+
+// Debug components
+export { default as DebugContextButton } from './DebugContextButton';
 
 // OpportunityMap components
 export { default as OpportunityMap } from './OpportunityMap';

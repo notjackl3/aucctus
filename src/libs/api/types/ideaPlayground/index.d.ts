@@ -193,6 +193,10 @@ export interface IIdeaPlaygroundGenerateIdeasResponse {
   core_concepts: IGeneratedIdeaPlaygroundConcept[];
   adjacent_concepts: IGeneratedIdeaPlaygroundConcept[];
   disruptive_concepts: IGeneratedIdeaPlaygroundConcept[];
+  /** Whether "generate more" is currently in progress */
+  generatingMore?: boolean;
+  /** Whether user can request more concepts (limit not reached) */
+  canGenerateMore?: boolean;
 }
 
 /**
@@ -223,3 +227,22 @@ export type INucleusInsightsResponse =
 export type IConceptGenerationResponse =
   | IIdeaPlaygroundGenerateIdeasResponse
   | IGenerationInProgress;
+
+/**
+ * Seed Context - Debug response containing all context for a seed
+ */
+export interface ISeedContextResponse {
+  seed_uuid: string;
+  seed_title: string;
+  anchor_thought: string;
+  company_context: string;
+  questions_context: string;
+  generated_concepts: {
+    uuid: string;
+    title: string;
+    description: string;
+    concept_type: string;
+  }[];
+  question_count: number;
+  answered_question_count: number;
+}

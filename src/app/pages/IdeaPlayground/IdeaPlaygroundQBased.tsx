@@ -10,6 +10,7 @@ import {
   PlaygroundLoadingIndicator,
   PlaygroundLoadingTransition,
   IdeationModeSwitcher,
+  DebugContextButton,
 } from '@components/IdeaPlayground';
 import type { IAnchorThought } from '@components/IdeaPlayground/types';
 import { animationStyles } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
@@ -293,18 +294,23 @@ const IdeaPlaygroundQBased: React.FC = () => {
     ideaPlaygroundStore.reset();
   };
 
-  const handleGenerateIdeas = () => {
+  const handleGenerateIdeas = async () => {
     // Trigger concept generation with force regenerate
     if (currentSeedUuid) {
-      generateConceptsAsync()
-        .then(() => {
-          // Clear any previously selected concepts when generating new ones
-          ideaPlaygroundStore.clearSelectedConcepts();
-          setShowOpportunityMap(true);
-        })
-        .catch(() => {
-          toast.error('Failed to generate concepts', undefined, 3000);
-        });
+      try {
+        // Clear any previously selected concepts when generating new ones
+        ideaPlaygroundStore.clearSelectedConcepts();
+
+        // Show the OpportunityMap immediately - it will show loading state
+        setShowOpportunityMap(true);
+
+        // Trigger the generation (this will update the query state)
+        await generateConceptsAsync();
+      } catch (error) {
+        // If generation fails, hide the map and show error
+        setShowOpportunityMap(false);
+        toast.error('Failed to generate concepts', undefined, 3000);
+      }
     }
   };
 
@@ -315,6 +321,13 @@ const IdeaPlaygroundQBased: React.FC = () => {
   return (
     <div className='relative h-screen overflow-hidden'>
       <style>{animationStyles}</style>
+
+      {/* Debug Context Button - Top Left (only in debug mode) */}
+      <DebugContextButton
+        seedUuid={currentSeedUuid}
+        className='absolute left-4 top-4 z-50'
+      />
+
       {/* Background Image with Blur */}
       <div
         className='absolute inset-0 bg-cover bg-center bg-no-repeat'

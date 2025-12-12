@@ -20,6 +20,7 @@ import type {
   INucleusInsightsResponse,
   IConceptGenerationResponse,
   IGenerationInProgress,
+  ISeedContextResponse,
 } from './types';
 
 export type { IGenerationInProgress } from './types/ideaPlayground';
@@ -185,6 +186,37 @@ export class IdeaPlaygroundApi extends ApiService {
   }
 
   /**
+   * Generate 4 additional concepts that are different from existing ones
+   * Returns 202 Accepted and starts background generation task
+   * Client will receive WebSocket notification when generation completes
+   * @param seedUuid - The seed UUID
+   */
+  generateMoreIdeas(seedUuid: string): Promise<IGenerationInProgress> {
+    return this.post<IGenerationInProgress>(
+      endpoints.ideaPlaygroundGenerateMoreIdeas(seedUuid),
+    );
+  }
+
+  /**
+   * Regenerate concepts based on user feedback
+   * Takes user feedback and generates a fresh set of 4 concepts that address the feedback,
+   * replacing the existing cached concepts.
+   * Returns 202 Accepted and starts background generation task
+   * Client will receive WebSocket notification when generation completes
+   * @param seedUuid - The seed UUID
+   * @param feedback - User feedback to guide regeneration (1-1000 characters)
+   */
+  regenerateIdeasWithFeedback(
+    seedUuid: string,
+    feedback: string,
+  ): Promise<IGenerationInProgress> {
+    return this.post<IGenerationInProgress, { feedback: string }>(
+      endpoints.ideaPlaygroundRegenerateIdeasWithFeedback(seedUuid),
+      { feedback },
+    );
+  }
+
+  /**
    * Get generated concepts for a seed
    */
   getConcepts(seedUuid: string): Promise<IGeneratedIdeaPlaygroundConcept[]> {
@@ -201,6 +233,17 @@ export class IdeaPlaygroundApi extends ApiService {
     return this.post<void, ISaveConceptsRequest>(
       endpoints.ideaPlaygroundSaveConcepts(seedUuid),
       payload,
+    );
+  }
+
+  /**
+   * Get seed context for debugging
+   * Returns all context used for concept generation including anchor thought,
+   * questions, answers, and generated concepts
+   */
+  getSeedContext(seedUuid: string): Promise<ISeedContextResponse> {
+    return this.get<ISeedContextResponse>(
+      endpoints.ideaPlaygroundSeedContext(seedUuid),
     );
   }
 }

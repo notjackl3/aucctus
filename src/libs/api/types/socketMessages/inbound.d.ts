@@ -744,6 +744,15 @@ export interface IIdeaPlaygroundConceptsGeneratedMessage
   disruptiveCount: number;
 }
 
+export interface IIdeaPlaygroundMoreConceptsGeneratedMessage
+  extends BaseSocketEvent {
+  type: 'idea_playground.more_concepts.generated.user';
+  seedUuid: string;
+  accountUuid: string;
+  newConceptCount: number;
+  totalConceptCount: number;
+}
+
 export interface IIdeaPlaygroundErrorMessage extends BaseSocketEvent {
   type: 'idea_playground.error.user';
   seedUuid: string;
@@ -845,6 +854,7 @@ export type InboundSocketEvent<C = {}> =
   | IIdeaPlaygroundInsightValidationFailedMessage
   | IIdeaPlaygroundQuestionsGeneratedMessage
   | IIdeaPlaygroundConceptsGeneratedMessage
+  | IIdeaPlaygroundMoreConceptsGeneratedMessage
   | IIdeaPlaygroundErrorMessage
   | IIdeaPlaygroundPossibleAnswerProcessingMessage
   | IIdeaPlaygroundPossibleAnswerGeneratedMessage

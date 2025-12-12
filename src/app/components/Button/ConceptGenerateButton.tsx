@@ -137,9 +137,9 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
           from 0deg,
           transparent 0%,
           transparent 88%,
-          rgba(174, 164, 164, 0.5) 93%,
-          rgba(128, 113, 113, 0.7) 96%,
-          rgba(174, 164, 164, 0.5) 100%
+          rgba(175, 20, 20, 0.5) 93%,
+          rgba(175, 20, 20, 0.7) 96%,
+          rgba(175, 20, 20, 0.5) 100%
         );
         animation: borderTrace 3s linear infinite;
         pointer-events: none;

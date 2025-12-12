@@ -746,12 +746,24 @@ export class Endpoints {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/generated-ideas`;
   }
 
+  static ideaPlaygroundGenerateMoreIdeas(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/generate-more-ideas`;
+  }
+
+  static ideaPlaygroundRegenerateIdeasWithFeedback(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/regenerate-ideas-with-feedback`;
+  }
+
   static ideaPlaygroundConcepts(seedUuid: string) {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/concepts`;
   }
 
   static ideaPlaygroundSaveConcepts(seedUuid: string) {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/save-concepts`;
+  }
+
+  static ideaPlaygroundSeedContext(seedUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/context`;
   }
 }
 
