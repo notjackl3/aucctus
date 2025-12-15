@@ -55,7 +55,7 @@ const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
             maxLength={MAX_FEEDBACK_LENGTH}
             disabled={isRegenerating || disabled}
             className={cn(
-              'aucctus-text-white placeholder:aucctus-text-placeholder flex-1 rounded-md border border-white/20 bg-white/10 px-3 py-2 transition-all duration-200',
+              'aucctus-text-white flex-1 rounded-md border border-white/20 bg-white/10 px-3 py-2 transition-all duration-200 placeholder:text-gray-light-400',
               'focus:border-white/40 focus:outline-none focus:ring-2 focus:ring-white/30',
               {
                 'cursor-not-allowed opacity-50': isRegenerating || disabled,

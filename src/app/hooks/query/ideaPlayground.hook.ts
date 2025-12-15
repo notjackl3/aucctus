@@ -38,23 +38,40 @@ export const useAnchorThoughts = () => {
 };
 
 /**
+ * Input type for creating a seed with optional file upload
+ */
+interface ICreateSeedInput {
+  thoughtText: string;
+  file?: File;
+}
+
+/**
  * Custom hook for creating a seed with an anchor thought.
  * Returns a mutation function for creating a new idea playground session.
+ * Optionally accepts a file to upload (max 10MB, supports all Gemini-compatible types).
  */
 export const useCreateSeed = () => {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: async (thoughtText: string) => {
+    mutationFn: async (input: ICreateSeedInput | string) => {
+      // Support both string (legacy) and object (with file) inputs
+      const thoughtText = typeof input === 'string' ? input : input.thoughtText;
+      const file = typeof input === 'string' ? undefined : input.file;
+
       if (!thoughtText?.trim()) {
         throw new Error('Thought text is required');
       }
-      return await api.ideaPlayground.createSeedWithThought(thoughtText);
+      return await api.ideaPlayground.createSeedWithThought(thoughtText, file);
     },
-    onSuccess: (data) => {
+    onSuccess: (data, input) => {
+      const hasFile = typeof input !== 'string' && !!input.file;
       telemetry.log('ideaPlayground.seed.created', {
         seedUuid: data.seedUuid,
         thoughtLength: data.anchorThought.thought.length,
+        hasFile,
+        fileName:
+          hasFile && typeof input !== 'string' ? input.file?.name : undefined,
       });
       // Invalidate and refetch questions for this seed
       queryClient.invalidateQueries([
@@ -252,9 +269,10 @@ export const useGenerateResearchInsights = (
 };
 
 /**
- * Custom hook for generating a possible answer for a question.
+ * Custom hook for generating possible answers for a question.
  * Returns a mutation function for AI-generated answer suggestions.
  * Handles 202 Accepted responses with WebSocket notifications and 1-minute polling fallback.
+ * Note: Backend now returns an array of all possible answers for the question.
  */
 export const useGeneratePossibleAnswer = (
   seedUuid: string,
@@ -297,11 +315,12 @@ export const useGeneratePossibleAnswer = (
 
       setIsGenerating(false);
       setShouldPoll(false);
-      return response as IPossibleAnswer;
+      return response as IPossibleAnswer[];
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       telemetry.log('ideaPlayground.possibleAnswer.generated', {
         questionUuid,
+        count: data?.length || 0,
       });
       queryClient.invalidateQueries([
         AucctusQueryKeys.ideaPlaygroundPossibleAnswer,
@@ -343,7 +362,9 @@ export const useGeneratePossibleAnswer = (
     generateAnswer: mutation.mutate,
     generateAnswerAsync: mutation.mutateAsync,
     isGenerating: isGenerating || mutation.isLoading,
-    possibleAnswer: mutation.data,
+    /** @deprecated Use possibleAnswers (plural) instead */
+    possibleAnswer: mutation.data?.[0],
+    possibleAnswers: mutation.data || [],
     error: mutation.error,
     isSuccess: mutation.isSuccess,
     reset: mutation.reset,
@@ -674,6 +695,63 @@ export const useRemoveUserAnswer = () => {
 };
 
 /**
+ * Custom hook for deleting a custom question from a seed.
+ * Only custom questions (isCustomQuestion: true) can be deleted.
+ * AI-generated questions will return a 400 error.
+ */
+export const useDeleteCustomQuestion = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async ({
+      seedUuid,
+      questionUuid,
+    }: {
+      seedUuid: string;
+      questionUuid: string;
+    }) => {
+      if (!seedUuid || !questionUuid) {
+        throw new Error('Seed UUID and Question UUID are required');
+      }
+      return await api.ideaPlayground.deleteCustomQuestion(
+        seedUuid,
+        questionUuid,
+      );
+    },
+    onSuccess: (_, { seedUuid, questionUuid }) => {
+      telemetry.log('ideaPlayground.customQuestion.deleted', {
+        questionUuid,
+      });
+      // Invalidate questions to refresh the list
+      queryClient.invalidateQueries([
+        AucctusQueryKeys.ideaPlaygroundQuestions,
+        seedUuid,
+      ]);
+    },
+    onError: (e: AxiosError) => {
+      // Check for specific error code for attempting to delete AI-generated question
+      const errorData = e.response?.data as { code?: string; detail?: string };
+      if (errorData?.code === 'cannot_delete_ai_question') {
+        toast.error('AI-generated questions cannot be deleted.');
+      } else {
+        const message = utils.osiris.parseFormError(e);
+        toast.error(message || 'Failed to delete question. Please try again.');
+      }
+      telemetry.error('ideaPlayground.customQuestion.delete.failed', e);
+    },
+  });
+
+  return {
+    deleteQuestion: mutation.mutate,
+    deleteQuestionAsync: mutation.mutateAsync,
+    isDeleting: mutation.isLoading,
+    error: mutation.error,
+    isSuccess: mutation.isSuccess,
+    reset: mutation.reset,
+  };
+};
+
+/**
  * Custom hook for generating concepts from answered questions.
  * Returns a mutation function for generating 9 concepts (Core/Adjacent/Disruptive).
  * Triggers generation only - use useGetGeneratedIdeas to fetch results.
@@ -778,15 +856,11 @@ export const useGetGeneratedIdeas = (seedUuid?: string) => {
       ? query.data.concepts.length > 0
       : false;
 
-  // Extract generatingMore and canGenerateMore from response
+  // Extract generatingMore from response
   const generatingMore =
     query.data && !isGenerationInProgress(query.data)
       ? (query.data.generatingMore ?? false)
       : false;
-  const canGenerateMore =
-    query.data && !isGenerationInProgress(query.data)
-      ? (query.data.canGenerateMore ?? true)
-      : true;
 
   return {
     ...query,
@@ -798,7 +872,55 @@ export const useGetGeneratedIdeas = (seedUuid?: string) => {
         ? query.data.concepts
         : [],
     generatingMore,
-    canGenerateMore,
+  };
+};
+
+/**
+ * Custom hook for deleting a generated concept from the cached concepts.
+ * Removes a single concept from the seed's generated concepts list.
+ * Returns a mutation function for deleting concepts.
+ */
+export const useDeleteGeneratedConcept = (seedUuid: string) => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (conceptUuid: string) => {
+      if (!seedUuid) {
+        throw new Error('Seed UUID is required');
+      }
+      if (!conceptUuid) {
+        throw new Error('Concept UUID is required');
+      }
+      return await api.ideaPlayground.deleteGeneratedConcept(
+        seedUuid,
+        conceptUuid,
+      );
+    },
+    onSuccess: (_, conceptUuid) => {
+      telemetry.log('ideaPlayground.concept.deleted', {
+        seedUuid,
+        conceptUuid,
+      });
+      // Invalidate the GET query to refresh the concepts list
+      queryClient.invalidateQueries([
+        AucctusQueryKeys.ideaPlaygroundGeneratedIdeas,
+        seedUuid,
+      ]);
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(message || 'Failed to delete concept. Please try again.');
+      telemetry.error('ideaPlayground.concept.delete.failed', e);
+    },
+  });
+
+  return {
+    deleteConcept: mutation.mutate,
+    deleteConceptAsync: mutation.mutateAsync,
+    isDeleting: mutation.isLoading,
+    error: mutation.error,
+    isSuccess: mutation.isSuccess,
+    reset: mutation.reset,
   };
 };
 
@@ -942,6 +1064,69 @@ export const useSaveConcepts = (seedUuid: string) => {
     saveConcepts: mutation.mutate,
     saveConceptsAsync: mutation.mutateAsync,
     isSaving: mutation.isLoading,
+    error: mutation.error,
+    isSuccess: mutation.isSuccess,
+    reset: mutation.reset,
+  };
+};
+
+/**
+ * Input type for adding a custom question
+ */
+interface IAddCustomQuestionInput {
+  seedUuid: string;
+  question: string;
+  description?: string;
+}
+
+/**
+ * Custom hook for adding a custom question to a seed.
+ * After adding, the question type is resolved via LLM on the backend.
+ * Returns the created question with a real UUID.
+ */
+export const useAddCustomQuestion = () => {
+  const queryClient = useQueryClient();
+
+  const mutation = useMutation({
+    mutationFn: async (input: IAddCustomQuestionInput) => {
+      if (!input.question?.trim()) {
+        throw new Error('Question text is required');
+      }
+      if (input.question.length > 500) {
+        throw new Error('Question must be 500 characters or less');
+      }
+      return await api.ideaPlayground.addCustomQuestion(
+        input.seedUuid,
+        input.question.trim(),
+        input.description?.trim(),
+      );
+    },
+    onSuccess: (data, input) => {
+      telemetry.log('ideaPlayground.customQuestion.added', {
+        seedUuid: input.seedUuid,
+        questionUuid: data.uuid,
+        questionLength: input.question.length,
+      });
+      // Invalidate questions query to refetch with new question
+      queryClient.invalidateQueries([
+        AucctusQueryKeys.ideaPlaygroundQuestions,
+        input.seedUuid,
+      ]);
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        message || 'Failed to add custom question. Please try again.',
+      );
+      telemetry.error('ideaPlayground.customQuestion.add.failed', e);
+    },
+  });
+
+  return {
+    addQuestion: mutation.mutate,
+    addQuestionAsync: mutation.mutateAsync,
+    isAdding: mutation.isLoading,
+    addedQuestion: mutation.data,
     error: mutation.error,
     isSuccess: mutation.isSuccess,
     reset: mutation.reset,

@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from '@components';
 import { Question } from '../types';
 import QuestionSelector from './QuestionSelector';
-import { cn } from '@libs/utils/react';
+
 interface QuestionNavigationFooterProps {
   questions: Question[];
   currentIndex: number;
@@ -11,6 +11,10 @@ interface QuestionNavigationFooterProps {
   onAddQuestion: () => void;
   onRemoveQuestion: (index: number, questionId: string) => void;
   onGenerateIdeas?: () => void;
+  onViewConcepts?: () => void;
+  hasGeneratedConcepts?: boolean;
+  hasInputsChangedSinceGeneration?: boolean;
+  deletingQuestionId?: string | null;
 }
 
 const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
@@ -18,10 +22,22 @@ const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
   currentIndex,
   isQuestionAnswered,
   onQuestionSelect,
-  // onAddQuestion,
+  onAddQuestion,
   onRemoveQuestion,
   onGenerateIdeas,
+  onViewConcepts,
+  hasGeneratedConcepts = false,
+  hasInputsChangedSinceGeneration = false,
+  deletingQuestionId = null,
 }) => {
+  // Determine button state and text
+  const showViewConcepts =
+    hasGeneratedConcepts && !hasInputsChangedSinceGeneration;
+  const buttonText = showViewConcepts
+    ? 'View Generated Concepts'
+    : 'Generate Ideas';
+  const buttonIcon = showViewConcepts ? 'eye' : 'lightbulb';
+  const handleButtonClick = showViewConcepts ? onViewConcepts : onGenerateIdeas;
   return (
     <div className='absolute bottom-0 left-0 right-0 z-30'>
       <div className='w-full border-t border-white/20 bg-black/60 px-8 py-6 backdrop-blur-md'>
@@ -29,72 +45,56 @@ const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
           <div className='w-40'></div>
 
           {/* Centered Question Selectors */}
-          <div className='flex items-end justify-center gap-3 overflow-x-auto'>
-            {questions.map((question, index) => (
-              <QuestionSelector
-                key={question.id}
-                question={question}
-                index={index}
-                isActive={index === currentIndex}
-                isAnswered={isQuestionAnswered(question.id)}
-                onSelect={() => onQuestionSelect(index)}
-                onRemove={
-                  question.id.startsWith('custom-')
-                    ? () => onRemoveQuestion(index, question.id)
-                    : undefined
-                }
-              />
-            ))}
+          <div className='flex items-end justify-center gap-3 overflow-x-auto overflow-y-visible py-3'>
+            {questions.map((question, index) => {
+              // Allow deletion for local temporary questions OR API custom questions
+              const canDelete =
+                question.id.startsWith('custom-') || question.isCustomQuestion;
+              return (
+                <QuestionSelector
+                  key={question.id}
+                  question={question}
+                  index={index}
+                  isActive={index === currentIndex}
+                  isAnswered={isQuestionAnswered(question.id)}
+                  isDeleting={deletingQuestionId === question.id}
+                  onSelect={() => onQuestionSelect(index)}
+                  onRemove={
+                    canDelete
+                      ? () => onRemoveQuestion(index, question.id)
+                      : undefined
+                  }
+                />
+              );
+            })}
 
-            {/* Add Question Button TODO: Add this back in when we have a way to add questions */}
-            {/* <button
+            {/* Add Question Button */}
+            <button
               onClick={onAddQuestion}
-              className='flex h-14 w-16 flex-shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/10 px-3 py-2 transition-all duration-300 hover:border-white/30 hover:bg-white/15'
+              className='flex h-14 w-16 flex-shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white/70 transition-all duration-300 hover:border-white/30 hover:bg-white/10'
             >
               <Icon
                 variant='plus'
-                className='aucctus-stroke-secondary-light'
+                className='stroke-white/70'
                 height={16}
                 width={16}
               />
-            </button> */}
+            </button>
           </div>
 
-          {/* Generate Ideas Button */}
+          {/* Generate Ideas / View Concepts Button */}
           <div className='flex items-end justify-end'>
             <button
-              onClick={onGenerateIdeas}
-              disabled={
-                questions.length === 0 ||
-                !questions.some((q) => isQuestionAnswered(q.id))
-              }
-              className={`btn whitespace-nowrap border px-3 py-2 transition-all duration-300 ${
-                questions.length === 0 ||
-                !questions.some((q) => isQuestionAnswered(q.id))
-                  ? 'btn-disabled backdrop-blur-md'
-                  : questions.every((q) => isQuestionAnswered(q.id))
-                    ? 'btn-success animate-pulse backdrop-blur-md'
-                    : 'btn-success backdrop-blur-md'
-              }`}
+              onClick={handleButtonClick}
+              className='btn btn-primary btn-md group whitespace-nowrap border border-white/30 bg-white/10 px-3 py-2 text-white backdrop-blur-md transition-all duration-300 hover:!border-white hover:!bg-white hover:!text-gray-900'
             >
               <Icon
-                variant='lightbulb'
-                className={cn('mr-2', {
-                  'aucctus-stroke-disabled':
-                    questions.length === 0 ||
-                    !questions.some((q) => isQuestionAnswered(q.id)),
-                  'aucctus-stroke-white': !(
-                    questions.length === 0 ||
-                    !questions.some((q) => isQuestionAnswered(q.id))
-                  ),
-                  'animate-pulse-subtle':
-                    questions.length !== 0 &&
-                    questions.every((q) => isQuestionAnswered(q.id)),
-                })}
+                variant={buttonIcon}
+                className='mr-2 stroke-white group-hover:stroke-gray-light-700'
                 height={16}
                 width={16}
               />
-              Generate Ideas
+              {buttonText}
             </button>
           </div>
         </div>

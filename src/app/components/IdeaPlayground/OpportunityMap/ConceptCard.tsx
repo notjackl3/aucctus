@@ -6,8 +6,10 @@ interface ConceptCardProps {
   concept: IGeneratedIdeaPlaygroundConcept;
   isSelected: boolean;
   isActive: boolean;
+  isDeleting?: boolean;
   onCardClick: () => void;
   onCardSelect: (e: React.MouseEvent) => void;
+  onDelete: (e: React.MouseEvent) => void;
   animationDelay?: number;
 }
 
@@ -23,8 +25,10 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
   concept,
   isSelected,
   isActive,
+  isDeleting = false,
   onCardClick,
   onCardSelect,
+  onDelete,
   animationDelay = 0,
 }) => {
   // Determine category badge styling
@@ -62,7 +66,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
   return (
     <div
       onClick={onCardClick}
-      className={`relative flex h-[220px] cursor-pointer flex-col rounded-xl border p-4 transition-all duration-200 ${
+      className={`group relative flex h-[220px] cursor-pointer flex-col rounded-lg border p-4 transition-all duration-200 ${
         isActive
           ? 'border-white/60 bg-white/20 shadow-lg'
           : 'border-white/30 bg-white/10 hover:border-white/40 hover:bg-white/15'
@@ -71,26 +75,52 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
         animation: `fadeIn 0.6s ease-out ${animationDelay}s both`,
       }}
     >
-      {/* Selection checkbox */}
-      <div
-        className='absolute right-3 top-3 z-10'
-        onClick={(e) => onCardSelect(e)}
-      >
-        <div
+      {/* Top-right action buttons */}
+      <div className='absolute right-3 top-3 z-10 flex items-center gap-2'>
+        {/* Delete button - appears on hover */}
+        <button
           className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all ${
-            isSelected
-              ? 'aucctus-bg-success-solid border-green-500'
-              : 'border-white/50 hover:border-white/70'
+            isDeleting
+              ? 'border-red-500/50 bg-red-500/20'
+              : 'border-white/30 bg-white/10 opacity-0 hover:border-red-400/50 hover:bg-red-500/20 group-hover:opacity-100'
           }`}
+          onClick={(e) => onDelete(e)}
+          disabled={isDeleting}
+          aria-label='Delete concept'
         >
-          {isSelected && (
+          {isDeleting ? (
             <Icon
-              variant='check'
+              variant='loading-02'
+              className='aucctus-stroke-white h-3 w-3 animate-spin'
+            />
+          ) : (
+            <Icon
+              variant='closeX'
               className='aucctus-stroke-white'
-              height={12}
-              width={12}
+              height={10}
+              width={10}
             />
           )}
+        </button>
+
+        {/* Selection checkbox */}
+        <div onClick={(e) => onCardSelect(e)}>
+          <div
+            className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all ${
+              isSelected
+                ? 'aucctus-bg-success-solid border-green-500'
+                : 'border-white/50 hover:border-white/70'
+            }`}
+          >
+            {isSelected && (
+              <Icon
+                variant='check'
+                className='aucctus-stroke-white'
+                height={12}
+                width={12}
+              />
+            )}
+          </div>
         </div>
       </div>
 

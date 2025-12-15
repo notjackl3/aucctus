@@ -79,7 +79,7 @@ const ConceptDetailPanel: React.FC<ConceptDetailPanelProps> = ({
 
       {/* initialGutCheck Card */}
       {conceptDetail.initialGutCheck && (
-        <div className='aucctus-bg-frosted-glass rounded-xl border border-white/20 p-6 backdrop-blur-md'>
+        <div className='aucctus-bg-frosted-glass rounded-lg border border-white/20 p-6 backdrop-blur-md'>
           <h3 className='aucctus-text-lg-semibold aucctus-text-white mb-3'>
             Gut Check
           </h3>
@@ -90,7 +90,7 @@ const ConceptDetailPanel: React.FC<ConceptDetailPanelProps> = ({
       )}
 
       {/* Idea Score Assessment Widget with Tabs */}
-      <div className='aucctus-bg-frosted-glass rounded-xl border border-white/20 p-6 backdrop-blur-md'>
+      <div className='aucctus-bg-frosted-glass rounded-lg border border-white/20 p-6 backdrop-blur-md'>
         <div className='mb-4 flex items-center justify-between'>
           <h3 className='aucctus-text-lg-semibold aucctus-text-white'>
             Idea Score Assessment
@@ -243,7 +243,7 @@ const ConceptDetailPanel: React.FC<ConceptDetailPanelProps> = ({
 
       {/* Problem It Solves Card */}
       {conceptDetail.problemItSolves && (
-        <div className='aucctus-bg-frosted-glass rounded-xl border border-white/20 p-6 backdrop-blur-md'>
+        <div className='aucctus-bg-frosted-glass rounded-lg border border-white/20 p-6 backdrop-blur-md'>
           <h3 className='aucctus-text-lg-semibold aucctus-text-white mb-3'>
             Problem It Solves
           </h3>
@@ -255,7 +255,7 @@ const ConceptDetailPanel: React.FC<ConceptDetailPanelProps> = ({
 
       {/* Unique Value Proposition Card */}
       {conceptDetail.uniqueValue && (
-        <div className='aucctus-bg-frosted-glass rounded-xl border border-white/20 p-6 backdrop-blur-md'>
+        <div className='aucctus-bg-frosted-glass rounded-lg border border-white/20 p-6 backdrop-blur-md'>
           <h3 className='aucctus-text-lg-semibold aucctus-text-white mb-3'>
             Unique Value Proposition
           </h3>

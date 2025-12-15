@@ -34,6 +34,7 @@ export interface Question {
   explanation: string;
   answer?: string;
   label: string;
+  isCustomQuestion?: boolean; // True if user-created, false/undefined if AI-generated
 }
 
 export interface InsightCard {

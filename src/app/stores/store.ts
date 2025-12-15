@@ -131,6 +131,9 @@ const useStore = create<IAppStore>()(
           financialProjection: state.financialProjection,
           testCollateral: state.testCollateral,
           magicShare: state.magicShare, // Now safe to persist - snapshotUrl is just a URL, not base64
+          ideaPlayground: {
+            lastActiveSeedUuid: state.ideaPlayground.lastActiveSeedUuid,
+          },
         }),
         merge: (persistedState: unknown, currentState: IAppStore): IAppStore =>
           mergeDeep(currentState, persistedState as IAppStore),

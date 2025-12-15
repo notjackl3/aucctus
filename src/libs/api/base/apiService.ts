@@ -223,4 +223,27 @@ export abstract class ApiService {
       throw error;
     }
   }
+
+  /**
+   * POST with multipart/form-data for file uploads
+   * Axios automatically sets the Content-Type header for FormData
+   */
+  async postFormData<T = unknown>(
+    url: string,
+    formData: FormData,
+    config?: AxiosRequestConfig,
+  ): Promise<T> {
+    try {
+      const response: AxiosResponse<T> = await this.api.post(url, formData, {
+        ...config,
+        headers: {
+          ...config?.headers,
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }

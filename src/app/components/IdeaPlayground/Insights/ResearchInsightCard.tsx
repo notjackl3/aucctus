@@ -216,9 +216,9 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   return (
     <div
-      className={`aucctus-text-white relative min-w-[250px] max-w-[350px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
+      className={`aucctus-text-white relative min-w-[350px] max-w-[350px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
         isLoading
-          ? 'scale-95 border-white/30 bg-white/10 opacity-80'
+          ? 'scale-95 border-white/30 bg-white/10 opacity-80 hover:z-50'
           : optimisticSelected
             ? 'scale-100 border-white/40 bg-white/20 opacity-100 ring-1 ring-white/30'
             : getSentimentColor(card.sentiment, card.source) +
@@ -288,12 +288,6 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       ) : null}
 
       <div className='mb-2 flex items-start gap-2 pr-6'>
-        <Icon
-          variant='search-md'
-          className='aucctus-stroke-info-primary mt-0.5 flex-shrink-0'
-          height={16}
-          width={16}
-        />
         <span className='aucctus-text-sm-medium leading-tight'>
           {card.insight}
         </span>
@@ -302,7 +296,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       <div className='flex justify-end'>
         <div
           className={cn(
-            'inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-2 py-1 transition-colors',
+            'inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/30 bg-white/10 px-2 py-1 transition-colors',
             card.source?.includes('Nucleus')
               ? 'cursor-default'
               : 'cursor-pointer hover:bg-white/15',

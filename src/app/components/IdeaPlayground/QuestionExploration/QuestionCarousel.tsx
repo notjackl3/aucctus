@@ -1,5 +1,14 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useCallback,
+  useMemo,
+} from 'react';
 import { Icon, toast } from '@components';
+import Modal from '@components/Modal';
+import { useModal } from '@context/ModalContextProvider';
+import type { IActionButton } from '@components/Modal/ConfirmationModal/ConfirmationModal';
 import type {
   IResearchInsight,
   Question,
@@ -11,172 +20,74 @@ import {
 } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
 import QuestionCard from './QuestionCard';
 import QuestionNavigationFooter from './QuestionNavigationFooter';
+import FloatingInsights from './FloatingInsights';
 import { InsightDetailSidePanel } from '../Insights';
-import {
-  getSentimentColor,
-  getSentimentIcon,
-  getSentimentDescription,
-  calculateCardPositions,
-  generateCustomInsights,
-} from './utils';
 import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
-import { useSocketEvent } from '@hooks/sockets/aucctus';
 import {
   useQuestions,
   useRemoveUserAnswer,
+  useAddCustomQuestion,
+  useDeleteCustomQuestion,
 } from '@hooks/query/ideaPlayground.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { PlaygroundLoadingIndicator } from '../PlaygroundLoadingIndicator';
-import { isGenerationInProgress } from '@libs/api/ideaPlayground';
-import utils from '@libs/utils';
-import { AxiosError } from 'axios';
-import { useMutation } from 'react-query';
 import api from '@libs/api';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
-import type { IResearchInsight as IApiResearchInsight } from '@libs/api/types';
-import { animated } from 'react-spring';
-import { InsightCard } from '../Insights';
+import {
+  useGenerationMutations,
+  useWebSocketSync,
+  useBulkQuestionsUpdate,
+} from './hooks';
 
 interface QuestionCarouselProps {
   topic: string;
   seedUuid: string | null;
   onGenerateIdeas?: () => void;
+  onViewConcepts?: () => void;
+  hasGeneratedConcepts?: boolean;
 }
+
+// Type for loading operations
+type LoadingOperation = 'insights' | 'possibleAnswer';
 
 const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
   seedUuid,
   onGenerateIdeas,
+  onViewConcepts,
+  hasGeneratedConcepts = false,
 }) => {
-  // Only use Zustand for UI state (carousel navigation)
-  const { currentQuestionIndex, setCurrentQuestionIndex } = useStore(
-    (state) => state.ideaPlayground,
-  );
+  // Zustand store for UI state
+  const {
+    currentQuestionIndex,
+    setCurrentQuestionIndex,
+    clearSelectedConcepts,
+  } = useStore((state) => state.ideaPlayground);
 
   // Debounced invalidation to prevent request storms
   const { debouncedInvalidate } = useDebouncedInvalidation();
 
-  // Fetch questions using React Query - single source of truth
+  // Fetch questions using React Query
   const { questions: apiQuestions, isLoading: isLoadingQuestions } =
     useQuestions(seedUuid || undefined);
 
-  // Sync selectedInsights with includedAnswers from API questions
-  useEffect(() => {
-    if (apiQuestions.length > 0) {
-      const syncedSelections: Record<string, string[]> = {};
-      apiQuestions.forEach((question) => {
-        if (question.includedAnswers && question.includedAnswers.length > 0) {
-          syncedSelections[question.uuid] = question.includedAnswers;
-        }
-      });
-      setSelectedInsights(syncedSelections);
-      telemetry.log('ideaPlayground.selections.synced', {
-        questionCount: apiQuestions.length,
-        selectionsCount: Object.keys(syncedSelections).length,
-      });
-    }
-  }, [apiQuestions]);
-
-  // Create a generic mutation for generating insights (works for any question)
-  const generateInsightsMutation = useMutation({
-    mutationFn: async ({
-      seedUuid,
-      questionUuid,
-    }: {
-      seedUuid: string;
-      questionUuid: string;
-    }) => {
-      return await api.ideaPlayground.generateResearchInsights(
-        seedUuid,
-        questionUuid,
-      );
-    },
-    onSuccess: (data, variables) => {
-      // Check if generation is in progress (202 response)
-      if (isGenerationInProgress(data)) {
-        // Generation started, will be notified via WebSocket - keep loading state
-        return;
-      }
-      // Sync response - remove loading state immediately
-      removeLoadingOperation(variables.questionUuid, 'insights');
-
-      // Invalidate questions query to refetch with new insights
-      debouncedInvalidate([
-        AucctusQueryKeys.ideaPlaygroundQuestions,
-        variables.seedUuid,
-      ]);
-      telemetry.log('ideaPlayground.insights.generated', {
-        questionUuid: variables.questionUuid,
-        count: (data as IApiResearchInsight[]).length,
-      });
-    },
-    onError: (error: AxiosError, variables) => {
-      // Remove loading state on error
-      removeLoadingOperation(variables.questionUuid, 'insights');
-
-      const message = utils.osiris.parseFormError(error);
-      toast.error(
-        message || 'Failed to generate research insights. Please try again.',
-      );
-      telemetry.error('ideaPlayground.insights.generate.failed', error);
-    },
-  });
-
-  // Mutation for generating possible answer (AI suggestion)
-  const generatePossibleAnswerMutation = useMutation({
-    mutationFn: async ({
-      seedUuid,
-      questionUuid,
-    }: {
-      seedUuid: string;
-      questionUuid: string;
-    }) => {
-      return await api.ideaPlayground.generatePossibleAnswer(
-        seedUuid,
-        questionUuid,
-      );
-    },
-    onSuccess: (data, variables) => {
-      // Check if generation is in progress (202 response)
-      if (isGenerationInProgress(data)) {
-        // Generation started, will be notified via WebSocket - keep loading state
-        return;
-      }
-      // Sync response - remove loading state immediately
-      removeLoadingOperation(variables.questionUuid, 'possibleAnswer');
-
-      // Invalidate questions query to refetch with new possible answer
-      debouncedInvalidate([
-        AucctusQueryKeys.ideaPlaygroundQuestions,
-        variables.seedUuid,
-      ]);
-      telemetry.log('ideaPlayground.possibleAnswer.generated', {
-        questionUuid: variables.questionUuid,
-      });
-    },
-    onError: (error: AxiosError, variables) => {
-      // Remove loading state on error
-      removeLoadingOperation(variables.questionUuid, 'possibleAnswer');
-
-      const message = utils.osiris.parseFormError(error);
-      toast.error(
-        message || 'Failed to generate answer suggestion. Please try again.',
-      );
-      telemetry.error('ideaPlayground.possibleAnswer.generate.failed', error);
-    },
-  });
-
-  // User answer removal hook
-  const { removeAnswerAsync } = useRemoveUserAnswer();
-
-  // Local state (currentQuestionIndex is now in Zustand store)
-  const [manualAnswerOpen, setManualAnswerOpen] = useState<
-    Record<string, boolean>
-  >({});
+  // Local state
   const [selectedInsights, setSelectedInsights] = useState<
     Record<string, string[]>
   >({});
+  const [inputsAtGeneration, setInputsAtGeneration] = useState<Record<
+    string,
+    string[]
+  > | null>(null);
+  const [questionsSnapshotAtGeneration, setQuestionsSnapshotAtGeneration] =
+    useState<typeof apiQuestions | null>(null);
   const [customQuestions, setCustomQuestions] = useState<Question[]>([]);
+  const [submittingQuestionId, setSubmittingQuestionId] = useState<
+    string | null
+  >(null);
+  const [deletingQuestionId, setDeletingQuestionId] = useState<string | null>(
+    null,
+  );
   const [sideMenuOpen, setSideMenuOpen] = useState(false);
   const [selectedInsightForDetails, setSelectedInsightForDetails] =
     useState<InsightCardType | null>(null);
@@ -186,14 +97,35 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
   const [customInsights, setCustomInsights] = useState<
     Record<string, InsightCardType[]>
   >({});
-
-  // Track loading operations per question using Sets for better state management
-  type LoadingOperation = 'insights' | 'possibleAnswer';
   const [loadingOperations, setLoadingOperations] = useState<
     Record<string, Set<LoadingOperation>>
   >({});
+  const [userInputValue, setUserInputValue] = useState<Record<string, string>>(
+    {},
+  );
+  const [isSubmittingUserInput, setIsSubmittingUserInput] = useState(false);
 
-  // Helper functions to manage loading operations
+  // Modal context
+  const { openModal, closeModal } = useModal();
+
+  // Refs for positioning
+  const leftNavRef = useRef<HTMLButtonElement>(null);
+  const rightNavRef = useRef<HTMLButtonElement>(null);
+  const questionCardRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [elementRects, setElementRects] = useState<{
+    leftNav?: DOMRect;
+    rightNav?: DOMRect;
+    questionCard?: DOMRect;
+    container?: DOMRect;
+  }>({});
+
+  // API hooks
+  const { removeAnswerAsync } = useRemoveUserAnswer();
+  const { addQuestionAsync } = useAddCustomQuestion();
+  const { deleteQuestionAsync } = useDeleteCustomQuestion();
+
+  // Helper functions for loading operations
   const addLoadingOperation = useCallback(
     (questionId: string, operation: LoadingOperation) => {
       setLoadingOperations((prev) => {
@@ -217,7 +149,6 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
         if (newOps[questionId]) {
           newOps[questionId] = new Set(newOps[questionId]);
           newOps[questionId].delete(operation);
-          // Clean up empty sets
           if (newOps[questionId].size === 0) {
             delete newOps[questionId];
           }
@@ -228,231 +159,88 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     [],
   );
 
-  // Track previous card IDs for smooth animations
-  const prevCardIdsRef = useRef<Set<string>>(new Set());
+  // Custom hooks
+  const { generateInsightsMutation, generatePossibleAnswerMutation } =
+    useGenerationMutations({
+      removeLoadingOperation,
+    });
 
-  // Refs for precise positioning calculations
-  const leftNavRef = useRef<HTMLButtonElement>(null);
-  const rightNavRef = useRef<HTMLButtonElement>(null);
-  const questionCardRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  // Convert API questions to Question format
+  const apiQuestionsConverted: Question[] = useMemo(
+    () =>
+      apiQuestions.map((q) => ({
+        id: q.uuid,
+        question: q.question,
+        explanation: q.description,
+        label: q.questionType,
+        isCustomQuestion: q.isCustomQuestion ?? false,
+      })),
+    [apiQuestions],
+  );
 
-  // Track element rects for precise positioning
-  const [elementRects, setElementRects] = useState<{
-    leftNav?: DOMRect;
-    rightNav?: DOMRect;
-    questionCard?: DOMRect;
-    container?: DOMRect;
-  }>({});
+  const questions = useMemo(
+    () => [...apiQuestionsConverted, ...customQuestions],
+    [apiQuestionsConverted, customQuestions],
+  );
 
-  // Update element rects
-  const updateRects = useCallback(() => {
+  const currentQuestion = questions[currentQuestionIndex];
+
+  // WebSocket sync
+  useWebSocketSync({
+    seedUuid,
+    currentQuestionId: currentQuestion?.id,
+    addLoadingOperation,
+    removeLoadingOperation,
+  });
+
+  // Bulk update hook for revert functionality
+  const { revertToGenerationState } = useBulkQuestionsUpdate({
+    seedUuid,
+    inputsAtGeneration,
+    questionsSnapshotAtGeneration,
+    setSelectedInsights,
+  });
+
+  // Derived state
+  const hasSnapshotCaptured = inputsAtGeneration !== null;
+
+  const hasInputsChangedSinceGeneration = useMemo(() => {
     if (
-      leftNavRef.current &&
-      rightNavRef.current &&
-      questionCardRef.current &&
-      containerRef.current
-    ) {
-      setElementRects({
-        leftNav: leftNavRef.current.getBoundingClientRect(),
-        rightNav: rightNavRef.current.getBoundingClientRect(),
-        questionCard: questionCardRef.current.getBoundingClientRect(),
-        container: containerRef.current.getBoundingClientRect(),
-      });
+      !hasGeneratedConcepts ||
+      !hasSnapshotCaptured ||
+      inputsAtGeneration === null
+    )
+      return false;
+
+    const currentKeys = Object.keys(selectedInsights);
+    const snapshotKeys = Object.keys(inputsAtGeneration);
+
+    if (currentKeys.length !== snapshotKeys.length) return true;
+
+    for (const questionId of currentKeys) {
+      const currentSelections = selectedInsights[questionId] || [];
+      const snapshotSelections = inputsAtGeneration[questionId] || [];
+
+      if (currentSelections.length !== snapshotSelections.length) return true;
+
+      const sortedCurrent = [...currentSelections].sort();
+      const sortedSnapshot = [...snapshotSelections].sort();
+      for (let i = 0; i < sortedCurrent.length; i++) {
+        if (sortedCurrent[i] !== sortedSnapshot[i]) return true;
+      }
     }
-  }, []);
 
-  // Update rects on mount and when question changes
-  useEffect(() => {
-    // Small delay to ensure DOM is rendered
-    const timer = setTimeout(updateRects, 0);
-    return () => clearTimeout(timer);
-  }, [currentQuestionIndex, updateRects]);
-
-  // Handle window resize for card repositioning
-  useEffect(() => {
-    const handleResize = () => {
-      updateRects();
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // WebSocket listener for questions generated
-  useSocketEvent<'idea_playground.questions.generated.user'>(
-    'idea_playground.questions.generated.user',
-    (data) => {
-      if (data.seedUuid === seedUuid) {
-        telemetry.log('ideaPlayground.questions.generated.websocket', {
-          questionCount: data.questionCount,
-        });
-        // Invalidate questions query to refetch
-        debouncedInvalidate([
-          AucctusQueryKeys.ideaPlaygroundQuestions,
-          seedUuid,
-        ]);
-      }
-    },
-  );
-
-  // WebSocket listener for insight enhancement
-  useSocketEvent<'idea_playground.insight.enhanced.user'>(
-    'idea_playground.insight.enhanced.user',
-    (data) => {
-      if (data.seedUuid === seedUuid) {
-        // Invalidate questions query to get updated insights
-        debouncedInvalidate([
-          AucctusQueryKeys.ideaPlaygroundQuestions,
-          data.seedUuid,
-        ]);
-        telemetry.log('ideaPlayground.insight.enhanced.websocket', {
-          insightUuid: data.insightUuid,
-        });
-      }
-    },
-  );
-
-  // WebSocket listener for insight validation failure
-  useSocketEvent<'idea_playground.insight.validation_failed.user'>(
-    'idea_playground.insight.validation_failed.user',
-    (data) => {
-      if (data.seedUuid === seedUuid) {
-        // Invalidate questions query to get updated insight with failed status
-        debouncedInvalidate([
-          AucctusQueryKeys.ideaPlaygroundQuestions,
-          data.seedUuid,
-        ]);
-        telemetry.log('ideaPlayground.insight.validation_failed.websocket', {
-          insightUuid: data.insightUuid,
-          error: data.errorMessage,
-        });
-      }
-    },
-  );
-
-  // WebSocket listener for possible answer generated
-  useSocketEvent<'idea_playground.possible_answer.generated.user'>(
-    'idea_playground.possible_answer.generated.user',
-    (data) => {
-      if (data.seedUuid === seedUuid) {
-        telemetry.log('ideaPlayground.possibleAnswer.generated.websocket', {
-          questionUuid: data.questionUuid,
-        });
-
-        // Remove loading operation for this question
-        removeLoadingOperation(data.questionUuid, 'possibleAnswer');
-
-        // Invalidate React Query cache to refetch questions with new possible answer
-        debouncedInvalidate([
-          AucctusQueryKeys.ideaPlaygroundQuestions,
-          data.seedUuid,
-        ]);
-      }
-    },
-  );
-
-  // WebSocket listener for research insights generated
-  useSocketEvent<'idea_playground.research_insights.generated.user'>(
-    'idea_playground.research_insights.generated.user',
-    (data) => {
-      if (data.seedUuid === seedUuid) {
-        telemetry.log('ideaPlayground.insights.generated.websocket', {
-          questionUuid: data.questionUuid,
-          insightCount: data.insightCount,
-        });
-
-        // Remove loading operation for this question
-        removeLoadingOperation(data.questionUuid, 'insights');
-
-        // Invalidate React Query cache to refetch questions with new insights
-        debouncedInvalidate([
-          AucctusQueryKeys.ideaPlaygroundQuestions,
-          data.seedUuid,
-        ]);
-      }
-    },
-  );
-
-  // WebSocket listener for possible answer processing started
-  useSocketEvent<'idea_playground.possible_answer.processing.user'>(
-    'idea_playground.possible_answer.processing.user',
-    (data) => {
-      if (data.seedUuid === seedUuid) {
-        telemetry.log('ideaPlayground.possibleAnswer.processing.websocket', {
-          questionUuid: data.questionUuid,
-        });
-
-        // Add loading operation for this question
-        addLoadingOperation(data.questionUuid, 'possibleAnswer');
-      }
-    },
-  );
-
-  // WebSocket listener for research insights processing started
-  useSocketEvent<'idea_playground.research_insights.processing.user'>(
-    'idea_playground.research_insights.processing.user',
-    (data) => {
-      if (data.seedUuid === seedUuid) {
-        telemetry.log('ideaPlayground.insights.processing.websocket', {
-          questionUuid: data.questionUuid,
-        });
-
-        // Add loading operation for this question
-        addLoadingOperation(data.questionUuid, 'insights');
-      }
-    },
-  );
-
-  // WebSocket listener for errors
-  useSocketEvent<'idea_playground.error.user'>(
-    'idea_playground.error.user',
-    (data) => {
-      if (data.seedUuid === seedUuid) {
-        telemetry.error('ideaPlayground.error.websocket', {
-          operation: data.operation,
-          error: data.errorMessage,
-          details: data.details,
-        });
-
-        // Extract question UUID from details if available for per-question error handling
-        const questionUuid =
-          data.details?.questionUuid || data.details?.question_uuid;
-        const targetQuestionId = questionUuid || currentQuestion?.id;
-
-        if (targetQuestionId) {
-          // Determine which operation failed and remove it
-          const operation = data.operation?.toLowerCase();
-          if (operation?.includes('insight')) {
-            removeLoadingOperation(targetQuestionId, 'insights');
-          } else if (operation?.includes('answer')) {
-            removeLoadingOperation(targetQuestionId, 'possibleAnswer');
-          } else {
-            // If we can't determine the specific operation, clear all operations for this question
-            removeLoadingOperation(targetQuestionId, 'insights');
-            removeLoadingOperation(targetQuestionId, 'possibleAnswer');
-          }
-        }
-
-        // Show error toast
-        toast.error(
-          data.errorMessage || 'An error occurred. Please try again.',
-        );
-      }
-    },
-  );
-
-  // Inject keyframe animations
-  useEffect(() => {
-    const styleId = 'carousel-animations';
-    if (!document.getElementById(styleId)) {
-      const style = document.createElement('style');
-      style.id = styleId;
-      style.textContent = animationStyles;
-      document.head.appendChild(style);
+    for (const questionId of snapshotKeys) {
+      if (!currentKeys.includes(questionId)) return true;
     }
-  }, []);
+
+    return false;
+  }, [
+    hasGeneratedConcepts,
+    hasSnapshotCaptured,
+    selectedInsights,
+    inputsAtGeneration,
+  ]);
 
   // Helper function to convert IResearchInsight to InsightCard format
   const convertInsightToCard = (
@@ -469,130 +257,188 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     citationValidationStatus: insight.citationValidationStatus,
   });
 
-  // Convert API questions to legacy format for existing UI
-  const apiQuestionsConverted: Question[] = apiQuestions.map((q) => ({
-    id: q.uuid,
-    question: q.question,
-    explanation: q.description,
-    label: q.questionType,
-  }));
-
-  const questions = [...apiQuestionsConverted, ...customQuestions];
-  const currentQuestion = questions[currentQuestionIndex];
-
-  // Get insights for current question from API and store, convert to card format
+  // Get current question's insights
   const currentApiQuestion = apiQuestions.find(
     (q) => q.uuid === currentQuestion?.id,
   );
-
-  // Get research insights from React Query data
   const apiInsights = currentApiQuestion?.insights
     ? currentApiQuestion.insights.map(convertInsightToCard)
     : [];
-
   const currentInsights = currentQuestion
     ? [...apiInsights, ...(customInsights[currentQuestion.id] || [])]
     : [];
 
-  // Reset card tracking and manual answer state when navigating to a different question
-  useEffect(() => {
-    prevCardIdsRef.current.clear();
-    // Clear manual answer open state for all questions except the current one
-    setManualAnswerOpen((prev) => {
-      if (!currentQuestion?.id) return {};
-      // Only keep the current question's state if it exists
-      return currentQuestion.id in prev
-        ? { [currentQuestion.id]: prev[currentQuestion.id] }
-        : {};
-    });
-  }, [currentQuestion?.id]);
+  // Update element rects for positioning
+  const updateRects = useCallback(() => {
+    if (
+      leftNavRef.current &&
+      rightNavRef.current &&
+      questionCardRef.current &&
+      containerRef.current
+    ) {
+      setElementRects({
+        leftNav: leftNavRef.current.getBoundingClientRect(),
+        rightNav: rightNavRef.current.getBoundingClientRect(),
+        questionCard: questionCardRef.current.getBoundingClientRect(),
+        container: containerRef.current.getBoundingClientRect(),
+      });
+    }
+  }, []);
 
-  // Auto-fetch data for ALL questions as soon as they're available
+  // Effects
+  useEffect(() => {
+    const timer = setTimeout(updateRects, 0);
+    return () => clearTimeout(timer);
+  }, [currentQuestionIndex, updateRects]);
+
+  useEffect(() => {
+    window.addEventListener('resize', updateRects);
+    return () => window.removeEventListener('resize', updateRects);
+  }, [updateRects]);
+
+  useEffect(() => {
+    const styleId = 'carousel-animations';
+    if (!document.getElementById(styleId)) {
+      const style = document.createElement('style');
+      style.id = styleId;
+      style.textContent = animationStyles;
+      document.head.appendChild(style);
+    }
+  }, []);
+
+  // Sync selectedInsights with API data
+  useEffect(() => {
+    if (apiQuestions.length > 0) {
+      const syncedSelections: Record<string, string[]> = {};
+      apiQuestions.forEach((question) => {
+        if (question.includedAnswers && question.includedAnswers.length > 0) {
+          syncedSelections[question.uuid] = question.includedAnswers;
+        }
+      });
+      setSelectedInsights(syncedSelections);
+      telemetry.log('ideaPlayground.selections.synced', {
+        questionCount: apiQuestions.length,
+        selectionsCount: Object.keys(syncedSelections).length,
+      });
+    }
+  }, [apiQuestions]);
+
+  // Initialize snapshot when restoring session with existing concepts
+  useEffect(() => {
+    if (
+      hasGeneratedConcepts &&
+      !hasSnapshotCaptured &&
+      apiQuestions.length > 0
+    ) {
+      setInputsAtGeneration({ ...selectedInsights });
+      setQuestionsSnapshotAtGeneration([...apiQuestions]);
+    }
+  }, [
+    hasGeneratedConcepts,
+    hasSnapshotCaptured,
+    selectedInsights,
+    apiQuestions,
+  ]);
+
+  // Auto-fetch data for all questions
   useEffect(() => {
     if (!seedUuid || apiQuestions.length === 0) return;
 
-    // Trigger generation for all non-custom questions that don't have data yet
     apiQuestions.forEach((question) => {
       const questionId = question.uuid;
-
-      // Get data from React Query (single source of truth)
       const hasInsights =
         question.researchInsights && question.researchInsights.length > 0;
       const hasPossibleAnswer =
         question.possibleAnswers && question.possibleAnswers.length > 0;
-
-      // Check if operations are already loading
       const currentOps = loadingOperations[questionId];
       const isLoadingInsights = currentOps?.has('insights');
       const isLoadingPossibleAnswer = currentOps?.has('possibleAnswer');
 
-      // Auto-fetch insights if not cached and not already loading
       if (!hasInsights && !isLoadingInsights) {
         addLoadingOperation(questionId, 'insights');
-        generateInsightsMutation.mutate({
-          seedUuid: seedUuid,
-          questionUuid: questionId,
-        });
+        generateInsightsMutation.mutate({ seedUuid, questionUuid: questionId });
       }
 
-      // Auto-fetch possible answer if not cached and not already loading
       if (!hasPossibleAnswer && !isLoadingPossibleAnswer) {
         addLoadingOperation(questionId, 'possibleAnswer');
         generatePossibleAnswerMutation.mutate({
-          seedUuid: seedUuid,
+          seedUuid,
           questionUuid: questionId,
         });
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- Helper functions (addLoadingOperation, removeLoadingOperation) and mutations are stable; loadingOperations intentionally excluded to avoid re-triggering on state changes
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [seedUuid, apiQuestions.length]);
 
-  // Side menu now handles its own animations internally
+  // Event handlers
+  const discardUnsavedCustomQuestion = useCallback(() => {
+    const currentQ = questions[currentQuestionIndex];
+    if (currentQ?.id.startsWith('custom-') && !currentQ.question) {
+      setCustomQuestions((prev) => prev.filter((q) => q.id !== currentQ.id));
+      setCustomQuestionInput((prev) => {
+        const newInput = { ...prev };
+        delete newInput[currentQ.id];
+        return newInput;
+      });
+      return true;
+    }
+    return false;
+  }, [questions, currentQuestionIndex]);
 
   const handleNext = () => {
+    discardUnsavedCustomQuestion();
     setCurrentQuestionIndex((currentQuestionIndex + 1) % questions.length);
   };
 
   const handlePrevious = () => {
+    discardUnsavedCustomQuestion();
     setCurrentQuestionIndex(
       (currentQuestionIndex - 1 + questions.length) % questions.length,
     );
   };
 
-  const handleQuestionClick = (questionId: string) => {
-    // Open manual answer card if it's not already open
-    if (!manualAnswerOpen[questionId]) {
-      setManualAnswerOpen((prev) => ({ ...prev, [questionId]: true }));
-    }
+  const handleQuestionSelect = useCallback(
+    (index: number) => {
+      if (index === currentQuestionIndex) return;
+      discardUnsavedCustomQuestion();
+      setCurrentQuestionIndex(index);
+    },
+    [
+      currentQuestionIndex,
+      discardUnsavedCustomQuestion,
+      setCurrentQuestionIndex,
+    ],
+  );
 
-    // No need to generate insights/answers here - they're already being generated
-    // for all questions in the useEffect above
-  };
+  const handleUserInputSubmit = async () => {
+    if (!seedUuid || !currentQuestion?.id) return;
 
-  const handleSubmitAnswer = async (
-    questionId: string,
-    answer: string,
-  ): Promise<void> => {
-    if (!seedUuid || !answer.trim()) return;
+    const inputValue = userInputValue[currentQuestion.id];
+    if (!inputValue?.trim()) return;
 
+    setIsSubmittingUserInput(true);
     try {
       await api.ideaPlayground.addUserAnswer(
         seedUuid,
-        questionId,
-        answer.trim(),
+        currentQuestion.id,
+        inputValue.trim(),
       );
-
-      // Invalidate questions query to refetch with new user answer
       debouncedInvalidate([AucctusQueryKeys.ideaPlaygroundQuestions, seedUuid]);
-
+      // Clear the input after successful submission
+      setUserInputValue((prev) => {
+        const newInput = { ...prev };
+        delete newInput[currentQuestion.id];
+        return newInput;
+      });
       telemetry.log('ideaPlayground.userAnswer.submitted', {
-        questionUuid: questionId,
-        answerLength: answer.trim().length,
+        questionUuid: currentQuestion.id,
+        answerLength: inputValue.trim().length,
       });
     } catch (error) {
       telemetry.error('ideaPlayground.userAnswer.submit.failed', error);
       toast.error('Failed to save your answer. Please try again.');
-      throw error; // Re-throw so ManualAnswer knows submission failed
+    } finally {
+      setIsSubmittingUserInput(false);
     }
   };
 
@@ -601,25 +447,16 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     cardId: string,
     isSelected: boolean,
   ) => {
-    // Use functional form to avoid race conditions when multiple cards update simultaneously
     setSelectedInsights((prev) => {
       const currentSelections = prev[questionId] || [];
-
-      // Check if the card is already in the desired state to avoid unnecessary updates
       const isCurrentlySelected = currentSelections.includes(cardId);
-      if (isCurrentlySelected === isSelected) {
-        // Already in correct state, no update needed
-        return prev;
-      }
+      if (isCurrentlySelected === isSelected) return prev;
 
       const updatedSelections = isSelected
         ? [...currentSelections, cardId]
         : currentSelections.filter((id) => id !== cardId);
 
-      return {
-        ...prev,
-        [questionId]: updatedSelections,
-      };
+      return { ...prev, [questionId]: updatedSelections };
     });
   };
 
@@ -630,29 +467,18 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
 
   const handleUserAnswerDelete = async (questionId: string, card: any) => {
     if (!seedUuid) return;
-
-    // If it's a saved user answer, delete it via API
     if (card.isSaved && card.userAnswerUuid) {
-      await removeAnswerAsync({
-        seedUuid: seedUuid,
-        questionUuid: questionId,
-      });
+      await removeAnswerAsync({ seedUuid, questionUuid: questionId });
     }
   };
 
   const isQuestionAnswered = (questionId: string) => {
-    // Check if question has any included answers from API
     const question = apiQuestions.find((q) => q.uuid === questionId);
     const hasIncludedAnswers =
       question?.includedAnswers && question.includedAnswers.length > 0;
-
-    // Check if question has a user answer
     const hasUserAnswer =
       question?.userAnswer !== undefined && question?.userAnswer !== null;
-
-    // Also check local state for immediate feedback
     const hasSelectedInsights = (selectedInsights[questionId] || []).length > 0;
-
     return hasIncludedAnswers || hasUserAnswer || hasSelectedInsights;
   };
 
@@ -669,72 +495,168 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     setCustomQuestionInput((prev) => ({ ...prev, [newQuestion.id]: '' }));
   };
 
-  const handleRemoveQuestion = (questionIndex: number, questionId: string) => {
-    if (!questionId.startsWith('custom-')) return;
+  const handleRemoveQuestion = async (
+    questionIndex: number,
+    questionId: string,
+  ) => {
+    const questionToRemove = questions.find((q) => q.id === questionId);
+    if (!questionToRemove) return;
 
-    setCustomQuestions((prev) => prev.filter((q) => q.id !== questionId));
+    const isLocalTempQuestion = questionId.startsWith('custom-');
+    const isApiCustomQuestion = questionToRemove.isCustomQuestion;
 
-    if (currentQuestionIndex >= questionIndex && currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-    } else if (currentQuestionIndex >= questions.length - 1) {
-      setCurrentQuestionIndex(Math.max(0, questions.length - 2));
+    if (!isLocalTempQuestion && !isApiCustomQuestion) {
+      toast.error('AI-generated questions cannot be deleted.');
+      return;
     }
 
-    setSelectedInsights((prev) => {
-      const newInsights = { ...prev };
-      delete newInsights[questionId];
-      return newInsights;
-    });
+    if (isApiCustomQuestion && !isLocalTempQuestion && seedUuid) {
+      try {
+        setDeletingQuestionId(questionId);
+        await deleteQuestionAsync({ seedUuid, questionUuid: questionId });
+        if (currentQuestionIndex >= questionIndex && currentQuestionIndex > 0) {
+          setCurrentQuestionIndex(currentQuestionIndex - 1);
+        } else if (currentQuestionIndex >= questions.length - 1) {
+          setCurrentQuestionIndex(Math.max(0, questions.length - 2));
+        }
+        return;
+      } catch {
+        return;
+      } finally {
+        setDeletingQuestionId(null);
+      }
+    }
 
-    setCustomQuestionInput((prev) => {
-      const newInput = { ...prev };
-      delete newInput[questionId];
-      return newInput;
-    });
-
-    setCustomInsights((prev) => {
-      const newInsights = { ...prev };
-      delete newInsights[questionId];
-      return newInsights;
-    });
-
-    setManualAnswerOpen((prev) => {
-      const newManualAnswerOpen = { ...prev };
-      delete newManualAnswerOpen[questionId];
-      return newManualAnswerOpen;
-    });
+    if (isLocalTempQuestion) {
+      setCustomQuestions((prev) => prev.filter((q) => q.id !== questionId));
+      if (currentQuestionIndex >= questionIndex && currentQuestionIndex > 0) {
+        setCurrentQuestionIndex(currentQuestionIndex - 1);
+      } else if (currentQuestionIndex >= questions.length - 1) {
+        setCurrentQuestionIndex(Math.max(0, questions.length - 2));
+      }
+      setSelectedInsights((prev) => {
+        const n = { ...prev };
+        delete n[questionId];
+        return n;
+      });
+      setCustomQuestionInput((prev) => {
+        const n = { ...prev };
+        delete n[questionId];
+        return n;
+      });
+      setCustomInsights((prev) => {
+        const n = { ...prev };
+        delete n[questionId];
+        return n;
+      });
+      setUserInputValue((prev) => {
+        const n = { ...prev };
+        delete n[questionId];
+        return n;
+      });
+    }
   };
 
-  const handleCustomQuestionSubmit = (questionId: string) => {
+  const handleCustomQuestionSubmit = async (questionId: string) => {
     const input = customQuestionInput[questionId];
-    if (!input?.trim()) return;
+    if (!input?.trim() || !seedUuid) return;
 
-    setCustomQuestions((prev) =>
-      prev.map((q) =>
-        q.id === questionId ? { ...q, question: input.trim() } : q,
-      ),
-    );
+    setSubmittingQuestionId(questionId);
 
-    const generatedInsights = generateCustomInsights(questionId, input);
+    try {
+      const newQuestion = await addQuestionAsync({
+        seedUuid,
+        question: input.trim(),
+      });
+      setCustomQuestions((prev) => prev.filter((q) => q.id !== questionId));
+      setCustomQuestionInput((prev) => {
+        const n = { ...prev };
+        delete n[questionId];
+        return n;
+      });
 
-    setCustomInsights((prev) => ({
-      ...prev,
-      [questionId]: generatedInsights,
-    }));
+      addLoadingOperation(newQuestion.uuid, 'insights');
+      addLoadingOperation(newQuestion.uuid, 'possibleAnswer');
+      generateInsightsMutation.mutate({
+        seedUuid,
+        questionUuid: newQuestion.uuid,
+      });
+      generatePossibleAnswerMutation.mutate({
+        seedUuid,
+        questionUuid: newQuestion.uuid,
+      });
+
+      telemetry.log('ideaPlayground.customQuestion.submitted', {
+        seedUuid,
+        questionUuid: newQuestion.uuid,
+        questionText: input.trim(),
+      });
+      toast.success('Question added! Generating insights...');
+    } catch (error) {
+      telemetry.error('ideaPlayground.customQuestion.submit.failed', error);
+    } finally {
+      setSubmittingQuestionId(null);
+    }
   };
 
-  // Utility functions moved to utils.tsx and imported above
+  const handleGenerateIdeasClick = useCallback(() => {
+    if (hasInputsChangedSinceGeneration && hasGeneratedConcepts) {
+      const actions: IActionButton[] = [
+        {
+          title: 'Revert Changes',
+          variant: 'light',
+          onClick: () => {
+            closeModal();
+            revertToGenerationState();
+          },
+        },
+        {
+          title: 'Regenerate',
+          variant: 'primary',
+          onClick: () => {
+            closeModal();
+            clearSelectedConcepts();
+            setInputsAtGeneration({ ...selectedInsights });
+            setQuestionsSnapshotAtGeneration([...apiQuestions]);
+            onGenerateIdeas?.();
+          },
+        },
+      ];
 
-  // Compute loading state and message for current question
-  const currentQuestionLoadingState = React.useMemo(() => {
-    if (!currentQuestion?.id) {
-      return { isLoading: false, message: '' };
+      openModal(
+        Modal.Confirmation,
+        {
+          title: 'Regenerate Concepts?',
+          subtitle:
+            "You've changed your inputs. Your previously generated concepts will be lost. You can revert your changes or regenerate with the new inputs.",
+          actions,
+        },
+        { position: 'center', shouldCloseOnOverlayClick: true },
+      );
+    } else {
+      setInputsAtGeneration({ ...selectedInsights });
+      setQuestionsSnapshotAtGeneration([...apiQuestions]);
+      onGenerateIdeas?.();
     }
+  }, [
+    hasInputsChangedSinceGeneration,
+    hasGeneratedConcepts,
+    selectedInsights,
+    apiQuestions,
+    onGenerateIdeas,
+    openModal,
+    closeModal,
+    revertToGenerationState,
+    clearSelectedConcepts,
+  ]);
+
+  // Compute loading state for current question
+  const currentQuestionLoadingState = useMemo(() => {
+    if (!currentQuestion?.id) return { isLoading: false, message: '' };
 
     const operations = loadingOperations[currentQuestion.id];
-    if (!operations || operations.size === 0) {
+    if (!operations || operations.size === 0)
       return { isLoading: false, message: '' };
-    }
 
     const hasInsights = operations.has('insights');
     const hasPossibleAnswer = operations.has('possibleAnswer');
@@ -753,161 +675,13 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     return { isLoading: false, message: '' };
   }, [currentQuestion?.id, loadingOperations]);
 
-  // Check if a user answer card is actually rendered on screen
-  const hasUserAnswerOnScreen = React.useMemo(() => {
+  const hasUserAnswerOnScreen = useMemo(() => {
     if (!currentQuestion?.id) return false;
+    const currentApiQ = apiQuestions.find((q) => q.uuid === currentQuestion.id);
+    return !!currentApiQ?.userAnswer;
+  }, [currentQuestion?.id, apiQuestions]);
 
-    // A manual answer card is rendered when:
-    // 1. There's a saved user answer, OR
-    // 2. The manual answer input is open
-    const currentApiQuestion = apiQuestions.find(
-      (q) => q.uuid === currentQuestion.id,
-    );
-    const hasSavedAnswer = !!currentApiQuestion?.userAnswer;
-    const hasOpenInput = manualAnswerOpen[currentQuestion.id];
-
-    return hasSavedAnswer || hasOpenInput;
-  }, [currentQuestion?.id, apiQuestions, manualAnswerOpen]);
-
-  const renderFloatingInsights = () => {
-    // Build limited insights array: nucleus first (if exists), then non-nucleus up to 3 more
-    const limitedInsights = currentInsights.slice(0, 5);
-
-    const allCards = [...limitedInsights];
-
-    // Add possible answer cards if available (now supports multiple)
-    const currentApiQuestion = apiQuestions.find(
-      (q) => q.uuid === currentQuestion.id,
-    );
-    if (
-      currentApiQuestion?.possibleAnswers &&
-      !currentQuestion.id.startsWith('custom-')
-    ) {
-      currentApiQuestion.possibleAnswers.forEach((possibleAnswer) => {
-        allCards.push({
-          id: possibleAnswer.uuid,
-          insight: possibleAnswer.answer,
-          source: 'Possible Answer',
-          type: 'data' as any,
-          sentiment: 'neutral' as any,
-          isManual: false,
-          moreDetails: null,
-          whyItMatters: null,
-        } as any);
-      });
-    }
-
-    // Use a stable ID for both input and saved states to prevent re-animation
-    const manualAnswerCardId = `manual-answer-${currentQuestion.id}`;
-
-    // Add the saved user answer if it exists
-    if (
-      currentApiQuestion?.userAnswer &&
-      !currentQuestion.id.startsWith('custom-')
-    ) {
-      allCards.push({
-        id: manualAnswerCardId, // Use stable ID instead of UUID
-        insight: currentApiQuestion.userAnswer.answer,
-        source: 'User Answer',
-        type: 'manual' as any,
-        sentiment: 'neutral' as any,
-        isManual: true,
-        isSaved: true, // Mark as saved to trigger API delete
-        userAnswerUuid: currentApiQuestion.userAnswer.uuid, // Store UUID for deletion
-      } as any);
-    }
-
-    // Add manual answer input card only if no saved answer exists and it's been opened
-    if (
-      !currentApiQuestion?.userAnswer &&
-      manualAnswerOpen[currentQuestion.id] &&
-      !currentQuestion.id.startsWith('custom-')
-    ) {
-      allCards.push({
-        id: manualAnswerCardId, // Use stable ID
-        source: { url: '', title: 'manual', credibility: 0 },
-        type: 'manual' as any,
-        sentiment: 'neutral' as any,
-        isManual: true,
-      } as any);
-    }
-
-    // Identify new cards vs existing cards for animation purposes
-    const newCardIds = allCards
-      .filter((card) => !prevCardIdsRef.current.has(card.id))
-      .map((c) => c.id);
-
-    // Update ref with current card IDs for next render
-    prevCardIdsRef.current = new Set(allCards.map((c) => c.id));
-
-    const transitionDuration = 400; // ms for existing cards to move
-
-    return allCards.map((card, index) => {
-      const { x, y } = calculateCardPositions(
-        allCards.length,
-        index,
-        elementRects,
-      );
-      const isNewCard = newCardIds.includes(card.id);
-      const entranceDelay = isNewCard ? transitionDuration + 50 : 0;
-
-      return (
-        <div
-          key={card.id}
-          className='pointer-events-auto absolute z-10'
-          style={{
-            left: `calc(50% + ${x}px)`,
-            top: `calc(50% + ${y}px)`,
-            transform: 'translate(-50%, -50%)',
-            transition: isNewCard
-              ? undefined
-              : 'left 400ms ease-out, top 400ms ease-out',
-          }}
-        >
-          <animated.div
-            style={
-              {
-                opacity: 0,
-                transform: `translate(${-x}px, ${-y}px) scale(0.5)`,
-                animation: `fadeSlideToPosition 300ms ease-out ${entranceDelay}ms forwards, float ${2.5 + (index % 3) * 0.5}s ease-in-out ${entranceDelay + 300}ms infinite`,
-                '--slide-x': `${-x}px`,
-                '--slide-y': `${-y}px`,
-              } as React.CSSProperties
-            }
-          >
-            <InsightCard
-              card={card}
-              isSelected={(selectedInsights[currentQuestion.id] || []).includes(
-                card.id,
-              )}
-              seedUuid={seedUuid || ''}
-              questionUuid={currentQuestion.id}
-              answer={card.insight}
-              getSentimentColor={getSentimentColor}
-              getSentimentIcon={getSentimentIcon}
-              getSentimentDescription={getSentimentDescription}
-              onSelectionChange={(cardId, isSelected) =>
-                handleSelectionChange(currentQuestion.id, cardId, isSelected)
-              }
-              onDoubleClick={() => handleInsightDoubleClick(card)}
-              onDelete={() => handleUserAnswerDelete(currentQuestion.id, card)}
-              onSubmit={(answer) =>
-                handleSubmitAnswer(currentQuestion.id, answer)
-              }
-              onAnimationComplete={() =>
-                setManualAnswerOpen((prev) => ({
-                  ...prev,
-                  [currentQuestion.id]: false,
-                }))
-              }
-            />
-          </animated.div>
-        </div>
-      );
-    });
-  };
-
-  // Always render loading indicator - it manages its own enter/exit animations
+  // Render
   return (
     <>
       {!isLoadingQuestions && !currentQuestion && (
@@ -919,12 +693,10 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
       )}
 
       <div className='relative flex h-full w-full flex-col'>
-        {/* Carousel Container */}
         <div
           ref={containerRef}
           className='relative flex flex-1 items-center justify-center pb-20'
         >
-          {/* Global loading indicator for initial questions generation - centered in carousel */}
           <PlaygroundLoadingIndicator
             show={isLoadingQuestions}
             message='Generating innovation questions...'
@@ -932,7 +704,6 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
             usePortal={false}
           />
 
-          {/* Loading indicator for current question operations - bottom-left of carousel */}
           <PlaygroundLoadingIndicator
             show={currentQuestionLoadingState.isLoading}
             message={currentQuestionLoadingState.message}
@@ -942,7 +713,6 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
 
           {!isLoadingQuestions && currentQuestion && (
             <>
-              {/* Navigation Arrows */}
               <button
                 ref={leftNavRef}
                 onClick={handlePrevious}
@@ -969,7 +739,6 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
                 />
               </button>
 
-              {/* Question Card with Floating Insights */}
               <div className='relative'>
                 <div
                   ref={questionCardRef}
@@ -984,9 +753,11 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
                     customQuestionInput={
                       customQuestionInput[currentQuestion.id]
                     }
-                    onQuestionClick={() =>
-                      handleQuestionClick(currentQuestion.id)
+                    isSubmittingCustomQuestion={
+                      submittingQuestionId === currentQuestion.id
                     }
+                    userInputValue={userInputValue[currentQuestion.id]}
+                    isSubmittingUserInput={isSubmittingUserInput}
                     onCustomQuestionInputChange={(value) =>
                       setCustomQuestionInput((prev) => ({
                         ...prev,
@@ -996,37 +767,55 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
                     onCustomQuestionSubmit={() =>
                       handleCustomQuestionSubmit(currentQuestion.id)
                     }
+                    onUserInputChange={(value) =>
+                      setUserInputValue((prev) => ({
+                        ...prev,
+                        [currentQuestion.id]: value,
+                      }))
+                    }
+                    onUserInputSubmit={handleUserInputSubmit}
                   />
                 </div>
 
-                {/* Floating Insight Cards */}
                 <div className='pointer-events-none absolute inset-0'>
-                  {renderFloatingInsights()}
+                  <FloatingInsights
+                    currentInsights={currentInsights}
+                    currentQuestion={currentQuestion}
+                    apiQuestions={apiQuestions}
+                    selectedInsights={selectedInsights}
+                    seedUuid={seedUuid || ''}
+                    elementRects={elementRects}
+                    onSelectionChange={handleSelectionChange}
+                    onInsightDoubleClick={handleInsightDoubleClick}
+                    onUserAnswerDelete={handleUserAnswerDelete}
+                  />
                 </div>
               </div>
             </>
           )}
         </div>
 
-        {/* Bottom Navigation Footer */}
         {!isLoadingQuestions && currentQuestion && (
           <QuestionNavigationFooter
             questions={questions}
             currentIndex={currentQuestionIndex}
             isQuestionAnswered={isQuestionAnswered}
-            onQuestionSelect={setCurrentQuestionIndex}
+            onQuestionSelect={handleQuestionSelect}
             onAddQuestion={handleAddQuestion}
             onRemoveQuestion={handleRemoveQuestion}
-            onGenerateIdeas={onGenerateIdeas}
+            onGenerateIdeas={handleGenerateIdeasClick}
+            onViewConcepts={onViewConcepts}
+            hasGeneratedConcepts={hasGeneratedConcepts}
+            hasInputsChangedSinceGeneration={hasInputsChangedSinceGeneration}
+            deletingQuestionId={deletingQuestionId}
           />
         )}
 
-        {/* Side Menu for Insight Details */}
         {!isLoadingQuestions && currentQuestion && (
           <InsightDetailSidePanel
             selectedInsight={selectedInsightForDetails}
             isOpen={sideMenuOpen}
-            getSentimentIcon={getSentimentIcon}
+            getSentimentIcon={() => 'trending-up'}
             onClose={() => setSideMenuOpen(false)}
             onAddRelatedInsight={(newInsight) => {
               setCustomInsights((prev) => ({

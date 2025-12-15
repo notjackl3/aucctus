@@ -1,4 +1,10 @@
-import React, { useEffect, useState, useCallback, useMemo } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+} from 'react';
 import { Icon, toast } from '@components';
 import type { IGeneratedIdeaPlaygroundConcept } from '../types';
 import {
@@ -17,6 +23,7 @@ import {
   useGetGeneratedIdeas,
   useGenerateMoreConcepts,
   useRegenerateConceptsWithFeedback,
+  useDeleteGeneratedConcept,
 } from '@hooks/query/ideaPlayground.hook';
 import { ConceptGenerationLoading } from '../ConceptGenerationLoading';
 import { useNavigate } from 'react-router-dom';
@@ -69,16 +76,22 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     concepts,
     refetch: refetchGeneratedIdeas,
     generatingMore,
-    canGenerateMore,
   } = useGetGeneratedIdeas(seedUuid || undefined);
 
   // Hook for generating more concepts
-  const { generateMore, isLoading: isGenerateMoreLoading } =
-    useGenerateMoreConcepts(seedUuid || '');
+  const { generateMore } = useGenerateMoreConcepts(seedUuid || '');
 
   // Hook for regenerating concepts with feedback
   const { regenerateWithFeedback, isLoading: isRegenerateLoading } =
     useRegenerateConceptsWithFeedback(seedUuid || '');
+
+  // Hook for deleting concepts
+  const { deleteConcept } = useDeleteGeneratedConcept(seedUuid || '');
+
+  // Track which concept is being deleted
+  const [deletingConceptUuid, setDeletingConceptUuid] = useState<string | null>(
+    null,
+  );
 
   const { data: anchorThoughts } = useAnchorThought(seedUuid || undefined);
   // Local state
@@ -88,6 +101,18 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   const [isRegenerating, setIsRegenerating] = useState(false);
   // Rotating message index for loading overlay
   const [messageIndex, setMessageIndex] = useState(0);
+
+  // Generate More button progress animation state
+  const [generateMoreProgress, setGenerateMoreProgress] = useState(0);
+  const [generateMorePhase, setGenerateMorePhase] = useState<
+    'idle' | 'loading' | 'completing' | 'fading'
+  >('idle');
+  const generateMoreStartTimeRef = useRef<number | null>(null);
+  // Track when we've initiated a "generate more" action locally
+  const [localGeneratingMore, setLocalGeneratingMore] = useState(false);
+  // Track if backend has confirmed generation started (generatingMore was true)
+  const backendConfirmedGeneratingRef = useRef(false);
+  const wasGeneratingMoreRef = useRef(false);
 
   // Determine if we should show the loading overlay on concepts grid
   const showConceptsLoadingOverlay = useMemo(
@@ -108,6 +133,73 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
 
     return () => clearInterval(interval);
   }, [showConceptsLoadingOverlay]);
+
+  // Generate More button progress animation
+  // Use local state OR backend state to prevent flickering during the brief gap
+  // between mutation completion and query refetch
+  const isGeneratingMore = localGeneratingMore || generatingMore;
+
+  // Calculate asymptotic progress: approaches 95% but never reaches it
+  // Formula: progress = 95 * (1 - e^(-t/tau)) where tau controls speed
+  const calculateAsymptoticProgress = useCallback(
+    (elapsedMs: number): number => {
+      const tau = 8000; // 8 seconds to reach ~63% of max
+      const maxProgress = 95;
+      return maxProgress * (1 - Math.exp(-elapsedMs / tau));
+    },
+    [],
+  );
+
+  // Handle the generate more progress animation
+  useEffect(() => {
+    // Detect when loading starts
+    if (isGeneratingMore && !wasGeneratingMoreRef.current) {
+      wasGeneratingMoreRef.current = true;
+      generateMoreStartTimeRef.current = Date.now();
+      setGenerateMorePhase('loading');
+      setGenerateMoreProgress(0);
+    }
+
+    // Detect when loading ends
+    if (!isGeneratingMore && wasGeneratingMoreRef.current) {
+      wasGeneratingMoreRef.current = false;
+      // Rush to completion
+      setGenerateMorePhase('completing');
+      setGenerateMoreProgress(100);
+
+      // After completion animation, start fading
+      const fadeTimer = setTimeout(() => {
+        setGenerateMorePhase('fading');
+      }, 300);
+
+      // After fade, return to idle
+      const idleTimer = setTimeout(() => {
+        setGenerateMorePhase('idle');
+        setGenerateMoreProgress(0);
+        generateMoreStartTimeRef.current = null;
+      }, 800);
+
+      return () => {
+        clearTimeout(fadeTimer);
+        clearTimeout(idleTimer);
+      };
+    }
+
+    // Update progress during loading
+    if (generateMorePhase === 'loading' && generateMoreStartTimeRef.current) {
+      const updateProgress = () => {
+        if (generateMoreStartTimeRef.current) {
+          const elapsed = Date.now() - generateMoreStartTimeRef.current;
+          setGenerateMoreProgress(calculateAsymptoticProgress(elapsed));
+        }
+      };
+
+      updateProgress();
+      const interval = setInterval(updateProgress, 50);
+      return () => clearInterval(interval);
+    }
+  }, [isGeneratingMore, generateMorePhase, calculateAsymptoticProgress]);
+
   const [selectedIdeaDetail, setSelectedIdeaDetail] = useState<{
     title: string;
     section: string;
@@ -179,8 +271,33 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     // Clear any selected concepts before generating more
     clearSelectedConcepts();
     setSelectedIdeaDetail(null);
+    // Set local state immediately to prevent flickering
+    setLocalGeneratingMore(true);
+    // Reset the backend confirmation tracker
+    backendConfirmedGeneratingRef.current = false;
     generateMore();
   }, [generateMore, clearSelectedConcepts]);
+
+  // Track when backend confirms generation has started, then clear local state when it ends
+  useEffect(() => {
+    // If backend says it's generating, mark that we've seen confirmation
+    if (generatingMore) {
+      backendConfirmedGeneratingRef.current = true;
+    }
+
+    // Only clear local state if:
+    // 1. Backend has confirmed it was generating at some point
+    // 2. Backend now says it's no longer generating
+    // 3. We still have local state set
+    if (
+      backendConfirmedGeneratingRef.current &&
+      !generatingMore &&
+      localGeneratingMore
+    ) {
+      setLocalGeneratingMore(false);
+      backendConfirmedGeneratingRef.current = false;
+    }
+  }, [generatingMore, localGeneratingMore]);
 
   // WebSocket listener for concepts generated - refetch when ready
   useSocketEvent<'idea_playground.concepts.generated.user'>(
@@ -245,6 +362,26 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
             transform: translateY(0);
           }
         }
+
+        @keyframes glowPulse {
+          0%, 100% {
+            opacity: 0.2;
+            transform: translate(-50%, -50%) scale(1);
+          }
+          50% {
+            opacity: 0.4;
+            transform: translate(-50%, -50%) scale(1.15);
+          }
+        }
+
+        @keyframes logoPulse {
+          0%, 100% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.05);
+          }
+        }
       `;
       document.head.appendChild(style);
     }
@@ -290,6 +427,48 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     e.stopPropagation();
     handleCardSelect(conceptUuid);
   };
+
+  /**
+   * Handle deleting a generated concept
+   * Clears selection if the deleted concept was selected
+   * Clears detail panel if the deleted concept was being viewed
+   */
+  const handleDeleteConcept = useCallback(
+    (conceptUuid: string, conceptTitle: string, e: React.MouseEvent) => {
+      e.stopPropagation();
+      setDeletingConceptUuid(conceptUuid);
+
+      deleteConcept(conceptUuid, {
+        onSuccess: () => {
+          // If this concept was selected, deselect it
+          if (selectedConceptUuids.includes(conceptUuid)) {
+            toggleConceptSelection(conceptUuid);
+          }
+
+          // If this concept was being viewed in detail panel, close it
+          if (selectedIdeaDetail?.title === conceptTitle) {
+            setSelectedIdeaDetail(null);
+          }
+
+          telemetry.log('ideaPlayground.concept.deleted.ui', {
+            seedUuid,
+            conceptUuid,
+          });
+          setDeletingConceptUuid(null);
+        },
+        onError: () => {
+          setDeletingConceptUuid(null);
+        },
+      });
+    },
+    [
+      deleteConcept,
+      selectedConceptUuids,
+      toggleConceptSelection,
+      selectedIdeaDetail,
+      seedUuid,
+    ],
+  );
 
   const handleGenerateReports = async () => {
     if (!seedUuid || selectedConceptUuids.length === 0) {
@@ -415,7 +594,15 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
             {/* Loading Overlay for Concepts Grid */}
             {showConceptsLoadingOverlay && (
               <div className='absolute inset-0 z-10 flex animate-fade-in flex-col items-center justify-center bg-black bg-opacity-40'>
-                <LogoAnimation size={120} loop autoPlay fps={45} />
+                {/* Logo with pulsating glow */}
+                <div className='relative flex flex-col items-center'>
+                  {/* Pulsating glow behind logo */}
+                  <div className='absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 animate-[glowPulse_3s_ease-in-out_infinite] rounded-full bg-white/20 blur-2xl' />
+                  {/* Animated logo with subtle pulse */}
+                  <div className='relative animate-[logoPulse_2s_ease-in-out_infinite]'>
+                    <LogoAnimation size={120} loop autoPlay fps={90} />
+                  </div>
+                </div>
                 <p
                   key={messageIndex}
                   className='aucctus-text-md-medium mt-6 animate-fade-in text-white/90'
@@ -437,31 +624,45 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
                     concept={concept}
                     isSelected={selectedConceptUuids.includes(concept.uuid)}
                     isActive={selectedIdeaDetail?.title === concept.title}
+                    isDeleting={deletingConceptUuid === concept.uuid}
                     onCardClick={() => handleCardClick(concept)}
                     onCardSelect={(e) => handleCircleClick(concept.uuid, e)}
+                    onDelete={(e) =>
+                      handleDeleteConcept(concept.uuid, concept.title, e)
+                    }
                     animationDelay={index * 0.1}
                   />
                 ))}
               </div>
             </div>
 
-            {/* Generate More Button */}
+            {/* Generate More Button with Progress Fill */}
             <div className='px-6 pb-6'>
               <button
-                className='aucctus-text-white aucctus-text-sm w-full rounded-lg border border-white/30 bg-transparent py-2 transition-all hover:border-white/40 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50'
-                disabled={
-                  !canGenerateMore ||
-                  generatingMore ||
-                  isGenerateMoreLoading ||
-                  isRegenerateLoading
-                }
+                className='aucctus-text-white aucctus-text-sm relative w-full overflow-hidden rounded-lg border border-white/30 bg-transparent py-2 transition-all hover:border-white/40 hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-50'
+                disabled={isGeneratingMore || isRegenerateLoading}
                 onClick={handleGenerateMore}
               >
-                {generatingMore || isGenerateMoreLoading
-                  ? 'Generating More...'
-                  : canGenerateMore
-                    ? 'Generate More'
-                    : 'Generate More Limit Reached'}
+                {/* Progress fill background */}
+                {generateMorePhase !== 'idle' && (
+                  <div
+                    className='absolute inset-0 bg-white/20'
+                    style={{
+                      width: `${generateMoreProgress}%`,
+                      transition:
+                        generateMorePhase === 'completing'
+                          ? 'width 300ms ease-out'
+                          : generateMorePhase === 'fading'
+                            ? 'opacity 500ms ease-out'
+                            : 'width 50ms linear',
+                      opacity: generateMorePhase === 'fading' ? 0 : 1,
+                    }}
+                  />
+                )}
+                {/* Button text */}
+                <span className='relative z-10'>
+                  {isGeneratingMore ? 'Generating More...' : 'Generate More'}
+                </span>
               </button>
             </div>
           </div>
@@ -489,8 +690,8 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
             selectedIdeasCount={selectedConceptUuids.length}
             onGenerateReports={handleGenerateReports}
             onRegenerateWithFeedback={handleRegenerateWithFeedback}
-            isRegenerating={isRegenerateLoading || generatingMore}
-            disabled={generatingMore || isGenerateMoreLoading}
+            isRegenerating={isRegenerateLoading || isGeneratingMore}
+            disabled={isGeneratingMore}
           />
         </div>
       </div>

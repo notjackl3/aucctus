@@ -21,6 +21,8 @@ import type {
   IConceptGenerationResponse,
   IGenerationInProgress,
   ISeedContextResponse,
+  IBulkUpdateQuestionsRequest,
+  IBulkUpdateQuestionsResponse,
 } from './types';
 
 export type { IGenerationInProgress } from './types/ideaPlayground';
@@ -48,8 +50,26 @@ export class IdeaPlaygroundApi extends ApiService {
 
   /**
    * Create a new seed with an anchor thought
+   * @param thoughtText - The anchor thought text
+   * @param file - Optional file to upload (max 10MB, supports PDF, DOCX, TXT, HTML, XLSX, CSV, PPTX, PNG, JPG, WEBP, GIF, MP3, WAV, MP4, MOV)
    */
-  createSeedWithThought(thoughtText: string): Promise<ICreateSeedResponse> {
+  createSeedWithThought(
+    thoughtText: string,
+    file?: File,
+  ): Promise<ICreateSeedResponse> {
+    if (file) {
+      // Use multipart/form-data for file upload
+      const formData = new FormData();
+      formData.append('thought_text', thoughtText);
+      formData.append('file', file);
+
+      return this.postFormData<ICreateSeedResponse>(
+        endpoints.ideaPlaygroundSeedWithFile,
+        formData,
+      );
+    }
+
+    // No file - use JSON body
     const payload: ICreateSeedRequest = { thought_text: thoughtText };
     return this.post<ICreateSeedResponse, ICreateSeedRequest>(
       endpoints.ideaPlaygroundSeed,
@@ -75,6 +95,40 @@ export class IdeaPlaygroundApi extends ApiService {
     return this.get<IQuestionsResponse>(
       endpoints.ideaPlaygroundSeedQuestions(seedUuid),
     ).then((response) => response.questions);
+  }
+
+  /**
+   * Add a custom question to a seed
+   * The question type will be resolved via LLM on the backend
+   * @param seedUuid - The seed UUID
+   * @param question - The question text (1-500 chars)
+   * @param description - Optional description (max 1000 chars)
+   */
+  addCustomQuestion(
+    seedUuid: string,
+    question: string,
+    description?: string,
+  ): Promise<IAnchorQuestion> {
+    return this.post<
+      IAnchorQuestion,
+      { question: string; description?: string }
+    >(endpoints.ideaPlaygroundSeedQuestions(seedUuid), {
+      question,
+      description,
+    });
+  }
+
+  /**
+   * Delete a custom question from a seed
+   * Only custom questions (isCustomQuestion: true) can be deleted
+   * Returns 400 error with code 'cannot_delete_ai_question' if attempting to delete AI-generated question
+   * @param seedUuid - The seed UUID
+   * @param questionUuid - The question UUID to delete
+   */
+  deleteCustomQuestion(seedUuid: string, questionUuid: string): Promise<void> {
+    return this.delete<void>(
+      endpoints.ideaPlaygroundDeleteQuestion(seedUuid, questionUuid),
+    );
   }
 
   /**
@@ -186,6 +240,18 @@ export class IdeaPlaygroundApi extends ApiService {
   }
 
   /**
+   * Delete a generated concept from the cached concepts
+   * Removes a single concept from the seed's generated concepts list
+   * @param seedUuid - The seed UUID
+   * @param conceptUuid - The concept UUID to delete
+   */
+  deleteGeneratedConcept(seedUuid: string, conceptUuid: string): Promise<void> {
+    return this.delete<void>(
+      endpoints.ideaPlaygroundDeleteGeneratedConcept(seedUuid, conceptUuid),
+    );
+  }
+
+  /**
    * Generate 4 additional concepts that are different from existing ones
    * Returns 202 Accepted and starts background generation task
    * Client will receive WebSocket notification when generation completes
@@ -246,6 +312,23 @@ export class IdeaPlaygroundApi extends ApiService {
       endpoints.ideaPlaygroundSeedContext(seedUuid),
     );
   }
+
+  /**
+   * Bulk update all questions for a seed
+   * Replaces the cached questions with the provided list
+   * Used for reverting to a previous state or batch updates
+   * @param seedUuid - The seed UUID
+   * @param questions - Complete list of questions to replace cache
+   */
+  bulkUpdateQuestions(
+    seedUuid: string,
+    request: IBulkUpdateQuestionsRequest,
+  ): Promise<IAnchorQuestion[]> {
+    return this.put<IBulkUpdateQuestionsResponse, IBulkUpdateQuestionsRequest>(
+      endpoints.ideaPlaygroundSeedQuestions(seedUuid),
+      request,
+    ).then((response) => response.questions);
+  }
 }
 
 // Type guard helpers
@@ -255,10 +338,19 @@ export function isGenerationInProgress(
   return response && response.status === 'generating';
 }
 
+export function isPossibleAnswers(
+  response: IPossibleAnswerResponse,
+): response is IPossibleAnswer[] {
+  return Array.isArray(response);
+}
+
+/**
+ * @deprecated Use isPossibleAnswers (plural) instead - endpoint now returns an array
+ */
 export function isPossibleAnswer(
   response: IPossibleAnswerResponse,
-): response is IPossibleAnswer {
-  return !isGenerationInProgress(response);
+): response is IPossibleAnswer[] {
+  return isPossibleAnswers(response);
 }
 
 export function isResearchInsights(

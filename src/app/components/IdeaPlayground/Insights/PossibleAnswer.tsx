@@ -78,9 +78,9 @@ const PossibleAnswer: React.FC<PossibleAnswerProps> = ({
   };
   return (
     <div
-      className={`aucctus-text-white relative min-w-[250px] max-w-[350px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
+      className={`aucctus-text-white relative min-w-[350px] max-w-[350px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
         isLoading
-          ? 'scale-95 border-white/30 bg-white/10 opacity-80'
+          ? 'scale-95 border-white/30 bg-white/10 opacity-80 hover:z-50'
           : optimisticSelected
             ? 'scale-100 border-white/40 bg-white/20 opacity-100 ring-1 ring-white/30'
             : getSentimentColor(card.sentiment, card.source) +
@@ -120,12 +120,6 @@ const PossibleAnswer: React.FC<PossibleAnswerProps> = ({
       ) : null}
 
       <div className='mb-2 flex items-start gap-2'>
-        <Icon
-          variant='lightbulb'
-          className='aucctus-stroke-warning-tertiary mt-0.5 flex-shrink-0'
-          height={16}
-          width={16}
-        />
         <span className='aucctus-text-sm-medium leading-tight'>
           {card.insight}
         </span>

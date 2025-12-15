@@ -5,7 +5,7 @@ import { useClerk } from '@clerk/clerk-react';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import NavButton from './NavButton';
@@ -16,10 +16,19 @@ interface NavDrawerProps {
 
 const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
   const { user, account } = useStore((state) => state.auth);
+  const { lastActiveSeedUuid } = useStore((state) => state.ideaPlayground);
   const { signOut } = useClerk();
   const [collapsed, setCollapsed] = useState(true);
 
   const navigate = useNavigate();
+
+  // Build playground path with cached seed if available
+  const playgroundPath = useMemo(() => {
+    if (lastActiveSeedUuid) {
+      return `${AppPath.IdeaPlayground}?seed=${lastActiveSeedUuid}`;
+    }
+    return AppPath.IdeaPlayground;
+  }, [lastActiveSeedUuid]);
 
   const handleMouseEnter = () => {
     onExpandCollapse(false);
@@ -89,7 +98,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
         />
         {/* Uncomment this when we have the playground ready */}
         <NavButton
-          to={AppPath.IdeaPlayground}
+          to={playgroundPath}
           title='Playground'
           icon='test-drive'
           collapsed={collapsed}

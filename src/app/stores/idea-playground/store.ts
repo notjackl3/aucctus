@@ -5,6 +5,8 @@ import {
   setCurrentQuestionIndex,
   toggleConceptSelection,
   clearSelectedConcepts,
+  setLastActiveSeedUuid,
+  clearLastActiveSeedUuid,
   reset,
 } from './actions';
 
@@ -17,6 +19,7 @@ import {
  * What's stored here:
  * - currentQuestionIndex: Carousel navigation state
  * - selectedConceptUuids: Temporary selections before saving to API
+ * - lastActiveSeedUuid: Cached seed UUID for session restoration
  *
  * What's NOT stored here (use React Query hooks instead):
  * - currentSeedUuid → Use URL params or page-level useState
@@ -33,6 +36,10 @@ export interface IIdeaPlaygroundState extends IIdeaPlaygroundActions {
 
   // Temporary UI State (selections not yet saved to API)
   selectedConceptUuids: string[];
+
+  // Session Restoration State (persisted to session storage)
+  // Used to restore the active seed when returning to playground via navigation
+  lastActiveSeedUuid: string | null;
 }
 
 const ideaPlaygroundSlice: Lens<IIdeaPlaygroundState, IAppStore> = (
@@ -46,11 +53,14 @@ const ideaPlaygroundSlice: Lens<IIdeaPlaygroundState, IAppStore> = (
     // Initial state
     currentQuestionIndex: 0,
     selectedConceptUuids: [],
+    lastActiveSeedUuid: null,
 
     // Actions - bound to actionContext
     setCurrentQuestionIndex: setCurrentQuestionIndex.bind(actionContext),
     toggleConceptSelection: toggleConceptSelection.bind(actionContext),
     clearSelectedConcepts: clearSelectedConcepts.bind(actionContext),
+    setLastActiveSeedUuid: setLastActiveSeedUuid.bind(actionContext),
+    clearLastActiveSeedUuid: clearLastActiveSeedUuid.bind(actionContext),
     reset: reset.bind(actionContext),
   };
 };

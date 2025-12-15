@@ -30,11 +30,25 @@ export interface ICreateSeedRequest {
 }
 
 /**
+ * Seed File - Uploaded file associated with a seed
+ */
+export interface ISeedFile {
+  uuid: string;
+  fileType: string;
+  originalFilename: string;
+  contentType: string;
+  fileSize: number;
+  createdAt: string;
+}
+
+/**
  * Response after creating a seed
  */
 export interface ICreateSeedResponse {
   seedUuid: string;
   anchorThought: IAnchorThought;
+  title?: string;
+  file?: ISeedFile | null;
 }
 
 /**
@@ -58,7 +72,13 @@ export interface IAnchorQuestion {
   insights?: IResearchInsight[];
   userAnswer?: IUserAnswer | null; // Single user answer per question
   includedAnswers?: string[]; // UUIDs of answers that are selected/included for this question
+  isCustomQuestion?: boolean; // True if user-created, false/undefined if AI-generated
   createdAt?: string;
+  // Pipeline status flags
+  hasPossibleAnswerGenerated?: boolean; // Whether possible answer pipeline has completed
+  hasInsightsGenerated?: boolean; // Whether insights pipeline has completed
+  isGeneratingPossibleAnswer?: boolean; // Whether possible answer generation is in progress
+  isGeneratingInsights?: boolean; // Whether insights generation is in progress
 }
 
 /**
@@ -195,8 +215,6 @@ export interface IIdeaPlaygroundGenerateIdeasResponse {
   disruptive_concepts: IGeneratedIdeaPlaygroundConcept[];
   /** Whether "generate more" is currently in progress */
   generatingMore?: boolean;
-  /** Whether user can request more concepts (limit not reached) */
-  canGenerateMore?: boolean;
 }
 
 /**
@@ -216,8 +234,9 @@ export interface IGenerationInProgress {
 
 /**
  * Union type for endpoints that may return data or generation status
+ * Note: generate_possible_answer endpoint returns an array of all existing possible answers
  */
-export type IPossibleAnswerResponse = IPossibleAnswer | IGenerationInProgress;
+export type IPossibleAnswerResponse = IPossibleAnswer[] | IGenerationInProgress;
 export type IResearchInsightsResponse =
   | IResearchInsight[]
   | IGenerationInProgress;
@@ -245,4 +264,52 @@ export interface ISeedContextResponse {
   }[];
   question_count: number;
   answered_question_count: number;
+}
+
+/**
+ * Bulk Update Questions - Request types for restoring/updating all questions at once
+ */
+export interface IBulkPossibleAnswer {
+  uuid: string;
+  answer: string;
+}
+
+export interface IBulkInsight {
+  uuid: string;
+  insight: string;
+  source_type: 'research' | 'nucleus';
+  source_url?: string;
+  source_title?: string;
+  source_credibility?: number;
+  sentiment?: 'headwind' | 'tailwind' | 'neutral';
+  more_details?: string | null;
+  why_it_matters?: IWhyItMatters | null;
+  citation_validation_status?: CitationValidationStatus;
+}
+
+export interface IBulkUserAnswer {
+  uuid: string;
+  answer: string;
+}
+
+export interface IBulkQuestion {
+  uuid: string;
+  question: string;
+  question_type: string;
+  description?: string;
+  possible_answers?: IBulkPossibleAnswer[];
+  research_insights?: IBulkInsight[];
+  nucleus_insights?: IBulkInsight[];
+  combined_insights?: IBulkInsight[];
+  user_answer?: IBulkUserAnswer | null;
+  included_answers?: string[];
+  is_custom_question?: boolean;
+}
+
+export interface IBulkUpdateQuestionsRequest {
+  questions: IBulkQuestion[];
+}
+
+export interface IBulkUpdateQuestionsResponse {
+  questions: IAnchorQuestion[];
 }

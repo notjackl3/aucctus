@@ -691,6 +691,8 @@ export class Endpoints {
   static ideaPlaygroundAnchorThoughts =
     'api/v2/concept/idea-playground/anchor-thoughts';
   static ideaPlaygroundSeed = 'api/v2/concept/idea-playground/seed';
+  static ideaPlaygroundSeedWithFile =
+    'api/v2/concept/idea-playground/seed-with-file';
 
   static ideaPlaygroundSeedAnchorThought(seedUuid: string) {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/anchor-thought`;
@@ -698,6 +700,10 @@ export class Endpoints {
 
   static ideaPlaygroundSeedQuestions(seedUuid: string) {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/questions`;
+  }
+
+  static ideaPlaygroundDeleteQuestion(seedUuid: string, questionUuid: string) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/questions/${questionUuid}`;
   }
 
   static ideaPlaygroundPossibleAnswer(seedUuid: string, questionUuid: string) {
@@ -744,6 +750,13 @@ export class Endpoints {
 
   static ideaPlaygroundGeneratedIdeas(seedUuid: string) {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/generated-ideas`;
+  }
+
+  static ideaPlaygroundDeleteGeneratedConcept(
+    seedUuid: string,
+    conceptUuid: string,
+  ) {
+    return `api/v2/concept/idea-playground/seed/${seedUuid}/generated-ideas/${conceptUuid}`;
   }
 
   static ideaPlaygroundGenerateMoreIdeas(seedUuid: string) {

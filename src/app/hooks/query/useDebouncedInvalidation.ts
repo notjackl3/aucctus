@@ -16,7 +16,7 @@ import { useEffect } from 'react';
  * debouncedInvalidate([AucctusQueryKeys.someKey, param]);
  * ```
  */
-export const useDebouncedInvalidation = (delayMs = 500) => {
+export const useDebouncedInvalidation = (delayMs = 100) => {
   const queryClient = useQueryClient();
   const { scheduleDebouncedInvalidation, clearAll } = useStore(
     (state) => state.queryInvalidation,

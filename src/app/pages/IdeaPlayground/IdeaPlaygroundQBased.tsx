@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTransition, animated } from 'react-spring';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { AppPath } from '@routes/routes';
 import {
   QuestionCarousel,
   OpportunityMap,
@@ -14,7 +15,6 @@ import {
 } from '@components/IdeaPlayground';
 import type { IAnchorThought } from '@components/IdeaPlayground/types';
 import { animationStyles } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
-import images from '@assets/img';
 import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
 import { toast } from '@components';
@@ -35,6 +35,10 @@ const IdeaPlaygroundQBased: React.FC = () => {
   const [showOpportunityMap, setShowOpportunityMap] = useState(false);
   // Track if data is ready to show carousel (after loading transition completes)
   const [isDataReady, setIsDataReady] = useState(false);
+  // Track selected file for upload
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  // Track if logo animation intro has completed (for showing title)
+  const [showLogoTitle, setShowLogoTitle] = useState(false);
 
   // URL parameter handling
   const [searchParams, setSearchParams] = useSearchParams();
@@ -118,26 +122,13 @@ const IdeaPlaygroundQBased: React.FC = () => {
         // Reset the newly created seed flag since we're now in restoration mode
         setIsNewlyCreatedSeed(false);
 
-        // Check if all questions already have data (restored session with complete data)
-        const allQuestionsHaveData = existingQuestions.every((q) => {
-          const hasPossibleAnswers =
-            q.possibleAnswers && q.possibleAnswers.length > 0;
-          const hasResearchInsights =
-            (q.researchInsights && q.researchInsights.length > 0) ||
-            (q.insights && q.insights.length > 0);
-          return hasPossibleAnswers && hasResearchInsights;
-        });
-
-        if (allQuestionsHaveData) {
-          // Skip loading transition if data is already available
-          setIsDataReady(true);
-        }
+        // Let the loading transition check backend flags to determine readiness
+        // (isDataReady will be set by PlaygroundLoadingTransition.onReady)
 
         telemetry.log('ideaPlayground.session.restored', {
           seedUuid: seedUuidFromUrl,
           questionCount: existingQuestions.length,
           anchorThought: seedAnchorThought.thought,
-          dataReady: allQuestionsHaveData,
         });
       } else if (
         !isLoadingExistingQuestions &&
@@ -222,14 +213,18 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setInputValue(thought.thought);
 
     try {
-      // Create seed with the selected anchor thought using hook
-      const { seedUuid } = await createSeedAsync(thought.thought);
+      // Create seed with the selected anchor thought using hook (with optional file)
+      const { seedUuid } = await createSeedAsync({
+        thoughtText: thought.thought,
+        file: selectedFile || undefined,
+      });
 
       // Set seed UUID in local state (synchronized with URL)
       setCurrentSeedUuid(seedUuid);
 
-      // Reset carousel to first question
+      // Reset carousel to first question and clear file
       ideaPlaygroundStore.reset();
+      setSelectedFile(null);
 
       // Mark this as a newly created seed (not a restoration)
       setIsNewlyCreatedSeed(true);
@@ -254,14 +249,18 @@ const IdeaPlaygroundQBased: React.FC = () => {
       setCurrentTopic(thoughtText);
 
       try {
-        // Create seed with custom input using hook
-        const { seedUuid } = await createSeedAsync(thoughtText);
+        // Create seed with custom input using hook (with optional file)
+        const { seedUuid } = await createSeedAsync({
+          thoughtText,
+          file: selectedFile || undefined,
+        });
 
         // Set seed UUID in local state (synchronized with URL)
         setCurrentSeedUuid(seedUuid);
 
-        // Reset carousel to first question
+        // Reset carousel to first question and clear file
         ideaPlaygroundStore.reset();
+        setSelectedFile(null);
 
         // Mark this as a newly created seed (not a restoration)
         setIsNewlyCreatedSeed(true);
@@ -272,6 +271,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
         telemetry.log('ideaPlayground.seed.created.custom', {
           seedUuid,
           thoughtLength: thoughtText.length,
+          hasFile: !!selectedFile,
         });
 
         setHasStartedTyping(true);
@@ -289,9 +289,37 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setHasRestoredSession(false);
     setIsNewlyCreatedSeed(false);
     setIsDataReady(false);
+    setSelectedFile(null);
+    setShowLogoTitle(false);
     // Clear URL parameter and reset UI state
     setSearchParams({});
     ideaPlaygroundStore.reset();
+    // Clear cached seedUuid so returning to playground starts fresh
+    ideaPlaygroundStore.clearLastActiveSeedUuid();
+  };
+
+  // Show title after logo animation completes its first cycle (~5 seconds at 75fps)
+  useEffect(() => {
+    if (currentSeedUuid && !isDataReady && !showLogoTitle) {
+      const timer = setTimeout(() => {
+        setShowLogoTitle(true);
+      }, 5000); // 5 seconds for logo animation intro
+
+      return () => clearTimeout(timer);
+    }
+  }, [currentSeedUuid, isDataReady, showLogoTitle]);
+
+  // Cache the active seedUuid in the store for session restoration via NavDrawer
+  useEffect(() => {
+    if (currentSeedUuid) {
+      ideaPlaygroundStore.setLastActiveSeedUuid(currentSeedUuid);
+    }
+  }, [currentSeedUuid, ideaPlaygroundStore]);
+
+  const handleClose = () => {
+    // Clear cached seedUuid so returning to playground starts fresh
+    ideaPlaygroundStore.clearLastActiveSeedUuid();
+    navigate(AppPath.ConceptBank);
   };
 
   const handleGenerateIdeas = async () => {
@@ -332,7 +360,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
       <div
         className='absolute inset-0 bg-cover bg-center bg-no-repeat'
         style={{
-          backgroundImage: `url(${images.aiExplorationsBackground})`,
+          backgroundImage: `url('/images/darker-background.png')`,
           filter: 'blur(8px)',
           animation: 'moveBackground 30s ease infinite',
         }}
@@ -375,6 +403,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
                 inputValue={inputValue}
                 onInputChange={handleInputChange}
                 onKeyPress={handleKeyPress}
+                onFileChange={setSelectedFile}
+                selectedFile={selectedFile}
                 style={style}
               />
             ),
@@ -396,6 +426,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
                       <ExplorationModeSelector
                         currentTopic={currentTopic}
                         onRestart={handleRestart}
+                        onClose={handleClose}
+                        showTitle={showLogoTitle}
                       />
                     </div>
                     <div className='relative flex-1 pt-24'>
@@ -414,6 +446,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
                       <ExplorationModeSelector
                         currentTopic={currentTopic}
                         onRestart={handleRestart}
+                        onClose={handleClose}
+                        showTitle={true}
                       />
                     </div>
 
@@ -423,6 +457,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
                         topic={currentTopic || 'Cheese on chicken in QSR'}
                         seedUuid={currentSeedUuid}
                         onGenerateIdeas={handleGenerateIdeas}
+                        onViewConcepts={() => setShowOpportunityMap(true)}
+                        hasGeneratedConcepts={hasGeneratedConcepts}
                       />
                     </div>
                   </div>

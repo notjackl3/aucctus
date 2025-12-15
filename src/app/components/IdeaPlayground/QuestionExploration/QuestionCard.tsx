@@ -8,22 +8,36 @@ interface QuestionCardProps {
   isAnswered: boolean;
   hasUserAnswer?: boolean;
   customQuestionInput?: string;
-  onQuestionClick?: () => void;
+  isSubmittingCustomQuestion?: boolean;
+  userInputValue?: string;
+  isSubmittingUserInput?: boolean;
   onCustomQuestionInputChange?: (value: string) => void;
   onCustomQuestionSubmit?: () => void;
+  onUserInputChange?: (value: string) => void;
+  onUserInputSubmit?: () => void;
 }
+
+const MAX_QUESTION_LENGTH = 500;
 
 const QuestionCard: React.FC<QuestionCardProps> = ({
   question,
   isAnswered,
   hasUserAnswer,
   customQuestionInput,
-  onQuestionClick,
+  isSubmittingCustomQuestion,
+  userInputValue,
+  isSubmittingUserInput,
   onCustomQuestionInputChange,
   onCustomQuestionSubmit,
+  onUserInputChange,
+  onUserInputSubmit,
 }) => {
   const isCustomQuestion = question.id.startsWith('custom-');
   const hasQuestion = question.question;
+  const inputLength = customQuestionInput?.length || 0;
+  const isOverLimit = inputLength > MAX_QUESTION_LENGTH;
+  const canSubmit =
+    customQuestionInput?.trim() && !isOverLimit && !isSubmittingCustomQuestion;
 
   return (
     <div
@@ -33,7 +47,6 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           : 'border-2 border-dashed border-white/30 bg-transparent hover:border-white/40 hover:bg-white/10'
       }`}
       style={getAnimationStyle('slideInFromRight', 400, 0)}
-      onClick={() => !isCustomQuestion && onQuestionClick?.()}
     >
       {/* Answered Checkmark */}
       {isAnswered && (
@@ -51,20 +64,23 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       {isCustomQuestion && !hasQuestion ? (
         <div className='mb-4 text-center'>
           <p className='aucctus-text-white aucctus-text-sm mb-3 opacity-60'>
-            Describe Something to Consider
+            Add Your Own Question
           </p>
           <textarea
             value={customQuestionInput || ''}
             onChange={(e) => onCustomQuestionInputChange?.(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') {
+              if (e.key === 'Enter' && !e.shiftKey && canSubmit) {
                 e.preventDefault();
                 onCustomQuestionSubmit?.();
               }
             }}
-            placeholder='Start typing your question...'
-            className='aucctus-text-xl-bold aucctus-text-white w-full select-text resize-none overflow-hidden border-none bg-transparent text-center leading-tight outline-none placeholder:text-white placeholder:opacity-40'
+            placeholder='What would you like to explore?'
+            className={`aucctus-text-xl-bold w-full select-text resize-none overflow-hidden border-none bg-transparent text-center leading-tight outline-none placeholder:text-white placeholder:opacity-40 ${
+              isOverLimit ? 'text-red-400' : 'aucctus-text-white'
+            }`}
             autoFocus
+            disabled={isSubmittingCustomQuestion}
             rows={1}
             style={{ minHeight: 'auto' }}
             onInput={(e) => {
@@ -73,13 +89,24 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               target.style.height = target.scrollHeight + 'px';
             }}
           />
-          {customQuestionInput?.trim() && (
-            <div className='mt-3 text-center'>
-              <p className='aucctus-text-white aucctus-text-xs opacity-50'>
-                Press Enter to generate insights
-              </p>
-            </div>
-          )}
+          {/* Character count and submit hint */}
+          <div className='mt-3 flex items-center justify-center gap-4'>
+            <span
+              className={`aucctus-text-xs ${isOverLimit ? 'text-red-400' : 'text-white/50'}`}
+            >
+              {inputLength}/{MAX_QUESTION_LENGTH}
+            </span>
+            {canSubmit && (
+              <span className='aucctus-text-xs text-white/50'>
+                Press Enter to submit
+              </span>
+            )}
+            {isSubmittingCustomQuestion && (
+              <span className='aucctus-text-xs animate-pulse text-white/70'>
+                Submitting...
+              </span>
+            )}
+          </div>
         </div>
       ) : (
         <>
@@ -92,12 +119,34 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             </p>
           </div>
 
-          {/* Click Hint for non-custom questions */}
+          {/* Inline answer input for non-custom questions without saved user answer */}
           {!isCustomQuestion && !hasUserAnswer && (
-            <div className='mt-3 text-center'>
-              <p className='aucctus-text-white aucctus-text-xs opacity-50'>
-                Click to Add Answer Manually
-              </p>
+            <div className='mt-4 border-t border-white/10 pt-4'>
+              <input
+                type='text'
+                value={userInputValue || ''}
+                onChange={(e) => onUserInputChange?.(e.target.value)}
+                onKeyDown={(e) => {
+                  if (
+                    e.key === 'Enter' &&
+                    userInputValue?.trim() &&
+                    !isSubmittingUserInput
+                  ) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    onUserInputSubmit?.();
+                  }
+                }}
+                onClick={(e) => e.stopPropagation()}
+                placeholder='Type your answer or select a bubble...'
+                className='w-full border-none bg-transparent text-left text-sm text-white/80 transition-all placeholder:text-white/30 focus:text-white focus:outline-none'
+                disabled={isSubmittingUserInput}
+              />
+              {isSubmittingUserInput && (
+                <p className='aucctus-text-xs mt-2 animate-pulse text-center text-white/70'>
+                  Saving...
+                </p>
+              )}
             </div>
           )}
         </>

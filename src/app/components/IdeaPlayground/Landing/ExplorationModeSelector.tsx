@@ -4,12 +4,19 @@ import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExplor
 
 interface ExplorationModeSelectorProps {
   currentTopic: string;
+  /** Restart the playground from the beginning */
   onRestart: () => void;
+  /** Close and navigate to concept bank */
+  onClose: () => void;
+  /** Whether to show the title bubble (hidden until LogoAnimation completes) */
+  showTitle?: boolean;
 }
 
 const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
   currentTopic,
   onRestart,
+  onClose,
+  showTitle = true,
 }) => {
   return (
     <div
@@ -21,26 +28,29 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
         style={getAnimationStyle('fadeIn', 500, 600)}
       >
         <div className='relative w-full'>
-          <div className='relative flex justify-center'>
-            <div
-              className='group cursor-pointer'
-              style={getAnimationStyle('scaleIn', 400, 100)}
-            >
-              <div className='flex h-12 items-center rounded-full border border-white/30 bg-white/15 px-4 py-3 shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/40 hover:bg-white/20'>
-                <div className='flex items-center gap-3'>
-                  <Icon
-                    variant='lightbulb'
-                    className='aucctus-stroke-warning-tertiary'
-                    height={16}
-                    width={16}
-                  />
-                  <span className='aucctus-text-sm-medium aucctus-text-white'>
-                    {currentTopic}
-                  </span>
+          {/* Title bubble - only shown when showTitle is true */}
+          {showTitle && (
+            <div className='relative flex justify-center'>
+              <div
+                className='group cursor-pointer'
+                style={getAnimationStyle('scaleIn', 400, 100)}
+              >
+                <div className='flex h-12 items-center rounded-full border border-white/30 bg-white/15 px-4 py-3 shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/40 hover:bg-white/20'>
+                  <div className='flex items-center gap-3'>
+                    <Icon
+                      variant='lightbulb'
+                      className='aucctus-stroke-warning-tertiary'
+                      height={16}
+                      width={16}
+                    />
+                    <span className='aucctus-text-sm-medium aucctus-text-white'>
+                      {currentTopic}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          )}
 
           {/* Right: Action Buttons */}
           <div
@@ -61,7 +71,7 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
             </button>
 
             <button
-              onClick={onRestart}
+              onClick={onClose}
               className='aucctus-text-white flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-white/15 p-3 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/70 hover:bg-white/20'
               title='Close'
             >
