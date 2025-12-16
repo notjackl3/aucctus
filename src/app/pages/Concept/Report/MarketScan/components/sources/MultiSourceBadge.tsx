@@ -1,6 +1,7 @@
 import images from '@assets/img';
 import { ISource } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { getLogoUrl } from '@libs/utils/source';
 import { FunctionComponent, useCallback } from 'react';
 
 interface MultiSourceBadgeProps {
@@ -41,7 +42,7 @@ const MultiSourceBadge: FunctionComponent<MultiSourceBadgeProps> = ({
             <img
               className='h-full w-full object-contain'
               alt='source-logo'
-              src={`https://logo.clearbit.com/${getBaseUrl(source.url) || ''}`}
+              src={getLogoUrl(getBaseUrl(source.url) || '')}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src = images.link;
               }}

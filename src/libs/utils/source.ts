@@ -3,6 +3,16 @@
  */
 
 /**
+ * Generates a Logo.dev URL for a given domain
+ * @param domain - The domain to get the logo for (e.g., 'stripe.com')
+ * @returns The Logo.dev URL with authentication token
+ */
+export const getLogoUrl = (domain: string): string => {
+  const token = import.meta.env.VITE_LOGO_DEV_TOKEN;
+  return `https://img.logo.dev/${domain}?token=${token}`;
+};
+
+/**
  * Extracts the base URL from a full URL
  */
 export const getBaseUrl = (url: string): string => {

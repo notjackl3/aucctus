@@ -8,6 +8,7 @@ import type {
   IEcosystemV2Response,
   ISource,
 } from '@libs/api/types';
+import { getLogoUrl } from '@libs/utils/source';
 
 export interface StrategicTag {
   tag: string;
@@ -152,6 +153,25 @@ const mapProduct = (
   url: product.url,
 });
 
+/**
+ * Converts Clearbit logo URLs to Logo.dev URLs
+ * If the URL is not a Clearbit URL, returns it as-is
+ */
+const convertLogoUrl = (
+  logoUrl: string | null | undefined,
+): string | undefined => {
+  if (!logoUrl) return undefined;
+
+  // Check if it's a Clearbit logo URL
+  const clearbitMatch = logoUrl.match(/^https?:\/\/logo\.clearbit\.com\/(.+)$/);
+  if (clearbitMatch) {
+    const domain = clearbitMatch[1];
+    return getLogoUrl(domain);
+  }
+
+  return logoUrl;
+};
+
 const mapCompany = (
   company: IEcosystemCompany,
   oldestYear: number,
@@ -174,7 +194,7 @@ const mapCompany = (
     companySizeScore: company.size,
     brandColor: company.brandColor || '#111827',
     logoType: company.logoType,
-    logoUrl: company.logoUrl || undefined,
+    logoUrl: convertLogoUrl(company.logoUrl),
     logoText: company.logoText || undefined,
     product: company.product,
     differentiator: company.differentiator,

@@ -6,6 +6,7 @@ import type { IconProps } from '@components/Icon/Icon/Icon';
 import ComponentCarousel from '../../Carousel/ComponentCarousel';
 import { cn } from '@libs/utils/react';
 import images from '@assets/img';
+import { getLogoUrl } from '@libs/utils/source';
 
 interface CompanyDetailPanelProps {
   company: Company | null;
@@ -47,27 +48,27 @@ type SourceDisplay = {
 const SOURCE_MAP: Record<string, SourceDisplay> = {
   linkedin: {
     label: 'LinkedIn',
-    iconUrl: 'https://logo.clearbit.com/linkedin.com',
+    iconUrl: getLogoUrl('linkedin.com'),
   },
   pitchbook: {
     label: 'PitchBook',
-    iconUrl: 'https://logo.clearbit.com/pitchbook.com',
+    iconUrl: getLogoUrl('pitchbook.com'),
   },
   crunchbase: {
     label: 'Crunchbase',
-    iconUrl: 'https://logo.clearbit.com/crunchbase.com',
+    iconUrl: getLogoUrl('crunchbase.com'),
   },
   'cb insights': {
     label: 'CB Insights',
-    iconUrl: 'https://logo.clearbit.com/cbinsights.com',
+    iconUrl: getLogoUrl('cbinsights.com'),
   },
   growjo: {
     label: 'Growjo',
-    iconUrl: 'https://logo.clearbit.com/growjo.com',
+    iconUrl: getLogoUrl('growjo.com'),
   },
   'seamless.ai': {
     label: 'Seamless.AI',
-    iconUrl: 'https://logo.clearbit.com/seamless.ai',
+    iconUrl: getLogoUrl('seamless.ai'),
   },
   'press coverage': {
     label: 'Press Coverage',
@@ -370,7 +371,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                     <img
                       className='h-80 w-80 object-contain'
                       alt='source-logo'
-                      src={`https://logo.clearbit.com/${source.domain}`}
+                      src={getLogoUrl(source.domain)}
                       onError={(e) => {
                         (e.currentTarget as HTMLImageElement).src = images.link;
                       }}

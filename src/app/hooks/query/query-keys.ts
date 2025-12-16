@@ -82,7 +82,7 @@ export enum AucctusQueryKeys {
   nucleusReportsList = 'nucleusReportsList',
 
   /* External APIs */
-  clearbitCompany = 'clearbitCompany',
+  companyInfo = 'companyInfo',
   articlePublishedDate = 'articlePublishedDate',
 
   /* Agent Timing */

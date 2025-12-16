@@ -2,6 +2,7 @@ import images from '@assets/img';
 import { Badge, Button, Icon } from '@components';
 import { IIncumbent } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { getLogoUrl } from '@libs/utils/source';
 import React from 'react';
 
 interface SidebarItemProps {
@@ -31,7 +32,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
           <div className='h-8 w-8 overflow-hidden rounded-full'>
             <img
               alt='company-logo'
-              src={`https://logo.clearbit.com/${incumbent.domain || ''}`}
+              src={getLogoUrl(incumbent.domain || '')}
               onError={(e) => {
                 (e.currentTarget as HTMLImageElement).src =
                   images.companyLogoDefault;

@@ -12,15 +12,20 @@ const getBaseUrl = (url: string): string => {
   }
 };
 
-// TODO: Combine this with the published dates on server side
-export const useClearbitCompany = (url: string) => {
+/**
+ * Hook to fetch company information (name, logo, etc.) from domain.
+ * Currently uses Clearbit Autocomplete API which may be deprecated.
+ * TODO: Migrate to Logo.dev Brand Search API when available.
+ * @see https://docs.logo.dev/brand-search/overview
+ */
+export const useCompanyInfo = (url: string) => {
   const baseUrl = getBaseUrl(url);
   const hasValidUrl = Boolean(
     url && url.trim() !== '' && baseUrl && baseUrl !== '',
   );
 
   const query = useQuery({
-    queryKey: [AucctusQueryKeys.clearbitCompany, baseUrl],
+    queryKey: [AucctusQueryKeys.companyInfo, baseUrl],
     staleTime: Infinity,
     cacheTime: Infinity,
     enabled: hasValidUrl,
@@ -30,7 +35,7 @@ export const useClearbitCompany = (url: string) => {
           `https://autocomplete.clearbit.com/v1/companies/suggest?query=${baseUrl}`,
         );
         if (!response.ok) {
-          // Clearbit API failed, return empty array instead of throwing
+          // API failed, return empty array instead of throwing
           return [];
         }
         return response.json();

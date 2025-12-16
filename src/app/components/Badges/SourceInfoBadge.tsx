@@ -1,11 +1,11 @@
 import images from '@assets/img';
 import { ComponentTooltip, Icon } from '@components';
 import {
-  useClearbitCompany,
+  useCompanyInfo,
   usePublishedDatesQuery,
 } from '@hooks/query/articles.hook';
 import type { ISource } from '@libs/api/types';
-import { getBaseUrl, formatRelativeDate } from '@libs/utils/source';
+import { getBaseUrl, formatRelativeDate, getLogoUrl } from '@libs/utils/source';
 import { cn } from '@libs/utils/react';
 import React, { useMemo } from 'react';
 import ClassificationBadge from '../../pages/Concept/Report/MarketScan/v3/components/ClassificationBadge';
@@ -30,7 +30,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
   hideDelay = 0,
 }) => {
   const publishedDatesQuery = usePublishedDatesQuery(source, showPublishedDate);
-  const clearbitCompanyQuery = useClearbitCompany(source.url);
+  const companyInfoQuery = useCompanyInfo(source.url);
 
   // Check if this is an AI-generated source (AI Reasoning or AI Synthesis)
   const isAIGenerated =
@@ -56,8 +56,8 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
         }
       } else if (!!source?.nucleusFileSource?.title) {
         sourceTitle = source.nucleusFileSource.title;
-      } else if (clearbitCompanyQuery.data?.[0]?.name) {
-        sourceTitle = clearbitCompanyQuery.data[0].name;
+      } else if (companyInfoQuery.data?.[0]?.name) {
+        sourceTitle = companyInfoQuery.data[0].name;
       } else {
         sourceTitle = getBaseUrl(source.url);
       }
@@ -71,7 +71,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
       return { sourceTitle, publishedDate, logoSizeClass, fontSizeClass };
     }, [
       badgeSize,
-      clearbitCompanyQuery.data,
+      companyInfoQuery.data,
       publishedDatesQuery.data,
       showPublishedDate,
       source.url,
@@ -110,7 +110,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
           <img
             className='h-full w-full object-contain'
             alt='source-logo'
-            src={`https://logo.clearbit.com/${sourceBaseUrl}`}
+            src={getLogoUrl(sourceBaseUrl)}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = images.link;
             }}

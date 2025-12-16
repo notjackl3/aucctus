@@ -7,6 +7,7 @@ import ComponentCarousel, {
 } from '../../Carousel/ComponentCarousel';
 import CompanyTooltip from './CompanyTooltip';
 import type { Company, Product } from '../hooks/useEcosystem';
+import { getLogoUrl } from '@libs/utils/source';
 
 interface ProductCarouselProps {
   ecosystemData: Company[];
@@ -16,7 +17,7 @@ const getCompanyLogoUrl = (websiteUrl: string | undefined): string => {
   if (!websiteUrl) return '';
   try {
     const hostname = new URL(websiteUrl).hostname.replace('www.', '');
-    return `https://logo.clearbit.com/${hostname}`;
+    return getLogoUrl(hostname);
   } catch {
     return '';
   }

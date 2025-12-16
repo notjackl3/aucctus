@@ -1,12 +1,13 @@
 import images from '@assets/img';
 import { ComponentTooltip, Icon } from '@components';
 import {
-  useClearbitCompany,
+  useCompanyInfo,
   usePublishedDatesQuery,
 } from '@hooks/query/articles.hook';
 import type { IBaseFinancialProjectionSourceV2 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { cn } from '@libs/utils/react';
+import { getLogoUrl } from '@libs/utils/source';
 import React, { useEffect, useState } from 'react';
 
 interface FinancialProjectionSourceBadgeProps {
@@ -40,7 +41,7 @@ const FinancialProjectionSourceBadge: React.FC<
   const isAIReasoning = source.title === 'AI Reasoning' || !source.url;
   const hasValidUrl = source.url && source.url.trim() !== '';
 
-  const clearbitCompanyQuery = useClearbitCompany(source.url || '');
+  const companyInfoQuery = useCompanyInfo(source.url || '');
   const publishedDatesQuery = usePublishedDatesQuery(
     hasValidUrl
       ? {
@@ -76,18 +77,18 @@ const FinancialProjectionSourceBadge: React.FC<
     if (isAIReasoning) {
       setSourceTitle('AI Reasoning');
     } else if (
-      clearbitCompanyQuery.data &&
-      clearbitCompanyQuery.data.length > 0 &&
-      clearbitCompanyQuery.data[0].name
+      companyInfoQuery.data &&
+      companyInfoQuery.data.length > 0 &&
+      companyInfoQuery.data[0].name
     ) {
-      setSourceTitle(clearbitCompanyQuery.data[0].name);
+      setSourceTitle(companyInfoQuery.data[0].name);
     } else if (hasValidUrl) {
       setSourceTitle(getBaseUrl(source.url!));
     } else {
       setSourceTitle(source.title);
     }
   }, [
-    clearbitCompanyQuery.data,
+    companyInfoQuery.data,
     source.title,
     source.url,
     isAIReasoning,
@@ -133,7 +134,7 @@ const FinancialProjectionSourceBadge: React.FC<
           <img
             className='h-full w-full object-contain'
             alt='source-logo'
-            src={`https://logo.clearbit.com/${sourceBaseUrl || ''}`}
+            src={getLogoUrl(sourceBaseUrl || '')}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = images.link;
             }}

@@ -22,18 +22,14 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
   >('map');
   const [selectedCompany, setSelectedCompany] = useState<Company | null>(null);
 
-  // Auto-select first company when switching tabs
+  // Auto-select first company when switching tabs, or clear selection if no companies
   useEffect(() => {
     if (ecosystemTab === 'startups') {
       const startups = ecosystemData.filter((c) => c.type === 'startup');
-      if (startups.length > 0) {
-        setSelectedCompany(startups[0]);
-      }
+      setSelectedCompany(startups.length > 0 ? startups[0] : null);
     } else if (ecosystemTab === 'incumbents') {
       const incumbents = ecosystemData.filter((c) => c.type === 'incumbent');
-      if (incumbents.length > 0) {
-        setSelectedCompany(incumbents[0]);
-      }
+      setSelectedCompany(incumbents.length > 0 ? incumbents[0] : null);
     }
   }, [ecosystemTab, ecosystemData]);
 
@@ -186,46 +182,89 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
 
           {/* Startups View */}
           <TabsContent value='startups' className='mt-0'>
-            <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border'>
-              <div className='grid h-[500px] grid-cols-7'>
-                {/* Left Panel - Company List */}
-                <div className='aucctus-border-secondary col-span-2 overflow-hidden border-r'>
-                  <CompanyListPanel
-                    companies={ecosystemData.filter(
-                      (c) => c.type === 'startup',
-                    )}
-                    selectedCompany={selectedCompany}
-                    onSelectCompany={setSelectedCompany}
-                  />
-                </div>
-                {/* Right Panel - Company Details */}
-                <div className='col-span-5 overflow-hidden'>
-                  <CompanyDetailPanel company={selectedCompany} />
+            {ecosystemData.filter((c) => c.type === 'startup').length === 0 ? (
+              <div className='aucctus-bg-primary aucctus-border-secondary flex h-[300px] items-center justify-center rounded-lg border'>
+                <div className='flex flex-col items-center gap-3 text-center'>
+                  <div className='aucctus-bg-secondary flex h-12 w-12 items-center justify-center rounded-full'>
+                    <Icon
+                      variant='zap'
+                      className='aucctus-stroke-tertiary h-6 w-6'
+                    />
+                  </div>
+                  <div>
+                    <p className='aucctus-text-primary aucctus-text-md-semibold'>
+                      No startups found
+                    </p>
+                    <p className='aucctus-text-secondary aucctus-text-sm mt-1'>
+                      No emerging competitors were identified in this space
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border'>
+                <div className='grid h-[500px] grid-cols-7'>
+                  {/* Left Panel - Company List */}
+                  <div className='aucctus-border-secondary col-span-2 overflow-hidden border-r'>
+                    <CompanyListPanel
+                      companies={ecosystemData.filter(
+                        (c) => c.type === 'startup',
+                      )}
+                      selectedCompany={selectedCompany}
+                      onSelectCompany={setSelectedCompany}
+                    />
+                  </div>
+                  {/* Right Panel - Company Details */}
+                  <div className='col-span-5 overflow-hidden'>
+                    <CompanyDetailPanel company={selectedCompany} />
+                  </div>
+                </div>
+              </div>
+            )}
           </TabsContent>
 
           {/* Incumbents View */}
           <TabsContent value='incumbents' className='mt-0'>
-            <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border'>
-              <div className='grid h-[500px] grid-cols-7'>
-                {/* Left Panel - Company List */}
-                <div className='aucctus-border-secondary col-span-2 overflow-hidden border-r'>
-                  <CompanyListPanel
-                    companies={ecosystemData.filter(
-                      (c) => c.type === 'incumbent',
-                    )}
-                    selectedCompany={selectedCompany}
-                    onSelectCompany={setSelectedCompany}
-                  />
-                </div>
-                {/* Right Panel - Company Details */}
-                <div className='col-span-5 overflow-hidden'>
-                  <CompanyDetailPanel company={selectedCompany} />
+            {ecosystemData.filter((c) => c.type === 'incumbent').length ===
+            0 ? (
+              <div className='aucctus-bg-primary aucctus-border-secondary flex h-[300px] items-center justify-center rounded-lg border'>
+                <div className='flex flex-col items-center gap-3 text-center'>
+                  <div className='aucctus-bg-secondary flex h-12 w-12 items-center justify-center rounded-full'>
+                    <Icon
+                      variant='building-02'
+                      className='aucctus-stroke-tertiary h-6 w-6'
+                    />
+                  </div>
+                  <div>
+                    <p className='aucctus-text-primary aucctus-text-md-semibold'>
+                      No incumbents found
+                    </p>
+                    <p className='aucctus-text-secondary aucctus-text-sm mt-1'>
+                      No established competitors were identified in this space
+                    </p>
+                  </div>
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border'>
+                <div className='grid h-[500px] grid-cols-7'>
+                  {/* Left Panel - Company List */}
+                  <div className='aucctus-border-secondary col-span-2 overflow-hidden border-r'>
+                    <CompanyListPanel
+                      companies={ecosystemData.filter(
+                        (c) => c.type === 'incumbent',
+                      )}
+                      selectedCompany={selectedCompany}
+                      onSelectCompany={setSelectedCompany}
+                    />
+                  </div>
+                  {/* Right Panel - Company Details */}
+                  <div className='col-span-5 overflow-hidden'>
+                    <CompanyDetailPanel company={selectedCompany} />
+                  </div>
+                </div>
+              </div>
+            )}
           </TabsContent>
         </Tabs>
 

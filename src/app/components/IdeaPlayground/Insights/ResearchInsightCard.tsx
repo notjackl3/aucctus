@@ -1,7 +1,7 @@
 import React, { useRef, useMemo, useState } from 'react';
 import { Icon } from '@components';
 import { InsightCard as InsightCardType } from '../types';
-import { getBaseUrl } from '@libs/utils/source';
+import { getBaseUrl, getLogoUrl } from '@libs/utils/source';
 import { cn } from '@libs/utils/react';
 import {
   useIncludeAnswerLight,
@@ -156,7 +156,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
           <img
             className='h-full w-full object-contain'
             alt='source-logo'
-            src={`https://logo.clearbit.com/${sourceBaseUrl}`}
+            src={getLogoUrl(sourceBaseUrl)}
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src =
                 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"%3E%3Cpath d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/%3E%3Cpath d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/%3E%3C/svg%3E';
