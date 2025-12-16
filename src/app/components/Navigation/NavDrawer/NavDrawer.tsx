@@ -100,7 +100,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
         <NavButton
           to={playgroundPath}
           title='Playground'
-          icon='test-drive'
+          icon='route'
           collapsed={collapsed}
         />
       </div>

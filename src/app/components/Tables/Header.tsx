@@ -3,18 +3,38 @@ import { cn } from '@libs/utils/react';
 import { Header, flexRender } from '@tanstack/react-table';
 import React from 'react';
 
+// Column IDs that should be pinned to the right when horizontal scroll is active
+const PINNED_RIGHT_COLUMNS = ['actions', 'settings'];
+// Width of the settings column (rightmost pinned column)
+const SETTINGS_COLUMN_WIDTH = 60;
+
 // Props for the TableHeader component
 interface ITableHeaderProps<T>
   extends React.HTMLAttributes<HTMLTableHeaderCellElement> {
   header: Header<T, unknown>;
+  /** When true, action columns will be pinned to the right */
+  hasHorizontalScroll?: boolean;
 }
 
 // TableHeader Component
 const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
   header,
+  hasHorizontalScroll = false,
   ...props
 }: ITableHeaderProps<T>) => {
   const [isResizing, setIsResizing] = React.useState(false);
+
+  const columnId = header.column.id;
+  const isPinnedColumn = PINNED_RIGHT_COLUMNS.includes(columnId);
+  const shouldPin = hasHorizontalScroll && isPinnedColumn;
+
+  // Calculate right offset: settings = 0, actions = 60 (width of settings column)
+  const rightOffset =
+    columnId === 'settings'
+      ? 0
+      : columnId === 'actions'
+        ? SETTINGS_COLUMN_WIDTH
+        : 0;
 
   // Apply global cursor style during resize and handle mouseup anywhere
   React.useEffect(() => {
@@ -54,7 +74,12 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
         minWidth: header.column.columnDef.minSize || header.column.getSize(),
         position: 'sticky',
         top: 0,
-        zIndex: 10,
+        right: shouldPin ? `${rightOffset}px` : undefined,
+        // Higher z-index when pinned right (sticky both top AND right)
+        zIndex: shouldPin ? 30 : 10,
+        // Explicit background for pinned headers matching the header's background
+        // aucctus-bg-primary-hover uses bg-base-white = #FFFFFF
+        backgroundColor: shouldPin ? '#FFFFFF' : undefined,
       }}
     >
       {header.isPlaceholder ? null : (
@@ -105,7 +130,7 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
             header.getResizeHandler()(e);
           }}
           className={cn(
-            'absolute right-0 top-0 h-full w-1 cursor-col-resize touch-none select-none',
+            'absolute top-0 h-full w-3 cursor-col-resize touch-none select-none',
             'hover:aucctus-bg-brand-primary transition-opacity hover:opacity-100',
             'opacity-0',
             {
@@ -114,7 +139,7 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
             },
           )}
           style={{
-            transform: 'translateX(50%)',
+            right: '-6px',
             zIndex: 20,
           }}
         />

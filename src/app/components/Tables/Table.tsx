@@ -14,6 +14,8 @@ interface IAucctusTableProps<T = any>
   tfootProps?: React.HTMLAttributes<HTMLTableSectionElement>;
   rowProps?: React.HTMLAttributes<HTMLTableRowElement>;
   headerProps?: React.HTMLAttributes<HTMLTableHeaderCellElement>;
+  /** When true, action columns will be pinned to the right during horizontal scroll */
+  hasHorizontalScroll?: boolean;
 }
 
 const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
@@ -26,7 +28,7 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
   rowProps,
   headerProps,
   emptyTableText = 'No data available',
-
+  hasHorizontalScroll = false,
   ...props
 }: IAucctusTableProps<T>) => {
   return (
@@ -43,7 +45,7 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
       <thead
         {...theadProps}
         className={cn(
-          'aucctus-bg-primary sticky top-0 z-10',
+          'aucctus-bg-primary sticky top-0 z-20',
           theadProps?.className,
         )}
       >
@@ -51,7 +53,12 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
           table.getHeaderGroups().map((headerGroup) => (
             <tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
-                <TB.Header {...headerProps} key={header.id} header={header} />
+                <TB.Header
+                  {...headerProps}
+                  key={header.id}
+                  header={header}
+                  hasHorizontalScroll={hasHorizontalScroll}
+                />
               ))}
             </tr>
           ))}
@@ -76,6 +83,7 @@ const AucctusTable: React.FC<IAucctusTableProps> = <T,>({
                 row={row}
                 handleClick={handleRowClick}
                 isSelected={selectedRowId === row.id}
+                hasHorizontalScroll={hasHorizontalScroll}
               />
             ))}
         {/* Display a message if the table is empty */}

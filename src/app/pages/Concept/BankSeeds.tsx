@@ -37,7 +37,9 @@ const BankSeeds: React.FC = () => {
           />
         }
       >
-        <Table table={table} />
+        {(hasHorizontalScroll) => (
+          <Table table={table} hasHorizontalScroll={hasHorizontalScroll} />
+        )}
       </Container.ConceptTableWrapper>
     </>
   );

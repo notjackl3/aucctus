@@ -1097,10 +1097,10 @@ export const useConceptBank = (
         enableSorting: false,
         size: 200,
         minSize: 200,
-        maxSize: 300,
+        maxSize: 220,
         enableResizing: true,
         cell: ({ row }) => (
-          <span className='m-auto flex h-full w-full min-w-[200px] max-w-[300px] items-center justify-center self-stretch'>
+          <span className='m-auto flex h-full w-full min-w-[180px] max-w-[260px] items-center justify-center self-stretch'>
             <Button.ConceptGenerate
               variant={row.original.reportStatusAggregate}
               onClick={handleGenerateConceptButton(row)}
@@ -1117,18 +1117,20 @@ export const useConceptBank = (
         id: 'settings',
         enableColumnFilter: false,
         enableSorting: false,
-        size: 60,
-        maxSize: 60,
+        size: 100,
+        maxSize: 100,
         enableResizing: false,
         header: () => {},
         cell: (info) => (
-          <Table.ConceptBank.ConceptActionMenuButton
-            status={info.row.original.status}
-            reportStatus={info.row.original.reportStatusAggregate}
-            identifier={info.row.original.identifier}
-            conceptUuid={info.row.original.uuid}
-            seedUuid={info.row.original.seedUuid}
-          />
+          <div className='pr-4'>
+            <Table.ConceptBank.ConceptActionMenuButton
+              status={info.row.original.status}
+              reportStatus={info.row.original.reportStatusAggregate}
+              identifier={info.row.original.identifier}
+              conceptUuid={info.row.original.uuid}
+              seedUuid={info.row.original.seedUuid}
+            />
+          </div>
         ),
       }),
     ];
