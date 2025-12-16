@@ -45,23 +45,8 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
     }
   };
 
-  // Determine icon based on concept type
-  const getIconVariant = ():
-    | 'droplets'
-    | 'layers'
-    | 'chef-hat'
-    | 'lightbulb' => {
-    switch (concept.conceptType) {
-      case 'Core':
-        return 'droplets';
-      case 'Adjacent':
-        return 'layers';
-      case 'Disruptive':
-        return 'chef-hat';
-      default:
-        return 'lightbulb';
-    }
-  };
+  /** Icon variant from backend - assigned by AI based on concept's domain/mechanism */
+  const iconVariant: IconVariant = concept.icon || 'lightbulb';
 
   return (
     <div
@@ -137,7 +122,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
       <div className='flex h-full flex-col pt-8'>
         <div className='mb-2 flex items-start gap-2 pr-8'>
           <Icon
-            variant={getIconVariant()}
+            variant={iconVariant}
             className='aucctus-stroke-white mt-0.5 h-6 w-6 flex-shrink-0'
           />
           <h3 className='aucctus-text-sm-bold aucctus-text-white leading-tight'>

@@ -39,6 +39,7 @@ import {
   useWebSocketSync,
   useBulkQuestionsUpdate,
 } from './hooks';
+import { getSentimentIcon } from './utils';
 
 interface QuestionCarouselProps {
   topic: string;
@@ -815,7 +816,7 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
           <InsightDetailSidePanel
             selectedInsight={selectedInsightForDetails}
             isOpen={sideMenuOpen}
-            getSentimentIcon={() => 'trending-up'}
+            getSentimentIcon={getSentimentIcon}
             onClose={() => setSideMenuOpen(false)}
             onAddRelatedInsight={(newInsight) => {
               setCustomInsights((prev) => ({

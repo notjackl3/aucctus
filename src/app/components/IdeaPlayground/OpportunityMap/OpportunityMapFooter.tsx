@@ -4,9 +4,11 @@ import { cn } from '@libs/utils/react';
 
 interface OpportunityMapFooterProps {
   selectedIdeasCount: number;
+  onSaveConcepts: () => void;
   onGenerateReports: () => void;
   onRegenerateWithFeedback: (feedback: string) => void;
   isRegenerating: boolean;
+  isSaving?: boolean;
   disabled?: boolean;
 }
 
@@ -14,9 +16,11 @@ const MAX_FEEDBACK_LENGTH = 1000;
 
 const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
   selectedIdeasCount,
+  onSaveConcepts,
   onGenerateReports,
   onRegenerateWithFeedback,
   isRegenerating,
+  isSaving = false,
   disabled = false,
 }) => {
   const [feedback, setFeedback] = useState('');
@@ -44,7 +48,7 @@ const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
   return (
     <div className='flex border-t border-white/10 bg-black/20 backdrop-blur-md'>
       {/* Left Side - Feedback Input */}
-      <div className='flex w-1/2 items-center gap-2 border-r border-white/10 p-6'>
+      <div className='flex w-1/2 items-center gap-2 border-r border-white/10 px-4 py-3'>
         <div className='flex flex-1 items-center gap-2'>
           <input
             type='text'
@@ -88,32 +92,66 @@ const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
         </div>
       </div>
 
-      {/* Right Side - Selected Count and Generate Reports Button */}
-      <div className='flex w-1/2 items-center justify-end gap-3 p-6'>
-        <div className='aucctus-text-secondary aucctus-text-sm'>
-          {selectedIdeasCount} idea{selectedIdeasCount !== 1 ? 's' : ''}{' '}
-          selected
+      {/* Right Side - Selected Count and Action Buttons */}
+      <div className='flex w-1/2 items-center justify-end gap-3 px-4 py-3'>
+        <div className='aucctus-text-sm text-white/80'>
+          {selectedIdeasCount} selected
         </div>
 
+        {/* Save for Later Button - Dark bg, light text, subtle border */}
+        <button
+          onClick={onSaveConcepts}
+          disabled={selectedIdeasCount === 0 || isSaving}
+          className={cn(
+            'flex items-center gap-2 whitespace-nowrap rounded-md border border-white/70 px-4 py-2 transition-all',
+            {
+              'cursor-not-allowed bg-gray-900 text-white/90 opacity-40':
+                selectedIdeasCount === 0 || isSaving,
+              'bg-gray-900 text-white/90 hover:bg-gray-800':
+                selectedIdeasCount > 0 && !isSaving,
+            },
+          )}
+        >
+          {isSaving ? (
+            <div className='h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white' />
+          ) : (
+            <Icon
+              variant='save'
+              className='aucctus-stroke-white'
+              height={16}
+              width={16}
+            />
+          )}
+          <span>Save for Later</span>
+        </button>
+
+        {/* Generate Reports Button - Light bg, dark text, subtle border */}
         <button
           onClick={onGenerateReports}
-          disabled={selectedIdeasCount === 0}
-          className={`flex items-center gap-2 whitespace-nowrap rounded-md border px-4 py-2 transition-all duration-300 ${
-            selectedIdeasCount === 0
-              ? 'aucctus-bg-disabled aucctus-text-disabled aucctus-border-disabled cursor-not-allowed opacity-50'
-              : 'aucctus-bg-brand-solid aucctus-text-white hover:aucctus-bg-brand-solid-hover border-transparent'
-          }`}
+          disabled={selectedIdeasCount === 0 || isSaving}
+          className={cn(
+            'flex items-center gap-2 whitespace-nowrap rounded-md border border-white/70 px-4 py-2 transition-all',
+            {
+              'cursor-not-allowed bg-gray-900 text-white/90 opacity-40':
+                selectedIdeasCount === 0 || isSaving,
+              'bg-white/90 text-gray-900 hover:bg-white':
+                selectedIdeasCount > 0 && !isSaving,
+            },
+          )}
         >
-          <Icon
-            variant='presentation-chart'
-            className={`${
-              selectedIdeasCount === 0
-                ? 'aucctus-stroke-disabled'
-                : 'aucctus-stroke-white'
-            }`}
-            height={16}
-            width={16}
-          />
+          {isSaving ? (
+            <div className='h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black' />
+          ) : (
+            <Icon
+              variant='presentation-chart'
+              className={cn({
+                'aucctus-stroke-white': selectedIdeasCount === 0 || isSaving,
+                'aucctus-stroke-primary': selectedIdeasCount > 0 && !isSaving,
+              })}
+              height={16}
+              width={16}
+            />
+          )}
           <span>Generate Reports</span>
         </button>
       </div>

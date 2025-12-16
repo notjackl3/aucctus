@@ -1,5 +1,5 @@
 import React, { useRef, useMemo, useState } from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import { Icon } from '@components';
 import { InsightCard as InsightCardType } from '../types';
 import { getBaseUrl } from '@libs/utils/source';
 import { cn } from '@libs/utils/react';
@@ -100,16 +100,14 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   const isNucleusInsight =
     card.source?.toLowerCase().includes('nucleus report') || false;
-  const canOpenDetails =
-    !isNucleusInsight && card.citationValidationStatus !== 'error';
 
   const handleDoubleClick = () => {
     if (clickTimerRef.current) {
       clearTimeout(clickTimerRef.current);
       clickTimerRef.current = null;
     }
-    // Don't open modal for Nucleus insights or failed validations
-    if (!canOpenDetails) return;
+    // Don't open modal for Nucleus insights
+    if (isNucleusInsight) return;
     onDoubleClick();
   };
 
@@ -124,36 +122,6 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
       window.open(card.url, '_blank', 'noopener,noreferrer');
     }
   };
-
-  // Determine citation validation status
-  const getCitationStatus = () => {
-    switch (card.citationValidationStatus) {
-      case 'success':
-        return {
-          icon: 'check-circle-broken' as const,
-          color: 'aucctus-stroke-success-primary',
-          tooltip: 'Citation validated - Double click for details',
-          animate: false,
-        };
-      case 'error':
-        return {
-          icon: 'closeX' as const,
-          color: 'aucctus-stroke-error-primary',
-          tooltip: 'Citation validation failed',
-          animate: false,
-        };
-      case 'pending':
-      default:
-        return {
-          icon: 'beaker' as const,
-          color: 'aucctus-stroke-quaternary',
-          tooltip: 'Researching and validating...',
-          animate: true,
-        };
-    }
-  };
-
-  const citationStatus = getCitationStatus();
 
   // Render source logo similar to SourceInfoBadge
   const renderSourceLogo = useMemo(() => {
@@ -216,7 +184,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   return (
     <div
-      className={`aucctus-text-white relative min-w-[350px] max-w-[350px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
+      className={`aucctus-text-white relative min-w-[275px] max-w-[275px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
         isLoading
           ? 'scale-95 border-white/30 bg-white/10 opacity-80 hover:z-50'
           : optimisticSelected
@@ -230,35 +198,6 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         transition: 'all 0.15s cubic-bezier(0.4, 0, 0.2, 1)',
       }}
     >
-      {/* Citation validation status icon - top right (hidden for Nucleus insights) */}
-      {!isNucleusInsight && (
-        <div className='absolute right-2 top-2'>
-          <ComponentTooltip
-            tip={
-              <div
-                className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary max-w-xs rounded-lg border px-3 py-2 shadow-lg'
-                style={{
-                  boxShadow:
-                    '0 0 15px rgba(0, 0, 0, 0.075), 0 8px 15px rgba(0, 0, 0, 0.15)',
-                }}
-              >
-                <span className='aucctus-text-xs'>
-                  {citationStatus.tooltip}
-                </span>
-              </div>
-            }
-            preferredPosition='below'
-          >
-            <Icon
-              variant={citationStatus.icon}
-              className={`${citationStatus.color} ${citationStatus.animate ? 'animate-pulse' : ''}`}
-              height={16}
-              width={16}
-            />
-          </ComponentTooltip>
-        </div>
-      )}
-
       {/* Selected indicator or loading spinner */}
       {optimisticSelected || isLoading ? (
         <div
@@ -287,16 +226,16 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
         </div>
       ) : null}
 
-      <div className='mb-2 flex items-start gap-2 pr-6'>
+      <div className='mb-2 flex items-start gap-2 px-1 pr-6'>
         <span className='aucctus-text-sm-medium leading-tight'>
           {card.insight}
         </span>
       </div>
 
-      <div className='flex justify-end'>
+      <div className='flex justify-start'>
         <div
           className={cn(
-            'inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-white/30 bg-white/10 px-2 py-1 transition-colors',
+            'inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-white/30 bg-white/10 px-1.5 py-0.5 transition-colors',
             card.source?.includes('Nucleus')
               ? 'cursor-default'
               : 'cursor-pointer hover:bg-white/15',
@@ -308,13 +247,13 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
           {getSentimentIcon(card.sentiment)}
 
           {renderSourceLogo}
-          <span className='aucctus-text-xs font-normal'>{displayTitle}</span>
+          <span className='text-[10px] font-normal'>{displayTitle}</span>
           {card.url && !card.source?.includes('Nucleus') && (
             <Icon
               variant='link-external'
               className='aucctus-stroke-white opacity-70'
-              height={12}
-              width={12}
+              height={10}
+              width={10}
             />
           )}
         </div>

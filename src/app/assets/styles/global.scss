@@ -154,6 +154,18 @@ select:focus {
   --tw-ring-shadow: none !important;
 }
 
+// Utility class to remove focus ring on specific inputs
+.no-focus-ring {
+
+  &:focus,
+  &:focus-visible {
+    outline: none !important;
+    box-shadow: none !important;
+    --tw-ring-shadow: none !important;
+    --tw-ring-offset-shadow: none !important;
+  }
+}
+
 :root {
   --nav-drawer-expanded-width: 15.5rem;
   --nav-drawer-collapsed-width: 6rem;

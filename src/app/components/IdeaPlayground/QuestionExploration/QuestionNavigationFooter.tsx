@@ -40,12 +40,12 @@ const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
   const handleButtonClick = showViewConcepts ? onViewConcepts : onGenerateIdeas;
   return (
     <div className='absolute bottom-0 left-0 right-0 z-30'>
-      <div className='w-full border-t border-white/20 bg-black/60 px-8 py-6 backdrop-blur-md'>
-        <div className='flex w-full items-end justify-between'>
+      <div className='w-full border-t border-white/20 bg-black/60 px-6 py-3 backdrop-blur-md'>
+        <div className='flex w-full items-center justify-between'>
           <div className='w-40'></div>
 
           {/* Centered Question Selectors */}
-          <div className='flex items-end justify-center gap-3 overflow-x-auto overflow-y-visible py-3'>
+          <div className='flex items-center justify-center gap-2 overflow-x-auto overflow-y-visible py-1'>
             {questions.map((question, index) => {
               // Allow deletion for local temporary questions OR API custom questions
               const canDelete =
@@ -71,28 +71,28 @@ const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
             {/* Add Question Button */}
             <button
               onClick={onAddQuestion}
-              className='flex h-14 w-16 flex-shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-white/70 transition-all duration-300 hover:border-white/30 hover:bg-white/10'
+              className='flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 text-white/70 transition-all duration-300 hover:border-white/30 hover:bg-white/10'
             >
               <Icon
                 variant='plus'
                 className='stroke-white/70'
-                height={16}
-                width={16}
+                height={14}
+                width={14}
               />
             </button>
           </div>
 
           {/* Generate Ideas / View Concepts Button */}
-          <div className='flex items-end justify-end'>
+          <div className='flex items-center justify-end'>
             <button
               onClick={handleButtonClick}
-              className='btn btn-primary btn-md group whitespace-nowrap border border-white/30 bg-white/10 px-3 py-2 text-white backdrop-blur-md transition-all duration-300 hover:!border-white hover:!bg-white hover:!text-gray-900'
+              className='btn btn-primary btn-sm group whitespace-nowrap border border-white/30 bg-white/10 px-3 py-1.5 text-white backdrop-blur-md transition-all duration-300 hover:!border-white hover:!bg-white hover:!text-gray-900'
             >
               <Icon
                 variant={buttonIcon}
-                className='mr-2 stroke-white group-hover:stroke-gray-light-700'
-                height={16}
-                width={16}
+                className='mr-1.5 stroke-white group-hover:stroke-gray-light-700'
+                height={14}
+                width={14}
               />
               {buttonText}
             </button>

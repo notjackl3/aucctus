@@ -358,16 +358,17 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
       {/* Background Image with Blur */}
       <div
-        className='absolute inset-0 bg-cover bg-center bg-no-repeat'
+        className='absolute -inset-4 bg-cover bg-center bg-no-repeat'
         style={{
           backgroundImage: `url('/images/darker-background.png')`,
-          filter: 'blur(8px)',
+          filter: 'blur(6px)',
           animation: 'moveBackground 30s ease infinite',
+          transform: 'scale(1.05)',
         }}
       />
 
       {/* Inlay */}
-      <div className='absolute inset-0 bg-black/20'>
+      <div className='absolute inset-0 bg-black/45'>
         {/* Floating Inspiration Cards - Only show if not awaiting restoration */}
         {!isLoadingThoughts && !isAwaitingSessionRestoration && (
           <FloatingAnchorThought

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useEffect } from 'react';
 import { Icon } from '@components';
 import { Question } from '../types';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
@@ -32,6 +32,26 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
   onUserInputChange,
   onUserInputSubmit,
 }) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Autofocus the appropriate input when question changes
+  useEffect(() => {
+    const isCustom = question.id.startsWith('custom-');
+    const hasQ = question.question;
+
+    // Small delay to ensure DOM is ready after animation
+    const timer = setTimeout(() => {
+      if (isCustom && !hasQ) {
+        textareaRef.current?.focus();
+      } else if (!isCustom && !hasUserAnswer) {
+        inputRef.current?.focus();
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [question.id, question.question, hasUserAnswer]);
+
   const isCustomQuestion = question.id.startsWith('custom-');
   const hasQuestion = question.question;
   const inputLength = customQuestionInput?.length || 0;
@@ -41,7 +61,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 
   return (
     <div
-      className={`relative z-20 select-none rounded-2xl p-6 shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-[1.02] ${
+      className={`relative z-20 select-none rounded-lg p-6 shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-[1.02] ${
         isAnswered
           ? 'aucctus-bg-success-glass aucctus-border-success hover:aucctus-bg-success-glass-hover border-2'
           : 'border-2 border-dashed border-white/30 bg-transparent hover:border-white/40 hover:bg-white/10'
@@ -67,6 +87,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             Add Your Own Question
           </p>
           <textarea
+            ref={textareaRef}
             value={customQuestionInput || ''}
             onChange={(e) => onCustomQuestionInputChange?.(e.target.value)}
             onKeyDown={(e) => {
@@ -76,10 +97,9 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
               }
             }}
             placeholder='What would you like to explore?'
-            className={`aucctus-text-xl-bold w-full select-text resize-none overflow-hidden border-none bg-transparent text-center leading-tight outline-none placeholder:text-white placeholder:opacity-40 ${
+            className={`no-focus-ring aucctus-text-xl-bold w-full select-text resize-none overflow-hidden border-none bg-transparent text-center leading-tight outline-none placeholder:text-white placeholder:opacity-40 ${
               isOverLimit ? 'text-red-400' : 'aucctus-text-white'
             }`}
-            autoFocus
             disabled={isSubmittingCustomQuestion}
             rows={1}
             style={{ minHeight: 'auto' }}
@@ -123,6 +143,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
           {!isCustomQuestion && !hasUserAnswer && (
             <div className='mt-4 border-t border-white/10 pt-4'>
               <input
+                ref={inputRef}
                 type='text'
                 value={userInputValue || ''}
                 onChange={(e) => onUserInputChange?.(e.target.value)}
@@ -139,7 +160,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                 }}
                 onClick={(e) => e.stopPropagation()}
                 placeholder='Type your answer or select a bubble...'
-                className='w-full border-none bg-transparent text-left text-sm text-white/80 transition-all placeholder:text-white/30 focus:text-white focus:outline-none'
+                className='no-focus-ring w-full border-none bg-transparent text-left text-sm text-white/80 transition-all placeholder:text-white/30 focus:text-white focus:outline-none'
                 disabled={isSubmittingUserInput}
               />
               {isSubmittingUserInput && (

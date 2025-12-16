@@ -79,7 +79,9 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   } = useGetGeneratedIdeas(seedUuid || undefined);
 
   // Hook for generating more concepts
-  const { generateMore } = useGenerateMoreConcepts(seedUuid || '');
+  const { generateMore, error: generateMoreError } = useGenerateMoreConcepts(
+    seedUuid || '',
+  );
 
   // Hook for regenerating concepts with feedback
   const { regenerateWithFeedback, isLoading: isRegenerateLoading } =
@@ -233,6 +235,38 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     }
   }, [isRegenerating, concepts.length, isGeneratingConcepts, generatingMore]);
 
+  // Track previous loading state to detect transition from loading to concepts
+  const wasLoadingRef = useRef(true);
+
+  // Auto-select first concept when transitioning from loading state to concepts view
+  useEffect(() => {
+    const isCurrentlyLoading =
+      isGeneratingConcepts || isInitialMount || isRegenerating;
+    const wasLoading = wasLoadingRef.current;
+
+    // Update the ref for next render
+    wasLoadingRef.current = isCurrentlyLoading;
+
+    // If we just transitioned from loading to not loading, and we have concepts
+    if (wasLoading && !isCurrentlyLoading && concepts.length > 0) {
+      // Auto-select the first concept to show in the detail panel
+      const firstConcept = concepts[0];
+      setSelectedIdeaDetail({
+        title: firstConcept.title,
+        section: firstConcept.conceptType,
+        icon: firstConcept.icon || 'lightbulb',
+        description: firstConcept.description,
+        rationale: firstConcept.rationale,
+        initialGutCheck: firstConcept.initialGutCheck,
+        problemItSolves: firstConcept.problemItSolves,
+        uniqueValueProposition: firstConcept.uniqueValueProposition,
+        reasonsToBelieve: firstConcept.reasonsToBelieve,
+        reasonsToChallenge: firstConcept.reasonsToChallenge,
+        keyThingsToValidate: firstConcept.keyThingsToValidate,
+      });
+    }
+  }, [isGeneratingConcepts, isInitialMount, isRegenerating, concepts]);
+
   /**
    * Handle regeneration with feedback
    * Shows loading state immediately, triggers the mutation
@@ -298,6 +332,19 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       backendConfirmedGeneratingRef.current = false;
     }
   }, [generatingMore, localGeneratingMore]);
+
+  // Reset local generating state if there's an error from the generateMore mutation
+  useEffect(() => {
+    if (generateMoreError && localGeneratingMore) {
+      setLocalGeneratingMore(false);
+      backendConfirmedGeneratingRef.current = false;
+      // Reset the progress animation state
+      setGenerateMorePhase('idle');
+      setGenerateMoreProgress(0);
+      generateMoreStartTimeRef.current = null;
+      wasGeneratingMoreRef.current = false;
+    }
+  }, [generateMoreError, localGeneratingMore]);
 
   // WebSocket listener for concepts generated - refetch when ready
   useSocketEvent<'idea_playground.concepts.generated.user'>(
@@ -391,27 +438,16 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     toggleConceptSelection(conceptUuid);
   };
 
-  // Determine icon based on concept type
+  /** Get icon variant from backend - assigned by AI based on concept's domain/mechanism */
   const getIconVariant = (
-    conceptType: string,
-  ): 'droplets' | 'layers' | 'chef-hat' | 'lightbulb' => {
-    switch (conceptType) {
-      case 'Core':
-        return 'droplets';
-      case 'Adjacent':
-        return 'layers';
-      case 'Disruptive':
-        return 'chef-hat';
-      default:
-        return 'lightbulb';
-    }
-  };
+    concept: IGeneratedIdeaPlaygroundConcept,
+  ): IconVariant => concept.icon || 'lightbulb';
 
   const handleCardClick = (concept: IGeneratedIdeaPlaygroundConcept) => {
     setSelectedIdeaDetail({
       title: concept.title,
       section: concept.conceptType,
-      icon: getIconVariant(concept.conceptType),
+      icon: getIconVariant(concept),
       description: concept.description,
       rationale: concept.rationale,
       initialGutCheck: concept.initialGutCheck,
@@ -470,12 +506,19 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     ],
   );
 
-  const handleGenerateReports = async () => {
+  // Track if we're saving concepts
+  const [isSaving, setIsSaving] = useState(false);
+
+  /**
+   * Save concepts only (without generating reports)
+   */
+  const handleSaveConcepts = async () => {
     if (!seedUuid || selectedConceptUuids.length === 0) {
       toast.warning('Please select at least one concept to save');
       return;
     }
 
+    setIsSaving(true);
     try {
       await api.ideaPlayground.saveConcepts(seedUuid, selectedConceptUuids);
       toast.success(
@@ -484,13 +527,70 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       telemetry.log('ideaPlayground.concepts.saved', {
         count: selectedConceptUuids.length,
         seedUuid: seedUuid,
+        generateReports: false,
       });
-      // Navigate or close after saving
+      // Navigate to ConceptBank after saving
       handleClose();
       navigate(AppPath.ConceptBank);
     } catch (error) {
       telemetry.error('ideaPlayground.concepts.save.failed', error);
       toast.error('Failed to save concepts', undefined, 3000);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  /**
+   * Save concepts AND generate reports for each
+   */
+  const handleGenerateReports = async () => {
+    if (!seedUuid || selectedConceptUuids.length === 0) {
+      toast.warning('Please select at least one concept to save');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      // First save the concepts
+      await api.ideaPlayground.saveConcepts(seedUuid, selectedConceptUuids);
+
+      telemetry.log('ideaPlayground.concepts.saved', {
+        count: selectedConceptUuids.length,
+        seedUuid: seedUuid,
+        generateReports: true,
+      });
+
+      // Then trigger report generation for each saved concept
+      const reportPromises = selectedConceptUuids.map((conceptUuid) =>
+        api.concept.generateReport(conceptUuid).catch((error) => {
+          telemetry.error('ideaPlayground.concept.generateReport.failed', {
+            conceptUuid,
+            error,
+          });
+          // Don't throw - we want to continue with other concepts
+          return null;
+        }),
+      );
+
+      await Promise.all(reportPromises);
+
+      toast.success(
+        `Saved ${selectedConceptUuids.length} concept${selectedConceptUuids.length > 1 ? 's' : ''} and started report generation`,
+      );
+
+      telemetry.log('ideaPlayground.concepts.reportsTriggered', {
+        count: selectedConceptUuids.length,
+        seedUuid: seedUuid,
+      });
+
+      // Navigate to ConceptBank after saving and triggering reports
+      handleClose();
+      navigate(AppPath.ConceptBank);
+    } catch (error) {
+      telemetry.error('ideaPlayground.concepts.saveAndGenerate.failed', error);
+      toast.error('Failed to save concepts', undefined, 3000);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -544,12 +644,12 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       className={`absolute inset-0 z-50 bg-black/30 backdrop-blur-xl transition-all duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
     >
       <div
-        className='relative h-full w-full'
+        className='flex h-full w-full flex-col'
         style={!isClosing ? getAnimationStyle('fadeIn', 300, 0) : undefined}
       >
         {/* Header */}
         <div
-          className={`relative flex items-center justify-center border-b border-white/20 p-6 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+          className={`relative flex shrink-0 items-center justify-center border-b border-white/20 p-6 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
           style={
             !isClosing
               ? getAnimationStyle('slideInFromTop', 600, 200)
@@ -588,7 +688,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         </div>
 
         {/* Split Content */}
-        <div className='flex h-[calc(100vh-200px)]'>
+        <div className='flex min-h-0 flex-1'>
           {/* Left Side - 2x2 Grid */}
           <div className='relative flex w-1/2 flex-col border-r border-white/10'>
             {/* Loading Overlay for Concepts Grid */}
@@ -679,7 +779,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
 
         {/* Footer */}
         <div
-          className={`transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
+          className={`shrink-0 transition-opacity duration-300 ${isClosing ? 'opacity-0' : 'opacity-100'}`}
           style={
             !isClosing
               ? getAnimationStyle('slideInFromBottom', 600, 400)
@@ -688,9 +788,11 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         >
           <OpportunityMapFooter
             selectedIdeasCount={selectedConceptUuids.length}
+            onSaveConcepts={handleSaveConcepts}
             onGenerateReports={handleGenerateReports}
             onRegenerateWithFeedback={handleRegenerateWithFeedback}
             isRegenerating={isRegenerateLoading || isGeneratingMore}
+            isSaving={isSaving}
             disabled={isGeneratingMore}
           />
         </div>

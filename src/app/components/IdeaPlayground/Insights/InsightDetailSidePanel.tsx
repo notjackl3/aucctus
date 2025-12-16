@@ -88,133 +88,140 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
             </button>
           </div>
 
-          {/* Section 1: What We Found */}
-          <div className='mb-8 mt-2'>
-            <div className='aucctus-border-secondary aucctus-bg-secondary shadow-glass mb-4 rounded-lg border p-4 backdrop-blur-sm'>
-              <div className='flex items-start gap-3'>
-                {selectedInsight.source === 'Possible Answer' ? (
-                  <Icon
-                    variant='lightbulb'
-                    className='aucctus-stroke-warning-primary'
-                    height={20}
-                    width={20}
-                  />
-                ) : (
-                  <Icon
-                    variant='search-md'
-                    className='aucctus-stroke-info-primary'
-                    height={20}
-                    width={20}
-                  />
-                )}
-                <div>
-                  <h4 className='aucctus-text-xl-semibold aucctus-text-primary mb-3 capitalize'>
-                    {selectedInsight.insight}
-                  </h4>
-                  <div className='mb-3 flex items-center gap-3'>
-                    <div className='aucctus-bg-tertiary aucctus-border-tertiary inline-flex items-center gap-1 rounded-full border px-2 py-1'>
-                      <div
-                        className={`aucctus-text-xs flex h-4 w-4 items-center justify-center rounded-full ${getSourceColor(selectedInsight.source)} aucctus-text-white`}
-                      >
-                        {getSourceInitial(selectedInsight.source)}
+          {/* Error State - Show only error message */}
+          {selectedInsight.citationValidationStatus === 'error' ? (
+            <div className='mt-8 flex items-center justify-center'>
+              <div className='aucctus-bg-secondary aucctus-border-secondary flex flex-col items-center justify-center rounded-lg border p-8 text-center'>
+                <div className='mb-4 text-5xl'>😅</div>
+                <h3 className='aucctus-text-xl-semibold aucctus-text-primary mb-3 max-w-[320px]'>
+                  Oops! We Couldn&apos;t Find More Details on This Insight
+                </h3>
+                <p className='aucctus-text-md aucctus-text-tertiary max-w-[300px] leading-relaxed'>
+                  Our agents had a hard time finding more insights on this
+                  topic. Please try again later or explore other insights.
+                </p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Section 1: What We Found */}
+              <div className='mb-8 mt-2'>
+                <div className='aucctus-border-secondary aucctus-bg-secondary shadow-glass mb-4 rounded-lg border p-4 backdrop-blur-sm'>
+                  <div className='flex items-start gap-3'>
+                    {selectedInsight.source === 'Possible Answer' ? (
+                      <Icon
+                        variant='lightbulb'
+                        className='aucctus-stroke-warning-primary'
+                        height={20}
+                        width={20}
+                      />
+                    ) : (
+                      <Icon
+                        variant='search-md'
+                        className='aucctus-stroke-info-primary'
+                        height={20}
+                        width={20}
+                      />
+                    )}
+                    <div>
+                      <h4 className='aucctus-text-xl-semibold aucctus-text-primary mb-3 capitalize'>
+                        {selectedInsight.insight}
+                      </h4>
+                      <div className='mb-3 flex items-center gap-3'>
+                        <div className='aucctus-bg-tertiary aucctus-border-tertiary inline-flex items-center gap-1 rounded-full border px-2 py-1'>
+                          <div
+                            className={`aucctus-text-xs flex h-4 w-4 items-center justify-center rounded-full ${getSourceColor(selectedInsight.source)} aucctus-text-white`}
+                          >
+                            {getSourceInitial(selectedInsight.source)}
+                          </div>
+                          <span className='aucctus-text-xs-medium aucctus-text-secondary max-w-[80px] truncate'>
+                            {selectedInsight.source.replace('.com', '')}
+                          </span>
+                        </div>
+                        <div className='flex items-center gap-1'>
+                          {getSentimentIcon(selectedInsight.sentiment)}
+                          <span className='aucctus-text-sm aucctus-text-secondary capitalize'>
+                            {selectedInsight.sentiment}
+                          </span>
+                        </div>
                       </div>
-                      <span className='aucctus-text-xs-medium aucctus-text-secondary max-w-[80px] truncate'>
-                        {selectedInsight.source.replace('.com', '')}
-                      </span>
-                    </div>
-                    <div className='flex items-center gap-1'>
-                      {getSentimentIcon(selectedInsight.sentiment)}
-                      <span className='aucctus-text-sm aucctus-text-secondary capitalize'>
-                        {selectedInsight.sentiment}
-                      </span>
                     </div>
                   </div>
                 </div>
-              </div>
-            </div>
-            <div className='space-y-3'>
-              <div className='aucctus-text-xs-medium aucctus-text-placeholder mb-2 uppercase tracking-wider'>
-                MORE DETAILS
-              </div>
-              {selectedInsight.citationValidationStatus === 'pending' && (
-                <div className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-4'>
-                  <Loading isSmall />
-                  <span className='aucctus-text-tertiary aucctus-text-sm'>
-                    Validating citation and gathering more details...
-                  </span>
+                <div className='space-y-3'>
+                  <div className='aucctus-text-xs-medium aucctus-text-placeholder mb-2 uppercase tracking-wider'>
+                    MORE DETAILS
+                  </div>
+                  {selectedInsight.citationValidationStatus === 'pending' && (
+                    <div className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-4'>
+                      <Loading isSmall />
+                      <span className='aucctus-text-tertiary aucctus-text-sm'>
+                        Validating citation and gathering more details...
+                      </span>
+                    </div>
+                  )}
+                  {selectedInsight.citationValidationStatus === 'success' &&
+                    selectedInsight.moreDetails && (
+                      <p className='aucctus-text-secondary leading-relaxed'>
+                        {selectedInsight.moreDetails}
+                      </p>
+                    )}
                 </div>
-              )}
-              {selectedInsight.citationValidationStatus === 'error' && (
-                <div className='flex items-center gap-2 rounded-lg border border-red-500/20 bg-red-500/5 p-4'>
+              </div>
+
+              {/* Section 2: Why This Matters */}
+              <div className='mb-8'>
+                <div className='mb-4 flex items-center gap-2'>
                   <Icon
-                    variant='closeX'
-                    className='aucctus-stroke-error-primary h-4 w-4'
+                    variant='target'
+                    className='aucctus-stroke-success-primary'
+                    height={20}
+                    width={20}
                   />
-                  <span className='aucctus-text-error-primary aucctus-text-sm'>
-                    Citation validation failed
-                  </span>
+                  <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
+                    Why This Matters
+                  </h3>
                 </div>
-              )}
-              {selectedInsight.citationValidationStatus === 'success' &&
-                selectedInsight.moreDetails && (
-                  <p className='aucctus-text-secondary leading-relaxed'>
-                    {selectedInsight.moreDetails}
-                  </p>
+
+                {!selectedInsight.whyItMatters && (
+                  <div className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-4'>
+                    <Loading isSmall />
+                    <span className='aucctus-text-tertiary aucctus-text-sm'>
+                      Analyzing implications...
+                    </span>
+                  </div>
                 )}
-            </div>
-          </div>
 
-          {/* Section 2: Why This Matters */}
-          <div className='mb-8'>
-            <div className='mb-4 flex items-center gap-2'>
-              <Icon
-                variant='target'
-                className='aucctus-stroke-success-primary'
-                height={20}
-                width={20}
-              />
-              <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
-                Why This Matters
-              </h3>
-            </div>
+                {selectedInsight.whyItMatters && (
+                  <>
+                    {/* The Good News */}
+                    <div className='aucctus-bg-success-primary aucctus-border-success-subtle shadow-glass mb-4 rounded-lg border p-4 backdrop-blur-sm'>
+                      <div className='mb-3 flex items-start gap-2'>
+                        <span className='aucctus-text-success-primary aucctus-text-sm-semibold'>
+                          The Good News:
+                        </span>
+                      </div>
+                      <p className='aucctus-text-secondary aucctus-text-sm leading-relaxed'>
+                        {selectedInsight.whyItMatters.goodNews}
+                      </p>
+                    </div>
 
-            {!selectedInsight.whyItMatters && (
-              <div className='flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 p-4'>
-                <Loading isSmall />
-                <span className='aucctus-text-tertiary aucctus-text-sm'>
-                  Analyzing implications...
-                </span>
+                    {/* The Bad News */}
+                    <div className='aucctus-bg-error-primary aucctus-border-error-subtle shadow-glass mb-4 rounded-lg border p-4 backdrop-blur-sm'>
+                      <div className='mb-3 flex items-start gap-2'>
+                        <span className='aucctus-text-error-primary aucctus-text-sm-semibold'>
+                          The Bad News:
+                        </span>
+                      </div>
+                      <p className='aucctus-text-secondary aucctus-text-sm leading-relaxed'>
+                        {selectedInsight.whyItMatters.badNews}
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
-            )}
-
-            {selectedInsight.whyItMatters && (
-              <>
-                {/* The Good News */}
-                <div className='aucctus-bg-success-primary aucctus-border-success-subtle shadow-glass mb-4 rounded-lg border p-4 backdrop-blur-sm'>
-                  <div className='mb-3 flex items-start gap-2'>
-                    <span className='aucctus-text-success-primary aucctus-text-sm-semibold'>
-                      The Good News:
-                    </span>
-                  </div>
-                  <p className='aucctus-text-secondary aucctus-text-sm leading-relaxed'>
-                    {selectedInsight.whyItMatters.goodNews}
-                  </p>
-                </div>
-
-                {/* The Bad News */}
-                <div className='aucctus-bg-error-primary aucctus-border-error-subtle shadow-glass mb-4 rounded-lg border p-4 backdrop-blur-sm'>
-                  <div className='mb-3 flex items-start gap-2'>
-                    <span className='aucctus-text-error-primary aucctus-text-sm-semibold'>
-                      The Bad News:
-                    </span>
-                  </div>
-                  <p className='aucctus-text-secondary aucctus-text-sm leading-relaxed'>
-                    {selectedInsight.whyItMatters.badNews}
-                  </p>
-                </div>
-              </>
-            )}
-          </div>
+            </>
+          )}
 
           {/* Section 3: Other Relevant Insights - To be implemented later */}
           {/* 

@@ -8,7 +8,11 @@ import telemetry from '@libs/telemetry';
 import { useState, useEffect } from 'react';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { isGenerationInProgress } from '@libs/api/ideaPlayground';
-import type { IResearchInsight, IPossibleAnswer } from '@libs/api/types';
+import type {
+  IResearchInsight,
+  IPossibleAnswer,
+  IConceptGenerationResponse,
+} from '@libs/api/types';
 
 /**
  * Custom hook for fetching anchor thoughts.
@@ -879,6 +883,7 @@ export const useGetGeneratedIdeas = (seedUuid?: string) => {
  * Custom hook for deleting a generated concept from the cached concepts.
  * Removes a single concept from the seed's generated concepts list.
  * Returns a mutation function for deleting concepts.
+ * Uses optimistic update to immediately remove the concept from the UI on success.
  */
 export const useDeleteGeneratedConcept = (seedUuid: string) => {
   const queryClient = useQueryClient();
@@ -901,11 +906,24 @@ export const useDeleteGeneratedConcept = (seedUuid: string) => {
         seedUuid,
         conceptUuid,
       });
-      // Invalidate the GET query to refresh the concepts list
-      queryClient.invalidateQueries([
+
+      // Optimistically remove the concept from the cache immediately
+      const currentData = queryClient.getQueryData<IConceptGenerationResponse>([
         AucctusQueryKeys.ideaPlaygroundGeneratedIdeas,
         seedUuid,
       ]);
+
+      if (currentData && !('status' in currentData)) {
+        queryClient.setQueryData<IConceptGenerationResponse>(
+          [AucctusQueryKeys.ideaPlaygroundGeneratedIdeas, seedUuid],
+          {
+            ...currentData,
+            concepts: currentData.concepts.filter(
+              (c) => c.uuid !== conceptUuid,
+            ),
+          },
+        );
+      }
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);

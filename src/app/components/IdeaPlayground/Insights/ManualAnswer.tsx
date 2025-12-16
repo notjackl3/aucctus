@@ -154,7 +154,7 @@ const ManualAnswer: React.FC<ManualAnswerProps> = ({
   return (
     <animated.div
       style={fadeOutAnimation}
-      className='aucctus-text-white relative min-w-[350px] max-w-[350px] select-none rounded-xl border border-white/30 bg-white/10 p-3 shadow-lg backdrop-blur-md transition-all duration-200 hover:bg-white/15'
+      className='aucctus-text-white relative min-w-[275px] max-w-[275px] select-none rounded-xl border border-white/30 bg-white/10 p-3 shadow-lg backdrop-blur-md transition-all duration-200 hover:bg-white/15'
     >
       {onDelete && !isSubmitting && !isDeletingRequest && !isDeleting && (
         <button

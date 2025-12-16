@@ -186,6 +186,8 @@ export interface IGeneratedIdeaPlaygroundConcept {
   title: string;
   description: string;
   conceptType: ConceptType;
+  /** Icon that best represents the concept - assigned by AI based on concept's domain/mechanism */
+  icon?: IconVariant | null;
   rationale: string;
   initialGutCheck?: string;
   problemItSolves: string;

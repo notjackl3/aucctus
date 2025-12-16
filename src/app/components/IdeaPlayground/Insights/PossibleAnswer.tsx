@@ -78,7 +78,7 @@ const PossibleAnswer: React.FC<PossibleAnswerProps> = ({
   };
   return (
     <div
-      className={`aucctus-text-white relative min-w-[350px] max-w-[350px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
+      className={`aucctus-text-white relative min-w-[275px] max-w-[275px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
         isLoading
           ? 'scale-95 border-white/30 bg-white/10 opacity-80 hover:z-50'
           : optimisticSelected

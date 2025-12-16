@@ -303,7 +303,7 @@ const PlaygroundLoadingTransition: React.FC<
       </div>
 
       {/* Logo and progress bar */}
-      <div className='relative z-20 flex flex-col items-center'>
+      <div className='relative z-20 flex -translate-y-7 flex-col items-center'>
         <div className='absolute left-1/2 top-14 h-32 w-32 -translate-x-1/2 -translate-y-1/2 animate-[glowPulse_3s_ease-in-out_infinite] rounded-full bg-white/20 blur-2xl' />
         <div className='relative flex h-28 w-28 animate-[logoPulse_2s_ease-in-out_infinite] items-center justify-center'>
           <LogoAnimation size={112} loop fps={75} />
