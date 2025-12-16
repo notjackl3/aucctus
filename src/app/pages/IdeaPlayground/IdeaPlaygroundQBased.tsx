@@ -374,7 +374,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
         className='absolute -inset-4 bg-cover bg-center bg-no-repeat'
         style={{
           backgroundImage: `url('/images/darker-background.png')`,
-          filter: 'contract(1.3) blur(4px)',
+          filter: 'blur(4px) contrast(1.3)',
           animation: 'moveBackground 30s ease infinite',
           transform: 'scale(1.05)',
         }}
