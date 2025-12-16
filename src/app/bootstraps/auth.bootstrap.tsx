@@ -5,11 +5,14 @@ import api from '../../libs/api';
 import LoadingScreen from '../pages/LoadingScreen';
 import { useAuth, useUser as useClerkUser } from '@clerk/clerk-react';
 import telemetry from '@libs/telemetry';
+import { identifyHotjarUser, clearHotjarIdentity } from '@libs/hotjar';
 
 const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const { setInitialized } = useStore((state) => state.auth);
+  const user = useStore((state) => state.auth.user);
+  const account = useStore((state) => state.auth.account);
   const { refetch: checkAuthentication, isLoading: isUserDataLoading } =
     useUser();
 
@@ -53,7 +56,8 @@ const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
           });
         }
       } else if (!isSignedIn) {
-        // User is not signed in, disconnect WebSocket and reset user data state
+        // User is not signed in, clear Hotjar identity, disconnect WebSocket and reset user data state
+        clearHotjarIdentity();
         api.aucctusSocket.disconnect();
         setUserDataFetched(false);
       }
@@ -66,6 +70,20 @@ const AuthBootstrap: React.FC<{ children: React.ReactNode }> = ({
     checkAuthentication,
     userDataFetched,
   ]);
+
+  // Identify user to Hotjar after successful authentication and user data fetch
+  React.useEffect(() => {
+    if (userDataFetched && user) {
+      identifyHotjarUser(user.uuid, {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        company: account?.name,
+        role: user.role,
+        accountId: account?.uuid,
+      });
+    }
+  }, [userDataFetched, user, account]);
 
   // Show loading until Clerk is loaded, token setup is complete, and user data is fetched (if signed in)
   if (!isLoaded || !clerkTokenSetupComplete) {

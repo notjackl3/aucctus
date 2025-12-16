@@ -42,3 +42,22 @@ declare const __ENVIRONMENT__: 'development' | 'staging' | 'production';
 declare const FEATURE_CUSTOMER_PROFILE_CHAT: boolean;
 declare const FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS: boolean;
 declare const FEATURE_CONCEPT_VERSIONING: boolean;
+
+// Hotjar User Identification
+interface HotjarUserAttributes {
+  email?: string;
+  firstName?: string;
+  lastName?: string;
+  company?: string;
+  role?: string;
+  accountId?: string;
+  [key: string]: string | number | boolean | undefined;
+}
+
+interface Window {
+  hj?: (
+    method: 'identify',
+    userId: string | null,
+    attributes?: HotjarUserAttributes,
+  ) => void;
+}
