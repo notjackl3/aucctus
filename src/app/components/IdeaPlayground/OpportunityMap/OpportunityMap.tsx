@@ -95,6 +95,13 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     null,
   );
 
+  // Track new concepts (from Generate More or Regenerate)
+  const [newConceptUuids, setNewConceptUuids] = useState<Set<string>>(
+    new Set(),
+  );
+  // Track concept UUIDs before generation to determine which are new
+  const conceptsBeforeGenerationRef = useRef<Set<string>>(new Set());
+
   const { data: anchorThoughts } = useAnchorThought(seedUuid || undefined);
   // Local state
   const [isClosing, setIsClosing] = useState(false);
@@ -117,9 +124,10 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   const wasGeneratingMoreRef = useRef(false);
 
   // Determine if we should show the loading overlay on concepts grid
+  // Only show for regenerate (full regeneration), NOT for generating more
   const showConceptsLoadingOverlay = useMemo(
-    () => generatingMore || isRegenerateLoading || isRegenerating,
-    [generatingMore, isRegenerateLoading, isRegenerating],
+    () => isRegenerateLoading || isRegenerating,
+    [isRegenerateLoading, isRegenerating],
   );
 
   // Rotate messages every 3 seconds when loading overlay is visible
@@ -213,7 +221,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     uniqueValueProposition?: string;
     reasonsToBelieve?: string[];
     reasonsToChallenge?: string[];
-    keyThingsToValidate?: string[];
+    alignment?: string[];
   } | null>(null);
 
   // Handle initial mount - show loading until we have concepts or confirm we're generating
@@ -262,7 +270,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         uniqueValueProposition: firstConcept.uniqueValueProposition,
         reasonsToBelieve: firstConcept.reasonsToBelieve,
         reasonsToChallenge: firstConcept.reasonsToChallenge,
-        keyThingsToValidate: firstConcept.keyThingsToValidate,
+        alignment: firstConcept.alignment,
       });
     }
   }, [isGeneratingConcepts, isInitialMount, isRegenerating, concepts]);
@@ -276,6 +284,11 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       // Clear any selected concepts before regenerating
       clearSelectedConcepts();
       setSelectedIdeaDetail(null);
+      // Clear new concept tracking and track current concepts
+      conceptsBeforeGenerationRef.current = new Set(
+        concepts.map((c) => c.uuid),
+      );
+      setNewConceptUuids(new Set());
       setIsRegenerating(true);
       regenerateWithFeedback(feedback, {
         onError: () => {
@@ -287,7 +300,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         feedbackLength: feedback.length,
       });
     },
-    [regenerateWithFeedback, seedUuid, clearSelectedConcepts],
+    [regenerateWithFeedback, seedUuid, clearSelectedConcepts, concepts],
   );
 
   const handleClose = useCallback(() => {
@@ -305,12 +318,14 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     // Clear any selected concepts before generating more
     clearSelectedConcepts();
     setSelectedIdeaDetail(null);
+    // Track current concepts before generating more
+    conceptsBeforeGenerationRef.current = new Set(concepts.map((c) => c.uuid));
     // Set local state immediately to prevent flickering
     setLocalGeneratingMore(true);
     // Reset the backend confirmation tracker
     backendConfirmedGeneratingRef.current = false;
     generateMore();
-  }, [generateMore, clearSelectedConcepts]);
+  }, [generateMore, clearSelectedConcepts, concepts]);
 
   // Track when backend confirms generation has started, then clear local state when it ends
   useEffect(() => {
@@ -377,6 +392,20 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       }
     },
   );
+
+  // Track new concepts when concepts array changes after generation
+  useEffect(() => {
+    if (conceptsBeforeGenerationRef.current.size > 0 && concepts.length > 0) {
+      const newUuids = concepts
+        .filter((c) => !conceptsBeforeGenerationRef.current.has(c.uuid))
+        .map((c) => c.uuid);
+      if (newUuids.length > 0) {
+        setNewConceptUuids((prev) => new Set([...prev, ...newUuids]));
+        // Clear the reference after processing
+        conceptsBeforeGenerationRef.current = new Set();
+      }
+    }
+  }, [concepts]);
 
   // Polling fallback - refetch every 60 seconds while generating
   useEffect(() => {
@@ -455,7 +484,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       uniqueValueProposition: concept.uniqueValueProposition,
       reasonsToBelieve: concept.reasonsToBelieve,
       reasonsToChallenge: concept.reasonsToChallenge,
-      keyThingsToValidate: concept.keyThingsToValidate,
+      alignment: concept.alignment,
     });
   };
 
@@ -624,8 +653,8 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         reasonsToChallenge: selectedIdeaDetail.reasonsToChallenge || [
           'Risk assessment pending',
         ],
-        alignment: selectedIdeaDetail.keyThingsToValidate || [
-          'Validation criteria being determined',
+        alignment: selectedIdeaDetail.alignment || [
+          'Strategic alignment being determined',
         ],
       }
     : null;
@@ -725,6 +754,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
                     isSelected={selectedConceptUuids.includes(concept.uuid)}
                     isActive={selectedIdeaDetail?.title === concept.title}
                     isDeleting={deletingConceptUuid === concept.uuid}
+                    isNew={newConceptUuids.has(concept.uuid)}
                     onCardClick={() => handleCardClick(concept)}
                     onCardSelect={(e) => handleCircleClick(concept.uuid, e)}
                     onDelete={(e) =>

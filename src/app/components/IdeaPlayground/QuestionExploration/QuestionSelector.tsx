@@ -204,7 +204,7 @@ const QuestionSelector: React.FC<QuestionSelectorProps> = ({
           </button>
         )}
 
-        <span className='aucctus-text-xs opacity-50'>{index + 1}.</span>
+        <span className='aucctus-text-xs opacity-50'>{index + 1}</span>
         <span className='aucctus-text-xs-medium'>{question.label}</span>
       </button>
     </div>

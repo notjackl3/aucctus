@@ -184,7 +184,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
   return (
     <div
-      className={`aucctus-text-white relative min-w-[275px] max-w-[275px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
+      className={`aucctus-text-white relative min-w-[275px] max-w-[275px] cursor-pointer select-none rounded-lg border p-3 shadow-lg backdrop-blur-md ${
         isLoading
           ? 'scale-95 border-white/30 bg-white/10 opacity-80 hover:z-50'
           : optimisticSelected
@@ -248,14 +248,6 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
 
           {renderSourceLogo}
           <span className='text-[10px] font-normal'>{displayTitle}</span>
-          {card.url && !card.source?.includes('Nucleus') && (
-            <Icon
-              variant='link-external'
-              className='aucctus-stroke-white opacity-70'
-              height={10}
-              width={10}
-            />
-          )}
         </div>
       </div>
     </div>

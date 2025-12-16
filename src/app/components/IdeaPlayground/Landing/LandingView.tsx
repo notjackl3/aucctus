@@ -29,8 +29,9 @@ const SUPPORTED_EXTENSIONS = [
 
 interface LandingViewProps {
   inputValue: string;
-  onInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  onKeyPress: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+  onInputChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onSubmit?: () => void;
   onFileChange?: (file: File | null) => void;
   selectedFile?: File | null;
   style?: any;
@@ -39,11 +40,13 @@ interface LandingViewProps {
 const LandingView: React.FC<LandingViewProps> = ({
   inputValue,
   onInputChange,
-  onKeyPress,
+  onKeyDown,
+  onSubmit,
   onFileChange,
   selectedFile,
   style,
 }) => {
+  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragging, setIsDragging] = useState(false);
 
@@ -137,7 +140,7 @@ const LandingView: React.FC<LandingViewProps> = ({
           </div>
 
           <div
-            className='pointer-events-auto mx-auto w-full max-w-lg'
+            className='pointer-events-auto mx-auto w-full max-w-xl'
             style={getAnimationStyle('fadeIn', 800, 600)}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
@@ -148,12 +151,28 @@ const LandingView: React.FC<LandingViewProps> = ({
                 'rounded-3xl ring-2 ring-white/40': isDragging,
               })}
             >
-              <input
+              <textarea
+                ref={textareaRef}
                 value={inputValue}
                 onChange={onInputChange}
-                onKeyPress={onKeyPress}
+                onKeyDown={(e) => {
+                  // Enter submits (without shift), Shift+Enter creates newline
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    onSubmit?.();
+                  }
+                  onKeyDown?.(e);
+                }}
                 placeholder='Describe a problem, idea or focus area on your mind'
-                className='aucctus-text-md shadow-glass aucctus-text-white w-full rounded-3xl border border-white/20 bg-white/10 py-6 pl-8 pr-24 backdrop-blur-md transition-all duration-300 placeholder:text-white/60 focus:border-white/40 focus:bg-white/20'
+                rows={1}
+                className='aucctus-text-md shadow-glass aucctus-text-white w-full resize-none overflow-y-auto rounded-3xl border border-white/20 bg-white/10 py-6 pl-8 pr-24 backdrop-blur-md transition-all duration-300 [-ms-overflow-style:none] [scrollbar-width:none] placeholder:text-white/60 focus:border-white/40 focus:bg-white/20 [&::-webkit-scrollbar]:hidden'
+                style={{ maxHeight: '7.5rem' }} // ~3 lines
+                onInput={(e) => {
+                  const target = e.target as HTMLTextAreaElement;
+                  target.style.height = 'auto';
+                  target.style.height =
+                    Math.min(target.scrollHeight, 120) + 'px';
+                }}
               />
 
               {/* File upload button */}
@@ -161,7 +180,7 @@ const LandingView: React.FC<LandingViewProps> = ({
                 type='button'
                 onClick={handleUploadClick}
                 className={cn(
-                  'absolute right-14 top-1/2 -translate-y-1/2 transform rounded-lg p-1.5 transition-all duration-200',
+                  'absolute right-14 top-6 rounded-lg p-1.5 transition-all duration-200',
                   {
                     'opacity-60 hover:bg-white/10 hover:opacity-100':
                       !selectedFile,
@@ -180,12 +199,26 @@ const LandingView: React.FC<LandingViewProps> = ({
                 />
               </button>
 
-              <Icon
-                variant='lightbulb'
-                className='aucctus-stroke-white absolute right-6 top-1/2 -translate-y-1/2 transform opacity-60'
-                height={24}
-                width={24}
-              />
+              {/* Send button */}
+              <button
+                type='button'
+                onClick={onSubmit}
+                disabled={!inputValue.trim()}
+                className={cn(
+                  'absolute right-6 top-6 rounded-lg p-1.5 transition-all duration-200',
+                  {
+                    'cursor-not-allowed opacity-30': !inputValue.trim(),
+                    'opacity-60 hover:bg-white/10 hover:opacity-100':
+                      inputValue.trim(),
+                  },
+                )}
+                title='Submit'
+              >
+                <Icon
+                  variant='paper-airplane'
+                  className='aucctus-stroke-white h-5 w-5'
+                />
+              </button>
 
               {/* Hidden file input */}
               <input

@@ -386,17 +386,55 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     return false;
   }, [questions, currentQuestionIndex]);
 
-  const handleNext = () => {
+  const handleNext = useCallback(() => {
     discardUnsavedCustomQuestion();
     setCurrentQuestionIndex((currentQuestionIndex + 1) % questions.length);
-  };
+  }, [
+    discardUnsavedCustomQuestion,
+    currentQuestionIndex,
+    questions.length,
+    setCurrentQuestionIndex,
+  ]);
 
-  const handlePrevious = () => {
+  const handlePrevious = useCallback(() => {
     discardUnsavedCustomQuestion();
     setCurrentQuestionIndex(
       (currentQuestionIndex - 1 + questions.length) % questions.length,
     );
-  };
+  }, [
+    discardUnsavedCustomQuestion,
+    currentQuestionIndex,
+    questions.length,
+    setCurrentQuestionIndex,
+  ]);
+
+  // Keyboard navigation: Arrow keys to navigate questions
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if focused on an input/textarea
+      const activeElement = document.activeElement as HTMLElement;
+      const isInputFocused =
+        activeElement?.tagName === 'INPUT' ||
+        activeElement?.tagName === 'TEXTAREA';
+
+      // Allow arrow navigation from inputs with data-allow-arrow-navigation
+      const allowArrowNavigation =
+        activeElement?.dataset?.allowArrowNavigation === 'true';
+
+      if (isInputFocused && !allowArrowNavigation) return;
+
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        handleNext();
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        handlePrevious();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleNext, handlePrevious]);
 
   const handleQuestionSelect = useCallback(
     (index: number) => {

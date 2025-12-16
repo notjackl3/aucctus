@@ -194,7 +194,7 @@ export interface IGeneratedIdeaPlaygroundConcept {
   uniqueValueProposition: string;
   reasonsToBelieve: string[]; // 3-4 bullet points (each 5-10 words)
   reasonsToChallenge: string[]; // 3-4 bullet points (each 5-10 words)
-  keyThingsToValidate: string[]; // 3-4 bullet points (each 5-10 words)
+  alignment: string[]; // 2-4 bullet points showing strategic fit with company priorities
   momentumScore?: string; // "1-3" score representing idea momentum (Early/Emerging/High)
   createdAt: string;
 }

@@ -63,8 +63,8 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
     <div
       className={`relative z-20 select-none rounded-lg p-6 shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-[1.02] ${
         isAnswered
-          ? 'aucctus-bg-success-glass aucctus-border-success hover:aucctus-bg-success-glass-hover border-2'
-          : 'border-2 border-dashed border-white/30 bg-transparent hover:border-white/40 hover:bg-white/10'
+          ? 'aucctus-bg-success-glass aucctus-border-success hover:aucctus-bg-success-glass-hover border'
+          : 'border border-dashed border-white/30 bg-transparent hover:border-white/40 hover:bg-white/10'
       }`}
       style={getAnimationStyle('slideInFromRight', 400, 0)}
     >
@@ -162,6 +162,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                 placeholder='Type your answer or select a bubble...'
                 className='no-focus-ring w-full border-none bg-transparent text-left text-sm text-white/80 transition-all placeholder:text-white/30 focus:text-white focus:outline-none'
                 disabled={isSubmittingUserInput}
+                data-allow-arrow-navigation='true'
               />
               {isSubmittingUserInput && (
                 <p className='aucctus-text-xs mt-2 animate-pulse text-center text-white/70'>

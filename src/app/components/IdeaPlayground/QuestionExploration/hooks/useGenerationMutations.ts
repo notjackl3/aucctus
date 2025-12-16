@@ -1,8 +1,6 @@
 import { useMutation } from 'react-query';
 import { AxiosError } from 'axios';
-import { toast } from '@components';
 import api from '@libs/api';
-import utils from '@libs/utils';
 import telemetry from '@libs/telemetry';
 import { isGenerationInProgress } from '@libs/api/ideaPlayground';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
@@ -61,7 +59,6 @@ export const useGenerationMutations = ({
       // Remove loading state on error
       removeLoadingOperation(variables.questionUuid, 'insights');
 
-      const message = utils.osiris.parseFormError(error);
       telemetry.error('ideaPlayground.insights.generate.failed', error);
     },
   });
@@ -104,7 +101,6 @@ export const useGenerationMutations = ({
       // Remove loading state on error
       removeLoadingOperation(variables.questionUuid, 'possibleAnswer');
 
-      const message = utils.osiris.parseFormError(error);
       telemetry.error('ideaPlayground.possibleAnswer.generate.failed', error);
     },
   });

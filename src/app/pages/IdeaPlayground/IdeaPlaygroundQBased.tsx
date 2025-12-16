@@ -212,6 +212,9 @@ const IdeaPlaygroundQBased: React.FC = () => {
     setCurrentTopic(thought.thought);
     setInputValue(thought.thought);
 
+    // Start transition immediately (optimistic)
+    setHasStartedTyping(true);
+
     try {
       // Create seed with the selected anchor thought using hook (with optional file)
       const { seedUuid } = await createSeedAsync({
@@ -231,54 +234,64 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
       // Update URL with seed parameter
       setSearchParams({ seed: seedUuid });
-
-      setHasStartedTyping(true);
     } catch (error) {
-      // Error handling is done in the hook
+      // On error, return to main screen with toast
+      toast.error('Failed to start exploration. Please try again.');
+      setHasStartedTyping(false);
+      setCurrentTopic('');
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const value = e.target.value;
     setInputValue(value);
   };
 
-  const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && inputValue.trim()) {
-      const thoughtText = inputValue.trim();
-      setCurrentTopic(thoughtText);
+  const handleSubmit = async () => {
+    if (!inputValue.trim()) return;
 
-      try {
-        // Create seed with custom input using hook (with optional file)
-        const { seedUuid } = await createSeedAsync({
-          thoughtText,
-          file: selectedFile || undefined,
-        });
+    const thoughtText = inputValue.trim();
+    setCurrentTopic(thoughtText);
 
-        // Set seed UUID in local state (synchronized with URL)
-        setCurrentSeedUuid(seedUuid);
+    // Start transition immediately (optimistic)
+    setHasStartedTyping(true);
 
-        // Reset carousel to first question and clear file
-        ideaPlaygroundStore.reset();
-        setSelectedFile(null);
+    try {
+      // Create seed with custom input using hook (with optional file)
+      const { seedUuid } = await createSeedAsync({
+        thoughtText,
+        file: selectedFile || undefined,
+      });
 
-        // Mark this as a newly created seed (not a restoration)
-        setIsNewlyCreatedSeed(true);
+      // Set seed UUID in local state (synchronized with URL)
+      setCurrentSeedUuid(seedUuid);
 
-        // Update URL with seed parameter
-        setSearchParams({ seed: seedUuid });
+      // Reset carousel to first question and clear file
+      ideaPlaygroundStore.reset();
+      setSelectedFile(null);
 
-        telemetry.log('ideaPlayground.seed.created.custom', {
-          seedUuid,
-          thoughtLength: thoughtText.length,
-          hasFile: !!selectedFile,
-        });
+      // Mark this as a newly created seed (not a restoration)
+      setIsNewlyCreatedSeed(true);
 
-        setHasStartedTyping(true);
-      } catch (error) {
-        // Error handling is done in the hook
-      }
+      // Update URL with seed parameter
+      setSearchParams({ seed: seedUuid });
+
+      telemetry.log('ideaPlayground.seed.created.custom', {
+        seedUuid,
+        thoughtLength: thoughtText.length,
+        hasFile: !!selectedFile,
+      });
+    } catch (error) {
+      // On error, return to main screen with toast
+      toast.error('Failed to start exploration. Please try again.');
+      setHasStartedTyping(false);
+      setCurrentTopic('');
     }
+  };
+
+  // Handler for textarea keydown (for any future key handling beyond Enter)
+  const handleKeyDown = () => {
+    // Additional key handling can go here if needed
   };
 
   const handleRestart = () => {
@@ -361,7 +374,7 @@ const IdeaPlaygroundQBased: React.FC = () => {
         className='absolute -inset-4 bg-cover bg-center bg-no-repeat'
         style={{
           backgroundImage: `url('/images/darker-background.png')`,
-          filter: 'blur(6px)',
+          filter: 'contract(1.3) blur(4px)',
           animation: 'moveBackground 30s ease infinite',
           transform: 'scale(1.05)',
         }}
@@ -403,7 +416,8 @@ const IdeaPlaygroundQBased: React.FC = () => {
               <LandingView
                 inputValue={inputValue}
                 onInputChange={handleInputChange}
-                onKeyPress={handleKeyPress}
+                onKeyDown={handleKeyDown}
+                onSubmit={handleSubmit}
                 onFileChange={setSelectedFile}
                 selectedFile={selectedFile}
                 style={style}

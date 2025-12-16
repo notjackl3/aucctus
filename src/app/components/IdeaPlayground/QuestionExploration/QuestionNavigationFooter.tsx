@@ -86,15 +86,15 @@ const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
           <div className='flex items-center justify-end'>
             <button
               onClick={handleButtonClick}
-              className='btn btn-primary btn-sm group whitespace-nowrap border border-white/30 bg-white/10 px-3 py-1.5 text-white backdrop-blur-md transition-all duration-300 hover:!border-white hover:!bg-white hover:!text-gray-900'
+              className='btn btn-primary group flex h-9 items-center whitespace-nowrap border border-white/30 bg-white/10 px-4 text-white backdrop-blur-md transition-all duration-300 hover:!border-white hover:!bg-white hover:!text-gray-900'
             >
               <Icon
                 variant={buttonIcon}
-                className='mr-1.5 stroke-white group-hover:stroke-gray-light-700'
-                height={14}
-                width={14}
+                className='mr-2 stroke-white group-hover:stroke-gray-light-700'
+                height={16}
+                width={16}
               />
-              {buttonText}
+              <span className='aucctus-text-sm-medium'>{buttonText}</span>
             </button>
           </div>
         </div>

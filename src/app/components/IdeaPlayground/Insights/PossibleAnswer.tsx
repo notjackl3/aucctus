@@ -24,7 +24,6 @@ const PossibleAnswer: React.FC<PossibleAnswerProps> = ({
   isSelected,
   seedUuid,
   questionUuid,
-  getSentimentColor,
   onSelectionChange,
 }) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -78,13 +77,12 @@ const PossibleAnswer: React.FC<PossibleAnswerProps> = ({
   };
   return (
     <div
-      className={`aucctus-text-white relative min-w-[275px] max-w-[275px] cursor-pointer select-none rounded-xl border p-3 shadow-lg backdrop-blur-md ${
+      className={`aucctus-text-white relative min-w-[275px] max-w-[275px] cursor-pointer select-none rounded-lg border p-3 shadow-lg backdrop-blur-md ${
         isLoading
           ? 'scale-95 border-white/30 bg-white/10 opacity-80 hover:z-50'
           : optimisticSelected
             ? 'scale-100 border-white/40 bg-white/20 opacity-100 ring-1 ring-white/30'
-            : getSentimentColor(card.sentiment, card.source) +
-              ' scale-100 opacity-100'
+            : 'scale-100 border-orange-400/40 bg-orange-300/20 opacity-100'
       }`}
       onClick={handleClick}
       style={{

@@ -107,27 +107,33 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
               {/* Section 1: What We Found */}
               <div className='mb-8 mt-2'>
                 <div className='aucctus-border-secondary aucctus-bg-secondary shadow-glass mb-4 rounded-lg border p-4 backdrop-blur-sm'>
-                  <div className='flex items-start gap-3'>
-                    {selectedInsight.source === 'Possible Answer' ? (
-                      <Icon
-                        variant='lightbulb'
-                        className='aucctus-stroke-warning-primary'
-                        height={20}
-                        width={20}
-                      />
-                    ) : (
-                      <Icon
-                        variant='search-md'
-                        className='aucctus-stroke-info-primary'
-                        height={20}
-                        width={20}
-                      />
-                    )}
-                    <div>
-                      <h4 className='aucctus-text-xl-semibold aucctus-text-primary mb-3 capitalize'>
-                        {selectedInsight.insight}
-                      </h4>
-                      <div className='mb-3 flex items-center gap-3'>
+                  <div>
+                    <h4 className='aucctus-text-xl-semibold aucctus-text-primary mb-3 capitalize'>
+                      {selectedInsight.insight}
+                    </h4>
+                    <div className='mb-3 flex items-center gap-3'>
+                      {selectedInsight.url ? (
+                        <button
+                          onClick={() =>
+                            window.open(
+                              selectedInsight.url,
+                              '_blank',
+                              'noopener,noreferrer',
+                            )
+                          }
+                          className='aucctus-bg-tertiary aucctus-border-tertiary inline-flex cursor-pointer items-center gap-1 rounded-full border px-2 py-1 transition-colors hover:bg-white/10'
+                          title={`Open ${selectedInsight.source}`}
+                        >
+                          <div
+                            className={`aucctus-text-xs flex h-4 w-4 items-center justify-center rounded-full ${getSourceColor(selectedInsight.source)} aucctus-text-white`}
+                          >
+                            {getSourceInitial(selectedInsight.source)}
+                          </div>
+                          <span className='aucctus-text-xs-medium aucctus-text-secondary max-w-[80px] truncate'>
+                            {selectedInsight.source.replace('.com', '')}
+                          </span>
+                        </button>
+                      ) : (
                         <div className='aucctus-bg-tertiary aucctus-border-tertiary inline-flex items-center gap-1 rounded-full border px-2 py-1'>
                           <div
                             className={`aucctus-text-xs flex h-4 w-4 items-center justify-center rounded-full ${getSourceColor(selectedInsight.source)} aucctus-text-white`}
@@ -138,12 +144,9 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
                             {selectedInsight.source.replace('.com', '')}
                           </span>
                         </div>
-                        <div className='flex items-center gap-1'>
-                          {getSentimentIcon(selectedInsight.sentiment)}
-                          <span className='aucctus-text-sm aucctus-text-secondary capitalize'>
-                            {selectedInsight.sentiment}
-                          </span>
-                        </div>
+                      )}
+                      <div className='flex items-center gap-1'>
+                        {getSentimentIcon(selectedInsight.sentiment)}
                       </div>
                     </div>
                   </div>

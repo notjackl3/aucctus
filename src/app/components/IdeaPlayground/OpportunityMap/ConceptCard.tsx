@@ -7,6 +7,7 @@ interface ConceptCardProps {
   isSelected: boolean;
   isActive: boolean;
   isDeleting?: boolean;
+  isNew?: boolean;
   onCardClick: () => void;
   onCardSelect: (e: React.MouseEvent) => void;
   onDelete: (e: React.MouseEvent) => void;
@@ -26,6 +27,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
   isSelected,
   isActive,
   isDeleting = false,
+  isNew = false,
   onCardClick,
   onCardSelect,
   onDelete,
@@ -62,6 +64,14 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
     >
       {/* Top-right action buttons */}
       <div className='absolute right-3 top-3 z-10 flex items-center gap-2'>
+        {/* NEW badge */}
+        {isNew && (
+          <span className='flex items-center gap-1 text-[10px] font-medium text-white'>
+            <span className='h-1.5 w-1.5 rounded-full bg-white'></span>
+            NEW
+          </span>
+        )}
+
         {/* Delete button - appears on hover */}
         <button
           className={`flex h-5 w-5 items-center justify-center rounded-full border-2 transition-all ${
