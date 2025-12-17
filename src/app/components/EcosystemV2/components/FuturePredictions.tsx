@@ -46,7 +46,11 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
                 cleaned = cleaned.replace(/^[""]/, '').replace(/[""]$/, '');
                 cleaned = cleaned.replace(/^['']/, '').replace(/['']$/, '');
                 cleaned = cleaned.replace(/^[`]/, '').replace(/[`]$/, '');
-                return <div key={index}>&ldquo;{cleaned}&rdquo;</div>;
+                return (
+                  <div key={`citation-${index}-${cleaned.substring(0, 20)}`}>
+                    &ldquo;{cleaned}&rdquo;
+                  </div>
+                );
               })}
             </div>
           )}
@@ -73,9 +77,9 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
         <div className='mt-1 flex flex-wrap items-center gap-2'>
           {sources.length <= maxVisibleSources ? (
             // Show all sources if <= maxVisibleSources
-            sources.map((source) => (
+            sources.map((source, index) => (
               <Badge.SourceInfo
-                key={source.uuid}
+                key={`${source.uuid || 'source'}-${index}`}
                 badgeSize='small'
                 badgeClassName='aucctus-text-primary whitespace-nowrap'
                 source={source}
@@ -91,9 +95,9 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
           ) : (
             // Show first (maxVisibleSources - 1) sources + MultiSourceBadge for the rest
             <>
-              {sources.slice(0, visibleCount).map((source) => (
+              {sources.slice(0, visibleCount).map((source, index) => (
                 <Badge.SourceInfo
-                  key={source.uuid}
+                  key={`${source.uuid || 'source'}-${index}`}
                   badgeSize='small'
                   badgeClassName='aucctus-text-primary whitespace-nowrap'
                   source={source}
@@ -119,7 +123,7 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
                   >
                     {sources.slice(visibleCount).map((source, index) => (
                       <div
-                        key={source.uuid}
+                        key={`${source.uuid || 'source'}-${index}`}
                         className={cn(
                           'flex cursor-pointer flex-col gap-2 p-3 transition-colors hover:bg-gray-50',
                           index < sources.slice(visibleCount).length - 1 &&

@@ -241,6 +241,9 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
     isLoadingGlobalTiming,
   ]);
 
+  // Calculate estimated seconds with proper loading state handling
+  // Only use fallback AFTER loading is complete and no timing data was found
+  // This prevents the time from switching multiple times as APIs load
   const estimatedSeconds =
     overrideEstimatedSeconds !== undefined
       ? overrideEstimatedSeconds
@@ -248,7 +251,7 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
         ? Math.round(conceptTimingData.estimatedSeconds)
         : globalTimingData?.estimatedSeconds
           ? Math.round(globalTimingData.estimatedSeconds)
-          : fallbackEstimatedSeconds !== undefined
+          : !isLoadingTiming && fallbackEstimatedSeconds !== undefined
             ? fallbackEstimatedSeconds
             : null;
 
@@ -260,9 +263,11 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
           ? 'concept-history'
           : globalTimingData?.estimatedSeconds
             ? 'global-history'
-            : fallbackEstimatedSeconds !== undefined
+            : !isLoadingTiming && fallbackEstimatedSeconds !== undefined
               ? 'fallback'
-              : 'none';
+              : isLoadingTiming
+                ? 'loading'
+                : 'none';
 
     if (estimateSourceRef.current !== source) {
       estimateSourceRef.current = source;
@@ -277,10 +282,13 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
               ? conceptTimingData?.estimatedSeconds
               : source === 'global-history'
                 ? globalTimingData?.estimatedSeconds
-                : fallbackEstimatedSeconds,
+                : source === 'fallback'
+                  ? fallbackEstimatedSeconds
+                  : null,
         conceptEstimateSeconds: conceptTimingData?.estimatedSeconds,
         globalEstimateSeconds: globalTimingData?.estimatedSeconds,
         fallbackSeconds: fallbackEstimatedSeconds,
+        isLoadingTiming,
       });
     }
   }, [
@@ -290,6 +298,7 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
     fallbackEstimatedSeconds,
     conceptTimingData?.estimatedSeconds,
     globalTimingData?.estimatedSeconds,
+    isLoadingTiming,
   ]);
 
   // Track if we have valid timing data from cache/history
@@ -598,7 +607,12 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
       </div>
 
       {/* Estimated time remaining and action buttons */}
-      <div className='flex items-center justify-between'>
+      <div
+        className={cn(
+          'flex items-center',
+          onCancel || onEmail ? 'justify-between' : 'justify-center',
+        )}
+      >
         {showTimeRemaining &&
           !isLoading &&
           (usingFallbackTiming

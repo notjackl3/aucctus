@@ -13,7 +13,7 @@ import type { Id } from 'react-toastify';
 import type { ProgressToastPayload } from '@components/Notification/toast';
 import {
   createStageMessage,
-  DEFAULT_CONCEPT_REPORT_ESTIMATE_SECONDS,
+  getFallbackEstimateForAgent,
   stageKeyFromMessage,
   CONCEPT_REPORT_STAGE_ORDER,
   type ConceptReportStageKey,
@@ -534,17 +534,59 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
   const resolveStageKey = (
     message: IConceptWorkflowMessage,
   ): ConceptReportStageKey | undefined => {
-    if (
-      message.eventType === 'section_started' &&
-      message.message?.toLowerCase().includes('workflow started')
-    ) {
-      return 'ecosystem';
-    }
+    // Normalize section status payload (camelCase primary, snake_case fallback)
+    const reportStatusBySection =
+      message.reportStatusBySection ||
+      (message as any).report_status_by_section;
 
     if (message.eventType === 'workflow_completed') {
       return 'overview';
     }
 
+    // Prefer explicit agent name mapping when available
+    if (message.agentName) {
+      const agentToStage: Record<string, ConceptReportStageKey> = {
+        MarketScanPipeline: 'marketScan',
+        MarketScanEcosystemPipeline: 'ecosystem',
+        TrendsPipeline: 'trends',
+        ConceptOverviewPipeline: 'overview',
+        CustomerProfilePipeline: 'customerProfiles',
+        FinancialProjectionPipeline: 'financialProjection',
+        TestGenerationPipeline: 'assumptions',
+      };
+
+      let mappedStage = agentToStage[message.agentName];
+
+      if (
+        ['MarketScanEcosystemPipeline', 'TrendsPipeline'].includes(
+          message.agentName,
+        ) &&
+        reportStatusBySection?.marketScan?.status === 'pending'
+      ) {
+        mappedStage = 'marketScan';
+      }
+
+      if (mappedStage) return mappedStage;
+    }
+
+    if (reportStatusBySection) {
+      const pendingStage = CONCEPT_REPORT_STAGE_ORDER.find(
+        (stage: (typeof CONCEPT_REPORT_STAGE_ORDER)[number]) =>
+          reportStatusBySection?.[stage.key]?.status === 'pending',
+      );
+      if (pendingStage) return pendingStage.key;
+
+      // Fallback: check for any active/error sections
+      const activeStage = CONCEPT_REPORT_STAGE_ORDER.find(
+        (stage: (typeof CONCEPT_REPORT_STAGE_ORDER)[number]) => {
+          const status = reportStatusBySection?.[stage.key]?.status;
+          return status === 'error' || status === 'pending';
+        },
+      );
+      if (activeStage) return activeStage.key;
+    }
+
+    // Fallback to message parsing if section status not available
     const derived = stageKeyFromMessage(message.message);
     if (derived) return derived;
 
@@ -563,11 +605,26 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     const toastKeys = getToastKeysFromMessage(message);
     if (toastKeys.length === 0) return;
 
-    const stageKey = resolveStageKey(message);
-    const stageMessage =
+    const completedCount =
+      (message as any).completedSectionsCount ??
+      message.completedSections?.length ??
+      0;
+    const aggregatePending =
+      message.aggregateStatus === 'pending' ||
+      message.aggregateStatus === 'notStarted';
+
+    let stageKey = resolveStageKey(message);
+    let stageMessage =
       createStageMessage(stageKey, message.eventType) ||
       message.message ||
       undefined;
+
+    // For the very first kickoff (no sections done yet), keep the toast generic
+    const isInitialKickoff = aggregatePending && completedCount === 0;
+    if (isInitialKickoff) {
+      stageKey = undefined;
+      stageMessage = 'Generating report';
+    }
 
     const existing = getToastRecordForKeys(toastKeys, true);
     const startTime = existing?.data.startTime ?? Date.now();
@@ -578,6 +635,17 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     const conceptIdentifier =
       message.conceptRootIdentifier || existing?.data.conceptIdentifier;
 
+    // DEBUG: Log the raw message to see what we're receiving
+    telemetry.debug('concept_workflow.toast.upsert.raw_message', {
+      messageConceptUuid: message.conceptUuid,
+      messageConceptTitle: message.conceptTitle,
+      messageConceptRootIdentifier: message.conceptRootIdentifier,
+      messageAgentName: message.agentName,
+      messageEventType: message.eventType,
+      existingConceptUuid: existing?.data.conceptUuid,
+      resolvedConceptUuid: conceptUuid,
+    });
+
     telemetry.debug('concept_workflow.toast.upsert', {
       toastKeys,
       stageKey,
@@ -587,18 +655,36 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       conceptIdentifier,
     });
 
+    // Use full-pipeline timing during the initial kickoff (no sections completed yet)
+    const useFullPipelineTiming = isInitialKickoff;
+
+    // Timing agent name (used by AgentProgressBar for estimates)
+    const messageAgentName =
+      message.agentName || (message as any).agentname || undefined;
+    const agentName = useFullPipelineTiming
+      ? 'ConceptReportPipeline'
+      : messageAgentName || 'ConceptReportPipeline';
+
+    const messageEstimatedTime =
+      (message as any).estimatedTime ??
+      (message as any).estimated_time ??
+      (message as any).estimatedSeconds ??
+      (message as any).estimated_seconds ??
+      undefined;
+
     const payload: ProgressToastPayload = {
-      title: message.message || 'Generating Concept Report',
+      title: stageMessage || message.message || 'Generating Concept Report',
       conceptTitle: conceptTitle,
-      agentName: 'ConceptReportPipeline',
+      agentName: agentName,
       conceptUuid: conceptUuid,
       conceptIdentifier: conceptIdentifier,
       message: stageMessage,
       startTime,
-      overrideEstimatedSeconds: existing?.data.overrideEstimatedSeconds,
+      overrideEstimatedSeconds:
+        messageEstimatedTime ?? existing?.data.overrideEstimatedSeconds,
       fallbackEstimatedSeconds:
         existing?.data.fallbackEstimatedSeconds ??
-        DEFAULT_CONCEPT_REPORT_ESTIMATE_SECONDS,
+        getFallbackEstimateForAgent(agentName), // Use section-specific fallback
     };
 
     if (!existing) {

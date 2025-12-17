@@ -463,6 +463,9 @@ export interface IConceptWorkflowMessage extends BaseSocketEvent {
   // Additional context
   message?: string;
   errorDetails?: any;
+
+  // Progress tracking
+  agentName?: string; // Agent name for section-specific timing estimates (e.g., 'CustomerProfilePipeline', 'MarketScanPipeline')
 }
 
 // ==========================================

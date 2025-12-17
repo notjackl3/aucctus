@@ -1,6 +1,7 @@
 import { ConceptReportStatusBySection } from '@libs/api/types';
 
 export const CONCEPT_REPORT_STAGE_ORDER = [
+  { key: 'marketScan', label: 'Market Scan' },
   { key: 'ecosystem', label: 'Ecosystem' },
   { key: 'trends', label: 'Trends' },
   { key: 'customerProfiles', label: 'Customer Profiles' },
@@ -25,7 +26,33 @@ export interface ConceptReportStage {
 
 export const DEFAULT_CONCEPT_REPORT_ESTIMATE_SECONDS = 20 * 60;
 
+// Section-specific fallback times (in seconds) when no timing history exists
+// These are reasonable estimates for each section type
+export const SECTION_FALLBACK_ESTIMATES: Record<string, number> = {
+  ConceptReportPipeline: 20 * 60, // 20 minutes - full report
+  ConceptOverviewPipeline: 2 * 60, // 2 minutes
+  MarketScanPipeline: 6 * 60, // 6 minutes - full market scan (ecosystem + trends combined)
+  MarketScanEcosystemPipeline: 4 * 60, // 4 minutes - ecosystem only
+  TrendsPipeline: 3 * 60, // 3 minutes - trends only
+  CustomerProfilePipeline: 4 * 60, // 4 minutes
+  FinancialProjectionPipeline: 5 * 60, // 5 minutes
+  TestGenerationPipeline: 3 * 60, // 3 minutes (matches testing_task.py agent name)
+};
+
+/**
+ * Get the fallback estimated seconds for a given agent name.
+ * Falls back to the full report estimate if agent is unknown.
+ */
+export const getFallbackEstimateForAgent = (agentName?: string): number => {
+  if (!agentName) return DEFAULT_CONCEPT_REPORT_ESTIMATE_SECONDS;
+  return (
+    SECTION_FALLBACK_ESTIMATES[agentName] ??
+    DEFAULT_CONCEPT_REPORT_ESTIMATE_SECONDS
+  );
+};
+
 const STAGE_KEYWORDS: Record<ConceptReportStageKey, string[]> = {
+  marketScan: ['market scan'],
   ecosystem: ['ecosystem'],
   trends: ['trend'],
   customerProfiles: ['customer profile', 'customers'],
