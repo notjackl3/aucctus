@@ -637,10 +637,17 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     if (!existing) return;
 
     const stageKey = resolveStageKey(message);
+
+    // On workflow error, immediately dismiss progress toast to avoid showing as progress
+    if (message.eventType === 'workflow_error') {
+      toast.dismiss(existing.toastId);
+      clearToastRecord(existing);
+      return;
+    }
+
     const payload: ProgressToastPayload = {
       ...existing.data,
-      progress:
-        message.eventType === 'workflow_error' ? existing.data.progress : 100,
+      progress: 100,
       message:
         createStageMessage(stageKey, message.eventType) ||
         message.message ||
