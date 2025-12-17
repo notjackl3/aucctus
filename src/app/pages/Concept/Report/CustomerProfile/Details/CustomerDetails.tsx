@@ -6,7 +6,13 @@ import { CustomerProfileConversationEvent } from '@libs/events/CustomerProfileCo
 import { cn } from '@libs/utils/react';
 import { ICustomerProfileConversation } from '@stores/customer_profile_conversations/store';
 import useStore from '@stores/store';
-import { FunctionComponent, useEffect, useRef, useState } from 'react';
+import {
+  FunctionComponent,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import CustomerConversation from './CustomerConversation';
 import CustomerJobs from './CustomerJobs';
 import CustomerOverview from './CustomerOverview';
@@ -36,6 +42,9 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
   const { description, isLoading } = useEditCustomerProfile(profile.uuid);
   const overviewRef = useRef<HTMLDivElement>(null);
   const conversationRef = useRef<HTMLDivElement>(null);
+  const jobsRef = useRef<HTMLDivElement>(null);
+  const painsRef = useRef<HTMLDivElement>(null);
+  const alternativesRef = useRef<HTMLDivElement>(null);
   const [conversations, setConversations] = useState<
     ICustomerProfileConversation[]
   >([]);
@@ -122,6 +131,81 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
     }
   }, [isLoading]);
 
+  // Synchronize the heights of Jobs, Pains, and Alternatives cards
+  // Uses a flag to prevent infinite resize loops
+  const syncCardsHeight = useCallback(() => {
+    const jobsElement = jobsRef.current;
+    const painsElement = painsRef.current;
+    const alternativesElement = alternativesRef.current;
+
+    if (!jobsElement || !painsElement || !alternativesElement) return;
+
+    // First, reset all heights to auto to get natural heights
+    jobsElement.style.minHeight = 'auto';
+    painsElement.style.minHeight = 'auto';
+    alternativesElement.style.minHeight = 'auto';
+
+    // Force a reflow to get accurate measurements
+    void jobsElement.offsetHeight;
+
+    // Get the natural heights of all three cards
+    const jobsHeight = jobsElement.offsetHeight;
+    const painsHeight = painsElement.offsetHeight;
+    const alternativesHeight = alternativesElement.offsetHeight;
+
+    // Find the maximum height
+    const maxHeight = Math.max(jobsHeight, painsHeight, alternativesHeight);
+
+    // Apply the max height to all cards
+    jobsElement.style.minHeight = `${maxHeight}px`;
+    painsElement.style.minHeight = `${maxHeight}px`;
+    alternativesElement.style.minHeight = `${maxHeight}px`;
+  }, []);
+
+  useEffect(() => {
+    const jobsElement = jobsRef.current;
+    const painsElement = painsRef.current;
+    const alternativesElement = alternativesRef.current;
+
+    if (!jobsElement || !painsElement || !alternativesElement || isLoading) {
+      return;
+    }
+
+    // Initial sync
+    // Use setTimeout to let the content render first
+    const timeoutId = setTimeout(syncCardsHeight, 100);
+
+    // Create a single ResizeObserver for all three cards
+    let isUpdating = false;
+    const resizeObserver = new ResizeObserver(() => {
+      // Prevent recursive updates
+      if (isUpdating) return;
+      isUpdating = true;
+
+      // Use requestAnimationFrame to batch updates
+      requestAnimationFrame(() => {
+        syncCardsHeight();
+        // Reset the flag after a short delay to allow for settling
+        setTimeout(() => {
+          isUpdating = false;
+        }, 50);
+      });
+    });
+
+    resizeObserver.observe(jobsElement);
+    resizeObserver.observe(painsElement);
+    resizeObserver.observe(alternativesElement);
+
+    // Also listen for window resize
+    window.addEventListener('resize', syncCardsHeight);
+
+    return () => {
+      clearTimeout(timeoutId);
+      resizeObserver.disconnect();
+      window.removeEventListener('resize', syncCardsHeight);
+    };
+  }, [isLoading, syncCardsHeight]);
+
   const shouldShowSkeleton = showSkeletons || isLoading;
 
   const renderSupportSkeletonCard = () => (
@@ -165,28 +249,38 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         {shouldShowSkeleton ? (
           <JobsToBeDoneSkeleton />
         ) : (
-          <CustomerJobs
-            customerProfileUuid={profile.uuid}
-            jobs={profile.jobs}
-            insight={profile.jobsToBeDoneInsight}
-          />
+          <div
+            ref={jobsRef}
+            className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
+          >
+            <CustomerJobs
+              customerProfileUuid={profile.uuid}
+              jobs={profile.jobs}
+            />
+          </div>
         )}
         {shouldShowSkeleton ? (
           renderSupportSkeletonCard()
         ) : (
-          <CustomerPains
-            customerProfileUuid={profile.uuid}
-            pains={profile.pains}
-            insight={profile.painsInsight}
-          />
+          <div
+            ref={painsRef}
+            className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
+          >
+            <CustomerPains
+              customerProfileUuid={profile.uuid}
+              pains={profile.pains}
+            />
+          </div>
         )}
         {shouldShowSkeleton ? (
           renderSupportSkeletonCard()
         ) : (
-          <CustomerAlternatives
-            customerProfileUuid={profile.uuid}
-            insight={profile.alternativesInsight}
-          />
+          <div
+            ref={alternativesRef}
+            className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
+          >
+            <CustomerAlternatives customerProfileUuid={profile.uuid} />
+          </div>
         )}
       </div>
 
@@ -198,7 +292,6 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
             customerProfileUuid={profile.uuid}
             journey={profile.journey}
             productName='High Fibre Cheese Bites'
-            insight={profile.journeyInsight}
           />
         )}
       </div>

@@ -3,7 +3,6 @@ import { Icon, toast } from '@components';
 import { IUserJourneyStep } from '@libs/api/types';
 import SectionHeader from './components/SectionHeader';
 import JourneyCarousel from './components/JourneyCarousel';
-import AiInsight from './components/AiInsight';
 import {
   useCustomerJourneyStepsList,
   useCustomerJourneyStepCreate,
@@ -16,8 +15,6 @@ import Modal from '@components/Modal';
 
 // Constants for styling
 const ICON_STROKE = 'aucctus-stroke-brand-primary';
-const AI_INSIGHT_TEXT_COLOR = 'aucctus-text-brand-primary';
-const AI_INSIGHT_ICON_STROKE = 'aucctus-stroke-brand-primary';
 const JOB_LABEL = 'Job to be Done';
 const PAIN_LABEL = 'Pain Point';
 const INTERVENTION_LABEL = 'Moment of Intervention';
@@ -42,14 +39,12 @@ interface UserJourneyFlowProps {
   customerProfileUuid: string;
   journey?: IUserJourneyStep[];
   productName?: string;
-  insight?: string;
 }
 
 const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
   customerProfileUuid,
   journey: initialJourney,
   productName = 'High Fibre Portable Cheese Bites',
-  insight,
 }) => {
   const { openModal, closeModal } = useModal();
 
@@ -78,15 +73,6 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
     if (isLoading) return [];
     return journeyStepsData || initialJourney || [];
   }, [journeyStepsData, isLoading, initialJourney]);
-
-  // Find the intervention step
-  const interventionStep = React.useMemo(
-    () =>
-      steps.find(
-        (step) => step.relationType === RELATION_TYPE.MOMENT_OF_INTERVENTION,
-      ),
-    [steps],
-  );
 
   // Add step function
   const handleAddStep = React.useCallback(
@@ -289,23 +275,6 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
               interventionLabel={INTERVENTION_LABEL}
               relationTypes={RELATION_TYPE}
             />
-
-            {(interventionStep || insight) && (
-              <AiInsight
-                topJob={{
-                  uuid:
-                    interventionStep?.uuid || `intervention-step-${Date.now()}`,
-                  description: interventionStep
-                    ? `${interventionStep.title} - ${interventionStep.description}`
-                    : '',
-                  order: 10,
-                  icon: 'briefcase',
-                }}
-                textColorClass={AI_INSIGHT_TEXT_COLOR}
-                iconStrokeClass={AI_INSIGHT_ICON_STROKE}
-                customInsight={insight}
-              />
-            )}
           </>
         )}
       </div>

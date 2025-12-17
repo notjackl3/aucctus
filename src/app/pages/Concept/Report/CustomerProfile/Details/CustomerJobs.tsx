@@ -9,7 +9,6 @@ import {
   useCustomerJobDelete,
 } from '@hooks/query/concepts.hook';
 import PriorityIndicator from './components/PriorityIndicator';
-import AiInsight from './components/AiInsight';
 import SectionHeader from './components/SectionHeader';
 
 export interface Job {
@@ -20,7 +19,6 @@ export interface Job {
 interface JobsToBeDoneProps {
   customerProfileUuid: string;
   jobs?: ICustomerJob[];
-  insight?: string;
 }
 
 const PRIORITY_COLOR_TEXT = 'text-orangeDark-900';
@@ -29,13 +27,9 @@ const PRIORITY_COLOR_LINE = 'bg-orangeDark-700';
 const PRIORITY_COLOR_ICON = 'stroke-orangeDark-900';
 const PRIORITY_COLOR_ICON_BG = 'bg-orangeDark-100';
 
-const AI_INSIGHT_TEXT_COLOR = 'text-orangeDark-900';
-const AI_INSIGHT_ICON_STROKE = 'stroke-orangeDark-900';
-
 const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
   customerProfileUuid,
   jobs: initialJobs,
-  insight,
 }) => {
   const [isAdding, setIsAdding] = useState(false);
 
@@ -55,7 +49,6 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
     () => [...jobs].sort((a, b) => (a.order || 0) - (b.order || 0)),
     [jobs],
   );
-  const topJob = sortedJobs[0];
   const items: ICustomerListItemWithUuid[] = useMemo(
     () =>
       sortedJobs.map((job) => ({
@@ -111,7 +104,7 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
   const handleAddComplete = React.useCallback(() => setIsAdding(false), []);
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary h-fit flex-1 overflow-hidden rounded-lg border shadow-sm'>
+    <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-lg border shadow-sm'>
       <SectionHeader
         icon='briefcase'
         iconClass={PRIORITY_COLOR_ICON}
@@ -160,18 +153,6 @@ const JobsToBeDone: React.FC<JobsToBeDoneProps> = ({
             />
           </div>
         </div>
-
-        {/* AI Insight */}
-        {(topJob || insight) && (
-          <div className='mt-auto pt-2'>
-            <AiInsight
-              topJob={topJob}
-              textColorClass={AI_INSIGHT_TEXT_COLOR}
-              iconStrokeClass={AI_INSIGHT_ICON_STROKE}
-              customInsight={insight}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

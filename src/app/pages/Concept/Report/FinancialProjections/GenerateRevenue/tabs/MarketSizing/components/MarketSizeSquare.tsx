@@ -67,7 +67,8 @@ const MarketSizeSquare: React.FC<MarketSizeSquareProps> = ({
       </div>
       {percentage !== undefined && parentType && (
         <div className={cn('aucctus-text-xs mt-0.5', config.subtextColor)}>
-          {percentage.toFixed(1)}% of {parentType}
+          {percentage < 1 && percentage > 0 ? '<1' : percentage.toFixed(1)}% of{' '}
+          {parentType}
         </div>
       )}
       {filterTransition((style, show) =>

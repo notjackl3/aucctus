@@ -2,18 +2,15 @@ import React from 'react';
 import Badges from '@components/Badges';
 import { Icon, Container } from '@components';
 import SectionHeader from './components/SectionHeader';
-import AiInsight from './components/AiInsight';
 import type { ICustomerAlternative } from '@libs/api/types';
 import { useCustomerAlternativesList } from '@hooks/query/concepts.hook';
 
 /**
  * Props for CustomerAlternatives component.
  * @param customerProfileUuid Customer profile UUID
- * @param insight Optional AI-generated insight about alternatives
  */
 export interface CustomerAlternativesProps {
   customerProfileUuid: string;
-  insight?: string;
 }
 
 const MAIN_ICON_STROKE = 'aucctus-stroke-brand-primary';
@@ -22,7 +19,6 @@ const CLOSE_ICON_STROKE = 'aucctus-stroke-error-primary';
 
 const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
   customerProfileUuid,
-  insight,
 }) => {
   const { data: alternatives = [] } =
     useCustomerAlternativesList(customerProfileUuid);
@@ -36,15 +32,13 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
     );
   };
 
-  const topAlt = alternatives[0];
-
   // Return null if there are no alternatives
   if (!alternatives.length) {
     return null;
   }
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary h-fit flex-1 overflow-hidden rounded-lg border shadow-sm'>
+    <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-lg border shadow-sm'>
       <SectionHeader
         icon={'clipboard' as any}
         iconClass={MAIN_ICON_STROKE}
@@ -181,23 +175,6 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
             )}
           </div>
         </div>
-        {(topAlt || insight) && (
-          <div className='mt-auto pt-2'>
-            <AiInsight
-              topJob={{
-                uuid:
-                  topAlt?.uuid ||
-                  `alt-${topAlt?.name?.replace(/\s+/g, '-').toLowerCase() || 'default'}`,
-                description: topAlt?.name || '',
-                order: 10,
-                icon: 'clipboard',
-              }}
-              textColorClass='aucctus-text-brand-primary'
-              iconStrokeClass='aucctus-stroke-brand-primary'
-              customInsight={insight}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

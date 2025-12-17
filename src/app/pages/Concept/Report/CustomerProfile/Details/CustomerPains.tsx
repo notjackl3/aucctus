@@ -9,7 +9,6 @@ import {
   useCustomerPainDelete,
 } from '@hooks/query/concepts.hook';
 import telemetry from '@libs/telemetry';
-import AiInsight from './components/AiInsight';
 import PriorityIndicator from './components/PriorityIndicator';
 import SectionHeader from './components/SectionHeader';
 
@@ -21,7 +20,6 @@ export interface Pain {
 interface PainPointsProps {
   customerProfileUuid: string;
   pains?: ICustomerPain[];
-  insight?: string;
 }
 
 const PRIORITY_COLOR_TEXT = 'text-orangeDark-600';
@@ -30,13 +28,9 @@ const PRIORITY_COLOR_LINE = 'bg-orangeDark-700';
 const PRIORITY_COLOR_ICON = 'stroke-orangeDark-600';
 const PRIORITY_COLOR_ICON_BG = 'bg-orangeDark-100';
 
-const AI_INSIGHT_TEXT_COLOR = 'text-orangeDark-600';
-const AI_INSIGHT_ICON_STROKE = 'stroke-orangeDark-600';
-
 const PainPoints: React.FC<PainPointsProps> = ({
   customerProfileUuid,
   pains: initialPains,
-  insight,
 }) => {
   const [isAdding, setIsAdding] = useState(false);
 
@@ -57,7 +51,6 @@ const PainPoints: React.FC<PainPointsProps> = ({
     () => [...pains].sort((a, b) => (a.order || 0) - (b.order || 0)),
     [pains],
   );
-  const topPain = sortedPains[0];
   const items: ICustomerListItemWithUuid[] = useMemo(
     () =>
       sortedPains.map((pain) => ({
@@ -113,7 +106,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
   const handleAddComplete = React.useCallback(() => setIsAdding(false), []);
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary h-fit flex-1 overflow-hidden rounded-lg border shadow-sm'>
+    <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-lg border shadow-sm'>
       <SectionHeader
         icon='alert-circle'
         iconClass={PRIORITY_COLOR_ICON}
@@ -162,18 +155,6 @@ const PainPoints: React.FC<PainPointsProps> = ({
             />
           </div>
         </div>
-
-        {/* AI Insight */}
-        {(topPain || insight) && (
-          <div className='mt-auto pt-2'>
-            <AiInsight
-              topJob={topPain}
-              textColorClass={AI_INSIGHT_TEXT_COLOR}
-              iconStrokeClass={AI_INSIGHT_ICON_STROKE}
-              customInsight={insight}
-            />
-          </div>
-        )}
       </div>
     </div>
   );

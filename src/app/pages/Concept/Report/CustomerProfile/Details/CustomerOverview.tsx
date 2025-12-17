@@ -3,7 +3,6 @@ import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { forwardRef, useCallback } from 'react';
-import AiInsight from './components/AiInsight';
 
 // Icon stroke constant for consistency
 const MAIN_ICON_STROKE = 'aucctus-stroke-brand-primary';
@@ -30,9 +29,6 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
     // Cast to extended profile for the demo
     const extendedProfile = profile as ExtendedCustomerProfile;
 
-    // Mock top job for AiInsight (can be empty since we use customInsight)
-    const mockTopJob = { uuid: '', description: '', order: 0 };
-
     const formatIncome = useCallback((income: number) => {
       if (income < 1000) {
         // If income is a small number like 80 or 85, assume it's already in thousands
@@ -51,7 +47,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
           className,
         )}
       >
-        <div className='flex flex-col px-6 py-2 pt-4'>
+        <div className='flex flex-col px-6 pb-4 pt-4'>
           {/* Header with avatar, segment and name */}
           <div className='mb-6 flex items-start gap-4'>
             <img
@@ -87,7 +83,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
           <div className='mt-2'>
             <div className='flex-1'>
               {/* Overview section */}
-              <div className='mb-6'>
+              <div className='mb-6 pb-4'>
                 <h3 className='aucctus-text-secondary aucctus-text-md-medium mb-2 uppercase tracking-wider'>
                   OVERVIEW
                 </h3>
@@ -207,16 +203,6 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                     </div>
                   </div>
                 </div>
-
-                {/* Customer Insight */}
-                {profile?.customerInsight && (
-                  <AiInsight
-                    topJob={mockTopJob}
-                    textColorClass='aucctus-text-brand-primary'
-                    iconStrokeClass='aucctus-stroke-brand-primary'
-                    customInsight={profile.customerInsight}
-                  />
-                )}
               </div>
             </div>
           </div>

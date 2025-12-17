@@ -2,11 +2,10 @@ import React, { useMemo, useCallback, useState } from 'react';
 import { Badge, Icon, Modal } from '@components';
 import { ICustomerProfileRealWorldSignal } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import { SignalSource } from './SignalSource';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { useCustomerProfileRealWorldSignalDelete } from '@hooks/query/concepts.hook';
 import { useModal } from '@context/ModalContextProvider';
-import { SignalStanceType, SignalSourceCategoryType } from '@libs/api/types';
+import { SignalStanceType } from '@libs/api/types';
 // Consolidated style mappings by stance
 const stanceStyleMap: Record<
   SignalStanceType,
@@ -33,17 +32,6 @@ const stanceStyleMap: Record<
   },
 };
 
-// Map source categories to appropriate icon variants
-const iconSourceCategoryMap: Record<SignalSourceCategoryType, IconVariant> = {
-  'First-Party Research': 'building-02',
-  'Online Article': 'link-01',
-  'Government Report': 'bank',
-  'Academic Study': 'book-open',
-  'Social Media': 'users-03',
-  'User Forum': 'message-circle',
-  Other: 'link-external',
-};
-
 interface RealWorldSignalCardProps {
   profileUuid: string;
   signal: ICustomerProfileRealWorldSignal;
@@ -67,13 +55,6 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
     [signal.stance],
   );
   const isLoading = useMemo(() => isDeleting, [isDeleting]);
-  const iconVariant = useMemo(
-    () =>
-      iconSourceCategoryMap[
-        signal.sourceCategory as SignalSourceCategoryType
-      ] || 'link-external',
-    [signal.sourceCategory],
-  );
 
   // Event handlers
   const handleMouseEnter = useCallback(() => setIsHovering(true), []);
@@ -154,19 +135,28 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
         />
       </div>
 
-      {/* Source category */}
-      <div className='flex flex-row items-center gap-2'>
-        <Icon
-          variant={iconVariant}
-          className='aucctus-stroke-secondary h-4 w-4'
+      {/* Source badge with logo and link */}
+      {primarySource && (
+        <Badge.SourceInfo
+          source={primarySource}
+          badgeSize='small'
+          badgeClassName='aucctus-text-primary'
+          onClick={() => window.open(primarySource.url, '_blank')}
+          showPublishedDate={false}
+          sourceDescription={
+            <div className='space-y-2'>
+              <div className='aucctus-text-xs aucctus-text-secondary'>
+                {signal.sourceCategory}
+              </div>
+              {primarySource.description && (
+                <div className='aucctus-text-xs aucctus-text-secondary'>
+                  {primarySource.description}
+                </div>
+              )}
+            </div>
+          }
         />
-        <span className='aucctus-text-secondary aucctus-text-sm'>
-          {signal.sourceCategory}
-        </span>
-      </div>
-
-      {/* Primary source details */}
-      {primarySource && <SignalSource source={primarySource} />}
+      )}
 
       {/* Action buttons */}
       <div

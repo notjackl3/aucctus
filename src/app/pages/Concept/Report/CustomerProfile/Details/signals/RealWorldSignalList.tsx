@@ -3,10 +3,9 @@ import { useCustomerProfileRealWorldSignals } from '@hooks/query/concepts.hook';
 import React, { useMemo } from 'react';
 import GroupedSignals from './GroupedSignals';
 import SignalHeader from './SignalHeader';
-import AiInsight from '../components/AiInsight';
 
 const containerClassName =
-  'flex flex-1 flex-col gap-2 rounded-lg border aucctus-border-primary aucctus-bg-primary px-4 pt-6 pb-2';
+  'flex flex-1 flex-col gap-2 rounded-lg border aucctus-border-primary aucctus-bg-primary px-4 pt-6 pb-4';
 
 interface IRealWorldSignalListProps {
   profileUuid: string;
@@ -25,7 +24,6 @@ const RealWorldSignalList: React.FC<IRealWorldSignalListProps> = ({
     () => signalsResponse?.signals || [],
     [signalsResponse],
   );
-  const summary = useMemo(() => signalsResponse?.summary, [signalsResponse]);
   const isAgentResearching = useMemo(
     () => ['Pending', 'Not Started'].includes(signalsResponse?.status || ''),
     [signalsResponse],
@@ -65,13 +63,6 @@ const RealWorldSignalList: React.FC<IRealWorldSignalListProps> = ({
       {signals.length > 0 && (
         <>
           <GroupedSignals profileUuid={profileUuid} signals={signals} />
-          {summary && (
-            <AiInsight
-              textColorClass='aucctus-text-brand-primary'
-              iconStrokeClass='aucctus-stroke-brand-primary'
-              customInsight={summary}
-            />
-          )}
         </>
       )}
 
