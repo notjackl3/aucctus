@@ -5,7 +5,10 @@ import type {
   IClarifyingQuestion,
 } from './questionnaire';
 import type { IGeneratedConcept } from '../concept/concepts';
-import { IAnchorThought } from '../ideaPlayground';
+import type {
+  IAnchorThought,
+  IAnchorThoughtWithQuestions,
+} from '../ideaPlayground';
 
 export interface IConceptSeedAnswer {
   answer: string[];
@@ -44,7 +47,11 @@ export interface IConceptSeed {
 
   clarifyingQuestions: IClarifyingQuestion[];
   cachedConcepts?: IGeneratedConcept[];
-  anchorThought?: IAnchorThought;
+  /**
+   * For IDEA_PLAYGROUND seeds, this returns the full nested structure with questions.
+   * For other seed types, this returns the basic anchor thought or undefined.
+   */
+  anchorThought?: IAnchorThought | IAnchorThoughtWithQuestions;
 }
 
 export interface IConceptSeedUpdate {

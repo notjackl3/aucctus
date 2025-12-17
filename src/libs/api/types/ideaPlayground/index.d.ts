@@ -7,12 +7,77 @@
 
 /**
  * Anchor Thought - A pre-generated seed idea to start the ideation process
+ * Basic version without nested questions (used during ideation flow)
  */
 export interface IAnchorThought {
   uuid: string;
   thought: string;
   title: string;
   createdAt: string;
+}
+
+/**
+ * Simple Source - Basic source info for research insights in saved seeds
+ * Used in the nested anchor thought structure returned from seed endpoint
+ */
+export interface ISimpleSavedSource {
+  uuid: string;
+  url?: string;
+  title?: string;
+  credibility: number;
+}
+
+/**
+ * Saved Research Insight - Research insight with nested source object
+ * Used in saved seed responses (different from IResearchInsight which has flat source fields)
+ */
+export interface ISavedResearchInsight {
+  uuid: string;
+  insight: string;
+  moreDetails?: string | null;
+  source: ISimpleSavedSource;
+}
+
+/**
+ * Saved Possible Answer - AI-generated answer in saved seed
+ */
+export interface ISavedPossibleAnswer {
+  uuid: string;
+  answer: string;
+}
+
+/**
+ * Saved User Answer - User's custom answer in saved seed
+ */
+export interface ISavedUserAnswer {
+  uuid: string;
+  answer: string;
+}
+
+/**
+ * Saved Anchor Question - Question with all nested data from saved seed
+ * This is the structure returned when fetching a saved IDEA_PLAYGROUND seed
+ */
+export interface ISavedAnchorQuestion {
+  uuid: string;
+  question: string;
+  questionType: string;
+  description?: string;
+  possibleAnswers: ISavedPossibleAnswer[];
+  researchInsights: ISavedResearchInsight[];
+  userAnswer?: ISavedUserAnswer | null;
+}
+
+/**
+ * Anchor Thought with Questions - Full nested structure for saved seeds
+ * Returned by GET /api/v2/concept/seed/{uuid} for IDEA_PLAYGROUND seeds
+ */
+export interface IAnchorThoughtWithQuestions {
+  uuid: string;
+  thought: string;
+  questions: ISavedAnchorQuestion[];
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
 /**

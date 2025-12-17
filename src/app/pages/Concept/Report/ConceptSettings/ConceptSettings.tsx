@@ -1,6 +1,10 @@
 import { toast, ConceptReportSkeletons } from '@components';
 import { useSeed } from '@hooks/query/concepts.hook';
-import { ConceptIncubationQuestion, IConceptSeedAnswer } from '@libs/api/types';
+import {
+  ConceptIncubationQuestion,
+  IConceptSeedAnswer,
+  IAnchorThoughtWithQuestions,
+} from '@libs/api/types';
 import { isMultiSelectQuestion } from '@libs/api/utils/typeGuards';
 import { snakeToTitleCase } from '@libs/utils/string';
 import React from 'react';
@@ -8,6 +12,7 @@ import { useOutletContext } from 'react-router-dom';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { ClarifyingQuestion } from './components/ClarifyingQuestion';
 import { IgnitionQuestion } from './components/IgnitionQuestion';
+import { IdeaPlaygroundSeedDisplay } from './components/IdeaPlaygroundSeedDisplay';
 import { useClarifyingQuestionsWithAnswers } from '@hooks/concepts/clarifying-questions.hook';
 import { useCloneSeed } from '@hooks/query/concepts.hook';
 import { useNavigate } from 'react-router-dom';
@@ -15,6 +20,20 @@ import { AppPath } from '@routes/routes';
 import utils from '@libs/utils';
 
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+
+/**
+ * Type guard to check if anchor thought has nested questions (IDEA_PLAYGROUND seed)
+ */
+const isIdeaPlaygroundAnchorThought = (
+  anchorThought: unknown,
+): anchorThought is IAnchorThoughtWithQuestions => {
+  return (
+    !!anchorThought &&
+    typeof anchorThought === 'object' &&
+    'questions' in anchorThought &&
+    Array.isArray((anchorThought as IAnchorThoughtWithQuestions).questions)
+  );
+};
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const formatAnswer = (
@@ -104,7 +123,13 @@ const ConceptSettings: React.FC = () => {
     return <ConceptReportSkeletons.ConceptSettingsSkeleton />;
   }
 
-  // Check if there's any content to display
+  // Check if this is an Idea Playground seed with nested questions
+  const isIdeaPlaygroundSeed =
+    seedDraft?.type === 'IDEA_PLAYGROUND' &&
+    seedDraft?.anchorThought &&
+    isIdeaPlaygroundAnchorThought(seedDraft.anchorThought);
+
+  // Check if there's any content to display (for non-Idea Playground seeds)
   const hasContent =
     ignitionQuestions.length > 0 ||
     filteredClarifyingQuestions.length > 0 ||
@@ -112,7 +137,7 @@ const ConceptSettings: React.FC = () => {
 
   return (
     <div className='h-full w-full'>
-      <div className='mx-0 max-w-3xl'>
+      <div className='mx-0'>
         <div className='no-scrollbar mt-4 flex flex-1 flex-col gap-6'>
           {/* Clone Concept Seed Button - Always visible if seedDraft exists */}
           {seedDraft && (
@@ -127,65 +152,79 @@ const ConceptSettings: React.FC = () => {
             </div>
           )}
 
-          {/* Anchor Thought - Display if it exists */}
-          {seedDraft?.anchorThought && (
-            <div className='flex flex-col gap-3'>
-              <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
-                Anchor Thought
-              </h2>
-              <div className='aucctus-bg-primary aucctus-text-secondary rounded-lg p-4'>
-                {seedDraft.anchorThought.thought}
-              </div>
-            </div>
+          {/* Idea Playground Seed Display - Full visualization for IDEA_PLAYGROUND seeds */}
+          {isIdeaPlaygroundSeed && (
+            <IdeaPlaygroundSeedDisplay
+              anchorThought={
+                seedDraft.anchorThought as IAnchorThoughtWithQuestions
+              }
+            />
           )}
 
-          {/* Initial Questions */}
-          {ignitionQuestions.length > 0 && (
-            <div className='flex flex-col gap-3'>
-              <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
-                Initial Questions
-              </h2>
-              <div className='no-scrollbar flex flex-1 flex-col gap-3'>
-                {ignitionQuestions.map((answer) => (
-                  <IgnitionQuestion
-                    key={`ignition-${answer.question.id}`}
-                    answer={answer}
-                    question={answer.question}
-                    formatAnswer={formatAnswer}
-                  />
-                ))}
-              </div>
-            </div>
-          )}
+          {/* Non-Idea Playground seed content */}
+          {!isIdeaPlaygroundSeed && (
+            <>
+              {/* Anchor Thought - Display if it exists (basic display for non-IP seeds) */}
+              {seedDraft?.anchorThought && (
+                <div className='flex flex-col gap-3'>
+                  <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
+                    Anchor Thought
+                  </h2>
+                  <div className='aucctus-bg-primary aucctus-text-secondary rounded-lg p-4'>
+                    {seedDraft.anchorThought.thought}
+                  </div>
+                </div>
+              )}
 
-          {/* Clarifying Questions */}
-          {filteredClarifyingQuestions.length > 0 && (
-            <div className='flex flex-col gap-3'>
-              <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
-                Clarifying Questions
-              </h2>
-              <div className='no-scrollbar flex flex-1 flex-col gap-3'>
-                {filteredClarifyingQuestions.map(({ question, answer }) => {
-                  return (
-                    <ClarifyingQuestion
-                      key={`clarifying-${question.uuid}`}
-                      question={question}
-                      answer={answer}
-                      formatAnswer={formatAnswer}
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          )}
+              {/* Initial Questions */}
+              {ignitionQuestions.length > 0 && (
+                <div className='flex flex-col gap-3'>
+                  <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
+                    Initial Questions
+                  </h2>
+                  <div className='no-scrollbar flex flex-1 flex-col gap-3'>
+                    {ignitionQuestions.map((answer) => (
+                      <IgnitionQuestion
+                        key={`ignition-${answer.question.id}`}
+                        answer={answer}
+                        question={answer.question}
+                        formatAnswer={formatAnswer}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
 
-          {/* No Content Message */}
-          {!hasContent && (
-            <div className='flex items-center justify-center py-12'>
-              <p className='aucctus-text-secondary aucctus-text-md'>
-                No seed information available
-              </p>
-            </div>
+              {/* Clarifying Questions */}
+              {filteredClarifyingQuestions.length > 0 && (
+                <div className='flex flex-col gap-3'>
+                  <h2 className='aucctus-text-xl-medium aucctus-text-primary ml-1'>
+                    Clarifying Questions
+                  </h2>
+                  <div className='no-scrollbar flex flex-1 flex-col gap-3'>
+                    {filteredClarifyingQuestions.map(({ question, answer }) => {
+                      return (
+                        <ClarifyingQuestion
+                          key={`clarifying-${question.uuid}`}
+                          question={question}
+                          answer={answer}
+                          formatAnswer={formatAnswer}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* No Content Message */}
+              {!hasContent && (
+                <div className='flex items-center justify-center py-12'>
+                  <p className='aucctus-text-secondary aucctus-text-md'>
+                    No seed information available
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
