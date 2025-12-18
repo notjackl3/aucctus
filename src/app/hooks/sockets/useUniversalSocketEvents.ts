@@ -655,22 +655,7 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       conceptIdentifier,
     });
 
-    // Use full-pipeline timing during the initial kickoff (no sections completed yet)
-    const useFullPipelineTiming = isInitialKickoff;
-
-    // Timing agent name (used by AgentProgressBar for estimates)
-    const messageAgentName =
-      message.agentName || (message as any).agentname || undefined;
-    const agentName = useFullPipelineTiming
-      ? 'ConceptReportPipeline'
-      : messageAgentName || 'ConceptReportPipeline';
-
-    const messageEstimatedTime =
-      (message as any).estimatedTime ??
-      (message as any).estimated_time ??
-      (message as any).estimatedSeconds ??
-      (message as any).estimated_seconds ??
-      undefined;
+    const agentName = 'ConceptReportPipeline';
 
     const payload: ProgressToastPayload = {
       title: stageMessage || message.message || 'Generating Concept Report',
@@ -680,11 +665,10 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       conceptIdentifier: conceptIdentifier,
       message: stageMessage,
       startTime,
-      overrideEstimatedSeconds:
-        messageEstimatedTime ?? existing?.data.overrideEstimatedSeconds,
+      overrideEstimatedSeconds: undefined,
       fallbackEstimatedSeconds:
         existing?.data.fallbackEstimatedSeconds ??
-        getFallbackEstimateForAgent(agentName), // Use section-specific fallback
+        getFallbackEstimateForAgent(agentName), // 20 mins for ConceptReportPipeline
     };
 
     if (!existing) {
