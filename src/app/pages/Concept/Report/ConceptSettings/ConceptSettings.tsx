@@ -103,8 +103,14 @@ const ConceptSettings: React.FC = () => {
         // Navigate to the incubation page with the cloned seed
         resetQuestionnaire();
         setIsNewSeed(false);
+        let baseUrl = `${AppPath.IncubateConcept}`;
+
+        if (clonedSeed.type === 'IDEA_PLAYGROUND') {
+          baseUrl = `${AppPath.IdeaPlayground}`;
+        }
+
         navigate(
-          `${AppPath.IncubateConcept}/?${new URLSearchParams({
+          `${baseUrl}/?${new URLSearchParams({
             seed: clonedSeed.uuid,
           }).toString()}`,
         );

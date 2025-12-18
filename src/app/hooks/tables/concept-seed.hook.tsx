@@ -424,6 +424,7 @@ export const useSeedsBank = (
           <Table.SeedBank.SeedActionMenuButton
             uuid={info.getValue()}
             status={info.row.original.status}
+            seedType={info.row.original.type}
           />
         ),
       }),

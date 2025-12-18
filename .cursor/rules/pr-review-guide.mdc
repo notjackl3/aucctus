@@ -1,0 +1,238 @@
+# PR Review Guide
+
+When reviewing a pull request, systematically evaluate it across the following dimensions:
+
+## 1. Edge Cases, Error Handling & Assumptions
+
+### Questions to Ask:
+- Are edge cases identified and handled appropriately?
+  - Empty arrays/objects, null/undefined values
+  - Zero, negative, or boundary values
+  - Very large datasets or extreme inputs
+  - Network failures, timeouts, or API errors
+- Is error handling comprehensive and user-friendly?
+  - Are errors caught at appropriate levels?
+  - Are error messages clear and actionable?
+  - Is there proper fallback behavior?
+  - Are loading and error states handled in UI components?
+- Are assumptions documented and reasonable?
+  - Are data shape assumptions validated?
+  - Are external dependencies properly handled?
+  - Are environment-specific assumptions noted?
+
+### Red Flags:
+- Missing null/undefined checks
+- Unhandled promise rejections
+- Silent failures without logging
+- Assumptions about data existence without validation
+- No error boundaries in React components
+
+## 2. Bugs, Regressions & Security
+
+### Questions to Ask:
+- Could this introduce bugs?
+  - Are type assertions safe?
+  - Could race conditions occur?
+  - Are array/object mutations handled correctly?
+  - Could this cause infinite loops or memory leaks?
+- Could this break existing functionality?
+  - Are breaking changes to shared components/utilities documented?
+  - Are API contract changes backward compatible?
+  - Could CSS changes affect other components?
+- Are there security concerns?
+  - Is user input sanitized?
+  - Are authentication/authorization checks present?
+  - Are sensitive data (tokens, keys) properly handled?
+  - Could this introduce XSS or injection vulnerabilities?
+  - Are environment variables used for secrets?
+
+### Red Flags:
+- Direct DOM manipulation in React
+- Unescaped user input rendering
+- Hardcoded credentials or API keys
+- Missing authentication checks on sensitive operations
+- SQL/NoSQL injection possibilities
+- Unsafe use of `dangerouslySetInnerHTML`
+
+## 3. Design & Maintainability
+
+### Questions to Ask:
+- Is this the right approach architecturally?
+  - Does it follow existing patterns in the codebase?
+  - Is the abstraction level appropriate?
+  - Could it be simpler without losing functionality?
+  - Does it separate concerns properly?
+- Is it consistent with the existing codebase?
+  - Does it follow established naming conventions?
+  - Does it use existing utilities/components where appropriate?
+  - Does it match the project's style and patterns?
+- Is the code maintainable?
+  - Are functions/components focused and single-purpose?
+  - Is the code DRY without being overly abstract?
+  - Are dependencies minimal and justified?
+
+### Red Flags:
+- Reinventing existing utilities or components
+- God objects/components doing too many things
+- Tight coupling between unrelated modules
+- Overly clever or unnecessarily complex solutions
+- Deep nesting (>3-4 levels)
+- Large functions (>50 lines typically indicate need for refactoring)
+
+## 4. Readability & Structure
+
+### Questions to Ask:
+- Is the code self-documenting?
+  - Are variable/function names clear and descriptive?
+  - Is the logic flow easy to follow?
+  - Are magic numbers/strings explained or extracted as constants?
+- Is the structure appropriate?
+  - Are components/functions appropriately sized?
+  - Is related code grouped logically?
+  - Are TypeScript types/interfaces well-defined?
+- Is abstraction appropriate?
+  - Are repeated patterns extracted without over-engineering?
+  - Are hooks/utilities reusable but not overly generic?
+  - Is component composition logical?
+
+### Guidelines:
+- Variables: Use descriptive names (prefer `userProfileData` over `data`)
+- Functions: Verb-noun combinations (prefer `fetchUserProfile` over `getUser`)
+- Components: PascalCase, descriptive of purpose
+- Constants: UPPER_SNAKE_CASE for true constants
+- Complex logic should have explanatory comments
+- JSDoc for public APIs and complex functions
+
+### Red Flags:
+- Single-letter variables (except loop counters)
+- Unclear abbreviations
+- Commented-out code blocks
+- TODO comments without tickets/context
+- Inconsistent formatting
+
+## 5. Future Maintainability
+
+### Questions to Ask:
+- Will this be understandable in 6 months?
+  - Is complex logic explained with comments?
+  - Are non-obvious decisions documented?
+  - Could a new team member understand this?
+- Is it safely modifiable?
+  - Are types comprehensive enough to prevent breaking changes?
+  - Are there clear extension points?
+  - Will changes here require changes in many places?
+- Is technical debt minimized?
+  - Are shortcuts justified and documented?
+  - Is there a clear path to improvement?
+  - Are TODOs tracked with tickets?
+
+### Red Flags:
+- No comments on complex algorithms
+- Implicit dependencies or ordering requirements
+- Fragile code that's easy to break
+- Multiple places to update for a single logical change
+
+## 6. Quality & Impact - Safe to Merge?
+
+### Questions to Ask:
+- Are tests present and meaningful?
+  - Do tests cover happy paths and edge cases?
+  - Are test names descriptive?
+  - Do tests test behavior, not implementation?
+  - Are mocks/stubs appropriate and not overly complex?
+  - Do tests actually fail when code is broken?
+- Performance considerations:
+  - Are there unnecessary re-renders in React?
+  - Are expensive calculations memoized appropriately?
+  - Are large lists virtualized?
+  - Are images optimized?
+  - Are bundle sizes considered?
+- Scalability:
+  - Will this work with 10x current data volume?
+  - Are there N+1 query issues?
+  - Is pagination/infinite scroll implemented where needed?
+- Backward compatibility:
+  - Are API changes backward compatible?
+  - Are database migrations reversible?
+  - Are feature flags used for risky changes?
+  - Is there a rollback plan?
+
+### Red Flags:
+- No tests for new functionality
+- Tests that always pass (false positives)
+- Performance issues (unnecessary loops, unoptimized queries)
+- Breaking changes without migration path
+- Missing loading states for async operations
+- No consideration for existing users/data
+
+## Aucctus-Specific Considerations
+
+### Styling:
+- Are Aucctus theme classes used as primary styling approach?
+- Is the `cn` utility used with object notation for conditional classes?
+- Are hover classes used correctly (without `hover:` prefix)?
+- Are semantic HTML elements used with proper ARIA attributes?
+
+### Components:
+- Are shared components from `@components` used where appropriate?
+- Is the Icon component used for all icons with proper className?
+- Are components accessible (keyboard navigation, screen readers)?
+- Are components responsive using Tailwind breakpoints?
+
+### TypeScript:
+- Are types properly defined and not using `any`?
+- Are props interfaces documented with JSDoc?
+- Is type inference leveraged appropriately?
+
+### Hooks & State:
+- Are hooks used correctly (rules of hooks)?
+- Is state properly scoped (component vs. global)?
+- Are useMemo and useCallback used to prevent unnecessary re-renders?
+
+## Review Process
+
+1. **First Pass**: Read the entire PR to understand the overall approach
+2. **Second Pass**: Systematically go through each section above
+3. **Testing**: Pull the branch and test manually if needed
+4. **Documentation**: Ensure README/docs are updated if needed
+5. **Final Check**: Review your own comments for clarity and helpfulness
+
+## Providing Feedback
+
+### Good Feedback:
+- Be specific about the issue and why it matters
+- Suggest alternatives when possible
+- Distinguish between blocking issues and suggestions
+- Acknowledge good patterns and solutions
+- Ask questions to understand intent rather than assuming
+
+### Example Comments:
+- ✅ "This could cause a race condition if the user clicks rapidly. Consider debouncing or disabling the button while processing."
+- ✅ "Nice use of the existing `useDebounce` hook here!"
+- ✅ "Question: Why did we choose to fetch all data upfront instead of paginating? Is there a perf concern with large datasets?"
+- ❌ "This is wrong"
+- ❌ "We don't do it this way"
+
+## Priority Levels
+
+### 🔴 Blocking (Must fix before merge):
+- Security vulnerabilities
+- Data loss or corruption risks
+- Breaking changes without migration
+- Critical bugs
+- Missing error handling for critical paths
+
+### 🟡 High Priority (Should fix before merge):
+- Performance issues
+- Poor user experience
+- Missing tests for important functionality
+- Significant code quality issues
+- Accessibility problems
+
+### 🟢 Nice to Have (Can address in follow-up):
+- Minor refactoring suggestions
+- Additional test coverage
+- Documentation improvements
+- Code style nitpicks (if not caught by linters)
+
+Remember: The goal is to ensure quality while empowering the team. Be thorough but also trust your teammates.

@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-} from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { Icon, toast } from '@components';
 import type { IGeneratedIdeaPlaygroundConcept } from '../types';
 import {
@@ -14,7 +8,6 @@ import {
 import ConceptDetailPanel from './ConceptDetailPanel';
 import OpportunityMapFooter from './OpportunityMapFooter';
 import ConceptCard from './ConceptCard';
-import LogoAnimation from '@components/Animation/LogoAnimation';
 import api from '@libs/api';
 import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
@@ -35,25 +28,6 @@ interface OpportunityMapProps {
   onClose: () => void;
 }
 
-// Fun rotating messages for concept generation loading
-const GENERATION_MESSAGES = [
-  'Brewing innovative ideas...',
-  'Exploring new possibilities...',
-  'Connecting the dots...',
-  'Thinking outside the box...',
-  'Sparking creativity...',
-  'Discovering hidden gems...',
-  'Crafting unique concepts...',
-  'Mixing inspiration with insight...',
-  'Unlocking potential...',
-  'Dreaming up the future...',
-  'Weaving ideas together...',
-  'Chasing brilliance...',
-  'Hatching something special...',
-  'Polishing rough diamonds...',
-  'Igniting imagination...',
-];
-
 const OpportunityMap: React.FC<OpportunityMapProps> = ({
   seedUuid,
   onClose,
@@ -68,6 +42,10 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   const clearSelectedConcepts = useStore(
     (state) => state.ideaPlayground.clearSelectedConcepts,
   );
+  const clearLastActiveSeedUuid = useStore(
+    (state) => state.ideaPlayground.clearLastActiveSeedUuid,
+  );
+  const reset = useStore((state) => state.ideaPlayground.reset);
   const navigate = useNavigate();
 
   // Use the GET hook to check and fetch generated concepts
@@ -106,10 +84,6 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   // Local state
   const [isClosing, setIsClosing] = useState(false);
   const [isInitialMount, setIsInitialMount] = useState(true);
-  // Track if we're in a regeneration flow (to show loading state immediately)
-  const [isRegenerating, setIsRegenerating] = useState(false);
-  // Rotating message index for loading overlay
-  const [messageIndex, setMessageIndex] = useState(0);
 
   // Generate More button progress animation state
   const [generateMoreProgress, setGenerateMoreProgress] = useState(0);
@@ -123,26 +97,9 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   const backendConfirmedGeneratingRef = useRef(false);
   const wasGeneratingMoreRef = useRef(false);
 
-  // Determine if we should show the loading overlay on concepts grid
-  // Only show for regenerate (full regeneration), NOT for generating more
-  const showConceptsLoadingOverlay = useMemo(
-    () => isRegenerateLoading || isRegenerating,
-    [isRegenerateLoading, isRegenerating],
-  );
-
-  // Rotate messages every 3 seconds when loading overlay is visible
-  useEffect(() => {
-    if (!showConceptsLoadingOverlay) {
-      setMessageIndex(0);
-      return;
-    }
-
-    const interval = setInterval(() => {
-      setMessageIndex((prev) => (prev + 1) % GENERATION_MESSAGES.length);
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [showConceptsLoadingOverlay]);
+  // Determine if we should show the full-screen loading overlay
+  // Only for initial generation, NOT for regenerate with feedback or generate more
+  const showFullScreenLoading = isGeneratingConcepts || isInitialMount;
 
   // Generate More button progress animation
   // Use local state OR backend state to prevent flickering during the brief gap
@@ -231,25 +188,12 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
     }
   }, [isInitialMount, concepts.length, isGeneratingConcepts]);
 
-  // Reset regenerating state when concepts are refreshed (generation complete)
-  useEffect(() => {
-    if (
-      isRegenerating &&
-      concepts.length > 0 &&
-      !isGeneratingConcepts &&
-      !generatingMore
-    ) {
-      setIsRegenerating(false);
-    }
-  }, [isRegenerating, concepts.length, isGeneratingConcepts, generatingMore]);
-
   // Track previous loading state to detect transition from loading to concepts
   const wasLoadingRef = useRef(true);
 
   // Auto-select first concept when transitioning from loading state to concepts view
   useEffect(() => {
-    const isCurrentlyLoading =
-      isGeneratingConcepts || isInitialMount || isRegenerating;
+    const isCurrentlyLoading = isGeneratingConcepts || isInitialMount;
     const wasLoading = wasLoadingRef.current;
 
     // Update the ref for next render
@@ -273,11 +217,11 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         alignment: firstConcept.alignment,
       });
     }
-  }, [isGeneratingConcepts, isInitialMount, isRegenerating, concepts]);
+  }, [isGeneratingConcepts, isInitialMount, concepts]);
 
   /**
    * Handle regeneration with feedback
-   * Shows loading state immediately, triggers the mutation
+   * Triggers mutation - loading state shown inline via isRegenerateLoading
    */
   const handleRegenerateWithFeedback = useCallback(
     (feedback: string) => {
@@ -289,12 +233,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         concepts.map((c) => c.uuid),
       );
       setNewConceptUuids(new Set());
-      setIsRegenerating(true);
-      regenerateWithFeedback(feedback, {
-        onError: () => {
-          setIsRegenerating(false);
-        },
-      });
+      regenerateWithFeedback(feedback);
       telemetry.log('ideaPlayground.regenerateWithFeedback.initiated', {
         seedUuid,
         feedbackLength: feedback.length,
@@ -558,6 +497,10 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         seedUuid: seedUuid,
         generateReports: false,
       });
+      // Clear the cached seed UUID so NavDrawer doesn't restore it
+      clearLastActiveSeedUuid();
+      // Reset UI state (question index, selected concepts)
+      reset();
       // Navigate to ConceptBank after saving
       handleClose();
       navigate(AppPath.ConceptBank);
@@ -612,6 +555,10 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         seedUuid: seedUuid,
       });
 
+      // Clear the cached seed UUID so NavDrawer doesn't restore it
+      clearLastActiveSeedUuid();
+      // Reset UI state (question index, selected concepts)
+      reset();
       // Navigate to ConceptBank after saving and triggering reports
       handleClose();
       navigate(AppPath.ConceptBank);
@@ -659,8 +606,9 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
       }
     : null;
 
-  // Show loading state while generating/regenerating concepts or on initial mount (prevents flash of content)
-  if (isGeneratingConcepts || isInitialMount || isRegenerating) {
+  // Show loading state while generating concepts or on initial mount (prevents flash of content)
+  // Note: regenerate with feedback uses inline loading (like Generate More), not full-screen overlay
+  if (showFullScreenLoading) {
     return (
       <div className='absolute inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-xl'>
         <ConceptGenerationLoading />
@@ -720,30 +668,6 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
         <div className='flex min-h-0 flex-1'>
           {/* Left Side - 2x2 Grid */}
           <div className='relative flex w-1/2 flex-col border-r border-white/10'>
-            {/* Loading Overlay for Concepts Grid */}
-            {showConceptsLoadingOverlay && (
-              <div className='absolute inset-0 z-10 flex animate-fade-in flex-col items-center justify-center bg-black bg-opacity-40'>
-                {/* Logo with pulsating glow */}
-                <div className='relative flex flex-col items-center'>
-                  {/* Pulsating glow behind logo */}
-                  <div className='absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 animate-[glowPulse_3s_ease-in-out_infinite] rounded-full bg-white/20 blur-2xl' />
-                  {/* Animated logo with subtle pulse */}
-                  <div className='relative animate-[logoPulse_2s_ease-in-out_infinite]'>
-                    <LogoAnimation size={120} loop autoPlay fps={90} />
-                  </div>
-                </div>
-                <p
-                  key={messageIndex}
-                  className='aucctus-text-md-medium mt-6 animate-fade-in text-white/90'
-                  style={{
-                    animation: 'fadeInUp 0.5s ease-out',
-                  }}
-                >
-                  {GENERATION_MESSAGES[messageIndex]}
-                </p>
-              </div>
-            )}
-
             {/* Ideas Grid - Scrollable */}
             <div className='flex-1 overflow-y-auto p-6'>
               <div className='grid grid-cols-2 gap-4'>

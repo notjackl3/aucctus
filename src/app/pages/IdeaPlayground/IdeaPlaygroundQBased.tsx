@@ -53,7 +53,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
   // Store access for UI state only (carousel navigation, concept selection)
   const ideaPlaygroundStore = useStore((state) => state.ideaPlayground);
-
   // Fetch anchor thoughts using React Query hook
   const { anchorThoughts, isLoading: isLoadingThoughts } = useAnchorThoughts();
 
@@ -323,11 +322,13 @@ const IdeaPlaygroundQBased: React.FC = () => {
   }, [currentSeedUuid, isDataReady, showLogoTitle]);
 
   // Cache the active seedUuid in the store for session restoration via NavDrawer
+  // Only set when currentSeedUuid changes, don't re-run on store reference changes
   useEffect(() => {
     if (currentSeedUuid) {
       ideaPlaygroundStore.setLastActiveSeedUuid(currentSeedUuid);
     }
-  }, [currentSeedUuid, ideaPlaygroundStore]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentSeedUuid]);
 
   const handleClose = () => {
     // Clear cached seedUuid so returning to playground starts fresh

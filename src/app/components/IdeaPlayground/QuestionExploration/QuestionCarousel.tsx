@@ -697,22 +697,33 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
     if (!operations || operations.size === 0)
       return { isLoading: false, message: '' };
 
-    const hasInsights = operations.has('insights');
-    const hasPossibleAnswer = operations.has('possibleAnswer');
+    // Find the API question to check for existing data
+    const apiQuestion = apiQuestions.find((q) => q.uuid === currentQuestion.id);
 
-    if (hasInsights && hasPossibleAnswer) {
+    // Check if data already exists - if so, don't show loading even if operation is in Set
+    const hasInsightsData =
+      apiQuestion?.insights && apiQuestion.insights.length > 0;
+    const hasPossibleAnswerData =
+      apiQuestion?.possibleAnswers && apiQuestion.possibleAnswers.length > 0;
+
+    // Only consider loading if operation is pending AND data doesn't exist yet
+    const isLoadingInsights = operations.has('insights') && !hasInsightsData;
+    const isLoadingPossibleAnswer =
+      operations.has('possibleAnswer') && !hasPossibleAnswerData;
+
+    if (isLoadingInsights && isLoadingPossibleAnswer) {
       return {
         isLoading: true,
         message: 'Generating insights and suggestions...',
       };
-    } else if (hasInsights) {
+    } else if (isLoadingInsights) {
       return { isLoading: true, message: 'Researching insights...' };
-    } else if (hasPossibleAnswer) {
+    } else if (isLoadingPossibleAnswer) {
       return { isLoading: true, message: 'Generating answer suggestion...' };
     }
 
     return { isLoading: false, message: '' };
-  }, [currentQuestion?.id, loadingOperations]);
+  }, [currentQuestion?.id, loadingOperations, apiQuestions]);
 
   const hasUserAnswerOnScreen = useMemo(() => {
     if (!currentQuestion?.id) return false;
