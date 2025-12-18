@@ -246,6 +246,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
             marketScan={marketScan}
             isLoadingMarketScan={isLoadingMarketScan}
             executiveSummary={executiveSummaries?.marketScanEcosystem}
+            concept={concept}
           />
         );
       case 3:

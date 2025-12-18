@@ -3,6 +3,8 @@ import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { IEcosystemPlayer } from './config';
 import ProgressBar from './ProgressBar';
+import { useEcosystem } from '../EcosystemV2/hooks/useEcosystem';
+import type { IConcept } from '@libs/api/types';
 
 interface EcosystemCardProps {
   currentCardIndex: number;
@@ -15,6 +17,8 @@ interface EcosystemCardProps {
   marketScan?: any;
   isLoadingMarketScan?: boolean;
   executiveSummary?: string;
+  // Concept to check feature version
+  concept?: IConcept;
 }
 
 const EcosystemCard: React.FC<EcosystemCardProps> = ({
@@ -23,24 +27,66 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
   totalCards,
   onCardClick,
   conceptId,
+  conceptUuid,
   marketScan,
   isLoadingMarketScan = false,
   executiveSummary,
+  concept,
 }) => {
   const navigate = useNavigate();
 
-  // Create ecosystem players from real data or fallback to mock
+  // Check if concept is using V2 ecosystem
+  const isEcosystemV2 = concept?.featureVersions?.ecosystem === 'v2';
+
+  // Fetch V2 ecosystem data if the concept is using V2
+  const { ecosystemData: v2EcosystemData, isLoading: isLoadingV2 } =
+    useEcosystem(isEcosystemV2 && conceptUuid ? conceptUuid : '');
+
+  // Create ecosystem players from real data
+  // Use V2 data if ecosystem version is v2, otherwise fallback to V1 marketScan data
   const ecosystemPlayers = useMemo((): IEcosystemPlayer[] => {
+    // Use V2 ecosystem data when available
+    if (isEcosystemV2 && v2EcosystemData && v2EcosystemData.length > 0) {
+      const startupsCount = v2EcosystemData.filter(
+        (company) => company.type === 'startup',
+      ).length;
+      const incumbentsCount = v2EcosystemData.filter(
+        (company) => company.type === 'incumbent',
+      ).length;
+
+      if (startupsCount > 0 || incumbentsCount > 0) {
+        return [
+          {
+            id: '1',
+            type: 'startups',
+            name: 'Startups',
+            count: startupsCount,
+            iconVariant: 'lightbulb',
+            description: 'Emerging companies disrupting the market',
+          },
+          {
+            id: '2',
+            type: 'incumbents',
+            name: 'Incumbents',
+            count: incumbentsCount,
+            iconVariant: 'building',
+            description: 'Established market leaders',
+          },
+        ];
+      }
+    }
+
+    // Fallback to V1 marketScan data
     if (
       marketScan &&
-      (marketScan.startups.length > 0 || marketScan.incumbents.length > 0)
+      (marketScan.startups?.length > 0 || marketScan.incumbents?.length > 0)
     ) {
       return [
         {
           id: '1',
           type: 'startups',
           name: 'Startups',
-          count: marketScan.startups.length,
+          count: marketScan.startups?.length || 0,
           iconVariant: 'lightbulb',
           description: 'Emerging companies disrupting the market',
         },
@@ -48,14 +94,14 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
           id: '2',
           type: 'incumbents',
           name: 'Incumbents',
-          count: marketScan.incumbents.length,
+          count: marketScan.incumbents?.length || 0,
           iconVariant: 'building',
           description: 'Established market leaders',
         },
       ];
     }
     return [];
-  }, [marketScan]);
+  }, [isEcosystemV2, v2EcosystemData, marketScan]);
 
   // Get real summary data (no mock fallback)
   const ecosystemSummary = executiveSummary || null;
@@ -147,7 +193,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
           <div className='grid flex-1 grid-cols-1 gap-4 md:grid-cols-2'>
             {/* Left - Competitive Landscape Summary */}
             <div className='flex flex-col justify-start px-2'>
-              {isLoadingMarketScan ? (
+              {isLoadingMarketScan || (isEcosystemV2 && isLoadingV2) ? (
                 <div className='aucctus-text-lg aucctus-text-secondary'>
                   Loading ecosystem data...
                 </div>
@@ -174,7 +220,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
         ) : (
           // Single-column layout: Player Cards only (expanded)
           <div className='flex flex-1 items-center justify-center'>
-            {isLoadingMarketScan ? (
+            {isLoadingMarketScan || (isEcosystemV2 && isLoadingV2) ? (
               <div className='aucctus-text-lg aucctus-text-secondary'>
                 Loading ecosystem data...
               </div>
