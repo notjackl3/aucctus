@@ -172,10 +172,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
         </div>
 
         {/* Outdated sections banner */}
-        <OutdatedSectionsBanner
-          outdatedSections={outdatedSections}
-          additionalMessage='Ecosystem temporarily disabled for AI Editing.'
-        />
+        <OutdatedSectionsBanner outdatedSections={outdatedSections} />
       </div>
 
       {/* Main content area with flex-grow to take available space */}
