@@ -198,17 +198,22 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
   };
 
   // Normalize validation status
-  const normalizedStatus: 'validated' | 'invalidated' | 'no-change' = (() => {
+  const normalizedStatus:
+    | 'validated'
+    | 'invalidated'
+    | 'partially_validated'
+    | 'no-change' = (() => {
     const status = assumption.validationStatus || '';
 
-    const statusMap: Record<string, 'validated' | 'invalidated' | 'no-change'> =
-      {
-        validated: 'validated',
-        invalidated: 'invalidated',
-        partially_validated: 'no-change',
-        partiallyValidated: 'no-change',
-        untested: 'no-change',
-      };
+    const statusMap: Record<
+      string,
+      'validated' | 'invalidated' | 'partially_validated' | 'no-change'
+    > = {
+      validated: 'validated',
+      invalidated: 'invalidated',
+      partiallyValidated: 'partially_validated',
+      untested: 'no-change',
+    };
 
     return statusMap[status] || 'no-change';
   })();
@@ -280,15 +285,18 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
   };
 
   const handleValidationSelect = (
-    result: 'validated' | 'invalidated' | 'no-change',
+    result: 'validated' | 'invalidated' | 'partially_validated' | 'no-change',
   ) => {
     // Map to backend values
-    const statusMap: Record<string, 'validated' | 'invalidated' | 'untested'> =
-      {
-        validated: 'validated',
-        invalidated: 'invalidated',
-        'no-change': 'untested',
-      };
+    const statusMap: Record<
+      string,
+      'validated' | 'invalidated' | 'partially_validated' | 'untested'
+    > = {
+      validated: 'validated',
+      invalidated: 'invalidated',
+      partially_validated: 'partially_validated',
+      'no-change': 'untested',
+    };
 
     onValidationChange(assumption, statusMap[result]);
   };
@@ -401,6 +409,31 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
                 })}
               />
               Validated
+            </button>
+
+            <button
+              onClick={() => handleValidationSelect('partially_validated')}
+              disabled={isUpdating}
+              className={cn(
+                'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
+                {
+                  'bg-yellow-600 text-white hover:bg-yellow-700':
+                    normalizedStatus === 'partially_validated',
+                  'border border-yellow-200 text-yellow-700 hover:bg-yellow-50':
+                    normalizedStatus !== 'partially_validated',
+                  'cursor-not-allowed opacity-50': isUpdating,
+                },
+              )}
+            >
+              <Icon
+                variant='check'
+                className={cn('h-3.5 w-3.5', {
+                  'stroke-white': normalizedStatus === 'partially_validated',
+                  'stroke-yellow-700':
+                    normalizedStatus !== 'partially_validated',
+                })}
+              />
+              Partially Validated
             </button>
 
             <button
