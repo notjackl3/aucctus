@@ -466,6 +466,7 @@ export interface IConceptWorkflowMessage extends BaseSocketEvent {
 
   // Progress tracking
   agentName?: string; // Agent name for section-specific timing estimates (e.g., 'CustomerProfilePipeline', 'MarketScanPipeline')
+  estimatedTime?: number; // Backend-calculated estimated time in seconds for this section/workflow
 }
 
 // ==========================================

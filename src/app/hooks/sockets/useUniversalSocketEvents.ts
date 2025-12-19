@@ -646,6 +646,22 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       resolvedConceptUuid: conceptUuid,
     });
 
+    // Determine agent name for timing estimates:
+    // 1. Initial kickoff of full report → use ConceptReportPipeline (20 min)
+    // 2. Existing toast being updated → preserve original agent name to avoid mid-generation time changes
+    // 3. New toast for section regeneration (not initial kickoff) → use section-specific agent
+    let agentName: string;
+    if (isInitialKickoff) {
+      // Full report starting - use full pipeline timing
+      agentName = 'ConceptReportPipeline';
+    } else if (existing?.data.agentName) {
+      // Updating existing toast - preserve original agent name for consistent timing
+      agentName = existing.data.agentName;
+    } else {
+      // New toast for section regeneration - use section-specific timing
+      agentName = message.agentName || 'ConceptReportPipeline';
+    }
+
     telemetry.debug('concept_workflow.toast.upsert', {
       toastKeys,
       stageKey,
@@ -653,9 +669,17 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       hasExisting: Boolean(existing),
       conceptTitle,
       conceptIdentifier,
+      agentName,
+      messageAgentName: message.agentName,
+      isInitialKickoff,
+      messageEstimatedTime: message.estimatedTime,
     });
 
-    const agentName = 'ConceptReportPipeline';
+    // For estimated time:
+    // - Use existing fallback if we're updating a toast (preserves consistent timing)
+    // - Use backend-provided estimate only for section regenerations (not full report)
+    // - Fall back to agent-specific fallback
+    const shouldUseBackendEstimate = !isInitialKickoff && !existing;
 
     const payload: ProgressToastPayload = {
       title: stageMessage || message.message || 'Generating Concept Report',
@@ -665,10 +689,13 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       conceptIdentifier: conceptIdentifier,
       message: stageMessage,
       startTime,
-      overrideEstimatedSeconds: undefined,
+      // Only use backend-provided estimated time for true section regenerations
+      overrideEstimatedSeconds: shouldUseBackendEstimate
+        ? (message.estimatedTime ?? undefined)
+        : (existing?.data.overrideEstimatedSeconds ?? undefined),
       fallbackEstimatedSeconds:
         existing?.data.fallbackEstimatedSeconds ??
-        getFallbackEstimateForAgent(agentName), // 20 mins for ConceptReportPipeline
+        getFallbackEstimateForAgent(agentName),
     };
 
     if (!existing) {
