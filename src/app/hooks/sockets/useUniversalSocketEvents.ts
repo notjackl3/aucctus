@@ -605,13 +605,25 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
     const toastKeys = getToastKeysFromMessage(message);
     if (toastKeys.length === 0) return;
 
-    const completedCount =
-      (message as any).completedSectionsCount ??
-      message.completedSections?.length ??
-      0;
+    // Get existing toast first - needed to determine if this is a new workflow start
+    const existing = getToastRecordForKeys(toastKeys, true);
+    const startTime = existing?.data.startTime ?? Date.now();
+
     const aggregatePending =
       message.aggregateStatus === 'pending' ||
       message.aggregateStatus === 'notStarted';
+
+    // Count how many sections are currently pending
+    // This helps distinguish between:
+    // - Starting a workflow (multiple sections pending) → use full pipeline timing
+    // - Single section regeneration/AI edit (1 section pending) → use section timing
+    const pendingSectionCount = message.reportStatusBySection
+      ? Object.values(message.reportStatusBySection).filter((section) => {
+          const status =
+            typeof section === 'string' ? section : section?.status;
+          return status === 'pending';
+        }).length
+      : 0;
 
     let stageKey = resolveStageKey(message);
     let stageMessage =
@@ -619,15 +631,19 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       message.message ||
       undefined;
 
-    // For the very first kickoff (no sections done yet), keep the toast generic
-    const isInitialKickoff = aggregatePending && completedCount === 0;
-    if (isInitialKickoff) {
+    // Determine if this is starting a new workflow (fresh start OR resume from partial)
+    // A new workflow start is when:
+    // - No existing toast for this concept (!existing)
+    // - Workflow is pending (aggregatePending)
+    // - Multiple sections are pending (pendingSectionCount > 1) - distinguishes from single section AI edit
+    const isNewWorkflowStart =
+      !existing && aggregatePending && pendingSectionCount > 1;
+
+    // For new workflow starts (fresh or resuming), keep the toast generic
+    if (isNewWorkflowStart) {
       stageKey = undefined;
       stageMessage = 'Generating report';
     }
-
-    const existing = getToastRecordForKeys(toastKeys, true);
-    const startTime = existing?.data.startTime ?? Date.now();
 
     // Use concept data from message directly (backend now sends conceptTitle)
     const conceptUuid = message.conceptUuid || existing?.data.conceptUuid;
@@ -644,21 +660,22 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       messageEventType: message.eventType,
       existingConceptUuid: existing?.data.conceptUuid,
       resolvedConceptUuid: conceptUuid,
+      pendingSectionCount,
     });
 
     // Determine agent name for timing estimates:
-    // 1. Initial kickoff of full report → use ConceptReportPipeline (20 min)
+    // 1. New workflow start (fresh or resuming) → use ConceptReportPipeline (full timing)
     // 2. Existing toast being updated → preserve original agent name to avoid mid-generation time changes
-    // 3. New toast for section regeneration (not initial kickoff) → use section-specific agent
+    // 3. New toast for single section regeneration → use section-specific agent
     let agentName: string;
-    if (isInitialKickoff) {
-      // Full report starting - use full pipeline timing
+    if (isNewWorkflowStart) {
+      // Starting new workflow (fresh or resuming) - use full pipeline timing
       agentName = 'ConceptReportPipeline';
     } else if (existing?.data.agentName) {
       // Updating existing toast - preserve original agent name for consistent timing
       agentName = existing.data.agentName;
     } else {
-      // New toast for section regeneration - use section-specific timing
+      // New toast for single section regeneration - use section-specific timing
       agentName = message.agentName || 'ConceptReportPipeline';
     }
 
@@ -671,15 +688,16 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       conceptIdentifier,
       agentName,
       messageAgentName: message.agentName,
-      isInitialKickoff,
+      isNewWorkflowStart,
+      pendingSectionCount,
       messageEstimatedTime: message.estimatedTime,
     });
 
     // For estimated time:
     // - Use existing fallback if we're updating a toast (preserves consistent timing)
-    // - Use backend-provided estimate only for section regenerations (not full report)
+    // - Use backend-provided estimate only for single section regenerations (not workflow starts)
     // - Fall back to agent-specific fallback
-    const shouldUseBackendEstimate = !isInitialKickoff && !existing;
+    const shouldUseBackendEstimate = !isNewWorkflowStart && !existing;
 
     const payload: ProgressToastPayload = {
       title: stageMessage || message.message || 'Generating Concept Report',
