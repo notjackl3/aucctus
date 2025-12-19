@@ -1,16 +1,39 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { createPortal } from 'react-dom';
+import { Icon } from '@components';
+import { snakeToTitleCase } from '@libs/utils/string';
+import { IComprehensiveEditRecommendation } from '../../../../types';
 
 interface ApplyRecommendationsWarningModalProps {
-  recommendationCount: number;
+  isOpen: boolean;
+  selectedRecommendations: IComprehensiveEditRecommendation[];
   onConfirm: () => void;
   onCancel: () => void;
 }
 
 const ApplyRecommendationsWarningModal: React.FC<
   ApplyRecommendationsWarningModalProps
-> = ({ recommendationCount, onConfirm, onCancel }) => {
-  if (typeof document === 'undefined' || !document.body) {
+> = ({ isOpen, selectedRecommendations, onConfirm, onCancel }) => {
+  // Group recommendations by section
+  const groupedRecommendations = useMemo(() => {
+    const groups: Record<string, IComprehensiveEditRecommendation[]> = {};
+
+    selectedRecommendations.forEach((rec) => {
+      if (!groups[rec.section]) {
+        groups[rec.section] = [];
+      }
+      groups[rec.section].push(rec);
+    });
+
+    return groups;
+  }, [selectedRecommendations]);
+
+  if (
+    !isOpen ||
+    typeof document === 'undefined' ||
+    !document.body ||
+    selectedRecommendations.length === 0
+  ) {
     return null;
   }
 
@@ -26,27 +49,59 @@ const ApplyRecommendationsWarningModal: React.FC<
       />
 
       {/* Modal */}
-      <div className='aucctus-bg-primary aucctus-border-secondary relative max-w-[400px] rounded-xl border p-6 shadow-lg'>
+      <div className='aucctus-bg-primary aucctus-border-secondary relative max-w-xl rounded-xl border p-6 shadow-lg'>
         {/* Header */}
-        <div className='mb-6 text-center'>
-          <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
-            Applying Recommendations
-            <br />
-            Will Complete Test
-          </h3>
-          <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-            This action cannot be undone.
+        <div className='mb-4'>
+          <div className='mb-1 flex items-center gap-2'>
+            <Icon
+              variant='check'
+              className='aucctus-stroke-brand-primary h-5 w-5'
+            />
+            <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
+              Apply Recommended Changes
+            </h3>
+          </div>
+          <p className='aucctus-text-sm aucctus-text-secondary'>
+            Review the changes that will be applied to your concept
           </p>
         </div>
 
-        {/* Content */}
-        <div className='aucctus-bg-secondary-subtle aucctus-border-secondary mb-6 rounded-lg border p-4'>
-          <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-            Applying {recommendationCount} recommendation
-            {recommendationCount !== 1 ? 's' : ''} will mark your current test
-            as completed. A new recommended test will be generated once the
-            recommendations have been processed.
-          </p>
+        {/* Content - Grouped Recommendations */}
+        <div className='mb-6 max-h-[300px] space-y-4 overflow-y-auto py-2'>
+          {Object.entries(groupedRecommendations).map(
+            ([section, recommendations]) => (
+              <div key={section} className='space-y-2'>
+                <div className='aucctus-text-sm-medium aucctus-text-primary'>
+                  {snakeToTitleCase(section)}
+                </div>
+                {recommendations.map((rec) => (
+                  <div
+                    key={rec.uuid}
+                    className='aucctus-bg-secondary rounded-md p-2'
+                  >
+                    {rec.beforeContent && rec.afterContent ? (
+                      <div className='flex items-center gap-2'>
+                        <div className='aucctus-text-sm aucctus-text-tertiary flex-1'>
+                          {rec.beforeContent}
+                        </div>
+                        <Icon
+                          variant='arrowright'
+                          className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
+                        />
+                        <div className='aucctus-text-sm-medium aucctus-text-primary flex-1'>
+                          {rec.afterContent}
+                        </div>
+                      </div>
+                    ) : (
+                      <span className='aucctus-text-sm aucctus-text-primary'>
+                        {rec.recommendation}
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ),
+          )}
         </div>
 
         {/* Actions */}
@@ -55,7 +110,7 @@ const ApplyRecommendationsWarningModal: React.FC<
             Cancel
           </button>
           <button className='btn btn-primary btn-sm' onClick={onConfirm}>
-            Proceed
+            Apply Changes & Regenerate Report
           </button>
         </div>
       </div>

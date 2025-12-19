@@ -6,6 +6,7 @@ import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 interface IConfigureLaunchStepProps {
   isReady: boolean;
   onExecute: () => void;
+  onCancel?: () => void;
   isLoading?: boolean;
   disabledReason?: string;
 }
@@ -13,6 +14,7 @@ interface IConfigureLaunchStepProps {
 const ConfigureLaunchStep: React.FC<IConfigureLaunchStepProps> = ({
   isReady,
   onExecute,
+  onCancel,
   isLoading = false,
   disabledReason,
 }) => {
@@ -26,7 +28,7 @@ const ConfigureLaunchStep: React.FC<IConfigureLaunchStepProps> = ({
       onClick={onExecute}
       disabled={isButtonDisabled}
       className={cn(
-        'btn btn-lg flex items-center justify-center gap-3 px-12 py-6 font-semibold shadow-lg transition-all duration-200 hover:shadow-xl',
+        'btn btn-lg flex w-full items-center justify-center gap-3 px-12 py-6 font-semibold shadow-lg transition-all duration-200 hover:shadow-xl',
         !isButtonDisabled
           ? 'btn-primary'
           : 'aucctus-bg-secondary aucctus-text-secondary cursor-not-allowed opacity-50',
@@ -59,8 +61,8 @@ const ConfigureLaunchStep: React.FC<IConfigureLaunchStepProps> = ({
   );
 
   return (
-    <div className='flex justify-center'>
-      {/* Launch Button - Centered, prominent */}
+    <div className='flex flex-col gap-3'>
+      {/* Launch Button */}
       {disabledReason ? (
         <ComponentTooltip
           tip={
@@ -71,10 +73,21 @@ const ConfigureLaunchStep: React.FC<IConfigureLaunchStepProps> = ({
             </div>
           }
         >
-          <span className='inline-flex'>{launchButton}</span>
+          <span className='inline-flex w-full'>{launchButton}</span>
         </ComponentTooltip>
       ) : (
         launchButton
+      )}
+
+      {/* Cancel Button */}
+      {onCancel && (
+        <button
+          onClick={onCancel}
+          className='btn btn-light btn-md w-full'
+          aria-label='Cancel test setup'
+        >
+          Cancel Test
+        </button>
       )}
     </div>
   );

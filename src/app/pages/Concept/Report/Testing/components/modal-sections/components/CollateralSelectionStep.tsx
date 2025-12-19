@@ -88,7 +88,7 @@ const CollateralSelectionStep: React.FC<ICollateralSelectionStepProps> = ({
   return (
     <div className='space-y-4'>
       {/* Collateral Grid */}
-      <div className='grid grid-cols-2 gap-4 lg:grid-cols-4'>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {collaterals.map((collateral) => {
           const isSelected = selectedCollateralUuids.includes(collateral.uuid);
           const isMaxReached =

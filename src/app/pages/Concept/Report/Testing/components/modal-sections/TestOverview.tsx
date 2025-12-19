@@ -1,19 +1,23 @@
 import React from 'react';
-import { Assumption, ITestDetails } from '../../types';
-import TestMethodCard from '../common/TestMethodCard';
-import AssumptionDetailCard from '../../../Assumptions/components/cards/AssumptionDetailCard';
-import {
-  IAssumptionV2,
-  AssumptionCategory,
-  AssumptionStatusV2,
-  RiskCategory,
-} from '@libs/api/types';
 import { Icon } from '@components';
+import { AssumptionCategory } from '@libs/api/types';
+import { Assumption, ITestDetails, ITestAssumptionDetailed } from '../../types';
+import TestMethodCard from '../common/TestMethodCard';
+import TestAssumptionCard from '../common/TestAssumptionCard';
+import TabBanner from '../common/TabBanner';
 
 interface TestOverviewProps {
   assumptions?: Assumption[];
   testType?: string;
   testDetail?: ITestDetails | null;
+}
+
+// Helper to get assumption data in a normalized format for TestAssumptionCard
+interface NormalizedAssumption {
+  id: string;
+  category: AssumptionCategory;
+  statement: string;
+  benchmark?: string;
 }
 
 const TestOverview: React.FC<TestOverviewProps> = ({
@@ -26,135 +30,43 @@ const TestOverview: React.FC<TestOverviewProps> = ({
   const testName = testDetail?.name || displayTestType;
   const testDescription =
     testDetail?.description ||
-    'One-on-one conversations with target users to uncover needs, pain points, and experiences. Through structured questioning, you&apos;ll gather qualitative insights that quantitative data might miss.';
-  const testObjective =
-    testDetail?.objective ||
-    'Customer interviews are highly effective for gathering deep insights directly from your users. They allow you to uncover hidden pain points, validate assumptions, and build empathy with your audience.';
+    "One-on-one conversations with target users to uncover needs, pain points, and experiences. Through structured questioning, you'll gather qualitative insights that quantitative data might miss.";
 
   // Format the title to include "1-1" if it's a customer interview
   const formattedTitle = displayTestType.toLowerCase().includes('interview')
-    ? `${testName}`
+    ? `1-1 ${testName}`
     : testName;
 
-  // Convert API assumptions directly to IAssumptionV2 format (skip intermediate Assumption format)
-  const convertApiToAssumptionCard = (apiAssumption: any): IAssumptionV2 => {
-    // Normalize validation status to handle both camelCase and snake_case from API
-    // Return type matches IAssumptionV2.validationStatus (excludes 'unvalidated')
-    const normalizeValidationStatus = (
-      status: string | undefined,
-    ): 'validated' | 'partially_validated' | 'invalidated' | 'untested' => {
-      if (!status) return 'untested';
+  // Normalize API assumptions to simple format for TestAssumptionCard
+  const normalizeApiAssumption = (
+    apiAssumption: ITestAssumptionDetailed,
+  ): NormalizedAssumption => ({
+    id: apiAssumption.uuid,
+    category: apiAssumption.category as AssumptionCategory,
+    statement: apiAssumption.statement,
+    benchmark: apiAssumption.benchmark,
+  });
 
-      // Handle camelCase from API serializer
-      const normalized =
-        status === 'partiallyValidated'
-          ? 'partially_validated'
-          : status.toLowerCase();
+  // Normalize legacy Assumption props to simple format
+  const normalizeLegacyAssumption = (
+    assumption: Assumption,
+  ): NormalizedAssumption => ({
+    id: assumption.id,
+    category: (assumption.category?.toLowerCase() ||
+      'desirability') as AssumptionCategory,
+    statement: assumption.description,
+    benchmark: assumption.benchmark,
+  });
 
-      if (
-        normalized === 'validated' ||
-        normalized === 'partially_validated' ||
-        normalized === 'invalidated' ||
-        normalized === 'untested'
-      ) {
-        return normalized as
-          | 'validated'
-          | 'partially_validated'
-          | 'invalidated'
-          | 'untested';
-      }
-      return 'untested';
-    };
-
-    const validationStatus = normalizeValidationStatus(
-      apiAssumption.validationStatus,
-    );
-
-    return {
-      uuid: apiAssumption.uuid,
-      statement: apiAssumption.statement,
-      category: apiAssumption.category as AssumptionCategory,
-      risk: apiAssumption.riskScore || 0.5, // Use riskScore from API or default
-      certainty: apiAssumption.certainty, // Already in 0-1 range
-      importance: apiAssumption.importance, // Already in 0-1 range
-      certaintyCategory: (apiAssumption.riskLevel as RiskCategory) || 'medium',
-      importanceCategory: 'high' as RiskCategory, // Default based on importance value
-      riskCategory: (apiAssumption.riskLevel as RiskCategory) || 'medium',
-      validationStatus,
-      createdBy: apiAssumption.createdBy || 1, // Default createdBy
-      createdAt: apiAssumption.createdAt || new Date().toISOString(),
-      updatedAt: apiAssumption.updatedAt || new Date().toISOString(),
-
-      // Optional computed fields for backward compatibility
-      id: apiAssumption.uuid, // Alias for backward compatibility
-      lastModified: apiAssumption.updatedAt || new Date().toISOString(),
-      metadata: {},
-      status: validationStatus,
-      confidence: apiAssumption.certainty, // Alias for certainty
-      impactPoints: Math.round(apiAssumption.importance * 10), // Convert 0-1 to 0-10
-      validationPercentage: 0, // Will be updated based on test results
-      tests: [], // Empty tests array for now
-      priority: 'medium',
-      benchmark: apiAssumption.benchmark, // Include benchmark from API
-    };
-  };
-
-  // Convert Testing assumptions to Assumption card format (for props fallback)
-  const convertToAssumptionCard = (assumption: Assumption): IAssumptionV2 => {
-    // Map risk from string to number
-    const riskValue = (() => {
-      switch (assumption.risk) {
-        case 'high':
-          return 0.8; // Convert to 0-1 range
-        case 'medium':
-          return 0.5;
-        case 'low':
-          return 0.2;
-        default:
-          return 0.5;
-      }
-    })();
-
-    return {
-      uuid: assumption.id || '',
-      statement: assumption.description || '',
-      category: (assumption.category?.toLowerCase() ||
-        'desirability') as AssumptionCategory,
-      risk: riskValue, // 0-1 range as expected by API
-      certainty: (assumption.confidence || 0) / 100, // Convert back to 0-1 range
-      importance: 0.7, // Default importance for testing (0-1 range)
-      certaintyCategory: 'medium' as RiskCategory,
-      importanceCategory: 'high' as RiskCategory,
-      riskCategory: (assumption.risk as RiskCategory) || 'medium',
-      validationStatus:
-        assumption.status === 'validated' ? 'validated' : 'untested',
-      createdBy: 1, // Default createdBy
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-
-      // Optional computed fields for backward compatibility
-      id: assumption.id || '',
-      lastModified: new Date().toISOString(),
-      metadata: {},
-      status: (assumption.status || 'untested') as AssumptionStatusV2,
-      confidence: (assumption.confidence || 0) / 100, // Convert to 0-1 range
-      impactPoints: 7, // Default impact points (0-10)
-      validationPercentage: 0, // Will be updated based on test results
-      tests: [], // Empty tests array for now
-      priority: 'medium',
-      benchmark: assumption.benchmark, // Include benchmark from original assumption
-    };
-  };
-
-  // Determine which assumptions to display - convert directly to IAssumptionV2
-  const getDisplayAssumptions = (): IAssumptionV2[] => {
+  // Get normalized assumptions from either source
+  const getDisplayAssumptions = (): NormalizedAssumption[] => {
     // Use assumptions from testDetail if available
     if (testDetail?.assumptions && testDetail.assumptions.length > 0) {
-      return testDetail.assumptions.map(convertApiToAssumptionCard);
+      return testDetail.assumptions.map(normalizeApiAssumption);
     }
-    // Fallback to props assumptions - convert them to IAssumptionV2 format
+    // Fallback to props assumptions
     if (assumptions.length > 0) {
-      return assumptions.map(convertToAssumptionCard);
+      return assumptions.map(normalizeLegacyAssumption);
     }
     return [];
   };
@@ -163,26 +75,31 @@ const TestOverview: React.FC<TestOverviewProps> = ({
 
   return (
     <div className='space-y-6'>
+      {/* Tab Banner */}
+      <TabBanner
+        icon='clipboard-list'
+        title='Test Overview'
+        description="Review the test method and assumptions you'll be validating with this test."
+      />
+
       {/* Test Method Card */}
       <TestMethodCard
         title={formattedTitle}
         description={testDescription}
-        insight={testObjective}
+        icon='heart'
       />
 
       {/* Assumptions Section */}
-      <div className='space-y-4'>
+      <div className='space-y-3'>
         {displayAssumptions.length > 0 ? (
-          <div className='space-y-3'>
-            {displayAssumptions.map((assumption) => (
-              <AssumptionDetailCard
-                key={assumption.uuid || assumption.statement}
-                assumption={assumption}
-                showBenchmark={true}
-                showActions={false}
-              />
-            ))}
-          </div>
+          displayAssumptions.map((assumption) => (
+            <TestAssumptionCard
+              key={assumption.id || assumption.statement}
+              category={assumption.category}
+              statement={assumption.statement}
+              benchmark={assumption.benchmark}
+            />
+          ))
         ) : (
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-8'>
             <div className='flex flex-col items-center justify-center text-center'>

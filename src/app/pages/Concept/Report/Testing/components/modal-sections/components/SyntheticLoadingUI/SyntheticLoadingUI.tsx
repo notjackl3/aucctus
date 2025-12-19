@@ -18,6 +18,7 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
   startTime,
   conceptUuid,
   testUuid,
+  testName,
   plannedParticipantCounts,
   onViewResults,
 }) => {
@@ -48,6 +49,20 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
     });
   }, [profiles, status, completedProfileUuids]);
 
+  // Calculate current participant index based on completed profiles
+  const currentParticipantIndex = useMemo(() => {
+    if (!profiles.length || status !== 'running') return undefined;
+
+    // Find the first non-completed profile
+    for (let i = 0; i < profiles.length; i++) {
+      if (!completedProfileUuids?.has(profiles[i].uuid)) {
+        return i;
+      }
+    }
+    // All completed, return last index
+    return profiles.length - 1;
+  }, [profiles, completedProfileUuids, status]);
+
   if (status === 'completed') {
     return (
       <CompletedState
@@ -73,13 +88,37 @@ const SyntheticLoadingUI: React.FC<ISyntheticLoadingUIProps> = ({
         numProfiles={profiles.length}
         estimatedSeconds={estimatedSeconds}
         startTime={startTime}
+        testName={testName}
       />
 
       {/* Interview Progress Card */}
       <InterviewProgressCard
         personaProgress={personaProgress}
         quotes={quotes}
+        currentParticipantIndex={currentParticipantIndex}
       />
+
+      {/* Live Responses Section */}
+      {quotes.length > 0 && (
+        <div className='space-y-3'>
+          <h3 className='aucctus-text-primary text-center text-lg font-semibold'>
+            Live Responses
+          </h3>
+          <div className='grid grid-cols-1 gap-3 md:grid-cols-2'>
+            {quotes.map((quote, index) => (
+              <div
+                key={`${quote.profileUuid}-${index}`}
+                className='aucctus-bg-primary aucctus-border-secondary animate-fade-in rounded-lg border p-3 shadow-sm'
+                style={{ animationDelay: `${index * 0.2}s` }}
+              >
+                <p className='aucctus-text-secondary aucctus-text-sm'>
+                  &ldquo;{quote.text}&rdquo;
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

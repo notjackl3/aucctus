@@ -33,6 +33,7 @@ export interface ISyntheticLoadingUIProps {
   // Concept UUID for agent timing
   conceptUuid?: string;
   testUuid?: string;
+  testName?: string;
   plannedParticipantCounts?: Record<string, number>;
 
   // Navigation callback

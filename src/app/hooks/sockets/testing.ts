@@ -429,9 +429,16 @@ const persistExecutionState = (
     state.status !== 'completed' // Don't persist completed
   ) {
     try {
+      // Convert Set to array for JSON serialization
+      const stateToSerialize = {
+        ...state,
+        completedProfileUuids: state.completedProfileUuids
+          ? Array.from(state.completedProfileUuids)
+          : [],
+      };
       sessionStorage.setItem(
         EXECUTION_STATE_KEY(conceptUuid, testUuid),
-        JSON.stringify(state),
+        JSON.stringify(stateToSerialize),
       );
     } catch (error) {
       // Handle storage errors gracefully
@@ -468,7 +475,27 @@ const getPersistedExecutionState = (
         typeof parsed.status === 'string' &&
         typeof parsed.progress === 'number'
       ) {
-        return parsed;
+        // Convert completedProfileUuids array back to Set
+        // Handle both array format (new) and any legacy formats
+        let completedProfileUuids: Set<string> | undefined;
+        if (Array.isArray(parsed.completedProfileUuids)) {
+          completedProfileUuids = new Set(parsed.completedProfileUuids);
+        } else if (
+          parsed.completedProfileUuids &&
+          typeof parsed.completedProfileUuids === 'object'
+        ) {
+          // Handle case where Set was serialized as object (legacy)
+          completedProfileUuids = new Set(
+            Object.values(parsed.completedProfileUuids) as string[],
+          );
+        } else {
+          completedProfileUuids = new Set<string>();
+        }
+
+        return {
+          ...parsed,
+          completedProfileUuids,
+        };
       }
     }
   } catch (error) {
@@ -579,6 +606,11 @@ export const useSyntheticExecutionEvents = (
               // Invalidate test results queries to show new synthetic results
               queryClient.invalidateQueries({
                 queryKey: [AucctusQueryKeys.testResults, conceptUuid, testUuid],
+              });
+
+              // Invalidate test detail to refresh comprehensiveRecommendations for Impact tab
+              queryClient.invalidateQueries({
+                queryKey: [AucctusQueryKeys.testDetail, conceptUuid, testUuid],
               });
 
               // Call completion callback with results count

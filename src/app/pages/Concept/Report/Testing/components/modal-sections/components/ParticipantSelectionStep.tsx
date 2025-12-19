@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { ICustomerProfile } from '@libs/api/types/concept/concepts';
@@ -15,9 +15,203 @@ interface IParticipantSelectionStepProps {
   onRemoveParticipant: (profileUuid: string) => void;
   onSkipParticipant?: (profileUuid: string) => void;
   onUnskipParticipant?: (profileUuid: string) => void;
+  onPersistCountChange?: (profileUuid: string, newCount: number) => void;
   isLoading: boolean;
   canEditSkip?: boolean;
 }
+
+/**
+ * Individual participant card with local state for debounced API calls
+ */
+const ParticipantCard: React.FC<{
+  profile: ICustomerProfile;
+  count: number;
+  isSkipped: boolean;
+  isSelected: boolean;
+  isLockedSkip: boolean;
+  canToggle: boolean;
+  onCountChange: (profileUuid: string, newCount: number) => void;
+  onPersistCountChange?: (profileUuid: string, newCount: number) => void;
+  onSkipParticipant?: (profileUuid: string) => void;
+  onUnskipParticipant?: (profileUuid: string) => void;
+  onCardClick: (
+    normalizedUuid: string,
+    isSkipped: boolean,
+    isLockedSkip: boolean,
+  ) => void;
+}> = ({
+  profile,
+  count,
+  isSkipped,
+  isSelected,
+  isLockedSkip,
+  canToggle,
+  onCountChange,
+  onPersistCountChange,
+  onSkipParticipant,
+  onCardClick,
+}) => {
+  const normalizedUuid = normalizeUuid(profile.uuid);
+
+  // Local state for immediate UI feedback
+  const [localCount, setLocalCount] = useState(count);
+
+  // Track if the user made a change (vs prop sync from API)
+  const isDirty = useRef(false);
+
+  // Sync local count when prop changes (from API response)
+  useEffect(() => {
+    // Only sync if not dirty (i.e., this is from API, not our own change)
+    if (!isDirty.current) {
+      setLocalCount(count);
+    }
+  }, [count]);
+
+  // Debounced API call - only fire if dirty (user-initiated change)
+  useEffect(() => {
+    if (!isDirty.current || !onPersistCountChange) {
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      onPersistCountChange(normalizedUuid, localCount);
+      isDirty.current = false; // Reset after API call
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [localCount, normalizedUuid, onPersistCountChange]);
+
+  // Handle count change - update local state immediately, parent state, and debounce API
+  const handleCountChange = useCallback(
+    (newCount: number) => {
+      if (newCount < 1) newCount = 1;
+      if (newCount > 20) newCount = 20;
+
+      isDirty.current = true; // Mark as user-initiated
+      setLocalCount(newCount);
+      onCountChange(normalizedUuid, newCount);
+    },
+    [normalizedUuid, onCountChange],
+  );
+
+  return (
+    <div className='group relative'>
+      {/* Clickable Card - using div instead of button to allow nested buttons */}
+      <div
+        role='button'
+        tabIndex={canToggle ? 0 : -1}
+        onClick={() => onCardClick(normalizedUuid, isSkipped, isLockedSkip)}
+        onKeyDown={(e) => {
+          if (canToggle && (e.key === 'Enter' || e.key === ' ')) {
+            e.preventDefault();
+            onCardClick(normalizedUuid, isSkipped, isLockedSkip);
+          }
+        }}
+        className={cn(
+          'w-full rounded-xl border p-4 text-left shadow-sm transition-all',
+          isSelected
+            ? 'aucctus-border-brand aucctus-bg-brand-secondary'
+            : 'aucctus-border-secondary aucctus-bg-primary',
+          canToggle && !isSelected && 'hover:aucctus-bg-secondary-subtle',
+          canToggle ? 'cursor-pointer' : 'cursor-default',
+        )}
+      >
+        <div className='flex items-start gap-4'>
+          {/* Avatar */}
+          <div className='flex-shrink-0'>
+            {profile.avatarUrl ? (
+              <img
+                src={profile.avatarUrl}
+                alt={profile.name}
+                className='h-12 w-12 rounded-full object-cover'
+              />
+            ) : (
+              <div className='aucctus-bg-secondary flex h-12 w-12 items-center justify-center rounded-full'>
+                <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
+                  {profile.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .slice(0, 2)}
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Profile Info */}
+          <div className='min-w-0 flex-1 space-y-2 pr-8'>
+            <div className='aucctus-text-md-semibold aucctus-text-primary'>
+              {profile.segment}
+            </div>
+            <div className='aucctus-text-sm aucctus-text-secondary'>
+              {profile.name}
+            </div>
+
+            {/* Variant Counter or Skipped Badge */}
+            {isSelected ? (
+              <div className='flex w-fit items-center gap-2 rounded-lg px-3 py-1.5'>
+                <button
+                  type='button'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCountChange(localCount - 1);
+                  }}
+                  disabled={localCount <= 1}
+                  className='aucctus-bg-primary hover:aucctus-bg-secondary flex h-5 w-5 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-50'
+                >
+                  <Icon
+                    variant='minus'
+                    className='aucctus-stroke-secondary h-3 w-3'
+                  />
+                </button>
+                <span className='aucctus-text-sm-medium aucctus-text-primary min-w-[20px] px-1 text-center'>
+                  {localCount}
+                </span>
+                <button
+                  type='button'
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleCountChange(localCount + 1);
+                  }}
+                  disabled={localCount >= 20}
+                  className='aucctus-bg-primary hover:aucctus-bg-secondary flex h-5 w-5 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-50'
+                >
+                  <Icon
+                    variant='plus'
+                    className='aucctus-stroke-secondary h-3 w-3'
+                  />
+                </button>
+                <span className='aucctus-text-xs aucctus-text-secondary ml-1'>
+                  variants
+                </span>
+              </div>
+            ) : (
+              <div className='aucctus-text-secondary inline-flex items-center rounded px-2 py-1 text-xs font-medium'>
+                {isLockedSkip ? 'Managed in Participants tab' : 'Skipped'}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* X button to skip (only when selected and can toggle) */}
+      {isSelected && canToggle && (
+        <button
+          type='button'
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onSkipParticipant) {
+              onSkipParticipant(normalizedUuid);
+            }
+          }}
+          className='aucctus-bg-secondary hover:aucctus-bg-tertiary absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full transition-colors'
+        >
+          <Icon variant='closeX' className='aucctus-stroke-secondary h-4 w-4' />
+        </button>
+      )}
+    </div>
+  );
+};
 
 const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
   profiles,
@@ -27,9 +221,24 @@ const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
   onParticipantCountChange,
   onSkipParticipant,
   onUnskipParticipant,
+  onPersistCountChange,
   isLoading,
   canEditSkip = true,
 }) => {
+  // Handle card click to toggle selection
+  const handleCardClick = useCallback(
+    (normalizedUuid: string, isSkipped: boolean, isLockedSkip: boolean) => {
+      if (isLockedSkip || !canEditSkip) return;
+
+      if (isSkipped && onUnskipParticipant) {
+        onUnskipParticipant(normalizedUuid);
+      } else if (!isSkipped && onSkipParticipant) {
+        onSkipParticipant(normalizedUuid);
+      }
+    },
+    [canEditSkip, onSkipParticipant, onUnskipParticipant],
+  );
+
   if (isLoading) {
     return (
       <div className='flex items-center justify-center py-8'>
@@ -63,143 +272,32 @@ const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
   return (
     <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
       {profiles.map((profile) => {
-        // Ensure UUID format is consistent (hyphens, not underscores)
         const normalizedUuid = normalizeUuid(profile.uuid);
-        const count = participantCounts[normalizedUuid] || 5; // Default to 5 if not set
-        const isSelected = count >= 1;
+        const count = participantCounts[normalizedUuid] ?? 2;
         const isSkipped = skippedParticipants.has(normalizedUuid);
+        const isSelected = !isSkipped && count >= 1;
         const isLockedSkip = lockedParticipants?.has(normalizedUuid) ?? false;
-        const allowSkipControls =
+        const canToggle =
           canEditSkip &&
           !isLockedSkip &&
-          onSkipParticipant &&
-          onUnskipParticipant;
+          !!onSkipParticipant &&
+          !!onUnskipParticipant;
 
         return (
-          <div
+          <ParticipantCard
             key={profile.uuid}
-            className='relative overflow-hidden rounded-xl border border-gray-200 bg-white transition-all'
-          >
-            {/* Main content area with conditional background */}
-            <div
-              className={cn(
-                'h-full p-6 transition-all',
-                isSkipped
-                  ? 'bg-gray-50 opacity-60'
-                  : isSelected
-                    ? 'bg-gray-100'
-                    : 'bg-gray-50 hover:bg-gray-100',
-              )}
-            >
-              <div className='flex items-start gap-3'>
-                {/* Avatar */}
-                <div className='flex-shrink-0'>
-                  {profile.avatarUrl ? (
-                    <img
-                      src={profile.avatarUrl}
-                      alt={profile.name}
-                      className='h-12 w-12 rounded-full object-cover'
-                    />
-                  ) : (
-                    <div className='flex h-12 w-12 items-center justify-center rounded-full bg-gray-300'>
-                      <span className='text-sm font-semibold text-gray-700'>
-                        {profile.name
-                          .split(' ')
-                          .map((n) => n[0])
-                          .join('')
-                          .slice(0, 2)}
-                      </span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Profile Info */}
-                <div className='min-w-0 flex-1'>
-                  <h4 className='mb-1 text-lg font-semibold text-gray-900'>
-                    {profile.segment}
-                  </h4>
-                  <p className='mb-3 text-sm text-gray-600'>{profile.name}</p>
-
-                  {/* Variant Counter or Skipped State */}
-                  {isSkipped ? (
-                    <div className='text-sm font-medium text-gray-500'>
-                      Skipped
-                    </div>
-                  ) : (
-                    <div className='flex items-center gap-3'>
-                      <button
-                        onClick={() =>
-                          onParticipantCountChange(normalizedUuid, count - 1)
-                        }
-                        disabled={count <= 1}
-                        className='flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50'
-                      >
-                        <Icon
-                          variant='minus'
-                          className='h-4 w-4 stroke-gray-600'
-                        />
-                      </button>
-
-                      <span className='min-w-[2rem] text-center text-lg font-semibold text-gray-900'>
-                        {count}
-                      </span>
-
-                      <button
-                        onClick={() =>
-                          onParticipantCountChange(normalizedUuid, count + 1)
-                        }
-                        disabled={count >= 20}
-                        className='flex h-8 w-8 items-center justify-center rounded-lg border border-gray-300 bg-white transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50'
-                      >
-                        <Icon
-                          variant='plus'
-                          className='h-4 w-4 stroke-gray-600'
-                        />
-                      </button>
-
-                      <span className='ml-1 text-sm text-gray-500'>
-                        variants
-                      </span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Button positioned outside the grey background */}
-            <div
-              className={cn(
-                'absolute right-4',
-                allowSkipControls ? 'top-4' : 'bottom-4',
-              )}
-            >
-              {allowSkipControls ? (
-                isSkipped ? (
-                  <button
-                    onClick={() => onUnskipParticipant(normalizedUuid)}
-                    className='cursor-pointer rounded-lg bg-blue-600 px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200 hover:bg-blue-700 hover:shadow-md'
-                  >
-                    Unskip
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => onSkipParticipant(normalizedUuid)}
-                    className='flex h-6 w-6 items-center justify-center rounded-full text-xl text-gray-400 transition-colors hover:text-gray-600'
-                  >
-                    ×
-                  </button>
-                )
-              ) : (
-                isSkipped && (
-                  <span className='aucctus-text-xs-semibold aucctus-text-secondary rounded-full bg-gray-100 px-3 py-1'>
-                    {isLockedSkip
-                      ? 'Managed in Participants tab'
-                      : 'Skipped for this run'}
-                  </span>
-                )
-              )}
-            </div>
-          </div>
+            profile={profile}
+            count={count}
+            isSkipped={isSkipped}
+            isSelected={isSelected}
+            isLockedSkip={isLockedSkip}
+            canToggle={canToggle}
+            onCountChange={onParticipantCountChange}
+            onPersistCountChange={onPersistCountChange}
+            onSkipParticipant={onSkipParticipant}
+            onUnskipParticipant={onUnskipParticipant}
+            onCardClick={handleCardClick}
+          />
         );
       })}
     </div>

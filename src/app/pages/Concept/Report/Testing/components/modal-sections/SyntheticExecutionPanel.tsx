@@ -4,9 +4,13 @@ import {
   useSyntheticDistributionPreview,
   useTestCollaterals,
 } from '@hooks/query/synthetic-execution.hook';
+import {
+  useTestParticipants,
+  useUpdateTestParticipant,
+} from '@hooks/query/testing.hook';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import telemetry from '@libs/telemetry';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import CollateralSelectionStep from './components/CollateralSelectionStep';
 import ConfigureLaunchStep from './components/ConfigureLaunchStep';
 import ParticipantSelectionStep from './components/ParticipantSelectionStep';
@@ -41,10 +45,12 @@ interface ISyntheticExecutionPanelProps {
   // New props for configuration
   conceptUuid: string;
   testUuid: string;
+  testName?: string;
   onExecute: (config: ISyntheticExecutionRequest) => void;
   onReset: () => void;
   onNavigateToCollateral?: (collateralUuid: string) => void;
   onNavigateToResults?: () => void;
+  onCancelSetup?: () => void;
   initialParticipantCounts?: Record<string, number>;
   lockedSkippedParticipants?: Set<string>;
   isCollateralRegenerating?: boolean;
@@ -73,11 +79,13 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   completedProfileUuids,
   conceptUuid,
   testUuid,
+  testName,
   onExecute,
   onReset,
   onCancel,
   onNavigateToCollateral,
   onNavigateToResults,
+  onCancelSetup,
   initialParticipantCounts,
   lockedSkippedParticipants,
   isCollateralRegenerating = false,
@@ -91,6 +99,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   const [participantCounts, setParticipantCounts] = useState<
     Record<string, number>
   >(initialParticipantCounts || {});
+
   const [syntheticSkippedParticipants, setSyntheticSkippedParticipants] =
     useState<Set<string>>(new Set());
 
@@ -119,6 +128,51 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     testUuid,
   );
 
+  // Fetch participants to get the mapping from profileUuid → participantUuid
+  const { participants } = useTestParticipants(conceptUuid, testUuid, {
+    enabled: !!conceptUuid && !!testUuid,
+  });
+
+  // Mutation for persisting count changes to backend
+  const updateParticipant = useUpdateTestParticipant();
+
+  // Create lookup map: profileUuid → participantUuid
+  const profileToParticipantMap = useMemo(() => {
+    const map = new Map<string, string>();
+    if (participants) {
+      participants.forEach((participant) => {
+        const normalizedProfileUuid = normalizeUuid(
+          participant.customerProfile.uuid,
+        );
+        map.set(normalizedProfileUuid, participant.uuid);
+      });
+    }
+    return map;
+  }, [participants]);
+
+  // Handler to persist count change to backend
+  const handlePersistCountChange = useCallback(
+    (profileUuid: string, newCount: number) => {
+      const participantUuid = profileToParticipantMap.get(profileUuid);
+      if (!participantUuid) {
+        telemetry.warn('synthetic.execution.persist_count.no_participant', {
+          conceptUuid,
+          testUuid,
+          profileUuid,
+        });
+        return;
+      }
+
+      updateParticipant.mutate({
+        conceptUuid,
+        testUuid,
+        participantUuid,
+        data: { count: newCount },
+      });
+    },
+    [conceptUuid, testUuid, profileToParticipantMap, updateParticipant],
+  );
+
   // Clear selected collaterals when regeneration completes to avoid stale UUIDs
   const prevRegeneratingRef = React.useRef(isCollateralRegenerating);
   React.useEffect(() => {
@@ -133,12 +187,20 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     prevRegeneratingRef.current = isCollateralRegenerating;
   }, [conceptUuid, testUuid, isCollateralRegenerating, refetchCollaterals]);
 
-  // Computed values
+  // Set of valid profile UUIDs from current profiles (handles profile regeneration)
+  const validProfileUuids = useMemo(() => {
+    return new Set(profiles.map((p) => normalizeUuid(p.uuid)));
+  }, [profiles]);
+
+  // Computed values - filter by valid profile UUIDs to handle regenerated profiles
   const totalTests = useMemo(() => {
     return Object.entries(participantCounts)
       .filter(([uuid]) => !effectiveSkippedParticipants.has(uuid))
+      .filter(
+        ([uuid]) => validProfileUuids.size === 0 || validProfileUuids.has(uuid),
+      )
       .reduce((sum, [, count]) => sum + count, 0);
-  }, [participantCounts, effectiveSkippedParticipants]);
+  }, [participantCounts, effectiveSkippedParticipants, validProfileUuids]);
 
   // Filter profiles to only show selected ones for loading UI
   const selectedProfiles = useMemo(() => {
@@ -180,9 +242,16 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     executionConfigKey,
   ]);
 
-  // Initialize participant counts when profiles load
-  // Initialize from server-provided defaults once when they change
+  // Sync participant counts and skipped state when API data changes
+  // This ensures changes made on Participants tab are reflected in Execute tab
+  // IMPORTANT: Only sync when idle - during running/completed, use session storage config
   useEffect(() => {
+    // Don't sync with server data while test is running - rely on session storage config instead
+    // This prevents overwriting the execution config with all participants from the API
+    if (status !== 'idle') {
+      return;
+    }
+
     const hasInitialCounts =
       initialParticipantCounts &&
       Object.keys(initialParticipantCounts).length > 0;
@@ -191,37 +260,77 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       return;
     }
 
+    const skippedFromServer = new Set<string>();
+    const unskippedFromServer = new Set<string>();
+
+    Object.entries(initialParticipantCounts).forEach(([uuid, count]) => {
+      if (count === 0) {
+        skippedFromServer.add(uuid);
+      } else {
+        unskippedFromServer.add(uuid);
+      }
+    });
+
+    setSyntheticSkippedParticipants((prev) => {
+      const updated = new Set(prev);
+
+      // Add server-skipped profiles
+      skippedFromServer.forEach((uuid) => updated.add(uuid));
+
+      // Remove profiles that server says are NOT skipped (user unskipped on Participants tab)
+      unskippedFromServer.forEach((uuid) => updated.delete(uuid));
+
+      return updated;
+    });
+
     setParticipantCounts(initialParticipantCounts);
-    setSyntheticSkippedParticipants(new Set());
-  }, [initialParticipantCounts]);
+  }, [initialParticipantCounts, status]);
 
   // Fallback initialization (session restore or default counts)
   useEffect(() => {
     const hasInitialCountsProp =
       initialParticipantCounts &&
       Object.keys(initialParticipantCounts).length > 0;
-    if (hasInitialCountsProp) {
+
+    // During running/completed states, prioritize session storage over initialParticipantCounts
+    // This preserves the actual execution configuration (which profiles were selected)
+    const isExecuting = status !== 'idle';
+
+    // Skip if we have initial counts AND we're idle (normal setup flow)
+    if (hasInitialCountsProp && !isExecuting) {
       return;
     }
 
     const shouldInitialize =
       profiles.length > 0 && Object.keys(participantCounts).length === 0;
 
-    if (!shouldInitialize) {
+    // During execution, always try to restore from session storage even if counts exist
+    // This handles the case where navigation caused counts to be cleared
+    const shouldRestoreForExecution = isExecuting && profiles.length > 0;
+
+    if (!shouldInitialize && !shouldRestoreForExecution) {
       return;
     }
 
     const savedConfig = sessionStorage.getItem(executionConfigKey);
-    if (savedConfig && status !== 'idle') {
+    if (savedConfig && isExecuting) {
       try {
         const config = JSON.parse(savedConfig);
         const configAge = Date.now() - config.timestamp;
 
         if (configAge < 60 * 60 * 1000) {
-          setParticipantCounts(config.participantCounts);
-          setSyntheticSkippedParticipants(
-            new Set(config.skippedParticipants || []),
-          );
+          // Only restore if current counts are empty or different from saved
+          const currentCountsEmpty =
+            Object.keys(participantCounts).length === 0;
+          const savedCountsJson = JSON.stringify(config.participantCounts);
+          const currentCountsJson = JSON.stringify(participantCounts);
+
+          if (currentCountsEmpty || savedCountsJson !== currentCountsJson) {
+            setParticipantCounts(config.participantCounts);
+            setSyntheticSkippedParticipants(
+              new Set(config.skippedParticipants || []),
+            );
+          }
           return;
         }
       } catch (error) {
@@ -253,6 +362,38 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
     initialParticipantCounts,
   ]);
 
+  // Detect and fix stale participant counts (when profiles have been regenerated)
+  // This effect reinitializes counts when ALL existing counts reference stale/deleted profiles
+  useEffect(() => {
+    if (profiles.length === 0 || Object.keys(participantCounts).length === 0) {
+      return;
+    }
+
+    // Check if any of the current participant counts match valid profile UUIDs
+    const hasAnyValidCount = Object.keys(participantCounts).some((uuid) =>
+      validProfileUuids.has(uuid),
+    );
+
+    // If ALL counts are stale (none match current profiles), reinitialize with defaults
+    if (!hasAnyValidCount) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[SyntheticExecutionPanel] All participant counts reference stale profile UUIDs. ' +
+          'Reinitializing with current profiles. This typically happens after profiles are regenerated.',
+      );
+
+      const defaultCounts: Record<string, number> = {};
+      profiles.forEach((profile) => {
+        const normalizedUuid = normalizeUuid(profile.uuid);
+        // Use 5 as the default count per profile
+        defaultCounts[normalizedUuid] = 5;
+      });
+
+      setParticipantCounts(defaultCounts);
+      setSyntheticSkippedParticipants(new Set());
+    }
+  }, [profiles, participantCounts, validProfileUuids]);
+
   // Memoized configuration object
   const executionConfig = useMemo(
     (): ISyntheticExecutionRequest => ({
@@ -266,6 +407,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
           ? Object.fromEntries(
               Object.entries(participantCounts)
                 .filter(([uuid]) => !effectiveSkippedParticipants.has(uuid))
+                // Filter to only include valid profile UUIDs (handles regenerated profiles)
+                .filter(([uuid]) => validProfileUuids.has(uuid))
                 .map(([uuid, count]) => [uuid, count]), // Send raw counts, backend will normalize
             )
           : undefined,
@@ -275,6 +418,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       selectedCollateralUuids,
       participantCounts,
       effectiveSkippedParticipants,
+      validProfileUuids,
     ],
   );
 
@@ -350,11 +494,10 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   const handleRemoveParticipant = (profileUuid: string) => {
     // Ensure UUID format is consistent (hyphens, not underscores)
     const normalizedUuid = normalizeUuid(profileUuid);
-    setParticipantCounts((prev) => {
-      const newCounts = { ...prev };
-      delete newCounts[normalizedUuid];
-      return newCounts;
-    });
+    setParticipantCounts((prev) => ({
+      ...prev,
+      [normalizedUuid]: 0,
+    }));
 
     setSyntheticSkippedParticipants((prev) => {
       if (!prev.has(normalizedUuid)) {
@@ -373,17 +516,19 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       return;
     }
 
-    setParticipantCounts((prev) => {
-      const newCounts = { ...prev };
-      delete newCounts[normalizedUuid];
-      return newCounts;
-    });
+    setParticipantCounts((prev) => ({
+      ...prev,
+      [normalizedUuid]: 0,
+    }));
 
     setSyntheticSkippedParticipants((prev) => {
       const updated = new Set(prev);
       updated.add(normalizedUuid);
       return updated;
     });
+
+    // Persist count=0 to backend
+    handlePersistCountChange(normalizedUuid, 0);
   };
 
   const handleUnskipParticipant = (profileUuid: string) => {
@@ -402,10 +547,14 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
       return updated;
     });
 
+    const defaultCount = 5;
     setParticipantCounts((prev) => ({
       ...prev,
-      [normalizedUuid]: prev[normalizedUuid] || 5,
+      [normalizedUuid]: prev[normalizedUuid] || defaultCount,
     }));
+
+    // Persist restored count to backend
+    handlePersistCountChange(normalizedUuid, defaultCount);
   };
 
   return (
@@ -446,7 +595,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
                 <div className='flex items-center gap-3'>
                   <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
                     <Icon
-                      variant='file-attachment'
+                      variant='file-text'
                       className='aucctus-stroke-brand-primary h-4 w-4'
                     />
                   </div>
@@ -490,8 +639,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
             <div className='px-6 py-4'>
               <StepNavigation
                 stepNumber={1}
-                title='Select Participants'
-                description='Choose participant profiles for your synthetic test'
+                title='Confirm Participants'
+                description='Review participant selection from the Participants tab'
                 isComplete={isStep1Complete}
               />
 
@@ -504,6 +653,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
                 onRemoveParticipant={handleRemoveParticipant}
                 onSkipParticipant={handleSkipParticipant}
                 onUnskipParticipant={handleUnskipParticipant}
+                onPersistCountChange={handlePersistCountChange}
                 isLoading={profilesLoading}
               />
             </div>
@@ -544,6 +694,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
                 <ConfigureLaunchStep
                   isReady={isReady}
                   onExecute={handleExecute}
+                  onCancel={onCancelSetup}
                   isLoading={isExecuting}
                   disabledReason={collateralBlockedMessage}
                 />
@@ -571,6 +722,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
           startTime={startTime}
           conceptUuid={conceptUuid}
           testUuid={testUuid}
+          testName={testName}
           plannedParticipantCounts={participantCounts}
           onViewResults={onNavigateToResults}
         />

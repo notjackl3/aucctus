@@ -7,6 +7,8 @@ import {
   useApplyRecommendations,
 } from '@hooks/query/testing.hook';
 import { markConceptSectionsPending } from '@hooks/query/concepts.hook';
+import { Icon } from '@components';
+import TabBanner from '../../common/TabBanner';
 import LoadingState from './components/LoadingState';
 import NoDataState from './components/NoDataState';
 import AssumptionValidationCard from './components/AssumptionValidationCard';
@@ -172,25 +174,39 @@ const TestImpact: React.FC<TestImpactProps> = ({
 
   return (
     <div className='relative space-y-6'>
+      <TabBanner
+        icon='trending-up'
+        title='Test Impact'
+        description='Review how test results affect your assumptions and apply recommended changes to your concept.'
+      />
+
       <div className={`${isDisabled ? 'pointer-events-none opacity-50' : ''}`}>
         {hasNoData ? (
           <NoDataState />
         ) : (
           <div className='space-y-6'>
-            {/* Assumptions Validation Results */}
+            {/* Impact to Original Assumptions */}
             {!hasNoAssumptions && (
-              <div className='space-y-4'>
-                <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary'>
-                  Assumption Validation Results
-                </h4>
-                {assumptions.map((assumption) => (
-                  <AssumptionValidationCard
-                    key={assumption.uuid}
-                    assumption={assumption}
-                    isUpdating={updatingAssumptionUuid === assumption.uuid}
-                    onValidationChange={handleValidationStatusChange}
+              <div className='space-y-5'>
+                <div className='flex items-center gap-2'>
+                  <Icon
+                    variant='target'
+                    className='aucctus-stroke-brand-primary h-5 w-5'
                   />
-                ))}
+                  <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
+                    Impact to Original Assumptions
+                  </h4>
+                </div>
+                <div className='space-y-4'>
+                  {assumptions.map((assumption) => (
+                    <AssumptionValidationCard
+                      key={assumption.uuid}
+                      assumption={assumption}
+                      isUpdating={updatingAssumptionUuid === assumption.uuid}
+                      onValidationChange={handleValidationStatusChange}
+                    />
+                  ))}
+                </div>
               </div>
             )}
 

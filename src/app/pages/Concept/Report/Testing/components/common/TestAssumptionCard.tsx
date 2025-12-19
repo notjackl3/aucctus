@@ -1,106 +1,118 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Icon } from '@components';
-import CertaintyMeter from '../../../Assumptions/components/badges/CertaintyMeter';
-import ImportanceMeter from '../../../Assumptions/components/badges/ImportanceMeter';
-import GenericStatusBadge from '../../../Assumptions/components/shared/GenericStatusBadge';
-import { ASSUMPTION_STATUS_CONFIGS } from '../../../Assumptions/constants/statusConfigs';
+import { AssumptionCategory } from '@libs/api/types';
+import CategoryIcon from '../../../Assumptions/components/cards/category-progress-card/CategoryIcon';
 
 interface TestAssumptionCardProps {
-  category: string;
+  category: AssumptionCategory;
   statement: string;
-  certainty: number;
-  importance: number;
-  benchmark: string;
+  benchmark?: string;
+  onBenchmarkChange?: (newBenchmark: string) => void;
 }
 
 const TestAssumptionCard: React.FC<TestAssumptionCardProps> = ({
   category,
   statement,
-  certainty,
-  importance,
   benchmark,
+  onBenchmarkChange,
 }) => {
-  // Helper to get category icon
-  const getCategoryIcon = (): React.ReactNode => {
-    switch (category.toLowerCase()) {
-      case 'desirability':
-        return (
-          <Icon variant='heart' className='aucctus-stroke-brown-500 h-5 w-5' />
-        );
-      case 'viability':
-        return (
-          <Icon
-            variant='currency-dollar'
-            className='aucctus-stroke-purple-500 h-5 w-5'
-          />
-        );
-      case 'feasibility':
-        return (
-          <Icon variant='gear' className='aucctus-stroke-blue-500 h-5 w-5' />
-        );
-      case 'adaptability':
-        return (
-          <Icon
-            variant='refresh'
-            className='aucctus-stroke-orange-500 h-5 w-5'
-          />
-        );
-      default:
-        return (
-          <Icon
-            variant='clipboard'
-            className='aucctus-stroke-tertiary h-5 w-5'
-          />
-        );
+  const [isEditing, setIsEditing] = useState(false);
+  const [editValue, setEditValue] = useState(benchmark || '');
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    setEditValue(benchmark || '');
+  }, [benchmark]);
+
+  useEffect(() => {
+    if (isEditing && textareaRef.current) {
+      textareaRef.current.focus();
+      textareaRef.current.select();
+    }
+  }, [isEditing]);
+
+  const handleSave = () => {
+    if (editValue.trim() && onBenchmarkChange) {
+      onBenchmarkChange(editValue.trim());
+    }
+    setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSave();
+    } else if (e.key === 'Escape') {
+      setEditValue(benchmark || '');
+      setIsEditing(false);
     }
   };
 
   return (
-    <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-5 shadow-sm'>
-      {/* Category and status badges */}
-      <div className='mb-3 flex items-start justify-between'>
-        <div className='flex items-center'>
-          {getCategoryIcon()}
-          <span className='aucctus-text-sm-medium ml-2 capitalize'>
+    <div className='aucctus-bg-primary aucctus-border-secondary flex overflow-hidden rounded-lg border shadow-sm'>
+      {/* Left side - The Assumption */}
+      <div className='flex-1 p-5'>
+        {/* Category row */}
+        <div className='mb-4 flex items-center space-x-2'>
+          <CategoryIcon category={category} />
+          <span className='aucctus-text-sm-medium aucctus-text-primary capitalize'>
             {category}
           </span>
         </div>
 
-        <div className='flex items-center'>
-          <GenericStatusBadge config={ASSUMPTION_STATUS_CONFIGS.untested} />
-        </div>
+        {/* Assumption statement */}
+        <h3 className='aucctus-text-lg-bold aucctus-text-primary'>
+          {statement}
+        </h3>
       </div>
 
-      {/* Assumption statement */}
-      <p className='aucctus-text-md-semibold aucctus-text-primary mb-4'>
-        {statement}
-      </p>
-
-      {/* Meters */}
-      <div className='mt-3 flex flex-wrap gap-2'>
-        <CertaintyMeter certainty={certainty} />
-        <ImportanceMeter importance={importance} />
-      </div>
-
-      {/* Validation Benchmark */}
-      <div className='aucctus-bg-brand-section-subtle mt-4 rounded-lg p-3'>
-        <div className='flex items-start gap-2'>
-          <div className='mt-0.5'>
-            <Icon
-              variant='target'
-              className='aucctus-stroke-brand-primary h-4 w-4'
+      {/* Right side - Validation Benchmark/Threshold */}
+      {benchmark && (
+        <div className='aucctus-bg-success-secondary flex w-72 flex-col justify-center border-l border-emerald-200 p-4'>
+          <div className='mb-2 flex items-center gap-2'>
+            <div className='aucctus-bg-success-primary rounded-full p-1'>
+              <Icon
+                variant='target-round'
+                className='aucctus-stroke-success-primary h-3 w-3'
+              />
+            </div>
+            <div className='flex flex-1 items-center justify-between'>
+              <span className='aucctus-text-xs-medium aucctus-text-success-primary uppercase'>
+                Threshold
+              </span>
+              {!isEditing && onBenchmarkChange && (
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className='aucctus-bg-success-primary-hover rounded p-0.5 transition-colors'
+                >
+                  <Icon
+                    variant='edit'
+                    className='aucctus-stroke-success-primary h-2.5 w-2.5'
+                  />
+                </button>
+              )}
+            </div>
+          </div>
+          {isEditing ? (
+            <textarea
+              ref={textareaRef}
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onBlur={handleSave}
+              onKeyDown={handleKeyDown}
+              className='aucctus-text-xs aucctus-text-success-primary aucctus-bg-primary w-full resize-none rounded border border-emerald-300 px-1.5 py-1 focus:outline-none focus:ring-1 focus:ring-emerald-500/50'
+              rows={2}
             />
-          </div>
-          <div>
-            <p className='aucctus-text-xs-semibold aucctus-text-brand-primary mb-0.5'>
-              Validation Benchmark
-            </p>
-            <p className='aucctus-text-sm-regular aucctus-text-brand-secondary'>
+          ) : (
+            <div
+              className={`aucctus-text-xs aucctus-text-success-primary ${onBenchmarkChange ? 'aucctus-bg-success-primary-hover -mx-1 cursor-pointer rounded px-1 py-0.5 transition-colors' : ''}`}
+              onDoubleClick={() => onBenchmarkChange && setIsEditing(true)}
+            >
               {benchmark}
-            </p>
-          </div>
+            </div>
+          )}
         </div>
-      </div>
+      )}
     </div>
   );
 };

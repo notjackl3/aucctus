@@ -1,7 +1,21 @@
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useCallback,
+  useRef,
+  useMemo,
+} from 'react';
 import { Icon } from '@components';
-import { useTestResults, useTestDetail } from '@hooks/query/testing.hook';
-import { ITestResult } from '@libs/api/types/concept/testing';
+import {
+  useTestResults,
+  useTestDetail,
+  useTestParticipants,
+} from '@hooks/query/testing.hook';
+import {
+  ITestResult,
+  IAssumptionValidation,
+  ITestLearning,
+} from '@libs/api/types/concept/testing';
 import TestCompletionLoadingOverlay from './test-impact/components/TestCompletionLoadingOverlay';
 import TestResultProcessingStatus from './TestResultProcessingStatus';
 
@@ -9,10 +23,13 @@ import TestResultProcessingStatus from './TestResultProcessingStatus';
 import TestResultsInfoSection from './components/TestResultsInfoSection';
 import TestResultsHeader from './components/TestResultsHeader';
 import TestResultCard from './components/TestResultCard';
-import TestResultsKeyLearnings from './components/TestResultsKeyLearnings';
 import TestResultsConfirmationDialog from './components/TestResultsConfirmationDialog';
 import RawResultsFiles from './components/RawResultsFiles';
 import SummaryOfFindings from './components/SummaryOfFindings';
+import AssumptionResultCard from './components/AssumptionResultCard';
+import ResultsByParticipant from './components/ResultsByParticipant';
+import TabBanner from '../common/TabBanner';
+import { AssumptionCategory } from '@libs/api/types';
 
 // Extracted hooks
 import { useTestResultsState } from './hooks/useTestResultsState';
@@ -69,6 +86,13 @@ const TestResults: React.FC<TestResultsProps> = ({
     enabled: shouldFetchTestDetail,
   });
 
+  // Fetch participants for Results by Participant section
+  const { participants } = useTestParticipants(
+    conceptUuid || '',
+    testUuid || '',
+    { enabled: shouldFetch },
+  );
+
   const results = fetchedResults as ITestResult[];
 
   // Operations hook
@@ -114,6 +138,91 @@ const TestResults: React.FC<TestResultsProps> = ({
     executionState.executionId; // Must have execution ID to be valid synthetic execution
   const shouldShowResults = hasResults; // Always show results if they exist
   const shouldShowFindings = hasResults; // Always show findings if results exist
+
+  // Aggregate all assumption validations from all test results, keyed by assumptionUuid
+  // Consolidates supportingLearningUuids from all results into a single validation per assumption
+  const assumptionValidationsMap = useMemo(() => {
+    if (!results || results.length === 0)
+      return new Map<string, IAssumptionValidation>();
+
+    // Flatten all assumption validations from all results
+    const allValidations = results
+      .flatMap((result) => result.assumptionValidations || [])
+      .filter(Boolean);
+
+    // Consolidate by assumptionUuid - keep highest confidence and merge all supportingLearningUuids
+    const validationMap = new Map<string, IAssumptionValidation>();
+    allValidations.forEach((validation) => {
+      const existing = validationMap.get(validation.assumptionUuid);
+      // Ensure supportingLearningUuids is always an array (may be undefined/null from API)
+      const validationUuids = validation.supportingLearningUuids || [];
+
+      if (!existing) {
+        // First validation for this assumption - clone it to avoid mutating original
+        validationMap.set(validation.assumptionUuid, {
+          ...validation,
+          supportingLearningUuids: [...validationUuids],
+        });
+      } else {
+        // Merge supportingLearningUuids (deduplicate)
+        const existingUuids = existing.supportingLearningUuids || [];
+        const mergedUuids = new Set([...existingUuids, ...validationUuids]);
+        // Keep the validation with higher confidence, but with merged learning UUIDs
+        if (validation.confidence > existing.confidence) {
+          validationMap.set(validation.assumptionUuid, {
+            ...validation,
+            supportingLearningUuids: Array.from(mergedUuids),
+          });
+        } else {
+          existing.supportingLearningUuids = Array.from(mergedUuids);
+        }
+      }
+    });
+
+    return validationMap;
+  }, [results]);
+
+  // Create a map of learnings keyed by learningUuid for quick lookup
+  const learningsMap = useMemo(() => {
+    if (!results || results.length === 0)
+      return new Map<string, ITestLearning>();
+
+    const learningMap = new Map<string, ITestLearning>();
+    results.forEach((result) => {
+      result.learnings?.forEach((learning) => {
+        learningMap.set(learning.uuid, learning);
+      });
+    });
+
+    return learningMap;
+  }, [results]);
+
+  // Handler for downloading source files from AssumptionResultCard
+  const handleSourceClick = useCallback(
+    (sourceFilename: string) => {
+      if (!results) return;
+
+      // Find the file across all results that matches the source filename
+      for (const result of results) {
+        if (result.files && Array.isArray(result.files)) {
+          const file = result.files.find(
+            (f) => f.originalFilename === sourceFilename,
+          );
+          if (file?.fileUrl) {
+            // Create a temporary link and click it to download
+            const link = document.createElement('a');
+            link.href = file.fileUrl;
+            link.download = file.originalFilename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            return;
+          }
+        }
+      }
+    },
+    [results],
+  );
 
   // Notify parent about results state changes - only when values actually change
   useEffect(() => {
@@ -163,7 +272,7 @@ const TestResults: React.FC<TestResultsProps> = ({
   }
 
   return (
-    <div className='relative space-y-4'>
+    <div className='relative space-y-6'>
       {/* Loading Overlay for Test Result Analysis */}
       {(operations.isCreating || operations.isUpdating) && (
         <TestCompletionLoadingOverlay
@@ -173,6 +282,13 @@ const TestResults: React.FC<TestResultsProps> = ({
         />
       )}
 
+      {/* Tab Banner */}
+      <TabBanner
+        icon='clipboard'
+        title='Test Results'
+        description='Upload and analyze results from your test.'
+      />
+
       {/* Real-time Processing Status - Hide only during active synthetic execution */}
       {!isSyntheticExecutionInProgress && (
         <TestResultProcessingStatus processingState={state.processingState} />
@@ -181,24 +297,51 @@ const TestResults: React.FC<TestResultsProps> = ({
       {/* Information Section - Show when no results */}
       {!hasResults && <TestResultsInfoSection />}
 
-      {/* Raw Results Files Section - Always show results if they exist */}
-      <RawResultsFiles
-        results={results || []}
-        canDelete={canDelete}
-        onDeleteFile={
-          operations.handleDeleteFile as (
-            resultUuid: string,
-            fileUuid: string,
-            filename: string,
-          ) => void
-        }
-        onDeleteAllFiles={operations.handleDeleteAllFiles}
-        onFilesUpload={operations.handleFilesUpload}
-        isViewMode={isViewMode}
-      />
-
       {/* Summary of Findings Section - Show when results exist */}
       {shouldShowFindings && <SummaryOfFindings testDetail={testDetail} />}
+
+      {/* Results by Assumption Section - Show when assumptions exist */}
+      {testDetail?.assumptions && testDetail.assumptions.length > 0 && (
+        <div className='space-y-5'>
+          <div className='flex items-center gap-2'>
+            <Icon
+              variant='target-round'
+              className='aucctus-stroke-brand-primary h-5 w-5'
+            />
+            <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
+              Results by Assumption
+            </h4>
+          </div>
+
+          <div className='space-y-4'>
+            {testDetail.assumptions.map((assumption) => (
+              <AssumptionResultCard
+                key={assumption.uuid}
+                assumptionUuid={assumption.uuid}
+                category={
+                  assumption.category.toLowerCase() as AssumptionCategory
+                }
+                statement={assumption.statement}
+                benchmark={assumption.benchmark || ''}
+                benchmarkAchieved={assumption.validationStatus === 'validated'}
+                assumptionValidationsMap={assumptionValidationsMap}
+                learningsMap={learningsMap}
+                onSourceClick={handleSourceClick}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Results by Participant Section - Show when participants exist */}
+      {participants && participants.length > 0 && (
+        <ResultsByParticipant
+          participants={participants}
+          results={results || []}
+          learningsMap={learningsMap}
+          onSourceClick={handleSourceClick}
+        />
+      )}
 
       {/* Results Grid - Show when results exist */}
       {shouldShowResults && hasRegularResults && (
@@ -238,18 +381,24 @@ const TestResults: React.FC<TestResultsProps> = ({
                 );
               })}
           </div>
-
-          {/* Key Learnings Section */}
-          <TestResultsKeyLearnings results={results} />
         </div>
       )}
 
-      {/* Key Learnings Section - Show even if only synthetic results exist */}
-      {shouldShowResults && !hasRegularResults && (
-        <div className='space-y-6'>
-          <TestResultsKeyLearnings results={results} />
-        </div>
-      )}
+      {/* Raw Results Files Section - Moved to bottom */}
+      <RawResultsFiles
+        results={results || []}
+        canDelete={canDelete}
+        onDeleteFile={
+          operations.handleDeleteFile as (
+            resultUuid: string,
+            fileUuid: string,
+            filename: string,
+          ) => void
+        }
+        onDeleteAllFiles={operations.handleDeleteAllFiles}
+        onFilesUpload={operations.handleFilesUpload}
+        isViewMode={isViewMode}
+      />
 
       {/* Confirmation Dialog */}
       <TestResultsConfirmationDialog

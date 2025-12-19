@@ -14,10 +14,12 @@ import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
 import { useTestParticipants } from '@hooks/query/testing.hook';
+import TabBanner from '../common/TabBanner';
 
 interface TestExecutionProps {
   conceptUuid?: string;
   testUuid?: string;
+  testName?: string;
   onNavigateToCollateral?: (collateralUuid: string) => void;
   onNavigateToResults?: () => void;
   onExecutionStateChange?: (executionState: any) => void; // Expose execution state to parent
@@ -27,6 +29,7 @@ interface TestExecutionProps {
 const TestExecution: React.FC<TestExecutionProps> = ({
   conceptUuid,
   testUuid,
+  testName,
   onNavigateToCollateral,
   onNavigateToResults,
   onExecutionStateChange,
@@ -224,6 +227,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           totalPersonas: undefined,
           error: undefined,
           quotes: [],
+          completedProfileUuids: new Set<string>(),
           startTime: undefined,
         };
       }
@@ -244,6 +248,8 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           ? JSON.stringify(persistentStatus.error)
           : undefined,
         quotes: executionState.quotes || [], // Include quotes from WebSocket state
+        completedProfileUuids:
+          executionState.completedProfileUuids || new Set<string>(), // Include completed profiles from WebSocket state
         startTime: executionState.startTime, // Include startTime from WebSocket state
       };
     }
@@ -391,12 +397,19 @@ const TestExecution: React.FC<TestExecutionProps> = ({
 
   return (
     <div className='space-y-6'>
+      {/* Tab Banner */}
+      <TabBanner
+        icon='play-square'
+        title='Execute Your Test'
+        description='Choose how you want to run this test - facilitate it yourself, or use AI-powered synthetic participants.'
+      />
+
       {/* Test Mode Selection - 2x2 Grid */}
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {/* Facilitated Option */}
         <div
           className={cn(
-            'aucctus-border-secondary cursor-pointer rounded-lg border p-4 transition-colors',
+            'aucctus-border-secondary min-h-[120px] cursor-pointer rounded-lg border p-4 transition-colors',
             selectedMode === 'facilitated'
               ? 'aucctus-border-brand-primary aucctus-bg-secondary-extra-subtle'
               : 'aucctus-bg-primary hover:aucctus-bg-secondary-subtle',
@@ -406,7 +419,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
               <Icon
-                variant='users-03'
+                variant='user'
                 className={cn(
                   'h-5 w-5',
                   selectedMode === 'facilitated'
@@ -422,7 +435,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
                     : 'aucctus-text-brand-primary',
                 )}
               >
-                Facilitated
+                Real World DIY
               </h4>
             </div>
             {selectedMode === 'facilitated' && (
@@ -438,55 +451,10 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           </p>
         </div>
 
-        {/* Expert-Led Option - Coming Soon */}
-        <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4 opacity-70'>
-          <div className='mb-3 flex items-start justify-between'>
-            <div className='flex items-center gap-2'>
-              <Icon
-                variant='users-03'
-                className='aucctus-stroke-tertiary h-5 w-5'
-              />
-              <h4 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
-                Expert-Led
-              </h4>
-            </div>
-            <span className='aucctus-bg-secondary-subtle aucctus-text-tertiary aucctus-border-secondary rounded-full border px-2 py-0.5 text-xs'>
-              Coming soon
-            </span>
-          </div>
-          <p className='aucctus-text-sm-regular aucctus-text-tertiary'>
-            Testing experts at Disruptive Edge will facilitate the test for you
-            with real customers, ensuring high-touch engagement and testing best
-            practice
-          </p>
-        </div>
-
-        {/* Automated Option - Coming Soon */}
-        <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-4 opacity-70'>
-          <div className='mb-3 flex items-start justify-between'>
-            <div className='flex items-center gap-2'>
-              <Icon
-                variant='trendup'
-                className='aucctus-stroke-tertiary h-5 w-5'
-              />
-              <h4 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
-                Automated
-              </h4>
-            </div>
-            <span className='aucctus-bg-secondary-subtle aucctus-text-tertiary aucctus-border-secondary rounded-full border px-2 py-0.5 text-xs'>
-              Coming soon
-            </span>
-          </div>
-          <p className='aucctus-text-sm-regular aucctus-text-tertiary'>
-            Aucctus runs the test for you with real participants that match your
-            target profiles
-          </p>
-        </div>
-
         {/* Synthetic Option */}
         <div
           className={cn(
-            'cursor-pointer rounded-lg border p-4 transition-colors',
+            'min-h-[120px] cursor-pointer rounded-lg border p-4 transition-colors',
             selectedMode === 'synthetic'
               ? 'aucctus-border-brand-primary aucctus-bg-secondary-extra-subtle'
               : 'aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-subtle',
@@ -496,7 +464,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
               <Icon
-                variant='ai-conclusion'
+                variant='ghost'
                 className={cn(
                   'h-5 w-5',
                   selectedMode === 'synthetic'
@@ -527,6 +495,48 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             profiles
           </p>
         </div>
+
+        {/* Expert-Led Option - Coming Soon */}
+        <div className='aucctus-border-secondary aucctus-bg-primary min-h-[120px] rounded-lg border p-4 opacity-70'>
+          <div className='mb-3 flex items-start justify-between'>
+            <div className='flex items-center gap-2'>
+              <Icon
+                variant='users-03'
+                className='aucctus-stroke-tertiary h-5 w-5'
+              />
+              <h4 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
+                Expert-Led
+              </h4>
+            </div>
+            <span className='aucctus-bg-secondary-subtle aucctus-text-tertiary aucctus-border-secondary rounded-full border px-2 py-0.5 text-xs'>
+              Coming soon
+            </span>
+          </div>
+          <p className='aucctus-text-sm-regular aucctus-text-tertiary'>
+            Testing experts at Disruptive Edge will facilitate the test for you
+            with real customers, ensuring high-touch engagement and testing best
+            practice
+          </p>
+        </div>
+
+        {/* Automated Option - Coming Soon */}
+        <div className='aucctus-border-secondary aucctus-bg-primary min-h-[120px] rounded-lg border p-4 opacity-70'>
+          <div className='mb-3 flex items-start justify-between'>
+            <div className='flex items-center gap-2'>
+              <Icon variant='zap' className='aucctus-stroke-tertiary h-5 w-5' />
+              <h4 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
+                Automated
+              </h4>
+            </div>
+            <span className='aucctus-bg-secondary-subtle aucctus-text-tertiary aucctus-border-secondary rounded-full border px-2 py-0.5 text-xs'>
+              Coming soon
+            </span>
+          </div>
+          <p className='aucctus-text-sm-regular aucctus-text-tertiary'>
+            Aucctus runs the test for you with real participants that match your
+            target profiles
+          </p>
+        </div>
       </div>
 
       {/* Synthetic Mode Actions */}
@@ -551,10 +561,12 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             onCancel={handleCancelExecution}
             conceptUuid={conceptUuid || ''}
             testUuid={testUuid || ''}
+            testName={testName}
             onExecute={handleExecuteSynthetic}
             onReset={resetExecution}
             onNavigateToCollateral={onNavigateToCollateral}
             onNavigateToResults={onNavigateToResults}
+            onCancelSetup={() => setSelectedMode(null)}
             initialParticipantCounts={participantCountsFromApi}
             lockedSkippedParticipants={skippedParticipantsFromApi}
             isCollateralRegenerating={isCollateralRegenerating}
@@ -563,7 +575,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
       )}
 
       {/* Information Section */}
-      <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-6'>
+      {/* <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-6'>
         <div className='flex items-start gap-3'>
           <div className='mt-1'>
             <Icon
@@ -628,72 +640,6 @@ const TestExecution: React.FC<TestExecutionProps> = ({
                 </>
               )}
             </ul>
-          </div>
-        </div>
-      </div>
-
-      {/* Test Execution Checklist */}
-      {/* <div className='aucctus-border-secondary aucctus-bg-primary rounded-lg border p-6'>
-        <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-4'>
-          Test Execution Checklist
-        </h4>
-
-        <div className='space-y-3'>
-          <div className='flex items-center gap-3'>
-            <div className='aucctus-bg-success-secondary flex h-6 w-6 items-center justify-center rounded-full'>
-              <Icon
-                variant='check'
-                className='aucctus-stroke-success-primary h-4 w-4'
-              />
-            </div>
-            <span className='aucctus-text-sm-regular aucctus-text-brand-primary'>
-              Invite participants
-            </span>
-          </div>
-
-          <div className='flex items-center gap-3'>
-            <div className='aucctus-bg-success-secondary flex h-6 w-6 items-center justify-center rounded-full'>
-              <Icon
-                variant='check'
-                className='aucctus-stroke-success-primary h-4 w-4'
-              />
-            </div>
-            <span className='aucctus-text-sm-regular aucctus-text-brand-primary'>
-              Prepare interview guide
-            </span>
-          </div>
-
-          <div className='flex items-center gap-3'>
-            <div className='aucctus-border-secondary flex h-6 w-6 items-center justify-center rounded-full border'>
-              <span className='aucctus-text-xs-semibold aucctus-text-tertiary'>
-                3
-              </span>
-            </div>
-            <span className='aucctus-text-sm-regular aucctus-text-brand-primary'>
-              Conduct test sessions
-            </span>
-          </div>
-
-          <div className='flex items-center gap-3'>
-            <div className='aucctus-border-secondary flex h-6 w-6 items-center justify-center rounded-full border'>
-              <span className='aucctus-text-xs-semibold aucctus-text-tertiary'>
-                4
-              </span>
-            </div>
-            <span className='aucctus-text-sm-regular aucctus-text-brand-primary'>
-              Record and analyze results
-            </span>
-          </div>
-
-          <div className='flex items-center gap-3'>
-            <div className='aucctus-border-secondary flex h-6 w-6 items-center justify-center rounded-full border'>
-              <span className='aucctus-text-xs-semibold aucctus-text-tertiary'>
-                5
-              </span>
-            </div>
-            <span className='aucctus-text-sm-regular aucctus-text-brand-primary'>
-              Update assumptions
-            </span>
           </div>
         </div>
       </div> */}

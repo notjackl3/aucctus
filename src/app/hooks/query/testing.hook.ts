@@ -794,10 +794,6 @@ export const useUpdateTestParticipant = () => {
           variables.testUuid,
         ],
       });
-      toast.success(
-        'Participant Updated',
-        'Test participant has been updated successfully',
-      );
     },
     onError: (e: AxiosError) => {
       const message = utils.osiris.parseFormError(e);

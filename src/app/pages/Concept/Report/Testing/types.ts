@@ -49,6 +49,24 @@ export interface RecommendedTest {
   testDetails: ITestDetails;
 }
 
+// Comprehensive edit recommendation extracted from test results
+export interface IComprehensiveEditRecommendation {
+  uuid: string;
+  section: string;
+  recommendation: string;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  rationale: string;
+  sourceCount: number;
+  sourceDetails: string[];
+  status: 'pending' | 'applied' | 'rejected';
+  appliedAt?: string;
+  rejectedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  beforeContent?: string;
+  afterContent?: string;
+}
+
 // API Types for Testing Endpoints
 export interface ITestDetails {
   uuid: string;
@@ -90,20 +108,7 @@ export interface ITestDetails {
   }>;
   // Synthesized comprehensive edit recommendations from all test results
   // Note: Backend returns as 'comprehensive_recommendations' but gets auto-converted to camelCase
-  comprehensiveRecommendations?: Array<{
-    uuid: string;
-    section: string;
-    recommendation: string;
-    priority: 'critical' | 'high' | 'medium' | 'low';
-    rationale: string;
-    sourceCount: number;
-    sourceDetails: string[];
-    status: 'pending' | 'applied' | 'rejected';
-    appliedAt?: string;
-    rejectedAt?: string;
-    createdAt: string;
-    updatedAt: string;
-  }>;
+  comprehensiveRecommendations?: IComprehensiveEditRecommendation[];
   collateralRegenerationStatus?: ICollateralRegenerationStatus;
 }
 

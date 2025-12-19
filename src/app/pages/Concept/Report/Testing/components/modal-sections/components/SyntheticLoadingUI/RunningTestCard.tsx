@@ -11,6 +11,7 @@ interface RunningTestCardProps {
   numProfiles: number;
   estimatedSeconds?: number | null;
   startTime?: number;
+  testName?: string;
 }
 
 export const RunningTestCard: React.FC<RunningTestCardProps> = ({
@@ -22,6 +23,7 @@ export const RunningTestCard: React.FC<RunningTestCardProps> = ({
   numProfiles,
   estimatedSeconds: propEstimatedSeconds,
   startTime,
+  testName,
 }) => {
   const [stageMessage, setStageMessage] = useState<string>('');
   const prevStageRef = useRef('');
@@ -86,13 +88,16 @@ export const RunningTestCard: React.FC<RunningTestCardProps> = ({
   }, [currentStage, message, stageLabels]);
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-xl border shadow-sm'>
+    <div className='aucctus-bg-brand-secondary aucctus-border-brand-subtle animate-fade-in overflow-hidden rounded-xl border shadow-sm'>
       {/* Left border accent */}
-      <div className='border-l-4 border-l-amber-600'>
+      <div className='aucctus-border-brand border-l-4'>
         <div className='p-6'>
-          <h2 className='aucctus-text-primary mb-4 text-2xl font-bold'>
+          <h2 className='aucctus-text-primary mb-1 text-center text-2xl font-bold'>
             Running Synthetic Test
           </h2>
+          <p className='aucctus-text-secondary aucctus-text-sm mb-4 text-center'>
+            {testName || 'Synthetic 1-1 Customer Interviews'}
+          </p>
 
           {/* AgentProgressBar - handles timing and progress display */}
           <AgentProgressBar
@@ -101,7 +106,7 @@ export const RunningTestCard: React.FC<RunningTestCardProps> = ({
             progress={progress >= 95 ? progress : undefined}
             overrideEstimatedSeconds={estimatedSeconds}
             message={stageMessage || 'Synthetic 1-1 Customer Interviews'}
-            showPercentage={false}
+            showPercentage={true}
             showTimeRemaining={true}
             theme='warning'
             size='lg'

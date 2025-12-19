@@ -13,12 +13,12 @@ const StepNavigation: React.FC<IStepNavigationProps> = ({
   description,
 }) => {
   return (
-    <div className='mb-4 flex items-center gap-3'>
-      <div className='aucctus-bg-primary aucctus-text-primary flex h-8 w-8 items-center justify-center rounded-full border border-gray-300 text-sm font-semibold'>
+    <div className='mb-4 flex items-center gap-4'>
+      <div className='aucctus-bg-brand-solid aucctus-text-white flex h-10 w-10 items-center justify-center rounded-full text-base font-semibold'>
         {stepNumber}
       </div>
       <div>
-        <h3 className='aucctus-text-md-semibold aucctus-text-primary'>
+        <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
           {title}
         </h3>
         <p className='aucctus-text-sm aucctus-text-secondary'>{description}</p>

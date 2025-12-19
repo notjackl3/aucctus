@@ -149,14 +149,14 @@ export const CompletedState: React.FC<CompletedStateProps> = ({
   return (
     <div className='space-y-6'>
       {/* Success Card */}
-      <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-xl border shadow-sm'>
+      <div className='aucctus-bg-success-subtle aucctus-border-success-subtle overflow-hidden rounded-xl border shadow-sm'>
         <div className='border-l-4 border-l-green-500'>
           <div className='p-8 text-center'>
             <h2 className='aucctus-text-primary mb-2 text-3xl font-bold'>
               Synthetic Test Complete!
             </h2>
             <p className='aucctus-text-secondary aucctus-text-lg mb-6'>
-              Successfully interviewed {profiles.length} synthetic participants
+              Successfully interviewed {totalResponses} synthetic participants
             </p>
 
             <button
@@ -176,7 +176,7 @@ export const CompletedState: React.FC<CompletedStateProps> = ({
       {/* Completed Interviews Grid */}
       <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border shadow-sm'>
         <div className='p-6'>
-          <h3 className='aucctus-text-primary mb-6 text-xl font-semibold'>
+          <h3 className='aucctus-text-primary mb-4 text-lg font-semibold'>
             Completed Interviews
           </h3>
 
@@ -215,34 +215,32 @@ export const CompletedState: React.FC<CompletedStateProps> = ({
               );
             })}
           </div>
+        </div>
+      </div>
 
-          {/* Summary Stats */}
-          <div className='mt-8 grid grid-cols-3 gap-6'>
-            <div className='text-center'>
-              <div className='aucctus-text-primary text-4xl font-bold'>
-                {profiles.length}
-              </div>
-              <div className='aucctus-text-secondary aucctus-text-sm'>
-                Participants
-              </div>
-            </div>
-            <div className='text-center'>
-              <div className='aucctus-text-primary text-4xl font-bold'>
-                {totalResponses}
-              </div>
-              <div className='aucctus-text-secondary aucctus-text-sm'>
-                Responses
-              </div>
-            </div>
-            <div className='text-center'>
-              <div className='aucctus-text-primary text-4xl font-bold'>
-                100%
-              </div>
-              <div className='aucctus-text-secondary aucctus-text-sm'>
-                Complete
-              </div>
-            </div>
+      {/* Summary Stats - Separate Cards */}
+      <div className='grid grid-cols-3 gap-4'>
+        <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4 text-center'>
+          <div className='aucctus-text-brand-primary text-2xl font-bold'>
+            {profiles.length}
           </div>
+          <div className='aucctus-text-secondary aucctus-text-sm'>
+            Participants
+          </div>
+        </div>
+        <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4 text-center'>
+          <div className='aucctus-text-brand-primary text-2xl font-bold'>
+            {totalResponses}
+          </div>
+          <div className='aucctus-text-secondary aucctus-text-sm'>
+            Responses
+          </div>
+        </div>
+        <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4 text-center'>
+          <div className='aucctus-text-brand-primary text-2xl font-bold'>
+            100%
+          </div>
+          <div className='aucctus-text-secondary aucctus-text-sm'>Complete</div>
         </div>
       </div>
     </div>

@@ -30,9 +30,9 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
   return (
     <div className='space-y-4'>
       {/* Section Header */}
-      <div className='flex items-center gap-3'>
+      <div className='flex items-center gap-2'>
         <Icon
-          variant='barchart'
+          variant='chart-column'
           className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
         />
         <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
@@ -41,15 +41,15 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
       </div>
 
       {/* Two-column layout */}
-      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+      <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
         {/* Affirming Findings (Left Column - Green) */}
-        <div className='aucctus-bg-success-subtle aucctus-border-success-subtle rounded-lg border p-6'>
+        <div className='aucctus-border-secondary rounded-lg border p-4'>
           <div className='mb-4 flex items-center gap-2'>
             <Icon
-              variant='check'
+              variant='trending-up'
               className='aucctus-stroke-success-primary h-5 w-5'
             />
-            <h5 className='aucctus-text-md-semibold aucctus-text-success-primary'>
+            <h5 className='aucctus-text-md-semibold aucctus-text-primary'>
               Affirming Findings
             </h5>
           </div>
@@ -63,12 +63,18 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
               {affirmingFindings.map((finding, index) => (
                 <div
                   key={`${finding.uuid || 'na'}-${index}`}
-                  className='flex items-start gap-3'
+                  className='rounded-lg border border-green-200 bg-green-50/30 p-3'
                 >
-                  <div className='mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-green-500' />
-                  <p className='aucctus-text-sm aucctus-text-secondary leading-relaxed'>
-                    {finding.learning}
-                  </p>
+                  <div className='flex items-center gap-2'>
+                    <div className='flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-green-100'>
+                      <span className='text-xs font-semibold text-green-700'>
+                        {index + 1}
+                      </span>
+                    </div>
+                    <p className='aucctus-text-sm aucctus-text-primary'>
+                      {finding.learning}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -76,13 +82,13 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
         </div>
 
         {/* Challenging Findings (Right Column - Red) */}
-        <div className='aucctus-bg-error-subtle aucctus-border-error-subtle rounded-lg border p-6'>
+        <div className='aucctus-border-secondary rounded-lg border p-4'>
           <div className='mb-4 flex items-center gap-2'>
             <Icon
-              variant='closeX'
+              variant='trending-down'
               className='aucctus-stroke-error-primary h-5 w-5'
             />
-            <h5 className='aucctus-text-md-semibold aucctus-text-error-primary'>
+            <h5 className='aucctus-text-md-semibold aucctus-text-primary'>
               Challenging Findings
             </h5>
           </div>
@@ -96,12 +102,18 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
               {challengingFindings.map((finding, index) => (
                 <div
                   key={`${finding.uuid || 'na'}-${index}`}
-                  className='flex items-start gap-3'
+                  className='rounded-lg border border-red-200 bg-red-50/30 p-3'
                 >
-                  <div className='mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-red-500' />
-                  <p className='aucctus-text-sm aucctus-text-secondary leading-relaxed'>
-                    {finding.learning}
-                  </p>
+                  <div className='flex items-center gap-2'>
+                    <div className='flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-red-100'>
+                      <span className='text-xs font-semibold text-red-700'>
+                        {index + 1}
+                      </span>
+                    </div>
+                    <p className='aucctus-text-sm aucctus-text-primary'>
+                      {finding.learning}
+                    </p>
+                  </div>
                 </div>
               ))}
             </div>

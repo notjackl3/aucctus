@@ -54,11 +54,18 @@ export const useParticipantManagement = ({
   // Hook for updating test participants
   const updateTestParticipant = useUpdateTestParticipant();
 
-  const [totalParticipants, setTotalParticipants] = useState(0);
+  // Default to 20 participants max - this ensures users can always select participants
+  // even for new tests that don't have targetParticipants set yet
+  const DEFAULT_MAX_PARTICIPANTS = 20;
+
+  const [totalParticipants, setTotalParticipants] = useState(
+    DEFAULT_MAX_PARTICIPANTS,
+  );
 
   // Initialize totalParticipants from test detail's targetParticipants
+  // Only use the API value if it's a positive number; otherwise keep the default
   useEffect(() => {
-    if (testDetail?.targetParticipants !== undefined) {
+    if (testDetail?.targetParticipants && testDetail.targetParticipants > 0) {
       setTotalParticipants(testDetail.targetParticipants);
     }
   }, [testDetail]);
@@ -93,7 +100,7 @@ export const useParticipantManagement = ({
     const chartData = personas
       .filter((p) => p.count > 0 && !p.isSkipped)
       .map((persona) => ({
-        name: persona.segment,
+        name: persona.name,
         value: persona.count,
         ratio: persona.ratio,
         id: persona.id,

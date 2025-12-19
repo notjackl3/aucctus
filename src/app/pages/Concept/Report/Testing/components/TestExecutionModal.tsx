@@ -188,6 +188,23 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     });
   }, [isSyntheticExecutionRunning]);
 
+  // Enable Impact tab when testDetail has comprehensiveRecommendations
+  // This ensures Impact is enabled even if Results tab hasn't been visited
+  useEffect(() => {
+    if (!isSyntheticExecutionRunning && !isTestDetailLoading) {
+      const hasRecommendations =
+        (testDetail?.comprehensiveRecommendations?.length ?? 0) > 0;
+
+      if (hasRecommendations) {
+        setDisabledTabs((prev) => prev.filter((tab) => tab !== 'impact'));
+      }
+    }
+  }, [
+    testDetail?.comprehensiveRecommendations,
+    isSyntheticExecutionRunning,
+    isTestDetailLoading,
+  ]);
+
   // Memoized callback to avoid infinite loops
   const handleResultsChange = useCallback(
     (hasResults: boolean, hasRecommendations: boolean) => {
@@ -287,23 +304,23 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
     () => [
       {
         value: 'overview',
-        label: createTabLabel('file', 'Overview', 'overview'),
+        label: createTabLabel('file-text', 'Overview', 'overview'),
       },
       {
         value: 'participants',
-        label: createTabLabel('users-03', 'Participants', 'participants'),
+        label: createTabLabel('users-02', 'Participants', 'participants'),
       },
       {
         value: 'collateral',
-        label: createTabLabel('file-attachment', 'Collateral', 'collateral'),
+        label: createTabLabel('file-plus', 'Collateral', 'collateral'),
       },
       {
         value: 'execute',
-        label: createTabLabel('play-square', 'Execute', 'execute'),
+        label: createTabLabel('play', 'Execute', 'execute'),
       },
       {
         value: 'results',
-        label: createTabLabel('barchart', 'Results', 'results'),
+        label: createTabLabel('chart-column', 'Results', 'results'),
       },
       {
         value: 'impact',
@@ -382,6 +399,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             testDetail={testDetail}
             isCollateralRegenerating={isCollateralRegenerating}
             isSyntheticRunning={isSyntheticExecutionRunning}
+            isActive={activeTab === 'participants'}
           />
         );
 
@@ -401,6 +419,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
           <TestExecution
             conceptUuid={conceptUuid}
             testUuid={testUuid}
+            testName={testDetail?.name}
             isCollateralRegenerating={isCollateralRegenerating}
             onNavigateToCollateral={(collateralUuid) => {
               // Set the selected collateral UUID
@@ -471,11 +490,11 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
       <div className='flex min-h-0 flex-1 flex-col'>
         <TabView
           tabs={tabs}
-          tabGroupClassName='w-full px-6 flex-shrink-0'
-          tabContainerClassName='flex flex-1 items-center justify-center'
-          tabClassName='flex flex-1 aucctus-bg-primary-hover items-center justify-center'
+          tabGroupClassName='aucctus-border-secondary w-full border-b px-6 py-0 flex-shrink-0'
+          tabContainerClassName='grid w-full grid-cols-6'
+          tabClassName='flex flex-1 items-center justify-center py-3 mt-4'
           className='flex min-h-0 w-full flex-1 flex-col'
-          variant='button'
+          variant='default'
           onTabSelect={(value) => {
             if (!disabledTabs.includes(value)) {
               setActiveTab(value);

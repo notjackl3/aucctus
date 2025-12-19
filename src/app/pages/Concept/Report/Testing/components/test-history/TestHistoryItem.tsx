@@ -1,7 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Icon, Container, Modal } from '@components';
-import { cn } from '@libs/utils/react';
-import { useModal } from '@context/ModalContextProvider';
+import { Icon, Container } from '@components';
 import { ITestDetails } from '../../types';
 import GenericStatusBadge from '../../../Assumptions/components/shared/GenericStatusBadge';
 import { TEST_STATUS_CONFIGS } from '../../../Assumptions/constants/statusConfigs';
@@ -12,21 +10,18 @@ import {
   TestTypeV2,
   TestResult,
 } from '@libs/api/types';
-import { useTestResults, useRevertTestDetail } from '@hooks/query/testing.hook';
-import { ITestResult } from '@libs/api/types/concept/testing';
-import { formatTestType, riskLevelToNumber } from '../../utils/testUtils';
+import { riskLevelToNumber } from '../../utils/testUtils';
 import TestValidationStats from './TestValidationStats';
-import TestResultsDisplay from './TestResultsDisplay';
 import TestAssumptionsDisplay from './TestAssumptionsDisplay';
-import RevertTestConfirmationModal from './RevertTestConfirmationModal';
-import type { ITestGenerationState } from '@hooks/sockets/testing';
 
 interface TestHistoryItemProps {
   test: ITestDetails;
   isExpanded: boolean;
   conceptUuid?: string;
-  concept?: any; // Add concept prop needed for the modal
-  generationState: ITestGenerationState;
+  concept?: any;
+  generationState: {
+    status: string;
+  };
 }
 
 const TestStatusBadge: React.FC<{ status: string }> = ({ status }) => {
@@ -34,41 +29,13 @@ const TestStatusBadge: React.FC<{ status: string }> = ({ status }) => {
   return <GenericStatusBadge config={config} />;
 };
 
-const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
-  test,
-  isExpanded,
-  conceptUuid,
-  concept,
-  generationState,
-}) => {
-  const { openModal } = useModal();
-  const [showRevertModal, setShowRevertModal] = useState(false);
-
-  // Fetch test results to get learnings and recommendations
-  const { results: fetchedResults } = useTestResults(
-    conceptUuid || '',
-    test.uuid,
-    {
-      enabled: !!conceptUuid && !!test.uuid && test.status === 'completed',
-    },
-  );
-
-  // Revert test mutation
-  const revertTestMutation = useRevertTestDetail();
-
-  // Check if a test is currently being generated
-  const isGeneratingTest = generationState.status === 'in_progress';
-
-  // Type cast the results to include extended properties
-  const testResults = (fetchedResults as ITestResult[]) || [];
-  const hasResults = testResults.length > 0;
+const TestHistoryItem: React.FC<TestHistoryItemProps> = ({ test }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
 
   // Calculate validation stats from assumptions
   const validationStats = useMemo(() => {
-    // Normalize validation status to handle both camelCase (from API) and snake_case
     const normalizeStatus = (status: string | undefined): string => {
       if (!status) return 'untested';
-      // Handle camelCase from API serializer
       if (status === 'partiallyValidated') return 'partially_validated';
       return status.toLowerCase();
     };
@@ -76,42 +43,28 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
     const validated = test.assumptions.filter(
       (a) => normalizeStatus(a.validationStatus) === 'validated',
     ).length;
-    const partiallyValidated = test.assumptions.filter(
-      (a) => normalizeStatus(a.validationStatus) === 'partially_validated',
-    ).length;
     const invalidated = test.assumptions.filter(
       (a) => normalizeStatus(a.validationStatus) === 'invalidated',
-    ).length;
-    const untested = test.assumptions.filter(
-      (a) => normalizeStatus(a.validationStatus) === 'untested',
     ).length;
 
     return {
       validated,
-      partiallyValidated,
       invalidated,
-      untested,
-      total: test.assumptions.length,
     };
   }, [test.assumptions]);
 
-  // Map our assumptions to the format expected by AssumptionDetailCard
+  // Map assumptions to the format expected by TestAssumptionsDisplay
   const mappedAssumptions = useMemo(() => {
-    // Normalize validation status to handle both camelCase (from API) and snake_case
     const normalizeStatus = (
       status: string | undefined,
     ): AssumptionStatusV2 => {
       if (!status) return 'untested';
-      // Handle camelCase from API serializer
       if (status === 'partiallyValidated') return 'partially_validated';
       return status.toLowerCase() as AssumptionStatusV2;
     };
 
     return test.assumptions.map((assumption) => {
-      // Convert risk level to number for processing
       const riskValue = riskLevelToNumber(assumption.riskLevel);
-
-      // Map status from Testing types to Assumptions types
       const statusValue = normalizeStatus(assumption.validationStatus);
 
       return {
@@ -123,8 +76,8 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
         risk: riskValue,
         certainty: assumption.certainty || 50,
         confidence: assumption.certainty || 50,
-        importance: 70, // Default to high importance
-        impactPoints: 7, // Default impact points (0-10)
+        importance: 70,
+        impactPoints: 7,
         validationPercentage:
           statusValue === 'validated'
             ? 100
@@ -150,236 +103,100 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({
     });
   }, [test]);
 
-  // Handle opening test details modal
-  const handleViewTestDetails = () => {
-    if (concept && test.uuid) {
-      openModal(
-        Modal.TestExecutionModal,
-        {
-          testUuid: test.uuid,
-          testType: test.testType,
-          concept,
-          mode: 'view', // Always open completed tests in view mode
-        },
-        {
-          position: 'center',
-          backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-25',
-          shouldCloseOnOverlayClick: true,
-          shouldCloseOnEscape: true,
-        },
-      );
-    }
-  };
+  // Get learning summary from objective or description
+  const learningSummary = test.objective || test.description || '';
 
-  // Handle revert test
-  const handleRevertTest = () => {
-    setShowRevertModal(true);
-  };
-
-  const handleConfirmRevert = async () => {
-    if (!conceptUuid || !test.uuid) return;
-
-    await revertTestMutation.mutateAsync({
-      conceptUuid,
-      testUuid: test.uuid,
-    });
-
-    setShowRevertModal(false);
+  const handleToggle = () => {
+    setIsExpanded(!isExpanded);
   };
 
   return (
-    <div className='aucctus-border-secondary aucctus-bg-primary overflow-hidden rounded-xl border shadow-sm'>
-      {/* Test Header */}
-      <div className='p-6'>
-        <div className='flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between'>
-          {/* Left Section - Test Info */}
-          <div className='flex-1 space-y-3'>
-            <div className='flex items-start justify-between gap-3'>
-              <div className='flex-1'>
-                <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-1'>
+    <div className='aucctus-border-secondary aucctus-bg-primary overflow-hidden rounded-lg border'>
+      <div className='p-5'>
+        <div className='grid grid-cols-1 gap-4 lg:grid-cols-12'>
+          {/* Left Column - Test Info */}
+          <div className='lg:col-span-4'>
+            <div className='space-y-2'>
+              <div className='flex items-center justify-between'>
+                <h3 className='aucctus-text-md-medium aucctus-text-brand-primary'>
                   {test.name}
                 </h3>
-                <div className='flex flex-wrap items-center gap-3'>
-                  <TestStatusBadge status={test.status} />
-                  {test.testType && (
-                    <span className='aucctus-text-xs-medium aucctus-text-brand-tertiary aucctus-bg-secondary-subtle rounded-md px-2 py-1'>
-                      {formatTestType(test.testType)}
-                    </span>
-                  )}
-                  <span className='aucctus-text-xs-regular aucctus-text-secondary'>
-                    {new Date(test.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
+                <TestStatusBadge status={test.status} />
               </div>
-            </div>
-
-            {/* Test Description and Objective */}
-            <div className='space-y-2'>
-              <p className='aucctus-text-sm-regular aucctus-text-secondary line-clamp-2'>
-                {test.objective || test.description}
+              <p className='aucctus-text-sm aucctus-text-tertiary'>
+                {new Date(test.createdAt).toLocaleDateString('en-US', {
+                  month: 'long',
+                  day: 'numeric',
+                  year: 'numeric',
+                })}
               </p>
-              {test.status === 'completed' && (
-                <div className='aucctus-bg-secondary-extra-subtle rounded-lg p-3'>
-                  <h4 className='aucctus-text-sm-semibold aucctus-text-brand-primary mb-1 flex items-center gap-1'>
-                    <Icon
-                      variant='lightbulb'
-                      className='aucctus-stroke-brand-primary h-4 w-4'
-                    />
-                    Key Insight
-                  </h4>
-                  <p className='aucctus-text-sm-regular aucctus-text-brand-secondary'>
-                    {test.objective}
-                  </p>
-                </div>
-              )}
             </div>
           </div>
 
-          {/* Right Section - Metrics and Actions */}
-          <div className='space-between flex h-full flex-col gap-8 lg:w-80'>
-            {/* Validation Results using TestValidationStats component */}
-            <TestValidationStats
-              validationStats={validationStats}
-              testStatus={test.status}
-              targetParticipants={test.targetParticipants}
-              assumptionsCount={test.assumptions.length}
-            />
+          {/* Middle Column - Learning Summary */}
+          <div className='lg:col-span-5'>
+            <div className='space-y-2'>
+              <h4 className='aucctus-text-sm-medium aucctus-text-primary'>
+                Learning Summary
+              </h4>
+              <p className='aucctus-text-sm aucctus-text-secondary'>
+                {learningSummary}
+              </p>
+            </div>
+          </div>
 
-            {/* Action Buttons */}
-            <div className='flex flex-col gap-2'>
+          {/* Right Column - Stats and Toggle */}
+          <div className='lg:col-span-3'>
+            <div className='space-y-3'>
+              {/* Validation Stats */}
+              <TestValidationStats validationStats={validationStats} />
+
+              {/* Toggle Button */}
               <button
-                className={cn(
-                  'btn btn-light w-full transition-all duration-200',
-                  !concept && 'cursor-not-allowed opacity-50',
-                )}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleViewTestDetails();
-                }}
-                disabled={!concept}
-                aria-expanded={false}
-                aria-controls={`test-details-${test.uuid}`}
-                title={
-                  !concept
-                    ? 'Test details will be available shortly'
-                    : 'View test details'
-                }
+                onClick={handleToggle}
+                className='btn btn-light btn-sm w-full gap-1'
               >
-                <>
-                  <Icon
-                    variant='eye'
-                    className='aucctus-stroke-primary mr-2 h-4 w-4'
-                  />
-                  View Details
-                </>
-              </button>
-
-              {/* Revert Button - Only show for completed tests */}
-              {test.status === 'completed' && (
-                <button
-                  className={cn(
-                    'btn btn-primary w-full transition-all duration-200',
-                    (!conceptUuid || isGeneratingTest) &&
-                      'cursor-not-allowed opacity-50',
-                  )}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRevertTest();
-                  }}
-                  disabled={
-                    !conceptUuid ||
-                    revertTestMutation.isLoading ||
-                    isGeneratingTest
-                  }
-                  title={
-                    isGeneratingTest
-                      ? 'Cannot revert while a new test is being generated'
-                      : 'Revert this test back to active status'
-                  }
-                >
+                {isExpanded ? (
                   <>
+                    Hide Details
                     <Icon
-                      variant='refresh'
-                      className={cn(
-                        'mr-2 h-4 w-4',
-                        !conceptUuid ||
-                          revertTestMutation.isLoading ||
-                          isGeneratingTest
-                          ? 'aucctus-stroke-secondary'
-                          : 'aucctus-stroke-white',
-                      )}
+                      variant='chevronup'
+                      className='aucctus-stroke-primary h-3.5 w-3.5'
                     />
-                    {revertTestMutation.isLoading
-                      ? 'Reverting...'
-                      : 'Revert Test'}
                   </>
-                </button>
-              )}
+                ) : (
+                  <>
+                    View Details
+                    <Icon
+                      variant='chevrondown'
+                      className='aucctus-stroke-primary h-3.5 w-3.5'
+                    />
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Expanded Content using Container.Collapsible */}
+      {/* Expanded Content */}
       <Container.Collapsible open={isExpanded} id={`test-details-${test.uuid}`}>
-        <div className='aucctus-border-secondary aucctus-bg-secondary-extra-subtle border-t'>
-          <div className='space-y-6 p-6'>
-            {/* Test Results Section */}
-            {test.status === 'completed' && (
-              <TestResultsDisplay
-                testResults={testResults}
-                hasResults={hasResults}
-                testDetails={test}
-              />
-            )}
-
-            {/* Show test overview for non-completed tests */}
-            {test.status !== 'completed' && (
-              <div className='space-y-4'>
-                <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary flex items-center gap-2'>
-                  <Icon
-                    variant='file'
-                    className='aucctus-stroke-brand-primary h-5 w-5'
-                  />
-                  Test Overview
-                </h4>
-                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
-                  <div className='aucctus-bg-primary rounded-lg p-4'>
-                    <h5 className='aucctus-text-sm-semibold aucctus-text-brand-tertiary mb-2'>
-                      Objective
-                    </h5>
-                    <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-                      {test.objective}
-                    </p>
-                  </div>
-                  {test.methodology && (
-                    <div className='aucctus-bg-primary rounded-lg p-4'>
-                      <h5 className='aucctus-text-sm-semibold aucctus-text-brand-tertiary mb-2'>
-                        Methodology
-                      </h5>
-                      <p className='aucctus-text-sm-regular aucctus-text-secondary'>
-                        {test.methodology}
-                      </p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Tested Assumptions */}
-            <TestAssumptionsDisplay mappedAssumptions={mappedAssumptions} />
-          </div>
+        <div className='aucctus-border-secondary border-t p-5'>
+          <TestAssumptionsDisplay mappedAssumptions={mappedAssumptions} />
         </div>
       </Container.Collapsible>
 
-      {/* Revert Confirmation Modal */}
-      <RevertTestConfirmationModal
-        isOpen={showRevertModal}
-        onConfirm={handleConfirmRevert}
-        onCancel={() => setShowRevertModal(false)}
-        testName={test.name}
-        isReverting={revertTestMutation.isLoading}
-      />
+      {/* Revert Test Button - Commented out for now
+      {test.status === 'completed' && (
+        <button
+          className="btn btn-primary w-full"
+          onClick={handleRevertTest}
+        >
+          <Icon variant='refresh' className='mr-2 h-4 w-4' />
+          Revert Test
+        </button>
+      )}
+      */}
     </div>
   );
 };

@@ -1,5 +1,21 @@
 import type { IPageResponse } from '../osiris';
 
+// Assumption Validation Types (from test result analysis)
+export interface IAssumptionValidation {
+  evidence: string;
+  confidence: number;
+  assumptionUuid: string;
+  impactAnalysis: string;
+  followUpActions: string[];
+  validationStatus:
+    | 'validated'
+    | 'partially_validated'
+    | 'invalidated'
+    | 'untested';
+  assumptionStatement: string;
+  supportingLearningUuids: string[];
+}
+
 // Test Result Types
 export interface ITestResult {
   uuid: string;
@@ -18,6 +34,7 @@ export interface ITestResult {
   updatedAt: string;
   editRecommendations?: IEditRecommendation[];
   files: ITestFile[];
+  assumptionValidations?: IAssumptionValidation[];
 
   // Synthetic testing fields
   isSynthetic?: boolean; // Maps to is_synthetic from Django model
@@ -37,6 +54,7 @@ export interface ITestResult {
   willingnessToPayFeedback?: string; // Maps to willingness_to_pay from Django model
   overallSentiment?: string; // Maps to overall_sentiment from Django model
   rawInterviewTranscript?: string; // Maps to raw_interview_transcript from Django model
+  keyQuotes?: string[]; // Maps to key_quotes from Django model
 }
 
 export interface ITestFile {

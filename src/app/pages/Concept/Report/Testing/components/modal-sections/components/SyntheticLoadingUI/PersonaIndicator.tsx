@@ -10,6 +10,7 @@ interface PersonaIndicatorProps {
   isLast: boolean;
   quotes: Array<{ text: string; profileUuid: string }>;
   bubblePosition: 'top' | 'bottom';
+  isActive?: boolean;
 }
 
 export const PersonaIndicator: React.FC<PersonaIndicatorProps> = ({
@@ -17,39 +18,54 @@ export const PersonaIndicator: React.FC<PersonaIndicatorProps> = ({
   status,
   quotes,
   bubblePosition,
+  isActive = false,
 }) => {
   const avatarRef = useRef<HTMLDivElement>(null);
 
   // Get the most recent quote for this profile
   const latestQuote = quotes.length > 0 ? quotes[quotes.length - 1].text : null;
 
-  const getStatusStyles = () => {
+  // Determine styles based on active state and status
+  const getStyles = () => {
+    if (isActive) {
+      return {
+        container: 'scale-110',
+        border: 'border-4 aucctus-border-brand shadow-lg',
+        avatar: 'opacity-100',
+      };
+    }
+
     switch (status) {
-      case 'processing':
-        return {
-          border: 'border-4 border-amber-600',
-          avatar: 'opacity-100',
-          animation: 'animate-pulse',
-        };
       case 'completed':
         return {
+          container: 'scale-100',
           border: 'border-4 border-green-500',
           avatar: 'opacity-100',
-          animation: '',
+        };
+      case 'processing':
+        return {
+          container: 'scale-100 opacity-60',
+          border: 'border-2 aucctus-border-secondary',
+          avatar: 'opacity-100',
         };
       default: // pending
         return {
+          container: 'scale-100 opacity-60',
           border: 'border-2 aucctus-border-secondary',
-          avatar: 'opacity-60',
-          animation: '',
+          avatar: 'opacity-100',
         };
     }
   };
 
-  const styles = getStatusStyles();
+  const styles = getStyles();
 
   return (
-    <div className='relative flex flex-col items-center gap-3'>
+    <div
+      className={cn(
+        'relative flex flex-col items-center gap-2 transition-all duration-500',
+        styles.container,
+      )}
+    >
       {/* Avatar with status border */}
       <div className='relative' ref={avatarRef}>
         {/* Show animated speech bubble if there's a quote */}
@@ -58,9 +74,8 @@ export const PersonaIndicator: React.FC<PersonaIndicatorProps> = ({
         )}
         <div
           className={cn(
-            'overflow-hidden rounded-full transition-all duration-300',
+            'overflow-hidden rounded-full transition-all duration-500',
             styles.border,
-            styles.animation,
           )}
         >
           {profile.avatarUrl ? (
@@ -87,22 +102,22 @@ export const PersonaIndicator: React.FC<PersonaIndicatorProps> = ({
           )}
         </div>
 
-        {/* Status indicator */}
-        {status === 'completed' && (
+        {/* Active indicator - green pulsing dot at top-right */}
+        {isActive && (
+          <div className='absolute -right-1 -top-1 h-4 w-4 animate-pulse rounded-full bg-green-500' />
+        )}
+
+        {/* Completed indicator - checkmark at bottom-right */}
+        {status === 'completed' && !isActive && (
           <div className='absolute -bottom-1 -right-1 rounded-full bg-green-500 p-1'>
             <Icon variant='check' className='h-3 w-3 stroke-white stroke-2' />
           </div>
         )}
       </div>
 
-      {/* Persona Label */}
+      {/* Persona Label - simplified to just segment */}
       <div className='text-center'>
-        <div className='aucctus-text-primary aucctus-text-sm font-medium'>
-          {profile.segment}
-        </div>
-        <div className='aucctus-text-secondary aucctus-text-xs'>
-          {profile.name}
-        </div>
+        <div className='aucctus-text-xs font-medium'>{profile.segment}</div>
       </div>
     </div>
   );
