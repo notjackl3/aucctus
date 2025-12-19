@@ -3,7 +3,6 @@ import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
 import { animated, useTransition } from 'react-spring';
 import React, { useState } from 'react';
-import { IconVariant } from '@components/Icon/Icon/icons';
 import { useColumnVisibilityStore } from '@stores/table-columns.store';
 
 interface IStaticColumnMenuProps {

@@ -7,6 +7,10 @@ export interface INucleusAnswerState extends INucleusAnswerActions {
   answerProgressByQuestion: Record<string, INucleusAnswerProgressState>;
 }
 
+export const initialNucleusAnswerState = {
+  answerProgressByQuestion: {},
+};
+
 const nucleusAnswerSlice: Lens<INucleusAnswerState, IAppStore> = (set, get) => {
   return {
     answerProgressByQuestion: {},

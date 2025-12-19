@@ -5,7 +5,6 @@ import { cn } from '@libs/utils/react';
 import * as Menubar from '@radix-ui/react-menubar';
 import React, { useState } from 'react';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
-import { IconVariant } from '@components/Icon/Icon/icons';
 
 interface IColumnVisibilityMenuProps {
   propertyDefinitions?: IPropertyDefinition[];

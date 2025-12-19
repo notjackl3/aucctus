@@ -42,6 +42,12 @@ export interface IIdeaPlaygroundState extends IIdeaPlaygroundActions {
   lastActiveSeedUuid: string | null;
 }
 
+export const initialIdeaPlaygroundState = {
+  currentQuestionIndex: 0,
+  selectedConceptUuids: [],
+  lastActiveSeedUuid: null,
+};
+
 const ideaPlaygroundSlice: Lens<IIdeaPlaygroundState, IAppStore> = (
   set,
   get,

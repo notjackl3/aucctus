@@ -25,6 +25,19 @@ export interface IFinancialProjectionState extends IFinancialProjectionActions {
   impactSizingAssumptions: Record<string, IImpactSizingAssumptionEntryV2[]>;
 }
 
+// Export initial state for use in store and reset functionality
+export const initialFinancialProjectionState = {
+  activeFinancialProjection: undefined as IFinancialProjectionV2 | undefined,
+  marketSizingAssumptions: {} as Record<
+    string,
+    IMarketSizingAssumptionEntryV2[]
+  >,
+  impactSizingAssumptions: {} as Record<
+    string,
+    IImpactSizingAssumptionEntryV2[]
+  >,
+};
+
 const financialProjectionSlice: Lens<IFinancialProjectionState, IAppStore> = (
   set,
   get,
@@ -33,9 +46,7 @@ const financialProjectionSlice: Lens<IFinancialProjectionState, IAppStore> = (
   const actionContext = { set, get, storeApi };
 
   return {
-    activeFinancialProjection: undefined,
-    marketSizingAssumptions: {},
-    impactSizingAssumptions: {},
+    ...initialFinancialProjectionState,
     setActiveFinancialProjection:
       setActiveFinancialProjection.bind(actionContext),
     setMarketSizingAssumptions: setMarketSizingAssumptions.bind(actionContext),

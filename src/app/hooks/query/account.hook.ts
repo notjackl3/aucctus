@@ -1,6 +1,6 @@
 import { useClerk, useUser as useClerkUser } from '@clerk/clerk-react';
 import { toast } from '@components';
-import useStore from '@stores/store';
+import useStore, { resetAllStoreData } from '@stores/store';
 import { AxiosError, isAxiosError } from 'axios';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 import api from '../../../libs/api';
@@ -83,7 +83,9 @@ export const useUser = () => {
         const status = error.response?.status;
         if ([401, 403, 419].includes(status || 0)) {
           // Log the user out if we have an unauthenticated error
-          signOut();
+          signOut().then(() => {
+            resetAllStoreData();
+          });
         }
       }
     },

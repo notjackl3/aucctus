@@ -42,6 +42,29 @@ export interface IConceptIncubationState extends IConceptIncubationActions {
   activeGeneratedConcept: IGeneratedConcept | undefined;
 }
 
+// Export initial state for use in store and reset functionality
+export const initialIncubationState = {
+  status: 'pre-generation' as
+    | 'pre-generation'
+    | 'generating'
+    | 'selecting'
+    | 'post-generation',
+  isNewSeed: true,
+  currentQuestionOrder: undefined as number | undefined,
+  isClonedSeed: false,
+  activeQuestionnaire: undefined as
+    | IConceptIncubationQuestionnaireSection
+    | undefined,
+  activeClarifyingQuestion: undefined as IClarifyingQuestion | undefined,
+  draftSeedUuid: '',
+  currentTextAnswerList: [] as AnswerItem[],
+  currentMultiSelectAnswerList: [] as AnswerItem[],
+  submittedAnswers: [] as IncubationAnswer[],
+  clarifyingQuestions: [] as IClarifyingQuestion[],
+  activeGeneratedConcept: undefined as IGeneratedConcept | undefined,
+  suggestions: {} as IncubationAISuggestions,
+};
+
 const conceptIncubationSlice: Lens<IConceptIncubationState, IAppStore> = (
   set,
   get,
@@ -51,19 +74,7 @@ const conceptIncubationSlice: Lens<IConceptIncubationState, IAppStore> = (
 
   return {
     // State
-    status: 'pre-generation',
-    isNewSeed: true,
-    currentQuestionOrder: undefined,
-    isClonedSeed: false,
-    activeQuestionnaire: undefined,
-    activeClarifyingQuestion: undefined,
-    draftSeedUuid: '',
-    currentTextAnswerList: [],
-    currentMultiSelectAnswerList: [],
-    submittedAnswers: [],
-    clarifyingQuestions: [],
-    activeGeneratedConcept: undefined,
-    suggestions: {},
+    ...initialIncubationState,
 
     // Actions
     setCurrentQuestionOrder: setCurrentQuestionOrder.bind(actionContext),

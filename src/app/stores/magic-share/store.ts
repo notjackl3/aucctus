@@ -7,6 +7,10 @@ export interface IMagicShareState extends IMagicShareActions {
   shareProgressByConcept: Record<string, IMagicShareProgressState>;
 }
 
+export const initialMagicShareState = {
+  shareProgressByConcept: {},
+};
+
 const magicShareSlice: Lens<IMagicShareState, IAppStore> = (set, get) => {
   return {
     shareProgressByConcept: {},

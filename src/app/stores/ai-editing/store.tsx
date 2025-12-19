@@ -47,6 +47,15 @@ export interface IAiEditingState extends IAiEditingActions {
   hasError: boolean;
 }
 
+// Export initial state for use in store and reset functionality
+export const initialAiEditingState = {
+  sessionId: undefined as string | undefined,
+  messages: [] as EditMessage[],
+  currentMessage: undefined as string | undefined,
+  isAucctusThinking: false,
+  thinkingMessage: undefined as string | undefined,
+};
+
 const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
   set,
   get,

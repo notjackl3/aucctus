@@ -6,9 +6,14 @@ export interface IDebugModeState extends IDebugModeActions {
   isDebugModeEnabled: boolean;
 }
 
+// Export initial state for use in store and reset functionality
+export const initialDebugModeState = {
+  isDebugModeEnabled: false,
+};
+
 const debugModeSlice: Lens<IDebugModeState, IAppStore> = (set, get) => {
   return {
-    isDebugModeEnabled: false,
+    ...initialDebugModeState,
 
     toggleDebugMode: () => {
       const currentState = get();

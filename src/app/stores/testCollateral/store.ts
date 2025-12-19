@@ -14,6 +14,14 @@ export interface ITestCollateralState extends ITestCollateralActions {
   collateralFeedbackStates: Record<string, CollateralFeedbackProcessingState>;
 }
 
+// Export initial state for use in store and reset functionality
+export const initialTestCollateralState = {
+  collateralFeedbackStates: {} as Record<
+    string,
+    CollateralFeedbackProcessingState
+  >,
+};
+
 const testCollateralSlice: Lens<ITestCollateralState, IAppStore> = (
   set,
   get,
@@ -23,7 +31,7 @@ const testCollateralSlice: Lens<ITestCollateralState, IAppStore> = (
 
   return {
     // State
-    collateralFeedbackStates: {},
+    ...initialTestCollateralState,
 
     // Actions
     setCollateralFeedbackProcessingState:

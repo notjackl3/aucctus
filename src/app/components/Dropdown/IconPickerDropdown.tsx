@@ -1,5 +1,4 @@
 import { Icon } from '@components';
-import { IconVariant } from '@components/Icon/Icon/icons';
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
 import React, { useState, useMemo } from 'react';

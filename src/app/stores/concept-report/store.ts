@@ -20,6 +20,13 @@ export interface IConceptReportState extends IConceptReportActions {
   >;
 }
 
+// Export initial state for use in store and reset functionality
+export const initialConceptReportState = {
+  conceptUuid: undefined as string | undefined,
+  identifier: undefined as string | undefined,
+  featureVersions: undefined as IFeatureVersions | undefined,
+};
+
 const conceptReportSlice: Lens<IConceptReportState, IAppStore> = (
   set,
   get,

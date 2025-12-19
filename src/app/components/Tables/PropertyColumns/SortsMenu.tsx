@@ -3,7 +3,6 @@ import { IPropertyDefinition } from '@libs/api/types';
 import * as Popover from '@radix-ui/react-popover';
 import React, { useState } from 'react';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
-import { IconVariant } from '@components/Icon/Icon/icons';
 
 interface ISortsMenuProps {
   propertyDefinitions?: IPropertyDefinition[];

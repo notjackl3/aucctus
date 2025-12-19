@@ -21,15 +21,20 @@ export interface IAuthState extends IAuthActions {
   account: IAccount | undefined | null;
 }
 
+// Export initial state for use in store and reset functionality
+export const initialAuthState = {
+  access: undefined as string | undefined,
+  refresh: undefined as string | undefined,
+  user: undefined as IUser | undefined | null,
+  account: undefined as IAccount | undefined | null,
+  initialized: false,
+};
+
 const authSlice: Lens<IAuthState, IAppStore> = (set, get, storeApi) => {
   const actionContext = { set, get, storeApi };
 
   return {
-    access: undefined,
-    refresh: undefined,
-    user: undefined,
-    account: undefined,
-    initialized: false,
+    ...initialAuthState,
     clearTokens: clearTokens.bind(actionContext),
     setInitialized: setInitialized.bind(actionContext),
     isAuthenticated: isAuthenticated.bind(actionContext),

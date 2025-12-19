@@ -1,7 +1,7 @@
 import { Input } from '@components';
 import utils from '@libs/utils';
 import { AppPath } from '@routes/routes';
-import useStore from '@stores/store';
+import useStore, { resetAllStoreData } from '@stores/store';
 import { FunctionComponent, useCallback, useState } from 'react';
 import { Navigate, Link } from 'react-router-dom';
 import Footer from '../components/Auth/Footer/Footer';
@@ -142,7 +142,11 @@ const OnBoarding: FunctionComponent = () => {
               <Link
                 className='btn btn-link !text-gray-light-700 hover:!text-primary-900'
                 to={AppPath.Login}
-                onClick={() => signOut()}
+                onClick={() =>
+                  signOut().then(() => {
+                    resetAllStoreData();
+                  })
+                }
               >
                 Sign out
               </Link>

@@ -62,6 +62,16 @@ export interface ICustomerProfileConversationState
   thinkingMessage?: string;
 }
 
+// Export initial state for use in store and reset functionality
+export const initialCustomerProfileConversationState = {
+  sessionId: undefined as string | undefined,
+  customerProfileUuid: undefined as string | undefined,
+  messages: [] as CustomerProfileMessage[],
+  currentMessage: undefined as string | undefined,
+  isAucctusTyping: false,
+  thinkingMessage: undefined as string | undefined,
+};
+
 const customerProfileConversationSlice: Lens<
   ICustomerProfileConversationState,
   IAppStore
@@ -69,11 +79,7 @@ const customerProfileConversationSlice: Lens<
   const actionContext = { set, get, storeApi };
 
   return {
-    sessionId: undefined,
-    customerProfileUuid: undefined,
-    messages: [],
-    currentMessage: undefined,
-    isAucctusTyping: false,
+    ...initialCustomerProfileConversationState,
     // User input is locked both when the agent is typing and when the streams are incoming
     // This is to prevent the user from sending multiple messages at once.
     userInputLocked: false,

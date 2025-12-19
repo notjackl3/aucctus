@@ -1,7 +1,5 @@
-// Declare as global ambient type for backwards compatibility
 declare global {
-    type IconVariant =
-        | 'activity'
+    type IconVariant = 'activity'
         | 'ai-conclusion'
         | 'alert'
         | 'alert-circle'
@@ -147,5 +145,4 @@ declare global {
         | 'zap';
 }
 
-// Also export for explicit imports
-export type { IconVariant };
+export { };

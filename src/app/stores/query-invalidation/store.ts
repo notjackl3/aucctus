@@ -12,6 +12,10 @@ export interface IQueryInvalidationState {
   clearAll: () => void;
 }
 
+export const initialQueryInvalidationState = {
+  pendingInvalidations: new Map(),
+};
+
 const queryInvalidationSlice: Lens<IQueryInvalidationState, IAppStore> = (
   set,
   get,

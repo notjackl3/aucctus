@@ -4,7 +4,7 @@ import { Avatar } from '@components';
 import { useClerk } from '@clerk/clerk-react';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
-import useStore from '@stores/store';
+import useStore, { resetAllStoreData } from '@stores/store';
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -117,6 +117,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           onClick={async (e) => {
             e.preventDefault();
             await signOut();
+            resetAllStoreData();
           }}
           collapsed={collapsed}
         />

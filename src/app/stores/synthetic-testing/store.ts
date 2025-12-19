@@ -18,6 +18,11 @@ export interface ISyntheticTestingState {
   ) => void;
 }
 
+export const initialSyntheticTestingState = {
+  isModalOpen: false,
+  lastExecutionState: null,
+};
+
 const syntheticTestingSlice: Lens<ISyntheticTestingState, IAppStore> = (
   set,
   get,
