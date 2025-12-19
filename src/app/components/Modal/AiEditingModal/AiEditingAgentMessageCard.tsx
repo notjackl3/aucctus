@@ -1,10 +1,13 @@
 import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
+import { Icon } from '@components';
 import { IConceptReportEdit } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 const CONCEPT_AI_EDITING_NOTE =
   'AI editing can make mistakes. Additional sections may be impacted. This process will take up to 10 minutes.';
+
+const MAX_VISIBLE_EDITS = 2;
 
 const sectionToIconMap: Record<string, IconVariant> = {
   overview: 'eye',
@@ -28,9 +31,17 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
   onConfirmation,
   onRejection,
 }) => {
-  const hasEdits = useMemo(() => {
-    return (message.edits ?? []).length > 0;
-  }, [message.edits]);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const edits = useMemo(() => message.edits ?? [], [message.edits]);
+  const hasEdits = edits.length > 0;
+  const hasMoreEdits = edits.length > MAX_VISIBLE_EDITS;
+  const hiddenCount = edits.length - MAX_VISIBLE_EDITS;
+
+  const visibleEdits = useMemo(() => {
+    if (isExpanded) return edits;
+    return edits.slice(0, MAX_VISIBLE_EDITS);
+  }, [edits, isExpanded]);
 
   return (
     <>
@@ -43,15 +54,36 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
           <span className='aucctus-text-sm text-gray-light-200'>
             {message.reply || ''}
           </span>
-          {(message.edits ?? []).map((edit, index) => (
-            <AiFrostedCard
-              key={index}
-              title={edit.title}
-              message={edit.description}
-              variant='dark'
-              leadingIcon={sectionToIconMap[edit.section] ?? edit.icon ?? ''}
-            />
-          ))}
+          <div
+            className={cn('flex flex-col gap-4', {
+              'max-h-[400px] overflow-y-auto overscroll-contain':
+                isExpanded && hasMoreEdits,
+            })}
+          >
+            {visibleEdits.map((edit, index) => (
+              <AiFrostedCard
+                key={index}
+                title={edit.title}
+                message={edit.description}
+                variant='dark'
+                leadingIcon={sectionToIconMap[edit.section] ?? edit.icon ?? ''}
+              />
+            ))}
+          </div>
+          {hasMoreEdits && (
+            <button
+              onClick={() => setIsExpanded(!isExpanded)}
+              className='flex items-center gap-1 text-sm text-gray-light-300 transition-colors hover:text-white'
+            >
+              <Icon
+                variant={isExpanded ? 'chevronup' : 'chevrondown'}
+                className='h-4 w-4 stroke-gray-light-300'
+              />
+              {isExpanded
+                ? 'Show less'
+                : `Show ${hiddenCount} more edit${hiddenCount > 1 ? 's' : ''}`}
+            </button>
+          )}
         </div>
         {hasEdits && (
           <>
