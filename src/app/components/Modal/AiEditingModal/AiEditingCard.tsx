@@ -244,6 +244,9 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
                       onSuccess: () => {
                         setAiEditSubmission(undefined);
 
+                        // Clear the conversation after successful edit
+                        clearConversation();
+
                         // Mark sections as pending in the cache
                         // DO NOT invalidate queries here - that would force a refetch from backend
                         // which still shows "complete" status, overwriting our pending states.

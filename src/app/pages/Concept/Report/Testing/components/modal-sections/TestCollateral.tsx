@@ -347,7 +347,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   return (
     <div
       className={cn(
-        'relative flex h-full flex-col',
+        'relative flex h-full flex-col overscroll-contain',
         !effectiveIsRegenerating && 'space-y-4',
       )}
     >

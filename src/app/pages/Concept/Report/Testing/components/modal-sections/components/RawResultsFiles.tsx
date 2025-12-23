@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Icon } from '@components';
 import { formatFileSize } from '../TestResults.utils';
 import { UploadedFile } from '../TestResults.types';
+import { cn } from '@libs/utils/react';
 
 interface FileInfo {
   uuid: string;
@@ -147,7 +148,14 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
       </div>
 
       {/* Files List */}
-      <div className='space-y-3'>
+      <div
+        className={cn(
+          'space-y-3',
+          isExpanded &&
+            allFiles.length > 0 &&
+            'max-h-[400px] overflow-y-auto pr-2',
+        )}
+      >
         {allFiles.length === 0 ? (
           <div className='aucctus-border-secondary aucctus-bg-secondary rounded-lg border p-6 text-center'>
             <Icon

@@ -33,18 +33,70 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
   results,
   onSourceClick,
 }) => {
-  // Group results by profile UUID
+  // Normalization helpers
+  const normalizeUuid = (value?: string | null) =>
+    value ? value.replace(/_/g, '-').toLowerCase() : undefined;
+
+  const normalizeName = (value?: string | null) =>
+    value
+      ? value
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .trim()
+          .toLowerCase()
+      : undefined;
+
+  // Group results by profile UUID with fallback to persona name matching
   const resultsByProfile = useMemo(() => {
     const map = new Map<string, ITestResult[]>();
+
+    // Initialize map with participant profile UUIDs
+    participants.forEach((participant) => {
+      const normalizedUuid =
+        normalizeUuid(participant.customerProfile.uuid) ??
+        participant.customerProfile.uuid.toLowerCase();
+      map.set(normalizedUuid, []);
+    });
+
     results?.forEach((result) => {
-      const profileUuid = result.baseProfileUuid || result.personaUuid;
-      if (profileUuid) {
-        const existing = map.get(profileUuid) || [];
-        map.set(profileUuid, [...existing, result]);
+      // Try to match by UUID first
+      const candidateIds = [
+        normalizeUuid(result.baseProfileUuid),
+        normalizeUuid(result.personaUuid),
+      ]
+        .filter(Boolean)
+        .map((id) => id as string);
+
+      let matched = false;
+      for (const candidate of candidateIds) {
+        if (map.has(candidate)) {
+          const existing = map.get(candidate) || [];
+          map.set(candidate, [...existing, result]);
+          matched = true;
+          break;
+        }
+      }
+
+      // Fallback: match by persona name if UUID matching failed
+      if (!matched && result.personaName) {
+        const personaName = normalizeName(result.personaName);
+        const matchingParticipant = participants.find(
+          (participant) =>
+            normalizeName(participant.customerProfile.name) === personaName,
+        );
+
+        if (matchingParticipant) {
+          const normalizedProfileUuid =
+            normalizeUuid(matchingParticipant.customerProfile.uuid) ??
+            matchingParticipant.customerProfile.uuid.toLowerCase();
+          const existing = map.get(normalizedProfileUuid) || [];
+          map.set(normalizedProfileUuid, [...existing, result]);
+        }
       }
     });
+
     return map;
-  }, [results]);
+  }, [results, participants]);
 
   // Get findings for a specific profile
   const getFindingsForProfile = (profileUuid: string): ParticipantFinding[] => {
@@ -93,15 +145,22 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
   // Get profiles that have results (only show tabs for profiles with data)
   const profiles = useMemo(() => {
     return participants
-      .map((p) => ({
-        uuid: p.customerProfile.uuid,
-        name: p.customerProfile.name,
-        segment: p.customerProfile.segment,
-        avatarUrl: p.customerProfile.avatarUrl,
-      }))
+      .map((p) => {
+        const normalizedUuid =
+          normalizeUuid(p.customerProfile.uuid) ??
+          p.customerProfile.uuid.toLowerCase();
+        return {
+          uuid: normalizedUuid,
+          originalUuid: p.customerProfile.uuid,
+          name: p.customerProfile.name,
+          segment: p.customerProfile.segment,
+          avatarUrl: p.customerProfile.avatarUrl,
+        };
+      })
       .filter((profile) => {
         // Only include profiles that have results
-        return resultsByProfile.has(profile.uuid);
+        const profileResults = resultsByProfile.get(profile.uuid) || [];
+        return profileResults.length > 0;
       });
   }, [participants, resultsByProfile]);
 
@@ -111,7 +170,8 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
   // State for expanded findings and quotes lists
   const [expandedFindings, setExpandedFindings] = useState(false);
   const [expandedQuotes, setExpandedQuotes] = useState(false);
-  const INITIAL_DISPLAY_COUNT = 6;
+  const INITIAL_FINDINGS_DISPLAY_COUNT = 4;
+  const INITIAL_QUOTES_DISPLAY_COUNT = 4;
 
   // Don't render if no profiles
   if (profiles.length === 0) {
@@ -199,14 +259,15 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
           // Show limited findings unless expanded
           const displayedFindings = expandedFindings
             ? allFindings
-            : allFindings.slice(0, INITIAL_DISPLAY_COUNT);
-          const hasMoreFindings = allFindings.length > INITIAL_DISPLAY_COUNT;
+            : allFindings.slice(0, INITIAL_FINDINGS_DISPLAY_COUNT);
+          const hasMoreFindings =
+            allFindings.length > INITIAL_FINDINGS_DISPLAY_COUNT;
 
           // Show limited quotes unless expanded
           const displayedQuotes = expandedQuotes
             ? quotes
-            : quotes.slice(0, INITIAL_DISPLAY_COUNT);
-          const hasMoreQuotes = quotes.length > INITIAL_DISPLAY_COUNT;
+            : quotes.slice(0, INITIAL_QUOTES_DISPLAY_COUNT);
+          const hasMoreQuotes = quotes.length > INITIAL_QUOTES_DISPLAY_COUNT;
 
           return (
             <div key={profile.uuid} className='space-y-6'>
@@ -220,7 +281,12 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
                     {allFindings.length}
                   </span>
                 </div>
-                <div className='grid grid-cols-1 gap-4 md:grid-cols-2'>
+                <div
+                  className={cn(
+                    'grid grid-cols-1 gap-4 md:grid-cols-2',
+                    expandedFindings && 'max-h-[720px] overflow-y-auto pr-2',
+                  )}
+                >
                   {displayedFindings.map((finding) => (
                     <div
                       key={finding.id}
@@ -289,7 +355,12 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
                       {quotes.length}
                     </span>
                   </div>
-                  <div className='space-y-3'>
+                  <div
+                    className={cn(
+                      'space-y-3',
+                      expandedQuotes && 'max-h-[600px] overflow-y-auto pr-2',
+                    )}
+                  >
                     {displayedQuotes.map((quoteItem) => (
                       <div
                         key={quoteItem.id}

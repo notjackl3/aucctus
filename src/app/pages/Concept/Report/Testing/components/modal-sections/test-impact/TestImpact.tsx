@@ -173,7 +173,7 @@ const TestImpact: React.FC<TestImpactProps> = ({
   const isDisabled = hasNoTestResults;
 
   return (
-    <div className='relative space-y-6'>
+    <div className='relative space-y-6 overscroll-contain'>
       <TabBanner
         icon='trending-up'
         title='Test Impact'

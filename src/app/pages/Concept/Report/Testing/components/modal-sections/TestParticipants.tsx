@@ -105,7 +105,7 @@ const TestParticipants: React.FC<TestParticipantsProps> = ({
   );
 
   return (
-    <div className='space-y-4'>
+    <div className='space-y-4 overscroll-contain'>
       <TabBanner
         icon='users-03'
         title='Select Participants'

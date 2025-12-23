@@ -74,7 +74,7 @@ const TestOverview: React.FC<TestOverviewProps> = ({
   const displayAssumptions = getDisplayAssumptions();
 
   return (
-    <div className='space-y-6'>
+    <div className='space-y-6 overscroll-contain'>
       {/* Tab Banner */}
       <TabBanner
         icon='clipboard-list'

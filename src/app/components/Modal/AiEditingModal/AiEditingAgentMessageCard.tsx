@@ -1,8 +1,8 @@
 import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
 import { Icon } from '@components';
-import { IConceptReportEdit } from '@libs/api/types';
+import { IAiEditingSuggestion, IConceptReportEdit } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useCallback, useEffect } from 'react';
 
 const CONCEPT_AI_EDITING_NOTE =
   'AI editing can make mistakes. Additional sections may be impacted. This process will take up to 10 minutes.';
@@ -20,7 +20,9 @@ const sectionToIconMap: Record<string, IconVariant> = {
 
 interface AiEditingAgentMessageCardProps {
   message: IConceptReportEdit | Partial<IConceptReportEdit>;
-  onConfirmation?: () => void;
+  onConfirmation?: (
+    editedMessage: IConceptReportEdit | Partial<IConceptReportEdit>,
+  ) => void;
   onRejection?: () => void;
   className?: string;
 }
@@ -34,13 +36,55 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
 
   const edits = useMemo(() => message.edits ?? [], [message.edits]);
+
+  // Track selected edits by their index - all selected by default
+  const [selectedIndices, setSelectedIndices] = useState<Set<number>>(
+    () => new Set(edits.map((_, index) => index)),
+  );
+
+  // Update selection when edits change (reset to all selected)
+  useEffect(() => {
+    setSelectedIndices(new Set(edits.map((_, index) => index)));
+  }, [edits]);
+
   const hasEdits = edits.length > 0;
   const hasMoreEdits = edits.length > MAX_VISIBLE_EDITS;
   const hiddenCount = edits.length - MAX_VISIBLE_EDITS;
+  const hasSelectedEdits = selectedIndices.size > 0;
 
-  const visibleEdits = useMemo(() => {
-    if (isExpanded) return edits;
-    return edits.slice(0, MAX_VISIBLE_EDITS);
+  const toggleEditSelection = useCallback((index: number) => {
+    setSelectedIndices((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  }, []);
+
+  const handleConfirmation = useCallback(() => {
+    if (!onConfirmation || !hasSelectedEdits) return;
+
+    // Filter edits to only include selected ones
+    const selectedEdits: IAiEditingSuggestion[] = edits.filter((_, index) =>
+      selectedIndices.has(index),
+    );
+
+    const editedMessage: IConceptReportEdit | Partial<IConceptReportEdit> = {
+      ...message,
+      edits: selectedEdits,
+    };
+
+    onConfirmation(editedMessage);
+  }, [onConfirmation, hasSelectedEdits, edits, selectedIndices, message]);
+
+  // Track visible edits with their original indices
+  const visibleEditsWithIndices = useMemo(() => {
+    const editsWithIndices = edits.map((edit, index) => ({ edit, index }));
+    if (isExpanded) return editsWithIndices;
+    return editsWithIndices.slice(0, MAX_VISIBLE_EDITS);
   }, [edits, isExpanded]);
 
   return (
@@ -56,19 +100,37 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
           </span>
           <div
             className={cn('flex flex-col gap-4', {
-              'max-h-[400px] overflow-y-auto overscroll-contain':
-                isExpanded && hasMoreEdits,
+              'max-h-[400px] overflow-y-auto': isExpanded && hasMoreEdits,
             })}
           >
-            {visibleEdits.map((edit, index) => (
-              <AiFrostedCard
-                key={index}
-                title={edit.title}
-                message={edit.description}
-                variant='dark'
-                leadingIcon={sectionToIconMap[edit.section] ?? edit.icon ?? ''}
-              />
-            ))}
+            {visibleEditsWithIndices.map(({ edit, index }) => {
+              const isSelected = selectedIndices.has(index);
+              return (
+                <button
+                  key={index}
+                  type='button'
+                  onClick={() => toggleEditSelection(index)}
+                  className={cn(
+                    'w-full cursor-pointer rounded-lg text-left transition-all duration-200',
+                    'ring-2 ring-offset-2 ring-offset-transparent',
+                    {
+                      'ring-brand-primary-500': isSelected,
+                      'opacity-50 ring-transparent hover:opacity-75':
+                        !isSelected,
+                    },
+                  )}
+                >
+                  <AiFrostedCard
+                    title={edit.title}
+                    message={edit.description}
+                    variant='dark'
+                    leadingIcon={
+                      sectionToIconMap[edit.section] ?? edit.icon ?? ''
+                    }
+                  />
+                </button>
+              );
+            })}
           </div>
           {hasMoreEdits && (
             <button
@@ -90,9 +152,19 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
             <span className='aucctus-text-sm flex-1 break-words text-gray-light-200'>
               {CONCEPT_AI_EDITING_NOTE}
             </span>
-            <div className='mt-2 flex flex-1 flex-row gap-2'>
+            <div className='mt-2 flex flex-1 flex-row items-center gap-2'>
               <span className='flex-1' />
-              <button className='btn btn-light' onClick={onConfirmation}>
+              <span className='aucctus-text-sm text-gray-light-300'>
+                {selectedIndices.size}/{edits.length} selected
+              </span>
+              <button
+                className={cn('btn btn-light', {
+                  'btn-disabled cursor-not-allowed opacity-50':
+                    !hasSelectedEdits,
+                })}
+                onClick={handleConfirmation}
+                disabled={!hasSelectedEdits}
+              >
                 Make Changes
               </button>
               <button className='btn btn-light' onClick={onRejection}>

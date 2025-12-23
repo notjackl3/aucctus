@@ -272,7 +272,7 @@ const TestResults: React.FC<TestResultsProps> = ({
   }
 
   return (
-    <div className='relative space-y-6'>
+    <div className='relative space-y-6 overscroll-contain'>
       {/* Loading Overlay for Test Result Analysis */}
       {(operations.isCreating || operations.isUpdating) && (
         <TestCompletionLoadingOverlay

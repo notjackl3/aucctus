@@ -88,13 +88,7 @@ const AiEditingChatMessage: React.FC<AiEditingChatMessageProps> = ({
         <AiEditingAgentMessageCard
           className='mx-4'
           message={message.content}
-          onConfirmation={() =>
-            onConfirmation(
-              message.content as
-                | IConceptReportEdit
-                | Partial<IConceptReportEdit>,
-            )
-          }
+          onConfirmation={(editedMessage) => onConfirmation(editedMessage)}
           onRejection={onRejection}
         />
       )}
