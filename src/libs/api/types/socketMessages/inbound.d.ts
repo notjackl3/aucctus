@@ -705,6 +705,44 @@ export interface IMagicShareErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// POC Plan Generation Messages
+// ==========================================
+
+export interface IPocPlanGenerationProgressMessage extends BaseSocketEvent {
+  type: 'poc_plan.generation.progress.account';
+  account_uuid: string;
+  concept_uuid: string;
+  concept_identifier: string;
+  poc_plan_uuid: string;
+  stage: string;
+  progress: number;
+  message: string;
+  status: string;
+  error_details?: string;
+}
+
+export interface IPocPlanGenerationCompleteMessage extends BaseSocketEvent {
+  type: 'poc_plan.generation.complete.account';
+  account_uuid: string;
+  concept_uuid: string;
+  concept_identifier: string;
+  poc_plan_uuid: string;
+  status: 'complete';
+  message: string;
+}
+
+export interface IPocPlanGenerationErrorMessage extends BaseSocketEvent {
+  type: 'poc_plan.generation.error.account';
+  account_uuid: string;
+  concept_uuid: string;
+  concept_identifier: string;
+  poc_plan_uuid: string;
+  status: 'failed';
+  error_message: string;
+  error_code?: string;
+}
+
+// ==========================================
 // Idea Playground Event Messages
 // ==========================================
 
@@ -799,6 +837,67 @@ export interface IIdeaPlaygroundResearchInsightsGeneratedMessage
   insightCount: number;
 }
 
+// ==========================================
+// Concept Priority Messages
+// ==========================================
+
+export interface IConceptPriorityCompletedMessage extends BaseSocketEvent {
+  type: 'concept.priority.completed.user';
+  conceptUuid: string;
+  accountUuid: string;
+  overallPriorityScore: number;
+  strategicAlignmentScore: number;
+  financialOpportunityScore: number;
+  innovationRiskScore: number;
+  message: string;
+}
+
+export interface IConceptPriorityErrorMessage extends BaseSocketEvent {
+  type: 'concept.priority.error.user';
+  conceptUuid: string;
+  accountUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+export interface IBulkPriorityProgressMessage extends BaseSocketEvent {
+  type: 'concept.priority.bulk.progress.user';
+  accountUuid: string;
+  current: number;
+  total: number;
+  successCount: number;
+  errorCount: number;
+  currentConceptTitle: string;
+}
+
+export interface IBulkPriorityCompletedMessage extends BaseSocketEvent {
+  type: 'concept.priority.bulk.completed.user';
+  accountUuid: string;
+  totalCount: number;
+  successCount: number;
+  errorCount: number;
+  message: string;
+}
+
+export interface ITopPrioritySummary {
+  title: string;
+  overallScore: number;
+  keyStrength: string;
+}
+
+export interface IPortfolioSummaryMessage extends BaseSocketEvent {
+  type: 'concept.priority.portfolio_summary.user';
+  accountUuid: string;
+  totalAnalyzed: number;
+  highPriorityCount: number;
+  averageScore: number;
+  executiveInsight: string;
+  keyRecommendation: string;
+  portfolioHealth: 'strong' | 'balanced' | 'needs_attention';
+  topPriorities: ITopPrioritySummary[];
+}
+
 export type InboundSocketEvent<C = {}> =
   | ErrorEvent
   | ChatStreamEvent<C>
@@ -863,6 +962,14 @@ export type InboundSocketEvent<C = {}> =
   | IIdeaPlaygroundPossibleAnswerProcessingMessage
   | IIdeaPlaygroundPossibleAnswerGeneratedMessage
   | IIdeaPlaygroundResearchInsightsProcessingMessage
-  | IIdeaPlaygroundResearchInsightsGeneratedMessage;
+  | IIdeaPlaygroundResearchInsightsGeneratedMessage
+  | IPocPlanGenerationProgressMessage
+  | IPocPlanGenerationCompleteMessage
+  | IPocPlanGenerationErrorMessage
+  | IConceptPriorityCompletedMessage
+  | IConceptPriorityErrorMessage
+  | IBulkPriorityProgressMessage
+  | IBulkPriorityCompletedMessage
+  | IPortfolioSummaryMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

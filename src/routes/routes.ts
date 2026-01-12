@@ -7,6 +7,7 @@ export enum ConceptPath {
   Assumptions = 'assumptions',
   Settings = 'settings',
   Testing = 'testing',
+  PocPlan = 'poc-plan',
 }
 
 export enum AppPath {
@@ -27,6 +28,7 @@ export enum AppPath {
   ConceptMarketScan = `/concept/:id/${ConceptPath.MarketScan}`,
   ConceptSettings = `/concept/:id/${ConceptPath.Settings}`,
   ConceptTesting = `/concept/:id/${ConceptPath.Testing}`,
+  ConceptPocPlan = `/concept/:id/${ConceptPath.PocPlan}`,
 
   /* Challenges */
   ChallengeCenter = '/challenge',
@@ -36,8 +38,17 @@ export enum AppPath {
   /* Nucleus */
   Nucleus = '/nucleus',
 
+  /* Signal Scanning */
+  SignalScanning = '/signal-scanning',
+
+  /* Innovation Pipeline */
+  InnovationPipeline = '/innovation-pipeline',
+
   /* Idea Playground */
   IdeaPlayground = '/playground',
+
+  /* Portfolio Prioritization */
+  PortfolioPrioritization = '/portfolio',
 
   /* Settings */
   Settings = '/settings',

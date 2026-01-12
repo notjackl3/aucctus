@@ -21,6 +21,7 @@ import EditQuestionModal from './Nucleus/EditQuestionModal';
 import AddAnswerModal from './Nucleus/AddAnswerModal';
 import EditAnswerModal from './Nucleus/EditAnswerModal';
 import MagicShare from './MagicShareModal/MagicShareModal';
+import ProceedToPoc from './ProceedToPocModal/ProceedToPocModal';
 import RegenerateTestWarningModal from './RegenerateTestWarningModal';
 import PropertyDefinitionModal from './PropertyDefinitionModal/PropertyDefinitionModal';
 import IconPickerModal from './IconPickerModal/IconPickerModal';
@@ -47,6 +48,7 @@ const Modal = {
   AddAnswerModal,
   EditAnswerModal,
   MagicShare,
+  ProceedToPoc,
   RegenerateTestWarningModal,
   PropertyDefinitionModal,
   IconPickerModal,

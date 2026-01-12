@@ -146,6 +146,22 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/overview/upload-image`;
   }
 
+  static conceptPriority(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/priority`;
+  }
+
+  static conceptPriorityList() {
+    return `api/v2/concept/priority/list`;
+  }
+
+  static conceptPriorityGenerate(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/priority/generate`;
+  }
+
+  static conceptPriorityGenerateBulk() {
+    return `api/v2/concept/priority/generate-bulk`;
+  }
+
   static conceptOverviewImageSettings(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/overview/image-settings`;
   }
@@ -777,6 +793,73 @@ export class Endpoints {
 
   static ideaPlaygroundSeedContext(seedUuid: string) {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/context`;
+  }
+
+  // Signal Scanning Endpoints
+  static signalScanningDashboard = '/api/v1/signal-scanning/dashboard';
+  static signalScanningRefresh = '/api/v1/signal-scanning/refresh';
+  static signalScanningSignals = '/api/v1/signal-scanning/signals';
+  static signalScanningOpportunities = '/api/v1/signal-scanning/opportunities';
+  static signalScanningIntelligence = '/api/v1/signal-scanning/intelligence';
+
+  // Strategic Foresight V2 Endpoints (Insights)
+  static signalScanningInsights = '/api/v1/signal-scanning/insights';
+
+  static signalScanningInsight(insightUuid: string) {
+    return `/api/v1/signal-scanning/insights/${insightUuid}`;
+  }
+
+  static signalScanningInsightStatus(insightUuid: string) {
+    return `/api/v1/signal-scanning/insights/${insightUuid}/status`;
+  }
+
+  static signalScanningInsightTracking(insightUuid: string) {
+    return `/api/v1/signal-scanning/insights/${insightUuid}/tracking`;
+  }
+
+  static signalScanningSignal(signalUuid: string) {
+    return `/api/v1/signal-scanning/signals/${signalUuid}`;
+  }
+
+  static signalScanningSignalStatus(signalUuid: string) {
+    return `/api/v1/signal-scanning/signals/${signalUuid}/status`;
+  }
+
+  static signalScanningSignalCreateConcept(signalUuid: string) {
+    return `/api/v1/signal-scanning/signals/${signalUuid}/create-concept`;
+  }
+
+  static signalScanningSignalAttachConcept(signalUuid: string) {
+    return `/api/v1/signal-scanning/signals/${signalUuid}/attach-concept`;
+  }
+
+  static signalScanningOpportunity(opportunityUuid: string) {
+    return `/api/v1/signal-scanning/opportunities/${opportunityUuid}`;
+  }
+
+  static signalScanningOpportunityCreateConcept(opportunityUuid: string) {
+    return `/api/v1/signal-scanning/opportunities/${opportunityUuid}/create-concept`;
+  }
+
+  // POC Plan Endpoints
+  static pocPlanGenerate(conceptUuid: string) {
+    return `/api/v2/concept/${conceptUuid}/poc-plan/generate`;
+  }
+
+  static pocPlan(conceptUuid: string) {
+    return `/api/v2/concept/${conceptUuid}/poc-plan`;
+  }
+
+  static pocPlanStatus(conceptUuid: string) {
+    return `/api/v2/concept/${conceptUuid}/poc-plan/status`;
+  }
+
+  static pocPlanExists(conceptUuid: string) {
+    return `/api/v2/concept/${conceptUuid}/poc-plan/exists`;
+  }
+
+  static pocPlanModalContent(conceptUuid: string) {
+    return `/api/v2/concept/${conceptUuid}/poc-plan/modal-content`;
   }
 }
 

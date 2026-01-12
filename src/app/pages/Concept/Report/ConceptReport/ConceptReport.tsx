@@ -3,10 +3,12 @@ import {
   Icon,
   Loading,
   Modal,
+  PocGeneratingOverlay,
   Select,
   ConceptReportSkeletons,
 } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
+import ProceedToPocButton from '@components/Button/ProceedToPocButton';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import {
   useCancelConceptVersionRevert,
@@ -15,10 +17,11 @@ import {
   useConceptUpdate,
   useTrackConceptView,
 } from '@hooks/query/concepts.hook';
+import { usePocPlanStatus } from '@hooks/query/pocPlan.hook';
 import { useRoutePattern } from '@hooks/router.hook';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ConceptStatus, IConcept } from '@libs/api/types';
-import { AppPath } from '@routes/routes';
+import { AppPath, ConceptPath } from '@routes/routes';
 import useStore from '@stores/store';
 import { toast } from '@components';
 import ConceptVersionsButton from '@components/Button/ConceptVersionsButton';
@@ -93,6 +96,9 @@ const ConceptReport: FunctionComponent = () => {
   const { mutate: trackConceptView } = useTrackConceptView();
   const hasTrackedView = useRef(false);
 
+  // POC Generation state
+  const [isPocGenerating, setIsPocGenerating] = useState(false);
+
   const {
     concept,
     isLoading: isConceptLoading,
@@ -102,6 +108,12 @@ const ConceptReport: FunctionComponent = () => {
   const status = useMemo(() => concept?.status || 'new', [concept]);
   const { mutate: updateConcept } = useConceptUpdate();
   const { openModal, closeModal } = useModal();
+
+  // Track POC plan generation status
+  const { isComplete: isPocPlanReady } = usePocPlanStatus(conceptUuid, {
+    enabled: isPocGenerating,
+    enablePolling: true,
+  });
 
   const setActiveConcept = useStore(
     (state) => state.conceptReport.setActiveConcept,
@@ -173,6 +185,57 @@ const ConceptReport: FunctionComponent = () => {
       hasTrackedView.current = true;
     }
   }, [conceptUuid, trackConceptView]);
+
+  // Navigate to POC plan when generation is complete
+  useEffect(() => {
+    if (isPocPlanReady && isPocGenerating && conceptIdentifier) {
+      setIsPocGenerating(false);
+      // Update concept status to proofOfConcept, then navigate after success
+      updateConcept(
+        {
+          identifier: conceptIdentifier,
+          status: 'proofOfConcept' as ConceptStatus,
+        },
+        {
+          onSuccess: () => {
+            // Navigate to POC plan page after status is updated
+            navigate(`/concept/${conceptIdentifier}/${ConceptPath.PocPlan}`);
+          },
+        },
+      );
+    }
+  }, [
+    isPocPlanReady,
+    isPocGenerating,
+    conceptIdentifier,
+    navigate,
+    updateConcept,
+  ]);
+
+  // Handler for when POC generation starts
+  const handlePocGenerationStart = useCallback(() => {
+    setIsPocGenerating(true);
+  }, []);
+
+  // Handler for when POC generation completes (from overlay)
+  const handlePocGenerationComplete = useCallback(() => {
+    if (conceptIdentifier) {
+      setIsPocGenerating(false);
+      // Update concept status to proofOfConcept, then navigate after success
+      updateConcept(
+        {
+          identifier: conceptIdentifier,
+          status: 'proofOfConcept' as ConceptStatus,
+        },
+        {
+          onSuccess: () => {
+            // Navigate to POC plan page after status is updated
+            navigate(`/concept/${conceptIdentifier}/${ConceptPath.PocPlan}`);
+          },
+        },
+      );
+    }
+  }, [conceptIdentifier, navigate, updateConcept]);
 
   const onTabSelect = useCallback(
     (value: string) => {
@@ -346,6 +409,23 @@ const ConceptReport: FunctionComponent = () => {
           }
         />
       </div>
+
+      {/* Proceed to POC Button - Floating */}
+      {concept && (
+        <ProceedToPocButton
+          concept={concept}
+          onGenerationStart={handlePocGenerationStart}
+        />
+      )}
+
+      {/* POC Generation Overlay */}
+      {isPocGenerating && concept && (
+        <PocGeneratingOverlay
+          conceptUuid={concept.uuid}
+          conceptTitle={concept.title}
+          onComplete={handlePocGenerationComplete}
+        />
+      )}
 
       {concept?.isHistoricalVersion && FEATURE_CONCEPT_VERSIONING && (
         <div className='aucctus-bg-primary fixed left-1/2 top-0 z-50 flex -translate-x-1/2 animate-fade-in flex-row items-center justify-center gap-2 rounded-b-md px-4 py-2 shadow-md'>

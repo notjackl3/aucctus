@@ -31,6 +31,10 @@ export enum AucctusQueryKeys {
   assumption = 'assumption',
   assumptions = 'assumptions',
 
+  /* Concept Priority */
+  conceptPriority = 'conceptPriority',
+  conceptPriorities = 'conceptPriorities',
+
   /* Properties */
   propertyDefinitions = 'propertyDefinitions',
   propertyDefinition = 'propertyDefinition',
@@ -80,6 +84,26 @@ export enum AucctusQueryKeys {
   nucleusReport = 'nucleusReport',
   nucleusReportLatest = 'nucleusReportLatest',
   nucleusReportsList = 'nucleusReportsList',
+
+  /* Signal Scanning (V1) */
+  signalScanningDashboard = 'signalScanningDashboard',
+  signalScanningSignals = 'signalScanningSignals',
+  signalScanningSignal = 'signalScanningSignal',
+  signalScanningOpportunities = 'signalScanningOpportunities',
+  signalScanningOpportunity = 'signalScanningOpportunity',
+  signalScanningIntelligence = 'signalScanningIntelligence',
+
+  /* Strategic Foresight (V2) */
+  strategicForesightDashboard = 'strategicForesightDashboard',
+  strategicForesightInsights = 'strategicForesightInsights',
+  strategicForesightInsight = 'strategicForesightInsight',
+  strategicForesightPatterns = 'strategicForesightPatterns',
+  strategicForesightRadar = 'strategicForesightRadar',
+
+  /* POC Plan */
+  pocPlan = 'pocPlan',
+  pocPlanStatus = 'pocPlanStatus',
+  pocModalContent = 'pocModalContent',
 
   /* External APIs */
   companyInfo = 'companyInfo',

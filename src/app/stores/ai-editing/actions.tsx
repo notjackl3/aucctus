@@ -29,6 +29,8 @@ export interface IAiEditingActions {
     code: string;
   }) => void;
   clearError: () => void;
+  setPrepopulatedEditMessage: (message: string | undefined) => void;
+  clearPrepopulatedEditMessage: () => void;
 }
 
 /**

@@ -14,6 +14,7 @@ interface IStaticColumnMenuProps {
   onReorder?: (draggedId: string, targetId: string) => void;
   hasFilter?: boolean;
   filterSubmenu?: React.ReactNode; // Custom filter submenu component
+  badge?: React.ReactNode; // Optional badge to display next to column name
 }
 
 /**
@@ -29,6 +30,7 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
   onReorder,
   hasFilter = false,
   filterSubmenu,
+  badge,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [hoveredSubmenu, setHoveredSubmenu] = useState<
@@ -217,6 +219,7 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
                 />
               )}
               {columnName}
+              {badge && <span className='ml-1'>{badge}</span>}
             </span>
             <span className='ml-2 flex items-center gap-1'>
               {hasFilter && (

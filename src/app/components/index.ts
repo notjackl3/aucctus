@@ -27,6 +27,7 @@ import VersionUpgradeBanner from './Banner/VersionUpgradeBanner';
 import BetaDisclaimer from './BetaDisclaimer';
 import { ComponentCarousel } from './Carousel';
 import Loading from './Loading/Loading';
+import PocGeneratingOverlay from './Loading/PocGeneratingOverlay';
 import Progress from './Loading/Progress';
 import UnifiedLoadingState from './Loading/UnifiedLoadingState';
 import NucleusPage from './Nucleus/NucleusPage/NucleusPage';
@@ -75,6 +76,7 @@ export {
   Loading,
   LogoAnimation,
   Modal,
+  PocGeneratingOverlay,
   NucleusPage,
   Portal,
   Progress,

@@ -649,4 +649,49 @@ export class ConceptApi extends ApiService {
       hasHistory: boolean;
     }>(endpoints.syntheticPipelineEstimate(conceptUuid, numProfiles));
   }
+
+  /**
+   * Get priority scores for a specific concept
+   * @param conceptUuid - Concept UUID
+   * @returns Priority scores and reasoning
+   */
+  getConceptPriority(conceptUuid: string) {
+    return this.get<
+      import('./types/concept/concept_priority').IConceptPriority
+    >(endpoints.conceptPriority(conceptUuid));
+  }
+
+  /**
+   * Get all concept priorities for the account
+   * @returns List of concept priorities
+   */
+  getConceptPriorities() {
+    return this.get<
+      import('./types/concept/concept_priority').IConceptPrioritySummary[]
+    >(endpoints.conceptPriorityList());
+  }
+
+  /**
+   * Trigger priority calculation for a single concept
+   * @param conceptUuid - UUID of the concept to calculate priority for
+   * @returns Task information
+   */
+  generateConceptPriority(conceptUuid: string) {
+    return this.post<
+      import('./types/concept/concept_priority').IGeneratePrioritiesResponse,
+      Record<string, never>
+    >(endpoints.conceptPriorityGenerate(conceptUuid), {});
+  }
+
+  /**
+   * Trigger priority calculation for all Active (Complete) concepts
+   * @param conceptUuids - Optional list of specific concept UUIDs to process
+   * @returns Task information with count of concepts queued
+   */
+  generateBulkConceptPriorities(conceptUuids?: string[]) {
+    return this.post<
+      import('./types/concept/concept_priority').IGeneratePrioritiesResponse,
+      { conceptUuids?: string[] }
+    >(endpoints.conceptPriorityGenerateBulk(), { conceptUuids });
+  }
 }

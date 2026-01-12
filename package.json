@@ -27,6 +27,8 @@
   "dependencies": {
     "@clerk/clerk-react": "^5.38.0",
     "@dhmk/zustand-lens": "^5.0.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
     "@floating-ui/react-dom": "^2.1.1",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-collapsible": "^1.1.8",
@@ -50,6 +52,7 @@
     "immer": "^10.1.1",
     "jwt-decode": "^4.0.0",
     "lottie-react": "^2.4.1",
+    "lucide-react": "^0.562.0",
     "react": "^18.2.0",
     "react-click-away-listener": "^2.2.4",
     "react-dom": "^18.2.0",

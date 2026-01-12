@@ -85,6 +85,12 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
   const clearConversation = useStore(
     (state) => state.aiEditing.clearConversation,
   );
+  const prepopulatedEditMessage = useStore(
+    (state) => state.aiEditing.prepopulatedEditMessage,
+  );
+  const clearPrepopulatedEditMessage = useStore(
+    (state) => state.aiEditing.clearPrepopulatedEditMessage,
+  );
 
   const queryClient = useQueryClient();
 
@@ -122,6 +128,19 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
 
     return () => clearTimeout(focusTimeout);
   }, []);
+
+  // Consume prepopulated edit message from external navigation (e.g., Signal Scanning)
+  useEffect(() => {
+    if (prepopulatedEditMessage && !currentMessage) {
+      setCurrentMessage(prepopulatedEditMessage);
+      clearPrepopulatedEditMessage();
+    }
+  }, [
+    prepopulatedEditMessage,
+    currentMessage,
+    setCurrentMessage,
+    clearPrepopulatedEditMessage,
+  ]);
 
   // Cleanup function
   useEffect(() => {

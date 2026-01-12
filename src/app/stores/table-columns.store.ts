@@ -98,6 +98,7 @@ export const useColumnVisibilityStore = create<IColumnVisibilityStore>()(
         'lastModifiedBy',
         'updatedAt',
         'status',
+        'priority',
       ]),
 
       toggleColumnVisibility: (key: string) => {
@@ -172,6 +173,7 @@ export const useColumnVisibilityStore = create<IColumnVisibilityStore>()(
             'lastModifiedBy',
             'updatedAt',
             'status',
+            'priority',
           ]),
         });
       },
@@ -202,6 +204,7 @@ export const useColumnVisibilityStore = create<IColumnVisibilityStore>()(
             'lastModifiedBy',
             'updatedAt',
             'status',
+            'priority',
           ],
         ),
       }),

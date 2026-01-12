@@ -7,6 +7,8 @@ import {
   clearSelectedConcepts,
   setLastActiveSeedUuid,
   clearLastActiveSeedUuid,
+  setPrepopulatedAnchorThought,
+  clearPrepopulatedAnchorThought,
   reset,
 } from './actions';
 
@@ -40,12 +42,17 @@ export interface IIdeaPlaygroundState extends IIdeaPlaygroundActions {
   // Session Restoration State (persisted to session storage)
   // Used to restore the active seed when returning to playground via navigation
   lastActiveSeedUuid: string | null;
+
+  // Prepopulated anchor thought from external navigation (e.g., Signal Scanning)
+  // Cleared after consumption by IdeaPlayground
+  prepopulatedAnchorThought: string | null;
 }
 
 export const initialIdeaPlaygroundState = {
   currentQuestionIndex: 0,
   selectedConceptUuids: [],
   lastActiveSeedUuid: null,
+  prepopulatedAnchorThought: null,
 };
 
 const ideaPlaygroundSlice: Lens<IIdeaPlaygroundState, IAppStore> = (
@@ -60,6 +67,7 @@ const ideaPlaygroundSlice: Lens<IIdeaPlaygroundState, IAppStore> = (
     currentQuestionIndex: 0,
     selectedConceptUuids: [],
     lastActiveSeedUuid: null,
+    prepopulatedAnchorThought: null,
 
     // Actions - bound to actionContext
     setCurrentQuestionIndex: setCurrentQuestionIndex.bind(actionContext),
@@ -67,6 +75,10 @@ const ideaPlaygroundSlice: Lens<IIdeaPlaygroundState, IAppStore> = (
     clearSelectedConcepts: clearSelectedConcepts.bind(actionContext),
     setLastActiveSeedUuid: setLastActiveSeedUuid.bind(actionContext),
     clearLastActiveSeedUuid: clearLastActiveSeedUuid.bind(actionContext),
+    setPrepopulatedAnchorThought:
+      setPrepopulatedAnchorThought.bind(actionContext),
+    clearPrepopulatedAnchorThought:
+      clearPrepopulatedAnchorThought.bind(actionContext),
     reset: reset.bind(actionContext),
   };
 };

@@ -370,6 +370,7 @@ export interface IConceptQueryOptions extends IPageQueryOptions {
   lastModifiedBy?: string;
   sort?: ConceptSortString; // Now accepts comma-separated sort fields
   properties?: string; // JSON-encoded array of property filters with AND logic
+  pageSize?: number; // Number of results per page (default: 20)
   // Legacy single-property filter (deprecated, use properties instead)
   property_key?: string;
   property_value?: any;

@@ -1,6 +1,7 @@
 import { Lens, lens } from '@dhmk/zustand-lens';
 import { IInboundChatMessage, IMediaMessage } from '@libs/api/types';
 import { IConceptReportEdit } from '@libs/api/types/ai-editing';
+import { produce } from 'immer';
 import type { IAppStore } from '../store';
 import {
   addAssistantMessage,
@@ -45,6 +46,10 @@ export interface IAiEditingState extends IAiEditingActions {
 
   currentError?: { conceptUuid: string; message: string; code: string };
   hasError: boolean;
+
+  // Prepopulated edit message from external navigation (e.g., Signal Scanning)
+  // Cleared after consumption by AiEditingCard
+  prepopulatedEditMessage?: string;
 }
 
 // Export initial state for use in store and reset functionality
@@ -54,6 +59,7 @@ export const initialAiEditingState = {
   currentMessage: undefined as string | undefined,
   isAucctusThinking: false,
   thinkingMessage: undefined as string | undefined,
+  prepopulatedEditMessage: undefined as string | undefined,
 };
 
 const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
@@ -71,6 +77,7 @@ const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
     thinkingMessage: undefined,
     currentError: undefined,
     hasError: false,
+    prepopulatedEditMessage: undefined,
 
     sendMessage: sendMessage.bind(actionContext),
     setCurrentMessage: setCurrentMessage.bind(actionContext),
@@ -82,6 +89,20 @@ const aiEditingSlice: Lens<IAiEditingState, IAppStore> = (
     initializeListeners: initializeListeners.bind(actionContext),
     handleError: handleError.bind(actionContext),
     clearError: clearError.bind(actionContext),
+    setPrepopulatedEditMessage: (message: string | undefined) => {
+      set(
+        produce((state: IAiEditingState) => {
+          state.prepopulatedEditMessage = message;
+        }),
+      );
+    },
+    clearPrepopulatedEditMessage: () => {
+      set(
+        produce((state: IAiEditingState) => {
+          state.prepopulatedEditMessage = undefined;
+        }),
+      );
+    },
   };
 };
 

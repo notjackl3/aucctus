@@ -185,13 +185,22 @@ Use for neutral UI accents, tabs, and secondary elements
 - No need to include both the base class and hover class - the hover class already includes the base styling
 - Example: Use `className="aucctus-bg-primary-hover"` instead of `className="aucctus-bg-primary hover:aucctus-bg-primary-hover"`
 
-## ComponentU Usage
-Specific component use cases are listed below:
+## Icon Usage
 
-### Icon
-- Use the Icon component for all icon needs
-- use -> import { Icon } from '@components';
-- Example: <Icon variant="clipboard" className="aucctus-fill-brand-primary h-5 w-5" />
+We now use [lucide-react](https://lucide.dev/) for all icon needs.
+
+- **Install**: `npm install lucide-react`
+- **Import individual icons directly**. For example:
+  ```tsx
+  import { Clipboard } from "lucide-react";
+  ```
+- **Example usage**:
+  ```tsx
+  <Clipboard className="aucctus-stroke-brand-primary h-5 w-5" />
+  ```
+- **Prefer using the official Lucide icon names and variants.** See the [Lucide dev icons list](https://lucide.dev/icons) for available options.
+- You may pass custom `className` for color or size as needed, following Aucctus theme classes.
+- **Do not use the previous Icon component or @icons.d.ts. Use Lucide-React imports only.**
 
 ### Toast
 - use -> import { toast } from '@components';
@@ -246,4 +255,5 @@ Specific component use cases are listed below:
 ## Build and Development
 
 1. **Icon Management**
-   - When using icons from @Icon.tsx, consider variants from @icons.d.ts
+   - All icons should use lucide-react imports. Do not use legacy @Icon.tsx components or @icons.d.ts variants.
+   - Browse [https://lucide.dev/icons](https://lucide.dev/icons) for available icon names and import them as needed.

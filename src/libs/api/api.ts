@@ -13,8 +13,10 @@ import { IdeaPlaygroundApi } from './ideaPlayground';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { NucleusApi } from './nucleus';
+import { PocPlanApi } from './pocPlan';
 import { PropertyApi } from './properties';
 import { SeedApi } from './seed';
+import { SignalScanningApi } from './signalScanning';
 import { TestingApi } from './testing';
 import { TrendsAndDriversV3Api } from './trendsAndDrivers';
 
@@ -46,7 +48,9 @@ export class Api {
   trendsAndDriversV3!: TrendsAndDriversV3Api;
   nucleus!: NucleusApi;
   ideaPlayground!: IdeaPlaygroundApi;
+  pocPlan!: PocPlanApi;
   property!: PropertyApi;
+  signalScanning!: SignalScanningApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -73,7 +77,9 @@ export class Api {
       { key: 'trendsAndDriversV3', class: TrendsAndDriversV3Api },
       { key: 'nucleus', class: NucleusApi },
       { key: 'ideaPlayground', class: IdeaPlaygroundApi },
+      { key: 'pocPlan', class: PocPlanApi },
       { key: 'property', class: PropertyApi },
+      { key: 'signalScanning', class: SignalScanningApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

@@ -55,6 +55,11 @@ import syntheticTestingSlice, {
   initialSyntheticTestingState,
 } from './synthetic-testing/store';
 
+import signalScanningSlice, {
+  ISignalScanningState,
+  initialSignalScanningState,
+} from './signal-scanning/store';
+
 export interface IAppStore {
   // global: IGlobalState;
   auth: IAuthState;
@@ -70,6 +75,7 @@ export interface IAppStore {
   ideaPlayground: IIdeaPlaygroundState;
   queryInvalidation: IQueryInvalidationState;
   syntheticTesting: ISyntheticTestingState;
+  signalScanning: ISignalScanningState;
 }
 
 export interface IStoreApi<S> {
@@ -96,6 +102,7 @@ const useStore = create<IAppStore>()(
         ideaPlayground: ideaPlaygroundSlice,
         queryInvalidation: queryInvalidationSlice,
         syntheticTesting: syntheticTestingSlice,
+        signalScanning: signalScanningSlice,
       }),
     ),
     {
@@ -153,6 +160,9 @@ const useStore = create<IAppStore>()(
           ideaPlayground: {
             lastActiveSeedUuid: state.ideaPlayground.lastActiveSeedUuid,
           },
+          signalScanning: {
+            filters: state.signalScanning.filters,
+          },
         }),
         merge: (persistedState: unknown, currentState: IAppStore): IAppStore =>
           mergeDeep(currentState, persistedState as IAppStore),
@@ -187,6 +197,8 @@ const getInitialState = (): IAppStore => {
       initialQueryInvalidationState as unknown as IQueryInvalidationState,
     syntheticTesting:
       initialSyntheticTestingState as unknown as ISyntheticTestingState,
+    signalScanning:
+      initialSignalScanningState as unknown as ISignalScanningState,
   }; // Actions will be preserved automatically by Zustand's setState()
 };
 

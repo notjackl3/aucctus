@@ -1,6 +1,5 @@
-import { Button, Table, Text } from '@components';
+import { Badge, Button, ComponentTooltip, Table, Text } from '@components';
 import { toast } from '@components/Notification/toast';
-import { ComponentTooltip } from '@components';
 import { cn } from '@libs/utils/react';
 import {
   doFullConceptInvalidation,
@@ -8,7 +7,9 @@ import {
   useConcepts,
   useRetryConceptReport,
 } from '@hooks/query/concepts.hook';
+import { useConceptPriorities } from '@hooks/query/concept-priority.hook';
 import { usePropertyDefinitions } from '@hooks/query/properties.hook';
+import PriorityCell from '@components/Tables/ConceptBank/PriorityCell';
 import { buildPropertyColumns } from '@hooks/tables/utils/buildPropertyColumns';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
@@ -435,6 +436,19 @@ export const useConceptBank = (
 
   // Fetch concepts with memoized query options
   const { data, isLoading } = useConcepts(queryOptions);
+
+  // Fetch concept priorities
+  const { priorities } = useConceptPriorities();
+
+  // Create a lookup map for priorities by concept UUID
+  const priorityMap = React.useMemo(() => {
+    const map = new Map();
+    priorities.forEach((priority) => {
+      // Use conceptUuid to map priorities to concepts
+      map.set(priority.conceptUuid, priority);
+    });
+    return map;
+  }, [priorities]);
 
   // Optimize the updateTableFiltering function
   const updateTableFiltering = React.useCallback(
@@ -1074,6 +1088,46 @@ export const useConceptBank = (
         ),
         enableColumnFilter: false,
       }),
+      columnHelper.accessor('uuid', {
+        id: 'priority',
+        enableSorting: false,
+        size: 220,
+        minSize: 200,
+        maxSize: 250,
+        enableResizing: true,
+        header: () => (
+          <Table.ConceptBank.StaticColumnMenu
+            columnName='Priority'
+            columnId='priority'
+            leadingIcon='target'
+            onReorder={handleColumnReorder}
+            badge={
+              <ComponentTooltip
+                tip={
+                  <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border px-3 py-2 shadow-lg'>
+                    <p className='aucctus-text-primary aucctus-text-xs max-w-[200px]'>
+                      This is an early feature and may make mistakes.
+                    </p>
+                  </div>
+                }
+              >
+                <Badge.Beta size='xs' />
+              </ComponentTooltip>
+            }
+          />
+        ),
+        cell: (info) => {
+          const conceptUuid = info.getValue();
+          const prioritySummary = priorityMap.get(conceptUuid);
+          return (
+            <PriorityCell
+              conceptUuid={conceptUuid}
+              prioritySummary={prioritySummary}
+            />
+          );
+        },
+        enableColumnFilter: false,
+      }),
     ];
 
     // Build dynamic property columns
@@ -1191,6 +1245,7 @@ export const useConceptBank = (
     updateTableFiltering,
     localColumnOrder,
     wrappedColumns,
+    priorityMap,
   ]);
 
   // Initialize or update column order when columns change

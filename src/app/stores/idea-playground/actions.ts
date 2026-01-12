@@ -14,6 +14,8 @@ export interface IIdeaPlaygroundActions {
   clearSelectedConcepts: () => void;
   setLastActiveSeedUuid: (seedUuid: string | null) => void;
   clearLastActiveSeedUuid: () => void;
+  setPrepopulatedAnchorThought: (thought: string | null) => void;
+  clearPrepopulatedAnchorThought: () => void;
   reset: () => void;
 }
 
@@ -86,6 +88,29 @@ export function reset(this: IStoreApi<IIdeaPlaygroundState>) {
       state.selectedConceptUuids = [];
       // Note: lastActiveSeedUuid is intentionally NOT cleared on reset
       // It should only be cleared explicitly via clearLastActiveSeedUuid
+    }),
+  );
+}
+
+export function setPrepopulatedAnchorThought(
+  this: IStoreApi<IIdeaPlaygroundState>,
+  thought: string | null,
+) {
+  const { set } = this;
+  set(
+    produce((state: IIdeaPlaygroundState) => {
+      state.prepopulatedAnchorThought = thought;
+    }),
+  );
+}
+
+export function clearPrepopulatedAnchorThought(
+  this: IStoreApi<IIdeaPlaygroundState>,
+) {
+  const { set } = this;
+  set(
+    produce((state: IIdeaPlaygroundState) => {
+      state.prepopulatedAnchorThought = null;
     }),
   );
 }

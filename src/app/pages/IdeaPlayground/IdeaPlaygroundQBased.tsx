@@ -53,6 +53,9 @@ const IdeaPlaygroundQBased: React.FC = () => {
 
   // Store access for UI state only (carousel navigation, concept selection)
   const ideaPlaygroundStore = useStore((state) => state.ideaPlayground);
+  const prepopulatedAnchorThought = useStore(
+    (state) => state.ideaPlayground.prepopulatedAnchorThought,
+  );
   // Fetch anchor thoughts using React Query hook
   const { anchorThoughts, isLoading: isLoadingThoughts } = useAnchorThoughts();
 
@@ -101,6 +104,24 @@ const IdeaPlaygroundQBased: React.FC = () => {
       document.head.appendChild(style);
     }
   }, []);
+
+  // Consume prepopulated anchor thought from external navigation (e.g., Signal Scanning)
+  useEffect(() => {
+    if (prepopulatedAnchorThought && !hasStartedTyping && !seedUuidFromUrl) {
+      setInputValue(prepopulatedAnchorThought);
+      // Clear the prepopulated thought after consuming
+      ideaPlaygroundStore.clearPrepopulatedAnchorThought();
+      telemetry.log('ideaPlayground.prepopulated.consumed', {
+        thoughtLength: prepopulatedAnchorThought.length,
+        source: 'external_navigation',
+      });
+    }
+  }, [
+    prepopulatedAnchorThought,
+    hasStartedTyping,
+    seedUuidFromUrl,
+    ideaPlaygroundStore,
+  ]);
 
   // Restore session if seed exists in URL
   useEffect(() => {
