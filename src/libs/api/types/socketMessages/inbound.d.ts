@@ -743,6 +743,39 @@ export interface IPocPlanGenerationErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Idea Submissions Event Messages
+// ==========================================
+
+export interface IIdeaSubmissionsProcessingStartedMessage
+  extends BaseSocketEvent {
+  type: 'idea_submissions.processing.started.user';
+  accountUuid: string;
+  taskId: string;
+  submissionCount: number;
+}
+
+export interface IIdeaSubmissionsProcessingCompletedMessage
+  extends BaseSocketEvent {
+  type: 'idea_submissions.processing.completed.user';
+  accountUuid: string;
+  taskId: string;
+  totalIdeasProcessed: number;
+  uniqueIdeasCount: number;
+  themesCount: number;
+  topRecommendationsCount: number;
+  executiveSummary: string;
+}
+
+export interface IIdeaSubmissionsProcessingErrorMessage
+  extends BaseSocketEvent {
+  type: 'idea_submissions.processing.error.user';
+  accountUuid: string;
+  taskId: string;
+  errorMessage: string;
+  details?: string;
+}
+
+// ==========================================
 // Idea Playground Event Messages
 // ==========================================
 
@@ -970,6 +1003,9 @@ export type InboundSocketEvent<C = {}> =
   | IConceptPriorityErrorMessage
   | IBulkPriorityProgressMessage
   | IBulkPriorityCompletedMessage
-  | IPortfolioSummaryMessage;
+  | IPortfolioSummaryMessage
+  | IIdeaSubmissionsProcessingStartedMessage
+  | IIdeaSubmissionsProcessingCompletedMessage
+  | IIdeaSubmissionsProcessingErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

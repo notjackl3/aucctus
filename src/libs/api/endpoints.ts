@@ -861,6 +861,37 @@ export class Endpoints {
   static pocPlanModalContent(conceptUuid: string) {
     return `/api/v2/concept/${conceptUuid}/poc-plan/modal-content`;
   }
+
+  // Idea Submissions Endpoints (Public - no auth required)
+  static ideaSubmissionsPublicSubmit(accountUuid: string) {
+    return `/api/idea-submissions/${accountUuid}/submit`;
+  }
+
+  static ideaSubmissionsPublicAccountInfo(accountUuid: string) {
+    return `/api/idea-submissions/${accountUuid}/info`;
+  }
+
+  // Idea Submissions Endpoints (Admin - Authenticated)
+  static ideaSubmissionsAdmin = '/api/v1/idea-submissions';
+
+  static ideaSubmissionsAdminDetail(submissionUuid: string) {
+    return `/api/v1/idea-submissions/${submissionUuid}`;
+  }
+
+  static ideaSubmissionsAdminUpdateStatus(submissionUuid: string) {
+    return `/api/v1/idea-submissions/${submissionUuid}/status`;
+  }
+
+  static ideaSubmissionsAdminDelete(submissionUuid: string) {
+    return `/api/v1/idea-submissions/${submissionUuid}`;
+  }
+
+  // Idea Submissions Processing Endpoints
+  static ideaSubmissionsProcess = '/api/v1/idea-submissions/process';
+
+  static ideaSubmissionsProcessStatus(taskId: string) {
+    return `/api/v1/idea-submissions/process/${taskId}/status`;
+  }
 }
 
 export class SocketEndpoints {

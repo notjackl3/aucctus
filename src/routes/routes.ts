@@ -50,6 +50,10 @@ export enum AppPath {
   /* Portfolio Prioritization */
   PortfolioPrioritization = '/portfolio',
 
+  /* Idea Submissions */
+  IdeaSubmissionsAdmin = '/idea-submissions',
+  IdeaSubmissionsPublicForm = '/submit-idea/:accountUuid',
+
   /* Settings */
   Settings = '/settings',
   SettingsAbout = '/settings/about',
@@ -75,4 +79,5 @@ export const UNAUTH_ROUTES = [
   AppPath.ConfirmEmail,
   AppPath.ForgotPassword,
   AppPath.ResetPassword,
+  AppPath.IdeaSubmissionsPublicForm,
 ];

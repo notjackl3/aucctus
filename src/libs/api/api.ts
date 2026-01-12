@@ -10,6 +10,7 @@ import { ConceptApi } from './concepts';
 import { SocketEndpoints } from './endpoints';
 import { FinancialProjectionApi } from './financialProjection';
 import { IdeaPlaygroundApi } from './ideaPlayground';
+import { IdeaSubmissionsApi } from './ideaSubmissions';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { NucleusApi } from './nucleus';
@@ -48,6 +49,7 @@ export class Api {
   trendsAndDriversV3!: TrendsAndDriversV3Api;
   nucleus!: NucleusApi;
   ideaPlayground!: IdeaPlaygroundApi;
+  ideaSubmissions!: IdeaSubmissionsApi;
   pocPlan!: PocPlanApi;
   property!: PropertyApi;
   signalScanning!: SignalScanningApi;
@@ -77,6 +79,7 @@ export class Api {
       { key: 'trendsAndDriversV3', class: TrendsAndDriversV3Api },
       { key: 'nucleus', class: NucleusApi },
       { key: 'ideaPlayground', class: IdeaPlaygroundApi },
+      { key: 'ideaSubmissions', class: IdeaSubmissionsApi },
       { key: 'pocPlan', class: PocPlanApi },
       { key: 'property', class: PropertyApi },
       { key: 'signalScanning', class: SignalScanningApi },

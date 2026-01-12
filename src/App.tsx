@@ -5,10 +5,15 @@ import AccessGuard from '@routes/guards/access.guard';
 import { usePrivateRoutes, usePublicRoutes } from '@routes/hooks';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
-import React, { Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
 import { useDebugModeListener } from '@hooks/debug-mode.hook';
+
+// Lazy load the public submission form (completely unauthenticated)
+const PublicSubmissionForm = lazy(
+  () => import('@pages/IdeaSubmissions/PublicSubmissionForm'),
+);
 
 // const SentryRoutes = Sentry.withSentryReactRouterV6Routing(Routes);
 
@@ -86,6 +91,12 @@ function App() {
     <div role='main' className='App'>
       <Suspense fallback={<Loading />}>
         <Routes>
+          {/* Completely Public Route - No Auth Required */}
+          <Route
+            path={AppPath.IdeaSubmissionsPublicForm}
+            element={<PublicSubmissionForm />}
+          />
+
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>
             <Route element={<AccessGuard />}>

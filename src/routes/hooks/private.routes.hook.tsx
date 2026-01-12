@@ -57,6 +57,12 @@ const usePrivateRoutes = () => {
         element={<Page.Portfolio.PortfolioPrioritization />}
       />
 
+      {/* Idea Submissions Admin Panel */}
+      <Route
+        path={AppPath.IdeaSubmissionsAdmin}
+        element={<Page.IdeaSubmissions.AdminPanel />}
+      />
+
       {/* Testing/Demo Routes */}
       <Route
         path={AppPath.TestingConceptOverview}
