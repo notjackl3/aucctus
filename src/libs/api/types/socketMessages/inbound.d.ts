@@ -919,6 +919,17 @@ export interface ITopPrioritySummary {
   keyStrength: string;
 }
 
+export type InnovationHorizon = 'core' | 'adjacent' | 'disruptive';
+
+export interface IHorizonBreakdown {
+  coreCount: number;
+  adjacentCount: number;
+  disruptiveCount: number;
+  corePercentage: number;
+  adjacentPercentage: number;
+  disruptivePercentage: number;
+}
+
 export interface IPortfolioSummaryMessage extends BaseSocketEvent {
   type: 'concept.priority.portfolio_summary.user';
   accountUuid: string;
@@ -929,6 +940,7 @@ export interface IPortfolioSummaryMessage extends BaseSocketEvent {
   keyRecommendation: string;
   portfolioHealth: 'strong' | 'balanced' | 'needs_attention';
   topPriorities: ITopPrioritySummary[];
+  horizonBreakdown: IHorizonBreakdown;
 }
 
 export type InboundSocketEvent<C = {}> =

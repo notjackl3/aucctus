@@ -1,4 +1,4 @@
-import { Badge, Button, ComponentTooltip, Table, Text } from '@components';
+import { Button, ComponentTooltip, Table, Text } from '@components';
 import { toast } from '@components/Notification/toast';
 import { cn } from '@libs/utils/react';
 import {
@@ -90,6 +90,7 @@ function isSortableConceptProperty(
     'updated_by__last_name',
     'status',
     'title',
+    'priority__overall_priority_score',
   ];
   return (arr as string[]).includes(value);
 }
@@ -1090,39 +1091,42 @@ export const useConceptBank = (
       }),
       columnHelper.accessor('uuid', {
         id: 'priority',
-        enableSorting: false,
-        size: 220,
-        minSize: 200,
-        maxSize: 250,
+        enableSorting: true,
+        size: 150,
+        minSize: 130,
+        maxSize: 180,
         enableResizing: true,
         header: () => (
           <Table.ConceptBank.StaticColumnMenu
-            columnName='Priority'
+            columnName='Score'
             columnId='priority'
-            leadingIcon='target'
-            onReorder={handleColumnReorder}
-            badge={
-              <ComponentTooltip
-                tip={
-                  <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border px-3 py-2 shadow-lg'>
-                    <p className='aucctus-text-primary aucctus-text-xs max-w-[200px]'>
-                      This is an early feature and may make mistakes.
-                    </p>
-                  </div>
-                }
-              >
-                <Badge.Beta size='xs' />
-              </ComponentTooltip>
+            leadingIcon='trendup'
+            onSort={(direction) =>
+              handleStaticColumnSort(
+                'priority__overall_priority_score',
+                direction,
+              )
             }
+            currentSort={getStaticColumnSort(
+              'priority__overall_priority_score',
+            )}
+            onReorder={handleColumnReorder}
           />
         ),
         cell: (info) => {
           const conceptUuid = info.getValue();
           const prioritySummary = priorityMap.get(conceptUuid);
+          const conceptTitle = info.row.original.title;
+          const conceptDescription = info.row.original.summary;
+          const isConceptComplete =
+            info.row.original.reportStatusAggregate === 'complete';
           return (
             <PriorityCell
               conceptUuid={conceptUuid}
+              conceptTitle={conceptTitle}
+              conceptDescription={conceptDescription}
               prioritySummary={prioritySummary}
+              isConceptComplete={isConceptComplete}
             />
           );
         },

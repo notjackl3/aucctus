@@ -18,3 +18,11 @@ export type { NucleusLoadingStateProps } from './NucleusLoadingState/NucleusLoad
 
 export { NucleusHeroBackground } from './NucleusHeroBackground';
 export type { NucleusHeroBackgroundProps } from './NucleusHeroBackground';
+
+export { ConceptScoringConfig } from './ConceptScoringConfig';
+export type {
+  ScoringCategory,
+  ScoringQuestion,
+  Importance,
+  ImportanceConfig,
+} from './ConceptScoringConfig';

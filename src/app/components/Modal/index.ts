@@ -20,6 +20,7 @@ import AddQuestionModal from './Nucleus/AddQuestionModal';
 import EditQuestionModal from './Nucleus/EditQuestionModal';
 import AddAnswerModal from './Nucleus/AddAnswerModal';
 import EditAnswerModal from './Nucleus/EditAnswerModal';
+import SaveScoringConfigModal from './Nucleus/SaveScoringConfigModal';
 import MagicShare from './MagicShareModal/MagicShareModal';
 import ProceedToPoc from './ProceedToPocModal/ProceedToPocModal';
 import RegenerateTestWarningModal from './RegenerateTestWarningModal';
@@ -47,6 +48,7 @@ const Modal = {
   EditQuestionModal,
   AddAnswerModal,
   EditAnswerModal,
+  SaveScoringConfigModal,
   MagicShare,
   ProceedToPoc,
   RegenerateTestWarningModal,

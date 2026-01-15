@@ -342,7 +342,8 @@ export type SortableConceptProperties =
   | 'updated_by__first_name'
   | 'updated_by__last_name'
   | 'status'
-  | 'title';
+  | 'title'
+  | 'priority__overall_priority_score';
 
 // Single sort field (standard field or property)
 export type ConceptSortField =
@@ -371,6 +372,7 @@ export interface IConceptQueryOptions extends IPageQueryOptions {
   sort?: ConceptSortString; // Now accepts comma-separated sort fields
   properties?: string; // JSON-encoded array of property filters with AND logic
   pageSize?: number; // Number of results per page (default: 20)
+  uuids?: string; // Comma-separated UUIDs to filter by (e.g., "uuid1,uuid2,uuid3")
   // Legacy single-property filter (deprecated, use properties instead)
   property_key?: string;
   property_value?: any;

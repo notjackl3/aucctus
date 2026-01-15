@@ -3,6 +3,7 @@
  */
 
 import api from '@libs/api';
+import { IConceptPriorityDetail } from '@libs/api/types/accounts/scoring-config';
 import {
   IConceptPrioritySummary,
   IGeneratePrioritiesResponse,
@@ -16,7 +17,7 @@ import {
 } from '@libs/api/types/socketMessages/inbound';
 import { toast } from '@components';
 import utils from '@libs/utils';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
 
 import { useSocketEvent } from '../sockets/aucctus';
@@ -47,6 +48,32 @@ export const useConceptPriority = (conceptUuid: string) => {
   });
 
   return { ...query, priority: query.data };
+};
+
+/**
+ * Hook to fetch detailed priority with category and question breakdowns
+ */
+export const useConceptPriorityDetail = (conceptUuid: string | null) => {
+  const query = useQuery<IConceptPriorityDetail | null>({
+    queryKey: [AucctusQueryKeys.conceptPriority, conceptUuid, 'detail'],
+    queryFn: async () => {
+      if (!conceptUuid) return null;
+      try {
+        return await api.concept.getConceptPriorityDetail(conceptUuid);
+      } catch (error: any) {
+        // 404 is expected when priority doesn't exist yet
+        if (error?.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    },
+    enabled: !!conceptUuid,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 10, // 10 minutes
+  });
+
+  return { ...query, priorityDetail: query.data };
 };
 
 /**
@@ -183,6 +210,18 @@ export interface TopPrioritySummary {
 }
 
 /**
+ * Breakdown of portfolio by innovation horizon
+ */
+export interface HorizonBreakdown {
+  coreCount: number;
+  adjacentCount: number;
+  disruptiveCount: number;
+  corePercentage: number;
+  adjacentPercentage: number;
+  disruptivePercentage: number;
+}
+
+/**
  * State for portfolio executive summary
  */
 export interface PortfolioSummary {
@@ -194,6 +233,7 @@ export interface PortfolioSummary {
   keyRecommendation: string;
   portfolioHealth: 'strong' | 'balanced' | 'needs_attention';
   topPriorities: TopPrioritySummary[];
+  horizonBreakdown?: HorizonBreakdown;
 }
 
 // LocalStorage key for persisted portfolio summary (survives page refresh)
@@ -228,21 +268,59 @@ const savePortfolioSummary = (summary: PortfolioSummary | null) => {
   }
 };
 
+// Default progress state
+const DEFAULT_PROGRESS: BulkPriorityProgress = {
+  isCalculating: false,
+  current: 0,
+  total: 0,
+  successCount: 0,
+  errorCount: 0,
+  currentConceptTitle: '',
+};
+
 /**
  * Hook to listen for bulk priority calculation WebSocket events.
  * Returns progress state and portfolio summary that updates in real-time.
  * Portfolio summary is persisted in localStorage to survive page refresh.
+ *
+ * Uses React Query cache for progress state so it's shared across all components.
  */
 export const useBulkPrioritySocketEvents = () => {
   const queryClient = useQueryClient();
-  const [progress, setProgress] = useState<BulkPriorityProgress>({
-    isCalculating: false,
-    current: 0,
-    total: 0,
-    successCount: 0,
-    errorCount: 0,
-    currentConceptTitle: '',
+
+  // Use React Query cache for progress state so it's shared across all components
+  // This ensures PortfolioTab and ConceptScoringConfig share the same calculating state
+  const [progress, setProgressLocal] = useState<BulkPriorityProgress>(() => {
+    const cached = queryClient.getQueryData<BulkPriorityProgress>([
+      AucctusQueryKeys.bulkPriorityProgress,
+    ]);
+    return cached || DEFAULT_PROGRESS;
   });
+
+  // Subscribe to cache changes to sync local state
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe(() => {
+      const cached = queryClient.getQueryData<BulkPriorityProgress>([
+        AucctusQueryKeys.bulkPriorityProgress,
+      ]);
+      if (cached) {
+        setProgressLocal(cached);
+      }
+    });
+    return unsubscribe;
+  }, [queryClient]);
+
+  // Helper to update progress in both local state and cache
+  const setProgress = useCallback(
+    (newProgress: BulkPriorityProgress) => {
+      setProgressLocal(newProgress);
+      queryClient.setQueryData(
+        [AucctusQueryKeys.bulkPriorityProgress],
+        newProgress,
+      );
+    },
+    [queryClient],
+  );
 
   // Initialize from localStorage to survive page refresh
   const [portfolioSummary, setPortfolioSummaryLocal] =
@@ -260,16 +338,19 @@ export const useBulkPrioritySocketEvents = () => {
   // Listen for bulk progress events
   useSocketEvent<'concept.priority.bulk.progress.user'>(
     'concept.priority.bulk.progress.user',
-    useCallback((data: IBulkPriorityProgressMessage) => {
-      setProgress({
-        isCalculating: true,
-        current: data.current,
-        total: data.total,
-        successCount: data.successCount,
-        errorCount: data.errorCount,
-        currentConceptTitle: data.currentConceptTitle,
-      });
-    }, []),
+    useCallback(
+      (data: IBulkPriorityProgressMessage) => {
+        setProgress({
+          isCalculating: true,
+          current: data.current,
+          total: data.total,
+          successCount: data.successCount,
+          errorCount: data.errorCount,
+          currentConceptTitle: data.currentConceptTitle,
+        });
+      },
+      [setProgress],
+    ),
   );
 
   // Listen for bulk completion events
@@ -304,7 +385,7 @@ export const useBulkPrioritySocketEvents = () => {
           );
         }
       },
-      [queryClient],
+      [queryClient, setProgress],
     ),
   );
 
@@ -322,6 +403,7 @@ export const useBulkPrioritySocketEvents = () => {
           keyRecommendation: data.keyRecommendation,
           portfolioHealth: data.portfolioHealth,
           topPriorities: data.topPriorities,
+          horizonBreakdown: data.horizonBreakdown,
         });
       },
       [setPortfolioSummary],
@@ -329,15 +411,24 @@ export const useBulkPrioritySocketEvents = () => {
   );
 
   const resetProgress = useCallback(() => {
-    setProgress({
-      isCalculating: false,
-      current: 0,
-      total: 0,
-      successCount: 0,
-      errorCount: 0,
-      currentConceptTitle: '',
-    });
-  }, []);
+    setProgress(DEFAULT_PROGRESS);
+  }, [setProgress]);
+
+  // Start calculating immediately (called when mutation is triggered)
+  // This prevents the skeleton from disappearing between mutation completion and first WebSocket event
+  const startCalculating = useCallback(
+    (total: number) => {
+      setProgress({
+        isCalculating: true,
+        current: 0,
+        total,
+        successCount: 0,
+        errorCount: 0,
+        currentConceptTitle: 'Starting...',
+      });
+    },
+    [setProgress],
+  );
 
   const dismissSummary = useCallback(() => {
     if (portfolioSummary) {
@@ -352,6 +443,7 @@ export const useBulkPrioritySocketEvents = () => {
   return {
     progress,
     resetProgress,
+    startCalculating,
     portfolioSummary,
     dismissSummary,
     resetSummary,
@@ -401,6 +493,44 @@ export const useGenerateBulkConceptPriorities = () => {
         message ||
           'Failed to start bulk priority calculation. Please try again.',
       );
+    },
+  });
+};
+
+/**
+ * Hook to update a single question score for a concept priority.
+ * Recalculates overall and category scores on the backend.
+ */
+export const useUpdateQuestionScore = (conceptUuid: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      questionUuid,
+      score,
+    }: {
+      questionUuid: string;
+      score: number;
+    }) => api.concept.updateQuestionScore(conceptUuid, questionUuid, score),
+    onSuccess: () => {
+      // Invalidate the priority detail to refresh with new scores
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.conceptPriority, conceptUuid, 'detail'],
+      });
+
+      // Update the summary in the list view
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.conceptPriority, conceptUuid],
+      });
+
+      // Invalidate the priorities list
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.conceptPriorities],
+      });
+    },
+    onError: (error: any) => {
+      const message = utils.osiris.parseFormError(error);
+      toast.error(message || 'Failed to update question score');
     },
   });
 };

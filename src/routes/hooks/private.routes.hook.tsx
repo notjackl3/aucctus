@@ -24,6 +24,7 @@ const usePrivateRoutes = () => {
       {/* Concept Bank with Outlet pattern */}
       <Route path={AppPath.ConceptBank} element={<Page.Concept.Bank />}>
         <Route index element={<Page.Concept.BankConcepts />} />
+        <Route path='portfolio' element={<Page.Concept.Portfolio />} />
         <Route path='drafts' element={<Page.Concept.BankSeeds />} />
       </Route>
 
@@ -49,12 +50,6 @@ const usePrivateRoutes = () => {
       <Route
         path={AppPath.IdeaPlayground}
         element={<Page.IdeaPlayground.IdeaPlaygroundQBased />}
-      />
-
-      {/* Portfolio Prioritization Routes */}
-      <Route
-        path={AppPath.PortfolioPrioritization}
-        element={<Page.Portfolio.PortfolioPrioritization />}
       />
 
       {/* Idea Submissions Admin Panel */}

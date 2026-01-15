@@ -1,3 +1,4 @@
+export * from './accounts/scoring-config';
 export * from './ai-editing';
 export * from './assumptions';
 export * from './auth/accounts';

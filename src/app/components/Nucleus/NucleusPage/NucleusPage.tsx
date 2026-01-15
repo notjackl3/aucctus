@@ -1,6 +1,7 @@
 import { Icon, NucleusLoadingState } from '@components';
 import { useNucleusReportLatest } from '../../../hooks/query/nucleus.hook';
 import { NucleusHeroBackground } from '../NucleusHeroBackground';
+import { ConceptScoringConfig } from '../ConceptScoringConfig';
 import { cn } from '@libs/utils/react';
 import {
   NucleusReportSection,
@@ -10,7 +11,14 @@ import {
   SectionType,
 } from '@libs/api/types';
 import useStore from '../../../stores/store';
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { CategoriesGrid } from '../CategoriesGrid';
 import { CategoryState, QuestionState } from '../StatusDropdown';
 import {
@@ -47,6 +55,30 @@ const NucleusPage: React.FC = () => {
     useUpdateSection(nucleusReport?.uuid || '');
 
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
+
+  // Handle URL query param for opening scoring config
+  const [searchParams, setSearchParams] = useSearchParams();
+  const scoringConfigRef = useRef<HTMLDivElement>(null);
+  const [isScoringConfigExpanded, setIsScoringConfigExpanded] = useState(() => {
+    return searchParams.get('openScoringConfig') === 'true';
+  });
+
+  // Effect to clean up URL and scroll to scoring config when opened via query param
+  useEffect(() => {
+    if (searchParams.get('openScoringConfig') === 'true') {
+      // Remove the param from URL after initial load
+      searchParams.delete('openScoringConfig');
+      setSearchParams(searchParams, { replace: true });
+
+      // Scroll to scoring config section after a short delay for render
+      setTimeout(() => {
+        scoringConfigRef.current?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, [searchParams, setSearchParams]);
 
   // Mapping from section type to display name for pills
   const sectionTypeDisplayNames = useMemo(
@@ -584,6 +616,25 @@ const NucleusPage: React.FC = () => {
             reportUuid={nucleusReport?.uuid || ''}
             isAdmin={isAdmin}
           />
+
+          {/* Concept Scoring Configuration - At the end of categories */}
+          <div
+            ref={scoringConfigRef}
+            className='mt-6 grid auto-rows-min grid-cols-1 gap-6 lg:grid-cols-2'
+          >
+            <div
+              className={cn('transition-all duration-300 ease-in-out', {
+                'lg:col-span-2': isScoringConfigExpanded,
+              })}
+            >
+              <ConceptScoringConfig
+                isExpanded={isScoringConfigExpanded}
+                onToggleExpand={() =>
+                  setIsScoringConfigExpanded((prev) => !prev)
+                }
+              />
+            </div>
+          </div>
         </div>
 
         {/* Loading mask for question and section status updates */}

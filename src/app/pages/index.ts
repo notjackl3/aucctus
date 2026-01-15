@@ -8,7 +8,6 @@ import Concept from './Concept';
 import IdeaPlayground from './IdeaPlayground';
 import IdeaSubmissions from './IdeaSubmissions';
 import InnovationPipeline from './InnovationPipeline';
-import Portfolio from './Portfolio';
 import SignalScanning from './SignalScanning';
 
 const Page = {
@@ -19,7 +18,6 @@ const Page = {
   IdeaPlayground,
   IdeaSubmissions,
   InnovationPipeline,
-  Portfolio,
   SignalScanning,
   SettingsPages,
   Testing: TestingPages,

@@ -150,6 +150,10 @@ export class Endpoints {
     return `api/v2/concept/${conceptUuid}/priority`;
   }
 
+  static conceptPriorityDetail(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/priority/detail`;
+  }
+
   static conceptPriorityList() {
     return `api/v2/concept/priority/list`;
   }
@@ -160,6 +164,10 @@ export class Endpoints {
 
   static conceptPriorityGenerateBulk() {
     return `api/v2/concept/priority/generate-bulk`;
+  }
+
+  static conceptPriorityUpdateQuestionScore(conceptUuid: string) {
+    return `api/v2/concept/${conceptUuid}/priority/question-score`;
   }
 
   static conceptOverviewImageSettings(conceptUuid: string) {
@@ -659,6 +667,19 @@ export class Endpoints {
 
   static conceptEcosystemV2Generate(rootIdentifier: string) {
     return `api/v3/concept/${rootIdentifier}/ecosystem/generate`;
+  }
+
+  // Scoring Configuration Endpoints
+  static scoringConfig(accountUuid: string) {
+    return `/api/v1/accounts/${accountUuid}/scoring-config`;
+  }
+
+  static scoringConfigCategories(accountUuid: string) {
+    return `/api/v1/accounts/${accountUuid}/scoring-config/categories`;
+  }
+
+  static scoringConfigCategory(accountUuid: string, categoryUuid: string) {
+    return `/api/v1/accounts/${accountUuid}/scoring-config/categories/${categoryUuid}`;
   }
 
   // Nucleus Report Endpoints

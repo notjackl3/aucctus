@@ -662,6 +662,17 @@ export class ConceptApi extends ApiService {
   }
 
   /**
+   * Get detailed priority scores with category and question breakdowns
+   * @param conceptUuid - Concept UUID
+   * @returns Detailed priority with category scores
+   */
+  getConceptPriorityDetail(conceptUuid: string) {
+    return this.get<
+      import('./types/accounts/scoring-config').IConceptPriorityDetail
+    >(endpoints.conceptPriorityDetail(conceptUuid));
+  }
+
+  /**
    * Get all concept priorities for the account
    * @returns List of concept priorities
    */
@@ -693,5 +704,26 @@ export class ConceptApi extends ApiService {
       import('./types/concept/concept_priority').IGeneratePrioritiesResponse,
       { conceptUuids?: string[] }
     >(endpoints.conceptPriorityGenerateBulk(), { conceptUuids });
+  }
+
+  /**
+   * Update a single question score and recalculate overall priority
+   * @param conceptUuid - UUID of the concept
+   * @param questionUuid - UUID of the question to update
+   * @param score - New score (1-5)
+   * @returns Updated score information
+   */
+  updateQuestionScore(
+    conceptUuid: string,
+    questionUuid: string,
+    score: number,
+  ) {
+    return this.patch<
+      import('./types/accounts/scoring-config').IQuestionScoreUpdateResponse,
+      { questionUuid: string; score: number }
+    >(endpoints.conceptPriorityUpdateQuestionScore(conceptUuid), {
+      questionUuid,
+      score,
+    });
   }
 }

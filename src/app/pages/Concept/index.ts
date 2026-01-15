@@ -3,6 +3,7 @@ import BankConcepts from './BankConcepts';
 import BankSeeds from './BankSeeds';
 import Incubate from './IncubateConcept';
 import PocPlan from './PocPlan';
+import { PortfolioTab as Portfolio } from './Portfolio';
 import Report from './Report';
 
 const Concept = {
@@ -10,6 +11,7 @@ const Concept = {
   BankConcepts,
   BankSeeds,
   PocPlan,
+  Portfolio,
   Report,
   Incubate,
 };

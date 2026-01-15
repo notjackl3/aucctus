@@ -5,6 +5,11 @@ import {
   IAccount,
   IDashboard,
   IRegisterAccount,
+  IScoringCategory,
+  IScoringCategoryCreate,
+  IScoringConfig,
+  IScoringConfigSave,
+  IScoringConfigSaveResponse,
   IUser,
   IUserDetailsResponse,
   IUserQueryOptions,
@@ -47,5 +52,31 @@ export class AccountApi extends ApiService {
 
   getDashboard() {
     return this.get<IDashboard>(endpoints.dashboard);
+  }
+
+  // Scoring Configuration API
+
+  getScoringConfig(accountUuid: string) {
+    return this.get<IScoringConfig>(endpoints.scoringConfig(accountUuid));
+  }
+
+  saveScoringConfig(accountUuid: string, data: IScoringConfigSave) {
+    return this.put<IScoringConfigSaveResponse, IScoringConfigSave>(
+      endpoints.scoringConfig(accountUuid),
+      data,
+    );
+  }
+
+  createScoringCategory(accountUuid: string, data: IScoringCategoryCreate) {
+    return this.post<IScoringCategory, IScoringCategoryCreate>(
+      endpoints.scoringConfigCategories(accountUuid),
+      data,
+    );
+  }
+
+  deleteScoringCategory(accountUuid: string, categoryUuid: string) {
+    return this.delete<{ success: boolean; message: string }>(
+      endpoints.scoringConfigCategory(accountUuid, categoryUuid),
+    );
   }
 }

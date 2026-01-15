@@ -19,6 +19,12 @@ interface ISortsMenuProps {
 const STATIC_COLUMNS = [
   { id: 'title', name: 'Concept', icon: 'lightbulb' as IconVariant },
   {
+    id: 'priority',
+    name: 'Score',
+    icon: 'trendup' as IconVariant,
+    sortField: 'priority__overall_priority_score',
+  },
+  {
     id: 'createdBy',
     name: 'Created By',
     icon: 'user-square' as IconVariant,

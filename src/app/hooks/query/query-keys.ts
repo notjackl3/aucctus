@@ -34,6 +34,7 @@ export enum AucctusQueryKeys {
   /* Concept Priority */
   conceptPriority = 'conceptPriority',
   conceptPriorities = 'conceptPriorities',
+  bulkPriorityProgress = 'bulkPriorityProgress',
 
   /* Properties */
   propertyDefinitions = 'propertyDefinitions',
@@ -112,4 +113,7 @@ export enum AucctusQueryKeys {
   /* Agent Timing */
   agentTiming = 'agentTiming',
   syntheticPipelineEstimate = 'syntheticPipelineEstimate',
+
+  /* Scoring Configuration */
+  scoringConfig = 'scoringConfig',
 }

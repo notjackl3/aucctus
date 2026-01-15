@@ -97,12 +97,6 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           collapsed={collapsed}
         />
         <NavButton
-          to={AppPath.PortfolioPrioritization}
-          title='Portfolio'
-          icon='barchart'
-          collapsed={collapsed}
-        />
-        <NavButton
           to={AppPath.Nucleus}
           title='Nucleus'
           icon='compass-03'

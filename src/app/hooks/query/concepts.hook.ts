@@ -71,6 +71,7 @@ export const useConcepts = (queryOptions: IConceptQueryOptions) => {
       queryOptions.page,
       queryOptions.sort,
       queryOptions.properties, // Use the JSON-encoded properties array for cache key
+      queryOptions.uuids, // Comma-separated UUIDs filter
     ],
     queryFn: () => api.concept.getConcepts(queryOptions),
     staleTime: 1000 * 0, // 10 seconds - fresher data for active filtering/sorting

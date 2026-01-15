@@ -189,25 +189,42 @@ export const useColumnVisibilityStore = create<IColumnVisibilityStore>()(
         visibleStaticColumns: Array.from(state.visibleStaticColumns),
       }),
       // Custom deserialization to convert array back to Set
-      merge: (persistedState: any, currentState) => ({
-        ...currentState,
-        visiblePropertyColumns: new Set(
-          persistedState?.visiblePropertyColumns || [],
-        ),
-        knownPropertyKeys: new Set(persistedState?.knownPropertyKeys || []),
-        wrappedColumns: new Set(persistedState?.wrappedColumns || []),
-        visibleStaticColumns: new Set(
-          persistedState?.visibleStaticColumns || [
-            'title',
-            'createdBy',
-            'createdAt',
-            'lastModifiedBy',
-            'updatedAt',
-            'status',
-            'priority',
-          ],
-        ),
-      }),
+      // Also ensures new default columns (like 'priority') are added for existing users
+      merge: (persistedState: any, currentState) => {
+        // Default static columns for new users
+        const defaultStaticColumns = [
+          'title',
+          'createdBy',
+          'createdAt',
+          'lastModifiedBy',
+          'updatedAt',
+          'status',
+          'priority',
+        ];
+
+        // Get persisted columns or use defaults
+        const persistedStaticColumns =
+          persistedState?.visibleStaticColumns || defaultStaticColumns;
+
+        // Create a Set from persisted columns
+        const staticColumnsSet = new Set<string>(persistedStaticColumns);
+
+        // Auto-add 'priority' for existing users who don't have it yet
+        // This is a one-time migration for users with old localStorage data
+        if (!staticColumnsSet.has('priority')) {
+          staticColumnsSet.add('priority');
+        }
+
+        return {
+          ...currentState,
+          visiblePropertyColumns: new Set(
+            persistedState?.visiblePropertyColumns || [],
+          ),
+          knownPropertyKeys: new Set(persistedState?.knownPropertyKeys || []),
+          wrappedColumns: new Set(persistedState?.wrappedColumns || []),
+          visibleStaticColumns: staticColumnsSet,
+        };
+      },
     },
   ),
 );

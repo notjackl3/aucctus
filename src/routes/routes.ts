@@ -20,6 +20,7 @@ export enum AppPath {
   GeneratedConcepts = '/concept/incubate/results',
   Concept = '/concept',
   ConceptBank = '/concept',
+  ConceptBankPortfolio = '/concept/portfolio',
   ConceptBankDrafts = '/concept/drafts',
   ConceptOverview = '/concept/:id/',
   ConceptCustomerProfile = `/concept/:id/${ConceptPath.CustomerProfile}`,
@@ -46,9 +47,6 @@ export enum AppPath {
 
   /* Idea Playground */
   IdeaPlayground = '/playground',
-
-  /* Portfolio Prioritization */
-  PortfolioPrioritization = '/portfolio',
 
   /* Idea Submissions */
   IdeaSubmissionsAdmin = '/idea-submissions',
