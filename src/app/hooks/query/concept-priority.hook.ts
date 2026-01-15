@@ -253,7 +253,7 @@ const getStoredPortfolioSummary = (): PortfolioSummary | null => {
 };
 
 // Helper to save summary to localStorage
-const savePortfolioSummary = (summary: PortfolioSummary | null) => {
+const savePortfolioSummaryToStorage = (summary: PortfolioSummary | null) => {
   try {
     if (summary) {
       localStorage.setItem(
@@ -281,9 +281,12 @@ const DEFAULT_PROGRESS: BulkPriorityProgress = {
 /**
  * Hook to listen for bulk priority calculation WebSocket events.
  * Returns progress state and portfolio summary that updates in real-time.
- * Portfolio summary is persisted in localStorage to survive page refresh.
+ * Both are persisted in React Query cache (shared across components) and
+ * localStorage (survives page refresh).
  *
- * Uses React Query cache for progress state so it's shared across all components.
+ * Uses React Query cache for both progress and portfolioSummary so they're
+ * shared across all components - critical for when user navigates away during
+ * bulk calculation.
  */
 export const useBulkPrioritySocketEvents = () => {
   const queryClient = useQueryClient();
@@ -297,14 +300,35 @@ export const useBulkPrioritySocketEvents = () => {
     return cached || DEFAULT_PROGRESS;
   });
 
-  // Subscribe to cache changes to sync local state
+  // Use React Query cache for portfolioSummary so it's shared across all components
+  // Initialize from cache first, then localStorage as fallback
+  const [portfolioSummary, setPortfolioSummaryLocal] =
+    useState<PortfolioSummary | null>(() => {
+      const cached = queryClient.getQueryData<PortfolioSummary | null>([
+        AucctusQueryKeys.portfolioSummary,
+      ]);
+      if (cached !== undefined) {
+        return cached;
+      }
+      // Fallback to localStorage for persistence across page refresh
+      return getStoredPortfolioSummary();
+    });
+
+  // Subscribe to cache changes to sync local state for both progress and portfolioSummary
   useEffect(() => {
     const unsubscribe = queryClient.getQueryCache().subscribe(() => {
-      const cached = queryClient.getQueryData<BulkPriorityProgress>([
+      const cachedProgress = queryClient.getQueryData<BulkPriorityProgress>([
         AucctusQueryKeys.bulkPriorityProgress,
       ]);
-      if (cached) {
-        setProgressLocal(cached);
+      if (cachedProgress) {
+        setProgressLocal(cachedProgress);
+      }
+
+      const cachedSummary = queryClient.getQueryData<PortfolioSummary | null>([
+        AucctusQueryKeys.portfolioSummary,
+      ]);
+      if (cachedSummary !== undefined) {
+        setPortfolioSummaryLocal(cachedSummary);
       }
     });
     return unsubscribe;
@@ -322,17 +346,14 @@ export const useBulkPrioritySocketEvents = () => {
     [queryClient],
   );
 
-  // Initialize from localStorage to survive page refresh
-  const [portfolioSummary, setPortfolioSummaryLocal] =
-    useState<PortfolioSummary | null>(() => getStoredPortfolioSummary());
-
+  // Helper to update portfolioSummary in local state, cache, and localStorage
   const setPortfolioSummary = useCallback(
     (summary: PortfolioSummary | null) => {
-      // Update both local state and localStorage
       setPortfolioSummaryLocal(summary);
-      savePortfolioSummary(summary);
+      queryClient.setQueryData([AucctusQueryKeys.portfolioSummary], summary);
+      savePortfolioSummaryToStorage(summary);
     },
-    [],
+    [queryClient],
   );
 
   // Listen for bulk progress events

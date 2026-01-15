@@ -20,6 +20,9 @@ interface PortfolioBalanceWidgetProps {
 
 /**
  * Donut chart SVG component
+ *
+ * Uses stroke-based arcs to create a seamless donut ring.
+ * All segments share the same center and radius for a smooth appearance.
  */
 const DonutChart: React.FC<{
   horizonData: HorizonData[];
@@ -27,12 +30,14 @@ const DonutChart: React.FC<{
   hoveredHorizon: string | null;
   onHorizonHover: (horizon: string | null) => void;
 }> = ({ horizonData, totalIdeas, hoveredHorizon, onHorizonHover }) => {
-  // Chart calculations
+  // Chart dimensions - all segments share these exact values
   const centerX = 160;
   const centerY = 160;
   const radius = 105;
   const strokeWidth = 35;
-  const gapAngle = 3;
+
+  // Small gap between segments (in degrees) - set to 0 for seamless ring
+  const gapAngle = 2;
 
   const polarToCartesian = useCallback(
     (angle: number, r: number) => ({
@@ -42,31 +47,57 @@ const DonutChart: React.FC<{
     [],
   );
 
-  // Build segments
+  // Build segments - filter out 0% segments first, then calculate angles
   const segments = useMemo(() => {
     const labels = ['CORE', 'ADJACENT', 'DISRUPTIVE'];
-    let currentAngle = -90;
-    return horizonData.map((horizon, index) => {
-      const segmentAngle = (horizon.percentage / 100) * 360 - gapAngle;
+
+    // Filter to only segments with > 0%
+    const activeSegments = horizonData
+      .map((horizon, index) => ({ horizon, label: labels[index], index }))
+      .filter(({ horizon }) => horizon.percentage > 0);
+
+    // Only apply gaps when there are 2+ segments
+    // Single segment should be a continuous circle with no gap
+    const effectiveGap = activeSegments.length > 1 ? gapAngle : 0;
+
+    // Calculate total gap space needed (gaps between segments, not after the last one)
+    const totalGapAngle = effectiveGap * activeSegments.length;
+    // Available angle for actual segments
+    const availableAngle = 360 - totalGapAngle;
+
+    let currentAngle = -90; // Start at top of circle
+
+    return activeSegments.map(({ horizon, label, index }) => {
+      // Calculate segment angle proportional to its percentage
+      let segmentAngle = (horizon.percentage / 100) * availableAngle;
       const startAngle = currentAngle;
+
+      // SVG arcs can't render a full 360° circle (start and end points are the same)
+      // Cap at 359.9° to ensure the arc renders
+      const isFullCircle = segmentAngle >= 359.9;
+      if (isFullCircle) {
+        segmentAngle = 359.9;
+      }
+
       const endAngle = currentAngle + segmentAngle;
 
+      // Calculate arc path
       const start = polarToCartesian(startAngle, radius);
       const end = polarToCartesian(endAngle, radius);
       const largeArcFlag = segmentAngle > 180 ? 1 : 0;
 
-      const pathData = `
-        M ${start.x} ${start.y}
-        A ${radius} ${radius} 0 ${largeArcFlag} 1 ${end.x} ${end.y}
-      `;
+      const pathData = `M ${start.x} ${start.y} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${end.x} ${end.y}`;
 
-      currentAngle = endAngle + gapAngle;
+      // Move to next segment start (add gap only if multiple segments)
+      currentAngle = endAngle + effectiveGap;
 
       return {
         horizon,
         pathData,
-        label: labels[index],
+        label,
         index,
+        segmentAngle,
+        isFullCircle,
       };
     });
   }, [horizonData, polarToCartesian]);
@@ -107,37 +138,38 @@ const DonutChart: React.FC<{
         ))}
       </defs>
 
-      {/* Donut ring segments - only render segments with > 0% */}
-      {segments
-        .filter(({ horizon }) => horizon.percentage > 0)
-        .map(({ horizon, pathData, label }) => {
-          const isHovered = hoveredHorizon === horizon.horizon;
-          return (
-            <g key={horizon.horizon}>
-              {/* Main arc segment */}
-              <path
-                d={pathData}
-                fill='none'
-                stroke={`url(#gradient-${horizon.horizon})`}
-                strokeWidth={isHovered ? strokeWidth + 2 : strokeWidth}
-                strokeLinecap='round'
-                className='cursor-pointer transition-all duration-200'
-                style={{
-                  filter: `url(#shadow-${horizon.horizon})`,
-                }}
-                onMouseEnter={() => onHorizonHover(horizon.horizon)}
-                onMouseLeave={() => onHorizonHover(null)}
-              />
+      {/* Donut ring segments - segments already filtered to > 0% */}
+      {segments.map(({ horizon, pathData, label }) => {
+        const isHovered = hoveredHorizon === horizon.horizon;
+        return (
+          <g key={horizon.horizon}>
+            {/* Main arc segment - using butt linecap for clean edges */}
+            <path
+              d={pathData}
+              fill='none'
+              stroke={`url(#gradient-${horizon.horizon})`}
+              strokeWidth={isHovered ? strokeWidth + 4 : strokeWidth}
+              strokeLinecap='butt'
+              className='cursor-pointer transition-all duration-200'
+              style={{
+                filter: isHovered
+                  ? `url(#shadow-${horizon.horizon})`
+                  : undefined,
+              }}
+              onMouseEnter={() => onHorizonHover(horizon.horizon)}
+              onMouseLeave={() => onHorizonHover(null)}
+            />
 
-              {/* Invisible path for text to follow */}
-              <path
-                id={`textPath-${horizon.horizon}`}
-                d={pathData}
-                fill='none'
-                stroke='none'
-              />
+            {/* Invisible path for text to follow */}
+            <path
+              id={`textPath-${horizon.horizon}`}
+              d={pathData}
+              fill='none'
+              stroke='none'
+            />
 
-              {/* Curved text label */}
+            {/* Curved text label - only show on segments >= 15% to avoid warping */}
+            {horizon.percentage >= 15 && (
               <text
                 className='cursor-pointer transition-opacity duration-200'
                 style={{ opacity: isHovered ? 1 : 0.9 }}
@@ -160,9 +192,10 @@ const DonutChart: React.FC<{
                   {label}
                 </textPath>
               </text>
-            </g>
-          );
-        })}
+            )}
+          </g>
+        );
+      })}
 
       {/* Center text */}
       <g>

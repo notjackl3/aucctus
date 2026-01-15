@@ -35,6 +35,7 @@ export enum AucctusQueryKeys {
   conceptPriority = 'conceptPriority',
   conceptPriorities = 'conceptPriorities',
   bulkPriorityProgress = 'bulkPriorityProgress',
+  portfolioSummary = 'portfolioSummary',
 
   /* Properties */
   propertyDefinitions = 'propertyDefinitions',

@@ -348,7 +348,9 @@ const PortfolioTab: React.FC = () => {
         <PortfolioBalanceWidget
           horizonData={horizonData}
           totalIdeas={
-            priorities?.length || portfolioSummary?.totalAnalyzed || 0
+            horizonData.reduce((sum, h) => sum + h.count, 0) ||
+            portfolioSummary?.totalAnalyzed ||
+            0
           }
           portfolioSummary={portfolioSummary}
         />

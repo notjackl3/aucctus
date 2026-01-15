@@ -12,7 +12,10 @@ import {
 } from '@hooks/tables/concept-seed.hook';
 import { usePropertyDefinitions } from '@hooks/query/properties.hook';
 import { useAllUsers } from '@hooks/query/account.hook';
-import { usePrioritySocketEvents } from '@hooks/query/concept-priority.hook';
+import {
+  usePrioritySocketEvents,
+  useBulkPrioritySocketEvents,
+} from '@hooks/query/concept-priority.hook';
 import { ConceptStatus, IPropertyFilter } from '@libs/api/types';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
@@ -69,7 +72,11 @@ const ConceptBank: React.FC = () => {
   const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
 
   // Listen for priority calculation WebSocket events
+  // Individual priority events (for real-time updates in concept table)
   usePrioritySocketEvents();
+  // Bulk priority events (progress, completion, portfolio summary)
+  // Must be called here so listeners stay active when user navigates between tabs
+  useBulkPrioritySocketEvents();
 
   // Get account UUID for property definitions
   const accountUuid = useStore((state) => state.auth.user?.account?.uuid);
