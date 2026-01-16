@@ -1,123 +1,21 @@
 /**
- * Default scoring categories and configuration
- * These will be replaced with backend data when API is integrated
+ * Configuration constants for Concept Scoring
+ *
+ * Note: Default scoring categories are no longer defined here.
+ * Scoring criteria are now generated dynamically by AI when Nucleus
+ * processing completes. The AI analyzes company context from Nucleus
+ * data to create customized evaluation questions.
+ *
+ * For existing accounts without criteria:
+ * - Admins can trigger generation via Django admin action
+ * - "Generate scoring criteria" action on Account admin
  */
 
-import { ScoringCategory, ImportanceConfig, Importance } from './types';
+import { ImportanceConfig, Importance } from './types';
 
-export const DEFAULT_SCORING_CATEGORIES: ScoringCategory[] = [
-  {
-    id: 'strategic-fit',
-    name: 'Strategic Fit',
-    icon: 'target',
-    questions: [
-      {
-        id: 'q1-strategic',
-        text: 'Does this concept align with our strategic priorities?',
-        importance: 'high',
-      },
-      {
-        id: 'q2-strategic',
-        text: 'Does this reinforce our brand identity and values?',
-        importance: 'medium',
-      },
-      {
-        id: 'q3-strategic',
-        text: 'Is this consistent with our market positioning?',
-        importance: 'medium',
-      },
-    ],
-  },
-  {
-    id: 'market-opportunity',
-    name: 'Market Opportunity',
-    icon: 'trending-up',
-    questions: [
-      {
-        id: 'q1-market',
-        text: 'Is there a clear and sizeable market opportunity?',
-        importance: 'high',
-      },
-      {
-        id: 'q2-market',
-        text: 'Are market trends favorable for this concept?',
-        importance: 'medium',
-      },
-      {
-        id: 'q3-market',
-        text: 'Is the competitive landscape favorable?',
-        importance: 'medium',
-      },
-    ],
-  },
-  {
-    id: 'customer-value',
-    name: 'Customer Value',
-    icon: 'users-02',
-    questions: [
-      {
-        id: 'q1-customer',
-        text: 'Does this solve a real customer pain point?',
-        importance: 'high',
-      },
-      {
-        id: 'q2-customer',
-        text: 'Is the value proposition clearly differentiated?',
-        importance: 'high',
-      },
-      {
-        id: 'q3-customer',
-        text: 'Would customers pay a premium for this?',
-        importance: 'medium',
-      },
-    ],
-  },
-  {
-    id: 'feasibility',
-    name: 'Feasibility',
-    icon: 'zap',
-    questions: [
-      {
-        id: 'q1-feasibility',
-        text: 'Do we have the technical capabilities to execute?',
-        importance: 'high',
-      },
-      {
-        id: 'q2-feasibility',
-        text: 'Can this be delivered within budget constraints?',
-        importance: 'medium',
-      },
-      {
-        id: 'q3-feasibility',
-        text: 'Is the timeline realistic?',
-        importance: 'medium',
-      },
-    ],
-  },
-  {
-    id: 'risk-profile',
-    name: 'Risk Profile',
-    icon: 'shield-dollar',
-    questions: [
-      {
-        id: 'q1-risk',
-        text: 'Are regulatory risks manageable?',
-        importance: 'high',
-      },
-      {
-        id: 'q2-risk',
-        text: 'Are there significant operational risks?',
-        importance: 'medium',
-      },
-      {
-        id: 'q3-risk',
-        text: 'Is the financial risk acceptable?',
-        importance: 'medium',
-      },
-    ],
-  },
-];
-
+/**
+ * Visual configuration for importance levels in dropdowns and badges
+ */
 export const IMPORTANCE_CONFIG: Record<Importance, ImportanceConfig> = {
   low: {
     label: 'Low',

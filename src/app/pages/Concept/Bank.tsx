@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { Header, Icon, Input, Table } from '@components';
+import { Badge, Header, Icon, Input, Table } from '@components';
 import CompactFilterRibbon from '@components/Tables/ConceptBank/CompactFilterRibbon';
 import {
   IConceptFilterOptions,
@@ -389,6 +389,7 @@ const ConceptBank: React.FC = () => {
                 })}
               />
               Portfolio
+              <Badge.Beta size='xs' />
             </button>
             <button
               className={cn('btn', {

@@ -82,7 +82,7 @@ const PortfolioTab: React.FC = () => {
 
   // Bulk priority generation
   const bulkPriorityMutation = useGenerateBulkConceptPriorities();
-  const { progress, startCalculating, portfolioSummary } =
+  const { progress, startCalculating, resetProgress, portfolioSummary } =
     useBulkPrioritySocketEvents();
 
   // Check if we should show the banner
@@ -130,12 +130,18 @@ const PortfolioTab: React.FC = () => {
         // Start calculating immediately to show skeletons
         // This persists until the completion WebSocket event is received
         startCalculating(conceptUuidsToCalculate.length);
-        bulkPriorityMutation.mutate(conceptUuidsToCalculate);
+        try {
+          await bulkPriorityMutation.mutateAsync(conceptUuidsToCalculate);
+        } catch {
+          // Reset progress if the mutation fails (e.g., scoring criteria not configured)
+          // This prevents the page from being stuck in skeleton/loading mode
+          resetProgress();
+        }
       }
     } finally {
       setIsFetchingConcepts(false);
     }
-  }, [priorities, bulkPriorityMutation, startCalculating]);
+  }, [priorities, bulkPriorityMutation, startCalculating, resetProgress]);
 
   // Get high scoring concepts from real data
   const highScoringConcepts = useMemo<HighScoringConcept[]>(() => {

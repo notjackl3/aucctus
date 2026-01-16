@@ -1,4 +1,4 @@
-import { Button, ComponentTooltip, Table, Text } from '@components';
+import { Badge, Button, ComponentTooltip, Table, Text } from '@components';
 import { toast } from '@components/Notification/toast';
 import { cn } from '@libs/utils/react';
 import {
@@ -1111,6 +1111,7 @@ export const useConceptBank = (
               'priority__overall_priority_score',
             )}
             onReorder={handleColumnReorder}
+            badge={<Badge.Beta size='xs' />}
           />
         ),
         cell: (info) => {
