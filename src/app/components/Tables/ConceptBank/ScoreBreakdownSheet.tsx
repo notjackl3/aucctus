@@ -14,6 +14,7 @@ import { useConceptOverview } from '@hooks/query/concepts.hook';
 import { ICategoryScore } from '@libs/api/types/accounts/scoring-config';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
+import images from '@assets/img';
 
 interface ScoreBreakdownSheetProps {
   isOpen: boolean;
@@ -435,12 +436,17 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
                   className='h-full w-full object-cover'
                 />
               ) : (
-                <div className='aucctus-bg-secondary flex h-full w-full items-center justify-center'>
+                <div
+                  className='flex h-full w-full items-center justify-center bg-cover bg-center'
+                  style={{
+                    backgroundImage: `url(${images.aiExplorationsBackground})`,
+                  }}
+                >
                   <Icon
                     variant='lightbulb'
                     height={48}
                     width={48}
-                    className='aucctus-stroke-tertiary'
+                    className='stroke-white/70'
                   />
                 </div>
               )}

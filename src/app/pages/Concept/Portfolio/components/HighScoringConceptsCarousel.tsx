@@ -14,6 +14,7 @@ import { HighScoringConcept, STAGE_STYLES, ConceptStage } from '../types';
 import ScoreBreakdownSheet from '@components/Tables/ConceptBank/ScoreBreakdownSheet';
 import { useConceptOverview } from '@hooks/query/concepts.hook';
 import HighScoringConceptsCarouselSkeleton from './HighScoringConceptsCarouselSkeleton';
+import images from '@assets/img';
 
 interface HighScoringConceptsCarouselProps {
   concepts: HighScoringConcept[];
@@ -67,12 +68,17 @@ const ConceptCard: React.FC<{
             className='h-full w-full object-cover transition-transform duration-500 group-hover:scale-110'
           />
         ) : (
-          <div className='aucctus-bg-secondary flex h-full w-full items-center justify-center'>
+          <div
+            className='flex h-full w-full items-center justify-center bg-cover bg-center'
+            style={{
+              backgroundImage: `url(${images.aiExplorationsBackground})`,
+            }}
+          >
             <Icon
               variant='lightbulb'
               height={48}
               width={48}
-              className='aucctus-stroke-tertiary'
+              className='stroke-white/70'
             />
           </div>
         )}
