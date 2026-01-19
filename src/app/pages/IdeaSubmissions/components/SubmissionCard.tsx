@@ -116,14 +116,13 @@ const SubmissionCard: FunctionComponent<SubmissionCardProps> = ({
 
       <motion.div
         onClick={handleClick}
-        whileHover={{ y: -4, boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.2 }}
         className={cn(
           'aucctus-bg-primary group relative flex h-[220px] cursor-pointer flex-col rounded-xl border-2 p-6 shadow-sm transition-all duration-300',
           {
             'border-green-500 shadow-md': isSelected,
-            'aucctus-border-secondary hover:aucctus-border-brand/50 hover:shadow-md':
+            'aucctus-border-secondary hover:aucctus-border-brand/50':
               !isSelected,
           },
         )}
@@ -132,7 +131,7 @@ const SubmissionCard: FunctionComponent<SubmissionCardProps> = ({
         {duplicateCount > 0 && !isExpanded && (
           <button
             onClick={handleDuplicateBadgeClick}
-            className='absolute -right-2 -top-2 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[hsl(0,27%,29%)] text-xs font-bold text-white shadow-lg transition-transform hover:scale-110 dark:border-gray-900'
+            className='absolute -right-2 -top-2 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-[hsl(0,27%,29%)] text-xs font-bold text-white shadow-lg dark:border-gray-900'
             title='Click to expand group'
           >
             {duplicateCount + 1}

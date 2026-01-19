@@ -7,7 +7,6 @@ export enum ConceptPath {
   Assumptions = 'assumptions',
   Settings = 'settings',
   Testing = 'testing',
-  PocPlan = 'poc-plan',
 }
 
 export enum AppPath {
@@ -31,7 +30,6 @@ export enum AppPath {
   ConceptMarketScan = `/concept/:id/${ConceptPath.MarketScan}`,
   ConceptSettings = `/concept/:id/${ConceptPath.Settings}`,
   ConceptTesting = `/concept/:id/${ConceptPath.Testing}`,
-  ConceptPocPlan = `/concept/:id/${ConceptPath.PocPlan}`,
 
   /* Challenges */
   ChallengeCenter = '/challenge',

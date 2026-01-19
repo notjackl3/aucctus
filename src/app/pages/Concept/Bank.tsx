@@ -427,8 +427,9 @@ const ConceptBank: React.FC = () => {
           <div className='flex items-center gap-1'>
             <button
               className={cn('btn', {
-                'btn-outlined': isPortfolioRoute,
-                'btn-no-border aucctus-text-tertiary': !isPortfolioRoute,
+                'bg-black text-white': isPortfolioRoute,
+                'btn-no-border aucctus-text-tertiary hover:aucctus-text-primary':
+                  !isPortfolioRoute,
               })}
               onClick={() => handleTabChange(AppPath.ConceptBankPortfolio)}
             >
@@ -437,8 +438,9 @@ const ConceptBank: React.FC = () => {
                 height={16}
                 width={16}
                 className={cn({
-                  'aucctus-stroke-primary': isPortfolioRoute,
-                  'aucctus-stroke-tertiary': !isPortfolioRoute,
+                  'stroke-white': isPortfolioRoute,
+                  'aucctus-stroke-tertiary group-hover:aucctus-stroke-primary':
+                    !isPortfolioRoute,
                 })}
               />
               Portfolio
@@ -446,9 +448,9 @@ const ConceptBank: React.FC = () => {
             </button>
             <button
               className={cn('btn', {
-                'btn-outlined':
+                'bg-black text-white':
                   !isDraftsRoute && !isPortfolioRoute && !isSubmissionsRoute,
-                'btn-no-border aucctus-text-tertiary':
+                'btn-no-border aucctus-text-tertiary hover:aucctus-text-primary':
                   isDraftsRoute || isPortfolioRoute || isSubmissionsRoute,
               })}
               onClick={() => handleTabChange(AppPath.ConceptBank)}
@@ -457,8 +459,9 @@ const ConceptBank: React.FC = () => {
             </button>
             <button
               className={cn('btn', {
-                'btn-outlined': isSubmissionsRoute,
-                'btn-no-border aucctus-text-tertiary': !isSubmissionsRoute,
+                'bg-black text-white': isSubmissionsRoute,
+                'btn-no-border aucctus-text-tertiary hover:aucctus-text-primary':
+                  !isSubmissionsRoute,
               })}
               onClick={() => handleTabChange(AppPath.ConceptBankSubmissions)}
             >
@@ -466,7 +469,7 @@ const ConceptBank: React.FC = () => {
                 height={16}
                 width={16}
                 className={cn({
-                  'aucctus-stroke-primary': isSubmissionsRoute,
+                  'stroke-white': isSubmissionsRoute,
                   'aucctus-stroke-tertiary': !isSubmissionsRoute,
                 })}
               />
@@ -475,8 +478,9 @@ const ConceptBank: React.FC = () => {
             </button>
             <button
               className={cn('btn', {
-                'btn-outlined': isDraftsRoute,
-                'btn-no-border aucctus-text-tertiary': !isDraftsRoute,
+                'bg-black text-white': isDraftsRoute,
+                'btn-no-border aucctus-text-tertiary hover:aucctus-text-primary':
+                  !isDraftsRoute,
               })}
               onClick={() => handleTabChange(AppPath.ConceptBankDrafts)}
             >

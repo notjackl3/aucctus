@@ -110,6 +110,9 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
   // Generate report state
   const [isGeneratingReport, setIsGeneratingReport] = useState(false);
 
+  // Track if saved to bank (local state to immediately disable buttons)
+  const [isSavedToBank, setIsSavedToBank] = useState(!!submission.conceptUuid);
+
   // Score editing state
   const [questionScores, setQuestionScores] = useState<Record<string, number>>(
     {},
@@ -198,6 +201,7 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
   const saveToBankMutation = useMutation({
     mutationFn: () => api.ideaSubmissions.saveToBank(submission.uuid),
     onSuccess: () => {
+      setIsSavedToBank(true);
       queryClient.invalidateQueries({
         queryKey: ['submissionLinkSubmissions'],
       });
@@ -207,11 +211,15 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
       toast.error('Failed to save to concept bank');
     },
   });
-  const shouldGenerateReport = !submission?.reportGenerated;
+
+  // Buttons should be disabled if already saved to bank
+  const isAlreadySaved = isSavedToBank || !!submission.conceptUuid;
+  const shouldGenerateReport = !submission?.reportGenerated && !isAlreadySaved;
 
   // Handle generate report
   const handleGenerateReport = async () => {
     setIsGeneratingReport(true);
+    setIsSavedToBank(true);
 
     try {
       let conceptUuid = submission.conceptUuid;
@@ -219,14 +227,14 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
       // If not already saved to bank, save first (with generateReport flag if needed)
       if (!conceptUuid) {
         const result = await api.ideaSubmissions.saveToBank(submission.uuid, {
-          generateReport: shouldGenerateReport,
+          generateReport: !submission?.reportGenerated,
         });
         conceptUuid = result.conceptUuid;
         queryClient.invalidateQueries({
           queryKey: ['submissionLinkSubmissions'],
         });
         toast.success(
-          shouldGenerateReport
+          !submission?.reportGenerated
             ? 'Saved to concept bank! Report generation started.'
             : 'Saved to concept bank!',
         );
@@ -239,6 +247,7 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
     } catch {
       toast.error('Failed to generate report');
       setIsGeneratingReport(false);
+      setIsSavedToBank(false);
     }
   };
 
@@ -455,13 +464,13 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
         >
           <motion.button
             onClick={() => saveToBankMutation.mutate()}
-            disabled={saveToBankMutation.isLoading || !!submission.conceptUuid}
+            disabled={saveToBankMutation.isLoading || isAlreadySaved}
             className='btn btn-secondary btn-md flex flex-1 items-center justify-center gap-2 disabled:opacity-50'
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <FolderPlus className='h-4 w-4' />
-            {submission.conceptUuid ? 'Saved to Bank' : 'Save to Bank'}
+            {isAlreadySaved ? 'Saved to Bank' : 'Save to Bank'}
           </motion.button>
           <motion.button
             onClick={handleGenerateReport}

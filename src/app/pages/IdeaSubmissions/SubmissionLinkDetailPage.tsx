@@ -490,7 +490,6 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
         <motion.div
           className='aucctus-bg-primary aucctus-border-secondary flex items-center gap-4 rounded-xl border p-6 shadow-sm'
           variants={fadeInUp}
-          whileHover={{ boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}
         >
           <div className='flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-pink-100'>
             <Lightbulb className='h-6 w-6 stroke-pink-500' />
@@ -509,7 +508,6 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
         <motion.div
           className='aucctus-bg-primary aucctus-border-secondary flex items-center gap-4 rounded-xl border p-6 shadow-sm'
           variants={fadeInUp}
-          whileHover={{ boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}
         >
           <div className='flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-amber-100'>
             <Users className='h-6 w-6 stroke-amber-600' />
@@ -528,7 +526,6 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
         <motion.div
           className='aucctus-bg-primary aucctus-border-secondary flex items-center gap-4 rounded-xl border p-6 shadow-sm'
           variants={fadeInUp}
-          whileHover={{ boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}
         >
           <div className='flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-yellow-100'>
             <Star className='h-6 w-6 fill-yellow-500 stroke-yellow-500' />
@@ -552,10 +549,7 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
         transition={{ duration: 0.4, delay: 0.3 }}
       >
         {/* Major Themes */}
-        <motion.div
-          className='aucctus-bg-primary aucctus-border-secondary rounded-xl border p-6 shadow-sm'
-          whileHover={{ boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}
-        >
+        <motion.div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border p-6 shadow-sm'>
           <div className='mb-4 flex items-center gap-2'>
             <Target className='h-5 w-5 stroke-gray-500' />
             <h2 className='aucctus-text-lg-semibold aucctus-text-primary'>
@@ -571,10 +565,9 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
               className={cn(
                 'aucctus-text-xs-semibold rounded-full border px-4 py-1.5 transition-colors',
                 selectedTheme === null
-                  ? 'border-violet-300 bg-violet-100 text-violet-900'
-                  : 'aucctus-bg-secondary aucctus-text-secondary aucctus-border-secondary hover:aucctus-bg-tertiary',
+                  ? 'border-black bg-black text-white'
+                  : 'aucctus-bg-secondary aucctus-text-secondary aucctus-border-secondary hover:aucctus-text-primary',
               )}
-              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
               All Themes
@@ -588,10 +581,9 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
                 className={cn(
                   'aucctus-text-xs-semibold rounded-full border px-4 py-1.5 transition-colors',
                   selectedTheme === theme.name
-                    ? 'border-violet-300 bg-violet-100 text-violet-700'
-                    : 'aucctus-bg-secondary aucctus-text-secondary aucctus-border-secondary hover:aucctus-bg-tertiary',
+                    ? 'border-black bg-black text-white'
+                    : 'aucctus-bg-secondary aucctus-text-secondary aucctus-border-secondary hover:aucctus-text-primary',
                 )}
-                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 {theme.name}
@@ -634,12 +626,9 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
         </motion.div>
 
         {/* Analysis Summary */}
-        <motion.div
-          className='aucctus-bg-primary aucctus-border-secondary rounded-xl border p-6 shadow-sm'
-          whileHover={{ boxShadow: '0 8px 16px rgba(0,0,0,0.1)' }}
-        >
+        <motion.div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border p-6 shadow-sm'>
           <div className='mb-4 flex items-center gap-2'>
-            <Sparkles className='h-5 w-5 stroke-indigo-800' />
+            <Sparkles className='h-5 w-5 stroke-gray-500' />
             <h2 className='aucctus-text-lg-semibold aucctus-text-primary'>
               Analysis Summary
             </h2>
@@ -666,7 +655,7 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
 
                 return (
                   <div key={index} className='flex items-start gap-3'>
-                    <span className='mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-violet-500' />
+                    <span className='mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-gray-400' />
                     <p className='aucctus-text-sm aucctus-text-secondary'>
                       {headline && (
                         <span className='aucctus-text-sm-semibold aucctus-text-primary'>
@@ -881,7 +870,7 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
                         onClick={() =>
                           handleExpandSubmissionGroup(submission.uuid)
                         }
-                        className='aucctus-bg-brand-solid absolute -bottom-4 left-1/2 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white text-white shadow-lg transition-transform hover:scale-110 dark:border-gray-900'
+                        className='aucctus-bg-brand-solid absolute -bottom-4 left-1/2 z-10 flex h-10 w-10 -translate-x-1/2 items-center justify-center rounded-full border-2 border-white text-white shadow-lg dark:border-gray-900'
                         title='Collapse group'
                       >
                         <ChevronUp className='h-5 w-5' />

@@ -787,7 +787,7 @@ const AdminPanel: FunctionComponent = () => {
               <div
                 key={submission.uuid}
                 className={cn(
-                  'aucctus-bg-primary group cursor-pointer rounded-xl border shadow-sm transition-all hover:shadow-md',
+                  'aucctus-bg-primary group cursor-pointer rounded-xl border shadow-sm transition-all',
                   {
                     'aucctus-border-brand ring-brand-primary/20 ring-2':
                       isSelected,
