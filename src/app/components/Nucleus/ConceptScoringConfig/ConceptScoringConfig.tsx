@@ -1158,27 +1158,28 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                                   />
                                 </div>
 
-                                {/* Delete Button - disabled if last question in category */}
+                                {/* Delete Button - shows warning if last question in category */}
                                 {selectedCategory.questions.length === 1 ? (
                                   <ComponentTooltip
                                     tip={
                                       <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border px-3 py-2 shadow-lg'>
                                         <span className='aucctus-text-xs aucctus-text-primary whitespace-nowrap'>
-                                          Categories must have at least one
-                                          question
+                                          Deleting this will remove the category
                                         </span>
                                       </div>
                                     }
                                     preferredPosition='above'
                                   >
                                     <button
-                                      className='h-8 w-8 cursor-not-allowed rounded p-1.5 opacity-30'
-                                      disabled
-                                      title='Categories must have at least one question'
+                                      className='hover:aucctus-bg-error-subtle h-8 w-8 rounded p-1.5 opacity-0 transition-all group-hover:opacity-100'
+                                      onClick={() =>
+                                        handleDeleteCategory(selectedCategoryId)
+                                      }
+                                      title='Deleting this will remove the category'
                                     >
                                       <Icon
                                         variant='trash'
-                                        className='aucctus-stroke-tertiary'
+                                        className='aucctus-stroke-error-primary'
                                         height={16}
                                         width={16}
                                       />

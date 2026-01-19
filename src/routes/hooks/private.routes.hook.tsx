@@ -37,25 +37,10 @@ const usePrivateRoutes = () => {
       {/* Nucleus Routes */}
       <Route path={AppPath.Nucleus} element={<NucleusPage />} />
 
-      {/* Signal Scanning Routes */}
-      <Route path={AppPath.SignalScanning} element={<Page.SignalScanning />} />
-
-      {/* Innovation Pipeline Routes */}
-      <Route
-        path={AppPath.InnovationPipeline}
-        element={<Page.InnovationPipeline />}
-      />
-
       {/* Idea Playground Routes */}
       <Route
         path={AppPath.IdeaPlayground}
         element={<Page.IdeaPlayground.IdeaPlaygroundQBased />}
-      />
-
-      {/* Idea Submissions Admin Panel */}
-      <Route
-        path={AppPath.IdeaSubmissionsAdmin}
-        element={<Page.IdeaSubmissions.AdminPanel />}
       />
 
       {/* Testing/Demo Routes */}

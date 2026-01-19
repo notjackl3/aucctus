@@ -77,5 +77,4 @@ export const UNAUTH_ROUTES = [
   AppPath.ConfirmEmail,
   AppPath.ForgotPassword,
   AppPath.ResetPassword,
-  AppPath.IdeaSubmissionsPublicForm,
 ];

@@ -91,34 +91,15 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           collapsed={collapsed}
         />
         <NavButton
-          to={AppPath.InnovationPipeline}
-          title='Pipeline'
-          icon='dataflow-04'
-          collapsed={collapsed}
-        />
-        <NavButton
           to={AppPath.Nucleus}
           title='Nucleus'
           icon='compass-03'
           collapsed={collapsed}
         />
         <NavButton
-          to={AppPath.SignalScanning}
-          title='Signal Scanning'
-          icon='signal-02'
-          collapsed={collapsed}
-        />
-        {/* Uncomment this when we have the playground ready */}
-        <NavButton
           to={playgroundPath}
           title='Playground'
           icon='route'
-          collapsed={collapsed}
-        />
-        <NavButton
-          to={AppPath.IdeaSubmissionsAdmin}
-          title='Submissions'
-          icon='inbox-02'
           collapsed={collapsed}
         />
       </div>
