@@ -1,16 +1,20 @@
-import React, { useRef } from 'react';
-import { Icon, Button, Badge, ComponentTooltip } from '@components';
-import { cn } from '@libs/utils/react';
 import images from '@assets/img';
+import { Badge, Button, ComponentTooltip, Icon } from '@components';
+import { SkeletonBlock } from '@components/Skeleton/ConceptReport';
+import { cn } from '@libs/utils/react';
+import { getLogoUrl } from '@libs/utils/source';
+import type { ProductSearchStatus } from '@libs/api/types';
+import React, { useRef } from 'react';
 import ComponentCarousel, {
   ComponentCarouselRef,
 } from '../../Carousel/ComponentCarousel';
-import CompanyTooltip from './CompanyTooltip';
 import type { Company, Product } from '../hooks/useEcosystem';
-import { getLogoUrl } from '@libs/utils/source';
+import CompanyTooltip from './CompanyTooltip';
+import ProductImage from './ProductImage';
 
 interface ProductCarouselProps {
   ecosystemData: Company[];
+  productSearchStatus: ProductSearchStatus;
 }
 
 const getCompanyLogoUrl = (websiteUrl: string | undefined): string => {
@@ -23,8 +27,151 @@ const getCompanyLogoUrl = (websiteUrl: string | undefined): string => {
   }
 };
 
-const ProductCarousel: React.FC<ProductCarouselProps> = ({ ecosystemData }) => {
+/**
+ * Animated scanning icon with orbiting effect
+ */
+const ScanningIcon: React.FC = () => (
+  <>
+    <style>{`
+      @keyframes orbit {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes pulse-glow {
+        0%, 100% {
+          opacity: 0.4;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.8;
+          transform: scale(1.05);
+        }
+      }
+
+      .scanning-orbit {
+        animation: orbit 2s linear infinite;
+      }
+
+      .scanning-pulse {
+        animation: pulse-glow 2s ease-in-out infinite;
+      }
+    `}</style>
+    <div className='relative flex h-6 w-6 items-center justify-center'>
+      {/* Outer orbiting ring */}
+      <div className='scanning-orbit absolute inset-0'>
+        <svg viewBox='0 0 24 24' className='h-full w-full'>
+          <circle
+            cx='12'
+            cy='12'
+            r='10'
+            fill='none'
+            stroke='currentColor'
+            strokeWidth='1.5'
+            strokeDasharray='8 12'
+            className='aucctus-stroke-brand-primary opacity-60'
+          />
+        </svg>
+      </div>
+      {/* Inner pulsing dot */}
+      <div className='scanning-pulse aucctus-bg-brand-primary h-2 w-2 rounded-full' />
+    </div>
+  </>
+);
+
+/**
+ * Skeleton card that matches the real product card structure
+ */
+const ProductCardSkeleton: React.FC = () => (
+  <div className='aucctus-bg-primary aucctus-border-secondary flex h-[320px] w-[280px] flex-shrink-0 flex-col overflow-hidden rounded-lg border'>
+    {/* Image placeholder */}
+    <SkeletonBlock className='h-[180px] w-full rounded-none' />
+
+    {/* Product Info */}
+    <div className='flex flex-1 flex-col space-y-2 p-3'>
+      {/* Title and Price */}
+      <div className='flex items-start justify-between gap-2'>
+        <SkeletonBlock className='h-4 w-32' />
+        <div className='flex flex-col items-end gap-1'>
+          <SkeletonBlock className='h-4 w-16' />
+          <SkeletonBlock className='h-3 w-12' />
+        </div>
+      </div>
+
+      {/* Company Badge */}
+      <SkeletonBlock className='h-6 w-28 rounded-full' />
+
+      {/* Description */}
+      <SkeletonBlock className='h-8 w-full' />
+
+      {/* Tags */}
+      <div className='flex gap-1'>
+        <SkeletonBlock className='h-5 w-16 rounded' />
+        <SkeletonBlock className='h-5 w-20 rounded' />
+      </div>
+    </div>
+  </div>
+);
+
+/**
+ * Loading state skeleton showing product card placeholders in a carousel layout
+ */
+const ProductCarouselSkeleton: React.FC = () => (
+  <>
+    {/* Header */}
+    <div className='px-0 pt-4'>
+      <div className='flex items-center justify-between'>
+        <div className='flex-1'>
+          <h3 className='aucctus-text-primary flex items-center gap-2 text-xl font-semibold tracking-tight'>
+            <div className='aucctus-text-primary h-5 w-5'>
+              <Icon variant='map-02' />
+            </div>
+            Competitive Product Scan
+          </h3>
+          <div className='mt-1 flex items-center gap-2'>
+            <ScanningIcon />
+            <p className='aucctus-text-secondary text-base'>
+              Scanning competitor products
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {/* Skeleton Carousel */}
+    <div className='mt-4 flex gap-4 overflow-hidden'>
+      {[1, 2, 3, 4].map((i) => (
+        <ProductCardSkeleton key={i} />
+      ))}
+    </div>
+  </>
+);
+
+const ProductCarousel: React.FC<ProductCarouselProps> = ({
+  ecosystemData,
+  productSearchStatus,
+}) => {
   const carouselRef = useRef<ComponentCarouselRef>(null);
+
+  const hasProducts = ecosystemData.some(
+    (company) => company.relevantProducts.length > 0,
+  );
+  const isSearchingProducts =
+    productSearchStatus === 'pending' || productSearchStatus === 'in_progress';
+
+  // Show skeleton carousel when searching for products
+  if (isSearchingProducts) {
+    return <ProductCarouselSkeleton />;
+  }
+
+  // Hide section entirely if no products found after search completes
+  if (!hasProducts) {
+    return <></>;
+  }
 
   return (
     <>
@@ -86,20 +233,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({ ecosystemData }) => {
                   className='group relative overflow-hidden'
                   style={{ height: '180px' }}
                 >
-                  {product.image ? (
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className='h-full w-full object-cover'
-                    />
-                  ) : (
-                    <div className='flex h-full w-full items-center justify-center'>
-                      <Icon
-                        variant='cube'
-                        className='aucctus-stroke-secondary h-8 w-8'
-                      />
-                    </div>
-                  )}
+                  <ProductImage src={product.image} alt={product.name} />
                   {/* View Product Button */}
                   <Button
                     size='sm'

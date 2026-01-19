@@ -1,12 +1,12 @@
-import React, { useRef, useCallback } from 'react';
-import { Icon, Button, Badge, ComponentTooltip } from '@components';
+import { Badge, Button, ComponentTooltip, Icon } from '@components';
+import type { ISource } from '@libs/api/types';
+import { cn } from '@libs/utils/react';
+import React, { useCallback, useRef } from 'react';
+import MultiSourceBadge from '../../../pages/Concept/Report/MarketScan/components/sources/MultiSourceBadge';
 import ComponentCarousel, {
   ComponentCarouselRef,
 } from '../../Carousel/ComponentCarousel';
-import MultiSourceBadge from '../../../pages/Concept/Report/MarketScan/components/sources/MultiSourceBadge';
 import type { FuturePrediction } from '../hooks/useEcosystem';
-import type { ISource } from '@libs/api/types';
-import { cn } from '@libs/utils/react';
 
 interface FuturePredictionsProps {
   predictions: FuturePrediction[];
@@ -166,6 +166,10 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
     },
     [createSourceDescriptionWithCitations],
   );
+
+  if (!predictions || predictions.length === 0) {
+    return <></>;
+  }
 
   return (
     <>

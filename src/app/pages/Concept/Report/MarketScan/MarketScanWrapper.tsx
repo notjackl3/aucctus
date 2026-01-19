@@ -51,8 +51,8 @@ const MarketScanWrapper: React.FC = () => {
         />
       )}
 
-      {/* Show debug mode banner if debug mode is enabled */}
-      {isDebugModeEnabled && (
+      {/* Show debug mode banner for v2 only - v3 handles its own debug mode with tab awareness */}
+      {isDebugModeEnabled && !shouldRenderV3 && (
         <VersionUpgradeBanner
           onUpgrade={handleDebugModeGenerate}
           isLoading={isLoading}

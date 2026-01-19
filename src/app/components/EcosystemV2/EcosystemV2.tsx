@@ -7,6 +7,7 @@ import DialGauge from './components/DialGauge';
 import ProductCarousel from './components/ProductCarousel';
 import FuturePredictions from './components/FuturePredictions';
 import { useEcosystem, Company } from './hooks/useEcosystem';
+import { useProductSearchSocket } from './hooks/useProductSearchSocket';
 
 const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
   const {
@@ -15,7 +16,11 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
     tailwinds,
     crowdedness,
     futurePredictions,
+    productSearchStatus,
   } = useEcosystem(conceptId);
+
+  // Listen for product search WebSocket updates to refresh data when complete
+  useProductSearchSocket(conceptId);
 
   const [ecosystemTab, setEcosystemTab] = useState<
     'map' | 'startups' | 'incumbents'
@@ -269,7 +274,10 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
         </Tabs>
 
         {/* Product Carousel */}
-        <ProductCarousel ecosystemData={ecosystemData} />
+        <ProductCarousel
+          ecosystemData={ecosystemData}
+          productSearchStatus={productSearchStatus}
+        />
         {/* Future Predictions */}
         <FuturePredictions predictions={futurePredictions} />
       </div>

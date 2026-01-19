@@ -44,10 +44,16 @@ const Ecosystem: React.FC = () => {
     shouldFetchEcosystem ? activeConceptUuid : '',
   );
 
-  // Show skeleton while upgrading OR while loading data
+  // Check if ecosystem section is pending from backend status
+  const isEcosystemSectionPending =
+    concept?.reportStatusBySection?.ecosystem?.status === 'pending';
+
+  // Show skeleton while upgrading, loading data, or when section is pending
   // This keeps the loading isolated to just the Ecosystem subtab
   const shouldShowSkeletons =
-    isAwaitingEcosystemUpgrade || isEcosystemV2Loading;
+    isAwaitingEcosystemUpgrade ||
+    isEcosystemV2Loading ||
+    isEcosystemSectionPending;
   const isV2ExperienceActive = shouldRenderV2 || isAwaitingEcosystemUpgrade;
 
   const handleUpgrade = () => {

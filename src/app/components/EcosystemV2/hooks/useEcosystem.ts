@@ -7,6 +7,7 @@ import type {
   IEcosystemProduct,
   IEcosystemV2Response,
   ISource,
+  ProductSearchStatus,
 } from '@libs/api/types';
 import { getLogoUrl } from '@libs/utils/source';
 
@@ -106,6 +107,7 @@ export interface EcosystemCompanyData {
   isLoading: boolean;
   error: unknown;
   needsUpgrade?: boolean;
+  productSearchStatus: ProductSearchStatus;
 }
 
 const EMPTY_STATE: Omit<
@@ -120,6 +122,7 @@ const EMPTY_STATE: Omit<
     directCompetitors: 0,
   },
   futurePredictions: [],
+  productSearchStatus: 'pending',
 };
 
 const buildAdvantageCopy = (company: IEcosystemCompany) => {
@@ -281,6 +284,7 @@ export const useEcosystem = (conceptId: string): EcosystemCompanyData => {
           sources: prediction.sources || [],
         }),
       ),
+      productSearchStatus: data.productSearchStatus,
     };
   }, [data]);
 
@@ -294,5 +298,6 @@ export const useEcosystem = (conceptId: string): EcosystemCompanyData => {
     isLoading: isLoading || (!data && !error) || isGenerating,
     error,
     needsUpgrade: data?.needsUpgrade,
+    productSearchStatus: data?.productSearchStatus ?? 'pending',
   };
 };

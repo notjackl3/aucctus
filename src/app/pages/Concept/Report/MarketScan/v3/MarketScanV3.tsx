@@ -1,5 +1,10 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import { Icon, ConceptReportSkeletons } from '@components';
+import {
+  Icon,
+  ConceptReportSkeletons,
+  VersionUpgradeBanner,
+  toast,
+} from '@components';
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
@@ -13,20 +18,17 @@ import {
   useMarketScanPriorityInsightsV3,
   useMarketScanMarketForcesV3,
   useConceptExecutiveSummaries,
+  useGenerateTrendsAndDrivers,
+  useGenerateEcosystemV2,
 } from '@hooks/query/concepts.hook';
-import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
-import { AppPath } from '@routes/routes';
+import { useDebugMode } from '@hooks/debug-mode.hook';
 import { useSearchParams } from 'react-router-dom';
 import { useOutletContext } from 'react-router-dom';
 import { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
 import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
 
-const {
-  ExecutiveSummarySkeleton,
-  MarketScanSkeleton,
-  EcosystemV2Skeleton,
-  SkeletonBlock,
-} = ConceptReportSkeletons;
+const { ExecutiveSummarySkeleton, MarketScanSkeleton, EcosystemV2Skeleton } =
+  ConceptReportSkeletons;
 
 const MarketScanV3: React.FC = () => {
   const activeConceptUuid = useStore(
@@ -34,6 +36,7 @@ const MarketScanV3: React.FC = () => {
   );
   const { concept } = useOutletContext<IConceptReportContext>();
   const [searchParams] = useSearchParams();
+  const isDebugModeEnabled = useDebugMode();
 
   const trendsQuery = useMarketScanTrendsV3(activeConceptUuid || '');
   const priorityInsightsQuery = useMarketScanPriorityInsightsV3(
@@ -46,26 +49,34 @@ const MarketScanV3: React.FC = () => {
     activeConceptUuid || '',
   );
 
+  // Debug mode generation hooks
+  const { mutate: generateTrendsAndDrivers, isLoading: isGeneratingTrends } =
+    useGenerateTrendsAndDrivers();
+  const { mutate: generateEcosystem, isLoading: isGeneratingEcosystem } =
+    useGenerateEcosystemV2();
+
   const { trends = [] } = trendsQuery;
   const { priorityInsights = [] } = priorityInsightsQuery;
   const { marketForces = [] } = marketForcesQuery;
   const { executiveSummaries } = executiveSummariesQuery;
 
-  // Section-specific loading and regeneration status
-  const { isSectionPending, hasBlockingLoad } = useUnifiedLoading({
-    currentRoute: AppPath.ConceptMarketScan,
-    concept,
-    additionalLoadingStates: [
-      trendsQuery.isLoading || trendsQuery.isFetching,
-      priorityInsightsQuery.isLoading || priorityInsightsQuery.isFetching,
-      marketForcesQuery.isLoading || marketForcesQuery.isFetching,
-    ],
-  });
+  // Check section-specific pending status from backend
+  const isTrendsSectionPending =
+    concept?.reportStatusBySection?.trends?.status === 'pending';
+  const isEcosystemSectionPending =
+    concept?.reportStatusBySection?.ecosystem?.status === 'pending';
 
-  // Separate loading states for better granularity
-  const showTrendsSkeletons = isSectionPending || hasBlockingLoad;
+  // Only show skeleton during initial load (no data yet), not during background refetches
+  const isTrendsInitialLoading =
+    (trendsQuery.isLoading && trends.length === 0) ||
+    (priorityInsightsQuery.isLoading && priorityInsights.length === 0) ||
+    (marketForcesQuery.isLoading && marketForces.length === 0);
+
+  // Separate loading states for each tab
+  const showTrendsSkeletons = isTrendsSectionPending || isTrendsInitialLoading;
+  const showEcosystemSkeletons = isEcosystemSectionPending;
   const showExecutiveSummarySkeleton =
-    executiveSummariesQuery.isLoading || executiveSummariesQuery.isFetching;
+    executiveSummariesQuery.isLoading && !executiveSummaries;
 
   const [selectedRadarCategory, setSelectedRadarCategory] =
     useState<IMarketForceV3 | null>(null);
@@ -86,32 +97,34 @@ const MarketScanV3: React.FC = () => {
     }
   }, [marketForces, selectedRadarCategory]);
 
-  const marketScanTabs = useMemo(() => {
-    // Show skeleton placeholders for tab labels during loading
-    if (showTrendsSkeletons) {
-      return [
-        {
-          label: (
-            <div className='flex items-center gap-2'>
-              <SkeletonBlock className='h-4 w-4 rounded' />
-              <SkeletonBlock className='h-4 w-32' />
-            </div>
-          ),
-          value: 'trends-drivers',
+  // Debug mode generation handler - only regenerates the active section
+  const handleDebugModeGenerate = useCallback(() => {
+    if (activeTab === 'trends-drivers') {
+      generateTrendsAndDrivers(concept.identifier, {
+        onError: () => {
+          toast.error(
+            'Trends & Drivers Failed',
+            'Failed to generate Trends & Drivers',
+          );
         },
-        {
-          label: (
-            <div className='flex items-center gap-2'>
-              <SkeletonBlock className='h-4 w-4 rounded' />
-              <SkeletonBlock className='h-4 w-24' />
-            </div>
-          ),
-          value: 'ecosystem',
+      });
+    } else if (activeTab === 'ecosystem') {
+      generateEcosystem(concept.identifier, {
+        onError: () => {
+          toast.error('Ecosystem Failed', 'Failed to generate Ecosystem');
         },
-      ] as TabElement[];
+      });
     }
+  }, [
+    activeTab,
+    concept.identifier,
+    generateTrendsAndDrivers,
+    generateEcosystem,
+  ]);
 
-    // Normal tab labels when not loading
+  const isDebugGenerating = isGeneratingTrends || isGeneratingEcosystem;
+
+  const marketScanTabs = useMemo(() => {
     return [
       {
         label: (
@@ -138,7 +151,7 @@ const MarketScanV3: React.FC = () => {
         value: 'ecosystem',
       },
     ] as TabElement[];
-  }, [showTrendsSkeletons]);
+  }, []);
 
   const onTabSelect = useCallback(
     (value: string) => {
@@ -210,8 +223,8 @@ const MarketScanV3: React.FC = () => {
       );
     }
 
-    // Show skeleton when loading
-    if (showTrendsSkeletons) {
+    // Show skeleton when ecosystem section is pending
+    if (showEcosystemSkeletons) {
       return (
         <div className='mx-auto flex max-w-[1600px] flex-col gap-8 p-4'>
           <ExecutiveSummarySkeleton />
@@ -253,6 +266,15 @@ const MarketScanV3: React.FC = () => {
 
   return (
     <div className='flex flex-1 flex-col gap-4'>
+      {/* Debug mode banner - regenerates only the active section */}
+      {isDebugModeEnabled && (
+        <VersionUpgradeBanner
+          onUpgrade={handleDebugModeGenerate}
+          isLoading={isDebugGenerating}
+          buttonText={`Generate ${activeTab === 'trends-drivers' ? 'Trends & Drivers' : 'Ecosystem'}`}
+          debugMode={true}
+        />
+      )}
       <TabView
         tabs={marketScanTabs}
         tabGroupClassName='pointer-events-auto flex flex-1'

@@ -471,6 +471,7 @@ const ConceptBank: React.FC = () => {
                 })}
               />
               Submissions
+              <Badge.Beta size='xs' />
             </button>
             <button
               className={cn('btn', {

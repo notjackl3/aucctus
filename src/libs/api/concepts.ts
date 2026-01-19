@@ -260,6 +260,12 @@ export class ConceptApi extends ApiService {
     );
   }
 
+  generateTrendsAndDrivers(conceptIdentifier: string) {
+    return this.post<IGenerationResponse>(
+      endpoints.generateTrendsAndDrivers(conceptIdentifier),
+    );
+  }
+
   unarchive(uuid: string) {
     return this.post<IConcept>(endpoints.unarchiveConcept(uuid));
   }

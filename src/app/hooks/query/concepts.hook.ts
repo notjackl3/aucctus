@@ -472,6 +472,26 @@ export const useGenerateMarketScan = () => {
   });
 };
 
+export const useGenerateTrendsAndDrivers = () => {
+  return useMutation({
+    mutationFn: async (conceptIdentifier: string) =>
+      await api.concept.generateTrendsAndDrivers(conceptIdentifier),
+    onSuccess: () => {
+      // Don't mark the entire marketScan section as pending since we only want
+      // to show loading for trends-related content, not ecosystem.
+      // The isGenerating state from the mutation handles immediate feedback.
+      // WebSocket events will handle the actual data updates when backend completes.
+    },
+    onError: (e) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Trends & Drivers Generation Failed',
+        message || 'Unable to generate Trends & Drivers. Please try again',
+      );
+    },
+  });
+};
+
 export const useGenerateEcosystemV2 = () => {
   return useMutation({
     mutationFn: async (conceptIdentifier: string) =>

@@ -559,6 +559,10 @@ export class Endpoints {
     return `api/v3/concept/${conceptIdentifier}/market-scan/generate`;
   }
 
+  static generateTrendsAndDrivers(conceptIdentifier: string) {
+    return `api/v3/concept/${conceptIdentifier}/trends-and-drivers/generate`;
+  }
+
   // Financial Projection V2 Endpoints
   static financialProjectionV2(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/financial-projection`;

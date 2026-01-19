@@ -871,6 +871,21 @@ export interface IIdeaPlaygroundResearchInsightsGeneratedMessage
 }
 
 // ==========================================
+// Ecosystem Product Search Messages
+// ==========================================
+
+export interface IEcosystemProductSearchUpdateMessage extends BaseSocketEvent {
+  type: 'ecosystem.product_search.update';
+  conceptUuid: string;
+  accountUuid: string;
+  status: 'pending' | 'in_progress' | 'complete' | 'error';
+  totalCompanies?: number;
+  completedCompanies?: number;
+  productsFound?: number;
+  errorMessage?: string;
+}
+
+// ==========================================
 // Concept Priority Messages
 // ==========================================
 
@@ -1018,6 +1033,7 @@ export type InboundSocketEvent<C = {}> =
   | IPortfolioSummaryMessage
   | IIdeaSubmissionsProcessingStartedMessage
   | IIdeaSubmissionsProcessingCompletedMessage
-  | IIdeaSubmissionsProcessingErrorMessage;
+  | IIdeaSubmissionsProcessingErrorMessage
+  | IEcosystemProductSearchUpdateMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

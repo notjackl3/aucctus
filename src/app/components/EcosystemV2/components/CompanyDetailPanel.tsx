@@ -1,12 +1,12 @@
-import React from 'react';
-import { Company } from '../hooks/useEcosystem';
-import { Icon, Badge } from '@components';
-import ComponentTooltip from '../../ToolTip/ComponentTooltip';
-import type { IconProps } from '@components/Icon/Icon/Icon';
-import ComponentCarousel from '../../Carousel/ComponentCarousel';
-import { cn } from '@libs/utils/react';
 import images from '@assets/img';
+import { Badge, Icon } from '@components';
+import type { IconProps } from '@components/Icon/Icon/Icon';
+import { cn } from '@libs/utils/react';
 import { getLogoUrl } from '@libs/utils/source';
+import React from 'react';
+import ComponentCarousel from '../../Carousel/ComponentCarousel';
+import ComponentTooltip from '../../ToolTip/ComponentTooltip';
+import { Company } from '../hooks/useEcosystem';
 
 interface CompanyDetailPanelProps {
   company: Company | null;
@@ -391,12 +391,12 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
         </div>
 
         {/* Relevant Products */}
-        <div className='aucctus-border-primary rounded border p-6'>
-          <h3 className='text-foreground mb-4 text-sm font-semibold'>
-            Relevant Products
-          </h3>
+        {company.relevantProducts.length > 0 && (
+          <div className='aucctus-border-primary rounded border p-6'>
+            <h3 className='text-foreground mb-4 text-sm font-semibold'>
+              Relevant Products
+            </h3>
 
-          {company.relevantProducts.length > 0 ? (
             <ComponentCarousel
               cardWidth='280px'
               gap='16px'
@@ -476,12 +476,8 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                 </div>
               ))}
             </ComponentCarousel>
-          ) : (
-            <p className='aucctus-text-secondary text-sm'>
-              No products available
-            </p>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Possible Next Steps */}
         {company.nextSteps && company.nextSteps.length > 0 && (

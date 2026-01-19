@@ -304,6 +304,12 @@ export interface IEcosystemPrediction {
   sources: ISource[];
 }
 
+export type ProductSearchStatus =
+  | 'pending'
+  | 'in_progress'
+  | 'complete'
+  | 'error';
+
 export interface IEcosystemV2Response {
   needsUpgrade?: boolean;
   ecosystemData: IEcosystemCompany[];
@@ -314,4 +320,17 @@ export interface IEcosystemV2Response {
     directCompetitors: number;
   };
   futurePredictions: IEcosystemPrediction[];
+  productSearchStatus: ProductSearchStatus;
+}
+
+// WebSocket message for product search status updates
+export interface IEcosystemProductSearchMessage {
+  type: 'ecosystem.product_search.update';
+  conceptUuid: string;
+  accountUuid: string;
+  status: ProductSearchStatus;
+  totalCompanies?: number;
+  completedCompanies?: number;
+  productsFound?: number;
+  errorMessage?: string;
 }
