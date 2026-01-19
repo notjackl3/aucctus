@@ -10,21 +10,21 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Banner, ConceptReportSkeletons } from '@components';
-import api from '@libs/api';
 import {
-  PortfolioExecutiveSummary,
-  HighScoringConceptsCarousel,
-  PortfolioBalanceWidget,
-} from './components';
-import { HighScoringConcept, ConceptStage, HorizonData } from './types';
-import {
+  useBulkPrioritySocketEvents,
   useConceptPriorities,
   useGenerateBulkConceptPriorities,
-  useBulkPrioritySocketEvents,
 } from '@hooks/query/concept-priority.hook';
 import { useConcepts } from '@hooks/query/concepts.hook';
 import { useAutoInitScoringConfig } from '@hooks/query/scoringConfig.hook';
+import api from '@libs/api';
 import useStore from '@stores/store';
+import {
+  HighScoringConceptsCarousel,
+  PortfolioBalanceWidget,
+  PortfolioExecutiveSummary,
+} from './components';
+import { ConceptStage, HighScoringConcept, HorizonData } from './types';
 
 // Helper to map concept backend category to display stage
 const mapCategoryToStage = (category?: string): ConceptStage => {

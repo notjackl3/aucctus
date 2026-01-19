@@ -6,6 +6,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Aucctus is a React TypeScript frontend application for concept incubation and market analysis. It uses Vite for building, Zustand for state management, and Clerk for authentication.
 
+## Output Style (Quality Enforcement)
+
+For enforced type checking and linting workflows, use the frontend output style:
+
+**Frontend Development Mode** (`/output-style frontend-dev`):
+- Enforces `npm run type-check` after code changes
+- Requires `npm run lint` to pass
+- Mandates iterative fixing until all checks pass
+- Emphasizes Framer Motion animations and Radix UI usage
+- Makes validation a core part of the development workflow
+
+**How to activate:**
+```bash
+/output-style frontend-dev
+```
+
+This modifies Claude's system prompt to make type checking and linting non-negotiable. When active, Claude will automatically run validation checks and fix errors until all checks pass.
+
+**Related Skill:**
+- `/frontend-dev` - Frontend development skill (recommends frontend-dev output style)
+
 ## Development Commands
 
 ```bash
@@ -123,6 +144,74 @@ import { toast } from '@components';
 
 ### Skeleton Loading
 Use `SkeletonBlock` from `@components` and follow patterns in `.cursor/rules/skeleton-components.mdc`.
+
+## Animation & UI Libraries
+
+### Framer Motion (Micro-interactions)
+**Primary library for animations and micro-interactions.** Use for:
+- Entry/exit animations
+- Hover effects and gestures
+- Layout animations
+- Stagger effects for lists
+
+```tsx
+import { motion } from 'framer-motion';
+
+// Entry animation
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3 }}
+>
+  Content
+</motion.div>
+
+// Hover effect
+<motion.button
+  whileHover={{ scale: 1.05 }}
+  whileTap={{ scale: 0.95 }}
+>
+  Click me
+</motion.button>
+
+// Staggered list
+{items.map((item, index) => (
+  <motion.div
+    key={item.id}
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.3, delay: index * 0.1 }}
+  >
+    {item.content}
+  </motion.div>
+))}
+```
+
+### Radix UI (Accessible Primitives)
+**Comprehensive collection of unstyled, accessible UI primitives.** Available components:
+- `@radix-ui/react-dialog` - Modal dialogs
+- `@radix-ui/react-dropdown-menu` - Dropdown menus
+- `@radix-ui/react-popover` - Popovers
+- `@radix-ui/react-tooltip` - Tooltips
+- `@radix-ui/react-accordion` - Accordions
+- `@radix-ui/react-tabs` - Tab navigation
+- `@radix-ui/react-select` - Select inputs
+- `@radix-ui/react-checkbox` - Checkboxes
+- `@radix-ui/react-switch` - Toggle switches
+- `@radix-ui/react-slider` - Range sliders
+- `@radix-ui/react-progress` - Progress bars
+- `@radix-ui/react-toast` - Toast notifications
+- `@radix-ui/react-toggle` - Toggle buttons
+- `@radix-ui/react-toggle-group` - Toggle button groups
+- `@radix-ui/react-separator` - Dividers
+- `@radix-ui/react-navigation-menu` - Navigation menus
+- `@radix-ui/react-context-menu` - Context menus
+- `@radix-ui/react-hover-card` - Hover cards
+- `@radix-ui/react-label` - Form labels
+- `@radix-ui/react-alert-dialog` - Alert dialogs
+- `@radix-ui/react-aspect-ratio` - Aspect ratio containers
+
+Use Radix primitives for accessible, keyboard-friendly components, then style with Aucctus theme classes.
 
 ## Feature Flags
 Defined in `vite.config.mts` and `.env`:

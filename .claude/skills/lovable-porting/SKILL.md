@@ -36,7 +36,40 @@ import { toast } from 'sonner';
 
 // INTERNAL
 import { Icon, toast, SectionHeader } from '@components';
+import { motion } from 'framer-motion';  // For micro-interactions
 ```
+
+## Animation & Interaction Libraries
+
+**Framer Motion** is the primary animation library for micro-interactions:
+- Entry/exit animations
+- Hover effects and gestures
+- Layout animations
+- Stagger effects for lists
+
+```tsx
+import { motion } from 'framer-motion';
+
+<motion.div
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  transition={{ duration: 0.3 }}
+  whileHover={{ scale: 1.02 }}
+>
+  Content
+</motion.div>
+```
+
+**Radix UI** provides accessible, unstyled primitives:
+- `@radix-ui/react-dialog` - Modals
+- `@radix-ui/react-dropdown-menu` - Dropdowns
+- `@radix-ui/react-popover` - Popovers
+- `@radix-ui/react-tooltip` - Tooltips
+- `@radix-ui/react-tabs` - Tabs
+- `@radix-ui/react-accordion` - Accordions
+- And 10+ more components
+
+When porting shadcn components, prefer Radix UI primitives over custom implementations.
 
 ## Component Mapping
 

@@ -2,9 +2,7 @@
  * Score Breakdown Sheet component - displays detailed priority score breakdown in a sidebar.
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
-import { createPortal } from 'react-dom';
-import { useNavigate } from 'react-router-dom';
+import images from '@assets/img';
 import { Icon } from '@components';
 import {
   useConceptPriorityDetail,
@@ -14,7 +12,9 @@ import { useConceptOverview } from '@hooks/query/concepts.hook';
 import { ICategoryScore } from '@libs/api/types/accounts/scoring-config';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
-import images from '@assets/img';
+import React, { useCallback, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useNavigate } from 'react-router-dom';
 
 interface ScoreBreakdownSheetProps {
   isOpen: boolean;

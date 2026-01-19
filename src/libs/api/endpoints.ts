@@ -11,6 +11,7 @@ export class Endpoints {
   static allUsers = '/api/v1/user/list';
 
   static articlePublishedDate = '/article-published-date';
+  static logoSearch = '/logo-search';
 
   static account = `/api/v1/account`;
   static dashboard = `/api/v1/dashboard`;
@@ -912,6 +913,69 @@ export class Endpoints {
 
   static ideaSubmissionsProcessStatus(taskId: string) {
     return `/api/v1/idea-submissions/process/${taskId}/status`;
+  }
+
+  // Idea Submissions - Compare Endpoint
+  static ideaSubmissionsCompare = '/api/v1/idea-submissions/compare';
+
+  // Idea Submissions - Save to Bank Endpoint
+  static ideaSubmissionsSaveToBank(submissionUuid: string) {
+    return `/api/v1/idea-submissions/${submissionUuid}/save-to-bank`;
+  }
+
+  // Idea Submissions - Update Question Score Endpoint
+  static ideaSubmissionsUpdateQuestionScore(submissionUuid: string) {
+    return `/api/v1/idea-submissions/${submissionUuid}/question-score`;
+  }
+
+  // ============================================
+  // Submission Link Endpoints (Auth Required)
+  // ============================================
+  static submissionLinks = '/api/v1/submission-links';
+
+  static submissionLinkDetail(linkUuid: string) {
+    return `/api/v1/submission-links/${linkUuid}`;
+  }
+
+  static submissionLinkSubmissions(linkUuid: string) {
+    return `/api/v1/submission-links/${linkUuid}/submissions`;
+  }
+
+  /**
+   * Get detailed submission with full score breakdown.
+   * @param linkUuid - The submission link UUID
+   * @param submissionUuid - The submission UUID
+   */
+  static submissionLinkSubmissionDetail(
+    linkUuid: string,
+    submissionUuid: string,
+  ) {
+    return `/api/v1/submission-links/${linkUuid}/submissions/${submissionUuid}/details`;
+  }
+
+  // ============================================
+  // Public Submission Link Endpoints (No Auth)
+  // ============================================
+
+  /**
+   * Get public info for a submission link.
+   * @param accountSlug - The account's namespace/slug
+   * @param linkSlug - The submission link's slug
+   */
+  static ideaSubmissionsPublicLinkInfo(accountSlug: string, linkSlug: string) {
+    return `/api/idea-submissions/${accountSlug}/${linkSlug}/info`;
+  }
+
+  /**
+   * Submit an idea via a submission link.
+   * @param accountSlug - The account's namespace/slug
+   * @param linkSlug - The submission link's slug
+   */
+  static ideaSubmissionsPublicLinkSubmit(
+    accountSlug: string,
+    linkSlug: string,
+  ) {
+    return `/api/idea-submissions/${accountSlug}/${linkSlug}/submit`;
   }
 }
 

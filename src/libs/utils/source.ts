@@ -2,6 +2,8 @@
  * Utility functions for source-related operations
  */
 
+import api from '@libs/api';
+
 /**
  * Generates a Logo.dev URL for a given domain
  * @param domain - The domain to get the logo for (e.g., 'stripe.com')
@@ -10,6 +12,30 @@
 export const getLogoUrl = (domain: string): string => {
   const token = import.meta.env.VITE_LOGO_DEV_TOKEN;
   return `https://img.logo.dev/${domain}?token=${token}`;
+};
+
+/**
+ * Searches for a company logo using Logo.dev search API via backend proxy.
+ * The backend handles the secret key authentication to avoid CORS issues.
+ * @param companyName - The company name to search for (e.g., 'Schreiber')
+ * @returns Promise with the logo URL from the first search result, or null if not found
+ */
+export const searchCompanyLogo = async (
+  companyName: string,
+): Promise<string | null> => {
+  try {
+    const response = await api.article.searchCompanyLogo(companyName);
+
+    // Get the first result's logoUrl (Django Ninja converts snake_case to camelCase)
+    if (response?.results?.length > 0 && response.results[0].logoUrl) {
+      return response.results[0].logoUrl;
+    }
+
+    return null;
+  } catch {
+    // Silently fail - logo is optional
+    return null;
+  }
 };
 
 /**

@@ -1,14 +1,19 @@
 import { Loading } from '@components';
+import { useDebugModeListener } from '@hooks/debug-mode.hook';
 import Page from '@pages';
-import AuthGuard from '@routes/guards/auth.guard';
 import AccessGuard from '@routes/guards/access.guard';
+import AuthGuard from '@routes/guards/auth.guard';
 import { usePrivateRoutes, usePublicRoutes } from '@routes/hooks';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
 import React, { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
-import { useDebugModeListener } from '@hooks/debug-mode.hook';
+
+// Lazy load the public submission form (completely unauthenticated)
+const SubmissionLinkPublicForm = React.lazy(
+  () => import('@pages/IdeaSubmissions/SubmissionLinkPublicForm'),
+);
 
 function App() {
   // Initialize global debug mode listener
@@ -84,6 +89,12 @@ function App() {
     <div role='main' className='App'>
       <Suspense fallback={<Loading />}>
         <Routes>
+          {/* Completely Public Routes - No Auth Required */}
+          <Route
+            path={AppPath.SubmissionLinkPublicForm}
+            element={<SubmissionLinkPublicForm />}
+          />
+
           {/* Protected Routes */}
           <Route element={<AuthGuard />}>
             <Route element={<AccessGuard />}>

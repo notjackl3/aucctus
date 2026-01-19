@@ -6,10 +6,10 @@
  * insights from bulk priority calculation.
  */
 
-import React, { useState, useMemo, useCallback } from 'react';
 import { Icon } from '@components';
-import { HorizonData } from '../types';
 import { PortfolioSummary } from '@hooks/query/concept-priority.hook';
+import React, { useCallback, useMemo, useState } from 'react';
+import { HorizonData } from '../types';
 import PortfolioInsightsFeed from './PortfolioInsightsFeed';
 
 interface PortfolioBalanceWidgetProps {

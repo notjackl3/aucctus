@@ -11,7 +11,7 @@
  * - "Generate scoring criteria" action on Account admin
  */
 
-import { ImportanceConfig, Importance } from './types';
+import { Importance, ImportanceConfig } from './types';
 
 /**
  * Visual configuration for importance levels in dropdowns and badges

@@ -6,33 +6,32 @@
  * settings, and unsaved changes tracking.
  */
 
-import React, {
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-  useEffect,
-} from 'react';
-import { useQueryClient } from 'react-query';
-import { Icon, ComponentTooltip } from '@components';
-import { cn } from '@libs/utils/react';
-import { toast } from '@components';
-import useStore from '@stores/store';
-import {
-  useScoringConfig,
-  useSaveScoringConfig,
-  useAutoInitScoringConfig,
-} from '@hooks/query/scoringConfig.hook';
-import { useConcepts } from '@hooks/query/concepts.hook';
+import { ComponentTooltip, Icon, toast } from '@components';
+import SaveScoringConfigModal from '@components/Modal/Nucleus/SaveScoringConfigModal';
+import { useModal } from '@context/ModalContextProvider';
 import { useBulkPrioritySocketEvents } from '@hooks/query/concept-priority.hook';
+import { useConcepts } from '@hooks/query/concepts.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
+import {
+  useAutoInitScoringConfig,
+  useSaveScoringConfig,
+  useScoringConfig,
+} from '@hooks/query/scoringConfig.hook';
 import {
   IScoringCategory,
   IScoringConfigSave,
   Importance,
 } from '@libs/api/types';
-import { useModal } from '@context/ModalContextProvider';
-import SaveScoringConfigModal from '@components/Modal/Nucleus/SaveScoringConfigModal';
+import { cn } from '@libs/utils/react';
+import useStore from '@stores/store';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { useQueryClient } from 'react-query';
 
 import { ScoringCategory, ScoringQuestion } from './types';
 

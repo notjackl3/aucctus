@@ -7,14 +7,14 @@
  * Uses concept overview data to display proper presigned image URLs.
  */
 
-import React, { useCallback, useRef, useMemo, useState } from 'react';
+import images from '@assets/img';
 import { ComponentCarousel, Icon } from '@components';
 import { ComponentCarouselRef } from '@components/Carousel/ComponentCarousel';
-import { HighScoringConcept, STAGE_STYLES, ConceptStage } from '../types';
 import ScoreBreakdownSheet from '@components/Tables/ConceptBank/ScoreBreakdownSheet';
 import { useConceptOverview } from '@hooks/query/concepts.hook';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { ConceptStage, HighScoringConcept, STAGE_STYLES } from '../types';
 import HighScoringConceptsCarouselSkeleton from './HighScoringConceptsCarouselSkeleton';
-import images from '@assets/img';
 
 interface HighScoringConceptsCarouselProps {
   concepts: HighScoringConcept[];

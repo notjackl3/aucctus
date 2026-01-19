@@ -117,4 +117,10 @@ export enum AucctusQueryKeys {
 
   /* Scoring Configuration */
   scoringConfig = 'scoringConfig',
+
+  /* Idea Submissions */
+  submissionLinks = 'submissionLinks',
+  submissionLink = 'submissionLink',
+  submissionLinkSubmissions = 'submissionLinkSubmissions',
+  submissionDetail = 'submissionDetail',
 }

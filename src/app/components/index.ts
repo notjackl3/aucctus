@@ -38,6 +38,9 @@ import * as ConceptReportSkeletons from './Skeleton/ConceptReport';
 // Nucleus Components
 export * from './Nucleus';
 
+// Scoring Components
+export * from './Scoring';
+
 // Concept Overview Components
 import ConceptOverview from './ConceptOverview';
 

@@ -2,6 +2,7 @@
  * React Query hooks for concept portfolio prioritization.
  */
 
+import { toast } from '@components';
 import api from '@libs/api';
 import { IConceptPriorityDetail } from '@libs/api/types/accounts/scoring-config';
 import {
@@ -15,7 +16,6 @@ import {
   IConceptPriorityErrorMessage,
   IPortfolioSummaryMessage,
 } from '@libs/api/types/socketMessages/inbound';
-import { toast } from '@components';
 import utils from '@libs/utils';
 import { useCallback, useEffect, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from 'react-query';

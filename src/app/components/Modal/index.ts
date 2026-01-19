@@ -26,6 +26,8 @@ import ProceedToPoc from './ProceedToPocModal/ProceedToPocModal';
 import RegenerateTestWarningModal from './RegenerateTestWarningModal';
 import PropertyDefinitionModal from './PropertyDefinitionModal/PropertyDefinitionModal';
 import IconPickerModal from './IconPickerModal/IconPickerModal';
+import SubmissionDetail from './SubmissionDetailModal/SubmissionDetailModal';
+import ImportConcepts from './ImportConceptsModal/ImportConceptsModal';
 
 const Modal = {
   Base,
@@ -54,6 +56,8 @@ const Modal = {
   RegenerateTestWarningModal,
   PropertyDefinitionModal,
   IconPickerModal,
+  SubmissionDetail,
+  ImportConcepts,
 };
 
 export default Modal;

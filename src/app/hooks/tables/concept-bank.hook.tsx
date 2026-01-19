@@ -1,17 +1,19 @@
 import { Badge, Button, ComponentTooltip, Table, Text } from '@components';
 import { toast } from '@components/Notification/toast';
-import { cn } from '@libs/utils/react';
+import PriorityCell from '@components/Tables/ConceptBank/PriorityCell';
+import { UnseenChangesTooltip } from '@components/ToolTip/UnseenChangesTooltip';
+import { useDebugMode } from '@hooks/debug-mode.hook';
+import { useConceptPriorities } from '@hooks/query/concept-priority.hook';
 import {
   doFullConceptInvalidation,
   useConceptReportGenerate,
   useConcepts,
   useRetryConceptReport,
 } from '@hooks/query/concepts.hook';
-import { useConceptPriorities } from '@hooks/query/concept-priority.hook';
 import { usePropertyDefinitions } from '@hooks/query/properties.hook';
-import PriorityCell from '@components/Tables/ConceptBank/PriorityCell';
-import { buildPropertyColumns } from '@hooks/tables/utils/buildPropertyColumns';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
+import { buildPropertyColumns } from '@hooks/tables/utils/buildPropertyColumns';
 import {
   ConceptReportStatus,
   ConceptSortString,
@@ -22,16 +24,19 @@ import {
   IUser,
   SortableConceptProperties,
 } from '@libs/api/types';
+import { IConceptWorkflowMessage } from '@libs/api/types/socketMessages/inbound';
+import telemetry from '@libs/telemetry';
 import utils from '@libs/utils';
 import { canOpenConceptWhilePending } from '@libs/utils/concepts';
+import { cn } from '@libs/utils/react';
 import {
   getTablePreferences,
   saveColumnOrder,
   saveFilters,
 } from '@libs/utils/table-preferences';
 import { AppPath } from '@routes/routes';
-import { useColumnVisibilityStore } from '@stores/table-columns.store';
 import useStore from '@stores/store';
+import { useColumnVisibilityStore } from '@stores/table-columns.store';
 import {
   ColumnDef,
   ColumnResizeMode,
@@ -45,11 +50,6 @@ import {
 import React, { useMemo } from 'react';
 import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
-import { UnseenChangesTooltip } from '@components/ToolTip/UnseenChangesTooltip';
-import { useDebugMode } from '@hooks/debug-mode.hook';
-import { useSocketEvent } from '@hooks/sockets/aucctus';
-import { IConceptWorkflowMessage } from '@libs/api/types/socketMessages/inbound';
-import telemetry from '@libs/telemetry';
 
 /**
  * Represents a single sort configuration

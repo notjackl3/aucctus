@@ -100,9 +100,9 @@ const Modal: FunctionComponent<IModalProps> = ({
           ref={contentRef}
           className={cn(
             'aucctus-bg-primary max-h-[90vh] overflow-y-auto',
-            position === 'center' && 'rounded-md',
-            position === 'right' && 'h-full rounded-l-md',
-            position === 'left' && 'h-full rounded-r-md',
+            position === 'center' && 'rounded-lg',
+            position === 'right' && 'h-full rounded-l-lg',
+            position === 'left' && 'h-full rounded-r-lg',
             modalClassName,
           )}
         >

@@ -13,6 +13,7 @@ export interface IAccount {
 
   uuid: string;
   name: string;
+  namespace: string | null;
   domain: string;
   goal: string;
   hasConcepts: boolean;

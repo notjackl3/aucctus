@@ -5,7 +5,6 @@
  * used in portfolio prioritization.
  */
 
-import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { toast } from '@components';
 import api from '@libs/api';
 import {
@@ -15,6 +14,7 @@ import {
   IScoringConfigSaveResponse,
 } from '@libs/api/types';
 import utils from '@libs/utils';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from './query-keys';
 
 /**

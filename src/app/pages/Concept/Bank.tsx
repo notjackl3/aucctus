@@ -1,7 +1,15 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { Badge, Header, Icon, Input, Table } from '@components';
+import { Badge, Header, Icon, Input, Modal, Table } from '@components';
 import CompactFilterRibbon from '@components/Tables/ConceptBank/CompactFilterRibbon';
+import { useModal } from '@context/ModalContextProvider';
+import { useAllUsers } from '@hooks/query/account.hook';
+import {
+  useBulkPrioritySocketEvents,
+  usePrioritySocketEvents,
+} from '@hooks/query/concept-priority.hook';
+import { useSubmissionLinks } from '@hooks/query/idea-submissions.hook';
+import { usePropertyDefinitions } from '@hooks/query/properties.hook';
 import {
   IConceptFilterOptions,
   useConceptBank,
@@ -10,12 +18,6 @@ import {
   ISeedFilterOptions,
   useSeedsBank,
 } from '@hooks/tables/concept-seed.hook';
-import { usePropertyDefinitions } from '@hooks/query/properties.hook';
-import { useAllUsers } from '@hooks/query/account.hook';
-import {
-  usePrioritySocketEvents,
-  useBulkPrioritySocketEvents,
-} from '@hooks/query/concept-priority.hook';
 import { ConceptStatus, IPropertyFilter } from '@libs/api/types';
 import {
   ACTIVE_CONCEPT_STATUS_LIST,
@@ -27,7 +29,9 @@ import { toCamelCase } from '@libs/utils/string';
 import { AppPath } from '@routes/routes';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import useStore from '@stores/store';
-import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Check, ChevronDown, Link2, Upload } from 'lucide-react';
+import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -69,6 +73,7 @@ const areFilterOptionsSet = (
 const ConceptBank: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { openModal } = useModal();
   const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
 
   // Listen for priority calculation WebSocket events
@@ -87,9 +92,36 @@ const ConceptBank: React.FC = () => {
   // Fetch all users for natural language filter conversion
   const { users: allUsers } = useAllUsers();
 
+  // Get linkUuid from URL params for submissions route
+  const { linkUuid } = useParams<{ linkUuid?: string }>();
+
   // Determine current route for tab highlighting
   const isDraftsRoute = location.pathname.includes('/drafts');
   const isPortfolioRoute = location.pathname.includes('/portfolio');
+  const isSubmissionsRoute = location.pathname.includes('/submissions');
+
+  // Fetch submission links for the source filter dropdown (only on submissions route)
+  const { submissionLinks } = useSubmissionLinks();
+
+  // Source filter dropdown state
+  const [isSourceFilterOpen, setIsSourceFilterOpen] = React.useState(false);
+
+  // Get current selected link for display
+  const selectedLink = React.useMemo(() => {
+    if (!isSubmissionsRoute || !linkUuid) return null;
+    return submissionLinks.find((l) => l.uuid === linkUuid) || null;
+  }, [isSubmissionsRoute, linkUuid, submissionLinks]);
+
+  // Handle source link change
+  const handleSourceChange = useCallback(
+    (newLinkUuid: string) => {
+      setIsSourceFilterOpen(false);
+      navigate(
+        AppPath.ConceptBankSubmissionDetail.replace(':linkUuid', newLinkUuid),
+      );
+    },
+    [navigate],
+  );
 
   // Initialize both hooks to manage both concept and seed data
   const {
@@ -122,6 +154,18 @@ const ConceptBank: React.FC = () => {
     setIsNewSeed(true);
     navigate(AppPath.IncubateConcept);
   }, [resetQuestionnaire, navigate, setIsNewSeed]);
+
+  const handleOpenImportModal = useCallback(() => {
+    openModal(
+      Modal.ImportConcepts,
+      {},
+      {
+        position: 'center',
+        shouldCloseOnOverlayClick: true,
+        shouldCloseOnEscape: true,
+      },
+    );
+  }, [openModal]);
 
   const handleTabChange = useCallback(
     (tabPath: string) => {
@@ -353,18 +397,27 @@ const ConceptBank: React.FC = () => {
       {/* Header */}
       <div className='mb-4 flex flex-row items-start justify-between self-stretch'>
         <Header.One text='Concepts' />
-        <button
-          className={cn('btn btn-bold btn-primary')}
-          onClick={handleAddConcept}
-        >
-          <Icon
-            variant='rocket'
-            height={20}
-            width={20}
-            className='stroke-primary-100'
-          />
-          Add Concept
-        </button>
+        <div className='flex items-center gap-2'>
+          <button
+            className='btn btn-secondary flex h-10 w-10 items-center justify-center p-0'
+            onClick={handleOpenImportModal}
+            title='Import concepts'
+          >
+            <Upload className='h-4 w-4' />
+          </button>
+          <button
+            className={cn('btn btn-bold btn-primary')}
+            onClick={handleAddConcept}
+          >
+            <Icon
+              variant='rocket'
+              height={20}
+              width={20}
+              className='stroke-primary-100'
+            />
+            Add Concept
+          </button>
+        </div>
       </div>
 
       <div className='flex h-full w-full flex-col gap-3'>
@@ -393,13 +446,31 @@ const ConceptBank: React.FC = () => {
             </button>
             <button
               className={cn('btn', {
-                'btn-outlined': !isDraftsRoute && !isPortfolioRoute,
+                'btn-outlined':
+                  !isDraftsRoute && !isPortfolioRoute && !isSubmissionsRoute,
                 'btn-no-border aucctus-text-tertiary':
-                  isDraftsRoute || isPortfolioRoute,
+                  isDraftsRoute || isPortfolioRoute || isSubmissionsRoute,
               })}
               onClick={() => handleTabChange(AppPath.ConceptBank)}
             >
               Concepts
+            </button>
+            <button
+              className={cn('btn', {
+                'btn-outlined': isSubmissionsRoute,
+                'btn-no-border aucctus-text-tertiary': !isSubmissionsRoute,
+              })}
+              onClick={() => handleTabChange(AppPath.ConceptBankSubmissions)}
+            >
+              <Upload
+                height={16}
+                width={16}
+                className={cn({
+                  'aucctus-stroke-primary': isSubmissionsRoute,
+                  'aucctus-stroke-tertiary': !isSubmissionsRoute,
+                })}
+              />
+              Submissions
             </button>
             <button
               className={cn('btn', {
@@ -412,8 +483,98 @@ const ConceptBank: React.FC = () => {
             </button>
           </div>
 
-          {/* Search and filter controls moved from child components - hidden on Portfolio tab */}
-          {!isPortfolioRoute && (
+          {/* Source Filter - Only on Submissions tab (right aligned) */}
+          {isSubmissionsRoute && selectedLink && (
+            <div className='relative'>
+              <button
+                onClick={() => setIsSourceFilterOpen(!isSourceFilterOpen)}
+                className='aucctus-border-secondary hover:aucctus-bg-secondary flex items-center gap-2 rounded-lg border px-3 py-1.5 transition-colors'
+              >
+                <Link2 className='aucctus-stroke-tertiary h-3.5 w-3.5' />
+                <span className='aucctus-text-sm aucctus-text-secondary'>
+                  Source
+                </span>
+                <span className='aucctus-text-sm-medium aucctus-text-primary'>
+                  {selectedLink.title}
+                </span>
+                <ChevronDown
+                  className={cn(
+                    'aucctus-stroke-tertiary h-3.5 w-3.5 transition-transform',
+                    isSourceFilterOpen && 'rotate-180',
+                  )}
+                />
+              </button>
+
+              <AnimatePresence>
+                {isSourceFilterOpen && (
+                  <>
+                    {/* Backdrop to close dropdown */}
+                    <div
+                      className='fixed inset-0 z-10'
+                      onClick={() => setIsSourceFilterOpen(false)}
+                    />
+                    <motion.div
+                      initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                      transition={{ duration: 0.15, ease: 'easeOut' }}
+                      className='aucctus-bg-primary aucctus-border-secondary absolute right-0 top-full z-20 mt-1 min-w-[280px] rounded-lg border shadow-lg'
+                    >
+                      <div className='p-2'>
+                        <div className='aucctus-text-xs aucctus-text-tertiary mb-2 px-2'>
+                          Select source
+                        </div>
+                        {submissionLinks.map((link) => (
+                          <button
+                            key={link.uuid}
+                            onClick={() => handleSourceChange(link.uuid)}
+                            className={cn(
+                              'flex w-full items-center justify-between rounded-md px-3 py-2 text-left transition-colors',
+                              link.uuid === linkUuid
+                                ? 'aucctus-bg-brand-secondary'
+                                : 'hover:aucctus-bg-secondary',
+                            )}
+                          >
+                            <div className='flex items-center gap-2'>
+                              <span
+                                className={cn(
+                                  'h-2 w-2 rounded-full',
+                                  link.isActive
+                                    ? 'bg-green-500'
+                                    : 'bg-gray-400',
+                                )}
+                              />
+                              <span
+                                className={cn(
+                                  'aucctus-text-sm',
+                                  link.uuid === linkUuid
+                                    ? 'aucctus-text-brand-primary font-medium'
+                                    : 'aucctus-text-secondary',
+                                )}
+                              >
+                                {link.title}
+                              </span>
+                            </div>
+                            <div className='flex items-center gap-2'>
+                              <span className='aucctus-text-xs aucctus-text-tertiary'>
+                                {link.submissionCount} ideas
+                              </span>
+                              {link.uuid === linkUuid && (
+                                <Check className='h-4 w-4 text-green-500' />
+                              )}
+                            </div>
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
+
+          {/* Search and filter controls moved from child components - hidden on Portfolio and Submissions tabs */}
+          {!isPortfolioRoute && !isSubmissionsRoute && (
             <div className='flex items-center gap-3'>
               {/* Property management and column visibility (only show for concepts, not drafts) */}
               {!isDraftsRoute && (
@@ -548,8 +709,8 @@ const ConceptBank: React.FC = () => {
           )}
         </div>
 
-        {/* Filter ribbons row - only shows when filters/sorts are active (hidden on Portfolio) */}
-        {!isPortfolioRoute && filterHeaderSection && (
+        {/* Filter ribbons row - only shows when filters/sorts are active (hidden on Portfolio and Submissions) */}
+        {!isPortfolioRoute && !isSubmissionsRoute && filterHeaderSection && (
           <div className='w-full overflow-hidden'>
             <div className='flex flex-wrap items-center gap-2'>
               {filterHeaderSection}

@@ -2,21 +2,30 @@ import api from '@libs/api';
 import { useQuery } from 'react-query';
 import { AucctusQueryKeys } from './query-keys';
 import { ISource } from '@libs/api/types';
+import { getLogoUrl } from '@libs/utils/source';
 
 const getBaseUrl = (url: string): string => {
   try {
     const urlObject = new URL(url);
     return urlObject.hostname.replace(/^www\./, '');
-  } catch (e) {
+  } catch {
     return url;
   }
 };
 
 /**
+ * Company info result from Logo.dev
+ */
+interface CompanyInfo {
+  name: string;
+  domain: string;
+  logo: string;
+}
+
+/**
  * Hook to fetch company information (name, logo, etc.) from domain.
- * Currently uses Clearbit Autocomplete API which may be deprecated.
- * TODO: Migrate to Logo.dev Brand Search API when available.
- * @see https://docs.logo.dev/brand-search/overview
+ * Uses Logo.dev image endpoint directly with the publishable key (client-safe).
+ * @see https://docs.logo.dev
  */
 export const useCompanyInfo = (url: string) => {
   const baseUrl = getBaseUrl(url);
@@ -29,20 +38,16 @@ export const useCompanyInfo = (url: string) => {
     staleTime: Infinity,
     cacheTime: Infinity,
     enabled: hasValidUrl,
-    queryFn: async () => {
-      try {
-        const response = await fetch(
-          `https://autocomplete.clearbit.com/v1/companies/suggest?query=${baseUrl}`,
-        );
-        if (!response.ok) {
-          // API failed, return empty array instead of throwing
-          return [];
-        }
-        return response.json();
-      } catch (error) {
-        // Network error or other failure, return empty array
-        return [];
-      }
+    queryFn: async (): Promise<CompanyInfo[]> => {
+      // Use Logo.dev image endpoint directly with domain
+      // The publishable key is safe to use client-side
+      return [
+        {
+          name: baseUrl,
+          domain: baseUrl,
+          logo: getLogoUrl(baseUrl),
+        },
+      ];
     },
   });
 

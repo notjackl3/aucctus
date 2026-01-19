@@ -98,6 +98,8 @@ Apply fixes using the Aucctus theme system. See [AUCCTUS-THEME.md](AUCCTUS-THEME
 
 **Key principles:**
 - Use Aucctus theme classes (`aucctus-*`) as primary styling
+- Add micro-interactions with Framer Motion for polish
+- Leverage Radix UI primitives for accessible components
 - Supplement with Tailwind utilities where needed
 - Use `-hover` suffix directly (NOT `hover:` prefix)
 - Use `cn()` utility for conditional classes

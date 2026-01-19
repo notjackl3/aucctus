@@ -1,7 +1,7 @@
-import React, { useState, useCallback } from 'react';
-import { useModal } from '@context/ModalContextProvider';
 import { Icon } from '@components';
+import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
+import React, { useCallback, useState } from 'react';
 
 type SaveOption = 'new_only' | 'rescore_all';
 
@@ -94,11 +94,12 @@ const SaveScoringConfigModal: React.FC<SaveScoringConfigModalProps> = ({
                     : 'aucctus-text-primary',
                 )}
               >
-                Apply to new concepts only
+                Apply to new concepts and idea submissions only
               </h3>
               <p className='aucctus-text-sm aucctus-text-secondary mt-1'>
-                Existing concept scores will remain unchanged. New concepts will
-                use the updated criteria.
+                Existing concept and idea submission scores will remain
+                unchanged. New concepts and idea submissions will use the
+                updated criteria.
               </p>
             </div>
           </div>
@@ -144,11 +145,11 @@ const SaveScoringConfigModal: React.FC<SaveScoringConfigModalProps> = ({
                     : 'aucctus-text-primary',
                 )}
               >
-                Re-score all concepts
+                Re-score all concepts and idea submissions
               </h3>
               <p className='aucctus-text-sm aucctus-text-secondary mt-1'>
-                All existing concepts will be re-evaluated using the new scoring
-                criteria.
+                All existing concepts and idea submissions will be re-evaluated
+                using the new scoring criteria.
               </p>
             </div>
           </div>

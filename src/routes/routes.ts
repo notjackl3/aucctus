@@ -22,6 +22,8 @@ export enum AppPath {
   ConceptBank = '/concept',
   ConceptBankPortfolio = '/concept/portfolio',
   ConceptBankDrafts = '/concept/drafts',
+  ConceptBankSubmissions = '/concept/submissions',
+  ConceptBankSubmissionDetail = '/concept/submissions/:linkUuid',
   ConceptOverview = '/concept/:id/',
   ConceptCustomerProfile = `/concept/:id/${ConceptPath.CustomerProfile}`,
   ConceptFinancialProjection = `/concept/:id/${ConceptPath.FinancialProjection}`,
@@ -50,7 +52,9 @@ export enum AppPath {
 
   /* Idea Submissions */
   IdeaSubmissionsAdmin = '/idea-submissions',
-  IdeaSubmissionsPublicForm = '/submit-idea/:accountUuid',
+  SubmissionLinks = '/submission-links',
+  SubmissionLinkDetail = '/submission-links/:linkUuid',
+  SubmissionLinkPublicForm = '/submit/:accountSlug/:linkSlug',
 
   /* Settings */
   Settings = '/settings',
@@ -77,4 +81,5 @@ export const UNAUTH_ROUTES = [
   AppPath.ConfirmEmail,
   AppPath.ForgotPassword,
   AppPath.ResetPassword,
+  AppPath.SubmissionLinkPublicForm,
 ];

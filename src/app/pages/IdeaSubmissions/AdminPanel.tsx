@@ -35,16 +35,23 @@ import { toast } from '@components';
 import { cn } from '@libs/utils/react';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 
-// Status options for filtering and updating
+// Status options for filtering and updating (updated to match new backend schema)
 const statusOptions: IdeaSubmissionStatus[] = [
-  'pending',
-  'reviewed',
-  'archived',
+  'to_review',
+  'approved',
+  'rejected',
 ];
 const filterOptions: Array<'all' | IdeaSubmissionStatus> = [
   'all',
   ...statusOptions,
 ];
+
+// Status display labels for UI
+const STATUS_LABELS: Record<IdeaSubmissionStatus, string> = {
+  to_review: 'To Review',
+  approved: 'Approved',
+  rejected: 'Rejected',
+};
 
 /**
  * Admin Panel for Idea Submissions
@@ -425,11 +432,11 @@ const AdminPanel: FunctionComponent = () => {
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border px-4 py-3 text-center'>
             <div className='aucctus-text-2xl-bold aucctus-text-warning-primary'>
               {submissions?.filter(
-                (s: IIdeaSubmission) => s.status === 'pending',
+                (s: IIdeaSubmission) => s.status === 'to_review',
               ).length || 0}
             </div>
             <div className='aucctus-text-xs aucctus-text-tertiary uppercase tracking-wide'>
-              Pending
+              To Review
             </div>
           </div>
         </div>
@@ -503,12 +510,12 @@ const AdminPanel: FunctionComponent = () => {
                   )}
                 >
                   {status === 'all' && <Filter className='h-4 w-4' />}
-                  {status === 'pending' && <Clock className='h-4 w-4' />}
-                  {status === 'reviewed' && (
+                  {status === 'to_review' && <Clock className='h-4 w-4' />}
+                  {status === 'approved' && (
                     <CheckCircle2 className='h-4 w-4' />
                   )}
-                  {status === 'archived' && <Archive className='h-4 w-4' />}
-                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {status === 'rejected' && <Archive className='h-4 w-4' />}
+                  {status === 'all' ? 'All' : STATUS_LABELS[status]}
                   <span
                     className={cn(
                       'aucctus-text-xs-semibold rounded-full border px-2 py-0.5',
@@ -808,8 +815,10 @@ const AdminPanel: FunctionComponent = () => {
                         )}
                       </button>
                       <span className='aucctus-text-xs-semibold aucctus-bg-secondary aucctus-text-secondary rounded-full px-3 py-1'>
-                        {CATEGORY_LABELS[submission.category] ||
-                          submission.category}
+                        {submission.category
+                          ? CATEGORY_LABELS[submission.category] ||
+                            submission.category
+                          : 'Uncategorized'}
                       </span>
                     </div>
                     {getStatusBadge(submission.status)}
@@ -900,8 +909,10 @@ const AdminPanel: FunctionComponent = () => {
                   <div>
                     <div className='mb-2 flex items-center gap-2'>
                       <span className='aucctus-text-xs-semibold aucctus-bg-brand-secondary aucctus-text-brand-primary aucctus-border-brand rounded-full border px-3 py-1'>
-                        {CATEGORY_LABELS[selectedSubmission.category] ||
-                          selectedSubmission.category}
+                        {selectedSubmission.category
+                          ? CATEGORY_LABELS[selectedSubmission.category] ||
+                            selectedSubmission.category
+                          : 'Uncategorized'}
                       </span>
                       {getStatusBadge(selectedSubmission.status)}
                     </div>
@@ -1028,7 +1039,7 @@ const AdminPanel: FunctionComponent = () => {
                           },
                         )}
                       >
-                        {status === 'pending' && (
+                        {status === 'to_review' && (
                           <Clock
                             className={cn('h-4 w-4', {
                               'aucctus-stroke-brand-primary': isActive,
@@ -1036,7 +1047,7 @@ const AdminPanel: FunctionComponent = () => {
                             })}
                           />
                         )}
-                        {status === 'reviewed' && (
+                        {status === 'approved' && (
                           <CheckCircle2
                             className={cn('h-4 w-4', {
                               'aucctus-stroke-brand-primary': isActive,
@@ -1044,7 +1055,7 @@ const AdminPanel: FunctionComponent = () => {
                             })}
                           />
                         )}
-                        {status === 'archived' && (
+                        {status === 'rejected' && (
                           <Archive
                             className={cn('h-4 w-4', {
                               'aucctus-stroke-brand-primary': isActive,
@@ -1052,7 +1063,7 @@ const AdminPanel: FunctionComponent = () => {
                             })}
                           />
                         )}
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                        {STATUS_LABELS[status]}
                       </button>
                     );
                   })}
