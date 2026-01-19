@@ -86,14 +86,12 @@ const PortfolioTab: React.FC = () => {
     useBulkPrioritySocketEvents();
 
   // Check if we should show the banner
-  // Only count concepts that are complete (reportStatusAggregate === 'complete') and don't have priorities
+  // Count all concepts without priorities (including incomplete ones - they will receive low scores)
   const conceptsWithoutPrioritiesCount = useMemo(() => {
     if (!allConceptsData?.results) return 0;
     const priorityUuids = new Set(priorities?.map((p) => p.conceptUuid) || []);
-    return allConceptsData.results.filter(
-      (c) =>
-        c.reportStatusAggregate === 'complete' && !priorityUuids.has(c.uuid),
-    ).length;
+    return allConceptsData.results.filter((c) => !priorityUuids.has(c.uuid))
+      .length;
   }, [allConceptsData?.results, priorities]);
 
   // Track loading state for fetching concepts before bulk calculation
@@ -117,13 +115,9 @@ const PortfolioTab: React.FC = () => {
         priorities?.map((p) => p.conceptUuid) || [],
       );
 
-      // Filter to only complete concepts without priorities
+      // Filter to all concepts without priorities (including incomplete - they will receive low scores)
       const conceptUuidsToCalculate = allConcepts.results
-        .filter(
-          (c) =>
-            c.reportStatusAggregate === 'complete' &&
-            !priorityUuids.has(c.uuid),
-        )
+        .filter((c) => !priorityUuids.has(c.uuid))
         .map((c) => c.uuid);
 
       if (conceptUuidsToCalculate.length > 0) {

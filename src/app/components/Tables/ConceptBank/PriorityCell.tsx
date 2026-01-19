@@ -4,7 +4,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
-import { Icon, ComponentTooltip } from '@components';
+import { Icon } from '@components';
 import {
   IConceptPrioritySummary,
   getPriorityLevel,
@@ -23,7 +23,6 @@ interface PriorityCellProps {
   conceptDescription?: string;
   conceptImage?: string;
   prioritySummary?: IConceptPrioritySummary | null;
-  /** Whether the concept report is fully generated (report_status_aggregate === 'complete') */
   isConceptComplete?: boolean;
 }
 
@@ -91,6 +90,7 @@ export const PriorityCell: React.FC<PriorityCellProps> = ({
   conceptDescription,
   conceptImage,
   prioritySummary,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   isConceptComplete = false,
 }) => {
   const [showSheet, setShowSheet] = useState(false);
@@ -137,41 +137,8 @@ export const PriorityCell: React.FC<PriorityCellProps> = ({
   // Effective priority: prefer cached data (more up-to-date from WebSocket) over prop
   const effectivePriority = cachedPriorityData || prioritySummary;
 
-  // If no priority and not calculating, show Calculate button or disabled state
+  // If no priority and not calculating, show Calculate button
   if (!effectivePriority && !isCalculating) {
-    // If concept is not fully generated, show disabled state with tooltip
-    if (!isConceptComplete) {
-      return (
-        <div className='inline-flex'>
-          <ComponentTooltip
-            tip={
-              <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border px-3 py-2 shadow-lg'>
-                <span className='aucctus-text-xs aucctus-text-primary whitespace-nowrap'>
-                  Generate report first
-                </span>
-              </div>
-            }
-            preferredPosition='above'
-          >
-            <button
-              className='btn btn-outlined btn-sm cursor-not-allowed opacity-50'
-              disabled
-              onClick={(e) => e.stopPropagation()}
-            >
-              <Icon
-                variant='sparkles'
-                height={12}
-                width={12}
-                className='stroke-gray-400'
-              />
-              <span className='aucctus-text-xs text-gray-400'>Calculate</span>
-            </button>
-          </ComponentTooltip>
-        </div>
-      );
-    }
-
-    // Concept is complete, show normal Calculate button
     return (
       <button
         className={cn(
