@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
-import React, { useMemo } from 'react';
 import { IImpactSizingAssumptionEntryV2 } from '@libs/api/types/concept/financialProjectionV2';
+import React, { useMemo } from 'react';
 import { formatCurrency } from '../../../../GenerateRevenue/tabs/MarketSizing/assumptionsUtils';
 import {
+  buildCalculationBreakdown,
   buildExpression,
   evaluateExpression,
-  buildCalculationBreakdown,
 } from '../../../../shared/expressionBuilder';
 
 export interface ResultsPanelProps {
@@ -24,7 +24,7 @@ export const ResultsPanel: React.FC<ResultsPanelProps> = ({
   resultsRef,
 }) => {
   const calculatedValue = useMemo(() => {
-    // Sort assumptions by order to ensure proper calculation sequence
+    // Sort assumptions by order to ensure proper calculation sequence!
     const sortedAssumptions = [...assumptions].sort(
       (a, b) => a.order - b.order,
     );
