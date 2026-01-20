@@ -36,6 +36,10 @@ import {
   ConceptReportStatus,
   ITestGenerationCompletedMessage,
   ITestGenerationErrorMessage,
+  IIdeaSubmissionsUploadStartedMessage,
+  IIdeaSubmissionsUploadProgressMessage,
+  IIdeaSubmissionsUploadCompletedMessage,
+  IIdeaSubmissionsUploadErrorMessage,
 } from '@libs/api/types';
 import { normalizeReportSectionKey } from '@libs/utils/concepts';
 
@@ -263,6 +267,14 @@ export interface IdeaPlaygroundHandler {
   onConceptsGenerated?: (message: any) => void;
 }
 
+// Idea Submissions Upload event handler types
+export interface IdeaSubmissionsUploadHandler {
+  onUploadStarted?: (message: IIdeaSubmissionsUploadStartedMessage) => void;
+  onUploadProgress?: (message: IIdeaSubmissionsUploadProgressMessage) => void;
+  onUploadCompleted?: (message: IIdeaSubmissionsUploadCompletedMessage) => void;
+  onUploadError?: (message: IIdeaSubmissionsUploadErrorMessage) => void;
+}
+
 // Universal socket event configuration
 export interface SocketEventConfig {
   // Concept workflow events
@@ -284,6 +296,8 @@ export interface SocketEventConfig {
   testGeneration?: TestGenerationHandler;
   // Idea Playground events
   ideaPlayground?: IdeaPlaygroundHandler;
+  // Idea Submissions Upload events
+  ideaSubmissionsUpload?: IdeaSubmissionsUploadHandler;
 
   // Add more event types here as needed
   // customerProfile?: CustomerProfileHandler;
@@ -1462,6 +1476,87 @@ export const useUniversalSocketEvents = (config: SocketEventConfig) => {
       handler(message);
     },
   );
+
+  // Register idea submissions upload started events
+  useSocketEvent<
+    'idea_submissions.upload.started.user',
+    IIdeaSubmissionsUploadStartedMessage
+  >('idea_submissions.upload.started.user', (message) => {
+    if (!config.ideaSubmissionsUpload) return;
+
+    const handler =
+      config.ideaSubmissionsUpload.onUploadStarted ||
+      (() => {
+        // Default: no-op, let page handle progress display
+      });
+    handler(message);
+  });
+
+  // Register idea submissions upload progress events
+  useSocketEvent<
+    'idea_submissions.upload.progress.user',
+    IIdeaSubmissionsUploadProgressMessage
+  >('idea_submissions.upload.progress.user', (message) => {
+    if (!config.ideaSubmissionsUpload) return;
+
+    const handler =
+      config.ideaSubmissionsUpload.onUploadProgress ||
+      (() => {
+        // Default: no-op, let page handle progress display
+      });
+    handler(message);
+  });
+
+  // Register idea submissions upload completed events
+  useSocketEvent<
+    'idea_submissions.upload.completed.user',
+    IIdeaSubmissionsUploadCompletedMessage
+  >('idea_submissions.upload.completed.user', (message) => {
+    if (!config.ideaSubmissionsUpload) return;
+
+    const messageKey = `idea-upload-completed-${message.sourceFileUuid}`;
+    if (preventDuplicate(messageKey)) return;
+
+    const handler =
+      config.ideaSubmissionsUpload.onUploadCompleted ||
+      ((msg: IIdeaSubmissionsUploadCompletedMessage) => {
+        // Invalidate submission queries
+        queryClient.invalidateQueries({
+          queryKey: ['submissionLinkSubmissions', msg.submissionLinkUuid],
+        });
+        queryClient.invalidateQueries({
+          queryKey: ['submissionLink', msg.submissionLinkUuid],
+        });
+        queryClient.invalidateQueries({ queryKey: ['submissionLinks'] });
+
+        toast.deferred.completed(
+          'File Upload Complete',
+          `Extracted ${msg.ideasExtracted} ideas from your file`,
+        );
+      });
+    handler(message);
+  });
+
+  // Register idea submissions upload error events
+  useSocketEvent<
+    'idea_submissions.upload.error.user',
+    IIdeaSubmissionsUploadErrorMessage
+  >('idea_submissions.upload.error.user', (message) => {
+    if (!config.ideaSubmissionsUpload) return;
+
+    const messageKey = `idea-upload-error-${message.sourceFileUuid}`;
+    if (preventDuplicate(messageKey)) return;
+
+    const handler =
+      config.ideaSubmissionsUpload.onUploadError ||
+      ((msg: IIdeaSubmissionsUploadErrorMessage) => {
+        toast.deferred.error(
+          'File Upload Failed',
+          msg.errorMessage || 'Please try uploading your file again',
+        );
+      });
+    handler(message);
+  });
 };
 
 /**
@@ -1486,6 +1581,9 @@ export const socketEventConfigs = {
       // Uses default handlers defined in the hook
     },
     ideaPlayground: {
+      // Uses default handlers defined in the hook
+    },
+    ideaSubmissionsUpload: {
       // Uses default handlers defined in the hook
     },
   }),

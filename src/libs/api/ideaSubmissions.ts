@@ -7,6 +7,7 @@ import {
   ICreateIdeaSubmission,
   ICreateIdeaSubmissionViaLink,
   ICreateSubmissionLink,
+  IFileUploadResponse,
   IIdeaSubmission,
   IIdeaSubmissionDetail,
   IProcessIdeasTaskResponse,
@@ -194,6 +195,23 @@ export class IdeaSubmissionsApi extends ApiService {
       question_uuid: questionUuid,
       score,
     });
+  }
+
+  /**
+   * Upload a file containing idea submissions.
+   * Supports CSV, XLSX, XLS, TSV, PDF, DOC, DOCX, and TXT files.
+   * @param file - The file to upload
+   * @param submissionLinkUuid - The UUID of the submission link to associate with
+   */
+  uploadFile(file: File, submissionLinkUuid: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('submission_link_uuid', submissionLinkUuid);
+
+    return this.postFormData<IFileUploadResponse>(
+      endpoints.ideaSubmissionsUpload,
+      formData,
+    );
   }
 
   // ============================================

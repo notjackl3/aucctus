@@ -37,10 +37,12 @@ import { Modal, toast } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
+import { useSocketEvent } from '@hooks/sockets/aucctus';
 import SubmissionLinkModal from './components/SubmissionLinkModal';
 import SubmissionCard from './components/SubmissionCard';
 import SubmissionsListView from './components/SubmissionsListView';
 import ComparisonModal from './components/ComparisonModal';
+import FileUploadProgressCard from './components/FileUploadProgressCard';
 // Note: SubmissionDetailDrawer is no longer used - we now use Modal.SubmissionDetail via openModal
 
 // Local storage key for view preference
@@ -103,10 +105,144 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
     string | null
   >(null);
 
+  // File upload progress state
+  const [uploadProgress, setUploadProgress] = useState<{
+    isActive: boolean;
+    sourceFileUuid: string | null;
+    filename: string | null;
+    stage: string;
+    message: string;
+    progress: number;
+    ideasExtracted: number | null;
+    error: string | null;
+  }>({
+    isActive: false,
+    sourceFileUuid: null,
+    filename: null,
+    stage: '',
+    message: '',
+    progress: 0,
+    ideasExtracted: null,
+    error: null,
+  });
+
   // Save view preference to localStorage
   useEffect(() => {
     localStorage.setItem(VIEW_PREFERENCE_KEY, viewMode);
   }, [viewMode]);
+
+  // Listen for upload started events scoped to this submission link
+  useSocketEvent<'idea_submissions.upload.started.user'>(
+    'idea_submissions.upload.started.user',
+    useCallback(
+      (data) => {
+        if (data.submissionLinkUuid === linkUuid) {
+          setUploadProgress({
+            isActive: true,
+            sourceFileUuid: data.sourceFileUuid,
+            filename: data.filename,
+            stage: 'started',
+            message: `Processing ${data.filename}...`,
+            progress: 5,
+            ideasExtracted: null,
+            error: null,
+          });
+        }
+      },
+      [linkUuid],
+    ),
+  );
+
+  // Listen for upload progress events
+  useSocketEvent<'idea_submissions.upload.progress.user'>(
+    'idea_submissions.upload.progress.user',
+    useCallback(
+      (data) => {
+        if (data.submissionLinkUuid === linkUuid) {
+          setUploadProgress((prev) => ({
+            ...prev,
+            stage: data.stage,
+            message: data.message,
+            progress: data.progress,
+          }));
+        }
+      },
+      [linkUuid],
+    ),
+  );
+
+  // Listen for upload completed events
+  useSocketEvent<'idea_submissions.upload.completed.user'>(
+    'idea_submissions.upload.completed.user',
+    useCallback(
+      (data) => {
+        if (data.submissionLinkUuid === linkUuid) {
+          // Show toast outside of state updater to avoid setState during render
+          toast.success(
+            `Uploaded ${data.ideasExtracted} idea${data.ideasExtracted !== 1 ? 's' : ''} successfully`,
+          );
+
+          setUploadProgress((prev) => ({
+            ...prev,
+            isActive: false,
+            stage: 'completed',
+            message: `Successfully extracted ${data.ideasExtracted} ideas!`,
+            progress: 100,
+            ideasExtracted: data.ideasExtracted,
+          }));
+
+          // Invalidate queries to refresh submission list
+          queryClient.invalidateQueries({
+            queryKey: ['submissionLinkSubmissions', linkUuid],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['submissionLink', linkUuid],
+          });
+
+          // Auto-dismiss after delay
+          setTimeout(() => {
+            setUploadProgress((prev) => ({
+              ...prev,
+              isActive: false,
+              stage: '',
+            }));
+          }, 5000);
+        }
+      },
+      [linkUuid, queryClient],
+    ),
+  );
+
+  // Listen for upload error events
+  useSocketEvent<'idea_submissions.upload.error.user'>(
+    'idea_submissions.upload.error.user',
+    useCallback(
+      (data) => {
+        if (data.submissionLinkUuid === linkUuid) {
+          setUploadProgress((prev) => ({
+            ...prev,
+            isActive: false,
+            stage: 'error',
+            message: data.errorMessage,
+            error: data.errorMessage,
+            progress: 0,
+          }));
+
+          toast.error(data.errorMessage || 'File upload failed');
+
+          // Auto-dismiss after delay
+          setTimeout(() => {
+            setUploadProgress((prev) => ({
+              ...prev,
+              isActive: false,
+              stage: '',
+            }));
+          }, 5000);
+        }
+      },
+      [linkUuid],
+    ),
+  );
 
   // Fetch submission link details
   const {
@@ -478,6 +614,20 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
           </div>
         </div>
       </motion.div>
+
+      {/* File Upload Progress Card */}
+      <FileUploadProgressCard
+        isVisible={
+          uploadProgress.isActive ||
+          uploadProgress.stage === 'completed' ||
+          uploadProgress.stage === 'error'
+        }
+        filename={uploadProgress.filename}
+        stage={uploadProgress.stage}
+        message={uploadProgress.message}
+        progress={uploadProgress.progress}
+        ideasExtracted={uploadProgress.ideasExtracted}
+      />
 
       {/* Stats Row */}
       <motion.div

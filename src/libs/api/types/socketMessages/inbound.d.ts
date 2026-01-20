@@ -776,6 +776,52 @@ export interface IIdeaSubmissionsProcessingErrorMessage
 }
 
 // ==========================================
+// Idea Submissions Upload Event Messages
+// ==========================================
+
+export interface IIdeaSubmissionsUploadStartedMessage extends BaseSocketEvent {
+  type: 'idea_submissions.upload.started.user';
+  accountUuid: string;
+  submissionLinkUuid: string;
+  sourceFileUuid: string;
+  taskId: string;
+  filename: string;
+  fileType: string;
+}
+
+export interface IIdeaSubmissionsUploadProgressMessage extends BaseSocketEvent {
+  type: 'idea_submissions.upload.progress.user';
+  accountUuid: string;
+  submissionLinkUuid: string;
+  sourceFileUuid: string;
+  taskId: string;
+  stage: string;
+  message: string;
+  progress: number; // 0-100
+}
+
+export interface IIdeaSubmissionsUploadCompletedMessage
+  extends BaseSocketEvent {
+  type: 'idea_submissions.upload.completed.user';
+  accountUuid: string;
+  submissionLinkUuid: string;
+  sourceFileUuid: string;
+  taskId: string;
+  ideasExtracted: number;
+  fileType: string; // 'tabular' or 'document'
+}
+
+export interface IIdeaSubmissionsUploadErrorMessage extends BaseSocketEvent {
+  type: 'idea_submissions.upload.error.user';
+  accountUuid: string;
+  submissionLinkUuid: string;
+  sourceFileUuid: string;
+  taskId: string;
+  errorMessage: string;
+  details?: string;
+}
+
+// ==========================================
 // Idea Playground Event Messages
 // ==========================================
 
@@ -1034,6 +1080,10 @@ export type InboundSocketEvent<C = {}> =
   | IIdeaSubmissionsProcessingStartedMessage
   | IIdeaSubmissionsProcessingCompletedMessage
   | IIdeaSubmissionsProcessingErrorMessage
+  | IIdeaSubmissionsUploadStartedMessage
+  | IIdeaSubmissionsUploadProgressMessage
+  | IIdeaSubmissionsUploadCompletedMessage
+  | IIdeaSubmissionsUploadErrorMessage
   | IEcosystemProductSearchUpdateMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

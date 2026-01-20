@@ -1,4 +1,10 @@
-import { Icon, toast, ScoringCriteriaSection, Loading } from '@components';
+import {
+  Icon,
+  toast,
+  ScoringCriteriaSection,
+  Loading,
+  Badge,
+} from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useSubmissionDetail } from '@hooks/query/idea-submissions.hook';
 import api from '@libs/api';
@@ -434,7 +440,7 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
 
         {/* Submitter Info */}
         <motion.div
-          className='aucctus-text-xs aucctus-text-tertiary flex items-center justify-center gap-2'
+          className='aucctus-text-xs aucctus-text-tertiary flex flex-wrap items-center justify-center gap-2'
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3, duration: 0.3 }}

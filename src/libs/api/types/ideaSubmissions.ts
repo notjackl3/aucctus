@@ -5,6 +5,15 @@
 // Updated status values to match new backend schema
 export type IdeaSubmissionStatus = 'to_review' | 'approved' | 'rejected';
 
+/**
+ * Source file info for bulk-uploaded ideas
+ */
+export interface ISourceFileInfo {
+  uuid: string;
+  filename: string;
+  fileType: string;
+}
+
 // Legacy status values for backward compatibility
 export type LegacyIdeaSubmissionStatus = 'pending' | 'reviewed' | 'archived';
 
@@ -80,6 +89,12 @@ export interface IIdeaSubmission {
   conceptUuid: string | null;
   /** Whether a concept report has been generated for this submission */
   reportGenerated: boolean;
+
+  // ==========================================================================
+  // SOURCE FILE INFO (for bulk uploads)
+  // ==========================================================================
+  /** Source file info if this idea was bulk uploaded */
+  sourceFile: ISourceFileInfo | null;
 }
 
 /**
@@ -430,6 +445,21 @@ export interface IUpdateQuestionScoreResponse {
 }
 
 // ============================================
+// File Upload Types
+// ============================================
+
+/**
+ * Response from uploading a file with idea submissions
+ */
+export interface IFileUploadResponse {
+  taskId: string;
+  sourceFileUuid: string;
+  filename: string;
+  fileType: string;
+  message: string;
+}
+
+// ============================================
 // DETAILED SUBMISSION SCORE TYPES
 // (Used by GET /submission-links/{uuid}/submissions/{submissionUuid}/details)
 // ============================================
@@ -509,4 +539,8 @@ export interface IIdeaSubmissionDetail {
   conceptUuid: string | null;
   /** Whether a concept report has been generated for this submission */
   reportGenerated: boolean;
+
+  // Source file info (for bulk uploads)
+  /** Source file info if this idea was bulk uploaded */
+  sourceFile: ISourceFileInfo | null;
 }

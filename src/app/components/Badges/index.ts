@@ -7,6 +7,7 @@ import ConceptStatus from './ConceptStatus';
 import CostEstimate from './CostEstimateBadge';
 import Count from './Count';
 import RiskLevel from './RiskLevelBadge';
+import SourceFile from './SourceFileBadge';
 import SourceInfo from './SourceInfoBadge';
 import Stage from './StageBadge';
 import TestStatus from './TestStatus';
@@ -17,6 +18,7 @@ import WithLabel from './BadgeWithLabel';
 
 const Badges = {
   RiskLevel,
+  SourceFile,
   SourceInfo,
   FinancialProjectionSource,
   AssumptionCategory,

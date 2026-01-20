@@ -933,6 +933,9 @@ export class Endpoints {
     return `/api/v1/idea-submissions/${submissionUuid}/question-score`;
   }
 
+  // Idea Submissions - File Upload Endpoint
+  static ideaSubmissionsUpload = '/api/v1/idea-submissions/upload';
+
   // ============================================
   // Submission Link Endpoints (Auth Required)
   // ============================================
