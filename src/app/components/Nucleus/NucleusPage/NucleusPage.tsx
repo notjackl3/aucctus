@@ -1,5 +1,8 @@
 import { Icon, NucleusLoadingState } from '@components';
-import { useNucleusReportLatest } from '../../../hooks/query/nucleus.hook';
+import {
+  useNucleusReportLatest,
+  useGenerateNucleusReport,
+} from '../../../hooks/query/nucleus.hook';
 import { NucleusHeroBackground } from '../NucleusHeroBackground';
 import { ConceptScoringConfig } from '../ConceptScoringConfig';
 import { cn } from '@libs/utils/react';
@@ -45,6 +48,13 @@ const NucleusPage: React.FC = () => {
   // Check if current user is admin
   const isAdmin = user?.role.toLowerCase() === 'admin';
   const isDebugModeEnabled = useDebugMode();
+
+  // Hook for generating nucleus report
+  const {
+    generateReport,
+    isGenerating,
+    isSuccess: isGenerationStarted,
+  } = useGenerateNucleusReport();
 
   // Hook for updating question assessment status
   const { mutate: updateQuestion, isLoading: isUpdatingQuestion } =
@@ -374,9 +384,31 @@ const NucleusPage: React.FC = () => {
           <div className='aucctus-text-xl aucctus-text-primary mb-2'>
             No Nucleus Report Found
           </div>
-          <div className='aucctus-text-md aucctus-text-secondary'>
+          <div className='aucctus-text-md aucctus-text-secondary mb-6'>
             No nucleus report has been generated for this account yet.
           </div>
+          {isAdmin && (
+            <button
+              onClick={() => generateReport()}
+              disabled={isGenerating || isGenerationStarted}
+              className='btn btn-primary btn-md inline-flex items-center gap-2'
+            >
+              {isGenerating || isGenerationStarted ? (
+                <>
+                  <div className='h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent' />
+                  Generating...
+                </>
+              ) : (
+                <>
+                  <Icon
+                    variant='sparkles'
+                    className='h-4 w-4 fill-white stroke-white'
+                  />
+                  Generate Nucleus
+                </>
+              )}
+            </button>
+          )}
         </div>
       </div>
     );

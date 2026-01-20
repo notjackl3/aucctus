@@ -233,4 +233,52 @@ export const useNucleusReportEmailWhenReady = () => {
   };
 };
 
+/**
+ * Custom hook for generating a new nucleus report.
+ * Admin only. Triggers the nucleus generation pipeline asynchronously.
+ */
+export const useGenerateNucleusReport = () => {
+  const { mutate, isLoading, error, isSuccess, reset } = useMutation({
+    mutationFn: async () => {
+      return await api.nucleus.generateReport();
+    },
+    onSuccess: () => {
+      toast.success(
+        'Generation Started',
+        'Your Nucleus report is being generated. This may take several minutes.',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      // Check for specific error codes
+      const errorCode = (e.response?.data as { code?: string })?.code;
+      if (errorCode === 'generation_in_progress') {
+        toast.error(
+          'Generation In Progress',
+          'A Nucleus report is already being generated. Please wait for it to complete.',
+        );
+      } else if (errorCode === 'admin_required') {
+        toast.error(
+          'Permission Denied',
+          'Only admins can generate Nucleus reports.',
+        );
+      } else {
+        toast.error(
+          'Generation Failed',
+          message ||
+            'Unable to start Nucleus report generation. Please try again.',
+        );
+      }
+    },
+  });
+
+  return {
+    generateReport: mutate,
+    isGenerating: isLoading,
+    error,
+    isSuccess,
+    reset,
+  };
+};
+
 export { useNucleusReportLatestProgress };

@@ -42,7 +42,7 @@ const MiniScoreGauge: React.FC<{ score: number }> = ({ score }) => {
   const gaugeColor = getGaugeColor(clampedScore);
 
   return (
-    <svg width='120' height='72' viewBox='0 0 120 72' className='flex-shrink-0'>
+    <svg width='90' height='54' viewBox='0 0 120 72' className='flex-shrink-0'>
       {/* Gray background arc (full) */}
       <path
         d='M 12 60 A 48 48 0 0 1 108 60'

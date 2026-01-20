@@ -688,6 +688,7 @@ export class Endpoints {
   }
 
   // Nucleus Report Endpoints
+  static nucleusReportGenerate = '/api/v1/nucleus-reports/generate';
   static nucleusReportLatest = '/api/v1/nucleus-reports/latest';
   static nucleusReportLatestProgress =
     '/api/v1/nucleus-reports/latest/progress';

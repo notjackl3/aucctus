@@ -750,6 +750,12 @@ export const useConceptBank = (
         return;
       }
 
+      // Prevent reordering pinned columns (title and priority are fixed at the start)
+      const pinnedColumnIds = new Set(['title', 'priority']);
+      if (pinnedColumnIds.has(draggedId) || pinnedColumnIds.has(targetId)) {
+        return;
+      }
+
       // Find indices
       const draggedIndex = currentOrder.indexOf(draggedId);
       const targetIndex = currentOrder.indexOf(targetId);
@@ -1208,14 +1214,28 @@ export const useConceptBank = (
 
     // Apply saved column order from localStorage
     if (localColumnOrder && localColumnOrder.length > 0) {
-      // Separate action columns (always last)
+      // Separate action columns (always last) and pinned columns (fixed position)
       const actionColumnIds = new Set(['actions', 'settings']);
+      const pinnedColumnIds = new Set(['title', 'priority']); // These stay in fixed order at the start
+
       const reorderableColumns = allColumns.filter(
-        (col) => !actionColumnIds.has(col.id || ''),
+        (col) =>
+          !actionColumnIds.has(col.id || '') &&
+          !pinnedColumnIds.has(col.id || ''),
       );
       const actionColumnsToKeep = allColumns.filter((col) =>
         actionColumnIds.has(col.id || ''),
       );
+      const pinnedColumns = allColumns.filter((col) =>
+        pinnedColumnIds.has(col.id || ''),
+      );
+
+      // Sort pinned columns to ensure title is first, priority is second
+      const sortedPinnedColumns = pinnedColumns.sort((a, b) => {
+        if (a.id === 'title') return -1;
+        if (b.id === 'title') return 1;
+        return 0;
+      });
 
       // Sort reorderable columns based on saved order
       const orderedReorderableColumns = [...reorderableColumns].sort((a, b) => {
@@ -1230,8 +1250,12 @@ export const useConceptBank = (
         return aIndex - bIndex;
       });
 
-      // Always append action columns at the end in correct order
-      return [...orderedReorderableColumns, ...actionColumnsToKeep];
+      // Pinned columns first, then reorderable, then action columns
+      return [
+        ...sortedPinnedColumns,
+        ...orderedReorderableColumns,
+        ...actionColumnsToKeep,
+      ];
     }
 
     return allColumns;
@@ -1260,6 +1284,7 @@ export const useConceptBank = (
     const columnIds = columns.map((col) => col.id || '').filter(Boolean);
     const staticIds = new Set([
       'title',
+      'priority',
       'createdBy',
       'createdAt',
       'lastModifiedBy',
@@ -1278,6 +1303,7 @@ export const useConceptBank = (
 
       const orderedIds = [
         'title',
+        'priority',
         'createdBy',
         'createdAt',
         'lastModifiedBy',

@@ -27,6 +27,15 @@ export class NucleusApi extends ApiService {
   }
 
   /**
+   * Generate a new nucleus report for the authenticated user's account.
+   * Admin only. Triggers the nucleus generation pipeline asynchronously.
+   * Returns 202 Accepted with a message indicating generation has started.
+   */
+  generateReport() {
+    return this.post<{ message: string }>(endpoints.nucleusReportGenerate);
+  }
+
+  /**
    * Get the latest nucleus report for the authenticated user's account.
    * Returns the complete nucleus report with all sections, questions, answers, and sources.
    */

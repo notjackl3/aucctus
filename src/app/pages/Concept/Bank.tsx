@@ -426,7 +426,7 @@ const ConceptBank: React.FC = () => {
           {/* Tabs grouped on the left */}
           <div className='flex items-center gap-1'>
             <button
-              className={cn('btn', {
+              className={cn('btn btn-sm', {
                 'bg-black text-white': isPortfolioRoute,
                 'btn-no-border aucctus-text-tertiary hover:aucctus-text-primary':
                   !isPortfolioRoute,
@@ -435,8 +435,8 @@ const ConceptBank: React.FC = () => {
             >
               <Icon
                 variant='lightbulb'
-                height={16}
-                width={16}
+                height={14}
+                width={14}
                 className={cn({
                   'stroke-white': isPortfolioRoute,
                   'aucctus-stroke-tertiary group-hover:aucctus-stroke-primary':
@@ -447,7 +447,7 @@ const ConceptBank: React.FC = () => {
               <Badge.Beta size='xs' />
             </button>
             <button
-              className={cn('btn', {
+              className={cn('btn btn-sm', {
                 'bg-black text-white':
                   !isDraftsRoute && !isPortfolioRoute && !isSubmissionsRoute,
                 'btn-no-border aucctus-text-tertiary hover:aucctus-text-primary':
@@ -458,7 +458,7 @@ const ConceptBank: React.FC = () => {
               Concepts
             </button>
             <button
-              className={cn('btn', {
+              className={cn('btn btn-sm', {
                 'bg-black text-white': isSubmissionsRoute,
                 'btn-no-border aucctus-text-tertiary hover:aucctus-text-primary':
                   !isSubmissionsRoute,
@@ -466,8 +466,8 @@ const ConceptBank: React.FC = () => {
               onClick={() => handleTabChange(AppPath.ConceptBankSubmissions)}
             >
               <Upload
-                height={16}
-                width={16}
+                height={14}
+                width={14}
                 className={cn({
                   'stroke-white': isSubmissionsRoute,
                   'aucctus-stroke-tertiary': !isSubmissionsRoute,
@@ -477,7 +477,7 @@ const ConceptBank: React.FC = () => {
               <Badge.Beta size='xs' />
             </button>
             <button
-              className={cn('btn', {
+              className={cn('btn btn-sm', {
                 'bg-black text-white': isDraftsRoute,
                 'btn-no-border aucctus-text-tertiary hover:aucctus-text-primary':
                   !isDraftsRoute,

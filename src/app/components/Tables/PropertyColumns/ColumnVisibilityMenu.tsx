@@ -13,6 +13,7 @@ interface IColumnVisibilityMenuProps {
 // Define static columns with their metadata
 const STATIC_COLUMNS = [
   { id: 'title', name: 'Concept', icon: 'lightbulb' as IconVariant },
+  { id: 'priority', name: 'Score', icon: 'trendup' as IconVariant },
   { id: 'createdBy', name: 'Created By', icon: 'user-square' as IconVariant },
   { id: 'createdAt', name: 'Created Date', icon: 'calendar' as IconVariant },
   {
