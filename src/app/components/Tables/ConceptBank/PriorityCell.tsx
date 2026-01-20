@@ -124,9 +124,16 @@ export const PriorityCell: React.FC<PriorityCellProps> = ({
     return unsubscribe;
   }, [queryClient, conceptUuid]);
 
-  // Check if we're in a calculating state (the marker set when generation starts)
+  // Check if we're in a calculating state
+  // 1. Client-side marker (set when generation starts, before WebSocket events)
   const isCalculatingMarker = cachedData?.isCalculating === true;
-  const isCalculating = isGenerating || isCalculatingMarker;
+  // 2. Backend status (persisted in DB, survives page refresh)
+  const backendScoringStatus = prioritySummary?.scoringStatus;
+  const isBackendCalculating =
+    backendScoringStatus === 'pending' || backendScoringStatus === 'scoring';
+  // Combine all calculating states
+  const isCalculating =
+    isGenerating || isCalculatingMarker || isBackendCalculating;
 
   // Check if cached data is a real priority (has overallPriorityScore)
   const cachedPriorityData =

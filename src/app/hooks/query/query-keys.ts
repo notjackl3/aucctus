@@ -123,4 +123,5 @@ export enum AucctusQueryKeys {
   submissionLink = 'submissionLink',
   submissionLinkSubmissions = 'submissionLinkSubmissions',
   submissionDetail = 'submissionDetail',
+  bulkSubmissionScoringProgress = 'bulkSubmissionScoringProgress',
 }

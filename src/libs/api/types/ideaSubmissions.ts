@@ -65,6 +65,8 @@ export interface IIdeaSubmission {
   createdAt: string;
   updatedAt: string;
 
+  /** Current status of AI scoring: pending, scoring, complete, error */
+  scoringStatus: 'pending' | 'scoring' | 'complete' | 'error' | null;
   /** Total score (0-100) */
   totalScore: number | null;
   /** AI explanation of the scoring */

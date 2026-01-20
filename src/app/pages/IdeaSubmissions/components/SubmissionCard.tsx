@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
 import { motion } from 'framer-motion';
-import { Star, CheckSquare, Square } from 'lucide-react';
+import { Star, CheckSquare, Square, RefreshCw } from 'lucide-react';
 import {
   IIdeaSubmission,
   IdeaSubmissionStatus,
@@ -170,18 +170,32 @@ const SubmissionCard: FunctionComponent<SubmissionCardProps> = ({
               {statusConfig.label}
             </span>
 
-            {/* Score Badge with Star */}
-            {submission.totalScore !== null && (
+            {/* Score Badge with Star or Calculating indicator */}
+            {(submission.scoringStatus === 'pending' ||
+              submission.scoringStatus === 'scoring') && (
               <div
-                className='flex items-center gap-1 rounded-full border border-yellow-200 bg-yellow-50 px-3 py-1'
-                title={`Score: ${submission.totalScore}/100`}
+                className='flex items-center gap-1 rounded-full border border-blue-200 bg-blue-50 px-3 py-1'
+                title='Calculating score...'
               >
-                <Star className='h-3 w-3 fill-yellow-400 stroke-yellow-500' />
-                <span className='text-sm font-bold text-yellow-700'>
-                  {submission.totalScore}
+                <RefreshCw className='h-3 w-3 animate-spin text-blue-500' />
+                <span className='text-sm font-medium text-blue-700'>
+                  Calculating...
                 </span>
               </div>
             )}
+            {submission.scoringStatus !== 'pending' &&
+              submission.scoringStatus !== 'scoring' &&
+              submission.totalScore !== null && (
+                <div
+                  className='flex items-center gap-1 rounded-full border border-yellow-200 bg-yellow-50 px-3 py-1'
+                  title={`Score: ${submission.totalScore}/100`}
+                >
+                  <Star className='h-3 w-3 fill-yellow-400 stroke-yellow-500' />
+                  <span className='text-sm font-bold text-yellow-700'>
+                    {submission.totalScore}
+                  </span>
+                </div>
+              )}
           </div>
         </div>
 

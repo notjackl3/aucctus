@@ -95,6 +95,8 @@ export interface ICategoryScore {
 
 export type InnovationHorizon = 'core' | 'adjacent' | 'disruptive';
 
+export type ScoringStatus = 'pending' | 'scoring' | 'complete' | 'error';
+
 export interface IConceptPriorityDetail {
   conceptUuid: string;
   overallScore: number; // 0-100
@@ -102,6 +104,8 @@ export interface IConceptPriorityDetail {
   priorityLevel: string;
   categoryScores: ICategoryScore[];
   isAiGenerated: boolean;
+  /** Current status of AI scoring: pending, scoring, complete, error */
+  scoringStatus: ScoringStatus | null;
   scoringConfigVersion: number | null;
   // Innovation horizon classification
   innovationHorizon?: InnovationHorizon | null;

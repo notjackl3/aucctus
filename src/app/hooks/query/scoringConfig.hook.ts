@@ -11,7 +11,6 @@ import {
   IScoringCategoryCreate,
   IScoringConfig,
   IScoringConfigSave,
-  IScoringConfigSaveResponse,
 } from '@libs/api/types';
 import utils from '@libs/utils';
 import { useMutation, useQuery, useQueryClient } from 'react-query';
@@ -49,14 +48,34 @@ export const useSaveScoringConfig = (accountUuid: string | undefined) => {
   return useMutation({
     mutationFn: async (data: IScoringConfigSave) => {
       if (!accountUuid) throw new Error('Account UUID is required');
-      return await api.account.saveScoringConfig(accountUuid, data);
+      const response = await api.account.saveScoringConfig(accountUuid, data);
+      // Return both response and request data so onSuccess knows if rescoring was requested
+      return { response, rescoreRequested: data.rescoreAll ?? false };
     },
-    onSuccess: (response: IScoringConfigSaveResponse) => {
+    onSuccess: ({ rescoreRequested }) => {
       queryClient.invalidateQueries({
         queryKey: [AucctusQueryKeys.scoringConfig, accountUuid],
       });
 
-      if (response.rescoreTaskId) {
+      // Note: Task IDs are no longer returned from the API because tasks are dispatched
+      // after the database transaction commits (to prevent race conditions).
+      // We use the request's rescoreAll flag to determine the appropriate message.
+      if (rescoreRequested) {
+        // Invalidate concept bank and submission queries so the UI refreshes
+        // with the new scoring_status (pending) that was set by the backend
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.concepts],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.conceptPriority],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.conceptPriorities],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.submissionLinkSubmissions],
+        });
+
         toast.success(
           'Scoring configuration saved. Re-scoring concepts in background...',
         );
