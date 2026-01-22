@@ -152,7 +152,7 @@ const ConceptBank: React.FC = () => {
   const handleAddConcept = useCallback(() => {
     resetQuestionnaire();
     setIsNewSeed(true);
-    navigate(AppPath.IncubateConcept);
+    navigate(AppPath.IdeaPlayground);
   }, [resetQuestionnaire, navigate, setIsNewSeed]);
 
   const handleOpenImportModal = useCallback(() => {

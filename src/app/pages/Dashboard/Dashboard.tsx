@@ -34,7 +34,7 @@ const Dashboard: FunctionComponent = () => {
             onClick={() => {
               resetQuestionnaire();
               setIsNewSeed(true);
-              navigate(AppPath.IncubateConcept);
+              navigate(AppPath.IdeaPlayground);
             }}
           >
             <Icon
