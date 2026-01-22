@@ -7,6 +7,7 @@ import React from 'react';
 import ComponentCarousel from '../../Carousel/ComponentCarousel';
 import ComponentTooltip from '../../ToolTip/ComponentTooltip';
 import { Company } from '../hooks/useEcosystem';
+import ProductImage from './ProductImage';
 
 interface CompanyDetailPanelProps {
   company: Company | null;
@@ -413,20 +414,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                     className='aucctus-bg-secondary group relative overflow-hidden'
                     style={{ height: '180px' }}
                   >
-                    {product.image ? (
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className='h-full w-full object-cover'
-                      />
-                    ) : (
-                      <div className='flex h-full w-full items-center justify-center'>
-                        <Icon
-                          variant='cube'
-                          className='aucctus-stroke-secondary h-8 w-8'
-                        />
-                      </div>
-                    )}
+                    <ProductImage src={product.image} alt={product.name} />
                     {/* View Product Button */}
                     <button
                       className='absolute right-2 top-2 flex items-center gap-1.5 rounded border border-white/60 bg-black/40 px-2 py-1 text-xs font-medium text-white shadow-xl backdrop-blur-md transition-all hover:bg-black/50'
