@@ -1111,24 +1111,43 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                                 {/* Question Content */}
                                 <div className='min-w-0 flex-1 space-y-2'>
                                   {editingQuestionId === question.id ? (
-                                    <input
+                                    <textarea
                                       value={question.text}
-                                      onChange={(e) =>
+                                      onChange={(e) => {
+                                        // Strip line breaks from content
+                                        const cleanedText =
+                                          e.target.value.replace(
+                                            /[\r\n]+/g,
+                                            ' ',
+                                          );
                                         handleUpdateQuestion(question.id, {
-                                          text: e.target.value,
-                                        })
-                                      }
+                                          text: cleanedText,
+                                        });
+                                        // Auto-resize based on content
+                                        e.target.style.height = 'auto';
+                                        e.target.style.height = `${e.target.scrollHeight}px`;
+                                      }}
                                       onBlur={() => setEditingQuestionId(null)}
                                       onKeyDown={(e) => {
-                                        if (
-                                          e.key === 'Enter' ||
-                                          e.key === 'Escape'
-                                        )
+                                        // Prevent Enter from inserting newline
+                                        if (e.key === 'Enter') {
+                                          e.preventDefault();
+                                          setEditingQuestionId(null);
+                                        }
+                                        if (e.key === 'Escape')
                                           setEditingQuestionId(null);
                                       }}
                                       placeholder='Enter question text...'
-                                      className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1 text-sm'
+                                      className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary w-full resize-none overflow-hidden rounded border px-2 py-1 text-sm'
                                       autoFocus
+                                      rows={1}
+                                      ref={(el) => {
+                                        if (el) {
+                                          // Initial auto-size on mount
+                                          el.style.height = 'auto';
+                                          el.style.height = `${el.scrollHeight}px`;
+                                        }
+                                      }}
                                     />
                                   ) : (
                                     <p
