@@ -5,16 +5,7 @@ import React, {
   useRef,
   useEffect,
 } from 'react';
-import {
-  Icon,
-  Loading,
-  FeatureInitiation,
-  ConceptReportSkeletons,
-} from '@components';
-import type {
-  FeatureHighlight,
-  InitiationBadge,
-} from '@components/FeatureInitiation/FeatureInitiation';
+import { Icon, Loading, ConceptReportSkeletons } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import images from '@assets/img';
@@ -28,6 +19,11 @@ import {
   SignalTrendsWidget,
   FutureDomainsWidget,
   ConceptOpportunitiesWidget,
+  WatchtowerInitiation,
+} from './components';
+import type {
+  WatchtowerFeatureHighlight,
+  WatchtowerInitiationBadge,
 } from './components';
 
 import type { Signal, SignalType, SignalCategory } from './types';
@@ -690,7 +686,7 @@ const WatchtowerPage: React.FC = () => {
   const isFirstRun = !lastRefreshedAt && apiSignals.length === 0;
 
   // Feature initiation configuration for first-run experience
-  const watchtowerFeatures: FeatureHighlight[] = [
+  const watchtowerFeatures: WatchtowerFeatureHighlight[] = [
     {
       icon: 'search-refraction',
       title: 'See Disruption Early',
@@ -711,7 +707,7 @@ const WatchtowerPage: React.FC = () => {
     },
   ];
 
-  const watchtowerBadges: InitiationBadge[] = [
+  const watchtowerBadges: WatchtowerInitiationBadge[] = [
     {
       icon: 'star-01',
       text: 'Premium Add-On',
@@ -750,7 +746,7 @@ const WatchtowerPage: React.FC = () => {
   // Show first-run initiation screen if user has never run a scan
   if (isFirstRun && !isScanningActive) {
     return (
-      <FeatureInitiation
+      <WatchtowerInitiation
         icon='signal-02'
         title='Watchtower'
         subtitle='Signal Intelligence System'
@@ -775,7 +771,7 @@ const WatchtowerPage: React.FC = () => {
           <div
             className='absolute inset-0 bg-cover bg-center bg-no-repeat'
             style={{
-              backgroundImage: `url(${images.aiExplorationsBackground})`,
+              backgroundImage: `url(${images.nucleusBrandGradient})`,
               filter: 'blur(2px)',
             }}
           />
@@ -803,7 +799,7 @@ const WatchtowerPage: React.FC = () => {
                 <div
                   className='absolute inset-0 bg-cover bg-center bg-no-repeat'
                   style={{
-                    backgroundImage: `url(${images.aiExplorationsBackground})`,
+                    backgroundImage: `url(${images.nucleusBrandGradient})`,
                   }}
                 />
                 <div className='absolute inset-0 bg-black/70' />
@@ -895,7 +891,7 @@ const WatchtowerPage: React.FC = () => {
         <div
           className='absolute inset-0 bg-cover bg-center bg-no-repeat'
           style={{
-            backgroundImage: `url(${images.aiExplorationsBackground})`,
+            backgroundImage: `url(${images.nucleusBrandGradient})`,
             filter: 'blur(2px)',
           }}
         />
@@ -923,7 +919,7 @@ const WatchtowerPage: React.FC = () => {
               <div
                 className='absolute inset-0 bg-cover bg-center bg-no-repeat'
                 style={{
-                  backgroundImage: `url(${images.aiExplorationsBackground})`,
+                  backgroundImage: `url(${images.nucleusBrandGradient})`,
                 }}
               />
               <div className='absolute inset-0 bg-black/70' />

@@ -30,6 +30,14 @@ export class AccountApi extends ApiService {
     return this.get<IAccount>(endpoints.account);
   }
 
+  /**
+   * Get the account's logo URL.
+   * Returns a presigned URL for the custom logo if one exists.
+   */
+  getAccountLogo() {
+    return this.get<{ logoUrl: string | null }>(endpoints.accountLogo);
+  }
+
   createAccount(account: IRegisterAccount) {
     return this.post<IAccount, IRegisterAccount>(endpoints.account, account);
   }

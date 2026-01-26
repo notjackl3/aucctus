@@ -1,10 +1,10 @@
 import NavLogo from '@assets/aucctus_logo.png';
 import NavWord from '@assets/aucctus_nav_word.png';
-import { memo, useCallback, useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Lightbulb, Send, Loader2, Lock, Eye, EyeOff } from 'lucide-react';
 import { cn } from '@libs/utils/react';
 import { Turnstile } from '@marsidev/react-turnstile';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Eye, EyeOff, Lightbulb, Loader2, Lock, Send } from 'lucide-react';
+import { memo, useCallback, useState } from 'react';
 
 interface VideoBackgroundProps {
   headquartersVideoUrl?: string | null;
@@ -81,12 +81,12 @@ export const VideoBackground = memo<VideoBackgroundProps>(
                 animate={{ opacity: 0.75, y: 0 }}
                 transition={{ delay: 0.3, duration: 0.6 }}
                 whileHover={{ scale: 1.05, opacity: 0.9 }}
-                className='h-30 w-30 flex items-center justify-center overflow-hidden rounded-lg'
+                className='flex items-center justify-center overflow-hidden rounded-md bg-white/30 p-4 backdrop-blur-sm'
               >
                 <img
                   src={companyLogoUrl}
                   alt={accountName || 'Company logo'}
-                  className='h-full w-full object-contain'
+                  className='h-24 w-auto max-w-[200px] object-contain'
                   onError={onLogoError}
                 />
               </motion.div>
@@ -325,12 +325,12 @@ export const SubmissionForm = memo<SubmissionFormProps>(
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3, duration: 0.4 }}
-                  className='flex h-24 w-24 items-center justify-center overflow-hidden rounded-lg lg:hidden'
+                  className='flex items-center justify-center overflow-hidden rounded-md p-3 lg:hidden'
                 >
                   <img
                     src={companyLogoUrl}
                     alt={linkInfo?.accountName || 'Company logo'}
-                    className='h-full w-full object-contain'
+                    className='h-16 w-auto max-w-[100px] object-contain'
                   />
                 </motion.div>
               )}

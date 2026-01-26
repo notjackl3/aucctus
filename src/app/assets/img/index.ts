@@ -19,6 +19,7 @@ import trendTwo from './trends/trend2.png';
 import trendThree from './trends/trend3.png';
 
 import avatar from './avatar.png';
+import nucleusBrandGradient from './nucleus-brand-gradient.png';
 
 const images = {
   // Auth
@@ -52,6 +53,9 @@ const images = {
   // User
   avatar,
   companyLogoDefault,
+
+  // Nucleus
+  nucleusBrandGradient,
 };
 
 export default images;

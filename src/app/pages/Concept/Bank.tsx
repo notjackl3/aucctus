@@ -71,6 +71,8 @@ const areFilterOptionsSet = (
 };
 
 const ConceptBank: React.FC = () => {
+  // Track page time for analytics
+
   const navigate = useNavigate();
   const location = useLocation();
   const { openModal } = useModal();

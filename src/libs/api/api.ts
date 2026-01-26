@@ -1,6 +1,7 @@
 import { HeadersDefaults } from 'axios';
 import analytics from '../telemetry';
 import { AccountApi } from './account';
+import { AdminApi } from './admin';
 import { ArticleApi } from './article';
 import { AssumptionsApi } from './assumptions';
 
@@ -17,9 +18,9 @@ import { NucleusApi } from './nucleus';
 import { PocPlanApi } from './pocPlan';
 import { PropertyApi } from './properties';
 import { SeedApi } from './seed';
-import { SignalScanningApi } from './signalScanning';
 import { TestingApi } from './testing';
 import { TrendsAndDriversV3Api } from './trendsAndDrivers';
+import { WatchtowerApi } from './watchtower';
 
 export interface IApiConfig {
   /* End Points */
@@ -37,6 +38,7 @@ export class Api {
   private _clerkTokenGetter?: () => Promise<string | null>;
 
   account!: AccountApi;
+  admin!: AdminApi;
   concept!: ConceptApi;
   seed!: SeedApi;
   assumption!: AssumptionsApi;
@@ -52,7 +54,7 @@ export class Api {
   ideaSubmissions!: IdeaSubmissionsApi;
   pocPlan!: PocPlanApi;
   property!: PropertyApi;
-  signalScanning!: SignalScanningApi;
+  watchtower!: WatchtowerApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -68,6 +70,7 @@ export class Api {
 
     const apiClasses: { key: keyof Api; class: any }[] = [
       { key: 'account', class: AccountApi },
+      { key: 'admin', class: AdminApi },
       { key: 'concept', class: ConceptApi },
       { key: 'assumption', class: AssumptionsApi },
       { key: 'marketScan', class: MarketScanApi },
@@ -82,7 +85,7 @@ export class Api {
       { key: 'ideaSubmissions', class: IdeaSubmissionsApi },
       { key: 'pocPlan', class: PocPlanApi },
       { key: 'property', class: PropertyApi },
-      { key: 'signalScanning', class: SignalScanningApi },
+      { key: 'watchtower', class: WatchtowerApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

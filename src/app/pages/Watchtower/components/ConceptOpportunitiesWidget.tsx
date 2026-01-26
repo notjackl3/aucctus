@@ -114,7 +114,7 @@ const ConceptOpportunitiesWidget: React.FC = () => {
                   <div
                     className='flex h-full w-full items-center justify-center bg-cover bg-center'
                     style={{
-                      backgroundImage: `url(${images.aiExplorationsBackground})`,
+                      backgroundImage: `url(${images.nucleusBrandGradient})`,
                     }}
                   >
                     <div className='flex flex-col items-center gap-1'>

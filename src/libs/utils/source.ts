@@ -7,11 +7,11 @@ import api from '@libs/api';
 /**
  * Generates a Logo.dev URL for a given domain
  * @param domain - The domain to get the logo for (e.g., 'stripe.com')
- * @returns The Logo.dev URL with authentication token
+ * @returns The Logo.dev URL with authentication token and transparent PNG format
  */
 export const getLogoUrl = (domain: string): string => {
   const token = import.meta.env.VITE_LOGO_DEV_TOKEN;
-  return `https://img.logo.dev/${domain}?token=${token}`;
+  return `https://img.logo.dev/${domain}?token=${token}&format=png`;
 };
 
 /**

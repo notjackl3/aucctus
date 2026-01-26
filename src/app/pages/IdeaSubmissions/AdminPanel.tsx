@@ -60,6 +60,8 @@ const STATUS_LABELS: Record<IdeaSubmissionStatus, string> = {
  * Allows admins to view submissions and update their status.
  */
 const AdminPanel: FunctionComponent = () => {
+  // Track page time for analytics
+
   const queryClient = useQueryClient();
   const account = useStore((state) => state.auth.account);
   const [selectedSubmission, setSelectedSubmission] =

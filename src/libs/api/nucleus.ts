@@ -13,6 +13,15 @@ import {
   NucleusReportAnswer,
   NucleusReportSection,
   NucleusReportProgress,
+  NucleusVideoGenerateRequest,
+  NucleusVideoGenerateResponse,
+  NucleusStatus,
+  InitializeNucleusRequest,
+  InitializeNucleusResponse,
+  DocumentWithUsage,
+  DocumentUsage,
+  CompanyLookupRequest,
+  CompanyLookupResponse,
 } from './types/nucleus';
 
 /**
@@ -33,6 +42,109 @@ export class NucleusApi extends ApiService {
    */
   generateReport() {
     return this.post<{ message: string }>(endpoints.nucleusReportGenerate);
+  }
+
+  // ============================================
+  // Nucleus Status & Initialization
+  // ============================================
+
+  /**
+   * Get the Nucleus initialization status for the authenticated user's account.
+   * Returns whether Nucleus has been initialized and if it's currently loading.
+   */
+  getNucleusStatus() {
+    return this.get<NucleusStatus>(endpoints.nucleusStatus);
+  }
+
+  /**
+   * Initialize Nucleus for the authenticated user's account.
+   * Admin only. Saves company info, context questions, and triggers the Nucleus research pipeline.
+   *
+   * @param data Company information and context questions
+   * @param files Optional array of files to include in research (uploaded during initialization)
+   * @param headquartersImage Optional image file for HQ building (used for video generation)
+   */
+  initializeNucleus(
+    data: InitializeNucleusRequest,
+    files?: File[],
+    headquartersImage?: File,
+  ) {
+    // Use multipart/form-data if any files are provided
+    const hasFiles = (files && files.length > 0) || headquartersImage;
+
+    if (hasFiles) {
+      const formData = new FormData();
+
+      // Append JSON data as 'data' field
+      formData.append('data', JSON.stringify(data));
+
+      // Append document files
+      if (files && files.length > 0) {
+        files.forEach((file) => {
+          formData.append('files', file);
+        });
+      }
+
+      // Append HQ image separately (for video generation)
+      if (headquartersImage) {
+        formData.append('headquartersImage', headquartersImage);
+      }
+
+      return this.post<InitializeNucleusResponse>(
+        endpoints.nucleusInitialize,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        },
+      );
+    }
+
+    // No files - use regular JSON POST
+    return this.post<InitializeNucleusResponse, InitializeNucleusRequest>(
+      endpoints.nucleusInitialize,
+      data,
+    );
+  }
+
+  /**
+   * Look up company headquarters and website from a company name using AI-powered web search.
+   * Results are ephemeral and not persisted to the database.
+   */
+  lookupCompanyInfo(companyName: string) {
+    return this.post<CompanyLookupResponse, CompanyLookupRequest>(
+      endpoints.nucleusLookupCompanyInfo,
+      { companyName },
+    );
+  }
+
+  /**
+   * Get all uploaded documents for the account with category usage.
+   * Returns documents from the latest nucleus report with which categories use each document.
+   */
+  getDocuments() {
+    return this.get<DocumentWithUsage[]>(endpoints.nucleusDocumentsList);
+  }
+
+  /**
+   * Get usage/cascade information for a document before deletion.
+   * Returns which categories and how many sources would be affected.
+   */
+  getDocumentUsage(documentUuid: string) {
+    return this.get<DocumentUsage>(
+      endpoints.nucleusDocumentUsage(documentUuid),
+    );
+  }
+
+  /**
+   * Delete a document and cascade delete all associated answer sources.
+   * Admin only. Returns usage info showing what was deleted.
+   */
+  deleteDocument(documentUuid: string) {
+    return this.delete<DocumentUsage>(
+      endpoints.nucleusDocumentDelete(documentUuid),
+    );
   }
 
   /**
@@ -176,5 +288,36 @@ export class NucleusApi extends ApiService {
 
   emailWhenReady(reportUuid: string) {
     return this.post(endpoints.nucleusReportEmailWhenReady(reportUuid));
+  }
+
+  /**
+   * Generate a nucleus headquarters video.
+   * Admin only. Triggers the video generation pipeline asynchronously.
+   * Returns task ID for status polling.
+   *
+   * Accepts optional image file for HQ building. If not provided, agent will search for images.
+   */
+  generateVideo(data: NucleusVideoGenerateRequest) {
+    const formData = new FormData();
+
+    // Append image file if provided
+    if (data.image) {
+      formData.append('image', data.image);
+    }
+
+    // Append other parameters as query params (mood, duration)
+    const params = new URLSearchParams();
+    if (data.mood) {
+      params.append('mood', data.mood);
+    }
+    if (data.duration !== undefined) {
+      params.append('duration', data.duration.toString());
+    }
+
+    const url = params.toString()
+      ? `${endpoints.adminNucleusVideoGenerate}?${params.toString()}`
+      : endpoints.adminNucleusVideoGenerate;
+
+    return this.postFormData<NucleusVideoGenerateResponse>(url, formData);
   }
 }

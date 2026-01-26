@@ -13,7 +13,20 @@ import {
 } from '@hooks/query/concepts.hook';
 import utils from '@libs/utils';
 import SignalForm from './SignalForm';
+import { SourceInput, SourceErrors } from './MultiSourceFields';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
+
+// Convert API sources to form sources
+const toSourceInputs = (sources?: ISource[]): SourceInput[] => {
+  if (!sources || sources.length === 0) {
+    return [{ id: `new-${Date.now()}`, title: '', url: '' }];
+  }
+  return sources.map((source) => ({
+    id: source.uuid || `existing-${Date.now()}-${Math.random()}`,
+    title: source.title || '',
+    url: source.url || '',
+  }));
+};
 
 interface EditRealWorldSignalProps {
   signal?: ICustomerProfileRealWorldSignal;
@@ -29,16 +42,19 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
     description: signal?.description || '',
     sourceCategory: signal?.sourceCategory,
     stance: signal?.stance,
-    sourceTitle: signal?.sources?.[0]?.title || '',
-    sourceUrl: signal?.sources?.[0]?.url || '',
+    sources: toSourceInputs(signal?.sources),
   });
 
-  const [errors, setErrors] = useState({
-    description: undefined as string | undefined,
-    sourceCategory: undefined as string | undefined,
-    stance: undefined as string | undefined,
-    sourceTitle: undefined as string | undefined,
-    sourceUrl: undefined as string | undefined,
+  const [errors, setErrors] = useState<{
+    description?: string;
+    sourceCategory?: string;
+    stance?: string;
+    sources: Record<string, SourceErrors>;
+  }>({
+    description: undefined,
+    sourceCategory: undefined,
+    stance: undefined,
+    sources: {},
   });
 
   // Use the create mutation if no signal is provided (new signal)
@@ -51,8 +67,8 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
 
   const isLoading = isCreating || isUpdating;
 
-  const handleFormChange = (
-    field: keyof typeof formData,
+  const handleFieldChange = (
+    field: 'description' | 'sourceCategory' | 'stance',
     value: string,
     error?: string,
   ) => {
@@ -60,8 +76,17 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
     setErrors((prev) => ({ ...prev, [field]: error }));
   };
 
+  const handleSourcesChange = (
+    sources: SourceInput[],
+    sourceErrors: Record<string, SourceErrors>,
+  ) => {
+    setFormData((prev) => ({ ...prev, sources }));
+    setErrors((prev) => ({ ...prev, sources: sourceErrors }));
+  };
+
   const validateForm = () => {
-    const newErrors = {
+    // Validate basic fields
+    const fieldErrors = {
       description: !formData.description
         ? 'Description is required.'
         : undefined,
@@ -69,14 +94,43 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
         ? 'Source category is required.'
         : undefined,
       stance: !formData.stance ? 'Stance is required.' : undefined,
-      sourceTitle: !formData.sourceTitle
+    };
+
+    // Validate sources
+    const sourceErrors: Record<string, SourceErrors> = {};
+    let hasSourceError = false;
+
+    formData.sources.forEach((source) => {
+      const titleError = !source.title.trim()
         ? 'Source title is required.'
-        : undefined,
-      sourceUrl: !formData.sourceUrl ? 'Source URL is required.' : undefined,
+        : undefined;
+      const urlError = !source.url.trim()
+        ? 'Source URL is required.'
+        : undefined;
+
+      if (titleError || urlError) {
+        hasSourceError = true;
+        sourceErrors[source.id] = { title: titleError, url: urlError };
+      }
+    });
+
+    // Must have at least one source
+    if (formData.sources.length === 0) {
+      hasSourceError = true;
+    }
+
+    const newErrors = {
+      ...fieldErrors,
+      sources: sourceErrors,
     };
 
     setErrors(newErrors);
-    return !Object.values(newErrors).some((error) => error !== undefined);
+
+    const hasFieldError = Object.values(fieldErrors).some(
+      (error) => error !== undefined,
+    );
+
+    return !hasFieldError && !hasSourceError;
   };
 
   const handleSave = () => {
@@ -92,16 +146,13 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
       return;
     }
 
-    const { description, sourceCategory, stance, sourceTitle, sourceUrl } =
-      formData;
+    const { description, sourceCategory, stance, sources } = formData;
 
     // Prepare source data
-    const updatedSources: Partial<ISource>[] = [
-      {
-        title: sourceTitle.trim(),
-        url: sourceUrl.trim(),
-      },
-    ];
+    const updatedSources: Partial<ISource>[] = sources.map((source) => ({
+      title: source.title.trim(),
+      url: source.url.trim(),
+    }));
 
     const signalData: ICreateRealWorldSignal = {
       description,
@@ -186,14 +237,23 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
   );
 
   const isFormValid = useMemo(() => {
-    return (
+    const hasRequiredFields =
       formData.description &&
       formData.sourceCategory &&
       formData.stance &&
-      formData.sourceTitle &&
-      formData.sourceUrl &&
-      !Object.values(errors).some((error) => error !== undefined)
+      formData.sources.length > 0;
+
+    const allSourcesValid = formData.sources.every(
+      (source) => source.title.trim() && source.url.trim(),
     );
+
+    const hasFieldErrors =
+      errors.description ||
+      errors.sourceCategory ||
+      errors.stance ||
+      Object.values(errors.sources).some((e) => e.title || e.url);
+
+    return hasRequiredFields && allSourcesValid && !hasFieldErrors;
   }, [formData, errors]);
 
   return (
@@ -203,7 +263,8 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
       <SignalForm
         formData={formData}
         errors={errors}
-        onChange={handleFormChange}
+        onFieldChange={handleFieldChange}
+        onSourcesChange={handleSourcesChange}
       />
 
       <div className={styles.footer}>

@@ -33,6 +33,8 @@ const Testing: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
   const conceptUuid = concept?.uuid || '';
 
+  // Track page time for analytics
+
   const { generationState, resetGenerationState } =
     useTestGenerationEvents(conceptUuid);
 

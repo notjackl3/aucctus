@@ -16,6 +16,10 @@ const useSettingsRoutes = () => {
         path={AppPath.SettingsSecurity}
         element={<Page.SettingsPages.SecurityDetails />}
       />
+      <Route
+        path={AppPath.SettingsAdmin}
+        element={<Page.SettingsPages.AdminDetails />}
+      />
     </Route>
   );
 };

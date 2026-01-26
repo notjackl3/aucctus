@@ -86,21 +86,9 @@ export enum AucctusQueryKeys {
   nucleusReport = 'nucleusReport',
   nucleusReportLatest = 'nucleusReportLatest',
   nucleusReportsList = 'nucleusReportsList',
-
-  /* Signal Scanning (V1) */
-  signalScanningDashboard = 'signalScanningDashboard',
-  signalScanningSignals = 'signalScanningSignals',
-  signalScanningSignal = 'signalScanningSignal',
-  signalScanningOpportunities = 'signalScanningOpportunities',
-  signalScanningOpportunity = 'signalScanningOpportunity',
-  signalScanningIntelligence = 'signalScanningIntelligence',
-
-  /* Strategic Foresight (V2) */
-  strategicForesightDashboard = 'strategicForesightDashboard',
-  strategicForesightInsights = 'strategicForesightInsights',
-  strategicForesightInsight = 'strategicForesightInsight',
-  strategicForesightPatterns = 'strategicForesightPatterns',
-  strategicForesightRadar = 'strategicForesightRadar',
+  nucleusStatus = 'nucleusStatus',
+  nucleusDocuments = 'nucleusDocuments',
+  nucleusDocumentUsage = 'nucleusDocumentUsage',
 
   /* POC Plan */
   pocPlan = 'pocPlan',
@@ -124,4 +112,10 @@ export enum AucctusQueryKeys {
   submissionLinkSubmissions = 'submissionLinkSubmissions',
   submissionDetail = 'submissionDetail',
   bulkSubmissionScoringProgress = 'bulkSubmissionScoringProgress',
+
+  /* Admin */
+  adminMetrics = 'adminMetrics',
+  accountLogo = 'accountLogo',
+  userMetrics = 'userMetrics',
+  userMetricsDetail = 'userMetricsDetail',
 }

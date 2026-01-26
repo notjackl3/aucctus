@@ -309,6 +309,8 @@ export interface ISubmissionLinkInfo {
   accountName: string;
   /** Domain of the organization for logo fetching (e.g., "schreiber.com") */
   accountDomain: string | null;
+  /** Presigned URL for custom account logo (takes priority over logo.dev search) */
+  accountLogoUrl: string | null;
   requiresPassword: boolean;
   backgroundImageUrl: string | null;
   /** Presigned URL for headquarters video from Nucleus report */

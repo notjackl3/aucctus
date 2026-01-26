@@ -13,6 +13,8 @@ import CostSavingsProjections from './CostSavings/CostSavingsProjections';
 
 const FinancialProjectionsV2: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
+
+  // Track page time for analytics
   const { financialProjectionV2, isLoading: isFinancialProjectionLoading } =
     useFinancialProjectionV2(concept.uuid);
 

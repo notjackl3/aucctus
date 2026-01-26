@@ -2,7 +2,7 @@
  * Watchtower React Query Hooks
  *
  * Provides data fetching hooks for the Watchtower signal monitoring feature.
- * Uses real API endpoints from SignalScanningApi.
+ * Uses real API endpoints from WatchtowerApi.
  * Includes WebSocket integration for real-time scan progress updates.
  */
 
@@ -48,7 +48,7 @@ export const useWatchtowerDashboard = () => {
   const query = useQuery({
     queryKey: watchtowerKeys.dashboard(),
     queryFn: async (): Promise<IWatchtowerDashboard> => {
-      return await api.signalScanning.getWatchtowerDashboard();
+      return await api.watchtower.getWatchtowerDashboard();
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
     cacheTime: 1000 * 60 * 5, // 5 minutes
@@ -97,7 +97,7 @@ export const useMonitoringRules = () => {
   const query = useQuery({
     queryKey: watchtowerKeys.rules(),
     queryFn: async (): Promise<IWatchtowerMonitoringRule[]> => {
-      return await api.signalScanning.getMonitoringRules();
+      return await api.watchtower.getMonitoringRules();
     },
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 10, // 10 minutes
@@ -127,7 +127,7 @@ export const useCreateMonitoringRule = () => {
 
   const mutation = useMutation({
     mutationFn: async (ruleText: string) => {
-      return await api.signalScanning.createMonitoringRule({ ruleText });
+      return await api.watchtower.createMonitoringRule({ ruleText });
     },
     onSuccess: () => {
       // Invalidate rules query
@@ -165,7 +165,7 @@ export const useUpdateMonitoringRule = () => {
       ruleUuid: string;
       data: { ruleText?: string; isActive?: boolean };
     }) => {
-      return await api.signalScanning.updateMonitoringRule(ruleUuid, data);
+      return await api.watchtower.updateMonitoringRule(ruleUuid, data);
     },
     onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: watchtowerKeys.rules() });
@@ -199,7 +199,7 @@ export const useDeleteMonitoringRule = () => {
 
   const mutation = useMutation({
     mutationFn: async (ruleUuid: string) => {
-      return await api.signalScanning.deleteMonitoringRule(ruleUuid);
+      return await api.watchtower.deleteMonitoringRule(ruleUuid);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: watchtowerKeys.rules() });
@@ -354,7 +354,7 @@ export const useWatchtowerSocketEvents = () => {
 export const useRefreshWatchtower = () => {
   const mutation = useMutation({
     mutationFn: async () => {
-      return await api.signalScanning.refreshWatchtower();
+      return await api.watchtower.refreshWatchtower();
     },
     onSuccess: () => {
       toast.success(
@@ -403,9 +403,7 @@ export const useAddOpportunityToConceptBank = () => {
 
   const mutation = useMutation({
     mutationFn: async (opportunityUuid: string) => {
-      return await api.signalScanning.addOpportunityToConceptBank(
-        opportunityUuid,
-      );
+      return await api.watchtower.addOpportunityToConceptBank(opportunityUuid);
     },
     onSuccess: (data) => {
       // Invalidate dashboard to refresh opportunities list
@@ -464,7 +462,7 @@ export const useToggleSignalTracking = () => {
       signalId: string;
       isTracked: boolean;
     }) => {
-      return await api.signalScanning.toggleWatchtowerSignalTracking(
+      return await api.watchtower.toggleWatchtowerSignalTracking(
         signalId,
         isTracked,
       );

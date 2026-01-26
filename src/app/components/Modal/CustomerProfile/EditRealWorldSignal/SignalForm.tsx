@@ -2,39 +2,49 @@ import React, { FunctionComponent, useCallback } from 'react';
 import TextArea from '../../../Input/TextArea/TextArea';
 import { sourceCategories, stanceOptions } from './constants';
 import CategorySelect from '../CategorySelect';
-import SourceFields from './SourceFields';
+import MultiSourceFields, {
+  SourceInput,
+  SourceErrors,
+} from './MultiSourceFields';
 import { SignalSourceCategoryType, SignalStanceType } from '@libs/api/types';
 
 interface FormData {
   description?: string;
   sourceCategory?: SignalSourceCategoryType;
   stance?: SignalStanceType;
-  sourceTitle?: string;
-  sourceUrl?: string;
+  sources: SourceInput[];
 }
 
 interface FormErrors {
   description?: string;
   sourceCategory?: string;
   stance?: string;
-  sourceTitle?: string;
-  sourceUrl?: string;
+  sources: Record<string, SourceErrors>;
 }
 
 interface SignalFormProps {
   formData: FormData;
   errors: FormErrors;
-  onChange: (field: keyof FormData, value: string, error?: string) => void;
+  onFieldChange: (
+    field: 'description' | 'sourceCategory' | 'stance',
+    value: string,
+    error?: string,
+  ) => void;
+  onSourcesChange: (
+    sources: SourceInput[],
+    errors: Record<string, SourceErrors>,
+  ) => void;
 }
 
 const SignalForm: FunctionComponent<SignalFormProps> = ({
   formData,
   errors,
-  onChange,
+  onFieldChange,
+  onSourcesChange,
 }) => {
   const handleTextFieldChange = useCallback(
     (
-      fieldName: 'description' | 'sourceTitle' | 'sourceUrl',
+      fieldName: 'description' | 'sourceCategory' | 'stance',
       displayName: string,
       maxLength?: number,
     ) =>
@@ -48,18 +58,18 @@ const SignalForm: FunctionComponent<SignalFormProps> = ({
           error = `${displayName} exceeds the maximum allowed length.`;
         }
 
-        onChange(fieldName, input, error);
+        onFieldChange(fieldName, input, error);
       },
-    [onChange],
+    [onFieldChange],
   );
 
   const handleSelectChange = useCallback(
     (fieldName: 'sourceCategory' | 'stance', displayName: string) =>
       (value: string) => {
         const error = !value ? `${displayName} is required.` : undefined;
-        onChange(fieldName, value, error);
+        onFieldChange(fieldName, value, error);
       },
-    [onChange],
+    [onFieldChange],
   );
 
   return (
@@ -94,24 +104,10 @@ const SignalForm: FunctionComponent<SignalFormProps> = ({
         required
       />
 
-      <SourceFields
-        sourceTitle={formData.sourceTitle || ''}
-        sourceUrl={formData.sourceUrl || ''}
-        onSourceTitleChange={(value) =>
-          handleTextFieldChange(
-            'sourceTitle',
-            'Source title',
-          )({ target: { value } } as any)
-        }
-        onSourceUrlChange={(value) =>
-          handleTextFieldChange(
-            'sourceUrl',
-            'Source URL',
-          )({ target: { value } } as any)
-        }
-        sourceTitleError={errors.sourceTitle}
-        sourceUrlError={errors.sourceUrl}
-        required
+      <MultiSourceFields
+        sources={formData.sources}
+        errors={errors.sources}
+        onChange={onSourcesChange}
       />
     </div>
   );

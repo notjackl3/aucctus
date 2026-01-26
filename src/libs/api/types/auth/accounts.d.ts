@@ -25,6 +25,7 @@ export interface IAccount {
     email: string;
   };
   createdAt: string;
+  logoUrl?: string | null;
 }
 
 export interface IRegisterAccount {

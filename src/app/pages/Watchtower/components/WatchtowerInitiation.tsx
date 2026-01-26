@@ -5,9 +5,9 @@ import { motion, AnimatePresence } from 'framer-motion';
 import images from '@assets/img';
 
 /**
- * Feature highlight item for the initiation page
+ * Feature highlight item for the Watchtower initiation page
  */
-export interface FeatureHighlight {
+export interface WatchtowerFeatureHighlight {
   icon: IconVariant;
   title: string;
   description: string;
@@ -17,7 +17,7 @@ export interface FeatureHighlight {
 /**
  * Badge configuration for top badges
  */
-export interface InitiationBadge {
+export interface WatchtowerInitiationBadge {
   icon?: IconVariant;
   text: string;
   variant: 'premium' | 'status' | 'neutral';
@@ -25,9 +25,9 @@ export interface InitiationBadge {
 }
 
 /**
- * Props for the FeatureInitiation component
+ * Props for the WatchtowerInitiation component
  */
-export interface FeatureInitiationProps {
+export interface WatchtowerInitiationProps {
   /** Main icon for the feature */
   icon: IconVariant;
   /** Title of the feature */
@@ -35,7 +35,7 @@ export interface FeatureInitiationProps {
   /** Subtitle/tagline */
   subtitle: string;
   /** Feature highlights to display */
-  features: FeatureHighlight[];
+  features: WatchtowerFeatureHighlight[];
   /** Text for the CTA button */
   ctaText: string;
   /** Loading text for the CTA button */
@@ -43,21 +43,17 @@ export interface FeatureInitiationProps {
   /** Help text below the CTA */
   helpText?: string;
   /** Badges to display at the top */
-  badges?: InitiationBadge[];
+  badges?: WatchtowerInitiationBadge[];
   /** Called when the CTA is clicked */
   onInitialize: () => void | Promise<void>;
   /** Whether initialization is in progress */
   isInitializing?: boolean;
-  /** Custom background image (defaults to AI explorations background) */
-  backgroundImage?: string;
 }
 
 /**
- * Blurred radar background with animated signal dots
+ * Watchtower radar background with animated signal dots
  */
-const BlurredRadarBackground: React.FC<{ backgroundImage?: string }> = ({
-  backgroundImage,
-}) => {
+const WatchtowerRadarBackground: React.FC = () => {
   const signalDots = [
     { x: 25, y: 30, delay: 0 },
     { x: 70, y: 25, delay: 0.3 },
@@ -73,16 +69,30 @@ const BlurredRadarBackground: React.FC<{ backgroundImage?: string }> = ({
 
   return (
     <div className='absolute inset-0 overflow-hidden'>
-      {/* Background image */}
-      <div
-        className='absolute inset-0 bg-cover bg-center bg-no-repeat'
+      {/* Background image with blur and subtle movement */}
+      <motion.div
+        className='absolute -inset-4 bg-cover bg-center bg-no-repeat'
         style={{
-          backgroundImage: `url(${backgroundImage || images.aiExplorationsBackground})`,
-          filter: 'blur(1px)',
+          backgroundImage: `url(${images.nucleusBrandGradient})`,
+          filter: 'blur(2px)',
+          transform: 'scale(1.05)',
+        }}
+        initial={{ scale: 1.08 }}
+        animate={{ scale: 1.05 }}
+        transition={{ duration: 2, ease: 'easeOut' }}
+      />
+
+      {/* Dark overlay with multiply blend */}
+      <div
+        className='absolute inset-0'
+        style={{
+          backgroundColor: 'rgba(20, 10, 10, 0.55)',
+          mixBlendMode: 'multiply',
         }}
       />
-      {/* Dark overlay */}
-      <div className='absolute inset-0 bg-black/20' />
+
+      {/* Radial glow effect */}
+      <div className='bg-gradient-radial from-primary/10 absolute inset-0 via-transparent to-transparent opacity-50' />
 
       {/* Radar grid lines */}
       <svg
@@ -207,9 +217,9 @@ const BlurredRadarBackground: React.FC<{ backgroundImage?: string }> = ({
 /**
  * Badge component for the initiation header
  */
-const InitiationBadgeComponent: React.FC<{ badge: InitiationBadge }> = ({
-  badge,
-}) => {
+const InitiationBadgeComponent: React.FC<{
+  badge: WatchtowerInitiationBadge;
+}> = ({ badge }) => {
   const getVariantClasses = () => {
     switch (badge.variant) {
       case 'premium':
@@ -267,12 +277,12 @@ const InitiationBadgeComponent: React.FC<{ badge: InitiationBadge }> = ({
 };
 
 /**
- * FeatureInitiation - A reusable cinematic introduction component for new features
+ * WatchtowerInitiation - Cinematic introduction component for Watchtower first-run experience
  *
- * This component provides a visually engaging first-run experience for new features,
- * with animated backgrounds, feature highlights, and a prominent CTA button.
+ * This component provides a visually engaging first-run experience for Watchtower,
+ * with animated radar background, feature highlights, and a prominent CTA button.
  */
-const FeatureInitiation: React.FC<FeatureInitiationProps> = ({
+const WatchtowerInitiation: React.FC<WatchtowerInitiationProps> = ({
   icon,
   title,
   subtitle,
@@ -283,7 +293,6 @@ const FeatureInitiation: React.FC<FeatureInitiationProps> = ({
   badges = [],
   onInitialize,
   isInitializing = false,
-  backgroundImage,
 }) => {
   const [showContent, setShowContent] = useState(true);
   const [isFlashing, setIsFlashing] = useState(false);
@@ -303,8 +312,8 @@ const FeatureInitiation: React.FC<FeatureInitiationProps> = ({
 
   return (
     <div className='relative min-h-screen w-full overflow-hidden'>
-      {/* Blurred radar background */}
-      <BlurredRadarBackground backgroundImage={backgroundImage} />
+      {/* Watchtower radar background */}
+      <WatchtowerRadarBackground />
 
       {/* Activation flash overlay */}
       <AnimatePresence>
@@ -492,4 +501,4 @@ const FeatureInitiation: React.FC<FeatureInitiationProps> = ({
   );
 };
 
-export default FeatureInitiation;
+export default WatchtowerInitiation;

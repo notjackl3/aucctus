@@ -47,7 +47,7 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
   const { openModal, closeModal } = useModal();
 
   // Memoized values
-  const primarySource = useMemo(() => signal.sources?.[0], [signal.sources]);
+  const sources = useMemo(() => signal.sources || [], [signal.sources]);
   const stanceStyles = useMemo(
     () =>
       stanceStyleMap[signal.stance as SignalStanceType] ||
@@ -135,28 +135,32 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
         />
       </div>
 
-      {/* Source badge with logo and link */}
-      {primarySource && (
-        <Badge.SourceInfo
-          source={primarySource}
-          badgeSize='small'
-          badgeClassName='aucctus-text-primary'
-          onClick={() => window.open(primarySource.url, '_blank')}
-          showPublishedDate={false}
-          sourceDescription={
-            <div className='space-y-2'>
-              <div className='aucctus-text-xs aucctus-text-secondary'>
-                {signal.sourceCategory}
-              </div>
-              {primarySource.description && (
-                <div className='aucctus-text-xs aucctus-text-secondary'>
-                  {primarySource.description}
-                </div>
-              )}
-            </div>
-          }
-        />
-      )}
+      {/* Sources with citations */}
+      <div className='flex flex-col gap-2'>
+        {sources.map((source, index) => (
+          <div key={source.url || index} className='flex flex-col gap-1'>
+            <Badge.SourceInfo
+              source={source}
+              badgeSize='small'
+              badgeClassName='aucctus-text-primary'
+              onClick={() => window.open(source.url, '_blank')}
+              showPublishedDate={false}
+              sourceDescription={
+                index === 0 ? (
+                  <div className='aucctus-text-xs aucctus-text-secondary'>
+                    {signal.sourceCategory}
+                  </div>
+                ) : undefined
+              }
+            />
+            {source.description && (
+              <blockquote className='aucctus-text-xs aucctus-text-secondary aucctus-border-primary border-l-2 border-opacity-50 pl-2 italic'>
+                &ldquo;{source.description}&rdquo;
+              </blockquote>
+            )}
+          </div>
+        ))}
+      </div>
 
       {/* Action buttons */}
       <div

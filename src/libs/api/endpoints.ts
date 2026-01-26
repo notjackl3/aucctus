@@ -14,6 +14,7 @@ export class Endpoints {
   static logoSearch = '/logo-search';
 
   static account = `/api/v1/account`;
+  static accountLogo = `/api/v1/account/logo`;
   static dashboard = `/api/v1/dashboard`;
 
   static concept = 'api/v1/concept/';
@@ -730,6 +731,34 @@ export class Endpoints {
     return `/api/v1/nucleus-reports/${reportUuid}/upload`;
   }
 
+  // Nucleus Status & Initialization Endpoints
+  static nucleusStatus = '/api/v1/nucleus-reports/status';
+  static nucleusInitialize = '/api/v1/nucleus-reports/initialize';
+  static nucleusLookupCompanyInfo =
+    '/api/v1/nucleus-reports/lookup-company-info';
+  static nucleusDocumentsList = '/api/v1/nucleus-reports/documents';
+  static nucleusDocumentUsage(documentUuid: string) {
+    return `/api/v1/nucleus-reports/documents/${documentUuid}/usage`;
+  }
+  static nucleusDocumentDelete(documentUuid: string) {
+    return `/api/v1/nucleus-reports/documents/${documentUuid}`;
+  }
+
+  // Nucleus Video Endpoints (Admin only)
+  static adminNucleusVideoGenerate = '/api/v1/admin/nucleus-video/generate';
+
+  // Admin Metrics Endpoints (now under analytics)
+  static adminMetrics = '/api/v1/analytics/metrics';
+
+  // Admin Account Logo Endpoint
+  static adminAccountLogoUpload = '/api/v1/admin/account-logo/upload';
+
+  // Admin User Metrics Endpoints
+  static adminUserMetrics = '/api/v1/analytics/users';
+  static adminUserMetricsDetail(userUuid: string) {
+    return `/api/v1/analytics/users/${userUuid}`;
+  }
+
   // Idea Playground Endpoints
   static ideaPlaygroundAnchorThoughts =
     'api/v2/concept/idea-playground/anchor-thoughts';
@@ -820,52 +849,6 @@ export class Endpoints {
 
   static ideaPlaygroundSeedContext(seedUuid: string) {
     return `api/v2/concept/idea-playground/seed/${seedUuid}/context`;
-  }
-
-  // Signal Scanning Endpoints
-  static signalScanningDashboard = '/api/v1/signal-scanning/dashboard';
-  static signalScanningRefresh = '/api/v1/signal-scanning/refresh';
-  static signalScanningSignals = '/api/v1/signal-scanning/signals';
-  static signalScanningOpportunities = '/api/v1/signal-scanning/opportunities';
-  static signalScanningIntelligence = '/api/v1/signal-scanning/intelligence';
-
-  // Strategic Foresight V2 Endpoints (Insights)
-  static signalScanningInsights = '/api/v1/signal-scanning/insights';
-
-  static signalScanningInsight(insightUuid: string) {
-    return `/api/v1/signal-scanning/insights/${insightUuid}`;
-  }
-
-  static signalScanningInsightStatus(insightUuid: string) {
-    return `/api/v1/signal-scanning/insights/${insightUuid}/status`;
-  }
-
-  static signalScanningInsightTracking(insightUuid: string) {
-    return `/api/v1/signal-scanning/insights/${insightUuid}/tracking`;
-  }
-
-  static signalScanningSignal(signalUuid: string) {
-    return `/api/v1/signal-scanning/signals/${signalUuid}`;
-  }
-
-  static signalScanningSignalStatus(signalUuid: string) {
-    return `/api/v1/signal-scanning/signals/${signalUuid}/status`;
-  }
-
-  static signalScanningSignalCreateConcept(signalUuid: string) {
-    return `/api/v1/signal-scanning/signals/${signalUuid}/create-concept`;
-  }
-
-  static signalScanningSignalAttachConcept(signalUuid: string) {
-    return `/api/v1/signal-scanning/signals/${signalUuid}/attach-concept`;
-  }
-
-  static signalScanningOpportunity(opportunityUuid: string) {
-    return `/api/v1/signal-scanning/opportunities/${opportunityUuid}`;
-  }
-
-  static signalScanningOpportunityCreateConcept(opportunityUuid: string) {
-    return `/api/v1/signal-scanning/opportunities/${opportunityUuid}/create-concept`;
   }
 
   // Watchtower Endpoints

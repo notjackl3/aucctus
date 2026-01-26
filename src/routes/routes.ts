@@ -39,12 +39,8 @@ export enum AppPath {
   /* Nucleus */
   Nucleus = '/nucleus',
 
-  /* Signal Scanning */
-  SignalScanning = '/signal-scanning',
-
   /* Watchtower */
   Watchtower = '/watchtower',
-  WatchtowerInitiation = '/watchtower/initiation',
 
   /* Innovation Pipeline */
   InnovationPipeline = '/innovation-pipeline',
@@ -62,6 +58,7 @@ export enum AppPath {
   Settings = '/settings',
   SettingsAbout = '/settings/about',
   SettingsSecurity = '/settings/security',
+  SettingsAdmin = '/settings/admin',
 
   /* Testing */
   Testing = '/testing',

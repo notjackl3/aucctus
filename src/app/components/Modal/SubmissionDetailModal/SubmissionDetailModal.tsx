@@ -1,10 +1,4 @@
-import {
-  Icon,
-  toast,
-  ScoringCriteriaSection,
-  Loading,
-  Badge,
-} from '@components';
+import { Icon, Loading, ScoringCriteriaSection, toast } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useSubmissionDetail } from '@hooks/query/idea-submissions.hook';
 import api from '@libs/api';

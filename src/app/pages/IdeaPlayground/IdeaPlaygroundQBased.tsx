@@ -28,6 +28,7 @@ import {
 } from '@hooks/query/ideaPlayground.hook';
 
 const IdeaPlaygroundQBased: React.FC = () => {
+  // Track page time for analytics
   const [inputValue, setInputValue] = useState('');
   const [currentTopic, setCurrentTopic] = useState('');
   const [hasStartedTyping, setHasStartedTyping] = useState(false);

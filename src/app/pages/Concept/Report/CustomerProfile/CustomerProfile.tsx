@@ -44,6 +44,9 @@ const CustomerProfile: FunctionComponent = () => {
   const activeConceptUuid = useStore(
     (state) => state.conceptReport.conceptUuid,
   );
+
+  // Track page time for analytics
+
   const { concept } = useOutletContext<IConceptReportContext>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();

@@ -2,7 +2,7 @@ import { toast } from '@components';
 import api from '@libs/api';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
-import { useQuery, useMutation } from 'react-query';
+import { useQuery, useMutation, useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from './query-keys';
 
 /**
@@ -277,6 +277,307 @@ export const useGenerateNucleusReport = () => {
     isGenerating: isLoading,
     error,
     isSuccess,
+    reset,
+  };
+};
+
+/**
+ * Custom hook for generating a nucleus headquarters video.
+ * Admin only. Triggers the video generation pipeline asynchronously.
+ */
+export const useGenerateNucleusVideo = () => {
+  const { mutate, isLoading, error, isSuccess, reset, data } = useMutation({
+    mutationFn: async (params?: {
+      image?: File;
+      mood?: string;
+      duration?: number;
+    }) => {
+      return await api.nucleus.generateVideo({
+        image: params?.image,
+        mood: params?.mood as
+          | 'professional'
+          | 'innovative'
+          | 'established'
+          | 'modern'
+          | undefined,
+        duration: params?.duration,
+      });
+    },
+    onSuccess: () => {
+      toast.success(
+        'Video Generation Started',
+        'Your headquarters video is being generated. This may take several minutes.',
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      // Check for specific error codes
+      const errorCode = (e.response?.data as { code?: string })?.code;
+      if (errorCode === 'aucctus_admin_required') {
+        toast.error(
+          'Permission Denied',
+          'This feature is restricted to Aucctus administrators.',
+        );
+      } else {
+        toast.error(
+          'Video Generation Failed',
+          message || 'Unable to start video generation. Please try again.',
+        );
+      }
+    },
+  });
+
+  return {
+    generateVideo: mutate,
+    isGenerating: isLoading,
+    error,
+    isSuccess,
+    taskId: data?.taskId,
+    reset,
+  };
+};
+
+// ============================================
+// Nucleus Status & Initialization Hooks
+// ============================================
+
+import type {
+  NucleusStatus,
+  InitializeNucleusRequest,
+  DocumentWithUsage,
+  DocumentUsage,
+  CompanyLookupResponse,
+} from '@libs/api/types/nucleus';
+
+/**
+ * Custom hook for fetching the Nucleus initialization status.
+ * Returns whether Nucleus has been initialized and if it's currently loading.
+ */
+export const useNucleusStatus = () => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.nucleusStatus],
+    queryFn: async () => await api.nucleus.getNucleusStatus(),
+    staleTime: 1000 * 30, // 30 seconds - status can change during initialization
+    cacheTime: 1000 * 60 * 5, // 5 minutes
+    refetchOnWindowFocus: true, // Refetch when user returns
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Nucleus Status Fetch Failed',
+        message || 'Unable to fetch Nucleus status. Please try again',
+      );
+    },
+  });
+
+  return {
+    ...query,
+    // Note: query.isLoading is React Query's loading state (true while fetching)
+    // nucleusStatus.isLoading is the API response field (true if report is being generated)
+    nucleusStatus: query.data as NucleusStatus | undefined,
+    isInitialized: query.data?.isInitialized ?? false,
+    isNucleusGenerating: query.data?.isLoading ?? false, // Renamed to avoid collision with query.isLoading
+    initializationProgress: query.data?.initializationProgress ?? [],
+  };
+};
+
+/**
+ * Parameters for initializing Nucleus with optional files.
+ */
+interface InitializeNucleusParams {
+  data: InitializeNucleusRequest;
+  files?: File[];
+  headquartersImage?: File;
+}
+
+/**
+ * Custom hook for initializing Nucleus.
+ * Admin only. Saves company info, context questions, uploads documents, and triggers the Nucleus research pipeline.
+ */
+export const useInitializeNucleus = () => {
+  const { mutate, isLoading, error, isSuccess, reset } = useMutation({
+    mutationFn: async ({
+      data,
+      files,
+      headquartersImage,
+    }: InitializeNucleusParams) => {
+      return await api.nucleus.initializeNucleus(
+        data,
+        files,
+        headquartersImage,
+      );
+    },
+    onSuccess: (_, variables) => {
+      const fileCount = variables.files?.length ?? 0;
+      const fileMessage =
+        fileCount > 0
+          ? ` with ${fileCount} document${fileCount > 1 ? 's' : ''}`
+          : '';
+      toast.success(
+        'Initialization Started',
+        `Your Nucleus is being initialized${fileMessage}. This may take several minutes.`,
+      );
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      const errorCode = (e.response?.data as { code?: string })?.code;
+      if (errorCode === 'already_initialized') {
+        toast.error(
+          'Already Initialized',
+          'Nucleus has already been initialized for this account.',
+        );
+      } else if (errorCode === 'admin_required') {
+        toast.error('Permission Denied', 'Only admins can initialize Nucleus.');
+      } else {
+        toast.error(
+          'Initialization Failed',
+          message || 'Unable to initialize Nucleus. Please try again.',
+        );
+      }
+    },
+  });
+
+  return {
+    initializeNucleus: mutate,
+    isInitializing: isLoading,
+    error,
+    isSuccess,
+    reset,
+  };
+};
+
+/**
+ * Custom hook for looking up company headquarters and website from a company name.
+ * Uses AI-powered web search to find company information.
+ * Results are ephemeral and not persisted to the database.
+ */
+export const useCompanyInfoLookup = () => {
+  const { mutateAsync, isLoading, error, data, reset } = useMutation({
+    mutationFn: async (companyName: string) => {
+      return await api.nucleus.lookupCompanyInfo(companyName);
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Company Lookup Failed',
+        message ||
+          'Unable to look up company information. Please enter manually.',
+      );
+    },
+  });
+
+  return {
+    lookupCompanyInfo: mutateAsync,
+    isLookingUp: isLoading,
+    lookupResult: data as CompanyLookupResponse | undefined,
+    error,
+    reset,
+  };
+};
+
+/**
+ * Custom hook for fetching all uploaded documents with category usage.
+ * Returns documents from the latest nucleus report with which categories use each document.
+ */
+export const useNucleusDocuments = () => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.nucleusDocuments],
+    queryFn: async () => await api.nucleus.getDocuments(),
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 10, // 10 minutes
+    onError: (e: AxiosError) => {
+      // Only show error if it's not a 404 (no reports found)
+      if (e.response?.status !== 404) {
+        const message = utils.osiris.parseFormError(e);
+        toast.error(
+          'Documents Fetch Failed',
+          message || 'Unable to fetch documents. Please try again',
+        );
+      }
+    },
+  });
+
+  return {
+    ...query,
+    documents: (query.data as DocumentWithUsage[] | undefined) ?? [],
+    hasDocuments:
+      ((query.data as DocumentWithUsage[] | undefined) ?? []).length > 0,
+    isNoReportFound:
+      query.error && (query.error as AxiosError)?.response?.status === 404,
+  };
+};
+
+/**
+ * Custom hook for fetching usage/cascade information for a document.
+ * Returns which categories and how many sources would be affected by deletion.
+ */
+export const useNucleusDocumentUsage = (documentUuid?: string) => {
+  const query = useQuery({
+    queryKey: [AucctusQueryKeys.nucleusDocumentUsage, documentUuid],
+    queryFn: async () =>
+      documentUuid ? await api.nucleus.getDocumentUsage(documentUuid) : null,
+    enabled: !!documentUuid,
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 10, // 10 minutes
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      toast.error(
+        'Document Usage Fetch Failed',
+        message || 'Unable to fetch document usage. Please try again',
+      );
+    },
+  });
+
+  return {
+    ...query,
+    documentUsage: query.data as DocumentUsage | null,
+    categories: (query.data as DocumentUsage | null)?.categories ?? [],
+    totalSourcesAffected:
+      (query.data as DocumentUsage | null)?.totalSourcesAffected ?? 0,
+  };
+};
+
+/**
+ * Custom hook for deleting a document and all associated answer sources.
+ * Admin only. Returns usage info showing what was deleted.
+ * Invalidates the nucleus report query to refresh answers after deletion.
+ */
+export const useDeleteNucleusDocument = () => {
+  const queryClient = useQueryClient();
+
+  const { mutate, isLoading, error, isSuccess, reset, data } = useMutation({
+    mutationFn: async (documentUuid: string) => {
+      return await api.nucleus.deleteDocument(documentUuid);
+    },
+    onSuccess: (result) => {
+      toast.success(
+        'Document Deleted',
+        `Successfully deleted document and ${result?.totalSourcesAffected ?? 0} associated sources`,
+      );
+      // Invalidate nucleus report to refresh answers that may have been deleted
+      queryClient.invalidateQueries([AucctusQueryKeys.nucleusReportLatest]);
+      // Also invalidate documents list
+      queryClient.invalidateQueries([AucctusQueryKeys.nucleusDocuments]);
+    },
+    onError: (e: AxiosError) => {
+      const message = utils.osiris.parseFormError(e);
+      const errorCode = (e.response?.data as { code?: string })?.code;
+      if (errorCode === 'admin_required') {
+        toast.error('Permission Denied', 'Only admins can delete documents.');
+      } else {
+        toast.error(
+          'Delete Failed',
+          message || 'Unable to delete document. Please try again.',
+        );
+      }
+    },
+  });
+
+  return {
+    deleteDocument: mutate,
+    isDeleting: isLoading,
+    error,
+    isSuccess,
+    deletedDocumentUsage: data as DocumentUsage | undefined,
     reset,
   };
 };

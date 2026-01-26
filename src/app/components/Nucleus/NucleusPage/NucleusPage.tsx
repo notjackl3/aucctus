@@ -1,40 +1,59 @@
 import { Icon, NucleusLoadingState } from '@components';
+import { useDebugMode } from '@hooks/debug-mode.hook';
 import {
-  useNucleusReportLatest,
-  useGenerateNucleusReport,
-} from '../../../hooks/query/nucleus.hook';
-import { NucleusHeroBackground } from '../NucleusHeroBackground';
-import { ConceptScoringConfig } from '../ConceptScoringConfig';
-import { cn } from '@libs/utils/react';
-import {
-  NucleusReportSection,
-  NucleusReportQuestion,
-  NucleusReportAnswer,
   AssessmentStatus,
+  NucleusReportAnswer,
+  NucleusReportQuestion,
+  NucleusReportSection,
   SectionType,
 } from '@libs/api/types';
-import useStore from '../../../stores/store';
+import { cn } from '@libs/utils/react';
+import { motion } from 'framer-motion';
 import React, {
-  useEffect,
-  useState,
-  useMemo,
   useCallback,
+  useEffect,
+  useMemo,
   useRef,
+  useState,
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { CategoriesGrid } from '../CategoriesGrid';
-import { CategoryState, QuestionState } from '../StatusDropdown';
+import { useAccountLogo } from '../../../hooks/query/admin.hook';
+import {
+  useGenerateNucleusReport,
+  useNucleusReportLatest,
+  useNucleusStatus,
+} from '../../../hooks/query/nucleus.hook';
 import {
   useUpdateQuestion,
   useUpdateSection,
 } from '../../../hooks/query/nucleusCrud.hook';
+import useStore from '../../../stores/store';
 import LoadingMask from '../../Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { animationStyles } from '../../Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
-import StatusBadge from '../StatusBadge';
+import { CategoriesGrid } from '../CategoriesGrid';
+import { ConceptScoringConfig } from '../ConceptScoringConfig';
 import DocumentUpload from '../DocumentUpload';
-import { useDebugMode } from '@hooks/debug-mode.hook';
+import { NucleusHeroBackground } from '../NucleusHeroBackground';
+import { NucleusInitiation } from '../NucleusInitiation';
+import { UploadsTab } from '../UploadsTab';
+import StatusBadge from '../StatusBadge';
+import { CategoryState, QuestionState } from '../StatusDropdown';
+import { useQueryClient } from 'react-query';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 
 const NucleusPage: React.FC = () => {
+  // Track page time for analytics
+
+  // Fetch nucleus status (initialization check)
+  // isLoading = React Query's loading state (true while fetching)
+  // isNucleusGenerating = API response field (true if report is being generated)
+  const {
+    nucleusStatus,
+    isLoading: isStatusLoading,
+    isNucleusGenerating,
+  } = useNucleusStatus();
+  const queryClient = useQueryClient();
+
   // Fetch real nucleus data
   const {
     nucleusReport,
@@ -66,8 +85,31 @@ const NucleusPage: React.FC = () => {
 
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
 
-  // Handle URL query param for opening scoring config
+  // Company logo - fetch from dedicated endpoint
+  const { logoUrl: companyLogoUrl } = useAccountLogo();
+  const [logoFailed, setLogoFailed] = useState(false);
+
+  // Handle URL query param for tabs and scoring config
   const [searchParams, setSearchParams] = useSearchParams();
+
+  // Tab state - persists in URL params
+  type NucleusTab = 'categories' | 'data-uploads';
+  const activeTab: NucleusTab =
+    (searchParams.get('tab') as NucleusTab) || 'categories';
+
+  const setActiveTab = useCallback(
+    (tab: NucleusTab) => {
+      const newParams = new URLSearchParams(searchParams);
+      if (tab === 'categories') {
+        newParams.delete('tab'); // Default, no need to store
+      } else {
+        newParams.set('tab', tab);
+      }
+      setSearchParams(newParams, { replace: true });
+    },
+    [searchParams, setSearchParams],
+  );
+
   const scoringConfigRef = useRef<HTMLDivElement>(null);
   const [isScoringConfigExpanded, setIsScoringConfigExpanded] = useState(() => {
     return searchParams.get('openScoringConfig') === 'true';
@@ -359,6 +401,61 @@ const NucleusPage: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [activeDropdown]);
 
+  // Handle initialization completion - refetch status to show loading state
+  const handleInitializationComplete = useCallback(() => {
+    queryClient.invalidateQueries([AucctusQueryKeys.nucleusStatus]);
+    queryClient.invalidateQueries([AucctusQueryKeys.nucleusReportLatest]);
+  }, [queryClient]);
+
+  // ==============================================
+  // INITIALIZATION-BASED ROUTING
+  // ==============================================
+
+  // Show loading while fetching status
+  if (isStatusLoading) {
+    return (
+      <div className='aucctus-bg-primary flex min-h-screen items-center justify-center'>
+        <div className='text-center'>
+          <div className='aucctus-text-lg aucctus-text-primary mb-4'>
+            Loading Nucleus...
+          </div>
+          <div className='mx-auto h-8 w-8 animate-spin rounded-full border-b-2 border-gray-900'></div>
+        </div>
+      </div>
+    );
+  }
+
+  // If not initialized, show initialization wizard or contact admin message
+  if (nucleusStatus && !nucleusStatus.isInitialized) {
+    if (isAdmin) {
+      // Admin can initialize Nucleus
+      return <NucleusInitiation onComplete={handleInitializationComplete} />;
+    }
+    // Non-admin sees contact admin message
+    return (
+      <div className='aucctus-bg-primary flex min-h-screen items-center justify-center'>
+        <div className='text-center'>
+          <Icon
+            variant='lock'
+            className='aucctus-text-secondary mx-auto mb-4 h-12 w-12'
+          />
+          <div className='aucctus-text-xl aucctus-text-primary mb-2'>
+            Nucleus Not Set Up
+          </div>
+          <div className='aucctus-text-md aucctus-text-secondary max-w-md'>
+            Contact your account administrator to set up Nucleus for your
+            organization.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // If initialized but still generating report, show loading state
+  if (nucleusStatus?.isInitialized && isNucleusGenerating) {
+    return <NucleusLoadingState />;
+  }
+
   // Loading and error states
   if (isLoading) {
     return (
@@ -528,10 +625,26 @@ const NucleusPage: React.FC = () => {
           <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-12'>
             <StatusBadge status={nucleusReport.processingStatus} />
 
-            {/* Company Name */}
-            <h1 className='aucctus-header-2xl-bold mb-4 text-center tracking-tight text-white drop-shadow-xl'>
-              {companyName}
-            </h1>
+            {/* Company Logo or Name */}
+            {companyLogoUrl && !logoFailed ? (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className='mb-4 flex items-center justify-center rounded-md bg-white/30 p-4 backdrop-blur-sm'
+              >
+                <img
+                  src={companyLogoUrl}
+                  alt={companyName}
+                  className='h-24 w-auto max-w-[200px] object-contain drop-shadow-xl'
+                  onError={() => setLogoFailed(true)}
+                />
+              </motion.div>
+            ) : (
+              <h1 className='aucctus-header-2xl-bold mb-4 text-center tracking-tight text-white drop-shadow-xl'>
+                {companyName}
+              </h1>
+            )}
 
             {/* Subtitle */}
             <p className='aucctus-text-lg mx-auto mb-12 max-w-2xl text-center leading-relaxed text-white/80'>
@@ -591,21 +704,35 @@ const NucleusPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Header for Categories */}
+        {/* Tab Header */}
         <div className='relative'>
           <div className='absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 transform'>
             <div className='aucctus-border-primary rounded-lg border bg-white px-1 py-1 shadow-sm backdrop-blur-sm'>
               <div className='flex gap-2'>
-                <div className='aucctus-text-sm-medium btn btn-bold btn-primary rounded-md px-3 py-1.5'>
+                <button
+                  type='button'
+                  onClick={() => setActiveTab('categories')}
+                  className={cn(
+                    'aucctus-text-sm-medium rounded-md px-3 py-1.5 transition-colors',
+                    activeTab === 'categories'
+                      ? 'btn btn-bold btn-primary'
+                      : 'btn btn-ghost hover:bg-gray-100',
+                  )}
+                >
                   Categories
-                </div>
-                <div className='aucctus-text-sm-medium btn btn-disabled flex items-center rounded-md px-3 py-1.5'>
-                  <Icon
-                    variant='lock'
-                    className='aucctus-fill-disabled aucctus-stroke-disabled h-4 w-4'
-                  />
-                  AI Insights
-                </div>
+                </button>
+                <button
+                  type='button'
+                  onClick={() => setActiveTab('data-uploads')}
+                  className={cn(
+                    'aucctus-text-sm-medium rounded-md px-3 py-1.5 transition-colors',
+                    activeTab === 'data-uploads'
+                      ? 'btn btn-bold btn-primary'
+                      : 'btn btn-ghost hover:bg-gray-100',
+                  )}
+                >
+                  Data &amp; Uploads
+                </button>
               </div>
             </div>
           </div>
@@ -614,60 +741,88 @@ const NucleusPage: React.FC = () => {
           <div className='h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent'></div>
         </div>
 
-        {/* Categories Content */}
-        <div
-          className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'
-          data-tab='categories'
-        >
-          <CategoriesGrid
-            allCategories={allSections}
-            expandedCategory={expandedCategory}
-            setExpandedCategory={handleExpandedCategoryChange}
-            getCategoryStateInfo={(categoryId: string) => {
-              const section = reportSections.find(
-                (s: NucleusReportSection) => s.sectionType === categoryId,
-              );
-              return section
-                ? getCategoryStateInfo(section)
-                : {
-                    state: 'needs_input' as CategoryState,
-                    validated: 0,
-                    newDetails: 0,
-                    needsInput: 0,
-                    totalSources: 0,
-                  };
-            }}
-            getStateConfig={getStateConfig}
-            setCategoryStatusOverrides={setCategoryStatusOverrides}
-            activeDropdown={activeDropdown}
-            setActiveDropdown={setActiveDropdown}
-            questionStatusOverrides={questionStatusOverrides}
-            handleQuestionStatusChange={handleQuestionStatusChange}
-            handleSectionStatusChange={handleSectionStatusChange}
-            getQuestionState={getQuestionState}
-            reportUuid={nucleusReport?.uuid || ''}
-            isAdmin={isAdmin}
-          />
-
-          {/* Concept Scoring Configuration - At the end of categories */}
+        {/* Tab Content */}
+        {activeTab === 'categories' && (
           <div
-            ref={scoringConfigRef}
-            className='mt-6 grid auto-rows-min grid-cols-1 gap-6 lg:grid-cols-2'
+            className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'
+            data-tab='categories'
           >
+            <CategoriesGrid
+              allCategories={allSections}
+              expandedCategory={expandedCategory}
+              setExpandedCategory={handleExpandedCategoryChange}
+              getCategoryStateInfo={(categoryId: string) => {
+                const section = reportSections.find(
+                  (s: NucleusReportSection) => s.sectionType === categoryId,
+                );
+                return section
+                  ? getCategoryStateInfo(section)
+                  : {
+                      state: 'needs_input' as CategoryState,
+                      validated: 0,
+                      newDetails: 0,
+                      needsInput: 0,
+                      totalSources: 0,
+                    };
+              }}
+              getStateConfig={getStateConfig}
+              setCategoryStatusOverrides={setCategoryStatusOverrides}
+              activeDropdown={activeDropdown}
+              setActiveDropdown={setActiveDropdown}
+              questionStatusOverrides={questionStatusOverrides}
+              handleQuestionStatusChange={handleQuestionStatusChange}
+              handleSectionStatusChange={handleSectionStatusChange}
+              getQuestionState={getQuestionState}
+              reportUuid={nucleusReport?.uuid || ''}
+              isAdmin={isAdmin}
+            />
+
+            {/* Concept Scoring Configuration - At the end of categories */}
             <div
-              className={cn('transition-all duration-300 ease-in-out', {
-                'lg:col-span-2': isScoringConfigExpanded,
-              })}
+              ref={scoringConfigRef}
+              className='mt-6 grid auto-rows-min grid-cols-1 gap-6 lg:grid-cols-2'
             >
-              <ConceptScoringConfig
-                isExpanded={isScoringConfigExpanded}
-                onToggleExpand={() =>
-                  setIsScoringConfigExpanded((prev) => !prev)
-                }
-              />
+              <div
+                className={cn('transition-all duration-300 ease-in-out', {
+                  'lg:col-span-2': isScoringConfigExpanded,
+                })}
+              >
+                <ConceptScoringConfig
+                  isExpanded={isScoringConfigExpanded}
+                  onToggleExpand={() =>
+                    setIsScoringConfigExpanded((prev) => !prev)
+                  }
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
+
+        {/* Data & Uploads Tab */}
+        {activeTab === 'data-uploads' && (
+          <div data-tab='data-uploads'>
+            <UploadsTab
+              onNavigateToCategory={(categoryId) => {
+                setActiveTab('categories');
+                setExpandedCategory(categoryId);
+                // Scroll to the category card after DOM updates
+                requestAnimationFrame(() => {
+                  requestAnimationFrame(() => {
+                    const categoryElement = document.getElementById(
+                      `category-${categoryId}`,
+                    );
+                    if (categoryElement) {
+                      categoryElement.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                      });
+                    }
+                  });
+                });
+              }}
+            />
+          </div>
+        )}
 
         {/* Loading mask for question and section status updates */}
         <LoadingMask

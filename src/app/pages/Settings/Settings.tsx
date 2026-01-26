@@ -3,26 +3,41 @@ import useStore from '@stores/store';
 import { FunctionComponent, useCallback, useMemo, useState } from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { AppPath } from '../../../routes/routes';
+import { isAucctusAdmin } from '../../../libs/utils/account';
 import TabView from '../../components/Container/TabView/TabView';
 
-export const SETTING_TABS = [
+const BASE_SETTING_TABS = [
   { label: 'About you', value: AppPath.SettingsAbout },
   { label: 'Security', value: AppPath.SettingsSecurity },
 ];
 
+const ADMIN_TAB = { label: 'Admin', value: AppPath.SettingsAdmin };
+
 const Settings: FunctionComponent = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { user } = useStore((state) => state.auth);
+
+  // Build tabs list conditionally based on admin status
+  const SETTING_TABS = useMemo(() => {
+    if (isAucctusAdmin(user)) {
+      return [...BASE_SETTING_TABS, ADMIN_TAB];
+    }
+    return BASE_SETTING_TABS;
+  }, [user]);
+
   // Initialize activeTab based on current route
-  const getActiveTabFromRoute = (pathname: string) => {
-    const matchingTab = SETTING_TABS.find((tab) => tab.value === pathname);
-    return matchingTab ? matchingTab.value : AppPath.SettingsAbout;
-  };
+  const getActiveTabFromRoute = useCallback(
+    (pathname: string) => {
+      const matchingTab = SETTING_TABS.find((tab) => tab.value === pathname);
+      return matchingTab ? matchingTab.value : AppPath.SettingsAbout;
+    },
+    [SETTING_TABS],
+  );
 
   const [activeTab, setActiveTab] = useState<string>(() =>
     getActiveTabFromRoute(location.pathname),
   );
-  const { user } = useStore((state) => state.auth);
 
   const missingFields = useMemo(() => {
     if (!user) return [];

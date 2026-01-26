@@ -13,6 +13,7 @@ import Stage from './StageBadge';
 import TestStatus from './TestStatus';
 import ValidationStatus from './ValidationStatus';
 import AnswerSource from './AnswerSourceBadge';
+import NucleusSource from './NucleusSourceBadge';
 import WithIcon from './BadgeWithIcon';
 import WithLabel from './BadgeWithLabel';
 
@@ -32,6 +33,7 @@ const Badges = {
   Default,
   Beta,
   AnswerSource,
+  NucleusSource,
   WithIcon,
   WithLabel,
 };

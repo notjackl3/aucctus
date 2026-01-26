@@ -8,8 +8,7 @@ import Concept from './Concept';
 import IdeaPlayground from './IdeaPlayground';
 import IdeaSubmissions from './IdeaSubmissions';
 import InnovationPipeline from './InnovationPipeline';
-import SignalScanning from './SignalScanning';
-import { WatchtowerPage, WatchtowerInitiationPage } from './Watchtower';
+import { WatchtowerPage } from './Watchtower';
 
 const Page = {
   Auth,
@@ -19,11 +18,9 @@ const Page = {
   IdeaPlayground,
   IdeaSubmissions,
   InnovationPipeline,
-  SignalScanning,
   SettingsPages,
   Testing: TestingPages,
   WatchtowerPage,
-  WatchtowerInitiationPage,
 };
 
 export default Page;

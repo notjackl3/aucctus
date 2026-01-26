@@ -12,6 +12,8 @@ import { AppPath } from '@routes/routes';
 
 const MarketScanWrapper: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
+
+  // Track page time for analytics
   const { mutate: generateMarketScan, isLoading } = useGenerateMarketScan();
 
   // Use global debug mode state

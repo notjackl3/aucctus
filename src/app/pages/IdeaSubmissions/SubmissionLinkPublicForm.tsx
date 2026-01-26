@@ -1,11 +1,10 @@
 import { animationStyles } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
-import { FunctionComponent, useState, useCallback, useEffect } from 'react';
+import { FunctionComponent, useState, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { useMutation, useQuery } from 'react-query';
 import { Loader2, AlertTriangle } from 'lucide-react';
 import api from '@libs/api';
 import { ICreateIdeaSubmissionViaLink } from '@libs/api/types/ideaSubmissions';
-import { searchCompanyLogo } from '@libs/utils/source';
 import utils from '@libs/utils';
 import {
   VideoBackground,
@@ -36,8 +35,7 @@ const SubmissionLinkPublicForm: FunctionComponent = () => {
   // Component state
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  // Logo state
-  const [companyLogoUrl, setCompanyLogoUrl] = useState<string | null>(null);
+  // Logo state - uses account logo if available, otherwise falls back to account name
   const [logoFailed, setLogoFailed] = useState(false);
 
   // Fetch link info
@@ -53,17 +51,8 @@ const SubmissionLinkPublicForm: FunctionComponent = () => {
     retry: false,
   });
 
-  // Fetch company logo using search API when linkInfo is available
-  useEffect(() => {
-    const fetchLogo = async () => {
-      if (linkInfo?.accountName) {
-        const logoUrl = await searchCompanyLogo(linkInfo.accountName);
-        setCompanyLogoUrl(logoUrl);
-      }
-    };
-
-    fetchLogo();
-  }, [linkInfo?.accountName]);
+  // Use account logo if available (no logo.dev fallback - will show account name instead)
+  const companyLogoUrl = linkInfo?.accountLogoUrl || null;
 
   // Submit mutation
   const submitMutation = useMutation({

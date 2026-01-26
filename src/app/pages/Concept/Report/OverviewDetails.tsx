@@ -13,6 +13,9 @@ const OverviewDetails: FunctionComponent = () => {
   const activeConceptUuid = useStore(
     (state) => state.conceptReport.conceptUuid ?? '',
   );
+
+  // Track page time for analytics
+
   const { navigateToTab, concept } = useOutletContext<IConceptReportContext>();
   const isDebugModeEnabled = useDebugMode();
 

@@ -232,6 +232,19 @@ select:focus {
     0px 4px 6px -2px rgba(187, 45, 10, 0.819);
 }
 
+/* Background Animation Keyframes */
+@keyframes moveBackground {
+  0% {
+    background-position: 0% 0%;
+  }
+  50% {
+    background-position: 50% 100%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
 /* Custom Scrollbar Styling */
 * {
 

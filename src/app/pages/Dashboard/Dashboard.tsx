@@ -17,6 +17,7 @@ const defaultIconProps = {
 };
 
 const Dashboard: FunctionComponent = () => {
+  // Track page time for analytics
   const navigate = useNavigate();
   const { resetQuestionnaire, setIsNewSeed } = useConceptIncubationStore();
   const { account, isAuthenticated } = useStore((state) => state.auth);

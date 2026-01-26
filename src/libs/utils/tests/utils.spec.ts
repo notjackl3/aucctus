@@ -122,3 +122,79 @@ describe('createPaginationNumbers', () => {
     expect(utils.array.createPaginationNumbers(5, 10, 2)).toEqual([1, 10]);
   });
 });
+
+describe('isAucctusAdmin', () => {
+  it('should return true for admin with @aucctus.com email', () => {
+    const user = {
+      uuid: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'admin@aucctus.com',
+      role: 'Admin' as const,
+    };
+    expect(utils.account.isAucctusAdmin(user)).toBe(true);
+  });
+
+  it('should return false for admin with non-aucctus email', () => {
+    const user = {
+      uuid: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'admin@acme.com',
+      role: 'Admin' as const,
+    };
+    expect(utils.account.isAucctusAdmin(user)).toBe(false);
+  });
+
+  it('should return false for employee with @aucctus.com email', () => {
+    const user = {
+      uuid: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'employee@aucctus.com',
+      role: 'Employee' as const,
+    };
+    expect(utils.account.isAucctusAdmin(user)).toBe(false);
+  });
+
+  it('should return false for employee with non-aucctus email', () => {
+    const user = {
+      uuid: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'employee@acme.com',
+      role: 'Employee' as const,
+    };
+    expect(utils.account.isAucctusAdmin(user)).toBe(false);
+  });
+
+  it('should return false for null user', () => {
+    expect(utils.account.isAucctusAdmin(null)).toBe(false);
+  });
+
+  it('should return false for undefined user', () => {
+    expect(utils.account.isAucctusAdmin(undefined)).toBe(false);
+  });
+
+  it('should handle uppercase email domain correctly (case-insensitive)', () => {
+    const user = {
+      uuid: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'admin@AUCCTUS.COM',
+      role: 'Admin' as const,
+    };
+    expect(utils.account.isAucctusAdmin(user)).toBe(true);
+  });
+
+  it('should handle mixed case email domain correctly', () => {
+    const user = {
+      uuid: '123',
+      firstName: 'John',
+      lastName: 'Doe',
+      email: 'admin@Aucctus.Com',
+      role: 'Admin' as const,
+    };
+    expect(utils.account.isAucctusAdmin(user)).toBe(true);
+  });
+});

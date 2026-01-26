@@ -27,6 +27,18 @@ export type SectionType =
   | 'talent_culture' // Operating Model & Core Capabilities
   | 'financial'; // Financial Performance & Resource Allocation
 
+export interface NucleusFileSource {
+  uuid: string;
+  type: FileType;
+  title: string;
+  description?: string;
+  originalFilename?: string;
+  fileSize?: number;
+  contentType?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface NucleusAnswerSource {
   uuid: string;
   url?: string;
@@ -36,6 +48,7 @@ export interface NucleusAnswerSource {
   credibilityScore?: number;
   confidenceLevel?: ConfidenceLevel;
   order: number;
+  nucleusFileSource?: NucleusFileSource;
   createdAt: string;
   updatedAt: string;
 }
@@ -223,4 +236,151 @@ export interface NucleusReportProgress {
   };
   recentAnswers: NucleusReportAnswerProgress[];
   headquartersVideoUrl: string;
+}
+
+/**
+ * Request to generate nucleus video
+ * POST /api/v1/admin/nucleus-video/generate
+ *
+ * Note: This is sent as multipart/form-data with an optional image file.
+ */
+export interface NucleusVideoGenerateRequest {
+  image?: File;
+  mood?: 'professional' | 'innovative' | 'established' | 'modern';
+  duration?: number;
+}
+
+/**
+ * Response from nucleus video generation
+ */
+export interface NucleusVideoGenerateResponse {
+  taskId: string;
+  message: string;
+}
+
+// ============================================
+// Nucleus Initialization Flow Types
+// ============================================
+
+/**
+ * Category progress during Nucleus initialization
+ */
+export interface CategoryProgress {
+  categoryId: string;
+  categoryName: string;
+  progress: number; // 0-100
+  estimatedSeconds?: number;
+}
+
+/**
+ * Response from GET /api/v1/nucleus-reports/status
+ */
+export interface NucleusStatus {
+  isInitialized: boolean;
+  isLoading: boolean;
+  initializationProgress?: CategoryProgress[];
+}
+
+/**
+ * Context question with answer for initialization
+ */
+export interface ContextQuestion {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+/**
+ * Request for POST /api/v1/nucleus-reports/initialize
+ */
+export interface InitializeNucleusRequest {
+  companyName: string;
+  headquarters: string;
+  websiteDomain: string;
+  contextQuestions: ContextQuestion[];
+}
+
+/**
+ * Response from initialization endpoint
+ */
+export interface InitializeNucleusResponse {
+  message: string;
+  nucleusReportUuid?: string;
+}
+
+// ============================================
+// Document with Category Usage Types
+// ============================================
+
+export type FileType =
+  | 'pdf'
+  | 'doc'
+  | 'docx'
+  | 'txt'
+  | 'csv'
+  | 'xls'
+  | 'xlsx'
+  | 'ppt'
+  | 'pptx'
+  | 'file';
+
+/**
+ * Category usage information for a document
+ */
+export interface CategoryUsage {
+  categoryId: string;
+  categoryName: string;
+  sourceCount: number;
+}
+
+/**
+ * Document with category usage information
+ * Returned by GET /api/v1/nucleus-reports/documents
+ */
+export interface DocumentWithUsage {
+  uuid: string;
+  type: FileType;
+  title: string;
+  description?: string;
+  originalFilename?: string;
+  fileSize?: number;
+  contentType?: string;
+  categories: CategoryUsage[];
+  createdAt: string;
+  updatedAt: string;
+}
+
+/**
+ * Document usage/cascade information
+ * Returned by GET /api/v1/nucleus-reports/documents/{uuid}/usage
+ * and DELETE /api/v1/nucleus-reports/documents/{uuid}
+ */
+export interface DocumentUsage {
+  uuid: string;
+  title: string;
+  originalFilename?: string;
+  fileSize?: number;
+  categories: CategoryUsage[];
+  totalSourcesAffected: number;
+}
+
+// ============================================
+// Company Info Lookup Types
+// ============================================
+
+/**
+ * Request for POST /api/v1/nucleus-reports/lookup-company-info
+ */
+export interface CompanyLookupRequest {
+  companyName: string;
+}
+
+/**
+ * Response from company info lookup
+ * Returns headquarters location and website domain with confidence score
+ */
+export interface CompanyLookupResponse {
+  headquarters: string | null;
+  websiteDomain: string | null;
+  confidence: number;
 }

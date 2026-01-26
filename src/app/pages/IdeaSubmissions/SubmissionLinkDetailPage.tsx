@@ -76,6 +76,8 @@ const staggerContainer = {
  * - Submissions grid/list with compare functionality
  */
 const SubmissionLinkDetailPage: FunctionComponent = () => {
+  // Track page time for analytics
+
   const { linkUuid } = useParams<{ linkUuid: string }>();
   const queryClient = useQueryClient();
   const account = useStore((state) => state.auth.account);
