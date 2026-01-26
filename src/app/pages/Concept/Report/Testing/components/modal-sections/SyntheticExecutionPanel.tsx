@@ -54,6 +54,7 @@ interface ISyntheticExecutionPanelProps {
   initialParticipantCounts?: Record<string, number>;
   lockedSkippedParticipants?: Set<string>;
   isCollateralRegenerating?: boolean;
+  isViewMode?: boolean;
 }
 
 /**
@@ -89,6 +90,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
   initialParticipantCounts,
   lockedSkippedParticipants,
   isCollateralRegenerating = false,
+  isViewMode = false,
 }) => {
   // Configuration state
   const [selectedCollateralUuids, setSelectedCollateralUuids] = useState<
@@ -605,8 +607,123 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
 
   return (
     <div className='space-y-6'>
-      {/* Test Preview Section - Hide when execution is running */}
-      {status === 'idle' && (
+      {/* View Mode - Completed Summary */}
+      {isViewMode && (
+        <div className='space-y-6'>
+          {/* Header Card */}
+          <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-xl border border-l-4 border-l-emerald-500 shadow-sm'>
+            <div className='px-6 py-4'>
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-4'>
+                  <div className='aucctus-bg-success-subtle rounded-full p-3'>
+                    <Icon
+                      variant='check'
+                      className='aucctus-stroke-success-primary h-6 w-6'
+                    />
+                  </div>
+                  <div>
+                    <h2 className='aucctus-text-primary text-2xl font-bold'>
+                      Test Completed
+                    </h2>
+                    <p className='aucctus-text-sm aucctus-text-secondary mt-1'>
+                      Synthetic interviews were executed successfully
+                    </p>
+                  </div>
+                </div>
+
+                {/* Metrics Row */}
+                <div className='flex items-center gap-12'>
+                  <div className='flex items-center gap-3'>
+                    <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
+                      <Icon
+                        variant='users-03'
+                        className='aucctus-stroke-brand-primary h-4 w-4'
+                      />
+                    </div>
+                    <div>
+                      <div className='aucctus-text-xl-bold aucctus-text-primary'>
+                        {totalTests}
+                      </div>
+                      <div className='aucctus-text-xs aucctus-text-secondary'>
+                        Participants
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className='flex items-center gap-3'>
+                    <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
+                      <Icon
+                        variant='file-text'
+                        className='aucctus-stroke-brand-primary h-4 w-4'
+                      />
+                    </div>
+                    <div>
+                      <div className='aucctus-text-xl-bold aucctus-text-primary'>
+                        {collateralOptions?.length || '-'}
+                      </div>
+                      <div className='aucctus-text-xs aucctus-text-secondary'>
+                        Collateral
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Participants Used - Reuse ParticipantSelectionStep in read-only mode */}
+          <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border shadow-sm'>
+            <div className='px-6 py-4'>
+              <StepNavigation
+                stepNumber={1}
+                title='Participants Used'
+                description='Customer profiles that participated in this test'
+                isComplete={true}
+              />
+              <div className='pointer-events-none opacity-80'>
+                <ParticipantSelectionStep
+                  profiles={participantProfiles}
+                  participantCounts={participantCounts}
+                  skippedParticipants={effectiveSkippedParticipants}
+                  lockedParticipants={new Set(Object.keys(participantCounts))}
+                  onParticipantCountChange={() => {}}
+                  onRemoveParticipant={() => {}}
+                  onSkipParticipant={() => {}}
+                  onUnskipParticipant={() => {}}
+                  onPersistCountChange={() => {}}
+                  isLoading={participantsLoading}
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Collateral Used - Reuse CollateralSelectionStep in read-only mode */}
+          <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border shadow-sm'>
+            <div className='px-6 py-4'>
+              <StepNavigation
+                stepNumber={2}
+                title='Collateral Used'
+                description='Materials used for synthetic interviews'
+                isComplete={true}
+              />
+              <div className='pointer-events-none opacity-80'>
+                <CollateralSelectionStep
+                  collaterals={collateralOptions}
+                  selectedCollateralUuids={
+                    collateralOptions?.map((c) => c.uuid) || []
+                  }
+                  onSelectionChange={() => {}}
+                  isLoading={collateralsLoading}
+                  maxSelection={collateralOptions?.length || 4}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Test Preview Section - Hide when execution is running or in view mode */}
+      {status === 'idle' && !isViewMode && (
         <div className='aucctus-bg-primary aucctus-border-secondary overflow-hidden rounded-xl border border-l-4 border-l-black shadow-sm'>
           <div className='px-6 py-4'>
             <div className='flex items-center justify-between'>
@@ -677,8 +794,8 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
         </div>
       )}
 
-      {/* Step-based Configuration - Only show when idle */}
-      {status === 'idle' && (
+      {/* Step-based Configuration - Only show when idle and not in view mode */}
+      {status === 'idle' && !isViewMode && (
         <div className='space-y-6'>
           {/* Step 1: Select Participants */}
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border shadow-sm'>

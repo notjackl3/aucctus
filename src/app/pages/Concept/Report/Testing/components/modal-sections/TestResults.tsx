@@ -286,7 +286,11 @@ const TestResults: React.FC<TestResultsProps> = ({
       <TabBanner
         icon='clipboard'
         title='Test Results'
-        description='Upload and analyze results from your test.'
+        description={
+          isViewMode
+            ? 'Review the results and findings from this completed test.'
+            : 'Upload and analyze results from your test.'
+        }
       />
 
       {/* Real-time Processing Status - Hide only during active synthetic execution */}

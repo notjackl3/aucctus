@@ -1,18 +1,10 @@
-import React, { useMemo, useState } from 'react';
-import { Icon, Container } from '@components';
+import React, { useMemo } from 'react';
+import { Icon, Modal } from '@components';
 import { ITestDetails } from '../../types';
 import GenericStatusBadge from '../../../Assumptions/components/shared/GenericStatusBadge';
 import { TEST_STATUS_CONFIGS } from '../../../Assumptions/constants/statusConfigs';
-import {
-  IAssumptionV2,
-  AssumptionCategory,
-  AssumptionStatusV2,
-  TestTypeV2,
-  TestResult,
-} from '@libs/api/types';
-import { riskLevelToNumber } from '../../utils/testUtils';
 import TestValidationStats from './TestValidationStats';
-import TestAssumptionsDisplay from './TestAssumptionsDisplay';
+import { useModal } from '@context/ModalContextProvider';
 
 interface TestHistoryItemProps {
   test: ITestDetails;
@@ -29,8 +21,8 @@ const TestStatusBadge: React.FC<{ status: string }> = ({ status }) => {
   return <GenericStatusBadge config={config} />;
 };
 
-const TestHistoryItem: React.FC<TestHistoryItemProps> = ({ test }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+const TestHistoryItem: React.FC<TestHistoryItemProps> = ({ test, concept }) => {
+  const { openModal } = useModal();
 
   // Calculate validation stats from assumptions
   const validationStats = useMemo(() => {
@@ -53,61 +45,25 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({ test }) => {
     };
   }, [test.assumptions]);
 
-  // Map assumptions to the format expected by TestAssumptionsDisplay
-  const mappedAssumptions = useMemo(() => {
-    const normalizeStatus = (
-      status: string | undefined,
-    ): AssumptionStatusV2 => {
-      if (!status) return 'untested';
-      if (status === 'partiallyValidated') return 'partially_validated';
-      return status.toLowerCase() as AssumptionStatusV2;
-    };
-
-    return test.assumptions.map((assumption) => {
-      const riskValue = riskLevelToNumber(assumption.riskLevel);
-      const statusValue = normalizeStatus(assumption.validationStatus);
-
-      return {
-        id: assumption.uuid,
-        statement: assumption.statement,
-        category: (assumption.category?.toLowerCase() ||
-          'desirability') as AssumptionCategory,
-        status: statusValue,
-        risk: riskValue,
-        certainty: assumption.certainty || 50,
-        confidence: assumption.certainty || 50,
-        importance: 70,
-        impactPoints: 7,
-        validationPercentage:
-          statusValue === 'validated'
-            ? 100
-            : statusValue === 'invalidated'
-              ? 0
-              : statusValue === 'partially_validated'
-                ? 50
-                : 0,
-        tests: [
-          {
-            id: test.uuid,
-            name: test.name,
-            type: 'experiment' as TestTypeV2,
-            date: new Date(test.createdAt).toLocaleDateString(),
-            result: (test.status === 'completed'
-              ? 'validated'
-              : 'untested') as TestResult,
-          },
-        ],
-        priority: 'medium',
-        benchmark: assumption.benchmark,
-      } as IAssumptionV2;
-    });
-  }, [test]);
-
   // Get learning summary from objective or description
   const learningSummary = test.objective || test.description || '';
 
-  const handleToggle = () => {
-    setIsExpanded(!isExpanded);
+  const handleViewDetails = () => {
+    openModal(
+      Modal.TestExecutionModal,
+      {
+        testUuid: test.uuid,
+        testType: test.testType,
+        concept,
+        mode: 'view' as const,
+      },
+      {
+        position: 'center',
+        backgroundClassName: 'aucctus-bg-secondary-solid bg-opacity-25',
+        shouldCloseOnOverlayClick: true,
+        shouldCloseOnEscape: true,
+      },
+    );
   };
 
   return (
@@ -151,52 +107,21 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({ test }) => {
               {/* Validation Stats */}
               <TestValidationStats validationStats={validationStats} />
 
-              {/* Toggle Button */}
+              {/* View Details Button */}
               <button
-                onClick={handleToggle}
+                onClick={handleViewDetails}
                 className='btn btn-light btn-sm w-full gap-1'
               >
-                {isExpanded ? (
-                  <>
-                    Hide Details
-                    <Icon
-                      variant='chevronup'
-                      className='aucctus-stroke-primary h-3.5 w-3.5'
-                    />
-                  </>
-                ) : (
-                  <>
-                    View Details
-                    <Icon
-                      variant='chevrondown'
-                      className='aucctus-stroke-primary h-3.5 w-3.5'
-                    />
-                  </>
-                )}
+                View Details
+                <Icon
+                  variant='eye'
+                  className='aucctus-stroke-primary h-3.5 w-3.5'
+                />
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Expanded Content */}
-      <Container.Collapsible open={isExpanded} id={`test-details-${test.uuid}`}>
-        <div className='aucctus-border-secondary border-t p-5'>
-          <TestAssumptionsDisplay mappedAssumptions={mappedAssumptions} />
-        </div>
-      </Container.Collapsible>
-
-      {/* Revert Test Button - Commented out for now
-      {test.status === 'completed' && (
-        <button
-          className="btn btn-primary w-full"
-          onClick={handleRevertTest}
-        >
-          <Icon variant='refresh' className='mr-2 h-4 w-4' />
-          Revert Test
-        </button>
-      )}
-      */}
     </div>
   );
 };

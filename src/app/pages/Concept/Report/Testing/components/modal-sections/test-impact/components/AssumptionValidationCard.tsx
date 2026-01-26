@@ -18,6 +18,7 @@ interface AssumptionValidationCardProps {
       | 'invalidated'
       | 'untested',
   ) => void;
+  isViewMode?: boolean;
 }
 
 // 4-bar meter component
@@ -186,6 +187,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
   assumption,
   isUpdating,
   onValidationChange,
+  isViewMode = false,
 }) => {
   const statement = assumption.statement || '';
   const category = assumption.category || '';
@@ -389,15 +391,19 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
           <div className='flex gap-2'>
             <button
               onClick={() => handleValidationSelect('validated')}
-              disabled={isUpdating}
+              disabled={isUpdating || isViewMode}
               className={cn(
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                 {
                   'bg-green-600 text-white hover:bg-green-700':
-                    normalizedStatus === 'validated',
+                    normalizedStatus === 'validated' && !isViewMode,
+                  'bg-green-600 text-white':
+                    normalizedStatus === 'validated' && isViewMode,
                   'border border-green-200 text-green-700 hover:bg-green-50':
-                    normalizedStatus !== 'validated',
-                  'cursor-not-allowed opacity-50': isUpdating,
+                    normalizedStatus !== 'validated' && !isViewMode,
+                  'border border-green-200 text-green-700':
+                    normalizedStatus !== 'validated' && isViewMode,
+                  'cursor-not-allowed opacity-50': isUpdating || isViewMode,
                 },
               )}
             >
@@ -413,15 +419,19 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
 
             <button
               onClick={() => handleValidationSelect('partially_validated')}
-              disabled={isUpdating}
+              disabled={isUpdating || isViewMode}
               className={cn(
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                 {
                   'bg-yellow-600 text-white hover:bg-yellow-700':
-                    normalizedStatus === 'partially_validated',
+                    normalizedStatus === 'partially_validated' && !isViewMode,
+                  'bg-yellow-600 text-white':
+                    normalizedStatus === 'partially_validated' && isViewMode,
                   'border border-yellow-200 text-yellow-700 hover:bg-yellow-50':
-                    normalizedStatus !== 'partially_validated',
-                  'cursor-not-allowed opacity-50': isUpdating,
+                    normalizedStatus !== 'partially_validated' && !isViewMode,
+                  'border border-yellow-200 text-yellow-700':
+                    normalizedStatus !== 'partially_validated' && isViewMode,
+                  'cursor-not-allowed opacity-50': isUpdating || isViewMode,
                 },
               )}
             >
@@ -438,15 +448,19 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
 
             <button
               onClick={() => handleValidationSelect('invalidated')}
-              disabled={isUpdating}
+              disabled={isUpdating || isViewMode}
               className={cn(
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                 {
                   'bg-red-600 text-white hover:bg-red-700':
-                    normalizedStatus === 'invalidated',
+                    normalizedStatus === 'invalidated' && !isViewMode,
+                  'bg-red-600 text-white':
+                    normalizedStatus === 'invalidated' && isViewMode,
                   'border border-red-200 text-red-700 hover:bg-red-50':
-                    normalizedStatus !== 'invalidated',
-                  'cursor-not-allowed opacity-50': isUpdating,
+                    normalizedStatus !== 'invalidated' && !isViewMode,
+                  'border border-red-200 text-red-700':
+                    normalizedStatus !== 'invalidated' && isViewMode,
+                  'cursor-not-allowed opacity-50': isUpdating || isViewMode,
                 },
               )}
             >
@@ -462,15 +476,19 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
 
             <button
               onClick={() => handleValidationSelect('no-change')}
-              disabled={isUpdating}
+              disabled={isUpdating || isViewMode}
               className={cn(
                 'flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                 {
                   'bg-gray-600 text-white hover:bg-gray-700':
-                    normalizedStatus === 'no-change',
+                    normalizedStatus === 'no-change' && !isViewMode,
+                  'bg-gray-600 text-white':
+                    normalizedStatus === 'no-change' && isViewMode,
                   'border border-gray-200 text-gray-700 hover:bg-gray-50':
-                    normalizedStatus !== 'no-change',
-                  'cursor-not-allowed opacity-50': isUpdating,
+                    normalizedStatus !== 'no-change' && !isViewMode,
+                  'border border-gray-200 text-gray-700':
+                    normalizedStatus !== 'no-change' && isViewMode,
+                  'cursor-not-allowed opacity-50': isUpdating || isViewMode,
                 },
               )}
             >

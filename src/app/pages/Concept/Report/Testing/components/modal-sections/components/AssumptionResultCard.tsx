@@ -49,22 +49,9 @@ const AssumptionResultCard: React.FC<AssumptionResultCardProps> = ({
       .map((uuid) => learningsMap.get(uuid))
       .filter((learning): learning is ITestLearning => !!learning);
 
-    // Create findings from the validation data
-    // Option 1: Create a single finding from the validation evidence
+    // Create findings from the supporting learnings
     const findings: Finding[] = [];
 
-    if (validation.evidence) {
-      findings.push({
-        id: `${assumptionUuid}-evidence`,
-        title: validation.evidence,
-        impact: validation.impactAnalysis,
-        sources: supportingLearnings
-          .map((l) => l.sourceFilename)
-          .filter(Boolean),
-      });
-    }
-
-    // Option 2: Also add individual learnings as separate findings
     supportingLearnings.forEach((learning) => {
       findings.push({
         id: learning.uuid,

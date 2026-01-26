@@ -8,12 +8,14 @@ interface RecommendedChangesSectionProps {
   recommendations: IComprehensiveEditRecommendation[];
   onApplyRecommendations: (selectedUuids: string[]) => void;
   isApplying?: boolean;
+  isViewMode?: boolean;
 }
 
 const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
   recommendations,
   onApplyRecommendations,
   isApplying = false,
+  isViewMode = false,
 }) => {
   // Separate pending and applied recommendations
   const pendingRecommendations = useMemo(
@@ -95,6 +97,7 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
         {/* Pending Recommendations */}
         {pendingRecommendations.map((recommendation) => {
           const isSelected = selectedUuids.has(recommendation.uuid);
+          const isDisabled = isApplying || isViewMode;
 
           return (
             <div key={recommendation.uuid} className='group relative'>
@@ -102,15 +105,17 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
                 onClick={() =>
                   handleToggleRecommendation(recommendation.uuid, false)
                 }
-                disabled={isApplying}
+                disabled={isDisabled}
                 className={cn(
                   'w-full rounded-xl border p-4 text-left shadow-sm transition-all',
                   {
                     'aucctus-border-brand aucctus-bg-brand-primary shadow-brand/10':
                       isSelected,
                     'aucctus-border-secondary aucctus-bg-primary hover:shadow-md':
-                      !isSelected,
-                    'cursor-not-allowed opacity-50': isApplying,
+                      !isSelected && !isViewMode,
+                    'aucctus-border-secondary aucctus-bg-primary':
+                      !isSelected && isViewMode,
+                    'cursor-not-allowed opacity-50': isDisabled,
                   },
                 )}
               >
@@ -125,7 +130,7 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
                   </span>
                 </div>
               </button>
-              {isSelected && (
+              {isSelected && !isViewMode && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -163,35 +168,37 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
       </div>
 
       {/* Footer */}
-      <div className='flex items-center justify-between pt-4'>
-        <span className='aucctus-text-sm aucctus-text-tertiary'>
-          {selectedUuids.size} of {pendingRecommendations.length} changes
-          selected
-        </span>
-        <button
-          onClick={handleApply}
-          disabled={selectedUuids.size === 0 || isApplying}
-          className={cn('btn btn-md flex items-center gap-2', {
-            'btn-primary': selectedUuids.size > 0 && !isApplying,
-            'btn-disabled': selectedUuids.size === 0 || isApplying,
-          })}
-        >
-          {isApplying ? (
-            <>
-              <Icon
-                variant='loading-02'
-                className='h-4 w-4 animate-spin stroke-current'
-              />
-              Applying...
-            </>
-          ) : (
-            <>
-              <Icon variant='check' className='h-4 w-4 stroke-current' />
-              Apply Selected Changes
-            </>
-          )}
-        </button>
-      </div>
+      {!isViewMode && (
+        <div className='flex items-center justify-between pt-4'>
+          <span className='aucctus-text-sm aucctus-text-tertiary'>
+            {selectedUuids.size} of {pendingRecommendations.length} changes
+            selected
+          </span>
+          <button
+            onClick={handleApply}
+            disabled={selectedUuids.size === 0 || isApplying}
+            className={cn('btn btn-md flex items-center gap-2', {
+              'btn-primary': selectedUuids.size > 0 && !isApplying,
+              'btn-disabled': selectedUuids.size === 0 || isApplying,
+            })}
+          >
+            {isApplying ? (
+              <>
+                <Icon
+                  variant='loading-02'
+                  className='h-4 w-4 animate-spin stroke-current'
+                />
+                Applying...
+              </>
+            ) : (
+              <>
+                <Icon variant='check' className='h-4 w-4 stroke-current' />
+                Apply Selected Changes
+              </>
+            )}
+          </button>
+        </div>
+      )}
 
       {/* Warning Modal */}
       <ApplyRecommendationsWarningModal

@@ -400,6 +400,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             isCollateralRegenerating={isCollateralRegenerating}
             isSyntheticRunning={isSyntheticExecutionRunning}
             isActive={activeTab === 'participants'}
+            isViewMode={isViewMode}
           />
         );
 
@@ -411,6 +412,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             initialSelectedCollateralUuid={selectedCollateralUuid}
             isRegenerating={isCollateralRegenerating}
             regenerationStatus={collateralRegenerationStatus}
+            isViewMode={isViewMode}
           />
         );
 
@@ -432,6 +434,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
               setActiveTab('results');
             }}
             onExecutionStateChange={setExecutionState}
+            isViewMode={isViewMode}
           />
         );
 
@@ -454,6 +457,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
             testUuid={testUuid}
             conceptIdentifier={concept?.identifier}
             onCloseModal={closeModal}
+            isViewMode={isViewMode}
           />
         );
 

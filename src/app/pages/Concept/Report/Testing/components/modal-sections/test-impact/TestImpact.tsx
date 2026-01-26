@@ -24,6 +24,7 @@ interface TestImpactProps {
   testUuid?: string;
   conceptIdentifier?: string; // Add conceptIdentifier prop for versioned concepts
   onCloseModal?: () => void;
+  isViewMode?: boolean;
 }
 
 const TestImpact: React.FC<TestImpactProps> = ({
@@ -31,6 +32,7 @@ const TestImpact: React.FC<TestImpactProps> = ({
   testUuid,
   conceptIdentifier,
   onCloseModal,
+  isViewMode = false,
 }) => {
   const [updatingAssumptionUuid, setUpdatingAssumptionUuid] = useState<
     string | null
@@ -204,6 +206,7 @@ const TestImpact: React.FC<TestImpactProps> = ({
                       assumption={assumption}
                       isUpdating={updatingAssumptionUuid === assumption.uuid}
                       onValidationChange={handleValidationStatusChange}
+                      isViewMode={isViewMode}
                     />
                   ))}
                 </div>
@@ -216,6 +219,7 @@ const TestImpact: React.FC<TestImpactProps> = ({
                 recommendations={comprehensiveRecommendations}
                 onApplyRecommendations={handleApplyRecommendations}
                 isApplying={applyRecommendations.isLoading}
+                isViewMode={isViewMode}
               />
             )}
           </div>

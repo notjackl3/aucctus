@@ -21,6 +21,7 @@ interface TestCollateralProps {
   initialSelectedCollateralUuid?: string;
   isRegenerating?: boolean;
   regenerationStatus?: ICollateralRegenerationStatus;
+  isViewMode?: boolean;
 }
 
 const TestCollateral: React.FC<TestCollateralProps> = ({
@@ -29,6 +30,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
   initialSelectedCollateralUuid,
   isRegenerating = false,
   regenerationStatus,
+  isViewMode = false,
 }) => {
   // Use props data if available, otherwise fetch (for backward compatibility)
   const shouldFetch = !!conceptUuid && !!testUuid;
@@ -447,91 +449,99 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                     );
                   })}
 
-                  {/* Customize Collateral - Expandable Input */}
-                  {isCustomizeExpanded ? (
-                    <div className='aucctus-border-secondary aucctus-bg-primary animate-fade-in rounded-lg border shadow-sm'>
-                      <div className='p-3'>
-                        <input
-                          ref={customInputRef}
-                          type='text'
-                          value={customRequest}
-                          onChange={(e) => setCustomRequest(e.target.value)}
-                          placeholder='Describe the collateral you need...'
-                          className='aucctus-text-sm aucctus-text-primary placeholder:aucctus-text-placeholder w-full border-0 bg-transparent px-0 py-6 focus:outline-none'
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              handleCustomCollateralSubmit();
-                            }
-                            if (e.key === 'Escape') {
-                              setIsCustomizeExpanded(false);
-                              setCustomRequest('');
-                            }
-                          }}
-                          disabled={isSubmittingRequest}
-                        />
-                      </div>
-                      <div className='aucctus-border-secondary aucctus-bg-secondary-subtle flex justify-end border-t px-3 py-2'>
+                  {/* Customize Collateral - Expandable Input (hidden in view mode) */}
+                  {!isViewMode && (
+                    <>
+                      {isCustomizeExpanded ? (
+                        <div className='aucctus-border-secondary aucctus-bg-primary animate-fade-in rounded-lg border shadow-sm'>
+                          <div className='p-3'>
+                            <input
+                              ref={customInputRef}
+                              type='text'
+                              value={customRequest}
+                              onChange={(e) => setCustomRequest(e.target.value)}
+                              placeholder='Describe the collateral you need...'
+                              className='aucctus-text-sm aucctus-text-primary placeholder:aucctus-text-placeholder w-full border-0 bg-transparent px-0 py-6 focus:outline-none'
+                              onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                  handleCustomCollateralSubmit();
+                                }
+                                if (e.key === 'Escape') {
+                                  setIsCustomizeExpanded(false);
+                                  setCustomRequest('');
+                                }
+                              }}
+                              disabled={isSubmittingRequest}
+                            />
+                          </div>
+                          <div className='aucctus-border-secondary aucctus-bg-secondary-subtle flex justify-end border-t px-3 py-2'>
+                            <button
+                              onClick={handleCustomCollateralSubmit}
+                              disabled={
+                                !customRequest.trim() || isSubmittingRequest
+                              }
+                              className='btn btn-primary btn-sm flex h-7 items-center gap-1 px-3 text-xs disabled:opacity-50'
+                            >
+                              {isSubmittingRequest ? (
+                                <Loading isSmall />
+                              ) : (
+                                <>
+                                  Generate
+                                  <Icon
+                                    variant='arrowright'
+                                    className='aucctus-stroke-secondary h-3 w-3'
+                                  />
+                                </>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
                         <button
-                          onClick={handleCustomCollateralSubmit}
+                          onClick={() => setIsCustomizeExpanded(true)}
                           disabled={
-                            !customRequest.trim() || isSubmittingRequest
+                            isFeedbackProcessing || isSubmittingFeedback
                           }
-                          className='btn btn-primary btn-sm flex h-7 items-center gap-1 px-3 text-xs disabled:opacity-50'
+                          className='aucctus-text-secondary hover:aucctus-text-primary hover:aucctus-border-brand-primary flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50'
                         >
-                          {isSubmittingRequest ? (
-                            <Loading isSmall />
-                          ) : (
-                            <>
-                              Generate
-                              <Icon
-                                variant='arrowright'
-                                className='aucctus-stroke-secondary h-3 w-3'
-                              />
-                            </>
-                          )}
+                          <Icon
+                            variant='plus'
+                            className='aucctus-stroke-secondary h-4 w-4'
+                          />
+                          <span className='aucctus-text-sm-medium'>
+                            Customize Collateral
+                          </span>
                         </button>
-                      </div>
-                    </div>
-                  ) : (
+                      )}
+                    </>
+                  )}
+
+                  {/* Upload File Button (hidden in view mode) */}
+                  {!isViewMode && (
                     <button
-                      onClick={() => setIsCustomizeExpanded(true)}
-                      disabled={isFeedbackProcessing || isSubmittingFeedback}
+                      onClick={handleFileUpload}
+                      disabled={
+                        isFeedbackProcessing ||
+                        isSubmittingFeedback ||
+                        uploadImageCollateral.isLoading
+                      }
                       className='aucctus-text-secondary hover:aucctus-text-primary hover:aucctus-border-brand-primary flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50'
                     >
-                      <Icon
-                        variant='plus'
-                        className='aucctus-stroke-secondary h-4 w-4'
-                      />
+                      {uploadImageCollateral.isLoading ? (
+                        <Loading isSmall />
+                      ) : (
+                        <Icon
+                          variant='upload'
+                          className='aucctus-stroke-secondary h-4 w-4'
+                        />
+                      )}
                       <span className='aucctus-text-sm-medium'>
-                        Customize Collateral
+                        {uploadImageCollateral.isLoading
+                          ? 'Uploading...'
+                          : 'Upload File'}
                       </span>
                     </button>
                   )}
-
-                  {/* Upload File Button */}
-                  <button
-                    onClick={handleFileUpload}
-                    disabled={
-                      isFeedbackProcessing ||
-                      isSubmittingFeedback ||
-                      uploadImageCollateral.isLoading
-                    }
-                    className='aucctus-text-secondary hover:aucctus-text-primary hover:aucctus-border-brand-primary flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50'
-                  >
-                    {uploadImageCollateral.isLoading ? (
-                      <Loading isSmall />
-                    ) : (
-                      <Icon
-                        variant='upload'
-                        className='aucctus-stroke-secondary h-4 w-4'
-                      />
-                    )}
-                    <span className='aucctus-text-sm-medium'>
-                      {uploadImageCollateral.isLoading
-                        ? 'Uploading...'
-                        : 'Upload File'}
-                    </span>
-                  </button>
                 </div>
               </div>
 
@@ -606,8 +616,12 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                               ref={textareaRef}
                               value={editContent}
                               onChange={(e) => setEditContent(e.target.value)}
-                              className='aucctus-text-sm aucctus-text-primary h-full w-full resize-none rounded-lg bg-transparent p-5 leading-relaxed focus:outline-none'
+                              className={cn(
+                                'aucctus-text-sm aucctus-text-primary h-full w-full resize-none rounded-lg bg-transparent p-5 leading-relaxed focus:outline-none',
+                                isViewMode && 'cursor-default',
+                              )}
                               placeholder='Enter your collateral content...'
+                              readOnly={isViewMode}
                             />
                           </div>
                         ) : selectedItem.type === 'image' ? (
@@ -629,75 +643,79 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                         )}
                       </div>
 
-                      {/* Simplified Feedback Section - Fixed at bottom */}
-                      <div className='aucctus-border-secondary aucctus-bg-primary flex-shrink-0 border-t px-4 py-3'>
-                        <div className='flex items-center gap-2'>
-                          {isSubmittingFeedback || isFeedbackProcessing ? (
-                            <div className='flex flex-1 items-center gap-2'>
-                              <Loading isSmall />
-                              <span className='aucctus-text-sm-regular aucctus-text-secondary'>
-                                {isFeedbackProcessing
-                                  ? 'Processing feedback...'
-                                  : 'Submitting...'}
-                              </span>
-                            </div>
-                          ) : feedbackProcessingState.error ? (
-                            <div className='flex flex-1 items-center gap-2'>
-                              <Icon
-                                variant='alert-circle'
-                                className='aucctus-stroke-error-primary h-4 w-4'
-                              />
-                              <span className='aucctus-text-sm-regular aucctus-text-error-primary flex-1'>
-                                {feedbackProcessingState.error}
-                              </span>
-                              <button
-                                onClick={() =>
-                                  selectedItem &&
-                                  clearFeedbackProcessingState(selectedItem.id)
-                                }
-                                className='btn btn-secondary btn-sm'
-                              >
-                                Dismiss
-                              </button>
-                            </div>
-                          ) : (
-                            <>
-                              <input
-                                type='text'
-                                value={feedback}
-                                onChange={(e) => setFeedback(e.target.value)}
-                                onKeyDown={(e) =>
-                                  selectedItem &&
-                                  handleKeyDownFeedback(
-                                    selectedItem.id,
-                                    e,
-                                    selectedItem.updatedAt,
-                                  )
-                                }
-                                placeholder='Enter feedback to regenerate this collateral'
-                                className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary placeholder:aucctus-text-placeholder focus:aucctus-border-brand-primary flex-1 rounded border px-3 py-2 text-sm focus:outline-none'
-                                disabled={
-                                  isSubmittingFeedback || isFeedbackProcessing
-                                }
-                              />
-                              <button
-                                onClick={handleFeedbackSubmission}
-                                disabled={
-                                  !feedback.trim() ||
-                                  isSubmittingFeedback ||
-                                  isFeedbackProcessing
-                                }
-                                className='btn btn-secondary btn-sm flex h-9 w-9 items-center justify-center p-0 disabled:opacity-50'
-                              >
+                      {/* Simplified Feedback Section - Fixed at bottom (hidden in view mode) */}
+                      {!isViewMode && (
+                        <div className='aucctus-border-secondary aucctus-bg-primary flex-shrink-0 border-t px-4 py-3'>
+                          <div className='flex items-center gap-2'>
+                            {isSubmittingFeedback || isFeedbackProcessing ? (
+                              <div className='flex flex-1 items-center gap-2'>
+                                <Loading isSmall />
+                                <span className='aucctus-text-sm-regular aucctus-text-secondary'>
+                                  {isFeedbackProcessing
+                                    ? 'Processing feedback...'
+                                    : 'Submitting...'}
+                                </span>
+                              </div>
+                            ) : feedbackProcessingState.error ? (
+                              <div className='flex flex-1 items-center gap-2'>
                                 <Icon
-                                  variant='arrowright'
-                                  className='aucctus-stroke-secondary h-4 w-4'
+                                  variant='alert-circle'
+                                  className='aucctus-stroke-error-primary h-4 w-4'
                                 />
-                              </button>
-                            </>
-                          )}
+                                <span className='aucctus-text-sm-regular aucctus-text-error-primary flex-1'>
+                                  {feedbackProcessingState.error}
+                                </span>
+                                <button
+                                  onClick={() =>
+                                    selectedItem &&
+                                    clearFeedbackProcessingState(
+                                      selectedItem.id,
+                                    )
+                                  }
+                                  className='btn btn-secondary btn-sm'
+                                >
+                                  Dismiss
+                                </button>
+                              </div>
+                            ) : (
+                              <>
+                                <input
+                                  type='text'
+                                  value={feedback}
+                                  onChange={(e) => setFeedback(e.target.value)}
+                                  onKeyDown={(e) =>
+                                    selectedItem &&
+                                    handleKeyDownFeedback(
+                                      selectedItem.id,
+                                      e,
+                                      selectedItem.updatedAt,
+                                    )
+                                  }
+                                  placeholder='Enter feedback to regenerate this collateral'
+                                  className='aucctus-bg-primary aucctus-border-secondary aucctus-text-primary placeholder:aucctus-text-placeholder focus:aucctus-border-brand-primary flex-1 rounded border px-3 py-2 text-sm focus:outline-none'
+                                  disabled={
+                                    isSubmittingFeedback || isFeedbackProcessing
+                                  }
+                                />
+                                <button
+                                  onClick={handleFeedbackSubmission}
+                                  disabled={
+                                    !feedback.trim() ||
+                                    isSubmittingFeedback ||
+                                    isFeedbackProcessing
+                                  }
+                                  className='btn btn-secondary btn-sm flex h-9 w-9 items-center justify-center p-0 disabled:opacity-50'
+                                >
+                                  <Icon
+                                    variant='arrowright'
+                                    className='aucctus-stroke-secondary h-4 w-4'
+                                  />
+                                </button>
+                              </>
+                            )}
+                          </div>
                         </div>
-                      </div>
+                      )}
                     </>
                   ) : (
                     <div className='flex h-full items-center justify-center p-6'>

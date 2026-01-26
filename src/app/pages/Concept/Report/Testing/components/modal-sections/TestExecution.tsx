@@ -13,7 +13,7 @@ import { useSyntheticPipelineEstimate } from '@hooks/query/agent-timing.hook';
 import { ISyntheticExecutionRequest } from '@libs/api/types/concept/testing';
 import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
-import { useTestParticipants } from '@hooks/query/testing.hook';
+import { useTestParticipants, useTestResults } from '@hooks/query/testing.hook';
 import TabBanner from '../common/TabBanner';
 
 interface TestExecutionProps {
@@ -24,6 +24,7 @@ interface TestExecutionProps {
   onNavigateToResults?: () => void;
   onExecutionStateChange?: (executionState: any) => void; // Expose execution state to parent
   isCollateralRegenerating?: boolean;
+  isViewMode?: boolean;
 }
 
 const TestExecution: React.FC<TestExecutionProps> = ({
@@ -34,11 +35,32 @@ const TestExecution: React.FC<TestExecutionProps> = ({
   onNavigateToResults,
   onExecutionStateChange,
   isCollateralRegenerating = false,
+  isViewMode = false,
 }) => {
   const [selectedMode, setSelectedMode] = useState<string | null>(
     'facilitated',
   );
   const [isInitializing, setIsInitializing] = useState(true);
+
+  // Fetch test results to determine execution mode in view mode
+  const { results: testResults } = useTestResults(
+    conceptUuid || '',
+    testUuid || '',
+    { enabled: isViewMode && !!conceptUuid && !!testUuid },
+  );
+
+  // Determine execution mode from test results when in view mode
+  const hasSyntheticResults = useMemo(() => {
+    if (!testResults || testResults.length === 0) return false;
+    return testResults.some((result: any) => result.isSynthetic);
+  }, [testResults]);
+
+  // Set the selected mode based on results when in view mode
+  useEffect(() => {
+    if (isViewMode && testResults && testResults.length > 0) {
+      setSelectedMode(hasSyntheticResults ? 'synthetic' : 'facilitated');
+    }
+  }, [isViewMode, testResults, hasSyntheticResults]);
 
   // Fetch customer profiles for quote assignment
   const { profiles } = useConceptCustomerProfiles(conceptUuid || '');
@@ -400,8 +422,12 @@ const TestExecution: React.FC<TestExecutionProps> = ({
       {/* Tab Banner */}
       <TabBanner
         icon='play-square'
-        title='Execute Your Test'
-        description='Choose how you want to run this test - facilitate it yourself, or use AI-powered synthetic participants.'
+        title={isViewMode ? 'Execution Summary' : 'Execute Your Test'}
+        description={
+          isViewMode
+            ? 'Review how this test was executed.'
+            : 'Choose how you want to run this test - facilitate it yourself, or use AI-powered synthetic participants.'
+        }
       />
 
       {/* Test Mode Selection - 2x2 Grid */}
@@ -409,12 +435,16 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         {/* Facilitated Option */}
         <div
           className={cn(
-            'aucctus-border-secondary min-h-[120px] cursor-pointer rounded-lg border p-4 transition-colors',
+            'aucctus-border-secondary min-h-[120px] rounded-lg border p-4 transition-colors',
+            !isViewMode && 'cursor-pointer',
             selectedMode === 'facilitated'
               ? 'aucctus-border-brand-primary aucctus-bg-secondary-extra-subtle'
-              : 'aucctus-bg-primary hover:aucctus-bg-secondary-subtle',
+              : cn(
+                  'aucctus-bg-primary',
+                  !isViewMode && 'hover:aucctus-bg-secondary-subtle',
+                ),
           )}
-          onClick={() => setSelectedMode('facilitated')}
+          onClick={() => !isViewMode && setSelectedMode('facilitated')}
         >
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
@@ -439,10 +469,17 @@ const TestExecution: React.FC<TestExecutionProps> = ({
               </h4>
             </div>
             {selectedMode === 'facilitated' && (
-              <Icon
-                variant='check'
-                className='aucctus-stroke-brand-primary h-5 w-5'
-              />
+              <div className='flex items-center gap-2'>
+                {isViewMode && (
+                  <span className='aucctus-bg-success-subtle aucctus-text-success-primary rounded-full px-2 py-0.5 text-xs'>
+                    Used
+                  </span>
+                )}
+                <Icon
+                  variant='check'
+                  className='aucctus-stroke-brand-primary h-5 w-5'
+                />
+              </div>
             )}
           </div>
           <p className='aucctus-text-sm-regular aucctus-text-secondary'>
@@ -454,12 +491,16 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         {/* Synthetic Option */}
         <div
           className={cn(
-            'min-h-[120px] cursor-pointer rounded-lg border p-4 transition-colors',
+            'min-h-[120px] rounded-lg border p-4 transition-colors',
+            !isViewMode && 'cursor-pointer',
             selectedMode === 'synthetic'
               ? 'aucctus-border-brand-primary aucctus-bg-secondary-extra-subtle'
-              : 'aucctus-border-secondary aucctus-bg-primary hover:aucctus-bg-secondary-subtle',
+              : cn(
+                  'aucctus-border-secondary aucctus-bg-primary',
+                  !isViewMode && 'hover:aucctus-bg-secondary-subtle',
+                ),
           )}
-          onClick={() => setSelectedMode('synthetic')}
+          onClick={() => !isViewMode && setSelectedMode('synthetic')}
         >
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
@@ -484,10 +525,17 @@ const TestExecution: React.FC<TestExecutionProps> = ({
               </h4>
             </div>
             {selectedMode === 'synthetic' && (
-              <Icon
-                variant='check'
-                className='aucctus-stroke-brand-primary h-5 w-5'
-              />
+              <div className='flex items-center gap-2'>
+                {isViewMode && (
+                  <span className='aucctus-bg-success-subtle aucctus-text-success-primary rounded-full px-2 py-0.5 text-xs'>
+                    Used
+                  </span>
+                )}
+                <Icon
+                  variant='check'
+                  className='aucctus-stroke-brand-primary h-5 w-5'
+                />
+              </div>
             )}
           </div>
           <p className='aucctus-text-sm-regular aucctus-text-secondary'>
@@ -570,6 +618,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
             initialParticipantCounts={participantCountsFromApi}
             lockedSkippedParticipants={skippedParticipantsFromApi}
             isCollateralRegenerating={isCollateralRegenerating}
+            isViewMode={isViewMode}
           />
         </div>
       )}

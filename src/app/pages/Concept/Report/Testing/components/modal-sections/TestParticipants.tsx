@@ -15,6 +15,7 @@ interface TestParticipantsProps {
   isCollateralRegenerating?: boolean;
   isSyntheticRunning?: boolean;
   isActive?: boolean;
+  isViewMode?: boolean;
 }
 
 const TestParticipants: React.FC<TestParticipantsProps> = ({
@@ -24,6 +25,7 @@ const TestParticipants: React.FC<TestParticipantsProps> = ({
   isCollateralRegenerating = false,
   isSyntheticRunning = false,
   isActive = false,
+  isViewMode = false,
 }) => {
   const {
     // Data
@@ -45,7 +47,10 @@ const TestParticipants: React.FC<TestParticipantsProps> = ({
   });
 
   const disablePersonaActions =
-    isUpdatingParticipant || isCollateralRegenerating || isSyntheticRunning;
+    isViewMode ||
+    isUpdatingParticipant ||
+    isCollateralRegenerating ||
+    isSyntheticRunning;
 
   if (isParticipantsLoading || isTestDetailLoading) {
     return (
