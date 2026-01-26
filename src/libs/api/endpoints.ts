@@ -868,6 +868,23 @@ export class Endpoints {
     return `/api/v1/signal-scanning/opportunities/${opportunityUuid}/create-concept`;
   }
 
+  // Watchtower Endpoints
+  static watchtowerDashboard = '/api/v1/watchtower/dashboard';
+  static watchtowerRefresh = '/api/v1/watchtower/refresh';
+  static watchtowerRules = '/api/v1/watchtower/rules';
+
+  static watchtowerRule(ruleUuid: string) {
+    return `/api/v1/watchtower/rules/${ruleUuid}`;
+  }
+
+  static watchtowerOpportunityAddToBank(opportunityUuid: string) {
+    return `/api/v1/watchtower/opportunities/${opportunityUuid}/add-to-bank`;
+  }
+
+  static watchtowerSignalTracking(signalUuid: string) {
+    return `/api/v1/watchtower/signals/${signalUuid}/tracking`;
+  }
+
   // POC Plan Endpoints
   static pocPlanGenerate(conceptUuid: string) {
     return `/api/v2/concept/${conceptUuid}/poc-plan/generate`;

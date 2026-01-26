@@ -44,6 +44,9 @@ export * from './Scoring';
 // Concept Overview Components
 import ConceptOverview from './ConceptOverview';
 
+// Feature Initiation Components
+import { FeatureInitiation } from './FeatureInitiation';
+
 // Ecosystem Components
 import {
   EcosystemV2,
@@ -71,6 +74,7 @@ export {
   ConceptReportSkeletons,
   DialGauge,
   EcosystemV2,
+  FeatureInitiation,
   FileDropzone,
   Header,
   Icon,

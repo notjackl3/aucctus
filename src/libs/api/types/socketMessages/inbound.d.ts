@@ -932,6 +932,38 @@ export interface IEcosystemProductSearchUpdateMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Watchtower Scan Messages
+// ==========================================
+
+export interface IWatchtowerScanProgressMessage extends BaseSocketEvent {
+  type: 'watchtower.scan.progress.account';
+  accountUuid: string;
+  stage: string;
+  progress: number;
+  message: string;
+}
+
+export interface IWatchtowerScanCompletedMessage extends BaseSocketEvent {
+  type: 'watchtower.scan.completed.account';
+  accountUuid: string;
+  patternsCreated: number;
+  insightsCreated: number;
+  predictionsCreated: number;
+  trendsCreated: number;
+  domainsCreated: number;
+  opportunitiesCreated: number;
+  message: string;
+}
+
+export interface IWatchtowerScanErrorMessage extends BaseSocketEvent {
+  type: 'watchtower.scan.error.account';
+  accountUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+// ==========================================
 // Concept Priority Messages
 // ==========================================
 
@@ -1080,10 +1112,13 @@ export type InboundSocketEvent<C = {}> =
   | IIdeaSubmissionsProcessingStartedMessage
   | IIdeaSubmissionsProcessingCompletedMessage
   | IIdeaSubmissionsProcessingErrorMessage
+  | IEcosystemProductSearchUpdateMessage
+  | IWatchtowerScanProgressMessage
+  | IWatchtowerScanCompletedMessage
+  | IWatchtowerScanErrorMessage
   | IIdeaSubmissionsUploadStartedMessage
   | IIdeaSubmissionsUploadProgressMessage
   | IIdeaSubmissionsUploadCompletedMessage
-  | IIdeaSubmissionsUploadErrorMessage
-  | IEcosystemProductSearchUpdateMessage;
+  | IIdeaSubmissionsUploadErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

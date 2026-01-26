@@ -42,6 +42,10 @@ export enum AppPath {
   /* Signal Scanning */
   SignalScanning = '/signal-scanning',
 
+  /* Watchtower */
+  Watchtower = '/watchtower',
+  WatchtowerInitiation = '/watchtower/initiation',
+
   /* Innovation Pipeline */
   InnovationPipeline = '/innovation-pipeline',
 

@@ -2,6 +2,7 @@ export interface ISource {
   uuid: string;
   title: string;
   description?: string;
+  citations?: string; // Verbatim quotes from the source
   url: string;
   classification?: string;
   nucleusFileSource?: {

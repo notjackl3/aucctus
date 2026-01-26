@@ -102,6 +102,12 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           icon='route'
           collapsed={collapsed}
         />
+        <NavButton
+          to={AppPath.Watchtower}
+          title='Watchtower'
+          icon='signal-02'
+          collapsed={collapsed}
+        />
       </div>
       <div className='flex flex-col gap-6 px-4'>
         <NavButton

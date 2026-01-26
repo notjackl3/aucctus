@@ -25,3 +25,4 @@ export * from './nucleus';
 export * from './pocPlan';
 export * from './signalScanning';
 export * from './strategicForesight';
+export * from './watchtower';
