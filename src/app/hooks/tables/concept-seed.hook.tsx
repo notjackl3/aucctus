@@ -282,9 +282,9 @@ export const useSeedsBank = (
             info.row.original.title ||
             info.row.original?.anchorThought?.thought ||
             `${answeredCount} question${answeredCount !== 1 ? 's' : ''} answered`;
-          const description =
-            info.row.original.description ||
-            info.row.original?.type === 'IDEA_PLAYGROUND'
+          const description = info.row.original.description
+            ? info.row.original.description
+            : info.row.original?.type === 'IDEA_PLAYGROUND'
               ? 'Idea playground'
               : info.getValue();
 

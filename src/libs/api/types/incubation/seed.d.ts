@@ -2,6 +2,7 @@ import type { IUser } from '../auth/accounts';
 import type { IPageQueryOptions } from '../osiris';
 import type {
   ConceptIncubationQuestion,
+  ConceptIncubationQuestionnaireType,
   IClarifyingQuestion,
 } from './questionnaire';
 import type { IGeneratedConcept } from '../concept/concepts';
@@ -9,6 +10,7 @@ import type {
   IAnchorThought,
   IAnchorThoughtWithQuestions,
 } from '../ideaPlayground';
+import type { IIdeaSubmission } from '../ideaSubmissions';
 
 export interface IConceptSeedAnswer {
   answer: string[];
@@ -47,6 +49,7 @@ export interface IConceptSeed {
 
   clarifyingQuestions: IClarifyingQuestion[];
   cachedConcepts?: IGeneratedConcept[];
+  ideaSubmissions?: IIdeaSubmission[];
   /**
    * For IDEA_PLAYGROUND seeds, this returns the full nested structure with questions.
    * For other seed types, this returns the basic anchor thought or undefined.

@@ -154,6 +154,7 @@ export interface IWatchtowerConceptOpportunity {
   urgency: WatchtowerOpportunityUrgency;
   potentialImpact: string;
   image: string;
+  isAddedToBank: boolean;
 }
 
 // ============================================

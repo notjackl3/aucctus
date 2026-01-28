@@ -32,8 +32,9 @@ const ConceptOpportunitiesWidget: React.FC = () => {
   const { opportunities, isLoading } = useWatchtowerOpportunities();
   const { addToBank, addingOpportunityId } = useAddOpportunityToConceptBank();
 
-  // Track opportunities that have been successfully added to prevent re-adding
-  const [addedOpportunityIds, setAddedOpportunityIds] = useState<Set<string>>(
+  // Track opportunities added during this session for optimistic UI updates
+  // (supplements the backend isAddedToBank field for immediate feedback)
+  const [sessionAddedIds, setSessionAddedIds] = useState<Set<string>>(
     new Set(),
   );
 
@@ -41,8 +42,8 @@ const ConceptOpportunitiesWidget: React.FC = () => {
     (opportunityId: string) => {
       addToBank(opportunityId, {
         onSuccess: () => {
-          // Mark this opportunity as added
-          setAddedOpportunityIds((prev) => new Set([...prev, opportunityId]));
+          // Mark this opportunity as added for optimistic UI
+          setSessionAddedIds((prev) => new Set([...prev, opportunityId]));
         },
       });
     },
@@ -169,7 +170,9 @@ const ConceptOpportunitiesWidget: React.FC = () => {
 
                 {(() => {
                   const isThisAdding = addingOpportunityId === concept.id;
-                  const isAlreadyAdded = addedOpportunityIds.has(concept.id);
+                  // Check both backend state and session-local state for optimistic updates
+                  const isAlreadyAdded =
+                    concept.isAddedToBank || sessionAddedIds.has(concept.id);
                   const isDisabled = isThisAdding || isAlreadyAdded;
 
                   return (
