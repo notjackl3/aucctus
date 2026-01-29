@@ -21,6 +21,7 @@ import { SeedApi } from './seed';
 import { TestingApi } from './testing';
 import { TrendsAndDriversV3Api } from './trendsAndDrivers';
 import { WatchtowerApi } from './watchtower';
+import { CompetitorAssessmentApi } from './competitorAssessment';
 
 export interface IApiConfig {
   /* End Points */
@@ -55,6 +56,7 @@ export class Api {
   pocPlan!: PocPlanApi;
   property!: PropertyApi;
   watchtower!: WatchtowerApi;
+  competitorAssessment!: CompetitorAssessmentApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -86,6 +88,7 @@ export class Api {
       { key: 'pocPlan', class: PocPlanApi },
       { key: 'property', class: PropertyApi },
       { key: 'watchtower', class: WatchtowerApi },
+      { key: 'competitorAssessment', class: CompetitorAssessmentApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

@@ -75,6 +75,12 @@ const usePrivateRoutes = () => {
 
       {/* Watchtower Routes */}
       <Route path={AppPath.Watchtower} element={<Page.WatchtowerPage />} />
+
+      {/* Competitor Assessment Routes */}
+      <Route
+        path={AppPath.CompetitorAssessment}
+        element={<Page.CompetitorAssessmentPage />}
+      />
     </Route>
   );
 };

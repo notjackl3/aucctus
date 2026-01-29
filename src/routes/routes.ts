@@ -42,6 +42,9 @@ export enum AppPath {
   /* Watchtower */
   Watchtower = '/watchtower',
 
+  /* Competitor Assessment */
+  CompetitorAssessment = '/competitor-assessment',
+
   /* Innovation Pipeline */
   InnovationPipeline = '/innovation-pipeline',
 

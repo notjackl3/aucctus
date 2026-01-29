@@ -868,6 +868,20 @@ export class Endpoints {
     return `/api/v1/watchtower/signals/${signalUuid}/tracking`;
   }
 
+  // Competitor Assessment Endpoints
+  static competitorAssessmentDashboard =
+    '/api/v1/competitor-assessment/dashboard';
+  static competitorAssessmentRefresh = '/api/v1/competitor-assessment/refresh';
+  static competitorAssessmentCompetitors =
+    '/api/v1/competitor-assessment/competitors';
+  static competitorAssessmentConfig = '/api/v1/competitor-assessment/config';
+  static competitorAssessmentWhiteSpaces =
+    '/api/v1/competitor-assessment/white-spaces';
+
+  static competitorAssessmentCompetitor(competitorUuid: string) {
+    return `/api/v1/competitor-assessment/competitors/${competitorUuid}`;
+  }
+
   // POC Plan Endpoints
   static pocPlanGenerate(conceptUuid: string) {
     return `/api/v2/concept/${conceptUuid}/poc-plan/generate`;

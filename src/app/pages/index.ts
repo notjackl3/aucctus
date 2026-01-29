@@ -9,6 +9,7 @@ import IdeaPlayground from './IdeaPlayground';
 import IdeaSubmissions from './IdeaSubmissions';
 import InnovationPipeline from './InnovationPipeline';
 import { WatchtowerPage } from './Watchtower';
+import { CompetitorAssessmentPage } from './CompetitorAssessment';
 
 const Page = {
   Auth,
@@ -21,6 +22,7 @@ const Page = {
   SettingsPages,
   Testing: TestingPages,
   WatchtowerPage,
+  CompetitorAssessmentPage,
 };
 
 export default Page;

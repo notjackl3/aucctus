@@ -964,6 +964,37 @@ export interface IWatchtowerScanErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Competitor Assessment Scan Messages
+// ==========================================
+
+export interface ICompetitorAssessmentScanProgressMessage
+  extends BaseSocketEvent {
+  type: 'competitor_assessment.scan.progress.account';
+  accountUuid: string;
+  stage: string;
+  progress: number;
+  message: string;
+  currentCompetitor?: string;
+}
+
+export interface ICompetitorAssessmentScanCompletedMessage
+  extends BaseSocketEvent {
+  type: 'competitor_assessment.scan.completed.account';
+  accountUuid: string;
+  competitorsAssessed: number;
+  whiteSpacesFound: number;
+  message: string;
+}
+
+export interface ICompetitorAssessmentScanErrorMessage extends BaseSocketEvent {
+  type: 'competitor_assessment.scan.error.account';
+  accountUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+// ==========================================
 // Concept Priority Messages
 // ==========================================
 
@@ -1116,6 +1147,9 @@ export type InboundSocketEvent<C = {}> =
   | IWatchtowerScanProgressMessage
   | IWatchtowerScanCompletedMessage
   | IWatchtowerScanErrorMessage
+  | ICompetitorAssessmentScanProgressMessage
+  | ICompetitorAssessmentScanCompletedMessage
+  | ICompetitorAssessmentScanErrorMessage
   | IIdeaSubmissionsUploadStartedMessage
   | IIdeaSubmissionsUploadProgressMessage
   | IIdeaSubmissionsUploadCompletedMessage

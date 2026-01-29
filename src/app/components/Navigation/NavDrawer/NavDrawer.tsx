@@ -108,6 +108,12 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           icon='signal-02'
           collapsed={collapsed}
         />
+        <NavButton
+          to={AppPath.CompetitorAssessment}
+          title='Competitors'
+          icon='swords'
+          collapsed={collapsed}
+        />
       </div>
       <div className='flex flex-col gap-6 px-4'>
         <NavButton
