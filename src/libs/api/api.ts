@@ -7,7 +7,9 @@ import { AssumptionsApi } from './assumptions';
 
 import { IApiServiceConfig } from './base/apiService';
 import { ISocketConfig, SocketService } from './base/socketService';
+import { CompetitorAssessmentApi } from './competitorAssessment';
 import { ConceptApi } from './concepts';
+import { CustomCommandsApi } from './customCommands';
 import { SocketEndpoints } from './endpoints';
 import { FinancialProjectionApi } from './financialProjection';
 import { IdeaPlaygroundApi } from './ideaPlayground';
@@ -21,7 +23,6 @@ import { SeedApi } from './seed';
 import { TestingApi } from './testing';
 import { TrendsAndDriversV3Api } from './trendsAndDrivers';
 import { WatchtowerApi } from './watchtower';
-import { CompetitorAssessmentApi } from './competitorAssessment';
 
 export interface IApiConfig {
   /* End Points */
@@ -57,6 +58,7 @@ export class Api {
   property!: PropertyApi;
   watchtower!: WatchtowerApi;
   competitorAssessment!: CompetitorAssessmentApi;
+  customCommands!: CustomCommandsApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -89,6 +91,7 @@ export class Api {
       { key: 'property', class: PropertyApi },
       { key: 'watchtower', class: WatchtowerApi },
       { key: 'competitorAssessment', class: CompetitorAssessmentApi },
+      { key: 'customCommands', class: CustomCommandsApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

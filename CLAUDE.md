@@ -219,6 +219,7 @@ Defined in `vite.config.mts` and `.env`:
 - `FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS`
 - `FEATURE_CONCEPT_VERSIONING`
 - `FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS`
+- `FEATURE_OVERSEER`
 
 When adding new feature flags, also add them to `vite-env.d.ts`.
 

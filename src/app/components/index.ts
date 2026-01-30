@@ -35,6 +35,9 @@ import ComponentTooltip from './ToolTip/ComponentTooltip';
 import Tooltip from './ToolTip/Tooltip';
 import * as ConceptReportSkeletons from './Skeleton/ConceptReport';
 
+// Overseer Components
+import { OverseerWrapper } from './Overseer';
+
 // Nucleus Components
 export * from './Nucleus';
 
@@ -79,6 +82,7 @@ export {
   Loading,
   LogoAnimation,
   Modal,
+  OverseerWrapper,
   PocGeneratingOverlay,
   NucleusPage,
   Portal,

@@ -6,6 +6,7 @@ import {
   Select,
   ConceptReportSkeletons,
 } from '@components';
+import { OverseerWrapper } from '@components/Overseer';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import {
@@ -329,14 +330,16 @@ const ConceptReport: FunctionComponent = () => {
                 <Loading />
               </div>
             ) : (
-              <div key={activeTab} className='animate-fade-in'>
-                <Outlet
-                  context={{
-                    navigateToTab: onTabSelect,
-                    concept: concept,
-                  }}
-                />
-              </div>
+              <OverseerWrapper>
+                <div key={activeTab} className='animate-fade-in'>
+                  <Outlet
+                    context={{
+                      navigateToTab: onTabSelect,
+                      concept: concept,
+                    }}
+                  />
+                </div>
+              </OverseerWrapper>
             )}
           </Container.TabView>
         </div>

@@ -6,6 +6,7 @@ export * from './assumptions';
 export * from './auth/accounts';
 export * from './chat';
 export * from './concept/assumptions';
+export * from './customCommands';
 export * from './concept/concepts';
 export * from './concept/financialProjection';
 export * from './concept/financialProjectionV2';

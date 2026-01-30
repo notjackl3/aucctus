@@ -54,6 +54,10 @@ import syntheticTestingSlice, {
   ISyntheticTestingState,
   initialSyntheticTestingState,
 } from './synthetic-testing/store';
+import overseerSlice, {
+  IOverseerState,
+  initialOverseerState,
+} from './overseer/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -70,6 +74,7 @@ export interface IAppStore {
   ideaPlayground: IIdeaPlaygroundState;
   queryInvalidation: IQueryInvalidationState;
   syntheticTesting: ISyntheticTestingState;
+  overseer: IOverseerState;
 }
 
 export interface IStoreApi<S> {
@@ -96,6 +101,7 @@ const useStore = create<IAppStore>()(
         ideaPlayground: ideaPlaygroundSlice,
         queryInvalidation: queryInvalidationSlice,
         syntheticTesting: syntheticTestingSlice,
+        overseer: overseerSlice,
       }),
     ),
     {
@@ -187,6 +193,7 @@ const getInitialState = (): IAppStore => {
       initialQueryInvalidationState as unknown as IQueryInvalidationState,
     syntheticTesting:
       initialSyntheticTestingState as unknown as ISyntheticTestingState,
+    overseer: initialOverseerState as unknown as IOverseerState,
   }; // Actions will be preserved automatically by Zustand's setState()
 };
 

@@ -108,6 +108,76 @@ export interface IAIEditingStartedMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Overseer (AI Context Analysis) Messages
+// ==========================================
+
+export interface IOverseerHandshakeMessage extends BaseSocketEvent {
+  type: 'overseer.handshake';
+  sessionId: string;
+  conceptUuid: string;
+}
+
+export interface IOverseerChatMessage extends BaseSocketEvent {
+  type: 'overseer.chat';
+  uuid: string;
+  sessionId: string;
+  conceptUuid: string;
+  role: 'assistant';
+  name: string;
+  content: string;
+  timestamp?: string;
+}
+
+export interface IOverseerChatStreamMessage extends BaseSocketEvent {
+  type: 'overseer.chat.stream';
+  content?: string;
+  context?: {
+    uuid: string;
+    conceptUuid: string;
+    sessionId: string;
+    name: string;
+    timestamp?: string;
+  };
+}
+
+export interface IOverseerTypingMessage extends BaseSocketEvent {
+  type: 'overseer.chat.typing';
+  conceptUuid: string;
+  sessionId: string;
+  value: boolean;
+  content?: string;
+}
+
+export interface IOverseerSuggestedQuestionsMessage extends BaseSocketEvent {
+  type: 'overseer.suggested.questions';
+  conceptUuid: string;
+  sessionId: string;
+  questions: string[];
+}
+
+export interface IOverseerErrorMessage extends BaseSocketEvent {
+  type: 'overseer.error';
+  conceptUuid: string;
+  code: string;
+  message: string;
+}
+
+export interface IOverseerToolActivityMessage extends BaseSocketEvent {
+  type: 'overseer.tool.activity';
+  conceptUuid: string;
+  sessionId: string;
+  toolName: string;
+  activityMessage: string;
+}
+
+export interface IOverseerEditSuggestionMessage extends BaseSocketEvent {
+  type: 'overseer.edit.suggestion';
+  conceptUuid: string;
+  sessionId: string;
+  content: IConceptReportEdit;
+}
+
+// ==========================================
 // Test Result Related Messages
 // ==========================================
 
@@ -1153,6 +1223,14 @@ export type InboundSocketEvent<C = {}> =
   | IIdeaSubmissionsUploadStartedMessage
   | IIdeaSubmissionsUploadProgressMessage
   | IIdeaSubmissionsUploadCompletedMessage
-  | IIdeaSubmissionsUploadErrorMessage;
+  | IIdeaSubmissionsUploadErrorMessage
+  | IOverseerHandshakeMessage
+  | IOverseerChatMessage
+  | IOverseerChatStreamMessage
+  | IOverseerTypingMessage
+  | IOverseerSuggestedQuestionsMessage
+  | IOverseerErrorMessage
+  | IOverseerToolActivityMessage
+  | IOverseerEditSuggestionMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];

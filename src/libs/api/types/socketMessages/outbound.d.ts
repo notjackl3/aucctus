@@ -179,6 +179,50 @@ export interface ICustomerProfileOutboundTypingMessage
 }
 
 // ----------------
+// Overseer Messages
+// ----------------
+
+/**
+ * Base interface for Overseer messages
+ * Supports two modes:
+ * 1. Concept mode: conceptUuid is required, accountUuid is optional
+ * 2. Account mode: accountUuid is required, conceptUuid is optional
+ */
+interface BaseOverseerMessage extends BaseSocketEvent {
+  conceptUuid?: string;
+  accountUuid?: string;
+  pageContext: string;
+}
+
+/**
+ * Interface for starting an Overseer conversation
+ */
+export interface IOverseerConversationStartMessage extends BaseOverseerMessage {
+  type: 'overseer.conversation.start';
+  uuid?: string;
+  selectedText: string;
+  expandedText: string;
+  content: string;
+}
+
+/**
+ * Interface for Overseer follow-up messages
+ */
+export interface IOverseerOutboundChatMessage extends BaseOverseerMessage {
+  type: 'overseer.message';
+  uuid?: string;
+  sessionId: string;
+  content: string;
+}
+
+/**
+ * Interface for cancelling Overseer tasks
+ */
+export interface IOverseerOutboundCancelMessage extends BaseOverseerMessage {
+  type: 'overseer.cancel';
+}
+
+// ----------------
 // Incubation Messages
 // ----------------
 
@@ -211,6 +255,9 @@ export type OutboundSocketEvent =
   | ICustomerProfileOutboundChatMessage
   | ICustomerProfileOutboundFileMessage
   | ICustomerProfileOutboundTypingMessage
+  | IOverseerConversationStartMessage
+  | IOverseerOutboundChatMessage
+  | IOverseerOutboundCancelMessage
   | OutboundChatMessage
   | OutboundChatMediaMessage
   | IUserTypingMessage;

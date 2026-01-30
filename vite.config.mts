@@ -87,6 +87,10 @@ export default defineConfig(async (config: ViteUserConfig) => {
       FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS: Boolean(
         env.FEATURE_POST_CONCEPT_CLARIFYING_QUESTIONS === 'true',
       ),
+      FEATURE_OVERSEER:
+        env.FEATURE_OVERSEER !== undefined
+          ? env.FEATURE_OVERSEER === 'true'
+          : (env.ENVIRONMENT ?? 'production') !== 'production',
     },
     css: {
       preprocessorOptions: {

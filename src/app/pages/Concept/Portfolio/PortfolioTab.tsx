@@ -10,6 +10,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Banner, ConceptReportSkeletons } from '@components';
+import OverseerWrapper from '@components/Overseer/OverseerWrapper';
 import {
   useBulkPrioritySocketEvents,
   useConceptPriorities,
@@ -305,57 +306,59 @@ const PortfolioTab: React.FC = () => {
   );
 
   return (
-    <div className='animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300'>
-      {/* Priority Calculation Banner */}
-      {showPriorityBanner && (
-        <Banner
-          title='Portfolio Priority Scoring Available'
-          description={`You have ${conceptsWithoutPrioritiesCount} concept${conceptsWithoutPrioritiesCount === 1 ? '' : 's'} without priority scores. Calculate priorities to see which concepts align best with your strategic goals.`}
-          onAction={handleCalculateAllPriorities}
-          isLoading={isCalculatingPriorities}
-          buttonText={
-            isFetchingConcepts
-              ? 'Loading...'
-              : progress.isCalculating
-                ? `Calculating ${progress.current}/${progress.total}...`
-                : 'Calculate Priorities'
+    <OverseerWrapper pageContext='portfolio'>
+      <div className='animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300'>
+        {/* Priority Calculation Banner */}
+        {showPriorityBanner && (
+          <Banner
+            title='Portfolio Priority Scoring Available'
+            description={`You have ${conceptsWithoutPrioritiesCount} concept${conceptsWithoutPrioritiesCount === 1 ? '' : 's'} without priority scores. Calculate priorities to see which concepts align best with your strategic goals.`}
+            onAction={handleCalculateAllPriorities}
+            isLoading={isCalculatingPriorities}
+            buttonText={
+              isFetchingConcepts
+                ? 'Loading...'
+                : progress.isCalculating
+                  ? `Calculating ${progress.current}/${progress.total}...`
+                  : 'Calculate Priorities'
+            }
+            iconVariant='bar-chart-12'
+          />
+        )}
+
+        {/* Executive Summary */}
+        {isCalculatingPriorities ? (
+          <ConceptReportSkeletons.PortfolioExecutiveSummarySkeleton />
+        ) : (
+          <PortfolioExecutiveSummary summary={executiveSummary} />
+        )}
+
+        {/* High Scoring Concepts Carousel */}
+        <HighScoringConceptsCarousel
+          concepts={highScoringConcepts}
+          isLoading={
+            prioritiesLoading || conceptsLoading || isCalculatingPriorities
           }
-          iconVariant='bar-chart-12'
+          onViewAll={handleViewAllConcepts}
+          onConceptClick={handleConceptClick}
         />
-      )}
 
-      {/* Executive Summary */}
-      {isCalculatingPriorities ? (
-        <ConceptReportSkeletons.PortfolioExecutiveSummarySkeleton />
-      ) : (
-        <PortfolioExecutiveSummary summary={executiveSummary} />
-      )}
-
-      {/* High Scoring Concepts Carousel */}
-      <HighScoringConceptsCarousel
-        concepts={highScoringConcepts}
-        isLoading={
-          prioritiesLoading || conceptsLoading || isCalculatingPriorities
-        }
-        onViewAll={handleViewAllConcepts}
-        onConceptClick={handleConceptClick}
-      />
-
-      {/* Portfolio Balance Widget (Donut Chart) - shows AI-classified innovation horizons */}
-      {isCalculatingPriorities ? (
-        <ConceptReportSkeletons.PortfolioBalanceWidgetSkeleton />
-      ) : (
-        <PortfolioBalanceWidget
-          horizonData={horizonData}
-          totalIdeas={
-            horizonData.reduce((sum, h) => sum + h.count, 0) ||
-            portfolioSummary?.totalAnalyzed ||
-            0
-          }
-          portfolioSummary={portfolioSummary}
-        />
-      )}
-    </div>
+        {/* Portfolio Balance Widget (Donut Chart) - shows AI-classified innovation horizons */}
+        {isCalculatingPriorities ? (
+          <ConceptReportSkeletons.PortfolioBalanceWidgetSkeleton />
+        ) : (
+          <PortfolioBalanceWidget
+            horizonData={horizonData}
+            totalIdeas={
+              horizonData.reduce((sum, h) => sum + h.count, 0) ||
+              portfolioSummary?.totalAnalyzed ||
+              0
+            }
+            portfolioSummary={portfolioSummary}
+          />
+        )}
+      </div>
+    </OverseerWrapper>
   );
 };
 

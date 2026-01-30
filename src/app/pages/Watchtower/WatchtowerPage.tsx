@@ -5,7 +5,12 @@ import React, {
   useRef,
   useEffect,
 } from 'react';
-import { Icon, Loading, ConceptReportSkeletons } from '@components';
+import {
+  Icon,
+  Loading,
+  ConceptReportSkeletons,
+  OverseerWrapper,
+} from '@components';
 import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import images from '@assets/img';
@@ -490,9 +495,9 @@ const SignalRadar: React.FC<{
 };
 
 /**
- * Main Watchtower Page Component
+ * Main Watchtower Page Component (internal)
  */
-const WatchtowerPage: React.FC = () => {
+const WatchtowerPageContent: React.FC = () => {
   // Get account info for company logo
   const { account } = useStore((state) => state.auth);
   const companyLogoUrl = useMemo(() => {
@@ -1889,6 +1894,17 @@ const WatchtowerPage: React.FC = () => {
         )}
       </AnimatePresence>
     </div>
+  );
+};
+
+/**
+ * Main Watchtower Page Component with Overseer support
+ */
+const WatchtowerPage: React.FC = () => {
+  return (
+    <OverseerWrapper pageContext='watchtower'>
+      <WatchtowerPageContent />
+    </OverseerWrapper>
   );
 };
 

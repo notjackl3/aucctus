@@ -42,6 +42,7 @@ declare const __ENVIRONMENT__: 'development' | 'staging' | 'production';
 declare const FEATURE_CUSTOMER_PROFILE_CHAT: boolean;
 declare const FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS: boolean;
 declare const FEATURE_CONCEPT_VERSIONING: boolean;
+declare const FEATURE_OVERSEER: boolean;
 
 // Hotjar User Identification
 interface HotjarUserAttributes {

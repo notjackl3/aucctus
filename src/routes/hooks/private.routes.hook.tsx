@@ -1,4 +1,4 @@
-import { NucleusPage } from '@components';
+import { NucleusPage, OverseerWrapper } from '@components';
 import Page from '@pages';
 import { useConceptReportRoutes, useSettingsRoutes } from '@routes/hooks';
 import Layout from '@routes/layouts';
@@ -43,7 +43,14 @@ const usePrivateRoutes = () => {
       {SettingsRoutes}
 
       {/* Nucleus Routes */}
-      <Route path={AppPath.Nucleus} element={<NucleusPage />} />
+      <Route
+        path={AppPath.Nucleus}
+        element={
+          <OverseerWrapper pageContext='nucleus'>
+            <NucleusPage />
+          </OverseerWrapper>
+        }
+      />
 
       {/* Idea Playground Routes */}
       <Route
