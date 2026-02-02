@@ -15,6 +15,7 @@ import {
   useBulkPrioritySocketEvents,
   useConceptPriorities,
   useGenerateBulkConceptPriorities,
+  usePortfolioSummary,
 } from '@hooks/query/concept-priority.hook';
 import { useConcepts } from '@hooks/query/concepts.hook';
 import { useAutoInitScoringConfig } from '@hooks/query/scoringConfig.hook';
@@ -83,8 +84,11 @@ const PortfolioTab: React.FC = () => {
 
   // Bulk priority generation
   const bulkPriorityMutation = useGenerateBulkConceptPriorities();
-  const { progress, startCalculating, resetProgress, portfolioSummary } =
+  const { progress, startCalculating, resetProgress } =
     useBulkPrioritySocketEvents();
+
+  // Fetch portfolio summary from API
+  const { portfolioSummary } = usePortfolioSummary();
 
   // Check if we should show the banner
   // Count all concepts without priorities (including incomplete ones - they will receive low scores)

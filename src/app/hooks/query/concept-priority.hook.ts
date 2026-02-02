@@ -8,13 +8,13 @@ import { IConceptPriorityDetail } from '@libs/api/types/accounts/scoring-config'
 import {
   IConceptPrioritySummary,
   IGeneratePrioritiesResponse,
+  IPortfolioSummaryResponse,
 } from '@libs/api/types/concept/concept_priority';
 import {
   IBulkPriorityCompletedMessage,
   IBulkPriorityProgressMessage,
   IConceptPriorityCompletedMessage,
   IConceptPriorityErrorMessage,
-  IPortfolioSummaryMessage,
 } from '@libs/api/types/socketMessages/inbound';
 import utils from '@libs/utils';
 import { useCallback, useEffect, useState } from 'react';
@@ -88,6 +88,30 @@ export const useConceptPriorities = () => {
   });
 
   return { ...query, priorities: query.data || [] };
+};
+
+/**
+ * Hook to fetch portfolio summary with AI-generated insights
+ */
+export const usePortfolioSummary = () => {
+  const query = useQuery<IPortfolioSummaryResponse | null>({
+    queryKey: [AucctusQueryKeys.portfolioSummary],
+    queryFn: async () => {
+      try {
+        return await api.concept.getPortfolioSummary();
+      } catch (error: any) {
+        // 404 is expected when no portfolio summary exists yet
+        if (error?.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    },
+    staleTime: 1000 * 60 * 1, // 1 minutes
+    cacheTime: 1000 * 60 * 1, // 1 minutes
+  });
+
+  return { ...query, portfolioSummary: query.data };
 };
 
 /**
@@ -200,74 +224,6 @@ export interface BulkPriorityProgress {
   currentConceptTitle: string;
 }
 
-/**
- * Top priority concept for executive summary
- */
-export interface TopPrioritySummary {
-  title: string;
-  overallScore: number;
-  keyStrength: string;
-}
-
-/**
- * Breakdown of portfolio by innovation horizon
- */
-export interface HorizonBreakdown {
-  coreCount: number;
-  adjacentCount: number;
-  disruptiveCount: number;
-  corePercentage: number;
-  adjacentPercentage: number;
-  disruptivePercentage: number;
-}
-
-/**
- * State for portfolio executive summary
- */
-export interface PortfolioSummary {
-  showSummary: boolean;
-  totalAnalyzed: number;
-  highPriorityCount: number;
-  averageScore: number;
-  executiveInsight: string;
-  keyRecommendation: string;
-  portfolioHealth: 'strong' | 'balanced' | 'needs_attention';
-  topPriorities: TopPrioritySummary[];
-  horizonBreakdown?: HorizonBreakdown;
-}
-
-// LocalStorage key for persisted portfolio summary (survives page refresh)
-const PORTFOLIO_SUMMARY_STORAGE_KEY = 'aucctus_portfolio_summary';
-
-// Helper to get summary from localStorage
-const getStoredPortfolioSummary = (): PortfolioSummary | null => {
-  try {
-    const stored = localStorage.getItem(PORTFOLIO_SUMMARY_STORAGE_KEY);
-    if (stored) {
-      return JSON.parse(stored) as PortfolioSummary;
-    }
-  } catch {
-    // Ignore parse errors
-  }
-  return null;
-};
-
-// Helper to save summary to localStorage
-const savePortfolioSummaryToStorage = (summary: PortfolioSummary | null) => {
-  try {
-    if (summary) {
-      localStorage.setItem(
-        PORTFOLIO_SUMMARY_STORAGE_KEY,
-        JSON.stringify(summary),
-      );
-    } else {
-      localStorage.removeItem(PORTFOLIO_SUMMARY_STORAGE_KEY);
-    }
-  } catch {
-    // Ignore storage errors
-  }
-};
-
 // Default progress state
 const DEFAULT_PROGRESS: BulkPriorityProgress = {
   isCalculating: false,
@@ -280,13 +236,11 @@ const DEFAULT_PROGRESS: BulkPriorityProgress = {
 
 /**
  * Hook to listen for bulk priority calculation WebSocket events.
- * Returns progress state and portfolio summary that updates in real-time.
- * Both are persisted in React Query cache (shared across components) and
- * localStorage (survives page refresh).
+ * Returns progress state that updates in real-time.
+ * Progress is persisted in React Query cache (shared across components).
  *
- * Uses React Query cache for both progress and portfolioSummary so they're
- * shared across all components - critical for when user navigates away during
- * bulk calculation.
+ * Uses React Query cache for progress so it's shared across all components -
+ * critical for when user navigates away during bulk calculation.
  */
 export const useBulkPrioritySocketEvents = () => {
   const queryClient = useQueryClient();
@@ -300,21 +254,7 @@ export const useBulkPrioritySocketEvents = () => {
     return cached || DEFAULT_PROGRESS;
   });
 
-  // Use React Query cache for portfolioSummary so it's shared across all components
-  // Initialize from cache first, then localStorage as fallback
-  const [portfolioSummary, setPortfolioSummaryLocal] =
-    useState<PortfolioSummary | null>(() => {
-      const cached = queryClient.getQueryData<PortfolioSummary | null>([
-        AucctusQueryKeys.portfolioSummary,
-      ]);
-      if (cached !== undefined) {
-        return cached;
-      }
-      // Fallback to localStorage for persistence across page refresh
-      return getStoredPortfolioSummary();
-    });
-
-  // Subscribe to cache changes to sync local state for both progress and portfolioSummary
+  // Subscribe to cache changes to sync local state for progress
   useEffect(() => {
     const unsubscribe = queryClient.getQueryCache().subscribe(() => {
       const cachedProgress = queryClient.getQueryData<BulkPriorityProgress>([
@@ -322,13 +262,6 @@ export const useBulkPrioritySocketEvents = () => {
       ]);
       if (cachedProgress) {
         setProgressLocal(cachedProgress);
-      }
-
-      const cachedSummary = queryClient.getQueryData<PortfolioSummary | null>([
-        AucctusQueryKeys.portfolioSummary,
-      ]);
-      if (cachedSummary !== undefined) {
-        setPortfolioSummaryLocal(cachedSummary);
       }
     });
     return unsubscribe;
@@ -342,16 +275,6 @@ export const useBulkPrioritySocketEvents = () => {
         [AucctusQueryKeys.bulkPriorityProgress],
         newProgress,
       );
-    },
-    [queryClient],
-  );
-
-  // Helper to update portfolioSummary in local state, cache, and localStorage
-  const setPortfolioSummary = useCallback(
-    (summary: PortfolioSummary | null) => {
-      setPortfolioSummaryLocal(summary);
-      queryClient.setQueryData([AucctusQueryKeys.portfolioSummary], summary);
-      savePortfolioSummaryToStorage(summary);
     },
     [queryClient],
   );
@@ -388,9 +311,12 @@ export const useBulkPrioritySocketEvents = () => {
           currentConceptTitle: '',
         });
 
-        // Invalidate the priorities list to refetch with new data
+        // Invalidate the priorities list and portfolio summary to refetch with new data
         queryClient.invalidateQueries({
           queryKey: [AucctusQueryKeys.conceptPriorities],
+        });
+        queryClient.invalidateQueries({
+          queryKey: [AucctusQueryKeys.portfolioSummary],
         });
 
         // Show completion message
@@ -407,27 +333,6 @@ export const useBulkPrioritySocketEvents = () => {
         }
       },
       [queryClient, setProgress],
-    ),
-  );
-
-  // Listen for portfolio summary events
-  useSocketEvent<'concept.priority.portfolio_summary.user'>(
-    'concept.priority.portfolio_summary.user',
-    useCallback(
-      (data: IPortfolioSummaryMessage) => {
-        setPortfolioSummary({
-          showSummary: true,
-          totalAnalyzed: data.totalAnalyzed,
-          highPriorityCount: data.highPriorityCount,
-          averageScore: data.averageScore,
-          executiveInsight: data.executiveInsight,
-          keyRecommendation: data.keyRecommendation,
-          portfolioHealth: data.portfolioHealth,
-          topPriorities: data.topPriorities,
-          horizonBreakdown: data.horizonBreakdown,
-        });
-      },
-      [setPortfolioSummary],
     ),
   );
 
@@ -451,23 +356,10 @@ export const useBulkPrioritySocketEvents = () => {
     [setProgress],
   );
 
-  const dismissSummary = useCallback(() => {
-    if (portfolioSummary) {
-      setPortfolioSummary({ ...portfolioSummary, showSummary: false });
-    }
-  }, [portfolioSummary, setPortfolioSummary]);
-
-  const resetSummary = useCallback(() => {
-    setPortfolioSummary(null);
-  }, [setPortfolioSummary]);
-
   return {
     progress,
     resetProgress,
     startCalculating,
-    portfolioSummary,
-    dismissSummary,
-    resetSummary,
   };
 };
 

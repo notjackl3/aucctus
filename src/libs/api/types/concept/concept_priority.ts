@@ -139,3 +139,38 @@ export function getHorizonColorClass(
       };
   }
 }
+
+/**
+ * Top priority concept for portfolio summary
+ */
+export interface ITopPrioritySummary {
+  title: string;
+  overallScore: number;
+  keyStrength: string;
+}
+
+/**
+ * Breakdown of portfolio by innovation horizon
+ */
+export interface IHorizonBreakdown {
+  coreCount: number;
+  adjacentCount: number;
+  disruptiveCount: number;
+  corePercentage: number;
+  adjacentPercentage: number;
+  disruptivePercentage: number;
+}
+
+/**
+ * Portfolio summary response from API
+ */
+export interface IPortfolioSummaryResponse {
+  totalAnalyzed: number;
+  highPriorityCount: number;
+  averageScore: number;
+  executiveInsight: string;
+  keyRecommendation: string;
+  portfolioHealth: 'strong' | 'balanced' | 'needs_attention';
+  topPriorities: ITopPrioritySummary[];
+  horizonBreakdown?: IHorizonBreakdown;
+}

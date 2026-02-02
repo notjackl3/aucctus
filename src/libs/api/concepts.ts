@@ -732,4 +732,14 @@ export class ConceptApi extends ApiService {
       score,
     });
   }
+
+  /**
+   * Get portfolio summary with AI-generated insights
+   * @returns Portfolio summary with executive insight, recommendations, and top priorities
+   */
+  getPortfolioSummary() {
+    return this.get<
+      import('./types/concept/concept_priority').IPortfolioSummaryResponse
+    >(endpoints.conceptPriorityPortfolioSummary());
+  }
 }

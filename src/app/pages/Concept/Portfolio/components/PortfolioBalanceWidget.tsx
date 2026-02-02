@@ -7,7 +7,7 @@
  */
 
 import { Icon } from '@components';
-import { PortfolioSummary } from '@hooks/query/concept-priority.hook';
+import { IPortfolioSummaryResponse } from '@libs/api/types/concept/concept_priority';
 import React, { useCallback, useMemo, useState } from 'react';
 import { HorizonData } from '../types';
 import PortfolioInsightsFeed from './PortfolioInsightsFeed';
@@ -15,7 +15,7 @@ import PortfolioInsightsFeed from './PortfolioInsightsFeed';
 interface PortfolioBalanceWidgetProps {
   horizonData: HorizonData[];
   totalIdeas: number;
-  portfolioSummary?: PortfolioSummary | null;
+  portfolioSummary?: IPortfolioSummaryResponse | null;
 }
 
 /**
@@ -380,8 +380,8 @@ const PortfolioBalanceWidget: React.FC<PortfolioBalanceWidgetProps> = ({
   // Check if we have horizon data to display
   const hasHorizonData = horizonData.length > 0;
 
-  // Show insights feed when we have a portfolio summary with showSummary=true
-  const showInsights = portfolioSummary?.showSummary === true;
+  // Show insights feed when we have a portfolio summary from the API
+  const showInsights = !!portfolioSummary;
 
   return (
     <div className='grid w-full grid-cols-1 gap-6 lg:grid-cols-2'>

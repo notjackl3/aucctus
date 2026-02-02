@@ -9,12 +9,12 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { Icon } from '@components';
 import {
-  PortfolioSummary,
-  TopPrioritySummary,
-} from '@hooks/query/concept-priority.hook';
+  IPortfolioSummaryResponse,
+  ITopPrioritySummary,
+} from '@libs/api/types/concept/concept_priority';
 
 interface PortfolioInsightsFeedProps {
-  portfolioSummary: PortfolioSummary;
+  portfolioSummary: IPortfolioSummaryResponse;
 }
 
 // Internal insight type for display
@@ -60,7 +60,7 @@ const PortfolioInsightsFeed: React.FC<PortfolioInsightsFeedProps> = ({
 
     // Top priorities as insights
     portfolioSummary.topPriorities.forEach(
-      (priority: TopPrioritySummary, index: number) => {
+      (priority: ITopPrioritySummary, index: number) => {
         result.push({
           id: `priority-${index}`,
           headline: priority.title,

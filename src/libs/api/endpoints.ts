@@ -160,6 +160,10 @@ export class Endpoints {
     return `api/v2/concept/priority/list`;
   }
 
+  static conceptPriorityPortfolioSummary() {
+    return `api/v2/concept/priority/portfolio-summary`;
+  }
+
   static conceptPriorityGenerate(conceptUuid: string) {
     return `api/v2/concept/${conceptUuid}/priority/generate`;
   }
