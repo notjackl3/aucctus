@@ -9,7 +9,7 @@
  */
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { Icon, Loading, Tabs, TabsContent } from '@components';
+import { Badge, Icon, Loading, Tabs, TabsContent } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 
@@ -142,8 +142,9 @@ const CompetitorAssessmentPage: React.FC = () => {
               />
             </div>
             <div>
-              <h1 className='aucctus-text-primary text-xl font-bold'>
+              <h1 className='aucctus-text-primary flex items-center gap-2 text-xl font-bold'>
                 Competitor Assessment
+                <Badge.Beta size='xs' />
               </h1>
               <p className='aucctus-text-secondary text-sm'>
                 Competitive Intelligence Dashboard

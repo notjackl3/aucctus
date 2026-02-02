@@ -31,8 +31,8 @@ interface SubmissionLinkModalProps {
   embedded?: boolean;
 }
 
-// Slug validation: lowercase alphanumeric and hyphens, 3-50 chars
-const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{1,48}[a-z0-9]$/;
+// Slug validation: lowercase alphanumeric and hyphens, 3-200 chars
+const SLUG_REGEX = /^[a-z0-9][a-z0-9-]{1,198}[a-z0-9]$/;
 
 /**
  * Modal for creating or editing a submission link
@@ -67,7 +67,7 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, '-')
         .replace(/^-+|-+$/g, '')
-        .slice(0, 50);
+        .slice(0, 200);
       setSlug(generated);
     }
   }, [title, isEditing, slug]);
@@ -127,7 +127,7 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
       newErrors.slug = 'Slug is required';
     } else if (!SLUG_REGEX.test(slug)) {
       newErrors.slug =
-        'Slug must be 3-50 characters, lowercase letters, numbers, and hyphens only';
+        'Slug must be 3-200 characters, lowercase letters, numbers, and hyphens only';
     }
 
     if (hasPassword && !password) {
@@ -306,69 +306,70 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
           <label className='aucctus-text-xs aucctus-text-tertiary block font-medium uppercase tracking-wide'>
             Customize URL
           </label>
-          <div className='flex items-center gap-2'>
+          <div className='space-y-2'>
             <div
               className={cn(
-                'aucctus-bg-secondary/20 aucctus-border-secondary/50 focus-within:aucctus-bg-primary flex flex-1 items-center overflow-hidden rounded-lg border transition-colors',
+                'aucctus-bg-secondary/20 aucctus-border-secondary/50 focus-within:aucctus-bg-primary flex w-full items-center overflow-hidden rounded-lg border transition-colors',
                 errors.slug
                   ? 'aucctus-border-error'
                   : 'focus-within:aucctus-border-brand/50',
               )}
             >
-              <span className='aucctus-text-sm aucctus-text-tertiary aucctus-border-secondary/50 border-r px-3 py-2.5'>
+              <span className='aucctus-text-sm aucctus-text-tertiary aucctus-border-secondary/50 shrink-0 border-r px-3 py-2.5'>
                 {accountSlug}.aucctus.com/
               </span>
               <input
                 type='text'
                 value={slug}
                 onChange={(e) => handleSlugChange(e.target.value)}
-                className='aucctus-text-primary h-10 flex-1 border-0 bg-transparent px-2 font-mono text-sm focus:outline-none focus:ring-0'
-                maxLength={50}
+                className='aucctus-text-primary h-10 min-w-0 flex-1 border-0 bg-transparent px-2 font-mono text-sm focus:outline-none focus:ring-0'
               />
             </div>
-            <button
-              type='button'
-              onClick={() => {
-                const newState = !hasPassword;
-                setHasPassword(newState);
-                if (newState && !password) {
-                  generatePassword();
+            <div className='flex items-center gap-1'>
+              <button
+                type='button'
+                onClick={() => {
+                  const newState = !hasPassword;
+                  setHasPassword(newState);
+                  if (newState && !password) {
+                    generatePassword();
+                  }
+                  if (!newState) {
+                    setPassword('');
+                    setClearPassword(isEditing);
+                  }
+                }}
+                className={cn(
+                  'aucctus-text-tertiary hover:aucctus-text-primary h-9 w-9 shrink-0 rounded-lg transition-colors',
+                  hasPassword
+                    ? 'bg-[hsl(25,15%,12%)] text-white hover:bg-[hsl(25,15%,18%)]'
+                    : 'hover:aucctus-bg-secondary',
+                )}
+                title={
+                  hasPassword
+                    ? 'Password protection enabled'
+                    : 'Enable password protection'
                 }
-                if (!newState) {
-                  setPassword('');
-                  setClearPassword(isEditing);
-                }
-              }}
-              className={cn(
-                'aucctus-text-tertiary hover:aucctus-text-primary h-11 w-11 shrink-0 rounded-lg transition-colors',
-                hasPassword
-                  ? 'bg-[hsl(25,15%,12%)] text-white hover:bg-[hsl(25,15%,18%)]'
-                  : 'hover:aucctus-bg-secondary',
-              )}
-              title={
-                hasPassword
-                  ? 'Password protection enabled'
-                  : 'Enable password protection'
-              }
-            >
-              <LockKeyhole className='mx-auto h-4 w-4' />
-            </button>
-            <button
-              type='button'
-              onClick={copyUrl}
-              className='aucctus-text-tertiary hover:aucctus-text-primary hover:aucctus-bg-secondary h-11 w-11 shrink-0 rounded-lg transition-colors'
-              title='Copy URL'
-            >
-              <Copy className='mx-auto h-4 w-4' />
-            </button>
-            <button
-              type='button'
-              onClick={openUrl}
-              className='aucctus-text-tertiary hover:aucctus-text-primary hover:aucctus-bg-secondary h-11 w-11 shrink-0 rounded-lg transition-colors'
-              title='Open URL'
-            >
-              <ExternalLink className='mx-auto h-4 w-4' />
-            </button>
+              >
+                <LockKeyhole className='mx-auto h-4 w-4' />
+              </button>
+              <button
+                type='button'
+                onClick={copyUrl}
+                className='aucctus-text-tertiary hover:aucctus-text-primary hover:aucctus-bg-secondary h-9 w-9 shrink-0 rounded-lg transition-colors'
+                title='Copy URL'
+              >
+                <Copy className='mx-auto h-4 w-4' />
+              </button>
+              <button
+                type='button'
+                onClick={openUrl}
+                className='aucctus-text-tertiary hover:aucctus-text-primary hover:aucctus-bg-secondary h-9 w-9 shrink-0 rounded-lg transition-colors'
+                title='Open URL'
+              >
+                <ExternalLink className='mx-auto h-4 w-4' />
+              </button>
+            </div>
           </div>
           {errors.slug && (
             <p className='aucctus-text-xs aucctus-text-error-primary flex items-center gap-1'>
