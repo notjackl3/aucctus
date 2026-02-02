@@ -1,47 +1,47 @@
-import React, {
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-  useEffect,
-} from 'react';
+import images from '@assets/img';
 import {
+  ConceptReportSkeletons,
   Icon,
   Loading,
-  ConceptReportSkeletons,
   OverseerWrapper,
 } from '@components';
 import { cn } from '@libs/utils/react';
-import { motion, AnimatePresence } from 'framer-motion';
-import images from '@assets/img';
 import { useAccountLogo } from '@hooks/query/admin.hook';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 
-import {
-  RadarSweep,
-  SignalCarouselWidget,
-  FuturePredictionsWidget,
-  SignalTrendsWidget,
-  FutureDomainsWidget,
-  ConceptOpportunitiesWidget,
-  WatchtowerInitiation,
-} from './components';
 import type {
   WatchtowerFeatureHighlight,
   WatchtowerInitiationBadge,
 } from './components';
-
-import type { Signal, SignalType, SignalCategory } from './types';
-import { signalTypeConfig, signalCategoryConfig } from './types';
-import { mockImpactedConcepts } from './fixtures';
 import {
-  useWatchtowerDashboard,
-  useRefreshWatchtower,
+  ConceptOpportunitiesWidget,
+  FutureDomainsWidget,
+  FuturePredictionsWidget,
+  RadarSweep,
+  SignalCarouselWidget,
+  SignalTrendsWidget,
+  WatchtowerInitiation,
+} from './components';
+
+import {
   useCreateMonitoringRule,
   useDeleteMonitoringRule,
-  useWatchtowerSocketEvents,
+  useRefreshWatchtower,
   useToggleSignalTracking,
+  useWatchtowerDashboard,
+  useWatchtowerSocketEvents,
 } from '@hooks/query/watchtower.hook';
 import type { IWatchtowerSignal } from '@libs/api/types/watchtower';
+import { mockImpactedConcepts } from './fixtures';
+import type { Signal, SignalCategory, SignalType } from './types';
+import { signalCategoryConfig, signalTypeConfig } from './types';
 
 /**
  * Transform API signal to local Signal type
@@ -89,6 +89,20 @@ const SignalRadar: React.FC<{
   introComplete = false,
   companyLogoUrl,
 }) => {
+  const [staggerComplete, setStaggerComplete] = useState(false);
+
+  // After intro stagger finishes, disable delays so select/deselect is instant
+  useEffect(() => {
+    if (introComplete && !staggerComplete) {
+      const maxStaggerDelay = 0.6 + signals.length * 0.08;
+      const timer = setTimeout(
+        () => setStaggerComplete(true),
+        maxStaggerDelay * 1000 + 300,
+      );
+      return () => clearTimeout(timer);
+    }
+  }, [introComplete, staggerComplete, signals.length]);
+
   let filteredSignals =
     filter === 'all' ? signals : signals.filter((s) => s.type === filter);
   if (categoryFilter !== 'all') {
@@ -390,9 +404,10 @@ const SignalRadar: React.FC<{
                   type: 'spring',
                   stiffness: 300,
                   damping: 12,
-                  delay: 0.6 + index * 0.08,
+                  delay: staggerComplete ? 0.3 : 0.6 + index * 0.08,
+                  cx: { duration: 0 },
+                  cy: { duration: 0 },
                 }}
-                className='transition-all duration-200'
               />
               {/* Selection ring */}
               {isSelected && (
@@ -413,7 +428,8 @@ const SignalRadar: React.FC<{
                     type: 'spring',
                     stiffness: 300,
                     damping: 12,
-                    delay: 0.6 + index * 0.08,
+                    cx: { duration: 0 },
+                    cy: { duration: 0 },
                   }}
                 />
               )}
@@ -427,7 +443,9 @@ const SignalRadar: React.FC<{
                 className='pointer-events-none'
                 initial={{ opacity: 0 }}
                 animate={introComplete ? { opacity: 1 } : { opacity: 0 }}
-                transition={{ delay: 0.6 + index * 0.08 + 0.1 }}
+                transition={{
+                  delay: staggerComplete ? 0 : 0.6 + index * 0.08 + 0.1,
+                }}
               >
                 <div className='flex h-full w-full items-center justify-center'>
                   <Icon
@@ -454,7 +472,9 @@ const SignalRadar: React.FC<{
                       ? { r: 3.6, opacity: 1 }
                       : { r: 0, opacity: 0 }
                   }
-                  transition={{ delay: 0.6 + index * 0.08 + 0.15 }}
+                  transition={{
+                    delay: staggerComplete ? 0 : 0.6 + index * 0.08 + 0.15,
+                  }}
                 />
               )}
             </g>

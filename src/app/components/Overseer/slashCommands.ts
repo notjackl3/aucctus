@@ -183,7 +183,8 @@ export function parseSlashCommand(
     return [command, normalizeRemaining(remaining), '', remaining];
   }
 
-  // Match first valid command anywhere in the message
+  // Match last valid command anywhere in the message.
+  // Later commands override earlier ones so only one command is active at a time.
   let bestMatch: { command: SlashCommand; start: number; end: number } | null =
     null;
   const tokenRegex = /(^|\s)(\/\S+)/g;
@@ -199,16 +200,12 @@ export function parseSlashCommand(
 
     const start = match.index + match[1].length;
     const end = start + token.length;
-    if (!bestMatch || start < bestMatch.start) {
-      bestMatch = { command, start, end };
-    }
+    bestMatch = { command, start, end };
   }
 
   if (bestMatch) {
-    const prefix = source.slice(0, bestMatch.start);
     const suffix = source.slice(bestMatch.end);
-    const remaining = prefix + suffix;
-    return [bestMatch.command, normalizeRemaining(remaining), prefix, suffix];
+    return [bestMatch.command, normalizeRemaining(suffix), '', suffix];
   }
 
   // Command not found, return original message

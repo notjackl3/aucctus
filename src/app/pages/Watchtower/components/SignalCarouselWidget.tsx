@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Icon, toast } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -67,12 +67,14 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
+  const isInternalSelection = useRef(false);
 
   // Auto-cycle through signals
   useEffect(() => {
     if (!isPlaying || isExpanded || signals.length === 0) return;
 
     const interval = setInterval(() => {
+      isInternalSelection.current = true;
       setCurrentIndex((prev) => {
         const newIndex = (prev + 1) % signals.length;
         // Also update radar selection during auto-cycle
@@ -90,6 +92,11 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
       const idx = signals.findIndex((s) => s.id === selectedSignal.id);
       if (idx !== -1) {
         setCurrentIndex(idx);
+        // Pause auto-play when selection comes from outside (e.g., radar click)
+        if (!isInternalSelection.current) {
+          setIsPlaying(false);
+        }
+        isInternalSelection.current = false;
       }
     }
   }, [selectedSignal, signals]);
@@ -98,12 +105,14 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
 
   const goNext = useCallback(() => {
     const newIndex = (currentIndex + 1) % signals.length;
+    isInternalSelection.current = true;
     setCurrentIndex(newIndex);
     onSelectSignal(signals[newIndex]);
   }, [currentIndex, signals, onSelectSignal]);
 
   const goPrev = useCallback(() => {
     const newIndex = (currentIndex - 1 + signals.length) % signals.length;
+    isInternalSelection.current = true;
     setCurrentIndex(newIndex);
     onSelectSignal(signals[newIndex]);
   }, [currentIndex, signals, onSelectSignal]);
@@ -304,6 +313,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                         <button
                           key={signal.id}
                           onClick={() => {
+                            isInternalSelection.current = true;
                             setCurrentIndex(actualIdx);
                             onSelectSignal(signals[actualIdx]);
                           }}
