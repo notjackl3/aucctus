@@ -308,11 +308,11 @@ const ImportConceptsModal: FunctionComponent<ImportConceptsModalProps> = ({
 
               {/* Dropdown */}
               {isSourceDropdownOpen && (
-                <div className='aucctus-bg-primary aucctus-border-secondary absolute z-10 mt-1 w-full rounded-lg border shadow-lg'>
+                <div className='aucctus-bg-primary aucctus-border-secondary absolute z-10 mt-1 max-h-64 w-full overflow-y-auto rounded-lg border shadow-lg'>
                   {/* Create New Source Option */}
                   <button
                     onClick={handleCreateNewSource}
-                    className='aucctus-text-brand-primary hover:aucctus-bg-secondary flex w-full items-center gap-2 px-4 py-3 text-left transition-colors'
+                    className='aucctus-bg-primary aucctus-text-brand-primary hover:aucctus-bg-secondary sticky top-0 flex w-full items-center gap-2 px-4 py-3 text-left transition-colors'
                   >
                     <Plus className='h-4 w-4' />
                     <span className='aucctus-text-sm-semibold'>
