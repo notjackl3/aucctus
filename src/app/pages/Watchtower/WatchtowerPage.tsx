@@ -14,8 +14,7 @@ import {
 import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import images from '@assets/img';
-import { getLogoUrl, getBaseUrl } from '@libs/utils/source';
-import useStore from '@stores/store';
+import { useAccountLogo } from '@hooks/query/admin.hook';
 
 import {
   RadarSweep,
@@ -149,7 +148,7 @@ const SignalRadar: React.FC<{
         preserveAspectRatio='xMidYMid slice'
       >
         <defs>
-          {/* Gradient for center hub - brand aligned warm tones */}
+          {/* Gradient for center hub - dark background behind logo */}
           <radialGradient
             id='hubGradient'
             cx='50%'
@@ -158,9 +157,9 @@ const SignalRadar: React.FC<{
             fx='50%'
             fy='50%'
           >
-            <stop offset='0%' stopColor='rgba(20, 15, 15, 0.95)' />
-            <stop offset='70%' stopColor='rgba(30, 20, 18, 0.9)' />
-            <stop offset='100%' stopColor='rgba(40, 25, 20, 0.8)' />
+            <stop offset='0%' stopColor='rgba(15, 10, 10, 1)' />
+            <stop offset='70%' stopColor='rgba(20, 14, 12, 1)' />
+            <stop offset='100%' stopColor='rgba(28, 18, 15, 0.95)' />
           </radialGradient>
 
           {/* Outer urgency glow ring - brand red, larger radius */}
@@ -327,17 +326,7 @@ const SignalRadar: React.FC<{
           fill='url(#hubGradient)'
         />
 
-        {/* White semicircle background for company logo - fills entire visible hub area */}
-        <path
-          d={`M ${centerX - hubRadius} ${centerY} 
-              A ${hubRadius} ${hubRadius} 0 1 1 ${centerX + hubRadius} ${centerY} 
-              L ${centerX + hubRadius} ${centerY + hubRadius}
-              L ${centerX - hubRadius} ${centerY + hubRadius}
-              Z`}
-          fill='white'
-        />
-
-        {/* Company logo centered in the white semicircle */}
+        {/* Company logo centered in the hub */}
         <foreignObject
           x={centerX - hubRadius * 0.7}
           y={centerY - hubRadius * 0.85}
@@ -348,14 +337,16 @@ const SignalRadar: React.FC<{
             className='flex h-full w-full items-center justify-center'
             style={{ backgroundColor: 'transparent' }}
           >
-            <img
-              src={companyLogoUrl || images.companyLogoDefault}
-              alt='Client Logo'
-              className='h-full w-auto max-w-full object-contain'
-              onError={(e) => {
-                (e.target as HTMLImageElement).src = images.companyLogoDefault;
-              }}
-            />
+            {companyLogoUrl && (
+              <img
+                src={companyLogoUrl}
+                alt='Client Logo'
+                className='h-full w-auto max-w-full object-contain'
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.display = 'none';
+                }}
+              />
+            )}
           </div>
         </foreignObject>
 
@@ -498,16 +489,9 @@ const SignalRadar: React.FC<{
  * Main Watchtower Page Component (internal)
  */
 const WatchtowerPageContent: React.FC = () => {
-  // Get account info for company logo
-  const { account } = useStore((state) => state.auth);
-  const companyLogoUrl = useMemo(() => {
-    if (account?.domain) {
-      // Extract clean domain from URL (e.g., "https://ca.gymshark.com" -> "ca.gymshark.com")
-      const cleanDomain = getBaseUrl(account.domain);
-      return getLogoUrl(cleanDomain);
-    }
-    return undefined;
-  }, [account?.domain]);
+  // Get account logo from dedicated API endpoint
+  const { logoUrl } = useAccountLogo();
+  const companyLogoUrl = logoUrl || undefined;
 
   // Fetch dashboard data from API
   const {

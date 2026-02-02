@@ -1,25 +1,25 @@
-import { FunctionComponent, useState, useEffect } from 'react';
-import { useMutation } from 'react-query';
-import { motion } from 'framer-motion';
-import {
-  ArrowLeft,
-  Eye,
-  EyeOff,
-  AlertCircle,
-  Copy,
-  ExternalLink,
-  LockKeyhole,
-} from 'lucide-react';
+import images from '@assets/img';
+import { toast } from '@components';
 import api from '@libs/api';
 import {
-  ISubmissionLink,
   ICreateSubmissionLink,
+  ISubmissionLink,
   IUpdateSubmissionLink,
 } from '@libs/api/types/ideaSubmissions';
-import useStore from '@stores/store';
-import { toast } from '@components';
 import { cn } from '@libs/utils/react';
-import images from '@assets/img';
+import useStore from '@stores/store';
+import { motion } from 'framer-motion';
+import {
+  AlertCircle,
+  ArrowLeft,
+  Copy,
+  ExternalLink,
+  Eye,
+  EyeOff,
+  LockKeyhole,
+} from 'lucide-react';
+import { FunctionComponent, useEffect, useState } from 'react';
+import { useMutation } from 'react-query';
 
 interface SubmissionLinkModalProps {
   link: ISubmissionLink | null;
@@ -90,7 +90,7 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
     },
   });
 
-  // Update mutation
+  // Update Mutation
   const updateMutation = useMutation({
     mutationFn: ({
       uuid,
