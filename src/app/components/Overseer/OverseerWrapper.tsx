@@ -66,7 +66,8 @@ const OverseerWrapper: React.FC<OverseerWrapperProps> = ({
   }, [activeTab, pageContextOverride]);
 
   // Disable Overseer on certain pages (initialization pages are handled at a higher level)
-  const isEnabled = FEATURE_OVERSEER;
+  const isEnabled =
+    typeof FEATURE_OVERSEER !== 'undefined' ? FEATURE_OVERSEER : false;
 
   return (
     <OverseerProvider pageContext={pageContext} enabled={isEnabled}>

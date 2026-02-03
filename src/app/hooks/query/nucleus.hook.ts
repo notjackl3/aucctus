@@ -12,9 +12,24 @@ import { AucctusQueryKeys } from './query-keys';
 export const useNucleusReportLatest = () => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.nucleusReportLatest],
-    queryFn: async () => await api.nucleus.getLatestReport(),
+    queryFn: async () => {
+      try {
+        return await api.nucleus.getLatestReport();
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 10, // 10 minutes
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
+    },
     onError: (e: AxiosError) => {
       // Only show error if it's not a 404 (no reports found)
       if (e.response?.status !== 404) {
@@ -31,8 +46,7 @@ export const useNucleusReportLatest = () => {
     ...query,
     nucleusReport: query.data,
     hasNucleusReport: !!query.data,
-    isNoReportFound:
-      query.error && (query.error as AxiosError)?.response?.status === 404,
+    isNoReportFound: query.isSuccess && query.data === null,
   };
 };
 
@@ -160,12 +174,27 @@ export const useNucleusDocumentUpload = () => {
 const useNucleusReportLatestProgress = () => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.nucleusReportLatest, 'progress'],
-    queryFn: async () => await api.nucleus.getLatestReportProgress(),
+    queryFn: async () => {
+      try {
+        return await api.nucleus.getLatestReportProgress();
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes (websockets provide real-time updates)
     cacheTime: 1000 * 60 * 10, // 10 minutes
     refetchInterval: false, // No polling - websockets provide real-time updates
     refetchOnWindowFocus: true, // Refetch on window focus for fresh data when user returns
     refetchOnMount: true, // Fetch on mount for initial load
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
+    },
     onError: (e: AxiosError) => {
       // Only show error if it's not a 404 (no reports found)
       if (e.response?.status !== 404) {
@@ -192,8 +221,7 @@ const useNucleusReportLatestProgress = () => {
     totalQuestionsWithAnswers: query.data?.totalQuestionsWithAnswers ?? 0,
     totalQuestionsValidated: query.data?.totalQuestionsValidated ?? 0,
     sections: query.data?.sections ?? {},
-    isNoReportFound:
-      query.error && (query.error as AxiosError)?.response?.status === 404,
+    isNoReportFound: query.isSuccess && query.data === null,
   };
 };
 
@@ -481,9 +509,24 @@ export const useCompanyInfoLookup = () => {
 export const useNucleusDocuments = () => {
   const query = useQuery({
     queryKey: [AucctusQueryKeys.nucleusDocuments],
-    queryFn: async () => await api.nucleus.getDocuments(),
+    queryFn: async () => {
+      try {
+        return await api.nucleus.getDocuments();
+      } catch (error: any) {
+        if (error?.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
+    },
     staleTime: 1000 * 60 * 5, // 5 minutes
     cacheTime: 1000 * 60 * 10, // 10 minutes
+    retry: (failureCount, error: any) => {
+      if (error?.response?.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
+    },
     onError: (e: AxiosError) => {
       // Only show error if it's not a 404 (no reports found)
       if (e.response?.status !== 404) {
@@ -501,8 +544,7 @@ export const useNucleusDocuments = () => {
     documents: (query.data as DocumentWithUsage[] | undefined) ?? [],
     hasDocuments:
       ((query.data as DocumentWithUsage[] | undefined) ?? []).length > 0,
-    isNoReportFound:
-      query.error && (query.error as AxiosError)?.response?.status === 404,
+    isNoReportFound: query.isSuccess && query.data === null,
   };
 };
 
