@@ -1194,6 +1194,7 @@ export const useConceptBank = (
               identifier={info.row.original.identifier}
               conceptUuid={info.row.original.uuid}
               seedUuid={info.row.original.seedUuid}
+              seedType={info.row.original.seedType}
             />
           </div>
         ),

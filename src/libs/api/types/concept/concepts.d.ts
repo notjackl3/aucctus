@@ -1,3 +1,4 @@
+import { ConceptIncubationQuestionnaireType } from '../incubation/questionnaire';
 import type { IPageQueryOptions, IPageResponse } from '../osiris';
 import type { ISource } from './support';
 
@@ -172,6 +173,7 @@ export interface IConcept extends IBaseConceptEntity {
   createdBy: IUser; // Assuming IUser is defined elsewhere
   hasSeed: boolean;
   seedUuid: string;
+  seedType: ConceptIncubationQuestionnaireType;
   hasSeenConceptChange: boolean;
   lastModifiedBy?: {
     id: number;

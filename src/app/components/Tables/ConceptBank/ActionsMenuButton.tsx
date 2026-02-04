@@ -5,7 +5,11 @@ import {
   useConceptReportCancel,
   useCloneSeed,
 } from '@hooks/query/concepts.hook';
-import { ConceptStatus, ConceptReportStatus } from '@libs/api/types';
+import {
+  ConceptStatus,
+  ConceptReportStatus,
+  ConceptIncubationQuestionnaireType,
+} from '@libs/api/types';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
 import utils from '@libs/utils';
@@ -20,6 +24,7 @@ interface IConceptActionMenuButton {
   conceptUuid: string; // Add conceptUuid for operations that need it
   reportStatus: ConceptReportStatus;
   seedUuid?: string; // Add seedUuid to enable cloning
+  seedType?: ConceptIncubationQuestionnaireType;
 }
 
 const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
@@ -28,6 +33,7 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
   conceptUuid,
   reportStatus,
   seedUuid,
+  seedType,
 }) => {
   const { mutate: unarchiveConcept } = useUnarchiveConcept();
   const { mutate: updateConcept } = useConceptUpdate();
@@ -97,6 +103,7 @@ const ConceptActionMenuButton: React.FC<IConceptActionMenuButton> = ({
       onCloneConceptSeed={seedUuid ? () => handleCloneConceptSeed() : undefined}
       buttonClassName='btn btn-light btn-bold p-2'
       iconSize={28}
+      seedType={seedType}
     />
   );
 };

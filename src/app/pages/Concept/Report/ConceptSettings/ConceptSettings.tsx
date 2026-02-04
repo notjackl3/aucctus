@@ -221,7 +221,7 @@ const ConceptSettings: React.FC = () => {
       <div className='mx-0'>
         <div className='no-scrollbar mt-4 flex flex-1 flex-col gap-6'>
           {/* Clone Concept Seed Button - Always visible if seedDraft exists */}
-          {seedDraft && (
+          {seedDraft && !(isWatchtowerSeed || isEmployeeSubmissionSeed) && (
             <div className='flex items-center justify-end'>
               <button
                 onClick={handleCloneConceptSeed}
@@ -245,6 +245,18 @@ const ConceptSettings: React.FC = () => {
           {/* Non-Idea Playground seed content */}
           {!isIdeaPlaygroundSeed && (
             <>
+              {/* Source Badge - Display seed type */}
+              {seedDraft?.type && (
+                <div className='flex items-center gap-2'>
+                  <span className='aucctus-text-tertiary text-xs uppercase'>
+                    Source
+                  </span>
+                  <div className='aucctus-bg-secondary aucctus-border-primary aucctus-text-primary inline-flex items-center rounded-full border px-3 py-1 text-xs font-medium'>
+                    {snakeToTitleCase(seedDraft.type)}
+                  </div>
+                </div>
+              )}
+
               {/* Seed Summary - show CONTEXT only for watchtower/submission, both for regular */}
               {hasSeedSummary && (
                 <div className='flex flex-col gap-3'>

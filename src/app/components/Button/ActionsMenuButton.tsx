@@ -1,8 +1,9 @@
-import { Icon } from '@components';
+import { Icon, ComponentTooltip } from '@components';
 import {
   ConceptStatus,
   SeedStatus,
   ConceptReportStatus,
+  ConceptIncubationQuestionnaireType,
 } from '@libs/api/types';
 import * as Popover from '@radix-ui/react-popover';
 import React from 'react';
@@ -21,6 +22,7 @@ interface IActionsMenuButtonProps {
   onCloneConceptSeed?: (conceptUuid: string) => void; // Receives concept UUID, parent should handle getting seedUuid and cloning
   buttonClassName?: string;
   iconSize?: number;
+  seedType?: ConceptIncubationQuestionnaireType;
 }
 
 const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
@@ -33,11 +35,15 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
   onCloneConceptSeed,
   buttonClassName = 'btn flex h-8 w-8 items-center justify-center rounded-lg border border-gray-100 bg-white p-0 shadow-sm transition-all hover:bg-gray-50',
   iconSize = 24,
+  seedType,
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const archiveLabel = status !== 'archived' ? 'Archive' : 'Unarchive';
   const showCancelReport = reportStatus === 'pending' && onCancelReport;
   const showCloneConceptSeed = status !== 'draft' && onCloneConceptSeed;
+
+  const disableCloneConceptSeed =
+    seedType === 'EMPLOYEE_SUBMISSION' || seedType === 'WATCHTOWER_SIGNAL';
 
   // Smooth animation for menu appearance
   const menuTransition = useTransition(open, {
@@ -120,17 +126,36 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
                     {showCloneConceptSeed && (
                       <>
                         <div className='aucctus-bg-secondary mx-2 h-px' />
-                        <button
-                          className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
-                          onClick={() => {
-                            onCloneConceptSeed?.(identifier);
-                            setOpen(false);
-                          }}
-                        >
-                          <span className='aucctus-text-primary text-base'>
-                            Clone Concept Seed
-                          </span>
-                        </button>
+                        {disableCloneConceptSeed ? (
+                          <ComponentTooltip
+                            tip={
+                              <div className='aucctus-text-primary aucctus-text-sm aucctus-bg-primary rounded-lg p-6'>
+                                Not available for this seed type
+                              </div>
+                            }
+                          >
+                            <button
+                              className='btn btn-no-border btn-light flex w-full cursor-not-allowed items-center justify-start px-3 py-2 opacity-50'
+                              disabled={true}
+                            >
+                              <span className='aucctus-text-primary text-base'>
+                                Clone Concept Seed
+                              </span>
+                            </button>
+                          </ComponentTooltip>
+                        ) : (
+                          <button
+                            className='btn btn-no-border btn-light hover:aucctus-bg-secondary flex w-full items-center justify-start px-3 py-2'
+                            onClick={() => {
+                              onCloneConceptSeed?.(identifier);
+                              setOpen(false);
+                            }}
+                          >
+                            <span className='aucctus-text-primary text-base'>
+                              Clone Concept Seed
+                            </span>
+                          </button>
+                        )}
                       </>
                     )}
                   </div>
