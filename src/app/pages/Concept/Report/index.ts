@@ -10,6 +10,7 @@ import MarketScan from './MarketScanBase';
 import OverviewDetails from './OverviewDetails';
 import OverviewWrapper from './OverviewWrapper';
 import Testing from './Testing/Testing';
+import Workshop from './Workshop/Workshop';
 
 // Regular exports
 export {
@@ -23,6 +24,7 @@ export {
   OverviewDetails,
   OverviewWrapper,
   Testing,
+  Workshop,
 };
 
 // Type exports
@@ -37,6 +39,7 @@ const ReportWithTabs = ConceptReport as unknown as typeof ConceptReport & {
   Assumptions: typeof AssumptionsWrapper;
   ConceptSettings: typeof ConceptSettings;
   Testing: typeof Testing;
+  Workshop: typeof Workshop;
 };
 
 // Assign components as properties
@@ -47,5 +50,6 @@ ReportWithTabs.FinancialProjection = FinancialProjectionsWrapper;
 ReportWithTabs.Assumptions = AssumptionsWrapper;
 ReportWithTabs.ConceptSettings = ConceptSettings;
 ReportWithTabs.Testing = Testing;
+ReportWithTabs.Workshop = Workshop;
 
 export default ReportWithTabs;

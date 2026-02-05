@@ -93,6 +93,9 @@
     "zustand": "^5.0.3",
     "zustand-multi-persist": "^0.1.4"
   },
+  "overrides": {
+    "fast-xml-parser": "^5.3.4"
+  },
   "devDependencies": {
     "@sentry/vite-plugin": "^2.22.6",
     "@types/jwt-decode": "^2.2.1",

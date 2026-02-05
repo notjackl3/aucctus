@@ -8,6 +8,7 @@ import ConceptSettings from '@pages/Concept/Report/ConceptSettings/ConceptSettin
 import CustomerProfile from '@pages/Concept/Report/CustomerProfile';
 import MarketScanBase from '@pages/Concept/Report/MarketScanBase';
 import Testing from '@pages/Concept/Report/Testing/Testing';
+import Workshop from '@pages/Concept/Report/Workshop/Workshop';
 import { AppPath, ConceptPath } from '@routes/routes';
 import { Route } from 'react-router-dom';
 
@@ -22,6 +23,7 @@ const useConceptReportRoutes = () => {
       />
       <Route path={ConceptPath.CustomerProfile} element={<CustomerProfile />} />
       <Route path={ConceptPath.Assumptions} element={<AssumptionsWrapper />} />
+      <Route path={ConceptPath.Workshop} element={<Workshop />} />
       <Route path={ConceptPath.Testing} element={<Testing />} />
       <Route path={ConceptPath.Settings} element={<ConceptSettings />} />
     </Route>

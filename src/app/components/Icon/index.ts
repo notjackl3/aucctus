@@ -6,6 +6,9 @@ import RotatingIcon from './RotatingIcon';
 
 import Tooltip from './Tooltip';
 
+// Export the AgentDecidedColor type for use in other components
+export type { AgentDecidedColor } from './Icon/Icon';
+
 (Default as any).Feature = Feature;
 (Default as any).LoadingSpinner = LoadingSpinner;
 (Default as any).AssumptionCategory = AssumptionCategory;

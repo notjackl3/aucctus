@@ -26,4 +26,5 @@ export * from './property';
 export * from './socketMessages/base';
 export * from './socketMessages/inbound';
 export * from './socketMessages/outbound';
+export * from './dynamicComponent';
 export * from './watchtower';

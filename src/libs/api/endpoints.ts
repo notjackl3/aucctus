@@ -1013,6 +1013,19 @@ export class Endpoints {
   static customCommandDetail(commandUuid: string) {
     return `/api/v1/chat/custom-commands/${commandUuid}`;
   }
+
+  // ============================================
+  // Dynamic Component Endpoints
+  // ============================================
+  static dynamicComponentGenerate = '/api/v1/dynamic-components/generate';
+
+  static dynamicComponentDetail(componentUuid: string) {
+    return `/api/v1/dynamic-components/${componentUuid}`;
+  }
+
+  static dynamicComponentsForConcept(conceptUuid: string) {
+    return `/api/v1/dynamic-components/concept/${conceptUuid}`;
+  }
 }
 
 export class SocketEndpoints {

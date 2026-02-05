@@ -5,6 +5,7 @@ export enum ConceptPath {
   FinancialProjection = 'financial-projection',
   CustomerProfile = 'customer-profile',
   Assumptions = 'assumptions',
+  Workshop = 'workshop',
   Settings = 'settings',
   Testing = 'testing',
 }
@@ -29,6 +30,7 @@ export enum AppPath {
   ConceptKeyAssumptions = `/concept/:id/${ConceptPath.Assumptions}`,
   ConceptMarketScan = `/concept/:id/${ConceptPath.MarketScan}`,
   ConceptSettings = `/concept/:id/${ConceptPath.Settings}`,
+  ConceptWorkshop = `/concept/:id/${ConceptPath.Workshop}`,
   ConceptTesting = `/concept/:id/${ConceptPath.Testing}`,
 
   /* Challenges */
@@ -56,6 +58,9 @@ export enum AppPath {
   SubmissionLinks = '/submission-links',
   SubmissionLinkDetail = '/submission-links/:linkUuid',
   SubmissionLinkPublicForm = '/submit/:accountSlug/:linkSlug',
+
+  /* Component Workshop - DEPRECATED: Use Concept Report Workshop tab instead */
+  /* ComponentWorkshop = '/workshop', */
 
   /* Settings */
   Settings = '/settings',

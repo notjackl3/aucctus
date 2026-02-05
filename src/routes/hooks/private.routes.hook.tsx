@@ -79,12 +79,6 @@ const usePrivateRoutes = () => {
         element={<Page.IdeaSubmissions.SubmissionLinkDetailPage />}
       />
 
-      {/* Testing/Demo Routes */}
-      <Route
-        path={AppPath.TestingConceptOverview}
-        element={<Page.Testing.ConceptOverviewTesting />}
-      />
-
       {/* Watchtower Routes */}
       <Route path={AppPath.Watchtower} element={<Page.WatchtowerPage />} />
 

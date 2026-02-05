@@ -11,7 +11,13 @@ module.exports = {
     'plugin:react-hooks/recommended',
     'prettier',
   ],
-  ignorePatterns: ['build/**', 'dist/**', 'node_modules/**'],
+  ignorePatterns: [
+    'build/**',
+    'dist/**',
+    'node_modules/**',
+    'agent/**',
+    'public/compiled/**',
+  ],
   settings: {
     react: {
       version: 'detect',

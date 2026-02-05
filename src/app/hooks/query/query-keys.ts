@@ -103,6 +103,11 @@ export enum AucctusQueryKeys {
   agentTiming = 'agentTiming',
   syntheticPipelineEstimate = 'syntheticPipelineEstimate',
 
+  /* Dynamic Components */
+  dynamicComponents = 'dynamicComponents',
+  dynamicComponent = 'dynamicComponent',
+  dynamicComponentHealth = 'dynamicComponentHealth',
+
   /* Scoring Configuration */
   scoringConfig = 'scoringConfig',
 

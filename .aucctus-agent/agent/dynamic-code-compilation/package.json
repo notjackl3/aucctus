@@ -1,0 +1,37 @@
+{
+  "name": "@aucctus/agent-compiler",
+  "version": "1.0.0",
+  "description": "Agent-side TSX to JS compiler for dynamic component rendering",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "lint": "eslint . --ext .ts",
+    "verify": "node scripts/verify.mjs",
+    "compile": "node scripts/compile-test.mjs"
+  },
+  "dependencies": {
+    "esbuild": "^0.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.1.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "keywords": [
+    "react",
+    "tsx",
+    "compiler",
+    "dynamic-components",
+    "esbuild"
+  ]
+}

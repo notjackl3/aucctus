@@ -10,6 +10,7 @@ import { ISocketConfig, SocketService } from './base/socketService';
 import { CompetitorAssessmentApi } from './competitorAssessment';
 import { ConceptApi } from './concepts';
 import { CustomCommandsApi } from './customCommands';
+import { DynamicComponentApi } from './dynamicComponent';
 import { SocketEndpoints } from './endpoints';
 import { FinancialProjectionApi } from './financialProjection';
 import { IdeaPlaygroundApi } from './ideaPlayground';
@@ -59,6 +60,7 @@ export class Api {
   watchtower!: WatchtowerApi;
   competitorAssessment!: CompetitorAssessmentApi;
   customCommands!: CustomCommandsApi;
+  dynamicComponent!: DynamicComponentApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -92,6 +94,7 @@ export class Api {
       { key: 'watchtower', class: WatchtowerApi },
       { key: 'competitorAssessment', class: CompetitorAssessmentApi },
       { key: 'customCommands', class: CustomCommandsApi },
+      { key: 'dynamicComponent', class: DynamicComponentApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

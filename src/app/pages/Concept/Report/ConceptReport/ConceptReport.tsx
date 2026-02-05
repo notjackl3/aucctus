@@ -43,6 +43,7 @@ type TabTitles =
   | 'FINANCIAL PROJECTION'
   | 'CUSTOMER PROFILE'
   | 'ASSUMPTIONS'
+  | 'WORKSHOP'
   | 'CONTEXT'
   | 'TESTING';
 
@@ -83,6 +84,12 @@ const CONCEPT_TABS: { label: TabTitles; value: AppPath; icon: IconVariant }[] =
       value: AppPath.ConceptKeyAssumptions,
       icon: 'book-open',
     },
+    // TODO: Re-activate Workshop tab when ready
+    // {
+    //   label: 'WORKSHOP',
+    //   value: AppPath.ConceptWorkshop,
+    //   icon: 'filecode',
+    // },
     { label: 'CONTEXT', value: AppPath.ConceptSettings, icon: 'globe' },
   ];
 
