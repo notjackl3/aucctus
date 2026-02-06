@@ -67,6 +67,12 @@ export interface IIdeaSubmission {
 
   /** Current status of AI scoring: pending, scoring, complete, error */
   scoringStatus: 'pending' | 'scoring' | 'complete' | 'error' | null;
+  /** Per-question scores (1-5) and reasoning, keyed by question UUID */
+  questionScores: Record<string, { score: number; reasoning: string }> | null;
+  /** Aggregated category scores, keyed by category UUID */
+  categoryScores: Record<string, { score: number; maxScore: number }> | null;
+  /** UUID of the scoring config version used for this score */
+  scoringConfigVersionUuid: string | null;
   /** Total score (0-100) */
   totalScore: number | null;
   /** AI explanation of the scoring */
@@ -446,6 +452,96 @@ export interface IUpdateQuestionScoreResponse {
   questionUuid: string;
   score: number;
   message?: string;
+}
+
+// ============================================
+// SUBMISSION FILTER TYPES
+// ============================================
+
+/**
+ * Sort options for submission lists
+ */
+export enum SubmissionSortOption {
+  /** Sort by total score, ascending (lowest first) */
+  IDEA_SCORE_ASC = 'idea_score_asc',
+  /** Sort by total score, descending (highest first) */
+  IDEA_SCORE_DESC = 'idea_score_desc',
+  /** Sort by submission date, ascending (oldest first) */
+  SUBMISSION_DATE_ASC = 'submission_date_asc',
+  /** Sort by submission date, descending (newest first) */
+  SUBMISSION_DATE_DESC = 'submission_date_desc',
+}
+
+/**
+ * Date range filter for submission filtering
+ */
+export interface ISubmissionDateRange {
+  /** Start date for the range (ISO 8601 format) */
+  start?: string;
+  /** End date for the range (ISO 8601 format) */
+  end?: string;
+}
+
+/**
+ * Per-question score filter
+ */
+export interface IQuestionScoreFilter {
+  /** UUID of the scoring question to filter by */
+  questionUuid: string;
+  /** Minimum score for this question (1-5) */
+  minScore?: number;
+  /** Maximum score for this question (1-5) */
+  maxScore?: number;
+}
+
+/**
+ * Filter parameters for submission lists
+ */
+export interface ISubmissionFilterParams {
+  /** Filter by submission status */
+  status?: IdeaSubmissionStatus;
+  /** Filter by submission link UUID */
+  submissionLinkUuid?: string;
+  /** Filter by submission date range */
+  submissionDateRange?: ISubmissionDateRange;
+  /** Sort option */
+  sortBy?: SubmissionSortOption;
+  /** Minimum total score (0-100) */
+  minTotalScore?: number;
+  /** Maximum total score (0-100) */
+  maxTotalScore?: number;
+  /** Per-question score filter */
+  questionScoreFilter?: IQuestionScoreFilter;
+}
+
+/**
+ * Scoring criteria question for filtering
+ */
+export interface IScoringCriteriaQuestion {
+  uuid: string;
+  text: string;
+  importance: 'low' | 'medium' | 'high';
+  order: number;
+  categoryUuid: string;
+  categoryName: string;
+}
+
+/**
+ * Metadata about available filters
+ */
+export interface ISubmissionFilterMetadata {
+  /** Available scoring questions that can be used for filtering */
+  scoringQuestions: IScoringCriteriaQuestion[];
+}
+
+/**
+ * Response from list submissions endpoint with filter metadata
+ */
+export interface ISubmissionListResponse {
+  /** List of idea submissions */
+  submissions: IIdeaSubmission[];
+  /** Metadata for filtering options */
+  metadata: ISubmissionFilterMetadata;
 }
 
 // ============================================

@@ -82,13 +82,16 @@ const AdminPanel: FunctionComponent = () => {
 
   // Fetch all submissions
   const {
-    data: submissions,
+    data: submissionResponse,
     isLoading,
     error,
   } = useQuery({
     queryKey: ['ideaSubmissions'],
     queryFn: () => api.ideaSubmissions.getAllSubmissions(),
   });
+
+  // Extract submissions array from response
+  const submissions = submissionResponse?.submissions ?? [];
 
   // Update status mutation
   const updateStatusMutation = useMutation({

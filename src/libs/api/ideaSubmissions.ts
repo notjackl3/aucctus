@@ -14,8 +14,10 @@ import {
   IProcessTaskStatus,
   ISaveToBankRequest,
   ISaveToBankResponse,
+  ISubmissionFilterParams,
   ISubmissionLink,
   ISubmissionLinkInfo,
+  ISubmissionListResponse,
   IUpdateIdeaSubmissionStatus,
   IUpdateQuestionScoreRequest,
   IUpdateQuestionScoreResponse,
@@ -70,9 +72,54 @@ export class IdeaSubmissionsApi extends ApiService {
   /**
    * Get all idea submissions for the authenticated user's account.
    * Admin only endpoint.
+   * @param filters - Optional filter parameters for sorting and filtering submissions
    */
-  getAllSubmissions() {
-    return this.get<IIdeaSubmission[]>(endpoints.ideaSubmissionsAdmin);
+  getAllSubmissions(filters?: ISubmissionFilterParams) {
+    const params = new URLSearchParams();
+
+    if (filters?.status) {
+      params.append('status', filters.status);
+    }
+    if (filters?.submissionLinkUuid) {
+      params.append('submission_link_uuid', filters.submissionLinkUuid);
+    }
+    if (filters?.submissionDateRange?.start) {
+      params.append('submission_date_start', filters.submissionDateRange.start);
+    }
+    if (filters?.submissionDateRange?.end) {
+      params.append('submission_date_end', filters.submissionDateRange.end);
+    }
+    if (filters?.sortBy) {
+      params.append('sort_by', filters.sortBy);
+    }
+    if (filters?.minTotalScore !== undefined) {
+      params.append('min_total_score', filters.minTotalScore.toString());
+    }
+    if (filters?.maxTotalScore !== undefined) {
+      params.append('max_total_score', filters.maxTotalScore.toString());
+    }
+    if (filters?.questionScoreFilter) {
+      params.append('question_uuid', filters.questionScoreFilter.questionUuid);
+      if (filters.questionScoreFilter.minScore !== undefined) {
+        params.append(
+          'min_question_score',
+          filters.questionScoreFilter.minScore.toString(),
+        );
+      }
+      if (filters.questionScoreFilter.maxScore !== undefined) {
+        params.append(
+          'max_question_score',
+          filters.questionScoreFilter.maxScore.toString(),
+        );
+      }
+    }
+
+    const queryString = params.toString();
+    const url = queryString
+      ? `${endpoints.ideaSubmissionsAdmin}?${queryString}`
+      : endpoints.ideaSubmissionsAdmin;
+
+    return this.get<ISubmissionListResponse>(url);
   }
 
   /**
@@ -201,12 +248,15 @@ export class IdeaSubmissionsApi extends ApiService {
    * Upload a file containing idea submissions.
    * Supports CSV, XLSX, XLS, TSV, PDF, DOC, DOCX, and TXT files.
    * @param file - The file to upload
-   * @param submissionLinkUuid - The UUID of the submission link to associate with
+   * @param submissionLinkUuid - Optional UUID of the submission link to associate with.
+   *                            If not provided, a new submission link will be auto-created based on the filename.
    */
-  uploadFile(file: File, submissionLinkUuid: string) {
+  uploadFile(file: File, submissionLinkUuid?: string) {
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('submission_link_uuid', submissionLinkUuid);
+    if (submissionLinkUuid) {
+      formData.append('submission_link_uuid', submissionLinkUuid);
+    }
 
     return this.postFormData<IFileUploadResponse>(
       endpoints.ideaSubmissionsUpload,
@@ -270,11 +320,51 @@ export class IdeaSubmissionsApi extends ApiService {
   /**
    * Get all submissions for a specific submission link.
    * @param linkUuid - The UUID of the submission link
+   * @param filters - Optional filter parameters for sorting and filtering submissions
    */
-  getSubmissionsByLink(linkUuid: string) {
-    return this.get<IIdeaSubmission[]>(
-      endpoints.submissionLinkSubmissions(linkUuid),
-    );
+  getSubmissionsByLink(linkUuid: string, filters?: ISubmissionFilterParams) {
+    const params = new URLSearchParams();
+
+    if (filters?.status) {
+      params.append('status', filters.status);
+    }
+    if (filters?.submissionDateRange?.start) {
+      params.append('submission_date_start', filters.submissionDateRange.start);
+    }
+    if (filters?.submissionDateRange?.end) {
+      params.append('submission_date_end', filters.submissionDateRange.end);
+    }
+    if (filters?.sortBy) {
+      params.append('sort_by', filters.sortBy);
+    }
+    if (filters?.minTotalScore !== undefined) {
+      params.append('min_total_score', filters.minTotalScore.toString());
+    }
+    if (filters?.maxTotalScore !== undefined) {
+      params.append('max_total_score', filters.maxTotalScore.toString());
+    }
+    if (filters?.questionScoreFilter) {
+      params.append('question_uuid', filters.questionScoreFilter.questionUuid);
+      if (filters.questionScoreFilter.minScore !== undefined) {
+        params.append(
+          'min_question_score',
+          filters.questionScoreFilter.minScore.toString(),
+        );
+      }
+      if (filters.questionScoreFilter.maxScore !== undefined) {
+        params.append(
+          'max_question_score',
+          filters.questionScoreFilter.maxScore.toString(),
+        );
+      }
+    }
+
+    const queryString = params.toString();
+    const url = queryString
+      ? `${endpoints.submissionLinkSubmissions(linkUuid)}?${queryString}`
+      : endpoints.submissionLinkSubmissions(linkUuid);
+
+    return this.get<ISubmissionListResponse>(url);
   }
 
   /**

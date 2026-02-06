@@ -29,6 +29,7 @@ import {
 import api from '@libs/api';
 import {
   IIdeaSubmission,
+  ISubmissionFilterParams,
   ISubmissionLink,
   ISubmissionLinkTheme,
 } from '@libs/api/types/ideaSubmissions';
@@ -38,6 +39,8 @@ import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
+import { SubmissionFilter } from '@components/Submissions/SubmissionFilter';
+import { useSubmissionLinkSubmissions } from '@hooks/query/idea-submissions.hook';
 import SubmissionLinkModal from './components/SubmissionLinkModal';
 import SubmissionCard from './components/SubmissionCard';
 import SubmissionsListView from './components/SubmissionsListView';
@@ -94,6 +97,9 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
     const saved = localStorage.getItem(VIEW_PREFERENCE_KEY);
     return (saved as ViewMode) || 'grid';
   });
+
+  // Filter state for SubmissionFilter component
+  const [filterState, setFilterState] = useState<ISubmissionFilterParams>({});
 
   // Selection mode state for comparison
   const [isSelectionMode, setIsSelectionMode] = useState(false);
@@ -257,12 +263,19 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
     enabled: !!linkUuid,
   });
 
-  // Fetch submissions for this link
-  const { data: submissions, isLoading: isLoadingSubmissions } = useQuery({
-    queryKey: ['submissionLinkSubmissions', linkUuid],
-    queryFn: () => api.ideaSubmissions.getSubmissionsByLink(linkUuid!),
-    enabled: !!linkUuid,
-  });
+  // Fetch submissions for this link with filters (includes scoring metadata)
+  const {
+    submissions,
+    metadata,
+    isLoading: isLoadingSubmissions,
+    error: submissionsError,
+  } = useSubmissionLinkSubmissions(linkUuid || null, filterState);
+
+  // Get scoring questions from the submissions endpoint metadata
+  const scoringQuestions = useMemo(
+    () => metadata?.scoringQuestions ?? [],
+    [metadata],
+  );
 
   // Toggle active status mutation
   const toggleActiveMutation = useMutation({
@@ -441,6 +454,17 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
     );
   }, []);
 
+  // Handle filter changes
+  const handleFilterChange = useCallback(
+    (newFilters: Partial<ISubmissionFilterParams>) => {
+      setFilterState((prev) => ({
+        ...prev,
+        ...newFilters,
+      }));
+    },
+    [],
+  );
+
   // Handle submission click (opens drawer modal - US-023)
   const handleSubmissionClick = useCallback(
     (submission: IIdeaSubmission) => {
@@ -470,6 +494,11 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
 
   // Loading state
   const isLoading = isLoadingLink || isLoadingSubmissions;
+
+  // Show error if submissions failed to load (logged for debugging)
+  if (submissionsError && !isLoadingSubmissions) {
+    // Error is handled by react-query, no need to log here
+  }
 
   if (isLoading) {
     return (
@@ -837,95 +866,125 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
         transition={{ duration: 0.4, delay: 0.4 }}
       >
         {/* Section Header */}
-        <div className='mb-4 flex items-center justify-between'>
-          <div className='flex items-center gap-2'>
-            <Lightbulb className='aucctus-stroke-primary h-5 w-5' />
-            <h2 className='aucctus-text-lg-semibold aucctus-text-primary'>
-              Submissions
-            </h2>
-            <span className='aucctus-text-sm aucctus-text-tertiary'>
-              {filteredSubmissions.length}
-            </span>
-          </div>
+        <div className='mb-4 flex flex-col gap-4'>
+          <div className='flex items-center justify-between'>
+            <div className='flex items-center gap-2'>
+              <Lightbulb className='aucctus-stroke-primary h-5 w-5' />
+              <h2 className='aucctus-text-lg-semibold aucctus-text-primary'>
+                Submissions
+              </h2>
+              <span className='aucctus-text-sm aucctus-text-tertiary'>
+                {filteredSubmissions.length}
+              </span>
+            </div>
 
-          <div className='flex items-center gap-3'>
-            {/* Selection mode controls */}
-            {isSelectionMode ? (
-              <div className='flex items-center gap-3'>
-                <span className='aucctus-text-sm aucctus-text-secondary'>
-                  {selectedIds.size} selected
-                </span>
-                {selectedIds.size >= 2 && (
+            <div className='flex items-center gap-3'>
+              {/* Selection mode controls */}
+              {isSelectionMode ? (
+                <div className='flex items-center gap-3'>
+                  <span className='aucctus-text-sm aucctus-text-secondary'>
+                    {selectedIds.size} selected
+                  </span>
+                  {selectedIds.size >= 2 && (
+                    <button
+                      onClick={() => setShowComparisonModal(true)}
+                      className='btn btn-primary btn-sm flex items-center gap-2'
+                    >
+                      <GitCompare className='h-4 w-4' />
+                      Compare Selected
+                    </button>
+                  )}
                   <button
-                    onClick={() => setShowComparisonModal(true)}
-                    className='btn btn-primary btn-sm flex items-center gap-2'
+                    onClick={exitSelectionMode}
+                    className='aucctus-text-secondary hover:aucctus-text-primary flex items-center gap-1 transition-colors'
                   >
-                    <GitCompare className='h-4 w-4' />
-                    Compare Selected
+                    <X className='h-4 w-4' />
+                    <span className='aucctus-text-sm-semibold'>Cancel</span>
                   </button>
-                )}
-                <button
-                  onClick={exitSelectionMode}
-                  className='aucctus-text-secondary hover:aucctus-text-primary flex items-center gap-1 transition-colors'
-                >
-                  <X className='h-4 w-4' />
-                  <span className='aucctus-text-sm-semibold'>Cancel</span>
-                </button>
-              </div>
-            ) : (
-              <>
-                {/* Compare Button */}
-                {filteredSubmissions.length >= 2 && (
-                  <motion.button
-                    onClick={enterSelectionMode}
-                    className='aucctus-text-secondary hover:aucctus-text-brand-primary hover:aucctus-bg-brand-secondary flex items-center gap-2 rounded-lg px-3 py-2 transition-colors'
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <GitCompare className='h-4 w-4' />
-                    <span className='aucctus-text-sm-semibold'>Compare</span>
-                  </motion.button>
-                )}
-
-                {/* View Toggle */}
-                <div className='aucctus-bg-secondary flex rounded-lg p-1'>
-                  <motion.button
-                    onClick={() => setViewMode('grid')}
-                    className={cn(
-                      'rounded-md p-2 transition-colors',
-                      viewMode === 'grid'
-                        ? 'aucctus-bg-primary aucctus-text-brand-primary shadow-sm'
-                        : 'aucctus-text-tertiary hover:aucctus-text-secondary',
-                    )}
-                    title='Grid View'
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <LayoutGrid className='h-4 w-4' />
-                  </motion.button>
-                  <motion.button
-                    onClick={() => setViewMode('list')}
-                    className={cn(
-                      'rounded-md p-2 transition-colors',
-                      viewMode === 'list'
-                        ? 'aucctus-bg-primary aucctus-text-brand-primary shadow-sm'
-                        : 'aucctus-text-tertiary hover:aucctus-text-secondary',
-                    )}
-                    title='List View'
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                  >
-                    <List className='h-4 w-4' />
-                  </motion.button>
                 </div>
-              </>
-            )}
+              ) : (
+                <>
+                  {/* Compare Button */}
+                  {filteredSubmissions.length >= 2 && (
+                    <motion.button
+                      onClick={enterSelectionMode}
+                      className='aucctus-text-secondary hover:aucctus-text-brand-primary hover:aucctus-bg-brand-secondary flex items-center gap-2 rounded-lg px-3 py-2 transition-colors'
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <GitCompare className='h-4 w-4' />
+                      <span className='aucctus-text-sm-semibold'>Compare</span>
+                    </motion.button>
+                  )}
+
+                  {/* View Toggle */}
+                  <div className='aucctus-bg-secondary flex rounded-lg p-1'>
+                    <motion.button
+                      onClick={() => setViewMode('grid')}
+                      className={cn(
+                        'rounded-md p-2 transition-colors',
+                        viewMode === 'grid'
+                          ? 'aucctus-bg-primary aucctus-text-brand-primary shadow-sm'
+                          : 'aucctus-text-tertiary hover:aucctus-text-secondary',
+                      )}
+                      title='Grid View'
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <LayoutGrid className='h-4 w-4' />
+                    </motion.button>
+                    <motion.button
+                      onClick={() => setViewMode('list')}
+                      className={cn(
+                        'rounded-md p-2 transition-colors',
+                        viewMode === 'list'
+                          ? 'aucctus-bg-primary aucctus-text-brand-primary shadow-sm'
+                          : 'aucctus-text-tertiary hover:aucctus-text-secondary',
+                      )}
+                      title='List View'
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                    >
+                      <List className='h-4 w-4' />
+                    </motion.button>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
+
+          {/* Filter Component */}
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.5 }}
+          >
+            <SubmissionFilter
+              filterState={filterState}
+              onFilterChange={handleFilterChange}
+              scoringQuestions={scoringQuestions}
+            />
+          </motion.div>
         </div>
 
         {/* Submissions Content */}
         <AnimatePresence mode='wait'>
-          {filteredSubmissions.length === 0 ? (
+          {isLoadingSubmissions ? (
+            <motion.div
+              key='loading'
+              className='py-12 text-center'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
+              <div className='flex animate-pulse flex-col items-center gap-4'>
+                <div className='aucctus-border-brand h-12 w-12 animate-spin rounded-full border-4 border-t-transparent' />
+                <p className='aucctus-text-sm aucctus-text-secondary'>
+                  Loading submissions...
+                </p>
+              </div>
+            </motion.div>
+          ) : filteredSubmissions.length === 0 ? (
             <motion.div
               key='empty'
               className='py-12 text-center'

@@ -4,9 +4,10 @@
 
 import api from '@libs/api';
 import {
-  IIdeaSubmission,
   IIdeaSubmissionDetail,
+  ISubmissionFilterParams,
   ISubmissionLink,
+  ISubmissionListResponse,
 } from '@libs/api/types/ideaSubmissions';
 import { useQuery } from 'react-query';
 
@@ -44,19 +45,34 @@ export const useSubmissionLink = (linkUuid: string | null) => {
 
 /**
  * Hook to fetch all submissions for a specific link
+ * @param linkUuid - The UUID of the submission link
+ * @param filters - Optional filter parameters for sorting and filtering submissions
  */
-export const useSubmissionLinkSubmissions = (linkUuid: string | null) => {
-  const query = useQuery<IIdeaSubmission[]>({
-    queryKey: [AucctusQueryKeys.submissionLinkSubmissions, linkUuid],
+export const useSubmissionLinkSubmissions = (
+  linkUuid: string | null,
+  filters?: ISubmissionFilterParams,
+) => {
+  const query = useQuery<ISubmissionListResponse>({
+    queryKey: [AucctusQueryKeys.submissionLinkSubmissions, linkUuid, filters],
     queryFn: async () => {
-      if (!linkUuid) return [];
-      return api.ideaSubmissions.getSubmissionsByLink(linkUuid);
+      if (!linkUuid)
+        return { submissions: [], metadata: { scoringQuestions: [] } };
+      return api.ideaSubmissions.getSubmissionsByLink(linkUuid, filters);
     },
     enabled: !!linkUuid,
     staleTime: 1000 * 60 * 2, // 2 minutes
+    // Keep previous data visible while fetching new filtered results
+    // This prevents the loading flash when filters change
+    keepPreviousData: true,
   });
 
-  return { ...query, submissions: query.data ?? [] };
+  // isPreviousData indicates we're showing stale data while fetching
+  return {
+    ...query,
+    submissions: query.data?.submissions ?? [],
+    metadata: query.data?.metadata ?? null,
+    isFiltering: query.isFetching && query.isPreviousData,
+  };
 };
 
 /**

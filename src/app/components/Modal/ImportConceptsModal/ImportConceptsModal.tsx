@@ -186,7 +186,7 @@ const ImportConceptsModal: FunctionComponent<ImportConceptsModalProps> = ({
   const uploadMutation = useMutation<
     IFileUploadResponse,
     unknown,
-    { file: File; submissionLinkUuid: string }
+    { file: File; submissionLinkUuid?: string }
   >({
     mutationFn: ({ file, submissionLinkUuid }) =>
       api.ideaSubmissions.uploadFile(file, submissionLinkUuid),
@@ -209,13 +209,10 @@ const ImportConceptsModal: FunctionComponent<ImportConceptsModalProps> = ({
       toast.error('Please select a file to upload');
       return;
     }
-    if (!selectedSourceUuid) {
-      toast.error('Please select a source');
-      return;
-    }
+    // Source is now optional - backend will auto-create if not provided
     uploadMutation.mutate({
       file: selectedFile,
-      submissionLinkUuid: selectedSourceUuid,
+      submissionLinkUuid: selectedSourceUuid || undefined,
     });
   }, [selectedFile, selectedSourceUuid, uploadMutation]);
 
@@ -226,9 +223,9 @@ const ImportConceptsModal: FunctionComponent<ImportConceptsModalProps> = ({
   }, []);
 
   const getSelectedSourceName = () => {
-    if (!selectedSourceUuid) return 'Select a source';
+    if (!selectedSourceUuid) return 'Auto-create from file name';
     const link = submissionLinks.find((l) => l.uuid === selectedSourceUuid);
-    return link?.title || 'Select a source';
+    return link?.title || 'Auto-create from file name';
   };
 
   // Show SubmissionLinkModal when creating a new link
@@ -276,11 +273,15 @@ const ImportConceptsModal: FunctionComponent<ImportConceptsModalProps> = ({
 
         {/* Content */}
         <div className='space-y-6 p-6'>
-          {/* Source Selector */}
+          {/* Source Selector (Optional) */}
           <div className='space-y-2'>
             <label className='aucctus-text-xs-semibold aucctus-text-tertiary block uppercase tracking-wide'>
-              Source <span className='aucctus-text-error-primary'>*</span>
+              Source (Optional)
             </label>
+            <p className='aucctus-text-xs aucctus-text-secondary mb-2'>
+              Select an existing source or leave blank to auto-create one based
+              on the file name
+            </p>
             <div className='relative'>
               <button
                 onClick={() => setIsSourceDropdownOpen(!isSourceDropdownOpen)}
@@ -438,9 +439,7 @@ const ImportConceptsModal: FunctionComponent<ImportConceptsModalProps> = ({
             </button>
             <button
               onClick={handleUploadConfirm}
-              disabled={
-                !selectedFile || !selectedSourceUuid || uploadMutation.isLoading
-              }
+              disabled={!selectedFile || uploadMutation.isLoading}
               className='btn btn-primary btn-md flex items-center gap-2 disabled:opacity-50'
             >
               {uploadMutation.isLoading ? (
