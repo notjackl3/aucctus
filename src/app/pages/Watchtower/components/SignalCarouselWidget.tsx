@@ -4,7 +4,6 @@ import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Signal } from '../types';
 import { signalTypeConfig, signalCategoryConfig } from '../types';
-import { mockImpactedConcepts } from '../fixtures';
 
 // Source type colors for avatars
 const sourceTypeColors: Record<string, string> = {
@@ -173,6 +172,27 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                   style={{ backgroundColor: '#1570EF' }}
                 />
               )}
+              {/* Concept impact indicator */}
+              {currentSignal?.conceptImpacts &&
+                currentSignal.conceptImpacts.some(
+                  (impact) => impact.isMaterial,
+                ) && (
+                  <div className='flex items-center gap-1 rounded-full bg-amber-500/20 px-1.5 py-0.5'>
+                    <Icon
+                      variant='lightbulb'
+                      height={10}
+                      width={10}
+                      className='stroke-amber-400'
+                    />
+                    <span className='text-[9px] text-amber-300'>
+                      {
+                        currentSignal.conceptImpacts.filter(
+                          (impact) => impact.isMaterial,
+                        ).length
+                      }
+                    </span>
+                  </div>
+                )}
             </div>
             <div className='flex items-center gap-1'>
               {/* Pin button */}
@@ -645,8 +665,13 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
 
                     {/* Impacted Concepts Section */}
                     {(() => {
-                      const impactedConcepts =
-                        mockImpactedConcepts[currentSignal.id] || [];
+                      const conceptImpacts = currentSignal.conceptImpacts || [];
+                      const materialImpacts = conceptImpacts.filter(
+                        (impact) => impact.isMaterial,
+                      );
+                      const noMaterialImpact =
+                        conceptImpacts.length > 0 &&
+                        materialImpacts.length === 0;
 
                       return (
                         <div className='space-y-3 border-t border-white/10 pt-4'>
@@ -658,83 +683,58 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                               className='stroke-amber-400/70'
                             />
                             <span className='text-xs font-semibold uppercase tracking-wider text-white/60'>
-                              Impacted Concepts
+                              Concept Impacts
                             </span>
-                            <span className='rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300'>
-                              {impactedConcepts.length}
-                            </span>
+                            {materialImpacts.length > 0 && (
+                              <span className='rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-300'>
+                                {materialImpacts.length}
+                              </span>
+                            )}
                           </div>
 
-                          {impactedConcepts.length > 0 ? (
+                          {materialImpacts.length > 0 ? (
                             <>
                               <p className='-mt-1 text-xs text-white/50'>
-                                These concepts from your bank may need updates
-                                based on this signal.
+                                This signal may cause major disruption or
+                                acceleration to concepts in your bank.
                               </p>
 
-                              {/* Horizontal scrolling cards */}
-                              <div className='-mx-4 flex gap-3 overflow-x-auto px-4 pb-2'>
-                                {impactedConcepts.map((concept) => (
-                                  <div
-                                    key={concept.id}
-                                    className='w-[280px] flex-shrink-0 overflow-hidden rounded-lg border border-white/10 bg-white/5'
+                              {/* Vertical list of impact cards */}
+                              <div className='space-y-3'>
+                                {materialImpacts.map((impact) => (
+                                  <motion.div
+                                    key={impact.uuid}
+                                    className='rounded-lg border border-white/10 bg-white/5 p-3'
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3 }}
                                   >
-                                    {/* Concept Image Header */}
-                                    <div className='relative h-24 overflow-hidden'>
-                                      <img
-                                        src={concept.image}
-                                        alt={concept.conceptName}
-                                        className='h-full w-full object-cover'
-                                      />
-                                      <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent' />
-                                    </div>
-
-                                    <div className='space-y-2.5 p-3'>
-                                      <h5 className='line-clamp-2 text-sm font-semibold leading-snug text-white'>
-                                        {concept.conceptName}
+                                    <div className='space-y-2'>
+                                      <h5 className='text-sm font-semibold leading-snug text-white'>
+                                        {impact.conceptName}
                                       </h5>
 
-                                      <div className='space-y-1.5'>
-                                        <div className='flex items-start gap-1.5'>
-                                          <Icon
-                                            variant='alert-circle'
-                                            height={12}
-                                            width={12}
-                                            className='mt-0.5 flex-shrink-0 stroke-red-400/70'
-                                          />
-                                          <p className='line-clamp-2 text-xs leading-relaxed text-white/60'>
-                                            <span className='font-medium text-white/80'>
-                                              Impact:{' '}
-                                            </span>
-                                            {concept.impact}
-                                          </p>
-                                        </div>
-
-                                        <div className='flex items-start gap-1.5'>
-                                          <Icon
-                                            variant='trendup'
-                                            height={12}
-                                            width={12}
-                                            className='mt-0.5 flex-shrink-0 stroke-green-400/70'
-                                          />
-                                          <p className='line-clamp-2 text-xs leading-relaxed text-white/60'>
-                                            <span className='font-medium text-white/80'>
-                                              Suggested:{' '}
-                                            </span>
-                                            {concept.suggestedChange}
-                                          </p>
-                                        </div>
+                                      <div className='flex items-start gap-1.5'>
+                                        <Icon
+                                          variant='alert-circle'
+                                          height={12}
+                                          width={12}
+                                          className='mt-0.5 flex-shrink-0 stroke-red-400/70'
+                                        />
+                                        <p className='text-xs leading-relaxed text-white/70'>
+                                          {impact.impactStatement}
+                                        </p>
                                       </div>
 
-                                      <div className='mt-2 flex gap-2'>
+                                      <div className='flex items-center gap-2 pt-1'>
                                         <button
                                           onClick={() => {
                                             toast.info(
-                                              `Opening "${concept.conceptName}"`,
+                                              `Opening "${impact.conceptName}"`,
                                               'Navigating to concept details...',
                                             );
                                           }}
-                                          className='flex flex-1 items-center justify-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/20'
+                                          className='flex flex-1 items-center justify-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/20'
                                         >
                                           <Icon
                                             variant='link-external'
@@ -742,34 +742,30 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                                             width={12}
                                             className='stroke-current'
                                           />
-                                          Open
-                                        </button>
-                                        <button
-                                          onClick={() => {
-                                            toast.success(
-                                              `Applied changes to "${concept.conceptName}"`,
-                                              'The concept has been updated with the suggested changes.',
-                                            );
-                                          }}
-                                          className='flex flex-1 items-center justify-center gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/20 px-3 py-1.5 text-xs font-medium text-amber-200 transition-colors hover:bg-amber-500/30'
-                                        >
-                                          Apply
-                                          <Icon
-                                            variant='arrowright'
-                                            height={12}
-                                            width={12}
-                                            className='stroke-current'
-                                          />
+                                          View Concept
                                         </button>
                                       </div>
                                     </div>
-                                  </div>
+                                  </motion.div>
                                 ))}
                               </div>
                             </>
+                          ) : noMaterialImpact ? (
+                            <div className='rounded-lg border border-green-500/20 bg-green-500/10 p-3'>
+                              <p className='text-xs text-green-300/80'>
+                                <Icon
+                                  variant='check'
+                                  height={12}
+                                  width={12}
+                                  className='mr-1.5 inline stroke-current'
+                                />
+                                No material impact on active or near-term
+                                concepts identified.
+                              </p>
+                            </div>
                           ) : (
                             <p className='text-xs italic text-white/40'>
-                              No concepts in your bank are directly impacted by
+                              Concept impact assessment not yet available for
                               this signal.
                             </p>
                           )}

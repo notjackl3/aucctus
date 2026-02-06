@@ -2,6 +2,8 @@
  * Watchtower Signal Types and Interfaces
  */
 
+import type { IConceptImpactAssessment } from '@libs/api/types/watchtower';
+
 export type SignalType = 'threat' | 'opportunity' | 'watch';
 export type SignalCategory =
   | 'competition'
@@ -45,6 +47,7 @@ export interface Signal {
   dateAdded: string;
   evidence: SignalEvidence[];
   sources: SignalSource[];
+  conceptImpacts?: IConceptImpactAssessment[]; // Optional concept impact assessments
 }
 
 export interface ImpactedConcept {

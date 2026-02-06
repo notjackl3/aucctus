@@ -44,11 +44,13 @@ export const watchtowerKeys = {
  * Fetches the complete Watchtower dashboard data.
  * Returns signals, predictions, trends, domains, opportunities, metrics, and rules.
  */
-export const useWatchtowerDashboard = () => {
+export const useWatchtowerDashboard = (
+  includeConceptImpacts: boolean = false,
+) => {
   const query = useQuery({
-    queryKey: watchtowerKeys.dashboard(),
+    queryKey: [...watchtowerKeys.dashboard(), includeConceptImpacts],
     queryFn: async (): Promise<IWatchtowerDashboard> => {
-      return await api.watchtower.getWatchtowerDashboard();
+      return await api.watchtower.getWatchtowerDashboard(includeConceptImpacts);
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
     cacheTime: 1000 * 60 * 5, // 5 minutes
@@ -499,8 +501,11 @@ export const useToggleSignalTracking = () => {
  */
 export const useWatchtowerSignals = (
   type?: 'threat' | 'opportunity' | 'watch' | 'all',
+  includeConceptImpacts: boolean = false,
 ) => {
-  const { signals, isLoading, isError } = useWatchtowerDashboard();
+  const { signals, isLoading, isError } = useWatchtowerDashboard(
+    includeConceptImpacts,
+  );
 
   const filteredSignals =
     !type || type === 'all' ? signals : signals.filter((s) => s.type === type);
@@ -523,8 +528,11 @@ export const useWatchtowerSignalsByCategory = (
     | 'regulatory'
     | 'capital'
     | 'all',
+  includeConceptImpacts: boolean = false,
 ) => {
-  const { signals, isLoading, isError } = useWatchtowerDashboard();
+  const { signals, isLoading, isError } = useWatchtowerDashboard(
+    includeConceptImpacts,
+  );
 
   const filteredSignals =
     !category || category === 'all'

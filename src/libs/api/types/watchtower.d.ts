@@ -11,6 +11,19 @@
  */
 
 // ============================================
+// Concept Impact Assessment Types
+// ============================================
+
+export interface IConceptImpactAssessment {
+  uuid: string;
+  conceptUuid: string;
+  conceptName: string;
+  impactStatement: string;
+  isMaterial: boolean;
+  assessedAt: string;
+}
+
+// ============================================
 // Signal Types (mapped from StrategicInsight)
 // ============================================
 
@@ -60,6 +73,7 @@ export interface IWatchtowerSignal {
   dateAdded: string;
   evidence: IWatchtowerSignalEvidence[];
   sources: IWatchtowerSignalSource[];
+  conceptImpacts?: IConceptImpactAssessment[]; // Optional concept impact assessments
 }
 
 // ============================================

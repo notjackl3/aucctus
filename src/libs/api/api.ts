@@ -19,6 +19,8 @@ import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { NucleusApi } from './nucleus';
 import { PocPlanApi } from './pocPlan';
+import { PortfolioApi } from './portfolio';
+import { PortfolioInsightsApi } from './portfolioInsights';
 import { PropertyApi } from './properties';
 import { SeedApi } from './seed';
 import { TestingApi } from './testing';
@@ -61,6 +63,8 @@ export class Api {
   competitorAssessment!: CompetitorAssessmentApi;
   customCommands!: CustomCommandsApi;
   dynamicComponent!: DynamicComponentApi;
+  portfolio!: PortfolioApi;
+  portfolioInsights!: PortfolioInsightsApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -95,6 +99,8 @@ export class Api {
       { key: 'competitorAssessment', class: CompetitorAssessmentApi },
       { key: 'customCommands', class: CustomCommandsApi },
       { key: 'dynamicComponent', class: DynamicComponentApi },
+      { key: 'portfolio', class: PortfolioApi },
+      { key: 'portfolioInsights', class: PortfolioInsightsApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

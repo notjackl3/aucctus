@@ -1065,6 +1065,54 @@ export interface ICompetitorAssessmentScanErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Portfolio Executive Summary Messages
+// ==========================================
+
+export interface IPortfolioExecutiveSummaryGenerationProgressMessage
+  extends BaseSocketEvent {
+  type: 'portfolio_executive_summary.generation.progress.account';
+  accountUuid: string;
+  stage: string;
+  progress: number;
+  message: string;
+}
+
+export interface IPortfolioExecutiveSummaryGenerationCompletedMessage
+  extends BaseSocketEvent {
+  type: 'portfolio_executive_summary.generation.completed.account';
+  accountUuid: string;
+  summaryUuid: string;
+  conceptCount: number;
+  message: string;
+}
+
+export interface IPortfolioExecutiveSummaryGenerationErrorMessage
+  extends BaseSocketEvent {
+  type: 'portfolio_executive_summary.generation.error.account';
+  accountUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+// ==========================================
+// Portfolio Insights Messages
+// ==========================================
+
+export interface IPortfolioInsightsGeneratedMessage extends BaseSocketEvent {
+  type: 'portfolio.insights.generated.user';
+  accountUuid: string;
+  insightCount: number;
+  insightUuids: string[];
+}
+
+export interface IPortfolioInsightsErrorMessage extends BaseSocketEvent {
+  type: 'portfolio.insights.error.user';
+  accountUuid: string;
+  errorMessage: string;
+}
+
+// ==========================================
 // Concept Priority Messages
 // ==========================================
 
@@ -1205,6 +1253,11 @@ export type InboundSocketEvent<C = {}> =
   | IPocPlanGenerationProgressMessage
   | IPocPlanGenerationCompleteMessage
   | IPocPlanGenerationErrorMessage
+  | IPortfolioExecutiveSummaryGenerationProgressMessage
+  | IPortfolioExecutiveSummaryGenerationCompletedMessage
+  | IPortfolioExecutiveSummaryGenerationErrorMessage
+  | IPortfolioInsightsGeneratedMessage
+  | IPortfolioInsightsErrorMessage
   | IConceptPriorityCompletedMessage
   | IConceptPriorityErrorMessage
   | IBulkPriorityProgressMessage

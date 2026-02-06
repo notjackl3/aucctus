@@ -25,6 +25,7 @@ import {
   HighScoringConceptsCarousel,
   PortfolioBalanceWidget,
   PortfolioExecutiveSummary,
+  PortfolioExecutiveSummaryWrapper,
 } from './components';
 import { ConceptStage, HighScoringConcept, HorizonData } from './types';
 
@@ -187,24 +188,6 @@ const PortfolioTab: React.FC = () => {
       .filter((c): c is HighScoringConcept => c !== null);
   }, [priorities, topConceptsData]);
 
-  // Get executive summary from real data or use a default
-  const executiveSummary = useMemo(() => {
-    if (portfolioSummary?.executiveInsight) {
-      return portfolioSummary.executiveInsight;
-    }
-    if (priorities && priorities.length > 0) {
-      const avgScore = Math.round(
-        priorities.reduce((sum, p) => sum + p.overallPriorityScore, 0) /
-          priorities.length,
-      );
-      const highPriorityCount = priorities.filter(
-        (p) => p.overallPriorityScore >= 70,
-      ).length;
-      return `Your portfolio contains ${priorities.length} scored concepts with an average priority score of ${avgScore}. ${highPriorityCount} concepts are high priority and ready for advancement.`;
-    }
-    return 'Calculate priorities for your concepts to see portfolio insights and recommendations.';
-  }, [portfolioSummary, priorities]);
-
   // Get horizon data - prefer computing from priorities API data, fallback to WebSocket summary
   const horizonData = useMemo<HorizonData[]>(() => {
     // First, try to compute from priorities array (API data)
@@ -311,6 +294,9 @@ const PortfolioTab: React.FC = () => {
 
   return (
     <OverseerWrapper pageContext='portfolio'>
+      {/* WebSocket event listener for portfolio executive summary */}
+      <PortfolioExecutiveSummaryWrapper />
+
       <div className='animate-in fade-in slide-in-from-bottom-2 space-y-8 duration-300'>
         {/* Priority Calculation Banner */}
         {showPriorityBanner && (
@@ -330,12 +316,8 @@ const PortfolioTab: React.FC = () => {
           />
         )}
 
-        {/* Executive Summary */}
-        {isCalculatingPriorities ? (
-          <ConceptReportSkeletons.PortfolioExecutiveSummarySkeleton />
-        ) : (
-          <PortfolioExecutiveSummary summary={executiveSummary} />
-        )}
+        {/* Executive Summary - Now using real data from API */}
+        <PortfolioExecutiveSummary />
 
         {/* High Scoring Concepts Carousel */}
         <HighScoringConceptsCarousel

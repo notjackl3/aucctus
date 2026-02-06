@@ -886,6 +886,9 @@ export class Endpoints {
     return `/api/v1/competitor-assessment/competitors/${competitorUuid}`;
   }
 
+  // Portfolio Executive Summary Endpoints
+  static portfolioExecutiveSummary = '/api/v1/portfolio/executive-summary';
+
   // POC Plan Endpoints
   static pocPlanGenerate(conceptUuid: string) {
     return `/api/v2/concept/${conceptUuid}/poc-plan/generate`;
@@ -1025,6 +1028,23 @@ export class Endpoints {
 
   static dynamicComponentsForConcept(conceptUuid: string) {
     return `/api/v1/dynamic-components/concept/${conceptUuid}`;
+  }
+
+  // ============================================
+  // Portfolio Insights Endpoints
+  // ============================================
+
+  /**
+   * List portfolio insights with pagination.
+   * @param page - Page number (1-indexed)
+   * @param pageSize - Items per page (max 100)
+   */
+  static portfolioInsights(page?: number, pageSize?: number) {
+    const params = new URLSearchParams();
+    if (page) params.append('page', page.toString());
+    if (pageSize) params.append('page_size', pageSize.toString());
+    const query = params.toString();
+    return `/api/v1/portfolio/insights${query ? `?${query}` : ''}`;
   }
 }
 

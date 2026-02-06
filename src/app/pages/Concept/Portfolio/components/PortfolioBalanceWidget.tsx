@@ -10,7 +10,7 @@ import { Icon } from '@components';
 import { IPortfolioSummaryResponse } from '@libs/api/types/concept/concept_priority';
 import React, { useCallback, useMemo, useState } from 'react';
 import { HorizonData } from '../types';
-import PortfolioInsightsFeed from './PortfolioInsightsFeed';
+import PortfolioInsightsCarousel from './PortfolioInsightsCarousel';
 
 interface PortfolioBalanceWidgetProps {
   horizonData: HorizonData[];
@@ -326,49 +326,9 @@ const PortfolioBalanceEmptyState: React.FC = () => (
   </div>
 );
 
-/**
- * Empty state for Portfolio Insights when no summary exists
- */
-const PortfolioInsightsEmptyState: React.FC = () => (
-  <div className='aucctus-bg-primary aucctus-border-secondary flex h-[360px] flex-col overflow-hidden rounded-lg border shadow-sm'>
-    <div className='aucctus-bg-secondary/30 flex min-h-0 flex-1 flex-col p-4'>
-      {/* Header */}
-      <div className='mb-4 flex shrink-0 items-center gap-2'>
-        <Icon
-          variant='sparkles'
-          height={20}
-          width={20}
-          className='aucctus-stroke-brand-primary'
-        />
-        <h2 className='aucctus-text-primary aucctus-text-xl font-semibold'>
-          Portfolio Insights
-        </h2>
-      </div>
-
-      {/* Empty State Content */}
-      <div className='flex flex-1 flex-col items-center justify-center text-center'>
-        <Icon
-          variant='sparkles'
-          height={48}
-          width={48}
-          className='aucctus-stroke-tertiary mb-4 opacity-50'
-        />
-        <p className='aucctus-text-secondary aucctus-text-md mb-1'>
-          No insights generated yet
-        </p>
-        <p className='aucctus-text-tertiary aucctus-text-sm'>
-          Calculate priorities to receive AI-generated portfolio insights and
-          recommendations
-        </p>
-      </div>
-    </div>
-  </div>
-);
-
 const PortfolioBalanceWidget: React.FC<PortfolioBalanceWidgetProps> = ({
   horizonData,
   totalIdeas,
-  portfolioSummary,
 }) => {
   const [hoveredHorizon, setHoveredHorizon] = useState<string | null>(null);
 
@@ -379,9 +339,6 @@ const PortfolioBalanceWidget: React.FC<PortfolioBalanceWidgetProps> = ({
 
   // Check if we have horizon data to display
   const hasHorizonData = horizonData.length > 0;
-
-  // Show insights feed when we have a portfolio summary from the API
-  const showInsights = !!portfolioSummary;
 
   return (
     <div className='grid w-full grid-cols-1 gap-6 lg:grid-cols-2'>
@@ -432,12 +389,8 @@ const PortfolioBalanceWidget: React.FC<PortfolioBalanceWidgetProps> = ({
         )}
       </div>
 
-      {/* Portfolio Insights Feed - Show empty state when no insights */}
-      {showInsights && portfolioSummary ? (
-        <PortfolioInsightsFeed portfolioSummary={portfolioSummary} />
-      ) : (
-        <PortfolioInsightsEmptyState />
-      )}
+      {/* Portfolio Insights Carousel - Uses Portfolio Insights API */}
+      <PortfolioInsightsCarousel />
     </div>
   );
 };

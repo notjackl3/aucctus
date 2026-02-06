@@ -29,8 +29,13 @@ export class WatchtowerApi extends ApiService {
    * Get the Watchtower dashboard data.
    * Returns signals, predictions, trends, domains, opportunities, metrics, and rules.
    */
-  getWatchtowerDashboard() {
-    return this.get<IWatchtowerDashboard>(endpoints.watchtowerDashboard);
+  getWatchtowerDashboard(includeConceptImpacts: boolean = false) {
+    const params = includeConceptImpacts
+      ? { include_concept_impacts: true }
+      : {};
+    return this.get<IWatchtowerDashboard>(endpoints.watchtowerDashboard, {
+      params,
+    });
   }
 
   /**

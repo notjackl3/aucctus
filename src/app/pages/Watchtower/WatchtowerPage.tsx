@@ -4,6 +4,7 @@ import {
   Icon,
   Loading,
   OverseerWrapper,
+  toast,
 } from '@components';
 import { cn } from '@libs/utils/react';
 import { useAccountLogo } from '@hooks/query/admin.hook';
@@ -39,7 +40,6 @@ import {
   useWatchtowerSocketEvents,
 } from '@hooks/query/watchtower.hook';
 import type { IWatchtowerSignal } from '@libs/api/types/watchtower';
-import { mockImpactedConcepts } from './fixtures';
 import type { Signal, SignalCategory, SignalType } from './types';
 import { signalCategoryConfig, signalTypeConfig } from './types';
 
@@ -65,6 +65,7 @@ const transformSignal = (apiSignal: IWatchtowerSignal): Signal => ({
   dateAdded: apiSignal.dateAdded,
   evidence: apiSignal.evidence,
   sources: apiSignal.sources,
+  conceptImpacts: apiSignal.conceptImpacts,
 });
 
 /**
@@ -513,13 +514,13 @@ const WatchtowerPageContent: React.FC = () => {
   const { logoUrl } = useAccountLogo();
   const companyLogoUrl = logoUrl || undefined;
 
-  // Fetch dashboard data from API
+  // Fetch dashboard data from API with concept impacts
   const {
     signals: apiSignals,
     monitoringRules,
     lastRefreshedAt,
     isLoading,
-  } = useWatchtowerDashboard();
+  } = useWatchtowerDashboard(true);
 
   // WebSocket events for real-time updates
   const { scanProgress, startScanning } = useWatchtowerSocketEvents();
@@ -1774,10 +1775,15 @@ const WatchtowerPageContent: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Impacted Concepts Section */}
+                  {/* Concept Impacts Section */}
                   {(() => {
-                    const concepts =
-                      mockImpactedConcepts[openPinnedSignal.id] || [];
+                    const conceptImpacts =
+                      openPinnedSignal.conceptImpacts || [];
+                    const materialImpacts = conceptImpacts.filter(
+                      (impact) => impact.isMaterial,
+                    );
+                    const noMaterialImpact =
+                      conceptImpacts.length > 0 && materialImpacts.length === 0;
 
                     return (
                       <div className='aucctus-border-secondary space-y-3 border-t pt-4'>
@@ -1789,92 +1795,63 @@ const WatchtowerPageContent: React.FC = () => {
                             className='stroke-amber-500/70'
                           />
                           <span className='aucctus-text-secondary text-xs font-semibold uppercase tracking-wider'>
-                            Impacted Concepts
+                            Concept Impacts
                           </span>
-                          <span className='rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-600'>
-                            {concepts.length}
-                          </span>
+                          {materialImpacts.length > 0 && (
+                            <span className='rounded-full bg-amber-500/20 px-1.5 py-0.5 text-[10px] text-amber-600'>
+                              {materialImpacts.length}
+                            </span>
+                          )}
                         </div>
 
-                        {concepts.length > 0 ? (
+                        {materialImpacts.length > 0 ? (
                           <>
                             <p className='aucctus-text-tertiary -mt-1 text-xs'>
-                              These concepts from your bank may need updates
-                              based on this signal.
+                              This signal may cause major disruption or
+                              acceleration to concepts in your bank.
                             </p>
 
-                            {/* Horizontal scrolling cards */}
-                            <div className='scrollbar-thin scrollbar-thumb-muted -mx-6 flex gap-3 overflow-x-auto px-6 pb-2'>
-                              {concepts.map((concept) => (
+                            {/* List of impact cards */}
+                            <div className='space-y-3'>
+                              {materialImpacts.map((impact) => (
                                 <div
-                                  key={concept.id}
-                                  className='aucctus-bg-secondary aucctus-border-secondary w-[260px] flex-shrink-0 overflow-hidden rounded-lg border'
+                                  key={impact.uuid}
+                                  className='aucctus-bg-secondary aucctus-border-secondary rounded-lg border p-3'
                                 >
-                                  {/* Concept Image Header */}
-                                  <div className='relative h-20 overflow-hidden'>
-                                    <img
-                                      src={concept.image}
-                                      alt={concept.conceptName}
-                                      className='h-full w-full object-cover'
-                                    />
-                                    <div className='absolute inset-0 bg-gradient-to-t from-black/60 to-transparent' />
-                                  </div>
-
-                                  <div className='space-y-2 p-3'>
-                                    <h5 className='aucctus-text-primary line-clamp-2 text-sm font-semibold leading-snug'>
-                                      {concept.conceptName}
+                                  <div className='space-y-2'>
+                                    <h5 className='aucctus-text-primary text-sm font-semibold leading-snug'>
+                                      {impact.conceptName}
                                     </h5>
 
-                                    <div className='space-y-1.5'>
-                                      <div className='flex items-start gap-1.5'>
-                                        <Icon
-                                          variant='alert-triangle'
-                                          height={12}
-                                          width={12}
-                                          className='mt-0.5 flex-shrink-0 stroke-red-500/70'
-                                        />
-                                        <p className='aucctus-text-secondary line-clamp-2 text-xs leading-relaxed'>
-                                          <span className='font-medium'>
-                                            Impact:{' '}
-                                          </span>
-                                          {concept.impact}
-                                        </p>
-                                      </div>
-
-                                      <div className='flex items-start gap-1.5'>
-                                        <Icon
-                                          variant='trendup'
-                                          height={12}
-                                          width={12}
-                                          className='mt-0.5 flex-shrink-0 stroke-green-500/70'
-                                        />
-                                        <p className='aucctus-text-secondary line-clamp-2 text-xs leading-relaxed'>
-                                          <span className='font-medium'>
-                                            Suggested:{' '}
-                                          </span>
-                                          {concept.suggestedChange}
-                                        </p>
-                                      </div>
+                                    <div className='flex items-start gap-1.5'>
+                                      <Icon
+                                        variant='alert-circle'
+                                        height={12}
+                                        width={12}
+                                        className='mt-0.5 flex-shrink-0 stroke-red-500/70'
+                                      />
+                                      <p className='aucctus-text-secondary text-xs leading-relaxed'>
+                                        {impact.impactStatement}
+                                      </p>
                                     </div>
 
-                                    <div className='mt-2 flex gap-2'>
-                                      <button className='aucctus-bg-secondary-hover aucctus-border-secondary aucctus-text-primary flex flex-1 items-center justify-center gap-1.5 rounded-md border px-3 py-1.5 text-xs font-medium transition-colors'>
+                                    <div className='flex items-center gap-2 pt-1'>
+                                      <button
+                                        onClick={() => {
+                                          toast.info(
+                                            `Opening "${impact.conceptName}"`,
+                                            'Navigating to concept details...',
+                                          );
+                                        }}
+                                        className='aucctus-bg-secondary-hover aucctus-border-secondary aucctus-text-primary flex flex-1 items-center justify-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors'
+                                      >
                                         <Icon
                                           variant='link-external'
                                           height={12}
                                           width={12}
                                           className='stroke-current'
                                         />
-                                        Open
-                                      </button>
-                                      <button className='flex flex-1 items-center justify-center gap-1.5 rounded-md border border-amber-500/30 bg-amber-500/20 px-3 py-1.5 text-xs font-medium text-amber-700 transition-colors hover:bg-amber-500/30'>
-                                        Apply
-                                        <Icon
-                                          variant='chevronright'
-                                          height={12}
-                                          width={12}
-                                          className='stroke-current'
-                                        />
+                                        View Concept
                                       </button>
                                     </div>
                                   </div>
@@ -1882,10 +1859,23 @@ const WatchtowerPageContent: React.FC = () => {
                               ))}
                             </div>
                           </>
+                        ) : noMaterialImpact ? (
+                          <div className='rounded-lg border border-green-500/20 bg-green-500/10 p-3'>
+                            <p className='text-xs text-green-600'>
+                              <Icon
+                                variant='check'
+                                height={12}
+                                width={12}
+                                className='mr-1.5 inline stroke-current'
+                              />
+                              No material impact on active or near-term concepts
+                              identified.
+                            </p>
+                          </div>
                         ) : (
                           <p className='aucctus-text-tertiary text-xs italic'>
-                            No concepts in your bank are directly impacted by
-                            this signal.
+                            Concept impact assessment not yet available for this
+                            signal.
                           </p>
                         )}
                       </div>
