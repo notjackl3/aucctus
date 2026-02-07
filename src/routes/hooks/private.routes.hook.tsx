@@ -80,7 +80,9 @@ const usePrivateRoutes = () => {
       />
 
       {/* Watchtower Routes */}
-      <Route path={AppPath.Watchtower} element={<Page.WatchtowerPage />} />
+      {FEATURE_WATCHTOWER && (
+        <Route path={AppPath.Watchtower} element={<Page.WatchtowerPage />} />
+      )}
 
       {/* Competitor Assessment Routes */}
       {isAdmin && (

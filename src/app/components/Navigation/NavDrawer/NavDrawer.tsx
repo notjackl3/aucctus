@@ -104,12 +104,14 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           icon='route'
           collapsed={collapsed}
         />
-        <NavButton
-          to={AppPath.Watchtower}
-          title='Watchtower'
-          icon='signal-02'
-          collapsed={collapsed}
-        />
+        {FEATURE_WATCHTOWER && (
+          <NavButton
+            to={AppPath.Watchtower}
+            title='Watchtower'
+            icon='signal-02'
+            collapsed={collapsed}
+          />
+        )}
         {isAdmin && (
           <NavButton
             to={AppPath.CompetitorAssessment}
