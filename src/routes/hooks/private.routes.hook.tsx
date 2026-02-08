@@ -3,16 +3,16 @@ import Page from '@pages';
 import { useConceptReportRoutes, useSettingsRoutes } from '@routes/hooks';
 import Layout from '@routes/layouts';
 import { AppPath } from '@routes/routes';
-import { isAucctusAdmin } from '@libs/utils/account';
-import useStore from '@stores/store';
+// import { isAucctusAdmin } from '@libs/utils/account';
+// import useStore from '@stores/store';
 import { Route } from 'react-router-dom';
-import { useMemo } from 'react';
+// import { useMemo } from 'react';
 
 const usePrivateRoutes = () => {
   const ConceptReportRoutes = useConceptReportRoutes();
   const SettingsRoutes = useSettingsRoutes();
-  const { user } = useStore((state) => state.auth);
-  const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
+  // const { user } = useStore((state) => state.auth);
+  // const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
 
   return (
     <Route element={<Layout.Private />}>
@@ -84,13 +84,13 @@ const usePrivateRoutes = () => {
         <Route path={AppPath.Watchtower} element={<Page.WatchtowerPage />} />
       )}
 
-      {/* Competitor Assessment Routes */}
-      {isAdmin && (
+      {/* Competitor Assessment Routes - disabled, feature dormant */}
+      {/* {isAdmin && (
         <Route
           path={AppPath.CompetitorAssessment}
           element={<Page.CompetitorAssessmentPage />}
         />
-      )}
+      )} */}
     </Route>
   );
 };

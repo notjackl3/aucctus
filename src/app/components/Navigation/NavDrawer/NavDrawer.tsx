@@ -3,7 +3,7 @@ import NavWord from '@assets/aucctus_nav_word.png';
 import { Avatar } from '@components';
 import { useClerk } from '@clerk/clerk-react';
 import { cn } from '@libs/utils/react';
-import { isAucctusAdmin } from '@libs/utils/account';
+// import { isAucctusAdmin } from '@libs/utils/account';
 import { AppPath } from '@routes/routes';
 import useStore, { resetAllStoreData } from '@stores/store';
 import { useMemo, useState } from 'react';
@@ -22,7 +22,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
   const [collapsed, setCollapsed] = useState(true);
 
   const navigate = useNavigate();
-  const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
+  // const isAdmin = useMemo(() => isAucctusAdmin(user), [user]);
 
   // Build playground path with cached seed if available
   const playgroundPath = useMemo(() => {
@@ -112,14 +112,15 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
             collapsed={collapsed}
           />
         )}
-        {isAdmin && (
+        {/* Competitor Assessment - disabled, feature dormant */}
+        {/* {isAdmin && (
           <NavButton
             to={AppPath.CompetitorAssessment}
             title='Competitors'
             icon='swords'
             collapsed={collapsed}
           />
-        )}
+        )} */}
       </div>
       <div className='flex flex-col gap-6 px-4'>
         <NavButton
