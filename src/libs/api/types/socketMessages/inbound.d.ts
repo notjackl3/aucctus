@@ -1034,6 +1034,38 @@ export interface IWatchtowerScanErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Watchtower Concept Impact Messages
+// ==========================================
+
+export interface IWatchtowerConceptImpactProgressMessage
+  extends BaseSocketEvent {
+  type: 'watchtower.concept_impact.progress.account';
+  accountUuid: string;
+  progress: number;
+  total: number;
+  impactsSoFar: number;
+  message: string;
+}
+
+export interface IWatchtowerConceptImpactCompletedMessage
+  extends BaseSocketEvent {
+  type: 'watchtower.concept_impact.completed.account';
+  accountUuid: string;
+  signalsEvaluated: number;
+  impactsCreated: number;
+  failedSignals: number;
+  message: string;
+}
+
+export interface IWatchtowerConceptImpactErrorMessage extends BaseSocketEvent {
+  type: 'watchtower.concept_impact.error.account';
+  accountUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+// ==========================================
 // Competitor Assessment Scan Messages
 // ==========================================
 
@@ -1270,6 +1302,9 @@ export type InboundSocketEvent<C = {}> =
   | IWatchtowerScanProgressMessage
   | IWatchtowerScanCompletedMessage
   | IWatchtowerScanErrorMessage
+  | IWatchtowerConceptImpactProgressMessage
+  | IWatchtowerConceptImpactCompletedMessage
+  | IWatchtowerConceptImpactErrorMessage
   | ICompetitorAssessmentScanProgressMessage
   | ICompetitorAssessmentScanCompletedMessage
   | ICompetitorAssessmentScanErrorMessage

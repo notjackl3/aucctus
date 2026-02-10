@@ -16,8 +16,9 @@
 
 export interface IConceptImpactAssessment {
   uuid: string;
-  conceptUuid: string;
+  conceptIdentifier: string;
   conceptName: string;
+  impactType: 'disruption' | 'acceleration';
   impactStatement: string;
   isMaterial: boolean;
   assessedAt: string;
@@ -74,6 +75,7 @@ export interface IWatchtowerSignal {
   evidence: IWatchtowerSignalEvidence[];
   sources: IWatchtowerSignalSource[];
   conceptImpacts?: IConceptImpactAssessment[]; // Optional concept impact assessments
+  conceptImpactEvaluatedAt?: string | null; // When concept impact evaluation was last run (null = not yet evaluated)
 }
 
 // ============================================

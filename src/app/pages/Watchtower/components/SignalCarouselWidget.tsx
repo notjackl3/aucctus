@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Icon, toast } from '@components';
+import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { AppPath } from '@routes/routes';
 import type { Signal } from '../types';
-import { signalTypeConfig, signalCategoryConfig } from '../types';
+import { signalCategoryConfig, signalTypeConfig } from '../types';
 
 // Source type colors for avatars
 const sourceTypeColors: Record<string, string> = {
@@ -63,6 +65,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
   pinnedSignalIds = [],
   onPinSignal,
 }) => {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isPlaying, setIsPlaying] = useState(true);
@@ -669,9 +672,10 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       const materialImpacts = conceptImpacts.filter(
                         (impact) => impact.isMaterial,
                       );
+                      const hasBeenEvaluated =
+                        !!currentSignal.conceptImpactEvaluatedAt;
                       const noMaterialImpact =
-                        conceptImpacts.length > 0 &&
-                        materialImpacts.length === 0;
+                        hasBeenEvaluated && materialImpacts.length === 0;
 
                       return (
                         <div className='space-y-3 border-t border-white/10 pt-4'>
@@ -693,63 +697,74 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                           </div>
 
                           {materialImpacts.length > 0 ? (
-                            <>
-                              <p className='-mt-1 text-xs text-white/50'>
-                                This signal may cause major disruption or
-                                acceleration to concepts in your bank.
-                              </p>
-
-                              {/* Vertical list of impact cards */}
-                              <div className='space-y-3'>
-                                {materialImpacts.map((impact) => (
-                                  <motion.div
-                                    key={impact.uuid}
-                                    className='rounded-lg border border-white/10 bg-white/5 p-3'
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                  >
-                                    <div className='space-y-2'>
+                            <div className='space-y-3'>
+                              {materialImpacts.map((impact) => (
+                                <motion.div
+                                  key={impact.uuid}
+                                  className='rounded-lg border border-white/10 bg-white/5 p-3'
+                                  initial={{ opacity: 0, y: 10 }}
+                                  animate={{ opacity: 1, y: 0 }}
+                                  transition={{ duration: 0.3 }}
+                                >
+                                  <div className='space-y-2'>
+                                    <div className='flex items-center gap-2'>
                                       <h5 className='text-sm font-semibold leading-snug text-white'>
                                         {impact.conceptName}
                                       </h5>
+                                      <span
+                                        className={cn(
+                                          'rounded-full px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wider',
+                                          impact.impactType === 'acceleration'
+                                            ? 'bg-green-500/20 text-green-300'
+                                            : 'bg-red-500/20 text-red-300',
+                                        )}
+                                      >
+                                        {impact.impactType}
+                                      </span>
+                                    </div>
 
-                                      <div className='flex items-start gap-1.5'>
+                                    <div className='flex items-start gap-1.5'>
+                                      <Icon
+                                        variant='alert-circle'
+                                        height={12}
+                                        width={12}
+                                        className={cn(
+                                          'mt-0.5 flex-shrink-0',
+                                          impact.impactType === 'acceleration'
+                                            ? 'stroke-green-400/70'
+                                            : 'stroke-red-400/70',
+                                        )}
+                                      />
+                                      <p className='text-xs leading-relaxed text-white/70'>
+                                        {impact.impactStatement}
+                                      </p>
+                                    </div>
+
+                                    <div className='flex items-center gap-2 pt-1'>
+                                      <button
+                                        onClick={() =>
+                                          navigate(
+                                            AppPath.ConceptOverview.replace(
+                                              ':id',
+                                              impact.conceptIdentifier,
+                                            ),
+                                          )
+                                        }
+                                        className='flex flex-1 items-center justify-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/20'
+                                      >
                                         <Icon
-                                          variant='alert-circle'
+                                          variant='link-external'
                                           height={12}
                                           width={12}
-                                          className='mt-0.5 flex-shrink-0 stroke-red-400/70'
+                                          className='stroke-current'
                                         />
-                                        <p className='text-xs leading-relaxed text-white/70'>
-                                          {impact.impactStatement}
-                                        </p>
-                                      </div>
-
-                                      <div className='flex items-center gap-2 pt-1'>
-                                        <button
-                                          onClick={() => {
-                                            toast.info(
-                                              `Opening "${impact.conceptName}"`,
-                                              'Navigating to concept details...',
-                                            );
-                                          }}
-                                          className='flex flex-1 items-center justify-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/20'
-                                        >
-                                          <Icon
-                                            variant='link-external'
-                                            height={12}
-                                            width={12}
-                                            className='stroke-current'
-                                          />
-                                          View Concept
-                                        </button>
-                                      </div>
+                                        View Concept
+                                      </button>
                                     </div>
-                                  </motion.div>
-                                ))}
-                              </div>
-                            </>
+                                  </div>
+                                </motion.div>
+                              ))}
+                            </div>
                           ) : noMaterialImpact ? (
                             <div className='rounded-lg border border-green-500/20 bg-green-500/10 p-3'>
                               <p className='text-xs text-green-300/80'>
@@ -765,8 +780,8 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                             </div>
                           ) : (
                             <p className='text-xs italic text-white/40'>
-                              Concept impact assessment not yet available for
-                              this signal.
+                              No material impact on active or near-term concepts
+                              identified.
                             </p>
                           )}
                         </div>

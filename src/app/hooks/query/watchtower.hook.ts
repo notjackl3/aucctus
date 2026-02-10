@@ -44,13 +44,11 @@ export const watchtowerKeys = {
  * Fetches the complete Watchtower dashboard data.
  * Returns signals, predictions, trends, domains, opportunities, metrics, and rules.
  */
-export const useWatchtowerDashboard = (
-  includeConceptImpacts: boolean = false,
-) => {
+export const useWatchtowerDashboard = () => {
   const query = useQuery({
-    queryKey: [...watchtowerKeys.dashboard(), includeConceptImpacts],
+    queryKey: watchtowerKeys.dashboard(),
     queryFn: async (): Promise<IWatchtowerDashboard> => {
-      return await api.watchtower.getWatchtowerDashboard(includeConceptImpacts);
+      return await api.watchtower.getWatchtowerDashboard(true);
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
     cacheTime: 1000 * 60 * 5, // 5 minutes
@@ -323,6 +321,16 @@ export const useWatchtowerSocketEvents = () => {
     }, []),
   );
 
+  // Listen for concept impact evaluation completed → silently refresh dashboard
+  useSocketEvent<'watchtower.concept_impact.completed.account'>(
+    'watchtower.concept_impact.completed.account',
+    useCallback(() => {
+      queryClient.invalidateQueries({
+        queryKey: watchtowerKeys.dashboard(),
+      });
+    }, [queryClient]),
+  );
+
   const resetProgress = useCallback(() => {
     setScanProgress(DEFAULT_SCAN_PROGRESS);
   }, []);
@@ -501,11 +509,8 @@ export const useToggleSignalTracking = () => {
  */
 export const useWatchtowerSignals = (
   type?: 'threat' | 'opportunity' | 'watch' | 'all',
-  includeConceptImpacts: boolean = false,
 ) => {
-  const { signals, isLoading, isError } = useWatchtowerDashboard(
-    includeConceptImpacts,
-  );
+  const { signals, isLoading, isError } = useWatchtowerDashboard();
 
   const filteredSignals =
     !type || type === 'all' ? signals : signals.filter((s) => s.type === type);
@@ -528,11 +533,8 @@ export const useWatchtowerSignalsByCategory = (
     | 'regulatory'
     | 'capital'
     | 'all',
-  includeConceptImpacts: boolean = false,
 ) => {
-  const { signals, isLoading, isError } = useWatchtowerDashboard(
-    includeConceptImpacts,
-  );
+  const { signals, isLoading, isError } = useWatchtowerDashboard();
 
   const filteredSignals =
     !category || category === 'all'

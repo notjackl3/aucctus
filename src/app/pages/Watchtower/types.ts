@@ -48,6 +48,7 @@ export interface Signal {
   evidence: SignalEvidence[];
   sources: SignalSource[];
   conceptImpacts?: IConceptImpactAssessment[]; // Optional concept impact assessments
+  conceptImpactEvaluatedAt?: string | null; // When concept impact evaluation was last run (null = not yet evaluated)
 }
 
 export interface ImpactedConcept {
