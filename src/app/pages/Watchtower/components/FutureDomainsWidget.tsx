@@ -10,7 +10,7 @@ const FutureDomainsWidget: React.FC = () => {
 
   if (isLoading || domains.length === 0) {
     return (
-      <div className='aucctus-bg-primary aucctus-border-secondary flex h-[540px] flex-col items-center justify-center rounded-xl border p-6'>
+      <div className='aucctus-bg-primary aucctus-border-secondary flex h-[490px] flex-col items-center justify-center rounded-xl border p-6'>
         <Icon
           variant='compass-03'
           height={32}
@@ -25,7 +25,7 @@ const FutureDomainsWidget: React.FC = () => {
   }
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary flex h-[540px] flex-col rounded-xl border p-6'>
+    <div className='aucctus-bg-primary aucctus-border-secondary flex h-[490px] flex-col rounded-xl border p-6'>
       <div className='mb-4 flex items-center gap-2'>
         <Icon
           variant='compass-03'
