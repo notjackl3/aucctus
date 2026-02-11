@@ -148,9 +148,9 @@ export interface IWatchtowerFutureDomain {
   id: string;
   name: string;
   description: string;
-  opportunity: string;
-  relatedSignals: string[];
-  timeframe: string;
+  whyThisMatters: string;
+  evidenceBasis: string[];
+  timeHorizon: string;
 }
 
 // ============================================

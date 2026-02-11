@@ -10,7 +10,7 @@ const FutureDomainsWidget: React.FC = () => {
 
   if (isLoading || domains.length === 0) {
     return (
-      <div className='aucctus-bg-primary aucctus-border-secondary flex h-[480px] flex-col items-center justify-center rounded-xl border p-6'>
+      <div className='aucctus-bg-primary aucctus-border-secondary flex h-[540px] flex-col items-center justify-center rounded-xl border p-6'>
         <Icon
           variant='compass-03'
           height={32}
@@ -25,7 +25,7 @@ const FutureDomainsWidget: React.FC = () => {
   }
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary flex h-[480px] flex-col rounded-xl border p-6'>
+    <div className='aucctus-bg-primary aucctus-border-secondary flex h-[540px] flex-col rounded-xl border p-6'>
       <div className='mb-4 flex items-center gap-2'>
         <Icon
           variant='compass-03'
@@ -61,7 +61,7 @@ const FutureDomainsWidget: React.FC = () => {
                 {domain.name}
               </h4>
               <span className='aucctus-text-tertiary flex-shrink-0 text-[10px]'>
-                {domain.timeframe}
+                {domain.timeHorizon}
               </span>
             </div>
 
@@ -73,11 +73,11 @@ const FutureDomainsWidget: React.FC = () => {
               <span className='aucctus-text-success-primary font-semibold'>
                 Opportunity:
               </span>{' '}
-              {domain.opportunity}
+              {domain.whyThisMatters}
             </p>
 
             <div className='flex flex-wrap items-center gap-1.5'>
-              {domain.relatedSignals.map((signal, idx) => (
+              {domain.evidenceBasis.map((signal, idx) => (
                 <span
                   key={idx}
                   className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-tertiary rounded border px-1.5 py-0.5 text-[10px]'

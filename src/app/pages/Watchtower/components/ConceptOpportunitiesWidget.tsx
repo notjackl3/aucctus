@@ -52,7 +52,7 @@ const ConceptOpportunitiesWidget: React.FC = () => {
 
   if (isLoading || opportunities.length === 0) {
     return (
-      <div className='aucctus-bg-primary aucctus-border-secondary flex h-[480px] flex-col items-center justify-center rounded-xl border p-6'>
+      <div className='aucctus-bg-primary aucctus-border-secondary flex h-[540px] flex-col items-center justify-center rounded-xl border p-6'>
         <Icon
           variant='lightbulb'
           height={32}
@@ -69,7 +69,7 @@ const ConceptOpportunitiesWidget: React.FC = () => {
   }
 
   return (
-    <div className='aucctus-bg-primary aucctus-border-secondary flex h-[480px] flex-col rounded-xl border p-6'>
+    <div className='aucctus-bg-primary aucctus-border-secondary flex h-[540px] flex-col rounded-xl border p-6'>
       <div className='mb-4 flex items-center gap-2'>
         <Icon
           variant='lightbulb'
@@ -101,7 +101,7 @@ const ConceptOpportunitiesWidget: React.FC = () => {
           return (
             <div
               key={concept.id}
-              className='aucctus-bg-primary aucctus-border-secondary group flex h-[340px] w-[260px] flex-shrink-0 cursor-pointer flex-col overflow-hidden rounded-lg border transition-all hover:shadow-lg'
+              className='aucctus-bg-primary aucctus-border-secondary group flex h-[400px] w-[260px] flex-shrink-0 cursor-pointer flex-col overflow-hidden rounded-lg border transition-all hover:shadow-lg'
             >
               {/* Image Header */}
               <div className='relative h-28 flex-shrink-0 overflow-hidden'>
