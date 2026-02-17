@@ -6,7 +6,7 @@ import {
 import { canOpenConceptWhilePending } from '@libs/utils/concepts';
 import { cn } from '@libs/utils/react';
 import { FunctionComponent, ReactNode } from 'react';
-import { animated, useSpring } from 'react-spring';
+import { motion } from 'framer-motion';
 import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
 import ConceptGeneratingButton from './ConceptGeneratingButton';
 
@@ -77,14 +77,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
 
   const isGenerating = variant === 'pending' && !canOpenWhilePending;
 
-  // Animate width transition between Generate (120px) and Generating (150px)
-  const animationStyle = useSpring({
-    maxWidth: isGenerating ? '150px' : '120px',
-    config: {
-      tension: 280,
-      friction: 60,
-    },
-  });
+  const animatedMaxWidth = isGenerating ? '150px' : '120px';
 
   // If in pending state, use the ConceptGeneratingButton component
   if (isGenerating) {
@@ -94,7 +87,7 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
         dateReportStarted={dateReportStarted}
         dateReportCompleted={dateReportCompleted}
         conceptUuid={conceptUuid}
-        animationStyle={animationStyle}
+        animatedMaxWidth={animatedMaxWidth}
       />
     );
   }
@@ -175,14 +168,16 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
           }
           hideDelay={0}
         >
-          <animated.button
+          <motion.button
             className={cn(style, { 'btn-border-trace': isUpdating })}
             onClick={onClick}
             disabled={disabled}
-            style={animationStyle}
+            initial={false}
+            animate={{ maxWidth: animatedMaxWidth }}
+            transition={{ type: 'spring', stiffness: 280, damping: 60 }}
           >
             <span>{resolvedLabel}</span>
-          </animated.button>
+          </motion.button>
         </ComponentTooltip>
       </>
     );
@@ -192,14 +187,16 @@ const ConceptGenerateButton: FunctionComponent<ConceptRowButtonProps> = ({
   return (
     <>
       {borderTraceStyles}
-      <animated.button
+      <motion.button
         className={cn(style, { 'btn-border-trace': isUpdating })}
         onClick={onClick}
         disabled={disabled}
-        style={animationStyle}
+        initial={false}
+        animate={{ maxWidth: animatedMaxWidth }}
+        transition={{ type: 'spring', stiffness: 280, damping: 60 }}
       >
         <span>{resolvedLabel}</span>
-      </animated.button>
+      </motion.button>
     </>
   );
 };

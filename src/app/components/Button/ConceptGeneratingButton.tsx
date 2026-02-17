@@ -1,7 +1,7 @@
 import { ComponentTooltip } from '@components';
 import { ConceptReportStatusBySection } from '@libs/api/types';
 import { FunctionComponent } from 'react';
-import { animated, SpringValue } from 'react-spring';
+import { motion } from 'framer-motion';
 import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
 
 type ConceptGeneratingButtonProps = {
@@ -9,10 +9,7 @@ type ConceptGeneratingButtonProps = {
   dateReportStarted?: string;
   dateReportCompleted?: string;
   conceptUuid?: string;
-  animationStyle?: {
-    width?: SpringValue<string>;
-    maxWidth?: SpringValue<string>;
-  };
+  animatedMaxWidth?: string;
 };
 
 const ConceptGeneratingButton: FunctionComponent<
@@ -22,9 +19,17 @@ const ConceptGeneratingButton: FunctionComponent<
   dateReportStarted,
   dateReportCompleted,
   conceptUuid,
-  animationStyle,
+  animatedMaxWidth,
 }) => {
-  const ButtonComponent = animationStyle ? animated.button : 'button';
+  const ButtonComponent = animatedMaxWidth ? motion.button : 'button';
+
+  const motionProps = animatedMaxWidth
+    ? {
+        initial: false as const,
+        animate: { maxWidth: animatedMaxWidth },
+        transition: { type: 'spring' as const, stiffness: 280, damping: 60 },
+      }
+    : {};
 
   return (
     <ComponentTooltip
@@ -43,7 +48,7 @@ const ConceptGeneratingButton: FunctionComponent<
       <ButtonComponent
         className='btn btn-generating btn-bold btn-sm'
         disabled
-        style={animationStyle as any}
+        {...motionProps}
       >
         <span className='flex'>
           {'Generating'.split('').map((letter, index) => (

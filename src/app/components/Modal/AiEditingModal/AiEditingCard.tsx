@@ -15,7 +15,7 @@ import {
 import useStore from '@stores/store';
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { useQueryClient } from 'react-query';
-import { animated, useTransition } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import AiEditingConversation from './AiEditingConversation';
 import OutdatedSectionsBanner from './OutdatedSectionsBanner';
 import { LATEST_FEATURE_VERSIONS } from '@libs/constants';
@@ -108,17 +108,6 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     useConceptAiEditing();
   const { closeModal } = useModal();
 
-  // ===== Animations =====
-  const transition = useTransition(messages.length === 0, {
-    from: { opacity: 0, transform: 'translateY(20px)' },
-    enter: { opacity: 1, transform: 'translateY(0px)' },
-    leave: { opacity: 0, transform: 'translateY(20px)' },
-    config: { tension: 280, friction: 60 },
-    onRest: () => {
-      setShowConversation(true);
-    },
-  });
-
   // Auto-focus the message input when component mounts
   useEffect(() => {
     // Small delay to ensure the modal is fully rendered and animated
@@ -150,6 +139,8 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const showIntro = messages.length === 0;
 
   return (
     // This has relative positioning for the use of the confirmation modal defined at the bottom of the component
@@ -197,20 +188,26 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
       {/* Main content area with flex-grow to take available space */}
       <div className='relative flex h-full flex-1 flex-col overflow-hidden'>
         {/* Intro message (shown when no messages exist) */}
-        {transition(
-          (style, item) =>
-            item && (
-              <animated.div
-                style={style}
-                className='absolute inset-0 flex items-center justify-center px-4'
-              >
-                <AiIntroMessage
-                  title='AI Editing'
-                  subtitle='Describe how you want this report to change'
-                />
-              </animated.div>
-            ),
-        )}
+        <AnimatePresence
+          onExitComplete={() => {
+            setShowConversation(true);
+          }}
+        >
+          {showIntro && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 20 }}
+              transition={{ type: 'spring', stiffness: 280, damping: 60 }}
+              className='absolute inset-0 flex items-center justify-center px-4'
+            >
+              <AiIntroMessage
+                title='AI Editing'
+                subtitle='Describe how you want this report to change'
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <AiEditingConversation
           showConversation={showConversation}

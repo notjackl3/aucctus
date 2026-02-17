@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTransition, animated } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
 import {
@@ -198,23 +198,6 @@ const IdeaPlaygroundQBased: React.FC = () => {
     conceptsGenerating,
     hasGeneratedConcepts,
   ]);
-
-  // Entry state animation
-  const entryTransition = useTransition(!hasStartedTyping, {
-    from: { opacity: 1 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-    config: { duration: 600 },
-  });
-
-  // Interface state animation
-  const interfaceTransition = useTransition(hasStartedTyping, {
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-    config: { duration: 600 },
-    delay: 300,
-  });
 
   useEffect(() => {
     const handleClickOutside = () => {
@@ -432,78 +415,81 @@ const IdeaPlaygroundQBased: React.FC = () => {
       )}
 
       {/* Entry State - Clean centered layout - Only show if not awaiting restoration */}
-      {!isAwaitingSessionRestoration &&
-        entryTransition(
-          (style, item) =>
-            item && (
-              <LandingView
-                inputValue={inputValue}
-                onInputChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                onSubmit={handleSubmit}
-                onFileChange={setSelectedFile}
-                selectedFile={selectedFile}
-                style={style}
-              />
-            ),
-        )}
+      {!isAwaitingSessionRestoration && (
+        <AnimatePresence>
+          {!hasStartedTyping && (
+            <LandingView
+              inputValue={inputValue}
+              onInputChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              onSubmit={handleSubmit}
+              onFileChange={setSelectedFile}
+              selectedFile={selectedFile}
+              style={{ opacity: 1 }}
+            />
+          )}
+        </AnimatePresence>
+      )}
 
       {/* Interface State - After Starting - Only show if not awaiting restoration */}
-      {!isAwaitingSessionRestoration &&
-        interfaceTransition(
-          (style, item) =>
-            item && (
-              <animated.div
-                style={style}
-                className='relative z-10 flex min-h-screen'
-              >
-                {/* Loading Transition - Show until data is ready */}
-                {!isDataReady && (
-                  <div className='flex flex-1 flex-col'>
-                    <div className='px-8 pb-4 pt-8'>
-                      <ExplorationModeSelector
-                        currentTopic={currentTopic}
-                        onRestart={handleRestart}
-                        onClose={handleClose}
-                        showTitle={showLogoTitle}
-                      />
-                    </div>
-                    <div className='relative flex-1 pt-24'>
-                      <PlaygroundLoadingTransition
-                        seedUuid={currentSeedUuid}
-                        onReady={() => setIsDataReady(true)}
-                      />
-                    </div>
+      {!isAwaitingSessionRestoration && (
+        <AnimatePresence>
+          {hasStartedTyping && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className='relative z-10 flex min-h-screen'
+            >
+              {/* Loading Transition - Show until data is ready */}
+              {!isDataReady && (
+                <div className='flex flex-1 flex-col'>
+                  <div className='px-8 pb-4 pt-8'>
+                    <ExplorationModeSelector
+                      currentTopic={currentTopic}
+                      onRestart={handleRestart}
+                      onClose={handleClose}
+                      showTitle={showLogoTitle}
+                    />
                   </div>
-                )}
-
-                {/* Question Carousel - Show when data is ready */}
-                {isDataReady && (
-                  <div className='flex flex-1 flex-col'>
-                    <div className='px-8 pb-4 pt-8'>
-                      <ExplorationModeSelector
-                        currentTopic={currentTopic}
-                        onRestart={handleRestart}
-                        onClose={handleClose}
-                        showTitle={true}
-                      />
-                    </div>
-
-                    {/* Main Map Area - Question Carousel */}
-                    <div className='relative flex-1 pt-24'>
-                      <QuestionCarousel
-                        topic={currentTopic || 'Cheese on chicken in QSR'}
-                        seedUuid={currentSeedUuid}
-                        onGenerateIdeas={handleGenerateIdeas}
-                        onViewConcepts={() => setShowOpportunityMap(true)}
-                        hasGeneratedConcepts={hasGeneratedConcepts}
-                      />
-                    </div>
+                  <div className='relative flex-1 pt-24'>
+                    <PlaygroundLoadingTransition
+                      seedUuid={currentSeedUuid}
+                      onReady={() => setIsDataReady(true)}
+                    />
                   </div>
-                )}
-              </animated.div>
-            ),
-        )}
+                </div>
+              )}
+
+              {/* Question Carousel - Show when data is ready */}
+              {isDataReady && (
+                <div className='flex flex-1 flex-col'>
+                  <div className='px-8 pb-4 pt-8'>
+                    <ExplorationModeSelector
+                      currentTopic={currentTopic}
+                      onRestart={handleRestart}
+                      onClose={handleClose}
+                      showTitle={true}
+                    />
+                  </div>
+
+                  {/* Main Map Area - Question Carousel */}
+                  <div className='relative flex-1 pt-24'>
+                    <QuestionCarousel
+                      topic={currentTopic || 'Cheese on chicken in QSR'}
+                      seedUuid={currentSeedUuid}
+                      onGenerateIdeas={handleGenerateIdeas}
+                      onViewConcepts={() => setShowOpportunityMap(true)}
+                      hasGeneratedConcepts={hasGeneratedConcepts}
+                    />
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      )}
 
       {/* Opportunity Map Overlay */}
       {showOpportunityMap && (

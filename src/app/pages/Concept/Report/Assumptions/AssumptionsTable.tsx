@@ -1,5 +1,4 @@
 import React from 'react';
-import { animated } from 'react-spring';
 import AssumptionDetailCard from './components/cards/AssumptionDetailCard';
 import BatchEditableAssumptionCard from './components/cards/BatchEditableAssumptionCard';
 import RegenerateTestsBanner from './components/RegenerateTestsBanner';
@@ -14,7 +13,7 @@ import {
   getValidationStatusFromMetrics,
   getValidationPercentageFromMetrics,
 } from './utils/assumptionUtils';
-import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
+import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import { useBatchAssumptionTable } from '@hooks/concepts/useBatchAssumptionTable';
 
 const DEFAULT_STATUS_COUNTS: CategoryStatusCounts = {
@@ -141,15 +140,6 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
     window.addEventListener('resize', updateHeight);
     return () => window.removeEventListener('resize', updateHeight);
   }, [categoryStatusCounts]);
-
-  // Animation for add form
-  const addFormTransition = useExpandCollapseTransition({
-    isExpanded: isAdding,
-    withOpacity: true,
-    collapsedHeight: 0,
-    maxHeight: 300,
-    expandedOverflow: 'visible',
-  });
 
   const newAssumptionsForSelectedCategory = getNewAssumptions().filter(
     (change) => change.changes?.category === selectedCategory,
@@ -366,21 +356,23 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
           )}
 
           {/* Add New Assumption Form - appears at bottom */}
-          {addFormTransition(
-            (style, item) =>
-              item && (
-                <animated.div style={style} className='mt-4'>
-                  <BatchEditableAssumptionCard
-                    mode='add'
-                    category={selectedCategory}
-                    onSave={handleSaveNewAssumption}
-                    onCancel={handleCancelAdding}
-                    isLoading={isSubmitting}
-                    tempId={`temp_${Date.now()}`}
-                  />
-                </animated.div>
-              ),
-          )}
+          <ExpandCollapse
+            isExpanded={isAdding}
+            withOpacity
+            collapsedHeight={0}
+            maxHeight={300}
+            expandedOverflow='visible'
+            className='mt-4'
+          >
+            <BatchEditableAssumptionCard
+              mode='add'
+              category={selectedCategory}
+              onSave={handleSaveNewAssumption}
+              onCancel={handleCancelAdding}
+              isLoading={isSubmitting}
+              tempId={`temp_${Date.now()}`}
+            />
+          </ExpandCollapse>
         </div>
       </div>
     </div>

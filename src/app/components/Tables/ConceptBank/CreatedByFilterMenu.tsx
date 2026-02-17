@@ -5,7 +5,7 @@ import { IUser } from '@libs/api/types';
 import utils from '@libs/utils';
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
-import { animated, useTransition } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
 
 export interface ICreatedByFilterMenuProps {
@@ -147,26 +147,6 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
     }
   };
 
-  // Smooth animation for menu appearance
-  const menuTransition = useTransition(isOpen, {
-    from: {
-      opacity: 0,
-      transform: 'scale(0.95) translateY(-8px)',
-    },
-    enter: {
-      opacity: 1,
-      transform: 'scale(1) translateY(0px)',
-    },
-    leave: {
-      opacity: 0,
-      transform: 'scale(0.95) translateY(-8px)',
-    },
-    config: {
-      tension: 300,
-      friction: 25,
-    },
-  });
-
   // Use local selection for UI display
   const hasActiveFilter = localSelection && localSelection.size > 0;
   const selectedCount = localSelection?.size || 0;
@@ -296,192 +276,199 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
                 handleClose();
               }}
               onClick={(e) => e.stopPropagation()}
+              forceMount
             >
-              {menuTransition(
-                (styles, item) =>
-                  item && (
-                    <animated.div
-                      style={styles}
-                      className='aucctus-bg-primary aucctus-border-secondary w-[280px] rounded-lg border shadow-lg'
-                    >
-                      {showFilterView ? (
-                        // Filter View
-                        <div className='p-3'>
-                          {/* Search input */}
-                          <div className='mb-2'>
-                            <Input.Search
-                              value={search}
-                              debounce={500}
-                              onChange={(e) => {
-                                setSearch(e.target.value);
-                              }}
-                              placeholder='Search users...'
-                            />
-                          </div>
+              <AnimatePresence>
+                {isOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 300,
+                      damping: 25,
+                    }}
+                    className='aucctus-bg-primary aucctus-border-secondary w-[280px] rounded-lg border shadow-lg'
+                  >
+                    {showFilterView ? (
+                      // Filter View
+                      <div className='p-3'>
+                        {/* Search input */}
+                        <div className='mb-2'>
+                          <Input.Search
+                            value={search}
+                            debounce={500}
+                            onChange={(e) => {
+                              setSearch(e.target.value);
+                            }}
+                            placeholder='Search users...'
+                          />
+                        </div>
 
-                          {/* User list with checkboxes */}
-                          <div className='max-h-80 min-h-[240px] overflow-y-auto'>
-                            {users.length > 0 ? (
-                              users.map((user) => {
-                                const isSelected = isUserSelected(user);
+                        {/* User list with checkboxes */}
+                        <div className='max-h-80 min-h-[240px] overflow-y-auto'>
+                          {users.length > 0 ? (
+                            users.map((user) => {
+                              const isSelected = isUserSelected(user);
 
-                                return (
-                                  <div
-                                    key={`user-${user.uuid}`}
-                                    className='aucctus-bg-primary-hover flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 transition-colors'
-                                    onClick={(e) => {
-                                      e.preventDefault();
+                              return (
+                                <div
+                                  key={`user-${user.uuid}`}
+                                  className='aucctus-bg-primary-hover flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 transition-colors'
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    handleUserToggle(user);
+                                  }}
+                                >
+                                  <Input.CheckBox
+                                    key={`checkbox-${user.uuid}-${isSelected}`}
+                                    id={`filter-createdBy-${user.uuid}`}
+                                    checked={isSelected}
+                                    onChange={(e) => {
                                       e.stopPropagation();
-                                      handleUserToggle(user);
+                                      // handleUserToggle is called by parent div onClick
                                     }}
-                                  >
-                                    <Input.CheckBox
-                                      key={`checkbox-${user.uuid}-${isSelected}`}
-                                      id={`filter-createdBy-${user.uuid}`}
-                                      checked={isSelected}
-                                      onChange={(e) => {
-                                        e.stopPropagation();
-                                        // handleUserToggle is called by parent div onClick
-                                      }}
+                                  />
+                                  <div className='flex flex-1 items-center gap-2'>
+                                    <Avatar
+                                      firstName={user.firstName}
+                                      lastName={user.lastName}
+                                      src={user.profileImage}
                                     />
-                                    <div className='flex flex-1 items-center gap-2'>
-                                      <Avatar
-                                        firstName={user.firstName}
-                                        lastName={user.lastName}
-                                        src={user.profileImage}
-                                      />
-                                      <span className='aucctus-text-secondary truncate text-sm font-medium'>
-                                        {utils.account.getUsersFullName(user)}
-                                      </span>
-                                    </div>
+                                    <span className='aucctus-text-secondary truncate text-sm font-medium'>
+                                      {utils.account.getUsersFullName(user)}
+                                    </span>
                                   </div>
-                                );
-                              })
-                            ) : (
-                              <div className='aucctus-text-quaternary flex h-full items-center justify-center text-sm'>
-                                No users found
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Clear filter button */}
-                          {hasActiveFilter && (
-                            <>
-                              <div className='aucctus-bg-secondary my-2 h-px' />
-                              <button
-                                className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
-                                onClick={(e: React.MouseEvent) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  handleClearFilter();
-                                }}
-                              >
-                                <Icon
-                                  variant='closeX'
-                                  className='aucctus-stroke-secondary h-4 w-4'
-                                />
-                                <span className='aucctus-text-secondary'>
-                                  Clear filter
-                                </span>
-                              </button>
-                            </>
-                          )}
-
-                          {/* Sort button */}
-                          {onSort && (
-                            <>
-                              <div className='aucctus-bg-secondary my-2 h-px' />
-                              <button
-                                className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
-                                onClick={(e: React.MouseEvent) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setShowFilterView(false);
-                                }}
-                              >
-                                <Icon
-                                  variant='switch-vertical-01'
-                                  className='aucctus-stroke-secondary h-4 w-4'
-                                />
-                                <span className='aucctus-text-secondary'>
-                                  Sort
-                                </span>
-                                <Icon
-                                  variant='chevron-right'
-                                  className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                                />
-                              </button>
-                            </>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <div className='aucctus-text-quaternary flex h-full items-center justify-center text-sm'>
+                              No users found
+                            </div>
                           )}
                         </div>
-                      ) : (
-                        // Sort View
-                        <div className='p-3'>
-                          <div className='mb-2 flex items-center gap-2'>
+
+                        {/* Clear filter button */}
+                        {hasActiveFilter && (
+                          <>
+                            <div className='aucctus-bg-secondary my-2 h-px' />
                             <button
-                              onClick={() => setShowFilterView(true)}
-                              className='aucctus-bg-primary-hover rounded p-1 transition-colors'
+                              className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
+                              onClick={(e: React.MouseEvent) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleClearFilter();
+                              }}
                             >
                               <Icon
-                                variant='chevronleft'
+                                variant='closeX'
                                 className='aucctus-stroke-secondary h-4 w-4'
                               />
+                              <span className='aucctus-text-secondary'>
+                                Clear filter
+                              </span>
                             </button>
-                            <span className='aucctus-text-secondary text-sm font-medium'>
-                              Sort
-                            </span>
-                          </div>
+                          </>
+                        )}
 
+                        {/* Sort button */}
+                        {onSort && (
+                          <>
+                            <div className='aucctus-bg-secondary my-2 h-px' />
+                            <button
+                              className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
+                              onClick={(e: React.MouseEvent) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowFilterView(false);
+                              }}
+                            >
+                              <Icon
+                                variant='switch-vertical-01'
+                                className='aucctus-stroke-secondary h-4 w-4'
+                              />
+                              <span className='aucctus-text-secondary'>
+                                Sort
+                              </span>
+                              <Icon
+                                variant='chevron-right'
+                                className='aucctus-stroke-tertiary ml-auto h-4 w-4'
+                              />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      // Sort View
+                      <div className='p-3'>
+                        <div className='mb-2 flex items-center gap-2'>
                           <button
-                            className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
-                            onClick={(e: React.MouseEvent) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleSort('asc');
-                            }}
+                            onClick={() => setShowFilterView(true)}
+                            className='aucctus-bg-primary-hover rounded p-1 transition-colors'
                           >
                             <Icon
-                              variant='arrowup'
+                              variant='chevronleft'
                               className='aucctus-stroke-secondary h-4 w-4'
                             />
-                            <span className='aucctus-text-secondary'>
-                              Sort ascending
-                            </span>
-                            {currentSort === 'asc' && (
-                              <Icon
-                                variant='check'
-                                className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                              />
-                            )}
                           </button>
-
-                          <button
-                            className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
-                            onClick={(e: React.MouseEvent) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleSort('desc');
-                            }}
-                          >
-                            <Icon
-                              variant='arrowdown'
-                              className='aucctus-stroke-secondary h-4 w-4'
-                            />
-                            <span className='aucctus-text-secondary'>
-                              Sort descending
-                            </span>
-                            {currentSort === 'desc' && (
-                              <Icon
-                                variant='check'
-                                className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                              />
-                            )}
-                          </button>
+                          <span className='aucctus-text-secondary text-sm font-medium'>
+                            Sort
+                          </span>
                         </div>
-                      )}
-                    </animated.div>
-                  ),
-              )}
+
+                        <button
+                          className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSort('asc');
+                          }}
+                        >
+                          <Icon
+                            variant='arrowup'
+                            className='aucctus-stroke-secondary h-4 w-4'
+                          />
+                          <span className='aucctus-text-secondary'>
+                            Sort ascending
+                          </span>
+                          {currentSort === 'asc' && (
+                            <Icon
+                              variant='check'
+                              className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
+                            />
+                          )}
+                        </button>
+
+                        <button
+                          className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSort('desc');
+                          }}
+                        >
+                          <Icon
+                            variant='arrowdown'
+                            className='aucctus-stroke-secondary h-4 w-4'
+                          />
+                          <span className='aucctus-text-secondary'>
+                            Sort descending
+                          </span>
+                          {currentSort === 'desc' && (
+                            <Icon
+                              variant='check'
+                              className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
+                            />
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </Popover.Content>
           )}
         </Popover.Portal>

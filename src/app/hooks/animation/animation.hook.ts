@@ -1,5 +1,5 @@
-import { easings, useSpring, SpringConfig } from 'react-spring';
-import { useTransition } from 'react-spring';
+import React from 'react';
+import { AnimatePresence, motion, type Transition } from 'framer-motion';
 
 /**
  * Configuration options for the floating animation
@@ -7,56 +7,40 @@ import { useTransition } from 'react-spring';
 export interface FloatingAnimationOptions {
   /** Vertical movement distance in pixels (default: 3) */
   amplitude?: number;
-  /** Animation duration in milliseconds (default: 1500) */
+  /** Animation duration in seconds (default: 1.5) */
   duration?: number;
-  /** Easing function to use (default: easeInOutSine) */
-  easing?: (t: number) => number;
-  /** Delay before animation starts in milliseconds (default: 0) */
+  /** Delay before animation starts in seconds (default: 0) */
   delay?: number;
-  /** Custom spring configuration (overrides duration and easing if provided) */
-  config?: SpringConfig;
-  /** Custom loop configuration (default: { reverse: true }) */
-  loop?: boolean | { reverse: boolean };
   /** Direction of the animation (default: 'y' for vertical) */
   direction?: 'x' | 'y';
 }
 
 /**
  * Hook for creating a floating animation effect
- * @param options - Configuration options for the animation
- * @returns Animation spring object that can be applied to an animated component
+ * Returns framer-motion props to spread onto a motion component
  */
 export const useFloatingAnimation = (
   options: FloatingAnimationOptions = {},
 ) => {
-  const {
-    amplitude = 3,
-    duration = 1500,
-    easing = easings.easeInOutSine,
-    delay = 0,
-    config,
-    loop = { reverse: true },
-    direction = 'y',
-  } = options;
+  const { amplitude = 3, duration = 1.5, delay = 0, direction = 'y' } = options;
 
-  const property = direction === 'x' ? 'translateX' : 'translateY';
-
-  return useSpring({
-    from: { transform: `${property}(${amplitude}px)` },
-    to: { transform: `${property}(-${amplitude}px)` },
-    config: config || {
-      duration,
-      easing,
+  return {
+    animate: { [direction]: [-amplitude, amplitude] },
+    transition: {
+      [direction]: {
+        duration,
+        delay,
+        repeat: Infinity,
+        repeatType: 'reverse' as const,
+        ease: 'easeInOut',
+      },
     },
-    delay,
-    loop,
-  });
+  };
 };
 
 /**
  * Hook for creating a pulsing/echo animation effect
- * @param options - Configuration options for the animation
- * @returns Animation spring object that can be applied to an animated component
+ * Returns framer-motion props to spread onto a motion component
  */
 export const usePulseAnimation = (
   options: {
@@ -66,8 +50,6 @@ export const usePulseAnimation = (
     endOpacity?: number;
     duration?: number;
     delay?: number;
-    easing?: (t: number) => number;
-    loop?: boolean | object;
   } = {},
 ) => {
   const {
@@ -75,95 +57,95 @@ export const usePulseAnimation = (
     endScale = 2,
     startOpacity = 0.3,
     endOpacity = 0,
-    duration = 1000,
+    duration = 1,
     delay = 0,
-    easing = easings.easeInOutSine,
-    loop = true,
   } = options;
 
-  return useSpring({
-    from: { transform: `scale(${startScale})`, opacity: startOpacity },
-    to: { transform: `scale(${endScale})`, opacity: endOpacity },
-    config: {
+  return {
+    initial: { scale: startScale, opacity: startOpacity },
+    animate: { scale: endScale, opacity: endOpacity },
+    transition: {
       duration,
-      easing,
+      delay,
+      repeat: Infinity,
+      repeatDelay: delay,
+      ease: 'easeInOut' as const,
     },
-    delay,
-    loop,
-  });
+  };
 };
 
 /**
- * Configuration options for the expand/collapse animation
+ * Configuration options for the ExpandCollapse component
  */
-export interface ExpandCollapseOptions {
-  /** Whether the element is expanded (default: false) */
-  isExpanded?: boolean;
-  /** Maximum height when expanded in pixels (default: 'auto') */
-  maxHeight?: number | 'auto';
-  /** Duration of the animation in milliseconds (default: 300) */
+export interface ExpandCollapseProps {
+  /** Whether the element is expanded */
+  isExpanded: boolean;
+  /** Maximum height when expanded in pixels (default: 1000) */
+  maxHeight?: number;
+  /** Duration of the animation in seconds (default: 0.3) */
   duration?: number;
-  /** Easing function to use (default: easeOutCubic) */
-  easing?: (t: number) => number;
-  /** Delay before animation starts in milliseconds (default: 0) */
-  delay?: number;
-  /** Custom spring configuration (overrides duration and easing if provided) */
-  config?: SpringConfig;
   /** Whether to include opacity transition (default: true) */
   withOpacity?: boolean;
   /** Initial height when collapsed (default: 0) */
   collapsedHeight?: number;
   /** Overflow value while expanded (default: 'hidden') */
   expandedOverflow?: 'visible' | 'hidden' | 'auto';
+  /** Additional className for the animated wrapper */
+  className?: string;
+  /** Content to render inside */
+  children: React.ReactNode;
 }
 
 /**
- * Hook for creating expand/collapse transition animations
- * @param options - Configuration options for the animation
- * @returns Animation spring object and ref to be applied to an animated component
+ * ExpandCollapse component using AnimatePresence + motion.div
+ * Replaces the old useExpandCollapseTransition render-prop pattern
  */
-export const useExpandCollapseTransition = (
-  options: ExpandCollapseOptions = {},
-) => {
-  const {
-    isExpanded = false,
-    maxHeight = 1000,
-    duration = 300,
-    easing = undefined,
-    delay = 0,
-    config,
-    withOpacity = true,
-    collapsedHeight = 0,
-    expandedOverflow = 'hidden',
-  } = options;
+export const ExpandCollapse: React.FC<ExpandCollapseProps> = ({
+  isExpanded,
+  maxHeight = 1000,
+  duration = 0.3,
+  withOpacity = true,
+  collapsedHeight = 0,
+  expandedOverflow = 'hidden',
+  className,
+  children,
+}) => {
+  const transition: Transition = {
+    type: 'spring',
+    stiffness: 100,
+    damping: 26,
+    mass: 0.6,
+    ...(duration ? { duration } : {}),
+  };
 
-  // Use transition to handle mount/unmount animations
-  const transitions = useTransition(isExpanded, {
-    from: {
-      maxHeight: collapsedHeight,
-      opacity: withOpacity ? 0 : 1,
-      overflow: 'hidden',
-    },
-    enter: {
-      maxHeight: maxHeight, // Use a large value for 'auto'
-      opacity: 1,
-      overflow: expandedOverflow,
-    },
-    leave: {
-      maxHeight: collapsedHeight,
-      opacity: withOpacity ? 0 : 1,
-      overflow: 'hidden',
-    },
-    config: config || {
-      tension: 100, // Default tension value
-      friction: 26, // Default friction value
-      mass: 0.6, // Default mass value
-      // Only use duration and easing if specifically provided
-      ...(duration && { duration }),
-      ...(easing && { easing }),
-    },
-    delay,
-  });
-
-  return transitions;
+  return React.createElement(
+    AnimatePresence,
+    null,
+    isExpanded
+      ? React.createElement(
+          motion.div,
+          {
+            key: 'expand-collapse',
+            initial: {
+              maxHeight: collapsedHeight,
+              opacity: withOpacity ? 0 : 1,
+              overflow: 'hidden',
+            },
+            animate: {
+              maxHeight,
+              opacity: 1,
+              overflow: expandedOverflow,
+            },
+            exit: {
+              maxHeight: collapsedHeight,
+              opacity: withOpacity ? 0 : 1,
+              overflow: 'hidden',
+            },
+            transition,
+            className,
+          },
+          children,
+        )
+      : null,
+  );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { animated, useTransition } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import { Icon } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useNavigate } from 'react-router-dom';
@@ -92,15 +92,6 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
   const hasChanged =
     mode === 'add' || statement.trim() !== initialStatement.trim();
 
-  // Sequential fade transition between form and confirmation states
-  const transitions = useTransition(showConfirmation, {
-    from: { opacity: 0 },
-    enter: { opacity: 1 },
-    leave: { opacity: 0 },
-    config: { duration: 150 },
-    exitBeforeEnter: true,
-  });
-
   const getTitle = () => {
     if (showConfirmation) {
       return 'Confirm Assumption Change';
@@ -127,10 +118,17 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
 
       {/* Content */}
       <div className='relative min-h-[400px] w-full overflow-hidden'>
-        {transitions((style, isConfirmation) =>
-          isConfirmation ? (
+        <AnimatePresence mode='wait'>
+          {showConfirmation ? (
             /* Confirmation View */
-            <animated.div style={style} className='absolute inset-0'>
+            <motion.div
+              key='confirmation'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className='absolute inset-0'
+            >
               <div className='flex h-full w-full flex-col p-6'>
                 {/* Statement Preview */}
                 <div className='mb-6'>
@@ -213,10 +211,17 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
                   </button>
                 </div>
               </div>
-            </animated.div>
+            </motion.div>
           ) : (
             /* Form View */
-            <animated.div style={style} className='absolute inset-0'>
+            <motion.div
+              key='form'
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.15 }}
+              className='absolute inset-0'
+            >
               <div className='h-full w-full p-6'>
                 <form
                   onSubmit={handleSubmit}
@@ -295,9 +300,9 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
                   </div>
                 </form>
               </div>
-            </animated.div>
-          ),
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

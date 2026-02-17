@@ -1,8 +1,7 @@
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
+import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import React, { useState } from 'react';
-import { animated } from 'react-spring';
 
 interface OutdatedSectionsBannerProps {
   outdatedSections: string[];
@@ -30,14 +29,6 @@ const OutdatedSectionsBanner: React.FC<OutdatedSectionsBannerProps> = ({
   additionalMessage,
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-
-  // Transition for expanding/collapsing the content - must be called before early return
-  const contentTransitions = useExpandCollapseTransition({
-    isExpanded: isHovered,
-    withOpacity: true,
-    maxHeight: 200,
-    duration: 300,
-  });
 
   // Show banner if there are outdated sections OR an additional message
   if (outdatedSections.length === 0 && !additionalMessage) {
@@ -82,51 +73,53 @@ const OutdatedSectionsBanner: React.FC<OutdatedSectionsBannerProps> = ({
       )}
 
       {/* Expandable content when there are outdated sections */}
-      {outdatedSections.length > 0 &&
-        contentTransitions(
-          (style, item) =>
-            item && (
-              <animated.div style={style} className='flex-1 overflow-hidden'>
-                <div className='flex flex-col gap-3 p-4 pl-0'>
-                  {additionalMessage && (
-                    <div
-                      style={STYLES.text}
-                      className='aucctus-text-sm !text-gray-light-200'
-                    >
-                      {additionalMessage}
-                    </div>
-                  )}
+      {outdatedSections.length > 0 && (
+        <ExpandCollapse
+          isExpanded={isHovered}
+          withOpacity
+          maxHeight={200}
+          duration={0.3}
+          className='flex-1 overflow-hidden'
+        >
+          <div className='flex flex-col gap-3 p-4 pl-0'>
+            {additionalMessage && (
+              <div
+                style={STYLES.text}
+                className='aucctus-text-sm !text-gray-light-200'
+              >
+                {additionalMessage}
+              </div>
+            )}
 
-                  <div
-                    style={STYLES.text}
-                    className='aucctus-text-md-medium !text-gray-light-200'
-                  >
-                    Sections requiring updates
-                  </div>
+            <div
+              style={STYLES.text}
+              className='aucctus-text-md-medium !text-gray-light-200'
+            >
+              Sections requiring updates
+            </div>
 
-                  <div
-                    style={STYLES.text}
-                    className='aucctus-text-sm !text-gray-light-200'
-                  >
-                    The following sections are ineligible for AI editing until
-                    they are updated:
-                  </div>
+            <div
+              style={STYLES.text}
+              className='aucctus-text-sm !text-gray-light-200'
+            >
+              The following sections are ineligible for AI editing until they
+              are updated:
+            </div>
 
-                  <ul className='ml-4 space-y-1'>
-                    {outdatedSections.map((section, index) => (
-                      <li
-                        key={index}
-                        style={STYLES.text}
-                        className='aucctus-text-sm list-disc !text-gray-light-200'
-                      >
-                        {section}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </animated.div>
-            ),
-        )}
+            <ul className='ml-4 space-y-1'>
+              {outdatedSections.map((section, index) => (
+                <li
+                  key={index}
+                  style={STYLES.text}
+                  className='aucctus-text-sm list-disc !text-gray-light-200'
+                >
+                  {section}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </ExpandCollapse>
+      )}
     </div>
   );
 };

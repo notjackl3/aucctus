@@ -266,7 +266,7 @@ The Status column supports inline editing similar to dynamic property columns. U
 
 The component follows the same pattern as `EditablePropertyCell`:
 - Portal-based dropdown rendering (avoids z-index issues)
-- Smooth animations with `react-spring`
+- Smooth animations with `framer-motion`
 - Optimistic UI updates
 - Error handling with rollback
 - Loading states during API calls

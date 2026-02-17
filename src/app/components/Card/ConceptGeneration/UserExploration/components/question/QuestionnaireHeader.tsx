@@ -1,7 +1,7 @@
 import { Badge, Icon } from '@components';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
-import { animated, useTransition } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import IncubationIcon from '../util/IncubationIcon';
 import ProgressCircle from '../util/ProgressCircle';
 import { IConceptIncubationQuestionnaireSection } from '@libs/api/types';
@@ -51,22 +51,8 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
     return submittedAnswers.length > 0 || activeClarifyingQuestion;
   }, [submittedAnswers, activeClarifyingQuestion]);
 
-  const backButtonTransition = useTransition(showBackButton, {
-    from: { opacity: 0, maxWidth: '0px' },
-    enter: { opacity: 1, maxWidth: '200px' },
-    leave: { opacity: 0, maxWidth: '0px' },
-    config: { tension: 100, friction: 12, mass: 0.5 },
-  });
-
-  const buttonTransition = useTransition(
-    currentQuestionOrder !== Infinity || activeClarifyingQuestion,
-    {
-      from: { opacity: 0, maxWidth: '0px' },
-      enter: { opacity: 1, maxWidth: '200px' },
-      leave: { opacity: 0, maxWidth: '0px' },
-      config: { tension: 100, friction: 12, mass: 0.5 },
-    },
-  );
+  const showContinueButton =
+    currentQuestionOrder !== Infinity || !!activeClarifyingQuestion;
 
   const buttonText = useMemo(() => {
     return isQuestionAnswered || isRequired || currentQuestionOrder === Infinity
@@ -94,36 +80,56 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
       <span className='aucctus-text-sm-medium aucctus-text-secondary ml-3 w-20'>
         {progressText}
       </span>
-      {backButtonTransition(
-        (style, show) =>
-          show && (
-            <animated.span className='overflow-hidden' style={style}>
-              <button
-                className='btn btn-light mx-3 flex items-center gap-2'
-                onClick={onGoBack}
-              >
-                <Icon variant='arrowleft' width={20} height={20} />
-              </button>
-            </animated.span>
-          ),
-      )}
-      {buttonTransition(
-        (style, show) =>
-          show && (
-            <animated.span className='overflow-hidden' style={style}>
-              <button
-                className='btn btn-primary flex items-center gap-2'
-                onClick={onContinue}
-                disabled={
-                  !isQuestionAnswered &&
-                  (isRequired || !!activeClarifyingQuestion)
-                }
-              >
-                {buttonText}
-              </button>
-            </animated.span>
-          ),
-      )}
+      <AnimatePresence>
+        {showBackButton && (
+          <motion.span
+            className='overflow-hidden'
+            initial={{ opacity: 0, maxWidth: '0px' }}
+            animate={{ opacity: 1, maxWidth: '200px' }}
+            exit={{ opacity: 0, maxWidth: '0px' }}
+            transition={{
+              type: 'spring',
+              stiffness: 100,
+              damping: 12,
+              mass: 0.5,
+            }}
+          >
+            <button
+              className='btn btn-light mx-3 flex items-center gap-2'
+              onClick={onGoBack}
+            >
+              <Icon variant='arrowleft' width={20} height={20} />
+            </button>
+          </motion.span>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {showContinueButton && (
+          <motion.span
+            className='overflow-hidden'
+            initial={{ opacity: 0, maxWidth: '0px' }}
+            animate={{ opacity: 1, maxWidth: '200px' }}
+            exit={{ opacity: 0, maxWidth: '0px' }}
+            transition={{
+              type: 'spring',
+              stiffness: 100,
+              damping: 12,
+              mass: 0.5,
+            }}
+          >
+            <button
+              className='btn btn-primary flex items-center gap-2'
+              onClick={onContinue}
+              disabled={
+                !isQuestionAnswered &&
+                (isRequired || !!activeClarifyingQuestion)
+              }
+            >
+              {buttonText}
+            </button>
+          </motion.span>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

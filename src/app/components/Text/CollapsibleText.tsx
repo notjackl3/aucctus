@@ -1,6 +1,6 @@
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import { animated, useSpring } from '@react-spring/web';
+import { motion } from 'framer-motion';
 import React from 'react';
 
 interface TitleDescriptionProps {
@@ -66,11 +66,6 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
     };
   }, []);
 
-  const animatedStyles = useSpring({
-    height: open ? textRef.current?.scrollHeight : maxDescriptionHeight,
-    config: { tension: 300, friction: 25 },
-  });
-
   return (
     <span
       ref={containerRef}
@@ -87,7 +82,7 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
       >
         {title}
       </span>
-      <animated.span
+      <motion.span
         ref={textRef}
         className={cn(
           'aucctus-text-tertiary aucctus-text-sm self-start leading-tight',
@@ -101,8 +96,14 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
           // This is to ensure relative is set and takes priority
           'relative',
         )}
+        initial={false}
+        animate={{
+          height: open
+            ? (textRef.current?.scrollHeight ?? 'auto')
+            : maxDescriptionHeight,
+        }}
+        transition={{ type: 'spring', stiffness: 300, damping: 25 }}
         style={{
-          ...animatedStyles,
           // Additional CSS properties for better text wrapping
           overflowWrap: 'anywhere',
           wordBreak: 'break-word',
@@ -121,7 +122,7 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
             </span>
           </>
         )}
-      </animated.span>
+      </motion.span>
     </span>
   );
 };

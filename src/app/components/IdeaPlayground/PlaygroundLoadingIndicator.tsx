@@ -1,6 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { useTransition, animated, easings } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import NavLogo from '@assets/aucctus_logo.png';
 import { cn } from '@libs/utils/react';
 
@@ -23,18 +23,16 @@ export const PlaygroundLoadingIndicator: React.FC<
   className = 'pointer-events-none fixed right-6 top-6 z-[9999] flex items-center gap-3',
   usePortal = true,
 }) => {
-  // Fade in/out transition
-  const transitions = useTransition(show, {
-    from: { opacity: 0, scale: 0.4, transform: 'translateY(-20px)' },
-    enter: { opacity: 1, scale: 1, transform: 'translateY(0px)' },
-    leave: { opacity: 0 },
-    config: { duration: 300, easing: easings.easeInOutSine },
-  });
-
-  const content = transitions(
-    (style, item) =>
-      item && (
-        <animated.div style={style} className={cn(className)}>
+  const content = (
+    <AnimatePresence>
+      {show && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.4, y: -20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3, ease: [0.37, 0, 0.63, 1] }}
+          className={cn(className)}
+        >
           {/* Glassmorphic container */}
           <div className='aucctus-bg-frosted-glass flex items-center gap-3 rounded-2xl border border-white/20 px-4 py-3 shadow-2xl backdrop-blur-xl'>
             {/* Logo with animation */}
@@ -72,8 +70,9 @@ export const PlaygroundLoadingIndicator: React.FC<
               </span>
             )}
           </div>
-        </animated.div>
-      ),
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 
   // Use portal to render at document body level or render inline

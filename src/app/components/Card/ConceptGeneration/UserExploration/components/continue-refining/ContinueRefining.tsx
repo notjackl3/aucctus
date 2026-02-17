@@ -4,7 +4,7 @@ import {
   ConceptIncubationQuestion,
   IClarifyingQuestion,
 } from '@libs/api/types';
-import { animated } from '@react-spring/web';
+import { motion } from 'framer-motion';
 import React, { useCallback } from 'react';
 import { boxShadowStyle } from '../../../../../Icon/QuestionIcon';
 import { CompletionIcon } from '../question/CompletionIcon';
@@ -56,17 +56,17 @@ const ContinueRefining: React.FC<ContinueRefiningProps> = ({
 
   return (
     <span onMouseEnter={onMouseEnter} className='z-[999] flex flex-col gap-4'>
-      <animated.span
-        style={iconAnimation}
+      <motion.span
+        {...iconAnimation}
         className='flex flex-row items-center gap-2'
       >
         <ContinueRefiningIcon iconRef={iconRef} />
-        <animated.span style={labelAnimation} className='aucctus-text-primary'>
+        <motion.span {...labelAnimation} className='aucctus-text-primary'>
           {'Or, answer these questions to help refine even further'}
-        </animated.span>
-      </animated.span>
-      <animated.span
-        style={cardAnimation}
+        </motion.span>
+      </motion.span>
+      <motion.span
+        {...cardAnimation}
         className='no-scrollbar flex flex-col gap-2'
       >
         {clarifyingQuestions.map((question: IClarifyingQuestion) => (
@@ -99,7 +99,7 @@ const ContinueRefining: React.FC<ContinueRefiningProps> = ({
             )}
           </div>
         ))}
-      </animated.span>
+      </motion.span>
     </span>
   );
 };

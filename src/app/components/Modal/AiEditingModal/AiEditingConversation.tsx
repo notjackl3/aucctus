@@ -1,7 +1,7 @@
 import FrostedLoadingCard from '@components/AiInteraction/FrostedLoadingCard';
 import { IConceptReportEdit } from '@libs/api/types';
 import React, { useEffect, useCallback } from 'react';
-import { animated, useTransition } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import AiEditingChatMessage from './AiEditingChatMessage';
 
 interface AiEditingConversationProps {
@@ -47,29 +47,6 @@ const AiEditingConversation: React.FC<AiEditingConversationProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [messages, isThinking]);
 
-  const loadingTransition = useTransition(isThinking, {
-    from: {
-      opacity: 0,
-      transform: 'translateY(40px) scale(0.9)',
-      maxHeight: '0px',
-    },
-    enter: {
-      opacity: 1,
-      transform: 'translateY(0px) scale(1)',
-      maxHeight: '100px',
-    },
-    leave: {
-      opacity: 0,
-      transform: 'translateY(40px) scale(0.9)',
-      maxHeight: '0px',
-    },
-    config: {
-      tension: 220,
-      friction: 30,
-      mass: 1,
-    },
-  });
-
   return (
     <div className='flex h-full flex-1 flex-col overflow-hidden'>
       <div className='flex h-full flex-col justify-end overflow-auto'>
@@ -91,22 +68,44 @@ const AiEditingConversation: React.FC<AiEditingConversationProps> = ({
         </div>
       </div>
       {/* Loading indicator when AI is thinking */}
-      {loadingTransition(
-        (style, item) =>
-          item && (
-            <animated.div
-              style={style}
-              className='mx-4 flex h-fit flex-row gap-4 overflow-hidden'
-            >
-              <FrostedLoadingCard
-                variant='dark'
-                className='flex-1'
-                defaultMessage='Got it, processing your feedback...'
-                message={thinkingMessage}
-              />
-            </animated.div>
-          ),
-      )}
+      <AnimatePresence>
+        {isThinking && (
+          <motion.div
+            initial={{
+              opacity: 0,
+              y: 40,
+              scale: 0.9,
+              maxHeight: 0,
+            }}
+            animate={{
+              opacity: 1,
+              y: 0,
+              scale: 1,
+              maxHeight: 100,
+            }}
+            exit={{
+              opacity: 0,
+              y: 40,
+              scale: 0.9,
+              maxHeight: 0,
+            }}
+            transition={{
+              type: 'spring',
+              stiffness: 220,
+              damping: 30,
+              mass: 1,
+            }}
+            className='mx-4 flex h-fit flex-row gap-4 overflow-hidden'
+          >
+            <FrostedLoadingCard
+              variant='dark'
+              className='flex-1'
+              defaultMessage='Got it, processing your feedback...'
+              message={thinkingMessage}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

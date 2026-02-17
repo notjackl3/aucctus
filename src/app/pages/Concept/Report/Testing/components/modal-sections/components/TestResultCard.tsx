@@ -1,8 +1,7 @@
 import React from 'react';
 import { Icon } from '@components';
-import { animated } from 'react-spring';
 import { cn } from '@libs/utils/react';
-import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
+import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import { TestResultCardProps } from '../TestResults.types';
 import SyntheticResultView from './SyntheticResultView';
 import RegularResultView from './RegularResultView';
@@ -23,13 +22,7 @@ const TestResultCard: React.FC<TestResultCardPropsExtended> = ({
   isExpanded,
   onToggleExpansion,
 }) => {
-  // Animated expand/collapse transition for synthetic results
-  const expandTransitions = useExpandCollapseTransition({
-    isExpanded: isExpanded && result.isSynthetic,
-    withOpacity: true,
-    maxHeight: 5000, // Large value to accommodate very long content
-    duration: 300,
-  });
+  const isSyntheticExpanded = isExpanded && result.isSynthetic;
 
   // Handle card click for expansion (only for synthetic results)
   const handleCardClick = (e: React.MouseEvent) => {
@@ -131,23 +124,24 @@ const TestResultCard: React.FC<TestResultCardPropsExtended> = ({
       {/* Card Content */}
       {result.isSynthetic ? (
         // Animated expand/collapse for synthetic results
-        expandTransitions(
-          (style, item) =>
-            item &&
-            (result.keyInsights ||
-              result.painPoints ||
-              result.solutionFeedback ||
-              result.willingnessToPayFeedback ||
-              result.overallSentiment ||
-              result.summary) && (
-              <animated.div style={style}>
-                <SyntheticResultView
-                  result={result}
-                  viewMode={viewMode}
-                  onToggleViewMode={onToggleViewMode}
-                />
-              </animated.div>
-            ),
+        (result.keyInsights ||
+          result.painPoints ||
+          result.solutionFeedback ||
+          result.willingnessToPayFeedback ||
+          result.overallSentiment ||
+          result.summary) && (
+          <ExpandCollapse
+            isExpanded={isSyntheticExpanded}
+            withOpacity
+            maxHeight={5000}
+            duration={0.3}
+          >
+            <SyntheticResultView
+              result={result}
+              viewMode={viewMode}
+              onToggleViewMode={onToggleViewMode}
+            />
+          </ExpandCollapse>
         )
       ) : (
         <RegularResultView

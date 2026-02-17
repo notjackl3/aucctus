@@ -1,6 +1,6 @@
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useMemo, useRef } from 'react';
-import { animated, useSpring } from 'react-spring';
+import { motion } from 'framer-motion';
 import { CompletionIcon } from './CompletionIcon';
 import { ConceptIncubationQuestion } from '@libs/api/types';
 import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
@@ -27,17 +27,21 @@ const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
     return highestOrder < Math.floor(currentQuestionOrder);
   }, [questionGroup, currentQuestionOrder]);
 
-  const collapseAnimation = useSpring({
-    marginTop: isGroupCompleted ? '-29px' : '5px', // magic number
-    config: isGroupCompleted
-      ? { tension: 100, friction: 12, mass: 0.5 }
+  const collapseAnimateProps = {
+    animate: {
+      marginTop: isGroupCompleted ? '-29px' : '5px',
+    },
+    transition: isGroupCompleted
+      ? { type: 'spring' as const, stiffness: 100, damping: 12, mass: 0.5 }
       : { duration: 0 },
-  });
+  };
 
-  const fadeOutAnimation = useSpring({
-    opacity: isGroupCompleted ? 0 : 1,
-    config: { duration: 200 },
-  });
+  const fadeOutAnimateProps = {
+    animate: {
+      opacity: isGroupCompleted ? 0 : 1,
+    },
+    transition: { duration: 0.2 },
+  };
 
   const isPartial = useCallback((question: ConceptIncubationQuestion) => {
     return !Number.isInteger(question.order);
@@ -70,11 +74,9 @@ const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
   return (
     <span ref={componentRef} className='relative'>
       {questionGroup.map((question, index) => (
-        <animated.span
-          style={{
-            ...getQuestionStyle(question, index),
-            ...(index > 0 ? collapseAnimation : {}),
-          }}
+        <motion.span
+          style={getQuestionStyle(question, index)}
+          {...(index > 0 ? collapseAnimateProps : {})}
           className='relative flex flex-row items-center gap-2 ease-in-out'
           key={question.identifier}
         >
@@ -83,13 +85,13 @@ const CompletionIconGroup: React.FC<CompletionIconGroupProps> = ({
             className='aucctus-bg-secondary-hover ml-2 h-8 w-8 cursor-pointer'
             iconClassName='z-[10] animate-fade-in opacity-0'
           />
-          <animated.span
-            style={index > 0 ? fadeOutAnimation : {}}
+          <motion.span
+            {...(index > 0 ? fadeOutAnimateProps : {})}
             className='aucctus-completed-question-label aucctus-text-sm aucctus-text-primary'
           >
             {question.label}
-          </animated.span>
-        </animated.span>
+          </motion.span>
+        </motion.span>
       ))}
     </span>
   );

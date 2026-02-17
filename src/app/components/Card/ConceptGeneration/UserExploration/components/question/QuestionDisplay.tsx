@@ -1,7 +1,7 @@
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
-import { animated, useTransition } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import { useDispatchIncubationAnimation } from '../../hooks/incubation-animation-event.hook';
 import { useQuestionIconLine } from '../../hooks/question-icon-line.hook';
 import { useQuestionTransition } from '../../hooks/question-transition.hook';
@@ -146,26 +146,41 @@ const QuestionDisplay: React.FC<QuestionDisplayProps> = () => {
     spacerRef,
   ]);
 
-  const completedQuestionsTransition = useTransition(
-    previousQuestion && currentQuestionOrder !== Infinity,
-    {
-      from: { opacity: 1, maxHeight: '500px' },
-      enter: { opacity: 1, maxHeight: '500px' },
-      leave: { opacity: 0, maxHeight: '0px', delay: 500 },
-      config: { tension: 100, friction: 12, mass: 0.5 },
-    },
-  );
+  const showCompletedQuestions =
+    !!previousQuestion && currentQuestionOrder !== Infinity;
 
   const renderCompletedQuestions = useCallback(() => {
-    return completedQuestionsTransition(
-      (style, item) =>
-        item && (
-          <animated.span style={style} className='z-[99] flex flex-col gap-4'>
+    return (
+      <AnimatePresence>
+        {showCompletedQuestions && (
+          <motion.span
+            initial={{ opacity: 1, maxHeight: '500px' }}
+            animate={{ opacity: 1, maxHeight: '500px' }}
+            exit={{
+              opacity: 0,
+              maxHeight: '0px',
+              transition: {
+                type: 'spring',
+                stiffness: 100,
+                damping: 12,
+                mass: 0.5,
+                delay: 0.5,
+              },
+            }}
+            transition={{
+              type: 'spring',
+              stiffness: 100,
+              damping: 12,
+              mass: 0.5,
+            }}
+            className='z-[99] flex flex-col gap-4'
+          >
             <CompletedQuestions />
-          </animated.span>
-        ),
+          </motion.span>
+        )}
+      </AnimatePresence>
     );
-  }, [completedQuestionsTransition]);
+  }, [showCompletedQuestions]);
 
   const renderReadyToGenerate = useCallback(() => {
     return (

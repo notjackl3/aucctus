@@ -1,6 +1,6 @@
 import { Icon } from '@components';
 import React from 'react';
-import { animated, useSpring } from 'react-spring';
+import { motion } from 'framer-motion';
 import { IconProps } from './Icon/Icon';
 
 interface RotatingIconProps extends Omit<IconProps, 'variant'> {
@@ -13,22 +13,19 @@ const RotatingIcon: React.FC<RotatingIconProps> = ({
   variant = 'chevronup',
   ...props
 }) => {
-  const springProps = useSpring({
-    transform: isUp ? 'rotate(0deg)' : 'rotate(180deg)',
-    config: { tension: 300, friction: 10 },
-  });
-
   return (
-    <animated.div
+    <motion.div
+      initial={false}
+      animate={{ rotate: isUp ? 0 : 180 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 10 }}
       style={{
-        ...springProps,
-        display: 'inline-flex', // Change to inline-flex
+        display: 'inline-flex',
         justifyContent: 'center',
         alignItems: 'center',
       }}
     >
       <Icon variant={variant} {...props} />
-    </animated.div>
+    </motion.div>
   );
 };
 

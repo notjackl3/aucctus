@@ -1,6 +1,6 @@
 import { cn } from '@libs/utils/react';
 import React, { useEffect, useState } from 'react';
-import { animated, useSpring } from 'react-spring';
+import { motion } from 'framer-motion';
 
 interface AnimatedSpeechBubbleProps {
   quote: string;
@@ -15,33 +15,6 @@ export const AnimatedSpeechBubble: React.FC<AnimatedSpeechBubbleProps> = ({
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [shouldFadeOut, setShouldFadeOut] = useState(false);
-
-  // Main bubble animation with fade-in, fade-out, and scale
-  // Note: Must include translateX(-50%) to maintain horizontal centering since inline transform overrides CSS
-  const bubbleSpring = useSpring({
-    opacity: shouldFadeOut ? 0 : 1,
-    transform: shouldFadeOut
-      ? 'translateX(-50%) scale(0.95) translateY(-5px)'
-      : 'translateX(-50%) scale(1) translateY(0px)',
-    config: {
-      tension: 200,
-      friction: 25,
-    },
-    from: {
-      opacity: 0,
-      transform: 'translateX(-50%) scale(0.95) translateY(-5px)',
-    },
-  });
-
-  // Quote text transition for smooth quote changes
-  const textSpring = useSpring({
-    opacity: isTransitioning ? 0 : 1,
-    transform: isTransitioning ? 'translateY(-5px)' : 'translateY(0px)',
-    config: {
-      tension: 300,
-      friction: 30,
-    },
-  });
 
   // Handle quote transitions
   useEffect(() => {
@@ -89,20 +62,44 @@ export const AnimatedSpeechBubble: React.FC<AnimatedSpeechBubbleProps> = ({
   }
 
   return (
-    <animated.div
-      style={bubbleSpring}
+    <motion.div
+      initial={{
+        opacity: 0,
+        scale: 0.95,
+        y: -5,
+        x: '-50%',
+      }}
+      animate={{
+        opacity: shouldFadeOut ? 0 : 1,
+        scale: shouldFadeOut ? 0.95 : 1,
+        y: shouldFadeOut ? -5 : 0,
+        x: '-50%',
+      }}
+      transition={{
+        type: 'spring',
+        stiffness: 200,
+        damping: 25,
+      }}
       className={cn(
         'pointer-events-none absolute left-1/2 z-20 w-56',
         position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2',
       )}
     >
       <div className='aucctus-bg-primary aucctus-border-secondary relative rounded-xl border-2 p-3 shadow-xl'>
-        <animated.p
-          style={textSpring}
+        <motion.p
+          animate={{
+            opacity: isTransitioning ? 0 : 1,
+            y: isTransitioning ? -5 : 0,
+          }}
+          transition={{
+            type: 'spring',
+            stiffness: 300,
+            damping: 30,
+          }}
           className='aucctus-text-primary aucctus-text-xs text-center leading-relaxed'
         >
           &ldquo;{displayQuote}&rdquo;
-        </animated.p>
+        </motion.p>
         {/* Speech bubble tail */}
         <div
           className={cn(
@@ -138,6 +135,6 @@ export const AnimatedSpeechBubble: React.FC<AnimatedSpeechBubbleProps> = ({
           />
         </div>
       </div>
-    </animated.div>
+    </motion.div>
   );
 };

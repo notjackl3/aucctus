@@ -6,7 +6,6 @@ import React, {
   useMemo,
 } from 'react';
 import * as Popover from '@radix-ui/react-popover';
-import { animated, useTransition } from 'react-spring';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '@components';
 import {
@@ -331,13 +330,6 @@ const AddFilterDropdown: React.FC<IAddFilterDropdownProps> = ({
     IQuestionScoreFilter | undefined
   >(undefined);
 
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
-
   // Reset pending values when dropdown opens
   useEffect(() => {
     if (isOpen) {
@@ -433,21 +425,98 @@ const AddFilterDropdown: React.FC<IAddFilterDropdownProps> = ({
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition(
-          (styles, item) =>
-            item &&
-            isOpen && (
-              <Popover.Content asChild align='start' sideOffset={4}>
-                <animated.div
-                  style={styles}
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[200px] rounded-lg border p-1 shadow-lg'
-                >
-                  {/* Status Filter */}
-                  {!hideFilters?.status && !filterState.status && (
+        <AnimatePresence>
+          {isOpen && (
+            <Popover.Content asChild align='start' sideOffset={4} forceMount>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[200px] rounded-lg border p-1 shadow-lg'
+              >
+                {/* Status Filter */}
+                {!hideFilters?.status && !filterState.status && (
+                  <FilterMenuItemWithSubmenu
+                    icon='loading-02'
+                    label='Status'
+                    submenuKey='status'
+                    hoveredSubmenu={hoveredSubmenu}
+                    setSubmenuImmediate={setSubmenuImmediate}
+                    setSubmenuDelayed={setSubmenuDelayed}
+                  >
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.25, ease: 'easeOut' }}
+                      className='space-y-1'
+                    >
+                      {STATUS_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                          onClick={() => {
+                            onFilterChange({ status: option.value });
+                            onOpenChange(false);
+                          }}
+                        >
+                          <span className='aucctus-text-secondary'>
+                            {option.label}
+                          </span>
+                        </button>
+                      ))}
+                    </motion.div>
+                  </FilterMenuItemWithSubmenu>
+                )}
+
+                {/* Date Range Filter */}
+                {!hideFilters?.dateRange &&
+                  !filterState.submissionDateRange?.start &&
+                  !filterState.submissionDateRange?.end && (
                     <FilterMenuItemWithSubmenu
-                      icon='loading-02'
-                      label='Status'
-                      submenuKey='status'
+                      icon='calendar'
+                      label='Submission Date'
+                      submenuKey='dateRange'
+                      hoveredSubmenu={hoveredSubmenu}
+                      setSubmenuImmediate={setSubmenuImmediate}
+                      setSubmenuDelayed={setSubmenuDelayed}
+                      wide
+                    >
+                      <DateRangeForm
+                        startDate={pendingDateRange.start}
+                        endDate={pendingDateRange.end}
+                        onStartChange={(v) =>
+                          setPendingDateRange((prev) => ({
+                            ...prev,
+                            start: v,
+                          }))
+                        }
+                        onEndChange={(v) =>
+                          setPendingDateRange((prev) => ({ ...prev, end: v }))
+                        }
+                        onApply={() => {
+                          if (pendingDateRange.start || pendingDateRange.end) {
+                            onFilterChange({
+                              submissionDateRange: pendingDateRange,
+                            });
+                            onOpenChange(false);
+                          }
+                        }}
+                        applyDisabled={
+                          !pendingDateRange.start && !pendingDateRange.end
+                        }
+                      />
+                    </FilterMenuItemWithSubmenu>
+                  )}
+
+                {/* Total Score Filter */}
+                {!hideFilters?.totalScore &&
+                  filterState.minTotalScore === undefined &&
+                  filterState.maxTotalScore === undefined && (
+                    <FilterMenuItemWithSubmenu
+                      icon='star-01'
+                      label='Total Score'
+                      submenuKey='totalScore'
                       hoveredSubmenu={hoveredSubmenu}
                       setSubmenuImmediate={setSubmenuImmediate}
                       setSubmenuDelayed={setSubmenuDelayed}
@@ -456,175 +525,96 @@ const AddFilterDropdown: React.FC<IAddFilterDropdownProps> = ({
                         initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.25, ease: 'easeOut' }}
-                        className='space-y-1'
+                        className='space-y-3 p-2'
                       >
-                        {STATUS_OPTIONS.map((option) => (
-                          <button
-                            key={option.value}
-                            className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                            onClick={() => {
-                              onFilterChange({ status: option.value });
-                              onOpenChange(false);
-                            }}
-                          >
-                            <span className='aucctus-text-secondary'>
-                              {option.label}
-                            </span>
-                          </button>
-                        ))}
-                      </motion.div>
-                    </FilterMenuItemWithSubmenu>
-                  )}
-
-                  {/* Date Range Filter */}
-                  {!hideFilters?.dateRange &&
-                    !filterState.submissionDateRange?.start &&
-                    !filterState.submissionDateRange?.end && (
-                      <FilterMenuItemWithSubmenu
-                        icon='calendar'
-                        label='Submission Date'
-                        submenuKey='dateRange'
-                        hoveredSubmenu={hoveredSubmenu}
-                        setSubmenuImmediate={setSubmenuImmediate}
-                        setSubmenuDelayed={setSubmenuDelayed}
-                        wide
-                      >
-                        <DateRangeForm
-                          startDate={pendingDateRange.start}
-                          endDate={pendingDateRange.end}
-                          onStartChange={(v) =>
-                            setPendingDateRange((prev) => ({
-                              ...prev,
-                              start: v,
-                            }))
-                          }
-                          onEndChange={(v) =>
-                            setPendingDateRange((prev) => ({ ...prev, end: v }))
-                          }
-                          onApply={() => {
+                        <div>
+                          <label className='aucctus-text-xs aucctus-text-tertiary mb-1 block font-medium'>
+                            Min Score (0-100)
+                          </label>
+                          <input
+                            type='number'
+                            min={0}
+                            max={100}
+                            value={pendingTotalScore.min ?? ''}
+                            onChange={(e) =>
+                              setPendingTotalScore((prev) => ({
+                                ...prev,
+                                min: e.target.value
+                                  ? Number(e.target.value)
+                                  : undefined,
+                              }))
+                            }
+                            placeholder='e.g., 70'
+                            className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1.5 text-sm'
+                          />
+                        </div>
+                        <div>
+                          <label className='aucctus-text-xs aucctus-text-tertiary mb-1 block font-medium'>
+                            Max Score (0-100)
+                          </label>
+                          <input
+                            type='number'
+                            min={0}
+                            max={100}
+                            value={pendingTotalScore.max ?? ''}
+                            onChange={(e) =>
+                              setPendingTotalScore((prev) => ({
+                                ...prev,
+                                max: e.target.value
+                                  ? Number(e.target.value)
+                                  : undefined,
+                              }))
+                            }
+                            placeholder='e.g., 100'
+                            className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1.5 text-sm'
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
                             if (
-                              pendingDateRange.start ||
-                              pendingDateRange.end
+                              pendingTotalScore.min !== undefined ||
+                              pendingTotalScore.max !== undefined
                             ) {
                               onFilterChange({
-                                submissionDateRange: pendingDateRange,
+                                minTotalScore: pendingTotalScore.min,
+                                maxTotalScore: pendingTotalScore.max,
                               });
                               onOpenChange(false);
                             }
                           }}
-                          applyDisabled={
-                            !pendingDateRange.start && !pendingDateRange.end
+                          disabled={
+                            pendingTotalScore.min === undefined &&
+                            pendingTotalScore.max === undefined
                           }
-                        />
-                      </FilterMenuItemWithSubmenu>
-                    )}
-
-                  {/* Total Score Filter */}
-                  {!hideFilters?.totalScore &&
-                    filterState.minTotalScore === undefined &&
-                    filterState.maxTotalScore === undefined && (
-                      <FilterMenuItemWithSubmenu
-                        icon='star-01'
-                        label='Total Score'
-                        submenuKey='totalScore'
-                        hoveredSubmenu={hoveredSubmenu}
-                        setSubmenuImmediate={setSubmenuImmediate}
-                        setSubmenuDelayed={setSubmenuDelayed}
-                      >
-                        <motion.div
-                          initial={{ opacity: 0, y: 4 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.25, ease: 'easeOut' }}
-                          className='space-y-3 p-2'
+                          className='btn btn-primary btn-sm w-full disabled:opacity-50'
                         >
-                          <div>
-                            <label className='aucctus-text-xs aucctus-text-tertiary mb-1 block font-medium'>
-                              Min Score (0-100)
-                            </label>
-                            <input
-                              type='number'
-                              min={0}
-                              max={100}
-                              value={pendingTotalScore.min ?? ''}
-                              onChange={(e) =>
-                                setPendingTotalScore((prev) => ({
-                                  ...prev,
-                                  min: e.target.value
-                                    ? Number(e.target.value)
-                                    : undefined,
-                                }))
-                              }
-                              placeholder='e.g., 70'
-                              className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1.5 text-sm'
-                            />
-                          </div>
-                          <div>
-                            <label className='aucctus-text-xs aucctus-text-tertiary mb-1 block font-medium'>
-                              Max Score (0-100)
-                            </label>
-                            <input
-                              type='number'
-                              min={0}
-                              max={100}
-                              value={pendingTotalScore.max ?? ''}
-                              onChange={(e) =>
-                                setPendingTotalScore((prev) => ({
-                                  ...prev,
-                                  max: e.target.value
-                                    ? Number(e.target.value)
-                                    : undefined,
-                                }))
-                              }
-                              placeholder='e.g., 100'
-                              className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1.5 text-sm'
-                            />
-                          </div>
-                          <button
-                            onClick={() => {
-                              if (
-                                pendingTotalScore.min !== undefined ||
-                                pendingTotalScore.max !== undefined
-                              ) {
-                                onFilterChange({
-                                  minTotalScore: pendingTotalScore.min,
-                                  maxTotalScore: pendingTotalScore.max,
-                                });
-                                onOpenChange(false);
-                              }
-                            }}
-                            disabled={
-                              pendingTotalScore.min === undefined &&
-                              pendingTotalScore.max === undefined
-                            }
-                            className='btn btn-primary btn-sm w-full disabled:opacity-50'
-                          >
-                            Apply
-                          </button>
-                        </motion.div>
-                      </FilterMenuItemWithSubmenu>
-                    )}
+                          Apply
+                        </button>
+                      </motion.div>
+                    </FilterMenuItemWithSubmenu>
+                  )}
 
-                  {/* Question Score Filter */}
-                  {!hideFilters?.questionScore &&
-                    scoringQuestions.length > 0 &&
-                    !filterState.questionScoreFilter && (
-                      <QuestionScoreSubmenu
-                        scoringQuestions={scoringQuestions}
-                        pendingFilter={pendingQuestionFilter}
-                        setPendingFilter={setPendingQuestionFilter}
-                        hoveredSubmenu={hoveredSubmenu}
-                        setSubmenuImmediate={setSubmenuImmediate}
-                        setSubmenuDelayed={setSubmenuDelayed}
-                        onApply={(filter) => {
-                          onFilterChange({ questionScoreFilter: filter });
-                          onOpenChange(false);
-                        }}
-                      />
-                    )}
-                </animated.div>
-              </Popover.Content>
-            ),
-        )}
+                {/* Question Score Filter */}
+                {!hideFilters?.questionScore &&
+                  scoringQuestions.length > 0 &&
+                  !filterState.questionScoreFilter && (
+                    <QuestionScoreSubmenu
+                      scoringQuestions={scoringQuestions}
+                      pendingFilter={pendingQuestionFilter}
+                      setPendingFilter={setPendingQuestionFilter}
+                      hoveredSubmenu={hoveredSubmenu}
+                      setSubmenuImmediate={setSubmenuImmediate}
+                      setSubmenuDelayed={setSubmenuDelayed}
+                      onApply={(filter) => {
+                        onFilterChange({ questionScoreFilter: filter });
+                        onOpenChange(false);
+                      }}
+                    />
+                  )}
+              </motion.div>
+            </Popover.Content>
+          )}
+        </AnimatePresence>
       </Popover.Portal>
     </Popover.Root>
   );
@@ -647,13 +637,6 @@ const SortDropdown: React.FC<ISortDropdownProps> = ({
   isOpen,
   onOpenChange,
 }) => {
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
-
   return (
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
@@ -669,64 +652,65 @@ const SortDropdown: React.FC<ISortDropdownProps> = ({
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition(
-          (styles, item) =>
-            item &&
-            isOpen && (
-              <Popover.Content asChild align='start' sideOffset={4}>
-                <animated.div
-                  style={styles}
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[220px] rounded-lg border p-1 shadow-lg'
+        <AnimatePresence>
+          {isOpen && (
+            <Popover.Content asChild align='start' sideOffset={4} forceMount>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[220px] rounded-lg border p-1 shadow-lg'
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className='space-y-1'
                 >
-                  <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, ease: 'easeOut' }}
-                    className='space-y-1'
-                  >
-                    {SORT_OPTIONS.map((option) => (
-                      <button
-                        key={option.value}
-                        className={cn(
-                          'flex w-full items-center justify-between rounded px-3 py-2 text-sm transition-colors',
-                          sortBy === option.value
-                            ? 'bg-blue-50 text-blue-800'
-                            : 'aucctus-bg-primary-hover aucctus-text-secondary',
-                        )}
-                        onClick={() => {
-                          onChange(option.value);
-                          onOpenChange(false);
-                        }}
-                      >
-                        <div className='flex items-center gap-2'>
-                          <Icon
-                            variant={
-                              option.direction === 'desc'
-                                ? 'arrowdown'
-                                : 'arrowup'
-                            }
-                            className={cn(
-                              'h-3.5 w-3.5',
-                              sortBy === option.value
-                                ? 'stroke-blue-600'
-                                : 'aucctus-stroke-secondary',
-                            )}
-                          />
-                          <span>{option.label}</span>
-                        </div>
-                        {sortBy === option.value && (
-                          <Icon
-                            variant='check'
-                            className='h-4 w-4 stroke-blue-600'
-                          />
-                        )}
-                      </button>
-                    ))}
-                  </motion.div>
-                </animated.div>
-              </Popover.Content>
-            ),
-        )}
+                  {SORT_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded px-3 py-2 text-sm transition-colors',
+                        sortBy === option.value
+                          ? 'bg-blue-50 text-blue-800'
+                          : 'aucctus-bg-primary-hover aucctus-text-secondary',
+                      )}
+                      onClick={() => {
+                        onChange(option.value);
+                        onOpenChange(false);
+                      }}
+                    >
+                      <div className='flex items-center gap-2'>
+                        <Icon
+                          variant={
+                            option.direction === 'desc'
+                              ? 'arrowdown'
+                              : 'arrowup'
+                          }
+                          className={cn(
+                            'h-3.5 w-3.5',
+                            sortBy === option.value
+                              ? 'stroke-blue-600'
+                              : 'aucctus-stroke-secondary',
+                          )}
+                        />
+                        <span>{option.label}</span>
+                      </div>
+                      {sortBy === option.value && (
+                        <Icon
+                          variant='check'
+                          className='h-4 w-4 stroke-blue-600'
+                        />
+                      )}
+                    </button>
+                  ))}
+                </motion.div>
+              </motion.div>
+            </Popover.Content>
+          )}
+        </AnimatePresence>
       </Popover.Portal>
     </Popover.Root>
   );
@@ -754,13 +738,6 @@ const SortChip: React.FC<ISortChipProps> = ({
   const sortOption = SORT_OPTIONS.find((s) => s.value === sortBy);
   const directionIcon =
     sortOption?.direction === 'desc' ? 'arrowdown' : 'arrowup';
-
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
 
   return (
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
@@ -790,61 +767,62 @@ const SortChip: React.FC<ISortChipProps> = ({
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition(
-          (styles, item) =>
-            item &&
-            isOpen && (
-              <Popover.Content asChild align='start' sideOffset={4}>
-                <animated.div
-                  style={styles}
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] w-56 rounded-lg border p-1 shadow-lg'
+        <AnimatePresence>
+          {isOpen && (
+            <Popover.Content asChild align='start' sideOffset={4} forceMount>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className='aucctus-bg-primary aucctus-border-secondary z-[9999] w-56 rounded-lg border p-1 shadow-lg'
+              >
+                <motion.div
+                  initial={{ opacity: 0, y: 4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25, ease: 'easeOut' }}
+                  className='space-y-1'
                 >
-                  <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, ease: 'easeOut' }}
-                    className='space-y-1'
-                  >
-                    {SORT_OPTIONS.map((option) => (
-                      <button
-                        key={option.value}
-                        className={cn(
-                          'flex w-full items-center justify-between rounded px-3 py-2 text-sm transition-colors',
-                          sortBy === option.value
-                            ? 'bg-blue-50 text-blue-800'
-                            : 'aucctus-bg-primary-hover aucctus-text-secondary',
-                        )}
-                        onClick={() => onChange(option.value)}
-                      >
-                        <div className='flex items-center gap-2'>
-                          <Icon
-                            variant={
-                              option.direction === 'desc'
-                                ? 'arrowdown'
-                                : 'arrowup'
-                            }
-                            className={cn(
-                              'h-3.5 w-3.5',
-                              sortBy === option.value
-                                ? 'stroke-blue-600'
-                                : 'aucctus-stroke-secondary',
-                            )}
-                          />
-                          <span>{option.label}</span>
-                        </div>
-                        {sortBy === option.value && (
-                          <Icon
-                            variant='check'
-                            className='h-4 w-4 stroke-blue-600'
-                          />
-                        )}
-                      </button>
-                    ))}
-                  </motion.div>
-                </animated.div>
-              </Popover.Content>
-            ),
-        )}
+                  {SORT_OPTIONS.map((option) => (
+                    <button
+                      key={option.value}
+                      className={cn(
+                        'flex w-full items-center justify-between rounded px-3 py-2 text-sm transition-colors',
+                        sortBy === option.value
+                          ? 'bg-blue-50 text-blue-800'
+                          : 'aucctus-bg-primary-hover aucctus-text-secondary',
+                      )}
+                      onClick={() => onChange(option.value)}
+                    >
+                      <div className='flex items-center gap-2'>
+                        <Icon
+                          variant={
+                            option.direction === 'desc'
+                              ? 'arrowdown'
+                              : 'arrowup'
+                          }
+                          className={cn(
+                            'h-3.5 w-3.5',
+                            sortBy === option.value
+                              ? 'stroke-blue-600'
+                              : 'aucctus-stroke-secondary',
+                          )}
+                        />
+                        <span>{option.label}</span>
+                      </div>
+                      {sortBy === option.value && (
+                        <Icon
+                          variant='check'
+                          className='h-4 w-4 stroke-blue-600'
+                        />
+                      )}
+                    </button>
+                  ))}
+                </motion.div>
+              </motion.div>
+            </Popover.Content>
+          )}
+        </AnimatePresence>
       </Popover.Portal>
     </Popover.Root>
   );
@@ -1712,13 +1690,6 @@ const FilterChip: React.FC<IFilterChipProps> = ({
   onClear,
   children,
 }) => {
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
-
   return (
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
@@ -1744,20 +1715,21 @@ const FilterChip: React.FC<IFilterChipProps> = ({
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition(
-          (styles, item) =>
-            item &&
-            isOpen && (
-              <Popover.Content asChild align='start' sideOffset={4}>
-                <animated.div
-                  style={styles}
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] rounded-lg border p-1 shadow-lg'
-                >
-                  {children}
-                </animated.div>
-              </Popover.Content>
-            ),
-        )}
+        <AnimatePresence>
+          {isOpen && (
+            <Popover.Content asChild align='start' sideOffset={4} forceMount>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className='aucctus-bg-primary aucctus-border-secondary z-[9999] rounded-lg border p-1 shadow-lg'
+              >
+                {children}
+              </motion.div>
+            </Popover.Content>
+          )}
+        </AnimatePresence>
       </Popover.Portal>
     </Popover.Root>
   );
@@ -2042,13 +2014,6 @@ const QuestionScoreFilterChip: React.FC<IQuestionScoreFilterChipProps> = ({
     setLocalFilter((prev) => ({ ...prev, minScore: min, maxScore: max }));
   };
 
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
-
   return (
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
@@ -2076,198 +2041,197 @@ const QuestionScoreFilterChip: React.FC<IQuestionScoreFilterChipProps> = ({
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition(
-          (styles, item) =>
-            item &&
-            isOpen && (
-              <Popover.Content asChild align='start' sideOffset={4}>
-                <animated.div
-                  style={styles}
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] flex w-[480px] rounded-lg border shadow-lg'
-                >
-                  {/* Left Panel - Question Selection */}
-                  <div className='aucctus-border-secondary flex-1 border-r p-4'>
-                    <h4 className='aucctus-text-sm-semibold aucctus-text-primary mb-3'>
-                      Change Question
-                    </h4>
-                    <div className='max-h-64 space-y-4 overflow-y-auto pr-2'>
-                      {Object.entries(questionsByCategory).map(
-                        ([categoryName, questions]) => (
-                          <div key={categoryName}>
-                            <div className='aucctus-text-xs aucctus-text-tertiary mb-2 font-semibold uppercase tracking-wide'>
-                              {categoryName}
-                            </div>
-                            <div className='space-y-1'>
-                              {questions.map((q) => (
-                                <button
-                                  key={q.uuid}
-                                  className={cn(
-                                    'flex w-full items-start gap-2 rounded-lg p-2.5 text-left transition-colors',
-                                    localFilter.questionUuid === q.uuid
-                                      ? 'bg-blue-50 ring-1 ring-blue-200'
-                                      : 'aucctus-bg-primary-hover',
-                                  )}
-                                  onClick={() =>
-                                    setLocalFilter((prev) => ({
-                                      ...prev,
-                                      questionUuid: q.uuid,
-                                    }))
-                                  }
-                                >
-                                  <div className='flex-1'>
-                                    <p
-                                      className={cn(
-                                        'text-sm leading-snug',
-                                        localFilter.questionUuid === q.uuid
-                                          ? 'font-medium text-blue-900'
-                                          : 'aucctus-text-secondary',
-                                      )}
-                                    >
-                                      {q.text}
-                                    </p>
-                                  </div>
-                                  <div className='flex flex-shrink-0 items-center gap-2'>
-                                    {getImportanceBadge(q.importance)}
-                                    {localFilter.questionUuid === q.uuid && (
-                                      <Icon
-                                        variant='check'
-                                        className='h-4 w-4 stroke-blue-600'
-                                      />
-                                    )}
-                                  </div>
-                                </button>
-                              ))}
-                            </div>
+        <AnimatePresence>
+          {isOpen && (
+            <Popover.Content asChild align='start' sideOffset={4} forceMount>
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+                className='aucctus-bg-primary aucctus-border-secondary z-[9999] flex w-[480px] rounded-lg border shadow-lg'
+              >
+                {/* Left Panel - Question Selection */}
+                <div className='aucctus-border-secondary flex-1 border-r p-4'>
+                  <h4 className='aucctus-text-sm-semibold aucctus-text-primary mb-3'>
+                    Change Question
+                  </h4>
+                  <div className='max-h-64 space-y-4 overflow-y-auto pr-2'>
+                    {Object.entries(questionsByCategory).map(
+                      ([categoryName, questions]) => (
+                        <div key={categoryName}>
+                          <div className='aucctus-text-xs aucctus-text-tertiary mb-2 font-semibold uppercase tracking-wide'>
+                            {categoryName}
                           </div>
-                        ),
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Right Panel - Score Configuration */}
-                  <div className='w-48 p-4'>
-                    <h4 className='aucctus-text-sm-semibold aucctus-text-primary mb-3'>
-                      Score Range
-                    </h4>
-
-                    <div className='space-y-4'>
-                      {/* Quick Presets */}
-                      <div>
-                        <label className='aucctus-text-xs aucctus-text-tertiary mb-2 block font-medium'>
-                          Quick Select
-                        </label>
-                        <div className='grid grid-cols-2 gap-1.5'>
-                          <button
-                            onClick={() => applyPreset(4, undefined)}
-                            className={cn(
-                              'rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                              localFilter.minScore === 4 &&
-                                !localFilter.maxScore
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'aucctus-bg-secondary aucctus-text-secondary hover:aucctus-bg-tertiary',
-                            )}
-                          >
-                            4+ Only
-                          </button>
-                          <button
-                            onClick={() => applyPreset(5, 5)}
-                            className={cn(
-                              'rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                              localFilter.minScore === 5 &&
-                                localFilter.maxScore === 5
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'aucctus-bg-secondary aucctus-text-secondary hover:aucctus-bg-tertiary',
-                            )}
-                          >
-                            Perfect 5
-                          </button>
-                          <button
-                            onClick={() => applyPreset(undefined, 2)}
-                            className={cn(
-                              'rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                              !localFilter.minScore &&
-                                localFilter.maxScore === 2
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'aucctus-bg-secondary aucctus-text-secondary hover:aucctus-bg-tertiary',
-                            )}
-                          >
-                            Low (≤2)
-                          </button>
-                          <button
-                            onClick={() => applyPreset(3, 3)}
-                            className={cn(
-                              'rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                              localFilter.minScore === 3 &&
-                                localFilter.maxScore === 3
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'aucctus-bg-secondary aucctus-text-secondary hover:aucctus-bg-tertiary',
-                            )}
-                          >
-                            Neutral (3)
-                          </button>
+                          <div className='space-y-1'>
+                            {questions.map((q) => (
+                              <button
+                                key={q.uuid}
+                                className={cn(
+                                  'flex w-full items-start gap-2 rounded-lg p-2.5 text-left transition-colors',
+                                  localFilter.questionUuid === q.uuid
+                                    ? 'bg-blue-50 ring-1 ring-blue-200'
+                                    : 'aucctus-bg-primary-hover',
+                                )}
+                                onClick={() =>
+                                  setLocalFilter((prev) => ({
+                                    ...prev,
+                                    questionUuid: q.uuid,
+                                  }))
+                                }
+                              >
+                                <div className='flex-1'>
+                                  <p
+                                    className={cn(
+                                      'text-sm leading-snug',
+                                      localFilter.questionUuid === q.uuid
+                                        ? 'font-medium text-blue-900'
+                                        : 'aucctus-text-secondary',
+                                    )}
+                                  >
+                                    {q.text}
+                                  </p>
+                                </div>
+                                <div className='flex flex-shrink-0 items-center gap-2'>
+                                  {getImportanceBadge(q.importance)}
+                                  {localFilter.questionUuid === q.uuid && (
+                                    <Icon
+                                      variant='check'
+                                      className='h-4 w-4 stroke-blue-600'
+                                    />
+                                  )}
+                                </div>
+                              </button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-
-                      {/* Custom Range */}
-                      <div className='aucctus-border-secondary border-t pt-3'>
-                        <label className='aucctus-text-xs aucctus-text-tertiary mb-2 block font-medium'>
-                          Custom Range
-                        </label>
-                        <div className='flex items-center gap-2'>
-                          <input
-                            type='number'
-                            min={1}
-                            max={5}
-                            value={localFilter.minScore ?? ''}
-                            onChange={(e) =>
-                              setLocalFilter((prev) => ({
-                                ...prev,
-                                minScore: e.target.value
-                                  ? Number(e.target.value)
-                                  : undefined,
-                              }))
-                            }
-                            placeholder='Min'
-                            className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1.5 text-center text-sm'
-                          />
-                          <span className='aucctus-text-tertiary text-sm'>
-                            to
-                          </span>
-                          <input
-                            type='number'
-                            min={1}
-                            max={5}
-                            value={localFilter.maxScore ?? ''}
-                            onChange={(e) =>
-                              setLocalFilter((prev) => ({
-                                ...prev,
-                                maxScore: e.target.value
-                                  ? Number(e.target.value)
-                                  : undefined,
-                              }))
-                            }
-                            placeholder='Max'
-                            className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1.5 text-center text-sm'
-                          />
-                        </div>
-                      </div>
-
-                      {/* Apply Button */}
-                      <button
-                        onClick={() => {
-                          onChange(localFilter);
-                          onOpenChange(false);
-                        }}
-                        className='btn btn-primary btn-sm w-full'
-                      >
-                        Apply Changes
-                      </button>
-                    </div>
+                      ),
+                    )}
                   </div>
-                </animated.div>
-              </Popover.Content>
-            ),
-        )}
+                </div>
+
+                {/* Right Panel - Score Configuration */}
+                <div className='w-48 p-4'>
+                  <h4 className='aucctus-text-sm-semibold aucctus-text-primary mb-3'>
+                    Score Range
+                  </h4>
+
+                  <div className='space-y-4'>
+                    {/* Quick Presets */}
+                    <div>
+                      <label className='aucctus-text-xs aucctus-text-tertiary mb-2 block font-medium'>
+                        Quick Select
+                      </label>
+                      <div className='grid grid-cols-2 gap-1.5'>
+                        <button
+                          onClick={() => applyPreset(4, undefined)}
+                          className={cn(
+                            'rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
+                            localFilter.minScore === 4 && !localFilter.maxScore
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'aucctus-bg-secondary aucctus-text-secondary hover:aucctus-bg-tertiary',
+                          )}
+                        >
+                          4+ Only
+                        </button>
+                        <button
+                          onClick={() => applyPreset(5, 5)}
+                          className={cn(
+                            'rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
+                            localFilter.minScore === 5 &&
+                              localFilter.maxScore === 5
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'aucctus-bg-secondary aucctus-text-secondary hover:aucctus-bg-tertiary',
+                          )}
+                        >
+                          Perfect 5
+                        </button>
+                        <button
+                          onClick={() => applyPreset(undefined, 2)}
+                          className={cn(
+                            'rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
+                            !localFilter.minScore && localFilter.maxScore === 2
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'aucctus-bg-secondary aucctus-text-secondary hover:aucctus-bg-tertiary',
+                          )}
+                        >
+                          Low (≤2)
+                        </button>
+                        <button
+                          onClick={() => applyPreset(3, 3)}
+                          className={cn(
+                            'rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
+                            localFilter.minScore === 3 &&
+                              localFilter.maxScore === 3
+                              ? 'bg-blue-100 text-blue-800'
+                              : 'aucctus-bg-secondary aucctus-text-secondary hover:aucctus-bg-tertiary',
+                          )}
+                        >
+                          Neutral (3)
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Custom Range */}
+                    <div className='aucctus-border-secondary border-t pt-3'>
+                      <label className='aucctus-text-xs aucctus-text-tertiary mb-2 block font-medium'>
+                        Custom Range
+                      </label>
+                      <div className='flex items-center gap-2'>
+                        <input
+                          type='number'
+                          min={1}
+                          max={5}
+                          value={localFilter.minScore ?? ''}
+                          onChange={(e) =>
+                            setLocalFilter((prev) => ({
+                              ...prev,
+                              minScore: e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
+                            }))
+                          }
+                          placeholder='Min'
+                          className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1.5 text-center text-sm'
+                        />
+                        <span className='aucctus-text-tertiary text-sm'>
+                          to
+                        </span>
+                        <input
+                          type='number'
+                          min={1}
+                          max={5}
+                          value={localFilter.maxScore ?? ''}
+                          onChange={(e) =>
+                            setLocalFilter((prev) => ({
+                              ...prev,
+                              maxScore: e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
+                            }))
+                          }
+                          placeholder='Max'
+                          className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-primary w-full rounded border px-2 py-1.5 text-center text-sm'
+                        />
+                      </div>
+                    </div>
+
+                    {/* Apply Button */}
+                    <button
+                      onClick={() => {
+                        onChange(localFilter);
+                        onOpenChange(false);
+                      }}
+                      className='btn btn-primary btn-sm w-full'
+                    >
+                      Apply Changes
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </Popover.Content>
+          )}
+        </AnimatePresence>
       </Popover.Portal>
     </Popover.Root>
   );

@@ -10,7 +10,7 @@ import { createPortal } from 'react-dom';
 import api from '@libs/api';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
-import { useTransition, animated } from '@react-spring/web';
+import { AnimatePresence, motion } from 'framer-motion';
 
 interface IEditableStatusCellProps {
   value: ConceptStatus;
@@ -44,7 +44,7 @@ const CONCEPT_STATUSES: ConceptStatus[] = [
 /**
  * Inline dropdown menu for status cell
  * Uses portal rendering to avoid z-index issues within table cells
- * Features smooth mount/unmount animations with react-spring
+ * Features smooth mount/unmount animations with framer-motion
  */
 const InlineStatusDropdown: React.FC<InlineStatusDropdownProps> = ({
   selectedValue,
@@ -52,84 +52,77 @@ const InlineStatusDropdown: React.FC<InlineStatusDropdownProps> = ({
   onSelect,
   isOpen,
 }) => {
-  // Animation transition for mount/unmount
-  const transition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
-
   if (typeof document === 'undefined') return null;
 
   return createPortal(
-    <>
-      {transition((style, item) =>
-        item ? (
-          <animated.div
-            style={{
-              ...style,
-              position: 'fixed',
-              top: `${position.top}px`,
-              left: `${position.left}px`,
-              zIndex: 9999,
-            }}
-            className='aucctus-bg-primary aucctus-border-secondary w-fit min-w-[180px] rounded-md border shadow-lg'
-            data-aucctus-portal-target='true'
-          >
-            <ul className='no-scrollbar max-h-60 overflow-y-auto overscroll-contain py-1'>
-              {CONCEPT_STATUSES.map((status) => {
-                const styles = getConceptStatusStyles(status);
-                const displayName = getConceptStatusDisplayName(status);
-                const isSelected = status === selectedValue;
+    <AnimatePresence>
+      {isOpen && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95, y: -8 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -8 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+          style={{
+            position: 'fixed',
+            top: `${position.top}px`,
+            left: `${position.left}px`,
+            zIndex: 9999,
+          }}
+          className='aucctus-bg-primary aucctus-border-secondary w-fit min-w-[180px] rounded-md border shadow-lg'
+          data-aucctus-portal-target='true'
+        >
+          <ul className='no-scrollbar max-h-60 overflow-y-auto overscroll-contain py-1'>
+            {CONCEPT_STATUSES.map((status) => {
+              const styles = getConceptStatusStyles(status);
+              const displayName = getConceptStatusDisplayName(status);
+              const isSelected = status === selectedValue;
 
-                return (
-                  <li
-                    key={status}
-                    className={cn(
-                      'aucctus-text-sm cursor-pointer px-3 py-2 transition-all duration-200',
-                      {
-                        'aucctus-bg-primary-hover': !isSelected,
-                        'aucctus-bg-brand-secondary': isSelected,
-                      },
-                    )}
-                    onClick={() => onSelect(status)}
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        onSelect(status);
-                        e.preventDefault();
-                      }
-                    }}
-                    data-aucctus-portal-target='true'
-                  >
-                    <div className='flex items-center gap-2'>
-                      <div
+              return (
+                <li
+                  key={status}
+                  className={cn(
+                    'aucctus-text-sm cursor-pointer px-3 py-2 transition-all duration-200',
+                    {
+                      'aucctus-bg-primary-hover': !isSelected,
+                      'aucctus-bg-brand-secondary': isSelected,
+                    },
+                  )}
+                  onClick={() => onSelect(status)}
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      onSelect(status);
+                      e.preventDefault();
+                    }
+                  }}
+                  data-aucctus-portal-target='true'
+                >
+                  <div className='flex items-center gap-2'>
+                    <div
+                      className={cn(
+                        'flex items-center justify-center rounded-full px-2 py-1',
+                        'w-full',
+                        styles.bg,
+                        `border border-${styles.bg.match(/bg-([a-z]+)-\d+/)?.[1] || 'gray'}-100`,
+                      )}
+                    >
+                      <span
                         className={cn(
-                          'flex items-center justify-center rounded-full px-2 py-1',
-                          'w-full',
-                          styles.bg,
-                          `border border-${styles.bg.match(/bg-([a-z]+)-\d+/)?.[1] || 'gray'}-100`,
+                          'aucctus-text-sm font-medium capitalize',
+                          styles.text,
                         )}
                       >
-                        <span
-                          className={cn(
-                            'aucctus-text-sm font-medium capitalize',
-                            styles.text,
-                          )}
-                        >
-                          {displayName}
-                        </span>
-                      </div>
+                        {displayName}
+                      </span>
                     </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </animated.div>
-        ) : null,
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
+        </motion.div>
       )}
-    </>,
+    </AnimatePresence>,
     document.body,
   );
 };

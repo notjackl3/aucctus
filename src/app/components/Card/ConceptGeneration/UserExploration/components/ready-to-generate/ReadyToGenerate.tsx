@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { CompletionIcon } from '../question/CompletionIcon';
-import { animated } from '@react-spring/web';
+import { motion } from 'framer-motion';
 import { useReadyToGenerateAnimations } from './ready-to-generate-animation.hook';
 import images from '@assets/img';
 import AucctusImg from '@components/Image/AucctusImg';
@@ -110,21 +110,21 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
 
   return (
     <span className='z-[999] mt-4 flex flex-col gap-4'>
-      <animated.span
-        style={iconAnimation}
+      <motion.span
+        {...iconAnimation}
         className='flex flex-row items-center gap-2'
       >
         <ReadyToGenerateIcon />
-        <animated.span
+        <motion.span
           onMouseEnter={onMouseEnter}
-          style={labelAnimation}
+          {...labelAnimation}
           className='aucctus-text-primary cursor-pointer'
         >
           {headerMessage}
-        </animated.span>
+        </motion.span>
         <span className='flex flex-1'></span>
-        <animated.span
-          style={headerButtonAnimation}
+        <motion.span
+          {...headerButtonAnimation}
           className={cn('aucctus-text-primary mr-2', {
             'pointer-events-none': !compact,
           })}
@@ -132,9 +132,9 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
           <button className='btn btn-primary' onClick={handleButtonClick}>
             {buttonText}
           </button>
-        </animated.span>
-      </animated.span>
-      <animated.span style={cardAnimation} className='flex flex-row gap-2'>
+        </motion.span>
+      </motion.span>
+      <motion.span {...cardAnimation} className='flex flex-row gap-2'>
         <div className='aucctus-bg-primary aucctus-border-primary flex w-full flex-row gap-2 rounded-xl border-2 p-4'>
           <div
             className={cn('flex-grow-3 flex flex-col gap-2', {
@@ -167,7 +167,7 @@ const ReadyToGenerate: React.FC<ReadyToGenerateProps> = ({
             </div>
           )}
         </div>
-      </animated.span>
+      </motion.span>
     </span>
   );
 };

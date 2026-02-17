@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from 'react';
-import { animated } from 'react-spring';
 import type { InsightCard as InsightCardType } from '../types';
 import type { IAnchorQuestion } from '@libs/api/types';
 import { InsightCard } from '../Insights';
@@ -134,7 +133,7 @@ const FloatingInsights: React.FC<FloatingInsightsProps> = ({
                 : 'left 400ms ease-out, top 400ms ease-out',
             }}
           >
-            <animated.div
+            <div
               style={
                 {
                   opacity: 0,
@@ -162,7 +161,7 @@ const FloatingInsights: React.FC<FloatingInsightsProps> = ({
                 onDoubleClick={() => onInsightDoubleClick(card)}
                 onDelete={() => onUserAnswerDelete(currentQuestion.id, card)}
               />
-            </animated.div>
+            </div>
           </div>
         );
       })}

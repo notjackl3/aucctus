@@ -291,15 +291,21 @@ const areFilterOptionsSet = (filterOptions) => {
 
 ## Animation System
 
-All filter menus use `react-spring` for smooth mount/unmount animations:
+All filter menus use `framer-motion` for smooth mount/unmount animations:
 
 ```typescript
-const menuTransition = useTransition(isOpen, {
-  from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-  enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-  leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-  config: { tension: 300, friction: 25 },
-});
+<AnimatePresence>
+  {isOpen && (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95, y: -8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.95, y: -8 }}
+      transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+    >
+      {/* Menu content */}
+    </motion.div>
+  )}
+</AnimatePresence>
 ```
 
 ## Filter Operator Handling

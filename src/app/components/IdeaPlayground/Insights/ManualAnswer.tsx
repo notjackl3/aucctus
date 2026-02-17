@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { useState, memo, useCallback } from 'react';
-import { useSpring, animated } from 'react-spring';
+import { motion } from 'framer-motion';
 import { Icon } from '@components';
 import ManualAnswerEdit from './ManualAnswerEdit';
 
@@ -77,18 +77,6 @@ const ManualAnswer: React.FC<ManualAnswerProps> = ({
   // Local state for editing - sync with prop when switching to edit mode
   const [localAnswer, setLocalAnswer] = useState(answer || '');
 
-  // Animation for deletion - loading state (0.8 opacity) then fade out
-  const fadeOutAnimation = useSpring({
-    opacity: isDeleting ? 0 : isDeletingRequest ? 0.8 : 1,
-    transform: isDeleting ? 'scale(0.95)' : 'scale(1)',
-    config: { duration: 300 },
-    onRest: () => {
-      if (isDeleting) {
-        onAnimationComplete?.();
-      }
-    },
-  });
-
   // Sync local state when answer prop changes (e.g., after save)
   React.useEffect(() => {
     if (!isEditing) {
@@ -152,8 +140,17 @@ const ManualAnswer: React.FC<ManualAnswerProps> = ({
   );
 
   return (
-    <animated.div
-      style={fadeOutAnimation}
+    <motion.div
+      animate={{
+        opacity: isDeleting ? 0 : isDeletingRequest ? 0.8 : 1,
+        scale: isDeleting ? 0.95 : 1,
+      }}
+      transition={{ duration: 0.3 }}
+      onAnimationComplete={() => {
+        if (isDeleting) {
+          onAnimationComplete?.();
+        }
+      }}
       className='aucctus-text-white relative min-w-[275px] max-w-[275px] select-none rounded-xl border border-white/30 bg-white/10 p-3 shadow-lg backdrop-blur-md transition-all duration-200 hover:bg-white/15'
     >
       {onDelete && !isSubmitting && !isDeletingRequest && !isDeleting && (
@@ -194,7 +191,7 @@ const ManualAnswer: React.FC<ManualAnswerProps> = ({
       ) : (
         <ManualAnswerView answer={answer || ''} onEdit={handleEdit} />
       )}
-    </animated.div>
+    </motion.div>
   );
 };
 

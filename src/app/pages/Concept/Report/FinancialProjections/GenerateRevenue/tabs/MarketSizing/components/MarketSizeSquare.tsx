@@ -2,8 +2,7 @@ import React from 'react';
 import { Icon } from '@components';
 import { formatCurrency } from '../assumptionsUtils';
 import { ComponentTooltip } from '@components';
-import { animated } from 'react-spring';
-import { useExpandCollapseTransition } from '@hooks/animation/animation.hook';
+import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import { cn } from '@libs/utils/react';
 import {
   marketSizeSquareConfig,
@@ -36,11 +35,7 @@ const MarketSizeSquare: React.FC<MarketSizeSquareProps> = ({
     handleFilterToggle(type);
   };
 
-  const filterTransition = useExpandCollapseTransition({
-    isExpanded: activeFilter === type || activeFilter === null,
-    duration: 200,
-    withOpacity: true,
-  });
+  const isFilterExpanded = activeFilter === type || activeFilter === null;
 
   const renderSquareContent = () => (
     <div className={`absolute left-4 top-4 ${config.textColor}`}>
@@ -71,19 +66,16 @@ const MarketSizeSquare: React.FC<MarketSizeSquareProps> = ({
           {parentType}
         </div>
       )}
-      {filterTransition((style, show) =>
-        show ? (
-          <animated.div
-            style={style}
-            className={cn(
-              `aucctus-text-xs mt-2 w-fit rounded-full px-2 py-0.5`,
-              config.filterBgClass,
-            )}
-          >
-            {activeFilter === type ? 'Click to show all' : 'Filter'}
-          </animated.div>
-        ) : null,
-      )}
+      <ExpandCollapse isExpanded={isFilterExpanded} duration={0.2} withOpacity>
+        <div
+          className={cn(
+            `aucctus-text-xs mt-2 w-fit rounded-full px-2 py-0.5`,
+            config.filterBgClass,
+          )}
+        >
+          {activeFilter === type ? 'Click to show all' : 'Filter'}
+        </div>
+      </ExpandCollapse>
     </div>
   );
 

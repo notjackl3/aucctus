@@ -1,46 +1,46 @@
-import { useSpring } from '@react-spring/web';
-
 export const useContinueRefiningAnimations = () => {
-  const iconAnimation = useSpring({
-    from: { opacity: 0, maxHeight: '0px', transform: 'translateY(20px)' },
-    to: { opacity: 1, maxHeight: '200px', transform: 'translateY(0px)' },
-    config: {
-      tension: 100,
-      friction: 12,
+  const iconAnimation = {
+    initial: { opacity: 0, maxHeight: '0px', transform: 'translateY(20px)' },
+    animate: { opacity: 1, maxHeight: '200px', transform: 'translateY(0px)' },
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 12,
       mass: 0.5,
     },
-  });
+  };
 
-  const labelAnimation = useSpring({
-    from: { opacity: 0, transform: 'translateY(20px) rotate(-3deg)' },
-    to: { opacity: 1, transform: 'translateY(0px) rotate(0deg)' },
-    config: {
-      offset: 100,
-      tension: 100,
-      friction: 12,
+  const labelAnimation = {
+    initial: { opacity: 0, transform: 'translateY(20px) rotate(-3deg)' },
+    animate: { opacity: 1, transform: 'translateY(0px) rotate(0deg)' },
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 12,
       mass: 0.5,
     },
-  });
+  };
 
-  const cardAnimation = useSpring({
-    from: {
+  const cardAnimation = {
+    initial: {
       opacity: 0,
       maxHeight: '0px',
       transform: 'scale(0.5)',
       transformOrigin: 'top',
     },
-    to: {
+    animate: {
       opacity: 1,
       maxHeight: '2000px',
       transform: 'scale(1)',
       transformOrigin: 'top',
     },
-    config: {
-      tension: 100,
-      friction: 12,
+    transition: {
+      type: 'spring' as const,
+      stiffness: 100,
+      damping: 12,
       mass: 0.5,
     },
-  });
+  };
 
   return {
     iconAnimation,

@@ -2,7 +2,6 @@ import images from '@assets/img';
 import { useConceptGeneration, useSeed } from '@hooks/query/concepts.hook';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { IGeneratedConcept } from '@libs/api/types';
-import { animated, useTransition } from '@react-spring/web';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useCallback, useEffect, useRef, useMemo } from 'react';
@@ -13,6 +12,7 @@ import {
 } from '../UserExploration/components/util/animation-keyframes';
 import FloatingAiIcon from './FloatingAiIcon';
 import { AgentProgressBar } from '@components/Progress';
+import { motion } from 'framer-motion';
 
 const getFadeInStyle = (duration: number, delay: number = 0) =>
   getAnimationStyle('fadeIn', duration, delay);
@@ -89,42 +89,6 @@ const ConceptGeneration = React.forwardRef<
   const conceptAnimated = useCallback((concept: IGeneratedConcept) => {
     return !!concept.title && animatedTitles.current.has(concept.title);
   }, []);
-
-  const transitions = useTransition(concepts, {
-    from: (concept, index) => {
-      const isAnimated = conceptAnimated(concept);
-      const isFaded = concepts.length > -1 && index < concepts.length - 2;
-
-      return {
-        opacity: isFaded ? 0.15 : isAnimated ? 1 : 0,
-        transform: isAnimated
-          ? `translateY(${index * 20}px) scale(${0.9 + index * 0.05})`
-          : 'translateY(0px) scale(1)',
-        maxHeight: isAnimated ? '200px' : '0px',
-        padding: isAnimated ? '20px' : '0px',
-      };
-    },
-    enter: (concept, index) => async (next) => {
-      const animatedIndex = concepts.findIndex(
-        (c) => c.title === concept.title,
-      );
-
-      await next({
-        opacity: animatedIndex === concepts.length - 1 ? 1 : 0.15,
-        transform: `translateY(${index * 20}px) scale(${0.9 + index * 0.05})`,
-        maxHeight: '200px',
-        padding: '20px',
-      });
-      if (concept.title) {
-        animatedTitles.current.add(concept.title);
-      }
-    },
-    config: {
-      duration: 300,
-      tension: 280,
-      friction: 20,
-    },
-  });
 
   const handleGenerateComplete = useCallback(() => {
     const content = contentRef.current;
@@ -220,19 +184,45 @@ const ConceptGeneration = React.forwardRef<
   );
 
   const renderConcepts = () =>
-    transitions((style, concept) => (
-      <animated.div
-        style={{ ...style, transformOrigin: 'top' }}
-        className='aucctus-border-primary aucctus-bg-primary absolute flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-opacity-25 bg-opacity-[0.3] p-4'
-      >
-        <span className='aucctus-text-white aucctus-text-sm'>
-          {concept.title}
-        </span>
-        <span className='aucctus-text-white aucctus-text-xs line-clamp-3 min-h-[4em]'>
-          {concept.summary}
-        </span>
-      </animated.div>
-    ));
+    concepts.map((concept, index) => {
+      const isAnimated = conceptAnimated(concept);
+      const isFaded = concepts.length > -1 && index < concepts.length - 2;
+
+      // Mark title as animated after first render
+      if (concept.title) {
+        animatedTitles.current.add(concept.title);
+      }
+
+      return (
+        <motion.div
+          key={concept.title || index}
+          initial={{
+            opacity: isFaded ? 0.15 : isAnimated ? 1 : 0,
+            transform: isAnimated
+              ? `translateY(${index * 20}px) scale(${0.9 + index * 0.05})`
+              : 'translateY(0px) scale(1)',
+            maxHeight: isAnimated ? '200px' : '0px',
+            padding: isAnimated ? '20px' : '0px',
+          }}
+          animate={{
+            opacity: index === concepts.length - 1 ? 1 : 0.15,
+            transform: `translateY(${index * 20}px) scale(${0.9 + index * 0.05})`,
+            maxHeight: '200px',
+            padding: '20px',
+          }}
+          transition={{ duration: 0.3 }}
+          style={{ transformOrigin: 'top' }}
+          className='aucctus-border-primary aucctus-bg-primary absolute flex w-full flex-col gap-2 overflow-hidden rounded-lg border border-opacity-25 bg-opacity-[0.3] p-4'
+        >
+          <span className='aucctus-text-white aucctus-text-sm'>
+            {concept.title}
+          </span>
+          <span className='aucctus-text-white aucctus-text-xs line-clamp-3 min-h-[4em]'>
+            {concept.summary}
+          </span>
+        </motion.div>
+      );
+    });
 
   return (
     <>

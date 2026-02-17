@@ -11,7 +11,7 @@ import { camelCaseToTitleCase } from '@libs/utils/string';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
 import React, { ReactNode, useState } from 'react';
 import * as Popover from '@radix-ui/react-popover';
-import { animated, useTransition } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   StatusFilterContent,
   UserFilterContent,
@@ -23,6 +23,13 @@ interface ICompactFilterRibbonProps {
   propertyDefinitions?: IPropertyDefinition[];
   onUpdateFilters: (updates: Partial<IConceptFilterOptions>) => void;
 }
+
+const dropdownMotionProps = {
+  initial: { opacity: 0, scale: 0.95, y: -8 },
+  animate: { opacity: 1, scale: 1, y: 0 },
+  exit: { opacity: 0, scale: 0.95, y: -8 },
+  transition: { type: 'spring' as const, stiffness: 300, damping: 25 },
+};
 
 /**
  * Compact filter ribbon that shows sorts first, then a divider, then filters
@@ -36,14 +43,6 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const [hoveredSubmenu, setHoveredSubmenu] = useState<string | null>(null);
   const submenuCloseTimeoutRef = React.useRef<NodeJS.Timeout | null>(null);
-
-  // Dropdown animation
-  const dropdownTransition = useTransition(openDropdown !== null, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
 
   // Helper to set submenu with immediate effect
   const setSubmenuImmediate = (submenu: string | null) => {
@@ -172,71 +171,69 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
           </Popover.Trigger>
 
           <Popover.Portal>
-            {dropdownTransition(
-              (styles, item) =>
-                item &&
-                openDropdown === dropdownKey && (
-                  <Popover.Content asChild align='end' sideOffset={4}>
-                    <animated.div
-                      style={styles}
-                      className='aucctus-bg-primary aucctus-border-secondary z-[9999] w-[200px] rounded-md border p-1 shadow-lg'
+            <Popover.Content align='end' sideOffset={4} forceMount>
+              <AnimatePresence>
+                {openDropdown === dropdownKey && (
+                  <motion.div
+                    {...dropdownMotionProps}
+                    className='aucctus-bg-primary aucctus-border-secondary z-[9999] w-[200px] rounded-md border p-1 shadow-lg'
+                  >
+                    {/* Toggle Sort Direction */}
+                    <button
+                      onClick={() => {
+                        const newDirection = isDescending ? '' : '-';
+                        const newField = isProperty
+                          ? `${newDirection}property:${field}`
+                          : `${newDirection}${field}`;
+                        const newSorts = [...sortFields];
+                        newSorts[index] = newField;
+                        onUpdateFilters({ sort: newSorts.join(',') } as any);
+                        setOpenDropdown(null);
+                      }}
+                      className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
                     >
-                      {/* Toggle Sort Direction */}
-                      <button
-                        onClick={() => {
-                          const newDirection = isDescending ? '' : '-';
-                          const newField = isProperty
-                            ? `${newDirection}property:${field}`
-                            : `${newDirection}${field}`;
-                          const newSorts = [...sortFields];
-                          newSorts[index] = newField;
-                          onUpdateFilters({ sort: newSorts.join(',') } as any);
-                          setOpenDropdown(null);
-                        }}
-                        className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                      >
-                        <Icon
-                          variant={isDescending ? 'arrowup' : 'arrowdown'}
-                          className='aucctus-stroke-secondary h-4 w-4'
-                        />
-                        <span className='aucctus-text-secondary'>
-                          Sort {isDescending ? 'ascending' : 'descending'}
-                        </span>
-                      </button>
+                      <Icon
+                        variant={isDescending ? 'arrowup' : 'arrowdown'}
+                        className='aucctus-stroke-secondary h-4 w-4'
+                      />
+                      <span className='aucctus-text-secondary'>
+                        Sort {isDescending ? 'ascending' : 'descending'}
+                      </span>
+                    </button>
 
-                      <div className='aucctus-bg-secondary my-1 h-px' />
+                    <div className='aucctus-bg-secondary my-1 h-px' />
 
-                      {/* Remove Sort */}
-                      <button
-                        onClick={() => {
-                          const remainingSorts = sortFields.filter(
-                            (_, i) => i !== index,
-                          );
-                          if (remainingSorts.length === 0) {
-                            onUpdateFilters({
-                              sort: undefined,
-                              sortConfigs: [],
-                            } as any);
-                          } else {
-                            const newSortString = remainingSorts.join(',');
-                            onUpdateFilters({ sort: newSortString } as any);
-                          }
-                          setOpenDropdown(null);
-                        }}
-                        className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                      >
-                        <Icon
-                          variant='trash'
-                          className='aucctus-stroke-error-primary h-4 w-4'
-                        />
-                        <span className='aucctus-text-error-primary'>
-                          Remove sort
-                        </span>
-                      </button>
-                    </animated.div>
-                  </Popover.Content>
-                ),
-            )}
+                    {/* Remove Sort */}
+                    <button
+                      onClick={() => {
+                        const remainingSorts = sortFields.filter(
+                          (_, i) => i !== index,
+                        );
+                        if (remainingSorts.length === 0) {
+                          onUpdateFilters({
+                            sort: undefined,
+                            sortConfigs: [],
+                          } as any);
+                        } else {
+                          const newSortString = remainingSorts.join(',');
+                          onUpdateFilters({ sort: newSortString } as any);
+                        }
+                        setOpenDropdown(null);
+                      }}
+                      className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                    >
+                      <Icon
+                        variant='trash'
+                        className='aucctus-stroke-error-primary h-4 w-4'
+                      />
+                      <span className='aucctus-text-error-primary'>
+                        Remove sort
+                      </span>
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </Popover.Content>
           </Popover.Portal>
         </Popover.Root>,
       );
@@ -485,13 +482,6 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
 
   const submenuKey = 'status-filter-submenu';
 
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
-
   React.useEffect(() => {
     if (isOpen) {
       setLocalSelection(filterOptions.status);
@@ -550,96 +540,94 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition(
-          (styles, item) =>
-            item &&
-            isOpen && (
-              <Popover.Content
-                asChild
-                align='end'
-                sideOffset={4}
-                onInteractOutside={(e) => {
-                  e.preventDefault();
-                  handleClose();
-                }}
-                onEscapeKeyDown={(e) => {
-                  e.preventDefault();
-                  handleClose();
-                }}
+        <Popover.Content
+          align='end'
+          sideOffset={4}
+          forceMount
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            handleClose();
+          }}
+          onEscapeKeyDown={(e) => {
+            e.preventDefault();
+            handleClose();
+          }}
+        >
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                {...dropdownMotionProps}
+                className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[200px] rounded-md border p-1 shadow-lg'
               >
-                <animated.div
-                  style={styles}
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[200px] rounded-md border p-1 shadow-lg'
-                >
-                  {/* Filter button with hover submenu */}
-                  <div className='relative'>
-                    <button
-                      ref={filterButtonRef}
-                      className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                      onMouseEnter={() => setSubmenuImmediate(submenuKey)}
-                      onMouseLeave={() => setSubmenuDelayed(null)}
-                    >
-                      <Icon
-                        variant='filter-lines'
-                        className='aucctus-stroke-secondary h-4 w-4'
-                      />
-                      <span className='aucctus-text-secondary'>Filter</span>
-                      <Icon
-                        variant='chevron-right'
-                        className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                      />
-                    </button>
-
-                    {/* Filter Submenu Flyout */}
-                    {hoveredSubmenu === submenuKey && (
-                      <div
-                        onMouseEnter={() => setSubmenuImmediate(submenuKey)}
-                        onMouseLeave={() => setSubmenuDelayed(null)}
-                        className='absolute left-full top-1/2 z-[10000] -ml-2 -translate-y-1/2'
-                      >
-                        {/* Invisible bridge */}
-                        <div className='absolute bottom-0 right-full top-0 w-3' />
-                        <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[240px] rounded-lg border p-3 shadow-lg'>
-                          <div className='mb-3 flex items-center gap-2'>
-                            <Icon
-                              variant='filter-lines'
-                              className='aucctus-stroke-secondary h-4 w-4'
-                            />
-                            <span className='aucctus-text-secondary text-sm font-medium'>
-                              Filter by Status
-                            </span>
-                          </div>
-
-                          <StatusFilterContent
-                            localSelection={localSelection}
-                            onToggle={handleToggle}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className='aucctus-bg-secondary my-1 h-px' />
-
+                {/* Filter button with hover submenu */}
+                <div className='relative'>
                   <button
-                    onClick={() => {
-                      onUpdateFilters({ status: new Set() });
-                      onOpenChange(false);
-                    }}
+                    ref={filterButtonRef}
                     className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                    onMouseEnter={() => setSubmenuImmediate(submenuKey)}
+                    onMouseLeave={() => setSubmenuDelayed(null)}
                   >
                     <Icon
-                      variant='trash'
-                      className='aucctus-stroke-error-primary h-4 w-4'
+                      variant='filter-lines'
+                      className='aucctus-stroke-secondary h-4 w-4'
                     />
-                    <span className='aucctus-text-error-primary'>
-                      Remove filter
-                    </span>
+                    <span className='aucctus-text-secondary'>Filter</span>
+                    <Icon
+                      variant='chevron-right'
+                      className='aucctus-stroke-tertiary ml-auto h-4 w-4'
+                    />
                   </button>
-                </animated.div>
-              </Popover.Content>
-            ),
-        )}
+
+                  {/* Filter Submenu Flyout */}
+                  {hoveredSubmenu === submenuKey && (
+                    <div
+                      onMouseEnter={() => setSubmenuImmediate(submenuKey)}
+                      onMouseLeave={() => setSubmenuDelayed(null)}
+                      className='absolute left-full top-1/2 z-[10000] -ml-2 -translate-y-1/2'
+                    >
+                      {/* Invisible bridge */}
+                      <div className='absolute bottom-0 right-full top-0 w-3' />
+                      <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[240px] rounded-lg border p-3 shadow-lg'>
+                        <div className='mb-3 flex items-center gap-2'>
+                          <Icon
+                            variant='filter-lines'
+                            className='aucctus-stroke-secondary h-4 w-4'
+                          />
+                          <span className='aucctus-text-secondary text-sm font-medium'>
+                            Filter by Status
+                          </span>
+                        </div>
+
+                        <StatusFilterContent
+                          localSelection={localSelection}
+                          onToggle={handleToggle}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className='aucctus-bg-secondary my-1 h-px' />
+
+                <button
+                  onClick={() => {
+                    onUpdateFilters({ status: new Set() });
+                    onOpenChange(false);
+                  }}
+                  className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                >
+                  <Icon
+                    variant='trash'
+                    className='aucctus-stroke-error-primary h-4 w-4'
+                  />
+                  <span className='aucctus-text-error-primary'>
+                    Remove filter
+                  </span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
   );
@@ -681,13 +669,6 @@ const UserFilterDropdown: React.FC<IUserFilterDropdownProps> = ({
     },
   );
   const filterButtonRef = React.useRef<HTMLButtonElement>(null);
-
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
 
   React.useEffect(() => {
     if (isOpen) {
@@ -768,101 +749,99 @@ const UserFilterDropdown: React.FC<IUserFilterDropdownProps> = ({
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition(
-          (styles, item) =>
-            item &&
-            isOpen && (
-              <Popover.Content
-                asChild
-                align='end'
-                sideOffset={4}
-                onInteractOutside={(e) => {
-                  e.preventDefault();
-                  handleClose();
-                }}
-                onEscapeKeyDown={(e) => {
-                  e.preventDefault();
-                  handleClose();
-                }}
+        <Popover.Content
+          align='end'
+          sideOffset={4}
+          forceMount
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            handleClose();
+          }}
+          onEscapeKeyDown={(e) => {
+            e.preventDefault();
+            handleClose();
+          }}
+        >
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                {...dropdownMotionProps}
+                className='aucctus-bg-primary aucctus-border-secondary z-[9999] w-[200px] rounded-md border p-1 shadow-lg'
               >
-                <animated.div
-                  style={styles}
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] w-[200px] rounded-md border p-1 shadow-lg'
-                >
-                  {/* Filter button with hover submenu */}
-                  <div className='relative'>
-                    <button
-                      ref={filterButtonRef}
-                      className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                      onMouseEnter={() => setSubmenuImmediate(submenuKey)}
-                      onMouseLeave={() => setSubmenuDelayed(null)}
-                    >
-                      <Icon
-                        variant='filter-lines'
-                        className='aucctus-stroke-secondary h-4 w-4'
-                      />
-                      <span className='aucctus-text-secondary'>Filter</span>
-                      <Icon
-                        variant='chevron-right'
-                        className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                      />
-                    </button>
-
-                    {/* Filter Submenu Flyout */}
-                    {hoveredSubmenu === submenuKey && (
-                      <div
-                        onMouseEnter={() => setSubmenuImmediate(submenuKey)}
-                        onMouseLeave={() => setSubmenuDelayed(null)}
-                        className='absolute left-full top-1/2 z-[10000] -ml-2 -translate-y-1/2'
-                      >
-                        {/* Invisible bridge */}
-                        <div className='absolute bottom-0 right-full top-0 w-3' />
-                        <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[280px] rounded-lg border p-3 shadow-lg'>
-                          <div className='mb-3 flex items-center gap-2'>
-                            <Icon
-                              variant='filter-lines'
-                              className='aucctus-stroke-secondary h-4 w-4'
-                            />
-                            <span className='aucctus-text-secondary text-sm font-medium'>
-                              Filter by {label}
-                            </span>
-                          </div>
-
-                          <UserFilterContent
-                            localSelection={localSelection}
-                            onToggle={handleUserToggle}
-                            filterType={filterType}
-                          />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className='aucctus-bg-secondary my-1 h-px' />
-
+                {/* Filter button with hover submenu */}
+                <div className='relative'>
                   <button
-                    onClick={() => {
-                      onUpdateFilters(
-                        filterType === 'createdBy'
-                          ? { createdBy: undefined }
-                          : { lastModifiedBy: undefined },
-                      );
-                      onOpenChange(false);
-                    }}
+                    ref={filterButtonRef}
                     className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                    onMouseEnter={() => setSubmenuImmediate(submenuKey)}
+                    onMouseLeave={() => setSubmenuDelayed(null)}
                   >
                     <Icon
-                      variant='trash'
-                      className='aucctus-stroke-error-primary h-4 w-4'
+                      variant='filter-lines'
+                      className='aucctus-stroke-secondary h-4 w-4'
                     />
-                    <span className='aucctus-text-error-primary'>
-                      Remove filter
-                    </span>
+                    <span className='aucctus-text-secondary'>Filter</span>
+                    <Icon
+                      variant='chevron-right'
+                      className='aucctus-stroke-tertiary ml-auto h-4 w-4'
+                    />
                   </button>
-                </animated.div>
-              </Popover.Content>
-            ),
-        )}
+
+                  {/* Filter Submenu Flyout */}
+                  {hoveredSubmenu === submenuKey && (
+                    <div
+                      onMouseEnter={() => setSubmenuImmediate(submenuKey)}
+                      onMouseLeave={() => setSubmenuDelayed(null)}
+                      className='absolute left-full top-1/2 z-[10000] -ml-2 -translate-y-1/2'
+                    >
+                      {/* Invisible bridge */}
+                      <div className='absolute bottom-0 right-full top-0 w-3' />
+                      <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[280px] rounded-lg border p-3 shadow-lg'>
+                        <div className='mb-3 flex items-center gap-2'>
+                          <Icon
+                            variant='filter-lines'
+                            className='aucctus-stroke-secondary h-4 w-4'
+                          />
+                          <span className='aucctus-text-secondary text-sm font-medium'>
+                            Filter by {label}
+                          </span>
+                        </div>
+
+                        <UserFilterContent
+                          localSelection={localSelection}
+                          onToggle={handleUserToggle}
+                          filterType={filterType}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className='aucctus-bg-secondary my-1 h-px' />
+
+                <button
+                  onClick={() => {
+                    onUpdateFilters(
+                      filterType === 'createdBy'
+                        ? { createdBy: undefined }
+                        : { lastModifiedBy: undefined },
+                    );
+                    onOpenChange(false);
+                  }}
+                  className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                >
+                  <Icon
+                    variant='trash'
+                    className='aucctus-stroke-error-primary h-4 w-4'
+                  />
+                  <span className='aucctus-text-error-primary'>
+                    Remove filter
+                  </span>
+                </button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
   );
@@ -909,13 +888,6 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
 
   // Ref to capture immediate filter value for synchronous access (checkbox case)
   const pendingFilterValueRef = React.useRef<any>(null);
-
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
 
   React.useEffect(() => {
     if (isOpen) {
@@ -995,106 +967,104 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition(
-          (styles, item) =>
-            item &&
-            isOpen && (
-              <Popover.Content
-                asChild
-                align='end'
-                sideOffset={4}
-                onInteractOutside={(e) => {
-                  e.preventDefault();
-                  onOpenChange(false);
-                }}
-                onEscapeKeyDown={(e) => {
-                  e.preventDefault();
-                  onOpenChange(false);
-                }}
+        <Popover.Content
+          align='end'
+          sideOffset={4}
+          forceMount
+          onInteractOutside={(e) => {
+            e.preventDefault();
+            onOpenChange(false);
+          }}
+          onEscapeKeyDown={(e) => {
+            e.preventDefault();
+            onOpenChange(false);
+          }}
+        >
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                {...dropdownMotionProps}
+                className='aucctus-bg-primary aucctus-border-secondary z-[9999] rounded-md border shadow-lg'
               >
-                <animated.div
-                  style={styles}
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] rounded-md border shadow-lg'
-                >
-                  {propDef && (
-                    <div className='p-1'>
-                      {/* Filter button with hover submenu */}
-                      <div className='relative'>
-                        <button
-                          ref={filterButtonRef}
-                          className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                          onMouseEnter={() => setSubmenuImmediate(submenuKey)}
-                          onMouseLeave={() => setSubmenuDelayed(null)}
-                        >
-                          <Icon
-                            variant='filter-lines'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
-                          <span className='aucctus-text-secondary'>Filter</span>
-                          <Icon
-                            variant='chevron-right'
-                            className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                          />
-                        </button>
-
-                        {/* Filter Submenu Flyout */}
-                        {hoveredSubmenu === submenuKey && (
-                          <div
-                            onMouseEnter={() => setSubmenuImmediate(submenuKey)}
-                            onMouseLeave={() => setSubmenuDelayed(null)}
-                            className='absolute left-full top-1/2 z-[10000] -ml-2 -translate-y-1/2'
-                          >
-                            {/* Invisible bridge */}
-                            <div className='absolute bottom-0 right-full top-0 w-3' />
-                            <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[280px] rounded-lg border p-3 shadow-lg'>
-                              <div className='mb-3 flex items-center gap-2'>
-                                <Icon
-                                  variant='filter-lines'
-                                  className='aucctus-stroke-secondary h-4 w-4'
-                                />
-                                <span className='aucctus-text-secondary text-sm font-medium'>
-                                  Filter by {name}
-                                </span>
-                              </div>
-
-                              <PropertyFilterContent
-                                propDef={propDef}
-                                filterValue={filterValue}
-                                filterOperator={filterOperator}
-                                onFilterValueChange={(value) => {
-                                  // Store in ref for synchronous access (checkbox case)
-                                  pendingFilterValueRef.current = value;
-                                  setFilterValue(value);
-                                }}
-                                onFilterOperatorChange={setFilterOperator}
-                                onApply={handleApplyFilter}
-                                onCancel={() => setSubmenuImmediate(null)}
-                              />
-                            </div>
-                          </div>
-                        )}
-                      </div>
-
-                      <div className='aucctus-bg-secondary my-1 h-px' />
-
+                {propDef && (
+                  <div className='p-1'>
+                    {/* Filter button with hover submenu */}
+                    <div className='relative'>
                       <button
-                        onClick={handleRemoveFilter}
+                        ref={filterButtonRef}
                         className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                        onMouseEnter={() => setSubmenuImmediate(submenuKey)}
+                        onMouseLeave={() => setSubmenuDelayed(null)}
                       >
                         <Icon
-                          variant='trash'
-                          className='aucctus-stroke-error-primary h-4 w-4'
+                          variant='filter-lines'
+                          className='aucctus-stroke-secondary h-4 w-4'
                         />
-                        <span className='aucctus-text-error-primary'>
-                          Remove filter
-                        </span>
+                        <span className='aucctus-text-secondary'>Filter</span>
+                        <Icon
+                          variant='chevron-right'
+                          className='aucctus-stroke-tertiary ml-auto h-4 w-4'
+                        />
                       </button>
+
+                      {/* Filter Submenu Flyout */}
+                      {hoveredSubmenu === submenuKey && (
+                        <div
+                          onMouseEnter={() => setSubmenuImmediate(submenuKey)}
+                          onMouseLeave={() => setSubmenuDelayed(null)}
+                          className='absolute left-full top-1/2 z-[10000] -ml-2 -translate-y-1/2'
+                        >
+                          {/* Invisible bridge */}
+                          <div className='absolute bottom-0 right-full top-0 w-3' />
+                          <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[280px] rounded-lg border p-3 shadow-lg'>
+                            <div className='mb-3 flex items-center gap-2'>
+                              <Icon
+                                variant='filter-lines'
+                                className='aucctus-stroke-secondary h-4 w-4'
+                              />
+                              <span className='aucctus-text-secondary text-sm font-medium'>
+                                Filter by {name}
+                              </span>
+                            </div>
+
+                            <PropertyFilterContent
+                              propDef={propDef}
+                              filterValue={filterValue}
+                              filterOperator={filterOperator}
+                              onFilterValueChange={(value) => {
+                                // Store in ref for synchronous access (checkbox case)
+                                pendingFilterValueRef.current = value;
+                                setFilterValue(value);
+                              }}
+                              onFilterOperatorChange={setFilterOperator}
+                              onApply={handleApplyFilter}
+                              onCancel={() => setSubmenuImmediate(null)}
+                            />
+                          </div>
+                        </div>
+                      )}
                     </div>
-                  )}
-                </animated.div>
-              </Popover.Content>
-            ),
-        )}
+
+                    <div className='aucctus-bg-secondary my-1 h-px' />
+
+                    <button
+                      onClick={handleRemoveFilter}
+                      className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                    >
+                      <Icon
+                        variant='trash'
+                        className='aucctus-stroke-error-primary h-4 w-4'
+                      />
+                      <span className='aucctus-text-error-primary'>
+                        Remove filter
+                      </span>
+                    </button>
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Popover.Content>
       </Popover.Portal>
     </Popover.Root>
   );

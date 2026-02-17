@@ -1,6 +1,6 @@
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
-import { animated, useTransition } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import AnswerInput from './answer/AnswerInput';
 import ConfirmAnswerUpdate from './answer/ConfirmAnswerUpdate';
 import QuestionDisplay from './question/QuestionDisplay';
@@ -49,16 +49,8 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
     return generatedConcepts[draftSeedUuid] || [];
   }, [generatedConcepts, draftSeedUuid]);
 
-  // Add transition for answer input
-  const answerInputTransition = useTransition(
-    currentQuestionOrder !== Infinity || activeClarifyingQuestion,
-    {
-      from: { opacity: 0, transform: 'translateY(100px)' },
-      enter: { opacity: 1, transform: 'translateY(0px)' },
-      leave: { opacity: 0, transform: 'translateY(100px)' },
-      config: { tension: 200, friction: 20, mass: 0.5 },
-    },
-  );
+  const showAnswerInput =
+    currentQuestionOrder !== Infinity || !!activeClarifyingQuestion;
 
   return (
     <>
@@ -77,20 +69,29 @@ const UserInteraction: React.FC<UserInteractionProps> = () => {
             <PostGenerateQuestionDisplay />
           )}
         </div>
-        {answerInputTransition(
-          (style, item) =>
-            item && (
-              <animated.div style={style}>
-                <AnswerInput
-                  value={answerValue}
-                  onChange={onInputChange}
-                  onAddAnswer={handleAddAnswer}
-                  allowAddAnswer={allowAddAnswer}
-                  onGenerateAiSuggestions={dispatchAiSuggestionsEvent}
-                />
-              </animated.div>
-            ),
-        )}
+        <AnimatePresence>
+          {showAnswerInput && (
+            <motion.div
+              initial={{ opacity: 0, transform: 'translateY(100px)' }}
+              animate={{ opacity: 1, transform: 'translateY(0px)' }}
+              exit={{ opacity: 0, transform: 'translateY(100px)' }}
+              transition={{
+                type: 'spring',
+                stiffness: 200,
+                damping: 20,
+                mass: 0.5,
+              }}
+            >
+              <AnswerInput
+                value={answerValue}
+                onChange={onInputChange}
+                onAddAnswer={handleAddAnswer}
+                allowAddAnswer={allowAddAnswer}
+                onGenerateAiSuggestions={dispatchAiSuggestionsEvent}
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       <LoadingMask isLoading={isLoading} message={loadingMessage} />
       <ConfirmAnswerUpdate

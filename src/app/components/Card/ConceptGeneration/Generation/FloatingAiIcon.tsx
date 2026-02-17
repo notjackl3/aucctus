@@ -1,5 +1,5 @@
 import React from 'react';
-import { animated } from '@react-spring/web';
+import { motion } from 'framer-motion';
 import { Icon } from '@components';
 import {
   useFloatingAnimation,
@@ -16,7 +16,7 @@ const FloatingAiIcon: React.FC<FloatingAiIconProps> = ({
   // Use custom animation hooks instead of direct useSpring
   const floatingAnimation = useFloatingAnimation({
     amplitude: 3,
-    duration: 1500,
+    duration: 1.5,
     delay: 0,
   });
 
@@ -25,16 +25,16 @@ const FloatingAiIcon: React.FC<FloatingAiIconProps> = ({
     endScale: 2,
     startOpacity: 0.3,
     endOpacity: 0,
-    duration: 1000,
-    delay: 1000,
+    duration: 1,
+    delay: 1,
   });
 
   return (
     <>
       {showPulse && (
-        <animated.div
+        <motion.div
           className='aucctus-bg-primary-solid absolute rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
-          style={echoAnimation}
+          {...echoAnimation}
         >
           <Icon
             variant='ai-conclusion'
@@ -42,11 +42,11 @@ const FloatingAiIcon: React.FC<FloatingAiIconProps> = ({
             width={24}
             height={24}
           />
-        </animated.div>
+        </motion.div>
       )}
-      <animated.div
+      <motion.div
         className='aucctus-bg-primary-solid rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
-        style={floatingAnimation}
+        {...floatingAnimation}
       >
         <Icon
           variant='ai-conclusion'
@@ -54,7 +54,7 @@ const FloatingAiIcon: React.FC<FloatingAiIconProps> = ({
           width={24}
           height={24}
         />
-      </animated.div>
+      </motion.div>
     </>
   );
 };

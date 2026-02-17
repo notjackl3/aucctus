@@ -11,7 +11,7 @@ import {
   useSeed,
 } from '@hooks/query/concepts.hook';
 import { cn } from '@libs/utils/react';
-import { animated, easings, useTransition } from '@react-spring/web';
+import { AnimatePresence, motion } from 'framer-motion';
 import { AppPath } from '@routes/routes';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
@@ -405,29 +405,14 @@ const IncubateConcept: React.FC = () => {
     seedDraftData?.cachedConcepts,
   ]);
 
-  // Animation Transitions
-  const userExplorationTransition = useTransition(
-    ['pre-generation', 'selection-refinement'].includes(conceptGenerationState),
-    {
-      from: { opacity: 0, maxWidth: '0px' },
-      enter: { opacity: 1, maxWidth: '3000px' },
-      leave: { opacity: 0, maxWidth: '0px', overflow: 'hidden' },
-      config: { duration: 300, easing: easings.easeInOutSine },
-    },
-  );
-
-  const aiExplorationTransition = useTransition(
-    ['pre-generation', 'selection-refinement'].includes(conceptGenerationState),
-    {
-      enter: { width: '35%' },
-      leave: { width: '100%' },
-      config: { duration: 300, easing: easings.easeInOutSine },
-      onRest: () => {
-        if (conceptGenerationState === 'generating') {
-          setPregenToGenAnimationComplete(true);
-        }
-      },
-    },
+  // Track whether userExploration panel is showing
+  const showUserExploration = [
+    'pre-generation',
+    'selection-refinement',
+  ].includes(conceptGenerationState);
+  // Track whether aiExploration panel is showing
+  const showAiExploration = ['pre-generation', 'selection-refinement'].includes(
+    conceptGenerationState,
   );
 
   const handleBeginConceptSelection = useCallback(() => {
@@ -456,46 +441,67 @@ const IncubateConcept: React.FC = () => {
 
     return (
       <>
-        {userExplorationTransition(
-          (style, show) =>
-            show && (
-              <animated.span style={style} className={cn('flex-1')}>
-                <Card.UserExplorationCard
-                  ref={userExplorationRef}
-                  className='ease opacity-1 ml-4 h-full flex-1 p-4 transition-all duration-300'
-                />
-              </animated.span>
-            ),
-        )}
+        <AnimatePresence
+          onExitComplete={() => {
+            if (conceptGenerationState === 'generating') {
+              setPregenToGenAnimationComplete(true);
+            }
+          }}
+        >
+          {showUserExploration && (
+            <motion.span
+              key='user-exploration'
+              initial={{ opacity: 0, maxWidth: '0px' }}
+              animate={{ opacity: 1, maxWidth: '3000px' }}
+              exit={{ opacity: 0, maxWidth: '0px', overflow: 'hidden' }}
+              transition={{ duration: 0.3, ease: [0.37, 0, 0.63, 1] }}
+              className={cn('flex-1')}
+            >
+              <Card.UserExplorationCard
+                ref={userExplorationRef}
+                className='ease opacity-1 ml-4 h-full flex-1 p-4 transition-all duration-300'
+              />
+            </motion.span>
+          )}
+        </AnimatePresence>
 
-        {aiExplorationTransition(
-          (style, show) =>
-            show && (
-              <animated.span
-                style={style}
-                className={cn('transition-all duration-300', {
-                  '!w-[35%]':
-                    !!currentQuestionOrder &&
-                    ['pre-generation', 'selection-refinement'].includes(
-                      conceptGenerationState,
-                    ),
-                  '!w-[50%]':
-                    !currentQuestionOrder &&
-                    ['pre-generation', 'selection-refinement'].includes(
-                      conceptGenerationState,
-                    ),
-                  '!w-[100%]': conceptGenerationState === 'generating',
-                })}
-              >
-                <Card.AiExplorationsCard className='ease mr-4 h-full flex-1 p-4 transition-all duration-300' />
-              </animated.span>
-            ),
-        )}
+        <AnimatePresence
+          onExitComplete={() => {
+            if (conceptGenerationState === 'generating') {
+              setPregenToGenAnimationComplete(true);
+            }
+          }}
+        >
+          {showAiExploration && (
+            <motion.span
+              key='ai-exploration'
+              initial={{ width: '35%' }}
+              animate={{ width: '35%' }}
+              exit={{ width: '100%' }}
+              transition={{ duration: 0.3, ease: [0.37, 0, 0.63, 1] }}
+              className={cn('transition-all duration-300', {
+                '!w-[35%]':
+                  !!currentQuestionOrder &&
+                  ['pre-generation', 'selection-refinement'].includes(
+                    conceptGenerationState,
+                  ),
+                '!w-[50%]':
+                  !currentQuestionOrder &&
+                  ['pre-generation', 'selection-refinement'].includes(
+                    conceptGenerationState,
+                  ),
+                '!w-[100%]': conceptGenerationState === 'generating',
+              })}
+            >
+              <Card.AiExplorationsCard className='ease mr-4 h-full flex-1 p-4 transition-all duration-300' />
+            </motion.span>
+          )}
+        </AnimatePresence>
       </>
     );
   }, [
-    userExplorationTransition,
-    aiExplorationTransition,
+    showUserExploration,
+    showAiExploration,
     conceptGenerationState,
     currentQuestionOrder,
   ]);

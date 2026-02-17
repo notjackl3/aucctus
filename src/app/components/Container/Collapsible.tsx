@@ -1,30 +1,33 @@
-import { animated, useSpring } from '@react-spring/web';
+import { motion, AnimatePresence } from 'framer-motion';
 import React from 'react';
-import { useMeasure } from 'react-use';
 
-interface CollapsibleProp extends React.HTMLAttributes<HTMLDivElement> {
+interface CollapsibleProp {
   children: React.ReactNode;
   open?: boolean;
+  className?: string;
+  style?: React.CSSProperties;
 }
 
 const Collapsible: React.FC<CollapsibleProp> = ({
   children,
   open = false,
-  ...props
+  className,
 }) => {
-  const [ref, { height }] = useMeasure<HTMLDivElement>();
-
-  const animProps = useSpring({
-    height: open ? height : 0,
-    opacity: open ? 1 : 0,
-    overflow: 'hidden',
-    config: { tension: 300, friction: 20 },
-  });
-
   return (
-    <animated.div {...props} style={animProps}>
-      <div ref={ref}>{children}</div>
-    </animated.div>
+    <AnimatePresence initial={false}>
+      {open && (
+        <motion.div
+          className={className}
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          style={{ overflow: 'hidden' }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

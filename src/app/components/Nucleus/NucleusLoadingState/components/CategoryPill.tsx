@@ -1,5 +1,5 @@
 import React from 'react';
-import { animated, useSpring } from 'react-spring';
+import { motion } from 'framer-motion';
 import { cn } from '@libs/utils/react';
 
 /**
@@ -11,13 +11,6 @@ const CategoryPill: React.FC<{ progress: number; name: string }> = ({
   progress,
   name,
 }) => {
-  // Animate the progress bar width - updates when progress changes
-  const progressSpring = useSpring({
-    width: `${progress}%`,
-    from: { width: '0%' },
-    config: { duration: 1000, easing: (t: number) => 1 - Math.pow(1 - t, 3) }, // easeOut
-  });
-
   return (
     <>
       <style>{`
@@ -64,8 +57,13 @@ const CategoryPill: React.FC<{ progress: number; name: string }> = ({
         }}
       >
         {/* Progress fill background */}
-        <animated.div
-          style={progressSpring}
+        <motion.div
+          initial={{ width: '0%' }}
+          animate={{ width: `${progress}%` }}
+          transition={{
+            duration: 1,
+            ease: [0.33, 1, 0.68, 1], // cubic-bezier easeOut approximation
+          }}
           className={cn(
             'pill-shimmer-effect absolute inset-y-0 left-0 overflow-hidden rounded-l-full',
             'bg-white/30',

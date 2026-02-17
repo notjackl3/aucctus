@@ -4,7 +4,7 @@ import { IPropertyFilter } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
 import React, { useState } from 'react';
-import { useTransition, animated } from '@react-spring/web';
+import { AnimatePresence, motion } from 'framer-motion';
 import api from '@libs/api';
 import useStore from '@stores/store';
 
@@ -164,14 +164,6 @@ const NaturalLanguageFilterButton: React.FC<
     }
   };
 
-  // Animation for dropdown
-  const dropdownTransition = useTransition(isOpen, {
-    from: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    enter: { opacity: 1, transform: 'scale(1) translateY(0px)' },
-    leave: { opacity: 0, transform: 'scale(0.95) translateY(-8px)' },
-    config: { tension: 300, friction: 25 },
-  });
-
   return (
     <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
       <Popover.Trigger asChild>
@@ -192,11 +184,14 @@ const NaturalLanguageFilterButton: React.FC<
       </Popover.Trigger>
 
       <Popover.Portal>
-        {dropdownTransition((style, item) =>
-          item ? (
+        <AnimatePresence>
+          {isOpen && (
             <Popover.Content asChild forceMount align='end' sideOffset={8}>
-              <animated.div
-                style={style}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: -8 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: -8 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
                 className='aucctus-bg-primary z-[9999] flex w-[400px] flex-col rounded-md shadow-lg will-change-[transform,opacity] [animation-duration:_400ms] [animation-timing-function:_cubic-bezier(0.16,_1,_0.3,_1)]'
               >
                 <form onSubmit={handleSubmit}>
@@ -312,10 +307,10 @@ const NaturalLanguageFilterButton: React.FC<
                     </div>
                   </div>
                 </form>
-              </animated.div>
+              </motion.div>
             </Popover.Content>
-          ) : null,
-        )}
+          )}
+        </AnimatePresence>
       </Popover.Portal>
     </Popover.Root>
   );

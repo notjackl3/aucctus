@@ -1,7 +1,5 @@
-import { animated, useSpring } from '@react-spring/web';
+import { motion, AnimatePresence } from 'framer-motion';
 import React, { FunctionComponent } from 'react';
-import { useMeasure } from 'react-use';
-import { usePrevious } from '../../hooks/utility.hook';
 
 interface CollapsibleProps {
   toggle: boolean;
@@ -14,29 +12,25 @@ const Collapsible: FunctionComponent<CollapsibleProps> = ({
   children,
   width,
 }) => {
-  // @ts-ignore
-  const [bind, { height: viewHeight }] = useMeasure<HTMLDivElement>();
-  const previous = usePrevious(toggle);
-
-  const spring = useSpring({
-    from: { height: 0, opacity: 0 },
-    to: { height: toggle ? viewHeight : 0, opacity: toggle ? 1 : 0 },
-  });
-
   return (
-    <animated.div
-      aria-expanded={toggle}
-      style={{
-        width: width,
-        position: 'relative',
-        opacity: spring.opacity,
-        height: toggle && previous === toggle ? 'auto' : spring.height,
-        zIndex: toggle ? 0 : -100,
-      }}
-    >
-      {/* @ts-ignore */}
-      <animated.div {...bind}>{children}</animated.div>
-    </animated.div>
+    <AnimatePresence initial={false}>
+      {toggle && (
+        <motion.div
+          aria-expanded={toggle}
+          initial={{ height: 0, opacity: 0 }}
+          animate={{ height: 'auto', opacity: 1 }}
+          exit={{ height: 0, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 170, damping: 26 }}
+          style={{
+            width: width,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          {children}
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };
 

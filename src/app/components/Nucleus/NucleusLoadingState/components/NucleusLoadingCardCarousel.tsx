@@ -1,9 +1,12 @@
 import React, { useState, useRef } from 'react';
-import { animated, useTransition, easings } from 'react-spring';
+import { AnimatePresence, motion } from 'framer-motion';
 import { cn } from '@libs/utils/react';
 import StackCard from './StackCard';
 import LiveAnswerCard, { LiveAnswer } from './LiveAnswerCard';
 import SkeletonBlock from '@components/Skeleton/ConceptReport/SkeletonBlock';
+
+const STACK_SYNC_EXIT_DURATION = 0.4;
+const STACK_SYNC_EASE: [number, number, number, number] = [0.65, 0, 0.35, 1];
 
 interface NucleusLoadingCardCarouselProps {
   liveAnswers: LiveAnswer[];
@@ -45,45 +48,6 @@ const NucleusLoadingCardCarousel: React.FC<NucleusLoadingCardCarouselProps> = ({
   // Track transition state to coordinate stack card fade out
   const [isTransitioning, setIsTransitioning] = useState(false);
   const currentExitDirection = useRef(exitDirection);
-
-  // Use transition for center card to handle enter/exit animations with keys
-  const centerTransitions = useTransition(centerCard, {
-    from: {
-      x: 0,
-      y: 30,
-      scale: 0.85,
-      opacity: 0,
-    },
-    enter: {
-      x: 0,
-      y: -10,
-      scale: 1,
-      opacity: 1,
-    },
-    leave: {
-      // Exit to the exact position and appearance of the first stack card
-      x: exitDirection === 'left' ? -138 : 138,
-      y: -10,
-      scale: 0.8,
-      opacity: 0.95, // Match the first stack card opacity instead of fading to 0
-    },
-    config: (item, index, state) => {
-      // Use spring physics for enter, smoother/faster duration for exit
-      return state === 'leave'
-        ? { duration: 400, easing: easings.easeInOutCubic } // Faster to sync with stack card appearance
-        : { tension: 170, friction: 26, mass: 1 };
-    },
-    keys: centerCard,
-    onStart: () => {
-      // When leave animation starts, trigger stack card fade out
-      currentExitDirection.current = exitDirection;
-      setIsTransitioning(true);
-    },
-    onRest: () => {
-      // When animations complete, snap opacity back
-      setIsTransitioning(false);
-    },
-  });
 
   return (
     <div className='relative mb-8 flex h-20 w-full max-w-4xl items-center justify-center'>
@@ -146,27 +110,74 @@ const NucleusLoadingCardCarousel: React.FC<NucleusLoadingCardCarouselProps> = ({
         })}
 
         {/* Center card with enter/exit animations */}
-        {centerTransitions((style, item) => (
-          <animated.div
+        <AnimatePresence
+          onExitComplete={() => {
+            setIsTransitioning(false);
+          }}
+        >
+          <motion.div
+            key={centerCard}
+            initial={{
+              x: 0,
+              y: 30,
+              scale: 0.85,
+              opacity: 0,
+            }}
+            animate={{
+              x: 0,
+              y: -10,
+              scale: 1,
+              opacity: 1,
+            }}
+            exit={{
+              x: exitDirection === 'left' ? -138 : 138,
+              y: -10,
+              scale: 0.8,
+              opacity: 0.95,
+              transition: {
+                duration: STACK_SYNC_EXIT_DURATION,
+                ease: STACK_SYNC_EASE,
+              },
+            }}
+            transition={{
+              type: 'spring',
+              stiffness: 170,
+              damping: 26,
+              mass: 1,
+            }}
+            onAnimationStart={(definition) => {
+              // When the exit animation starts, trigger stack card fade out
+              // In framer-motion, we detect exit by checking if the animation target
+              // matches exit values (non-zero x)
+              if (
+                typeof definition === 'object' &&
+                definition !== null &&
+                'x' in definition &&
+                (definition as { x: number }).x !== 0
+              ) {
+                currentExitDirection.current = exitDirection;
+                setIsTransitioning(true);
+              }
+            }}
+            transformTemplate={(_props, generated) =>
+              `translate(-50%, -50%) ${generated}`
+            }
             style={{
               position: 'absolute',
               left: '50%',
               top: '50%',
-              transform: 'translate(-50%, -50%)',
               zIndex: 20,
             }}
           >
-            <animated.div style={style}>
-              {liveAnswers.length === 0 ||
-              item >= liveAnswers.length ||
-              !liveAnswers[item] ? (
-                <SkeletonAnswerCard />
-              ) : (
-                <LiveAnswerCard answer={liveAnswers[item]!} />
-              )}
-            </animated.div>
-          </animated.div>
-        ))}
+            {liveAnswers.length === 0 ||
+            centerCard >= liveAnswers.length ||
+            !liveAnswers[centerCard] ? (
+              <SkeletonAnswerCard />
+            ) : (
+              <LiveAnswerCard answer={liveAnswers[centerCard]!} />
+            )}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

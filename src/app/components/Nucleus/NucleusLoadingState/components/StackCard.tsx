@@ -1,5 +1,5 @@
 import React from 'react';
-import { animated, useSpring, easings } from 'react-spring';
+import { motion } from 'framer-motion';
 import { cn } from '@libs/utils/react';
 import LiveAnswerCard, { LiveAnswer } from './LiveAnswerCard';
 import SkeletonBlock from '@components/Skeleton/ConceptReport/SkeletonBlock';
@@ -50,18 +50,8 @@ const StackCard: React.FC<StackCardProps> = ({
   const baseOpacity = stackIndex === 0 ? 0.95 : 0.7;
   const targetOpacity = shouldFadeOut ? 0 : baseOpacity;
 
-  const spring = useSpring({
-    x: xOffset,
-    y: -10,
-    scale: stackIndex === 0 ? 0.8 : 0.6,
-    opacity: targetOpacity,
-    config: shouldFadeOut
-      ? { duration: 400, easing: easings.easeInOutCubic } // Match center card leave duration
-      : { duration: 0 }, // Snap back instantly when transition completes
-  });
-
   return (
-    <animated.div
+    <div
       key={`${side}-${stackIndex}-${cardIndex}`}
       style={{
         position: 'absolute',
@@ -71,14 +61,27 @@ const StackCard: React.FC<StackCardProps> = ({
         zIndex: 10 - stackIndex,
       }}
     >
-      <animated.div style={spring}>
+      <motion.div
+        initial={false}
+        animate={{
+          x: xOffset,
+          y: -10,
+          scale: stackIndex === 0 ? 0.8 : 0.6,
+          opacity: targetOpacity,
+        }}
+        transition={
+          shouldFadeOut
+            ? { duration: 0.4, ease: [0.65, 0, 0.35, 1] } // easeInOutCubic
+            : { duration: 0 } // Snap back instantly when transition completes
+        }
+      >
         {isGhost || cardIndex === undefined || !liveAnswers[cardIndex] ? (
           <SkeletonAnswerCard />
         ) : (
           <LiveAnswerCard answer={liveAnswers[cardIndex]!} />
         )}
-      </animated.div>
-    </animated.div>
+      </motion.div>
+    </div>
   );
 };
 

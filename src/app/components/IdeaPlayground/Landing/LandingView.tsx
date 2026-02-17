@@ -1,5 +1,5 @@
 import React, { useRef, useState } from 'react';
-import { animated } from 'react-spring';
+import { motion } from 'framer-motion';
 import { Icon, toast } from '@components';
 import { cn } from '@libs/utils/react';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
@@ -121,7 +121,7 @@ const LandingView: React.FC<LandingViewProps> = ({
   };
 
   return (
-    <animated.div
+    <motion.div
       style={style}
       className='pointer-events-none absolute inset-0 z-20 flex items-center justify-center'
     >
@@ -270,7 +270,7 @@ const LandingView: React.FC<LandingViewProps> = ({
           </div>
         </div>
       </div>
-    </animated.div>
+    </motion.div>
   );
 };
 
