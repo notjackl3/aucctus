@@ -42,9 +42,15 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
     <div className='min-h-screen'>
       <div className='max-w-7xl space-y-8'>
         {/* Crowdedness Gauge & Headwinds/Tailwinds Grid */}
-        <div className='grid grid-cols-1 gap-6 lg:grid-cols-3'>
+        <div
+          data-section-id='ecosystem_v2_competitive_forces'
+          className='grid grid-cols-1 gap-6 lg:grid-cols-3'
+        >
           {/* Crowdedness Gauge */}
-          <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4'>
+          <div
+            data-section-id='ecosystem_v2_crowdedness'
+            className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4'
+          >
             <div className='pb-2'>
               <div className='aucctus-text-primary flex items-center gap-2 text-lg font-semibold'>
                 <Icon
@@ -186,7 +192,11 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
           </TabsContent>
 
           {/* Startups View */}
-          <TabsContent value='startups' className='mt-0'>
+          <TabsContent
+            value='startups'
+            className='mt-0'
+            data-section-id='ecosystem_v2_startups'
+          >
             {ecosystemData.filter((c) => c.type === 'startup').length === 0 ? (
               <div className='aucctus-bg-primary aucctus-border-secondary flex h-[300px] items-center justify-center rounded-lg border'>
                 <div className='flex flex-col items-center gap-3 text-center'>
@@ -229,7 +239,11 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
           </TabsContent>
 
           {/* Incumbents View */}
-          <TabsContent value='incumbents' className='mt-0'>
+          <TabsContent
+            value='incumbents'
+            className='mt-0'
+            data-section-id='ecosystem_v2_incumbents'
+          >
             {ecosystemData.filter((c) => c.type === 'incumbent').length ===
             0 ? (
               <div className='aucctus-bg-primary aucctus-border-secondary flex h-[300px] items-center justify-center rounded-lg border'>
@@ -279,7 +293,9 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
           productSearchStatus={productSearchStatus}
         />
         {/* Future Predictions */}
-        <FuturePredictions predictions={futurePredictions} />
+        <div data-section-id='ecosystem_v2_future_predictions'>
+          <FuturePredictions predictions={futurePredictions} />
+        </div>
       </div>
     </div>
   );

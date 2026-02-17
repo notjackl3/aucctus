@@ -1,7 +1,6 @@
-import NavLogo from '@assets/aucctus_logo.png';
-import NavWord from '@assets/aucctus_nav_word.png';
 import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { IOverseerPendingImage, MentionItem } from '@stores/overseer/types';
 import React, {
   useCallback,
   useEffect,
@@ -9,142 +8,124 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import CommandPicker from './CommandPicker';
-import { parseSlashCommand, SlashCommand } from './slashCommands';
+import OverseerMentionMenu from './OverseerMentionMenu';
 
 interface OverseerInputProps {
   value: string;
   onChange: (value: string) => void;
   onSubmit: () => void;
-  onClose: () => void;
   disabled?: boolean;
   placeholder?: string;
   className?: string;
-  /** Whether there is selected text available */
-  hasSelection?: boolean;
-  /** Callback when a slash command is selected */
-  onCommandSelect?: (command: SlashCommand) => void;
+  mentions?: MentionItem[];
+  onMentionSelect?: (item: MentionItem) => void;
+  onMentionRemove?: (id: string) => void;
+  pendingImages?: IOverseerPendingImage[];
+  onImageAdd?: (file: File) => void;
+  onImageRemove?: (id: string) => void;
+  maxImages?: number;
+  conceptItems?: MentionItem[];
 }
 
 /**
- * Input component for Overseer with keyboard shortcuts
- * Features the "Powered by Aucctus" badge with logo
- * Supports slash commands with autocomplete dropdown
+ * Input component for Overseer with @mention and image attachment support
+ * Matches Lovable OverseerChatModal input area
  */
 const OverseerInput: React.FC<OverseerInputProps> = ({
   value,
   onChange,
   onSubmit,
   disabled = false,
-  placeholder = 'Ask a follow-up question...',
+  placeholder = 'Ask about this selection... (type @ to tag)',
   className,
-  hasSelection = false,
-  onCommandSelect,
+  mentions = [],
+  onMentionSelect,
+  onMentionRemove,
+  pendingImages = [],
+  onImageAdd,
+  onImageRemove,
+  maxImages = 4,
+  conceptItems,
 }) => {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [showCommandPicker, setShowCommandPicker] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [showMentionMenu, setShowMentionMenu] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState('');
 
-  // Parse current command to determine active state (match anywhere in text)
-  // Don't trim remaining args so spaces are preserved during typing
-  const [activeCommand, remainingArgs] = useMemo(
-    () =>
-      parseSlashCommand(value, { matchPosition: 'any', trimRemaining: false }),
-    [value],
-  );
+  // Detect @mention trigger
+  const mentionState = useMemo(() => {
+    const lastAtIndex = value.lastIndexOf('@');
+    if (lastAtIndex === -1) return { active: false, query: '', index: -1 };
 
-  // Determine if we should show command picker
-  // Show when user is typing a command (slash followed by non-space chars, no space after yet)
-  const commandPickerState = useMemo(() => {
-    // Find the last "/" in the value
-    const lastSlashIndex = value.lastIndexOf('/');
-
-    if (lastSlashIndex === -1) {
-      return { show: false, filter: '', index: -1 };
+    // @ must be at start or preceded by a space
+    if (lastAtIndex > 0 && value[lastAtIndex - 1] !== ' ') {
+      return { active: false, query: '', index: -1 };
     }
 
-    // Check if slash is at start or preceded by a space (valid command position)
-    if (lastSlashIndex > 0 && value[lastSlashIndex - 1] !== ' ') {
-      return { show: false, filter: '', index: -1 };
+    const textAfterAt = value.slice(lastAtIndex + 1);
+
+    // If there's a space, mention input is done
+    if (textAfterAt.includes(' ')) {
+      return { active: false, query: '', index: -1 };
     }
 
-    // Get text after the slash
-    const textAfterSlash = value.slice(lastSlashIndex + 1);
-
-    // If there's a space after the slash, command is complete
-    if (textAfterSlash.includes(' ')) {
-      return { show: false, filter: '', index: -1 };
-    }
-
-    // Show picker with filter (text after slash)
-    return { show: true, filter: textAfterSlash, index: lastSlashIndex };
+    return { active: true, query: textAfterAt, index: lastAtIndex };
   }, [value]);
 
-  // Update showCommandPicker state
   useEffect(() => {
-    setShowCommandPicker(commandPickerState.show);
-  }, [commandPickerState.show]);
+    setShowMentionMenu(mentionState.active);
+    setMentionQuery(mentionState.query);
+  }, [mentionState.active, mentionState.query]);
 
-  // Focus input on mount
+  // Focus on mount
   useEffect(() => {
-    // Small delay to ensure popup is rendered
     const timer = setTimeout(() => {
-      inputRef.current?.focus();
+      textareaRef.current?.focus();
     }, 100);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleSubmit = () => {
-    if (value.trim() && !disabled) {
+  // Auto-resize textarea
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+    textarea.style.height = 'auto';
+    textarea.style.height = `${Math.min(textarea.scrollHeight, 72)}px`;
+  }, [value]);
+
+  const handleSubmit = useCallback(() => {
+    if ((value.trim() || pendingImages.length > 0) && !disabled) {
       onSubmit();
     }
-  };
+  }, [value, disabled, onSubmit, pendingImages.length]);
 
-  // Handle command selection from picker
-  const handleCommandSelect = useCallback(
-    (command: SlashCommand) => {
-      setShowCommandPicker(false);
-
-      // Replace the partial command with the full command
-      if (commandPickerState.index >= 0) {
-        const prefix = value.slice(0, commandPickerState.index);
-        const newValue = `${prefix}${command.command} `;
-        onChange(newValue);
-      } else {
-        // Fallback: just set the command
-        onChange(command.command + ' ');
+  const handleMentionSelect = useCallback(
+    (item: MentionItem) => {
+      setShowMentionMenu(false);
+      if (mentionState.index >= 0) {
+        // Remove the @query text, only show the badge
+        const prefix = value.slice(0, mentionState.index).trimEnd();
+        onChange(prefix);
       }
-
-      // Notify parent if callback provided
-      if (onCommandSelect) {
-        onCommandSelect(command);
-      }
-
-      // Focus input after selection
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus();
-        }
-      }, 0);
+      onMentionSelect?.(item);
+      setTimeout(() => textareaRef.current?.focus(), 0);
     },
-    [onChange, onCommandSelect, value, commandPickerState.index],
+    [mentionState.index, value, onChange, onMentionSelect],
   );
 
-  // Close command picker
-  const handleCommandPickerClose = useCallback(() => {
-    setShowCommandPicker(false);
+  const handleMentionMenuClose = useCallback(() => {
+    setShowMentionMenu(false);
   }, []);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Don't handle Enter/Escape if command picker is open (it handles those)
-    if (showCommandPicker) {
+    // Let mention menu handle these keys
+    if (showMentionMenu) {
       if (
         e.key === 'Enter' ||
         e.key === 'Escape' ||
         e.key === 'ArrowUp' ||
-        e.key === 'ArrowDown' ||
-        e.key === 'Tab'
+        e.key === 'ArrowDown'
       ) {
-        // Let CommandPicker handle these
         return;
       }
     }
@@ -154,141 +135,177 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
       handleSubmit();
       return;
     }
-
-    // Handle backspace when in command mode with empty args
-    if (activeCommand && e.key === 'Backspace' && remainingArgs.trim() === '') {
-      e.preventDefault();
-      // Remove the command entirely to go back to normal mode
-      onChange(activeCommand.command.slice(0, -1));
-    }
   };
 
-  // Input change handler wrapper
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = e.target.value;
+  // Handle paste for clipboard images
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent) => {
+      if (!onImageAdd) return;
+      const items = e.clipboardData?.items;
+      if (!items) return;
 
-    if (activeCommand) {
-      // If we have an active command, the input only contains the message (without command)
-      // Reconstruct the full value: command + space + message
-      onChange(`${activeCommand.command} ${inputValue}`);
-    } else {
-      // Standard behavior
-      onChange(inputValue);
-    }
-  };
+      for (const item of items) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) onImageAdd(file);
+          return;
+        }
+      }
+    },
+    [onImageAdd],
+  );
 
-  const handleCommandsClick = () => {
-    // If there's already text, append slash with space, otherwise just slash
-    if (value.trim()) {
-      onChange(value.trimEnd() + ' /');
-    } else {
-      onChange('/');
-    }
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
+  // Handle file input change
+  const handleFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      if (!onImageAdd || !e.target.files) return;
+      for (const file of e.target.files) {
+        if (file.type.startsWith('image/')) {
+          onImageAdd(file);
+        }
+      }
+      // Reset input so the same file can be selected again
+      e.target.value = '';
+    },
+    [onImageAdd],
+  );
+
+  const canAddImages = pendingImages.length < maxImages;
 
   return (
-    <div className={cn('border-t border-white/10 px-4 py-3', className)}>
-      <div className='relative flex items-center'>
-        {/* Command picker dropdown - full width to match input */}
-        {showCommandPicker && (
-          <CommandPicker
-            filter={commandPickerState.filter}
-            onSelect={handleCommandSelect}
-            onClose={handleCommandPickerClose}
-            hasSelection={hasSelection}
-          />
-        )}
+    <div className={cn('relative px-4 pt-2', className)}>
+      {/* Mention menu (positioned above input) */}
+      <OverseerMentionMenu
+        query={mentionQuery}
+        onSelect={handleMentionSelect}
+        onClose={handleMentionMenuClose}
+        visible={showMentionMenu}
+        concepts={conceptItems}
+      />
 
-        {/* Active command badge - Aucctus brown theme */}
-        {activeCommand && (
-          <div className='absolute left-1 z-10 flex items-center gap-1.5 rounded-md bg-primary-700 px-2 py-1 shadow-sm ring-1 ring-primary-500/30'>
-            <Icon
-              variant={activeCommand.icon}
-              width={12}
-              height={12}
-              className='stroke-primary-100'
-            />
-            <span className='text-xs font-semibold text-primary-100'>
-              {activeCommand.label}
+      {/* Mention badges */}
+      {mentions.length > 0 && (
+        <div className='mb-1.5 flex flex-wrap gap-1'>
+          {mentions.map((m) => (
+            <span
+              key={m.id}
+              className={cn(
+                'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium',
+                m.type === 'persona'
+                  ? 'border border-purple-400/30 bg-purple-500/20 text-purple-300'
+                  : 'border border-amber-400/30 bg-amber-500/20 text-amber-300',
+              )}
+            >
+              @{m.name}
+              <button
+                onClick={() => onMentionRemove?.(m.id)}
+                className='transition-colors hover:text-white'
+              >
+                <Icon
+                  variant='closeX'
+                  width={10}
+                  height={10}
+                  className='stroke-current'
+                />
+              </button>
             </span>
-          </div>
-        )}
+          ))}
+        </div>
+      )}
 
-        <input
-          ref={inputRef}
-          type='text'
-          value={activeCommand ? remainingArgs : value}
-          onChange={handleInputChange}
+      {/* Image preview strip */}
+      {pendingImages.length > 0 && (
+        <div className='mb-1.5 flex gap-1.5'>
+          {pendingImages.map((img) => (
+            <div key={img.id} className='group relative'>
+              <img
+                src={img.dataUrl}
+                alt={img.file.name}
+                className='h-12 w-12 rounded-lg border border-white/10 object-cover'
+              />
+              <button
+                onClick={() => onImageRemove?.(img.id)}
+                className='absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/70 text-white/70 opacity-0 transition-opacity hover:text-white group-hover:opacity-100'
+                aria-label='Remove image'
+              >
+                <Icon
+                  variant='closeX'
+                  width={8}
+                  height={8}
+                  className='stroke-current'
+                />
+              </button>
+            </div>
+          ))}
+          <span className='self-end text-[10px] text-white/30'>
+            {pendingImages.length}/{maxImages}
+          </span>
+        </div>
+      )}
+
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type='file'
+        accept='image/jpeg,image/png,image/gif,image/webp'
+        multiple
+        className='hidden'
+        onChange={handleFileChange}
+      />
+
+      {/* Input container — matches Lovable style */}
+      <div className='flex items-center gap-2 rounded-xl border border-white/10 bg-white/[0.08] px-3 py-1.5'>
+        {/* Image attachment button */}
+        {onImageAdd && (
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            disabled={disabled || !canAddImages}
+            className={cn(
+              'rounded-lg p-1.5 transition-all',
+              canAddImages && !disabled
+                ? 'text-white/40 hover:bg-white/10 hover:text-white/60'
+                : 'text-white/15',
+            )}
+            aria-label='Attach image'
+          >
+            <Icon
+              variant='image'
+              width={14}
+              height={14}
+              className='stroke-current'
+            />
+          </button>
+        )}
+        <textarea
+          ref={textareaRef}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder={
-            activeCommand
-              ? activeCommand.placeholder || placeholder
-              : placeholder
-          }
+          onPaste={handlePaste}
+          placeholder={placeholder}
           disabled={disabled}
-          className={cn(
-            'w-full rounded-lg border bg-white py-2.5 pr-10 text-sm text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-gray-400',
-            activeCommand
-              ? 'border-primary-300 pl-[calc(var(--badge-width,80px)+12px)] focus:border-primary-400'
-              : 'border-gray-300 pl-3',
-          )}
-          style={
-            activeCommand
-              ? ({
-                  '--badge-width': `${activeCommand.label.length * 8 + 32}px`,
-                } as React.CSSProperties)
-              : undefined
-          }
+          rows={1}
+          className='no-focus-ring max-h-[72px] flex-1 resize-none overflow-y-auto bg-transparent text-sm text-white outline-none placeholder:text-white/25 disabled:cursor-not-allowed disabled:opacity-50'
         />
         <button
           onClick={handleSubmit}
-          disabled={!value.trim() || disabled}
+          disabled={(!value.trim() && pendingImages.length === 0) || disabled}
           className={cn(
-            'absolute right-2 top-1/2 flex h-6 w-6 -translate-y-1/2 items-center justify-center rounded-md transition-all',
-            value.trim() && !disabled
-              ? 'bg-black text-white hover:bg-gray-900'
-              : 'bg-white/10 text-gray-light-200',
+            'rounded-lg p-1.5 transition-all',
+            (value.trim() || pendingImages.length > 0) && !disabled
+              ? 'bg-white/15 text-white hover:bg-white/20'
+              : 'text-white/20',
           )}
           aria-label='Send message'
         >
           <Icon
-            variant='arrowup'
-            width={12}
-            height={12}
-            className={
-              value.trim() && !disabled
-                ? 'stroke-white'
-                : 'stroke-gray-light-200'
-            }
+            variant='paper-airplane'
+            width={14}
+            height={14}
+            className='stroke-current'
           />
         </button>
-      </div>
-
-      {/* Footer with powered by badge */}
-      <div className='mt-2.5 flex items-center justify-between px-0.5'>
-        <div className='flex items-center gap-2'>
-          <button
-            onClick={handleCommandsClick}
-            disabled={disabled}
-            className='aucctus-text-2xs font-medium text-white/40 transition-colors hover:text-white disabled:opacity-50'
-          >
-            / Commands
-          </button>
-        </div>
-        <div className='flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-2.5 py-1'>
-          <span className='text-[9px] font-bold uppercase tracking-wider text-white/30'>
-            Powered by
-          </span>
-          <img src={NavLogo} alt='Aucctus' className='h-3 w-3 opacity-80' />
-          <img
-            src={NavWord}
-            alt='Aucctus'
-            className='h-2.5 w-auto opacity-60 brightness-0 invert'
-          />
-        </div>
       </div>
     </div>
   );

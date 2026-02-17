@@ -1,78 +1,31 @@
 import api from '@libs/api';
-import { AucctusQueryKeys } from '@hooks/query/query-keys';
+import type {
+  IMediaMessage,
+  IOverseerConversationStartMessage,
+  IOverseerOutboundChatMessage,
+} from '@libs/api/types';
+import type { Mimetype } from '@libs/api/types/osiris';
+import type {
+  IOverseerConversation,
+  IOverseerConversationDetail,
+} from '@libs/api/types/overseer';
 import telemetry from '@libs/telemetry';
 import { produce } from 'immer';
-import { QueryClient } from 'react-query';
 import { v4 as uuidv4 } from 'uuid';
 import type { IStoreApi } from '../store';
 import {
-  CustomCommandFlowStep,
-  ICustomCommandFlow,
+  AgentStep,
   IOverseerAssistantMessage,
+  IOverseerEditSuggestionMessage,
   IOverseerEditSuggestions,
+  IOverseerPendingImage,
   IOverseerPosition,
   IOverseerState,
   IOverseerUserMessage,
+  MentionItem,
   OverseerContextType,
+  OverseerFeature,
 } from './types';
-
-// Query client reference for invalidating queries
-// This will be set by the main app when the query client is created
-let queryClientRef: QueryClient | null = null;
-
-export function setQueryClientRef(client: QueryClient) {
-  queryClientRef = client;
-}
-
-/**
- * Initial state for custom command flow
- */
-export const initialCustomCommandFlow: ICustomCommandFlow = {
-  isActive: false,
-  currentStep: 'name',
-  data: {
-    name: '',
-    label: '',
-    description: '',
-    promptModifier: '',
-    enableWebSearch: false,
-    enableNucleusSearch: false,
-  },
-  error: undefined,
-  isSubmitting: false,
-};
-
-export const initialCustomCommandManagementFlow = {
-  isActive: false,
-};
-
-/**
- * Custom command flow step configuration
- */
-const CUSTOM_COMMAND_STEPS: CustomCommandFlowStep[] = [
-  'name',
-  'label',
-  'description',
-  'promptModifier',
-  'tools',
-  'confirm',
-];
-
-/**
- * Reserved command names that cannot be used
- */
-const RESERVED_NAMES = [
-  'edit',
-  'web',
-  'nucleus',
-  'summarize',
-  'help',
-  'search',
-  'find',
-  'ask',
-  'chat',
-  'query',
-];
 
 /**
  * Account-level page contexts that don't require a concept UUID
@@ -165,10 +118,6 @@ export function confirmSelection(this: IStoreApi<IOverseerState>) {
 
 /**
  * Open the Overseer popup with selected text
- *
- * Supports two modes:
- * 1. Concept mode (default): For concept report pages - uses conceptUuid from conceptReport store
- * 2. Account mode: For Nucleus/Watchtower pages - uses accountUuid passed in params or from auth store
  */
 export function open(
   this: IStoreApi<IOverseerState>,
@@ -193,7 +142,6 @@ export function open(
   let accountUuid: string | undefined;
 
   if (contextType === 'account') {
-    // Account mode - get accountUuid from params or auth store
     accountUuid = params.accountUuid || storeApi.getState().auth.account?.uuid;
 
     if (!accountUuid) {
@@ -203,7 +151,6 @@ export function open(
       return;
     }
   } else {
-    // Concept mode - get conceptUuid from params or conceptReport store
     conceptUuid =
       params.conceptUuid || storeApi.getState().conceptReport.conceptUuid;
 
@@ -214,7 +161,6 @@ export function open(
       return;
     }
 
-    // Also get accountUuid for concept mode (needed for some operations)
     accountUuid = storeApi.getState().auth.account?.uuid;
   }
 
@@ -234,10 +180,17 @@ export function open(
       state.suggestedQuestions = [];
       state.currentMessage = '';
       state.editSuggestions = null;
+      state.highlightedSectionId = null;
       state.isThinking = false;
       state.thinkingMessage = undefined;
       state.currentError = undefined;
       state.hasError = false;
+      state.activeFeatures = new Set();
+      state.mentions = [];
+      state.toolActivitySteps = [];
+      state.historyItems = [];
+      state.showHistory = false;
+      state.pendingImages = [];
     }),
   );
 }
@@ -250,10 +203,8 @@ export function close(this: IStoreApi<IOverseerState>) {
   const { sessionId, conceptUuid, accountUuid, contextType, pageContext } =
     get();
 
-  // Get the identifier based on context type
   const identifier = contextType === 'account' ? accountUuid : conceptUuid;
 
-  // Send cancel message if we have an active session
   if (sessionId && identifier) {
     try {
       api.aucctusSocket.send({
@@ -283,10 +234,18 @@ export function close(this: IStoreApi<IOverseerState>) {
       state.suggestedQuestions = [];
       state.currentMessage = '';
       state.editSuggestions = null;
+      state.highlightedSectionId = null;
       state.isThinking = false;
       state.thinkingMessage = undefined;
       state.currentError = undefined;
       state.hasError = false;
+      state.activeFeatures = new Set();
+      state.mentions = [];
+      state.showHistory = false;
+      state.historyItems = [];
+      state.historyLoading = false;
+      state.toolActivitySteps = [];
+      state.pendingImages = [];
     }),
   );
 }
@@ -305,12 +264,13 @@ export async function sendMessage(this: IStoreApi<IOverseerState>) {
     contextType,
     conceptUuid,
     accountUuid,
+    activeFeatures,
+    pendingImages,
+    mentions: storeMentions,
   } = get();
 
-  // For initial message, we don't need currentMessage
   const isInitialMessage = !sessionId;
 
-  // Validate required data based on context type
   const identifier = contextType === 'account' ? accountUuid : conceptUuid;
   if (!identifier) {
     telemetry.error(
@@ -319,64 +279,114 @@ export async function sendMessage(this: IStoreApi<IOverseerState>) {
     return;
   }
 
-  // Require message content
-  if (!currentMessage?.trim()) {
+  if (!currentMessage?.trim() && pendingImages.length === 0) {
     telemetry.debug('Overseer: No message to send');
     return;
   }
 
-  // Create the message object
   const messageUuid = uuidv4();
-  const messageContent = currentMessage;
+  const messageContent = currentMessage?.trim()
+    ? currentMessage
+    : pendingImages.length > 0
+      ? 'Please analyze the attached image(s).'
+      : '';
+
+  // Prepend slash command based on active feature toggle (priority: aiEdit > web > nucleus)
+  // The backend parses slash commands from the message content to enable tools
+  let effectiveContent = messageContent;
+  if (activeFeatures.has('aiEdit')) {
+    effectiveContent = `/edit ${messageContent}`;
+  } else if (activeFeatures.has('web')) {
+    effectiveContent = `/web ${messageContent}`;
+  } else if (activeFeatures.has('nucleus')) {
+    effectiveContent = `/nucleus ${messageContent}`;
+  }
+
+  // Convert pending images to IMediaMessage[] for WebSocket and display data
+  const imageAttachments =
+    pendingImages.length > 0
+      ? pendingImages.map((img) => ({
+          dataUrl: img.dataUrl,
+          filename: img.file.name,
+        }))
+      : undefined;
+
+  const mediaMessages: IMediaMessage[] | undefined =
+    pendingImages.length > 0
+      ? pendingImages.map((img) => ({
+          mediaData: img.dataUrl,
+          mimetype: img.file.type as unknown as Mimetype,
+          filename: img.file.name,
+        }))
+      : undefined;
+
+  // Build mention payload for WebSocket
+  const mentionPayload = storeMentions
+    .filter((m) => m.type === 'concept')
+    .map((m) => ({ uuid: m.id, name: m.name, type: m.type as 'concept' }));
 
   const userMessage: IOverseerUserMessage = {
     uuid: messageUuid,
     content: messageContent,
     role: 'user',
     timestamp: new Date().toISOString(),
+    images: imageAttachments,
   };
 
-  // Update state with the new message
   set(
     produce((state: IOverseerState) => {
       state.isThinking = true;
       state.currentMessage = '';
+
+      // Snapshot current edit suggestions as a read-only history message
+      if (state.editSuggestions && state.editSuggestions.edits.length > 0) {
+        state.messages.push({
+          uuid: state.editSuggestions.uuid || uuidv4(),
+          role: 'edit_suggestion',
+          editSuggestions: { ...state.editSuggestions },
+          timestamp: new Date().toISOString(),
+        });
+      }
+
       state.messages = [...state.messages, userMessage];
-      state.suggestedQuestions = []; // Clear suggestions when sending
-      state.editSuggestions = null; // Clear edit suggestions when sending
+      state.suggestedQuestions = [];
+      state.editSuggestions = null;
+      state.highlightedSectionId = null;
+      state.toolActivitySteps = [];
+      state.pendingImages = [];
     }),
   );
 
-  // Build the message payload based on context type
-  const basePayload = {
-    uuid: messageUuid,
-    pageContext: pageContext,
-    content: messageContent,
-    // Include both UUIDs, backend will use the appropriate one based on page context
-    conceptUuid: contextType === 'concept' ? conceptUuid : undefined,
-    accountUuid: contextType === 'account' ? accountUuid : undefined,
-  };
-
-  // Send the appropriate message type
   if (isInitialMessage) {
-    // Start new conversation
     api.aucctusSocket.send({
       type: 'overseer.conversation.start',
-      ...basePayload,
+      uuid: messageUuid,
+      pageContext,
+      content: effectiveContent,
+      conceptUuid: contextType === 'concept' ? conceptUuid : undefined,
+      accountUuid: contextType === 'account' ? accountUuid : undefined,
       selectedText: selectedText,
       expandedText: expandedText,
-    });
+      images: mediaMessages,
+      mentions: mentionPayload.length > 0 ? mentionPayload : undefined,
+    } as IOverseerConversationStartMessage);
     telemetry.debug('Overseer: Started conversation', {
       identifier,
       contextType,
     });
   } else {
-    // Follow-up message
     api.aucctusSocket.send({
       type: 'overseer.message',
-      ...basePayload,
+      uuid: messageUuid,
+      pageContext,
+      content: effectiveContent,
+      conceptUuid: contextType === 'concept' ? conceptUuid : undefined,
+      accountUuid: contextType === 'account' ? accountUuid : undefined,
       sessionId: sessionId!,
-    });
+      images: mediaMessages,
+      selectedText: selectedText,
+      mentions: mentionPayload.length > 0 ? mentionPayload : undefined,
+    } as IOverseerOutboundChatMessage);
     telemetry.debug('Overseer: Sent follow-up message', {
       identifier,
       contextType,
@@ -410,7 +420,6 @@ export function handleHandshake(
   const { set, get } = this;
   const { conceptUuid, accountUuid, contextType } = get();
 
-  // The handshake.conceptUuid is used as an identifier for both concept and account modes
   const expectedIdentifier =
     contextType === 'account' ? accountUuid : conceptUuid;
 
@@ -423,34 +432,53 @@ export function handleHandshake(
     return;
   }
 
+  const { pageContext, contextType: ctxType } = get();
+
   set(
     produce((state: IOverseerState) => {
       state.sessionId = handshake.sessionId;
+
+      // Add a placeholder history item (name will arrive via WebSocket)
+      const placeholder: IOverseerConversation = {
+        uuid: handshake.sessionId,
+        name: null,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        pageContext,
+        contextType: ctxType,
+      };
+      state.historyItems = [placeholder, ...state.historyItems];
     }),
   );
 }
 
 /**
- * Add or update an assistant message
+ * Add or update an assistant message.
+ * Snapshots current toolActivitySteps onto the message and clears them from global state.
  */
 export function addAssistantMessage(
   this: IStoreApi<IOverseerState>,
   message: IOverseerAssistantMessage,
 ) {
   const { set, get } = this;
-  const { messages } = get();
+  const { messages, toolActivitySteps } = get();
 
-  let msgs = [...messages];
+  // Attach completed tool activity steps to the message
+  const messageWithSteps: IOverseerAssistantMessage = {
+    ...message,
+    toolActivitySteps:
+      toolActivitySteps.length > 0 ? toolActivitySteps : undefined,
+  };
+
+  const msgs = [...messages];
   const existingMessageIndex = msgs.findIndex(
     (msg) => msg.role === 'assistant' && msg.uuid === message.uuid,
   );
 
   if (existingMessageIndex !== -1) {
-    // Update existing message
-    msgs[existingMessageIndex] = message;
+    msgs[existingMessageIndex] = messageWithSteps;
   } else {
-    // Add new message
-    msgs.push(message);
+    msgs.push(messageWithSteps);
   }
 
   set(
@@ -458,6 +486,8 @@ export function addAssistantMessage(
       state.messages = msgs;
       state.isThinking = false;
       state.thinkingMessage = undefined;
+      // Clear global steps since they're now attached to the message
+      state.toolActivitySteps = [];
     }),
   );
 }
@@ -489,14 +519,16 @@ export function handleEditSuggestions(
 
   set(
     produce((state: IOverseerState) => {
-      // Always stop thinking when suggestions arrive
       state.isThinking = false;
       state.thinkingMessage = undefined;
+      // Clear tool activity steps — they've been shown during the edit pipeline
+      state.toolActivitySteps = [];
 
       if (suggestions.edits && suggestions.edits.length > 0) {
         state.editSuggestions = suggestions;
+        state.highlightedSectionId = suggestions.edits[0].section;
+        state.isDocked = true;
       } else if (suggestions.reply) {
-        // If no edits but we have a reply (e.g. vague request), show as message
         state.messages.push({
           uuid: suggestions.uuid || uuidv4(),
           content: suggestions.reply,
@@ -519,6 +551,7 @@ export function clearEditSuggestions(this: IStoreApi<IOverseerState>) {
   set(
     produce((state: IOverseerState) => {
       state.editSuggestions = null;
+      state.highlightedSectionId = null;
     }),
   );
 }
@@ -606,17 +639,19 @@ export function clearConversation(this: IStoreApi<IOverseerState>) {
       state.suggestedQuestions = [];
       state.currentMessage = '';
       state.editSuggestions = null;
+      state.highlightedSectionId = null;
       state.isThinking = false;
       state.thinkingMessage = undefined;
       state.currentError = undefined;
       state.hasError = false;
+      state.toolActivitySteps = [];
+      state.pendingImages = [];
     }),
   );
 }
 
 /**
  * Set the account context for account-level pages (Nucleus/Watchtower)
- * This should be called when navigating to account-level pages
  */
 export function setAccountContext(
   this: IStoreApi<IOverseerState>,
@@ -631,366 +666,531 @@ export function setAccountContext(
   );
 }
 
+/**
+ * Clear selected text (switch to Q&A / full-context mode)
+ */
+export function clearSelectedText(this: IStoreApi<IOverseerState>) {
+  const { set } = this;
+
+  set(
+    produce((state: IOverseerState) => {
+      state.selectedText = '';
+      state.expandedText = '';
+    }),
+  );
+}
+
 // =============================================================================
-// Custom Command Flow Actions
+// Section Highlight Actions
 // =============================================================================
 
 /**
- * Start the custom command creation flow
+ * Set the highlighted section ID for the overlay
  */
-export function startCustomCommandFlow(this: IStoreApi<IOverseerState>) {
-  const { set } = this;
-
-  set(
-    produce((state: IOverseerState) => {
-      state.customCommandFlow = {
-        isActive: true,
-        currentStep: 'name',
-        data: {
-          name: '',
-          label: '',
-          description: '',
-          promptModifier: '',
-          enableWebSearch: false,
-          enableNucleusSearch: false,
-        },
-        error: undefined,
-        isSubmitting: false,
-      };
-      state.customCommandManagementFlow = {
-        ...initialCustomCommandManagementFlow,
-      };
-      // Clear any existing messages/state
-      state.messages = [];
-      state.suggestedQuestions = [];
-      state.currentMessage = '';
-      state.isThinking = false;
-    }),
-  );
-}
-
-/**
- * Start the custom command management flow
- */
-export function startManageCustomCommandsFlow(this: IStoreApi<IOverseerState>) {
-  const { set } = this;
-
-  set(
-    produce((state: IOverseerState) => {
-      state.customCommandManagementFlow = { isActive: true };
-      state.customCommandFlow = { ...initialCustomCommandFlow };
-      // Clear any existing messages/state
-      state.messages = [];
-      state.suggestedQuestions = [];
-      state.currentMessage = '';
-      state.isThinking = false;
-    }),
-  );
-}
-
-/**
- * Validate the current step value
- */
-function validateStepValue(
-  step: CustomCommandFlowStep,
-  value: string,
-): string | undefined {
-  switch (step) {
-    case 'name': {
-      if (!value) return 'Command name is required';
-      if (value.length < 3) return 'Name must be at least 3 characters';
-      if (value.length > 32) return 'Name must be 32 characters or less';
-      if (!/^[a-z0-9][a-z0-9-]*[a-z0-9]$|^[a-z0-9]{1,2}$/.test(value)) {
-        return 'Only lowercase letters, numbers, and hyphens allowed';
-      }
-      if (value.includes('--')) return 'Cannot contain consecutive hyphens';
-      if (RESERVED_NAMES.includes(value))
-        return `"${value}" is a reserved name`;
-      return undefined;
-    }
-    case 'label': {
-      if (!value || value.length < 2) {
-        return 'Label must be at least 2 characters';
-      }
-      return undefined;
-    }
-    case 'description': {
-      if (!value || value.length < 10) {
-        return 'Description must be at least 10 characters';
-      }
-      return undefined;
-    }
-    case 'promptModifier': {
-      if (!value || value.length < 10) {
-        return 'Prompt must be at least 10 characters';
-      }
-      if (value.length > 2000) {
-        return 'Prompt must be 2000 characters or less';
-      }
-      return undefined;
-    }
-    default:
-      return undefined;
-  }
-}
-
-/**
- * Submit a value for the current step and advance
- */
-export function submitCustomCommandStep(
+export function setHighlightedSection(
   this: IStoreApi<IOverseerState>,
-  value: string,
-) {
-  const { set, get } = this;
-  const { customCommandFlow } = get();
-
-  if (!customCommandFlow.isActive) return;
-
-  const { currentStep } = customCommandFlow;
-
-  // For tools step, we handle it differently (via toggle)
-  if (currentStep === 'tools' || currentStep === 'confirm') {
-    // Just advance to next step
-    const currentIndex = CUSTOM_COMMAND_STEPS.indexOf(currentStep);
-    if (currentIndex < CUSTOM_COMMAND_STEPS.length - 1) {
-      set(
-        produce((state: IOverseerState) => {
-          state.customCommandFlow.currentStep =
-            CUSTOM_COMMAND_STEPS[currentIndex + 1];
-          state.customCommandFlow.error = undefined;
-        }),
-      );
-    }
-    return;
-  }
-
-  // Validate the value
-  const error = validateStepValue(currentStep, value);
-  if (error) {
-    set(
-      produce((state: IOverseerState) => {
-        state.customCommandFlow.error = error;
-      }),
-    );
-    return;
-  }
-
-  // Store the value and advance to next step
-  const currentIndex = CUSTOM_COMMAND_STEPS.indexOf(currentStep);
-  const nextStep =
-    currentIndex < CUSTOM_COMMAND_STEPS.length - 1
-      ? CUSTOM_COMMAND_STEPS[currentIndex + 1]
-      : currentStep;
-
-  set(
-    produce((state: IOverseerState) => {
-      // Store the value
-      if (currentStep === 'name') {
-        state.customCommandFlow.data.name = value
-          .toLowerCase()
-          .replace(/[^a-z0-9-]/g, '');
-      } else if (currentStep === 'label') {
-        state.customCommandFlow.data.label = value;
-      } else if (currentStep === 'description') {
-        state.customCommandFlow.data.description = value;
-      } else if (currentStep === 'promptModifier') {
-        state.customCommandFlow.data.promptModifier = value;
-      }
-
-      state.customCommandFlow.currentStep = nextStep;
-      state.customCommandFlow.error = undefined;
-      // Clear the current message for the next step
-      state.currentMessage = '';
-    }),
-  );
-}
-
-/**
- * Go back to the previous step
- */
-export function goBackCustomCommandStep(this: IStoreApi<IOverseerState>) {
-  const { set, get } = this;
-  const { customCommandFlow } = get();
-
-  if (!customCommandFlow.isActive) return;
-
-  const currentIndex = CUSTOM_COMMAND_STEPS.indexOf(
-    customCommandFlow.currentStep,
-  );
-  if (currentIndex > 0) {
-    set(
-      produce((state: IOverseerState) => {
-        state.customCommandFlow.currentStep =
-          CUSTOM_COMMAND_STEPS[currentIndex - 1];
-        state.customCommandFlow.error = undefined;
-      }),
-    );
-  }
-}
-
-/**
- * Cancel the custom command flow
- */
-export function cancelCustomCommandFlow(this: IStoreApi<IOverseerState>) {
-  const { set } = this;
-
-  set(
-    produce((state: IOverseerState) => {
-      state.customCommandFlow = { ...initialCustomCommandFlow };
-    }),
-  );
-}
-
-/**
- * Cancel the custom command management flow
- */
-export function cancelManageCustomCommandsFlow(
-  this: IStoreApi<IOverseerState>,
+  sectionId: string | null,
 ) {
   const { set } = this;
 
   set(
     produce((state: IOverseerState) => {
-      state.customCommandManagementFlow = {
-        ...initialCustomCommandManagementFlow,
-      };
+      state.highlightedSectionId = sectionId;
     }),
   );
 }
 
-/**
- * Toggle a tool option (web search or nucleus search)
- */
-export function toggleCustomCommandTool(
-  this: IStoreApi<IOverseerState>,
-  tool: 'webSearch' | 'nucleusSearch',
-) {
-  const { set, get } = this;
-  const { customCommandFlow } = get();
+// =============================================================================
+// Dock Actions
+// =============================================================================
 
-  if (!customCommandFlow.isActive) return;
+/**
+ * Set the docked state
+ */
+export function setDocked(this: IStoreApi<IOverseerState>, value: boolean) {
+  const { set } = this;
 
   set(
     produce((state: IOverseerState) => {
-      if (tool === 'webSearch') {
-        state.customCommandFlow.data.enableWebSearch =
-          !state.customCommandFlow.data.enableWebSearch;
+      state.isDocked = value;
+    }),
+  );
+}
+
+// =============================================================================
+// Feature Toggle Actions
+// =============================================================================
+
+/**
+ * Toggle a feature (web search, nucleus, aiEdit)
+ */
+export function toggleFeature(
+  this: IStoreApi<IOverseerState>,
+  feature: OverseerFeature,
+) {
+  const { set, get } = this;
+  const { activeFeatures } = get();
+
+  set(
+    produce((state: IOverseerState) => {
+      const newFeatures = new Set(activeFeatures);
+      if (newFeatures.has(feature)) {
+        newFeatures.delete(feature);
       } else {
-        state.customCommandFlow.data.enableNucleusSearch =
-          !state.customCommandFlow.data.enableNucleusSearch;
+        newFeatures.add(feature);
       }
+      state.activeFeatures = newFeatures;
     }),
   );
 }
 
 /**
- * Edit a specific field (go back to that step)
+ * Clear all active features
  */
-export function editCustomCommandField(
+export function clearFeatures(this: IStoreApi<IOverseerState>) {
+  const { set } = this;
+
+  set(
+    produce((state: IOverseerState) => {
+      state.activeFeatures = new Set();
+    }),
+  );
+}
+
+// =============================================================================
+// Mention Actions
+// =============================================================================
+
+/**
+ * Add a mention to the current message
+ */
+export function addMention(this: IStoreApi<IOverseerState>, item: MentionItem) {
+  const { set, get } = this;
+  const { mentions } = get();
+
+  // Don't add duplicate mentions
+  if (mentions.some((m) => m.id === item.id)) return;
+
+  set(
+    produce((state: IOverseerState) => {
+      state.mentions = [...state.mentions, item];
+    }),
+  );
+}
+
+/**
+ * Remove a mention by id
+ */
+export function removeMention(this: IStoreApi<IOverseerState>, id: string) {
+  const { set, get } = this;
+  const { mentions } = get();
+
+  set(
+    produce((state: IOverseerState) => {
+      state.mentions = mentions.filter((m) => m.id !== id);
+    }),
+  );
+}
+
+// =============================================================================
+// History Sidebar Actions
+// =============================================================================
+
+/**
+ * Toggle the chat history sidebar
+ */
+export function setShowHistory(
   this: IStoreApi<IOverseerState>,
-  step: CustomCommandFlowStep,
+  value: boolean,
+) {
+  const { set } = this;
+
+  set(
+    produce((state: IOverseerState) => {
+      state.showHistory = value;
+    }),
+  );
+}
+
+// =============================================================================
+// History Data Actions
+// =============================================================================
+
+/**
+ * Set history items from API response
+ */
+export function setHistoryItems(
+  this: IStoreApi<IOverseerState>,
+  items: IOverseerConversation[],
+) {
+  const { set } = this;
+
+  set(
+    produce((state: IOverseerState) => {
+      state.historyItems = items;
+    }),
+  );
+}
+
+/**
+ * Set history loading state
+ */
+export function setHistoryLoading(
+  this: IStoreApi<IOverseerState>,
+  value: boolean,
+) {
+  const { set } = this;
+
+  set(
+    produce((state: IOverseerState) => {
+      state.historyLoading = value;
+    }),
+  );
+}
+
+/**
+ * Handle conversation name arriving via WebSocket.
+ * Finds the placeholder item by sessionId and updates its name.
+ */
+export function handleConversationName(
+  this: IStoreApi<IOverseerState>,
+  params: { sessionId: string; name: string },
 ) {
   const { set, get } = this;
-  const { customCommandFlow } = get();
+  const { historyItems } = get();
 
-  if (!customCommandFlow.isActive) return;
-
-  // Get the existing value for pre-population
-  let existingValue = '';
-  switch (step) {
-    case 'name':
-      existingValue = customCommandFlow.data.name;
-      break;
-    case 'label':
-      existingValue = customCommandFlow.data.label;
-      break;
-    case 'description':
-      existingValue = customCommandFlow.data.description;
-      break;
-    case 'promptModifier':
-      existingValue = customCommandFlow.data.promptModifier;
-      break;
-  }
+  const updated = historyItems.map((item) =>
+    item.uuid === params.sessionId ? { ...item, name: params.name } : item,
+  );
 
   set(
     produce((state: IOverseerState) => {
-      state.customCommandFlow.currentStep = step;
-      state.customCommandFlow.error = undefined;
-      // Pre-populate the input with the existing value
-      state.currentMessage = existingValue;
+      state.historyItems = updated;
     }),
   );
 }
 
 /**
- * Confirm and create the custom command
+ * Load a conversation from the API response into the chat view.
  */
-export async function confirmCustomCommand(this: IStoreApi<IOverseerState>) {
-  const { set, get } = this;
-  const { customCommandFlow } = get();
+export function loadConversation(
+  this: IStoreApi<IOverseerState>,
+  conversation: IOverseerConversationDetail,
+) {
+  const { set } = this;
 
-  if (!customCommandFlow.isActive || customCommandFlow.isSubmitting) return;
-
-  // Set submitting state
   set(
     produce((state: IOverseerState) => {
-      state.customCommandFlow.isSubmitting = true;
-      state.customCommandFlow.error = undefined;
+      state.sessionId = conversation.uuid;
+      // Don't show the selected text chip for loaded conversations
+      state.selectedText = '';
+      state.expandedText = '';
+      state.pageContext = conversation.pageContext ?? 'overview';
+      state.contextType =
+        (conversation.contextType as OverseerContextType) ?? 'concept';
+      state.conceptUuid = conversation.conceptUuid ?? undefined;
+      state.accountUuid = conversation.accountUuid ?? undefined;
+
+      state.messages = conversation.messages.map((msg) => {
+        let content =
+          typeof msg.content === 'string'
+            ? msg.content
+            : JSON.stringify(msg.content);
+
+        // The first user message is stored with internal context prefixes
+        // e.g. "[Selected Text]: ...\n[Full Sentence]: ...\n[User Message]: hello"
+        // Extract just the actual user message for display.
+        if (msg.role === 'user' && content.includes('[User Message]:')) {
+          const match = content.match(/\[User Message\]:\s*([\s\S]*)$/);
+          if (match) {
+            content = match[1].trim();
+          }
+        }
+
+        // Strip "[User attached N image(s)]" text annotation (images stored in metadata)
+        content = content
+          .replace(/\n?\[User attached \d+ image\(s\)\]/, '')
+          .trim();
+
+        const images =
+          msg.role === 'user' && msg.metadata?.images
+            ? (msg.metadata.images as Array<{
+                dataUrl: string;
+                filename?: string;
+              }>)
+            : undefined;
+
+        // Edit suggestions stored as assistant + metadata flag — restore as edit_suggestion role
+        // Backend stores as overseer_edit_suggestion, CamelCaseMiddleware converts to overseerEditSuggestion
+        if (
+          msg.role === 'assistant' &&
+          msg.metadata?.overseerEditSuggestion === true
+        ) {
+          const parsed =
+            typeof msg.content === 'string'
+              ? JSON.parse(msg.content)
+              : msg.content;
+
+          return {
+            uuid: msg.uuid,
+            role: 'edit_suggestion' as const,
+            editSuggestions: {
+              uuid: parsed.uuid,
+              reply: parsed.reply,
+              edits: parsed.edits ?? [],
+            },
+            timestamp: msg.createdAt,
+          } as IOverseerEditSuggestionMessage;
+        }
+
+        const sources =
+          msg.role === 'assistant' &&
+          msg.metadata?.sources &&
+          Array.isArray(msg.metadata.sources)
+            ? (
+                msg.metadata.sources as Array<{ name: string; url: string }>
+              ).filter(
+                (s) =>
+                  typeof s === 'object' &&
+                  s !== null &&
+                  'name' in s &&
+                  'url' in s,
+              )
+            : undefined;
+
+        return {
+          uuid: msg.uuid,
+          content,
+          role: msg.role,
+          name: msg.name,
+          timestamp: msg.createdAt,
+          ...(images && { images }),
+          ...(sources && { sources }),
+        };
+      });
+
+      state.suggestedQuestions = [];
+      state.editSuggestions = null;
+      state.highlightedSectionId = null;
+      state.isThinking = false;
+      state.thinkingMessage = undefined;
+      state.currentError = undefined;
+      state.hasError = false;
+      state.toolActivitySteps = [];
+      state.showHistory = false;
     }),
   );
+}
 
-  try {
-    await api.customCommands.createCustomCommand({
-      name: customCommandFlow.data.name,
-      label: customCommandFlow.data.label,
-      description: customCommandFlow.data.description,
-      promptModifier: customCommandFlow.data.promptModifier,
-      enableWebSearch: customCommandFlow.data.enableWebSearch,
-      enableNucleusSearch: customCommandFlow.data.enableNucleusSearch,
-      icon: 'terminal',
-    });
+// =============================================================================
+// Image Actions
+// =============================================================================
 
-    const commandName = customCommandFlow.data.name;
+const ALLOWED_IMAGE_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+]);
+const MAX_IMAGES = 4;
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 
-    // Success - reset the flow and add success message
-    set(
-      produce((state: IOverseerState) => {
-        state.customCommandFlow = { ...initialCustomCommandFlow };
-        // Add a success message to the chat
-        state.messages = [
-          {
-            uuid: uuidv4(),
-            role: 'assistant',
-            content: `Your custom command **/${commandName}** has been created successfully! You can now use it by typing \`/${commandName}\` in the chat.`,
-            name: 'Overseer',
-            timestamp: new Date().toISOString(),
-          },
-        ];
-      }),
-    );
+/**
+ * Add an image to pending attachments
+ */
+export function addImage(this: IStoreApi<IOverseerState>, file: File) {
+  const { set, get } = this;
+  const { pendingImages } = get();
 
-    // Invalidate custom commands queries to refresh the list
-    if (queryClientRef) {
-      queryClientRef.invalidateQueries([AucctusQueryKeys.customCommands]);
-      queryClientRef.invalidateQueries([
-        AucctusQueryKeys.customCommandsForPicker,
-      ]);
-    }
-
-    telemetry.debug('Custom command created via conversational flow', {
-      name: commandName,
-    });
-  } catch (error: any) {
-    const errorMessage =
-      error?.response?.data?.detail ||
-      error?.response?.data?.message ||
-      'Failed to create custom command';
-
-    set(
-      produce((state: IOverseerState) => {
-        state.customCommandFlow.isSubmitting = false;
-        state.customCommandFlow.error = errorMessage;
-      }),
-    );
+  if (pendingImages.length >= MAX_IMAGES) {
+    telemetry.debug('Overseer: Maximum images reached');
+    return;
   }
+
+  if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+    telemetry.debug('Overseer: Unsupported image type', { type: file.type });
+    return;
+  }
+
+  if (file.size > MAX_IMAGE_SIZE) {
+    telemetry.debug('Overseer: Image too large', { size: file.size });
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const dataUrl = reader.result as string;
+    const image: IOverseerPendingImage = {
+      id: uuidv4(),
+      file,
+      dataUrl,
+    };
+    set(
+      produce((state: IOverseerState) => {
+        state.pendingImages = [...state.pendingImages, image];
+      }),
+    );
+  };
+  reader.readAsDataURL(file);
+}
+
+/**
+ * Remove a pending image by id
+ */
+export function removeImage(this: IStoreApi<IOverseerState>, id: string) {
+  const { set, get } = this;
+  const { pendingImages } = get();
+
+  set(
+    produce((state: IOverseerState) => {
+      state.pendingImages = pendingImages.filter((img) => img.id !== id);
+    }),
+  );
+}
+
+/**
+ * Clear all pending images
+ */
+export function clearImages(this: IStoreApi<IOverseerState>) {
+  const { set } = this;
+
+  set(
+    produce((state: IOverseerState) => {
+      state.pendingImages = [];
+    }),
+  );
+}
+
+// =============================================================================
+// Tool Activity Step Actions
+// =============================================================================
+
+/**
+ * Add a tool activity step. Marks previous active steps as done.
+ */
+export function addToolActivityStep(
+  this: IStoreApi<IOverseerState>,
+  activityMessage: string,
+  detail?: string,
+  icon?: AgentStep['icon'],
+) {
+  const { set, get } = this;
+  const { toolActivitySteps } = get();
+
+  // Use backend icon when provided, fall back to keyword matching
+  let resolvedIcon: AgentStep['icon'] = icon ?? 'search';
+  if (!icon) {
+    const lower = activityMessage.toLowerCase();
+    if (lower.includes('web') || lower.includes('browsing')) {
+      resolvedIcon = 'search';
+    } else if (lower.includes('nucleus') || lower.includes('scan')) {
+      resolvedIcon = 'scan';
+    } else if (lower.includes('analy')) {
+      resolvedIcon = 'analyze';
+    } else if (lower.includes('synth') || lower.includes('generat')) {
+      resolvedIcon = 'synthesize';
+    }
+  }
+
+  // Dedup: if a step with the same label already exists, reuse it
+  const existingIndex = toolActivitySteps.findIndex(
+    (s) => s.label === activityMessage,
+  );
+
+  if (existingIndex !== -1) {
+    // Reuse existing step: mark all active as done, reset the matched step to active
+    const updatedSteps = toolActivitySteps.map((step, i) => {
+      if (i === existingIndex) {
+        return {
+          ...step,
+          status: 'active' as const,
+          detail,
+          icon: resolvedIcon,
+        };
+      }
+      return step.status === 'active'
+        ? { ...step, status: 'done' as const }
+        : step;
+    });
+
+    set(
+      produce((state: IOverseerState) => {
+        state.toolActivitySteps = updatedSteps;
+      }),
+    );
+    return;
+  }
+
+  const newStep: AgentStep = {
+    id: uuidv4(),
+    label: activityMessage,
+    detail,
+    status: 'active',
+    icon: resolvedIcon,
+  };
+
+  // Mark all existing active steps as done
+  const updatedSteps = toolActivitySteps.map((step) =>
+    step.status === 'active' ? { ...step, status: 'done' as const } : step,
+  );
+
+  set(
+    produce((state: IOverseerState) => {
+      state.toolActivitySteps = [...updatedSteps, newStep];
+    }),
+  );
+}
+
+/**
+ * Start synthesis phase (when response arrives but before showing it).
+ * Adds a "Synthesizing findings" step as active, marks all prior steps as done.
+ */
+export function clearToolActivitySteps(this: IStoreApi<IOverseerState>) {
+  const { set, get } = this;
+  const { toolActivitySteps } = get();
+
+  if (toolActivitySteps.length === 0) return;
+
+  // Mark all existing steps as done
+  const doneSteps = toolActivitySteps.map((step) =>
+    step.status !== 'done' ? { ...step, status: 'done' as const } : step,
+  );
+
+  // Add synthesis step as active (will show spinner for 2 seconds)
+  const stepsWithSynthesis: AgentStep[] = [
+    ...doneSteps,
+    {
+      id: uuidv4(),
+      label: 'Synthesizing findings',
+      status: 'active' as const,
+      icon: 'synthesize' as const,
+    },
+  ];
+
+  set(
+    produce((state: IOverseerState) => {
+      state.toolActivitySteps = stepsWithSynthesis;
+    }),
+  );
+}
+
+/**
+ * Finalize the synthesis step by marking it as done.
+ * Called after the 2-second synthesis delay, right before showing the response.
+ */
+export function finalizeSynthesisStep(this: IStoreApi<IOverseerState>) {
+  const { set, get } = this;
+  const { toolActivitySteps } = get();
+
+  if (toolActivitySteps.length === 0) return;
+
+  const finalSteps = toolActivitySteps.map((step) =>
+    step.status !== 'done' ? { ...step, status: 'done' as const } : step,
+  );
+
+  set(
+    produce((state: IOverseerState) => {
+      state.toolActivitySteps = finalSteps;
+    }),
+  );
 }

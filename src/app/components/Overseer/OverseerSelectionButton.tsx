@@ -1,10 +1,11 @@
+import NavLogo from '@assets/aucctus_logo.png';
 import useStore from '@stores/store';
-import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import { createPortal } from 'react-dom';
 
 /**
- * A small button that appears when text is selected
+ * A pill-shaped tooltip that appears centered above text selection
  * Clicking it opens the Overseer chat with the selected text
  */
 const OverseerSelectionButton: React.FC = () => {
@@ -21,7 +22,6 @@ const OverseerSelectionButton: React.FC = () => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // Clear the text selection
     window.getSelection()?.removeAllRanges();
     confirmSelection();
   };
@@ -30,32 +30,20 @@ const OverseerSelectionButton: React.FC = () => {
     <AnimatePresence>
       <motion.button
         data-overseer-button='true'
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.9, y: 4 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 4 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
         onClick={handleClick}
-        className='fixed z-[10000] flex items-center gap-1.5 rounded-md bg-gray-900 px-3 py-1.5 text-sm font-medium text-white shadow-lg transition-colors hover:bg-black'
+        className='fixed z-[10000] flex items-center gap-2 rounded-full bg-[#1a1a1a] px-3.5 py-2 text-sm font-medium text-white shadow-xl ring-1 ring-white/10 transition-colors hover:bg-[#252525]'
         style={{
           left: pendingSelection.buttonPosition.x,
           top: pendingSelection.buttonPosition.y,
+          transform: 'translateX(-50%)',
         }}
       >
-        <svg
-          width='14'
-          height='14'
-          viewBox='0 0 24 24'
-          fill='none'
-          stroke='currentColor'
-          strokeWidth='2'
-          strokeLinecap='round'
-          strokeLinejoin='round'
-        >
-          <circle cx='12' cy='12' r='10' />
-          <path d='M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3' />
-          <path d='M12 17h.01' />
-        </svg>
-        Ask Overseer
+        <img src={NavLogo} alt='Aucctus' className='h-4 w-4' />
+        Ask Aucctus
       </motion.button>
     </AnimatePresence>
   );

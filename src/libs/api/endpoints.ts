@@ -1018,6 +1018,29 @@ export class Endpoints {
   }
 
   // ============================================
+  // Overseer History Endpoints
+  // ============================================
+
+  static overseerConversations(params?: {
+    page?: number;
+    conceptUuid?: string;
+    accountUuid?: string;
+  }) {
+    const searchParams = new URLSearchParams();
+    if (params?.page) searchParams.append('page', params.page.toString());
+    if (params?.conceptUuid)
+      searchParams.append('concept_uuid', params.conceptUuid);
+    if (params?.accountUuid)
+      searchParams.append('account_uuid', params.accountUuid);
+    const query = searchParams.toString();
+    return `/api/v1/chat/overseer/conversations${query ? `?${query}` : ''}`;
+  }
+
+  static overseerConversationDetail(uuid: string) {
+    return `/api/v1/chat/overseer/conversations/${uuid}`;
+  }
+
+  // ============================================
   // Dynamic Component Endpoints
   // ============================================
   static dynamicComponentGenerate = '/api/v1/dynamic-components/generate';

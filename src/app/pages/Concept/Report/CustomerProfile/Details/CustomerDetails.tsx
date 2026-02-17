@@ -231,7 +231,10 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
           <ProfileConversationSkeleton />
         </div>
       ) : (
-        <div className='flex w-full flex-row gap-4'>
+        <div
+          data-section-id='customer_profiles'
+          className='flex w-full flex-row gap-4'
+        >
           <CustomerOverview
             ref={overviewRef}
             profile={profile}
@@ -251,6 +254,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         ) : (
           <div
             ref={jobsRef}
+            data-section-id='customer_jobs'
             className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
           >
             <CustomerJobs
@@ -264,6 +268,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         ) : (
           <div
             ref={painsRef}
+            data-section-id='customer_pains'
             className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
           >
             <CustomerPains
@@ -277,6 +282,7 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         ) : (
           <div
             ref={alternativesRef}
+            data-section-id='customer_alternatives'
             className='flex min-w-0 flex-1 [&>*]:h-full [&>*]:w-full'
           >
             <CustomerAlternatives customerProfileUuid={profile.uuid} />
@@ -284,7 +290,10 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         )}
       </div>
 
-      <div className='flex w-full flex-row gap-4'>
+      <div
+        data-section-id='customer_journey_steps'
+        className='flex w-full flex-row gap-4'
+      >
         {shouldShowSkeleton ? (
           renderSupportSkeletonCard()
         ) : (
@@ -296,7 +305,10 @@ const CustomerDetails: FunctionComponent<ICustomerDetailsProps> = ({
         )}
       </div>
       {FEATURE_CUSTOMER_PROFILE_REAL_WORLD_SIGNALS && (
-        <div className='flex w-full flex-row gap-4'>
+        <div
+          data-section-id='customer_real_world_signals'
+          className='flex w-full flex-row gap-4'
+        >
           {shouldShowSkeleton ? (
             renderSupportSkeletonCard()
           ) : (

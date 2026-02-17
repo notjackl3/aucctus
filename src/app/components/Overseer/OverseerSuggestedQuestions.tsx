@@ -9,8 +9,8 @@ interface OverseerSuggestedQuestionsProps {
 }
 
 /**
- * Suggested follow-up questions displayed as pill buttons
- * Features horizontal drag scrolling and subtle styling
+ * Follow-up suggestion pills - smaller, more subtle style
+ * Features horizontal drag scrolling
  */
 const OverseerSuggestedQuestions: React.FC<OverseerSuggestedQuestionsProps> = ({
   questions,
@@ -45,11 +45,9 @@ const OverseerSuggestedQuestions: React.FC<OverseerSuggestedQuestionsProps> = ({
   };
 
   return (
-    <div
-      className={cn('shrink-0 border-t border-white/10 px-4 py-2.5', className)}
-    >
+    <div className={cn('shrink-0 px-4 py-2', className)}>
       <div
-        className='flex cursor-grab gap-2 overflow-x-auto active:cursor-grabbing'
+        className='flex cursor-grab gap-1.5 overflow-x-auto active:cursor-grabbing'
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
@@ -62,14 +60,14 @@ const OverseerSuggestedQuestions: React.FC<OverseerSuggestedQuestionsProps> = ({
             key={index}
             onClick={() => onQuestionClick(question)}
             disabled={disabled}
-            className={cn(
-              'aucctus-bg-frosted-glass shrink-0 rounded-full border border-white/15 bg-white/5 px-3 py-1.5 backdrop-blur-md',
-              'aucctus-text-xs-medium text-white/60 transition-all duration-200',
-              'hover:border-white/30 hover:bg-white/10 hover:text-white',
-              'disabled:cursor-not-allowed disabled:opacity-50',
-            )}
+            className='shrink-0 rounded-full px-2.5 py-0.5 text-[10px] font-light text-white/45 transition-colors hover:text-white/70 disabled:cursor-not-allowed disabled:opacity-50'
+            style={{
+              background: 'rgba(255,255,255,0.06)',
+              backdropFilter: 'blur(8px)',
+              border: '1px solid rgba(255,255,255,0.05)',
+            }}
           >
-            <span>{question}</span>
+            {question}
           </button>
         ))}
       </div>

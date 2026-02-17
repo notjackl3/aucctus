@@ -6,7 +6,8 @@ import {
   Select,
   ConceptReportSkeletons,
 } from '@components';
-import { OverseerWrapper } from '@components/Overseer';
+import { OverseerWrapper, ROUTE_TO_PAGE_CONTEXT } from '@components/Overseer';
+import AucctusLogo from '@assets/aucctus_logo.png';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import {
@@ -191,6 +192,21 @@ const ConceptReport: FunctionComponent = () => {
     [conceptIdentifier, navigate],
   );
 
+  const overseerOpen = useStore((state) => state.overseer.open);
+  const setDocked = useStore((state) => state.overseer.setDocked);
+
+  const onAskAucctusClick = useCallback(() => {
+    const pageContext = ROUTE_TO_PAGE_CONTEXT[activeTab || ''] || 'overview';
+    overseerOpen({
+      selectedText: '',
+      expandedText: '',
+      pageContext,
+      position: { x: 0, y: 0 },
+      conceptUuid: conceptUuid || undefined,
+    });
+    setDocked(true);
+  }, [activeTab, conceptUuid, overseerOpen, setDocked]);
+
   const onMagicShareClick = useCallback(() => {
     openModal(
       Modal.MagicShare,
@@ -233,111 +249,122 @@ const ConceptReport: FunctionComponent = () => {
   return (
     <>
       <ConceptReportSocketWrapper />
-      <div className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8')}>
-        <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
-          {/* Title and Status Section */}
-          {isConceptLoading || isConceptFetching ? (
-            <div className='aucctus-bg-secondary flex flex-row items-center justify-start gap-4 rounded-lg p-4'>
-              {/* Title Skeleton - matches text-3xl height */}
-              <SkeletonBlock className='h-9 w-80' />
-              {/* Status Dropdown Skeleton */}
-              <SkeletonBlock className='h-10 w-32 rounded' />
-            </div>
-          ) : (
-            <div className='flex flex-row items-center justify-start'>
-              <EditModeSwitcher
-                containerClassName={cn({
-                  'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
-                    concept?.isHistoricalVersion,
-                })}
-                pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
-                textFieldClassName='!text-3xl max-w-[600px]'
-                value={titleEdit.value}
-                label=''
-                name='title'
-                maxLength={titleEdit.validation.maxLength}
-                rows={1}
-                onChange={(e) => titleEdit.handleChange(e)}
-                saveOnBlur={true}
-                handleSave={() => titleEdit.handleSave()}
-                handleCancel={() => titleEdit.handleCancel()}
-              />
-              <div className='ml-4 flex'>
-                <Select.ConceptStatus
-                  disabled={concept?.isHistoricalVersion}
-                  value={status}
-                  onChange={changeConceptStatus}
-                />
-              </div>
-            </div>
-          )}
-          <div className='flex gap-4'>
-            {concept &&
-              !concept.isHistoricalVersion &&
-              FEATURE_CONCEPT_VERSIONING && (
-                <ConceptVersionsButton
-                  conceptUuid={conceptUuid}
-                  conceptIdentifier={conceptIdentifier}
-                />
-              )}
-            {!concept?.isHistoricalVersion && (
-              <>
-                <button
-                  onClick={onMagicShareClick}
-                  className='flex items-center gap-2 rounded-lg px-4 py-2 text-white transition-opacity hover:opacity-90'
-                  style={{ backgroundColor: '#120C0C' }}
-                  aria-label='Magic Share'
-                >
-                  <Icon
-                    variant='threeStars'
-                    className='h-4 w-4 fill-white stroke-white'
-                  />
-                  Magic Share
-                </button>
-                <div className='group relative'>
-                  <button
-                    onClick={() =>
-                      openModal(
-                        Modal.AiEditing,
-                        {},
-                        {
-                          position: 'right',
-                          modalClassName: 'max-h-[90vh]',
-                          hideBodyScroll: true,
-                          shouldCloseOnOverlayClick: true,
-                          shouldCloseOnEscape: true,
-                        },
-                      )
-                    }
-                    className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-                  >
-                    Refine
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        </div>
-        <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
-          <Container.TabView
-            className=''
-            tabGroupClassName='rounded-lg p-1 mb-2'
-            tabContainerClassName='gap-1'
-            tabContentClassName={cn({
-              'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
-                concept?.isHistoricalVersion,
-            })}
-            tabs={conceptTabs}
-            variant='icon-button'
-            onTabSelect={onTabSelect}
-            activeTab={activeTab || ''}
-          >
-            {!concept ? (
-              <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
-                <Loading />
+      <OverseerWrapper>
+        <div className={cn('mx-auto my-0 flex min-h-full w-full flex-col p-8')}>
+          <div className='mb-8 flex flex-row items-start justify-between self-stretch'>
+            {/* Title and Status Section */}
+            {isConceptLoading || isConceptFetching ? (
+              <div className='aucctus-bg-secondary flex flex-row items-center justify-start gap-4 rounded-lg p-4'>
+                {/* Title Skeleton - matches text-3xl height */}
+                <SkeletonBlock className='h-9 w-80' />
+                {/* Status Dropdown Skeleton */}
+                <SkeletonBlock className='h-10 w-32 rounded' />
               </div>
             ) : (
-              <OverseerWrapper>
+              <div className='flex flex-row items-center justify-start'>
+                <EditModeSwitcher
+                  containerClassName={cn({
+                    'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
+                      concept?.isHistoricalVersion,
+                  })}
+                  pClassName='aucctus-text-brand-primary aucctus-header-sm-medium'
+                  textFieldClassName='!text-3xl max-w-[600px]'
+                  value={titleEdit.value}
+                  label=''
+                  name='title'
+                  maxLength={titleEdit.validation.maxLength}
+                  rows={1}
+                  onChange={(e) => titleEdit.handleChange(e)}
+                  saveOnBlur={true}
+                  handleSave={() => titleEdit.handleSave()}
+                  handleCancel={() => titleEdit.handleCancel()}
+                />
+                <div className='ml-4 flex'>
+                  <Select.ConceptStatus
+                    disabled={concept?.isHistoricalVersion}
+                    value={status}
+                    onChange={changeConceptStatus}
+                  />
+                </div>
+              </div>
+            )}
+            <div className='flex gap-4'>
+              {!concept?.isHistoricalVersion && (
+                <button
+                  onClick={onAskAucctusClick}
+                  className='flex items-center gap-2 rounded-lg px-4 py-2 text-white transition-colors hover:bg-[#3a1212]'
+                  style={{ backgroundColor: '#2a0a0a' }}
+                  aria-label='Ask Aucctus'
+                >
+                  <img src={AucctusLogo} alt='Aucctus' className='h-4 w-4' />
+                  Ask Aucctus
+                </button>
+              )}
+              {concept &&
+                !concept.isHistoricalVersion &&
+                FEATURE_CONCEPT_VERSIONING && (
+                  <ConceptVersionsButton
+                    conceptUuid={conceptUuid}
+                    conceptIdentifier={conceptIdentifier}
+                  />
+                )}
+              {!concept?.isHistoricalVersion && (
+                <>
+                  <button
+                    onClick={onMagicShareClick}
+                    className='flex items-center gap-2 rounded-lg px-4 py-2 text-white transition-opacity hover:opacity-90'
+                    style={{ backgroundColor: '#120C0C' }}
+                    aria-label='Magic Share'
+                  >
+                    <Icon
+                      variant='threeStars'
+                      className='h-4 w-4 fill-white stroke-white'
+                    />
+                    Magic Share
+                  </button>
+                  <div className='group relative'>
+                    <button
+                      onClick={() =>
+                        openModal(
+                          Modal.AiEditing,
+                          {},
+                          {
+                            position: 'right',
+                            modalClassName: 'max-h-[90vh]',
+                            hideBodyScroll: true,
+                            shouldCloseOnOverlayClick: true,
+                            shouldCloseOnEscape: true,
+                          },
+                        )
+                      }
+                      className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
+                    >
+                      Refine
+                    </button>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+          <div className='flex h-full w-full max-w-[1200px] flex-col flex-wrap items-start gap-6 self-stretch'>
+            <Container.TabView
+              className=''
+              tabGroupClassName='rounded-lg p-1 mb-2'
+              tabContainerClassName='gap-1'
+              tabContentClassName={cn({
+                'pointer-events-none select-text select-auto user-select-auto webkit-user-select-auto':
+                  concept?.isHistoricalVersion,
+              })}
+              tabs={conceptTabs}
+              variant='icon-button'
+              onTabSelect={onTabSelect}
+              activeTab={activeTab || ''}
+            >
+              {!concept ? (
+                <div className='flex h-full min-h-96 w-full items-center justify-center align-middle'>
+                  <Loading />
+                </div>
+              ) : (
                 <div key={activeTab} className='animate-fade-in'>
                   <Outlet
                     context={{
@@ -346,16 +373,19 @@ const ConceptReport: FunctionComponent = () => {
                     }}
                   />
                 </div>
-              </OverseerWrapper>
-            )}
-          </Container.TabView>
+              )}
+            </Container.TabView>
+          </div>
+          <LoadingMask
+            isLoading={
+              isConceptLoading ||
+              isConceptFetching ||
+              isReverting ||
+              isCancelling
+            }
+          />
         </div>
-        <LoadingMask
-          isLoading={
-            isConceptLoading || isConceptFetching || isReverting || isCancelling
-          }
-        />
-      </div>
+      </OverseerWrapper>
 
       {concept?.isHistoricalVersion && FEATURE_CONCEPT_VERSIONING && (
         <div className='aucctus-bg-primary fixed left-1/2 top-0 z-50 flex -translate-x-1/2 animate-fade-in flex-row items-center justify-center gap-2 rounded-b-md px-4 py-2 shadow-md'>

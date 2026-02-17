@@ -56,11 +56,14 @@ const OverviewDetails: FunctionComponent = () => {
   }
 
   return (
-    <div className='flex flex-col items-start'>
+    <div data-section-id='overview' className='flex flex-col items-start'>
       <section className='inline-flex items-start justify-start gap-12'>
         {/* Left Section */}
         <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-8 self-stretch'>
-          <div className='inline-flex flex-col items-start justify-start gap-5'>
+          <div
+            data-section-id='concept_value_proposition'
+            className='inline-flex flex-col items-start justify-start gap-5'
+          >
             <Header.Three text='Value Proposition' />
             <Text.EditModeSwitcher
               pClassName='aucctus-text-tertiary aucctus-text-xl-medium'
@@ -75,7 +78,10 @@ const OverviewDetails: FunctionComponent = () => {
           </div>
 
           {concept?.problemStatement ? (
-            <div className='inline-flex flex-col items-start justify-start gap-5'>
+            <div
+              data-section-id='concept_problem_statement'
+              className='inline-flex flex-col items-start justify-start gap-5'
+            >
               <Header.Three text='Problem Statement' />
               <Text.EditModeSwitcher
                 pClassName='aucctus-text-tertiary aucctus-text-xl-medium'
@@ -93,7 +99,10 @@ const OverviewDetails: FunctionComponent = () => {
         {/* Right Section */}
         <div className='inline-flex shrink grow basis-0 flex-col items-start justify-start gap-8 self-stretch'>
           {/* Overview  */}
-          <div className='inline-flex flex-col items-start justify-start gap-5'>
+          <div
+            data-section-id='concept_overview'
+            className='inline-flex flex-col items-start justify-start gap-5'
+          >
             <Header.Three text='Overview' />
             <Text.EditModeSwitcher
               pClassName='self-stretch aucctus-text-tertiary aucctus-text-md'

@@ -43,7 +43,7 @@ const AssumptionsV2: React.FC = () => {
   };
 
   return (
-    <div className='space-y-6'>
+    <div data-section-id='assumptions' className='space-y-6'>
       <ExecutiveSummaryBanner
         summary={executiveSummaries?.keyAssumptions}
         isLoading={isExecutiveSummariesLoading}

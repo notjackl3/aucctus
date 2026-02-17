@@ -192,6 +192,7 @@ interface BaseOverseerMessage extends BaseSocketEvent {
   conceptUuid?: string;
   accountUuid?: string;
   pageContext: string;
+  mentions?: Array<{ uuid: string; name: string; type: 'concept' }>;
 }
 
 /**
@@ -203,6 +204,7 @@ export interface IOverseerConversationStartMessage extends BaseOverseerMessage {
   selectedText: string;
   expandedText: string;
   content: string;
+  images?: IMediaMessage[];
 }
 
 /**
@@ -213,6 +215,8 @@ export interface IOverseerOutboundChatMessage extends BaseOverseerMessage {
   uuid?: string;
   sessionId: string;
   content: string;
+  images?: IMediaMessage[];
+  selectedText?: string;
 }
 
 /**

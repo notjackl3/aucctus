@@ -116,6 +116,7 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
           <div className='p-6'>
             {!isCostSavingsPage && (
               <div
+                data-section-id='top_down_market_sizing'
                 style={{
                   display: activeView === 'top-down' ? 'block' : 'none',
                 }}
@@ -126,6 +127,7 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
 
             {bottomUpMarketSizing && (
               <div
+                data-section-id='bottom_up_market_sizing'
                 style={{
                   display:
                     activeView === 'bottom-up' || isCostSavingsPage

@@ -6,7 +6,6 @@ import { QueryCache, QueryClient, QueryClientProvider } from 'react-query';
 import { BrowserRouter } from 'react-router-dom';
 import { toast } from '@components';
 import { ClerkProvider } from '@clerk/clerk-react';
-import { setQueryClientRef } from '@stores/overseer/store';
 import 'react-toastify/dist/ReactToastify.css';
 import '~global.scss';
 import App from './App';
@@ -35,9 +34,6 @@ const queryClient = new QueryClient({
     },
   }),
 });
-
-// Set the query client reference for the overseer store
-setQueryClientRef(queryClient);
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

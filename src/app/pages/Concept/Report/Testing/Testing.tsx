@@ -177,6 +177,7 @@ const Testing: React.FC = () => {
       value={{ isCompletingTest, setIsCompletingTest }}
     >
       <div
+        data-section-id='tests'
         className='w-full space-y-6'
         role='region'
         aria-label='Testing Dashboard'

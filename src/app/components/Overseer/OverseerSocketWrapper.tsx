@@ -1,7 +1,7 @@
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import telemetry from '@libs/telemetry';
 import useStore from '@stores/store';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 
 /**
  * Socket event wrapper for Overseer
@@ -22,15 +22,38 @@ const OverseerSocketWrapper: React.FC = () => {
   );
   const agentIsThinking = useStore((state) => state.overseer.agentIsThinking);
   const handleError = useStore((state) => state.overseer.handleError);
+  const addToolActivityStep = useStore(
+    (state) => state.overseer.addToolActivityStep,
+  );
+  const clearToolActivitySteps = useStore(
+    (state) => state.overseer.clearToolActivitySteps,
+  );
+  const finalizeSynthesisStep = useStore(
+    (state) => state.overseer.finalizeSynthesisStep,
+  );
+  const handleConversationName = useStore(
+    (state) => state.overseer.handleConversationName,
+  );
   const conceptUuid = useStore((state) => state.overseer.conceptUuid);
   const accountUuid = useStore((state) => state.overseer.accountUuid);
   const contextType = useStore((state) => state.overseer.contextType);
 
   // Get the current identifier based on context type
-  // The backend sends conceptUuid as the identifier for both modes
   const currentIdentifier = useMemo(() => {
     return contextType === 'account' ? accountUuid : conceptUuid;
   }, [contextType, accountUuid, conceptUuid]);
+
+  // Ref for synthesis delay timeout
+  const synthesisTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Clear timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (synthesisTimeoutRef.current) {
+        clearTimeout(synthesisTimeoutRef.current);
+      }
+    };
+  }, []);
 
   // Handle handshake response
   useSocketEvent('overseer.handshake', (handshake) => {
@@ -49,17 +72,41 @@ const OverseerSocketWrapper: React.FC = () => {
   // Handle chat response
   useSocketEvent('overseer.chat', (message) => {
     if (message.conceptUuid === currentIdentifier) {
-      addAssistantMessage({
+      // Clear any previous pending synthesis timeout
+      if (synthesisTimeoutRef.current) {
+        clearTimeout(synthesisTimeoutRef.current);
+      }
+
+      const hasSteps =
+        useStore.getState().overseer.toolActivitySteps.length > 0;
+
+      const assistantMessage = {
         uuid: message.uuid,
         content: message.content,
-        role: 'assistant',
+        role: 'assistant' as const,
         name: message.name,
         timestamp: message.timestamp || new Date().toISOString(),
-      });
+        ...(message.sources &&
+          message.sources.length > 0 && { sources: message.sources }),
+      };
+
+      if (hasSteps) {
+        // Start synthesis phase — shows "Synthesizing findings" with spinner
+        clearToolActivitySteps();
+
+        // Delay the message by 2 seconds so the synthesis step is visible
+        synthesisTimeoutRef.current = setTimeout(() => {
+          finalizeSynthesisStep();
+          addAssistantMessage(assistantMessage);
+        }, 2000);
+      } else {
+        // No tool steps — show message immediately
+        addAssistantMessage(assistantMessage);
+      }
     }
   });
 
-  // Handle streaming response (if implemented)
+  // Handle streaming response
   useSocketEvent('overseer.chat.stream', (message) => {
     const ctx = message.context;
     if (!ctx) return;
@@ -81,18 +128,51 @@ const OverseerSocketWrapper: React.FC = () => {
     }
   });
 
-  // Handle tool activity notifications (e.g., "Searching the web...", "Checking Nucleus...")
+  // Handle tool activity notifications — accumulate as thinking steps
   useSocketEvent('overseer.tool.activity', (message) => {
     if (message.conceptUuid === currentIdentifier) {
-      // Update the thinking message to show what tool is being used
       agentIsThinking(true, message.activityMessage);
+      addToolActivityStep(
+        message.activityMessage,
+        message.detail,
+        message.icon,
+      );
     }
   });
 
-  // Handle edit suggestions
+  // Handle edit suggestions — finalize tool steps with synthesis delay before showing
   useSocketEvent('overseer.edit.suggestion', (message) => {
     if (message.conceptUuid === currentIdentifier) {
-      handleEditSuggestions(message.content);
+      // Clear any previous pending synthesis timeout
+      if (synthesisTimeoutRef.current) {
+        clearTimeout(synthesisTimeoutRef.current);
+      }
+
+      const hasSteps =
+        useStore.getState().overseer.toolActivitySteps.length > 0;
+
+      if (hasSteps) {
+        // Start synthesis phase — shows "Synthesizing findings" with spinner
+        clearToolActivitySteps();
+
+        // Delay the edit suggestions by 2 seconds so synthesis step is visible
+        synthesisTimeoutRef.current = setTimeout(() => {
+          finalizeSynthesisStep();
+          handleEditSuggestions(message.content);
+        }, 2000);
+      } else {
+        handleEditSuggestions(message.content);
+      }
+    }
+  });
+
+  // Handle conversation name
+  useSocketEvent('overseer.conversation.name', (message) => {
+    if (message.conceptUuid === currentIdentifier) {
+      handleConversationName({
+        sessionId: message.sessionId,
+        name: message.name,
+      });
     }
   });
 

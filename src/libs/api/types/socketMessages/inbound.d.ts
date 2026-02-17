@@ -126,6 +126,7 @@ export interface IOverseerChatMessage extends BaseSocketEvent {
   name: string;
   content: string;
   timestamp?: string;
+  sources?: Array<{ name: string; url: string }>;
 }
 
 export interface IOverseerChatStreamMessage extends BaseSocketEvent {
@@ -168,6 +169,8 @@ export interface IOverseerToolActivityMessage extends BaseSocketEvent {
   sessionId: string;
   toolName: string;
   activityMessage: string;
+  detail?: string;
+  icon?: 'search' | 'scan' | 'analyze' | 'synthesize';
 }
 
 export interface IOverseerEditSuggestionMessage extends BaseSocketEvent {
@@ -175,6 +178,13 @@ export interface IOverseerEditSuggestionMessage extends BaseSocketEvent {
   conceptUuid: string;
   sessionId: string;
   content: IConceptReportEdit;
+}
+
+export interface IOverseerConversationNameMessage extends BaseSocketEvent {
+  type: 'overseer.conversation.name';
+  conceptUuid: string;
+  sessionId: string;
+  name: string;
 }
 
 // ==========================================
@@ -1320,6 +1330,7 @@ export type InboundSocketEvent<C = {}> =
   | IOverseerErrorMessage
   | IOverseerToolActivityMessage
   | IOverseerEditSuggestionMessage
+  | IOverseerConversationNameMessage
   | ILivingPersonasDocumentProcessingProgressMessage
   | ILivingPersonasDocumentProcessingCompletedMessage
   | ILivingPersonasDocumentProcessingErrorMessage

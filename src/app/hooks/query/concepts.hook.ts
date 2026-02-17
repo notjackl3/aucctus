@@ -243,14 +243,13 @@ export const useConceptGeneration = (uuid: string) => {
 };
 
 export const useConceptAiEditing = () => {
-  const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: async (payload: EditConceptReportRequest) =>
       await api.concept.aiEditConcept(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [AucctusQueryKeys.concepts] });
-    },
+    // DO NOT invalidate queries here - that would force a refetch from backend
+    // which still shows "complete" status, overwriting our pending states.
+    // markConceptSectionsPending is called by the caller (OverseerPopup).
+    // WebSocket events will handle the actual data updates when backend completes.
     onError: (e) => {
       const message = utils.osiris.parseFormError(e);
       toast.error(

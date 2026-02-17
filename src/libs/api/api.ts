@@ -18,6 +18,7 @@ import { IdeaSubmissionsApi } from './ideaSubmissions';
 import { IncubateConceptApi } from './incubateConcepts';
 import { MarketScanApi } from './marketScan';
 import { NucleusApi } from './nucleus';
+import { OverseerApi } from './overseer';
 import { PersonaApi } from './persona';
 import { PocPlanApi } from './pocPlan';
 import { PortfolioApi } from './portfolio';
@@ -64,6 +65,7 @@ export class Api {
   competitorAssessment!: CompetitorAssessmentApi;
   customCommands!: CustomCommandsApi;
   dynamicComponent!: DynamicComponentApi;
+  overseer!: OverseerApi;
   persona!: PersonaApi;
   portfolio!: PortfolioApi;
   portfolioInsights!: PortfolioInsightsApi;
@@ -101,6 +103,7 @@ export class Api {
       { key: 'competitorAssessment', class: CompetitorAssessmentApi },
       { key: 'customCommands', class: CustomCommandsApi },
       { key: 'dynamicComponent', class: DynamicComponentApi },
+      { key: 'overseer', class: OverseerApi },
       { key: 'persona', class: PersonaApi },
       { key: 'portfolio', class: PortfolioApi },
       { key: 'portfolioInsights', class: PortfolioInsightsApi },

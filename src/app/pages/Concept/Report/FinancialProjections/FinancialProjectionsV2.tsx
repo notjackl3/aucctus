@@ -80,18 +80,30 @@ const FinancialProjectionsV2: React.FC = () => {
   // Use the financialProjectionType from the concept to determine which view to show
   // If that's not available, detect from the financial projection data itself
   if (concept.financialProjectionType === 'generate_revenue') {
-    return <RevenueProjections financialProjection={financialProjectionV2} />;
+    return (
+      <div data-section-id='financial_projection'>
+        <RevenueProjections financialProjection={financialProjectionV2} />
+      </div>
+    );
   } else if (concept.financialProjectionType === 'cost_savings') {
     return (
-      <CostSavingsProjections financialProjection={financialProjectionV2} />
+      <div data-section-id='financial_projection'>
+        <CostSavingsProjections financialProjection={financialProjectionV2} />
+      </div>
     );
   } else if (isRevenueProjections(financialProjectionV2)) {
     // Fallback: detect revenue projections from data
-    return <RevenueProjections financialProjection={financialProjectionV2} />;
+    return (
+      <div data-section-id='financial_projection'>
+        <RevenueProjections financialProjection={financialProjectionV2} />
+      </div>
+    );
   } else if (isCostSavings(financialProjectionV2)) {
     // Fallback: detect cost savings from data
     return (
-      <CostSavingsProjections financialProjection={financialProjectionV2} />
+      <div data-section-id='financial_projection'>
+        <CostSavingsProjections financialProjection={financialProjectionV2} />
+      </div>
     );
   }
 

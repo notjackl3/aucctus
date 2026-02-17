@@ -190,25 +190,31 @@ const MarketScanV3: React.FC = () => {
 
         {/* Market Forces Radar */}
         {marketForces.length > 0 && selectedRadarCategory && (
-          <MarketForcesRadar
-            conceptUuid={activeConceptUuid}
-            trendCategories={marketForces}
-            selectedCategory={selectedRadarCategory}
-            onCategorySelect={setSelectedRadarCategory}
-          />
+          <div data-section-id='trends_market_forces'>
+            <MarketForcesRadar
+              conceptUuid={activeConceptUuid}
+              trendCategories={marketForces}
+              selectedCategory={selectedRadarCategory}
+              onCategorySelect={setSelectedRadarCategory}
+            />
+          </div>
         )}
 
         {/* Priority Insights */}
         {priorityInsights.length > 0 && (
-          <PriorityInsights
-            conceptUuid={activeConceptUuid}
-            insights={priorityInsights}
-          />
+          <div data-section-id='trends_priority_insights'>
+            <PriorityInsights
+              conceptUuid={activeConceptUuid}
+              insights={priorityInsights}
+            />
+          </div>
         )}
 
         {/* PESTEL Analysis */}
         {trends.length > 0 && (
-          <PESTELAnalysis conceptUuid={activeConceptUuid} sections={trends} />
+          <div data-section-id='trends_analysis'>
+            <PESTELAnalysis conceptUuid={activeConceptUuid} sections={trends} />
+          </div>
         )}
       </div>
     );
@@ -265,7 +271,7 @@ const MarketScanV3: React.FC = () => {
   };
 
   return (
-    <div className='flex flex-1 flex-col gap-4'>
+    <div data-section-id='market_scan' className='flex flex-1 flex-col gap-4'>
       {/* Debug mode banner - regenerates only the active section */}
       {isDebugModeEnabled && (
         <VersionUpgradeBanner

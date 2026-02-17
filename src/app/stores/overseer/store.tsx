@@ -3,62 +3,71 @@ import { produce } from 'immer';
 import type { IAppStore } from '../store';
 import {
   addAssistantMessage,
+  addImage,
+  addMention,
+  addToolActivityStep,
   agentIsThinking,
-  cancelCustomCommandFlow,
-  cancelManageCustomCommandsFlow,
   clearConversation,
+  clearEditSuggestions,
   clearError,
+  clearFeatures,
+  clearImages,
+  clearSelectedText,
+  clearToolActivitySteps,
   close,
-  confirmCustomCommand,
+  setHighlightedSection,
   confirmSelection,
-  editCustomCommandField,
-  goBackCustomCommandStep,
+  finalizeSynthesisStep,
+  handleConversationName,
+  handleEditSuggestions,
   handleError,
   handleHandshake,
   handleSuggestedQuestions,
-  handleEditSuggestions,
   hideSelectionButton,
-  initialCustomCommandFlow,
-  initialCustomCommandManagementFlow,
+  loadConversation,
   open,
+  removeImage,
+  removeMention,
   sendMessage,
-  clearEditSuggestions,
-  setEditSuggestions,
   setAccountContext,
   setCurrentMessage,
-  setQueryClientRef,
+  setDocked,
+  setEditSuggestions,
+  setHistoryItems,
+  setHistoryLoading,
+  setShowHistory,
   showSelectionButton,
-  startCustomCommandFlow,
-  startManageCustomCommandsFlow,
-  submitCustomCommandStep,
-  toggleCustomCommandTool,
+  toggleFeature,
 } from './actions';
 
-// Re-export setQueryClientRef for use in main app
-export { setQueryClientRef };
+import type { IOverseerConversation } from '@libs/api/types/overseer';
+
 import {
-  ICustomCommandFlow,
-  ICustomCommandManagementFlow,
+  AgentStep,
+  IOverseerEditSuggestions,
+  IOverseerPendingImage,
   IOverseerPendingSelection,
   IOverseerPosition,
   IOverseerState,
-  IOverseerEditSuggestions,
+  MentionItem,
   OverseerContextType,
+  OverseerFeature,
   OverseerMessage,
 } from './types';
 
 // Re-export types for convenience
 export type {
-  CustomCommandFlowStep,
-  ICustomCommandFlow,
-  ICustomCommandManagementFlow,
+  AgentStep,
   IOverseerActions,
   IOverseerAssistantMessage,
+  IOverseerEditSuggestionMessage,
   IOverseerPendingSelection,
   IOverseerPosition,
   IOverseerState,
   IOverseerUserMessage,
+  MentionItem,
   OverseerContextType,
+  OverseerFeature,
   OverseerMessage,
 } from './types';
 
@@ -66,6 +75,7 @@ export type {
 export const initialOverseerState = {
   isOpen: false,
   position: { x: 0, y: 0 } as IOverseerPosition,
+  isDocked: false,
   showingSelectionButton: false,
   pendingSelection: undefined as IOverseerPendingSelection | undefined,
   selectedText: '',
@@ -79,13 +89,18 @@ export const initialOverseerState = {
   suggestedQuestions: [] as string[],
   currentMessage: '',
   editSuggestions: null as IOverseerEditSuggestions | null,
+  highlightedSectionId: null as string | null,
   isThinking: false,
   thinkingMessage: undefined as string | undefined,
   currentError: undefined as { message: string; code: string } | undefined,
   hasError: false,
-  customCommandFlow: initialCustomCommandFlow as ICustomCommandFlow,
-  customCommandManagementFlow:
-    initialCustomCommandManagementFlow as ICustomCommandManagementFlow,
+  activeFeatures: new Set<OverseerFeature>(),
+  mentions: [] as MentionItem[],
+  showHistory: false,
+  historyItems: [] as IOverseerConversation[],
+  historyLoading: false,
+  pendingImages: [] as IOverseerPendingImage[],
+  toolActivitySteps: [] as AgentStep[],
 };
 
 const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
@@ -95,6 +110,7 @@ const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
     // Initial state
     isOpen: false,
     position: { x: 0, y: 0 },
+    isDocked: false,
     showingSelectionButton: false,
     pendingSelection: undefined,
     selectedText: '',
@@ -108,12 +124,18 @@ const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
     suggestedQuestions: [],
     currentMessage: '',
     editSuggestions: null,
+    highlightedSectionId: null,
     isThinking: false,
     thinkingMessage: undefined,
     currentError: undefined,
     hasError: false,
-    customCommandFlow: initialCustomCommandFlow,
-    customCommandManagementFlow: initialCustomCommandManagementFlow,
+    activeFeatures: new Set<OverseerFeature>(),
+    mentions: [],
+    showHistory: false,
+    historyItems: [],
+    historyLoading: false,
+    pendingImages: [],
+    toolActivitySteps: [],
 
     // Actions
     showSelectionButton: showSelectionButton.bind(actionContext),
@@ -134,19 +156,38 @@ const overseerSlice: Lens<IOverseerState, IAppStore> = (set, get, storeApi) => {
     clearError: clearError.bind(actionContext),
     clearConversation: clearConversation.bind(actionContext),
     setAccountContext: setAccountContext.bind(actionContext),
+    clearSelectedText: clearSelectedText.bind(actionContext),
 
-    // Custom command flow actions
-    startCustomCommandFlow: startCustomCommandFlow.bind(actionContext),
-    startManageCustomCommandsFlow:
-      startManageCustomCommandsFlow.bind(actionContext),
-    submitCustomCommandStep: submitCustomCommandStep.bind(actionContext),
-    goBackCustomCommandStep: goBackCustomCommandStep.bind(actionContext),
-    cancelCustomCommandFlow: cancelCustomCommandFlow.bind(actionContext),
-    cancelManageCustomCommandsFlow:
-      cancelManageCustomCommandsFlow.bind(actionContext),
-    toggleCustomCommandTool: toggleCustomCommandTool.bind(actionContext),
-    confirmCustomCommand: confirmCustomCommand.bind(actionContext),
-    editCustomCommandField: editCustomCommandField.bind(actionContext),
+    // Section highlight
+    setHighlightedSection: setHighlightedSection.bind(actionContext),
+
+    // Dock actions
+    setDocked: setDocked.bind(actionContext),
+
+    // Feature toggle actions
+    toggleFeature: toggleFeature.bind(actionContext),
+    clearFeatures: clearFeatures.bind(actionContext),
+
+    // Mention actions
+    addMention: addMention.bind(actionContext),
+    removeMention: removeMention.bind(actionContext),
+
+    // History sidebar
+    setShowHistory: setShowHistory.bind(actionContext),
+    setHistoryItems: setHistoryItems.bind(actionContext),
+    setHistoryLoading: setHistoryLoading.bind(actionContext),
+    handleConversationName: handleConversationName.bind(actionContext),
+    loadConversation: loadConversation.bind(actionContext),
+
+    // Image actions
+    addImage: addImage.bind(actionContext),
+    removeImage: removeImage.bind(actionContext),
+    clearImages: clearImages.bind(actionContext),
+
+    // Tool activity steps
+    addToolActivityStep: addToolActivityStep.bind(actionContext),
+    clearToolActivitySteps: clearToolActivitySteps.bind(actionContext),
+    finalizeSynthesisStep: finalizeSynthesisStep.bind(actionContext),
 
     // Simple setters
     setPosition: (position: IOverseerPosition) => {

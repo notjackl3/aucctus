@@ -186,7 +186,6 @@ export function useTextSelection(config: UseTextSelectionConfig) {
   const hideSelectionButton = useStore(
     (state) => state.overseer.hideSelectionButton,
   );
-  const isOverseerOpen = useStore((state) => state.overseer.isOpen);
   const showingSelectionButton = useStore(
     (state) => state.overseer.showingSelectionButton,
   );
@@ -242,11 +241,6 @@ export function useTextSelection(config: UseTextSelectionConfig) {
         }
       }
 
-      // Don't show button if Overseer is already open
-      if (isOverseerOpen) {
-        return;
-      }
-
       // Get the selection range for positioning
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
@@ -295,7 +289,6 @@ export function useTextSelection(config: UseTextSelectionConfig) {
       containerRef,
       showSelectionButton,
       hideSelectionButton,
-      isOverseerOpen,
       showingSelectionButton,
     ],
   );

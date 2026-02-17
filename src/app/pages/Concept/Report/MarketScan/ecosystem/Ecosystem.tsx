@@ -75,7 +75,7 @@ const Ecosystem: React.FC = () => {
   }, [concept.identifier]);
 
   return (
-    <div className='flex w-full flex-col gap-6'>
+    <div data-section-id='ecosystem_v2' className='flex w-full flex-col gap-6'>
       {!shouldRenderV2 && (
         <VersionUpgradeBanner
           onUpgrade={handleUpgrade}

@@ -17,16 +17,26 @@ const BusinessModelTab: React.FC<BusinessModelTabProps> = () => {
     <div className='space-y-6'>
       {/* Business Model and Pricing Strategy */}
       <div className='grid grid-cols-1 gap-6 md:grid-cols-2'>
-        <BusinessModelCard
-          businessModelData={financialProjection?.businessModel}
-        />
-        <PricingStrategyCard pricingData={financialProjection?.pricingModel} />
+        <div data-section-id='business_model'>
+          <BusinessModelCard
+            businessModelData={financialProjection?.businessModel}
+          />
+        </div>
+        <div data-section-id='pricing'>
+          <PricingStrategyCard
+            pricingData={financialProjection?.pricingModel}
+          />
+        </div>
       </div>
 
-      <DistributionChannelsSection
-        distributionChannels={financialProjection?.distributionChannels}
-      />
-      <CostDriversSection costDrivers={financialProjection?.costDrivers} />
+      <div data-section-id='distribution_channels'>
+        <DistributionChannelsSection
+          distributionChannels={financialProjection?.distributionChannels}
+        />
+      </div>
+      <div data-section-id='cost_drivers'>
+        <CostDriversSection costDrivers={financialProjection?.costDrivers} />
+      </div>
     </div>
   );
 };

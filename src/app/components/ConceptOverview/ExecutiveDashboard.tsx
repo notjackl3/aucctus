@@ -297,7 +297,7 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
   }
 
   return (
-    <div className={`space-y-8 ${className}`}>
+    <div data-section-id='overview' className={`space-y-8 ${className}`}>
       {/* Gut Check Banner */}
       <GutCheckBanner
         recommendation={conceptOverview?.shouldWeDoThis}
@@ -356,41 +356,52 @@ const ExecutiveDashboard: React.FC<ExecutiveDashboardProps> = ({
 
         {/* Right - What is it, Value Proposition and Problem Statement */}
         <div className='space-y-6'>
-          <InfoSectionCard
-            iconVariant='lightbulb'
-            title={executiveDashboardUIText.sections.whatIsIt}
-            content={
-              conceptOverview?.whatIsThis || 'No product description available'
-            }
-          />
+          <div data-section-id='concept_overview'>
+            <InfoSectionCard
+              iconVariant='lightbulb'
+              title={executiveDashboardUIText.sections.whatIsIt}
+              content={
+                conceptOverview?.whatIsThis ||
+                'No product description available'
+              }
+            />
+          </div>
 
-          <InfoSectionCard
-            iconVariant='target'
-            title={executiveDashboardUIText.sections.valueProposition}
-            content={
-              conceptOverview?.valueProposition ||
-              'No value proposition available'
-            }
-          />
+          <div data-section-id='concept_value_proposition'>
+            <InfoSectionCard
+              iconVariant='target'
+              title={executiveDashboardUIText.sections.valueProposition}
+              content={
+                conceptOverview?.valueProposition ||
+                'No value proposition available'
+              }
+            />
+          </div>
 
-          <InfoSectionCard
-            iconVariant='alert-triangle'
-            title={executiveDashboardUIText.sections.problemStatement}
-            content={
-              conceptOverview?.problemStatement ||
-              'No problem statement available'
-            }
-          />
+          <div data-section-id='concept_problem_statement'>
+            <InfoSectionCard
+              iconVariant='alert-triangle'
+              title={executiveDashboardUIText.sections.problemStatement}
+              content={
+                conceptOverview?.problemStatement ||
+                'No problem statement available'
+              }
+            />
+          </div>
         </div>
       </div>
 
       {/* Three Column Layout: Differentiators, Our Right to Win, Tab Summary Carousel */}
       <div className='grid grid-cols-1 gap-6 lg:grid-cols-4'>
         {/* Differentiators Card */}
-        <DifferentiatorsCard differentiators={differentiators} />
+        <div data-section-id='differentiators'>
+          <DifferentiatorsCard differentiators={differentiators} />
+        </div>
 
         {/* Our Right to Win Card */}
-        <OurRightToWinCard rightsToWin={rightsToWin} />
+        <div data-section-id='rights_to_win'>
+          <OurRightToWinCard rightsToWin={rightsToWin} />
+        </div>
 
         {/* Tab Summary Cards with Progress Navigation */}
         <div className='relative h-fit lg:col-span-2'>

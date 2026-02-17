@@ -1,10 +1,14 @@
 import { OverseerPopup, OverseerSelectionButton } from '@components/Overseer';
+import SectionHighlightOverlay from '@components/Overseer/sectionHighlight/SectionHighlightOverlay';
 import { useTextSelection } from '@hooks/useTextSelection';
+import useStore from '@stores/store';
 import React, { createContext, useContext, useMemo } from 'react';
 
 interface OverseerContextValue {
   /** Function to temporarily ignore the next text selection */
   ignoreNextSelection: () => void;
+  /** Whether the Overseer panel is docked */
+  isDocked: boolean;
 }
 
 const OverseerContext = createContext<OverseerContextValue | null>(null);
@@ -19,24 +23,15 @@ interface OverseerProviderProps {
 
 /**
  * Provider component that enables Overseer functionality within its children.
- *
- * This provider:
- * - Sets up text selection detection
- * - Renders the OverseerPopup portal
- * - Provides context for child components to interact with Overseer
- *
- * Usage:
- * ```tsx
- * <OverseerProvider pageContext="overview">
- *   <YourPageContent />
- * </OverseerProvider>
- * ```
  */
 export const OverseerProvider: React.FC<OverseerProviderProps> = ({
   children,
   pageContext,
   enabled = true,
 }) => {
+  const isDocked = useStore((state) => state.overseer.isDocked);
+  const isOpen = useStore((state) => state.overseer.isOpen);
+
   // Set up text selection hook
   const { ignoreNextSelection } = useTextSelection({
     enabled,
@@ -48,8 +43,9 @@ export const OverseerProvider: React.FC<OverseerProviderProps> = ({
   const contextValue = useMemo(
     () => ({
       ignoreNextSelection,
+      isDocked: isOpen && isDocked,
     }),
-    [ignoreNextSelection],
+    [ignoreNextSelection, isDocked, isOpen],
   );
 
   return (
@@ -57,10 +53,9 @@ export const OverseerProvider: React.FC<OverseerProviderProps> = ({
       {children}
       {enabled && (
         <>
-          {/* Render the selection button - shown when text is selected */}
           <OverseerSelectionButton />
-          {/* Render the popup - it will only show when isOpen is true */}
           <OverseerPopup />
+          <SectionHighlightOverlay />
         </>
       )}
     </OverseerContext.Provider>

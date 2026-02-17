@@ -1,23 +1,30 @@
-import NavLogo from '@assets/aucctus_logo.png';
 import { cn } from '@libs/utils/react';
-import { OverseerMessage } from '@stores/overseer/store';
+import {
+  AgentStep,
+  IOverseerAssistantMessage,
+  IOverseerUserMessage,
+} from '@stores/overseer/types';
 import { motion } from 'framer-motion';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import AgentThinkingSteps from './AgentThinkingSteps';
+import SourceBadges from './SourceBadges';
 
 interface OverseerChatMessageProps {
-  message: OverseerMessage;
+  message: IOverseerUserMessage | IOverseerAssistantMessage;
   className?: string;
+  toolActivitySteps?: AgentStep[];
 }
 
 /**
  * Individual chat message component for Overseer
- * Renders user messages on the right, assistant messages on the left
- * Features subtle background styling and markdown support
+ * User messages: right-aligned with bg-white/10 bubble
+ * Assistant messages: left-aligned, glass card with border, no avatar (Lovable style)
  */
 const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
   message,
   className,
+  toolActivitySteps,
 }) => {
   if (message.role === 'user') {
     return (
@@ -25,12 +32,24 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className={cn('flex flex-row-reverse gap-2.5', className)}
+        className={cn('flex justify-end', className)}
       >
-        <div className='aucctus-bg-frosted-glass max-w-[85%] rounded-2xl bg-white/15 px-4 py-2.5 backdrop-blur-md'>
-          <span className='aucctus-text-sm text-white/90'>
+        <div className='max-w-[85%] rounded-lg bg-white/10 px-3.5 py-2'>
+          {message.images && message.images.length > 0 && (
+            <div className='mb-1.5 flex flex-wrap gap-1'>
+              {message.images.map((img, i) => (
+                <img
+                  key={i}
+                  src={img.dataUrl}
+                  alt={img.filename ?? `Image ${i + 1}`}
+                  className='h-16 w-16 rounded border border-white/10 object-cover'
+                />
+              ))}
+            </div>
+          )}
+          <div className='whitespace-pre-line text-[13px] font-light leading-relaxed text-white/90'>
             {message.content}
-          </span>
+          </div>
         </div>
       </motion.div>
     );
@@ -42,22 +61,28 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
       initial={{ opacity: 0, y: 4 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 }}
-      className={cn('flex flex-row gap-3', className)}
+      className={cn('flex justify-start', className)}
     >
-      <div className='mt-1 flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full border border-white/10 bg-white/5 shadow-inner'>
-        <img
-          src={NavLogo}
-          alt='Aucctus'
-          className='h-full w-full object-contain p-1.5'
-        />
-      </div>
-      <div className='aucctus-bg-frosted-glass max-w-[85%] rounded-2xl border border-white/10 bg-black/20 px-4 py-3 backdrop-blur-md'>
-        <div>
+      <div className='flex max-w-[92%] flex-col gap-1.5'>
+        {toolActivitySteps && toolActivitySteps.length > 0 && (
+          <AgentThinkingSteps steps={toolActivitySteps} />
+        )}
+        <div
+          className='rounded-lg border border-white/[0.08] px-4 py-3'
+          style={{
+            background:
+              'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.04) 100%)',
+            backdropFilter: 'blur(20px) saturate(1.4)',
+            WebkitBackdropFilter: 'blur(20px) saturate(1.4)',
+            boxShadow:
+              'inset 0 1px 0 rgba(255,255,255,0.08), inset 0 -1px 0 rgba(0,0,0,0.1), 0 4px 16px rgba(0,0,0,0.12)',
+          }}
+        >
           <ReactMarkdown
             className='prose prose-sm prose-invert prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0.5 prose-headings:my-2 max-w-none'
             components={{
               p: ({ children }) => (
-                <p className='aucctus-text-sm my-1 text-white/80'>{children}</p>
+                <p className='my-1 text-sm text-white/80'>{children}</p>
               ),
               ul: ({ children }) => (
                 <ul className='my-1 list-disc pl-4 text-white/80'>
@@ -70,9 +95,7 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
                 </ol>
               ),
               li: ({ children }) => (
-                <li className='aucctus-text-sm my-0.5 text-white/80'>
-                  {children}
-                </li>
+                <li className='my-0.5 text-sm text-white/80'>{children}</li>
               ),
               strong: ({ children }) => (
                 <strong className='font-semibold text-white'>{children}</strong>
@@ -102,8 +125,8 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
                   {children}
                 </blockquote>
               ),
-              code: ({ className, children, ...props }: any) => {
-                const isInline = !className?.includes('language-');
+              code: ({ className: codeClassName, children, ...props }: any) => {
+                const isInline = !codeClassName?.includes('language-');
                 return (
                   <code
                     className={cn(
@@ -111,7 +134,7 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
                       isInline
                         ? 'rounded bg-white/10 px-1 py-0.5'
                         : 'block w-full overflow-x-auto rounded-lg bg-black/40 p-3',
-                      className,
+                      codeClassName,
                     )}
                     {...props}
                   >
@@ -154,6 +177,11 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
           >
             {message.content}
           </ReactMarkdown>
+          {message.sources && message.sources.length > 0 && (
+            <SourceBadges
+              sources={message.sources.filter((s) => s.name && s.url)}
+            />
+          )}
         </div>
       </div>
     </motion.div>

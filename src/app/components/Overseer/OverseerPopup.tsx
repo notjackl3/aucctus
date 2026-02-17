@@ -1,37 +1,35 @@
-import images from '@assets/img';
+import { Icon } from '@components';
+import api from '@libs/api';
+import { IAiEditingSuggestion, IConceptReportEdit } from '@libs/api/types';
+import { cn } from '@libs/utils/react';
 import useStore from '@stores/store';
+import { MentionItem, OverseerFeature } from '@stores/overseer/types';
+import {
+  markConceptSectionsPending,
+  useConceptAiEditing,
+  useConcepts,
+} from '@hooks/query/concepts.hook';
+import { useOverseerConversations } from '@hooks/query/overseerHistory.hook';
 import { AnimatePresence, motion } from 'framer-motion';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
-import CustomCommandCreationFlow from './CustomCommandCreationFlow';
-import ManageCustomCommandsFlow from './ManageCustomCommandsFlow';
+import { useParams } from 'react-router-dom';
+import { useQueryClient } from 'react-query';
+import { v4 as uuidv4 } from 'uuid';
 import OverseerChat from './OverseerChat';
-import OverseerHeader from './OverseerHeader';
 import OverseerInput from './OverseerInput';
-import OverseerSelectedContent from './OverseerSelectedContent';
 import OverseerSocketWrapper from './OverseerSocketWrapper';
 import OverseerSuggestedQuestions from './OverseerSuggestedQuestions';
-import { generateHelpText, parseSlashCommand } from './slashCommands';
-import { IAiEditingSuggestion, IConceptReportEdit } from '@libs/api/types';
-import { v4 as uuidv4 } from 'uuid';
-import { useConceptAiEditing } from '@hooks/query/concepts.hook';
-
-// Animation keyframes for the moving background
-const ANIMATION_STYLES = `
-  @keyframes overseerFadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes overseerMoveBackground {
-    0% { background-position: 0% 0%; }
-    50% { background-position: 60% 100%; }
-    100% { background-position: 0% 0%; }
-  }
-`;
 
 // Panel dimension constants
-const DEFAULT_PANEL_WIDTH = 420;
+const DEFAULT_PANEL_WIDTH = 400;
+const DOCKED_PANEL_WIDTH = 400;
 const COMPACT_PANEL_HEIGHT = 500;
 const EXPANDED_PANEL_HEIGHT = 500;
 const MIN_PANEL_WIDTH = 320;
@@ -43,15 +41,38 @@ const VIEWPORT_PADDING = 12;
 type ResizeDirection = 'nw' | 'ne' | 'sw' | 'se' | 'n' | 's' | 'e' | 'w';
 
 /**
+ * Feature toggle button config
+ */
+const FEATURE_BUTTONS: {
+  key: OverseerFeature;
+  label: string;
+  icon: string;
+}[] = [
+  { key: 'web', label: 'Web Search', icon: 'globe' },
+  { key: 'nucleus', label: 'Nucleus', icon: 'compass-03' },
+  { key: 'aiEdit', label: 'AI Edit', icon: 'edit' },
+];
+
+const formatHistoryDate = (dateStr: string) => {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffDays = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24),
+  );
+  if (diffDays === 0) return 'Today';
+  if (diffDays === 1) return 'Yesterday';
+  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+};
+
+/**
  * Main Overseer popup component
- * Renders as a portal to ensure proper positioning and z-index
- * Features animated background, resize handles, and frosted glass effects
+ * Features dock/undock, feature toggles, chat history (full-panel takeover)
  */
 const OverseerPopup: React.FC = () => {
   const isOpen = useStore((state) => state.overseer.isOpen);
   const position = useStore((state) => state.overseer.position);
+  const isDocked = useStore((state) => state.overseer.isDocked);
   const selectedText = useStore((state) => state.overseer.selectedText);
-  const expandedText = useStore((state) => state.overseer.expandedText);
   const messages = useStore((state) => state.overseer.messages);
   const suggestedQuestions = useStore(
     (state) => state.overseer.suggestedQuestions,
@@ -59,10 +80,18 @@ const OverseerPopup: React.FC = () => {
   const editSuggestions = useStore((state) => state.overseer.editSuggestions);
   const currentMessage = useStore((state) => state.overseer.currentMessage);
   const isThinking = useStore((state) => state.overseer.isThinking);
-  const thinkingMessage = useStore((state) => state.overseer.thinkingMessage);
   const hasError = useStore((state) => state.overseer.hasError);
   const conceptUuid = useStore((state) => state.overseer.conceptUuid);
   const sessionId = useStore((state) => state.overseer.sessionId);
+  const activeFeatures = useStore((state) => state.overseer.activeFeatures);
+  const mentions = useStore((state) => state.overseer.mentions);
+  const showHistory = useStore((state) => state.overseer.showHistory);
+  const historyItems = useStore((state) => state.overseer.historyItems);
+  const contextType = useStore((state) => state.overseer.contextType);
+  const accountUuid = useStore((state) => state.overseer.accountUuid);
+  const toolActivitySteps = useStore(
+    (state) => state.overseer.toolActivitySteps,
+  );
 
   const close = useStore((state) => state.overseer.close);
   const setCurrentMessage = useStore(
@@ -73,39 +102,66 @@ const OverseerPopup: React.FC = () => {
   const clearEditSuggestions = useStore(
     (state) => state.overseer.clearEditSuggestions,
   );
-  const { mutate: aiEditConcept } = useConceptAiEditing();
+  const setDocked = useStore((state) => state.overseer.setDocked);
+  const toggleFeature = useStore((state) => state.overseer.toggleFeature);
+  const setShowHistory = useStore((state) => state.overseer.setShowHistory);
+  const loadConversation = useStore((state) => state.overseer.loadConversation);
+  const addMention = useStore((state) => state.overseer.addMention);
+  const removeMention = useStore((state) => state.overseer.removeMention);
+  const pendingImages = useStore((state) => state.overseer.pendingImages);
+  const addImage = useStore((state) => state.overseer.addImage);
+  const removeImage = useStore((state) => state.overseer.removeImage);
+  const clearSelectedText = useStore(
+    (state) => state.overseer.clearSelectedText,
+  );
+  const clearConversation = useStore(
+    (state) => state.overseer.clearConversation,
+  );
+  const setHighlightedSection = useStore(
+    (state) => state.overseer.setHighlightedSection,
+  );
 
-  // Custom command flow state and actions
-  const customCommandFlow = useStore(
-    (state) => state.overseer.customCommandFlow,
-  );
-  const customCommandManagementFlow = useStore(
-    (state) => state.overseer.customCommandManagementFlow,
-  );
-  const submitCustomCommandStep = useStore(
-    (state) => state.overseer.submitCustomCommandStep,
-  );
-  const goBackCustomCommandStep = useStore(
-    (state) => state.overseer.goBackCustomCommandStep,
-  );
-  const cancelCustomCommandFlow = useStore(
-    (state) => state.overseer.cancelCustomCommandFlow,
-  );
-  const cancelManageCustomCommandsFlow = useStore(
-    (state) => state.overseer.cancelManageCustomCommandsFlow,
-  );
-  const toggleCustomCommandTool = useStore(
-    (state) => state.overseer.toggleCustomCommandTool,
-  );
-  const confirmCustomCommand = useStore(
-    (state) => state.overseer.confirmCustomCommand,
-  );
-  const editCustomCommandField = useStore(
-    (state) => state.overseer.editCustomCommandField,
-  );
-  const startCustomCommandFlow = useStore(
-    (state) => state.overseer.startCustomCommandFlow,
-  );
+  const queryClient = useQueryClient();
+  const { id: conceptIdentifier } = useParams();
+
+  const { mutate: aiEditConcept, isLoading: isApplyingEdits } =
+    useConceptAiEditing();
+
+  // Fetch conversation history scoped to current context
+  const { data: fetchedHistory, isLoading: historyLoading } =
+    useOverseerConversations({
+      conceptUuid:
+        contextType === 'concept' ? (conceptUuid ?? undefined) : undefined,
+      accountUuid:
+        contextType === 'account' ? (accountUuid ?? undefined) : undefined,
+      enabled: isOpen,
+    });
+
+  // Merge React Query data with store placeholders (new conversations not yet in API)
+  const mergedHistory = useMemo(() => {
+    const apiItems = fetchedHistory ?? [];
+    // Keep only placeholders that aren't already in the API response
+    const newPlaceholders = historyItems.filter(
+      (item) => !apiItems.some((api) => api.uuid === item.uuid),
+    );
+    return [...newPlaceholders, ...apiItems];
+  }, [fetchedHistory, historyItems]);
+
+  // Fetch all non-archived concepts for @mention menu
+  const { data: conceptPage } = useConcepts({
+    page: 1,
+    pageSize: 199,
+  });
+  const conceptItems: MentionItem[] = useMemo(() => {
+    if (!conceptPage?.results) return [];
+    return conceptPage.results
+      .filter((c) => c.uuid !== conceptUuid) // Exclude current concept
+      .map((c) => ({
+        id: c.uuid,
+        name: c.title,
+        type: 'concept' as const,
+      }));
+  }, [conceptPage?.results, conceptUuid]);
 
   // Panel sizing state
   const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
@@ -113,6 +169,7 @@ const OverseerPopup: React.FC = () => {
   const [isResizing, setIsResizing] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
+  const [contentExpanded, setContentExpanded] = useState(true);
 
   const popupRef = useRef<HTMLDivElement>(null);
   const resizeStartRef = useRef<{
@@ -131,7 +188,6 @@ const OverseerPopup: React.FC = () => {
     mouseY: number;
   } | null>(null);
 
-  // Track previous selected text to detect new selections
   const prevSelectedTextRef = useRef(selectedText);
 
   // Reset panel when selected text changes
@@ -140,13 +196,14 @@ const OverseerPopup: React.FC = () => {
       setPanelWidth(DEFAULT_PANEL_WIDTH);
       setPanelHeight(COMPACT_PANEL_HEIGHT);
       setHasAutoExpanded(false);
+      setContentExpanded(true);
       prevSelectedTextRef.current = selectedText;
     }
   }, [selectedText]);
 
-  // Clamp position to viewport bounds - NEVER allow popup to escape
+  // Clamp position to viewport bounds (only in floating mode)
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen || isDocked) return;
 
     const clampToViewport = () => {
       const viewportWidth = window.innerWidth;
@@ -163,21 +220,25 @@ const OverseerPopup: React.FC = () => {
       }
     };
 
-    // Clamp on mount and when dimensions change
     clampToViewport();
-
-    // Also clamp on window resize
     window.addEventListener('resize', clampToViewport);
     return () => window.removeEventListener('resize', clampToViewport);
-  }, [isOpen, position.x, position.y, panelWidth, panelHeight, setPosition]);
+  }, [
+    isOpen,
+    isDocked,
+    position.x,
+    position.y,
+    panelWidth,
+    panelHeight,
+    setPosition,
+  ]);
 
   // Auto-expand panel when first AI response arrives
   useEffect(() => {
-    if (messages.length > 0 && !hasAutoExpanded && !isResizing) {
+    if (messages.length > 0 && !hasAutoExpanded && !isResizing && !isDocked) {
       const viewportHeight = window.innerHeight;
       const newHeight = EXPANDED_PANEL_HEIGHT;
 
-      // Ensure panel stays within viewport
       const newY = Math.min(
         position.y,
         viewportHeight - newHeight - VIEWPORT_PADDING,
@@ -194,44 +255,13 @@ const OverseerPopup: React.FC = () => {
     messages.length,
     hasAutoExpanded,
     isResizing,
+    isDocked,
     position.x,
     position.y,
     setPosition,
   ]);
 
-  // Handle click outside to close
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const handleClickOutside = (event: MouseEvent) => {
-      const target = event.target as HTMLElement;
-
-      // Don't close if clicking inside the popup
-      if (popupRef.current?.contains(target)) {
-        return;
-      }
-
-      // Don't close if clicking on a text selection
-      const selection = window.getSelection();
-      if (selection && !selection.isCollapsed) {
-        return;
-      }
-
-      close();
-    };
-
-    // Small delay to prevent immediate close after opening
-    const timer = setTimeout(() => {
-      document.addEventListener('mousedown', handleClickOutside);
-    }, 100);
-
-    return () => {
-      clearTimeout(timer);
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [isOpen, close]);
-
-  // Global keyboard event listener for Escape key
+  // Escape key handler
   useEffect(() => {
     if (!isOpen) return;
 
@@ -253,17 +283,15 @@ const OverseerPopup: React.FC = () => {
   const handleQuestionClick = useCallback(
     (question: string) => {
       setCurrentMessage(question);
-      // Small delay to update state before sending
-      setTimeout(() => {
-        sendMessage();
-      }, 50);
+      setTimeout(() => sendMessage(), 50);
     },
     [setCurrentMessage, sendMessage],
   );
 
   const handleConfirmEdits = useCallback(
     (selectedEdits: IAiEditingSuggestion[]) => {
-      if (!editSuggestions || !conceptUuid || !sessionId) return;
+      if (!editSuggestions || !conceptUuid || !sessionId || isApplyingEdits)
+        return;
 
       const payload: IConceptReportEdit = {
         ...editSuggestions,
@@ -271,7 +299,6 @@ const OverseerPopup: React.FC = () => {
         uuid: editSuggestions.uuid || uuidv4(),
       } as IConceptReportEdit;
 
-      // Call the API directly
       aiEditConcept(
         {
           concept_uuid: conceptUuid,
@@ -280,8 +307,18 @@ const OverseerPopup: React.FC = () => {
         },
         {
           onSuccess: () => {
+            // Mark affected sections as pending → triggers skeleton loading
+            if (conceptIdentifier) {
+              const sectionKeys = selectedEdits.map((e) => e.section);
+              markConceptSectionsPending(
+                queryClient,
+                conceptIdentifier,
+                sectionKeys,
+              );
+            }
+
+            setHighlightedSection(null);
             clearEditSuggestions();
-            // Add a confirmation message to the chat
             useStore.getState().overseer.addAssistantMessage({
               uuid: uuidv4(),
               role: 'assistant',
@@ -298,43 +335,37 @@ const OverseerPopup: React.FC = () => {
       editSuggestions,
       conceptUuid,
       sessionId,
+      isApplyingEdits,
       clearEditSuggestions,
+      setHighlightedSection,
       aiEditConcept,
+      queryClient,
+      conceptIdentifier,
     ],
   );
 
-  const handleCancelEdits = useCallback(() => {
-    clearEditSuggestions();
-  }, [clearEditSuggestions]);
+  const handleActiveEditChange = useCallback(
+    (edit: IAiEditingSuggestion) => {
+      setHighlightedSection(edit.section);
+    },
+    [setHighlightedSection],
+  );
 
-  const handleStartCreateFromManage = useCallback(() => {
-    cancelManageCustomCommandsFlow();
-    startCustomCommandFlow();
-  }, [cancelManageCustomCommandsFlow, startCustomCommandFlow]);
+  const handleCancelEdits = useCallback(() => {
+    setHighlightedSection(null);
+    clearEditSuggestions();
+  }, [clearEditSuggestions, setHighlightedSection]);
 
   const handleSubmitMessage = useCallback(() => {
-    const [command] = parseSlashCommand(currentMessage, {
-      matchPosition: 'any',
-    });
-    if (command?.frontendOnly && command.command === '/help') {
-      const helpText = generateHelpText();
-      useStore.getState().overseer.addAssistantMessage({
-        uuid: uuidv4(),
-        role: 'assistant',
-        content: helpText,
-        name: 'assistant',
-        timestamp: new Date().toISOString(),
-      });
-      setCurrentMessage('');
-      return;
-    }
-
     sendMessage();
-  }, [currentMessage, sendMessage, setCurrentMessage]);
+  }, [sendMessage]);
+
+  const hasEditSuggestions = (editSuggestions?.edits?.length ?? 0) > 0;
 
   // Drag handlers
   const handleDragStart = useCallback(
     (e: React.MouseEvent) => {
+      if (isDocked) return;
       e.preventDefault();
       setIsDragging(true);
       dragStartRef.current = {
@@ -344,7 +375,7 @@ const OverseerPopup: React.FC = () => {
         mouseY: e.clientY,
       };
     },
-    [position.x, position.y],
+    [isDocked, position.x, position.y],
   );
 
   useEffect(() => {
@@ -356,11 +387,9 @@ const OverseerPopup: React.FC = () => {
       const deltaX = e.clientX - mouseX;
       const deltaY = e.clientY - mouseY;
 
-      // Calculate new position
       let newX = x + deltaX;
       let newY = y + deltaY;
 
-      // Clamp to viewport bounds during drag
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
       const maxX = viewportWidth - panelWidth - VIEWPORT_PADDING;
@@ -386,9 +415,10 @@ const OverseerPopup: React.FC = () => {
     };
   }, [isDragging, setPosition, panelWidth, panelHeight]);
 
-  // Resize handlers
+  // Resize handlers (only in floating mode)
   const handleResizeStart = useCallback(
     (e: React.MouseEvent, direction: ResizeDirection) => {
+      if (isDocked) return;
       e.preventDefault();
       e.stopPropagation();
       setIsResizing(true);
@@ -402,7 +432,7 @@ const OverseerPopup: React.FC = () => {
         direction,
       };
     },
-    [panelWidth, panelHeight, position.x, position.y],
+    [isDocked, panelWidth, panelHeight, position.x, position.y],
   );
 
   useEffect(() => {
@@ -421,7 +451,6 @@ const OverseerPopup: React.FC = () => {
       let newX = x;
       let newY = y;
 
-      // Handle horizontal resizing
       if (direction.includes('e')) {
         newWidth = Math.min(
           Math.max(width + deltaX, MIN_PANEL_WIDTH),
@@ -435,7 +464,6 @@ const OverseerPopup: React.FC = () => {
         newX = x - widthDelta;
       }
 
-      // Handle vertical resizing
       if (direction.includes('s')) {
         newHeight = Math.min(
           Math.max(height + deltaY, MIN_PANEL_HEIGHT),
@@ -451,7 +479,6 @@ const OverseerPopup: React.FC = () => {
         newY = y - heightDelta;
       }
 
-      // Ensure panel stays within viewport
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
 
@@ -487,187 +514,486 @@ const OverseerPopup: React.FC = () => {
     };
   }, [isResizing, setPosition]);
 
+  // Clamp to viewport helper for undock repositioning
+  const clampToViewport = useCallback(
+    (x: number, y: number) => {
+      const vw = window.innerWidth;
+      const vh = window.innerHeight;
+      return {
+        x: Math.max(
+          VIEWPORT_PADDING,
+          Math.min(x, vw - panelWidth - VIEWPORT_PADDING),
+        ),
+        y: Math.max(
+          VIEWPORT_PADDING,
+          Math.min(y, vh - panelHeight - VIEWPORT_PADDING),
+        ),
+      };
+    },
+    [panelWidth, panelHeight],
+  );
+
+  // Group history items by date
+  const groupedHistory = useMemo(() => {
+    const grouped: Record<
+      string,
+      { uuid: string; name: string | null; createdAt: string }[]
+    > = {};
+    for (const item of mergedHistory) {
+      const label = formatHistoryDate(item.createdAt);
+      if (!grouped[label]) grouped[label] = [];
+      grouped[label].push(item);
+    }
+    return grouped;
+  }, [mergedHistory]);
+
   if (!isOpen) return null;
 
   const popupContent = (
     <>
-      {/* Socket wrapper for handling events */}
       <OverseerSocketWrapper />
-
-      {/* Animation styles */}
-      <style>{ANIMATION_STYLES}</style>
 
       <AnimatePresence>
         <motion.div
           ref={popupRef}
           data-overseer-root='true'
           initial={{ opacity: 0, scale: 0.95, y: 8 }}
-          animate={{
-            opacity: 1,
-            scale: 1,
-            y: 0,
-            height: panelHeight,
-          }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 8 }}
           transition={{
             duration: 0.2,
             ease: [0.22, 1, 0.36, 1],
-            height: { duration: 0.3, ease: 'easeOut' },
           }}
-          className='fixed z-[9999]'
-          style={{
-            left: position.x,
-            top: position.y,
-            width: panelWidth,
-          }}
+          className={cn(
+            'fixed z-[9999]',
+            isDocked ? 'right-0 top-0 h-full rounded-none' : '',
+          )}
+          style={
+            isDocked
+              ? { width: DOCKED_PANEL_WIDTH }
+              : {
+                  left: position.x,
+                  top: position.y,
+                  width: panelWidth,
+                  height: panelHeight,
+                }
+          }
         >
-          {/* Card container with animated background - matches Watchtower/IdeaPlayground */}
+          {/* Resize handles (only when floating) */}
+          {!isDocked && (
+            <>
+              <div
+                onMouseDown={(e) => handleResizeStart(e, 'w')}
+                className='absolute bottom-2 left-0 top-2 z-20 w-1.5 cursor-ew-resize rounded-full transition-colors hover:bg-white/10'
+              />
+              <div
+                onMouseDown={(e) => handleResizeStart(e, 'e')}
+                className='absolute bottom-2 right-0 top-2 z-20 w-1.5 cursor-ew-resize rounded-full transition-colors hover:bg-white/10'
+              />
+              <div
+                onMouseDown={(e) => handleResizeStart(e, 'n')}
+                className='absolute left-2 right-2 top-0 z-20 h-1.5 cursor-ns-resize rounded-full transition-colors hover:bg-white/10'
+              />
+              <div
+                onMouseDown={(e) => handleResizeStart(e, 's')}
+                className='absolute bottom-0 left-2 right-2 z-20 h-1.5 cursor-ns-resize rounded-full transition-colors hover:bg-white/10'
+              />
+              <div
+                onMouseDown={(e) => handleResizeStart(e, 'nw')}
+                className='absolute left-0 top-0 z-30 h-3 w-3 cursor-nwse-resize'
+              />
+              <div
+                onMouseDown={(e) => handleResizeStart(e, 'ne')}
+                className='absolute right-0 top-0 z-30 h-3 w-3 cursor-nesw-resize'
+              />
+              <div
+                onMouseDown={(e) => handleResizeStart(e, 'sw')}
+                className='absolute bottom-0 left-0 z-30 h-3 w-3 cursor-nesw-resize'
+              />
+              <div
+                onMouseDown={(e) => handleResizeStart(e, 'se')}
+                className='absolute bottom-0 right-0 z-30 h-3 w-3 cursor-nwse-resize'
+              />
+            </>
+          )}
+
+          {/* Glass Shell — rim area is draggable */}
           <div
-            className='relative flex h-full flex-col overflow-hidden rounded-xl shadow-2xl'
-            style={{
-              backgroundColor: '#1a1a1a',
-              backgroundImage: `url(${images.nucleusBrandGradient})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              animation:
-                'overseerFadeIn 0.5s ease-in-out forwards, overseerMoveBackground 40s ease infinite',
-            }}
-          >
-            {/* Header */}
-            <OverseerHeader
-              onClose={
-                customCommandFlow.isActive
-                  ? cancelCustomCommandFlow
-                  : customCommandManagementFlow.isActive
-                    ? cancelManageCustomCommandsFlow
-                    : close
-              }
-              onDragStart={handleDragStart}
-            />
-
-            {/* Custom Command Creation Flow */}
-            {customCommandManagementFlow.isActive ? (
-              <ManageCustomCommandsFlow
-                onCancel={cancelManageCustomCommandsFlow}
-                onCreate={handleStartCreateFromManage}
-              />
-            ) : customCommandFlow.isActive ? (
-              <CustomCommandCreationFlow
-                flow={customCommandFlow}
-                currentMessage={currentMessage}
-                onMessageChange={setCurrentMessage}
-                onSubmitStep={submitCustomCommandStep}
-                onGoBack={goBackCustomCommandStep}
-                onCancel={cancelCustomCommandFlow}
-                onToggleTool={toggleCustomCommandTool}
-                onConfirm={confirmCustomCommand}
-                onEditField={editCustomCommandField}
-              />
-            ) : (
-              <>
-                {/* Selected content */}
-                <OverseerSelectedContent
-                  selectedText={selectedText}
-                  expandedText={expandedText}
-                />
-
-                {/* Chat area */}
-                <OverseerChat
-                  messages={messages}
-                  isThinking={isThinking}
-                  thinkingMessage={thinkingMessage}
-                  className='min-h-[150px] flex-1'
-                  editSuggestions={editSuggestions}
-                  onConfirmEdits={handleConfirmEdits}
-                  onCancelEdits={handleCancelEdits}
-                />
-
-                {/* Suggested questions */}
-                <OverseerSuggestedQuestions
-                  questions={suggestedQuestions}
-                  onQuestionClick={handleQuestionClick}
-                  disabled={
-                    isThinking && !((editSuggestions?.edits?.length ?? 0) > 0)
-                  }
-                />
-
-                {/* Input - only show after initial loading completes or if there's no thinking */}
-                {(messages.length > 0 ||
-                  !isThinking ||
-                  (editSuggestions?.edits?.length ?? 0) > 0) && (
-                  <OverseerInput
-                    value={currentMessage}
-                    onChange={setCurrentMessage}
-                    onSubmit={handleSubmitMessage}
-                    onClose={close}
-                    disabled={
-                      isThinking && !((editSuggestions?.edits?.length ?? 0) > 0)
-                    }
-                    hasSelection={!!selectedText}
-                  />
-                )}
-
-                {/* Error display */}
-                {hasError && (
-                  <div className='border-t border-red-500/30 bg-red-900/20 px-4 py-2'>
-                    <p className='text-xs text-red-400'>
-                      Something went wrong. Please try again.
-                    </p>
-                  </div>
-                )}
-              </>
+            className={cn(
+              'liquid-glass-modal-shell h-full',
+              isDocked && 'rounded-none',
+              !isDocked && 'cursor-grab active:cursor-grabbing',
             )}
+            onMouseDown={handleDragStart}
+          >
+            {/* Animated Overseer Rim with floating gradient orbs */}
+            <div
+              className={cn(
+                'liquid-glass-modal-rim liquid-glass-modal-rim-overseer',
+                isDocked && 'rounded-none',
+              )}
+              aria-hidden='true'
+            >
+              <div className='overseer-rim-orb overseer-rim-orb-1' />
+              <div className='overseer-rim-orb overseer-rim-orb-2' />
+            </div>
 
-            {/* Corner resize handles */}
+            {/* Dark gradient surface — stop propagation so clicks inside don't trigger shell drag */}
             <div
-              className='absolute bottom-0 right-0 h-4 w-4 cursor-nwse-resize'
-              onMouseDown={(e) => handleResizeStart(e, 'se')}
-              style={{ touchAction: 'none' }}
-            />
-            <div
-              className='absolute left-0 top-0 h-4 w-4 cursor-nwse-resize'
-              onMouseDown={(e) => handleResizeStart(e, 'nw')}
-              style={{ touchAction: 'none' }}
-            />
-            <div
-              className='absolute right-0 top-0 h-4 w-4 cursor-nesw-resize'
-              onMouseDown={(e) => handleResizeStart(e, 'ne')}
-              style={{ touchAction: 'none' }}
-            />
-            <div
-              className='absolute bottom-0 left-0 h-4 w-4 cursor-nesw-resize'
-              onMouseDown={(e) => handleResizeStart(e, 'sw')}
-              style={{ touchAction: 'none' }}
-            />
+              className={cn(
+                'overseer-panel-surface h-full',
+                isDocked && '!rounded-none',
+              )}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <div className='relative z-10 flex h-full flex-col overflow-hidden'>
+                {showHistory ? (
+                  /* ======== History full-panel takeover (Lovable pattern) ======== */
+                  <div
+                    className='flex flex-1 flex-col overflow-hidden'
+                    style={{ background: 'rgba(18,18,18,0.95)' }}
+                  >
+                    {/* History header */}
+                    <div
+                      className='flex items-center justify-between px-3 py-1.5'
+                      style={{ background: 'rgba(255,255,255,0.04)' }}
+                    >
+                      <button
+                        onClick={() => setShowHistory(false)}
+                        className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                        title='Back to chat'
+                      >
+                        <Icon
+                          variant='chevronleft'
+                          width={14}
+                          height={14}
+                          className='stroke-current'
+                        />
+                      </button>
+                      <div
+                        className={cn(
+                          'h-3 flex-1',
+                          !isDocked && 'cursor-grab active:cursor-grabbing',
+                        )}
+                        onMouseDown={handleDragStart}
+                      />
+                      <div className='flex items-center'>
+                        {isDocked ? (
+                          <button
+                            onClick={() => {
+                              setDocked(false);
+                              const pos = clampToViewport(
+                                window.innerWidth - DEFAULT_PANEL_WIDTH - 40,
+                                40,
+                              );
+                              setPosition(pos);
+                            }}
+                            className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                            title='Undock panel'
+                          >
+                            <Icon
+                              variant='expand-06'
+                              width={14}
+                              height={14}
+                              className='stroke-current'
+                            />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setDocked(true)}
+                            className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                            title='Anchor to side panel'
+                          >
+                            <Icon
+                              variant='columns'
+                              width={14}
+                              height={14}
+                              className='stroke-current'
+                            />
+                          </button>
+                        )}
+                        <button
+                          onClick={close}
+                          className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                          title='Close panel'
+                        >
+                          <Icon
+                            variant='closeX'
+                            width={14}
+                            height={14}
+                            className='stroke-current'
+                          />
+                        </button>
+                      </div>
+                    </div>
 
-            {/* Edge resize handles */}
-            <div
-              className='absolute left-4 right-4 top-0 h-2 cursor-ns-resize'
-              onMouseDown={(e) => handleResizeStart(e, 'n')}
-              style={{ touchAction: 'none' }}
-            />
-            <div
-              className='absolute bottom-0 left-4 right-4 h-2 cursor-ns-resize'
-              onMouseDown={(e) => handleResizeStart(e, 's')}
-              style={{ touchAction: 'none' }}
-            />
-            <div
-              className='absolute bottom-4 left-0 top-4 w-2 cursor-ew-resize'
-              onMouseDown={(e) => handleResizeStart(e, 'w')}
-              style={{ touchAction: 'none' }}
-            />
-            <div
-              className='absolute bottom-4 right-0 top-4 w-2 cursor-ew-resize'
-              onMouseDown={(e) => handleResizeStart(e, 'e')}
-              style={{ touchAction: 'none' }}
-            />
+                    {/* History list */}
+                    <div className='flex-1 overflow-y-auto px-2 py-2'>
+                      {historyLoading && mergedHistory.length === 0 ? (
+                        /* Loading skeleton */
+                        <div className='space-y-2 px-3 py-2'>
+                          {[1, 2, 3].map((i) => (
+                            <div
+                              key={i}
+                              className='h-5 animate-pulse rounded bg-white/[0.06]'
+                            />
+                          ))}
+                        </div>
+                      ) : Object.keys(groupedHistory).length === 0 ? (
+                        <div className='px-3 py-6 text-center text-[11px] text-white/20'>
+                          No conversations yet
+                        </div>
+                      ) : (
+                        Object.entries(groupedHistory).map(
+                          ([dateLabel, chats], groupIdx) => (
+                            <div key={dateLabel}>
+                              {groupIdx > 0 && (
+                                <div className='mx-2 my-2 border-t border-white/[0.06]' />
+                              )}
+                              <div className='mb-1 px-3 pt-1 text-[10px] font-medium uppercase tracking-widest text-white/20'>
+                                {dateLabel}
+                              </div>
+                              {chats.map((chat, chatIdx) => (
+                                <div key={chat.uuid}>
+                                  {chatIdx > 0 && (
+                                    <div className='mx-3 border-t border-white/[0.04]' />
+                                  )}
+                                  <button
+                                    onClick={async () => {
+                                      try {
+                                        const detail =
+                                          await api.overseer.getConversation(
+                                            chat.uuid,
+                                          );
+                                        loadConversation(detail);
+                                      } catch {
+                                        setShowHistory(false);
+                                      }
+                                    }}
+                                    className='w-full truncate px-3 py-2.5 text-left text-[12px] font-light text-white/50 transition-all duration-200 hover:bg-white/[0.05] hover:text-white/85'
+                                  >
+                                    {chat.name === null ? (
+                                      <span className='inline-flex items-center gap-1 text-white/30'>
+                                        <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40' />
+                                        <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40 [animation-delay:0.2s]' />
+                                        <span className='inline-block h-1 w-1 animate-pulse rounded-full bg-white/40 [animation-delay:0.4s]' />
+                                      </span>
+                                    ) : (
+                                      chat.name
+                                    )}
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          ),
+                        )
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  /* ======== Main chat view ======== */
+                  <>
+                    {/* Header — matches Lovable: history (left), drag area (center), dock (right) */}
+                    <div className='flex items-center justify-between px-3 py-1.5'>
+                      <div className='flex items-center'>
+                        <button
+                          onClick={() => setShowHistory(true)}
+                          className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                          title='Chat history'
+                        >
+                          <Icon
+                            variant='clock-rewind'
+                            width={14}
+                            height={14}
+                            className='stroke-current'
+                          />
+                        </button>
+                        {messages.length > 0 && (
+                          <button
+                            onClick={clearConversation}
+                            className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                            title='New chat'
+                          >
+                            <Icon
+                              variant='plus'
+                              width={14}
+                              height={14}
+                              className='stroke-current'
+                            />
+                          </button>
+                        )}
+                      </div>
+
+                      {/* Drag handle area — invisible, full width */}
+                      <div
+                        className={cn(
+                          'h-3 flex-1',
+                          !isDocked && 'cursor-grab active:cursor-grabbing',
+                        )}
+                        onMouseDown={handleDragStart}
+                      />
+
+                      <div className='flex items-center'>
+                        {isDocked ? (
+                          <button
+                            onClick={() => {
+                              setDocked(false);
+                              const pos = clampToViewport(
+                                window.innerWidth - DEFAULT_PANEL_WIDTH - 40,
+                                40,
+                              );
+                              setPosition(pos);
+                            }}
+                            className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                            title='Undock panel'
+                          >
+                            <Icon
+                              variant='expand-06'
+                              width={14}
+                              height={14}
+                              className='stroke-current'
+                            />
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => setDocked(true)}
+                            className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                            title='Anchor to side panel'
+                          >
+                            <Icon
+                              variant='columns'
+                              width={14}
+                              height={14}
+                              className='stroke-current'
+                            />
+                          </button>
+                        )}
+                        <button
+                          onClick={close}
+                          className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                          title='Close panel'
+                        >
+                          <Icon
+                            variant='closeX'
+                            width={14}
+                            height={14}
+                            className='stroke-current'
+                          />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Messages */}
+                    <OverseerChat
+                      messages={messages}
+                      className='min-h-[120px] flex-1'
+                      editSuggestions={editSuggestions}
+                      onConfirmEdits={handleConfirmEdits}
+                      onCancelEdits={handleCancelEdits}
+                      isApplyingEdits={isApplyingEdits}
+                      isThinking={isThinking}
+                      toolActivitySteps={toolActivitySteps}
+                      onActiveEditChange={handleActiveEditChange}
+                    />
+
+                    {/* Follow-up suggestions */}
+                    <OverseerSuggestedQuestions
+                      questions={suggestedQuestions}
+                      onQuestionClick={handleQuestionClick}
+                      disabled={isThinking && !hasEditSuggestions}
+                    />
+
+                    {/* Referenced text chip (above input) — Lovable blue style */}
+                    {selectedText &&
+                      selectedText.trim().length > 0 &&
+                      contentExpanded && (
+                        <div className='px-4 pt-2'>
+                          <div className='flex items-center gap-2 rounded-lg border border-blue-400/25 bg-blue-500/10 px-2.5 py-2'>
+                            <Icon
+                              variant='arrowright'
+                              width={12}
+                              height={12}
+                              className='shrink-0 stroke-white/60'
+                            />
+                            <p className='min-w-0 flex-1 truncate text-[11px] text-white/70'>
+                              {selectedText}
+                            </p>
+                            <button
+                              onClick={() => {
+                                setContentExpanded(false);
+                                clearSelectedText();
+                              }}
+                              className='shrink-0 rounded p-0.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
+                            >
+                              <Icon
+                                variant='closeX'
+                                width={12}
+                                height={12}
+                                className='stroke-current'
+                              />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                    {/* Input area with mention menu */}
+                    <OverseerInput
+                      value={currentMessage}
+                      onChange={setCurrentMessage}
+                      onSubmit={handleSubmitMessage}
+                      disabled={isThinking && !hasEditSuggestions}
+                      mentions={mentions}
+                      onMentionSelect={addMention}
+                      onMentionRemove={removeMention}
+                      pendingImages={pendingImages}
+                      onImageAdd={addImage}
+                      onImageRemove={removeImage}
+                      conceptItems={conceptItems}
+                    />
+
+                    {/* Feature toggle buttons (no border-t — matches Lovable) */}
+                    <div className='flex items-center gap-1.5 px-4 py-2'>
+                      {FEATURE_BUTTONS.map((feat) => (
+                        <button
+                          key={feat.key}
+                          onClick={() => toggleFeature(feat.key)}
+                          className={cn(
+                            'flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[10px] font-medium transition-colors',
+                            activeFeatures.has(feat.key)
+                              ? 'border-blue-400/40 bg-blue-500/20 text-blue-300'
+                              : 'border-white/10 text-white/40 hover:bg-white/[0.08] hover:text-white/80',
+                          )}
+                          title={feat.label}
+                        >
+                          <Icon
+                            variant={feat.icon as 'globe'}
+                            width={12}
+                            height={12}
+                            className='stroke-current'
+                          />
+                          <span>{feat.label}</span>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Error display */}
+                    {hasError && (
+                      <div className='border-t border-red-500/30 bg-red-900/20 px-4 py-2'>
+                        <p className='text-xs text-red-400'>
+                          Something went wrong. Please try again.
+                        </p>
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>
     </>
   );
 
-  // Render as portal to body
   return createPortal(popupContent, document.body);
 };
 
