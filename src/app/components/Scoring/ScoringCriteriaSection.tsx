@@ -30,12 +30,12 @@
  */
 
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 
 import EmptyScoringState from './EmptyScoringState';
 import ScoringCategoryCard from './ScoringCategoryCard';
 import { ScoringCriteriaSectionProps } from './types';
+import { Settings } from 'lucide-react';
 
 const ScoringCriteriaSection: React.FC<ScoringCriteriaSectionProps> = ({
   categories,
@@ -64,10 +64,7 @@ const ScoringCriteriaSection: React.FC<ScoringCriteriaSectionProps> = ({
               title='Configure criteria'
               onClick={onConfigureClick}
             >
-              <Icon
-                variant='gear'
-                className='aucctus-stroke-tertiary h-4 w-4'
-              />
+              <Settings className='aucctus-stroke-tertiary h-4 w-4' />
             </button>
           )}
         </div>

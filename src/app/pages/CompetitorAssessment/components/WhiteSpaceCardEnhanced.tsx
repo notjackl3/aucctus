@@ -1,9 +1,9 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 import type { IWhiteSpaceOpportunity } from '@libs/api/types/competitorAssessment';
 import ConfidenceRing from './ConfidenceRing';
+import { ChevronRight, FileText, Layers } from 'lucide-react';
 
 interface WhiteSpaceCardEnhancedProps {
   whiteSpace: IWhiteSpaceOpportunity;
@@ -93,12 +93,7 @@ const WhiteSpaceCardEnhanced: React.FC<WhiteSpaceCardEnhancedProps> = ({
         {whiteSpace.evidenceSummary && (
           <div className='aucctus-bg-primary mb-3 rounded-lg px-3 py-2'>
             <p className='aucctus-text-tertiary line-clamp-1 text-[10px] leading-relaxed'>
-              <Icon
-                variant='file-text'
-                height={9}
-                width={9}
-                className='mr-1 inline stroke-current'
-              />
+              <FileText size={9} className='mr-1 inline stroke-current' />
               {whiteSpace.evidenceSummary}
             </p>
           </div>
@@ -107,20 +102,13 @@ const WhiteSpaceCardEnhanced: React.FC<WhiteSpaceCardEnhancedProps> = ({
         {/* Footer */}
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-1'>
-            <Icon
-              variant='layers'
-              height={10}
-              width={10}
-              className='aucctus-stroke-tertiary'
-            />
+            <Layers size={10} className='aucctus-stroke-tertiary' />
             <span className='aucctus-text-tertiary text-[10px]'>
               {whiteSpace.gapType}
             </span>
           </div>
-          <Icon
-            variant='chevron-right'
-            height={14}
-            width={14}
+          <ChevronRight
+            size={14}
             className='aucctus-stroke-tertiary transition-transform group-hover:translate-x-0.5'
           />
         </div>

@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 import React from 'react';
+import { ArrowDown } from 'lucide-react';
 
 interface TitleDescriptionProps {
   title: string;
@@ -116,7 +116,7 @@ const CollapsibleText: React.FC<TitleDescriptionProps> = ({
             <span className='absolute inset-x-0 bottom-0 flex w-full justify-center'>
               {isHovered && (
                 <button className='btn btn-light btn-xs mb-1'>
-                  See More <Icon variant='arrowdown' />
+                  See More <ArrowDown />
                 </button>
               )}
             </span>

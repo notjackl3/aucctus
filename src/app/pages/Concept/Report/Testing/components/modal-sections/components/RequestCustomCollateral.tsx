@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import { cn } from '@libs/utils/react';
 import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import {
   useTestCollateralRequest,
   useCreateTestCollateral,
 } from '@hooks/query/testing.hook';
+import { AlertCircle, ArrowRight, Plus } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface RequestCustomCollateralProps {
   conceptUuid?: string;
@@ -75,12 +77,12 @@ const RequestCustomCollateral: React.FC<RequestCustomCollateralProps> = ({
         type='button'
       >
         <div className='flex items-center gap-2'>
-          <Icon variant='plus' className='aucctus-stroke-tertiary h-5 w-5' />
+          <Plus className='aucctus-stroke-tertiary h-5 w-5' />
           <span className='aucctus-text-sm-semibold aucctus-text-tertiary'>
             Request Custom Collateral
           </span>
         </div>
-        <Icon
+        <DynamicIcon
           variant={isExpanded ? 'chevronup' : 'chevrondown'}
           className='aucctus-stroke-tertiary h-4 w-4'
         />
@@ -141,10 +143,7 @@ const RequestCustomCollateral: React.FC<RequestCustomCollateralProps> = ({
             ) : processingState.error ? (
               <div className='aucctus-bg-error-secondary aucctus-border-error flex flex-1 flex-col gap-3 rounded border p-4'>
                 <div className='flex items-center gap-2'>
-                  <Icon
-                    variant='alert-circle'
-                    className='aucctus-stroke-error-primary h-5 w-5'
-                  />
+                  <AlertCircle className='aucctus-stroke-error-primary h-5 w-5' />
                   <span className='aucctus-text-sm-semibold aucctus-text-error-primary'>
                     Processing Failed
                   </span>
@@ -194,8 +193,7 @@ const RequestCustomCollateral: React.FC<RequestCustomCollateralProps> = ({
                   {isSubmittingOrProcessing ? (
                     <Loading isSmall />
                   ) : (
-                    <Icon
-                      variant='arrowright'
+                    <ArrowRight
                       className={cn(
                         'h-4 w-4',
                         !customRequest.trim()

@@ -1,4 +1,4 @@
-import { Button, Container, Header, Icon, Loading, Table } from '@components';
+import { Button, Container, Header, Loading, Table } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useConceptTestDetails } from '@hooks/query/assumptions.hook';
 import { useAssumptionsToTestTable } from '@hooks/tables/assumptions-to-test.hook';
@@ -8,6 +8,8 @@ import utils from '@libs/utils';
 import React from 'react';
 import Footer from './Footer';
 import TestModalHeader from './Header';
+import { X } from 'lucide-react';
+import RotatingIcon from '@components/Icon/RotatingIcon';
 
 interface TestModalProps {
   conceptUuid: string;
@@ -55,7 +57,7 @@ const TestModal: React.FC<TestModalProps> = ({
           ID: {identifier}
         </div>
         <Button color='light' noBorder size='sm' onClick={closeModal}>
-          <Icon variant='closeX' />
+          <X />
         </Button>
       </div>
 
@@ -151,7 +153,7 @@ const SectionButton: React.FC<{
       onClick={() => setIsOpen(!isOpen)}
     >
       <Header.Two text={text} className='text-xl' />
-      <Icon.RotatingIcon isUp={isOpen} height={24} width={24} />
+      <RotatingIcon isUp={isOpen} height={24} width={24} />
     </button>
   );
 };

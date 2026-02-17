@@ -1,4 +1,4 @@
-import Icon from '@components/Icon';
+import { BookOpen } from 'lucide-react';
 import React from 'react';
 
 interface IFinancialModelCard {
@@ -26,10 +26,10 @@ const FinancialModelCard: React.FC<IFinancialModelCard> = ({
           {value}
         </h3>
         <button
-          className='btn btn-primary-light btn-no-border aucctus-border-secondary h-8 w-8 p-0 [&>svg>use]:stroke-primary-600'
+          className='btn btn-primary-light btn-no-border aucctus-border-secondary h-8 w-8 p-0 [&>svg]:stroke-primary-600'
           onClick={onClick}
         >
-          <Icon variant='book-open' strokeWidth={6} />
+          <BookOpen strokeWidth={6} />
         </button>
       </div>
 

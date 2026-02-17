@@ -1,6 +1,5 @@
-import { Icon } from '@components';
-
 import React from 'react';
+import { ArrowDown, ArrowUp, Check } from 'lucide-react';
 
 interface ISortSubmenuProps {
   currentSort?: 'asc' | 'desc' | null;
@@ -25,13 +24,10 @@ export const SortSubmenu: React.FC<ISortSubmenuProps> = ({
           onSort('asc');
         }}
       >
-        <Icon variant='arrowup' className='aucctus-stroke-secondary h-4 w-4' />
+        <ArrowUp className='aucctus-stroke-secondary h-4 w-4' />
         <span className='aucctus-text-secondary'>Ascending</span>
         {currentSort === 'asc' && (
-          <Icon
-            variant='check'
-            className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-          />
+          <Check className='aucctus-stroke-brand-primary ml-auto h-4 w-4' />
         )}
       </button>
 
@@ -43,16 +39,10 @@ export const SortSubmenu: React.FC<ISortSubmenuProps> = ({
           onSort('desc');
         }}
       >
-        <Icon
-          variant='arrowdown'
-          className='aucctus-stroke-secondary h-4 w-4'
-        />
+        <ArrowDown className='aucctus-stroke-secondary h-4 w-4' />
         <span className='aucctus-text-secondary'>Descending</span>
         {currentSort === 'desc' && (
-          <Icon
-            variant='check'
-            className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-          />
+          <Check className='aucctus-stroke-brand-primary ml-auto h-4 w-4' />
         )}
       </button>
     </div>

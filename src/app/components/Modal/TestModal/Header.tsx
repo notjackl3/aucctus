@@ -1,4 +1,4 @@
-import { Badge, Header, Icon, Text } from '@components';
+import { Badge, Header, Text } from '@components';
 import {
   ConceptTestStage,
   ConceptTestStatus,
@@ -9,6 +9,7 @@ import utils from '@libs/utils';
 import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/assumptions';
 import classNames from 'classnames';
 import React from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface HeaderProps {
   stage: ConceptTestStage;
@@ -69,7 +70,7 @@ const AssumptionTestHeader: React.FC<HeaderProps> = ({
               TESTING_STATUS_STYLE_MAP[status].text,
             )}
           >
-            <Icon
+            <DynamicIcon
               variant={TESTING_STATUS_STYLE_MAP[status].icon}
               className={classNames(TESTING_STATUS_STYLE_MAP[status].stroke)}
             />

@@ -1,5 +1,5 @@
 import images from '@assets/img';
-import { ComponentTooltip, Icon } from '@components';
+import { ComponentTooltip } from '@components';
 import {
   useCompanyInfo,
   usePublishedDatesQuery,
@@ -9,6 +9,7 @@ import utils from '@libs/utils';
 import { cn } from '@libs/utils/react';
 import { getLogoUrl } from '@libs/utils/source';
 import React, { useEffect, useState } from 'react';
+import { File, Lightbulb } from 'lucide-react';
 
 interface FinancialProjectionSourceBadgeProps {
   source: IBaseFinancialProjectionSourceV2;
@@ -113,8 +114,7 @@ const FinancialProjectionSourceBadge: React.FC<
             'aucctus-border-primary flex h-fit w-fit items-center justify-center overflow-hidden rounded-full',
           )}
         >
-          <Icon
-            variant='lightbulb'
+          <Lightbulb
             className={cn('aucctus-stroke-quaternary', logoSizeClass)}
           />
         </div>
@@ -151,10 +151,7 @@ const FinancialProjectionSourceBadge: React.FC<
           logoSizeClass,
         )}
       >
-        <Icon
-          variant='file'
-          className={cn('aucctus-fill-tertiary', logoSizeClass)}
-        />
+        <File className={cn('aucctus-fill-tertiary', logoSizeClass)} />
       </div>
     );
   };

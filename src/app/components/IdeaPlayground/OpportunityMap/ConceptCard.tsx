@@ -1,6 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import type { IGeneratedIdeaPlaygroundConcept } from '../types';
+import { Check, Loader2, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ConceptCardProps {
   concept: IGeneratedIdeaPlaygroundConcept;
@@ -48,7 +49,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
   };
 
   /** Icon variant from backend - assigned by AI based on concept's domain/mechanism */
-  const iconVariant: IconVariant = concept.icon || 'lightbulb';
+  const iconVariant: string = concept.icon || 'lightbulb';
 
   return (
     <div
@@ -84,17 +85,9 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
           aria-label='Delete concept'
         >
           {isDeleting ? (
-            <Icon
-              variant='loading-02'
-              className='aucctus-stroke-white h-3 w-3 animate-spin'
-            />
+            <Loader2 className='aucctus-stroke-white h-3 w-3 animate-spin' />
           ) : (
-            <Icon
-              variant='closeX'
-              className='aucctus-stroke-white'
-              height={10}
-              width={10}
-            />
+            <X size={10} className='aucctus-stroke-white' />
           )}
         </button>
 
@@ -107,14 +100,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
                 : 'border-white/50 hover:border-white/70'
             }`}
           >
-            {isSelected && (
-              <Icon
-                variant='check'
-                className='aucctus-stroke-white'
-                height={12}
-                width={12}
-              />
-            )}
+            {isSelected && <Check size={12} className='aucctus-stroke-white' />}
           </div>
         </div>
       </div>
@@ -131,7 +117,7 @@ const ConceptCard: React.FC<ConceptCardProps> = ({
       {/* Content */}
       <div className='flex h-full flex-col pt-8'>
         <div className='mb-2 flex items-start gap-2 pr-8'>
-          <Icon
+          <DynamicIcon
             variant={iconVariant}
             className='aucctus-stroke-white mt-0.5 h-6 w-6 flex-shrink-0'
           />

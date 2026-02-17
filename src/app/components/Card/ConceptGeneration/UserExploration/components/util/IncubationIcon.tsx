@@ -1,9 +1,9 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IncubationIconProps {
   size?: 'default' | 'small' | 'large';
-  variant: IconVariant;
+  variant: string;
   className?: string;
   iconClassName?: string;
 }
@@ -34,7 +34,7 @@ export const IncubationIcon = ({
         className,
       )}
     >
-      <Icon
+      <DynamicIcon
         variant={variant}
         width={dimension}
         height={dimension}

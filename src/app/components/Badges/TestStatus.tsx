@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { type AssumptionTestStatus, type TestStatus } from '@libs/api/types';
 import classNames from 'classnames';
 import React from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface TestStatusProps {
   status: AssumptionTestStatus | TestStatus;
@@ -21,14 +21,14 @@ const TestStatusBadge: React.FC<TestStatusProps> = ({ status }) => {
         style,
       )}
     >
-      {icon ? <Icon variant={icon} height={12} width={12} /> : null}
+      {icon ? <DynamicIcon variant={icon} height={12} width={12} /> : null}
     </span>
   );
 };
 
 const VALIDATED_STATUS_MAP: Record<
   AssumptionTestStatus | TestStatus,
-  { icon?: IconVariant | undefined; style?: string }
+  { icon?: string | undefined; style?: string }
 > = {
   notStarted: {},
   inProgress: {

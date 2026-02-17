@@ -1,9 +1,10 @@
 import React from 'react';
-import { Icon, Text } from '@components';
+import { Text } from '@components';
 import { cn } from '@libs/utils/react';
 import type { IPriorityInsightV3 } from '@libs/api/types/concept/marketScan';
 import type { ISource } from '@libs/api/types';
 import SourceBadgeList from './SourceBadgeList';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Extend the IPriorityInsightV3 interface with the fields we're using from the API
 interface ExtendedPriorityInsight extends IPriorityInsightV3 {
@@ -107,7 +108,7 @@ const PriorityInsightCard: React.FC<PriorityInsightCardProps> = ({
                 direction === 'down',
             })}
           >
-            <Icon
+            <DynamicIcon
               variant={direction === 'up' ? 'arrowup' : 'arrowdown'}
               className={cn({
                 'h-4 w-4': true,

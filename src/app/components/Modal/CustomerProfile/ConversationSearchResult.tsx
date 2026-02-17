@@ -1,10 +1,10 @@
-import { Icon } from '@components';
 import {
   IAggregatedMessage,
   ICustomerProfileConversation,
 } from '@libs/api/types';
 import { formatDate } from '@libs/utils/time';
 import React from 'react';
+import { MessageCircle } from 'lucide-react';
 
 interface ConversationSearchResultProps {
   result: ICustomerProfileConversation;
@@ -29,7 +29,7 @@ const ConversationSearchResult: React.FC<ConversationSearchResultProps> = ({
       onClick={() => onClick?.(result)}
     >
       <span className='flex items-center justify-center'>
-        <Icon variant='message-circle' width={20} height={20} />
+        <MessageCircle size={20} />
       </span>
       <div className='flex flex-col'>
         {result.summary && (

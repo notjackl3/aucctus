@@ -4,7 +4,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { useQueryClient } from 'react-query';
-import { Icon } from '@components';
 import {
   IConceptPrioritySummary,
   getPriorityLevel,
@@ -16,6 +15,7 @@ import {
 } from '@hooks/query/concept-priority.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import ScoreBreakdownSheet from './ScoreBreakdownSheet';
+import { RefreshCw, Sparkles } from 'lucide-react';
 
 interface PriorityCellProps {
   conceptUuid: string;
@@ -158,12 +158,7 @@ export const PriorityCell: React.FC<PriorityCellProps> = ({
         }}
         disabled={isGenerating}
       >
-        <Icon
-          variant='sparkles'
-          height={12}
-          width={12}
-          className='aucctus-stroke-brand-primary'
-        />
+        <Sparkles size={12} className='aucctus-stroke-brand-primary' />
         <span className='aucctus-text-xs'>Calculate</span>
       </button>
     );
@@ -176,10 +171,8 @@ export const PriorityCell: React.FC<PriorityCellProps> = ({
         className='btn btn-outlined btn-sm cursor-not-allowed opacity-70'
         disabled
       >
-        <Icon
-          variant='refresh'
-          height={12}
-          width={12}
+        <RefreshCw
+          size={12}
           className='aucctus-stroke-brand-primary animate-spin'
         />
         <span className='aucctus-text-xs'>Calculating...</span>

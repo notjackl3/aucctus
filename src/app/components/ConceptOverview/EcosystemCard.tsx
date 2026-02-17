@@ -1,10 +1,11 @@
-import { Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { IEcosystemPlayer } from './config';
 import ProgressBar from './ProgressBar';
 import { useEcosystem } from '../EcosystemV2/hooks/useEcosystem';
 import type { IConcept } from '@libs/api/types';
+import { Globe } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface EcosystemCardProps {
   currentCardIndex: number;
@@ -149,7 +150,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
       <div key={player.id} className={player.cardClasses}>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon
+            <DynamicIcon
               variant={player.iconVariant as any}
               className={player.iconClasses}
             />
@@ -175,7 +176,7 @@ const EcosystemCard: React.FC<EcosystemCardProps> = ({
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon variant='globe' className='aucctus-stroke-tertiary h-4 w-4' />
+            <Globe className='aucctus-stroke-tertiary h-4 w-4' />
             <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
               Ecosystem
             </h3>

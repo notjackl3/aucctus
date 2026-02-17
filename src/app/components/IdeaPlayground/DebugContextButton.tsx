@@ -1,8 +1,9 @@
 import React, { useState, useCallback } from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import api from '@libs/api';
 import { cn } from '@libs/utils/react';
+import { Clipboard, Loader2 } from 'lucide-react';
 
 interface DebugContextButtonProps {
   seedUuid: string | null;
@@ -63,15 +64,9 @@ const DebugContextButton: React.FC<DebugContextButtonProps> = ({
       title='Copy seed context to clipboard (Debug)'
     >
       {isLoading ? (
-        <Icon
-          variant='loading-02'
-          className='aucctus-stroke-warning-primary h-3.5 w-3.5 animate-spin'
-        />
+        <Loader2 className='aucctus-stroke-warning-primary h-3.5 w-3.5 animate-spin' />
       ) : (
-        <Icon
-          variant='clipboard'
-          className='aucctus-stroke-warning-primary h-3.5 w-3.5'
-        />
+        <Clipboard className='aucctus-stroke-warning-primary h-3.5 w-3.5' />
       )}
       <span>Copy Context</span>
     </button>

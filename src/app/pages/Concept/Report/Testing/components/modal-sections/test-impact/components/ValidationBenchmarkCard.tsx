@@ -1,6 +1,5 @@
 import React from 'react';
-import { Icon } from '@components';
-
+import { Target } from 'lucide-react';
 interface ValidationBenchmarkCardProps {
   benchmark: string;
 }
@@ -13,10 +12,7 @@ const ValidationBenchmarkCard: React.FC<ValidationBenchmarkCardProps> = ({
       <div className='flex items-start gap-2 p-3'>
         <div className='mt-0.5'>
           <div className='aucctus-bg-brand-secondary rounded-full p-1'>
-            <Icon
-              variant='target'
-              className='aucctus-stroke-brand-primary h-3 w-3'
-            />
+            <Target className='aucctus-stroke-brand-primary h-3 w-3' />
           </div>
         </div>
         <div className='flex-1'>

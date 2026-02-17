@@ -1,6 +1,8 @@
-import { Badge, ComponentTooltip, Header, Icon } from '@components';
+import { Badge, ComponentTooltip, Header } from '@components';
 import { cn } from '@libs/utils/react';
 import { PIPELINE_STAGES, type ConceptsByStage } from '../types/pipeline.types';
+import { Workflow } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface PipelineHeaderProps {
   totalCount: number;
@@ -19,12 +21,7 @@ const PipelineHeader = ({
         <div>
           <div className='flex items-center gap-3'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='dataflow-04'
-                height={28}
-                width={28}
-                className='aucctus-stroke-brand-primary'
-              />
+              <Workflow size={28} className='aucctus-stroke-brand-primary' />
               <Header.One text='Innovation Pipeline' />
             </div>
             <ComponentTooltip
@@ -86,7 +83,7 @@ const PipelineHeader = ({
                     stage.color.bg,
                   )}
                 >
-                  <Icon
+                  <DynamicIcon
                     variant={stage.icon}
                     className='h-3.5 w-3.5 stroke-white'
                   />

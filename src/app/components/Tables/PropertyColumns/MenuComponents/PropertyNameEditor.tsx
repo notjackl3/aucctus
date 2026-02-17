@@ -1,9 +1,10 @@
-import { Icon } from '@components';
 import { IPropertyDefinition } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React from 'react';
 import { IconPickerDropdown } from '@components/Dropdown';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
+import { Loader2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IPropertyNameEditorProps {
   definition: IPropertyDefinition;
@@ -43,8 +44,8 @@ export const PropertyNameEditor: React.FC<IPropertyNameEditorProps> = ({
               type='button'
               className='aucctus-bg-secondary-hover hover:aucctus-bg-tertiary flex h-8 w-8 flex-shrink-0 items-center justify-center rounded transition-colors'
             >
-              <Icon
-                variant={getPropertyIcon(definition) as IconVariant}
+              <DynamicIcon
+                variant={getPropertyIcon(definition) as string}
                 className='aucctus-stroke-secondary h-4 w-4'
               />
             </button>
@@ -77,10 +78,7 @@ export const PropertyNameEditor: React.FC<IPropertyNameEditorProps> = ({
           >
             <div className='flex items-center gap-2'>
               {isUpdatingName && (
-                <Icon
-                  variant='loading-02'
-                  className='aucctus-stroke-tertiary h-3 w-3 animate-spin'
-                />
+                <Loader2 className='aucctus-stroke-tertiary h-3 w-3 animate-spin' />
               )}
               <span>{propertyName}</span>
             </div>

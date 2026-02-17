@@ -1,5 +1,4 @@
 import { FunctionComponent, useState } from 'react';
-import { Icon } from '@components';
 import {
   IPocRisk,
   RiskSeverity,
@@ -7,6 +6,7 @@ import {
   PocRiskCategory,
 } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { AlertCircle, AlertTriangle, ChevronDown, User } from 'lucide-react';
 
 interface IRisksSectionProps {
   risks: IPocRisk[];
@@ -122,8 +122,7 @@ const RiskItem: FunctionComponent<{
           >
             {severityConfig.label}
           </span>
-          <Icon
-            variant='chevrondown'
+          <ChevronDown
             className={cn(
               'aucctus-stroke-tertiary h-4 w-4 transition-transform',
               isExpanded && 'rotate-180',
@@ -204,10 +203,7 @@ const RiskItem: FunctionComponent<{
           {/* Owner */}
           {risk.owner && (
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='user'
-                className='aucctus-stroke-tertiary h-4 w-4'
-              />
+              <User className='aucctus-stroke-tertiary h-4 w-4' />
               <span className='aucctus-text-tertiary aucctus-text-xs'>
                 Owner: {risk.owner}
               </span>
@@ -363,10 +359,7 @@ const RisksSection: FunctionComponent<IRisksSectionProps> = ({ risks }) => {
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-            <Icon
-              variant='alert-triangle'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <AlertTriangle className='aucctus-stroke-brand-primary h-5 w-5' />
           </div>
           <div className='flex flex-col'>
             <h2 className='aucctus-text-primary aucctus-header-sm-semibold'>
@@ -435,10 +428,7 @@ const RisksSection: FunctionComponent<IRisksSectionProps> = ({ risks }) => {
                 'border border-error-200 dark:border-error-800',
               )}
             >
-              <Icon
-                variant='alert-circle'
-                className='h-4 w-4 flex-shrink-0 stroke-error-500'
-              />
+              <AlertCircle className='h-4 w-4 flex-shrink-0 stroke-error-500' />
               <span className='text-xs text-error-700 dark:text-error-300'>
                 {criticalCount + highCount} priority{' '}
                 {criticalCount + highCount === 1

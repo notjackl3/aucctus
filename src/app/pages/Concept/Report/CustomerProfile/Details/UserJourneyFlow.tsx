@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import { IUserJourneyStep } from '@libs/api/types';
 import SectionHeader from './components/SectionHeader';
 import JourneyCarousel from './components/JourneyCarousel';
@@ -12,6 +12,7 @@ import {
 import telemetry from '@libs/telemetry';
 import { useModal } from '@context/ModalContextProvider';
 import Modal from '@components/Modal';
+import { Plus } from 'lucide-react';
 
 // Constants for styling
 const ICON_STROKE = 'aucctus-stroke-brand-primary';
@@ -232,10 +233,7 @@ const UserJourneyFlow: React.FC<UserJourneyFlowProps> = ({
             onClick={handleOpenAddStepModal}
             disabled={isLoading}
           >
-            <Icon
-              variant='plus'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <Plus className='aucctus-stroke-brand-primary h-5 w-5' />
           </button>
         }
       />

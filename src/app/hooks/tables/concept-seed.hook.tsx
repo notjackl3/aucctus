@@ -1,4 +1,4 @@
-import { Badge, Button, Icon, Table, Text } from '@components';
+import { Badge, Button, Table, Text } from '@components';
 import { ConceptStage } from '@components/Badges/StageBadge';
 import { useSeeds } from '@hooks/query/concepts.hook';
 import {
@@ -23,6 +23,7 @@ import {
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Shared interfaces and constants
 export interface ISeedFilterOptions {
@@ -291,7 +292,7 @@ export const useSeedsBank = (
           return (
             <div className='flex max-w-[700px] items-center p-3'>
               <div className='aucctus-border-primary aucctus-bg-primary mr-3 flex items-center justify-center rounded-lg p-3 shadow-sm'>
-                <Icon
+                <DynamicIcon
                   variant={
                     info.row.original.type === 'EXPAND_AN_EXISTING_IDEA'
                       ? 'lightbulb'

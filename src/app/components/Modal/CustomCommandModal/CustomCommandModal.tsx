@@ -1,4 +1,4 @@
-import { Icon, Input } from '@components';
+import { Input } from '@components';
 import {
   useCreateCustomCommand,
   useUpdateCustomCommand,
@@ -6,6 +6,7 @@ import {
 import { CustomCommand, CustomCommandCreateRequest } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React, { useState, useRef, useCallback } from 'react';
+import { Compass, FileCode, Globe, Loader2, X } from 'lucide-react';
 
 // Reserved command names that cannot be used
 const RESERVED_NAMES = [
@@ -159,10 +160,7 @@ const CustomCommandModal: React.FC<CustomCommandModalProps> = ({
       <div className='aucctus-border-secondary flex items-center justify-between border-b px-6 py-4'>
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-            <Icon
-              variant='filecode'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <FileCode className='aucctus-stroke-brand-primary h-5 w-5' />
           </div>
           <div>
             <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
@@ -179,7 +177,7 @@ const CustomCommandModal: React.FC<CustomCommandModalProps> = ({
           onClick={onClose}
           className='aucctus-text-tertiary-hover flex h-8 w-8 items-center justify-center rounded-lg'
         >
-          <Icon variant='closeX' className='h-5 w-5' />
+          <X className='h-5 w-5' />
         </button>
       </div>
 
@@ -319,10 +317,7 @@ const CustomCommandModal: React.FC<CustomCommandModalProps> = ({
                 className='aucctus-accent-brand h-4 w-4 rounded'
               />
               <div className='flex items-center gap-2'>
-                <Icon
-                  variant='globe'
-                  className='aucctus-stroke-tertiary h-4 w-4'
-                />
+                <Globe className='aucctus-stroke-tertiary h-4 w-4' />
                 <span className='aucctus-text-sm aucctus-text-secondary'>
                   Web Search
                 </span>
@@ -341,10 +336,7 @@ const CustomCommandModal: React.FC<CustomCommandModalProps> = ({
                 className='aucctus-accent-brand h-4 w-4 rounded'
               />
               <div className='flex items-center gap-2'>
-                <Icon
-                  variant='compass-03'
-                  className='aucctus-stroke-tertiary h-4 w-4'
-                />
+                <Compass className='aucctus-stroke-tertiary h-4 w-4' />
                 <span className='aucctus-text-sm aucctus-text-secondary'>
                   Nucleus Knowledge Search
                 </span>
@@ -365,10 +357,7 @@ const CustomCommandModal: React.FC<CustomCommandModalProps> = ({
           className='btn btn-primary btn-sm flex items-center gap-2'
         >
           {isLoading && (
-            <Icon
-              variant='loading-02'
-              className='h-4 w-4 animate-spin stroke-white'
-            />
+            <Loader2 className='h-4 w-4 animate-spin stroke-white' />
           )}
           {isEditing ? 'Save Changes' : 'Create Command'}
         </button>

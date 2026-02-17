@@ -6,7 +6,7 @@ import {
   ICreateRealWorldSignal,
   ISource,
 } from '@libs/api/types';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import {
   useCustomerProfileRealWorldSignalCreate,
   useCustomerProfileRealWorldSignalUpdate,
@@ -15,6 +15,7 @@ import utils from '@libs/utils';
 import SignalForm from './SignalForm';
 import { SourceInput, SourceErrors } from './MultiSourceFields';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
+import { X } from 'lucide-react';
 
 // Convert API sources to form sources
 const toSourceInputs = (sources?: ISource[]): SourceInput[] => {
@@ -224,12 +225,7 @@ const EditRealWorldSignal: FunctionComponent<EditRealWorldSignalProps> = ({
           className='aucctus-bg-primary-hover aspect-square rounded-lg p-2'
           onClick={closeModal}
         >
-          <Icon
-            variant='closeX'
-            className='aucctus-stroke-primary'
-            height={16}
-            width={16}
-          />
+          <X size={16} className='aucctus-stroke-primary' />
         </button>
       </div>
     ),

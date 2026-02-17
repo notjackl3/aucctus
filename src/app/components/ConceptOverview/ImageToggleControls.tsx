@@ -1,6 +1,5 @@
 import React from 'react';
-import { Icon } from '@components';
-
+import { Loader2, RefreshCw } from 'lucide-react';
 interface ImageToggleControlsProps {
   isReverting?: boolean;
   onRevertToAI: () => void;
@@ -21,18 +20,12 @@ const ImageToggleControls: React.FC<ImageToggleControlsProps> = ({
     >
       {isReverting ? (
         <>
-          <Icon
-            variant='loading-02'
-            className='aucctus-stroke-primary h-4 w-4 animate-spin'
-          />
+          <Loader2 className='aucctus-stroke-primary h-4 w-4 animate-spin' />
           <span className='aucctus-text-sm-medium'>Reverting...</span>
         </>
       ) : (
         <>
-          <Icon
-            variant='refresh'
-            className='aucctus-stroke-brand-primary h-4 w-4 transition-colors'
-          />
+          <RefreshCw className='aucctus-stroke-brand-primary h-4 w-4 transition-colors' />
           <span className='aucctus-text-sm-medium'>Revert to AI</span>
         </>
       )}

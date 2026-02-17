@@ -1,6 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { ICostDriverV2 } from '@libs/api/types/concept/financialProjectionV2';
+import { Lightbulb, ShieldCheck } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface CostDriversSectionProps {
   costDrivers?: ICostDriverV2[];
@@ -16,10 +17,7 @@ const CostDriversSection: React.FC<CostDriversSectionProps> = ({
           Cost Drivers
         </span>
         <span className='flex flex-row items-center gap-1'>
-          <Icon
-            variant='shield-dollar'
-            className='aucctus-stroke-brand-secondary mr-1 h-5 w-5 flex-shrink-0'
-          />
+          <ShieldCheck className='aucctus-stroke-brand-secondary mr-1 h-5 w-5 flex-shrink-0' />
           <h3 className='aucctus-text-lg-bold aucctus-text-primary'>
             Key Cost Categories
           </h3>
@@ -34,7 +32,7 @@ const CostDriversSection: React.FC<CostDriversSectionProps> = ({
           >
             <div className='mb-3 flex items-center justify-between'>
               <div className='flex flex-row items-center gap-1'>
-                <Icon
+                <DynamicIcon
                   variant={cost.icon as any}
                   className='aucctus-stroke-brand-secondary mr-1 h-5 w-5 flex-shrink-0'
                 />
@@ -56,10 +54,7 @@ const CostDriversSection: React.FC<CostDriversSectionProps> = ({
 
             <div className='aucctus-border-secondary mt-2 border-t pt-2'>
               <div className='flex items-center gap-2'>
-                <Icon
-                  variant='lightbulb'
-                  className='aucctus-stroke-quinary mr-1 h-5 w-5 flex-shrink-0'
-                />
+                <Lightbulb className='aucctus-stroke-quinary mr-1 h-5 w-5 flex-shrink-0' />
                 <p className='aucctus-text-xs aucctus-text-tertiary'>
                   {cost.mitigationStatement}
                 </p>

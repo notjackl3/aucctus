@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Icon, Tabs, TabsList, TabsTrigger, TabsContent } from '@components';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@components';
 import CompanyListPanel from './components/CompanyListPanel';
 import CompanyDetailPanel from './components/CompanyDetailPanel';
 import BubbleChart from './components/BubbleChart';
@@ -8,6 +8,14 @@ import ProductCarousel from './components/ProductCarousel';
 import FuturePredictions from './components/FuturePredictions';
 import { useEcosystem, Company } from './hooks/useEcosystem';
 import { useProductSearchSocket } from './hooks/useProductSearchSocket';
+import {
+  Building2,
+  Map,
+  TrendingDown,
+  TrendingUp,
+  Users,
+  Zap,
+} from 'lucide-react';
 
 const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
   const {
@@ -53,10 +61,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
           >
             <div className='pb-2'>
               <div className='aucctus-text-primary flex items-center gap-2 text-lg font-semibold'>
-                <Icon
-                  variant='users-02'
-                  className='aucctus-stroke-brand-primary h-5 w-5'
-                />
+                <Users className='aucctus-stroke-brand-primary h-5 w-5' />
                 Crowdedness
               </div>
             </div>
@@ -71,10 +76,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
           {/* Headwinds */}
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4'>
             <div className='flex flex-row items-center gap-2 pb-3'>
-              <Icon
-                variant='trending-down'
-                className='aucctus-stroke-error-primary h-5 w-5'
-              />
+              <TrendingDown className='aucctus-stroke-error-primary h-5 w-5' />
               <div className='aucctus-text-primary text-lg font-semibold'>
                 Headwinds
               </div>
@@ -103,10 +105,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
           {/* Tailwinds */}
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-4'>
             <div className='flex flex-row items-center gap-2 pb-3'>
-              <Icon
-                variant='trending-up'
-                className='aucctus-stroke-success-primary h-5 w-5'
-              />
+              <TrendingUp className='aucctus-stroke-success-primary h-5 w-5' />
               <div className='aucctus-text-primary text-lg font-semibold'>
                 Tailwinds
               </div>
@@ -145,7 +144,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
               <div className='flex-1'>
                 <h3 className='aucctus-text-primary flex items-center gap-2 text-xl font-semibold tracking-tight'>
                   <div className='aucctus-text-primary h-5 w-5'>
-                    <Icon variant='map-02' />
+                    <Map />
                   </div>
                   Ecosystem Map
                 </h3>
@@ -156,28 +155,16 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
               {/* Tab Navigation */}
               <TabsList>
                 <TabsTrigger value='map'>
-                  <Icon
-                    variant='map'
-                    width={16}
-                    height={16}
-                    className='aucctus-stroke-secondary mr-2'
-                  />
+                  <Map size={16} className='aucctus-stroke-secondary mr-2' />
                   Map
                 </TabsTrigger>
                 <TabsTrigger value='startups'>
-                  <Icon
-                    variant='zap'
-                    width={16}
-                    height={16}
-                    className='aucctus-stroke-secondary mr-2'
-                  />
+                  <Zap size={16} className='aucctus-stroke-secondary mr-2' />
                   Startups
                 </TabsTrigger>
                 <TabsTrigger value='incumbents'>
-                  <Icon
-                    variant='building-02'
-                    width={16}
-                    height={16}
+                  <Building2
+                    size={16}
                     className='aucctus-stroke-secondary mr-2'
                   />
                   Incumbents
@@ -201,10 +188,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
               <div className='aucctus-bg-primary aucctus-border-secondary flex h-[300px] items-center justify-center rounded-lg border'>
                 <div className='flex flex-col items-center gap-3 text-center'>
                   <div className='aucctus-bg-secondary flex h-12 w-12 items-center justify-center rounded-full'>
-                    <Icon
-                      variant='zap'
-                      className='aucctus-stroke-tertiary h-6 w-6'
-                    />
+                    <Zap className='aucctus-stroke-tertiary h-6 w-6' />
                   </div>
                   <div>
                     <p className='aucctus-text-primary aucctus-text-md-semibold'>
@@ -249,10 +233,7 @@ const EcosystemV2: React.FC<{ conceptId: string }> = ({ conceptId }) => {
               <div className='aucctus-bg-primary aucctus-border-secondary flex h-[300px] items-center justify-center rounded-lg border'>
                 <div className='flex flex-col items-center gap-3 text-center'>
                   <div className='aucctus-bg-secondary flex h-12 w-12 items-center justify-center rounded-full'>
-                    <Icon
-                      variant='building-02'
-                      className='aucctus-stroke-tertiary h-6 w-6'
-                    />
+                    <Building2 className='aucctus-stroke-tertiary h-6 w-6' />
                   </div>
                   <div>
                     <p className='aucctus-text-primary aucctus-text-md-semibold'>

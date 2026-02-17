@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import {
   IPropertyDefinition,
@@ -17,6 +16,16 @@ import {
   UserFilterContent,
   PropertyFilterContent,
 } from '../Filters/SharedFilterComponents';
+import {
+  ChevronDown,
+  ChevronRight,
+  ListFilter,
+  Loader2,
+  Search,
+  Trash2,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ICompactFilterRibbonProps {
   filterOptions: IConceptFilterOptions;
@@ -150,22 +159,19 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
         >
           <Popover.Trigger asChild>
             <div className='aucctus-bg-secondary flex max-w-xs items-center gap-1.5 rounded-md px-2 py-1'>
-              <Icon
+              <DynamicIcon
                 variant={icon as any}
                 className='aucctus-stroke-tertiary h-3.5 w-3.5 flex-shrink-0'
               />
               <span className='aucctus-text-sm aucctus-text-secondary truncate'>
                 {name}
               </span>
-              <Icon
+              <DynamicIcon
                 variant={directionIcon as any}
                 className='aucctus-stroke-brand-primary h-3.5 w-3.5 flex-shrink-0'
               />
               <button className='aucctus-bg-tertiary-hover ml-0.5 flex-shrink-0 rounded p-0.5'>
-                <Icon
-                  variant='chevrondown'
-                  className='aucctus-stroke-tertiary h-3 w-3'
-                />
+                <ChevronDown className='aucctus-stroke-tertiary h-3 w-3' />
               </button>
             </div>
           </Popover.Trigger>
@@ -192,7 +198,7 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
                       }}
                       className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
                     >
-                      <Icon
+                      <DynamicIcon
                         variant={isDescending ? 'arrowup' : 'arrowdown'}
                         className='aucctus-stroke-secondary h-4 w-4'
                       />
@@ -222,10 +228,7 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
                       }}
                       className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
                     >
-                      <Icon
-                        variant='trash'
-                        className='aucctus-stroke-error-primary h-4 w-4'
-                      />
+                      <Trash2 className='aucctus-stroke-error-primary h-4 w-4' />
                       <span className='aucctus-text-error-primary'>
                         Remove sort
                       </span>
@@ -376,10 +379,7 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
         key='search-filter'
         className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-100 bg-blue-25 px-2 py-1 text-blue-800'
       >
-        <Icon
-          variant='search-md'
-          className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-800'
-        />
+        <Search className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-800' />
         <span className='aucctus-text-sm flex-shrink-0 text-blue-800'>
           Search:
         </span>
@@ -391,7 +391,7 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
           className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-100'
           aria-label='Clear search'
         >
-          <Icon variant='closeX' className='h-3 w-3 stroke-blue-800' />
+          <X className='h-3 w-3 stroke-blue-800' />
         </button>
       </div>,
     );
@@ -435,10 +435,7 @@ const CompactFilterRibbon: React.FC<ICompactFilterRibbonProps> = ({
       }}
       className='aucctus-bg-error-subtle hover:aucctus-bg-error-secondary flex items-center gap-1.5 rounded-md px-2 py-1 transition-colors'
     >
-      <Icon
-        variant='closeX'
-        className='aucctus-stroke-error-primary h-3.5 w-3.5 flex-shrink-0'
-      />
+      <X className='aucctus-stroke-error-primary h-3.5 w-3.5 flex-shrink-0' />
       <span className='aucctus-text-sm aucctus-text-error-primary font-medium'>
         Clear All
       </span>
@@ -523,10 +520,7 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-100 bg-blue-25 px-2 py-1 text-blue-800'>
-          <Icon
-            variant='loading-02'
-            className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-800'
-          />
+          <Loader2 className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-800' />
           <span className='aucctus-text-sm flex-shrink-0 text-blue-800'>
             Status:
           </span>
@@ -534,7 +528,7 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
             {statusValues}
           </span>
           <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
-            <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-800' />
+            <ChevronDown className='h-3 w-3 stroke-blue-800' />
           </button>
         </div>
       </Popover.Trigger>
@@ -567,15 +561,9 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
                     onMouseEnter={() => setSubmenuImmediate(submenuKey)}
                     onMouseLeave={() => setSubmenuDelayed(null)}
                   >
-                    <Icon
-                      variant='filter-lines'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
+                    <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                     <span className='aucctus-text-secondary'>Filter</span>
-                    <Icon
-                      variant='chevron-right'
-                      className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                    />
+                    <ChevronRight className='aucctus-stroke-tertiary ml-auto h-4 w-4' />
                   </button>
 
                   {/* Filter Submenu Flyout */}
@@ -589,10 +577,7 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
                       <div className='absolute bottom-0 right-full top-0 w-3' />
                       <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[240px] rounded-lg border p-3 shadow-lg'>
                         <div className='mb-3 flex items-center gap-2'>
-                          <Icon
-                            variant='filter-lines'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                           <span className='aucctus-text-secondary text-sm font-medium'>
                             Filter by Status
                           </span>
@@ -616,10 +601,7 @@ const StatusFilterDropdown: React.FC<IStatusFilterDropdownProps> = ({
                   }}
                   className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
                 >
-                  <Icon
-                    variant='trash'
-                    className='aucctus-stroke-error-primary h-4 w-4'
-                  />
+                  <Trash2 className='aucctus-stroke-error-primary h-4 w-4' />
                   <span className='aucctus-text-error-primary'>
                     Remove filter
                   </span>
@@ -732,7 +714,7 @@ const UserFilterDropdown: React.FC<IUserFilterDropdownProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700'>
-          <Icon
+          <DynamicIcon
             variant={icon as any}
             className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
           />
@@ -743,7 +725,7 @@ const UserFilterDropdown: React.FC<IUserFilterDropdownProps> = ({
             {userNames}
           </span>
           <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
-            <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-700' />
+            <ChevronDown className='h-3 w-3 stroke-blue-700' />
           </button>
         </div>
       </Popover.Trigger>
@@ -776,15 +758,9 @@ const UserFilterDropdown: React.FC<IUserFilterDropdownProps> = ({
                     onMouseEnter={() => setSubmenuImmediate(submenuKey)}
                     onMouseLeave={() => setSubmenuDelayed(null)}
                   >
-                    <Icon
-                      variant='filter-lines'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
+                    <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                     <span className='aucctus-text-secondary'>Filter</span>
-                    <Icon
-                      variant='chevron-right'
-                      className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                    />
+                    <ChevronRight className='aucctus-stroke-tertiary ml-auto h-4 w-4' />
                   </button>
 
                   {/* Filter Submenu Flyout */}
@@ -798,10 +774,7 @@ const UserFilterDropdown: React.FC<IUserFilterDropdownProps> = ({
                       <div className='absolute bottom-0 right-full top-0 w-3' />
                       <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[280px] rounded-lg border p-3 shadow-lg'>
                         <div className='mb-3 flex items-center gap-2'>
-                          <Icon
-                            variant='filter-lines'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                           <span className='aucctus-text-secondary text-sm font-medium'>
                             Filter by {label}
                           </span>
@@ -830,10 +803,7 @@ const UserFilterDropdown: React.FC<IUserFilterDropdownProps> = ({
                   }}
                   className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
                 >
-                  <Icon
-                    variant='trash'
-                    className='aucctus-stroke-error-primary h-4 w-4'
-                  />
+                  <Trash2 className='aucctus-stroke-error-primary h-4 w-4' />
                   <span className='aucctus-text-error-primary'>
                     Remove filter
                   </span>
@@ -949,7 +919,7 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <div className='flex max-w-md items-center gap-1.5 rounded-md border border-blue-300 bg-blue-100 px-2 py-1 text-blue-700'>
-          <Icon
+          <DynamicIcon
             variant={icon as any}
             className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
           />
@@ -961,7 +931,7 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
             {formattedValue}
           </span>
           <button className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'>
-            <Icon variant='chevrondown' className='h-3 w-3 stroke-blue-700' />
+            <ChevronDown className='h-3 w-3 stroke-blue-700' />
           </button>
         </div>
       </Popover.Trigger>
@@ -996,15 +966,9 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
                         onMouseEnter={() => setSubmenuImmediate(submenuKey)}
                         onMouseLeave={() => setSubmenuDelayed(null)}
                       >
-                        <Icon
-                          variant='filter-lines'
-                          className='aucctus-stroke-secondary h-4 w-4'
-                        />
+                        <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                         <span className='aucctus-text-secondary'>Filter</span>
-                        <Icon
-                          variant='chevron-right'
-                          className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                        />
+                        <ChevronRight className='aucctus-stroke-tertiary ml-auto h-4 w-4' />
                       </button>
 
                       {/* Filter Submenu Flyout */}
@@ -1018,10 +982,7 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
                           <div className='absolute bottom-0 right-full top-0 w-3' />
                           <div className='aucctus-bg-primary aucctus-border-secondary ml-3 w-[280px] rounded-lg border p-3 shadow-lg'>
                             <div className='mb-3 flex items-center gap-2'>
-                              <Icon
-                                variant='filter-lines'
-                                className='aucctus-stroke-secondary h-4 w-4'
-                              />
+                              <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                               <span className='aucctus-text-secondary text-sm font-medium'>
                                 Filter by {name}
                               </span>
@@ -1051,10 +1012,7 @@ const PropertyFilterDropdown: React.FC<IPropertyFilterDropdownProps> = ({
                       onClick={handleRemoveFilter}
                       className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
                     >
-                      <Icon
-                        variant='trash'
-                        className='aucctus-stroke-error-primary h-4 w-4'
-                      />
+                      <Trash2 className='aucctus-stroke-error-primary h-4 w-4' />
                       <span className='aucctus-text-error-primary'>
                         Remove filter
                       </span>

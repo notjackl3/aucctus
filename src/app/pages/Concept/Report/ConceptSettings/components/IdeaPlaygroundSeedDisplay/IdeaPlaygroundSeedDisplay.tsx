@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { Icon } from '@components';
 import type { IAnchorThoughtWithQuestions } from '@libs/api/types';
 import { AnchorQuestionCard } from './AnchorQuestionCard';
 import { cn } from '@libs/utils/react';
+import { Compass, Lightbulb } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IdeaPlaygroundSeedDisplayProps {
   anchorThought: IAnchorThoughtWithQuestions;
@@ -94,12 +95,7 @@ export const IdeaPlaygroundSeedDisplay: React.FC<
                 'aucctus-bg-brand-primary hover:aucctus-bg-brand-primary-hover transition-all duration-200',
               )}
             >
-              <Icon
-                variant='lightbulb'
-                className='aucctus-stroke-brand-primary'
-                height={24}
-                width={24}
-              />
+              <Lightbulb size={24} className='aucctus-stroke-brand-primary' />
             </div>
 
             <div className='flex-1'>
@@ -145,12 +141,7 @@ export const IdeaPlaygroundSeedDisplay: React.FC<
             style={getStaggeredAnimation(1, 200)}
           >
             <div className='aucctus-bg-secondary flex h-9 w-9 items-center justify-center rounded-lg'>
-              <Icon
-                variant='compass-03'
-                className='aucctus-stroke-brand-primary'
-                height={18}
-                width={18}
-              />
+              <Compass className='aucctus-stroke-brand-primary' />
             </div>
             <h2 className='aucctus-text-lg-semibold aucctus-text-primary'>
               Exploration Journey
@@ -178,12 +169,7 @@ export const IdeaPlaygroundSeedDisplay: React.FC<
           style={getStaggeredAnimation(1, 200)}
         >
           <div className='aucctus-bg-secondary mb-4 flex h-16 w-16 items-center justify-center rounded-full'>
-            <Icon
-              variant='compass-03'
-              className='aucctus-stroke-tertiary'
-              height={24}
-              width={24}
-            />
+            <Compass size={24} className='aucctus-stroke-tertiary' />
           </div>
           <p className='aucctus-text-secondary aucctus-text-md text-center'>
             No exploration questions recorded for this seed
@@ -198,7 +184,7 @@ export const IdeaPlaygroundSeedDisplay: React.FC<
  * StatBadge - Small stat indicator component
  */
 interface StatBadgeProps {
-  icon: IconVariant;
+  icon: string;
   value: number;
   label: string;
 }
@@ -212,7 +198,7 @@ const StatBadge: React.FC<StatBadgeProps> = ({ icon, value, label }) => {
           'aucctus-bg-secondary hover:aucctus-bg-tertiary',
         )}
       >
-        <Icon
+        <DynamicIcon
           variant={icon}
           className='aucctus-stroke-tertiary'
           height={14}

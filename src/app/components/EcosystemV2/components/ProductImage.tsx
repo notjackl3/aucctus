@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { Box } from 'lucide-react';
 
 interface ProductImageProps {
   src?: string | null;
@@ -27,7 +27,7 @@ const ProductImage: React.FC<ProductImageProps> = ({
           className,
         )}
       >
-        <Icon variant='cube' className={fallbackIconClassName} />
+        <Box className={fallbackIconClassName} />
       </div>
     );
   }

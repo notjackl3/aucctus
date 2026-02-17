@@ -1,7 +1,9 @@
 import { FunctionComponent, useMemo } from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import { ComponentTooltip } from '@components';
 import { IPocResource } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { DollarSign, PiggyBank } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IResourcesSectionProps {
   resources: IPocResource[];
@@ -9,7 +11,7 @@ interface IResourcesSectionProps {
 
 const CATEGORY_CONFIG: Record<
   IPocResource['category'],
-  { label: string; icon: IconVariant; gradient: string; bgGradient: string }
+  { label: string; icon: string; gradient: string; bgGradient: string }
 > = {
   personnel: {
     label: 'Personnel',
@@ -79,7 +81,7 @@ const CategoryTooltipContent: FunctionComponent<{
           config.gradient,
         )}
       >
-        <Icon variant={config.icon} className='h-5 w-5 stroke-white' />
+        <DynamicIcon variant={config.icon} className='h-5 w-5 stroke-white' />
         <span className='font-semibold text-white'>
           {config.label} Resources
         </span>
@@ -188,7 +190,10 @@ const CategoryCard: FunctionComponent<{
                   'shadow-lg',
                 )}
               >
-                <Icon variant={config.icon} className='h-6 w-6 stroke-white' />
+                <DynamicIcon
+                  variant={config.icon}
+                  className='h-6 w-6 stroke-white'
+                />
               </div>
               <div className='flex flex-col items-end'>
                 <span className='aucctus-text-primary aucctus-header-md-semibold'>
@@ -287,7 +292,7 @@ const ResourcesSection: FunctionComponent<IResourcesSectionProps> = ({
               'bg-gradient-to-br from-emerald-500 to-teal-600',
             )}
           >
-            <Icon variant='currency-dollar' className='h-5 w-5 stroke-white' />
+            <DollarSign className='h-5 w-5 stroke-white' />
           </div>
           <div className='flex flex-col'>
             <h2 className='aucctus-text-primary aucctus-header-md-semibold'>
@@ -307,7 +312,7 @@ const ResourcesSection: FunctionComponent<IResourcesSectionProps> = ({
             'bg-gradient-to-r from-emerald-500 to-teal-600',
           )}
         >
-          <Icon variant='piggy-bank' className='h-5 w-5 stroke-white/80' />
+          <PiggyBank className='h-5 w-5 stroke-white/80' />
           <div className='flex flex-col'>
             <span className='text-xs text-emerald-100'>Total Investment</span>
             <span className='text-lg font-bold text-white'>

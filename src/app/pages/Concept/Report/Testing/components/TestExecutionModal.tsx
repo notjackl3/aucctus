@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import TabView, { TabElement } from '@components/Container/TabView/TabView';
 import LoadingSpinner from '@components/Icon/LoadingSpinner';
 import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
@@ -22,6 +21,15 @@ import TestOverview from './modal-sections/TestOverview';
 import TestParticipants from './modal-sections/TestParticipants';
 import TestResults from './modal-sections/TestResults';
 import TestImpact from './modal-sections/test-impact/TestImpact';
+import {
+  AlertTriangle,
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  Lock,
+  RefreshCw,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface TestExecutionModalProps {
   assumptions?: Assumption[];
@@ -269,7 +277,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
 
       const tabContent = (
         <div className={cn('flex items-center gap-2', textClass)}>
-          <Icon variant={icon as any} className={iconClass} />
+          <DynamicIcon variant={icon as any} className={iconClass} />
           <span>{label}</span>
         </div>
       );
@@ -472,7 +480,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
       {/* Header */}
       <div className='aucctus-border-secondary flex flex-shrink-0 items-center justify-between border-b p-6'>
         <div className='flex items-center gap-3'>
-          <Icon
+          <DynamicIcon
             variant={isViewMode ? 'eye' : 'plus'}
             className='aucctus-stroke-brand-primary h-5 w-5'
           />
@@ -482,7 +490,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
         </div>
         {isViewMode && (
           <div className='flex items-center gap-2'>
-            <Icon variant='lock' className='aucctus-stroke-secondary h-4 w-4' />
+            <Lock className='aucctus-stroke-secondary h-4 w-4' />
             <span className='aucctus-text-sm-medium aucctus-text-secondary'>
               View Only
             </span>
@@ -521,10 +529,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
               ) : testDetailError ? (
                 <div className='flex h-full items-center justify-center p-6'>
                   <div className='flex flex-col items-center gap-4 text-center'>
-                    <Icon
-                      variant='alert-triangle'
-                      className='aucctus-stroke-error-primary h-8 w-8'
-                    />
+                    <AlertTriangle className='aucctus-stroke-error-primary h-8 w-8' />
                     <p className='aucctus-text-sm aucctus-text-error-primary'>
                       Error loading test data
                     </p>
@@ -564,10 +569,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
                 onClick={goToPreviousTab}
                 disabled={isFirstTab}
               >
-                <Icon
-                  variant='arrowleft'
-                  className='aucctus-stroke-secondary h-4 w-4'
-                />
+                <ArrowLeft className='aucctus-stroke-secondary h-4 w-4' />
                 Previous
               </button>
 
@@ -602,15 +604,9 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
                     }
                   >
                     {completeTestDetail.isLoading ? (
-                      <Icon
-                        variant='refresh'
-                        className='aucctus-stroke-white h-4 w-4 animate-spin'
-                      />
+                      <RefreshCw className='aucctus-stroke-white h-4 w-4 animate-spin' />
                     ) : (
-                      <Icon
-                        variant='check'
-                        className='aucctus-stroke-white h-4 w-4'
-                      />
+                      <Check className='aucctus-stroke-white h-4 w-4' />
                     )}
                     {completeTestDetail.isLoading
                       ? 'Completing...'
@@ -622,10 +618,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
                     onClick={goToNextTab}
                   >
                     Next
-                    <Icon
-                      variant='arrowright'
-                      className='aucctus-stroke-white h-4 w-4'
-                    />
+                    <ArrowRight className='aucctus-stroke-white h-4 w-4' />
                   </button>
                 )}
               </div>

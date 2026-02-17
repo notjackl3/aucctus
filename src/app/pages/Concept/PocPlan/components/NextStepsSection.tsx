@@ -1,7 +1,19 @@
 import { FunctionComponent, useState } from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import { IPocNextStep } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import {
+  Calendar,
+  Check,
+  CheckCircle2,
+  List,
+  Loader2,
+  Play,
+  RefreshCw,
+  Rocket,
+  Target,
+  User,
+} from 'lucide-react';
 
 interface INextStepsSectionProps {
   nextSteps: IPocNextStep[];
@@ -41,7 +53,7 @@ const NextStepItem: FunctionComponent<INextStepItemProps> = ({
       )}
     >
       {isCompleted ? (
-        <Icon variant='check' className='h-4 w-4 stroke-white stroke-2' />
+        <Check className='h-4 w-4 stroke-white stroke-2' />
       ) : (
         index + 1
       )}
@@ -65,7 +77,7 @@ const NextStepItem: FunctionComponent<INextStepItemProps> = ({
       <div className='flex items-center gap-4 pt-1'>
         {step.assignee && (
           <div className='flex items-center gap-1.5'>
-            <Icon variant='user' className='aucctus-stroke-tertiary h-4 w-4' />
+            <User className='aucctus-stroke-tertiary h-4 w-4' />
             <span className='aucctus-text-tertiary aucctus-text-xs'>
               {step.assignee}
             </span>
@@ -73,10 +85,7 @@ const NextStepItem: FunctionComponent<INextStepItemProps> = ({
         )}
         {step.dueDate && (
           <div className='flex items-center gap-1.5'>
-            <Icon
-              variant='calendar'
-              className='aucctus-stroke-tertiary h-4 w-4'
-            />
+            <Calendar className='aucctus-stroke-tertiary h-4 w-4' />
             <span className='aucctus-text-tertiary aucctus-text-xs'>
               Due: {new Date(step.dueDate).toLocaleDateString()}
             </span>
@@ -84,10 +93,7 @@ const NextStepItem: FunctionComponent<INextStepItemProps> = ({
         )}
         {isCompleted && (
           <div className='flex items-center gap-1.5'>
-            <Icon
-              variant='check-circle-broken'
-              className='h-4 w-4 stroke-success-500'
-            />
+            <CheckCircle2 className='h-4 w-4 stroke-success-500' />
             <span className='aucctus-text-xs font-medium text-success-600'>
               Completed
             </span>
@@ -108,7 +114,7 @@ const NextStepItem: FunctionComponent<INextStepItemProps> = ({
           'hover:aucctus-bg-brand-secondary',
         )}
       >
-        <Icon variant='check' className='h-4 w-4 stroke-current' />
+        <Check className='h-4 w-4 stroke-current' />
         Mark Done
       </button>
     ) : (
@@ -122,7 +128,7 @@ const NextStepItem: FunctionComponent<INextStepItemProps> = ({
           'hover:aucctus-text-secondary',
         )}
       >
-        <Icon variant='refresh' className='h-4 w-4 stroke-current' />
+        <RefreshCw className='h-4 w-4 stroke-current' />
         Undo
       </button>
     )}
@@ -181,10 +187,7 @@ const NextStepsSection: FunctionComponent<INextStepsSectionProps> = ({
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-            <Icon
-              variant='list'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <List className='aucctus-stroke-brand-primary h-5 w-5' />
           </div>
           <div className='flex flex-col'>
             <h2 className='aucctus-text-primary aucctus-header-md-semibold'>
@@ -204,7 +207,7 @@ const NextStepsSection: FunctionComponent<INextStepsSectionProps> = ({
               'bg-gradient-to-r from-primary-500 to-primary-600',
             )}
           >
-            <Icon variant='target' className='h-5 w-5 stroke-white' />
+            <Target className='h-5 w-5 stroke-white' />
             <div className='flex flex-col'>
               <span className='text-xs text-white/80'>Go/No-Go Decision</span>
               <span className='font-semibold text-white'>
@@ -266,8 +269,7 @@ const NextStepsSection: FunctionComponent<INextStepsSectionProps> = ({
           )}
         >
           <div className='flex items-center gap-4'>
-            <Icon
-              variant='rocket'
+            <Rocket
               className={cn(
                 'h-8 w-8',
                 allCompleted
@@ -295,7 +297,7 @@ const NextStepsSection: FunctionComponent<INextStepsSectionProps> = ({
               allCompleted ? 'btn-primary' : 'btn-secondary',
             )}
           >
-            <Icon variant='play' className='h-4 w-4 stroke-current' />
+            <Play className='h-4 w-4 stroke-current' />
             Start POC Execution
           </button>
         </div>
@@ -310,7 +312,7 @@ const NextStepsSection: FunctionComponent<INextStepsSectionProps> = ({
         >
           <div className='flex items-center gap-4'>
             <div className='flex h-12 w-12 items-center justify-center rounded-full bg-success-500'>
-              <Icon variant='check' className='h-6 w-6 stroke-white stroke-2' />
+              <Check className='h-6 w-6 stroke-white stroke-2' />
             </div>
             <div className='flex flex-col'>
               <span className='aucctus-text-primary aucctus-text-md-semibold'>
@@ -322,10 +324,7 @@ const NextStepsSection: FunctionComponent<INextStepsSectionProps> = ({
             </div>
           </div>
           <div className='flex items-center gap-2 rounded-lg bg-success-100 px-4 py-2 dark:bg-success-900'>
-            <Icon
-              variant='loading-02'
-              className='h-4 w-4 animate-spin stroke-success-600'
-            />
+            <Loader2 className='h-4 w-4 animate-spin stroke-success-600' />
             <span className='aucctus-text-sm-medium text-success-700 dark:text-success-300'>
               In Progress
             </span>

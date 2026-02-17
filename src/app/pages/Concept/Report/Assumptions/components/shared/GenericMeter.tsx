@@ -1,7 +1,8 @@
 import React from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import { ComponentTooltip } from '@components';
 import { cn } from '@libs/utils/react';
 import MeterSquares from './MeterSquares';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 type MeterType = 'certainty' | 'importance';
 
@@ -88,7 +89,7 @@ const GenericMeter: React.FC<GenericMeterProps> = ({ type, value }) => {
       <div className='aucctus-bg-secondary aucctus-border-tertiary inline-block rounded p-2'>
         <div className='flex items-center gap-3'>
           <div className='flex items-center'>
-            <Icon
+            <DynamicIcon
               variant={config.icon}
               className='aucctus-stroke-tertiary mr-1.5 h-3.5 w-3.5'
             />

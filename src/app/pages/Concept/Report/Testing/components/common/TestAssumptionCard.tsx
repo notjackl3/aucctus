@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Icon } from '@components';
 import { AssumptionCategory } from '@libs/api/types';
 import CategoryIcon from '../../../Assumptions/components/cards/category-progress-card/CategoryIcon';
+import { Pencil, Target } from 'lucide-react';
 
 interface TestAssumptionCardProps {
   category: AssumptionCategory;
@@ -71,10 +71,7 @@ const TestAssumptionCard: React.FC<TestAssumptionCardProps> = ({
         <div className='aucctus-bg-success-secondary flex w-72 flex-col justify-center border-l border-emerald-200 p-4'>
           <div className='mb-2 flex items-center gap-2'>
             <div className='aucctus-bg-success-primary rounded-full p-1'>
-              <Icon
-                variant='target-round'
-                className='aucctus-stroke-success-primary h-3 w-3'
-              />
+              <Target className='aucctus-stroke-success-primary h-3 w-3' />
             </div>
             <div className='flex flex-1 items-center justify-between'>
               <span className='aucctus-text-xs-medium aucctus-text-success-primary uppercase'>
@@ -85,10 +82,7 @@ const TestAssumptionCard: React.FC<TestAssumptionCardProps> = ({
                   onClick={() => setIsEditing(true)}
                   className='aucctus-bg-success-primary-hover rounded p-0.5 transition-colors'
                 >
-                  <Icon
-                    variant='edit'
-                    className='aucctus-stroke-success-primary h-2.5 w-2.5'
-                  />
+                  <Pencil className='aucctus-stroke-success-primary h-2.5 w-2.5' />
                 </button>
               )}
             </div>

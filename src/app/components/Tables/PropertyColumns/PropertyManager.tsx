@@ -1,4 +1,4 @@
-import { Icon, Modal } from '@components';
+import { Modal } from '@components';
 import * as Popover from '@radix-ui/react-popover';
 import { IPropertyDefinition } from '@libs/api/types';
 import React, { useState } from 'react';
@@ -15,6 +15,8 @@ import {
 import { useModal } from '@context/ModalContextProvider';
 import useStore from '@stores/store';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
+import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IPropertyManagerProps {
   propertyDefinitions?: IPropertyDefinition[];
@@ -134,12 +136,7 @@ const PropertyManager: React.FC<IPropertyManagerProps> = ({
     <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
       <Popover.Trigger asChild>
         <button className='aucctus-bg-secondary-hover flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200'>
-          <Icon
-            variant='plus'
-            height={16}
-            width={16}
-            className='aucctus-stroke-secondary'
-          />
+          <Plus size={16} className='aucctus-stroke-secondary' />
         </button>
       </Popover.Trigger>
       <Popover.Portal forceMount>
@@ -172,10 +169,7 @@ const PropertyManager: React.FC<IPropertyManagerProps> = ({
                         setIsOpen(false);
                       }}
                     >
-                      <Icon
-                        variant='plus'
-                        className='aucctus-stroke-brand-primary h-4 w-4'
-                      />
+                      <Plus className='aucctus-stroke-brand-primary h-4 w-4' />
                       <span className='aucctus-text-sm-medium aucctus-text-brand-primary'>
                         Add Property
                       </span>
@@ -195,8 +189,8 @@ const PropertyManager: React.FC<IPropertyManagerProps> = ({
                             )}
                           >
                             <div className='flex items-center gap-2 overflow-hidden'>
-                              <Icon
-                                variant={getPropertyIcon(def) as IconVariant}
+                              <DynamicIcon
+                                variant={getPropertyIcon(def) as string}
                                 className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
                               />
                               <span className='aucctus-text-sm aucctus-text-secondary truncate'>
@@ -213,10 +207,7 @@ const PropertyManager: React.FC<IPropertyManagerProps> = ({
                                 className='hover:aucctus-bg-secondary rounded p-1'
                                 title='Edit property'
                               >
-                                <Icon
-                                  variant='edit'
-                                  className='aucctus-stroke-tertiary h-3.5 w-3.5'
-                                />
+                                <Pencil className='aucctus-stroke-tertiary h-3.5 w-3.5' />
                               </button>
                               <button
                                 onClick={(e) => {
@@ -227,10 +218,7 @@ const PropertyManager: React.FC<IPropertyManagerProps> = ({
                                 className='hover:aucctus-bg-error-secondary rounded p-1'
                                 title='Delete property'
                               >
-                                <Icon
-                                  variant='trash'
-                                  className='aucctus-stroke-error-primary h-3.5 w-3.5'
-                                />
+                                <Trash2 className='aucctus-stroke-error-primary h-3.5 w-3.5' />
                               </button>
                             </div>
                           </div>

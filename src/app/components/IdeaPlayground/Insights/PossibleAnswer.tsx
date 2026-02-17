@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { InsightCard as InsightCardType } from '../types';
 import {
   useIncludeAnswerLight,
@@ -7,6 +6,7 @@ import {
 } from '@hooks/query/ideaPlayground.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
+import { Check, Loader2 } from 'lucide-react';
 interface PossibleAnswerProps {
   card: InsightCardType;
   isSelected: boolean;
@@ -99,20 +99,12 @@ const PossibleAnswer: React.FC<PossibleAnswerProps> = ({
           }`}
         >
           {isLoading ? (
-            <Icon
-              variant='loading-02'
+            <Loader2
+              size={12}
               className='aucctus-stroke-quaternary animate-spin'
-              height={12}
-              width={12}
             />
           ) : (
-            <Icon
-              variant='check'
-              className='aucctus-stroke-white'
-              height={10}
-              width={10}
-              strokeWidth={3}
-            />
+            <Check size={10} className='aucctus-stroke-white' strokeWidth={3} />
           )}
         </div>
       ) : null}

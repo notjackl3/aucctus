@@ -1,14 +1,10 @@
 import React from 'react';
-import { Icon } from '@components';
-
+import { Lightbulb } from 'lucide-react';
 const NoDataState: React.FC = () => {
   return (
     <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-8'>
       <div className='flex flex-col items-center justify-center text-center'>
-        <Icon
-          variant='lightbulb'
-          className='aucctus-stroke-tertiary mb-4 h-12 w-12'
-        />
+        <Lightbulb className='aucctus-stroke-tertiary mb-4 h-12 w-12' />
         <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
           No impact analysis available
         </h4>

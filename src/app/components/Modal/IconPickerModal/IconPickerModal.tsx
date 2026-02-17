@@ -1,10 +1,11 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import React, { useState, useMemo } from 'react';
+import { Check, Search, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // All available icon variants from icons.d.ts (filtered)
 // Excludes: 'circle', 'linkedin'
-const ALL_ICONS: IconVariant[] = [
+const ALL_ICONS: string[] = [
   'activity',
   'ai-conclusion',
   'alert',
@@ -186,7 +187,7 @@ const IconPickerModal: React.FC<IIconPickerModalProps> = ({
           onClick={onCancel}
           className='aucctus-bg-secondary-hover rounded-full p-2 transition-colors'
         >
-          <Icon variant='closeX' className='aucctus-stroke-secondary h-5 w-5' />
+          <X className='aucctus-stroke-secondary h-5 w-5' />
         </button>
       </div>
 
@@ -195,10 +196,7 @@ const IconPickerModal: React.FC<IIconPickerModalProps> = ({
         {/* Search */}
         <div className='mb-4'>
           <div className='relative'>
-            <Icon
-              variant='search-md'
-              className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2'
-            />
+            <Search className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2' />
             <input
               type='text'
               value={searchQuery}
@@ -238,8 +236,8 @@ const IconPickerModal: React.FC<IIconPickerModalProps> = ({
                       selectedIcon === icon && 'aucctus-bg-brand-secondary',
                     )}
                   >
-                    <Icon
-                      variant={icon as IconVariant}
+                    <DynamicIcon
+                      variant={icon as string}
                       className={cn(
                         'h-5 w-5',
                         selectedIcon === icon
@@ -259,20 +257,14 @@ const IconPickerModal: React.FC<IIconPickerModalProps> = ({
                     {icon}
                   </span>
                   {selectedIcon === icon && (
-                    <Icon
-                      variant='check'
-                      className='aucctus-stroke-brand-primary h-5 w-5'
-                    />
+                    <Check className='aucctus-stroke-brand-primary h-5 w-5' />
                   )}
                 </button>
               ))}
             </div>
           ) : (
             <div className='aucctus-text-quaternary flex flex-col items-center justify-center py-12'>
-              <Icon
-                variant='search-md'
-                className='aucctus-stroke-quaternary mb-3 h-12 w-12'
-              />
+              <Search className='aucctus-stroke-quaternary mb-3 h-12 w-12' />
               <p className='aucctus-text-sm'>
                 No icons found matching &quot;{searchQuery}&quot;
               </p>

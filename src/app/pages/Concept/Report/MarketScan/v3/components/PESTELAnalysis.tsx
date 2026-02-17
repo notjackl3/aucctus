@@ -1,8 +1,9 @@
 import React from 'react';
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import type { ITrendV3 } from '@libs/api/types/concept/marketScan';
 import { useMarketScanTrendsV3 } from '@hooks/query/concepts.hook';
 import TrendCard from './TrendCard';
+import { ShieldCheck } from 'lucide-react';
 
 interface PESTELAnalysisProps {
   conceptUuid: string;
@@ -21,10 +22,7 @@ const PESTELAnalysis: React.FC<PESTELAnalysisProps> = ({
         {/* Section Header */}
         <div className='mt-4'>
           <div className='mb-2 flex items-center gap-2'>
-            <Icon
-              variant='shield-dollar'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <ShieldCheck className='aucctus-stroke-brand-primary h-5 w-5' />
             <h2 className='aucctus-text-xl-semibold aucctus-text-primary'>
               PESTEL Analysis
             </h2>
@@ -48,10 +46,7 @@ const PESTELAnalysis: React.FC<PESTELAnalysisProps> = ({
         {/* Section Header */}
         <div className='mt-4'>
           <div className='mb-2 flex items-center gap-2'>
-            <Icon
-              variant='shield-dollar'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <ShieldCheck className='aucctus-stroke-brand-primary h-5 w-5' />
             <h2 className='aucctus-text-xl-semibold aucctus-text-primary'>
               PESTEL Analysis
             </h2>
@@ -76,10 +71,7 @@ const PESTELAnalysis: React.FC<PESTELAnalysisProps> = ({
       {/* Section Header */}
       <div className='mt-4'>
         <div className='mb-2 flex items-center gap-2'>
-          <Icon
-            variant='shield-dollar'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <ShieldCheck className='aucctus-stroke-brand-primary h-5 w-5' />
           <h2 className='aucctus-text-xl-semibold aucctus-text-primary'>
             PESTEL Analysis
           </h2>

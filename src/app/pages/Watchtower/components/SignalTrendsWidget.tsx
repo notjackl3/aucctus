@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import type { TimePeriod } from '../types';
 import { useWatchtowerTrends } from '@hooks/query/watchtower.hook';
+import { TrendingUp } from 'lucide-react';
 
 const periodLabels: Record<TimePeriod, string> = {
   '6mo': '6 Months',
@@ -33,12 +33,7 @@ const SignalTrendsWidget: React.FC = () => {
   return (
     <div className='aucctus-bg-primary aucctus-border-secondary h-full rounded-xl border p-6'>
       <div className='mb-4 flex items-center gap-2'>
-        <Icon
-          variant='trending-up'
-          height={20}
-          width={20}
-          className='aucctus-stroke-secondary'
-        />
+        <TrendingUp size={20} className='aucctus-stroke-secondary' />
         <h3 className='aucctus-text-primary aucctus-text-lg-semibold'>
           Trends Over Time
         </h3>

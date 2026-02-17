@@ -1,4 +1,4 @@
-import { Icon, Input } from '@components';
+import { Input } from '@components';
 import {
   IPropertyDefinition,
   PropertyType,
@@ -10,6 +10,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { normalizePropertyOptions } from '@libs/utils/propertyColors';
 import { getPropertyTypeIcon } from '@libs/utils/propertyIcons';
 import { IconPickerDropdown } from '@components/Dropdown';
+import { Loader2, Plus, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Softer color palette from Tailwind config (non-branded colors)
 // Each color has background, text (foreground), and border colors for proper contrast
@@ -327,10 +329,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
       {isLoading && (
         <div className='absolute inset-0 z-50 flex items-center justify-center rounded-lg bg-black/30 backdrop-blur-sm'>
           <div className='aucctus-bg-primary flex flex-col items-center gap-3 rounded-lg px-8 py-6 shadow-xl'>
-            <Icon
-              variant='loading-02'
-              className='aucctus-stroke-brand-primary h-8 w-8 animate-spin'
-            />
+            <Loader2 className='aucctus-stroke-brand-primary h-8 w-8 animate-spin' />
             <p className='aucctus-text-sm-medium aucctus-text-secondary'>
               {existingProperty
                 ? 'Updating property...'
@@ -350,7 +349,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
           className='aucctus-bg-secondary-hover rounded-full p-2 transition-colors'
           disabled={isLoading}
         >
-          <Icon variant='closeX' className='aucctus-stroke-secondary h-5 w-5' />
+          <X className='aucctus-stroke-secondary h-5 w-5' />
         </button>
       </div>
 
@@ -380,12 +379,10 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                   disabled={isLoading}
                   className='aucctus-bg-secondary aucctus-border-secondary hover:aucctus-bg-secondary-hover flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg border transition-all disabled:cursor-not-allowed disabled:opacity-50'
                 >
-                  <Icon
+                  <DynamicIcon
                     variant={
                       (formData.icon ||
-                        getPropertyTypeIcon(
-                          formData.property_type,
-                        )) as IconVariant
+                        getPropertyTypeIcon(formData.property_type)) as string
                     }
                     className='aucctus-stroke-secondary h-5 w-5'
                   />
@@ -442,7 +439,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                     'cursor-not-allowed opacity-50',
                 )}
               >
-                <Icon
+                <DynamicIcon
                   variant={
                     type === 'text'
                       ? 'file'
@@ -540,10 +537,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                       : 'Add option'
                 }
               >
-                <Icon
-                  variant='plus'
-                  className='aucctus-stroke-secondary h-4 w-4'
-                />
+                <Plus className='aucctus-stroke-secondary h-4 w-4' />
               </button>
             </div>
             <div className='relative max-h-[500px] space-y-3 overflow-y-auto'>
@@ -670,10 +664,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
                       className='aucctus-bg-error-subtle hover:aucctus-bg-error-secondary flex-shrink-0 rounded-full p-1.5 transition-colors'
                       title='Remove option'
                     >
-                      <Icon
-                        variant='closeX'
-                        className='aucctus-stroke-error-primary h-4 w-4'
-                      />
+                      <X className='aucctus-stroke-error-primary h-4 w-4' />
                     </button>
                   </div>
                 );
@@ -802,9 +793,7 @@ const PropertyDefinitionModal: React.FC<IPropertyDefinitionModalProps> = ({
           disabled={isLoading}
           className='btn btn-primary flex items-center gap-2'
         >
-          {isLoading && (
-            <Icon variant='loading-02' className='h-4 w-4 animate-spin' />
-          )}
+          {isLoading && <Loader2 className='h-4 w-4 animate-spin' />}
           {existingProperty ? 'Update Property' : 'Create Property'}
         </button>
       </div>

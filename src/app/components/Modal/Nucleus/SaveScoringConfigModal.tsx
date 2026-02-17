@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
 import React, { useCallback, useState } from 'react';
+import { Plus, RefreshCw, X } from 'lucide-react';
 
 type SaveOption = 'new_only' | 'rescore_all';
 
@@ -39,7 +39,7 @@ const SaveScoringConfigModal: React.FC<SaveScoringConfigModalProps> = ({
         aria-label='Close modal'
         disabled={isSaving}
       >
-        <Icon variant='closeX' className='aucctus-stroke-tertiary h-5 w-5' />
+        <X className='aucctus-stroke-tertiary h-5 w-5' />
       </button>
 
       {/* Header */}
@@ -75,8 +75,7 @@ const SaveScoringConfigModal: React.FC<SaveScoringConfigModalProps> = ({
                   : 'aucctus-bg-secondary',
               )}
             >
-              <Icon
-                variant='plus'
+              <Plus
                 className={cn(
                   'h-5 w-5',
                   selectedOption === 'new_only'
@@ -126,8 +125,7 @@ const SaveScoringConfigModal: React.FC<SaveScoringConfigModalProps> = ({
                   : 'aucctus-bg-secondary',
               )}
             >
-              <Icon
-                variant='refresh'
+              <RefreshCw
                 className={cn(
                   'h-5 w-5',
                   selectedOption === 'rescore_all'

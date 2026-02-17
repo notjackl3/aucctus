@@ -1,4 +1,4 @@
-import { Icon, ToggleSwitch, Modal } from '@components';
+import { ToggleSwitch, Modal } from '@components';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import React, { useCallback, useMemo, useState } from 'react';
 import { cn } from '@libs/utils/react';
@@ -13,6 +13,8 @@ import {
 import { ExpandedCategoryViewProps } from './types';
 import QuestionAnswerDisplay from './QuestionAnswerDisplay';
 import QuestionCard from './QuestionCard';
+import { HelpCircle, Plus, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
   questions,
@@ -238,8 +240,7 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
                   aria-label='Add Question'
                   title={isAdmin ? 'Add Question' : 'Admin access required'}
                 >
-                  <Icon
-                    variant='plus'
+                  <Plus
                     className={cn(
                       'h-5 w-5',
                       isAdmin
@@ -253,10 +254,7 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
                   onClick={onClose}
                   aria-label='Close expanded view'
                 >
-                  <Icon
-                    variant='closeX'
-                    className='aucctus-stroke-tertiary h-4 w-4'
-                  />
+                  <X className='aucctus-stroke-tertiary h-4 w-4' />
                 </button>
               </div>
             </div>
@@ -330,13 +328,10 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
                     <div className='aucctus-bg-tertiary aucctus-text-tertiary aucctus-border-quaternary rounded border px-1.5 py-0.5 text-xs'>
                       {deeperQuestions.length}
                     </div>
-                    <Icon
-                      variant='help-circle'
-                      className='aucctus-stroke-quaternary hover:aucctus-stroke-tertiary h-3 w-3 transition-colors'
-                    />
+                    <HelpCircle className='aucctus-stroke-quaternary hover:aucctus-stroke-tertiary h-3 w-3 transition-colors' />
                   </div>
                   <div className='flex items-center gap-1'>
-                    <Icon
+                    <DynamicIcon
                       variant={
                         deeperResearchExpanded ? 'chevrondown' : 'chevronright'
                       }
@@ -358,10 +353,7 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
                                 .includeInContext
                             }
                           </span>
-                          <Icon
-                            variant='help-circle'
-                            className='aucctus-stroke-quaternary hover:aucctus-stroke-tertiary h-3 w-3'
-                          />
+                          <HelpCircle className='aucctus-stroke-quaternary hover:aucctus-stroke-tertiary h-3 w-3' />
                         </div>
                         <div title={isAdmin ? '' : 'Admin access required'}>
                           <ToggleSwitch

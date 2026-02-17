@@ -1,8 +1,9 @@
 import React, { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import { cn } from '@libs/utils/react';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
+import { File, FileUp, Send, X } from 'lucide-react';
 
 /** Maximum file size: 10MB */
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
@@ -193,10 +194,7 @@ const LandingView: React.FC<LandingViewProps> = ({
                     : 'Attach a file (optional)'
                 }
               >
-                <Icon
-                  variant='file-attachment'
-                  className='aucctus-stroke-white h-5 w-5'
-                />
+                <FileUp className='aucctus-stroke-white h-5 w-5' />
               </button>
 
               {/* Send button */}
@@ -214,10 +212,7 @@ const LandingView: React.FC<LandingViewProps> = ({
                 )}
                 title='Submit'
               >
-                <Icon
-                  variant='paper-airplane'
-                  className='aucctus-stroke-white h-5 w-5'
-                />
+                <Send className='aucctus-stroke-white h-5 w-5' />
               </button>
 
               {/* Hidden file input */}
@@ -237,10 +232,7 @@ const LandingView: React.FC<LandingViewProps> = ({
                 style={getAnimationStyle('fadeIn', 300, 0)}
               >
                 <div className='flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 backdrop-blur-md'>
-                  <Icon
-                    variant='file'
-                    className='aucctus-stroke-white h-4 w-4 opacity-80'
-                  />
+                  <File className='aucctus-stroke-white h-4 w-4 opacity-80' />
                   <span className='aucctus-text-sm aucctus-text-white max-w-48 truncate opacity-80'>
                     {selectedFile.name}
                   </span>
@@ -253,10 +245,7 @@ const LandingView: React.FC<LandingViewProps> = ({
                     className='ml-1 rounded-full p-0.5 transition-colors hover:bg-white/20'
                     title='Remove file'
                   >
-                    <Icon
-                      variant='closeX'
-                      className='aucctus-stroke-white h-3.5 w-3.5 opacity-80'
-                    />
+                    <X className='aucctus-stroke-white h-3.5 w-3.5 opacity-80' />
                   </button>
                 </div>
               </div>

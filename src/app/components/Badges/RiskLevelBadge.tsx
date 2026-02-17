@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 
 import { RiskCategory } from '@libs/api/types';
-import Icon from '../Icon/Icon/Icon';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const defaultIconProps = {
   width: 16,
@@ -16,21 +16,18 @@ export interface RiskLevelBadgeProps {
   category: RiskCategory;
 }
 
-const BADGE_LEVEL_MAP: Record<
-  RiskCategory,
-  { style: string; icon: IconVariant }
-> = {
+const BADGE_LEVEL_MAP: Record<RiskCategory, { style: string; icon: string }> = {
   high: {
     icon: 'alert-octagon',
-    style: 'text-error-700 bg-error-50 [&>svg>use]:stroke-error-700',
+    style: 'text-error-700 bg-error-50 [&>svg]:stroke-error-700',
   },
   medium: {
     icon: 'alert-triangle',
-    style: 'text-warning-500 bg-warning-50 [&>svg>use]:stroke-warning-500',
+    style: 'text-warning-500 bg-warning-50 [&>svg]:stroke-warning-500',
   },
   low: {
     icon: 'alert',
-    style: 'text-success-700 bg-success-50 [&>svg>use]:stroke-success-700',
+    style: 'text-success-700 bg-success-50 [&>svg]:stroke-success-700',
   },
 };
 
@@ -46,7 +43,10 @@ const RiskLevelBadge: FunctionComponent<RiskLevelBadgeProps> = ({
       }`}
     >
       {category ? (
-        <Icon variant={BADGE_LEVEL_MAP[category].icon} {...defaultIconProps} />
+        <DynamicIcon
+          variant={BADGE_LEVEL_MAP[category].icon}
+          {...defaultIconProps}
+        />
       ) : null}
       <span
         className={

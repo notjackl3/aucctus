@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { ArrowUp } from 'lucide-react';
 
 interface ConceptGenerationInputProps {
   value: string;
@@ -67,14 +67,7 @@ const ConceptGenerationInput: React.FC<ConceptGenerationInputProps> = ({
           disabled={value.length === 0 && !allowAddAnswer}
         >
           <span>
-            {
-              <Icon
-                variant='arrowup'
-                width={16}
-                height={16}
-                className='stroke-white !stroke-[0.5]'
-              />
-            }
+            {<ArrowUp size={16} className='stroke-white !stroke-[0.5]' />}
           </span>
         </button>
       </span>

@@ -1,9 +1,9 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import StatusDropdown from '../StatusDropdown/StatusDropdown';
 import { NucleusReportQuestion } from '@libs/api/types';
 import { QuestionState } from './types';
+import { Pencil, Trash2 } from 'lucide-react';
 
 interface QuestionCardProps {
   question: NucleusReportQuestion;
@@ -63,7 +63,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             }}
             aria-label='Edit question'
           >
-            <Icon variant='edit' className='aucctus-stroke-secondary h-3 w-3' />
+            <Pencil className='aucctus-stroke-secondary h-3 w-3' />
           </button>
           <button
             className='aucctus-bg-primary aucctus-border-secondary hover:aucctus-bg-primary-hover rounded-md border p-1 shadow-sm'
@@ -73,10 +73,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
             }}
             aria-label='Delete question'
           >
-            <Icon
-              variant='trash'
-              className='aucctus-stroke-error-primary h-3 w-3'
-            />
+            <Trash2 className='aucctus-stroke-error-primary h-3 w-3' />
           </button>
         </div>
       )}

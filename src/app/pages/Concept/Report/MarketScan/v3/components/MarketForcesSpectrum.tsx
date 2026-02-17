@@ -1,10 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import type {
-  IMarketForceV3,
-  IconVariant,
-} from '@libs/api/types/concept/marketScan';
+import type { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface MarketForcesSpectrumProps {
   trendCategories: IMarketForceV3[];
@@ -66,8 +63,8 @@ const MarketForcesSpectrum: React.FC<MarketForcesSpectrumProps> = ({
             >
               <div className='mb-2 flex items-center justify-between'>
                 <div className='flex items-center gap-2'>
-                  <Icon
-                    variant={category.icon as IconVariant}
+                  <DynamicIcon
+                    variant={category.icon as string}
                     className='aucctus-stroke-brand-primary h-5 w-5'
                   />
                   <span className='aucctus-text-md-semibold aucctus-text-primary'>

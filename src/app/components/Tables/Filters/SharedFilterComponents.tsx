@@ -1,4 +1,4 @@
-import { Avatar, Icon, Input } from '@components';
+import { Avatar, Input } from '@components';
 import { useAllUsers } from '@hooks/query/account.hook';
 import {
   ConceptStatus,
@@ -15,6 +15,7 @@ import {
   SelectFilterInput,
   CheckboxFilterInput,
 } from '../PropertyColumns/FilterInputs';
+import { Check } from 'lucide-react';
 
 // ============================================================================
 // Status Filter Content
@@ -47,10 +48,7 @@ export const StatusFilterContent: React.FC<IStatusFilterContentProps> = ({
               {utils.string.camelCaseToTitleCase(status)}
             </span>
             {isSelected && (
-              <Icon
-                variant='check'
-                className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
-              />
+              <Check className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0' />
             )}
           </div>
         );
@@ -120,10 +118,7 @@ export const UserFilterContent: React.FC<IUserFilterContentProps> = ({
                   </span>
                 </div>
                 {isSelected && (
-                  <Icon
-                    variant='check'
-                    className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
-                  />
+                  <Check className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0' />
                 )}
               </div>
             );

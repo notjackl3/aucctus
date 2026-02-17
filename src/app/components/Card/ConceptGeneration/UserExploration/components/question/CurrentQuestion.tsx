@@ -9,7 +9,7 @@ const CurrentQuestion: React.FC<{
   questionIconRef: React.RefObject<HTMLSpanElement>;
   questionLabelRef: React.RefObject<HTMLSpanElement>;
   question: ConceptIncubationQuestion;
-  iconVariant?: IconVariant;
+  iconVariant?: string;
 }> = ({ questionIconRef, questionLabelRef, question, iconVariant }) => {
   if (!question) return null;
 

@@ -1,10 +1,10 @@
 import { useDroppable } from '@dnd-kit/core';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import type { IConcept } from '@libs/api/types';
 import type { PipelineStageConfig } from '../types/pipeline.types';
 import PipelineCard from './PipelineCard';
 import EmptyColumnState from './EmptyColumnState';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface PipelineColumnProps {
   stage: PipelineStageConfig;
@@ -36,7 +36,10 @@ const PipelineColumn = ({ stage, concepts }: PipelineColumnProps) => {
                 stage.color.bg,
               )}
             >
-              <Icon variant={stage.icon} className='h-4 w-4 stroke-white' />
+              <DynamicIcon
+                variant={stage.icon}
+                className='h-4 w-4 stroke-white'
+              />
             </div>
             {/* Stage name */}
             <span className={cn('text-sm font-semibold', stage.color.text)}>

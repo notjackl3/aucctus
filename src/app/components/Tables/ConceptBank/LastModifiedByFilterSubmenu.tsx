@@ -1,9 +1,10 @@
-import { Avatar, Icon, Input } from '@components';
+import { Avatar, Input } from '@components';
 import { useAllUsers } from '@hooks/query/account.hook';
 import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import { IUser } from '@libs/api/types';
 import utils from '@libs/utils';
 import React, { useState } from 'react';
+import { Check, X } from 'lucide-react';
 
 export interface ILastModifiedByFilterSubmenuProps {
   filterOptions: IConceptFilterOptions;
@@ -144,10 +145,7 @@ const LastModifiedByFilterSubmenu: React.FC<
                     </span>
                   </div>
                   {isSelected && (
-                    <Icon
-                      variant='check'
-                      className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
-                    />
+                    <Check className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0' />
                   )}
                 </div>
               );
@@ -171,10 +169,7 @@ const LastModifiedByFilterSubmenu: React.FC<
                 handleClearFilter();
               }}
             >
-              <Icon
-                variant='closeX'
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
+              <X className='aucctus-stroke-secondary h-4 w-4' />
               <span className='aucctus-text-secondary'>Clear filter</span>
             </button>
           </>

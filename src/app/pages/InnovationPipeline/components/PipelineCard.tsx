@@ -1,12 +1,14 @@
 import { useDraggable } from '@dnd-kit/core';
 import { CSS } from '@dnd-kit/utilities';
 import { useNavigate } from 'react-router-dom';
-import { Avatar, Icon } from '@components';
+import { Avatar } from '@components';
 import { cn } from '@libs/utils/react';
 import type { IConcept } from '@libs/api/types';
 import { dateFormatter } from '@libs/utils/time';
 import { getConceptStatusDisplayName } from '@libs/utils/concepts';
 import { getStageConfigByStatus } from '../types/pipeline.types';
+import { Clock } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface PipelineCardProps {
   concept: IConcept;
@@ -105,7 +107,7 @@ const PipelineCard = ({
         {/* Financial type indicator */}
         {concept.financialProjectionType && (
           <span className='inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600 dark:bg-gray-800 dark:text-gray-400'>
-            <Icon
+            <DynamicIcon
               variant={
                 concept.financialProjectionType === 'generate_revenue'
                   ? 'currency-dollar'
@@ -138,7 +140,7 @@ const PipelineCard = ({
         {/* Last modified */}
         {lastModified && (
           <div className='flex flex-shrink-0 items-center gap-1 text-gray-400'>
-            <Icon variant='clock' className='h-3 w-3' />
+            <Clock className='h-3 w-3' />
             <span className='whitespace-nowrap text-xs'>{lastModified}</span>
           </div>
         )}

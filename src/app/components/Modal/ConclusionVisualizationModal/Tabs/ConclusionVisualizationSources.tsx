@@ -1,6 +1,7 @@
-import { Badge, Card, Icon } from '@components';
+import { Badge, Card } from '@components';
 import { ISource } from '@libs/api/types';
 import React from 'react';
+import { ExternalLink } from 'lucide-react';
 
 interface ConclusionVisualizationSourcesProps {
   sources: ISource[];
@@ -16,7 +17,7 @@ const ConclusionVisualizationSources: React.FC<
         className='aucctus-bg-primary-hover cursor-pointer items-center rounded-lg px-2.5 py-2.5 transition-all !duration-200 hover:scale-105'
         onClick={() => window.open(source.url, '_blank')}
       >
-        <Icon variant='link-external' />
+        <ExternalLink />
       </div>
     );
   };

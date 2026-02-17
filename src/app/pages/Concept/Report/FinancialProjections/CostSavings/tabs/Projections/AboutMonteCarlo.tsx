@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { ExpandCollapse } from '@hooks/animation/animation.hook';
+import { ChevronRight, HelpCircle } from 'lucide-react';
 
 const AboutMonteCarlo: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -13,21 +13,15 @@ const AboutMonteCarlo: React.FC = () => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <div className='flex items-center gap-2'>
-          <Icon
-            variant='help-circle'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <HelpCircle className='aucctus-stroke-brand-primary h-5 w-5' />
           <h3 className='aucctus-text-md-semibold aucctus-text-primary'>
             About Monte Carlo Simulation
           </h3>
         </div>
-        <Icon
-          variant='chevronright'
+        <ChevronRight
           className={cn(
             'aucctus-stroke-secondary h-5 w-5 transition-transform',
-            {
-              'rotate-90': isOpen,
-            },
+            { 'rotate-90': isOpen },
           )}
         />
       </header>
@@ -73,10 +67,7 @@ const AboutMonteCarlo: React.FC = () => {
           <div className='flex justify-end'>
             <button className='aucctus-text-brand-primary aucctus-text-sm flex items-center gap-1'>
               Learn more
-              <Icon
-                variant='chevronright'
-                className='aucctus-stroke-brand-primary h-3 w-3'
-              />
+              <ChevronRight className='aucctus-stroke-brand-primary h-3 w-3' />
             </button>
           </div>
         </div>

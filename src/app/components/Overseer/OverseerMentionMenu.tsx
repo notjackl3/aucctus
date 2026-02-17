@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { MentionItem } from '@stores/overseer/types';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Lightbulb } from 'lucide-react';
 
 interface OverseerMentionMenuProps {
   query: string;
@@ -58,12 +58,7 @@ const OverseerMentionMenu: React.FC<OverseerMentionMenuProps> = ({
       className='absolute bottom-full left-0 right-0 z-50 mb-0 max-h-[140px] overflow-y-auto rounded-lg rounded-b-none border border-b-0 border-white/15 bg-black/90 shadow-2xl backdrop-blur-xl'
     >
       <div className='flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-semibold uppercase tracking-wider text-white/30'>
-        <Icon
-          variant='lightbulb'
-          width={12}
-          height={12}
-          className='stroke-current'
-        />
+        <Lightbulb size={12} className='stroke-current' />
         Concept Bank
       </div>
       {filteredConcepts.map((item, i) => (
@@ -78,12 +73,7 @@ const OverseerMentionMenu: React.FC<OverseerMentionMenuProps> = ({
           )}
         >
           <span className='flex h-5 w-5 items-center justify-center rounded-full bg-amber-500/20'>
-            <Icon
-              variant='lightbulb'
-              width={12}
-              height={12}
-              className='stroke-amber-300'
-            />
+            <Lightbulb size={12} className='stroke-amber-300' />
           </span>
           <span className='flex-1 truncate'>{item.name}</span>
         </button>

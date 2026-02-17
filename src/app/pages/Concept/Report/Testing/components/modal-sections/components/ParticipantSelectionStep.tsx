@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { ICustomerProfile } from '@libs/api/types/concept/concepts';
+import { Loader2, Minus, Plus, Users, X } from 'lucide-react';
 
 // Utility function to normalize UUID format (underscores to hyphens)
 const normalizeUuid = (uuid: string): string => uuid.replace(/_/g, '-');
@@ -159,10 +159,7 @@ const ParticipantCard: React.FC<{
                   disabled={localCount <= 1}
                   className='aucctus-bg-primary hover:aucctus-bg-secondary flex h-5 w-5 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-50'
                 >
-                  <Icon
-                    variant='minus'
-                    className='aucctus-stroke-secondary h-3 w-3'
-                  />
+                  <Minus className='aucctus-stroke-secondary h-3 w-3' />
                 </button>
                 <span className='aucctus-text-sm-medium aucctus-text-primary min-w-[20px] px-1 text-center'>
                   {localCount}
@@ -176,10 +173,7 @@ const ParticipantCard: React.FC<{
                   disabled={localCount >= 20}
                   className='aucctus-bg-primary hover:aucctus-bg-secondary flex h-5 w-5 items-center justify-center rounded-md transition-colors disabled:cursor-not-allowed disabled:opacity-50'
                 >
-                  <Icon
-                    variant='plus'
-                    className='aucctus-stroke-secondary h-3 w-3'
-                  />
+                  <Plus className='aucctus-stroke-secondary h-3 w-3' />
                 </button>
                 <span className='aucctus-text-xs aucctus-text-secondary ml-1'>
                   variants
@@ -206,7 +200,7 @@ const ParticipantCard: React.FC<{
           }}
           className='aucctus-bg-secondary hover:aucctus-bg-tertiary absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full transition-colors'
         >
-          <Icon variant='closeX' className='aucctus-stroke-secondary h-4 w-4' />
+          <X className='aucctus-stroke-secondary h-4 w-4' />
         </button>
       )}
     </div>
@@ -242,10 +236,7 @@ const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
   if (isLoading) {
     return (
       <div className='flex items-center justify-center py-8'>
-        <Icon
-          variant='loading-02'
-          className='aucctus-stroke-primary h-6 w-6 animate-spin'
-        />
+        <Loader2 className='aucctus-stroke-primary h-6 w-6 animate-spin' />
         <span className='aucctus-text-sm aucctus-text-secondary ml-2'>
           Loading participants...
         </span>
@@ -257,7 +248,7 @@ const ParticipantSelectionStep: React.FC<IParticipantSelectionStepProps> = ({
     return (
       <div className='aucctus-border-secondary flex flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-8'>
         <div className='aucctus-bg-secondary-subtle mb-4 rounded-full p-3'>
-          <Icon variant='users-03' className='aucctus-stroke-tertiary' />
+          <Users className='aucctus-stroke-tertiary' />
         </div>
         <h3 className='aucctus-text-sm-semibold aucctus-text-primary mb-2 text-center'>
           No customer profiles found

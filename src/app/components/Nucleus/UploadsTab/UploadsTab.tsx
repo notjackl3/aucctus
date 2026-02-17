@@ -20,10 +20,11 @@ import {
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import Tooltip from '@components/ToolTip/Tooltip';
-import { toast, Icon } from '@components';
+import { toast } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import type { DocumentWithUsage } from '@libs/api/types/nucleus';
 import { X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Accepted file types for Nucleus documents
 const ACCEPTED_FILE_EXTENSIONS = [
@@ -107,7 +108,7 @@ const getFileTypeConfig = (filename: string): FileTypeConfig => {
 };
 
 // Category configuration matching CategoriesGrid
-const CATEGORY_CONFIG: Record<string, { name: string; icon: IconVariant }> = {
+const CATEGORY_CONFIG: Record<string, { name: string; icon: string }> = {
   basic_profile: { name: 'Company Identity', icon: 'building' },
   geographic: { name: 'Geographic Footprint', icon: 'globe' },
   strategic: { name: 'Corporate Strategy', icon: 'target' },
@@ -183,7 +184,7 @@ const DeleteDocumentModal: React.FC<DeleteDocumentModalProps> = ({
             {document.categories.map((category) => {
               const categoryInfo = CATEGORY_CONFIG[category.categoryId] || {
                 name: category.categoryName,
-                icon: 'help-circle' as IconVariant,
+                icon: 'help-circle' as string,
               };
               return (
                 <div
@@ -191,7 +192,7 @@ const DeleteDocumentModal: React.FC<DeleteDocumentModalProps> = ({
                   className='flex items-center gap-3 rounded-lg border border-red-200 bg-red-50/50 p-3'
                 >
                   <div className='flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md bg-red-100'>
-                    <Icon
+                    <DynamicIcon
                       variant={categoryInfo.icon}
                       className='aucctus-stroke-error-primary h-4 w-4 fill-none'
                     />
@@ -805,7 +806,7 @@ const UploadsTab: React.FC<UploadsTabProps> = ({ onNavigateToCategory }) => {
                                 category.categoryId
                               ] || {
                                 name: category.categoryName,
-                                icon: 'help-circle' as IconVariant,
+                                icon: 'help-circle' as string,
                               };
                               return (
                                 <div
@@ -816,7 +817,7 @@ const UploadsTab: React.FC<UploadsTabProps> = ({ onNavigateToCategory }) => {
                                   className='hover:aucctus-border-brand hover:aucctus-bg-brand-secondary group flex cursor-pointer items-center gap-3 rounded-lg border border-gray-200 bg-white p-3 transition-all'
                                 >
                                   <div className='aucctus-bg-secondary group-hover:aucctus-bg-brand-secondary flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-md transition-colors'>
-                                    <Icon
+                                    <DynamicIcon
                                       variant={categoryInfo.icon}
                                       className='aucctus-stroke-tertiary group-hover:aucctus-stroke-brand-primary h-4 w-4 transition-colors'
                                     />

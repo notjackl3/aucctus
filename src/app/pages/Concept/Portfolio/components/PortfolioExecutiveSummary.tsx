@@ -7,12 +7,12 @@
 
 import React, { useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { Icon } from '@components';
 import {
   usePortfolioExecutiveSummary,
   usePortfolioExecutiveSummarySocketEvents,
 } from '@hooks/query/portfolio.hook';
 import { dateFormatter } from '@libs/utils/time';
+import { AlertCircle, Clock, Layers, Lightbulb, Loader2 } from 'lucide-react';
 
 const PortfolioExecutiveSummary: React.FC = () => {
   const { summary, isEmpty, isError } = usePortfolioExecutiveSummary();
@@ -46,11 +46,9 @@ const PortfolioExecutiveSummary: React.FC = () => {
       >
         <div className='mb-3 flex items-center justify-between gap-3'>
           <div className='flex items-center gap-3'>
-            <Icon
-              variant='lightbulb'
+            <Lightbulb
+              size={20}
               className='aucctus-stroke-tertiary flex-shrink-0'
-              height={20}
-              width={20}
             />
             <h3 className='aucctus-text-tertiary aucctus-text-sm font-medium uppercase tracking-wider'>
               PORTFOLIO EXECUTIVE SUMMARY
@@ -75,11 +73,9 @@ const PortfolioExecutiveSummary: React.FC = () => {
         className='aucctus-bg-primary w-full rounded-lg border-b border-l-4 border-r border-t border-red-200 border-l-red-500 px-6 py-4 shadow-sm dark:border-red-800 dark:border-l-red-400'
       >
         <div className='mb-3 flex items-center gap-3'>
-          <Icon
-            variant='alert-circle'
+          <AlertCircle
+            size={20}
             className='flex-shrink-0 stroke-red-500 dark:stroke-red-400'
-            height={20}
-            width={20}
           />
           <h3 className='font-medium uppercase tracking-wider text-red-600 dark:text-red-400'>
             PORTFOLIO EXECUTIVE SUMMARY
@@ -107,11 +103,9 @@ const PortfolioExecutiveSummary: React.FC = () => {
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
           >
-            <Icon
-              variant='loading-02'
+            <Loader2
+              size={20}
               className='aucctus-stroke-tertiary flex-shrink-0'
-              height={20}
-              width={20}
             />
           </motion.div>
           <h3 className='aucctus-text-tertiary aucctus-text-sm font-medium uppercase tracking-wider'>
@@ -157,11 +151,9 @@ const PortfolioExecutiveSummary: React.FC = () => {
       className='aucctus-bg-primary w-full rounded-lg border-b border-l-4 border-r border-t border-gray-light-200 border-l-primary-500 px-6 py-4 shadow-sm dark:border-gray-light-800 dark:border-l-primary-400'
     >
       <div className='mb-3 flex items-center gap-3'>
-        <Icon
-          variant='lightbulb'
+        <Lightbulb
+          size={20}
           className='aucctus-stroke-tertiary flex-shrink-0'
-          height={20}
-          width={20}
         />
         <h3 className='aucctus-text-tertiary aucctus-text-sm font-medium uppercase tracking-wider'>
           PORTFOLIO EXECUTIVE SUMMARY
@@ -183,23 +175,13 @@ const PortfolioExecutiveSummary: React.FC = () => {
       >
         {generatedAtText && (
           <span className='aucctus-text-tertiary flex items-center gap-1'>
-            <Icon
-              variant='clock'
-              height={12}
-              width={12}
-              className='aucctus-stroke-tertiary'
-            />
+            <Clock size={12} className='aucctus-stroke-tertiary' />
             {generatedAtText}
           </span>
         )}
         {conceptCount !== undefined && (
           <span className='aucctus-text-tertiary flex items-center gap-1'>
-            <Icon
-              variant='layers'
-              height={12}
-              width={12}
-              className='aucctus-stroke-tertiary'
-            />
+            <Layers size={12} className='aucctus-stroke-tertiary' />
             {conceptCount} concept{conceptCount !== 1 ? 's' : ''} analyzed
           </span>
         )}

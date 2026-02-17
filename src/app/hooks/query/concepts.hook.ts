@@ -1673,12 +1673,9 @@ export const useRevertConceptVersion = () => {
 
 /**
 
-
  * Custom hook for committing a concept version revert.
 
-
  * @returns The result of the useMutation hook.
-
 
  */
 
@@ -1764,7 +1761,7 @@ export const useCustomerJobCreate = (customerProfileUuid: string) => {
     mutationFn: async (data: {
       description: string;
       order?: number;
-      icon?: IconVariant;
+      icon?: string;
     }) => {
       return await api.concept.createCustomerJob(customerProfileUuid, data);
     },
@@ -1893,7 +1890,7 @@ export const useCustomerPainCreate = (customerProfileUuid: string) => {
     mutationFn: async (data: {
       description: string;
       order?: number;
-      icon?: IconVariant;
+      icon?: string;
     }) => {
       return await api.concept.createCustomerPain(customerProfileUuid, data);
     },

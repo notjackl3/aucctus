@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { useConceptReportGenerate } from '@hooks/query/concepts.hook';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
@@ -23,6 +22,7 @@ import LoadingMask from '../util/LoadingMask';
 import { PointerEventMask } from '../util/PointerEventMask';
 import Question from './Question';
 import { IClarifyingQuestion } from '@libs/api/types';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface PostGenerateQuestionDisplayProps {}
 
@@ -46,12 +46,7 @@ const ConceptCounter: React.FC<ConceptCounterProps> = ({
           className='cursor-pointer hover:scale-110'
           onClick={onPreviousConcept}
         >
-          <Icon
-            variant='arrowleft'
-            width={20}
-            height={20}
-            className='!stroke-gray-light-600'
-          />
+          <ArrowLeft size={20} className='!stroke-gray-light-600' />
         </span>
       )}
       <span className='aucctus-text-secondary'>
@@ -62,12 +57,7 @@ const ConceptCounter: React.FC<ConceptCounterProps> = ({
           className='cursor-pointer hover:scale-110'
           onClick={onNextConcept}
         >
-          <Icon
-            variant='arrowright'
-            width={20}
-            height={20}
-            className='!stroke-gray-light-600'
-          />
+          <ArrowRight size={20} className='!stroke-gray-light-600' />
         </span>
       )}
     </div>

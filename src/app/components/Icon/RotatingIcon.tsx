@@ -1,18 +1,22 @@
-import { Icon } from '@components';
+import { resolveIcon } from '@libs/utils/iconMap';
+import { cn } from '@libs/utils/react';
+import type { LucideProps } from 'lucide-react';
 import React from 'react';
 import { motion } from 'framer-motion';
-import { IconProps } from './Icon/Icon';
 
-interface RotatingIconProps extends Omit<IconProps, 'variant'> {
+interface RotatingIconProps extends LucideProps {
   isUp: boolean;
-  variant?: IconVariant;
+  variant?: string;
 }
 
 const RotatingIcon: React.FC<RotatingIconProps> = ({
   isUp = false,
   variant = 'chevronup',
+  className,
   ...props
 }) => {
+  const IconComponent = resolveIcon(variant);
+
   return (
     <motion.div
       initial={false}
@@ -24,7 +28,10 @@ const RotatingIcon: React.FC<RotatingIconProps> = ({
         alignItems: 'center',
       }}
     >
-      <Icon variant={variant} {...props} />
+      <IconComponent
+        className={cn('stroke-gray-light-700', className)}
+        {...props}
+      />
     </motion.div>
   );
 };

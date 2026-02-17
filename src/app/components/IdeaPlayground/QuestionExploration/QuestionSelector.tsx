@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Icon } from '@components';
 import { Question } from '../types';
+import { Loader2, X } from 'lucide-react';
 
 interface QuestionSelectorProps {
   question: Question;
@@ -189,17 +189,9 @@ const QuestionSelector: React.FC<QuestionSelectorProps> = ({
             }`}
           >
             {isDeleting ? (
-              <Icon
-                variant='loading-02'
-                className='aucctus-stroke-white h-2.5 w-2.5 animate-spin'
-              />
+              <Loader2 className='aucctus-stroke-white h-2.5 w-2.5 animate-spin' />
             ) : (
-              <Icon
-                variant='closeX'
-                className='aucctus-stroke-white'
-                height={10}
-                width={10}
-              />
+              <X size={10} className='aucctus-stroke-white' />
             )}
           </button>
         )}

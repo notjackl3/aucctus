@@ -4,10 +4,10 @@ import { AssumptionCategory } from '../../../../libs/api/types';
 import { useModal } from '../../../context/ModalContextProvider';
 import { useAssumptionCreate } from '../../../hooks/query/assumptions.hook';
 import Dropdown, { Option } from '../../Button/Dropdown/Dropdown';
-import Icon from '../../Icon/Icon/Icon';
 import TextArea from '../../Input/TextArea/TextArea';
 
 import styles from './edit-key-assumption.module.scss';
+import { Trash2 } from 'lucide-react';
 
 interface IEditKeyAssumptionModalProps {
   conceptUuid: string;
@@ -127,7 +127,7 @@ const AddKeyAssumptionModal: FunctionComponent<
           disabled={showConfirmation}
           onClick={() => setShowConfirmation(true)}
         >
-          <Icon variant='trash' />
+          <Trash2 />
         </button>
         <button
           aria-label='Close'

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import defaultAvatar from '@assets/img/avatar.png';
+import { Check } from 'lucide-react';
 
 interface PersonaCardProps {
   persona: {
@@ -121,10 +121,7 @@ const PersonaCard: React.FC<PersonaCardProps> = ({
             style={{ backgroundColor: activeColor }}
           >
             {isSelected && (
-              <Icon
-                variant='check'
-                className='h-3 w-3 stroke-white stroke-[3]'
-              />
+              <Check className='h-3 w-3 stroke-white stroke-[3]' />
             )}
           </div>
 

@@ -1,10 +1,11 @@
 import { ConceptReportStatusBySection } from '@libs/api/types';
 import { FunctionComponent } from 'react';
-import { Icon, Card } from '@components';
+import { Card } from '@components';
 import { cn } from '@libs/utils/react';
 import Progress from '../Loading/Progress';
 import useGenerationStatus from '@hooks/concepts/generation-status.hook';
 import { restoreConceptWorkflowToast } from '@hooks/sockets/useUniversalSocketEvents';
+import { AlertCircle, Check, Clock, Timer } from 'lucide-react';
 
 // Friendly names for section keys
 // Note: ecosystem and trends run in parallel
@@ -44,41 +45,13 @@ const formatDuration = (startDateStr: string, endDateStr?: string) => {
 const getStatusIcon = (status: string) => {
   switch (status) {
     case 'complete':
-      return (
-        <Icon
-          variant='check'
-          width={20}
-          height={20}
-          className='stroke-success-600'
-        />
-      );
+      return <Check size={20} className='stroke-success-600' />;
     case 'pending':
-      return (
-        <Icon
-          variant='clock-stopwatch'
-          width={20}
-          height={20}
-          className='stroke-warning-600'
-        />
-      );
+      return <Timer size={20} className='stroke-warning-600' />;
     case 'error':
-      return (
-        <Icon
-          variant='alert-circle'
-          width={20}
-          height={20}
-          className='stroke-error-600'
-        />
-      );
+      return <AlertCircle size={20} className='stroke-error-600' />;
     default:
-      return (
-        <Icon
-          variant='clock'
-          width={20}
-          height={20}
-          className='stroke-gray-light-500'
-        />
-      );
+      return <Clock size={20} className='stroke-gray-light-500' />;
   }
 };
 

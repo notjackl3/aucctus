@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
 import { Link, To, useMatch } from 'react-router-dom';
-import Icon from '../../Icon/Icon/Icon';
 import styles from './nested-link.module.scss';
+import { ChevronRight, Lock } from 'lucide-react';
 
 const defaultIconProps = {
   stroke: '#7586A9',
@@ -11,7 +11,7 @@ const defaultIconProps = {
 export interface NestedLinkProps {
   to: To;
   onClick?: () => void;
-  icon?: IconVariant;
+  icon?: string;
   title: string;
   locked?: boolean;
 }
@@ -36,9 +36,9 @@ const NestedLink: FunctionComponent<NestedLinkProps> = ({
       className={`${styles.nestedLink} ${isActive ? styles.active : ''} ${locked ? styles.locked : ''}`}
       aria-disabled={locked}
     >
-      {icon ? <Icon variant='chevronright' {...defaultIconProps} /> : null}
+      {icon ? <ChevronRight {...defaultIconProps} /> : null}
       <span>{title}</span>
-      {locked ? <Icon variant='lock' {...defaultIconProps} /> : null}
+      {locked ? <Lock {...defaultIconProps} /> : null}
     </Link>
   );
 };

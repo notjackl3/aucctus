@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import api from '@libs/api';
 import { IAiEditingSuggestion, IConceptReportEdit } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
@@ -26,6 +25,16 @@ import OverseerChat from './OverseerChat';
 import OverseerInput from './OverseerInput';
 import OverseerSocketWrapper from './OverseerSocketWrapper';
 import OverseerSuggestedQuestions from './OverseerSuggestedQuestions';
+import {
+  ArrowRight,
+  ChevronLeft,
+  ClockArrowDown,
+  Columns3,
+  Expand,
+  Plus,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Panel dimension constants
 const DEFAULT_PANEL_WIDTH = 400;
@@ -663,12 +672,7 @@ const OverseerPopup: React.FC = () => {
                         className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                         title='Back to chat'
                       >
-                        <Icon
-                          variant='chevronleft'
-                          width={14}
-                          height={14}
-                          className='stroke-current'
-                        />
+                        <ChevronLeft size={14} className='stroke-current' />
                       </button>
                       <div
                         className={cn(
@@ -691,12 +695,7 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Undock panel'
                           >
-                            <Icon
-                              variant='expand-06'
-                              width={14}
-                              height={14}
-                              className='stroke-current'
-                            />
+                            <Expand size={14} className='stroke-current' />
                           </button>
                         ) : (
                           <button
@@ -704,12 +703,7 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Anchor to side panel'
                           >
-                            <Icon
-                              variant='columns'
-                              width={14}
-                              height={14}
-                              className='stroke-current'
-                            />
+                            <Columns3 size={14} className='stroke-current' />
                           </button>
                         )}
                         <button
@@ -717,12 +711,7 @@ const OverseerPopup: React.FC = () => {
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Close panel'
                         >
-                          <Icon
-                            variant='closeX'
-                            width={14}
-                            height={14}
-                            className='stroke-current'
-                          />
+                          <X size={14} className='stroke-current' />
                         </button>
                       </div>
                     </div>
@@ -801,10 +790,8 @@ const OverseerPopup: React.FC = () => {
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Chat history'
                         >
-                          <Icon
-                            variant='clock-rewind'
-                            width={14}
-                            height={14}
+                          <ClockArrowDown
+                            size={14}
                             className='stroke-current'
                           />
                         </button>
@@ -814,12 +801,7 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='New chat'
                           >
-                            <Icon
-                              variant='plus'
-                              width={14}
-                              height={14}
-                              className='stroke-current'
-                            />
+                            <Plus size={14} className='stroke-current' />
                           </button>
                         )}
                       </div>
@@ -847,12 +829,7 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Undock panel'
                           >
-                            <Icon
-                              variant='expand-06'
-                              width={14}
-                              height={14}
-                              className='stroke-current'
-                            />
+                            <Expand size={14} className='stroke-current' />
                           </button>
                         ) : (
                           <button
@@ -860,12 +837,7 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Anchor to side panel'
                           >
-                            <Icon
-                              variant='columns'
-                              width={14}
-                              height={14}
-                              className='stroke-current'
-                            />
+                            <Columns3 size={14} className='stroke-current' />
                           </button>
                         )}
                         <button
@@ -873,12 +845,7 @@ const OverseerPopup: React.FC = () => {
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Close panel'
                         >
-                          <Icon
-                            variant='closeX'
-                            width={14}
-                            height={14}
-                            className='stroke-current'
-                          />
+                          <X size={14} className='stroke-current' />
                         </button>
                       </div>
                     </div>
@@ -909,10 +876,8 @@ const OverseerPopup: React.FC = () => {
                       contentExpanded && (
                         <div className='px-4 pt-2'>
                           <div className='flex items-center gap-2 rounded-lg border border-blue-400/25 bg-blue-500/10 px-2.5 py-2'>
-                            <Icon
-                              variant='arrowright'
-                              width={12}
-                              height={12}
+                            <ArrowRight
+                              size={12}
                               className='shrink-0 stroke-white/60'
                             />
                             <p className='min-w-0 flex-1 truncate text-[11px] text-white/70'>
@@ -925,12 +890,7 @@ const OverseerPopup: React.FC = () => {
                               }}
                               className='shrink-0 rounded p-0.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             >
-                              <Icon
-                                variant='closeX'
-                                width={12}
-                                height={12}
-                                className='stroke-current'
-                              />
+                              <X size={12} className='stroke-current' />
                             </button>
                           </div>
                         </div>
@@ -965,7 +925,7 @@ const OverseerPopup: React.FC = () => {
                           )}
                           title={feat.label}
                         >
-                          <Icon
+                          <DynamicIcon
                             variant={feat.icon as 'globe'}
                             width={12}
                             height={12}

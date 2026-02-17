@@ -8,12 +8,18 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Icon } from '@components';
 import {
   usePortfolioInsights,
   usePortfolioInsightsSocketEvents,
 } from '@hooks/query/portfolioInsights.hook';
 import type { IPortfolioInsight } from '@libs/api/types/portfolioInsights';
+import {
+  AlertCircle,
+  Layers,
+  Lightbulb,
+  RefreshCw,
+  Sparkles,
+} from 'lucide-react';
 
 const CARD_DURATION = 8000; // 8 seconds per card
 const PROGRESS_INTERVAL = 50; // Update progress every 50ms
@@ -122,12 +128,7 @@ const PortfolioInsightsCarousel: React.FC = () => {
           {/* Header */}
           <div className='mb-4 flex shrink-0 items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='sparkles'
-                height={20}
-                width={20}
-                className='aucctus-stroke-brand-primary'
-              />
+              <Sparkles size={20} className='aucctus-stroke-brand-primary' />
               <h2 className='aucctus-text-primary aucctus-text-xl font-semibold'>
                 Portfolio Insights
               </h2>
@@ -159,12 +160,7 @@ const PortfolioInsightsCarousel: React.FC = () => {
           {/* Header */}
           <div className='mb-4 flex shrink-0 items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='sparkles'
-                height={20}
-                width={20}
-                className='aucctus-stroke-brand-primary'
-              />
+              <Sparkles size={20} className='aucctus-stroke-brand-primary' />
               <h2 className='aucctus-text-primary aucctus-text-xl font-semibold'>
                 Portfolio Insights
               </h2>
@@ -173,12 +169,7 @@ const PortfolioInsightsCarousel: React.FC = () => {
 
           {/* Empty state content */}
           <div className='aucctus-bg-primary aucctus-border-secondary/40 flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-xl border p-8'>
-            <Icon
-              variant='lightbulb'
-              height={48}
-              width={48}
-              className='aucctus-stroke-secondary mb-4'
-            />
+            <Lightbulb size={48} className='aucctus-stroke-secondary mb-4' />
             <h3 className='aucctus-text-primary mb-2 text-lg font-semibold'>
               No Insights Yet
             </h3>
@@ -205,12 +196,7 @@ const PortfolioInsightsCarousel: React.FC = () => {
           {/* Header */}
           <div className='mb-4 flex shrink-0 items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='sparkles'
-                height={20}
-                width={20}
-                className='aucctus-stroke-brand-primary'
-              />
+              <Sparkles size={20} className='aucctus-stroke-brand-primary' />
               <h2 className='aucctus-text-primary aucctus-text-xl font-semibold'>
                 Portfolio Insights
               </h2>
@@ -222,19 +208,14 @@ const PortfolioInsightsCarousel: React.FC = () => {
               className='aucctus-text-secondary hover:aucctus-text-primary flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800'
               aria-label='Retry loading insights'
             >
-              <Icon variant='refresh' height={16} width={16} />
+              <RefreshCw size={16} />
               <span>Retry</span>
             </motion.button>
           </div>
 
           {/* Error state content */}
           <div className='aucctus-bg-primary aucctus-border-secondary/40 flex min-h-0 flex-1 flex-col items-center justify-center overflow-hidden rounded-xl border p-8'>
-            <Icon
-              variant='alert-circle'
-              height={48}
-              width={48}
-              className='mb-4 stroke-red-500'
-            />
+            <AlertCircle size={48} className='mb-4 stroke-red-500' />
             <h3 className='aucctus-text-primary mb-2 text-lg font-semibold'>
               Failed to Load Insights
             </h3>
@@ -259,12 +240,7 @@ const PortfolioInsightsCarousel: React.FC = () => {
         {/* Header */}
         <div className='mb-4 flex shrink-0 items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='sparkles'
-              height={20}
-              width={20}
-              className='aucctus-stroke-brand-primary'
-            />
+            <Sparkles size={20} className='aucctus-stroke-brand-primary' />
             <h2 className='aucctus-text-primary aucctus-text-xl font-semibold'>
               Portfolio Insights
             </h2>
@@ -355,7 +331,7 @@ const PortfolioInsightsCarousel: React.FC = () => {
                 {/* Metadata (if any relevant info) */}
                 {currentInsight.metadata?.conceptCount && (
                   <div className='aucctus-text-tertiary flex items-center gap-1 text-xs'>
-                    <Icon variant='layers' height={14} width={14} />
+                    <Layers size={14} />
                     <span>
                       {currentInsight.metadata.conceptCount} concept
                       {currentInsight.metadata.conceptCount !== 1

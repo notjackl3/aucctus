@@ -9,7 +9,7 @@
  */
 
 import React, { useCallback, useMemo, useState } from 'react';
-import { Badge, Icon, Loading, Tabs, TabsContent } from '@components';
+import { Badge, Loading, Tabs, TabsContent } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 
@@ -24,6 +24,8 @@ import CompetitorOverview from './components/CompetitorOverview';
 import CompetitorMatrix from './components/CompetitorMatrix';
 import CompetitorProfiles from './components/CompetitorProfiles';
 import WhiteSpaceGrid from './components/WhiteSpaceGrid';
+import { Clock, RefreshCw, Swords } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 type TabValue = 'overview' | 'matrix' | 'competitors' | 'white-spaces';
 
@@ -134,12 +136,7 @@ const CompetitorAssessmentPage: React.FC = () => {
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-3'>
             <div className='aucctus-bg-secondary rounded-lg p-2'>
-              <Icon
-                variant='swords'
-                height={24}
-                width={24}
-                className='aucctus-stroke-primary'
-              />
+              <Swords size={24} className='aucctus-stroke-primary' />
             </div>
             <div>
               <h1 className='aucctus-text-primary flex items-center gap-2 text-xl font-bold'>
@@ -154,12 +151,7 @@ const CompetitorAssessmentPage: React.FC = () => {
 
           {/* Refresh control */}
           <div className='aucctus-bg-secondary aucctus-border-secondary flex items-center gap-2 rounded-lg border px-3 py-2'>
-            <Icon
-              variant='clock'
-              height={14}
-              width={14}
-              className='aucctus-stroke-tertiary'
-            />
+            <Clock size={14} className='aucctus-stroke-tertiary' />
             {isScanningActive ? (
               <span className='aucctus-text-secondary text-xs'>
                 {scanProgress.message || 'Scanning...'}
@@ -186,10 +178,8 @@ const CompetitorAssessmentPage: React.FC = () => {
               )}
               title='Refresh assessment'
             >
-              <Icon
-                variant='refresh'
-                height={14}
-                width={14}
+              <RefreshCw
+                size={14}
                 className={cn(
                   'aucctus-stroke-secondary',
                   isScanningActive && 'animate-spin',
@@ -219,7 +209,7 @@ const CompetitorAssessmentPage: React.FC = () => {
                       !isActive,
                   })}
                 >
-                  <Icon
+                  <DynamicIcon
                     variant={tab.icon as any}
                     height={14}
                     width={14}

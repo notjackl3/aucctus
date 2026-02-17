@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useEffect, useRef, useState } from 'react';
-import Icon from '../../Icon/Icon/Icon';
 import TextArea from '../../Input/TextArea/TextArea';
+import { Save } from 'lucide-react';
 
 interface IEditModeSwitcherProps {
   value?: string;
@@ -117,7 +117,7 @@ const EditModeSwitcher: FunctionComponent<IEditModeSwitcherProps> = ({
                 setIsEditing(false);
               }}
             >
-              <Icon variant='save' height={15} width={15} />
+              <Save size={15} />
             </button>
           </div>
           <TextArea

@@ -1,15 +1,11 @@
 import React from 'react';
-import { Icon } from '@components';
-
+import { Clipboard } from 'lucide-react';
 const TestResultsInfoSection: React.FC = () => {
   return (
     <div className='aucctus-bg-secondary-extra-subtle aucctus-border-secondary rounded-lg border p-4'>
       <div className='flex items-start gap-3'>
         <div className='mt-1'>
-          <Icon
-            variant='clipboard'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <Clipboard className='aucctus-stroke-brand-primary h-5 w-5' />
         </div>
         <div>
           <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>

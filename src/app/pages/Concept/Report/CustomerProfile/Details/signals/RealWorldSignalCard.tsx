@@ -1,11 +1,12 @@
 import React, { useMemo, useCallback, useState } from 'react';
-import { Badge, Icon, Modal } from '@components';
+import { Badge, Modal } from '@components';
 import { ICustomerProfileRealWorldSignal } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { useCustomerProfileRealWorldSignalDelete } from '@hooks/query/concepts.hook';
 import { useModal } from '@context/ModalContextProvider';
 import { SignalStanceType } from '@libs/api/types';
+import { Pencil, Trash2 } from 'lucide-react';
 // Consolidated style mappings by stance
 const stanceStyleMap: Record<
   SignalStanceType,
@@ -178,7 +179,7 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
           className='btn btn-grey border-none !text-primary-900 shadow-none'
           aria-label='Edit signal'
         >
-          <Icon variant='edit' className='aucctus-stroke-primary h-4 w-4' />
+          <Pencil className='aucctus-stroke-primary h-4 w-4' />
           Edit
         </button>
         <button
@@ -186,10 +187,7 @@ const RealWorldSignalCard: React.FC<RealWorldSignalCardProps> = ({
           className='btn btn-grey border-none !text-primary-900 shadow-none'
           aria-label='Delete signal'
         >
-          <Icon
-            variant='trash'
-            className='aucctus-stroke-error-primary h-4 w-4'
-          />
+          <Trash2 className='aucctus-stroke-error-primary h-4 w-4' />
           Delete
         </button>
       </div>

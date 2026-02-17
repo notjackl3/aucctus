@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
+import { Lightbulb, RefreshCw, X } from 'lucide-react';
 
 interface ExplorationModeSelectorProps {
   currentTopic: string;
@@ -37,11 +37,9 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
               >
                 <div className='flex h-12 items-center rounded-full border border-white/30 bg-white/15 px-4 py-3 shadow-xl backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/40 hover:bg-white/20'>
                   <div className='flex items-center gap-3'>
-                    <Icon
-                      variant='lightbulb'
+                    <Lightbulb
+                      size={16}
                       className='aucctus-stroke-warning-tertiary'
-                      height={16}
-                      width={16}
                     />
                     <span className='aucctus-text-sm-medium aucctus-text-white'>
                       {currentTopic}
@@ -62,12 +60,7 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
               className='aucctus-text-white flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-white/15 p-3 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/70 hover:bg-white/20'
               title='Restart'
             >
-              <Icon
-                variant='refresh'
-                className='aucctus-stroke-white'
-                height={16}
-                width={16}
-              />
+              <RefreshCw size={16} className='aucctus-stroke-white' />
             </button>
 
             <button
@@ -75,12 +68,7 @@ const ExplorationModeSelector: React.FC<ExplorationModeSelectorProps> = ({
               className='aucctus-text-white flex h-12 w-12 items-center justify-center rounded-full border border-white/50 bg-white/15 p-3 backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/70 hover:bg-white/20'
               title='Close'
             >
-              <Icon
-                variant='closeX'
-                className='aucctus-stroke-white'
-                height={16}
-                width={16}
-              />
+              <X size={16} className='aucctus-stroke-white' />
             </button>
           </div>
         </div>

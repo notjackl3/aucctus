@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { Icon } from '@components';
 import { ICustomerPain, ICustomerListItemWithUuid } from '@libs/api/types';
 import EditableList from './components/EditableList';
 import {
@@ -11,6 +10,7 @@ import {
 import telemetry from '@libs/telemetry';
 import PriorityIndicator from './components/PriorityIndicator';
 import SectionHeader from './components/SectionHeader';
+import { Plus } from 'lucide-react';
 
 export interface Pain {
   text: string;
@@ -120,7 +120,7 @@ const PainPoints: React.FC<PainPointsProps> = ({
             onClick={handleStartAdding}
             disabled={isAdding}
           >
-            <Icon variant='plus' height={18} width={18} />
+            <Plus />
           </button>
         }
       />

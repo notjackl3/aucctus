@@ -1,6 +1,6 @@
 import { cn } from '@libs/utils/react';
 import { FunctionComponent, ReactNode } from 'react';
-import Icon from '../Icon';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export interface IBannerProps {
   title: string;
@@ -87,7 +87,7 @@ const Banner: FunctionComponent<IBannerProps> = ({
         <div className='flex flex-1 items-start gap-3'>
           {/* Icon with variant styling */}
           <div className={cn(styles.iconBg, 'mt-0.5 rounded-full p-1')}>
-            <Icon
+            <DynamicIcon
               variant={iconVariant as any}
               className={styles.iconStroke}
               height={16}

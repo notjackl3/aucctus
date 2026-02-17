@@ -1,8 +1,9 @@
 import React, { useRef } from 'react';
-import { Icon, ComponentCarousel, Badge } from '@components';
+import { ComponentCarousel, Badge } from '@components';
 import { useWatchtowerPredictions } from '@hooks/query/watchtower.hook';
 import type { ISource } from '@libs/api/types';
 import type { PredictionSource } from '../types';
+import { ChevronLeft, ChevronRight, Sparkles, Telescope } from 'lucide-react';
 
 /**
  * Converts a PredictionSource to ISource format for SourceInfoBadge
@@ -89,12 +90,7 @@ const FuturePredictionsWidget: React.FC = () => {
   if (isLoading || predictions.length === 0) {
     return (
       <div className='aucctus-bg-primary aucctus-border-secondary flex h-full flex-col items-center justify-center rounded-xl border p-6'>
-        <Icon
-          variant='future'
-          height={32}
-          width={32}
-          className='aucctus-stroke-tertiary mb-2'
-        />
+        <Telescope size={32} className='aucctus-stroke-tertiary mb-2' />
         <p className='aucctus-text-tertiary text-sm'>
           {isLoading ? 'Loading predictions...' : 'No predictions available'}
         </p>
@@ -107,12 +103,7 @@ const FuturePredictionsWidget: React.FC = () => {
       <div className='mb-4 flex items-center justify-between'>
         <div className='flex items-center gap-2'>
           <div className='aucctus-text-secondary h-5 w-5'>
-            <Icon
-              variant='future'
-              height={20}
-              width={20}
-              className='aucctus-stroke-secondary'
-            />
+            <Telescope size={20} className='aucctus-stroke-secondary' />
           </div>
           <h3 className='aucctus-text-primary aucctus-text-lg-semibold'>
             Future Predictions
@@ -123,23 +114,13 @@ const FuturePredictionsWidget: React.FC = () => {
             className='aucctus-bg-secondary-hover aucctus-border-secondary flex h-8 w-8 items-center justify-center rounded-lg border transition-colors disabled:cursor-not-allowed disabled:opacity-50'
             onClick={() => carouselRef.current?.scrollPrev()}
           >
-            <Icon
-              variant='chevronleft'
-              height={16}
-              width={16}
-              className='aucctus-stroke-secondary'
-            />
+            <ChevronLeft size={16} className='aucctus-stroke-secondary' />
           </button>
           <button
             className='aucctus-bg-secondary-hover aucctus-border-secondary flex h-8 w-8 items-center justify-center rounded-lg border transition-colors disabled:cursor-not-allowed disabled:opacity-50'
             onClick={() => carouselRef.current?.scrollNext()}
           >
-            <Icon
-              variant='chevronright'
-              height={16}
-              width={16}
-              className='aucctus-stroke-secondary'
-            />
+            <ChevronRight size={16} className='aucctus-stroke-secondary' />
           </button>
         </div>
       </div>
@@ -188,10 +169,7 @@ const FuturePredictionsWidget: React.FC = () => {
                     ))}
                   {prediction.hasAiReasoning && (
                     <div className='aucctus-border-primary flex items-center gap-2 rounded-full border p-1'>
-                      <Icon
-                        variant='sparkles'
-                        className='aucctus-stroke-secondary h-4 w-4'
-                      />
+                      <Sparkles className='aucctus-stroke-secondary h-4 w-4' />
                       <span className='aucctus-text-secondary pr-2 text-xs font-normal'>
                         AI Reasoning
                       </span>

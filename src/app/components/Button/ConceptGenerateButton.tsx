@@ -1,4 +1,4 @@
-import { ComponentTooltip, Icon, Loading, PulsatingText } from '@components';
+import { ComponentTooltip, Loading, PulsatingText } from '@components';
 import {
   ConceptReportStatus,
   ConceptReportStatusBySection,
@@ -9,6 +9,7 @@ import { FunctionComponent, ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import { ConceptStatusTooltip } from '../ToolTip/ConceptStatusTooltip';
 import ConceptGeneratingButton from './ConceptGeneratingButton';
+import { RefreshCw } from 'lucide-react';
 
 type ConceptRowButtonProps = {
   variant: ConceptReportStatus;
@@ -48,7 +49,7 @@ const getButtonContext = (variant: ConceptRowButtonProps['variant']) => {
       style: `btn btn-light btn-bold btn-sm`,
       label: (
         <>
-          <Icon variant='refresh' height={20} width={20} /> Retry
+          <RefreshCw size={20} /> Retry
         </>
       ),
     },

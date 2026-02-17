@@ -1,9 +1,9 @@
 import React, { useCallback, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { CategoryState, QuestionState } from './types';
 import { StatusOption } from './fixtures';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Types
 interface DropdownPosition {
@@ -153,7 +153,7 @@ const DropdownOption: React.FC<DropdownOptionProps> = ({
       onClick={handleKeyboardClick}
       className={optionClassNames}
     >
-      <Icon
+      <DynamicIcon
         variant={option.icon}
         className={iconClassNames}
         height={16}

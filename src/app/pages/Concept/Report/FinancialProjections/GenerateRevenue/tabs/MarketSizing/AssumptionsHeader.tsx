@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { RefreshCw } from 'lucide-react';
 
 interface AssumptionsHeaderProps {
   resetToDefaults: () => void;
@@ -28,7 +28,7 @@ const AssumptionsHeader: React.FC<AssumptionsHeaderProps> = ({
         onClick={resetToDefaults}
         className='btn btn-light flex items-center gap-2 text-sm'
       >
-        <Icon variant='refresh' className='aucctus-stroke-tertiary h-4 w-4' />
+        <RefreshCw className='aucctus-stroke-tertiary h-4 w-4' />
         Reset
       </button>
     </div>

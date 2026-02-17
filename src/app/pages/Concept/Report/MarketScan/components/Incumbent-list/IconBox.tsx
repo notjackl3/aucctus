@@ -1,10 +1,10 @@
 // _shared/IconBox.tsx
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import React from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IconBoxProps {
-  variant: IconVariant;
+  variant: string;
   onClick?: () => void;
   height?: number;
   width?: number;
@@ -26,7 +26,12 @@ const IconBox: React.FC<IconBoxProps> = ({
       )}
       onClick={onClick}
     >
-      <Icon variant={variant} height={height} width={width} stroke={stroke} />
+      <DynamicIcon
+        variant={variant}
+        height={height}
+        width={width}
+        stroke={stroke}
+      />
     </div>
   );
 };

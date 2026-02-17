@@ -2,16 +2,7 @@
 // Remove this file once all users have migrated to AssumptionsV2.tsx
 // Related files to remove: useAssumptionsTable hook, V1 table components
 
-import {
-  Badge,
-  Card,
-  Chart,
-  Header,
-  Icon,
-  Loading,
-  Modal,
-  Table,
-} from '@components';
+import { Badge, Card, Chart, Header, Loading, Modal, Table } from '@components';
 import { Point } from '@components/Charts/ScatterChart/ScatterChart';
 import { useModal } from '@context/ModalContextProvider';
 import {
@@ -26,6 +17,7 @@ import {
 import React from 'react';
 import { useOutletContext } from 'react-router-dom';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
+import { List, ListFilter } from 'lucide-react';
 
 const AssumptionsV1: React.FC = () => {
   const { concept } = useOutletContext<IConceptReportContext>();
@@ -161,10 +153,10 @@ const AssumptionsV1: React.FC = () => {
             <div>{/* This will display active filters */}</div>
             <div className='inline-flex h-3 items-center justify-end gap-2'>
               <button>
-                <Icon variant='filter-lines' />
+                <ListFilter />
               </button>
               <button>
-                <Icon variant='list' />
+                <List />
               </button>
             </div>
           </div>

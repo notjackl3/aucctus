@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Icon } from '@components';
 import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import { cn } from '@libs/utils/react';
 import { useLocation } from 'react-router-dom';
 import SimpleMarketSizeView from './SimpleMarketSizeView';
 import BottomUpCalculator from './BottomUpCalculator';
 import useStore from '@stores/store';
+import { ArrowDown, ArrowUp, HelpCircle } from 'lucide-react';
 
 interface MarketSizingTabProps {}
 
@@ -76,16 +76,10 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
                   : 'aucctus-text-tertiary-hover aucctus-bg-primary-hover',
               )}
             >
-              <Icon
-                variant='arrowdown'
-                className='aucctus-stroke-brand-primary h-4 w-4'
-              />
+              <ArrowDown className='aucctus-stroke-brand-primary h-4 w-4' />
               Top Down
               <ComponentTooltip tip={topDownTooltip} preferredPosition='above'>
-                <Icon
-                  variant='help-circle'
-                  className='aucctus-stroke-tertiary h-4 w-4'
-                />
+                <HelpCircle className='aucctus-stroke-tertiary h-4 w-4' />
               </ComponentTooltip>
             </button>
             <button
@@ -97,16 +91,10 @@ const MarketSizingTab: React.FC<MarketSizingTabProps> = () => {
                   : 'aucctus-text-tertiary-hover aucctus-bg-primary-hover',
               )}
             >
-              <Icon
-                variant='arrowup'
-                className='aucctus-stroke-brand-primary h-4 w-4'
-              />
+              <ArrowUp className='aucctus-stroke-brand-primary h-4 w-4' />
               Bottom Up
               <ComponentTooltip tip={bottomUpTooltip} preferredPosition='above'>
-                <Icon
-                  variant='help-circle'
-                  className='aucctus-stroke-tertiary h-4 w-4'
-                />
+                <HelpCircle className='aucctus-stroke-tertiary h-4 w-4' />
               </ComponentTooltip>
             </button>
           </div>

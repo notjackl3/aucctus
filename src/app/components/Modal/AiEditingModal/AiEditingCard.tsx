@@ -1,4 +1,4 @@
-import { BetaDisclaimer, Icon, Modal } from '@components';
+import { BetaDisclaimer, Modal } from '@components';
 import AiIntroMessage from '@components/AiInteraction/AiIntroMessage';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import AucctusMessageInput from '@components/Input/AucctusMessageInput';
@@ -21,6 +21,7 @@ import OutdatedSectionsBanner from './OutdatedSectionsBanner';
 import { LATEST_FEATURE_VERSIONS } from '@libs/constants';
 import { mapBackendSectionToReportKey } from '@libs/utils/concepts';
 import type { ConceptReportStatusBySection } from '@libs/api/types/concept/concepts';
+import { Trash2, X } from 'lucide-react';
 
 interface AiEditingCardProps {
   onClose: () => void;
@@ -156,12 +157,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
               title='Clear conversation'
             >
               <span className='flex items-center justify-center'>
-                <Icon
-                  variant='trash'
-                  width={16}
-                  height={16}
-                  className='stroke-gray-light-100'
-                />
+                <Trash2 size={16} className='stroke-gray-light-100' />
               </span>
             </button>
             <button
@@ -170,12 +166,7 @@ const AiEditingCard: React.FC<AiEditingCardProps> = ({ onClose }) => {
               title='Close window'
             >
               <span className='flex items-center justify-center'>
-                <Icon
-                  variant='closeX'
-                  width={20}
-                  height={20}
-                  className='stroke-gray-light-100'
-                />
+                <X size={20} className='stroke-gray-light-100' />
               </span>
             </button>
           </div>

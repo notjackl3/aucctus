@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import images from '@assets/img';
+import { Swords } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * Feature highlight item for the initiation page
  */
 export interface CompetitorFeatureHighlight {
-  icon: IconVariant;
+  icon: string;
   title: string;
   description: string;
   subDescription?: string;
@@ -18,7 +19,7 @@ export interface CompetitorFeatureHighlight {
  * Badge configuration for top badges
  */
 export interface CompetitorInitiationBadge {
-  icon?: IconVariant;
+  icon?: string;
   text: string;
   variant: 'premium' | 'status' | 'neutral';
   statusColor?: 'green' | 'amber' | 'red';
@@ -250,7 +251,7 @@ const InitiationBadgeComponent: React.FC<{
       )}
     >
       {badge.variant === 'premium' && badge.icon && (
-        <Icon
+        <DynamicIcon
           variant={badge.icon}
           height={14}
           width={14}
@@ -380,10 +381,8 @@ const CompetitorAssessmentInitiation: React.FC<
               <div className='relative'>
                 <div className='absolute inset-0 scale-150 rounded-lg bg-white/20 blur-xl' />
                 <div className='relative rounded-lg border border-white/20 bg-white/5 p-4 backdrop-blur-md'>
-                  <Icon
-                    variant='swords'
-                    height={48}
-                    width={48}
+                  <Swords
+                    size={48}
                     className='stroke-white'
                     strokeWidth={1.5}
                   />
@@ -421,7 +420,7 @@ const CompetitorAssessmentInitiation: React.FC<
                   className='flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm transition-shadow hover:shadow-lg hover:shadow-white/5'
                 >
                   <div className='shrink-0 rounded-lg bg-white/10 p-2.5'>
-                    <Icon
+                    <DynamicIcon
                       variant={feature.icon}
                       height={16}
                       width={16}
@@ -472,7 +471,7 @@ const CompetitorAssessmentInitiation: React.FC<
 
               {/* Button content */}
               <span className='relative flex items-center gap-3'>
-                <Icon
+                <DynamicIcon
                   variant={isInitializing || isFlashing ? 'refresh' : 'zap'}
                   height={20}
                   width={20}

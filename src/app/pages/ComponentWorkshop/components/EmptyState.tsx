@@ -6,7 +6,7 @@
  */
 
 import React from 'react';
-import { Icon } from '@components';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IEmptyStateAction {
   /** Button label */
@@ -19,7 +19,7 @@ interface IEmptyStateAction {
 
 interface IEmptyStateProps {
   /** Icon variant to display */
-  icon: IconVariant;
+  icon: string;
   /** Title text */
   title: string;
   /** Description text */
@@ -39,7 +39,7 @@ const EmptyState: React.FC<IEmptyStateProps> = ({
 }) => {
   return (
     <div className='aucctus-bg-primary aucctus-border-secondary rounded-2xl border p-12 text-center'>
-      <Icon
+      <DynamicIcon
         variant={icon}
         className='aucctus-stroke-tertiary mx-auto mb-4 h-12 w-12'
       />

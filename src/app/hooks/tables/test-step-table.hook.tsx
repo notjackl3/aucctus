@@ -6,10 +6,11 @@ import {
 } from '@tanstack/react-table';
 import React from 'react';
 
-import { Icon, Table } from '@components';
+import { Table } from '@components';
 import { useUpdateConceptTestStep } from '@hooks/query/assumptions.hook';
 import { ITestStep } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { Check } from 'lucide-react';
 
 const columnHelper = createColumnHelper<ITestStep>();
 
@@ -35,9 +36,7 @@ export const useTestStepTable = (testUuid: string, steps: ITestStep[] = []) => {
               })
             }
           >
-            {info.getValue() ? (
-              <Icon variant='check' className='text-green-500' />
-            ) : null}
+            {info.getValue() ? <Check className='text-green-500' /> : null}
           </button>
         ),
       }),

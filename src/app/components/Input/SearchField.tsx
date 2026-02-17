@@ -1,6 +1,7 @@
-import { Icon, Input } from '@components';
+import { Input } from '@components';
 import React from 'react';
 import { cn } from '@libs/utils/react';
+import { Search } from 'lucide-react';
 
 interface SearchInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   debounce?: number;
@@ -12,8 +13,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ ...props }) => {
   return (
     <div className='relative w-full max-w-md'>
       <div className='absolute inset-y-0 left-0 flex items-center pl-3'>
-        <Icon
-          variant='search-md'
+        <Search
           className={cn({
             'stroke-gray-light-500': !focus,
             'stroke-primary-900': focus,

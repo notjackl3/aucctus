@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import {
   useSyntheticDistributionPreview,
   useTestCollaterals,
@@ -16,6 +15,16 @@ import ConfigureLaunchStep from './components/ConfigureLaunchStep';
 import ParticipantSelectionStep from './components/ParticipantSelectionStep';
 import StepNavigation from './components/StepNavigation';
 import SyntheticLoadingUI from './components/SyntheticLoadingUI';
+import {
+  AlertCircle,
+  ArrowLeft,
+  Check,
+  Clock,
+  FileText,
+  Loader2,
+  Users,
+  X,
+} from 'lucide-react';
 
 interface ISyntheticExecutionPanelProps {
   // Existing props
@@ -616,10 +625,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
               <div className='flex items-center justify-between'>
                 <div className='flex items-center gap-4'>
                   <div className='aucctus-bg-success-subtle rounded-full p-3'>
-                    <Icon
-                      variant='check'
-                      className='aucctus-stroke-success-primary h-6 w-6'
-                    />
+                    <Check className='aucctus-stroke-success-primary h-6 w-6' />
                   </div>
                   <div>
                     <h2 className='aucctus-text-primary text-2xl font-bold'>
@@ -635,10 +641,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
                 <div className='flex items-center gap-12'>
                   <div className='flex items-center gap-3'>
                     <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
-                      <Icon
-                        variant='users-03'
-                        className='aucctus-stroke-brand-primary h-4 w-4'
-                      />
+                      <Users className='aucctus-stroke-brand-primary h-4 w-4' />
                     </div>
                     <div>
                       <div className='aucctus-text-xl-bold aucctus-text-primary'>
@@ -652,10 +655,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
 
                   <div className='flex items-center gap-3'>
                     <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
-                      <Icon
-                        variant='file-text'
-                        className='aucctus-stroke-brand-primary h-4 w-4'
-                      />
+                      <FileText className='aucctus-stroke-brand-primary h-4 w-4' />
                     </div>
                     <div>
                       <div className='aucctus-text-xl-bold aucctus-text-primary'>
@@ -740,10 +740,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
               <div className='flex items-center gap-12'>
                 <div className='flex items-center gap-3'>
                   <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
-                    <Icon
-                      variant='users-03'
-                      className='aucctus-stroke-brand-primary h-4 w-4'
-                    />
+                    <Users className='aucctus-stroke-brand-primary h-4 w-4' />
                   </div>
                   <div>
                     <div className='aucctus-text-xl-bold aucctus-text-primary'>
@@ -757,10 +754,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
 
                 <div className='flex items-center gap-3'>
                   <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
-                    <Icon
-                      variant='file-text'
-                      className='aucctus-stroke-brand-primary h-4 w-4'
-                    />
+                    <FileText className='aucctus-stroke-brand-primary h-4 w-4' />
                   </div>
                   <div>
                     <div className='aucctus-text-xl-bold aucctus-text-primary'>
@@ -774,10 +768,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
 
                 <div className='flex items-center gap-3'>
                   <div className='aucctus-bg-brand-secondary rounded-lg p-2'>
-                    <Icon
-                      variant='clock'
-                      className='aucctus-stroke-brand-primary h-4 w-4'
-                    />
+                    <Clock className='aucctus-stroke-brand-primary h-4 w-4' />
                   </div>
                   <div>
                     <div className='aucctus-text-xl-bold aucctus-text-primary'>
@@ -900,10 +891,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
               <div className='p-6'>
                 <div className='mb-4'>
                   <h2 className='aucctus-text-primary mb-1 flex items-center gap-3 text-2xl font-bold'>
-                    <Icon
-                      variant='loading-02'
-                      className='aucctus-stroke-error-primary h-6 w-6 animate-spin'
-                    />
+                    <Loader2 className='aucctus-stroke-error-primary h-6 w-6 animate-spin' />
                     Cancelling Test
                   </h2>
                   <p className='aucctus-text-secondary aucctus-text-sm'>
@@ -970,10 +958,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
           <div className='aucctus-bg-error-subtle rounded-lg p-4'>
             <div className='flex items-start gap-3'>
               <div className='aucctus-bg-error-primary mt-0.5 rounded-full p-1.5'>
-                <Icon
-                  variant='alert-circle'
-                  className='aucctus-stroke-white h-4 w-4'
-                />
+                <AlertCircle className='aucctus-stroke-white h-4 w-4' />
               </div>
               <div className='flex-1'>
                 <h4 className='aucctus-text-sm-semibold aucctus-text-error-primary mb-1'>
@@ -996,7 +981,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
               className='btn btn-danger btn-sm flex items-center gap-2'
               onClick={onCancel}
             >
-              <Icon variant='closeX' className='aucctus-stroke-white h-4 w-4' />
+              <X className='aucctus-stroke-white h-4 w-4' />
               Cancel Execution
             </button>
           </div>
@@ -1010,10 +995,7 @@ const SyntheticExecutionPanel: React.FC<ISyntheticExecutionPanelProps> = ({
             className='btn btn-light btn-sm flex items-center gap-2'
             onClick={onReset}
           >
-            <Icon
-              variant='arrowleft'
-              className='aucctus-stroke-secondary h-4 w-4'
-            />
+            <ArrowLeft className='aucctus-stroke-secondary h-4 w-4' />
             Back
           </button>
         </div>

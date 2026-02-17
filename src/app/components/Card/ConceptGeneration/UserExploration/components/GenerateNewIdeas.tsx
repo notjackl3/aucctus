@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import {
   useConceptIncubationQuestionnaire,
   useSaveSeed,
@@ -8,6 +7,7 @@ import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedSt
 import React from 'react';
 import { toast } from '@components';
 import LoadingMask from './util/LoadingMask';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 type QuestionPath = 'expand-an-existing-idea' | 'identify-new-opportunities';
 
@@ -16,7 +16,7 @@ const ideaCards = [
     title: 'Expand An Existing Idea',
     description:
       "Describe an idea you already have and we'll help you validate it.",
-    icon: 'lightbulb' as IconVariant,
+    icon: 'lightbulb' as string,
     path: 'expand-an-existing-idea' as QuestionPath,
     animationDelay: 600,
     disabled: false,
@@ -25,7 +25,7 @@ const ideaCards = [
     title: 'Identify New Opportunities',
     description:
       "Describe the problem you want to solve and we'll suggest ideas.",
-    icon: 'telescope' as IconVariant,
+    icon: 'telescope' as string,
     path: 'identify-new-opportunities' as QuestionPath,
     animationDelay: 800,
   },
@@ -34,7 +34,7 @@ const ideaCards = [
 interface IdeaCardProps {
   title: string;
   description: string;
-  icon: IconVariant;
+  icon: string;
   path: QuestionPath;
   style: React.CSSProperties;
   onSelect: (path: QuestionPath) => void;
@@ -56,7 +56,7 @@ const IdeaCard: React.FC<IdeaCardProps> = ({
   >
     <div>
       <span className='aucctus-bg-tertiary flex h-14 w-14 items-center justify-center rounded-full align-middle'>
-        <Icon variant={icon} className='h-8 w-8 stroke-primary-900' />
+        <DynamicIcon variant={icon} className='h-8 w-8 stroke-primary-900' />
       </span>
     </div>
     <div className='aucctus-text-brand-secondary aucctus-text-xl-medium'>

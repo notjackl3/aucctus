@@ -1,5 +1,5 @@
 import images from '@assets/img';
-import { ComponentTooltip, Icon } from '@components';
+import { ComponentTooltip } from '@components';
 import {
   useCompanyInfo,
   usePublishedDatesQuery,
@@ -9,6 +9,7 @@ import { getBaseUrl, formatRelativeDate, getLogoUrl } from '@libs/utils/source';
 import { cn } from '@libs/utils/react';
 import React, { useMemo } from 'react';
 import ClassificationBadge from '../../pages/Concept/Report/MarketScan/v3/components/ClassificationBadge';
+import { Lightbulb } from 'lucide-react';
 
 interface SourceInfoBadgeProps {
   source: ISource;
@@ -89,8 +90,7 @@ const SourceInfoBadge: React.FC<SourceInfoBadgeProps> = ({
             'aucctus-border-primary flex h-fit w-fit items-center justify-center overflow-hidden rounded-full',
           )}
         >
-          <Icon
-            variant='lightbulb'
+          <Lightbulb
             className={cn('aucctus-stroke-quaternary', logoSizeClass)}
           />
         </div>

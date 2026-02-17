@@ -1,6 +1,6 @@
 import { FunctionComponent } from 'react';
-
-import Tooltip from '../../Icon/Tooltip/Tooltip';
+import { CircleHelp } from 'lucide-react';
+import { ComponentTooltip } from '@components';
 
 export interface RowInfoProps {
   label: string;
@@ -21,7 +21,11 @@ const RowInfo: FunctionComponent<RowInfoProps> = ({
         {label && (
           <div className='aucctus-text-sm-semibold aucctus-text-brand-secondary flex justify-start gap-2 self-stretch'>
             {label}
-            {tooltipContent && <Tooltip content={tooltipContent} />}
+            {tooltipContent && (
+              <ComponentTooltip tip={tooltipContent}>
+                <CircleHelp className='aucctus-stroke-tertiary h-4 w-4' />
+              </ComponentTooltip>
+            )}
           </div>
         )}
         {sublabel && (

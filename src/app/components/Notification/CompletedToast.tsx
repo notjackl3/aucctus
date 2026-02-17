@@ -1,10 +1,10 @@
 import React from 'react';
 import Lottie from 'lottie-react';
 import { ToastContentProps } from 'react-toastify';
-import { Icon } from '@components';
 import Avatar from '@components/Avatar';
 import animations from '@assets/animations';
 import useStore from '@stores/store';
+import { Check } from 'lucide-react';
 
 interface CompletedToastData {
   title: string;
@@ -96,12 +96,7 @@ const CompletedToast: React.FC<CompletedToastProps> = ({
             </div>
             {/* Checkmark circle on the right */}
             <div className='aucctus-border-primary absolute -right-1 top-1/2 flex h-5 w-5 -translate-y-1/2 transform items-center justify-center rounded-full border-[3px] border-white bg-green-600'>
-              <Icon
-                variant='check'
-                className='aucctus-stroke-white'
-                height={12}
-                width={12}
-              />
+              <Check size={12} className='aucctus-stroke-white' />
             </div>
           </div>
           <span className='aucctus-text-xs-medium aucctus-text-secondary whitespace-nowrap text-right'>

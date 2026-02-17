@@ -3,8 +3,8 @@ import React, {
   InputHTMLAttributes,
   useState,
 } from 'react';
-import Icon from '../../Icon/Icon/Icon';
 import { cn } from '@libs/utils/react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface InputFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: string;
@@ -123,7 +123,7 @@ const Input: ForwardRefRenderFunction<HTMLInputElement, InputFieldProps> = (
             onClick={togglePasswordVisibility}
             aria-label='Toggle password visibility'
           >
-            <Icon
+            <DynamicIcon
               variant={isPasswordVisible ? 'eye-off' : 'eye'}
               {...defaultIconProps}
             />

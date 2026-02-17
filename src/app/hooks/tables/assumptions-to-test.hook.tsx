@@ -6,8 +6,9 @@ import {
 } from '@tanstack/react-table';
 import React from 'react';
 
-import { Badge, Icon, Table } from '@components';
+import { Badge, Table } from '@components';
 import { IAssumptionsToTest } from '@libs/api/types';
+import AssumptionCategoryIcon from '@components/Icon/AssumptionCategoryIcon';
 
 const columnHelper = createColumnHelper<IAssumptionsToTest>();
 
@@ -22,7 +23,7 @@ export const useAssumptionsToTestTable = (
         header: () => 'Assumptions',
         cell: (info) => (
           <span className='flex items-center gap-1.5 text-wrap'>
-            <Icon.AssumptionCategory category={info.row.original.category} />
+            <AssumptionCategoryIcon category={info.row.original.category} />
             <Table.Column.Text
               className='flex text-wrap'
               value={info.row.original.name}

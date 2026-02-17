@@ -1,6 +1,5 @@
 import React from 'react';
-import { Icon } from '@components';
-
+import { BookOpen } from 'lucide-react';
 export interface CalculatorHeaderProps {
   title: string;
   description: string;
@@ -12,10 +11,7 @@ export const CalculatorHeader: React.FC<CalculatorHeaderProps> = ({
 }) => (
   <div className='aucctus-bg-secondary-subtle aucctus-border-primary rounded-lg border bg-opacity-50 p-4'>
     <div className='flex items-start gap-3'>
-      <Icon
-        variant='book-open'
-        className='aucctus-stroke-brand-primary mt-2 h-5 w-5'
-      />
+      <BookOpen className='aucctus-stroke-brand-primary mt-2 h-5 w-5' />
       <div>
         <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-1'>
           {title}

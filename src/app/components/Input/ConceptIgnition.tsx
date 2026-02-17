@@ -1,9 +1,9 @@
 import Button from '../Button';
-import Icon from '../Icon';
 import InputField from './InputField/InputField';
 import React from 'react';
 import TextArea from './TextArea/TextArea';
 import { ConceptIncubationQuestion, IDetailQuestion } from '@libs/api/types';
+import { Plus } from 'lucide-react';
 
 interface ConceptIncubationInputProps {
   value?: string;
@@ -97,12 +97,7 @@ const ConceptIncubation: React.FC<ConceptIncubationInputProps> = ({
                   className='inline-flex items-center justify-start gap-2 rounded-lg py-2 pr-3.5 text-xs font-bold text-primary-600'
                   onClick={() => setShowDetails(!showDetails)}
                 >
-                  <Icon
-                    variant='plus'
-                    className='stroke-primary-800'
-                    height={20}
-                    width={20}
-                  />
+                  <Plus size={20} className='stroke-primary-800' />
                   Add Details
                 </button>
               )

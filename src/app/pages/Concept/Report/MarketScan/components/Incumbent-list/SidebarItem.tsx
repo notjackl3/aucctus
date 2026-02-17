@@ -1,9 +1,10 @@
 import images from '@assets/img';
-import { Badge, Button, Icon } from '@components';
+import { Badge, Button } from '@components';
 import { IIncumbent } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { getLogoUrl } from '@libs/utils/source';
 import React from 'react';
+import { Link } from 'lucide-react';
 
 interface SidebarItemProps {
   incumbent: IIncumbent;
@@ -53,7 +54,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({
               window.open(incumbent.domain, '_blank');
             }}
           >
-            <Icon variant='link' height='12' width='12' />
+            <Link height='12' width='12' />
           </Button>
         )}
       </div>

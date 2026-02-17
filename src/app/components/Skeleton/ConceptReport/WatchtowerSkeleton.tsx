@@ -1,8 +1,7 @@
 import React from 'react';
 import SkeletonBlock from './SkeletonBlock';
 import AgentProgressBar from '../../Progress/AgentProgressBar';
-import Icon from '../../Icon';
-
+import { Signal } from 'lucide-react';
 interface WatchtowerSkeletonProps {
   /** Message to display about the current scan progress */
   progressMessage?: string;
@@ -29,12 +28,7 @@ const WatchtowerSkeleton: React.FC<WatchtowerSkeletonProps> = ({
         <div className='aucctus-bg-secondary aucctus-border-secondary rounded-xl border p-6'>
           <div className='mb-4 flex items-center gap-3'>
             <div className='flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-amber-500/20 to-red-500/20'>
-              <Icon
-                variant='signal-02'
-                height={20}
-                width={20}
-                className='stroke-amber-500'
-              />
+              <Signal size={20} className='stroke-amber-500' />
             </div>
             <div>
               <h3 className='aucctus-text-primary aucctus-text-md-semibold'>

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { InsightCard } from '../types';
+import { Minus, TrendingDown, TrendingUp } from 'lucide-react';
 
 export const getSentimentColor = (
   sentiment: InsightCard['sentiment'],
@@ -16,31 +16,14 @@ export const getSentimentIcon = (sentiment: InsightCard['sentiment']) => {
   switch (sentiment) {
     case 'headwind':
       return (
-        <Icon
-          variant='trending-down'
-          className='aucctus-stroke-error-primary'
-          height={12}
-          width={12}
-        />
+        <TrendingDown size={12} className='aucctus-stroke-error-primary' />
       );
     case 'tailwind':
       return (
-        <Icon
-          variant='trendup'
-          className='aucctus-stroke-success-primary'
-          height={12}
-          width={12}
-        />
+        <TrendingUp size={12} className='aucctus-stroke-success-primary' />
       );
     case 'neutral':
-      return (
-        <Icon
-          variant='minus'
-          className='aucctus-stroke-info-primary'
-          height={12}
-          width={12}
-        />
-      );
+      return <Minus size={12} className='aucctus-stroke-info-primary' />;
     default:
       return null;
   }

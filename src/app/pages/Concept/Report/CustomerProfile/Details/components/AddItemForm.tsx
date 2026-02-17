@@ -1,5 +1,7 @@
 import React from 'react';
-import { Input, Button, Icon } from '@components';
+import { Input, Button } from '@components';
+import { Check, X } from 'lucide-react';
+import LoadingSpinner from '@components/Icon/LoadingSpinner';
 
 /**
  * Props for AddItemForm
@@ -51,12 +53,7 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
         disabled={loading}
       >
         <span className='flex items-center'>
-          <Icon
-            className='aucctus-stroke-primary'
-            variant='closeX'
-            height={14}
-            width={14}
-          />
+          <X size={14} className='aucctus-stroke-primary' />
         </span>
       </Button>
       <Button
@@ -67,14 +64,9 @@ const AddItemForm: React.FC<AddItemFormProps> = ({
         disabled={loading}
       >
         <span className='flex items-center'>
-          <Icon
-            variant='check'
-            height={14}
-            width={14}
-            className='aucctus-stroke-white'
-          />
+          <Check size={14} className='aucctus-stroke-white' />
           {loading && (
-            <Icon.LoadingSpinner className='ml-2' height={16} width={16} />
+            <LoadingSpinner className='ml-2' height={16} width={16} />
           )}
         </span>
       </Button>

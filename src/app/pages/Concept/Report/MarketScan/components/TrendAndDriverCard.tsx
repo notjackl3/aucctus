@@ -1,4 +1,4 @@
-import { Card, Icon, Modal } from '@components';
+import { Card, Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import {
   IInsight,
@@ -8,6 +8,7 @@ import {
 } from '@libs/api/types';
 import { FunctionComponent, useCallback, useMemo, useRef } from 'react';
 import SourceBadgeFooter from './sources/SourceBadgeFooter';
+import { Link2 } from 'lucide-react';
 
 const iconDefaultProps = {
   height: 19,
@@ -70,7 +71,7 @@ const TrendAndDriverCard: FunctionComponent<ITrendsAndDriversProps> = ({
         cursor-pointer items-center justify-center
         rounded-md p-[4px] transition-colors'
       >
-        <Icon variant='link-source' {...iconDefaultProps} />
+        <Link2 {...iconDefaultProps} />
       </div>
     );
   }, [

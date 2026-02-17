@@ -1,6 +1,5 @@
 import images from '@assets/img';
-import { Badge, Icon } from '@components';
-import type { IconProps } from '@components/Icon/Icon/Icon';
+import { Badge } from '@components';
 import { cn } from '@libs/utils/react';
 import { getLogoUrl } from '@libs/utils/source';
 import React from 'react';
@@ -8,6 +7,8 @@ import ComponentCarousel from '../../Carousel/ComponentCarousel';
 import ComponentTooltip from '../../ToolTip/ComponentTooltip';
 import { Company } from '../hooks/useEcosystem';
 import ProductImage from './ProductImage';
+import { ExternalLink, MapPin, Sparkles } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface CompanyDetailPanelProps {
   company: Company | null;
@@ -43,7 +44,7 @@ const extractSources = (text: string) => {
 type SourceDisplay = {
   label: string;
   iconUrl?: string;
-  iconVariant?: IconProps['variant'];
+  iconVariant?: string;
 };
 
 const SOURCE_MAP: Record<string, SourceDisplay> = {
@@ -172,7 +173,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
               }}
             />
           ) : (
-            <Icon
+            <DynamicIcon
               variant={source.iconVariant || 'link-external'}
               className='aucctus-stroke-primary h-4 w-4 flex-shrink-0'
             />
@@ -255,7 +256,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
           {/* Right side - Location info */}
           <div className='flex flex-col items-end gap-2'>
             <Badge.WithIcon className='aucctus-border-primary aucctus-text-primary'>
-              <Icon variant='map-pin' />
+              <MapPin />
               <span className='whitespace-nowrap text-sm'>
                 {company.headquarters}
               </span>
@@ -268,10 +269,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                   rel='noopener noreferrer'
                   className='flex h-8 w-8 items-center justify-center rounded bg-black hover:bg-black/90'
                 >
-                  <Icon
-                    variant='link-external'
-                    className='aucctus-stroke-white h-4 w-4'
-                  />
+                  <ExternalLink className='aucctus-stroke-white h-4 w-4' />
                 </a>
               )}
             </div>
@@ -381,10 +379,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                   <span className='aucctus-text-primary pr-1 text-xs font-medium'>
                     {source.name}
                   </span>
-                  <Icon
-                    variant='link-external'
-                    className='aucctus-stroke-primary h-4 w-4'
-                  />
+                  <ExternalLink className='aucctus-stroke-primary h-4 w-4' />
                 </a>
               ))}
             </div>
@@ -428,10 +423,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
                         }
                       }}
                     >
-                      <Icon
-                        variant='link-external'
-                        className='h-3.5 w-3.5 stroke-white'
-                      />
+                      <ExternalLink className='h-3.5 w-3.5 stroke-white' />
                       View Product
                     </button>
                   </div>
@@ -471,10 +463,7 @@ const CompanyDetailPanel: React.FC<CompanyDetailPanelProps> = ({ company }) => {
         {company.nextSteps && company.nextSteps.length > 0 && (
           <div className='aucctus-border-primary rounded border p-6'>
             <h3 className='text-foreground mb-4 flex items-center gap-2 text-sm font-semibold'>
-              <Icon
-                variant='sparkles'
-                className='aucctus-stroke-primary h-4 w-4'
-              />
+              <Sparkles className='aucctus-stroke-primary h-4 w-4' />
               Possible Next Steps
             </h3>
 

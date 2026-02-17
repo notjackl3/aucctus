@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { useConceptVideoGenerate } from '@hooks/query/concepts.hook';
 import { useConceptVideoGenerationEvents } from '@hooks/sockets/conceptVideo';
 import React, { useCallback, useEffect, useState } from 'react';
+import { AlertCircle, Check, Clock, Download, PlaySquare } from 'lucide-react';
 
 interface IConceptVideoGenerationProps {
   conceptUuid: string;
@@ -88,10 +88,7 @@ const ConceptVideoGeneration: React.FC<IConceptVideoGenerationProps> = ({
             onClick={hasVideo ? handleResetAndRegenerate : handleGenerateVideo}
             disabled={generateVideoMutation.isLoading}
           >
-            <Icon
-              variant='play-square'
-              className='aucctus-stroke-white h-4 w-4'
-            />
+            <PlaySquare className='aucctus-stroke-white h-4 w-4' />
             {hasVideo ? 'Regenerate Video' : 'Generate Video'}
           </button>
         )}
@@ -135,10 +132,7 @@ const ConceptVideoGeneration: React.FC<IConceptVideoGenerationProps> = ({
               {/* Stage indicator */}
               {videoGenerationState.stage && (
                 <div className='aucctus-text-tertiary mt-2 flex items-center gap-2 text-xs'>
-                  <Icon
-                    variant='clock'
-                    className='aucctus-stroke-tertiary h-3 w-3'
-                  />
+                  <Clock className='aucctus-stroke-tertiary h-3 w-3' />
                   <span>Stage: {videoGenerationState.stage}</span>
                 </div>
               )}
@@ -151,10 +145,7 @@ const ConceptVideoGeneration: React.FC<IConceptVideoGenerationProps> = ({
       {hasError && (
         <div className='aucctus-bg-error-subtle aucctus-border-error rounded-xl border p-6'>
           <div className='flex items-start gap-3'>
-            <Icon
-              variant='alert-circle'
-              className='aucctus-stroke-error-primary h-5 w-5 flex-shrink-0'
-            />
+            <AlertCircle className='aucctus-stroke-error-primary h-5 w-5 flex-shrink-0' />
             <div className='flex-1'>
               <h4 className='aucctus-text-error-primary mb-1 font-semibold'>
                 Video Generation Failed
@@ -194,7 +185,7 @@ const ConceptVideoGeneration: React.FC<IConceptVideoGenerationProps> = ({
             {hasCompleted && (
               <div className='absolute right-4 top-4'>
                 <div className='aucctus-bg-success-solid flex items-center gap-2 rounded-full px-3 py-1.5 shadow-lg'>
-                  <Icon variant='check' className='h-4 w-4 stroke-white' />
+                  <Check className='h-4 w-4 stroke-white' />
                   <span className='aucctus-text-xs font-medium text-white'>
                     Generated
                   </span>
@@ -219,10 +210,7 @@ const ConceptVideoGeneration: React.FC<IConceptVideoGenerationProps> = ({
                 download='concept-video.mp4'
                 className='btn btn-secondary btn-xs'
               >
-                <Icon
-                  variant='download'
-                  className='aucctus-stroke-secondary h-3 w-3'
-                />
+                <Download className='aucctus-stroke-secondary h-3 w-3' />
                 Download
               </a>
             </div>
@@ -233,10 +221,7 @@ const ConceptVideoGeneration: React.FC<IConceptVideoGenerationProps> = ({
       {/* Empty State - no video yet */}
       {!hasVideo && !isGenerating && !hasError && (
         <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-xl border p-6 text-center'>
-          <Icon
-            variant='play-square'
-            className='aucctus-stroke-tertiary mx-auto mb-4 h-16 w-16'
-          />
+          <PlaySquare className='aucctus-stroke-tertiary mx-auto mb-4 h-16 w-16' />
           <h4 className='aucctus-text-primary mb-2 text-lg font-semibold'>
             No Video Yet
           </h4>

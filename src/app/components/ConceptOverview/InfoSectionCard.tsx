@@ -1,6 +1,6 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import React from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface InfoSectionCardProps {
   /** Icon variant to display in the header */
@@ -30,7 +30,7 @@ const InfoSectionCard: React.FC<InfoSectionCardProps> = ({
     <div className={cn('aucctus-border-primary rounded-lg border', className)}>
       <div className='p-5'>
         <div className='mb-3 flex items-center gap-2'>
-          <Icon
+          <DynamicIcon
             variant={iconVariant as any}
             className='aucctus-stroke-tertiary h-3 w-3'
           />

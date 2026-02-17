@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export interface StatusConfig {
   bg: string;
@@ -36,7 +36,10 @@ const GenericStatusBadge: React.FC<GenericStatusBadgeProps> = ({
         className,
       )}
     >
-      <Icon variant={config.icon} className={cn('h-3 w-3', config.stroke)} />
+      <DynamicIcon
+        variant={config.icon}
+        className={cn('h-3 w-3', config.stroke)}
+      />
       {config.label}
     </span>
   );

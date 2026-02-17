@@ -1,4 +1,4 @@
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import { DynamicComponentRenderer } from '@components/DynamicComponent/DynamicComponentRenderer';
 import { useWorkshop } from '@hooks/query/dynamicComponent.hook';
 import type { IDynamicComponent } from '@libs/api/types/dynamicComponent.d';
@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { IConceptReportContext } from '../ConceptReport/ConceptReport';
+import { Eye, FileCode, Layers } from 'lucide-react';
 
 /**
  * Workshop page for testing dynamic component generation.
@@ -171,7 +172,7 @@ const Workshop: React.FC = () => {
               </>
             ) : (
               <>
-                <Icon variant='filecode' className='h-4 w-4 stroke-white' />
+                <FileCode className='h-4 w-4 stroke-white' />
                 <span>Generate Component</span>
               </>
             )}
@@ -217,10 +218,7 @@ const Workshop: React.FC = () => {
         className='space-y-4'
       >
         <div className='flex items-center gap-2'>
-          <Icon
-            variant='layers'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <Layers className='aucctus-stroke-brand-primary h-5 w-5' />
           <h2 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
             Generated Components
           </h2>
@@ -238,10 +236,7 @@ const Workshop: React.FC = () => {
         ) : components.length === 0 ? (
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-8'>
             <div className='flex flex-col items-center justify-center text-center'>
-              <Icon
-                variant='filecode'
-                className='aucctus-stroke-tertiary mb-4 h-12 w-12'
-              />
+              <FileCode className='aucctus-stroke-tertiary mb-4 h-12 w-12' />
               <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
                 No components yet
               </h3>
@@ -316,10 +311,7 @@ const Workshop: React.FC = () => {
                             }}
                             className='btn btn-secondary btn-sm'
                           >
-                            <Icon
-                              variant='eye'
-                              className='mr-1 h-4 w-4 stroke-current'
-                            />
+                            <Eye className='mr-1 h-4 w-4 stroke-current' />
                             {selectedComponentUuid === component.uuid
                               ? 'Hide'
                               : 'Preview'}
@@ -333,10 +325,7 @@ const Workshop: React.FC = () => {
                             }}
                             className='btn btn-secondary btn-sm'
                           >
-                            <Icon
-                              variant='filecode'
-                              className='mr-1 h-4 w-4 stroke-current'
-                            />
+                            <FileCode className='mr-1 h-4 w-4 stroke-current' />
                             Code
                           </motion.button>
                         </>

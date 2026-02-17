@@ -1,5 +1,4 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { animationStyles } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
 import { useNucleusLoadingState } from './hooks/useNucleusLoadingState';
@@ -7,6 +6,7 @@ import { NucleusHeroBackground } from '../NucleusHeroBackground';
 import CategoryPill from './components/CategoryPill';
 import ActiveBadge from './components/ActiveBadge';
 import NucleusLoadingCardCarousel from './components/NucleusLoadingCardCarousel';
+import { Check, Mail } from 'lucide-react';
 
 export interface NucleusLoadingStateProps {}
 
@@ -149,24 +149,14 @@ const NucleusLoadingState: React.FC<NucleusLoadingStateProps> = ({}) => {
                 </div>
               ) : isNotified ? (
                 <>
-                  <Icon
-                    variant='check'
-                    width={16}
-                    height={16}
-                    className='stroke-white'
-                  />
+                  <Check size={16} className='stroke-white' />
                   <span className='aucctus-text-sm-medium text-white'>
                     Notifying You
                   </span>
                 </>
               ) : (
                 <>
-                  <Icon
-                    variant='mail'
-                    width={16}
-                    height={16}
-                    className='stroke-white'
-                  />
+                  <Mail size={16} className='stroke-white' />
                   <span className='aucctus-text-sm-medium text-white'>
                     Notify When Done
                   </span>

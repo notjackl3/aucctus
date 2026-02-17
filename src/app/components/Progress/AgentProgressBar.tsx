@@ -8,8 +8,7 @@ import React, {
 import { useAgentEstimatedTime } from '@hooks/query/agent-timing.hook';
 import { cn } from '@libs/utils/react';
 import telemetry from '@libs/telemetry';
-import Icon from '@components/Icon';
-
+import { Mail } from 'lucide-react';
 export interface AgentProgressBarProps {
   /**
    * The name of the agent being executed (must match backend agent name)
@@ -644,12 +643,7 @@ const AgentProgressBar: React.FC<AgentProgressBarProps> = ({
                 onClick={onEmail}
                 disabled={isEmailScheduled}
               >
-                <Icon
-                  variant='mail'
-                  width={16}
-                  height={16}
-                  className='aucctus-stroke-white'
-                />
+                <Mail size={16} className='aucctus-stroke-white' />
                 {isEmailScheduled ? 'Email scheduled' : 'Email me'}
               </button>
             )}

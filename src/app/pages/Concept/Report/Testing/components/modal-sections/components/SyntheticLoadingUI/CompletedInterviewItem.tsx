@@ -1,6 +1,6 @@
-import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types/concept/concepts';
 import React from 'react';
+import { Check, UserSquare } from 'lucide-react';
 
 interface CompletedInterviewItemProps {
   profile: ICustomerProfile;
@@ -23,16 +23,13 @@ export const CompletedInterviewItem: React.FC<CompletedInterviewItemProps> = ({
           />
         ) : (
           <div className='aucctus-bg-secondary flex h-12 w-12 items-center justify-center rounded-full'>
-            <Icon
-              variant='user-square'
-              className='aucctus-stroke-secondary h-6 w-6'
-            />
+            <UserSquare className='aucctus-stroke-secondary h-6 w-6' />
           </div>
         )}
 
         {/* Green checkmark at top-right */}
         <div className='absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-green-500'>
-          <Icon variant='check' className='h-3 w-3 stroke-white stroke-2' />
+          <Check className='h-3 w-3 stroke-white stroke-2' />
         </div>
       </div>
 

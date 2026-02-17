@@ -1,8 +1,8 @@
 /* eslint-disable react/prop-types */
 import React, { useState, memo, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { Icon } from '@components';
 import ManualAnswerEdit from './ManualAnswerEdit';
+import { Loader2, Pencil, Target, X } from 'lucide-react';
 
 interface ManualAnswerProps {
   answer?: string;
@@ -18,12 +18,7 @@ const ManualAnswerView = memo<{
 }>(({ answer, onEdit }) => (
   <>
     <div className='mb-2 flex items-start gap-2'>
-      <Icon
-        variant='target'
-        className='aucctus-stroke-white mt-0.5 flex-shrink-0'
-        height={16}
-        width={16}
-      />
+      <Target size={16} className='aucctus-stroke-white mt-0.5 flex-shrink-0' />
       <span className='aucctus-text-sm-medium leading-tight'>Your Answer</span>
     </div>
 
@@ -46,12 +41,7 @@ const ManualAnswerView = memo<{
         className='inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-2 py-1 transition-colors hover:bg-white/15'
         title='Edit answer'
       >
-        <Icon
-          variant='edit'
-          className='aucctus-stroke-white'
-          height={12}
-          width={12}
-        />
+        <Pencil size={12} className='aucctus-stroke-white' />
         <span className='aucctus-text-xs-medium max-w-[80px] truncate'>
           Edit
         </span>
@@ -159,23 +149,13 @@ const ManualAnswer: React.FC<ManualAnswerProps> = ({
           className='aucctus-bg-error-solid hover:aucctus-bg-error-solid-hover absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full transition-colors duration-200'
           title='Delete answer'
         >
-          <Icon
-            variant='closeX'
-            className='aucctus-stroke-white'
-            height={12}
-            width={12}
-          />
+          <X size={12} className='aucctus-stroke-white' />
         </button>
       )}
 
       {isDeletingRequest && (
         <div className='absolute inset-0 flex items-center justify-center rounded-xl bg-black/20'>
-          <Icon
-            variant='loading-02'
-            className='aucctus-stroke-white animate-spin'
-            height={24}
-            width={24}
-          />
+          <Loader2 size={24} className='aucctus-stroke-white animate-spin' />
         </div>
       )}
 

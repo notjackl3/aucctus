@@ -1,14 +1,16 @@
-import { Button, Card, Icon, Loading, Text } from '@components';
+import { Button, Card, Loading, Text } from '@components';
 import { useStartup } from '@hooks/query/company.hook';
 import { EngagementAction, ISource } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { toTitleCase } from '@libs/utils/string';
 import React, { useCallback } from 'react';
 import InfoSection from '../InfoSection';
+import { Link2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // TODO: Handling Loading
 
-const ACTION_ICON_MAPPING: Record<EngagementAction, IconVariant> = {
+const ACTION_ICON_MAPPING: Record<EngagementAction, string> = {
   acquisition: 'target',
   investment: 'shield-dollar',
   partnership: 'link-03',
@@ -39,7 +41,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
       return null;
     }
 
-    return <Icon variant={engagementIcon} />;
+    return <DynamicIcon variant={engagementIcon} />;
   }, []);
 
   const handleEvidenceClick = useCallback(
@@ -231,7 +233,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
                         size='xs'
                         onClick={handleEvidenceClick(fact.text, fact.evidence)}
                       >
-                        <Icon variant='link-source' />
+                        <Link2 />
                       </Button>
                     </div>
                   </li>
@@ -274,7 +276,7 @@ const StartupDetails: React.FC<StartupDetailsProps> = ({
                           );
                         }}
                       >
-                        <Icon
+                        <DynamicIcon
                           variant={contact.linkedin ? 'linkedin' : 'mail'}
                           className='fill-primary-100 stroke-primary-100'
                           height={20}

@@ -1,7 +1,7 @@
 import { FunctionComponent, useEffect } from 'react';
-import { Icon } from '@components';
 import { usePocPlanStatus, useOnPocPlanReady } from '@hooks/query/pocPlan.hook';
 import { cn } from '@libs/utils/react';
+import { Check, Rocket } from 'lucide-react';
 
 interface IPocGeneratingOverlayProps {
   conceptUuid: string;
@@ -78,10 +78,7 @@ const PocGeneratingOverlay: FunctionComponent<IPocGeneratingOverlayProps> = ({
               'shadow-lg',
             )}
           >
-            <Icon
-              variant='rocket'
-              className='h-12 w-12 animate-pulse stroke-white'
-            />
+            <Rocket className='h-12 w-12 animate-pulse stroke-white' />
           </div>
         </div>
 
@@ -145,10 +142,7 @@ const PocGeneratingOverlay: FunctionComponent<IPocGeneratingOverlayProps> = ({
                   )}
                 >
                   {isComplete ? (
-                    <Icon
-                      variant='check'
-                      className='h-3 w-3 stroke-white stroke-2'
-                    />
+                    <Check className='h-3 w-3 stroke-white stroke-2' />
                   ) : isCurrent ? (
                     <div className='h-2 w-2 animate-pulse rounded-full bg-white' />
                   ) : (

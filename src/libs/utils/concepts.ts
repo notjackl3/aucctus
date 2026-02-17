@@ -250,7 +250,7 @@ export function getAssumptionHexColor(
 }
 
 export function getDashboardConceptStatusIcon(status: ActiveConceptStatus) {
-  const conceptStatusIconObj: Record<ActiveConceptStatus, IconVariant> = {
+  const conceptStatusIconObj: Record<ActiveConceptStatus, string> = {
     prototyping: 'lightbulb',
     proofOfConcept: 'paper-airplane',
     minimumViableProduct: 'rocket',

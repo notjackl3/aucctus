@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { Header, flexRender } from '@tanstack/react-table';
 import React from 'react';
+import { ArrowDown, ArrowUp } from 'lucide-react';
 
 // Column IDs that should be pinned to the right when horizontal scroll is active
 const PINNED_RIGHT_COLUMNS = ['actions', 'settings'];
@@ -101,15 +101,8 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
             {flexRender(header.column.columnDef.header, header.getContext())}
             {header.column.getCanSort() &&
               ({
-                asc: (
-                  <Icon variant='arrowup' className='ml-1 stroke-primary-800' />
-                ),
-                desc: (
-                  <Icon
-                    variant='arrowdown'
-                    className='ml-1 stroke-primary-800'
-                  />
-                ),
+                asc: <ArrowUp className='ml-1 stroke-primary-800' />,
+                desc: <ArrowDown className='ml-1 stroke-primary-800' />,
               }[header.column.getIsSorted() as string] ??
                 null)}
           </span>

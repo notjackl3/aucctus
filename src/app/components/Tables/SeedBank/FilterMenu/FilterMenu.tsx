@@ -1,4 +1,4 @@
-import { Avatar, Icon, Input } from '@components';
+import { Avatar, Input } from '@components';
 import { useAllUsers } from '@hooks/query/account.hook';
 import { ISeedFilterOptions } from '@hooks/tables/concept-seed.hook';
 import { SeedStatus } from '@libs/api/types';
@@ -8,6 +8,7 @@ import { cn } from '@libs/utils/react';
 import * as Menubar from '@radix-ui/react-menubar';
 import React from 'react';
 import SubMenuTrigger from './FilterMenuTrigger';
+import { ListFilter } from 'lucide-react';
 
 // TODO: Revisit typing for status options
 
@@ -107,12 +108,7 @@ const FilterMenubar: React.FC<IFilterMenubarProps> = ({
     <Menubar.Root className='flex flex-row'>
       <Menubar.Menu>
         <Menubar.Trigger className='flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 transition-colors duration-200 hover:bg-primary-50 active:bg-primary-100'>
-          <Icon
-            variant='filter-lines'
-            height={18}
-            width={18}
-            className='stroke-primary-500'
-          />
+          <ListFilter className='stroke-primary-500' />
           <span className='font-inter text-sm font-semibold leading-[143%] text-[#514141]'>
             Filters
           </span>

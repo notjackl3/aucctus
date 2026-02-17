@@ -1,6 +1,6 @@
-import Icon from '../Icon';
 import { cn } from '@libs/utils/react';
 import { FunctionComponent } from 'react';
+import { Bell } from 'lucide-react';
 
 interface IVersionUpgradeBannerProps {
   onUpgrade: () => void;
@@ -33,12 +33,7 @@ const VersionUpgradeBanner: FunctionComponent<IVersionUpgradeBannerProps> = ({
         <div className='flex flex-1 items-start gap-3'>
           {/* Icon with subtle primary accent */}
           <div className='aucctus-bg-brand-primary mt-0.5 rounded-full p-1'>
-            <Icon
-              variant='announcement'
-              className='aucctus-stroke-brand-primary'
-              height={16}
-              width={16}
-            />
+            <Bell size={16} className='aucctus-stroke-brand-primary' />
           </div>
 
           <div className='flex-1'>

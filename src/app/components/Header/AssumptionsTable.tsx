@@ -1,5 +1,6 @@
-import { Badge, Header, Icon } from '@components';
+import { Badge, Header } from '@components';
 import React from 'react';
+import { Plus } from 'lucide-react';
 
 interface AssumptionsTableProps {
   text: string;
@@ -19,7 +20,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
         <Badge.Count value={count} />
       </div>
       <button onClick={handleAdd}>
-        <Icon variant='plus' />
+        <Plus />
       </button>
     </div>
   );

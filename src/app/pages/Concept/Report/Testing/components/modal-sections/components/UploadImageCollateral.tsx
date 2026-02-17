@@ -1,7 +1,9 @@
 import React, { useState, useRef } from 'react';
-import { Icon, Loading, toast } from '@components';
+import { Loading, toast } from '@components';
 import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import { useUploadTestCollateralImage } from '@hooks/query/testing.hook';
+import { Upload } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface UploadImageCollateralProps {
   conceptUuid?: string;
@@ -91,12 +93,12 @@ const UploadImageCollateral: React.FC<UploadImageCollateralProps> = ({
         type='button'
       >
         <div className='flex items-center gap-2'>
-          <Icon variant='upload' className='aucctus-stroke-tertiary h-5 w-5' />
+          <Upload className='aucctus-stroke-tertiary h-5 w-5' />
           <span className='aucctus-text-sm-semibold aucctus-text-tertiary'>
             Upload Image Collateral
           </span>
         </div>
-        <Icon
+        <DynamicIcon
           variant={isExpanded ? 'chevronup' : 'chevrondown'}
           className='aucctus-stroke-tertiary h-4 w-4'
         />

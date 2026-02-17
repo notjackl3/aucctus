@@ -1,11 +1,11 @@
 import defaultAvatar from '@assets/img/avatar.png';
 import Avatar from '@components/Avatar';
-import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { CustomerProfileMessage } from '@stores/customer_profile_conversations/store';
 import useStore from '@stores/store';
 import React from 'react';
+import { AlertCircle, AlertTriangle } from 'lucide-react';
 
 interface CustomerProfileChatMessage {
   agentId: string;
@@ -54,21 +54,11 @@ const CustomerProfileChatMessage: React.FC<CustomerProfileChatMessageProps> = ({
     return (
       <div className='mb-2 flex flex-1 animate-expand flex-row'>
         <div className='aucctus-bg-error-primary aucctus-border-error flex h-6 w-6 items-center justify-center rounded-full border'>
-          <Icon
-            variant='alert-circle'
-            className='aucctus-stroke-white'
-            height={14}
-            width={14}
-          />
+          <AlertCircle size={14} className='aucctus-stroke-white' />
         </div>
         <div className='aucctus-text-error-primary aucctus-bg-error-secondary aucctus-border-error ml-4 h-fit max-w-[70%] rounded-lg border p-4'>
           <div className='mb-2 flex items-center gap-2'>
-            <Icon
-              variant='alert-triangle'
-              className='aucctus-stroke-error-primary'
-              height={16}
-              width={16}
-            />
+            <AlertTriangle size={16} className='aucctus-stroke-error-primary' />
             <span className='aucctus-text-error-primary aucctus-text-sm-semibold'>
               Error
             </span>

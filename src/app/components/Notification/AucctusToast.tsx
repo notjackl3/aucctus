@@ -1,8 +1,8 @@
 import React from 'react';
-import Icon from '../Icon';
 import Avatar from '../Avatar';
 import { ToastContentProps } from 'react-toastify';
 import useStore from '@stores/store';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Define possible status types
 type ToastStatus = 'warning' | 'alert' | 'success';
@@ -23,7 +23,7 @@ const iconDefaultProps = {
 const statusStyles: Record<
   ToastStatus,
   {
-    iconVariant: IconVariant;
+    iconVariant: string;
     iconColor: string;
     avatarBg: string;
     borderColor: string;
@@ -86,7 +86,7 @@ const AucctusToast: React.FC<CustomToastProps> = ({ closeToast, data }) => {
         {/* Title with icon */}
         <div className='flex flex-col gap-1'>
           <div className='flex items-center gap-2'>
-            <Icon
+            <DynamicIcon
               variant={iconVariant}
               {...iconDefaultProps}
               className={iconColor}

@@ -1,11 +1,12 @@
 import React from 'react';
 
 import { ICustomerProfile } from '@libs/api/types';
-import Icon from '@components/Icon/Icon/Icon';
 // TODO: This should be a PNG
 import { Card } from '@components';
 import utils from '@libs/utils';
 import defaultAvatar from '../../assets/img/avatar.png';
+import { Users } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ICustomerProfilesCardProps {
   profile: ICustomerProfile | undefined;
@@ -27,7 +28,7 @@ type DemographicProfile = keyof Pick<
 >;
 const DEMOGRAPHIC_VALUE_MAP: Record<
   DemographicProfile,
-  { prefix: string; icon: IconVariant }
+  { prefix: string; icon: string }
 > = {
   geoLocation: {
     icon: 'globe',
@@ -64,16 +65,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
           onClick={onViewProfilesClick}
           aria-label='View Customer Profiles'
         >
-          <span>
-            {
-              <Icon
-                variant='user-group'
-                width={16}
-                height={16}
-                stroke='#626BA3'
-              />
-            }
-          </span>
+          <span>{<Users size={16} stroke='#626BA3' />}</span>
           View Profile
         </button>
       }
@@ -108,7 +100,7 @@ const CustomerProfilesCard: React.FC<ICustomerProfilesCardProps> = ({
                 key={`${item}${utils.string.generateRandomString(6)}`}
                 className='inline-flex h-4 items-center justify-start gap-3 self-stretch'
               >
-                <Icon variant={DEMOGRAPHIC_VALUE_MAP[item].icon} />
+                <DynamicIcon variant={DEMOGRAPHIC_VALUE_MAP[item].icon} />
                 <span className='aucctus-text-tertiary aucctus-text-sm shrink grow basis-0 text-sm'>
                   {DEMOGRAPHIC_VALUE_MAP[item].prefix}{' '}
                   {profile ? profile[item] : ''}

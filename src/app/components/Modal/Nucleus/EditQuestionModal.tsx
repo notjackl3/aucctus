@@ -1,6 +1,5 @@
 import { FunctionComponent, useCallback, useState, useEffect } from 'react';
 import { Input } from '@components';
-import Icon from '../../Icon/Icon/Icon';
 import { useModal } from '../../../context/ModalContextProvider';
 import { useUpdateQuestion } from '../../../hooks/query/nucleusCrud.hook';
 import {
@@ -8,6 +7,7 @@ import {
   AssessmentStatus,
 } from '@libs/api/types/nucleus';
 import CategorySelect from '../../Modal/CustomerProfile/CategorySelect';
+import { X } from 'lucide-react';
 
 interface EditQuestionModalProps {
   reportUuid: string;
@@ -219,7 +219,7 @@ const EditQuestionModal: FunctionComponent<EditQuestionModalProps> = ({
           onClick={closeModal}
           type='button'
         >
-          <Icon variant='closeX' />
+          <X />
         </button>
       </div>
 

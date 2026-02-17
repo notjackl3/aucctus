@@ -1,11 +1,20 @@
 import React, { useMemo } from 'react';
-import { Icon } from '@components';
 import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import { getCategoryIcon } from '../../../../../Assumptions/utils/assumptionUtils';
 import { getCategoryColors } from '../../../../../Assumptions/constants/categoryColors';
 import { AssumptionCategory } from '@libs/api/types';
 import { ITestAssumptionDetailed } from '../../../../types';
 import { cn } from '@libs/utils/react';
+import {
+  ArrowRight,
+  Check,
+  CircleDot,
+  Target,
+  TrendingDown,
+  TrendingUp,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface AssumptionValidationCardProps {
   assumption: ITestAssumptionDetailed;
@@ -127,11 +136,11 @@ const ChangeBadge: React.FC<{
   const badgeContent =
     direction === 'up' ? (
       <span className='ml-1 inline-flex cursor-help items-center rounded-full bg-green-100 px-1 py-0.5'>
-        <Icon variant='trending-up' className='h-3 w-3 stroke-green-700' />
+        <TrendingUp className='h-3 w-3 stroke-green-700' />
       </span>
     ) : (
       <span className='ml-1 inline-flex cursor-help items-center rounded-full bg-red-100 px-1 py-0.5'>
-        <Icon variant='trending-down' className='h-3 w-3 stroke-red-700' />
+        <TrendingDown className='h-3 w-3 stroke-red-700' />
       </span>
     );
 
@@ -156,7 +165,7 @@ const ChangeBadge: React.FC<{
       </div>
 
       {/* Arrow */}
-      <Icon variant='arrowright' className='aucctus-stroke-tertiary h-4 w-4' />
+      <ArrowRight className='aucctus-stroke-tertiary h-4 w-4' />
 
       {/* After */}
       <div className='flex flex-col items-center gap-1'>
@@ -254,7 +263,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
     const categoryColors = getCategoryColors(category as AssumptionCategory);
 
     return (
-      <Icon
+      <DynamicIcon
         variant={iconVariant as any}
         className={`${categoryColors.stroke} h-5 w-5`}
       />
@@ -372,7 +381,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
         <div className='flex w-full flex-col justify-center border-l border-[#17B26A]/20 bg-[#ECFDF3] p-4 lg:w-72'>
           <div className='mb-2 flex items-center gap-2'>
             <div className='rounded-full bg-[#DCFAE6] p-1'>
-              <Icon variant='target' className='h-3 w-3 stroke-[#17B26A]' />
+              <Target className='h-3 w-3 stroke-[#17B26A]' />
             </div>
             <span className='text-xs font-medium text-[#079455]'>
               THRESHOLD
@@ -407,8 +416,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
                 },
               )}
             >
-              <Icon
-                variant='check'
+              <Check
                 className={cn('h-3.5 w-3.5', {
                   'stroke-white': normalizedStatus === 'validated',
                   'stroke-green-700': normalizedStatus !== 'validated',
@@ -435,8 +443,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
                 },
               )}
             >
-              <Icon
-                variant='check'
+              <Check
                 className={cn('h-3.5 w-3.5', {
                   'stroke-white': normalizedStatus === 'partially_validated',
                   'stroke-yellow-700':
@@ -464,8 +471,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
                 },
               )}
             >
-              <Icon
-                variant='closeX'
+              <X
                 className={cn('h-3.5 w-3.5', {
                   'stroke-white': normalizedStatus === 'invalidated',
                   'stroke-red-700': normalizedStatus !== 'invalidated',
@@ -492,8 +498,7 @@ const AssumptionValidationCard: React.FC<AssumptionValidationCardProps> = ({
                 },
               )}
             >
-              <Icon
-                variant='circle-empty'
+              <CircleDot
                 className={cn('h-3.5 w-3.5', {
                   'stroke-white': normalizedStatus === 'no-change',
                   'stroke-gray-700': normalizedStatus !== 'no-change',

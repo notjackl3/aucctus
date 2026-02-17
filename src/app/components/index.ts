@@ -8,7 +8,13 @@ import Chart from './Charts'; // Object with chart components - keep for compati
 import Container from './Container';
 import FileDropzone from './FileDropzone';
 import Header from './Header';
-import Icon from './Icon';
+// Icon sub-components (main Icon replaced by direct lucide-react imports)
+export {
+  LoadingSpinner,
+  AssumptionCategoryIcon,
+  RotatingIcon,
+  QuestionIcon,
+} from './Icon';
 import Input from './Input';
 import Legend from './Legends'; // Object with legend components - keep for compatibility
 import Modal from './Modal';
@@ -90,7 +96,6 @@ export {
   LiquidGlassModalFooter,
   LiquidGlassTabs,
   Header,
-  Icon,
   Input,
   Legend, // This is an object with legend components - keep for compatibility
   Loading,

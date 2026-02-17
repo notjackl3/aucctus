@@ -5,8 +5,8 @@ import {
   isClerkRuntimeError,
   isReverificationCancelledError,
 } from '@clerk/clerk-react/errors';
-import Icon from '../../../components/Icon/Icon/Icon';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
+import { Pencil, Save } from 'lucide-react';
 
 const defaultIconProps = {
   width: 20,
@@ -229,7 +229,7 @@ const SecurityDetails: FunctionComponent = () => {
               setIsFormDisabled(false);
             }}
           >
-            <Icon variant='edit' {...defaultIconProps} />
+            <Pencil {...defaultIconProps} />
             Update Password
           </button>
         ) : (
@@ -238,7 +238,7 @@ const SecurityDetails: FunctionComponent = () => {
             type='submit'
             disabled={isLoading}
           >
-            <Icon variant='save' {...defaultIconProps} />
+            <Save {...defaultIconProps} />
             Save
           </button>
         )}

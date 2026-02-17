@@ -6,7 +6,7 @@
  * settings, and unsaved changes tracking.
  */
 
-import { ComponentTooltip, Icon, toast } from '@components';
+import { ComponentTooltip, toast } from '@components';
 import SaveScoringConfigModal from '@components/Modal/Nucleus/SaveScoringConfigModal';
 import { useModal } from '@context/ModalContextProvider';
 import { useBulkPrioritySocketEvents } from '@hooks/query/concept-priority.hook';
@@ -35,6 +35,23 @@ import { useQueryClient } from 'react-query';
 
 import ConceptScoringConfigSkeleton from './ConceptScoringConfigSkeleton';
 import { ScoringCategory, ScoringQuestion } from './types';
+import {
+  AlertCircle,
+  AlertTriangle,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  Clock,
+  EllipsisVertical,
+  HelpCircle,
+  Lightbulb,
+  List,
+  Pencil,
+  Plus,
+  Target,
+  Trash2,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Helper to convert API categories to local state format
 const apiToLocalCategories = (
@@ -217,8 +234,7 @@ const ImportanceDropdown: React.FC<{
           <span className={cn('text-sm font-medium', currentConfig.textClass)}>
             {currentConfig.label}
           </span>
-          <Icon
-            variant='chevrondown'
+          <ChevronDown
             className={cn('h-4 w-4', currentConfig.textClass)}
             style={{ stroke: 'currentColor' }}
           />
@@ -264,10 +280,7 @@ const ImportanceDropdown: React.FC<{
 
                   {/* Checkmark for selected */}
                   {isSelected && (
-                    <Icon
-                      variant='check'
-                      className='aucctus-stroke-primary mt-1 h-4 w-4 flex-shrink-0'
-                    />
+                    <Check className='aucctus-stroke-primary mt-1 h-4 w-4 flex-shrink-0' />
                   )}
                 </button>
               );
@@ -296,7 +309,12 @@ const CategoryIcon: React.FC<{ icon: string; className?: string }> = ({
 }) => {
   const iconVariant = icon as any;
   return (
-    <Icon variant={iconVariant} className={className} height={16} width={16} />
+    <DynamicIcon
+      variant={iconVariant}
+      className={className}
+      height={16}
+      width={16}
+    />
   );
 };
 
@@ -662,10 +680,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
             <div className='flex flex-1 items-center gap-4'>
               {/* Icon on the left */}
               <div className='aucctus-bg-brand-secondary aucctus-border-brand w-fit flex-shrink-0 rounded-lg border p-2'>
-                <Icon
-                  variant='target'
-                  className='aucctus-stroke-brand-primary h-5 w-5'
-                />
+                <Target className='aucctus-stroke-brand-primary h-5 w-5' />
               </div>
 
               {/* Title and description to the right of icon */}
@@ -691,10 +706,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                   {totalQuestions} questions
                 </span>
               )}
-              <Icon
-                variant='chevrondown'
-                className='aucctus-stroke-tertiary h-4 w-4'
-              />
+              <ChevronDown className='aucctus-stroke-tertiary h-4 w-4' />
             </div>
           </div>
         ) : (
@@ -705,10 +717,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                 {/* Icon at top left */}
                 <div className='mb-3'>
                   <div className='aucctus-bg-brand-secondary aucctus-border-brand w-fit rounded-lg border p-2'>
-                    <Icon
-                      variant='target'
-                      className='aucctus-stroke-brand-primary h-5 w-5'
-                    />
+                    <Target className='aucctus-stroke-brand-primary h-5 w-5' />
                   </div>
                 </div>
 
@@ -718,10 +727,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                 </h3>
               </div>
 
-              <Icon
-                variant='chevronleft'
-                className='aucctus-stroke-tertiary h-5 w-5 rotate-180'
-              />
+              <ChevronLeft className='aucctus-stroke-tertiary h-5 w-5 rotate-180' />
             </div>
 
             {/* Description - left aligned */}
@@ -736,10 +742,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                 {categories.length === 0 ? (
                   <div className='aucctus-text-xs flex items-center gap-2'>
                     <div className='aucctus-bg-warning-subtle flex items-center gap-1.5 rounded-md px-2 py-1'>
-                      <Icon
-                        variant='clock'
-                        className='aucctus-stroke-warning-primary h-4 w-4'
-                      />
+                      <Clock className='aucctus-stroke-warning-primary h-4 w-4' />
                       <span className='aucctus-text-warning-primary font-medium'>
                         Awaiting Nucleus completion
                       </span>
@@ -748,19 +751,13 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                 ) : (
                   <div className='aucctus-text-xs flex items-center gap-2'>
                     <div className='aucctus-bg-secondary flex items-center gap-1.5 rounded-md px-2 py-1'>
-                      <Icon
-                        variant='list'
-                        className='aucctus-stroke-tertiary h-4 w-4'
-                      />
+                      <List className='aucctus-stroke-tertiary h-4 w-4' />
                       <span className='aucctus-text-secondary font-medium'>
                         {categories.length} categories
                       </span>
                     </div>
                     <div className='aucctus-bg-secondary flex items-center gap-1.5 rounded-md px-2 py-1'>
-                      <Icon
-                        variant='help-circle'
-                        className='aucctus-stroke-tertiary h-4 w-4'
-                      />
+                      <HelpCircle className='aucctus-stroke-tertiary h-4 w-4' />
                       <span className='aucctus-text-secondary font-medium'>
                         {totalQuestions} questions
                       </span>
@@ -819,10 +816,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
             ) : isError ? (
               <div className='flex h-[500px] items-center justify-center'>
                 <div className='flex flex-col items-center gap-3 text-center'>
-                  <Icon
-                    variant='alert-triangle'
-                    className='aucctus-stroke-error-primary h-10 w-10'
-                  />
+                  <AlertTriangle className='aucctus-stroke-error-primary h-10 w-10' />
                   <p className='aucctus-text-sm aucctus-text-error'>
                     Failed to load scoring configuration
                   </p>
@@ -836,10 +830,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
               <div className='flex h-[500px] items-center justify-center'>
                 <div className='flex max-w-md flex-col items-center gap-4 text-center'>
                   <div className='aucctus-bg-secondary/50 rounded-full p-4'>
-                    <Icon
-                      variant='target'
-                      className='aucctus-stroke-tertiary h-12 w-12'
-                    />
+                    <Target className='aucctus-stroke-tertiary h-12 w-12' />
                   </div>
                   <div>
                     <h3 className='aucctus-text-lg-semibold aucctus-text-primary mb-2'>
@@ -853,10 +844,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                     </p>
                     <div className='aucctus-bg-info-subtle aucctus-border-info-subtle rounded-lg border p-3'>
                       <div className='flex items-start gap-2'>
-                        <Icon
-                          variant='alert-circle'
-                          className='aucctus-stroke-info-primary mt-0.5 h-4 w-4 shrink-0'
-                        />
+                        <AlertCircle className='aucctus-stroke-info-primary mt-0.5 h-4 w-4 shrink-0' />
                         <p className='aucctus-text-xs aucctus-text-info-primary text-left'>
                           If you&apos;ve already completed a Nucleus run, please
                           contact your administrator to generate the scoring
@@ -964,11 +952,9 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                                   }}
                                   title='Rename'
                                 >
-                                  <Icon
-                                    variant='edit'
+                                  <Pencil
+                                    size={14}
                                     className='aucctus-stroke-tertiary'
-                                    height={14}
-                                    width={14}
                                   />
                                 </button>
                                 <button
@@ -979,11 +965,9 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                                   }}
                                   title='Delete'
                                 >
-                                  <Icon
-                                    variant='trash'
+                                  <Trash2
+                                    size={14}
                                     className='aucctus-stroke-error-primary'
-                                    height={14}
-                                    width={14}
                                   />
                                 </button>
                               </div>
@@ -1033,11 +1017,9 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                           className='aucctus-border-secondary aucctus-text-secondary hover:aucctus-text-primary mt-2 flex w-full items-center gap-3 rounded-lg border border-dashed px-3 py-2.5 text-left transition-all hover:border-gray-400 hover:bg-white/60 dark:hover:bg-gray-800/60'
                         >
                           <div className='aucctus-bg-secondary rounded-md p-1.5'>
-                            <Icon
-                              variant='plus'
+                            <Plus
+                              size={16}
                               className='aucctus-stroke-tertiary'
-                              height={16}
-                              width={16}
                             />
                           </div>
                           <span className='text-sm font-medium'>
@@ -1061,12 +1043,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                           className='btn btn-primary btn-sm'
                           onClick={handleAddQuestion}
                         >
-                          <Icon
-                            variant='plus'
-                            className='aucctus-stroke-white'
-                            height={16}
-                            width={16}
-                          />
+                          <Plus size={16} className='aucctus-stroke-white' />
                           Add Question
                         </button>
                       </div>
@@ -1075,10 +1052,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                       <div className='space-y-2'>
                         {selectedCategory.questions.length === 0 ? (
                           <div className='aucctus-text-secondary py-12 text-center'>
-                            <Icon
-                              variant='lightbulb'
-                              className='aucctus-stroke-tertiary mx-auto mb-3 h-10 w-10 opacity-30'
-                            />
+                            <Lightbulb className='aucctus-stroke-tertiary mx-auto mb-3 h-10 w-10 opacity-30' />
                             <p className='aucctus-text-sm'>No questions yet</p>
                             <p className='aucctus-text-xs mt-1'>
                               Add questions to evaluate concepts in this
@@ -1094,11 +1068,9 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                               <div className='flex items-start gap-3'>
                                 {/* Drag Handle */}
                                 <div className='mt-2.5 cursor-grab opacity-40 transition-opacity active:cursor-grabbing group-hover:opacity-100'>
-                                  <Icon
-                                    variant='dots-vertical'
+                                  <EllipsisVertical
+                                    size={16}
                                     className='aucctus-stroke-tertiary'
-                                    height={16}
-                                    width={16}
                                   />
                                 </div>
 
@@ -1189,11 +1161,9 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                                       }
                                       title='Deleting this will remove the category'
                                     >
-                                      <Icon
-                                        variant='trash'
+                                      <Trash2
+                                        size={16}
                                         className='aucctus-stroke-error-primary'
-                                        height={16}
-                                        width={16}
                                       />
                                     </button>
                                   </ComponentTooltip>
@@ -1205,11 +1175,9 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
                                     }
                                     title='Delete question'
                                   >
-                                    <Icon
-                                      variant='trash'
+                                    <Trash2
+                                      size={16}
                                       className='aucctus-stroke-error-primary'
-                                      height={16}
-                                      width={16}
                                     />
                                   </button>
                                 )}

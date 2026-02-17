@@ -1,8 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import ApplyRecommendationsWarningModal from './ApplyRecommendationsWarningModal';
 import { IComprehensiveEditRecommendation } from '../../../../types';
+import { Check, Lightbulb, Loader2, X } from 'lucide-react';
 
 interface RecommendedChangesSectionProps {
   recommendations: IComprehensiveEditRecommendation[];
@@ -78,10 +78,7 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
       {/* Header */}
       <div className='space-y-2'>
         <div className='flex items-center gap-2'>
-          <Icon
-            variant='lightbulb'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <Lightbulb className='aucctus-stroke-brand-primary h-5 w-5' />
           <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
             Recommended Changes to Your Concept
           </h4>
@@ -139,10 +136,7 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
                   disabled={isApplying}
                   className='aucctus-bg-secondary absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full transition-colors hover:opacity-80'
                 >
-                  <Icon
-                    variant='closeX'
-                    className='aucctus-stroke-tertiary h-4 w-4'
-                  />
+                  <X className='aucctus-stroke-tertiary h-4 w-4' />
                 </button>
               )}
             </div>
@@ -157,7 +151,7 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
           >
             <div className='flex items-start gap-3'>
               <div className='aucctus-bg-success-solid flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full'>
-                <Icon variant='check' className='h-3 w-3 stroke-white' />
+                <Check className='h-3 w-3 stroke-white' />
               </div>
               <span className='aucctus-text-sm aucctus-text-tertiary leading-relaxed'>
                 {recommendation.recommendation}
@@ -184,15 +178,12 @@ const RecommendedChangesSection: React.FC<RecommendedChangesSectionProps> = ({
           >
             {isApplying ? (
               <>
-                <Icon
-                  variant='loading-02'
-                  className='h-4 w-4 animate-spin stroke-current'
-                />
+                <Loader2 className='h-4 w-4 animate-spin stroke-current' />
                 Applying...
               </>
             ) : (
               <>
-                <Icon variant='check' className='h-4 w-4 stroke-current' />
+                <Check className='h-4 w-4 stroke-current' />
                 Apply Selected Changes
               </>
             )}

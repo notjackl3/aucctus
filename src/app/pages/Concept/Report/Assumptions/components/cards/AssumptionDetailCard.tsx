@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { Icon, Modal } from '@components';
+import { Modal } from '@components';
 import EditableStatusBadge from '../badges/EditableStatusBadge';
 import RiskBadge from '../badges/RiskBadge';
 import EditableImportanceMeter from '../badges/EditableImportanceMeter';
@@ -13,6 +13,7 @@ import useStore from '@stores/store';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
 import { useBatchAssumptionChangesStore } from '@stores/batch-assumption-changes';
+import { Trash2 } from 'lucide-react';
 
 interface AssumptionDetailCardProps {
   assumption: IAssumptionV2;
@@ -299,10 +300,7 @@ const AssumptionDetailCard: React.FC<AssumptionDetailCardProps> = ({
             className='aucctus-bg-primary-hover aucctus-border-secondary rounded-md border p-2 shadow-sm'
             aria-label='Delete assumption'
           >
-            <Icon
-              variant='trash'
-              className='aucctus-stroke-error-primary h-4 w-4'
-            />
+            <Trash2 className='aucctus-stroke-error-primary h-4 w-4' />
           </button>
         </div>
       )}

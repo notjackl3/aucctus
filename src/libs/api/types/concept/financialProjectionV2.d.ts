@@ -135,7 +135,7 @@ export interface ICostDriverV2 extends IBaseFinancialProjectionEntity {
   description: string;
   costPercentageEstimate: number;
   mitigationStatement: string;
-  icon?: IconVariant;
+  icon?: string;
 }
 
 export interface ICreateCostDriverV2 {
@@ -143,7 +143,7 @@ export interface ICreateCostDriverV2 {
   description: string;
   costPercentageEstimate: number;
   mitigationStatement: string;
-  icon?: IconVariant;
+  icon?: string;
 }
 
 export interface IPatchCostDriverV2 {
@@ -151,7 +151,7 @@ export interface IPatchCostDriverV2 {
   description?: string;
   costPercentageEstimate?: number;
   mitigationStatement?: string;
-  icon?: IconVariant;
+  icon?: string;
 }
 
 // Distribution Channel types
@@ -260,7 +260,7 @@ export interface ICostInterferenceV2 extends IBaseFinancialProjectionEntity {
   title: string;
   interferenceInsight: string;
   mitigationStatement: string;
-  icon?: IconVariant;
+  icon?: string;
 }
 
 export interface ICreateCostInterferenceV2 {
@@ -268,7 +268,7 @@ export interface ICreateCostInterferenceV2 {
   description: string;
   interferenceInsight: string;
   mitigationStatement: string;
-  icon?: IconVariant;
+  icon?: string;
 }
 
 export interface IPatchCostInterferenceV2 {
@@ -276,7 +276,7 @@ export interface IPatchCostInterferenceV2 {
   description?: string;
   interferenceInsight?: string;
   mitigationStatement?: string;
-  icon?: IconVariant;
+  icon?: string;
 }
 
 // Impact Sizing types

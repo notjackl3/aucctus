@@ -1,10 +1,12 @@
 import React, { useMemo } from 'react';
 import images from '@assets/img';
-import { ComponentTooltip, Icon } from '@components';
+import { ComponentTooltip } from '@components';
 import type { NucleusAnswerSource, FileType } from '@libs/api/types/nucleus';
 import { cn } from '@libs/utils/react';
 import { getBaseUrl, getLogoUrl } from '@libs/utils/source';
 import { motion } from 'framer-motion';
+import { Lightbulb, Link } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // File type icon mapping to Icon component variants
 const FILE_TYPE_ICONS: Record<FileType, string> = {
@@ -132,7 +134,7 @@ const NucleusSourceBadge: React.FC<NucleusSourceBadgeProps> = ({
             logoContainerClass,
           )}
         >
-          <Icon
+          <DynamicIcon
             variant={iconVariant as 'file'}
             className={cn('aucctus-stroke-tertiary', iconSizeClass)}
           />
@@ -149,8 +151,7 @@ const NucleusSourceBadge: React.FC<NucleusSourceBadgeProps> = ({
             logoContainerClass,
           )}
         >
-          <Icon
-            variant='lightbulb'
+          <Lightbulb
             className={cn('aucctus-stroke-quaternary', iconSizeClass)}
           />
         </div>
@@ -176,10 +177,7 @@ const NucleusSourceBadge: React.FC<NucleusSourceBadgeProps> = ({
             }}
           />
         ) : (
-          <Icon
-            variant='link'
-            className={cn('aucctus-stroke-tertiary', iconSizeClass)}
-          />
+          <Link className={cn('aucctus-stroke-tertiary', iconSizeClass)} />
         )}
       </div>
     );
@@ -196,7 +194,7 @@ const NucleusSourceBadge: React.FC<NucleusSourceBadgeProps> = ({
       {/* Header with icon and source type */}
       <div className='mb-3 flex items-center gap-3'>
         <div className='aucctus-bg-secondary flex h-10 w-10 shrink-0 items-center justify-center rounded-lg'>
-          <Icon
+          <DynamicIcon
             variant={iconVariant as 'file'}
             className='aucctus-stroke-tertiary h-5 w-5'
           />

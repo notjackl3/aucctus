@@ -1,10 +1,5 @@
 import images from '@assets/img';
-import {
-  ConceptReportSkeletons,
-  Icon,
-  Loading,
-  OverseerWrapper,
-} from '@components';
+import { ConceptReportSkeletons, Loading, OverseerWrapper } from '@components';
 import { useAccountLogo } from '@hooks/query/admin.hook';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -43,6 +38,29 @@ import { AppPath } from '@routes/routes';
 import { useNavigate } from 'react-router-dom';
 import type { Signal, SignalCategory, SignalType } from './types';
 import { signalCategoryConfig, signalTypeConfig } from './types';
+import {
+  AlertCircle,
+  AlertTriangle,
+  Check,
+  ChevronDown,
+  Clock,
+  EllipsisVertical,
+  ExternalLink,
+  Eye,
+  Layers,
+  Lightbulb,
+  Plus,
+  RefreshCw,
+  Settings,
+  Signal as SignalIcon,
+  Sparkles,
+  Star,
+  Target,
+  Trash2,
+  TrendingUp,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * Transform API signal to local Signal type
@@ -451,7 +469,7 @@ const SignalRadar: React.FC<{
                 }}
               >
                 <div className='flex h-full w-full items-center justify-center'>
-                  <Icon
+                  <DynamicIcon
                     variant={
                       signalCategoryConfig[signal.category].iconVariant as any
                     }
@@ -829,10 +847,8 @@ const WatchtowerPageContent: React.FC = () => {
                   }}
                   className='relative z-10 mb-4'
                 >
-                  <Icon
-                    variant='signal-02'
-                    height={40}
-                    width={40}
+                  <SignalIcon
+                    size={40}
                     className='relative z-10 stroke-white/90'
                   />
                 </motion.div>
@@ -949,10 +965,8 @@ const WatchtowerPageContent: React.FC = () => {
                 }}
                 className='relative z-10 mb-4'
               >
-                <Icon
-                  variant='signal-02'
-                  height={40}
-                  width={40}
+                <SignalIcon
+                  size={40}
                   className='relative z-10 stroke-white/90'
                 />
               </motion.div>
@@ -1001,10 +1015,8 @@ const WatchtowerPageContent: React.FC = () => {
                 : 'border-white/20 bg-white/10 hover:border-white/30 hover:bg-white/15',
             )}
           >
-            <Icon
-              variant='eye'
-              height={12}
-              width={12}
+            <Eye
+              size={12}
               className={cn(
                 'stroke-current',
                 filter === 'all' ? 'text-blue-400' : 'text-white/60',
@@ -1025,10 +1037,8 @@ const WatchtowerPageContent: React.FC = () => {
                 : 'border-white/20 bg-white/10 hover:border-white/30 hover:bg-white/15',
             )}
           >
-            <Icon
-              variant='alert-triangle'
-              height={12}
-              width={12}
+            <AlertTriangle
+              size={12}
               className={cn(
                 'stroke-current',
                 filter === 'threat' ? 'text-red-400' : 'text-white/60',
@@ -1049,10 +1059,8 @@ const WatchtowerPageContent: React.FC = () => {
                 : 'border-white/20 bg-white/10 hover:border-white/30 hover:bg-white/15',
             )}
           >
-            <Icon
-              variant='sparkles'
-              height={12}
-              width={12}
+            <Sparkles
+              size={12}
               className={cn(
                 'stroke-current',
                 filter === 'opportunity' ? 'text-green-400' : 'text-white/60',
@@ -1073,10 +1081,8 @@ const WatchtowerPageContent: React.FC = () => {
                 : 'border-white/20 bg-white/10 hover:border-white/30 hover:bg-white/15',
             )}
           >
-            <Icon
-              variant='eye'
-              height={12}
-              width={12}
+            <Eye
+              size={12}
               className={cn(
                 'stroke-current',
                 filter === 'watch' ? 'text-slate-200' : 'text-white/60',
@@ -1102,24 +1108,14 @@ const WatchtowerPageContent: React.FC = () => {
                   : 'border-white/20 bg-white/10 hover:border-white/30 hover:bg-white/15',
               )}
             >
-              <Icon
-                variant='layers'
-                height={12}
-                width={12}
-                className='stroke-white/80'
-              />
+              <Layers size={12} className='stroke-white/80' />
               <span className='font-semibold text-white'>Category</span>
               <span className='font-normal text-white/70'>
                 {categoryFilter === 'all'
                   ? 'All'
                   : signalCategoryConfig[categoryFilter].label}
               </span>
-              <Icon
-                variant='chevrondown'
-                height={12}
-                width={12}
-                className='stroke-white/60'
-              />
+              <ChevronDown size={12} className='stroke-white/60' />
             </button>
 
             {/* Dropdown menu */}
@@ -1146,12 +1142,7 @@ const WatchtowerPageContent: React.FC = () => {
                     All Categories
                   </span>
                   {categoryFilter === 'all' && (
-                    <Icon
-                      variant='check'
-                      height={16}
-                      width={16}
-                      className='aucctus-stroke-brand-primary'
-                    />
+                    <Check size={16} className='aucctus-stroke-brand-primary' />
                   )}
                 </button>
                 {(
@@ -1174,7 +1165,7 @@ const WatchtowerPageContent: React.FC = () => {
                     )}
                   >
                     <div className='flex items-center gap-2'>
-                      <Icon
+                      <DynamicIcon
                         variant={config.iconVariant as any}
                         height={16}
                         width={16}
@@ -1193,10 +1184,8 @@ const WatchtowerPageContent: React.FC = () => {
                       </span>
                     </div>
                     {categoryFilter === key && (
-                      <Icon
-                        variant='check'
-                        height={16}
-                        width={16}
+                      <Check
+                        size={16}
                         className='aucctus-stroke-brand-primary'
                       />
                     )}
@@ -1238,12 +1227,7 @@ const WatchtowerPageContent: React.FC = () => {
             className='absolute bottom-6 left-6 z-10 inline-flex select-none items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur-md transition-all duration-200 hover:border-white/30 hover:bg-white/15'
             title='Last Updated'
           >
-            <Icon
-              variant='clock'
-              height={14}
-              width={14}
-              className='stroke-white/60'
-            />
+            <Clock size={14} className='stroke-white/60' />
             {isScanningActive ? (
               <span className='text-white'>
                 {scanProgress.message || 'Scanning...'}
@@ -1268,10 +1252,8 @@ const WatchtowerPageContent: React.FC = () => {
               )}
               title='Refresh signals'
             >
-              <Icon
-                variant='refresh'
-                height={12}
-                width={12}
+              <RefreshCw
+                size={12}
                 className={cn(
                   'stroke-current',
                   isScanningActive && 'animate-spin',
@@ -1287,12 +1269,7 @@ const WatchtowerPageContent: React.FC = () => {
             onClick={() => setShowCustomize(true)}
             className='absolute bottom-6 right-6 z-10 inline-flex select-none items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur-md transition-all duration-200 hover:border-white/30 hover:bg-white/15'
           >
-            <Icon
-              variant='gear'
-              height={14}
-              width={14}
-              className='stroke-white'
-            />
+            <Settings size={14} className='stroke-white' />
             <span className='text-white'>Customize</span>
           </button>
         )}
@@ -1313,12 +1290,7 @@ const WatchtowerPageContent: React.FC = () => {
                   onClick={() => setShowCustomize(false)}
                   className='absolute right-4 top-4 rounded-full border border-white/20 bg-white/10 p-1.5 transition-colors hover:border-white/30 hover:bg-white/20'
                 >
-                  <Icon
-                    variant='closeX'
-                    height={16}
-                    width={16}
-                    className='stroke-white'
-                  />
+                  <X size={16} className='stroke-white' />
                 </button>
                 <div className='max-w-2xl'>
                   <h4 className='mb-1 text-sm font-semibold text-white'>
@@ -1344,12 +1316,7 @@ const WatchtowerPageContent: React.FC = () => {
                       disabled={!newRule.trim() || isCreatingRule}
                       className='flex items-center gap-1.5 rounded-lg border border-white/30 bg-white/20 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/30 disabled:opacity-40 disabled:hover:bg-white/20'
                     >
-                      <Icon
-                        variant='plus'
-                        height={16}
-                        width={16}
-                        className='stroke-current'
-                      />
+                      <Plus size={16} className='stroke-current' />
                       {isCreatingRule ? 'Adding...' : 'Add Rule'}
                     </button>
                   </div>
@@ -1370,12 +1337,7 @@ const WatchtowerPageContent: React.FC = () => {
                             disabled={isDeletingRule}
                             className='rounded p-1 text-white/40 opacity-0 transition-colors hover:bg-red-500/20 hover:text-red-400 disabled:opacity-30 group-hover:opacity-100'
                           >
-                            <Icon
-                              variant='trash'
-                              height={14}
-                              width={14}
-                              className='stroke-current'
-                            />
+                            <Trash2 size={14} className='stroke-current' />
                           </button>
                         </div>
                       ))}
@@ -1398,12 +1360,7 @@ const WatchtowerPageContent: React.FC = () => {
           style={{ bottom: showCustomize ? 'auto' : 0 }}
         >
           <div className='flex items-center gap-1 opacity-40 transition-opacity group-hover:opacity-100'>
-            <Icon
-              variant='dots-vertical'
-              height={16}
-              width={16}
-              className='rotate-90 stroke-white/60'
-            />
+            <EllipsisVertical size={16} className='rotate-90 stroke-white/60' />
           </div>
         </div>
       </div>
@@ -1427,12 +1384,7 @@ const WatchtowerPageContent: React.FC = () => {
         <div className='px-6 pb-6'>
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border p-6'>
             <div className='mb-4 flex items-center gap-2'>
-              <Icon
-                variant='star-01'
-                height={20}
-                width={20}
-                className='stroke-amber-500'
-              />
+              <Star size={20} className='stroke-amber-500' />
               <h3 className='aucctus-text-primary aucctus-text-lg-semibold'>
                 Pinned Signals
               </h3>
@@ -1459,7 +1411,7 @@ const WatchtowerPageContent: React.FC = () => {
                             'aucctus-bg-secondary aucctus-text-secondary',
                         )}
                       >
-                        <Icon
+                        <DynamicIcon
                           variant={
                             signal.type === 'threat'
                               ? 'alert-triangle'
@@ -1474,7 +1426,7 @@ const WatchtowerPageContent: React.FC = () => {
                         {signalTypeConfig[signal.type].label}
                       </div>
                       <div className='aucctus-bg-secondary aucctus-text-secondary flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px]'>
-                        <Icon
+                        <DynamicIcon
                           variant={
                             signalCategoryConfig[signal.category]
                               .iconVariant as any
@@ -1494,12 +1446,7 @@ const WatchtowerPageContent: React.FC = () => {
                       className='rounded p-1 text-amber-500 transition-colors hover:bg-amber-500/10 hover:text-amber-600'
                       title='Unpin signal'
                     >
-                      <Icon
-                        variant='closeX'
-                        height={14}
-                        width={14}
-                        className='stroke-current'
-                      />
+                      <X size={14} className='stroke-current' />
                     </button>
                   </div>
                   <h4 className='aucctus-text-primary aucctus-text-sm-medium line-clamp-2 leading-snug transition-colors group-hover:text-opacity-80'>
@@ -1539,12 +1486,7 @@ const WatchtowerPageContent: React.FC = () => {
               {/* Header */}
               <div className='aucctus-border-secondary flex items-center justify-between border-b px-6 py-4'>
                 <div className='flex items-center gap-2'>
-                  <Icon
-                    variant='star-01'
-                    height={16}
-                    width={16}
-                    className='stroke-amber-500'
-                  />
+                  <Star size={16} className='stroke-amber-500' />
                   <span className='aucctus-text-primary font-semibold'>
                     Pinned Signal
                   </span>
@@ -1553,12 +1495,7 @@ const WatchtowerPageContent: React.FC = () => {
                   onClick={() => setOpenPinnedSignal(null)}
                   className='aucctus-bg-secondary-hover rounded-lg p-2 transition-colors'
                 >
-                  <Icon
-                    variant='closeX'
-                    height={16}
-                    width={16}
-                    className='aucctus-stroke-secondary'
-                  />
+                  <X size={16} className='aucctus-stroke-secondary' />
                 </button>
               </div>
 
@@ -1578,7 +1515,7 @@ const WatchtowerPageContent: React.FC = () => {
                           'aucctus-border-secondary aucctus-bg-secondary aucctus-text-secondary',
                       )}
                     >
-                      <Icon
+                      <DynamicIcon
                         variant={
                           openPinnedSignal.type === 'threat'
                             ? 'alert-triangle'
@@ -1593,7 +1530,7 @@ const WatchtowerPageContent: React.FC = () => {
                       {signalTypeConfig[openPinnedSignal.type].label}
                     </div>
                     <div className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-secondary flex items-center gap-1.5 rounded border px-2 py-1 text-xs'>
-                      <Icon
+                      <DynamicIcon
                         variant={
                           signalCategoryConfig[openPinnedSignal.category]
                             .iconVariant as any
@@ -1659,12 +1596,7 @@ const WatchtowerPageContent: React.FC = () => {
                   {/* Meta row */}
                   <div className='aucctus-text-tertiary flex items-center gap-3 text-[11px]'>
                     <div className='flex items-center gap-1.5'>
-                      <Icon
-                        variant='clock'
-                        height={12}
-                        width={12}
-                        className='stroke-current'
-                      />
+                      <Clock size={12} className='stroke-current' />
                       <span>
                         {(() => {
                           const date = new Date(openPinnedSignal.dateAdded);
@@ -1700,10 +1632,8 @@ const WatchtowerPageContent: React.FC = () => {
                     )}
                   >
                     <div className='mb-2 flex items-center gap-1.5'>
-                      <Icon
-                        variant='lightbulb'
-                        height={14}
-                        width={14}
+                      <Lightbulb
+                        size={14}
                         className={cn(
                           'stroke-current',
                           openPinnedSignal.type === 'threat' && 'text-red-500',
@@ -1727,10 +1657,8 @@ const WatchtowerPageContent: React.FC = () => {
                     {/* What Changed */}
                     <div className='space-y-1.5'>
                       <div className='flex items-center gap-1.5'>
-                        <Icon
-                          variant='trendup'
-                          height={12}
-                          width={12}
+                        <TrendingUp
+                          size={12}
                           className='aucctus-stroke-tertiary'
                         />
                         <span className='aucctus-text-secondary text-[10px] font-semibold uppercase tracking-wider'>
@@ -1745,12 +1673,7 @@ const WatchtowerPageContent: React.FC = () => {
                     {/* Why It Matters */}
                     <div className='space-y-1.5'>
                       <div className='flex items-center gap-1.5'>
-                        <Icon
-                          variant='target'
-                          height={12}
-                          width={12}
-                          className='aucctus-stroke-tertiary'
-                        />
+                        <Target size={12} className='aucctus-stroke-tertiary' />
                         <span className='aucctus-text-secondary text-[10px] font-semibold uppercase tracking-wider'>
                           Why It Matters
                         </span>
@@ -1763,10 +1686,8 @@ const WatchtowerPageContent: React.FC = () => {
                     {/* Likely Impact */}
                     <div className='space-y-1.5'>
                       <div className='flex items-center gap-1.5'>
-                        <Icon
-                          variant='trending-up'
-                          height={12}
-                          width={12}
+                        <TrendingUp
+                          size={12}
                           className='aucctus-stroke-tertiary'
                         />
                         <span className='aucctus-text-secondary text-[10px] font-semibold uppercase tracking-wider'>
@@ -1794,10 +1715,8 @@ const WatchtowerPageContent: React.FC = () => {
                     return (
                       <div className='aucctus-border-secondary space-y-3 border-t pt-4'>
                         <div className='flex items-center gap-1.5'>
-                          <Icon
-                            variant='lightbulb'
-                            height={14}
-                            width={14}
+                          <Lightbulb
+                            size={14}
                             className='stroke-amber-500/70'
                           />
                           <span className='aucctus-text-secondary text-xs font-semibold uppercase tracking-wider'>
@@ -1835,10 +1754,8 @@ const WatchtowerPageContent: React.FC = () => {
                                   </div>
 
                                   <div className='flex items-start gap-1.5'>
-                                    <Icon
-                                      variant='alert-circle'
-                                      height={12}
-                                      width={12}
+                                    <AlertCircle
+                                      size={12}
                                       className={cn(
                                         'mt-0.5 flex-shrink-0',
                                         impact.impactType === 'acceleration'
@@ -1863,10 +1780,8 @@ const WatchtowerPageContent: React.FC = () => {
                                       }
                                       className='aucctus-bg-secondary-hover aucctus-border-secondary aucctus-text-primary flex flex-1 items-center justify-center gap-1.5 rounded-md border px-2.5 py-1.5 text-xs font-medium transition-colors'
                                     >
-                                      <Icon
-                                        variant='link-external'
-                                        height={12}
-                                        width={12}
+                                      <ExternalLink
+                                        size={12}
                                         className='stroke-current'
                                       />
                                       View Concept
@@ -1879,10 +1794,8 @@ const WatchtowerPageContent: React.FC = () => {
                         ) : noMaterialImpact ? (
                           <div className='rounded-lg border border-green-500/20 bg-green-500/10 p-3'>
                             <p className='text-xs text-green-600'>
-                              <Icon
-                                variant='check'
-                                height={12}
-                                width={12}
+                              <Check
+                                size={12}
                                 className='mr-1.5 inline stroke-current'
                               />
                               No material impact on active or near-term concepts

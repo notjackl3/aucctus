@@ -1,7 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
 import type { IAnchorThought } from '../types';
+import { Lightbulb } from 'lucide-react';
 
 interface FloatingAnchorThoughtProps {
   thoughts: IAnchorThought[];
@@ -50,11 +50,9 @@ const FloatingAnchorThought: React.FC<FloatingAnchorThoughtProps> = ({
                   animationDelay: `${index * 0.15}s`,
                 }}
               >
-                <Icon
-                  variant='lightbulb'
+                <Lightbulb
+                  size={16}
                   className='aucctus-stroke-warning-tertiary flex-shrink-0'
-                  height={16}
-                  width={16}
                 />
                 <span className='aucctus-text-sm-medium'>
                   {thought.thought}

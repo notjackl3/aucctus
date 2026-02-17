@@ -1,8 +1,10 @@
 import React from 'react';
-import { Badge, Icon } from '@components';
+import { Badge } from '@components';
 import { IBusinessModelV2 } from '@libs/api/types/concept/financialProjectionV2';
+import { DollarSign, TrendingUp } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
-const BusinessModelSubtypeIconMap: Record<string, IconVariant> = {
+const BusinessModelSubtypeIconMap: Record<string, string> = {
   // Revenue Models
   'Direct-to-Consumer Model': 'target',
   'Subscription Box Model': 'repeat-02',
@@ -70,7 +72,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
       <div className='mb-2 flex flex-1 flex-row items-center gap-2'>
         {businessModelData?.subtype && (
           <>
-            <Icon
+            <DynamicIcon
               variant={BusinessModelSubtypeIconMap[businessModelData.subtype]}
               className='aucctus-stroke-brand-secondary h-5 w-5'
             />
@@ -87,19 +89,13 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
       {/* Primary Value Driver Section */}
       <div className='aucctus-border-tertiary mt-4 border-t pt-3'>
         <div className='mb-2 flex items-center gap-2'>
-          <Icon
-            variant='trendup'
-            className='aucctus-stroke-secondary h-4 w-4'
-          />
+          <TrendingUp className='aucctus-stroke-secondary h-4 w-4' />
           <h4 className='aucctus-text-sm-medium aucctus-text-secondary'>
             Primary Value Driver
           </h4>
         </div>
         <div className='aucctus-bg-success-secondary flex items-center gap-2 rounded-md bg-opacity-25 px-3 py-2'>
-          <Icon
-            variant='currency-dollar'
-            className='aucctus-stroke-success-primary h-4 w-4'
-          />
+          <DollarSign className='aucctus-stroke-success-primary h-4 w-4' />
           <p className='aucctus-text-xs aucctus-text-success-primary'>
             Generate Revenue
           </p>

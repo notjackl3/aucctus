@@ -1,5 +1,4 @@
 import { FunctionComponent, useState } from 'react';
-import { Icon } from '@components';
 import {
   useNucleusReportLatest,
   useGenerateNucleusReport,
@@ -8,6 +7,15 @@ import {
 import { useAccountLogo, useUploadAccountLogo } from '@hooks/query/admin.hook';
 import { cn } from '@libs/utils/react';
 import { ProcessingStatus } from '@libs/api/types';
+import {
+  CheckCircle2,
+  Image,
+  PlaySquare,
+  Sparkles,
+  Upload,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * Get status configuration for nucleus report display
@@ -184,10 +192,7 @@ const AccountSettingsTab: FunctionComponent = () => {
         <div className='flex items-start justify-between'>
           <div className='flex-1'>
             <div className='mb-2 flex items-center gap-3'>
-              <Icon
-                variant='sparkles'
-                className='aucctus-stroke-brand-primary h-5 w-5'
-              />
+              <Sparkles className='aucctus-stroke-brand-primary h-5 w-5' />
               <h4 className='aucctus-text-lg-semibold aucctus-text-primary'>
                 Generate Nucleus
               </h4>
@@ -212,7 +217,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                 </div>
               ) : (
                 <div className='flex items-center gap-2'>
-                  <Icon
+                  <DynamicIcon
                     variant={statusConfig.iconVariant}
                     className={cn('h-4 w-4', statusConfig.iconClass)}
                   />
@@ -255,10 +260,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                 </>
               ) : (
                 <>
-                  <Icon
-                    variant='sparkles'
-                    className='h-4 w-4 fill-white stroke-white'
-                  />
+                  <Sparkles className='h-4 w-4 fill-white stroke-white' />
                   <span>Generate</span>
                 </>
               )}
@@ -272,10 +274,7 @@ const AccountSettingsTab: FunctionComponent = () => {
         <div className='flex items-start justify-between'>
           <div className='flex-1'>
             <div className='mb-2 flex items-center gap-3'>
-              <Icon
-                variant='play-square'
-                className='aucctus-stroke-brand-primary h-5 w-5'
-              />
+              <PlaySquare className='aucctus-stroke-brand-primary h-5 w-5' />
               <h4 className='aucctus-text-lg-semibold aucctus-text-primary'>
                 Generate Nucleus Video
               </h4>
@@ -303,10 +302,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                     },
                   )}
                 >
-                  <Icon
-                    variant='upload'
-                    className='aucctus-stroke-secondary h-4 w-4'
-                  />
+                  <Upload className='aucctus-stroke-secondary h-4 w-4' />
                   <span>Choose Image</span>
                   <input
                     id='hq-image-file'
@@ -319,10 +315,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                 </label>
                 {imageFile && (
                   <div className='flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1.5'>
-                    <Icon
-                      variant='image'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
+                    <Image className='aucctus-stroke-secondary h-4 w-4' />
                     <span className='aucctus-text-sm aucctus-text-secondary max-w-[200px] truncate'>
                       {imageFile.name}
                     </span>
@@ -332,10 +325,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                       disabled={isVideoGenerateDisabled}
                       className='ml-1 rounded-full p-0.5 hover:bg-gray-200'
                     >
-                      <Icon
-                        variant='closeX'
-                        className='aucctus-stroke-tertiary h-3 w-3'
-                      />
+                      <X className='aucctus-stroke-tertiary h-3 w-3' />
                     </button>
                   </div>
                 )}
@@ -348,10 +338,7 @@ const AccountSettingsTab: FunctionComponent = () => {
             {/* Success Message */}
             {isVideoGenerationStarted && (
               <div className='flex items-center gap-2 rounded-md bg-green-50 p-3'>
-                <Icon
-                  variant='check-circle-broken'
-                  className='aucctus-stroke-success-primary h-4 w-4'
-                />
+                <CheckCircle2 className='aucctus-stroke-success-primary h-4 w-4' />
                 <span className='aucctus-text-sm aucctus-text-success-primary'>
                   Video generation started. This may take several minutes.
                 </span>
@@ -378,10 +365,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                 </>
               ) : (
                 <>
-                  <Icon
-                    variant='play-square'
-                    className='h-4 w-4 stroke-white'
-                  />
+                  <PlaySquare className='h-4 w-4 stroke-white' />
                   <span>Generate Video</span>
                 </>
               )}
@@ -395,10 +379,7 @@ const AccountSettingsTab: FunctionComponent = () => {
         <div className='flex items-start justify-between'>
           <div className='flex-1'>
             <div className='mb-2 flex items-center gap-3'>
-              <Icon
-                variant='image'
-                className='aucctus-stroke-brand-primary h-5 w-5'
-              />
+              <Image className='aucctus-stroke-brand-primary h-5 w-5' />
               <h4 className='aucctus-text-lg-semibold aucctus-text-primary'>
                 Account Logo
               </h4>
@@ -445,10 +426,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                     },
                   )}
                 >
-                  <Icon
-                    variant='upload'
-                    className='aucctus-stroke-secondary h-4 w-4'
-                  />
+                  <Upload className='aucctus-stroke-secondary h-4 w-4' />
                   <span>Choose File</span>
                   <input
                     id='account-logo-file'
@@ -461,10 +439,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                 </label>
                 {logoFile && (
                   <div className='flex items-center gap-2 rounded-md bg-gray-100 px-3 py-1.5'>
-                    <Icon
-                      variant='image'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
+                    <Image className='aucctus-stroke-secondary h-4 w-4' />
                     <span className='aucctus-text-sm aucctus-text-secondary max-w-[200px] truncate'>
                       {logoFile.name}
                     </span>
@@ -474,10 +449,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                       disabled={isLogoUploading}
                       className='ml-1 rounded-full p-0.5 hover:bg-gray-200'
                     >
-                      <Icon
-                        variant='closeX'
-                        className='aucctus-stroke-tertiary h-3 w-3'
-                      />
+                      <X className='aucctus-stroke-tertiary h-3 w-3' />
                     </button>
                   </div>
                 )}
@@ -507,10 +479,7 @@ const AccountSettingsTab: FunctionComponent = () => {
             {/* Success Message */}
             {isLogoUploadSuccess && (
               <div className='flex items-center gap-2 rounded-md bg-green-50 p-3'>
-                <Icon
-                  variant='check-circle-broken'
-                  className='aucctus-stroke-success-primary h-4 w-4'
-                />
+                <CheckCircle2 className='aucctus-stroke-success-primary h-4 w-4' />
                 <span className='aucctus-text-sm aucctus-text-success-primary'>
                   Logo uploaded successfully.
                 </span>
@@ -537,7 +506,7 @@ const AccountSettingsTab: FunctionComponent = () => {
                 </>
               ) : (
                 <>
-                  <Icon variant='upload' className='h-4 w-4 stroke-white' />
+                  <Upload className='h-4 w-4 stroke-white' />
                   <span>Upload</span>
                 </>
               )}

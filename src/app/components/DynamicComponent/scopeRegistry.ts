@@ -5,7 +5,7 @@
  * dynamically compiled components at runtime.
  *
  * When the agent generates a component with imports like:
- * - `import { Icon } from '@components'`
+ * - ``
  * - `import { cn } from '@libs/utils/react'`
  * - `import { BarChart } from 'recharts'`
  *
@@ -54,7 +54,6 @@ import * as RadixTooltip from '@radix-ui/react-tooltip';
 
 // Components - Direct imports (these are actual components)
 import {
-  Icon,
   Button,
   Modal,
   Loading,
@@ -85,6 +84,7 @@ import {
   Text as TextNamespace,
   AiInteraction as AiInteractionNamespace,
 } from '@components';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Utils - cn for class name merging
 import { cn } from '@libs/utils/react';
@@ -174,7 +174,7 @@ export interface ComponentScope {
  */
 export const Components = {
   // Core UI Components (these are direct components)
-  Icon,
+  Icon: DynamicIcon,
   Button,
   Modal,
   Loading,

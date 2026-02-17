@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import utils from '@libs/utils';
 import classNames from 'classnames';
 import React from 'react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface IPaginationProps {
   page: number;
@@ -52,7 +52,7 @@ const Pagination: React.FC<IPaginationProps> = ({
         aria-label='Previous Page'
         disabled={page <= 1}
       >
-        <Icon variant='arrowleft' width={20} height={20} />
+        <ArrowLeft size={20} />
         {!hideNavText ? 'Previous' : ''}
       </button>
       <div className='inline-flex items-end gap-2'>{renderPageNumbers()}</div>
@@ -63,7 +63,7 @@ const Pagination: React.FC<IPaginationProps> = ({
         aria-label='Next Page'
       >
         {!hideNavText ? 'Next' : ''}
-        <Icon variant='arrowright' width={20} height={20} />
+        <ArrowRight size={20} />
       </button>
     </div>
   );

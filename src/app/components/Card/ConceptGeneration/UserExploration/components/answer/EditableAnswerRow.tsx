@@ -1,8 +1,8 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useAnswerList } from '../../hooks/answer-list.hook';
+import { Check, Pencil, X } from 'lucide-react';
 
 interface Answer {
   uuid: string;
@@ -106,7 +106,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
         aria-label='Save answer'
         disabled={!editedAnswer.trim()}
       >
-        <Icon variant='check' />
+        <Check />
       </button>
     </>
   );
@@ -131,7 +131,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
           onClick={() => setIsEditing(true)}
           aria-label='Edit answer'
         >
-          <Icon variant='edit' />
+          <Pencil />
         </button>
       )}
       {handleRemoveAnswer && (
@@ -140,7 +140,7 @@ const EditableAnswerRow: React.FC<EditableAnswerRowProps> = ({
           onClick={(e) => handleRemoveAnswer?.(e, answer.uuid)}
           aria-label='Remove answer'
         >
-          <Icon variant='closeX' />
+          <X />
         </button>
       )}
     </>

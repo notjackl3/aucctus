@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Icon, Badge } from '@components';
+import { Badge } from '@components';
 import type { ISavedAnchorQuestion } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { InsightBadge } from './InsightBadge';
 import { PossibleAnswerBadge, UserAnswerBadge } from './AnswerBadge';
+import { ChevronDown } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface AnchorQuestionCardProps {
   question: ISavedAnchorQuestion;
@@ -17,7 +19,7 @@ const questionTypeConfig: Record<
   string,
   {
     label: string;
-    icon: IconVariant;
+    icon: string;
   }
 > = {
   Audience: {
@@ -56,7 +58,7 @@ const questionTypeConfig: Record<
 
 const defaultConfig = {
   label: 'Question',
-  icon: 'help-circle' as IconVariant,
+  icon: 'help-circle' as string,
 };
 
 /**
@@ -107,7 +109,7 @@ export const AnchorQuestionCard: React.FC<AnchorQuestionCardProps> = ({
             },
           )}
         >
-          <Icon
+          <DynamicIcon
             variant={config.icon}
             className='aucctus-stroke-brand-primary'
             height={16}
@@ -151,12 +153,7 @@ export const AnchorQuestionCard: React.FC<AnchorQuestionCardProps> = ({
             },
           )}
         >
-          <Icon
-            variant='chevrondown'
-            className='aucctus-stroke-brand-primary'
-            height={14}
-            width={14}
-          />
+          <ChevronDown size={14} className='aucctus-stroke-brand-primary' />
         </div>
       </button>
 
@@ -239,7 +236,7 @@ export const AnchorQuestionCard: React.FC<AnchorQuestionCardProps> = ({
  */
 interface ContentSectionProps {
   title: string;
-  icon: IconVariant;
+  icon: string;
   stroke?: string;
   children: React.ReactNode;
 }
@@ -252,7 +249,7 @@ const ContentSection: React.FC<ContentSectionProps> = ({
 }) => (
   <div>
     <h4 className='aucctus-text-sm-semibold aucctus-text-secondary mb-3 flex items-center gap-2'>
-      <Icon variant={icon} className={stroke} height={14} width={14} />
+      <DynamicIcon variant={icon} className={stroke} height={14} width={14} />
       {title}
     </h4>
     {children}

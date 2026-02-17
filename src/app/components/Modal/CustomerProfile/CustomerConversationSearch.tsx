@@ -1,9 +1,10 @@
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useConceptCustomerProfileConversationList } from '@hooks/query/concepts.hook';
 import { ICustomerProfileConversation } from '@libs/api/types';
 import React, { useEffect, useRef, useState } from 'react';
 import ConversationSearchResult from './ConversationSearchResult';
+import { Search, X } from 'lucide-react';
 
 interface CustomerConversationSearchProps {
   customerProfileUuid: string;
@@ -54,17 +55,14 @@ const CustomerConversationSearch: React.FC<CustomerConversationSearchProps> = ({
             onChange={handleSearchChange}
             className='aucctus-text-primary flex-1 rounded-md p-3 !outline-none focus:!outline-none focus:!ring-0 focus:!ring-offset-0'
           />
-          <Icon
-            variant='search-md'
-            className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2'
-          />
+          <Search className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2' />
         </span>
         <span>
           <button
             onClick={closeModal}
             className='aucctus-bg-primary-hover flex items-center justify-center rounded-md p-3'
           >
-            <Icon variant='closeX' width={20} height={20} />
+            <X size={20} />
           </button>
         </span>
       </div>

@@ -1,5 +1,4 @@
 import { FunctionComponent, useState, useEffect } from 'react';
-import { Icon } from '@components';
 import {
   useUserMetricsList,
   useUserMetricsDetail,
@@ -10,6 +9,20 @@ import {
   MetricsTimeRange,
   UserMetricsSummary,
 } from '@libs/api/types';
+import {
+  AlertCircle,
+  Check,
+  CheckCircle2,
+  Ghost,
+  Layers,
+  Lock,
+  RefreshCw,
+  Rocket,
+  Target,
+  Users,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const TIME_RANGE_OPTIONS: { value: MetricsTimeRange; label: string }[] = [
   { value: '7d', label: '7 Days' },
@@ -119,7 +132,7 @@ const ActivitySummaryCard: FunctionComponent<ActivitySummaryCardProps> = ({
         style.bgClass,
       )}
     >
-      <Icon
+      <DynamicIcon
         variant={style.iconVariant as any}
         className={cn('mt-0.5 h-4 w-4 flex-shrink-0', style.iconClass)}
       />
@@ -215,7 +228,7 @@ const UserDetailDrawer: FunctionComponent<UserDetailDrawerProps> = ({
             onClick={handleClose}
             className='rounded-lg p-2 hover:bg-gray-100'
           >
-            <Icon variant='closeX' className='h-5 w-5' />
+            <X className='h-5 w-5' />
           </button>
         </div>
 
@@ -289,23 +302,20 @@ const UserDetailDrawer: FunctionComponent<UserDetailDrawerProps> = ({
                 </h5>
                 <div className='flex flex-wrap gap-4'>
                   <div className='flex items-center gap-2'>
-                    <Icon variant='check' className='h-4 w-4 text-green-500' />
+                    <Check className='h-4 w-4 text-green-500' />
                     <span className='aucctus-text-sm'>
                       {userDetail.aiEditsApplied} applied
                     </span>
                   </div>
                   <div className='flex items-center gap-2'>
-                    <Icon variant='closeX' className='h-4 w-4 text-red-500' />
+                    <X className='h-4 w-4 text-red-500' />
                     <span className='aucctus-text-sm'>
                       {userDetail.aiEditsRejected} rejected
                     </span>
                   </div>
                   {userDetail.aiAcceptanceRate && (
                     <div className='flex items-center gap-2'>
-                      <Icon
-                        variant='target'
-                        className='aucctus-stroke-brand-primary h-4 w-4'
-                      />
+                      <Target className='aucctus-stroke-brand-primary h-4 w-4' />
                       <span
                         className={cn('aucctus-text-sm-medium', {
                           'text-green-600':
@@ -371,29 +381,20 @@ const UserDetailDrawer: FunctionComponent<UserDetailDrawerProps> = ({
                 </h5>
                 <div className='flex flex-wrap gap-4'>
                   <div className='flex items-center gap-2'>
-                    <Icon
-                      variant='rocket'
-                      className='aucctus-stroke-brand-primary h-4 w-4'
-                    />
+                    <Rocket className='aucctus-stroke-brand-primary h-4 w-4' />
                     <span className='aucctus-text-sm'>
                       {userDetail.testsLaunched} launched
                     </span>
                   </div>
                   <div className='flex items-center gap-2'>
-                    <Icon
-                      variant='check-circle-broken'
-                      className='h-4 w-4 text-green-500'
-                    />
+                    <CheckCircle2 className='h-4 w-4 text-green-500' />
                     <span className='aucctus-text-sm'>
                       {userDetail.testsCompleted} completed
                     </span>
                   </div>
                   {userDetail.testsPerConcept && (
                     <div className='flex items-center gap-2'>
-                      <Icon
-                        variant='layers'
-                        className='aucctus-stroke-tertiary h-4 w-4'
-                      />
+                      <Layers className='aucctus-stroke-tertiary h-4 w-4' />
                       <span className='aucctus-text-sm'>
                         {parseFloat(userDetail.testsPerConcept).toFixed(1)}{' '}
                         tests/concept
@@ -402,10 +403,7 @@ const UserDetailDrawer: FunctionComponent<UserDetailDrawerProps> = ({
                   )}
                   {userDetail.syntheticTestRatio && (
                     <div className='flex items-center gap-2'>
-                      <Icon
-                        variant='ghost'
-                        className='aucctus-stroke-tertiary h-4 w-4'
-                      />
+                      <Ghost className='aucctus-stroke-tertiary h-4 w-4' />
                       <span className='aucctus-text-sm aucctus-text-secondary'>
                         {parseFloat(userDetail.syntheticTestRatio).toFixed(0)}%
                         synthetic
@@ -669,10 +667,7 @@ const UserMetricsPanel: FunctionComponent = () => {
     <div className='aucctus-bg-primary rounded-lg border border-gray-200 p-6'>
       <div className='mb-6 flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <Icon
-            variant='users-02'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <Users className='aucctus-stroke-brand-primary h-5 w-5' />
           <h4 className='aucctus-text-lg-semibold aucctus-text-primary'>
             User Activity Metrics
           </h4>
@@ -708,10 +703,7 @@ const UserMetricsPanel: FunctionComponent = () => {
       {/* Error State */}
       {isError && !isForbidden && (
         <div className='flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-8'>
-          <Icon
-            variant='alert-circle'
-            className='aucctus-stroke-error-primary mb-3 h-8 w-8'
-          />
+          <AlertCircle className='aucctus-stroke-error-primary mb-3 h-8 w-8' />
           <p className='aucctus-text-sm aucctus-text-error-primary mb-4'>
             Failed to load user metrics. Please try again.
           </p>
@@ -719,7 +711,7 @@ const UserMetricsPanel: FunctionComponent = () => {
             onClick={() => refetch()}
             className='btn btn-secondary btn-sm inline-flex items-center gap-2'
           >
-            <Icon variant='refresh' className='h-4 w-4' />
+            <RefreshCw className='h-4 w-4' />
             Retry
           </button>
         </div>
@@ -728,10 +720,7 @@ const UserMetricsPanel: FunctionComponent = () => {
       {/* Forbidden State */}
       {isForbidden && (
         <div className='flex flex-col items-center justify-center rounded-lg border border-amber-200 bg-amber-50 p-8'>
-          <Icon
-            variant='lock'
-            className='aucctus-stroke-warning-primary mb-3 h-8 w-8'
-          />
+          <Lock className='aucctus-stroke-warning-primary mb-3 h-8 w-8' />
           <p className='aucctus-text-sm aucctus-text-warning-primary'>
             User metrics are only available to Aucctus administrators.
           </p>
@@ -832,10 +821,7 @@ const UserMetricsPanel: FunctionComponent = () => {
       {/* Empty State */}
       {!isLoading && !isError && users.length === 0 && (
         <div className='flex flex-col items-center justify-center py-12'>
-          <Icon
-            variant='users-02'
-            className='aucctus-stroke-tertiary mb-3 h-12 w-12 opacity-50'
-          />
+          <Users className='aucctus-stroke-tertiary mb-3 h-12 w-12 opacity-50' />
           <p className='aucctus-text-sm aucctus-text-tertiary'>
             No user activity data available for this time period.
           </p>

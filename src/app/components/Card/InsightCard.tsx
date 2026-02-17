@@ -1,7 +1,8 @@
-import { Badge, Icon } from '@components';
+import { Badge } from '@components';
 import { IInsight, ISource } from '@libs/api/types';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { ExternalLink } from 'lucide-react';
 
 interface SourceCardProps {
   source: ISource;
@@ -15,7 +16,7 @@ const SourceCard: React.FC<SourceCardProps> = ({ source }) => {
       py-2.5 transition-all !duration-200 hover:scale-105 hover:bg-gray-200 hover:bg-opacity-75'
         onClick={() => window.open(source.url, '_blank')}
       >
-        <Icon variant='link-external' />
+        <ExternalLink />
       </div>
     );
   };

@@ -8,30 +8,30 @@ import {
 
 export const ASSUMPTION_CATEGORY_MAP: Record<
   AssumptionCategory,
-  { style: string; icon: IconVariant }
+  { style: string; icon: string }
 > = {
   desirability: {
-    style: 'bg-purple-50 [&>svg>use]:stroke-purple-900',
+    style: 'bg-purple-50 [&>svg]:stroke-purple-900',
     icon: 'heart',
   },
   viability: {
-    style: 'bg-success-50 [&>svg>use]:stroke-success-800',
+    style: 'bg-success-50 [&>svg]:stroke-success-800',
     icon: 'line-chart-up',
   },
 
   feasibility: {
-    style: 'bg-indigo-50 [&>svg>use]:stroke-indigo-800',
+    style: 'bg-indigo-50 [&>svg]:stroke-indigo-800',
     icon: 'filecode',
   },
   adaptability: {
-    style: 'bg-blue-50 [&>svg>use]:stroke-blue-800',
+    style: 'bg-blue-50 [&>svg]:stroke-blue-800',
     icon: 'expand-06',
   },
 };
 
 export const TESTING_STATUS_STYLE_MAP: Record<
   AssumptionTestStatus | ConceptTestStatus,
-  { icon: IconVariant; bg: string; stroke: string; svg: string; text: string }
+  { icon: string; bg: string; stroke: string; svg: string; text: string }
 > = {
   notStarted: {
     icon: 'play-square',
@@ -77,7 +77,7 @@ export const TESTING_STATUS_STYLE_MAP: Record<
   },
 };
 
-export const TEST_TYPE_ICON_MAP: Record<TestType, IconVariant> = {
+export const TEST_TYPE_ICON_MAP: Record<TestType, string> = {
   scanningSurvey: 'survey',
   immersiveDialogue: 'annotation-dots',
   marketPulseCheck: 'activity',

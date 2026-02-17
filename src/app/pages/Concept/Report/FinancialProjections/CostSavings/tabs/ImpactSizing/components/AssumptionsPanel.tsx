@@ -1,7 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { IImpactSizingAssumptionEntryV2 } from '@libs/api/types/concept/financialProjectionV2';
 import { AssumptionItem } from './AssumptionItem';
+import { RefreshCw } from 'lucide-react';
 
 export interface AssumptionsPanelProps {
   assumptions: IImpactSizingAssumptionEntryV2[];
@@ -42,7 +42,7 @@ export const AssumptionsPanel: React.FC<AssumptionsPanelProps> = ({
           onClick={resetToDefaults}
           className='btn btn-light flex items-center gap-2 text-sm'
         >
-          <Icon variant='refresh' className='aucctus-stroke-tertiary h-4 w-4' />
+          <RefreshCw className='aucctus-stroke-tertiary h-4 w-4' />
           Reset
         </button>
       </div>

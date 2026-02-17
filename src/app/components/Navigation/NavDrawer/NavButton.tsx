@@ -1,9 +1,10 @@
 import { Button } from '@components';
 import { FunctionComponent, useMemo } from 'react';
 import { To, useLocation, useMatch, useNavigate } from 'react-router-dom';
-import Icon from '../../Icon/Icon/Icon';
 import NestedLink, { NestedLinkProps } from '../NestedLink/NestedLink';
 import { cn } from '@libs/utils/react';
+import { ChevronUp, Lock } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const defaultIconProps = {
   width: 24,
@@ -14,7 +15,7 @@ interface NavButtonProps {
   title: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement> | undefined;
   to?: To;
-  icon: IconVariant;
+  icon: string;
   locked?: boolean;
   openBasePath?: string;
   nestedRoutes?: NestedLinkProps[];
@@ -81,7 +82,7 @@ const NavButton: FunctionComponent<NavButtonProps> = ({
         )}
       >
         <span>
-          <Icon
+          <DynamicIcon
             variant={icon}
             className='fill-none stroke-gray-light-700'
             {...defaultIconProps}
@@ -101,15 +102,13 @@ const NavButton: FunctionComponent<NavButtonProps> = ({
           {title}
         </span>
         {locked && (
-          <Icon
-            variant='lock'
+          <Lock
             className='ml-1 fill-none stroke-gray-light-700'
             {...defaultIconProps}
           />
         )}
         {isOpen && (
-          <Icon
-            variant='chevronup'
+          <ChevronUp
             className='ml-1 fill-none stroke-gray-light-700'
             {...defaultIconProps}
           />

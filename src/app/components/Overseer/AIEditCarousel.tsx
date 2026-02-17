@@ -1,7 +1,15 @@
-import { Icon } from '@components';
 import { IAiEditingSuggestion } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React, { useEffect, useState } from 'react';
+import {
+  Check,
+  CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
+  Pencil,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface AIEditCarouselProps {
   edits: IAiEditingSuggestion[];
@@ -83,12 +91,7 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
         {/* Header with nav */}
         <div className='flex items-center justify-between border-b border-white/[0.08] bg-white/[0.12] px-3 py-2 backdrop-blur-xl'>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='edit'
-              width={12}
-              height={12}
-              className='stroke-white/70'
-            />
+            <Pencil size={12} className='stroke-white/70' />
             <span className='text-[11px] font-medium text-white/90'>
               Proposed Changes · {currentIndex + 1}/{edits.length}
             </span>
@@ -99,24 +102,14 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
               disabled={currentIndex === 0}
               className='rounded p-1 text-white/30 transition-colors hover:text-white/70 disabled:opacity-30'
             >
-              <Icon
-                variant='chevronleft'
-                width={14}
-                height={14}
-                className='stroke-current'
-              />
+              <ChevronLeft size={14} className='stroke-current' />
             </button>
             <button
               onClick={() => goTo(currentIndex + 1)}
               disabled={currentIndex === edits.length - 1}
               className='rounded p-1 text-white/30 transition-colors hover:text-white/70 disabled:opacity-30'
             >
-              <Icon
-                variant='chevronright'
-                width={14}
-                height={14}
-                className='stroke-current'
-              />
+              <ChevronRight size={14} className='stroke-current' />
             </button>
           </div>
         </div>
@@ -143,7 +136,7 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
                   : 'border-red-400/30 bg-red-500/20 text-red-300',
               )}
             >
-              <Icon
+              <DynamicIcon
                 variant={currentStatus === 'accepted' ? 'check' : 'closeX'}
                 width={10}
                 height={10}
@@ -183,24 +176,14 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
                 onClick={() => handleStatusChange(currentIndex, 'rejected')}
                 className='flex items-center gap-1 rounded-lg border border-red-400/20 px-2.5 py-1 text-[10px] font-medium text-red-300/70 transition-colors hover:bg-red-500/15 hover:text-red-300'
               >
-                <Icon
-                  variant='closeX'
-                  width={12}
-                  height={12}
-                  className='stroke-current'
-                />
+                <X size={12} className='stroke-current' />
                 Reject
               </button>
               <button
                 onClick={() => handleStatusChange(currentIndex, 'accepted')}
                 className='flex items-center gap-1 rounded-lg border border-emerald-400/20 px-2.5 py-1 text-[10px] font-medium text-emerald-300/70 transition-colors hover:bg-emerald-500/15 hover:text-emerald-300'
               >
-                <Icon
-                  variant='check'
-                  width={12}
-                  height={12}
-                  className='stroke-current'
-                />
+                <Check size={12} className='stroke-current' />
                 Accept
               </button>
             </div>
@@ -216,12 +199,7 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
             disabled={isLoading}
             className='flex items-center gap-1 rounded-full border border-white/[0.05] bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-white/45 backdrop-blur-sm transition-colors hover:text-white/70 disabled:cursor-not-allowed disabled:opacity-40'
           >
-            <Icon
-              variant='check-circle-broken'
-              width={12}
-              height={12}
-              className='stroke-current'
-            />
+            <CheckCircle2 size={12} className='stroke-current' />
             Accept all
           </button>
           {(acceptedEdits.length > 0 || allDecided) && (
@@ -235,7 +213,7 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
                   : 'text-white/60 hover:text-white/90',
               )}
             >
-              <Icon
+              <DynamicIcon
                 variant={isLoading ? 'loading-02' : 'arrowright'}
                 width={12}
                 height={12}

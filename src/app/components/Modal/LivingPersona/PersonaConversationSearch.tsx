@@ -1,9 +1,10 @@
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { usePersonaConversationSearch } from '@hooks/query/persona.hook';
 import type { IPersonaConversationSearchResult } from '@libs/api/types/persona';
 import { formatDate } from '@libs/utils/time';
 import React, { useEffect, useRef, useState } from 'react';
+import { MessageCircle, Search, X } from 'lucide-react';
 
 interface PersonaConversationSearchProps {
   personaUuid: string;
@@ -52,17 +53,14 @@ const PersonaConversationSearch: React.FC<PersonaConversationSearchProps> = ({
             placeholder='Search conversations...'
             className='aucctus-text-primary flex-1 rounded-md p-3 !outline-none focus:!outline-none focus:!ring-0 focus:!ring-offset-0'
           />
-          <Icon
-            variant='search-md'
-            className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2'
-          />
+          <Search className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2' />
         </span>
         <span>
           <button
             onClick={closeModal}
             className='aucctus-bg-primary-hover flex items-center justify-center rounded-md p-3'
           >
-            <Icon variant='closeX' width={20} height={20} />
+            <X size={20} />
           </button>
         </span>
       </div>
@@ -85,7 +83,7 @@ const PersonaConversationSearch: React.FC<PersonaConversationSearchProps> = ({
                     onClick={() => handleSelect(result)}
                   >
                     <span className='flex items-center justify-center'>
-                      <Icon variant='message-circle' width={20} height={20} />
+                      <MessageCircle size={20} />
                     </span>
                     <div className='flex flex-col'>
                       {result.summary && (

@@ -1,13 +1,12 @@
 import React from 'react';
-import { Badge, Button, Icon, Loading } from '@components';
+import { Badge, Button, Loading } from '@components';
 import { cn } from '@libs/utils/react';
-import type {
-  IconVariant,
-  IMarketForceV3,
-} from '@libs/api/types/concept/marketScan';
+import type { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
 import { useMarketScanMarketForcesV3 } from '@hooks/query/concepts.hook';
 import HexagonChart from './HexagonChart';
 import RadarLegend from './RadarLegend';
+import { TrendingUp } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Extended interface to include additional properties from the API
 interface ExtendedMarketForce extends IMarketForceV3 {
@@ -179,10 +178,7 @@ const MarketForcesRadar: React.FC<MarketForcesRadarProps> = ({
       <div className='relative p-6'>
         <div className='mb-4'>
           <div className='mb-1 flex items-center gap-2'>
-            <Icon
-              variant='trendup'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <TrendingUp className='aucctus-stroke-brand-primary h-5 w-5' />
             <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
               Market Forces Radar
             </h3>
@@ -238,8 +234,8 @@ const MarketForcesRadar: React.FC<MarketForcesRadarProps> = ({
                         minHeight: '44px',
                       }}
                     >
-                      <Icon
-                        variant={category.icon as IconVariant}
+                      <DynamicIcon
+                        variant={category.icon as string}
                         className='aucctus-stroke-primary h-5 w-5 opacity-80 mix-blend-hard-light'
                       />
                       <span className='aucctus-text-primary aucctus-text-sm opacity-80 mix-blend-hard-light'>
@@ -275,8 +271,8 @@ const MarketForcesRadar: React.FC<MarketForcesRadarProps> = ({
                           minHeight: '44px',
                         }}
                       >
-                        <Icon
-                          variant={category.icon as IconVariant}
+                        <DynamicIcon
+                          variant={category.icon as string}
                           className='aucctus-stroke-primary h-5 w-5 opacity-80 mix-blend-hard-light'
                         />
                         <span className='aucctus-text-primary aucctus-text-sm opacity-80 mix-blend-hard-light'>
@@ -291,8 +287,8 @@ const MarketForcesRadar: React.FC<MarketForcesRadarProps> = ({
 
             <div className='flex-1'>
               <div className='mb-3 flex items-center gap-3'>
-                <Icon
-                  variant={selectedCategory.icon as IconVariant}
+                <DynamicIcon
+                  variant={selectedCategory.icon as string}
                   className='aucctus-stroke-primary h-6 w-6'
                 />
                 <h3 className='aucctus-text-lg-bold aucctus-text-primary'>

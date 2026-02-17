@@ -1,5 +1,5 @@
-import { Icon } from '@components';
 import React from 'react';
+import { ArrowLeft } from 'lucide-react';
 
 interface ConceptSelectionHeaderProps {
   onClose: () => void;
@@ -14,7 +14,7 @@ const ConceptSelectionHeader: React.FC<ConceptSelectionHeaderProps> = ({
     </span>
     <span className='flex flex-1' />
     <button onClick={onClose} className='btn btn-light aspect-square !p-2'>
-      <Icon variant='arrowleft' height={20} width={20} />
+      <ArrowLeft size={20} />
     </button>
   </div>
 );

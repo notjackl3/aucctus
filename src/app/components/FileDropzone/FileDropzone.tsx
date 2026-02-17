@@ -1,6 +1,8 @@
 import React, { useState, useCallback, useRef } from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import { cn } from '@libs/utils/react';
+import { ArrowUp, RefreshCw, Trash2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface StagedFile {
   id: string;
@@ -246,10 +248,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
       <div className={cn('space-y-4', className)}>
         <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-8'>
           <div className='flex flex-col items-center justify-center text-center'>
-            <Icon
-              variant='refresh'
-              className='aucctus-stroke-brand-primary mb-4 h-8 w-8 animate-spin'
-            />
+            <RefreshCw className='aucctus-stroke-brand-primary mb-4 h-8 w-8 animate-spin' />
             <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
               Uploading {stagedFiles.length} files...
             </h4>
@@ -283,7 +282,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
             >
               <div className='flex items-start gap-4'>
                 <div className='flex-shrink-0'>
-                  <Icon
+                  <DynamicIcon
                     variant={
                       stagedFile.file.type === 'application/pdf'
                         ? 'file-2'
@@ -318,10 +317,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
                   onClick={() => handleRemoveStagedFile(stagedFile.id)}
                   className='btn btn-secondary btn-sm flex items-center gap-1'
                 >
-                  <Icon
-                    variant='trash'
-                    className='aucctus-stroke-secondary h-4 w-4'
-                  />
+                  <Trash2 className='aucctus-stroke-secondary h-4 w-4' />
                   Remove
                 </button>
               </div>
@@ -335,20 +331,14 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
               className='btn btn-primary flex items-center gap-2'
               disabled={stagedFiles.length === 0}
             >
-              <Icon
-                variant='arrowup'
-                className='aucctus-stroke-white h-4 w-4'
-              />
+              <ArrowUp className='aucctus-stroke-white h-4 w-4' />
               Upload All ({stagedFiles.length} files)
             </button>
             <button
               onClick={handleClearAll}
               className='btn btn-secondary flex items-center gap-2'
             >
-              <Icon
-                variant='trash'
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
+              <Trash2 className='aucctus-stroke-secondary h-4 w-4' />
               Clear All
             </button>
           </div>
@@ -374,7 +364,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
             >
               <div className='flex items-start gap-4'>
                 <div className='flex-shrink-0'>
-                  <Icon
+                  <DynamicIcon
                     variant={
                       uploadedFile.file.type === 'application/pdf'
                         ? 'file-2'
@@ -409,10 +399,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
                   onClick={() => handleRemoveUploadedFile(uploadedFile.id)}
                   className='btn btn-secondary btn-sm flex items-center gap-1'
                 >
-                  <Icon
-                    variant='trash'
-                    className='aucctus-stroke-secondary h-4 w-4'
-                  />
+                  <Trash2 className='aucctus-stroke-secondary h-4 w-4' />
                   Remove
                 </button>
               </div>
@@ -435,8 +422,7 @@ const FileDropzone: React.FC<FileDropzoneProps> = ({
         >
           <div className='flex flex-col items-center justify-center text-center'>
             <div className='aucctus-bg-secondary aucctus-border-secondary mb-4 flex h-12 w-12 items-center justify-center rounded-lg border'>
-              <Icon
-                variant='arrowup'
+              <ArrowUp
                 className={cn(
                   'h-6 w-6',
                   isDragOver

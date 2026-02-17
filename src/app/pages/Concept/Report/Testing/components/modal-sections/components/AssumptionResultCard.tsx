@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { Icon } from '@components';
 import { AssumptionCategory } from '@libs/api/types';
 import {
   IAssumptionValidation,
@@ -8,6 +7,8 @@ import {
 import CategoryIcon from '../../../../Assumptions/components/cards/category-progress-card/CategoryIcon';
 import { cn } from '@libs/utils/react';
 import SourceBadges from './SourceBadges';
+import { Check, Target, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export interface Finding {
   id: string;
@@ -121,10 +122,7 @@ const AssumptionResultCard: React.FC<AssumptionResultCardProps> = ({
                   : 'aucctus-bg-error-secondary',
               )}
             >
-              <Icon
-                variant='target-round'
-                className={cn('h-3 w-3', benchmarkStyles.icon)}
-              />
+              <Target className={cn('h-3 w-3', benchmarkStyles.icon)} />
             </div>
             <div className='flex flex-1 items-center justify-between'>
               <div className='flex items-center gap-2'>
@@ -139,18 +137,18 @@ const AssumptionResultCard: React.FC<AssumptionResultCardProps> = ({
                 {/* Status Badge */}
                 {benchmarkAchieved ? (
                   <span className='inline-flex items-center gap-1 rounded-full bg-emerald-500 px-2 py-0.5 text-[10px] font-medium text-white'>
-                    <Icon variant='check' className='h-3 w-3 stroke-white' />
+                    <Check className='h-3 w-3 stroke-white' />
                     Achieved
                   </span>
                 ) : (
                   <span className='inline-flex items-center gap-1 rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-medium text-white'>
-                    <Icon variant='closeX' className='h-3 w-3 stroke-white' />
+                    <X className='h-3 w-3 stroke-white' />
                     Not Met
                   </span>
                 )}
               </div>
               {/* Expand/Collapse chevron */}
-              <Icon
+              <DynamicIcon
                 variant={isExpanded ? 'chevrondown' : 'chevronright'}
                 className={cn('h-4 w-4', benchmarkStyles.icon)}
               />

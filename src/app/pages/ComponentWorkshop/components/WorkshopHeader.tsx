@@ -6,8 +6,8 @@
  */
 
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { Sparkles } from 'lucide-react';
 
 type ViewMode = 'generate' | 'preview' | 'library';
 
@@ -116,7 +116,7 @@ const WorkshopHeader: React.FC<IWorkshopHeaderProps> = ({
         {/* Branding */}
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-solid flex h-10 w-10 items-center justify-center rounded-lg'>
-            <Icon variant='sparkles' className='aucctus-stroke-white h-5 w-5' />
+            <Sparkles className='aucctus-stroke-white h-5 w-5' />
           </div>
           <div>
             <h1 className='aucctus-text-xl-semibold aucctus-text-primary'>

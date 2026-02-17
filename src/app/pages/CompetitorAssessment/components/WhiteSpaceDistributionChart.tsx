@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts';
-import { Icon } from '@components';
 import type { IWhiteSpaceOpportunity } from '@libs/api/types/competitorAssessment';
+import { Star } from 'lucide-react';
 
 interface WhiteSpaceDistributionChartProps {
   whiteSpaces: IWhiteSpaceOpportunity[];
@@ -93,12 +93,7 @@ const WhiteSpaceDistributionChart: React.FC<
             </p>
           </div>
           <div className='flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1'>
-            <Icon
-              variant='star-01'
-              height={12}
-              width={12}
-              className='stroke-amber-500'
-            />
+            <Star size={12} className='stroke-amber-500' />
             <span className='aucctus-text-tertiary text-[10px]'>
               Avg score: {avgScore}
             </span>

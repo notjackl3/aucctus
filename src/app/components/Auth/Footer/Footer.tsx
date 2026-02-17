@@ -1,7 +1,6 @@
 import { FunctionComponent } from 'react';
 import { HELP_EMAIL } from '../../../../libs/constants';
-import Icon from '../../Icon/Icon/Icon';
-
+import { Mail } from 'lucide-react';
 const year = new Date().getFullYear();
 
 const Footer: FunctionComponent = () => {
@@ -11,10 +10,8 @@ const Footer: FunctionComponent = () => {
         © {year} Aucctus Inc. All Rights Reserved.
       </div>
       <div className='mb-3 mr-8 flex flex-row items-center gap-2'>
-        <Icon
-          variant='mail'
-          width={24}
-          height={24}
+        <Mail
+          size={24}
           className='h-4 w-4 flex-shrink-0 overflow-hidden stroke-gray-light-900'
         />
         <a

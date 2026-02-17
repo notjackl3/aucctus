@@ -1,5 +1,5 @@
 import images from '@assets/img';
-import { Badge, Button, ComponentTooltip, Icon } from '@components';
+import { Badge, Button, ComponentTooltip } from '@components';
 import { SkeletonBlock } from '@components/Skeleton/ConceptReport';
 import { cn } from '@libs/utils/react';
 import { getLogoUrl } from '@libs/utils/source';
@@ -11,6 +11,7 @@ import ComponentCarousel, {
 import type { Company, Product } from '../hooks/useEcosystem';
 import CompanyTooltip from './CompanyTooltip';
 import ProductImage from './ProductImage';
+import { ChevronLeft, ChevronRight, ExternalLink, Map } from 'lucide-react';
 
 interface ProductCarouselProps {
   ecosystemData: Company[];
@@ -128,7 +129,7 @@ const ProductCarouselSkeleton: React.FC = () => (
         <div className='flex-1'>
           <h3 className='aucctus-text-primary flex items-center gap-2 text-xl font-semibold tracking-tight'>
             <div className='aucctus-text-primary h-5 w-5'>
-              <Icon variant='map-02' />
+              <Map />
             </div>
             Competitive Product Scan
           </h3>
@@ -181,7 +182,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({
           <div className='flex-1'>
             <h3 className='aucctus-text-primary flex items-center gap-2 text-xl font-semibold tracking-tight'>
               <div className='aucctus-text-primary h-5 w-5'>
-                <Icon variant='map-02' />
+                <Map />
               </div>
               Competitive Product Scan
             </h3>
@@ -195,20 +196,14 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({
               size='sm'
               color='light'
             >
-              <Icon
-                variant='chevronleft'
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
+              <ChevronLeft className='aucctus-stroke-secondary h-4 w-4' />
             </Button>
             <Button
               onClick={() => carouselRef.current?.scrollNext()}
               size='sm'
               color='light'
             >
-              <Icon
-                variant='chevron-right'
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
+              <ChevronRight className='aucctus-stroke-secondary h-4 w-4' />
             </Button>
           </div>
         </div>
@@ -253,10 +248,7 @@ const ProductCarousel: React.FC<ProductCarouselProps> = ({
                       }
                     }}
                   >
-                    <Icon
-                      variant='link-external'
-                      className='h-3.5 w-3.5 stroke-white'
-                    />
+                    <ExternalLink className='h-3.5 w-3.5 stroke-white' />
                     View Product
                   </Button>
                 </div>

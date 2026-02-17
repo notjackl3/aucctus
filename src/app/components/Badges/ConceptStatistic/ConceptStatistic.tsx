@@ -1,11 +1,11 @@
 import { FunctionComponent } from 'react';
 
 import { ConceptStatusIconColor } from '../../../../libs/utils/concepts';
-import Icon from '../../Icon/Icon/Icon';
 import { cn } from '@libs/utils/react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export interface IConceptStatisticProps {
-  icon: IconVariant;
+  icon: string;
   iconColor: ConceptStatusIconColor;
   infoTitle: string;
   infoValue: string;
@@ -57,7 +57,7 @@ const ConceptStatistic: FunctionComponent<IConceptStatisticProps> = ({
           },
         )}
       >
-        <Icon variant={icon} {...defaultIconProps} />
+        <DynamicIcon variant={icon} {...defaultIconProps} />
       </span>
       <div className='flex flex-col'>
         <div className='aucctus-text-sm aucctus-text-tertiary'>{infoTitle}</div>

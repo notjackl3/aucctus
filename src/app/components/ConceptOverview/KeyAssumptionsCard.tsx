@@ -1,9 +1,10 @@
-import { Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { AssumptionCategory } from '@libs/api/types/concept/assumptions';
 import type { RiskLevel } from './config';
 import ProgressBar from './ProgressBar';
+import { AlertTriangle } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Import CategoryMetric from assumptions API
 interface CategoryMetric {
@@ -169,10 +170,7 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='alert-triangle'
-              className='aucctus-stroke-tertiary h-4 w-4'
-            />
+            <AlertTriangle className='aucctus-stroke-tertiary h-4 w-4' />
             <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
               Key Assumptions
             </h3>
@@ -210,7 +208,7 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
                     className={`border ${category.colors.border} ${category.colors.bg} flex min-h-[90px] flex-col justify-center rounded-lg p-3`}
                   >
                     <div className='flex h-full flex-col items-center justify-center text-center'>
-                      <Icon
+                      <DynamicIcon
                         variant={category.iconVariant as any}
                         className={`h-5 w-5 ${category.colors.icon} mb-2`}
                       />
@@ -249,7 +247,7 @@ const KeyAssumptionsCard: React.FC<KeyAssumptionsCardProps> = ({
                     className={`border ${category.colors.border} ${category.colors.bg} flex min-h-[85px] flex-col justify-center rounded-lg p-3`}
                   >
                     <div className='flex h-full flex-col items-center justify-center text-center'>
-                      <Icon
+                      <DynamicIcon
                         variant={category.iconVariant as any}
                         className={`h-5 w-5 ${category.colors.icon} mb-1`}
                       />

@@ -1,6 +1,6 @@
-import { Icon } from '@components';
 import React from 'react';
 import { executiveDashboardUIText } from './config';
+import { Star } from 'lucide-react';
 
 interface DifferentiatorsCardProps {
   differentiators: any[];
@@ -13,10 +13,7 @@ const DifferentiatorsCard: React.FC<DifferentiatorsCardProps> = ({
     <div className='aucctus-border-primary aucctus-bg-primary h-full min-h-[350px] rounded-lg border lg:col-span-1'>
       <div className='flex h-full flex-col p-6'>
         <h3 className='aucctus-text-xl-semibold aucctus-text-primary mb-4 flex items-center gap-2'>
-          <Icon
-            variant='star-01'
-            className='aucctus-stroke-info-primary h-5 w-5'
-          />
+          <Star className='aucctus-stroke-info-primary h-5 w-5' />
           {executiveDashboardUIText.sections.differentiators}
         </h3>
 

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { RegularResultViewProps } from '../TestResults.types';
 import { formatFileSize, formatDate } from '../TestResults.utils';
+import { Calendar, Download, FileCode, Trash2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const RegularResultView: React.FC<RegularResultViewProps> = ({
   result,
@@ -26,10 +27,7 @@ const RegularResultView: React.FC<RegularResultViewProps> = ({
           {/* Metadata in compact grid */}
           <div className='grid grid-cols-2 gap-3 text-xs'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='filecode'
-                className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0'
-              />
+              <FileCode className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0' />
               <div>
                 <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
                   Size
@@ -41,10 +39,7 @@ const RegularResultView: React.FC<RegularResultViewProps> = ({
             </div>
 
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='calendar'
-                className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0'
-              />
+              <Calendar className='aucctus-stroke-tertiary h-3 w-3 flex-shrink-0' />
               <div>
                 <p className='aucctus-text-xs-regular aucctus-text-tertiary'>
                   Uploaded
@@ -59,7 +54,7 @@ const RegularResultView: React.FC<RegularResultViewProps> = ({
           {/* Status indicator */}
           <div className='mt-3 flex items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
+              <DynamicIcon
                 variant={isProcessingComplete ? 'check' : 'refresh'}
                 className={cn(
                   'h-3 w-3',
@@ -92,10 +87,7 @@ const RegularResultView: React.FC<RegularResultViewProps> = ({
                   title='Download file'
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <Icon
-                    variant='download'
-                    className='aucctus-stroke-white h-3 w-3'
-                  />
+                  <Download className='aucctus-stroke-white h-3 w-3' />
                 </a>
               )}
               {canDelete && (
@@ -111,10 +103,7 @@ const RegularResultView: React.FC<RegularResultViewProps> = ({
                   className='btn btn-secondary btn-xs flex items-center gap-1'
                   title='Delete file'
                 >
-                  <Icon
-                    variant='trash'
-                    className='aucctus-stroke-secondary h-3 w-3'
-                  />
+                  <Trash2 className='aucctus-stroke-secondary h-3 w-3' />
                 </button>
               )}
             </div>

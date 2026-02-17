@@ -14,7 +14,7 @@
  */
 
 import React, { useState, useCallback, useMemo } from 'react';
-import { Icon, Loading, toast } from '@components';
+import { Loading, toast } from '@components';
 import { DynamicComponentRenderer } from '@components/DynamicComponent';
 import { cn } from '@libs/utils/react';
 import {
@@ -35,6 +35,8 @@ import {
   EmptyState,
 } from './components';
 import { useFileUpload } from './hooks';
+import { Plus, RefreshCw, Sparkles } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * View mode for the workshop
@@ -208,10 +210,7 @@ const ComponentWorkshop: React.FC = () => {
                   {/* Hero Section */}
                   <div className='mb-6'>
                     <div className='aucctus-bg-brand-solid mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl'>
-                      <Icon
-                        variant='sparkles'
-                        className='aucctus-stroke-white h-8 w-8'
-                      />
+                      <Sparkles className='aucctus-stroke-white h-8 w-8' />
                     </div>
                     <h2 className='aucctus-text-xl-semibold aucctus-text-primary mb-2'>
                       Create a Component
@@ -279,10 +278,7 @@ const ComponentWorkshop: React.FC = () => {
                       </span>
                     ) : (
                       <span className='flex items-center justify-center gap-2'>
-                        <Icon
-                          variant='sparkles'
-                          className='aucctus-stroke-white h-5 w-5'
-                        />
+                        <Sparkles className='aucctus-stroke-white h-5 w-5' />
                         Generate Component
                       </span>
                     )}
@@ -295,7 +291,7 @@ const ComponentWorkshop: React.FC = () => {
                         key={tip.title}
                         className='aucctus-bg-secondary rounded-xl p-4 text-left'
                       >
-                        <Icon
+                        <DynamicIcon
                           variant={tip.icon as any}
                           className='aucctus-stroke-brand-primary mb-2 h-5 w-5'
                         />
@@ -354,10 +350,7 @@ const ComponentWorkshop: React.FC = () => {
                   onClick={handleNewComponent}
                   className='btn btn-secondary btn-sm'
                 >
-                  <Icon
-                    variant='plus'
-                    className='aucctus-stroke-secondary mr-1.5 h-4 w-4'
-                  />
+                  <Plus className='aucctus-stroke-secondary mr-1.5 h-4 w-4' />
                   New Component
                 </button>
               </div>
@@ -465,10 +458,7 @@ const ComponentWorkshop: React.FC = () => {
                   </p>
                 </div>
                 <button onClick={refresh} className='btn btn-secondary btn-sm'>
-                  <Icon
-                    variant='refresh'
-                    className='aucctus-stroke-secondary mr-1.5 h-4 w-4'
-                  />
+                  <RefreshCw className='aucctus-stroke-secondary mr-1.5 h-4 w-4' />
                   Refresh
                 </button>
               </div>

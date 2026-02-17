@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { cn } from '@libs/utils/react';
-import { Icon } from '@components';
 import ConceptVersionsDropdown from './Dropdown/ConceptVersionsDropdown';
+import { ClockArrowDown } from 'lucide-react';
 
 interface ConceptVersionsButtonProps {
   conceptUuid?: string;
@@ -117,10 +117,8 @@ const ConceptVersionsButton: React.FC<ConceptVersionsButtonProps> = ({
         )}
       >
         <span>
-          <Icon
-            variant='clock-rewind'
-            height={20}
-            width={20}
+          <ClockArrowDown
+            size={20}
             className='stroke-primary-900 transition-colors duration-300 group-hover:stroke-primary-100'
           />
         </span>

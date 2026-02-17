@@ -1,9 +1,9 @@
-import { Icon } from '@components';
 import React, { useCallback, useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { ICustomerProfile as ICustomerProfileAPI } from '@libs/api/types/concept/concepts';
 import type { ICustomerProfile } from './config';
 import ProgressBar from './ProgressBar';
+import { Users } from 'lucide-react';
 
 interface CustomerProfilesCardProps {
   currentCardIndex: number;
@@ -196,10 +196,7 @@ const CustomerProfilesCard: React.FC<CustomerProfilesCardProps> = ({
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='users-03'
-              className='aucctus-stroke-tertiary h-4 w-4'
-            />
+            <Users className='aucctus-stroke-tertiary h-4 w-4' />
             <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
               Customer Profiles
             </h3>

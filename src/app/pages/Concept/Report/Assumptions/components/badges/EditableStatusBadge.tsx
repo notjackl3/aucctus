@@ -1,8 +1,9 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { AssumptionStatusV2 } from '@libs/api/types';
 import { ASSUMPTION_STATUS_CONFIGS } from '../../constants/statusConfigs';
+import { Check, ChevronDown } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface EditableStatusBadgeProps {
   status: AssumptionStatusV2;
@@ -109,16 +110,13 @@ const EditableStatusBadge: React.FC<EditableStatusBadgeProps> = ({
           disabled && 'cursor-not-allowed opacity-50',
         )}
       >
-        <Icon
+        <DynamicIcon
           variant={currentConfig.icon as any}
           className={cn('h-3 w-3', currentConfig.stroke)}
         />
         {currentConfig.label}
         {!disabled && (
-          <Icon
-            variant='chevrondown'
-            className={cn('ml-0.5 h-3 w-3', currentConfig.stroke)}
-          />
+          <ChevronDown className={cn('ml-0.5 h-3 w-3', currentConfig.stroke)} />
         )}
       </button>
 
@@ -146,7 +144,7 @@ const EditableStatusBadge: React.FC<EditableStatusBadgeProps> = ({
                   isSelected && 'aucctus-bg-secondary',
                 )}
               >
-                <Icon
+                <DynamicIcon
                   variant={config.icon as any}
                   className={cn('h-4 w-4', config.stroke)}
                 />
@@ -154,10 +152,7 @@ const EditableStatusBadge: React.FC<EditableStatusBadgeProps> = ({
                   {config.label}
                 </span>
                 {isSelected && (
-                  <Icon
-                    variant='check'
-                    className={cn('ml-auto h-4 w-4', config.stroke)}
-                  />
+                  <Check className={cn('ml-auto h-4 w-4', config.stroke)} />
                 )}
               </button>
             );

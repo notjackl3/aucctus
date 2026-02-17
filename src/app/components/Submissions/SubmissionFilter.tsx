@@ -7,7 +7,6 @@ import React, {
 } from 'react';
 import * as Popover from '@radix-ui/react-popover';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Icon } from '@components';
 import {
   ISubmissionFilterParams,
   IScoringCriteriaQuestion,
@@ -17,6 +16,18 @@ import {
   IQuestionScoreFilter,
 } from '@libs/api/types/ideaSubmissions';
 import { cn } from '@libs/utils/react';
+import {
+  Calendar,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Clipboard,
+  ListFilter,
+  SwitchCamera,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // ============================================================================
 // Type Definitions
@@ -280,10 +291,7 @@ export const SubmissionFilter: React.FC<ISubmissionFilterProps> = ({
               onClick={clearAllFilters}
               className='flex items-center gap-1.5 rounded-md bg-red-50 px-2 py-1 transition-colors hover:bg-red-100'
             >
-              <Icon
-                variant='closeX'
-                className='h-3.5 w-3.5 flex-shrink-0 stroke-red-600'
-              />
+              <X className='h-3.5 w-3.5 flex-shrink-0 stroke-red-600' />
               <span className='text-sm font-medium text-red-600'>
                 Clear All
               </span>
@@ -414,12 +422,7 @@ const AddFilterDropdown: React.FC<IAddFilterDropdownProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <button className='aucctus-bg-secondary-hover flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-200'>
-          <Icon
-            variant='filter-lines'
-            height={16}
-            width={16}
-            className='aucctus-stroke-secondary'
-          />
+          <ListFilter size={16} className='aucctus-stroke-secondary' />
           <span className='aucctus-text-sm aucctus-text-secondary'>Filter</span>
         </button>
       </Popover.Trigger>
@@ -641,12 +644,7 @@ const SortDropdown: React.FC<ISortDropdownProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <button className='aucctus-bg-secondary-hover flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-200'>
-          <Icon
-            variant='switch-vertical-01'
-            height={16}
-            width={16}
-            className='aucctus-stroke-secondary'
-          />
+          <SwitchCamera size={16} className='aucctus-stroke-secondary' />
           <span className='aucctus-text-sm aucctus-text-secondary'>Sort</span>
         </button>
       </Popover.Trigger>
@@ -683,7 +681,7 @@ const SortDropdown: React.FC<ISortDropdownProps> = ({
                       }}
                     >
                       <div className='flex items-center gap-2'>
-                        <Icon
+                        <DynamicIcon
                           variant={
                             option.direction === 'desc'
                               ? 'arrowdown'
@@ -699,10 +697,7 @@ const SortDropdown: React.FC<ISortDropdownProps> = ({
                         <span>{option.label}</span>
                       </div>
                       {sortBy === option.value && (
-                        <Icon
-                          variant='check'
-                          className='h-4 w-4 stroke-blue-600'
-                        />
+                        <Check className='h-4 w-4 stroke-blue-600' />
                       )}
                     </button>
                   ))}
@@ -743,17 +738,14 @@ const SortChip: React.FC<ISortChipProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <div className='flex items-center gap-1 rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-blue-800'>
-          <Icon
+          <DynamicIcon
             variant={directionIcon as any}
             className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
           />
           <span className='text-sm font-medium text-blue-800'>
             {sortOption?.shortLabel || 'Sort'}
           </span>
-          <Icon
-            variant='chevrondown'
-            className='h-3 w-3 flex-shrink-0 stroke-blue-700'
-          />
+          <ChevronDown className='h-3 w-3 flex-shrink-0 stroke-blue-700' />
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -761,7 +753,7 @@ const SortChip: React.FC<ISortChipProps> = ({
             }}
             className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'
           >
-            <Icon variant='closeX' className='h-3 w-3 stroke-blue-700' />
+            <X className='h-3 w-3 stroke-blue-700' />
           </button>
         </div>
       </Popover.Trigger>
@@ -795,7 +787,7 @@ const SortChip: React.FC<ISortChipProps> = ({
                       onClick={() => onChange(option.value)}
                     >
                       <div className='flex items-center gap-2'>
-                        <Icon
+                        <DynamicIcon
                           variant={
                             option.direction === 'desc'
                               ? 'arrowdown'
@@ -811,10 +803,7 @@ const SortChip: React.FC<ISortChipProps> = ({
                         <span>{option.label}</span>
                       </div>
                       {sortBy === option.value && (
-                        <Icon
-                          variant='check'
-                          className='h-4 w-4 stroke-blue-600'
-                        />
+                        <Check className='h-4 w-4 stroke-blue-600' />
                       )}
                     </button>
                   ))}
@@ -986,10 +975,7 @@ const MiniCalendar: React.FC<IMiniCalendarProps> = ({
           onClick={() => navigate(-1)}
           className='aucctus-bg-primary-hover rounded-md p-1 transition-colors'
         >
-          <Icon
-            variant='chevronleft'
-            className='aucctus-stroke-secondary h-3.5 w-3.5'
-          />
+          <ChevronLeft className='aucctus-stroke-secondary h-3.5 w-3.5' />
         </motion.button>
 
         <AnimatePresence mode='wait' custom={direction}>
@@ -1013,10 +999,7 @@ const MiniCalendar: React.FC<IMiniCalendarProps> = ({
           onClick={() => navigate(1)}
           className='aucctus-bg-primary-hover rounded-md p-1 transition-colors'
         >
-          <Icon
-            variant='chevronright'
-            className='aucctus-stroke-secondary h-3.5 w-3.5'
-          />
+          <ChevronRight className='aucctus-stroke-secondary h-3.5 w-3.5' />
         </motion.button>
       </div>
 
@@ -1132,8 +1115,7 @@ const DateTrigger: React.FC<IDateTriggerProps> = ({
           : 'aucctus-border-secondary aucctus-bg-secondary hover:border-blue-300',
       )}
     >
-      <Icon
-        variant='calendar'
+      <Calendar
         className={cn(
           'h-3.5 w-3.5 flex-shrink-0',
           active ? 'stroke-blue-500' : 'aucctus-stroke-tertiary',
@@ -1172,7 +1154,7 @@ const DateTrigger: React.FC<IDateTriggerProps> = ({
             }}
             className='flex-shrink-0 rounded-full p-0.5 transition-colors hover:bg-blue-200/60'
           >
-            <Icon variant='closeX' className='h-3 w-3 stroke-blue-500' />
+            <X className='h-3 w-3 stroke-blue-500' />
           </motion.span>
         )}
       </AnimatePresence>
@@ -1303,17 +1285,14 @@ const FilterMenuItemWithSubmenu: React.FC<IFilterMenuItemWithSubmenuProps> = ({
             if (!contentHasFocusRef.current) setSubmenuDelayed(null);
           }}
         >
-          <Icon
+          <DynamicIcon
             variant={icon as any}
             className='aucctus-stroke-secondary h-4 w-4'
           />
           <span className='aucctus-text-secondary flex-1 text-left'>
             {label}
           </span>
-          <Icon
-            variant='chevron-right'
-            className='aucctus-stroke-tertiary h-4 w-4'
-          />
+          <ChevronRight className='aucctus-stroke-tertiary h-4 w-4' />
         </button>
       </Popover.Trigger>
 
@@ -1432,17 +1411,11 @@ const QuestionScoreSubmenu: React.FC<IQuestionScoreSubmenuProps> = ({
           onMouseEnter={() => setSubmenuImmediate(submenuKey)}
           onMouseLeave={() => setSubmenuDelayed(null)}
         >
-          <Icon
-            variant='clipboard'
-            className='aucctus-stroke-secondary h-4 w-4'
-          />
+          <Clipboard className='aucctus-stroke-secondary h-4 w-4' />
           <span className='aucctus-text-secondary flex-1 text-left'>
             Question Score
           </span>
-          <Icon
-            variant='chevron-right'
-            className='aucctus-stroke-tertiary h-4 w-4'
-          />
+          <ChevronRight className='aucctus-stroke-tertiary h-4 w-4' />
         </button>
       </Popover.Trigger>
 
@@ -1508,10 +1481,7 @@ const QuestionScoreSubmenu: React.FC<IQuestionScoreSubmenuProps> = ({
                               {getImportanceBadge(question.importance)}
                               {pendingFilter?.questionUuid ===
                                 question.uuid && (
-                                <Icon
-                                  variant='check'
-                                  className='h-4 w-4 stroke-blue-600'
-                                />
+                                <Check className='h-4 w-4 stroke-blue-600' />
                               )}
                             </div>
                           </button>
@@ -1694,7 +1664,7 @@ const FilterChip: React.FC<IFilterChipProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <div className='flex max-w-xs items-center gap-1.5 rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-blue-800'>
-          <Icon
+          <DynamicIcon
             variant={icon as any}
             className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
           />
@@ -1709,7 +1679,7 @@ const FilterChip: React.FC<IFilterChipProps> = ({
             }}
             className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'
           >
-            <Icon variant='closeX' className='h-3 w-3 stroke-blue-700' />
+            <X className='h-3 w-3 stroke-blue-700' />
           </button>
         </div>
       </Popover.Trigger>
@@ -1777,7 +1747,7 @@ const StatusFilterChip: React.FC<IStatusFilterChipProps> = ({
           >
             <span>{option.label}</span>
             {status === option.value && (
-              <Icon variant='check' className='h-4 w-4 stroke-blue-600' />
+              <Check className='h-4 w-4 stroke-blue-600' />
             )}
           </button>
         ))}
@@ -2018,10 +1988,7 @@ const QuestionScoreFilterChip: React.FC<IQuestionScoreFilterChipProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <div className='flex max-w-sm items-center gap-1.5 rounded-md border border-blue-100 bg-blue-50 px-2 py-1 text-blue-800'>
-          <Icon
-            variant='clipboard'
-            className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700'
-          />
+          <Clipboard className='h-3.5 w-3.5 flex-shrink-0 stroke-blue-700' />
           <span className='truncate text-sm text-blue-700' title={questionName}>
             {truncatedName}
           </span>
@@ -2035,7 +2002,7 @@ const QuestionScoreFilterChip: React.FC<IQuestionScoreFilterChipProps> = ({
             }}
             className='ml-0.5 flex-shrink-0 rounded p-0.5 hover:bg-blue-200'
           >
-            <Icon variant='closeX' className='h-3 w-3 stroke-blue-700' />
+            <X className='h-3 w-3 stroke-blue-700' />
           </button>
         </div>
       </Popover.Trigger>
@@ -2095,10 +2062,7 @@ const QuestionScoreFilterChip: React.FC<IQuestionScoreFilterChipProps> = ({
                                 <div className='flex flex-shrink-0 items-center gap-2'>
                                   {getImportanceBadge(q.importance)}
                                   {localFilter.questionUuid === q.uuid && (
-                                    <Icon
-                                      variant='check'
-                                      className='h-4 w-4 stroke-blue-600'
-                                    />
+                                    <Check className='h-4 w-4 stroke-blue-600' />
                                   )}
                                 </div>
                               </button>

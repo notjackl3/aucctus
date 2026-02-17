@@ -1,8 +1,9 @@
-import Icon from '@components/Icon';
 import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import utils from '@libs/utils';
 
 import React from 'react';
+import { X as XIcon } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IFilterOptionsHeaderItemProps {
   propertyName: keyof IConceptFilterOptions | 'propertyFilter';
@@ -31,7 +32,11 @@ const FilterOptionsHeaderItem: React.FC<IFilterOptionsHeaderItemProps> = ({
   return (
     <span className='flex h-full w-fit max-w-96 items-center gap-2 rounded-lg bg-primary-50 px-3 py-2 align-middle text-primary-600 [&>svg]:stroke-primary-600'>
       <span className='[&>svg]:stroke-primary-600'>
-        <Icon variant={getPropertyIcon(propertyName)} width={16} height={16} />
+        <DynamicIcon
+          variant={getPropertyIcon(propertyName)}
+          width={16}
+          height={16}
+        />
       </span>
       <span className='truncate'>{displayText}</span>
       {onRemove && (
@@ -39,7 +44,7 @@ const FilterOptionsHeaderItem: React.FC<IFilterOptionsHeaderItemProps> = ({
           onClick={onRemove}
           className='ml-1 rounded-full p-1 hover:bg-primary-100'
         >
-          <Icon variant='closeX' width={12} height={12} />
+          <XIcon size={12} />
         </button>
       )}
     </span>
@@ -62,7 +67,7 @@ function checkStringOrder(str: string) {
 
 const getPropertyIcon = (
   propertyName: keyof IConceptFilterOptions | 'propertyFilter',
-): IconVariant => {
+): string => {
   switch (propertyName) {
     case 'status':
       return 'loading-02';

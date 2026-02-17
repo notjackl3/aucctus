@@ -1,7 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { ITestCollateralOption } from '@libs/api/types/concept/testing';
+import { Check, Eye, FileUp } from 'lucide-react';
 
 interface ICollateralSelectionStepProps {
   collaterals: ITestCollateralOption[];
@@ -70,10 +70,7 @@ const CollateralSelectionStep: React.FC<ICollateralSelectionStepProps> = ({
     return (
       <div className='aucctus-border-secondary flex flex-col items-center justify-center rounded-lg border-2 border-dashed px-4 py-12'>
         <div className='aucctus-bg-secondary-subtle mb-4 rounded-full p-3'>
-          <Icon
-            variant='file-attachment'
-            className='aucctus-stroke-tertiary h-6 w-6'
-          />
+          <FileUp className='aucctus-stroke-tertiary h-6 w-6' />
         </div>
         <h3 className='aucctus-text-sm-semibold aucctus-text-primary mb-2 text-center'>
           No collaterals available
@@ -123,7 +120,7 @@ const CollateralSelectionStep: React.FC<ICollateralSelectionStepProps> = ({
               {isSelected && (
                 <div className='absolute -right-2 -top-2 z-10'>
                   <div className='flex h-6 w-6 items-center justify-center rounded-full bg-green-500 shadow-sm'>
-                    <Icon variant='check' className='h-3 w-3 stroke-white' />
+                    <Check className='h-3 w-3 stroke-white' />
                   </div>
                 </div>
               )}
@@ -145,10 +142,7 @@ const CollateralSelectionStep: React.FC<ICollateralSelectionStepProps> = ({
                     }}
                     aria-label={`View ${collateral.title} in collateral tab`}
                   >
-                    <Icon
-                      variant='eye'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
+                    <Eye className='aucctus-stroke-secondary h-4 w-4' />
                   </button>
                 </div>
 

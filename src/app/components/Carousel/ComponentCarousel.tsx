@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import Icon from '../Icon';
-
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 interface ComponentCarouselProps {
   children: React.ReactNode;
   cardWidth?: string;
@@ -215,24 +214,14 @@ const ComponentCarousel = React.forwardRef<
                 onClick={scrollPrev}
                 disabled={!scrollState.canScrollLeft}
               >
-                <Icon
-                  variant='arrowleft'
-                  height={16}
-                  width={16}
-                  className='aucctus-stroke-secondary'
-                />
+                <ArrowLeft size={16} className='aucctus-stroke-secondary' />
               </button>
               <button
                 className={navButtonStyles}
                 onClick={scrollNext}
                 disabled={!scrollState.canScrollRight}
               >
-                <Icon
-                  variant='arrowright'
-                  height={16}
-                  width={16}
-                  className='aucctus-stroke-secondary'
-                />
+                <ArrowRight size={16} className='aucctus-stroke-secondary' />
               </button>
             </div>
           )}
@@ -274,24 +263,14 @@ const ComponentCarousel = React.forwardRef<
                   onClick={scrollPrev}
                   disabled={!scrollState.canScrollLeft}
                 >
-                  <Icon
-                    variant='arrowleft'
-                    height={16}
-                    width={16}
-                    className='aucctus-stroke-secondary'
-                  />
+                  <ArrowLeft size={16} className='aucctus-stroke-secondary' />
                 </button>
                 <button
                   className={`absolute right-2 top-1/2 z-10 -translate-y-1/2 ${navButtonStyles}`}
                   onClick={scrollNext}
                   disabled={!scrollState.canScrollRight}
                 >
-                  <Icon
-                    variant='arrowright'
-                    height={16}
-                    width={16}
-                    className='aucctus-stroke-secondary'
-                  />
+                  <ArrowRight size={16} className='aucctus-stroke-secondary' />
                 </button>
               </>
             )}
@@ -305,24 +284,14 @@ const ComponentCarousel = React.forwardRef<
                 onClick={scrollPrev}
                 disabled={!scrollState.canScrollLeft}
               >
-                <Icon
-                  variant='arrowleft'
-                  height={16}
-                  width={16}
-                  className='aucctus-stroke-secondary'
-                />
+                <ArrowLeft size={16} className='aucctus-stroke-secondary' />
               </button>
               <button
                 className={navButtonStyles}
                 onClick={scrollNext}
                 disabled={!scrollState.canScrollRight}
               >
-                <Icon
-                  variant='arrowright'
-                  height={16}
-                  width={16}
-                  className='aucctus-stroke-secondary'
-                />
+                <ArrowRight size={16} className='aucctus-stroke-secondary' />
               </button>
             </div>
           )}

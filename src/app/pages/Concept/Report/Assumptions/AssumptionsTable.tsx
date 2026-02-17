@@ -5,7 +5,6 @@ import RegenerateTestsBanner from './components/RegenerateTestsBanner';
 import CategoryProgressCard from './components/cards/category-progress-card/CategoryProgressCard';
 import { CategoryStatusCounts } from './components/cards/category-progress-card/types';
 import telemetry from '@libs/telemetry';
-import { Icon } from '@components';
 import { IAssumptionV2, AssumptionCategory } from '@libs/api/types';
 import { CategoryMetric } from '@hooks/query/assumptions.hook';
 import {
@@ -15,6 +14,7 @@ import {
 } from './utils/assumptionUtils';
 import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import { useBatchAssumptionTable } from '@hooks/concepts/useBatchAssumptionTable';
+import { Plus } from 'lucide-react';
 
 const DEFAULT_STATUS_COUNTS: CategoryStatusCounts = {
   validated: 0,
@@ -318,8 +318,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                     className='aucctus-border-secondary aucctus-text-brand-tertiary hover:aucctus-bg-secondary-hover aucctus-text-sm-medium flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-3 transition-colors disabled:cursor-not-allowed disabled:opacity-60'
                     disabled={editingAssumptionId !== null || isSubmitting}
                   >
-                    <Icon
-                      variant='plus'
+                    <Plus
                       className='h-4 w-4'
                       style={{ stroke: 'currentColor' }}
                     />
@@ -343,8 +342,7 @@ const AssumptionsTable: React.FC<AssumptionsTableProps> = ({
                     className='aucctus-border-secondary aucctus-text-brand-tertiary hover:aucctus-bg-secondary-hover aucctus-text-sm-medium flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed py-3 transition-colors disabled:cursor-not-allowed disabled:opacity-60'
                     disabled={editingAssumptionId !== null || isSubmitting}
                   >
-                    <Icon
-                      variant='plus'
+                    <Plus
                       className='h-4 w-4'
                       style={{ stroke: 'currentColor' }}
                     />

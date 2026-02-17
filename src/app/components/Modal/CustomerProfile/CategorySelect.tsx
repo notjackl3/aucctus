@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { cn } from '@libs/utils/react';
-import { Icon } from '@components';
 import DropdownMenu from './DropdownMenu';
+import { ChevronDown } from 'lucide-react';
 
 interface CategorySelectProps<T extends string> {
   label: string;
@@ -88,8 +88,7 @@ const CategorySelect = <T extends string>({
           }}
         >
           <span>{selectedValue}</span>
-          <Icon
-            variant='chevrondown'
+          <ChevronDown
             className={cn({
               'aucctus-stroke-secondary h-4 w-4 transition-transform duration-200':
                 true,

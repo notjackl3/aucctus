@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import {
   Tabs,
   TabsList,
   TabsTrigger,
   TabsContent,
 } from '@components/Tabs/Tabs';
+import { AlertTriangle, Target, ThumbsUp } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ConceptDetail {
   shouldWeDo: string;
@@ -49,7 +50,7 @@ const ConceptDetailPanel: React.FC<ConceptDetailPanelProps> = ({
       {/* Header with Badge */}
       <div className='flex items-start justify-between gap-4'>
         <div className='flex flex-1 items-start gap-3'>
-          <Icon
+          <DynamicIcon
             variant={icon as any}
             className='aucctus-stroke-white h-6 w-6 flex-shrink-0 opacity-80'
           />
@@ -152,30 +153,21 @@ const ConceptDetailPanel: React.FC<ConceptDetailPanelProps> = ({
               value='believe'
               className='data-[state=active]:aucctus-text-white aucctus-text-tertiary aucctus-text-xs flex items-center justify-center gap-1.5 py-2 data-[state=active]:bg-white/20'
             >
-              <Icon
-                variant='thumbs-up'
-                className='aucctus-stroke-white h-4 w-4'
-              />
+              <ThumbsUp className='aucctus-stroke-white h-4 w-4' />
               <span className='aucctus-text-white'>Reasons to Believe</span>
             </TabsTrigger>
             <TabsTrigger
               value='challenge'
               className='data-[state=active]:aucctus-text-white aucctus-text-tertiary aucctus-text-xs flex items-center justify-center gap-1.5 py-2 data-[state=active]:bg-white/20'
             >
-              <Icon
-                variant='alert-triangle'
-                className='aucctus-stroke-white h-4 w-4'
-              />
+              <AlertTriangle className='aucctus-stroke-white h-4 w-4' />
               <span className='aucctus-text-white'>Reasons to Challenge</span>
             </TabsTrigger>
             <TabsTrigger
               value='alignment'
               className='data-[state=active]:aucctus-text-white aucctus-text-tertiary aucctus-text-xs flex items-center justify-center gap-1.5 py-2 data-[state=active]:bg-white/20'
             >
-              <Icon
-                variant='target-round'
-                className='aucctus-stroke-white h-4 w-4'
-              />
+              <Target className='aucctus-stroke-white h-4 w-4' />
               <span className='aucctus-text-white'>Alignment</span>
             </TabsTrigger>
           </TabsList>

@@ -1,14 +1,15 @@
 import { FunctionComponent, useMemo } from 'react';
-import { Icon } from '@components';
 import { IPocPlan } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { PresentationIcon } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IPocAtAGlanceProps {
   pocPlan: IPocPlan;
 }
 
 interface IMetricCardProps {
-  icon: IconVariant;
+  icon: string;
   label: string;
   value: string | number;
   subtext?: string;
@@ -109,7 +110,7 @@ const MetricCard: FunctionComponent<IMetricCardProps> = ({
         color,
       )}
     >
-      <Icon variant={icon} className='h-6 w-6 stroke-white' />
+      <DynamicIcon variant={icon} className='h-6 w-6 stroke-white' />
     </div>
     <div className='flex flex-col'>
       <span className='aucctus-text-tertiary aucctus-text-xs uppercase tracking-wider'>
@@ -167,10 +168,7 @@ const PocAtAGlance: FunctionComponent<IPocAtAGlanceProps> = ({ pocPlan }) => {
       {/* Header with Health Score */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <Icon
-            variant='presentation-chart'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <PresentationIcon className='aucctus-stroke-brand-primary h-5 w-5' />
           <h3 className='aucctus-text-primary aucctus-text-md-semibold'>
             At A Glance
           </h3>

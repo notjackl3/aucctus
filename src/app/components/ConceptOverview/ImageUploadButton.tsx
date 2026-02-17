@@ -1,5 +1,6 @@
 import React, { useCallback, useRef } from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
+import { Loader2, Upload } from 'lucide-react';
 
 interface ImageUploadButtonProps {
   conceptUuid: string;
@@ -84,18 +85,12 @@ const ImageUploadButton: React.FC<ImageUploadButtonProps> = ({
       >
         {uploadMutation.isLoading ? (
           <>
-            <Icon
-              variant='loading-02'
-              className='aucctus-stroke-primary h-4 w-4 animate-spin'
-            />
+            <Loader2 className='aucctus-stroke-primary h-4 w-4 animate-spin' />
             <span className='aucctus-text-sm-medium'>Uploading...</span>
           </>
         ) : (
           <>
-            <Icon
-              variant='upload'
-              className='aucctus-stroke-brand-primary h-4 w-4 transition-colors'
-            />
+            <Upload className='aucctus-stroke-brand-primary h-4 w-4 transition-colors' />
             <span className='aucctus-text-sm-medium'>
               {isCustomActive ? 'Replace Image' : 'Upload Image'}
             </span>

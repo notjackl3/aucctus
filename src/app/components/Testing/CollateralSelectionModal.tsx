@@ -1,7 +1,8 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { Icon } from '@components';
 import { ITestCollateralOption } from '@libs/api/types/concept/testing';
+import { File, Loader2, Search, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface CollateralSelectionModalProps {
   isOpen: boolean;
@@ -166,7 +167,7 @@ const CollateralSelectionModal: React.FC<CollateralSelectionModalProps> = ({
                   className='aucctus-bg-secondary-hover rounded-full p-2 transition-colors'
                   aria-label='Close modal'
                 >
-                  <Icon variant='closeX' className='aucctus-stroke-secondary' />
+                  <X className='aucctus-stroke-secondary' />
                 </button>
               </div>
             </div>
@@ -175,10 +176,7 @@ const CollateralSelectionModal: React.FC<CollateralSelectionModalProps> = ({
             <div className='min-h-0 flex-1 space-y-4 overflow-y-auto p-6'>
               {/* Search */}
               <div className='relative'>
-                <Icon
-                  variant='search-md'
-                  className='aucctus-stroke-tertiary absolute left-3 top-1/2 -translate-y-1/2 transform'
-                />
+                <Search className='aucctus-stroke-tertiary absolute left-3 top-1/2 -translate-y-1/2 transform' />
                 <input
                   type='text'
                   placeholder='Search collaterals...'
@@ -204,20 +202,14 @@ const CollateralSelectionModal: React.FC<CollateralSelectionModalProps> = ({
               <div className='max-h-96 overflow-y-auto pr-2'>
                 {isLoading ? (
                   <div className='flex items-center justify-center py-8'>
-                    <Icon
-                      variant='loading-02'
-                      className='aucctus-stroke-secondary animate-spin'
-                    />
+                    <Loader2 className='aucctus-stroke-secondary animate-spin' />
                     <span className='aucctus-text-sm aucctus-text-secondary ml-2'>
                       Loading collaterals...
                     </span>
                   </div>
                 ) : Object.keys(collateralsByType).length === 0 ? (
                   <div className='py-8 text-center'>
-                    <Icon
-                      variant='file'
-                      className='aucctus-stroke-tertiary mx-auto mb-2'
-                    />
+                    <File className='aucctus-stroke-tertiary mx-auto mb-2' />
                     <p className='aucctus-text-sm aucctus-text-secondary'>
                       {searchTerm
                         ? 'No collaterals match your search'
@@ -231,7 +223,7 @@ const CollateralSelectionModal: React.FC<CollateralSelectionModalProps> = ({
                         <div key={type}>
                           {/* Type Header */}
                           <div className='mb-3 flex items-center gap-2'>
-                            <Icon
+                            <DynamicIcon
                               variant={getTypeIcon(type)}
                               className='aucctus-stroke-tertiary'
                             />

@@ -1,4 +1,4 @@
-import { Card, Icon } from '@components';
+import { Card } from '@components';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import useStore from '@stores/store';
 import { FunctionComponent } from 'react';
@@ -9,6 +9,7 @@ import { useDashboard } from '../../hooks/query/account.hook';
 import DashboardInnovationCard from './components/DashboardInnovationCard';
 import DashboardOpportunityCard from './components/DashboardOpportunityCard';
 import styles from './styles/dashboard.module.scss';
+import { ArrowRight, Rocket } from 'lucide-react';
 
 const defaultIconProps = {
   stroke: '#2B3674',
@@ -38,12 +39,7 @@ const Dashboard: FunctionComponent = () => {
               navigate(AppPath.IdeaPlayground);
             }}
           >
-            <Icon
-              variant='rocket'
-              height={20}
-              width={20}
-              className='stroke-primary-100'
-            />
+            <Rocket size={20} className='stroke-primary-100' />
             Add Concept
           </button>
         </div>
@@ -66,8 +62,7 @@ const Dashboard: FunctionComponent = () => {
                 }}
                 aria-label='View Concept Bank'
               >
-                Go to Concept Bank{' '}
-                <Icon variant='arrowright' {...defaultIconProps} />
+                Go to Concept Bank <ArrowRight {...defaultIconProps} />
               </button>
             }
           >

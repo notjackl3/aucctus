@@ -1,10 +1,11 @@
-import { Badge, Icon } from '@components';
+import { Badge } from '@components';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React, { useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import IncubationIcon from '../util/IncubationIcon';
 import ProgressCircle from '../util/ProgressCircle';
 import { IConceptIncubationQuestionnaireSection } from '@libs/api/types';
+import { ArrowLeft } from 'lucide-react';
 
 interface QuestionnaireHeaderProps {
   questionnaire?: IConceptIncubationQuestionnaireSection;
@@ -98,7 +99,7 @@ const QuestionnaireHeader: React.FC<QuestionnaireHeaderProps> = ({
               className='btn btn-light mx-3 flex items-center gap-2'
               onClick={onGoBack}
             >
-              <Icon variant='arrowleft' width={20} height={20} />
+              <ArrowLeft size={20} />
             </button>
           </motion.span>
         )}

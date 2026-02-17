@@ -1,12 +1,12 @@
 import React from 'react';
-import { Icon, ComponentCarousel } from '@components';
+import { ComponentCarousel } from '@components';
 import Text from '@components/Text';
 import type {
-  IconVariant,
   ITrendV3,
   IKeyFindingV3,
 } from '@libs/api/types/concept/marketScan';
 import KeyFindingCard from './KeyFindingCard';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface TrendCardProps {
   section: ITrendV3;
@@ -42,8 +42,8 @@ const TrendCard: React.FC<TrendCardProps> = ({ section, index }) => {
       <div className='aucctus-bg-secondary px-6 pb-4 pt-6'>
         <div className='mb-1 flex items-center gap-2'>
           <div className='flex items-center justify-center py-1'>
-            <Icon
-              variant={section.icon as IconVariant}
+            <DynamicIcon
+              variant={section.icon as string}
               className='aucctus-stroke-brand-secondary h-5 w-5'
             />
           </div>

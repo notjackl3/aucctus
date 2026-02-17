@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { AssumptionCategory } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import ThresholdMarker from './ThresholdMarker';
 import { getCategoryColors } from '../../../../constants/categoryColors';
+import { Check } from 'lucide-react';
 
 interface StandardProgressBarProps {
   category: AssumptionCategory;
@@ -119,11 +119,7 @@ const StandardProgressBar: React.FC<StandardProgressBarProps> = ({
       {/* For Validated state - add a checkmark */}
       {isValidated && (
         <div className='absolute right-1 top-1/2 -translate-y-1/2 transform rounded-full bg-green-500 p-0.5'>
-          <Icon
-            variant='check'
-            className='aucctus-stroke-white h-3 w-3'
-            strokeWidth={3}
-          />
+          <Check className='aucctus-stroke-white h-3 w-3' strokeWidth={3} />
         </div>
       )}
     </>

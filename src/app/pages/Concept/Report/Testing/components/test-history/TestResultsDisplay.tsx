@@ -1,8 +1,8 @@
 import React from 'react';
-import { Icon } from '@components';
 import { ITestResult } from '@libs/api/types/concept/testing';
 import { ITestDetails } from '../../types';
 import { cn } from '@libs/utils/react';
+import { ArrowRight, BarChart3, Check, Lightbulb, Users } from 'lucide-react';
 
 interface TestResultsDisplayProps {
   testResults: ITestResult[];
@@ -41,10 +41,7 @@ const TestResultsDisplay: React.FC<TestResultsDisplayProps> = ({
   if (!hasResults || testResults.length === 0) {
     return (
       <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6 text-center'>
-        <Icon
-          variant='barchart'
-          className='aucctus-stroke-tertiary mx-auto mb-3 h-12 w-12'
-        />
+        <BarChart3 className='aucctus-stroke-tertiary mx-auto mb-3 h-12 w-12' />
         <h5 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
           Analysis in Progress
         </h5>
@@ -67,10 +64,7 @@ const TestResultsDisplay: React.FC<TestResultsDisplayProps> = ({
       {learnings.length > 0 && (
         <div className='space-y-4'>
           <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary flex items-center gap-2'>
-            <Icon
-              variant='lightbulb'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <Lightbulb className='aucctus-stroke-brand-primary h-5 w-5' />
             Key Learnings ({learnings.length})
           </h4>
           <div className='grid grid-cols-1 gap-4 lg:grid-cols-2'>
@@ -81,10 +75,7 @@ const TestResultsDisplay: React.FC<TestResultsDisplayProps> = ({
               >
                 <div className='flex items-start gap-3'>
                   <div className='aucctus-bg-brand-secondary aucctus-border-brand mt-1 flex-shrink-0 rounded-full border p-1'>
-                    <Icon
-                      variant='check'
-                      className='aucctus-stroke-brand-primary h-3 w-3'
-                    />
+                    <Check className='aucctus-stroke-brand-primary h-3 w-3' />
                   </div>
                   <div className='min-w-0 flex-1'>
                     <p className='aucctus-text-sm-semibold aucctus-text-brand-primary mb-2'>
@@ -110,10 +101,7 @@ const TestResultsDisplay: React.FC<TestResultsDisplayProps> = ({
       {recommendations.length > 0 && (
         <div className='space-y-4'>
           <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary flex items-center gap-2'>
-            <Icon
-              variant='arrowright'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <ArrowRight className='aucctus-stroke-brand-primary h-5 w-5' />
             Recommendations ({recommendations.length})
           </h4>
           <div className='space-y-3'>
@@ -136,17 +124,11 @@ const TestResultsDisplay: React.FC<TestResultsDisplayProps> = ({
                     <div className='flex-shrink-0 pt-1'>
                       {isApplied ? (
                         <div className='aucctus-bg-success-solid aucctus-border-success flex h-5 w-5 items-center justify-center rounded border-2'>
-                          <Icon
-                            variant='check'
-                            className='aucctus-stroke-white h-3 w-3'
-                          />
+                          <Check className='aucctus-stroke-white h-3 w-3' />
                         </div>
                       ) : (
                         <div className='aucctus-bg-secondary aucctus-border-secondary flex h-5 w-5 items-center justify-center rounded-full border p-1'>
-                          <Icon
-                            variant='arrowright'
-                            className='aucctus-stroke-brand-primary h-3 w-3'
-                          />
+                          <ArrowRight className='aucctus-stroke-brand-primary h-3 w-3' />
                         </div>
                       )}
                     </div>
@@ -234,8 +216,7 @@ const TestResultsDisplay: React.FC<TestResultsDisplayProps> = ({
 
                       {recommendation.sourceCount > 0 && (
                         <div className='flex items-center gap-2'>
-                          <Icon
-                            variant='users-03'
+                          <Users
                             className={cn(
                               'h-4 w-4',
                               isApplied
@@ -268,10 +249,7 @@ const TestResultsDisplay: React.FC<TestResultsDisplayProps> = ({
       {/* No Results Available */}
       {learnings.length === 0 && recommendations.length === 0 && (
         <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6 text-center'>
-          <Icon
-            variant='barchart'
-            className='aucctus-stroke-tertiary mx-auto mb-3 h-12 w-12'
-          />
+          <BarChart3 className='aucctus-stroke-tertiary mx-auto mb-3 h-12 w-12' />
           <h5 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
             Analysis in Progress
           </h5>

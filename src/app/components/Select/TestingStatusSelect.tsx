@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { AssumptionTestStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/assumptions';
@@ -6,6 +5,8 @@ import { VALIDATION_STATUS } from '@libs/utils/concepts';
 import * as Select from '@radix-ui/react-select';
 import classNames from 'classnames';
 import React from 'react';
+import RotatingIcon from '@components/Icon/RotatingIcon';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface TestingStatusSelectProps {
   value: AssumptionTestStatus;
@@ -38,7 +39,7 @@ const TestingStatusSelect: React.FC<TestingStatusSelectProps> = ({
         className={`inline-flex min-h-8 min-w-32 items-center justify-center gap-2 text-nowrap rounded-md px-2.5 py-1.5 mix-blend-multiply shadow ${style.bg}`}
       >
         <Select.Icon>
-          <Icon variant={style.icon} />
+          <DynamicIcon variant={style.icon} />
         </Select.Icon>
         <Select.Value className={`flex flex-row gap-4`}>
           <span className={`${style.text}`}>
@@ -46,7 +47,7 @@ const TestingStatusSelect: React.FC<TestingStatusSelectProps> = ({
           </span>
         </Select.Value>
         <Select.Icon asChild>
-          <Icon.RotatingIcon isUp={open} className={`${style.stroke}`} />
+          <RotatingIcon isUp={open} className={`${style.stroke}`} />
         </Select.Icon>
       </Select.Trigger>
 
@@ -65,7 +66,7 @@ const TestingStatusSelect: React.FC<TestingStatusSelectProps> = ({
                   TESTING_STATUS_STYLE_MAP[item].text,
                 )}
               >
-                <Icon
+                <DynamicIcon
                   variant={TESTING_STATUS_STYLE_MAP[item].icon}
                   className={TESTING_STATUS_STYLE_MAP[item].stroke}
                 />

@@ -1,4 +1,4 @@
-import { Icon, Modal } from '@components';
+import { Modal } from '@components';
 import { AgentProgressBar } from '@components/Progress';
 import { cn } from '@libs/utils/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -21,6 +21,17 @@ import {
 } from '@hooks/query/testing.hook';
 import { useModal } from '@context/ModalContextProvider';
 import type { AssumptionCategory } from '@libs/api/types/concept/assumptions';
+import {
+  AlertTriangle,
+  ArrowRight,
+  Check,
+  Clipboard,
+  Plus,
+  RefreshCw,
+  Sparkles,
+  Telescope,
+  X,
+} from 'lucide-react';
 
 interface RecommendedTestSectionProps {
   conceptUuid: string;
@@ -340,10 +351,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
       return (
         <div className='aucctus-bg-primary aucctus-border-secondary relative rounded-lg border p-6 shadow-sm'>
           <div className='flex flex-col items-center justify-center py-8'>
-            <Icon
-              variant='refresh'
-              className='aucctus-stroke-brand-primary mb-3 h-8 w-8 animate-spin'
-            />
+            <RefreshCw className='aucctus-stroke-brand-primary mb-3 h-8 w-8 animate-spin' />
             <p className='aucctus-text-sm-medium aucctus-text-brand-secondary'>
               Checking assumptions...
             </p>
@@ -389,12 +397,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
       return (
         <div className='aucctus-bg-error-subtle aucctus-border-error relative rounded-lg border p-6 shadow-sm'>
           <div className='flex flex-col items-center justify-center gap-3 py-8 text-center'>
-            <Icon
-              variant='alert-triangle'
-              height={48}
-              width={48}
-              className='aucctus-stroke-error-primary'
-            />
+            <AlertTriangle size={48} className='aucctus-stroke-error-primary' />
             <h3 className='aucctus-text-lg-semibold aucctus-text-error-primary'>
               We hit a snag generating your next test
             </h3>
@@ -429,10 +432,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
           {(isCompletingTest || generateNextTest.isLoading) && (
             <div className='absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white bg-opacity-75'>
               <div className='flex flex-col items-center gap-3'>
-                <Icon
-                  variant='refresh'
-                  className='aucctus-stroke-brand-primary h-8 w-8 animate-spin'
-                />
+                <RefreshCw className='aucctus-stroke-brand-primary h-8 w-8 animate-spin' />
                 <p className='aucctus-text-sm-medium aucctus-text-brand-primary'>
                   Generating next test...
                 </p>
@@ -440,10 +440,8 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
             </div>
           )}
           <div className='flex flex-col items-center justify-center py-8'>
-            <Icon
-              variant='telescope'
-              height={48}
-              width={48}
+            <Telescope
+              size={48}
               className='aucctus-stroke-brand-primary mb-4'
             />
             <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
@@ -475,7 +473,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
               disabled={generateNextTest.isLoading}
               className='btn btn-primary flex items-center gap-2'
             >
-              <Icon variant='plus' className='aucctus-stroke-white h-4 w-4' />
+              <Plus className='aucctus-stroke-white h-4 w-4' />
               Generate Next Test
             </button>
           </div>
@@ -494,10 +492,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
         {isCompletingTest && (
           <div className='absolute inset-0 z-10 flex items-center justify-center rounded-lg bg-white bg-opacity-75'>
             <div className='flex flex-col items-center gap-3'>
-              <Icon
-                variant='refresh'
-                className='aucctus-stroke-brand-primary h-8 w-8 animate-spin'
-              />
+              <RefreshCw className='aucctus-stroke-brand-primary h-8 w-8 animate-spin' />
               <p className='aucctus-text-sm-medium aucctus-text-brand-primary'>
                 Generating next test...
               </p>
@@ -505,12 +500,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
           </div>
         )}
         <div className='flex flex-col items-center justify-center py-8'>
-          <Icon
-            variant='check'
-            height={48}
-            width={48}
-            className='aucctus-stroke-success-primary mb-4'
-          />
+          <Check size={48} className='aucctus-stroke-success-primary mb-4' />
           <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
             All assumptions validated!
           </h3>
@@ -569,10 +559,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
               </div>
             ) : (
               <div className='flex flex-col items-center gap-3'>
-                <Icon
-                  variant='refresh'
-                  className='aucctus-stroke-brand-primary h-8 w-8 animate-spin'
-                />
+                <RefreshCw className='aucctus-stroke-brand-primary h-8 w-8 animate-spin' />
                 <p className='aucctus-text-sm-medium aucctus-text-brand-primary'>
                   Generating next test...
                 </p>
@@ -583,10 +570,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
 
         {hasGenerationError && (
           <div className='aucctus-bg-error-subtle aucctus-border-error mb-4 flex items-start gap-2 rounded-md border p-3 text-left'>
-            <Icon
-              variant='alert-triangle'
-              className='aucctus-stroke-error-primary mt-0.5 h-4 w-4'
-            />
+            <AlertTriangle className='aucctus-stroke-error-primary mt-0.5 h-4 w-4' />
             <div className='flex flex-1 flex-col gap-1'>
               <p className='aucctus-text-sm-semibold aucctus-text-error-primary'>
                 We couldn&apos;t generate the next test
@@ -610,10 +594,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
         <div className='mb-4 flex items-start justify-between'>
           {/* Recommended Label */}
           <div className='aucctus-bg-brand-secondary aucctus-border-secondary aucctus-text-xs-semibold aucctus-text-brand-primary mb-1 inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5'>
-            <Icon
-              variant='ai-conclusion'
-              className='aucctus-stroke-brand-primary h-3.5 w-3.5'
-            />
+            <Sparkles className='aucctus-stroke-brand-primary h-3.5 w-3.5' />
             Recommended Next Test
           </div>
 
@@ -632,10 +613,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                 className='btn btn-primary flex items-center gap-1'
                 disabled={regenerateTestDetails.isLoading}
               >
-                <Icon
-                  variant='arrowright'
-                  className='aucctus-stroke-white h-4 w-4'
-                />
+                <ArrowRight className='aucctus-stroke-white h-4 w-4' />
                 Save Changes
               </button>
             </div>
@@ -649,15 +627,9 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
               disabled={disableInteractions}
             >
               {disableInteractions ? (
-                <Icon
-                  variant='refresh'
-                  className='aucctus-stroke-white h-4 w-4 animate-spin'
-                />
+                <RefreshCw className='aucctus-stroke-white h-4 w-4 animate-spin' />
               ) : (
-                <Icon
-                  variant='arrowright'
-                  className='aucctus-stroke-white h-4 w-4'
-                />
+                <ArrowRight className='aucctus-stroke-white h-4 w-4' />
               )}
               {disableInteractions ? 'Running...' : 'Run Test'}
             </button>
@@ -677,10 +649,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
         {/* Assumptions to Test */}
         <div className='relative'>
           <h4 className='aucctus-text-sm-semibold aucctus-text-brand-tertiary mb-4 flex items-center gap-1.5'>
-            <Icon
-              variant='clipboard'
-              className='aucctus-stroke-brand-primary h-4 w-4'
-            />
+            <Clipboard className='aucctus-stroke-brand-primary h-4 w-4' />
             Assumptions to Test
           </h4>
 
@@ -746,10 +715,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
                         className='flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100'
                         aria-label='Remove assumption'
                       >
-                        <Icon
-                          variant='closeX'
-                          className='aucctus-stroke-error-primary h-4 w-4'
-                        />
+                        <X className='aucctus-stroke-error-primary h-4 w-4' />
                       </button>
                     </div>
                   </div>
@@ -772,7 +738,7 @@ const RecommendedTestSection: React.FC<RecommendedTestSectionProps> = ({
               )}
               disabled={!conceptUuid || !testUuid}
             >
-              <Icon variant='plus' className='aucctus-stroke-primary h-4 w-4' />
+              <Plus className='aucctus-stroke-primary h-4 w-4' />
               Add assumption
             </button>
 

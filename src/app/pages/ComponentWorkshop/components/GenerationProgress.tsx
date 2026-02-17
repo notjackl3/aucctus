@@ -8,9 +8,10 @@
  */
 
 import React, { useMemo, useEffect, useRef } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import type { IAgentMessage } from '@libs/api/types/dynamicComponent.d';
+import { Loader2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IGenerationProgressProps {
   /** Agent messages from generation */
@@ -106,10 +107,7 @@ const GenerationProgress: React.FC<IGenerationProgressProps> = ({
           Generation Progress
         </h3>
         <div className='flex items-center gap-2'>
-          <Icon
-            variant='loading-02'
-            className='aucctus-stroke-brand-primary h-4 w-4 animate-spin'
-          />
+          <Loader2 className='aucctus-stroke-brand-primary h-4 w-4 animate-spin' />
           <span className='aucctus-text-xs aucctus-text-tertiary'>
             {messages.length} messages
           </span>
@@ -151,7 +149,7 @@ const GenerationProgress: React.FC<IGenerationProgressProps> = ({
                 },
               )}
             >
-              <Icon
+              <DynamicIcon
                 variant={typeInfo.icon}
                 className={cn('mt-0.5 h-4 w-4 flex-shrink-0', {
                   'aucctus-stroke-secondary': message.type === 'text',

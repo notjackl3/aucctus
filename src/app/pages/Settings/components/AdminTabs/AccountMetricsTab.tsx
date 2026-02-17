@@ -1,11 +1,18 @@
 import { FunctionComponent, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Icon } from '@components';
 import { useAdminMetrics } from '@hooks/query/admin.hook';
 import { cn } from '@libs/utils/react';
 import { MetricsTimeRange, TopConcept } from '@libs/api/types';
-
-type IconVariant = Parameters<typeof Icon>[0]['variant'];
+import {
+  AlertCircle,
+  BarChart3,
+  ChevronRight,
+  Lock,
+  RefreshCw,
+  Star,
+  Users,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const TIME_RANGE_OPTIONS: { value: MetricsTimeRange; label: string }[] = [
   { value: '7d', label: '7 Days' },
@@ -39,7 +46,7 @@ interface MetricCardProps {
   title: string;
   value: string | number;
   subtitle?: string;
-  icon?: IconVariant;
+  icon?: string;
   trend?: 'up' | 'down' | 'neutral';
   trendValue?: string;
   className?: string;
@@ -66,7 +73,7 @@ const MetricCard = ({
     <div className='mb-1 flex items-center justify-between'>
       <p className='aucctus-text-xs aucctus-text-tertiary'>{title}</p>
       {icon && (
-        <Icon
+        <DynamicIcon
           variant={icon}
           className='aucctus-stroke-tertiary h-4 w-4 opacity-50'
         />
@@ -88,7 +95,7 @@ const MetricCard = ({
               },
             )}
           >
-            <Icon
+            <DynamicIcon
               variant={
                 trend === 'up'
                   ? 'trending-up'
@@ -120,10 +127,7 @@ const TopConceptsCard = ({ concepts }: TopConceptsCardProps) => (
   <div className='col-span-1 rounded-lg border border-gray-200 p-4 sm:col-span-2 lg:col-span-3'>
     <div className='mb-3 flex items-center justify-between'>
       <p className='aucctus-text-xs aucctus-text-tertiary'>Top 3 Concepts</p>
-      <Icon
-        variant='star-01'
-        className='aucctus-stroke-tertiary h-4 w-4 opacity-50'
-      />
+      <Star className='aucctus-stroke-tertiary h-4 w-4 opacity-50' />
     </div>
     {concepts.length === 0 ? (
       <p className='aucctus-text-sm aucctus-text-tertiary italic'>
@@ -170,10 +174,7 @@ const TopConceptsCard = ({ concepts }: TopConceptsCardProps) => (
               >
                 {concept.priorityScore}
               </span>
-              <Icon
-                variant='chevronright'
-                className='aucctus-stroke-tertiary h-4 w-4'
-              />
+              <ChevronRight className='aucctus-stroke-tertiary h-4 w-4' />
             </div>
           </Link>
         ))}
@@ -187,7 +188,7 @@ const TopConceptsCard = ({ concepts }: TopConceptsCardProps) => (
  */
 interface ComingSoonCardProps {
   title: string;
-  icon?: IconVariant;
+  icon?: string;
   description?: string;
 }
 
@@ -196,7 +197,7 @@ const ComingSoonCard = ({ title, icon, description }: ComingSoonCardProps) => (
     <div className='mb-1 flex items-center justify-between'>
       <p className='aucctus-text-xs aucctus-text-tertiary'>{title}</p>
       {icon && (
-        <Icon
+        <DynamicIcon
           variant={icon}
           className='aucctus-stroke-tertiary h-4 w-4 opacity-40'
         />
@@ -255,10 +256,7 @@ const UsersByTeamCard = ({ usersByTeam }: UsersByTeamCardProps) => {
         <p className='aucctus-text-xs aucctus-text-tertiary'>
           Active Users by Team
         </p>
-        <Icon
-          variant='users-02'
-          className='aucctus-stroke-tertiary h-4 w-4 opacity-50'
-        />
+        <Users className='aucctus-stroke-tertiary h-4 w-4 opacity-50' />
       </div>
       <p className='aucctus-text-2xl-semibold aucctus-text-primary mb-3'>
         {totalUsers}{' '}
@@ -307,7 +305,7 @@ interface ProgressMetricCardProps {
   title: string;
   totalCount: number;
   testedCount: number;
-  icon?: IconVariant;
+  icon?: string;
   testedLabel?: string;
 }
 
@@ -326,7 +324,7 @@ const ProgressMetricCard = ({
       <div className='mb-1 flex items-center justify-between'>
         <p className='aucctus-text-xs aucctus-text-tertiary'>{title}</p>
         {icon && (
-          <Icon
+          <DynamicIcon
             variant={icon}
             className='aucctus-stroke-tertiary h-4 w-4 opacity-50'
           />
@@ -382,10 +380,7 @@ const AccountMetricsTab: FunctionComponent = () => {
     <div className='aucctus-bg-primary rounded-lg border border-gray-200 p-6'>
       <div className='mb-6 flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <Icon
-            variant='barchart'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <BarChart3 className='aucctus-stroke-brand-primary h-5 w-5' />
           <h4 className='aucctus-text-lg-semibold aucctus-text-primary'>
             Account Metrics
           </h4>
@@ -413,10 +408,7 @@ const AccountMetricsTab: FunctionComponent = () => {
       {/* Error State */}
       {isMetricsError && !isForbidden && (
         <div className='flex flex-col items-center justify-center rounded-lg border border-red-200 bg-red-50 p-8'>
-          <Icon
-            variant='alert-circle'
-            className='aucctus-stroke-error-primary mb-3 h-8 w-8'
-          />
+          <AlertCircle className='aucctus-stroke-error-primary mb-3 h-8 w-8' />
           <p className='aucctus-text-sm aucctus-text-error-primary mb-4'>
             Failed to load metrics. Please try again.
           </p>
@@ -424,7 +416,7 @@ const AccountMetricsTab: FunctionComponent = () => {
             onClick={() => refetchMetrics()}
             className='btn btn-secondary btn-sm inline-flex items-center gap-2'
           >
-            <Icon variant='refresh' className='h-4 w-4' />
+            <RefreshCw className='h-4 w-4' />
             Retry
           </button>
         </div>
@@ -433,10 +425,7 @@ const AccountMetricsTab: FunctionComponent = () => {
       {/* Forbidden State */}
       {isForbidden && (
         <div className='flex flex-col items-center justify-center rounded-lg border border-amber-200 bg-amber-50 p-8'>
-          <Icon
-            variant='lock'
-            className='aucctus-stroke-warning-primary mb-3 h-8 w-8'
-          />
+          <Lock className='aucctus-stroke-warning-primary mb-3 h-8 w-8' />
           <p className='aucctus-text-sm aucctus-text-warning-primary'>
             Metrics are only available to Aucctus administrators.
           </p>

@@ -1,8 +1,9 @@
 import React from 'react';
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import type { IPriorityInsightV3 } from '@libs/api/types/concept/marketScan';
 import PriorityInsightCard from './PriorityInsightCard';
 import { useMarketScanPriorityInsightsV3 } from '@hooks/query/concepts.hook';
+import { TrendingUp } from 'lucide-react';
 
 interface PriorityInsightsProps {
   conceptUuid: string;
@@ -39,10 +40,7 @@ const PriorityInsights: React.FC<PriorityInsightsProps> = ({
         {/* Section Header */}
         <div className='mt-4'>
           <div className='mb-2 flex items-center gap-2'>
-            <Icon
-              variant='trendup'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <TrendingUp className='aucctus-stroke-brand-primary h-5 w-5' />
             <h2 className='aucctus-text-xl-semibold aucctus-text-primary'>
               Priority Insights
             </h2>
@@ -66,10 +64,7 @@ const PriorityInsights: React.FC<PriorityInsightsProps> = ({
         {/* Section Header */}
         <div className='mt-4'>
           <div className='mb-2 flex items-center gap-2'>
-            <Icon
-              variant='trendup'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <TrendingUp className='aucctus-stroke-brand-primary h-5 w-5' />
             <h2 className='aucctus-text-xl-semibold aucctus-text-primary'>
               Priority Insights
             </h2>
@@ -94,10 +89,7 @@ const PriorityInsights: React.FC<PriorityInsightsProps> = ({
       {/* Section Header */}
       <div className='mt-4'>
         <div className='mb-2 flex items-center gap-2'>
-          <Icon
-            variant='trendup'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <TrendingUp className='aucctus-stroke-brand-primary h-5 w-5' />
           <h2 className='aucctus-text-xl-semibold aucctus-text-primary'>
             Priority Insights
           </h2>

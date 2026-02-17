@@ -1,7 +1,8 @@
 import { FunctionComponent } from 'react';
-import { Card, Icon } from '@components';
+import { Card } from '@components';
 import { cn } from '@libs/utils/react';
 import utils from '@libs/utils';
+import { Clock } from 'lucide-react';
 
 interface UnseenChangesTooltipProps {
   conceptTitle?: string;
@@ -28,12 +29,7 @@ const UnseenChangesTooltip: FunctionComponent<UnseenChangesTooltipProps> = ({
       <div className='flex w-full flex-col'>
         <div className='mb-1 w-full'>
           <div className='flex items-start gap-2 p-2'>
-            <Icon
-              variant='clock'
-              width={20}
-              height={20}
-              className='stroke-blueDark-600'
-            />
+            <Clock size={20} className='stroke-blueDark-600' />
             <div className='flex flex-col'>
               <span className='aucctus-text-md'>
                 This concept was updated {timeAgo}

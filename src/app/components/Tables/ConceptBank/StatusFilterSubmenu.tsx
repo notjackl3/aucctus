@@ -1,9 +1,9 @@
-import { Icon } from '@components';
 import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import { ConceptStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import { CONCEPT_STATUS_LIST } from '@libs/utils/concepts';
 import React, { useState } from 'react';
+import { Check, X } from 'lucide-react';
 
 export interface IStatusFilterSubmenuProps {
   filterOptions: IConceptFilterOptions;
@@ -69,10 +69,7 @@ const StatusFilterSubmenu: React.FC<IStatusFilterSubmenuProps> = ({
           {utils.string.camelCaseToTitleCase(value)}
         </span>
         {isSelected && (
-          <Icon
-            variant='check'
-            className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
-          />
+          <Check className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0' />
         )}
       </div>
     );
@@ -106,10 +103,7 @@ const StatusFilterSubmenu: React.FC<IStatusFilterSubmenuProps> = ({
           {option.label}
         </span>
         {isSelected && (
-          <Icon
-            variant='check'
-            className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0'
-          />
+          <Check className='aucctus-stroke-success-primary h-4 w-4 flex-shrink-0' />
         )}
       </div>
     );
@@ -148,10 +142,7 @@ const StatusFilterSubmenu: React.FC<IStatusFilterSubmenuProps> = ({
                 handleClearFilter();
               }}
             >
-              <Icon
-                variant='closeX'
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
+              <X className='aucctus-stroke-secondary h-4 w-4' />
               <span className='aucctus-text-secondary'>Clear filter</span>
             </button>
           </>

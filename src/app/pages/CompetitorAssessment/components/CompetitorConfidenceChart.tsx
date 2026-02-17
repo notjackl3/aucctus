@@ -9,8 +9,8 @@ import {
   Cell,
   ReferenceLine,
 } from 'recharts';
-import { Icon } from '@components';
 import type { ICompetitor } from '@libs/api/types/competitorAssessment';
+import { BarChart3 } from 'lucide-react';
 
 interface CompetitorConfidenceChartProps {
   competitors: ICompetitor[];
@@ -109,12 +109,7 @@ const CompetitorConfidenceChart: React.FC<CompetitorConfidenceChartProps> = ({
             </p>
           </div>
           <div className='flex items-center gap-1.5 rounded-full bg-white/5 px-2.5 py-1'>
-            <Icon
-              variant='barchart'
-              height={12}
-              width={12}
-              className='aucctus-stroke-tertiary'
-            />
+            <BarChart3 size={12} className='aucctus-stroke-tertiary' />
             <span className='aucctus-text-tertiary text-[10px]'>
               Avg: {avgScore}%
             </span>

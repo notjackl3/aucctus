@@ -1,9 +1,12 @@
 import React, { useState, useCallback } from 'react';
 import { cn } from '@libs/utils/react';
-import { Button, Icon, Input } from '@components';
+import { Button, Input } from '@components';
 import type { ICustomerListItemWithUuid } from '@libs/api/types';
 import AddItemForm from './AddItemForm';
 import { ExpandCollapse } from '@hooks/animation/animation.hook';
+import { Check, Pencil, X } from 'lucide-react';
+import LoadingSpinner from '@components/Icon/LoadingSpinner';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export interface EditableListProps {
   items: ICustomerListItemWithUuid[];
@@ -151,7 +154,7 @@ const EditableList: React.FC<EditableListProps> = ({
                   iconBgClass,
                 )}
               >
-                <Icon
+                <DynamicIcon
                   variant={iconVariant}
                   height={16}
                   width={16}
@@ -173,7 +176,7 @@ const EditableList: React.FC<EditableListProps> = ({
                   <div className='flex justify-end gap-2'>
                     <Button size='sm' color='light' onClick={handleCancelEdit}>
                       <span className='flex items-center'>
-                        <Icon variant='closeX' height={16} width={16} />
+                        <X size={16} />
                       </span>
                     </Button>
                     <Button
@@ -183,14 +186,9 @@ const EditableList: React.FC<EditableListProps> = ({
                       disabled={isLoading}
                     >
                       <span className='flex items-center'>
-                        <Icon
-                          variant='check'
-                          height={16}
-                          width={16}
-                          className='aucctus-stroke-white'
-                        />
+                        <Check size={16} className='aucctus-stroke-white' />
                         {isLoading && (
-                          <Icon.LoadingSpinner
+                          <LoadingSpinner
                             className='ml-2'
                             height={16}
                             width={16}
@@ -212,13 +210,13 @@ const EditableList: React.FC<EditableListProps> = ({
                       className='aucctus-bg-secondary-hover flex h-5 w-5 cursor-pointer items-center justify-center rounded-full'
                       onClick={() => handleEditStart(index, item.description)}
                     >
-                      <Icon variant='edit' height={14} width={14} />
+                      <Pencil size={14} />
                     </span>
                     <span
                       className='aucctus-bg-secondary-hover flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-red-500'
                       onClick={() => handleRemove(item, index)}
                     >
-                      <Icon variant='closeX' height={12} width={12} />
+                      <X size={12} />
                     </span>
                   </div>
                 </>

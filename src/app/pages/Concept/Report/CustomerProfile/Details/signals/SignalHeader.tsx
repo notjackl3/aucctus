@@ -1,7 +1,8 @@
-import { Icon, Modal } from '@components';
+import { Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
 import React, { useCallback } from 'react';
+import { LineChart, Plus } from 'lucide-react';
 
 interface SignalHeaderProps {
   profileUuid: string;
@@ -24,10 +25,7 @@ const SignalHeader: React.FC<SignalHeaderProps> = ({ profileUuid }) => {
   return (
     <div className='flex flex-1 flex-col gap-2'>
       <div className='flex flex-row items-center gap-2'>
-        <Icon
-          variant='line-chart-up'
-          className='aucctus-stroke-secondary h-5 w-5'
-        />
+        <LineChart className='aucctus-stroke-secondary h-5 w-5' />
         <span className='aucctus-text-primary aucctus-text-md'>
           Real World Signals
         </span>
@@ -39,10 +37,7 @@ const SignalHeader: React.FC<SignalHeaderProps> = ({ profileUuid }) => {
           })}
           aria-label='Add signal'
         >
-          <Icon
-            variant='plus'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <Plus className='aucctus-stroke-brand-primary h-5 w-5' />
         </button>
       </div>
       <span className='aucctus-text-tertiary aucctus-text-sm'>

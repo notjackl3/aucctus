@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { IncubationAnswer } from '@libs/api/concepts';
 import {
   ConceptIncubationQuestion,
@@ -9,6 +8,7 @@ import React, { useCallback } from 'react';
 import { boxShadowStyle } from '../../../../../Icon/QuestionIcon';
 import { CompletionIcon } from '../question/CompletionIcon';
 import { useContinueRefiningAnimations } from './continue-refining-animation.hook';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ContinueRefiningIconProps {
   iconRef: React.RefObject<HTMLSpanElement>;
@@ -79,8 +79,8 @@ const ContinueRefining: React.FC<ContinueRefiningProps> = ({
               style={boxShadowStyle}
               className='aucctus-bg-primary aucctus-border-secondary mr-2 flex h-8 w-8 items-center justify-center self-center justify-self-center rounded-lg border-2'
             >
-              <Icon
-                variant={(question.icon as IconVariant) || 'help'}
+              <DynamicIcon
+                variant={(question.icon as string) || 'help'}
                 height={16}
                 width={16}
               />

@@ -8,12 +8,12 @@
  * - Scrollable list within fixed height
  */
 
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Heart } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
+import { X } from 'lucide-react';
 
 /** Social value item structure */
 export interface SocialValueItem {
@@ -184,10 +184,7 @@ const SocialValuesWidget: React.FC<SocialValuesWidgetProps> = ({
                         onClick={() => onDelete(item.uuid)}
                         className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
                       >
-                        <Icon
-                          variant='closeX'
-                          className='h-3 w-3 text-red-500'
-                        />
+                        <X className='h-3 w-3 text-red-500' />
                       </button>
                     )}
                   </div>

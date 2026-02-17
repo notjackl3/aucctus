@@ -1,8 +1,8 @@
-import { Icon } from '@components';
 import HexagonChart from '@pages/Concept/Report/MarketScan/v3/components/HexagonChart';
 import React, { useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProgressBar from './ProgressBar';
+import { LineChart } from 'lucide-react';
 
 interface TrendsDriversCardProps {
   currentCardIndex: number;
@@ -56,10 +56,7 @@ const TrendsDriversCard: React.FC<TrendsDriversCardProps> = ({
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='line-chart-up'
-              className='aucctus-stroke-tertiary h-4 w-4'
-            />
+            <LineChart className='aucctus-stroke-tertiary h-4 w-4' />
             <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
               Trends & Drivers
             </h3>

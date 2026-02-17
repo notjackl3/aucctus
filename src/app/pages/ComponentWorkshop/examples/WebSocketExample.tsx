@@ -8,9 +8,10 @@
  */
 
 import React, { useState } from 'react';
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import { cn } from '@libs/utils/react';
 import { useComponentGeneratorWebSocket } from '@hooks/query/dynamicComponentWebSocket.hook';
+import { AlertCircle, RefreshCw, Sparkles } from 'lucide-react';
 
 /**
  * Simple example of WebSocket component generation
@@ -84,10 +85,7 @@ export const WebSocketExample: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <Icon
-                    variant='sparkles'
-                    className='aucctus-stroke-white mr-2 h-4 w-4'
-                  />
+                  <Sparkles className='aucctus-stroke-white mr-2 h-4 w-4' />
                   Generate
                 </>
               )}
@@ -97,10 +95,7 @@ export const WebSocketExample: React.FC = () => {
                 onClick={handleReset}
                 className='btn btn-secondary btn-sm'
               >
-                <Icon
-                  variant='refresh'
-                  className='aucctus-stroke-secondary mr-2 h-4 w-4'
-                />
+                <RefreshCw className='aucctus-stroke-secondary mr-2 h-4 w-4' />
                 Reset
               </button>
             )}
@@ -257,10 +252,7 @@ export const WebSocketExample: React.FC = () => {
 
             <div className='aucctus-bg-info-subtle aucctus-border-info mt-4 rounded-lg border p-4'>
               <div className='flex gap-2'>
-                <Icon
-                  variant='alert-circle'
-                  className='aucctus-stroke-info-primary mt-0.5 h-4 w-4 flex-shrink-0'
-                />
+                <AlertCircle className='aucctus-stroke-info-primary mt-0.5 h-4 w-4 flex-shrink-0' />
                 <div className='aucctus-text-xs aucctus-text-info-primary'>
                   <strong>Note:</strong> Make sure the aucctus-dynamic-frontend
                   service is running on port 8003.

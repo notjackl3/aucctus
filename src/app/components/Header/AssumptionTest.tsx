@@ -1,9 +1,9 @@
-import { Icon } from '@components';
 import { ConceptTestStage, TestType } from '@libs/api/types';
 import utils from '@libs/utils';
 import { TEST_TYPE_ICON_MAP } from '@libs/utils/assumptions';
 import { cn } from '@libs/utils/react';
 import React from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface AssumptionTestProps {
   test: TestType;
@@ -23,7 +23,7 @@ const AssumptionTestBadge: React.FC<AssumptionTestProps> = ({
         lg ? 'aucctus-text-lg' : 'aucctus-text-sm',
       )}
     >
-      <Icon
+      <DynamicIcon
         variant={TEST_TYPE_ICON_MAP[test]}
         className={cn({
           'stroke-blue-700': stage === 'validate',

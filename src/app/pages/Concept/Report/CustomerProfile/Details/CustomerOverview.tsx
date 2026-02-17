@@ -1,8 +1,15 @@
 import defaultAvatar from '@assets/img/avatar.png';
-import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { forwardRef, useCallback } from 'react';
+import {
+  BookOpen,
+  Briefcase,
+  Calendar,
+  DollarSign,
+  Globe,
+  Users,
+} from 'lucide-react';
 
 // Icon stroke constant for consistency
 const MAIN_ICON_STROKE = 'aucctus-stroke-brand-primary';
@@ -60,12 +67,7 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
               {profile?.isPrimary && (
                 <div className='mb-1 flex'>
                   <span className='aucctus-bg-brand-secondary aucctus-text-brand-tertiary flex items-center gap-1 rounded-full px-3 py-1 text-sm'>
-                    <Icon
-                      variant='briefcase'
-                      height={14}
-                      width={14}
-                      className={MAIN_ICON_STROKE}
-                    />
+                    <Briefcase size={14} className={MAIN_ICON_STROKE} />
                     Primary
                   </span>
                 </div>
@@ -101,10 +103,8 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
 
                 <div className='aucctus-text-secondary space-y-3'>
                   <div className='flex items-start gap-2'>
-                    <Icon
-                      variant='globe'
-                      height={16}
-                      width={16}
+                    <Globe
+                      size={16}
                       className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
                     <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
@@ -118,10 +118,8 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                   </div>
 
                   <div className='flex items-start gap-2'>
-                    <Icon
-                      variant='calendar'
-                      height={16}
-                      width={16}
+                    <Calendar
+                      size={16}
                       className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
                     <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
@@ -135,10 +133,8 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                   </div>
 
                   <div className='flex items-start gap-2'>
-                    <Icon
-                      variant='user-group'
-                      height={16}
-                      width={16}
+                    <Users
+                      size={16}
                       className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
                     <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
@@ -152,10 +148,8 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                   </div>
 
                   <div className='flex items-start gap-2'>
-                    <Icon
-                      variant='currency-dollar'
-                      height={16}
-                      width={16}
+                    <DollarSign
+                      size={16}
                       className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
                     <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
@@ -169,10 +163,8 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                   </div>
 
                   <div className='flex items-start gap-2'>
-                    <Icon
-                      variant='book-open'
-                      height={16}
-                      width={16}
+                    <BookOpen
+                      size={16}
                       className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
                     <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>
@@ -186,10 +178,8 @@ const CustomerOverview = forwardRef<HTMLDivElement, CustomerOverviewProps>(
                   </div>
 
                   <div className='flex items-start gap-2'>
-                    <Icon
-                      variant='briefcase'
-                      height={16}
-                      width={16}
+                    <Briefcase
+                      size={16}
                       className='aucctus-stroke-secondary mr-1 mt-0.5 flex-shrink-0'
                     />
                     <div className='flex min-w-0 flex-1 flex-col sm:flex-row sm:gap-4'>

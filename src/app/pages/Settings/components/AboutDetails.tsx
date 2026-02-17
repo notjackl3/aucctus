@@ -2,9 +2,9 @@ import { Input, Loading, toast } from '@components';
 import useStore from '@stores/store';
 import { FunctionComponent, useMemo, useState } from 'react';
 import { IUser } from '../../../../libs/api/types';
-import Icon from '../../../components/Icon/Icon/Icon';
 import RowInfo from '../../../components/Text/RowInfo/RowInfo';
 import { useUpdateUser } from '../../../hooks/query/account.hook';
+import { Pencil, Save } from 'lucide-react';
 
 const defaultIconProps = {
   width: 20,
@@ -143,7 +143,7 @@ const AboutDetails: FunctionComponent = () => {
                 setIsFormDisabled(false);
               }}
             >
-              <Icon variant='edit' {...defaultIconProps} />
+              <Pencil {...defaultIconProps} />
               Edit
             </button>
           ) : (
@@ -152,7 +152,7 @@ const AboutDetails: FunctionComponent = () => {
               type='submit'
               disabled={isLoading}
             >
-              <Icon variant='save' {...defaultIconProps} />
+              <Save {...defaultIconProps} />
               Save
             </button>
           )}

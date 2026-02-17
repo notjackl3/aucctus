@@ -1,4 +1,4 @@
-import Icon from '@components/Icon';
+import { ExternalLink, Link, X } from 'lucide-react';
 import React, { useEffect } from 'react';
 import ReactMarkdown, { Components } from 'react-markdown';
 import { mightContainMarkdown } from '@libs/utils/string';
@@ -64,7 +64,7 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({
           className='btn btn-close btn-no-border aucctus-bg-primary-hover mx-6 mt-6 aspect-square'
           onClick={closeModal}
         >
-          <Icon variant='closeX' />
+          <X />
         </button>
       </div>
 
@@ -107,8 +107,8 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({
                 <div className='inline-flex h-full flex-row items-start justify-start gap-3'>
                   <div className='flex items-start justify-start gap-2'>
                     {/* Bullet */}
-                    <div className='aucctus-border-secondary aucctus-bg-primary flex h-10 w-10 items-center justify-center rounded-full border [&>svg>use]:stroke-primary-600'>
-                      <Icon variant='link-03' />
+                    <div className='aucctus-border-secondary aucctus-bg-primary flex h-10 w-10 items-center justify-center rounded-full border [&>svg]:stroke-primary-600'>
+                      <Link />
                     </div>
                   </div>
                   <div className='group relative inline-flex h-10 flex-col items-start justify-start'>
@@ -123,7 +123,7 @@ const EvidenceAndReasoning: React.FC<IEvidenceAndReasoningProps> = ({
 
                 <div className='inline-flex flex-col items-end justify-center'>
                   <div className='inline-flex items-center justify-end rounded-lg py-2.5'>
-                    <Icon variant='link-external' />
+                    <ExternalLink />
                   </div>
                 </div>
               </a>

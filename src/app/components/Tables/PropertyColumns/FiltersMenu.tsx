@@ -1,5 +1,3 @@
-import { Icon } from '@components';
-
 import {
   IPropertyDefinition,
   IPropertyFilter,
@@ -15,6 +13,8 @@ import {
   UserFilterContent,
   PropertyFilterContent,
 } from '../Filters/SharedFilterComponents';
+import { ChevronRight, ListFilter } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IFiltersMenuProps {
   propertyDefinitions?: IPropertyDefinition[];
@@ -32,19 +32,19 @@ const STATIC_FILTER_COLUMNS = [
   {
     id: 'status',
     name: 'Status',
-    icon: 'activity' as IconVariant,
+    icon: 'activity' as string,
     type: 'status',
   },
   {
     id: 'createdBy',
     name: 'Created By',
-    icon: 'user-square' as IconVariant,
+    icon: 'user-square' as string,
     type: 'user',
   },
   {
     id: 'lastModifiedBy',
     name: 'Last Modified By',
-    icon: 'users-edit' as IconVariant,
+    icon: 'users-edit' as string,
     type: 'user',
   },
 ];
@@ -384,12 +384,7 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
     <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
       <Popover.Trigger asChild>
         <button className='aucctus-bg-secondary-hover flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-200'>
-          <Icon
-            variant='filter-lines'
-            height={16}
-            width={16}
-            className='aucctus-stroke-secondary'
-          />
+          <ListFilter size={16} className='aucctus-stroke-secondary' />
           <span className='aucctus-text-sm aucctus-text-secondary'>
             Filters
           </span>
@@ -421,10 +416,7 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                 <div className='aucctus-bg-primary w-[280px] select-none rounded-md shadow-lg'>
                   {/* Header with title and icon */}
                   <div className='flex items-center gap-2 px-3 py-3'>
-                    <Icon
-                      variant='filter-lines'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
+                    <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                     <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
                       Filter columns
                     </span>
@@ -441,7 +433,7 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                         const icon =
                           item.type === 'static'
                             ? item.column.icon
-                            : (getPropertyIcon(item.definition) as IconVariant);
+                            : (getPropertyIcon(item.definition) as string);
                         const name =
                           item.type === 'static'
                             ? item.column.name
@@ -485,7 +477,7 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                   e.stopPropagation();
                                 }}
                               >
-                                <Icon
+                                <DynamicIcon
                                   variant={icon}
                                   className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
                                 />
@@ -493,15 +485,9 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                   {name}
                                 </span>
                                 {hasFilter && (
-                                  <Icon
-                                    variant='filter-lines'
-                                    className='aucctus-stroke-brand-primary h-4 w-4 flex-shrink-0'
-                                  />
+                                  <ListFilter className='aucctus-stroke-brand-primary h-4 w-4 flex-shrink-0' />
                                 )}
-                                <Icon
-                                  variant='chevron-right'
-                                  className='aucctus-stroke-quaternary h-3.5 w-3.5 flex-shrink-0'
-                                />
+                                <ChevronRight className='aucctus-stroke-quaternary h-3.5 w-3.5 flex-shrink-0' />
                               </button>
                             </Popover.Anchor>
 
@@ -557,10 +543,7 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                         {item.column.type === 'status' && (
                                           <>
                                             <div className='mb-3 flex items-center gap-2'>
-                                              <Icon
-                                                variant='filter-lines'
-                                                className='aucctus-stroke-secondary h-4 w-4'
-                                              />
+                                              <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                                               <span className='aucctus-text-secondary text-sm font-medium'>
                                                 Filter by {item.column.name}
                                               </span>
@@ -595,10 +578,7 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                         {item.column.type === 'user' && (
                                           <>
                                             <div className='mb-3 flex items-center gap-2'>
-                                              <Icon
-                                                variant='filter-lines'
-                                                className='aucctus-stroke-secondary h-4 w-4'
-                                              />
+                                              <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                                               <span className='aucctus-text-secondary text-sm font-medium'>
                                                 Filter by {item.column.name}
                                               </span>
@@ -670,10 +650,7 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
                                       <>
                                         {/* Property filters */}
                                         <div className='mb-3 flex items-center gap-2'>
-                                          <Icon
-                                            variant='filter-lines'
-                                            className='aucctus-stroke-secondary h-4 w-4'
-                                          />
+                                          <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                                           <span className='aucctus-text-secondary text-sm font-medium'>
                                             Filter by {item.definition.name}
                                           </span>

@@ -7,10 +7,11 @@
  */
 
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 
 import { ScoringCategoryCardProps, QuestionImportance } from './types';
+import { ChevronDown } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * Map icon name from backend to frontend icon variant
@@ -85,7 +86,7 @@ const ScoringCategoryCard: React.FC<ScoringCategoryCardProps> = ({
         <div className='flex items-center justify-between p-5'>
           <div className='flex flex-1 items-center gap-3 text-left'>
             <div className='aucctus-bg-tertiary rounded-md p-2'>
-              <Icon
+              <DynamicIcon
                 variant={mapIconVariant(category.categoryIcon) as any}
                 className='aucctus-stroke-secondary h-4 w-4'
               />
@@ -109,8 +110,7 @@ const ScoringCategoryCard: React.FC<ScoringCategoryCardProps> = ({
                 out of {category.maxScore}
               </div>
             </div>
-            <Icon
-              variant='chevrondown'
+            <ChevronDown
               className={cn(
                 'aucctus-stroke-tertiary h-5 w-5 transition-transform duration-200',
                 { 'rotate-180': isExpanded },

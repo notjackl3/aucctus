@@ -1,7 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
+import { Loader2, Rocket } from 'lucide-react';
 
 interface IConfigureLaunchStepProps {
   isReady: boolean;
@@ -37,16 +37,12 @@ const ConfigureLaunchStep: React.FC<IConfigureLaunchStepProps> = ({
     >
       {isLoading ? (
         <>
-          <Icon
-            variant='loading-02'
-            className='aucctus-stroke-white h-5 w-5 animate-spin'
-          />
+          <Loader2 className='aucctus-stroke-white h-5 w-5 animate-spin' />
           Launching...
         </>
       ) : (
         <>
-          <Icon
-            variant='rocket'
+          <Rocket
             className={cn(
               'h-5 w-5',
               !isButtonDisabled

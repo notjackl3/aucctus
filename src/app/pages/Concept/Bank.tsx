@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 
-import { Badge, Header, Icon, Input, Modal, Table } from '@components';
+import { Badge, Header, Input, Modal, Table } from '@components';
 import CompactFilterRibbon from '@components/Tables/ConceptBank/CompactFilterRibbon';
 import { useModal } from '@context/ModalContextProvider';
 import { useAllUsers } from '@hooks/query/account.hook';
@@ -32,6 +32,7 @@ import useStore from '@stores/store';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Check, ChevronDown, Link2, Upload } from 'lucide-react';
 import { Outlet, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Lightbulb, Rocket } from 'lucide-react';
 
 export const CONCEPT_STATUS_LIST_MAP = {
   draft: DRAFT_CONCEPT_STATUS_LIST,
@@ -411,12 +412,7 @@ const ConceptBank: React.FC = () => {
             className={cn('btn btn-bold btn-primary')}
             onClick={handleAddConcept}
           >
-            <Icon
-              variant='rocket'
-              height={20}
-              width={20}
-              className='stroke-primary-100'
-            />
+            <Rocket size={20} className='stroke-primary-100' />
             Add Concept
           </button>
         </div>
@@ -435,10 +431,8 @@ const ConceptBank: React.FC = () => {
               })}
               onClick={() => handleTabChange(AppPath.ConceptBankPortfolio)}
             >
-              <Icon
-                variant='lightbulb'
-                height={14}
-                width={14}
+              <Lightbulb
+                size={14}
                 className={cn({
                   'stroke-white': isPortfolioRoute,
                   'aucctus-stroke-tertiary group-hover:aucctus-stroke-primary':

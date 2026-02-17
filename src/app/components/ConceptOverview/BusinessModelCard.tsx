@@ -1,9 +1,10 @@
-import { Icon } from '@components';
 import React, { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { IBusinessMetric, BusinessMetricType } from './config';
 import { formatCurrency } from '@pages/Concept/Report/FinancialProjections/GenerateRevenue/tabs/MarketSizing/assumptionsUtils';
 import ProgressBar from './ProgressBar';
+import { DollarSign } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface BusinessModelCardProps {
   currentCardIndex: number;
@@ -132,7 +133,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
       <div key={metric.id} className={metric.cardClasses}>
         <div className='flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon
+            <DynamicIcon
               variant={metric.iconVariant as any}
               className={metric.iconClasses}
             />
@@ -158,10 +159,7 @@ const BusinessModelCard: React.FC<BusinessModelCardProps> = ({
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='currencydollar'
-              className='aucctus-stroke-tertiary h-4 w-4'
-            />
+            <DollarSign className='aucctus-stroke-tertiary h-4 w-4' />
             <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
               Business Model
             </h3>

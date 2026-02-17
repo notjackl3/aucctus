@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { AssumptionCategory } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { FunctionComponent } from 'react';
+import AssumptionCategoryIcon from '@components/Icon/AssumptionCategoryIcon';
 
 export interface IConceptAssumptionBadgeProps {
   category: AssumptionCategory;
@@ -13,7 +13,7 @@ const AssumptionCategoryBadge: FunctionComponent<
 > = ({ category, textProps }) => {
   return (
     <div className={`flex items-center gap-2`}>
-      <Icon.AssumptionCategory category={category} />
+      <AssumptionCategoryIcon category={category} />
       <span
         {...textProps}
         className={cn(

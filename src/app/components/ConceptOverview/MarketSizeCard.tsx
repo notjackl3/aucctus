@@ -1,8 +1,8 @@
-import { Icon } from '@components';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { executiveDashboardUIText } from './config';
 import ProgressBar from './ProgressBar';
+import { Globe } from 'lucide-react';
 
 interface MarketSizeData {
   tam: string;
@@ -46,7 +46,7 @@ const MarketSizeCard: React.FC<MarketSizeCardProps> = ({
 
         <div className='mb-6 flex items-center justify-between'>
           <div className='flex items-center gap-2'>
-            <Icon variant='globe' className='aucctus-stroke-tertiary h-4 w-4' />
+            <Globe className='aucctus-stroke-tertiary h-4 w-4' />
             <h3 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
               {executiveDashboardUIText.marketSize.title}
             </h3>

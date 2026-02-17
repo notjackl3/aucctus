@@ -1,10 +1,10 @@
-import { Icon } from '@components';
 import type {
   ConceptIncubationQuestion,
   IClarifyingQuestion,
   IConceptSeedAnswer,
 } from '@libs/api/types';
 import React from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ClarifyingQuestionProps {
   question: IClarifyingQuestion;
@@ -26,7 +26,11 @@ export const ClarifyingQuestion: React.FC<ClarifyingQuestionProps> = ({
     <div className='pb-3'>
       <div className='ease flex flex-row items-center gap-2 pb-3'>
         <span className='aucctus-bg-primary aucctus-border-secondary mr-2 flex h-8 w-8 items-center justify-center self-center justify-self-center rounded-lg border-2'>
-          <Icon variant={question.icon || 'help'} height={16} width={16} />
+          <DynamicIcon
+            variant={question.icon || 'help'}
+            height={16}
+            width={16}
+          />
         </span>
 
         <div className='flex flex-col'>

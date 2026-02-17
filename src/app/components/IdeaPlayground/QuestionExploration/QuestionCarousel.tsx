@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import Modal from '@components/Modal';
 import { useModal } from '@context/ModalContextProvider';
 import type { IActionButton } from '@components/Modal/ConfirmationModal/ConfirmationModal';
@@ -40,6 +40,7 @@ import {
   useBulkQuestionsUpdate,
 } from './hooks';
 import { getSentimentIcon } from './utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface QuestionCarouselProps {
   topic: string;
@@ -768,11 +769,9 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
                 onClick={handlePrevious}
                 className='aucctus-text-white absolute left-8 z-10 rounded-lg border border-white/30 bg-white/30 backdrop-blur-md transition-all duration-100 hover:scale-110 active:scale-90'
               >
-                <Icon
-                  variant='chevronleft'
+                <ChevronLeft
+                  size={26}
                   className='aucctus-stroke-white mx-4 my-2'
-                  height={26}
-                  width={26}
                 />
               </button>
 
@@ -781,11 +780,9 @@ const QuestionCarousel: React.FC<QuestionCarouselProps> = ({
                 onClick={handleNext}
                 className='aucctus-text-white absolute right-8 z-10 rounded-lg border border-white/30 bg-white/30 backdrop-blur-md transition-all duration-100 hover:scale-110 active:scale-90'
               >
-                <Icon
-                  variant='chevronright'
+                <ChevronRight
+                  size={26}
                   className='aucctus-stroke-white mx-4 my-2'
-                  height={26}
-                  width={26}
                 />
               </button>
 

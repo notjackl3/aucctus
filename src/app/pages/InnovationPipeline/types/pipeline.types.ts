@@ -19,7 +19,7 @@ export interface PipelineStageConfig {
     accent: string;
     dot: string;
   };
-  icon: IconVariant;
+  icon: string;
 }
 
 export const PIPELINE_STAGES: PipelineStageConfig[] = [

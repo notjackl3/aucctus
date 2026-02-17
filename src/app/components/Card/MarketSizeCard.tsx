@@ -1,4 +1,4 @@
-import Icon from '@components/Icon';
+import { BookOpen } from 'lucide-react';
 import utils from '@libs/utils';
 import React from 'react';
 
@@ -41,10 +41,10 @@ const MarketSizeCard: React.FC<IMarketSizeCard> = ({
               </p>
             </div>
             <button
-              className='btn btn-primary-light btn-no-border h-8 w-8 border-violet-50 p-0 [&>svg>use]:stroke-primary-600'
+              className='btn btn-primary-light btn-no-border h-8 w-8 border-violet-50 p-0 [&>svg]:stroke-primary-600'
               onClick={onClick}
             >
-              <Icon variant='book-open' strokeWidth={6} />
+              <BookOpen strokeWidth={6} />
             </button>
           </div>
         </div>

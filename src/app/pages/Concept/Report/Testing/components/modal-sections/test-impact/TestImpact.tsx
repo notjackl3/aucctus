@@ -7,7 +7,6 @@ import {
   useApplyRecommendations,
 } from '@hooks/query/testing.hook';
 import { markConceptSectionsPending } from '@hooks/query/concepts.hook';
-import { Icon } from '@components';
 import TabBanner from '../../common/TabBanner';
 import LoadingState from './components/LoadingState';
 import NoDataState from './components/NoDataState';
@@ -17,6 +16,7 @@ import { ITestAssumptionDetailed } from '../../../types';
 import { ITestResult } from '@libs/api/types/concept/testing';
 import { mapBackendSectionToReportKey } from '@libs/utils/concepts';
 import type { ConceptReportStatusBySection } from '@libs/api/types/concept/concepts';
+import { Target } from 'lucide-react';
 
 interface TestImpactProps {
   assumptions?: any[]; // Keep for backward compatibility but won't use
@@ -191,10 +191,7 @@ const TestImpact: React.FC<TestImpactProps> = ({
             {!hasNoAssumptions && (
               <div className='space-y-5'>
                 <div className='flex items-center gap-2'>
-                  <Icon
-                    variant='target'
-                    className='aucctus-stroke-brand-primary h-5 w-5'
-                  />
+                  <Target className='aucctus-stroke-brand-primary h-5 w-5' />
                   <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
                     Impact to Original Assumptions
                   </h4>

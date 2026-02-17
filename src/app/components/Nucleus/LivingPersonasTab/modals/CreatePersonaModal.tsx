@@ -13,7 +13,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload } from 'lucide-react';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Icon, LiquidGlassModal, LiquidGlassModalFooter } from '@components';
+import { LiquidGlassModal, LiquidGlassModalFooter } from '@components';
 import { cn } from '@libs/utils/react';
 import {
   useCreatePersona,
@@ -25,6 +25,8 @@ import type {
   ILivingPersonasPersonaReadyMessage,
 } from '@libs/api/types/socketMessages/inbound';
 import avatarPlaceholder from '@assets/img/avatar.png';
+import { CheckCircle2, FileText, Image, User, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /** Props for the CreatePersonaModal component */
 export interface CreatePersonaModalProps {
@@ -410,7 +412,7 @@ const CreatePersonaModal: React.FC<CreatePersonaModalProps> = ({
                 : undefined
             }
           >
-            <Icon
+            <DynamicIcon
               variant={
                 hasError
                   ? 'alert-circle'
@@ -440,7 +442,7 @@ const CreatePersonaModal: React.FC<CreatePersonaModalProps> = ({
 
         {/* Persona name badge */}
         <div className='aucctus-bg-secondary aucctus-border-secondary mb-6 inline-flex items-center gap-2 rounded-full border px-3 py-1.5'>
-          <Icon variant='user' className='aucctus-text-tertiary h-3.5 w-3.5' />
+          <User className='aucctus-text-tertiary h-3.5 w-3.5' />
           <span className='aucctus-text-sm-medium aucctus-text-primary'>
             {segment}
           </span>
@@ -468,10 +470,7 @@ const CreatePersonaModal: React.FC<CreatePersonaModalProps> = ({
               >
                 {/* Stage indicator */}
                 {isStageComplete || (stage === 'completed' && isComplete) ? (
-                  <Icon
-                    variant='check-circle-broken'
-                    className='h-5 w-5 shrink-0 text-success-500'
-                  />
+                  <CheckCircle2 className='h-5 w-5 shrink-0 text-success-500' />
                 ) : isStageActive ? (
                   <div className='h-5 w-5 shrink-0'>
                     <div className='aucctus-border-brand h-5 w-5 animate-spin rounded-full border-2 border-t-transparent' />
@@ -659,7 +658,7 @@ const CreatePersonaModal: React.FC<CreatePersonaModalProps> = ({
                         className='h-full w-full object-cover transition-transform duration-300 group-hover:scale-110'
                       />
                       <div className='absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100'>
-                        <Icon variant='image' className='h-6 w-6 text-white' />
+                        <Image className='h-6 w-6 text-white' />
                       </div>
                     </>
                   ) : (
@@ -673,10 +672,7 @@ const CreatePersonaModal: React.FC<CreatePersonaModalProps> = ({
                       />
                       {/* Overlay on hover */}
                       <div className='aucctus-bg-primary relative z-10 flex flex-col items-center gap-1.5 rounded-lg px-4 py-3 opacity-0 shadow-sm transition-opacity group-hover:opacity-100'>
-                        <Icon
-                          variant='image'
-                          className='aucctus-text-brand-primary h-5 w-5'
-                        />
+                        <Image className='aucctus-text-brand-primary h-5 w-5' />
                         <span className='aucctus-text-xs-medium aucctus-text-primary'>
                           Add Photo
                         </span>
@@ -744,10 +740,7 @@ const CreatePersonaModal: React.FC<CreatePersonaModalProps> = ({
                       animate={{ opacity: 1, y: 0 }}
                       className='aucctus-bg-tertiary aucctus-border-secondary flex items-center gap-2 rounded-lg border px-2 py-2'
                     >
-                      <Icon
-                        variant='file-text'
-                        className='aucctus-text-secondary h-3.5 w-3.5 shrink-0'
-                      />
+                      <FileText className='aucctus-text-secondary h-3.5 w-3.5 shrink-0' />
                       <span className='aucctus-text-xs aucctus-text-primary flex-1 truncate'>
                         {file.name}
                       </span>
@@ -763,10 +756,7 @@ const CreatePersonaModal: React.FC<CreatePersonaModalProps> = ({
                         }}
                         className='hover:aucctus-bg-secondary shrink-0 rounded p-0.5'
                       >
-                        <Icon
-                          variant='closeX'
-                          className='aucctus-text-tertiary h-3 w-3'
-                        />
+                        <X className='aucctus-text-tertiary h-3 w-3' />
                       </button>
                     </motion.div>
                   ))}

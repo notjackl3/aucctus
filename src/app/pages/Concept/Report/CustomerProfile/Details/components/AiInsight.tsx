@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { Icon, Container } from '@components';
+import { Container } from '@components';
 import { ICustomerJob } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { Sparkles } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * Props for AiInsight component.
@@ -42,18 +44,13 @@ const AiInsight: React.FC<AiInsightProps> = ({
       >
         <div className='flex items-center gap-2'>
           <span className={iconContainerStyles}>
-            <Icon
-              variant='ai-conclusion'
-              height={14}
-              width={14}
-              className={iconStrokeClass}
-            />
+            <Sparkles size={14} className={iconStrokeClass} />
           </span>
           <span className={cn(labelStyles, textColorClass)}>
             AUCCTUS INSIGHT
           </span>
         </div>
-        <Icon
+        <DynamicIcon
           variant={insightExpanded ? 'chevronup' : 'chevrondown'}
           height={12}
           width={12}

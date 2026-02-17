@@ -1,7 +1,8 @@
 import React from 'react';
-import { Icon } from '@components';
 import { Question } from '../types';
 import QuestionSelector from './QuestionSelector';
+import { Plus } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface QuestionNavigationFooterProps {
   questions: Question[];
@@ -73,12 +74,7 @@ const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
               onClick={onAddQuestion}
               className='flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 text-white/70 transition-all duration-300 hover:border-white/30 hover:bg-white/10'
             >
-              <Icon
-                variant='plus'
-                className='stroke-white/70'
-                height={14}
-                width={14}
-              />
+              <Plus size={14} className='stroke-white/70' />
             </button>
           </div>
 
@@ -88,7 +84,7 @@ const QuestionNavigationFooter: React.FC<QuestionNavigationFooterProps> = ({
               onClick={handleButtonClick}
               className='btn btn-primary group flex h-9 items-center whitespace-nowrap border border-white/30 bg-white/10 px-4 text-white backdrop-blur-md transition-all duration-300 hover:!border-white hover:!bg-white hover:!text-gray-900'
             >
-              <Icon
+              <DynamicIcon
                 variant={buttonIcon}
                 className='mr-2 stroke-white group-hover:stroke-gray-light-700'
                 height={16}

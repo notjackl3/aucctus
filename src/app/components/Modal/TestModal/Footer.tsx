@@ -1,6 +1,8 @@
-import { Button, Header, Icon, Tooltip } from '@components';
+import { Button, Header, Tooltip } from '@components';
 import { ConceptTestStatus } from '@libs/api/types';
 import React from 'react';
+import { Check } from 'lucide-react';
+import LoadingSpinner from '@components/Icon/LoadingSpinner';
 
 interface FooterProps {
   status: ConceptTestStatus;
@@ -28,14 +30,9 @@ const Footer: React.FC<FooterProps> = ({ status }) => {
     <div className='flex h-24 flex-row items-center justify-between gap-2  rounded-b-lg bg-primary-100 px-8 py-4'>
       <span className='flex flex-row items-center justify-center gap-2.5'>
         {isCompleted ? (
-          <Icon
-            variant='check'
-            className='stroke-primary-500'
-            height={24}
-            width={24}
-          />
+          <Check size={24} className='stroke-primary-500' />
         ) : (
-          <Icon.LoadingSpinner
+          <LoadingSpinner
             backgroundPathProps={{ className: 'text-primary-500' }}
           />
         )}

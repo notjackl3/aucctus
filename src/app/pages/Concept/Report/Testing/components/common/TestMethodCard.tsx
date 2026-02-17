@@ -1,10 +1,10 @@
 import React from 'react';
-import { Icon } from '@components';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface TestMethodCardProps {
   title: string;
   description: string;
-  icon?: IconVariant;
+  icon?: string;
   badgeText?: string;
 }
 
@@ -23,7 +23,7 @@ const TestMethodCard: React.FC<TestMethodCardProps> = ({
         <div className='mb-4 flex items-center justify-between'>
           <div className='flex items-center gap-2.5'>
             <div className='aucctus-bg-brand-secondary rounded-md p-1.5'>
-              <Icon
+              <DynamicIcon
                 variant={icon}
                 className='aucctus-stroke-brand-primary h-5 w-5'
               />

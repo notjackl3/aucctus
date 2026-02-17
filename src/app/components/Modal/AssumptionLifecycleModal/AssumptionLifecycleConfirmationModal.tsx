@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import { Icon } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import {
   IAssumptionLifecycleAddRequest,
@@ -7,6 +6,8 @@ import {
 } from '@libs/api/types';
 import { getCategoryColors } from '../../../pages/Concept/Report/Assumptions/constants/categoryColors';
 import { getCategoryIcon } from '../../../pages/Concept/Report/Assumptions/utils/assumptionUtils';
+import { Loader2, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface AssumptionLifecycleConfirmationModalProps {
   mode: 'add_edit' | 'delete';
@@ -63,7 +64,7 @@ const AssumptionLifecycleConfirmationModal: React.FC<
 
         {/* Category */}
         <div className='mb-3 flex items-center'>
-          <Icon
+          <DynamicIcon
             variant={iconVariant as any}
             className={`${categoryColors.stroke} mr-2 h-5 w-5`}
           />
@@ -157,7 +158,7 @@ const AssumptionLifecycleConfirmationModal: React.FC<
           aria-label='Close modal'
           disabled={isProcessing}
         >
-          <Icon variant='closeX' className='aucctus-stroke-secondary h-6 w-6' />
+          <X className='aucctus-stroke-secondary h-6 w-6' />
         </button>
       </div>
 
@@ -167,7 +168,7 @@ const AssumptionLifecycleConfirmationModal: React.FC<
           {/* Warning Icon and Message */}
           <div className='mb-6 flex flex-col items-center text-center'>
             <div className='mb-4 rounded-full bg-orange-100 p-3'>
-              <Icon
+              <DynamicIcon
                 variant={content.icon}
                 className={`h-8 w-8 ${
                   mode === 'delete'
@@ -202,10 +203,7 @@ const AssumptionLifecycleConfirmationModal: React.FC<
             >
               {isProcessing ? (
                 <>
-                  <Icon
-                    variant='loading-02'
-                    className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin'
-                  />
+                  <Loader2 className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin' />
                   Processing...
                 </>
               ) : (

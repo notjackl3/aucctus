@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
-import { Icon } from '@components';
 import { IPocPlan } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { AlertTriangle, Lightbulb } from 'lucide-react';
 
 interface IExecutiveBriefProps {
   pocPlan: IPocPlan;
@@ -84,7 +84,7 @@ const ExecutiveBrief: FunctionComponent<IExecutiveBriefProps> = ({
         )}
       >
         <div className='flex items-center gap-2'>
-          <Icon variant='lightbulb' className='h-5 w-5 stroke-primary-500' />
+          <Lightbulb className='h-5 w-5 stroke-primary-500' />
           <span className='aucctus-text-primary aucctus-text-md-semibold'>
             Strategic Rationale
           </span>
@@ -137,8 +137,7 @@ const ExecutiveBrief: FunctionComponent<IExecutiveBriefProps> = ({
         >
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='alert-triangle'
+              <AlertTriangle
                 className={cn(
                   'h-5 w-5',
                   criticalRisks.length > 0

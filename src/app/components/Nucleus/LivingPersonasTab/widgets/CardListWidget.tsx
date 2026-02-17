@@ -8,9 +8,9 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import React, { useCallback, useState } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
+import { ArrowDown } from 'lucide-react';
 
 /** Card list item structure */
 export interface CardListItem {
@@ -250,8 +250,7 @@ const CardListWidget: React.FC<CardListWidgetProps> = ({
             >
               {scaleConfig.topLabel}
             </span>
-            <Icon
-              variant='arrowdown'
+            <ArrowDown
               className={cn(
                 'my-1 h-3 w-3',
                 getScaleTextColor(scaleConfig.color).arrow,
@@ -263,8 +262,7 @@ const CardListWidget: React.FC<CardListWidgetProps> = ({
                 getScaleGradient(scaleConfig.color),
               )}
             />
-            <Icon
-              variant='arrowdown'
+            <ArrowDown
               className={cn(
                 'my-1 h-3 w-3',
                 getScaleTextColor(scaleConfig.color).arrowFaded,

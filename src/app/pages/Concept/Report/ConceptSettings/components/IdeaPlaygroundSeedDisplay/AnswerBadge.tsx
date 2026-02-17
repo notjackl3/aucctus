@@ -1,7 +1,8 @@
 import React from 'react';
-import { Icon, Badge } from '@components';
+import { Badge } from '@components';
 import type { ISavedPossibleAnswer, ISavedUserAnswer } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { Check, UserSquare } from 'lucide-react';
 
 interface PossibleAnswerBadgeProps {
   answer: ISavedPossibleAnswer;
@@ -60,12 +61,7 @@ export const UserAnswerBadge: React.FC<UserAnswerBadgeProps> = ({ answer }) => {
             'aucctus-bg-brand-primary',
           )}
         >
-          <Icon
-            variant='user-square'
-            className='aucctus-stroke-brand-primary'
-            height={12}
-            width={12}
-          />
+          <UserSquare size={12} className='aucctus-stroke-brand-primary' />
         </div>
 
         {/* Content */}
@@ -77,12 +73,7 @@ export const UserAnswerBadge: React.FC<UserAnswerBadgeProps> = ({ answer }) => {
 
         {/* User badge */}
         <Badge.WithIcon className='aucctus-bg-tertiary aucctus-border-tertiary aucctus-text-xs aucctus-text-brand-primary'>
-          <Icon
-            variant='check'
-            className='aucctus-stroke-brand-primary'
-            height={10}
-            width={10}
-          />
+          <Check size={10} className='aucctus-stroke-brand-primary' />
           <span>Yours</span>
         </Badge.WithIcon>
       </div>

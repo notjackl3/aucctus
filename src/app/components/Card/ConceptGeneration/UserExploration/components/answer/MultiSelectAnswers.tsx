@@ -1,9 +1,10 @@
-import { Icon, Input } from '@components';
+import { Input } from '@components';
 import { AnswerItem } from '@stores/concept-incubation/actions';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
 import { v4 as uuidv4 } from 'uuid';
 import { boxShadowStyle } from '../../../../../Icon/QuestionIcon';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * MultiSelectAnswers component handles rendering and interaction for multiple choice questions
@@ -74,8 +75,8 @@ const MultiSelectAnswers: React.FC<{
               style={boxShadowStyle}
               className='aucctus-bg-primary aucctus-border-secondary mr-2 flex h-8 w-8 items-center justify-center rounded-lg border-2'
             >
-              <Icon
-                variant={(option.icon || 'help') as IconVariant}
+              <DynamicIcon
+                variant={(option.icon || 'help') as string}
                 height={16}
                 width={16}
               />

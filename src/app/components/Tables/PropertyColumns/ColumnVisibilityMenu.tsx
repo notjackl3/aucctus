@@ -1,5 +1,3 @@
-import { Icon } from '@components';
-
 import { IPropertyDefinition } from '@libs/api/types';
 import { useColumnVisibilityStore } from '@stores/table-columns.store';
 import { cn } from '@libs/utils/react';
@@ -7,6 +5,8 @@ import * as Popover from '@radix-ui/react-popover';
 import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
+import { Eye, EyeOff, Search } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IColumnVisibilityMenuProps {
   propertyDefinitions?: IPropertyDefinition[];
@@ -14,17 +14,17 @@ interface IColumnVisibilityMenuProps {
 
 // Define static columns with their metadata
 const STATIC_COLUMNS = [
-  { id: 'title', name: 'Concept', icon: 'lightbulb' as IconVariant },
-  { id: 'priority', name: 'Score', icon: 'trendup' as IconVariant },
-  { id: 'createdBy', name: 'Created By', icon: 'user-square' as IconVariant },
-  { id: 'createdAt', name: 'Created Date', icon: 'calendar' as IconVariant },
+  { id: 'title', name: 'Concept', icon: 'lightbulb' as string },
+  { id: 'priority', name: 'Score', icon: 'trendup' as string },
+  { id: 'createdBy', name: 'Created By', icon: 'user-square' as string },
+  { id: 'createdAt', name: 'Created Date', icon: 'calendar' as string },
   {
     id: 'lastModifiedBy',
     name: 'Last Modified By',
-    icon: 'users-edit' as IconVariant,
+    icon: 'users-edit' as string,
   },
-  { id: 'updatedAt', name: 'Last Modified Date', icon: 'clock' as IconVariant },
-  { id: 'status', name: 'Status', icon: 'activity' as IconVariant },
+  { id: 'updatedAt', name: 'Last Modified Date', icon: 'clock' as string },
+  { id: 'status', name: 'Status', icon: 'activity' as string },
 ];
 
 /**
@@ -101,12 +101,7 @@ const ColumnVisibilityMenu: React.FC<IColumnVisibilityMenuProps> = ({
     <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
       <Popover.Trigger asChild>
         <button className='aucctus-bg-secondary-hover flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200'>
-          <Icon
-            variant='eye'
-            height={16}
-            width={16}
-            className='aucctus-stroke-secondary'
-          />
+          <Eye size={16} className='aucctus-stroke-secondary' />
         </button>
       </Popover.Trigger>
       <Popover.Portal forceMount>
@@ -129,10 +124,7 @@ const ColumnVisibilityMenu: React.FC<IColumnVisibilityMenuProps> = ({
                 <div className='aucctus-bg-primary flex w-[280px] select-none flex-col rounded-md shadow-lg'>
                   {/* Header with title and icon */}
                   <div className='flex items-center gap-2 px-3 py-3'>
-                    <Icon
-                      variant='eye'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
+                    <Eye className='aucctus-stroke-secondary h-4 w-4' />
                     <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
                       Property visibility
                     </span>
@@ -141,10 +133,7 @@ const ColumnVisibilityMenu: React.FC<IColumnVisibilityMenuProps> = ({
                   {/* Search input */}
                   <div className='p-2'>
                     <div className='relative'>
-                      <Icon
-                        variant='search-md'
-                        className='aucctus-stroke-quaternary absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2'
-                      />
+                      <Search className='aucctus-stroke-quaternary absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2' />
                       <input
                         type='text'
                         placeholder='Search for a property...'
@@ -184,17 +173,14 @@ const ColumnVisibilityMenu: React.FC<IColumnVisibilityMenuProps> = ({
                                 toggleStaticColumnVisibility(column.id)
                               }
                             >
-                              <Icon
+                              <DynamicIcon
                                 variant={column.icon}
                                 className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
                               />
                               <span className='aucctus-text-sm aucctus-text-secondary flex-1 truncate text-left'>
                                 {column.name}
                               </span>
-                              <Icon
-                                variant='eye'
-                                className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
-                              />
+                              <Eye className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0' />
                             </button>
                           );
                         } else {
@@ -210,19 +196,14 @@ const ColumnVisibilityMenu: React.FC<IColumnVisibilityMenuProps> = ({
                                 toggleColumnVisibility(definition.key)
                               }
                             >
-                              <Icon
-                                variant={
-                                  getPropertyIcon(definition) as IconVariant
-                                }
+                              <DynamicIcon
+                                variant={getPropertyIcon(definition) as string}
                                 className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
                               />
                               <span className='aucctus-text-sm aucctus-text-secondary flex-1 truncate text-left'>
                                 {definition.name}
                               </span>
-                              <Icon
-                                variant='eye'
-                                className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
-                              />
+                              <Eye className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0' />
                             </button>
                           );
                         }
@@ -268,17 +249,14 @@ const ColumnVisibilityMenu: React.FC<IColumnVisibilityMenuProps> = ({
                                   toggleStaticColumnVisibility(column.id)
                                 }
                               >
-                                <Icon
+                                <DynamicIcon
                                   variant={column.icon}
                                   className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
                                 />
                                 <span className='aucctus-text-sm aucctus-text-tertiary flex-1 truncate text-left'>
                                   {column.name}
                                 </span>
-                                <Icon
-                                  variant='eye-off'
-                                  className='aucctus-stroke-disabled h-4 w-4 flex-shrink-0'
-                                />
+                                <EyeOff className='aucctus-stroke-disabled h-4 w-4 flex-shrink-0' />
                               </button>
                             );
                           } else {
@@ -294,19 +272,16 @@ const ColumnVisibilityMenu: React.FC<IColumnVisibilityMenuProps> = ({
                                   toggleColumnVisibility(definition.key)
                                 }
                               >
-                                <Icon
+                                <DynamicIcon
                                   variant={
-                                    getPropertyIcon(definition) as IconVariant
+                                    getPropertyIcon(definition) as string
                                   }
                                   className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
                                 />
                                 <span className='aucctus-text-sm aucctus-text-tertiary flex-1 truncate text-left'>
                                   {definition.name}
                                 </span>
-                                <Icon
-                                  variant='eye-off'
-                                  className='aucctus-stroke-disabled h-4 w-4 flex-shrink-0'
-                                />
+                                <EyeOff className='aucctus-stroke-disabled h-4 w-4 flex-shrink-0' />
                               </button>
                             );
                           }

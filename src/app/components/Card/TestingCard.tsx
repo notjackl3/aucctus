@@ -1,4 +1,4 @@
-import { Button, Header, Icon } from '@components';
+import { Button, Header } from '@components';
 import {
   AssumptionTestStatus,
   ConceptTestStage,
@@ -8,6 +8,8 @@ import utils from '@libs/utils';
 import { TESTING_STATUS_STYLE_MAP } from '@libs/utils/assumptions';
 import { cn } from '@libs/utils/react';
 import React from 'react';
+import { ExternalLink, Star } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface TestingProps {
   stage: ConceptTestStage;
@@ -53,7 +55,7 @@ const Testing: React.FC<TestingProps> = ({
 
           {!hasStarted && (
             <span className='aucctus-bg-secondary inline-flex items-center justify-center gap-1.5 rounded-lg p-2 text-center text-xs font-semibold text-primary-600'>
-              <Icon variant='star-01' className='stroke-primary-600' />
+              <Star className='stroke-primary-600' />
               Recommended
             </span>
           )}
@@ -72,7 +74,7 @@ const Testing: React.FC<TestingProps> = ({
             }
           }}
         >
-          {hasStarted ? <Icon variant='link-external' /> : 'Start'}
+          {hasStarted ? <ExternalLink /> : 'Start'}
         </Button>
       </div>
       <div className='inline-flex items-center justify-start gap-3.5 self-stretch'>
@@ -122,7 +124,7 @@ const Testing: React.FC<TestingProps> = ({
               )}
             >
               <span>
-                <Icon
+                <DynamicIcon
                   variant={validationStatusVisuals.icon}
                   className={validationStatusVisuals.stroke}
                   height={20}

@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Icon, toast, Loading, ConceptReportSkeletons } from '@components';
+import { toast, Loading, ConceptReportSkeletons } from '@components';
 import { cn } from '@libs/utils/react';
 import {
   useTestCollateral,
@@ -14,6 +14,19 @@ import {
   ICollateralRegenerationStatus,
   ITestCollateral,
 } from '@libs/api/types/concept/testing';
+import {
+  AlertCircle,
+  ArrowRight,
+  Clipboard,
+  Download,
+  File,
+  FileText,
+  FileUp,
+  Image,
+  Plus,
+  RefreshCw,
+  Upload,
+} from 'lucide-react';
 
 interface TestCollateralProps {
   conceptUuid?: string;
@@ -331,10 +344,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
     return (
       <div className='flex items-center justify-center py-12'>
         <div className='flex flex-col items-center gap-3'>
-          <Icon
-            variant='refresh'
-            className='aucctus-stroke-brand-primary h-6 w-6 animate-spin'
-          />
+          <RefreshCw className='aucctus-stroke-brand-primary h-6 w-6 animate-spin' />
           <p className='aucctus-text-sm-regular aucctus-text-secondary'>
             Loading collateral...
           </p>
@@ -366,10 +376,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
             // No data state
             <div className='aucctus-bg-secondary-subtle aucctus-border-secondary flex flex-1 items-center justify-center rounded-lg border p-6'>
               <div className='flex flex-col items-center justify-center text-center'>
-                <Icon
-                  variant='file-open'
-                  className='aucctus-stroke-tertiary mb-4 h-8 w-8'
-                />
+                <File className='aucctus-stroke-tertiary mb-4 h-8 w-8' />
                 <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
                   No collateral found
                 </h4>
@@ -407,20 +414,11 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                         <div className='flex items-start gap-3'>
                           <div className='relative'>
                             {item.type === 'text' ? (
-                              <Icon
-                                variant='file-text'
-                                className='aucctus-stroke-tertiary h-8 w-8 shrink-0'
-                              />
+                              <FileText className='aucctus-stroke-tertiary h-8 w-8 shrink-0' />
                             ) : item.type === 'image' ? (
-                              <Icon
-                                variant='image'
-                                className='aucctus-stroke-tertiary h-8 w-8 shrink-0'
-                              />
+                              <Image className='aucctus-stroke-tertiary h-8 w-8 shrink-0' />
                             ) : (
-                              <Icon
-                                variant='file-attachment'
-                                className='aucctus-stroke-tertiary h-8 w-8 shrink-0'
-                              />
+                              <FileUp className='aucctus-stroke-tertiary h-8 w-8 shrink-0' />
                             )}
                             {isItemProcessing && (
                               <div className='absolute -right-1 -top-1'>
@@ -429,10 +427,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                             )}
                             {hasItemError && (
                               <div className='absolute -right-1 -top-1'>
-                                <Icon
-                                  variant='alert-circle'
-                                  className='aucctus-stroke-error-primary h-3 w-3'
-                                />
+                                <AlertCircle className='aucctus-stroke-error-primary h-3 w-3' />
                               </div>
                             )}
                           </div>
@@ -487,10 +482,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                               ) : (
                                 <>
                                   Generate
-                                  <Icon
-                                    variant='arrowright'
-                                    className='aucctus-stroke-secondary h-3 w-3'
-                                  />
+                                  <ArrowRight className='aucctus-stroke-secondary h-3 w-3' />
                                 </>
                               )}
                             </button>
@@ -504,10 +496,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                           }
                           className='aucctus-text-secondary hover:aucctus-text-primary hover:aucctus-border-brand-primary flex w-full items-center justify-center gap-2 rounded-lg border-2 border-dashed border-gray-300 p-4 transition-colors disabled:cursor-not-allowed disabled:opacity-50'
                         >
-                          <Icon
-                            variant='plus'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <Plus className='aucctus-stroke-secondary h-4 w-4' />
                           <span className='aucctus-text-sm-medium'>
                             Customize Collateral
                           </span>
@@ -530,10 +519,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                       {uploadImageCollateral.isLoading ? (
                         <Loading isSmall />
                       ) : (
-                        <Icon
-                          variant='upload'
-                          className='aucctus-stroke-secondary h-4 w-4'
-                        />
+                        <Upload className='aucctus-stroke-secondary h-4 w-4' />
                       )}
                       <span className='aucctus-text-sm-medium'>
                         {uploadImageCollateral.isLoading
@@ -568,19 +554,13 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                               className='aucctus-bg-primary hover:aucctus-bg-secondary-subtle aucctus-border-secondary flex h-8 w-8 items-center justify-center rounded border'
                               onClick={handleCopyContent}
                             >
-                              <Icon
-                                variant='clipboard'
-                                className='aucctus-stroke-secondary h-4 w-4'
-                              />
+                              <Clipboard className='aucctus-stroke-secondary h-4 w-4' />
                             </button>
                             <button
                               className='aucctus-bg-primary hover:aucctus-bg-secondary-subtle aucctus-border-secondary flex h-8 w-8 items-center justify-center rounded border'
                               onClick={handleDownloadContent}
                             >
-                              <Icon
-                                variant='download'
-                                className='aucctus-stroke-secondary h-4 w-4'
-                              />
+                              <Download className='aucctus-stroke-secondary h-4 w-4' />
                             </button>
                           </>
                         )}
@@ -589,10 +569,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                             className='aucctus-bg-primary hover:aucctus-bg-secondary-subtle aucctus-border-secondary flex h-8 w-8 items-center justify-center rounded border'
                             onClick={handleDownloadContent}
                           >
-                            <Icon
-                              variant='download'
-                              className='aucctus-stroke-secondary h-4 w-4'
-                            />
+                            <Download className='aucctus-stroke-secondary h-4 w-4' />
                           </button>
                         )}
                       </div>
@@ -658,10 +635,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                               </div>
                             ) : feedbackProcessingState.error ? (
                               <div className='flex flex-1 items-center gap-2'>
-                                <Icon
-                                  variant='alert-circle'
-                                  className='aucctus-stroke-error-primary h-4 w-4'
-                                />
+                                <AlertCircle className='aucctus-stroke-error-primary h-4 w-4' />
                                 <span className='aucctus-text-sm-regular aucctus-text-error-primary flex-1'>
                                   {feedbackProcessingState.error}
                                 </span>
@@ -706,10 +680,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                                   }
                                   className='btn btn-secondary btn-sm flex h-9 w-9 items-center justify-center p-0 disabled:opacity-50'
                                 >
-                                  <Icon
-                                    variant='arrowright'
-                                    className='aucctus-stroke-secondary h-4 w-4'
-                                  />
+                                  <ArrowRight className='aucctus-stroke-secondary h-4 w-4' />
                                 </button>
                               </>
                             )}
@@ -720,10 +691,7 @@ const TestCollateral: React.FC<TestCollateralProps> = ({
                   ) : (
                     <div className='flex h-full items-center justify-center p-6'>
                       <div className='text-center'>
-                        <Icon
-                          variant='file-attachment'
-                          className='aucctus-stroke-tertiary mx-auto mb-2 h-8 w-8'
-                        />
+                        <FileUp className='aucctus-stroke-tertiary mx-auto mb-2 h-8 w-8' />
                         <p className='aucctus-text-sm-regular aucctus-text-tertiary'>
                           Select a collateral item to view its content
                         </p>

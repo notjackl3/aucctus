@@ -7,8 +7,8 @@ type CardVariant = 'light' | 'dark';
 interface AiFrostedCardProps {
   title?: string;
   message?: string;
-  leadingIcon?: IconVariant;
-  trailingIcon?: IconVariant;
+  leadingIcon?: string;
+  trailingIcon?: string;
   onClick?: () => void;
   titleClassName?: string;
   messageClassName?: string;

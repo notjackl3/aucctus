@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
-import { Icon, Badge } from '@components';
+import { Badge } from '@components';
 import { cn } from '@libs/utils/react';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { NucleusReportAnswer, NucleusAnswerSource } from '@libs/api/types';
+import { Calendar, Pencil, Trash2 } from 'lucide-react';
 
 interface AnswerCardProps {
   answer: NucleusReportAnswer;
@@ -74,8 +75,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
             aria-label='Edit answer'
             title={isAdmin ? 'Edit answer' : 'Admin access required'}
           >
-            <Icon
-              variant='edit'
+            <Pencil
               className={cn(
                 'h-4 w-4',
                 isAdmin
@@ -97,8 +97,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
             aria-label='Delete answer'
             title={isAdmin ? 'Delete answer' : 'Admin access required'}
           >
-            <Icon
-              variant='trash'
+            <Trash2
               className={cn(
                 'h-4 w-4',
                 isAdmin
@@ -160,10 +159,7 @@ const AnswerCard: React.FC<AnswerCardProps> = ({
 
           return (
             <div className='aucctus-bg-secondary flex items-center gap-1 rounded-md px-1.5 py-0.5'>
-              <Icon
-                variant='calendar'
-                className='aucctus-stroke-tertiary h-2.5 w-2.5'
-              />
+              <Calendar className='aucctus-stroke-tertiary h-2.5 w-2.5' />
               <span className='aucctus-text-xs aucctus-text-tertiary font-medium'>
                 {`${month} '${year}`}
               </span>

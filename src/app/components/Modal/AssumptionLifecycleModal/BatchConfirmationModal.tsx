@@ -1,5 +1,4 @@
 import React, { useCallback, useState } from 'react';
-import { Icon } from '@components';
 import { BatchAssumptionChange } from '@stores/batch-assumption-changes';
 import { useModal } from '@context/ModalContextProvider';
 import { AssumptionStatusV2 } from '@libs/api/types';
@@ -7,6 +6,7 @@ import { AssumptionStatusV2 } from '@libs/api/types';
 // Import existing badge components
 import RiskBadge from '@pages/Concept/Report/Assumptions/components/badges/RiskBadge';
 import StatusBadge from '@pages/Concept/Report/Assumptions/components/badges/StatusBadge';
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 
 interface BatchConfirmationModalProps {
   changes: BatchAssumptionChange[];
@@ -121,10 +121,7 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
       <div className='mt-4 w-full space-y-4 px-2'>
         {/* Section Header */}
         <div className='flex items-center gap-2'>
-          <Icon
-            variant='alert-triangle'
-            className='aucctus-stroke-warning-primary h-4 w-4'
-          />
+          <AlertTriangle className='aucctus-stroke-warning-primary h-4 w-4' />
           <p className='aucctus-text-xs-medium aucctus-text-tertiary uppercase tracking-wide'>
             Modified
           </p>
@@ -231,10 +228,7 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
                     </>
                   ) : change.type === 'delete' ? (
                     <div className='aucctus-bg-error-subtle aucctus-text-error-primary flex w-full items-center gap-2 rounded px-2 py-1 text-xs'>
-                      <Icon
-                        variant='alert-triangle'
-                        className='aucctus-stroke-error-primary h-3.5 w-3.5'
-                      />
+                      <AlertTriangle className='aucctus-stroke-error-primary h-3.5 w-3.5' />
                       Will be permanently deleted
                     </div>
                   ) : null}
@@ -268,7 +262,7 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
         aria-label='Close modal'
         disabled={isDisabled}
       >
-        <Icon variant='closeX' className='aucctus-stroke-secondary h-6 w-6' />
+        <X className='aucctus-stroke-secondary h-6 w-6' />
       </button>
 
       {/* Content */}
@@ -305,10 +299,7 @@ const BatchConfirmationModal: React.FC<BatchConfirmationModalProps> = ({
             >
               {isDisabled ? (
                 <>
-                  <Icon
-                    variant='loading-02'
-                    className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin'
-                  />
+                  <Loader2 className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin' />
                   Processing...
                 </>
               ) : (

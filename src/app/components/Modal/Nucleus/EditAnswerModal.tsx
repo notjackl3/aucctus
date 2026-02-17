@@ -1,10 +1,10 @@
 import { FunctionComponent, useCallback, useState, useEffect } from 'react';
 import { Input } from '@components';
 import TextArea from '../../Input/TextArea/TextArea';
-import Icon from '../../Icon/Icon/Icon';
 import { useModal } from '../../../context/ModalContextProvider';
 import { useUpdateAnswer } from '../../../hooks/query/nucleusCrud.hook';
 import { NucleusReportAnswer } from '@libs/api/types/nucleus';
+import { Plus, Trash2, X } from 'lucide-react';
 
 interface EditAnswerModalProps {
   reportUuid: string;
@@ -304,7 +304,7 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
           onClick={closeModal}
           type='button'
         >
-          <Icon variant='closeX' />
+          <X />
         </button>
       </div>
 
@@ -341,7 +341,7 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
                 disabled={isLoading}
                 aria-label='Add source'
               >
-                <Icon variant='plus' width={16} height={16} />
+                <Plus size={16} />
                 Add Source
               </button>
             </div>
@@ -363,7 +363,7 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
                       disabled={isLoading}
                       aria-label={`Remove source ${index + 1}`}
                     >
-                      <Icon variant='trash' width={16} height={16} />
+                      <Trash2 size={16} />
                     </button>
                   )}
                 </div>

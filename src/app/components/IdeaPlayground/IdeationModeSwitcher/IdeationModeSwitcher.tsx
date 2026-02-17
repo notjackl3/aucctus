@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Icon } from '@components';
 import { AppPath } from '@routes/routes';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import { cn } from '@libs/utils/react';
+import { Check, ChevronDown } from 'lucide-react';
 
 type IdeationMode = 'playground' | 'ideate';
 type SwitcherVariant = 'dark' | 'light';
@@ -110,8 +110,7 @@ const IdeationModeSwitcher: React.FC<IdeationModeSwitcherProps> = ({
         )}
       >
         <span className='aucctus-text-sm-medium'>{currentOption?.label}</span>
-        <Icon
-          variant='chevrondown'
+        <ChevronDown
           className={cn('h-4 w-4 transition-transform duration-200', {
             'aucctus-stroke-white': isDark,
             'stroke-gray-700': !isDark,
@@ -168,8 +167,7 @@ const IdeationModeSwitcher: React.FC<IdeationModeSwitcherProps> = ({
                   )}
                 >
                   {isSelected && (
-                    <Icon
-                      variant='check'
+                    <Check
                       className={cn('h-3 w-3', {
                         'aucctus-stroke-brand-primary': isDark,
                         'stroke-white': !isDark,

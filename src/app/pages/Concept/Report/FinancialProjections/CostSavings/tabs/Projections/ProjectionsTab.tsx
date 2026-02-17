@@ -1,8 +1,8 @@
 import React from 'react';
-import { Icon } from '@components';
 import { ProjectionSettings } from '../../shared/types';
 import MonteCarloChart from './MonteCarloChart';
 import AboutMonteCarlo from './AboutMonteCarlo';
+import { Clock, PiggyBank } from 'lucide-react';
 
 interface ProjectionsTabProps {
   projectionSettings?: ProjectionSettings;
@@ -23,10 +23,7 @@ const ProjectionsTab: React.FC<ProjectionsTabProps> = ({
       <div className='pointer-events-none blur-[10px]'>
         <div className='aucctus-bg-primary aucctus-border-primary rounded-lg border p-6 shadow-sm'>
           <div className='mb-4 flex items-center gap-2'>
-            <Icon
-              variant='piggy-bank'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <PiggyBank className='aucctus-stroke-brand-primary h-5 w-5' />
             <h3 className='aucctus-header-xs-medium aucctus-text-primary'>
               Cost Savings Projections
             </h3>
@@ -60,10 +57,7 @@ const ProjectionsTab: React.FC<ProjectionsTabProps> = ({
       >
         <div className='aucctus-bg-tertiary aucctus-border-primary rounded-lg border-2 bg-opacity-50 px-8 py-6 shadow-lg backdrop-blur-sm'>
           <div className='flex items-center justify-center gap-3'>
-            <Icon
-              variant='clock'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <Clock className='aucctus-stroke-brand-primary h-5 w-5' />
             <h3 className='aucctus-text-xl-semibold aucctus-text-primary'>
               Coming Soon
             </h3>

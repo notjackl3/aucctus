@@ -1,11 +1,11 @@
-import { Icon } from '@components';
 import * as Menubar from '@radix-ui/react-menubar';
 import classNames from 'classnames';
 import React from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ISubMenuTriggerProps {
   label: string;
-  icon: IconVariant;
+  icon: string;
 }
 
 const SubMenuTrigger: React.FC<ISubMenuTriggerProps> = ({
@@ -50,7 +50,7 @@ const SubMenuTrigger: React.FC<ISubMenuTriggerProps> = ({
           'text-tertiary-700 [&>svg]:stroke-tertiary-700 flex h-5 shrink grow basis-0 items-center justify-start gap-2 text-sm font-medium group-hover:font-bold',
         )}
       >
-        {icon ? <Icon variant={icon} /> : null}
+        {icon ? <DynamicIcon variant={icon} /> : null}
 
         {label}
       </div>

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import { InsightCard } from '../types';
 import { getSourceInitial, getSourceColor } from './utils';
+import { Target, X } from 'lucide-react';
 
 interface InsightDetailSidePanelProps {
   selectedInsight: InsightCard | null;
@@ -79,12 +80,7 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
               onClick={handleClose}
               className='btn btn-sm btn-secondary absolute -right-3 -top-3'
             >
-              <Icon
-                variant='closeX'
-                className='aucctus-stroke-secondary'
-                height={12}
-                width={12}
-              />
+              <X size={12} className='aucctus-stroke-secondary' />
             </button>
           </div>
 
@@ -175,11 +171,9 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
               {/* Section 2: Why This Matters */}
               <div className='mb-8'>
                 <div className='mb-4 flex items-center gap-2'>
-                  <Icon
-                    variant='target'
+                  <Target
+                    size={20}
                     className='aucctus-stroke-success-primary'
-                    height={20}
-                    width={20}
                   />
                   <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
                     Why This Matters
@@ -230,12 +224,7 @@ const InsightDetailSidePanel: React.FC<InsightDetailSidePanelProps> = ({
           {/* 
           <div className='mb-6'>
             <div className='mb-4 flex items-center gap-2'>
-              <Icon
-                variant='columns'
-                className='aucctus-stroke-research-primary'
-                height={20}
-                width={20}
-              />
+              <Columns3 size={20} className='aucctus-stroke-research-primary' />
               <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
                 Other Relevant Insights
               </h3>

@@ -1,7 +1,9 @@
 import { FunctionComponent, useState } from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import { IPocMilestone, PocMilestoneStatus } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { Check, ChevronDown, Clipboard, Target } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IMilestonesSectionProps {
   milestones: IPocMilestone[];
@@ -14,7 +16,7 @@ const STATUS_CONFIG: Record<
     color: string;
     bgColor: string;
     dotColor: string;
-    icon: IconVariant;
+    icon: string;
   }
 > = {
   not_started: {
@@ -215,10 +217,7 @@ const MilestoneRow: FunctionComponent<IMilestoneRowProps> = ({
                           {config.label}
                         </span>
                         {isSelected && (
-                          <Icon
-                            variant='check'
-                            className='ml-auto h-4 w-4 stroke-primary-500'
-                          />
+                          <Check className='ml-auto h-4 w-4 stroke-primary-500' />
                         )}
                       </button>
                     );
@@ -236,10 +235,7 @@ const MilestoneRow: FunctionComponent<IMilestoneRowProps> = ({
             'aucctus-bg-tertiary',
           )}
         >
-          <Icon
-            variant='clipboard'
-            className='aucctus-stroke-tertiary h-3.5 w-3.5'
-          />
+          <Clipboard className='aucctus-stroke-tertiary h-3.5 w-3.5' />
           <span className='aucctus-text-secondary text-xs font-medium'>
             {milestone.deliverables.length}
           </span>
@@ -255,8 +251,7 @@ const MilestoneRow: FunctionComponent<IMilestoneRowProps> = ({
             isExpanded && 'rotate-180 bg-primary-100 dark:bg-primary-900',
           )}
         >
-          <Icon
-            variant='chevrondown'
+          <ChevronDown
             className={cn(
               'h-4 w-4 transition-colors duration-200',
               isExpanded
@@ -310,7 +305,7 @@ const MilestoneRow: FunctionComponent<IMilestoneRowProps> = ({
                             : 'aucctus-bg-tertiary',
                         )}
                       >
-                        <Icon
+                        <DynamicIcon
                           variant={status === 'completed' ? 'check' : 'circle'}
                           className={cn(
                             'h-3.5 w-3.5',
@@ -413,7 +408,7 @@ const MilestonesSection: FunctionComponent<IMilestonesSectionProps> = ({
               'shadow-lg shadow-primary-500/25',
             )}
           >
-            <Icon variant='target' className='h-5 w-5 stroke-white' />
+            <Target className='h-5 w-5 stroke-white' />
           </div>
           <div className='flex flex-col'>
             <h2 className='aucctus-text-primary aucctus-header-md-semibold'>
@@ -453,10 +448,7 @@ const MilestonesSection: FunctionComponent<IMilestonesSectionProps> = ({
               isAllExpanded && 'rotate-180',
             )}
           >
-            <Icon
-              variant='chevrondown'
-              className='h-3.5 w-3.5 stroke-white stroke-[2.5]'
-            />
+            <ChevronDown className='h-3.5 w-3.5 stroke-white stroke-[2.5]' />
           </div>
         </button>
       </div>

@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Icon } from '@components';
 import {
   useFloatingAnimation,
   usePulseAnimation,
 } from '@hooks/animation/animation.hook';
+import { Sparkles } from 'lucide-react';
 
 interface FloatingAiIconProps {
   showPulse?: boolean;
@@ -36,24 +36,14 @@ const FloatingAiIcon: React.FC<FloatingAiIconProps> = ({
           className='aucctus-bg-primary-solid absolute rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
           {...echoAnimation}
         >
-          <Icon
-            variant='ai-conclusion'
-            className='stroke-primary-100 opacity-30'
-            width={24}
-            height={24}
-          />
+          <Sparkles size={24} className='stroke-primary-100 opacity-30' />
         </motion.div>
       )}
       <motion.div
         className='aucctus-bg-primary-solid rounded-lg border-[1.5px] border-primary-300 border-opacity-50 p-2'
         {...floatingAnimation}
       >
-        <Icon
-          variant='ai-conclusion'
-          className='stroke-primary-100'
-          width={24}
-          height={24}
-        />
+        <Sparkles size={24} className='stroke-primary-100' />
       </motion.div>
     </>
   );

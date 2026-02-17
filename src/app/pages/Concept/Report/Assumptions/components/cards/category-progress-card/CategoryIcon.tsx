@@ -1,38 +1,22 @@
 import React from 'react';
-import { Icon } from '@components';
 import { CategoryIconProps } from './types';
 import { getCategoryColors } from '../../../constants/categoryColors';
+import { DollarSign, Heart, HelpCircle, Settings, Waves } from 'lucide-react';
 
 const CategoryIcon: React.FC<CategoryIconProps> = ({ category }) => {
   const categoryColors = getCategoryColors(category);
 
   switch (category) {
     case 'desirability':
-      return (
-        <Icon variant='heart' className={`${categoryColors.stroke} h-5 w-5`} />
-      );
+      return <Heart className={`${categoryColors.stroke} h-5 w-5`} />;
     case 'feasibility':
-      return (
-        <Icon variant='gear' className={`${categoryColors.stroke} h-5 w-5`} />
-      );
+      return <Settings className={`${categoryColors.stroke} h-5 w-5`} />;
     case 'viability':
-      return (
-        <Icon
-          variant='currency-dollar'
-          className={`${categoryColors.stroke} h-5 w-5`}
-        />
-      );
+      return <DollarSign className={`${categoryColors.stroke} h-5 w-5`} />;
     case 'adaptability':
-      return (
-        <Icon variant='waves' className={`${categoryColors.stroke} h-5 w-5`} />
-      );
+      return <Waves className={`${categoryColors.stroke} h-5 w-5`} />;
     default:
-      return (
-        <Icon
-          variant='help-circle'
-          className='aucctus-stroke-tertiary h-5 w-5'
-        />
-      );
+      return <HelpCircle className='aucctus-stroke-tertiary h-5 w-5' />;
   }
 };
 

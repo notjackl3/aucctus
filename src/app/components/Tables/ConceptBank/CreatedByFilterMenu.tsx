@@ -1,4 +1,4 @@
-import { Avatar, Icon, Input } from '@components';
+import { Avatar, Input } from '@components';
 import { useAllUsers } from '@hooks/query/account.hook';
 import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import { IUser } from '@libs/api/types';
@@ -7,6 +7,19 @@ import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ListFilter,
+  SwitchCamera,
+  UserSquare,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export interface ICreatedByFilterMenuProps {
   filterOptions: IConceptFilterOptions;
@@ -232,10 +245,7 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
             }}
           >
             <span className='flex items-center gap-1.5'>
-              <Icon
-                variant='user-square'
-                className='aucctus-stroke-tertiary h-4 w-4'
-              />
+              <UserSquare className='aucctus-stroke-tertiary h-4 w-4' />
               Created By
               {hasActiveFilter && (
                 <span className='aucctus-bg-brand-solid ml-1 flex h-4 w-4 items-center justify-center rounded-full text-[10px] text-white'>
@@ -245,18 +255,15 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
             </span>
             <span className='ml-2 flex items-center gap-1'>
               {hasActiveFilter && (
-                <Icon
-                  variant='filter-lines'
-                  className='aucctus-stroke-brand-primary h-4 w-4'
-                />
+                <ListFilter className='aucctus-stroke-brand-primary h-4 w-4' />
               )}
               {currentSort && (
-                <Icon
+                <DynamicIcon
                   variant={currentSort === 'asc' ? 'arrowup' : 'arrowdown'}
                   className='aucctus-stroke-brand-primary h-4 w-4'
                 />
               )}
-              <Icon variant='chevrondown' className='ml-0.5 h-4 w-4' />
+              <ChevronDown className='ml-0.5 h-4 w-4' />
             </span>
           </button>
         </Popover.Trigger>
@@ -363,10 +370,7 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
                                 handleClearFilter();
                               }}
                             >
-                              <Icon
-                                variant='closeX'
-                                className='aucctus-stroke-secondary h-4 w-4'
-                              />
+                              <X className='aucctus-stroke-secondary h-4 w-4' />
                               <span className='aucctus-text-secondary'>
                                 Clear filter
                               </span>
@@ -386,17 +390,11 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
                                 setShowFilterView(false);
                               }}
                             >
-                              <Icon
-                                variant='switch-vertical-01'
-                                className='aucctus-stroke-secondary h-4 w-4'
-                              />
+                              <SwitchCamera className='aucctus-stroke-secondary h-4 w-4' />
                               <span className='aucctus-text-secondary'>
                                 Sort
                               </span>
-                              <Icon
-                                variant='chevron-right'
-                                className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                              />
+                              <ChevronRight className='aucctus-stroke-tertiary ml-auto h-4 w-4' />
                             </button>
                           </>
                         )}
@@ -409,10 +407,7 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
                             onClick={() => setShowFilterView(true)}
                             className='aucctus-bg-primary-hover rounded p-1 transition-colors'
                           >
-                            <Icon
-                              variant='chevronleft'
-                              className='aucctus-stroke-secondary h-4 w-4'
-                            />
+                            <ChevronLeft className='aucctus-stroke-secondary h-4 w-4' />
                           </button>
                           <span className='aucctus-text-secondary text-sm font-medium'>
                             Sort
@@ -427,18 +422,12 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
                             handleSort('asc');
                           }}
                         >
-                          <Icon
-                            variant='arrowup'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <ArrowUp className='aucctus-stroke-secondary h-4 w-4' />
                           <span className='aucctus-text-secondary'>
                             Sort ascending
                           </span>
                           {currentSort === 'asc' && (
-                            <Icon
-                              variant='check'
-                              className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                            />
+                            <Check className='aucctus-stroke-brand-primary ml-auto h-4 w-4' />
                           )}
                         </button>
 
@@ -450,18 +439,12 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
                             handleSort('desc');
                           }}
                         >
-                          <Icon
-                            variant='arrowdown'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <ArrowDown className='aucctus-stroke-secondary h-4 w-4' />
                           <span className='aucctus-text-secondary'>
                             Sort descending
                           </span>
                           {currentSort === 'desc' && (
-                            <Icon
-                              variant='check'
-                              className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                            />
+                            <Check className='aucctus-stroke-brand-primary ml-auto h-4 w-4' />
                           )}
                         </button>
                       </div>

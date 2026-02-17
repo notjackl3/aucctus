@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { useWatchtowerDomains } from '@hooks/query/watchtower.hook';
+import { Compass, Sparkles } from 'lucide-react';
 
 /**
  * FutureDomainsWidget - AI-suggested strategic domains
@@ -11,12 +11,7 @@ const FutureDomainsWidget: React.FC = () => {
   if (isLoading || domains.length === 0) {
     return (
       <div className='aucctus-bg-primary aucctus-border-secondary flex h-[490px] flex-col items-center justify-center rounded-xl border p-6'>
-        <Icon
-          variant='compass-03'
-          height={32}
-          width={32}
-          className='aucctus-stroke-tertiary mb-2'
-        />
+        <Compass size={32} className='aucctus-stroke-tertiary mb-2' />
         <p className='aucctus-text-tertiary text-sm'>
           {isLoading ? 'Loading domains...' : 'No future domains available'}
         </p>
@@ -27,22 +22,12 @@ const FutureDomainsWidget: React.FC = () => {
   return (
     <div className='aucctus-bg-primary aucctus-border-secondary flex h-[490px] flex-col rounded-xl border p-6'>
       <div className='mb-4 flex items-center gap-2'>
-        <Icon
-          variant='compass-03'
-          height={20}
-          width={20}
-          className='aucctus-stroke-secondary'
-        />
+        <Compass size={20} className='aucctus-stroke-secondary' />
         <h3 className='aucctus-text-primary aucctus-text-lg-semibold'>
           Future Domains
         </h3>
         <span className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-tertiary flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px]'>
-          <Icon
-            variant='sparkles'
-            height={12}
-            width={12}
-            className='aucctus-stroke-tertiary'
-          />
+          <Sparkles size={12} className='aucctus-stroke-tertiary' />
           AI Suggested
         </span>
       </div>

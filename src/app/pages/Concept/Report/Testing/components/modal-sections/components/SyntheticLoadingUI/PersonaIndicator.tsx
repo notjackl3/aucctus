@@ -1,8 +1,8 @@
-import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types/concept/concepts';
 import { cn } from '@libs/utils/react';
 import React, { useRef } from 'react';
 import { AnimatedSpeechBubble } from './AnimatedSpeechBubble';
+import { Check, UserSquare } from 'lucide-react';
 
 interface PersonaIndicatorProps {
   profile: ICustomerProfile;
@@ -94,10 +94,7 @@ export const PersonaIndicator: React.FC<PersonaIndicatorProps> = ({
                 styles.avatar,
               )}
             >
-              <Icon
-                variant='user-square'
-                className='aucctus-stroke-secondary h-8 w-8'
-              />
+              <UserSquare className='aucctus-stroke-secondary h-8 w-8' />
             </div>
           )}
         </div>
@@ -110,7 +107,7 @@ export const PersonaIndicator: React.FC<PersonaIndicatorProps> = ({
         {/* Completed indicator - checkmark at bottom-right */}
         {status === 'completed' && !isActive && (
           <div className='absolute -bottom-1 -right-1 rounded-full bg-green-500 p-1'>
-            <Icon variant='check' className='h-3 w-3 stroke-white stroke-2' />
+            <Check className='h-3 w-3 stroke-white stroke-2' />
           </div>
         )}
       </div>

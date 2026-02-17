@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { toast } from '@components/Notification/toast';
 import { IPropertyFilter } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
@@ -7,6 +6,7 @@ import React, { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import api from '@libs/api';
 import useStore from '@stores/store';
+import { Loader2, Search, Sparkles, X } from 'lucide-react';
 
 interface IStandardFilter {
   filterType: 'sort' | 'status' | 'createdBy' | 'lastModifiedBy' | 'search';
@@ -174,12 +174,7 @@ const NaturalLanguageFilterButton: React.FC<
           )}
           title='Search with natural language'
         >
-          <Icon
-            variant='ai-conclusion'
-            height={16}
-            width={16}
-            className='aucctus-stroke-brand-primary'
-          />
+          <Sparkles size={16} className='aucctus-stroke-brand-primary' />
         </button>
       </Popover.Trigger>
 
@@ -198,10 +193,7 @@ const NaturalLanguageFilterButton: React.FC<
                   {/* Header */}
                   <div className='aucctus-border-secondary flex items-center justify-between border-b px-3 py-2'>
                     <div className='flex items-center gap-2'>
-                      <Icon
-                        variant='ai-conclusion'
-                        className='aucctus-stroke-brand-primary h-4 w-4'
-                      />
+                      <Sparkles className='aucctus-stroke-brand-primary h-4 w-4' />
                       <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
                         Natural Language Search
                       </span>
@@ -215,10 +207,7 @@ const NaturalLanguageFilterButton: React.FC<
                       }}
                       className='aucctus-bg-primary-hover rounded p-1 transition-colors'
                     >
-                      <Icon
-                        variant='closeX'
-                        className='aucctus-stroke-secondary h-4 w-4'
-                      />
+                      <X className='aucctus-stroke-secondary h-4 w-4' />
                     </button>
                   </div>
 
@@ -288,18 +277,12 @@ const NaturalLanguageFilterButton: React.FC<
                       >
                         {isLoading ? (
                           <>
-                            <Icon
-                              variant='loading-02'
-                              className='aucctus-stroke-white h-4 w-4 animate-spin'
-                            />
+                            <Loader2 className='aucctus-stroke-white h-4 w-4 animate-spin' />
                             <span>Searching...</span>
                           </>
                         ) : (
                           <>
-                            <Icon
-                              variant='search-md'
-                              className='aucctus-stroke-white h-4 w-4'
-                            />
+                            <Search className='aucctus-stroke-white h-4 w-4' />
                             <span>Search</span>
                           </>
                         )}

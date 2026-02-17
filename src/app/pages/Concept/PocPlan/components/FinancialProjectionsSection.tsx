@@ -1,7 +1,7 @@
 import { FunctionComponent, useMemo } from 'react';
-import { Icon } from '@components';
 import { IPocPlan } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { Clock, DollarSign } from 'lucide-react';
 
 interface IFinancialProjectionsSectionProps {
   pocPlan: IPocPlan;
@@ -98,7 +98,7 @@ const FinancialProjectionsSection: FunctionComponent<
               'bg-gradient-to-br from-emerald-500 to-emerald-600',
             )}
           >
-            <Icon variant='currency-dollar' className='h-5 w-5 stroke-white' />
+            <DollarSign className='h-5 w-5 stroke-white' />
           </div>
           <div className='flex flex-col'>
             <h2 className='aucctus-text-primary aucctus-header-md-semibold'>
@@ -176,7 +176,7 @@ const FinancialProjectionsSection: FunctionComponent<
         )}
       >
         <div className='flex items-center gap-3'>
-          <Icon variant='clock' className='aucctus-stroke-tertiary h-5 w-5' />
+          <Clock className='aucctus-stroke-tertiary h-5 w-5' />
           <div className='flex flex-col'>
             <span className='aucctus-text-secondary aucctus-text-sm'>
               Weekly Burn Rate

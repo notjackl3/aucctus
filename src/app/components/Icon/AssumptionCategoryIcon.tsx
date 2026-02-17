@@ -1,22 +1,17 @@
 import { AssumptionCategory } from '@libs/api/types';
 import { ASSUMPTION_CATEGORY_MAP } from '@libs/utils/assumptions';
+import { resolveIcon } from '@libs/utils/iconMap';
 import { cn } from '@libs/utils/react';
 import React from 'react';
-import Icon from './Icon/Icon';
 
 interface AssumptionCategoryIconProps {
   category: AssumptionCategory;
 }
 
-const defaultIconProps = {
-  height: 16,
-  width: 16,
-  stroke: '#2B3674',
-};
-
 const AssumptionCategoryIcon: React.FC<AssumptionCategoryIconProps> = ({
   category,
 }) => {
+  const IconComponent = resolveIcon(ASSUMPTION_CATEGORY_MAP[category].icon);
   return (
     <span
       className={cn(
@@ -24,10 +19,7 @@ const AssumptionCategoryIcon: React.FC<AssumptionCategoryIconProps> = ({
         ASSUMPTION_CATEGORY_MAP[category].style,
       )}
     >
-      <Icon
-        variant={ASSUMPTION_CATEGORY_MAP[category].icon}
-        {...defaultIconProps}
-      />
+      <IconComponent size={16} stroke='#2B3674' />
     </span>
   );
 };

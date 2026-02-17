@@ -1,9 +1,9 @@
-import { Icon } from '@components';
 import { IPropertyDefinition, IPropertyOption } from '@libs/api/types';
 import React from 'react';
 import { createPortal } from 'react-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { getPropertyOptions, getColorScheme } from '@libs/utils/propertyColors';
+import { Check } from 'lucide-react';
 
 interface DropdownPosition {
   top: number;
@@ -81,10 +81,7 @@ export const InlineMultiSelectDropdown: React.FC<
                     <span>{option}</span>
                   </div>
                   {isSelected && (
-                    <Icon
-                      variant='check'
-                      className='aucctus-stroke-brand-primary h-4 w-4 flex-shrink-0'
-                    />
+                    <Check className='aucctus-stroke-brand-primary h-4 w-4 flex-shrink-0' />
                   )}
                 </button>
               );

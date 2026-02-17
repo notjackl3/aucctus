@@ -1,10 +1,10 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import { Input } from '@components';
-import Icon from '../../Icon/Icon/Icon';
 import { useModal } from '../../../context/ModalContextProvider';
 import { useCreateQuestion } from '../../../hooks/query/nucleusCrud.hook';
 import { AssessmentStatus } from '@libs/api/types/nucleus';
 import CategorySelect from '../../Modal/CustomerProfile/CategorySelect';
+import { X } from 'lucide-react';
 
 interface AddQuestionModalProps {
   reportUuid: string;
@@ -199,7 +199,7 @@ const AddQuestionModal: FunctionComponent<AddQuestionModalProps> = ({
           onClick={closeModal}
           type='button'
         >
-          <Icon variant='closeX' />
+          <X />
         </button>
       </div>
 

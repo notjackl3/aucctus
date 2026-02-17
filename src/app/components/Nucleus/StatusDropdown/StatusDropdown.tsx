@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import React, {
   useCallback,
@@ -14,6 +13,7 @@ import {
 } from './fixtures';
 import { StatusDropdownProps, CategoryState, QuestionState } from './types';
 import DropdownMenu, { DropdownPosition } from './DropdownMenu';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Constants
 const MIN_DROPDOWN_WIDTH = 192; // 192px (w-48 equivalent)
@@ -175,7 +175,7 @@ const DropdownTrigger = React.forwardRef<
       title={disabled ? 'Admin access required' : ''}
     >
       {currentConfig && (
-        <Icon
+        <DynamicIcon
           variant={currentConfig.icon}
           className={cn(
             currentConfig.colorClass.replace(
@@ -198,7 +198,7 @@ const DropdownTrigger = React.forwardRef<
           {currentConfig.label}
         </span>
       )}
-      <Icon
+      <DynamicIcon
         variant={isOpen ? 'chevronup' : 'chevrondown'}
         className={cn(
           disabled ? 'aucctus-stroke-disabled' : 'aucctus-stroke-quaternary',

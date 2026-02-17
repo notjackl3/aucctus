@@ -1,5 +1,4 @@
 import React, { useRef, useMemo, useState } from 'react';
-import { Icon } from '@components';
 import { InsightCard as InsightCardType } from '../types';
 import { getBaseUrl, getLogoUrl } from '@libs/utils/source';
 import { cn } from '@libs/utils/react';
@@ -10,6 +9,7 @@ import {
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useDebouncedInvalidation } from '@hooks/query/useDebouncedInvalidation';
 import AucctusLogo from '@assets/aucctus_logo.png';
+import { Check, Link, Loader2 } from 'lucide-react';
 interface ResearchInsightCardProps {
   card: InsightCardType;
   isSelected: boolean;
@@ -163,12 +163,7 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
             }}
           />
         ) : (
-          <Icon
-            variant='link'
-            className='aucctus-stroke-white'
-            height={12}
-            width={12}
-          />
+          <Link size={12} className='aucctus-stroke-white' />
         )}
       </div>
     );
@@ -208,20 +203,12 @@ const ResearchInsightCard: React.FC<ResearchInsightCardProps> = ({
           }`}
         >
           {isLoading ? (
-            <Icon
-              variant='loading-02'
+            <Loader2
+              size={12}
               className='aucctus-stroke-quaternary animate-spin'
-              height={12}
-              width={12}
             />
           ) : (
-            <Icon
-              variant='check'
-              className='aucctus-stroke-white'
-              height={10}
-              width={10}
-              strokeWidth={3}
-            />
+            <Check size={10} className='aucctus-stroke-white' strokeWidth={3} />
           )}
         </div>
       ) : null}

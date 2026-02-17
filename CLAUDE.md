@@ -46,9 +46,6 @@ npm run lint             # ESLint with max-warnings=0
 npm run type-check       # TypeScript checking
 npm run format           # Prettier formatting
 npm run prettier-check   # Check formatting without fixing
-
-# Icons (when adding new SVG icons)
-npm run generate-sprite  # Regenerate icon sprite and types
 ```
 
 ## Architecture
@@ -131,11 +128,16 @@ Always use the `cn` utility with object notation for conditional classes.
 ## Component Patterns
 
 ### Icons
+Uses `lucide-react` for all icons. Import directly from the package:
 ```tsx
-import { Icon } from '@components';
-<Icon variant="clipboard" className="aucctus-fill-brand-primary h-5 w-5" />
+import { Clipboard } from 'lucide-react';
+<Clipboard className="aucctus-fill-brand-primary h-5 w-5" />
 ```
-Icon variants are typed in `icons.d.ts`.
+For dynamic icon resolution (when variant comes from API/props), use:
+```tsx
+import { DynamicIcon } from '@libs/utils/iconMap';
+<DynamicIcon variant={iconName} className="h-5 w-5" />
+```
 
 ### Toasts
 ```tsx

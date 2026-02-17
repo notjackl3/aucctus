@@ -7,7 +7,7 @@ import compression from 'vite-plugin-compression';
 import eslint from 'vite-plugin-eslint';
 import svgr from 'vite-plugin-svgr';
 import { defineConfig, ViteUserConfig } from 'vitest/config';
-import { viteBoilerplatePlugin, watchIcons } from './vite/plugins.js';
+import { viteBoilerplatePlugin } from './vite/plugins.js';
 
 // https://vitejs.dev/config/
 export default defineConfig(async (config: ViteUserConfig) => {
@@ -32,7 +32,6 @@ export default defineConfig(async (config: ViteUserConfig) => {
   ];
 
   const devPlugins = [
-    watchIcons(),
     viteBoilerplatePlugin(),
     eslint(),
     checker({

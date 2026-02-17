@@ -1,7 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { IUserJourneyStep } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { AlertCircle, Briefcase, Pencil, Trash2 } from 'lucide-react';
 
 interface StepCardProps {
   step: IUserJourneyStep;
@@ -79,24 +79,14 @@ const StepCard: React.FC<StepCardProps> = ({
     if (isJobStep) {
       return (
         <div className={cn(baseBadgeStyles, JOB_BADGE_BG, JOB_BADGE_TEXT)}>
-          <Icon
-            variant='briefcase'
-            height={12}
-            width={12}
-            className={JOB_ICON_COLOR}
-          />
+          <Briefcase size={12} className={JOB_ICON_COLOR} />
           <span className='truncate'>{jobLabel}</span>
         </div>
       );
     } else if (isPainStep) {
       return (
         <div className={cn(baseBadgeStyles, PAIN_BADGE_BG, PAIN_BADGE_TEXT)}>
-          <Icon
-            variant='alert-circle'
-            height={12}
-            width={12}
-            className={PAIN_ICON_COLOR}
-          />
+          <AlertCircle size={12} className={PAIN_ICON_COLOR} />
           <span className='truncate'>{painPointLabel}</span>
         </div>
       );
@@ -177,17 +167,15 @@ const StepCard: React.FC<StepCardProps> = ({
               <div className={actionButtonContainerStyles}>
                 {onEdit && (
                   <button className={editButtonStyles} onClick={onEdit}>
-                    <Icon variant='edit' height={12} width={12} />
+                    <Pencil size={12} />
                     <span className='sr-only'>Edit</span>
                   </button>
                 )}
 
                 {onRemove && (
                   <button className={deleteButtonStyles} onClick={onRemove}>
-                    <Icon
-                      variant='trash'
-                      height={12}
-                      width={12}
+                    <Trash2
+                      size={12}
                       className='aucctus-stroke-error-primary'
                     />
                     <span className='sr-only'>Delete</span>

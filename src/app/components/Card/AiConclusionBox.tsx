@@ -1,6 +1,5 @@
 import React from 'react';
-import { Icon } from '@components';
-
+import { Sparkles } from 'lucide-react';
 interface AiConclusionBoxProps {
   title: string;
   content?: string; // or string | undefined
@@ -17,12 +16,7 @@ const AiConclusionBox: React.FC<AiConclusionBoxProps> = ({
           {title}
         </h3>
         <div className='mb-1 flex items-center justify-between'>
-          <Icon
-            variant='ai-conclusion'
-            className='stroke-primary-900'
-            height='14'
-            width='14'
-          />
+          <Sparkles className='stroke-primary-900' height='14' width='14' />
           <span className='aucctus-text-brand-primary aucctus-text-xs-bold px-2 py-1'>
             AI Conclusion
           </span>

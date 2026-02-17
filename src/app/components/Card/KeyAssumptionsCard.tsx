@@ -1,9 +1,10 @@
 // TODO: DEPRECATE - This component uses IAssumptionV1 format.
 // Remove once all assumption displays migrate to V2 format.
 
-import { Badge, Card, Icon } from '@components';
+import { Badge, Card } from '@components';
 import { IAssumptionV1 } from '@libs/api/types';
 import React from 'react';
+import { TriangleAlert } from 'lucide-react';
 
 interface IKeyAssumptionsCardProps {
   assumptions: IAssumptionV1[] | undefined;
@@ -32,7 +33,7 @@ const KeyAssumptionsCard: React.FC<IKeyAssumptionsCardProps> = ({
           onClick={onViewClick}
           aria-label='View Assumptions'
         >
-          <span>{<Icon variant='warning' {...iconDefaultProps} />}</span>
+          <span>{<TriangleAlert {...iconDefaultProps} />}</span>
           View Key Assumptions
         </button>
       }

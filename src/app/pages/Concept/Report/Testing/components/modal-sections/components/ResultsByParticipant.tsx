@@ -1,9 +1,9 @@
 import React, { useMemo, useState } from 'react';
-import { Icon } from '@components';
 import { ITestResult, ITestLearning } from '@libs/api/types/concept/testing';
 import { ITestParticipant } from '../../../types';
 import { cn } from '@libs/utils/react';
 import SourceBadges from './SourceBadges';
+import { ChevronDown, ChevronUp, MessageCircle, User } from 'lucide-react';
 
 // Persona colors matching the participants tab
 const PERSONA_COLORS = ['#FF8A00', '#00C853', '#00B0FF', '#AA00FF'];
@@ -182,7 +182,7 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
     <div className='space-y-5'>
       {/* Section Header */}
       <div className='flex items-center gap-2'>
-        <Icon variant='user' className='aucctus-stroke-brand-primary h-5 w-5' />
+        <User className='aucctus-stroke-brand-primary h-5 w-5' />
         <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
           Results by Participant
         </h4>
@@ -324,18 +324,12 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
                     >
                       {expandedFindings ? (
                         <>
-                          <Icon
-                            variant='chevronup'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <ChevronUp className='aucctus-stroke-secondary h-4 w-4' />
                           Show less
                         </>
                       ) : (
                         <>
-                          <Icon
-                            variant='chevrondown'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <ChevronDown className='aucctus-stroke-secondary h-4 w-4' />
                           See all {allFindings.length} findings
                         </>
                       )}
@@ -368,8 +362,7 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
                         style={{ borderLeftColor: color }}
                       >
                         <div className='flex gap-3'>
-                          <Icon
-                            variant='message-circle'
+                          <MessageCircle
                             className='mt-0.5 h-5 w-5 flex-shrink-0'
                             style={{ color }}
                           />
@@ -397,18 +390,12 @@ const ResultsByParticipant: React.FC<ResultsByParticipantProps> = ({
                       >
                         {expandedQuotes ? (
                           <>
-                            <Icon
-                              variant='chevronup'
-                              className='aucctus-stroke-secondary h-4 w-4'
-                            />
+                            <ChevronUp className='aucctus-stroke-secondary h-4 w-4' />
                             Show less
                           </>
                         ) : (
                           <>
-                            <Icon
-                              variant='chevrondown'
-                              className='aucctus-stroke-secondary h-4 w-4'
-                            />
+                            <ChevronDown className='aucctus-stroke-secondary h-4 w-4' />
                             See all {quotes.length} quotes
                           </>
                         )}

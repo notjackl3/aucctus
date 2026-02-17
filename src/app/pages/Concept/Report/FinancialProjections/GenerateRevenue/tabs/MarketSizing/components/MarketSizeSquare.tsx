@@ -1,5 +1,4 @@
 import React from 'react';
-import { Icon } from '@components';
 import { formatCurrency } from '../assumptionsUtils';
 import { ComponentTooltip } from '@components';
 import { ExpandCollapse } from '@hooks/animation/animation.hook';
@@ -8,6 +7,7 @@ import {
   marketSizeSquareConfig,
   type MarketSizeType,
 } from '../styles/marketSizeStyles';
+import { HelpCircle } from 'lucide-react';
 
 interface MarketSizeSquareProps {
   type: MarketSizeType;
@@ -43,16 +43,10 @@ const MarketSizeSquare: React.FC<MarketSizeSquareProps> = ({
         {formatCurrency(value)}
         {tooltipContent ? (
           <ComponentTooltip tip={tooltipContent}>
-            <Icon
-              variant='help-circle'
-              className={`h-4 w-4 ${config.iconColor} cursor-help`}
-            />
+            <HelpCircle className={`h-4 w-4 ${config.iconColor} cursor-help`} />
           </ComponentTooltip>
         ) : (
-          <Icon
-            variant='help-circle'
-            className={`h-4 w-4 ${config.iconColor}`}
-          />
+          <HelpCircle className={`h-4 w-4 ${config.iconColor}`} />
         )}
       </div>
       <div

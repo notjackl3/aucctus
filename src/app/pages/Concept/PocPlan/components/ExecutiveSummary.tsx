@@ -1,14 +1,15 @@
 import { FunctionComponent } from 'react';
-import { Icon } from '@components';
 import { IPocExecutiveSummary } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { CheckCircle2, FileText } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IExecutiveSummaryProps {
   summary: IPocExecutiveSummary;
 }
 
 interface ISummaryCardProps {
-  icon: IconVariant;
+  icon: string;
   title: string;
   content: string;
   variant?: 'default' | 'highlight';
@@ -28,7 +29,7 @@ const SummaryCard: FunctionComponent<ISummaryCardProps> = ({
     )}
   >
     <div className='flex items-center gap-2'>
-      <Icon
+      <DynamicIcon
         variant={icon}
         className={cn(
           'h-5 w-5',
@@ -73,10 +74,7 @@ const ExecutiveSummary: FunctionComponent<IExecutiveSummaryProps> = ({
       {/* Section Header */}
       <div className='flex items-center gap-3'>
         <div className='aucctus-bg-brand-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-          <Icon
-            variant='file-text'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <FileText className='aucctus-stroke-brand-primary h-5 w-5' />
         </div>
         <h2 className='aucctus-text-primary aucctus-header-md-semibold'>
           Executive Summary
@@ -120,10 +118,7 @@ const ExecutiveSummary: FunctionComponent<IExecutiveSummaryProps> = ({
         )}
       >
         <div className='flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-primary-500'>
-          <Icon
-            variant='check-circle-broken'
-            className='h-5 w-5 stroke-white'
-          />
+          <CheckCircle2 className='h-5 w-5 stroke-white' />
         </div>
         <div className='flex flex-col gap-2'>
           <span className='aucctus-text-brand-primary aucctus-text-sm-semibold'>

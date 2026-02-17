@@ -1,8 +1,15 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 import type { IWhiteSpaceOpportunity } from '@libs/api/types/competitorAssessment';
+import {
+  FileText,
+  Lightbulb,
+  Sparkles,
+  Star,
+  TrendingUp,
+  X,
+} from 'lucide-react';
 
 interface WhiteSpaceDetailPanelProps {
   whiteSpace: IWhiteSpaceOpportunity;
@@ -55,12 +62,7 @@ const WhiteSpaceDetailPanel: React.FC<WhiteSpaceDetailPanelProps> = ({
         {/* Header */}
         <div className='aucctus-border-secondary flex items-center justify-between border-b px-6 py-4'>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='sparkles'
-              height={16}
-              width={16}
-              className='stroke-amber-500'
-            />
+            <Sparkles size={16} className='stroke-amber-500' />
             <span className='aucctus-text-primary font-semibold'>
               White Space Opportunity
             </span>
@@ -69,12 +71,7 @@ const WhiteSpaceDetailPanel: React.FC<WhiteSpaceDetailPanelProps> = ({
             onClick={onClose}
             className='aucctus-bg-secondary-hover rounded-lg p-2 transition-colors'
           >
-            <Icon
-              variant='closeX'
-              height={16}
-              width={16}
-              className='aucctus-stroke-secondary'
-            />
+            <X size={16} className='aucctus-stroke-secondary' />
           </button>
         </div>
 
@@ -92,12 +89,7 @@ const WhiteSpaceDetailPanel: React.FC<WhiteSpaceDetailPanelProps> = ({
                 {urgency.label}
               </span>
               <div className='flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/20 px-2 py-0.5 text-amber-400'>
-                <Icon
-                  variant='star-01'
-                  height={12}
-                  width={12}
-                  className='stroke-current'
-                />
+                <Star size={12} className='stroke-current' />
                 <span className='text-[10px] font-medium'>
                   Score: {whiteSpace.opportunityScore}
                 </span>
@@ -120,12 +112,7 @@ const WhiteSpaceDetailPanel: React.FC<WhiteSpaceDetailPanelProps> = ({
             {/* Market Opportunity */}
             <div className='aucctus-bg-secondary rounded-lg p-4'>
               <div className='mb-2 flex items-center gap-1.5'>
-                <Icon
-                  variant='trending-up'
-                  height={14}
-                  width={14}
-                  className='stroke-green-500'
-                />
+                <TrendingUp size={14} className='stroke-green-500' />
                 <span className='aucctus-text-secondary text-[10px] font-semibold uppercase tracking-wider'>
                   Market Opportunity
                 </span>
@@ -138,12 +125,7 @@ const WhiteSpaceDetailPanel: React.FC<WhiteSpaceDetailPanelProps> = ({
             {/* Evidence Summary */}
             <div className='space-y-1.5'>
               <div className='flex items-center gap-1.5'>
-                <Icon
-                  variant='file-text'
-                  height={12}
-                  width={12}
-                  className='aucctus-stroke-tertiary'
-                />
+                <FileText size={12} className='aucctus-stroke-tertiary' />
                 <span className='aucctus-text-secondary text-[10px] font-semibold uppercase tracking-wider'>
                   Evidence Summary
                 </span>
@@ -156,12 +138,7 @@ const WhiteSpaceDetailPanel: React.FC<WhiteSpaceDetailPanelProps> = ({
             {/* Recommendation */}
             <div className='rounded-lg border border-amber-500/20 bg-amber-500/10 p-4'>
               <div className='mb-2 flex items-center gap-1.5'>
-                <Icon
-                  variant='lightbulb'
-                  height={14}
-                  width={14}
-                  className='stroke-amber-500'
-                />
+                <Lightbulb size={14} className='stroke-amber-500' />
                 <span className='aucctus-text-secondary text-[10px] font-semibold uppercase tracking-wider'>
                   Recommendation
                 </span>

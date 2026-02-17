@@ -1,12 +1,13 @@
 import { FunctionComponent, useMemo } from 'react';
-import { Icon } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { cn } from '@libs/utils/react';
 import { usePocModalContent } from '@hooks/query/pocPlan.hook';
 import type { IPocModalItemContent } from '@libs/api/types';
+import { HelpCircle, Rocket } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Mapping from backend keys to icon variants
-const KEY_TO_ICON: Record<string, IconVariant> = {
+const KEY_TO_ICON: Record<string, string> = {
   strategic_objectives: 'target',
   milestone_plan: 'calendar',
   resource_requirements: 'users-02',
@@ -94,7 +95,7 @@ const ProceedToPocModal: FunctionComponent<IProceedToPocModalProps> = ({
           <div className='flex items-center gap-3'>
             {/* Icon with glass effect */}
             <div className='flex h-11 w-11 items-center justify-center rounded-lg bg-white/20 shadow-lg ring-1 ring-white/30 backdrop-blur-sm'>
-              <Icon variant='rocket' className='h-5 w-5 stroke-white' />
+              <Rocket className='h-5 w-5 stroke-white' />
             </div>
             <div className='flex flex-col'>
               <span className='text-[10px] font-semibold uppercase tracking-wider text-white/70'>
@@ -128,7 +129,7 @@ const ProceedToPocModal: FunctionComponent<IProceedToPocModalProps> = ({
                 )}
               >
                 <div className='aucctus-bg-brand-secondary flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md'>
-                  <Icon
+                  <DynamicIcon
                     variant={KEY_TO_ICON[item.key] || 'check'}
                     className='aucctus-stroke-brand-primary h-3.5 w-3.5'
                   />
@@ -148,10 +149,7 @@ const ProceedToPocModal: FunctionComponent<IProceedToPocModalProps> = ({
 
         {/* Info banner */}
         <div className='aucctus-bg-brand-secondary flex items-start gap-2.5 rounded-lg p-3'>
-          <Icon
-            variant='help-circle'
-            className='aucctus-stroke-brand-primary mt-0.5 h-4 w-4 flex-shrink-0'
-          />
+          <HelpCircle className='aucctus-stroke-brand-primary mt-0.5 h-4 w-4 flex-shrink-0' />
           <p className='aucctus-text-secondary text-xs leading-relaxed'>
             The concept will be locked while the POC plan is being generated.
             This typically takes 30-60 seconds. Once complete, you will be taken
@@ -171,7 +169,7 @@ const ProceedToPocModal: FunctionComponent<IProceedToPocModalProps> = ({
             onClick={handleProceed}
             className='btn btn-primary btn-sm flex items-center gap-2 px-5'
           >
-            <Icon variant='rocket' className='h-3.5 w-3.5 stroke-current' />
+            <Rocket className='h-3.5 w-3.5 stroke-current' />
             Generate POC Plan
           </button>
         </div>

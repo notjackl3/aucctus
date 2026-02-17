@@ -12,7 +12,7 @@ export interface TabElement {
   /**
    * Optional icon variant to display with the tab label
    */
-  icon?: IconVariant;
+  icon?: string;
   /**
    * Whether the tab content is currently loading/updating
    */

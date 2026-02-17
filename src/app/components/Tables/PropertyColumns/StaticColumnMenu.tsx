@@ -1,8 +1,15 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useState } from 'react';
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  ChevronDown,
+  ListFilter,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface IStaticColumnMenuProps {
   columnName: string;
@@ -125,7 +132,7 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
           >
             <span className='flex items-center gap-1.5'>
               {leadingIcon && (
-                <Icon
+                <DynamicIcon
                   variant={leadingIcon as any}
                   className='aucctus-stroke-tertiary h-4 w-4'
                 />
@@ -134,18 +141,15 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
             </span>
             <span className='ml-2 flex items-center gap-1'>
               {hasFilter && (
-                <Icon
-                  variant='filter-lines'
-                  className='aucctus-stroke-brand-primary h-4 w-4'
-                />
+                <ListFilter className='aucctus-stroke-brand-primary h-4 w-4' />
               )}
               {currentSort && (
-                <Icon
+                <DynamicIcon
                   variant={currentSort === 'asc' ? 'arrowup' : 'arrowdown'}
                   className='aucctus-stroke-brand-primary h-4 w-4'
                 />
               )}
-              <Icon variant='chevrondown' className='ml-0.5 h-4 w-4' />
+              <ChevronDown className='ml-0.5 h-4 w-4' />
             </span>
           </button>
         </Popover.Trigger>
@@ -176,18 +180,12 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
                         handleSort('asc');
                       }}
                     >
-                      <Icon
-                        variant='arrowup'
-                        className='aucctus-stroke-secondary h-4 w-4'
-                      />
+                      <ArrowUp className='aucctus-stroke-secondary h-4 w-4' />
                       <span className='aucctus-text-secondary'>
                         Sort ascending
                       </span>
                       {currentSort === 'asc' && (
-                        <Icon
-                          variant='check'
-                          className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                        />
+                        <Check className='aucctus-stroke-brand-primary ml-auto h-4 w-4' />
                       )}
                     </button>
 
@@ -199,18 +197,12 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
                         handleSort('desc');
                       }}
                     >
-                      <Icon
-                        variant='arrowdown'
-                        className='aucctus-stroke-secondary h-4 w-4'
-                      />
+                      <ArrowDown className='aucctus-stroke-secondary h-4 w-4' />
                       <span className='aucctus-text-secondary'>
                         Sort descending
                       </span>
                       {currentSort === 'desc' && (
-                        <Icon
-                          variant='check'
-                          className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                        />
+                        <Check className='aucctus-stroke-brand-primary ml-auto h-4 w-4' />
                       )}
                     </button>
                   </div>

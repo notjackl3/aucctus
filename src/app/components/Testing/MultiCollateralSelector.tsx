@@ -1,6 +1,7 @@
-import { Icon } from '@components';
 import { ITestCollateralOption } from '@libs/api/types/concept/testing';
 import React, { useMemo, useState } from 'react';
+import { File, Loader2, Plus, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Collateral limits configuration
 const COLLATERAL_LIMITS = {
@@ -173,10 +174,7 @@ const MultiCollateralSelector: React.FC<MultiCollateralSelectorProps> = ({
   if (isLoading) {
     return (
       <div className='flex items-center gap-2 py-2'>
-        <Icon
-          variant='loading-02'
-          className='aucctus-stroke-secondary h-4 w-4'
-        />
+        <Loader2 className='aucctus-stroke-secondary h-4 w-4' />
         <span className='aucctus-text-sm aucctus-text-secondary'>
           Loading collaterals...
         </span>
@@ -195,7 +193,7 @@ const MultiCollateralSelector: React.FC<MultiCollateralSelectorProps> = ({
               disabled={disabled}
               className='btn btn-primary btn-sm mx-auto flex items-center gap-2 disabled:opacity-50'
             >
-              <Icon variant='plus' className='aucctus-stroke-white h-4 w-4' />
+              <Plus className='aucctus-stroke-white h-4 w-4' />
               Select Collaterals
             </button>
           </div>
@@ -230,7 +228,7 @@ const MultiCollateralSelector: React.FC<MultiCollateralSelectorProps> = ({
                 className='btn btn-light btn-sm flex items-center gap-1 disabled:opacity-50'
               >
                 <span>{isExpanded ? 'Done' : 'Edit'}</span>
-                <Icon
+                <DynamicIcon
                   variant={isExpanded ? 'check' : 'edit'}
                   className='aucctus-stroke-secondary h-3 w-3'
                 />
@@ -244,7 +242,7 @@ const MultiCollateralSelector: React.FC<MultiCollateralSelectorProps> = ({
                 key={collateral.uuid}
                 className='aucctus-bg-secondary-subtle aucctus-border-secondary flex items-center gap-2 rounded-md border px-2 py-1'
               >
-                <Icon
+                <DynamicIcon
                   variant={getTypeIcon(collateral.type || 'text')}
                   className='aucctus-stroke-tertiary h-3 w-3'
                 />
@@ -256,10 +254,7 @@ const MultiCollateralSelector: React.FC<MultiCollateralSelectorProps> = ({
                   disabled={disabled}
                   className='aucctus-text-tertiary hover:aucctus-text-error-primary disabled:opacity-50'
                 >
-                  <Icon
-                    variant='closeX'
-                    className='stroke-aucctus-primary h-3 w-3'
-                  />
+                  <X className='stroke-aucctus-primary h-3 w-3' />
                 </button>
               </div>
             ))}
@@ -273,7 +268,7 @@ const MultiCollateralSelector: React.FC<MultiCollateralSelectorProps> = ({
           {Object.entries(collateralsByType).map(([type, typeCollaterals]) => (
             <div key={type} className='space-y-2'>
               <div className='flex items-center gap-2'>
-                <Icon
+                <DynamicIcon
                   variant={getTypeIcon(type)}
                   className='aucctus-stroke-tertiary h-4 w-4'
                 />
@@ -341,10 +336,7 @@ const MultiCollateralSelector: React.FC<MultiCollateralSelectorProps> = ({
 
           {collaterals.length === 0 && (
             <div className='py-4 text-center'>
-              <Icon
-                variant='file'
-                className='aucctus-stroke-tertiary mx-auto mb-2 h-8 w-8'
-              />
+              <File className='aucctus-stroke-tertiary mx-auto mb-2 h-8 w-8' />
               <p className='aucctus-text-sm aucctus-text-secondary'>
                 No collaterals available for this test
               </p>

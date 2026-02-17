@@ -5,7 +5,6 @@ import React, {
   useRef,
   useMemo,
 } from 'react';
-import { Icon } from '@components';
 import {
   useTestResults,
   useTestDetail,
@@ -38,6 +37,7 @@ import { useTestResultsOperations } from './hooks/useTestResultsOperations';
 
 // Types
 import { TestResultsProps } from './TestResults.types';
+import { RefreshCw, Target } from 'lucide-react';
 
 const TestResults: React.FC<TestResultsProps> = ({
   conceptUuid,
@@ -259,10 +259,7 @@ const TestResults: React.FC<TestResultsProps> = ({
     return (
       <div className='flex items-center justify-center py-12'>
         <div className='flex flex-col items-center gap-3'>
-          <Icon
-            variant='refresh'
-            className='aucctus-stroke-brand-primary h-6 w-6 animate-spin'
-          />
+          <RefreshCw className='aucctus-stroke-brand-primary h-6 w-6 animate-spin' />
           <p className='aucctus-text-sm-regular aucctus-text-secondary'>
             Loading results...
           </p>
@@ -308,10 +305,7 @@ const TestResults: React.FC<TestResultsProps> = ({
       {testDetail?.assumptions && testDetail.assumptions.length > 0 && (
         <div className='space-y-5'>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='target-round'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <Target className='aucctus-stroke-brand-primary h-5 w-5' />
             <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
               Results by Assumption
             </h4>

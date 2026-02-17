@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
-import { Icon } from '@components';
 import { IPocSuccessMetric } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { BarChart3, Target } from 'lucide-react';
 
 interface ISuccessMetricsSectionProps {
   metrics: IPocSuccessMetric[];
@@ -114,7 +114,7 @@ const SuccessMetricsSection: FunctionComponent<ISuccessMetricsSectionProps> = ({
               'bg-gradient-to-br from-purple-500 to-purple-600',
             )}
           >
-            <Icon variant='barchart' className='h-4 w-4 stroke-white' />
+            <BarChart3 className='h-4 w-4 stroke-white' />
           </div>
           <div className='flex flex-col'>
             <h2 className='aucctus-text-primary aucctus-header-sm-semibold'>
@@ -131,7 +131,7 @@ const SuccessMetricsSection: FunctionComponent<ISuccessMetricsSectionProps> = ({
       {goNoGoMetrics.length > 0 && (
         <div className='flex flex-col'>
           <div className='flex items-center gap-2 px-6 pb-2'>
-            <Icon variant='target' className='h-3.5 w-3.5 stroke-primary-500' />
+            <Target className='h-3.5 w-3.5 stroke-primary-500' />
             <span className='text-[10px] font-semibold uppercase tracking-wider text-primary-600 dark:text-primary-400'>
               Decision Criteria
             </span>
@@ -184,10 +184,7 @@ const SuccessMetricsSection: FunctionComponent<ISuccessMetricsSectionProps> = ({
       {otherMetrics.length > 0 && (
         <div className='flex flex-col pb-4'>
           <div className='flex items-center gap-2 px-6 pb-2 pt-2'>
-            <Icon
-              variant='barchart'
-              className='aucctus-stroke-tertiary h-3.5 w-3.5'
-            />
+            <BarChart3 className='aucctus-stroke-tertiary h-3.5 w-3.5' />
             <span className='aucctus-text-tertiary text-[10px] font-semibold uppercase tracking-wider'>
               Supporting Metrics
             </span>

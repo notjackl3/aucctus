@@ -1,11 +1,11 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { boxShadowStyle } from '../../../../../Icon/QuestionIcon';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface CompletionIconProps {
   className?: string;
   iconClassName?: string;
-  variant?: IconVariant;
+  variant?: string;
   onClick?: () => void;
 }
 
@@ -24,7 +24,7 @@ export const CompletionIcon = ({
         className,
       )}
     >
-      <Icon className={iconClassName} variant={variant} />
+      <DynamicIcon className={iconClassName} variant={variant} />
     </span>
   );
 };

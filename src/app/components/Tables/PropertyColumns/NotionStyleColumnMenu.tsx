@@ -1,5 +1,3 @@
-import { Icon } from '@components';
-
 import { IPropertyDefinition, IPropertyFilter } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
@@ -10,6 +8,16 @@ import { useUpdatePropertyDefinition } from '@hooks/query/properties-mutations.h
 import { useColumnVisibilityStore } from '@stores/table-columns.store';
 import { PropertyFilterContent } from '../Filters/SharedFilterComponents';
 import { PropertyNameEditor, SortSubmenu } from './MenuComponents';
+import {
+  ChevronDown,
+  ChevronRight,
+  EyeOff,
+  ListFilter,
+  Settings,
+  SwitchCamera,
+  Trash2,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface INotionStyleColumnMenuProps {
   definition: IPropertyDefinition;
@@ -352,26 +360,23 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
             }}
           >
             <span className='flex items-center gap-1.5'>
-              <Icon
-                variant={getPropertyIcon(definition) as IconVariant}
+              <DynamicIcon
+                variant={getPropertyIcon(definition) as string}
                 className='aucctus-stroke-tertiary h-4 w-4'
               />
               {definition.name}
             </span>
             <span className='ml-2 flex items-center gap-1'>
               {hasActiveFilter && (
-                <Icon
-                  variant='filter-lines'
-                  className='aucctus-stroke-brand-primary h-4 w-4'
-                />
+                <ListFilter className='aucctus-stroke-brand-primary h-4 w-4' />
               )}
               {currentSort && (
-                <Icon
+                <DynamicIcon
                   variant={currentSort === 'asc' ? 'arrowup' : 'arrowdown'}
                   className='aucctus-stroke-brand-primary h-4 w-4'
                 />
               )}
-              <Icon variant='chevrondown' className='ml-0.5 h-4 w-4' />
+              <ChevronDown className='ml-0.5 h-4 w-4' />
             </span>
           </button>
         </Popover.Trigger>
@@ -431,18 +436,12 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                             }}
                           >
                             <div className='flex items-center gap-2'>
-                              <Icon
-                                variant='filter-lines'
-                                className='aucctus-stroke-secondary h-4 w-4'
-                              />
+                              <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                               <span className='aucctus-text-secondary'>
                                 Filter
                               </span>
                             </div>
-                            <Icon
-                              variant='chevron-right'
-                              className='aucctus-stroke-tertiary h-4 w-4'
-                            />
+                            <ChevronRight className='aucctus-stroke-tertiary h-4 w-4' />
                           </button>
 
                           {/* Filter Submenu Flyout */}
@@ -473,10 +472,7 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                               >
                                 <div className='aucctus-bg-primary aucctus-border-secondary w-[280px] rounded-lg border p-3 shadow-lg'>
                                   <div className='mb-3 flex items-center gap-2'>
-                                    <Icon
-                                      variant='filter-lines'
-                                      className='aucctus-stroke-secondary h-4 w-4'
-                                    />
+                                    <ListFilter className='aucctus-stroke-secondary h-4 w-4' />
                                     <span className='aucctus-text-secondary text-sm font-medium'>
                                       Filter by {definition.name}
                                     </span>
@@ -527,18 +523,12 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                               }}
                             >
                               <div className='flex items-center gap-2'>
-                                <Icon
-                                  variant='switch-vertical-01'
-                                  className='aucctus-stroke-secondary h-4 w-4'
-                                />
+                                <SwitchCamera className='aucctus-stroke-secondary h-4 w-4' />
                                 <span className='aucctus-text-secondary'>
                                   Sort
                                 </span>
                               </div>
-                              <Icon
-                                variant='chevron-right'
-                                className='aucctus-stroke-tertiary h-4 w-4'
-                              />
+                              <ChevronRight className='aucctus-stroke-tertiary h-4 w-4' />
                             </button>
 
                             {/* Sort Submenu Flyout */}
@@ -591,10 +581,7 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                             setIsOpen(false);
                           }}
                         >
-                          <Icon
-                            variant='gear'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <Settings className='aucctus-stroke-secondary h-4 w-4' />
                           <span className='aucctus-text-secondary'>
                             Edit property
                           </span>
@@ -611,7 +598,7 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                             toggleColumnWrap(definition.key);
                           }}
                         >
-                          <Icon
+                          <DynamicIcon
                             variant={
                               isColumnWrapped(definition.key)
                                 ? 'minus'
@@ -635,10 +622,7 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                             handleHideColumn();
                           }}
                         >
-                          <Icon
-                            variant='eye-off'
-                            className='aucctus-stroke-secondary h-4 w-4'
-                          />
+                          <EyeOff className='aucctus-stroke-secondary h-4 w-4' />
                           <span className='aucctus-text-secondary'>
                             Hide in view
                           </span>
@@ -656,10 +640,7 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                             setIsOpen(false);
                           }}
                         >
-                          <Icon
-                            variant='trash'
-                            className='aucctus-stroke-error-primary h-4 w-4'
-                          />
+                          <Trash2 className='aucctus-stroke-error-primary h-4 w-4' />
                           <span className='aucctus-text-error-primary'>
                             Delete property
                           </span>

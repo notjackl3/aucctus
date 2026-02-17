@@ -97,7 +97,7 @@ export interface IMarketScan extends IBaseConceptEntity {
 
 // ===== MarketScan V3 Visualization Types =====
 
-export type IconVariant =
+export type string =
   | 'activity'
   | 'gear'
   | 'trendup'
@@ -120,7 +120,7 @@ export type IconVariant =
 
 export interface ITrendCategory {
   name: string;
-  icon: IconVariant;
+  icon: string;
   status: 'favorable' | 'manageable' | 'challenging';
   position: { x: number; y: number };
   radarValue: number;
@@ -141,7 +141,7 @@ export interface IPriorityInsight {
 
 export interface IPESTELSection {
   category: string;
-  icon: IconVariant;
+  icon: string;
   summary: string;
   impact: string;
   keyFindings: Array<{

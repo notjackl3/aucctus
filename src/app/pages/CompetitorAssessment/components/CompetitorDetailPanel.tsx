@@ -1,9 +1,10 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 import type { ICompetitor } from '@libs/api/types/competitorAssessment';
 import ConfidenceRing from './ConfidenceRing';
+import { Building, ExternalLink, Search, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface CompetitorDetailPanelProps {
   competitor: ICompetitor;
@@ -79,12 +80,7 @@ const CompetitorDetailPanel: React.FC<CompetitorDetailPanelProps> = ({
                 />
               ) : (
                 <div className='aucctus-bg-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-                  <Icon
-                    variant='building'
-                    height={20}
-                    width={20}
-                    className='aucctus-stroke-tertiary'
-                  />
+                  <Building size={20} className='aucctus-stroke-tertiary' />
                 </div>
               )}
               <div>
@@ -114,12 +110,7 @@ const CompetitorDetailPanel: React.FC<CompetitorDetailPanelProps> = ({
                     rel='noopener noreferrer'
                     className='aucctus-text-tertiary mt-0.5 flex items-center gap-1 text-xs hover:underline'
                   >
-                    <Icon
-                      variant='link-external'
-                      height={10}
-                      width={10}
-                      className='stroke-current'
-                    />
+                    <ExternalLink size={10} className='stroke-current' />
                     {competitor.website
                       .replace(/^https?:\/\//, '')
                       .replace(/\/$/, '')}
@@ -131,12 +122,7 @@ const CompetitorDetailPanel: React.FC<CompetitorDetailPanelProps> = ({
               onClick={onClose}
               className='aucctus-bg-secondary-hover rounded-lg p-2 transition-colors'
             >
-              <Icon
-                variant='closeX'
-                height={16}
-                width={16}
-                className='aucctus-stroke-secondary'
-              />
+              <X size={16} className='aucctus-stroke-secondary' />
             </button>
           </div>
 
@@ -150,7 +136,7 @@ const CompetitorDetailPanel: React.FC<CompetitorDetailPanelProps> = ({
                   : 'border-blue-500/30 bg-blue-500/10 text-blue-400',
               )}
             >
-              <Icon
+              <DynamicIcon
                 variant={
                   competitor.source === 'ai_suggested' ? 'sparkles' : 'user'
                 }
@@ -220,7 +206,7 @@ const CompetitorDetailPanel: React.FC<CompetitorDetailPanelProps> = ({
                   return (
                     <div key={section.key} className='space-y-1.5'>
                       <div className='flex items-center gap-2'>
-                        <Icon
+                        <DynamicIcon
                           variant={section.icon as any}
                           height={13}
                           width={13}
@@ -256,10 +242,8 @@ const CompetitorDetailPanel: React.FC<CompetitorDetailPanelProps> = ({
                         rel='noopener noreferrer'
                         className='aucctus-bg-secondary aucctus-bg-secondary-hover group flex items-start gap-2.5 rounded-lg p-3 transition-colors'
                       >
-                        <Icon
-                          variant='link-external'
-                          height={12}
-                          width={12}
+                        <ExternalLink
+                          size={12}
                           className='aucctus-stroke-tertiary mt-0.5 shrink-0'
                         />
                         <div className='min-w-0'>
@@ -291,12 +275,7 @@ const CompetitorDetailPanel: React.FC<CompetitorDetailPanelProps> = ({
             {/* No assessment state */}
             {!assessment && (
               <div className='flex flex-col items-center py-12 text-center'>
-                <Icon
-                  variant='search-refraction'
-                  height={32}
-                  width={32}
-                  className='aucctus-stroke-tertiary mb-3'
-                />
+                <Search size={32} className='aucctus-stroke-tertiary mb-3' />
                 <p className='aucctus-text-secondary text-sm'>
                   No assessment data yet
                 </p>

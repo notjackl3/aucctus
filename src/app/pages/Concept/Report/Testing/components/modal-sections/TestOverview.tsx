@@ -1,10 +1,10 @@
 import React from 'react';
-import { Icon } from '@components';
 import { AssumptionCategory } from '@libs/api/types';
 import { Assumption, ITestDetails, ITestAssumptionDetailed } from '../../types';
 import TestMethodCard from '../common/TestMethodCard';
 import TestAssumptionCard from '../common/TestAssumptionCard';
 import TabBanner from '../common/TabBanner';
+import { Clipboard } from 'lucide-react';
 
 interface TestOverviewProps {
   assumptions?: Assumption[];
@@ -103,10 +103,7 @@ const TestOverview: React.FC<TestOverviewProps> = ({
         ) : (
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-8'>
             <div className='flex flex-col items-center justify-center text-center'>
-              <Icon
-                variant='clipboard'
-                className='aucctus-stroke-tertiary mb-4 h-12 w-12'
-              />
+              <Clipboard className='aucctus-stroke-tertiary mb-4 h-12 w-12' />
               <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-2'>
                 No assumptions found
               </h4>

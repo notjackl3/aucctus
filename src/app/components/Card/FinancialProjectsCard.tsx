@@ -3,8 +3,7 @@ import React from 'react';
 import { Card, Legend } from '@components';
 import { IFinancialProjection } from '../../../libs/api/types';
 import MarketChart from '../Charts/MarketChart';
-import Icon from '../Icon/Icon/Icon';
-
+import { LineChart } from 'lucide-react';
 interface IFinancialProjectsCardProps {
   projection: IFinancialProjection | undefined;
   onViewClick: React.MouseEventHandler<HTMLButtonElement> | undefined;
@@ -33,16 +32,7 @@ const FinancialProjectsCard: React.FC<IFinancialProjectsCardProps> = ({
           onClick={onViewClick}
           aria-label='View Financial Projection'
         >
-          <span>
-            {
-              <Icon
-                variant='line-chart-up'
-                width={16}
-                height={16}
-                stroke='#626BA3'
-              />
-            }
-          </span>
+          <span>{<LineChart size={16} stroke='#626BA3' />}</span>
           View Projections
         </button>
       }

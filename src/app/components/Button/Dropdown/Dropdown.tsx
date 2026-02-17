@@ -1,6 +1,6 @@
 import { FunctionComponent, ReactNode, useMemo, useState } from 'react';
-import Icon from '../../Icon/Icon/Icon';
 import styles from './dropdown.module.scss';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export interface Option {
   label: ReactNode;
@@ -49,7 +49,7 @@ const Dropdown: FunctionComponent<DropdownProps> = ({
           {selectedOption ? selectedOption.displayLabel : 'Select an option'}
         </span>
         {!hideChevron ? (
-          <Icon
+          <DynamicIcon
             variant={!isOpen ? 'chevrondown' : 'chevronup'}
             stroke={chevronColor}
           />

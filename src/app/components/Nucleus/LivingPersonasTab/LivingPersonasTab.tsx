@@ -10,7 +10,7 @@
  * - Dynamic color theming based on selected persona's avatar
  */
 
-import { ComponentTooltip, GlassSurface, Icon } from '@components';
+import { ComponentTooltip, GlassSurface } from '@components';
 import { usePersonas } from '@hooks/query/persona.hook';
 import type { IPersonaListItem } from '@libs/api/types/persona';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -27,6 +27,7 @@ import { useSearchParams } from 'react-router-dom';
 import PersonaDetailView from './PersonaDetailView';
 import PersonaSidebarItem from './PersonaSidebarItem';
 import { CreatePersonaModal, LivingPersonasInitModal } from './modals';
+import { AlertCircle, RefreshCw, Users } from 'lucide-react';
 
 /** Props for the LivingPersonasTab component */
 export interface LivingPersonasTabProps {
@@ -273,10 +274,7 @@ const LivingPersonasTab: React.FC<LivingPersonasTabProps> = ({
         className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'
       >
         <div className='aucctus-border-secondary aucctus-bg-secondary flex min-h-[400px] flex-col items-center justify-center rounded-xl border p-12 text-center'>
-          <Icon
-            variant='alert-circle'
-            className='aucctus-text-error-primary mb-4 h-12 w-12'
-          />
+          <AlertCircle className='aucctus-text-error-primary mb-4 h-12 w-12' />
           <h2 className='aucctus-header-sm-bold aucctus-text-primary mb-2'>
             Unable to Load Personas
           </h2>
@@ -289,7 +287,7 @@ const LivingPersonasTab: React.FC<LivingPersonasTabProps> = ({
             onClick={() => refetch()}
             className='btn btn-primary btn-md flex items-center gap-2'
           >
-            <Icon variant='refresh' className='h-4 w-4' />
+            <RefreshCw className='h-4 w-4' />
             <span>Retry</span>
           </motion.button>
         </div>
@@ -316,10 +314,7 @@ const LivingPersonasTab: React.FC<LivingPersonasTabProps> = ({
             className='mx-auto flex max-w-7xl flex-col items-center justify-center px-4 py-24 sm:px-6 lg:px-8'
           >
             <div className='aucctus-bg-brand-secondary mb-4 flex h-14 w-14 items-center justify-center rounded-full'>
-              <Icon
-                variant='user-group'
-                className='aucctus-stroke-brand-primary h-7 w-7 fill-none'
-              />
+              <Users className='aucctus-stroke-brand-primary h-7 w-7 fill-none' />
             </div>
             <h2 className='aucctus-header-sm-bold aucctus-text-primary mb-2'>
               No Personas Yet

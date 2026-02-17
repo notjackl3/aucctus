@@ -1,4 +1,4 @@
-import { Icon, ComponentTooltip } from '@components';
+import { ComponentTooltip } from '@components';
 import {
   ConceptStatus,
   SeedStatus,
@@ -10,6 +10,7 @@ import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 
 import { cn } from '@libs/utils/react';
+import { EllipsisVertical } from 'lucide-react';
 
 // Common interface for all action menu buttons
 interface IActionsMenuButtonProps {
@@ -54,7 +55,7 @@ const ActionsMenuButton: React.FC<IActionsMenuButtonProps> = ({
           })}
           aria-label='Update Item'
         >
-          <Icon variant='dots-vertical' height={iconSize} width={iconSize} />
+          <EllipsisVertical height={iconSize} width={iconSize} />
         </button>
       </Popover.Trigger>
       <Popover.Portal>

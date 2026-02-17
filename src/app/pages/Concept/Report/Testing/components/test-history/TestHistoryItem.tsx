@@ -1,10 +1,11 @@
 import React, { useMemo } from 'react';
-import { Icon, Modal } from '@components';
+import { Modal } from '@components';
 import { ITestDetails } from '../../types';
 import GenericStatusBadge from '../../../Assumptions/components/shared/GenericStatusBadge';
 import { TEST_STATUS_CONFIGS } from '../../../Assumptions/constants/statusConfigs';
 import TestValidationStats from './TestValidationStats';
 import { useModal } from '@context/ModalContextProvider';
+import { Eye } from 'lucide-react';
 
 interface TestHistoryItemProps {
   test: ITestDetails;
@@ -113,10 +114,7 @@ const TestHistoryItem: React.FC<TestHistoryItemProps> = ({ test, concept }) => {
                 className='btn btn-light btn-sm w-full gap-1'
               >
                 View Details
-                <Icon
-                  variant='eye'
-                  className='aucctus-stroke-primary h-3.5 w-3.5'
-                />
+                <Eye className='aucctus-stroke-primary h-3.5 w-3.5' />
               </button>
             </div>
           </div>

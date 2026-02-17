@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { IOverseerPendingImage, MentionItem } from '@stores/overseer/types';
 import React, {
@@ -9,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import OverseerMentionMenu from './OverseerMentionMenu';
+import { Image, Send, X } from 'lucide-react';
 
 interface OverseerInputProps {
   value: string;
@@ -202,12 +202,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
                 onClick={() => onMentionRemove?.(m.id)}
                 className='transition-colors hover:text-white'
               >
-                <Icon
-                  variant='closeX'
-                  width={10}
-                  height={10}
-                  className='stroke-current'
-                />
+                <X size={10} className='stroke-current' />
               </button>
             </span>
           ))}
@@ -229,12 +224,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
                 className='absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-black/70 text-white/70 opacity-0 transition-opacity hover:text-white group-hover:opacity-100'
                 aria-label='Remove image'
               >
-                <Icon
-                  variant='closeX'
-                  width={8}
-                  height={8}
-                  className='stroke-current'
-                />
+                <X size={8} className='stroke-current' />
               </button>
             </div>
           ))}
@@ -269,12 +259,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
             )}
             aria-label='Attach image'
           >
-            <Icon
-              variant='image'
-              width={14}
-              height={14}
-              className='stroke-current'
-            />
+            <Image size={14} className='stroke-current' />
           </button>
         )}
         <textarea
@@ -299,12 +284,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
           )}
           aria-label='Send message'
         >
-          <Icon
-            variant='paper-airplane'
-            width={14}
-            height={14}
-            className='stroke-current'
-          />
+          <Send size={14} className='stroke-current' />
         </button>
       </div>
     </div>

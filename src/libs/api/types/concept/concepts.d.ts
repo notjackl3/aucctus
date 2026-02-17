@@ -238,7 +238,7 @@ export interface ICustomerListItem {
   uuid: string;
   description: string;
   order: number;
-  icon?: IconVariant;
+  icon?: string;
 }
 
 // Common response type for generation endpoints (matches Django MessageSchema)
@@ -405,7 +405,7 @@ export interface IUserJourneyStep {
     | 'JTBD'
     | 'Pain'
     | 'Moment of Intervention';
-  icon?: IconVariant;
+  icon?: string;
 }
 
 export interface IUserJourneyStepCreate {

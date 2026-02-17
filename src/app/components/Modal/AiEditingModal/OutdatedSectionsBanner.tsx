@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import React, { useState } from 'react';
+import { AlertCircle } from 'lucide-react';
 
 interface OutdatedSectionsBannerProps {
   outdatedSections: string[];
@@ -54,10 +54,8 @@ const OutdatedSectionsBanner: React.FC<OutdatedSectionsBannerProps> = ({
     >
       {/* Icon - triggers initial hover */}
       <div className='p-4' onMouseEnter={() => setIsHovered(true)}>
-        <Icon
-          variant='alert-circle'
-          width={20}
-          height={20}
+        <AlertCircle
+          size={20}
           className='flex-shrink-0 stroke-gray-light-200'
         />
       </div>

@@ -1,9 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import { ComponentTooltip } from '@components';
 import type { ISavedResearchInsight } from '@libs/api/types';
 import { getBaseUrl, getLogoUrl } from '@libs/utils/source';
 import { cn } from '@libs/utils/react';
 import images from '@assets/img';
+import { ChevronDown, Link } from 'lucide-react';
 
 interface InsightBadgeProps {
   insight: ISavedResearchInsight;
@@ -40,14 +41,7 @@ export const InsightBadge: React.FC<InsightBadgeProps> = ({ insight }) => {
 
   const renderSourceLogo = () => {
     if (!sourceBaseUrl && !insight.source?.url) {
-      return (
-        <Icon
-          variant='link'
-          className='aucctus-stroke-tertiary'
-          height={16}
-          width={16}
-        />
-      );
+      return <Link size={16} className='aucctus-stroke-tertiary' />;
     }
 
     return (
@@ -143,11 +137,9 @@ export const InsightBadge: React.FC<InsightBadgeProps> = ({ insight }) => {
                 )}
                 aria-label={showDetails ? 'Hide details' : 'Show details'}
               >
-                <Icon
-                  variant='chevrondown'
+                <ChevronDown
+                  size={12}
                   className='aucctus-stroke-brand-primary'
-                  height={12}
-                  width={12}
                 />
               </button>
             )}

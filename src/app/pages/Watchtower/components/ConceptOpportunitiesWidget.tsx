@@ -1,11 +1,18 @@
 import React, { useState, useCallback } from 'react';
 import images from '@assets/img';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import {
   useWatchtowerOpportunities,
   useAddOpportunityToConceptBank,
 } from '@hooks/query/watchtower.hook';
+import {
+  ArrowRight,
+  Check,
+  Lightbulb,
+  RefreshCw,
+  Sparkles,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const urgencyConfig = {
   immediate: {
@@ -53,12 +60,7 @@ const ConceptOpportunitiesWidget: React.FC = () => {
   if (isLoading || opportunities.length === 0) {
     return (
       <div className='aucctus-bg-primary aucctus-border-secondary flex h-[490px] flex-col items-center justify-center rounded-xl border p-6'>
-        <Icon
-          variant='lightbulb'
-          height={32}
-          width={32}
-          className='aucctus-stroke-tertiary mb-2'
-        />
+        <Lightbulb size={32} className='aucctus-stroke-tertiary mb-2' />
         <p className='aucctus-text-tertiary text-sm'>
           {isLoading
             ? 'Loading opportunities...'
@@ -71,22 +73,12 @@ const ConceptOpportunitiesWidget: React.FC = () => {
   return (
     <div className='aucctus-bg-primary aucctus-border-secondary flex h-[490px] flex-col rounded-xl border p-6'>
       <div className='mb-4 flex items-center gap-2'>
-        <Icon
-          variant='lightbulb'
-          height={20}
-          width={20}
-          className='aucctus-stroke-secondary'
-        />
+        <Lightbulb size={20} className='aucctus-stroke-secondary' />
         <h3 className='aucctus-text-primary aucctus-text-lg-semibold'>
           Concept Opportunities
         </h3>
         <span className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-tertiary flex items-center gap-1 rounded-full border px-1.5 py-0.5 text-[10px]'>
-          <Icon
-            variant='sparkles'
-            height={12}
-            width={12}
-            className='aucctus-stroke-tertiary'
-          />
+          <Sparkles size={12} className='aucctus-stroke-tertiary' />
           Signal-Driven
         </span>
       </div>
@@ -119,10 +111,8 @@ const ConceptOpportunitiesWidget: React.FC = () => {
                     }}
                   >
                     <div className='flex flex-col items-center gap-1'>
-                      <Icon
-                        variant='refresh'
-                        height={20}
-                        width={20}
+                      <RefreshCw
+                        size={20}
                         className='animate-spin stroke-white/70'
                       />
                       <span className='text-[10px] font-medium text-white/70'>
@@ -138,7 +128,7 @@ const ConceptOpportunitiesWidget: React.FC = () => {
                     urgency.bgClass,
                   )}
                 >
-                  <Icon
+                  <DynamicIcon
                     variant={urgency.iconVariant}
                     height={12}
                     width={12}
@@ -191,33 +181,21 @@ const ConceptOpportunitiesWidget: React.FC = () => {
                     >
                       {isThisAdding ? (
                         <>
-                          <Icon
-                            variant='refresh'
-                            height={12}
-                            width={12}
+                          <RefreshCw
+                            size={12}
                             className='animate-spin stroke-current'
                           />
                           Adding...
                         </>
                       ) : isAlreadyAdded ? (
                         <>
-                          <Icon
-                            variant='check'
-                            height={12}
-                            width={12}
-                            className='stroke-current'
-                          />
+                          <Check size={12} className='stroke-current' />
                           Added to Concept Bank
                         </>
                       ) : (
                         <>
                           Add to Concept Bank
-                          <Icon
-                            variant='arrowright'
-                            height={12}
-                            width={12}
-                            className='stroke-current'
-                          />
+                          <ArrowRight size={12} className='stroke-current' />
                         </>
                       )}
                     </button>

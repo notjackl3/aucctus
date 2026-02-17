@@ -1,9 +1,11 @@
 import React from 'react';
 import Badges from '@components/Badges';
-import { Icon, Container } from '@components';
+import { Container } from '@components';
 import SectionHeader from './components/SectionHeader';
 import type { ICustomerAlternative } from '@libs/api/types';
 import { useCustomerAlternativesList } from '@hooks/query/concepts.hook';
+import { Check, Clipboard, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * Props for CustomerAlternatives component.
@@ -70,12 +72,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                       <span
                         className={`aucctus-bg-secondary-subtle flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full`}
                       >
-                        <Icon
-                          variant='clipboard'
-                          className={MAIN_ICON_STROKE}
-                          height={14}
-                          width={14}
-                        />
+                        <Clipboard size={14} className={MAIN_ICON_STROKE} />
                       </span>
                       <div className='min-w-0 flex-1'>
                         <h3 className='aucctus-text-primary aucctus-text-base truncate font-medium'>
@@ -94,7 +91,7 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                           />
                         </div>
                       </div>
-                      <Icon
+                      <DynamicIcon
                         variant={expanded ? 'chevronup' : 'chevrondown'}
                         className='aucctus-stroke-secondary'
                         height={16}
@@ -106,11 +103,9 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                         <div className='grid grid-cols-2 gap-4'>
                           <div>
                             <h4 className='aucctus-text-success-primary aucctus-text-sm-semibold mb-2 flex items-center'>
-                              <Icon
-                                variant='check'
+                              <Check
+                                size={16}
                                 className={`${CHECK_ICON_STROKE} mr-1`}
-                                height={16}
-                                width={16}
                               />{' '}
                               Pros
                             </h4>
@@ -122,11 +117,9 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                                     className='aucctus-text-primary aucctus-text-sm flex items-start gap-2'
                                   >
                                     <span className='aucctus-bg-success-secondary mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full'>
-                                      <Icon
-                                        variant='check'
+                                      <Check
+                                        size={12}
                                         className={CHECK_ICON_STROKE}
-                                        height={12}
-                                        width={12}
                                       />
                                     </span>
                                     {pro}
@@ -137,11 +130,9 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                           </div>
                           <div>
                             <h4 className='aucctus-text-error-primary aucctus-text-sm-semibold mb-2 flex items-center'>
-                              <Icon
-                                variant='closeX'
+                              <X
+                                size={16}
                                 className={`${CLOSE_ICON_STROKE} mr-1`}
-                                height={16}
-                                width={16}
                               />{' '}
                               Cons
                             </h4>
@@ -153,11 +144,9 @@ const CustomerAlternatives: React.FC<CustomerAlternativesProps> = ({
                                     className='aucctus-text-primary aucctus-text-sm flex items-start gap-2'
                                   >
                                     <span className='aucctus-bg-error-secondary mt-0.5 flex h-4 w-4 flex-shrink-0 items-center justify-center rounded-full'>
-                                      <Icon
-                                        variant='closeX'
+                                      <X
+                                        size={12}
                                         className={CLOSE_ICON_STROKE}
-                                        height={12}
-                                        width={12}
                                       />
                                     </span>
                                     {con}

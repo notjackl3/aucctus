@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import images from '@assets/img';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * Feature highlight item for the Watchtower initiation page
  */
 export interface WatchtowerFeatureHighlight {
-  icon: IconVariant;
+  icon: string;
   title: string;
   description: string;
   subDescription?: string;
@@ -18,7 +18,7 @@ export interface WatchtowerFeatureHighlight {
  * Badge configuration for top badges
  */
 export interface WatchtowerInitiationBadge {
-  icon?: IconVariant;
+  icon?: string;
   text: string;
   variant: 'premium' | 'status' | 'neutral';
   statusColor?: 'green' | 'amber' | 'red';
@@ -29,7 +29,7 @@ export interface WatchtowerInitiationBadge {
  */
 export interface WatchtowerInitiationProps {
   /** Main icon for the feature */
-  icon: IconVariant;
+  icon: string;
   /** Title of the feature */
   title: string;
   /** Subtitle/tagline */
@@ -256,7 +256,7 @@ const InitiationBadgeComponent: React.FC<{
       )}
     >
       {badge.variant === 'premium' && badge.icon && (
-        <Icon
+        <DynamicIcon
           variant={badge.icon}
           height={14}
           width={14}
@@ -362,7 +362,7 @@ const WatchtowerInitiation: React.FC<WatchtowerInitiationProps> = ({
               <div className='relative'>
                 <div className='absolute inset-0 scale-150 rounded-lg bg-white/20 blur-xl' />
                 <div className='relative rounded-lg border border-white/20 bg-white/5 p-4 backdrop-blur-md'>
-                  <Icon
+                  <DynamicIcon
                     variant={icon}
                     height={48}
                     width={48}
@@ -401,7 +401,7 @@ const WatchtowerInitiation: React.FC<WatchtowerInitiationProps> = ({
                   className='flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-4 py-4 backdrop-blur-sm'
                 >
                   <div className='shrink-0 rounded-lg bg-white/10 p-2.5'>
-                    <Icon
+                    <DynamicIcon
                       variant={feature.icon}
                       height={16}
                       width={16}
@@ -450,7 +450,7 @@ const WatchtowerInitiation: React.FC<WatchtowerInitiationProps> = ({
 
               {/* Button content */}
               <span className='relative flex items-center gap-3'>
-                <Icon
+                <DynamicIcon
                   variant={isInitializing || isFlashing ? 'refresh' : 'zap'}
                   height={20}
                   width={20}

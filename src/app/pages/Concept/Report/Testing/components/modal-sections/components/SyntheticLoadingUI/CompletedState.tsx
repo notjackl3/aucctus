@@ -1,8 +1,8 @@
-import { Icon } from '@components';
 import { ICustomerProfile } from '@libs/api/types/concept/concepts';
 import { useTestResults } from '@hooks/query/testing.hook';
 import React, { useMemo } from 'react';
 import { CompletedInterviewItem } from './CompletedInterviewItem';
+import { FileUp } from 'lucide-react';
 
 interface CompletedStateProps {
   profiles: ICustomerProfile[];
@@ -163,10 +163,7 @@ export const CompletedState: React.FC<CompletedStateProps> = ({
               className='btn btn-primary btn-lg inline-flex items-center gap-2'
               onClick={onViewResults}
             >
-              <Icon
-                variant='file-attachment'
-                className='aucctus-stroke-white h-5 w-5'
-              />
+              <FileUp className='aucctus-stroke-white h-5 w-5' />
               View Results
             </button>
           </div>

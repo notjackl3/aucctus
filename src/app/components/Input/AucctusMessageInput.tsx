@@ -1,6 +1,6 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import React, { useEffect, useRef } from 'react';
+import { ArrowUp, Sparkles } from 'lucide-react';
 
 interface AucctusMessageInputProps {
   value: string;
@@ -120,9 +120,7 @@ const AucctusMessageInput = React.forwardRef<
               disabled={!allowAddAnswer || disabled}
               onClick={onGenerateAiSuggestions}
             >
-              <span>
-                {<Icon variant='ai-conclusion' width={16} height={16} />}
-              </span>
+              <span>{<Sparkles size={16} />}</span>
             </button>
           </span>
         )}
@@ -134,14 +132,7 @@ const AucctusMessageInput = React.forwardRef<
             onClick={onAddAnswer}
           >
             <span>
-              {
-                <Icon
-                  variant='arrowup'
-                  width={16}
-                  height={16}
-                  className='stroke-white !stroke-[0.5]'
-                />
-              }
+              {<ArrowUp size={16} className='stroke-white !stroke-[0.5]' />}
             </span>
           </button>
         </span>

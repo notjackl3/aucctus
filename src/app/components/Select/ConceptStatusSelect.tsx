@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { ConceptStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import {
@@ -7,6 +6,7 @@ import {
 } from '@libs/utils/concepts';
 import * as Select from '@radix-ui/react-select';
 import React from 'react';
+import RotatingIcon from '@components/Icon/RotatingIcon';
 
 interface DropdownMenuProps {
   value: ConceptStatus;
@@ -50,7 +50,7 @@ const ConceptStatusSelect: React.FC<DropdownMenuProps> = ({
           </span>
         </Select.Value>
         <Select.Icon asChild>
-          <Icon.RotatingIcon isUp={open} className={`${style.stroke}`} />
+          <RotatingIcon isUp={open} className={`${style.stroke}`} />
         </Select.Icon>
       </Select.Trigger>
 

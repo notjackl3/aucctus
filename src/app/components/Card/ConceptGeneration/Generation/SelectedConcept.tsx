@@ -1,9 +1,9 @@
-import { Icon } from '@components';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { IGeneratedConcept } from '@libs/api/types';
 import { useConceptGenerationStore } from '@stores/concept-generation.store';
 import { useConceptIncubationStore } from '@stores/concept-incubation/enhancedStore';
 import React from 'react';
+import { CheckCircle2 } from 'lucide-react';
 interface ConceptHeaderProps {
   title: string;
   onSelect: () => void;
@@ -22,8 +22,7 @@ const ConceptHeader: React.FC<ConceptHeaderProps> = ({
       </span>
       <span className='flex flex-1'></span>
       <button onClick={onSelect} className='btn btn-light !p-2'>
-        <Icon variant='check-circle-broken' height={20} width={20} />{' '}
-        {isSelected ? 'Unselect' : 'Select'}
+        <CheckCircle2 size={20} /> {isSelected ? 'Unselect' : 'Select'}
       </button>
     </div>
   );

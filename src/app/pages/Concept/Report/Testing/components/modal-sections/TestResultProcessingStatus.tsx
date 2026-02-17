@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import telemetry from '@libs/telemetry';
+import { AlertCircle } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export interface ITestResultProcessingState {
   isProcessing: boolean;
@@ -39,8 +40,8 @@ export const getStageDisplay = (stage: string): string => {
   return stageLabels[stage] || stage;
 };
 
-const getStageIcon = (stage: string): IconVariant => {
-  const stageIcons: Record<string, IconVariant> = {
+const getStageIcon = (stage: string): string => {
+  const stageIcons: Record<string, string> = {
     extracting_text: 'clipboard',
     analyzing_content: 'message-circle',
     generating_insights: 'lightbulb',
@@ -105,10 +106,7 @@ const TestResultProcessingStatus: React.FC<TestResultProcessingStatusProps> = ({
     >
       {processingState.error ? (
         <div className='flex items-start gap-3'>
-          <Icon
-            variant='alert-circle'
-            className='aucctus-stroke-error-primary mt-1 h-5 w-5 flex-shrink-0'
-          />
+          <AlertCircle className='aucctus-stroke-error-primary mt-1 h-5 w-5 flex-shrink-0' />
           <div className='flex-1'>
             <div className='aucctus-text-md-semibold aucctus-text-error-primary mb-1'>
               Processing Failed
@@ -120,7 +118,7 @@ const TestResultProcessingStatus: React.FC<TestResultProcessingStatusProps> = ({
         </div>
       ) : (
         <div className='flex items-start gap-3'>
-          <Icon
+          <DynamicIcon
             variant={
               processingState.stage === 'completed'
                 ? 'check-circle-broken'

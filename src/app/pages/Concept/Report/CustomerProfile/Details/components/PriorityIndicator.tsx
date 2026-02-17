@@ -1,5 +1,5 @@
-import { Icon } from '@components';
 import React from 'react';
+import { ArrowDown } from 'lucide-react';
 
 /**
  * Props for PriorityIndicator component.
@@ -37,21 +37,11 @@ const PriorityIndicator: React.FC<PriorityIndicatorProps> = ({
         {highLabel}
       </span>
       <div className='h-3'></div>
-      <Icon
-        variant='arrowdown'
-        height={12}
-        width={12}
-        className='aucctus-stroke-secondary'
-      />
+      <ArrowDown size={12} className='aucctus-stroke-secondary' />
     </div>
     <div className={`my-1 h-full w-px flex-grow ${lineColorClass}`}></div>
     <div className='flex flex-col items-center'>
-      <Icon
-        variant='arrowdown'
-        height={12}
-        width={12}
-        className='aucctus-stroke-tertiary opacity-20'
-      />
+      <ArrowDown size={12} className='aucctus-stroke-tertiary opacity-20' />
       <div className='h-3'></div>
       <span
         className={`${textColorClass} aucctus-text-xs`}

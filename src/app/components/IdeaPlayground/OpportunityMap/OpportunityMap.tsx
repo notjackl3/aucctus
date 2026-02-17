@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useRef } from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import type { IGeneratedIdeaPlaygroundConcept } from '../types';
 import {
   getAnimationStyle,
@@ -22,6 +22,7 @@ import { ConceptGenerationLoading } from '../ConceptGenerationLoading';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
+import { ArrowLeft } from 'lucide-react';
 
 interface OpportunityMapProps {
   seedUuid: string | null;
@@ -407,9 +408,8 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
   };
 
   /** Get icon variant from backend - assigned by AI based on concept's domain/mechanism */
-  const getIconVariant = (
-    concept: IGeneratedIdeaPlaygroundConcept,
-  ): IconVariant => concept.icon || 'lightbulb';
+  const getIconVariant = (concept: IGeneratedIdeaPlaygroundConcept): string =>
+    concept.icon || 'lightbulb';
 
   const handleCardClick = (concept: IGeneratedIdeaPlaygroundConcept) => {
     setSelectedIdeaDetail({
@@ -639,12 +639,7 @@ const OpportunityMap: React.FC<OpportunityMapProps> = ({
               onClick={handleClose}
               className='btn btn-secondary aucctus-text-white flex items-center gap-2 rounded-full border border-white/30 bg-white/10 px-4 py-2 transition-colors hover:bg-white/15'
             >
-              <Icon
-                variant='arrowleft'
-                className='aucctus-stroke-white'
-                height={16}
-                width={16}
-              />
+              <ArrowLeft size={16} className='aucctus-stroke-white' />
               <span className='aucctus-text-sm aucctus-text-white'>
                 Back to Playground
               </span>

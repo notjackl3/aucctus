@@ -1,9 +1,9 @@
 import { FunctionComponent } from 'react';
 
-import { Icon } from '@components';
 import EditCustomerProfileDemographics from '@components/Modal/CustomerProfile/EditCustomerProfileDemographics';
 import { useModal } from '@context/ModalContextProvider';
 import { ICustomerProfile } from '@libs/api/types';
+import { Globe, PiggyBank, Umbrella, Users } from 'lucide-react';
 
 const iconDefaultProps = {
   height: 20,
@@ -38,8 +38,7 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
       <div className='flex flex-col items-start gap-1 self-stretch'>
         <div className='flex flex-col gap-2 self-stretch'>
           <span className='inline-flex items-start gap-4'>
-            <Icon
-              variant='globe'
+            <Globe
               {...iconDefaultProps}
               className='h-6 w-6 stroke-primary-600'
             />
@@ -51,8 +50,7 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
             </p>
           </span>
           <span className='inline-flex items-start gap-4'>
-            <Icon
-              variant='umbrella'
+            <Umbrella
               {...iconDefaultProps}
               className='h-6 w-6 stroke-primary-600'
             />
@@ -64,8 +62,7 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
             </p>
           </span>
           <span className='inline-flex items-start gap-4'>
-            <Icon
-              variant='user-group'
+            <Users
               {...iconDefaultProps}
               className='h-6 w-6 stroke-primary-600'
             />
@@ -77,8 +74,7 @@ const Demographics: FunctionComponent<IDemographicsProps> = ({
             </p>
           </span>
           <span className='inline-flex items-start gap-4'>
-            <Icon
-              variant='piggy-bank'
+            <PiggyBank
               {...iconDefaultProps}
               className='h-6 w-6 stroke-primary-600'
             />

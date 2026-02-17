@@ -1,4 +1,4 @@
-import { Icon, Loading, ScoringCriteriaSection, toast } from '@components';
+import { Loading, ScoringCriteriaSection, toast } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useSubmissionDetail } from '@hooks/query/idea-submissions.hook';
 import api from '@libs/api';
@@ -22,6 +22,7 @@ import {
 import { FunctionComponent, useState } from 'react';
 import { useMutation, useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 
 // Status display configuration
 const STATUS_CONFIG: Record<
@@ -487,10 +488,7 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
               </>
             ) : (
               <>
-                <Icon
-                  variant='threeStars'
-                  className='h-4 w-4 fill-white stroke-white'
-                />
+                <Sparkles className='h-4 w-4 fill-white stroke-white' />
                 Generate Report
               </>
             )}

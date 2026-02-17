@@ -1,12 +1,9 @@
 import { CategoryState, QuestionState } from './types';
 
-// IconVariant type for the specific icons used
-type IconVariant = 'check-circle-broken' | 'refresh' | 'alert-triangle';
-
 export interface StatusOption {
   value: CategoryState | QuestionState;
   label: string;
-  icon: IconVariant;
+  icon: string;
   colorClass: string;
   bgClass: string;
   borderClass: string;

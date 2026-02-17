@@ -1,9 +1,9 @@
 import React, { useState, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Icon } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
+import { AlertCircle, ArrowLeft, Check, Loader2, X } from 'lucide-react';
 
 interface AssumptionStatementModalProps {
   mode: 'add' | 'edit';
@@ -112,7 +112,7 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
           aria-label='Close modal'
           disabled={isSubmitting}
         >
-          <Icon variant='closeX' className='aucctus-stroke-secondary h-6 w-6' />
+          <X className='aucctus-stroke-secondary h-6 w-6' />
         </button>
       </div>
 
@@ -147,10 +147,7 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
                   <div className='flex items-start space-x-3'>
                     <div className='flex flex-shrink-0 items-center'>
                       <div className='rounded-full bg-orange-100 p-2'>
-                        <Icon
-                          variant='alert-circle'
-                          className='aucctus-stroke-warning-primary h-5 w-5'
-                        />
+                        <AlertCircle className='aucctus-stroke-warning-primary h-5 w-5' />
                       </div>
                     </div>
                     <div className='flex-1'>
@@ -177,10 +174,7 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
                     onClick={handleCancel}
                     disabled={isSubmitting}
                   >
-                    <Icon
-                      variant='arrowleft'
-                      className='aucctus-stroke-secondary mr-2 h-4 w-4'
-                    />
+                    <ArrowLeft className='aucctus-stroke-secondary mr-2 h-4 w-4' />
                     Back to Edit
                   </button>
                   <button
@@ -191,18 +185,12 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
                   >
                     {isSubmitting ? (
                       <>
-                        <Icon
-                          variant='loading-02'
-                          className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin'
-                        />
+                        <Loader2 className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin' />
                         Processing...
                       </>
                     ) : (
                       <>
-                        <Icon
-                          variant='check'
-                          className='aucctus-stroke-white mr-2 h-4 w-4'
-                        />
+                        <Check className='aucctus-stroke-white mr-2 h-4 w-4' />
                         {mode === 'add'
                           ? 'Add Assumption'
                           : 'Update Assumption'}
@@ -285,10 +273,7 @@ const AssumptionStatementModal: React.FC<AssumptionStatementModalProps> = ({
                     >
                       {isSubmitting ? (
                         <>
-                          <Icon
-                            variant='loading-02'
-                            className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin'
-                          />
+                          <Loader2 className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin' />
                           {mode === 'add' ? 'Adding...' : 'Updating...'}
                         </>
                       ) : mode === 'add' ? (

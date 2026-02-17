@@ -1,9 +1,10 @@
 import { FunctionComponent, useCallback, useMemo } from 'react';
-import { Icon, Modal } from '@components';
+import { Modal } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { useGeneratePocPlan } from '@hooks/query/pocPlan.hook';
 import { ConceptStatus, IConcept } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { ArrowRight, Rocket } from 'lucide-react';
 
 // Statuses that can proceed to POC
 const PRE_POC_STATUSES: ConceptStatus[] = [
@@ -84,8 +85,7 @@ const ProceedToPocButton: FunctionComponent<IProceedToPocButtonProps> = ({
       )}
       aria-label='Proceed to Proof of Concept'
     >
-      <Icon
-        variant='rocket'
+      <Rocket
         className={cn(
           'h-5 w-5 stroke-current',
           isGenerating && 'animate-pulse',
@@ -94,7 +94,7 @@ const ProceedToPocButton: FunctionComponent<IProceedToPocButtonProps> = ({
       <span className='aucctus-text-md-semibold'>
         {isGenerating ? 'Starting...' : 'Proceed to POC'}
       </span>
-      <Icon variant='arrowright' className='h-4 w-4 stroke-current' />
+      <ArrowRight className='h-4 w-4 stroke-current' />
     </button>
   );
 };

@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useCallback } from 'react';
-import { Icon, Input } from '@components';
+import { Input } from '@components';
 import { cn } from '@libs/utils/react';
+import { Plus, Trash2 } from 'lucide-react';
 
 export interface SourceInput {
   id: string;
@@ -102,10 +103,7 @@ const MultiSourceFields: FunctionComponent<MultiSourceFieldsProps> = ({
             onClick={addSource}
             className='aucctus-text-brand-primary aucctus-text-sm flex items-center gap-1 hover:underline'
           >
-            <Icon
-              variant='plus'
-              className='aucctus-stroke-brand-primary h-4 w-4'
-            />
+            <Plus className='aucctus-stroke-brand-primary h-4 w-4' />
             Add Source
           </button>
         )}
@@ -130,10 +128,7 @@ const MultiSourceFields: FunctionComponent<MultiSourceFieldsProps> = ({
                   onClick={() => removeSource(source.id)}
                   className='aucctus-text-error-primary aucctus-text-xs flex items-center gap-1 hover:underline'
                 >
-                  <Icon
-                    variant='trash'
-                    className='aucctus-stroke-error-primary h-3 w-3'
-                  />
+                  <Trash2 className='aucctus-stroke-error-primary h-3 w-3' />
                   Remove
                 </button>
               )}

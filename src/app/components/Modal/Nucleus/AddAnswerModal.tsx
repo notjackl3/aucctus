@@ -1,9 +1,9 @@
 import { FunctionComponent, useCallback, useState } from 'react';
 import { Input } from '@components';
 import TextArea from '../../Input/TextArea/TextArea';
-import Icon from '../../Icon/Icon/Icon';
 import { useModal } from '../../../context/ModalContextProvider';
 import { useCreateAnswer } from '../../../hooks/query/nucleusCrud.hook';
+import { Plus, Trash2, X } from 'lucide-react';
 
 interface AddAnswerModalProps {
   reportUuid: string;
@@ -277,7 +277,7 @@ const AddAnswerModal: FunctionComponent<AddAnswerModalProps> = ({
           onClick={closeModal}
           type='button'
         >
-          <Icon variant='closeX' />
+          <X />
         </button>
       </div>
 
@@ -314,7 +314,7 @@ const AddAnswerModal: FunctionComponent<AddAnswerModalProps> = ({
                 disabled={isLoading}
                 aria-label='Add source'
               >
-                <Icon variant='plus' width={16} height={16} />
+                <Plus size={16} />
                 Add Source
               </button>
             </div>
@@ -336,7 +336,7 @@ const AddAnswerModal: FunctionComponent<AddAnswerModalProps> = ({
                       disabled={isLoading}
                       aria-label={`Remove source ${index + 1}`}
                     >
-                      <Icon variant='trash' width={16} height={16} />
+                      <Trash2 size={16} />
                     </button>
                   )}
                 </div>

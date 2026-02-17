@@ -1,10 +1,10 @@
 import React from 'react';
-import { Icon } from '@components';
 import { useModal } from '@context/ModalContextProvider';
 import { IUserJourneyStep } from '@libs/api/types';
 import { RELATION_TYPE } from '../../pages/Concept/Report/CustomerProfile/Details/UserJourneyFlow';
 import { cn } from '@libs/utils/react';
 import CategorySelect from './CustomerProfile/CategorySelect';
+import { X } from 'lucide-react';
 
 interface JourneyStepModalProps {
   onSubmit: (step: IUserJourneyStep) => void;
@@ -69,7 +69,7 @@ const JourneyStepModal: React.FC<JourneyStepModalProps> = ({
           onClick={closeModal}
           aria-label='Close modal'
         >
-          <Icon variant='closeX' className='aucctus-stroke-secondary h-6 w-6' />
+          <X className='aucctus-stroke-secondary h-6 w-6' />
         </button>
       </div>
 

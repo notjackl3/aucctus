@@ -1,7 +1,7 @@
-import { Icon } from '@components';
 import { IPropertyFilter, IPropertyDefinition } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React, { useState, useEffect, useRef } from 'react';
+import { ChevronDown } from 'lucide-react';
 
 interface ITextFilterInputProps {
   definition: IPropertyDefinition;
@@ -80,13 +80,10 @@ export const TextFilterInput: React.FC<ITextFilterInputProps> = ({
           onClick={() => setIsOperatorDropdownOpen(!isOperatorDropdownOpen)}
         >
           <span>{selectedOperatorLabel}</span>
-          <Icon
-            variant='chevrondown'
+          <ChevronDown
             className={cn(
               'aucctus-stroke-secondary h-4 w-4 transition-transform',
-              {
-                'rotate-180': isOperatorDropdownOpen,
-              },
+              { 'rotate-180': isOperatorDropdownOpen },
             )}
           />
         </div>

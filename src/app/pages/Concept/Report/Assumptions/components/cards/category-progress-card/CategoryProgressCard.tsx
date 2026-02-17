@@ -5,7 +5,8 @@ import StatusBadge from '../../badges/StatusBadge';
 import CategoryIcon from './CategoryIcon';
 import { getCategoryColors } from '../../../constants/categoryColors';
 import { AssumptionStatusV2 } from '@libs/api/types';
-import { Icon, ComponentTooltip } from '@components';
+import { ComponentTooltip } from '@components';
+import { AlertCircle, Check, X } from 'lucide-react';
 
 const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
   category,
@@ -81,11 +82,7 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
           }
         >
           <div className='flex items-center gap-1 rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700'>
-            <Icon
-              variant='check'
-              className='h-3 w-3'
-              style={{ stroke: 'rgb(21, 128, 61)' }}
-            />
+            <Check className='h-3 w-3' style={{ stroke: 'rgb(21, 128, 61)' }} />
             {stats.validated}
           </div>
         </ComponentTooltip>
@@ -101,11 +98,7 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
           }
         >
           <div className='flex items-center gap-1 rounded border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700'>
-            <Icon
-              variant='closeX'
-              className='h-3 w-3'
-              style={{ stroke: 'rgb(185, 28, 28)' }}
-            />
+            <X className='h-3 w-3' style={{ stroke: 'rgb(185, 28, 28)' }} />
             {stats.invalidated}
           </div>
         </ComponentTooltip>
@@ -121,8 +114,7 @@ const CategoryProgressCard: React.FC<CategoryProgressCardProps> = ({
           }
         >
           <div className='flex items-center gap-1 rounded border border-amber-200 bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700'>
-            <Icon
-              variant='alert-circle'
+            <AlertCircle
               className='h-3 w-3'
               style={{ stroke: 'rgb(146, 64, 14)' }}
             />

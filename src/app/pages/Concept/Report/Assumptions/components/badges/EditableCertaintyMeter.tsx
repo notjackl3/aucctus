@@ -1,6 +1,6 @@
 import React, { useCallback, useState, useRef, useEffect } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { ChevronDown } from 'lucide-react';
 
 interface EditableCertaintyMeterProps {
   certainty: number; // 0-100 percentage
@@ -113,10 +113,7 @@ const EditableCertaintyMeter: React.FC<EditableCertaintyMeterProps> = ({
         <span className='aucctus-text-xs-semibold aucctus-text-primary capitalize'>
           {currentLevel}
         </span>
-        <Icon
-          variant='chevrondown'
-          className='aucctus-stroke-secondary h-3 w-3'
-        />
+        <ChevronDown className='aucctus-stroke-secondary h-3 w-3' />
       </button>
 
       {isOpen && (

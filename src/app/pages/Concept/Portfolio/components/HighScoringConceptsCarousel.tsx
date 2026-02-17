@@ -8,13 +8,14 @@
  */
 
 import images from '@assets/img';
-import { ComponentCarousel, Icon } from '@components';
+import { ComponentCarousel } from '@components';
 import { ComponentCarouselRef } from '@components/Carousel/ComponentCarousel';
 import ScoreBreakdownSheet from '@components/Tables/ConceptBank/ScoreBreakdownSheet';
 import { useConceptOverview } from '@hooks/query/concepts.hook';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { ConceptStage, HighScoringConcept, STAGE_STYLES } from '../types';
 import HighScoringConceptsCarouselSkeleton from './HighScoringConceptsCarouselSkeleton';
+import { ArrowLeft, ArrowRight, BarChart3, Lightbulb, Zap } from 'lucide-react';
 
 interface HighScoringConceptsCarouselProps {
   concepts: HighScoringConcept[];
@@ -74,12 +75,7 @@ const ConceptCard: React.FC<{
               backgroundImage: `url(${images.aiExplorationsBackground})`,
             }}
           >
-            <Icon
-              variant='lightbulb'
-              height={48}
-              width={48}
-              className='stroke-white/70'
-            />
+            <Lightbulb size={48} className='stroke-white/70' />
           </div>
         )}
         <div className='absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent' />
@@ -192,12 +188,7 @@ const HighScoringConceptsCarousel: React.FC<
           {/* Header */}
           <div className='mb-6 flex items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='zap'
-                height={20}
-                width={20}
-                className='aucctus-stroke-tertiary'
-              />
+              <Zap size={20} className='aucctus-stroke-tertiary' />
               <h2 className='aucctus-text-primary aucctus-text-xl font-semibold'>
                 High Scoring Concepts
               </h2>
@@ -210,22 +201,15 @@ const HighScoringConceptsCarousel: React.FC<
                     className='aucctus-bg-primary aucctus-border-secondary hover:aucctus-bg-secondary flex h-8 w-8 items-center justify-center rounded-full border shadow-sm transition-colors'
                     aria-label='Previous'
                   >
-                    <Icon
-                      variant='arrowleft'
-                      height={16}
-                      width={16}
-                      className='aucctus-stroke-secondary'
-                    />
+                    <ArrowLeft size={16} className='aucctus-stroke-secondary' />
                   </button>
                   <button
                     onClick={handleScrollNext}
                     className='aucctus-bg-primary aucctus-border-secondary hover:aucctus-bg-secondary flex h-8 w-8 items-center justify-center rounded-full border shadow-sm transition-colors'
                     aria-label='Next'
                   >
-                    <Icon
-                      variant='arrowright'
-                      height={16}
-                      width={16}
+                    <ArrowRight
+                      size={16}
                       className='aucctus-stroke-secondary'
                     />
                   </button>
@@ -236,10 +220,8 @@ const HighScoringConceptsCarousel: React.FC<
                     className='aucctus-text-secondary hover:aucctus-text-primary flex items-center gap-1 text-sm transition-colors'
                   >
                     View All
-                    <Icon
-                      variant='arrowright'
-                      height={16}
-                      width={16}
+                    <ArrowRight
+                      size={16}
                       className='aucctus-stroke-secondary'
                     />
                   </button>
@@ -271,10 +253,8 @@ const HighScoringConceptsCarousel: React.FC<
             </div>
           ) : (
             <div className='flex h-[200px] flex-col items-center justify-center text-center'>
-              <Icon
-                variant='barchart'
-                height={48}
-                width={48}
+              <BarChart3
+                size={48}
                 className='aucctus-stroke-tertiary mb-4 opacity-50'
               />
               <p className='aucctus-text-secondary aucctus-text-md mb-1'>

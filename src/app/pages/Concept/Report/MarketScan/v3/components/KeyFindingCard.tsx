@@ -1,9 +1,9 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import type { ISource } from '@libs/api/types';
 import type { IKeyFindingSourceV3 } from '@libs/api/types/concept/marketScan';
 import SourceBadgeList from './SourceBadgeList';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface KeyFindingCardProps {
   finding: {
@@ -70,7 +70,7 @@ const KeyFindingCard: React.FC<KeyFindingCardProps> = ({ finding }) => {
               finding.direction === 'down',
           })}
         >
-          <Icon
+          <DynamicIcon
             variant={finding.direction === 'up' ? 'arrowup' : 'arrowdown'}
             className={cn({
               'h-3 w-3': true,

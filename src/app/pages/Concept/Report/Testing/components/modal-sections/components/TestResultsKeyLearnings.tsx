@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { TestResultsKeyLearningsProps } from '../TestResults.types';
+import { Lightbulb } from 'lucide-react';
 
 const TestResultsKeyLearnings: React.FC<TestResultsKeyLearningsProps> = ({
   results,
@@ -28,10 +28,7 @@ const TestResultsKeyLearnings: React.FC<TestResultsKeyLearningsProps> = ({
     <div>
       <div className='mb-4 flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <Icon
-            variant='lightbulb'
-            className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
-          />
+          <Lightbulb className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0' />
           <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
             Key Learnings from Analysis
           </h4>

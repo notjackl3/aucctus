@@ -1,8 +1,16 @@
 import React, { useState, useCallback } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ICompetitor } from '@libs/api/types/competitorAssessment';
+import {
+  Building,
+  ChevronUp,
+  Columns3,
+  Expand,
+  ShieldCheck,
+  Swords,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const assessmentRows = [
   {
@@ -66,12 +74,7 @@ const CompetitorMatrix: React.FC<CompetitorMatrixProps> = ({ competitors }) => {
   if (orderedCompetitors.length === 0) {
     return (
       <div className='aucctus-bg-secondary aucctus-border-secondary flex flex-col items-center justify-center rounded-lg border p-12'>
-        <Icon
-          variant='swords'
-          height={48}
-          width={48}
-          className='aucctus-stroke-tertiary mb-4'
-        />
+        <Swords size={48} className='aucctus-stroke-tertiary mb-4' />
         <p className='aucctus-text-secondary text-sm'>
           No competitors to display. Run a scan to discover competitors.
         </p>
@@ -87,12 +90,7 @@ const CompetitorMatrix: React.FC<CompetitorMatrixProps> = ({ competitors }) => {
             <tr className='aucctus-bg-secondary'>
               <th className='aucctus-border-secondary aucctus-text-secondary sticky left-0 z-10 border-b border-r bg-inherit px-5 py-4 text-left text-xs font-semibold uppercase tracking-wider'>
                 <div className='flex items-center gap-2'>
-                  <Icon
-                    variant='columns'
-                    height={14}
-                    width={14}
-                    className='aucctus-stroke-tertiary'
-                  />
+                  <Columns3 size={14} className='aucctus-stroke-tertiary' />
                   Attribute
                 </div>
               </th>
@@ -130,10 +128,8 @@ const CompetitorMatrix: React.FC<CompetitorMatrixProps> = ({ competitors }) => {
                         />
                       ) : (
                         <div className='aucctus-bg-primary flex h-9 w-9 items-center justify-center rounded-lg'>
-                          <Icon
-                            variant='building'
-                            height={16}
-                            width={16}
+                          <Building
+                            size={16}
                             className='aucctus-stroke-tertiary'
                           />
                         </div>
@@ -158,12 +154,7 @@ const CompetitorMatrix: React.FC<CompetitorMatrixProps> = ({ competitors }) => {
                             colors.text,
                           )}
                         >
-                          <Icon
-                            variant='shield-dollar'
-                            height={10}
-                            width={10}
-                            className='stroke-current'
-                          />
+                          <ShieldCheck size={10} className='stroke-current' />
                           {competitor.assessment.confidenceScore}% confidence
                         </div>
                       )}
@@ -188,7 +179,7 @@ const CompetitorMatrix: React.FC<CompetitorMatrixProps> = ({ competitors }) => {
                 <td className='aucctus-border-secondary aucctus-text-primary sticky left-0 z-10 border-r bg-inherit px-5 py-3.5'>
                   <div className='flex items-center gap-2.5'>
                     <div className='aucctus-bg-secondary flex h-7 w-7 shrink-0 items-center justify-center rounded-md'>
-                      <Icon
+                      <DynamicIcon
                         variant={row.icon as any}
                         height={13}
                         width={13}
@@ -236,10 +227,8 @@ const CompetitorMatrix: React.FC<CompetitorMatrixProps> = ({ competitors }) => {
                                   {value}
                                 </p>
                                 <span className='aucctus-text-tertiary mt-1.5 inline-flex items-center gap-1 text-[10px]'>
-                                  <Icon
-                                    variant='chevronup'
-                                    height={8}
-                                    width={8}
+                                  <ChevronUp
+                                    size={8}
                                     className='stroke-current'
                                   />
                                   Collapse
@@ -258,10 +247,8 @@ const CompetitorMatrix: React.FC<CompetitorMatrixProps> = ({ competitors }) => {
                                 </p>
                                 {value.length > 150 && (
                                   <span className='aucctus-text-tertiary mt-1 inline-flex items-center gap-1 text-[10px]'>
-                                    <Icon
-                                      variant='expand-06'
-                                      height={8}
-                                      width={8}
+                                    <Expand
+                                      size={8}
                                       className='stroke-current'
                                     />
                                     Expand

@@ -1,4 +1,4 @@
-import { Icon } from '@components';
+import { resolveIcon } from '@libs/utils/iconMap';
 import { cn } from '@libs/utils/react';
 import React from 'react';
 
@@ -8,7 +8,7 @@ export const boxShadowStyle = {
 };
 
 // Icon mapping for question types
-export const questionIconVariantMap: Record<string, IconVariant> = {
+export const questionIconVariantMap: Record<string, string> = {
   problemStatement: 'alert-circle',
   businessModel: 'route',
   targetProfiles: 'user-group',
@@ -23,28 +23,21 @@ export const QuestionIcon: React.FC<{
   questionType: string;
   className?: string;
   innerRef?: React.RefObject<HTMLSpanElement>;
-  variant?: IconVariant;
-}> = ({
-  questionType,
-  className,
-  innerRef,
-  variant,
-}: {
-  questionType: string;
-  className?: string;
-  innerRef?: React.RefObject<HTMLSpanElement>;
-  variant?: IconVariant;
-}) => (
-  <span
-    ref={innerRef}
-    style={boxShadowStyle}
-    className={cn(
-      'aucctus-bg-primary aucctus-border-primary ml-1 flex h-10 w-10 items-center justify-center rounded-lg border stroke-primary-600 p-2',
-      className,
-    )}
-  >
-    <Icon
-      variant={variant || questionIconVariantMap[questionType] || 'help-circle'}
-    />
-  </span>
-);
+  variant?: string;
+}> = ({ questionType, className, innerRef, variant }) => {
+  const IconComponent = resolveIcon(
+    variant || questionIconVariantMap[questionType] || 'help-circle',
+  );
+  return (
+    <span
+      ref={innerRef}
+      style={boxShadowStyle}
+      className={cn(
+        'aucctus-bg-primary aucctus-border-primary ml-1 flex h-10 w-10 items-center justify-center rounded-lg border stroke-primary-600 p-2',
+        className,
+      )}
+    >
+      <IconComponent size={18} />
+    </span>
+  );
+};

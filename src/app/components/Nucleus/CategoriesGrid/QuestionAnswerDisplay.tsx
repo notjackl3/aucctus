@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
-import { Icon } from '@components';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { expandedCategoryViewUIText } from './expandedCategoryViewFixtures';
 import { NucleusReportQuestion } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import AnswerCard from './AnswerCard';
+import { Clock, File, Plus } from 'lucide-react';
 
 interface QuestionAnswerDisplayProps {
   selectedQuestionData: NucleusReportQuestion | undefined;
@@ -39,7 +39,7 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
     return (
       <div className='flex h-full items-center justify-center'>
         <div className='aucctus-text-tertiary py-8 text-center'>
-          <Icon variant='file' className='mx-auto mb-2 h-8 w-8 opacity-50' />
+          <File className='mx-auto mb-2 h-8 w-8 opacity-50' />
           <p className='aucctus-text-sm'>
             {expandedCategoryViewUIText.placeholders.selectQuestionToView}
           </p>
@@ -69,8 +69,7 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
           }
           disabled={!isAdmin}
         >
-          <Icon
-            variant='plus'
+          <Plus
             className={cn(
               'h-5 w-5',
               isAdmin
@@ -115,10 +114,7 @@ const QuestionAnswerDisplay: React.FC<QuestionAnswerDisplayProps> = ({
         ) : (
           <div className='flex h-full items-center justify-center'>
             <div className='aucctus-text-tertiary py-8 text-center'>
-              <Icon
-                variant='clock'
-                className='mx-auto mb-3 h-8 w-8 opacity-50'
-              />
+              <Clock className='mx-auto mb-3 h-8 w-8 opacity-50' />
               <p className='aucctus-text-sm mb-3'>
                 {expandedCategoryViewUIText.placeholders.questionNotAnswered}
               </p>

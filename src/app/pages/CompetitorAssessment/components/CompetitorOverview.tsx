@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 import type {
@@ -10,6 +9,8 @@ import type {
 import CompetitorConfidenceChart from './CompetitorConfidenceChart';
 import WhiteSpaceDistributionChart from './WhiteSpaceDistributionChart';
 import ConfidenceRing from './ConfidenceRing';
+import { ArrowRight, Building, Sparkles } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface CompetitorOverviewProps {
   competitors: ICompetitor[];
@@ -49,7 +50,7 @@ const KpiCard: React.FC<KpiCardProps> = ({
           iconColor,
         )}
       >
-        <Icon
+        <DynamicIcon
           variant={icon as any}
           height={16}
           width={16}
@@ -164,12 +165,7 @@ const CompetitorOverview: React.FC<CompetitorOverviewProps> = ({
         <div>
           <div className='mb-4 flex items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='sparkles'
-                height={16}
-                width={16}
-                className='stroke-amber-500'
-              />
+              <Sparkles size={16} className='stroke-amber-500' />
               <h3 className='aucctus-text-primary text-sm font-semibold'>
                 Top Opportunities
               </h3>
@@ -179,12 +175,7 @@ const CompetitorOverview: React.FC<CompetitorOverviewProps> = ({
               className='aucctus-text-tertiary flex items-center gap-1 text-xs transition-colors hover:text-white/70'
             >
               View all
-              <Icon
-                variant='arrowright'
-                height={12}
-                width={12}
-                className='stroke-current'
-              />
+              <ArrowRight size={12} className='stroke-current' />
             </button>
           </div>
 
@@ -261,10 +252,8 @@ const CompetitorOverview: React.FC<CompetitorOverviewProps> = ({
                       />
                     ) : (
                       <div className='aucctus-bg-primary flex h-6 w-6 items-center justify-center rounded'>
-                        <Icon
-                          variant='building'
-                          height={12}
-                          width={12}
+                        <Building
+                          size={12}
                           className='aucctus-stroke-tertiary'
                         />
                       </div>

@@ -4,7 +4,7 @@ import React from 'react';
 interface IdeaSubmissionQuestionProps {
   label: string;
   answer: string;
-  iconVariant?: IconVariant;
+  iconVariant?: string;
 }
 
 /**

@@ -1,15 +1,15 @@
 import AiFrostedCard from '@components/AiInteraction/AiFrostedCard';
-import { Icon } from '@components';
 import { IAiEditingSuggestion, IConceptReportEdit } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React, { useMemo, useState, useCallback, useEffect } from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const CONCEPT_AI_EDITING_NOTE =
   'AI editing can make mistakes. Additional sections may be impacted. This process will take up to 10 minutes.';
 
 const MAX_VISIBLE_EDITS = 2;
 
-const sectionToIconMap: Record<string, IconVariant> = {
+const sectionToIconMap: Record<string, string> = {
   overview: 'eye',
   market_scan: 'compass-03',
   assumptions: 'lightbulb',
@@ -137,7 +137,7 @@ const AiEditingAgentMessageCard: React.FC<AiEditingAgentMessageCardProps> = ({
               onClick={() => setIsExpanded(!isExpanded)}
               className='flex items-center gap-1 text-sm text-gray-light-300 transition-colors hover:text-white'
             >
-              <Icon
+              <DynamicIcon
                 variant={isExpanded ? 'chevronup' : 'chevrondown'}
                 className='h-4 w-4 stroke-gray-light-300'
               />

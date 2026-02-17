@@ -1,6 +1,5 @@
 import React from 'react';
-import { Icon } from '@components';
-
+import { ArrowRight } from 'lucide-react';
 const RadarLegend: React.FC = () => {
   return (
     <div className='flex max-w-fit items-center gap-3 rounded-md px-3 py-2 backdrop-blur-sm'>
@@ -16,10 +15,7 @@ const RadarLegend: React.FC = () => {
           <span className='aucctus-text-error-primary aucctus-text-xs-semibold'>
             Headwinds
           </span>
-          <Icon
-            variant='arrowright'
-            className='aucctus-stroke-tertiary h-3 w-3'
-          />
+          <ArrowRight className='aucctus-stroke-tertiary h-3 w-3' />
           <span className='aucctus-text-success-primary aucctus-text-xs-semibold'>
             Tailwinds
           </span>

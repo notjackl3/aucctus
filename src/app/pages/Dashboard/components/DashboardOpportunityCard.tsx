@@ -15,7 +15,7 @@ export interface OpportunityData {
   somValue: number;
   infoValue: string;
   infoSubValue: string;
-  icon: IconVariant;
+  icon: string;
   iconColor: ConceptStatusIconColor;
   variant?: IConceptStatisticProps['variant'];
 }

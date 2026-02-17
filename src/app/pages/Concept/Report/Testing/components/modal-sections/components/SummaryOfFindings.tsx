@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
-import { Icon } from '@components';
-
+import { ChartColumn, TrendingDown, TrendingUp } from 'lucide-react';
 interface Finding {
   uuid: string;
   learning: string;
@@ -31,10 +30,7 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
     <div className='space-y-4'>
       {/* Section Header */}
       <div className='flex items-center gap-2'>
-        <Icon
-          variant='chart-column'
-          className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
-        />
+        <ChartColumn className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0' />
         <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
           Summary of Findings
         </h4>
@@ -45,10 +41,7 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
         {/* Affirming Findings (Left Column - Green) */}
         <div className='aucctus-border-secondary rounded-lg border p-4'>
           <div className='mb-4 flex items-center gap-2'>
-            <Icon
-              variant='trending-up'
-              className='aucctus-stroke-success-primary h-5 w-5'
-            />
+            <TrendingUp className='aucctus-stroke-success-primary h-5 w-5' />
             <h5 className='aucctus-text-md-semibold aucctus-text-primary'>
               Affirming Findings
             </h5>
@@ -84,10 +77,7 @@ const SummaryOfFindings: React.FC<SummaryOfFindingsProps> = ({
         {/* Challenging Findings (Right Column - Red) */}
         <div className='aucctus-border-secondary rounded-lg border p-4'>
           <div className='mb-4 flex items-center gap-2'>
-            <Icon
-              variant='trending-down'
-              className='aucctus-stroke-error-primary h-5 w-5'
-            />
+            <TrendingDown className='aucctus-stroke-error-primary h-5 w-5' />
             <h5 className='aucctus-text-md-semibold aucctus-text-primary'>
               Challenging Findings
             </h5>

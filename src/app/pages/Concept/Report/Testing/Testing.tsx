@@ -9,12 +9,20 @@ import { useOutletContext } from 'react-router-dom';
 import RecommendedTestSection from './components/RecommendedTestSection';
 import TestHistorySection from './components/TestHistorySection';
 import { useModal } from '@context/ModalContextProvider';
-import { Modal, Icon, ConceptReportSkeletons } from '@components';
+import { Modal, ConceptReportSkeletons } from '@components';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { useTestDetails } from '@hooks/query/testing.hook';
 import { useUnifiedLoading } from '@hooks/concepts/unified-loading.hook';
 import { AppPath } from '@routes/routes';
 import { useTestGenerationEvents } from '@hooks/sockets/testing';
+import {
+  AlertTriangle,
+  Clipboard,
+  Clock,
+  File,
+  Plus,
+  RefreshCw,
+} from 'lucide-react';
 
 interface TestCompletionContextType {
   isCompletingTest: boolean;
@@ -135,10 +143,8 @@ const Testing: React.FC = () => {
 
         <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6 shadow-sm'>
           <div className='flex flex-col items-center justify-center py-8'>
-            <Icon
-              variant='alert-triangle'
-              height={48}
-              width={48}
+            <AlertTriangle
+              size={48}
               className='aucctus-stroke-error-primary mb-4'
             />
             <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
@@ -153,10 +159,7 @@ const Testing: React.FC = () => {
               className='btn btn-primary'
               onClick={() => window.location.reload()}
             >
-              <Icon
-                variant='refresh'
-                className='aucctus-stroke-white mr-2 h-4 w-4'
-              />
+              <RefreshCw className='aucctus-stroke-white mr-2 h-4 w-4' />
               Refresh Page
             </button>
           </div>
@@ -203,10 +206,8 @@ const Testing: React.FC = () => {
           <div className='space-y-6'>
             <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6 shadow-sm'>
               <div className='flex flex-col items-center justify-center py-8'>
-                <Icon
-                  variant='clipboard'
-                  height={48}
-                  width={48}
+                <Clipboard
+                  size={48}
                   className='aucctus-stroke-brand-tertiary mb-4'
                 />
                 <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>
@@ -218,10 +219,7 @@ const Testing: React.FC = () => {
                   from your target audience.
                 </p>
                 <button className='btn btn-primary'>
-                  <Icon
-                    variant='plus'
-                    className='aucctus-stroke-white mr-2 h-4 w-4'
-                  />
+                  <Plus className='aucctus-stroke-white mr-2 h-4 w-4' />
                   Create Your First Test
                 </button>
               </div>
@@ -230,10 +228,7 @@ const Testing: React.FC = () => {
             {/* Empty Test History Section */}
             <div className='space-y-3'>
               <div className='flex items-center gap-2'>
-                <Icon
-                  variant='clock'
-                  className='aucctus-stroke-brand-primary h-5 w-5'
-                />
+                <Clock className='aucctus-stroke-brand-primary h-5 w-5' />
                 <h2 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
                   Test History
                 </h2>
@@ -241,10 +236,8 @@ const Testing: React.FC = () => {
 
               <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border p-6 shadow-sm'>
                 <div className='flex flex-col items-center justify-center py-8'>
-                  <Icon
-                    variant='file'
-                    height={48}
-                    width={48}
+                  <File
+                    size={48}
                     className='aucctus-stroke-brand-tertiary mb-4'
                   />
                   <h3 className='aucctus-text-lg-semibold aucctus-text-brand-primary mb-2'>

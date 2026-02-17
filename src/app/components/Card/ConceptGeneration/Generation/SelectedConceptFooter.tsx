@@ -1,7 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { IGeneratedConcept } from '@libs/api/types';
 import { capitalize, numberToWord, pluralize } from '@libs/utils/string';
+import { Box } from 'lucide-react';
 
 interface SelectedConceptFooterProps {
   selectedConcepts: IGeneratedConcept[];
@@ -29,7 +29,7 @@ const SelectedConceptFooter: React.FC<SelectedConceptFooterProps> = ({
     <div className='aucctus-border-primary aucctus-bg-primary m-2 flex flex-row rounded-xl border-2'>
       <div className='m-4 self-center'>
         <button className='btn btn-light pointer-events-none aspect-square !p-0'>
-          <Icon variant='cube' height={30} width={30} />
+          <Box size={30} />
         </button>
       </div>
       <div className='m-4 flex flex-col'>

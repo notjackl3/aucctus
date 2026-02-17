@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
 import React, { memo } from 'react';
-import { Icon } from '@components';
-
+import { Pencil, Target } from 'lucide-react';
 interface ManualAnswerEditProps {
   answer: string;
   originalAnswer?: string; // Track original answer to detect changes
@@ -91,11 +90,9 @@ const ManualAnswerEdit: React.FC<ManualAnswerEditProps> = memo(
     return (
       <>
         <div className='mb-2 flex items-start gap-2'>
-          <Icon
-            variant='target'
+          <Target
+            size={16}
             className='aucctus-stroke-white mt-0.5 flex-shrink-0'
-            height={16}
-            width={16}
           />
           <span className='aucctus-text-sm-medium leading-tight'>
             Add answer manually
@@ -136,12 +133,7 @@ const ManualAnswerEdit: React.FC<ManualAnswerEditProps> = memo(
 
         <div className='mt-2 flex justify-end'>
           <div className='inline-flex items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-2 py-1 transition-colors hover:bg-white/15'>
-            <Icon
-              variant='edit'
-              className='aucctus-stroke-white'
-              height={12}
-              width={12}
-            />
+            <Pencil size={12} className='aucctus-stroke-white' />
             <span className='aucctus-text-xs-medium max-w-[80px] truncate'>
               User Input
             </span>

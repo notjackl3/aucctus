@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
-import { Icon } from '@components';
 import { Question } from '../types';
 import { getAnimationStyle } from '@components/Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
+import { Check } from 'lucide-react';
 
 interface QuestionCardProps {
   question: Question;
@@ -71,12 +71,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
       {/* Answered Checkmark */}
       {isAnswered && (
         <div className='aucctus-bg-success-solid absolute right-3 top-3 z-10 flex h-7 w-7 items-center justify-center rounded-full shadow-lg'>
-          <Icon
-            variant='check'
-            className='aucctus-stroke-white'
-            height={16}
-            width={16}
-          />
+          <Check size={16} className='aucctus-stroke-white' />
         </div>
       )}
 

@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
-import { Icon } from '@components';
 import ExecutiveSummaryBanner from '@components/ConceptOverview/ExecutiveSummaryBanner';
 import useStore from '@stores/store';
 import { useSearchParams } from 'react-router-dom';
@@ -11,6 +10,7 @@ import { BusinessModelTab } from './tabs/BusinessModel';
 import { MarketSizingTab } from './tabs/MarketSizing';
 import { ProjectionsTab } from './tabs/Projections';
 import { IFinancialProjectionV2 } from '@libs/api/types/concept/financialProjectionV2';
+import { Building, DollarSign, TrendingUp } from 'lucide-react';
 
 interface RevenueProjectionsProps {
   financialProjection: IFinancialProjectionV2;
@@ -53,10 +53,7 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
       {
         label: (
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='building'
-              className='aucctus-stroke-brand-primary h-4 w-4'
-            />
+            <Building className='aucctus-stroke-brand-primary h-4 w-4' />
             <span>Business Model</span>
           </div>
         ),
@@ -65,10 +62,7 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
       {
         label: (
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='currency-dollar'
-              className='aucctus-stroke-brand-primary h-4 w-4'
-            />
+            <DollarSign className='aucctus-stroke-brand-primary h-4 w-4' />
             <span>Market Sizing</span>
           </div>
         ),
@@ -77,10 +71,7 @@ const RevenueProjections: React.FC<RevenueProjectionsProps> = ({
       {
         label: (
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='trendup'
-              className='aucctus-stroke-brand-primary h-4 w-4'
-            />
+            <TrendingUp className='aucctus-stroke-brand-primary h-4 w-4' />
             <span>Projections</span>
           </div>
         ),

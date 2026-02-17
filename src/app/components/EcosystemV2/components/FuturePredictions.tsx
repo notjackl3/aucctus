@@ -1,4 +1,4 @@
-import { Badge, Button, ComponentTooltip, Icon } from '@components';
+import { Badge, Button, ComponentTooltip } from '@components';
 import type { ISource } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React, { useCallback, useRef } from 'react';
@@ -7,6 +7,7 @@ import ComponentCarousel, {
   ComponentCarouselRef,
 } from '../../Carousel/ComponentCarousel';
 import type { FuturePrediction } from '../hooks/useEcosystem';
+import { ChevronLeft, ChevronRight, Telescope } from 'lucide-react';
 
 interface FuturePredictionsProps {
   predictions: FuturePrediction[];
@@ -179,7 +180,7 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
           <div className='flex-1'>
             <h3 className='aucctus-text-primary flex items-center gap-2 text-xl font-semibold tracking-tight'>
               <div className='aucctus-text-primary h-5 w-5'>
-                <Icon variant='future' />
+                <Telescope />
               </div>
               Future Predictions
             </h3>
@@ -193,20 +194,14 @@ const FuturePredictions: React.FC<FuturePredictionsProps> = ({
               size='sm'
               color='light'
             >
-              <Icon
-                variant='chevronleft'
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
+              <ChevronLeft className='aucctus-stroke-secondary h-4 w-4' />
             </Button>
             <Button
               onClick={() => predictionsCarouselRef.current?.scrollNext()}
               size='sm'
               color='light'
             >
-              <Icon
-                variant='chevron-right'
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
+              <ChevronRight className='aucctus-stroke-secondary h-4 w-4' />
             </Button>
           </div>
         </div>

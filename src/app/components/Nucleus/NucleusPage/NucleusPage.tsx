@@ -1,4 +1,4 @@
-import { Icon, LiquidGlassTabs, NucleusLoadingState } from '@components';
+import { LiquidGlassTabs, NucleusLoadingState } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
@@ -34,6 +34,7 @@ import { NucleusHeroBackground } from '../NucleusHeroBackground';
 import { NucleusInitiation } from '../NucleusInitiation';
 import StatusBadge from '../StatusBadge';
 import { CategoryState, QuestionState } from '../StatusDropdown';
+import { AlertCircle, AlertTriangle, Lock, Sparkles } from 'lucide-react';
 
 const NucleusPage: React.FC = () => {
   // Track page time for analytics
@@ -438,10 +439,7 @@ const NucleusPage: React.FC = () => {
     return (
       <div className='aucctus-bg-primary flex min-h-screen items-center justify-center'>
         <div className='text-center'>
-          <Icon
-            variant='lock'
-            className='aucctus-text-secondary mx-auto mb-4 h-12 w-12'
-          />
+          <Lock className='aucctus-text-secondary mx-auto mb-4 h-12 w-12' />
           <div className='aucctus-text-xl aucctus-text-primary mb-2'>
             Nucleus Not Set Up
           </div>
@@ -477,10 +475,7 @@ const NucleusPage: React.FC = () => {
     return (
       <div className='aucctus-bg-primary flex min-h-screen items-center justify-center'>
         <div className='text-center'>
-          <Icon
-            variant='alert-triangle'
-            className='aucctus-text-warning-primary mx-auto mb-4 h-12 w-12'
-          />
+          <AlertTriangle className='aucctus-text-warning-primary mx-auto mb-4 h-12 w-12' />
           <div className='aucctus-text-xl aucctus-text-primary mb-2'>
             No Nucleus Report Found
           </div>
@@ -500,10 +495,7 @@ const NucleusPage: React.FC = () => {
                 </>
               ) : (
                 <>
-                  <Icon
-                    variant='sparkles'
-                    className='h-4 w-4 fill-white stroke-white'
-                  />
+                  <Sparkles className='h-4 w-4 fill-white stroke-white' />
                   Generate Nucleus
                 </>
               )}
@@ -518,10 +510,7 @@ const NucleusPage: React.FC = () => {
     return (
       <div className='aucctus-bg-primary flex min-h-screen items-center justify-center'>
         <div className='text-center'>
-          <Icon
-            variant='alert-circle'
-            className='aucctus-text-error-primary mx-auto mb-4 h-12 w-12'
-          />
+          <AlertCircle className='aucctus-text-error-primary mx-auto mb-4 h-12 w-12' />
           <div className='aucctus-text-xl aucctus-text-primary mb-2'>
             Error Loading Report
           </div>

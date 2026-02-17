@@ -1,8 +1,8 @@
 import React from 'react';
-import { Icon } from '@components';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface TabBannerProps {
-  icon: IconVariant;
+  icon: string;
   title: string;
   description: string;
 }
@@ -12,7 +12,7 @@ const TabBanner: React.FC<TabBannerProps> = ({ icon, title, description }) => {
     <div className='aucctus-bg-brand-primary aucctus-border-primary rounded-lg border p-4'>
       <div className='flex items-start gap-3'>
         <div className='aucctus-bg-brand-secondary rounded-md p-2'>
-          <Icon
+          <DynamicIcon
             variant={icon}
             className='aucctus-stroke-brand-primary h-4 w-4'
           />

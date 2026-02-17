@@ -1,6 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { ICostInterferenceV2 } from '@libs/api/types/concept/financialProjectionV2';
+import { Lightbulb, TrendingDown } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface CostInterferencesSectionProps {
   costInterferences?: ICostInterferenceV2[];
@@ -16,10 +17,7 @@ const CostInterferencesSection: React.FC<CostInterferencesSectionProps> = ({
           Unintended Consequences
         </h3>
         <span className='flex flex-row items-center gap-1'>
-          <Icon
-            variant='decreasing'
-            className='aucctus-stroke-brand-secondary mr-1 h-5 w-5 flex-shrink-0'
-          />
+          <TrendingDown className='aucctus-stroke-brand-secondary mr-1 h-5 w-5 flex-shrink-0' />
           <h3 className='aucctus-text-lg-bold aucctus-text-primary'>
             Possible Cost Interferences
           </h3>
@@ -34,7 +32,7 @@ const CostInterferencesSection: React.FC<CostInterferencesSectionProps> = ({
           >
             <div className='mb-3'>
               <div className='flex flex-row items-center gap-1'>
-                <Icon
+                <DynamicIcon
                   variant={interference.icon as any}
                   className='aucctus-stroke-brand-secondary mr-1 h-5 w-5 flex-shrink-0'
                 />
@@ -51,10 +49,7 @@ const CostInterferencesSection: React.FC<CostInterferencesSectionProps> = ({
 
             <div className='aucctus-border-secondary mt-2 border-t pt-2'>
               <div className='flex items-start gap-2'>
-                <Icon
-                  variant='lightbulb'
-                  className='aucctus-stroke-quaternary mt-0.5 h-5 w-5 flex-shrink-0'
-                />
+                <Lightbulb className='aucctus-stroke-quaternary mt-0.5 h-5 w-5 flex-shrink-0' />
                 <p className='aucctus-text-xs aucctus-text-tertiary'>
                   {interference.mitigationStatement}
                 </p>

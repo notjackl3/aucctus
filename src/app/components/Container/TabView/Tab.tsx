@@ -1,7 +1,8 @@
 import { FunctionComponent, ReactNode } from 'react';
 import styles from './styles/tab.module.scss';
-import { BorderTraceWrapper, Icon, PulsatingText } from '@components';
+import { BorderTraceWrapper, PulsatingText } from '@components';
 import { cn } from '@libs/utils/react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 export type TabVariant =
   | 'default'
@@ -12,7 +13,6 @@ export interface ITabProps<T = string> {
   /**
    * The value the will be used when the tab is selected
 
-
    */
   value: T;
   onSelect: (value: T) => void;
@@ -22,7 +22,7 @@ export interface ITabProps<T = string> {
   /**
    * Optional icon variant to display with the tab label
    */
-  icon?: IconVariant;
+  icon?: string;
   /**
    * The variant of the tab for different styles
    */
@@ -68,7 +68,7 @@ const Tab: FunctionComponent<ITabProps> = ({
       }}
     >
       {icon && variant === 'icon-button' && (
-        <Icon variant={icon} className='h-4 w-4' />
+        <DynamicIcon variant={icon} className='h-4 w-4' />
       )}
       <span className={`${styles.label} ${activeClassName}`}>
         {isLoading && typeof label === 'string' ? (

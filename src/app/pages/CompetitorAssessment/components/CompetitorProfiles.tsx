@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { AnimatePresence } from 'framer-motion';
 import type { ICompetitor } from '@libs/api/types/competitorAssessment';
 import CompetitorProfileCard from './CompetitorProfileCard';
 import CompetitorDetailPanel from './CompetitorDetailPanel';
+import { Swords } from 'lucide-react';
 
 interface CompetitorProfilesProps {
   competitors: ICompetitor[];
@@ -24,12 +24,7 @@ const CompetitorProfiles: React.FC<CompetitorProfilesProps> = ({
   if (orderedCompetitors.length === 0) {
     return (
       <div className='aucctus-bg-secondary aucctus-border-secondary flex flex-col items-center justify-center rounded-xl border p-12'>
-        <Icon
-          variant='swords'
-          height={48}
-          width={48}
-          className='aucctus-stroke-tertiary mb-4'
-        />
+        <Swords size={48} className='aucctus-stroke-tertiary mb-4' />
         <p className='aucctus-text-secondary text-sm'>
           No competitors discovered yet. Run a scan to find competitors.
         </p>

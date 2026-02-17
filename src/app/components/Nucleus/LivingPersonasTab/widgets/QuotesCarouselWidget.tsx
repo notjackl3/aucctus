@@ -8,8 +8,9 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import React, { useState, useEffect, useCallback } from 'react';
-import { GlassSurface, Icon } from '@components';
+import { GlassSurface } from '@components';
 import { cn } from '@libs/utils/react';
+import { MessageSquare } from 'lucide-react';
 
 /** Quote structure */
 export interface PersonaQuote {
@@ -81,10 +82,7 @@ const QuotesCarouselWidget: React.FC<QuotesCarouselWidgetProps> = ({
       <div className='relative z-10 flex flex-col px-8 py-5'>
         {/* Section header */}
         <div className='mb-3 flex items-center gap-2'>
-          <Icon
-            variant='annotation-dots'
-            className='aucctus-text-brand-primary h-4 w-4'
-          />
+          <MessageSquare className='aucctus-text-brand-primary h-4 w-4' />
           <h3 className='aucctus-text-xs-bold aucctus-text-tertiary uppercase tracking-wider'>
             What They Say
           </h3>

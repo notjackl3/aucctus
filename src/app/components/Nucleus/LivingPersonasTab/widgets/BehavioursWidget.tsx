@@ -8,10 +8,9 @@
  * - Scrollable list within fixed height with bottom fade gradient
  */
 
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { X as XIcon, Zap } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
 
@@ -128,7 +127,7 @@ const BehavioursWidget: React.FC<BehavioursWidgetProps> = ({
                 }}
                 className='btn btn-ghost btn-xs'
               >
-                <X className='h-3 w-3' />
+                <XIcon className='h-3 w-3' />
               </button>
             </div>
           </motion.div>
@@ -152,7 +151,7 @@ const BehavioursWidget: React.FC<BehavioursWidgetProps> = ({
                   className='aucctus-border-secondary hover:aucctus-bg-secondary-hover group flex items-start gap-3 rounded-md border p-3 transition-colors'
                 >
                   <div className='mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-blue-500/20'>
-                    <Icon variant='zap' className='h-3 w-3 text-blue-600' />
+                    <Zap className='h-3 w-3 text-blue-600' />
                   </div>
                   <p className='aucctus-text-sm aucctus-text-primary flex-1'>
                     {item.text}
@@ -163,7 +162,7 @@ const BehavioursWidget: React.FC<BehavioursWidgetProps> = ({
                       onClick={() => onDelete(item.uuid)}
                       className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
                     >
-                      <Icon variant='closeX' className='h-3 w-3 text-red-500' />
+                      <XIcon className='h-3 w-3 text-red-500' />
                     </button>
                   )}
                 </motion.div>

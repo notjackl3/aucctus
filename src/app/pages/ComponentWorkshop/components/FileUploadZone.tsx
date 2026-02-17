@@ -8,7 +8,6 @@
  */
 
 import React from 'react';
-import { Icon } from '@components';
 import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
 import { cn } from '@libs/utils/react';
 import { SUPPORTED_FILE_EXTENSIONS } from '@libs/api/types/dynamicComponent.d';
@@ -21,6 +20,7 @@ import {
   FileSpreadsheet,
   type LucideIcon,
 } from 'lucide-react';
+import { Upload, X } from 'lucide-react';
 
 interface IFileUploadZoneProps {
   /** Currently uploaded files */
@@ -191,8 +191,7 @@ const FileUploadZone: React.FC<IFileUploadZoneProps> = ({
           aria-hidden='true'
         />
 
-        <Icon
-          variant='upload'
+        <Upload
           className={cn('mx-auto mb-2 h-8 w-8', {
             'aucctus-stroke-brand-primary': isDragging,
             'aucctus-stroke-tertiary': !isDragging,
@@ -250,10 +249,7 @@ const FileUploadZone: React.FC<IFileUploadZoneProps> = ({
                       )}
                       aria-label={`Remove ${file.name}`}
                     >
-                      <Icon
-                        variant='closeX'
-                        className='aucctus-stroke-white h-3 w-3'
-                      />
+                      <X className='aucctus-stroke-white h-3 w-3' />
                     </button>
                   </div>
 

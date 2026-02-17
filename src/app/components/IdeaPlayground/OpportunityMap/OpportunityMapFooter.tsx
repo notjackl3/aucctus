@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { Presentation, RefreshCw, Save } from 'lucide-react';
 
 interface OpportunityMapFooterProps {
   selectedIdeasCount: number;
@@ -81,12 +81,7 @@ const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
             {isRegenerating ? (
               <div className='h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white' />
             ) : (
-              <Icon
-                variant='refresh'
-                className='aucctus-stroke-white'
-                height={16}
-                width={16}
-              />
+              <RefreshCw size={16} className='aucctus-stroke-white' />
             )}
           </button>
         </div>
@@ -115,12 +110,7 @@ const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
           {isSaving ? (
             <div className='h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white' />
           ) : (
-            <Icon
-              variant='save'
-              className='aucctus-stroke-white'
-              height={16}
-              width={16}
-            />
+            <Save size={16} className='aucctus-stroke-white' />
           )}
           <span>Save for Later</span>
         </button>
@@ -142,14 +132,12 @@ const OpportunityMapFooter: React.FC<OpportunityMapFooterProps> = ({
           {isSaving ? (
             <div className='h-4 w-4 animate-spin rounded-full border-2 border-black/30 border-t-black' />
           ) : (
-            <Icon
-              variant='presentation-chart'
+            <Presentation
               className={cn({
                 'aucctus-stroke-white': selectedIdeasCount === 0 || isSaving,
                 'aucctus-stroke-primary': selectedIdeasCount > 0 && !isSaving,
               })}
-              height={16}
-              width={16}
+              size={16}
             />
           )}
           <span>Generate Reports</span>

@@ -1,8 +1,10 @@
 import React from 'react';
-import { Badge, Icon } from '@components';
+import { Badge } from '@components';
 import { ISavingMethodV2 } from '@libs/api/types/concept/financialProjectionV2';
+import { BarChart3, PiggyBank } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
-const SavingMethodIconMap: Record<string, IconVariant> = {
+const SavingMethodIconMap: Record<string, string> = {
   // Process & Automation
   'Process Automation': 'gear',
   'Labor Reallocation': 'users-edit',
@@ -55,7 +57,7 @@ const SavingsMethodCard: React.FC<SavingsMethodCardProps> = ({
       <div className='mb-2 flex flex-1 flex-row items-center gap-2'>
         {savingMethodData?.type && (
           <>
-            <Icon
+            <DynamicIcon
               variant={SavingMethodIconMap[savingMethodData.type]}
               className='aucctus-stroke-brand-secondary h-5 w-5'
             />
@@ -72,19 +74,13 @@ const SavingsMethodCard: React.FC<SavingsMethodCardProps> = ({
       {/* Primary Value Driver Section */}
       <div className='aucctus-border-tertiary mt-4 border-t pt-3'>
         <div className='mb-2 flex items-center gap-2'>
-          <Icon
-            variant='barchart'
-            className='aucctus-stroke-secondary h-4 w-4'
-          />
+          <BarChart3 className='aucctus-stroke-secondary h-4 w-4' />
           <h4 className='aucctus-text-sm-medium aucctus-text-secondary'>
             Primary Value Driver
           </h4>
         </div>
         <div className='aucctus-bg-success-secondary flex items-center gap-2 rounded-md bg-opacity-25 px-3 py-2'>
-          <Icon
-            variant='piggy-bank'
-            className='aucctus-stroke-success-primary h-4 w-4'
-          />
+          <PiggyBank className='aucctus-stroke-success-primary h-4 w-4' />
           <p className='aucctus-text-xs aucctus-text-success-primary'>
             Cost Savings
           </p>

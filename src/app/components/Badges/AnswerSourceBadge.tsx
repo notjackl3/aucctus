@@ -1,7 +1,6 @@
 import React from 'react';
 import { cn } from '@libs/utils/react';
-import { Icon } from '@components';
-
+import { Sparkles, UserSquare } from 'lucide-react';
 interface AnswerSourceBadgeProps {
   isAiGenerated: boolean;
   className?: string;
@@ -21,10 +20,7 @@ const AnswerSourceBadge: React.FC<AnswerSourceBadgeProps> = ({
           className,
         )}
       >
-        <Icon
-          variant='ai-conclusion'
-          className='aucctus-stroke-brand-primary h-3 w-3'
-        />
+        <Sparkles className='aucctus-stroke-brand-primary h-3 w-3' />
         <span>AI</span>
       </div>
     );
@@ -39,10 +35,7 @@ const AnswerSourceBadge: React.FC<AnswerSourceBadgeProps> = ({
         className,
       )}
     >
-      <Icon
-        variant='user-square'
-        className='aucctus-stroke-secondary h-3 w-3'
-      />
+      <UserSquare className='aucctus-stroke-secondary h-3 w-3' />
       <span>User</span>
     </div>
   );

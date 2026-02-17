@@ -7,11 +7,11 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { Icon } from '@components';
 import {
   IPortfolioSummaryResponse,
   ITopPrioritySummary,
 } from '@libs/api/types/concept/concept_priority';
+import { Sparkles } from 'lucide-react';
 
 interface PortfolioInsightsFeedProps {
   portfolioSummary: IPortfolioSummaryResponse;
@@ -124,12 +124,7 @@ const PortfolioInsightsFeed: React.FC<PortfolioInsightsFeedProps> = ({
       <div className='aucctus-bg-secondary/30 flex min-h-0 flex-1 flex-col p-4'>
         {/* Header */}
         <div className='mb-4 flex shrink-0 items-center gap-2'>
-          <Icon
-            variant='sparkles'
-            height={20}
-            width={20}
-            className='aucctus-stroke-brand-primary'
-          />
+          <Sparkles size={20} className='aucctus-stroke-brand-primary' />
           <h2 className='aucctus-text-primary aucctus-text-xl font-semibold'>
             Portfolio Insights
           </h2>

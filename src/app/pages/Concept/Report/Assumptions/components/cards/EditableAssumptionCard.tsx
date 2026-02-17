@@ -1,10 +1,11 @@
 import React, { useState, useCallback } from 'react';
-import { Icon } from '@components';
 import { AssumptionCategory } from '@libs/api/types';
 import { getCategoryColors } from '../../constants/categoryColors';
 import { getCategoryIcon } from '../../utils/assumptionUtils';
 import EditableImportanceMeter from '../badges/EditableImportanceMeter';
 import EditableCertaintyMeter from '../badges/EditableCertaintyMeter';
+import { Loader2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Internal frontend format for editing
 interface EditableAssumptionData {
@@ -116,7 +117,7 @@ const EditableAssumptionCard: React.FC<EditableAssumptionCardProps> = ({
       {/* Assumption header */}
       <div className='mb-3 flex flex-wrap items-start justify-between gap-2'>
         <div className='flex items-center'>
-          <Icon
+          <DynamicIcon
             variant={iconVariant as any}
             className={`${categoryColors.stroke} h-5 w-5`}
           />
@@ -177,10 +178,7 @@ const EditableAssumptionCard: React.FC<EditableAssumptionCardProps> = ({
         >
           {isLoading ? (
             <>
-              <Icon
-                variant='loading-02'
-                className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin'
-              />
+              <Loader2 className='aucctus-stroke-white mr-2 h-4 w-4 animate-spin' />
               {mode === 'add' ? 'Adding...' : 'Saving...'}
             </>
           ) : mode === 'add' ? (

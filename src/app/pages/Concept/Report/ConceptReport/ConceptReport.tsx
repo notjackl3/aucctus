@@ -1,6 +1,5 @@
 import {
   Container,
-  Icon,
   Loading,
   Modal,
   Select,
@@ -30,6 +29,7 @@ import { cn } from '@libs/utils/react';
 import { FunctionComponent, useCallback, useMemo } from 'react';
 import { Navigate, Outlet, useNavigate, useParams } from 'react-router-dom';
 import ConceptReportSocketWrapper from './ConceptReportSocketWrapper';
+import { AlertTriangle, Sparkles } from 'lucide-react';
 
 const { SkeletonBlock } = ConceptReportSkeletons;
 
@@ -58,41 +58,40 @@ const TAB_TO_SECTION_MAP: Partial<Record<TabTitles, string>> = {
 };
 
 // Base tabs - Testing will be added dynamically based on concept version
-const CONCEPT_TABS: { label: TabTitles; value: AppPath; icon: IconVariant }[] =
-  [
-    {
-      label: 'OVERVIEW',
-      value: AppPath.ConceptOverview,
-      icon: 'presentation-chart',
-    },
-    {
-      label: 'MARKET SCAN',
-      value: AppPath.ConceptMarketScan,
-      icon: 'search-md',
-    },
-    {
-      label: 'FINANCIAL PROJECTION',
-      value: AppPath.ConceptFinancialProjection,
-      icon: 'trendup',
-    },
-    {
-      label: 'CUSTOMER PROFILE',
-      value: AppPath.ConceptCustomerProfile,
-      icon: 'users-03',
-    },
-    {
-      label: 'ASSUMPTIONS',
-      value: AppPath.ConceptKeyAssumptions,
-      icon: 'book-open',
-    },
-    // TODO: Re-activate Workshop tab when ready
-    // {
-    //   label: 'WORKSHOP',
-    //   value: AppPath.ConceptWorkshop,
-    //   icon: 'filecode',
-    // },
-    { label: 'CONTEXT', value: AppPath.ConceptSettings, icon: 'globe' },
-  ];
+const CONCEPT_TABS: { label: TabTitles; value: AppPath; icon: string }[] = [
+  {
+    label: 'OVERVIEW',
+    value: AppPath.ConceptOverview,
+    icon: 'presentation-chart',
+  },
+  {
+    label: 'MARKET SCAN',
+    value: AppPath.ConceptMarketScan,
+    icon: 'search-md',
+  },
+  {
+    label: 'FINANCIAL PROJECTION',
+    value: AppPath.ConceptFinancialProjection,
+    icon: 'trendup',
+  },
+  {
+    label: 'CUSTOMER PROFILE',
+    value: AppPath.ConceptCustomerProfile,
+    icon: 'users-03',
+  },
+  {
+    label: 'ASSUMPTIONS',
+    value: AppPath.ConceptKeyAssumptions,
+    icon: 'book-open',
+  },
+  // TODO: Re-activate Workshop tab when ready
+  // {
+  //   label: 'WORKSHOP',
+  //   value: AppPath.ConceptWorkshop,
+  //   icon: 'filecode',
+  // },
+  { label: 'CONTEXT', value: AppPath.ConceptSettings, icon: 'globe' },
+];
 
 const ConceptReport: FunctionComponent = () => {
   const { id: conceptIdentifier } = useParams();
@@ -316,10 +315,7 @@ const ConceptReport: FunctionComponent = () => {
                     style={{ backgroundColor: '#120C0C' }}
                     aria-label='Magic Share'
                   >
-                    <Icon
-                      variant='threeStars'
-                      className='h-4 w-4 fill-white stroke-white'
-                    />
+                    <Sparkles className='h-4 w-4 fill-white stroke-white' />
                     Magic Share
                   </button>
                   <div className='group relative'>
@@ -390,12 +386,7 @@ const ConceptReport: FunctionComponent = () => {
       {concept?.isHistoricalVersion && FEATURE_CONCEPT_VERSIONING && (
         <div className='aucctus-bg-primary fixed left-1/2 top-0 z-50 flex -translate-x-1/2 animate-fade-in flex-row items-center justify-center gap-2 rounded-b-md px-4 py-2 shadow-md'>
           <span className='flex min-h-6 min-w-6 items-center justify-center'>
-            <Icon
-              variant='alert-triangle'
-              height={16}
-              width={16}
-              className='stroke-warning-500'
-            />
+            <AlertTriangle size={16} className='stroke-warning-500' />
           </span>
           <span className='aucctus-text-brand-secondary aucctus-text-sm-medium mr-2'>
             You are viewing a historical version of this concept

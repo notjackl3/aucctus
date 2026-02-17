@@ -21,7 +21,7 @@ import React, {
 import { v4 as uuidv4 } from 'uuid';
 
 // Components
-import { Icon, Loading, Modal, toast } from '@components';
+import { Loading, Modal, toast } from '@components';
 import defaultAvatar from '@assets/img/avatar.png';
 import Avatar from '@components/Avatar';
 import LoadingMask from '@components/Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
@@ -30,6 +30,13 @@ import Tooltip from '@components/ToolTip/Tooltip';
 import CustomerConversationSocketWrapper from '../CustomerConversationSocketWrapper';
 import CustomerChatMessage from './CustomerChatMessage';
 import SelectableCustomerConversationList from './SelectableCustomerConversationList';
+import {
+  AlertCircle,
+  Download,
+  MessageCircle,
+  Pencil,
+  Search,
+} from 'lucide-react';
 
 // Types
 interface CustomerConversationProps {
@@ -324,7 +331,7 @@ const CustomerConversation = forwardRef<
       {/* Header */}
       <div className='flex flex-row gap-4 p-4'>
         <span className='flex items-center justify-center'>
-          <Icon variant='message-circle' width={20} height={20} />
+          <MessageCircle size={20} />
         </span>
         <span className='aucctus-text-primary aucctus-text-lg'>
           Chat with{' '}
@@ -345,12 +352,7 @@ const CustomerConversation = forwardRef<
               aria-label='Search conversation'
             >
               <span className='flex items-center justify-center'>
-                <Icon
-                  variant='search-md'
-                  width={20}
-                  height={20}
-                  className='aucctus-stroke-secondary'
-                />
+                <Search size={20} className='aucctus-stroke-secondary' />
               </span>
             </button>
           </Tooltip>
@@ -370,12 +372,7 @@ const CustomerConversation = forwardRef<
                 {isExporting ? (
                   <Loading isSmall />
                 ) : (
-                  <Icon
-                    variant='download'
-                    width={20}
-                    height={20}
-                    className='aucctus-stroke-secondary'
-                  />
+                  <Download size={20} className='aucctus-stroke-secondary' />
                 )}
               </span>
             </button>
@@ -391,12 +388,7 @@ const CustomerConversation = forwardRef<
               aria-label='Start new conversation'
             >
               <span className='flex items-center justify-center'>
-                <Icon
-                  variant='edit'
-                  width={20}
-                  height={20}
-                  className='aucctus-stroke-secondary'
-                />
+                <Pencil size={20} className='aucctus-stroke-secondary' />
               </span>
             </button>
           </Tooltip>
@@ -504,12 +496,7 @@ const CustomerConversation = forwardRef<
         />
         <div className='aucctus-text-tertiary aucctus-text-sm mt-2 flex flex-row items-center justify-center gap-2'>
           <span className='flex items-center justify-center'>
-            <Icon
-              variant='alert-circle'
-              className='aucctus-stroke-quaternary'
-              width={16}
-              height={16}
-            />
+            <AlertCircle size={16} className='aucctus-stroke-quaternary' />
           </span>
           <span>
             This chat is synthetic and may provide inaccurate information

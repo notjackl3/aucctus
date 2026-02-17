@@ -1,8 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-// TODO: Replace with import from Icon types when available
-export type IconVariant = 'alert-circle' | 'briefcase' | 'plus';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 /**
  * Props for SectionHeader component.
@@ -15,7 +13,7 @@ export type IconVariant = 'alert-circle' | 'briefcase' | 'plus';
  * @param noDivider When true, removes the bottom border divider
  */
 export interface SectionHeaderProps {
-  icon: IconVariant;
+  icon: string;
   iconClass?: string;
   iconBgClass?: string;
   title: string;
@@ -47,7 +45,12 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
           iconBgClass,
         )}
       >
-        <Icon variant={icon} height={16} width={16} className={iconClass} />
+        <DynamicIcon
+          variant={icon}
+          height={16}
+          width={16}
+          className={iconClass}
+        />
       </span>
       <span className='aucctus-text-primary aucctus-text-md-semibold'>
         {title}

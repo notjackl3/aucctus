@@ -30,7 +30,7 @@ const Question = forwardRef<HTMLSpanElement, QuestionProps>(
   ) => {
     const questionIcon = useMemo(() => {
       if (icon) {
-        return (icon as IconVariant) || 'help-circle';
+        return (icon as string) || 'help-circle';
       }
 
       return undefined;

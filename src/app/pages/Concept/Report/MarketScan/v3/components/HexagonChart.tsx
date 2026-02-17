@@ -1,10 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
-import type {
-  IconVariant,
-  IMarketForceV3,
-} from '@libs/api/types/concept/marketScan';
+import type { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface HexagonChartProps {
   trendCategories: IMarketForceV3[];
@@ -331,8 +328,8 @@ const HexagonChart: React.FC<HexagonChartProps> = ({
               height={20}
               className='pointer-events-none'
             >
-              <Icon
-                variant={category.icon as IconVariant}
+              <DynamicIcon
+                variant={category.icon as string}
                 className='aucctus-stroke-secondary h-5 w-5'
                 style={{ display: 'block', margin: 'auto' }}
               />
@@ -428,8 +425,8 @@ const HexagonChart: React.FC<HexagonChartProps> = ({
               height={iconSize}
               className='pointer-events-none cursor-pointer'
             >
-              <Icon
-                variant={category.icon as IconVariant}
+              <DynamicIcon
+                variant={category.icon as string}
                 className={cn({
                   'aucctus-stroke-white transition-all duration-200': true,
                   'opacity-90': !isSelected && scale < 1,

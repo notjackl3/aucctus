@@ -1,8 +1,9 @@
 import { FunctionComponent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Header, Icon } from '@components';
+import { Header } from '@components';
 import { IConcept, IPocPlan } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { ArrowLeft, Calendar, ExternalLink, Rocket } from 'lucide-react';
 
 interface IPocPlanHeaderProps {
   concept: IConcept;
@@ -61,7 +62,7 @@ const PocPlanHeader: FunctionComponent<IPocPlanHeaderProps> = ({
           onClick={() => navigate(`/concept/${concept.identifier}/`)}
           className='aucctus-text-tertiary aucctus-text-sm hover:aucctus-text-primary flex items-center gap-1 transition-colors'
         >
-          <Icon variant='arrowleft' className='h-4 w-4 stroke-current' />
+          <ArrowLeft className='h-4 w-4 stroke-current' />
           Back to Concept Report
         </button>
       </div>
@@ -70,12 +71,7 @@ const PocPlanHeader: FunctionComponent<IPocPlanHeaderProps> = ({
       <div className='flex items-start justify-between gap-4'>
         <div>
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='rocket'
-              height={28}
-              width={28}
-              className='aucctus-stroke-brand-primary'
-            />
+            <Rocket size={28} className='aucctus-stroke-brand-primary' />
             <Header.One text='Proof of Concept Plan' />
           </div>
           <p className='aucctus-text-md aucctus-text-secondary mt-1'>
@@ -103,7 +99,7 @@ const PocPlanHeader: FunctionComponent<IPocPlanHeaderProps> = ({
               )}
               title='Add to Google Calendar'
             >
-              <Icon variant='calendar' className='h-5 w-5 stroke-white' />
+              <Calendar className='h-5 w-5 stroke-white' />
               <div className='flex flex-col'>
                 <span className='text-[10px] uppercase tracking-wider text-white/80'>
                   Go/No-Go Decision
@@ -112,10 +108,7 @@ const PocPlanHeader: FunctionComponent<IPocPlanHeaderProps> = ({
                   {formatGoNoGoDate(pocPlan.goNoGoDate)}
                 </span>
               </div>
-              <Icon
-                variant='link-external'
-                className='h-3.5 w-3.5 stroke-white/60'
-              />
+              <ExternalLink className='h-3.5 w-3.5 stroke-white/60' />
             </a>
           ) : (
             <div
@@ -125,7 +118,7 @@ const PocPlanHeader: FunctionComponent<IPocPlanHeaderProps> = ({
                 'shadow-md',
               )}
             >
-              <Icon variant='calendar' className='h-5 w-5 stroke-white' />
+              <Calendar className='h-5 w-5 stroke-white' />
               <div className='flex flex-col'>
                 <span className='text-[10px] uppercase tracking-wider text-white/80'>
                   Go/No-Go Decision

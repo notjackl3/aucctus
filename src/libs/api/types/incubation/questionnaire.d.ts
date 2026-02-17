@@ -49,7 +49,7 @@ export interface IConceptIncubationMultiSelectQuestion
 export interface IClarifyingQuestion {
   title: string;
   uuid: string;
-  icon: IconVariant;
+  icon: string;
   question: ConceptIncubationQuestion;
 }
 

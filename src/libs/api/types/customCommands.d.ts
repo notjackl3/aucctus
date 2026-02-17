@@ -6,8 +6,6 @@
  * with custom prompt modifiers.
  */
 
-import { IconVariant } from '@icons.d';
-
 /**
  * Full custom command data from the API
  */
@@ -16,7 +14,7 @@ export interface CustomCommand {
   name: string;
   label: string;
   description: string;
-  icon: IconVariant;
+  icon: string;
   promptModifier: string;
   enableWebSearch: boolean;
   enableNucleusSearch: boolean;
@@ -33,7 +31,7 @@ export interface CustomCommandForPicker {
   name: string;
   label: string;
   description: string;
-  icon: IconVariant;
+  icon: string;
   enableWebSearch: boolean;
   enableNucleusSearch: boolean;
 }

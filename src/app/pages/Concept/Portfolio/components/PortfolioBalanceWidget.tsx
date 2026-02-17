@@ -6,11 +6,11 @@
  * insights from bulk priority calculation.
  */
 
-import { Icon } from '@components';
 import { IPortfolioSummaryResponse } from '@libs/api/types/concept/concept_priority';
 import React, { useCallback, useMemo, useState } from 'react';
 import { HorizonData } from '../types';
 import PortfolioInsightsCarousel from './PortfolioInsightsCarousel';
+import { PieChart } from 'lucide-react';
 
 interface PortfolioBalanceWidgetProps {
   horizonData: HorizonData[];
@@ -310,12 +310,7 @@ const HoverTooltip: React.FC<{
  */
 const PortfolioBalanceEmptyState: React.FC = () => (
   <div className='flex flex-1 flex-col items-center justify-center text-center'>
-    <Icon
-      variant='pie-chart'
-      height={48}
-      width={48}
-      className='aucctus-stroke-tertiary mb-4 opacity-50'
-    />
+    <PieChart size={48} className='aucctus-stroke-tertiary mb-4 opacity-50' />
     <p className='aucctus-text-secondary aucctus-text-md mb-1'>
       No horizon data available
     </p>
@@ -345,12 +340,7 @@ const PortfolioBalanceWidget: React.FC<PortfolioBalanceWidgetProps> = ({
       {/* Portfolio Balance Card */}
       <div className='aucctus-bg-primary aucctus-border-secondary flex h-[360px] flex-col rounded-lg border p-4 shadow-sm'>
         <div className='mb-2 flex items-center gap-2'>
-          <Icon
-            variant='pie-chart'
-            height={20}
-            width={20}
-            className='aucctus-stroke-brand-primary'
-          />
+          <PieChart size={20} className='aucctus-stroke-brand-primary' />
           <h2 className='aucctus-text-primary aucctus-text-xl font-semibold'>
             Portfolio Balance
           </h2>

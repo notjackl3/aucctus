@@ -1,11 +1,12 @@
-import { Button, Icon } from '@components';
+import { Button } from '@components';
 import { cn } from '@libs/utils/react';
 import React from 'react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface InfoSectionProps {
   title: string;
   content: string;
-  iconVariant?: IconVariant;
+  iconVariant?: string;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   contentClassName?: string;
 }
@@ -23,7 +24,7 @@ const InfoSection: React.FC<InfoSectionProps> = ({
         <h3 className='aucctus-text-sm-medium aucctus-text-primary'>{title}</h3>
         {onClick && (
           <Button color='grey' noBorder size='xs' onClick={onClick}>
-            <Icon variant={iconVariant} />
+            <DynamicIcon variant={iconVariant} />
           </Button>
         )}
       </div>

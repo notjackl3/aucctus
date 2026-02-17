@@ -1,6 +1,6 @@
-import { Icon } from '@components';
 import React from 'react';
 import { executiveDashboardUIText } from './config';
+import { Target } from 'lucide-react';
 
 interface OurRightToWinCardProps {
   rightsToWin: any[];
@@ -13,10 +13,7 @@ const OurRightToWinCard: React.FC<OurRightToWinCardProps> = ({
     <div className='aucctus-border-primary aucctus-bg-primary h-full min-h-[350px] rounded-lg border lg:col-span-1'>
       <div className='flex h-full flex-col p-6'>
         <h3 className='aucctus-text-xl-semibold aucctus-text-primary mb-4 flex items-center gap-2'>
-          <Icon
-            variant='target'
-            className='aucctus-stroke-success-primary h-5 w-5'
-          />
+          <Target className='aucctus-stroke-success-primary h-5 w-5' />
           {executiveDashboardUIText.sections.ourRightToWin}
         </h3>
 

@@ -1,10 +1,11 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
 import React, { useState, useMemo } from 'react';
+import { Search, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // All available icon variants
-const ALL_ICONS: IconVariant[] = [
+const ALL_ICONS: string[] = [
   'activity',
   'ai-conclusion',
   'alert',
@@ -181,8 +182,8 @@ const IconPickerDropdown: React.FC<IIconPickerDropdownProps> = ({
       <Popover.Trigger asChild>
         {trigger || (
           <button className='aucctus-bg-secondary-hover hover:aucctus-bg-tertiary flex items-center justify-center rounded p-0.5 transition-colors'>
-            <Icon
-              variant={(currentIcon as IconVariant) || 'file'}
+            <DynamicIcon
+              variant={(currentIcon as string) || 'file'}
               className='aucctus-stroke-tertiary h-4 w-4'
             />
           </button>
@@ -206,10 +207,7 @@ const IconPickerDropdown: React.FC<IIconPickerDropdownProps> = ({
             {/* Header with search and clear button */}
             <div className='aucctus-border-secondary flex items-center gap-2 border-b p-3'>
               <div className='relative flex-1'>
-                <Icon
-                  variant='search-md'
-                  className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2'
-                />
+                <Search className='aucctus-stroke-tertiary absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2' />
                 <input
                   type='text'
                   value={searchQuery}
@@ -226,10 +224,7 @@ const IconPickerDropdown: React.FC<IIconPickerDropdownProps> = ({
                 }}
                 className='aucctus-bg-secondary-hover rounded p-2 transition-colors'
               >
-                <Icon
-                  variant='closeX'
-                  className='aucctus-stroke-secondary h-4 w-4'
-                />
+                <X className='aucctus-stroke-secondary h-4 w-4' />
               </button>
             </div>
 
@@ -250,8 +245,8 @@ const IconPickerDropdown: React.FC<IIconPickerDropdownProps> = ({
                     currentIcon === currentIcon && 'aucctus-bg-secondary',
                   )}
                 >
-                  <Icon
-                    variant={currentIcon as IconVariant}
+                  <DynamicIcon
+                    variant={currentIcon as string}
                     className='aucctus-stroke-secondary h-5 w-5'
                   />
                 </button>
@@ -278,7 +273,7 @@ const IconPickerDropdown: React.FC<IIconPickerDropdownProps> = ({
                     )}
                     title={icon}
                   >
-                    <Icon
+                    <DynamicIcon
                       variant={icon}
                       className='aucctus-stroke-secondary h-5 w-5'
                     />

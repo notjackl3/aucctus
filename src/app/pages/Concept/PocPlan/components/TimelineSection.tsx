@@ -1,7 +1,8 @@
 import { FunctionComponent } from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import { ComponentTooltip } from '@components';
 import { IPocTimelinePhase, IPocMilestone } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { Clock } from 'lucide-react';
 
 // Milestone tooltip content component
 const MilestoneTooltipContent: FunctionComponent<{
@@ -100,10 +101,7 @@ const TimelineSection: FunctionComponent<ITimelineSectionProps> = ({
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-            <Icon
-              variant='clock'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <Clock className='aucctus-stroke-brand-primary h-5 w-5' />
           </div>
           <div className='flex flex-col'>
             <h2 className='aucctus-text-primary aucctus-header-md-semibold'>

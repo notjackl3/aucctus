@@ -1,7 +1,8 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { AgentStep } from '@stores/overseer/types';
 import React, { useState } from 'react';
+import { Check, ChevronRight, Loader2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface AgentThinkingStepsProps {
   steps: AgentStep[];
@@ -32,27 +33,18 @@ const AgentThinkingSteps: React.FC<AgentThinkingStepsProps> = ({ steps }) => {
         className='group flex w-full items-center gap-2 px-3 py-1.5 text-left transition-colors hover:bg-white/5'
       >
         {!allDone ? (
-          <Icon
-            variant='loading-02'
-            width={12}
-            height={12}
+          <Loader2
+            size={12}
             className='shrink-0 animate-spin stroke-blue-400'
           />
         ) : (
-          <Icon
-            variant='check'
-            width={12}
-            height={12}
-            className='shrink-0 stroke-emerald-400'
-          />
+          <Check size={12} className='shrink-0 stroke-emerald-400' />
         )}
         <span className='flex-1 text-[11px] font-light text-white/50'>
           {!allDone ? activeStep?.label : `Completed ${completedCount} steps`}
         </span>
-        <Icon
-          variant='chevron-right'
-          width={12}
-          height={12}
+        <ChevronRight
+          size={12}
           className={cn(
             'stroke-white/25 transition-transform duration-200',
             expanded && 'rotate-90',
@@ -69,19 +61,12 @@ const AgentThinkingSteps: React.FC<AgentThinkingStepsProps> = ({ steps }) => {
               <div key={step.id} className='flex items-start gap-2 py-1'>
                 <div className='mt-0.5 shrink-0'>
                   {step.status === 'active' ? (
-                    <Icon
-                      variant='loading-02'
-                      width={12}
-                      height={12}
+                    <Loader2
+                      size={12}
                       className='animate-spin stroke-blue-400'
                     />
                   ) : step.status === 'done' ? (
-                    <Icon
-                      variant='check'
-                      width={12}
-                      height={12}
-                      className='stroke-emerald-400'
-                    />
+                    <Check size={12} className='stroke-emerald-400' />
                   ) : (
                     <div className='h-3 w-3 rounded-full border border-white/15' />
                   )}
@@ -97,7 +82,7 @@ const AgentThinkingSteps: React.FC<AgentThinkingStepsProps> = ({ steps }) => {
                           : 'text-white/25',
                     )}
                   >
-                    <Icon
+                    <DynamicIcon
                       variant={iconVariant as 'globe'}
                       width={12}
                       height={12}

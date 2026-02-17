@@ -1,10 +1,12 @@
 import React from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import { ComponentTooltip } from '@components';
 import {
   IPricingV2,
   IPricingConsiderationV2,
 } from '@libs/api/types/concept/financialProjectionV2';
 import { formatNumber } from '@libs/utils/number';
+import { AlertCircle } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface PricingStrategyCardProps {
   pricingData?: IPricingV2;
@@ -44,10 +46,7 @@ const PricingStrategyCard: React.FC<PricingStrategyCardProps> = ({
             </div>
           }
         >
-          <Icon
-            variant='alert-circle'
-            className='aucctus-stroke-tertiary mr-2 h-5 w-5 flex-shrink-0'
-          />
+          <AlertCircle className='aucctus-stroke-tertiary mr-2 h-5 w-5 flex-shrink-0' />
         </ComponentTooltip>
         <span className='aucctus-text-secondary'>{unit}</span>
       </div>
@@ -64,7 +63,7 @@ const PricingStrategyCard: React.FC<PricingStrategyCardProps> = ({
                 className='aucctus-border-secondary flex items-center gap-2 rounded-md border p-3'
               >
                 <div className='aucctus-bg-secondary aucctus-border-secondary flex items-center justify-center rounded-full border border-opacity-50'>
-                  <Icon
+                  <DynamicIcon
                     variant={consideration.icon as any}
                     className='aucctus-stroke-brand-primary h-7 w-7 p-[0.3rem]'
                   />

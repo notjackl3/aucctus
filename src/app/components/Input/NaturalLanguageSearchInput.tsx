@@ -1,10 +1,10 @@
-import { Icon } from '@components';
 import { toast } from '@components/Notification/toast';
 import { IPropertyFilter } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React, { useState, useCallback } from 'react';
 import api from '@libs/api';
 import useStore from '@stores/store';
+import { Loader2, Sparkles } from 'lucide-react';
 
 interface IStandardFilter {
   filterType: 'sort' | 'status' | 'createdBy' | 'lastModifiedBy' | 'search';
@@ -165,13 +165,9 @@ const NaturalLanguageSearchInput: React.FC<
     <div className={cn('relative w-full', className)}>
       <div className='absolute inset-y-0 left-0 flex items-center pl-3'>
         {isLoading ? (
-          <Icon
-            variant='loading-02'
-            className='aucctus-stroke-brand-primary h-4 w-4 animate-spin'
-          />
+          <Loader2 className='aucctus-stroke-brand-primary h-4 w-4 animate-spin' />
         ) : (
-          <Icon
-            variant='ai-conclusion'
+          <Sparkles
             className={cn('h-4 w-4', {
               'aucctus-stroke-tertiary': !isFocused,
               'aucctus-stroke-brand-primary': isFocused,

@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Icon } from '@components';
 import {
   IMarketSizingV2,
   IMarketSizingAssumptionEntryV2,
@@ -8,6 +7,7 @@ import { getAssumptionsByGroup, updateAssumption } from './assumptionsUtils';
 import AssumptionsList from './AssumptionsList';
 import MarketSizeVisualization from './MarketSizeVisualization';
 import useStore from '@stores/store';
+import { AlertCircle } from 'lucide-react';
 
 interface SimpleMarketSizeViewProps {
   marketSizing?: IMarketSizingV2;
@@ -134,10 +134,7 @@ const SimpleMarketSizeView: React.FC<SimpleMarketSizeViewProps> = ({
     return (
       <div className='aucctus-bg-secondary-subtle aucctus-border-primary rounded-lg border p-4'>
         <div className='flex items-start gap-3'>
-          <Icon
-            variant='alert-circle'
-            className='aucctus-stroke-tertiary h-6 w-6 self-center justify-self-center'
-          />
+          <AlertCircle className='aucctus-stroke-tertiary h-6 w-6 self-center justify-self-center' />
           <div>
             <h3 className='aucctus-text-md-semibold aucctus-text-primary mb-1'>
               No Market Sizing Data Available

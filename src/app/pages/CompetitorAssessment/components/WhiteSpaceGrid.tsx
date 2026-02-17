@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence } from 'framer-motion';
 import type {
@@ -8,6 +7,7 @@ import type {
 } from '@libs/api/types/competitorAssessment';
 import WhiteSpaceCardEnhanced from './WhiteSpaceCardEnhanced';
 import WhiteSpaceDetailPanel from './WhiteSpaceDetailPanel';
+import { AlertTriangle, Sparkles, Star } from 'lucide-react';
 
 interface WhiteSpaceGridProps {
   whiteSpaces: IWhiteSpaceOpportunity[];
@@ -62,12 +62,7 @@ const WhiteSpaceGrid: React.FC<WhiteSpaceGridProps> = ({ whiteSpaces }) => {
   if (whiteSpaces.length === 0) {
     return (
       <div className='aucctus-bg-secondary aucctus-border-secondary flex flex-col items-center justify-center rounded-xl border p-12'>
-        <Icon
-          variant='sparkles'
-          height={48}
-          width={48}
-          className='mb-4 stroke-amber-500/30'
-        />
+        <Sparkles size={48} className='mb-4 stroke-amber-500/30' />
         <p className='aucctus-text-secondary text-sm'>
           No white space opportunities discovered yet.
         </p>
@@ -125,12 +120,7 @@ const WhiteSpaceGrid: React.FC<WhiteSpaceGridProps> = ({ whiteSpaces }) => {
                 : 'aucctus-text-tertiary',
             )}
           >
-            <Icon
-              variant='star-01'
-              height={11}
-              width={11}
-              className='stroke-current'
-            />
+            <Star size={11} className='stroke-current' />
             Score
           </button>
           <button
@@ -142,12 +132,7 @@ const WhiteSpaceGrid: React.FC<WhiteSpaceGridProps> = ({ whiteSpaces }) => {
                 : 'aucctus-text-tertiary',
             )}
           >
-            <Icon
-              variant='alert-triangle'
-              height={11}
-              width={11}
-              className='stroke-current'
-            />
+            <AlertTriangle size={11} className='stroke-current' />
             Urgency
           </button>
         </div>

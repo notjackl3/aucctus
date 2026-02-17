@@ -1,6 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { BatchAssumptionChange } from '@stores/batch-assumption-changes';
+import { AlertCircle, Loader2, Save, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface BatchChangesIndicatorProps {
   changesCount: number;
@@ -27,10 +28,7 @@ const BatchChangesIndicator: React.FC<BatchChangesIndicatorProps> = ({
     <div className='aucctus-bg-warning-secondary aucctus-border-warning sticky top-0 z-10 rounded-lg border p-4 shadow-md'>
       <div className='flex items-center justify-between gap-4'>
         <div className='flex items-center gap-3'>
-          <Icon
-            variant='alert-circle'
-            className='aucctus-stroke-warning-primary h-5 w-5'
-          />
+          <AlertCircle className='aucctus-stroke-warning-primary h-5 w-5' />
           <div>
             <div className='aucctus-text-sm-semibold aucctus-text-warning-primary'>
               {changesCount} unsaved change{changesCount !== 1 ? 's' : ''}
@@ -52,10 +50,7 @@ const BatchChangesIndicator: React.FC<BatchChangesIndicatorProps> = ({
             onClick={onDiscardAll}
             disabled={isLoading}
           >
-            <Icon
-              variant='closeX'
-              className='aucctus-stroke-secondary mr-1 h-4 w-4'
-            />
+            <X className='aucctus-stroke-secondary mr-1 h-4 w-4' />
             Discard All
           </button>
           <button
@@ -66,18 +61,12 @@ const BatchChangesIndicator: React.FC<BatchChangesIndicatorProps> = ({
           >
             {isLoading ? (
               <>
-                <Icon
-                  variant='loading-02'
-                  className='aucctus-stroke-white mr-1 h-4 w-4 animate-spin'
-                />
+                <Loader2 className='aucctus-stroke-white mr-1 h-4 w-4 animate-spin' />
                 Saving...
               </>
             ) : (
               <>
-                <Icon
-                  variant='save'
-                  className='aucctus-stroke-white mr-1 h-4 w-4'
-                />
+                <Save className='aucctus-stroke-white mr-1 h-4 w-4' />
                 Save All Changes
               </>
             )}
@@ -96,7 +85,7 @@ const BatchChangesIndicator: React.FC<BatchChangesIndicatorProps> = ({
               key={change.id}
               className='aucctus-text-xs aucctus-text-tertiary flex items-center gap-2 rounded bg-white bg-opacity-50 p-2'
             >
-              <Icon
+              <DynamicIcon
                 variant={
                   change.type === 'add'
                     ? 'plus'

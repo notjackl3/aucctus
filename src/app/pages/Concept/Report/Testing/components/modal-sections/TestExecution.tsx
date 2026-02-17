@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Icon, toast } from '@components';
+import { toast } from '@components';
 import { cn } from '@libs/utils/react';
 import api from '@libs/api';
 import telemetry from '@libs/telemetry';
@@ -15,6 +15,7 @@ import { useConceptCustomerProfiles } from '@hooks/query/concepts.hook';
 import SyntheticExecutionPanel from './SyntheticExecutionPanel';
 import { useTestParticipants, useTestResults } from '@hooks/query/testing.hook';
 import TabBanner from '../common/TabBanner';
+import { Check, Ghost, User, Users, Zap } from 'lucide-react';
 
 interface TestExecutionProps {
   conceptUuid?: string;
@@ -448,8 +449,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         >
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='user'
+              <User
                 className={cn(
                   'h-5 w-5',
                   selectedMode === 'facilitated'
@@ -475,10 +475,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
                     Used
                   </span>
                 )}
-                <Icon
-                  variant='check'
-                  className='aucctus-stroke-brand-primary h-5 w-5'
-                />
+                <Check className='aucctus-stroke-brand-primary h-5 w-5' />
               </div>
             )}
           </div>
@@ -504,8 +501,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         >
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='ghost'
+              <Ghost
                 className={cn(
                   'h-5 w-5',
                   selectedMode === 'synthetic'
@@ -531,10 +527,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
                     Used
                   </span>
                 )}
-                <Icon
-                  variant='check'
-                  className='aucctus-stroke-brand-primary h-5 w-5'
-                />
+                <Check className='aucctus-stroke-brand-primary h-5 w-5' />
               </div>
             )}
           </div>
@@ -548,10 +541,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         <div className='aucctus-border-secondary aucctus-bg-primary min-h-[120px] rounded-lg border p-4 opacity-70'>
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon
-                variant='users-03'
-                className='aucctus-stroke-tertiary h-5 w-5'
-              />
+              <Users className='aucctus-stroke-tertiary h-5 w-5' />
               <h4 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
                 Expert-Led
               </h4>
@@ -571,7 +561,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
         <div className='aucctus-border-secondary aucctus-bg-primary min-h-[120px] rounded-lg border p-4 opacity-70'>
           <div className='mb-3 flex items-start justify-between'>
             <div className='flex items-center gap-2'>
-              <Icon variant='zap' className='aucctus-stroke-tertiary h-5 w-5' />
+              <Zap className='aucctus-stroke-tertiary h-5 w-5' />
               <h4 className='aucctus-text-sm-semibold aucctus-text-tertiary'>
                 Automated
               </h4>
@@ -627,10 +617,7 @@ const TestExecution: React.FC<TestExecutionProps> = ({
       {/* <div className='aucctus-bg-secondary-subtle aucctus-border-secondary rounded-lg border p-6'>
         <div className='flex items-start gap-3'>
           <div className='mt-1'>
-            <Icon
-              variant='help-circle'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <HelpCircle className='aucctus-stroke-brand-primary h-5 w-5' />
           </div>
           <div>
             <h4 className='aucctus-text-md-semibold aucctus-text-brand-primary mb-3'>

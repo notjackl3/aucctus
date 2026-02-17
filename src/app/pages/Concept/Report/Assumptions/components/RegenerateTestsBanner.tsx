@@ -1,6 +1,5 @@
 import React from 'react';
-import { Icon } from '@components';
-
+import { AlertTriangle, Loader2, X } from 'lucide-react';
 interface RegenerateTestsBannerProps {
   onRegenerate: () => void;
   onDismiss: () => void;
@@ -27,7 +26,7 @@ const RegenerateTestsBanner: React.FC<RegenerateTestsBannerProps> = ({
         aria-label='Dismiss banner'
         disabled={isLoading}
       >
-        <Icon variant='closeX' className='aucctus-stroke-secondary h-4 w-4' />
+        <X className='aucctus-stroke-secondary h-4 w-4' />
       </button>
 
       <div className='flex items-center justify-between pr-8'>
@@ -38,10 +37,8 @@ const RegenerateTestsBanner: React.FC<RegenerateTestsBannerProps> = ({
             className='mt-0.5 flex items-center justify-center rounded-full p-1'
             style={{ backgroundColor: 'rgba(93, 66, 223, 0.1)' }}
           >
-            <Icon
-              variant='alert-triangle'
-              height={16}
-              width={16}
+            <AlertTriangle
+              size={16}
               className='aucctus-stroke-brand-primary'
               style={{ opacity: 0.7 }}
             />
@@ -67,10 +64,7 @@ const RegenerateTestsBanner: React.FC<RegenerateTestsBannerProps> = ({
           >
             {isLoading ? (
               <>
-                <Icon
-                  variant='loading-02'
-                  className='aucctus-stroke-white h-4 w-4 animate-spin'
-                />
+                <Loader2 className='aucctus-stroke-white h-4 w-4 animate-spin' />
                 Regenerating...
               </>
             ) : (

@@ -500,7 +500,7 @@ export class ConceptApi extends ApiService {
 
   createCustomerJob(
     customerProfileUuid: string,
-    data: { description: string; order?: number; icon?: IconVariant },
+    data: { description: string; order?: number; icon?: string },
   ) {
     return this.post<ICustomerJob>(
       endpoints.customerProfileJobs(customerProfileUuid),
@@ -540,7 +540,7 @@ export class ConceptApi extends ApiService {
 
   createCustomerPain(
     customerProfileUuid: string,
-    data: { description: string; order?: number; icon?: IconVariant },
+    data: { description: string; order?: number; icon?: string },
   ) {
     return this.post<ICustomerPain>(
       endpoints.customerProfilePains(customerProfileUuid),

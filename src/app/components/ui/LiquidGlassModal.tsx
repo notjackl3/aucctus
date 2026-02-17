@@ -2,8 +2,8 @@ import * as Dialog from '@radix-ui/react-dialog';
 import { motion, AnimatePresence } from 'framer-motion';
 import React from 'react';
 
-import Icon from '@components/Icon';
 import { cn } from '@libs/utils/react';
+import { X } from 'lucide-react';
 
 type ModalSize = 'sm' | 'md' | 'lg';
 type ModalVariant = 'default' | 'danger';
@@ -295,10 +295,8 @@ const LiquidGlassModal: React.FC<LiquidGlassModalProps> = ({
                                     )}
                                     aria-label='Close'
                                   >
-                                    <Icon
-                                      variant='closeX'
-                                      width={16}
-                                      height={16}
+                                    <X
+                                      size={16}
                                       className='aucctus-stroke-secondary'
                                     />
                                   </motion.button>

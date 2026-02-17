@@ -1,5 +1,4 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import ThresholdMarker from './ThresholdMarker';
 import { AssumptionCategory } from '@libs/api/types';
@@ -7,6 +6,7 @@ import {
   INVALIDATED_COLORS,
   COMMON_COLORS,
 } from '../../../../constants/categoryColors';
+import { X } from 'lucide-react';
 
 // Inline getProgressBarColors utility
 export const getProgressBarColors = (
@@ -135,11 +135,7 @@ const InvalidatedProgressBar: React.FC<InvalidatedProgressBarProps> = ({
       {/* Red X overlay to indicate invalidation */}
       <div className='absolute inset-0 flex items-center justify-center'>
         <div className='rounded-full bg-red-500 p-0.5'>
-          <Icon
-            variant='closeX'
-            className='aucctus-stroke-white h-3 w-3'
-            strokeWidth={3}
-          />
+          <X className='aucctus-stroke-white h-3 w-3' strokeWidth={3} />
         </div>
       </div>
     </>

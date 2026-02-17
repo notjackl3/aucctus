@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import { Icon } from '@components';
 import { snakeToTitleCase } from '@libs/utils/string';
 import { IComprehensiveEditRecommendation } from '../../../../types';
+import { ArrowRight, Check } from 'lucide-react';
 
 interface ApplyRecommendationsWarningModalProps {
   isOpen: boolean;
@@ -59,10 +59,7 @@ const ApplyRecommendationsWarningModal: React.FC<
             {/* Header */}
             <div className='mb-4'>
               <div className='mb-1 flex items-center gap-2'>
-                <Icon
-                  variant='check'
-                  className='aucctus-stroke-brand-primary h-5 w-5'
-                />
+                <Check className='aucctus-stroke-brand-primary h-5 w-5' />
                 <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
                   Apply Recommended Changes
                 </h3>
@@ -90,10 +87,7 @@ const ApplyRecommendationsWarningModal: React.FC<
                             <div className='aucctus-text-sm aucctus-text-tertiary flex-1'>
                               {rec.beforeContent}
                             </div>
-                            <Icon
-                              variant='arrowright'
-                              className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
-                            />
+                            <ArrowRight className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0' />
                             <div className='aucctus-text-sm-medium aucctus-text-primary flex-1'>
                               {rec.afterContent}
                             </div>

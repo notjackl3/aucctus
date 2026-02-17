@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react';
-import { Icon } from '@components';
 import { IPocObjective } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
+import { CheckCircle2, HelpCircle, Target } from 'lucide-react';
 
 interface IObjectivesSectionProps {
   objectives: IPocObjective[];
@@ -42,10 +42,7 @@ const ObjectiveCard: FunctionComponent<{ objective: IPocObjective }> = ({
     {/* Hypothesis */}
     <div className='aucctus-bg-primary flex flex-col gap-2 rounded-lg p-4'>
       <div className='flex items-center gap-2'>
-        <Icon
-          variant='help-circle'
-          className='aucctus-stroke-brand-primary h-4 w-4'
-        />
+        <HelpCircle className='aucctus-stroke-brand-primary h-4 w-4' />
         <span className='aucctus-text-brand-primary aucctus-text-xs-semibold uppercase tracking-wider'>
           Hypothesis to Validate
         </span>
@@ -58,10 +55,7 @@ const ObjectiveCard: FunctionComponent<{ objective: IPocObjective }> = ({
     {/* Success Criteria */}
     <div className='flex flex-col gap-2'>
       <div className='flex items-center gap-2'>
-        <Icon
-          variant='check-circle-broken'
-          className='aucctus-stroke-success-500 h-4 w-4'
-        />
+        <CheckCircle2 className='aucctus-stroke-success-500 h-4 w-4' />
         <span className='aucctus-text-secondary aucctus-text-xs-semibold uppercase tracking-wider'>
           Success Criteria
         </span>
@@ -89,10 +83,7 @@ const ObjectivesSection: FunctionComponent<IObjectivesSectionProps> = ({
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-            <Icon
-              variant='target'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <Target className='aucctus-stroke-brand-primary h-5 w-5' />
           </div>
           <div className='flex flex-col'>
             <h2 className='aucctus-text-primary aucctus-header-md-semibold'>

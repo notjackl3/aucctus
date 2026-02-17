@@ -1,8 +1,7 @@
 import React from 'react';
 import { IAssumptionV2, AssumptionCategory } from '@libs/api/types';
 import CategoryIcon from '../../../Assumptions/components/cards/category-progress-card/CategoryIcon';
-import { Icon } from '@components';
-
+import { AlertTriangle } from 'lucide-react';
 interface TestAssumptionsDisplayProps {
   mappedAssumptions: IAssumptionV2[];
 }
@@ -56,10 +55,7 @@ const RiskLevelTag: React.FC<{ risk: number }> = ({ risk }) => {
     <div
       className={`inline-flex items-center gap-1.5 rounded border p-2 ${getRiskColor()}`}
     >
-      <Icon
-        variant='alert-triangle'
-        className={`h-3.5 w-3.5 ${getStrokeColor()}`}
-      />
+      <AlertTriangle className={`h-3.5 w-3.5 ${getStrokeColor()}`} />
       <span className='text-xs font-medium'>Risk:</span>
       <span className='text-xs'>{getRiskLabel()}</span>
     </div>

@@ -1,7 +1,7 @@
-import Icon from '@components/Icon';
 import React, { useState, useCallback } from 'react';
 import { useNucleusDocumentUpload } from '../../../hooks/query/nucleus.hook';
 import { cn } from '@libs/utils/react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface DocumentUploadProps {
   reportUuid: string;
@@ -94,7 +94,7 @@ const DocumentUpload: React.FC<DocumentUploadProps> = ({ reportUuid }) => {
               </>
             ) : (
               <>
-                <Icon
+                <DynamicIcon
                   variant={isUploadSuccess ? 'check' : 'upload'}
                   className={cn('mb-2 h-6 w-6', {
                     'aucctus-stroke-brand-primary': !isUploadSuccess,

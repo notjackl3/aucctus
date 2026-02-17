@@ -1,6 +1,5 @@
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import {
-  Icon,
   ConceptReportSkeletons,
   VersionUpgradeBanner,
   toast,
@@ -26,6 +25,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useOutletContext } from 'react-router-dom';
 import { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
 import { IConceptReportContext } from '../../ConceptReport/ConceptReport';
+import { Globe, TrendingUp } from 'lucide-react';
 
 const { ExecutiveSummarySkeleton, MarketScanSkeleton, EcosystemV2Skeleton } =
   ConceptReportSkeletons;
@@ -129,10 +129,7 @@ const MarketScanV3: React.FC = () => {
       {
         label: (
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='trendup'
-              className='aucctus-stroke-brand-primary h-4 w-4'
-            />
+            <TrendingUp className='aucctus-stroke-brand-primary h-4 w-4' />
             <span>Trends & Drivers</span>
           </div>
         ),
@@ -141,10 +138,7 @@ const MarketScanV3: React.FC = () => {
       {
         label: (
           <div className='flex items-center gap-2'>
-            <Icon
-              variant='globe'
-              className='aucctus-stroke-brand-primary h-4 w-4'
-            />
+            <Globe className='aucctus-stroke-brand-primary h-4 w-4' />
             <span>Ecosystem</span>
           </div>
         ),

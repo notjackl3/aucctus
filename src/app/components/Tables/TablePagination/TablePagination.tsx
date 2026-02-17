@@ -1,7 +1,7 @@
 import { FunctionComponent, useState } from 'react';
 
-import { Icon } from '@components';
 import styles from './styles/tablePagination.module.scss';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 export interface TablePaginationProps {
   totalPages: number;
@@ -105,7 +105,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
         disabled={isPreviousPageDisabled}
         aria-label='Previous Page'
       >
-        <Icon variant='arrowleft' className={'stroke-yellow-500'} />
+        <ArrowLeft className={'stroke-yellow-500'} />
         Previous
       </button>
       <div className={styles.pageContainer}>{renderPageNumbers()}</div>
@@ -116,7 +116,7 @@ const TablePagination: FunctionComponent<TablePaginationProps> = ({
         aria-label='Next Page'
       >
         Next
-        <Icon variant='arrowright' className={'stroke-gray-light-900'} />
+        <ArrowRight className={'stroke-gray-light-900'} />
       </button>
     </div>
   );

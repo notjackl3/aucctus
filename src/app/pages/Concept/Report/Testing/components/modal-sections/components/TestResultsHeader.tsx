@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { TestResultsHeaderProps } from '../TestResults.types';
+import { Download, Trash2 } from 'lucide-react';
 
 const TestResultsHeader: React.FC<TestResultsHeaderProps> = ({
   resultsCount,
@@ -27,10 +27,7 @@ const TestResultsHeader: React.FC<TestResultsHeaderProps> = ({
             onClick={onDownloadResults}
             disabled={isDownloading}
           >
-            <Icon
-              variant='download'
-              className='aucctus-stroke-secondary h-4 w-4'
-            />
+            <Download className='aucctus-stroke-secondary h-4 w-4' />
             {isDownloading ? 'Downloading...' : 'Download PDF'}
           </button>
         )}
@@ -40,7 +37,7 @@ const TestResultsHeader: React.FC<TestResultsHeaderProps> = ({
             onClick={onDeleteAll}
             disabled={isDeletingAll}
           >
-            <Icon variant='trash' className='aucctus-stroke-white h-4 w-4' />
+            <Trash2 className='aucctus-stroke-white h-4 w-4' />
             {isDeletingAll ? 'Deleting...' : 'Delete All Results'}
           </button>
         )}

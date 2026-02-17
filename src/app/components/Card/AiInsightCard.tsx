@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
+import { Lightbulb } from 'lucide-react';
 
 interface AiInsightCardProps {
   children: React.ReactNode;
@@ -52,10 +52,7 @@ const AiInsightCard: React.FC<AiInsightCardProps> = ({
       <div className='mb-3 flex items-center'>
         <div className='flex items-center'>
           <div className={cn('mr-2 rounded-full p-1.5', styles.icon)}>
-            <Icon
-              variant='lightbulb'
-              className={cn('h-5 w-5', styles.iconStroke)}
-            />
+            <Lightbulb className={cn('h-5 w-5', styles.iconStroke)} />
           </div>
           <span className={cn('aucctus-text-sm-semibold', styles.titleText)}>
             {title}

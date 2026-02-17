@@ -9,10 +9,9 @@
  * - Add form appears inside the list (doesn't affect tab bar or layout)
  */
 
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Target, X, Zap } from 'lucide-react';
+import { Target, X as XIcon, Zap } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
 
@@ -216,7 +215,7 @@ const MotivationsBehavioursWidget: React.FC<
                           }}
                           className='btn btn-ghost btn-xs'
                         >
-                          <X className='h-3 w-3' />
+                          <XIcon className='h-3 w-3' />
                         </button>
                       </div>
                     </motion.div>
@@ -257,10 +256,7 @@ const MotivationsBehavioursWidget: React.FC<
                         onClick={() => onDelete(item.uuid)}
                         className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
                       >
-                        <Icon
-                          variant='closeX'
-                          className='h-3 w-3 text-red-500'
-                        />
+                        <XIcon className='h-3 w-3 text-red-500' />
                       </button>
                     )}
                   </motion.div>

@@ -1,10 +1,17 @@
-import { Icon } from '@components';
-
 import { IPropertyDefinition } from '@libs/api/types';
 import * as Popover from '@radix-ui/react-popover';
 import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
+import {
+  ArrowDown,
+  ArrowUp,
+  Check,
+  ChevronRight,
+  SwitchCamera,
+  Trash2,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ISortsMenuProps {
   propertyDefinitions?: IPropertyDefinition[];
@@ -19,38 +26,38 @@ interface ISortsMenuProps {
 
 // Define static columns with their metadata
 const STATIC_COLUMNS = [
-  { id: 'title', name: 'Concept', icon: 'lightbulb' as IconVariant },
+  { id: 'title', name: 'Concept', icon: 'lightbulb' as string },
   {
     id: 'priority',
     name: 'Score',
-    icon: 'trendup' as IconVariant,
+    icon: 'trendup' as string,
     sortField: 'priority__overall_priority_score',
   },
   {
     id: 'createdBy',
     name: 'Created By',
-    icon: 'user-square' as IconVariant,
+    icon: 'user-square' as string,
     sortField: 'created_by__first_name',
   },
   {
     id: 'createdAt',
     name: 'Created Date',
-    icon: 'calendar' as IconVariant,
+    icon: 'calendar' as string,
     sortField: 'created_at',
   },
   {
     id: 'lastModifiedBy',
     name: 'Last Modified By',
-    icon: 'users-edit' as IconVariant,
+    icon: 'users-edit' as string,
     sortField: 'updated_by__first_name',
   },
   {
     id: 'updatedAt',
     name: 'Last Modified Date',
-    icon: 'clock' as IconVariant,
+    icon: 'clock' as string,
     sortField: 'updated_at',
   },
-  { id: 'status', name: 'Status', icon: 'activity' as IconVariant },
+  { id: 'status', name: 'Status', icon: 'activity' as string },
 ];
 
 interface ISortConfig {
@@ -183,12 +190,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
     <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
       <Popover.Trigger asChild>
         <button className='aucctus-bg-secondary-hover flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-200'>
-          <Icon
-            variant='switch-vertical-01'
-            height={16}
-            width={16}
-            className='aucctus-stroke-secondary'
-          />
+          <SwitchCamera size={16} className='aucctus-stroke-secondary' />
           <span className='aucctus-text-sm aucctus-text-secondary'>Sorts</span>
           {sortConfigs.length > 0 && (
             <span className='aucctus-bg-brand-solid aucctus-text-xs flex h-5 min-w-[20px] items-center justify-center rounded px-1.5 text-white'>
@@ -218,10 +220,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                 <div className='aucctus-bg-primary w-[280px] select-none rounded-md shadow-lg'>
                   {/* Header with title and icon */}
                   <div className='flex items-center gap-2 px-3 py-3'>
-                    <Icon
-                      variant='switch-vertical-01'
-                      className='aucctus-stroke-secondary h-4 w-4'
-                    />
+                    <SwitchCamera className='aucctus-stroke-secondary h-4 w-4' />
                     <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
                       Sort columns
                     </span>
@@ -248,7 +247,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                         const icon =
                           item.type === 'static'
                             ? item.column.icon
-                            : (getPropertyIcon(item.definition) as IconVariant);
+                            : (getPropertyIcon(item.definition) as string);
                         const name =
                           item.type === 'static'
                             ? item.column.name
@@ -278,7 +277,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                                   e.stopPropagation();
                                 }}
                               >
-                                <Icon
+                                <DynamicIcon
                                   variant={icon}
                                   className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
                                 />
@@ -292,7 +291,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                                         {sortOrder}
                                       </span>
                                     )}
-                                    <Icon
+                                    <DynamicIcon
                                       variant={
                                         currentSortDir === 'asc'
                                           ? 'arrowup'
@@ -302,10 +301,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                                     />
                                   </>
                                 )}
-                                <Icon
-                                  variant='chevron-right'
-                                  className='aucctus-stroke-quaternary h-3.5 w-3.5 flex-shrink-0'
-                                />
+                                <ChevronRight className='aucctus-stroke-quaternary h-3.5 w-3.5 flex-shrink-0' />
                               </button>
                             </Popover.Anchor>
 
@@ -334,18 +330,12 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                                       setHoveredColumn(null);
                                     }}
                                   >
-                                    <Icon
-                                      variant='arrowup'
-                                      className='aucctus-stroke-secondary h-4 w-4'
-                                    />
+                                    <ArrowUp className='aucctus-stroke-secondary h-4 w-4' />
                                     <span className='aucctus-text-secondary'>
                                       Ascending
                                     </span>
                                     {currentSortDir === 'asc' && (
-                                      <Icon
-                                        variant='check'
-                                        className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                                      />
+                                      <Check className='aucctus-stroke-brand-primary ml-auto h-4 w-4' />
                                     )}
                                   </button>
 
@@ -358,18 +348,12 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                                       setHoveredColumn(null);
                                     }}
                                   >
-                                    <Icon
-                                      variant='arrowdown'
-                                      className='aucctus-stroke-secondary h-4 w-4'
-                                    />
+                                    <ArrowDown className='aucctus-stroke-secondary h-4 w-4' />
                                     <span className='aucctus-text-secondary'>
                                       Descending
                                     </span>
                                     {currentSortDir === 'desc' && (
-                                      <Icon
-                                        variant='check'
-                                        className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                                      />
+                                      <Check className='aucctus-stroke-brand-primary ml-auto h-4 w-4' />
                                     )}
                                   </button>
 
@@ -385,10 +369,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                                           setHoveredColumn(null);
                                         }}
                                       >
-                                        <Icon
-                                          variant='trash'
-                                          className='aucctus-stroke-error-primary h-4 w-4'
-                                        />
+                                        <Trash2 className='aucctus-stroke-error-primary h-4 w-4' />
                                         <span className='aucctus-text-error-primary'>
                                           Remove sort
                                         </span>

@@ -1,6 +1,6 @@
 import { Header } from '@components';
 import { FunctionComponent, ReactNode } from 'react';
-import Icon from '../Icon/Icon/Icon';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface DetailCardProps
   extends React.DetailedHTMLProps<
@@ -18,7 +18,7 @@ interface DetailCardProps
   headerClassName?: string;
   contentClassName?: string;
 
-  icon?: IconVariant;
+  icon?: string;
 }
 
 const iconDefaultProps = {
@@ -53,7 +53,7 @@ const DetailCard: FunctionComponent<DetailCardProps> = ({
           {/* Title */}
           <div className='flex-column flex max-w-full items-center justify-between self-stretch'>
             <span className='flex max-w-full flex-row items-center justify-center gap-2'>
-              {icon && <Icon variant={icon} {...iconDefaultProps} />}
+              {icon && <DynamicIcon variant={icon} {...iconDefaultProps} />}
               <Header.Three text={title} />
             </span>
             {headerAction}

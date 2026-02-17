@@ -5,9 +5,10 @@ import React, {
   useMemo,
   useRef,
 } from 'react';
-import { Icon, Loading } from '@components';
+import { Loading } from '@components';
 import { cn } from '@libs/utils/react';
 import { executeWithScope, validateComponent } from './scopeRegistry';
+import { AlertTriangle, Box, CheckCircle2, RefreshCw } from 'lucide-react';
 
 /**
  * Props for the DynamicComponentRenderer
@@ -318,10 +319,7 @@ export const DynamicComponentRenderer: React.FC<
         )}
       >
         <div className='aucctus-bg-error-secondary mb-6 flex h-16 w-16 items-center justify-center rounded-full'>
-          <Icon
-            variant='alert-triangle'
-            className='aucctus-stroke-error-primary h-8 w-8'
-          />
+          <AlertTriangle className='aucctus-stroke-error-primary h-8 w-8' />
         </div>
 
         <div className='text-center'>
@@ -350,7 +348,7 @@ export const DynamicComponentRenderer: React.FC<
               'focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2',
             )}
           >
-            <Icon variant='refresh' className='h-4 w-4 stroke-white' />
+            <RefreshCw className='h-4 w-4 stroke-white' />
             <span className='aucctus-text-sm-semibold'>Retry</span>
           </button>
         )}
@@ -382,20 +380,14 @@ export const DynamicComponentRenderer: React.FC<
       {process.env.NODE_ENV === 'development' && loadTime > 0 && (
         <div className='mb-2 flex items-center justify-end gap-2'>
           <div className='aucctus-bg-success-subtle flex items-center gap-1.5 rounded-full px-3 py-1'>
-            <Icon
-              variant='check-circle-broken'
-              className='aucctus-stroke-success-primary h-3.5 w-3.5'
-            />
+            <CheckCircle2 className='aucctus-stroke-success-primary h-3.5 w-3.5' />
             <span className='aucctus-text-xs aucctus-text-success-primary'>
               Loaded in {loadTime}ms
             </span>
           </div>
           {componentId && (
             <div className='aucctus-bg-secondary flex items-center gap-1.5 rounded-full px-3 py-1'>
-              <Icon
-                variant='cube'
-                className='aucctus-stroke-tertiary h-3.5 w-3.5'
-              />
+              <Box className='aucctus-stroke-tertiary h-3.5 w-3.5' />
               <span className='aucctus-text-xs aucctus-text-tertiary'>
                 {componentId}
               </span>

@@ -1,7 +1,6 @@
 import TabView from '@components/Container/TabView';
 import { TabElement } from '@components/Container/TabView/TabView';
 import {
-  Icon,
   VersionUpgradeBanner,
   toast,
   ConceptReportSkeletons,
@@ -28,6 +27,7 @@ import { useDebugMode } from '@hooks/debug-mode.hook';
 import { IConceptReportContext } from '../ConceptReport/ConceptReport';
 import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
+import { Briefcase } from 'lucide-react';
 
 const {
   ExecutiveSummarySkeleton,
@@ -118,12 +118,7 @@ const CustomerProfile: FunctionComponent = () => {
           <span>{item.segment}</span>
           {item.isPrimary && (
             <span className='aucctus-bg-brand-secondary aucctus-text-brand-tertiary flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs'>
-              <Icon
-                variant='briefcase'
-                height={14}
-                width={14}
-                className='aucctus-stroke-brand-primary'
-              />
+              <Briefcase size={14} className='aucctus-stroke-brand-primary' />
               Primary
             </span>
           )}

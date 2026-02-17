@@ -1,6 +1,6 @@
 import { FunctionComponent, useMemo, useState, useCallback } from 'react';
 import { useParams, Navigate } from 'react-router-dom';
-import { Icon, Loading, toast } from '@components';
+import { Loading, toast } from '@components';
 import { useConcept } from '@hooks/query/concepts.hook';
 import { usePocPlan } from '@hooks/query/pocPlan.hook';
 import { cn } from '@libs/utils/react';
@@ -14,6 +14,8 @@ import TimelineSection from './components/TimelineSection';
 import PocPlanHeader from './components/PocPlanHeader';
 import ExecutiveBrief from './components/ExecutiveBrief';
 import FinancialProjectionsSection from './components/FinancialProjectionsSection';
+import { AlertCircle } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // 5 focused tabs for executive clarity
 type PocTab = 'dashboard' | 'execution' | 'metrics' | 'resources' | 'risks';
@@ -21,7 +23,7 @@ type PocTab = 'dashboard' | 'execution' | 'metrics' | 'resources' | 'risks';
 interface ITabConfig {
   id: PocTab;
   label: string;
-  icon: IconVariant;
+  icon: string;
   description: string;
 }
 
@@ -106,10 +108,7 @@ const PocPlan: FunctionComponent = () => {
   if (!concept || !pocPlan) {
     return (
       <div className='flex h-full min-h-[60vh] w-full flex-col items-center justify-center gap-4'>
-        <Icon
-          variant='alert-circle'
-          className='aucctus-stroke-tertiary h-12 w-12'
-        />
+        <AlertCircle className='aucctus-stroke-tertiary h-12 w-12' />
         <p className='aucctus-text-secondary aucctus-text-lg'>
           POC Plan not found
         </p>
@@ -247,7 +246,7 @@ const PocPlan: FunctionComponent = () => {
                   : 'aucctus-text-secondary hover:aucctus-text-primary hover:aucctus-bg-tertiary',
               )}
             >
-              <Icon
+              <DynamicIcon
                 variant={tab.icon}
                 className={cn(
                   'h-4 w-4',

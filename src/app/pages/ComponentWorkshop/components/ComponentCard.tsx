@@ -8,9 +8,9 @@
  */
 
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import type { IComponentListItem } from '@libs/api/types/dynamicComponent.d';
+import { Box, Trash2 } from 'lucide-react';
 
 interface IComponentCardProps {
   /** Component metadata */
@@ -68,10 +68,7 @@ const ComponentCard: React.FC<IComponentCardProps> = ({
       <div className='flex items-start justify-between'>
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-            <Icon
-              variant='cube'
-              className='aucctus-stroke-brand-primary h-5 w-5'
-            />
+            <Box className='aucctus-stroke-brand-primary h-5 w-5' />
           </div>
           <div>
             <h3 className='aucctus-text-sm-semibold aucctus-text-primary'>
@@ -95,10 +92,7 @@ const ComponentCard: React.FC<IComponentCardProps> = ({
           )}
           aria-label={`Delete ${component.name}`}
         >
-          <Icon
-            variant='trash'
-            className='aucctus-stroke-tertiary hover:aucctus-stroke-error-primary h-4 w-4'
-          />
+          <Trash2 className='aucctus-stroke-tertiary hover:aucctus-stroke-error-primary h-4 w-4' />
         </button>
       </div>
 

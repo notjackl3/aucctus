@@ -1,8 +1,8 @@
-import { Icon } from '@components';
 import React from 'react';
 import { ITestDetails } from '../types';
 import { TestHistoryItem } from './test-history';
 import type { ITestGenerationState } from '@hooks/sockets/testing';
+import { Clock } from 'lucide-react';
 
 interface TestHistorySectionProps {
   tests: ITestDetails[];
@@ -28,12 +28,7 @@ const TestHistorySection: React.FC<TestHistorySectionProps> = ({
 
         <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border p-8 shadow-sm'>
           <div className='flex flex-col items-center justify-center py-4'>
-            <Icon
-              variant='clock'
-              height={56}
-              width={56}
-              className='aucctus-stroke-tertiary mb-4'
-            />
+            <Clock size={56} className='aucctus-stroke-tertiary mb-4' />
             <h3 className='aucctus-text-lg-semibold aucctus-text-primary mb-2'>
               No completed tests yet
             </h3>

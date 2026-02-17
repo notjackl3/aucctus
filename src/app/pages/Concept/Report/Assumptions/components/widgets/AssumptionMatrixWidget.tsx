@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Icon, ComponentTooltip } from '@components';
+import { ComponentTooltip } from '@components';
 import { cn } from '@libs/utils/react';
 import {
   IAssumptionV2,
@@ -7,6 +7,13 @@ import {
   CATEGORY_COLORS,
   AssumptionCategory,
 } from '@libs/api/types';
+import {
+  AlertCircle,
+  AlertOctagon,
+  AlertTriangle,
+  Check,
+  HelpCircle,
+} from 'lucide-react';
 
 interface AssumptionMatrixWidgetProps {
   assumptions: IAssumptionV2[];
@@ -120,34 +127,30 @@ const AssumptionMatrixWidget: React.FC<AssumptionMatrixWidgetProps> = ({
     switch (level) {
       case 'r1':
         return (
-          <Icon
-            variant='alert-octagon'
+          <AlertOctagon
             className={`h-4 w-4 ${colors?.icon || 'text-error-600'} mr-1.5`}
           />
         );
       case 'r2':
         return (
-          <Icon
-            variant='alert-circle'
+          <AlertCircle
             className={`h-4 w-4 ${colors?.icon || 'text-warning-600'} mr-1.5`}
           />
         );
       case 'r3':
         return (
-          <Icon
-            variant='alert-triangle'
+          <AlertTriangle
             className={`h-4 w-4 ${colors?.icon || 'text-orange-600'} mr-1.5`}
           />
         );
       case 'r4':
         return (
-          <Icon
-            variant='check'
+          <Check
             className={`h-4 w-4 ${colors?.icon || 'text-success-600'} mr-1.5`}
           />
         );
       default:
-        return <Icon variant='help-circle' className='mr-1.5 h-4 w-4' />;
+        return <HelpCircle className='mr-1.5 h-4 w-4' />;
     }
   };
 
@@ -269,7 +272,7 @@ const AssumptionMatrixWidget: React.FC<AssumptionMatrixWidgetProps> = ({
             ) : (
               <div className='flex h-full items-center justify-center text-gray-400'>
                 <div className='flex items-center gap-1'>
-                  <Icon variant='help-circle' className='h-3 w-3' />
+                  <HelpCircle className='h-3 w-3' />
                   <span className='text-2xs'>Select a risk level</span>
                 </div>
               </div>

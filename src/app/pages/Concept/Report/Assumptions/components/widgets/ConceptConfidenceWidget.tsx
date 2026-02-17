@@ -1,7 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { IAssumptionV2 } from '@libs/api/types';
+import { Compass, HelpCircle } from 'lucide-react';
 
 interface ConceptConfidenceWidgetProps {
   assumptions: IAssumptionV2[];
@@ -54,10 +54,7 @@ const ConceptConfidenceWidget: React.FC<ConceptConfidenceWidgetProps> = ({
           <div className='absolute inset-0 z-30 flex items-center justify-center'>
             <div className='aucctus-bg-primary-alt/50 aucctus-border-tertiary rounded-md border px-4 py-2 shadow-sm backdrop-blur-sm'>
               <div className='flex items-center gap-2'>
-                <Icon
-                  variant='compass-03'
-                  className='aucctus-stroke-secondary h-5 w-5'
-                />
+                <Compass className='aucctus-stroke-secondary h-5 w-5' />
                 <span className='aucctus-text-sm-medium aucctus-text-secondary'>
                   Coming Soon
                 </span>
@@ -87,10 +84,7 @@ const ConceptConfidenceWidget: React.FC<ConceptConfidenceWidgetProps> = ({
       <div className='mt-5 text-center'>
         <button className='aucctus-text-sm aucctus-text-secondary-hover mx-auto flex items-center justify-center'>
           <span>How Confidence is Calculated</span>
-          <Icon
-            variant='help-circle'
-            className='aucctus-stroke-secondary ml-1 h-4 w-4'
-          />
+          <HelpCircle className='aucctus-stroke-secondary ml-1 h-4 w-4' />
         </button>
       </div>
     </div>

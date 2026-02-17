@@ -6,10 +6,11 @@ import {
   getMeterValueText,
   getMeterValueTextColor,
 } from '@libs/api/types';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import RiskBadge from '../badges/RiskBadge';
 import MeterSquares from '../../components/shared/MeterSquares';
+import { ArrowRight, DollarSign, Signal } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface RiskSummaryCardProps {
   assumptions: IAssumptionV2[];
@@ -88,7 +89,7 @@ const RiskSummaryCard: React.FC<RiskSummaryCardProps> = ({
                       CATEGORY_ICONS[assumption.category].bgClass,
                     )}
                   >
-                    <Icon
+                    <DynamicIcon
                       variant={CATEGORY_ICONS[assumption.category].iconVariant}
                       className={cn(
                         'h-4 w-4',
@@ -112,10 +113,7 @@ const RiskSummaryCard: React.FC<RiskSummaryCardProps> = ({
                 <div className='aucctus-bg-secondary-subtle aucctus-border-tertiary inline-block rounded p-2'>
                   <div className='flex items-center gap-3'>
                     <div className='flex items-center'>
-                      <Icon
-                        variant='signal-02'
-                        className='aucctus-stroke-tertiary mr-1.5 h-3.5 w-3.5'
-                      />
+                      <Signal className='aucctus-stroke-tertiary mr-1.5 h-3.5 w-3.5' />
                       <span className='aucctus-text-sm-medium aucctus-text-primary'>
                         Certainty
                       </span>
@@ -141,10 +139,7 @@ const RiskSummaryCard: React.FC<RiskSummaryCardProps> = ({
                 <div className='aucctus-bg-secondary-subtle aucctus-border-tertiary inline-block rounded p-2'>
                   <div className='flex items-center gap-3'>
                     <div className='flex items-center'>
-                      <Icon
-                        variant='currency-dollar'
-                        className='aucctus-stroke-tertiary mr-1.5 h-3.5 w-3.5'
-                      />
+                      <DollarSign className='aucctus-stroke-tertiary mr-1.5 h-3.5 w-3.5' />
                       <span className='aucctus-text-sm-medium aucctus-text-primary'>
                         Importance
                       </span>
@@ -181,10 +176,7 @@ const RiskSummaryCard: React.FC<RiskSummaryCardProps> = ({
         <div className='mt-auto pt-6 text-right'>
           <button className='btn btn-primary flex items-center justify-center px-4 py-2 text-sm'>
             <span>View Recommended Tests</span>
-            <Icon
-              variant='arrowright'
-              className='aucctus-stroke-white ml-2 h-4 w-4'
-            />
+            <ArrowRight className='aucctus-stroke-white ml-2 h-4 w-4' />
           </button>
         </div>
       )}

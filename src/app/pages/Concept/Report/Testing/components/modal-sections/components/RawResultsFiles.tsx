@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
 import { formatFileSize } from '../TestResults.utils';
 import { UploadedFile } from '../TestResults.types';
 import { cn } from '@libs/utils/react';
+import { Download, File, Trash2, Upload, X } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface FileInfo {
   uuid: string;
@@ -101,10 +102,7 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
       {/* Section Header */}
       <div className='flex items-center justify-between'>
         <div className='flex items-center gap-3'>
-          <Icon
-            variant='download'
-            className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0'
-          />
+          <Download className='aucctus-stroke-brand-primary h-5 w-5 flex-shrink-0' />
           <h4 className='aucctus-text-lg-semibold aucctus-text-brand-primary'>
             Raw Results Files
           </h4>
@@ -117,7 +115,7 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
               className='btn btn-danger btn-sm flex items-center gap-2'
               title='Delete all files'
             >
-              <Icon variant='trash' className='aucctus-stroke-white h-4 w-4' />
+              <Trash2 className='aucctus-stroke-white h-4 w-4' />
               Delete All Files
             </button>
           )}
@@ -136,10 +134,7 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
                 htmlFor='file-upload'
                 className='btn btn-light btn-sm flex cursor-pointer items-center gap-2'
               >
-                <Icon
-                  variant='upload'
-                  className='aucctus-stroke-secondary h-4 w-4'
-                />
+                <Upload className='aucctus-stroke-secondary h-4 w-4' />
                 Upload results
               </label>
             </>
@@ -158,10 +153,7 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
       >
         {allFiles.length === 0 ? (
           <div className='aucctus-border-secondary aucctus-bg-secondary rounded-lg border p-6 text-center'>
-            <Icon
-              variant='file'
-              className='aucctus-stroke-tertiary mx-auto mb-3 h-8 w-8'
-            />
+            <File className='aucctus-stroke-tertiary mx-auto mb-3 h-8 w-8' />
             <p className='aucctus-text-secondary aucctus-text-sm mb-2'>
               No files uploaded yet
             </p>
@@ -178,10 +170,7 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
               {/* File Info */}
               <div className='flex items-center gap-3'>
                 <div className='aucctus-bg-secondary flex h-10 w-10 items-center justify-center rounded-lg'>
-                  <Icon
-                    variant='file'
-                    className='aucctus-stroke-brand-primary h-5 w-5'
-                  />
+                  <File className='aucctus-stroke-brand-primary h-5 w-5' />
                 </div>
                 <div>
                   <h5 className='aucctus-text-sm-semibold aucctus-text-primary'>
@@ -202,10 +191,7 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
                   title='Download file'
                   disabled={!file.fileUrl}
                 >
-                  <Icon
-                    variant='download'
-                    className='aucctus-stroke-secondary hover:aucctus-stroke-primary h-4 w-4 transition-colors'
-                  />
+                  <Download className='aucctus-stroke-secondary hover:aucctus-stroke-primary h-4 w-4 transition-colors' />
                 </button>
 
                 {/* Delete Button */}
@@ -215,10 +201,7 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
                     className='aucctus-text-secondary hover:aucctus-text-error-primary aucctus-bg-secondary-hover rounded p-2 transition-colors'
                     title='Delete file'
                   >
-                    <Icon
-                      variant='closeX'
-                      className='aucctus-stroke-secondary hover:aucctus-stroke-error-primary h-4 w-4 transition-colors'
-                    />
+                    <X className='aucctus-stroke-secondary hover:aucctus-stroke-error-primary h-4 w-4 transition-colors' />
                   </button>
                 )}
               </div>
@@ -233,7 +216,7 @@ const RawResultsFiles: React.FC<RawResultsFilesProps> = ({
               onClick={() => setIsExpanded(!isExpanded)}
               className='aucctus-text-secondary hover:aucctus-text-primary flex items-center gap-1 text-sm transition-colors'
             >
-              <Icon
+              <DynamicIcon
                 variant={isExpanded ? 'chevronup' : 'chevrondown'}
                 className='aucctus-stroke-secondary h-4 w-4'
               />

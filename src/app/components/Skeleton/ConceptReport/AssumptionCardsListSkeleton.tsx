@@ -1,7 +1,6 @@
 import React from 'react';
 import SkeletonBlock from './SkeletonBlock';
-import { Icon } from '@components';
-
+import { Plus } from 'lucide-react';
 /**
  * Skeleton for the assumption cards list only (right column content).
  * Used when switching between categories in the AssumptionsTable.
@@ -16,10 +15,7 @@ const AssumptionCardsListSkeleton: React.FC = () => {
           className='aucctus-bg-primary aspect-square cursor-not-allowed rounded-lg p-1 opacity-50'
           aria-label='Add new assumption'
         >
-          <Icon
-            variant='plus'
-            className='aucctus-stroke-brand-primary h-5 w-5'
-          />
+          <Plus className='aucctus-stroke-brand-primary h-5 w-5' />
         </button>
       </div>
 

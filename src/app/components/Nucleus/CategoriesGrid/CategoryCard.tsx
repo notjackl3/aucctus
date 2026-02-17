@@ -1,10 +1,22 @@
-import { ComponentTooltip, Icon } from '@components';
+import { ComponentTooltip } from '@components';
 import { cn } from '@libs/utils/react';
 import React from 'react';
 import StatusDropdown from '../StatusDropdown/StatusDropdown';
 import StatusTooltip from '../StatusTooltip/StatusTooltip';
 
 import { CategoryCardProps } from './types';
+import {
+  AlertTriangle,
+  Beaker,
+  CheckCircle2,
+  ChevronDown,
+  ChevronLeft,
+  ClockArrowUp,
+  Globe,
+  RefreshCw,
+  Workflow,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 const CategoryCard: React.FC<CategoryCardProps> = ({
   category,
@@ -249,7 +261,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                     colorScheme.border,
                   )}
                 >
-                  <Icon
+                  <DynamicIcon
                     variant={icon}
                     className={cn('h-5 w-5', colorScheme.stroke)}
                   />
@@ -288,10 +300,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                             hideDelay={0}
                           >
                             <div className='hover:aucctus-bg-success-secondary flex cursor-default items-center gap-1.5 rounded-md px-2 py-1 transition-colors'>
-                              <Icon
-                                variant='check-circle-broken'
-                                className='aucctus-stroke-success-primary h-4 w-4'
-                              />
+                              <CheckCircle2 className='aucctus-stroke-success-primary h-4 w-4' />
                               <span className='aucctus-text-success-primary font-medium'>
                                 {stateInfo.validated}
                               </span>
@@ -307,10 +316,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                             hideDelay={0}
                           >
                             <div className='hover:aucctus-bg-info-secondary flex cursor-default items-center gap-1.5 rounded-md px-2 py-1 transition-colors'>
-                              <Icon
-                                variant='refresh'
-                                className='aucctus-stroke-info-primary h-4 w-4'
-                              />
+                              <RefreshCw className='aucctus-stroke-info-primary h-4 w-4' />
                               <span className='aucctus-text-info-primary font-medium'>
                                 {stateInfo.newDetails}
                               </span>
@@ -326,10 +332,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                             hideDelay={0}
                           >
                             <div className='hover:aucctus-bg-warning-secondary flex cursor-default items-center gap-1.5 rounded-md px-2 py-1 transition-colors'>
-                              <Icon
-                                variant='alert-triangle'
-                                className='aucctus-stroke-warning-primary h-4 w-4'
-                              />
+                              <AlertTriangle className='aucctus-stroke-warning-primary h-4 w-4' />
                               <span className='aucctus-text-warning-primary font-medium'>
                                 {stateInfo.needsInput}
                               </span>
@@ -353,10 +356,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                             hideDelay={0}
                           >
                             <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-2 py-1 transition-colors'>
-                              <Icon
-                                variant='beaker'
-                                className='aucctus-stroke-tertiary h-4 w-4'
-                              />
+                              <Beaker className='aucctus-stroke-tertiary h-4 w-4' />
                               <span className='aucctus-text-tertiary font-medium'>
                                 {categoryMetrics.deeperQuestions}
                               </span>
@@ -372,10 +372,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                             hideDelay={0}
                           >
                             <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-2 py-1 transition-colors'>
-                              <Icon
-                                variant='globe'
-                                className='aucctus-stroke-tertiary h-4 w-4'
-                              />
+                              <Globe className='aucctus-stroke-tertiary h-4 w-4' />
                               <span className='aucctus-text-tertiary font-medium'>
                                 {categoryMetrics.uniqueSources}
                               </span>
@@ -391,10 +388,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                             hideDelay={0}
                           >
                             <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-2 py-1 transition-colors'>
-                              <Icon
-                                variant='dataflow-04'
-                                className='aucctus-stroke-tertiary h-4 w-4'
-                              />
+                              <Workflow className='aucctus-stroke-tertiary h-4 w-4' />
                               <span className='aucctus-text-tertiary font-medium'>
                                 {categoryMetrics.dataPoints}
                               </span>
@@ -410,10 +404,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                             hideDelay={0}
                           >
                             <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-2 py-1 transition-colors'>
-                              <Icon
-                                variant='clock-fast-forward'
-                                className='aucctus-stroke-tertiary h-4 w-4'
-                              />
+                              <ClockArrowUp className='aucctus-stroke-tertiary h-4 w-4' />
                               <span className='aucctus-text-tertiary font-medium'>
                                 {categoryMetrics.hoursSaved}h
                               </span>
@@ -452,10 +443,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                 </div>
 
                 {/* Chevron */}
-                <Icon
-                  variant='chevrondown'
-                  className='aucctus-stroke-tertiary h-4 w-4'
-                />
+                <ChevronDown className='aucctus-stroke-tertiary h-4 w-4' />
               </div>
             </div>
           ) : (
@@ -472,7 +460,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                         colorScheme.border,
                       )}
                     >
-                      <Icon
+                      <DynamicIcon
                         variant={icon}
                         className={cn('h-5 w-5', colorScheme.stroke)}
                       />
@@ -485,10 +473,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                   </h3>
                 </div>
 
-                <Icon
-                  variant='chevronleft'
-                  className='aucctus-stroke-tertiary h-5 w-5 rotate-180'
-                />
+                <ChevronLeft className='aucctus-stroke-tertiary h-5 w-5 rotate-180' />
               </div>
 
               {/* Goal Description - left aligned */}
@@ -518,10 +503,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                               hideDelay={0}
                             >
                               <div className='hover:aucctus-bg-success-secondary flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors'>
-                                <Icon
-                                  variant='check-circle-broken'
-                                  className='aucctus-stroke-success-primary h-4 w-4'
-                                />
+                                <CheckCircle2 className='aucctus-stroke-success-primary h-4 w-4' />
                                 <span className='aucctus-text-success-primary font-medium'>
                                   {stateInfo.validated}
                                 </span>
@@ -537,10 +519,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                               hideDelay={0}
                             >
                               <div className='hover:aucctus-bg-info-secondary flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors'>
-                                <Icon
-                                  variant='refresh'
-                                  className='aucctus-stroke-info-primary h-4 w-4'
-                                />
+                                <RefreshCw className='aucctus-stroke-info-primary h-4 w-4' />
                                 <span className='aucctus-text-info-primary font-medium'>
                                   {stateInfo.newDetails}
                                 </span>
@@ -556,10 +535,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                               hideDelay={0}
                             >
                               <div className='hover:aucctus-bg-warning-secondary flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors'>
-                                <Icon
-                                  variant='alert-triangle'
-                                  className='aucctus-stroke-warning-primary h-4 w-4'
-                                />
+                                <AlertTriangle className='aucctus-stroke-warning-primary h-4 w-4' />
                                 <span className='aucctus-text-warning-primary font-medium'>
                                   {stateInfo.needsInput}
                                 </span>
@@ -583,10 +559,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                               hideDelay={0}
                             >
                               <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors'>
-                                <Icon
-                                  variant='beaker'
-                                  className='aucctus-stroke-tertiary h-4 w-4'
-                                />
+                                <Beaker className='aucctus-stroke-tertiary h-4 w-4' />
                                 <span className='aucctus-text-tertiary font-medium'>
                                   {categoryMetrics.deeperQuestions}
                                 </span>
@@ -602,10 +575,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                               hideDelay={0}
                             >
                               <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors'>
-                                <Icon
-                                  variant='globe'
-                                  className='aucctus-stroke-tertiary h-4 w-4'
-                                />
+                                <Globe className='aucctus-stroke-tertiary h-4 w-4' />
                                 <span className='aucctus-text-tertiary font-medium'>
                                   {categoryMetrics.uniqueSources}
                                 </span>
@@ -621,10 +591,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                               hideDelay={0}
                             >
                               <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors'>
-                                <Icon
-                                  variant='dataflow-04'
-                                  className='aucctus-stroke-tertiary h-4 w-4'
-                                />
+                                <Workflow className='aucctus-stroke-tertiary h-4 w-4' />
                                 <span className='aucctus-text-tertiary font-medium'>
                                   {categoryMetrics.dataPoints}
                                 </span>
@@ -642,10 +609,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({
                               hideDelay={0}
                             >
                               <div className='hover:aucctus-bg-tertiary flex cursor-default items-center gap-1.5 rounded-md px-1.5 py-0.5 transition-colors'>
-                                <Icon
-                                  variant='clock-fast-forward'
-                                  className='aucctus-stroke-tertiary h-4 w-4'
-                                />
+                                <ClockArrowUp className='aucctus-stroke-tertiary h-4 w-4' />
                                 <span className='aucctus-text-tertiary font-medium'>
                                   {categoryMetrics.hoursSaved}h
                                 </span>

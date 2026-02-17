@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Icon } from '@components';
-
+import { Download, FileText } from 'lucide-react';
 interface SourceBadgesProps {
   sources: string[];
   onSourceClick?: (source: string) => void;
@@ -31,10 +30,7 @@ const SourceBadges: React.FC<SourceBadgesProps> = ({
               key={idx}
               className='aucctus-bg-brand-secondary aucctus-border-secondary flex h-4 w-4 items-center justify-center rounded-full border-2'
             >
-              <Icon
-                variant='file-text'
-                className='aucctus-stroke-brand-primary h-2 w-2'
-              />
+              <FileText className='aucctus-stroke-brand-primary h-2 w-2' />
             </div>
           ))}
         </div>
@@ -56,15 +52,9 @@ const SourceBadges: React.FC<SourceBadgesProps> = ({
             onSourceClick?.(source);
           }}
         >
-          <Icon
-            variant='file-text'
-            className='aucctus-stroke-secondary h-3 w-3'
-          />
+          <FileText className='aucctus-stroke-secondary h-3 w-3' />
           <span className='aucctus-text-secondary'>{source}</span>
-          <Icon
-            variant='download'
-            className='aucctus-stroke-secondary ml-0.5 h-2.5 w-2.5'
-          />
+          <Download className='aucctus-stroke-secondary ml-0.5 h-2.5 w-2.5' />
         </button>
       ))}
       <button

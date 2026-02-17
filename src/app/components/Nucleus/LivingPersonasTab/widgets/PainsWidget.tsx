@@ -10,11 +10,10 @@
  * - Scrollable list within fixed height with bottom fade gradient
  */
 
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import PriorityIndicator from '@pages/Concept/Report/CustomerProfile/Details/components/PriorityIndicator';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X } from 'lucide-react';
+import { AlertCircle, X as XIcon } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
 import GlassWidget, { WidgetSize } from './GlassWidget';
 
@@ -147,7 +146,7 @@ const PainsWidget: React.FC<PainsWidgetProps> = ({
                         }}
                         className='btn btn-ghost btn-xs'
                       >
-                        <X className='h-3 w-3' />
+                        <XIcon className='h-3 w-3' />
                       </button>
                     </div>
                   </motion.div>
@@ -172,10 +171,7 @@ const PainsWidget: React.FC<PainsWidgetProps> = ({
                         ICON_BG,
                       )}
                     >
-                      <Icon
-                        variant='alert-circle'
-                        className={cn('h-3 w-3', ICON_COLOR)}
-                      />
+                      <AlertCircle className={cn('h-3 w-3', ICON_COLOR)} />
                     </div>
                     <p className='aucctus-text-sm aucctus-text-primary flex-1'>
                       {item.text}
@@ -186,10 +182,7 @@ const PainsWidget: React.FC<PainsWidgetProps> = ({
                         onClick={() => onDelete(item.uuid)}
                         className='flex h-5 w-5 shrink-0 items-center justify-center rounded opacity-0 transition-opacity hover:bg-red-100 group-hover:opacity-100 dark:hover:bg-red-900/30'
                       >
-                        <Icon
-                          variant='closeX'
-                          className='h-3 w-3 text-red-500'
-                        />
+                        <XIcon className='h-3 w-3 text-red-500' />
                       </button>
                     )}
                   </motion.div>

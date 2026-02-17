@@ -3,7 +3,6 @@
  */
 
 import images from '@assets/img';
-import { Icon } from '@components';
 import {
   useConceptPriorityDetail,
   useUpdateQuestionScore,
@@ -15,6 +14,16 @@ import { AppPath } from '@routes/routes';
 import React, { useCallback, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useNavigate } from 'react-router-dom';
+import {
+  AlertTriangle,
+  BarChart3,
+  ChevronDown,
+  Lightbulb,
+  Settings,
+  ThumbsUp,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ScoreBreakdownSheetProps {
   isOpen: boolean;
@@ -164,7 +173,7 @@ const ScoringCategorySection: React.FC<{
         <div className='flex items-center justify-between p-5'>
           <div className='flex flex-1 items-center gap-3 text-left'>
             <div className='aucctus-bg-tertiary rounded-md p-2'>
-              <Icon
+              <DynamicIcon
                 variant={mapIconVariant(category.categoryIcon) as any}
                 className='aucctus-stroke-secondary h-4 w-4'
               />
@@ -188,8 +197,7 @@ const ScoringCategorySection: React.FC<{
                 out of {category.maxScore}
               </div>
             </div>
-            <Icon
-              variant='chevrondown'
+            <ChevronDown
               className={cn(
                 'aucctus-stroke-tertiary h-5 w-5 transition-transform duration-200',
                 { 'rotate-180': isExpanded },
@@ -273,10 +281,7 @@ const ScoringCategorySection: React.FC<{
  */
 const EmptyScoringState: React.FC = () => (
   <div className='aucctus-bg-secondary aucctus-border-secondary rounded-xl border p-8 text-center'>
-    <Icon
-      variant='barchart'
-      className='aucctus-stroke-tertiary mx-auto mb-3 h-10 w-10'
-    />
+    <BarChart3 className='aucctus-stroke-tertiary mx-auto mb-3 h-10 w-10' />
     <h4 className='aucctus-text-md-semibold aucctus-text-primary mb-2'>
       No Scoring Data Yet
     </h4>
@@ -442,12 +447,7 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
                     backgroundImage: `url(${images.aiExplorationsBackground})`,
                   }}
                 >
-                  <Icon
-                    variant='lightbulb'
-                    height={48}
-                    width={48}
-                    className='stroke-white/70'
-                  />
+                  <Lightbulb size={48} className='stroke-white/70' />
                 </div>
               )}
               {/* Close button overlaid on image */}
@@ -461,8 +461,7 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
                 )}
                 aria-label='Close'
               >
-                <Icon
-                  variant='closeX'
+                <X
                   className={cn(
                     'h-4 w-4',
                     imageUrl ? 'stroke-white' : 'aucctus-stroke-primary',
@@ -507,8 +506,7 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
                         : 'aucctus-text-tertiary',
                     )}
                   >
-                    <Icon
-                      variant='thumbs-up'
+                    <ThumbsUp
                       className={cn('h-3.5 w-3.5', {
                         'aucctus-stroke-success-primary':
                           activeTab === 'believe',
@@ -526,8 +524,7 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
                         : 'aucctus-text-tertiary',
                     )}
                   >
-                    <Icon
-                      variant='alert-triangle'
+                    <AlertTriangle
                       className={cn('h-3.5 w-3.5', {
                         'aucctus-stroke-warning-primary':
                           activeTab === 'challenge',
@@ -592,10 +589,7 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
                       title='Configure criteria'
                       onClick={handleConfigureCriteria}
                     >
-                      <Icon
-                        variant='gear'
-                        className='aucctus-stroke-tertiary h-4 w-4'
-                      />
+                      <Settings className='aucctus-stroke-tertiary h-4 w-4' />
                     </button>
                   </div>
                   <div className='aucctus-text-sm-semibold aucctus-text-tertiary'>

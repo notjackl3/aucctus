@@ -1,7 +1,7 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { ITestLearningData } from '@libs/api/types';
+import { ArrowUp, Lightbulb, MessageCircle } from 'lucide-react';
 
 interface TestResultLearningsProps {
   learnings: ITestLearningData[];
@@ -29,10 +29,7 @@ const TestResultLearnings: React.FC<TestResultLearningsProps> = ({
     >
       {/* Header */}
       <div className='flex items-center gap-2'>
-        <Icon
-          variant='lightbulb'
-          className='aucctus-stroke-success-primary h-5 w-5'
-        />
+        <Lightbulb className='aucctus-stroke-success-primary h-5 w-5' />
         <h3 className='aucctus-text-lg-semibold aucctus-text-success-primary'>
           AI-Generated Insights
         </h3>
@@ -85,10 +82,7 @@ const TestResultLearnings: React.FC<TestResultLearningsProps> = ({
                   {/* Learning Content */}
                   <div>
                     <h5 className='aucctus-text-sm-semibold aucctus-text-brand-primary mb-2 flex items-center gap-2'>
-                      <Icon
-                        variant='message-circle'
-                        className='aucctus-stroke-brand-primary h-4 w-4'
-                      />
+                      <MessageCircle className='aucctus-stroke-brand-primary h-4 w-4' />
                       Learning
                     </h5>
                     <p className='aucctus-text-sm-regular aucctus-text-secondary'>
@@ -99,10 +93,7 @@ const TestResultLearnings: React.FC<TestResultLearningsProps> = ({
                   {/* Impact */}
                   <div>
                     <h5 className='aucctus-text-sm-semibold aucctus-text-warning-primary mb-2 flex items-center gap-2'>
-                      <Icon
-                        variant='arrowup'
-                        className='aucctus-stroke-warning-primary h-4 w-4'
-                      />
+                      <ArrowUp className='aucctus-stroke-warning-primary h-4 w-4' />
                       Impact
                     </h5>
                     <p className='aucctus-text-sm-regular aucctus-text-secondary'>

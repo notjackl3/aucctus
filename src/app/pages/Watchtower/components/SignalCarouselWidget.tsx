@@ -1,4 +1,3 @@
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
@@ -6,6 +5,20 @@ import { useNavigate } from 'react-router-dom';
 import { AppPath } from '@routes/routes';
 import type { Signal } from '../types';
 import { signalCategoryConfig, signalTypeConfig } from '../types';
+import {
+  AlertCircle,
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  Clock,
+  Expand,
+  ExternalLink,
+  Lightbulb,
+  Star,
+  TrendingUp,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 // Source type colors for avatars
 const sourceTypeColors: Record<string, string> = {
@@ -181,12 +194,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                   (impact) => impact.isMaterial,
                 ) && (
                   <div className='flex items-center gap-1 rounded-full bg-amber-500/20 px-1.5 py-0.5'>
-                    <Icon
-                      variant='lightbulb'
-                      height={10}
-                      width={10}
-                      className='stroke-amber-400'
-                    />
+                    <Lightbulb size={10} className='stroke-amber-400' />
                     <span className='text-[9px] text-amber-300'>
                       {
                         currentSignal.conceptImpacts.filter(
@@ -217,24 +225,14 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       : 'Pin signal'
                   }
                 >
-                  <Icon
-                    variant='star-01'
-                    height={12}
-                    width={12}
-                    className='fill-current stroke-current'
-                  />
+                  <Star size={12} className='fill-current stroke-current' />
                 </button>
               )}
               <button
                 className='flex h-6 items-center gap-1 rounded bg-white/10 px-2 text-[10px] text-white/80 hover:bg-white/20 hover:text-white'
                 onClick={handleExpand}
               >
-                <Icon
-                  variant='expand-06'
-                  height={12}
-                  width={12}
-                  className='stroke-current'
-                />
+                <Expand size={12} className='stroke-current' />
                 Expand
               </button>
             </div>
@@ -257,7 +255,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                         'border-slate-400/30 bg-slate-500/20 text-slate-300',
                     )}
                   >
-                    <Icon
+                    <DynamicIcon
                       variant={
                         currentSignal.type === 'threat'
                           ? 'alert-triangle'
@@ -272,7 +270,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                     {signalTypeConfig[currentSignal.type].label}
                   </div>
                   <div className='flex items-center gap-1 rounded border border-white/20 bg-white/15 px-1.5 py-0.5 text-[10px] text-white/80'>
-                    <Icon
+                    <DynamicIcon
                       variant={
                         signalCategoryConfig[currentSignal.category]
                           .iconVariant as any
@@ -285,12 +283,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                   </div>
                 </div>
                 <div className='flex items-center gap-1 text-[10px] text-white/50'>
-                  <Icon
-                    variant='clock'
-                    height={10}
-                    width={10}
-                    className='stroke-current'
-                  />
+                  <Clock size={10} className='stroke-current' />
                   {formatRelativeDate(currentSignal.dateAdded)}
                 </div>
               </div>
@@ -364,29 +357,19 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                 className='flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white/80 transition-colors hover:bg-white/25 hover:text-white'
                 onClick={goPrev}
               >
-                <Icon
-                  variant='chevronleft'
-                  height={20}
-                  width={20}
-                  className='stroke-current'
-                />
+                <ChevronLeft size={20} className='stroke-current' />
               </button>
               <button
                 className='flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white/80 transition-colors hover:bg-white/25 hover:text-white'
                 onClick={goNext}
               >
-                <Icon
-                  variant='chevronright'
-                  height={20}
-                  width={20}
-                  className='stroke-current'
-                />
+                <ChevronRight size={20} className='stroke-current' />
               </button>
               <button
                 className='flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white/80 transition-colors hover:bg-white/25 hover:text-white'
                 onClick={() => setIsPlaying(!isPlaying)}
               >
-                <Icon
+                <DynamicIcon
                   variant={isPlaying ? 'clock-stopwatch' : 'play'}
                   height={16}
                   width={16}
@@ -424,23 +407,13 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                     className='flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white'
                     onClick={goPrev}
                   >
-                    <Icon
-                      variant='chevronleft'
-                      height={16}
-                      width={16}
-                      className='stroke-current'
-                    />
+                    <ChevronLeft size={16} className='stroke-current' />
                   </button>
                   <button
                     className='flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white'
                     onClick={goNext}
                   >
-                    <Icon
-                      variant='chevronright'
-                      height={16}
-                      width={16}
-                      className='stroke-current'
-                    />
+                    <ChevronRight size={16} className='stroke-current' />
                   </button>
                   {currentSignal && onPinSignal && (
                     <button
@@ -457,24 +430,14 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                           : 'Pin signal'
                       }
                     >
-                      <Icon
-                        variant='star-01'
-                        height={16}
-                        width={16}
-                        className='fill-current stroke-current'
-                      />
+                      <Star size={16} className='fill-current stroke-current' />
                     </button>
                   )}
                   <button
                     className='flex h-7 w-7 items-center justify-center rounded bg-white/10 text-white/70 transition-colors hover:bg-white/20 hover:text-white'
                     onClick={() => setIsExpanded(false)}
                   >
-                    <Icon
-                      variant='closeX'
-                      height={16}
-                      width={16}
-                      className='stroke-current'
-                    />
+                    <X size={16} className='stroke-current' />
                   </button>
                 </div>
               </div>
@@ -496,7 +459,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                             'border-white/20 bg-white/10 text-white/70',
                         )}
                       >
-                        <Icon
+                        <DynamicIcon
                           variant={
                             currentSignal.type === 'threat'
                               ? 'alert-triangle'
@@ -511,7 +474,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                         {signalTypeConfig[currentSignal.type].label}
                       </div>
                       <div className='flex items-center gap-1.5 rounded border border-white/15 bg-white/10 px-2 py-1 text-xs text-white/60'>
-                        <Icon
+                        <DynamicIcon
                           variant={
                             signalCategoryConfig[currentSignal.category]
                               .iconVariant as any
@@ -563,12 +526,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                     {/* Meta row */}
                     <div className='flex items-center gap-3 text-[11px] text-white/50'>
                       <div className='flex items-center gap-1.5'>
-                        <Icon
-                          variant='clock'
-                          height={12}
-                          width={12}
-                          className='stroke-current'
-                        />
+                        <Clock size={12} className='stroke-current' />
                         <span className='text-white/70'>
                           {formatRelativeDate(currentSignal.dateAdded)}
                         </span>
@@ -588,10 +546,8 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       )}
                     >
                       <div className='mb-2 flex items-center gap-1.5'>
-                        <Icon
-                          variant='lightbulb'
-                          height={14}
-                          width={14}
+                        <Lightbulb
+                          size={14}
                           className={cn(
                             'stroke-current',
                             currentSignal.type === 'threat' && 'text-red-400',
@@ -614,12 +570,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       {/* What Changed */}
                       <div className='space-y-1.5'>
                         <div className='flex items-center gap-1.5'>
-                          <Icon
-                            variant='trendup'
-                            height={12}
-                            width={12}
-                            className='stroke-white/40'
-                          />
+                          <TrendingUp size={12} className='stroke-white/40' />
                           <span className='text-[10px] font-semibold uppercase tracking-wider text-white/40'>
                             What Changed
                           </span>
@@ -632,12 +583,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       {/* Why It Matters */}
                       <div className='space-y-1.5'>
                         <div className='flex items-center gap-1.5'>
-                          <Icon
-                            variant='alert-circle'
-                            height={12}
-                            width={12}
-                            className='stroke-white/40'
-                          />
+                          <AlertCircle size={12} className='stroke-white/40' />
                           <span className='text-[10px] font-semibold uppercase tracking-wider text-white/40'>
                             Why It Matters
                           </span>
@@ -650,12 +596,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       {/* Likely Impact */}
                       <div className='space-y-1.5'>
                         <div className='flex items-center gap-1.5'>
-                          <Icon
-                            variant='trending-up'
-                            height={12}
-                            width={12}
-                            className='stroke-white/40'
-                          />
+                          <TrendingUp size={12} className='stroke-white/40' />
                           <span className='text-[10px] font-semibold uppercase tracking-wider text-white/40'>
                             Likely Impact
                           </span>
@@ -680,10 +621,8 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       return (
                         <div className='space-y-3 border-t border-white/10 pt-4'>
                           <div className='flex items-center gap-1.5'>
-                            <Icon
-                              variant='lightbulb'
-                              height={14}
-                              width={14}
+                            <Lightbulb
+                              size={14}
                               className='stroke-amber-400/70'
                             />
                             <span className='text-xs font-semibold uppercase tracking-wider text-white/60'>
@@ -724,10 +663,8 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                                     </div>
 
                                     <div className='flex items-start gap-1.5'>
-                                      <Icon
-                                        variant='alert-circle'
-                                        height={12}
-                                        width={12}
+                                      <AlertCircle
+                                        size={12}
                                         className={cn(
                                           'mt-0.5 flex-shrink-0',
                                           impact.impactType === 'acceleration'
@@ -752,10 +689,8 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                                         }
                                         className='flex flex-1 items-center justify-center gap-1.5 rounded-md border border-white/20 bg-white/10 px-2.5 py-1.5 text-xs font-medium text-white/80 transition-colors hover:bg-white/20'
                                       >
-                                        <Icon
-                                          variant='link-external'
-                                          height={12}
-                                          width={12}
+                                        <ExternalLink
+                                          size={12}
                                           className='stroke-current'
                                         />
                                         View Concept
@@ -768,10 +703,8 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                           ) : noMaterialImpact ? (
                             <div className='rounded-lg border border-green-500/20 bg-green-500/10 p-3'>
                               <p className='text-xs text-green-300/80'>
-                                <Icon
-                                  variant='check'
-                                  height={12}
-                                  width={12}
+                                <Check
+                                  size={12}
                                   className='mr-1.5 inline stroke-current'
                                 />
                                 No material impact on active or near-term

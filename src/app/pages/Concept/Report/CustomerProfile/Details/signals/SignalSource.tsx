@@ -1,5 +1,5 @@
-import { Icon } from '@components';
 import React, { useCallback } from 'react';
+import { ExternalLink, File } from 'lucide-react';
 
 interface SignalSourceProps {
   source: {
@@ -21,10 +21,7 @@ export const SignalSource: React.FC<SignalSourceProps> = ({ source }) => {
       onClick={handleSourceClick}
     >
       <span>
-        <Icon
-          variant='file'
-          className='aucctus-stroke-tertiary group-hover:aucctus-stroke-brand-primary h-4 w-4 transition-colors duration-300'
-        />
+        <File className='aucctus-stroke-tertiary group-hover:aucctus-stroke-brand-primary h-4 w-4 transition-colors duration-300' />
       </span>
       <span
         title={source.title}
@@ -34,10 +31,7 @@ export const SignalSource: React.FC<SignalSourceProps> = ({ source }) => {
       </span>
       <span className='flex-1' />
       <span className='aucctus-bg-secondary-hover flex items-center justify-center rounded-lg p-1'>
-        <Icon
-          variant='link-external'
-          className='aucctus-stroke-tertiary group-hover:aucctus-stroke-brand-primary h-4 w-4 transition-colors duration-300'
-        />
+        <ExternalLink className='aucctus-stroke-tertiary group-hover:aucctus-stroke-brand-primary h-4 w-4 transition-colors duration-300' />
       </span>
     </div>
   );

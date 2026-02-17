@@ -1,10 +1,11 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { ExpandCollapse } from '@hooks/animation/animation.hook';
 import { TestResultCardProps } from '../TestResults.types';
 import SyntheticResultView from './SyntheticResultView';
 import RegularResultView from './RegularResultView';
+import { Eye, Trash2 } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface TestResultCardPropsExtended extends TestResultCardProps {
   isExpanded: boolean;
@@ -70,7 +71,7 @@ const TestResultCard: React.FC<TestResultCardPropsExtended> = ({
       <div className='aucctus-border-secondary border-b px-4 py-3'>
         <div className='flex items-center gap-3'>
           <div className='aucctus-bg-brand-secondary flex h-8 w-8 items-center justify-center rounded-full'>
-            <Icon
+            <DynamicIcon
               variant={result.isSynthetic ? 'ai-conclusion' : 'file-2'}
               className='aucctus-stroke-brand-primary h-4 w-4'
             />
@@ -92,10 +93,7 @@ const TestResultCard: React.FC<TestResultCardPropsExtended> = ({
                   }}
                   className='aucctus-text-secondary hover:aucctus-text-primary aucctus-bg-secondary-hover flex items-center gap-1 rounded px-2 py-1 text-sm transition-colors'
                 >
-                  <Icon
-                    variant='eye'
-                    className='aucctus-stroke-secondary h-4 w-4'
-                  />
+                  <Eye className='aucctus-stroke-secondary h-4 w-4' />
                   {viewMode === 'raw'
                     ? 'View Structured'
                     : 'View Raw Interview'}
@@ -111,10 +109,7 @@ const TestResultCard: React.FC<TestResultCardPropsExtended> = ({
                 className='aucctus-text-secondary hover:aucctus-text-error-primary aucctus-bg-secondary-hover rounded p-1 transition-colors'
                 title='Delete file'
               >
-                <Icon
-                  variant='trash'
-                  className='aucctus-stroke-secondary hover:aucctus-stroke-error-primary h-4 w-4 transition-colors'
-                />
+                <Trash2 className='aucctus-stroke-secondary hover:aucctus-stroke-error-primary h-4 w-4 transition-colors' />
               </button>
             )}
           </div>

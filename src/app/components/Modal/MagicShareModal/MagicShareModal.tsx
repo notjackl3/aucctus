@@ -1,10 +1,21 @@
-import { Icon } from '@components';
 import { useMagicShareModal } from '@components/Modal/MagicShareModal/hooks/useMagicShareModal';
 import { ConceptShareFormat } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import React, { useCallback } from 'react';
 import magicShareBg from '../../../assets/magic-share-background.png';
 import { useModal } from '../../../context/ModalContextProvider';
+import {
+  Check,
+  ChevronLeft,
+  ChevronRight,
+  File,
+  Loader2,
+  PlaySquare,
+  PresentationIcon,
+  RefreshCw,
+  X,
+} from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface MagicShareModalProps {
   conceptUuid: string;
@@ -43,7 +54,7 @@ const PRESET_OPTIONS: PresetOption[] = [
 const FORMAT_OPTIONS: Array<{
   value: ShareFormat;
   label: string;
-  icon: IconVariant;
+  icon: string;
   enabled: boolean;
 }> = [
   { value: 'pdf', label: 'PDF', icon: 'file-2', enabled: true },
@@ -240,10 +251,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
       {isLoading && (
         <div className='absolute inset-0 z-[100] flex items-center justify-center bg-black/20 backdrop-blur-sm'>
           <div className='flex flex-col items-center gap-3'>
-            <Icon
-              variant='loading-02'
-              className='h-8 w-8 animate-spin stroke-white'
-            />
+            <Loader2 className='h-8 w-8 animate-spin stroke-white' />
             <span className='aucctus-text-sm-medium text-white'>
               Loading...
             </span>
@@ -279,10 +287,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
             className='aucctus-border-secondary group absolute bottom-4 left-4 z-50 flex h-8 items-center gap-1.5 rounded-full border border-opacity-25 px-3 transition-colors hover:bg-white/20'
             aria-label='Restart'
           >
-            <Icon
-              variant='refresh'
-              className='h-3.5 w-3.5 stroke-white/70 group-hover:stroke-white'
-            />
+            <RefreshCw className='h-3.5 w-3.5 stroke-white/70 group-hover:stroke-white' />
             <span className='text-sm font-medium text-white/70 group-hover:text-white'>
               Restart
             </span>
@@ -295,10 +300,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
           className='group absolute right-4 top-4 z-50 flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/20'
           aria-label='Close'
         >
-          <Icon
-            variant='closeX'
-            className='h-4 w-4 stroke-white/70 group-hover:stroke-white'
-          />
+          <X className='h-4 w-4 stroke-white/70 group-hover:stroke-white' />
         </button>
 
         {/* Floating Cards */}
@@ -315,10 +317,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                 <div className='h-2 rounded bg-white/10'></div>
               </div>
               <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
-                <Icon
-                  variant='file-2'
-                  className='h-3.5 w-3.5 fill-transparent stroke-slate-200'
-                />
+                <File className='h-3.5 w-3.5 fill-transparent stroke-slate-200' />
                 <span className='text-[10px] font-medium text-slate-200'>
                   PDF
                 </span>
@@ -347,10 +346,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                 <div className='via-white/8 pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-white/15 via-30% to-transparent'></div>
               </div>
               <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
-                <Icon
-                  variant='presentation-chart'
-                  className='h-3.5 w-3.5 stroke-orange-200'
-                />
+                <PresentationIcon className='h-3.5 w-3.5 stroke-orange-200' />
                 <span className='text-[10px] font-medium text-orange-200'>
                   PPT
                 </span>
@@ -364,18 +360,12 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
               <div className='flex flex-1 items-center justify-center'>
                 <div className='relative flex h-12 w-20 items-center justify-center rounded bg-gradient-to-br from-pink-600/30 to-rose-600/30'>
                   <div className='flex h-8 w-8 items-center justify-center rounded-full bg-white/90'>
-                    <Icon
-                      variant='play-square'
-                      className='ml-0.5 h-4 w-4 fill-pink-600 text-pink-600'
-                    />
+                    <PlaySquare className='ml-0.5 h-4 w-4 fill-pink-600 text-pink-600' />
                   </div>
                 </div>
               </div>
               <div className='mt-auto flex items-center justify-center gap-1 pt-1.5'>
-                <Icon
-                  variant='play-square'
-                  className='h-3.5 w-3.5 stroke-rose-200'
-                />
+                <PlaySquare className='h-3.5 w-3.5 stroke-rose-200' />
                 <span className='text-[10px] font-medium text-rose-200'>
                   MOV
                 </span>
@@ -398,7 +388,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                   : 'bg-gradient-to-br from-pink-100 to-orange-100',
               )}
             >
-              <Icon
+              <DynamicIcon
                 variant={
                   hasError ? 'alert-circle' : getFormatIcon(actualFormat)
                 }
@@ -480,8 +470,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                   {/* Checkmark at end when complete */}
                   {isComplete && (
                     <div className='absolute -right-1 top-1/2 flex h-5 w-5 -translate-y-1/2 transform items-center justify-center rounded-full border-[3px] border-white bg-green-600'>
-                      <Icon
-                        variant='check'
+                      <Check
                         className='aucctus-stroke-white h-3 w-3'
                         strokeWidth={3}
                       />
@@ -598,10 +587,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                     className='aucctus-bg-primary-hover flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:opacity-50'
                     aria-label='Previous suggestions'
                   >
-                    <Icon
-                      variant='chevronleft'
-                      className='aucctus-stroke-secondary h-3.5 w-3.5'
-                    />
+                    <ChevronLeft className='aucctus-stroke-secondary h-3.5 w-3.5' />
                   </button>
 
                   <button
@@ -610,10 +596,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                     className='aucctus-bg-primary-hover flex h-7 w-7 items-center justify-center rounded-full transition-colors disabled:opacity-50'
                     aria-label='Next suggestions'
                   >
-                    <Icon
-                      variant='chevronright'
-                      className='aucctus-stroke-secondary h-3.5 w-3.5'
-                    />
+                    <ChevronRight className='aucctus-stroke-secondary h-3.5 w-3.5' />
                   </button>
                 </div>
               </div>
@@ -637,7 +620,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
                       : option.enabled && 'aucctus-bg-primary-hover',
                   )}
                 >
-                  <Icon
+                  <DynamicIcon
                     variant={option.icon}
                     className={cn(
                       'h-4 w-4',
@@ -678,7 +661,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
             >
               {isSubmittingGenerate ? (
                 <div className='flex items-center justify-center gap-2'>
-                  <Icon variant='loading-02' className='h-5 w-5 animate-spin' />
+                  <Loader2 className='h-5 w-5 animate-spin' />
                   <span>Generating...</span>
                 </div>
               ) : (

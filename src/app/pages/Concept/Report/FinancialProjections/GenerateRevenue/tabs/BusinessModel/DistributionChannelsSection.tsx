@@ -1,7 +1,6 @@
 import React from 'react';
 import { IDistributionChannelV2 } from '@libs/api/types/concept/financialProjectionV2';
-import Icon from '@components/Icon';
-
+import { Workflow } from 'lucide-react';
 interface DistributionChannelsSectionProps {
   distributionChannels?: IDistributionChannelV2[];
 }
@@ -30,10 +29,7 @@ const DistributionChannelsSection: React.FC<
           Channels
         </h3>
         <span className='flex flex-row items-center gap-1'>
-          <Icon
-            variant='dataflow-04'
-            className='aucctus-stroke-brand-secondary mr-1 h-5 w-5 flex-shrink-0'
-          />
+          <Workflow className='aucctus-stroke-brand-secondary mr-1 h-5 w-5 flex-shrink-0' />
           <h3 className='aucctus-text-lg-bold aucctus-text-primary'>
             Distribution Channels
           </h3>

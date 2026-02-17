@@ -1,9 +1,10 @@
 import React from 'react';
-import { Icon } from '@components';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
 import type { ICompetitor } from '@libs/api/types/competitorAssessment';
 import ConfidenceRing from './ConfidenceRing';
+import { Building, ChevronRight } from 'lucide-react';
+import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface CompetitorProfileCardProps {
   competitor: ICompetitor;
@@ -70,12 +71,7 @@ const CompetitorProfileCard: React.FC<CompetitorProfileCardProps> = ({
               />
             ) : (
               <div className='aucctus-bg-primary flex h-11 w-11 items-center justify-center rounded-xl'>
-                <Icon
-                  variant='building'
-                  height={20}
-                  width={20}
-                  className='aucctus-stroke-tertiary'
-                />
+                <Building size={20} className='aucctus-stroke-tertiary' />
               </div>
             )}
             <div>
@@ -130,7 +126,7 @@ const CompetitorProfileCard: React.FC<CompetitorProfileCardProps> = ({
                   : 'bg-blue-500/10 text-blue-400',
               )}
             >
-              <Icon
+              <DynamicIcon
                 variant={
                   competitor.source === 'ai_suggested' ? 'sparkles' : 'user'
                 }
@@ -149,10 +145,8 @@ const CompetitorProfileCard: React.FC<CompetitorProfileCardProps> = ({
             )}
           </div>
 
-          <Icon
-            variant='chevron-right'
-            height={14}
-            width={14}
+          <ChevronRight
+            size={14}
             className='aucctus-stroke-tertiary transition-transform group-hover:translate-x-0.5'
           />
         </div>

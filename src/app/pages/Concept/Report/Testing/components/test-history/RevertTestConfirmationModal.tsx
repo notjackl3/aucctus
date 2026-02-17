@@ -1,7 +1,6 @@
 import React from 'react';
 import { createPortal } from 'react-dom';
-import { Icon } from '@components';
-
+import { AlertCircle } from 'lucide-react';
 interface RevertTestConfirmationModalProps {
   isOpen: boolean;
   onConfirm: () => void;
@@ -37,10 +36,7 @@ const RevertTestConfirmationModal: React.FC<
           </div>
           <div className='liquid-glass-modal-surface p-6'>
             <div className='mb-4 flex items-center gap-3'>
-              <Icon
-                variant='alert-circle'
-                className='aucctus-stroke-warning-primary h-6 w-6'
-              />
+              <AlertCircle className='aucctus-stroke-warning-primary h-6 w-6' />
               <h3 className='aucctus-text-lg-semibold aucctus-text-primary'>
                 Revert Test from History?
               </h3>
