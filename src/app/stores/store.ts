@@ -58,6 +58,10 @@ import overseerSlice, {
   IOverseerState,
   initialOverseerState,
 } from './overseer/store';
+import personaConversationsSlice, {
+  IPersonaConversationState,
+  initialPersonaConversationState,
+} from './persona-conversations/store';
 
 export interface IAppStore {
   // global: IGlobalState;
@@ -75,6 +79,7 @@ export interface IAppStore {
   queryInvalidation: IQueryInvalidationState;
   syntheticTesting: ISyntheticTestingState;
   overseer: IOverseerState;
+  personaConversations: IPersonaConversationState;
 }
 
 export interface IStoreApi<S> {
@@ -102,6 +107,7 @@ const useStore = create<IAppStore>()(
         queryInvalidation: queryInvalidationSlice,
         syntheticTesting: syntheticTestingSlice,
         overseer: overseerSlice,
+        personaConversations: personaConversationsSlice,
       }),
     ),
     {
@@ -194,6 +200,8 @@ const getInitialState = (): IAppStore => {
     syntheticTesting:
       initialSyntheticTestingState as unknown as ISyntheticTestingState,
     overseer: initialOverseerState as unknown as IOverseerState,
+    personaConversations:
+      initialPersonaConversationState as unknown as IPersonaConversationState,
   }; // Actions will be preserved automatically by Zustand's setState()
 };
 

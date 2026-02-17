@@ -1,14 +1,18 @@
-import React from 'react';
 import { Icon } from '@components';
+import React from 'react';
 
 /**
  * Props for PriorityIndicator component.
  * @param textColorClass Tailwind or Aucctus class for the text color
  * @param lineColorClass Tailwind class for the vertical line color
+ * @param highLabel Label for the top of the scale (default: "High Priority")
+ * @param lowLabel Label for the bottom of the scale (default: "Low Priority")
  */
 interface PriorityIndicatorProps {
   textColorClass?: string;
   lineColorClass?: string;
+  highLabel?: string;
+  lowLabel?: string;
 }
 
 /**
@@ -18,8 +22,10 @@ interface PriorityIndicatorProps {
 const PriorityIndicator: React.FC<PriorityIndicatorProps> = ({
   textColorClass = 'aucctus-text-brand-primary',
   lineColorClass = 'bg-gradient-to-b from-blue-500/80 to-blue-500/20',
+  highLabel = 'High Priority',
+  lowLabel = 'Low Priority',
 }) => (
-  <div className='mr-2 mt-1 flex w-8 flex-shrink-0 flex-col items-center'>
+  <div className='mb-4 mr-2 mt-1 flex w-8 flex-shrink-0 flex-col items-center'>
     <div className='flex flex-col items-center'>
       <span
         className={`${textColorClass} aucctus-text-xs-semibold`}
@@ -28,7 +34,7 @@ const PriorityIndicator: React.FC<PriorityIndicatorProps> = ({
           transform: 'rotate(180deg)',
         }}
       >
-        High Priority
+        {highLabel}
       </span>
       <div className='h-3'></div>
       <Icon
@@ -54,7 +60,7 @@ const PriorityIndicator: React.FC<PriorityIndicatorProps> = ({
           transform: 'rotate(180deg)',
         }}
       >
-        Low Priority
+        {lowLabel}
       </span>
     </div>
   </div>

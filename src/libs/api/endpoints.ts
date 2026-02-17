@@ -1031,6 +1031,206 @@ export class Endpoints {
   }
 
   // ============================================
+  // Living Personas Endpoints
+  // ============================================
+  static personas = '/api/v1/personas/';
+
+  static persona(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}`;
+  }
+
+  static personaTags(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/tags`;
+  }
+
+  static personaTag(personaUuid: string, tagUuid: string) {
+    return `/api/v1/personas/${personaUuid}/tags/${tagUuid}`;
+  }
+
+  static personaDemographics(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/demographics`;
+  }
+
+  // Persona nested content endpoints
+  static personaJobs(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/jobs`;
+  }
+
+  static personaJob(personaUuid: string, jobUuid: string) {
+    return `/api/v1/personas/${personaUuid}/jobs/${jobUuid}`;
+  }
+
+  static personaJobsReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/jobs/reorder`;
+  }
+
+  static personaPains(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/pains`;
+  }
+
+  static personaPain(personaUuid: string, painUuid: string) {
+    return `/api/v1/personas/${personaUuid}/pains/${painUuid}`;
+  }
+
+  static personaPainsReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/pains/reorder`;
+  }
+
+  static personaGains(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/gains`;
+  }
+
+  static personaGain(personaUuid: string, gainUuid: string) {
+    return `/api/v1/personas/${personaUuid}/gains/${gainUuid}`;
+  }
+
+  static personaGainsReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/gains/reorder`;
+  }
+
+  static personaSocialValues(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/social-values`;
+  }
+
+  static personaSocialValue(personaUuid: string, valueUuid: string) {
+    return `/api/v1/personas/${personaUuid}/social-values/${valueUuid}`;
+  }
+
+  static personaSocialValuesReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/social-values/reorder`;
+  }
+
+  static personaMotivations(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/motivations`;
+  }
+
+  static personaMotivation(personaUuid: string, motivationUuid: string) {
+    return `/api/v1/personas/${personaUuid}/motivations/${motivationUuid}`;
+  }
+
+  static personaMotivationsReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/motivations/reorder`;
+  }
+
+  static personaBehaviours(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/behaviours`;
+  }
+
+  static personaBehaviour(personaUuid: string, behaviourUuid: string) {
+    return `/api/v1/personas/${personaUuid}/behaviours/${behaviourUuid}`;
+  }
+
+  static personaBehavioursReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/behaviours/reorder`;
+  }
+
+  static personaKeyFacts(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/key-facts`;
+  }
+
+  static personaKeyFact(personaUuid: string, factUuid: string) {
+    return `/api/v1/personas/${personaUuid}/key-facts/${factUuid}`;
+  }
+
+  static personaKeyFactsReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/key-facts/reorder`;
+  }
+
+  static personaQuotes(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/quotes`;
+  }
+
+  static personaQuote(personaUuid: string, quoteUuid: string) {
+    return `/api/v1/personas/${personaUuid}/quotes/${quoteUuid}`;
+  }
+
+  static personaQuotesReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/quotes/reorder`;
+  }
+
+  static personaWorkdaySteps(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/workday-steps`;
+  }
+
+  static personaWorkdayStep(personaUuid: string, stepUuid: string) {
+    return `/api/v1/personas/${personaUuid}/workday-steps/${stepUuid}`;
+  }
+
+  static personaWorkdayStepsReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/workday-steps/reorder`;
+  }
+
+  static personaChartData(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chart-data`;
+  }
+
+  static personaChartDataItem(personaUuid: string, dataUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chart-data/${dataUuid}`;
+  }
+
+  static personaChartDataReorder(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chart-data/reorder`;
+  }
+
+  // Persona training documents
+  static personaTrainingDocuments(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/training-documents`;
+  }
+
+  static personaTrainingDocument(personaUuid: string, documentUuid: string) {
+    return `/api/v1/personas/${personaUuid}/training-documents/${documentUuid}`;
+  }
+
+  // Persona evidence
+  static personaEvidence(personaUuid: string, status?: string) {
+    const base = `/api/v1/personas/${personaUuid}/evidence`;
+    return status ? `${base}?status=${status}` : base;
+  }
+
+  static personaEvidenceAccept(personaUuid: string, evidenceUuid: string) {
+    return `/api/v1/personas/${personaUuid}/evidence/${evidenceUuid}/accept`;
+  }
+
+  static personaEvidenceIgnore(personaUuid: string, evidenceUuid: string) {
+    return `/api/v1/personas/${personaUuid}/evidence/${evidenceUuid}/ignore`;
+  }
+
+  static personaEvidenceAcceptAll(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/evidence/accept-all`;
+  }
+
+  // Persona chat
+  static personaChatSessions(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chat/sessions`;
+  }
+
+  static personaChatSession(personaUuid: string, sessionUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chat/sessions/${sessionUuid}`;
+  }
+
+  static personaChatMessages(personaUuid: string, sessionUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chat/sessions/${sessionUuid}/messages`;
+  }
+
+  static personaChatPrompts(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chat/prompts`;
+  }
+
+  static personaChatConversations(personaUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chat/conversations`;
+  }
+
+  static personaChatSessionExport(personaUuid: string, sessionUuid: string) {
+    return `/api/v1/personas/${personaUuid}/chat/sessions/${sessionUuid}/export`;
+  }
+
+  // Mention search
+  static mentionSearch(query: string, type?: string) {
+    const base = `/api/v1/mentions/search?q=${encodeURIComponent(query)}`;
+    return type ? `${base}&type=${type}` : base;
+  }
+
+  // ============================================
   // Portfolio Insights Endpoints
   // ============================================
 

@@ -15,39 +15,47 @@ const TestResultsConfirmationDialog: React.FC<
 
   return createPortal(
     <div
-      className='fixed inset-0 z-50 flex items-center justify-center'
+      className='glass-modal-overlay fixed inset-0 z-50 flex items-center justify-center'
       data-aucctus-portal-target='true'
     >
-      {/* Backdrop */}
-      <div
-        className='aucctus-bg-secondary-solid absolute inset-0 bg-opacity-50'
-        onClick={onClose}
-      />
+      {/* Click-outside handler */}
+      <div className='absolute inset-0' onClick={onClose} />
 
-      {/* Dialog */}
-      <div className='aucctus-bg-primary aucctus-border-secondary relative max-w-md rounded-lg border p-6 shadow-lg'>
-        <h3 className='aucctus-text-lg-semibold aucctus-text-primary mb-2'>
-          {confirmationDialog.title}
-        </h3>
-        <p className='aucctus-text-sm aucctus-text-secondary mb-6'>
-          {confirmationDialog.message}
-        </p>
-
-        <div className='flex justify-end gap-3'>
-          <button className='btn btn-light btn-sm' onClick={onClose}>
-            Cancel
-          </button>
-          <button
-            className='btn btn-danger btn-sm'
-            onClick={confirmationDialog.onConfirm}
-            disabled={isDeletingAll}
+      {/* Glass modal */}
+      <div className='relative max-w-md' onClick={(e) => e.stopPropagation()}>
+        <div className='liquid-glass-modal-shell'>
+          <div
+            aria-hidden='true'
+            className='liquid-glass-modal-rim liquid-glass-modal-rim-animated'
           >
-            {confirmationDialog.type === 'deleteAll' && isDeletingAll
-              ? 'Deleting...'
-              : confirmationDialog.type === 'deleteAll'
-                ? 'Delete All'
-                : 'Delete'}
-          </button>
+            <div className='rim-orb rim-orb-1' />
+            <div className='rim-orb rim-orb-2' />
+          </div>
+          <div className='liquid-glass-modal-surface p-6'>
+            <h3 className='aucctus-text-lg-semibold aucctus-text-primary mb-2'>
+              {confirmationDialog.title}
+            </h3>
+            <p className='aucctus-text-sm aucctus-text-secondary mb-6'>
+              {confirmationDialog.message}
+            </p>
+
+            <div className='flex justify-end gap-3'>
+              <button className='btn btn-light btn-sm' onClick={onClose}>
+                Cancel
+              </button>
+              <button
+                className='btn btn-danger btn-sm'
+                onClick={confirmationDialog.onConfirm}
+                disabled={isDeletingAll}
+              >
+                {confirmationDialog.type === 'deleteAll' && isDeletingAll
+                  ? 'Deleting...'
+                  : confirmationDialog.type === 'deleteAll'
+                    ? 'Delete All'
+                    : 'Delete'}
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>,

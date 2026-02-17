@@ -1319,6 +1319,124 @@ export type InboundSocketEvent<C = {}> =
   | IOverseerSuggestedQuestionsMessage
   | IOverseerErrorMessage
   | IOverseerToolActivityMessage
-  | IOverseerEditSuggestionMessage;
+  | IOverseerEditSuggestionMessage
+  | ILivingPersonasDocumentProcessingProgressMessage
+  | ILivingPersonasDocumentProcessingCompletedMessage
+  | ILivingPersonasDocumentProcessingErrorMessage
+  | ILivingPersonasEvidenceDiscoveredMessage
+  | ILivingPersonasPersonaReadyMessage
+  | IPersonaChatHandshakeMessage
+  | IPersonaChatInboundMessage
+  | IPersonaChatStreamEvent
+  | IPersonaChatTypingMessage
+  | IPersonaChatErrorMessage;
 
 export type InboundSocketEventType = InboundSocketEvent['type'];
+
+// ----------------
+// Living Personas Chat
+// ----------------
+
+export interface IPersonaChatHandshakeMessage
+  extends IBaseInboundChatMessage,
+    BaseSocketEvent {
+  type: 'living_personas.chat.handshake';
+  sessionId: string;
+  personaUuid: string;
+  accountUuid: string;
+}
+
+export interface IPersonaChatInboundMessage
+  extends IInboundChatMessage,
+    BaseSocketEvent {
+  type: 'living_personas.chat.message';
+  personaUuid: string;
+  accountUuid: string;
+}
+
+export interface IPersonaChatStreamEvent extends BaseSocketEvent {
+  type: 'living_personas.chat.stream';
+  messageUuid: string;
+  content: string;
+  isFinal: boolean;
+  role: string;
+  personaUuid: string;
+  sessionId: string;
+}
+
+export interface IPersonaChatTypingMessage extends BaseSocketEvent {
+  type: 'living_personas.chat.typing';
+  isTyping: boolean;
+  personaUuid: string;
+  sessionId: string;
+}
+
+export interface IPersonaChatErrorMessage extends BaseSocketEvent {
+  type: 'living_personas.chat.error';
+  error: string;
+  message: string;
+  personaUuid: string;
+  sessionId?: string;
+}
+
+// ----------------
+// Living Personas Documents
+// ----------------
+
+export interface ILivingPersonasDocumentProcessingProgressMessage
+  extends BaseSocketEvent {
+  type: 'living_personas.document.processing.progress.account';
+  accountUuid: string;
+  personaUuid: string;
+  documentUuid: string;
+  stage:
+    | 'pending'
+    | 'processing'
+    | 'completed'
+    | 'failed'
+    | 'started'
+    | 'extracting'
+    | 'analyzing'
+    | 'creating_evidence';
+  progress: number;
+  message: string;
+  filename?: string;
+}
+
+export interface ILivingPersonasDocumentProcessingCompletedMessage
+  extends BaseSocketEvent {
+  type: 'living_personas.document.processing.completed.account';
+  accountUuid: string;
+  personaUuid: string;
+  documentUuid: string;
+  evidenceCount: number;
+  message: string;
+}
+
+export interface ILivingPersonasDocumentProcessingErrorMessage
+  extends BaseSocketEvent {
+  type: 'living_personas.document.processing.error.account';
+  accountUuid: string;
+  personaUuid: string;
+  documentUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+export interface ILivingPersonasEvidenceDiscoveredMessage
+  extends BaseSocketEvent {
+  type: 'living_personas.evidence.discovered.account';
+  accountUuid: string;
+  personaUuid: string;
+  evidenceCount: number;
+  message: string;
+}
+
+export interface ILivingPersonasPersonaReadyMessage extends BaseSocketEvent {
+  type: 'living_personas.persona.ready.account';
+  accountUuid: string;
+  personaUuid: string;
+  evidenceCount: number;
+  message: string;
+}

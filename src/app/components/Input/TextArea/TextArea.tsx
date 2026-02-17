@@ -83,7 +83,12 @@ const Input: ForwardRefRenderFunction<ITextAreaHandle, TextAreaProps> = (
     if (internalRef.current) {
       internalRef.current.style.height = 'auto'; // Reset height to calculate new scroll height
       internalRef.current.style.height = `${internalRef.current.scrollHeight}px`; // Set textarea height based on content
-      scrollToTextAreaWithPadding();
+
+      // Only scroll into view if the textarea is not inside a modal (fixed overlay)
+      const isInsideModal = internalRef.current.closest('.fixed');
+      if (!isInsideModal) {
+        scrollToTextAreaWithPadding();
+      }
     }
   }, [scrollToTextAreaWithPadding, value]);
 

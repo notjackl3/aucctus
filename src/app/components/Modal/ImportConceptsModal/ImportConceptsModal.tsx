@@ -1,36 +1,36 @@
-import {
-  FunctionComponent,
-  useState,
-  useCallback,
-  useRef,
-  DragEvent,
-} from 'react';
+import images from '@assets/img';
+import { toast } from '@components';
 import { useModal } from '@context/ModalContextProvider';
-import { cn } from '@libs/utils/react';
-import {
-  Link2,
-  FileUp,
-  X,
-  ArrowLeft,
-  Upload,
-  File,
-  ChevronDown,
-  Plus,
-  Loader2,
-} from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useMutation, useQueryClient } from 'react-query';
-import { AppPath } from '@routes/routes';
+import { useSubmissionLinks } from '@hooks/query/idea-submissions.hook';
 import api from '@libs/api';
 import {
   IFileUploadResponse,
   ISubmissionLink,
 } from '@libs/api/types/ideaSubmissions';
-import SubmissionLinkModal from '@pages/IdeaSubmissions/components/SubmissionLinkModal';
-import { useSubmissionLinks } from '@hooks/query/idea-submissions.hook';
-import { toast } from '@components';
-import images from '@assets/img';
 import utils from '@libs/utils';
+import { cn } from '@libs/utils/react';
+import SubmissionLinkModal from '@pages/IdeaSubmissions/components/SubmissionLinkModal';
+import { AppPath } from '@routes/routes';
+import {
+  ArrowLeft,
+  ChevronDown,
+  File,
+  FileUp,
+  Link2,
+  Loader2,
+  Plus,
+  Upload,
+  X,
+} from 'lucide-react';
+import {
+  DragEvent,
+  FunctionComponent,
+  useCallback,
+  useRef,
+  useState,
+} from 'react';
+import { useMutation, useQueryClient } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 
 type ImportStep = 'select' | 'submission-link' | 'file-upload';
 
@@ -244,7 +244,7 @@ const ImportConceptsModal: FunctionComponent<ImportConceptsModalProps> = ({
   // File Upload Screen
   if (importStep === 'file-upload') {
     return (
-      <div className='aucctus-bg-primary flex w-[640px] max-w-[90vw] flex-col overflow-hidden rounded-lg'>
+      <div className='flex w-[640px] max-w-[90vw] flex-col overflow-hidden rounded-lg'>
         {/* Header with background */}
         <div
           className='rounded-tlg relative px-6 pb-10 pt-6'
@@ -458,7 +458,7 @@ const ImportConceptsModal: FunctionComponent<ImportConceptsModalProps> = ({
   }
 
   return (
-    <div className='aucctus-bg-primary flex w-[640px] max-w-[90vw] flex-col rounded-lg'>
+    <div className='flex w-[640px] max-w-[90vw] flex-col rounded-lg'>
       {/* Header */}
       <div className='relative px-6 pb-2 pt-6'>
         {/* Close button */}

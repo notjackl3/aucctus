@@ -20,6 +20,7 @@ const PrivateLayout = () => {
       <div className='aucctus-bg-secondary-extra-subtle flex min-h-screen flex-row items-start overflow-hidden'>
         <NavDrawer onExpandCollapse={setNavCollapsed} />
         <div
+          data-scroll-container
           className={cn(
             'min-h-screen overflow-auto transition-all duration-300',
             {

@@ -128,4 +128,14 @@ export enum AucctusQueryKeys {
   customCommands = 'customCommands',
   customCommandsForPicker = 'customCommandsForPicker',
   customCommand = 'customCommand',
+
+  /* Living Personas */
+  personas = 'personas',
+  persona = 'persona',
+  personaEvidence = 'personaEvidence',
+  personaTrainingDocuments = 'personaTrainingDocuments',
+  personaChatSessions = 'personaChatSessions',
+  personaChatSession = 'personaChatSession',
+  personaStarterPrompts = 'personaStarterPrompts',
+  mentionSearch = 'mentionSearch',
 }

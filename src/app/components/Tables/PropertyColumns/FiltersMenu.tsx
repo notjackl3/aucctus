@@ -1,4 +1,5 @@
 import { Icon } from '@components';
+
 import {
   IPropertyDefinition,
   IPropertyFilter,
@@ -6,6 +7,7 @@ import {
   IUser,
 } from '@libs/api/types';
 import * as Popover from '@radix-ui/react-popover';
+import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
 import {
@@ -399,423 +401,486 @@ const FiltersMenu: React.FC<IFiltersMenuProps> = ({
         </button>
       </Popover.Trigger>
 
-      <Popover.Portal>
+      <Popover.Portal forceMount>
         <Popover.Content
-          className='aucctus-bg-primary z-[9999] w-[280px] select-none rounded-md shadow-lg'
+          forceMount
+          className='z-[9999]'
           align='end'
           side='bottom'
           sideOffset={8}
+          style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
         >
-          {/* Header with title and icon */}
-          <div className='flex items-center gap-2 px-3 py-3'>
-            <Icon
-              variant='filter-lines'
-              className='aucctus-stroke-secondary h-4 w-4'
-            />
-            <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
-              Filter columns
-            </span>
-          </div>
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: -4 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: -4 }}
+                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              >
+                <div className='aucctus-bg-primary w-[280px] select-none rounded-md shadow-lg'>
+                  {/* Header with title and icon */}
+                  <div className='flex items-center gap-2 px-3 py-3'>
+                    <Icon
+                      variant='filter-lines'
+                      className='aucctus-stroke-secondary h-4 w-4'
+                    />
+                    <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
+                      Filter columns
+                    </span>
+                  </div>
 
-          {/* Columns list */}
-          <div className='flex flex-col p-2'>
-            <div className='max-h-[400px] overflow-y-auto'>
-              {allColumns.map((item) => {
-                const columnKey =
-                  item.type === 'static'
-                    ? `static-${item.column.id}`
-                    : `property-${item.definition.key}`;
-                const icon =
-                  item.type === 'static'
-                    ? item.column.icon
-                    : (getPropertyIcon(item.definition) as IconVariant);
-                const name =
-                  item.type === 'static'
-                    ? item.column.name
-                    : item.definition.name;
-                const hasFilter =
-                  item.type === 'static'
-                    ? hasActiveFilter(item.column.id, item.column.type)
-                    : !!getPropertyFilter(item.definition.key);
+                  {/* Columns list */}
+                  <div className='flex flex-col p-2'>
+                    <div className='max-h-[400px] overflow-y-auto'>
+                      {allColumns.map((item) => {
+                        const columnKey =
+                          item.type === 'static'
+                            ? `static-${item.column.id}`
+                            : `property-${item.definition.key}`;
+                        const icon =
+                          item.type === 'static'
+                            ? item.column.icon
+                            : (getPropertyIcon(item.definition) as IconVariant);
+                        const name =
+                          item.type === 'static'
+                            ? item.column.name
+                            : item.definition.name;
+                        const hasFilter =
+                          item.type === 'static'
+                            ? hasActiveFilter(item.column.id, item.column.type)
+                            : !!getPropertyFilter(item.definition.key);
 
-                return (
-                  <Popover.Root
-                    key={columnKey}
-                    open={hoveredColumn === columnKey}
-                    onOpenChange={(open) => {
-                      if (!open) {
-                        // Apply buffered filters when closing
-                        if (item.type === 'static') {
-                          handleSubmenuClose(item.column.id, item.column.type);
-                        } else {
-                          setHoveredColumn(null);
-                        }
-                      }
-                    }}
-                  >
-                    <Popover.Anchor asChild>
-                      <button
-                        ref={(el) => {
-                          if (el) columnRefs.current.set(columnKey, el);
-                        }}
-                        className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors duration-300 hover:outline-none focus:outline-none focus-visible:outline-none'
-                        onMouseEnter={() => {
-                          checkSubmenuPosition(columnKey);
-                          setSubmenuImmediate(columnKey);
-                        }}
-                        onMouseLeave={() => setSubmenuDelayed(null)}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                        }}
-                      >
-                        <Icon
-                          variant={icon}
-                          className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
-                        />
-                        <span className='aucctus-text-sm aucctus-text-secondary flex-1 truncate text-left'>
-                          {name}
-                        </span>
-                        {hasFilter && (
-                          <Icon
-                            variant='filter-lines'
-                            className='aucctus-stroke-brand-primary h-4 w-4 flex-shrink-0'
-                          />
-                        )}
-                        <Icon
-                          variant='chevron-right'
-                          className='aucctus-stroke-quaternary h-3.5 w-3.5 flex-shrink-0'
-                        />
-                      </button>
-                    </Popover.Anchor>
-
-                    {/* Filter Submenu Flyout in Portal */}
-                    <Popover.Portal>
-                      <Popover.Content
-                        side={submenuPosition === 'right' ? 'right' : 'left'}
-                        align='center'
-                        sideOffset={8}
-                        onMouseEnter={() => setSubmenuImmediate(columnKey)}
-                        onMouseLeave={() => setSubmenuDelayed(null)}
-                        className='z-[10000]'
-                        onOpenAutoFocus={(e) => e.preventDefault()}
-                        onInteractOutside={(e) => {
-                          // Prevent closing when clicking inside the submenu
-                          const target = e.target as HTMLElement;
-                          if (
-                            target.closest(
-                              '[data-radix-popper-content-wrapper]',
-                            )
-                          ) {
-                            e.preventDefault();
-                          }
-                        }}
-                        onPointerDownOutside={(e) => {
-                          // Prevent closing when clicking inside the submenu
-                          const target = e.target as HTMLElement;
-                          if (
-                            target.closest(
-                              '[data-radix-popper-content-wrapper]',
-                            )
-                          ) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <div
-                          className='aucctus-bg-primary aucctus-border-secondary w-[280px] rounded-lg border p-3 shadow-lg'
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                          onMouseDown={(e) => {
-                            e.stopPropagation();
-                          }}
-                        >
-                          {item.type === 'static' ? (
-                            <>
-                              {/* Static column filters */}
-                              {item.column.type === 'status' && (
-                                <>
-                                  <div className='mb-3 flex items-center gap-2'>
-                                    <Icon
-                                      variant='filter-lines'
-                                      className='aucctus-stroke-secondary h-4 w-4'
-                                    />
-                                    <span className='aucctus-text-secondary text-sm font-medium'>
-                                      Filter by {item.column.name}
-                                    </span>
-                                  </div>
-                                  <StatusFilterContent
-                                    localSelection={localStatusSelection}
-                                    onToggle={handleStatusToggle}
-                                  />
-                                  {/* Clear button for Status */}
-                                  {localStatusSelection.size > 0 && (
-                                    <div className='aucctus-border-secondary mt-3 flex items-center justify-end border-t pt-2'>
-                                      <button
-                                        onClick={() => {
-                                          onUpdateFilters({
-                                            status: undefined,
-                                          });
-                                          setLocalStatusSelection(new Set());
-                                          setHoveredColumn(null);
-                                        }}
-                                        className='aucctus-text-sm aucctus-text-tertiary hover:aucctus-text-secondary rounded px-2 py-1 transition-colors'
-                                      >
-                                        Clear
-                                      </button>
-                                    </div>
-                                  )}
-                                </>
-                              )}
-                              {item.column.type === 'user' && (
-                                <>
-                                  <div className='mb-3 flex items-center gap-2'>
-                                    <Icon
-                                      variant='filter-lines'
-                                      className='aucctus-stroke-secondary h-4 w-4'
-                                    />
-                                    <span className='aucctus-text-secondary text-sm font-medium'>
-                                      Filter by {item.column.name}
-                                    </span>
-                                  </div>
-                                  <UserFilterContent
-                                    localSelection={
-                                      item.column.id === 'createdBy'
-                                        ? localCreatedBySelection
-                                        : localLastModifiedBySelection
-                                    }
-                                    onToggle={(user) =>
-                                      handleUserToggle(
-                                        user,
-                                        item.column.id as
-                                          | 'createdBy'
-                                          | 'lastModifiedBy',
-                                      )
-                                    }
-                                    filterType={
-                                      item.column.id as
-                                        | 'createdBy'
-                                        | 'lastModifiedBy'
-                                    }
-                                  />
-                                  {/* Clear button for User filters */}
-                                  {((item.column.id === 'createdBy' &&
-                                    localCreatedBySelection &&
-                                    localCreatedBySelection.size > 0) ||
-                                    (item.column.id === 'lastModifiedBy' &&
-                                      localLastModifiedBySelection &&
-                                      localLastModifiedBySelection.size >
-                                        0)) && (
-                                    <div className='aucctus-border-secondary mt-3 flex items-center justify-end border-t pt-2'>
-                                      <button
-                                        onClick={() => {
-                                          if (item.column.id === 'createdBy') {
-                                            onUpdateFilters({
-                                              createdBy: undefined,
-                                            });
-                                            setLocalCreatedBySelection(
-                                              undefined,
-                                            );
-                                          } else {
-                                            onUpdateFilters({
-                                              lastModifiedBy: undefined,
-                                            });
-                                            setLocalLastModifiedBySelection(
-                                              undefined,
-                                            );
-                                          }
-                                          setHoveredColumn(null);
-                                        }}
-                                        className='aucctus-text-sm aucctus-text-tertiary hover:aucctus-text-secondary rounded px-2 py-1 transition-colors'
-                                      >
-                                        Clear
-                                      </button>
-                                    </div>
-                                  )}
-                                </>
-                              )}
-                            </>
-                          ) : (
-                            <>
-                              {/* Property filters */}
-                              <div className='mb-3 flex items-center gap-2'>
-                                <Icon
-                                  variant='filter-lines'
-                                  className='aucctus-stroke-secondary h-4 w-4'
-                                />
-                                <span className='aucctus-text-secondary text-sm font-medium'>
-                                  Filter by {item.definition.name}
-                                </span>
-                              </div>
-                              <PropertyFilterContent
-                                propDef={item.definition}
-                                filterValue={(() => {
-                                  const localValue = localPropertyFilters.get(
-                                    item.definition.key,
-                                  )?.value;
-                                  if (
-                                    localValue !== undefined &&
-                                    localValue !== null
-                                  )
-                                    return localValue;
-                                  const currentValue = getPropertyFilter(
-                                    item.definition.key,
-                                  )?.value;
-                                  if (
-                                    currentValue !== undefined &&
-                                    currentValue !== null
-                                  )
-                                    return currentValue;
-                                  return '';
-                                })()}
-                                filterOperator={
-                                  localPropertyFilters.get(item.definition.key)
-                                    ?.operator ||
-                                  getPropertyFilter(item.definition.key)
-                                    ?.operator ||
-                                  getDefaultOperator(
-                                    item.definition.propertyType,
-                                  )
+                        return (
+                          <Popover.Root
+                            key={columnKey}
+                            open={hoveredColumn === columnKey}
+                            onOpenChange={(open) => {
+                              if (!open) {
+                                // Apply buffered filters when closing
+                                if (item.type === 'static') {
+                                  handleSubmenuClose(
+                                    item.column.id,
+                                    item.column.type,
+                                  );
+                                } else {
+                                  setHoveredColumn(null);
                                 }
-                                onFilterValueChange={(value) => {
-                                  // Update local state only (buffered)
-                                  const currentOperator =
-                                    localPropertyFilters.get(
-                                      item.definition.key,
-                                    )?.operator ||
-                                    getPropertyFilter(item.definition.key)
-                                      ?.operator ||
-                                    getDefaultOperator(
-                                      item.definition.propertyType,
-                                    );
-
-                                  // Store in ref for synchronous access (checkbox case)
-                                  pendingFilterValueRef.current = {
-                                    key: item.definition.key,
-                                    value,
-                                    operator: currentOperator,
-                                  };
-
-                                  updateLocalPropertyFilter(
-                                    item.definition.key,
-                                    value,
-                                    currentOperator,
-                                  );
-                                  // Note: For checkbox, the onApply will be called by SharedFilterComponents
-                                  // For select/multi-select, wait for Apply button
+                              }
+                            }}
+                          >
+                            <Popover.Anchor asChild>
+                              <button
+                                ref={(el) => {
+                                  if (el) columnRefs.current.set(columnKey, el);
                                 }}
-                                onFilterOperatorChange={(operator) => {
-                                  // Update operator in local state
-                                  let currentValue =
-                                    localPropertyFilters.get(
-                                      item.definition.key,
-                                    )?.value ||
-                                    getPropertyFilter(item.definition.key)
-                                      ?.value ||
-                                    '';
+                                className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 transition-colors duration-300 hover:outline-none focus:outline-none focus-visible:outline-none'
+                                onMouseEnter={() => {
+                                  checkSubmenuPosition(columnKey);
+                                  setSubmenuImmediate(columnKey);
+                                }}
+                                onMouseLeave={() => setSubmenuDelayed(null)}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  e.stopPropagation();
+                                }}
+                              >
+                                <Icon
+                                  variant={icon}
+                                  className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
+                                />
+                                <span className='aucctus-text-sm aucctus-text-secondary flex-1 truncate text-left'>
+                                  {name}
+                                </span>
+                                {hasFilter && (
+                                  <Icon
+                                    variant='filter-lines'
+                                    className='aucctus-stroke-brand-primary h-4 w-4 flex-shrink-0'
+                                  />
+                                )}
+                                <Icon
+                                  variant='chevron-right'
+                                  className='aucctus-stroke-quaternary h-3.5 w-3.5 flex-shrink-0'
+                                />
+                              </button>
+                            </Popover.Anchor>
 
-                                  // For is_null and not_blank operators, set value to 'true'
+                            {/* Filter Submenu Flyout in Portal */}
+                            <Popover.Portal>
+                              <Popover.Content
+                                side={
+                                  submenuPosition === 'right' ? 'right' : 'left'
+                                }
+                                align='center'
+                                sideOffset={8}
+                                onMouseEnter={() =>
+                                  setSubmenuImmediate(columnKey)
+                                }
+                                onMouseLeave={() => setSubmenuDelayed(null)}
+                                className='z-[10000]'
+                                onOpenAutoFocus={(e) => e.preventDefault()}
+                                onInteractOutside={(e) => {
+                                  // Prevent closing when clicking inside the submenu
+                                  const target = e.target as HTMLElement;
                                   if (
-                                    operator === 'is_null' ||
-                                    operator === 'not_blank'
+                                    target.closest(
+                                      '[data-radix-popper-content-wrapper]',
+                                    )
                                   ) {
-                                    currentValue = 'true';
+                                    e.preventDefault();
                                   }
-
-                                  updateLocalPropertyFilter(
-                                    item.definition.key,
-                                    currentValue,
-                                    operator,
-                                  );
                                 }}
-                                onApply={() => {
-                                  // Apply buffered changes
-                                  // For checkbox, use pending ref value if available (synchronous)
+                                onPointerDownOutside={(e) => {
+                                  // Prevent closing when clicking inside the submenu
+                                  const target = e.target as HTMLElement;
                                   if (
-                                    pendingFilterValueRef.current &&
-                                    pendingFilterValueRef.current.key ===
-                                      item.definition.key
+                                    target.closest(
+                                      '[data-radix-popper-content-wrapper]',
+                                    )
                                   ) {
-                                    applyPropertyFilter(
-                                      pendingFilterValueRef.current.key,
-                                      pendingFilterValueRef.current.value,
-                                      pendingFilterValueRef.current.operator,
-                                    );
-                                    pendingFilterValueRef.current = null;
-                                  } else {
-                                    // For other types, read from local state
-                                    const localFilter =
-                                      localPropertyFilters.get(
-                                        item.definition.key,
-                                      );
-                                    if (localFilter) {
-                                      applyPropertyFilter(
-                                        item.definition.key,
-                                        localFilter.value,
-                                        localFilter.operator,
-                                      );
-                                    } else {
-                                      applyPropertyFilter(item.definition.key);
-                                    }
+                                    e.preventDefault();
                                   }
-                                  setHoveredColumn(null);
                                 }}
-                                onCancel={() => {
-                                  // Reset local state and close
-                                  const currentFilter = getPropertyFilter(
-                                    item.definition.key,
-                                  );
-                                  if (currentFilter) {
-                                    setLocalPropertyFilters((prev) => {
-                                      const newMap = new Map(prev);
-                                      newMap.set(item.definition.key, {
-                                        value: currentFilter.value,
-                                        operator: currentFilter.operator,
-                                      });
-                                      return newMap;
-                                    });
-                                  }
-                                  setHoveredColumn(null);
-                                }}
-                              />
+                              >
+                                <div className='aucctus-bg-primary aucctus-border-secondary w-[280px] rounded-lg border p-3 shadow-lg'>
+                                  <div
+                                    onClick={(e) => {
+                                      e.stopPropagation();
+                                    }}
+                                    onMouseDown={(e) => {
+                                      e.stopPropagation();
+                                    }}
+                                  >
+                                    {item.type === 'static' ? (
+                                      <>
+                                        {/* Static column filters */}
+                                        {item.column.type === 'status' && (
+                                          <>
+                                            <div className='mb-3 flex items-center gap-2'>
+                                              <Icon
+                                                variant='filter-lines'
+                                                className='aucctus-stroke-secondary h-4 w-4'
+                                              />
+                                              <span className='aucctus-text-secondary text-sm font-medium'>
+                                                Filter by {item.column.name}
+                                              </span>
+                                            </div>
+                                            <StatusFilterContent
+                                              localSelection={
+                                                localStatusSelection
+                                              }
+                                              onToggle={handleStatusToggle}
+                                            />
+                                            {/* Clear button for Status */}
+                                            {localStatusSelection.size > 0 && (
+                                              <div className='aucctus-border-secondary mt-3 flex items-center justify-end border-t pt-2'>
+                                                <button
+                                                  onClick={() => {
+                                                    onUpdateFilters({
+                                                      status: undefined,
+                                                    });
+                                                    setLocalStatusSelection(
+                                                      new Set(),
+                                                    );
+                                                    setHoveredColumn(null);
+                                                  }}
+                                                  className='aucctus-text-sm aucctus-text-tertiary hover:aucctus-text-secondary rounded px-2 py-1 transition-colors'
+                                                >
+                                                  Clear
+                                                </button>
+                                              </div>
+                                            )}
+                                          </>
+                                        )}
+                                        {item.column.type === 'user' && (
+                                          <>
+                                            <div className='mb-3 flex items-center gap-2'>
+                                              <Icon
+                                                variant='filter-lines'
+                                                className='aucctus-stroke-secondary h-4 w-4'
+                                              />
+                                              <span className='aucctus-text-secondary text-sm font-medium'>
+                                                Filter by {item.column.name}
+                                              </span>
+                                            </div>
+                                            <UserFilterContent
+                                              localSelection={
+                                                item.column.id === 'createdBy'
+                                                  ? localCreatedBySelection
+                                                  : localLastModifiedBySelection
+                                              }
+                                              onToggle={(user) =>
+                                                handleUserToggle(
+                                                  user,
+                                                  item.column.id as
+                                                    | 'createdBy'
+                                                    | 'lastModifiedBy',
+                                                )
+                                              }
+                                              filterType={
+                                                item.column.id as
+                                                  | 'createdBy'
+                                                  | 'lastModifiedBy'
+                                              }
+                                            />
+                                            {/* Clear button for User filters */}
+                                            {((item.column.id === 'createdBy' &&
+                                              localCreatedBySelection &&
+                                              localCreatedBySelection.size >
+                                                0) ||
+                                              (item.column.id ===
+                                                'lastModifiedBy' &&
+                                                localLastModifiedBySelection &&
+                                                localLastModifiedBySelection.size >
+                                                  0)) && (
+                                              <div className='aucctus-border-secondary mt-3 flex items-center justify-end border-t pt-2'>
+                                                <button
+                                                  onClick={() => {
+                                                    if (
+                                                      item.column.id ===
+                                                      'createdBy'
+                                                    ) {
+                                                      onUpdateFilters({
+                                                        createdBy: undefined,
+                                                      });
+                                                      setLocalCreatedBySelection(
+                                                        undefined,
+                                                      );
+                                                    } else {
+                                                      onUpdateFilters({
+                                                        lastModifiedBy:
+                                                          undefined,
+                                                      });
+                                                      setLocalLastModifiedBySelection(
+                                                        undefined,
+                                                      );
+                                                    }
+                                                    setHoveredColumn(null);
+                                                  }}
+                                                  className='aucctus-text-sm aucctus-text-tertiary hover:aucctus-text-secondary rounded px-2 py-1 transition-colors'
+                                                >
+                                                  Clear
+                                                </button>
+                                              </div>
+                                            )}
+                                          </>
+                                        )}
+                                      </>
+                                    ) : (
+                                      <>
+                                        {/* Property filters */}
+                                        <div className='mb-3 flex items-center gap-2'>
+                                          <Icon
+                                            variant='filter-lines'
+                                            className='aucctus-stroke-secondary h-4 w-4'
+                                          />
+                                          <span className='aucctus-text-secondary text-sm font-medium'>
+                                            Filter by {item.definition.name}
+                                          </span>
+                                        </div>
+                                        <PropertyFilterContent
+                                          propDef={item.definition}
+                                          filterValue={(() => {
+                                            const localValue =
+                                              localPropertyFilters.get(
+                                                item.definition.key,
+                                              )?.value;
+                                            if (
+                                              localValue !== undefined &&
+                                              localValue !== null
+                                            )
+                                              return localValue;
+                                            const currentValue =
+                                              getPropertyFilter(
+                                                item.definition.key,
+                                              )?.value;
+                                            if (
+                                              currentValue !== undefined &&
+                                              currentValue !== null
+                                            )
+                                              return currentValue;
+                                            return '';
+                                          })()}
+                                          filterOperator={
+                                            localPropertyFilters.get(
+                                              item.definition.key,
+                                            )?.operator ||
+                                            getPropertyFilter(
+                                              item.definition.key,
+                                            )?.operator ||
+                                            getDefaultOperator(
+                                              item.definition.propertyType,
+                                            )
+                                          }
+                                          onFilterValueChange={(value) => {
+                                            // Update local state only (buffered)
+                                            const currentOperator =
+                                              localPropertyFilters.get(
+                                                item.definition.key,
+                                              )?.operator ||
+                                              getPropertyFilter(
+                                                item.definition.key,
+                                              )?.operator ||
+                                              getDefaultOperator(
+                                                item.definition.propertyType,
+                                              );
 
-                              {/* Clear filter button - shown when filter is active */}
-                              {getPropertyFilter(item.definition.key) && (
-                                <button
-                                  onClick={() => {
-                                    // Clear the filter
-                                    const updatedFilters = (
-                                      filterOptions.propertyFilters || []
-                                    ).filter(
-                                      (f) => f.key !== item.definition.key,
-                                    );
-                                    onUpdateFilters({
-                                      propertyFilters: updatedFilters,
-                                    });
-                                    // Clear local state
-                                    setLocalPropertyFilters((prev) => {
-                                      const newMap = new Map(prev);
-                                      newMap.delete(item.definition.key);
-                                      return newMap;
-                                    });
-                                    setHoveredColumn(null);
-                                  }}
-                                  className='aucctus-text-error-primary hover:aucctus-text-error-primary mt-3 w-full text-left text-sm transition-colors'
-                                >
-                                  Clear filter
-                                </button>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      </Popover.Content>
-                    </Popover.Portal>
-                  </Popover.Root>
-                );
-              })}
-            </div>
-          </div>
+                                            // Store in ref for synchronous access (checkbox case)
+                                            pendingFilterValueRef.current = {
+                                              key: item.definition.key,
+                                              value,
+                                              operator: currentOperator,
+                                            };
+
+                                            updateLocalPropertyFilter(
+                                              item.definition.key,
+                                              value,
+                                              currentOperator,
+                                            );
+                                            // Note: For checkbox, the onApply will be called by SharedFilterComponents
+                                            // For select/multi-select, wait for Apply button
+                                          }}
+                                          onFilterOperatorChange={(
+                                            operator,
+                                          ) => {
+                                            // Update operator in local state
+                                            let currentValue =
+                                              localPropertyFilters.get(
+                                                item.definition.key,
+                                              )?.value ||
+                                              getPropertyFilter(
+                                                item.definition.key,
+                                              )?.value ||
+                                              '';
+
+                                            // For is_null and not_blank operators, set value to 'true'
+                                            if (
+                                              operator === 'is_null' ||
+                                              operator === 'not_blank'
+                                            ) {
+                                              currentValue = 'true';
+                                            }
+
+                                            updateLocalPropertyFilter(
+                                              item.definition.key,
+                                              currentValue,
+                                              operator,
+                                            );
+                                          }}
+                                          onApply={() => {
+                                            // Apply buffered changes
+                                            // For checkbox, use pending ref value if available (synchronous)
+                                            if (
+                                              pendingFilterValueRef.current &&
+                                              pendingFilterValueRef.current
+                                                .key === item.definition.key
+                                            ) {
+                                              applyPropertyFilter(
+                                                pendingFilterValueRef.current
+                                                  .key,
+                                                pendingFilterValueRef.current
+                                                  .value,
+                                                pendingFilterValueRef.current
+                                                  .operator,
+                                              );
+                                              pendingFilterValueRef.current =
+                                                null;
+                                            } else {
+                                              // For other types, read from local state
+                                              const localFilter =
+                                                localPropertyFilters.get(
+                                                  item.definition.key,
+                                                );
+                                              if (localFilter) {
+                                                applyPropertyFilter(
+                                                  item.definition.key,
+                                                  localFilter.value,
+                                                  localFilter.operator,
+                                                );
+                                              } else {
+                                                applyPropertyFilter(
+                                                  item.definition.key,
+                                                );
+                                              }
+                                            }
+                                            setHoveredColumn(null);
+                                          }}
+                                          onCancel={() => {
+                                            // Reset local state and close
+                                            const currentFilter =
+                                              getPropertyFilter(
+                                                item.definition.key,
+                                              );
+                                            if (currentFilter) {
+                                              setLocalPropertyFilters(
+                                                (prev) => {
+                                                  const newMap = new Map(prev);
+                                                  newMap.set(
+                                                    item.definition.key,
+                                                    {
+                                                      value:
+                                                        currentFilter.value,
+                                                      operator:
+                                                        currentFilter.operator,
+                                                    },
+                                                  );
+                                                  return newMap;
+                                                },
+                                              );
+                                            }
+                                            setHoveredColumn(null);
+                                          }}
+                                        />
+
+                                        {/* Clear filter button - shown when filter is active */}
+                                        {getPropertyFilter(
+                                          item.definition.key,
+                                        ) && (
+                                          <button
+                                            onClick={() => {
+                                              // Clear the filter
+                                              const updatedFilters = (
+                                                filterOptions.propertyFilters ||
+                                                []
+                                              ).filter(
+                                                (f) =>
+                                                  f.key !== item.definition.key,
+                                              );
+                                              onUpdateFilters({
+                                                propertyFilters: updatedFilters,
+                                              });
+                                              // Clear local state
+                                              setLocalPropertyFilters(
+                                                (prev) => {
+                                                  const newMap = new Map(prev);
+                                                  newMap.delete(
+                                                    item.definition.key,
+                                                  );
+                                                  return newMap;
+                                                },
+                                              );
+                                              setHoveredColumn(null);
+                                            }}
+                                            className='aucctus-text-error-primary hover:aucctus-text-error-primary mt-3 w-full text-left text-sm transition-colors'
+                                          >
+                                            Clear filter
+                                          </button>
+                                        )}
+                                      </>
+                                    )}
+                                  </div>
+                                </div>
+                              </Popover.Content>
+                            </Popover.Portal>
+                          </Popover.Root>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </Popover.Content>
       </Popover.Portal>
     </Popover.Root>

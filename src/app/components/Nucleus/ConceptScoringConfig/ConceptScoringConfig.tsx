@@ -33,6 +33,7 @@ import React, {
 } from 'react';
 import { useQueryClient } from 'react-query';
 
+import ConceptScoringConfigSkeleton from './ConceptScoringConfigSkeleton';
 import { ScoringCategory, ScoringQuestion } from './types';
 
 // Helper to convert API categories to local state format
@@ -814,14 +815,7 @@ const ConceptScoringConfig: React.FC<ConceptScoringConfigProps> = ({
 
             {/* Main Content */}
             {isLoading && !isInitialized ? (
-              <div className='flex h-[500px] items-center justify-center'>
-                <div className='flex flex-col items-center gap-3'>
-                  <div className='aucctus-bg-secondary h-10 w-10 animate-spin rounded-full border-2 border-t-transparent' />
-                  <p className='aucctus-text-sm aucctus-text-secondary'>
-                    Loading scoring configuration...
-                  </p>
-                </div>
-              </div>
+              <ConceptScoringConfigSkeleton />
             ) : isError ? (
               <div className='flex h-[500px] items-center justify-center'>
                 <div className='flex flex-col items-center gap-3 text-center'>

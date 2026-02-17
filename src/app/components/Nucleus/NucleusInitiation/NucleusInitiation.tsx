@@ -794,7 +794,7 @@ const NucleusInitiation: React.FC<NucleusInitiationProps> = ({
                                   )
                                 }
                                 onClick={(e) => e.stopPropagation()}
-                                placeholder='City, State'
+                                placeholder='City, State/Province'
                                 className='w-full border-0 bg-transparent p-0 text-2xl font-bold text-white outline-none placeholder:text-white/30'
                               />
                             </div>

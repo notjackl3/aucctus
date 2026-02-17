@@ -1,5 +1,6 @@
-import { Icon, NucleusLoadingState } from '@components';
+import { Icon, LiquidGlassTabs, NucleusLoadingState } from '@components';
 import { useDebugMode } from '@hooks/debug-mode.hook';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import {
   AssessmentStatus,
   NucleusReportAnswer,
@@ -7,15 +8,10 @@ import {
   NucleusReportSection,
   SectionType,
 } from '@libs/api/types';
-import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { Building2, Scale, Users } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useQueryClient } from 'react-query';
 import { useSearchParams } from 'react-router-dom';
 import { useAccountLogo } from '../../../hooks/query/admin.hook';
 import {
@@ -30,16 +26,14 @@ import {
 import useStore from '../../../stores/store';
 import LoadingMask from '../../Card/ConceptGeneration/UserExploration/components/util/LoadingMask';
 import { animationStyles } from '../../Card/ConceptGeneration/UserExploration/components/util/animation-keyframes';
-import { CategoriesGrid } from '../CategoriesGrid';
-import { ConceptScoringConfig } from '../ConceptScoringConfig';
+import { CompanyContextTab } from '../CompanyContextTab';
+import { DecisionMakingTab } from '../DecisionMakingTab';
 import DocumentUpload from '../DocumentUpload';
+import { LivingPersonasTab } from '../LivingPersonasTab';
 import { NucleusHeroBackground } from '../NucleusHeroBackground';
 import { NucleusInitiation } from '../NucleusInitiation';
-import { UploadsTab } from '../UploadsTab';
 import StatusBadge from '../StatusBadge';
 import { CategoryState, QuestionState } from '../StatusDropdown';
-import { useQueryClient } from 'react-query';
-import { AucctusQueryKeys } from '@hooks/query/query-keys';
 
 const NucleusPage: React.FC = () => {
   // Track page time for analytics
@@ -93,14 +87,14 @@ const NucleusPage: React.FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
 
   // Tab state - persists in URL params
-  type NucleusTab = 'categories' | 'data-uploads';
+  type NucleusTab = 'company-context' | 'living-personas' | 'decision-making';
   const activeTab: NucleusTab =
-    (searchParams.get('tab') as NucleusTab) || 'categories';
+    (searchParams.get('tab') as NucleusTab) || 'company-context';
 
   const setActiveTab = useCallback(
     (tab: NucleusTab) => {
       const newParams = new URLSearchParams(searchParams);
-      if (tab === 'categories') {
+      if (tab === 'company-context') {
         newParams.delete('tab'); // Default, no need to store
       } else {
         newParams.set('tab', tab);
@@ -110,25 +104,34 @@ const NucleusPage: React.FC = () => {
     [searchParams, setSearchParams],
   );
 
-  const scoringConfigRef = useRef<HTMLDivElement>(null);
-  const [isScoringConfigExpanded, setIsScoringConfigExpanded] = useState(() => {
-    return searchParams.get('openScoringConfig') === 'true';
-  });
+  // Tab configuration for LiquidGlassTabs
+  const tabConfig = useMemo(
+    () => [
+      {
+        id: 'company-context',
+        label: 'Company Context',
+        icon: <Building2 className='h-4 w-4' />,
+      },
+      {
+        id: 'living-personas',
+        label: 'Living Personas',
+        icon: <Users className='h-4 w-4' />,
+      },
+      {
+        id: 'decision-making',
+        label: 'Decision Making',
+        icon: <Scale className='h-4 w-4' />,
+      },
+    ],
+    [],
+  );
 
-  // Effect to clean up URL and scroll to scoring config when opened via query param
+  // Handle openScoringConfig URL param by switching to decision-making tab
   useEffect(() => {
     if (searchParams.get('openScoringConfig') === 'true') {
-      // Remove the param from URL after initial load
       searchParams.delete('openScoringConfig');
+      searchParams.set('tab', 'decision-making');
       setSearchParams(searchParams, { replace: true });
-
-      // Scroll to scoring config section after a short delay for render
-      setTimeout(() => {
-        scoringConfigRef.current?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center',
-        });
-      }, 100);
     }
   }, [searchParams, setSearchParams]);
 
@@ -567,46 +570,6 @@ const NucleusPage: React.FC = () => {
     }
   };
 
-  const handleCategoryBadgeClick = (categoryId: string) => {
-    setExpandedCategory(categoryId);
-
-    // Use multiple RAF to ensure DOM has fully updated
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          const categoryElement = document.getElementById(
-            `category-${categoryId}`,
-          );
-
-          if (categoryElement) {
-            // Scroll to category with proper offset for header
-            const elementRect = categoryElement.getBoundingClientRect();
-            const targetScrollY = window.scrollY + elementRect.top - 120; // 120px offset for header
-
-            window.scrollTo({
-              top: Math.max(0, targetScrollY),
-              behavior: 'smooth',
-            });
-          } else {
-            // Fallback: scroll to categories section with preserved position
-            const categoriesSection = document.querySelector(
-              '[data-tab="categories"]',
-            );
-            if (categoriesSection) {
-              const sectionRect = categoriesSection.getBoundingClientRect();
-              const targetScrollY = window.scrollY + sectionRect.top - 80;
-
-              window.scrollTo({
-                top: Math.max(0, targetScrollY),
-                behavior: 'smooth',
-              });
-            }
-          }
-        });
-      });
-    });
-  };
-
   if (!isLoading && nucleusReport?.processingStatus === 'processing') {
     return <NucleusLoadingState />;
   }
@@ -615,14 +578,15 @@ const NucleusPage: React.FC = () => {
     <div className='aucctus-bg-primary min-h-screen p-8'>
       <style>{animationStyles}</style>
       <div className='aucctus-bg-primary min-h-screen'>
-        {/* Hero Header Section */}
-        <div className='relative h-[32rem] overflow-hidden rounded-xl'>
+        {/* Hero Header Section - 280px height per design spec */}
+        <div className='relative h-[280px] overflow-hidden rounded-xl'>
           <NucleusHeroBackground
             videoUrl={nucleusReport.headquartersVideoUrl}
           />
 
           {/* Header Content */}
-          <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-12'>
+          <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-8'>
+            {/* Status Badge with pulse animation */}
             <StatusBadge status={nucleusReport.processingStatus} />
 
             {/* Company Logo or Name */}
@@ -631,141 +595,63 @@ const NucleusPage: React.FC = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6 }}
-                className='mb-4 flex items-center justify-center rounded-md bg-white/30 p-4 backdrop-blur-sm'
+                className='mb-2 flex items-center justify-center rounded-md bg-white/30 p-3 backdrop-blur-sm'
               >
                 <img
                   src={companyLogoUrl}
                   alt={companyName}
-                  className='h-24 w-auto max-w-[200px] object-contain drop-shadow-xl'
+                  className='h-16 w-auto max-w-[160px] object-contain drop-shadow-xl'
                   onError={() => setLogoFailed(true)}
                 />
               </motion.div>
             ) : (
-              <h1 className='aucctus-header-2xl-bold mb-4 text-center tracking-tight text-white drop-shadow-xl'>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+                className='aucctus-header-xl-bold mb-2 text-center tracking-tight text-white drop-shadow-xl'
+              >
                 {companyName}
-              </h1>
+              </motion.h1>
             )}
 
             {/* Subtitle */}
-            <p className='aucctus-text-lg mx-auto mb-12 max-w-2xl text-center leading-relaxed text-white/80'>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className='aucctus-text-md mx-auto mb-6 max-w-2xl text-center leading-relaxed text-white/80'
+            >
               Your central hub of company context used by Aucctus AI Agents
-            </p>
+            </motion.p>
 
-            {/* Context Status Pills */}
-            <div className='mx-auto flex max-w-4xl flex-wrap items-center justify-center gap-3'>
-              {allSections.map((section: NucleusReportSection) => {
-                // Get display name from mapping
-                const displayName =
-                  sectionTypeDisplayNames[section.sectionType] ||
-                  section.sectionType;
-                const stateInfo = getCategoryStateInfo(section);
-                const stateConfig = getStateConfig(stateInfo.state);
-
-                return (
-                  <button
-                    key={section.sectionType}
-                    className='group relative cursor-pointer border-0 bg-transparent p-0'
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      handleCategoryBadgeClick(section.sectionType);
-                    }}
-                  >
-                    {/* Glassmorphic pill container */}
-                    <div className='rounded-full border border-white/20 bg-white/10 px-4 py-2.5 shadow-sm backdrop-blur-md transition-all duration-300 hover:scale-105 hover:border-white/30 hover:bg-white/15'>
-                      <div className='flex items-center gap-2'>
-                        <div
-                          className={cn(
-                            'relative h-2 w-2 rounded-full transition-all duration-500',
-                            {
-                              'aucctus-bg-brand-solid':
-                                stateInfo.state === 'new_details',
-                              'aucctus-bg-warning-solid':
-                                stateInfo.state === 'needs_input',
-                              'aucctus-bg-success-solid':
-                                stateInfo.state === 'validated',
-                            },
-                          )}
-                        ></div>
-                        {/* Category name */}
-                        <span className='aucctus-text-xs-medium text-white/90'>
-                          {displayName}
-                        </span>
-                        {/* State label */}
-                        <span className='aucctus-text-xs-bold text-white'>
-                          {stateConfig.label}
-                        </span>
-                      </div>
-                    </div>
-                  </button>
-                );
-              })}
-            </div>
+            {/* Liquid Glass Tab Bar with sliding indicator */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <LiquidGlassTabs
+                tabs={tabConfig}
+                activeTab={activeTab}
+                onTabChange={(tabId) => setActiveTab(tabId as NucleusTab)}
+                size='md'
+              />
+            </motion.div>
           </div>
-        </div>
-
-        {/* Tab Header */}
-        <div className='relative'>
-          <div className='absolute left-1/2 z-40 -translate-x-1/2 -translate-y-1/2 transform'>
-            <div className='aucctus-border-primary rounded-lg border bg-white px-1 py-1 shadow-sm backdrop-blur-sm'>
-              <div className='flex gap-2'>
-                <button
-                  type='button'
-                  onClick={() => setActiveTab('categories')}
-                  className={cn(
-                    'aucctus-text-sm-medium rounded-md px-3 py-1.5 transition-colors',
-                    activeTab === 'categories'
-                      ? 'btn btn-bold btn-primary'
-                      : 'btn btn-ghost hover:bg-gray-100',
-                  )}
-                >
-                  Categories
-                </button>
-                <button
-                  type='button'
-                  onClick={() => setActiveTab('data-uploads')}
-                  className={cn(
-                    'aucctus-text-sm-medium rounded-md px-3 py-1.5 transition-colors',
-                    activeTab === 'data-uploads'
-                      ? 'btn btn-bold btn-primary'
-                      : 'btn btn-ghost hover:bg-gray-100',
-                  )}
-                >
-                  Data &amp; Uploads
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Dividing line */}
-          <div className='h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent'></div>
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'categories' && (
-          <div
-            className='mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8'
-            data-tab='categories'
-          >
-            <CategoriesGrid
-              allCategories={allSections}
+        {activeTab === 'company-context' && (
+          <div data-tab='company-context'>
+            <CompanyContextTab
+              allSections={allSections}
+              reportSections={reportSections}
               expandedCategory={expandedCategory}
               setExpandedCategory={handleExpandedCategoryChange}
-              getCategoryStateInfo={(categoryId: string) => {
-                const section = reportSections.find(
-                  (s: NucleusReportSection) => s.sectionType === categoryId,
-                );
-                return section
-                  ? getCategoryStateInfo(section)
-                  : {
-                      state: 'needs_input' as CategoryState,
-                      validated: 0,
-                      newDetails: 0,
-                      needsInput: 0,
-                      totalSources: 0,
-                    };
-              }}
+              getCategoryStateInfo={getCategoryStateInfo}
               getStateConfig={getStateConfig}
+              sectionTypeDisplayNames={sectionTypeDisplayNames}
               setCategoryStatusOverrides={setCategoryStatusOverrides}
               activeDropdown={activeDropdown}
               setActiveDropdown={setActiveDropdown}
@@ -775,37 +661,12 @@ const NucleusPage: React.FC = () => {
               getQuestionState={getQuestionState}
               reportUuid={nucleusReport?.uuid || ''}
               isAdmin={isAdmin}
-            />
-
-            {/* Concept Scoring Configuration - At the end of categories */}
-            <div
-              ref={scoringConfigRef}
-              className='mt-6 grid auto-rows-min grid-cols-1 gap-6 lg:grid-cols-2'
-            >
-              <div
-                className={cn('transition-all duration-300 ease-in-out', {
-                  'lg:col-span-2': isScoringConfigExpanded,
-                })}
-              >
-                <ConceptScoringConfig
-                  isExpanded={isScoringConfigExpanded}
-                  onToggleExpand={() =>
-                    setIsScoringConfigExpanded((prev) => !prev)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Data & Uploads Tab */}
-        {activeTab === 'data-uploads' && (
-          <div data-tab='data-uploads'>
-            <UploadsTab
               onNavigateToCategory={(categoryId) => {
-                setActiveTab('categories');
+                // Switch to intelligence section and expand the category
+                const newParams = new URLSearchParams(searchParams);
+                newParams.delete('section'); // intelligence is the default
+                setSearchParams(newParams, { replace: true });
                 setExpandedCategory(categoryId);
-                // Scroll to the category card after DOM updates
                 requestAnimationFrame(() => {
                   requestAnimationFrame(() => {
                     const categoryElement = document.getElementById(
@@ -821,6 +682,20 @@ const NucleusPage: React.FC = () => {
                 });
               }}
             />
+          </div>
+        )}
+
+        {/* Living Personas Tab */}
+        {activeTab === 'living-personas' && (
+          <div data-tab='living-personas'>
+            <LivingPersonasTab />
+          </div>
+        )}
+
+        {/* Decision Making Tab */}
+        {activeTab === 'decision-making' && (
+          <div data-tab='decision-making'>
+            <DecisionMakingTab />
           </div>
         )}
 

@@ -1,7 +1,8 @@
 import { Icon, Modal } from '@components';
-import * as Menubar from '@radix-ui/react-menubar';
+import * as Popover from '@radix-ui/react-popover';
 import { IPropertyDefinition } from '@libs/api/types';
-import React from 'react';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@libs/utils/react';
 import PropertyDefinitionModal, {
   IPropertyFormData,
@@ -127,100 +128,123 @@ const PropertyManager: React.FC<IPropertyManagerProps> = ({
     }
   };
 
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Menubar.Root className='flex flex-row'>
-      <Menubar.Menu>
-        <Menubar.Trigger className='aucctus-bg-secondary-hover flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200'>
+    <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
+      <Popover.Trigger asChild>
+        <button className='aucctus-bg-secondary-hover flex h-8 w-8 items-center justify-center rounded-md transition-colors duration-200'>
           <Icon
             variant='plus'
             height={16}
             width={16}
             className='aucctus-stroke-secondary'
           />
-        </Menubar.Trigger>
-        <Menubar.Portal>
-          <Menubar.Content
-            className='aucctus-bg-primary z-[9999] flex w-[280px] flex-col gap-1 rounded-md p-2 shadow-lg'
-            align='end'
-            sideOffset={5}
-          >
-            <div className='box-border flex w-full flex-col'>
-              {/* Add New Property */}
-              <Menubar.Item
-                className={cn(
-                  'aucctus-bg-primary-hover group rounded-md transition-colors duration-300 hover:outline-none focus:outline-none focus-visible:outline-none',
-                  'inline-flex h-[38px] cursor-pointer items-center gap-2 px-2.5 py-[9px]',
-                )}
-                onClick={handleCreateProperty}
+        </button>
+      </Popover.Trigger>
+      <Popover.Portal forceMount>
+        <Popover.Content
+          forceMount
+          className='z-[9999]'
+          align='end'
+          side='bottom'
+          sideOffset={5}
+          style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+        >
+          <AnimatePresence>
+            {isOpen && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.96, y: -4 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.96, y: -4 }}
+                transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
               >
-                <Icon
-                  variant='plus'
-                  className='aucctus-stroke-brand-primary h-4 w-4'
-                />
-                <span className='aucctus-text-sm-medium aucctus-text-brand-primary'>
-                  Add Property
-                </span>
-              </Menubar.Item>
-
-              {propertyDefinitions && propertyDefinitions.length > 0 && (
-                <>
-                  <Menubar.Separator className='aucctus-bg-secondary my-1 h-px' />
-
-                  {/* Existing Properties */}
-                  {propertyDefinitions.map((def) => (
-                    <div
-                      key={def.uuid}
+                <div className='aucctus-bg-primary flex w-[280px] flex-col gap-1 rounded-md p-2 shadow-lg'>
+                  <div className='box-border flex w-full flex-col'>
+                    {/* Add New Property */}
+                    <button
                       className={cn(
-                        'aucctus-bg-primary-hover group rounded-md transition-colors duration-300',
-                        'flex h-[38px] items-center justify-between px-2.5 py-[9px]',
+                        'aucctus-bg-primary-hover group rounded-md transition-colors duration-300 hover:outline-none focus:outline-none focus-visible:outline-none',
+                        'inline-flex h-[38px] cursor-pointer items-center gap-2 px-2.5 py-[9px]',
                       )}
+                      onClick={() => {
+                        handleCreateProperty();
+                        setIsOpen(false);
+                      }}
                     >
-                      <div className='flex items-center gap-2 overflow-hidden'>
-                        <Icon
-                          variant={getPropertyIcon(def) as IconVariant}
-                          className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
-                        />
-                        <span className='aucctus-text-sm aucctus-text-secondary truncate'>
-                          {def.name}
-                        </span>
-                      </div>
-                      <div className='flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleEditProperty(def);
-                          }}
-                          className='hover:aucctus-bg-secondary rounded p-1'
-                          title='Edit property'
-                        >
-                          <Icon
-                            variant='edit'
-                            className='aucctus-stroke-tertiary h-3.5 w-3.5'
-                          />
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteProperty(def);
-                          }}
-                          className='hover:aucctus-bg-error-secondary rounded p-1'
-                          title='Delete property'
-                        >
-                          <Icon
-                            variant='trash'
-                            className='aucctus-stroke-error-primary h-3.5 w-3.5'
-                          />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </>
-              )}
-            </div>
-          </Menubar.Content>
-        </Menubar.Portal>
-      </Menubar.Menu>
-    </Menubar.Root>
+                      <Icon
+                        variant='plus'
+                        className='aucctus-stroke-brand-primary h-4 w-4'
+                      />
+                      <span className='aucctus-text-sm-medium aucctus-text-brand-primary'>
+                        Add Property
+                      </span>
+                    </button>
+
+                    {propertyDefinitions && propertyDefinitions.length > 0 && (
+                      <>
+                        <div className='aucctus-bg-secondary my-1 h-px' />
+
+                        {/* Existing Properties */}
+                        {propertyDefinitions.map((def) => (
+                          <div
+                            key={def.uuid}
+                            className={cn(
+                              'aucctus-bg-primary-hover group rounded-md transition-colors duration-300',
+                              'flex h-[38px] items-center justify-between px-2.5 py-[9px]',
+                            )}
+                          >
+                            <div className='flex items-center gap-2 overflow-hidden'>
+                              <Icon
+                                variant={getPropertyIcon(def) as IconVariant}
+                                className='aucctus-stroke-tertiary h-4 w-4 flex-shrink-0'
+                              />
+                              <span className='aucctus-text-sm aucctus-text-secondary truncate'>
+                                {def.name}
+                              </span>
+                            </div>
+                            <div className='flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100'>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditProperty(def);
+                                  setIsOpen(false);
+                                }}
+                                className='hover:aucctus-bg-secondary rounded p-1'
+                                title='Edit property'
+                              >
+                                <Icon
+                                  variant='edit'
+                                  className='aucctus-stroke-tertiary h-3.5 w-3.5'
+                                />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteProperty(def);
+                                  setIsOpen(false);
+                                }}
+                                className='hover:aucctus-bg-error-secondary rounded p-1'
+                                title='Delete property'
+                              >
+                                <Icon
+                                  variant='trash'
+                                  className='aucctus-stroke-error-primary h-3.5 w-3.5'
+                                />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </>
+                    )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Popover.Content>
+      </Popover.Portal>
+    </Popover.Root>
   );
 };
 

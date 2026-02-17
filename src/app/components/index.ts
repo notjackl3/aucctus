@@ -55,6 +55,15 @@ import {
   CompanyDetailPanel,
 } from './EcosystemV2';
 
+// UI Components - Liquid Glass Design System
+import {
+  GlassSurface,
+  LiquidGlassDropdown,
+  LiquidGlassModal,
+  LiquidGlassModalFooter,
+  LiquidGlassTabs,
+} from './ui';
+
 export {
   AiInteraction, // This is an object with AI components - keep for compatibility
   Avatar,
@@ -75,6 +84,11 @@ export {
   DialGauge,
   EcosystemV2,
   FileDropzone,
+  GlassSurface,
+  LiquidGlassDropdown,
+  LiquidGlassModal,
+  LiquidGlassModalFooter,
+  LiquidGlassTabs,
   Header,
   Icon,
   Input,

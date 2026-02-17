@@ -1,10 +1,10 @@
-import React, { useCallback } from 'react';
 import { Icon } from '@components';
-import { useModal } from '../../../context/ModalContextProvider';
-import { cn } from '@libs/utils/react';
-import magicShareBg from '../../../assets/magic-share-background.png';
-import { ConceptShareFormat } from '@libs/api/types';
 import { useMagicShareModal } from '@components/Modal/MagicShareModal/hooks/useMagicShareModal';
+import { ConceptShareFormat } from '@libs/api/types';
+import { cn } from '@libs/utils/react';
+import React, { useCallback } from 'react';
+import magicShareBg from '../../../assets/magic-share-background.png';
+import { useModal } from '../../../context/ModalContextProvider';
 
 interface MagicShareModalProps {
   conceptUuid: string;
@@ -545,7 +545,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
 
       {/* Content Section */}
       {!isGenerating && !isComplete && !hasError && (
-        <div className='aucctus-bg-primary max-h-[calc(90vh-14rem)] space-y-4 overflow-y-auto px-6 pb-6 pt-2'>
+        <div className='max-h-[calc(90vh-14rem)] space-y-4 overflow-y-auto px-6 pb-6 pt-2'>
           {/* Title */}
           <div className='text-center'>
             <div className='mb-2 flex items-center justify-center gap-2'>
@@ -571,7 +571,7 @@ const MagicShareModal: React.FC<MagicShareModalProps> = ({ conceptUuid }) => {
             />
 
             {/* Quick Suggestions Carousel */}
-            <div className='aucctus-bg-brand-primary/5 aucctus-border-primary border-t px-2 py-3'>
+            <div className='aucctus-bg-brand-primary/10 px-2 py-3'>
               <div className='flex items-center gap-2'>
                 <div
                   className='flex-1 overflow-hidden'

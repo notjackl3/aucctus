@@ -238,6 +238,47 @@ export interface IncubationAiSuggestionsRequestEvent extends BaseSocketEvent {
 }
 
 // ----------------
+// Persona Chat Messages
+// ----------------
+
+/**
+ * Structured mention data sent with persona chat messages
+ */
+export interface IOutboundMention {
+  uuid: string;
+  type: 'concept' | 'persona';
+  name: string;
+}
+
+/**
+ * Base interface for persona chat messages
+ */
+interface BasePersonaChatMessage extends ITextMessage, BaseSocketEvent {
+  personaUuid: string;
+  mentions?: IOutboundMention[];
+}
+
+/**
+ * Interface for starting a persona chat conversation
+ */
+export interface IPersonaChatOutboundConversationStartMessage
+  extends BasePersonaChatMessage,
+    IConversationStartMessage {
+  type: 'persona.chat.conversation.start';
+  content: string;
+}
+
+/**
+ * Interface for persona chat messages
+ */
+export interface IPersonaChatOutboundMessage
+  extends BasePersonaChatMessage,
+    OutboundChatMessage {
+  type: 'persona.chat.message';
+  personaUuid: string;
+}
+
+// ----------------
 // Export Types
 // ----------------
 
@@ -258,6 +299,8 @@ export type OutboundSocketEvent =
   | IOverseerConversationStartMessage
   | IOverseerOutboundChatMessage
   | IOverseerOutboundCancelMessage
+  | IPersonaChatOutboundConversationStartMessage
+  | IPersonaChatOutboundMessage
   | OutboundChatMessage
   | OutboundChatMediaMessage
   | IUserTypingMessage;

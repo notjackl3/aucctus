@@ -1,11 +1,12 @@
 import { Icon, Input } from '@components';
+
 import { IConceptFilterOptions } from '@hooks/tables/concept-bank.hook';
 import { ConceptStatus } from '@libs/api/types';
 import utils from '@libs/utils';
 import { CONCEPT_STATUS_LIST } from '@libs/utils/concepts';
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
-import { animated, useTransition } from 'react-spring';
+import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
 
 export interface IStatusFilterMenuProps {
@@ -121,26 +122,6 @@ const StatusFilterMenu: React.FC<IStatusFilterMenuProps> = ({
       onReorder(draggedId, columnId);
     }
   };
-
-  // Smooth animation for menu appearance
-  const menuTransition = useTransition(isOpen, {
-    from: {
-      opacity: 0,
-      transform: 'scale(0.95) translateY(-8px)',
-    },
-    enter: {
-      opacity: 1,
-      transform: 'scale(1) translateY(0px)',
-    },
-    leave: {
-      opacity: 0,
-      transform: 'scale(0.95) translateY(-8px)',
-    },
-    config: {
-      tension: 300,
-      friction: 25,
-    },
-  });
 
   // Use local selection for UI display
   const hasActiveFilter = localSelection && localSelection.size > 0;
@@ -295,160 +276,163 @@ const StatusFilterMenu: React.FC<IStatusFilterMenuProps> = ({
           </button>
         </Popover.Trigger>
 
-        <Popover.Portal>
-          {isOpen && (
-            <Popover.Content
-              className='z-[9999]'
-              align='start'
-              sideOffset={5}
-              onInteractOutside={(e) => {
-                e.preventDefault();
-                handleClose();
-              }}
-              onEscapeKeyDown={(e) => {
-                e.preventDefault();
-                handleClose();
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {menuTransition(
-                (styles, item) =>
-                  item && (
-                    <animated.div
-                      style={styles}
-                      className='aucctus-bg-primary aucctus-border-secondary min-w-[200px] rounded-lg border shadow-lg'
-                    >
-                      {showFilterView ? (
-                        // Filter View
-                        <div className='p-1'>
-                          <div className='max-h-80 overflow-y-auto'>
-                            {statusOptions
-                              ? statusOptions.map((option) =>
-                                  createCustomStatusCheckItem(option),
-                                )
-                              : CONCEPT_STATUS_LIST.map((status) =>
-                                  createStatusCheckItem(status),
-                                )}
-                          </div>
-
-                          {hasActiveFilter && (
-                            <>
-                              <div className='aucctus-bg-secondary my-1 h-px' />
-                              <button
-                                className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
-                                onClick={(e: React.MouseEvent) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  handleClearFilter();
-                                }}
-                              >
-                                <Icon
-                                  variant='closeX'
-                                  className='aucctus-stroke-secondary h-4 w-4'
-                                />
-                                <span className='aucctus-text-secondary'>
-                                  Clear filter
-                                </span>
-                              </button>
-                            </>
-                          )}
-
-                          {onSort && (
-                            <>
-                              <div className='aucctus-bg-secondary my-1 h-px' />
-                              <button
-                                className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
-                                onClick={(e: React.MouseEvent) => {
-                                  e.preventDefault();
-                                  e.stopPropagation();
-                                  setShowFilterView(false);
-                                }}
-                              >
-                                <Icon
-                                  variant='switch-vertical-01'
-                                  className='aucctus-stroke-secondary h-4 w-4'
-                                />
-                                <span className='aucctus-text-secondary'>
-                                  Sort
-                                </span>
-                                <Icon
-                                  variant='chevron-right'
-                                  className='aucctus-stroke-tertiary ml-auto h-4 w-4'
-                                />
-                              </button>
-                            </>
-                          )}
+        <Popover.Portal forceMount>
+          <Popover.Content
+            forceMount
+            className='z-[9999]'
+            align='start'
+            sideOffset={5}
+            onInteractOutside={(e) => {
+              e.preventDefault();
+              handleClose();
+            }}
+            onEscapeKeyDown={(e) => {
+              e.preventDefault();
+              handleClose();
+            }}
+            onClick={(e) => e.stopPropagation()}
+            style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+          >
+            <AnimatePresence>
+              {isOpen && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.96, y: -4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96, y: -4 }}
+                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                >
+                  <div className='aucctus-bg-primary aucctus-border-secondary min-w-[200px] rounded-lg border shadow-lg'>
+                    {showFilterView ? (
+                      // Filter View
+                      <div className='p-1'>
+                        <div className='max-h-80 overflow-y-auto'>
+                          {statusOptions
+                            ? statusOptions.map((option) =>
+                                createCustomStatusCheckItem(option),
+                              )
+                            : CONCEPT_STATUS_LIST.map((status) =>
+                                createStatusCheckItem(status),
+                              )}
                         </div>
-                      ) : (
-                        // Sort View
-                        <div className='p-1'>
-                          <div className='mb-2 flex items-center gap-2 px-3 py-2'>
+
+                        {hasActiveFilter && (
+                          <>
+                            <div className='aucctus-bg-secondary my-1 h-px' />
                             <button
-                              onClick={() => setShowFilterView(true)}
-                              className='aucctus-bg-primary-hover rounded p-1 transition-colors'
+                              className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
+                              onClick={(e: React.MouseEvent) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleClearFilter();
+                              }}
                             >
                               <Icon
-                                variant='chevronleft'
+                                variant='closeX'
                                 className='aucctus-stroke-secondary h-4 w-4'
                               />
+                              <span className='aucctus-text-secondary'>
+                                Clear filter
+                              </span>
                             </button>
-                            <span className='aucctus-text-secondary text-sm font-medium'>
-                              Sort
-                            </span>
-                          </div>
+                          </>
+                        )}
 
+                        {onSort && (
+                          <>
+                            <div className='aucctus-bg-secondary my-1 h-px' />
+                            <button
+                              className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
+                              onClick={(e: React.MouseEvent) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setShowFilterView(false);
+                              }}
+                            >
+                              <Icon
+                                variant='switch-vertical-01'
+                                className='aucctus-stroke-secondary h-4 w-4'
+                              />
+                              <span className='aucctus-text-secondary'>
+                                Sort
+                              </span>
+                              <Icon
+                                variant='chevron-right'
+                                className='aucctus-stroke-tertiary ml-auto h-4 w-4'
+                              />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      // Sort View
+                      <div className='p-1'>
+                        <div className='mb-2 flex items-center gap-2 px-3 py-2'>
                           <button
-                            className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
-                            onClick={(e: React.MouseEvent) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleSort('asc');
-                            }}
+                            onClick={() => setShowFilterView(true)}
+                            className='aucctus-bg-primary-hover rounded p-1 transition-colors'
                           >
                             <Icon
-                              variant='arrowup'
+                              variant='chevronleft'
                               className='aucctus-stroke-secondary h-4 w-4'
                             />
-                            <span className='aucctus-text-secondary'>
-                              Sort ascending
-                            </span>
-                            {currentSort === 'asc' && (
-                              <Icon
-                                variant='check'
-                                className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                              />
-                            )}
                           </button>
-
-                          <button
-                            className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
-                            onClick={(e: React.MouseEvent) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleSort('desc');
-                            }}
-                          >
-                            <Icon
-                              variant='arrowdown'
-                              className='aucctus-stroke-secondary h-4 w-4'
-                            />
-                            <span className='aucctus-text-secondary'>
-                              Sort descending
-                            </span>
-                            {currentSort === 'desc' && (
-                              <Icon
-                                variant='check'
-                                className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
-                              />
-                            )}
-                          </button>
+                          <span className='aucctus-text-secondary text-sm font-medium'>
+                            Sort
+                          </span>
                         </div>
-                      )}
-                    </animated.div>
-                  ),
+
+                        <button
+                          className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSort('asc');
+                          }}
+                        >
+                          <Icon
+                            variant='arrowup'
+                            className='aucctus-stroke-secondary h-4 w-4'
+                          />
+                          <span className='aucctus-text-secondary'>
+                            Sort ascending
+                          </span>
+                          {currentSort === 'asc' && (
+                            <Icon
+                              variant='check'
+                              className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
+                            />
+                          )}
+                        </button>
+
+                        <button
+                          className='aucctus-bg-primary-hover flex w-full cursor-pointer items-center gap-2 rounded px-3 py-2 text-sm outline-none transition-colors'
+                          onClick={(e: React.MouseEvent) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            handleSort('desc');
+                          }}
+                        >
+                          <Icon
+                            variant='arrowdown'
+                            className='aucctus-stroke-secondary h-4 w-4'
+                          />
+                          <span className='aucctus-text-secondary'>
+                            Sort descending
+                          </span>
+                          {currentSort === 'desc' && (
+                            <Icon
+                              variant='check'
+                              className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
+                            />
+                          )}
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </motion.div>
               )}
-            </Popover.Content>
-          )}
+            </AnimatePresence>
+          </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
     </div>

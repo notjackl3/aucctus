@@ -1,7 +1,8 @@
 import { Icon } from '@components';
+
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
-import { animated, useTransition } from 'react-spring';
+import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState } from 'react';
 import { useColumnVisibilityStore } from '@stores/table-columns.store';
 
@@ -168,26 +169,6 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
     }
   };
 
-  // Smooth animation for menu appearance
-  const menuTransition = useTransition(isOpen, {
-    from: {
-      opacity: 0,
-      transform: 'scale(0.95) translateY(-8px)',
-    },
-    enter: {
-      opacity: 1,
-      transform: 'scale(1) translateY(0px)',
-    },
-    leave: {
-      opacity: 0,
-      transform: 'scale(0.95) translateY(-8px)',
-    },
-    config: {
-      tension: 300,
-      friction: 25,
-    },
-  });
-
   return (
     <div
       ref={wrapperRef}
@@ -239,22 +220,26 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
           </button>
         </Popover.Trigger>
 
-        <Popover.Portal>
-          {menuTransition(
-            (styles, item) =>
-              item && (
-                <Popover.Content
-                  asChild
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[200px] rounded-lg border shadow-lg'
-                  align='start'
-                  sideOffset={5}
-                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
+        <Popover.Portal forceMount>
+          <Popover.Content
+            forceMount
+            className='z-[9999]'
+            align='start'
+            sideOffset={5}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+          >
+            <AnimatePresence>
+              {isOpen && (
+                <motion.div
+                  ref={popoverContentRef}
+                  initial={{ opacity: 0, scale: 0.96, y: -4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96, y: -4 }}
+                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  className='relative'
                 >
-                  <animated.div
-                    ref={popoverContentRef}
-                    style={styles}
-                    className='relative'
-                  >
+                  <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border shadow-lg'>
                     <div className='w-[280px] p-1'>
                       {/* Filter Section - Only show if filterSubmenu is provided */}
                       {filterSubmenu && (
@@ -384,57 +369,58 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
                                 />
                                 <div
                                   className={cn(
-                                    'aucctus-bg-primary aucctus-border-secondary w-[200px] rounded-lg border p-1 shadow-lg',
                                     submenuPosition === 'right'
                                       ? 'ml-3'
                                       : 'mr-3',
                                   )}
                                 >
-                                  <button
-                                    className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      handleSort('asc');
-                                    }}
-                                  >
-                                    <Icon
-                                      variant='arrowup'
-                                      className='aucctus-stroke-secondary h-4 w-4'
-                                    />
-                                    <span className='aucctus-text-secondary'>
-                                      Ascending
-                                    </span>
-                                    {currentSort === 'asc' && (
+                                  <div className='aucctus-bg-primary aucctus-border-secondary w-[200px] rounded-lg border p-1 shadow-lg'>
+                                    <button
+                                      className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleSort('asc');
+                                      }}
+                                    >
                                       <Icon
-                                        variant='check'
-                                        className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
+                                        variant='arrowup'
+                                        className='aucctus-stroke-secondary h-4 w-4'
                                       />
-                                    )}
-                                  </button>
+                                      <span className='aucctus-text-secondary'>
+                                        Ascending
+                                      </span>
+                                      {currentSort === 'asc' && (
+                                        <Icon
+                                          variant='check'
+                                          className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
+                                        />
+                                      )}
+                                    </button>
 
-                                  <button
-                                    className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      e.stopPropagation();
-                                      handleSort('desc');
-                                    }}
-                                  >
-                                    <Icon
-                                      variant='arrowdown'
-                                      className='aucctus-stroke-secondary h-4 w-4'
-                                    />
-                                    <span className='aucctus-text-secondary'>
-                                      Descending
-                                    </span>
-                                    {currentSort === 'desc' && (
+                                    <button
+                                      className='aucctus-bg-primary-hover flex w-full items-center gap-2 rounded px-3 py-2 text-sm transition-colors'
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        handleSort('desc');
+                                      }}
+                                    >
                                       <Icon
-                                        variant='check'
-                                        className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
+                                        variant='arrowdown'
+                                        className='aucctus-stroke-secondary h-4 w-4'
                                       />
-                                    )}
-                                  </button>
+                                      <span className='aucctus-text-secondary'>
+                                        Descending
+                                      </span>
+                                      {currentSort === 'desc' && (
+                                        <Icon
+                                          variant='check'
+                                          className='aucctus-stroke-brand-primary ml-auto h-4 w-4'
+                                        />
+                                      )}
+                                    </button>
+                                  </div>
                                 </div>
                               </div>
                             )}
@@ -469,10 +455,11 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
                         </span>
                       </button>
                     </div>
-                  </animated.div>
-                </Popover.Content>
-              ),
-          )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
     </div>

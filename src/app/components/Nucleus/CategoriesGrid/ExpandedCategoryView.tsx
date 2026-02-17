@@ -100,20 +100,28 @@ const ExpandedCategoryView: React.FC<ExpandedCategoryViewProps> = ({
 
   const handleAddAnswer = useCallback(
     (questionUuid: string) => {
-      openModal(Modal.AddAnswerModal, {
-        reportUuid,
-        questionUuid,
-      });
+      openModal(
+        Modal.AddAnswerModal,
+        {
+          reportUuid,
+          questionUuid,
+        },
+        { hideBodyScroll: true },
+      );
     },
     [openModal, reportUuid],
   );
 
   const handleEditAnswer = useCallback(
     (answer: any) => {
-      openModal(Modal.EditAnswerModal, {
-        reportUuid,
-        answer,
-      });
+      openModal(
+        Modal.EditAnswerModal,
+        {
+          reportUuid,
+          answer,
+        },
+        { hideBodyScroll: true },
+      );
     },
     [openModal, reportUuid],
   );

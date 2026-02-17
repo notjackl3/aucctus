@@ -1,6 +1,6 @@
-import React, { useMemo } from 'react';
-import { motion } from 'framer-motion';
 import images from '@assets/img';
+import { motion } from 'framer-motion';
+import React, { useMemo } from 'react';
 
 /** Node shape variants for the neural network visualization */
 type NodeShape = 'circle' | 'diamond' | 'square' | 'hexagon';
@@ -251,9 +251,6 @@ const NucleusHeroBackground: React.FC<NucleusHeroBackgroundProps> = ({
           }}
         />
       )}
-
-      {/* Layer 2: Dark Overlay */}
-      <div className='absolute inset-0 bg-black/30' />
 
       {/* Configurable Gradient Overlay (for video mode compatibility) */}
       {videoUrl && <div className={`absolute inset-0 ${gradientOverlay}`} />}

@@ -7,11 +7,15 @@ import React, {
   useMemo,
   useCallback,
 } from 'react';
-import Modal, { ModalPosition } from '../components/Modal/Modal/Modal';
+import Modal, {
+  ModalPosition,
+  ModalVariant,
+} from '../components/Modal/Modal/Modal';
 import { createPortal } from 'react-dom';
 
 interface ModalOptions {
   position?: ModalPosition;
+  variant?: ModalVariant;
   shouldCloseOnOverlayClick?: boolean;
   modalClassName?: string;
   backgroundClassName?: string;
@@ -76,6 +80,12 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
     ) => {
       if (options.hideBodyScroll) {
         document.body.style.overflow = 'hidden';
+        const scrollContainer = document.querySelector<HTMLElement>(
+          '[data-scroll-container]',
+        );
+        if (scrollContainer) {
+          scrollContainer.style.overflow = 'hidden';
+        }
       }
 
       setModalState({
@@ -109,6 +119,12 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
 
         if (prev.options.hideBodyScroll) {
           document.body.style.overflow = '';
+          const scrollContainer = document.querySelector<HTMLElement>(
+            '[data-scroll-container]',
+          );
+          if (scrollContainer) {
+            scrollContainer.style.overflow = '';
+          }
         }
 
         return {
@@ -151,6 +167,7 @@ export const ModalProvider: React.FC<ModalProviderProps> = ({ children }) => {
         createPortal(
           <Modal
             position={modalState.options.position ?? 'center'}
+            variant={modalState.options.variant}
             modalClassName={modalState.options.modalClassName}
             backgroundClassName={modalState.options.backgroundClassName}
             isClosing={modalState.isClosing}

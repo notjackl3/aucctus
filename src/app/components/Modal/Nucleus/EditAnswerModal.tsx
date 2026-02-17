@@ -285,9 +285,12 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
     Object.keys(sourceErrors).length === 0;
 
   return (
-    <div className='aucctus-bg-primary flex max-h-[90vh] max-w-[600px] flex-col gap-6 overflow-y-auto rounded-xl p-6'>
+    <form
+      onSubmit={handleSubmit}
+      className='aucctus-bg-primary flex max-h-[90vh] max-w-[600px] flex-col rounded-xl'
+    >
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className='flex shrink-0 items-center justify-between px-6 pb-4 pt-6'>
         <h1
           className='aucctus-text-xl-semibold aucctus-text-primary'
           id='edit-answer-modal-title'
@@ -305,114 +308,118 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
         </button>
       </div>
 
-      {/* Form */}
-      <form onSubmit={handleSubmit} className='flex flex-col gap-6'>
-        {/* Answer Section */}
-        <div className='flex flex-col gap-2'>
-          <TextArea
-            label='Answer'
-            name='answer'
-            value={answerText}
-            errorMessage={answerError}
-            onChange={handleAnswerChange}
-            placeholder='Enter your answer...'
-            maxLength={MAX_ANSWER_LENGTH}
-            disabled={isLoading}
-            showAsterisk
-            required
-            rows={6}
-          />
-        </div>
-
-        {/* Sources Section */}
-        <div className='flex flex-col gap-4'>
-          <div className='flex items-center justify-between'>
-            <h3 className='aucctus-text-md-semibold aucctus-text-primary'>
-              Sources (Optional)
-            </h3>
-            <button
-              type='button'
-              className='btn btn-light btn-sm'
-              onClick={addSource}
+      {/* Scrollable Content */}
+      <div className='min-h-0 flex-1 overflow-y-auto px-6 py-2'>
+        <div className='flex flex-col gap-6'>
+          {/* Answer Section */}
+          <div className='flex flex-col gap-2'>
+            <TextArea
+              label='Answer'
+              name='answer'
+              value={answerText}
+              errorMessage={answerError}
+              onChange={handleAnswerChange}
+              placeholder='Enter your answer...'
+              maxLength={MAX_ANSWER_LENGTH}
               disabled={isLoading}
-              aria-label='Add source'
-            >
-              <Icon variant='plus' width={16} height={16} />
-              Add Source
-            </button>
+              showAsterisk
+              required
+              rows={6}
+            />
           </div>
 
-          {sources.map((source, index) => (
-            <div
-              key={index}
-              className='aucctus-border-primary flex flex-col gap-3 rounded-lg border p-4'
-            >
-              <div className='flex items-center justify-between'>
-                <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
-                  Source {index + 1}
-                </span>
-                {sources.length > 1 && (
-                  <button
-                    type='button'
-                    className='btn btn-light btn-no-border btn-sm'
-                    onClick={() => removeSource(index)}
-                    disabled={isLoading}
-                    aria-label={`Remove source ${index + 1}`}
-                  >
-                    <Icon variant='trash' width={16} height={16} />
-                  </button>
-                )}
-              </div>
-
-              <Input.Field
-                label='Title'
-                name={`source-title-${index}`}
-                value={source.title}
-                errorMessage={sourceErrors[index]?.title}
-                onChange={(e) =>
-                  handleSourceChange(index, 'title', e.target.value)
-                }
-                placeholder='Enter source title...'
-                maxLength={MAX_SOURCE_TITLE_LENGTH}
+          {/* Sources Section */}
+          <div className='flex flex-col gap-4'>
+            <div className='flex items-center justify-between'>
+              <h3 className='aucctus-text-md-semibold aucctus-text-primary'>
+                Sources (Optional)
+              </h3>
+              <button
+                type='button'
+                className='btn btn-light btn-sm'
+                onClick={addSource}
                 disabled={isLoading}
-                showAsterisk
-                required
-              />
-
-              <Input.Field
-                label='URL'
-                name={`source-url-${index}`}
-                value={source.url}
-                errorMessage={sourceErrors[index]?.url}
-                onChange={(e) =>
-                  handleSourceChange(index, 'url', e.target.value)
-                }
-                placeholder='https://example.com'
-                type='url'
-                disabled={isLoading}
-                showAsterisk
-                required
-              />
-
-              <TextArea
-                label='Description (Optional)'
-                name={`source-description-${index}`}
-                value={source.description}
-                errorMessage={sourceErrors[index]?.description}
-                onChange={(e) =>
-                  handleSourceChange(index, 'description', e.target.value)
-                }
-                placeholder='Brief description of the source content...'
-                maxLength={MAX_SOURCE_SUMMARY_LENGTH}
-                disabled={isLoading}
-                rows={3}
-              />
+                aria-label='Add source'
+              >
+                <Icon variant='plus' width={16} height={16} />
+                Add Source
+              </button>
             </div>
-          ))}
-        </div>
 
-        {/* Actions */}
-        <div className='flex flex-row justify-between gap-4 pt-2'>
+            {sources.map((source, index) => (
+              <div
+                key={index}
+                className='aucctus-border-primary flex flex-col gap-3 rounded-lg border p-4'
+              >
+                <div className='flex items-center justify-between'>
+                  <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
+                    Source {index + 1}
+                  </span>
+                  {sources.length > 1 && (
+                    <button
+                      type='button'
+                      className='btn btn-light btn-no-border btn-sm'
+                      onClick={() => removeSource(index)}
+                      disabled={isLoading}
+                      aria-label={`Remove source ${index + 1}`}
+                    >
+                      <Icon variant='trash' width={16} height={16} />
+                    </button>
+                  )}
+                </div>
+
+                <Input.Field
+                  label='Title'
+                  name={`source-title-${index}`}
+                  value={source.title}
+                  errorMessage={sourceErrors[index]?.title}
+                  onChange={(e) =>
+                    handleSourceChange(index, 'title', e.target.value)
+                  }
+                  placeholder='Enter source title...'
+                  maxLength={MAX_SOURCE_TITLE_LENGTH}
+                  disabled={isLoading}
+                  showAsterisk
+                  required
+                />
+
+                <Input.Field
+                  label='URL'
+                  name={`source-url-${index}`}
+                  value={source.url}
+                  errorMessage={sourceErrors[index]?.url}
+                  onChange={(e) =>
+                    handleSourceChange(index, 'url', e.target.value)
+                  }
+                  placeholder='https://example.com'
+                  type='url'
+                  disabled={isLoading}
+                  showAsterisk
+                  required
+                />
+
+                <TextArea
+                  label='Description (Optional)'
+                  name={`source-description-${index}`}
+                  value={source.description}
+                  errorMessage={sourceErrors[index]?.description}
+                  onChange={(e) =>
+                    handleSourceChange(index, 'description', e.target.value)
+                  }
+                  placeholder='Brief description of the source content...'
+                  maxLength={MAX_SOURCE_SUMMARY_LENGTH}
+                  disabled={isLoading}
+                  rows={3}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Footer */}
+      <div className='shrink-0 px-6 pb-6 pt-4'>
+        <div className='flex flex-row justify-between gap-4'>
           <button
             type='button'
             className='btn btn-light w-1/2'
@@ -430,8 +437,8 @@ const EditAnswerModal: FunctionComponent<EditAnswerModalProps> = ({
             {isLoading ? 'Updating...' : 'Update Answer'}
           </button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 };
 

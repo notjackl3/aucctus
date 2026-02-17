@@ -1,8 +1,9 @@
 import { Icon } from '@components';
+
 import { IPropertyDefinition, IPropertyFilter } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import * as Popover from '@radix-ui/react-popover';
-import { animated, useTransition } from 'react-spring';
+import { motion, AnimatePresence } from 'framer-motion';
 import React, { useState, useEffect } from 'react';
 import { getPropertyIcon } from '@libs/utils/propertyIcons';
 import { useUpdatePropertyDefinition } from '@hooks/query/properties-mutations.hook';
@@ -327,26 +328,6 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
       currentFilter.operator === 'is_null' ||
       currentFilter.operator === 'not_blank');
 
-  // Smooth animation for menu appearance
-  const menuTransition = useTransition(isOpen, {
-    from: {
-      opacity: 0,
-      transform: 'scale(0.95) translateY(-8px)',
-    },
-    enter: {
-      opacity: 1,
-      transform: 'scale(1) translateY(0px)',
-    },
-    leave: {
-      opacity: 0,
-      transform: 'scale(0.95) translateY(-8px)',
-    },
-    config: {
-      tension: 300,
-      friction: 25,
-    },
-  });
-
   return (
     <div
       ref={wrapperRef}
@@ -395,22 +376,26 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
           </button>
         </Popover.Trigger>
 
-        <Popover.Portal>
-          {menuTransition(
-            (styles, item) =>
-              item && (
-                <Popover.Content
-                  asChild
-                  className='aucctus-bg-primary aucctus-border-secondary z-[9999] min-w-[240px] rounded-lg border shadow-lg'
-                  align='start'
-                  sideOffset={5}
-                  onClick={(e: React.MouseEvent) => e.stopPropagation()}
+        <Popover.Portal forceMount>
+          <Popover.Content
+            forceMount
+            className='z-[9999]'
+            align='start'
+            sideOffset={5}
+            onClick={(e: React.MouseEvent) => e.stopPropagation()}
+            style={{ pointerEvents: isOpen ? 'auto' : 'none' }}
+          >
+            <AnimatePresence>
+              {isOpen && (
+                <motion.div
+                  ref={popoverContentRef}
+                  initial={{ opacity: 0, scale: 0.96, y: -4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.96, y: -4 }}
+                  transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  className='relative'
                 >
-                  <animated.div
-                    ref={popoverContentRef}
-                    style={styles}
-                    className='relative'
-                  >
+                  <div className='aucctus-bg-primary aucctus-border-secondary rounded-lg border shadow-lg'>
                     {/* Main Menu */}
                     <div className='w-[280px]'>
                       {/* Property Name Section */}
@@ -482,43 +467,44 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                                 )}
                               />
                               <div
-                                className={cn(
-                                  'aucctus-bg-primary aucctus-border-secondary w-[280px] rounded-lg border p-3 shadow-lg',
-                                  submenuPosition === 'right' ? 'ml-3' : 'mr-3',
-                                )}
+                                className={
+                                  submenuPosition === 'right' ? 'ml-3' : 'mr-3'
+                                }
                               >
-                                <div className='mb-3 flex items-center gap-2'>
-                                  <Icon
-                                    variant='filter-lines'
-                                    className='aucctus-stroke-secondary h-4 w-4'
+                                <div className='aucctus-bg-primary aucctus-border-secondary w-[280px] rounded-lg border p-3 shadow-lg'>
+                                  <div className='mb-3 flex items-center gap-2'>
+                                    <Icon
+                                      variant='filter-lines'
+                                      className='aucctus-stroke-secondary h-4 w-4'
+                                    />
+                                    <span className='aucctus-text-secondary text-sm font-medium'>
+                                      Filter by {definition.name}
+                                    </span>
+                                  </div>
+
+                                  <PropertyFilterContent
+                                    propDef={definition}
+                                    filterValue={filterValue}
+                                    filterOperator={filterOperator}
+                                    onFilterValueChange={(value) => {
+                                      // Store in ref for synchronous access (checkbox case)
+                                      pendingFilterValueRef.current = value;
+                                      setFilterValue(value);
+                                    }}
+                                    onFilterOperatorChange={setFilterOperator}
+                                    onApply={handleApplyFilterWrapper}
+                                    onCancel={() => setHoveredSubmenu(null)}
                                   />
-                                  <span className='aucctus-text-secondary text-sm font-medium'>
-                                    Filter by {definition.name}
-                                  </span>
+
+                                  {hasActiveFilter && (
+                                    <button
+                                      onClick={handleClearFilter}
+                                      className='aucctus-text-error-primary hover:aucctus-text-error-primary mt-3 w-full text-left text-sm transition-colors'
+                                    >
+                                      Clear filter
+                                    </button>
+                                  )}
                                 </div>
-
-                                <PropertyFilterContent
-                                  propDef={definition}
-                                  filterValue={filterValue}
-                                  filterOperator={filterOperator}
-                                  onFilterValueChange={(value) => {
-                                    // Store in ref for synchronous access (checkbox case)
-                                    pendingFilterValueRef.current = value;
-                                    setFilterValue(value);
-                                  }}
-                                  onFilterOperatorChange={setFilterOperator}
-                                  onApply={handleApplyFilterWrapper}
-                                  onCancel={() => setHoveredSubmenu(null)}
-                                />
-
-                                {hasActiveFilter && (
-                                  <button
-                                    onClick={handleClearFilter}
-                                    className='aucctus-text-error-primary hover:aucctus-text-error-primary mt-3 w-full text-left text-sm transition-colors'
-                                  >
-                                    Clear filter
-                                  </button>
-                                )}
                               </div>
                             </div>
                           )}
@@ -680,10 +666,11 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                         </button>
                       </div>
                     </div>
-                  </animated.div>
-                </Popover.Content>
-              ),
-          )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </Popover.Content>
         </Popover.Portal>
       </Popover.Root>
     </div>

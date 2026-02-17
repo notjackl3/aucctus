@@ -7,6 +7,12 @@ export type {
 
 export { default as NucleusPage } from './NucleusPage';
 
+export { LivingPersonasTab, PersonaSidebarItem } from './LivingPersonasTab';
+export type {
+  LivingPersonasTabProps,
+  PersonaSidebarItemProps,
+} from './LivingPersonasTab';
+
 export { CategoriesGrid } from './CategoriesGrid';
 export type {
   CategoriesGridProps,
@@ -26,3 +32,8 @@ export type {
   Importance,
   ImportanceConfig,
 } from './ConceptScoringConfig';
+
+export { CompanyContextTab } from './CompanyContextTab';
+export type { CompanyContextTabProps } from './CompanyContextTab';
+
+export { DecisionMakingTab } from './DecisionMakingTab';

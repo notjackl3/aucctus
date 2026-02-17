@@ -18,7 +18,7 @@ import {
   EyeOff,
   LockKeyhole,
 } from 'lucide-react';
-import { FunctionComponent, useEffect, useState } from 'react';
+import React, { FunctionComponent, useEffect, useState } from 'react';
 import { useMutation } from 'react-query';
 
 interface SubmissionLinkModalProps {
@@ -227,7 +227,10 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
       animate={{ opacity: 1, scale: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.95, y: 20 }}
       transition={{ duration: 0.3 }}
-      className='aucctus-bg-primary w-full max-w-xl overflow-hidden rounded-lg'
+      className={cn(
+        'w-full max-w-xl overflow-hidden',
+        embedded && 'rounded-lg',
+      )}
     >
       {/* Header with Background Image */}
       <div
@@ -472,10 +475,23 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
     return modalContent;
   }
 
-  // Standalone mode with overlay
+  // Standalone mode with glass overlay
   return (
-    <div className='aucctus-bg-overlay fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm'>
-      {modalContent}
+    <div className='glass-modal-overlay fixed inset-0 z-50 flex items-center justify-center p-4'>
+      <div className='relative w-full max-w-xl'>
+        <div className='liquid-glass-modal-shell'>
+          <div
+            aria-hidden='true'
+            className='liquid-glass-modal-rim liquid-glass-modal-rim-animated'
+          >
+            <div className='rim-orb rim-orb-1' />
+            <div className='rim-orb rim-orb-2' />
+          </div>
+          <div className='liquid-glass-modal-surface overflow-hidden'>
+            {modalContent}
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

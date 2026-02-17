@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react';
 import { Icon } from '@components';
 import { ITestCollateralOption } from '@libs/api/types/concept/testing';
+import React, { useMemo, useState } from 'react';
 
 // Collateral limits configuration
 const COLLATERAL_LIMITS = {
@@ -256,7 +256,10 @@ const MultiCollateralSelector: React.FC<MultiCollateralSelectorProps> = ({
                   disabled={disabled}
                   className='aucctus-text-tertiary hover:aucctus-text-error-primary disabled:opacity-50'
                 >
-                  <Icon variant='closeX' className='h-3 w-3' />
+                  <Icon
+                    variant='closeX'
+                    className='stroke-aucctus-primary h-3 w-3'
+                  />
                 </button>
               </div>
             ))}

@@ -1,4 +1,5 @@
 import { Icon } from '@components';
+
 import React from 'react';
 
 interface ISortSubmenuProps {

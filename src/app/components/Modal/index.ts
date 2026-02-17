@@ -28,6 +28,7 @@ import PropertyDefinitionModal from './PropertyDefinitionModal/PropertyDefinitio
 import IconPickerModal from './IconPickerModal/IconPickerModal';
 import SubmissionDetail from './SubmissionDetailModal/SubmissionDetailModal';
 import ImportConcepts from './ImportConceptsModal/ImportConceptsModal';
+import PersonaConversationSearch from './LivingPersona/PersonaConversationSearch';
 
 const Modal = {
   Base,
@@ -58,6 +59,7 @@ const Modal = {
   IconPickerModal,
   SubmissionDetail,
   ImportConcepts,
+  PersonaConversationSearch,
 };
 
 export default Modal;

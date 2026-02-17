@@ -1,25 +1,25 @@
-import React, { useState, useEffect, useCallback } from 'react';
 import { Icon } from '@components';
+import TabView, { TabElement } from '@components/Container/TabView/TabView';
 import LoadingSpinner from '@components/Icon/LoadingSpinner';
 import ComponentTooltip from '@components/ToolTip/ComponentTooltip';
-import { cn } from '@libs/utils/react';
 import { useModal } from '@context/ModalContextProvider';
-import TabView, { TabElement } from '@components/Container/TabView/TabView';
-import {
-  useTestDetail,
-  useCompleteTestDetail,
-} from '@hooks/query/testing.hook';
-import { Assumption } from '../types';
-import { useQueryClient } from 'react-query';
 import { AucctusQueryKeys } from '@hooks/query/query-keys';
-import useStore from '@stores/store';
+import {
+  useCompleteTestDetail,
+  useTestDetail,
+} from '@hooks/query/testing.hook';
 import { useCollateralRegenerationEvents } from '@hooks/sockets/testing';
+import { cn } from '@libs/utils/react';
+import useStore from '@stores/store';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useQueryClient } from 'react-query';
+import { Assumption } from '../types';
 
 // Test Execution Modal Sections
-import TestOverview from './modal-sections/TestOverview';
-import TestParticipants from './modal-sections/TestParticipants';
 import TestCollateral from './modal-sections/TestCollateral';
 import TestExecution from './modal-sections/TestExecution';
+import TestOverview from './modal-sections/TestOverview';
+import TestParticipants from './modal-sections/TestParticipants';
 import TestResults from './modal-sections/TestResults';
 import TestImpact from './modal-sections/test-impact/TestImpact';
 
@@ -468,7 +468,7 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
 
   return (
     // Parent modal container height is 90vh, this container height needs to match
-    <div className='aucctus-bg-primary flex h-[90vh] w-[1200px] flex-col rounded-xl'>
+    <div className='flex h-[90vh] w-[1200px] flex-col rounded-xl'>
       {/* Header */}
       <div className='aucctus-border-secondary flex flex-shrink-0 items-center justify-between border-b p-6'>
         <div className='flex items-center gap-3'>

@@ -1,6 +1,6 @@
 ---
 name: lovable-porting
-description: Port code from external sources (Lovable/shadcn) to Aucctus codebase. Use when porting Lovable components, converting shadcn/ui to Aucctus, migrating external React code, or adapting lucide icons to Aucctus Icon component.
+description: Port code from external sources (Lovable/shadcn) to Aucctus codebase. Use when porting Lovable components, converting shadcn/ui to Aucctus, or migrating external React code.
 ---
 
 # Lovable to Aucctus Porting
@@ -11,7 +11,6 @@ This skill guides you through porting code from external sources (specifically L
 
 - Porting components from `@lovable` directory
 - Converting shadcn/ui components to Aucctus equivalents
-- Replacing lucide-react icons with Aucctus Icon component
 - Migrating external React TypeScript code to Aucctus patterns
 
 ## Porting Process Overview
@@ -35,7 +34,8 @@ import { Briefcase, ArrowDown, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 // INTERNAL
-import { Icon, toast, SectionHeader } from '@components';
+import { Briefcase, ArrowDown, Plus } from 'lucide-react';  // Keep lucide icons as-is
+import { toast, SectionHeader } from '@components';
 import { motion } from 'framer-motion';  // For micro-interactions
 ```
 
@@ -80,7 +80,7 @@ When porting shadcn components, prefer Radix UI primitives over custom implement
 | `Button variant="ghost"` | `<button className="aucctus-bg-secondary-hover rounded-full p-2 transition-colors">` |
 | `Button variant="outline"` | `<button className="btn btn-light">` |
 | `Button variant="default"` | `<button className="btn btn-primary">` |
-| Lucide icons | `<Icon variant="name" className="aucctus-stroke-primary" height={18} width={18} />` |
+| Lucide icons | Keep as-is - Aucctus uses `lucide-react` directly |
 | `toast` (sonner) | `toast` from `@components` |
 
 ## Styling Transformations
@@ -108,20 +108,20 @@ className="aucctus-bg-primary-hover"
 className="hover:aucctus-bg-primary-hover"
 ```
 
-## Icon Transformation
+## Icons (No Transformation Needed)
+
+Aucctus uses `lucide-react` directly, so **keep lucide icons as-is**:
 
 ```tsx
-// EXTERNAL
-<Briefcase className="h-5 w-5 text-primary" />
+// Keep this - no changes needed
+import { Briefcase, ArrowDown, Plus } from 'lucide-react';
 
-// INTERNAL
-<Icon variant="briefcase" className="aucctus-stroke-primary" height={18} width={18} />
+<Briefcase className="h-5 w-5 text-primary" />
 ```
 
-Icon size mapping:
-- `h-4 w-4` → `height={16} width={16}`
-- `h-5 w-5` → `height={18} width={18}`
-- `h-6 w-6` → `height={24} width={24}`
+Just update the color classes to use Aucctus theme classes:
+- `text-primary` → `aucctus-text-primary`
+- `text-muted-foreground` → `aucctus-text-secondary`
 
 ## State Management Pattern
 
@@ -151,7 +151,7 @@ const handleDelete = useCallback((id: string) => {
 Before completing a port, verify:
 
 - [ ] All shadcn/ui imports removed
-- [ ] All lucide-react icons replaced with Icon component
+- [ ] Lucide icons kept as-is (just update color classes to aucctus-* variants)
 - [ ] All sonner toast replaced with @components toast
 - [ ] Tailwind colors replaced with aucctus-* classes
 - [ ] Buttons use btn classes
