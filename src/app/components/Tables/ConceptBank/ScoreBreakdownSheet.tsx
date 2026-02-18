@@ -8,7 +8,6 @@ import {
   useConceptPriorityDetail,
   useUpdateQuestionScore,
 } from '@hooks/query/concept-priority.hook';
-import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useConceptOverview } from '@hooks/query/concepts.hook';
 import {
   useBulkConceptUpdate,
@@ -26,7 +25,6 @@ import React, {
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
-import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -486,7 +484,6 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
   const navigate = useNavigate();
   const accountUuid = useStore((state) => state.auth.user?.account?.uuid);
   const { configs } = useScoringConfigs(accountUuid);
-  const queryClient = useQueryClient();
 
   // Track when we've triggered a config change and are waiting for rescore
   const [isAwaitingRescore, setIsAwaitingRescore] = useState(false);
@@ -518,18 +515,13 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
   const handleScoringConfigChange = useCallback(
     (configUuid: string) => {
       if (!conceptUuid || !configUuid) return;
-      // Optimistically mark the concept as calculating before the mutation
-      queryClient.setQueryData(
-        [AucctusQueryKeys.conceptPriority, conceptUuid],
-        { isCalculating: true },
-      );
       setIsAwaitingRescore(true);
       bulkConceptUpdate.mutate({
         conceptUuids: [conceptUuid],
         scoringConfigUuid: configUuid,
       });
     },
-    [conceptUuid, bulkConceptUpdate, queryClient],
+    [conceptUuid, bulkConceptUpdate],
   );
 
   // Fetch detailed priority data when sheet is open

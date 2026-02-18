@@ -144,6 +144,9 @@ export const PriorityCell: React.FC<PriorityCellProps> = ({
   // Effective priority: prefer cached data (more up-to-date from WebSocket) over prop
   const effectivePriority = cachedPriorityData || prioritySummary;
 
+  const score = effectivePriority?.overallPriorityScore ?? 0;
+  const level = effectivePriority ? getPriorityLevel(score) : null;
+
   // If no priority and not calculating, show Calculate button
   if (!effectivePriority && !isCalculating) {
     return (
@@ -164,8 +167,8 @@ export const PriorityCell: React.FC<PriorityCellProps> = ({
     );
   }
 
-  // Show loading state while calculating
-  if (isCalculating) {
+  // Show loading state while calculating (but always keep sheet mounted below)
+  if (isCalculating && !showSheet) {
     return (
       <button
         className='btn btn-outlined btn-sm cursor-not-allowed opacity-70'
@@ -180,27 +183,35 @@ export const PriorityCell: React.FC<PriorityCellProps> = ({
     );
   }
 
-  // At this point, effectivePriority must exist
-  if (!effectivePriority) return null;
-
-  const score = effectivePriority.overallPriorityScore;
-  const level = getPriorityLevel(score);
-
   return (
     <>
-      <button
-        onClick={(e) => {
-          e.stopPropagation();
-          setShowSheet(true);
-        }}
-        className={cn('flex items-center transition-opacity hover:opacity-80')}
-        aria-label={`Priority: ${level} (${score}/100)`}
-      >
-        {/* Mini semicircle gauge */}
-        <MiniScoreGauge score={score} />
-      </button>
+      {isCalculating ? (
+        <button
+          className='btn btn-outlined btn-sm cursor-not-allowed opacity-70'
+          disabled
+        >
+          <RefreshCw
+            size={12}
+            className='aucctus-stroke-brand-primary animate-spin'
+          />
+          <span className='aucctus-text-xs'>Calculating...</span>
+        </button>
+      ) : effectivePriority ? (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            setShowSheet(true);
+          }}
+          className={cn(
+            'flex items-center transition-opacity hover:opacity-80',
+          )}
+          aria-label={`Priority: ${level} (${score}/100)`}
+        >
+          <MiniScoreGauge score={score} />
+        </button>
+      ) : null}
 
-      {/* Score Breakdown Sheet */}
+      {/* Sheet always stays mounted when open, even during calculating */}
       <ScoreBreakdownSheet
         isOpen={showSheet}
         onClose={() => setShowSheet(false)}
