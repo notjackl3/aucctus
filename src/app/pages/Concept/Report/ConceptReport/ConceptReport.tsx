@@ -5,8 +5,7 @@ import {
   Select,
   ConceptReportSkeletons,
 } from '@components';
-import { OverseerWrapper, ROUTE_TO_PAGE_CONTEXT } from '@components/Overseer';
-import AucctusLogo from '@assets/aucctus_logo.png';
+import { OverseerWrapper } from '@components/Overseer';
 import EditModeSwitcher from '@components/Text/EditModeSwitcher/EditModeSwitcher';
 import { useEditConcept } from '@hooks/concepts/editable.hook';
 import {
@@ -191,21 +190,6 @@ const ConceptReport: FunctionComponent = () => {
     [conceptIdentifier, navigate],
   );
 
-  const overseerOpen = useStore((state) => state.overseer.open);
-  const setDocked = useStore((state) => state.overseer.setDocked);
-
-  const onAskAucctusClick = useCallback(() => {
-    const pageContext = ROUTE_TO_PAGE_CONTEXT[activeTab || ''] || 'overview';
-    overseerOpen({
-      selectedText: '',
-      expandedText: '',
-      pageContext,
-      position: { x: 0, y: 0 },
-      conceptUuid: conceptUuid || undefined,
-    });
-    setDocked(true);
-  }, [activeTab, conceptUuid, overseerOpen, setDocked]);
-
   const onMagicShareClick = useCallback(() => {
     openModal(
       Modal.MagicShare,
@@ -288,17 +272,6 @@ const ConceptReport: FunctionComponent = () => {
               </div>
             )}
             <div className='flex gap-4'>
-              {!concept?.isHistoricalVersion && (
-                <button
-                  onClick={onAskAucctusClick}
-                  className='flex items-center gap-2 rounded-lg px-4 py-2 text-white transition-colors hover:bg-[#3a1212]'
-                  style={{ backgroundColor: '#2a0a0a' }}
-                  aria-label='Ask Aucctus'
-                >
-                  <img src={AucctusLogo} alt='Aucctus' className='h-4 w-4' />
-                  Ask Aucctus
-                </button>
-              )}
               {concept &&
                 !concept.isHistoricalVersion &&
                 FEATURE_CONCEPT_VERSIONING && (
