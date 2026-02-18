@@ -65,6 +65,10 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
       {...props}
       className={cn(
         'aucctus-text-primary aucctus-border-secondary aucctus-bg-primary-hover text-nowrap border-b p-3 align-top text-base font-medium leading-normal transition-colors first:pl-8 last:pr-4 hover:border-l hover:border-r',
+        {
+          'border-r border-primary-100 !p-0 !align-middle':
+            columnId === 'select',
+        },
         props.className,
       )}
       key={header.id}
@@ -83,10 +87,16 @@ const TableHeader: React.FC<ITableHeaderProps<any>> = <T,>({
       }}
     >
       {header.isPlaceholder ? null : (
-        <span className='flex flex-row items-center justify-start [&>svg]:stroke-primary-500'>
+        <span
+          className={cn(
+            'flex flex-row items-center [&>svg]:stroke-primary-500',
+            columnId === 'select' ? 'justify-center' : 'justify-start',
+          )}
+        >
           <span
             className={cn([
-              '!aucctus-text-primary flex items-center justify-start',
+              '!aucctus-text-primary flex items-center',
+              columnId === 'select' ? 'justify-center' : 'justify-start',
               {
                 'cursor-pointer': header.column.getCanSort(),
                 'select-none': header.column.getCanSort(),

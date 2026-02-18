@@ -1,5 +1,6 @@
 import images from '@assets/img';
 import { toast } from '@components';
+import { useScoringConfigs } from '@hooks/query/scoringConfig.hook';
 import api from '@libs/api';
 import {
   ICreateSubmissionLink,
@@ -12,6 +13,7 @@ import { motion } from 'framer-motion';
 import {
   AlertCircle,
   ArrowLeft,
+  ChevronDown,
   Copy,
   ExternalLink,
   Eye,
@@ -47,9 +49,15 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
   const account = useStore((state) => state.auth.account);
   const isEditing = !!link;
 
+  // Scoring configs
+  const { configs: scoringConfigs } = useScoringConfigs(account?.uuid);
+
   // Form state
   const [title, setTitle] = useState(link?.title || '');
   const [slug, setSlug] = useState(link?.slug || '');
+  const [scoringConfigUuid, setScoringConfigUuid] = useState<string>(
+    link?.defaultScoringConfigUuid || '',
+  );
   const [hasPassword, setHasPassword] = useState(
     link?.requiresPassword || false,
   );
@@ -162,6 +170,11 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
         slug,
       };
 
+      // Handle scoring config changes
+      if (scoringConfigUuid !== (link.defaultScoringConfigUuid || '')) {
+        data.scoring_config_uuid = scoringConfigUuid || null;
+      }
+
       // Handle password changes
       if (clearPassword) {
         data.password = null;
@@ -176,6 +189,7 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
         title,
         slug,
         password: hasPassword ? password : undefined,
+        scoring_config_uuid: scoringConfigUuid || undefined,
       };
 
       createMutation.mutate(data);
@@ -437,6 +451,34 @@ const SubmissionLinkModal: FunctionComponent<SubmissionLinkModalProps> = ({
             </p>
           )}
         </div>
+
+        {/* Scoring Config */}
+        {scoringConfigs.length > 0 && (
+          <div className='space-y-2'>
+            <label className='aucctus-text-xs aucctus-text-tertiary block font-medium uppercase tracking-wide'>
+              Scoring Criteria
+            </label>
+            <div className='relative'>
+              <select
+                value={scoringConfigUuid}
+                onChange={(e) => setScoringConfigUuid(e.target.value)}
+                className='aucctus-bg-secondary/20 aucctus-border-secondary/50 aucctus-text-primary focus:aucctus-bg-primary focus:aucctus-border-brand/50 h-11 w-full appearance-none rounded-lg border px-4 pr-10 transition-colors focus:outline-none'
+              >
+                <option value=''>Use Account Default</option>
+                {scoringConfigs.map((config) => (
+                  <option key={config.uuid} value={config.uuid}>
+                    {config.name}
+                    {config.isDefault ? ' (Account Default)' : ''}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className='aucctus-text-tertiary pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2' />
+            </div>
+            <p className='aucctus-text-xs aucctus-text-tertiary'>
+              New submissions under this link will be scored with this criteria.
+            </p>
+          </div>
+        )}
 
         {/* Footer */}
         <div className='flex items-center justify-end gap-3 pt-4'>

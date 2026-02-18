@@ -143,11 +143,11 @@ const SaveScoringConfigModal: React.FC<SaveScoringConfigModalProps> = ({
                     : 'aucctus-text-primary',
                 )}
               >
-                Re-score all concepts and idea submissions
+                Re-score concepts using this config
               </h3>
               <p className='aucctus-text-sm aucctus-text-secondary mt-1'>
-                All existing concepts and idea submissions will be re-evaluated
-                using the new scoring criteria.
+                Concepts and idea submissions assigned to this scoring
+                configuration will be re-evaluated using the updated criteria.
               </p>
             </div>
           </div>

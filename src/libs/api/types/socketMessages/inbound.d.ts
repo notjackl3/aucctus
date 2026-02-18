@@ -902,6 +902,21 @@ export interface IIdeaSubmissionsUploadErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Idea Submissions Bulk Rescore Event Messages
+// ==========================================
+
+export interface IIdeaSubmissionsBulkRescoreCompletedMessage
+  extends BaseSocketEvent {
+  type: 'idea_submissions.bulk_rescore.completed.user';
+  accountUuid: string;
+  taskId: string;
+  total: number;
+  successCount: number;
+  errorCount: number;
+  submissionLinkUuid?: string;
+}
+
+// ==========================================
 // Idea Playground Event Messages
 // ==========================================
 
@@ -1322,6 +1337,7 @@ export type InboundSocketEvent<C = {}> =
   | IIdeaSubmissionsUploadProgressMessage
   | IIdeaSubmissionsUploadCompletedMessage
   | IIdeaSubmissionsUploadErrorMessage
+  | IIdeaSubmissionsBulkRescoreCompletedMessage
   | IOverseerHandshakeMessage
   | IOverseerChatMessage
   | IOverseerChatStreamMessage

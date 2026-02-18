@@ -15,7 +15,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ListFilter,
-  SwitchCamera,
+  ArrowUpDown,
   UserSquare,
   X,
 } from 'lucide-react';
@@ -390,7 +390,7 @@ const CreatedByFilterMenu: React.FC<ICreatedByFilterMenuProps> = ({
                                 setShowFilterView(false);
                               }}
                             >
-                              <SwitchCamera className='aucctus-stroke-secondary h-4 w-4' />
+                              <ArrowUpDown className='aucctus-stroke-secondary h-4 w-4' />
                               <span className='aucctus-text-secondary'>
                                 Sort
                               </span>

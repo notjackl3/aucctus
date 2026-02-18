@@ -2,6 +2,8 @@ import Api from './api';
 import { ApiService, IApiServiceConfig } from './base/apiService';
 import { Endpoints as endpoints } from './endpoints';
 import {
+  IBulkSubmissionUpdate,
+  IBulkSubmissionUpdateResponse,
   ICompareSubmissionsRequest,
   ICompareSubmissionsResponse,
   ICreateIdeaSubmission,
@@ -261,6 +263,22 @@ export class IdeaSubmissionsApi extends ApiService {
     return this.postFormData<IFileUploadResponse>(
       endpoints.ideaSubmissionsUpload,
       formData,
+    );
+  }
+
+  // ============================================
+  // Bulk Update Endpoint (Authentication Required)
+  // ============================================
+
+  /**
+   * Bulk update multiple idea submissions.
+   * Supports updating scoring config and/or status for multiple submissions at once.
+   * @param data - Submission UUIDs and fields to update
+   */
+  bulkUpdateSubmissions(data: IBulkSubmissionUpdate) {
+    return this.patch<IBulkSubmissionUpdateResponse, IBulkSubmissionUpdate>(
+      `${endpoints.ideaSubmissionsAdmin}/bulk-update`,
+      data,
     );
   }
 

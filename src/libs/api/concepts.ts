@@ -32,6 +32,8 @@ import {
   QuestionFieldType,
   IConceptMagicShareLatest,
   NotificationSectionKey,
+  IBulkConceptUpdate,
+  IBulkConceptUpdateResponse,
 } from './types'; // Import the missing type
 import {
   IConceptVersionList,
@@ -741,5 +743,15 @@ export class ConceptApi extends ApiService {
     return this.get<
       import('./types/concept/concept_priority').IPortfolioSummaryResponse
     >(endpoints.conceptPriorityPortfolioSummary());
+  }
+
+  /**
+   * Bulk update multiple concepts at once.
+   */
+  bulkUpdateConcepts(data: IBulkConceptUpdate) {
+    return this.patch<IBulkConceptUpdateResponse>(
+      endpoints.conceptBulkUpdate,
+      data,
+    );
   }
 }

@@ -4,13 +4,17 @@
 
 import api from '@libs/api';
 import {
+  IBulkSubmissionUpdate,
+  IBulkSubmissionUpdateResponse,
   IIdeaSubmissionDetail,
   ISubmissionFilterParams,
   ISubmissionLink,
   ISubmissionListResponse,
 } from '@libs/api/types/ideaSubmissions';
-import { useQuery } from 'react-query';
+import { useMutation, useQuery, useQueryClient } from 'react-query';
+import { toast } from '@components';
 
+import utils from '@libs/utils';
 import { AucctusQueryKeys } from './query-keys';
 
 /**
@@ -114,4 +118,32 @@ export const useSubmissionDetail = (
   });
 
   return { ...query, submissionDetail: query.data };
+};
+
+/**
+ * Hook to bulk update multiple idea submissions.
+ * Supports updating scoring config and/or status.
+ */
+export const useBulkSubmissionUpdate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation<
+    IBulkSubmissionUpdateResponse,
+    unknown,
+    IBulkSubmissionUpdate
+  >({
+    mutationFn: async (data: IBulkSubmissionUpdate) => {
+      return await api.ideaSubmissions.bulkUpdateSubmissions(data);
+    },
+    onSuccess: (result) => {
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.submissionLinkSubmissions],
+      });
+      toast.success(result.message);
+    },
+    onError: (error: unknown) => {
+      const message = utils.osiris.parseFormError(error);
+      toast.error(message || 'Failed to update submissions');
+    },
+  });
 };

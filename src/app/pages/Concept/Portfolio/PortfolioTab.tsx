@@ -18,9 +18,7 @@ import {
   usePortfolioSummary,
 } from '@hooks/query/concept-priority.hook';
 import { useConcepts } from '@hooks/query/concepts.hook';
-import { useAutoInitScoringConfig } from '@hooks/query/scoringConfig.hook';
 import api from '@libs/api';
-import useStore from '@stores/store';
 import {
   HighScoringConceptsCarousel,
   PortfolioBalanceWidget,
@@ -51,11 +49,6 @@ const DEFAULT_PILLAR_COLORS = [
 
 const PortfolioTab: React.FC = () => {
   const navigate = useNavigate();
-  const account = useStore((state) => state.auth.account);
-
-  // Auto-initialize scoring config with defaults if none exists
-  useAutoInitScoringConfig(account?.uuid);
-
   // Fetch real priorities
   const { priorities, isLoading: prioritiesLoading } = useConceptPriorities();
 

@@ -70,6 +70,43 @@ export interface IScoringConfigSaveResponse {
   message: string;
   version: number | null;
   rescoreTaskId: string | null;
+  affectedConceptUuids: string[];
+}
+
+// Multi-config types
+
+export interface IScoringConfigSummary {
+  uuid: string;
+  name: string;
+  isDefault: boolean;
+  categoryCount: number;
+  questionCount: number;
+  createdAt: string;
+}
+
+export interface IScoringConfigCreate {
+  name: string;
+  cloneFromUuid?: string;
+}
+
+export interface IScoringConfigUpdate {
+  name: string;
+}
+
+// Bulk concept update types
+
+export interface IBulkConceptUpdate {
+  conceptUuids: string[];
+  status?: string;
+  scoringConfigUuid?: string;
+  customProperties?: Record<string, unknown>;
+}
+
+export interface IBulkConceptUpdateResponse {
+  updatedCount: number;
+  rescoreQueued: boolean;
+  affectedConceptUuids: string[];
+  message: string;
 }
 
 // Priority Score Types (for scoring results)
@@ -107,6 +144,8 @@ export interface IConceptPriorityDetail {
   /** Current status of AI scoring: pending, scoring, complete, error */
   scoringStatus: ScoringStatus | null;
   scoringConfigVersion: number | null;
+  /** UUID of the scoring config used for this concept's scores */
+  scoringConfigUuid: string | null;
   // Innovation horizon classification
   innovationHorizon?: InnovationHorizon | null;
   innovationHorizonReasoning?: string;

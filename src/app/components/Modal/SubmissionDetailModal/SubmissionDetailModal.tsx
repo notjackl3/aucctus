@@ -277,7 +277,7 @@ const SubmissionDetailModal: FunctionComponent<SubmissionDetailModalProps> = ({
   };
 
   return (
-    <div className='flex h-screen w-[480px] flex-col overflow-hidden'>
+    <div className='aucctus-bg-primary flex h-screen w-[480px] flex-col overflow-hidden'>
       {/* Header Image - Gradient with Lightbulb */}
       <div
         className='relative flex h-32 w-full flex-shrink-0 items-center justify-center'

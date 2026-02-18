@@ -14,7 +14,7 @@ import {
   EyeOff,
   ListFilter,
   Settings,
-  SwitchCamera,
+  ArrowUpDown,
   Trash2,
 } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
@@ -523,7 +523,7 @@ const NotionStyleColumnMenu: React.FC<INotionStyleColumnMenuProps> = ({
                               }}
                             >
                               <div className='flex items-center gap-2'>
-                                <SwitchCamera className='aucctus-stroke-secondary h-4 w-4' />
+                                <ArrowUpDown className='aucctus-stroke-secondary h-4 w-4' />
                                 <span className='aucctus-text-secondary'>
                                   Sort
                                 </span>

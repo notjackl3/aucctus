@@ -2,22 +2,38 @@
  * Score Breakdown Sheet component - displays detailed priority score breakdown in a sidebar.
  */
 
+import { ComponentTooltip } from '@components';
 import images from '@assets/img';
 import {
   useConceptPriorityDetail,
   useUpdateQuestionScore,
 } from '@hooks/query/concept-priority.hook';
+import { AucctusQueryKeys } from '@hooks/query/query-keys';
 import { useConceptOverview } from '@hooks/query/concepts.hook';
+import {
+  useBulkConceptUpdate,
+  useScoringConfigs,
+} from '@hooks/query/scoringConfig.hook';
 import { ICategoryScore } from '@libs/api/types/accounts/scoring-config';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
-import React, { useCallback, useMemo, useState } from 'react';
+import useStore from '@stores/store';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
+import { useQueryClient } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import {
   AlertTriangle,
   BarChart3,
+  Check,
   ChevronDown,
+  HelpCircle,
   Lightbulb,
   Settings,
   ThumbsUp,
@@ -251,7 +267,7 @@ const ScoringCategorySection: React.FC<{
                     })}
                   </div>
                 </div>
-                <div className='mt-2'>
+                <div className='mt-2 flex items-center gap-2'>
                   <span
                     className={cn(
                       'rounded-full border px-3 py-1 text-xs font-medium',
@@ -266,6 +282,20 @@ const ScoringCategorySection: React.FC<{
                       question.importance.slice(1)}{' '}
                     Priority
                   </span>
+                  {question.reasoning && (
+                    <ComponentTooltip
+                      tip={
+                        <div className='aucctus-bg-primary aucctus-border-secondary max-w-xs rounded-lg border px-3 py-2 shadow-lg'>
+                          <p className='aucctus-text-xs aucctus-text-primary leading-relaxed'>
+                            {question.reasoning}
+                          </p>
+                        </div>
+                      }
+                      preferredPosition='above'
+                    >
+                      <HelpCircle className='aucctus-stroke-secondary hover:aucctus-stroke-primary h-4 w-4 cursor-help transition-colors' />
+                    </ComponentTooltip>
+                  )}
                 </div>
               </div>
             );
@@ -314,6 +344,133 @@ const SheetSkeleton: React.FC = () => (
 );
 
 /**
+ * Portal-based scoring config dropdown selector
+ */
+const ScoringConfigDropdown: React.FC<{
+  configs: { uuid: string; name: string; isDefault: boolean }[];
+  currentConfigUuid: string;
+  onChange: (configUuid: string) => void;
+  disabled?: boolean;
+}> = ({ configs, currentConfigUuid, onChange, disabled = false }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ top: 0, left: 0, width: 0 });
+
+  const selectedConfig = configs.find((c) => c.uuid === currentConfigUuid);
+
+  useEffect(() => {
+    if (isOpen && triggerRef.current) {
+      const rect = triggerRef.current.getBoundingClientRect();
+      setPosition({
+        top: rect.bottom + 4,
+        left: rect.left,
+        width: rect.width,
+      });
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as Element;
+      if (
+        !triggerRef.current?.contains(target) &&
+        !dropdownRef.current?.contains(target)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsOpen(false);
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [isOpen]);
+
+  return (
+    <div className='aucctus-bg-secondary aucctus-border-secondary mb-6 rounded-xl border p-4 shadow-sm'>
+      <label className='aucctus-text-sm-semibold aucctus-text-primary'>
+        Scoring Criteria
+      </label>
+      <button
+        ref={triggerRef}
+        type='button'
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
+        className={cn(
+          'aucctus-bg-primary aucctus-border-secondary aucctus-text-primary mt-2 flex w-full items-center justify-between rounded-lg border px-3 py-2 text-sm transition-all',
+          'hover:border-gray-400 dark:hover:border-gray-500',
+          disabled && 'cursor-not-allowed opacity-50',
+        )}
+      >
+        <span className='truncate'>
+          {selectedConfig?.name ?? 'Select config'}
+          {selectedConfig?.isDefault ? ' (Default)' : ''}
+        </span>
+        <ChevronDown
+          className={cn(
+            'aucctus-stroke-tertiary ml-2 h-4 w-4 shrink-0 transition-transform duration-200',
+            isOpen && 'rotate-180',
+          )}
+        />
+      </button>
+
+      {isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className='aucctus-bg-primary aucctus-border-secondary fixed z-[99999] overflow-hidden rounded-lg border shadow-lg'
+            style={{
+              top: position.top,
+              left: position.left,
+              width: position.width,
+            }}
+            data-aucctus-portal-target='true'
+          >
+            <ul className='no-scrollbar max-h-60 overscroll-contain py-1'>
+              {configs.map((config) => {
+                const isSelected = config.uuid === currentConfigUuid;
+                return (
+                  <li
+                    key={config.uuid}
+                    className={cn(
+                      'aucctus-text-sm flex cursor-pointer items-center gap-2 px-3 py-2.5 transition-colors',
+                      isSelected
+                        ? 'aucctus-bg-secondary aucctus-text-primary font-medium'
+                        : 'aucctus-text-primary hover:bg-gray-50 dark:hover:bg-gray-800/50',
+                    )}
+                    onClick={() => {
+                      onChange(config.uuid);
+                      setIsOpen(false);
+                    }}
+                    data-aucctus-portal-target='true'
+                  >
+                    <span className='min-w-0 flex-1 truncate'>
+                      {config.name}
+                      {config.isDefault ? ' (Default)' : ''}
+                    </span>
+                    {isSelected && (
+                      <Check className='aucctus-stroke-primary h-4 w-4 shrink-0' />
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          </div>,
+          document.body,
+        )}
+    </div>
+  );
+};
+
+/**
  * Main Score Breakdown Sheet component
  */
 export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
@@ -327,6 +484,21 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
   score: propScore,
 }) => {
   const navigate = useNavigate();
+  const accountUuid = useStore((state) => state.auth.user?.account?.uuid);
+  const { configs } = useScoringConfigs(accountUuid);
+  const queryClient = useQueryClient();
+
+  // Track when we've triggered a config change and are waiting for rescore
+  const [isAwaitingRescore, setIsAwaitingRescore] = useState(false);
+
+  const bulkConceptUpdate = useBulkConceptUpdate({
+    onRescoreStarted: (affectedUuids) => {
+      if (conceptUuid && affectedUuids.includes(conceptUuid)) {
+        setIsAwaitingRescore(true);
+      }
+    },
+  });
+
   const [activeTab, setActiveTab] = useState<'believe' | 'challenge'>(
     'believe',
   );
@@ -342,9 +514,37 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
     navigate(`${AppPath.Nucleus}?openScoringConfig=true`);
   }, [navigate]);
 
+  // Handle scoring config change for this concept
+  const handleScoringConfigChange = useCallback(
+    (configUuid: string) => {
+      if (!conceptUuid || !configUuid) return;
+      // Optimistically mark the concept as calculating before the mutation
+      queryClient.setQueryData(
+        [AucctusQueryKeys.conceptPriority, conceptUuid],
+        { isCalculating: true },
+      );
+      setIsAwaitingRescore(true);
+      bulkConceptUpdate.mutate({
+        conceptUuids: [conceptUuid],
+        scoringConfigUuid: configUuid,
+      });
+    },
+    [conceptUuid, bulkConceptUpdate, queryClient],
+  );
+
   // Fetch detailed priority data when sheet is open
   const { priorityDetail, isLoading: priorityLoading } =
     useConceptPriorityDetail(isOpen ? (conceptUuid ?? null) : null);
+
+  // Get the current concept's scoring config UUID from priority detail
+  const currentScoringConfigUuid = useMemo(() => {
+    if (priorityDetail?.scoringConfigUuid) {
+      return priorityDetail.scoringConfigUuid;
+    }
+    // Fallback to default config if priority detail doesn't have one
+    const defaultConfig = configs.find((c) => c.isDefault);
+    return defaultConfig?.uuid ?? '';
+  }, [priorityDetail, configs]);
 
   // Mutation for updating question scores
   const updateScoreMutation = useUpdateQuestionScore(conceptUuid ?? '');
@@ -365,7 +565,16 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
     return conceptOverview?.conceptImageUrl || null;
   }, [conceptImage, conceptOverview]);
 
-  const isLoading = externalLoading || priorityLoading;
+  // Don't show loading skeleton when we're just waiting for a rescore after config change
+  // (the query refetch from invalidation would otherwise flash the skeleton)
+  const isLoading = (externalLoading || priorityLoading) && !isAwaitingRescore;
+
+  // Clear awaiting rescore when priority detail comes back with fresh data
+  useEffect(() => {
+    if (isAwaitingRescore && priorityDetail && !priorityLoading) {
+      setIsAwaitingRescore(false);
+    }
+  }, [isAwaitingRescore, priorityDetail, priorityLoading]);
 
   // Calculate overall score
   const overallScore = useMemo(() => {
@@ -576,6 +785,16 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
                   </ul>
                 )}
               </div>
+
+              {/* Scoring Config Selector */}
+              {configs.length > 1 && (
+                <ScoringConfigDropdown
+                  configs={configs}
+                  currentConfigUuid={currentScoringConfigUuid}
+                  onChange={handleScoringConfigChange}
+                  disabled={bulkConceptUpdate.isLoading}
+                />
+              )}
 
               {/* Scoring Criteria */}
               <div className='space-y-4'>

@@ -73,6 +73,7 @@ const TableRow: React.FC<ITableRowProps<any>> = <T,>({
         return (
           <td
             className={cn('break-words p-3 text-base font-normal first:pl-4', {
+              'border-r border-primary-100 !p-0': columnId === 'select',
               'bg-inherit': !shouldPin,
             })}
             style={{

@@ -23,8 +23,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Clipboard,
+  ArrowUpDown,
   ListFilter,
-  SwitchCamera,
   X,
 } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
@@ -644,7 +644,7 @@ const SortDropdown: React.FC<ISortDropdownProps> = ({
     <Popover.Root open={isOpen} onOpenChange={onOpenChange} modal={false}>
       <Popover.Trigger asChild>
         <button className='aucctus-bg-secondary-hover flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-200'>
-          <SwitchCamera size={16} className='aucctus-stroke-secondary' />
+          <ArrowUpDown size={16} className='aucctus-stroke-secondary' />
           <span className='aucctus-text-sm aucctus-text-secondary'>Sort</span>
         </button>
       </Popover.Trigger>

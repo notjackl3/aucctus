@@ -29,6 +29,7 @@ import IconPickerModal from './IconPickerModal/IconPickerModal';
 import SubmissionDetail from './SubmissionDetailModal/SubmissionDetailModal';
 import ImportConcepts from './ImportConceptsModal/ImportConceptsModal';
 import PersonaConversationSearch from './LivingPersona/PersonaConversationSearch';
+import BulkEditConcepts from './BulkEditConceptsModal/BulkEditConceptsModal';
 
 const Modal = {
   Base,
@@ -60,6 +61,7 @@ const Modal = {
   SubmissionDetail,
   ImportConcepts,
   PersonaConversationSearch,
+  BulkEditConcepts,
 };
 
 export default Modal;

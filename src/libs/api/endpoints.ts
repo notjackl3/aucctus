@@ -680,17 +680,24 @@ export class Endpoints {
   }
 
   // Scoring Configuration Endpoints
-  static scoringConfig(accountUuid: string) {
-    return `/api/v1/accounts/${accountUuid}/scoring-config`;
+  static scoringConfigs(accountUuid: string) {
+    return `/api/v1/accounts/${accountUuid}/scoring-configs`;
   }
 
-  static scoringConfigCategories(accountUuid: string) {
-    return `/api/v1/accounts/${accountUuid}/scoring-config/categories`;
+  static scoringConfigDetail(accountUuid: string, configUuid: string) {
+    return `/api/v1/accounts/${accountUuid}/scoring-configs/${configUuid}`;
   }
 
-  static scoringConfigCategory(accountUuid: string, categoryUuid: string) {
-    return `/api/v1/accounts/${accountUuid}/scoring-config/categories/${categoryUuid}`;
+  static scoringConfigSetDefault(accountUuid: string, configUuid: string) {
+    return `/api/v1/accounts/${accountUuid}/scoring-configs/${configUuid}/set-default`;
   }
+
+  static scoringConfigFullDetail(accountUuid: string, configUuid: string) {
+    return `/api/v1/accounts/${accountUuid}/scoring-configs/${configUuid}/detail`;
+  }
+
+  // Bulk Concept Update Endpoint
+  static conceptBulkUpdate = 'api/v2/concept/bulk-update';
 
   // Nucleus Report Endpoints
   static nucleusReportGenerate = '/api/v1/nucleus-reports/generate';

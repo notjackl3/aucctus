@@ -8,7 +8,7 @@ import {
   ArrowUp,
   Check,
   ChevronRight,
-  SwitchCamera,
+  ArrowUpDown,
   Trash2,
 } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
@@ -190,7 +190,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
     <Popover.Root open={isOpen} onOpenChange={setIsOpen}>
       <Popover.Trigger asChild>
         <button className='aucctus-bg-secondary-hover flex h-8 items-center gap-1.5 rounded-md px-2 transition-colors duration-200'>
-          <SwitchCamera size={16} className='aucctus-stroke-secondary' />
+          <ArrowUpDown size={16} className='aucctus-stroke-secondary' />
           <span className='aucctus-text-sm aucctus-text-secondary'>Sorts</span>
           {sortConfigs.length > 0 && (
             <span className='aucctus-bg-brand-solid aucctus-text-xs flex h-5 min-w-[20px] items-center justify-center rounded px-1.5 text-white'>
@@ -220,7 +220,7 @@ const SortsMenu: React.FC<ISortsMenuProps> = ({
                 <div className='aucctus-bg-primary w-[280px] select-none rounded-md shadow-lg'>
                   {/* Header with title and icon */}
                   <div className='flex items-center gap-2 px-3 py-3'>
-                    <SwitchCamera className='aucctus-stroke-secondary h-4 w-4' />
+                    <ArrowUpDown className='aucctus-stroke-secondary h-4 w-4' />
                     <span className='aucctus-text-sm-semibold aucctus-text-secondary'>
                       Sort columns
                     </span>

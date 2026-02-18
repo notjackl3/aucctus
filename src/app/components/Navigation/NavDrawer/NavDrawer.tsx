@@ -126,7 +126,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
         <NavButton
           to={AppPath.SettingsAbout}
           title='Settings'
-          icon='file-search'
+          icon='settings-01'
           collapsed={collapsed}
         />
         <NavButton

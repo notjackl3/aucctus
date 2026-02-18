@@ -10,7 +10,7 @@ import {
   ChevronDown,
   ChevronRight,
   ListFilter,
-  SwitchCamera,
+  ArrowUpDown,
 } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
 
@@ -331,7 +331,7 @@ const StaticColumnMenu: React.FC<IStaticColumnMenuProps> = ({
                               }}
                             >
                               <div className='flex items-center gap-2'>
-                                <SwitchCamera className='aucctus-stroke-secondary h-4 w-4' />
+                                <ArrowUpDown className='aucctus-stroke-secondary h-4 w-4' />
                                 <span className='aucctus-text-secondary'>
                                   Sort
                                 </span>

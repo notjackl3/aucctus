@@ -5,11 +5,12 @@ import {
   IAccount,
   IDashboard,
   IRegisterAccount,
-  IScoringCategory,
-  IScoringCategoryCreate,
   IScoringConfig,
+  IScoringConfigCreate,
   IScoringConfigSave,
   IScoringConfigSaveResponse,
+  IScoringConfigSummary,
+  IScoringConfigUpdate,
   IUser,
   IUserDetailsResponse,
   IUserQueryOptions,
@@ -62,29 +63,60 @@ export class AccountApi extends ApiService {
     return this.get<IDashboard>(endpoints.dashboard);
   }
 
-  // Scoring Configuration API
+  // Per-config detail API (categories/questions for a specific config)
 
-  getScoringConfig(accountUuid: string) {
-    return this.get<IScoringConfig>(endpoints.scoringConfig(accountUuid));
+  getScoringConfigDetail(accountUuid: string, configUuid: string) {
+    return this.get<IScoringConfig>(
+      endpoints.scoringConfigFullDetail(accountUuid, configUuid),
+    );
   }
 
-  saveScoringConfig(accountUuid: string, data: IScoringConfigSave) {
+  saveScoringConfigDetail(
+    accountUuid: string,
+    configUuid: string,
+    data: IScoringConfigSave,
+  ) {
     return this.put<IScoringConfigSaveResponse, IScoringConfigSave>(
-      endpoints.scoringConfig(accountUuid),
+      endpoints.scoringConfigFullDetail(accountUuid, configUuid),
       data,
     );
   }
 
-  createScoringCategory(accountUuid: string, data: IScoringCategoryCreate) {
-    return this.post<IScoringCategory, IScoringCategoryCreate>(
-      endpoints.scoringConfigCategories(accountUuid),
+  // Multi-config Scoring Configuration API
+
+  listScoringConfigs(accountUuid: string) {
+    return this.get<IScoringConfigSummary[]>(
+      endpoints.scoringConfigs(accountUuid),
+    );
+  }
+
+  createScoringConfig(accountUuid: string, data: IScoringConfigCreate) {
+    return this.post<IScoringConfigSummary, IScoringConfigCreate>(
+      endpoints.scoringConfigs(accountUuid),
       data,
     );
   }
 
-  deleteScoringCategory(accountUuid: string, categoryUuid: string) {
-    return this.delete<{ success: boolean; message: string }>(
-      endpoints.scoringConfigCategory(accountUuid, categoryUuid),
+  updateScoringConfigName(
+    accountUuid: string,
+    configUuid: string,
+    data: IScoringConfigUpdate,
+  ) {
+    return this.put<{ message: string }, IScoringConfigUpdate>(
+      endpoints.scoringConfigDetail(accountUuid, configUuid),
+      data,
+    );
+  }
+
+  deleteScoringConfig(accountUuid: string, configUuid: string) {
+    return this.delete<{ message: string }>(
+      endpoints.scoringConfigDetail(accountUuid, configUuid),
+    );
+  }
+
+  setDefaultScoringConfig(accountUuid: string, configUuid: string) {
+    return this.post<{ message: string }>(
+      endpoints.scoringConfigSetDefault(accountUuid, configUuid),
     );
   }
 }

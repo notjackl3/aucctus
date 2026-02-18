@@ -17,7 +17,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ListFilter,
-  SwitchCamera,
+  ArrowUpDown,
   X,
 } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
@@ -352,7 +352,7 @@ const StatusFilterMenu: React.FC<IStatusFilterMenuProps> = ({
                                 setShowFilterView(false);
                               }}
                             >
-                              <SwitchCamera className='aucctus-stroke-secondary h-4 w-4' />
+                              <ArrowUpDown className='aucctus-stroke-secondary h-4 w-4' />
                               <span className='aucctus-text-secondary'>
                                 Sort
                               </span>

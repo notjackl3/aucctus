@@ -65,6 +65,8 @@ export interface IIdeaSubmission {
   createdAt: string;
   updatedAt: string;
 
+  /** UUID of the scoring config assigned to this submission (null = uses link/account default) */
+  scoringConfigUuid: string | null;
   /** Current status of AI scoring: pending, scoring, complete, error */
   scoringStatus: 'pending' | 'scoring' | 'complete' | 'error' | null;
   /** Per-question scores (1-5) and reasoning, keyed by question UUID */
@@ -264,6 +266,8 @@ export interface ISubmissionLink {
   isActive: boolean;
   requiresPassword: boolean;
   backgroundImageUrl: string;
+  /** UUID of the default scoring config for submissions under this link */
+  defaultScoringConfigUuid: string | null;
   submissionCount: number;
   createdAt: string;
   updatedAt: string;
@@ -291,6 +295,8 @@ export interface ICreateSubmissionLink {
   description?: string;
   password?: string;
   background_image_url?: string;
+  /** UUID of the default scoring config for submissions under this link */
+  scoring_config_uuid?: string;
 }
 
 /**
@@ -304,6 +310,8 @@ export interface IUpdateSubmissionLink {
   password?: string | null;
   is_active?: boolean;
   background_image_url?: string;
+  /** UUID of the default scoring config (null to clear and use account default) */
+  scoring_config_uuid?: string | null;
 }
 
 /**
@@ -622,6 +630,8 @@ export interface IIdeaSubmissionDetail {
   updatedAt: string;
 
   // Detailed scoring (enriched with category/question metadata)
+  /** UUID of the scoring config assigned to this submission (null = uses link/account default) */
+  scoringConfigUuid: string | null;
   totalScore: number | null;
   scoreReasoning: string | null;
   isAiGenerated: boolean;
@@ -643,4 +653,26 @@ export interface IIdeaSubmissionDetail {
   // Source file info (for bulk uploads)
   /** Source file info if this idea was bulk uploaded */
   sourceFile: ISourceFileInfo | null;
+}
+
+// ============================================
+// BULK UPDATE TYPES
+// ============================================
+
+/**
+ * Payload for bulk updating multiple idea submissions
+ */
+export interface IBulkSubmissionUpdate {
+  submission_uuids: string[];
+  scoring_config_uuid?: string;
+  status?: IdeaSubmissionStatus;
+}
+
+/**
+ * Response from bulk updating submissions
+ */
+export interface IBulkSubmissionUpdateResponse {
+  updatedCount: number;
+  rescoreQueued: boolean;
+  message: string;
 }

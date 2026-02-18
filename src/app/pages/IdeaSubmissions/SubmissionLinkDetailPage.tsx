@@ -25,6 +25,9 @@ import {
   X,
   Target,
   ChevronUp,
+  CheckSquare,
+  Square,
+  MinusSquare,
 } from 'lucide-react';
 import api from '@libs/api';
 import {
@@ -45,6 +48,7 @@ import SubmissionLinkModal from './components/SubmissionLinkModal';
 import SubmissionCard from './components/SubmissionCard';
 import SubmissionsListView from './components/SubmissionsListView';
 import ComparisonModal from './components/ComparisonModal';
+import BulkEditSubmissionsModal from './components/BulkEditSubmissionsModal';
 import FileUploadProgressCard from './components/FileUploadProgressCard';
 // Note: SubmissionDetailDrawer is no longer used - we now use Modal.SubmissionDetail via openModal
 
@@ -101,9 +105,15 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
   // Filter state for SubmissionFilter component
   const [filterState, setFilterState] = useState<ISubmissionFilterParams>({});
 
-  // Selection mode state for comparison
+  // Selection mode state for comparison and bulk edit
   const [isSelectionMode, setIsSelectionMode] = useState(false);
+  const [selectionPurpose, setSelectionPurpose] = useState<
+    'compare' | 'bulk_edit'
+  >('compare');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+
+  // Bulk edit modal state
+  const [showBulkEditModal, setShowBulkEditModal] = useState(false);
 
   // Comparison modal state
   const [showComparisonModal, setShowComparisonModal] = useState(false);
@@ -249,6 +259,31 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
         }
       },
       [linkUuid],
+    ),
+  );
+
+  // Listen for bulk rescore completed events to refresh submission data
+  useSocketEvent<'idea_submissions.bulk_rescore.completed.user'>(
+    'idea_submissions.bulk_rescore.completed.user',
+    useCallback(
+      (data) => {
+        // Refresh if this event is for our link or is account-wide (no link specified)
+        if (!data.submissionLinkUuid || data.submissionLinkUuid === linkUuid) {
+          queryClient.invalidateQueries({
+            queryKey: ['submissionLinkSubmissions', linkUuid],
+          });
+          queryClient.invalidateQueries({
+            queryKey: ['submissionLink', linkUuid],
+          });
+
+          const msg =
+            data.errorCount > 0
+              ? `Re-scored ${data.successCount} of ${data.total} submissions (${data.errorCount} failed)`
+              : `Successfully re-scored ${data.successCount} submission${data.successCount !== 1 ? 's' : ''}`;
+          toast.success(msg);
+        }
+      },
+      [linkUuid, queryClient],
     ),
   );
 
@@ -426,7 +461,7 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
     if (newSelected.has(uuid)) {
       newSelected.delete(uuid);
     } else {
-      if (newSelected.size >= 5) {
+      if (selectionPurpose === 'compare' && newSelected.size >= 5) {
         toast.error('Maximum 5 submissions can be compared');
         return;
       }
@@ -436,8 +471,9 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
   };
 
   // Enter selection mode
-  const enterSelectionMode = () => {
+  const enterSelectionMode = (purpose: 'compare' | 'bulk_edit') => {
     setIsSelectionMode(true);
+    setSelectionPurpose(purpose);
     setSelectedIds(new Set());
   };
 
@@ -446,6 +482,18 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
     setIsSelectionMode(false);
     setSelectedIds(new Set());
   };
+
+  // Toggle select all filtered submissions
+  const toggleSelectAll = useCallback(() => {
+    const allUuids = filteredSubmissions.map((s) => s.uuid);
+    const allSelected =
+      allUuids.length > 0 && allUuids.every((uuid) => selectedIds.has(uuid));
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(allUuids));
+    }
+  }, [filteredSubmissions, selectedIds]);
 
   // Handle expand/collapse duplicate group
   const handleExpandSubmissionGroup = useCallback((submissionId: string) => {
@@ -882,16 +930,47 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
               {/* Selection mode controls */}
               {isSelectionMode ? (
                 <div className='flex items-center gap-3'>
-                  <span className='aucctus-text-sm aucctus-text-secondary'>
-                    {selectedIds.size} selected
-                  </span>
-                  {selectedIds.size >= 2 && (
+                  <button
+                    onClick={toggleSelectAll}
+                    className='flex items-center gap-2'
+                    title={
+                      filteredSubmissions.length > 0 &&
+                      filteredSubmissions.every((s) => selectedIds.has(s.uuid))
+                        ? 'Deselect all'
+                        : 'Select all'
+                    }
+                  >
+                    {filteredSubmissions.length > 0 &&
+                    filteredSubmissions.every((s) =>
+                      selectedIds.has(s.uuid),
+                    ) ? (
+                      <CheckSquare className='aucctus-stroke-brand-primary h-4 w-4' />
+                    ) : selectedIds.size > 0 ? (
+                      <MinusSquare className='aucctus-stroke-brand-primary h-4 w-4' />
+                    ) : (
+                      <Square className='aucctus-stroke-secondary h-4 w-4' />
+                    )}
+                    <span className='aucctus-text-sm aucctus-text-secondary'>
+                      {selectedIds.size} selected
+                    </span>
+                  </button>
+                  {selectionPurpose === 'compare' && selectedIds.size >= 2 && (
                     <button
                       onClick={() => setShowComparisonModal(true)}
                       className='btn btn-primary btn-sm flex items-center gap-2'
                     >
                       <GitCompare className='h-4 w-4' />
                       Compare Selected
+                    </button>
+                  )}
+                  {selectionPurpose === 'bulk_edit' && (
+                    <button
+                      onClick={() => setShowBulkEditModal(true)}
+                      disabled={selectedIds.size === 0}
+                      className='btn btn-primary btn-sm flex items-center gap-2'
+                    >
+                      <Pencil className='h-4 w-4' />
+                      Edit Selected
                     </button>
                   )}
                   <button
@@ -904,10 +983,25 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
                 </div>
               ) : (
                 <>
+                  {/* Bulk Edit Button */}
+                  {filteredSubmissions.length >= 1 && (
+                    <motion.button
+                      onClick={() => enterSelectionMode('bulk_edit')}
+                      className='aucctus-text-secondary hover:aucctus-text-brand-primary hover:aucctus-bg-brand-secondary flex items-center gap-2 rounded-lg px-3 py-2 transition-colors'
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Pencil className='h-4 w-4' />
+                      <span className='aucctus-text-sm-semibold'>
+                        Bulk Edit
+                      </span>
+                    </motion.button>
+                  )}
+
                   {/* Compare Button */}
                   {filteredSubmissions.length >= 2 && (
                     <motion.button
-                      onClick={enterSelectionMode}
+                      onClick={() => enterSelectionMode('compare')}
                       className='aucctus-text-secondary hover:aucctus-text-brand-primary hover:aucctus-bg-brand-secondary flex items-center gap-2 rounded-lg px-3 py-2 transition-colors'
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
@@ -1130,6 +1224,7 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
                 isSelectionMode={isSelectionMode}
                 selectedIds={selectedIds}
                 onToggleSelect={toggleSelection}
+                onSelectAll={toggleSelectAll}
                 duplicateCounts={duplicateCounts}
                 duplicateGroups={duplicateGroups}
                 expandedSubmissionId={expandedSubmissionId}
@@ -1161,6 +1256,14 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
           }}
         />
       )}
+
+      {/* Bulk Edit Modal */}
+      <BulkEditSubmissionsModal
+        isOpen={showBulkEditModal}
+        onClose={() => setShowBulkEditModal(false)}
+        selectedSubmissionUuids={Array.from(selectedIds)}
+        onSuccess={exitSelectionMode}
+      />
     </div>
   );
 };

@@ -44,6 +44,7 @@ import {
   getCoreRowModel,
   OnChangeFn,
   Row,
+  RowSelectionState,
   SortingState,
   useReactTable,
 } from '@tanstack/react-table';
@@ -155,6 +156,11 @@ interface UseConceptBankResult {
   handleRowClick: (rowId: string) => void;
   handleRemoveSort: (field: string, isProperty: boolean) => void;
   isDebugModeEnabled: boolean;
+  rowSelection: Record<string, boolean>;
+  setRowSelection: React.Dispatch<
+    React.SetStateAction<Record<string, boolean>>
+  >;
+  selectedConceptUuids: string[];
 }
 
 export const useConceptBank = (
@@ -368,6 +374,7 @@ export const useConceptBank = (
   const [sorting, setSorting] = React.useState<SortingState>([
     { id: 'createdAt', desc: true },
   ]);
+  const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
 
   // If we receive external filter options, use those instead
   React.useEffect(() => {
@@ -750,8 +757,8 @@ export const useConceptBank = (
         return;
       }
 
-      // Prevent reordering pinned columns (title and priority are fixed at the start)
-      const pinnedColumnIds = new Set(['title', 'priority']);
+      // Prevent reordering pinned columns (select, title and priority are fixed at the start)
+      const pinnedColumnIds = new Set(['select', 'title', 'priority']);
       if (pinnedColumnIds.has(draggedId) || pinnedColumnIds.has(targetId)) {
         return;
       }
@@ -790,6 +797,46 @@ export const useConceptBank = (
       }
 
       return null;
+    };
+
+    // Checkbox selection column
+    const selectColumn: ColumnDef<IConcept, any> = {
+      id: 'select',
+      size: 40,
+      minSize: 40,
+      maxSize: 40,
+      enableResizing: false,
+      enableSorting: false,
+      header: ({ table: tbl }) => {
+        const isAllSelected = tbl.getIsAllPageRowsSelected();
+        const isSomeSelected = tbl.getIsSomePageRowsSelected();
+        return (
+          <div className='flex items-center justify-center'>
+            <input
+              type='checkbox'
+              ref={(el) => {
+                if (el) el.indeterminate = isSomeSelected && !isAllSelected;
+              }}
+              checked={isAllSelected}
+              onChange={tbl.getToggleAllPageRowsSelectedHandler()}
+              className='ml-1 h-4 w-4 cursor-pointer rounded-md border border-gray-300 accent-primary-500'
+            />
+          </div>
+        );
+      },
+      cell: ({ row }) => (
+        <div
+          className='flex items-center justify-center'
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            type='checkbox'
+            checked={row.getIsSelected()}
+            onChange={row.getToggleSelectedHandler()}
+            className='ml-1 h-4 w-4 cursor-pointer rounded-md border border-gray-300 accent-primary-500'
+          />
+        </div>
+      ),
     };
 
     // Static columns
@@ -1206,8 +1253,9 @@ export const useConceptBank = (
       visibleStaticColumns.has(col.id || ''),
     );
 
-    // Merge all columns: static + property + actions
+    // Merge all columns: select + static + property + actions
     const allColumns = [
+      selectColumn,
       ...visibleStaticColumnsFiltered,
       ...propertyColumns,
       ...actionColumns,
@@ -1217,7 +1265,7 @@ export const useConceptBank = (
     if (localColumnOrder && localColumnOrder.length > 0) {
       // Separate action columns (always last) and pinned columns (fixed position)
       const actionColumnIds = new Set(['actions', 'settings']);
-      const pinnedColumnIds = new Set(['title', 'priority']); // These stay in fixed order at the start
+      const pinnedColumnIds = new Set(['select', 'title', 'priority']); // These stay in fixed order at the start
 
       const reorderableColumns = allColumns.filter(
         (col) =>
@@ -1231,11 +1279,12 @@ export const useConceptBank = (
         pinnedColumnIds.has(col.id || ''),
       );
 
-      // Sort pinned columns to ensure title is first, priority is second
+      // Sort pinned columns to ensure select is first, title second, priority third
+      const pinnedOrder = ['select', 'title', 'priority'];
       const sortedPinnedColumns = pinnedColumns.sort((a, b) => {
-        if (a.id === 'title') return -1;
-        if (b.id === 'title') return 1;
-        return 0;
+        const aIdx = pinnedOrder.indexOf(a.id || '');
+        const bIdx = pinnedOrder.indexOf(b.id || '');
+        return aIdx - bIdx;
       });
 
       // Sort reorderable columns based on saved order
@@ -1387,13 +1436,16 @@ export const useConceptBank = (
     columns,
     manualSorting: true,
     pageCount: data?.numberOfPages || 0,
+    enableRowSelection: true,
     state: {
       pagination: {
         pageSize: PAGE_SIZE,
         pageIndex: page - 1,
       },
       sorting,
+      rowSelection,
     },
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     onSortingChange: handleSortingChange,
     enableColumnResizing: true,
@@ -1405,6 +1457,12 @@ export const useConceptBank = (
 
   // Use useReactTable directly at the top level, not inside a callback
   const table = useReactTable(tableOptions);
+
+  // Compute selected concept UUIDs from row selection state
+  const selectedConceptUuids = React.useMemo(
+    () => Object.keys(rowSelection).filter((key) => rowSelection[key]),
+    [rowSelection],
+  );
 
   // Return memoized values to prevent unnecessary re-renders
   return useMemo(
@@ -1420,6 +1478,9 @@ export const useConceptBank = (
       handleRowClick,
       handleRemoveSort,
       isDebugModeEnabled,
+      rowSelection,
+      setRowSelection,
+      selectedConceptUuids,
     }),
     [
       isLoading,
@@ -1433,6 +1494,9 @@ export const useConceptBank = (
       handleRowClick,
       handleRemoveSort,
       isDebugModeEnabled,
+      rowSelection,
+      setRowSelection,
+      selectedConceptUuids,
     ],
   );
 };

@@ -113,11 +113,15 @@ const NucleusPage: React.FC = () => {
         label: 'Company Context',
         icon: <Building2 className='h-4 w-4' />,
       },
-      {
-        id: 'living-personas',
-        label: 'Living Personas',
-        icon: <Users className='h-4 w-4' />,
-      },
+      ...(FEATURE_LIVING_PERSONAS
+        ? [
+            {
+              id: 'living-personas' as const,
+              label: 'Living Personas',
+              icon: <Users className='h-4 w-4' />,
+            },
+          ]
+        : []),
       {
         id: 'decision-making',
         label: 'Decision Making',
@@ -675,7 +679,7 @@ const NucleusPage: React.FC = () => {
         )}
 
         {/* Living Personas Tab */}
-        {activeTab === 'living-personas' && (
+        {FEATURE_LIVING_PERSONAS && activeTab === 'living-personas' && (
           <div data-tab='living-personas'>
             <LivingPersonasTab />
           </div>

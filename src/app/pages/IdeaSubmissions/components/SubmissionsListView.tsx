@@ -5,6 +5,7 @@ import {
   Users,
   CheckSquare,
   Square,
+  MinusSquare,
   ChevronDown,
   ChevronUp,
 } from 'lucide-react';
@@ -64,6 +65,7 @@ interface SubmissionsListViewProps {
   isSelectionMode: boolean;
   selectedIds: Set<string>;
   onToggleSelect: (uuid: string) => void;
+  onSelectAll?: () => void;
   duplicateCounts: Map<string, number>;
   duplicateGroups: Map<string, IIdeaSubmission[]>;
   expandedSubmissionId: string | null;
@@ -86,11 +88,16 @@ const SubmissionsListView: FunctionComponent<SubmissionsListViewProps> = ({
   isSelectionMode,
   selectedIds,
   onToggleSelect,
+  onSelectAll,
   duplicateCounts,
   duplicateGroups,
   expandedSubmissionId,
   onExpandSubmission,
 }) => {
+  const allSelected =
+    submissions.length > 0 && submissions.every((s) => selectedIds.has(s.uuid));
+  const someSelected =
+    !allSelected && submissions.some((s) => selectedIds.has(s.uuid));
   const handleRowClick = (submission: IIdeaSubmission) => {
     if (isSelectionMode) {
       onToggleSelect(submission.uuid);
@@ -262,7 +269,21 @@ const SubmissionsListView: FunctionComponent<SubmissionsListViewProps> = ({
           <tr>
             {isSelectionMode && (
               <th className='w-12 px-4 py-3 text-left'>
-                <span className='sr-only'>Select</span>
+                <motion.button
+                  onClick={onSelectAll}
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  className='aucctus-bg-secondary hover:aucctus-bg-tertiary flex h-6 w-6 items-center justify-center rounded transition-colors'
+                  title={allSelected ? 'Deselect all' : 'Select all'}
+                >
+                  {allSelected ? (
+                    <CheckSquare className='aucctus-stroke-brand-primary h-4 w-4' />
+                  ) : someSelected ? (
+                    <MinusSquare className='aucctus-stroke-brand-primary h-4 w-4' />
+                  ) : (
+                    <Square className='aucctus-stroke-secondary h-4 w-4' />
+                  )}
+                </motion.button>
               </th>
             )}
             <th className='aucctus-text-xs-semibold aucctus-text-tertiary px-4 py-3 text-left uppercase tracking-wide'>

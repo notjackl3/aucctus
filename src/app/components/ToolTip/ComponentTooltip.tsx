@@ -143,7 +143,7 @@ const ComponentTooltip: FunctionComponent<ComponentTooltipProps> = ({
       {isHovered &&
         createPortal(
           <div
-            className='z-50 animate-fade-in'
+            className='z-[10000] animate-fade-in'
             ref={tooltipRef}
             style={{ position: 'fixed' }}
             onMouseEnter={handleMouseEnter}
