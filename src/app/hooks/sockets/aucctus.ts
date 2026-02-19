@@ -5,24 +5,12 @@ import telemetry from '@libs/telemetry';
 import useStore from '@stores/store';
 import React from 'react';
 
-function isSocketEventOfType<
-  T extends InboundSocketEventType,
-  C extends object,
->(
-  data: InboundSocketEvent<C>,
-  type: T,
-): data is Extract<InboundSocketEvent<C>, { type: T }> {
-  return data.type === type;
-}
-
 /**
- * Validates that a websocket message is intended for the current user and account
- * @param message The websocket message to validate
- * @param currentAccountUuid The current user's account UUID
- * @param currentUserUuid The current user's UUID
- * @returns true if the message is valid for this user/account, false otherwise
+ * Validates that a websocket message is intended for the current user and account.
+ * This is called once per message in the central dispatcher (socketService.ts),
+ * NOT per-listener, eliminating redundant validation.
  */
-function validateMessageMultitenancy(
+export function validateMessageMultitenancy(
   message: any,
   currentAccountUuid?: string,
   currentUserUuid?: string,
@@ -70,11 +58,11 @@ function validateMessageMultitenancy(
 
 /**
  * Custom hook to listen for a specific event type from the WebSocket.
+ * Uses the central message dispatcher in SocketService for O(1) message routing
+ * instead of N independent addEventListener calls.
+ *
  * @param eventName The event "type" to filter for.
  * @param callback Function to call when an event with the matching type is received.
- *
- * ... Its annoying and redundant, but if you need to specify the type of K (So in cases like the stream.structured)
- * you have to specify T/SocketEventType which is a little redundant
  */
 export function useSocketEvent<
   T extends InboundSocketEventType,
@@ -90,62 +78,34 @@ export function useSocketEvent<
     savedCallback.current = callback;
   }, [callback]);
 
-  // State counter that increments when WebSocket instance changes
-  const [wsInstanceCounter, setWsInstanceCounter] = React.useState(0);
-
-  // Listen for WebSocket instance changes from SocketService
+  // Subscribe to the central dispatcher — handles reconnection automatically
   React.useEffect(() => {
     if (!api.aucctusSocket) return;
 
-    const handleWsInstanceChange = () => {
-      setWsInstanceCounter((prev) => prev + 1);
-    };
+    const handler = (data: any) => {
+      // Multitenancy validation (done once per message type match)
+      const currentUser = useStore.getState().auth.user;
+      const currentAccount = useStore.getState().auth.account;
 
-    api.aucctusSocket.addWsInstanceChangeListener(handleWsInstanceChange);
-
-    return () => {
-      api.aucctusSocket?.removeWsInstanceChangeListener(handleWsInstanceChange);
-    };
-  }, []); // Only run once on mount
-
-  // Main effect that handles WebSocket message listening
-  React.useEffect(() => {
-    if (!api.aucctusSocket || !api.aucctusSocket.ws) return;
-
-    const handleIncoming = (e: MessageEvent) => {
-      try {
-        const data: InboundSocketEvent<C> = JSON.parse(e.data);
-        if (isSocketEventOfType<T, C>(data, eventName)) {
-          // Get current user and account info for validation
-          const currentUser = useStore.getState().auth.user;
-          const currentAccount = useStore.getState().auth.account;
-
-          // Validate multitenancy
-          if (
-            !validateMessageMultitenancy(
-              data,
-              currentAccount?.uuid,
-              currentUser?.uuid,
-            )
-          ) {
-            return; // Reject the message
-          }
-
-          savedCallback.current(
-            data as Extract<InboundSocketEvent<C>, { type: T }>,
-          );
-        }
-      } catch (error) {
-        // eslint-disable-next-line no-console
-        console.error('Error parsing WebSocket message:', error);
+      if (
+        !validateMessageMultitenancy(
+          data,
+          currentAccount?.uuid,
+          currentUser?.uuid,
+        )
+      ) {
+        return;
       }
+
+      savedCallback.current(
+        data as Extract<InboundSocketEvent<C>, { type: T }>,
+      );
     };
 
-    api.aucctusSocket.ws.addEventListener('message', handleIncoming);
-    return () => {
-      api.aucctusSocket.ws?.removeEventListener('message', handleIncoming);
-    };
-  }, [eventName, wsInstanceCounter]);
+    const unsubscribe = api.aucctusSocket.subscribe(eventName, handler);
+
+    return unsubscribe;
+  }, [eventName]);
 }
 
 export function useSocketMaxRetriesExceeded(

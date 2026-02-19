@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { toast } from '@components';
 import { cn } from '@libs/utils/react';
 import api from '@libs/api';
+import useStore from '@stores/store';
 import telemetry from '@libs/telemetry';
 import { useSyntheticExecutionEvents } from '@hooks/sockets/testing';
 import {
@@ -386,15 +387,8 @@ const TestExecution: React.FC<TestExecutionProps> = ({
       // Immediately set to cancelling state for instant user feedback
       setCancellingState();
 
-      // Emit event to immediately dismiss progress toast
-      window.dispatchEvent(
-        new CustomEvent('synthetic-execution-cancelled', {
-          detail: {
-            conceptUuid,
-            testUuid,
-          },
-        }),
-      );
+      // Clear execution state to dismiss toast via Zustand subscription
+      useStore.getState().syntheticTesting.setLastExecutionState(null);
 
       try {
         const result = await cancelExecution.mutateAsync(

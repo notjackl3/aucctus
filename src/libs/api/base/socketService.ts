@@ -62,6 +62,11 @@ export class SocketService {
   protected wsInstanceChangeListeners: Array<(ws: WebSocket | null) => void> =
     [];
 
+  // Central message dispatcher: event type → set of handlers
+  // Parses each message once and dispatches to matching handlers
+  private messageHandlers: Map<string, Set<(data: any) => void>> = new Map();
+  private boundMessageHandler: ((e: MessageEvent) => void) | null = null;
+
   constructor(
     protected api: Api,
     config: ISocketConfig,
@@ -208,6 +213,9 @@ export class SocketService {
       // Reset retry count on successful connection.
       this.currentRetryCount = 0;
 
+      // Attach central message dispatcher for subscribe/unsubscribe pattern
+      this.attachMessageDispatcher();
+
       // Log successful connection
       telemetry.log('websocket.connection.established', {
         baseUrl: this.config.baseUrl,
@@ -260,6 +268,9 @@ export class SocketService {
       });
 
       this._isConnected = false;
+
+      // Detach central message dispatcher before nulling the WebSocket
+      this.detachMessageDispatcher();
       this._ws = null;
 
       // Notify listeners that WebSocket instance changed (now null)
@@ -635,5 +646,84 @@ export class SocketService {
     this.wsInstanceChangeListeners = this.wsInstanceChangeListeners.filter(
       (l) => l !== listener,
     );
+  }
+
+  /**
+   * Subscribe to a specific WebSocket event type.
+   * The handler receives already-parsed, multitenancy-validated data.
+   * Returns an unsubscribe function for convenience.
+   */
+  public subscribe(
+    eventType: string,
+    handler: (data: any) => void,
+  ): () => void {
+    let handlers = this.messageHandlers.get(eventType);
+    if (!handlers) {
+      handlers = new Set();
+      this.messageHandlers.set(eventType, handlers);
+    }
+    handlers.add(handler);
+
+    return () => this.unsubscribe(eventType, handler);
+  }
+
+  /**
+   * Unsubscribe a handler from a specific event type.
+   */
+  public unsubscribe(eventType: string, handler: (data: any) => void): void {
+    const handlers = this.messageHandlers.get(eventType);
+    if (handlers) {
+      handlers.delete(handler);
+      if (handlers.size === 0) {
+        this.messageHandlers.delete(eventType);
+      }
+    }
+  }
+
+  /**
+   * Attach the central message dispatcher to the current WebSocket instance.
+   * Called once per connection in onopen.
+   */
+  protected attachMessageDispatcher(): void {
+    if (!this._ws) return;
+
+    // Detach previous handler if any
+    this.detachMessageDispatcher();
+
+    this.boundMessageHandler = (e: MessageEvent) => {
+      let data: any;
+      try {
+        data = JSON.parse(e.data);
+      } catch {
+        return;
+      }
+
+      const eventType = data?.type;
+      if (!eventType) return;
+
+      const handlers = this.messageHandlers.get(eventType);
+      if (!handlers || handlers.size === 0) return;
+
+      // Dispatch to all matching handlers
+      handlers.forEach((handler) => {
+        try {
+          handler(data);
+        } catch (error) {
+          analytics.error('Error in WebSocket message handler', error);
+        }
+      });
+    };
+
+    this._ws.addEventListener('message', this.boundMessageHandler);
+  }
+
+  /**
+   * Detach the central message dispatcher from the WebSocket.
+   */
+  protected detachMessageDispatcher(): void {
+    if (this.boundMessageHandler && this._ws) {
+      this._ws.removeEventListener('message', this.boundMessageHandler);
+    }
+    this.boundMessageHandler = null;
   }
 }

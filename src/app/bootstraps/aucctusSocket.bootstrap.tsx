@@ -2,10 +2,7 @@ import useStore from '@stores/store';
 import React from 'react';
 import api from '../../libs/api';
 import telemetry from '../../libs/telemetry';
-import {
-  useUniversalSocketEvents,
-  socketEventConfigs,
-} from '@hooks/sockets/useUniversalSocketEvents';
+import { useUniversalSocketEvents } from '@hooks/sockets/useUniversalSocketEvents';
 
 const AucctusSocketBootstrap: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -53,7 +50,7 @@ const AucctusSocketBootstrap: React.FC<{ children: React.ReactNode }> = ({
   }, []);
 
   // Use universal socket events with default application-wide handling
-  useUniversalSocketEvents(socketEventConfigs.universalDefault());
+  useUniversalSocketEvents();
 
   return <>{children}</>;
 };

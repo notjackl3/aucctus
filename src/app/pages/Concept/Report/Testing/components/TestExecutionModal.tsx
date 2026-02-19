@@ -53,55 +53,14 @@ const TestExecutionModal: React.FC<TestExecutionModalProps> = ({
   // Track modal open state for synthetic execution toast
   const setModalOpen = useStore((state) => state.syntheticTesting.setModalOpen);
 
-  // Set modal as open on mount, closed on unmount
+  // Set modal as open on mount, closed on unmount.
+  // The Zustand subscription in useUniversalSocketEvents handles toast coordination
+  // when isModalOpen transitions (no window.dispatchEvent needed).
   useEffect(() => {
-    // Set modal open FIRST (synchronously)
     setModalOpen(true);
 
-    // Then dismiss any existing toast (use setTimeout to ensure state is updated)
-    const dismissTimeout = setTimeout(() => {
-      const state = useStore.getState().syntheticTesting.lastExecutionState;
-      if (state?.conceptUuid && state?.testUuid) {
-        window.dispatchEvent(
-          new CustomEvent('synthetic-modal-opened', {
-            detail: {
-              conceptUuid: state.conceptUuid,
-              testUuid: state.testUuid,
-            },
-          }),
-        );
-      }
-    }, 0);
-
     return () => {
-      // Clear the dismiss timeout if component unmounts before it fires
-      clearTimeout(dismissTimeout);
-
-      // Set modal closed FIRST
       setModalOpen(false);
-
-      // Then create toast if needed with a longer delay to avoid race with remount
-      const createTimeout = setTimeout(() => {
-        // Check if modal is still closed (not reopened)
-        const currentModalState =
-          useStore.getState().syntheticTesting.isModalOpen;
-        if (currentModalState) {
-          return;
-        }
-
-        const state = useStore.getState().syntheticTesting.lastExecutionState;
-
-        if (state && state.progress !== undefined && state.progress < 100) {
-          window.dispatchEvent(
-            new CustomEvent('synthetic-modal-closed', {
-              detail: state,
-            }),
-          );
-        }
-      }, 100); // Longer delay to ensure modal state is stable
-
-      // Store timeout ID so it can be cleared if needed
-      (window as any).__syntheticToastCreateTimeout = createTimeout;
     };
   }, [setModalOpen]);
 
