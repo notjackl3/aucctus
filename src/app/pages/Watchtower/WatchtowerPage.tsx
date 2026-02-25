@@ -1127,7 +1127,7 @@ const WatchtowerPageContent: React.FC = () => {
                     setShowCategoryDropdown(false);
                   }}
                   className={cn(
-                    'flex w-full items-center justify-between px-3 py-2 text-sm',
+                    'flex w-full items-center justify-between px-3 py-2 text-left text-sm',
                     categoryFilter === 'all'
                       ? 'aucctus-bg-secondary'
                       : 'hover:aucctus-bg-secondary',
@@ -1158,7 +1158,7 @@ const WatchtowerPageContent: React.FC = () => {
                       setShowCategoryDropdown(false);
                     }}
                     className={cn(
-                      'flex w-full items-center justify-between px-3 py-2 text-sm',
+                      'flex w-full items-center justify-between px-3 py-2 text-left text-sm',
                       categoryFilter === key
                         ? 'aucctus-bg-secondary'
                         : 'hover:aucctus-bg-secondary',
