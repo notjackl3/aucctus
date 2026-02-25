@@ -6,6 +6,7 @@ import type {
   IWatchtowerDashboard,
   IWatchtowerMonitoringRule,
   IWatchtowerRefreshResponse,
+  IWatchtowerScanListItem,
   ICreateMonitoringRulePayload,
   IUpdateMonitoringRulePayload,
 } from './types/watchtower';
@@ -28,14 +29,29 @@ export class WatchtowerApi extends ApiService {
   /**
    * Get the Watchtower dashboard data.
    * Returns signals, predictions, trends, domains, opportunities, metrics, and rules.
+   * Optionally pass a scanUuid to load a specific historical scan.
    */
-  getWatchtowerDashboard(includeConceptImpacts: boolean = false) {
-    const params = includeConceptImpacts
-      ? { include_concept_impacts: true }
-      : {};
+  getWatchtowerDashboard(
+    includeConceptImpacts: boolean = false,
+    scanUuid?: string,
+  ) {
+    const params: Record<string, unknown> = {};
+    if (includeConceptImpacts) {
+      params.include_concept_impacts = true;
+    }
+    if (scanUuid) {
+      params.scan_uuid = scanUuid;
+    }
     return this.get<IWatchtowerDashboard>(endpoints.watchtowerDashboard, {
       params,
     });
+  }
+
+  /**
+   * Get scan history (completed scans) for the account.
+   */
+  getScanHistory() {
+    return this.get<IWatchtowerScanListItem[]>(endpoints.watchtowerScans);
   }
 
   /**

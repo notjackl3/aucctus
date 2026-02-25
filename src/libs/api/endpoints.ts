@@ -866,6 +866,7 @@ export class Endpoints {
   static watchtowerDashboard = '/api/v1/watchtower/dashboard';
   static watchtowerRefresh = '/api/v1/watchtower/refresh';
   static watchtowerRules = '/api/v1/watchtower/rules';
+  static watchtowerScans = '/api/v1/watchtower/scans';
 
   static watchtowerRule(ruleUuid: string) {
     return `/api/v1/watchtower/rules/${ruleUuid}`;

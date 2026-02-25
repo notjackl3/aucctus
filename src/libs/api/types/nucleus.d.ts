@@ -345,6 +345,7 @@ export interface DocumentWithUsage {
   originalFilename?: string;
   fileSize?: number;
   contentType?: string;
+  processingStatus?: 'pending' | 'processing' | 'completed' | 'failed';
   categories: CategoryUsage[];
   createdAt: string;
   updatedAt: string;

@@ -1,7 +1,7 @@
-import React from 'react';
-import { cn } from '@libs/utils/react';
 import type { IMarketForceV3 } from '@libs/api/types/concept/marketScan';
 import { DynamicIcon } from '@libs/utils/iconMap';
+import { cn } from '@libs/utils/react';
+import React from 'react';
 
 interface HexagonChartProps {
   trendCategories: IMarketForceV3[];
@@ -393,7 +393,6 @@ const HexagonChart: React.FC<HexagonChartProps> = ({
                 stroke='#1d4ed8'
                 strokeWidth='2'
                 strokeOpacity='0.6'
-                className='animate-pulse'
               />
             )}
 

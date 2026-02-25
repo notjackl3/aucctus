@@ -15,14 +15,16 @@ import {
 } from '@libs/api/types/socketMessages/inbound';
 import utils from '@libs/utils';
 import { AxiosError } from 'axios';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from 'react-query';
 
 import { useSocketEvent } from '../sockets/aucctus';
 
 import type {
+  IWatchtowerActiveScan,
   IWatchtowerDashboard,
   IWatchtowerMonitoringRule,
+  IWatchtowerScanListItem,
 } from '@libs/api/types/watchtower';
 
 // ============================================
@@ -31,7 +33,11 @@ import type {
 
 export const watchtowerKeys = {
   all: ['watchtower'] as const,
-  dashboard: () => [...watchtowerKeys.all, 'dashboard'] as const,
+  dashboard: (scanUuid?: string) =>
+    scanUuid
+      ? ([...watchtowerKeys.all, 'dashboard', scanUuid] as const)
+      : ([...watchtowerKeys.all, 'dashboard'] as const),
+  scanHistory: () => [...watchtowerKeys.all, 'scanHistory'] as const,
   rules: () => [...watchtowerKeys.all, 'rules'] as const,
   rule: (uuid: string) => [...watchtowerKeys.all, 'rule', uuid] as const,
 };
@@ -43,12 +49,13 @@ export const watchtowerKeys = {
 /**
  * Fetches the complete Watchtower dashboard data.
  * Returns signals, predictions, trends, domains, opportunities, metrics, and rules.
+ * Optionally pass a scanUuid to load a specific historical scan.
  */
-export const useWatchtowerDashboard = () => {
+export const useWatchtowerDashboard = (scanUuid?: string) => {
   const query = useQuery({
-    queryKey: watchtowerKeys.dashboard(),
+    queryKey: watchtowerKeys.dashboard(scanUuid),
     queryFn: async (): Promise<IWatchtowerDashboard> => {
-      return await api.watchtower.getWatchtowerDashboard(true);
+      return await api.watchtower.getWatchtowerDashboard(true, scanUuid);
     },
     staleTime: 1000 * 60 * 2, // 2 minutes
     cacheTime: 1000 * 60 * 5, // 5 minutes
@@ -79,10 +86,35 @@ export const useWatchtowerDashboard = () => {
     monitoringRules: query.data?.monitoringRules ?? [],
     lastRefreshedAt: query.data?.lastRefreshedAt,
     isAutoRefreshing: query.data?.isRefreshing ?? false, // True if stale data triggered auto-refresh
+    activeScan: query.data?.activeScan ?? null, // Active scan progress for state recovery
     isLoading: query.isLoading,
     isError: query.isError,
     error: query.error,
     refetch: query.refetch,
+  };
+};
+
+// ============================================
+// Scan History Hook
+// ============================================
+
+/**
+ * Fetches the list of completed scans for the account.
+ * Used by the SignalHistoryPopover to show past scan dates.
+ */
+export const useWatchtowerScanHistory = () => {
+  const query = useQuery({
+    queryKey: watchtowerKeys.scanHistory(),
+    queryFn: async (): Promise<IWatchtowerScanListItem[]> => {
+      return await api.watchtower.getScanHistory();
+    },
+    staleTime: 1000 * 60 * 5, // 5 minutes
+    cacheTime: 1000 * 60 * 10, // 10 minutes
+  });
+
+  return {
+    scans: query.data ?? [],
+    isLoading: query.isLoading,
   };
 };
 
@@ -246,12 +278,37 @@ const DEFAULT_SCAN_PROGRESS: WatchtowerScanProgress = {
 /**
  * Hook to listen for Watchtower scan WebSocket events.
  * Updates the query cache when scan completes and provides real-time progress.
+ * Accepts optional activeScan from dashboard data to recover scan state on page load.
  */
-export const useWatchtowerSocketEvents = () => {
+export const useWatchtowerSocketEvents = (
+  activeScan?: IWatchtowerActiveScan | null,
+) => {
   const queryClient = useQueryClient();
   const [scanProgress, setScanProgress] = useState<WatchtowerScanProgress>(
     DEFAULT_SCAN_PROGRESS,
   );
+
+  // Seed scan progress from dashboard data on page load / refresh.
+  // Only re-run when the active scan identity or status changes (not on every render).
+  const activeScanStage = activeScan?.stage;
+  const activeScanProgress = activeScan?.progress;
+  const activeScanMessage = activeScan?.message;
+  const activeScanStatus = activeScan?.status;
+  useEffect(() => {
+    if (activeScanStatus === 'running' || activeScanStatus === 'pending') {
+      setScanProgress({
+        isScanning: true,
+        stage: activeScanStage || 'started',
+        progress: activeScanProgress || 0,
+        message: activeScanMessage || 'Scan in progress...',
+      });
+    }
+  }, [
+    activeScanStatus,
+    activeScanStage,
+    activeScanProgress,
+    activeScanMessage,
+  ]);
 
   // Listen for scan progress events
   useSocketEvent<'watchtower.scan.progress.account'>(
@@ -290,6 +347,10 @@ export const useWatchtowerSocketEvents = () => {
         });
         queryClient.invalidateQueries({
           queryKey: watchtowerKeys.rules(),
+        });
+        // Refresh scan history to include the new scan
+        queryClient.invalidateQueries({
+          queryKey: watchtowerKeys.scanHistory(),
         });
 
         // Show success toast with summary

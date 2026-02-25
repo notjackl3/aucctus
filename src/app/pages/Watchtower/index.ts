@@ -1,4 +1,3 @@
-export { default as WatchtowerPage } from './WatchtowerPage';
-export * from './types';
-export * from './fixtures';
 export * from './components';
+export * from './types';
+export { default as WatchtowerPage } from './WatchtowerPage';

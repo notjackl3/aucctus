@@ -10,6 +10,8 @@ import {
   FileType,
   Presentation,
   File,
+  Loader2,
+  AlertCircle,
 } from 'lucide-react';
 import {
   useNucleusDocuments,
@@ -105,6 +107,42 @@ const getFileTypeConfig = (filename: string): FileTypeConfig => {
       bgColor: 'bg-gray-100',
     }
   );
+};
+
+// Processing status badge for per-document status
+const ProcessingStatusBadge: React.FC<{
+  status?: DocumentWithUsage['processingStatus'];
+}> = ({ status }) => {
+  if (!status || status === 'completed') return null;
+
+  if (status === 'pending') {
+    return (
+      <span className='inline-flex items-center gap-1 rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-500'>
+        <span className='h-1.5 w-1.5 rounded-full bg-gray-400' />
+        Queued
+      </span>
+    );
+  }
+
+  if (status === 'processing') {
+    return (
+      <span className='inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-600'>
+        <Loader2 className='h-3 w-3 animate-spin' />
+        Processing
+      </span>
+    );
+  }
+
+  if (status === 'failed') {
+    return (
+      <span className='inline-flex items-center gap-1 rounded-full bg-red-50 px-2 py-0.5 text-xs text-red-600'>
+        <AlertCircle className='h-3 w-3' />
+        Failed
+      </span>
+    );
+  }
+
+  return null;
 };
 
 // Category configuration matching CategoriesGrid
@@ -760,6 +798,15 @@ const UploadsTab: React.FC<UploadsTabProps> = ({ onNavigateToCategory }) => {
                           Used in {doc.categories.length} categor
                           {doc.categories.length !== 1 ? 'ies' : 'y'}
                         </span>
+                        {doc.processingStatus &&
+                          doc.processingStatus !== 'completed' && (
+                            <>
+                              <span>&middot;</span>
+                              <ProcessingStatusBadge
+                                status={doc.processingStatus}
+                              />
+                            </>
+                          )}
                       </div>
                     </div>
                   </div>

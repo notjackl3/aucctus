@@ -43,6 +43,7 @@ export type WatchtowerConfidence = 'high' | 'medium' | 'low';
 
 export interface IWatchtowerSignalSource {
   title: string;
+  url: string;
   excerpt: string;
   type: 'News' | 'Report' | 'Filing' | 'Internal' | 'Analysis';
 }
@@ -207,6 +208,21 @@ export interface IWatchtowerMetrics {
   activeRules: number;
 }
 
+export interface IWatchtowerActiveScan {
+  scanUuid: string;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  stage?: string;
+  progress?: number;
+  message?: string;
+}
+
+export interface IWatchtowerScanListItem {
+  uuid: string;
+  scannedAt: string;
+  completedAt?: string | null;
+  status: string;
+}
+
 export interface IWatchtowerDashboard {
   signals: IWatchtowerSignal[];
   predictions: IWatchtowerPrediction[];
@@ -217,6 +233,7 @@ export interface IWatchtowerDashboard {
   monitoringRules: IWatchtowerMonitoringRule[];
   lastRefreshedAt: string | null;
   isRefreshing: boolean; // True if auto-refresh was triggered due to stale data (>2 weeks old)
+  activeScan?: IWatchtowerActiveScan | null; // Active scan progress for state recovery on page load
 }
 
 // ============================================

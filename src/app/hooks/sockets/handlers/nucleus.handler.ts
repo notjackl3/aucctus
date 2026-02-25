@@ -9,17 +9,37 @@ import type {
   INucleusAnswerCompletedMessage,
   INucleusAnswerErrorMessage,
 } from '@libs/api/types';
+import type { DocumentWithUsage } from '@libs/api/types/nucleus';
 
 export const useNucleusHandler = (
   preventDuplicate: (key: string) => boolean,
 ) => {
   const queryClient = useQueryClient();
 
-  // Upload progress
+  // Upload progress — includes per-document status updates
   useSocketEvent<
     'nucleus_upload.progress.account',
     INucleusUploadProgressMessage
   >('nucleus_upload.progress.account', (message) => {
+    // Per-document status update: optimistically update React Query cache
+    if (message.sourceUuid && message.processingStatus) {
+      queryClient.setQueryData<DocumentWithUsage[] | undefined>(
+        [AucctusQueryKeys.nucleusDocuments],
+        (oldData) => {
+          if (!oldData) return oldData;
+          return oldData.map((doc) =>
+            doc.uuid === message.sourceUuid
+              ? {
+                  ...doc,
+                  processingStatus:
+                    message.processingStatus as DocumentWithUsage['processingStatus'],
+                }
+              : doc,
+          );
+        },
+      );
+    }
+
     if (message.stage === 'completed') {
       toast.deferred.completed('Documents Processed');
     }
@@ -37,6 +57,11 @@ export const useNucleusHandler = (
       queryKey: [AucctusQueryKeys.nucleusReportLatest],
     });
 
+    // Invalidate documents to reconcile processing_status from server
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.nucleusDocuments],
+    });
+
     toast.deferred.completed(
       `${message.uploadedCount} Document${message.uploadedCount > 1 ? 's' : ''} Uploaded`,
     );
@@ -48,6 +73,11 @@ export const useNucleusHandler = (
     (message) => {
       const messageKey = `nucleus-error-${message.nucleusReportUuid || 'unknown'}-${message.errorCode || message.message}`;
       if (preventDuplicate(messageKey)) return;
+
+      // Invalidate documents to get updated failed status
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.nucleusDocuments],
+      });
 
       toast.deferred.error(
         'Document Upload Failed',

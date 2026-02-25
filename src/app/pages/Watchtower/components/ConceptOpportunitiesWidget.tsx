@@ -1,10 +1,10 @@
-import React, { useState, useCallback } from 'react';
 import images from '@assets/img';
-import { cn } from '@libs/utils/react';
 import {
-  useWatchtowerOpportunities,
   useAddOpportunityToConceptBank,
+  useWatchtowerOpportunities,
 } from '@hooks/query/watchtower.hook';
+import { DynamicIcon } from '@libs/utils/iconMap';
+import { cn } from '@libs/utils/react';
 import {
   ArrowRight,
   Check,
@@ -12,7 +12,7 @@ import {
   RefreshCw,
   Sparkles,
 } from 'lucide-react';
-import { DynamicIcon } from '@libs/utils/iconMap';
+import React, { useCallback, useState } from 'react';
 
 const urgencyConfig = {
   immediate: {
@@ -86,14 +86,14 @@ const ConceptOpportunitiesWidget: React.FC = () => {
         Specific product concepts suggested based on active signals
       </p>
 
-      <div className='scrollbar-thin scrollbar-thumb-muted flex gap-3 overflow-x-auto overflow-y-hidden pb-2'>
+      <div className='scrollbar-thin scrollbar-thumb-muted flex min-h-0 flex-1 gap-3 overflow-x-auto overflow-y-hidden pb-2'>
         {opportunities.map((concept) => {
           const urgency = urgencyConfig[concept.urgency];
 
           return (
             <div
               key={concept.id}
-              className='aucctus-bg-primary aucctus-border-secondary group flex h-[360px] w-[260px] flex-shrink-0 cursor-pointer flex-col overflow-hidden rounded-lg border transition-all hover:shadow-lg'
+              className='aucctus-bg-primary aucctus-border-secondary group flex h-full max-h-[400px] w-[300px] flex-shrink-0 cursor-pointer flex-col overflow-hidden rounded-lg border transition-all hover:shadow-lg'
             >
               {/* Image Header */}
               <div className='relative h-28 flex-shrink-0 overflow-hidden'>
@@ -138,18 +138,18 @@ const ConceptOpportunitiesWidget: React.FC = () => {
                 </span>
               </div>
 
-              <div className='flex flex-1 flex-col p-3'>
+              <div className='flex min-h-0 flex-1 flex-col p-3'>
                 <h4 className='aucctus-text-primary aucctus-text-sm-semibold line-clamp-2 leading-snug transition-colors group-hover:text-opacity-80'>
                   {concept.title}
                 </h4>
 
-                <div className='scrollbar-thin scrollbar-thumb-muted mt-2 max-h-[4.5rem] overflow-y-auto'>
+                <div className='scrollbar-thin no-scrollbar mt-2 min-h-0 flex-1 overflow-y-auto'>
                   <p className='aucctus-text-secondary text-xs leading-relaxed'>
                     {concept.description}
                   </p>
                 </div>
 
-                <div className='aucctus-border-secondary mt-2 space-y-1.5 border-t pt-2'>
+                <div className='aucctus-border-secondary mt-2 flex-shrink-0 space-y-1.5 border-t pt-2'>
                   <div className='flex items-center gap-1.5'>
                     <span className='aucctus-bg-secondary aucctus-border-secondary aucctus-text-tertiary rounded border px-1.5 py-0.5 text-[10px]'>
                       {concept.signalBasis}
@@ -172,7 +172,7 @@ const ConceptOpportunitiesWidget: React.FC = () => {
                       onClick={() => handleAddToBank(concept.id)}
                       disabled={isDisabled}
                       className={cn(
-                        'mt-auto flex w-full items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-medium transition-colors',
+                        'mt-auto flex w-full flex-shrink-0 items-center justify-center gap-1.5 rounded-md py-1.5 text-xs font-medium transition-colors',
                         isAlreadyAdded
                           ? 'cursor-not-allowed bg-gray-200 text-gray-500 dark:bg-gray-700 dark:text-gray-400'
                           : 'border border-gray-900 bg-gray-900 text-white hover:bg-gray-800 dark:border-white dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100',

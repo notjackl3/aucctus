@@ -24,6 +24,7 @@ import {
   SignalTrendsWidget,
   WatchtowerInitiation,
 } from './components';
+import SignalHistoryPopover from './components/SignalHistoryPopover';
 
 import {
   useCreateMonitoringRule,
@@ -34,10 +35,8 @@ import {
   useWatchtowerSocketEvents,
 } from '@hooks/query/watchtower.hook';
 import type { IWatchtowerSignal } from '@libs/api/types/watchtower';
+import { DynamicIcon } from '@libs/utils/iconMap';
 import { AppPath } from '@routes/routes';
-import { useNavigate } from 'react-router-dom';
-import type { Signal, SignalCategory, SignalType } from './types';
-import { signalCategoryConfig, signalTypeConfig } from './types';
 import {
   AlertCircle,
   AlertTriangle,
@@ -50,9 +49,7 @@ import {
   Layers,
   Lightbulb,
   Plus,
-  RefreshCw,
   Settings,
-  Signal as SignalIcon,
   Sparkles,
   Star,
   Target,
@@ -60,7 +57,9 @@ import {
   TrendingUp,
   X,
 } from 'lucide-react';
-import { DynamicIcon } from '@libs/utils/iconMap';
+import { useNavigate } from 'react-router-dom';
+import type { Signal, SignalCategory, SignalType } from './types';
+import { signalCategoryConfig, signalTypeConfig } from './types';
 
 /**
  * Transform API signal to local Signal type
@@ -107,7 +106,7 @@ const SignalRadar: React.FC<{
   filter,
   categoryFilter,
   height: containerHeight = 480,
-  introComplete = false,
+  introComplete = true,
   companyLogoUrl,
 }) => {
   const [staggerComplete, setStaggerComplete] = useState(false);
@@ -438,7 +437,6 @@ const SignalRadar: React.FC<{
                   fill='none'
                   stroke='rgba(255,255,255,0.6)'
                   strokeWidth='2'
-                  className='animate-pulse'
                   initial={{ r: 0, opacity: 0 }}
                   animate={
                     introComplete
@@ -536,16 +534,20 @@ const WatchtowerPageContent: React.FC = () => {
   const { logoUrl } = useAccountLogo();
   const companyLogoUrl = logoUrl || undefined;
 
+  // Scan history browsing state
+  const [selectedScanUuid, setSelectedScanUuid] = useState<string | null>(null);
+
   // Fetch dashboard data from API with concept impacts
   const {
     signals: apiSignals,
     monitoringRules,
     lastRefreshedAt,
+    activeScan,
     isLoading,
-  } = useWatchtowerDashboard();
+  } = useWatchtowerDashboard(selectedScanUuid ?? undefined);
 
-  // WebSocket events for real-time updates
-  const { scanProgress, startScanning } = useWatchtowerSocketEvents();
+  // WebSocket events for real-time updates (activeScan seeds progress on page load)
+  const { scanProgress, startScanning } = useWatchtowerSocketEvents(activeScan);
 
   // Mutations for refresh and rules
   const { refresh: triggerRefresh, isRefreshing } = useRefreshWatchtower();
@@ -567,7 +569,6 @@ const WatchtowerPageContent: React.FC = () => {
   const [categoryFilter, setCategoryFilter] = useState<'all' | SignalCategory>(
     'all',
   );
-  const [introComplete, setIntroComplete] = useState(false);
   const [openPinnedSignal, setOpenPinnedSignal] = useState<Signal | null>(null);
   const [showCustomize, setShowCustomize] = useState(false);
   const [newRule, setNewRule] = useState('');
@@ -656,14 +657,6 @@ const WatchtowerPageContent: React.FC = () => {
     },
     [deleteRule],
   );
-
-  // Trigger intro completion after animation
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIntroComplete(true);
-    }, 2800);
-    return () => clearTimeout(timer);
-  }, []);
 
   // Resizable radar section
   const [radarHeight, setRadarHeight] = useState(
@@ -818,74 +811,6 @@ const WatchtowerPageContent: React.FC = () => {
           {/* Subtle radial glow effect */}
           <div className='bg-gradient-radial from-primary/10 absolute inset-0 via-transparent to-transparent opacity-50' />
 
-          {/* Cinematic Intro Animation for first scan */}
-          <AnimatePresence>
-            {!introComplete && (
-              <motion.div
-                className='absolute inset-0 z-50 flex flex-col items-center justify-center'
-                initial={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: 'easeOut' }}
-              >
-                {/* Gradient background */}
-                <div
-                  className='absolute inset-0 bg-cover bg-center bg-no-repeat'
-                  style={{
-                    backgroundImage: `url(${images.nucleusBrandGradient})`,
-                  }}
-                />
-                <div className='absolute inset-0 bg-black/70' />
-
-                {/* Icon animation */}
-                <motion.div
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{
-                    duration: 0.4,
-                    ease: 'easeOut',
-                    delay: 0.1,
-                  }}
-                  className='relative z-10 mb-4'
-                >
-                  <SignalIcon
-                    size={40}
-                    className='relative z-10 stroke-white/90'
-                  />
-                </motion.div>
-
-                {/* Title animation */}
-                <motion.h1
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.25, ease: 'easeOut' }}
-                  className='relative z-10 text-2xl font-semibold tracking-wide text-white'
-                >
-                  Watchtower
-                </motion.h1>
-
-                {/* Subtle divider line */}
-                <motion.div
-                  className='relative z-10 mt-3'
-                  initial={{ opacity: 0, scaleX: 0 }}
-                  animate={{ opacity: 1, scaleX: 1 }}
-                  transition={{ duration: 0.3, delay: 0.45, ease: 'easeOut' }}
-                >
-                  <div className='h-px w-16 bg-white/30' />
-                </motion.div>
-
-                {/* Subtitle animation */}
-                <motion.p
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.3, delay: 0.55, ease: 'easeOut' }}
-                  className='relative z-10 mt-2 text-xs uppercase tracking-widest text-white/50'
-                >
-                  Signal Intelligence
-                </motion.p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
           {/* Radar visualization during first scan */}
           <div className='relative flex' style={{ height: radarHeight }}>
             <div className='flex-1 overflow-hidden'>
@@ -896,7 +821,6 @@ const WatchtowerPageContent: React.FC = () => {
                 filter='all'
                 categoryFilter='all'
                 height={radarHeight}
-                introComplete={introComplete}
                 companyLogoUrl={companyLogoUrl}
               />
             </div>
@@ -914,7 +838,7 @@ const WatchtowerPageContent: React.FC = () => {
   }
 
   return (
-    <div className='aucctus-bg-primary min-h-screen'>
+    <div className='aucctus-bg-primary min-h-screen overflow-clip'>
       {/* Edge-to-edge resizable radar section with brand gradient background */}
       <div className='relative overflow-hidden border-b border-white/10'>
         {/* Brand gradient background image */}
@@ -936,76 +860,13 @@ const WatchtowerPageContent: React.FC = () => {
         {/* Subtle radial glow effect */}
         <div className='bg-gradient-radial from-primary/10 absolute inset-0 via-transparent to-transparent opacity-50' />
 
-        {/* Cinematic Intro Animation */}
-        <AnimatePresence>
-          {!introComplete && (
-            <motion.div
-              className='absolute inset-0 z-50 flex flex-col items-center justify-center'
-              initial={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5, ease: 'easeOut' }}
-            >
-              {/* Gradient background */}
-              <div
-                className='absolute inset-0 bg-cover bg-center bg-no-repeat'
-                style={{
-                  backgroundImage: `url(${images.nucleusBrandGradient})`,
-                }}
-              />
-              <div className='absolute inset-0 bg-black/70' />
-
-              {/* Icon animation */}
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{
-                  duration: 0.4,
-                  ease: 'easeOut',
-                  delay: 0.1,
-                }}
-                className='relative z-10 mb-4'
-              >
-                <SignalIcon
-                  size={40}
-                  className='relative z-10 stroke-white/90'
-                />
-              </motion.div>
-
-              {/* Title animation */}
-              <motion.h1
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.25, ease: 'easeOut' }}
-                className='relative z-10 text-2xl font-semibold tracking-wide text-white'
-              >
-                Watchtower
-              </motion.h1>
-
-              {/* Subtle divider line */}
-              <motion.div
-                className='relative z-10 mt-3'
-                initial={{ opacity: 0, scaleX: 0 }}
-                animate={{ opacity: 1, scaleX: 1 }}
-                transition={{ duration: 0.3, delay: 0.45, ease: 'easeOut' }}
-              >
-                <div className='h-px w-16 bg-white/30' />
-              </motion.div>
-
-              {/* Subtitle animation */}
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.3, delay: 0.55, ease: 'easeOut' }}
-                className='relative z-10 mt-2 text-xs uppercase tracking-widest text-white/50'
-              >
-                Signal Intelligence
-              </motion.p>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
         {/* Filter pills overlaid on radar - glassmorphic style */}
-        <div className='absolute left-6 top-6 z-10 flex items-center gap-1.5'>
+        <motion.div
+          className='absolute left-6 top-6 z-10 flex items-center gap-1.5'
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
+        >
           <button
             onClick={() => setFilter('all')}
             className={cn(
@@ -1120,7 +981,7 @@ const WatchtowerPageContent: React.FC = () => {
 
             {/* Dropdown menu */}
             {showCategoryDropdown && (
-              <div className='aucctus-bg-primary aucctus-border-secondary absolute left-0 top-full z-50 mt-1 w-56 rounded-lg border shadow-lg'>
+              <div className='aucctus-bg-primary aucctus-border-secondary absolute left-0 top-full z-50 mt-1 w-56 min-w-max rounded-lg border shadow-lg'>
                 <button
                   onClick={() => {
                     setCategoryFilter('all');
@@ -1194,7 +1055,7 @@ const WatchtowerPageContent: React.FC = () => {
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
 
         <div className='relative flex' style={{ height: radarHeight }}>
           {/* Radar section - full width now */}
@@ -1206,72 +1067,50 @@ const WatchtowerPageContent: React.FC = () => {
               filter={filter}
               categoryFilter={categoryFilter}
               height={radarHeight}
-              introComplete={introComplete}
               companyLogoUrl={companyLogoUrl}
             />
           </div>
 
           {/* Overlaid carousel widget */}
-          <SignalCarouselWidget
-            signals={filteredSignals}
-            selectedSignal={selectedSignal}
-            onSelectSignal={handleSelectSignal}
-            pinnedSignalIds={pinnedSignalIds}
-            onPinSignal={handlePinSignal}
-          />
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.4, delay: 0.3, ease: 'easeOut' }}
+          >
+            <SignalCarouselWidget
+              signals={filteredSignals}
+              selectedSignal={selectedSignal}
+              onSelectSignal={handleSelectSignal}
+              pinnedSignalIds={pinnedSignalIds}
+              onPinSignal={handlePinSignal}
+            />
+          </motion.div>
         </div>
 
-        {/* Last Updated badge - bottom left */}
+        {/* Signal History / Last Updated badge - bottom left */}
         {!showCustomize && (
-          <div
-            className='absolute bottom-6 left-6 z-10 inline-flex select-none items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur-md transition-all duration-200 hover:border-white/30 hover:bg-white/15'
-            title='Last Updated'
-          >
-            <Clock size={14} className='stroke-white/60' />
-            {isScanningActive ? (
-              <span className='text-white'>
-                {scanProgress.message || 'Scanning...'}
-                {scanProgress.progress > 0 && ` (${scanProgress.progress}%)`}
-              </span>
-            ) : (
-              <span className='text-white'>
-                {lastUpdated.toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </span>
-            )}
-            <button
-              onClick={handleRefresh}
-              disabled={isScanningActive}
-              className={cn(
-                '-mr-1 rounded-full p-0.5 transition-colors',
-                isScanningActive
-                  ? 'cursor-not-allowed text-white/40'
-                  : 'text-white/60 hover:bg-white/15 hover:text-white',
-              )}
-              title='Refresh signals'
-            >
-              <RefreshCw
-                size={12}
-                className={cn(
-                  'stroke-current',
-                  isScanningActive && 'animate-spin',
-                )}
-              />
-            </button>
-          </div>
+          <SignalHistoryPopover
+            lastUpdated={lastUpdated}
+            isScanningActive={isScanningActive}
+            scanProgress={scanProgress}
+            onRefresh={handleRefresh}
+            selectedScanUuid={selectedScanUuid}
+            onSelectScan={setSelectedScanUuid}
+          />
         )}
 
         {/* Customize button - bottom right */}
         {!showCustomize && (
-          <button
+          <motion.button
             onClick={() => setShowCustomize(true)}
             className='absolute bottom-6 right-6 z-10 inline-flex select-none items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs font-medium backdrop-blur-md transition-all duration-200 hover:border-white/30 hover:bg-white/15'
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.5, ease: 'easeOut' }}
           >
             <Settings size={14} className='stroke-white' />
             <span className='text-white'>Customize</span>
-          </button>
+          </motion.button>
         )}
 
         {/* Customize panel */}
@@ -1366,7 +1205,12 @@ const WatchtowerPageContent: React.FC = () => {
       </div>
 
       {/* Future Predictions and Signal Trends widgets - side by side */}
-      <div className='p-6'>
+      <motion.div
+        className='p-6'
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.6, ease: 'easeOut' }}
+      >
         <div className='mb-6 grid grid-cols-2 gap-6'>
           <FuturePredictionsWidget />
           <SignalTrendsWidget />
@@ -1377,11 +1221,16 @@ const WatchtowerPageContent: React.FC = () => {
           <FutureDomainsWidget />
           <ConceptOpportunitiesWidget />
         </div>
-      </div>
+      </motion.div>
 
       {/* Pinned Signals Section */}
       {pinnedSignals.length > 0 && (
-        <div className='px-6 pb-6'>
+        <motion.div
+          className='px-6 pb-6'
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.7, ease: 'easeOut' }}
+        >
           <div className='aucctus-bg-primary aucctus-border-secondary rounded-xl border p-6'>
             <div className='mb-4 flex items-center gap-2'>
               <Star size={20} className='stroke-amber-500' />
@@ -1459,7 +1308,7 @@ const WatchtowerPageContent: React.FC = () => {
               ))}
             </div>
           </div>
-        </div>
+        </motion.div>
       )}
 
       {/* Pinned Signal Side Panel */}

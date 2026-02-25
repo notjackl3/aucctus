@@ -269,7 +269,10 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                     />
                     {signalTypeConfig[currentSignal.type].label}
                   </div>
-                  <div className='flex items-center gap-1 rounded border border-white/20 bg-white/15 px-1.5 py-0.5 text-[10px] text-white/80'>
+                  <div
+                    className='flex items-center gap-1 rounded border border-white/20 bg-white/15 px-1.5 py-0.5 text-[10px] text-white/80'
+                    title={signalCategoryConfig[currentSignal.category].label}
+                  >
                     <DynamicIcon
                       variant={
                         signalCategoryConfig[currentSignal.category]
@@ -279,7 +282,11 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       width={10}
                       className='stroke-current'
                     />
-                    {signalCategoryConfig[currentSignal.category].label}
+                    {
+                      signalCategoryConfig[currentSignal.category].label.split(
+                        ' ',
+                      )[0]
+                    }
                   </div>
                 </div>
                 <div className='flex items-center gap-1 text-[10px] text-white/50'>
@@ -503,8 +510,11 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                       currentSignal.sources.length > 0 && (
                         <div className='-mt-2 flex flex-wrap items-center gap-1.5'>
                           {currentSignal.sources.map((source, idx) => (
-                            <div
+                            <a
                               key={idx}
+                              href={source.url}
+                              target='_blank'
+                              rel='noopener noreferrer'
                               className='flex items-center gap-1.5 rounded-full bg-white/15 px-2 py-1 transition-colors hover:bg-white/20'
                             >
                               <div
@@ -518,7 +528,7 @@ const SignalCarouselWidget: React.FC<SignalCarouselWidgetProps> = ({
                               <span className='max-w-[120px] truncate text-[10px] text-white/70'>
                                 {source.title}
                               </span>
-                            </div>
+                            </a>
                           ))}
                         </div>
                       )}

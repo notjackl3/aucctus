@@ -657,6 +657,8 @@ export interface INucleusUploadProgressMessage extends BaseSocketEvent {
   progress?: number;
   filesProcessed?: number;
   totalFiles?: number;
+  sourceUuid?: string;
+  processingStatus?: string;
 }
 
 export interface INucleusUploadCompletedMessage extends BaseSocketEvent {

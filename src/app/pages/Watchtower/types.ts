@@ -16,6 +16,7 @@ export type Confidence = 'high' | 'medium' | 'low';
 
 export interface SignalSource {
   title: string;
+  url: string;
   excerpt: string;
   type: 'News' | 'Report' | 'Filing' | 'Internal' | 'Analysis';
 }
