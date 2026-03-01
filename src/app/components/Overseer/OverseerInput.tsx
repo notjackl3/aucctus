@@ -8,7 +8,7 @@ import React, {
   useState,
 } from 'react';
 import OverseerMentionMenu from './OverseerMentionMenu';
-import { Image, Send, X } from 'lucide-react';
+import { Paperclip, Send, X } from 'lucide-react';
 
 interface OverseerInputProps {
   value: string;
@@ -25,6 +25,7 @@ interface OverseerInputProps {
   onImageRemove?: (id: string) => void;
   maxImages?: number;
   conceptItems?: MentionItem[];
+  personaItems?: MentionItem[];
 }
 
 /**
@@ -36,7 +37,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
   onChange,
   onSubmit,
   disabled = false,
-  placeholder = 'Ask about this selection... (type @ to tag)',
+  placeholder = 'Ask anything or type @ to tag',
   className,
   mentions = [],
   onMentionSelect,
@@ -46,6 +47,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
   onImageRemove,
   maxImages = 4,
   conceptItems,
+  personaItems,
 }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -182,6 +184,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
         onClose={handleMentionMenuClose}
         visible={showMentionMenu}
         concepts={conceptItems}
+        personas={personaItems}
       />
 
       {/* Mention badges */}
@@ -259,7 +262,7 @@ const OverseerInput: React.FC<OverseerInputProps> = ({
             )}
             aria-label='Attach image'
           >
-            <Image size={14} className='stroke-current' />
+            <Paperclip size={14} className='stroke-current' />
           </button>
         )}
         <textarea

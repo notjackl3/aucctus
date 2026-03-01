@@ -1064,17 +1064,9 @@ export class Endpoints {
   // Overseer History Endpoints
   // ============================================
 
-  static overseerConversations(params?: {
-    page?: number;
-    conceptUuid?: string;
-    accountUuid?: string;
-  }) {
+  static overseerConversations(params?: { page?: number }) {
     const searchParams = new URLSearchParams();
     if (params?.page) searchParams.append('page', params.page.toString());
-    if (params?.conceptUuid)
-      searchParams.append('concept_uuid', params.conceptUuid);
-    if (params?.accountUuid)
-      searchParams.append('account_uuid', params.accountUuid);
     const query = searchParams.toString();
     return `/api/v1/chat/overseer/conversations${query ? `?${query}` : ''}`;
   }

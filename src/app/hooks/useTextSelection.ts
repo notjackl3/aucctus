@@ -87,7 +87,7 @@ function calculateButtonPosition(
 ): { x: number; y: number } | null {
   if (!rect || rect.width === 0) return null;
 
-  const padding = 8;
+  const padding = 16;
   const buttonWidth = 130;
   const buttonHeight = 32;
 
@@ -166,6 +166,17 @@ function calculatePopupPosition(
   return { x, y };
 }
 
+// Module-level range capture for persistent highlight
+let pendingRange: Range | null = null;
+
+export function getPendingRange(): Range | null {
+  return pendingRange;
+}
+
+export function clearPendingRange(): void {
+  pendingRange = null;
+}
+
 /**
  * Hook for detecting text selection and showing the "Ask Overseer" button.
  *
@@ -197,11 +208,15 @@ export function useTextSelection(config: UseTextSelectionConfig) {
     (event: MouseEvent) => {
       if (!enabled) return;
 
-      // Always ignore selections made inside the Overseer popup or selection button
+      // Always ignore selections made inside the Overseer popup, selection button,
+      // or portal-rendered elements (Radix dialogs, popovers, dropdowns, etc.)
       const target = event.target as HTMLElement;
       if (
         target.closest('[data-overseer-root]') ||
-        target.closest('[data-overseer-button]')
+        target.closest('[data-overseer-button]') ||
+        target.closest('[data-radix-portal]') ||
+        target.closest('[role="dialog"]') ||
+        target.closest('[role="alertdialog"]')
       ) {
         return;
       }
@@ -241,8 +256,21 @@ export function useTextSelection(config: UseTextSelectionConfig) {
         }
       }
 
+      // Skip selections inside SVG elements (highlight marks break SVG rendering)
+      {
+        const range = selection.getRangeAt(0);
+        const ancestor =
+          range.commonAncestorContainer instanceof Element
+            ? range.commonAncestorContainer
+            : range.commonAncestorContainer.parentElement;
+        if (ancestor?.closest('svg')) {
+          return;
+        }
+      }
+
       // Get the selection range for positioning
       const range = selection.getRangeAt(0);
+      pendingRange = range.cloneRange();
       const rect = range.getBoundingClientRect();
 
       // Calculate button and popup positions

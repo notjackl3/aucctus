@@ -17,11 +17,8 @@ import { useQuery } from 'react-query';
 
 export const overseerHistoryKeys = {
   all: ['overseerHistory'] as const,
-  conversations: (params?: {
-    conceptUuid?: string;
-    accountUuid?: string;
-    page?: number;
-  }) => [...overseerHistoryKeys.all, 'conversations', params] as const,
+  conversations: (params?: { page?: number }) =>
+    [...overseerHistoryKeys.all, 'conversations', params] as const,
   conversation: (uuid: string) =>
     [...overseerHistoryKeys.all, 'conversation', uuid] as const,
 };
@@ -31,12 +28,10 @@ export const overseerHistoryKeys = {
 // ============================================
 
 /**
- * Fetches paginated Overseer conversations scoped to a concept or account.
+ * Fetches paginated Overseer conversations for the current user (global history).
  */
 export const useOverseerConversations = (params?: {
   page?: number;
-  conceptUuid?: string;
-  accountUuid?: string;
   enabled?: boolean;
 }) => {
   const { enabled = true, ...queryParams } = params ?? {};

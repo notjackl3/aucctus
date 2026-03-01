@@ -50,7 +50,9 @@ export const OverseerProvider: React.FC<OverseerProviderProps> = ({
 
   return (
     <OverseerContext.Provider value={contextValue}>
-      {children}
+      <div {...(enabled ? { 'data-overseer-selectable': true } : {})}>
+        {children}
+      </div>
       {enabled && (
         <>
           <OverseerSelectionButton />

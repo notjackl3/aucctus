@@ -27,25 +27,14 @@ import {
   OverseerFeature,
 } from './types';
 
-/**
- * Account-level page contexts that don't require a concept UUID
- */
-const ACCOUNT_LEVEL_PAGES = new Set([
-  'nucleus',
-  'nucleus_categories',
-  'nucleus_data_uploads',
-  'watchtower',
-  'watchtower_signals',
-  'watchtower_predictions',
-  'watchtower_trends',
-  'portfolio',
-]);
+import { ACCOUNT_LEVEL_PAGE_CONTEXTS } from '@components/Overseer/overseerRouteConfig';
 
 /**
- * Check if a page context is an account-level page (Nucleus/Watchtower)
+ * Check if a page context is an account-level page (Nucleus/Watchtower/Portfolio/etc.)
+ * Derived from the central Overseer route registry.
  */
 function isAccountLevelPage(pageContext: string): boolean {
-  return ACCOUNT_LEVEL_PAGES.has(pageContext);
+  return ACCOUNT_LEVEL_PAGE_CONTEXTS.has(pageContext);
 }
 
 /**
@@ -196,6 +185,76 @@ export function open(
 }
 
 /**
+ * Open the Overseer panel from the floating search bar.
+ * Opens docked, with no text selection, and pre-loads the search query.
+ * Falls back to account-level context when no concept UUID is available.
+ */
+export function openFromSearchBar(
+  this: IStoreApi<IOverseerState>,
+  params: {
+    message: string;
+    pageContext: string;
+    contextType?: OverseerContextType;
+    conceptUuid?: string;
+    accountUuid?: string;
+    images?: IOverseerPendingImage[];
+    mentions?: MentionItem[];
+  },
+) {
+  const { set, storeApi } = this;
+
+  let contextType: OverseerContextType =
+    params.contextType ||
+    (isAccountLevelPage(params.pageContext) ? 'account' : 'concept');
+
+  const conceptUuid: string | undefined =
+    params.conceptUuid || storeApi.getState().conceptReport.conceptUuid;
+  const accountUuid: string | undefined =
+    params.accountUuid || storeApi.getState().auth.account?.uuid;
+
+  // Fall back to account mode if concept mode was desired but no conceptUuid is available
+  if (contextType === 'concept' && !conceptUuid) {
+    contextType = 'account';
+  }
+
+  if (contextType === 'account' && !accountUuid) {
+    telemetry.error('Overseer: Cannot open search bar without account UUID');
+    return;
+  }
+
+  set(
+    produce((state: IOverseerState) => {
+      state.isOpen = true;
+      state.isDocked = true;
+      state.selectedText = '';
+      state.expandedText = '';
+      state.pageContext = params.pageContext;
+      state.position = { x: 0, y: 0 };
+      state.contextType = contextType;
+      state.conceptUuid = conceptUuid;
+      state.accountUuid = accountUuid;
+      state.currentMessage = params.message;
+      // Reset conversation state
+      state.sessionId = undefined;
+      state.messages = [];
+      state.suggestedQuestions = [];
+      state.editSuggestions = null;
+      state.highlightedSectionId = null;
+      state.isThinking = false;
+      state.thinkingMessage = undefined;
+      state.currentError = undefined;
+      state.hasError = false;
+      state.activeFeatures = new Set();
+      state.mentions = params.mentions ?? [];
+      state.toolActivitySteps = [];
+      state.historyItems = [];
+      state.showHistory = false;
+      state.pendingImages = params.images ?? [];
+    }),
+  );
+}
+
+/**
  * Close the Overseer popup
  */
 export function close(this: IStoreApi<IOverseerState>) {
@@ -322,8 +381,8 @@ export async function sendMessage(this: IStoreApi<IOverseerState>) {
 
   // Build mention payload for WebSocket
   const mentionPayload = storeMentions
-    .filter((m) => m.type === 'concept')
-    .map((m) => ({ uuid: m.id, name: m.name, type: m.type as 'concept' }));
+    .filter((m) => m.type === 'concept' || m.type === 'persona')
+    .map((m) => ({ uuid: m.id, name: m.name, type: m.type }));
 
   const userMessage: IOverseerUserMessage = {
     uuid: messageUuid,

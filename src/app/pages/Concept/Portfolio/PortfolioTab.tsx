@@ -10,7 +10,6 @@ import React, { useCallback, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { Banner, ConceptReportSkeletons } from '@components';
-import OverseerWrapper from '@components/Overseer/OverseerWrapper';
 import {
   useBulkPrioritySocketEvents,
   useConceptPriorities,
@@ -286,7 +285,7 @@ const PortfolioTab: React.FC = () => {
   );
 
   return (
-    <OverseerWrapper pageContext='portfolio'>
+    <>
       {/* WebSocket event listener for portfolio executive summary */}
       <PortfolioExecutiveSummaryWrapper />
 
@@ -337,7 +336,7 @@ const PortfolioTab: React.FC = () => {
           />
         )}
       </div>
-    </OverseerWrapper>
+    </>
   );
 };
 

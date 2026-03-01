@@ -1,5 +1,5 @@
 import images from '@assets/img';
-import { ConceptReportSkeletons, Loading, OverseerWrapper } from '@components';
+import { ConceptReportSkeletons, Loading } from '@components';
 import { useAccountLogo } from '@hooks/query/admin.hook';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -1674,11 +1674,7 @@ const WatchtowerPageContent: React.FC = () => {
  * Main Watchtower Page Component with Overseer support
  */
 const WatchtowerPage: React.FC = () => {
-  return (
-    <OverseerWrapper pageContext='watchtower'>
-      <WatchtowerPageContent />
-    </OverseerWrapper>
-  );
+  return <WatchtowerPageContent />;
 };
 
 export default WatchtowerPage;

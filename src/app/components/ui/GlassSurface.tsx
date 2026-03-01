@@ -88,7 +88,7 @@ const GlassSurface: React.FC<GlassSurfaceProps> = ({
   const variantClasses: Record<GlassVariant, string> = {
     default: 'liquid-glass',
     vibrant: 'liquid-glass-vibrant',
-    contextual: 'liquid-glass-contextual',
+    contextual: 'liquid-glass-persona',
     elevated: 'liquid-glass-elevated',
   };
 

@@ -192,7 +192,7 @@ interface BaseOverseerMessage extends BaseSocketEvent {
   conceptUuid?: string;
   accountUuid?: string;
   pageContext: string;
-  mentions?: Array<{ uuid: string; name: string; type: 'concept' }>;
+  mentions?: Array<{ uuid: string; name: string; type: 'concept' | 'persona' }>;
 }
 
 /**

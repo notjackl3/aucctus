@@ -179,22 +179,34 @@ select:focus {
    * Usage:
    * - .liquid-glass: Standard glass surface for cards, panels, widgets
    * - .liquid-glass-vibrant: Higher contrast for hero sections, overlays
-   * - .liquid-glass-contextual: Dynamic theming using --persona-color
+   * - .liquid-glass-contextual: Neutral white glass for content areas
+   * - .liquid-glass-persona: Dynamic theming using --persona-color
    *
    * Example:
    *   <div className="liquid-glass p-4 rounded-xl">Content</div>
-   *   <div className="liquid-glass-contextual" style={{ '--persona-color': '200 70% 80%' }}>Themed</div>
+   *   <div className="liquid-glass-persona" style={{ '--persona-color': '200 70% 80%' }}>Themed</div>
    * ======================================================================== */
 
-  /* Light mode glass variables */
-  --glass-background: rgba(255, 255, 255, 0.45);
+  /* Light mode glass variables (matched to Lovable source) */
+  --glass-background: rgba(255, 255, 255, 0.7);
   --glass-background-elevated: rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-border: rgba(0, 0, 0, 0.06);
   --glass-border-subtle: rgba(0, 0, 0, 0.06);
-  --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.06), 0 1px 4px rgba(0, 0, 0, 0.04);
+  --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   --glass-shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.06);
-  --glass-blur: 24px;
+  --glass-blur: 16px;
   --glass-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.5);
+
+  /* Chromatic glass variables (Lovable design system) */
+  --glass-chromatic-primary: 0 12% 29%;
+  --glass-chromatic-secondary: 200 98% 86%;
+  --glass-chromatic-tertiary: 31 87% 83%;
+  --glass-chromatic-accent: 200 60% 50%;
+  --glass-chromatic-intensity: 0.05;
+
+  /* HSL variables for modal surface (Lovable design system) */
+  --card: 0 0% 100%;
+  --border: 220 13% 91%;
 
   /* Prismatic gradient for glass modal rim refraction */
   --prismatic-gradient: linear-gradient(135deg,
@@ -275,11 +287,23 @@ select:focus {
 .dark {
   --glass-background: rgba(255, 255, 255, 0.05);
   --glass-background-elevated: rgba(255, 255, 255, 0.08);
-  --glass-border: rgba(255, 255, 255, 0.12);
+  --glass-border: rgba(255, 255, 255, 0.1);
   --glass-border-subtle: rgba(255, 255, 255, 0.04);
-  --glass-shadow: 0 4px 24px rgba(0, 0, 0, 0.3), 0 1px 4px rgba(0, 0, 0, 0.2);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
   --glass-shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.4), 0 2px 8px rgba(0, 0, 0, 0.25);
+  --glass-blur: 16px;
   --glass-inner-glow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+
+  /* Chromatic glass dark mode overrides */
+  --glass-chromatic-primary: 0 12% 50%;
+  --glass-chromatic-secondary: 200 80% 60%;
+  --glass-chromatic-tertiary: 31 70% 60%;
+  --glass-chromatic-accent: 200 60% 50%;
+  --glass-chromatic-intensity: 0.08;
+
+  /* HSL variables for modal surface */
+  --card: 220 13% 11%;
+  --border: 220 13% 15%;
 
   --prismatic-gradient: linear-gradient(135deg,
       rgba(255, 255, 255, 0.02) 0%,
@@ -299,12 +323,27 @@ select:focus {
 /* Standard glass surface - use for cards, panels, widgets, sidebars */
 .liquid-glass {
   background: var(--glass-background);
-  backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
-  -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
-  border-bottom-color: var(--glass-border-subtle);
-  box-shadow: var(--glass-shadow), var(--glass-inner-glow);
-  border-radius: 1rem;
+  box-shadow: var(--glass-shadow);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--prismatic-gradient);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+.liquid-glass:hover::before {
+  opacity: 1;
 }
 
 /* Elevated glass - higher opacity for nested glass-on-glass surfaces */
@@ -320,25 +359,49 @@ select:focus {
 
 /* Vibrant glass - higher contrast for hero sections, overlays, modals */
 .liquid-glass-vibrant {
-  background: rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(28px) saturate(1.8);
-  -webkit-backdrop-filter: blur(28px) saturate(1.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  box-shadow: var(--glass-inner-glow);
-  border-radius: 1rem;
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(16px) saturate(2.0);
+  -webkit-backdrop-filter: blur(16px) saturate(2.0);
+  border: 0.5px solid rgba(255, 255, 255, 0.45);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.5);
 }
 
-/* Dark mode vibrant glass adjustment */
-.dark .liquid-glass-vibrant {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+/* Vibrant glass selected state */
+.liquid-glass-vibrant-selected {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(16px) saturate(2.0);
+  -webkit-backdrop-filter: blur(16px) saturate(2.0);
+  border: 0.5px solid rgba(255, 255, 255, 0.35);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.8);
 }
 
-/* Contextual glass - uses dynamic persona theme color
+/* Contextual glass - Lovable style for white/neutral backgrounds */
+.liquid-glass-contextual {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.05),
+    0 1px 2px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Persona-themed glass - uses dynamic persona theme color (Aucctus extension)
  * Set --persona-color via inline style: style={{ '--persona-color': '200 70% 80%' }}
  * The value should be HSL values without the hsl() wrapper (e.g., "200 70% 80%")
  */
-.liquid-glass-contextual {
+.liquid-glass-persona {
   background-color: hsl(var(--persona-color) / 0.1);
   backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
@@ -346,19 +409,183 @@ select:focus {
   border-radius: 1rem;
 }
 
-/* Contextual glass hover state - subtle highlight */
-.liquid-glass-contextual:hover {
+/* Persona glass hover state - subtle highlight */
+.liquid-glass-persona:hover {
   background-color: hsl(var(--persona-color) / 0.15);
   border-color: hsl(var(--persona-color) / 0.2);
 }
 
-/* Contextual glass active/selected state */
-.liquid-glass-contextual-active {
+/* Persona glass active/selected state */
+.liquid-glass-persona-active {
   background-color: hsl(var(--persona-color) / 0.2);
   backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
   -webkit-backdrop-filter: blur(var(--glass-blur)) saturate(1.8);
   border: 1px solid hsl(var(--persona-color) / 0.3);
   border-radius: 1rem;
+}
+
+/* ========================================================================
+ * Liquid Glass - Additional Variants (Lovable Design System)
+ * ======================================================================== */
+
+/* Text shadow utilities for glass surfaces */
+.glass-text-shadow {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.glass-text-shadow-strong {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark glass - for dark backgrounds with glass effect */
+.liquid-glass-dark {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.4);
+}
+
+.liquid-glass-dark-selected {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(1.9);
+  -webkit-backdrop-filter: blur(24px) saturate(1.9);
+  border: 0.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Light glass - for light backgrounds with ultra-subtle glass */
+.liquid-glass-light {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(0, 0, 0, 0.01);
+  backdrop-filter: blur(40px);
+  -webkit-backdrop-filter: blur(40px);
+  border: 0.5px solid rgba(0, 0, 0, 0.04);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.8);
+}
+
+.liquid-glass-light-selected {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.03);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 0.5px solid rgba(0, 0, 0, 0.06);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* Clean glass - similar to dark glass, crisp appearance */
+.liquid-glass-clean {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.4);
+}
+
+.liquid-glass-clean-selected {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(24px) saturate(1.9);
+  -webkit-backdrop-filter: blur(24px) saturate(1.9);
+  border: 0.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow: inset 0 0.5px 0 rgba(255, 255, 255, 0.6);
+}
+
+/* Minimal glass - lightweight for secondary/nested elements */
+.liquid-glass-minimal {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: inset 0 0.5px 0.5px rgba(255, 255, 255, 0.4);
+}
+
+/* Chromatic glass - with brand color gradients and specular highlight */
+.liquid-glass-chromatic {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(40px) saturate(1.8);
+  -webkit-backdrop-filter: blur(40px) saturate(1.8);
+  border: 0.5px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 0.5px 0.5px rgba(255, 255, 255, 0.5),
+    0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.liquid-glass-chromatic::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.25) 0%,
+    transparent 20%);
+  pointer-events: none;
+}
+
+.liquid-glass-chromatic:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* Immersive glass - full treatment with enhanced depth */
+.liquid-glass-immersive {
+  position: relative;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(50px) saturate(2.0);
+  -webkit-backdrop-filter: blur(50px) saturate(2.0);
+  border: 0.5px solid rgba(255, 255, 255, 0.25);
+  box-shadow:
+    inset 0 1px 1px rgba(255, 255, 255, 0.6),
+    inset 0 -0.5px 0.5px rgba(0, 0, 0, 0.05),
+    0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.liquid-glass-immersive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(180deg,
+    rgba(255, 255, 255, 0.3) 0%,
+    rgba(255, 255, 255, 0.05) 15%,
+    transparent 35%);
+  pointer-events: none;
+}
+
+/* Animated glass shimmer effect */
+.liquid-glass-animate {
+  animation: glass-shimmer 8s ease-in-out infinite;
+}
+
+@keyframes glass-shimmer {
+  0%, 100% {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  50% {
+    background: rgba(255, 255, 255, 0.16);
+  }
 }
 
 /* ========================================================================
@@ -388,13 +615,13 @@ select:focus {
 .liquid-glass-modal {
   --lg-modal-radius: 18px;
   --lg-rim: clamp(10px, 1.1vw + 8px, 14px);
-  --lg-rim-blur: 50px;
-  --lg-rim-saturate: 3.0;
-  --lg-rim-alpha: 0.04;
-  --lg-surface-alpha: 0.95;
+  --lg-rim-blur: 30px;
+  --lg-rim-saturate: 2.2;
+  --lg-rim-alpha: 0.12;
+  --lg-surface-alpha: 0.90;
 
-  overflow: hidden;
   position: relative;
+  overflow: hidden;
   border-radius: var(--lg-modal-radius);
   padding: var(--lg-rim);
 
@@ -405,13 +632,11 @@ select:focus {
 
 .dark .liquid-glass-modal-shell,
 .dark .liquid-glass-modal {
-  --lg-rim-blur: 50px;
-  --lg-rim-saturate: 3.0;
-  --lg-rim-alpha: 0.04;
-  --lg-surface-alpha: 0.95;
+  --lg-rim-alpha: 0.10;
+  --lg-surface-alpha: 0.78;
 }
 
-/* Rim: frosted glass ring (inspired by Overseer rim refinements) */
+/* Rim: frosted glass ring */
 .liquid-glass-modal-rim {
   position: absolute;
   inset: 0;
@@ -419,34 +644,27 @@ select:focus {
   border-radius: inherit;
   pointer-events: none;
 
-  filter: blur(64px) saturate(1.1) brightness(1.05);
-
-  background: rgb(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, var(--lg-rim-alpha));
   backdrop-filter: blur(var(--lg-rim-blur)) saturate(var(--lg-rim-saturate));
   -webkit-backdrop-filter: blur(var(--lg-rim-blur)) saturate(var(--lg-rim-saturate));
 
-  border: 0.5px solid rgba(255, 255, 255, 0.18);
+  border: 0.5px solid rgba(255, 255, 255, 0.28);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
-    0 0 30px rgba(120, 60, 50, 0.05),
-    0 0 60px rgba(100, 50, 45, 0.03);
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
 }
 
-/* Rotating conic gradient for subtle animated glow */
+/* Static radial gradient + prismatic tint for rim refraction */
 .liquid-glass-modal-rim::before {
   content: '';
   position: absolute;
-  inset: -50%;
+  inset: -45%;
   border-radius: inherit;
-  background: conic-gradient(from 0deg,
-      hsl(0 12% 29% / 0.05),
-      hsl(31 87% 83% / 0.04),
-      hsl(200 98% 86% / 0.04),
-      hsl(0 12% 29% / 0.03),
-      hsl(0 12% 29% / 0.05));
-  opacity: 0.15;
-  animation: glass-rim-rotate 12s linear infinite;
+  background-image:
+    radial-gradient(120% 90% at 20% 0%, rgba(255, 255, 255, 0.22) 0%, transparent 55%),
+    var(--prismatic-gradient);
+  opacity: 0.9;
+  transform: rotate(8deg);
   pointer-events: none;
 }
 
@@ -474,13 +692,10 @@ select:focus {
 }
 
 .liquid-glass-modal-rim-danger::before {
-  background: conic-gradient(from 0deg,
-      hsl(0 70% 55% / 0.06),
-      hsl(0 40% 80% / 0.04),
-      hsl(350 60% 50% / 0.05),
-      hsl(0 70% 55% / 0.03),
-      hsl(0 70% 55% / 0.06));
-  opacity: 0.2;
+  background-image:
+    radial-gradient(120% 90% at 20% 0%, rgba(255, 200, 200, 0.25) 0%, transparent 55%),
+    radial-gradient(80% 60% at 80% 100%, rgba(239, 68, 68, 0.12) 0%, transparent 50%);
+  opacity: 0.95;
 }
 
 .liquid-glass-modal-rim-danger::after {
@@ -602,14 +817,13 @@ select:focus {
   overflow: hidden;
   border-radius: calc(var(--lg-modal-radius) - var(--lg-rim));
 
-  background: rgba(255, 255, 255, var(--lg-surface-alpha));
-  border: 1px solid rgba(235, 233, 233, 0.35);
+  background: hsl(var(--card) / var(--lg-surface-alpha));
+  border: 1px solid hsl(var(--border) / 0.35);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
 }
 
 .dark .liquid-glass-modal-surface {
-  background: rgba(27, 19, 19, var(--lg-surface-alpha));
-  border: 1px solid rgba(55, 37, 37, 0.6);
+  border: 1px solid hsl(var(--border) / 0.6);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -897,6 +1111,13 @@ select:focus {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
   /* Chrome, Safari, Edge */
+}
+
+/* Overseer — brand-red text selection highlight (inline text only) */
+[data-overseer-selectable] ::selection,
+[data-overseer-selectable]::selection {
+  background-color: rgba(163, 13, 19, 0.25);
+  color: inherit;
 }
 
 /* React-Toastify Custom Styling - Remove default white container background */

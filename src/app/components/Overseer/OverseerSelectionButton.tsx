@@ -3,6 +3,22 @@ import useStore from '@stores/store';
 import { AnimatePresence, motion } from 'framer-motion';
 import React from 'react';
 import { createPortal } from 'react-dom';
+import { getPendingRange, clearPendingRange } from '@hooks/useTextSelection';
+import {
+  applyHighlightToRange,
+  removeAllHighlights,
+} from './utils/textHighlight';
+
+// Module-level cleanup for persistent highlight
+let cleanupHighlight: (() => void) | null = null;
+
+export function clearHighlight(): void {
+  if (cleanupHighlight) {
+    cleanupHighlight();
+    cleanupHighlight = null;
+  }
+  removeAllHighlights();
+}
 
 /**
  * A pill-shaped tooltip that appears centered above text selection
@@ -22,6 +38,16 @@ const OverseerSelectionButton: React.FC = () => {
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // Capture and apply persistent highlight before clearing the selection
+    const range = getPendingRange();
+    if (range) {
+      // Clean up any existing highlight first
+      clearHighlight();
+      cleanupHighlight = applyHighlightToRange(range);
+      clearPendingRange();
+    }
+
     window.getSelection()?.removeAllRanges();
     confirmSelection();
   };
@@ -35,7 +61,7 @@ const OverseerSelectionButton: React.FC = () => {
         exit={{ opacity: 0, scale: 0.9, y: 4 }}
         transition={{ duration: 0.15, ease: 'easeOut' }}
         onClick={handleClick}
-        className='fixed z-[10000] flex items-center gap-2 rounded-full bg-[#1a1a1a] px-3.5 py-2 text-sm font-medium text-white shadow-xl ring-1 ring-white/10 transition-colors hover:bg-[#252525]'
+        className='fixed z-[10000] flex items-center gap-2 rounded-full bg-[#111111] px-3.5 py-2 text-sm font-medium text-white shadow-2xl ring-1 ring-white/20 transition-colors hover:bg-[#1a1a1a]'
         style={{
           left: pendingSelection.buttonPosition.x,
           top: pendingSelection.buttonPosition.y,

@@ -42,7 +42,10 @@ import Tooltip from './ToolTip/Tooltip';
 import * as ConceptReportSkeletons from './Skeleton/ConceptReport';
 
 // Overseer Components
-import { OverseerWrapper } from './Overseer';
+export {
+  OVERSEER_ROUTE_REGISTRY,
+  ACCOUNT_LEVEL_PAGE_CONTEXTS,
+} from './Overseer';
 
 // Nucleus Components
 export * from './Nucleus';
@@ -63,7 +66,11 @@ import {
 
 // UI Components - Liquid Glass Design System
 import {
+  ChromaticGlass,
+  ChromaticGlassSelection,
+  GlassMorphicPanel,
   GlassSurface,
+  LiquidGlass,
   LiquidGlassDropdown,
   LiquidGlassModal,
   LiquidGlassModalFooter,
@@ -80,6 +87,8 @@ export {
   Button, // This is a component with attached properties - keep
   Card, // This is an object with card components - keep for compatibility
   Chart, // This is an object with chart components - keep for compatibility
+  ChromaticGlass,
+  ChromaticGlassSelection,
   ComponentCarousel,
   ComponentTooltip,
   CompanyDetailPanel,
@@ -90,7 +99,9 @@ export {
   DialGauge,
   EcosystemV2,
   FileDropzone,
+  GlassMorphicPanel,
   GlassSurface,
+  LiquidGlass,
   LiquidGlassDropdown,
   LiquidGlassModal,
   LiquidGlassModalFooter,
@@ -101,7 +112,6 @@ export {
   Loading,
   LogoAnimation,
   Modal,
-  OverseerWrapper,
   PocGeneratingOverlay,
   NucleusPage,
   Portal,

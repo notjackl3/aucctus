@@ -116,6 +116,8 @@ export interface MentionItem {
   name: string;
   type: 'persona' | 'concept';
   segment?: string;
+  themeColor?: string;
+  avatar?: string;
 }
 
 /**
@@ -139,6 +141,15 @@ export interface IOverseerActions {
     contextType?: OverseerContextType;
     conceptUuid?: string;
     accountUuid?: string;
+  }) => void;
+  openFromSearchBar: (params: {
+    message: string;
+    pageContext: string;
+    contextType?: OverseerContextType;
+    conceptUuid?: string;
+    accountUuid?: string;
+    images?: IOverseerPendingImage[];
+    mentions?: MentionItem[];
   }) => void;
   close: () => void;
   sendMessage: () => Promise<void>;

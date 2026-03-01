@@ -8,6 +8,7 @@ import {
   useConceptAiEditing,
   useConcepts,
 } from '@hooks/query/concepts.hook';
+import { usePersonas } from '@hooks/query/persona.hook';
 import { useOverseerConversations } from '@hooks/query/overseerHistory.hook';
 import { AnimatePresence, motion } from 'framer-motion';
 import React, {
@@ -26,15 +27,16 @@ import OverseerInput from './OverseerInput';
 import OverseerSocketWrapper from './OverseerSocketWrapper';
 import OverseerSuggestedQuestions from './OverseerSuggestedQuestions';
 import {
-  ArrowRight,
   ChevronLeft,
   ClockArrowDown,
-  Columns3,
-  Expand,
+  CornerDownRight,
+  PanelRightClose,
+  PanelRightOpen,
   Plus,
   X,
 } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
+import { clearHighlight } from './OverseerSelectionButton';
 
 // Panel dimension constants
 const DEFAULT_PANEL_WIDTH = 400;
@@ -96,8 +98,6 @@ const OverseerPopup: React.FC = () => {
   const mentions = useStore((state) => state.overseer.mentions);
   const showHistory = useStore((state) => state.overseer.showHistory);
   const historyItems = useStore((state) => state.overseer.historyItems);
-  const contextType = useStore((state) => state.overseer.contextType);
-  const accountUuid = useStore((state) => state.overseer.accountUuid);
   const toolActivitySteps = useStore(
     (state) => state.overseer.toolActivitySteps,
   );
@@ -136,15 +136,9 @@ const OverseerPopup: React.FC = () => {
   const { mutate: aiEditConcept, isLoading: isApplyingEdits } =
     useConceptAiEditing();
 
-  // Fetch conversation history scoped to current context
+  // Fetch global conversation history for the current user
   const { data: fetchedHistory, isLoading: historyLoading } =
-    useOverseerConversations({
-      conceptUuid:
-        contextType === 'concept' ? (conceptUuid ?? undefined) : undefined,
-      accountUuid:
-        contextType === 'account' ? (accountUuid ?? undefined) : undefined,
-      enabled: isOpen,
-    });
+    useOverseerConversations({ enabled: isOpen });
 
   // Merge React Query data with store placeholders (new conversations not yet in API)
   const mergedHistory = useMemo(() => {
@@ -156,10 +150,11 @@ const OverseerPopup: React.FC = () => {
     return [...newPlaceholders, ...apiItems];
   }, [fetchedHistory, historyItems]);
 
-  // Fetch all non-archived concepts for @mention menu
+  // Fetch all non-archived concepts for @mention menu (only when popup is open)
   const { data: conceptPage } = useConcepts({
     page: 1,
     pageSize: 199,
+    enabled: isOpen,
   });
   const conceptItems: MentionItem[] = useMemo(() => {
     if (!conceptPage?.results) return [];
@@ -172,6 +167,20 @@ const OverseerPopup: React.FC = () => {
       }));
   }, [conceptPage?.results, conceptUuid]);
 
+  // Fetch all active personas for @mention menu (only when popup is open)
+  const { personas: personaList } = usePersonas();
+  const personaItems: MentionItem[] = useMemo(() => {
+    if (!personaList) return [];
+    return personaList.map((p) => ({
+      id: p.uuid,
+      name: p.name,
+      type: 'persona' as const,
+      segment: p.segment,
+      themeColor: p.themeColor,
+      avatar: p.avatar,
+    }));
+  }, [personaList]);
+
   // Panel sizing state
   const [panelWidth, setPanelWidth] = useState(DEFAULT_PANEL_WIDTH);
   const [panelHeight, setPanelHeight] = useState(COMPACT_PANEL_HEIGHT);
@@ -179,6 +188,7 @@ const OverseerPopup: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [hasAutoExpanded, setHasAutoExpanded] = useState(false);
   const [contentExpanded, setContentExpanded] = useState(true);
+  const [isTextExpanded, setIsTextExpanded] = useState(false);
 
   const popupRef = useRef<HTMLDivElement>(null);
   const resizeStartRef = useRef<{
@@ -206,6 +216,7 @@ const OverseerPopup: React.FC = () => {
       setPanelHeight(COMPACT_PANEL_HEIGHT);
       setHasAutoExpanded(false);
       setContentExpanded(true);
+      setIsTextExpanded(false);
       prevSelectedTextRef.current = selectedText;
     }
   }, [selectedText]);
@@ -278,6 +289,7 @@ const OverseerPopup: React.FC = () => {
       if (e.key === 'Escape') {
         e.preventDefault();
         e.stopPropagation();
+        clearHighlight();
         close();
       }
     };
@@ -287,6 +299,19 @@ const OverseerPopup: React.FC = () => {
       document.removeEventListener('keydown', handleGlobalKeyDown, true);
     };
   }, [isOpen, close]);
+
+  // Wrap close to also clean up persistent highlight
+  const handleClose = useCallback(() => {
+    clearHighlight();
+    close();
+  }, [close]);
+
+  // Clean up highlight on unmount
+  useEffect(() => {
+    return () => {
+      clearHighlight();
+    };
+  }, []);
 
   // Handle suggested question click
   const handleQuestionClick = useCallback(
@@ -695,7 +720,10 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Undock panel'
                           >
-                            <Expand size={14} className='stroke-current' />
+                            <PanelRightOpen
+                              size={14}
+                              className='stroke-current'
+                            />
                           </button>
                         ) : (
                           <button
@@ -703,11 +731,14 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Anchor to side panel'
                           >
-                            <Columns3 size={14} className='stroke-current' />
+                            <PanelRightClose
+                              size={14}
+                              className='stroke-current'
+                            />
                           </button>
                         )}
                         <button
-                          onClick={close}
+                          onClick={handleClose}
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Close panel'
                         >
@@ -829,7 +860,10 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Undock panel'
                           >
-                            <Expand size={14} className='stroke-current' />
+                            <PanelRightOpen
+                              size={14}
+                              className='stroke-current'
+                            />
                           </button>
                         ) : (
                           <button
@@ -837,11 +871,14 @@ const OverseerPopup: React.FC = () => {
                             className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                             title='Anchor to side panel'
                           >
-                            <Columns3 size={14} className='stroke-current' />
+                            <PanelRightClose
+                              size={14}
+                              className='stroke-current'
+                            />
                           </button>
                         )}
                         <button
-                          onClick={close}
+                          onClick={handleClose}
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Close panel'
                         >
@@ -876,15 +913,25 @@ const OverseerPopup: React.FC = () => {
                       contentExpanded && (
                         <div className='px-4 pt-2'>
                           <div className='flex items-center gap-2 rounded-lg border border-blue-400/25 bg-blue-500/10 px-2.5 py-2'>
-                            <ArrowRight
+                            <CornerDownRight
                               size={12}
                               className='shrink-0 stroke-white/60'
                             />
-                            <p className='min-w-0 flex-1 truncate text-[11px] text-white/70'>
+                            <p
+                              className={cn(
+                                'min-w-0 flex-1 cursor-pointer select-none text-[11px] text-white/70',
+                                !isTextExpanded && 'truncate',
+                              )}
+                              onDoubleClick={() =>
+                                setIsTextExpanded((prev) => !prev)
+                              }
+                              title='Double-click to expand/collapse'
+                            >
                               {selectedText}
                             </p>
                             <button
                               onClick={() => {
+                                clearHighlight();
                                 setContentExpanded(false);
                                 clearSelectedText();
                               }}
@@ -909,6 +956,12 @@ const OverseerPopup: React.FC = () => {
                       onImageAdd={addImage}
                       onImageRemove={removeImage}
                       conceptItems={conceptItems}
+                      personaItems={personaItems}
+                      placeholder={
+                        selectedText && selectedText.trim().length > 0
+                          ? 'Ask anything about the selected content'
+                          : 'Ask anything or type @ to tag'
+                      }
                     />
 
                     {/* Feature toggle buttons (no border-t — matches Lovable) */}

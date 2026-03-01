@@ -1,0 +1,192 @@
+/* Floating Search Bar — Ported from Lovable prototype
+   Self-contained glass morphism: shell, rim, surface, orbs.
+   Uses warm Aucctus brand colors (rose, vermillion, pink, peach). */
+
+/* Kill every possible focus indicator on the search input */
+.floating-search-surface input,
+.floating-search-surface input:focus,
+.floating-search-surface input:focus-visible,
+.floating-search-surface input:focus-within,
+.floating-search-surface input:active {
+  box-shadow: none !important;
+  outline: none !important;
+  ring: 0 !important;
+  border-color: transparent !important;
+  -webkit-appearance: none;
+}
+
+/* ── Shell ── */
+.floating-search-shell {
+  position: relative;
+  border-radius: 28px;
+  padding: clamp(4px, 0.5vw + 3px, 6px);
+  overflow: hidden;
+  box-shadow:
+    0 12px 40px -12px rgba(0, 0, 0, 0.18),
+    0 4px 16px -6px rgba(0, 0, 0, 0.10);
+}
+
+.floating-search-shell--dragover {
+  outline: 2px dashed rgba(0, 0, 0, 0.15);
+  outline-offset: -2px;
+}
+
+/* ── Glass Rim ── */
+.floating-search-rim {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(30px) saturate(2.2);
+  -webkit-backdrop-filter: blur(30px) saturate(2.2);
+  border: 0.5px solid rgba(255, 255, 255, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
+}
+
+.dark .floating-search-rim {
+  background: rgba(255, 255, 255, 0.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.12);
+}
+
+/* Prismatic shimmer on the rim */
+.floating-search-rim::before {
+  content: '';
+  position: absolute;
+  inset: -45%;
+  border-radius: inherit;
+  background-image:
+    radial-gradient(120% 90% at 20% 0%, rgba(255, 255, 255, 0.22) 0%, transparent 55%),
+    var(--prismatic-gradient);
+  opacity: 0.9;
+  transform: rotate(8deg);
+  pointer-events: none;
+}
+
+/* Top specular highlight */
+.floating-search-rim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    rgba(255, 255, 255, 0.10) 2%,
+    transparent 10%
+  );
+  pointer-events: none;
+}
+
+/* ── Surface ── */
+.floating-search-surface {
+  position: relative;
+  z-index: 2;
+  border-radius: 24px;
+  backdrop-filter: blur(28px) saturate(1.5);
+  -webkit-backdrop-filter: blur(28px) saturate(1.5);
+}
+
+.floating-search-surface--light {
+  background: hsl(var(--card) / 0.75);
+  border: 1px solid hsl(var(--border) / 0.15);
+  box-shadow: inset 0 1px 0 hsl(var(--card) / 0.8);
+}
+
+.floating-search-surface--dark {
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ── Orbs — corner-anchored, highly diffused ── */
+.floating-search-orb {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.8;
+  filter: blur(28px);
+}
+
+.dark .floating-search-orb {
+  opacity: 0.65;
+  filter: blur(24px);
+}
+
+/* Top-left — Rose */
+.floating-search-orb-1 {
+  top: -10%;
+  left: 2%;
+  background: radial-gradient(circle, hsl(0 80% 58%) 0%, hsl(0 80% 58% / 0) 70%);
+  animation: search-orb-corner-1 16s ease-in-out infinite;
+}
+
+/* Bottom-right — Vermillion */
+.floating-search-orb-2 {
+  bottom: -10%;
+  right: 2%;
+  background: radial-gradient(circle, hsl(15 90% 58%) 0%, hsl(15 90% 58% / 0) 70%);
+  animation: search-orb-corner-2 19s ease-in-out infinite;
+}
+
+/* Top-right — Pink */
+.floating-search-orb-3 {
+  top: -10%;
+  right: 18%;
+  background: radial-gradient(circle, hsl(330 75% 62%) 0%, hsl(330 75% 62% / 0) 70%);
+  animation: search-orb-corner-3 21s ease-in-out infinite;
+}
+
+/* Bottom-left — Peach */
+.floating-search-orb-4 {
+  bottom: -10%;
+  left: 18%;
+  background: radial-gradient(circle, hsl(25 85% 65%) 0%, hsl(25 85% 65% / 0) 70%);
+  animation: search-orb-corner-4 14s ease-in-out infinite;
+}
+
+/* Corner-wandering keyframes */
+@keyframes search-orb-corner-1 {
+  0%   { transform: translate(0px, 0px); }
+  20%  { transform: translate(14px, 6px); }
+  40%  { transform: translate(6px, -8px); }
+  60%  { transform: translate(18px, 4px); }
+  80%  { transform: translate(4px, -4px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+@keyframes search-orb-corner-2 {
+  0%   { transform: translate(0px, 0px); }
+  18%  { transform: translate(-12px, -6px); }
+  38%  { transform: translate(-4px, 8px); }
+  58%  { transform: translate(-16px, -2px); }
+  78%  { transform: translate(-6px, 6px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+@keyframes search-orb-corner-3 {
+  0%   { transform: translate(0px, 0px); }
+  22%  { transform: translate(-10px, 8px); }
+  42%  { transform: translate(6px, 4px); }
+  62%  { transform: translate(-14px, 10px); }
+  82%  { transform: translate(4px, -4px); }
+  100% { transform: translate(0px, 0px); }
+}
+
+@keyframes search-orb-corner-4 {
+  0%   { transform: translate(0px, 0px); }
+  15%  { transform: translate(10px, -6px); }
+  35%  { transform: translate(16px, 4px); }
+  55%  { transform: translate(6px, -10px); }
+  75%  { transform: translate(14px, 2px); }
+  100% { transform: translate(0px, 0px); }
+}

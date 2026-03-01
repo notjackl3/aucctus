@@ -18,13 +18,9 @@ export class OverseerApi extends ApiService {
   }
 
   /**
-   * List Overseer conversations scoped to a concept or account.
+   * List all Overseer conversations for the current user.
    */
-  getConversations(params?: {
-    page?: number;
-    conceptUuid?: string;
-    accountUuid?: string;
-  }) {
+  getConversations(params?: { page?: number }) {
     return this.get<{ items: IOverseerConversation[]; count: number }>(
       endpoints.overseerConversations(params),
     );
