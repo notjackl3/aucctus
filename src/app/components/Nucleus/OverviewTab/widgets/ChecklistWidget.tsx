@@ -9,6 +9,7 @@
 
 import { GlassSurface } from '@components';
 import type { INucleusOverviewWidget } from '@libs/api/types/nucleusOverview';
+import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
   AlertTriangle,
@@ -18,7 +19,6 @@ import {
   Trash2,
 } from 'lucide-react';
 import React, { useCallback, useId, useState } from 'react';
-import { cn } from '@libs/utils/react';
 
 interface ChecklistWidgetProps {
   widget: INucleusOverviewWidget;
@@ -384,7 +384,7 @@ const ChecklistWidget: React.FC<ChecklistWidgetProps> = ({
                     }
                   />
                 </div>
-                <span className='aucctus-text-primary aucctus-text-sm flex-1'>
+                <span className='aucctus-text-primary aucctus-text-sm flex flex-1 flex-row items-center'>
                   {renderItemContent(item)}
                 </span>
               </div>
@@ -416,7 +416,7 @@ const ChecklistWidget: React.FC<ChecklistWidgetProps> = ({
                       : undefined
                   }
                 />
-                <span className='text-foreground/90 flex-1 text-sm'>
+                <span className='text-foreground/90 flex flex-1 flex-row items-center text-sm'>
                   {renderItemContent(item)}
                 </span>
               </div>
@@ -453,7 +453,7 @@ const ChecklistWidget: React.FC<ChecklistWidgetProps> = ({
                         : undefined
                     }
                   />
-                  <span className='text-foreground/90 flex-1 text-sm'>
+                  <span className='text-foreground/90 flex flex-1 flex-row items-center text-sm'>
                     {renderItemContent(item)}
                   </span>
                 </div>

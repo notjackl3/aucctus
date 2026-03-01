@@ -22,7 +22,6 @@ export interface IOverviewCardListItem {
   title: string;
   description: string;
   icon: string;
-  color: string;
   order: number;
 }
 
@@ -37,7 +36,6 @@ export interface IOverviewAccordionItem {
   name: string;
   description: string;
   icon: string;
-  color: string;
   order: number;
 }
 
@@ -47,7 +45,6 @@ export interface IOverviewVisualizationItem {
   shortName: string;
   title: string;
   description: string;
-  color: string;
   order: number;
 }
 
@@ -100,7 +97,6 @@ export interface ICreateOverviewWidgetItemPayload {
   title?: string;
   description?: string;
   icon?: string;
-  color?: string;
   // checklist
   text?: string;
   // accordion
@@ -118,7 +114,6 @@ export interface ICreateCardListItemPayload {
   title: string;
   description?: string;
   icon?: string;
-  color?: string;
 }
 
 export interface ICreateChecklistItemPayload {
@@ -129,7 +124,6 @@ export interface ICreateAccordionItemPayload {
   name: string;
   description?: string;
   icon?: string;
-  color?: string;
 }
 
 export interface ICreateVisualizationItemPayload {
@@ -137,7 +131,6 @@ export interface ICreateVisualizationItemPayload {
   shortName?: string;
   title: string;
   description?: string;
-  color?: string;
 }
 
 export interface ICreateConstrainedTextItemPayload {
@@ -150,7 +143,6 @@ export interface IUpdateCardListItemPayload {
   title?: string;
   description?: string;
   icon?: string;
-  color?: string;
 }
 
 export interface IUpdateChecklistItemPayload {
@@ -161,7 +153,6 @@ export interface IUpdateAccordionItemPayload {
   name?: string;
   description?: string;
   icon?: string;
-  color?: string;
 }
 
 export interface IUpdateVisualizationItemPayload {
@@ -169,7 +160,6 @@ export interface IUpdateVisualizationItemPayload {
   shortName?: string;
   title?: string;
   description?: string;
-  color?: string;
 }
 
 export interface IUpdateConstrainedTextItemPayload {

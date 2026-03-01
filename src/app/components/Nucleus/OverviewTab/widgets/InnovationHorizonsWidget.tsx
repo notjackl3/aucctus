@@ -146,12 +146,10 @@ const InnovationHorizonsWidget: React.FC<InnovationHorizonsWidgetProps> = ({
   );
   const svgId = useId();
   const current = horizons[selectedIndex];
-  /** Resolve color for a horizon: item color → brand color by index → fallback */
-  const getHorizonColor = (itemColor: string | undefined, index: number) =>
-    itemColor || brandColorValues[index % brandColorValues.length] || '#333';
-  const currentColor = current
-    ? getHorizonColor(current.color, selectedIndex)
-    : '#333';
+  /** Resolve color for a horizon from brand colors by index */
+  const getHorizonColor = (index: number) =>
+    brandColorValues[index % brandColorValues.length] || '#333';
+  const currentColor = current ? getHorizonColor(selectedIndex) : '#333';
   const [isAdding, setIsAdding] = useState(false);
   const [newLabel, setNewLabel] = useState('');
   const [newShortName, setNewShortName] = useState('');
@@ -422,12 +420,12 @@ const InnovationHorizonsWidget: React.FC<InnovationHorizonsWidgetProps> = ({
                 >
                   <stop
                     offset='0%'
-                    stopColor={getHorizonColor(h.color, i)}
+                    stopColor={getHorizonColor(i)}
                     stopOpacity={i === 0 ? '0.35' : i === 1 ? '0.5' : '0.45'}
                   />
                   <stop
                     offset='100%'
-                    stopColor={getHorizonColor(h.color, i)}
+                    stopColor={getHorizonColor(i)}
                     stopOpacity={i === 0 ? '0.15' : i === 1 ? '0.25' : '0.2'}
                   />
                 </radialGradient>
@@ -446,17 +444,17 @@ const InnovationHorizonsWidget: React.FC<InnovationHorizonsWidgetProps> = ({
                   >
                     <stop
                       offset='0%'
-                      stopColor={getHorizonColor(h.color, i)}
+                      stopColor={getHorizonColor(i)}
                       stopOpacity={i === 0 ? '0.18' : i === 1 ? '0.3' : '0.25'}
                     />
                     <stop
                       offset='60%'
-                      stopColor={getHorizonColor(h.color, i)}
+                      stopColor={getHorizonColor(i)}
                       stopOpacity={i === 0 ? '0.05' : i === 1 ? '0.12' : '0.08'}
                     />
                     <stop
                       offset='100%'
-                      stopColor={getHorizonColor(h.color, i)}
+                      stopColor={getHorizonColor(i)}
                       stopOpacity='0'
                     />
                   </radialGradient>
@@ -476,17 +474,17 @@ const InnovationHorizonsWidget: React.FC<InnovationHorizonsWidgetProps> = ({
                   <stop offset='0%' stopColor='white' stopOpacity='0.4' />
                   <stop
                     offset='25%'
-                    stopColor={getHorizonColor(h.color, i)}
+                    stopColor={getHorizonColor(i)}
                     stopOpacity={i === 0 ? '0.3' : i === 1 ? '0.45' : '0.35'}
                   />
                   <stop
                     offset='50%'
-                    stopColor={getHorizonColor(h.color, i)}
+                    stopColor={getHorizonColor(i)}
                     stopOpacity={i === 0 ? '0.25' : i === 1 ? '0.4' : '0.3'}
                   />
                   <stop
                     offset='75%'
-                    stopColor={getHorizonColor(h.color, i)}
+                    stopColor={getHorizonColor(i)}
                     stopOpacity={i === 0 ? '0.3' : i === 1 ? '0.45' : '0.35'}
                   />
                   <stop offset='100%' stopColor='white' stopOpacity='0.4' />
@@ -630,7 +628,7 @@ const InnovationHorizonsWidget: React.FC<InnovationHorizonsWidgetProps> = ({
                   const isSelected = selectedIndex === ring.index;
                   const horizon = horizons[ring.index];
                   if (!horizon) return null;
-                  const color = getHorizonColor(horizon.color, ring.index);
+                  const color = getHorizonColor(ring.index);
                   const labelRadius =
                     ((ring.innerRadius + ring.outerRadius) / 2) * maxRadius;
 
