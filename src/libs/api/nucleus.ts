@@ -23,6 +23,13 @@ import {
   CompanyLookupRequest,
   CompanyLookupResponse,
 } from './types/nucleus';
+import type {
+  INucleusOverviewWidget,
+  ICreateNucleusOverviewWidgetPayload,
+  IUpdateNucleusOverviewWidgetPayload,
+  IReorderOverviewItemsPayload,
+  IGenerateOverviewResponse,
+} from './types/nucleusOverview';
 
 /**
  * Nucleus API
@@ -319,5 +326,131 @@ export class NucleusApi extends ApiService {
       : endpoints.adminNucleusVideoGenerate;
 
     return this.postFormData<NucleusVideoGenerateResponse>(url, formData);
+  }
+
+  // ============================================
+  // Overview Widgets
+  // ============================================
+
+  /**
+   * Trigger AI generation of overview widgets for a nucleus report.
+   * Returns 202 Accepted immediately; generation runs asynchronously.
+   */
+  generateOverview(reportUuid: string) {
+    return this.post<IGenerateOverviewResponse>(
+      endpoints.nucleusOverviewGenerate(reportUuid),
+    );
+  }
+
+  /**
+   * Get all overview widgets (with items) for a nucleus report.
+   */
+  getOverviewWidgets(reportUuid: string) {
+    return this.get<INucleusOverviewWidget[]>(
+      endpoints.nucleusOverviewWidgets(reportUuid),
+    );
+  }
+
+  /**
+   * Create a new overview widget with optional initial items.
+   */
+  createOverviewWidget(
+    reportUuid: string,
+    data: ICreateNucleusOverviewWidgetPayload,
+  ) {
+    return this.post<
+      INucleusOverviewWidget,
+      ICreateNucleusOverviewWidgetPayload
+    >(endpoints.nucleusOverviewWidgets(reportUuid), data);
+  }
+
+  /**
+   * Update an overview widget's metadata (title, description, icon).
+   */
+  updateOverviewWidget(
+    reportUuid: string,
+    widgetUuid: string,
+    data: IUpdateNucleusOverviewWidgetPayload,
+  ) {
+    return this.patch<
+      INucleusOverviewWidget,
+      IUpdateNucleusOverviewWidgetPayload
+    >(endpoints.nucleusOverviewWidget(reportUuid, widgetUuid), data);
+  }
+
+  /**
+   * Delete an overview widget and all its items.
+   */
+  deleteOverviewWidget(reportUuid: string, widgetUuid: string) {
+    return this.delete(endpoints.nucleusOverviewWidget(reportUuid, widgetUuid));
+  }
+
+  /**
+   * Reorder overview widgets on the dashboard.
+   */
+  reorderOverviewWidgets(
+    reportUuid: string,
+    data: IReorderOverviewItemsPayload,
+  ) {
+    return this.post<INucleusOverviewWidget[], IReorderOverviewItemsPayload>(
+      endpoints.nucleusOverviewWidgetsReorder(reportUuid),
+      data,
+    );
+  }
+
+  /**
+   * Add an item to an overview widget.
+   */
+  addOverviewWidgetItem(
+    reportUuid: string,
+    widgetUuid: string,
+    data: Record<string, unknown>,
+  ) {
+    return this.post<INucleusOverviewWidget, Record<string, unknown>>(
+      endpoints.nucleusOverviewWidgetItems(reportUuid, widgetUuid),
+      data,
+    );
+  }
+
+  /**
+   * Update an item within an overview widget.
+   */
+  updateOverviewWidgetItem(
+    reportUuid: string,
+    widgetUuid: string,
+    itemUuid: string,
+    data: Record<string, unknown>,
+  ) {
+    return this.patch<INucleusOverviewWidget, Record<string, unknown>>(
+      endpoints.nucleusOverviewWidgetItem(reportUuid, widgetUuid, itemUuid),
+      data,
+    );
+  }
+
+  /**
+   * Delete an item from an overview widget.
+   */
+  deleteOverviewWidgetItem(
+    reportUuid: string,
+    widgetUuid: string,
+    itemUuid: string,
+  ) {
+    return this.delete<INucleusOverviewWidget>(
+      endpoints.nucleusOverviewWidgetItem(reportUuid, widgetUuid, itemUuid),
+    );
+  }
+
+  /**
+   * Reorder items within an overview widget.
+   */
+  reorderOverviewWidgetItems(
+    reportUuid: string,
+    widgetUuid: string,
+    data: IReorderOverviewItemsPayload,
+  ) {
+    return this.post<INucleusOverviewWidget, IReorderOverviewItemsPayload>(
+      endpoints.nucleusOverviewWidgetItemsReorder(reportUuid, widgetUuid),
+      data,
+    );
   }
 }

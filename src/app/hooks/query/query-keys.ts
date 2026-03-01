@@ -89,6 +89,10 @@ export enum AucctusQueryKeys {
   nucleusStatus = 'nucleusStatus',
   nucleusDocuments = 'nucleusDocuments',
   nucleusDocumentUsage = 'nucleusDocumentUsage',
+  nucleusOverviewWidgets = 'nucleusOverviewWidgets',
+
+  /* Account Branding */
+  accountBranding = 'accountBranding',
 
   /* POC Plan */
   pocPlan = 'pocPlan',

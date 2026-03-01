@@ -1,6 +1,7 @@
 import { HeadersDefaults } from 'axios';
 import analytics from '../telemetry';
 import { AccountApi } from './account';
+import { AccountBrandingApi } from './accountBranding';
 import { AdminApi } from './admin';
 import { ArticleApi } from './article';
 import { AssumptionsApi } from './assumptions';
@@ -69,6 +70,7 @@ export class Api {
   persona!: PersonaApi;
   portfolio!: PortfolioApi;
   portfolioInsights!: PortfolioInsightsApi;
+  accountBranding!: AccountBrandingApi;
 
   constructor(apiConfig: IApiConfig) {
     this._config = apiConfig;
@@ -107,6 +109,7 @@ export class Api {
       { key: 'persona', class: PersonaApi },
       { key: 'portfolio', class: PortfolioApi },
       { key: 'portfolioInsights', class: PortfolioInsightsApi },
+      { key: 'accountBranding', class: AccountBrandingApi },
     ];
 
     apiClasses.forEach(({ key, class: ApiClass }) => {

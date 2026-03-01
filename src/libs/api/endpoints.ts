@@ -758,6 +758,41 @@ export class Endpoints {
   // Nucleus Video Endpoints (Admin only)
   static adminNucleusVideoGenerate = '/api/v1/admin/nucleus-video/generate';
 
+  // Nucleus Overview Widget Endpoints
+  static nucleusOverviewGenerate(reportUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/overview/generate`;
+  }
+  static nucleusOverviewWidgets(reportUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/overview/widgets`;
+  }
+  static nucleusOverviewWidget(reportUuid: string, widgetUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/overview/widgets/${widgetUuid}`;
+  }
+  static nucleusOverviewWidgetsReorder(reportUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/overview/widgets/reorder`;
+  }
+  static nucleusOverviewWidgetItems(reportUuid: string, widgetUuid: string) {
+    return `/api/v1/nucleus-reports/${reportUuid}/overview/widgets/${widgetUuid}/items`;
+  }
+  static nucleusOverviewWidgetItem(
+    reportUuid: string,
+    widgetUuid: string,
+    itemUuid: string,
+  ) {
+    return `/api/v1/nucleus-reports/${reportUuid}/overview/widgets/${widgetUuid}/items/${itemUuid}`;
+  }
+  static nucleusOverviewWidgetItemsReorder(
+    reportUuid: string,
+    widgetUuid: string,
+  ) {
+    return `/api/v1/nucleus-reports/${reportUuid}/overview/widgets/${widgetUuid}/items/reorder`;
+  }
+
+  // Account Branding Endpoints
+  static accountBranding = '/api/v1/account/branding';
+  static accountBrandingHqImage = '/api/v1/account/branding/hq-image';
+  static accountBrandingLogo = '/api/v1/account/branding/logo';
+
   // Admin Metrics Endpoints (now under analytics)
   static adminMetrics = '/api/v1/analytics/metrics';
 

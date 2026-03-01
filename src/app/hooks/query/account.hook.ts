@@ -153,6 +153,28 @@ export const useRegisterAccount = () => {
   });
 };
 
+export const useUpdateAccount = () => {
+  const queryClient = useQueryClient();
+  const setAccount = useStore((state) => state.auth.setAccount);
+
+  return useMutation<IAccount, AxiosError<IFormError>, Partial<IAccount>>({
+    mutationFn: async (payload) => await api.account.updateAccount(payload),
+    onSuccess: (data) => {
+      setAccount(data);
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.userDetails],
+      });
+      toast.success(
+        'Account Updated',
+        'Your account has been updated successfully',
+      );
+    },
+    onError: () => {
+      toast.error('Update Failed', 'Failed to update account details');
+    },
+  });
+};
+
 export const useUpdateUser = () => {
   const queryClient = useQueryClient();
   const setUser = useStore((state) => state.auth.setUser);

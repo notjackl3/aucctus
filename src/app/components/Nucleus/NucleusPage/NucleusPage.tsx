@@ -8,6 +8,7 @@ import {
   NucleusReportSection,
   SectionType,
 } from '@libs/api/types';
+import { isAucctusAdmin } from '@libs/utils/account';
 import { motion } from 'framer-motion';
 import { Building2, Scale, Users } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -61,6 +62,7 @@ const NucleusPage: React.FC = () => {
 
   // Check if current user is admin
   const isAdmin = user?.role.toLowerCase() === 'admin';
+  const showLivingPersonas = useMemo(() => isAucctusAdmin(user), [user]);
   const isDebugModeEnabled = useDebugMode();
 
   // Hook for generating nucleus report
@@ -113,7 +115,7 @@ const NucleusPage: React.FC = () => {
         label: 'Company Context',
         icon: <Building2 className='h-4 w-4' />,
       },
-      ...(FEATURE_LIVING_PERSONAS
+      ...(showLivingPersonas
         ? [
             {
               id: 'living-personas' as const,
@@ -128,7 +130,7 @@ const NucleusPage: React.FC = () => {
         icon: <Scale className='h-4 w-4' />,
       },
     ],
-    [],
+    [showLivingPersonas],
   );
 
   // Handle openScoringConfig URL param by switching to decision-making tab
@@ -579,34 +581,35 @@ const NucleusPage: React.FC = () => {
 
           {/* Header Content */}
           <div className='relative z-10 flex h-full flex-col items-center justify-center px-6 py-8'>
-            {/* Status Badge with pulse animation */}
-            <StatusBadge status={nucleusReport.processingStatus} />
-
-            {/* Company Logo or Name */}
-            {companyLogoUrl && !logoFailed ? (
+            {/* Logo in top-right corner */}
+            {companyLogoUrl && !logoFailed && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className='mb-2 flex items-center justify-center rounded-md bg-white/30 p-3 backdrop-blur-sm'
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5 }}
+                className='absolute right-4 top-4 flex items-center justify-center rounded-md bg-white/30 p-2 backdrop-blur-sm'
               >
                 <img
                   src={companyLogoUrl}
                   alt={companyName}
-                  className='h-16 w-auto max-w-[160px] object-contain drop-shadow-xl'
+                  className='h-10 w-auto max-w-[120px] object-contain drop-shadow-lg'
                   onError={() => setLogoFailed(true)}
                 />
               </motion.div>
-            ) : (
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6 }}
-                className='aucctus-header-xl-bold mb-2 text-center tracking-tight text-white drop-shadow-xl'
-              >
-                {companyName}
-              </motion.h1>
             )}
+
+            {/* Status Badge with pulse animation */}
+            <StatusBadge status={nucleusReport.processingStatus} />
+
+            {/* Company Name */}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className='aucctus-header-xl-bold mb-2 text-center tracking-tight text-white drop-shadow-xl'
+            >
+              {companyName}
+            </motion.h1>
 
             {/* Subtitle */}
             <motion.p
@@ -654,6 +657,7 @@ const NucleusPage: React.FC = () => {
               getQuestionState={getQuestionState}
               reportUuid={nucleusReport?.uuid || ''}
               isAdmin={isAdmin}
+              isAucctusAdmin={showLivingPersonas}
               onNavigateToCategory={(categoryId) => {
                 // Switch to intelligence section and expand the category
                 const newParams = new URLSearchParams(searchParams);
@@ -679,7 +683,7 @@ const NucleusPage: React.FC = () => {
         )}
 
         {/* Living Personas Tab */}
-        {FEATURE_LIVING_PERSONAS && activeTab === 'living-personas' && (
+        {showLivingPersonas && activeTab === 'living-personas' && (
           <div data-tab='living-personas'>
             <LivingPersonasTab />
           </div>

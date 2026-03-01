@@ -16,7 +16,7 @@ import type {
 } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
 import { motion } from 'framer-motion';
-import { Database, Radar } from 'lucide-react';
+import { Database, LayoutDashboard, Palette, Radar } from 'lucide-react';
 import React, {
   useCallback,
   useEffect,
@@ -27,11 +27,17 @@ import React, {
 } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CategoriesGrid } from '../CategoriesGrid';
+import OverviewTab from '../OverviewTab/OverviewTab';
+import PersonalizationTab from '../PersonalizationTab/PersonalizationTab';
 import type { CategoryState, QuestionState } from '../StatusDropdown';
 import { UploadsTab } from '../UploadsTab';
 
 /** Sub-section identifiers */
-type ContextSection = 'intelligence' | 'data-uploads';
+type ContextSection =
+  | 'overview'
+  | 'intelligence'
+  | 'data-uploads'
+  | 'personalization';
 
 /** Sidebar item configuration */
 interface SidebarItem {
@@ -40,9 +46,22 @@ interface SidebarItem {
   label: string;
 }
 
-const sidebarItems: SidebarItem[] = [
+/** Build sidebar items based on access level */
+const getSidebarItems = (isAucctusAdmin: boolean): SidebarItem[] => [
+  ...(isAucctusAdmin
+    ? [{ id: 'overview' as const, icon: LayoutDashboard, label: 'Overview' }]
+    : []),
   { id: 'intelligence', icon: Radar, label: 'Intelligence' },
   { id: 'data-uploads', icon: Database, label: 'Data & Uploads' },
+  ...(isAucctusAdmin
+    ? [
+        {
+          id: 'personalization' as const,
+          icon: Palette,
+          label: 'Personalization',
+        },
+      ]
+    : []),
 ];
 
 /** Category state info returned by getCategoryStateInfo */
@@ -89,6 +108,7 @@ export interface CompanyContextTabProps {
   getQuestionState: (question: NucleusReportQuestion) => QuestionState;
   reportUuid: string;
   isAdmin: boolean;
+  isAucctusAdmin: boolean;
   onNavigateToCategory: (categoryId: string) => void;
 }
 
@@ -108,8 +128,13 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
   getQuestionState,
   reportUuid,
   isAdmin,
+  isAucctusAdmin: isAucctusAdminProp,
   onNavigateToCategory,
 }) => {
+  const sidebarItems = useMemo(
+    () => getSidebarItems(isAucctusAdminProp),
+    [isAucctusAdminProp],
+  );
   const [searchParams, setSearchParams] = useSearchParams();
   const [sidebarExpanded, setSidebarExpanded] = useState(false);
   const sectionRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -121,13 +146,16 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
     left: 0,
   });
 
+  const defaultSection: ContextSection = isAucctusAdminProp
+    ? 'overview'
+    : 'intelligence';
   const activeSection: ContextSection =
-    (searchParams.get('section') as ContextSection) || 'intelligence';
+    (searchParams.get('section') as ContextSection) || defaultSection;
 
   const setActiveSection = useCallback(
     (section: ContextSection) => {
       const newParams = new URLSearchParams(searchParams);
-      if (section === 'intelligence') {
+      if (section === 'overview') {
         newParams.delete('section');
       } else {
         newParams.set('section', section);
@@ -166,7 +194,7 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
       }
       return next;
     });
-  }, [activeSection]);
+  }, [activeSection, sidebarItems]);
 
   useLayoutEffect(() => {
     recalcIndicator();
@@ -271,7 +299,7 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
                           'flex cursor-pointer items-center rounded-lg transition-colors',
                           isActive
                             ? 'aucctus-text-brand-primary'
-                            : 'aucctus-text-tertiary aucctus-bg-secondary-hover hover:aucctus-text-secondary',
+                            : 'aucctus-text-tertiary aucctus-bg-primary-hover hover:aucctus-text-secondary',
                         )}
                         style={{
                           padding: sidebarExpanded ? '8px 10px' : '8px',
@@ -318,6 +346,16 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
 
         {/* Main Content Area */}
         <div className='min-w-0 flex-1'>
+          {isAucctusAdminProp && activeSection === 'overview' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <OverviewTab reportUuid={reportUuid} />
+            </motion.div>
+          )}
+
           {activeSection === 'intelligence' && (
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -351,6 +389,16 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
               transition={{ duration: 0.25 }}
             >
               <UploadsTab onNavigateToCategory={onNavigateToCategory} />
+            </motion.div>
+          )}
+
+          {isAucctusAdminProp && activeSection === 'personalization' && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.25 }}
+            >
+              <PersonalizationTab />
             </motion.div>
           )}
         </div>

@@ -44,7 +44,7 @@ export class AccountApi extends ApiService {
   }
 
   updateAccount(account: Partial<IAccount>) {
-    return this.put<IAccount, Partial<IAccount>>(endpoints.account, account);
+    return this.patch<IAccount>(endpoints.account, account);
   }
 
   getUser() {
