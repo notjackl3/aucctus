@@ -142,6 +142,7 @@ const renderOverviewWidget = (
           onAddItem={onAddItem}
           onUpdateItem={onUpdateItem}
           onDeleteItem={onDeleteItem}
+          onUpdateWidget={onUpdateWidget}
         />
       );
     case 'card_list':
@@ -153,6 +154,7 @@ const renderOverviewWidget = (
           onAddItem={onAddItem}
           onUpdateItem={onUpdateItem}
           onDeleteItem={onDeleteItem}
+          onUpdateWidget={onUpdateWidget}
         />
       );
     case 'checklist':
@@ -164,6 +166,7 @@ const renderOverviewWidget = (
           onAddItem={onAddItem}
           onUpdateItem={onUpdateItem}
           onDeleteItem={onDeleteItem}
+          onUpdateWidget={onUpdateWidget}
         />
       );
     case 'constrained_text':
@@ -175,6 +178,7 @@ const renderOverviewWidget = (
           onAddItem={onAddItem}
           onUpdateItem={onUpdateItem}
           onDeleteItem={onDeleteItem}
+          onUpdateWidget={onUpdateWidget}
         />
       );
     case 'visualization':
@@ -186,6 +190,7 @@ const renderOverviewWidget = (
           onAddItem={onAddItem}
           onUpdateItem={onUpdateItem}
           onDeleteItem={onDeleteItem}
+          onUpdateWidget={onUpdateWidget}
         />
       );
     default:

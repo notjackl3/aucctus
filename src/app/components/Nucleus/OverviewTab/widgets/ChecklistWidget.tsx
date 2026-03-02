@@ -8,7 +8,10 @@
  */
 
 import { GlassSurface } from '@components';
+import { IconPickerDropdown } from '@components/Dropdown';
 import type { INucleusOverviewWidget } from '@libs/api/types/nucleusOverview';
+import { resolveIcon } from '@libs/utils/iconMap';
+import { VALID_OVERVIEW_WIDGET_ICONS } from './constants';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import {
@@ -31,6 +34,7 @@ interface ChecklistWidgetProps {
     data: Record<string, unknown>,
   ) => void;
   onDeleteItem?: (widgetUuid: string, itemUuid: string) => void;
+  onUpdateWidget?: (widgetUuid: string, data: Record<string, unknown>) => void;
 }
 
 type ChecklistVariant = 'filter' | 'pitfall' | 'metric';
@@ -250,13 +254,14 @@ const ChecklistWidget: React.FC<ChecklistWidgetProps> = ({
   onAddItem,
   onUpdateItem,
   onDeleteItem,
+  onUpdateWidget,
 }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newText, setNewText] = useState('');
   const items = widget.checklistItems;
   const variant = getVariant(widget.title);
   const config = variantConfig[variant];
-  const HeaderIcon = config.Icon;
+  const HeaderIcon = widget.icon ? resolveIcon(widget.icon) : config.Icon;
   const brandColorValues = Object.values(brandColors);
   const primaryBrandColor = brandColorValues[0] || null;
   const secondaryBrandColor = brandColorValues[1] || primaryBrandColor;
@@ -327,21 +332,65 @@ const ChecklistWidget: React.FC<ChecklistWidgetProps> = ({
 
       <div className='relative z-20 flex-shrink-0 px-4 pb-3 pt-3'>
         <div className='flex items-center gap-2'>
-          <HeaderIcon
-            className={`h-4 w-4 ${config.iconClass}${config.headerIconSuffix}`}
-            style={
-              (variant === 'pitfall' ? secondaryBrandColor : primaryBrandColor)
-                ? {
-                    color:
-                      variant === 'pitfall'
-                        ? secondaryBrandColor!
-                        : primaryBrandColor!,
-                  }
-                : undefined
-            }
-          />
+          {isEditable && onUpdateWidget ? (
+            <IconPickerDropdown
+              currentIcon={widget.icon}
+              onSelect={(icon) => onUpdateWidget(widget.uuid, { icon })}
+              allowedIcons={VALID_OVERVIEW_WIDGET_ICONS}
+              trigger={
+                <button
+                  type='button'
+                  className='hover:aucctus-bg-secondary rounded p-0.5 transition-colors'
+                  title='Change icon'
+                >
+                  <HeaderIcon
+                    className={`h-4 w-4 ${config.iconClass}${config.headerIconSuffix}`}
+                    style={
+                      (
+                        variant === 'pitfall'
+                          ? secondaryBrandColor
+                          : primaryBrandColor
+                      )
+                        ? {
+                            color:
+                              variant === 'pitfall'
+                                ? secondaryBrandColor!
+                                : primaryBrandColor!,
+                          }
+                        : undefined
+                    }
+                  />
+                </button>
+              }
+            />
+          ) : (
+            <HeaderIcon
+              className={`h-4 w-4 ${config.iconClass}${config.headerIconSuffix}`}
+              style={
+                (
+                  variant === 'pitfall'
+                    ? secondaryBrandColor
+                    : primaryBrandColor
+                )
+                  ? {
+                      color:
+                        variant === 'pitfall'
+                          ? secondaryBrandColor!
+                          : primaryBrandColor!,
+                    }
+                  : undefined
+              }
+            />
+          )}
           <span className='aucctus-text-xs-medium aucctus-text-tertiary flex-1 uppercase tracking-wider'>
-            {widget.title}
+            {isEditable && onUpdateWidget ? (
+              <EditableText
+                value={widget.title}
+                onSave={(v) => onUpdateWidget(widget.uuid, { title: v })}
+              />
+            ) : (
+              widget.title
+            )}
           </span>
           {isEditable && onAddItem && (
             <button

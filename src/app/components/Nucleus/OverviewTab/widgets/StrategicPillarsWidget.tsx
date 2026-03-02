@@ -7,8 +7,10 @@
  */
 
 import { GlassSurface } from '@components';
+import { IconPickerDropdown } from '@components/Dropdown';
 import type { INucleusOverviewWidget } from '@libs/api/types/nucleusOverview';
 import { resolveIcon } from '@libs/utils/iconMap';
+import { VALID_OVERVIEW_WIDGET_ICONS } from './constants';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ChevronDown, Layers, Plus, Trash2 } from 'lucide-react';
@@ -25,6 +27,7 @@ interface StrategicPillarsWidgetProps {
     data: Record<string, unknown>,
   ) => void;
   onDeleteItem?: (widgetUuid: string, itemUuid: string) => void;
+  onUpdateWidget?: (widgetUuid: string, data: Record<string, unknown>) => void;
 }
 
 /** Inline editable text that becomes an input/textarea on click. */
@@ -111,6 +114,7 @@ const StrategicPillarsWidget: React.FC<StrategicPillarsWidgetProps> = ({
   onAddItem,
   onUpdateItem,
   onDeleteItem,
+  onUpdateWidget,
 }) => {
   const [expandedIndex, setExpandedIndex] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
@@ -145,9 +149,43 @@ const StrategicPillarsWidget: React.FC<StrategicPillarsWidgetProps> = ({
     >
       <div className='flex-shrink-0 px-4 pb-1 pt-2'>
         <div className='flex items-center gap-2'>
-          <Layers className='text-primary/70 h-4 w-4' />
+          {isEditable && onUpdateWidget ? (
+            <IconPickerDropdown
+              currentIcon={widget.icon}
+              onSelect={(icon) => onUpdateWidget(widget.uuid, { icon })}
+              allowedIcons={VALID_OVERVIEW_WIDGET_ICONS}
+              trigger={
+                <button
+                  type='button'
+                  className='hover:aucctus-bg-secondary rounded p-0.5 transition-colors'
+                  title='Change icon'
+                >
+                  {React.createElement(
+                    widget.icon ? resolveIcon(widget.icon) : Layers,
+                    {
+                      className: 'text-primary/70 h-4 w-4',
+                    },
+                  )}
+                </button>
+              }
+            />
+          ) : (
+            React.createElement(
+              widget.icon ? resolveIcon(widget.icon) : Layers,
+              {
+                className: 'text-primary/70 h-4 w-4',
+              },
+            )
+          )}
           <span className='aucctus-text-xs-medium aucctus-text-tertiary flex-1 uppercase tracking-wider'>
-            {widget.title}
+            {isEditable && onUpdateWidget ? (
+              <EditableText
+                value={widget.title}
+                onSave={(v) => onUpdateWidget(widget.uuid, { title: v })}
+              />
+            ) : (
+              widget.title
+            )}
           </span>
           {isEditable && onAddItem && (
             <button

@@ -6,7 +6,10 @@
  */
 
 import { GlassSurface } from '@components';
+import { IconPickerDropdown } from '@components/Dropdown';
 import type { INucleusOverviewWidget } from '@libs/api/types/nucleusOverview';
+import { resolveIcon } from '@libs/utils/iconMap';
+import { VALID_OVERVIEW_WIDGET_ICONS } from './constants';
 import { motion } from 'framer-motion';
 import { Compass } from 'lucide-react';
 import React, { useCallback, useState } from 'react';
@@ -163,7 +166,34 @@ const CompanyThesisWidget: React.FC<CompanyThesisWidgetProps> = ({
         variant='elevated'
       >
         <div className='mb-3 flex items-center gap-2'>
-          <Compass className='text-primary/70 h-4 w-4' />
+          {isEditable && onUpdateWidget ? (
+            <IconPickerDropdown
+              currentIcon={widget.icon}
+              onSelect={(icon) => onUpdateWidget(widget.uuid, { icon })}
+              allowedIcons={VALID_OVERVIEW_WIDGET_ICONS}
+              trigger={
+                <button
+                  type='button'
+                  className='hover:aucctus-bg-secondary rounded p-0.5 transition-colors'
+                  title='Change icon'
+                >
+                  {React.createElement(
+                    widget.icon ? resolveIcon(widget.icon) : Compass,
+                    {
+                      className: 'text-primary/70 h-4 w-4',
+                    },
+                  )}
+                </button>
+              }
+            />
+          ) : (
+            React.createElement(
+              widget.icon ? resolveIcon(widget.icon) : Compass,
+              {
+                className: 'text-primary/70 h-4 w-4',
+              },
+            )
+          )}
           <span className='aucctus-text-xs-medium aucctus-text-tertiary uppercase tracking-wider'>
             Innovation Thesis
           </span>

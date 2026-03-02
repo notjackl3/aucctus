@@ -149,6 +149,7 @@ interface IIconPickerDropdownProps {
   currentIcon?: string;
   onSelect: (icon: string) => void;
   trigger?: React.ReactNode;
+  allowedIcons?: string[];
 }
 
 /**
@@ -159,17 +160,20 @@ const IconPickerDropdown: React.FC<IIconPickerDropdownProps> = ({
   currentIcon,
   onSelect,
   trigger,
+  allowedIcons,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
+  const baseIcons = allowedIcons ?? ALL_ICONS;
+
   // Filter icons based on search query
   const filteredIcons = useMemo(() => {
-    if (!searchQuery.trim()) return ALL_ICONS;
+    if (!searchQuery.trim()) return baseIcons;
 
     const query = searchQuery.toLowerCase();
-    return ALL_ICONS.filter((icon) => icon.toLowerCase().includes(query));
-  }, [searchQuery]);
+    return baseIcons.filter((icon) => icon.toLowerCase().includes(query));
+  }, [searchQuery, baseIcons]);
 
   const handleSelect = (icon: string) => {
     onSelect(icon);

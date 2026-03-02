@@ -7,8 +7,10 @@
  */
 
 import { GlassSurface } from '@components';
+import { IconPickerDropdown } from '@components/Dropdown';
 import type { INucleusOverviewWidget } from '@libs/api/types/nucleusOverview';
 import { resolveIcon } from '@libs/utils/iconMap';
+import { VALID_OVERVIEW_WIDGET_ICONS } from './constants';
 import { cn } from '@libs/utils/react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Plus, Trash2, Trophy } from 'lucide-react';
@@ -25,6 +27,7 @@ interface MustWinPrioritiesWidgetProps {
     data: Record<string, unknown>,
   ) => void;
   onDeleteItem?: (widgetUuid: string, itemUuid: string) => void;
+  onUpdateWidget?: (widgetUuid: string, data: Record<string, unknown>) => void;
 }
 
 const MustWinPrioritiesWidget: React.FC<MustWinPrioritiesWidgetProps> = ({
@@ -34,6 +37,7 @@ const MustWinPrioritiesWidget: React.FC<MustWinPrioritiesWidgetProps> = ({
   onAddItem,
   onUpdateItem,
   onDeleteItem,
+  onUpdateWidget,
 }) => {
   const [isAdding, setIsAdding] = useState(false);
   const [newTitle, setNewTitle] = useState('');
@@ -73,9 +77,43 @@ const MustWinPrioritiesWidget: React.FC<MustWinPrioritiesWidgetProps> = ({
     >
       <div className='flex-shrink-0 pb-2 pl-4 pr-4 pt-3'>
         <div className='flex items-center gap-2'>
-          <Trophy className='text-primary/70 h-4 w-4' />
+          {isEditable && onUpdateWidget ? (
+            <IconPickerDropdown
+              currentIcon={widget.icon}
+              onSelect={(icon) => onUpdateWidget(widget.uuid, { icon })}
+              allowedIcons={VALID_OVERVIEW_WIDGET_ICONS}
+              trigger={
+                <button
+                  type='button'
+                  className='hover:aucctus-bg-secondary rounded p-0.5 transition-colors'
+                  title='Change icon'
+                >
+                  {React.createElement(
+                    widget.icon ? resolveIcon(widget.icon) : Trophy,
+                    {
+                      className: 'text-primary/70 h-4 w-4',
+                    },
+                  )}
+                </button>
+              }
+            />
+          ) : (
+            React.createElement(
+              widget.icon ? resolveIcon(widget.icon) : Trophy,
+              {
+                className: 'text-primary/70 h-4 w-4',
+              },
+            )
+          )}
           <span className='aucctus-text-xs-medium aucctus-text-tertiary flex-1 uppercase tracking-wider'>
-            {widget.title}
+            {isEditable && onUpdateWidget ? (
+              <EditableField
+                value={widget.title}
+                onSave={(v) => onUpdateWidget(widget.uuid, { title: v })}
+              />
+            ) : (
+              widget.title
+            )}
           </span>
           {isEditable && onAddItem && (
             <button
