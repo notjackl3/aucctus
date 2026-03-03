@@ -11,7 +11,6 @@ import {
 } from './AssumptionLifecycleModal';
 import Base from './Modal/Modal';
 import ConclusionVisualization from './ConclusionVisualizationModal/ConclusionVisualizationModal';
-import AiEditing from './AiEditingModal/AiEditingModal';
 import TestModal from './TestModal/TestModal';
 import JourneyStep from './JourneyStepModal';
 import EditRealWorldSignal from './CustomerProfile/EditRealWorldSignal/EditRealWorldSignal';
@@ -33,7 +32,6 @@ import BulkEditConcepts from './BulkEditConceptsModal/BulkEditConceptsModal';
 
 const Modal = {
   Base,
-  AiEditing,
   Confirmation,
   CustomerConversationSearch,
   EditCustomerProfileDemographics,

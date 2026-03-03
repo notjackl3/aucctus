@@ -289,26 +289,6 @@ const ConceptReport: FunctionComponent = () => {
                   <Sparkles className='h-4 w-4 fill-white stroke-white' />
                   Magic Share
                 </button>
-                <div className='group relative'>
-                  <button
-                    onClick={() =>
-                      openModal(
-                        Modal.AiEditing,
-                        {},
-                        {
-                          position: 'right',
-                          modalClassName: 'max-h-[90vh]',
-                          hideBodyScroll: true,
-                          shouldCloseOnOverlayClick: true,
-                          shouldCloseOnEscape: true,
-                        },
-                      )
-                    }
-                    className='btn btn-bold aucctus-text-brand-primary group hover:bg-primary-900 hover:text-white'
-                  >
-                    Refine
-                  </button>
-                </div>
               </>
             )}
           </div>

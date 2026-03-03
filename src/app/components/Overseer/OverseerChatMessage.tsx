@@ -1,4 +1,5 @@
 import { cn } from '@libs/utils/react';
+import useStore from '@stores/store';
 import {
   AgentStep,
   IOverseerAssistantMessage,
@@ -26,13 +27,17 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
   className,
   toolActivitySteps,
 }) => {
+  const profileImage = useStore((state) => state.auth.user?.profileImage);
+  const firstName = useStore((state) => state.auth.user?.firstName);
+  const lastName = useStore((state) => state.auth.user?.lastName);
+
   if (message.role === 'user') {
     return (
       <motion.div
         initial={{ opacity: 0, y: 4 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
-        className={cn('flex justify-end', className)}
+        className={cn('flex items-start justify-end gap-2', className)}
       >
         <div className='max-w-[85%] rounded-lg bg-white/10 px-3.5 py-2'>
           {message.images && message.images.length > 0 && (
@@ -50,6 +55,20 @@ const OverseerChatMessage: React.FC<OverseerChatMessageProps> = ({
           <div className='whitespace-pre-line text-[13px] font-light leading-relaxed text-white/90'>
             {message.content}
           </div>
+        </div>
+        <div className='h-[29px] w-[29px] flex-shrink-0 overflow-hidden rounded-md'>
+          {profileImage ? (
+            <img
+              src={profileImage}
+              alt={firstName ?? 'User'}
+              className='h-full w-full object-cover'
+            />
+          ) : (
+            <div className='flex h-full w-full items-center justify-center bg-white/15 text-[11px] font-medium text-white/60'>
+              {firstName?.charAt(0) ?? ''}
+              {lastName?.charAt(0) ?? ''}
+            </div>
+          )}
         </div>
       </motion.div>
     );

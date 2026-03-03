@@ -3,10 +3,6 @@ import { create, StoreApi } from 'zustand';
 import { multiPersist } from 'zustand-multi-persist';
 import { createJSONStorage, subscribeWithSelector } from 'zustand/middleware';
 import telemetry from '@libs/telemetry';
-import aiEditingSlice, {
-  IAiEditingState,
-  initialAiEditingState,
-} from './ai-editing/store';
 import authSlice, { IAuthState, initialAuthState } from './auth/store';
 import conceptIncubationSlice, {
   IConceptIncubationState,
@@ -67,7 +63,6 @@ export interface IAppStore {
   // global: IGlobalState;
   auth: IAuthState;
   incubation: IConceptIncubationState;
-  aiEditing: IAiEditingState;
   conceptReport: IConceptReportState;
   financialProjection: IFinancialProjectionState;
   customerProfileConversations: ICustomerProfileConversationState;
@@ -95,7 +90,6 @@ const useStore = create<IAppStore>()(
         // global: globalSlice,
         auth: authSlice,
         incubation: conceptIncubationSlice,
-        aiEditing: aiEditingSlice,
         conceptReport: conceptReportSlice,
         financialProjection: financialProjectionSlice,
         customerProfileConversations: customerProfileConversationsSlice,
@@ -152,7 +146,6 @@ const useStore = create<IAppStore>()(
             initialized: state.auth.initialized,
           },
           incubation: state.incubation,
-          aiEditing: state.aiEditing,
           conceptReport: {
             conceptUuid: state.conceptReport.conceptUuid,
             identifier: state.conceptReport.identifier,
@@ -183,7 +176,6 @@ const getInitialState = (): IAppStore => {
     // Use exported initial state constants from each slice
     auth: initialAuthState as IAuthState,
     incubation: initialIncubationState as unknown as IConceptIncubationState,
-    aiEditing: initialAiEditingState as unknown as IAiEditingState,
     conceptReport: initialConceptReportState as IConceptReportState,
     financialProjection:
       initialFinancialProjectionState as IFinancialProjectionState,

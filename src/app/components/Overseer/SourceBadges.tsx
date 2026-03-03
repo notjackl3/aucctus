@@ -22,7 +22,7 @@ const SourcePill: React.FC<{ source: Source }> = ({ source }) => {
       href={source.url || '#'}
       target='_blank'
       rel='noopener noreferrer'
-      className='inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-white/60 backdrop-blur-sm transition-colors hover:border-white/15 hover:text-white/80'
+      className='inline-flex items-center gap-1.5 rounded-full border border-white/[0.08] bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium !text-white/60 no-underline backdrop-blur-sm transition-colors hover:border-white/15 hover:!text-white/80'
     >
       {favicon ? (
         <img
@@ -81,7 +81,10 @@ const SourceBadges: React.FC<SourceBadgesProps> = ({ sources }) => {
     );
   }
 
-  // Collapsed: stacked avatars + count
+  // Collapsed: stacked avatars + count (cap visible avatars at 5)
+  const MAX_VISIBLE_AVATARS = 5;
+  const visibleSources = sources.slice(0, MAX_VISIBLE_AVATARS);
+
   return (
     <div className='mt-2.5'>
       <button
@@ -93,7 +96,7 @@ const SourceBadges: React.FC<SourceBadgesProps> = ({ sources }) => {
       >
         {/* Stacked avatars */}
         <div className='flex items-center'>
-          {sources.map((source, i) => {
+          {visibleSources.map((source, i) => {
             const favicon = getFaviconUrl(source.url);
             return (
               <div
@@ -101,7 +104,7 @@ const SourceBadges: React.FC<SourceBadgesProps> = ({ sources }) => {
                 className='relative h-4 w-4 shrink-0 overflow-hidden rounded-full border border-black/30 bg-white/[0.12]'
                 style={{
                   marginLeft: i > 0 ? '-5px' : '0',
-                  zIndex: sources.length - i,
+                  zIndex: visibleSources.length - i,
                 }}
               >
                 {favicon ? (

@@ -255,6 +255,56 @@ export function openFromSearchBar(
 }
 
 /**
+ * Open the Overseer panel docked with history view visible.
+ * Used by the floating search bar's history button.
+ */
+export function openToHistory(this: IStoreApi<IOverseerState>) {
+  const { set, storeApi } = this;
+
+  const conceptUuid: string | undefined =
+    storeApi.getState().conceptReport.conceptUuid;
+  const accountUuid: string | undefined =
+    storeApi.getState().auth.account?.uuid;
+
+  let contextType: OverseerContextType = conceptUuid ? 'concept' : 'account';
+
+  if (contextType === 'account' && !accountUuid) {
+    telemetry.error('Overseer: Cannot open history without account UUID');
+    return;
+  }
+
+  set(
+    produce((state: IOverseerState) => {
+      state.isOpen = true;
+      state.isDocked = true;
+      state.showHistory = true;
+      state.selectedText = '';
+      state.expandedText = '';
+      state.pageContext = 'general';
+      state.position = { x: 0, y: 0 };
+      state.contextType = contextType;
+      state.conceptUuid = conceptUuid;
+      state.accountUuid = accountUuid;
+      // Reset conversation state
+      state.sessionId = undefined;
+      state.messages = [];
+      state.suggestedQuestions = [];
+      state.currentMessage = '';
+      state.editSuggestions = null;
+      state.highlightedSectionId = null;
+      state.isThinking = false;
+      state.thinkingMessage = undefined;
+      state.currentError = undefined;
+      state.hasError = false;
+      state.activeFeatures = new Set();
+      state.mentions = [];
+      state.toolActivitySteps = [];
+      state.pendingImages = [];
+    }),
+  );
+}
+
+/**
  * Close the Overseer popup
  */
 export function close(this: IStoreApi<IOverseerState>) {

@@ -58,6 +58,13 @@ const AIEditCarousel: React.FC<AIEditCarouselProps> = ({
 
   const handleStatusChange = (index: number, status: EditStatus) => {
     setStatuses((prev) => ({ ...prev, [index]: status }));
+
+    // Auto-proceed for single-edit carousels
+    if (edits.length === 1 && status === 'accepted') {
+      onConfirm?.([edits[0]]);
+      return;
+    }
+
     if (index < edits.length - 1) {
       goTo(index + 1);
     }

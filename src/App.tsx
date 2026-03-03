@@ -5,7 +5,6 @@ import AccessGuard from '@routes/guards/access.guard';
 import AuthGuard from '@routes/guards/auth.guard';
 import { usePrivateRoutes, usePublicRoutes } from '@routes/hooks';
 import { AppPath } from '@routes/routes';
-import useStore from '@stores/store';
 import React, { Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { Slide, ToastContainer } from 'react-toastify';
@@ -18,19 +17,6 @@ const SubmissionLinkPublicForm = React.lazy(
 function App() {
   // Initialize global debug mode listener
   useDebugModeListener();
-
-  // Initialize AI editing conversation auto-clear listeners
-  const initializeAiEditingListeners = useStore(
-    (state) => state.aiEditing.initializeListeners,
-  );
-
-  React.useEffect(() => {
-    // Initialize listeners for auto-clearing AI editing conversation
-    const cleanup = initializeAiEditingListeners();
-
-    // Cleanup listeners when app unmounts
-    return cleanup;
-  }, [initializeAiEditingListeners]);
 
   // Add portal target attribute to toast container
   React.useEffect(() => {

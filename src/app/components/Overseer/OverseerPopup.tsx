@@ -28,7 +28,7 @@ import OverseerSocketWrapper from './OverseerSocketWrapper';
 import OverseerSuggestedQuestions from './OverseerSuggestedQuestions';
 import {
   ChevronLeft,
-  ClockArrowDown,
+  History,
   CornerDownRight,
   PanelRightClose,
   PanelRightOpen,
@@ -36,6 +36,7 @@ import {
   X,
 } from 'lucide-react';
 import { DynamicIcon } from '@libs/utils/iconMap';
+import { Badge } from '@components';
 import { clearHighlight } from './OverseerSelectionButton';
 
 // Panel dimension constants
@@ -655,7 +656,7 @@ const OverseerPopup: React.FC = () => {
           <div
             className={cn(
               'liquid-glass-modal-shell h-full',
-              isDocked && 'rounded-none',
+              isDocked && '!rounded-none',
               !isDocked && 'cursor-grab active:cursor-grabbing',
             )}
             onMouseDown={handleDragStart}
@@ -821,10 +822,7 @@ const OverseerPopup: React.FC = () => {
                           className='rounded-lg p-1.5 text-white/30 transition-all hover:bg-white/10 hover:text-white'
                           title='Chat history'
                         >
-                          <ClockArrowDown
-                            size={14}
-                            className='stroke-current'
-                          />
+                          <History size={14} className='stroke-current' />
                         </button>
                         {messages.length > 0 && (
                           <button
@@ -835,6 +833,28 @@ const OverseerPopup: React.FC = () => {
                             <Plus size={14} className='stroke-current' />
                           </button>
                         )}
+                        <Badge.Beta
+                          size='xs'
+                          className='border border-white/20 !bg-transparent !text-white/40'
+                        />
+                        {messages.length > 0 &&
+                          (() => {
+                            const lastMsg = messages[messages.length - 1];
+                            const d = new Date(lastMsg.timestamp);
+                            return (
+                              <span className='ml-1.5 select-none text-[10px] font-light tabular-nums text-white/25'>
+                                {d.toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
+                                })}{' '}
+                                {d.toLocaleTimeString('en-US', {
+                                  hour: 'numeric',
+                                  minute: '2-digit',
+                                  hour12: true,
+                                })}
+                              </span>
+                            );
+                          })()}
                       </div>
 
                       {/* Drag handle area — invisible, full width */}

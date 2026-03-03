@@ -151,6 +151,7 @@ export interface IOverseerActions {
     images?: IOverseerPendingImage[];
     mentions?: MentionItem[];
   }) => void;
+  openToHistory: () => void;
   close: () => void;
   sendMessage: () => Promise<void>;
   setCurrentMessage: (message: string) => void;

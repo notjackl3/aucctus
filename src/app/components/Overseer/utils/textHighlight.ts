@@ -49,6 +49,10 @@ export function applyHighlightToRange(range: Range): () => void {
 
     if (startOffset === endOffset) continue;
 
+    // Skip whitespace-only text nodes to avoid highlighting margins/empty areas
+    const textContent = textNode.textContent || '';
+    if (!textContent.trim()) continue;
+
     // Split off the portion we need to wrap
     const targetNode =
       startOffset > 0 ? textNode.splitText(startOffset) : textNode;

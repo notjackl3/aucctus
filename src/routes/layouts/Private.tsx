@@ -5,7 +5,6 @@ import { OverseerProvider } from '@context/OverseerProvider';
 import { useConcepts } from '@hooks/query/concepts.hook';
 import { usePersonas } from '@hooks/query/persona.hook';
 import { useOverseerRouteConfig } from '@hooks/useOverseerRouteConfig';
-import { isAucctusAdmin } from '@libs/utils/account';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
@@ -25,12 +24,12 @@ const PrivateLayout = () => {
   const openFromSearchBar = useStore(
     (state) => state.overseer.openFromSearchBar,
   );
+  const openToHistory = useStore((state) => state.overseer.openToHistory);
   const sendMessage = useStore((state) => state.overseer.sendMessage);
 
   const location = useLocation();
   const { isEnabled, pageContext } = useOverseerRouteConfig();
-  const isAdmin = isAucctusAdmin(user);
-  const isOverseerEnabled = isEnabled && isAdmin;
+  const isOverseerEnabled = isEnabled;
 
   // Close Overseer panel when page context changes to prevent stale state
   const prevPageContext = useRef(pageContext);
@@ -49,15 +48,15 @@ const PrivateLayout = () => {
 
   // Floating search bar visibility — shown on all pages except excluded routes
   const isSearchBarVisible =
-    isAdmin &&
     location.pathname !== '/playground' &&
-    !location.pathname.startsWith('/concept/incubate');
+    !location.pathname.startsWith('/concept/incubate') &&
+    !isOpen;
 
   // Fetch concepts for @mention menu in the floating search bar
   const { data: conceptPage } = useConcepts({
     page: 1,
     pageSize: 199,
-    enabled: isAdmin,
+    enabled: isSearchBarVisible,
   });
   const conceptItems: MentionItem[] = useMemo(() => {
     if (!conceptPage?.results) return [];
@@ -135,6 +134,7 @@ const PrivateLayout = () => {
         <FloatingSearchBar
           visible={isSearchBarVisible}
           onSubmit={handleSearchSubmit}
+          onHistoryClick={openToHistory}
           leftOffset={navWidth}
           rightOffset={dockWidth}
           conceptItems={conceptItems}

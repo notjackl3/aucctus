@@ -1,7 +1,7 @@
 import { cn } from '@libs/utils/react';
 import { IOverseerPendingImage, MentionItem } from '@stores/overseer/types';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Lightbulb, Search, Users, X } from 'lucide-react';
+import { History, Lightbulb, Search, Users, X } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import './floating-search-bar.scss';
 
@@ -14,6 +14,7 @@ interface FloatingSearchBarProps {
     images: IOverseerPendingImage[],
     mentions: MentionItem[],
   ) => void;
+  onHistoryClick?: () => void;
   leftOffset?: number;
   rightOffset?: number;
   conceptItems?: MentionItem[];
@@ -23,6 +24,7 @@ interface FloatingSearchBarProps {
 const FloatingSearchBar = ({
   visible,
   onSubmit,
+  onHistoryClick,
   leftOffset = 96,
   rightOffset = 0,
   conceptItems,
@@ -425,6 +427,16 @@ const FloatingSearchBar = ({
                         className='shrink-0 rounded-md p-1 transition-colors hover:bg-gray-100'
                       >
                         <X className='h-3.5 w-3.5 text-gray-400' />
+                      </button>
+                    )}
+                    {onHistoryClick && (
+                      <button
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={onHistoryClick}
+                        className='shrink-0 rounded-md p-1 transition-colors hover:bg-gray-100'
+                        title='Chat history'
+                      >
+                        <History className='h-4 w-4 text-gray-400 hover:text-gray-600' />
                       </button>
                     )}
                   </div>
