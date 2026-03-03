@@ -134,9 +134,6 @@ export const usePrioritySocketEvents = () => {
         } = {
           conceptUuid: data.conceptUuid,
           overallPriorityScore: data.overallPriorityScore,
-          strategicAlignmentScore: data.strategicAlignmentScore,
-          financialOpportunityScore: data.financialOpportunityScore,
-          innovationRiskScore: data.innovationRiskScore,
         };
 
         // Update the specific concept priority cache with partial data for immediate UI feedback

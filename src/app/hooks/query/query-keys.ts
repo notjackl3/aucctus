@@ -128,11 +128,6 @@ export enum AucctusQueryKeys {
   userMetrics = 'userMetrics',
   userMetricsDetail = 'userMetricsDetail',
 
-  /* Custom Commands */
-  customCommands = 'customCommands',
-  customCommandsForPicker = 'customCommandsForPicker',
-  customCommand = 'customCommand',
-
   /* Living Personas */
   personas = 'personas',
   persona = 'persona',

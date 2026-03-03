@@ -9,14 +9,7 @@ export type ScoringStatus = 'pending' | 'scoring' | 'complete' | 'error';
 export interface IConceptPriority {
   uuid: string;
   conceptUuid: string;
-  strategicAlignmentScore: number;
-  financialOpportunityScore: number;
-  innovationRiskScore: number;
   overallPriorityScore: number;
-  strategicAlignmentReasoning: string;
-  financialOpportunityReasoning: string;
-  innovationRiskReasoning: string;
-  // Dynamic scoring fields
   /** Current status of AI scoring: pending, scoring, complete, error */
   scoringStatus?: ScoringStatus | null;
   innovationHorizon?: InnovationHorizon | null;
@@ -27,9 +20,6 @@ export interface IConceptPriority {
 export interface IConceptPrioritySummary {
   uuid: string;
   conceptUuid: string;
-  strategicAlignmentScore: number;
-  financialOpportunityScore: number;
-  innovationRiskScore: number;
   overallPriorityScore: number;
   /** Current status of AI scoring: pending, scoring, complete, error */
   scoringStatus?: ScoringStatus | null;

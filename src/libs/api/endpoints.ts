@@ -1051,16 +1051,6 @@ export class Endpoints {
   }
 
   // ============================================
-  // Custom Commands Endpoints (Overseer)
-  // ============================================
-  static customCommands = '/api/v1/chat/custom-commands';
-  static customCommandsPicker = '/api/v1/chat/custom-commands/picker';
-
-  static customCommandDetail(commandUuid: string) {
-    return `/api/v1/chat/custom-commands/${commandUuid}`;
-  }
-
-  // ============================================
   // Overseer History Endpoints
   // ============================================
 

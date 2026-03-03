@@ -1180,9 +1180,6 @@ export interface IConceptPriorityCompletedMessage extends BaseSocketEvent {
   conceptUuid: string;
   accountUuid: string;
   overallPriorityScore: number;
-  strategicAlignmentScore: number;
-  financialOpportunityScore: number;
-  innovationRiskScore: number;
   message: string;
 }
 

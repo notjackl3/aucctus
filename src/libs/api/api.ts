@@ -10,7 +10,6 @@ import { IApiServiceConfig } from './base/apiService';
 import { ISocketConfig, SocketService } from './base/socketService';
 import { CompetitorAssessmentApi } from './competitorAssessment';
 import { ConceptApi } from './concepts';
-import { CustomCommandsApi } from './customCommands';
 import { DynamicComponentApi } from './dynamicComponent';
 import { SocketEndpoints } from './endpoints';
 import { FinancialProjectionApi } from './financialProjection';
@@ -64,7 +63,6 @@ export class Api {
   property!: PropertyApi;
   watchtower!: WatchtowerApi;
   competitorAssessment!: CompetitorAssessmentApi;
-  customCommands!: CustomCommandsApi;
   dynamicComponent!: DynamicComponentApi;
   overseer!: OverseerApi;
   persona!: PersonaApi;
@@ -103,7 +101,6 @@ export class Api {
       { key: 'property', class: PropertyApi },
       { key: 'watchtower', class: WatchtowerApi },
       { key: 'competitorAssessment', class: CompetitorAssessmentApi },
-      { key: 'customCommands', class: CustomCommandsApi },
       { key: 'dynamicComponent', class: DynamicComponentApi },
       { key: 'overseer', class: OverseerApi },
       { key: 'persona', class: PersonaApi },
