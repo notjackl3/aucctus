@@ -458,6 +458,11 @@ export const useConceptBank = (
     return map;
   }, [priorities]);
 
+  // Ref to access priorityMap inside column definitions without causing column re-creation.
+  // This prevents PriorityCell from remounting (and losing sheet open state) when priorities update.
+  const priorityMapRef = React.useRef(priorityMap);
+  priorityMapRef.current = priorityMap;
+
   // Optimize the updateTableFiltering function
   const updateTableFiltering = React.useCallback(
     (value: Partial<IConceptFilterOptions>) => {
@@ -1169,7 +1174,7 @@ export const useConceptBank = (
         ),
         cell: (info) => {
           const conceptUuid = info.getValue();
-          const prioritySummary = priorityMap.get(conceptUuid);
+          const prioritySummary = priorityMapRef.current.get(conceptUuid);
           const conceptTitle = info.row.original.title;
           const conceptDescription = info.row.original.summary;
           const isConceptComplete =
@@ -1324,7 +1329,6 @@ export const useConceptBank = (
     updateTableFiltering,
     localColumnOrder,
     wrappedColumns,
-    priorityMap,
   ]);
 
   // Initialize or update column order when columns change
