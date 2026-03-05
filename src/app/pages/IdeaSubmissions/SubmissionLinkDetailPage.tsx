@@ -5,8 +5,8 @@ import {
   useMemo,
   useCallback,
 } from 'react';
-import { useQuery, useMutation, useQueryClient } from 'react-query';
-import { Link, useParams } from 'react-router-dom';
+import { useMutation, useQueryClient } from 'react-query';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft,
@@ -25,6 +25,7 @@ import {
   X,
   Target,
   ChevronUp,
+  Trash2,
   CheckSquare,
   Square,
   MinusSquare,
@@ -43,13 +44,17 @@ import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import { useSocketEvent } from '@hooks/sockets/aucctus';
 import { SubmissionFilter } from '@components/Submissions/SubmissionFilter';
-import { useSubmissionLinkSubmissions } from '@hooks/query/idea-submissions.hook';
+import {
+  useSubmissionLink,
+  useSubmissionLinkSubmissions,
+} from '@hooks/query/idea-submissions.hook';
 import SubmissionLinkModal from './components/SubmissionLinkModal';
 import SubmissionCard from './components/SubmissionCard';
 import SubmissionsListView from './components/SubmissionsListView';
 import ComparisonModal from './components/ComparisonModal';
 import BulkEditSubmissionsModal from './components/BulkEditSubmissionsModal';
 import FileUploadProgressCard from './components/FileUploadProgressCard';
+import DeleteSubmissionLinkModal from './components/DeleteSubmissionLinkModal';
 // Note: SubmissionDetailDrawer is no longer used - we now use Modal.SubmissionDetail via openModal
 
 // Local storage key for view preference
@@ -86,12 +91,14 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
   // Track page time for analytics
 
   const { linkUuid } = useParams<{ linkUuid: string }>();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const account = useStore((state) => state.auth.account);
   const { openModal } = useModal();
 
-  // Modal state for editing
+  // Modal state for editing and deleting
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
   // Theme filter state
   const [selectedTheme, setSelectedTheme] = useState<string | null>(null);
@@ -289,14 +296,18 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
 
   // Fetch submission link details
   const {
-    data: link,
+    submissionLink: link,
     isLoading: isLoadingLink,
     error: linkError,
-  } = useQuery({
-    queryKey: ['submissionLink', linkUuid],
-    queryFn: () => api.ideaSubmissions.getSubmissionLink(linkUuid!),
-    enabled: !!linkUuid,
-  });
+  } = useSubmissionLink(linkUuid || null);
+
+  const isMissingLink = !isLoadingLink && !linkError && link === null;
+
+  useEffect(() => {
+    if (isMissingLink) {
+      navigate(AppPath.ConceptBankSubmissions, { replace: true });
+    }
+  }, [isMissingLink, navigate]);
 
   // Fetch submissions for this link with filters (includes scoring metadata)
   const {
@@ -561,6 +572,19 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
     );
   }
 
+  if (isMissingLink) {
+    return (
+      <div className='flex h-96 items-center justify-center'>
+        <div className='flex animate-pulse flex-col items-center gap-4'>
+          <div className='aucctus-border-brand h-12 w-12 animate-spin rounded-full border-4 border-t-transparent' />
+          <p className='aucctus-text-sm aucctus-text-secondary'>
+            Redirecting to submission links...
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   // Error state
   if (linkError || !link) {
     return (
@@ -663,6 +687,15 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
                 >
                   <Pencil className='h-4 w-4' />
                   <span className='aucctus-text-sm'>Edit</span>
+                </button>
+
+                <button
+                  onClick={() => setIsDeleteModalOpen(true)}
+                  className='flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-1.5 text-red-600 transition-colors hover:bg-red-50'
+                  title='Delete Link'
+                >
+                  <Trash2 className='h-4 w-4' />
+                  <span className='aucctus-text-sm'>Delete</span>
                 </button>
 
                 <button
@@ -1243,6 +1276,15 @@ const SubmissionLinkDetailPage: FunctionComponent = () => {
           onSuccess={handleEditSuccess}
         />
       )}
+
+      {/* Delete Modal */}
+      <DeleteSubmissionLinkModal
+        linkUuid={linkUuid!}
+        linkTitle={link.title}
+        submissionCount={link.submissionCount}
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+      />
 
       {/* Comparison Modal */}
       {showComparisonModal && (

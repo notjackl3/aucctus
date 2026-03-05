@@ -38,7 +38,15 @@ export const useSubmissionLink = (linkUuid: string | null) => {
     queryKey: [AucctusQueryKeys.submissionLink, linkUuid],
     queryFn: async () => {
       if (!linkUuid) return null;
-      return api.ideaSubmissions.getSubmissionLink(linkUuid);
+      try {
+        return await api.ideaSubmissions.getSubmissionLink(linkUuid);
+      } catch (error: any) {
+        // Missing links are handled by the page redirecting back to the list.
+        if (error?.response?.status === 404) {
+          return null;
+        }
+        throw error;
+      }
     },
     enabled: !!linkUuid,
     staleTime: 1000 * 60 * 5, // 5 minutes
@@ -61,7 +69,19 @@ export const useSubmissionLinkSubmissions = (
     queryFn: async () => {
       if (!linkUuid)
         return { submissions: [], metadata: { scoringQuestions: [] } };
-      return api.ideaSubmissions.getSubmissionsByLink(linkUuid, filters);
+      try {
+        return await api.ideaSubmissions.getSubmissionsByLink(
+          linkUuid,
+          filters,
+        );
+      } catch (error: any) {
+        // When a link is deleted or the URL is stale, let the detail page redirect
+        // without surfacing a global query-error toast from this dependent query.
+        if (error?.response?.status === 404) {
+          return { submissions: [], metadata: { scoringQuestions: [] } };
+        }
+        throw error;
+      }
     },
     enabled: !!linkUuid,
     staleTime: 1000 * 60 * 2, // 2 minutes

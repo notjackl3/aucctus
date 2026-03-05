@@ -2,8 +2,8 @@
  * Score Breakdown Sheet component - displays detailed priority score breakdown in a sidebar.
  */
 
-import { ComponentTooltip } from '@components';
 import images from '@assets/img';
+import { ScoringCategoryCard } from '@components';
 import {
   useConceptPriorityDetail,
   useUpdateQuestionScore,
@@ -13,7 +13,6 @@ import {
   useBulkConceptUpdate,
   useScoringConfigs,
 } from '@hooks/query/scoringConfig.hook';
-import { ICategoryScore } from '@libs/api/types/accounts/scoring-config';
 import { cn } from '@libs/utils/react';
 import { AppPath } from '@routes/routes';
 import useStore from '@stores/store';
@@ -31,13 +30,11 @@ import {
   BarChart3,
   Check,
   ChevronDown,
-  HelpCircle,
   Lightbulb,
   Settings,
   ThumbsUp,
   X,
 } from 'lucide-react';
-import { DynamicIcon } from '@libs/utils/iconMap';
 
 interface ScoreBreakdownSheetProps {
   isOpen: boolean;
@@ -121,187 +118,6 @@ const getScoreDescription = (score: number): string => {
     return 'This concept has moderate potential but requires further validation and refinement.';
   }
   return 'This concept needs significant development before it can be considered viable.';
-};
-
-/**
- * Map icon name from backend to frontend icon variant
- */
-const mapIconVariant = (icon: string): string => {
-  // Map common icon names
-  const iconMap: Record<string, string> = {
-    target: 'target',
-    'trending-up': 'trending-up',
-    'users-02': 'users-02',
-    zap: 'zap',
-    'shield-dollar': 'shield-dollar',
-    beaker: 'beaker',
-    'currency-dollar': 'currency-dollar',
-  };
-  return iconMap[icon] || 'target';
-};
-
-/**
- * Collapsible category section for scoring criteria
- */
-const ScoringCategorySection: React.FC<{
-  category: ICategoryScore;
-  questionScores: Record<string, number>;
-  onScoreChange: (questionId: string, score: number) => void;
-  isUpdating?: boolean;
-  updatingQuestionId?: string | null;
-}> = ({
-  category,
-  questionScores,
-  onScoreChange,
-  isUpdating = false,
-  updatingQuestionId = null,
-}) => {
-  const [isExpanded, setIsExpanded] = useState(false);
-
-  const percentage =
-    category.maxScore > 0 ? (category.score / category.maxScore) * 100 : 0;
-
-  const getScoreColor = () => {
-    if (percentage < 50) return 'text-red-500';
-    if (percentage < 75) return 'text-yellow-600';
-    return 'text-green-600';
-  };
-
-  const getBorderColor = () => {
-    if (percentage < 50) return 'border-l-red-500';
-    if (percentage < 75) return 'border-l-yellow-500';
-    return 'border-l-green-500';
-  };
-
-  return (
-    <div
-      className={cn(
-        'aucctus-bg-secondary aucctus-border-secondary overflow-hidden rounded-xl border border-l-4 shadow-sm',
-        getBorderColor(),
-      )}
-    >
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className='group w-full transition-all hover:bg-gray-50 dark:hover:bg-gray-800/50'
-      >
-        <div className='flex items-center justify-between p-5'>
-          <div className='flex flex-1 items-center gap-3 text-left'>
-            <div className='aucctus-bg-tertiary rounded-md p-2'>
-              <DynamicIcon
-                variant={mapIconVariant(category.categoryIcon) as any}
-                className='aucctus-stroke-secondary h-4 w-4'
-              />
-            </div>
-            <div>
-              <h4 className='aucctus-text-md-semibold aucctus-text-primary'>
-                {category.categoryName}
-              </h4>
-              <p className='aucctus-text-sm aucctus-text-tertiary'>
-                {category.questions.length} question
-                {category.questions.length !== 1 ? 's' : ''}
-              </p>
-            </div>
-          </div>
-          <div className='flex items-center gap-4'>
-            <div className='text-right'>
-              <div className={cn('text-2xl font-bold', getScoreColor())}>
-                {category.score}
-              </div>
-              <div className='aucctus-text-xs aucctus-text-tertiary'>
-                out of {category.maxScore}
-              </div>
-            </div>
-            <ChevronDown
-              className={cn(
-                'aucctus-stroke-tertiary h-5 w-5 transition-transform duration-200',
-                { 'rotate-180': isExpanded },
-              )}
-            />
-          </div>
-        </div>
-      </button>
-
-      {isExpanded && (
-        <div className='aucctus-bg-primary px-5 pb-5 pt-2'>
-          {category.questions.map((question) => {
-            const score =
-              questionScores[question.questionUuid] || question.score || 0;
-
-            return (
-              <div
-                key={question.questionUuid}
-                className='aucctus-border-secondary border-b py-4 last:border-b-0'
-              >
-                <div className='flex items-start justify-between gap-4'>
-                  <p className='aucctus-text-sm-semibold aucctus-text-primary flex-1'>
-                    {question.questionText}
-                  </p>
-                  <div className='flex items-center gap-1'>
-                    {[1, 2, 3, 4, 5].map((value) => {
-                      const isThisUpdating =
-                        isUpdating &&
-                        updatingQuestionId === question.questionUuid;
-                      return (
-                        <button
-                          key={value}
-                          onClick={() =>
-                            onScoreChange(question.questionUuid, value)
-                          }
-                          disabled={isUpdating}
-                          className={cn(
-                            'h-8 w-8 rounded-md text-sm font-medium transition-all',
-                            score === value
-                              ? 'bg-[#5C3D2E] text-white'
-                              : 'aucctus-bg-primary aucctus-border-secondary aucctus-text-tertiary hover:aucctus-text-primary border',
-                            isUpdating && 'cursor-not-allowed opacity-50',
-                            isThisUpdating &&
-                              score === value &&
-                              'animate-pulse',
-                          )}
-                        >
-                          {value}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-                <div className='mt-2 flex items-center gap-2'>
-                  <span
-                    className={cn(
-                      'rounded-full border px-3 py-1 text-xs font-medium',
-                      question.importance === 'high'
-                        ? 'border-emerald-300 bg-emerald-50 text-emerald-700 dark:border-emerald-600 dark:bg-emerald-950 dark:text-emerald-400'
-                        : question.importance === 'medium'
-                          ? 'border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-600 dark:bg-amber-950 dark:text-amber-400'
-                          : 'border-slate-300 bg-slate-50 text-slate-600 dark:border-slate-600 dark:bg-slate-950 dark:text-slate-400',
-                    )}
-                  >
-                    {question.importance.charAt(0).toUpperCase() +
-                      question.importance.slice(1)}{' '}
-                    Priority
-                  </span>
-                  {question.reasoning && (
-                    <ComponentTooltip
-                      tip={
-                        <div className='aucctus-bg-primary aucctus-border-secondary max-w-xs rounded-lg border px-3 py-2 shadow-lg'>
-                          <p className='aucctus-text-xs aucctus-text-primary leading-relaxed'>
-                            {question.reasoning}
-                          </p>
-                        </div>
-                      }
-                      preferredPosition='above'
-                    >
-                      <HelpCircle className='aucctus-stroke-secondary hover:aucctus-stroke-primary h-4 w-4 cursor-help transition-colors' />
-                    </ComponentTooltip>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
 };
 
 /**
@@ -812,13 +628,15 @@ export const ScoreBreakdownSheet: React.FC<ScoreBreakdownSheetProps> = ({
                 {categoryScores.length > 0 ? (
                   <div className='space-y-3'>
                     {categoryScores.map((category) => (
-                      <ScoringCategorySection
+                      <ScoringCategoryCard
                         key={category.categoryUuid}
                         category={category}
+                        variant='editable'
                         questionScores={questionScores}
                         onScoreChange={handleScoreChange}
                         isUpdating={updateScoreMutation.isLoading}
                         updatingQuestionId={updatingQuestionId}
+                        showQuestionReasoning={true}
                       />
                     ))}
                   </div>

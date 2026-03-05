@@ -325,8 +325,7 @@ export class IdeaSubmissionsApi extends ApiService {
   }
 
   /**
-   * Delete a submission link.
-   * Note: This will NOT delete associated submissions.
+   * Delete a submission link and all associated submissions (cascade).
    * @param linkUuid - The UUID of the submission link
    */
   deleteSubmissionLink(linkUuid: string) {
