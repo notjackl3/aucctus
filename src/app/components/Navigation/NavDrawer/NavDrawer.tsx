@@ -61,7 +61,7 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
           },
         )}
         onClick={() => {
-          navigate(AppPath.Home);
+          navigate(AppPath.ConceptBank);
         }}
       >
         <img alt='Aucctus' className='h-12 w-12' src={NavLogo} />
@@ -75,13 +75,6 @@ const NavDrawer = ({ onExpandCollapse }: NavDrawerProps) => {
         />
       </div>
       <div className='mt-2 flex flex-1 flex-col gap-6 px-4'>
-        <NavButton
-          to={AppPath.Home}
-          title='Dashboard'
-          icon='home'
-          collapsed={collapsed}
-        />
-
         <NavButton
           to={
             account?.hasConcepts || account?.hasSeeds

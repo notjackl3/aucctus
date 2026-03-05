@@ -5,7 +5,7 @@ import Layout from '@routes/layouts';
 import { AppPath } from '@routes/routes';
 import { isAucctusAdmin } from '@libs/utils/account';
 import useStore from '@stores/store';
-import { Route } from 'react-router-dom';
+import { Navigate, Route } from 'react-router-dom';
 import { useMemo } from 'react';
 
 const usePrivateRoutes = () => {
@@ -16,7 +16,8 @@ const usePrivateRoutes = () => {
 
   return (
     <Route element={<Layout.Private />}>
-      <Route index path={AppPath.Home} element={<Page.Dashboard />} />
+      {/* Redirect root to Concept Bank */}
+      <Route index element={<Navigate to={AppPath.ConceptBank} replace />} />
       <Route
         path={AppPath.IncubateConcept}
         element={<Page.Concept.Incubate />}
