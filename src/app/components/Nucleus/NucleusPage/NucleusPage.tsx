@@ -570,11 +570,11 @@ const NucleusPage: React.FC = () => {
   }
 
   return (
-    <div className='aucctus-bg-primary min-h-screen p-8'>
+    <div className='aucctus-bg-primary min-h-screen'>
       <style>{animationStyles}</style>
       <div className='aucctus-bg-primary min-h-screen'>
         {/* Hero Header Section - 280px height per design spec */}
-        <div className='relative h-[280px] overflow-hidden rounded-xl'>
+        <div className='relative h-[280px] overflow-hidden'>
           <NucleusHeroBackground
             videoUrl={nucleusReport.headquartersVideoUrl}
           />
@@ -638,64 +638,68 @@ const NucleusPage: React.FC = () => {
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'company-context' && (
-          <div data-tab='company-context'>
-            <CompanyContextTab
-              allSections={allSections}
-              reportSections={reportSections}
-              expandedCategory={expandedCategory}
-              setExpandedCategory={handleExpandedCategoryChange}
-              getCategoryStateInfo={getCategoryStateInfo}
-              getStateConfig={getStateConfig}
-              sectionTypeDisplayNames={sectionTypeDisplayNames}
-              setCategoryStatusOverrides={setCategoryStatusOverrides}
-              activeDropdown={activeDropdown}
-              setActiveDropdown={setActiveDropdown}
-              questionStatusOverrides={questionStatusOverrides}
-              handleQuestionStatusChange={handleQuestionStatusChange}
-              handleSectionStatusChange={handleSectionStatusChange}
-              getQuestionState={getQuestionState}
-              reportUuid={nucleusReport?.uuid || ''}
-              overviewStatus={nucleusReport?.overviewStatus}
-              isAdmin={isAdmin}
-              isAucctusAdmin={showLivingPersonas}
-              onNavigateToCategory={(categoryId) => {
-                // Switch to intelligence section and expand the category
-                const newParams = new URLSearchParams(searchParams);
-                newParams.delete('section'); // intelligence is the default
-                setSearchParams(newParams, { replace: true });
-                setExpandedCategory(categoryId);
-                requestAnimationFrame(() => {
+        <div className='p-8'>
+          {activeTab === 'company-context' && (
+            <div data-tab='company-context'>
+              <CompanyContextTab
+                allSections={allSections}
+                reportSections={reportSections}
+                expandedCategory={expandedCategory}
+                setExpandedCategory={handleExpandedCategoryChange}
+                getCategoryStateInfo={getCategoryStateInfo}
+                getStateConfig={getStateConfig}
+                sectionTypeDisplayNames={sectionTypeDisplayNames}
+                setCategoryStatusOverrides={setCategoryStatusOverrides}
+                activeDropdown={activeDropdown}
+                setActiveDropdown={setActiveDropdown}
+                questionStatusOverrides={questionStatusOverrides}
+                handleQuestionStatusChange={handleQuestionStatusChange}
+                handleSectionStatusChange={handleSectionStatusChange}
+                getQuestionState={getQuestionState}
+                reportUuid={nucleusReport?.uuid || ''}
+                overviewStatus={nucleusReport?.overviewStatus}
+                isAdmin={isAdmin}
+                isAucctusAdmin={showLivingPersonas}
+                onNavigateToCategory={(categoryId) => {
+                  // Switch to intelligence section and expand the category
+                  const newParams = new URLSearchParams(searchParams);
+                  newParams.delete('section'); // intelligence is the default
+                  setSearchParams(newParams, { replace: true });
+                  setExpandedCategory(categoryId);
                   requestAnimationFrame(() => {
-                    const categoryElement = document.getElementById(
-                      `category-${categoryId}`,
-                    );
-                    if (categoryElement) {
-                      categoryElement.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start',
+                    requestAnimationFrame(() => {
+                      requestAnimationFrame(() => {
+                        const categoryElement = document.getElementById(
+                          `category-${categoryId}`,
+                        );
+                        if (categoryElement) {
+                          categoryElement.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start',
+                          });
+                        }
                       });
-                    }
+                    });
                   });
-                });
-              }}
-            />
-          </div>
-        )}
+                }}
+              />
+            </div>
+          )}
 
-        {/* Living Personas Tab */}
-        {showLivingPersonas && activeTab === 'living-personas' && (
-          <div data-tab='living-personas'>
-            <LivingPersonasTab />
-          </div>
-        )}
+          {/* Living Personas Tab */}
+          {showLivingPersonas && activeTab === 'living-personas' && (
+            <div data-tab='living-personas'>
+              <LivingPersonasTab />
+            </div>
+          )}
 
-        {/* Decision Making Tab */}
-        {activeTab === 'decision-making' && (
-          <div data-tab='decision-making'>
-            <DecisionMakingTab />
-          </div>
-        )}
+          {/* Decision Making Tab */}
+          {activeTab === 'decision-making' && (
+            <div data-tab='decision-making'>
+              <DecisionMakingTab />
+            </div>
+          )}
+        </div>
 
         {/* Loading mask for question and section status updates */}
         <LoadingMask
