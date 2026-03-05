@@ -27,6 +27,7 @@ import { PropertyApi } from './properties';
 import { SeedApi } from './seed';
 import { TestingApi } from './testing';
 import { TrendsAndDriversV3Api } from './trendsAndDrivers';
+import { ValueDiscoveryApi } from './valueDiscovery';
 import { WatchtowerApi } from './watchtower';
 
 export interface IApiConfig {
@@ -63,6 +64,7 @@ export class Api {
   property!: PropertyApi;
   watchtower!: WatchtowerApi;
   competitorAssessment!: CompetitorAssessmentApi;
+  valueDiscovery!: ValueDiscoveryApi;
   dynamicComponent!: DynamicComponentApi;
   overseer!: OverseerApi;
   persona!: PersonaApi;
@@ -101,6 +103,7 @@ export class Api {
       { key: 'property', class: PropertyApi },
       { key: 'watchtower', class: WatchtowerApi },
       { key: 'competitorAssessment', class: CompetitorAssessmentApi },
+      { key: 'valueDiscovery', class: ValueDiscoveryApi },
       { key: 'dynamicComponent', class: DynamicComponentApi },
       { key: 'overseer', class: OverseerApi },
       { key: 'persona', class: PersonaApi },

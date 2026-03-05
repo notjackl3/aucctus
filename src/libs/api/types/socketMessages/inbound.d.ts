@@ -1120,6 +1120,53 @@ export interface IWatchtowerConceptImpactErrorMessage extends BaseSocketEvent {
 }
 
 // ==========================================
+// Value Discovery Briefing Messages
+// ==========================================
+
+export interface IValueDiscoveryBriefingProgressMessage
+  extends BaseSocketEvent {
+  type: 'value_discovery.briefing.progress.account';
+  accountUuid: string;
+  stage: string;
+  progress: number;
+  message: string;
+}
+
+export interface IValueDiscoveryBriefingCompletedMessage
+  extends BaseSocketEvent {
+  type: 'value_discovery.briefing.completed.account';
+  accountUuid: string;
+  assessmentUuid: string;
+  message: string;
+}
+
+export interface IValueDiscoveryBriefingErrorMessage extends BaseSocketEvent {
+  type: 'value_discovery.briefing.error.account';
+  accountUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
+export interface IValueDiscoveryQuestionReadyMessage extends BaseSocketEvent {
+  type: 'value_discovery.question.ready.account';
+  accountUuid: string;
+  assessmentUuid: string;
+  questionNumber: number;
+  isComplete: boolean;
+  questionText?: string;
+  questionType?: string;
+  questionOptions?: { label: string; value: string }[];
+}
+
+export interface IValueDiscoveryQuestionErrorMessage extends BaseSocketEvent {
+  type: 'value_discovery.question.error.account';
+  accountUuid: string;
+  assessmentUuid: string;
+  message: string;
+}
+
+// ==========================================
 // Competitor Assessment Scan Messages
 // ==========================================
 
@@ -1362,6 +1409,11 @@ export type InboundSocketEvent<C = {}> =
   | ICompetitorAssessmentScanProgressMessage
   | ICompetitorAssessmentScanCompletedMessage
   | ICompetitorAssessmentScanErrorMessage
+  | IValueDiscoveryBriefingProgressMessage
+  | IValueDiscoveryBriefingCompletedMessage
+  | IValueDiscoveryBriefingErrorMessage
+  | IValueDiscoveryQuestionReadyMessage
+  | IValueDiscoveryQuestionErrorMessage
   | IIdeaSubmissionsUploadStartedMessage
   | IIdeaSubmissionsUploadProgressMessage
   | IIdeaSubmissionsUploadCompletedMessage

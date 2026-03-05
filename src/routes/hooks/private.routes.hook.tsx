@@ -78,6 +78,14 @@ const usePrivateRoutes = () => {
         <Route path={AppPath.Watchtower} element={<Page.WatchtowerPage />} />
       )}
 
+      {/* Value Discovery */}
+      {isAdmin && (
+        <Route
+          path={AppPath.ValueDiscovery}
+          element={<Page.ValueDiscoveryPage />}
+        />
+      )}
+
       {/* Competitor Assessment Routes - disabled, feature dormant */}
       {/* {isAdmin && (
         <Route

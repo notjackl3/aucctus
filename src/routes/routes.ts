@@ -44,6 +44,10 @@ export enum AppPath {
   /* Watchtower */
   Watchtower = '/watchtower',
 
+  /* Value Discovery */
+  ValueDiscovery = '/value-discovery',
+  Discover = '/discover',
+
   /* Competitor Assessment */
   CompetitorAssessment = '/competitor-assessment',
 
@@ -89,4 +93,5 @@ export const UNAUTH_ROUTES = [
   AppPath.ForgotPassword,
   AppPath.ResetPassword,
   AppPath.SubmissionLinkPublicForm,
+  AppPath.Discover,
 ];

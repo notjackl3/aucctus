@@ -915,6 +915,52 @@ export class Endpoints {
     return `/api/v1/watchtower/signals/${signalUuid}/tracking`;
   }
 
+  // Value Discovery Endpoints
+  static valueDiscoveryStart = '/api/v1/value-discovery/start';
+
+  static valueDiscoveryAnswer(assessmentUuid: string) {
+    return `/api/v1/value-discovery/${assessmentUuid}/answer`;
+  }
+
+  static valueDiscoveryLead(assessmentUuid: string) {
+    return `/api/v1/value-discovery/${assessmentUuid}/lead`;
+  }
+
+  static valueDiscoveryBriefing(assessmentUuid: string) {
+    return `/api/v1/value-discovery/${assessmentUuid}/briefing`;
+  }
+
+  static valueDiscoveryBriefingExport(assessmentUuid: string) {
+    return `/api/v1/value-discovery/${assessmentUuid}/briefing/export`;
+  }
+
+  static valueDiscoveryAssessment(assessmentUuid: string) {
+    return `/api/v1/value-discovery/${assessmentUuid}`;
+  }
+
+  // Value Discovery Public Endpoints (no auth required)
+  static valueDiscoveryPublicStart = '/api/value-discovery/public/start';
+
+  static valueDiscoveryPublicAnswer(assessmentUuid: string) {
+    return `/api/value-discovery/public/${assessmentUuid}/answer`;
+  }
+
+  static valueDiscoveryPublicQuestionStatus(assessmentUuid: string) {
+    return `/api/value-discovery/public/${assessmentUuid}/question-status`;
+  }
+
+  static valueDiscoveryPublicLead(assessmentUuid: string) {
+    return `/api/value-discovery/public/${assessmentUuid}/lead`;
+  }
+
+  static valueDiscoveryPublicBriefing(assessmentUuid: string) {
+    return `/api/value-discovery/public/${assessmentUuid}/briefing`;
+  }
+
+  static valueDiscoveryPublicBriefingExport(assessmentUuid: string) {
+    return `/api/value-discovery/public/${assessmentUuid}/briefing/export`;
+  }
+
   // Competitor Assessment Endpoints
   static competitorAssessmentDashboard =
     '/api/v1/competitor-assessment/dashboard';

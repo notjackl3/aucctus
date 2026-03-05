@@ -14,6 +14,11 @@ const SubmissionLinkPublicForm = React.lazy(
   () => import('@pages/IdeaSubmissions/SubmissionLinkPublicForm'),
 );
 
+// Lazy load the public Value Discovery page (completely unauthenticated)
+const PublicValueDiscoveryPage = React.lazy(
+  () => import('@pages/ValueDiscovery/PublicValueDiscoveryPage'),
+);
+
 function App() {
   // Initialize global debug mode listener
   useDebugModeListener();
@@ -79,6 +84,10 @@ function App() {
           <Route
             path={AppPath.SubmissionLinkPublicForm}
             element={<SubmissionLinkPublicForm />}
+          />
+          <Route
+            path={AppPath.Discover}
+            element={<PublicValueDiscoveryPage />}
           />
 
           {/* Protected Routes */}

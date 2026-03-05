@@ -1049,6 +1049,7 @@ export function loadConversation(
               edits: parsed.edits ?? [],
             },
             timestamp: msg.createdAt,
+            applied: msg.metadata?.applied === true,
           } as IOverseerEditSuggestionMessage;
         }
 
@@ -1079,14 +1080,30 @@ export function loadConversation(
       });
 
       state.suggestedQuestions = [];
-      state.editSuggestions = null;
-      state.highlightedSectionId = null;
       state.isThinking = false;
       state.thinkingMessage = undefined;
       state.currentError = undefined;
       state.hasError = false;
       state.toolActivitySteps = [];
       state.showHistory = false;
+
+      // If the last message is an unapplied edit suggestion, restore it as a
+      // live actionable carousel instead of a read-only historical snapshot.
+      // This handles the case where the user closed the chat before acting on
+      // proposed edits and later re-opened the conversation from history.
+      const lastMsg = state.messages[state.messages.length - 1];
+      if (
+        lastMsg?.role === 'edit_suggestion' &&
+        !(lastMsg as IOverseerEditSuggestionMessage).applied
+      ) {
+        const editMsg = state.messages.pop() as IOverseerEditSuggestionMessage;
+        state.editSuggestions = editMsg.editSuggestions;
+        state.highlightedSectionId =
+          editMsg.editSuggestions.edits[0]?.section ?? null;
+      } else {
+        state.editSuggestions = null;
+        state.highlightedSectionId = null;
+      }
     }),
   );
 }

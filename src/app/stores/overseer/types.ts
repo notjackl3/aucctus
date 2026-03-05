@@ -47,12 +47,15 @@ export interface IOverseerAssistantMessage {
 
 /**
  * Historical edit suggestion message (read-only snapshot)
+ * When `applied` is false/undefined and this is the last message,
+ * it is restored as a live actionable carousel instead of read-only.
  */
 export interface IOverseerEditSuggestionMessage {
   uuid: string;
   role: 'edit_suggestion';
   editSuggestions: IOverseerEditSuggestions;
   timestamp: string;
+  applied?: boolean;
 }
 
 export type OverseerMessage =
