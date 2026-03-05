@@ -89,9 +89,12 @@ export interface NucleusReportSection {
   updatedAt: string;
 }
 
+export type OverviewStatus = 'idle' | 'generating' | 'completed' | 'failed';
+
 export interface NucleusReport {
   uuid: string;
   processingStatus: ProcessingStatus;
+  overviewStatus?: OverviewStatus;
   headquartersVideoUrl?: string;
   createdAt: string;
   updatedAt: string;

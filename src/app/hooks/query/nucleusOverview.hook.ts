@@ -127,6 +127,10 @@ export const useGenerateNucleusOverview = (reportUuid: string | undefined) => {
       return await api.nucleus.generateOverview(reportUuid!);
     },
     onSuccess: () => {
+      // Invalidate the report query so overviewStatus updates to 'generating' promptly
+      queryClient.invalidateQueries({
+        queryKey: [AucctusQueryKeys.nucleusReportLatest],
+      });
       toast.success(
         'Overview Generation Started',
         'AI is generating your strategic overview.',

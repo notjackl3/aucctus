@@ -12,6 +12,7 @@ import { ComponentTooltip, GlassSurface } from '@components';
 import type {
   NucleusReportQuestion,
   NucleusReportSection,
+  OverviewStatus,
   SectionType,
 } from '@libs/api/types';
 import { cn } from '@libs/utils/react';
@@ -107,6 +108,7 @@ export interface CompanyContextTabProps {
   ) => void;
   getQuestionState: (question: NucleusReportQuestion) => QuestionState;
   reportUuid: string;
+  overviewStatus?: OverviewStatus;
   isAdmin: boolean;
   isAucctusAdmin: boolean;
   onNavigateToCategory: (categoryId: string) => void;
@@ -127,6 +129,7 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
   handleSectionStatusChange,
   getQuestionState,
   reportUuid,
+  overviewStatus,
   isAdmin,
   isAucctusAdmin: isAucctusAdminProp,
   onNavigateToCategory,
@@ -352,7 +355,10 @@ const CompanyContextTab: React.FC<CompanyContextTabProps> = ({
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.25 }}
             >
-              <OverviewTab reportUuid={reportUuid} />
+              <OverviewTab
+                reportUuid={reportUuid}
+                overviewStatus={overviewStatus}
+              />
             </motion.div>
           )}
 

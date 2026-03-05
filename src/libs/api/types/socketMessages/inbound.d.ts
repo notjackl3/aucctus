@@ -750,6 +750,33 @@ export interface INucleusReportProgressMessage extends BaseSocketEvent {
   }>;
 }
 
+// Nucleus Overview Generation Event Messages
+export interface INucleusOverviewProgressMessage extends BaseSocketEvent {
+  type: 'nucleus_overview.progress.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  stage: 'started' | 'generating' | 'saving' | 'completed';
+  progress: number;
+  message: string;
+}
+
+export interface INucleusOverviewCompletedMessage extends BaseSocketEvent {
+  type: 'nucleus_overview.completed.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  widgetsCreated: number;
+  message: string;
+}
+
+export interface INucleusOverviewErrorMessage extends BaseSocketEvent {
+  type: 'nucleus_overview.error.account';
+  accountUuid: string;
+  nucleusReportUuid: string;
+  error: string;
+  message: string;
+  details?: string;
+}
+
 // Magic Share Event Messages
 export interface IMagicShareProgressMessage extends BaseSocketEvent {
   type: 'magic_share.progress.account';
@@ -1293,6 +1320,9 @@ export type InboundSocketEvent<C = {}> =
   | INucleusAnswerCompletedMessage
   | INucleusAnswerErrorMessage
   | INucleusReportProgressMessage
+  | INucleusOverviewProgressMessage
+  | INucleusOverviewCompletedMessage
+  | INucleusOverviewErrorMessage
   | IMagicShareProgressMessage
   | IMagicShareCompletedMessage
   | IMagicShareErrorMessage

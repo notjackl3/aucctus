@@ -656,6 +656,7 @@ const NucleusPage: React.FC = () => {
               handleSectionStatusChange={handleSectionStatusChange}
               getQuestionState={getQuestionState}
               reportUuid={nucleusReport?.uuid || ''}
+              overviewStatus={nucleusReport?.overviewStatus}
               isAdmin={isAdmin}
               isAucctusAdmin={showLivingPersonas}
               onNavigateToCategory={(categoryId) => {

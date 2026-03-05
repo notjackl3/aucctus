@@ -8,6 +8,9 @@ import type {
   INucleusUploadErrorMessage,
   INucleusAnswerCompletedMessage,
   INucleusAnswerErrorMessage,
+  INucleusOverviewCompletedMessage,
+  INucleusOverviewErrorMessage,
+  INucleusOverviewProgressMessage,
 } from '@libs/api/types';
 import type { DocumentWithUsage } from '@libs/api/types/nucleus';
 
@@ -102,4 +105,52 @@ export const useNucleusHandler = (
       return;
     },
   );
+
+  // Overview progress (no-op — OverviewTab polls via overviewStatus on the report)
+  useSocketEvent<
+    'nucleus_overview.progress.account',
+    INucleusOverviewProgressMessage
+  >('nucleus_overview.progress.account', () => {
+    return;
+  });
+
+  // Overview completed — invalidate widgets query so OverviewTab auto-fetches new data
+  useSocketEvent<
+    'nucleus_overview.completed.account',
+    INucleusOverviewCompletedMessage
+  >('nucleus_overview.completed.account', (message) => {
+    const messageKey = `nucleus-overview-completed-${message.nucleusReportUuid}`;
+    if (preventDuplicate(messageKey)) return;
+
+    // Invalidate overview widgets to fetch the newly generated widgets
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.nucleusOverviewWidgets],
+    });
+
+    // Invalidate nucleus report to update overviewStatus from 'generating' → 'completed'
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.nucleusReportLatest],
+    });
+
+    toast.deferred.completed('Strategic Overview Generated');
+  });
+
+  // Overview error — update report status and notify user
+  useSocketEvent<
+    'nucleus_overview.error.account',
+    INucleusOverviewErrorMessage
+  >('nucleus_overview.error.account', (message) => {
+    const messageKey = `nucleus-overview-error-${message.nucleusReportUuid}`;
+    if (preventDuplicate(messageKey)) return;
+
+    // Invalidate nucleus report to update overviewStatus from 'generating' → 'failed'
+    queryClient.invalidateQueries({
+      queryKey: [AucctusQueryKeys.nucleusReportLatest],
+    });
+
+    toast.deferred.error(
+      'Overview Generation Failed',
+      message.message || 'Please try generating the overview again',
+    );
+  });
 };

@@ -540,7 +540,12 @@ const PersonaChatInput = React.forwardRef<
             )}
             aria-label='Send message'
           >
-            <ArrowUp size={16} className='aucctus-stroke-on-brand' />
+            <ArrowUp
+              size={16}
+              className={
+                disabled || isEmpty ? 'aucctus-stroke-on-brand' : 'text-white'
+              }
+            />
           </button>
         </div>
       </div>

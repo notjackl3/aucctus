@@ -29,7 +29,14 @@ import {
   clearOverviewWidgetPreferences,
 } from '@libs/utils/overview-widget-preferences';
 import { motion, AnimatePresence } from 'framer-motion';
-import { LayoutDashboard, Plus, Settings, Sparkles } from 'lucide-react';
+import type { OverviewStatus } from '@libs/api/types/nucleus';
+import {
+  LayoutDashboard,
+  Loader2,
+  Plus,
+  Settings,
+  Sparkles,
+} from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import useStore from '@stores/store';
 
@@ -43,6 +50,7 @@ import type { OverviewWidgetConfig } from './OverviewWidgetGrid';
 
 interface OverviewTabProps {
   reportUuid: string;
+  overviewStatus?: OverviewStatus;
 }
 
 /** Merge local config with API widget data: prune deleted, append new. */
@@ -99,7 +107,30 @@ const OverviewEmptyState: React.FC<{
   </motion.div>
 );
 
-const OverviewTab: React.FC<OverviewTabProps> = ({ reportUuid }) => {
+const OverviewGeneratingState: React.FC = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.4 }}
+    className='flex flex-col items-center justify-center py-20'
+  >
+    <GlassSurface className='max-w-md p-8 text-center' variant='default'>
+      <Loader2 className='text-primary/40 mx-auto mb-4 h-10 w-10 animate-spin' />
+      <h3 className='aucctus-text-primary mb-2 text-lg font-semibold'>
+        Generating Strategic Overview
+      </h3>
+      <p className='aucctus-text-secondary text-sm'>
+        AI is synthesizing your Nucleus intelligence into actionable strategic
+        widgets. This typically takes 1-2 minutes.
+      </p>
+    </GlassSurface>
+  </motion.div>
+);
+
+const OverviewTab: React.FC<OverviewTabProps> = ({
+  reportUuid,
+  overviewStatus,
+}) => {
   const { widgets, hasWidgets, isLoading, isFetching } =
     useNucleusOverviewWidgets(reportUuid);
   const { branding } = useAccountBranding();
@@ -216,7 +247,20 @@ const OverviewTab: React.FC<OverviewTabProps> = ({ reportUuid }) => {
     );
   }
 
+  // Show generating state when overview is in progress:
+  // - overviewStatus from the report API (covers auto-dispatch after Phase 3)
+  // - generateMutation.isLoading (during the API call itself)
+  // - generateMutation.isSuccess (bridges the gap after 202 returns but before overviewStatus updates)
+  const isGenerating =
+    overviewStatus === 'generating' ||
+    generateMutation.isLoading ||
+    generateMutation.isSuccess;
+
   if (!hasWidgets) {
+    if (isGenerating) {
+      return <OverviewGeneratingState />;
+    }
+
     return (
       <OverviewEmptyState
         onGenerate={() => generateMutation.mutate()}
